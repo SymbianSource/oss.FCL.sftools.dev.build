@@ -1,0 +1,60 @@
+/*
+* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description: 
+*
+*/
+
+
+/**
+@file
+
+@SYMPurpose Tool for building ROMs
+*/
+
+PRJ_EXPORTS
+
+../tools/buildrom.pl		/epoc32/tools/buildrom.pl
+../tools/buildrom.pm		/epoc32/tools/buildrom.pm
+../tools/buildrom.cmd		/epoc32/tools/buildrom.cmd
+../tools/cdfparser.pm		/epoc32/tools/cdfparser.pm
+../tools/datadriveimage.pm	/epoc32/tools/datadriveimage.pm
+../tools/Dep_Lister.pm		/epoc32/tools/dep_lister.pm
+../tools/externaltools.pm	/epoc32/tools/externaltools.pm
+../tools/featureparser.pm	/epoc32/tools/featureparser.pm
+../tools/GenericParser.pm	/epoc32/tools/genericparser.pm
+../tools/ImageContentHandler.pm	/epoc32/tools/imagecontenthandler.pm
+../tools/spitool.pm		/epoc32/tools/spitool.pm
+../tools/spitool.pl		/epoc32/tools/spitool.pl
+../tools/CONVERT.PL		/epoc32/rom/tools/
+../tools/CODESIZE.PL		/epoc32/rom/tools/
+../tools/configpaging.pm	/epoc32/tools/configpaging.pm
+../tools/efficient_rom_paging.pm /epoc32/tools/efficient_rom_paging.pm
+
+//
+// Files for Enhanced Feature Manager Support
+//
+../tools/featuresutil.pm	/epoc32/tools/featuresutil.pm
+../tools/featureregistry.pm	/epoc32/tools/featureregistry.pm
+../tools/featuremanager.pm	/epoc32/tools/featuremanager.pm
+../tools/featurefile.pm		/epoc32/tools/featurefile.pm
+../tools/featurecfg.pm		/epoc32/tools/featurecfg.pm
+../tools/featuresdat.pm		/epoc32/tools/featuresdat.pm
+../tools/features.cmd		/epoc32/tools/features.cmd
+../tools/features.pl		/epoc32/tools/features.pl
+../tools/features.pm		/epoc32/tools/features.pm
+
+// backwards compatibility for buildrom commandlines...
+
+../tools/buildrom.cmd		/epoc32/rom/tools/
+

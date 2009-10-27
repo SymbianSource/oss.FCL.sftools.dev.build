@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<build xmlns="http://symbian.com/xml/build" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symbian.com/xml/build ../../schema/build/2_0.xsd">
+	<!-- Extension interfaces : replacements for Template Extension Makefiles -->
+
+	<interface name="Symbian.UserFLM" extends="base.flm" abstract="true">
+		<param name='EPOCROOT'/>
+		<param name='PRODUCT_INCLUDE'/>
+		<param name='EPOCBLD'/>
+		<param name='TO_BLDINF'/>
+		<param name='EXTENSION_ROOT'/>
+		<param name='PLATFORM'/>
+		<param name='PLATFORM_PATH'/>
+		<param name='CFG'/>
+		<param name='CFG_PATH'/>
+		<param name='PERL'/>
+	</interface>
+
+	<interface name="Symbian.KernelFLM" extends="Symbian.UserFLM" abstract="true">
+		<param name='CC'/>
+		<param name='LD'/>
+		<param name='ASM'/>
+		<param name='FROMELF'/>		
+	</interface>
+	
+	<interface name="tools.stlport" extends="Symbian.UserFLM" flm="tools/stlport.flm">
+		<param name="STLPORT_VERSION"/>
+		<param name="STL_REL_LIB_NAME"/>
+		<param name="STL_DEB_LIB_NAME"/>
+		<param name="SOURCE_ARCHIVE"/>
+	</interface>
+
+	<interface name="converged-comms.createcommdbs" extends="Symbian.UserFLM" flm="converged-comms/createcommdbs.flm">
+		<param name="SRCDIR"/>
+	</interface>
+	<interface name="application-protocols.buildstubsis" extends="Symbian.UserFLM" flm="tools/buildstubsis.flm">
+		<param name="SISNAME"/>
+		<param name="SRCDIR"/>
+	</interface>
+	<!-- -->
+	<interface name="app-services.buildstubsis" extends="application-protocols.buildstubsis" flm="tools/buildstubsis.flm">
+	</interface>
+
+	<interface name="converged-comms.installdefaultcommdb" extends="Symbian.UserFLM" flm="converged-comms/installdefaultcommdb.flm">
+
+	</interface>
+
+</build>

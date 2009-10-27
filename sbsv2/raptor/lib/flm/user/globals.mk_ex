@@ -1,0 +1,21 @@
+# Copyright (c) Symbian Software Ltd 2008-2009.
+#
+# Description:
+# This is an example file.
+# If it exists, the file globals.mk in this directory is automatically
+# included by $(SBS_HOME)/lib/flm/globals.mk
+# This allows end-users to "drop in" a file which adds to the default
+# behaviour (or overrides it) rather than editing the shipped .mk file.
+# globals.mk contains things which require one instance per build.
+# For example, macros and variables, dependencies and targets which are
+# truly global - independent of the epoc32 tree location.
+#
+
+
+# example resource dependency variables
+
+mycore_DEPENDS:=eikcore.rsg eikcoctl.rsg
+mymisc_DEPENDS:=eikmisc.rsg
+
+
+# end of example file

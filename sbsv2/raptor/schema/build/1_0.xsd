@@ -1,0 +1,87 @@
+<?xml version="1.0"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://symbian.com/xml/build" xmlns="http://symbian.com/xml/build" elementFormDefault="qualified">
+
+	<xsd:annotation>
+		<xsd:documentation xml:lang="en">
+			Copyright (c) 2008-2009 Nokia Corporation and/or its subsidiary(-ies).
+			All rights reserved.
+			This component and the accompanying materials are made available
+			under the terms of the License "Eclipse Public License v1.0"
+			which accompanies this distribution, and is available
+			at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+			Initial Contributors:
+			Nokia Corporation - initial contribution.
+
+			Contributors:
+
+			Description:
+
+		</xsd:documentation>
+	</xsd:annotation>
+
+	<xsd:element name="build">
+		<xsd:complexType>
+  		<xsd:sequence>
+    		<xsd:element ref="config" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element ref="var" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="config">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="varRef" minOccurs="0" maxOccurs="unbounded">
+					<xsd:complexType>
+						<xsd:attribute name="ref" type="xsd:string"/>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element ref="var" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element name="configRef" minOccurs="0" maxOccurs="unbounded">
+					<xsd:complexType>
+						<xsd:attribute name="ref" type="xsd:string"/>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element ref="config" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="name" type="xsd:string"/>
+			<xsd:attribute name="abstract" type="xsd:boolean"/>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:element name="var">
+		<xsd:complexType>
+			<xsd:sequence maxOccurs="unbounded">
+		  	<xsd:element name="env" minOccurs="0" maxOccurs="unbounded">
+	  			<xsd:complexType>
+		      	<xsd:attribute name="name" type="xsd:string"/>
+		      	<xsd:attribute name="default" type="xsd:string"/>
+		      	<xsd:attribute name="type" type="xsd:string"/>
+						<xsd:attribute name="versionCommand" type="xsd:string"/>
+						<xsd:attribute name="versionResult" type="xsd:string"/>
+		  		</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="set" minOccurs="0" maxOccurs="unbounded">
+					<xsd:complexType>
+						<xsd:attribute name="name" type="xsd:string"/>
+						<xsd:attribute name="value" type="xsd:string"/>
+						<xsd:attribute name="type" type="xsd:string"/>
+						<xsd:attribute name="versionCommand" type="xsd:string"/>
+						<xsd:attribute name="versionResult" type="xsd:string"/>
+					</xsd:complexType>
+				</xsd:element>
+				<xsd:element name="append" minOccurs="0" maxOccurs="unbounded">
+					<xsd:complexType>
+						<xsd:attribute name="name" type="xsd:string"/>
+						<xsd:attribute name="value" type="xsd:string"/>
+						<xsd:attribute name="separator" type="xsd:string"/>
+					</xsd:complexType>
+				</xsd:element>
+			</xsd:sequence>
+			<xsd:attribute name="name" type="xsd:string"/>
+		</xsd:complexType>
+	</xsd:element>
+
+</xsd:schema>
+

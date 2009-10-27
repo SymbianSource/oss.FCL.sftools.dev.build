@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<build xmlns="http://symbian.com/xml/build" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symbian.com/xml/build ../../schema/build/2_0.xsd">
+	<!-- interfaces which do not correspond to target types:
+         they are added automatically to the build specification for a given
+         build configuration if listed in its INTERFACE.config variable -->
+
+	<interface name="Symbian.config.default" flm="config/default.flm">
+		<param name='EPOCROOT'/>
+		<param name='ELF2E32' default=''/>
+		<param name='WHATLOG' default=''/>
+	</interface>
+
+</build>

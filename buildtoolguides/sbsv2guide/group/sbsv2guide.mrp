@@ -1,0 +1,9 @@
+component	dev_build_buildtoolguides_sbsv2guide
+
+source /src/tools/dev/build/buildtoolguides/sbsv2guide/com.nokia.sysbuild_0.1.jar
+source /src/tools/dev/build/buildtoolguides/sbsv2guide/group/sbsv2guide.mrp
+source /src/tools/dev/build/buildtoolguides/sbsv2guide/group/bld.inf
+
+exports /src/tools/dev/build/buildtoolguides/sbsv2guide/group
+
+notes_source	\component_defs\release.src

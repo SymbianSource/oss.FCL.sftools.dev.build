@@ -1,0 +1,688 @@
+# Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+#
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+#
+# Contributors:
+#
+# Description:
+# WINSCW EXE/DLL/IMPLIB/LIB Function Like Makefile (FLM)
+# Knows how to build all possible executables for the WINSCW emulator build
+#
+#
+
+# passed in values, stripped of whitespace
+COPY_FOR_STATIC_LINKAGE:=$(strip $(COPY_FOR_STATIC_LINKAGE))
+DEFFILE:=$(strip $(DEFFILE))
+DEFFILEKEYWORD:=$(strip $(DEFFILEKEYWORD))
+EPOCALLOWDLLDATA:=$(strip $(EPOCALLOWDLLDATA))
+EXPORTLIBRARY:=$(strip $(EXPORTLIBRARY))
+BASEADDRESS:=$(strip $(BASEADDRESS))
+LINKAS:=$(strip $(LINKAS))
+NOEXPORTLIBRARY:=$(strip $(NOEXPORTLIBRARY))
+SECUREID:=$(strip $(SECUREID))
+UID2:=$(strip $(UID2))
+UID3:=$(strip $(UID3))
+VENDORID:=$(strip $(VENDORID))
+VID:=$(strip $(VID))
+WIN32_HEADERS:=$(strip $(WIN32_HEADERS))
+
+# local variables
+BINDIR:=
+BINDIRSTATICLINK:=
+BINTARGET:=
+BINTARGETSTATICLINK:=
+BLDDIR:=
+CHECKLIB_TYPE:=
+CREATABLEPATHS:=
+CLEANTARGETS:=
+CW_RUNTIME:=
+ENTRYSYMBOL:=
+IMPORTLIBLINKAS:=
+IMPORTLIBTARGET:=
+LIBDIR:=
+LINKER_FIRSTSTATLIB:=
+MAINLINKAS:=
+NEWLIBFILE:=
+RELEASABLES:=
+STATLIBDIR:=
+STDCPP_BUILD:=
+STDCPPTAGFILE:=
+UID1:=
+WIN32_LIBRARIES:=
+
+# FIVESPACES variable created to ensure that a suitable gap of space characters can
+# be placed between the separate arguments in the call to a tool (if required).
+# This is a workaround for a problem in Cygwin, where separate arguments are interpreted
+# as a single argument when passed to bash.
+FIVESPACES=$(BLANK)     $(BLANK)
+
+# CW runtime varies based on TARGETTYPE requirements, with wrapper FLMs dictating the choice
+# We override a CW-specific environment variable to do this, in common with ABLD
+ifeq ($(CW_STATIC_RUNTIME),1)
+  CW_RUNTIME:=$(CW_RUNTIME_STATIC)
+  CFLAGS:=$(CFLAGS) $(OPT.RUNTIME)staticmulti
+else
+  CW_RUNTIME:=$(CW_RUNTIME_NONSTATIC)
+  CFLAGS:=$(CFLAGS) $(OPT.RUNTIME)dllmulti
+endif
+MWSym2LibraryFiles:=$(subst $(CHAR_SPACE),$(DIRSEP),$(CW_RUNTIME) $(CW_DEFAULT_LIBS))
+ifneq ($(WIN32_LIBRARY),)
+  WIN32_HEADERS:=1
+  WIN32_LIBRARIES:=$(addprefix $(OPT.LIBFILE),$(WIN32_LIBRARY))
+endif
+
+# top-level definitions
+BINDIR:=$(RELEASEPATH)/$(FULLVARIANTPATH)
+
+# TARGETPATH and COPY_FOR_STATIC_LINKAGE only apply when TARGETPATH is a sub-directory of /sys/bin
+TARGETPATH_APPEND:=$(subst \,/,$(TARGETPATH))
+ifneq ($(findstring /sys/bin/,$(TARGETPATH_APPEND)),)
+  ifeq ($(COPY_FOR_STATIC_LINKAGE),1)
+    BINDIRSTATICLINK:=$(BINDIR)
+  endif
+  BINDIR:=$(BINDIR)/z$(TARGETPATH_APPEND)
+else
+  COPY_FOR_STATIC_LINKAGE:=0
+endif
+
+BLDDIR:=$(OUTPUTPATH)/$(FULLVARIANTPATH)
+LIBDIR:=$(RELEASEPATH)/$(LINKPATH)
+STATLIBDIR:=$(RELEASEPATH)/$(FULLVARIANTPATH)
+CREATABLEPATHS:=$(BLDDIR) $(BINDIR) $(BINDIRSTATICLINK)
+
+# Deduce whether we should be performing a build with standard CPP characteristics
+# This operates differently per-OS release, although OE TARGETTYPEs always build with standard CPP traits
+ifeq ($(OPEN_ENVIRONMENT),1)
+  STDCPP_BUILD:=1
+endif
+
+ifeq ($(SUPPORTS_STDCPP_NEWLIB),1)
+  ifeq ($(NOSTDCPP),1)
+    STDCPP_BUILD:=
+  else
+    ifeq ($(STDCPP),1)
+      STDCPP_BUILD:=1
+    endif
+  endif
+
+  ifneq ($(NEWLIB),)
+    NEWLIBFILE:=$(STATLIBDIR)/$(NEWLIB)
+  else
+    ifeq ($(SYSTEM_TARGET),1)
+      NEWLIBFILE:=$(STATLIBDIR)/$(DEFAULT_SYSTEM_NEWLIB)
+    else
+      NEWLIBFILE:=$(STATLIBDIR)/$(DEFAULT_NORMAL_NEWLIB)
+    endif
+  endif
+endif
+
+ifeq ($(STDCPP_BUILD),1)
+  CDEFS:=$(CDEFS) $(STDCPP_DEF)
+  SYSTEMINCLUDE:=$(SYSTEMINCLUDE) $(STDCPP_INCLUDE)
+  CFLAGS:=$(CFLAGS) $(OPT.WCHAR) on
+  CHECKLIB_TYPE:=$(OPT.CHECKLIB.STDCPP)
+  STDCPPTAGFILE:=$(OPT.LIBPATH)$(EPOCROOT)/epoc32/tools/tag $(OPT.SEARCH) tag_coff
+else
+  CFLAGS:=$(CFLAGS) $(OPT.WCHAR) off
+  CHECKLIB_TYPE:=$(OPT.CHECKLIB.SYMCPP)
+endif
+
+ifeq ($(WIN32_HEADERS),1)
+  CDEFS:=$(CDEFS) WIN32
+  CDEFS:=$(CDEFS) _WINDOWS
+  CFLAGS:=$(CFLAGS) $(OPT.STDINC)
+else
+  CFLAGS:=$(CFLAGS) $(OPT.NOSTDINC)
+endif
+
+# get the compiler to generate dependencies for us?
+ifeq ($(DEPEND_SKIP),)
+  CFLAGS:=$(CFLAGS) $(OPT.DEPEND)
+endif
+
+# specifics relating to the base type of the target being processed
+ifeq ($(BASE_TYPE),dll)
+  # Special case, although this should be dealt with in the wrapper FLM in a better way
+  ifeq ($(TARGETTYPE),exexp)
+    CDEFS:=$(CDEFS) __EXE__
+    ENTRYSYMBOL:=__E32Startup
+    LFLAGS:=$(LFLAGS) $(OPT.NOENTRY)
+    UID1:=1000007a
+  else
+    CDEFS:=$(CDEFS) __DLL__
+    ENTRYSYMBOL:=__E32Dll
+    LFLAGS:=$(LFLAGS) $(OPT.MAINENTRYPOINT)__Win32DllMain@12
+    UID1:=10000079
+  endif
+  LFLAGS:=$(LFLAGS) $(OPT.SHARED)
+
+  ifneq ($(BASEADDRESS),)
+    LFLAGS:=$(LFLAGS) $(OPT.IMAGEBASE)$(BASEADDRESS)
+  endif
+
+  ifeq ($(FIRST_STATLIB),)
+    BASE_TYPE_STATLIB:=edll.lib
+  else
+    BASE_TYPE_STATLIB:=$(FIRST_STATLIB)
+  endif
+endif
+ifeq ($(BASE_TYPE),exe)
+  CDEFS:=$(CDEFS) __EXE__
+  ENTRYSYMBOL:=?_E32Bootstrap@@YGXXZ
+  UID1:=1000007a
+
+  ifeq ($(FIRST_STATLIB),)
+    BASE_TYPE_STATLIB:=eexe.lib
+  else
+    BASE_TYPE_STATLIB:=$(FIRST_STATLIB)
+  endif
+endif
+
+ifeq ($(FIRSTLIB),)
+  LINKER_FIRSTSTATLIB:=$(BASE_TYPE_STATLIB)
+else
+  LINKER_FIRSTSTATLIB:=$(FIRSTLIB)
+endif
+
+
+BINTARGET:=$(BINDIR)/$(TARGET).$(if $(REQUESTEDTARGETEXT),$(REQUESTEDTARGETEXT),$(TARGETTYPE))
+
+
+# Run trace compiler #####################################
+TRACE_MARKER_PATH:=$(OUTPUTPATH)
+
+ifeq ($(UID3),)
+  ifeq ($(UID2),)
+    USE_TRACE_COMPILER:=
+  else
+    UID_TC:=$(UID2)
+  endif
+else
+  UID_TC:=$(UID3)
+endif
+
+# USE_TRACE_COMPILER defaults to blank in Raptor config.
+# Users can turn TC on by setting it to 1 in user config.
+ifneq ($(USE_TRACE_COMPILER),) 
+  include $(FLMHOME)/tracecompiler.mk
+endif
+
+
+####################
+## IMPORT LIBRARY ##
+####################
+
+IMPORTLIBLINKAS:=$(TARGET).$(if $(REQUESTEDTARGETEXT),$(REQUESTEDTARGETEXT),$(TARGETTYPE))
+# LINKAS, if supplied, only applies to IMPLIB TARGETTYPEs
+ifeq ($(BASE_TYPE),importlib)
+  ifneq ($(LINKAS),)
+    IMPORTLIBLINKAS:=$(LINKAS)
+  else
+    IMPORTLIBLINKAS:=$(TARGET).dll
+  endif
+endif
+
+ifneq ($(EXPORTLIBRARY),)
+  IMPORTLIBTARGET:=$(LIBDIR)/$(EXPORTLIBRARY).lib
+else
+  IMPORTLIBTARGET:=$(LIBDIR)/$(TARGET).lib
+endif
+
+# Regardless of whether a TARGETTYPE normally supports an import library, always attempt
+# to generate one if an explicit DEFFILE keyword was listed
+ifeq ($(DEFFILEKEYWORD),1)
+  SUPPORTS_IMPORT_LIBRARY:=1
+endif
+
+ifeq ($(SUPPORTS_IMPORT_LIBRARY),1)
+  ifneq ($(NOEXPORTLIBRARY),1)
+    ifneq ($(TARGET_$(call sanitise,$(IMPORTLIBTARGET))),1)
+      CLEANTARGETS:=$(CLEANTARGETS) $(if $(or $(EXPORTUNFROZEN),$(DEFFILE)),$(IMPORTLIBTARGET))
+      RELEASABLES:=$(RELEASABLES) $(if $(or $(EXPORTUNFROZEN),$(DEFFILE)),$(IMPORTLIBTARGET))
+
+      # import libraries are generated to the UDEB release directory
+      ifneq ($(VARIANTTYPE),udeb)
+        CREATABLEPATHS:=$(CREATABLEPATHS) $(if $(or $(EXPORTUNFROZEN),$(DEFFILE)),$(LIBDIR))
+      endif
+
+      ifneq ($(EXPORTUNFROZEN),)
+        # EXPORTUNFROZEN amounts to doing the stage-two link with the makedef generated temporary .def file but creating a .lib
+        # file as a side-effect of linking.  The import library is therefore dependent on the final binary in this instance.
+        $(info <warning project='$(PROJECT_META)' component='$(COMPONENT_META)'>EXPORTUNFROZEN present in $(PROJECT_META) - unfrozen exports will be represented in import library.</warning> )
+        $(IMPORTLIBTARGET): $(BINTARGET)
+        $(eval TARGET_$(call sanitise,$(IMPORTLIBTARGET)):=1)
+      else
+        ifneq ($(DEFFILE),)
+          # If a .def file physically exists (either explicitly via DEFFILE or implicitly in the correct place) then we
+          # generate an import library with reference to it
+          PREPPEDDEFFILE:=$(BLDDIR)/$(TARGET).prep.def
+          CLEANTARGETS:=$(CLEANTARGETS) $(PREPPEDDEFFILE)
+
+          define win32def2lib
+            $(IMPORTLIBTARGET): $(DEFFILE)
+	          $(call startrule,win32def2lib) \
+	          $(PREPDEF) "$(DEFFILE)" "$(PREPPEDDEFFILE)" && \
+	          $(LD) $(PREPPEDDEFFILE) $(OPT.IMPORTLIB) -o "$$@" $(OPT.ADDCOMMAND) "out:$(IMPORTLIBLINKAS)" $(OPT.WARNINGS) off \
+	          $(call endrule,win32def2lib)
+          endef
+          $(eval $(win32def2lib))
+          $(eval TARGET_$(call sanitise,$(IMPORTLIBTARGET)):=1)
+        endif
+      endif
+    endif
+  endif
+endif
+
+
+ifneq ($(BASE_TYPE),importlib)
+
+  #############
+  ## COMPILE ##
+  #############
+
+  ifeq ($(COPY_FOR_STATIC_LINKAGE),1)
+    BINTARGETSTATICLINK:=$(BINDIRSTATICLINK)/$(TARGET).$(if $(REQUESTEDTARGETEXT),$(REQUESTEDTARGETEXT),$(TARGETTYPE))
+  endif
+
+  CLEANTARGETS:=$(CLEANTARGETS) $(BINTARGET) $(BINTARGETSTATICLINK)
+  RELEASABLES:=$(RELEASABLES) $(BINTARGET) $(BINTARGETSTATICLINK)
+
+  # work on a local source files list
+  SRCFILES:=$(SOURCE)
+  # and there may be more source for stage 2 in OE builds
+  SRCFILES_OE:=
+
+  ifneq ($(BASE_TYPE),staticlib)
+    # add the generated UID source file
+    GENSOURCE:=$(BLDDIR)/$(TARGET).UID.CPP
+    SRCFILES:=$(SRCFILES) $(GENSOURCE)
+
+    # the generated symbol lookup source file for Open Environment.
+    # this only gets linked in at stage 2
+    SYMSOURCE:=$(if $(OPEN_ENVIRONMENT),$(BLDDIR)/$(TARGET)_SYM_.cpp,)
+    SRCFILES_OE:=$(SYMSOURCE)
+
+    CLEANTARGETS:=$(CLEANTARGETS) $(GENSOURCE) $(SYMSOURCE)
+
+    ifeq ($(UID2),00000000)
+      ifneq ($(UID2_DEFAULT),)
+        UID2:=$(UID2_DEFAULT)
+      endif
+    endif
+
+    ifeq ($(SECUREID),)
+      SECUREID:=$(UID3)
+    endif
+
+    define win32generateUIDcpp
+      $(GENSOURCE): $(PROJECT_META)
+	    $(call startrule,win32generateUIDcpp,,) \
+	    echo "// SBS-generated uid source file" > $$@ && \
+	    echo "#include <e32cmn.h>" >> $$@ && \
+	    echo "#pragma data_seg(\".SYMBIAN\")" >> $$@ && \
+	    echo "__EMULATOR_IMAGE_HEADER2(0x$(UID1),0x$(UID2),0x$(UID3),EPriority$(EPOCPROCESSPRIORITY),0x$(CAPABILITYFLAG1),0x$(CAPABILITYFLAG2),0x$(SECUREID),0x$(VENDORID),0x$(VERSIONHEX),$(EPOCALLOWDLLDATA))" >> $$@ && \
+	    echo "#pragma data_seg()" >> $$@ \
+	    $(call endrule,win32generateUIDcpp)
+    endef
+    $(eval $(win32generateUIDcpp))
+  endif # neq $(BASE_TYPE),staticlib
+
+  # object files
+  OBJECTFILES:=$(patsubst %,$(BLDDIR)/%,$(addsuffix .o,$(basename $(notdir $(call allsuffixsubst,.cia .CIA .Cia,_.cia,$(SRCFILES))))))
+  OBJECTFILES:=$(patsubst %.UID.o,%_UID_.o,$(OBJECTFILES))
+
+  # object file extras for stage 2
+  OBJECTFILES_OE:=$(patsubst %,$(BLDDIR)/%,$(addsuffix .o,$(basename $(notdir $(SRCFILES_OE)))))
+
+  CLEANTARGETS:=$(CLEANTARGETS) $(OBJECTFILES) $(OBJECTFILES_OE)
+
+  # include paths and preinclude file
+  UINCLUDE:=$(patsubst %,$(OPT.USERINCLUDE)%,$(USERINCLUDE))
+  SINCLUDE:=$(patsubst %,$(OPT.SYSINCLUDE)%,$(SYSTEMINCLUDE))
+  PINCLUDE:=$(OPT.PREINCLUDE)$(notdir $(PRODUCT_INCLUDE))
+
+  #INCLUDES:=$(UINCLUDE) $(OPT.SPLITINCLUDE) $(SINCLUDE) $(PINCLUDE)
+  INCLUDES:=$(OPT.SPLITINCLUDE) $(UINCLUDE) $(SINCLUDE) $(PINCLUDE)
+
+  # macro definitions
+  DEFINES:=$(call makemacrodef,$(OPT.DEFINE),$(CDEFS) $(TARGET_MACRO))
+
+
+  # $(1) is the name of the source file, $(2) is the extension to map it to e.g. .o
+  # no space in front of function body
+  define mapwin32file
+    $(patsubst %.UID$(2),%_UID_$(2),$(BLDDIR)/$(addsuffix $2,$(basename $(notdir $(call allsuffixsubst,.cia .CIA .Cia,_.cia,$(1))))))
+  endef
+
+  # compile all source files, creating and including compiler generated dependency files along the way
+  # SED is used to (a) remove relatively pathed "object_file: source_file" references that can appear
+  # with some versions of mwccsym2 and (b) convert slashes
+  define win32compile2object
+
+    $(eval DEPENDFILENAME:=$(call mapwin32file,$(1),.o.d))
+    $(eval DEPENDFILE:=$(wildcard $(DEPENDFILENAME)))
+
+    $(call mapwin32file,$(1),.o): $(1) $(PROJECT_META) $(if $(DEPENDFILE),,RESOURCE BITMAP EXPORT) $(if $(USE_TRACE_COMPILER),$(TRACE_MARKER))
+	  $(call startrule,win32compile2object,,$(1)) \
+	  $(CC) $$(if $$(filter %.C,$(1)),-lang c) $(CFLAGS) $(OPTION_CW) \
+	  $(if $(STDCPP_BUILD),$$(if $$(filter %.c %.C,$(1)),,$$(call makemacrodef,$(OPT.DEFINE),$(STDCPP_WCHAR_DEF))),) \
+	  $(DEFINES) $(INCLUDES) $(OPT.OUT)"$$@" "$(1)" && \
+	  $(GNUSED) 's#\\\\\(.\)#/\1#g;s#/ #\\\ #g;s#\([A-Za-z]:\)\\\\#\1/#g;1,1s#.*: .* \(.\)\?$$$$#$(call mapwin32file,$(1),.o): $1 \1#' $(call mapwin32file,$(1),.dep) > $(call mapwin32file,$(1),.o.d) \
+	  $(call endrule,win32compile2object)
+
+    CLEANTARGETS:=$$(CLEANTARGETS) $(call mapwin32file,$(1),.dep)
+
+    CLEANTARGETS:=$$(CLEANTARGETS) $(DEPENDFILENAME)
+    ifneq "$(DEPENDFILE)" ""
+    ifeq ($(NO_DEPEND_INCLUDE),)
+      ifeq "$(filter %CLEAN,$(call uppercase,$(MAKECMDGOALS)))" ""
+        -include $(DEPENDFILE)
+      endif
+    endif
+    endif
+
+    # individual source file compilation
+    SOURCETARGET_$(call sanitise,$(1)): $(call mapwin32file,$(1),.o)
+
+  endef
+
+  # List target, depends on object file
+  define win32list
+  LISTING:: $(OBJECTFILES) $(OBJECTFILES_OE)
+	$(call startrule,win32listing) \
+	$(CC) $(OPT.LISTING) $(patsubst %.UID.o,%_UID_.o,$(BLDDIR)/$(addsuffix .o,$(basename $(notdir $(1))))) -o $(basename $1).WINSCW.lst \
+	$(call endrule,win32listing)
+  endef
+
+  $(foreach SRCFILE,$(SRCFILES) $(SRCFILES_OE),$(eval $(call win32compile2object,$(SRCFILE))))
+  $(foreach SRCFILE,$(SRCFILES) $(SRCFILES_OE),$(eval $(call win32list,$(SRCFILE))))
+
+  ######################
+  ## RESOURCE COMPILE ##
+  ######################
+
+  # If Python has been used to construct the environment on Windows then the standard MW include path environment
+  # variable will have been munged to UPPERCASE.
+  STDMWCINCLUDEPATHS:=$(if $(MWCSym2Includes),$(MWCSym2Includes),$(MWCSYM2INCLUDES))
+
+  define win32resourcecompile
+    # Note that two calls are made to the resource compiler here.  There seems to be no means to override the
+    # default behaviour of dumping dependency files into the CWD when using -MD.  So - we compile once for real,
+    # and then pipe dependency output through SED afterwards to create the dependency file where we want it
+
+    $(eval DEPENDFILENAME:=$(call mapwin32file,$(1),.res.d))
+    $(eval DEPENDFILE:=$(wildcard $(DEPENDFILENAME)))
+
+    $(call mapwin32file,$(1),.res): $(1) $(PROJECT_META) $(if $(DEPENDFILE),,RESOURCE BITMAP EXPORT)
+	  $(call startrule,win32resourcecompile,,$(1)) \
+	  MWCIncludes='$(STDMWCINCLUDEPATHS)' $(RC) $(OPT.OUT)"$$@" "$(1)" && \
+	  MWCIncludes='$(STDMWCINCLUDEPATHS)' $(RC) -make $(OPT.OUT)"$$@" "$(1)" | \
+	  $(GNUSED) 's#\\\\\(.\)#/\1#g;s#/ #\\\ #g;s#\([A-Za-z]:\)\\\\#\1/#g;1,1s#.*: .* \(.\)\?$$$$#$(call mapwin32file,$(1),.res): $1 \1#' > $(call mapwin32file,$(1),.res.d) \
+	  $(call endrule,win32resourcecompile)
+
+    CLEANTARGETS:=$$(CLEANTARGETS) $(DEPENDFILENAME)
+    ifneq "$(DEPENDFILE)" ""
+    ifeq ($(NO_DEPEND_INCLUDE),)
+      ifeq "$(filter %CLEAN,$(call uppercase,$(MAKECMDGOALS)))" ""
+        -include $(DEPENDFILE)
+      endif
+    endif
+    endif
+
+  endef
+
+  $(foreach WIN32RESOURCEFILE,$(WIN32_RESOURCE),$(eval $(call win32resourcecompile,$(WIN32RESOURCEFILE))))
+  OBJECTFILES:=$(OBJECTFILES) $(patsubst %,$(BLDDIR)/%,$(addsuffix .res,$(basename $(notdir $(WIN32_RESOURCE)))))
+
+  ##################
+  ## LINK/ARCHIVE ##
+  ##################
+
+  # libraries
+  STATICLIBS:=$(patsubst %,%.lib,$(STATICLIBRARY))
+  STATICLIBFILES:=$(patsubst %,$(STATLIBDIR)/%,$(STATICLIBS))
+  LINKER_FIRSTSTATLIBFILE:=$(STATLIBDIR)/$(LINKER_FIRSTSTATLIB)
+
+  ifeq ($(VARIANTTYPE),urel)
+    LINKLIBS:=$(patsubst %.dso,%.lib,$(LIBRARY))
+  else
+    LINKLIBS:=$(patsubst %.dso,%.lib,$(LIBRARY_DEBUG))
+  endif
+
+  LINKLIBFILES:=$(patsubst %,$(LIBDIR)/%,$(LINKLIBS))
+
+  MAP:=
+  ifneq ($(BASE_TYPE),staticlib)
+    ifneq ($(BASE_TYPE),importlib)
+      # link map file (urel only)
+      ifeq ($(VARIANTTYPE),urel)
+        MAP:=$(OPT.MAP)$(BINTARGET).map
+        CLEANTARGETS:=$(CLEANTARGETS) $(BINTARGET).map
+        RELEASABLES:=$(RELEASABLES) $(BINTARGET).map
+      endif
+    endif
+  endif
+
+  # all object files are listed in a response file to minimise the length of linker calls
+  OBJECTFILES_LRF:=$(BLDDIR)/$(TARGET)_$(VARIANTTYPE)_objects.lrf
+  CLEANTARGET:=$(CLEANTARGETS) $(OBJECTFILES_LRF)
+
+  define groupin10
+	$(if $1,@echo -e $(foreach L,$(wordlist 1,10,$1),"$(L)\\n") >> $(OBJECTFILES_LRF),)
+	$(if $1,$(call groupin10,$(wordlist 11,$(words $1),$1)),@true)
+  endef
+
+  #
+  # Archive
+  #
+  ifeq ($(BASE_TYPE),staticlib)
+    define win32archive
+      $(BINTARGET): $(OBJECTFILES)
+	    @echo "" > $(OBJECTFILES_LRF);
+		$(call groupin10,$(notdir $(OBJECTFILES))) ;
+	    $(call startrule,win32archive) \
+	    $(LD) $(OPT.STATICLIBRARY) $(LFLAGS) $(OPT.NOIMPLIB) $(WIN32_LIBRARIES) $(OPT.OUT)"$$@" $(STDCPPTAGFILE) $(OPT.LIBPATH)$(BLDDIR) $(OPT.SEARCH) @$(OBJECTFILES_LRF) \
+	    $(if $(SAVESPACE),; $(GNURM) -rf $(BLDDIR); true,) \
+	    $(call endrule,win32archive)
+    endef
+    $(eval $(win32archive))
+  endif
+
+  ifneq ($(EPOCHEAPSIZEMIN_DEC_KB),)
+    LFLAGS:=$(LFLAGS) $(OPT.HEAPRESERVE)$(EPOCHEAPSIZEMAX_DEC_KB) $(OPT.HEAPCOMMIT)$(EPOCHEAPSIZEMIN_DEC_KB)
+  endif
+
+  #
+  # Simple link
+  #
+  ifeq ($(BASE_TYPE),exe)
+    define win32simplelink
+      $(BINTARGET).map: $(BINTARGET)
+
+      $(BINTARGET): $(OBJECTFILES) $(LINKER_FIRSTSTATLIBFILE) $(NEWLIBFILE) $(STATICLIBFILES) $(LINKLIBFILES)
+	    @echo "" > $(OBJECTFILES_LRF);
+		$(call groupin10,$(notdir $(OBJECTFILES))) ;
+	    $(call startrule,win32simplelink) \
+	    $(if $(SUPPORTS_STDCPP_NEWLIB),$(if $(STATICLIBFILES),$(CHECKLIB) $(CHECKLIB_TYPE) $(OPT.CHECKLIB.WIN32) $(STATICLIBFILES) &&,),) \
+	    MWSym2LibraryFiles="$(MWSym2LibraryFiles)" $(LD) $(LFLAGS) $(OPT.MENTRYPOINT)$(ENTRYSYMBOL) $(MAP) $(LINKER_FIRSTSTATLIBFILE) $(NEWLIBFILE) $(WIN32_LIBRARIES) $(STATICLIBFILES) $(LINKLIBFILES) $(OPT.OUT)"$$@" $(OPT.NOIMPLIB) $(OPT.LIBPATH)$(BLDDIR) $(OPT.SEARCH) @$(OBJECTFILES_LRF) \
+	    $(if $(SAVESPACE),; $(GNURM) -rf $(BLDDIR); true,) \
+	    $(call endrule,win32simplelink)
+    endef
+    $(eval $(win32simplelink))
+  endif
+
+  #
+  # Two stage link
+  #
+  ifeq ($(BASE_TYPE),dll)
+    TMP_IMPLIB:=$(BLDDIR)/$(TARGET).lib
+    TMP_INFFILE:=$(BLDDIR)/$(TARGET).inf
+    TMP_SYMFILE:=$(if $(OPEN_ENVIRONMENT),$(BLDDIR)/$(TARGET).sym,)
+    TMP_TARGET:=$(BLDDIR)/$(TARGET).$(if $(REQUESTEDTARGETEXT),$(REQUESTEDTARGETEXT),$(TARGETTYPE))
+    TMP_DEFFILE:=$(BLDDIR)/$(TARGET).def
+
+    CLEANTARGETS:=$(CLEANTARGETS) $(TMP_IMPLIB) $(TMP_INFFILE) $(TMP_TARGET) $(TMP_DEFFILE) $(TMP_SYMFILE)
+
+    MAKEDEF_ARGS:=-absent $(ENTRYSYMBOL) -Inffile  $(call dblquote,$(TMP_INFFILE)) $(NAME_LOOKUP)
+
+    ifeq ($(SYSTEM_TARGET),1)
+        MAKEDEF_ARGS:=$(MAKEDEF_ARGS) -SystemTargetType
+    endif
+
+    ifneq ($(FIXED_EXPORT),)
+      # Fixed export TARGETTYPE, but with possibility of a .def file if explicitly specified and available
+      ifeq ($(DEFFILEKEYWORD),1)
+        ifneq ($(DEFFILE),)
+          MAKEDEF_ARGS:=$(MAKEDEF_ARGS) -Frzfile $(call dblquote,$(DEFFILE))
+        endif
+      endif
+      MAKEDEF_ARGS:=$(MAKEDEF_ARGS) -1 $(FIXED_EXPORT)
+    else
+      # Variable export TARGETTYPE with either deduced or explicitly specified .def file (if available)
+      ifneq ($(DEFFILE),)
+        MAKEDEF_ARGS:=$(MAKEDEF_ARGS) -Frzfile $(call dblquote,$(DEFFILE))
+      endif
+    endif
+
+
+    ifneq ($(EXPORTSUNFROZEN),)
+    	LIBRARY: $(TMP_IMPLIB)
+    endif
+
+    define win32stageonelink
+      # Stage One
+      # Link by name, generating temporary main binary and import library.
+      $(TMP_IMPLIB): $(TMP_TARGET)
+
+      $(TMP_TARGET): $(OBJECTFILES) $(LINKER_FIRSTSTATLIBFILE) $(NEWLIBFILE) $(STATICLIBFILES) $(LINKLIBFILES)
+	    @echo "" > $(OBJECTFILES_LRF);
+		$(call groupin10,$(notdir $(OBJECTFILES))) ;
+	    $(call startrule,win32stageonelink) \
+	    $(if $(SUPPORTS_STDCPP_NEWLIB),$(if $(STATICLIBFILES),$(CHECKLIB) $(CHECKLIB_TYPE) $(OPT.CHECKLIB.WIN32) $(STATICLIBFILES) &&,),) \
+	    MWSym2LibraryFiles="$(MWSym2LibraryFiles)" $(LD) $(LFLAGS) $(OPT.MENTRYPOINT)$(ENTRYSYMBOL) $(OPT.EXPORT)$(EXPORT_TYPE) $(OPT.NOCOMPACTIMPORTLIB) $(OPT.ADDCOMMAND) "out:$(TARGET).$(if $(REQUESTEDTARGETEXT),$(REQUESTEDTARGETEXT),$(TARGETTYPE))" $(OPT.WARNINGS) off $(OPT.IMPLIB)"$(TMP_IMPLIB)" $(OPT.OUT)"$(TMP_TARGET)" $(LINKER_FIRSTSTATLIBFILE) $(NEWLIBFILE) $(WIN32_LIBRARIES) $(STATICLIBFILES) $(LINKLIBFILES) $(OPT.LIBPATH)$(BLDDIR) $(OPT.SEARCH) @$(OBJECTFILES_LRF) \
+	    $(call endrule,win32stageonelink)
+    endef
+    $(eval $(win32stageonelink))
+
+    define win32processexports
+      # Process exports
+      # Generate a descriptive info file from the import library.
+      # Push info file through MAKEDEF to generated a valid .def file for link by ordinal.
+      $(TMP_DEFFILE): $(TMP_IMPLIB)
+	    $(call startrule,win32processexports) \
+	    $(LD) $(LFLAGS_INFGEN) $(OPT.OUT)"$(TMP_INFFILE)" "$(TMP_IMPLIB)" && \
+	    $(MAKEDEF) $(MAKEDEF_ARGS) "$$@" \
+	    $(call endrule,win32processexports)
+    endef
+    $(eval $(win32processexports))
+
+    ifeq ($(OPEN_ENVIRONMENT),1)
+      define win32processoeexports
+   	    # Process additional exports for Open Environment
+        # Generate a symbol file from the temporary DLL.
+        # Generate a C++ source file from the symbol file
+
+        $(TMP_SYMFILE): $(TMP_TARGET)
+	      $(call startrule,win32generatesymfile) \
+	      $(LD) $(LFLAGS_SYMGEN) $(OPT.OUT)"$(TMP_SYMFILE)" "$(TMP_TARGET)" \
+	      $(call endrule,win32generatesymfile)
+
+        $(SYMSOURCE): $(TMP_SYMFILE)
+	      $(call startrule,win32generatesymcpp) \
+	      $(SYMLOOKUPUTIL) $(OPT.OUT)"$(SYMSOURCE)" $(OPT.SYM)"$(TMP_SYMFILE)" $(SYMLOOKUPARGS) \
+	      $(call endrule,win32generatesymcpp)
+      endef
+      $(eval $(win32processoeexports))
+    endif
+
+    define win32stagetwolink
+      # Stage Two
+      # Link by ordinal, based on a previously MAKEDEF-generated temporary .def file
+      # Optionally create an import library if EXPORTUNFROZEN is specified
+      #
+      $(BINTARGET).map: $(BINTARGET)
+
+      $(BINTARGET): $(OBJECTFILES) $(OBJECTFILES_OE) $(LINKER_FIRSTSTATLIBFILE) $(STATICLIBFILES) $(NEWLIBFILE) $(LINKLIBFILES) $(TMP_DEFFILE)
+	    @echo "" > $(OBJECTFILES_LRF);
+		$(call groupin10,$(notdir $(OBJECTFILES) $(OBJECTFILES_OE))) ;
+	    $(call startrule,win32stagetwolink) \
+	    MWSym2LibraryFiles="$(MWSym2LibraryFiles)" \
+	    $(LD) $(LFLAGS) $(OPT.DEFFILE)$(TMP_DEFFILE) $(MAP) $(LINKER_FIRSTSTATLIBFILE) $(NEWLIBFILE) $(WIN32_LIBRARIES) $(STATICLIBFILES) $(LINKLIBFILES) \
+	    $(OPT.OUT)"$$@" \
+	    $(if $(EXPORTUNFROZEN),$(OPT.IMPLIB)$(IMPORTLIBTARGET),$(OPT.NOIMPLIB)) \
+	    $(OPT.LIBPATH)$(BLDDIR) $(OPT.SEARCH) @$(OBJECTFILES_LRF) \
+	    $(if $(SAVESPACE),; $(GNURM) -rf $(BLDDIR); true,) \
+	    $(call endrule,win32stagetwolink)
+    endef
+    $(eval $(win32stagetwolink))
+
+    define win32copyforstaticlink
+      # Copy additonal binary to "traditional" output location (if required)
+      $(BINTARGETSTATICLINK): $(BINTARGET)
+	    $(call startrule,win32copyforstaticlink) \
+	    $(GNUCP) $$< $$@ \
+	    $(call endrule,win32copyforstaticlink)
+    endef
+    ifeq ($(COPY_FOR_STATIC_LINKAGE),1)
+      $(eval $(win32copyforstaticlink))
+    endif
+
+    define e32freeze
+      # DLL-type targets that support import library generation support freezing of exports using EFREEZE
+      FREEZE:: $(1)
+	    $(call startrule,freeze,,$(RESOLVED_DEFFILE)) \
+	    $(EFREEZE) $(EFREEZE_REMOVE_OPTION) "$(RESOLVED_DEFFILE)" $(FIVESPACES) "$(2)" \
+	    $(call endrule,freeze)
+    endef
+    # Create only one freeze target per urel/udeb variant as the interface won't differ between them
+    # Only create a freeze target if the component supports import library generation
+    ifneq ($(TARGET_$(call sanitise,$(IMPORTLIBTARGET))_FREEZE),1)
+      ifeq ($(SUPPORTS_IMPORT_LIBRARY),1)
+        $(eval $(call e32freeze,$(BINTARGET),$(TMP_DEFFILE)))
+        $(eval TARGET_$(call sanitise,$(IMPORTLIBTARGET))_FREEZE:=1)
+      endif
+    endif
+  endif
+endif # neq $(BASE_TYPE),importlib
+
+
+# Global targets
+.PHONY:: $(ALLTARGET)
+$(ALLTARGET):: $(RELEASABLES)
+TARGET:: $(RELEASABLES)
+
+ifeq ($(TARGET_$(call sanitise,$(IMPORTLIBTARGET))),1)
+  LIBRARY:: $(IMPORTLIBTARGET)
+else
+  ifeq ($(BASE_TYPE),staticlib)
+    LIBRARY:: $(BINTARGET)
+  endif
+endif
+
+
+# Deal with test code batch files generation.
+ifneq ($(TESTPATH),)
+  EPOC_ROOT:=$(patsubst %/,%,$(EPOCROOT))
+  TOBLDINF:=$(dir $(subst :,,$(subst $(EPOC_ROOT)/,,$(COMPONENT_META))))
+
+
+  BATCHDIR:=$(EPOCROOT)/epoc32/release/$(VARIANTPLATFORM)/$(VARIANTTYPE)/z/test/
+  $(eval $(call MakeTestBatchFiles,$(TARGET),$(BATCHDIR)$(MODULE)/$(VARIANTPLATFORM).$(TESTPATH)))
+  BATCHFILE_CREATED_$(BATCHDIR)$(MODULE)/$(VARIANTPLATFORM).$(TESTPATH):=1
+  TARGET_CREATED_$(EPOCROOT)/epoc32/release/$(VARIANTPLATFORM)/$(VARIANTTYPE)/z/test/$(MODULE)/$(VARIANTPLATFORM).$(TESTPATH)_$(TARGET):=1
+  RELEASABLES:=$(RELEASABLES) $(EPOCROOT)/epoc32/release/$(VARIANTPLATFORM)/$(VARIANTTYPE)/z/test/$(MODULE)/$(VARIANTPLATFORM).$(TESTPATH)
+  CLEANTARGETS:=$(CLEANTARGETS) $(EPOCROOT)/epoc32/release/$(VARIANTPLATFORM)/$(VARIANTTYPE)/z/test/$(MODULE)/$(VARIANTPLATFORM).$(TESTPATH)
+endif
+
+# clean up
+$(eval $(call GenerateStandardCleanTarget,$(CLEANTARGETS),$(CREATABLEPATHS),))
+# make the output directories while reading makefile - some build engines prefer this
+$(call makepath,$(CREATABLEPATHS))
+# for the abld -what target
+$(eval $(call whatmacro,$(RELEASABLES),WHATWINSCW))

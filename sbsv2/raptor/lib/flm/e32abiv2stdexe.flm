@@ -1,0 +1,63 @@
+# Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+#
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+#
+# Contributors:
+#
+# Description:
+# e32abiv2exe.flm
+# ARMv5 STDEXE/DLL ABIv2 Function Like Makefile (FLM)
+# Build an e32 STDEXE
+# 
+#
+
+# What we need to build a STDEXE
+
+ifeq ($(TARGETTYPE),stdexe)
+include $(FLMHOME)/e32abiv2defaults.mk
+
+POSTLINKTARGETTYPE:=STDEXE
+POSTLINKFILETYPE:=exe
+DOPOSTLINK:=1
+# Determine what kind of entrypoint option to set
+LINKER_STUB_LIBRARY:=
+LINKER_ENTRYPOINT_LIBDEP:=$(STATIC_RUNTIME_DIR)/eexe.lib
+LINKER_ENTRYPOINT_SETTING:=$(LINKER_ENTRY_OPTION) _E32Startup $(LINKER_ENTRYPOINT_DECORATION) $(call dblquote,$(STATIC_RUNTIME_DIR)/eexe.lib$(LINKER_ENTRYPOINT_ADORNMENT))
+DEFAULT_NEWLIB:=$(DEFAULT_STDCPP_NEWLIB)
+
+ifeq ("$(NEED_ENTRYPOINT_LIBRARY)","True")
+LINKER_ENTRYPOINT_SETTING:=$(LINKER_ENTRYPOINT_SETTING) $(LINKER_ENTRYPOINT_LIBDEP)
+endif
+
+STATIC_RUNTIME_LIB:=$(USER_STATIC_RUNTIME_LIB)
+NAMEDSYMLKUP:=1
+LIBRARY:=$(LIBRARY) euser.dso
+
+MAKEDEFFILE:=
+
+$(call vsave,CDEFS SYSTEMINCLUDE STATICLIBRARY)
+
+# STDEXEs need the c runtime library
+ifneq ($(WCHARENTRYPOINT),)
+STATICLIBRARY:=$(STATICLIBRARY) libwcrt0
+else
+STATICLIBRARY:=$(STATICLIBRARY) libcrt0
+endif
+
+SYSTEMINCLUDE:=$(SYSTEMINCLUDE) $(EPOCROOT)/epoc32/include/stdapis
+CDEFS:=$(CDEFS) __EXE__
+NOHIDEALL:=1
+
+include $(FLMHOME)/e32abiv2.flm
+$(call vrestore)
+
+else
+$(error e32abiv2stdexe.flm called with wrong TARGETTYPE (should be 'stdexe' but is '$(TARGETTYPE)'))
+endif
+

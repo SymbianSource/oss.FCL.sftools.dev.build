@@ -1,0 +1,212 @@
+# Copyright (c) 2008-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+#
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+#
+# Contributors:
+#
+# Description:
+# MSVC TOOLS EXE/LIB Function Like Makefile (FLM)
+# Knows how to build all possible executables for the TOOLS build
+# 
+#
+
+CLEANTARGETS:=
+RELEASABLES:=
+INSTALLTARGET:=
+
+RELEASEPATH:=$(RELEASEPATHROOT)/$(FULLVARIANTPATH)
+BUILDPATH:=$(OUTPUTPATH)/$(FULLVARIANTPATH)
+RELEASETARGET:=$(RELEASEPATH)/$(TARGET).$(if $(REQUESTEDTARGETEXT),$(REQUESTEDTARGETEXT),$(TARGETTYPE))
+
+# make the output directories while reading makefile - some build engines prefer this
+$(call makepath,$(RELEASEPATH))
+$(call makepath,$(BUILDPATH))
+
+CLEANTARGETS:=$(CLEANTARGETS) $(RELEASETARGET)
+RELEASEABLES:=$(RELEASEABLES) $(RELEASETARGET)
+
+GENDEBUGINFO:=$(if $(findstring deb,$(VARIANTTYPE)),1,)
+
+# MSVC "no space" arguments must take the form /<ARG><PATH_WITH_DOS_SLASHES> e.g.
+# 	/FoF:\object\file\to\be\created.obj
+define msvcformatarg
+	$(1)$(subst /,\\\,$(2))
+endef
+
+#############
+## COMPILE ##
+#############
+
+# object files and related
+OBJFILES:=$(patsubst %,$(BUILDPATH)/%.obj,$(basename $(notdir $(SOURCE))))
+SBRFILES:=$(addsuffix .sbr, $(basename $(OBJFILES)))
+LISFILES:=$(addsuffix .lis, $(basename $(OBJFILES)))
+LSTFILES:=$(addsuffix .tools.lst, $(basename $(SOURCE)))
+CLEANTARGETS:=$(CLEANTARGETS) $(OBJFILES) $(SBRFILES) $(LISFILES) $(LSTFILES)
+
+# include paths and preinclude file
+UINCLUDE:=$(patsubst %,$(OPT.USERINCLUDE)%,$(USERINCLUDE))
+SINCLUDE:=$(patsubst %,$(OPT.SYSINCLUDE)%,$(SYSTEMINCLUDE))
+PINCLUDE:=$(OPT.PREINCLUDE)$(notdir $(PRODUCT_INCLUDE))
+INCLUDES:=$(PINCLUDE) $(UINCLUDE) $(SINCLUDE)
+
+# macros
+DEFINES:=$(call makemacrodef,$(OPT.DEFINE),$(CDEFS) $(BASE_MACRO) $(CFLAGS.ADD))
+
+# other
+PDBFILE:=$(if $(GENDEBUGINFO),$(RELEASEPATH)/$(TARGET).pdb,)
+CLEANTARGETS:=$(CLEANTARGETS) $(PDBFILE)
+
+#compile
+define msvctoolscompile
+  $(BUILDPATH)/$(basename $(notdir $(1))).obj: $(1) $(PROJECT_META) $(if $(HAVE_ORDERONLY),|,)  EXPORT
+	$(call startrule,msvctoolscompile,,$(1)) \
+	$(CC) \
+	$(if $(findstring staticlib,$(BASE_TYPE)),,$(CFLAGS.LIB)) \
+	$(CFLAGS) $$(subst /,-,$(OPTION_MSVC)) \
+	$(if $(findstring /W,$(OPTION_MSVC)),,$(CFLAGS.DEFAULT.WARNLEVEL)) \
+	$(if $(PDBFILE),$$(call msvcformatarg,$(OPT.PDBFILE),$(PDBFILE)),) \
+	$(DEFINES) $(INCLUDES) \
+	$$(call msvcformatarg,$(OPT.BROWSEFILE),$(BUILDPATH)/$(basename $(notdir $(1))).sbr) \
+	$$(call msvcformatarg,$(OPT.OBJECTFILE),$$@) $(1) \
+	$(call endrule,msvctoolscompile)
+endef
+# make the output directories while reading makefile - some build engines prefer this
+$(call makepath,$(BUILDPATH))
+$(foreach SRCFILE,$(SOURCE),$(eval $(call msvctoolscompile,$(SRCFILE))))
+
+# assembler listing
+define msvctoolslisting
+  LISTING:: $(BUILDPATH)/$(basename $(notdir $(1))).lis
+	$(GNUCP) $$< $(basename $(1)).tools.lst
+  
+  $(BUILDPATH)/$(basename $(notdir $(1))).lis: $(1)
+	$(call startrule,msvctoolslisting) \
+	$(CC) \
+	$(if $(findstring staticlib,$(BASE_TYPE)),,$(CFLAGS.LIB)) \
+	$(CFLAGS) $$(subst /,-,$(OPTION_MSVC)) \
+	$(if $(findstring /W,$(OPTION_MSVC)),,$(CFLAGS.DEFAULT.WARNLEVEL)) \
+	$(DEFINES) $(INCLUDES) \
+	$$(call msvcformatarg,$(OPT.LISTING),$(BUILDPATH)/$(basename $(notdir $(1))).lis) \
+	$(1) \
+	$(call endrule,msvctoolslisting)
+
+  endef
+$(foreach SRCFILE,$(SOURCE),$(eval $(call msvctoolslisting,$(SRCFILE))))
+
+
+ifeq ($(BASE_TYPE),staticlib)
+
+  #############
+  ## ARCHIVE ##
+  #############
+
+  ARCHIVERRESPONSEFILE:=$(BUILDPATH)/$(TARGET).arf
+  CLEANTARGETS:=$(CLEANTARGETS) $(ARCHIVERRESPONSEFILE)
+
+  define msvctoolsarchive
+    $(RELEASETARGET): $(OBJFILES)
+	  @echo "" > $(ARCHIVERRESPONSEFILE);
+	  $(call groupin10infile,$(ARCHIVERRESPONSEFILE),$(OBJFILES)) ;
+	  $(call startrule,msvctoolsarchive) \
+	  $(AR) $(ARFLAGS) $(OPT.SUBSYSTEM)$(SUBSYSTEM) $$(call msvcformatarg,$(OPT.OUTFILE),$$@) \
+	  $$(call msvcformatarg,$(PREFIX.RESPONSEFILE),$(ARCHIVERRESPONSEFILE)) \
+	  $(if $(SAVESPACE),; $(GNURM) -f $(OBJFILES); true,) \
+	  $(call endrule,msvctoolsarchive)
+
+  endef
+  $(eval $(msvctoolsarchive))
+
+else
+
+  ##########
+  ## LINK ##
+  ##########
+
+  STATICLIBS:=$(patsubst %,$(RELEASEPATH)/%.lib,$(STATICLIBRARY))
+  IMPORTLIBS:=$(patsubst %.dso,$(IMPORTLIBPATH)/%.lib,$(LIBRARY))
+  LINKERRESPONSEFILE:=$(BUILDPATH)/$(TARGET).lrf
+  CLEANTARGETS:=$(CLEANTARGETS) $(RELEASETARGET).lib $(LINKERRESPONSEFILE)
+  
+  define msvctoolslink
+    $(RELEASETARGET): $(OBJFILES) $(STATICLIBS) $(IMPORTLIBS)
+	  @echo "" > $(LINKERRESPONSEFILE);
+	  $(call groupin10infile,$(LINKERRESPONSEFILE),$(STATICLIBS) $(IMPORTLIBS) $(OBJFILES)) ;
+	  $(call startrule,msvctoolslink) \
+	  $(LD) $(LFLAGS) $(WIN32_LIBRARY) $(OPT.SUBSYSTEM)$(SUBSYSTEM) \
+	  $$(call msvcformatarg,$(OPT.OUTFILE),$$@) \
+	  $$(call msvcformatarg,$(OPT.IMPLIB),$(RELEASETARGET).lib) \
+	  $$(call msvcformatarg,$(PREFIX.RESPONSEFILE),$(LINKERRESPONSEFILE)) \
+	  $(if $(SAVESPACE),; $(GNURM) -f $(OBJFILES); true,) \
+	  $(call endrule,msvctoolslink)
+  endef
+  $(eval $(msvctoolslink)) 
+
+endif
+
+
+#############
+## INSTALL ##
+#############
+
+ifneq ($(INSTALLPATH),)
+  INSTALLTARGET:=$(INSTALLPATH)/$(TARGET).$(if $(REQUESTEDTARGETEXT),$(REQUESTEDTARGETEXT),$(TARGETTYPE))
+  CLEANTARGETS:=$(CLEANTARGETS) $(INSTALLTARGET)
+  RELEASEABLES:=$(RELEASEABLES) $(INSTALLTARGET)
+
+  define msvctoolsinstall
+    $(INSTALLTARGET): $(RELEASETARGET)
+	  $(call startrule,msvctoolsinstall) \
+	  $(GNUCP) $$< $$@ && \
+	  $(GNUCHMOD) a+rwx $$@ \
+	  $(call endrule,msvctoolsinstall)
+  endef
+  # make the output directories while reading makefile - some build engines prefer this
+  $(call makepath,$(INSTALLPATH))
+  $(eval $(msvctoolsinstall))
+endif
+
+
+##########################
+## BROWSE DB GENERATION ##
+##########################
+
+ifneq ($(GENDEBUGINFO),)
+  BSCFILE:=$(RELEASEPATH)/$(TARGET).bsc
+  BSCRESPONSEFILE:=$(BUILDPATH)/$(TARGET).brf
+  CLEANTARGETS:=$(CLEANTARGETS) $(BSCFILE) $(BSCRESPONSEFILE)
+  RELEASEABLES:=$(RELEASEABLES) $(BSCFILE)
+
+  define msvctoolsgenbrowse  
+    $(BSCFILE): $(OBJFILES)
+	  @echo "" > $(BSCRESPONSEFILE);
+	  $(call groupin10infile,$(BSCRESPONSEFILE),$(SBRFILES)) ;
+	  $(call startrule,msvctoolsgenbrowse) \
+	  $(BROWSETOOL) $(BROWSEFLAGS) $$(call msvcformatarg,$(OPT.BROWSEDB),$$@) \
+	  $$(call msvcformatarg,$(PREFIX.RESPONSEFILE),$(BSCRESPONSEFILE)) \
+	  $(if $(SAVESPACE),; $(GNURM) -f $(SBRFILES); true,) \
+	  $(call endrule,msvctoolsgenbrowse)
+  endef
+  $(eval $(msvctoolsgenbrowse)) 
+endif
+
+
+# Global targets
+.PHONY:: $(ALLTARGET)
+$(ALLTARGET):: $(RELEASEABLES)
+TARGET:: $(RELEASEABLES)
+
+ifeq ($(BASE_TYPE),staticlib)
+  LIBRARY:: $(RELEASETARGET) $(INSTALLTARGET)
+endif
+
+# clean up
+$(eval $(call GenerateStandardCleanTarget,$(CLEANTARGETS),,))
+# for the abld -what target
+$(eval $(call whatmacro,$(INSTALLTARGET),WHATTOOLS))

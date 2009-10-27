@@ -1,0 +1,56 @@
+# Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+#
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+#
+# Contributors:
+#
+# Description:
+# ARMv5 EXE/DLL ABIv2 Function Like Makefile (FLM)
+# Build a window server animation DLL. 
+# 
+#
+
+ifeq ($(TARGETTYPE),ani)
+include $(FLMHOME)/e32abiv2defaults.mk
+
+# What we need to build a DLL
+CANHAVEEXPORTS:=1
+POSTLINKTARGETTYPE:=ANI
+POSTLINKFILETYPE:=ani
+DOPOSTLINK:=1
+AUTOEXPORTS:=_Z15CreateCAnimDllLv,1;
+DEFFILE:=
+
+# Determine what kind of entrypoint option to set
+LINKER_ENTRYPOINT_LIBDEP:=$(STATIC_RUNTIME_DIR)/edll.lib
+LINKER_ENTRYPOINT_SETTING:=$(LINKER_ENTRY_OPTION) _E32Dll $(LINKER_ENTRYPOINT_DECORATION) $(call dblquote,$(STATIC_RUNTIME_DIR)/edll.lib$(LINKER_ENTRYPOINT_ADORNMENT))
+
+ifeq ("$(NEED_ENTRYPOINT_LIBRARY)","True")
+LINKER_ENTRYPOINT_SETTING:=$(LINKER_ENTRYPOINT_SETTING) $(LINKER_ENTRYPOINT_LIBDEP)
+endif
+
+LINKER_STUB_LIBRARY:=$(STATIC_RUNTIME_DIR)/edllstub.lib
+STATIC_RUNTIME_LIB:=$(USER_STATIC_RUNTIME_LIB)
+CANIGNORENONCALLABLE:=1
+
+UID2:=10003b22
+
+
+# We are appending to CDEFS but we don't want this to affect
+# other invocations so we are going to save it on a stack
+# and restore it afterwards
+$(call vsave,CDEFS)
+CDEFS:=$(CDEFS) __DLL__
+include $(FLMHOME)/e32abiv2.flm
+$(call vrestore)
+
+else
+$(error $e32abiv2dll.flm called with wrong TARGETTYPE (should be 'ani' but is '$(TARGETTYPE)'))
+endif
+

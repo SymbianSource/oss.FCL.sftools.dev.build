@@ -1,0 +1,230 @@
+# Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+#
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+#
+# Contributors:
+#
+# Description:
+# Template Extension Makefile  (TEM) FLM
+# Knows how to run TEMs
+# 
+#
+
+################################# FLM Parameter description ##
+# Parameters:
+#   TEMPLATE_EXTENSION_MAKEFILE
+#   PRODUCT_INCLUDE
+#   EPOCROOT:=
+#   PLATFORM:=$(VARIANTPLATFORM)
+# The current configuration either UREL or UDEB:
+#   CFG:=$(VARIANTTYPE)
+# Relative path to EPOCROOT. (to where?):
+#   TO_ROOT:=
+# The path to the top-level bld.inf.
+# Note: if a bld.inf file #includes another bld.inf, this variable will
+# always contain the directory of that top-level file. If you require
+# the directory of the bld.inf which actually references the makefile,
+# use $(EXTENSION_ROOT) instead.
+#   TO_BLDINF:=
+# The project's working build directory under \epoc32\build\..
+#   EPOCBLD:=
+# The path to the directory containing the bld.inf in which the extension makefile was called:
+#   EXTENSION_ROOT:=
+# The path of the host-platform specific (i.e. the shell) makefile containing the above definitions:
+#   HOST_SHELL:=
+# The current platform in lower case to be used as part of path
+# names.
+#   PLATFORM_PATH:=
+# The current configuration in lower case to be used as part of
+# path names.
+#   CFG_PATH:=
+# A list of options passed from a bld.inf to this
+# Template Extension Makefile
+#  O._MEMBERS:=
+# Options should have the name specifed in the bld.inf 
+# but with a prefix of "O." e.g. O.PATH or O.FILENAME
+# (in which case O._MEMBERS:=PATH FILENAME)
+
+# create the working directory for the TEM
+$(shell $(GNUMKDIR) -p $(EPOCBLD))
+
+################################ Standard Variables ##
+# We may set the following 
+# for the sake of template
+# extension makefiles which
+# need to know them:
+
+## Path element separator.
+/:=/
+## PATH environment variable separator.
+;:=:
+
+####
+# Various file and directory manipulation tools.
+# We are using the standard GNU coretools.
+# On Windows these are supplied by CYGWIN
+RMDIR:=$(GNURMDIR)
+RM:=$(GNURM)
+ERASE:=$(GNURM)
+MKDIR:=$(GNUMKDIR)
+CP:=$(GNUCP)
+ARMV7BUILD:=
+
+######################## Target Specific Parameters ##
+# We need to declare the parameters for the TEM 
+# to be target specific to the unique targets
+# that we have created.
+
+UNIQ:=$(TEMPLATE_EXTENSION_MAKEFILE)$(PLATFORM)$(TO_ROOT)$(TO_BLDINF)$(EPOCBLD)$(EXTENSION_ROOT)$(TEMCOUNT)
+UNIQ:=$(word 1,$(shell echo $(UNIQ) | $(GNUMD5SUM)))
+
+# Work out the other FINAL target if we're building both udeb and urel
+ifneq ($($(UNIQ)),)
+
+ifeq ($(CFG),urel)
+OTHER_CFG:=udeb
+endif
+ifeq ($(CFG),udeb)
+OTHER_CFG:=urel
+endif
+ifeq ($(CFG),rel)
+OTHER_CFG:=deb
+endif
+ifeq ($(CFG),deb)
+OTHER_CFG:=rel
+endif
+
+OTHER_MAKMAKE:=$(UNIQ)_$(OTHER_CFG)_MAKMAKE
+OTHER_BLD:=$(UNIQ)_$(OTHER_CFG)_BLD
+OTHER_FREEZE:=$(UNIQ)_$(OTHER_CFG)_FREEZE
+OTHER_LIB:=$(UNIQ)_$(OTHER_CFG)_LIB
+OTHER_CLEANLIB:=$(UNIQ)_$(OTHER_CFG)_CLEANLIB
+OTHER_RESOURCE:=$(UNIQ)_$(OTHER_CFG)_RESOURCE
+OTHER_CLEAN:=$(UNIQ)_$(OTHER_CFG)_CLEAN
+OTHER_FINAL:=$(UNIQ)_$(OTHER_CFG)_FINAL
+endif # ifneq ($($(UNIQ)),)
+
+# Set $($(UNIQ)) so it can be detected if we're run again
+$(UNIQ):=1
+
+tem_$(notdir $(TEMPLATE_EXTENSION_MAKEFILE))_$(PLATFORM)_$(CFG):=$(tem_$(notdir $(TEMPLATE_EXTENSION_MAKEFILE))_$(PLATFORM)_$(CFG)) $(UNIQ)_$(CFG)
+
+TEPARAMETERS:= \
+	EPOCROOT PLATFORM CFG TO_ROOT TO_BLDINF \
+	EPOCBLD EXTENSION_ROOT HOST_SHELL       \
+	RMDIR RM ERASE MKDIR CP                 \
+	PLATFORM_PATH CFG_PATH                  \
+	TEMPLATE_EXTENSION_MAKEFILE             \
+	TARGET SOURCE DEPENDENCIES TOOL PRODUCT_INCLUDE \
+	RVCTBIN RVCTINC RVCTLIB
+
+
+# The standard Template Extension Makefile Targets
+# These will be implemented in terms of double colon
+# rules - such that make FREEZE will cause all FREEZE 
+# targets to be evaluated.
+# For each call of this FLM we also need
+# to create unique versions of each of these targets
+# so that there is something to attach
+# the current FLM parameters to using target-specific 
+# variable declarations.
+
+TETARGETS:= \
+	MAKMAKE     \
+	BLD         \
+	FREEZE      \
+	LIB         \
+	CLEANLIB    \
+	RESOURCE    \
+	CLEAN       \
+	RELEASABLES \
+	FINAL
+
+# If we split the makefiles then only use a subset of
+# the targets for each group makefile.
+#
+ifeq ($(MAKEFILE_GROUP),BITMAP)
+TETARGETS:=MAKMAKE
+endif
+#
+ifeq ($(MAKEFILE_GROUP),RESOURCE)
+TETARGETS:=RESOURCE
+endif
+#
+ifeq ($(MAKEFILE_GROUP),ALL)
+TETARGETS:=BLD FREEZE LIB CLEANLIB CLEAN RELEASABLES FINAL
+endif
+
+# Hook into global targets
+#
+MAKMAKE_HOOK:=BITMAP
+BLD_HOOK:=TARGET
+FREEZE_HOOK:=FREEZE
+LIB_HOOK:=LIBRARY
+CLEAN_HOOK:=CLEAN
+CLEANLIB_HOOK:=CLEAN
+RESOURCE_HOOK:=RESOURCE
+FINAL_HOOK:=FINAL
+RELEASABLES_HOOK:=RELEASABLES
+
+# make sure TEMS happen at the right stages
+# OTHER_$(STAGE) only set if running udeb+urel
+MAKMAKE_DEPS:=EXPORT $(OTHER_MAKMAKE)
+RESOURCE_DEPS:=BITMAP $(OTHER_RESOURCE)
+LIB_DEPS:=RESOURCE $(OTHER_LIB)
+BLD_DEPS:=LIBRARY $(OTHER_BLD)
+FINAL_DEPS:=TARGET $(OTHER_FINAL)
+FREEZE_DEPS:=$(OTHER_FREEZE)
+CLEANLIB_DEPS:=$(OTHER_CLEANLIB)
+CLEAN_DEPS:=$(OTHER_CLEAN)
+
+export /
+export ;
+export SHELL
+
+#################################### Global Targets ##
+## All the global targets for the TEM
+# TEMs are called as sub-makes.
+
+define getMember
+$(subst $$,$$$$,$(O.$(1)))
+endef
+
+define callTEM
+.PHONY:: $(UNIQ)_$(CFG)_$(1) 
+$($(1)_HOOK):: $(UNIQ)_$(CFG)_$(1)
+
+$(EPOCROOT)/epoc32/build/TEM_$(1):: $(UNIQ)_$(CFG)_$(1)
+
+$(UNIQ)_$(CFG)_$(1) : $($(1)_DEPS)
+	$(call startrule,tem,FORCESUCCESS,$(notdir $(TEMPLATE_EXTENSION_MAKEFILE))_$(1)) \
+	$(foreach V,$(TEPARAMETERS),$(V)='$($(V))') TEMTARGET='$(1)' $(foreach V,$(O._MEMBERS),$(V)='$(call getMember,$(V))')  $(TEMMAKE) -C $(EPOCBLD) -f $(TEMPLATE_EXTENSION_MAKEFILE) $(if $(SAVESPACE),$(subst BLD,SAVESPACE,$(1)),$(1)) \
+	$(call endrule,tem)
+ifneq ($(call isoneof,$(1),RELEASABLES FINAL),)
+	$(call startrawoutput) \
+	echo "$(call whatLogOpen)" ; \
+	$(foreach V,$(TEPARAMETERS),$(V)='$($(V))') TEMTARGET='$(1)' \
+	$(foreach V,$(O._MEMBERS),$(V)='$(call getMember,$(V))')  \
+	$(TEMMAKE) -s --no-print-directory -C $(EPOCBLD) -f $(TEMPLATE_EXTENSION_MAKEFILE) RELEASABLES | \
+	(read -r LINE; while [ $$$$? -eq 0 ]; do \
+	if [[ ! $$$$LINE =~ "Nothing to be done for"  ]] ; then echo "$(call whatLogItem,TEM,$$$$LINE)"; fi; \
+	read -r LINE; done; ); \
+	echo "$(call whatLogClose)" \
+	$(call endrawoutput) 
+
+WHATTEM:: $(UNIQ)_$(CFG)_RELEASABLES
+
+endif
+
+
+tem_debug::
+	@echo "TEM_DEBUG: O._MEMBERS=$(O._MEMBERS)"
+endef
+
+$(foreach TETRG,$(TETARGETS),$(eval $(call callTEM,$(TETRG))))

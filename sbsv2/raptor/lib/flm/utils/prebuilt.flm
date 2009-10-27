@@ -1,0 +1,103 @@
+# Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+#
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+#
+# Contributors:
+#
+# Description:
+#
+
+# FLM to copy pre-built binaries into the right release locations
+
+# parameters
+#
+# PRE_PLATFORM    the target of the binaries, e.g. armv5
+# PRE_TYPE        the build variant of the binaries, e.g. urel
+# BINARIES        the list of binary files, relative to EXTENSION_ROOT
+
+# The filenames in the list BINARIES may optionally have an appended "->name"
+# when the destination basename should be different from the source. For
+# example, ../bin/deb_codec66.lib->codec66.lib will create files
+# called "codec66.lib" and not "deb_codec66.lib"
+               
+# ensure that there are no nasty leading or trailing spaces
+PRE_PLATFORM:=$(strip $(PRE_PLATFORM))
+PRE_TYPE:=$(strip $(PRE_TYPE))
+
+# don't do anything unless the prebuilt binaries match what we are building
+#
+ifeq ($(PRE_PLATFORM),$(VARIANTPLATFORM))
+ifeq ($(PRE_TYPE),$(VARIANTTYPE))
+
+# the feature Invariant directory for binaries of this ilk
+INV:=$(RELEASEPATH)/$(VARIANTPLATFORM)/$(VARIANTTYPE)
+
+CREATABLEPATHS:=
+RELEASABLES:=
+
+# for any configuration (feature variant or not) add rules to copy the
+# prebuilt binaries from the source directory to the Invariant directory.
+#
+# For example,
+# cp /src/armv5/urel/my.lib /epoc32/release/armv5/urel/my.lib
+#
+# Without this you would always have to build the invariant configuration
+# before (or alongside) any feature variant configuration.
+
+define copyprebuilt
+#
+# $1 is the source file
+# $2 is the destination file
+
+ALL:: $(2)
+
+$(2): $(1)
+	$(call startrule,copyprebuilt) \
+	$(GNUCP) $(1) $(2) && \
+	$(GNUCHMOD) a+rw $(2) \
+	$(call endrule,copyprebuilt)
+
+CREATABLEPATHS:=$(INV)
+RELEASABLES:=$$(RELEASABLES) $(2)
+
+endef # copyprebuilt
+
+define copyprebuiltfile
+#
+# $1 is "name" or "name->name"
+
+ifeq ($(findstring ->,$(1)),)
+$(call copyprebuilt,$(EXTENSION_ROOT)/$(1),$(INV)/$(notdir $(1)))
+else
+$(call copyprebuilt,$(EXTENSION_ROOT)/$(word 1,$(subst ->, ,$(1))),$(INV)/$(word 2,$(subst ->, ,$(1))))
+endif
+endef # copyprebuiltfile
+
+$(eval $(foreach B,$(BINARIES),$(call copyprebuiltfile,$(B))))
+
+
+# housekeeping
+
+# make the output directories while reading the makefile,
+# as some build engines prefer this.
+$(call makepath,$(CREATABLEPATHS))
+
+# clean
+$(eval $(call GenerateStandardCleanTarget,$(RELEASABLES),$(CREATABLEPATHS)))
+
+# what
+$(eval $(call whatmacro,$(RELEASABLES)))
+
+
+endif # PRE_TYPE == VARIANTTYPE
+endif # PRE_PLATFORM == VARIANTPLATFORM
+
+
+# the end
+

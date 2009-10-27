@@ -1,0 +1,32 @@
+# Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+#
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+#
+# Contributors:
+#
+# Description:
+# e32abiv2lib.flm
+# ARMv5 LIB ABIv2 Function Like Makefile (FLM)
+# Build an e32 static library
+# 
+#
+
+ifeq ($(TARGETTYPE),stdlib)
+include $(FLMHOME)/e32abiv2defaults.mk
+
+# What we need to build a LIB 
+POSTLINKFILETYPE:=lib
+
+NOHIDEALL:=1
+
+include $(FLMHOME)/e32abiv2.flm
+
+else
+$(error e32abiv2stdlib.flm called with wrong TARGETTYPE (should be 'stdlib' but is '$(TARGETTYPE)'))
+endif

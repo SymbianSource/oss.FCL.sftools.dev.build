@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<build xmlns="http://symbian.com/xml/build" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symbian.com/xml/build ../../schema/build/2_0.xsd">
+
+	<!-- 
+	
+	The root variant is extended by all buildable variants.
+	
+	It contains references to variants which have defaults here but which
+	can be overridden to effectively apply a global change for all builds. 
+	
+	-->
+
+	<var name="root">
+		<varRef ref="root.places"/>
+		<varRef ref="root.properties"/>
+		
+		<!-- redefine this to make changes to the root variant -->
+		<varRef ref="root.changes"/>
+	</var>
+
+	<!-- Common folders and files -->
+	<var name="root.places">
+		<env name='EPOCROOT' default='/' type='path'/>
+		
+		<set name='EPOCINCLUDE' value='$(EPOCROOT)/epoc32/include'/>
+		<set name='EPOCTOOLS' value='$(EPOCROOT)/epoc32/tools'/>
+
+		<!-- Place where intermediate files are built -->
+		<env name='SBS_BUILD_DIR' default='$(EPOCROOT)/epoc32/build' type='path'/> 
+
+		<!-- Configuration files and directories -->
+		<set name='PRODUCT_INCLUDE' value='$(EPOCINCLUDE)/variant/symbian_os.hrh'/>
+		<set name='VARIANT_CFG' value='$(EPOCTOOLS)/variant/variant.cfg'/>
+		<set name='MAKEFILE_TEMPLATES' value='$(EPOCTOOLS)/makefile_templates'/>
+		<set name='FLM_EXPORT_DIR' value='$(MAKEFILE_TEMPLATES)'/>
+	</var>
+	
+	<!-- Things which are properties of different OS versions rather than
+		 properties of Raptor itself. The values here are for TB92sf and
+		 may be completely redefined for other OS versions or modified
+		 slightly by redefining the root.changes variant. -->
+	<var name="root.properties">
+		<set name='POSTLINKER_SUPPORTS_WDP' value='1'/>
+		<set name='SUPPORTS_STDCPP_NEWLIB' value='1'/>
+		<set name="RVCT_PRE_INCLUDE" value="$(EPOCINCLUDE)/rvct/rvct.h"/>
+	</var>
+	
+	<!-- Placeholder for the root.changes variant. This will typically be
+	     redefined inside a .xml file in the $(EPOCROOT)/epoc32/sbs_config
+	     folder or a folder added with the configpath option. -->
+	<var name="root.changes"/>
+	
+</build>

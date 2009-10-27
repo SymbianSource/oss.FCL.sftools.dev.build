@@ -1,0 +1,34 @@
+# Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+#
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+#
+# Contributors:
+#
+# Description:
+# WINSCW PDD Function Like Makefile (FLM)
+# Build an emulator PDD
+# 
+#
+
+ifeq ($(TARGETTYPE),pdd)
+
+BASE_TYPE=dll
+CW_STATIC_RUNTIME:=1
+FIRST_STATLIB:=edev.lib
+FIXED_EXPORT:=?CreatePhysicalDevice@@YAPAVDPhysicalDevice@@XZ
+SUPPORTS_IMPORT_LIBRARY:=0
+SYSTEM_TARGET:=1
+UID2_DEFAULT:=100039d0
+
+# Use the general win32 FLM 
+include $(FLMHOME)/win32.flm
+
+else
+$(error $win32pdd.flm called with wrong TARGETTYPE (should be 'pdd' but is '$(TARGETTYPE)'))
+endif

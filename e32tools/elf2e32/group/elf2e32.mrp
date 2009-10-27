@@ -1,0 +1,9 @@
+component       dev_build_e32tools_elf2e32
+
+source          /src/tools/dev/build/e32tools/elf2e32
+binary          /src/tools/dev/build/e32tools/elf2e32/group all
+
+notes_source    release.txt
+
+ipr T
+

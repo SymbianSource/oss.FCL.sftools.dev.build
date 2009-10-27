@@ -1,0 +1,26 @@
+# Copyright (c) Symbian Software Ltd 2008-2009.
+#
+# Description:
+# This is an example file.
+# If it exists, the file default.flm in this directory is automatically
+# included by $(SBS_HOME)/lib/flm/config/default.flm
+# This allows end-users to "drop in" a file which adds to the default
+# behaviour (or overrides it) rather than editing the shipped .flm file.
+# default.flm contains things which require one instance per configuration.
+# For example, dependencies in the epoc32 tree (which need the $(EPOCROOT)
+# variable) and recipes to make things not specified in a bld.inf file.
+#
+
+
+# an example dependency - the script my.pl uses the rcomp tool
+
+$(EPOCROOT)/epoc32/tools/my.pl:	$(EPOCROOT)/epoc32/tools/rcomp$(DOTEXE)
+
+
+# an example recipe - run an accounting script after the binaries are made
+
+FINAL::
+	python $(EPOCROOT)/epoc32/tools/my_account.py $(EPOCROOT) $(PLATFORM)
+
+
+# end of example file

@@ -1,0 +1,38 @@
+    1: --------------------------------------------------------------------------
+    2: This program is free software; you can redistribute it and/or modify it
+    3: under the terms of the GNU General Public License (GPL) as published by
+    4: the Free Software Foundation; either version 2 of the License, or (at
+    5: your option) any later version.
+    6: 
+    7: This program is distributed in the hope that it will be useful,
+    8: but WITHOUT ANY WARRANTY; without even the implied warranty of
+    9: MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   10: GNU General Public License for more details.
+   11: 
+   12: You should have received a copy of the GNU General Public License
+   13: along with this program; if not, write to the Free Software
+   14: Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+   15: --------------------------------------------------------------------------
+   16: 
+   17: *** NOTE ***
+   18: 
+   19: In accordance with section 10 of the GPL, Red Hat permits programs whose
+   20: sources are distributed under a license that complies with the Open
+   21: Source definition to be linked with libcygwin.a without libcygwin.a
+   22: itself causing the resulting program to be covered by the GNU GPL.
+   23: 
+   24: This means that you can port an Open Source(tm) application to cygwin,
+   25: and distribute that executable as if it didn't include a copy of
+   26: libcygwin.a linked into it.  Note that this does not apply to the cygwin
+   27: DLL itself.  If you distribute a (possibly modified) version of the DLL
+   28: you must adhere to the terms of the GPL, i.e. you must provide sources
+   29: for the cygwin DLL.
+   30: 
+   31: See http://www.opensource.org/docs/definition_plain.html for the precise Open Source
+   32: Definition referenced above.
+   33: 
+   34: Red Hat sells a special Cygwin License for customers who are unable to
+   35: provide their application in open source code form.  For more
+   36: information, please see: http://www.redhat.com/software/tools/cygwin/,
+   37: or call 866-2REDHAT ext.  3007
+   38: 

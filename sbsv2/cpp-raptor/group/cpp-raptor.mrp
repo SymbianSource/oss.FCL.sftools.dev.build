@@ -1,0 +1,10 @@
+component dev_build_sbsv2_cpp-raptor
+
+
+source /src/tools/dev/build/sbsv2/cpp-raptor
+exports /src/tools/dev/build/sbsv2/cpp-raptor/group
+
+ipr T
+
+notes_source release.txt
+

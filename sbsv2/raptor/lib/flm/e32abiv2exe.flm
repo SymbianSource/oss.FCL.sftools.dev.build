@@ -1,0 +1,49 @@
+# Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+#
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+#
+# Contributors:
+#
+# Description:
+# ARMv5 EXE/DLL ABIv2 Function Like Makefile (FLM)
+# Build an e32 EXE
+# 
+#
+
+# What we need to build an EXE
+
+ifeq ($(TARGETTYPE),exe)
+include $(FLMHOME)/e32abiv2defaults.mk
+
+POSTLINKTARGETTYPE:=EXE
+POSTLINKFILETYPE:=exe
+DOPOSTLINK:=1
+# Determine what kind of entrypoint option to set
+LINKER_STUB_LIBRARY:=
+LINKER_ENTRYPOINT_LIBDEP:=$(STATIC_RUNTIME_DIR)/$(if $(FIRSTLIB),$(FIRSTLIB),eexe.lib)
+
+LINKER_ENTRYPOINT_SETTING:=$(LINKER_ENTRY_OPTION) _E32Startup $(LINKER_ENTRYPOINT_DECORATION) $(call dblquote,$(STATIC_RUNTIME_DIR)/$(if $(FIRSTLIB),$(FIRSTLIB),eexe.lib)$(LINKER_ENTRYPOINT_ADORNMENT)) 
+
+ifeq ("$(NEED_ENTRYPOINT_LIBRARY)","True")
+LINKER_ENTRYPOINT_SETTING:=$(LINKER_ENTRYPOINT_SETTING) $(LINKER_ENTRYPOINT_LIBDEP)
+endif
+
+STATIC_RUNTIME_LIB:=$(USER_STATIC_RUNTIME_LIB)
+
+MAKEDEFFILE:=
+
+$(call vsave,CDEFS)
+CDEFS:=$(CDEFS) __EXE__
+include $(FLMHOME)/e32abiv2.flm
+$(call vrestore)
+
+else
+$(error $e32abiv2exe.flm called with wrong TARGETTYPE (should be 'exe' but is '$(TARGETTYPE)'))
+endif
+

@@ -1,0 +1,301 @@
+# Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+#
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+#
+# Contributors:
+#
+# Description:
+# Function Like Makefile (FLM) to create a resource header (.rsg)
+# and resource files (.rsc, .r01, .r02 etc.)
+#
+#
+
+## Parameters that are expected:
+# TARGET
+# TARGETPATH
+# LANGUAGES
+# HEADER
+# HEADERONLY
+# EPOCROOT
+# MMPDEFS
+# PRODUCT_INCLUDE
+# SYSTEMINCLUDE
+# USERINCLUDE
+# GNUCPP
+# GNUSED
+# RCOMP
+# OUTPUTPATH
+# SOURCE
+# BINCOPYDIRS
+
+
+# The rss is pre-processed once for each language and results
+# in a file with extension r$(LANGUAGE) where $(LANGUAGE) is
+# either "sc" or a 2 (or more) digit number.
+ifneq ($(TARGETPATH),)
+RSCDIR:=$(subst //,/,$(EPOCROOT)/epoc32/data/z/$(TARGETPATH))
+else
+RSCDIR:=$(subst //,/,$(EPOCROOT)/epoc32/data)
+endif
+RESBASE:=$(RSCDIR)/$(TARGET_lower)
+
+# Ensure that RELEASABLES and CLEANTARGETS cannot expand indefinitely in successive calls to this flm:
+CLEANTARGETS:=
+RELEASABLES:=
+
+# There is only one resource header (.rsg) file and we only
+# make that if we are asked.
+RSGDIR:=$(EPOCROOT)/epoc32/include
+ifneq ($(or $(HEADER),$(HEADERONLY)),)
+        RESOURCEHEADER:=$(RSGDIR)/$(HEADER)
+
+        # If there are multiple LANGUAGES then it is the last one in the list
+        # which produces the header.
+        HEADLANG:=$(lastword $(LANGUAGES:SC=sc))
+else
+	HEADLANG:=
+    RESOURCEHEADER:=
+endif
+
+# we create intermediate .rpp and .d files
+INTERBASE:=$(OUTPUTPATH)/$(TARGET_lower)$(if $(TARGETPATH),_$(subst /,_,$(TARGETPATH)),)
+
+################################## localisation ###########################$(GNUMKDIR)#############
+# Only make copies for full resource builds
+
+# Initialise to prevent RELEASABLES spill-over between calls
+DESTRPP:=
+INFOFILE:=
+
+ifeq ($(HEADERONLY),)
+
+RSSBASENAME:=$(call lowercase,$(basename $(notdir $(SOURCE))))
+DESTRPP:=$(EPOCROOT)/epoc32/localisation/$(RSSBASENAME)/rsc/$(RSSBASENAME).rpp
+$(call makepath,$(EPOCROOT)/epoc32/localisation/$(RSSBASENAME)/rsc)
+
+INFOFILE:=$(EPOCROOT)/epoc32/localisation/group/$(RSSBASENAME).info
+# If there are MULTIPLE languages then copy the .rpp for the last one
+RPPLANG:=$(lastword $(LANGUAGES:SC=sc))
+
+# Copy .rpp files from epoc32/build/ to epoc32/localisation/x/rsc/x.rpp and create .info files in localisation
+define CreateRppAndInfo
+
+ifeq ($(RESOURCE_$(call sanitise,$(SOURCE))),)
+RESOURCE_$(call sanitise,$(SOURCE)):=1
+
+RESOURCE:: $(DESTRPP) $(INFOFILE)
+
+$(DESTRPP): $(INTERBASE)_$(RPPLANG).rpp
+	$(call startrule,rppfilecopy,FORCESUCCESS) \
+	$(GNUCP) $$< $$@ \
+	$(call endrule,rppfilecopy)
+
+$(INFOFILE)::
+	@if [ ! -d $(EPOCROOT)/epoc32/localisation/group ]; then $(GNUMKDIR) -p $(EPOCROOT)/epoc32/localisation/group; fi
+	@if [ ! -f $$@ ]; then echo "DATADIR: /$(RSSBASENAME)" > $$@ ; fi
+	@echo -e "\n/z$(TARGETPATH)/$(TARGET_lower).rsc : $(RSSBASENAME).rpp" >> $$@
+
+CLEANTARGETS:=$$(CLEANTARGETS) $(DESTRPP) $(INFOFILE)
+
+endif
+endef
+
+$(eval $(call CreateRppAndInfo))
+endif
+################################# end of localisation ###################################
+
+# make the output directories while reading makefile - some build engines prefer this
+$(call makepath,$(INTERBASE))
+
+# common pre-processor options
+CPPOPT:=-nostdinc -undef -D_UNICODE -include $(PRODUCT_INCLUDE)\
+ -I$(dir $(SOURCE)) $(foreach I, $(USERINCLUDE),-I$(I) ) -I- $(foreach J,$(SYSTEMINCLUDE),-I$(J) )
+
+CREATABLEPATHS:=$(RSCDIR) $(RSGDIR) $(OUTPUTPATH)
+
+# additional binary resource copies performed based on BINCOPYDIRS
+RSCCOPYDIRS:=
+ifneq ($(BINCOPYDIRS),)
+        RSCCOPYDIRS:=$(subst //,/,$(patsubst %,%/$(if $(TARGETPATH),/z/$(TARGETPATH),),$(BINCOPYDIRS)))
+        CREATABLEPATHS:=$(CREATABLEPATHS) $(RSCCOPYDIRS)
+endif
+
+###############################################################################
+define preprocessresource
+# $(1) is the RPPFILE		(eg. /epoc32/build/xxx/b_sc.rpp)
+# $(2) is the related RESOURCEFILE if any (eg. /a/b.rsc)
+# $(3) is the LANGUAGE		(eg. sc or 01 or 02 ...)
+
+  ifeq ($(TARGET_$(call sanitise,$1)),)
+    TARGET_$(call sanitise,$1):=1
+    $(if $(FLMDEBUG),$(info preprocessresource: $(1) for $(2) LANG:$(3)))
+
+    RESOURCE_DEPS:: $(1).d
+    $(1).d: $(SOURCE)
+	  $(call startrule,resourcedependencies,FORCESUCCESS) \
+	  $(GNUCPP) -C -DLANGUAGE_$(3) -DLANGUAGE_$(subst sc,SC,$(3)) $(call makemacrodef,-D,$(MMPDEFS))\
+	  $(CPPOPT) $(SOURCE) -M -MG -MT"$(1)" | \
+	  $(GNUSED)  -r 's# ([^ \/]+\.((rsg)|(mbg)))# $(EPOCROOT)\/epoc32\/include\/\1#ig' > $(1).d \
+	  $(call endrule,resourcedependencies)
+
+    $(1): $(1).d
+	  $(call startrule,resourcepreprocess,FORCESUCCESS) \
+	  $(GNUCPP) -C -DLANGUAGE_$(3) -DLANGUAGE_$(subst sc,SC,$(3)) $(call makemacrodef,-D,$(MMPDEFS))\
+	  $(CPPOPT) $(SOURCE) -o $$@ \
+	  $(call endrule,resourcepreprocess)
+
+    CLEANTARGETS:= $$(CLEANTARGETS) $(1)
+
+    $(eval DEPENDFILENAME:=$(1).d)
+    $(eval DEPENDFILE:=$(wildcard $(DEPENDFILENAME)))
+
+    CLEANTARGETS:=$$(CLEANTARGETS) $(DEPENDFILENAME)
+    ifneq "$(DEPENDFILE)" ""
+      ifeq "$(filter %CLEAN,$(call uppercase,$(MAKECMDGOALS)))" ""
+        -include $(DEPENDFILE)
+      endif
+    endif
+
+  endif
+endef # preprocessresource #
+
+###############################################################################
+define copyresource
+# $(1) is the source
+# $(2) is the destination
+
+RELEASABLES:=$$(RELEASABLES) $(2)
+
+   ifeq ($(TARGET_$(call sanitise,$2)),)
+           TARGET_$(call sanitise,$2):=1
+        CLEANTARGETS:=$$(CLEANTARGETS) $2
+
+        RESOURCE:: $2
+        ## perform additional copies of binaries
+        #
+        # Only certain builds require further copies of the generated resource binaries
+        #
+        $(2): $(1)
+		$(call startrule,resourcecopy,FORCESUCCESS) \
+		$(GNUCP) $$< $$@ \
+		$(call endrule,resourcecopy)
+
+   endif
+
+endef # copyresource #
+
+###############################################################################
+define generateresource
+
+# $(1) is the resource filename e.g. /a/b/resource.rsc
+# $(2) is the preprocessed resource to make it from
+# $(3) is the language e.g. sc or 01 or 02
+
+    RELEASABLES:=$$(RELEASABLES) $(1)
+
+        ifeq ($(TARGET_$(call sanitise,$1)),)
+                TARGET_$(call sanitise,$1):=1
+            CLEANTARGETS:=$$(CLEANTARGETS) $(1)
+
+            $(if $(FLMDEBUG),$(info generateresource: $(1) from $(2) LANG:$(3)),)
+
+
+            RESOURCE:: $(1)
+
+            $(1): $(2) $(RCOMP)
+			$(call startrule,resourcecompile,FORCESUCCESS) \
+			$(RCOMP) -m045,046,047 -u -o$(1) -s$(2) \
+			$(call endrule,resourcecompile)
+
+        endif
+#	Whether or not we have generated this resource for some other variant, check if there
+#       are any new copies to be made for this variant. e.g. winscw requires that we make
+#       some extra copies.
+
+        $(foreach F,$(sort $(patsubst %,%/$(notdir $(1)),$(RSCCOPYDIRS))),$(call copyresource,$(1),$(F)))
+
+        # individual source file compilation
+        SOURCETARGET_$(call sanitise,$(SOURCE)): $(1)
+
+endef # generateresource
+
+
+###############################################################################
+define generateresourceheader
+# $(1) is the resource header	(eg. /epoc32/include/a.rsg)
+# $(2) is the preprocessed resource to make it from
+# $(3) is the language to use	(eg. sc)
+
+		RELEASABLES:= $$(RELEASABLES) $(1)
+
+        ifeq ($(TARGET_$(call sanitise,$1)),)
+                TARGET_$(call sanitise,$1):=1
+                CLEANTARGETS:= $$(CLEANTARGETS) $(1)
+                $(if $(FLMDEBUG),$(info resourceheader: $(1) from $(2) LANG:$(3)))
+
+                RESOURCE:: $(1)
+
+                $(1): $(2) $(RCOMP)
+			$(call startrule,resourceheader,FORCESUCCESS) \
+			$(RCOMP) -m045,046,047 -u -h$(1) -s$(2) \
+			$(call endrule,resourceheader)
+
+        endif
+
+
+        # individual source file compilation
+        SOURCETARGET_$(call sanitise,$(SOURCE)): $(1)
+
+endef
+
+###############################################################################
+## call the generator
+
+# We always create at least the header
+# even if we sometimes don't create the resources
+ifneq ($(RESOURCEHEADER),)
+        $(eval $(call generateresourceheader,$(RESOURCEHEADER),$(INTERBASE)_$(HEADLANG).rpp,$(HEADLANG)))
+endif
+
+ifeq ($(HEADERONLY),)
+        # generate a resource file for each language
+        # For sc we generate $(RESBASE).rsc and define LANGUAGE_SC and LANGUAGE_sc.
+        $(foreach L,$(LANGUAGES:SC=sc),$(eval $(call preprocessresource,$(INTERBASE)_$(L).rpp,$(RESBASE).r$(L),$(L))))
+        $(foreach L,$(LANGUAGES:SC=sc),$(eval $(call generateresource,$(RESBASE).r$(L),$(INTERBASE)_$(L).rpp,$(L))))
+else
+        # No resources are going to be made so unless we specifically ask for it, there will be no
+        # preprocessed file from which to create the header:
+
+        $(eval $(call preprocessresource,$(INTERBASE)_$(HEADLANG).rpp,,$(HEADLANG)))
+
+endif
+
+###############################################################################
+## .rfi generation in support of the gccxml build
+## Note that .rfi files are created from the dependency files generated from preprocessing resources to create .rpp files
+ifneq ($(RFIFILE),)
+  RESOURCE:: $(RFIFILE)
+  RELEASABLES:=$(RELEASABLES) $(RFIFILE)
+  CLEANTARGETS:=$(CLEANTARGETS) $(RFIFILE)
+  CREATABLEPATHS:=$(CREATABLEPATHS) $(dir $(RFIFILE))
+
+  RPPFILES:=$(foreach L,$(LANGUAGES:SC=sc),$(INTERBASE)_$(L).rpp)
+  $(eval $(call generaterfifile,$(RFIFILE),$(RPPFILES),$(addsuffix .d,$(RPPFILES))))
+endif
+
+
+## Clean up
+$(eval $(call GenerateStandardCleanTarget,$(CLEANTARGETS),$(CREATABLEPATHS),))
+# make the output directories while reading makefile - some build engines prefer this
+$(call makepath,$(CREATABLEPATHS))
+
+# for the abld -what target
+RELEASABLES:=$(RELEASABLES) $(DESTRPP) $(INFOFILE)
+$(eval $(call whatmacro,$(RELEASABLES),WHATRESOURCES))
+

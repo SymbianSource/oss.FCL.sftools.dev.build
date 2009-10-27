@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<build xmlns="http://symbian.com/xml/build" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symbian.com/xml/build ../../schema/build/2_0.xsd">
+	<!-- build configurations for MSVC compilers -->
+	<var name="tools_base" extends="root">
+		<varRef ref="default.interfaces"/>
+		<varRef ref="default.locations"/>
+
+		<!-- picked up from the Environment -->
+		<env name='MS_CL' default='cl.exe' type='tool' versionCommand='$(MS_CL)' versionResult='Version 12\.[0-9]{2}\.[0-9]{4}'/>
+		<env name='MS_LINK' default='link.exe' type='tool' versionCommand='$(MS_LINK)' versionResult='Version 6\.[0-9]{2}.[0-9]{4}'/>
+		<env name='MS_LIB' default='lib.exe' type='tool' versionCommand='$(MS_LIB)' versionResult='Version 6\.[0-9]{2}.[0-9]{4}'/>
+		<env name='MS_BSCMAKE' default='bscmake.exe' type='tool' versionCommand='$(MS_BSCMAKE)' versionResult='Version 6\.[0-9]{2}.[0-9]{4}'/>
+
+		<!-- MS toolchain environment variables -->
+		<env name='INCLUDE'/>
+		<env name='LIB'/>
+
+		<!-- link to bld.inf and mmp platform names -->
+		<set name='TRADITIONAL_PLATFORM' value='TOOLS'/>
+		<set name='NMAKE' value='nmake'/>
+		<set name='NMAKEFLAGS' value='-nologo -x - '/>
+		<!-- tools options -->
+		<set name='OPT.BROWSEDB' value='-o'/>
+		<set name='OPT.BROWSEFILE' value='-FR'/>
+		<set name='OPT.COMPILE' value='-c '/>
+		<set name='OPT.DEFINE' value='-D '/>
+		<set name='OPT.INCLUDE' value='-I '/>
+		<set name='OPT.IMPLIB' value='-implib:'/>
+		<set name='OPT.LIBDEB' value='-MTd '/>
+		<set name='OPT.LIBREL' value='-MT '/>
+		<set name='OPT.LISTING' value='-Fa'/>
+		<set name='OPT.NOLOGO' value='-nologo'/>
+		<set name='OPT.OBJECTFILE' value='-Fo'/>
+		<set name='OPT.OUTFILE' value='-out:'/>
+		<set name='OPT.PDBFILE' value='-Fd'/>
+		<set name='OPT.PREINCLUDE' value='-FI '/>
+		<set name='OPT.SUBSYSTEM' value='-subsystem:'/>
+		<set name='OPT.SYSINCLUDE' value='-I '/>
+		<set name='OPT.USERINCLUDE' value='-I '/>
+		<set name='PREFIX.RESPONSEFILE' value='@'/>
+		<set name='CC' value='$(MS_CL)'/>
+		<set name='CDEFS' value='__SYMBIAN32__ __VC32__ __TOOLS__ __MSVC6__ __MSVC600__ WIN32 WINDOWS __SUPPORT_CPP_EXCEPTIONS__ $(MMPDEFS)'/>
+		<set name='CDEFS.DEB' value='_DEBUG'/>
+		<set name='CDEFS.REL' value='NDEBUG'/>
+		<set name='CFLAGS' value='$(OPT.COMPILE) $(OPT.NOLOGO) -Zp4 -GF'/>
+		<set name='CFLAGS.DEFAULT.WARNLEVEL' value='-W4'/>
+		<set name='CFLAGS.DEB' value='-Zi -Od'/>
+		<set name='CFLAGS.REL' value='-O1 -Op'/>
+		<set name='SHAREDFLAGS' value='kernel32.lib $(OPT.NOLOGO) -machine:IX86  -ignore:4089 -ignore:4005 -ignore:4098'/>
+		<set name='LD' value='$(MS_LINK)'/>
+		<set name='LFLAGS' value='$(SHAREDFLAGS) -WARN:1'/>
+		<set name='LFLAGS.DEB' value='-debug'/>
+		<set name='LFLAGS.REL' value='-incremental:no'/>
+		<set name='AR' value='$(MS_LIB)'/>
+		<set name='ARFLAGS' value='$(SHAREDFLAGS)'/>
+		<set name='BROWSETOOL' value='$(MS_BSCMAKE)'/>
+		<set name='BROWSEFLAGS' value='$(OPT.NOLOGO)'/>
+		<set name='PLATMACROS.WINDOWS' value='VC32 TOOLS MSVC6 MSVC600'/>
+		<set name='PLATMACROS.LINUX' value='$(PLATMACROS.WINDOWS)'/>
+		<!-- interfaces -->
+		<set name="INTERFACE.exe" value="msvctools.exe"/>
+		<set name="INTERFACE.lib" value="msvctools.lib"/>
+
+		<set name='RELEASEPATHROOT' value='$(EPOCROOT)/epoc32/release'/>
+		<set name='IMPORTLIBPATH' value='$(RELEASEPATHROOT)/tools/udeb'/>
+
+		<set name='MMPDEFS' value=''/>
+		<set name='OUTPUTPATH' value='$(SBS_BUILD_DIR)'/>
+		<set name='SBSV1MAKE' value='$(EPOCROOT)/epoc32/tools/make$(DOTEXE)'/>
+		<set name='SYSTEMINCLUDE' value=''/>
+		<set name='TARGET' value='TARGET_WAS_NOT_SET_PROPERLY'/>
+		<set name='TARGETPATH' value=''/>
+		<set name='TARGETTYPE' value='TARGETTYPE_WAS_NOT_SET_PROPERLY'/>
+		<set name='USERINCLUDE' value=''/>
+		<set name='VARIANTPLATFORM' value='tools'/>
+	</var>
+
+	<var name="tools_deb" extends="tools_base">
+		<set name='FULLVARIANTPATH' value='tools/deb'/>
+		<set name='VARIANTTYPE' value='deb'/>
+		<set name='INSTALLPATH' value=''/> <!-- don't install DEB builds  -->
+		<append name='CDEFS' value='$(CDEFS.DEB)'/>
+		<append name='CFLAGS' value='$(CFLAGS.DEB)'/>
+		<append name='LFLAGS' value='$(LFLAGS.DEB)'/>
+		<set name='CFLAGS.LIB' value='$(OPT.LIBDEB)'/>
+	</var>
+
+	<var name="tools_rel" extends="tools_base">
+		<set name='FULLVARIANTPATH' value='tools/rel'/>
+		<set name='VARIANTTYPE' value='rel'/>
+		<set name='INSTALLPATH' value='$(EPOCROOT)/epoc32/tools'/>
+		<append name='CDEFS' value='$(CDEFS.REL)'/>
+		<append name='CFLAGS' value='$(CFLAGS.REL)'/>
+		<append name='LFLAGS' value='$(LFLAGS.REL)'/>
+		<set name='CFLAGS.LIB' value='$(OPT.LIBREL)'/>
+	</var>
+
+	<group name='tools'>
+		<varRef ref='tools_rel'/>
+		<varRef ref='tools_deb'/>
+	</group>
+</build>

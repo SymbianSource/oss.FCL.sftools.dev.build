@@ -1,0 +1,74 @@
+   1              	@ DLL Stub routines
+   2              	@
+   3              	@ Compile with "gcc -c -Wa,-adhln stubs.s"
+   4              	@
+   5              	.text
+   6              		.code 32
+   7              		.globl  arm4_stub
+   8              	arm4_stub:
+   9 0000 00C09FE5 		ldr     ip, [pc]
+  10 0004 00F09CE5 		ldr     pc, [ip]
+  11 0008 44332211 		.word   0x11223344  @ address in IAT/edata
+  12              	
+  13              		.code 32
+  14              		.globl  armi_stub
+  15              	armi_stub:
+  16 000c 04C09FE5 		ldr     ip, [pc, #4]
+  17 0010 00F09CE5 		ldr     pc, [ip]
+  18 0014 1CFF2FE1 		bx      ip
+  19 0018 44332211 		.word   0x11223344  @ address in IAT/edata
+  20              	
+  21              		.code 16
+  22              		.globl  thumb_stub
+  23              	thumb_stub:
+  24 001c 40B4     		push    {r6}
+  25 001e 024E     		ldr     r6, [pc, #8]
+  26 0020 3668     		ldr     r6, [r6]
+  27 0022 B446     		mov     ip, r6
+  28 0024 40BC     		pop     {r6}
+  29 0026 6047     		bx      ip
+  30 0028 44332211 		.word   0x11223344	@ address in IAT/edata
+  31              	
+  32              		.code 16
+  33              		.globl  thumb_r3unused_stub
+  34              	thumb_r3unused_stub:
+  35 002c 014B     		ldr     r3, [pc, #4]
+  36 002e 1B68     		ldr     r3, [r3]
+  37 0030 1847     		bx      r3
+  38 0032 C046     		nop
+  39 0034 44332211 		.word   0x11223344	@ address in IAT/edata
+  40              	
+  41              	
+  42              	@ In-place rewrites if destination address
+  43              	@ is fixed
+  44              	@
+  45              		.code 32
+  46              		.globl  fast_armi_stub
+  47              	fast_armi_stub:
+  48 0038 04C09FE5 		ldr     ip, [pc, #4]
+  49 003c 1CFF2FE1 		bx      ip
+  50 0040 00000000 		.word   0           @ nop
+  51 0044 53525150 		.word   0x50515253  @ destination address
+  52              	
+  53              		.code 16
+  54              		.globl  fast_thumb_stub
+  55              	fast_thumb_stub:
+  56 0048 40B4     		push    {r6}
+  57 004a 024E     		ldr     r6, [pc, #8]
+  58 004c B446     		mov     ip, r6
+  59 004e 40BC     		pop     {r6}
+  60 0050 6047     		bx      ip
+  61 0052 C046     		nop
+  62 0054 53525150 		.word   0x50515253  @ destination address
+  63              	
+  64              		.code 16
+  65              		.globl  fast_thumb_r3unused_stub
+  66              	fast_thumb_r3unused_stub:
+  67 0058 014B     		ldr     r3, [pc, #4]
+  68 005a 1847     		bx      r3
+  69 005c C046     		nop
+  70 005e C046     		nop
+  71 0060 53525150 		.word   0x50515253  @ destination address
+  72              	
+  73              	
+  74              	

@@ -1,0 +1,15 @@
+#component name "romtools"
+
+component dev_build_imgtools_romtools
+source  \src\tools\dev\build\imgtools\romtools
+binary  \src\tools\dev\build\imgtools\romtools\group all
+exports \src\tools\dev\build\imgtools\romtools\group 
+
+binary	\epoc32\release\tools2\rel\rombuild.exe
+binary	\epoc32\release\tools2\rel\rofsbuild.exe
+binary	\epoc32\release\tools2\rel\readimage.exe
+
+notes_source	\component_defs\release.src
+
+
+ipr T 

@@ -1,0 +1,42 @@
+/*
+* Copyright (c) 1999-2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description: 
+*
+*/
+
+
+PRJ_PLATFORMS
+TOOLS2
+
+PRJ_EXPORTS
+
+../maksym/fixupsym.bat              /epoc32/tools/fixupsym.bat
+../maksym/hpsym.bat                 /epoc32/tools/hpsym.bat
+../maksym/maksym.bat                /epoc32/tools/maksym.bat
+../maksym/maksymrofs.bat            /epoc32/tools/maksymrofs.bat
+../maksym/fixupsym.pl               /epoc32/tools/fixupsym.pl
+../maksym/hpsym.pl                  /epoc32/tools/hpsym.pl
+../maksym/maksym.pl                 /epoc32/tools/maksym.pl
+../maksym/maksymrofs.pl             /epoc32/tools/maksymrofs.pl
+
+../rombuild/checkstubs.pl		/epoc32/rom/tools/checkstubs.pl
+../rombuild/addextension.pl		/epoc32/rom/tools/addextension.pl
+
+PRJ_MMPFILES 
+readimage 
+../rofsbuild/rofsbuild.mmp
+../rombuild/rombuild.mmp 
+
+PRJ_TESTMMPFILES
+../rombuild/r_t_areaset

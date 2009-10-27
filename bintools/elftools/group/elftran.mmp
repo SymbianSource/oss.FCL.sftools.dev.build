@@ -1,0 +1,49 @@
+/*
+* Copyright (c) 2003-2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description: 
+*
+*/
+
+
+macro           __SUPPORT_ELF_FILES__
+
+target          elftran.exe
+targettype      exe
+
+sourcepath      ../elftran
+source          elf_file.cpp elf_dlld.cpp elf_imp.cpp elf_reloc.cpp elf_tran.cpp
+
+sourcepath      ../../../imgtools/imglib/e32uid
+source          e32uid.cpp
+
+sourcepath      ../../../imgtools/imglib/host
+source          h_file.cpp h_mem.cpp h_utl.cpp
+
+userinclude     ../inc
+userinclude     ../../../e32tools/e32lib/e32image/inc
+
+systeminclude   ../../../e32tools/e32lib/e32image/inc
+
+sourcepath      ../../../e32tools/e32lib/e32image
+source          e32image.cpp tr_main.cpp imgdump.cpp
+
+sourcepath      ../../../e32tools/e32lib/e32image/deflate
+source          decode.cpp encode.cpp deflate.cpp inflate.cpp panic.cpp compress.cpp
+
+sourcepath      ../../../imgtools/imglib/compress
+source          byte_pair.cpp pagedCompress.cpp
+
+systeminclude   ../inc /epoc32/include ../../../imgtools/imglib/compress /epoc32/include/tools/
+
+VENDORID        0x70000001

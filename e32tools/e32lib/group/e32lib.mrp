@@ -1,0 +1,9 @@
+component       dev_build_e32tools_e32lib
+
+source          /src/tools/dev/build/e32tools/e32lib
+binary          /src/tools/dev/build/e32tools/e32lib/group all
+
+notes_source    release.txt
+
+ipr T
+

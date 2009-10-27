@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<build xmlns="http://symbian.com/xml/build" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symbian.com/xml/build ../../schema/build/2_0.xsd">
+	<!-- build configurations for the gccxml_cc1plus C++ language processor -->
+	<var name="gccxml_base" extends="root">
+		<varRef ref="default.interfaces"/>
+		<varRef ref="default.locations"/>
+		<!-- picked up from the Environment -->
+		<env name='CPP' default='$(GNUCPP)' type='tool'/>
+		<env name='BMCONV' default="$(EPOCROOT)/epoc32/tools/bmconv$(DOTEXE)" type='tool'/>
+		<env name='CREATERFIFILE' default='$(PERL) $(SBS_HOME)/bin/createrfifile.pl ' type='path'/>
+		<env name='GNUAWK' default='$(GNUPREFIX)gawk$(DOTEXE)' type='tool' versionCommand='$(GNUAWK) --version' versionResult='GNU Awk [3-9].*'/>
+		<env name='MAKEDEF' default='$(PERL) $(EPOCROOT)/epoc32/tools/makedef.pl' type='path'/>
+		<env name='PREPDEF' default='$(PERL) $(EPOCROOT)/epoc32/tools/prepdef.pl' type='path'/>
+		<env name='RCOMP' default='$(EPOCROOT)/epoc32/tools/rcomp$(DOTEXE)' type='tool'/>
+		<env name='RVCT22BIN' type='path'/>
+		<env name='RVCT22INC' type='path'/>
+		<env name='RVCT22LIB' type='path'/>
+		<env name='STRINGTABLE' default='$(PERL) $(EPOCROOT)/epoc32/tools/stringtable.pl' type='path'/>
+
+		<!-- link to bld.inf and mmp platform names -->
+		<set name='TRADITIONAL_PLATFORM' value='GCCXML'/>
+
+		<!-- interfaces -->
+		<set name="INTERFACE.ani" value="analysis.ani"/>
+		<set name="INTERFACE.dll" value="analysis.dll"/>
+		<set name="INTERFACE.exe" value="analysis.exe"/>
+		<set name="INTERFACE.exexp" value="analysis.exexp"/>
+		<set name="INTERFACE.extension" value="analysis.extension"/>
+		<set name="INTERFACE.implib" value="analysis.implib"/>
+		<set name="INTERFACE.fsy" value="analysis.fsy"/>
+		<set name="INTERFACE.kdll" value="analysis.kdll"/>
+		<set name="INTERFACE.kext" value="analysis.kext"/>
+		<set name="INTERFACE.klib" value="analysis.klib"/>
+		<set name="INTERFACE.ldd" value="analysis.ldd"/>
+		<set name="INTERFACE.lib" value="analysis.lib"/>
+		<set name="INTERFACE.pdd" value="analysis.pdd"/>
+		<set name="INTERFACE.pdl" value="analysis.pdl"/>
+		<set name="INTERFACE.plugin" value="analysis.plugin"/>
+		<set name="INTERFACE.resource" value="analysis.resource"/>
+		<set name="INTERFACE.stddll" value="analysis.stddll"/>
+		<set name="INTERFACE.stdexe" value="analysis.stdexe"/>
+		<set name="INTERFACE.stdlib" value="analysis.stdlib"/>
+		<set name="INTERFACE.textnotifier2" value="analysis.textnotifier2"/>
+		<set name="INTERFACE.var" value="analysis.var"/>
+		<set name="INTERFACE.var2" value="analysis.var2"/>
+		<!-- the following should really be done via the default "Symbian.*" interfaces from standard.xml - but they're currently tied to non-defaulted ARM build specifics -->
+		<set name="INTERFACE.none" value="analysis.none"/>
+
+		<!-- Java used by Trace Compiler -->
+		<env name='JAVA_HOME' default='' type='path'/>
+		<env name='JAVATC' default='$(JAVA_HOME)/bin/java' type='tool'/>
+
+		<!-- note that gccxml_cc1plus should be version checked, but I've yet to find a reliable way of doing this -->
+		<set name='CC' value="$(EPOCROOT)/epoc32/tools/gccxml_cc1plus$(DOTEXE)" type='tool'/>
+		<set name='CDEFS' value='_UNICODE __SYMBIAN32__ __GCC32__ __EPOC32__ __MARM__ __MINGW32__ _STLP_LITTLE_ENDIAN __GCCXML__ __MARM_ARM4__ $(MMPDEFS)'/>
+		<set name='CFLAGS' value='-bi -nostdinc -Wall -Wno-ctor-dtor-privacy -Wno-unknown-pragmas -UWIN32 -fshort-wchar -quiet -w '/>
+
+		<!-- in support of TEMs - processed as if in an RVCT build -->
+		<set name='RVCTBIN' value='$(RVCT22BIN)'/>
+		<set name='RVCTINC' value='$(RVCT22INC)'/>
+		<set name='RVCTLIB' value='$(RVCT22LIB)'/>
+
+		<set name='CPPFLAGS' value='-nostdinc -M -MG'/>
+
+		<set name='MMPDEFS' value=''/>
+		<set name='NMAKE' value='nmake$(DOTEXE)'/>
+		<set name='NMAKEFLAGS' value='-nologo -x - '/>
+		<set name='MAIN_OUTPUTPATH' value='$(EPOCROOT)/epoc32/build'/>
+		<set name='OUTPUTPATH' value='$(MAIN_OUTPUTPATH)'/>
+		<set name='RELEASEPATH' value='$(EPOCROOT)/epoc32/release'/>
+		<set name='SBSV1MAKE' value='$(EPOCROOT)/epoc32/tools/make$(DOTEXE)'/>
+		<set name='SYSTEMINCLUDE' value=''/>
+		<set name='TARGET' value='TARGET_WAS_NOT_SET_PROPERLY'/>
+		<set name='TARGETPATH' value=''/>
+		<set name='TARGETTYPE' value='TARGETTYPE_WAS_NOT_SET_PROPERLY'/>
+		<set name='USERINCLUDE' value=''/>
+		<set name='VARIANTPLATFORM' value='gccxml'/>
+
+		<set name='OPT.DEFINE' value='-D'/>
+		<set name='OPT.OUT' value='-o '/>
+		<set name='OPT.PREINCLUDE' value='-include '/>
+		<set name='OPT.SPLITINCLUDE' value=' -I- '/>
+		<set name='OPT.SYSINCLUDE' value='-I '/>
+		<set name='OPT.USERINCLUDE' value='-I '/>
+		<set name='PLATMACROS.WINDOWS' value='GCCXML ARMCC EPOC32 MARM EABI ARMCC_2 ARMCC_2_2 GENERIC_MARM MARM_ARMV5'/>
+		<set name='PLATMACROS.LINUX' value='$(PLATMACROS.WINDOWS)'/>
+		
+		<set name='KERNEL_MODE_DEF' value='__KERNEL_MODE__'/>
+		<set name='KERNEL_MODE_INCLUDES' value='$(EPOCINCLUDE)/nkern $(EPOCINCLUDE)/kernel/arm $(EPOCINCLUDE)/memmodel/epoc $(EPOCINCLUDE)/kernel $(EPOCINCLUDE)/nkern/arm'/>
+		<set name='STDCPP_DEF' value='__SYMBIAN_STDCPP_SUPPORT__'/>
+		<set name='STDCPP_INCLUDE' value='$(EPOCINCLUDE)/stdapis'/>
+	</var>
+
+	<var name="gccxml_udeb" extends="gccxml_base">
+		<set name='FULLVARIANTPATH' value='gccxml/udeb'/>
+		<set name='VARIANTTYPE' value='udeb'/>
+
+		<append name='CDEFS' value='_DEBUG'/>
+		<append name='CFLAGS' value='-g'/>
+	</var>
+
+	<var name="gccxml_urel" extends="gccxml_base">
+		<set name='FULLVARIANTPATH' value='gccxml/urel'/>
+		<set name='VARIANTTYPE' value='urel'/>
+
+		<append name='CDEFS' value='NDEBUG'/>
+		<append name='CFLAGS' value='-fomit-frame-pointer'/>
+	</var>
+
+	<group name="gccxml">
+		<varRef ref="gccxml_urel"/>
+		<varRef ref="gccxml_udeb"/>
+	</group>
+</build>
+

@@ -1,0 +1,77 @@
+# Copyright (c) 2006-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+#
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+#
+# Contributors:
+#
+# Description:
+# Function-Like Makefile to build a TOOLS2 EXE with gcc
+# 
+#
+
+## Outputs - externally relevant targets that this FLM generates
+ifeq ($(OSTYPE),cygwin)
+SYSTEMLIBS:=$(LIBS.WIN32)
+else
+SYSTEMLIBS:=$(LIBS.LINUX)
+endif
+
+EXETARGET:=$(RELEASEPATH)/$(TARGET)$(DOTEXE)
+
+ifneq ($(TOOLSPATH),)
+INSTALLED:=$(TOOLSPATH)/$(TARGET)$(DOTEXE)
+endif
+
+## Target groups
+RELEASEABLES:=$(INSTALLED)
+TARGETS:=$(EXETARGET) $(INSTALLED)
+
+## Common build steps (compiling and cleaning)
+include $(FLMHOME)/tools2common.flm
+
+## Static libraries
+ifneq ($(STATICLIBRARY),)
+STATICLIBS:=$(patsubst %,$(RELEASEPATH)/lib%.a,$(STATICLIBRARY))
+LLIBS:=$(OPT.L)"$(RELEASEPATH)" $(patsubst %,$(OPT.l)%,$(STATICLIBRARY))
+#
+ifneq ($(SYSTEMLIBS),)
+LLIBS:=$(LLIBS) $(patsubst %,$(OPT.l)%,$(SYSTEMLIBS))
+endif
+#
+endif
+
+## Link executable
+# get OBJECTFILES from call to tools2common
+define tools2linkexe
+$(EXETARGET): $(OBJECTFILES) $(STATICLIBS)
+	$(call startrule,tools2linkexe) \
+	$(LINKER) $(CFLAGS) $(LFLAGS) $(OPT.O)"$(EXETARGET)" $(call dblquote,$(OBJECTFILES)) $(LLIBS) \
+	$(if $(SAVESPACE),; $(GNURM) -rf $(OUTPUTPATH); true,) \
+	$(call endrule,tools2linkexe)
+
+endef
+
+$(eval $(call tools2linkexe))
+
+	
+## Copy executable to the tools directory
+ifneq ($(TOOLSPATH),)
+define tools2install
+$(INSTALLED): $(EXETARGET)
+	$(call startrule,tools2install) \
+	$(GNUCP) "$(EXETARGET)" "$(INSTALLED)" && \
+	$(GNUCHMOD) a+rwx "$(INSTALLED)" \
+	$(call endrule,tools2install)
+endef
+
+$(eval $(call tools2install))
+
+endif
+
+## The End

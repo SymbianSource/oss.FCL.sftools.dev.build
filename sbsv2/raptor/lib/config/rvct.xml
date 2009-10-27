@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<build xmlns="http://symbian.com/xml/build" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symbian.com/xml/build ../../schema/build/2_0.xsd">
+	<!-- RVCT build variant for RVCT compilers -->
+	<var name="rvct">
+		<set name="TOOLCHAIN" value="RVCT"/>
+		<set name="CC" value="$(ARMCC)"/>
+		<set name="LD" value="$(ARMLD)"/>
+		<set name="ASM" value="$(ARMASM)"/>
+		<set name="AR" value="$(ARMAR)"/>	
+		<set name="ARMCC" value="$(RVCTBIN)/armcc$(DOTEXE)"/>
+		<set name="ARMLD" value="$(RVCTBIN)/armlink$(DOTEXE)"/>
+		<set name="ARMASM" value="$(RVCTBIN)/armasm$(DOTEXE)"/>
+		<set name="ARMAR" value="$(RVCTBIN)/armar$(DOTEXE)"/>
+		<set name="FROMELF" value="$(RVCTBIN)/fromelf$(DOTEXE)"/>
+		<set name="AAPCS_OPTION" value="--apcs /inter"/>
+		<set name="ARCHIVER_CREATE_OPTION" value="--create"/>
+		<set name="ARM_INSTRUCTION_SET" value="--arm"/>
+		<set name="ASM_OUTPUT_OPTION" value="-o"/>
+		<set name="ASSEMBLER_LISTING_OPTION" value="-S"/>
+		<set name="BPABI_OPTION" value="--bpabi"/>
+		<set name="CC_ERRORS_CONTROL_OPTION" value="--diag_error 1267"/>
+		<set name="CC_WARNINGS_CONTROL_OPTION" value="--diag_suppress 161,611,654,997,1152,1300,1464,1488,2523,6318,6331"/>
+		<set name="C_LANG_OPTION" value=""/>
+		<set name="COMMANDFILE_OPTION" value="--via "/>
+		<set name="COMPILE_ONLY_OPTION" value="-c"/>
+		<set name="CPP_LANG_OPTION" value="--cpp"/>
+		<set name="DEBUG_OPTIMISATION" value="-O0"/>
+		<set name="DEPEND_OPTION" value="--depend_format=unix --depend"/>
+		<set name="ENUM_OPTION" value="--enum_is_int"/>
+		<set name="EXPORT_VTBL_OPTION" value="--export_all_vtbl"/>
+		<set name="EXTRA_LD_OPTION" value="--datacompressor=off"/>
+		<set name="FPMODE_OPTION" value="--fpmode ieee_no_fenv"/>
+		<set name="LD_ERRORS_CONTROL_OPTION" value=""/>
+		<set name="LD_WARNINGS_CONTROL_OPTION" value="--diag_suppress 6331"/>
+		<set name="LISTING_OPTION" value="-S"/>
+		<set name="EXCEPTIONS" value="--exceptions --exceptions_unwind"/>
+		<set name="NO_EXCEPTIONS" value="--no_exceptions --no_exceptions_unwind"/>
+		<set name="PREINCLUDE_OPTION" value="--preinclude"/>
+		<set name="PREPROCESSOR_OPTION" value="-E"/>
+		<set name="REL_OPTIMISATION" value="-O2"/>
+		<set name="STDLIB_OPTION" value="--no_scanlib"/>
+		<set name="RUNTIME_SYMBOL_VISIBILITY_OPTION" value="--dllimport_runtime"/>
+		<set name="RW_BASE_OPTION" value="--rw-base"/>
+		<set name="CODE_SEGMENT_START" value=""/>
+		<set name="PREINCLUDE" value="$(RVCT_PRE_INCLUDE)"/>
+		<set name="CC.DWARF2" value="--dwarf2"/>
+		<set name="CC.DWARF3" value="--dwarf3"/>
+		<set name="LD.ARMV5" value=""/>
+		<set name="LD.ARMV6" value=""/>
+		<set name="LD.ARMV7" value=""/>
+		<set name="ARMMACROS.VAR" value=""/>
+		<set name="CFLAGS" value=""/>
+		<set name="CIADEFS" value="__CIA__"/>
+		<append name="CDEFS" value='__SUPPORT_CPP_EXCEPTIONS__ _UNICODE __SYMBIAN32__ __ARMCC__ __EPOC32__ __MARM__ __EABI__ __PRODUCT_INCLUDE__="$(PRODUCT_INCLUDE)" $(MMPDEFS) $(ARMMACROS)'/>
+		<set name="COMPILER_CIA_FLAGS" value=""/>
+		<set name="COMPILER_FPU_FLAGS" value="--fpu $(ARMFPU)"/>	
+		<set name="COMPILER_DEFINES" value=""/>
+		<set name="COMPILER_INTERWORK_DEFINES" value="__MARM_INTERWORK__"/>
+		<set name="COMPILER_SYSTEM_INCLUDE_OPTION" value="-J"/>
+		<set name="COMPILER_THUMB_DEFINES" value="__MARM_THUMB__"/>
+		<set name="DATA_SEGMENT_START" value="$(SPLIT_OPTION) $(RW_BASE_OPTION)"/>
+		<set name="EXTRA_CC_OPTION" value=""/>
+		<set name="HEADER_FILES_CONTROL_OPTION" value=""/>
+		<set name="LIBPATH" value=""/>
+		<set name="LIBRARY" value=""/>
+		<set name="LICENSERETRY_OPTION" value=""/>
+		<set name="LINKER_ADD_STATIC_RUNTIME" value=""/>		
+		<set name="LINKER_DEBUG_OPTION" value="--debug"/>
+		<set name="LINKER_DEFAULT_LIBS" value=""/>
+		<set name="LINKER_DEFAULT_LIB_PATHS" value=""/>
+		<set name="LINKER_ENTRY_OPTION" value="--entry"/>
+		<set name="LINKER_GROUP_START_OPTION" value=""/>
+		<set name="LINKER_GROUP_END_OPTION" value=""/>
+		<set name="LINKER_MISC_FLAGS" value="$(LICENSERETRY_OPTION)"/>
+		<set name="LINKER_NODEBUG_OPTION" value=""/>
+		<set name="LINKER_SCRIPT_FILE_OPTION" value=""/>
+		<set name="LINKER_SYMBOLS_OPTION" value="--symbols"/>
+		<set name="LINKER_SYMBOLS_FILE_OPTION" value="--list"/>
+		<set name="SHARED_OBJECT_OPTION" value="--dll"/>
+		<set name="SID" value=""/>
+		<set name="SO_NAME_OPTION" value="--soname"/>
+		<set name="STATIC_LIBS_PATH" value="$(RVCTLIB)/armlib"/>
+		<set name="STDCPP_INCLUDE" value="$(EPOCINCLUDE)/stdapis"/>
+		<set name="SYMBIAN_LD_MESSAGE_OPTION" value="$(LD_WARNINGS_CONTROL_OPTION) $(LD_ERRORS_CONTROL_OPTION)"/>
+		<set name="SUPPORTS_ABIV1_IMPLIBS" value="1"/>		
+		<set name="TARGET_RELOCATION_OPTION" value="" />
+		<set name="SYMVER_OPTION" value="--symver_soname"/>
+		<set name="TEMP_FILES_OPTION" value=""/>
+		<set name="THUMB_INSTRUCTION_SET" value="--thumb"/>
+		<set name="INSTRUCTION_SET" value=""/>
+		<set name="TRANASM_FLAGS" value="-n -s"/>
+		<set name="TRANASM_INPUT_OPTION" value=""/>
+		<set name="TRANASM_OUTPUT_OPTION" value="-o="/>
+		<set name="TRANSFORM_CIA" value="1"/>
+		<set name="UNDEFINED_SYMBOL_REF_OPTION" value=""/>
+		<set name="UNIX_SLASH_FOR_CC_ABS_PATHS" value="0"/>
+		<set name="UNRESOLVED_SYMBOL_REF_OPTION" value=""/>
+		<set name="USERINCLUDE" value=""/>
+		<set name="USER_LIBS_PATH_OPTION" value="--userlibpath"/>
+		<set name="VFE_OPTION" value="--no_vfe"/>
+		<set name="PLATMACROS.WINDOWS" value="ARMCC EPOC32 MARM EABI GENERIC_MARM MARM_ARMV5 $(PLATMACROS.CONFIG) $(PLATMACROS.VAR)"/>
+		<set name="PLATMACROS.LINUX" value="$(PLATMACROS.WINDOWS)"/>
+		<set name="PLATMACROS.CONFIG" value=""/>
+		<set name="PLATMACROS.VAR" value=""/>
+		<set name="NO_UNALIGNED_ACCESS" value="$(CC.NO_UNALIGNED_ACCESS)"/>
+	</var>
+</build>

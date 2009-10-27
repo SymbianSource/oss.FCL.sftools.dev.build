@@ -1,0 +1,5 @@
+Microsoft
+libxml2-2.6.30/result/HTML/fp40.htm.sax, libxml2-2.6.30/test/HTML/fp40.htm, libxml2-2.6.30/result/HTML/fp40.htm and libxml2-2.6.30/result/HTML/fp40.htm.sax
+
+Example.com
+libxml2-2.6.30/test/schemas/po0_0.xsd and libxml2-2.6.30/test/schemas/po1_0.xsd

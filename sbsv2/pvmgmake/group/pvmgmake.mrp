@@ -1,0 +1,8 @@
+component dev_build_sbsv2_pvmgmake
+
+source ..
+
+ipr T
+
+notes_source release.txt
+

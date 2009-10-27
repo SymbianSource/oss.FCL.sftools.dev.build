@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SystemDefinition schema="3.0.0">
+    <package id="build" levels="lowlevel-libs middleware framework ui" name="Build">
+        <collection id="bintools" level="framework" name="Binary Tools">
+            <component filter="build_SFPhase3" id="evalid" name="Evalid" >
+                <unit bldFile="bintools/evalid" mrp="bintools/evalid/evalid.mrp"/>
+            </component>
+            <component filter="build_SFPhase1" id="rcomp" name="Resource Compiler" >
+                <unit bldFile="bintools/rcomp/group" mrp="bintools/rcomp/group/rcomp.mrp"/>
+            </component>
+            <component filter="build_SFPhase1" id="checklib" name="checklib" >
+                <unit bldFile="bintools/checklib/group" mrp="bintools/checklib/group/checklib.mrp"/>
+            </component>
+            <component filter="build_SFPhase1" id="elftools" name="elftools" >
+                <unit bldFile="bintools/elftools/group" mrp="bintools/elftools/group/elftools.mrp"/>
+            </component>
+        </collection>
+        <collection id="srctools" level="middleware" name="Source Tools">
+            <component filter="build_SFPhase1" id="tranasm" name="tranasm" >
+                <unit bldFile="srctools/tranasm/group" mrp="srctools/tranasm/group/tranasm.mrp"/>
+            </component>
+        </collection>
+        <collection id="e32tools" level="middleware" name="E32 Tools">
+            <component filter="build_SFPhase1" id="elf2e32" name="elf2e32 (Postlinker)" >
+                <unit bldFile="e32tools/elf2e32/group" mrp="e32tools/elf2e32/group/elf2e32.mrp"/>
+            </component>
+            <component filter="build_SFPhase1" id="e32lib" name="E32 Image Library" >
+                <unit bldFile="e32tools/e32lib/group" mrp="e32tools/e32lib/group/e32lib.mrp"/>
+            </component>
+        </collection>
+        <collection id="buildtoolguides" level="ui" name="Build Tool Guides">
+            <component filter="build_SFPhase3" id="emulconfiguratorguide" name="Emulator Configurator Guide" >
+                <unit bldFile="buildtoolguides/emulconfiguratorguide/group" mrp="buildtoolguides/emulconfiguratorguide/group/emulbuilderguide.mrp"/>
+            </component>
+            <component filter="build_SFPhase3" id="romtoolsguide" name="ROM Tools Guide" >
+                <unit bldFile="buildtoolguides/romtoolsguide/group" mrp="buildtoolguides/romtoolsguide/group/romtoolsguide.mrp"/>
+            </component>
+            <component filter="build_SFPhase3" id="sbsv2guide" name="SBSv2 Guide" >
+                <unit bldFile="buildtoolguides/sbsv2guide/group" mrp="buildtoolguides/sbsv2guide/group/sbsv2guide.mrp"/>
+            </component>
+        </collection>
+        <collection id="sbsv2" level="middleware" name="Symbian Build System v2">
+            <component filter="build_SFPhase3" id="cpp-raptor" name="CPP (Raptor)" >
+                <unit bldFile="sbsv2/cpp-raptor/group" mrp="sbsv2/cpp-raptor/group/cpp-raptor.mrp"/>
+            </component>
+            <component filter="build_SFPhase3" id="pvmgmake" name="PVM Gmake" >
+                <unit bldFile="sbsv2/pvmgmake/group" mrp="sbsv2/pvmgmake/group/pvmgmake.mrp"/>
+            </component>
+            <component filter="build_SFPhase3" id="raptor" name="SBSv2 (Raptor)" >
+                <unit bldFile="sbsv2/raptor/group" mrp="sbsv2/raptor/group/raptor.mrp"/>
+            </component>
+        </collection>
+        <collection id="imgtools" level="framework" name="Image Tools">
+            <component filter="build_SFPhase3" id="romtools" name="ROM Tools" >
+                <unit bldFile="imgtools/romtools/group" mrp="imgtools/romtools/group/romtools.mrp"/>
+            </component>
+            <component filter="build_SFPhase3" id="buildrom" name="Build ROM" >
+                <unit bldFile="imgtools/buildrom/group" mrp="imgtools/buildrom/group/buildrom.mrp"/>
+            </component>
+            <component filter="build_SFPhase1" id="imglib" name="ROM/ROFS Image Library" >
+                <unit bldFile="imgtools/imglib/group" mrp="imgtools/imglib/group/imglib.mrp"/>
+            </component>
+            <component filter="build_SFPhase3" id="sisutils" name="SIS Utility Library" >
+                <unit bldFile="imgtools/sisutils/group" mrp="imgtools/sisutils/group/sisutils.mrp"/>
+            </component>
+            <component filter="build_SFPhase2" id="imgcheck" name="Image Checker" >
+                <unit bldFile="imgtools/imgcheck/group" mrp="imgtools/imgcheck/group/imgcheck.mrp"/>
+            </component>
+        </collection>
+        <collection id="build_info" name="Build Info" level="ui">
+          <component id="build_metadata" name="Build Metadata" filter="build_SFPhase3">
+            <unit mrp="build_info/build_metadata/build_metadata.mrp"/>
+          </component>
+        </collection>
+    </package>
+</SystemDefinition>

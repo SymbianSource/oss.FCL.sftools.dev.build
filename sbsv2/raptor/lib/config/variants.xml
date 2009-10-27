@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<build xmlns="http://symbian.com/xml/build" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symbian.com/xml/build ../../schema/build/2_0.xsd">
+	<!-- Commonly used variants.
+
+	These can be referenced from the command-line or in configurations.
+	
+	-->
+  
+	<!-- This variant turns debug info on for arm only -->
+	<var name="debug_info">
+		<set name='DEBUG_INFO' value='1'/>
+	</var>
+	<!-- Run this variant to turn on trace compiler -->
+	<var name="tracecompiler">
+		<set name='USE_TRACE_COMPILER' value='1'/>
+		<env name='JAVA_HOME' default='' type='path'/>
+		<env name='SBS_JAVATC' default='$(JAVA_HOME)/bin/java.exe' type='tool' versionCommand='$(SBS_JAVATC) -version' versionResult='version \"1\.[5-9]' host='win*' />
+		<env name='SBS_JAVATC' default='$(JAVA_HOME)/bin/java' type='tool' versionCommand='$(SBS_JAVATC) -version' versionResult='version \"1\.[5-9]' host='lin*' />
+	</var>
+
+    <!-- Overrides the default debugging format for the ARM targets. -->
+    <var name="dwarf3">
+        <set name="DEBUG_FORMAT" value="$(CC.DWARF3)"/>
+    </var>
+	<var name="techview">
+	</var>
+
+	<var name="test">
+		<set name='TESTCODE' value='TRUE'/>
+	</var>
+
+	<var name="savespace">
+		<set name='SAVESPACE' value='TRUE'/>
+	</var>
+
+  <var name="generate_linkerfeedback">
+   <set name='GENERATELINKERFEEDBACK' value='TRUE'/>
+   </var>
+
+   <var name="use_linkerfeedback">
+    <set name='GENERATELINKERFEEDBACK' value='TRUE'/>
+   <set name='LINKERFEEDBACK_STAGE2' value='TRUE'/>
+   </var>
+
+   <var name="profilerfeedback">
+	   <set name='USE_PROFILER_FEEDBACK' value='TRUE'/>
+	   <env name='ARM_PROFILER_FILE' default='' type='path'/>
+   </var>
+
+   <var name="ltcg">
+	   <set name='LTCG' value='TRUE'/>
+	   <set name='LTCG_OPTION' value='--ltcg'/>
+   </var>
+
+   <var name="multifile">
+    <set name='MULTIFILE_ENABLED' value='TRUE'/>
+   </var>
+
+  <!-- build from clean can skip some processing -->
+  <var name="bfc">
+    <set name='DEPEND_SKIP' value='TRUE'/>
+  </var>
+
+	<!-- SMP variant for Kernel Code -->
+	<var name="smp">
+		<append name="CDEFS" value="__SMP__"/>
+		<append name="PLATMACROS.WINDOWS" value="SMP"/>
+		<!-- PLATMACROS.LINUX is set from PLATMACROS.WINDOWS -->
+		<append name="TRADITIONAL_PLATFORM" value='SMP' separator="" />
+		<append name="VARIANTPLATFORM" value="smp" separator=""/>
+		<set name="GENERATE_ABIV1_IMPLIBS" value=""/>
+	</var>
+
+	<!-- emit formatted releasable information into the logs for post-build parsing -->
+	<var name="whatlog">
+		<set name='WHATLOG' value='TRUE'/>
+	</var>
+
+	<var name="gcce4_3_2" extends="gcce_base">
+		<env name="GCCEBIN" type="path" />
+		<env name="GCCEVERSION" default="$(TOOLCHAINVERSION)" />
+		<set name="TOOLCHAINVERSION" value="4.3.2" />
+		<set name="OWN_LIBRARY_OPTION" value=""/>
+		<set name="STATIC_LIBS_LIST" value=""/>
+		<set name="RUNTIME_LIBS_LIST" value="drtaeabi.dso dfpaeabi.dso dfprvct3_1.dso drtrvct3_1.dso"/>
+		<set name="ARMLIBS" value=""/>
+		<set name="CC.OPT.SOFTVFP_MAYBE_VFPV2" value="-m"/>
+		<set name="CC.VAL.SOFTVFP_MAYBE_VFPV2" value="soft-float"/>
+		<set name="CC.ARMV5" value="-march=armv5t"/>
+		<set name="LD.ARMV5" value=""/>
+		<set name="LD.ARMV6" value=""/>
+		<set name="LD.ARMV7" value=""/>
+		<set name="RELOCATABLE_IMAGE_OPTION" value=""/>
+		<set name="RVCTLIB" value=""/>
+		<set name="CC.NO_UNALIGNED_ACCESS" value=""/>
+		<set name="CC.SOFTVFP_MAYBE_VFPV2" value=""/>
+		<set name="SPLIT_OPTION" value=""/>
+		<set name="NEED_ENTRYPOINT_LIBRARY" value=""/>
+		<set name="RVCTBIN" value="" />
+		<set name="RVCTINC" value="" />
+		<set name="USER_STATIC_RUNTIME_LIB" value="usrt3_1.lib"/>
+		<set name="KERNEL_STATIC_RUNTIME_LIB" value="ksrt3_1.lib"/>
+		<set name="NEED_ENTRYPOINT_LIBRARY" value="" />
+	</var>
+
+	<var name="gcce4_3_3" extends="gcce_base">
+		<env name="GCCEBIN" type="path" />
+		<env name="GCCEVERSION" default="$(TOOLCHAINVERSION)" />
+		<set name="TOOLCHAINVERSION" value="4.3.3" />
+		<set name="OWN_LIBRARY_OPTION" value=""/>
+		<set name="STATIC_LIBS_LIST" value=""/>
+		<set name="RUNTIME_LIBS_LIST" value="drtaeabi.dso dfpaeabi.dso dfprvct3_1.dso drtrvct3_1.dso"/>
+		<set name="ARMLIBS" value=""/>
+		<set name="CC.OPT.SOFTVFP_MAYBE_VFPV2" value="-m"/>
+		<set name="CC.VAL.SOFTVFP_MAYBE_VFPV2" value="soft-float"/>
+		<set name="CC.ARMV5" value="-march=armv5t"/>
+		<set name="LD.ARMV5" value=""/>
+		<set name="LD.ARMV6" value=""/>
+		<set name="LD.ARMV7" value=""/>
+		<set name="RELOCATABLE_IMAGE_OPTION" value=""/>
+		<set name="RVCTLIB" value=""/>
+		<set name="CC.NO_UNALIGNED_ACCESS" value=""/>
+		<set name="CC.SOFTVFP_MAYBE_VFPV2" value=""/>
+		<set name="SPLIT_OPTION" value=""/>
+		<set name="NEED_ENTRYPOINT_LIBRARY" value=""/>
+		<set name="RVCTBIN" value="" />
+		<set name="RVCTINC" value="" />
+		<set name="USER_STATIC_RUNTIME_LIB" value="usrt3_1.lib"/>
+		<set name="KERNEL_STATIC_RUNTIME_LIB" value="ksrt3_1.lib"/>
+		<set name="NEED_ENTRYPOINT_LIBRARY" value="" />
+	</var>
+
+	<var name="rvct2_2" extends="rvct">
+		<env name="RVCT22BIN" type="path"/>
+		<env name="RVCT22INC" type="path"/>
+		<env name="RVCT22LIB" type="path"/>
+		<set name="RVCTBIN" value="$(RVCT22BIN)"/>
+		<set name="RVCTINC" value="$(RVCT22INC)"/>
+		<set name="RVCTLIB" value="$(RVCT22LIB)"/>
+		<set name="ARMCC" value="&quot;$(RVCTBIN)/armcc$(DOTEXE)&quot;" type="tool" versionCommand="$(ARMCC) --vsn" versionResult="Compiler, RVCT2\.2\b"/>
+		<set name="OWN_LIBRARY_OPTION" value="-Ono_known_library"/>
+		<set name="RELOCATABLE_IMAGE_OPTION" value="--reloc"/>
+		<set name="SPLIT_OPTION" value="--split"/>
+		<set name="PLATMACROS.VAR" value="ARMCC_2 ARMCC_2_2"/>
+		<set name="ARMMACROS.VAR" value="__ARMCC_2__ __ARMCC_2_2__"/>
+		<set name="SYMBIAN_LINK_FLAGS.VAR" value=""/>
+		<set name="STATIC_LIBS_LIST" value="h_t__uf.l(switch8.o)"/>
+		<set name="RUNTIME_LIBS_LIST" value="drtaeabi.dso dfpaeabi.dso dfprvct2_2.dso drtrvct2_2.dso"/>
+		<set name="USER_STATIC_RUNTIME_LIB" value="usrt2_2.lib"/>
+		<set name="KERNEL_STATIC_RUNTIME_LIB" value="ksrt2_2.lib"/>
+		<set name="USRTLIB" value="usrt2_2.lib"/>
+		<set name="NEED_ENTRYPOINT_LIBRARY" value="False"/>
+		<set name="CC.NO_UNALIGNED_ACCESS" value="--memaccess -UL41"/>
+		<set name="CC.SOFTVFP_MAYBE_VFPV2" value="softvfp"/>
+		<set name="CC.ARMV5" value="--cpu 5T"/>
+		<set name="CC.ARMV6" value="--cpu 6"/>
+	</var>
+
+	<var name="rvct3_1" extends="rvct">
+		<env name="RVCT31BIN" type="path"/>
+		<env name="RVCT31INC" type="path"/>
+		<env name="RVCT31LIB" type="path"/>
+		<set name="RVCTBIN" value="$(RVCT31BIN)"/>
+		<set name="RVCTINC" value="$(RVCT31INC)"/>
+		<set name="RVCTLIB" value="$(RVCT31LIB)"/>
+		<set name="ARMCC" value="&quot;$(RVCTBIN)/armcc$(DOTEXE)&quot;" type="tool" versionCommand="$(ARMCC) --version_number" versionResult="310[6-9]\d\d\b"/>
+		<set name="OWN_LIBRARY_OPTION" value="--library_interface=aeabi_clib"/>
+		<set name="RELOCATABLE_IMAGE_OPTION" value=""/>
+		<set name="SPLIT_OPTION" value=""/>
+		<set name="PLATMACROS.VAR" value="ARMCC_3 ARMCC_3_1"/>
+		<set name="ARMMACROS.VAR" value="__ARMCC_3__ __ARMCC_3_1__"/>
+		<set name="SYMBIAN_LINK_FLAGS.VAR" value="--export_all"/>
+		<set name="STATIC_LIBS_LIST" value="h_5.l"/>
+		<set name="RUNTIME_LIBS_LIST" value="drtaeabi.dso dfpaeabi.dso dfprvct3_1.dso drtrvct3_1.dso"/>
+		<set name="USER_STATIC_RUNTIME_LIB" value="usrt3_1.lib"/>
+		<set name="KERNEL_STATIC_RUNTIME_LIB" value="ksrt3_1.lib"/>
+		<set name="USRTLIB" value="usrt3_1.lib"/>
+		<set name="NEED_ENTRYPOINT_LIBRARY" value="True"/>
+		<set name="CC.NO_UNALIGNED_ACCESS" value="--no_unaligned_access"/>
+		<set name="CC.SOFTVFP_MAYBE_VFPV2" value="softvfp"/>
+		<set name="CC.SOFTVFP_MAYBE_VFPV3" value="softvfp"/>
+		<set name="CC.ARMV5" value="--cpu=5TE"/>
+		<set name="CC.ARMV6" value="--cpu=6"/>
+		<set name="CC.ARMV7" value="--cpu=7-A"/>
+	</var>
+
+	<var name="rvct4_0" extends="rvct">
+		<env name="RVCT40BIN" type="path"/>
+		<env name="RVCT40INC" type="path"/>
+		<env name="RVCT40LIB" type="path"/>
+		<set name="RVCTBIN" value="$(RVCT40BIN)"/>
+		<set name="RVCTINC" value="$(RVCT40INC)"/>
+		<set name="RVCTLIB" value="$(RVCT40LIB)"/>
+		<set name="ARMCC" value="&quot;$(RVCTBIN)/armcc$(DOTEXE)&quot;" type="tool" versionCommand="$(ARMCC) --version_number" versionResult="400[4-9]\d\d\b"/>
+		<set name="OWN_LIBRARY_OPTION" value="--library_interface=aeabi_clib"/>
+		<set name="RELOCATABLE_IMAGE_OPTION" value=""/>
+		<set name="SPLIT_OPTION" value=""/>
+		<set name="STDLIB_OPTION" value=""/>
+		<set name="PLATMACROS.VAR" value="ARMCC_4 ARMCC_4_0"/>
+		<set name="ARMMACROS.VAR" value="__ARMCC_4__ __ARMCC_4_0__"/>
+		<set name="SYMBIAN_LINK_FLAGS.VAR" value="--override_visibility"/>
+		<set name="STATIC_LIBS_LIST" value=""/>
+		<set name="RUNTIME_LIBS_LIST" value="drtaeabi.dso dfpaeabi.dso"/>
+		<set name="USER_STATIC_RUNTIME_LIB" value="usrt4_0.lib"/>
+		<set name="KERNEL_STATIC_RUNTIME_LIB" value="ksrt4_0.lib"/>
+		<set name="USRTLIB" value="usrt4_0.lib"/>
+		<set name="NEED_ENTRYPOINT_LIBRARY" value="True"/>
+		<set name="CC.NO_UNALIGNED_ACCESS" value="--no_unaligned_access"/>
+		<set name="CC.SOFTVFP_MAYBE_VFPV2" value="softvfp+vfpv2"/>
+		<set name="CC.SOFTVFP_MAYBE_VFPV3" value="softvfp+vfpv3"/>
+		<set name="CC.ARMV5" value="--cpu=5TE"/>
+		<set name="CC.ARMV6" value="--cpu=6"/>
+		<set name="CC.ARMV7" value="--cpu=7-A"/>
+		<set name="LD.ARMV5" value="$(CC.ARMV5)"/>
+		<set name="LD.ARMV6" value="$(CC.ARMV6)"/>
+		<set name="LD.ARMV7" value="$(CC.ARMV7)"/>
+	</var>
+
+	<var name="urel">
+		<set name="DEBUG_INFO" value=""/>
+		<set name="SYMBIAN_CCFLAGS" value="$(REL_OPTIMISATION)"/>
+		<set name="VARIANTTYPE" value="urel"/>
+		<append name="CDEFS" value="NDEBUG"/>
+	</var>
+
+	<var name="udeb">
+		<set name="DEBUG_INFO" value="1"/>
+		<set name="SYMBIAN_CCFLAGS" value="$(DEBUG_OPTIMISATION)"/>
+		<set name="VARIANTTYPE" value="udeb"/>
+		<append name="CDEFS" value="_DEBUG"/>
+	</var>
+
+	<var name="remove_freeze">
+		<set name='EFREEZE_REMOVE_OPTION' value='-Remove'/>
+	</var>
+
+	<!-- OS variant mechanism is now deprecated. We retain the values for
+	     versions older than TB92sf until the mechanism is removed. -->
+
+	<!-- variant for OS version v9.4 -->
+	<var name="v94">
+		<set name='POSTLINKER_SUPPORTS_WDP' value=''/>
+		<set name='SUPPORTS_STDCPP_NEWLIB' value=''/>
+		<set name='RVCT_PRE_INCLUDE' value='$(EPOCINCLUDE)/rvct2_2/rvct2_2.h'/>
+	</var>
+
+	<!-- variants for OS version TB91* (the same as OS v9.4) -->
+	<var name="vtb91" extends="v94"/>
+	<var name="vtb91sf" extends="v94"/>
+
+	<!-- these OS variants are deliberately empty -->
+	<var name="v95"/>
+	<var name="v96"/>
+	<var name="vFuture"/>
+	<var name="vtb92"/>
+	<var name="vtb92sf"/>
+	<var name="vtb101"/>
+	<var name="vtb101sf"/>
+	
+	<!-- WINSCW specific variant for pick up nested relative include headers correctly -->
+	<var name="mwccinc">
+		<set name='OPTION_CW' value='-cwd include'/>
+	</var>
+
+</build>

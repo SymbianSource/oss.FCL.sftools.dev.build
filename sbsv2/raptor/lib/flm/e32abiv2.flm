@@ -1,0 +1,1178 @@
+# Copyright (c) 2006-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+#
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+#
+# Contributors:
+#
+# Description:
+# ARMv5 EXE/DLL ABIv2 Function Like Makefile (FLM)
+# Knows how to build all possible ABIV2 executables for ARM
+#
+#
+
+# Only build feature invariant binaries in non-product builds *and*
+# Only build feature variant binaries in product builds.
+#
+# FEATUREVARIANTNAME != "" implies product build
+# FEATUREVARIANT == 1 implies a feature variant binary
+#
+# test FEATUREVARIANTNAME=="" or FEATUREVARIANT==1
+#
+ifneq ($(or $(call equal,$(FEATUREVARIANTNAME),),$(call equal,$(FEATUREVARIANT),1)),)
+
+$(if $(FLMDEBUG),$(info <flm name='e32abiv2' target='$(TARGET)' type='$(TARGETTYPE)' outputpath='$(OUTPUTPATH)' metasource='$(METASOURCE)' postlinkfiletype='$(POSTLINKFILETYPE)' />))
+
+# Strip switch-type parameters
+#
+POSTLINKTARGETTYPE:=$(strip $(POSTLINKTARGETTYPE))
+UID1:=$(strip $(UID1))
+UID2:=$(strip $(UID2))
+UID3:=$(strip $(UID3))
+SID:=$(strip $(SECUREID))
+VENDORID:=$(strip $(VENDORID))
+AUTOEXPORTS:=$(strip $(AUTOEXPORTS))
+DEFFILE:=$(strip $(DEFFILE))
+IMPORTLIBRARYREQUIRED:=$(strip $(IMPORTLIBRARYREQUIRED))
+EPOCALLOWDLLDATA:=$(strip $(EPOCALLOWDLLDATA))
+PAGED:=$(strip $(PAGED))
+
+# the output directories
+VARIANTPLATFORM:=$(VARIANTPLATFORM)$(FEATUREVARIANTNAME)
+RELEASABLEPATH:=$(RELEASEPATH)/$(VARIANTPLATFORM)/$(VARIANTTYPE)
+INTERMEDIATEPATH:=$(OUTPUTPATH)/$(VARIANTPLATFORM)/$(VARIANTTYPE)
+INTERMEDIATE_PLATFORM_PATH:=$(OUTPUTPATH)/$(VARIANTPLATFORM)
+TRACE_MARKER_PATH:=$(OUTPUTPATH)
+IMPORTLIBPATH:=$(RUNTIME_LIBS_PATH)
+
+# LOCALLY USED VARIABLES
+CLEANTARGETS:=
+WHATRELEASE:=
+
+# Work out which new/delete library to use for binaries.
+CHECKLIB_TYPE:=symc++
+STDCPPTAGFILE:=
+ifeq ($(NOSTDCPP),1)
+  ifeq ($(STDCPP),1)
+    $(info <warning>STDCPP and NOSTDCPP both specified in $(PROJECT_META)</warning>)
+  else
+    ifeq ($(HAS_DEDICATED_OP_NEWDEL_LIB),1)
+      DEFAULT_NEWLIB:=$(DEFAULT_SYMBIAN_NEWLIB)
+    endif
+  endif
+else
+  ifeq ($(STDCPP),1)
+    CDEFS:=$(CDEFS) __SYMBIAN_STDCPP_SUPPORT__
+    ifneq ($(SUPPORTS_STDCPP_NEWLIB),)
+      ifeq ($(HAS_DEDICATED_OP_NEWDEL_LIB),1)
+        DEFAULT_NEWLIB:=$(DEFAULT_STDCPP_NEWLIB)
+      endif
+      CHECKLIB_TYPE:=stdc++
+      STDCPPTAGFILE:=$(EPOCROOT)/epoc32/tools/tag/tag_elf
+    endif
+  endif
+endif
+
+# If NEWLIB is specified in the MMP file, it overrides all the past stuff.
+ifeq ($(NEWLIB),)
+  NEWLIB:=$(DEFAULT_NEWLIB)
+endif
+
+
+##########################################################################
+## OUTPUTS - externally relevant targets that this FLM generates
+
+
+ifeq ($(EXPORTLIBRARY),)
+  EXPORTLIBRARY:=$(TARGET)
+endif
+
+# This will insert the file version between the name and the extension.
+# If there is more than one dot in generated filename the inserted position will be
+# BEFORE the last but two dot. E.g name1.name2.name3.dll to name1.name2{version}.name3.dll
+LIBEXT:=$(lastword $(subst .,$(CHAR_SPACE) ,$(EXPORTLIBRARY)))
+LIBBASE:=$(patsubst %.$(LIBEXT),%,$(EXPORTLIBRARY))
+ifneq ($(findstring .,$(EXPORTLIBRARY)),)
+  # Please note $(EXPORTLIBRARY) doesn't include target type.
+  VER_E32IMPORTLIBBASE:=$(IMPORTLIBPATH)/$(LIBBASE){$(VERSIONHEX)}.$(LIBEXT)
+else
+  VER_E32IMPORTLIBBASE:=$(IMPORTLIBPATH)/$(EXPORTLIBRARY){$(VERSIONHEX)}
+endif
+
+# Postlinkable targets need to be linked and elf2e32'd
+ifneq ($(DOPOSTLINK),)
+    E32TARGET:=$(RELEASABLEPATH)/$(TARGET)$(if $(EXPLICITVERSION),{$(VERSIONHEX)},).$(if $(REQUESTEDTARGETEXT),$(REQUESTEDTARGETEXT),$(POSTLINKFILETYPE))
+    LINK_TARGET:=$(RELEASABLEPATH)/$(TARGET)$(if $(EXPLICITVERSION),{$(VERSIONHEX)},).$(if $(REQUESTEDTARGETEXT),$(REQUESTEDTARGETEXT),$(POSTLINKFILETYPE)).sym
+    MAPFILE:=$(RELEASABLEPATH)/$(TARGET).$(if $(REQUESTEDTARGETEXT),$(REQUESTEDTARGETEXT),$(POSTLINKFILETYPE)).map
+else
+  E32TARGET:=
+  LINK_TARGET:=
+  MAPFILE:=
+endif
+
+# libs and klibs, on the other hand need to be archived
+ifneq ($(call isoneof,$(TARGETTYPE),lib klib stdlib),)
+  ARTARGET:=$(RELEASABLEPATH)/$(TARGET).lib
+  # We need libs and klibs before we can link stuff with them:
+  LIBRARY:: $(ARTARGET)
+else
+  ARTARGET:=
+endif
+
+
+ifneq ($(IMPORTLIBRARYREQUIRED),) # no dso files for plugins, animation dlls etc
+  # make sure we don't build import libraries more than once for UDEB and UREL
+  # Without this, wierd target-specific variable problems happen with LIBRARY in particular
+
+  TMP_IMPORTLIBTARGET_ROOT:=$(IMPORTLIBPATH)/$(EXPORTLIBRARY)
+
+  # ABIv2 .dso
+  IMPORTLIBTARGET_DSO:=
+  IMPORTLIBTARGETVERSIONED_DSO:=
+
+  BUILDMARKER_IMPORTLIBTARGET_DSO:=TARGET_$(subst :,,$(VER_E32IMPORTLIBBASE)).dso
+  WHATRELEASE:=$(WHATRELEASE) $(if $(EXPLICITVERSION),,$(TMP_IMPORTLIBTARGET_ROOT).dso)
+  WHATRELEASE:=$(WHATRELEASE) $(VER_E32IMPORTLIBBASE).dso
+  ifeq ($($(BUILDMARKER_IMPORTLIBTARGET_DSO)),)
+    IMPORTLIBTARGET_DSO:=$(TMP_IMPORTLIBTARGET_ROOT).dso
+    IMPORTLIBTARGETVERSIONED_DSO:=$(VER_E32IMPORTLIBBASE).dso
+    $(eval $(BUILDMARKER_IMPORTLIBTARGET_DSO):=1)
+  endif
+
+  # ABIv1 .lib (for specific builds, toolchains and host OS platforms only)
+  IMPORTLIBTARGET_LIB:=
+  IMPORTLIBTARGETVERSIONED_LIB:=
+  BUILDMARKER_IMPORTLIBTARGET_LIB:=TARGET_$(subst :,,$(VER_E32IMPORTLIBBASE)).lib
+  # Only for builds that require and support them, and only on windows
+  ifeq ($(OSTYPE),cygwin)
+  ifeq ($(GENERATE_ABIV1_IMPLIBS),1)
+    WHATRELEASE:=$(WHATRELEASE) $(if $(EXPLICITVERSION),,$(TMP_IMPORTLIBTARGET_ROOT).lib)
+    WHATRELEASE:=$(WHATRELEASE) $(VER_E32IMPORTLIBBASE).lib
+    ifeq ($($(BUILDMARKER_IMPORTLIBTARGET_LIB)),)
+      IMPORTLIBTARGET_LIB:=$(TMP_IMPORTLIBTARGET_ROOT).lib
+      IMPORTLIBTARGETVERSIONED_LIB:=$(VER_E32IMPORTLIBBASE).lib
+      $(eval $(BUILDMARKER_IMPORTLIBTARGET_LIB):=1)
+    endif
+  endif
+  endif
+endif
+
+# Try to make sure that we get the right linkas name
+# If linkas is specified then split it up and
+# put the hex version number in the right place
+ifeq ($(LINKAS),)
+  LINKASNAME=$(TARGET)
+  LINKASTYPE=$(if $(REQUESTEDTARGETEXT),$(REQUESTEDTARGETEXT),$(POSTLINKFILETYPE))
+else
+  SPLIT_LINKAS=$(subst ., ,$(LINKAS))
+  LINKASNAME=$(word 1,$(SPLIT_LINKAS))
+  LINKASTYPE=$(word 2,$(SPLIT_LINKAS))
+endif
+
+# ignore UID3 if it is zero
+ifeq ($(UID3),00000000)
+  LINKASVERSIONED=$(LINKASNAME){$(VERSIONHEX)}.$(LINKASTYPE)
+else
+  LINKASVERSIONED=$(LINKASNAME){$(VERSIONHEX)}$(if $(UID3),[$(UID3)],).$(LINKASTYPE)
+endif
+
+##########################################################################
+## TARGET GROUPS ##
+RELEASABLES:=$(strip $(E32TARGET) $(ARTARGET) $(LINK_TARGET) $(MAPFILE))
+# More targets to be added later
+TARGETS:=$(strip $(E32TARGET) $(IMPORTLIBTARGET) $(LINK_TARGET) $(ARTARGET))
+
+CREATABLEPATHS:=$(OUTPUTPATH)
+CREATABLEPATHS:=$(CREATABLEPATHS) $(INTERMEDIATE_PLATFORM_PATH)
+CREATABLEPATHS:=$(CREATABLEPATHS) $(INTERMEDIATEPATH)
+CREATABLEPATHS:=$(CREATABLEPATHS) $(RELEASABLEPATH)
+CREATABLEPATHS:=$(CREATABLEPATHS) $(RUNTIME_LIBS_PATH)
+CREATABLEPATHS:=$(CREATABLEPATHS) $(IMPORTLIBPATH)
+WHATRELEASE:=$(WHATRELEASE) $(RELEASABLES)
+
+
+
+## HIGH LEVEL Targets ##
+.PHONY:: $(ALLTARGET)
+
+## GLOBAL TARGETS ############################################################
+$(ALLTARGET):: $(RELEASABLES)
+TARGET:: $(RELEASABLES)
+
+## Internal targets ##
+
+# Determine the name of the generated DSO file ###############################
+# This is to generate the dso with the Some{Versionhex}.file.dso
+# It reproduces what appears to be a problem in the current build system
+# that affects messageintercept{000a0000}.esockdebug.dso whose
+# filename differs from it's "linkas" name.
+E32VAR:=$(subst .,$(CHAR_SPACE) ,$(TARGET))
+E32SOME:=$(word 1,$(E32VAR))
+E32VAR2:=$(patsubst $(E32SOME).%,%,$(TARGET))
+
+# Separate '_SH' variables created for output into bash - Preserves '{' and '}'
+
+ifneq ($(findstring .,$(TARGET)),)
+	DSODEFFILENAMEBASE:=$(E32SOME){$(VERSIONHEX)}.$(E32VAR2)
+else
+	DSODEFFILENAMEBASE:=$(TARGET){$(VERSIONHEX)}
+endif
+GENERATED_DSO:=$(call dblquote,$(INTERMEDIATEPATH)/$(DSODEFFILENAMEBASE).dso)
+GENERATED_DEFFILE:=$(call dblquote,$(INTERMEDIATEPATH)/$(DSODEFFILENAMEBASE).def)
+
+## IMPORT LIBRARY  ###########################################################
+
+# Static libraries will be postlinked when they are used so don't try to postlink them
+
+ifneq ($(IMPORTLIBRARYREQUIRED),)
+ifneq ($(or $(DEFFILE),$(EXPORTUNFROZEN)),)
+# Both ABIv2 .dso and ABIv1 .lib import library generation require a processed .def file,
+# unless EXPORTUNFROZEN is being used
+PREPPEDDEFFILE:=
+ifneq ($(DEFFILE),)
+  ifeq ($(EXPORTUNFROZEN),)
+    PREPPEDDEFFILE:=$(INTERMEDIATEPATH)/$(TARGET).prep
+    CLEANTARGETS:=$(CLEANTARGETS) $(PREPPEDDEFFILE)
+    define importlibtarget_prepfile
+      $(PREPPEDDEFFILE): $(DEFFILE)
+		$(call startrule,importlibtarget_prepfile,FORCESUCCESS) \
+		$(PREPDEF) $(call dblquote,$(DEFFILE)) $(call dblquote,$(PREPPEDDEFFILE)) \
+		$(call endrule,importlibtarget_prepfile)
+    endef
+    $(eval $(importlibtarget_prepfile))
+  endif
+endif
+
+# ABIv2 .dso
+ifneq ($(IMPORTLIBTARGET_DSO),) # check that we haven't tried to specify this target already
+
+  ifneq ($(EXPLICITVERSION),)
+    TARGETS:=$(strip $(TARGETS) $(IMPORTLIBTARGETVERSIONED_DSO))
+
+    # Add this importlibrary to our global targets
+    LIBRARY:: $(IMPORTLIBTARGETVERSIONED_DSO)
+    $(ALLTARGET):: $(IMPORTLIBTARGETVERSIONED_DSO)
+    TARGET:: $(IMPORTLIBTARGETVERSIONED_DSO)
+
+  else
+    TARGETS:=$(strip $(TARGETS) $(IMPORTLIBTARGETVERSIONED_DSO) $(IMPORTLIBTARGET_DSO))
+
+    # Add this importlibrary to our global targets
+    LIBRARY:: $(IMPORTLIBTARGET_DSO)
+    $(ALLTARGET):: $(IMPORTLIBTARGETVERSIONED_DSO) $(IMPORTLIBTARGET_DSO)
+    TARGET:: $(IMPORTLIBTARGETVERSIONED_DSO) $(IMPORTLIBTARGET_DSO)
+
+
+  endif
+
+
+
+  ifneq ($(EXPORTUNFROZEN),) # Unfrozen  - warn and create .dso as side-effect of the final postlink
+    $(info <warning project='$(PROJECT_META)' component='$(COMPONENT_META)'>EXPORTUNFROZEN present in $(PROJECT_META) - unfrozen exports will be represented in import library.</warning> )
+    define importlibtarget_unfrozen
+      $(IMPORTLIBTARGET_DSO): $(IMPORTLIBTARGETVERSIONED_DSO)
+		$(call startrule,importlibtarget_unfrozen,FORCESUCCESS) \
+		$(GNUCP) $$(call dblquote,$$<) $$(call dblquote,$$@) \
+		$(call endrule,importlibtarget_unfrozen)
+
+       CLEANTARGETS:=$$(CLEANTARGETS) $(IMPORTLIBTARGET_DSO)
+
+    endef
+
+    define importlibtarget_unfrozen_ver
+      $(IMPORTLIBTARGETVERSIONED_DSO): $(E32TARGET)
+		$(call startrule,importlibversioned_unfrozen,FORCESUCCESS) \
+		$(GNUCP) "$(GENERATED_DSO)" "$$@" \
+		$(call endrule,importlibversioned_unfrozen)
+
+      CLEANTARGETS:=$$(CLEANTARGETS) $(IMPORTLIBTARGET_DSO)
+    endef
+
+    ifeq ($(EXPLICITVERSION),)
+      # Generate the general dso if we aren't
+      # being asked to make just the specific version.
+      $(eval $(importlibtarget_unfrozen))
+    endif
+
+    $(eval $(importlibtarget_unfrozen_ver))
+  else
+    ifneq ($(DEFFILE),) # Frozen - use the def file and create .dso directly
+      define importlibtarget_func
+       $(IMPORTLIBTARGET_DSO): $(IMPORTLIBTARGETVERSIONED_DSO)
+	   $(call startrule,importlibtarget,FORCESUCCESS) \
+	   $(GNUCP) "$$<" "$$@" \
+	   $(call endrule,importlibtarget)
+
+          CLEANTARGETS:=$$(CLEANTARGETS) $(IMPORTLIBTARGET_DSO)
+      endef
+
+      ifeq ($(EXPLICITVERSION),)
+          # Generate the general dso if we aren't
+          # being asked to make just the specific version.
+          $(eval $(importlibtarget_func))
+      endif
+
+      define importlibtargetversioned_func
+        $(IMPORTLIBTARGETVERSIONED_DSO): $(ELF2E32) $(PREPPEDDEFFILE)
+	      $(call startrule,importlibversioned,FORCESUCCESS) \
+	      $(ELF2E32) --sid=0x$(if $(SID),$(SID),$(if $(UID3),$(UID3),0))  --version=$(VERSION)  	   \
+	 	  --definput="$(PREPPEDDEFFILE)" 				   \
+	 	  --dso=$$(call dblquote,$$@) 				   \
+	 	  --linkas=$(call dblquote,$(LINKASVERSIONED)) \
+	      $(call endrule,importlibversioned)
+
+              CLEANTARGETS:=$$(CLEANTARGETS) $(IMPORTLIBTARGETVERSIONED_DSO)
+      endef
+      $(eval $(importlibtargetversioned_func))
+    endif #  ifneq ($(DEFFILE),)
+  endif #  ifneq ($(EXPORTUNFROZEN),)
+endif #  ifneq ($(IMPORTLIBTARGET_DSO),)
+
+# ABIv1 .lib
+ifneq ($(IMPORTLIBTARGETVERSIONED_LIB),) # check that we haven't tried to specify this target already
+  CLEANTARGETS:=$(CLEANTARGETS) $(IMPORTLIBTARGETVERSIONED_LIB) $(IMPORTLIBTARGET_LIB)
+
+  define abiv1_generatelib
+
+    ifeq ($(EXPLICITVERSION),)
+      LIBRARY:: $(IMPORTLIBTARGETVERSIONED_LIB) $(IMPORTLIBTARGET_LIB)
+
+    else
+      LIBRARY:: $(IMPORTLIBTARGETVERSIONED_LIB)
+
+    endif
+
+    # If frozen, a prepped .def file is used as the basis for .lib creation
+    # If unfrozen, .lib files are based on the .def file generated by the final postlink
+    $(IMPORTLIBTARGETVERSIONED_LIB): $(if $(EXPORTUNFROZEN),$(E32TARGET),$(PREPPEDDEFFILE))
+	$(call startrule,importlibversioned_abiv1) \
+        if [ -f "$(EPOCROOT)/epoc32/tools/def2dll.pl" -a -f "$(if $(EXPORTUNFROZEN),$(GENERATED_DEFFILE),$(PREPPEDDEFFILE))" ]; then \
+                 $(PERL) $(EPOCROOT)/epoc32/tools/def2dll.pl \
+		--path=$(IMPORTLIBPATH) \
+		--bldpath=$(INTERMEDIATEPATH) \
+		--import=$(notdir $(basename $(IMPORTLIBTARGETVERSIONED_LIB))) \
+		--deffile="$(if $(EXPORTUNFROZEN),$(GENERATED_DEFFILE),$(PREPPEDDEFFILE))" \
+		--linkAs=$(call dblquote,$(LINKASVERSIONED)) \
+		--inter ; fi \
+	$(call endrule,importlibversioned_abiv1)
+
+    ifeq ($(EXPLICITVERSION),)
+      $(IMPORTLIBTARGET_LIB): $(IMPORTLIBTARGETVERSIONED_LIB)
+	$(call startrule,importlibtarget_abiv1) \
+	if [ -f $(EPOCROOT)/epoc32/tools/def2dll.pl ]; then $(GNUCP) "$$<" "$$@" ; fi \
+	$(call endrule,importlibtarget_abiv1)
+    endif
+  endef
+
+  $(eval $(abiv1_generatelib))
+endif #  ifneq ($(IMPORTLIBTARGET_LIB),)
+endif #  ($(or $(DEFFILE),$(EXPORTUNFROZEN)),)
+endif #  ifneq ($(IMPORTLIBRARYREQUIRED),)
+
+
+## POSTLINK ##################################################################
+
+# Set up the name of the exports file if this is a customdll
+EXPTARGET:=
+ifneq ($(DOPOSTLINK),)
+  ifneq ($(and $(or $(STATICLIBRARY),$(ARMLIBS),$(ARMRT)),$(DEFFILE)),)
+    EXPTARGET:=$(INTERMEDIATE_PLATFORM_PATH)/$(notdir $(VER_E32IMPORTLIBBASE)).exp
+  endif
+endif
+
+# Generating the import library is enough if TARGETTYPE=implib #############
+
+ifneq ($(DOPOSTLINK),)
+include $(FLMHOME)/e32postlink.mk
+endif # ifneq ($(DOPOSTLINK),)
+
+ifneq ($(TARGETTYPE),implib)
+
+## CUSTOM DLLS ###############################################################
+# exp file
+#
+# This tends to help getting exported objects
+# out of the arm libs and into custom dlls.
+
+ifneq ($(EXPTARGET),)
+ifeq ($(TARGET_$(EXPTARGET)),)
+# We only need one of these exptargets for UDEB and UREL
+TARGET_$(EXPTARGET):=1
+
+EXPTARGETASMFILE:=$(INTERMEDIATE_PLATFORM_PATH)/$(notdir $(VER_E32IMPORTLIBBASE)).s
+
+define e32expgen_func
+$(EXPTARGET): $(DEFFILE) $(ELF2E32)
+	$(call startrule,expgen) \
+	$(ELF2E32) \
+	   --definput=$$(call dblquote,$(DEFFILE)) \
+	   --dump=a \
+	   --output=$(call dblquote,$(EXPTARGETASMFILE)) && \
+	$(ASM) $(TARGET_ARCH_OPTION) $(AAPCS_OPTION) $(ASM_OUTPUT_OPTION) $$(call dblquote, $$@) $(EXPTARGETASMFILE) \
+	$(call endrule,expgen)
+endef
+
+$(eval $(e32expgen_func))
+CLEANTARGETS:=$(CLEANTARGETS) $(EXPTARGET) $(EXPTARGETASMFILE)
+endif
+endif
+
+
+
+
+## SOURCE FILES ##############################################################
+
+# Source files can be either C++ files (.cpp) or Assmbler-in-C++ files (.cia)
+# We have to split the two because they have the same link stage, the compile
+# stage is different for each.
+
+CPPFILEEXTENSIONS:=.cpp .CPP .Cpp .CPp .CpP .cPP .cpP .cPp .cc .CC \
+	.Cc .c++ .C++ .cxx .CXX .Cxx .cXx .CxX .CXx .cC .cXX .cxX
+CFILEEXTENSIONS:=.c .C
+CIAFILEEXTENSIONS:=.CIA .cia .Cia .cIa .cIA .ciA .CIa .CiA
+ASMFILEEXTENSIONS:=.s .S
+
+
+# Extract the CPP files from our sources
+CPPFILES:=$(call extractfilesoftype,$(CPPFILEEXTENSIONS),$(SOURCE))
+CFILES:=$(call extractfilesoftype,$(CFILEEXTENSIONS),$(SOURCE))
+ASMFILES:=$(call extractfilesoftype,$(ASMFILEEXTENSIONS),$(SOURCE))
+
+# Find out what assember-in-c files there are
+# If appropriate, work out what CPP files will be created from the assembler files
+CIAFILES:=$(call extractfilesoftype,$(CIAFILEEXTENSIONS),$(SOURCE))
+CIA_CPPFILES:=
+ifeq ($(TRANSFORM_CIA),1)
+  CIA_CPPFILES:=$(call relocatefiles,$(INTERMEDIATEPATH),$(call extractandmap,$(CIAFILEEXTENSIONS),_.cpp,$(CIAFILES)))
+else
+
+endif
+
+## LINK ######################################################################
+# Bring together all the .o files compiled from  .cpp, .c, .s and .cia files.
+# These files are stored in the "non-releasable" output diretory.
+
+define mapcpp2object
+$(call relocatefiles,$(INTERMEDIATEPATH),$(call extractandmap,$(CPPFILEEXTENSIONS),.o,$1))
+endef
+
+define mapc2object
+$(call relocatefiles,$(INTERMEDIATEPATH),$(call extractandmap,$(CFILEEXTENSIONS),.o,$1))
+endef
+
+define mapasm2object
+$(call relocatefiles,$(INTERMEDIATEPATH),$(call extractandmap,$(ASMFILEEXTENSIONS),.o,$1))
+endef
+
+define mapcia2object
+$(call relocatefiles,$(INTERMEDIATEPATH),$(call extractandmap,$(CIAFILEEXTENSIONS),_.o,$1))
+endef
+
+# Determine what object files will be linked by using the source files.
+CPPFILES_LINKOBJECTS:=$(call mapcpp2object,$(CPPFILES))
+CFILES_LINKOBJECTS:=$(call mapc2object,$(CFILES))
+ifeq ($(TRANSFORM_CIA),1) 
+  CIAFILES_LINKOBJECTS:=$(patsubst %_.cpp,%_.o,$(CIA_CPPFILES))
+else
+  CIAFILES_LINKOBJECTS:=$(call mapcia2object,$(CIAFILES))
+endif
+ASMFILES_LINKOBJECTS:=$(call mapasm2object,$(ASMFILES))
+
+# Try to link object files in the order in which the source files were specified.
+# This makes BC comparisons with non-Raptor builds easier.
+# Use the order of the source list to establish the order of the object files:
+LINKOBJECTS:=$(call relocatefiles,$(INTERMEDIATEPATH),$(SOURCE))
+# Replace the file extensions of the Source files with .o (or _.o for cia files) now
+# the list will contain the object files in the same order as the list of source files.
+LINKOBJECTS:=$(foreach FILE,$(LINKOBJECTS),$(basename $(FILE))$(if $(filter $(addprefix %,$(CIAFILEEXTENSIONS)),$(FILE)),_).o)
+
+ifneq ($(MULTIFILE_ENABLED),)
+MULTIFILEOBJECT:=$(INTERMEDIATEPATH)/$(TARGET).$(POSTLINKFILETYPE)_$(VARIANTTYPE)_multifileobject.o
+MULTIFILE_VIAFILE:=$(INTERMEDIATEPATH)/$(TARGET)_$(VARIANTTYPE)_multifile.via
+endif
+
+## Via file ####################################
+# list of all objects to be linked
+#
+VIAFILE:=$(INTERMEDIATEPATH)/$(TARGET)_$(VARIANTTYPE)_objects.via
+ifneq ($(GENERATELINKERFEEDBACK),)
+FEEDBACKFILE:=$(INTERMEDIATEPATH)/$(TARGET)_$(VARIANTTYPE)_feedback.fdb
+endif
+
+# The groupin10 macro allows us to construct a via file, 10 objects at a time
+# to avoid limits on argument lengths and sizes on Windows.
+# It expands to a list of commands, each of which is on a separate line.
+# This causes the shell to be invoked once for each line but each line should
+# be shorter than the maximum allowed by windows.
+define groupin10
+	$(if $1,@echo -e $(foreach L,$(wordlist 1,10,$1),"$(L)\\n") >>$(VIAFILE),)
+	$(if $1,$(call groupin10,$(wordlist 11,$(words $1),$1)),@true)
+endef
+
+################################################
+
+
+## Link-type selection:
+#	runtime static libraries link via AR
+ifneq ($(ARTARGET),)
+# Assuming that there are no libdeps in this case because this is probably one of the
+# Runtime libraries which has no deps.
+
+define artarget_func
+$(ARTARGET): $(if $(MULTIFILE_ENABLED),$(MULTIFILEOBJECT),$(LINKOBJECTS)) $(STDCPPTAGFILE)
+	$(if $(MULTIFILE_ENABLED),,@echo "$(STDCPPTAGFILE)" > $(VIAFILE);
+	$(call groupin10,$(LINKOBJECTS)) ;)
+	$(call startrule,ar,FORCESUCCESS) \
+	$$(call dblquote,$(AR)) $(ARCHIVER_CREATE_OPTION) $$@ $(if $(MULTIFILE_ENABLED),$(MULTIFILEOBJECT),$(COMMANDFILE_OPTION)$(VIAFILE)) \
+	$(if $(DUMPBCINFO),&& $(FROMELF) -v $$@  > $$@.elfdump,)  \
+	$(call endrule,ar)
+endef
+$(eval $(artarget_func))
+
+CLEANTARGETS:=$(CLEANTARGETS) $(VIAFILE) $(ARTARGET) $(if $(DUMPBCINFO),$(ARTARGET).elfdump,)
+endif
+
+
+
+# Targettype is some type of DLL or EXE (or derivative)
+ifneq ($(LINK_TARGET),)
+
+escaped_located_ARMLIBS:=$(foreach L,$(ARMLIBS),$(call ruleEscape,$(wildcard $(subst $(CHAR_SPACE),?,$(RVCTLIB)/*/$(L)))))
+quoted_located_ARMLIBS:=$(foreach L,$(ARMLIBS),$(call dblquoteitem,$(wildcard $(RVCTLIB)/*/$(L))))
+located_STATICLIBRARIES:=$(foreach L,$(STATICLIBRARY),$(STATIC_LIBRARY_DIR)/$(L).lib)
+e32abiv2_LIBS:=$(EXPTARGET) $(LINKER_STUB_LIBRARY) $(if $(STATIC_RUNTIME_LIB),$(STATIC_RUNTIME_DIR)/$(STATIC_RUNTIME_LIB),) $(located_STATICLIBRARIES)
+# DLLS and EXEs - These objects are linked by a linker
+ifeq ($(ARMRT),)
+# Some of the runtime libraries do not set ARMRT because of a circular reference
+# problem; we need to stop these from linking to their own dso and not link to
+# the STATIC_LIBS_LIST.
+ifneq ($(findstring $(TARGET).dso,$(RUNTIME_LIBS_LIST)),)
+# (almost) ARM RUNTIME LIBS
+REDUCED_RUNTIME_LIBS_LIST:=$(subst $(TARGET).dso,,$(RUNTIME_LIBS_LIST))
+
+ifeq ($(VARIANTTYPE),udeb)
+  e32abiv2_LIBS:=$(e32abiv2_LIBS) $(addprefix $(IMPORTLIBPATH)/,$(LIBRARY_DEBUG)) $(addprefix $(RUNTIME_LIBS_PATH)/,$(REDUCED_RUNTIME_LIBS_LIST)) 
+else
+  e32abiv2_LIBS:=$(e32abiv2_LIBS) $(addprefix $(IMPORTLIBPATH)/,$(LIBRARY)) $(addprefix $(RUNTIME_LIBS_PATH)/,$(REDUCED_RUNTIME_LIBS_LIST)) 
+endif
+quoted_e32abiv2_LIBS=$(e32abiv2_LIBS) $(quoted_located_ARMLIBS)
+escaped_e32abiv2_LIBS=$(e32abiv2_LIBS) $(escaped_located_ARMLIBS)
+
+else
+# NORMAL
+#
+ifeq ($(VARIANTTYPE),udeb)
+  e32abiv2_LIBS:=$(e32abiv2_LIBS) $(addprefix $(IMPORTLIBPATH)/,$(LIBRARY_DEBUG))
+else
+  e32abiv2_LIBS:=$(e32abiv2_LIBS) $(addprefix $(IMPORTLIBPATH)/,$(LIBRARY))
+endif
+ifeq ($(HAS_DEDICATED_OP_NEWDEL_LIB),1)
+  e32abiv2_LIBS:=$(e32abiv2_LIBS) $(addprefix $(RUNTIME_LIBS_PATH)/,$(NEWLIB))
+endif
+quoted_e32abiv2_LIBS:=$(e32abiv2_LIBS) $(addprefix $(RUNTIME_LIBS_PATH)/,$(RUNTIME_LIBS_LIST)) $(call addquotedprefix,$(STATIC_LIBS_PATH)/,$(STATIC_LIBS_LIST)) $(quoted_located_ARMLIBS)
+escaped_e32abiv2_LIBS:=$(e32abiv2_LIBS) $(addprefix $(RUNTIME_LIBS_PATH)/,$(RUNTIME_LIBS_LIST)) $(addprefix $(call ruleEscape,$(STATIC_LIBS_PATH)/),$(STATIC_LIBS_LIST)) $(escaped_located_ARMLIBS)
+
+endif
+else
+# ARM RUNTIME LIBS
+ifeq ($(VARIANTTYPE),udeb)
+  e32abiv2_LIBS:=$(e32abiv2_LIBS) $(addprefix $(IMPORTLIBPATH)/,$(LIBRARY_DEBUG)) 
+else
+  e32abiv2_LIBS:=$(e32abiv2_LIBS) $(addprefix $(IMPORTLIBPATH)/,$(LIBRARY))
+endif
+quoted_e32abiv2_LIBS=$(e32abiv2_LIBS) $(quoted_located_ARMLIBS)
+escaped_e32abiv2_LIBS=$(e32abiv2_LIBS) $(escaped_located_ARMLIBS)
+endif
+
+# NOTE: the groupin10 macro must be used before a call to the "startrule" macro
+# because the code between startrule and endrule is packaged up into one
+# commandline which would defeat the purpose of groupin10.
+# This is undesirable because viafile generation commands appear
+# outside the relevant tags but it is also unavoidable.
+define linktarget_func
+## The actual link target, dependencies and build step
+$(LINK_TARGET): $(if $(MULTIFILE_ENABLED),$(MULTIFILEOBJECT) $(CIAFILES_LINKOBJECTS),$(LINKOBJECTS)) $(escaped_e32abiv2_LIBS) $(LINKER_ENTRYPOINT_LIBDEP) $(if $(SUPPORTS_STDCPP_NEWLIB),$(CHECKLIB)) $(if $(LINKERFEEDBACK_STAGE2),$(FEEDBACKFILE),)
+	$(if $(MULTIFILE_ENABLED),,@echo -n "" > $(VIAFILE);
+	$(call groupin10,$(LINKOBJECTS)) ;)
+	$(call startrule,link) \
+	$(if $(PERTURBSTARTTIME),$(RANSLEEP) $(PERTURBMSECS) ;,) \
+	$(if $(SUPPORTS_STDCPP_NEWLIB),$(if $(located_STATICLIBRARIES),$(CHECKLIB) $(CHECKLIB_TYPE) --elf $(call dblquote,$(located_STATICLIBRARIES)) &&,),) \
+	$(LD) $(LINKER_MISC_FLAGS) $(LINKER_DEFAULT_LIB_PATHS) $(SYMBIAN_LINK_FLAGS) $(if $(DEBUG_INFO),$(LINKER_DEBUG_OPTION),$(LINKER_NODEBUG_OPTION)) \
+	  $(SHARED_OBJECT_OPTION) $(SPLIT_OPTION) \
+	  $(RW_BASE_OPTION) 0x400000 \
+	  $(LINKER_ARCH_OPTION) \
+	  $(SYMVER_OPTION) $(SO_NAME_OPTION) $(call dblquote,$(LINKASVERSIONED)) \
+	  $(LINKER_ENTRYPOINT_SETTING) \
+	  -o $$(call dblquote,$$@) \
+	  $(if $(LTCG),$(LTCG_OPTION),) \
+	  $(LINKER_SYMBOLS_OPTION) $(LINKER_SYMBOLS_FILE_OPTION) \
+	  $(call dblquote,$(MAPFILE)) \
+  	  $(LINKEROPTION) \
+	  $(if $(MULTIFILE_ENABLED),$(call dblquote,$(MULTIFILEOBJECT) $(CIAFILES_LINKOBJECTS)),$(COMMANDFILE_OPTION)$(call dblquote,$(VIAFILE))) \
+          $(if $(GENERATELINKERFEEDBACK),$(FEEDBACK_OPTION)$(call dblquote,$(FEEDBACKFILE))) \
+	  $(if $(LINKER_ADD_STATIC_RUNTIME),$(if $(STATIC_RUNTIME_LIB),$(LINKER_GROUP_START_OPTION) $(STATIC_RUNTIME_DIR)/$(STATIC_RUNTIME_LIB) $(LINKER_GROUP_END_OPTION),)) \
+	  $(quoted_e32abiv2_LIBS) $(LINKER_DEFAULT_LIBS)\
+	$(call endrule,link)
+
+$(MAPFILE): $(LINK_TARGET)
+endef
+$(eval $(linktarget_func))
+
+CLEANTARGETS:=$(CLEANTARGETS) $(LINK_TARGET) $(if $(GENERATELINKERFEEDBACK),$(FEEDBACKFILE)) $(if $(MULTIFILE_ENABLED),$(MULTIFILEOBJECT))
+CLEANTARGETS:=$(CLEANTARGETS) $(VIAFILE)
+CLEANTARGETS:=$(CLEANTARGETS) $(MAPFILE)
+WHATRELEASE:=$(WHATRELEASE) $(MAPFILE)
+
+endif # if TARGETTYPE lib
+
+
+## Run trace compiler ##############################################
+ifeq ($(UID3),)
+ ifeq ($(UID2),)
+  USE_TRACE_COMPILER:=
+ else
+  UID_TC:=$(UID2)
+ endif
+else
+ UID_TC:=$(UID3)
+endif
+
+# USE_TRACE_COMPILER defaults to blank in Raptor config.
+# Users can turn TC on by setting it to 1 in user config.
+ifneq ($(USE_TRACE_COMPILER),)
+  include $(FLMHOME)/tracecompiler.mk
+endif
+
+CC_CPPONLY_ARGS:=$(SYMBIAN_CCFLAGS) $(if $(DEBUG_INFO),-g) $(DEBUG_FORMAT) \
+  $(RUNTIME_SYMBOL_VISIBILITY_OPTION) $(EXCEPTIONS) \
+  $(CC_WARNINGS_CONTROL_OPTION) $(CC_ERRORS_CONTROL_OPTION) \
+  $(TARGET_ARCH_OPTION) $(ENUM_OPTION) $(OWN_LIBRARY_OPTION) $(FPMODE_OPTION) \
+  $(EXPORT_VTBL_OPTION) $(NO_UNALIGNED_ACCESS) $(VFE_OPTION) $(AAPCS_OPTION) \
+  $(CPPONLYOPTION) $(INSTRUCTION_SET) \
+  $(if $(ALWAYS_BUILD_AS_ARM),$(ARM_INSTRUCTION_SET),$(THUMB_INSTRUCTION_SET) $(call makemacrodef,-D,$(COMPILER_THUMB_DEFINES))) \
+  $(COMPILER_FPU_FLAGS)
+
+## COMPILE CPP Files #################################################################
+
+# For ARMCC we can compile all sourcefiles with one invocation
+# The pathprep macro is used to make sure that forward slashes in options
+# are not interpreted as being paths by CYGWIN on Windows.  On windows
+# pathprep makes a forward slash into two.
+
+# The majority of ARMCC arguments are common across all compiler invocations
+# Order is significant here in that OPTION_REPLACE here and in ABLD should
+# have the same impact
+CC_CORE_ARGS:=$(SYMBIAN_CCFLAGS) $(if $(DEBUG_INFO),-g) $(DEBUG_FORMAT) \
+  $(RUNTIME_SYMBOL_VISIBILITY_OPTION) $(EXCEPTIONS) \
+  $(CC_WARNINGS_CONTROL_OPTION) $(CC_ERRORS_CONTROL_OPTION) \
+  $(TARGET_ARCH_OPTION) $(ENUM_OPTION) $(OWN_LIBRARY_OPTION) $(FPMODE_OPTION) \
+  $(EXPORT_VTBL_OPTION) $(NO_UNALIGNED_ACCESS) $(VFE_OPTION) $(AAPCS_OPTION) \
+  $(COMPILE_ONLY_OPTION) $(INSTRUCTION_SET) \
+  $(if $(ALWAYS_BUILD_AS_ARM),$(ARM_INSTRUCTION_SET),$(THUMB_INSTRUCTION_SET) $(call makemacrodef,-D,$(COMPILER_THUMB_DEFINES))) \
+  $(COMPILER_FPU_FLAGS)
+
+ifeq ($(STDCPP),1)
+SYSTEMINCLUDE:=$(SYSTEMINCLUDE) $(call concat, $(COMPILER_SYSTEM_INCLUDE_OPTION),$(call dblquote,$(STDCPP_INCLUDE)))
+endif
+
+define option_replace
+  # Process a single, combined, item of the form 'search<->replace' in order to modify the command line tool call
+  # We split this into its component arguments for use in substitutions
+  # Spaces will have been escaped elsewhere to maintain distinct words, so we resurrect these
+  # after the split.
+  SEARCH:=$(subst %20,$(CHAR_SPACE),$(word 1,$(subst <->,$(CHAR_SPACE),$(1))))
+  REPLACE:=$(subst %20,$(CHAR_SPACE),$(word 2,$(subst <->,$(CHAR_SPACE),$(1))))
+
+  # Depending on whether there's a wildcard in the search, we may require either a normal $(subst) or a $(patsubst)
+  PATSUBST:=$$(if $$(findstring %,$$(SEARCH)),1,)
+
+  ifeq ($$(PATSUBST),1)
+    CC_CORE_ARGS:=$$(patsubst $$(SEARCH),$$(REPLACE),$$(CC_CORE_ARGS))
+  else
+    CC_CORE_ARGS:=$$(subst $$(SEARCH),$$(REPLACE),$$(CC_CORE_ARGS))
+  endif
+endef
+$(foreach ITEM,$(OPTION_REPLACE_COMPILER),$(eval $(call option_replace,$(ITEM))))
+
+define e32abiv2_compile
+
+$(eval DEPENDFILENAME:=$(1).d)
+$(eval DEPENDFILE:=$(wildcard $(DEPENDFILENAME)))
+
+# $4 is for language specific options (e.g. C++ vs C)
+$(1): $(2) $(PROJECT_META) $(if $(MULTIFILE_ENABLED),,$(if $(DEPENDFILE),,RESOURCE BITMAP EXPORT)) $(if $(USE_TRACE_COMPILER),$(TRACE_MARKER),) $(if $(LINKERFEEDBACK_STAGE2),$(FEEDBACKFILE),)
+	$(call startrule,compile,,$(2))		\
+		$(if $(PERTURBSTARTTIME), $(RANSLEEP) $(PERTURBMSECS) ;,) \
+		$(if $(MULTIFILE_ENABLED), echo $(2) $(3) > $(MULTIFILE_VIAFILE) ;,) \
+		$(CC) $(LICENSERETRY_OPTION) \
+			$(CC_CORE_ARGS) \
+			$(OPTION_COMPILER) $(if $(MULTIFILE_ENABLED),$(4),$(3)) \
+			$(if $(LTCG),$(LTCG_OPTION),) \
+			$(if $(USE_PROFILER_FEEDBACK),--profile=$(call dblquote,$(ARM_PROFILER_FILE)),) \
+			$(call makemacrodef,-D,$(COMPILER_INTERWORK_DEFINES) $(CDEFS))				\
+			$(if $(PREINCLUDE),$(PREINCLUDE_OPTION) ,)$(call concat, $(PREINCLUDE_OPTION) ,$(call dblquote,$(PREINCLUDE)))\
+			$(if $(SET_ARMINC),$(if $(RVCTINC),$(COMPILER_SYSTEM_INCLUDE_OPTION)$(call dblquoteitem,$(RVCTINC)),),)       \
+			$(COMPILER_SYSTEM_INCLUDE_OPTION)$$(call dblquote,$$(<D))                                                      \
+			$(if $(USERINCLUDE),$(COMPILER_SYSTEM_INCLUDE_OPTION),)$(call concat, $(COMPILER_SYSTEM_INCLUDE_OPTION),$(call dblquote,$(USERINCLUDE)))      \
+			$(if $(SYSTEMINCLUDE),$(COMPILER_SYSTEM_INCLUDE_OPTION),)$(call concat, $(COMPILER_SYSTEM_INCLUDE_OPTION),$(call dblquote,$(SYSTEMINCLUDE)))  \
+			$(if $(NOHIDEALL),--no_hide_all,) \
+			$(DEPEND_OPTION) $(call dblquote,$(1).d) \
+                        $(if $(LINKERFEEDBACK_STAGE2),$(FEEDBACK_OPTION)$(call dblquote,$(FEEDBACKFILE))) \
+			$(if $(MULTIFILE_ENABLED),--multifile $(OUTPUT_OPTION) $(MULTIFILEOBJECT) \
+			--via $$(call dblquote, $(MULTIFILE_VIAFILE)),$(OUTPUT_OPTION) $$@ $$(call dblquote, $$<))  \
+	$(call endrule,compile)
+
+CLEANTARGETS:=$$(CLEANTARGETS) $(DEPENDFILENAME)
+ifneq "$(DEPENDFILE)" ""
+ifeq ($(NO_DEPEND_INCLUDE),)
+  ifeq "$(filter %CLEAN,$(call uppercase,$(MAKECMDGOALS)))" ""
+    -include $(DEPENDFILE)
+  endif
+endif
+endif
+
+# individual source file compilation
+SOURCETARGET_$(call sanitise,$(2)): $(1)
+
+endef
+
+# Evaluate .cpp and .c files in one go for multifile, cannot do in separate steps since we have the same target.
+# This implementation means the .c files will always get put at the end of the .via file. Maybe there is a better way to do this?
+$(if $(MULTIFILE_ENABLED),$(eval $(call e32abiv2_compile,$(MULTIFILEOBJECT),$(CPPFILES),$(CFILES),$(CPP_LANG_OPTION))),$(foreach F,$(CPPFILES),$(eval $(call e32abiv2_compile,$(call mapcpp2object,$(F)),$(F),$(CPP_LANG_OPTION)))))
+$(if $(MULTIFILE_ENABLED),,$(foreach F,$(CFILES),$(eval $(call e32abiv2_compile,$(call mapc2object,$(F)),$(F),$(C_LANG_OPTION)))))
+ifneq ($(TRANSFORM_CIA),1)
+  $(if $(MULTIFILE_ENABLED),,$(foreach F,$(CIAFILES),$(eval $(call e32abiv2_compile,$(call mapcia2object,$(F)),$(F),$(CPP_LANG_OPTION) $(COMPILER_CIA_FLAGS)))))
+endif
+
+CLEANTARGETS:=$(CLEANTARGETS) $(if $(MULTIFILE_ENABLED),$(MULTIFILE_VIAFILE) $(MULTIFILEOBJECT),$(CPPFILES_LINKOBJECTS) $(CFILES_LINKOBJECTS) $(CIAFILES_LINKOBJECTS)) $(if $(GENERATELINKERFEEDBACK),$(FEEDBACKFILE))
+
+## Listing target ###################################################
+# Very similar to compile, apart from the extra flags passed to the
+# compile and different output options
+
+define map2listfile
+$(call relocatefiles,$(INTERMEDIATEPATH),$(call extractandmap,$(CPPFILEEXTENSIONS) $(CFILEEXTENSIONS),.lis,$1))
+endef
+
+
+define e32abiv2_cpponly
+# $1 is the sourcefile
+
+$(eval CPPONLYTARGET:=$(strip $(call extractandmap,$(CPPFILEEXTENSIONS) $(CFILEEXTENSIONS),.$(subst _,.,$(call sanitise,$(FULLVARIANTPATH))).pre,$1)))
+
+CPPONLY:: $(CPPONLYTARGET)
+
+$(CPPONLYTARGET): $(1) $(PROJECT_META)  $(if $(DEPENDFILE),,RESOURCE BITMAP EXPORT)
+	$(call startrule,e32cpponly,,$(1))		\
+		$(if $(PERTURBSTARTTIME), $(RANSLEEP) $(PERTURBMSECS) ;,) \
+		$(CC) $(LICENSERETRY_OPTION) $(SYMBIAN_CCFLAGS) \
+			$(CC_CPPONLY_ARGS) \
+			$(OPTION_COMPILER) 						\
+			$(call makemacrodef,-D,$(COMPILER_INTERWORK_DEFINES) $(CDEFS))				\
+			$(if $(PREINCLUDE),$(PREINCLUDE_OPTION) ,)$(call concat, $(PREINCLUDE_OPTION) ,$(call dblquote,$(PREINCLUDE)))\
+			$(if $(SET_ARMINC),$(if $(RVCTINC),$(COMPILER_SYSTEM_INCLUDE_OPTION)$(call dblquote,$(RVCTINC)),),)       \
+			$(COMPILER_SYSTEM_INCLUDE_OPTION)$$(call dblquote,$$(<D))                                                   \
+			$(if $(USERINCLUDE),$(COMPILER_SYSTEM_INCLUDE_OPTION),)$(call concat, $(COMPILER_SYSTEM_INCLUDE_OPTION),$(call dblquote,$(USERINCLUDE)))      \
+			$(if $(SYSTEMINCLUDE),$(COMPILER_SYSTEM_INCLUDE_OPTION),)$(call concat, $(COMPILER_SYSTEM_INCLUDE_OPTION),$(call dblquote,$(SYSTEMINCLUDE)))  \
+			$(if $(NOHIDEALL),--no_hide_all,) \
+			$$(call dblquote, $$<) $(OUTPUT_OPTION) $$(@) \
+	$(call endrule,e32cpponly)
+
+CLEANTARGETS:=$$(CLEANTARGETS) $(CPPONLYTARGET)
+endef
+
+ifneq ($(filter CPPONLY,$(call uppercase,$(MAKECMDGOALS))),)
+$(foreach F,$(CPPFILES) $(CFILES),$(eval $(call e32abiv2_cpponly,$(F))))
+endif
+
+define e32abiv2_listing
+# $1 is the sourcefile
+
+$(eval LISTINGTARGET:=$(strip $(call extractandmap,$(CPPFILEEXTENSIONS) $(CFILEEXTENSIONS),.$(subst _,.,$(call sanitise,$(FULLVARIANTPATH))).$(TARGET).$(if $(REQUESTEDTARGETEXT),$(REQUESTEDTARGETEXT),$(POSTLINKFILETYPE)).lst,$1)))
+$(eval DEPENDFILENAME:=$(call map2listfile,$1).d)
+$(eval DEPENDFILE:=$(wildcard $(DEPENDFILENAME)))
+
+
+LISTING:: $(LISTINGTARGET)
+
+$(LISTINGTARGET): $(1) $(PROJECT_META)  $(if $(DEPENDFILE),,RESOURCE BITMAP EXPORT)
+	$(call startrule,e32listing,,$(1))		\
+		$(if $(PERTURBSTARTTIME), $(RANSLEEP) $(PERTURBMSECS) ;,) \
+		$(CC) $(LICENSERETRY_OPTION) $(SYMBIAN_CCFLAGS) \
+			$(CC_CORE_ARGS) \
+			$(LISTING_OPTION)		            	\
+			$(OPTION_COMPILER) 						\
+			$(call makemacrodef,-D,$(COMPILER_INTERWORK_DEFINES) $(CDEFS))				\
+			$(if $(PREINCLUDE),$(PREINCLUDE_OPTION) ,)$(call concat, $(PREINCLUDE_OPTION) ,$(call dblquote,$(PREINCLUDE)))\
+			$(if $(SET_ARMINC),$(if $(RVCTINC),$(COMPILER_SYSTEM_INCLUDE_OPTION)$(call dblquoteitem,$(RVCTINC)),),)       \
+			$(COMPILER_SYSTEM_INCLUDE_OPTION)$$(call dblquote,$$(<D))                                                   \
+			$(if $(USERINCLUDE),$(COMPILER_SYSTEM_INCLUDE_OPTION),)$(call concat, $(COMPILER_SYSTEM_INCLUDE_OPTION),$(call dblquote,$(USERINCLUDE)))      \
+			$(if $(SYSTEMINCLUDE),$(COMPILER_SYSTEM_INCLUDE_OPTION),)$(call concat, $(COMPILER_SYSTEM_INCLUDE_OPTION),$(call dblquote,$(SYSTEMINCLUDE)))  \
+			$(if $(NOHIDEALL),--no_hide_all,) \
+			$(DEPEND_OPTION) $(call dblquote,$(DEPENDFILENAME)) \
+			$$(call dblquote, $$<) $(OUTPUT_OPTION) $$(@) \
+	$(call endrule,e32listing)
+
+CLEANTARGETS:=$$(CLEANTARGETS) $(LISTINGTARGET)
+
+CLEANTARGETS:=$$(CLEANTARGETS) $(DEPENDFILENAME)
+ifneq "$(DEPENDFILE)" ""
+ifeq ($(NO_DEPEND_INCLUDE),)
+  ifeq "$(filter %CLEAN,$(call uppercase,$(MAKECMDGOALS)))" ""
+    -include $(DEPENDFILE)
+  endif
+endif
+endif
+
+endef
+
+# No point at all in generating listing targetsif we aren't going to make them
+ifneq ($(filter LISTING,$(call uppercase,$(MAKECMDGOALS))),)
+$(foreach F,$(CPPFILES) $(CFILES),$(eval $(call e32abiv2_listing,$(F))))
+endif
+
+
+
+# Function to execute FREEZE ###########################################
+ifneq ($(SUPPORT_FREEZE),)
+
+# Fivespaces variable created to ensure a suitable gap of space characters
+# Is placed between the separate arguments. This fixes a problem in Cygwin, where
+# separate arguments are interpreted as a single argument when passed to bash
+FIVESPACES=$(BLANK)     $(BLANK)
+
+FREEZEGUARD:=TARGET_$(TARGET)_$(if $(REQUESTEDTARGETEXT),$(REQUESTEDTARGETEXT),$(POSTLINKFILETYPE))_$(IMPORTLIBPATH)_EFREEZE
+
+define e32freeze
+
+FREEZE:: $(1)
+	$(call startrule,freeze,,$(RESOLVED_DEFFILE)) \
+	$(EFREEZE) $(EFREEZE_REMOVE_OPTION) "$(RESOLVED_DEFFILE)" $(FIVESPACES) $(GENERATED_DEFFILE) \
+	$(call endrule,freeze)
+endef
+
+# DEFFILE should only be generated for target types that have a def file
+ifeq ($(MAKEDEFFILE),1)
+# Eval freeze only once - no point making the DEFFILE for urel *and* udeb.
+ifeq ($($(FREEZEGUARD)),)
+$(eval $(call e32freeze,$(E32TARGET)))
+$(FREEZEGUARD):=1
+endif
+endif
+
+endif
+
+CLEANTARGETS:=$(CLEANTARGETS) $(if $(MULTIFILE_ENABLED),$(MULTIFILEOBJECT),$(CPPFILES_LINKOBJECTS) $(CFILES_LINKOBJECTS))
+
+## ASSEMBLER FILES ###################################################################
+# CIA VERSION      ############################################
+define mapcia2xxx
+$(call relocatefiles,$(INTERMEDIATEPATH),$(call extractandmap,$(CIAFILEEXTENSIONS),$2,$1))
+endef
+
+define e32abiv2_CIA2CPP
+
+$(eval e32abiv2_OFILE:=$(call mapcia2xxx,$(1),_.o))
+$(eval e32abiv2_PREFILE:=$(call mapcia2xxx,$(1),_.pre))
+$(eval e32abiv2_CPPFILE:=$(call mapcia2xxx,$(1),_.cpp))
+$(eval CLEANTARGETS:=$(CLEANTARGETS) $(e32abiv2_OFILE) $(e32abiv2_CPPFILE) $(e32abiv2_PREFILE))
+
+$(e32abiv2_OFILE): $(e32abiv2_CPPFILE) $(PROJECT_META)
+	$(call startrule,cia2cpp2o,,$(e32abiv2_CPPFILE)) \
+		$(if $(PERTURBSTARTTIME),$(RANSLEEP) $(PERTURBMSECS) ;,) \
+			$(CC) $(LICENSERETRY_OPTION) \
+			$(CC_CORE_ARGS) \
+			$(if $(LTCG),$(LTCG_OPTION),) \
+			$(OPTION_COMPILER) \
+			$(call makemacrodef,-D,$(COMPILER_INTERWORK_DEFINES) $(CDEFS) $(CIADEFS)) $(CPP_LANG_OPTION)      \
+	 		$(if $(USERINCLUDE),$(COMPILER_SYSTEM_INCLUDE_OPTION),)$$(call concat, $(COMPILER_SYSTEM_INCLUDE_OPTION),$$(call dblquote,$(USERINCLUDE)))     \
+	 		$(if $(SYSTEMINCLUDE),$(COMPILER_SYSTEM_INCLUDE_OPTION),)$$(call concat, $(COMPILER_SYSTEM_INCLUDE_OPTION),$$(call dblquote,$(SYSTEMINCLUDE))) \
+	 		$$(call dblquote, $$<) $(OUTPUT_OPTION) $$@ \
+	$(call endrule,cia2cpp2o)
+
+
+# preprocessed CIA file to a CPP file
+$(e32abiv2_CPPFILE): $(e32abiv2_PREFILE)
+	$(call startrule,tranasm) \
+	$(if $(CPPFILT),CPPFILT="$(CPPFILT)",) \
+	$(TRANASM) --suppress-check --output="$$@" $$^ \
+	$(call endrule,tranasm)
+
+$(eval DEPENDFILENAME:=$(e32abiv2_PREFILE).d)
+$(eval DEPENDFILE:=$(wildcard $(DEPENDFILENAME)))
+
+# preprocess the cia file
+$(eval e32abiv2_PREFILE_OPTIONS:= $(LICENSERETRY_OPTION) $(PREPROCESSOR_OPTION) $(CPP_OPTION) \
+       $(SYMBIAN_CCFLAGS) $(call makemacrodef,-D,$(COMPILER_INTERWORK_DEFINES) $(CDEFS) $(CIADEFS)) $(CPP_LANG_OPTION) \
+       $(if $(PREINCLUDE),$(PREINCLUDE_OPTION) ,)$$(call concat, $(PREINCLUDE_OPTION) ,$$(call dblquote,$(PREINCLUDE))) \
+       $(if $(USERINCLUDE),$(COMPILER_SYSTEM_INCLUDE_OPTION),)$$(call concat, $(COMPILER_SYSTEM_INCLUDE_OPTION),$$(call dblquote,$(USERINCLUDE))) \
+       $(if $(SYSTEMINCLUDE),$(COMPILER_SYSTEM_INCLUDE_OPTION),)$$(call concat, $(COMPILER_SYSTEM_INCLUDE_OPTION),$$(call dblquote,$(SYSTEMINCLUDE))) \
+       $(if $(ARMINC),$(if $(RVCTINC), $(COMPILER_SYSTEM_INCLUDE_OPTION)$$(call dblquoteitem,$(RVCTINC)),),) )
+
+
+$(e32abiv2_PREFILE): $1 $(PROJECT_META) $(if $(DEPENDFILE),,RESOURCE BITMAP EXPORT)
+	$(call startrule,cia2cpp,,$1) \
+	$(if $(PERTURBSTARTTIME),$(RANSLEEP) $(PERTURBMSECS) ;,) \
+	$(CC) $(e32abiv2_PREFILE_OPTIONS) $(OUTPUT_OPTION) $$@ $$(call dblquote,$1) && \
+	$(CC) -M $(e32abiv2_PREFILE_OPTIONS) --depend_format=unix \
+	  $(OUTPUT_OPTION) $$@ $$(call dblquote,$1) > $(call dblquote,$(e32abiv2_PREFILE).d) \
+	$(call endrule,cia2cpp)
+
+CLEANTARGETS:=$$(CLEANTARGETS) $(DEPENDFILENAME)
+ifneq "$(DEPENDFILE)" ""
+ifeq ($(NO_DEPEND_INCLUDE),)
+  ifeq "$(filter %CLEAN,$(call uppercase,$(MAKECMDGOALS)))" ""
+    -include $(DEPENDFILE)
+  endif
+endif
+endif
+
+endef
+
+# Create a rule for each cia file
+ifeq ($(TRANSFORM_CIA),1)
+  $(eval $(foreach e32abiv2_RULE,$(CIAFILES),$(call e32abiv2_CIA2CPP,$(e32abiv2_RULE))))
+endif
+
+# Pure assembler (.s files) ################################
+
+e32abiv2_asm_OPTIONS:=$(LICENSERETRY_OPTION) \
+  $(CC_CORE_ARGS) \
+  $(OPTION_COMPILER) \
+  $(call makemacrodef,-D,$(COMPILER_INTERWORK_DEFINES) $(CDEFS)) \
+  $(if $(USERINCLUDE),$(COMPILER_SYSTEM_INCLUDE_OPTION),)$$(call concat, $(COMPILER_SYSTEM_INCLUDE_OPTION),$$(call dblquote,$(USERINCLUDE)))     \
+  $(if $(SYSTEMINCLUDE),$(COMPILER_SYSTEM_INCLUDE_OPTION),)$$(call concat, $(COMPILER_SYSTEM_INCLUDE_OPTION),$$(call dblquote,$(SYSTEMINCLUDE)))
+
+# note that the --no_rtti option cannot be passed with the -M option
+# so forcibly remove it when generating ASM dependencies.
+#
+define e32abiv2_asm
+
+$(eval DEPENDFILENAME:=$(1).d)
+$(eval DEPENDFILE:=$(wildcard $(DEPENDFILENAME)))
+
+$(1): $(2) $(PROJECT_META) $(if $(DEPENDFILE),,RESOURCE BITMAP EXPORT)
+	$(call startrule,asmcompile,,$(2)) \
+		$(if $(PERTURBSTARTTIME),$(RANSLEEP) $(PERTURBMSECS) ;,) \
+		$(CC) $(e32abiv2_asm_OPTIONS) \
+		$(DEPEND_OPTION) $(call dblquote,$(DEPENDFILENAME)) \
+	 	$$(call dblquote, $$<) $(OUTPUT_OPTION) $$@ \
+	$(call endrule,asmcompile)
+	$(call startrule,asmdependencies) \
+		$(CC) -M $(subst --no_rtti,,$(e32abiv2_asm_OPTIONS)) --depend_format=unix \
+	  	$(OUTPUT_OPTION) $$@ $$(call dblquote,$2) > $(call dblquote,$(DEPENDFILENAME)) \
+	$(call endrule,asmdependencies)
+
+CLEANTARGETS:=$$(CLEANTARGETS) $(DEPENDFILENAME)
+ifneq "$(DEPENDFILE)" ""
+ifeq ($(NO_DEPEND_INCLUDE),)
+  ifeq "$(filter %CLEAN,$(call uppercase,$(MAKECMDGOALS)))" ""
+    -include $(DEPENDFILE)
+  endif
+endif
+endif
+
+CREATABLEPATHS:=$$(CREATABLEPATHS) $(INTERMEDIATEPATH)
+
+endef
+
+$(eval $(foreach F,$(ASMFILES), $(call e32abiv2_asm,$(call mapasm2object,$(F)),$(F))))
+CLEANTARGETS:=$(CLEANTARGETS) $(ASMFILES_LINKOBJECTS)
+
+endif # ifneq ($(TARGETTYPE),implib)
+
+
+########################## Build ROMFILE target ############################
+EPOC_ROOT:=$(patsubst %/,%,$(EPOCROOT))
+TOBLDINF:=$(dir $(subst :,,$(subst $(EPOC_ROOT)/,,$(COMPONENT_META))))
+
+# Only build ROMFILE if asked
+ifneq ($(filter ROMFILE,$(call uppercase,$(MAKECMDGOALS))),)
+    ifeq ($(ROMFILE_$(call sanitise,$(TARGET).$(REQUESTEDTARGETEXT))),)
+        ROMFILE_$(call sanitise,$(TARGET).$(REQUESTEDTARGETEXT)):=1
+        ROMDIR:=$(EPOC_ROOT)/epoc32/rom/$(TOBLDINF)
+
+        # Default values
+        ROMFILETYPE:=file
+        ROMFILE:=$(TARGET).$(REQUESTEDTARGETEXT)
+        ROMPATH:=sys/bin/
+        ROMDECORATIONS:=
+        ROMFILETYPE_RAM:=data
+        ROMFILE_RAM:=$(TARGET).$(REQUESTEDTARGETEXT)
+        ROMPATH_RAM:=sys/bin/
+        BUILDROMTARGET:=1
+        ABIDIR:=MAIN
+
+        $(eval $(call DoRomSet))
+
+        ifneq ($(EPOCFIXEDPROCESS),)
+            ROMDECORATIONS:=$(ROMDECORATIONS) fixed
+        endif
+        ifeq ($(PAGED),1)
+            ROMDECORATIONS:=$(ROMDECORATIONS) paged
+        endif
+        ifeq ($(PAGED),0)
+            ROMDECORATIONS:=$(ROMDECORATIONS) unpaged
+        endif
+
+
+        ifeq ($(TESTCODE),TRUE)
+        	# Add 'TEST' to the .iby filename
+        	ROMTEST:=test
+            ifeq ($(TEST_OPTION),BOTH)
+                DATATEXT:="data=/epoc32/data/z/test/$(MODULE)/$(VARIANTPLATFORM).auto.bat test/$(MODULE).auto.bat"\n"data=/epoc32/data/z/test/$(MODULE)/$(VARIANTPLATFORM).manual.bat test/$(MODULE).manual.bat"
+            else
+                ifneq ($(TEST_OPTION),NONE)
+                    DATATEXT:="data=/epoc32/data/z/test/$(MODULE)/$(VARIANTPLATFORM).$(TEST_OPTION).bat test/$(MODULE).$(TEST_OPTION).bat"
+                endif
+            endif
+        else
+        	DATATEXT:=
+        endif
+
+        # ROMTARGET
+        ifneq ($(ROMTARGET),)
+            ifneq ($(words $(ROMTARGET)),1)
+                ROMTARGETALL:=$(ROMTARGET)
+                ROMTARGET:=$(word 1,$(ROMTARGET))
+            endif
+
+            ifeq ($(ROMTARGET),<none>)
+                BUILDROMTARGET:=
+            else
+                ifneq ($(ROMTARGET),+)
+                    ifneq ($(notdir $(ROMTARGET)),)
+                        ROMFILE:=$(notdir $(ROMTARGET))
+                    endif
+                    ifneq ($(dir $(ROMTARGET)),./)
+                        ROMPATH:=$(dir $(ROMTARGET))
+                    endif
+                endif
+            endif
+        endif
+    endif
+
+    ROMFILENAME:=$(ROMDIR)$(PLATFORM)$(ROMTEST).iby
+
+    # RAMTARGET
+    ifneq ($(RAMTARGET),)
+        ROMDECORATIONS_RAM:=" attrib=r"
+        ifneq ($(RAMTARGET),+)
+            ifneq ($(notdir $(RAMTARGET)),)
+                ROMFILE_RAM:=$(notdir $(RAMTARGET))
+            endif
+            ifneq ($(dir $(RAMTARGET)),./)
+                ROMPATH_RAM:=$(dir $(RAMTARGET))
+            endif
+        endif
+    endif
+
+    define BuildRomfileTarget
+        $(ALLTARGET)::ROMFILE
+        ROMFILE::
+	        $(call startrule,rombuild)	\
+	        $(GNUMKDIR) -p $(ROMDIR) \
+            $(if $(ROMFILE_CREATED_$(TOBLDINF)),,&& echo -e "// $(subst $(EPOC_ROOT)/,,$(ROMFILENAME))\n//\n$(DATATEXT)" > $(ROMFILENAME)) \
+            $(if $(BUILDROMTARGET),&& echo "$(ROMFILETYPE)=/epoc32/release/##$(ABIDIR)##/##BUILD##/$(TARGET).$(REQUESTEDTARGETEXT)   $(1)$(ROMDECORATIONS)" >> $(ROMFILENAME))	\
+	        $(if $(RAMTARGET),&& echo "$(ROMFILETYPE_RAM)=/epoc32/release/##$(ABIDIR)##/##BUILD##/$(TARGET).$(REQUESTEDTARGETEXT)   $(ROMPATH_RAM)$(ROMFILE_RAM)$(ROMDECORATIONS_RAM)" >> $(ROMFILENAME))	\
+	        $(call endrule,buildromfiletarget)
+    endef
+
+    # When VARIANTTYPE changes, romfile is finished,
+    # apart from if this is a new component......
+    ifneq ($(PREVIOUSVARIANTTYPE),)
+        ifneq ($(VARIANTTYPE),$(PREVIOUSVARIANTTYPE))
+            ifneq ($(ROMFILE_CREATED_$(TOBLDINF)),)
+                ROMFILEFINISHED:=1
+            else
+                ROMFILEFINISHED:=
+            endif
+        endif
+    endif
+
+    # When romfile is finished, don't continue to add to it
+    ifeq ($(ROMFILEFINISHED),)
+        $(eval $(call BuildRomfileTarget,$(ROMPATH)$(ROMFILE)))
+    endif
+
+    # Don't allow romfile to be recreated for every MMP
+    ifeq ($(ROMFILE_CREATED_$(TOBLDINF)),)
+        ROMFILE_CREATED_$(TOBLDINF):=1
+    endif
+
+    # Build other ROMTARGETs if there is more than one
+    ifneq ($(ROMTARGETALL),)
+        RAMTARGET:=
+        $(foreach ROMTARGET,$(wordlist 2,$(words $(ROMTARGETALL)),$(ROMTARGETALL)),$(eval $(call BuildRomfileTarget,$(ROMTARGET))))
+        ROMTARGETALL:=
+    endif
+
+    # Keep track of variant type while romfile is being created
+    PREVIOUSVARIANTTYPE:=$(VARIANTTYPE)
+
+    WHATRELEASE:=$(WHATRELEASE) $(ROMFILENAME)
+    CLEANTARGETS:=$(CLEANTARGETS) $(ROMFILENAME)
+endif
+
+# Deal with test code batch files generation.
+ifneq ($(TESTPATH),)
+
+    CREATABLEPATHS:=$(CREATABLEPATHS) $(EPOCROOT)/epoc32/data/z/test/
+    $(eval $(call MakeTestBatchFiles,$(TARGET),$(EPOCROOT)/epoc32/data/z/test/$(MODULE)/$(VARIANTPLATFORM).$(TESTPATH)))
+    BATCHFILE_CREATED_$(EPOCROOT)/epoc32/data/z/test/$(MODULE)/$(VARIANTPLATFORM).$(TESTPATH):=1
+    TARGET_CREATED_$(EPOCROOT)/epoc32/data/z/test/$(MODULE)/$(VARIANTPLATFORM).$(TESTPATH)_$(TARGET):=1
+    WHATRELEASE:=$(WHATRELEASE) $(EPOCROOT)/epoc32/data/z/test/$(MODULE)/$(VARIANTPLATFORM).$(TESTPATH)
+    CLEANTARGETS:=$(CLEANTARGETS) $(EPOCROOT)/epoc32/data/z/test/$(MODULE)/$(VARIANTPLATFORM).$(TESTPATH)
+endif
+
+###################### End of Build ROMFILE target ######################
+
+# Feature Variation requires a .vmap file to be created for each binary
+#
+ifneq ($(FEATUREVARIANTNAME),)
+ifneq ($(E32TARGET),)
+
+OUTPUTVMAP:=$(E32TARGET).vmap
+WHATRELEASE:=$(WHATRELEASE) $(OUPUTVMAP)
+
+TARGET:: $(OUTPUTVMAP)
+VMAPNEEDS:=$(E32TARGET) $(SOURCE) $(PROJECT_META)
+
+BV_SOURCELIST:=$(addprefix -s ,$(SOURCE) $(PROJECT_META))
+BV_FEATURELIST:=$(addprefix -f ,$(FEATURELISTFILES))
+BV_USER_INCLUDES:=$(addprefix -u ,$(USERINCLUDE))
+BV_SYSTEM_INCLUDES:=$(addprefix -x ,$(SYSTEMINCLUDE))
+
+# translate double quoted macros because $(shell) messes them up in some make engines
+BV_MACROLIST:=$(COMPILER_INTERWORK_DEFINES) $(CDEFS) $(if $(ALWAYS_BUILD_AS_ARM),,$(COMPILER_THUMB_DEFINES))
+BV_DEFINES:=$(call makemacrodef,-D,$(subst ",__SBS__QUOTE__,$(BV_MACROLIST)))
+
+# the script to generate our .vmap file and hash value
+VMAPCOMMAND:=$(CREATEVMAP) -o $(OUTPUTVMAP) $(BV_FEATURELIST) $(BV_DEFINES) -p $(PREINCLUDE) $(BV_SOURCELIST) $(BV_USER_INCLUDES) $(BV_SYSTEM_INCLUDES) -c $(CREATEVMAPCPP)
+
+# a recipe to create the .vmap from the "sources" with the createvmap script
+$(call raptor_recipe,createvmap,$(OUTPUTVMAP),$(VMAPNEEDS),$(VMAPCOMMAND))
+
+endif # E32TARGET != ""
+endif # FEATUREVARIANTNAME != ""
+
+########################### CONCLUSION ###################################
+
+# make the output directories while reading makefile - some build engines prefer this
+$(call makepath,$(CREATABLEPATHS))
+
+## Clean up
+$(eval $(call GenerateStandardCleanTarget,$(CLEANTARGETS) ,$(CREATABLEPATHS),))
+
+# For the abld -what target
+$(eval $(call whatmacro,$(filter-out %.sym,$(WHATRELEASE)),WHATARMV5))
+
+endif # FEATUREVARIANTNAME=="" or FEATUREVARIANT==1
+
+## The End
+

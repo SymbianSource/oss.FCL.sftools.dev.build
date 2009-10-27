@@ -1,0 +1,44 @@
+/*
+* Copyright (c) 1999-2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description: 
+* Base tools (e.g. petran)
+*
+*/
+
+
+
+PRJ_PLATFORMS
+TOOLS TOOLS2
+
+PRJ_EXPORTS
+
+../elf2inf.pl		/epoc32/tools/elf2inf.pl
+../def2dll.bat		/epoc32/tools/def2dll.bat
+../def2dll.pl		/epoc32/tools/def2dll.pl
+../deputil.pl		/epoc32/tools/deputil.pl
+../deputil.pm		/epoc32/tools/deputil.pm
+../inc/elfdefs.h	/epoc32/include/tools/elfdefs.h
+
+
+PRJ_MMPFILES
+#ifdef TOOLS
+genstubs
+getexports
+elftran
+#else
+elfdump
+#endif
+
+
+

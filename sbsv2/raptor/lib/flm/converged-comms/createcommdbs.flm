@@ -1,0 +1,60 @@
+# Copyright (c) 2008-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+#
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+#
+# Contributors:
+#
+# Description:
+#
+
+# FLM to build CommDB databases using CED.
+
+DBDONE:=$(EPOCBLD)/CommDb_$(PLATFORM)_$(CFG).done
+$(call makepathfor,$(DBDONE))
+
+# remember the name of the .done file so that we can make the FINAL stage of
+# installdefaultcommdb.flm depend on it
+CommDb_$(PLATFORM)_$(CFG)_done:=$(DBDONE)
+
+# macro for all the rules
+define createcommdbs
+
+FINAL:: $(DBDONE)
+
+$(DBDONE): TARGET
+	$(call startrule,createcommdbs) \
+	$(PERL) $(EXTENSION_ROOT)/createcommdbs.pl --command=build --platform=$(PLATFORM) --variant=$(CFG) --sourceDir=$(EXTENSION_ROOT)/$(SRCDIR) --platsec && \
+	touch $(DBDONE) \
+	$(call endrule,createcommdbs)
+
+CLEAN:: 
+	$(call startrule,clean) \
+	$(PERL) $(EXTENSION_ROOT)/createcommdbs.pl --command=clean --platform=$(PLATFORM) --variant=$(CFG) --sourceDir=$(EXTENSION_ROOT)/$(SRCDIR) --platsec && \
+	rm -f $(DBDONE) \
+	$(call endrule,clean)
+
+RELEASABLES:: 
+	@$(PERL) $(EXTENSION_ROOT)/createcommdbs.pl --command=releasables --platform=$(PLATFORM) --variant=$(CFG) --sourceDir=$(EXTENSION_ROOT)/$(SRCDIR) --platsec
+
+ifeq ($(WHATLOG),TRUE)
+FINAL::
+	@ { echo "<whatlog bldinf='$(COMPONENT_META)' mmp='' config='$(SBS_CONFIGURATION)'>" ; \
+	$(PERL) $(EXTENSION_ROOT)/createcommdbs.pl --command=releasables --platform=$(PLATFORM) --variant=$(CFG) --sourceDir=$(EXTENSION_ROOT)/$(SRCDIR) --platsec | \
+	(read -r LINE; while [ $$$$? -eq 0 ]; do \
+	echo "<build>$$$$LINE</build>"; \
+	read -r LINE; done; ); \
+	echo "</whatlog>"; } \
+	$(if $(DESCRAMBLE),2>&1 | $(DESCRAMBLE))
+endif
+
+endef
+
+# expand
+$(eval $(createcommdbs))
+

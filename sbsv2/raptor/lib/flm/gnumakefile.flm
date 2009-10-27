@@ -1,0 +1,191 @@
+# Copyright (c) 2008-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+#
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+#
+# Contributors:
+#
+# Description:
+# Gnumakefile FLM -> Knows how to run gnumakefiles
+# Will only work on Windows
+# 
+#
+
+TMPROOT:=$(subst \,/,$(EPOCROOT))
+OLD_EPOCROOT:=$(patsubst %/,%,$(TMPROOT))/
+OLDSTYLE_EPOCROOT:=$(subst /,\,$(OLD_EPOCROOT))
+
+# Set up the correct make to be invoked
+MAKEVAR:=
+ifeq ($(USENMAKE),1)
+MAKEVAR:=$(NMAKE) $(NMAKEFLAGS)
+else
+MAKEVAR:="$(SBSV1MAKE)"
+endif
+
+################################# FLM Parameter description ##
+# Parameters:
+#   EPOCROOT:=
+#   PLATFORM:=$(VARIANTPLATFORM)
+# The current configuration either UREL or UDEB:
+#   CFG:=$(VARIANTTYPE)
+# Relative path to EPOCROOT. (to where?):
+#   TO_ROOT:=
+# The path to the top-level bld.inf.
+# Note: if a bld.inf file #includes another bld.inf, this variable will
+# always contain the directory of that top-level file. If you require
+# the directory of the bld.inf which actually references the makefile,
+# use $(EXTENSION_ROOT) instead.
+#   TO_BLDINF:=
+# The project's working build directory under \epoc32\build\..
+#   EPOCBLD:=
+
+
+################################ Standard Variables ##
+# We may set the following 
+# for the sake of gnumakefiles which
+# need to know them:
+
+## Path element separator.
+/:=/
+## PATH environment variable separator.
+;:=:
+
+####
+# Various file and directory manipulation tools.
+# We are using the standard GNU coretools.
+# On Windows these are supplied by CYGWIN
+RMDIR:=$(GNURMDIR)
+RM:=$(GNURM)
+ERASE:=$(GNURM)
+MKDIR:=$(GNUMKDIR)
+CP:=$(GNUCP)
+
+# Targets:
+# We need to hook the BLD, LIB, ..., targets in the gnumakefile into the
+# global phony TARGET, LIBRARY, ..., targets in the overall Makefile.
+#
+# Additionally we need a specific name for each gnumakefile's targets so
+# that we can create dependencies between, say, the FINAL target of one
+# extension and the FINAL target of another. Ideally this name would be
+# unique but that would require the full path to be used so we compromise
+# and use a unique name and a portable reference that is relatively "unique".
+
+UNIQ:=$(DIRECTORY)$(EXTMAKEFILENAME)$(TO_ROOT)$(EPOCBLD)$(TO_BLDINF)$(PLATFORM)$(CFG)$(MAKEVAR)
+UNIQ:=$(word 1,$(shell echo $(UNIQ) | $(GNUMD5SUM)))
+gmake_$(notdir $(EXTMAKEFILENAME))_$(PLATFORM)_$(CFG):=$(UNIQ)
+CFG_uppercase:=$(call uppercase,$(CFG))
+
+RVCT22BIN:=$(RVCTBIN)
+RVCT22LIB:=$(RVCTLIB)
+RVCT22INC:=$(RVCTINC)
+
+EXTMAKEFILEPARAMETERS:= \
+	EPOCROOT PLATFORM TO_ROOT TO_BLDINF \
+	EPOCBLD CFG RMDIR RM ERASE MKDIR CP  \
+	MAKEFILENAME DIRECTORY EXTMAKEFILENAME            \
+	DEPENDENCIES TOOL RVCT22LIB RVCT22INC RVCT22BIN MAKEVAR
+
+# The standard gnumakefile Targets
+# These will be implemented in terms of double colon
+# rules - such that make FREEZE will cause all FREEZE 
+# targets to be evaluated.
+# For each call of this FLM we also need
+# to create unique versions of each of these targets
+# so that there is something to attach
+# the current FLM parameters to using target-specific 
+# variable declarations.
+
+EXTMAKETARGETS:= \
+	MAKMAKE     \
+	BLD         \
+	FREEZE      \
+	LIB         \
+	CLEANLIB    \
+	RESOURCE    \
+	CLEAN       \
+	RELEASABLES \
+	FINAL
+#	DO_NOTHING  
+
+# Hook into global targets
+#
+MAKEFILE::    $(UNIQ)_MAKMAKE
+BITMAP::      $(UNIQ)_MAKMAKE
+TARGET::      $(UNIQ)_BLD
+FREEZE::      $(UNIQ)_FREEZE
+LIBRARY::     $(UNIQ)_LIB
+CLEAN::       $(UNIQ)_CLEAN $(UNIQ)_CLEANLIB
+RESOURCE::    $(UNIQ)_RESOURCE
+FINAL::       $(UNIQ)_FINAL
+RELEASABLES:: $(UNIQ)_RELEASABLES
+
+# make sure gnumakefiles happen at the right stages
+MAKMAKE_DEPS:=EXPORT
+RESOURCE_DEPS:=BITMAP 
+LIB_DEPS:=RESOURCE
+BLD_DEPS:=LIBRARY
+FINAL_DEPS:=TARGET
+
+export /
+export ;
+
+#################################### Global Targets ##
+## All the global targets for the gnumakefiles
+# gnumakes are called as sub-makes, using make 3.79 from abld (passed through $(SBSV1MAKE)). 
+# makefile and nmakefile are called using nmake.
+
+define callgnumake
+.PHONY:: $(UNIQ)_$(1)
+
+$(EPOCROOT)/epoc32/build/TEM_$(1):: $(UNIQ)_$(1)
+
+$(UNIQ)_$(1): $($(1)_DEPS)
+	$(call startrule,extension_makefile,FORCESUCCESS) \
+	$(foreach V,$(EXTMAKEFILEPARAMETERS),$(V)='$($(V))') EXTMAKEFILETARGET='$(1)' \
+	$(if $(USENMAKE),export MAKEFLAGS="";cd "$(subst /,\,$(DIRECTORY))";,) export EPOCROOT="$(strip $(OLDSTYLE_EPOCROOT))\"; export CFG=$(CFG_uppercase); \
+	$(MAKEVAR) $(if $(USENMAKE),,-C "$(subst /,\,$(DIRECTORY))") -f "$(EXTMAKEFILENAME)" \
+	CFG=$(CFG_uppercase) EPOCBLD="$(subst /,\,$(EPOCBLD))" TO_BLDINF="$(subst /,\,$(TO_BLDINF))" PLATFORM=$(PLATFORM) $(if $(SAVESPACE),$(subst BLD,SAVESPACE,$(1)),$(1)) \
+	$(call endrule,extension_makefile) 
+ifneq ($(call isoneof,$(1),RELEASABLES FINAL),)
+	$(call startrawoutput) \
+	echo "$(call whatLogOpen)" ; \
+	$(foreach V,$(EXTMAKEFILEPARAMETERS),$(V)='$($(V))') EXTMAKEFILETARGET='RELEASABLES' \
+	$(if $(USENMAKE),export MAKEFLAGS="";cd "$(subst /,\,$(DIRECTORY))";,) export EPOCROOT="$(strip $(OLDSTYLE_EPOCROOT))\"; export CFG=$(CFG_uppercase); \
+	$(MAKEVAR) $(if $(USENMAKE),-C -S,-C "$(subst /,\,$(DIRECTORY))" --no-print-directory) -f "$(EXTMAKEFILENAME)" \
+	CFG=$(CFG_uppercase) EPOCBLD="$(subst /,\,$(EPOCBLD))" TO_BLDINF="$(subst /,\,$(TO_BLDINF))" PLATFORM=$(PLATFORM) RELEASABLES | \
+	(read -r LINE; while [ $$$$? -eq 0 ]; do \
+	if [[ ! $$$$LINE =~ "Nothing to be done for"  ]] ; then echo "$(call whatLogItem,EM,$$$$LINE)"; fi; \
+	read -r LINE; done; ); \
+	echo "$(call whatLogClose)" \
+	$(call endrawoutput)
+
+
+WHATGNUEM:: $(UNIQ)_RELEASABLES
+
+endif
+endef
+
+DO_NOTHING:: $(UNIQ)_DO_NOTHING 
+$(UNIQ)_DO_NOTHING: ;
+
+$(foreach EXTTRG,$(EXTMAKETARGETS),$(eval $(call callgnumake,$(EXTTRG))))
+
+## Do ROMFILE target in romstuff.mke
+ifeq ($(ROMFILE_$(call sanitise,$(EXTMAKEFILENAME))),)
+ROMFILE_$(call sanitise,$(EXTMAKEFILENAME)):=1
+
+ROMDIR:=$(subst $(OLD_EPOCROOT),$(OLD_EPOCROOT)epoc32/rom/,$(TO_BLDINF))
+
+define RomfileRomstuff
+ROMFILE::
+	@$(MAKEVAR) --no-print-directory $(if $(USENMAKE),,-C "$(subst /,\,$(DIRECTORY))") -f "$(EXTMAKEFILENAME)" ROMFILE >> $(ROMDIR)/ARMV5TEST.IBY
+endef
+
+$(eval $(call RomfileRomstuff))
+endif

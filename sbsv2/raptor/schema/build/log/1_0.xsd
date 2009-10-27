@@ -1,0 +1,79 @@
+<?xml version="1.0"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://symbian.com/xml/build/log" xmlns="http://symbian.com/xml/build/log" elementFormDefault="qualified">
+
+	<xsd:annotation>
+		<xsd:documentation xml:lang="en">
+			Copyright (c) 2008-2009 Nokia Corporation and/or its subsidiary(-ies).
+			All rights reserved.
+			This component and the accompanying materials are made available
+			uunder the terms of the License "Eclipse Public License v1.0"
+			which accompanies this distribution, and is available
+			at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+			Initial Contributors:
+			Nokia Corporation - initial contribution.
+
+			Contributors:
+
+			Description:
+
+		</xsd:documentation>
+	</xsd:annotation>
+
+	<xsd:element name="buildlog">
+		<xsd:complexType mixed="true">
+			<xsd:sequence maxOccurs="unbounded">
+				<xsd:element name="info" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element name="error" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element name="warning" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element name="flm" type="flmType" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element name="bmconvcmdfile" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+				<xsd:element name="recipe" type="recipeType" minOccurs="0" maxOccurs="unbounded"/>
+			</xsd:sequence>
+			<xsd:attribute name="sbs_version" type="xsd:string"/>
+		</xsd:complexType>
+	</xsd:element>
+
+	<xsd:complexType name="flmType" mixed="true">
+		<xsd:attribute name="name" type="xsd:string"/>
+		<xsd:attribute name="target" type="xsd:string"/>
+		<xsd:attribute name="EPOCROOT" type="xsd:string"/>
+		<xsd:attribute name="type" type="xsd:string"/>
+		<xsd:attribute name="variant" type="xsd:string"/>
+		<xsd:attribute name="component" type="xsd:string"/>
+		<xsd:attribute name="project" type="xsd:string"/>
+		<xsd:attribute name="source" type="xsd:string"/>
+	</xsd:complexType>
+
+	<xsd:complexType name="recipeType" mixed="true">
+		<xsd:sequence>
+		  <xsd:element name="time">
+	  		<xsd:complexType>
+		      <xsd:attribute name="start" type="xsd:decimal"/>
+		      <xsd:attribute name="elapsed" type="xsd:decimal"/>
+		    </xsd:complexType>
+			</xsd:element>
+			<xsd:element name="status">
+				<xsd:complexType>
+					<xsd:attribute name="exit" type="xsd:string"/>
+					<xsd:attribute name="code" type="xsd:integer"/>
+					<xsd:attribute name="name" type="xsd:string"/>
+					<xsd:attribute name="project" type="xsd:string"/>
+					<xsd:attribute name="component" type="xsd:string"/>
+					<xsd:attribute name="forcesuccess" type="xsd:string"/>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="name" type="xsd:string"/>
+		<xsd:attribute name="host" type="xsd:string"/>
+		<xsd:attribute name="layer" type="xsd:string"/>
+		<xsd:attribute name="component" type="xsd:string"/>
+		<xsd:attribute name="bldinf" type="xsd:string"/>
+		<xsd:attribute name="mmp" type="xsd:string"/>
+		<xsd:attribute name="config" type="xsd:string"/>
+		<xsd:attribute name="platform" type="xsd:string"/>
+		<xsd:attribute name="phase" type="xsd:string"/>
+	</xsd:complexType>
+
+</xsd:schema>
+

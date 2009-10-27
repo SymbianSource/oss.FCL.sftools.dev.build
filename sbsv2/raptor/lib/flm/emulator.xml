@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<build xmlns="http://symbian.com/xml/build" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symbian.com/xml/build ../../schema/build/2_0.xsd">
+	<!-- Emulator interfaces -->
+
+	<interface name="Emulator.flm" extends="base.flm" abstract="true">
+		<param name='DEFFILEKEYWORD'/>
+		<param name='OUTPUTPATH'/>
+		<param name='VARIANTPLATFORM'/>
+		<param name='PLATFORM' default='$(VARIANTPLATFORM)'/>
+		<param name='PRODUCT_INCLUDE'/>
+		<param name='RELEASEPATH'/>
+		<param name='REQUESTEDTARGETEXT' default=''/>
+		<param name='VARIANTTYPE'/>
+		<param name='SBSV1MAKE'/>
+		<param name='NMAKE'/>
+		<param name='NMAKEFLAGS'/>
+		<param name='FULLVARIANTPATH'/>
+		<param name='PLATMACROS.WINDOWS'/>
+		<param name='PLATMACROS.LINUX'/>
+		<param name='SUPPORTS_STDCPP_NEWLIB' default='1'/>
+	</interface>
+
+	<interface name="Emulator.mmp" extends="Emulator.flm" abstract="true">
+		<param name='BASEADDRESS' default=''/>
+		<param name='CAPABILITYFLAG1' default='00000000u'/>
+		<param name='CAPABILITYFLAG2' default='00000000u'/>
+		<param name='COPY_FOR_STATIC_LINKAGE' default='0'/>
+		<param name='DEBUGLIBRARY' default=''/>
+		<param name='DEFFILE' default=''/>
+		<param name='EFREEZE' default=''/>
+		<param name='EFREEZE_REMOVE_OPTION' default=''/>
+		<param name='EPOCALLOWDLLDATA' default='0'/>
+		<param name='EPOCHEAPSIZEMIN_DEC_KB' default=''/>
+		<param name='EPOCHEAPSIZEMAX_DEC_KB' default=''/>
+		<param name='EPOCPROCESSPRIORITY' default='Foreground'/>
+		<param name='EXPORTLIBRARY' default=''/>
+		<param name='EXPORTUNFROZEN' default=''/>
+		<param name='FIRSTLIB' default=''/>
+		<param name='LIBRARY' default=''/>
+		<param name='LIBRARY_DEBUG' default=''/>
+		<param name='LINKAS' default=''/>
+		<param name='LISTING_OPTION' default='-S'/>
+		<param name='MMPDEFS' default=''/>
+		<param name='NEWLIB' default=''/>
+		<param name='NOEXPORTLIBRARY' default='0'/>
+		<param name='NOSTDCPP' default=''/>
+		<param name='OPTION_CW' default=''/>
+		<param name='RESOLVED_DEFFILE' default=''/>
+		<param name='SECUREID' default=''/>
+		<param name='SOURCE' default=''/>
+		<param name='STATICLIBRARY' default=''/>
+		<param name='STDCPP' default=''/>
+		<param name='STDCPP_DEF' default=''/>
+		<param name='STDCPP_INCLUDE' default=''/>
+		<param name='STDCPP_WCHAR_DEF' default=''/>
+		<param name='SYSTEMINCLUDE' default=''/>
+		<param name='TARGET'/>
+		<param name='TARGETPATH'/>
+		<param name='TARGETTYPE'/>
+		<param name='TESTPATH' default=''/>
+		<param name='TESTCODE' default=''/>
+		<param name='TEST_OPTION' default=''/>
+		<param name='UID2' default='00000000'/>
+		<param name='UID3' default='00000000'/>
+		<param name='USE_TRACE_COMPILER' default=''/>
+		<param name='USERINCLUDE' default=''/>
+		<param name='VENDORID' default='00000000'/>
+		<param name='VERSIONHEX' default='00010000'/>
+		<param name='WIN32_HEADERS' default=''/>
+		<param name='WIN32_LIBRARY' default=''/>
+		<param name='WIN32_RESOURCE' default=''/>
+	</interface>
+
+	<interface name="Emulator.win32" extends="Emulator.mmp" abstract="true" flm="win32.flm">
+		<param name='CC'/>
+		<param name='CDEFS' default=''/>
+		<param name='CFLAGS' default=''/>
+		<param name='CW_DEFAULT_LIBS'/>
+		<param name='CW_RUNTIME_STATIC'/>
+		<param name='CW_RUNTIME_NONSTATIC'/>
+		<param name='DEFAULT_NORMAL_NEWLIB' default=''/>
+		<param name='DEFAULT_SYSTEM_NEWLIB' default=''/>
+		<param name='EXPORT_TYPE'/>
+		<param name='LINKPATH'/>
+		<param name='LFLAGS' default=''/>
+		<param name='NAME_LOOKUP' default=''/>
+		<param name='OPEN_ENVIRONMENT' default=''/>
+		<param name='OPT.ADDCOMMAND'/>
+		<param name='OPT.DEFINE'/>
+		<param name='OPT.DEFFILE'/>
+		<param name='OPT.DEPEND'/>
+		<param name='DEPEND_SKIP' default=''/>
+		<param name='OPT.EXPORT'/>
+		<param name='OPT.IMPORTLIB'/>
+		<param name='OPT.LISTING'/>
+		<param name='OPT.MENTRYPOINT'/>
+		<param name='OPT.MAINENTRYPOINT'/>
+		<param name='OPT.MAP'/>
+		<param name='OPT.NOCOMPACTIMPORTLIB'/>
+		<param name='OPT.NOENTRY'/>
+		<param name='OPT.NOSTDINC'/>
+		<param name='OPT.OUT'/>
+		<param name='OPT.PREINCLUDE'/>
+		<param name='OPT.RUNTIME'/>
+		<param name='OPT.SEARCH'/>
+		<param name='OPT.SHARED'/>
+		<param name='OPT.SPLITINCLUDE'/>
+		<param name='OPT.STDINC'/>
+		<param name='OPT.STDLIB'/>
+		<param name='OPT.SYSINCLUDE'/>
+		<param name='OPT.USERINCLUDE'/>
+		<param name='OPT.WARNINGS'/>
+		<param name='OPT.WCHAR'/>
+		<param name='PREPDEF'/>
+		<param name='RC'/>
+		<param name='MODULE'/>
+	</interface>
+
+	<interface name="Emulator.exe" extends="Emulator.win32" flm="win32exe.flm">
+		<param name='CHECKLIB' default=''/>
+		<param name='LD'/>
+		<param name='OPT.CHECKLIB.STDCPP'/>
+		<param name='OPT.CHECKLIB.SYMCPP'/>
+		<param name='OPT.CHECKLIB.WIN32'/>
+		<param name='OPT.HEAPCOMMIT'/>
+		<param name='OPT.HEAPRESERVE'/>
+		<param name='OPT.LIBFILE'/>
+		<param name='OPT.LIBPATH'/>
+		<param name='OPT.NOIMPLIB'/>
+	</interface>
+
+	<interface name="Emulator.stdexe" extends="Emulator.exe" flm="win32stdexe.flm">
+		<param name='TARGETTYPE' default="stdexe"/>
+		<param name='WCHARENTRYPOINT' default=""/>
+	</interface>
+
+	<interface name="Emulator.dll" extends="Emulator.win32" flm="win32dll.flm">
+		<param name='CHECKLIB' default=''/>
+		<param name='LD'/>
+		<param name='LFLAGS_INFGEN'/>
+		<param name='OPT.CHECKLIB.STDCPP'/>
+		<param name='OPT.CHECKLIB.SYMCPP'/>
+		<param name='OPT.CHECKLIB.WIN32'/>
+		<param name='OPT.HEAPCOMMIT'/>
+		<param name='OPT.HEAPRESERVE'/>
+		<param name='OPT.IMAGEBASE'/>
+		<param name='OPT.IMPLIB'/>
+		<param name='OPT.LIBFILE'/>
+		<param name='OPT.LIBPATH'/>
+		<param name='OPT.NOIMPLIB'/>
+		<param name='MAKEDEF'/>
+	</interface>
+
+	<interface name="Emulator.stddll" extends="Emulator.dll" flm="win32stddll.flm">
+		<param name='LFLAGS_SYMGEN'/>
+		<param name='SYMLOOKUPUTIL'/>
+		<param name='SYMLOOKUPARGS'/>
+		<param name='TARGETTYPE' default="stddll"/>
+	</interface>
+
+	<interface name="Emulator.implib" extends="Emulator.win32" flm="win32implib.flm">
+		<param name='LD'/>
+		<param name='OPT.IMPORTLIB'/>
+		<param name='PREPDEF'/>
+	</interface>
+
+	<interface name="Emulator.lib" extends="Emulator.win32" flm="win32lib.flm">
+		<param name='LD'/>
+		<param name='OPT.STATICLIBRARY'/>
+		<param name='OPT.LIBFILE'/>
+		<param name='OPT.LIBPATH'/>
+		<param name='OPT.NOIMPLIB'/>
+	</interface>
+
+	<interface name="Emulator.stdlib" extends="Emulator.lib" flm="win32stdlib.flm">
+		<param name='TARGETTYPE' default="stdlib"/>
+	</interface>
+
+	<interface name="Emulator.resource" extends="base.resource" flm="win32resource.flm">
+	</interface>
+
+	<interface name="Emulator.bitmap" extends="base.bitmap" flm="win32bitmap.flm">
+	</interface>
+
+	<interface name="Emulator.ani" extends="Emulator.dll" flm="win32ani.flm">
+	</interface>
+
+	<interface name="Emulator.exexp" extends="Emulator.dll" flm="win32exexp.flm">
+	</interface>
+
+	<interface name="Emulator.fsy" extends="Emulator.dll" flm="win32fsy.flm">
+	</interface>
+
+	<interface name="Emulator.kdll" extends="Emulator.dll" flm="win32kdll.flm">
+	</interface>
+
+	<interface name="Emulator.kext" extends="Emulator.dll" flm="win32kext.flm">
+	</interface>
+
+	<interface name="Emulator.klib" extends="Emulator.lib" flm="win32klib.flm">
+	</interface>
+
+	<interface name="Emulator.ldd" extends="Emulator.dll" flm="win32ldd.flm">
+	</interface>
+
+	<interface name="Emulator.none" extends="Emulator.mmp" flm="none.flm">
+	</interface>
+
+	<interface name="Emulator.pdd" extends="Emulator.dll" flm="win32pdd.flm">
+	</interface>
+
+	<interface name="Emulator.pdl" extends="Emulator.dll" flm="win32pdl.flm">
+	</interface>
+
+	<interface name="Emulator.plugin" extends="Emulator.dll" flm="win32plugin.flm">
+	</interface>
+
+	<interface name="Emulator.textnotifier2" extends="Emulator.dll" flm="win32textnotifier2.flm">
+	</interface>
+
+	<interface name="Emulator.var" extends="Emulator.dll" flm="win32var.flm">
+	</interface>
+
+	<interface name="Emulator.var2" extends="Emulator.dll" flm="win32var2.flm">
+	</interface>
+</build>

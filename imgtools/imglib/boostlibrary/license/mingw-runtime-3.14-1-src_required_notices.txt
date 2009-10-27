@@ -1,0 +1,149 @@
+
+These texts need to be included into the product documentation for binary only releases:
+
+----
+
+
+    2:  * Copyright (c) 1987, 1993, 1994, 1996
+    3:  *  The Regents of the University of California.  All rights reserved.
+    4:  *
+    5:  * Redistribution and use in source and binary forms, with or without
+    6:  * modification, are permitted provided that the following conditions
+    7:  * are met:
+    8:  * 1. Redistributions of source code must retain the above copyright
+    9:  *    notice, this list of conditions and the following disclaimer.
+   10:  * 2. Redistributions in binary form must reproduce the above copyright
+   11:  *    notice, this list of conditions and the following disclaimer in the
+   12:  *    documentation and/or other materials provided with the distribution.
+   13:  * 3. All advertising materials mentioning features or use of this software
+   14:  *    must display the following acknowledgement:
+   15:  *  This product includes software developed by the University of
+   16:  *  California, Berkeley and its contributors.
+   17:  * 4. Neither the name of the University nor the names of its contributors
+   18:  *    may be used to endorse or promote products derived from this software
+   19:  *    without specific prior written permission.
+   20:  *
+   21:  * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+   22:  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+   23:  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+   24:  * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+   25:  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+   26:  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+   27:  * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+   28:  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+   29:  * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+   30:  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+   31:  * SUCH DAMAGE.
+
+----
+
+    4:  * Copyright (c) 2000 The NetBSD Foundation, Inc.
+    5:  * All rights reserved.
+    6:  *
+    7:  * This code is derived from software contributed to The NetBSD Foundation
+    8:  * by Dieter Baron and Thomas Klausner.
+    9:  *
+   10:  * Redistribution and use in source and binary forms, with or without
+   11:  * modification, are permitted provided that the following conditions
+   12:  * are met:
+   13:  * 1. Redistributions of source code must retain the above copyright
+   14:  *    notice, this list of conditions and the following disclaimer.
+   15:  * 2. Redistributions in binary form must reproduce the above copyright
+   16:  *    notice, this list of conditions and the following disclaimer in the
+   17:  *    documentation and/or other materials provided with the distribution.
+   18:  * 3. All advertising materials mentioning features or use of this software
+   19:  *    must display the following acknowledgement:
+   20:  *        This product includes software developed by the NetBSD
+   21:  *        Foundation, Inc. and its contributors.
+   22:  * 4. Neither the name of The NetBSD Foundation nor the names of its
+   23:  *    contributors may be used to endorse or promote products derived
+   24:  *    from this software without specific prior written permission.
+   25:  *
+   26:  * THIS SOFTWARE IS PROVIDED BY THE NETBSD FOUNDATION, INC. AND CONTRIBUTORS
+   27:  * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+   28:  * TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+   29:  * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE FOUNDATION OR CONTRIBUTORS
+   30:  * BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+   31:  * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+   32:  * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+   33:  * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+   34:  * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+   35:  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+   36:  * POSSIBILITY OF SUCH DAMAGE.
+
+----
+
+These texts need to be included into the product documentation for releases in any form:
+
+----
+
+
+
+    6: # Copyright 1991 by the Massachusetts Institute of Technology
+    7: #
+    8: # Permission to use, copy, modify, distribute, and sell this software and its
+    9: # documentation for any purpose is hereby granted without fee, provided that
+   10: # the above copyright notice appear in all copies and that both that
+   11: # copyright notice and this permission notice appear in supporting
+   12: # documentation, and that the name of M.I.T. not be used in advertising or
+   13: # publicity pertaining to distribution of the software without specific,
+   14: # written prior permission.  M.I.T. makes no representations about the
+   15: # suitability of this software for any purpose.  It is provided "as is"
+   16: # without express or implied warranty.
+   17: #
+   18: # Calling this script install-sh is preferred over install.sh, to prevent
+   19: # `make' implicit rules from creating a file called install from it
+   20: # when there is no Makefile.
+   21: #
+   22: # This script is compatible with the BSD install script, but was written
+   23: # from scratch.  It can only install one file at a time, a restriction
+   24: # shared with many OS's install programs.
+
+----
+
+    1: /****************************************************************
+    2: Copyright (C) 1997, 1998 Lucent Technologies
+    3: All Rights Reserved
+    4: 
+    5: Permission to use, copy, modify, and distribute this software and
+    6: its documentation for any purpose and without fee is hereby
+    7: granted, provided that the above copyright notice appear in all
+    8: copies and that both that the copyright notice and this
+    9: permission notice and warranty disclaimer appear in supporting
+   10: documentation, and that the name of Lucent or any of its entities
+   11: not be used in advertising or publicity pertaining to
+   12: distribution of the software without specific, written prior
+   13: permission.
+   14: 
+   15: LUCENT DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
+   16: INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS.
+   17: IN NO EVENT SHALL LUCENT OR ANY OF ITS ENTITIES BE LIABLE FOR ANY
+   18: SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+   19: WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+   20: IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
+   21: ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
+   22: THIS SOFTWARE.
+   23: ****************************************************************/
+
+----
+
+    5: Copyright (C) 2005 by David M. Gay
+    6: All Rights Reserved
+    7: 
+    8: Permission to use, copy, modify, and distribute this software and its
+    9: documentation for any purpose and without fee is hereby granted,
+   10: provided that the above copyright notice appear in all copies and that
+   11: both that the copyright notice and this permission notice and warranty
+   12: disclaimer appear in supporting documentation, and that the name of
+   13: the author or any of his current or former employers not be used in
+   14: advertising or publicity pertaining to distribution of the software
+   15: without specific, written prior permission.
+   16: 
+   17: THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
+   18: INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS.  IN
+   19: NO EVENT SHALL THE AUTHOR OR ANY OF HIS CURRENT OR FORMER EMPLOYERS BE
+   20: LIABLE FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY
+   21: DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS,
+   22: WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,
+   23: ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
+   24: SOFTWARE.

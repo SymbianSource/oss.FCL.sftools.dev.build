@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<build xmlns="http://symbian.com/xml/build" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symbian.com/xml/build ../../schema/build/2_0.xsd">
+	
+	<!--
+	
+	Because Raptor is not part of the OS it needs to know some properties of
+	the OS that it is building. If you are building an older OS than the one
+	configured by default then you need to put a file like this one into the
+	folder EPOCROOT/epoc32/sbs_config
+	
+	The file can have any name as long as it ends with ".xml"
+	
+	-->
+	
+	<!-- changes required for v9.4, TB91, and TB91sf -->
+		 
+	<var name="root.changes">
+		<set name='POSTLINKER_SUPPORTS_WDP' value=''/>
+		<set name='SUPPORTS_STDCPP_NEWLIB' value=''/>
+		<set name='RVCT_PRE_INCLUDE' value='$(EPOCINCLUDE)/rvct2_2/rvct2_2.h'/>
+	</var>
+	
+</build>

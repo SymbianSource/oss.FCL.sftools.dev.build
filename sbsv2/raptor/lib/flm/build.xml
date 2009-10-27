@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<build xmlns="http://symbian.com/xml/build" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symbian.com/xml/build ../../schema/build/2_0.xsd">
+
+	<interface name="build.makefiles" extends="base.flm" flm='build.flm' >
+		<param name='SBS_BUILD_DIR' /> 
+		<param name='DATE' /> 
+		<param name='COMPONENT_PATHS' />
+		<param name='MAKEFILE_PATH' />
+		<param name='CONFIGS' default=''/>
+		<param name='CLI_OPTIONS' default=''/>
+		<param name='NO_BUILD' default='' />
+	</interface>
+
+</build>

@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<build xmlns="http://symbian.com/xml/build" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symbian.com/xml/build ../../schema/build/2_0.xsd">
+	<interface name="Symbian.mmp" extends="base.flm" abstract="true">
+		<param name='AAPCS_OPTION'/>
+		<param name='ALWAYS_BUILD_AS_ARM' default=''/>
+		<param name='SET_ARMINC' default=''/>
+		<param name='ARMLIBS' default=''/>
+		<param name='ARMFPU' default='softvfp'/>
+		<param name='POSTLINKFPU' default='softvfp'/>
+		<param name='ARMRT' default=''/>
+		<param name='TESTPATH' default=''/>
+		<param name='CAPABILITY'/>
+		<param name='CPPONLYOPTION' default='-E'/>
+		<param name='LIBRARY'/>
+		<param name='LIBRARY_DEBUG'/>
+		<param name='LINKAS' default=''/>
+		<param name='STATICLIBRARY' default=''/>
+		<param name='NOEXPORTLIBRARY' default=''/>
+		<param name='EXPORTLIBRARY' default=''/>
+		<param name='EXPORTUNFROZEN' default=''/>
+		<param name='FEEDBACK_OPTION' default='--feedback=' />
+		<param name='FIRSTLIB' default=''/>
+		<param name='LINKEROPTION_ARMCC' default=''/>
+		<param name='LISTING_OPTION' default='-S'/>
+		<param name='MMPDEFS' default=''/>
+		<param name='NOCOMPRESSTARGET' default=''/>
+		<param name='POSTLINKER_SUPPORTS_WDP' default=''/>
+		<param name='PAGED' default=''/>
+		<param name='PAGEDCODE_OPTION' default='default'/>
+		<param name='PAGEDDATA_OPTION' default='default'/>
+		<param name='PRODUCT_INCLUDE'/>
+		<param name='REQUESTEDTARGETEXT' default=''/>
+		<param name='GENERATELINKERFEEDBACK' default=''/>
+		<param name='LINKERFEEDBACK_STAGE2' default='' />
+		<param name='MULTIFILE_ENABLED' default=''/>
+		<param name='SYSTEMINCLUDE'/>
+		<param name='SECUREID' default=''/>
+		<param name='SOURCE' default=''/>
+		<param name='TARGET'/>
+		<param name='TARGET_lower'/>
+		<param name='LTCG' default=''/>
+		<param name='LTCG_OPTION' default='--ltcg'/>
+		<param name='TARGETTYPE'/>
+		<!-- UID2 and 3 must be empty by default or def file name generation is affected -->
+		<param name='UID2' default=''/>
+		<param name='UID3' default=''/>
+		<param name='VENDORID' default=''/>
+		<param name='USERINCLUDE'/>
+		<param name='OPTION_ARMCC' default=''/>
+		<param name='OPTION_REPLACE_ARMCC' default=''/>
+		<param name='DEBUGLIBRARY' default=''/>
+		<param name='DEFFILE'/>
+		<param name='DEBUGGABLE' default=''/>
+		<param name='DEFFILEKEYWORD' default=''/>
+		<param name='EPOCHEAPSIZEMIN' default=''/>
+		<param name='EPOCHEAPSIZEMAX' default=''/>
+		<param name='EPOCPROCESSPRIORITY' default=''/>
+		<param name='EPOCSTACKSIZE' default=''/>
+		<param name='EPOCFIXEDPROCESS' default=''/>
+		<param name='EPOCALLOWDLLDATA' default=''/>
+		<param name='PLATMACROS.WINDOWS' default=''/>
+		<param name='PLATMACROS.LINUX' default=''/>
+		<param name='MAKEDEFFILE' default='1'/>
+		<param name='STDCPP' default=''/>
+		<param name='NOSTDCPP' default=''/>
+		<param name='NEWLIB' default=''/>
+		<param name='SMPSAFE' default=''/>
+		<param name='STDCPP_INCLUDE' default=''/>
+		<param name='ROMTARGET' default=''/>
+		<param name='RAMTARGET' default=''/>
+		<param name='CC.OPT.SOFTVFP_MAYBE_VFPV2' default=''/>
+		<param name='CC.VAL.SOFTVFP_MAYBE_VFPV2' default=''/>
+		<param name='CODE_SEGMENT_START' default=''/>
+		<param name='TOOLCHAIN' default=''/>
+		<param name='TOOLCHAINVERSION' default=''/>
+	</interface>
+	<interface name="Symbian.e32abiv2" extends="Symbian.mmp" flm="e32abiv2.flm">
+		<param name='SUPPORTS_STDCPP_NEWLIB' default='1'/>
+		<param name='HAS_DEDICATED_OP_NEWDEL_LIB' default='1'/>
+		<param name='DEFAULT_STDCPP_NEWLIB'/>
+		<param name='DEFAULT_SYMBIAN_NEWLIB'/>
+		<param name='CHECKLIB'/>
+		<param name='ASM'/>
+		<param name='ASM_OUTPUT_OPTION'/>
+		<param name='ARM_INSTRUCTION_SET'/>
+		<param name='THUMB_INSTRUCTION_SET'/>
+		<param name='CC'/>
+		<param name='CC_ERRORS_CONTROL_OPTION'/>
+		<param name='CC_WARNINGS_CONTROL_OPTION'/>
+		<param name='CDEFS'/>
+		<param name='CIADEFS'/>
+		<param name='CFLAGS'/>
+		<param name='COMMANDFILE_OPTION'/>
+		<param name='COMPILE_ONLY_OPTION'/>
+		<param name='COMPILER_CIA_FLAGS'/>
+		<param name='COMPILER_FPU_FLAGS'/>
+		<param name='COMPILER_INTERWORK_DEFINES'/>
+		<param name='COMPILER_SYSTEM_INCLUDE_OPTION'/>
+		<param name='COMPILER_THUMB_DEFINES'/>
+		<param name='C_LANG_OPTION'/>		
+		<param name='CPP_LANG_OPTION'/>
+		<param name='CPPFILT'/>
+		<param name='CREATEVMAP'/>
+		<param name='CREATEVMAPCPP'/>
+		<param name='DEBUG_FORMAT'/>
+		<param name='DEBUG_INFO'/>
+		<param name='DEPEND_OPTION'/>
+		<param name='DEPEND_SKIP' default=''/>
+		<param name='ELF2E32'/>
+		<param name='EFREEZE'/>
+		<param name='EFREEZE_REMOVE_OPTION' default=''/>
+		<param name='ENUM_OPTION'/>
+		<param name='EXCEPTIONS'/>
+		<param name='NO_EXCEPTIONS'/>
+		<param name='EXPORT_VTBL_OPTION'/>
+		<param name='FEATURELISTFILES' default=''/>
+		<param name='FEATUREVARIANT' default=''/>
+		<param name='FEATUREVARIANTNAME' default=''/>
+		<param name='FPMODE_OPTION'/>
+		<param name='FROMELF'/>
+		<param name='FULLVARIANTPATH'/>
+		<param name='GENERATE_ABIV1_IMPLIBS' default=''/>		
+		<param name='RVCT3_1' default=''/>
+		<param name='LD'/>
+		<param name='LD_ERRORS_CONTROL_OPTION'/>
+		<param name='LD_WARNINGS_CONTROL_OPTION'/>
+		<param name='LIBPATH'/>
+		<param name='LICENSERETRY_OPTION' default=''/>
+		<param name='LINKER_ADD_STATIC_RUNTIME'/>
+		<param name='LINKER_DEBUG_OPTION'/>
+		<param name='LINKER_DEFAULT_LIBS'/>
+		<param name='LINKER_DEFAULT_LIB_PATHS'/>
+		<param name='LINKER_ENTRY_OPTION'/>
+		<param name='LINKER_GROUP_START_OPTION'/>
+		<param name='LINKER_GROUP_END_OPTION'/>
+		<param name='LINKER_MISC_FLAGS'/>		
+		<param name='LINKER_NODEBUG_OPTION'/>
+		<param name='LINKER_SYMBOLS_FILE_OPTION'/>
+		<param name='LINKER_SYMBOLS_OPTION'/>
+		<param name='NEED_ENTRYPOINT_LIBRARY'/>
+		<param name='OUTPUT_OPTION' default='-o'/>
+		<param name='OUTPUTPATH'/>
+		<param name='OWN_LIBRARY_OPTION'/>
+		<param name='PERL'/>
+		<param name='PERTURBSTARTTIME'/>
+		<param name='PERTURBMSECS' default='500'/>
+		<param name='PREPDEF'/>
+		<param name='PREINCLUDE'/>
+		<param name='PREINCLUDE_OPTION'/>
+		<param name='PREPROCESSOR_OPTION'/>
+		<param name='RANSLEEP'/>
+		<param name='RELEASEPATH'/>
+		<param name='RESOLVED_DEFFILE'/>
+		<param name='RUNTIME_LIBS_LIST'/>
+		<param name='RUNTIME_LIBS_PATH'/>
+		<param name='RUNTIME_SYMBOL_VISIBILITY_OPTION'/>
+		<param name='NO_UNALIGNED_ACCESS' default=''/>
+		<param name='RVCTBIN'/>
+		<param name='RVCTINC'/>
+		<param name='RVCTLIB'/>
+		<param name='RW_BASE_OPTION'/>
+		<param name='SBSV1MAKE'/>
+		<param name='NMAKE'/>
+		<param name='NMAKEFLAGS'/>
+		<param name='SHARED_OBJECT_OPTION'/>
+		<param name='SO_NAME_OPTION'/>
+		<param name='SPLIT_OPTION'/>
+		<param name='KERNEL_STATIC_RUNTIME_LIB'/>
+		<param name='USER_STATIC_RUNTIME_LIB'/>
+		<param name='STATIC_LIBS_LIST'/>
+		<param name='STATIC_LIBS_PATH'/>
+		<param name='STATIC_LIBRARY_DIR'/>
+		<param name='STATIC_RUNTIME_DIR'/>
+		<param name='SYMBIAN_CCFLAGS'/>
+		<param name='SYMBIAN_LD_MESSAGE_OPTION'/>
+		<param name='SYMBIAN_LINK_FLAGS'/>
+		<param name='SYMVER_OPTION'/>
+		<param name='TARGET_ARCH_OPTION'/>
+		<param name='LINKER_ARCH_OPTION'/>
+		<param name='TESTCODE' default=''/>
+		<param name='TEST_OPTION' default=''/>
+		<param name='TRANSFORM_CIA'/>
+		<param name='USE_TRACE_COMPILER' default=''/>
+		<param name='TRANASM'/>
+		<param name='INSTRUCTION_SET'/>
+		<param name='MODULE'/>
+		<param name='USER_LIBS_PATH_OPTION'/>
+		<param name='VARIANTPLATFORM'/>
+		<param name='PLATFORM' default='$(VARIANTPLATFORM)'/>
+		<param name='VARIANTTYPE'/>
+		<param name='VERSION' default='10.0'/>
+		<param name='VERSIONHEX' default='000a0000'/>
+		<param name='VFE_OPTION'/>
+		<param name='EXPLICITVERSION' default=''/>
+	</interface>
+	<interface name="Symbian.exe" extends="Symbian.e32abiv2" flm="e32abiv2exe.flm">
+		<param name='TARGETTYPE' default="exe"/>
+		<param name='UID1' default="1000007a"/>
+	</interface>
+	<interface name="Symbian.stdexe" extends="Symbian.e32abiv2" flm="e32abiv2stdexe.flm">
+		<param name='TARGETTYPE' default="stdexe"/>
+		<param name='UID1' default="1000007a"/>
+		<param name='UID2' default="20004c45"/>
+		<param name='WCHARENTRYPOINT' default=""/>
+	</interface>
+	<interface name="Symbian.dll" extends="Symbian.e32abiv2" flm="e32abiv2dll.flm">
+		<param name='TARGETTYPE' default="dll"/>
+		<param name='UID1' default="10000079"/>
+	</interface>
+	<interface name="Symbian.stddll" extends="Symbian.e32abiv2" flm="e32abiv2stddll.flm">
+		<param name='TARGETTYPE' default="stddll"/>
+		<param name='UID1' default="10000079"/>
+		<param name='UID2' default="20004c45"/>
+	</interface>
+	<interface name="Symbian.lib" extends="Symbian.e32abiv2" flm="e32abiv2lib.flm">
+		<param name='AR'/>
+		<param name='ARCHIVER_CREATE_OPTION'/>
+		<param name='TARGETTYPE' default="lib"/>
+	</interface>
+	<interface name="Symbian.stdlib" extends="Symbian.lib" flm="e32abiv2stdlib.flm">
+		<param name='TARGETTYPE' default="stdlib"/>
+	</interface>
+	<interface name="Symbian.extension" extends="base.extension" flm="template_ext.flm">
+		<param name='RVCTBIN'/>
+		<param name='RVCTLIB'/>
+		<param name='RVCTINC'/>
+	</interface>
+	<interface name="Symbian.ani" extends="Symbian.dll" flm="e32abiv2ani.flm">
+	</interface>
+	<interface name="Symbian.plugin" extends="Symbian.dll" flm="e32abiv2plugin.flm">
+	</interface>
+	<interface name="Symbian.textnotifier2" extends="Symbian.dll" flm="e32abiv2textnotifier2.flm">
+	</interface>
+	<interface name="Symbian.implib" extends="Symbian.dll" flm="e32abiv2implib.flm">
+	</interface>
+	<interface name="Symbian.var" extends="Symbian.dll" flm="e32abiv2var.flm">
+	</interface>
+	<interface name="Symbian.var2" extends="Symbian.dll" flm="e32abiv2var2.flm">
+	</interface>
+	<interface name="Symbian.exexp" extends="Symbian.exe" flm="e32abiv2exexp.flm">
+	</interface>
+	<interface name="Symbian.kexe" extends="Symbian.exe" flm="e32abiv2kexe.flm">
+	</interface>
+	<interface name="Symbian.kdll" extends="Symbian.dll" flm="e32abiv2kdll.flm">
+	</interface>
+	<interface name="Symbian.kext" extends="Symbian.dll" flm="e32abiv2kext.flm">
+	</interface>
+	<interface name="Symbian.klib" extends="Symbian.lib" flm="e32abiv2klib.flm">
+	</interface>
+	<interface name="Symbian.ldd" extends="Symbian.dll" flm="e32abiv2ldd.flm">
+	</interface>
+	<interface name="Symbian.pdd" extends="Symbian.dll" flm="e32abiv2pdd.flm">
+	</interface>
+	<interface name="Symbian.pdl" extends="Symbian.dll" flm="e32abiv2pdl.flm">
+	</interface>
+	<interface name="Symbian.fsy" extends="Symbian.dll" flm="e32abiv2fsy.flm">
+	</interface>
+	<interface name="Symbian.none" extends="Symbian.mmp" flm="none.flm">
+	</interface>
+</build>

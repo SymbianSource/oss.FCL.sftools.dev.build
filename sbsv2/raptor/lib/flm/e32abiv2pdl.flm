@@ -1,0 +1,56 @@
+# Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+#
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+#
+# Contributors:
+#
+# Description:
+# ARMv5 pdl ABIv2 Function Like Makefile (FLM)
+# Build an e32 pdl (Printer Device)
+# 
+#
+
+ifeq ($(TARGETTYPE),pdl)
+include $(FLMHOME)/e32abiv2defaults.mk
+
+# What we need to build a Printer Device
+CANHAVEEXPORTS:=1
+POSTLINKTARGETTYPE:=PDL
+POSTLINKFILETYPE:=pdl
+DOPOSTLINK:=1
+AUTOEXPORTS:=_Z17NewPrinterDeviceLv,1;
+
+# Determine what kind of entrypoint option to set
+LINKER_ENTRYPOINT_LIBDEP:=$(STATIC_RUNTIME_DIR)/edll.lib
+LINKER_ENTRYPOINT_SETTING:=$(LINKER_ENTRY_OPTION) _E32Dll $(LINKER_ENTRYPOINT_DECORATION) $(call dblquote,$(STATIC_RUNTIME_DIR)/edll.lib$(LINKER_ENTRYPOINT_ADORNMENT))
+
+ifeq ("$(NEED_ENTRYPOINT_LIBRARY)","True")
+LINKER_ENTRYPOINT_SETTING:=$(LINKER_ENTRYPOINT_SETTING) $(LINKER_ENTRYPOINT_LIBDEP)
+endif
+
+LINKER_STUB_LIBRARY:=$(STATIC_RUNTIME_DIR)/edllstub.lib
+STATIC_RUNTIME_LIB:=$(USER_STATIC_RUNTIME_LIB)
+CANIGNORENONCALLABLE:=1
+
+BASELIBS:=
+UID2:=10003b1c
+RESOURCEPATH:=Resource\Printers
+
+# We are appending to CDEFS but we don't want this to affect
+# other invocations so we are going to save it on a stack
+# and restore it afterwards
+$(call vsave,CDEFS)
+CDEFS:=$(CDEFS) __DLL__
+include $(FLMHOME)/e32abiv2.flm
+$(call vrestore)
+
+else
+$(error $e32abiv2pdl.flm called with wrong TARGETTYPE (should be 'pdl' but is '$(TARGETTYPE)'))
+endif
+

@@ -1,0 +1,69 @@
+# Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+#
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+#
+# Contributors:
+#
+# Description:
+# ARMv5 EXE/DLL ABIv2 Function Like Makefile (FLM)
+# Build an ECOM plugin
+# 
+#
+
+ifeq ($(TARGETTYPE),plugin)
+include $(FLMHOME)/e32abiv2defaults.mk
+
+# This is basically a DLL with some tweaks
+# If DEFFILE keyword is specified in the MMP, set the POSTLINKDEFFILE
+# and guarantee the generation of import library; if not specified import library
+# won't be generated for plugin (default)
+ifneq ($(DEFFILEKEYWORD),)
+POSTLINKDEFFILE:=$(DEFFILE)
+SUPPORT_FREEZE:=1
+IMPORTLIBRARYREQUIRED:=1
+endif
+
+# Default Linker settings for this target type
+LINKER_ENTRYPOINT_LIBDEP:=$(STATIC_RUNTIME_DIR)/edll.lib
+LINKER_ENTRYPOINT_SETTING:=$(LINKER_ENTRY_OPTION) _E32Dll $(LINKER_ENTRYPOINT_DECORATION) $(call dblquote,$(STATIC_RUNTIME_DIR)/edll.lib$(LINKER_ENTRYPOINT_ADORNMENT))
+
+ifeq ("$(NEED_ENTRYPOINT_LIBRARY)","True")
+LINKER_ENTRYPOINT_SETTING:=$(LINKER_ENTRYPOINT_SETTING) $(LINKER_ENTRYPOINT_LIBDEP)
+endif
+
+LINKER_STUB_LIBRARY:=$(STATIC_RUNTIME_DIR)/edllstub.lib
+STATIC_RUNTIME_LIB:=$(USER_STATIC_RUNTIME_LIB)
+
+# Default Postlinker settings
+CANHAVEEXPORTS:=1
+POSTLINKTARGETTYPE:=PLUGIN
+POSTLINKFILETYPE:=dll
+DOPOSTLINK:=1
+AUTOEXPORTS:=_Z24ImplementationGroupProxyRi,1;
+CANIGNORENONCALLABLE:=1
+
+# We could check the UID rather than forcing it
+# but there seems to be no point in that.
+UID2:=10009D8D
+
+
+RESOURCEPATH:=Resource/Plugins
+
+# Use the general EABI FLM 
+# We are appending to CDEFS but we don't want this to affect
+# other invocations so we are going to save it on a stack
+# and restore it afterwards
+$(call vsave,CDEFS)
+CDEFS:=$(CDEFS) __DLL__
+include $(FLMHOME)/e32abiv2.flm
+$(call vrestore)
+
+else
+$(error $e32abiv2plugin.flm called with wrong TARGETTYPE (should be 'plugin' but is '$(TARGETTYPE)'))
+endif

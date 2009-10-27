@@ -1,0 +1,55 @@
+/*
+* Copyright (c) 2001-2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description: 
+* rombuild area api unit tests
+*
+*/
+
+
+target			r_t_areaset.exe
+targettype		exe
+
+sourcepath	.
+
+// first the test code and the component to test
+
+source		r_t_areaset.cpp
+source		r_areaset.cpp
+
+// then all the dependent code (well, all rombuild except main() actually,
+// as the relationship between the various classes in quite intricate).
+
+source		r_dir.cpp r_header.cpp r_obey.cpp r_srec.cpp
+source		r_rom.cpp r_global.cpp r_build.cpp r_collapse.cpp
+sourcepath	..\..\imglib\e32uid
+source		e32uid.cpp
+sourcepath	..\..\imglib\host
+source		h_file.cpp h_mem.cpp h_utl.cpp
+sourcepath	..\..\imglib\e32image
+source			e32image.cpp
+sourcepath	..\..\imglib\e32image\deflate
+source			decode.cpp encode.cpp deflate.cpp inflate.cpp panic.cpp
+source			compress.cpp
+sourcepath		..\..\imglib\compress
+source 		byte_pair.cpp pagedcompress.cpp
+
+
+USERINCLUDE ..\..\imglib\inc
+OS_LAYER_SYSTEMINCLUDE_SYMBIAN
+
+userinclude     ..\..\imglib\compress ..\..\imglib\memmap\include 
+userinclude     ..\..\imglib\patchdataprocessor\include
+staticlibrary   memmap patchdataprocessor
+
+VENDORID 0x70000001

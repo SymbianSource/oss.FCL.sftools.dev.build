@@ -1,0 +1,46 @@
+# Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+#
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+#
+# Contributors:
+#
+# Description:
+# ARMv5 LIB ABIv2 Function Like Makefile (FLM)
+# Build an e32 static library
+# 
+#
+
+ifeq ($(TARGETTYPE),implib)
+include $(FLMHOME)/e32abiv2defaults.mk
+
+# What we need to build an import library
+POSTLINKFILETYPE:=dll
+# Determine what kind of entrypoint option to set
+IMPORTLIBRARYREQUIRED:=1
+POSTLINKDEFFILE:=$(DEFFILE)
+SUPPORT_FREEZE:=1
+
+# Import libraries are always built as .dso but
+# in their --linkas option they are meant to
+# "front" a dll.  So:
+REQUESTEDTARGETEXT:=dll
+# if there is a LINKAS variable then this won't matter
+
+
+# We are appending to CDEFS but we don't want this to affect
+# other invocations so we are going to save it on a stack
+# and restore it afterwards
+$(call vsave,CDEFS)
+CDEFS:=$(CDEFS) __DLL__
+include $(FLMHOME)/e32abiv2.flm
+$(call vrestore)
+
+else
+$(error $e32abiv2implib.flm called with wrong TARGETTYPE (should be 'implib' but is '$(TARGETTYPE)'))
+endif

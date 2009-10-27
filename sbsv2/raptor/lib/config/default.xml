@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<build xmlns="http://symbian.com/xml/build" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symbian.com/xml/build ../../schema/build/2_0.xsd">
+
+	<!-- The build configurations built by default -->
+
+	<group name="default">
+		<groupRef ref="armv5"/>
+		<groupRef ref="winscw"/>
+	</group>
+
+	<group name="urel">
+		<aliasRef ref="armv5_urel"/>
+		<aliasRef ref="winscw_urel"/>
+	</group>
+
+	<group name="udeb">
+		<aliasRef ref="armv5_udeb"/>
+		<aliasRef ref="winscw_udeb"/>
+	</group>
+
+	<!-- all known configurations -->
+
+	<group name="all">
+		<groupRef ref="armv5"/>
+		<groupRef ref="armv7"/>
+		<groupRef ref="gccxml"/>
+		<groupRef ref="tools"/>
+		<groupRef ref="tools2"/>
+		<groupRef ref="winscw"/>
+	</group>
+
+</build>

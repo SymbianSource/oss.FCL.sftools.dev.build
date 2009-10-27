@@ -1,0 +1,42 @@
+/*
+* Copyright (c) 2001-2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description: 
+* Resource compiler
+*
+*/
+
+
+/**
+ @file
+*/
+
+PRJ_PLATFORMS
+
+TOOLS2
+
+PRJ_EXPORTS
+// Add the Symbian localisation header files to the epoc32\include directory.
+// These files are needed by epocrc.pl to provide context information for
+// localisation of resource files.
+
+../inc/loc/symbiantags.rh
+../inc/loc/symbianbasictags.rh
+../inc/loc/symbiancontexts.rh
+
+
+
+PRJ_MMPFILES
+
+// Additional extension makefile to process the lex and yacc source files
+rcomp.mmp

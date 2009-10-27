@@ -1,0 +1,40 @@
+/*
+* Copyright (c) 2008-2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description: 
+* imgcheck.mmp
+*
+*/
+
+
+TARGET        unittestimgcheck.exe
+TARGETTYPE    exe
+
+SOURCEPATH	..\..\src
+SOURCE		dbgflagchecker.cpp cmdlinehandler.cpp depchecker.cpp hash.cpp
+SOURCE		imgcheckmanager.cpp sidchecker.cpp vidchecker.cpp common.cpp checker.cpp reporter.cpp
+SOURCE		exceptionimplementation.cpp exceptionreporter.cpp
+SOURCE 		cmdlinewriter.cpp xmlwriter.cpp
+SOURCEPATH	.
+SOURCE		main.cpp cmdlinehandletest.cpp imagecheckertest.cpp dbgflagchecktest.cpp e32inputnochecktest.cpp misc.cpp
+USERINCLUDE ..\..\inc ..\..\libimgutils\inc
+
+SYSTEMINCLUDE \src\cppunit-1.12.1\include  \src\cppunit-1.12.1\include\cppunit
+SYSTEMINCLUDE \epoc32\include ..\..\libxml  ..\..
+SYSTEMINCLUDE \src\cedar\generic\tools\e32tools\inc \src\cedar\generic\tools\e32tools\rofsbuild
+
+STATICLIBRARY imgutils xml2 wsock32 stlport.5.1 cppunit
+
+option GCC -w
+
+MACRO CPPUNIT_HAVE_SSTREAM

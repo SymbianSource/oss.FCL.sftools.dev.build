@@ -1,0 +1,9 @@
+component	dev_build_buildtoolguides_romtoolsguide
+
+source /src/tools/dev/build/buildtoolguides/romtoolsguide/com.nokia.rombuild_0.1.jar
+source /src/tools/dev/build/buildtoolguides/romtoolsguide/group/romtoolsguide.mrp
+source /src/tools/dev/build/buildtoolguides/romtoolsguide/group/bld.inf
+
+exports /src/tools/dev/build/buildtoolguides/romtoolsguide/group
+
+notes_source	\component_defs\release.src

@@ -1,0 +1,45 @@
+Version 3.17.0
+================
+(Made by Zhi Dou, 26/10/2009)
+  1. RM-RIM406-1263: BU: Visual ROM Layout
+
+Version 3.16.0
+================
+(Made by Zhi Dou, 21/10/2009)
+  1. RM-RIM406-1229: BU: Feature Name Alias.
+
+Version 3.15.2
+================
+(Made by Zhi Dou, 19/10/2009)
+  1. Minor change for copyright from SPL to EPL.
+
+Version 3.15.1
+================
+(Made by Zhi Dou, 19/08/2009)
+  1. DPDEF141566 Textshell ROM fails to build due to 'cannot open obey file' 
+
+Version 3.15.0
+================
+(Made by Zhi Dou, 31/07/2009)
+  1. PREQ2465's REQ12562 Byte-pair compression update
+
+Version 3.14.0
+================
+(Made by Zhi Dou, 21/07/2009)
+  1. PREQ2465's REQ12561 BUILDROM performance improvement
+
+Version 3.13.1
+================
+(Made by Zhi Dou, 21/07/2009)
+  1. DPDEF140655 Update of tools_romkit for DEF140419 need to be propagated to TCL as well   
+
+Version 3.13.0
+================
+(Made by Zhi Dou, 20/07/2009)
+  1. PREQ2131 Hardware Configuration Repository
+
+Version 3.12.38
+================
+(Made by Zhi Dou, 16/07/2009)
+  1. DPDEF140976 breaks textshell builds (RAM-ROM)
+

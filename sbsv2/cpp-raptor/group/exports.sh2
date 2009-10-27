@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# script to generate exports for this component from a team branch to compare with exports.inf
+
+# copy ../win32/* to /tools/sbs/win32/bv
+
+find ../../win32/bv -type f -print | grep -v 'distribution.policy.s60' | sed 's!\.\./\.\./win32/bv\(.*\)!\.\./win32\1 /tools/sbs/win32/bv\1!' > exports.inf2
+

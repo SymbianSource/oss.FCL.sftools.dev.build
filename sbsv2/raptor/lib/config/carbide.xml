@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<build xmlns="http://symbian.com/xml/build" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symbian.com/xml/build build/666.xsd">
+
+	<!-- This file is for Carbide to get a list of buildable configurations.
+	
+		The config elements are from the old 1.0 schema but the file has
+		an invalid schema version which forces the Raptor XML parser to
+		ignore it.
+		
+		This is an interim measure until a formal API is agreed. -->
+	
+	<config name="arm" abstract="true">
+		<config name="armv5" abstract="true">
+			<config name="armv5_urel"/>
+			<config name="armv5_udeb"/>
+		</config>
+		<config name="armv6" abstract="true">
+			<config name="armv6_urel"/>
+			<config name="armv6_udeb"/>
+		</config>
+		<config name="armv7" abstract="true">
+			<config name="armv7_urel"/>
+			<config name="armv7_udeb"/>
+		</config>
+		<config name="armv9e" abstract="true">
+			<config name="armv9e_urel"/>
+			<config name="armv9e_udeb"/>
+		</config>
+	</config>
+
+	<config name="winscw" abstract="true">
+		<config name="winscw_urel"/>
+		<config name="winscw_udeb"/>
+	</config>
+
+</build>

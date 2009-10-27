@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<build xmlns="http://symbian.com/xml/build" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symbian.com/xml/build ../../schema/build/2_0.xsd">
+	<!-- analysis interfaces -->
+
+	<interface name="analysis.flm" extends="base.flm" abstract="true">
+
+		<!-- analysis specific -->
+
+		<param name='EXPORTHEADERS' default=''/>
+		<param name='RESOURCEFILES' default=''/>
+
+		<!-- generic -->
+
+		<param name='NMAKE'/>
+		<param name='NMAKEFLAGS'/>
+		<param name='OUTPUTPATH'/>
+		<param name='PRODUCT_INCLUDE'/>
+		<param name='RELEASEPATH'/>
+		<param name='REQUESTEDTARGETEXT' default=''/>
+		<param name='SBSV1MAKE'/>
+		<param name='VARIANTTYPE'/>
+		<param name='FULLVARIANTPATH'/>
+		<param name='SUPPORTS_STDCPP_NEWLIB' default='1'/>
+	</interface>
+
+	<interface name="analysis.mmp" extends="analysis.flm" abstract="true">
+		<param name='CAPABILITY' default='none'/>
+		<param name='DEFFILE' default=''/>
+		<param name='FIRSTLIB' default=''/>
+		<param name='KERNEL_MODE_DEF'/>
+		<param name='KERNEL_MODE_INCLUDES'/>			
+		<param name='LIBRARY' default=''/>
+		<param name='LINKAS' default=''/>
+		<param name='MMPDEFS' default=''/>
+		<param name='NOSTDCPP' default=''/>
+		<param name='OPEN_ENVIRONMENT' default=''/>
+		<param name='SOURCE' default=''/>
+		<param name='STATICLIBRARY' default=''/>
+		<param name='STDCPP' default=''/>
+		<param name='STDCPP_DEF'/>
+		<param name='STDCPP_INCLUDE'/>
+		<param name='SYSTEMINCLUDE' default=''/>
+		<param name='TARGET'/>
+		<param name='TARGETPATH' default=''/>
+		<param name='TARGETTYPE'/>
+		<param name='TARGET_DEFS' default=''/>
+		<param name='TARGET_INCLUDES' default=''/>
+		<param name='UID2' default='00000000'/>
+		<param name='UID2_ZERO_OVERRIDE' default=''/>
+		<param name='UID3' default='00000000'/>
+		<param name='USERINCLUDE' default=''/>
+		<param name='VERSION' default='1.0'/>
+		<param name='OPTION_GCCXML' default=''/>
+		<param name='VERSIONHEX' default='00010000'/>
+	</interface>
+
+	<interface name="analysis.all" extends="analysis.mmp" abstract="true" flm="gccxml.flm">
+		<param name='CC'/>
+		<param name='CDEFS'/>
+		<param name='CFLAGS'/>
+		<param name='CPPFLAGS'/>
+		<param name='CREATERFIFILE'/>
+		<param name='GNUCPP'/>
+		<param name='GNUSED'/>
+		<param name='GNUAWK'/>
+		<param name='OPT.DEFINE'/>
+		<param name='OPT.OUT'/>
+		<param name='OPT.PREINCLUDE'/>
+		<param name='OPT.SPLITINCLUDE'/>
+		<param name='OPT.SYSINCLUDE'/>
+		<param name='OPT.USERINCLUDE'/>
+		<param name='ZIP'/>
+	</interface>
+
+	<!-- basic types -->
+
+	<interface name="analysis.exe" extends="analysis.all">
+		<param name='FIRSTLIB' default="eexe.lib"/>
+		<param name='UID1' default="1000007a"/>
+	</interface>
+
+	<interface name="analysis.dll" extends="analysis.all">
+		<param name='FIRSTLIB' default="edll.lib"/>
+		<param name='UID1' default="10000079"/>
+	</interface>
+
+	<interface name="analysis.lib" extends="analysis.all">
+		<param name='FIRSTLIB' default="elib.lib"/>
+		<param name='UID1' default="00000000"/>
+	</interface>
+
+	<!-- variations on the basic types -->
+
+	<interface name="analysis.ani" extends="analysis.dll">
+		<param name='UID2' default="10003b22"/>
+	</interface>
+
+	<interface name="analysis.exexp" extends="analysis.exe">
+	</interface>
+
+	<interface name="analysis.fsy" extends="analysis.dll">
+		<param name='UID2_ZERO_OVERRIDE' default="100039df"/>
+	</interface>
+
+	<interface name="analysis.kdll" extends="analysis.dll">
+		<param name='TARGET_DEFS' default='$(KERNEL_MODE_DEF)'/>
+		<param name='TARGET_INCLUDES' default='$(KERNEL_MODE_INCLUDES)'/>		
+		<param name='FIRSTLIB' default="ekll.lib"/>
+	</interface>
+
+	<interface name="analysis.kext" extends="analysis.dll">
+		<param name='TARGET_DEFS' default='$(KERNEL_MODE_DEF)'/>
+		<param name='TARGET_INCLUDES' default='$(KERNEL_MODE_INCLUDES)'/>	
+		<param name='FIRSTLIB' default="eext.lib"/>
+	</interface>
+
+	<interface name="analysis.klib" extends="analysis.lib">
+		<param name='TARGET_DEFS' default='$(KERNEL_MODE_DEF)'/>
+	</interface>
+
+	<interface name="analysis.ldd" extends="analysis.dll">
+		<param name='TARGET_DEFS' default='$(KERNEL_MODE_DEF)'/>
+		<param name='TARGET_INCLUDES' default='$(KERNEL_MODE_INCLUDES)'/>	
+		<param name='FIRSTLIB' default="edev.lib"/>
+		<param name='UID2_ZERO_OVERRIDE' default="100000af"/>
+	</interface>
+
+	<interface name="analysis.pdd" extends="analysis.dll">
+		<param name='TARGET_DEFS' default='$(KERNEL_MODE_DEF)'/>
+		<param name='TARGET_INCLUDES' default='$(KERNEL_MODE_INCLUDES)'/>	
+		<param name='FIRSTLIB' default="edev.lib"/>
+		<param name='UID2_ZERO_OVERRIDE' default="100039d0"/>
+	</interface>
+
+	<interface name="analysis.pdl" extends="analysis.dll">
+		<param name='UID2' default="10003b1c"/>
+	</interface>
+
+	<interface name="analysis.plugin" extends="analysis.dll">
+		<param name='UID2' default="10009D8D"/>
+	</interface>
+
+	<interface name="analysis.resource" extends="base.resource" flm="gccxmlresource.flm">
+		<param name='CREATERFIFILE'/>
+		<param name='OUTPUTPATHOFFSET' default=''/>
+		<param name='MAIN_OUTPUTPATH' default=''/>
+		<param name='MAIN_TARGET_lower' default=''/>
+		<param name='MAIN_REQUESTEDTARGETEXT' default=''/>
+		<param name='RFIFILE' default=''/>
+	</interface>
+
+	<interface name="analysis.stddll" extends="analysis.dll">
+		<param name='OPEN_ENVIRONMENT' default='1'/>
+		<param name='UID2' default="20004c45"/>
+	</interface>
+
+	<interface name="analysis.stdexe" extends="analysis.exe">
+		<param name='OPEN_ENVIRONMENT' default='1'/>
+		<param name='UID2' default="20004c45"/>
+	</interface>
+
+	<interface name="analysis.stdlib" extends="analysis.lib">
+		<param name='OPEN_ENVIRONMENT' default='1'/>
+	</interface>
+
+	<interface name="analysis.textnotifier2" extends="analysis.dll">
+		<param name='UID2' default="101fe38b"/>
+	</interface>
+
+	<interface name="analysis.var" extends="analysis.dll">
+		<param name='TARGET_DEFS' default='$(KERNEL_MODE_DEF)'/>
+		<param name='TARGET_INCLUDES' default='$(KERNEL_MODE_INCLUDES)'/>	
+		<param name='FIRSTLIB' default="evar.lib"/>
+	</interface>
+	
+	<interface name="analysis.var2" extends="analysis.dll">
+		<param name='TARGET_DEFS' default='$(KERNEL_MODE_DEF)'/>
+		<param name='TARGET_INCLUDES' default='$(KERNEL_MODE_INCLUDES)'/>	
+		<param name='FIRSTLIB' default="evar.lib"/>
+	</interface>
+
+	<interface name="analysis.none" extends="analysis.mmp" flm="none.flm">
+	</interface>
+
+	<!-- TEMs are processed as if in an RVCT build -->
+
+	<interface name="analysis.extension" extends="base.extension" flm="template_ext.flm">
+		<param name='RVCTBIN'/>
+		<param name='RVCTLIB'/>
+		<param name='RVCTINC'/>
+	</interface>
+
+	<!-- types we don't much care about, but don't want any standard processing for -->
+
+	<interface name="analysis.implib" flm="null.flm">
+	</interface>
+
+</build>
+

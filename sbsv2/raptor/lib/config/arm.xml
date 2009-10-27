@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<build xmlns="http://symbian.com/xml/build" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symbian.com/xml/build ../../schema/build/2_0.xsd">
+	<!-- build configurations for ARM compilers -->
+	<var name="arm" extends="root">
+		<varRef ref="default.interfaces"/>
+		<varRef ref="default.locations"/>
+		<env name="EFREEZE" default="$(PERL) $(EPOCROOT)/epoc32/tools/efreeze.pl" type="tool"/>
+		<!-- picked up from the Environment -->
+		<env name="ELF2E32" default="$(EPOCROOT)/epoc32/tools/elf2e32$(DOTEXE)" type="tool"/>
+		<env name="BMCONV" default="$(EPOCROOT)/epoc32/tools/bmconv$(DOTEXE)" type="tool"/>
+		<env name="CHECKLIB" default="$(EPOCROOT)/epoc32/tools/checklib$(DOTEXE)" type="tool"/>
+		<env name="TRANASM" default="$(PERL) $(EPOCROOT)/epoc32/tools/tranasm.pl" type="tool"/>
+		<env name="CPPFILT" default="$(GCCPREFIX)c++filt$(DOTEXE)" type="tool"/>
+		<env name="RCOMP" default="$(EPOCROOT)/epoc32/tools/rcomp$(DOTEXE)" type="tool"/>
+		<env name="PREPDEF" default="$(PERL) $(EPOCROOT)/epoc32/tools/prepdef.pl" type="path"/>
+		<env name="STRINGTABLE" default="$(PERL) $(EPOCROOT)/epoc32/tools/stringtable.pl" type="path"/>
+		<!-- RANSLEEP is a program that can be used to cause a random delay in milliseconds. This is only useful in parallel builds.  See the PERTURBSTARTTIME switch for more details.  -->
+		<env name="RANSLEEP" default="$(SBS_HOME)/bin/$(HOSTPLATFORM_DIR)/ransleep$(DOTEXE)" type="tool"/>
+		<set name="BLDINF_OUTPUTPATH" value="$(SBS_BUILD_DIR)"/>
+		<set name="CDEFS" value=""/>	
+		<!-- arm specific interfaces -->
+		<set name="INTERFACE.extension" value="Symbian.extension"/>
+		<!-- link to bld.inf and mmp platform names -->
+		<set name="ARMMACROS" value="__MARM_ARMV5__ $(ARMMACROS.CONFIG) $(ARMMACROS.VAR)"/>
+		<set name="ARMMACROS.CONFIG" value=""/>
+		<set name="ARMMACROS.VAR" value=""/>
+		<set name="CAPABILITY" value=""/>
+		<set name="CODE_SEGMENT_START" value=""/>
+		<set name="DEFAULT_STDCPP_NEWLIB" value="stdnew.dso"/>
+		<set name="DEFAULT_SYMBIAN_NEWLIB" value="scppnwdl.dso"/>
+		<set name="FULLVARIANTPATH" value="$(VARIANTPLATFORM)/$(VARIANTTYPE)"/>
+		<set name="HEADER_FILES_CONTROL_OPTION" value=""/>
+		<set name="LIBRARY_DEBUG" value=""/>
+		<set name="MMPDEFS" value=""/>
+		<set name="NMAKE" value="nmake"/>
+		<set name="NMAKEFLAGS" value="-nologo -x - "/>
+		<set name="OUTPUTPATH" value="$(SBS_BUILD_DIR)"/>
+		<set name="PERTURBSTARTTIME" value=""/>
+		<!-- add a random delay before starting armcc or armlink to ease contention for licensesthe maximum time to delay in milliseconds. RANSLEEP program must be available.   -->
+		<set name="PERTURBMSECS" value="500"/>
+		<!-- the maximum time to delay in milliseconds -->
+		<set name="BLDINF_OUTPUTPATH" value="$(SBS_BUILD_DIR)"/>
+		<set name="RELEASEPATH" value="$(EPOCROOT)/epoc32/release"/>
+		<set name="RESOLVED_DEFFILE" value=""/>
+		<set name="RUNTIME_LIBS_PATH" value="$(EPOCROOT)/epoc32/release/armv5/lib"/>
+		<set name="SBSV1MAKE" value="$(EPOCROOT)/epoc32/tools/make$(DOTEXE)"/>
+		<set name="SID" value=""/>
+		<set name="EPOCSTACKSIZE" value=""/>
+		<set name="STATIC_LIBRARY_DIR" value="$(EPOCROOT)/epoc32/release/$(VARIANTPLATFORM)/$(VARIANTTYPE)"/>
+		<set name="STATIC_RUNTIME_DIR" value="$(EPOCROOT)/epoc32/release/$(VARIANTPLATFORM)/$(VARIANTTYPE)"/>
+		<set name="SYMBIAN_CC_MESSAGE_OPTION" value="$(CC_WARNINGS_CONTROL_OPTION) $(CC_ERRORS_CONTROL_OPTION)"/>
+		<set name="SYMBIAN_DLL_DEFINITION" value="__DLL__"/>
+		<set name="SYMBIAN_EXE_DEFINITION" value="__EXE__"/>
+		<set name="SYMBIAN_LINK_FLAGS" value="$(SYMBIAN_LD_MESSAGE_OPTION) $(BPABI_OPTION) $(RELOCATABLE_IMAGE_OPTION) $(UNRESOLVED_SYMBOL_REF_OPTION) $(STDLIB_OPTION) $(EXTRA_LD_OPTION) $(SYMBIAN_LINK_FLAGS.CONFIG) $(SYMBIAN_LINK_FLAGS.VAR)"/>
+		<set name="SYMBIAN_LINK_FLAGS.CONFIG" value=""/>
+		<set name="SYMBIAN_LINK_FLAGS.VAR" value=""/>
+		<set name="SYSTEMINCLUDE" value=""/>
+		<set name="TARGET" value=""/>
+		<set name="UNIX_SLASH_FOR_CC_ABS_PATHS" value="0"/>
+		<set name="UNRESOLVED_SYMBOL_REF_OPTION" value=""/>
+		<set name="DUMPBCINFO" value=""/>
+		<set name="MAKEDEFFILE" value="1"/>
+		<set name="PLATMACROS.WINDOWS" value="ARMCC EPOC32 MARM EABI GENERIC_MARM MARM_ARMV5 $(PLATMACROS.CONFIG) $(PLATMACROS.VAR)"/>
+		<set name="PLATMACROS.LINUX" value="$(PLATMACROS.WINDOWS)"/>
+		<set name="PLATMACROS.CONFIG" value=""/>
+		<set name="PLATMACROS.VAR" value=""/>
+		<set name="NO_UNALIGNED_ACCESS" value="$(CC.NO_UNALIGNED_ACCESS)"/>
+	</var>
+	<var name="v5">
+		<set name="TRADITIONAL_PLATFORM" value="ARMV5"/>
+		<set name="VARIANTPLATFORM" value="armv5"/>
+		<set name="PLATMACROS.CONFIG" value=""/>
+		<set name="DEBUG_FORMAT" value="$(CC.DWARF2)"/>
+		<set name="TARGET_ARCH_OPTION" value="$(CC.ARMV5)"/>
+		<set name="LINKER_ARCH_OPTION" value="$(LD.ARMV5)"/>
+		<set name="ARMFPU" value="$(CC.SOFTVFP_MAYBE_VFPV2)"/>
+		<set name="GENERATE_ABIV1_IMPLIBS" value="$(SUPPORTS_ABIV1_IMPLIBS)"/>
+	</var>
+	<var name="v6">
+		<set name="TRADITIONAL_PLATFORM" value="ARMV6"/>
+		<set name="VARIANTPLATFORM" value="armv6"/>
+		<set name="PLATMACROS.CONFIG" value="ARMV6"/>
+		<set name="ARMMACROS.CONFIG" value="__ARMV6__"/>
+		<set name="DEBUG_FORMAT" value="$(CC.DWARF2)"/>
+		<set name="TARGET_ARCH_OPTION" value="$(CC.ARMV6)"/>
+		<set name="LINKER_ARCH_OPTION" value="$(LD.ARMV6)"/>
+		<set name="STATIC_RUNTIME_DIR" value="$(EPOCROOT)/epoc32/release/armv5/$(VARIANTTYPE)"/>
+		<set name="ARMFPU" value="$(CC.SOFTVFP_MAYBE_VFPV2)"/>
+	</var>
+	<var name="v7">
+		<set name="TRADITIONAL_PLATFORM" value="ARMV7"/>
+		<set name="VARIANTPLATFORM" value="armv7"/>
+		<set name="PLATMACROS.CONFIG" value="ARMV7"/>
+		<set name="ARMMACROS.CONFIG" value="__ARMV7__"/>
+		<set name="DEBUG_FORMAT" value="$(CC.DWARF3)"/>
+		<set name="TARGET_ARCH_OPTION" value="$(CC.ARMV7)"/>
+		<set name="LINKER_ARCH_OPTION" value="$(LD.ARMV7)"/>
+		<set name="ARMFPU" value="$(CC.SOFTVFP_MAYBE_VFPV3)"/>
+	</var>
+	<var name="9e" extends="v5">
+		<set name="VARIANTPLATFORM" value="arm9e"/>
+		<set name="PLATMACROS.CONFIG" value="ARM9E"/>
+		<set name="ARMMACROS.CONFIG" value="__ARM9E__"/>
+		<set name="TARGET_ARCH_OPTION" value="--cpu ARM9E"/>
+		<set name="STATIC_RUNTIME_DIR" value="$(EPOCROOT)/epoc32/release/armv5/$(VARIANTTYPE)"/>
+	</var>
+
+	<alias name="armv5_urel" meaning="arm.v5.urel.rvct2_2"/>
+	<alias name="armv5_udeb" meaning="arm.v5.udeb.rvct2_2"/>
+	<!-- To switch to GCCE for building armv5 code, 
+	comment out the two lines above this comment
+	and comment in the two lines below this comment -->
+	<!-- <alias name="armv5_urel" meaning="arm.v5.urel.gcce4_3_2"/> -->
+	<!-- <alias name="armv5_udeb" meaning="arm.v5.udeb.gcce4_3_2"/> -->
+
+	<!-- These aliases are provided to work with the "gcce_armv5" group -->
+	<alias name="armv5_urel_gcce4_3_2" meaning="arm.v5.urel.gcce4_3_2"/>
+	<alias name="armv5_udeb_gcce4_3_2" meaning="arm.v5.udeb.gcce4_3_2"/>
+
+	<!-- GCCE 4.3.3 aliases -->
+	<alias name="armv5_urel_gcce4_3_3" meaning="arm.v5.urel.gcce4_3_3"/>
+	<alias name="armv5_udeb_gcce4_3_3" meaning="arm.v5.udeb.gcce4_3_3"/>
+	
+	<alias name="armv6_urel" meaning="arm.v6.urel.rvct2_2"/>
+	<alias name="armv6_udeb" meaning="arm.v6.udeb.rvct2_2"/>
+	<alias name="armv7_urel" meaning="arm.v7.urel.rvct3_1"/>
+	<alias name="armv7_udeb" meaning="arm.v7.udeb.rvct3_1"/>
+
+	<alias name="arm9e_urel" meaning="arm.9e.urel.rvct2_2"/>
+	<alias name="arm9e_udeb" meaning="arm.9e.udeb.rvct2_2"/>
+
+	<group name="armv5">
+		<aliasRef ref="armv5_urel"/>
+		<aliasRef ref="armv5_udeb"/>
+	</group>
+
+	<group name="armv6">
+		<aliasRef ref="armv6_urel"/>
+		<aliasRef ref="armv6_udeb"/>
+	</group>
+	<group name="armv7">
+		<aliasRef ref="armv7_urel"/>
+		<aliasRef ref="armv7_udeb"/>
+	</group>
+
+	<group name="arm9e">
+		<aliasRef ref="arm9e_urel"/>
+		<aliasRef ref="arm9e_udeb"/>
+	</group>
+	
+	<group name="gcce_armv5">
+		<aliasRef ref="armv5_urel_gcce4_3_2"/>
+		<aliasRef ref="armv5_udeb_gcce4_3_2"/>
+	</group>
+	
+</build>

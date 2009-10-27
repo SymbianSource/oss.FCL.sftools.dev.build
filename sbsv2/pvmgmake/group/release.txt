@@ -1,0 +1,5 @@
+NOTESRC_RELEASER
+Symbian Software Ltd. (kits.notify@symbian.com)
+
+NOTESRC_RELEASE_REASON
+Symbian Build System release.

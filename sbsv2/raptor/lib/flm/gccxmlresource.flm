@@ -1,0 +1,37 @@
+# Copyright (c) 2008-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+#
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+#
+# Contributors:
+#
+# Description:
+# Thin Function Like Makefile (FLM) wrapper to general resource building FLM
+# for gccxml builds.
+# 
+#
+
+
+# .rfi files need to be generated to a known location that is determined by the "core" GCCXML wrapper build
+RFIFILE:=$(MAIN_OUTPUTPATH)/$(OUTPUTPATHOFFSET)/$(MAIN_TARGET_lower)_$(MAIN_REQUESTEDTARGETEXT)/gccxml/$(notdir $(SOURCE)).rfi
+
+define generaterfifile
+# $(1) is the .rfi filename
+# $(2) is the list of .rpp files
+# $(3) is the list of dependency files
+
+   $(1): $(2)
+	$(call startrule,generaterfifile,FORCESUCCESS) \
+	$(CREATERFIFILE) -o $(1) -x "$(EPOCROOT)/epoc32" $(3) \
+	$(call endrule,generaterfifile)
+endef
+
+# Main (and mostly generic) resource building FLM
+include $(FLMHOME)/resource.flm
+
+

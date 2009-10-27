@@ -1,0 +1,10 @@
+component	dev_build_bintools_evalid
+
+source	\src\dev\build\bintools\evalid
+exports	\src\dev\build\bintools\evalid
+
+notes_source	\component_defs\release.src
+
+
+ipr T 
+

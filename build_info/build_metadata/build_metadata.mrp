@@ -1,0 +1,6 @@
+component           build_metadata
+source   \src\tools\dev\build\build_info\build_metadata 
+source   \src\tools\dev\build\package_definition.xml
+source   \src\tools\dev\build\distribution.policy.s60
+notes_source      \component_defs\release.src
+ipr T 

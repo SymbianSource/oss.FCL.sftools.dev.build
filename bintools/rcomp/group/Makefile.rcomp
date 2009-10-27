@@ -1,0 +1,69 @@
+# Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+#
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+# 
+# Contributors:
+#
+
+CXX    = g++296 
+YACC   = bison
+LEX    = flex
+
+BLDDIR = ../build
+SRCDIR = ../src
+INCDIR = ../inc
+
+SOURCE = main.cpp \
+	 array.cpp astring.cpp ccodes.cpp ctable.cpp \
+	 datatype.cpp errorhan.cpp fileacc.cpp fileline.cpp \
+	 indextab.cpp linklist.cpp mem.cpp \
+	 nameidma.cpp numval.cpp rcbinstr.cpp \
+	 rcostrm.cpp \
+	 rcscan.cpp rcstack.cpp resource.cpp \
+	 stack.cpp stringar.cpp structst.cpp \
+	 unicode_compressor.cpp \
+ 	 localise.cpp \
+	 qualifar.cpp messages.cpp
+
+GENSRC = rcompl.cpp rcomp.cpp
+OBJECT = $(addprefix $(BLDDIR)/, $(notdir $(SOURCE:.cpp=.o) \
+					  $(GENSRC:.cpp=.o)))
+TARGET = $(BLDDIR)/rcomp
+
+VPATH  = $(SRCDIR) $(BLDDIR)
+
+dummy := $(shell mkdir -p $(BLDDIR))
+
+all: $(TARGET)
+
+$(TARGET): $(OBJECT)
+	$(CXX) $^ -o $@
+	strip $@
+	
+$(OBJECT): $(BLDDIR)/rcomp.hpp
+
+$(OBJECT): $(BLDDIR)/%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -D __LINUX__ -I $(INCDIR) -I $(BLDDIR) -c $< -o $@
+
+$(BLDDIR)/rcompl.cpp: rcomp.l
+	$(LEX) -t $< > $@
+
+$(BLDDIR)/rcomp.cpp $(BLDDIR)/rcomp.hpp: $(SRCDIR)/rcomp.y
+	$(YACC) -d $< -o $(BLDDIR)/rcomp.cpp
+
+clean:
+	rm -f $(OBJECT) $(TARGET)
+	rm -f $(addprefix $(BLDDIR)/, $(GENSRC) rcomp.hpp)
+	-rmdir $(BLDDIR)
+
+test:
+	@echo "stuff in ../tsrc"
+
+.PHONY: all clean test
+

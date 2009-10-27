@@ -1,0 +1,45 @@
+# Copyright (c) 2006-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+#
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+#
+# Contributors:
+#
+# Description:
+# Function-Like Makefile to build a TOOLS2 LIB with gcc
+# 
+#
+
+## Outputs - externally relevant targets that this FLM generates
+LIBTARGET:=$(RELEASEPATH)/$(TARGET).a
+
+## Target groups
+RELEASEABLES:=$(LIBTARGET)
+TARGETS:=$(LIBTARGET)
+
+## Common build steps (compiling)
+include $(FLMHOME)/tools2common.flm
+
+## Create library archive
+# get OBJECTFILES from tools2common
+define tools2lib
+$(LIBTARGET): $(OBJECTFILES)
+	$(call startrule,tools2lib) \
+	$(ARCHIVER) $(AFLAGS) $(LIBTARGET) $(OBJECTFILES) && \
+	$(RANLIB) $(LIBTARGET) \
+	$(if $(SAVESPACE),; $(GNURM) -rf $(OUTPUTPATH); true,) \
+	$(call endrule,tools2lib)
+
+endef
+
+$(eval $(call tools2lib))
+
+## Global target
+LIBRARY:: $(LIBTARGET)
+
+## The End

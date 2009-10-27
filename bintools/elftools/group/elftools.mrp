@@ -1,0 +1,10 @@
+component       dev_build_bintools_elftools
+
+source          /src/tools/dev/build/bintools/elftools
+exports         /src/tools/dev/build/bintools/elftools/group
+binary          /src/tools/dev/build/bintools/elftools/group all
+
+notes_source    release.txt
+
+ipr T
+

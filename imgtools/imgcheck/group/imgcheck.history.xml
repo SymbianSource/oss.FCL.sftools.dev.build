@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright (c) 2005-2009 Nokia Corporation and/or its subsidiary(-ies).
+ All rights reserved.
+ This component and the accompanying materials are made available
+ under the terms of the License "Eclipse Public License v1.0"
+ which accompanies this distribution, and is available
+ at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+ Initial Contributors:
+ Nokia Corporation - initial contribution.
+
+ Contributors:
+
+ Description: 
+
+-->
+<relnotes name="E32TOOLS EKA2">
+  <purpose>
+  </purpose>
+
+  <defect number="DEF121848" title="Imgcheck : Warning is not reported for duplicate E32 image file" revision="024">
+	Imgcheck : Warning is not reported for duplicate E32 image file
+  </defect>
+
+  <defect number="DEF121767" title="Imgcheck : Error is not reported for an invalid E32 image file" revision="023">
+	Imgcheck : Error is not reported for an invalid E32 image file
+  </defect>
+
+  <defect number="DEF121788" title="Imgcheck : backlash is not supported in the dir path for --e32input." revision="022">
+	Imgcheck : backlash is not supported in the dir path for --e32input.
+  </defect>
+
+  <defect number="DEF121848" title="Imgcheck : Warning is not reported for duplicate E32 image file" revision="021">
+	Imgcheck : Warning is not reported for duplicate E32 image file
+  </defect>
+
+  <defect number="DEF122029" title="Imgcheck tool throws memory reference error" revision="020">
+	Imgcheck tool throws memory reference error
+  </defect>
+
+  <minorchange revision="019">
+	CR1367 Additional functionality for dependency checker tool
+  </minorchange>
+
+  <defect number="DEF121262" title="Imgcheck tools throws memory reference error" revision="018">
+	Imgcheck tools throws memory reference error
+  </defect>
+
+  <defect number="DEF121360" title="Imgcheck.exe produces incorrect output when passed a 9.1 image" revision="017">
+	Imgcheck.exe produces incorrect output when passed a 9.1 image
+  </defect>
+
+  <minorchange revision="016">
+    Version Number for defect DEF120092 has been updated in Imgcheck.tdf
+  </minorchange>
+  
+  <defect number="DEF120092" title="Imgcheck.exe crashes when passed a licensee ROM image" revision="015">
+	Imgcheck.exe crashes when passed a licensee ROM image. 
+  </defect>
+
+  <defect number="DEF119681" title="Imgcheck help file is missing from work bench->Documentation" revision="014">
+	Imgcheck help file is missing from work bench->Documentation. 
+  </defect>
+
+  <defect number="DEF118651" title="Imgcheck tool throws error message while checking for --dep and --sidall option." revision="013">
+	Imgcheck tool throws error message while checking for --dep and --sidall option. 
+  </defect>
+
+  <defect number="DEF118430" title="GT0410 Imgcheck tool TDF not supplying the correct Symbian version number type" revision="012">
+	GT0410 Imgcheck tool TDF not supplying the correct Symbian version number type. 
+  </defect>
+  
+  <minorchange revision="011">
+    Imgcheck v1.1 PREQ1997 support for SID/VID checking.
+  </minorchange>
+  
+  <defect number="DEF117108" title="Imgcheck tool reports 'unknown dependency', while passing core ROM image " revision="010">
+	Imgcheck tool reports 'unknown dependency', while passing core ROM image. 
+  </defect>
+
+  <defect number="DEF116467" title="Imgcheck cannot handle ROM images where On-Demand Paging (ROM-DP) is used " revision="009">
+	Imgcheck cannot handle ROM images where On-Demand Paging (ROM-DP) is used. 
+  </defect>
+
+  <defect number="DEF116030" title="Imgcheck crashes when run " revision="008">
+	Imgcheck crashes when run. 
+  </defect>
+
+  <defect number="DEF113804" title="- Imgcheck tool failed to identify invalid rom images " revision="007">
+	Imgcheck tool failed to identify invalid rom images. 
+  </defect>
+
+  <defect number="DEF113803" title="Imgcheck tool - supports options of type -h= " revision="006">
+	Imgcheck tool - supports options of type -h=. 
+  </defect>
+
+  <defect number="DEF113585" title="Imgcheck.xsl creation failed if Imgcheck.exe exist in same directory" revision="005">
+	Imgcheck.xsl creation failed if Imgcheck.exe exist in same directory.
+  </defect>
+
+  <defect number="DEF113781" title="GT0367: Imgcheck installed but not added to path " revision="004">
+	GT0367: Imgcheck installed but not added to path. 
+  </defect>
+
+  <defect number="DEF113805" title="Imgcheck Tool Verbose mode(--verbose) doesn't work " revision="003">
+	Imgcheck Tool Verbose mode(--verbose) doesn't work. 
+  </defect>
+
+  <defect number="DEF113321" title="Imgcheck tool crashes for bigger ROM images " revision="002">
+	Imgcheck tool crashes for bigger ROM images. 
+  </defect>
+
+  <minorchange revision="001">
+    imgchek tool with support for Static Dependency Checking.
+  </minorchange>
+
+</relnotes>

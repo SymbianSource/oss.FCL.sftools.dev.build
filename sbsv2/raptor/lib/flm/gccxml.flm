@@ -1,0 +1,257 @@
+# Copyright (c) 2008-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+#
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+#
+# Contributors:
+#
+# Description:
+# All targets Function Like Makefile (FLM) supporting the execution of
+# gccxml_cc1plus on source, the creation of project and resource descriptive XML files
+# and packaging into an appropriate archive for CDB processing.
+#
+#
+
+
+# passed in values, stripped of whitespace
+DEFFILE:=$(strip $(DEFFILE))
+LINKAS:=$(strip $(LINKAS))
+UID1:=$(strip $(UID1))
+UID2:=$(strip $(UID2))
+UID3:=$(strip $(UID3))
+
+# local variables
+CREATABLEPATHS:=
+CLEANTARGETS:=
+RELEASABLES:=
+STDCPP_BUILD:=
+CIAFILEEXTENSIONS:=%.CIA %.cia %.Cia %.cIa %.cIA %.ciA %.CIa %.CiA
+
+ROOTBLDPATH:=$(OUTPUTPATH)/gccxml
+VARIANTBLDPATH:=$(OUTPUTPATH)/$(FULLVARIANTPATH)
+ROOTRELEASEPATH:=$(RELEASEPATH)/gccxml
+VARIANTRELEASEPATH:=$(RELEASEPATH)/$(FULLVARIANTPATH)
+
+CREATABLEPATHS:=$(CREATABLEPATHS) $(VARIANTBLDPATH) $(VARIANTRELEASEPATH) $(ROOTBLDPATH) $(ROOTRELEASEPATH)
+
+# type-specific definitions
+BASE_TYPE:=dll
+TARGET_MACRO:=__DLL__
+ifneq ($(findstring exe,$(TARGETTYPE)),)
+  BASE_TYPE:=exe
+  TARGET_MACRO:=__EXE__
+endif
+ifneq ($(findstring lib,$(TARGETTYPE)),)
+  BASE_TYPE:=lib
+  TARGET_MACRO:=
+endif
+
+# utility functions
+# returns absolutely-pathed temporary build filenames based solely on the basename of the source file, but with an additional "_" for .cia files
+# $(1) input source file list
+# $(2) output file extension
+define mapsource2output
+  $(foreach SOURCEFILE,$(1),$(patsubst %, $(VARIANTBLDPATH)/%, $(basename $(notdir $(SOURCEFILE)))$(if $(filter $(CIAFILEEXTENSIONS),$(SOURCEFILE)),_,)$(2)))
+endef
+
+# returns absolutely-pathed temporary build filenames based on the full resource filename
+# $(1) input resource file list
+# $(2) output file extension
+define mapresource2output
+  $(patsubst %, $(ROOTBLDPATH)/%, $(addsuffix $(2),$(notdir $(1))))
+endef
+
+# calls a tool multiple times with grouped arguments
+# $(1) tool to call with any non-variable arguments
+# $(2) list of further variable arguments to group in 150 element calls
+define groupcallin50
+	$(if $2,$1 $(foreach L,$(wordlist 1,50,$2),$(L)),)
+	$(if $2,$(call groupcallin50,$1,$(wordlist 51,$(words $2),$2)),true)
+endef
+
+# echos content to a file in groups performing optional search/replace based on passed args
+# $(1) template line with optional __VERBATIM__, __PATH__, __FILENAME__ replacements
+# $(2) list of pathed filenames to be batch processed and that can be used for template replacements
+# $(3) output file
+define groupreplacein50infile
+	$(if $2,@echo -e $(foreach L,$(wordlist 1,50,$2),"$(subst __VERBATIM__,$(L),$(subst __PATH__,$(dir $(L)),$(subst __FILENAME__,$(notdir $(L)),$1)))\\n") >>$3,)
+	$(if $2,$(call groupreplacein50infile,$1,$(wordlist 51,$(words $2),$2),$3),@true)
+endef
+
+# targets
+INCLUDESFILE:=$(ROOTRELEASEPATH)/includeheaders.txt
+MMPXMLFILE:=$(ROOTBLDPATH)/$(notdir $(PROJECT_META)).xml
+SRCXMLFILES:=$(call mapsource2output,$(SOURCE),.xml)
+RFIFILES:=$(call mapresource2output,$(RESOURCEFILES),.rfi)
+DEPFILES:=$(call mapsource2output,$(SOURCE),.xml.d)
+TEMPGXPARCHIVE:=$(VARIANTBLDPATH)/$(TARGET)$(BASE_TYPE).gxp
+GXPARCHIVE:=$(VARIANTRELEASEPATH)/$(TARGET)$(BASE_TYPE).gxp
+
+CLEANTARGETS:=$(CLEANTARGETS) $(MMPXMLFILE) $(SRCXMLFILES) $(DEPFILES) $(TEMPGXPARCHIVE) $(GXPARCHIVE)
+RELEASABLES:=$(RELEASABLES) $(GXPARCHIVE)
+
+# Deduce whether we should be performing a build with standard CPP characteristics
+# This operates differently per-OS release, although OE TARGETTYPEs always build with standard CPP traits
+ifeq ($(OPEN_ENVIRONMENT),1)
+  STDCPP_BUILD:=1
+endif
+
+ifeq ($(SUPPORTS_STDCPP_NEWLIB),1)
+  ifeq ($(NOSTDCPP),1)
+    STDCPP_BUILD:=
+  else
+    ifeq ($(STDCPP),1)
+      STDCPP_BUILD:=1
+    endif
+  endif
+endif
+
+ifeq ($(STDCPP_BUILD),1)
+  CDEFS:=$(CDEFS) $(STDCPP_DEF)
+  SYSTEMINCLUDE:=$(SYSTEMINCLUDE) $(STDCPP_INCLUDE)
+endif
+
+CDEFS:=$(CDEFS) $(TARGET_DEFS)
+SYSTEMINCLUDE:=$(SYSTEMINCLUDE) $(TARGET_INCLUDES)
+
+# include paths
+UINCLUDE:=$(patsubst %,$(OPT.USERINCLUDE)%,$(USERINCLUDE))
+SINCLUDE:=$(patsubst %,$(OPT.SYSINCLUDE)%,$(SYSTEMINCLUDE))
+PINCLUDE:=$(OPT.PREINCLUDE)$(PRODUCT_INCLUDE)
+INCLUDES:=$(UINCLUDE) $(OPT.SPLITINCLUDE) $(SINCLUDE) $(PINCLUDE)
+
+DEFINES:=$(call makemacrodef,$(OPT.DEFINE),$(CDEFS) $(TARGET_MACRO))
+
+
+# .mmp XML description file
+ifneq ($(PROCESSED_$(call sanitise,$(MMPXMLFILE))),1)
+
+  ifeq ($(LINKAS),)
+    LINKASBASE:=$(TARGET).$(if $(REQUESTEDTARGETEXT),$(REQUESTEDTARGETEXT),$(TARGETTYPE))
+  else
+    LINKASBASE:=$(LINKAS)
+  endif
+
+  LINKASVERSIONED:=$(basename $(LINKASBASE)){$(VERSIONHEX)}$(suffix $(LINKASBASE))
+
+  ADDED_CAPABILITIES:=$(subst $(CHAR_SPACE),+,$(filter-out -%,$(CAPABILITY)))
+  SUBTRACTED_CAPABILITIES:=$(subst $(CHAR_SPACE),,$(filter -%,$(CAPABILITY)))
+  FINAL_CAPABILITIES:=$(if $(ADDED_CAPABILITIES),$(ADDED_CAPABILITIES)$(SUBTRACTED_CAPABILITIES),none)
+
+  ifeq ($(UID2),00000000)
+    UID2:=$(if $(UID2_ZERO_OVERRIDE),$(UID2_ZERO_OVERRIDE),00000000)
+  endif
+
+  define gccxmlmeta2xml
+  # note: we jump through some rather awkward hoops here in an attempt to not cause issues for the Bash shell
+  # with gargantuan concatenated "echo" statements.  This includes not being wrapped by start/endrule and
+  # using grouping functions where appropriate.
+    $(1):
+	  $(call startrule,gccxmlmeta2xml) \
+	    echo creating $(1) quietly \
+	  $(call endrule,gccxmlmeta2xml)
+	  @echo -e \
+	    "<?xml version=\"1.0\"?>\n" \
+	    "<mmpInfo>\n" \
+	    "\t<mmp path=\"$(PROJECT_META)\"/>\n" \
+	    "\t<target name=\"$(TARGET).$(if $(REQUESTEDTARGETEXT),$(REQUESTEDTARGETEXT),$(TARGETTYPE))\" type=\"$(TARGETTYPE)\"$(if $(TARGETPATH), path=\"$(TARGETPATH)\",)/>\n" \
+	    "\t<cwd path=\"$(dir $(COMPONENT_META))\"/>\n" \
+	    "\t<abi type=\"ARM4\"/>\n" \
+	    "\t<linkAs name=\"$(LINKASVERSIONED)\"/>\n" \
+	    "\t<linkAsBase name=\"$(LINKASBASE)\"/>\n" \
+	    "\t<uids$(if $(UID1), u0=\"0x$(UID1)\",)$(if $(UID2), u1=\"0x$(UID2)\",)$(if $(UID3), u2=\"0x$(UID3)\",)/>\n" \
+	    "\t<version major=\"$(basename $(VERSION))\" minor=\"$(subst .,,$(suffix $(VERSION)))\"/>\n" \
+	    "\t<capability id=\"$(FINAL_CAPABILITIES)\"/>\n" \
+	    "\t<defFile path=\"\" type=\"GCC\"/>\n" \
+	    "\t<defFile path=\"$(DEFFILE)\" type=\"EABI\"/>\n" \
+	    "\t<libs>\n" \
+	    "\t\t<lib name=\"$(FIRSTLIB)\" type=\"First\"/>" \
+	    > $(1)
+	  $(call groupreplacein50infile,\t\t<lib name=\"__VERBATIM__\"/>,$(subst .dso,.lib,$(LIBRARY)),$(1))
+	  $(call groupreplacein50infile,\t\t<lib name=\"__VERBATIM__\"/>,$(STATICLIBRARY),$(1))
+	  @echo -e \
+	    "\t</libs>\n" \
+	    "\t<resources>" \
+	    >> $(1)
+	  $(call groupreplacein50infile,\t\t<resource name=\"__FILENAME__\"/>,$(RFIFILES),$(1))
+	  @echo -e \
+	    "\t</resources>" \
+	    >> $(1)
+	  $(call groupreplacein50infile,\t<sourceFile name=\"__FILENAME__\" path=\"__PATH__\"/>,$(SOURCE),$(1))
+	  $(call groupreplacein50infile,\t<export name=\"__VERBATIM__\"/>,$(EXPORTHEADERS),$(1))
+	  @echo -e \
+	    "</mmpInfo>\n" \
+	    >> $(1)
+  endef
+
+  $(eval $(call gccxmlmeta2xml,$(MMPXMLFILE)))
+  $(eval PROCESSED_$(call sanitise,$(MMPXMLFILE)):=1)
+endif
+
+
+# process straight source files into .xml files, generating .d dependency files and updating includeheaders.txt
+# note: includeheaders.txt is neither tracked as a formal dependency, nor deleted during a clean.  This mirrors
+# the situation with ABLD where the GCCXML build continually updates the file as it finds it.
+define gccxmlprocesssource
+
+  $(eval DEPENDFILENAME:=$(call mapsource2output,$(1),.xml.d))
+  $(eval DEPENDFILE:=$(DEPENDFILENAME))
+
+  $(call mapsource2output,$(1),.xml): $(1) $(if $(DEPENDFILE),,RESOURCE BITMAP EXPORT)
+	$(call startrule,gccxmlprocesssource) \
+	$(CC) $(CFLAGS) $(OPTION_GCCXML) \
+	$(if $(filter $(CIAFILEEXTENSIONS),$(1)),$(call makemacrodef,$(OPT.DEFINE),__CIA__),) \
+	$(DEFINES) \
+	$(OPT.USERINCLUDE)$(patsubst %/,%,$(dir $(1))) \
+	$(INCLUDES) \
+	-fxml="$$@" -MD "$$@.d" -MT "$$@" $(OPT.OUT) nul "$(1)" && \
+	$(GNUSED) '/^.*\.xml:.*$$$$/d;/^ [a-zA-Z].*$$$$/d;s/^  //;s/ \\\$$$$//;s/\/\//\//g;/^s*$$$$/d' < $$@.d | $(GNUAWK) '{sub(/ /,"\n")};1' >> $(INCLUDESFILE) \
+	$(call endrule,gccxmlprocesssource)
+
+    CLEANTARGETS:=$$(CLEANTARGETS) $(DEPENDFILENAME)
+    ifneq "$(DEPENDFILE)" ""
+    ifeq ($(NO_DEPEND_INCLUDE),)
+      ifeq "$(filter %CLEAN,$(call uppercase,$(MAKECMDGOALS)))" ""
+        -include $(DEPENDFILE)
+      endif
+    endif
+    endif
+
+endef
+$(foreach SRCFILE,$(SOURCE),$(eval $(call gccxmlprocesssource,$(SRCFILE))))
+
+
+# package output
+# this is done in a slightly indirect way in order to work around the fact that the ABLD GCCXML build doesn't always pick
+# a unique name for .gxp files for some components with multiple .mmp files i.e. it deletes/generates the same name
+# .gxp file over, and over, again.  What follows ensures that the build tree .gxp file is always unique, and that
+# we just publish that last one that is built.  This mirrors what ABLD achieves, and avoids "overriding" warnings in
+# makefile processing.
+# note: the main call here needs to reside outside of start/endrule in order to avoid command line length issues.
+define gccxmlpackage
+  $(TEMPGXPARCHIVE): $(MMPXMLFILE) $(SRCXMLFILES) $(DEFFILE)
+	  $$(call groupcallin50,$(ZIP) -j $$@,$$^ $(RFIFILES)) ;
+	  $(call startrule,gccxmlpackage) \
+	  $(GNURM) -f $(GXPARCHIVE) && \
+	  $(GNUCP) $$@ $(GXPARCHIVE) \
+	  $(if $(SAVESPACE),; $(GNURM) -rf $(VARIANTBLDPATH); true,) \
+	  $(call endrule,gccxmlpackage)
+
+  $(GXPARCHIVE): $(TEMPGXPARCHIVE)
+endef
+$(eval $(gccxmlpackage))
+
+# Global targets
+.PHONY:: $(ALLTARGET)
+$(ALLTARGET):: $(RELEASABLES)
+TARGET:: $(RELEASABLES)
+
+# clean up
+$(eval $(call GenerateStandardCleanTarget,$(CLEANTARGETS),$(CREATABLEPATHS),))
+$(call makepath, $(CREATABLEPATHS))
+

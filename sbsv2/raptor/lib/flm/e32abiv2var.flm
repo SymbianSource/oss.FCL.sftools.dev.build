@@ -1,0 +1,72 @@
+# Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+#
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+#
+# Contributors:
+#
+# Description:
+# ARMv5 EXE/DLL ABIv2 Function Like Makefile (FLM)
+# Build an e32 Variant DLL
+# 
+#
+
+ifeq ($(TARGETTYPE),var)
+include $(FLMHOME)/e32abiv2defaults.mk
+
+# What we need to build a DLL
+# May need a dso e.g. ecust.dll
+ifeq ($(NOEXPORTLIBRARY),)
+IMPORTLIBRARYREQUIRED:=1
+endif
+POSTLINKDEFFILE:=$(DEFFILE)
+SUPPORT_FREEZE:=1
+
+# Determine what kind of entrypoint option to set
+LINKER_ENTRYPOINT_LIBDEP:=$(STATIC_RUNTIME_DIR)/evar.lib
+LINKER_ENTRYPOINT_SETTING:=$(LINKER_ENTRY_OPTION) _E32Dll $(LINKER_ENTRYPOINT_DECORATION) $(call dblquote,$(STATIC_RUNTIME_DIR)/evar.lib$(LINKER_ENTRYPOINT_ADORNMENT))
+
+ifeq ("$(NEED_ENTRYPOINT_LIBRARY)","True")
+LINKER_ENTRYPOINT_SETTING:=$(LINKER_ENTRYPOINT_SETTING) $(LINKER_ENTRYPOINT_LIBDEP)
+endif
+
+LINKER_STUB_LIBRARY:=$(STATIC_RUNTIME_DIR)/edllstub.lib
+STATIC_RUNTIME_LIB:=$(KERNEL_STATIC_RUNTIME_LIB)
+RUNTIME_LIBS_LIST:=
+
+# Kernel code builds as arm
+ALWAYS_BUILD_AS_ARM:=1
+
+# No dedicated library for operator new/delete functions.
+HAS_DEDICATED_OP_NEWDEL_LIB:=
+
+# Default Postlinker settings
+CANHAVEEXPORTS:=1
+POSTLINKTARGETTYPE:=VAR
+POSTLINKFILETYPE:=dll
+DOPOSTLINK:=1
+AUTOEXPORTS:=_Z17VariantInitialisev,1;
+
+# No exception support for kernel code?
+EXCEPTIONS:=$(NO_EXCEPTIONS)
+
+
+
+# We are appending to CDEFS but we don't want this to affect
+# other invocations so we are going to save it on a stack
+# and restore it afterwards
+$(call vsave,CDEFS SYSTEMINCLUDE)
+SYSTEMINCLUDE:=$(SYSTEMINCLUDE) $(EPOCROOT)/epoc32/include/nkern $(EPOCROOT)/epoc32/include/kernel/arm $(EPOCROOT)/epoc32/include/memmodel/epoc $(EPOCROOT)/epoc32/include/kernel $(EPOCROOT)/epoc32/include/nkern/arm
+CDEFS:=$(CDEFS) __DLL__ __KERNEL_MODE__
+include $(FLMHOME)/e32abiv2.flm
+$(call vrestore)
+
+else
+$(error $e32abiv2var.flm called with wrong TARGETTYPE (should be 'var' but is '$(TARGETTYPE)'))
+endif
+

@@ -1,0 +1,32 @@
+/*
+* Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description: 
+*
+*/
+
+
+PRJ_PLATFORMS
+TOOLS2
+
+// These libraries needs to be exported
+PRJ_EXPORTS
+../libxml/lib/libxml2.a			/epoc32/release/tools2/rel/libxml2.a
+../libxml/lib/libxml2.a			/epoc32/release/tools2/deb/libxml2.a
+../src/imgcheck.xsl			/epoc32/tools/imgcheck.xsl
+./imgcheck.pl				/epoc32/tools/imgcheck.pl
+./imgcheck.cmd				/epoc32/tools/imgcheck.cmd
+
+PRJ_MMPFILES
+imgutils
+imgcheck

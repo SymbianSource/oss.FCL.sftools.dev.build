@@ -1,0 +1,12 @@
+component	dev_build_bintools_rcomp
+source	\src\tools\dev\build\bintools\rcomp
+binary	\src\tools\dev\build\bintools\rcomp\group	all
+exports	\src\tools\dev\build\bintools\rcomp\group
+
+binary	\epoc32\release\tools2\rel\rcomp.exe
+
+notes_source	\component_defs\release.src
+
+
+ipr T 
+

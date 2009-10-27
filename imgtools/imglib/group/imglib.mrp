@@ -1,0 +1,11 @@
+component	dev_build_imgtools_imglib
+
+source		\src\tools\dev\build\imgtools\imglib
+binary		\src\tools\dev\build\imgtools\imglib\group all
+exports		\src\tools\dev\build\imgtools\imglib\group
+
+binary	\epoc32\release\tools2\rel\uidcrc.exe
+
+notes_source	\component_defs\release.src
+
+ipr T 

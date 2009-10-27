@@ -1,0 +1,75 @@
+# Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+#
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+#
+# Contributors:
+#
+# Description:
+#
+#
+
+# Parameters:
+# COMPONENT_PATHS
+# CONFIGS
+#
+
+CREATABLEPATHS:=
+CLEANTARGETS:=
+
+.PHONY:: PP_EXPORTS
+
+
+SBS := $(subst \,/,$(SBS_HOME)/bin/sbs)
+
+define doexports
+PP_EXPORTS::
+	$(call startrule,makefile_generation_exports) \
+	export TALON_DESCRAMBLE=0; \
+	$(SBS) --export-only $(component_list) $(config_list) -f- -m $(SBS_BUILD_DIR)/makefiles_export.mk $(cli_options)  --mo=DESCRAMBLE:=  --mo=TALON_DESCRAMBLE:=0 | $(GNUSED) 's#]I*]>#XXX#' \
+	$(call endrule,makefile_generation_exports)
+
+CLEANTARGETS:=$$(CLEANTARGETS) $(SBS_BUILD_DIR)/makefiles_export.mk
+endef
+
+# Generate makefiles for particular bldinf
+# $(1) = source target source target......
+define generate_makefiles
+
+$$(info XXX component_list=$(COMPONENT_PATHS) makefile=$(MAKEFILE_PATH))
+
+ifeq ($(NO_BUILD),1)
+ALL:: $(MAKEFILE_PATH)
+else
+include $(MAKEFILE_PATH)
+endif
+
+$(MAKEFILE_PATH): $(COMPONENT_PATHS) | PP_EXPORTS 
+	$(call startrule,makefile_generation) \
+	export TALON_DESCRAMBLE=0; \
+	$(SBS) --toolcheck=off -n $(CLI_OPTIONS) $(component_list) $(config_list) -m $$@ -f- --mo=DESCRAMBLE:= --mo=TALON_DESCRAMBLE:=0  | $(GNUSED) 's#\]\][>]#XXX#' && \
+	$(MAKE) -j 8 -f $$@.resource_deps \
+	$(call endrule,makefile_generation)
+
+CLEANTARGETS:=$$(CLEANTARGETS) $(MAKEFILE_PATH) 
+
+endef
+
+# Create config list for commands
+config_list:=$(addprefix -c ,$(CONFIGS))
+component_list:=$(addprefix -b ,$(COMPONENT_PATHS))
+$(info COMFIG_LIST: $(config_list))
+
+$(eval $(doexports))
+
+# Create the Makefiles
+$(eval $(call generate_makefiles))
+
+$(eval $(call GenerateStandardCleanTarget,$(CLEANTARGETS),$(CREATABLEPATHS),))
+$(call makepath,$(CREATABLEPATHS))
+

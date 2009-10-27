@@ -1,0 +1,11 @@
+component dev_build_sbsv2_raptor
+
+
+source /src/tools/dev/build/sbsv2/raptor
+exports /src/tools/dev/build/sbsv2/raptor/group
+
+ipr T
+ipr B ../python/pyparsing.py
+
+notes_source release.txt
+

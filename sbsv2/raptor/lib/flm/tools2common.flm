@@ -1,0 +1,107 @@
+# Copyright (c) 2006-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+#
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+#
+# Contributors:
+#
+# Description:
+# Function-Like Makefile to build common TOOLS2 objects with gcc
+# (included by tools2exe.flm and tools2lib.flm)
+#
+#
+
+## Input parameters
+
+OUTPUTPATH:=$(OUTPUTPATH)/$(TARGET)_$(TARGETTYPE)/tools2/$(VARIANTTYPE)$(TOOLPLATFORMDIR)
+
+ifeq ($(OSTYPE),cygwin)
+CDEFS.TOOLS2:=$(CDEFS.WIN32) $(CDEFS)
+CFLAGS:=$(CFLAGS.WIN32) $(CFLAGS) $(OPTION_GCC)
+COMPILER_PATH:=$(COMPILER_PATH.WIN32)
+else
+CDEFS.TOOLS2:=$(CDEFS.LINUX) $(CDEFS)
+CFLAGS:=$(CFLAGS) $(OPTION_GCC)
+COMPILER_PATH=$(COMPILER_PATH.LINUX)
+endif
+CDEFS.TOOLS2:=$(call makemacrodef,$(OPT.D),$(CDEFS.TOOLS2))
+
+## Locally used variables
+CREATABLEPATHS:=$(OUTPUTPATH) $(RELEASEPATH) $(TOOLSPATH)
+
+## Global targets
+$(ALLTARGET):: $(TARGETS)
+TARGET:: $(TARGETS)
+
+## Pre-Include directories
+ifneq ($(INC.COMPILER),)
+PINCLUDE:=$(patsubst %,$(OPT.PREINCLUDE)%,$(INC.COMPILER))
+endif
+
+## User and System Include directories
+ifneq ($(USERINCLUDE),)
+UINCLUDE:=$(patsubst %,$(OPT.USERINCLUDE)%,$(USERINCLUDE))
+endif
+ifneq ($(SYSTEMINCLUDE),)
+SINCLUDE:=$(patsubst %,$(OPT.SYSTEMINCLUDE)%,$(SYSTEMINCLUDE))
+endif
+
+INCLUDES:=$(PINCLUDE) $(UINCLUDE) $(SINCLUDE)
+
+## Source files
+CPPFILES:=$(filter %.CPP,$(SOURCE))
+cppFILES:=$(filter %.cpp,$(SOURCE))
+CFILES:=$(filter %.C,$(SOURCE))
+cFILES:=$(filter %.c,$(SOURCE))
+
+## Object files
+CPPOBJFILES:=$(patsubst %,$(OUTPUTPATH)/%,$(notdir $(patsubst %.CPP,%.o,$(CPPFILES))))
+cppOBJFILES:=$(patsubst %,$(OUTPUTPATH)/%,$(notdir $(patsubst %.cpp,%.o,$(cppFILES))))
+COBJFILES:=$(patsubst %,$(OUTPUTPATH)/%,$(notdir $(patsubst %.C,%.o,$(CFILES))))
+cOBJFILES:=$(patsubst %,$(OUTPUTPATH)/%,$(notdir $(patsubst %.c,%.o,$(cFILES))))
+OBJECTFILES:=$(CPPOBJFILES) $(cppOBJFILES) $(cOBJFILES) $(COBJFILES)
+
+CLEANTARGETS:=
+## Compile CPP and cpp files
+define compile2object
+$(eval compile2object_TARGET:=$(OUTPUTPATH)/$(patsubst %.$(2),%.o,$(notdir $(1))))
+$(eval DEPENDFILENAME:=$(compile2object_TARGET).d)
+$(eval DEPENDFILE:=$(wildcard $(DEPENDFILENAME)))
+$(compile2object_TARGET): $(1) $(if (DEPENDFILE),,EXPORT)
+	$(call startrule,compile2object,,$(1)) \
+	$(if $(COMPILER_PATH),COMPILER_PATH="$(COMPILER_PATH)",) \
+	$(COMPILER) $(CFLAGS) $(CDEFS.TOOLS2) -MD -MT"$$@" -MF"$(DEPENDFILENAME)" $(INCLUDES) $(OPT.O)"$$@" "$(1)" \
+	$(call endrule,compile2object)
+
+CLEANTARGETS:=$$(CLEANTARGETS) $(DEPENDFILENAME)
+ifneq "$(DEPENDFILE)" ""
+ifeq ($(NO_DEPEND_INCLUDE),)
+  ifeq "$(filter %CLEAN,$(call uppercase,$(MAKECMDGOALS)))" ""
+    -include $(DEPENDFILE)
+  endif
+endif
+endif
+
+endef
+
+$(foreach SRC,$(CPPFILES),$(eval $(call compile2object,$(SRC),CPP)))
+$(foreach SRC,$(cppFILES),$(eval $(call compile2object,$(SRC),cpp)))
+$(foreach SRC,$(CFILES),$(eval $(call compile2object,$(SRC),C)))
+$(foreach SRC,$(cFILES),$(eval $(call compile2object,$(SRC),c)))
+
+### Conclusion - cleanup and introspection #######################
+
+# make the output directories while reading makefile - some build engines prefer this
+$(call makepath,$(CREATABLEPATHS))
+
+## Clean up (using eval to avoid target specific variables)
+$(eval $(call GenerateStandardCleanTarget,$(TARGETS) $(OBJECTFILES),$(CREATABLEPATHS),))
+## WHAT target
+$(eval $(call whatmacro,$(RELEASEABLES),WHATTOOLS2))
+
+## The End

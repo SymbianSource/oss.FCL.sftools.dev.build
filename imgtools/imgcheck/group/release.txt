@@ -1,0 +1,35 @@
+Version V1.3.5
+===============
+Made by Zhi Dou 19/10/2009
+  1. Minor change for copyright from SPL to EPL.
+
+Version V1.3.4
+===============
+Made by Ross Qin 21/09/2009
+  1. DEF142151 Imgcheck run has failed in MSF00197 vtb92sf build 
+
+Version V1.3.3
+===============
+Made by Ross Qin 14/09/2009
+  1. DPDEF141843 Coverity defects about Resource Leak and Delete Array. 
+
+Version V1.3.1
+===============
+Made by Zhi Dou 19/08/2009
+  1. DPDEF141566 Textshell ROM fails to build due to 'cannot open obey file' 
+
+Version V1.3.0
+===============
+Made by Zhi Dou 31/07/2009
+  1. PREQ2465's REQ12562 Byte-pair compression update
+
+Version V1.2.3
+===============
+Made by Zhi Dou 29/07/2009
+  1. DPDEF141175 - Removal of the "-w" option in imgtools .mmp files results in a lot of warnings 
+
+NOTESRC_RELEASER
+Nokia Corporation.
+
+NOTESRC_RELEASE_REASON
+Imgcheck release.

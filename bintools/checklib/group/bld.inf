@@ -1,0 +1,27 @@
+// Copyright (c) 1999-2009 Nokia Corporation and/or its subsidiary(-ies).
+// All rights reserved.
+// This component and the accompanying materials are made available
+// under the terms of "Eclipse Public License v1.0"
+// which accompanies this distribution, and is available
+// at the URL "http://www.eclipse.org/legal/epl-v10.html".
+//
+// Initial Contributors:
+// Nokia Corporation - initial contribution.
+//
+// Contributors:
+//
+// Description:
+//
+
+
+PRJ_PLATFORMS
+TOOLS2
+
+PRJ_EXPORTS
+../tag/tag_elf		/epoc32/tools/tag/tag_elf
+../tag/tag_coff		/epoc32/tools/tag/tag_coff
+
+
+PRJ_MMPFILES
+checklib.mmp
+

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<build xmlns="http://symbian.com/xml/build" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symbian.com/xml/build ../../../schema/build/2_0.xsd">
+	<!-- utility interfaces : handy FLMs for simple things -->
+
+	<interface name="utility.base" extends="base.flm" abstract="true">
+		<param name='EPOCROOT'/>
+		<param name='EPOCBLD'/>
+		<param name='EXTENSION_ROOT'/>
+	</interface>
+
+	<interface name="utility.copydir" extends="utility.base" flm="copydir.flm">
+		<param name="SOURCE_DIR"/>
+		<param name="DEST_DIR"/>
+	</interface>
+
+	<interface name="utility.prebuilt" extends="utility.base" flm="prebuilt.flm">
+		<!-- from the configuration -->
+		<param name="GNUCHMOD"/>
+		<param name="GNUCP"/>
+		<param name="RELEASEPATH"/>
+		<param name="VARIANTPLATFORM"/>
+		<param name="VARIANTTYPE"/>
+		<!-- from the bld.inf -->
+		<param name="BINARIES"/>
+		<param name="PRE_PLATFORM"/> 
+		<param name="PRE_TYPE"/>
+	</interface>
+</build>

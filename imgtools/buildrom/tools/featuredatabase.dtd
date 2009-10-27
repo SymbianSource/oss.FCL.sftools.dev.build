@@ -1,0 +1,47 @@
+<!--
+Copyright (c) 2004-2009 Nokia Corporation and/or its subsidiary(-ies).    
+All rights reserved.                                                      
+This component and the accompanying materials are made available          
+under the terms of "Eclipse Public License v1.0"                          
+which accompanies this distribution, and is available                     
+at the URL "http://www.eclipse.org/legal/epl-v10.html".                   
+                                                                          
+Initial Contributors:                                                     
+Nokia Corporation - initial contribution.                                 
+                                                                          
+Contributors:                                                             
+                                                                          
+Description:                                                              
+
+-->
+<!ELEMENT hrhmacro EMPTY>
+<!ATTLIST hrhmacro
+	exclude CDATA #IMPLIED
+	include CDATA #IMPLIED
+	infeaturesetiby CDATA #IMPLIED>
+	
+<!ELEMENT hfileheader (#PCDATA)>
+<!ATTLIST hfileheader
+	interfacestatus CDATA #REQUIRED
+	interfacevisibility CDATA #REQUIRED>
+	
+<!ELEMENT featureset ((hfileheader?, feature+))>
+<!ATTLIST featureset
+	hfilename CDATA #IMPLIED
+	ibyname CDATA #IMPLIED
+	namespace CDATA #IMPLIED>
+	
+<!ELEMENT featuredatabase ((featureset+, defaultfeaturerange*))>
+<!ELEMENT feature ((hrhmacro?, comment?))>
+<!ATTLIST feature
+	name CDATA #REQUIRED
+	statusflags CDATA #REQUIRED
+	uid CDATA #REQUIRED
+	userdata CDATA #IMPLIED>
+	
+<!ELEMENT defaultfeaturerange ((comment?))>
+<!ATTLIST defaultfeaturerange
+	higheruid CDATA #REQUIRED
+	loweruid CDATA #REQUIRED>
+	
+<!ELEMENT comment (#PCDATA)>

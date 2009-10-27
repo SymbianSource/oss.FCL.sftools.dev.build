@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<build xmlns="http://symbian.com/xml/build" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symbian.com/xml/build ../../schema/build/2_0.xsd">
+	<!-- Tools interfaces -->
+
+	<interface name="Tools.common" abstract="true" extends="base.flm">
+		<param name='CDEFS.WIN32' default=''/>
+		<param name='CDEFS.LINUX' default=''/>
+		<param name='CDEFS'/>
+		<param name='CFLAGS'/>
+		<param name='CFLAGS.WIN32'/>
+		<param name='COMPILER'/>
+		<param name='COMPILER_PATH.WIN32'/>
+		<param name='COMPILER_PATH.LINUX'/>
+		<param name='INC.COMPILER' default=''/>
+		<param name='MMPDEFS' default=''/>
+		<param name='OPT.D'/>
+		<param name='OPT.O'/>
+		<param name='OPT.PREINCLUDE'/>
+		<param name='OPT.SYSTEMINCLUDE'/>
+		<param name='OPT.USERINCLUDE'/>
+		<param name='OPTION_GCC' default=''/>
+		<param name='OUTPUTPATH'/>
+		<param name='VARIANTPLATFORM'/>
+		<param name='PLATFORM' default='$(VARIANTPLATFORM)'/>
+		<param name='RELEASEPATH'/>
+		<param name='SOURCE'/>
+		<param name='SYSTEMINCLUDE' default=''/>
+		<param name='TARGET'/>
+		<param name='TOOLSPATH'/>
+		<param name='USERINCLUDE' default=''/>
+		<param name='PRODUCT_INCLUDE' default=''/>
+		<param name='PLATMACROS.WINDOWS'/>
+		<param name='PLATMACROS.LINUX'/>
+		<param name='VARIANTTYPE'/>
+	</interface>
+
+	<interface name="Tools.exe" extends="Tools.common" flm="tools2exe.flm">
+		<param name='LINKER'/>
+		<param name='LFLAGS'/>
+		<param name='LIBS.WIN32' default=''/>
+		<param name='LIBS.LINUX' default=''/>
+		<param name='OPT.L'/>
+		<param name='OPT.l'/>
+		<param name='STATICLIBRARY'/>
+		<param name='TARGETTYPE' default="EXE"/>
+	</interface>
+
+	<interface name="Tools.lib" extends="Tools.common" flm="tools2lib.flm">
+		<param name='ARCHIVER'/>
+		<param name='RANLIB'/>
+		<param name='AFLAGS'/>
+		<param name='TARGETTYPE' default="LIB"/>
+	</interface>
+
+	<interface name="Tools.extension" extends="base.extension" flm="template_ext.flm">
+	</interface>
+
+</build>

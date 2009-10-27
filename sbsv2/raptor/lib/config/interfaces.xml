@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<build xmlns="http://symbian.com/xml/build" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symbian.com/xml/build ../../schema/build/2_0.xsd">
+	<!-- The standard interfaces used by most configurations. -->
+
+	<var name="default.interfaces">
+		<!-- interfaces corresponding to target types -->
+
+		<set name="INTERFACE_TYPES" value="exe stdexe ext_makefile dll stddll lib stdlib export extension ani plugin textnotifier2 implib var var2 exexp kexe kdll kext klib ldd pdd pdl fsy resource none stringtable bitmap"/>
+		<set name="INTERFACE.exe" value="Symbian.exe"/>
+		<set name="INTERFACE.stdexe" value="Symbian.stdexe"/>
+		<set name="INTERFACE.stddll" value="Symbian.stddll"/>
+		<set name="INTERFACE.stdlib" value="Symbian.stdlib"/>
+		<set name="INTERFACE.dll" value="Symbian.dll"/>
+		<set name="INTERFACE.lib" value="Symbian.lib"/>
+		<set name="INTERFACE.ani" value="Symbian.ani"/>
+		<set name="INTERFACE.plugin" value="Symbian.plugin"/>
+		<set name="INTERFACE.textnotifier2" value="Symbian.textnotifier2"/>
+		<set name="INTERFACE.implib" value="Symbian.implib"/>
+		<set name="INTERFACE.var" value="Symbian.var"/>
+		<set name="INTERFACE.var2" value="Symbian.var2"/>
+		<set name="INTERFACE.exexp" value="Symbian.exexp"/>
+		<set name="INTERFACE.kexe" value="Symbian.kexe"/>
+		<set name="INTERFACE.kdll" value="Symbian.kdll"/>
+		<set name="INTERFACE.kext" value="Symbian.kext"/>
+		<set name="INTERFACE.klib" value="Symbian.klib"/>
+		<set name="INTERFACE.ldd" value="Symbian.ldd"/>
+		<set name="INTERFACE.pdd" value="Symbian.pdd"/>
+		<set name="INTERFACE.pdl" value="Symbian.pdl"/>
+		<set name="INTERFACE.fsy" value="Symbian.fsy"/>
+		<set name="INTERFACE.none" value="Symbian.none"/>
+		<set name="INTERFACE.ext_makefile" value="base.ext_makefile"/>
+		<set name="INTERFACE.extension" value="base.extension"/>
+		<set name="INTERFACE.export" value="base.export"/>
+		<set name="INTERFACE.resource" value="base.resource"/>
+		<set name="INTERFACE.stringtable" value="base.stringtable"/>
+		<set name="INTERFACE.bitmap" value="base.bitmap"/>
+
+		<!-- per-configuration default interfaces -->
+		<set name="INTERFACE.config" value="Symbian.config.default"/>
+	</var>
+
+</build>

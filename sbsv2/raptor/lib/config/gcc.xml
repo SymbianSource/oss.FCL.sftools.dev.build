@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<build xmlns="http://symbian.com/xml/build" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symbian.com/xml/build ../../schema/build/2_0.xsd">
+
+	<!-- build configurations for GCC compilers -->
+	<var name="tools2_base" extends="root">
+
+		<varRef ref="default.interfaces"/>
+		<varRef ref="default.locations"/>
+		<!-- picked up from the Environment -->
+		<env name='RANLIB' default='$(GCCPREFIX)ranlib$(DOTEXE)' type='tool'/>
+		<env name='GCC' default='$(GCCPREFIX)g++$(DOTEXE)' type='tool'/>
+		<env name='AR' default='$(GCCPREFIX)ar$(DOTEXE)' type='tool'/>
+
+		<!-- interfaces -->
+		<set name="INTERFACE.exe" value="Tools.exe"/>
+		<set name="INTERFACE.lib" value="Tools.lib"/>
+
+		<!-- Java used by Trace Compiler -->
+		<env name='JAVA_HOME' default='' type='path'/>
+		<env name='JAVATC' default='$(JAVA_HOME)/bin/java' type='tool'/>
+
+		<!-- link to bld.inf and mmp platform names -->
+		<set name='TRADITIONAL_PLATFORM' value='TOOLS2'/>
+		<set name='VARIANTPLATFORM' value='tools2'/>
+
+		<!-- used by FLM code -->
+		<set name='COMPILER' value='$(GCC) -c' type='tool' versionCommand='$(GCC) -v' versionResult='gcc version (3.[456])|(4.[0-9])'/>
+
+		<set name='CFLAGS' value='-fdefer-pop -fmerge-constants -fthread-jumps -floop-optimize -fif-conversion -fif-conversion2 -fguess-branch-probability -fcprop-registers -foptimize-sibling-calls -fstrength-reduce -fcse-follow-jumps -fcse-skip-blocks -frerun-cse-after-loop -frerun-loop-opt -fgcse -fgcse-lm -fgcse-sm -fgcse-las -fdelete-null-pointer-checks -fexpensive-optimizations -fregmove -fschedule-insns -fschedule-insns2 -fsched-interblock -fsched-spec -fcaller-saves -fpeephole2 -freorder-blocks -freorder-functions -fstrict-aliasing -funit-at-a-time -falign-functions -falign-jumps -falign-loops -falign-labels -fcrossjumping -pipe -Wall -Wno-ctor-dtor-privacy -Wno-unknown-pragmas -m32'/>
+
+		<!-- msys based programs sometimes don't search the path properly.
+		COMPILER_PATH can be set to tell gcc where to find
+		as.exe (sometimes it doesn't and a build step fails).
+		-->
+		<set name='COMPILER_PATH.WIN32' value='$(SBS_HOME)/win32/mingw/bin'/>
+		<set name='COMPILER_PATH.LINUX' value=''/>
+
+		<set name='CFLAGS.WIN32' value=''/>
+
+		<!-- macro definitions set by mmps etc -->
+		<set name='CDEFS' value='$(MMPDEFS)'/>
+
+
+		<set name='CDEFS.DEFAULT' value='__SYMBIAN32__ __TOOLS__ __TOOLS2__ __EXE__ __SUPPORT_CPP_EXCEPTIONS__ __PRODUCT_INCLUDE__="$(PRODUCT_INCLUDE)"'/>
+		<set name='CDEFS.WIN32' value='$(CDEFS.DEFAULT) _WIN32 WIN32 _WINDOWS __TOOLS2_WINDOWS__'/>
+		<set name='CDEFS.LINUX' value='$(CDEFS.DEFAULT) __LINUX__ __TOOLS2_LINUX__'/>
+
+		<set name='INC.COMPILER' value='$(EPOCINCLUDE)/gcc_mingw/gcc_mingw_3_4_2.h'/>
+
+		<set name='OPT.D' value='-D'/>
+		<set name='OPT.L' value='-L'/>
+		<set name='OPT.l' value='-l'/>
+		<set name='OPT.O' value='-o '/>
+		<set name='OPT.PREINCLUDE' value='-include '/>
+		<set name='OPT.SYSTEMINCLUDE' value='-isystem '/>
+		<set name='OPT.USERINCLUDE' value='-I '/>
+
+		<!-- always use stlport headers -->
+		<set name='SYSTEMINCLUDE' value='$(EPOCINCLUDE)/tools/stlport'/>
+
+		<set name='LINKER' value='$(GCC)'/>
+		<set name='LFLAGS' value=''/>
+		<set name='STATICLIBRARY' value='stlport.5.1'/>
+		<set name='LIBS' value=''/>
+		<set name='LIBS.WIN32' value='$(LIBS)'/>
+		<set name='LIBS.LINUX' value='$(LIBS) pthread'/>
+
+		<set name='PLATMACROS.WINDOWS' value='GCC32 TOOLS2 TOOLS2_WINDOWS'/>
+		<set name='PLATMACROS.LINUX' value='GCC32 TOOLS2 TOOLS2_LINUX'/>
+
+		<set name='ARCHIVER' value='$(AR)'/>
+		<set name='AFLAGS' value='cr'/>
+
+		<set name='MMPDEFS' value=''/>
+		<set name='TARGET' value=''/>
+		<set name='TARGETTYPE' value=''/>
+		<set name='BLDINF_OUTPUTPATH' value='$(SBS_BUILD_DIR)'/>
+
+		<set name='OUTPUTPATH' value='$(SBS_BUILD_DIR)'/>
+		<set name='RELEASEPATH' value='$(EPOCROOT)/epoc32/release/tools2$$(TOOLPLATFORMDIR)'/>
+	</var>
+
+	<var name="tools2_deb" extends="tools2_base">
+		<set name='TOOLSPATH' value=''/> <!-- do not install -->
+		<set name='VARIANTTYPE' value='deb'/>
+
+		<append name='CFLAGS' value='-g'/>
+		<append name='CDEFS' value='_DEBUG'/>
+		<append name='RELEASEPATH' value='/deb' separator=''/>
+	</var>
+
+	<var name="tools2_rel" extends="tools2_base">
+		<set name='TOOLSPATH' value='$(EPOCTOOLS)'/> <!-- install -->
+		<set name='VARIANTTYPE' value='rel'/>
+
+		<append name='CFLAGS' value='-s'/>
+		<append name='CDEFS' value='NDEBUG'/>
+		<append name='RELEASEPATH' value='/rel' separator=''/>
+	</var>
+
+	<group name="tools2">
+		<varRef ref='tools2_rel'/>
+		<varRef ref='tools2_deb'/>
+	</group>
+
+</build>

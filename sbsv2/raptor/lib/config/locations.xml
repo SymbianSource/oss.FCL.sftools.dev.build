@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<build xmlns="http://symbian.com/xml/build" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symbian.com/xml/build ../../schema/build/2_0.xsd">
+	<!-- The standard locations for widely used tools and resources.
+
+       This is easier to maintain than defining the locations in each
+       configuration that uses a tool or resource.
+	-->
+
+	<var name="hostplatform.locations" host='linux.*'>	
+		<set name='DOTEXE' value=''/>
+		<set name='GCCPREFIX' value='/usr/bin/'/>
+		<set name='GNUPREFIX' value='/bin/'/>
+		
+		<env name='HOSTPLATFORM_DIR' default='linux-i386' />
+		<env name='HOSTPLATFORM' default='linux i386'/>
+		
+		<env name='SBS_GNUCPP' default='/usr/bin/cpp' type='tool'/>
+		<env name='SBS_GNUDATE' default='/bin/date' type='tool'/>
+		<env name='SBS_GNUMAKE38' default='$(SBS_HOME)/$(HOSTPLATFORM_DIR)/bin/make' type='tool'/>
+		<env name='SBS_GNUSED' default='/bin/sed' type='tool'/>
+		<env name='SBS_GNUMKDIR' default='/bin/mkdir' type='tool'/>
+		<env name='SBS_GNUMV' default='/bin/mv' type='tool'/>
+		<env name='SBS_GNUCP' default='/bin/cp' type='tool'/>
+		<env name='SBS_GNUCAT' default='/bin/cat' type='tool'/>
+		<env name='SBS_GNURM' default='/bin/rm' type='tool'/>
+		<env name='SBS_GNULN' default='/bin/ln' type='tool'/>
+		<env name='SBS_GNURMDIR' default='/bin/rmdir' type='tool'/>
+		<env name='SBS_GNUCHMOD' default='/bin/chmod' type='tool'/>
+		<env name='SBS_GNUMD5SUM' default='/usr/bin/md5sum' type='tool'/>
+		<env name='SBS_GNUTOUCH' default='/bin/touch' type='tool'/>
+		<env name='SBS_GNUFIND' default='/usr/bin/find' type='tool'/>
+		<env name='SBS_GNUGREP' default='/bin/grep' type='tool'/>
+		<env name='SBS_GNUSORT' default='/bin/sort' type='tool'/>
+		<env name='SBS_SHELL' default="$(SBS_HOME)/$(HOSTPLATFORM_DIR)/bin/sh" type='tool'/>
+		<env name='SBS_ZIP' default="$(SBS_HOME)/$(HOSTPLATFORM_DIR)/bin/zip" type='tool'/>
+		<env name='SBS_UNZIP' default="$(SBS_HOME)/$(HOSTPLATFORM_DIR)/bin/unzip" type='tool'/>
+		<env name='SBS_BVCPP' default="$(SBS_HOME)/$(HOSTPLATFORM_DIR)/bv/bin/cpp" type='tool'/>
+		<env name='SBS_PERL' default='perl' type='tool'/>
+		<env name='SBS_PYTHON' default='python' type='tool'/>
+	</var>
+	<var name="hostplatform.locations" host='win.*' >
+		<set name='COREUTILSBINDIR' value='$(SBS_CYGWIN)/bin' type='path'/>
+		<set name='DOTEXE' value='.exe'/>
+		<set name='GNUPREFIX' value='$(COREUTILSBINDIR)/'/>
+		<set name='GCCPREFIX' value='$(MINGWBINDIR)/'/>
+		<set name='MINGWBINDIR' value='$(SBS_MINGW)/bin' type='path'/>
+		
+		<env name='HOSTPLATFORM_DIR' default='win32' /> 
+		<env name='HOSTPLATFORM' default='win 32' />
+		
+		<env name='SBS_CYGWIN' default='$(SBS_HOME)/$(HOSTPLATFORM_DIR)/cygwin' type='path'/>
+		<env name='SBS_MINGW' default='$(SBS_HOME)/$(HOSTPLATFORM_DIR)/mingw' type='path'/>
+		<env name='SBS_GNUCPP' default='$(MINGWBINDIR)/cpp.exe' type='tool'/>
+		<env name='SBS_GNUDATE' default='$(COREUTILSBINDIR)/date.exe' type='tool'/>
+		<env name='SBS_GNUMAKE38' default='$(MINGWBINDIR)/make.exe' type='tool'/>
+		<env name='SBS_GNUSED' default='$(COREUTILSBINDIR)/sed.exe' type='tool'/>
+		<env name='SBS_GNUMKDIR' default='$(COREUTILSBINDIR)/mkdir.exe' type='tool'/>
+		<env name='SBS_GNUCP' default='$(COREUTILSBINDIR)/cp.exe' type='tool'/>
+		<env name='SBS_GNUMV' default='$(COREUTILSBINDIR)/mv.exe' type='tool'/>
+		<env name='SBS_GNUCAT' default='$(COREUTILSBINDIR)/cat.exe' type='tool'/>
+		<env name='SBS_GNURM' default='$(COREUTILSBINDIR)/rm.exe' type='tool'/>
+		<env name='SBS_GNULN' default='$(COREUTILSBINDIR)/ln.exe' type='tool'/>
+		<env name='SBS_GNURMDIR' default='$(COREUTILSBINDIR)/rmdir.exe' type='tool'/>
+		<env name='SBS_GNUCHMOD' default='$(COREUTILSBINDIR)/chmod.exe' type='tool'/>
+		<env name='SBS_GNUMD5SUM' default='$(COREUTILSBINDIR)/md5sum.exe' type='tool'/>
+		<env name='SBS_GNUTOUCH' default='$(COREUTILSBINDIR)/touch.exe' type='tool'/>
+		<env name='SBS_GNUFIND' default='$(COREUTILSBINDIR)/find.exe' type='tool'/>
+		<env name='SBS_GNUGREP' default='$(COREUTILSBINDIR)/grep.exe' type='tool'/>
+		<env name='SBS_GNUSORT' default='$(COREUTILSBINDIR)/sort.exe' type='tool'/>
+		<env name='SBS_SHELL' default="$(COREUTILSBINDIR)/sh.exe" type='tool'/>
+		<env name='SBS_ZIP' default="$(COREUTILSBINDIR)/zip.exe" type='tool'/>
+		<env name='SBS_UNZIP' default="$(COREUTILSBINDIR)/unzip.exe" type='tool'/>
+		<env name='SBS_BVCPP' default="$(SBS_HOME)/$(HOSTPLATFORM_DIR)/bv/bin/cpp.exe" type='tool'/>
+		<env name='SBS_PERL' default='perl.exe' type='tool'/>
+		<env name='SBS_PYTHON' default='$(SBS_HOME)/$(HOSTPLATFORM_DIR)/python252/python.exe' type='tool'/>
+	</var>
+
+	<var name="default.locations" extends="hostplatform.locations">
+		<env name='EPOCROOT' default='' type='path'/>
+		<!-- Place where intermediate files are built -->
+		<env name='SBS_BUILD_DIR' default='$(EPOCROOT)/epoc32/build' type='path'/>
+
+		<set name='DATE' value='$(SBS_GNUDATE)' type='tool'/>
+		<set name='GNUCPP' value='$(SBS_GNUCPP)' type='tool' versionCommand='$(GNUCPP) --version' versionResult='cpp(.exe)? .* [345]\..*'/>
+		<set name='GNUCP' value='$(SBS_GNUCP)' type='tool' versionCommand='$(GNUCP) --version' versionResult='cp(.exe)?\s*\((GNU\s*)?coreutils\)\s*[5-9]\..*'/>
+		<set name='GNUMV' value='$(SBS_GNUMV)' type='tool' versionCommand='$(GNUMV) --version' versionResult='mv(.exe)?\s*\((GNU\s*)?coreutils\)\s*[5-9]\..*'/>
+		<set name='GNUCAT' value='$(SBS_GNUCAT)' type='tool' versionCommand='$(GNUCAT) --version' versionResult='cat(.exe)?\s*\((GNU\s*)?coreutils\)\s*[5-9]\..*'/>
+		<set name='GNUMAKE38' value='$(SBS_GNUMAKE38)' type='tool' versionCommand='$(GNUMAKE38) -v' versionResult='GNU Make 3.8[1-9]'/>
+		<set name='GNUSED' value='$(SBS_GNUSED)' type='tool' versionCommand='$(GNUSED) --version' versionResult='GNU sed version [3-9].*'/>
+		<set name='GNUMKDIR' value='$(SBS_GNUMKDIR)' type='tool' versionCommand='$(GNUMKDIR) --version' versionResult='.*'/>
+		<set name='GNURM' value='$(SBS_GNURM)' type='tool' versionCommand='$(GNURM) --version' versionResult='rm.*coreutils.*'/>
+		<set name='GNULN' value='$(SBS_GNULN)' type='tool' versionCommand='$(GNULN) --version' versionResult='ln.*coreutils.*'/>
+		<set name='GNURMDIR' value='$(SBS_GNURMDIR)' type='tool' versionCommand='$(GNURMDIR) --version' versionResult='rmdir.*coreutils.*'/>
+		<set name='GNUCHMOD' value='$(SBS_GNUCHMOD)' type='tool' versionCommand='$(GNUCHMOD) --version' versionResult='chmod.*coreutils.*'/>
+		<set name='GNUMD5SUM' value='$(SBS_GNUMD5SUM)' type='tool' versionCommand='$(GNUMD5SUM) --version' versionResult='md5sum.*coreutils.*'/>
+		<set name='GNUTOUCH' value='$(SBS_GNUTOUCH)' type='tool' versionCommand='$(GNUTOUCH) --version' versionResult='touch.*coreutils.*'/>
+		<set name='GNUFIND' value='$(SBS_GNUFIND)' type='tool' versionCommand='$(GNUFIND) --version' versionResult='(GNU)?.*find.*(GNU)?.*'/>
+		<set name='GNUGREP' value='$(SBS_GNUGREP)' type='tool' versionCommand='$(GNUGREP) --version' versionResult='(GNU)?.*grep.*(GNU)?.*'/>
+		<set name='GNUSORT' value='$(SBS_GNUSORT)' type='tool' versionCommand='$(GNUSORT) --version' versionResult='(GNU)?.*sort.*(GNU)?.*'/>
+		<set name='ZIP' value="$(SBS_ZIP)" type='tool'/>
+		<set name='UNZIP' value="$(SBS_UNZIP)" type='tool'/>
+		<set name='PERL' value='$(SBS_PERL)' type='tool'/>
+		<set name='PYTHON' value='$(SBS_PYTHON)' type='tool' versionCommand='$(PYTHON) -V' versionResult='Python 2\.[456].*'/>
+
+		<set name='DEFAULT_PLATFORMS' value='ARMV5 ARMV7 WINSCW'/>
+		<set name='BASE_DEFAULT_PLATFORMS' value='ARMV5 ARMV7 WINSCW ARMV5SMP'/>
+		<set name='BASE_USER_DEFAULT_PLATFORMS' value='ARMV5 ARMV7 WINSCW'/>
+
+		<set name='BUILD_INCLUDE' value=''/>
+		<set name='CREATEVMAP' value='$(PYTHON) $(SBS_HOME)/bin/createvmap.py' type='tool'/>
+		<set name='CREATEVMAPCPP' value='$(SBS_BVCPP)' type='tool'/>
+		<set name='FEATURELISTFILES' value=''/>
+		<set name='FEATUREVARIANTNAME' value=''/>
+	</var>
+
+</build>

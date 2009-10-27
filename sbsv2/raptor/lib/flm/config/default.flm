@@ -1,0 +1,61 @@
+# Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+#
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+#
+# Contributors:
+#
+# Description:
+# config/default.flm
+# Default build-configuration-wide rules and dependencies.
+# 
+#
+
+# put things in here that depend on EPOCROOT and 
+# therefore cannot go in globals.mk
+
+# metaflm depends on variables set in the configuration
+include $(FLMHOME)/metaflm.mk
+
+# TEM dependencies
+EPOC32BUILD:=$(EPOCROOT)/epoc32/build
+
+.PHONY:: $(EPOC32BUILD)/TEM_MAKMAKE
+.PHONY:: $(EPOC32BUILD)/TEM_RESOURCE
+.PHONY:: $(EPOC32BUILD)/TEM_BLD
+.PHONY:: $(EPOC32BUILD)/TEM_FINAL
+
+$(EPOC32BUILD)/TEM_MAKMAKE:: EXPORT
+$(EPOC32BUILD)/TEM_RESOURCE:: $(EPOC32BUILD)/TEM_MAKMAKE
+$(EPOC32BUILD)/TEM_BLD:: $(EPOC32BUILD)/TEM_LIB
+$(EPOC32BUILD)/TEM_FINAL:: $(EPOC32BUILD)/TEM_BLD
+
+# Make engines with order only prerequisites should use them
+# other engines can use a simulation
+#
+ifneq ($(HAVE_ORDERONLY),)
+.PHONY:: $(EPOC32BUILD)/TEM_LIB
+
+$(EPOC32BUILD)/TEM_LIB:: $(EPOC32BUILD)/TEM_RESOURCE
+
+else
+# Set up some rules that will simulate order only behaviour on all
+# make engines:
+
+define predatedupdate
+	@touch --date='10 years ago' "$1"
+endef
+
+# This one is non-phony because it's the only one that 
+# anything actually depends upon in a purely incremental build.
+$(EPOC32BUILD)/TEM_LIB:: $(EPOC32BUILD)/TEM_RESOURCE
+	$(call predatedupdate,$@)
+endif
+
+# Optionally include user configuration if it exists.
+-include $(FLMHOME)/user/default.flm

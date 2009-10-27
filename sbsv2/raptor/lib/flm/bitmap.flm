@@ -1,0 +1,182 @@
+# Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+#
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+#
+# Contributors:
+#
+# Description:
+# Header file exporting Function Like Makefile (FLM)
+# The file destinations  relative to EPOCROOT
+# 
+#
+
+## Parameters that are expected:
+# BMCONV
+# EPOCROOT
+# HEADER
+# OUTPUTPATH
+# SOURCE
+# BMTARGET
+# TARGETPATH
+# BINCOPYDIRS
+
+ifneq ($(TARGETPATH),)
+DATAPATH:=$(subst //,/,$(EPOCROOT)/epoc32/data/z/$(TARGETPATH))
+else
+DATAPATH:=$(subst //,/,$(EPOCROOT)/epoc32/data)
+endif
+CREATABLEPATHS:=$(DATAPATH) $(OUTPUTPATH)
+
+BITMAPFILE:=$(subst //,/,$(DATAPATH)/$(BMTARGET))
+
+# additional binary resource copies performed based on BINCOPYDIRS
+MBMCOPYDIRS:=
+MBMCOPYFILES:=
+ifneq ($(BINCOPYDIRS),)
+  MBMCOPYDIRS:=$(subst //,/,$(patsubst %,%/$(if $(TARGETPATH),/z/$(TARGETPATH),),$(BINCOPYDIRS)))
+  CREATABLEPATHS:=$(CREATABLEPATHS) $(MBMCOPYDIRS)
+  MBMCOPYFILES:=$(subst //,/,$(patsubst %, %/$(notdir $(BITMAPFILE)),$(MBMCOPYDIRS)))
+endif
+
+
+ifneq ($(HEADER),)
+BITMAPHEADER:=$(subst //,/,$(EPOCROOT)/epoc32/include/$(basename $(BMTARGET)).mbg)
+else
+BITMAPHEADER:=
+endif
+
+
+# SOURCE is something like "DEPTH=2 FILE=/var/local/fred.bmp"
+# Extract the file parts for the dependencies.
+# Generate -2/var/local/fred.bmp for the command-line argument.
+SOURCEDEPS:=$(subst //,/,$(subst FILE=,,$(filter FILE=%,$(SOURCE))))
+SOURCEARGS:=$(subst //,/,$(subst DEPTH=,-,$(subst $(CHAR_SPACE)FILE=,,$(SOURCE))))
+
+BMCONVCMDFILE:=$(OUTPUTPATH)/$(BMTARGET)_bmconvcommands
+RELEASEABLES:=$(BITMAPHEADER) $(BITMAPFILE)
+CLEANTARGETS:=$(BITMAPHEADER) $(BITMAPFILE) $(BMCONVCMDFILE)
+
+# The groupbmpin10 macro allows us to construct a command file, 10 
+# bitmap objects at a time to avoid limits on argument lengths and 
+# sizes on Windows.
+define groupbmpin10
+	$(if $1,$(shell echo -e $(foreach L,$(wordlist 1,10,$1),"$(L)\\n") >>$(BMCONVCMDFILE)),)
+	$(if $1,$(call groupbmpin10,$(wordlist 11,$(words $1),$1)))
+endef
+
+GUARD:=$(call sanitise,TARGET_$(BITMAPFILE))
+define generatebitmap
+$(GUARD):=1
+
+BITMAP:: $(RELEASEABLES)
+
+ifneq ($(BITMAPHEADER),)
+$(BITMAPHEADER): $(BITMAPFILE)
+endif
+
+# Create commandfile during parse so that the log is not littered with 
+# these commands in parallel builds.
+$(info <bmconvcmdfile>)
+$(info $(BMCONVCMDFILE))
+$(shell $(GNUMKDIR) -p "$(dir $(BMCONVCMDFILE))")
+$(if $(BITMAPHEADER),$(shell echo -e "-h$(BITMAPHEADER)\n$(BITMAPFILE)" >$(BMCONVCMDFILE)),$(shell echo "$(BITMAPFILE)" >$(BMCONVCMDFILE)) )
+$(call groupbmpin10, $(SOURCEARGS))
+$(info </bmconvcmdfile>)
+
+$(BITMAPFILE): $(SOURCEDEPS) $(BMCONV) 
+	$(call startrule,bitmapcompile,FORCESUCCESS) \
+	$(BMCONV) $(BMCONVCMDFILE) \
+	$(call endrule,bitmapcompile)
+
+endef
+
+
+# Some builds require further copies of the generated mbm binaries
+define copybitmap
+
+BITMAP:: $(MBMCOPYFILES)
+
+$(MBMCOPYFILES): $(BITMAPFILE) 
+	$(call startrule,bitmapcopy,FORCESUCCESS) \
+	$(GNUCP) $$< $$@ \
+	$(call endrule,bitmapcopy)
+
+CLEANTARGETS:=$(CLEANTARGETS) $(MBMCOPYFILES)
+endef
+
+
+ifeq ($($(GUARD)),)
+$(eval $(call generatebitmap))
+endif
+
+ifneq ($(MBMCOPYFILES),)
+$(eval $(call copybitmap))
+endif
+
+################################### localisation #########################################
+## copy .bmp files to localisation
+
+# $(BMPFILES) is a list of bmp files in src
+BMPFILES:=$(subst FILE=,,$(filter FILE=%,$(SOURCE)))
+BMBASENAME:=$(call lowercase,$(basename $(BMTARGET)))
+BMPCOPYFILES:=
+BMPCOPYDIR:=$(EPOCROOT)/epoc32/localisation/$(BMBASENAME)/mbm
+$(call makepath,$(BMPCOPYDIR))
+
+define copyBMP
+# $(1) is the source .bmp file
+# $(2) is the (lower cased) copy in localisation 
+
+ifneq ($(BINCOPYDIRS),)
+BITMAP:: $(2)
+
+$(2): $(1)
+	$(call startrule,bmpfilecopy,FORCESUCCESS) \
+	$(GNUCP) $(1) $(2) && $(GNUCHMOD) +rw $(2) \
+	$(call endrule,bmpfilecopy)
+
+CLEANTARGETS:=$$(CLEANTARGETS) $(2)
+endif
+
+BMPCOPYFILES:=$$(BMPCOPYFILES) $(2)
+endef
+
+$(foreach BMP,$(BMPFILES),$(eval $(call copyBMP,$(BMP),$(BMPCOPYDIR)/$(call lowercase,$(notdir $(BMP))))))
+
+## create and edit info files for bitmap files in localisation/group
+INFOFILE:=$(EPOCROOT)/epoc32/localisation/group/$(BMBASENAME).info
+DEPTH:=$(subst DEPTH=,,$(filter DEPTH=%,$(SOURCE)))
+BMP:=$(notdir $(BMPFILES))
+DEPTHBMP:=$(subst _,\,$(join $(patsubst %,/%,$(DEPTH)),$(patsubst %,_%,$(BMP))))
+
+define bmpInfo
+
+BITMAP::$(INFOFILE)
+
+$(INFOFILE)::
+	@if [ ! -d $(EPOCROOT)/epoc32/localisation/group ]; then $(GNUMKDIR) -p $(EPOCROOT)/epoc32/localisation/group; fi
+	@if [ ! -f $$@ ]; then echo "DATADIR: /$(BMBASENAME)" > $$@ ; fi
+	@echo -e "\n/z$(TARGETPATH)/$(BMTARGET) : $(DEPTHBMP)" >> $$@
+
+CLEANTARGETS:=$$(CLEANTARGETS) $(INFOFILE)
+endef
+
+$(eval $(call bmpInfo))
+
+# end of localisation #########################################################
+
+## Clean up
+$(eval $(call GenerateStandardCleanTarget,$(CLEANTARGETS) ,$(CREATABLEPATHS)))
+$(call makepath,$(CREATABLEPATHS))
+$(call makepathfor,$(BITMAPHEADER))
+
+# for the abld -what target
+BMPRELEASEABLES:=$(RELEASEABLES) $(MBMCOPYFILES) $(BMPCOPYFILES) $(INFOFILE)
+$(eval $(call whatmacro,$(BMPRELEASEABLES),WHATBITMAP))
+

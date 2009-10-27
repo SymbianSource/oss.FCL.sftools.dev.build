@@ -1,0 +1,27 @@
+# Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+#
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+#
+# Contributors:
+#
+# Description:
+# ARMv5 EXE/DLL ABIv2 Function Like Makefile (FLM)
+# Build Resources only
+# 
+#
+
+ifeq ($(TARGETTYPE),none)
+
+# Nothing to do here at the moment.  Perhaps later 
+# this will contain "all" rules to tie resources together
+
+else
+$(error none.flm called with wrong TARGETTYPE (should be 'none' but is '$(TARGETTYPE)'))
+endif
+

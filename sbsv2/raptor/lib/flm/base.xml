@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<build xmlns="http://symbian.com/xml/build" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symbian.com/xml/build ../../schema/build/2_0.xsd">
+	<!-- 
+	Fundamental interfaces from which others (platform or nonplatform specific) 
+	may be derived 
+     -->
+
+	<interface name="base.null" flm="null.flm">
+		<!-- use this for "targets" which should be no-op -->
+	</interface>
+	
+	<interface name="base.flm" abstract="true">
+		<param name='COMPONENT_META' default=''/>  <!-- bld.inf -->
+		<param name='COMPONENT_NAME' default=''/>  <!-- MP4 Player -->
+		<param name='COMPONENT_LAYER' default=''/> <!-- Multimedia -->
+		<param name='PROJECT_META' default=''/>     <!-- my.mmp  -->
+		<param name='DATE' default=''/>
+		<param name='DUMPBCINFO' default=''/>
+		<param name='PLATFORM' default=''/>
+		<param name='GNUMAKE38'/>
+		<param name='GNUCP'/>
+		<param name='GNUCAT'/>
+		<param name='GNUMKDIR'/>
+		<param name='GNUMV'/>
+		<param name='GNURM'/>
+		<param name='GNULN'/>
+		<param name='GNURMDIR'/>
+		<param name='GNUCHMOD'/>
+		<param name='GNUTOUCH'/>
+		<param name='GNUFIND'/>
+		<param name='GNUGREP'/>
+		<param name='GNUSED'/>
+		<param name='GNUSORT'/>
+		<param name='SBS_JAVATC' default=''/>
+		<param name='ZIP'/>
+		<param name='UNZIP'/>
+		<param name='GNUMD5SUM'/>
+		<param name='SAVESPACE' default=''/> <!-- remove intermediate files ASAP -->
+		<param name='WHATLOG' default=''/>   <!-- emit formatted releasable info into the logs during the build -->
+		<param name='USE_PROFILER_FEEDBACK' default=''/> <!-- use the profiler feedback file for the builds -->
+		<param name='ARM_PROFILER_FILE' default=''/>
+	</interface>
+	<interface name="base.extension" extends="base.flm" flm="template_ext.flm">
+		<param name='TEMCOUNT'/>
+		<param name='TEMMAKE' default='$(GNUMAKE38)'/>
+		<param name='EPOCROOT'/>
+		<param name='TEMPLATE_EXTENSION_MAKEFILE'/>
+		<param name='PRODUCT_INCLUDE'/>
+		<param name='EPOCBLD'/>
+		<param name='TO_BLDINF'/>
+		<param name='TO_ROOT'/>
+		<param name='EXTENSION_ROOT'/>
+		<param name='O._MEMBERS' default=""/>
+		<param name='VARIANTPLATFORM'/>
+		<param name='VARIANTTYPE'/>
+		<param name='PLATFORM' default='$(VARIANTPLATFORM)'/>
+		<param name='PLATFORM_PATH' default='$(VARIANTPLATFORM)'/>
+		<param name='CFG' default='$(VARIANTTYPE)'/>
+		<param name='CFG_PATH' default='$(VARIANTTYPE)'/>
+		<param name='NMAKE' default=''/>
+		<param name='NMAKEFLAGS' default=''/>
+		<param name='SBSV1MAKE' default=''/>
+		<paramgroup pattern='^O\.[^ \t]+$' default=""/>
+	</interface>
+	<interface name="base.stringtable" extends="base.flm" flm="stringtable.flm">
+		<param name='EPOCROOT'/>
+		<param name='SOURCE'/>
+		<param name='EXPORTPATH'/>
+		<param name='HEADERONLY' default=''/>
+		<param name='OUTPUTPATH'/>
+		<param name='STRINGTABLE'/>
+		<param name='TARGET'/>
+	</interface>
+	<interface name="base.bitmap" extends="base.flm" flm="bitmap.flm">
+		<param name='BINCOPYDIRS' default=''/>
+		<param name='BMCONV'/>
+		<param name='EPOCROOT'/>
+		<param name='HEADER' default=''/>
+		<param name='OUTPUTPATH'/>
+		<param name='SOURCE'/>
+		<param name='BMTARGET'/>
+		<param name='TARGETPATH' default=''/>
+	</interface>
+	<interface name="base.resource" extends="base.flm" flm="resource.flm">
+		<param name='BINCOPYDIRS' default=''/>
+		<param name='MMPDEFS' default=''/>
+		<param name='GNUCPP'/>
+		<param name='GNUSED'/>
+		<param name='EPOCROOT'/>
+		<param name='HEADER' default=''/>
+		<param name='HEADERONLY' default=''/>
+		<param name='LANGUAGES' default='sc'/>
+		<param name='PRODUCT_INCLUDE'/>
+		<param name='RCOMP'/>
+		<param name='OUTPUTPATH'/>
+		<param name='RSGDEPENDS' default=''/>
+		<param name='SOURCE'/>
+		<param name='SYSTEMINCLUDE'/>
+		<param name='USERINCLUDE'/>
+		<param name='TARGET'/>
+		<param name='TARGET_lower'/>
+		<param name='TARGETPATH' default=''/>
+		<param name='UID1' default="1000007a"/>
+		<param name='UID2' default='00000000'/>
+		<param name='UID3' default='00000000'/>
+	</interface>
+	<interface name="base.export" extends="base.null">
+		<!-- exports are done in Python -->
+	</interface>
+	<interface name="base.ext_makefile" extends="base.flm" flm="gnumakefile.flm">
+		<param name='CFG' default='$(VARIANTTYPE)'/>
+		<param name='EPOCROOT'/>
+		<param name='EXTENSION_ROOT'/>
+		<param name='DIRECTORY'/>
+		<param name='EXTMAKEFILENAME'/>
+		<param name='EPOCBLD'/>
+		<param name='VARIANTPLATFORM'/>
+		<param name='PLATFORM' default='$(VARIANTPLATFORM)'/>
+		<param name='TO_ROOT'/>
+		<param name='TO_BLDINF'/>
+		<param name='USENMAKE' default=''/>
+		<param name='NMAKE' default=''/>
+		<param name='NMAKEFLAGS' default=''/>
+		<param name='SBSV1MAKE' default=''/>
+	</interface>
+
+</build>

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<build xmlns="http://symbian.com/xml/build" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symbian.com/xml/build ../../schema/build/2_0.xsd">
+	<!-- Some common Raptor make engines -->
+	
+	<!-- Raptor make engine for GNU make -->
+	<var name="make_engine">
+		<varRef ref="default.locations"/>
+
+		<!-- Shell settings -->
+		<set name='DEFAULT_SHELL' value='$(SBS_HOME)/$(HOSTPLATFORM_DIR)/bin/talon$(DOTEXE)' type='tool'/>
+		<set name='TALON_SHELL' value='$(SBS_SHELL)' type='tool'/>
+		<set name='USE_TALON' value='1'/>
+		<set name='TALON_TIMEOUT' value='600000'/>
+		<set name='TALON_DESCRAMBLE' value='1'/>
+		
+		<!-- Command-line for initialisation -->
+		<set name="initialise" value=""/>
+
+		<!-- Command-line for shutdown -->
+		<set name="shutdown" value=""/>
+
+		<!-- Command-line for build  -->
+		<set name="build" value="$(GNUMAKE38) HAVE_ORDERONLY=1 -r" type="tool"/>
+
+		<!-- Options  -->
+		<set name="makefile" value="-f"/>
+		<set name="keep_going" value="-k"/>
+		<set name="jobs" value="-j"/>
+		
+		<!-- The following are stuck on the commandline before any options
+		     specified by the sbs "mo" option, so they can be overridden -->
+		<set name="defaultoptions" value=""/>
+
+		<!-- How to split out the makefiles -->
+		<set name="selectors" value="export,bitmap,resource_deps,resource,default"/>
+		<set name="export.selector.iface" value="\.export$"/>
+		<set name="export.selector.target" value="EXPORT"/>
+		<set name="bitmap.selector.iface" value="\.(bitmap|extension|mifconv)$"/>
+		<set name="bitmap.selector.target" value="BITMAP"/>
+		<set name="resource_deps.selector.iface" value="\.resource$"/>
+		<set name="resource_deps.selector.target" value="RESOURCE_DEPS"/>
+		<set name="resource_deps.selector.ignoretargets" value="^(RESOURCE|CLEAN|CLEANEXPORT|REALLYCLEAN)$"/>
+		<set name="resource.selector.iface" value="\.(resource|extension|mif2cdlindex|nativejava)$"/>
+		<set name="resource.selector.target" value="RESOURCE"/>
+		<set name="default.selector.iface" value="\.(?!export$|bitmap$|resource$|mifconv$|mif2cdlindex$|nativejava$).*$"/>
+		<set name="default.selector.target" value="ALL"/>
+
+		<!-- is the text output with -j buffered or scrambled? -->
+		<set name="scrambled" value="true"/>
+	</var>
+	
+	<alias name="make" meaning="make_engine"/>
+
+	<!-- use the talon shell -->
+	<var name="make_no_talon_engine" extends="make_engine">
+	        <set name='DEFAULT_SHELL' value='$(SBS_SHELL)' type='tool'/>
+	        <set name='USE_TALON' value=''/>
+	</var>
+
+	<alias name="make_no_talon" meaning="make_no_talon_engine"/>
+
+	<!-- other derived versions of GNU make -->
+
+	<!-- Raptor make engine for Electric Make -->
+	<var name="emake_engine" extends="make_engine">
+		<env name="EMAKE" default="emake" type="tool" versionCommand="$(EMAKE) --version " versionResult="Electric Make version (4\.[2-9])|([56789]\.[0-9])"/>
+		<set name="build" value="$(EMAKE) HAVE_ORDERONLY= -r"/>
+		<set name="scrambled" value="false"/>
+		<set name='TALON_DESCRAMBLE' value=''/>
+	</var>
+
+	<alias name="emake" meaning="emake_engine"/>
+	
+	<!-- use the talon shell -->
+	<var name="emake_no_talon_engine" extends="emake_engine">
+	        <set name='DEFAULT_SHELL' value='$(SBS_SHELL)' type='tool'/>
+	        <set name='USE_TALON' value=''/>
+	</var>
+
+	<alias name="emake_no_talon" meaning="emake_no_talon_engine"/>
+	
+	<!-- Raptor make engine for PVMgmake -->
+	<var name="pvmgmake_engine" extends="make_engine">
+		<env name="PVMGMAKE" default="pvmgmake" type="tool" versionCommand="$(PVMGMAKE) --version " versionResult="PVMGmake-([0-9]\.[0-9])|(0.) rpt"/>
+		<set name="build" value="$(PVMGMAKE) HAVE_ORDERONLY=true  -r"/>
+		<set name="scrambled" value="false" />
+		<set name='TALON_DESCRAMBLE' value=''/>
+	</var>
+
+	<alias name="pvmgmake" meaning="pvmgmake_engine"/>
+
+</build>

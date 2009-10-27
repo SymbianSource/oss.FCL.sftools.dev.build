@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<build xmlns="http://symbian.com/xml/build" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symbian.com/xml/build ../../schema/build/2_0.xsd">
+	<!-- build configurations for Metrowerks Emulator compilers -->
+	<var name="winscw_base" extends="root">
+		<varRef ref="default.interfaces"/>
+		<varRef ref="default.locations"/>
+		<!-- picked up from the Environment -->
+		<env name='CHECKLIB' default='$(EPOCROOT)/epoc32/tools/checklib$(DOTEXE)' type='tool'/>
+		<env name='EFREEZE' default="$(PERL) $(EPOCROOT)/epoc32/tools/efreeze.pl" type='tool'/>
+		<env name='BMCONV' default="$(EPOCROOT)/epoc32/tools/bmconv$(DOTEXE)" type='tool'/>
+		<env name='MAKEDEF' default='$(PERL) $(EPOCROOT)/epoc32/tools/makedef.pl' type='path'/>
+		<env name='MWCC' default='mwccsym2$(DOTEXE)' type='tool' versionCommand='$(MWCC) -version' versionResult='Version 3.2.*'/>
+		<env name='MWLD' default='mwldsym2$(DOTEXE)' type='tool' versionCommand='$(MWLD) -version' versionResult='Version 3.2.*'/>
+		<env name='MWWINRC' default='mwwinrc$(DOTEXE)' type='tool' versionCommand='$(MWWINRC) -version' versionResult='Version 3.2.*'/>
+
+		<env name='PREPDEF' default='$(PERL) $(EPOCROOT)/epoc32/tools/prepdef.pl' type='path'/>
+		<env name='RCOMP' default='$(EPOCROOT)/epoc32/tools/rcomp$(DOTEXE)' type='tool'/>
+		<env name='STRINGTABLE' default='$(PERL) $(EPOCROOT)/epoc32/tools/stringtable.pl' type='path'/>	
+		
+		<!-- link to bld.inf and mmp platform names -->
+		<set name='TRADITIONAL_PLATFORM' value='WINSCW'/>
+
+		<!-- interfaces -->
+		<set name="INTERFACE.ani" value="Emulator.ani"/>
+		<set name="INTERFACE.bitmap" value="Emulator.bitmap"/>
+		<set name="INTERFACE.exe" value="Emulator.exe"/>
+		<set name="INTERFACE.stdexe" value="Emulator.stdexe"/>
+		<set name="INTERFACE.dll" value="Emulator.dll"/>
+		<set name="INTERFACE.stddll" value="Emulator.stddll"/>
+		<set name="INTERFACE.exexp" value="Emulator.exexp"/>
+		<set name="INTERFACE.fsy" value="Emulator.fsy"/>
+		<set name="INTERFACE.implib" value="Emulator.implib"/>
+		<set name="INTERFACE.kdll" value="Emulator.kdll"/>
+		<set name="INTERFACE.kext" value="Emulator.kext"/>
+		<set name="INTERFACE.klib" value="Emulator.klib"/>
+		<set name="INTERFACE.ldd" value="Emulator.ldd"/>
+		<set name="INTERFACE.lib" value="Emulator.lib"/>
+		<set name="INTERFACE.stdlib" value="Emulator.stdlib"/>
+		<set name="INTERFACE.none" value="Emulator.none"/>
+		<set name="INTERFACE.pdd" value="Emulator.pdd"/>
+		<set name="INTERFACE.pdl" value="Emulator.pdl"/>
+		<set name="INTERFACE.plugin" value="Emulator.plugin"/>
+		<set name="INTERFACE.resource" value="Emulator.resource"/>
+		<set name="INTERFACE.textnotifier2" value="Emulator.textnotifier2"/>
+		<set name="INTERFACE.var" value="Emulator.var"/>
+		<set name='CC' value='$(MWCC)'/>
+		<set name='CDEFS' value='__SYMBIAN32__ __CW32__ __WINS__ __WINSCW__ __SUPPORT_CPP_EXCEPTIONS__ _UNICODE $(MMPDEFS)'/>
+		<set name='CFLAGS' value='-c -align 4 -warnings on -w nohidevirtual,nounusedexpr -msgstyle gcc -enum int -str pool -exc ms -trigraphs on -cwd source'/>
+		<set name='CW_DEFAULT_LIBS' value='gdi32.lib user32.lib kernel32.lib'/>
+		<set name='CW_RUNTIME_STATIC' value='msl_all_static_mse_symbian_d.lib'/>
+		<set name='CW_RUNTIME_NONSTATIC' value='MSL_All_x86_Symbian_D.lib'/>
+		<set name='DEFAULT_NORMAL_NEWLIB' value='scppnwdl.lib'/>
+		<set name='DEFAULT_SYSTEM_NEWLIB' value='scppnwdl_kern.lib'/>
+		<set name='EXPORT_TYPE' value='dllexport'/>
+		<set name='LD' value='$(MWLD)'/>
+		<set name='LFLAGS' value='-msgstyle gcc -stdlib -subsystem windows'/>
+		<set name='LFLAGS_INFGEN' value='-S -show only,names,unmangled,verbose '/>
+		<set name='LFLAGS_SYMGEN' value='-S -show only,names,verbose '/>
+		<set name='LINKPATH' value='winscw/udeb'/>
+		<set name='LISTING_OPTION' value='-S'/>
+		<set name='MMPDEFS' value=''/>
+		<set name='EPOCSTACKSIZE' value=''/>
+		<set name='NMAKE' value='nmake'/>
+		<set name='NMAKEFLAGS' value='-nologo -x - '/>
+		<set name='OPT.ADDCOMMAND' value='-addcommand '/>
+		<set name='OPT.CHECKLIB.STDCPP' value='stdc++'/>
+		<set name='OPT.CHECKLIB.SYMCPP' value='symc++'/>
+		<set name='OPT.CHECKLIB.WIN32' value='--coff'/>
+		<set name='OPT.HEAPCOMMIT' value='-heapcommit='/>
+		<set name='OPT.DEFINE' value='-d '/>
+		<set name='OPT.DEFFILE' value='-f '/>
+		<set name='OPT.DEPEND' value='-gccdepends -MD '/>
+		<set name='OPT.EXPORT' value='-export '/>
+		<set name='OPT.HEAPRESERVE' value='-heapreserve='/>
+		<set name='OPT.IMAGEBASE' value='-imagebase '/>
+		<set name='OPT.IMPLIB' value='-implib '/>
+		<set name='OPT.IMPORTLIB' value='-importlib '/>
+		<set name='OPT.LIBFILE' value='-l'/>
+		<set name='OPT.LIBPATH' value='-l '/>
+		<set name='OPT.LISTING' value='-S -show source,unmangled,comments '/>
+		<set name='OPT.MENTRYPOINT' value='-m '/>
+		<set name='OPT.MAINENTRYPOINT' value='-main '/>
+		<set name='OPT.MAP' value='-map '/>
+		<set name='OPT.NOCOMPACTIMPORTLIB' value='-nocompactimportlib '/>
+		<set name='OPT.NOENTRY' value='-noentry '/>
+		<set name='OPT.NOIMPLIB' value='-noimplib '/>
+		<set name='OPT.NOSTDINC' value='-nostdinc '/>
+		<set name='OPT.OUT' value='-o '/>
+		<set name='OPT.PREINCLUDE' value='-include '/>
+		<set name='OPT.RUNTIME' value='-runtime '/>
+		<set name='OPT.SEARCH' value='-search'/>
+		<set name='OPT.SHARED' value='-shared '/>
+		<set name='OPT.SPLITINCLUDE' value='-i-'/>
+		<set name='OPT.STATICLIBRARY' value='-library '/>
+		<set name='OPT.STDINC' value='-stdinc '/>
+		<set name='OPT.STDLIB' value='-stdlib '/>
+		<set name='OPT.SYM' value='-sym '/>
+		<set name='OPT.SYSINCLUDE' value='-i '/>
+		<set name='OPT.USERINCLUDE' value='-i '/>
+		<set name='OPT.WCHAR' value='-wchar_t '/>
+		<set name='OPT.WARNINGS' value='-warnings '/>
+		<set name='OUTPUTPATH' value='$(SBS_BUILD_DIR)'/>
+		<set name='BLDINF_OUTPUTPATH' value='$(SBS_BUILD_DIR)'/>
+		<set name='RC' value='$(MWWINRC)'/>
+		<set name='RELEASEPATH' value='$(EPOCROOT)/epoc32/release'/>
+		<set name='SBSV1MAKE' value='$(EPOCROOT)/epoc32/tools/make$(DOTEXE)'/>
+		<set name='STDCPP_DEF' value='__SYMBIAN_STDCPP_SUPPORT__'/>
+		<set name='STDCPP_INCLUDE' value='$(EPOCINCLUDE)/stdapis'/>
+		<set name='STDCPP_WCHAR_DEF' value='__wchar_t_defined'/>
+		<set name='SYMLOOKUPUTIL' value='$(PERL) $(EPOCROOT)/epoc32/tools/sym_lkup_util.pl'/>
+		<set name='SYMLOOKUPARGS' value='--ignore_export_dir'/>
+		<set name='SYSTEMINCLUDE' value=''/>
+		<set name='TARGET' value='TARGET_WAS_NOT_SET_PROPERLY'/>
+		<set name='TARGETPATH' value=''/>
+		<set name='TARGETTYPE' value='TARGETTYPE_WAS_NOT_SET_PROPERLY'/>
+		<set name='USERINCLUDE' value=''/>
+		<set name='VARIANTPLATFORM' value='winscw'/>
+		<set name='PLATMACROS.WINDOWS' value='CW32 WINS WINSCW'/>
+		<set name='PLATMACROS.LINUX' value='$(PLATMACROS.WINDOWS)'/>
+	</var>
+
+	<var name="winscw_udeb" extends="winscw_base">
+		<set name='FULLVARIANTPATH' value='winscw/udeb'/>
+		<set name='VARIANTTYPE' value='udeb'/>
+
+		<append name='CDEFS' value='_DEBUG'/>
+		<append name='CFLAGS' value='-g -O0 -inline off'/>
+		<append name='LFLAGS' value='-g'/>
+	</var>
+
+	<var name="winscw_urel" extends="winscw_base">
+		<set name='FULLVARIANTPATH' value='winscw/urel'/>
+		<set name='VARIANTTYPE' value='urel'/>
+
+		<append name='CDEFS' value='NDEBUG'/>
+		<append name='CFLAGS' value='-O4,s'/>
+	</var>
+
+	<group name="winscw">
+		<varRef ref="winscw_urel"/>
+		<varRef ref="winscw_udeb"/>
+	</group>
+</build>

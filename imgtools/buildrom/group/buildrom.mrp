@@ -1,0 +1,10 @@
+component	dev_build_imgtools_buildrom
+source	\src\tools\dev\build\imgtools\buildrom
+binary	\src\tools\dev\build\imgtools\buildrom\group all
+exports	\src\tools\dev\build\imgtools\buildrom\group
+
+notes_source	\component_defs\release.src
+
+
+ipr T 
+

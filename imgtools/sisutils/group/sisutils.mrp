@@ -1,0 +1,8 @@
+component	dev_build_imgtools_sisutils
+source	\src\tools\dev\build\imgtools\sisutils
+binary	\src\tools\dev\build\imgtools\sisutils\group all
+exports	\src\tools\dev\build\imgtools\sisutils\group
+
+notes_source	\component_defs\release.src
+
+ipr T 

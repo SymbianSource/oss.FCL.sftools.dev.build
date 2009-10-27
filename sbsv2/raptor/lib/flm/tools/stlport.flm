@@ -1,0 +1,139 @@
+# Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+#
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+#
+# Contributors:
+#
+# Description:
+#
+
+# FLM to build STLport libraries.
+
+## Outputs - externally relevant targets that this FLM generates
+
+ifeq ($(OSTYPE),unix)
+STLPORT.OPT:=-fPIC -m32 -O2
+STLPORT.CXXFLAGS:=-m32 
+else
+STLPORT.OPT:=-O2
+STLPORT.CXXFLAGS:=
+endif
+
+
+SOURCE_ARCHIVE:=$(EXTENSION_ROOT)/$(SOURCE_ARCHIVE)
+
+EXTRACT_DIR:=$(EPOCBLD)$(TOOLPLATFORMDIR)
+STL_DIR:=$(EXTRACT_DIR)/STLport-$(STLPORT_VERSION)
+BUILD_DIR:=$(STL_DIR)/build/lib
+UNZIPPED:=$(STL_DIR)/unzipped.ok
+
+RELEASE_DIR:=$(EPOCROOT)/epoc32/release/tools2$(TOOLPLATFORMDIR)
+RELEASE_DIR_REL:=$(RELEASE_DIR)/rel
+RELEASE_DIR_DEB:=$(RELEASE_DIR)/deb
+WHATFLM:=
+
+ifeq ($(OSTYPE),unix)
+STLPORT.OPT:=-fPIC -m32 -O2
+STLPORT.CXXFLAGS:=-m32 
+else
+STLPORT.OPT:=-O2
+STLPORT.CXXFLAGS:=
+endif
+
+STL_REL_LIB_PATH:=$(STL_DIR)/lib/libstlport.a
+STL_DEB_LIB_PATH:=$(STL_DIR)/lib/libstlportg.a
+
+REL_LIB:=$(RELEASE_DIR_REL)/$(STL_REL_LIB_NAME)
+DEB_LIB:=$(RELEASE_DIR_DEB)/$(STL_REL_LIB_NAME)
+
+STL_HEADERS_PATH:=$(EPOCROOT)/epoc32/include/tools/stlport
+
+CLEANTARGETS:=
+CREATABLEPATHS:=
+
+define stlportcommon
+
+$(UNZIPPED): $(SOURCE_ARCHIVE) 
+	$(call startrule,unzip) \
+	$(UNZIP) -aa -o $(SOURCE_ARCHIVE) -d $(EXTRACT_DIR) && \
+	echo "SHELL:=$$$${SHELL}" > "$(BUILD_DIR)/raptor_gcc.mak" && \
+	$(GNUCAT) $(BUILD_DIR)/gcc.mak >> "$(BUILD_DIR)/raptor_gcc.mak" && \
+	$(GNUTOUCH) $(UNZIPPED) \
+	$(call endrule,unzip)
+
+CLEAN::
+	$(call startrule,clean) \
+	$(GNURM) -f $(UNZIPPED) ; \
+	$(GNURM) -rf $(STL_DIR)  \
+	$(call endrule,clean)
+
+CREATABLEPATHS:=$$(CREATABLEPATHS) $(dir $(UNZIPPED))
+endef
+
+# only declare targets once if they are the same for urel or udeb
+
+ifeq ($(TARGET_$(STL_DIR)),)
+$(eval $(stlportcommon))
+TARGET_$(STL_DIR):=1
+endif
+
+
+define stlportrel
+$(ALLTARGET):: $(REL_LIB)
+LIBRARY:: $(REL_LIB)
+
+$(REL_LIB): $(STL_REL_LIB_PATH)
+	$(call startrule,install) \
+	$(GNUCP) $(STL_REL_LIB_PATH) $(REL_LIB) \
+	$(call endrule,install)
+
+$(STL_REL_LIB_PATH): $(UNZIPPED)
+	$(call startrule,make) \
+	$(GNUMAKE38) -C "$(BUILD_DIR)" -fraptor_gcc.mak install-release-static LIB_SUFFIX= BASE_INSTALL_DIR=../.. EXTRA_CXXFLAGS='$(STLPORT.CXXFLAGS)' OPT='$(STLPORT.OPT)' \
+	$(call endrule,make)
+
+CREATABLEPATHS:=$$(CREATABLEPATHS) $(dir $(REL_LIB))
+CLEANTARGETS:=$$(CLEANTARGETS) $(REL_LIB)
+WHATFLM:=$$(WHATFLM) $(REL_LIB)
+endef
+
+ifeq ($(CFG_PATH),rel)
+$(eval $(stlportrel))
+endif
+
+define stlportdeb
+$(ALLTARGET):: $(DEB_LIB)
+LIBRARY:: $(DEB_LIB)
+
+$(DEB_LIB): $(STL_DEB_LIB_PATH)
+	$(call startrule,install) \
+	$(GNUCP) $(STL_DEB_LIB_PATH) $(DEB_LIB) \
+	$(call endrule,install)
+
+$(STL_DEB_LIB_PATH):  $(UNZIPPED)
+	$(call startrule,make) \
+	$(GNUMAKE38) -C "$(BUILD_DIR)" -fraptor_gcc.mak install-dbg-static LIB_SUFFIX= BASE_INSTALL_DIR=../.. EXTRA_CXXFLAGS='$(STLPORT.CXXFLAGS)' OPT='$(STLPORT.OPT)' \
+	$(call endrule,make)
+
+	
+CREATABLEPATHS:=$$(CREATABLE_PATHS) $(dir $(DEB_LIB))
+CLEANTARGETS:=$$(CLEANTARGETS) $(DEB_LIB)
+WHATFLM:=$$(WHATFLM) $(DEB_LIB)
+endef
+
+ifeq ($(CFG_PATH),deb)
+$(eval $(stlportdeb))
+endif
+
+$(eval $(call whatmacro,$(WHATFLM),WHATTEM))
+# make the output directories while reading makefile - some build engines prefer this
+$(call makepath,$(CREATABLEPATHS))
+
+## Clean up (using eval to avoid target specific variables)
+$(eval $(call GenerateStandardCleanTarget,$(CLEANTARGETS),))

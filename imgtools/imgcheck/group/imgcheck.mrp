@@ -1,0 +1,13 @@
+component	dev_build_imgtools_imgcheck
+
+source		\src\tools\dev\build\imgtools\imgcheck\inc
+source		\src\tools\dev\build\imgtools\imgcheck\src
+source		\src\tools\dev\build\imgtools\imgcheck\libimgutils
+source		\src\tools\dev\build\imgtools\imgcheck\libxml
+source		\src\tools\dev\build\imgtools\imgcheck\group
+binary		\src\tools\dev\build\imgtools\imgcheck\group all
+exports		\src\tools\dev\build\imgtools\imgcheck\group
+
+notes_source	\src\tools\dev\build\imgtools\imgcheck\group\release.txt
+
+ipr T 

@@ -1,0 +1,5 @@
+NOTESRC_RELEASER
+Nokia Corporation
+
+NOTESRC_RELEASE_REASON
+Postlinker(elf2e32) Release

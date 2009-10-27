@@ -1,0 +1,79 @@
+<?xml version='1.0' encoding='ISO-8859-1'?>
+<build xmlns='http://symbian.com/xml/build' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='http://symbian.com/xml/build ../../schema/build/2_0.xsd'>
+	<!-- Tools interfaces -->
+
+	<interface name='msvctools.flm' extends='base.flm' abstract='true'>
+		<param name='INSTALLPATH'/>
+		<param name='IMPORTLIBPATH'/>
+		<param name='OUTPUTPATH'/>
+		<param name='VARIANTPLATFORM'/>
+		<param name='PLATFORM' default='$(VARIANTPLATFORM)'/>
+		<param name='PRODUCT_INCLUDE'/>
+		<param name='RELEASEPATHROOT'/>
+		<param name='REQUESTEDTARGETEXT' default=''/>
+		<param name='VARIANTTYPE'/>
+		<param name='FULLVARIANTPATH'/>
+		<param name='PLATMACROS.WINDOWS'/>
+		<param name='PLATMACROS.LINUX'/>
+	</interface>
+
+	<interface name='msvctools.mmp' extends='msvctools.flm' abstract='true'>
+		<param name='LIBRARY' default=''/>
+		<param name='OPTION_MSVC' default=''/>
+		<param name='SOURCE' default=''/>
+		<param name='STATICLIBRARY' default=''/>
+		<param name='SYSTEMINCLUDE' default=''/>
+		<param name='TARGET'/>
+		<param name='TARGETPATH'/>
+		<param name='TARGETTYPE'/>
+		<param name='USERINCLUDE' default=''/>
+		<param name='WIN32_HEADERS' default=''/>
+		<param name='WIN32_LIBRARY' default=''/>
+	</interface>
+
+	<interface name='msvctools.toolchain' extends='msvctools.mmp' abstract='true'>
+		<param name='INCLUDE'/>
+		<param name='LIB'/>
+		<param name='OPT.BROWSEDB'/>
+		<param name='OPT.BROWSEFILE'/>
+		<param name='OPT.COMPILE'/>
+		<param name='OPT.DEFINE'/>
+		<param name='OPT.INCLUDE'/>
+		<param name='OPT.LISTING'/>
+		<param name='OPT.OBJECTFILE'/>
+		<param name='OPT.OUTFILE'/>
+		<param name='OPT.PDBFILE'/>
+		<param name='OPT.PREINCLUDE'/>
+		<param name='OPT.SUBSYSTEM'/>
+		<param name='OPT.SYSINCLUDE'/>
+		<param name='OPT.USERINCLUDE'/>
+		<param name='PREFIX.RESPONSEFILE'/>
+		<param name='BROWSETOOL'/>
+		<param name='BROWSEFLAGS'/>
+		<param name='CC'/>
+		<param name='CDEFS'/>
+		<param name='CFLAGS'/>
+		<param name='CFLAGS.DEFAULT.WARNLEVEL'/>
+		<param name='CFLAGS.LIB'/>
+	</interface>
+
+	<interface name='msvctools.exe' extends='msvctools.toolchain' flm='msvctools.flm'>
+		<param name='BASE_TYPE' default='exe'/>
+		<param name='BASE_MACRO' default='__EXE__'/>
+		<param name='LD'/>
+		<param name='LFLAGS'/>
+		<param name='OPT.IMPLIB'/>
+		<param name='CFLAGS.ADD' default=''/>
+		<param name='SUBSYSTEM' default='console'/>
+	</interface>
+
+	<interface name='msvctools.lib' extends='msvctools.toolchain' flm='msvctools.flm'>
+		<param name='BASE_TYPE' default='staticlib'/>
+		<param name='BASE_MACRO' default=''/>
+		<param name='AR'/>
+		<param name='ARFLAGS'/>
+		<param name='CFLAGS.ADD' default='_MT'/>
+		<param name='SUBSYSTEM' default='windows'/>
+	</interface>
+
+</build>

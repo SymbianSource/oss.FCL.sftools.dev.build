@@ -1,0 +1,42 @@
+/*
+* Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description: 
+*
+*/
+
+
+TARGET        imgcheck.exe
+TARGETTYPE    exe
+
+SOURCEPATH	../src
+SOURCE		cmdlinehandler.cpp depchecker.cpp hash.cpp main.cpp
+SOURCE		imgcheckmanager.cpp sidchecker.cpp vidchecker.cpp common.cpp checker.cpp reporter.cpp
+SOURCE		exceptionimplementation.cpp exceptionreporter.cpp
+SOURCE 		cmdlinewriter.cpp xmlwriter.cpp dbgflagchecker.cpp
+USERINCLUDE ../libimgutils/inc ../inc ../../imglib/compress
+USERINCLUDE   ../../imglib/boostlibrary
+
+OS_LAYER_SYSTEMINCLUDE_SYMBIAN
+SYSTEMINCLUDE ../libxml ../ 
+
+SYSTEMINCLUDE ../../imglib/inc ../../romtools/rofsbuild
+
+STATICLIBRARY imgutils xml2 wsock32 stlport.5.1 patchdataprocessor
+#ifdef TOOLS2_LINUX
+STATICLIBRARY   boost_thread-mgw34-mt-1_39_linux
+OPTION    GCC -pthread -O2 -Wno-uninitialized
+#else
+STATICLIBRARY   boost_thread-mgw34-mt-1_39_win32
+OPTION    GCC -mthreads -O2 -Wno-uninitialized
+#endif

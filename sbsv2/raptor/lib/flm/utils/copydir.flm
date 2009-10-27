@@ -1,0 +1,73 @@
+# Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+#
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+#
+# Contributors:
+#
+# Description:
+#
+
+# FLM to recursively copy one directory into another.
+
+# parameters
+#
+# SOURCE_DIR	the source directory, relative to EXTENSION_ROOT
+# DEST_DIR		the destination directory, relative to EPOCROOT
+
+SOURCEPATH:=$(EXTENSION_ROOT)/$(SOURCE_DIR)
+DESTPATH:=$(EPOCROOT)/$(DEST_DIR)
+
+# create the destination directory
+$(call makepath,$(DESTPATH))
+
+# macro for copying.
+define copydirectory
+
+# everything gets copied every time.
+ALL::
+	$(call startrule,copydir) \
+	$(GNUCP) -R $(SOURCEPATH)/* $(DESTPATH) && \
+	$(GNUCHMOD) -R a+rw $(DESTPATH) \
+	$(call endrule,copydir)
+
+# CLEAN removes the whole destination directory.
+CLEAN::
+	$(call startrule,clean) \
+	$(GNURM) -rf $(DESTPATH)  \
+	$(call endrule,clean)
+
+endef # copydirectory
+
+$(eval $(copydirectory))
+
+# for WHAT reporting we have to list every file because CBR
+# wont just take a directory name and include the contents.
+
+# normally we would just use the "whatmacro" macro, which
+# handles everything nicely for us, but we are likely to be
+# generating long lists of files here and might over-run the
+# space available for a single variable :-(
+
+FINDFILES:=$(GNUFIND) $(SOURCEPATH) -type f -print | $(GNUSED) 's!$(SOURCEPATH)!$(DESTPATH)!'
+
+define whatcopies
+
+WHAT::
+	@(echo "<whatlog bldinf='$(COMPONENT_META)' mmp='$(PROJECT_META)' config='$(SBS_CONFIGURATION)'>"; \
+	$(FINDFILES) | (read LINE; \
+	while [ $$$$? -eq 0 ]; do \
+		echo "<build>$$$$LINE</build>"; \
+		read LINE; \
+	done); \
+	echo "</whatlog>") $(if $(DESCRAMBLE),2>&1 | $(DESCRAMBLE))
+
+endef # whatcopies
+
+$(eval $(whatcopies))
+

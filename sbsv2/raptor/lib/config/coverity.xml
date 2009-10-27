@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<build xmlns="http://symbian.com/xml/build" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symbian.com/xml/build ../../schema/build/2_0.xsd">
+
+
+	<!-- Coverity testing -->
+	<var name="coverity">
+		<prepend name='CC' value='D:/apps/Coverity/bin/cov-translate.exe --run-compile '/>
+	</var>
+</build>
