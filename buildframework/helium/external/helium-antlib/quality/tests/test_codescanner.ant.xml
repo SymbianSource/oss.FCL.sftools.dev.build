@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : test_serializepath.ant.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test-quality" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>Helium antlib core serializepath tests.</description>
+
+    <taskdef resource="com/nokia/helium/quality/ant/antlib.xml" uri="http://www.nokia.com/helium" />
+    <property name="codescanner.output.dir" location="./cs"/>
+    <property name="codescanner.output.type" value="html"  />
+    <property name="codescanner.config" location="${basedir}/codescanner_config.xml"  />
+    <path id="src.path">
+        <pathelement path="./data" />
+    </path>
+
+    <condition property="do.codescanner.test">
+        <os family="windows" />
+    </condition>
+
+    <!-- is called prior to the test -->
+    <target name="setUp">
+        <delete dir="${codescanner.output.dir}" failonerror="false" />
+        <mkdir dir="${codescanner.output.dir}" />
+    </target>
+
+    <!-- is called after the test, even if that caused an error -->
+    <target name="tearDown">
+        <delete dir="${codescanner.output.dir}" failonerror="false" />
+    </target>
+
+    <target name="test-codescanner-linux" unless="do.codescanner.test">
+        <echo message="Codescanner supported only for windows" />
+    </target>
+
+    <!--
+     **************************************************************
+     ** test codescanner only for windows
+     **************************************************************
+    -->
+
+    <target name="test-codescanner" if="do.codescanner.test">
+        <hlm:codescanner dest="${codescanner.output.dir}"
+            format="${codescanner.output.type}"
+            configuration="${codescanner.config}">
+            <path refid="src.path"/>
+        </hlm:codescanner>
+        <au:assertLogContains text="Successfully executed codescanner"/>
+        <au:assertLogContains text="Output format: xml,html"/>
+        <au:assertLogContains text="data\src\exclude.txt"/>
+        <au:assertLogContains text="data\src2\exclude.txt"/>
+        <au:assertFileExists file="${codescanner.output.dir}/problemIndex.xml"/>
+    </target>
+
+    <!--
+     **************************************************************
+     ** test noargs
+     **************************************************************
+    -->
+    <target name="test-norargs" if="do.codescanner.test">
+        <au:expectfailure expectedMessage="'dest' attribute must be defined">
+            <hlm:codescanner/>
+        </au:expectfailure>
+    </target>
+
+    <!--
+     **************************************************************
+     ** test noconf
+     **************************************************************
+    -->
+    <target name="test-noconf" if="do.codescanner.test">
+        <au:expectfailure expectedMessage="'configuration' attribute must be defined">
+            <hlm:codescanner dest="${codescanner.output.dir}"/>
+        </au:expectfailure>
+    </target>
+
+    
+    <!--
+     **************************************************************
+     ** test noconf
+     **************************************************************
+    -->
+    <target name="test-codescanner-two-inputs" if="do.codescanner.test">
+        <path id="src.path.two.path">
+            <pathelement path="./data/src" />
+            <pathelement path="./data/src2" />
+        </path>
+        <hlm:codescanner dest="${codescanner.output.dir}"
+            format="${codescanner.output.type}"
+            configuration="${codescanner.config}">
+            <path refid="src.path.two.path"/>
+        </hlm:codescanner>
+        <au:assertLogContains text="Successfully executed codescanner"/>
+        <au:assertLogContains text="Output format: xml,html"/>
+        <au:assertLogContains text="data\src\exclude.txt"/>
+        <au:assertLogContains text="data\src2\exclude.txt"/>
+        <au:assertFileExists file="${codescanner.output.dir}/problemIndex.xml"/>
+    </target>
+</project>

@@ -1,0 +1,11 @@
+--- oldevalidmd5.pm	Mon Mar 12 13:49:20 2007
++++ evalidmd5.pm	Fri Aug 10 10:29:34 2007
+@@ -223,7 +223,7 @@
+     open LIST, "$iListFile" or croak "Cannot open $iListFile\n";
+     while(<LIST>)
+     {
+-      my $iFileName = $iDir."/".$_;
++      chomp(my $iFileName = $iDir."/".$_);
+       if(-e $iFileName)
+       {
+         # The listed file exists add to the @iFileList

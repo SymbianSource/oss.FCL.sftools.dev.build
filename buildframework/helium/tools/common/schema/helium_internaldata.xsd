@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2008 rel. 2 sp2 (http://www.altova.com) by William Bernardet (None) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<xs:complexType name="T_tasks">
+		<xs:sequence>
+			<xs:element ref="task" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="T_taskRef">
+		<xs:attribute name="thread" type="xs:string"/>
+		<xs:attribute name="startTime" type="xs:long" use="required"/>
+		<xs:attribute name="reference" type="xs:string"/>
+		<xs:attribute name="endTime" type="xs:long" use="required"/>
+	</xs:complexType>
+	<xs:complexType name="T_task">
+		<xs:attribute name="name" type="xs:string" use="required"/>
+		<xs:attribute name="id" type="xs:string"/>
+	</xs:complexType>
+	<xs:complexType name="T_targets">
+		<xs:sequence>
+			<xs:element ref="target"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="T_targetRef">
+		<xs:sequence>
+			<xs:element ref="taskRef" maxOccurs="unbounded"/>
+		</xs:sequence>
+		<xs:attribute name="thread" type="xs:string"/>
+		<xs:attribute name="startTime" type="xs:long" use="required"/>
+		<xs:attribute name="reference" type="xs:string" use="required"/>
+		<xs:attribute name="endTime" type="xs:long" use="required"/>
+	</xs:complexType>
+	<xs:complexType name="T_target">
+		<xs:attribute name="name" type="xs:string" use="required"/>
+		<xs:attribute ref="line" use="required"/>
+		<xs:attribute name="id" type="xs:string" use="required"/>
+		<xs:attribute ref="file" use="required"/>
+	</xs:complexType>
+	<xs:complexType name="T_statistics">
+		<xs:sequence>
+			<xs:element ref="database"/>
+			<xs:element ref="targets"/>
+			<xs:element ref="tasks"/>
+			<xs:element ref="executionTree"/>
+			<xs:element ref="properties"/>
+		</xs:sequence>
+		<xs:attribute ref="version" use="required"/>
+	</xs:complexType>
+	<xs:complexType name="T_property">
+		<xs:attribute ref="value" use="required"/>
+		<xs:attribute name="name" use="required"/>
+	</xs:complexType>
+	<xs:complexType name="T_properties">
+		<xs:sequence>
+			<xs:element ref="property" maxOccurs="unbounded"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="T_executionTree">
+		<xs:sequence>
+			<xs:element ref="build"/>
+		</xs:sequence>
+	</xs:complexType>
+	<xs:complexType name="T_build">
+		<xs:sequence>
+			<xs:element ref="targetRef"/>
+		</xs:sequence>
+		<xs:attribute name="thread" type="xs:string"/>
+		<xs:attribute name="startTime" type="xs:long" use="required"/>
+		<xs:attribute name="name" use="required"/>
+		<xs:attribute name="endTime" type="xs:long" use="required"/>
+	</xs:complexType>
+	<xs:attribute name="version">
+		<xs:simpleType>
+			<xs:restriction base="xs:string">
+				<xs:enumeration value="1.0"/>
+			</xs:restriction>
+		</xs:simpleType>
+	</xs:attribute>
+	<xs:attribute name="value"/>
+	<xs:attribute name="line" type="xs:int"/>
+	<xs:attribute name="file" type="xs:string"/>
+	<xs:element name="tasks" type="T_tasks"/>
+	<xs:element name="taskRef" type="T_taskRef"/>
+	<xs:element name="task" type="T_task"/>
+	<xs:element name="targets" type="T_targets"/>
+	<xs:element name="targetRef" type="T_targetRef"/>
+	<xs:element name="target" type="T_target"/>
+	<xs:element name="statistics" type="T_statistics">
+		<xs:key name="targetKey">
+			<xs:selector xpath="./targets/target"/>
+			<xs:field xpath="@id"/>
+		</xs:key>
+		<xs:keyref name="targetKeyRef" refer="targetKey">
+			<xs:selector xpath="./executionTree/targetRef"/>
+			<xs:field xpath="@reference"/>
+		</xs:keyref>
+		<xs:key name="taskKey">
+			<xs:selector xpath="./tasks/task"/>
+			<xs:field xpath="@id"/>
+		</xs:key>
+		<xs:keyref name="taskKeyRef" refer="taskKey">
+			<xs:selector xpath="./executionTree/taskRef"/>
+			<xs:field xpath="@reference"/>
+		</xs:keyref>
+	</xs:element>
+	<xs:element name="property" type="T_property"/>
+	<xs:element name="properties" type="T_properties"/>
+	<xs:element name="executionTree" type="T_executionTree"/>
+	<xs:element name="database" type="xs:string"/>
+	<xs:element name="build" type="T_build"/>
+	<xs:complexType name="T_database"/>
+</xs:schema>

@@ -1,0 +1,5 @@
+// <branchInfo originator="prozeniu" error="wiki-07wk22-002" since="07-05-22" category="fix">
+// Since Catalogs is not compiling at this point, and we are not building it, don't try to
+// pull it into the rom.  Also, tfxserver is crashing, so don't build or pull it in either.
+// </branchInfo>
+// BRANCH 07-05-22

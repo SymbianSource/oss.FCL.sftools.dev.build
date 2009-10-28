@@ -1,0 +1,29 @@
+
+    2:  ASM: a very small and fast Java bytecode manipulation framework
+    3:  Copyright (c) 2000-2005 INRIA, France Telecom
+    4:  Copyright (c) 2004, Eugene Kuleshov
+    4:  All rights reserved.
+    5: 
+    6:  Redistribution and use in source and binary forms, with or without
+    7:  modification, are permitted provided that the following conditions
+    8:  are met:
+    9:  1. Redistributions of source code must retain the above copyright
+   10:     notice, this list of conditions and the following disclaimer.
+   11:  2. Redistributions in binary form must reproduce the above copyright
+   12:     notice, this list of conditions and the following disclaimer in the
+   13:     documentation and/or other materials provided with the distribution.
+   14:  3. Neither the name of the copyright holders nor the names of its
+   15:     contributors may be used to endorse or promote products derived from
+   16:     this software without specific prior written permission.
+   17: 
+   18:  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+   19:  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+   20:  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+   21:  ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+   22:  LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+   23:  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+   24:  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+   25:  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+   26:  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+   27:  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+   28:  THE POSSIBILITY OF SUCH DAMAGE.

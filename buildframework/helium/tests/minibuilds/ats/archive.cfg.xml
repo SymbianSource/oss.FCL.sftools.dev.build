@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<build>
+    <config abstract="true">
+        <set name="max.uncompressed.size" value="2000000000"/>
+        <set name="max.files.per.archive" value="65000"/>
+        <set name="archive.tool" value="7za"/>
+        <set name="root.dir" value="${build.drive}\"/>
+        <set name="temp.build.dir" value="${temp.build.dir}"/>
+        
+
+        <config name="minibuild_archive" abstract="true">
+            <set name="archives.dir" value="${zips.build.dir}"/>
+            <config>
+	            <set name="root.dir" value="${build.drive}\s60\app\organizer\clock"/>
+                <set name="name" value="s60_app_organizer_clock"/>
+                <set name="include" value="**"/>
+                <set name="exclude" value="**/_ccmwaid.inf"/>
+            </config>
+            <!--<config>
+	            <set name="root.dir" value="${build.drive}\"/>
+                <set name="name" value="s60_app_organizer_clock_binary"/>
+                <set name="scanners" value="abld.what"/>
+                <set name="abld.buildpath" value="${build.drive}\s60\app\organizer\clock\group"/>
+                <set name="include" value="**"/>
+                <set name="exclude" value="**/_ccmwaid.inf"/>
+            </config>-->
+    	</config>
+
+	</config>
+</build>
+  

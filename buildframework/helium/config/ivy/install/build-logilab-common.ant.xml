@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : build-logilab-common.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="build-logilab-common" xmlns:ivy="antlib:org.apache.ivy.ant">
+    <description>Logilab library installation script.</description>
+    <target name="install">
+        <echo>
+          unzipping artifact: 
+          organisation=${artifact.organisation} 
+          module=${artifact.module} 
+          revision=${artifact.revision}
+          artifact=${artifact.artifact}
+          type=${artifact.type}
+          ext=${artifact.ext}
+          origin=${artifact.origin}
+          local=${artifact.local}
+          size=${artifact.size}
+          file=${artifact.file}
+          helium.dir=${helium.dir}
+        </echo>
+        
+        <bunzip2 src="${artifact.file}" dest="${artifact.file}.tar"/>
+        <untar src="${artifact.file}.tar" dest="${helium.dir}/external/python/lib/2.5"/>
+        <move todir="${helium.dir}/external/python/lib/2.5/logilab/common" flatten="true" overwrite="true">
+            <fileset dir="${helium.dir}/external/python/lib/2.5" includes="logilab-common*/**"/>
+        </move>
+        <touch file="${helium.dir}/external/python/lib/2.5/logilab/__init__.py"/>
+
+    </target>
+</project>

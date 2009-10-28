@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema targetNamespace="org.apache.ant.antunit"
+           xmlns:au="org.apache.ant.antunit"
+           xmlns:ant="ant.apache.org"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+    
+    <xs:element name="assertPropertyEquals">
+    <xs:complexType>
+        <xs:attribute name="name" type="xs:string"/>
+        <xs:attribute name="value" type="xs:string"/>
+    </xs:complexType>
+    </xs:element>
+    <xs:element name="assertLogDoesntContain">
+    <xs:complexType>
+        <xs:attribute name="text" type="xs:string"/>
+    </xs:complexType>
+    </xs:element>
+    <xs:element name="assertPropertySet">
+    <xs:complexType>
+        <xs:attribute name="name" type="xs:string"/>
+    </xs:complexType>
+    </xs:element>
+   
+</xs:schema>

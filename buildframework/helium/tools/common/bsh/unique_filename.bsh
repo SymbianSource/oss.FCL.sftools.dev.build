@@ -1,0 +1,11 @@
+import java.io.File;
+String counter = project.getProperty(".unique.counter");
+int count;
+if (counter == null){
+	count = 0;
+}else{
+	count = Integer.valueOf(counter) + 1;
+}
+project.setProperty(".unique.counter", ""+count);
+targetname = (String.format("%016d",count) + "_"+new File(source).getName());
+self.addMappedName(targetname);

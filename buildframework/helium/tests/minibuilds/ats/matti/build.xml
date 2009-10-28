@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : build.xml
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+Contains the configuration variables for the minibuild testing of MATTI.
+============================================================================
+-->
+<project name="minibuild.ats" default="minibuild-ats" xmlns:au="org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <property environment="env"/>
+    <import file="../../site/${env.TEAM}.ant.xml" />
+
+    <!-- Enable Helium internal assertion checking. -->
+    <property name="hlm.enable.asserts" value="1" />
+        
+    <property name="build.name" value="minibuild_ats" />
+    <property name="major.version" value="0" />
+    <property name="minor.version" value="0" />
+    <property name="build.drive" value="z:" />
+    
+    <!-- MATTI testing parameters-->
+    <property name="enabled.matti" value="1" />
+    <property name="enabled.ats" value="1" />
+	<property name="matti.scripts" value="${helium.dir}\testconfig\ats3\matti\script" />
+	<property name="template.file" value="${helium.dir}\tools\common\python\lib\ats3\matti\template\matti_demo.xml" />
+	<property name="ats.sis.images.dir" location="${helium.dir}\testconfig\ats3\matti\sis" />
+    <property name="ats.image.type" value="variant" />
+	<property name="ats.product.name" value="" />
+	<property name="ats.email.list" value="" />
+	<property name="ats.plan.name" value="" />
+	<property name="ats.flashfiles.minlimit" value="2" />
+	<property name="ats.target.platform" value="armv5 urel" />
+	<property name="ats.script.type" value="import" />
+	<property name="ats.product.hwid" value="" />
+    <property name="core.build.version" value="1" />
+    <property name="build.id" value="001" />
+	<property name="ats.testrun.name" value="${build.id}_${ats.product.name}_${core.build.version}" />
+	<property name="ats.test.timeout" value="60" />
+    <property name="ats.output.dir" location="${build.drive}\output\ats" />
+    <property name="ats.sisfiles.minlimit" value="1" />
+
+    <!--ats3 testing properties-->
+    <property name="tsrc.data.dir" value="data_rom" />
+    <property name="ats.ctc.enabled" value="True" />
+    <property name="ats.flashfiles.minlimit" value="2"/>
+ 
+    <property name="ta.flag.list" value="TA_M, TA_MU, TA_MMAPPFW,TA_MM"/>
+    <property name="ido.build.filter" value="${ta.flag.list},dfs_build"/>
+   <property name="ats.server" value="4fio00105:8080"/>
+    <property name="release.images.dir" value="${helium.dir}\testconfig\ats3\matti\variant_images" />
+		
+    <!-- build configuration -->
+    <property name="sysdef.configurations.list" value="helium_minibuild_matti_compile" />
+    <path id="system.definition.files">
+        <fileset dir="." includes="*.sysdef.xml"/>
+    </path>
+<!--    
+    <property name="build.system" value="ec-helium" />
+-->	
+	<property name="rvct.version" value="22_616"/>
+	<!-- Archiving configuration-->
+	<property name="zip.config.file" location="archive.cfg.xml"/>
+	<property name="zips.ee.spec.name" value="minibuild_archive"/>
+	
+    <!-- Synergy is not configured -->
+    <property name="skip.password.validation" value="1"/>
+    
+    <import file="${helium.dir}/helium.ant.xml"/>
+    
+   <!-- Run the full sequence of target for the minibuild. ,mini-build-prep,compile-main,zip-ee,mini-build-check-->
+    <!--target name="minibuild-matti" depends="mini-build-cleanup,mini-build-prep,compile-main,matti-test"/-->
+    <target name="minibuild-matti" depends="mini-build-prep,ee-roms,matti-test"/>
+    
+    <!-- Prepare the minibuild. -->
+    <!--target name="mini-build-prep" depends="init-build-area,start-ant-log,diamonds,set-arm-version,prep-copy-symbiantools"/-->
+    <target name="mini-build-prep" depends="prep"/>
+    
+    <!-- Stubbing few targets for easy testing with dragonfly ... -->
+    <target name="prep-drive" depends="build-number"/>
+    <target name="dragonfly-prep-drive"/>
+    <target name="do-prep-work-area"/>
+    <target name="create-bom"/>
+    <target name="check-env-prep"/>
+    <target name="prep-copy"/>
+    
+    <target name="mini-build-cleanup">
+        <delete verbose="true" includeemptydirs="true">
+            <fileset dir="${build.drive}/" casesensitive="false">
+                <include name="makefile"/>
+                <include name="*.mk"/>
+            	<include name="ecloud_tmp_*/**"/>
+            	<include name="emake.*"/>            	
+                <include name="epoc32/build/**"/>
+                <include name="epoc32/rombuild/*/**"/>
+                <include name="timestart.txt"/>
+                <include name="timestop.txt"/>
+            </fileset>
+        </delete>
+    </target>
+    
+    <target name="mini-build-check">
+    	<!-- Check if prep has set some prop correctly... -->
+        <echo>'${arm.compiler.version}'</echo>
+        <au:assertMatches string="${arm.compiler.version}" pattern="RVCT2\.2 \[Build 616\]" casesensitive="false" multiline="true"/>
+
+        <!-- Check if compile-main step did what expected... -->
+    	<au:assertFileExists file="${canonical.sysdef.file}"/>
+        <au:assertFileExists file="${build.drive}/Makefile"/>
+        <au:assertFileExists file="${build.drive}/emake.data"/>
+        <au:assertFileExists file="${build.log.dir}/${build.id}.helium_minibuild_compile_run_emake.bat"/>
+    	
+    	
+    	<!-- Checking the zip generation -->
+    	<au:assertFileExists file="${zips.build.dir}/s60_app_organizer_clock_binary.zip"/>
+    	<au:assertFileExists file="${zips.build.dir}/s60_app_organizer_clock.zip"/>    	
+    </target>
+    
+	
+</project>
+
+    

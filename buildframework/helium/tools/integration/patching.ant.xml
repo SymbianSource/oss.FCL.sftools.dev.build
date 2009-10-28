@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : patching.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="patching">
+    <description>Patching of S60 files.</description>
+    
+    <!--
+        Hack macro this macro enables to hack a file.
+        The macro check if the file needs to be patched if keyword regex doesn't match.
+        
+        Example:
+        <pre>
+        <hlm:hackMacro file="${build.drive}/epoc32/tools/variant/variant.cfg" keyword="ENABLE_ABIV2_MODE" regex="(.hrh$)" replace="\1\nENABLE_ABIV2_MODE"/>        
+        </pre>
+    -->
+    <macrodef name="hackMacro" uri="http://www.nokia.com/helium">
+        <attribute name="file"/>
+        <attribute name="keyword"/>
+        <attribute name="regex"/>
+        <attribute name="replace"/>
+        <attribute name="encoding" default="utf-8"/>
+        <sequential>
+            <script language="jython" setbeans="false">
+                <![CDATA[
+import re
+import os
+import codecs
+import traceback
+keyword = r'@{keyword}'
+filename = r'@{file}'
+regex = r'@{regex}'
+replace = r'@{replace}'
+encoding = r'@{encoding}'
+if os.path.exists(filename):
+    try:
+        f = codecs.open(filename, 'r', encoding)
+        content = f.read()
+        f.close()
+        if re.search(keyword, content, re.M | re.DOTALL) == None:
+            self.log("Hacking %s" % filename)
+            content = re.compile(regex, re.M | re.DOTALL).sub(replace, content)
+            f = codecs.open(filename, 'w+', encoding)
+            f.write(content)
+            f.close()
+        else:
+            self.log(str("File %s matching keyword." % filename))
+    except Exception, e:
+        print traceback.format_exc()
+else:
+    self.log(str("Could not find the file %s." % filename))
+                ]]>
+            </script>            
+        </sequential>
+    </macrodef>
+    
+    
+    <!-- Add new iby file includes to s60.iby 
+
+It uses a property [i]iby.include.list[/i] to list the iby-files (comma separated) that should be included in the s60.iby.
+
+Target first removes any existing includes to prevent duplicates. 
+Only problem with this one is that it does this by replacing the existing include with a line separator so the s60.iby will grow all the time.
+-->
+    <target name="modify-s60-iby">
+        <!-- Restore backup -->
+        <move file="${build.drive}/epoc32/rom/include/s60.iby.orig" tofile="${build.drive}/epoc32/rom/include/s60.iby" failonerror="false"/>
+        <!-- Create backup -->
+        <copy file="${build.drive}/epoc32/rom/include/s60.iby" tofile="${build.drive}/epoc32/rom/include/s60.iby.orig" failonerror="false"/>
+        <for list="${iby.include.list}" delimiter="," param="iby.name" >
+            <sequential>
+                <!-- First remove iby file include if it already exists to prevent duplicate includes -->
+                <replace file="${build.drive}/epoc32/rom/include/s60.iby" summary="true">
+                    <replacetoken>
+                        <![CDATA[#endif]]>
+                    </replacetoken>
+                    <replacevalue>
+                        <![CDATA[#include <@{iby.name}>
+#endif]]></replacevalue>
+                </replace>
+            </sequential>
+        </for>
+    </target>
+
+</project>

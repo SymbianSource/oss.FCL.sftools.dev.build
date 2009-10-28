@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+<build>
+
+	<config name="delivery" abstract="true">
+		<set  name="database" value="to1tobet"/>
+		<set  name="thread" value="1"/>
+		<set  name="dir" value="C:\temp"/>
+		
+    	<config type="snapshot" name="2D_OpenVG_1_0-to1tobet#ekhuq:project:ou1ape3#1"/>
+    </config>
+    
+</build>

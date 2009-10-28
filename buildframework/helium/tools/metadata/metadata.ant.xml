@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : metadata.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="metadata" xmlns:hlm="http://www.nokia.com/helium">
+    <description>
+    Metadata related ant macros and targets
+    </description>
+
+    <macrodef name="generateBuildStatus" uri="http://www.nokia.com/helium">
+        <attribute name="output-dir" default="${build.signal.status.dir}"/>
+        <attribute name="dbfile" default="${metadata.dbfile}" />
+        <attribute name="file" />
+        <sequential>
+            <mkdir dir="@{output-dir}" />
+            <fmpp sourceFile="${helium.dir}/tools/common/templates/log/build_status.xml.ftl"
+                         outputfile="@{output-dir}/@{file}.status.xml">
+                <freemarkerLinks expandProperties="yes">
+                    macro: ${helium.dir}/tools/common/templates/macro
+                </freemarkerLinks>
+                <data expandProperties="yes">
+                    dbPath: @{dbfile}
+                    logfile: @{file}
+                    ant: antProperties()
+                </data>
+            </fmpp>
+            <fmpp sourceFile="${build.status.email.template}"
+                         outputfile="@{output-dir}/@{file}.status.html">
+                <freemarkerLinks expandProperties="yes">
+                    macro: ${helium.dir}/tools/common/templates/macro
+                </freemarkerLinks>
+                <data expandProperties="yes">
+                    dbPath: @{dbfile}
+                    logfile: @{file}
+                    ant: antProperties()
+                </data>
+            </fmpp>
+        </sequential>
+    </macrodef>
+</project>

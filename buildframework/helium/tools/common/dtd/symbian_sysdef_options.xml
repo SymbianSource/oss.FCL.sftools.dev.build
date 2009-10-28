@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : symbian_sysdef_options.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<!DOCTYPE SystemDefinition [<!ELEMENT SystemDefinition (systemModel?, build?)>
+ <!ATTLIST SystemDefinition
+  name CDATA #REQUIRED
+  schema CDATA #REQUIRED>
+ <!ELEMENT systemModel (layer+)>
+ <!ELEMENT layer (logicalset* | module*)*>
+ <!ATTLIST layer
+  name CDATA #REQUIRED
+  levels CDATA #IMPLIED
+  span CDATA #IMPLIED>
+ <!ELEMENT logicalset (logicalsubset* | module* | unit* | package* | prebuilt*)*>
+ <!ATTLIST logicalset name CDATA #REQUIRED>
+ <!ELEMENT logicalsubset (module* | unit* | package* | prebuilt*)*>
+ <!ATTLIST logicalsubset name CDATA #REQUIRED>
+ <!ELEMENT module (component* | unit* | package* | prebuilt*)*>
+ <!ATTLIST module
+  name CDATA #REQUIRED
+  level CDATA #IMPLIED>
+ <!ELEMENT component (unit* | package* | prebuilt*)*>
+ <!ATTLIST component name CDATA #REQUIRED>
+ <!ELEMENT unit EMPTY>
+ <!ATTLIST unit
+  unitID ID #REQUIRED
+  name CDATA #REQUIRED
+  mrp CDATA #REQUIRED
+  filter CDATA #IMPLIED
+  bldFile CDATA #REQUIRED
+  priority CDATA #IMPLIED
+  contract CDATA #IMPLIED>
+ <!ELEMENT package EMPTY>
+ <!ATTLIST package
+  name CDATA #REQUIRED
+  mrp CDATA #REQUIRED
+  filter CDATA #IMPLIED
+  contract CDATA #IMPLIED>
+ <!ELEMENT prebuilt EMPTY>
+ <!ATTLIST prebuilt
+  name CDATA #REQUIRED
+  version CDATA #REQUIRED
+  late (Y|N) #IMPLIED
+  filter CDATA #IMPLIED
+  contract CDATA #IMPLIED>
+ <!ELEMENT build (option* | target+ | targetList+ | unitList+ | configuration+)*>
+ <!ELEMENT unitList (unitRef+)>
+ <!ATTLIST unitList
+  name ID #REQUIRED
+  description CDATA #REQUIRED>
+ <!ELEMENT unitRef EMPTY>
+ <!ATTLIST unitRef unit IDREF #REQUIRED>
+ <!ELEMENT targetList EMPTY>
+ <!ATTLIST targetList
+  name ID #REQUIRED
+  description CDATA #REQUIRED
+  target IDREFS #REQUIRED>
+ <!ELEMENT target EMPTY>
+ <!ATTLIST target
+  name ID #REQUIRED
+  abldTarget CDATA #REQUIRED
+  description CDATA #REQUIRED>
+ <!ELEMENT option EMPTY>
+ <!ATTLIST option
+  name ID #REQUIRED
+  abldOption CDATA #REQUIRED
+  description CDATA #REQUIRED
+  enable (Y | N | y | n) #REQUIRED>
+ <!ELEMENT configuration (unitListRef+ | layerRef+ | task+)*>
+ <!ATTLIST configuration
+  name ID #REQUIRED
+  description CDATA #REQUIRED
+  filter CDATA #REQUIRED>
+ <!ELEMENT task ( unitListRef* , (buildLayer | specialInstructions))>
+ <!ELEMENT unitListRef EMPTY>
+ <!ATTLIST unitListRef unitList IDREF #REQUIRED>
+ <!ELEMENT layerRef EMPTY>
+ <!ATTLIST layerRef layerName CDATA #REQUIRED>
+ <!ELEMENT buildLayer EMPTY>
+ <!ATTLIST buildLayer
+  command CDATA #REQUIRED
+  targetList IDREFS #IMPLIED
+  unitParallel (Y | N | y | n) #REQUIRED
+  targetParallel (Y | N | y | n) #IMPLIED>
+ <!ELEMENT specialInstructions EMPTY>
+ <!ATTLIST specialInstructions
+  name CDATA #REQUIRED
+  cwd CDATA #REQUIRED
+  command CDATA #REQUIRED>  
+]>
+<SystemDefinition name="symbian_sysdef_options_xml" schema="1.4.0">
+  <build>
+    <option name="KEEPGOING" abldOption="-keepgoing" description="Causes make to keepgoing on errors" enable="Y"/>
+    <option name="SAVESPACE" abldOption="-savespace" description="Causes the removal of intermediate files" enable="Y"/>
+    <option name="NO_DEBUG" abldOption="-no_debug" description="Causes the toolchain not to generate debug tables" enable="N"/>
+    <target name="WINS" abldTarget="wins" description="MSVC Compiler"/>
+    <target name="WINS_REL" abldTarget="wins urel" description="MSVC Compiler"/>
+    <target name="WINS_DEB" abldTarget="wins udeb" description="MSVC Compiler"/>
+    <target name="WINSCW" abldTarget="winscw" description="CodeWarrior Compiler"/>
+    <target name="WINSCW_REL" abldTarget="winscw urel" description="CodeWarrior Compiler"/>
+    <target name="WINSCW_DEB" abldTarget="winscw udeb" description="CodeWarrior Compiler"/>
+    <target name="TOOLS" abldTarget="tools" description="MSVC Compiler for Tools"/>
+    <target name="TOOLS_REL" abldTarget="tools rel" description="MSVC Compiler for Tools Release mode only"/>
+    <target name="TOOLS2" abldTarget="tools2" description="MinGW GCC Compiler for Tools"/>
+    <target name="TOOLS2_REL" abldTarget="tools2 rel" description="MinGW GCC Compiler for Tools Release mode only"/>
+    <target name="ARMV5" abldTarget="armv5" description="RVCT Compiler"/>
+    <target name="ARMV5_REL" abldTarget="armv5 urel" description="RVCT Compiler"/>
+    <target name="ARMV5_DEB" abldTarget="armv5 udeb" description="RVCT Compiler"/>
+
+    <!-- Aditional Targets -->
+    <target name="CWTOOLS" abldTarget="cwtools" description="CodeWarrior Compiler for Tools"/> <!-- Not supported -->
+    <target name="CWTOOLS_REL" abldTarget="cwtools rel" description="CodeWarrior Compiler for Tools Release mode only"/> <!-- Not supported -->
+    <target name="GCCXML" abldTarget="gccxml" description="GCCXML for Code comparision tools"/>
+    <target name="GCCXML_REL" abldTarget="gccxml urel" description="GCCXML for Code comparision tools release mode only"/>
+    
+    <targetList name="default_9.0" description="Main Targets for 9.0" target="WINSCW ARMV5"/>
+    <targetList name="default_9.0_rel" description="Main Targets for 9.0_rel" target="WINSCW_REL ARMV5_REL"/>
+    <targetList name="default_9.0_deb" description="Main Targets for 9.0_deb" target="WINSCW_DEB ARMV5_DEB"/>
+    <targetList name="tools" description="tools Targets" target="TOOLS"/>
+    <targetList name="tools_rel" description="tools Release Targets" target="TOOLS_REL"/>
+    <targetList name="tools2" description="tools Targets" target="TOOLS2"/>
+    <targetList name="tools2_rel" description="tools Release Targets" target="TOOLS2_REL"/>
+    <targetList name="gccxml" description="tools Targets" target="GCCXML"/>
+    <targetList name="gccxml_rel" description="tools Release Targets" target="GCCXML_REL"/>
+  </build>
+</SystemDefinition>

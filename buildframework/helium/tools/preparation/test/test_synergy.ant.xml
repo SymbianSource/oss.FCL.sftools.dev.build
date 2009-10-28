@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : test_ci.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test_synergy" xmlns:au="org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <property environment="env" />
+    <property name="publish.root.dir" value="${env.TEMP}" />
+    <property name="helium.dir" location="../../.." />
+    <import file="../../../helium.ant.xml" />
+
+    <target name="test-ccm-preparation-log-extraction">
+        <delete file="${env.TEMP}/temp.log" failonerror="false"/>
+        <delete file="${env.TEMP}/temp.sqlite" failonerror="false"/>
+        <echo file="${env.TEMP}/temp.log">
+   [python] INFO:ccm.extra:Using CachedSessionProvider.
+   [python] INFO:preparation.ccmgetinput:Get a session for databasexxx
+   [python] INFO:ccm:Database path set using the GSCM database.
+   [python] INFO:ccm:Database engine set using the GSCM database.
+   [python] INFO:ccm:Getting router address.
+   [python] INFO:ccm:Opening session.
+   [python] INFO:preparation.ccmgetinput:Checking 'MinibuildDomain-50_200832:project:tr1test1#1'...Ok
+   [python] INFO:preparation.ccmgetinput:Checking 'MinibuildDomain/next'...Ok
+   [python] INFO:preparation.ccmgetinput:Checking purpose 'Insulated Development'...Ok
+   [python] INFO:preparation.ccmgetinput:Try to switch user to role: developer
+   [python] INFO:preparation.ccmgetinput:=== Stage=checkout = MinibuildDomain-50_200832:project:tr1test1#1
+   [python] INFO:preparation.ccmgetinput:++ Started at 13:25:41
+   [python] INFO:preparation.ccmgetinput:Project found: 'MinibuildDomain-user:project:tr1test1#1'
+   [python] INFO:preparation.ccmgetinput:Switching user to role: developer
+   [python] INFO:preparation.ccmgetinput:Validating release
+   [python] INFO:preparation.ccmgetinput:Current release: 'MinibuildDomain:next:releasedef:1'
+   [python] INFO:preparation.ccmgetinput:Configuration release: 'MinibuildDomain:next:releasedef:1'
+   [python] INFO:preparation.ccmgetinput:Updating...
+   [python] INFO:preparation.ccmgetinput:Looking for new projects in the check out.
+   [python] INFO:preparation.ccmgetinput:       Task he1cfnet#19381: vpnclient: maittola: TSW Error: TLIN-7MFBL5, vpncleaner, mcl
+   [python] INFO:preparation.ccmgetinput:Synchronizing ...
+   [python] INFO:preparation.ccmgetinput:       Updating 'E:\Build_E\user\ido_wa\minibuild_ido\MinibuildDomain'.
+   [python] INFO:preparation.ccmgetinput:       Updating 'E:\Build_E\user\ido_wa\minibuild_ido\MinibuildDomain\MinibuildDomain'.
+   [python] INFO:preparation.ccmgetinput:       Work area update: 25% complete...
+   [python] INFO:preparation.ccmgetinput:       Work area update: 50% complete...
+   [python] INFO:preparation.ccmgetinput:       Updating 'E:\Build_E\user\ido_wa\minibuild_ido\MinibuildDomain\MinibuildDomain'.
+   [python] INFO:preparation.ccmgetinput:       Work area update: 75% complete...
+   [python] INFO:preparation.ccmgetinput:       Work area update: 100% complete...
+   [python] INFO:preparation.ccmgetinput:Synchronization summary:
+   [python] INFO:preparation.ccmgetinput:       0 Update(s) for project MinibuildDomain-user
+   [python] INFO:preparation.ccmgetinput:       0 Update(s) for project helloworldapi-user
+   [python] INFO:preparation.ccmgetinput:       0 Update(s) for project helloworldcons-user
+   [python] INFO:preparation.ccmgetinput:       0 Conflict(s) for project MinibuildDomain-user
+   [python] INFO:preparation.ccmgetinput:       0 Conflict(s) for project helloworldapi-user
+   [python] INFO:preparation.ccmgetinput:       0 Conflict(s) for project helloworldcons-user
+   [python] INFO:preparation.ccmgetinput:Synchronization complete.
+   [python] INFO:preparation.ccmgetinput:Project: MinibuildDomain-user
+   [python] INFO:preparation.ccmgetinput:
+   [python] INFO:preparation.ccmgetinput:         No conflicts detected.
+   [python] INFO:preparation.ccmgetinput:
+   [python] INFO:preparation.ccmgetinput:Project: helloworldapi-user
+   [python] INFO:preparation.ccmgetinput:
+   [python] INFO:preparation.ccmgetinput:         No conflicts detected.
+   [python] INFO:preparation.ccmgetinput:
+   [python] INFO:preparation.ccmgetinput:Project: helloworldcons-user
+   [python] INFO:preparation.ccmgetinput:
+   [python] WARNING:preparation.ccmgetinput:databasexxx#5298       Implicitly included
+   [python] WARNING:preparation.ccmgetinput:databasexxx#5304       Implicit task from explicit object
+   [python] INFO:preparation.ccmgetinput:Switching user to role: developer
+   [python] INFO:preparation.ccmgetinput:++ Finished at 13:25:53
+   [python] INFO:ccm.extra:Closing the CachedSessionProvider.
+   [python] INFO:ccm.extra:Cleaning up opened sessions.
+        </echo>
+        <hlm:metadatarecord database="${env.TEMP}/temp.sqlite">
+            <hlm:textmetadatainput>
+                <fileset casesensitive="false" file="${env.TEMP}/temp.log" />
+                <metadatafilterset refid="filterset.test.ccm" />
+            </hlm:textmetadatainput>
+        </hlm:metadatarecord>
+        <hlm:generateBuildStatus dbfile="${env.TEMP}/temp.sqlite" output-dir="${env.TEMP}/signals" file="temp.log" />
+        <au:assertTrue>
+            <and>
+                <not>
+                    <hlm:hasSeverity severity="error" file="${env.TEMP}/signals/temp.log.status.xml"/>
+                </not>
+                <hlm:hasSeverity severity="warning" file="${env.TEMP}/signals/temp.log.status.xml"/>
+            </and>
+        </au:assertTrue>
+    </target>
+   
+    <target name="test-ccm-check">
+        <trycatch property="ccm-check.thrown">
+            <try>
+                <antcall target="ccm-check"/>
+                <if>
+                    <equals arg1="${ccm.session.created}" arg2="-1"/>
+                    <then>
+                        <au:assertTrue/>
+                    </then>
+                    <else>
+                        <au:assertTrue/>
+                    </else>
+                </if>
+                <au:assertLogContains text="CachedSessionProvider"/>
+            </try>
+        </trycatch>
+    </target> 
+</project>

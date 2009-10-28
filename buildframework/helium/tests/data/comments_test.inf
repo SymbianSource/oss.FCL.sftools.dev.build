@@ -1,0 +1,4 @@
+// <branchInfo originator="wbernard">
+// Fix target export, which cause issue when cleanexport.
+// </branchInfo>
+// BRANCH 07-02-07

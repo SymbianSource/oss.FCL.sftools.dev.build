@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : helium_distribution_test.cfg.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<build>
+    <config name="helium_subcon">
+        <set name="root.dir" value="${helium.dir}/.."/>
+        <set name="max.files.per.archive" value="65000"/>
+        <set name="archive.tool" value="7za"/>
+        <set name="archives.dir" value="${helium.subcon.build.location}"/>
+        <set name="temp.build.dir" value="${env.TEMP}"/>
+        <set name="name" value="helium_${helium.version}_subcon"/>
+        <set name="include" value="helium/**/*"/>
+        <set name="exclude" value="helium/**/.svn,helium/build/**/*,helium/**/*.pyc,helium/**/*.pyo,helium/**/distribution.policy.s60,helium/**/hlm_debug.log"/>
+        <set name="distribution.policy.s60" value="7"/>
+        <set name="ignore.missing.policyfiles" value="true"/>
+
+        <!-- Keeping the distribution policy files for Mercurial delivery. -->
+        <config name="helium_sf_hg">
+            <set name="name" value="helium_${helium.version}_sf_hg"/>
+            <set name="exclude" value="helium/**/.svn,helium/build/**/*,helium/**/*.pyc,helium/**/*.pyo,**/.classpath,**/.project,helium/**/distribution.policy.s60"/>
+        </config>
+        <!-- 
+             PDT inherits the subcon and remove the docs
+             generated doc will be added to the package later.
+          -->
+        <config name="helium_sf_pdt">
+            <set name="name" value="helium_${helium.version}_sf_pdt"/>
+            <append name="exclude" value="**/.classpath,**/.project,helium/**/distribution.policy.s60,helium/doc/**"/>                    
+        </config>
+
+        <config name="winimage">
+            <set name="name" value="helium_${helium.version}_subcon_winimage"/>
+            <set name="distribution.policy.s60" value="311"/>
+        </config>
+    </config>
+</build>

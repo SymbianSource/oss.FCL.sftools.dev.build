@@ -1,0 +1,69 @@
+
+   14: The 4Suite License, Version 1.1
+   15: -------------------------------
+   16: 
+   17: Copyright (c) 2000 Fourthought, Inc.  All rights reserved.
+   18: 
+   19: Redistribution and use in source and binary forms, with or without
+   20: modification, are permitted provided that the following conditions
+   21: are met:
+   22: 
+   23:  1. Redistributions of source code must retain the above copyright
+   24:     notice, this list of conditions and the following disclaimer.
+   25: 
+   26:  2. Redistributions in binary form must reproduce the above
+   27:     copyright notice, this list of conditions and the following
+   28:     disclaimer in the documentation and/or other materials provided
+   29:     with the distribution.
+   30: 
+   31:  3. The end-user documentation included with the redistribution,
+   32:     if any, must include the following acknowledgment:
+   33:        "This product includes software developed by
+   34:         Fourthought, Inc. (http://www.fourthought.com)."
+   35:     Alternately, this acknowledgment may appear in the software
+   36:     itself, if and wherever such third-party acknowledgments
+   37:     normally appear.
+   38: 
+   39:  4. The names "4Suite", "4Suite Server" and "Fourthought" must not
+   40:     be used to endorse or promote products derived from this
+   41:     software without prior written permission. For written
+   42:     permission, please contact info@fourthought.com.
+   43: 
+   44:  5. Products derived from this software may not be called "4Suite",
+   45:     nor may "4Suite" appear in their name, without prior written
+   46:     permission of Fourthought, Inc.
+   47: 
+   48: THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
+   49: WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+   50: MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+   51:  IN NO EVENT SHALL FOURTHOGHT, INC. OR ITS CONTRIBUTORS BE LIABLE
+   52: FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+   53: CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+   54: SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+   55: BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+   56: LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+   57: NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+   58: SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+   59: 
+   60: ===================================================================
+   61: 
+   62: This license is based on the Apache Software License, Version 1.1,
+   63: Copyright (c) 2000 The Apache Software Foundation.
+   64: All rights reserved.
+
+----
+
+    8: Copyright (c) 2000-2001 Alexandre Fayolle (France).
+    9: 
+   10: Permission to use, copy, modify, and distribute this software and its
+   11: documentation for any purpose and without fee is hereby granted,
+   12: provided that the above copyright notice appear in all copies and that
+   13: both that copyright notice and this permission notice appear in
+   14: supporting documentation.
+   15: 
+   16: THIS PROGRAM IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+   17: OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+   18: MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+----
+

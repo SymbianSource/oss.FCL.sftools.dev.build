@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<releaseInformation>
+	<releaseDetails>
+		<releaseID>
+			<service name="service"/>
+			<product name="product"/>
+			<release name="release_1_001"/>
+		</releaseID>
+		<dependsOf>
+			<service name="service"/>
+			<product name="product"/>
+			<release name="release_1"/>
+		</dependsOf>
+	</releaseDetails>
+
+    <servicePacks>
+        <servicePack name="SP1" reInstallNeeded="false">
+            <file name="sp1.zip"/>
+            <instructions name="specialInstructions.xml"/>
+        </servicePack>
+    </servicePacks>
+	<externalFiles/>
+</releaseInformation>

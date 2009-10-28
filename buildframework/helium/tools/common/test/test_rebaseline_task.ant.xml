@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : test_rebaseline_task.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test_rebaseline_task" xmlns:au="org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <property environment="env"/>
+    
+    <property name="helium.dir" location="../../.." />
+    <import file="../../../helium.ant.xml"/>
+
+
+    <target name="test-rebaseline-no-arguments-case">
+        <au:expectfailure expectedMessage="[hlm:rebaseline] Error: mandatory attributes are not defined - database projectName password">
+            <hlm:rebaseline/>
+        </au:expectfailure>
+    </target>
+
+    <target name="test-rebaseline-task-database-set-case">
+        <au:expectfailure expectedMessage="[hlm:rebaseline] Error: mandatory attributes are not defined - projectName password">
+            <hlm:rebaseline database="to1tobet"/>
+        </au:expectfailure>
+        <au:assertLogContains text="Set database to to1tobet" level="debug"/>
+    </target>
+
+    <target name="test-rebaseline-task-projectName-set-case">
+        <au:expectfailure expectedMessage="[hlm:rebaseline] Error: mandatory attributes are not defined - database password">
+            <hlm:rebaseline projectName="helium-to1tobet#helium_4.49:project:vc1s60p1#1"/>
+        </au:expectfailure>
+        <au:assertLogContains text="Set projectName to helium-to1tobet#helium_4.49:project:vc1s60p1#1" level="debug"/>
+    </target>
+
+    <target name="test-rebaseline-task-password-set-case">
+        <au:expectfailure expectedMessage="[hlm:rebaseline] Error: mandatory attributes are not defined - database projectName">
+            <hlm:rebaseline password="test"/>
+        </au:expectfailure>
+        <au:assertLogContains text="Set password to test" level="debug"/>
+    </target>
+
+    <target name="test-rebaseline-task-release-set-case">
+        <au:expectfailure expectedMessage="[hlm:rebaseline] Error: mandatory attributes are not defined - database projectName password">
+            <hlm:rebaseline release="tony/test"/>
+        </au:expectfailure>
+        <au:assertLogContains text="Set release to tony/test" level="debug"/>
+    </target>
+
+    <target name="test-rebaseline-task-baseline-set-case">
+        <au:expectfailure expectedMessage="[hlm:rebaseline] Error: mandatory attributes are not defined - database projectName password">
+            <hlm:rebaseline baseline="helium-to1tobet#helium_4.49:project:vc1s60p1#1"/>
+        </au:expectfailure>
+        <au:assertLogContains text="Set baseline to helium-to1tobet#helium_4.49:project:vc1s60p1#1" level="debug"/>
+    </target>
+
+    <target name="test-rebaseline-task-version-set-case">
+        <au:expectfailure expectedMessage="[hlm:rebaseline] Error: mandatory attributes are not defined - database projectName password">
+            <hlm:rebaseline version="RnD_2007wk49"/>
+        </au:expectfailure>
+        <au:assertLogContains text="Set version to RnD_2007wk49" level="debug"/>
+    </target>
+
+    <target name="test-rebaseline-task-releaseBaseline-set-case">
+        <au:expectfailure expectedMessage="[hlm:rebaseline] Error: mandatory attributes are not defined - database projectName password">
+            <hlm:rebaseline releaseBaseline="yes"/>
+        </au:expectfailure>
+        <au:assertLogContains text="Set releaseBaseline to true" level="debug"/>
+    </target>
+
+    <target name="test-rebaseline-task-leaveFolderswritable-set-case">
+        <au:expectfailure expectedMessage="[hlm:rebaseline] Error: mandatory attributes are not defined - database projectName password">
+            <hlm:rebaseline leaveFolderswritable="yes"/>
+        </au:expectfailure>
+        <au:assertLogContains text="Set leaveFolderswritable to true" level="debug"/>
+    </target>
+
+    <target name="test-rebaseline-task-disableTaskRebadging-set-case">
+        <au:expectfailure expectedMessage="[hlm:rebaseline] Error: mandatory attributes are not defined - database projectName password">
+            <hlm:rebaseline disableTaskRebadging="yes"/>
+        </au:expectfailure>
+        <au:assertLogContains text="Set disableTaskRebadging to true" level="debug"/>
+    </target>
+
+    <target name="test-rebaseline-task-rebadgeObjectVersions-set-case">
+        <au:expectfailure expectedMessage="[hlm:rebaseline] Error: mandatory attributes are not defined - database projectName password">
+            <hlm:rebaseline rebadgeObjectVersions="yes"/>
+        </au:expectfailure>
+        <au:assertLogContains text="Set rebadgeObjectVersions to true" level="debug"/>
+    </target>
+
+    <target name="test-rebaseline-task-baselineName-set-to-quiet-case">
+        <au:expectfailure expectedMessage="[hlm:rebaseline] Error: mandatory attributes are not defined - database projectName password">
+            <hlm:rebaseline baselineName="shoephone-RnD_2007wk49_01project:co1train#1"/>
+        </au:expectfailure>
+        <au:assertLogContains text="Set baselineName to shoephone-RnD_2007wk49_01project:co1train#1" level="debug"/>
+    </target>
+
+    <target name="test-rebaseline-task-useBranchReleaseMethodology-set-case">
+        <au:expectfailure expectedMessage="[hlm:rebaseline] Error: mandatory attributes are not defined - database projectName password">
+            <hlm:rebaseline useBranchReleaseMethodology="yes"/>
+        </au:expectfailure>
+        <au:assertLogContains text="Set useBranchReleaseMethodology to true" level="debug"/>
+    </target>
+
+    <target name="test-rebaseline-task-createBaselineForRollingReleaseTag-set-case">
+        <au:expectfailure expectedMessage="[hlm:rebaseline] Error: mandatory attributes are not defined - database projectName password">
+            <hlm:rebaseline createBaselineForRollingReleaseTag="yes"/>
+        </au:expectfailure>
+        <au:assertLogContains text="Set createBaselineForRollingReleaseTag to true" level="debug"/>
+    </target>
+
+    <target name="test-rebaseline-task-verbosity-set-to-quiet-case">
+        <au:expectfailure expectedMessage="[hlm:rebaseline] Error: mandatory attributes are not defined - database projectName password">
+            <hlm:rebaseline verbosity="0"/>
+        </au:expectfailure>
+        <au:assertLogContains text="Set verbosity to 0" level="debug"/>
+    </target>
+
+    <target name="test-rebaseline-task-verbosity-set-to-verbose-case">
+        <au:expectfailure expectedMessage="[hlm:rebaseline] Error: mandatory attributes are not defined - database projectName password">
+            <hlm:rebaseline verbosity="1"/>
+        </au:expectfailure>
+        <au:assertLogContains text="Set verbosity to 1" level="debug"/>
+    </target>
+
+    <target name="test-rebaseline-task-database-and-projectName-set-case">
+        <au:expectfailure expectedMessage="[hlm:rebaseline] Error: mandatory attributes are not defined - password">
+            <hlm:rebaseline database="to1tobet" projectName="helium-to1tobet#helium_4.49:project:vc1s60p1#1"/>
+        </au:expectfailure>
+    </target>
+
+    <target name="test-rebaseline-task-database-and-password-set-case">
+        <au:expectfailure expectedMessage="[hlm:rebaseline] Error: mandatory attributes are not defined - projectName">
+            <hlm:rebaseline database="to1tobet" password="test"/>
+        </au:expectfailure>
+    </target>
+
+    <target name="test-rebaseline-task-projectName-and-password-set-case">
+        <au:expectfailure expectedMessage="[hlm:rebaseline] Error: mandatory attributes are not defined - database">
+            <hlm:rebaseline projectName="helium-to1tobet#helium_4.49:project:vc1s60p1#1" password="test"/>
+        </au:expectfailure>
+    </target>
+
+    <target name="test-rebaseline-task-all-mandatory-arguments-given-but-password-wrong-case">
+        <au:expectfailure expectedMessage="[hlm:rebaseline] Error: Script execution failure.">
+            <hlm:rebaseline database="to1tobet" projectName="helium-to1tobet#helium_4.49:project:vc1s60p1#1" password="test"/>
+        </au:expectfailure>
+        <au:assertLogContains text="Set database to to1tobet" level="debug"/>
+        <au:assertLogContains text="Set projectName to helium-to1tobet#helium_4.49:project:vc1s60p1#1" level="debug"/>
+        <au:assertLogContains text="Set password to test" level="debug"/>
+    </target>
+
+    <target name="test-rebaseline-task-all-mandatory-arguments-and-optional-arguments-given-but-password-wrong-case">
+        <au:expectfailure expectedMessage="[hlm:rebaseline] Error: Script execution failure.">
+            <hlm:rebaseline database="to1tobet" projectName="symbiantools-to1tobet#symbiantools_08_w34:project:ccm51#1" password="test" verbosity="1"/>
+        </au:expectfailure>
+        <au:assertLogContains text="Set database to to1tobet" level="debug"/>
+        <au:assertLogContains text="Set projectName to symbiantools-to1tobet#symbiantools_08_w34:project:ccm51#1" level="debug"/>
+        <au:assertLogContains text="Set password to test" level="debug"/>
+        <au:assertLogContains text="Set verbosity to 1" level="debug"/>
+    </target>
+
+    <target name="test-rebaseline-task-all-mandatory-arguments-and-optional-arguments-given-but-password-wrong-and-verbosity-wrong-case">
+        <au:expectfailure expectedMessage="[hlm:rebaseline] Error: Verbosity level is not recognised. Legal values are: 0 - quiet, 1 - verbose.">
+            <hlm:rebaseline database="to1tobet" projectName="symbiantools-to1tobet#symbiantools_08_w34:project:ccm51#1" password="test" verbosity="9"/>
+        </au:expectfailure>
+        <au:assertLogContains text="Set database to to1tobet" level="debug"/>
+        <au:assertLogContains text="Set projectName to symbiantools-to1tobet#symbiantools_08_w34:project:ccm51#1" level="debug"/>
+        <au:assertLogContains text="Set password to test" level="debug"/>
+        <au:assertLogContains text="Set verbosity to 9" level="debug"/>
+    </target>
+
+</project>

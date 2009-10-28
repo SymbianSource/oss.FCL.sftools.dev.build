@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<releaseInformation>
+    <releaseDetails>
+        <releaseID>
+            <service name="service"/>
+            <product name="prod"/>
+            <release name="rel"/>
+        </releaseID>
+    </releaseDetails>
+    <releaseFiles/>
+    <externalFiles/>
+
+	<filters>
+		<!-- Filter definitions -->
+		<!-- 	code = code used in package attribute "filters" 
+					text = Filter name
+					description = filter description
+		-->
+    <filter code="foo" text="Emulator binaries" description="Files needed for emulator." /> 
+    <filter code="bar" text="complementary binaries and sources" description="complementary components binaries and sources"/>
+    <filter code="test" text="source files" description="symbian and S60 source files"/>
+	</filters>
+    
+</releaseInformation>
+

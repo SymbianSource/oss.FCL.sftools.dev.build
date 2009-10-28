@@ -1,0 +1,36 @@
+
+No changes to P:\sf\mw\svgt\svgtopt\SVG\SVGRecog\Group\SvgRecog.MMP
+ERROR: P:\sf\mw\svgt\svgt_plat\svgt_api\tsrc\group\Bld.inf: #1: // to the same name in \epoc32\include
+ERROR: P:\sf\mw\svgt\svgt_plat\svgt_api\tsrc\group\Bld.inf: #1: \agnmodel\inc\AGMCOMON.H
+ERROR: P:\sf\mw\svgt\svgt_plat\svgt_api\tsrc\group\Bld.inf: #1: \agnmodel\group\agnmodel.mmp
+ERROR: P:\sf\mw\svgt\svgt_plat\svgt_api\tsrc\group\Bld.inf: #1: \agnmodel\group\agsvexe.mmp
+PRINT ONLY -> Writing P:\sf\mw\svgt\svgt_plat\svgt_api\tsrc\group\Bld.inf
+No changes to P:\sf\mw\svgt\svgt_plat\svgt_api\tsrc\group\svgtmodule.mmp
+ERROR: P:\sf\mw\classicui\uifw\AvKon\odeconf\group\odeconf.mmp: #1: SOURCEPATH		..\src
+ERROR: P:\sf\mw\classicui\uifw\AvKon\odeconf\group\odeconf.mmp: #1: SOURCEPATH		..\data
+ERROR: P:\sf\mw\classicui\uifw\AvKon\odeconf\group\odeconf.mmp: #1: TARGETPATH      resource\apps
+ERROR: P:\sf\mw\classicui\uifw\AvKon\odeconf\group\odeconf.mmp: #1: TARGETPATH 	    \private\10003a3f\apps
+ERROR: P:\sf\mw\classicui\uifw\AvKon\odeconf\group\odeconf.mmp: #1: USERINCLUDE	   ..\inc
+PRINT ONLY -> Writing P:\sf\mw\classicui\uifw\AvKon\odeconf\group\odeconf.mmp
+No changes to P:\sf\mw\classicui\uifw\AvKon\odeconf\inc\odeconf.hrh
+ERROR: P:\sf\app\homescreen\idlehomescreen\hsplugins\organizer\aiagendaplugin2\inc\aicalendarplugin2constants.hrh: #1: _LIT( KAICal2ArabicSummaryLocationSeparator, " \x060c" );
+ERROR: P:\sf\app\homescreen\idlehomescreen\hsplugins\organizer\aiagendaplugin2\inc\aicalendarplugin2constants.hrh: #1:  * \x0009 horizontal tab
+ERROR: P:\sf\app\homescreen\idlehomescreen\hsplugins\organizer\aiagendaplugin2\inc\aicalendarplugin2constants.hrh: #1:  * \x000a new line
+ERROR: P:\sf\app\homescreen\idlehomescreen\hsplugins\organizer\aiagendaplugin2\inc\aicalendarplugin2constants.hrh: #1:  * \x000b line tabulation (vertical
+ERROR: P:\sf\app\homescreen\idlehomescreen\hsplugins\organizer\aiagendaplugin2\inc\aicalendarplugin2constants.hrh: #1:  * \x000c form feed
+ERROR: P:\sf\app\homescreen\idlehomescreen\hsplugins\organizer\aiagendaplugin2\inc\aicalendarplugin2constants.hrh: #1:  * \x000d carriage return
+ERROR: P:\sf\app\homescreen\idlehomescreen\hsplugins\organizer\aiagendaplugin2\inc\aicalendarplugin2constants.hrh: #1:  * \x2028 line separator
+ERROR: P:\sf\app\homescreen\idlehomescreen\hsplugins\organizer\aiagendaplugin2\inc\aicalendarplugin2constants.hrh: #1:  * \x2029 paragraph separator
+ERROR: P:\sf\app\homescreen\idlehomescreen\hsplugins\organizer\aiagendaplugin2\inc\aicalendarplugin2constants.hrh: #1: "\x0009\x000A\x000B\x000C\x000D\x2028\x2029" );
+PRINT ONLY -> Writing P:\sf\app\homescreen\idlehomescreen\hsplugins\organizer\aiagendaplugin2\inc\aicalendarplugin2constants.hrh
+No changes to P:\sf\app\homescreen\idlehomescreen\hsplugins\organizer\aiagendaplugin2\inc\aicalendarplugin2uids.hrh
+No changes to P:\sf\app\homescreen\idlehomescreen\hsplugins\organizer\aiagendaplugin2\inc\calendar.hrh
+No changes to P:\sf\app\homescreen\idlehomescreen\hsplugins\organizer\aiagendaplugin2\inc\CalendarVariant.hrh
+ERROR: P:\sf\mw\inputmethods\textinput\peninputgenerichwr\inc\peninputhwrarabic.hrh: #1: _LIT(KStandardPuncExclamatoryPoint, "\x0021");
+ERROR: P:\sf\mw\inputmethods\textinput\peninputgenerichwr\inc\peninputhwrarabic.hrh: #1: _LIT(KStandardPuncDotPoint, "\x002E");
+ERROR: P:\sf\mw\inputmethods\textinput\peninputgenerichwr\inc\peninputhwrarabic.hrh: #1: _LIT(KArabicPuncComma, "\x060C");
+ERROR: P:\sf\mw\inputmethods\textinput\peninputgenerichwr\inc\peninputhwrarabic.hrh: #1: _LIT(KArabicPuncSemicolon, "\x061B");
+ERROR: P:\sf\mw\inputmethods\textinput\peninputgenerichwr\inc\peninputhwrarabic.hrh: #1: _LIT(KArabicPuncQuestion, "\x061F");
+ERROR: P:\sf\mw\inputmethods\textinput\peninputgenerichwr\inc\peninputhwrarabic.hrh: #1: _LIT(KArabicPuncWaw, "\x0648");
+PRINT ONLY -> Writing P:\sf\mw\inputmethods\textinput\peninputgenerichwr\inc\peninputhwrarabic.hrh
+

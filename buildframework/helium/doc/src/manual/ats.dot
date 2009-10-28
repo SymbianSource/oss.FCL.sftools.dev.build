@@ -1,0 +1,26 @@
+digraph G {
+
+"IBY list" -> "test.mk's"
+"test.mk's" -> "Build roms"
+"Per product" -> "Build roms"
+"Per product" -> "sysdef test layers"
+"sysdef test layers" -> "components pkg"  [label="Exclude any exclude.test.layers"]
+"components pkg" -> "Generate install_steps"
+"components pkg" -> "Generate execute_steps"
+"Generate install_steps" -> "test.xml"
+"Generate execute_steps" -> "test.xml"
+"Build roms" -> "rom images"
+"rom images" -> "ATSDrop zip"
+"test.xml" -> "ATSDrop zip"
+"ATSDrop zip"-> "network drive"
+"network drive" -> "ats server"
+"ats server" -> "Per test set (per component and or pkg)"
+"Per test set (per component and or pkg)" -> "flash images"
+"Per test set (per component and or pkg)" -> "install files"
+"Per test set (per component and or pkg)" -> "execute tests"
+"ats server" -> "send results to diamonds"
+
+subgraph "cluster1" {color=yellow;style=filled;label="per sysdef component or module"; "components pkg"; "Generate install_steps"; "Generate execute_steps"; "test.xml"; "ATSDrop zip"; "rom images"}
+
+subgraph "cluster2" {color=yellow;style=filled;label="ATS server runs each test set in parallel to protos"; "flash images"; "install files"; "execute tests"}
+}

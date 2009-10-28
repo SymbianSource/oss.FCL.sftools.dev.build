@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : buildmanagement.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="buildmanagement" xmlns:hlm="http://www.nokia.com/helium">
+    <description>
+        Runs the build manager Synergy operations.
+    </description>
+    <!-- Preprocesses the build management configuration file. -->
+    <target name="build-manager-prepare-input">
+        <property name="project.config.file.parsed" location="${build.cache.dir}/project_config.xml.parsed" />
+        <copy file="${project.config.file}" tofile="${project.config.file.parsed}" overwrite="true">
+            <filterchain>
+                <expandproperties />
+            </filterchain>
+        </copy>
+    </target>
+
+
+    <!-- Runs the build manager Synergy operations. -->
+    <target name="build-manager" depends="build-manager-prepare-input">
+        <record name="${build.log.dir}/${build.id}_build_manager.log" action="start" />
+        <echo>ccm.engine.host = ${ccm.engine.host}</echo>
+        <echo>ccm.database.path = ${ccm.database.path}</echo>
+        <hlm:python resultproperty="buildmanagement.result">
+import buildmanagement
+
+buildmanagement.buildmanager(r'${ccm.engine.host}', r'${ccm.database.path}', r'${project.config.file.parsed}', r'${project.spec.name}')
+        </hlm:python>
+        <record name="${build.log.dir}/${build.id}_build_manager.log" action="stop" />
+        <hlm:logextract file="${build.log.dir}/${build.id}_build_manager.log" />
+        <!-- <hlm:signal name="buildManagementSignal" result="${buildmanagement.result}"/> -->
+    </target>
+
+    <!-- This macro enables you to create a synergy session using information from your .netrc file. -->
+    <scriptdef name="createSessionMacro" language="jython" uri="http://www.nokia.com/helium">
+        <attribute name="database" />
+        <attribute name="reference" />
+        <attribute name="cache" />
+import sys
+import heliumlogging
+import logging
+import ant
+logging.getLogger('').addHandler(ant.AntHandler(self))
+reference = attributes.get('reference')
+cache = attributes.get('cache')
+if reference == None:
+    raise Exception("reference attribute is not defined.")
+database = attributes.get('database')
+if database == None:
+    raise Exception("database attribute is not defined.")
+
+import nokia.nokiaccm
+import ccm.extra
+from com.nokia.ant.types.ccm import SessionSet
+import traceback
+        
+session = None
+if cache != None:
+    p = ccm.extra.CachedSessionProvider(cache=str(cache))
+    session = p.get(database=str(database))
+    p.close()
+else:
+    session = nokia.nokiaccm.open_session(database=str(database))
+    session.close_on_exit = False
+
+sessionset = SessionSet()
+asession = sessionset.createSession()
+asession.setAddr(str(session.addr()))
+project.addReference(str(reference), sessionset)
+    </scriptdef>
+
+    <!-- Target to test ccm-task. -->
+    <target name="try-ccm-task" if="run.ccm">
+        <hlm:ccm>
+            <hlm:update project="mc_4032_component_branches-mc_4031_0650" />
+        </hlm:ccm>
+    </target>
+
+    <!-- Target to test ccm-task. -->
+    <target name="try-ccm-task2" if="run.ccm">
+        <hlm:createSessionMacro database="to1tobet" reference="test.session" />
+        <hlm:ccm verbose="false">
+            <!-- Defining some session to use. -->
+            <hlm:sessionset refid="test.session" />
+
+
+            <!-- Do something ...-->
+            <hlm:addtask folder="tr1test1#2079">
+                <task name="tr1test1#5310" />
+            </hlm:addtask>
+            <!--<hlm:update project="mc_4032_component_branches-mc_4031_0650"/>-->
+            <hlm:snapshot project="helium-to1tobet#helium_3.0:project:vc1s60p1#1" dir="c:\test" fast="true" recursive="true" />
+            <hlm:close />
+        </hlm:ccm>
+    </target>
+    <!-- Target to test ccm-checkout. -->
+    <target name="try-ccm-task3" if="run.ccm">
+        <hlm:createSessionMacro database="tr1test1" reference="test.session" />
+        <hlm:ccm verbose="false">
+            <!-- Defining some session to use. -->
+            <hlm:sessionset refid="test.session" />
+            <hlm:checkout project="Hello_World-8.2:project:tr1test1#1" release="Hello_World/next" />
+            <hlm:close />
+        </hlm:ccm>
+    </target>
+
+    <!-- Target to test ccm-work_area. -->
+    <target name="try-ccm-task4" if="run.ccm">
+        <hlm:createSessionMacro database="tr1test1" reference="test.session" />
+        <hlm:ccm verbose="false">
+            <!-- Defining some session to use. -->
+            <hlm:sessionset refid="test.session" />
+            <hlm:workarea project="Hello_World-8.3:project:tr1test1#1" maintain="True" />
+            <hlm:close />
+        </hlm:ccm>
+    </target>
+
+</project>

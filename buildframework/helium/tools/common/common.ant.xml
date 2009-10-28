@@ -1,0 +1,501 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : common.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="common" xmlns:hlm="http://www.nokia.com/helium" xmlns:cs="antlib:com.puppycrawl.tools.checkstyle">
+    <description>
+        Common targets for all helium tools.
+    </description>
+    
+    <import file="logging.ant.xml"/>
+    
+    <!--=======================================================================
+    Preset definitions -->
+    <presetdef name="preset.exec">
+        <exec>
+            <!-- Note the extra ':' required at the start of the value. This
+            is required for the Symbian tools to match the env variable. -->
+            <env key="ARMV5VER" value=":${arm.compiler.version}"/>
+
+            <!-- Tools configuration -->
+            <env key="LOGONSERVER" value="${logon.server}"/>
+        </exec>
+    </presetdef>
+    
+    
+    <presetdef name="preset.mail">
+        <mail from="${email.from}" messagemimetype="text/html" mailhost="${email.smtp.server}" failonerror="false"/>
+    </presetdef>
+    
+    
+    <!-- Outputs diagnostics information for the Helium configuration.
+    
+    This contains:
+    * The current configuration of properties.
+    * The Ant diagnostics information.
+    -->
+    <target name="diagnostics" description="Print diagnostics about Helium">
+        <echo>
+-------- Helium diagnostics report --------
+Helium version ${helium.version}
+            
+-------------------------------------------
+ Helium configuration
+-------------------------------------------
+        </echo>
+        <runtarget target="config"/>
+        <diagnostics/>
+        <hlm:database/>
+    </target>
+    
+    <!-- Sets the properties that are dependent on build.number -property. 
+    
+    The properties are:
+    * build.version
+    * build.id
+    * prep.build.dir
+    * publish.dir
+    * publish.release.dir
+     -->
+    <target name="build-number">
+        <fail unless="build.number" message="build.number property not defined" />
+        <property name="build.version" value="${core.build.version}.${build.number}"/>
+        <property name="build.id" value="${build.name}_${build.version}"/>
+        <property name="prep.build.dir" location="${prep.root.dir}/${build.id}"/>
+        <property name="publish.dir" location="${publish.root.dir}/${build.name}/builds/${core.build.version}/${build.id}"/>
+        <property name="publish.release.dir" location="${publish.root.dir}/${build.name}/releases/${core.build.version}/${build.id}"/>
+    </target>
+
+    <!-- Variable set to configuration tool. 
+        Currently supported configuration tool arguments are
+        argument        :    ant variable name
+        
+        -master_conf    :    master_conf
+        -confml         :    confml
+        -impl            :    impl
+        -iby            :    iby
+        -ignore_errors    :    keepgoing(true - uses -ignore_errors, otherwise not, setting 
+                            true generates cenrep incase of errors, and signals has to be configured to stop the build
+                            in case of errors).
+    -->    
+    <hlm:argSet id="cnftool.refid">
+        <hlm:arg name="path" value="${build.drive}/s60/tools/toolsextensions/configurationtool" />
+        <hlm:arg name="master_conf" value="s60.confml" />
+        <hlm:arg name="confml" value="\epoc32\rom\config\confml_data\s60" />
+        <hlm:arg name="impl" value="\epoc32\rom\config\confml_data\s60" />
+        <hlm:arg name="iby" value="\epoc32\rom\include\" />
+        <hlm:arg name="keepgoing" value="false" />
+    </hlm:argSet>
+
+    <!-- Target to run configtool. See cnftool.refid for config tool parameters-->
+    <target name="configtool" description="target to run configtool, refid is for mcl, overridden by changing cnftool.refid">
+        <hlm:toolMacro name="configuration">
+            <hlm:toolvarset refid="cnftool.refid"/>
+        </hlm:toolMacro>
+    </target>
+
+    <!-- Finds the build manager's (current user) email address from their username. -->
+    <target name="lookup-email" if="email.ldap.server">
+        <if>
+            <not>
+                <isset property="email.from"/>
+            </not>
+            <then>
+                <hlm:ldap url="${email.ldap.server}" rootdn="${email.ldap.rootdn}" filter="uid=${env.USERNAME}" outputproperty="email.from" key="mail"/>
+            </then>
+        </if>
+    </target>
+    
+    <!-- To authenticate the noe password (read from .netrc file) for ${env.USERNAME}. -->
+    <target name="authenticate-user" if="authenticate.noe.user">
+        <runtarget target="noe-password"/>
+
+        <hlm:ldapauthenticate   url="${email.ldap.server}" 
+                                rootdn="${email.ldap.rootdn}" 
+                                searchdn="${ldap.organization.unit.rootdn}, ${ldap.people.rootdn}" 
+                                filter="uid=${env.USERNAME}" 
+                                outputproperty="is.authentication.sucess" 
+                                key="employeeNumber"
+                                password="${noe.password}"
+                                />
+        <if>
+            <istrue value="${is.authentication.sucess}" />
+            <then>
+                <echo>noe authentication for user ${env.USERNAME} is success.</echo>              
+            </then>
+            <else>
+                <fail message="noe authentication for user ${env.USERNAME} is failed."/>
+            </else>
+        </if>
+    </target>
+    
+    <!-- Utility target to test mail sending from Helium. -->
+    <target name="check-mail" depends="lookup-email">
+        <preset.mail tolist="${email.from}" subject="mail-test"/>
+    </target>
+
+    <!-- A simple test target that prints a simple message -->
+    <target name="hello">
+        <echo message="Hello!"/>
+        <if>
+            <isset property="build.number"/>
+            <then>
+                <echo message="Ant libs found OK"/>
+            </then>
+        </if>
+    </target>
+    
+    
+    <!-- A simple test target that prints a simple message and is dependant upon another target to show how ANT works-->
+    <target name="hi" depends="hello"/>
+    
+    
+    <!-- A simple test target that prints a simple message -->
+    <target name="fail">
+        <fail message="Test build failure."/>
+    </target>
+    
+    
+    <!-- Print out the build properties -->
+    <target name="config" description="Print out the build properties">
+        <echoproperties>
+            <propertyset negate="true">
+                <propertyref prefix="java."/>
+                <propertyref prefix="sun."/>
+                <propertyref prefix="awt."/>
+                <propertyset refid="password.list.ref"/>
+            </propertyset>
+        </echoproperties>
+    </target>
+
+    <!-- Prints out target dependencies.
+    
+    A <tt>target</tt> property should be defined on the command line to specify which target's dependencies to analyse.
+
+    Example: <tt>hlm -Dtarget=compile-main deps</tt>
+    -->
+    <target name="deps">
+        <fail unless="target" message="target property not defined" />
+        <hlm:dependencies target="${target}" format="nested"/>
+    </target>
+    
+    
+    <!-- Displays target dependencies in a text box. 
+    
+    A <tt>target</tt> property should be defined on the command line to specify which target's dependencies to analyse. -->
+    <target name="execlist">
+        <fail unless="target" message="target property not defined" />
+        <record name="execlist.txt" action="start" emacsmode="true"/>
+        <hlm:dependencies target="${target}" format="executable"/>
+        <record name="execlist.txt" action="stop"/>
+        <exec executable="notepad.exe">
+            <arg value="execlist.txt"/>
+        </exec>
+        <delete file="execlist.txt"/>
+    </target>
+    
+    
+    <!-- Prints out Helium help dialog -->
+    <target name="help">
+        <if>
+            <not>
+                <available file="${database.file}"/>
+            </not>
+            <then>
+                <antcall target="database"/>
+            </then>
+        </if>
+        <if>
+            <isset property="help.target"/>
+            <then>
+                <fmpp sourcefile="${helium.dir}/tools/common/templates/help_text.txt.ftl" outputfile="build/help_text.txt" quiet="true">
+                    <data expandProperties="yes">
+                        xml: xml(${database.file})
+                        helpTarget: ${help.target}
+                    </data>
+                </fmpp>
+                <loadfile srcfile="build/help_text.txt" property="help.text"/>
+                <echo>${help.text}</echo>                
+            </then>
+            <else>
+                <echo>
+Usage:
+hlm [target] [-D&lt;property>=&lt;value>] [-f &lt;ant_build_file>] [-h] [-p -v]
+
+[target]                        Run Ant target
+[-D&lt;property>=&lt;value>]          Set an Ant property
+[-f &lt;ant_build_file>]           Use another Ant build file
+[-h]                            Print Ant help text
+[-p -v]                         List all Ant targets
+
+Variable properties for helium:
+-Dsysdef.configuration=default set build configuration, default value is 'default'
+-Dbuild.system=ebs             set build system, default value is 'ebs'
+                                  - possible values are 'ebs' and 'ec'
+
+Usage examples:
+hlm                            build the default build target
+hlm -Dbuild.system=ec-helium   use electric cloud build system
+                </echo>                
+            </else>
+        </if>
+    </target>
+        
+    
+    <!-- Automates deletion of old work areas.
+    
+    <tt>prep.root.dir</tt> is the path where work areas are typically stored. This command
+    scans that directory for sub-directories that match a pattern based on the build name.
+    A dialog is displayed listing the directories as checkboxes. Check each build area 
+    directory to delete it.
+    -->
+    <target name="clean-pc">
+        <dirset id="prep.build.dirs" dir="${prep.root.dir}">
+            <include name="*_*"/>
+            <include name="subcon_*_*"/>
+        </dirset>
+        <pathconvert pathsep="," property="prep.build.dirs.path">
+            <dirset refid="prep.build.dirs"/>
+        </pathconvert>
+        <fmpp sourceFile="${helium.dir}/tools/common/templates/clean_pc.ant.ftl"
+              outputFile="${cache.dir}/clean_pc.ant.xml">
+            <data expandProperties="yes">
+                prepRootDir: ${prep.root.dir}
+                buildAreaDirs: [${prep.build.dirs.path}]
+            </data>
+        </fmpp>
+        <ant antfile="${cache.dir}/clean_pc.ant.xml"/>
+        <delete file="${cache.dir}/clean_pc.ant.xml"/>
+    </target>
+    
+    
+    <!-- Displays the current version of Helium -->
+    <target name="version" description="Displays the current version of Helium">
+        <echo message="Helium version: ${helium.version}" />
+    </target>
+        
+    
+    <!-- Creates a database of the current configuration. -->
+    <target name="create-data-model-db">        
+        <echoproperties format="text" destfile="${build.cache.dir}/database.txt">        
+            <propertyset negate="true">
+                <propertyref prefix="ant."/>
+                <propertyref prefix="os."/>
+                <propertyref prefix="file."/>
+                <propertyref prefix="java."/>
+                <propertyref prefix="sun."/>
+                <propertyref prefix="awt."/>
+                <propertyref prefix="env."/>
+                <propertyref prefix="user."/>
+                <propertyref prefix="line."/>
+                <propertyref prefix="path."/>
+                <propertyref prefix="python."/>
+                <propertyref prefix="TODAY"/>
+                <propertyref prefix="DSTAMP"/>
+                <propertyref prefix="TSTAMP"/>
+                <propertyref prefix="sig"/>
+                <propertyref name="basedir"/>
+                <propertyset refid="password.list.ref"/>
+            </propertyset>
+        </echoproperties>
+    </target>
+    
+    <!--Macro to Assert Ant configuration against a Helium data model.-->
+    <macrodef name="checkDataModelMacro" uri="http://www.nokia.com/helium">
+        <attribute name="datamodel"/>
+        <attribute name="config"/>
+        <attribute name="assert" default="false"/>
+        <sequential>
+            <hlm:python>
+import logging
+import ant
+import configuration
+import configuration_model
+
+datamodel_file = ant.get_property(r'@{datamodel}')
+config_file = ant.get_property(r'@{config}')
+model = configuration_model.DataModel(str(datamodel_file))
+db_file = open(str(config_file), 'r')
+config = configuration.PropertiesConfiguration(db_file)
+
+items = model.validate_config(config)
+
+logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
+for item in items:
+    item.log(logging.getLogger())
+    
+assert_attr = ant.get_property(r'@{assert}')
+if assert_attr != None and str(assert_attr) == 'true':
+    for item in items:
+        if isinstance(item, configuration_model.MissingFromDataModelItem):
+            raise Exception(str(item))
+            </hlm:python>
+        </sequential>
+    </macrodef>
+        
+        
+    <!-- Checks the Ant configuration against a Helium data model. -->
+    <target name="check" depends="create-data-model-db">
+        <xslt in="${data.model.file}" out="${data.model.parsed}" style="${data.model.xsl}"/>
+        <hlm:checkDataModelMacro datamodel="${data.model.parsed}" config="${build.cache.dir}/database.txt"/>
+    </target>
+    
+    <!--Assert Ant configuration against a Helium data model.-->
+    <target name="assert-datamodel-correct" depends="create-data-model-db">
+        <xslt in="${data.model.file}" out="${data.model.parsed}" style="${data.model.xsl}"/>
+        <hlm:checkDataModelMacro datamodel="${data.model.parsed}" config="${build.cache.dir}/database.txt" assert="true"/>
+    </target>
+    
+    
+    <!-- Generates an Ant XML database file.
+        
+    This lists all the targets and information about them. -->
+    <target name="database">
+        <!-- Projects with no targets or non project files -->
+        <fileset id="database.extra.files" dir="${helium.dir}">
+            <include name="tools/**/*.antlib.xml"/>
+            <include name="tools/**/*.ant.xml"/>
+            <include name="extensions/nokia/tools/**/*.antlib.xml"/>
+            <include name="extensions/nokia/tools/**/*.ant.xml"/>
+            <include name="extensions/nokia/*.ant.xml"/>
+            <include name="config/signaling_config_default.ant.xml"/>
+        </fileset>
+        
+        <mkdir dir="${helium.build.dir}"/>
+        <property name="home.files.only" value="false"/>
+        <hlm:database output="${database.file}" refid="database.extra.files" homeFilesOnly="${home.files.only}"/>
+    </target>
+    
+    
+    <!-- Looks for lint-style issues with the Ant files in Helium, using the antlint task. -->
+    <target name="antlint" depends="check">
+        <delete dir="${helium.build.dir}/jep"/>
+        <delete dir="${helium.build.dir}/python"/>
+        <delete dir="${helium.build.dir}/beanshell"/>
+        <delete file="${helium.build.dir}/test_jython.xml"/>
+        <hlm:antlint configfile="${helium.dir}/config/antlint_config.xml">
+            <fileset id="antlint.files" dir="${helium.dir}">
+                <include name="*.ant.xml"/>
+                <include name="tools/**/*.ant.xml"/>
+                <include name="tools/**/build.xml"/>
+                <include name="tools/**/*.antlib.xml"/>
+                <include name="config/**/*.ant.xml"/>
+                <include name="config/**/build.xml"/>
+                <include name="config/**/*.antlib.xml"/>
+                <include name="external/helium-antlib/**/*.ant.xml"/>
+                <include name="external/helium-antlib/**/build.xml"/>
+                <include name="external/helium-antlib/**/*.antlib.xml"/>
+                <include name="extensions/nokia/**/build.xml"/>
+                <include name="extensions/nokia/**/*.antlib.xml"/>
+                <include name="extensions/nokia/**/*.ant.xml"/>
+            </fileset>
+        </hlm:antlint>
+        
+        <fileset id="jep.files" dir="${helium.build.dir}">
+            <include name="jep/**/*.py"/>
+            <include name="python/**/*.py"/>
+        </fileset>
+        <antcall target="pylint" inheritRefs="true">
+            <reference refid="jep.files" torefid="python.files" />
+        </antcall>
+        <cs:checkstyle config="config/java_checkstyle_config.xml">
+            <fileset dir="${helium.build.dir}/beanshell" includes="**/*.java"/>
+            <formatter type="plain"/>
+        </cs:checkstyle>
+        
+        <for param="file">
+            <path>
+                <fileset dir="${helium.dir}">
+                    <include name="**/*.ftl"/>
+                    <include name="**/*.rst"/>
+                    <exclude name="**/*.mk.ftl"/>
+                    <exclude name="build/**/*"/>
+                </fileset>
+            </path>
+            <sequential>
+                <loadfile srcfile="@{file}" property="tabs.in.ftl">
+                    <filterchain>
+                        <linecontainsregexp>
+                            <regexp pattern="\t"/>
+                        </linecontainsregexp>
+                    </filterchain>
+                </loadfile>
+                <fail if="tabs.in.ftl" message="@{file} has tabs" />
+            </sequential>
+        </for>
+    </target>
+    
+    
+    <!-- This target can be use to clean up after a build finished or failed.
+    
+    This contains:
+    * Unsubst build drive if the build finished.
+    * Can be used to do other cleanup stuff too.
+    -->
+    <target name="cleanup-all">
+        <!-- unsubst build drive after build finished if the property "unsubst.after.build" defined as "yes" -->
+        <if>
+            <and>
+                <isset property="unsubst.after.build"/>
+                <istrue value="${unsubst.after.build}" />
+            </and>
+            <then>
+                <echo> Removing build drive: ${build.drive} </echo>
+                <hlm:unsubst drive="${build.drive}"/>
+            </then>
+        </if>                
+    </target>
+    
+    
+    <!-- validate only requires properties at startup -->
+    <target name="validate-at-startup" depends="create-data-model-db">
+        <hlm:python>
+import logging
+import configuration
+import configuration_model
+
+model = configuration_model.DataModel(r'${data.model.file}')
+db_file = open(r'${build.cache.dir}/database.txt', 'r')
+config = configuration.PropertiesConfiguration(db_file)
+
+items = model.validate_config_at_startup(config)
+            
+_checks_logger = logging.getLogger('config_check')
+_handler = logging.StreamHandler()
+_handler.setFormatter(logging.Formatter('%(levelname)s: %(message)s'))
+_checks_logger.addHandler(_handler)
+_checks_logger.setLevel(logging.INFO)
+for item in items:
+    item.log(_checks_logger)
+        </hlm:python>
+    </target>
+    
+    
+    <!-- Macro test target. -->
+    <target name="macro-test">
+        <hlm:fooMacro/>
+    </target>
+
+</project>
+    
+
+
+

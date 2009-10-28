@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : ivy.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<ivy-module version="1.0">
+
+    <info organisation="S60_SAM"
+          module="helium"
+          revision="2.32"
+          status="integration"
+          publication="">
+        <license name="Nokia" url="http://www.my.org/mymodule/mylicense.html"/>
+        <ivyauthor name="Helium team" url="http://helium.nmp.nokia.com/"/>
+        <repository name="Helium" url="http://www.jayasoft.fr/org/ivyrep/" pattern="[organisation]/[module]/ivy-[revision].xml" ivys="true" artifacts="false"/>
+        <description homepage="http://www.my.org/mymodule/">
+        </description>
+    </info>
+
+    <configurations>
+        <conf name="core" description="Core Helium tools from SymSEE."/>
+        <conf name="subcon" extends="core" description="Helium libraries for SF and Nokia."/>
+        <conf name="core_install" extends="subcon" description="Core Helium libraries."/>
+        <conf name="product" extends="core" description="Product build libraries."/>
+        <conf name="ido" extends="core" description="IDO build tools from SymSEE."/>
+        <conf name="sf_install" description="SF build libraries."/>
+        <conf name="ido_install" extends="ido" description="IDO build libraries."/>
+        <conf name="internal" extends="ido" description="Internal libraries."/>
+    </configurations>
+    
+    <publications/>
+    
+    <dependencies defaultconfmapping="core->default;subcon->default;core_install->default;ido_install->default;sf_install->default">
+        <!-- Core dependencies -->
+        <dependency org="SWEPT" name="ant" rev="1.7" conf="core"/>
+        <dependency org="SWEPT" name="java" rev="1.6" conf="core"/>
+        <dependency org="SWEPT" name="perl" rev="5.6.1" conf="core"/>
+        <dependency org="SWEPT" name="python" rev="2.5" conf="core"/>
+
+        <!-- Dependency for product builds -->
+        <dependency org="SWEPT" name="unzip" rev="5.40" conf="product->default"/>
+        
+        <!-- IDO dependencies -->
+        <dependency org="SWEPT" name="7zip" rev="4" conf="ido->default"/>
+        <dependency org="SWEPT" name="ccm" rev="6.5" conf="ido->default"/>
+        <dependency org="SWEPT" name="codescanner" rev="[2.0,2.1]" conf="ido->default"/>
+        <dependency org="SWEPT" name="java13" rev="1.3.1" conf="ido->default"/>
+        <dependency org="SWEPT" name="sbs" rev="2.4" conf="ido->default"/>
+        
+        <!-- These dependencies are not in Ibiblio Maven2 so they need to be referenced explicitly by url -->
+        <dependency org="python" name="eggs_subcon" rev="1.0" conf="subcon"/>
+        <dependency org="java" name="jars_subcon" rev="1.0" conf="subcon"/>
+        <dependency org="python" name="eggs" rev="1.0" conf="core_install"/>
+        <dependency org="java" name="jars" rev="1.0" conf="core_install"/>
+        
+        <!-- Dependencies in Ibiblio Maven2 -->
+        <!-- License: Apache 2.0 -->
+        <dependency org="commons-collections" name="commons-collections" rev="3.2" transitive="false" conf="subcon"/>
+        <!-- License: Apache 2.0 -->
+        <dependency org="commons-configuration" name="commons-configuration" rev="1.5" transitive="false" conf="subcon"/>
+        <!-- License: Apache 2.0 -->
+        <dependency org="commons-lang" name="commons-lang" rev="2.4" transitive="false" conf="subcon"/>
+        <!-- License: Apache 2.0 -->
+        <dependency org="commons-logging" name="commons-logging" rev="1.1.1" transitive="false" conf="subcon"/>
+        <!-- License: Apache 2.0 -->
+        <dependency org="ant-contrib" name="ant-contrib" rev="1.0b2" transitive="false" conf="subcon"/>
+        <!-- License: Apache 2.0 -->
+        <dependency org="bsf" name="bsf" rev="2.4.0" transitive="false" conf="subcon"/>
+        <!-- License: Dom4j -->
+        <dependency org="dom4j" name="dom4j" rev="1.6.1" transitive="false" conf="subcon"/>
+        <!-- License: BSD and CDDL -->
+        <dependency org="org.freemarker" name="freemarker" rev="2.3.13" transitive="false" conf="subcon"/>
+        <!-- License: Apache 1.1 and BSD -->
+        <dependency org="net.sourceforge.fmpp" name="fmpp" rev="0.9.13" transitive="false" conf="subcon"/>
+        <!-- License: Apache 2.0 -->
+        <dependency org="commons-codec" name="commons-codec" rev="1.3" transitive="false" conf="subcon"/>
+        <!-- License: Apache 1.1 -->
+        <dependency org="commons-discovery" name="commons-discovery" rev="0.2" transitive="false" conf="subcon"/>
+        <!-- License: Apache 2.0 -->
+        <dependency org="commons-httpclient" name="commons-httpclient" rev="3.1" transitive="false" conf="subcon"/>
+        <!-- License: Apache 2.0 -->
+        <dependency org="commons-io" name="commons-io" rev="1.4" transitive="false" conf="subcon"/>
+        <!-- License: Apache 2.0 -->
+        <dependency org="commons-jxpath" name="commons-jxpath" rev="1.2" transitive="false" conf="subcon"/>
+        <!-- License: Apache 2.0 -->
+        <dependency org="org.apache.ant" name="ant-antunit" rev="1.0" transitive="false" conf="subcon"/>
+        <!-- License: BSD -->
+        <dependency org="asm" name="asm" rev="2.2.1" transitive="false" conf="subcon"/>
+        <!-- License: BSD -->
+        <dependency org="jsch" name="jsch" rev="0.1.29" transitive="false" conf="subcon"/>
+        <!-- License: Apache 2.0 -->
+        <dependency org="log4j" name="log4j" rev="1.2.9" transitive="false" conf="subcon"/>
+        <!-- License: Apache 1.1 -->
+        <dependency org="oro" name="oro" rev="2.0.8" transitive="false" conf="subcon"/>
+        <!-- License: Common Public License Version 1.0 -->
+        <dependency org="wsdl4j" name="wsdl4j" rev="1.5.1" transitive="false" conf="subcon"/>
+        <dependency org="jaxen" name="jaxen" rev="1.1.1" transitive="false" conf="subcon"/>
+        <!-- License: BSD -->
+        <dependency org="xmlunit" name="xmlunit" rev="1.2" transitive="false" conf="subcon"/>
+        <!-- License: BSD, CDDL -->
+        <dependency org="javax.mail" name="mail" rev="1.4.1" transitive="false" conf="subcon"/>
+        <!-- License: Apache 1.1 -->
+        <dependency org="velocity" name="velocity-dep" rev="1.3.1" transitive="false" conf="subcon"/>
+        <!-- License: Common Public License Version 1.0 -->
+        <dependency org="junit" name="junit" rev="4.5" transitive="false" conf="subcon"/>
+        <!-- License: Apache 2.0 -->
+        <dependency org="xalan" name="xalan" rev="2.7.1" transitive="false" conf="subcon"/>
+        <!-- License: Apache 2.0 -->
+        <dependency org="xalan" name="serializer" rev="2.7.1" transitive="false" conf="subcon"/>
+        <!-- License: Common Public License Version 1.0 -->
+        <dependency org="emma" name="emma" rev="2.0.5312" transitive="false" conf="subcon"/>
+        <!-- License: Common Public License Version 1.0 -->
+        <dependency org="emma" name="emma_ant" rev="2.0.5312" transitive="false" conf="subcon"/>
+        <!-- License: Apache 2.0 -->
+        <dependency org="org.apache.maven.scm" name="maven-scm-api" rev="1.1" transitive="false" conf="subcon"/>
+        <!-- License: Apache 2.0 -->
+        <dependency org="org.apache.maven.scm" name="maven-scm-provider-hg" rev="1.1" transitive="false" conf="subcon"/>
+        <!-- License: Apache 2.0 -->
+        <dependency org="org.codehaus.plexus" name="plexus-utils" rev="1.5.6" transitive="false" conf="subcon"/>
+        
+        <dependency org="asm" name="asm-tree" rev="2.2.1" transitive="false" conf="core_install"/>
+        <dependency org="axis" name="axis" rev="latest.integration" transitive="false" conf="core_install"/>
+        <dependency org="xml-apis" name="xml-apis" rev="latest.integration" transitive="false" conf="core_install"/>
+        <dependency org="javax.xml" name="jaxrpc" rev="latest.integration" transitive="false" conf="core_install"/>
+        <dependency org="checkstyle" name="checkstyle" rev="4.4" conf="internal"/>        
+        <!-- License: BSD -->
+        <dependency org="javax.xml.soap" name="saaj-api" rev="1.3" transitive="false" conf="core_install"/>
+        
+        <!--
+        sun.mail
+        <dependency org="" name="dsn" rev="latest.integration" transitive="false" conf="core_install"/>
+        <dependency org="" name="smtp" rev="latest.integration" transitive="false" conf="core_install"/>
+        -->
+        
+        <!-- Installed using installer -->
+        <!-- License: MIT -->
+        <dependency org="java" name="jep" rev="2.3-java6" transitive="false" conf="subcon"/>
+        
+        <!-- License: LGPL, W3C -->
+        <dependency org="java" name="xincluder" rev="1.0d11" transitive="false" conf="subcon"/>
+        
+        <!-- IDO continous integration package -->
+        <dependency org="java" name="cruisecontrol" rev="2.8.2" conf="ido_install"/>
+        
+        <dependency org="java" name="cruisecontrol" rev="2.8.2" conf="sf_install"/>
+    </dependencies>
+    
+</ivy-module>
+
+

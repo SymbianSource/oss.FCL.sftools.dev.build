@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : ebs.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="compile.ebs" xmlns:hlm="http://www.nokia.com/helium">
+    <description>
+        EBS compilation targets.
+    </description>
+    <!-- Find a free port to use for EBS client server communication. -->
+    <target name="find-freeport" >
+        <hlm:python outputproperty="ebs.port.number">  
+import ant
+import socket
+mySocket = socket.socket ( socket.AF_INET, socket.SOCK_STREAM )
+mySocket.bind ( ( '127.0.0.1', 0 ) )
+host, port = mySocket.getsockname() 
+print port
+mySocket.close()
+        </hlm:python>
+        <echo> Using port number ${ebs.port.number}</echo>        
+        <hlm:assertPropertySet property="ebs.port.number" message="Property not defined: ebs.port.number" />                
+    </target> 
+
+    
+    <!-- Executes compilation of a System Definition configuration using Symbian EBS tools. -->
+    <target name="compile-ebs" if="build.system.ebs" depends="set-arm-version">    
+        <hlm:assertFileExists file="${genxml.output.file}"/>
+        <hlm:compileEbsMacro input="${genxml.output.file}" log="${build.log.dir}/${build.id}.${sysdef.configuration}_compile.log" />
+        <!-- calculate below only if metadata is enabled, error is calculated before the signal is being sent.-->
+        <hlm:calculateErrorsFromLog logfile="${build.log.dir}/${build.id}.${sysdef.configuration}_compile.log" />
+    </target>
+
+    
+    <!-- Executes compilation of a System Definition configuration using
+    Symbian EBS tools, driven directly from Ant. -->
+    <target name="compile-ebs-ant" if="build.system.ebs-ant" depends="set-arm-version,find-freeport">        
+        <script language="jython" setbeans="false">
+threads = project.getProperty("number.of.threads")
+client_list = ','.join([str(i) for i in range(1, int(threads) + 1)])
+project.setProperty("build.clients", client_list)
+        </script>
+        <hlm:assertPropertySet property="build.clients" message="Property not defined: build.clients" /> 
+        <parallel>
+            <for list="${build.clients}" param="client" parallel="true">
+                <sequential>
+                    <preset.exec executable="perl" dir="${build.drive}/">
+                        <arg value="epoc32/tools/build/buildclient.pl"/>
+                        <arg line="-d localhost:${ebs.port.number} -w 2 -c client_@{client} -e 1 "/>
+                    </preset.exec>
+                </sequential>
+            </for>
+            <preset.exec executable="perl" dir="${build.drive}/" failonerror="true">
+                <arg value="epoc32/tools/build/buildserver.pl"/>
+                <arg line="-d ${genxml.output.file} -p ${ebs.port.number} -l ${build.log.dir}/${build.id}.${sysdef.configuration}_compile.log"/>
+            </preset.exec>
+        </parallel>
+    </target>
+
+</project>

@@ -1,0 +1,20 @@
+=== Stage=3771 == ibusal_chipset_product
+-- abld -what build armv5
+--- EBS_CLIENT3 Executed ID 8616
+++ Started at Thu Sep 20 01:56:51 2007
++++ HiRes Start 1190278611.17028
+Chdir \ncp_sw\spp_core4.0\ibusal_chipset\group\product
+\epoc32\release\ARMV5\UDEB\_product_NaviScrollPdd.pdd
+\epoc32\release\ARMV5\UDEB\_product_NaviScrollPdd.pdd.map
++++ HiRes End 1190278612.21715
+++ Finished at Thu Sep 20 01:56:52 2007
+=== Stage=3771 == ibusal_chipset_product2
+-- abld -what build armv5
+--- EBS_CLIENT1 Executed ID 8617
+++ Started at Thu Sep 20 01:56:51 2007
++++ HiRes Start 1190278611.34216
+Chdir \ncp_sw\spp_core4.0\ibusal_chipset\group\product2
+\epoc32\release\ARMV5\UDEB\_product2_accelerometerpdd.pdd
+\epoc32\release\ARMV5\UDEB\_product2_accelerometerpdd.pdd.map
++++ HiRes End 1190278612.35777
+++ Finished at Thu Sep 20 01:56:52 2007

@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : cmaker.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="compile.cmaker" xmlns:hlm="http://www.nokia.com/helium">
+    <description>
+        cMaker support.
+    </description>
+    
+    <property name="cmaker.component.dir" location="${build.drive}/tools/cmaker"/>
+    <property name="cmaker.config.dir" location="${build.drive}/config"/>
+    <property name="cmaker.pp.version" value=""/>
+    <property name="cmaker.s60.version" value=""/>
+    <property name="cmaker.log.label" value=""/>
+
+    <!--
+        The cmakerMacro enables the user to run cmaker commands directly from Ant.
+        To configure it just provide NCP and S60 version and the action you want to run.
+        Default action is WHAT.
+        
+        e.g
+        <pre>
+            <hlm:cmakerMacro ncp="53" s60="32" action="export"/>
+        </pre>
+    -->
+    <macrodef name="cmakerMacro" uri="http://www.nokia.com/helium">
+        <attribute name="ncp" default=""/>
+        <attribute name="s60" default=""/>
+        <attribute name="action" default="what"/>
+        <sequential>
+            <var name="temp.cmaker.arg1" value="NCP="/>
+            <var name="temp.cmaker.arg2" value="S60="/>
+            <if>
+                <not>
+                    <equals arg1="@{ncp}" arg2="" />
+                </not>
+                <then>
+                    <var name="temp.cmaker.arg1" value="NCP=@{ncp}"/>
+                </then>
+            </if>
+            <if>
+                <not>
+                    <equals arg1="@{s60}" arg2="" />
+                </not>
+                <then>
+                    <var name="temp.cmaker.arg2" value="S60=@{s60}"/>
+                </then>
+            </if>
+            <hlm:symbianLogHeaderMacro command="cmaker ${temp.cmaker.arg1} ${temp.cmaker.arg2} ACTION=@{action}"
+                    config="CMAKER_@{action}" dir="${cmaker.config.dir}"/>
+            <exec executable="${build.drive}/epoc32/tools/cmaker.cmd" dir="${cmaker.config.dir}">
+                <arg line="${temp.cmaker.arg1}" />
+                <arg line="${temp.cmaker.arg2}" />
+                <arg value="ACTION=@{action}" />
+            </exec>
+            <hlm:symbianLogFooterMacro/>
+        </sequential>
+    </macrodef>
+    
+    <!--  Installing CMaker. -->    
+    <target name="cmaker-install">
+        <hlm:recordStartMacro name="${build.id}_install.cmaker.log" emacsmode="true"/>
+        <exec executable="${build.drive}/epoc32/tools/make.exe" dir="${cmaker.component.dir}">
+            <arg line="install"/>
+        </exec>
+        <hlm:recordStopMacro name="${build.id}_install.cmaker.log"/>
+        <!-- Blocks packaging configuration generation. -->
+        <if>
+            <istrue value="${blocks.enabled}" />
+            <then>
+                <mkdir dir="${blocks.config.dir}" />
+                <exec executable="python">
+                    <arg value="-m"/>
+                    <arg value="packager.cli"/>
+                    <arg value="--epocroot=${build.drive}/" />
+                    <arg value="--config=${blocks.config.dir}" />
+                    <arg value="--datasource=cmaker" />
+                    <arg value="-Dwhatlog=${build.log.dir}/${build.id}_install.cmaker.log" />
+                    <arg value="-Dconfigdir=${cmaker.component.dir}" />
+                    <arg value="--updateData" />
+                </exec>
+            </then>
+        </if>
+    </target>
+    
+    <!-- CMaker export configuration. -->    
+    <target name="cmaker-export" depends="cmaker-install" if="enable.cmaker">
+        <hlm:recordStartMacro name="${build.id}${cmaker.log.label}.export.cmaker.log" emacsmode="true"/>
+        <hlm:cmakerMacro ncp="${cmaker.pp.version}"
+                      s60="${cmaker.s60.version}"
+                      action="export"/>
+        <hlm:recordStopMacro name="${build.id}${cmaker.log.label}.export.cmaker.log"/>
+        <hlm:metadatarecord database="${metadata.dbfile}">
+            <hlm:abldmetadatainput>
+                <fileset casesensitive="false" file="${build.log.dir}/${build.id}${cmaker.log.label}.export.cmaker.log" />
+                <metadatafilterset refid="filterset.compile" />
+            </hlm:abldmetadatainput>
+        </hlm:metadatarecord>
+    </target>
+
+    <!-- CMaker cleanup exported configuration. -->
+    <target name="cmaker-clean" depends="cmaker-install" if="enable.cmaker">
+        <hlm:recordStartMacro name="${build.id}${cmaker.log.label}.clean.cmaker.log" emacsmode="true"/>
+        <hlm:cmakerMacro ncp="${cmaker.pp.version}"
+                      s60="${cmaker.s60.version}"
+                      action="clean"/>
+        <hlm:recordStopMacro name="${build.id}${cmaker.log.label}.clean.cmaker.log"/>
+        <hlm:metadatarecord database="${metadata.dbfile}">
+            <hlm:abldmetadatainput>
+                <fileset casesensitive="false" file="${build.log.dir}/${build.id}${cmaker.log.label}.clean.cmaker.log" />
+                <metadatafilterset refid="filterset.compile" />
+            </hlm:abldmetadatainput>
+        </hlm:metadatarecord>
+    </target>
+    
+    <!-- CMaker list the final destination of what will be exported. -->
+    <target name="cmaker-what" depends="cmaker-install" if="enable.cmaker">
+        <hlm:recordStartMacro name="${build.id}${cmaker.log.label}.what.cmaker.log" emacsmode="true"/>
+        <hlm:cmakerMacro ncp="${cmaker.pp.version}"
+                      s60="${cmaker.s60.version}"
+                      action="what"/>
+        <hlm:recordStopMacro name="${build.id}${cmaker.log.label}.what.cmaker.log"/>
+        <hlm:metadatarecord database="${metadata.dbfile}">
+            <hlm:abldmetadatainput>
+                <fileset casesensitive="false" file="${build.log.dir}/${build.id}${cmaker.log.label}.what.cmaker.log" />
+                <metadatafilterset refid="filterset.compile" />
+            </hlm:abldmetadatainput>
+        </hlm:metadatarecord>
+
+        <!-- Blocks packaging configuration generation. -->
+        <if>
+            <istrue value="${blocks.enabled}" />
+            <then>
+                <mkdir dir="${blocks.config.dir}" />
+                <exec executable="python">
+                    <arg value="-m"/>
+                    <arg value="packager.cli"/>
+                    <arg value="--epocroot=${build.drive}/" />
+                    <arg value="--config=${blocks.config.dir}" />
+                    <arg value="--datasource=cmaker" />
+                    <arg value="-Dwhatlog=${build.log.dir}/${build.id}${cmaker.log.label}.what.cmaker.log" />
+                    <arg value="-Dconfigdir=${cmaker.config.dir}" />
+                    <!--arg value="-Dname=${cmaker.log.label}"-->
+                    <arg value="--updateData" />
+                </exec>
+            </then>
+        </if>
+    </target>
+
+    <!-- CMaker list the source files what will be exported. -->
+    <target name="cmaker-whatdeps" depends="cmaker-install" if="enable.cmaker">
+        <hlm:recordStartMacro name="${build.id}${cmaker.log.label}.whatdeps.cmaker.log" emacsmode="true"/>
+        <hlm:cmakerMacro ncp="${cmaker.pp.version}"
+                      s60="${cmaker.s60.version}"
+                      action="what_deps"/>
+        <hlm:recordStopMacro name="${build.id}${cmaker.log.label}.whatdeps.cmaker.log"/>
+        <hlm:metadatarecord database="${metadata.dbfile}">
+            <hlm:abldmetadatainput>
+                <fileset casesensitive="false" file="${build.log.dir}/${build.id}${cmaker.log.label}.whatdeps.cmaker.log" />
+                <metadatafilterset refid="filterset.compile" />
+            </hlm:abldmetadatainput>
+        </hlm:metadatarecord>
+    </target>
+</project>
+

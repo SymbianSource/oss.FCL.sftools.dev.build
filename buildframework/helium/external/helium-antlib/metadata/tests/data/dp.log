@@ -1,0 +1,9 @@
+INFO:dp:*******************************************
+INFO:dp:*                                         *
+INFO:dp:*       Data package 2.0 creation         *
+INFO:dp:*                 iCreatorDP              *
+INFO:dp:*                    v0.8.7                 *
+INFO:dp:*                                         *
+INFO:dp:*******************************************
+ERROR:dp:${${product.list}.dp.wa}/Setting_files does not exist
+Result: 1

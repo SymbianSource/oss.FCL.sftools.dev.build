@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<build-status>
+        <warning count= "2" />
+        <error count= "1" />
+        <fatal count= "0" />
+        <default count= "0" />
+        <remark count= "0" />
+        <info count= "0" />
+</build-status>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : libs.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="libs-signal" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>
+        Ant task definition declarations.
+    </description>
+    <taskdef resource="com/nokia/helium/core/ant/antlib.xml" uri="http://www.nokia.com/helium"/>
+    <taskdef resource="com/nokia/helium/signal/ant/antlib.xml" uri="http://www.nokia.com/helium"/>
+
+    <typedef name="signalstatusdef" classname="com.nokia.helium.signal.ant.types.SignalStatusDef" uri="http://www.nokia.com/helium"/>
+    <typedef name="exceptionsignal" classname="com.nokia.helium.signal.ant.types.SignalExceptionHandler" uri="http://www.nokia.com/helium"/>
+    <typedef name="buildfailmessage" classname="com.nokia.helium.signal.SignalExceptionMessage" uri="http://www.nokia.com/helium"/>
+    <typedef name="buildneverfailmessage" classname="com.nokia.helium.signal.SignalNeverFailMessage" uri="http://www.nokia.com/helium"/>
+
+    <hlm:deflist id="helium-signaling.list">
+        <hlm:listenerdef classname="com.nokia.helium.signal.ant.SignalListener" />
+        <hlm:signalstatusdef/>
+        <hlm:exceptionsignal/>
+        <hlm:buildfailmessage/>
+        <hlm:buildneverfailmessage/>
+    </hlm:deflist>
+</project>

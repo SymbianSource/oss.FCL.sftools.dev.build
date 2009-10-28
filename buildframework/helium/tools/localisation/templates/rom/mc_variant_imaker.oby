@@ -1,0 +1,43 @@
+/*
+* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description: 
+*
+*/
+/*
+ *
+ * mc_variant_imaker.oby
+ *
+ * This file is an example. Product can update it accordingly to their needs.
+ *
+ */
+#ifndef VARIANT_IMAKER_IBY
+#define VARIANT_IMAKER_IBY
+
+#include <ncp_feature_consts.hrh>
+#define VARIANT_INCLUDE(prefix,suffix) <##concat3(prefix,VARIANTID,suffix)##>
+#define LP_INCLUDE(prefix,suffix) <##concat3(prefix,LPID,suffix)##>
+
+ROM_IMAGE[2] {
+#ifdef VARIANTID
+	#include LP_INCLUDE(variant_,.iby)
+#else
+	#include <locales_sc.iby>
+#endif
+}
+
+ROM_IMAGE[3] {
+#include <variation.iby>
+}
+
+#endif // VARIANT_IMAKER_IBY

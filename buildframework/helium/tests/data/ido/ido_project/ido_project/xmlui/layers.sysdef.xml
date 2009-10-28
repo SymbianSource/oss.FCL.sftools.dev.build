@@ -1,0 +1,161 @@
+<?xml version="1.0"?>
+<!DOCTYPE SystemDefinition [
+<!ELEMENT SystemDefinition (systemModel?, build?)>
+<!ATTLIST SystemDefinition
+  name CDATA #REQUIRED
+  schema CDATA #REQUIRED
+>
+<!-- all paths are relative to the root of the source -->
+
+<!-- System Model Section of DTD -->
+<!ELEMENT systemModel (layer+)>
+
+<!ELEMENT layer (logicalset* | module*)*>
+<!-- Kernel Services, Base Services, OS Services, Etc -->
+<!ATTLIST layer
+  name CDATA #REQUIRED
+  levels CDATA #IMPLIED
+  span CDATA #IMPLIED
+>
+
+<!ELEMENT logicalset (logicalsubset* | module* | unit* | package* | prebuilt*)*>
+ <!-- Generic OS services, Comms Services, etc -->
+<!ATTLIST logicalset 
+  name CDATA #REQUIRED
+>
+
+<!ELEMENT logicalsubset (module* | unit* | package* | prebuilt*)*>
+<!-- Telephony services, Networking Services, etc -->
+<!ATTLIST logicalsubset 
+  name CDATA #REQUIRED
+>
+
+<!ELEMENT module (component* | unit* | package* | prebuilt*)*>
+<!-- Screen Driver, Content Handling, etc -->
+<!ATTLIST module
+  name CDATA #REQUIRED
+  level CDATA #IMPLIED  
+>
+
+<!ELEMENT component (unit* | package* | prebuilt*)*>
+<!-- units or packages -->
+<!ATTLIST component
+  name CDATA #REQUIRED
+>
+
+<!ELEMENT unit EMPTY >
+<!-- must be buildable (bld.inf) -->
+<!-- bldFile will soon be removed in favour of mrp -->
+<!ATTLIST unit
+  unitID ID #REQUIRED
+  name CDATA #REQUIRED
+  mrp CDATA #REQUIRED
+  filter CDATA #IMPLIED
+  bldFile CDATA #REQUIRED
+  priority CDATA #IMPLIED
+  contract CDATA #IMPLIED
+>
+
+<!ELEMENT package EMPTY >
+<!-- like a unit, but not buildable -->
+<!ATTLIST package
+  name CDATA #REQUIRED
+  mrp CDATA #REQUIRED
+  filter CDATA #IMPLIED
+  contract CDATA #IMPLIED
+>
+
+<!ELEMENT prebuilt EMPTY>
+<!-- pre-built CBR component -->
+<!ATTLIST prebuilt
+  name CDATA #REQUIRED
+  version CDATA #REQUIRED
+  late (Y|N) #IMPLIED
+  filter CDATA #IMPLIED
+  contract CDATA #IMPLIED
+>
+
+
+
+<!-- Build Section of DTD -->
+<!ELEMENT build (option* | target+ | targetList+ | unitList+ | configuration+)*>
+
+<!ELEMENT unitList (unitRef+)>
+<!-- e.g. common, beech, cedar, etc -->
+<!ATTLIST unitList
+  name ID #REQUIRED
+  description CDATA #REQUIRED
+>
+
+<!ELEMENT unitRef EMPTY>
+<!-- Reference to unit in System Model -->
+<!ATTLIST unitRef
+  unit IDREF #REQUIRED
+>
+
+<!ELEMENT targetList EMPTY>
+<!-- e.g. DEFAULT_7.0S, TOOLS_7.0S, etc -->
+<!ATTLIST targetList
+  name ID #REQUIRED
+  description CDATA #REQUIRED
+  target IDREFS #REQUIRED
+>
+
+<!ELEMENT target EMPTY>
+<!-- e.g. WINS, WINSCW, ARM4, etc -->
+<!ATTLIST target
+  name ID #REQUIRED
+  abldTarget CDATA #REQUIRED
+  description CDATA #REQUIRED
+>
+
+<!ELEMENT option EMPTY>
+<!-- e.g. Keepgoing, SaveSpace, etc -->
+<!ATTLIST option
+  name ID #REQUIRED
+  abldOption CDATA #REQUIRED
+  description CDATA #REQUIRED
+  enable (Y | N | y | n) #REQUIRED
+>
+
+<!ELEMENT configuration (unitListRef+ | layerRef+ | task+)*>
+<!-- 7.0s, 8.0a, 8.0b, cuskit, etc -->
+<!ATTLIST configuration
+  name ID #REQUIRED
+  description CDATA #REQUIRED
+  filter CDATA #REQUIRED
+>
+<!ELEMENT task ( unitListRef* , (buildLayer | specialInstructions))>
+
+<!ELEMENT unitListRef EMPTY>
+<!-- Reference to unitList -->
+<!ATTLIST unitListRef
+  unitList IDREF #REQUIRED
+>
+
+<!ELEMENT layerRef EMPTY>
+<!-- Reference to named entity in the model, usually a layer -->
+<!ATTLIST layerRef
+  layerName CDATA #REQUIRED
+>
+
+<!ELEMENT buildLayer EMPTY>
+<!-- bldmake, abld export, etc -->
+<!ATTLIST buildLayer
+  command CDATA #REQUIRED
+  targetList IDREFS #IMPLIED
+  unitParallel (Y | N | y | n) #REQUIRED
+  targetParallel (Y | N | y | n) #IMPLIED
+>
+
+<!ELEMENT specialInstructions EMPTY>
+<!-- BootStrap -->
+<!ATTLIST specialInstructions
+  name CDATA #REQUIRED
+  cwd CDATA #REQUIRED
+  command CDATA #REQUIRED
+>
+<!ENTITY layer_real_source_path "s60/mw/xmlui">
+]>
+
+<SystemDefinition name="MCL" schema="1.4.0"/>

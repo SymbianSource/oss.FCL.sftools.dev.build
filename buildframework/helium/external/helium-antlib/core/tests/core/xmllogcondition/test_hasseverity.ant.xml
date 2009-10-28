@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : test_hasseverity.ant.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test-hasseverity" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>Helium antlib core hasseverity tests.</description>
+
+    <taskdef resource="com/nokia/helium/core/ant/antlib.xml" uri="http://www.nokia.com/helium" />
+
+    <!-- is called prior to the test -->
+    <target name="setUp">
+    </target>
+
+    <!-- is called after the test, even if that caused an error -->
+    <target name="tearDown">
+    </target>
+
+    <fileset id="empty_folder.path" dir="data/empty_folder" />
+
+    <!-- the actual test case -->
+    <target name="test-hasseverity-error">
+        <!-- Check for errors -->
+        <au:assertTrue>
+            <hlm:hasSeverity severity="error" file="./data/helium_minibuild_ido_compile.log.xml" />
+        </au:assertTrue>
+    </target>
+
+    <target name="test-hasseverity-warning">
+        <!-- Check for warnings -->
+        <au:assertTrue>
+            <hlm:hasSeverity severity="warning" file="./data/helium_minibuild_ido_compile.log.xml" />
+        </au:assertTrue>
+    </target>
+
+    <target name="test-hasseverity-info">
+        <!-- Check for infos -->
+        <au:assertFalse>
+            <hlm:hasSeverity severity="info" file="./data/helium_minibuild_ido_compile.log.xml" />
+        </au:assertFalse>
+    </target>
+</project>

@@ -1,0 +1,136 @@
+<?xml version="1.0"?>
+<!-- 
+============================================================================ 
+Name        : test_diamonds.ant.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test-diamonds" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>Helium Antlib diamonds unittests.</description>
+    
+    <dirname property="project.dir" file="${ant.file.test-diamonds}" />
+    <target name="version">
+        <echo message="version target for diamonds to verify sending data to diamonds" />
+    </target>
+
+    <target name="diamonds" />
+
+    <target name="compile-target">
+        <echo message="verify the build stage with input source xml file" />
+    </target>
+
+    <target name="codescanner">
+        <echo message="target verification with input source xml file" />
+    </target>
+
+    <target name="create-bom-log">
+        <echo message="target without input file and just to send the data" />
+    </target>
+
+    <target name="invalid-target-input-file">
+        <echo message="target with invalid input source xml file" />
+    </target>
+
+    <target name="invalid-stage-input-file">
+        <echo message="stage with invalid input source xml file" />
+    </target>
+
+    <target name="invalid-template-file">
+        <echo message="target with invalid template-file" />
+    </target>
+
+    <target name="invalid-ant-properties-input">
+        <echo message="target with invalid ant properties input" />
+    </target>
+
+    <target name="non-existing-ant-properties">
+        <echo message="target with non-existing-ant-properties" />
+    </target>
+
+    <target name="invalid-diamonds-server-properties">
+        <echo message="target with invalid-diamonds-server-properties" />
+    </target>
+
+    <target name="defer-type">
+        <echo message="version target for diamonds to verify sending data to diamonds" />
+    </target>
+
+    <target name="test-defer-type">
+        <antcall target="defer-type" />
+    </target>
+
+    <target name="test-create-bom-log">
+        <antcall target="create-bom-log" />
+    </target>
+
+    <target name="test-codescanner">
+        <antcall target="codescanner" />
+    </target>
+
+    <target name="test-invalid-target-input-file">
+        <antcall target="invalid-target-input-file" />
+    </target>
+
+    <target name="test-invalid-stage-input-file">
+        <antcall target="invalid-target-input-file" />
+        <echo message="stage with invalid input source xml file" />
+    </target>
+
+    <target name="test-invalid-template-file">
+        <antcall target="invalid-template-file" />
+    </target>
+
+    <target name="test-invalid-ant-properties-input">
+        <antcall target="invalid-ant-properties-input" />
+    </target>
+
+    <target name="test-non-existing-ant-properties">
+        <antcall target="non-existing-ant-properties" />
+    </target>
+
+    <target name="test-invalid-diamonds-server-properties">
+        <antcall target="invalid-diamonds-server-properties" />
+        <echo message="target with invalid-diamonds-server-properties" />
+    </target>
+
+    <target name="test-compile-target">
+        <antcall target="compile-target" />
+    </target>
+
+    <target name="test-version">
+        <antcall target="version" />
+    </target>
+
+    <target name="test-buildid-set">
+        <echo>${diamonds.build.id}</echo>
+        <au:assertTrue>
+            <isset property="diamonds.build.id"/>
+        </au:assertTrue>
+    </target>
+
+    <target name="test-buildid-notset">
+        <au:assertFalse>
+            <isset property="diamonds.build.id"/>
+        </au:assertFalse>
+    </target>
+
+    <target name="test-all" depends="test-buildid-notset, diamonds, test-buildid-set, test-defer-type, test-version,
+        test-create-bom-log,test-codescanner,test-compile-target,test-invalid-diamonds-server-properties,
+        test-non-existing-ant-properties,test-invalid-ant-properties-input,test-invalid-template-file,
+        test-invalid-target-input-file,test-invalid-stage-input-file " />
+</project>

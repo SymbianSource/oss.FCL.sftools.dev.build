@@ -1,0 +1,53 @@
+    6:  * ====================================================================
+    7:  *
+    8:  * The Apache Software License, Version 1.1
+    9:  *
+   10:  * Copyright (c) 1999-2003 The Apache Software Foundation.  All rights
+   11:  * reserved.
+   12:  *
+   13:  * Redistribution and use in source and binary forms, with or without
+   14:  * modification, are permitted provided that the following conditions
+   15:  * are met:
+   16:  *
+   17:  * 1. Redistributions of source code must retain the above copyright
+   18:  *    notice, this list of conditions and the following disclaimer.
+   19:  *
+   20:  * 2. Redistributions in binary form must reproduce the above copyright
+   21:  *    notice, this list of conditions and the following disclaimer in
+   22:  *    the documentation and/or other materials provided with the
+   23:  *    distribution.
+   24:  *
+   25:  * 3. The end-user documentation included with the redistribution, if
+   26:  *    any, must include the following acknowlegement:
+   27:  *       "This product includes software developed by the
+   28:  *        Apache Software Foundation (http://www.apache.org/)."
+   29:  *    Alternately, this acknowlegement may appear in the software itself,
+   30:  *    if and wherever such third-party acknowlegements normally appear.
+   31:  *
+   32:  * 4. The names "The Jakarta Project", "Commons", and "Apache Software
+   33:  *    Foundation" must not be used to endorse or promote products derived
+   34:  *    from this software without prior written permission. For written
+   35:  *    permission, please contact apache@apache.org.
+   36:  *
+   37:  * 5. Products derived from this software may not be called "Apache"
+   38:  *    nor may "Apache" appear in their names without prior written
+   39:  *    permission of the Apache Group.
+   40:  *
+   41:  * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
+   42:  * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+   43:  * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+   44:  * DISCLAIMED.  IN NO EVENT SHALL THE APACHE SOFTWARE FOUNDATION OR
+   45:  * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+   46:  * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+   47:  * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
+   48:  * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+   49:  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+   50:  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+   51:  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+   52:  * SUCH DAMAGE.
+   53:  * ====================================================================
+   54:  *
+   55:  * This software consists of voluntary contributions made by many
+   56:  * individuals on behalf of the Apache Software Foundation.  For more
+   57:  * information on the Apache Software Foundation, please see
+   58:  * <http://www.apache.org/>.

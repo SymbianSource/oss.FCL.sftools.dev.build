@@ -1,0 +1,331 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : ec.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="compile.ec" xmlns:hlm="http://www.nokia.com/helium">
+    <description>
+        EC compilation targets.
+    </description>
+
+    <property name="ec.emake" value="emake"/>
+    <property name="ec.makefile.file" location="${build.drive}/Makefile"/>
+
+    <property name="ec.sysdef2make" location="${helium.dir}/tools/compile/ec/sysdef2make.pl"/>
+    
+    <property name="ec.historyfile" value="${build.drive}/emake.data"/>
+    <property name="ec.mem.limit" value="1000000000"/>
+    
+    <!-- This can be used to query cluster manager to find information about the build. Set
+    to default as all the clusture supports default class id.-->
+    <property name="ec.build.class" value="default"/>
+    
+
+    <!-- Converting cononical SDF into a Makefile. -->
+    <target name="compile-genxml-ec" if="build.system.ec-helium">
+        <!-- Using now the official script for GTI. -->
+        <exec executable="perl" dir="${build.drive}/" error="${build.log.dir}/${build.id}.${sysdef.configuration}.sysdef2make.log" failonerror="${failonerror}">
+            <arg line="${ec.sysdef2make} -n ${sysdef.configuration} -s ${env.EPOCROOT} -forcemake ((abld.*\-(w|what|c|check))|(abld.*resource)) ${canonical.sysdef.file}"/>
+        </exec>
+        <hlm:metadatarecord database="${metadata.dbfile}">
+            <hlm:textmetadatainput>
+                <fileset casesensitive="false" file="${build.log.dir}/${build.id}.${sysdef.configuration}.sysdef2make.log"/>
+                <metadatafilterset refid="filterset.genxml.ec" />
+            </hlm:textmetadatainput>
+        </hlm:metadatarecord>
+        <hlm:generateBuildStatus file="${build.id}.${sysdef.configuration}.sysdef2make.log" />
+    </target>
+
+    <!-- Locate the dependancy files from a previous build so that only those files that have been changed need to be compiled -->
+    <scriptdef name="findHistoryFile" language="jython" uri="http://www.nokia.com/helium">
+        <attribute name="history.dir"/>
+        <attribute name="week.number"/>
+        <attribute name="branch.name"/>
+<![CDATA[
+import os
+from build.ec import history
+
+file_name = "-1"
+branch_nm = ""
+hfm = history.HistoryFileManager(attributes.get('history.dir'), attributes.get('week.number'), attributes.get('branch.name'))
+hfm.findHistoryFilePath()
+file_name = hfm.findFile()
+
+if (file_name is not None):
+    file_name = os.path.join(hfm.path, file_name)
+project.setProperty("ec.historyfile.previous", file_name)
+]]>
+    </scriptdef>
+
+
+    <!-- Find the previous history file based on nearest release.
+    week.number and branch.name property needs to be set by the product
+    xml configuration. ec.historyfile.previous holds the matching history file
+    for current builds week.number and branch.name.
+    -->    
+    <target name="find-previous-history-file" if="build.system.ec-helium">
+        <echo message="history.dir:${ec.history.dir}" />
+        <if>
+            <isset property="branch.name" />
+            <then>
+                <var name="ec.branch" value="${branch.name}" />
+            </then>
+            <else>
+                <var name="ec.branch" value="" />
+            </else>
+        </if>
+        <hlm:findHistoryFile history.dir="${ec.history.dir}" week.number="${week.number}" branch.name="${ec.branch}" />
+        <echo message="${week.number}" />
+        <echo message="history.file:${ec.historyfile.previous}" />
+        <if>
+            <not>
+                <equals arg1="${ec.historyfile.previous}" arg2="-1" />
+            </not>
+            <then>
+                <if>
+                    <available file="${ec.historyfile.previous}" />
+                    <then>
+                        <copy file="${ec.historyfile.previous}" tofile="${ec.historyfile}" overwrite="true" failonerror="false" />
+                        <hlm:assertFileExists file="${ec.historyfile}"/>
+                    </then>
+                </if>
+            </then>
+        </if>
+    </target>
+
+    <!-- Find the previous history file based on time stamps. This is used 
+    only when week.number and branch.name not set by product configuration.
+    ec.historyfile.previous holds the history file generated using previous 
+    build.
+    -->    
+    <target name="reuse-previous-ec-history" if="build.system.ec-helium">
+        <if>
+            <available file="${ec.history.dir}" />
+            <then>
+                <timestampselector property="ec.historyfile.previous">
+                    <path>
+                        <fileset dir="${ec.history.dir}">
+                            <include name="*.data"/>
+                        </fileset>
+                    </path>
+                </timestampselector>
+                <if>
+                    <available file="${ec.historyfile.previous}"/>
+                    <then>
+                        <copy file="${ec.historyfile.previous}" tofile="${ec.historyfile}" overwrite="true" failonerror="false" />
+                        <hlm:assertFileExists file="${ec.historyfile}"/>
+                    </then>
+                </if>
+            </then>
+        </if>
+    </target>
+    
+    <!-- EC prequisites before compile. Finds the previous history file either 
+    based on nearest release or timestamp. If there is no previous history file,
+    it switches back to single node. If build has to run in serial mode, then ec.mode
+    needs to be set to serial -->    
+    <target name="precompile-ec" if="build.system.ec-helium">
+        <if>
+            <equals arg1="${ec.mode}" arg2="serial" />
+            <then>
+                <echo message="Single Node Build : Mode Serial" />
+                <var name="ec.maxagents" value="1"/>
+                <var name="ec.history.option" value="create"/>
+            </then>
+            <else>
+                <property name="ec.maxagents" value="0"/>    
+                <property name="ec.history.option" value="merge"/>
+                <if>
+                    <isset property="week.number"/>
+                    <then>
+                        <antcall target="find-previous-history-file"/>
+                        <if>
+                            <not>
+                                <available file="${ec.historyfile}"/>
+                            </not>
+                            <then>
+                                <echo message="Switching to Single Node Build" />
+                                <var name="ec.maxagents" value="1"/>
+                                <var name="ec.history.option" value="create"/>
+                            </then>
+                        </if>
+                    </then>
+                    <else>
+                        <antcall target="reuse-previous-ec-history"/>
+                    </else>
+                </if>
+            </else>
+        </if>
+        <echo message="ec.mode:${ec.mode}" />
+        <echo message="ec.maxagents:${ec.maxagents}"/>
+        <echo message="ec.history.option:${ec.history.option}"/>
+    </target>
+
+    <!--
+    The findUpdateHFPathMacro is used to find the history update dir. 
+    -->
+    <scriptdef name="findUpdateHFPathMacro" language="jython" uri="http://www.nokia.com/helium">
+        <attribute name="history.dir"/>
+        <attribute name="week.number"/>
+        <attribute name="branch.name"/>
+        <attribute name="property"/>
+<![CDATA[
+import os
+from build.ec import history
+hfm = history.HistoryFileManager(attributes.get('history.dir'), attributes.get('week.number'), attributes.get('branch.name'))
+file_path = hfm.findActualFilePath()
+project.setProperty(str(attributes.get('property')), str(file_path))
+]]>
+    </scriptdef>
+
+
+    <!-- EC post compile operation copy history file back to network drive -->    
+    <target name="postcompile-ec" if="build.system.ec-helium">
+        <if>
+            <and>
+                <isset property="week.number"/>
+                <available file="${ec.history.dir}"/>
+            </and>
+            <then>
+                <if>
+                    <isset property="branch.name"/>
+                    <then>
+                        <var name="ec.branch" value="${branch.name}"/>
+                    </then>
+                    <else>
+                        <var name="ec.branch" value=""/>
+                    </else>
+                </if>
+                <hlm:findUpdateHFPathMacro history.dir="${ec.history.dir}" week.number="${week.number}" branch.name="${ec.branch}" property="ec.history.update.dir"/>
+                <mkdir dir="${ec.history.update.dir}"/>
+                <if>
+                    <not>
+                        <available file="${ec.history.update.dir}/tmp" type="dir"/>
+                    </not>
+                    <then>
+                        <mkdir dir="${ec.history.update.dir}/tmp"/>
+                        <move file="${ec.history.update.dir}/${week.number}.data" todir="${ec.history.update.dir}/tmp" failonerror="false"/>
+                        <copy file="${ec.historyfile}" tofile="${ec.history.update.dir}/${week.number}.data" overwrite="true" failonerror="false" />
+                        <delete dir="${ec.history.update.dir}/tmp"/>
+                        <hlm:assertFileExists file="${ec.history.update.dir}/${week.number}.data"/>
+                    </then>
+                </if>
+            </then>
+            <else>
+                <if>
+                    <available file="${ec.history.dir}"/>
+                    <then>
+                        <copy file="${ec.historyfile}" tofile="${ec.history.dir}/${build.id}.data" overwrite="true" failonerror="false" />
+                        <hlm:assertFileExists file="${ec.history.dir}/${build.id}.data"/>
+                    </then>
+                </if>
+            </else>
+        </if>
+    </target>
+
+
+    <!-- Required Patches for symbian and java component build, before compiling EC-->    
+    <target name="compile-ec-patch" unless="skip.compile-ec-patch">
+        <echo>Patching....</echo>
+        <for list="\epoc32\tools\abld.pl,\src\cedar\generic\tools\e32toolp\bldmake\abld.pl"
+                param="file" trim="true">
+            <sequential>
+                <echo>Patching @{file}</echo>
+                <if>
+                    <available file="${build.drive}/@{file}"/>
+                    <then>
+                        <move file="${build.drive}\@{file}.ec_orig" tofile="${build.drive}\@{file}" overwrite="true" failonerror="false"/>
+                        <move file="${build.drive}\@{file}" tofile="${build.drive}\@{file}.ec_orig"/>
+                        <!-- perl -Wpe "s/\"make/\"\$ENV\{MAKE\}/" -->
+                        <exec executable="perl" dir="${build.drive}/" input="${build.drive}\@{file}.ec_orig"
+                                                output="${build.drive}\@{file}" failonerror="${failonerror}">
+                            <arg value="-Wpe"/>                         
+                            <arg value="s/\&quot;make/\&quot;\$ENV\{MAKE\}/"/>
+                        </exec>
+                    </then>
+                </if>
+            </sequential>
+        </for>
+    </target>
+
+    <!-- Unpatch symbian tool and java tool after compiling using EC-->    
+    <target name="compile-ec-unpatch" unless="skip.compile-ec-patch">
+        <echo>Rollback patches....</echo>
+        <move file="${build.drive}\epoc32\tools\abld.pl.ec_orig" tofile="${build.drive}\epoc32\tools\abld.pl" overwrite="true"/>
+    </target>
+
+    <!-- EC logs compatible to EBS. Still some of the EC errors are not compatible to 
+    EBS. 
+    1. If the component path in the sysdef is not valid, then in EBS the component is 
+    removed. In case of EC, the component is still built and there will be an error Make
+    No rule to make such directory.
+    2. If there is any error in building the component, the return value is compared in EBS
+    build and transfered to proper error message. The error will be there in EC, but it is not
+    transfered to proper error message. -->
+    <target name="compile-ec-logs">
+        <echo>Cleaning up the logs....</echo>
+        <exec executable="perl" dir="${build.drive}/" failonerror="${failonerror}">
+            <arg line="${helium.dir}/tools/compile/ec/ec_whatcheck.pl"/>
+            <redirector input="${build.log.dir}/${build.id}.${sysdef.configuration}_build_output.log"
+                output="${build.log.dir}/${build.id}.${sysdef.configuration}_compile.log"/>
+        </exec>
+    </target>
+
+
+    <!-- Build the component using EC. This is the only target for EC builds.
+    It patches the necessary tools for EC builds, and call the emake with 
+    necessary arguments.-->
+    <target name="compile-ec-helium" if="build.system.ec-helium" depends="set-arm-version" >
+        <mkdir dir="${build.output.dir}/ec/history"/>
+        <antcall target="compile-ec-patch"/>
+        <if>
+            <isset property="env.EMAKE_DEBUG"/>
+            <then>
+                <var name="emake_debug_flag" value="${env.EMAKE_DEBUG}"/>
+            </then>
+            <else>
+                <property name="emake_debug_flag" value="g"/>
+            </else>
+        </if>
+        
+        <echo>emake debug flag: ${emake_debug_flag}</echo>
+
+        <echo>Building ${sysdef.configuration}....</echo>
+        <echo file="${build.log.dir}/${build.id}.${sysdef.configuration}_run_emake.bat" level="info">
+set
+${ec.emake} --emake-build-label=${build.id}.${sysdef.configuration} --emake-class=${ec.build.class} --emake-priority=normal --emake-maxagents=${ec.maxagents} --emake-job-limit=0 --emake-mem-limit=${ec.mem.limit} --emake-history=${ec.history.option} --emake-annodetail=basic,history,file,waiting --emake-annofile=${build.log.dir}\${build.id}.${sysdef.configuration}.emake.anno.xml --emake-historyfile=${ec.historyfile} --emake-debug=${emake_debug_flag} --emake-logfile=${build.log.dir}\${build.id}.${sysdef.configuration}.emake.g.dlog --emake-root=%EMAKE_ROOT%;${helium.dir} --emake-autodepend=1 -k -i -f ${build.drive}/${sysdef.configuration}.make LOGBUILDTIME=&quot;&quot; VERBOSE=&quot;&quot; SAVESPACE=&quot;&quot; ${sysdef.configuration}
+        </echo>
+
+        <exec executable="${build.log.dir}/${build.id}.${sysdef.configuration}_run_emake.bat"
+              dir="${build.drive}/" output="${build.log.dir}/${build.id}.${sysdef.configuration}_build_output.log"
+              failonerror="${failonerror}">
+            <env key="SYMBIANBUILD_DEPENDENCYOFF" value="1" />
+        </exec>
+        
+        <antcall target="compile-ec-unpatch"/>
+        <antcall target="compile-ec-logs"/>
+
+        <!-- Testing everything happens correctly. -->
+        <hlm:assertFileExists file="${build.log.dir}/${build.id}.${sysdef.configuration}_run_emake.bat"/>
+        <hlm:assertFileExists file="${build.log.dir}/${build.id}.${sysdef.configuration}_build_output.log"/>
+        <hlm:assertFileExists file="${build.log.dir}/${build.id}.${sysdef.configuration}_compile.log"/>
+        <hlm:calculateErrorsFromLog logfile="${build.log.dir}/${build.id}.${sysdef.configuration}_compile.log" />
+    </target>
+</project>

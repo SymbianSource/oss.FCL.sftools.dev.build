@@ -1,0 +1,91 @@
+
+    2:  * Copyright (c) 2003 The Visigoth Software Society. All rights
+    3:  * reserved.
+    4:  *
+    5:  * Redistribution and use in source and binary forms, with or without
+    6:  * modification, are permitted provided that the following conditions
+    7:  * are met:
+    8:  *
+    9:  * 1. Redistributions of source code must retain the above copyright
+   10:  *    notice, this list of conditions and the following disclaimer.
+   11:  *
+   12:  * 2. Redistributions in binary form must reproduce the above copyright
+   13:  *    notice, this list of conditions and the following disclaimer in
+   14:  *    the documentation and/or other materials provided with the
+   15:  *    distribution.
+   16:  *
+   17:  * 3. The end-user documentation included with the redistribution, if
+   18:  *    any, must include the following acknowledgement:
+   19:  *       "This product includes software developed by the
+   20:  *        Visigoth Software Society (http://www.visigoths.org/)."
+   21:  *    Alternately, this acknowledgement may appear in the software itself,
+   22:  *    if and wherever such third-party acknowledgements normally appear.
+   23:  *
+   24:  * 4. Neither the name "FreeMarker", "Visigoth", nor any of the names of the
+   25:  *    project contributors may be used to endorse or promote products derived
+   26:  *    from this software without prior written permission. For written
+   27:  *    permission, please contact visigoths@visigoths.org.
+   28:  *
+   29:  * 5. Products derived from this software may not be called "FreeMarker" or "Visigoth"
+   30:  *    nor may "FreeMarker" or "Visigoth" appear in their names
+   31:  *    without prior written permission of the Visigoth Software Society.
+   32:  *
+   33:  * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
+   34:  * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+   35:  * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+   36:  * DISCLAIMED.  IN NO EVENT SHALL THE VISIGOTH SOFTWARE SOCIETY OR
+   37:  * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+   38:  * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+   39:  * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
+   40:  * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+   41:  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+   42:  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+   43:  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+   44:  * SUCH DAMAGE.
+   45:  * ====================================================================
+   46:  *
+   47:  * This software consists of voluntary contributions made by many
+   48:  * individuals on behalf of the Visigoth Software Society. For more
+   49:  * information on the Visigoth Software Society, please see
+   50:  * http://www.visigoths.org/
+
+----
+
+Copyright 1994-2007 Sun Microsystems, Inc. All Rights Reserved.
+Redistribution and use in source and binary forms, with or without 
+modification, are permitted provided that the following conditions 
+are met:
+ 
+
+    * Redistribution of source code must retain the above copyright 
+notice, this list of conditions and the following disclaimer.
+
+    * Redistribution in binary form must reproduce the above copyright 
+notice, this list of conditions and the following disclaimer in the 
+documentation and/or other materials provided with the distribution.
+
+ 
+Neither the name of Sun Microsystems, Inc. or the names of 
+contributors may be used to endorse or promote products derived from 
+this software without specific prior written permission.
+ 
+This software is provided "AS IS," without a warranty of any kind. 
+ALL EXPRESS OR IMPLIED CONDITIONS, REPRESENTATIONS AND WARRANTIES, 
+INCLUDING ANY IMPLIED WARRANTY OF MERCHANTABILITY, FITNESS FOR A 
+PARTICULAR PURPOSE OR NON-INFRINGEMENT, ARE HEREBY EXCLUDED. SUN 
+MICROSYSTEMS, INC. ("SUN") AND ITS LICENSORS SHALL NOT BE LIABLE 
+FOR ANY DAMAGES SUFFERED BY LICENSEE AS A RESULT OF USING, MODIFYING 
+OR DISTRIBUTING THIS SOFTWARE OR ITS DERIVATIVES. IN NO EVENT WILL 
+SUN OR ITS LICENSORS BE LIABLE FOR ANY LOST REVENUE, PROFIT OR 
+DATA, OR FOR DIRECT, INDIRECT, SPECIAL, CONSEQUENTIAL, INCIDENTAL 
+OR PUNITIVE DAMAGES, HOWEVER CAUSED AND REGARDLESS OF THE THEORY 
+OF LIABILITY, ARISING OUT OF THE USE OF OR INABILITY TO USE THIS 
+SOFTWARE, EVEN IF SUN HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH 
+DAMAGES.
+ 
+You acknowledge that this software is not designed, licensed or 
+intended for use in the design, construction, operation or 
+maintenance of any nuclear facility. 
+
+----
+

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : internal-exports.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="quality.internal-exports" xmlns:hlm="http://www.nokia.com/helium">
+    <description>
+        Analyse the content generated under the source tree.
+    </description>
+
+    <!--
+        This macro generates an XML file that list the file generated outside epoc32 during the build.
+        It relies on the output of "abld -what" command.
+
+        e.g:
+          <pre>
+        <hlm:internalExportsMacro output="${build.log.dir}/${build.id}_internal_exports.xml">
+            <fileset dir="${build.log.dir}">
+                <include name="${build.id}.*_compile.log"/>
+                <exclude name="${build.id}.*_output_build.log"/>
+            </fileset>
+        </hlm:internalExportsMacro>
+        </pre>
+    -->
+    <scriptdef name="internalExportsMacro" language="jython" uri="http://www.nokia.com/helium">
+        <element name="fileset" type="fileset"/>
+        <attribute name="output"/>
+        <![CDATA[
+import integration.quality
+import os
+if attributes.get('output') == None:
+    raise Exception("'output' attribute is not defined.")
+self.log("Creating %s" % str(attributes.get('output')))
+output = open(str(attributes.get('output')), "w+")
+output.write("<?xml version=\"1.0\"?>\n<internalexports>\n")
+for eid in range(elements.get("fileset").size()):
+    ds = elements.get("fileset").get(int(eid)).getDirectoryScanner(project)
+    ds.scan()
+    for filename in ds.getIncludedFiles():
+        filename = os.path.join(str(ds.getBasedir()), str(filename))
+        parser = integration.quality.InternalExportParser(open(filename, 'r'))
+        parser.parse()
+        for component in parser.internalexports.keys():
+            output.write("    <component name=\"%s\">\n" % component)
+            output.write("".join(map(lambda x: "        <file name=\"%s\"/>\n" % x, parser.internalexports[component])))
+            output.write("    </component>\n")
+output.write("</internalexports>\n")
+output.close()
+        ]]>
+    </scriptdef>
+
+    <!--
+        This target generate an XML file that contains the list of file exported inside the
+        source tree. The files are sorted by components.
+    -->
+    <target name="integration-internal-exports">
+        <hlm:internalExportsMacro output="${build.log.dir}/${build.id}_internal_exports.xml">
+            <fileset dir="${build.log.dir}">
+                <include name="${build.id}.*_compile.log"/>
+                <exclude name="${build.id}.*_output_build.log"/>
+            </fileset>
+        </hlm:internalExportsMacro>
+    </target>
+
+    
+    <!-- Render the build duplicates xml file into an HTML output. -->
+    <target name="render-internal-exports" depends="integration-internal-exports">
+        <fmpp sourceFile="${helium.dir}/tools/common/templates/integration/internal-exports.html.ftl"
+              outputFile="${build.log.dir}/${build.id}_internal-exports.html">
+            <freemarkerLinks expandProperties="yes">
+                macro: ${helium.dir}/tools/common/templates/macro
+            </freemarkerLinks>
+            <data expandProperties="yes">
+                doc: xml(${build.log.dir}/${build.id}_internal_exports.xml)
+                ant: antProperties()
+            </data>
+        </fmpp>
+    </target>
+
+
+
+</project>

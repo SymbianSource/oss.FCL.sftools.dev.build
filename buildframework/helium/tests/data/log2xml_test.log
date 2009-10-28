@@ -1,0 +1,468 @@
+     [exec] === Stage=mceraseuda == mceraseuda
+     [exec] ++ Started at Mon Sep 17 06:36:19 2007
+     [exec] +++ HiRes Start 1190000179.23461
+     [exec] =========== Configuration =================
+     [exec] PRODUCT:  product
+     [exec] WORKNAME: q:\output\development_flash_images\engineering_english/product\product_0.0738.3.X.201
+     [exec] TYPE:     rnd
+     [exec] ===========================================
+     [exec] *** Error: Can't read iMaker command file `/output/development_flash_images/engineering_english/product/product_0.0738.3.X.201_udaerase.icmd'.
+     [exec] mingw_make.exe[1]: *** [udaerase] Error 1
+     [exec] mingw_make.exe: *** [eraseudarnd] Error 2
+     [exec] Unzipping variation western...
+     [exec] unzip -o -qq -d / /output/build_area/localised/delta_western_package.zip
+     [exec] === Stage=flashuirnd == flashuirnd
+     [exec] ++ Started at Mon Sep 17 06:36:19 2007
+     [exec] +++ HiRes Start 1190000179.95337
+     [exec] =========== Configuration =================
+     [exec] PRODUCT          : product
+     [exec] TYPE             : rnd
+     [exec] NAME             : mc_5132_0.0738.3.X.201_rnd_ui
+     [exec] USE_OVERRIDE     : 1
+     [exec] BLDROM_OBY       : \epoc32\rom\master.oby /epoc32/rom/ppd.oby /epoc32/rom/rnd.oby
+     [exec] BLDROM_OPTION    : -p -v -nosymbols -D_IMAGE_TYPE_RND -D_EABI=ARMV5 -Dproduct -D_ASIC_VER_11 -DUSE_MULTIROFS -es60ibymacros -DXTI_TRACES -DNO_PLATSEC -DSECTION -DUSE_MULTIROFS  q:\output\development_flash_images\engineering_english/product/rnd/mc_5132_0.0738.3.X.201_rnd_ui_override_version.iby    -eoverride 
+     [exec] WORKDIR          : q:\output\development_flash_images\engineering_english/product/rnd
+     [exec] UDEBFILE         : 0
+     [exec] UDEBFILE_LIST    : 
+     [exec] USE_FOTI         : 
+     [exec] USE_FOTA         : 
+     [exec] PREBUILD_STEPS   :  
+     [exec] SOSCORE_VERSION  : 0.0738.3.0.201
+     [exec] SOSROFS1_VERSION : 0.0738.3.0.201	
+     [exec] SOSROFS2_VERSION : 0.0738.3.0.201.ee
+     [exec] SOSROFS3_VERSION : 0.0738.3.0.201.ee
+     [exec] ENABLE_ROMSYMBOL : 1
+     [exec] ===========================================
+     [exec] iMaker - The Image Maker, version 07.34.04, 24-Aug-2007.
+     [exec] Deleting q:\output\development_flash_images\engineering_english/product/rnd/mc_5132_0.0738.3.X.201_rnd_ui_sw.txt
+     [exec] Deleting q:\output\development_flash_images\engineering_english/product/rnd/mc_5132_0.0738.3.X.201_rnd_ui_model.txt
+     [exec] Deleting q:\output\development_flash_images\engineering_english/product/rnd/mc_5132_0.0738.3.X.201_rnd_ui_override_version.iby
+     [exec] Generating header iby for Core ROM image creation
+     [exec] Generating header iby for Core ROFS1 image creation
+     [exec] Generating Core FWID txt file
+     [exec] Generating Core FWID iby file
+     [exec] Generating file: q:\output\development_flash_images\engineering_english/product/rnd/mc_5132_0.0738.3.X.201_rnd_ui_sw.txt
+     [exec] Generating file: q:\output\development_flash_images\engineering_english/product/rnd/mc_5132_0.0738.3.X.201_rnd_ui_model.txt
+     [exec] Generating the q:\output\development_flash_images\engineering_english/product/rnd/mc_5132_0.0738.3.X.201_rnd_ui_override_version.iby
+     [exec] Generating the q:\output\development_flash_images\engineering_english/product/rnd/mc_5132_0.0738.3.X.201_rnd_ui_core_fwid.iby
+     [exec] Generating full Core ROM oby
+     [exec] 
+     [exec] Missing file(s):
+     [exec]  1) ..\..\epoc32\rom\include\ssc.iby(31): Missing file: '\epoc32\release\ARMV5\urel\ssc.ext' in statement 'extension[0x09080004]='
+     [exec]  2) ..\..\epoc32\rom\include\SWATI_Symbian_Tools.iby(163): Missing file: '\epoc32\release\ARMV5\urel\MobileCrashTimer.exe' in statement 'file='
+     [exec]  3) ..\..\epoc32\rom\include\PhoneCntFinderExt.iby(24): Missing file: '\epoc32\data\Z\System\install\phcntvoicerecoghandler_stub.SIS' in statement 'data='
+     [exec]  4) ..\..\epoc32\rom\include\screensaver.iby(24): Missing file: '\epoc32\release\ARMV5\urel\screensaver.product.exe' in statement 'file='
+     [exec]  5) ..\..\epoc32\rom\include\eSWT.iby(44): Missing file: '\epoc32\RELEASE\ARMV5\UREL\Z\Resource\ive\lib\jclcldc11\ext\odc\eswt-core.jar' in statement 'data='
+     [exec]  6) ..\..\epoc32\rom\include\eSWT.iby(45): Missing file: '\epoc32\RELEASE\ARMV5\UREL\Z\Resource\ive\lib\jclcldc11\ext\odc\esw.jar' in statement 'data='
+     [exec]  7) ..\..\epoc32\rom\include\eSWT.iby(46): Missing file: '\epoc32\RELEASE\ARMV5\UREL\Z\Resource\ive\lib\jclcldc11\ext\odc\eswt-expanded.jar' in statement 'data='
+     [exec]  8) ..\..\epoc32\rom\include\eSWT.iby(49): Missing file: '\epoc32\RELEASE\ARMV5\UREL\Z\Resource\ive\lib\jclcldc11\ext\eswt-core.odc' in statement 'data='
+     [exec]  9) ..\..\epoc32\rom\include\eSWT.iby(50): Missing file: '\epoc32\RELEASE\ARMV5\UREL\Z\Resource\ive\lib\jclcldc11\ext\esw.odc' in statement 'data='
+     [exec] 10) ..\..\epoc32\rom\include\eSWT.iby(51): Missing file: '\epoc32\RELEASE\ARMV5\UREL\Z\Resource\ive\lib\jclcldc11\ext\eswt-expanded.odc' in statement 'data='
+     [exec] 11) ..\..\epoc32\rom\include\advancedtspcontroller.iby(24): Missing file: '\epoc32\release\ARMV5\urel\AdvancedTspController.dll' in statement 'file='
+     [exec] 12) ..\..\epoc32\rom\include\.oby(30): Missing file: '\epoc32\data\Z\System\install\enh_drv.sis' in statement 'data='
+     [exec] 13) ..\..\epoc32\rom\include\d2d.iby(22): Missing file: '\epoc32\release\ARMV5\urel\d2dwlanconnector.dll' in statement 'file='
+     [exec] 14) ..\..\epoc32\rom\include\sysaplightpluginsource.iby(25): Missing file: '\epoc32\release\ARMV5\urel\sysaplightpluginsource.dll' in statement 'file='
+     [exec] 15) ..\..\epoc32\rom\include\animplugin.iby(8): Missing file: '\epoc32\release\ARMV5\urel\KeyCapturerPlugin.dll' in statement 'file='
+     [exec] 16) ..\..\epoc32\rom\include\OnlinePrint.iby(25): Missing file: '\epoc32\data\Z\system\install\OnlinePrint.sis' in statement 'data='
+     [exec] 17) ..\..\epoc32\rom\include\msync.iby(30): Missing file: '\epoc32\release\ARMV5\urel\msyncpluginmedia.dll' in statement 'file='
+     [exec] 18) ..\..\epoc32\rom\include\msync.iby(31): Missing file: '\epoc32\release\ARMV5\urel\msyncpluginmessaging.dll' in statement 'file='
+     [exec] 19) q:outputdevelopment_flash_images\033ngineering_english\product\rnd\mc_5132_0.0738.3.X.201_rnd_ui_core_fwid.iby(6): Missing file: 'q:\output\development_flash_images\engineering_english/product/rnd/mc_5132_0.0738.3.X.201_rnd_ui_fwid1.txt' in statement 'data='
+     [exec] 
+     [exec] Warning(s):
+     [exec]  1) WARNING: Unknown keyword '/'.  Line 193 ignored
+     [exec]  2) WARNING: Unknown keyword 'ROFS_HEADER'.  Line 212 ignored
+     [exec]  3) WARNING: Unknown keyword '..\data\VoiceRecorder_stub.SIS'.  Line 3242 ignored
+     [exec]  4) WARNING: Unknown keyword '***'.  Line 3580 ignored
+     [exec]  5) WARNING: Unknown keyword ';;'.  Line 7183 ignored
+     [exec]  6) WARNING: Unknown keyword '-----------------------------------------------------------'.  Line 7817 ignored
+     [exec]  7) WARNING: Unknown keyword '-----------------------------------------------------------'.  Line 7827 ignored
+     [exec]  8) WARNING: Unknown keyword '-----------------------------------------------------------'.  Line 7832 ignored
+     [exec]  9) WARNING: Unknown keyword '-----------------------------------------------------------'.  Line 7836 ignored
+     [exec] 10) WARNING: Unknown keyword '-----------------------------------------------------------'.  Line 7842 ignored
+     [exec] 11) WARNING: Unknown keyword '-----------------------------------------------------------'.  Line 7864 ignored
+     [exec] 
+     [exec] Error(s):
+     [exec] 1) ERROR: Override target \private\101fe1db\usbman.rsc was not found!
+     [exec] 2) ERROR: Override target private\10207254\themes\271012080\270513751\271063147\1.0\ci.o0001 was not found!
+     [exec] 3) ERROR: Override target resource\versions\langsw.txt was not found!
+     [exec] 4) ERROR: Override target private\10207254\themes\271012080\270513751\271063149\1.0\ai.o0001 was not found!
+     [exec] 5) ERROR: Override target resource\apps\startup.rsc was not found!
+     [exec] Creating Core ROM image
+     [exec] * cpp -o tmp1.oby -nostdinc -undef -I "..\..\..\..\..\EPOC32\include\oem\" -include "..\..\..\..\..\EPOC32\include\oem\feature_settings.hrh" -I. -I../../../../../epoc32/rom/include
+     [exec] * reading q:\output\development_flash_images\engineering_english/product/rnd/mc_5132_0.0738.3.X.201_rnd_ui_rom_hdr.iby
+     [exec] * reading q:\output\development_flash_images\engineering_english/product/rnd/mc_5132_0.0738.3.X.201_rnd_ui_rom_split.oby
+     [exec] * Writing tmp2.oby - result of substitution phase
+     [exec] * Writing tmp3.oby - result of reorganisation phase
+     [exec] * Writing tmp4.oby - result of Plugin stage
+     [exec] * No language codes specified, defaulting to 01
+     [exec] * Writing tmp5.oby - result of choosing language-specific files
+     [exec] * Writing tmp6.oby - result of SPI stage
+     [exec] configpaging.pm: Modifying demand paging configuration using \epoc32\rom\configpaging\configpaging.cfg
+     [exec] * Writing tmp7.oby - result of problem-suppression phase
+     [exec] * Writing tmp8.oby - result of bitmap conversion phase
+     [exec] * Removing previous image and logs...
+     [exec] * Writing tmp9.oby - result of cleaning phase
+     [exec] * Writing mc_5132_0.0738.3.X.201_rnd_ui.rom.oby - final OBY file
+     [exec] * Writing mc_5132_0.0738.3.X.201_rnd_ui.rom.dir - ROM directory listing
+     [exec] * Compression method: NONE
+     [exec] * Executing rombuild -slog  -type-safe-link -geninc -no-header mc_5132_0.0738.3.X.201_rnd_ui.rom.oby
+     [exec] 
+     [exec] ROMBUILD - Rom builder V2.07 (Build 576)
+     [exec] = Software Ltd.
+     [exec] 
+     [exec] WARNING: Unknown keyword '..\data\VoiceRecorder_stub.SIS'.  Line 1249 ignored
+     [exec] WARNING: Unknown keyword '***'.  Line 1408 ignored
+     [exec] WARNING: Unknown keyword ';;'.  Line 2891 ignored
+     [exec] WARNING: Unknown keyword '-----------------------------------------------------------'.  Line 3100 ignored
+     [exec] WARNING: Unknown keyword '-----------------------------------------------------------'.  Line 3104 ignored
+     [exec] WARNING: Unknown keyword '-----------------------------------------------------------'.  Line 3106 ignored
+     [exec] WARNING: Unknown keyword '-----------------------------------------------------------'.  Line 3108 ignored
+     [exec] WARNING: Unknown keyword '-----------------------------------------------------------'.  Line 3111 ignored
+     [exec] WARNING: Unknown keyword '-----------------------------------------------------------'.  Line 3118 ignored
+     [exec] ERROR: Can't build dependence graph for
+     [exec] 	\epoc32\release\ARMV5\urel\armh264enchwdevice_11.dll (UID3:20001c12 HWVD:01000000 VER:10.0)
+     [exec] because
+     [exec] 	armutilities_11.dll (UID3:102749fe HWVD:01000000 VER:10.0)
+     [exec] is not in rom.
+     [exec] ERROR: Can't build dependence graph for
+     [exec] 	\epoc32\release\ARMV5\urel\armh264enchwdevice_11.dll (UID3:20001c12 HWVD:01000000 VER:10.0)
+     [exec] because
+     [exec] 	armprocessengine_11.dll (UID3:1020db93 HWVD:01000000 VER:10.0)
+     [exec] is not in rom.
+     [exec] ERROR: Can't build dependence graph for
+     [exec] 	\epoc32\release\ARMV5\urel\glxuiutilities.dll (UID3:20000a08 HWVD:01000000 VER:10.0)
+     [exec] because
+     [exec] 	glxtvout.dll (UID3:2000a7bc HWVD:01000000 VER:10.0)
+     [exec] is not in rom.
+     [exec] ERROR: LoadContents failed - return code -1
+     [exec] 
+     [exec] ROMBUILD - Rom builder V2.07 (Build 576)
+     [exec] = Software Ltd.
+     [exec] 
+     [exec] WARNING: Unknown keyword '..\data\VoiceRecorder_stub.SIS'.  Line 1249 ignored
+     [exec] WARNING: Unknown keyword '***'.  Line 1408 ignored
+     [exec] WARNING: Unknown keyword ';;'.  Line 2891 ignored
+     [exec] WARNING: Unknown keyword '-----------------------------------------------------------'.  Line 3100 ignored
+     [exec] WARNING: Unknown keyword '-----------------------------------------------------------'.  Line 3104 ignored
+     [exec] WARNING: Unknown keyword '-----------------------------------------------------------'.  Line 3106 ignored
+     [exec] WARNING: Unknown keyword '-----------------------------------------------------------'.  Line 3108 ignored
+     [exec] WARNING: Unknown keyword '-----------------------------------------------------------'.  Line 3111 ignored
+     [exec] WARNING: Unknown keyword '-----------------------------------------------------------'.  Line 3118 ignored
+     [exec] ERROR: Can't build dependence graph for
+     [exec] *** Error: (S:COREBLDROM,C:1,B:1,K:0,V:1): Command `(perl /epoc32/tools/buildrom.pl -v -nosymbols -omc_5132_0.0738.3.X.201_rnd_ui.rom.img q:\output\development_flash_images\engineering_english/product/rnd/mc_5132_0.0738.3.X.201_rnd_ui_rom_hdr.iby q:\output\development_flash_images\engineering_english/product/rnd/mc_5132_0.0738.3.X.201_rnd_ui_rom_split.oby)' failed.
+     [exec] 	\epoc32\release\ARMV5\urel\armh264enchwdevice_11.dll (UID3:20001c12 HWVD:01000000 VER:10.0)
+     [exec] mingw_make.exe[1]: *** [flash] Error 1
+     [exec] because
+     [exec] 	armutilities_11.dll (UID3:102749fe HWVD:01000000 VER:10.0)
+     [exec] is not in rom.
+     [exec] ERROR: Can't build dependence graph for
+     [exec] 	\epoc32\release\ARMV5\urel\armh264enchwdevice_11.dll (UID3:20001c12 HWVD:01000000 VER:10.0)
+     [exec] because
+     [exec] 	armprocessengine_11.dll (UID3:1020db93 HWVD:01000000 VER:10.0)
+     [exec] is not in rom.
+     [exec] ERROR: Can't build dependence graph for
+     [exec] 	\epoc32\release\ARMV5\urel\glxuiutilities.dll (UID3:20000a08 HWVD:01000000 VER:10.0)
+     [exec] because
+     [exec] 	glxtvout.dll (UID3:2000a7bc HWVD:01000000 VER:10.0)
+     [exec] is not in rom.
+     [exec] ERROR: LoadContents failed - return code -1
+     [exec] * ROMBUILD failed
+     [exec] 
+     [exec] Creating Core ROM symbol file
+     [exec] 
+     [exec] Total duration: 03:13
+     [exec] mingw_make.exe: [flashuirnd] Error 2 (ignored)
+     [exec] +++ HiRes End 1190000371.08327
+     [exec] ++ Finished at Mon Sep 17 06:39:31 2007
+     [exec] === Stage=flashuiprd == flashuiprd
+     [exec] ++ Started at Mon Sep 17 06:39:31 2007
+     [exec] +++ HiRes Start 1190000371.22389
+     [exec] =========== Configuration =================
+     [exec] PRODUCT          : product
+     [exec] TYPE             : prd
+     [exec] NAME             : mc_5132_0.0738.3.X.201_prd_ui
+     [exec] USE_OVERRIDE     : 1
+     [exec] BLDROM_OBY       : \epoc32\rom\master.oby /epoc32/rom/ppd.oby 
+     [exec] BLDROM_OPTION    : -p -v -nosymbols -D_IMAGE_TYPE_PRD -D_EABI=ARMV5 -Dproduct -D_ASIC_VER_11 -DUSE_MULTIROFS -es60ibymacros -DXTI_TRACES -DNO_PLATSEC -DSECTION -DUSE_MULTIROFS  q:\output\development_flash_images\engineering_english/product/prd/mc_5132_0.0738.3.X.201_prd_ui_override_version.iby    -eoverride 
+     [exec] WORKDIR          : q:\output\development_flash_images\engineering_english/product/prd
+     [exec] UDEBFILE         : 0
+     [exec] UDEBFILE_LIST    : 
+     [exec] USE_FOTI         : 
+     [exec] USE_FOTA         : 
+     [exec] PREBUILD_STEPS   :  
+     [exec] SOSCORE_VERSION  : 0.0738.3.0.201
+     [exec] SOSROFS1_VERSION : 0.0738.3.0.201	
+     [exec] SOSROFS2_VERSION : 0.0738.3.0.201.ee
+     [exec] SOSROFS3_VERSION : 0.0738.3.0.201.ee
+     [exec] ENABLE_ROMSYMBOL : 1
+     [exec] ===========================================
+     [exec] iMaker - The Image Maker, version 07.34.04, 24-Aug-2007.
+     [exec] Deleting q:\output\development_flash_images\engineering_english/product/prd/mc_5132_0.0738.3.X.201_prd_ui_sw.txt
+     [exec] Deleting q:\output\development_flash_images\engineering_english/product/prd/mc_5132_0.0738.3.X.201_prd_ui_model.txt
+     [exec] Deleting q:\output\development_flash_images\engineering_english/product/prd/mc_5132_0.0738.3.X.201_prd_ui_override_version.iby
+     [exec] Generating header iby for Core ROM image creation
+     [exec] Generating header iby for Core ROFS1 image creation
+     [exec] Generating Core FWID txt file
+     [exec] Generating Core FWID iby file
+     [exec] Generating file: q:\output\development_flash_images\engineering_english/product/prd/mc_5132_0.0738.3.X.201_prd_ui_sw.txt
+     [exec] Generating file: q:\output\development_flash_images\engineering_english/product/prd/mc_5132_0.0738.3.X.201_prd_ui_model.txt
+     [exec] Generating the q:\output\development_flash_images\engineering_english/product/prd/mc_5132_0.0738.3.X.201_prd_ui_override_version.iby
+     [exec] Generating the q:\output\development_flash_images\engineering_english/product/prd/mc_5132_0.0738.3.X.201_prd_ui_core_fwid.iby
+     [exec] Generating full Core ROM oby
+     [exec] 
+     [exec] Missing file(s):
+     [exec]  1) ..\..\epoc32\rom\include\ssc.iby(31): Missing file: '\epoc32\release\ARMV5\urel\ssc.ext' in statement 'extension[0x09080004]='
+     [exec]  2) ..\..\epoc32\rom\include\SWATI_Symbian_Tools.iby(163): Missing file: '\epoc32\release\ARMV5\urel\MobileCrashTimer.exe' in statement 'file='
+     [exec]  3) ..\..\epoc32\rom\include\PhoneCntFinderExt.iby(24): Missing file: '\epoc32\data\Z\System\install\phcntvoicerecoghandler_stub.SIS' in statement 'data='
+     [exec]  4) ..\..\epoc32\rom\include\screensaver.iby(24): Missing file: '\epoc32\release\ARMV5\urel\screensaver.product.exe' in statement 'file='
+     [exec]  5) ..\..\epoc32\rom\include\eSWT.iby(44): Missing file: '\epoc32\RELEASE\ARMV5\UREL\Z\Resource\ive\lib\jclcldc11\ext\odc\eswt-core.jar' in statement 'data='
+     [exec]  6) ..\..\epoc32\rom\include\eSWT.iby(45): Missing file: '\epoc32\RELEASE\ARMV5\UREL\Z\Resource\ive\lib\jclcldc11\ext\odc\esw.jar' in statement 'data='
+     [exec]  7) ..\..\epoc32\rom\include\eSWT.iby(46): Missing file: '\epoc32\RELEASE\ARMV5\UREL\Z\Resource\ive\lib\jclcldc11\ext\odc\eswt-expanded.jar' in statement 'data='
+     [exec]  8) ..\..\epoc32\rom\include\eSWT.iby(49): Missing file: '\epoc32\RELEASE\ARMV5\UREL\Z\Resource\ive\lib\jclcldc11\ext\eswt-core.odc' in statement 'data='
+     [exec]  9) ..\..\epoc32\rom\include\eSWT.iby(50): Missing file: '\epoc32\RELEASE\ARMV5\UREL\Z\Resource\ive\lib\jclcldc11\ext\esw.odc' in statement 'data='
+     [exec] 10) ..\..\epoc32\rom\include\eSWT.iby(51): Missing file: '\epoc32\RELEASE\ARMV5\UREL\Z\Resource\ive\lib\jclcldc11\ext\eswt-expanded.odc' in statement 'data='
+     [exec] 11) ..\..\epoc32\rom\include\advancedtspcontroller.iby(24): Missing file: '\epoc32\release\ARMV5\urel\AdvancedTspController.dll' in statement 'file='
+     [exec] 12) ..\..\epoc32\rom\include\.oby(30): Missing file: '\epoc32\data\Z\System\install\enh_drv.sis' in statement 'data='
+     [exec] 13) ..\..\epoc32\rom\include\d2d.iby(22): Missing file: '\epoc32\release\ARMV5\urel\d2dwlanconnector.dll' in statement 'file='
+     [exec] 14) ..\..\epoc32\rom\include\sysaplightpluginsource.iby(25): Missing file: '\epoc32\release\ARMV5\urel\sysaplightpluginsource.dll' in statement 'file='
+     [exec] 15) ..\..\epoc32\rom\include\animplugin.iby(8): Missing file: '\epoc32\release\ARMV5\urel\KeyCapturerPlugin.dll' in statement 'file='
+     [exec] 16) ..\..\epoc32\rom\include\OnlinePrint.iby(25): Missing file: '\epoc32\data\Z\system\install\OnlinePrint.sis' in statement 'data='
+     [exec] 17) ..\..\epoc32\rom\include\msync.iby(30): Missing file: '\epoc32\release\ARMV5\urel\msyncpluginmedia.dll' in statement 'file='
+     [exec] 18) ..\..\epoc32\rom\include\msync.iby(31): Missing file: '\epoc32\release\ARMV5\urel\msyncpluginmessaging.dll' in statement 'file='
+     [exec] 19) q:outputdevelopment_flash_images\033ngineering_english\product\prd\mc_5132_0.0738.3.X.201_prd_ui_core_fwid.iby(6): Missing file: 'q:\output\development_flash_images\engineering_english/product/prd/mc_5132_0.0738.3.X.201_prd_ui_fwid1.txt' in statement 'data='
+     [exec] 
+     [exec] Warning(s):
+     [exec]  1) WARNING: Unknown keyword '/'.  Line 193 ignored
+     [exec]  2) WARNING: Unknown keyword 'ROFS_HEADER'.  Line 212 ignored
+     [exec]  3) WARNING: Unknown keyword '..\data\VoiceRecorder_stub.SIS'.  Line 3242 ignored
+     [exec]  4) WARNING: Unknown keyword '***'.  Line 3580 ignored
+     [exec]  5) WARNING: Unknown keyword ';;'.  Line 7183 ignored
+     [exec]  6) WARNING: Unknown keyword '-----------------------------------------------------------'.  Line 7817 ignored
+     [exec]  7) WARNING: Unknown keyword '-----------------------------------------------------------'.  Line 7827 ignored
+     [exec]  8) WARNING: Unknown keyword '-----------------------------------------------------------'.  Line 7832 ignored
+     [exec]  9) WARNING: Unknown keyword '-----------------------------------------------------------'.  Line 7836 ignored
+     [exec] 10) WARNING: Unknown keyword '-----------------------------------------------------------'.  Line 7842 ignored
+     [exec] 11) WARNING: Unknown keyword '-----------------------------------------------------------'.  Line 7864 ignored
+     [exec] 
+     [exec] Error(s):
+     [exec] 1) ERROR: Override target \private\101fe1db\usbman.rsc was not found!
+     [exec] 2) ERROR: Override target private\10207254\themes\271012080\270513751\271063147\1.0\ci.o0001 was not found!
+     [exec] 3) ERROR: Override target resource\versions\langsw.txt was not found!
+     [exec] 4) ERROR: Override target private\10207254\themes\271012080\270513751\271063149\1.0\ai.o0001 was not found!
+     [exec] 5) ERROR: Override target resource\apps\startup.rsc was not found!
+     [exec] Creating Core ROM image
+     [exec] * cpp -o tmp1.oby -nostdinc -undef -I "..\..\..\..\..\EPOC32\include\oem\" -include "..\..\..\..\..\EPOC32\include\oem\feature_settings.hrh" -I. -I../../../../../epoc32/rom/include
+     [exec] * reading q:\output\development_flash_images\engineering_english/product/prd/mc_5132_0.0738.3.X.201_prd_ui_rom_hdr.iby
+     [exec] * reading q:\output\development_flash_images\engineering_english/product/prd/mc_5132_0.0738.3.X.201_prd_ui_rom_split.oby
+     [exec] * Writing tmp2.oby - result of substitution phase
+     [exec] * Writing tmp3.oby - result of reorganisation phase
+     [exec] * Writing tmp4.oby - result of Plugin stage
+     [exec] * No language codes specified, defaulting to 01
+     [exec] * Writing tmp5.oby - result of choosing language-specific files
+     [exec] * Writing tmp6.oby - result of SPI stage
+     [exec] configpaging.pm: Modifying demand paging configuration using \epoc32\rom\configpaging\configpaging.cfg
+     [exec] * Writing tmp7.oby - result of problem-suppression phase
+     [exec] * Writing tmp8.oby - result of bitmap conversion phase
+     [exec] * Removing previous image and logs...
+     [exec] * Writing tmp9.oby - result of cleaning phase
+     [exec] * Writing mc_5132_0.0738.3.X.201_prd_ui.rom.oby - final OBY file
+     [exec] * Writing mc_5132_0.0738.3.X.201_prd_ui.rom.dir - ROM directory listing
+     [exec] * Compression method: NONE
+     [exec] * Executing rombuild -slog  -type-safe-link -geninc -no-header mc_5132_0.0738.3.X.201_prd_ui.rom.oby
+     [exec] 
+     [exec] ROMBUILD - Rom builder V2.07 (Build 576)
+     [exec] = Software Ltd.
+     [exec] 
+     [exec] WARNING: Unknown keyword '..\data\VoiceRecorder_stub.SIS'.  Line 1249 ignored
+     [exec] WARNING: Unknown keyword '***'.  Line 1408 ignored
+     [exec] WARNING: Unknown keyword ';;'.  Line 2891 ignored
+     [exec] WARNING: Unknown keyword '-----------------------------------------------------------'.  Line 3100 ignored
+     [exec] WARNING: Unknown keyword '-----------------------------------------------------------'.  Line 3104 ignored
+     [exec] WARNING: Unknown keyword '-----------------------------------------------------------'.  Line 3106 ignored
+     [exec] WARNING: Unknown keyword '-----------------------------------------------------------'.  Line 3108 ignored
+     [exec] WARNING: Unknown keyword '-----------------------------------------------------------'.  Line 3111 ignored
+     [exec] WARNING: Unknown keyword '-----------------------------------------------------------'.  Line 3118 ignored
+     [exec] ERROR: Can't build dependence graph for
+     [exec] 	\epoc32\release\ARMV5\urel\armh264enchwdevice_11.dll (UID3:20001c12 HWVD:01000000 VER:10.0)
+     [exec] because
+     [exec] 	armutilities_11.dll (UID3:102749fe HWVD:01000000 VER:10.0)
+     [exec] is not in rom.
+     [exec] ERROR: Can't build dependence graph for
+     [exec] 	\epoc32\release\ARMV5\urel\armh264enchwdevice_11.dll (UID3:20001c12 HWVD:01000000 VER:10.0)
+     [exec] because
+     [exec] 	armprocessengine_11.dll (UID3:1020db93 HWVD:01000000 VER:10.0)
+     [exec] is not in rom.
+     [exec] ERROR: Can't build dependence graph for
+     [exec] 	\epoc32\release\ARMV5\urel\glxuiutilities.dll (UID3:20000a08 HWVD:01000000 VER:10.0)
+     [exec] because
+     [exec] 	glxtvout.dll (UID3:2000a7bc HWVD:01000000 VER:10.0)
+     [exec] is not in rom.
+     [exec] ERROR: LoadContents failed - return code -1
+     [exec] 
+     [exec] ROMBUILD - Rom builder V2.07 (Build 576)
+     [exec] = Software Ltd.
+     [exec] 
+     [exec] WARNING: Unknown keyword '..\data\VoiceRecorder_stub.SIS'.  Line 1249 ignored
+     [exec] WARNING: Unknown keyword '***'.  Line 1408 ignored
+     [exec] WARNING: Unknown keyword ';;'.  Line 2891 ignored
+     [exec] WARNING: Unknown keyword '-----------------------------------------------------------'.  Line 3100 ignored
+     [exec] WARNING: Unknown keyword '-----------------------------------------------------------'.  Line 3104 ignored
+     [exec] WARNING: Unknown keyword '-----------------------------------------------------------'.  Line 3106 ignored
+     [exec] WARNING: Unknown keyword '-----------------------------------------------------------'.  Line 3108 ignored
+     [exec] WARNING: Unknown keyword '-----------------------------------------------------------'.  Line 3111 ignored
+     [exec] WARNING: Unknown keyword '-----------------------------------------------------------'.  Line 3118 ignored
+     [exec] ERROR: Can't build dependence graph for
+     [exec] 	\epoc32\release\ARMV5\urel\armh264enchwdevice_11.dll (UID3:20001c12 HWVD:01000000 VER:10.0)
+     [exec] because
+     [exec] 	armutilities_11.dll (UID3:102749fe HWVD:01000000 VER:10.0)
+     [exec] is not in rom.
+     [exec] ERROR: Can't build dependence graph for
+     [exec] 	\epoc32\release\ARMV5\urel\armh264enchwdevice_11.dll (UID3:20001c12 HWVD:01000000 VER:10.0)
+     [exec] because
+     [exec] *** Error: (S:COREBLDROM,C:1,B:1,K:0,V:1): Command `(perl /epoc32/tools/buildrom.pl -v -nosymbols -omc_5132_0.0738.3.X.201_prd_ui.rom.img q:\output\development_flash_images\engineering_english/product/prd/mc_5132_0.0738.3.X.201_prd_ui_rom_hdr.iby q:\output\development_flash_images\engineering_english/product/prd/mc_5132_0.0738.3.X.201_prd_ui_rom_split.oby)' failed.
+     [exec] 	armprocessengine_11.dll (UID3:1020db93 HWVD:01000000 VER:10.0)
+     [exec] is not in rom.
+     [exec] ERROR: Can't build dependence graph for
+     [exec] 	\epoc32\release\ARMV5\urel\glxuiutilities.dll (UID3:20000a08 HWVD:01000000 VER:10.0)
+     [exec] because
+     [exec] 	glxtvout.dll (UID3:2000a7bc HWVD:01000000 VER:10.0)
+     [exec] is not in rom.
+     [exec] ERROR: LoadContents failed - return code -1
+     [exec] * ROMBUILD failed
+     [exec] 
+     [exec] mingw_make.exe[1]: *** [flash] Error 1
+     [exec] Creating Core ROM symbol file
+     [exec] 
+     [exec] Total duration: 05:16
+     [exec] mingw_make.exe: [flashuiprd] Error 2 (ignored)
+     [exec] +++ HiRes End 1190000494.52393
+     [exec] ++ Finished at Mon Sep 17 06:41:34 2007
+     [exec] === Stage=mceraseuda == mceraseuda
+     [exec] ++ Started at Mon Sep 17 06:41:34 2007
+     [exec] +++ HiRes Start 1190000494.64893
+     [exec] =========== Configuration =================
+     [exec] PRODUCT:  product
+     [exec] WORKNAME: q:\output\development_flash_images\engineering_english/product\product_0.0738.3.X.201
+     [exec] TYPE:     prd
+     [exec] ===========================================
+     [exec] Generating UDA erase Elf2flash configuration
+     [exec] Creating flashable UDA erase image
+     [exec] 
+     [exec] Total duration: 05:17
+     [exec] +++ HiRes End 1190000495.28957
+     [exec] ++ Finished at Mon Sep 17 06:41:35 2007
+     [exec] mingw_make.exe: Target `ee_roms' not remade because of errors.
+     [exec] Result: 2
+     [exec] Unzipping variation western...
+     [exec] unzip -o -qq -d / /output/build_area/localised/delta_western_package.zip
+     [exec] === Stage=flashuirnd == flashuirnd
+     [exec] ++ Started at Mon Sep 17 06:41:35 2007
+     [exec] +++ HiRes Start 1190000495.74271
+     [exec] =========== Configuration =================
+     [exec] PRODUCT          : product_edge
+     [exec] TYPE             : rnd
+     [exec] NAME             : mc_5132_0.0738.3.X.201_rnd_ui
+     [exec] USE_OVERRIDE     : 1
+     [exec] BLDROM_OBY       : \epoc32\rom\master.oby /epoc32/rom/ppd.oby /epoc32/rom/rnd.oby
+     [exec] BLDROM_OPTION    : -p -v -nosymbols -D_IMAGE_TYPE_RND -D_EABI=ARMV5 -Dproduct_EDGE -D_ASIC_VER_11 -DUSE_MULTIROFS -es60ibymacros -DXTI_TRACES -DNO_PLATSEC -DSECTION -DUSE_MULTIROFS  q:\output\development_flash_images\engineering_english/product_edge/rnd/mc_5132_0.0738.3.X.201_rnd_ui_override_version.iby    -eoverride 
+     [exec] WORKDIR          : q:\output\development_flash_images\engineering_english/product_edge/rnd
+     [exec] UDEBFILE         : 0
+     [exec] UDEBFILE_LIST    : 
+     [exec] USE_FOTI         : 
+     [exec] USE_FOTA         : 
+     [exec] PREBUILD_STEPS   :  
+     [exec] SOSCORE_VERSION  : 0.0738.3.1.201
+     [exec] SOSROFS1_VERSION : 0.0738.3.1.201	
+     [exec] SOSROFS2_VERSION : 00
+     [exec] SOSROFS3_VERSION : 00
+     [exec] ENABLE_ROMSYMBOL : 1
+     [exec] ===========================================
+     [exec] iMaker - The Image Maker, version 07.34.04, 24-Aug-2007.
+     [exec] Deleting q:\output\development_flash_images\engineering_english/product_edge/rnd/mc_5132_0.0738.3.X.201_rnd_ui_sw.txt
+     [exec] Deleting q:\output\development_flash_images\engineering_english/product_edge/rnd/mc_5132_0.0738.3.X.201_rnd_ui_model.txt
+     [exec] Deleting q:\output\development_flash_images\engineering_english/product_edge/rnd/mc_5132_0.0738.3.X.201_rnd_ui_override_version.iby
+     [exec] Generating header iby for Core ROM image creation
+     [exec] Generating header iby for Core ROFS1 image creation
+     [exec] Generating Core FWID txt file
+     [exec] Generating Core FWID iby file
+     [exec] Generating file: q:\output\development_flash_images\engineering_english/product_edge/rnd/mc_5132_0.0738.3.X.201_rnd_ui_sw.txt
+     [exec] Generating file: q:\output\development_flash_images\engineering_english/product_edge/rnd/mc_5132_0.0738.3.X.201_rnd_ui_model.txt
+     [exec] Generating the q:\output\development_flash_images\engineering_english/product_edge/rnd/mc_5132_0.0738.3.X.201_rnd_ui_override_version.iby
+     [exec] Generating the q:\output\development_flash_images\engineering_english/product_edge/rnd/mc_5132_0.0738.3.X.201_rnd_ui_core_fwid.iby
+     [exec] Generating full Core ROM oby
+     [exec] * cpp -o tmp1.oby -nostdinc -undef -D_IMAGE_TYPE_RND -D_EABI=ARMV5 -Dproduct_EDGE -D_ASIC_VER_11 -DUSE_MULTIROFS -DXTI_TRACES -DNO_PLATSEC -DSECTION -DUSE_MULTIROFS -DPAGED_ROM -I "..\.\rom\CONFIG\platform\product_EDGE" -I "..\include\CONFIG\platform\product_EDGE" -I "..\.\rom\CONFIG\platform" -I "..\include\CONFIG\platform" -I "..\.\rom\CONFIG" -I "..\include\CONFIG" -I "..\include\oem\" -include "..\include\oem\feature_settings.hrh" -I. -I../../epoc32/rom/include
+     [exec] In file included from /epoc32/rom/ppd.oby:32:
+     [exec] ..\.\rom\CONFIG\platform\ppd_product.iby:28: spp_product.iby: No such file or directory
+     [exec] poc32
+     [exec] omoverride.oby:6: product_override.iby: No such file or directorypoc32
+     [exec] omoverride.oby:7: product_override_resources.iby: No such file or directory* cpp failed
+     [exec] * reading q:\output\development_flash_images\engineering_english/product_edge/rnd/mc_5132_0.0738.3.X.201_rnd_ui_override_version.iby
+     [exec] * reading \epoc32\rom\master.oby
+     [exec] * reading /epoc32/rom/ppd.oby
+     [exec] * reading /epoc32/rom/rnd.oby
+     [exec] * reading q:\output\development_flash_images\engineering_english/product_edge/rnd/mc_5132_0.0738.3.X.201_rnd_ui_core_fwid.iby
+     [exec] * reading \epoc32\rom\override.oby
+     [exec] *** Error: (S:COREBLDFULL,C:1,B:1,K:0,V:1): Command `(set VARIANT=product_edge) && (perl /epoc32/tools/buildrom.pl -p -v -nosymbols -D_IMAGE_TYPE_RND -D_EABI=ARMV5 -Dproduct_EDGE -D_ASIC_VER_11 -DUSE_MULTIROFS -es60ibymacros -DXTI_TRACES -DNO_PLATSEC -DSECTION -DUSE_MULTIROFS  q:\output\development_flash_images\engineering_english/product_edge/rnd/mc_5132_0.0738.3.X.201_rnd_ui_override_version.iby    -eoverride  -DPAGED_ROM   -omc_5132_0.0738.3.X.201_rnd_ui.full.img \epoc32\rom\master.oby /epoc32/rom/ppd.oby /epoc32/rom/rnd.oby q:\output\development_flash_images\engineering_english/product_edge/rnd/mc_5132_0.0738.3.X.201_rnd_ui_core_fwid.iby \epoc32\rom\override.oby )' failed.
+     [exec] mingw_make.exe[1]: *** [flash] Error 1
+     [exec] Creating Core ROM symbol file
+     [exec] ERROR: Can't open rombuild log file "q:\output\development_flash_images\engineering_english\product_edge\rnd\mc_5132_0.0738.3.X.201_rnd_ui.rom.log"
+     [exec] *** Error: (S:COREBLDROMSYM,C:1,B:1,K:0,V:1): Command `perl /epoc32/tools/maksym.pl q:\output\development_flash_images\engineering_english\product_edge\rnd\mc_5132_0.0738.3.X.201_rnd_ui.rom.log' failed.
+     [exec] mingw_make.exe[1]: *** [romsymbol] Error 1
+     [exec] mingw_make.exe: [flashuirnd] Error 2 (ignored)
+     [exec] +++ HiRes End 1190000501.1491
+     [exec] ++ Finished at Mon Sep 17 06:41:41 2007
+     [exec] === Stage=flashuiprd == flashuiprd
+     [exec] ++ Started at Mon Sep 17 06:41:41 2007
+     [exec] +++ HiRes Start 1190000501.28972
+     [exec] =========== Configuration =================
+     [exec] PRODUCT          : product_edge
+     [exec] TYPE             : prd
+     [exec] NAME             : mc_5132_0.0738.3.X.201_prd_ui
+     [exec] USE_OVERRIDE     : 1
+     [exec] BLDROM_OBY       : \epoc32\rom\master.oby /epoc32/rom/ppd.oby 
+     [exec] BLDROM_OPTION    : -p -v -nosymbols -D_IMAGE_TYPE_PRD -D_EABI=ARMV5 -Dproduct_EDGE -D_ASIC_VER_11 -DUSE_MULTIROFS -es60ibymacros -DXTI_TRACES -DNO_PLATSEC -DSECTION -DUSE_MULTIROFS  q:\output\development_flash_images\engineering_english/product_edge/prd/mc_5132_0.0738.3.X.201_prd_ui_override_version.iby    -eoverride 
+     [exec] WORKDIR          : q:\output\development_flash_images\engineering_english/product_edge/prd
+     [exec] UDEBFILE         : 0
+     [exec] UDEBFILE_LIST    : 
+     [exec] USE_FOTI         : 
+     [exec] USE_FOTA         : 
+     [exec] PREBUILD_STEPS   :  
+     [exec] SOSCORE_VERSION  : 0.0738.3.1.201
+     [exec] SOSROFS1_VERSION : 0.0738.3.1.201	
+     [exec] SOSROFS2_VERSION : 00
+     [exec] SOSROFS3_VERSION : 00
+     [exec] ENABLE_ROMSYMBOL : 1
+     [exec] ===========================================
+     [exec] iMaker - The Image Maker, version 07.34.04, 24-Aug-2007.
+     [exec] Deleting q:\output\development_flash_images\engineering_english/product_edge/prd/mc_5132_0.0738.3.X.201_prd_ui_sw.txt
+     [exec] Deleting q:\output\development_flash_images\engineering_english/product_edge/prd/mc_5132_0.0738.3.X.201_prd_ui_model.txt
+     [exec] Deleting q:\output\development_flash_images\engineering_english/product_edge/prd/mc_5132_0.0738.3.X.201_prd_ui_override_version.iby
+     [exec] Generating header iby for Core ROM image creation
+     [exec] Generating header iby for Core ROFS1 image creation
+     [exec] Generating Core FWID txt file
+     [exec] Generating Core FWID iby file
+     [exec] Generating file: q:\output\development_flash_images\engineering_english/product_edge/prd/mc_5132_0.0738.3.X.201_prd_ui_sw.txt
+     [exec] Generating file: q:\output\development_flash_images\engineering_english/product_edge/prd/mc_5132_0.0738.3.X.201_prd_ui_model.txt
+     [exec] Generating the q:\output\development_flash_images\engineering_english/product_edge/prd/mc_5132_0.0738.3.X.201_prd_ui_override_version.iby
+     [exec] Generating the q:\output\development_flash_images\engineering_english/product_edge/prd/mc_5132_0.0738.3.X.201_prd_ui_core_fwid.iby
+     [exec] Generating full Core ROM oby
+     [exec] * cpp -o tmp1.oby -nostdinc -undef -D_IMAGE_TYPE_PRD -D_EABI=ARMV5 -Dproduct_EDGE -D_ASIC_VER_11 -DUSE_MULTIROFS -DXTI_TRACES -DNO_PLATSEC -DSECTION -DUSE_MULTIROFS -DPAGED_ROM -I "..\.\rom\CONFIG\platform\product_EDGE" -I "..\include\CONFIG\platform\product_EDGE" -I "..\.\rom\CONFIG\platform" -I "..\include\CONFIG\platform" -I "..\.\rom\CONFIG" -I "..\include\CONFIG" -I "..\include\oem\" -include "..\include\oem\feature_settings.hrh" -I. -I../../epoc32/rom/include
+     [exec] In file included from /epoc32/rom/ppd.oby:32:
+     [exec] ..\.\rom\CONFIG\platform\ppd_product.iby:28: spp_product.iby: No such file or directory
+     [exec] poc32
+     [exec] omoverride.oby:6: product_override.iby: No such file or directorypoc32
+     [exec] omoverride.oby:7: product_override_resources.iby: No such file or directory* cpp failed
+     [exec] * reading q:\output\development_flash_images\engineering_english/product_edge/prd/mc_5132_0.0738.3.X.201_prd_ui_override_version.iby
+     [exec] * reading \epoc32\rom\master.oby
+     [exec] * reading /epoc32/rom/ppd.oby
+     [exec] * reading q:\output\development_flash_images\engineering_english/product_edge/prd/mc_5132_0.0738.3.X.201_prd_ui_core_fwid.iby
+     [exec] * reading \epoc32\rom\override.oby
+     [exec] *** Error: (S:COREBLDFULL,C:1,B:1,K:0,V:1): Command `(set VARIANT=product_edge) && (perl /epoc32/tools/buildrom.pl -p -v -nosymbols -D_IMAGE_TYPE_PRD -D_EABI=ARMV5 -Dproduct_EDGE -D_ASIC_VER_11 -DUSE_MULTIROFS -es60ibymacros -DXTI_TRACES -DNO_PLATSEC -DSECTION -DUSE_MULTIROFS  q:\output\development_flash_images\engineering_english/product_edge/prd/mc_5132_0.0738.3.X.201_prd_ui_override_version.iby    -eoverride  -DPAGED_ROM   -omc_5132_0.0738.3.X.201_prd_ui.full.img \epoc32\rom\master.oby /epoc32/rom/ppd.oby  q:\output\development_flash_images\engineering_english/product_edge/prd/mc_5132_0.0738.3.X.201_prd_ui_core_fwid.iby \epoc32\rom\override.oby )' failed.
+     [exec] mingw_make.exe[1]: *** [flash] Error 1
+     [exec] Creating Core ROM symbol file
+     [exec] ERROR: Can't open rombuild log file "q:\output\development_flash_images\engineering_english\product_edge\prd\mc_5132_0.0738.3.X.201_prd_ui.rom.log"
+     [exec] *** Error: (S:COREBLDROMSYM,C:1,B:1,K:0,V:1): Command `perl /epoc32/tools/maksym.pl q:\output\development_flash_images\engineering_english\product_edge\prd\mc_5132_0.0738.3.X.201_prd_ui.rom.log' failed.
+     [exec] mingw_make.exe[1]: *** [romsymbol] Error 1
+     [exec] mingw_make.exe: [flashuiprd] Error 2 (ignored)
+     [exec] +++ HiRes End 1190000506.71174
+     [exec] ++ Finished at Mon Sep 17 06:41:46 2007

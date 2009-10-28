@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : dependencies.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="preparation.dependencies" xmlns:ivy="antlib:org.apache.ivy.ant" xmlns:hlm="http://www.nokia.com/helium">
+    <description>Analysis of dependencies for build area preparation.</description>
+    
+    <!-- Clean the Ivy cache. This is important if Ivy file content is changed. -->
+    <target name="clean-ivy-cache">
+        <ivy:configure file="${tools.ivy.config.file}"/>
+        <ivy:cleancache/>
+    </target>
+    
+    
+    <!-- Check the tools environment to ensure all required tools are present. -->
+    <target name="check-tool-dependencies">
+        <hlm:createToolsTableMacro dir="${temp.build.dir}/build/doc/ivy" failonerror="true" 
+            configs="${build.type}" />
+    </target>
+    
+    
+    <!-- This is a test target for resolving the inputs for preparing the build area. -->
+    <target name="resolve-build-inputs">
+        <record name="f:\resolve.txt" action="start" loglevel="verbose"/>
+        <fmpp sourceRoot="${helium.dir}/tools/preparation/ivy/templates" outputRoot="${temp.build.dir}/ivy"
+              replaceExtension="xml.ftl, ivy.xml">
+            <data expandProperties="yes">
+                cfg: xml(${build_area.config.file})
+                ant: antProperties()
+            </data>
+        </fmpp>
+        <ivy:configure file="${build_area.ivy.config.file}"/>
+        <ivy:resolve file="${temp.build.dir}/ivy/ivy_file.ivy.xml" haltonfailure="false"/>
+        <ivy:artifactreport tofile="${build.log.dir}/build_area_artifacts.xml"/>
+        <record name="f:\resolve.txt" action="stop"/>
+    </target>
+    
+
+</project>

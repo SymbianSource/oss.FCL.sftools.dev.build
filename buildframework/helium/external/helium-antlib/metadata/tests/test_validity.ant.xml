@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<!-- 
+============================================================================ 
+Name        : test_diamonds.ant.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test-metadata-validity" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>Helium Antlib diamonds unittests.</description>
+    
+    <dirname property="project.dir" file="${ant.file.test-metadata-validity}" />
+
+    <taskdef resource="com/nokia/helium/metadata/ant/antlib.xml" uri="http://www.nokia.com/helium" />
+    <taskdef name="fmpp" classname="fmpp.tools.AntTask"  onerror="report"/>
+
+    <!--
+    <hlm:metadatafilterset id="all-regex-filterfile">
+        <metadatafilterset filterfile="${project.dir}/../data/common.csv" />
+    </hlm:metadatafilterset>
+
+    <target name="test-all-regex-filterfile">
+        <echo message="all regular expression validation" />
+        <echo message="database:${project.dir}/../output/log_all_filterfile.sqlite" />
+        <hlm:metadatarecord database="${project.dir}/../output/log_all_filterfile.sqlite">
+            <fileset dir="${project.dir}/../data/">
+                <include  name="all*.log"/>
+            </fileset>
+           <hlm:saxlogparser>
+                <metadatafilterset refid="all-regex-filterfile" />
+           </hlm:saxlogparser>
+        </hlm:metadatarecord>
+    </target>
+
+    <hlm:metadatafilterset id="all-regex-combined">
+        <metadatafilter priority="WARNING" regex=".*warning U4010" description="mingw error" />
+        <metadatafilterset filterfile="${project.dir}/../data/common.csv" />
+    </hlm:metadatafilterset>
+
+    <target name="test-all-regex-combined">
+        <echo message="all regular expression validation" />
+        <echo message="database:${project.dir}/../output/log_all_combined.sqlite" />
+        <hlm:metadatarecord database="${project.dir}/../output/log_all_combined.sqlite">
+            <fileset dir="${project.dir}/../data/">
+                <include  name="all*.log"/>
+            </fileset>
+            <hlm:saxlogparser>
+                <metadatafilterset refid="all-regex-combined" />
+            </hlm:saxlogparser>
+        </hlm:metadatarecord>
+    </target>
+    -->
+</project>

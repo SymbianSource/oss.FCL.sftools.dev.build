@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+============================================================================ 
+Name        : 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<helium>
+    <layer>
+        <name>Apache Ant</name>
+        <colour>#FFC726</colour>
+        <row>
+            <component>Apache Ant</component>
+        </row>
+    </layer>
+    <layer>
+        <name>Helium domains</name>
+        <colour>#66FFFF</colour>
+        <row>
+            <component>Preparation</component>
+            <component>Compilation</component>
+            <component>ROM/UDA creation</component>
+            <component>Localisation</component>
+            <component>Testing</component>
+        </row>
+        <row>
+            <component>Publishing</component>
+            <component>Releasing</component>
+            <component>Data packaging</component>
+            <component>Integration</component>
+            <component>FOTA</component>
+        </row>
+    </layer>
+    <layer>
+        <name>Helium services</name>
+        <colour>#C5D5A9</colour>
+        <row>
+            <component>Common configuration</component>
+            <component>Logging</component>
+            <component>Signaling</component>
+            <component>Metrics recording</component>
+        </row>
+        <row>
+            <component>Configuration validation</component>
+            <component>API documentation</component>
+            <component>Error checking</component>
+        </row>
+    </layer>
+    <layer>
+        <name>Ant libraries</name>
+        <colour>#A3B8CB</colour>
+        <row>
+            <component>antunit</component>
+            <component>ant-contrib</component>
+            <component>commons configuration</component>
+            <component>antform</component>
+            <component>freemarker</component>
+            <component>junit</component>
+        </row>
+        <row>
+            <component>dom4j</component>
+            <component>svnant</component>
+            <component>xmltask</component>
+            <component>ivy</component>
+        </row>
+    </layer>
+    <layer>
+        <name>External tools in Helium</name>
+        <colour>#ED9B4F</colour>
+        <row>
+            <component>Capability scan</component>
+            <component>CheckStubSis</component>
+            <component>CruiseControl</component>
+            <component>DependencyAnalyzer</component>
+            <component>VplSignJava</component>
+        </row>
+        <row>
+            <component>symbiantools</component>
+            <component>filedisk</component>
+            <component>info-zip</component>
+            <component>Subversion</component>
+            <component>unxutils</component>
+        </row>
+    </layer>
+    <layer>
+        <name>External tools not in Helium</name>
+        <colour>#E76F00</colour>
+        <row>
+            <component>7zip</component>
+            <component>Synergy</component>
+            <component>Mercurial</component>
+            <component>CodeScanner</component>
+            <component>GRACE CLI</component>
+        </row>
+        <row>
+            <component>Java 1.3.1</component>
+            <component>PCLint</component>
+            <component>RVCT</component>
+            <component>SymDEC</component>
+        </row>
+    </layer>
+    <layer>
+        <name>Runtimes</name>
+        <colour>#B2BC00</colour>
+        <row>
+            <component>Java 6</component>
+            <component>Python 2.5</component>
+            <component>Perl 5.6</component>
+        </row>
+    </layer>
+    <layer>
+        <name>Platforms</name>
+        <colour>#C69200</colour>
+        <row>
+            <component>Windows</component>
+            <component>Linux</component>
+        </row>
+    </layer>
+</helium>

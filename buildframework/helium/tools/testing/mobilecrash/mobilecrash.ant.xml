@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : mobilecrash.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="_testing.mobilecrash" xmlns:hlm="http://www.nokia.com/helium">
+    <description>
+    Supporting the MobileCrash crash analysis tool.
+    </description>
+
+
+    <!--
+    Prepare Engineer English files for analysis with the selge tool.
+    * Creates the output folders.
+    * Zips up all the mapfiles as input to \output\development_flash_images\engineering_english\.
+    * Parses the .log files to extract the checksum (which is used as ROM ID), and stores in a temporary file(ee_symbols.txt).
+    * Map the checksum to the appropriate Mapfiles.zip in ee_mapfiles.txt.
+
+    The check-env-mobilecrash-prep task ensures that there are some log files to parse, i.e. it is worth running the mobilecrash preparation.
+    -->
+    <target name="mobilecrash-prep-ee">
+        <mkdir dir="${build.output.dir}/build" />
+        <mkdir dir="${build.drive}${ee.rom.output.dir}" />
+        <zip basedir="${build.drive}\\epoc32\release\armv5\urel" includes="*.map" destfile="${build.drive}${ee.rom.output.dir}/Mapfiles.zip" />
+        <propertyregex input="${publish.dir}" property="proj.dir" regexp="\\" replace="\\\\\\\\\\\\\\\\" global="true" />
+        <propertyregex input="${ee.rom.output.dir}" property="rom.network.dir" regexp="\\output" replace="" global="true" />
+        <propertyregex input="${rom.network.dir}" property="rom.dir" regexp="\\" replace="\\\\\\\\\\\\\\\\" global="true" />
+        <for param="file">
+            <path>
+                <fileset dir="${build.drive}${ee.rom.output.dir}" includes="**/*.rom.log" />
+            </path>
+            <sequential>
+                <!-- write the checksum along with the location of the corresponding .symbol file -->
+                <propertyregex override="true" property="symbol.file.location" input="@{file}" regexp="\w:\\output(\\[^\.]*\\[^\\]+\.rom)\.log" replace="${proj.dir}\1\.symbol" />
+                <echo message="${symbol.file.location}" />
+                <propertyregex override="true" input="${symbol.file.location}" property="parsed.symbol.file.location" regexp="\\" replace="\\\\\\\\\\\\\\\\" global="true" />
+                <concat destfile="${build.output.dir}/build/ee_symbols.txt" append="yes">
+                    <fileset file="@{file}" />
+                    <filterchain>
+                        <tokenfilter>
+                            <containsregex pattern="Checksum word:" flags="i" />
+                            <replaceregex pattern="Checksum word:\s*(\w*)" replace="\1=${parsed.symbol.file.location}" flags="gi" />
+                        </tokenfilter>
+                    </filterchain>
+                </concat>
+                <!-- write the checksum with the corresponding mapfile zip location -->
+                <concat destfile="${build.output.dir}/build/ee_mapfiles.txt" append="yes">
+                    <fileset file="@{file}" />
+                    <filterchain>
+                        <tokenfilter>
+                            <containsregex pattern="Checksum word:" flags="i" />
+                            <replaceregex pattern="Checksum word:\s*(\w*)" replace="\1=${proj.dir}\\${rom.dir}\\\\Mapfiles.zip" flags="gi" />
+                        </tokenfilter>
+                    </filterchain>
+                </concat>
+            </sequential>
+        </for>
+    </target>
+    <!--
+    Prepare files for analysis with the selge tool.
+    * Creates the output folders.
+    * Zips up all the mapfiles as input to \output\release_flash_images\.
+    * Parses the .log files to extract the checksum (which is used as ROM ID), and stores in a temporary file(core_symbols.txt).
+    * Map the checksum to the appropriate Mapfiles.zip in core_mapfiles.txt.
+
+    
+    -->
+    <target name="mobilecrash-prep-loc">
+        <mkdir dir="${build.output.dir}/build" />
+        <mkdir dir="${build.drive}${core.rom.output.dir}" />
+        <zip basedir="${build.drive}\\epoc32\release\armv5\urel" includes="*.map" destfile="${build.drive}${core.rom.output.dir}/Mapfiles.zip" />
+        <propertyregex input="${publish.dir}" property="proj.dir" regexp="\\" replace="\\\\\\\\\\\\\\\\" global="true" />
+        <propertyregex input="${core.rom.output.dir}" property="core.rom.network.dir" regexp="\\output" replace="" global="true" />
+        <propertyregex input="${core.rom.network.dir}" property="core.rom.dir" regexp="\\" replace="\\\\\\\\\\\\\\\\" global="true" />
+        <for param="file">
+            <path>
+                <fileset dir="${build.drive}${core.rom.output.dir}" includes="**/*.rom.log" />
+            </path>
+            <sequential>
+                <!-- write the checksum along with the location of the corresponding .symbol file -->
+                <propertyregex override="true" property="symbol.file.location" input="@{file}" regexp="\w:\\output(\\[^\.]*\\[^\\]+\.rom)\.log" replace="${proj.dir}\1\.symbol" />
+                <echo message="${symbol.file.location}" />
+                <propertyregex override="true" input="${symbol.file.location}" property="parsed.symbol.file.location" regexp="\\" replace="\\\\\\\\\\\\\\\\" global="true" />
+                <concat destfile="${build.output.dir}/build/core_symbols.txt" append="yes">
+                    <fileset file="@{file}" />
+                    <filterchain>
+                        <tokenfilter>
+                            <containsregex pattern="Checksum word:" flags="i" />
+                            <replaceregex pattern="Checksum word:\s*(\w*)" replace="\1=${parsed.symbol.file.location}" flags="gi" />
+                        </tokenfilter>
+                    </filterchain>
+                </concat>
+                <!-- write the checksum with the corresponding mapfile zip location -->
+                <concat destfile="${build.output.dir}/build/core_mapfiles.txt" append="yes">
+                    <fileset file="@{file}" />
+                    <filterchain>
+                        <tokenfilter>
+                            <containsregex pattern="Checksum word:" flags="i" />
+                            <replaceregex pattern="Checksum word:\s*(\w*)" replace="\1=${proj.dir}\\${core.rom.dir}\\\\Mapfiles.zip" flags="gi" />
+                        </tokenfilter>
+                    </filterchain>
+                </concat>
+            </sequential>
+        </for>
+    </target>
+    <!--
+    * Load rom IDs, core rom IDs and their mapfiles from the text file mobilecrash-prep-ee and mobilecrash-prep-loc
+    * Copies a template selge.ini file to flashfiles sub-directory, replacing tokens with suitable content based on list of ROM IDs.
+    -->
+    <target name="mobilecrash-final">
+        <propertyregex input="${ee.rom.output.dir}" property="ee.rom.network.dir" regexp="\\output" replace="" global="true" />
+        <propertyregex input="${core.rom.output.dir}" property="core.rom.network.dir" regexp="\\output" replace="" global="true" />
+        <propertyregex input="${publish.dir}" property="proj.dir" regexp="\\" replace="\\\\\\\\\\\\\\\\" global="true" />
+        <propertyregex input="${ee.rom.network.dir}" property="ee.rom.dir" regexp="\\" replace="\\\\\\\\\\\\\\\\" global="true" />
+        <propertyregex input="${core.rom.network.dir}" property="core.rom.dir" regexp="\\" replace="\\\\\\\\\\\\\\\\" global="true" />
+        <loadfile property="ee.symbol.files" srcFile="${build.output.dir}/build/ee_symbols.txt" failonerror="false" />
+        <loadfile property="ee.mapfiles" srcFile="${build.output.dir}/build/ee_mapfiles.txt" failonerror="false" />
+        <loadfile property="loc.symbol.files" srcFile="${build.output.dir}/build/core_symbols.txt" failonerror="false" />
+        <loadfile property="loc.mapfiles" srcFile="${build.output.dir}/build/core_mapfiles.txt" failonerror="false" />
+        <copy file="${helium.dir}/tools/mobilecrash/selge.ini" todir="${build.drive}${core.rom.output.dir}" overwrite="true" failonerror="false">
+            <filterchain>
+                <replacetokens>
+                    <token key="ROMIDS" value="${ee.symbol.files}${loc.symbol.files}" />
+                    <token key="MAPFILES" value="${ee.mapfiles}${loc.mapfiles}" />
+                </replacetokens>
+            </filterchain>
+        </copy>
+    </target>
+
+    <!--
+    Publish EE MobileCrash selge.ini
+    -->
+    <target name="publish-mobilecrash" if="publish">
+        <copy file="${build.drive}${core.rom.output.dir}/selge.ini" tofile="${selge.ini.network.dir}\\${build.id}_selge.ini" overwrite="true" failonerror="false" />
+    </target>
+
+
+
+    <!--
+    Prepare files for analysis with the selge tool.
+
+    * Zips up all the mapfiles as input to selge.
+    * Parses the .symbol files to extract the checksum (which is used as ROM ID), and stores in a temporary file.
+    * Copies a template selge.ini file to flashfiles sub-directory, replacing tokens with suitable content based on list of ROM IDs.
+
+    The check-env-mobilecrash-prep task ensures that there are some log files to parse, i.e. it is worth running the mobilecrash preparation.
+    <target name="mobilecrash-prep" depends="check-env-mobilecrash-prep" if="variant.flashfiles.available" description="Creates the files needed for analysing MobileCrash logs from Auto SMS">
+        <mkdir dir="${build.output.dir}/development_rom_images/variants/${product.name}_prd/CoreImage"/>
+        <zip basedir="${build.drive}/epoc32/release/armv5/urel" includes="*.map" destfile="${build.output.dir}/development_rom_images/variants/${product.name}_prd/CoreImage/Mapfiles.zip"/>
+        <propertyregex input="${publish.dir}" property="proj.dir" regexp="\\" replace="\\\\" global="true"/>
+        <concat destfile="${build.dir}/romids.txt" append="yes">
+            <fileset dir="${build.output.dir}/development_rom_images/variants/${product.name}_prd/CoreImage" includes="*_rom.log"/>
+            <filterchain>
+                <tokenfilter>
+                    <containsregex pattern="Checksum word:" flags="i"/>
+                    <replaceregex pattern="Checksum word:\s*(\w*)" replace="\1=${proj.dir}\\flashfiles\\variants\\${product.name}_prd\\CoreImage" flags="gi"/>
+                </tokenfilter>
+            </filterchain>
+        </concat>
+        <concat destfile="${build.dir}/romids.txt" append="yes">
+            <fileset dir="${build.output.dir}/development_rom_images/variants/${product.name}_rnd/CoreImage/internal" includes="*_rom.log"/>
+            <filterchain>
+                <tokenfilter>
+                    <containsregex pattern="Checksum word:" flags="i"/>
+                    <replaceregex pattern="Checksum word:\s*(\w*)" replace="\1=${proj.dir}\\flashfiles\\variants\\${product.name}_rnd\\CoreImage\\internal" flags="gi"/>
+                </tokenfilter>
+            </filterchain>
+        </concat>
+        <loadfile property="romids" srcFile="${build.dir}/romids.txt" failonerror="false"/>
+        <loadfile property="mapfiles" srcFile="${build.dir}/romids.txt" failonerror="false">
+            <filterchain>
+                <tokenfilter>
+                    <replaceregex pattern="prd" replace="rnd" flags="gi"/>
+                    <replaceregex pattern="^([^=]*).*" replace="\1=${proj.dir}\\flashfiles\\variants\\${product.name}_prd\\CoreImage\\Mapfiles.zip" flags="gi"/>
+                </tokenfilter>
+            </filterchain>
+        </loadfile>
+        <copy file="${env.dir}/selge.ini" todir="${build.output.dir}/development_rom_images/variants/${product.name}_prd/CoreImage" overwrite="true" failonerror="false">
+            <filterchain>
+                <replacetokens>
+                    <token key="ROMIDS" value="${romids}"/>
+                    <token key="MAPFILES" value="${mapfiles}"/>
+                </replacetokens>
+            </filterchain>
+        </copy>
+        <copy file="${build.output.dir}/development_rom_images/variants/${product.name}_prd/CoreImage/selge.ini" tofile="${env.SELGE_INI_NETWORK_DIR}/${build.id}_selge.ini" overwrite="true" failonerror="false"/>
+    </target>
+    <target name="publish-mobilecrash" if="publish" description="Publish EE MobileCrash selge.ini">
+        <copy file="${build.drive}${core.rom.output.dir}/selge.ini" tofile="${selge.ini.network.dir}\\${build.id}_selge.ini" overwrite="true" failonerror="false"/>
+    </target>
+     -->
+</project>

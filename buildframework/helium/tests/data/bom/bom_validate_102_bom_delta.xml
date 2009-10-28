@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bomDelta>
+  <buildFrom>bom_validate_101</buildFrom>
+  <buildTo>bom_validate_102</buildTo>
+  <content>
+    <folder status="deleted" overridden="true">bh1spp#1635: Created for Helium Testing</folder>
+    <task status="deleted" overridden="false">bh1spp#52093: Testing Task for Helium</task>
+  </content>
+</bomDelta>

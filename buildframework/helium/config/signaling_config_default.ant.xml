@@ -1,0 +1,377 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : signaling_config_default.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="signaling-config" xmlns:hlm="http://www.nokia.com/helium">
+    <description>
+    Definitions of helium signals. 
+    </description>
+    
+    <taskdef resource="org/apache/tools/ant/types/conditions/antlib.xml" />
+
+    <!-- Only for backward compatibility -->
+    <hlm:notifierList id="defaultSignalFailNotifier">
+        <hlm:emailNotifier templateSrc="${helium.dir}/tools/common/templates/log/email_new.html.ftl" title="[signal] ${signal.name}"
+            smtp="${email.smtp.server}" ldap="${email.ldap.server}" notifyWhen="fail">
+        </hlm:emailNotifier>
+    </hlm:notifierList>
+
+    <hlm:notifierList id="defaultFailNotifier">
+        <hlm:emailNotifier defaultTemplate="${helium.dir}/tools/common/templates/log/email_default.html.ftl" title="[signal] ${signal.name}"
+            smtp="${email.smtp.server}" ldap="${email.ldap.server}" notifyWhen="fail">
+        </hlm:emailNotifier>
+    </hlm:notifierList>
+
+
+    <!-- check for its usage 
+    <hlm:notifierList id="defaultSignalWarnNotifier">
+        <hlm:emailNotifier defaultTemplate="${helium.dir}/tools/common/templates/log/email_warning.html.ftl" title="[signal] ${signal.name}"
+            smtp="${email.smtp.server}" ldap="${email.ldap.server}">
+        </hlm:emailNotifier>
+    </hlm:notifierList>
+    -->
+
+    <!-- This configuration just dump some message while a signal is raised. -->
+    <hlm:notifierList id="echoSignalNotifier">
+        <hlm:executeTaskNotifier>
+            <echo>defaultSignalAlwaysNotifier: Signal: ${signal.name}</echo>
+            <echo>defaultSignalAlwaysNotifier: Status: ${signal.status}</echo>
+        </hlm:executeTaskNotifier>
+    </hlm:notifierList>
+
+    <!-- Only for backward compatibility -->
+    <hlm:notifierList id="defaultSignalAlwaysNotifier">
+        <hlm:emailNotifier templateSrc="${helium.dir}/tools/common/templates/log/email_new.html.ftl" title="[signal] ${signal.name}"
+            smtp="${email.smtp.server}" ldap="${email.ldap.server}" notifyWhen="always">
+        </hlm:emailNotifier>
+    </hlm:notifierList>
+
+    <hlm:notifierList id="defaultAlwaysNotifier">
+        <hlm:emailNotifier defaultTemplate="${helium.dir}/tools/common/templates/log/email_default.html.ftl" title="[signal] ${signal.name}"
+            smtp="${email.smtp.server}" ldap="${email.ldap.server}" notifyWhen="always">
+        </hlm:emailNotifier>
+    </hlm:notifierList>
+
+    <hlm:signalInput id="buildManagementSignalInput" failbuild="now">
+        <hlm:notifierListRef refid="defaultSignalFailNotifier"/>
+    </hlm:signalInput>
+
+    <!-- default signal input, incase if no signal input is defined this
+        will be used -->
+    <hlm:signalInput id="defaultSignalInput" failbuild="defer">
+        <hlm:notifierListRef refid="defaultFailNotifier" />
+    </hlm:signalInput>
+
+    <hlm:signalInput id="prepWorkAreaSignalInput" failbuild="now">
+        <hlm:notifierListRef refid="defaultFailNotifier" />
+    </hlm:signalInput>
+
+    <!-- Check for its usage (as email template is not supported as 
+    converted directly from ant xml file). 
+    <hlm:signalInput id="prepWorkAreaSignalInputWarn" failbuild="never">
+        <hlm:notifierListRef refid="defaultSignalWarnNotifier" />
+    </hlm:signalInput>
+    -->
+    <hlm:signalInput id="preparationSignalInput" failbuild="now">
+        <hlm:notifierListRef refid="defaultFailNotifier" />
+    </hlm:signalInput>
+
+    <hlm:signalInput id="compileCleanSignalInput" failbuild="never">
+        <hlm:notifierListRef refid="defaultFailNotifier" />
+    </hlm:signalInput>
+
+
+    <hlm:signalInput id="compileSignalInput" failbuild="defer">
+        <hlm:notifierListRef refid="defaultFailNotifier" />
+    </hlm:signalInput>
+
+    <hlm:signalInput id="eeRomsSignalInput" failbuild="never">
+        <hlm:notifierListRef refid="defaultAlwaysNotifier" />
+    </hlm:signalInput>
+
+    <hlm:signalInput id="subconRomsSignalInput" failbuild="never">
+        <hlm:notifierListRef refid="defaultAlwaysNotifier" />
+    </hlm:signalInput>
+
+    <hlm:signalInput id="localizedRomsSignalInput" failbuild="defer">
+        <hlm:notifierListRef refid="defaultAlwaysNotifier" />
+    </hlm:signalInput>
+
+    <hlm:signalInput id="rombuildSignalInput" failbuild="never">
+        <hlm:notifierListRef refid="defaultFailNotifier" />
+    </hlm:signalInput>
+
+    <hlm:signalInput id="traceRomsSignalInput" failbuild="never">
+        <hlm:notifierListRef refid="defaultFailNotifier" />
+    </hlm:signalInput>
+
+    <hlm:signalInput id="graceUploadSignalInput" failbuild="defer">
+        <hlm:notifierListRef refid="defaultFailNotifier" />
+    </hlm:signalInput>
+
+    <hlm:signalInput id="dataPackagingSignalInput" failbuild="defer">
+        <hlm:notifierListRef refid="defaultFailNotifier" />
+    </hlm:signalInput>
+
+    <hlm:signalInput id="buildFinishedSignalInput" failbuild="now">
+        <hlm:notifierListRef refid="defaultFailNotifier" />
+    </hlm:signalInput>
+
+    <hlm:signalInput id="publishSignalInput" failbuild="defer">
+        <hlm:notifierListRef refid="defaultFailNotifier" />
+    </hlm:signalInput>
+
+    <hlm:signalInput id="testOneSignalInput" failbuild="now" />
+
+    <hlm:signalInput id="testTwoSignalInput" failbuild="never" />
+
+    <hlm:signalInput id="testThreeSignalInput" failbuild="defer" />
+
+    <hlm:signalInput id="testAlwaysSignalInput" />
+
+    <hlm:signalInput id="testAlertsSignalInput" failbuild="now" />
+
+    <hlm:signalInput id="fotaSignalInput" failbuild="never">
+        <hlm:notifierListRef refid="fotaSignalInput" />
+    </hlm:signalInput>
+
+    <hlm:signalInput id="btSmokeTestNotifySignalInput" failbuild="never">
+        <hlm:notifierListRef refid="defaultFailNotifier" />
+    </hlm:signalInput>
+
+    <hlm:signalInput id="archivePolicyErrorSignalInput" failbuild="never">
+        <hlm:notifierListRef refid="defaultFailNotifier" />
+    </hlm:signalInput>
+
+    <hlm:signalInput id="signalValidatePolicyInvalidOrMissingInput" failbuild="defer">
+        <hlm:notifierListRef refid="defaultFailNotifier" />
+    </hlm:signalInput>
+
+    <hlm:signalInput id="testSBSScanlogInput" failbuild="now">
+        <hlm:notifierListRef refid="defaultFailNotifier" />
+    </hlm:signalInput>
+
+    <hlm:signalListenerConfig id="testSBSScanlog" target="test-scanlog-metadata-1" message="sbs scanlog processed">
+        <hlm:targetCondition>
+            <hlm:hasSeverity severity="error" file="${env.TEMP}/signals/test-scanlog-metadata-1.log.status.xml" />
+        </hlm:targetCondition>
+        <signalNotifierInput>
+            <signalInput refid="testSBSScanlogInput" />
+            <notifierInput file = "${env.TEMP}/signals/test-scanlog-metadata-1.log.status.html" />
+        </signalNotifierInput>
+    </hlm:signalListenerConfig>
+
+    <hlm:signalListenerConfig id="prepWorkAreaSignal" target="prep-work-area" message="Errors happened during Preparing Work Area">
+        <hlm:targetCondition>
+            <hlm:hasSeverity severity="error" file="${build.cache.log.dir}/signals/${build.id}_ccm_get_input.log.status.xml" />
+        </hlm:targetCondition>
+        <signalNotifierInput>
+            <signalInput refid="prepWorkAreaSignalInput" />
+            <notifierInput file = "${build.cache.log.dir}/signals/${build.id}_ccm_get_input.log.status.html" />
+        </signalNotifierInput>
+    </hlm:signalListenerConfig>
+
+    <hlm:signalListenerConfig id="preparationSignal" target="prep-fail" message="Errors during preparation">
+        <targetCondition>
+            <hlm:hasSeverity severity="error" file="${build.signal.status.dir}/${build.id}_ant_build.log.status.xml" />
+        </targetCondition>
+        <signalNotifierInput>
+            <signalInput refid="preparationSignalInput" />
+            <notifierInput file = "${build.signal.status.dir}/${build.id}_ant_build.log.status.html" />
+        </signalNotifierInput>
+    </hlm:signalListenerConfig>
+
+    <hlm:signalListenerConfig id="eeRomsSignal" target="ee-roms" message="Errors happened during ee rom image">
+        <targetCondition>
+            <hlm:hasSeverity severity="error" file="${build.signal.status.dir}/${build.id}_ee_roms.log.status.xml" />
+        </targetCondition>
+        <signalNotifierInput>
+            <signalInput refid="eeRomsSignalInput" />
+            <notifierInput file = "${build.signal.status.dir}/${build.id}_ee_roms.log.html" />
+        </signalNotifierInput>
+    </hlm:signalListenerConfig>
+
+    <hlm:signalListenerConfig id="subconRomsSignal" target="subcon-roms" message="Errors happened during subcon rom image">
+        <hlm:targetCondition>
+            <hlm:hasSeverity severity="error" file="${build.signal.status.dir}/${build.id}_subcon_roms.log.status.xml" />
+        </hlm:targetCondition>
+        <signalNotifierInput>
+            <signalInput refid="subconRomsSignalInput" />
+            <notifierInput file = "${build.signal.status.dir}/${build.id}_subcon.log.status.html" />
+        </signalNotifierInput>
+    </hlm:signalListenerConfig>
+
+
+    <hlm:signalListenerConfig id="traceRomsSignal" target="trace-roms" message="Errors happened during trace rom">
+        <hlm:targetCondition>
+            <hlm:hasSeverity severity="error" file="${build.signal.status.dir}/${build.id}_trace_roms.log.xml" />
+        </hlm:targetCondition>
+        <signalNotifierInput>
+            <signalInput refid="traceRomsSignalInput" />
+            <notifierInput file = "${build.signal.status.dir}/${build.id}_trace_roms.log.html" />
+        </signalNotifierInput>
+    </hlm:signalListenerConfig>
+
+    <hlm:signalListenerConfig id="fotaSignal" target="fota-a-build" message="Fota execution finished">
+        <hlm:targetCondition>
+            <hlm:hasSeverity severity="error" file="${build.signal.status.dir}/${build.id}_fota.log.xml" />
+        </hlm:targetCondition>
+        <signalNotifierInput>
+            <signalInput refid="fotaSignalInput" />
+            <notifierInput file = "${build.signal.status.dir}/${build.id}_fota.log.status.html" />
+        </signalNotifierInput>
+    </hlm:signalListenerConfig>
+
+    <hlm:signalListenerConfig id="dataPackagingSignal" target="build-icreatordp" message="DP creation finished">
+        <hlm:targetCondition>
+            <hlm:hasSeverity severity="error" file="${build.signal.status.dir}/${build.id}_dp.log.status.xml" />
+        </hlm:targetCondition>
+        <signalNotifierInput>
+            <signalInput refid="dataPackagingSignalInput" />
+            <notifierInput file = "${build.signal.status.dir}/${build.id}_dp.log.status.html" />
+        </signalNotifierInput>
+    </hlm:signalListenerConfig>
+
+    <hlm:signalInput id="atsSignalInput" failbuild="defer">
+        <hlm:notifierListRef refid="defaultFailNotifier" />
+    </hlm:signalInput>
+
+    <hlm:signalListenerConfig id="atsSignal" target="ats-test" message="ATS creation finished">
+        <targetCondition>
+            <hlm:hasSeverity severity="error" file="${build.signal.status.dir}/${build.id}_ats.log.status.xml" />
+        </targetCondition>
+        <signalNotifierInput>
+            <signalInput refid="atsSignalInput" />
+            <notifierInput file = "${build.signal.status.dir}/${build.id}_ats.log.status.html" />
+        </signalNotifierInput>
+    </hlm:signalListenerConfig>
+
+    <hlm:signalListenerConfig id="asteSignal" target="ats-aste" message="ASTE finished">
+        <hlm:targetCondition>
+            <hlm:hasSeverity severity="error" file="${build.signal.status.dir}/${build.id}_ats.log.status.xml" />
+        </hlm:targetCondition>
+        <signalNotifierInput>
+            <signalInput refid="atsSignalInput" />
+            <notifierInput file = "${build.signal.status.dir}/${build.id}_ats.log.status.html" />
+        </signalNotifierInput>
+    </hlm:signalListenerConfig>
+
+    <hlm:signalListenerConfig id="mattiSignal" target="matti-test" message="ATS MATTI creation finished">
+        <targetCondition>
+            <hlm:hasSeverity severity="error" file="${build.signal.status.dir}/${build.id}_ats.log.status.xml" />
+        </targetCondition>
+        <signalNotifierInput>
+            <signalInput refid="atsSignalInput" />
+            <notifierInput file = "${build.signal.status.dir}/${build.id}_ats.log.status.html" />
+        </signalNotifierInput>
+    </hlm:signalListenerConfig>
+
+    <hlm:signalListenerConfig id="publishSignal" target="publish" message="content published">
+        <signalNotifierInput>
+            <signalInput refid="publishSignalInput" />
+        </signalNotifierInput>
+    </hlm:signalListenerConfig>
+
+    <hlm:signalListenerConfig id="testAlertsSignal" target="check-signal" message="Test alert signal">
+        <signalNotifierInput>
+            <signalInput refid="testAlertsSignalInput" />
+        </signalNotifierInput>
+    </hlm:signalListenerConfig>
+
+    <hlm:signalListenerConfig id="btSmokeTestNotifySignal" target="blacktusk-signal" message="Blacktusk signal">
+        <signalNotifierInput>
+            <signalInput refid="btSmokeTestNotifySignalInput" />
+        </signalNotifierInput>
+    </hlm:signalListenerConfig>
+
+    <hlm:signalInput id="archiveErrorSignalInput" failbuild="defer">
+        <hlm:notifierListRef refid="defaultFailNotifier" />
+    </hlm:signalInput>
+
+    <hlm:signalListenerConfig id="signalValidatePolicyInvalidOrMissing" target="render-validate-policy" message="Policy file validation">
+        <targetCondition>
+            <hlm:hasSeverity severity="error" file="${build.signal.status.dir}/${build.id}_validate_policy.log.status.xml" />
+        </targetCondition>
+        <signalNotifierInput>
+            <signalInput refid="signalValidatePolicyInvalidOrMissingInput" />
+            <notifierInput file = "${build.signal.status.dir}/${build.id}_validate_policy.log.status.html" />
+        </signalNotifierInput>
+    </hlm:signalListenerConfig>
+
+    <hlm:signalInput id="canonicalSysDefFailSignalInput" failbuild="now">
+        <hlm:notifierListRef refid="defaultFailNotifier" />
+    </hlm:signalInput>
+
+    
+    <hlm:signalInput id="getenvSignalInput" failbuild="now">
+        <hlm:notifierListRef refid="defaultFailNotifier" />
+    </hlm:signalInput>
+
+    <hlm:signalListenerConfig id="getEnvSignal" target="preparation-getenv" message="Getenv finished">
+        <targetCondition>
+            <hlm:hasSeverity severity="error" file="${build.signal.status.dir}/${build.id}_getenv.log.status.xml" />
+        </targetCondition>
+        <signalNotifierInput>
+            <signalInput refid="getenvSignalInput" />
+            <notifierInput file = "${build.signal.status.dir}/${build.id}_getenv.log.status.html" />
+        </signalNotifierInput>
+    </hlm:signalListenerConfig>
+
+    <hlm:signalInput id="signalConfigureQtInput" failbuild="defer">
+        <hlm:notifierListRef refid="defaultFailNotifier" />
+    </hlm:signalInput>
+
+    <hlm:signalListenerConfig id="signalConfigureQt" target="configure-qt" message="Configuring Qt framework">
+        <targetCondition>
+            <hlm:hasSeverity severity="error" file="${build.signal.status.dir}/${qt.configure.log.name}.status.xml" />
+        </targetCondition>
+        <signalNotifierInput>
+            <signalInput refid="signalConfigureQtInput" />
+            <notifierInput file = "${build.signal.status.dir}/${qt.configure.log.name}.status.html" />
+        </signalNotifierInput>
+    </hlm:signalListenerConfig>
+
+    <!-- Signal configuration for a signal sent when the build fails completely. -->
+    <hlm:signalInput id="buildExceptionSignalInput" failbuild="never">
+        <hlm:notifierListRef refid="defaultFailNotifier"/>
+    </hlm:signalInput>
+
+    <property name="signals.buildexception.signalinput" value="buildExceptionSignalInput"/>
+
+    <hlm:signalInput id="signalRunQMakeInput" failbuild="defer">
+        <hlm:notifierListRef refid="defaultFailNotifier" />
+    </hlm:signalInput>
+
+    <hlm:signalInput id="sisfilesSignalInput" failbuild="now">
+        <hlm:notifierListRef refid="defaultSignalFailNotifier" />
+    </hlm:signalInput>
+
+    <hlm:signalListenerConfig id="sisFilesSignal" target="sisfiles" message="sisfiles finished">
+        <hlm:targetCondition>
+            <hlm:hasSeverity severity="error" file="${build.signal.status.dir}/${build.id}_sisfiles.log.status.xml"  />
+        </hlm:targetCondition>
+        <signalNotifierInput>
+            <signalInput refid="sisfilesSignalInput" />
+            <notifierInput file = "${build.signal.status.dir}/${build.id}_sisfiles.log.status.html" />
+        </signalNotifierInput>
+    </hlm:signalListenerConfig>
+
+</project>

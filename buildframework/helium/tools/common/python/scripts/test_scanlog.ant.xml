@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : test_scanlog.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test_scanlog" xmlns:au="org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>
+        Testing scanlog implementation.
+    </description>
+    <property environment="env"/>
+
+    <dirname property="test.scanlog.dir" file="${ant.file.test_scanlog}"/>
+    
+    <property name="helium.dir" location="${test.scanlog.dir}/../../../.."/>
+    <import file="${helium.dir}/helium.ant.xml"/>
+
+    <!-- Macro to process the log to generate scanlog. -->
+    <macrodef name="scanlogTest" uri="http://www.nokia.com/helium">
+        <attribute name="log"/>
+        <attribute name="output"/>
+        <sequential>
+            <exec executable="python" dir="${test.scanlog.dir}" failonerror="false">
+                <arg value="sbsscanlog.py"/>
+                <arg value="--log"/>
+                <arg value="@{log}"/>
+                <arg value="--output"/>
+                <arg value="@{output}"/>
+            </exec>
+        </sequential>
+    </macrodef>
+
+    <!-- Macro to process the log to generate scanlog. -->
+    <macrodef name="scanlogMetadataTest" uri="http://www.nokia.com/helium">
+        <attribute name="log"/>
+        <attribute name="output"/>
+        <sequential>
+            <exec executable="python" dir="${test.scanlog.dir}" failonerror="false">
+                <arg value="sbsscanlogmetadata.py"/>
+                <arg value="--log"/>
+                <arg value="@{log}"/>
+                <arg value="--output"/>
+                <arg value="@{output}"/>
+            </exec>
+        </sequential>
+    </macrodef>
+
+    <target name="test-scanlog-1">
+        <echo message="log.dir:${env.TEMP}/" />
+        <delete file="${env.TEMP}/test-scanlog-1.log" failonerror="false"/>
+        <delete file="${env.TEMP}/test-scanlog-1.log.xml" failonerror="false"/>
+        <delete file="${env.TEMP}/test-scanlog-1.log.scan2.html" failonerror="false"/>
+        <hlm:scanlogTest log="${helium.dir}\tests\data\scanlog\ido_lcdo_tb92-ci_mcl.92.400__armv5_winscw_armv5.test_multiple_thread_dfs_build_compile.log"
+            output="${env.TEMP}/test-scanlog-1.log" />
+        <hlm:assertFileExists file="${env.TEMP}/test-scanlog-1.log"/>
+        <hlm:assertFileExists file="${env.TEMP}/test-scanlog-1.log.xml"/>
+        <hlm:assertFileExists file="${env.TEMP}/test-scanlog-1.log.scan2.html"/>
+    </target>
+
+    <target name="test-scanlog-2">
+        <echo message="log.dir:${env.TEMP}/" />
+        <delete file="${env.TEMP}/test-scanlog-1.log" failonerror="false"/>
+        <delete file="${env.TEMP}/test-scanlog-1.log.xml" failonerror="false"/>
+        <delete file="${env.TEMP}/test-scanlog-1.log.scan2.html" failonerror="false"/>
+        <hlm:scanlogTest log="${helium.dir}\tests\data\scanlog\ido_lcdo_tb92-ci_mcl.92.400__armv5_winscw_armv5.test_multiple_threadreallyclean_dfs_build_clean_compile.log"  output="${env.TEMP}/test-scanlog21.log" />
+        <hlm:assertFileExists file="${env.TEMP}/test-scanlog-1.log"/>
+        <hlm:assertFileExists file="${env.TEMP}/test-scanlog-1.log.xml"/>
+        <hlm:assertFileExists file="${env.TEMP}/test-scanlog-1.log.scan2.html"/>
+    </target>
+
+    <target name="test-scanlog-3">
+        <echo message="log.dir:${env.TEMP}/" />
+        <delete file="${env.TEMP}/test-scanlog-3.log" failonerror="false"/>
+        <delete file="${env.TEMP}/test-scanlog-3.log.xml" failonerror="false"/>
+        <delete file="${env.TEMP}/test-scanlog-3.log.scan2.html" failonerror="false"/>
+        <hlm:scanlogTest log="${helium.dir}\tests\data\scanlog\all_regex_type.log"
+            output="${env.TEMP}/test-scanlog-3.log" />
+        <hlm:assertFileExists file="${env.TEMP}/test-scanlog-3.log"/>
+        <hlm:assertFileExists file="${env.TEMP}/test-scanlog-3.log.xml"/>
+        <hlm:assertFileExists file="${env.TEMP}/test-scanlog-3.log.scan2.html"/>
+    </target>
+
+    <target name="test-scanlog-metadata-1">
+        <echo message="log.dir:${env.TEMP}/" />
+        <delete file="${env.TEMP}/test-scanlog-metadata-1.log" failonerror="false"/>
+        <delete file="${env.TEMP}/test-metadata-1.sqlite" failonerror="false"/>
+        <delete file="${env.TEMP}/test-scanlog-metadata-1.log.scan2.html" failonerror="false"/>
+        
+        <hlm:scanlogMetadataTest log="${helium.dir}\tests\data\scanlog\S60.MCL_7952_200932_5000__all_variants_multiple_thread_pf_7952_build_compile.log"
+            output="${env.TEMP}/test-scanlog-metadata-1.log" />
+        <hlm:assertFileExists file="${env.TEMP}/test-scanlog-metadata-1.log"/>
+        <hlm:metadatarecord database="${env.TEMP}/test-metadata-1.sqlite">
+            <hlm:sbsmetadatainput>
+                <fileset casesensitive="false" file="${env.TEMP}/test-scanlog-metadata-1.log"/>
+                <metadatafilterset refid="filterset.sbs" />
+            </hlm:sbsmetadatainput>
+        </hlm:metadatarecord>
+        <fmpp sourceFile="${helium.dir}/tools/common/templates/log/scan2.html.ftl"
+                     outputfile="${env.TEMP}/test-scanlog-metadata-1.log.scan2.html">
+            <freemarkerLinks expandProperties="yes">
+                macro: ${helium.dir}/tools/common/templates/macro
+            </freemarkerLinks>
+            <data expandProperties="yes">
+                dbPath: ${env.TEMP}/test-metadata-1.sqlite
+                doc: xml(${helium.dir}/tests/data/scanlog/all_regex_type.log_sbs_info.xml)
+                ant: antProperties()
+            </data>
+        </fmpp>
+        <hlm:generateBuildStatus dbfile="${env.TEMP}/test-metadata-1.sqlite" output-dir="${env.TEMP}" file="test-scanlog-metadata-1.log"/>
+        <hlm:assertFileExists file="${env.TEMP}/test-scanlog-metadata-1.log.scan2.html"/>
+    </target>
+    
+    <target name="test-metadata-signal">
+        <antcall target="test-scanlog-metadata-1" />
+    </target>
+</project>

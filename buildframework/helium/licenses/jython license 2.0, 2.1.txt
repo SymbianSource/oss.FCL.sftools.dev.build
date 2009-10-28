@@ -1,0 +1,200 @@
+
+    2: A. TERMS AND CONDITIONS FOR ACCESSING OR OTHERWISE USING JYTHON
+    3: =======================================================
+    4: 
+    5: PYTHON SOFTWARE FOUNDATION LICENSE VERSION 2
+    6: --------------------------------------------
+    7: 
+    8: 1. This LICENSE AGREEMENT is between the Python Software Foundation
+    9: ("PSF"), and the Individual or Organization ("Licensee") accessing and
+   10: otherwise using this software ("Jython") in source or binary form and
+   11: its associated documentation.
+   12: 
+   13: 2. Subject to the terms and conditions of this License Agreement, PSF
+   14: hereby grants Licensee a nonexclusive, royalty-free, world-wide
+   15: license to reproduce, analyze, test, perform and/or display publicly,
+   16: prepare derivative works, distribute, and otherwise use Jython alone
+   17: or in any derivative version, provided, however, that PSF's License
+   18: Agreement and PSF's notice of copyright, i.e., "Copyright (c) 2007
+   19: Python Software Foundation; All Rights Reserved" are retained in
+   20: Jython alone or in any derivative version prepared by Licensee.
+   21: 
+   22: 3. In the event Licensee prepares a derivative work that is based on
+   23: or incorporates Jython or any part thereof, and wants to make
+   24: the derivative work available to others as provided herein, then
+   25: Licensee hereby agrees to include in any such work a brief summary of
+   26: the changes made to Jython.
+   27: 
+   28: 4. PSF is making Jython available to Licensee on an "AS IS"
+   29: basis.  PSF MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR
+   30: IMPLIED.  BY WAY OF EXAMPLE, BUT NOT LIMITATION, PSF MAKES NO AND
+   31: DISCLAIMS ANY REPRESENTATION OR WARRANTY OF MERCHANTABILITY OR FITNESS
+   32: FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF JYTHON WILL NOT
+   33: INFRINGE ANY THIRD PARTY RIGHTS.
+   34: 
+   35: 5. PSF SHALL NOT BE LIABLE TO LICENSEE OR ANY OTHER USERS OF JYTHON
+   36: FOR ANY INCIDENTAL, SPECIAL, OR CONSEQUENTIAL DAMAGES OR LOSS AS
+   37: A RESULT OF MODIFYING, DISTRIBUTING, OR OTHERWISE USING JYTHON,
+   38: OR ANY DERIVATIVE THEREOF, EVEN IF ADVISED OF THE POSSIBILITY THEREOF.
+   39: 
+   40: 6. This License Agreement will automatically terminate upon a material
+   41: breach of its terms and conditions.
+   42: 
+   43: 7. Nothing in this License Agreement shall be deemed to create any
+   44: relationship of agency, partnership, or joint venture between PSF and
+   45: Licensee.  This License Agreement does not grant permission to use PSF
+   46: trademarks or trade name in a trademark sense to endorse or promote
+   47: products or services of Licensee, or any third party.
+   48: 
+   49: 8. By copying, installing or otherwise using Jython, Licensee
+   50: agrees to be bound by the terms and conditions of this License
+   51: Agreement.
+   52:  
+   53: Jython 2.0, 2.1 License
+   54: ================================
+   55: 
+   56: Copyright (c) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007 Jython Developers
+   57: All rights reserved.
+   58: 
+   59: Redistribution and use in source and binary forms, with or without
+   60: modification, are permitted provided that the following conditions
+   61: are met:
+   62: 
+   63:  - Redistributions of source code must retain the above copyright
+   64:    notice, this list of conditions and the following disclaimer.
+   65: 
+   66:  - Redistributions in binary form must reproduce the above copyright
+   67:    notice, this list of conditions and the following disclaimer in
+   68:    the documentation and/or other materials provided with the distribution.
+   69: 
+   70:  - Neither the name of the Jython Developers nor the names of
+   71:    its contributors may be used to endorse or promote products
+   72:    derived from this software without specific prior written permission.
+   73: 
+   74: THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+   75: ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+   76: LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+   77: A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE REGENTS OR
+   78: CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+   79: EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+   80: PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+   81: PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
+   82: OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+   83: NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+   84: SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+   85: 
+   86: 
+   87: 
+   88: 
+   89: JPython 1.1.x Software License.
+   90: =========================
+   91: 
+   92: ______________________________________________________________________
+   93: 
+   94: IMPORTANT: PLEASE READ THE FOLLOWING AGREEMENT CAREFULLY.
+   95: 
+   96: BY CLICKING ON THE "ACCEPT" BUTTON WHERE INDICATED, OR BY INSTALLING,
+   97: COPYING OR OTHERWISE USING THE SOFTWARE, YOU ARE DEEMED TO HAVE AGREED TO
+   98: THE TERMS AND CONDITIONS OF THIS AGREEMENT.
+   99: 
+  100: ______________________________________________________________________
+  101: 
+  102: JPython version 1.1.x
+  103: 
+  104:   1. This LICENSE AGREEMENT is between the Corporation for National Research
+  105:      Initiatives, having an office at 1895 Preston White Drive, Reston, VA
+  106:      20191 ("CNRI"), and the Individual or Organization ("Licensee")
+  107:      accessing and using JPython version 1.1.x in source or binary form and
+  108:      its associated documentation as provided herein ("Software").
+  109: 
+  110:   2. Subject to the terms and conditions of this License Agreement, CNRI
+  111:      hereby grants Licensee a non-exclusive, non-transferable, royalty-free,
+  112:      world-wide license to reproduce, analyze, test, perform and/or display
+  113:      publicly, prepare derivative works, distribute, and otherwise use the
+  114:      Software alone or in any derivative version, provided, however, that
+  115:      CNRI's License Agreement and CNRI's notice of copyright, i.e.,
+  116:      "Copyright ©1996-1999 Corporation for National Research Initiatives;
+  117:      All Rights Reserved" are both retained in the Software, alone or in any
+  118:      derivative version prepared by Licensee.
+  119: 
+  120:      Alternatively, in lieu of CNRI's License Agreement, Licensee may
+  121:      substitute the following text (omitting the quotes), provided, however,
+  122:      that such text is displayed prominently in the Software alone or in any
+  123:      derivative version prepared by Licensee: "JPython (Version 1.1.x) is
+  124:      made available subject to the terms and conditions in CNRI's License
+  125:      Agreement. This Agreement may be located on the Internet using the
+  126:      following unique, persistent identifier (known as a handle):
+  127:      1895.22/1006. The License may also be obtained from a proxy server on
+  128:      the Web using the following URL: http://hdl.handle.net/1895.22/1006."
+  129: 
+  130:   3. In the event Licensee prepares a derivative work that is based on or
+  131:      incorporates the Software or any part thereof, and wants to make the
+  132:      derivative work available to the public as provided herein, then
+  133:      Licensee hereby agrees to indicate in any such work, in a prominently
+  134:      visible way, the nature of the modifications made to CNRI's Software.
+  135: 
+  136:   4. Licensee may not use CNRI trademarks or trade name, including JPython
+  137:      or CNRI, in a trademark sense to endorse or promote products or
+  138:      services of Licensee, or any third party. Licensee may use the mark
+  139:      JPython in connection with Licensee's derivative versions that are
+  140:      based on or incorporate the Software, but only in the form
+  141:      "JPython-based ___________________," or equivalent.
+  142: 
+  143:   5. CNRI is making the Software available to Licensee on an "AS IS" basis.
+  144:      CNRI MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED. BY WAY
+  145:      OF EXAMPLE, BUT NOT LIMITATION, CNRI MAKES NO AND DISCLAIMS ANY
+  146:      REPRESENTATION OR WARRANTY OF MERCHANTABILITY OR FITNESS FOR ANY
+  147:      PARTICULAR PURPOSE OR THAT THE USE OF THE SOFTWARE WILL NOT INFRINGE
+  148:      ANY THIRD PARTY RIGHTS.
+  149: 
+  150:   6. CNRI SHALL NOT BE LIABLE TO LICENSEE OR OTHER USERS OF THE SOFTWARE FOR
+  151:      ANY INCIDENTAL, SPECIAL OR CONSEQUENTIAL DAMAGES OR LOSS AS A RESULT OF
+  152:      USING, MODIFYING OR DISTRIBUTING THE SOFTWARE, OR ANY DERIVATIVE
+  153:      THEREOF, EVEN IF ADVISED OF THE POSSIBILITY THEREOF. SOME STATES DO NOT
+  154:      ALLOW THE LIMITATION OR EXCLUSION OF LIABILITY SO THE ABOVE DISCLAIMER
+  155:      MAY NOT APPLY TO LICENSEE.
+  156: 
+  157:   7. This License Agreement may be terminated by CNRI (i) immediately upon
+  158:      written notice from CNRI of any material breach by the Licensee, if the
+  159:      nature of the breach is such that it cannot be promptly remedied; or
+  160:      (ii) sixty (60) days following notice from CNRI to Licensee of a
+  161:      material remediable breach, if Licensee has not remedied such breach
+  162:      within that sixty-day period.
+  163: 
+  164:   8. This License Agreement shall be governed by and interpreted in all
+  165:      respects by the law of the State of Virginia, excluding conflict of law
+  166:      provisions. Nothing in this Agreement shall be deemed to create any
+  167:      relationship of agency, partnership, or joint venture between CNRI and
+  168:      Licensee.
+  169: 
+  170:   9. By clicking on the "ACCEPT" button where indicated, or by installing,
+  171:      copying or otherwise using the Software, Licensee agrees to be bound by
+  172:      the terms and conditions of this License Agreement.
+  173: 
+  174:                                [ACCEPT BUTTON]
+  175: 
+  176: B. HISTORY OF THE SOFTWARE
+  177: =======================================================
+  178: 
+  179: JPython was created in late 1997 by Jim Hugunin. Jim was also the
+  180: primary developer while he was at CNRI. In February 1999 Barry Warsaw
+  181: took over as primary developer and released JPython version 1.1.
+  182: 
+  183: In October 2000 Barry helped move the software to SourceForge
+  184: where it was renamed to Jython. Jython 2.0 and 2.1 were developed
+  185: under the Jython specific license below.
+  186: 
+  187: From the 2.2 release on, Jython contributors have signed
+  188: Python Software Foundation contributor agreements and releases are
+  189: covered under the Python Software Foundation license version 2.
+  190: 
+  191: The standard library is covered by the Python Software Foundation
+  192: license as well. See the Lib/LICENSE file for details.
+  193: 
+  194: The zxJDBC package was written by Brian Zimmer and originally licensed
+  195: under the GNU Public License.  The package is now covered by the Jython
+  196: Software License.
+  197: 
+  198: The command line interpreter is covered by the Apache Software
+  199: License.  See the org/apache/LICENSE file for details.
+  200: 

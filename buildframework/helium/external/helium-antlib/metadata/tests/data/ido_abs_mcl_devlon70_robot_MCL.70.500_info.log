@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<info>
+                <id>ido_abs_mcl_devlon70_robot_MCL.70.500</id>
+                <number>500</number>
+                <startTime>2009-04-25T19:31:43</startTime>
+                <machine>FASYM011</machine>
+                <publish>
+                    <status>true</status>
+                    <location>\\fasamba\dfs\r1120_isis\NT\Build_and_Release\IDO_Statistics\ABS_Domain\Releases</location>
+                </publish>
+            </info>

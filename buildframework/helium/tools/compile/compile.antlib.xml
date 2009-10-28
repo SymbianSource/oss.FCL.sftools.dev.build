@@ -1,0 +1,324 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+============================================================================
+Name        : compile.antlib.xml
+Part of     : Helium
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<antlib xmlns:hlm="http://www.nokia.com/helium">
+    <!-- This task transfer the log file into html format -->
+    <macrodef name="compileHtmlscanlogMacro" uri="http://www.nokia.com/helium">
+        <attribute name="input"/>
+        <attribute name="output"/>
+        <sequential>
+            <exec dir="${build.drive}/" executable="perl" failonerror="${failonerror}">
+                <arg value="${epocroot}epoc32/tools/htmlscanlog.pl"/>
+                <arg value="-v"/>
+                <arg value="-v"/>
+                <arg value="-l"/>
+                <arg file="@{input}"/>
+                <arg value="-o"/>
+                <arg file="@{output}"/>
+            </exec>
+            <hlm:assertFileExists file="@{output}"/>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="calculateErrorsFromLog" uri="http://www.nokia.com/helium">
+        <attribute name="logfile"/>
+        <sequential>
+            <if>
+                <not>
+                    <isset property="skip.diamonds"/>
+                </not>
+                <then>
+                    <fmpp sourceFile="${helium.dir}/tools/common/templates/diamonds/faults_metadata.ftl"
+                                 outputfile="${build.log.dir}/compile-main.xml">
+                        <data expandProperties="yes">
+                            dbPath: ${metadata.dbfile}
+                            logpath: @{logfile} 
+                            ant: antProperties()
+                        </data>
+                    </fmpp>
+                </then>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <macrodef name="compileLogSignalMacro" uri="http://www.nokia.com/helium">
+        <attribute name="compile.summary.file"/>
+        <attribute name="error.limit"/>
+        <sequential>
+            <hlm:metadataCountSeverity severity="ERROR" log="@{compile.summary.file}" 
+                db="${metadata.dbfile}" 
+                property="build.errors.total"/>
+                
+            <echo>Errors after compile-main: ${build.errors.total}</echo>
+            <echo message="${build.errors.limit}" />
+            <echo message="@{error.limit}" />
+            <if>
+                <scriptcondition language="jython" value="false">
+errorsTotal = project.getProperty("build.errors.total")
+errorsLimit = project.getProperty("build.errors.limit")
+if int(errorsLimit) > -1:
+    if int(errorsTotal) > int(errorsLimit):
+        self.setValue(1)
+                </scriptcondition>
+                <then>
+                    <property name="compile.result" value="1"/>
+                </then>
+                <else>
+                    <property name="compile.result" value="0"/>
+                </else>
+            </if>
+            <echo message="compile result:${compile.result}" />
+            <hlm:signalMacro skip.count="true" result="${compile.result}" 
+                logfile="@{compile.summary.file}" 
+                signal.input="${compile.signal.input}" />
+        </sequential>
+    </macrodef>
+    
+    <!-- Macro to start the build using EBS. Parameters are generated xml file for EBS builds
+    the log output of the build and the number of threads for the build. -->
+    <macrodef name="compileEbsMacro" uri="http://www.nokia.com/helium">
+        <attribute name="input"/>
+        <attribute name="log"/>
+        <attribute name="threads" default="${number.of.threads}"/>
+        <sequential>
+            <exec executable="perl" dir="${build.drive}/" failonerror="${failonerror}">
+                <env key="EPOCROOT" value="${epocroot}"/>
+                <arg value="${helium.dir}/tools/compile/buildjob.pl"/>
+                <arg value="-d"/>
+                <arg value="@{input}"/>
+                <arg value="-l"/>
+                <arg value="@{log}"/>
+                <arg value="-n"/>
+                <arg value="${number.of.threads}"/>
+            </exec>
+            <hlm:assertFileExists file="@{log}"/>
+        </sequential>
+    </macrodef>
+
+    <!-- Macro to generate the xml file for EBS builds. Inputs are Merged xml file for the process,
+    configuration for which the EBS xml file is generated and the output xml file for the EBS builds and
+    the log output of the build. -->
+    <macrodef name="compileGenxmlMacro" uri="http://www.nokia.com/helium">
+        <attribute name="input"/>
+        <attribute name="configuration"/>
+        <attribute name="output"/>
+        <attribute name="log"/>
+        <sequential>
+            <preset.exec executable="perl" dir="${build.drive}/" failonerror="${failonerror}">
+                <arg value="${epocroot}epoc32/tools/build/genxml.pl"/>
+                <arg value="-o"/>
+                <arg value="@{output}"/>
+                <arg value="-l"/>
+                <arg value="@{log}"/> <!-- ${build.log.dir}/${build.id}.@{configuration}_genxml.log -->
+                <arg value="-s"/>
+                <arg value="${epocroot}"/>
+                <arg value="-n"/>
+                <arg value="@{configuration}"/>
+                <arg line="@{input}"/>
+            </preset.exec>
+            <hlm:assertFileExists file="@{output}"/>
+            <hlm:assertFileExists file="@{log}"/>
+        </sequential>
+    </macrodef>
+
+    <!--
+        Merges all preprocessed System Definition files into one combined file
+        This macro also handles the copying of the sysdef DTDs on the root of
+        the build environment.
+    -->
+    <macrodef name="compileGenxmlMergeMacro" uri="http://www.nokia.com/helium">
+        <attribute name="input"/>
+        <attribute name="output"/>
+        <sequential>
+            <copy todir="${build.drive}/" verbose="true">
+                <fileset dir="${helium.dir}/tools/common/dtd" includes="*.dtd"/>
+            </copy>
+            <preset.exec executable="perl" dir="${build.drive}/" failonerror="${failonerror}" output="${build.log.dir}/${build.id}.sysdef_GenxmlMerge.log">
+                <arg value="${epocroot}epoc32/tools/build/genxml.pl"/>
+                <arg value="-s"/>
+                <arg value="${epocroot}"/>
+                <arg value="-m"/>
+                <arg value="@{output}"/>              
+                <arg line="@{input}"/>
+            </preset.exec>
+            <if>
+                <not>
+                    <available file="@{output}"/>
+                </not>
+                <then>
+                    <!-- Todo: metadata: Make sure that logfilter is added to the filterset -->
+                    <hlm:metadatarecord database="${metadata.dbfile}">
+                        <hlm:textmetadatainput>
+                            <fileset casesensitive="false" file="${build.log.dir}/${build.id}.sysdef_GenxmlMerge.log" />
+                            <metadatafilterset>
+                                <metadatafilter priority="ERROR" regex="^ERROR:" description="genxml error" />
+                                <metadatafilter priority="ERROR" regex="^Context:" description="genxml context error" />
+                            </metadatafilterset>
+                            <metadatafilterset refid="filterset.genxml.merge" />
+                        </hlm:textmetadatainput>
+                    </hlm:metadatarecord>
+                    <hlm:generateBuildStatus file="${build.id}.sysdef_GenxmlMerge.log" />
+                    <hlm:signal name="canonicalSysDefFailSignal" result="1" >
+                        <signalNotifierInput>
+                            <signalInput refid="canonicalSysDefFailSignalInput" />
+                            <notifierInput file = "${build.signal.status.dir}/${build.id}.sysdef_GenxmlMerge.log.status.html" />
+                        </signalNotifierInput>
+                    </hlm:signal>
+                </then>
+            </if>
+
+            <hlm:assertFileExists file="@{output}"/>
+        </sequential>
+    </macrodef>
+
+    <!--
+      This macro uses genxml to filter a sysdef file.
+      -->
+    <macrodef name="compileGenxmlFilterMacro" uri="http://www.nokia.com/helium">
+        <attribute name="input"/>
+        <attribute name="output"/>
+        <attribute name="filter"/>
+        <sequential>
+            <preset.exec executable="perl" dir="${build.drive}/" failonerror="${failonerror}">
+                <arg value="${epocroot}epoc32/tools/build/genxml.pl"/>
+                <arg value="-s"/>
+                <arg value="${epocroot}"/>
+                <arg value="-m"/>
+                <arg value="@{output}"/>
+                <arg value="-f"/>
+                <arg value="@{filter}"/>
+                <arg value="-l"/>
+                <arg line="@{output}.log"/>
+                <arg value="-x"/>
+                <arg value="@{input}"/>
+            </preset.exec>
+            <hlm:assertFileExists file="@{output}"/>
+        </sequential>
+    </macrodef>
+
+
+  <!--
+    Electric Cloud emake support.
+    e.g:
+    <pre>
+    <hlm:emakeMacro name="zip-ee" makefile="/foo.mk" log="${build.log.dir}/zip-ee.log" target="zip-all"/>
+    </pre>
+    Optionally to generate emake annotation file use/add attribute annodetail="basic,history,file,waiting".
+  -->
+    <scriptdef name="emakeMacro" language="beanshell" uri="http://www.nokia.com/helium">
+        <attribute name="name"/>
+        <attribute name="log"/>
+        <attribute name="makefile"/>
+        <attribute name="target"/>
+        <attribute name="custom"/>
+        <attribute name="dir"/>
+        <attribute name="annodetail"/>
+        <attribute name="root"/> 
+        <attribute name="failonerror"/> 
+          self.setTaskName("emake");
+          // check attributes
+          if (attributes.get("name") == null)
+            throw new org.apache.tools.ant.BuildException("name attribute is not defined");
+          self.log("Name: " + attributes.get("name"));
+          if (attributes.get("makefile") == null)
+            throw new org.apache.tools.ant.BuildException("makefile attribute is not defined");
+          self.log("Makefile: " + attributes.get("makefile"));
+          String target = "all";
+          String custom = "";
+          if (attributes.get("target") != null)
+            target = attributes.get("target");
+          self.log("Target: " + target);
+          if (attributes.get("custom") != null)
+            custom = attributes.get("custom");
+          if (attributes.get("root") != null)
+            root = attributes.get("root");
+          else
+            root = "";
+          self.log("Custom: " + custom);
+
+      // Create and configure exec target
+          org.apache.tools.ant.taskdefs.ExecTask task = new org.apache.tools.ant.taskdefs.ExecTask();
+          task.setTaskName(self.getTaskName());
+          String emake = com.nokia.ant.util.Helper.getProperty(project, "ec.emake");          
+          task.setExecutable(emake);
+          if (attributes.get("failonerror") != null) {
+            task.setFailonerror(Boolean.parseBoolean(attributes.get("failonerror")));
+          } else {
+            task.setFailonerror(true);
+          }
+          String buildDrive = com.nokia.ant.util.Helper.getProperty(project, "build.drive");              
+          task.setDir(new java.io.File(buildDrive + "/"));
+          if (attributes.get("log") != null) {
+            self.log("Log: " + attributes.get("log"));
+            task.setOutput(new java.io.File(attributes.get("log")));
+          }
+          if (attributes.get("dir") != null) {
+            self.log("dir: " + attributes.get("dir"));
+            task.setDir(new java.io.File(attributes.get("dir")));
+          }
+          String buildId = com.nokia.ant.util.Helper.getProperty(project, "build.id");
+          task.createArg().setValue("--emake-build-label=" + buildId + "-" + attributes.get("name"));
+          String eclass = com.nokia.ant.util.Helper.getProperty(project, "ec.build.class");
+          task.createArg().setValue("--emake-class=" + eclass);
+          String eroot = com.nokia.ant.util.Helper.getProperty(project, "env.EMAKE_ROOT");          
+          String heliumDir = com.nokia.ant.util.Helper.getProperty(project, "helium.dir"); 
+          if (attributes.get("root") != null) {
+            self.log("--emake-root=" + eroot + ";" + heliumDir + ";" + root);
+          }         
+          task.createArg().setValue("--emake-root=" + eroot + ";" + heliumDir + ";" + root);
+          if (attributes.get("annodetail") != null) {
+            task.createArg().setValue("--emake-annodetail=" + attributes.get("annodetail"));            
+            task.createArg().setValue("--emake-annofile=" + com.nokia.ant.util.Helper.getProperty(project, "build.log.dir") + "/" + buildId + "-" + attributes.get("name") + ".anno.xml");
+          }
+          task.createArg().setLine(custom);
+          task.createArg().setLine("-f " + attributes.get("makefile"));
+          task.createArg().setLine(target);
+          // Execute.
+          task.execute();
+    </scriptdef>
+
+  <!-- Macro to build using Raptor.-->
+    <scriptdef name="sbsMacro" language="beanshell" uri="http://www.nokia.com/helium">
+        <attribute name="config"/>
+        <attribute name="layers"/>
+        <attribute name="engine"/>
+        <attribute name="skipbuild"/>
+        <attribute name="singlejob"/>
+        <attribute name="layer-order"/>
+        <attribute name="command"/>
+        <attribute name="components"/>
+<![CDATA[
+import com.nokia.tools.sbs.SBSTool;
+SBSTool sbsTool = new SBSTool();
+sbsTool.execute(attributes,project);
+]]>
+    </scriptdef>
+
+    <scriptdef name="getSBSConfigMacro" language="beanshell" uri="http://www.nokia.com/helium">
+        <attribute name="sbs.sysdef.file"/>
+<![CDATA[
+import com.nokia.config.SAXConfigParser;
+SAXConfigParser configParser = new SAXConfigParser(attributes.get("sbs.sysdef.file"));
+project.setProperty("sbs.configs",configParser.getConfigs());
+]]>
+    </scriptdef>
+</antlib>

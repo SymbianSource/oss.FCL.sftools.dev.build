@@ -1,0 +1,392 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="minibuild.compile" default="mini-build" xmlns:au="org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium" basedir=".">
+	<property environment="env" />
+    <import file="../site/${env.TEAM}.ant.xml" optional="true"/>
+	<dirname property="config.dir" file="${ant.file.minibuild.compile}" />
+
+	<!-- Enable Helium internal assertion checking. -->
+	<property name="hlm.enable.asserts" value="1" />
+
+	<property name="build.name" value="minibuild_compile" />
+	<property name="build.family" value="test_minibuilds" />
+	<property name="major.version" value="0" />
+	<property name="minor.version" value="0" />
+	<property name="publish.root.dir" location="${build.drive}/release" />
+
+	<!-- For Grace upload-->
+	<property name="release.grace.service" value="Test_Helium" />
+	<property name="release.grace.product" value="minibuild_compile" />
+	<property name="release.label" value="${major.version}.${minor.version}" />
+
+	<!-- build configuration -->
+	<property name="sysdef.configurations.list" value="helium_minibuild_compile" />
+	<path id="system.definition.files">
+		<fileset dir="." includes="*.sysdef.xml" />
+	</path>
+
+	<property name="build.system" value="ec-helium" />
+	<property name="rvct.version" value="22_616" />
+
+	<!-- Archiving configuration-->
+	<property name="zip.config.file" location="archive.cfg.xml" />
+	<property name="zips.ee.spec.name" value="minibuild_archive" />
+
+	<!-- Synergy is not configured -->
+	<property name="skip.password.validation" value="1" />
+
+
+	<import file="${helium.dir}/helium.ant.xml" />
+
+	<!-- Run the full sequence of target for the minibuild. ,mini-build-prep,compile-main,zip-ee,mini-build-check-->
+	<target name="do-mini-build" depends="mini-build-cleanup,mini-build-install-new-imaker,mini-build-prep,
+                compile-main,test-ec-history-option,integration-mmp-to-target,mini-build-archive,build-roms,
+                minibuild-release,mini-build-check" />
+
+
+	<target name="do-mini-build-subcon" depends="mini-build-cleanup,mini-build-install-new-imaker,mini-build-prep,
+                compile-main,mini-build-archive,mini-build-check" />
+
+	<!--ant code coverage for mini-builds-->
+	<target name="mini-build">
+    <antcall target="database">
+        <param name="home.files.only" value="false"/>
+    </antcall>
+		<mkdir dir="${helium.build.dir}/temp" />
+		<hlm:coveragerecord name="${helium.build.dir}/temp/test_minibuild.xml" action="start" />
+		<runtarget target="do-mini-build" />
+		<hlm:coveragerecord name="${helium.build.dir}/temp/test_minibuild.xml" action="stop" />
+		<fmpp sourcefile="${helium.dir}/tools/common/templates/coveragerecord.txt.ftl" outputfile="${helium.build.dir}/temp/test_minibuild.txt">
+			<data expandProperties="yes">
+                doc: xml(${helium.build.dir}/temp/test_minibuild.xml)
+                database: xml(${database.file})
+            </data>
+		</fmpp>
+		<loadfile srcfile="${helium.build.dir}/temp/test_minibuild.txt" property="ant.coverage.summary" />
+		<echo>
+The summary of Ant code coverage:
+
+${ant.coverage.summary}</echo>
+		<fmpp sourcefile="${helium.dir}/tools/common/templates/coveragerecord.html.ftl" outputfile="${helium.build.dir}/temp/test_minibuild.html">
+			<data expandProperties="yes">
+                    doc: xml(${helium.build.dir}/temp/test_minibuild.xml)
+                    database: xml(${database.file})
+             </data>
+		</fmpp>
+	</target>
+	
+    <!-- Test ec history option is create for single node build and merge is for multinode build. -->
+    <target name="test-ec-history-option" if="build.system.ec-helium">
+        <loadfile srcfile="${build.log.dir}/${build.id}.${sysdef.configurations.list}_run_emake.bat" property="emake.bat.file"/>
+        <if>
+            <equals arg1="${ec.maxagents}" arg2="1" />
+            <then>
+                <au:assertTrue>
+                    <contains string="${emake.bat.file}" substring="--emake-history=create"/>
+                </au:assertTrue>
+            </then>
+            <else>
+                <au:assertTrue>
+                    <contains string="${emake.bat.file}" substring="--emake-history=merge"/>
+                </au:assertTrue>
+            </else>
+        </if>
+        <echo message="ec.mode:${ec.mode}" />
+        <echo message="ec.maxagents:${ec.maxagents}"/>
+        <echo message="ec.history.option:${ec.history.option}"/>
+    </target>
+    
+	<!-- Prepare the minibuild. -->
+	<!--target name="mini-build-prep" depends="init-build-area,start-ant-log,diamonds,set-arm-version,prep-copy-symbiantools"/-->
+	<target name="mini-build-prep" depends="prep" />
+
+	<!-- Stubbing few targets for easy testing with dragonfly ... -->
+	<target name="prep-drive" depends="build-number" />
+	<target name="dragonfly-prep-drive" />
+	<target name="do-prep-work-area" />
+	<target name="create-bom" />
+	<target name="check-env-prep" />
+	<target name="prep-copy" />
+
+	<target name="minibuild-release">
+		<mkdir dir="${publish.release.dir}" />
+		<copy todir="${publish.release.dir}">
+			<fileset dir="${build.output.dir}">
+				<include name="release_flash_images/**" />
+			</fileset>
+		</copy>
+		<script language="jython" setbeans="false">
+			<![CDATA[
+import os
+import fileutils
+import pathaddition.relative
+result = []
+rootdir = os.path.normpath(project.getProperty("publish.release.dir") + "/..")
+
+def sortbydate(a, b):
+    if os.stat(a)[9] == os.stat(b)[9]:
+	    return 0
+    elif os.stat(a)[9] < os.stat(b)[9]:
+        return 1
+    return -1
+			
+if os.path.exists(rootdir):
+    for name in os.listdir(rootdir):
+        path = os.path.join(rootdir, name)
+        if os.path.isdir(path):
+           result.append(os.path.normpath(path))
+
+result.sort(sortbydate)
+if len(result) > 2:
+    for name in result[2:]:
+        print "Deleting " + name
+        fileutils.rmtree(name)
+
+project.setProperty('fota.publish.root.dir', project.getProperty("publish.root.dir"))
+old = pathaddition.relative.abs2rel(result[0], project.getProperty("publish.root.dir"))
+new = pathaddition.relative.abs2rel(result[1], project.getProperty("publish.root.dir"))
+project.setProperty('fota.old.publish.subdir', result[0])
+project.setProperty('fota.new.publish.subdir', result[1])
+print "Old subdir: %s" % old
+print "New subdir: %s" % old
+]]>
+		</script>
+	</target>
+
+	<!-- Upload to Grace -->
+	<target name="minibuild-grace-upload">
+		<echo message="Uploading files into Grace ${release.grace.dir}" />
+		<hlm:retry retryCount="${grace.upload.retryCount}" sleepTime="1000">
+			<copy file="${build.drive}\output\build_area\engineering_english\ant\sf_app_organizer_clock.zip" tofile="${release.grace.dir}\${build.name}_${major.version}.${minor.version}.${build.id}_sf_app_organizer_clock.zip" />
+		</hlm:retry>
+		<antcall target="release-grace-content">
+			<param name="release-grace-content" value="${cache.dir}" />
+		</antcall>
+	</target>
+
+
+	<!-- Check that the XML data returned from Diamonds via the REST interface
+    is the same as what is sent. 
+        
+    Currently there are some differences between the formats so some edits to the
+    XML content are made before using XMLUnit to compare the content.
+    -->
+	<target name="check-diamonds">
+		<loadfile srcfile="${build.log.dir}/${build.id}_diamonds-log-start.xml" property="diamonds.log.start">
+			<filterchain>
+				<tokenfilter>
+					<filetokenizer />
+					<hlm:prettyprintxml />
+				</tokenfilter>
+			</filterchain>
+		</loadfile>
+		<echo>Data sent to Diamonds:
+            
+${diamonds.log.start}</echo>
+		<loadresource property="diamonds.log.start.output">
+			<url url="${diamonds.build.url}?fmt=xml" />
+			<filterchain>
+				<tokenfilter>
+					<filetokenizer />
+					<hlm:prettyprintxml />
+				</tokenfilter>
+			</filterchain>
+		</loadresource>
+		<echo>Data returned from Diamonds:
+            
+${diamonds.log.start.output}</echo>
+		<echo file="${helium.dir}/diamonds_build.xml">${diamonds.log.start}</echo>
+		<!--xmltask source="${helium.dir}/diamonds_build.xml" dest="${helium.dir}/diamonds_build_edit.xml">
+            
+            <cut path="/diamonds-build/tool" buffer="toolElements"/>
+            <cut path="/diamonds-build/locations" buffer="temp"/>
+        </xmltask-->
+		<!--<loadfile srcfile="${helium.dir}/diamonds_build_edit.xml" property="diamonds.log.start.edited"/>
+        <echo>Data sent massaged to match what is received:
+            
+${diamonds.log.start.edited}</echo>-->
+		<!-- TODO: make assertXmlEqual work with direct string input -->
+		<string id="control.id" value="${diamonds.log.start}" />
+		<string id="test.id" value="${diamonds.log.start.output}" />
+		<hlm:assertXmlEqual control="control.id" test="test.id" failonerror="true" />
+	</target>
+
+
+	<target name="mini-build-archive" depends="mini-build-archive-ant,mini-build-archive-ec-full" />
+
+	<!-- This target will copy a part of the tree structure to test policy.remover mapper. -->
+	<target name="prepare-archiving">
+		<delete dir="${build.drive}/test_policy" failonerror="false" />
+		<mkdir dir="${build.drive}/test_policy/os" />
+		<!-- Creating a policy file under the new s60 test root. -->
+		<echo file="${build.drive}/test_policy/distribution.policy.s60">0</echo>
+		<echo file="${build.drive}/test_policy/os/distribution.policy.s60">0</echo>
+		<!-- Getting some Content -->
+		<copy todir="${build.drive}/test_policy">
+			<fileset dir="${build.drive}/sf">
+				<include name="os/graphics/" />
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="mini-build-archive-ec-full">
+		<antcall target="do-mini-build-archive">
+			<param name="build.system" value="ec-helium" />
+			<param name="archive.using.ec" value="true" />
+			<param name="zipping.type" value="ec" />
+			<!-- Uses to set the target location -->
+		</antcall>
+	</target>
+
+	<target name="mini-build-archive-ant">
+		<antcall target="do-mini-build-archive">
+			<param name="build.system" value="ebs" />
+			<param name="archive.using.ec" value="false" />
+			<param name="zipping.type" value="ant" />
+			<!-- Uses to set the target location -->
+		</antcall>
+	</target>
+
+	<target name="do-mini-build-archive">
+		<runtarget target="prepare-archiving" />
+		<runtarget target="zip-ee" />
+		<!-- Checking the zip generation Ant -->
+		<au:assertFileExists file="${zips.build.dir}/${zipping.type}/release_metadata.xml" />
+		<au:assertFileExists file="${zips.build.dir}/${zipping.type}/sf_app_organizer_clock_binary.zip" />
+		<au:assertFileExists file="${zips.build.dir}/${zipping.type}/sf_app_organizer_clock.zip" />
+        <au:assertFileExists file="${zips.build.dir}/${zipping.type}/sf_mw_classicui_and_app_radio_0.zip" />
+        <au:assertFileExists file="${zips.build.dir}/${zipping.type}/sf_mw_classicui_and_app_radio_1.zip" />
+        <au:assertFileExists file="${zips.build.dir}/${zipping.type}/sf_mw_classicui_and_app_radio_3.zip" />
+		<au:assertFileExists file="${zips.build.dir}/${zipping.type}/sf_mw_classicui_and_app_radio_950.zip" />
+        <au:assertFileExists file="${zips.build.dir}/${zipping.type}/sf_os_0.zip" />
+        <au:assertFileExists file="${zips.build.dir}/${zipping.type}/sf_os_1.zip" />
+        <au:assertFileExists file="${zips.build.dir}/${zipping.type}/sf_os_2.zip" />
+        <au:assertFileExists file="${zips.build.dir}/${zipping.type}/sf_os_3.zip" />
+        <au:assertFileExists file="${zips.build.dir}/${zipping.type}/sf_os_7.zip" />
+        <au:assertFileExists file="${zips.build.dir}/${zipping.type}/sf_os_1308.zip" />
+	</target>
+
+
+	<target name="mini-build-cleanup">
+		<delete verbose="true" includeemptydirs="true">		 
+			<fileset dir="${build.drive}/" casesensitive="false">
+				<include name="makefile" />
+				<include name="*.mk" />
+				<include name="*.make" />
+				<include name="ecloud_tmp_*/**" />
+				<include name="emake.*" />
+				<include name="epoc32/build/**" />
+                <include name="epoc32/rombuild/imaker_temp/**" />
+                <include name="epoc32/rombuild/${product.name}/**" />
+				<include name="epoc32/rom/config/*/**/foti*.*" />
+				<include name="output/**" />
+				<include name="timestart.txt" />
+				<include name="timestop.txt" />
+				<exclude name="output/build_area/localised/**" />
+			</fileset>
+		</delete>
+	</target>
+
+	<target name="mini-build-install-new-imaker">
+		<!-- Export custom image configuration file. -->
+		<copy file="config/image_conf_naming.mk" tofile="${build.drive}/epoc32/rom/config/image_conf_naming.mk" />
+		<property name="imaker.dir" value="${helium.dir}/../external/imaker" />
+		<!--
+        <delete dir="${build.drive}/imaker_rnd"/>
+        <copy todir="${build.drive}/imaker_rnd">
+            <fileset dir="${imaker.dir}"/>
+        </copy>
+        
+        <hlm:bldmakeBldfilesMacro dir="${build.drive}/imaker_rnd/group"/>
+        <hlm:abldMacro dir="${build.drive}/imaker_rnd/group" command="cleanexport" platform=""/>
+        <hlm:abldMacro dir="${build.drive}/imaker_rnd/group" command="export" platform=""/>
+        -->
+	</target>
+
+	<target name="mini-build-check">
+		<!-- Check if prep has set some prop correctly... -->
+		<echo>'${arm.compiler.version}'</echo>
+		<au:assertMatches string="${arm.compiler.version}" pattern="RVCT2\.2 \[Build 616\]" casesensitive="false" multiline="true" />
+
+		<!-- Check if compile-main step did what expected... -->
+		<au:assertFileExists file="${canonical.sysdef.file}" />
+		<!--<au:assertFileExists file="${build.drive}/Makefile"/>-->
+        <if>
+            <istrue value="${blocks.enabled}" />
+            <then>
+                <au:assertFileExists file="${blocks.config.dir}/roms.blocks_component.xml" />
+            </then>
+        </if>
+
+		<if>
+			<isset property="build.system.ec-helium" />
+			<then>
+				<au:assertFileExists file="${build.drive}/emake.data" />
+				<au:assertFileExists file="${build.log.dir}/${build.id}.helium_minibuild_compile_run_emake.bat" />
+			</then>
+		</if>
+
+		<resourcecount property="fpsx.count">
+			<fileset dir="${build.output.dir}">
+				<include name="**/*.core.fpsx" />
+				<include name="**/*.rofs2.fpsx" />
+			</fileset>
+		</resourcecount>
+		<echo>Number of images generated: ${fpsx.count}.</echo>
+	</target>
+
+
+	<!-- Custom iMaker configuration - preparing for future dev. -->
+	<property name="imaker.fmpp.makefile" location="${helium.dir}/tools/common/templates/imaker/build_imaker_roms_signing.mk.ftl" />
+	<hlm:imakerconfigurationset id="imaker.rom.config">
+		<imakerconfiguration>
+			<makefileset>
+                <include name="**/image_conf_${product.name}.mk" />
+			</makefileset>
+			<targetset>
+				<include name="fota" />
+			</targetset>
+		</imakerconfiguration>
+		<imakerconfiguration regionalVariation="true">
+			<makefileset>
+			    <include name="**/${product.name}/*ui.mk"/>
+			</makefileset>
+			<targetset>
+				<include name="core(?:-prd|-rnd|-subcon)?$" />
+				<include name="^langpack_01$" />
+				<exclude name=".*-image$" />
+			</targetset>
+			<variableset>
+				<variable name="USE_FOTI" value="1" />
+				<variable name="USE_FOTA" value="1" />
+				<variable name="TYPE" value="rnd" />
+			</variableset>
+		</imakerconfiguration>
+	</hlm:imakerconfigurationset>
+
+	<fileset dir="${build.drive}/" id="mmp.to.target.config">
+		<include name="s60/app/**/*.mmp" />
+	</fileset>
+
+</project>
+

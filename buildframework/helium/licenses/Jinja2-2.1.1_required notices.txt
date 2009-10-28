@@ -1,0 +1,44 @@
+
+    1: Copyright (c) 2006-2008 by the respective authors (see AUTHORS file).
+    2: All rights reserved.
+    3: 
+    4: Redistribution and use in source and binary forms, with or without
+    5: modification, are permitted provided that the following conditions are
+    6: met:
+    7: 
+    8:     * Redistributions of source code must retain the above copyright
+    9:       notice, this list of conditions and the following disclaimer.
+   10: 
+   11:     * Redistributions in binary form must reproduce the above
+   12:       copyright notice, this list of conditions and the following
+   13:       disclaimer in the documentation and/or other materials provided
+   14:       with the distribution.
+   15: 
+   16:     * The names of the contributors may not be used to endorse or
+   17:       promote products derived from this software without specific
+   18:       prior written permission.
+   19: 
+   20: THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+   21: "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+   22: LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+   23: A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+   24: OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+   25: SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+   26: LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+   27: DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+   28: THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+   29: (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+   30: OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+Jinja2-2.1.1/AUTHORS:
+
+    1: Jinja is written and maintained by Armin Ronacher <armin.ronacher@active-4.com>.
+    2: 
+    3: Other contributors (as mentionend in :copyright:s) are:
+    4: 
+    5: - Armin Ronacher <armin.ronacher@active-4.com>
+    6: - Georg Brandl
+    7: - Lawrence Journal-World.
+    8: - Bryan McLemore
+    9: - Mickaël Guérin <kael@crocobox.org>
+   10: - Cameron Knight

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<releaseInformation hidden="false">
+	<releaseDetails>
+		<releaseID>	
+			<service name="S60RnD"/>
+			<product name="pf_5250"/>
+			<release name="pf_5250_200836_001"/>
+		</releaseID>
+		<dependsOf>
+			<service name="S60RnD"/>
+			<product name="pf_5250"/>
+			<release name="pf_5250_200836"/>
+		</dependsOf>
+		<!-- <previousBaseline>
+			<service name="S60RnD" />
+			<product name="pf_5250" />
+			<release name="pf_5250_200835" />
+		</previousBaseline> -->
+	</releaseDetails>
+
+	<releaseFiles>
+	<package s60filter="emu" name="pf_5250_200836_SP1.zip" default="true" type="zip" filters="emu" extract="single"/>
+  </releaseFiles>
+
+	<!-- <servicePacks>
+		<servicePack name="SP1" reInstallNeeded="false">
+			<file name="pf_5250_200836_SP1.zip"/>
+			<instructions name="specialInstructions.xml"/>
+		</servicePack>
+	</servicePacks> -->
+
+	<localeVariants>
+		<variant name="western">
+			<file name="pf_5250_200836_delta_western.zip"/>
+		</variant>
+		<variant name="china">
+			<file name="pf_5250_200836_delta_china.zip"/>
+		</variant>
+		<variant name="japan">
+			<file name="pf_5250_200836_delta_japan.zip"/>
+		</variant>
+	</localeVariants>
+	
+	<filters>
+		<!-- Filter definitions -->
+		<!-- 	code = code used in package attribute "filters" 
+					text = Filter name
+					description = filter description
+		-->
+    <filter text="Emulator binaries" code="emu" description="Files needed for emulator."/> 
+    <filter text="complementary binaries and sources" code="compl" description="complementary components binaries and sources"/>
+    <filter text="source files" code="src" description="symbian and S60 source files"/>
+    <filter text="source files" code="tsrc" description="test source files"/>
+    <filter text="binary files" code="jvm" description="java virtual machine binaries and sources"/>
+	</filters>
+	
+</releaseInformation>

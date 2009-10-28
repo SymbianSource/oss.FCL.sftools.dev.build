@@ -1,0 +1,32 @@
+/*
+* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Symbian Foundation License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.symbianfoundation.org/legal/sfl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description:
+* iMaker example configuration exports.
+*
+*/
+
+
+PRJ_EXPORTS
+
+../example_imaker_extension.mk                          +/tools/rom/imaker/imaker_extension.mk
+
+//../example_image_conf_buildinfo.mk                      +/rom/config/image_conf_buildinfo.mk
+//../example_image_conf_naming.mk                         +/rom/config/image_conf_naming.mk
+../example_system_languages.mk                          +/rom/config/system_languages.mk
+
+../example_image_conf_platform.mk                       +/rom/config/platform/image_conf_platform.mk
+../example_image_conf_product.mk                        +/rom/config/platform/product/image_conf_product.mk
+../example_language_variant.mk                          +/rom/config/platform/product/language/langpack_01/language_variant.mk
+
+// END OF BLD.INF

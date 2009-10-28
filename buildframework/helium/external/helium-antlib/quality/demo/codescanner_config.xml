@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : codescanner_config.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<!-- This is a configuration file for Codescanner from Mobile Innovation Ltd. -->
+<codescannerConfig>
+    <sources>
+        <!-- source files matching any of the exclude patterns below will not be scanned -->
+
+        <!-- binary files -->
+        <exclude>.*\.jpg</exclude>
+        <exclude>.*\.wav</exclude>
+        <exclude>.*\.au</exclude>
+        <exclude>.*\.bmp</exclude>
+        <exclude>.*\.wbmp</exclude>
+        <exclude>.*\.gif</exclude>
+        <exclude>.*\.tif</exclude>
+        <exclude>.*\.exe</exclude>
+        <exclude>.*\.mp3</exclude>
+        <exclude>.*\.mpg</exclude>
+        <exclude>.*\.avi</exclude>
+        <exclude>.*\.raw</exclude>
+        <exclude>.*\.mbm</exclude>
+        <exclude>.*\.doc</exclude>
+        <exclude>.*\.xls</exclude>
+        <exclude>.*\.rtf</exclude>
+        <exclude>.*\.png</exclude>
+        <exclude>.*\.wmf</exclude>
+        <exclude>.*\\exclude.txt</exclude>
+
+        <!-- typical test directory names -->
+        <exclude>.*\\ts_.*</exclude>
+        <exclude>.*\\tsrc\\.*</exclude>
+        <exclude>.*\\test\\.*</exclude>
+        <exclude>.*\\.svn\\.*</exclude>
+    </sources>
+    <scripts>
+        <!-- Every element in this section corresponds to a Codescanner script -->
+        <!-- Every element has the following common attributes: -->
+        <!--    enable="true" or "false" -->
+        <!-- Some scripts have additional attributes or elements. -->
+
+        <accessArrayElementWithoutCheck enable="true"/>
+        <accessArrayElementWithoutCheck2 enable="true"/>
+        <activestart enable="true"/>
+        <activestop enable="true"/>
+        <arraypassing enable="true"/>
+        <arrayptrcleanup enable="true"/>
+        <assertdebuginvariant enable="true"/>
+        <baddefines enable="true"/>
+        <baseconstruct enable="true"/>
+        <callActiveObjectWithoutCheckingOrStopping enable="true"/>
+        <changenotification enable="true"/>
+        <cleanup enable="true"/>
+        <commentcode enable="true"/>
+        <connect enable="true"/>
+        <ConnectAndDontCloseMemberVariable enable="true"/>
+        <constnames enable="true"/>
+        <consttdescptr enable="true"/>
+        <controlornull enable="true"/>
+        <ctltargettype enable="true"/>
+        <debugrom enable="true"/>
+        <declarename enable="true"/>
+        <deleteMemberVariable enable="true"/>
+        <destructor enable="true"/>
+        <doubleSemiColon enable="true"/>
+        <driveletters enable="true"/>
+        <eikbuttons enable="true"/>
+        <eikonenvstatic enable="true"/>
+        <enummembers enable="true"/>
+        <enumnames enable="true"/>
+        <exportinline enable="true"/>
+        <exportpurevirtual enable="true"/>
+        <externaldriveletters enable="true"/>
+        <foff enable="true"/>
+        <forbiddenwords enable="true">
+            <!-- the following regular expression specifies the forbidden words detected by this script -->
+            <wordsRE>bad words</wordsRE>
+        </forbiddenwords>
+        <forgottoputptroncleanupstack enable="true"/>
+        <friend enable="true"/>
+        <goto enable="true"/>
+        <ifassignments enable="true"/>
+        <ifpreprocessor enable="true"/>
+        <intleaves enable="true"/>
+        <jmp enable="true"/>
+        <leave enable="true"/>
+        <LeaveNoError enable="true"/>
+        <leavingoperators enable="true"/>
+        <LFunctionCantLeave enable="true"/>
+        <!-- the length attribute specifies the largest number of characters permitted by this script -->
+        <longlines enable="true" length="160" />
+        <magicnumbers enable="true"/>
+        <mclassdestructor enable="true"/>
+        <memberlc enable="true"/>
+        <membervariablecallld enable="true"/>
+        <missingcclass enable="true"/>
+        <mmpsourcepath enable="true"/>
+        <multilangrsc enable="true"/>
+        <multipledeclarations enable="true"/>
+        <multipleinheritance enable="true"/>
+        <mydocs enable="true"/>
+        <namespace enable="true"/>
+        <newlreferences enable="true"/>
+        <noleavetrap enable="true"/>
+        <nonconsthbufc enable="true"/>
+        <nonconsttdesc enable="true"/>
+        <nonleavenew enable="true"/>
+        <nonunicodeskins enable="true"/>
+        <null enable="true"/>
+        <open enable="true"/>
+        <pointertoarrays enable="true"/>
+        <pragmadisable enable="true"/>
+        <pragmamessage enable="true"/>
+        <pragmaother enable="true"/>
+        <privateinheritance enable="true"/>
+        <pushaddrvar enable="true"/>
+        <pushmember enable="true"/>
+        <readresource enable="true"/>
+        <resourcesonheap enable="true"/>
+        <returndescriptoroutofscope enable="true"/>
+        <rfs enable="true"/>
+        <rssnames enable="true"/>
+        <stringliterals enable="true"/>
+        <stringsinresourcefiles enable="true"/>
+        <struct enable="true"/>
+        <tcclasses enable="true"/>
+        <tclassdestructor enable="true"/>
+        <todocomments enable="true"/>
+        <trapcleanup enable="true"/>
+        <trapeleave enable="true"/>
+        <traprunl enable="true"/>
+        <trspassing enable="true"/>
+        <uids enable="true"/>
+        <uncompressedaif enable="true"/>
+        <uncompressedbmp enable="true"/>
+        <unicodesource enable="true"/>
+        <userafter enable="true"/>
+        <userfree enable="true"/>
+        <userWaitForRequest enable="true"/>
+        <variablenames enable="true"/>
+        <voidparameter enable="true"/>
+        <worryingcomments enable="true">
+            <!-- the following regular expression specifies the worrying comments detected by this script -->
+            <worryRE>\!|\?|[Zz]{3}|kludge|workaround|\scrap|hack</worryRE>
+        </worryingcomments>
+    </scripts>
+    <severities>
+        <low enable="true"/>
+    </severities>
+    <categories>
+        <codereview enable="true"/>
+    </categories>
+</codescannerConfig>

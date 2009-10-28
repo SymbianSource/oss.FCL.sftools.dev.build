@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : mmp-to-target.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="quality.mmp-to-target" xmlns:hlm="http://www.nokia.com/helium">
+    <description>
+        Generate the list of targets from the project files.
+    </description>
+
+    <!--
+        Generates an output text file that list the generated target per mmp files.
+        The list of mmps is to provided throught a fileset.
+        
+        e.g.
+        <pre>
+        <hlm:mmpToTargetMacro output="targets_from_mmps.txt">
+            <fileset dir="${build.drive}/">
+                <include name="s60/**/*.mmp"/>
+                <include name="ncp_sw/**/*.mmp"/>
+                <include name="ppd_sw/**/*.mmp"/>
+                <include name="psw/**/*.mmp"/>
+                <exclude name="**/tsrc/**/*.mmp"/>
+            </fileset>
+        </hlm:mmpToTargetMacro>
+        </pre>
+    -->
+    <scriptdef name="mmpToTargetMacro" language="jython" uri="http://www.nokia.com/helium">
+        <element name="fileset" type="fileset"/>
+        <attribute name="output"/>
+        <![CDATA[
+import integration.quality
+import os
+import re
+if attributes.get('output') == None:
+    raise Exception("'output' attribute is not defined.")
+project.log("Creating %s" % str(attributes.get('output')))
+output = open(str(attributes.get('output')), "w+")
+match_target = re.compile("\s*TARGET\s+(.+)")
+for eid in range(elements.get("fileset").size()):
+    ds = elements.get("fileset").get(int(eid)).getDirectoryScanner(project)
+    ds.scan()
+    for filename in ds.getIncludedFiles():
+        filename = os.path.join(str(ds.getBasedir()), str(filename))
+        project.log("Analysing %s" % filename, 4)
+        input = open(filename, 'r')
+        for line in input.readlines():
+            m = match_target.match(line)
+            # do not match resource files.
+            if m != None and os.path.splitext(m.group(1))[1].lower() != ".rsc":            
+                output.write("%s : %s\n" % (os.path.splitdrive(filename)[1], m.group(1)))
+output.close()
+        ]]>
+    </scriptdef>
+
+
+    <!--
+        This target generates a text file which maps executable and they mmp source location.
+        
+        e.g:
+        \src\common\generic\wap-stack\wapstack\group\wapstkcli.mmp : wapstkcli.dll
+        \src\common\generic\wap-stack\wapstack\group\wapstksrv.mmp : wapstksrv.dll        
+    -->
+    <target name="integration-mmp-to-target">
+        <hlm:mmpToTargetMacro output="${build.log.dir}/${build.id}_targets_from_mmps.txt">
+            <fileset refid="mmp.to.target.config"/>
+        </hlm:mmpToTargetMacro>
+    </target>
+
+    <!-- Default configuration for the integration-mmp-to-target target. -->
+    <fileset dir="${build.drive}/" id="mmp.to.target.config">
+        <include name="s60/**/*.mmp"/>
+        <include name="ncp_sw/**/*.mmp"/>
+        <include name="ppd_sw/**/*.mmp"/>
+        <include name="psw/**/*.mmp"/>
+        <exclude name="**/tsrc/**/*.mmp"/>
+    </fileset>
+
+</project>

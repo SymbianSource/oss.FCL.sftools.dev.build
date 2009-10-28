@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : test_sbs.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+Used to test get variable and checking its value for SBS build config data.
+
+============================================================================
+-->
+<project name="test_sbs" xmlns:hlm="http://www.nokia.com/helium">
+    <description>
+    Used to test get variable and checking its value for SBS build config data.
+    </description>
+    <property environment="env" />
+    <property name="helium.dir" location="../../../.." />
+    <import file="../../../../helium.ant.xml" />
+    <property name="sbs.tools.config" value="tools_rel" />
+    
+    <!-- test the variable sbs.config set to armv5 and check it calls the set-arm-version-test
+    target so that I can check the code to do the get variable and read it works properly. -->
+    <target name="test-sbs-armv5">
+        <hlm:argSet id="sbs.config">
+            <hlm:arg name="config" value="armv5" />
+        </hlm:argSet>
+        <echo>message="config = ${sbs.config}"</echo>
+        <runtarget target="compile-sbs-test"/>
+    </target>
+
+    <!-- test the variable sbs.config set to winscw and check it does not call the set-arm-version-test
+    target so that I can check the code to do the get variable and read it works properly. -->
+    <target name="test-sbs-winscw">
+        <hlm:argSet id="sbs.config">
+            <hlm:arg name="config" value="winscw" />
+        </hlm:argSet>
+        <runtarget target="compile-sbs-test"/>
+    </target>
+
+    <!-- test the variable sbs.config set to armv5,winscw and check it calls the set-arm-version-test
+    target so that I can check the code to do the get variable and read it works properly. -->
+    <target name="test-sbs-both">
+        <hlm:argSet id="sbs.config">
+            <hlm:arg name="config" value="armv5,winscw" />
+        </hlm:argSet>
+        <runtarget target="compile-sbs-test"/>
+    </target>
+
+    <!-- test the variable sbs.config set to all valid values and that it behaves as above. -->
+    <target name="test-sbs-all">
+        <runtarget target="test-sbs-armv5"/>
+        <runtarget target="test-sbs-winscw"/>
+        <runtarget target="test-sbs-both"/>
+    </target>
+
+    <!-- call this to use the sbs.config value set in the build.xml file (if set). -->
+    <target name="test-sbs-build">
+        <runtarget target="compile-sbs-test"/>
+    </target>
+    
+    
+    <!-- test the variable sbs.config if set to anyhting other than winscw check it calls the set-arm-version-test
+    if set to winscw then it should not call set-arm-version-test. -->
+    <target name="compile-sbs-test" description="This is the main build that gets built for ARMV5 and WINSCW platforms">
+        <hlm:getVariableValue name="config" property="compilevalue.var">
+            <hlm:argSet refid="sbs.default.var" />
+        </hlm:getVariableValue>
+        <echo> stick in an extra line</echo>
+        <echo> message="sbs.config = ${sbs.config}"</echo>
+        <echo> message="compilevalue.var = ${compilevalue.var}"</echo>
+        <if>
+            <not>
+                <equals arg1="${compilevalue.var}" arg2="winscw"/>
+            </not>
+            <then>
+                <runtarget target="set-arm-version-test"/>
+                <echo>running set-arm-version-test</echo>
+            </then>
+        </if>
+        <echo>in the main body of target</echo>
+    </target>
+
+    <!-- just to confirm the if/then/else is working correctly -->
+    <target name="set-arm-version-test">
+        <echo>running set-arm-version-test yippee!!!!</echo>
+    </target>
+  
+</project>

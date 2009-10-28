@@ -1,0 +1,20 @@
+#<bsf>#
+
+# This file customizes the default ARMV5. It specifies a platform that uses
+# most optimization for arm936 based engines
+
+customizes ARMV5_ABIV1
+
+# The following options that can be overridden by MMP files
+common_options	--cpu ARM1136JF-S --diag_suppress 1,161,654,1135,1152,1300 --diag_error 1267
+
+# Fixed options for this build. These options should only be changed with great care since
+# they have the potential to introduce incompatible ABI (or machine) level effects.
+# -cpu 5T - this build just targets a generic 5T
+# -Ono_known_library - we use our own library so tell the compiler not to make assumptions about its implementation
+# -fpu softvfp - some system code explicitly assumes this variant of the EABI (softvfp+vfp could be used on say XScale)
+# --dll_vtbl - this switches on class exporting and is needed to support Symbian OS DLL model
+# -apcs /inter - redundant on 5T, but worth saying anyway
+# --enum_is_int - force all enum entries to be sizeof(int) which avoids problems when passing enums between 5T and 9E libs
+invariant_options	-Ono_known_library --enum_is_int --fpmode ieee_no_fenv --export_all_vtbl --no_vfe --APCS /inter --dllimport_runtime -O3 -Otime
+

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="minibuild.diamonds" default="mini-build" xmlns:au="org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium" basedir=".">
+    <property environment="env"/>
+    
+	<dirname property="config.dir" file="${ant.file.minibuild.diamonds}"/>
+
+    <!-- Enable Helium internal assertion checking. -->
+    <property name="hlm.enable.asserts" value="1" />
+        
+    <property name="build.name" value="minibuild_diamonds" />
+    <property name="build.family" value="test_minibuilds" />
+    <property name="major.version" value="0" />
+    <property name="minor.version" value="0" />
+    <property name="prep.root.dir" value="f:\pmackay" />
+    
+    <import file="${helium.dir}/helium.ant.xml"/>
+        
+    <!--ant code coverage for mini-builds-->
+    <target name="mini-build" depends="prep-drive,init-build-area,diamonds,prebuild,compile-main"/>
+
+    
+    <!-- Stubbing few targets for easy testing with dragonfly ... -->
+    <target name="prebuild">
+        <echo>Stubbed target: prebuild</echo>
+    </target>
+    <target name="compile-main">
+        <echo>Stubbed target: compile-main</echo>
+        <echo>Pause for 10 seconds.</echo>
+        <sleep seconds="10"/>
+    </target>
+    <target name="check-env-prep"/>
+    <target name="prep-copy"/>
+	
+</project>
+

@@ -1,0 +1,2694 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : helium_data_model.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<!--
+
+This describes the allowed values for some of the fields:
+
+property:
+- editStatus: [must, recommended, allowed, discouraged, never] 
+  type: [string, boolean, integer]
+
+-->
+<heliumDataModel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\tools\common\schema\helium_data_model.xsd">
+    <property>
+        <name>archive.max.number.of.threads</name>
+        <editStatus>allowed</editStatus>
+        <type>integer</type>
+        <description>Set the maximum number of threads running for archiving (for a parallel job).</description>
+    </property>
+    <property>
+        <name>ats.ctc.host</name>
+        <editStatus>recommended</editStatus>
+        <type>string</type>
+        <description>CTC host, provided by CATS used to create coverage measurement reports. MON.sym files are copied to this location, for example "10.0.0.1". If not given, code coverage reports are not created</description>
+    </property>
+    <property>
+        <name>ats.testrun.name</name>
+        <editStatus>recommended</editStatus>
+        <type>string</type>
+        <description>Modify the test-run name if you have understanding of test.xml file or leave it as it is. Deafault value is a string consist of build id, product name, major and minor versions</description>
+    </property>
+    <property>
+        <name>ats.plan.name</name>
+        <editStatus>recommended</editStatus>
+        <type>string</type>
+        <description>Modify the plan name if you have understanding of test.xml file or leave it as it is. Deafault value is "plan" </description>
+    </property>
+    <property>
+        <name>ats.trace.enabled</name>
+        <editStatus>recommended</editStatus>
+        <type>string</type>
+        <description>Should be "True" if tracing is needed during the tests running on ATS3. Deafault value is "False", the values are case-sensitive. </description>
+    </property>
+    <property>
+        <name>ats.ctc.enabled</name>
+        <editStatus>recommended</editStatus>
+        <type>string</type>
+        <description>Should be "True" if coverage measurement and dynamic analysis (CTC) tool support is to be used by ATS. Deafault value is "False", the values are case-sensitive. </description>
+    </property>
+    <property>
+        <name>ats.email.list</name>
+        <editStatus>recommended</editStatus>
+        <type>string</type>
+        <description>The property is needed if you want to get an email from ATS server after the tests are executed. There can be one to many semicolon(s) ";" separated email addresses.</description>
+    </property>
+    <property>
+        <name>ats.aste.email.list</name>
+        <editStatus>recommended</editStatus>
+        <type>string</type>
+        <description>The property is needed if you want to get an email from ATS server after the tests are executed. There can be one to many semicolon(s) ";" separated email addresses.</description>
+    </property>
+    <property>
+        <name>ats.flashfiles.minlimit</name>
+        <editStatus>recommended</editStatus>
+        <type>string</type>
+        <description>Limit of minimum number of flash files to execute ats-test target, otherwise ATSDrop.zip will not be generated. Default value is "2" files.</description>
+    </property>
+    <property>
+        <name>ats.sisfiles.minlimit</name>
+        <editStatus>recommended</editStatus>
+        <type>string</type>
+        <description>Limit of minimum number of sis files to execute matti-test target, otherwise MATTI-drop.zip will not be generated. Default value is "1" files.</description>
+    </property>
+    <property>
+        <name>ats.target.platform</name>
+        <editStatus>recommended</editStatus>
+        <type>string</type>
+        <description>Sets target platform for compiling test components. Default value is "armv5 urel".</description>
+    </property>
+    <property>
+        <name>ats.test.timeout</name>
+        <editStatus>recommended</editStatus>
+        <type>string</type>
+        <description>To set test commands execution time limit on ATS3 server, in seconds. Default value is "60".</description>
+    </property>
+    <property>
+        <name>ats.product.hwid</name>
+        <editStatus>recommended</editStatus>
+        <type>string</type>
+        <description>Product HardWare ID (HWID) attached to ATS. By default the value of HWID is not set.</description>
+    </property>
+    <property>
+        <name>ats.obey.pkgfiles.rule</name>
+        <editStatus>recommended</editStatus>
+        <type>string</type>
+        <description>If the property is set to "True", then the only test components which will have PKG files, will be included into the test.xml as a test-set. Which means, even if there's a test component (executable) but there's no PKG file, it should not be considered as a test component and hence not included into the test.xml as a separate test. By default the property value is False.</description>
+    </property>
+    <property>
+        <name>tsrc.data.dir</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>The default value is "data" and refers to the 'data' directory under 'tsrc' directory.</description>
+    </property>
+    <property>
+        <name>tsrc.path.list</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>Contains list of the tsrc directories. Gets the list from system definition layer files. Assuming that the test components are defined already in te layers.sysdef.xml files to get compiled. 
+        Not recommended, but the property value can be set if there are no system definition file(s), and tsrc directories paths to set manually.</description>
+    </property>
+    <property>
+        <name>ats.flash.images</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>List of flash images (.fpsx files) to install on the phone. It is not recommended to set the value manually however, it is possible.</description>
+    </property>
+    <property>
+        <name>ats.report.location</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>Sets ATS reports store location. Default location is "${publish.dir}/${publish.subdir}"</description>
+    </property>
+    <property>
+        <name>ats.drop.file</name>
+        <editStatus>discouraged</editStatus>
+        <type>string</type>
+        <description>Path for creation of the drop file during the build. Default is ATS3Drop.zip</description>
+    </property>
+    <property>
+        <name>ats.aste.drop.file</name>
+        <editStatus>discouraged</editStatus>
+        <type>string</type>
+        <description>Path for creation of the drop file during the build. Default is ATS3AsteDrop.zip</description>
+    </property>
+    <property>
+        <name>ats.product.name</name>
+        <editStatus>must</editStatus>
+        <type>string</type>
+        <description>Name of the product to be tested. For example: "PRODUCT"</description>
+    </property>
+    <property>
+        <name>ats.script.type</name>
+        <editStatus>recommended</editStatus>
+        <type>string</type>
+        <description>There are two types of ats script files to send drop to ATS server, "runx" and "import"; 
+        only difference is that with "import" ATS doesn't have to have access rights to testdrop.zip file, 
+        as it is sent to the system over http and import doesn't need network shares. 
+        If that is not needed "import" should not be used. Default value is "runx" as "import" involves heavy processing on ATS server</description>
+    </property>
+    <property>
+        <name>ats.drop.location</name>
+        <editStatus>must</editStatus>
+        <type>string</type>
+        <description>Server location (UNC path) to save the ATS3Drop file, before sending to the ATS. For example: \\trwsem00\some_folder\. In case, ``ats.script.type`` is set to "import", ATS doesn't need to have access to ats.drop.location,  its value can be any local folder on build machine, for example c:\temp (no network share needed).</description>
+    </property>
+    <property>
+        <name>ats.aste.testrun.name</name>
+        <editStatus>recommended</editStatus>
+        <type>string</type>
+        <description>Modify the test-run name if you have understanding of test.xml file or leave it as it is. Deafault value is a string consist of build id, product name, major and minor versions</description>
+    </property>
+    <property>
+        <name>ats.aste.plan.name</name>
+        <editStatus>recommended</editStatus>
+        <type>string</type>
+        <description>Modify the plan name if you have understanding of test.xml file or leave it as it is. Deafault value is "plan" </description>
+    </property>
+    <property>
+        <name>disable.analysis.tool</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>Set this property to disable Analysis Tool. By default Analysis Tool will run with every build and send api metrics to diamonds but Analysis Tools takes time.</description>
+    </property>
+    <property>
+        <name>drop.file.counter</name>
+        <editStatus>never</editStatus>
+        <type>integer</type>
+        <description>Drop package file counter. Updates its value automatically when a new drop file is created for ATS.</description>
+    </property>
+    <property>
+        <name>ido.build.filter</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Property is used to define ido build filters in the configuration file.</description>
+    </property>
+    <property>
+        <name>ats.server</name>
+        <editStatus>must</editStatus>
+        <type>string</type>
+        <description>For example: "4fio00105" or "catstresrv001.cats.noklab.net:80". Default server port is "8080", but it is not allowed between intra and Noklab. Because of this we need to define server port as 80. The host can be different depending on site and/or product.</description>
+    </property>
+    <property>
+        <name>ats.password</name>
+        <editStatus>must</editStatus>
+        <type>string</type>
+        <description>Password for ATS. This password might be different from NOE or HTTP/UNIX password.</description>
+    </property>
+    <property>
+        <name>ats.username</name>
+        <editStatus>must</editStatus>
+        <type>string</type>
+        <description>Username for ATS server. This is NOT the NOE or HTTP/UNIX username.</description>
+    </property>
+    <property>
+        <name>eunit.test.package</name>
+        <editStatus>recommended</editStatus>
+        <type>string</type>
+        <description>The EUnit package name to be unzipped on the environment, for executing EUnit tests."</description>
+    </property>
+    <property>
+        <name>eunitexerunner.flags</name>
+        <editStatus>must</editStatus>
+        <type>string</type>
+        <description>Flags for EUnit exerunner can be set by setting the value of this variable. The default flags are set to "/E S60AppEnv /R Off".</description>
+    </property>
+    <property>
+        <name>cache.dir</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Root directory where Helium can store files on a temporary basis for a user.</description>
+    </property>
+    <property>
+        <name>log4j.cache.dir</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>Log directory for log4j.</description>
+    </property>
+    <property>
+        <name>build.cache.dir</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Directory where Helium can store files on a temporary basis for a user per build.</description>
+    </property>
+    <property>
+        <name>build.cache.log.dir</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Directory where Helium can store log files on a temporary basis for a user per build.</description>
+    </property>
+    <property>
+        <name>build.duplicates.log</name>
+        <editStatus>discouraged</editStatus>
+        <type>string</type>
+        <description>Default name of the build duplicates log file.</description>
+    </property>
+    <property>
+        <name>build.version</name>
+        <editStatus>discouraged</editStatus>
+        <type>string</type>
+        <description>Version of the build.</description>
+    </property>
+    <property>
+        <name>build.drive</name>
+        <editStatus>recommended</editStatus>
+        <type>string</type>
+        <description>Substed drive where the build is performed. if not defined then helium should search next available build drive letter and subst autometically</description>
+    </property>
+    <property>
+        <name>unsubst.after.build</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>Unsubsted drive after build finished. If not defined then helium should left the drive as subst. Set the value as "yes" if you want to unsubst after build finished. </description>
+    </property>
+    <property>
+        <name>build.id</name>
+        <editStatus>discouraged</editStatus>
+        <type>string</type>
+        <description>A unique ID for the build.</description>
+    </property>
+    <property>
+        <name>zip.wa.file</name>
+        <editStatus>discouraged</editStatus>
+        <type>string</type>
+        <description>A unique name for the WA Sources ZIP file.</description>
+    </property>
+    <property>
+        <name>binary.root</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Defines location of binaries created in build. Used in check-capability target while generating capability scan report.</description>
+    </property>
+    <property>
+        <name>build.log</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Defines name of the log file.</description>
+    </property>
+    <property>
+        <name>build.log.dir</name>
+        <editStatus>discouraged</editStatus>
+        <type>string</type>
+        <description>This is where the build logs are stored.</description>
+    </property>
+    <property>
+        <name>build.signal.status.dir</name>
+        <editStatus>discouraged</editStatus>
+        <type>string</type>
+        <description>This is where the signal related files are stored.</description>
+    </property>
+    <property>
+        <name>build.status.email.template</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>This is the email template path where it updates the build status based on metadata database contents. The default file could (email_status.html.ftl under tools\common\template\log)be used as the base and any additional info could be added</description>
+    </property>
+    <property>
+        <name>build.logging.key.stages</name>
+        <editStatus>discouraged</editStatus>
+        <type>string</type>
+        <description> Defines which stages are considered as key stages and logged.</description>
+    </property>
+    <property>
+        <name>build.logging.start.stage</name>
+        <editStatus>discouraged</editStatus>
+        <type>string</type>
+        <description>Defines at which point logging is started.</description>
+    </property>
+    <property>
+        <name>build.name</name>
+        <editStatus>must</editStatus>
+        <type>string</type>
+        <description>A general label for this type of build. Currently if not defined, product.name will be used to set this property, but this will likely be removed in future.</description>
+    </property>
+    <property>
+        <name>build.output.dir</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>This is the directory where build output is placed.</description>
+    </property>
+    <property>
+        <name>build.property.cache.file</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>A file where persistent properties for a build should be stored.</description>
+    </property>
+    <property>
+        <name>build.sisfiles.dir</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>This is the directory where sisfiles are placed.</description>
+    </property>
+    <property>
+        <name>build.summary.file</name>
+        <editStatus>discouraged</editStatus>
+        <type>string</type>
+        <description>This is the file where build summary is stored.</description>
+    </property>
+    <property>
+        <name>build.system</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>This specifies which build system is used. Default for this is ebs You can use ec for Electric Cloud..</description>
+    </property>
+    <property>
+        <name>build.system.ebs</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Defined if build.system is set to "ebs", which is the default.</description>
+    </property>
+    <property>
+        <name>build.system.sbs</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Defined if ${build.system} is set to "sbs".</description>
+    </property>
+    <property>
+        <name>build.temp.dir</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>A directory for storing temporary build files.</description>
+    </property>
+    <property>
+        <name>build.type</name>
+        <editStatus>recommended</editStatus>
+        <type>string</type>
+        <description>The general type of the build. This is used for checking the tools environment. Potential values include core, ido, product.</description>
+    </property>
+    <property>
+        <name>build.errors.limit</name>
+        <editStatus>allowed</editStatus>
+        <type>number</type>
+        <description>Maximum allowable errors in a build.</description>
+    </property>
+    <property>
+        <name>canonical.sysdef.file</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>The path of the generated canonical System Definition file that contains all the input System Definition file content.</description>
+    </property>
+    <property>
+        <name>ccm.base.dir</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>Directory where CCM operations will be performed.</description>
+    </property>
+    <property>
+        <name>ccm.home.dir</name>
+        <editStatus>must</editStatus>
+        <type>string</type>
+        <description>Home directory of CCM operations.</description>
+    </property>
+    <property>
+        <name>ccm.database</name>
+        <editStatus>must</editStatus>
+        <type>string</type>
+        <description>Name of the CCM database to use. No default value.</description>
+    </property>
+    <property>
+        <name>ccm.cache.xml</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>Location of the cache.xml file which enables global synergy sessions.</description>
+    </property>
+    <property>
+        <name>ccm.database.path</name>
+        <editStatus>discouraged</editStatus>
+        <type>string</type>
+        <description>Path of the CCM database. No default value</description>
+    </property>
+    <property>
+        <name>ccm.enabled</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>Defines that property if you want the ccm-get-input step to be run during the build area preparation.</description>
+    </property>
+    <property>
+        <name>ccm.engine.host</name>
+        <editStatus>must</editStatus>
+        <type>string</type>
+        <description>Engine host of CCM database. No default value.</description>
+    </property>
+    <property>
+        <name>ccm.user.login</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Contains the user name for CCM by reading the information from .netrc file.</description>
+    </property>
+    <property>
+        <name>ccm.user.password</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Contains the password for CCM user name by reading the information from .netrc file.</description>
+    </property>
+    <property>
+        <name>ccmgetinput</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>To check which ccmgetinput helium will be use </description>
+    </property>
+    <property>
+        <name>ccmtask.python.script.file</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>The path for the Python script to handle the ccm task bridge to the ccm.py module.</description>
+    </property>
+    <!-- CMAKER -->
+    <property>
+        <name>cmaker.component.dir</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Location of the cmaker component to install it.</description>
+    </property>
+    <property>
+        <name>cmaker.config.dir</name>
+        <editStatus>discouraged</editStatus>
+        <type>string</type>
+        <description>Directory where to execute cMaker.</description>
+    </property>
+    <property>
+        <name>cmaker.log.label</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>Custom label added to the cmaker logs.</description>
+    </property>
+    <property>
+        <name>cmaker.pp.version</name>
+        <editStatus>recommended</editStatus>
+        <type>string</type>
+        <description>Version of PP(NCP) configuration to be exported</description>
+    </property>
+    <property>
+        <name>cmaker.s60.version</name>
+        <editStatus>recommended</editStatus>
+        <type>string</type>
+        <description>Version of S60(require cmaker.pp.version to be set) configuration to be exported</description>
+    </property>
+    <property>
+        <name>common.overlay.dir</name>
+        <editStatus>must</editStatus>
+        <type>string</type>
+        <description>Location of the common overlay.</description>
+    </property>
+    <property>
+        <name>current.env.config</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Internal property used for environment setting in the beginning of the build.</description>
+    </property>
+    <property>
+        <name>ctool.region.china</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>.</description>
+    </property>
+    <property>
+        <name>ctool.dir</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>Location of the configuration tool.</description>
+    </property>
+    <property>
+        <name>ctool.western.conf</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>configuration for the western variant.</description>
+    </property>
+    <property>
+        <name>ctool.china.conf</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>configuration for the chinese variant.</description>
+    </property>
+    <property>
+        <name>ctool.japan.conf</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>configuration for the japanese variant.</description>
+    </property>
+    <property>
+        <name>customer.makefile.target</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Default makefile target for running customer iMaker ROM building.</description>
+    </property>
+    <property>
+        <name>data.model.file</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>The data model XML file for the Ant configuration.</description>
+    </property>
+    <property>
+        <name>data.model.parsed</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>The data model XML file for the Ant configuration parsed.</description>
+    </property>
+    <property>
+        <name>delta.ant.file</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Temp file</description>
+    </property>
+    <property>
+        <name>delta.zip.delete.file</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Special Instructions file for SymDEC</description>
+    </property>
+    <property>
+        <name>delta.zip.file</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>The zip file</description>
+    </property>
+    <property>
+        <name>delta.zip.location</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Output location</description>
+    </property>
+    <property>
+        <name>delta.zip.temp.location</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Temp location</description>
+    </property>
+    <property>
+        <name>delta.zip.file.size</name>
+        <editStatus>must</editStatus>
+        <type>string</type>
+        <description>Define the file size of the zipped up released file, this is then used by delta
+         zipping code to determine if a delta zip is required or a full zip should be created.
+         The delta zip will only be published if it is less than 1/2 the size of this property 
+         </description>
+    </property>
+    <property>
+        <name>diamonds.compile.summary</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Compilation summary file for diamonds.</description>
+    </property>
+    <property>
+        <name>diamonds.listener.configuration.file</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Diamonds Configuration file with full path used for diamonds listener.</description>
+    </property>
+    <property>
+        <name>antlib.import.module.path</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Path where ant XML files dynamically downloaded from jar file.</description>
+    </property>
+    <property>
+        <name>diamonds.build.id</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>The ID assigned to the build by the Diamonds server.</description>
+    </property>
+    <property>
+        <name>diamonds.build.url</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>The full URL to the build entry on the Diamonds server.</description>
+    </property>
+    <property>
+        <name>diamonds.host</name>
+        <editStatus>discouraged</editStatus>
+        <type>string</type>
+        <description>Diamonds server's host address.</description>
+    </property>
+    <property>
+        <name>diamonds.path</name>
+        <editStatus>discouraged</editStatus>
+        <type>string</type>
+        <description>Diamonds server build location.</description>
+    </property>
+    <property>
+        <name>diamonds.port</name>
+        <editStatus>discouraged</editStatus>
+        <type>string</type>
+        <description>Diamonds server port number.</description>
+    </property>
+    <property>
+        <name>diamonds.mail</name>
+        <editStatus>discouraged</editStatus>
+        <type>string</type>
+        <description>Email address of diamonds server.</description>
+    </property>
+    <property>
+        <name>diamonds.schema</name>
+        <editStatus>discouraged</editStatus>
+        <type>string</type>
+        <description>Diamonds rest api schema.</description>
+    </property>
+    <property>
+        <name>documentation.host</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>The host server where the Helium documentation is stored.</description>
+    </property>
+    <property>
+        <name>documentation.path.root</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>The root of the path on the host server where the Helium documentation is stored.</description>
+    </property>
+    <property>
+        <name>documentation.path</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>The full path on the host server where the Helium documentation is stored.</description>
+    </property>
+    <property>
+        <name>diamonds.target.list.to.log</name>
+        <editStatus>discouraged</editStatus>
+        <type>string</type>
+        <description>List of targets that should be logged in to Diamonds.</description>
+    </property>
+    
+    <property>
+        <name>documentation.url.root</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>Root location of the Helium release documentation.</description>
+    </property>
+    
+    <property>
+        <name>log.target</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>Enables logging of the start and end of individual targets.</description>
+    </property>
+    <property>
+        <name>log4j.configuration</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Defines the path to log4j configuration.</description>
+    </property>
+    
+    <property>
+        <name>call.cleanup</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>Ensures the cleanup-all target is called when the build finishes.</description>
+    </property>
+    <property>
+        <name>sbs.config</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>Configurations for which the components to be built(armv5,winscw)</description>
+    </property>
+    <property>
+        <name>skip.sbs.layer.generation</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>skip sbs layer filtering (true) for new schema and false for schema 1.4.0</description>
+    </property>
+    <property>
+        <name>ec.allow.duplicates</name>
+        <editStatus>discouraged</editStatus>
+        <type>string</type>
+        <description>Setting this to "1" will force xml2mak to generate only warnings (instead of errors) for duplicate components in the component list</description>
+    </property>
+    <property>
+        <name>ec.emake</name>
+        <editStatus>discouraged</editStatus>
+        <type>string</type>
+        <description>Location of emake tool.</description>
+    </property>
+    <property>
+        <name>ec.history.dir</name>
+        <editStatus>discouraged</editStatus>
+        <type>string</type>
+        <description>This specifies the directory where Electric Cloud history files are stored. 
+        Currently defined in helium.ant.xml and mapped related to publish.root.dir</description>
+    </property>
+    <property>
+        <name>ec.historyfile</name>
+        <editStatus>discouraged</editStatus>
+        <type>string</type>
+        <description>Temporary location of the EC history file used by the current build.</description>
+    </property>
+    <property>
+        <name>ec.makefile.file</name>
+        <editStatus>discouraged</editStatus>
+        <type>string</type>
+        <description>Location of the Makefile generated to run the EC build.</description>
+    </property>
+    <property>
+        <name>ec.maxagents</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>Maximum number of agent to be used</description>
+    </property>
+    <property>
+        <name>ec.history.option</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Should be create for single node build and merge for multi node build.</description>
+    </property>
+    <property>
+        <name>ec.mode</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>mode is either serial / parallel - default is parallel</description>
+    </property>
+    <property>
+        <name>week.number</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>this is used to identify the history files based on releases</description>
+    </property>
+    <property>
+        <name>branch.name</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>this along with week.number used to find proper history file based on releases.</description>
+    </property>
+    <property>
+        <name>ec.scripts.dir</name>
+        <editStatus>discouraged</editStatus>
+        <type>string</type>
+        <description>ec scripts location</description>
+    </property>
+    <property>
+        <name>ec.sysdef2make</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Location of sysdef2make.pl file, which is used to translate system definition files to make files. Internal property that normally does not require changes.</description>
+    </property>
+    <property>
+        <name>ec.tools.dir</name>
+        <editStatus>discouraged</editStatus>
+        <type>string</type>
+        <description>Location of EC-tools. Passed to environment variable EC_TOOLS_DIR, when calling ecbuild_electric.cmd to execute Electric Cloud build.</description>
+    </property>
+    <property>
+        <name>email.ldap.server</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>Network address of the LDAP server.</description>
+    </property>
+    <property>
+        <name>ldap.organization.unit.rootdn</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>Organization root DN for LDAP server.</description>
+    </property>
+    <property>
+        <name>ldap.people.rootdn</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>People root DN for LDAP server.</description>
+    </property>
+    <property>
+        <name>email.ldap.rootdn</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>Root distinguished name of the LDAP server.</description>
+    </property>
+    <property>
+        <name>email.smtp.server</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>Network address of the SMTP server.</description>
+    </property>
+    <property>
+        <name>skip.ats.sending</name>
+        <editStatus>allowed</editStatus>
+        <type>boolean</type>
+        <description>Skips sending drop package file to ATS/ASTE after its creation.</description>
+    </property>
+    <property>
+        <name>skip.build.duplicates</name>
+        <editStatus>allowed</editStatus>
+        <type>boolean</type>
+        <description>This allow you to skip the build duplciates log generation.</description>
+    </property>
+    <property>
+        <name>skip.codescanner</name>
+        <editStatus>allowed</editStatus>
+        <type>boolean</type>
+        <description>Skip the codescanner target if true (true/yes/on).</description>
+    </property>
+    <property>
+        <name>skip.policy-validation</name>
+        <editStatus>allowed</editStatus>
+        <type>boolean</type>
+        <description>Skip the policy validation target if true (true/yes/on).</description>
+    </property>
+    <property>
+        <name>codescanner.config</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>Defines the location of a custom configuration for codescanner.</description>
+    </property>
+    <property>
+        <name>codescanner.format</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>Defines the format of Codescanner output (html|xml|std).</description>
+    </property>
+    <property>
+        <name>codescanner.log.unique</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>Defines if the folder for Codescanner output is unique (on|off).</description>
+    </property>
+    <property>
+        <name>file-comparison.bcomp_path</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>Defines the location of BComp.exe.</description>
+    </property>
+    <property>
+        <name>file-comparison.bcomp_conf</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>Defines the location of Beyond Compare configuration file.</description>
+    </property>
+    <property>
+        <name>file-comparison.left_side</name>
+        <editStatus>must</editStatus>
+        <type>string</type>
+        <description>The fileset id used on the left side of comparison.</description>
+    </property>
+    <property>
+        <name>file-comparison.right_side</name>
+        <editStatus>must</editStatus>
+        <type>string</type>
+        <description>The fileset id used on the right side of comparison.</description>
+    </property>
+    <property>
+        <name>file-comparison.output</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>Defines the location where comparison output should be put.</description>
+    </property>
+    <property>
+        <name>file-comparison.left_name</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>Defines the name of the folder for the left side of comparison.</description>
+    </property>
+    <property>
+        <name>file-comparison.right_name</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>Defines the name of the folder for the right side of comparison.</description>
+    </property>
+    <property>
+        <name>file-comparison.regexp.from</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>Defines the regexp pattern (in ANT-pattern style) which to mach from given filesets.</description>
+    </property>
+    <property>
+        <name>file-comparison.regexp.to</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>Defines the regexp pattern (in ANT-pattern style) what to use in (possible) replacement.</description>
+    </property>
+    <property>
+        <name>skip.compile-ec-patch</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>If defined it skips the buildtools emake patching.</description>
+    </property>
+    <property>
+        <name>ee_roms.log.file</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>ee log file location</description>
+    </property>
+    <property>
+        <name>ee.makefile.target</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>Defines make target that is run when creating engineer english images.</description>
+    </property>
+    <property>
+        <name>epocroot</name>
+        <editStatus>discouraged</editStatus>
+        <type>string</type>
+        <description>epocroot path</description>
+    </property>
+    <property>
+        <name>ext.java.lib.dir</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>External ant library path</description>
+    </property>
+    <property>
+        <name>genxml.output.file</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Path for the output XML file generated by genxml used as input to EBS or EC.</description>
+    </property>
+    <property>
+        <name>genxml.output.file.suffix</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Suffix used in genxml related output files. This value is added into file names to show that they are genxml related. Used in log files, genxml output files and component list for EE images. Normally does not need to be set.</description>
+    </property>
+    <property>
+        <name>helium.build.dir</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>The path where Helium-specific outputs are written to.</description>
+    </property>
+    <property>
+        <name>helium.doc.dir</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Location of helium doc src.</description>
+    </property>
+    <property>
+        <name>helium.ccm.workarea.dir</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>The path to a Synergy work area used for updating Helium releases.</description>
+    </property>
+    <property>
+        <name>helium.svn.url</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>SVN URL where to find Helium.</description>
+    </property>
+    <property>
+        <name>helium.java.lib.dir</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>helium java library location</description>
+    </property>
+    <property>
+        <name>helium.svn.workarea.dir</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>The path to a Subversion work area used for updating Helium releases.</description>
+    </property>
+    <property>
+        <name>helium.dir</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Defines the logical path to the helium directory used to start a build.</description>
+    </property>
+    <property>
+        <name>helium.version</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Contains Helium version information</description>
+    </property>
+    <!--
+        IDO codescanner integration.
+    -->
+    <property>
+        <name>ido.codescanner.config</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>Defines the location of a custom configuration for codescanner.</description>
+    </property>
+    <property>
+        <name>ido.codescanner.output.dir</name>
+        <editStatus>recommended</editStatus>
+        <type>string</type>
+        <description>Defines the location of Codescanner output.</description>
+    </property>
+    <property>
+        <name>ido.codescanner.output.type</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>Defines the format of Codescanner output (html|xml|std).</description>
+    </property>
+    <property>
+        <name>ido.keep.old</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>Once define this property will enable the backup of old ado before doing the copy.</description>
+    </property>
+    <property>
+        <name>ido.template.robot.ready</name>
+        <editStatus>discouraged</editStatus>
+        <type>string</type>
+        <description>Location of the ready.txt FMPP template (override that property if you want to customize the content).</description>
+    </property>
+    <property>
+        <name>robot.email.to</name>
+        <editStatus>discouraged</editStatus>
+        <type>string</type>
+        <description>Comma seperated list of email address.</description>
+    </property>
+    <property>
+        <name>imaker.command</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>The path to the iMaker executable file.</description>
+    </property>
+    <property>
+        <name>imaker.engine</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Defines which accelerator to use for running iMaker. (default value from build.system property)</description>
+    </property>
+    <property>
+        <name>imaker.fmpp.ant</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Location of the Ant iMaker execution template.</description>
+    </property>
+    <property>
+        <name>imaker.fmpp.makefile</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Location of the EC iMaker execution template.</description>
+    </property>    
+    <property>
+        <name>tools.ivy.config.file</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>The tools dependencies Ivy settings configuration file.</description>
+    </property>
+    <property>
+        <name>loc.output.dir</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>The directory that will contain the zipped .loc files zip package.</description>
+    </property>
+    <property>
+        <name>loc.output.filename</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>The filename of the zip-loc-files target output zip file.</description>
+    </property>
+    <property>
+        <name>loc.temp.dir</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>The location of temporary directory used during zip-loc-files.</description>
+    </property>
+    <property>
+        <name>localisation.files.china</name>
+        <editStatus>recommended</editStatus>
+        <type>string</type>
+        <description>Localisation files for the China region.</description>
+    </property>
+    <property>
+        <name>localisation.files.japan</name>
+        <editStatus>recommended</editStatus>
+        <type>string</type>
+        <description>Localisation files for the Japan region.</description>
+    </property>
+    <property>
+        <name>localisation.files.western</name>
+        <editStatus>recommended</editStatus>
+        <type>string</type>
+        <description>Localisation files for the western region.</description>
+    </property>
+    <property>
+        <name>localisation.makefile.target</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>Makefile target that is executed when creating localised rom images (target localisation-roms).</description>
+    </property>
+    <property>
+        <name>localisation.s60locfiles.dir</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Location of Series 60 localisation input files. Internal property that does not normally needs to be set.</description>
+    </property>
+    <property>
+        <name>localisation.tool</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>This key defines which tool should be used to localise the build area (localisation-mcss-localiser or localisation-s60-localiser).</description>
+    </property>
+    <property>
+        <name>localisation.buildfile</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>begining of the localisation buildfile name</description>
+    </property>
+    <property>
+        <name>isis_mktarget.list</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Comma separated list of file names(main, what, check file names)</description>
+    </property>
+    <property>
+        <name>log.build.build_id</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Diamonds logging information.</description>
+    </property>
+    <property>
+        <name>log.build.category</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Diamonds logging information.</description>
+    </property>
+    <property>
+        <name>log.build.computer</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Diamonds logging information.</description>
+    </property>
+    <property>
+        <name>log.build.user</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Diamonds logging information.</description>
+    </property>
+    <property>
+        <name>md5.signature.file</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Output location of md5 file</description>
+    </property>
+    <property>
+        <name>md5.split</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Number of partial md5 files to use during creation</description>
+    </property>
+    <property>
+        <name>old.md5.file.present</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>Is a previous builds md5 being passed manually</description>
+    </property>
+    <property>
+        <name>metadata.db.file</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>The path to the SQLite metadata database file.</description>
+    </property>
+    <property>
+        <name>exclude.test.layers</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>Comma seperated excluded test layers. The test components (mentioned in the excluded test layers) will not be included in the ATS test drops</description>
+    </property>
+    <property>
+        <name>delta.exclude.commasep</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>Comma seperated excluded directories from the zip</description>
+    </property>
+    <property>
+        <name>old.md5.file</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>A previous builds md5</description>
+    </property>
+    <property>
+        <name>number.of.threads</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>how many parallel threads can run</description>
+    </property>
+    <property>
+        <name>overlays.log.file</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>The path to the overlays output log file.</description>
+    </property>
+    <property>
+        <name>parse_abld_what.tool</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>Location of the parse_what_log.pl tool.</description>
+    </property>
+    <property>
+        <name>prep.root.dir</name>
+        <editStatus>recommended</editStatus>
+        <type>string</type>
+        <description>The directory where new build area directories are created and substed to the build drive.</description>
+    </property>
+    <property>
+        <name>qmake.enabled</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>If defined the qmake stage will be enabled during compilation.</description>
+    </property>
+    <property>
+        <name>qt.dir</name>
+        <editStatus>recommended</editStatus>
+        <type>string</type>
+        <description>The location of the Qt framework to build.</description>
+    </property>
+    <property>
+        <name>qt.qmake.ant.template</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>The location of the ant template to run qmake commands.</description>
+    </property>
+    <property>
+        <name>qt.qmake.makefile.template</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>The location of the makefile template to run qmake commands.</description>
+    </property>
+    <property>
+        <name>qt.configure.args</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>The command lines argument passed to the configure tool.</description>
+    </property>
+    <property>
+        <name>qt.qmake.default.args</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>Setting default arguments to qMake command line, if the qmakeArgs is defined from the system definition file
+        then those arguments are discarded.</description>
+    </property>
+    <property>
+        <name>qt.configure.log.name</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>The name of the Qt configure output log.</description>
+    </property>
+    <property>
+        <name>absolute.prep.root.dir</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>This will convert absolute path for prep.root.dir if anybody use relative path.</description>
+    </property>
+    <property>
+        <name>prep.build.dir</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>This is the directory where the build area is prepared. Once created it is substed to the build.drive.</description>
+    </property>
+    <property>
+        <name>prep.delivery.modificationset</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>Location where the XML modificationset file should be generated. If not defined the file is not generated. (Usefull for CI systems)</description>
+    </property>
+    <property>
+        <name>publish.dir</name>
+        <editStatus>must</editStatus>
+        <type>string</type>
+        <description>Directory where the build is published (includes build.id)</description>
+    </property>
+    <property>
+        <name>publish.ccm.folder</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>Synergy folder where you want your task to be published.</description>
+    </property>
+    <property>
+        <name>publish.base.dir</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Directory where all builds are published. Same as publish.dir but without build.id at the end</description>
+    </property>
+    <property>
+        <name>publish.fileset.ids</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>The fileset id which will be upload</description>
+    </property>
+    <property>
+        <name>publish.release.subdir</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Subdir part of the publish release dir, relative to publish.root.dir</description>
+    </property>
+    <property>
+        <name>publish.release.dir</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>The directory where the release of this build is published to on the local network.</description>
+    </property>
+    <property>
+        <name>release.images.dir</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>The directory where flash images of build can be found</description>
+    </property>
+    <property>
+        <name>releasenotes.output</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Location of output rtf file</description>
+    </property>
+    <property>
+        <name>releasenotes.output.dir</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Defines the directory that will contain the output of release notes creation.</description>
+    </property>
+    <property>
+        <name>releasenotes.props</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Property file with customer values</description>
+    </property>
+    <property>
+        <name>releasenotes.scan2log</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Location of scan2log HTML file</description>
+    </property>
+    <property>
+        <name>releasenotes.temp.errors</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Temp file</description>
+    </property>
+    <property>
+        <name>releasenotes.temp.output</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Temp file</description>
+    </property>
+    <property>
+        <name>releasenotes.temp.props</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Temp file</description>
+    </property>
+    <property>
+        <name>releasenotes.temp.props2</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Temp file</description>
+    </property>
+    <property>
+        <name>releasenotes.template</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Defines the name of the release note template used.</description>
+    </property>
+    <property>
+        <name>rombuild.using.var</name>
+        <editStatus>allowed</editStatus>
+        <type>boolean</type>
+        <description>Define this property if you build is using Symbian Binary Variation.</description>
+    </property>
+    <property>
+        <name>rombuild.buildinfo.template</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>FMPP template to generate a buildinfo makefile.</description>
+    </property>
+    <property>
+        <name>rombuild.buildinfo.output</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Location of the output file.</description>
+    </property>
+    <property>
+        <name>rombuild.makefile.name</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>The filename of the output makefile generated by Helium for iMaker.</description>
+    </property>
+    <property>
+        <name>roms.spec.name</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Used to select spec-section in rom image configuration for building. Used only for makefpsx.</description>
+    </property>
+    <property>
+        <name>s60.delta.config.prefix</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>Define the prefix part of the configuration name that builds delta variant.</description>
+    </property>
+    <property>
+        <name>s60.getenv.trigger.location</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>Define the location of the trigger file that should be used by CI.</description>
+    </property>
+    <property>
+        <name>getenv.tool.location</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Defines the location of the getenv.pl script.</description>
+    </property>
+    <property>
+        <name>src.dir</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>java source directory location for helium library</description>
+    </property>
+    <property>
+        <name>subcon.log.file</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>The path to the subcon ROMs log.</description>
+    </property>
+    <property>
+        <name>subcon.makefile.target</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>The name of the makefile target for making subcon ROMs.</description>
+    </property>
+    <property>
+        <name>subcon.zips.dir</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>The directory where subcon zips are stored.</description>
+    </property>
+    <property>
+        <name>team</name>
+        <editStatus>recommended</editStatus>
+        <type>string</type>
+        <description>Used to specify which team configuration is being used. These configuration files are under /mc/mc_build/teams.</description>
+    </property>
+    <property>
+        <name>temp.build.dir</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Directory to store temporary files generated during the process.</description>
+    </property>
+    <property>
+        <name>trace.log.file</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>The path to the trace ROMs log.</description>
+    </property>
+    <property>
+        <name>trace.makefile.target</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>The name of the makefile target for making trace ROMs.</description>
+    </property>
+    <property>
+        <name>uda.makefile.target</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>The name of the makefile target for making UDA images.</description>
+    </property>
+    <property>
+        <name>zip.ee.log.file</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Defines log file where to record archiving of engineering english area.</description>
+    </property>
+    <property>
+        <name>zip.subcon.log.file</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Defines log file where to record archiving of subcon environment.</description>
+    </property>
+    <property>
+        <name>zip.subcon_roms.log.file</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>The log file name for zipping subcon_roms.</description>
+    </property>
+    <property>
+        <name>zip.trace_roms.log.file</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>The log file name for zipping trace_roms.</description>
+    </property>
+    <property>
+        <name>zip.uda_roms.log.file</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>The log file name for zipping uda_roms.</description>
+    </property>
+    <property>
+        <name>zips.build.dir</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>This is the directory where build area is archived after the build has finished. </description>
+    </property>
+    <property>
+        <name>zips.flashfiles.dir</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>This is the directory where flash files are archived.</description>
+    </property>
+    <property>
+        <name>zips.loc.dir</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>This is the directory where build area is archived after the localisation.</description>
+    </property>
+    <property>
+        <name>zip.localised.log.file</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>The path to the localization zipping log file.</description>
+    </property>
+    <property>
+        <name>remote.builds.config.file</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>The path to the configuration file for remote builds.</description>
+    </property>
+    <property>
+        <name>local.free.space</name>
+        <editStatus>recommended</editStatus>
+        <type>string</type>
+        <description>The amount of free space needed on the build machine in Mbs.</description>
+    </property>
+    <property>
+        <name>localisation.language.file</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Defined where to find languages.xml.</description>
+    </property>
+    <property>
+        <name>network.free.space</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>Amount of free space in MBs needed on the network drive where the build is published. The ``network.drive`` drive property must also be defined.</description>
+    </property>
+    <property>
+        <name>network.drive</name>
+        <editStatus>recommended</editStatus>
+        <type>string</type>
+        <description>The drive letter of a substed drive that maps to the network location where the build is published.</description>
+    </property>
+    <property>
+        <name>ec.build.class</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Build class for Electric Cloud. No default value.</description>
+    </property>
+    <property>
+        <name>sbs.tools.config</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>tools configuration to be built</description>
+    </property>
+    <property>
+        <name>sbs.implicit.tools.build</name>
+        <editStatus>allowed</editStatus>
+        <type>boolean</type>
+        <description>uses tools config to be built before building the actual configuration.</description>
+    </property>
+    <property>
+        <name>sysdef.clean.configurations.list</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>Comma-separated list of System Definition configuration names to be built in the ido-prep-clean stage. If not defined the sysdef.configurations.list will be used to generate that configuration list.</description>
+    </property>
+    <property>
+        <name>sysdef.configurations.list</name>
+        <editStatus>must</editStatus>
+        <type>string</type>
+        <description>Comma-separated list of System Definition configuration names to be built in the compile-main stage.</description>
+    </property>
+    <property>
+        <name>compile.symbianos</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Property must be set if the Symbian System Definition file is included in a build, in order to do full build from source.</description>
+    </property>
+    <property>
+        <name>publish.subdir</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>Subdir part of the publish dir, relative to publish.root.dir</description>
+    </property>
+    <property>
+        <name>error.email.to.list</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>List of email addresses where email is sent in case of build failure. No default value</description>
+    </property>
+    <property>
+        <name>release.dir.root</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>This is the directory which points to release-directory root.</description>
+    </property>
+    <property>
+        <name>enabled.ats</name>
+        <editStatus>must</editStatus>
+        <type>string</type>
+        <description>Value must be set to execute ats-test target. for example, 'value="1"'</description>
+    </property>
+    <property>
+        <name>enabled.aste</name>
+        <editStatus>must</editStatus>
+        <type>string</type>
+        <description>Value must be set to execute ats-aste target. for example, 'value="1"'</description>
+    </property>
+    <property>
+        <name>eunit.prepare.zip</name>
+        <editStatus>must</editStatus>
+        <type>string</type>
+        <description>Name of eunit zip file. Need to unzip into build area to start eunit test</description>
+    </property>
+    <property>
+        <name>core.build.version</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>This Defaults to the ${major.version}.${minor.version} combo and is available so that 1 number can be used (dot can be removed)</description>
+    </property>
+    <property>
+        <name>major.version</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>Part of a version information that is used to differentiate a build. Major version is the part that changes less frequently. Ie. year.</description>
+    </property>
+    <property>
+        <name>minor.version</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>Part of a version information that is used to differentiate a build. Minor version is the part that changes more frequntly. Ie week or a running number.</description>
+    </property>
+    <property>
+        <name>notes.database</name>
+        <editStatus>recommended</editStatus>
+        <type>string</type>
+        <description>The Notes database to do DCT5 upload to.</description>
+    </property>
+    <property>
+        <name>notes.release.dir</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>The DCT5 Release Notes SW Release Folder (where your build is Published to, so it can be obtained from there.)</description>
+    </property>
+    <property>
+        <name>notes.server</name>
+        <editStatus>recommended</editStatus>
+        <type>string</type>
+        <description>Lotus notes server name</description>
+    </property>
+    <property>
+        <name>prep.config.file</name>
+        <editStatus>must</editStatus>
+        <type>string</type>
+        <description>Defines configuration file used in prep-copy target. The file defines how files are copied and extracted into build area.</description>
+    </property>
+    <property>
+        <name>prep.delivery.file</name>
+        <editStatus>must</editStatus>
+        <type>string</type>
+        <description>Defines configuration file used in synergy operations (ccm-get-input for example). This file contains definition of projects that are checkouted or snapshotted.</description>
+    </property>
+    <property>
+        <name>product.family</name>
+        <editStatus>must</editStatus>
+        <type>string</type>
+        <description>In product builds defines the product family that the build product belong to.</description>
+    </property>
+    <property>
+        <name>product.list</name>
+        <editStatus>must</editStatus>
+        <type>string</type>
+        <description>In product builds defines the list of products that are build in the configuration. Property is used in rom image creation, localisation release notes creation and data packaging.</description>
+    </property>
+    <property>
+        <name>product.printname</name>
+        <editStatus>must</editStatus>
+        <type>string</type>
+        <description>A printable name for a product used in release notes.</description>
+    </property>
+    <property>
+        <name>product.type</name>
+        <editStatus>must</editStatus>
+        <type>string</type>
+        <description>Project ID in release notes.</description>
+    </property>
+    <property>
+        <name>publish</name>
+        <editStatus>recommended</editStatus>
+        <type>string</type>
+        <description>Defines whether the build content will be published to the network.</description>
+    </property>
+    <property>
+        <name>is.published</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>The value is either true or false depending on whether the publish property is set or not.</description>
+    </property>
+    <property>
+        <name>publish.root.dir</name>
+        <editStatus>recommended</editStatus>
+        <type>string</type>
+        <description>Defines the root directory of publish feature. Should point into the root of the folder that will contain published nightly builds/releases.</description>
+    </property>
+    <property>
+        <name>releasenotes.logo</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Defines the logo image file which will be used in release notes.</description>
+    </property>
+    <property>
+        <name>relnotes.config.dir</name>
+        <editStatus>must</editStatus>
+        <type>string</type>
+        <description>Defines the directory that contains release notes creation configuration files.</description>
+    </property>
+    <property>
+        <name>sis.config.file</name>
+        <editStatus>recommended</editStatus>
+        <type>string</type>
+        <description>Configuration file for SIS-file generation.</description>
+    </property>
+    <property>
+        <name>sms.number</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>sms numbers to report error or build information.</description>
+    </property>
+    <property>
+        <name>src</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Source location for junit test class</description>
+    </property>
+    <property>
+        <name>src.classes</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Java source files location for helium library</description>
+    </property>
+    <property>
+        <name>subcon.build.drive</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Build drive for subcon build</description>
+    </property>
+    <property>
+        <name>subcon.prep.config.file</name>
+        <editStatus>must</editStatus>
+        <type>string</type>
+        <description> Subcon prep configuration file location </description>
+    </property>
+    <property>
+        <name>subcon.rombuild.config.file</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>A ROM configuration file for verifying subcon ROMS.</description>
+    </property>
+    <property>
+        <name>rombuild.config.file</name>
+        <editStatus>must</editStatus>
+        <type>string</type>
+        <description>This key defines where this parsed file will be located.</description>
+    </property>
+    <property>
+        <name>rombuild.config.file.parsed</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Locates the parsed configuration for ROM builds.</description>
+    </property>
+    <property>
+        <name>ee.rom.output.dir</name>
+        <editStatus>must</editStatus>
+        <type>string</type>
+        <description>/output/development_flash_images/engineering_english/logs</description>
+    </property>
+    <property>
+        <name>core.rom.output.dir</name>
+        <editStatus>must</editStatus>
+        <type>string</type>
+        <description>/output/release_flash_images/rnd/core</description>
+    </property>
+    <property>
+        <name>selge.ini.network.dir</name>
+        <editStatus>must</editStatus>
+        <type>string</type>
+        <description>\\\\vcfiler02\\pub\\flash_user\\Crashbin/working\\selge_ini_prep</description>
+    </property>
+    <property>
+        <name>unix.username</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Unix username.</description>
+    </property>
+    <property>
+        <name>unix.username.available</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Equal 0 if the unix username if available</description>
+    </property>
+    <property>
+        <name>unix.password</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Unix password</description>
+    </property>
+    <property>
+        <name>image_creation.copyto</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Path for copying the image files default is output/images</description>
+    </property>
+    <property>
+        <name>image_creation.drive</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Drive (environment) to use for creating images</description>
+    </property>
+    <property>
+        <name>variant.image.targetpath</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Path for copying the variant image files default is under output/variant_images</description>
+    </property>
+    <property>
+        <name>zips.ee.spec.name</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>the value should be "ee"</description>
+    </property>
+    <property>
+        <name>zip.config.file</name>
+        <editStatus>recommended</editStatus>
+        <type>string</type>
+        <description>Path to the the zip specification file</description>
+    </property>
+    <property>
+        <name>zip.config.file.parsed</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Path to the parsed file of zip specification file</description>
+    </property>
+    <property>
+        <name>unix.password.available</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Equal 0 if the unix password if available</description>
+    </property>
+    <property>
+        <name>failonerror</name>
+        <editStatus>never</editStatus>
+        <type>boolean</type>
+        <description>failonerror attribute for exec</description>
+    </property>
+    <property>
+        <name>flash.config.enabled</name>
+        <editStatus>recommended</editStatus>
+        <type>flag</type>
+        <description>Define that property to enable config file generation.</description>
+    </property>
+    <property>
+        <name>compile.signal.input</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Name of the signal input to be able to override the compile-main target.</description>
+    </property>
+    <property>
+        <name>compile.sysdef.dtd.stub</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>compile.sysdef.dtd.stub</description>
+    </property>
+    <property>
+        <name>ec.mem.limit</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>memory limit for EC execution. See user guide for more details</description>
+    </property>
+    <property>
+        <name>archive.using.ec</name>
+        <editStatus>recommended</editStatus>
+        <type>boolean</type>
+        <description>Set to true to enable EC zipping</description>
+    </property>
+    <property>
+        <name>build.drive.notdefined</name>
+        <editStatus>never</editStatus>
+        <type>flag</type>
+        <description>used to track if build.drive has predefined or not</description>
+    </property>
+    <property>
+        <name>ado.mapping.file</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Path to a INI file that contains the mapping between the ADO from Synergy WA and it's location on the BA.</description>
+    </property>
+    <property>
+        <name>ado.quality.mapping.file</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Path to a INI file that contains the mapping between the ADO from Synergy WA and it's location on the BA for quality targets.</description>
+    </property>
+    <property>
+        <name>ido.romtree</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Path to the build romtree; the location contains iby files. Default value is "${build.drive}${env.EPOCROOT}/epoc32/rom/include"</description>
+    </property>
+    <property>
+        <name>ido.cenrep.root</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Path to the cenrep root. Default value is "${build.drive}${env.EPOCROOT}/epoc32/tools/cenrep/ido/src"</description>
+    </property>
+    <property>
+        <name>ido.cenrep.target</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Path to the cenrep target directory. Default value is "${build.drive}${env.EPOCROOT}/epoc32/data/z/private/10202be9"</description>
+    </property>
+    <property>
+        <name>s60.build.robot.date</name>
+        <editStatus>must</editStatus>
+        <type>string</type>
+        <description>This property represent the releasing interval. The syntax is as follow:
+            day1,time1,day2,time2,projectname;day1,time1,day2,time2,projectname2
+            
+            With day and time matching the following properties:
+            day [1, 14]
+            time [00, 23]:[00, 59]
+            
+            Example:
+            2,10:00,3,20:00,ABS_domain
+        </description>
+    </property>
+    <property>
+        <name>s60.build.robot.path</name>
+        <editStatus>must</editStatus>
+        <type>string</type>
+        <description>Location where to publish the build robot delivery.</description>
+    </property>
+    <property>
+        <name>validate.properties.at.startup</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>display warnings at build startup if required properties are not defined.</description>
+    </property>
+    <property>
+        <name>tracing.csv.file</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Path location for the memory tracing data captured by the TracingLogger.</description>
+    </property>
+    <property>
+        <name>imagetool.cfg.xml.parsed</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Locates the parsed configuration for ImageTool in the build directory.</description>
+    </property>
+    <property>
+        <name>imagetool.destination</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>Location where to copy ImageTool and definitions.</description>
+    </property>
+    <property>
+        <name>imagetool.images</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>Defines comma separated list of image names.</description>
+    </property>
+    <property>
+        <name>imagetool.log</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Defines name of the ImageTool log file.</description>
+    </property>
+    <property>
+        <name>imagetool.output.dir</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Defines the location of ImageTool output files.</description>
+    </property>
+    <property>
+        <name>imagetool.tooldir</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Defines the location of ImageTool.</description>
+    </property>
+    <property>
+        <name>read.build.int</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>This must be set to enable reading the build.number from a text database file located on the network. It allows automated build number incrementing.</description>
+    </property>
+    <property>
+        <name>build.int.db.dir</name>
+        <editStatus>discouraged</editStatus>
+        <type>string</type>
+        <description>The directory where the build integer database text files are stored.</description>
+    </property>
+    <property>
+        <name>create.bom.workarea.root</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>Your synergy work area directory (Set as the parent of the helium dir by default)</description>
+    </property>
+    <property>
+        <name>validate.policy.csv</name>
+        <editStatus>recommended</editStatus>
+        <type>string</type>
+        <description>Location of the CSV file that defines policy IDs.</description>
+    </property>
+    <property>
+        <name>validate.policy.ignoreroot</name>
+        <editStatus>allowed</editStatus>
+        <type>boolean</type>
+        <description>Skip the validation of the given root folders.</description>
+    </property>
+    <property>
+        <name>validate.policy.log</name>
+        <editStatus>discouraged</editStatus>
+        <type>string</type>
+        <description>Location validate policy xml log.</description>
+    </property>
+    <property>
+        <name>validate.policy.log.xml</name>
+        <editStatus>discouraged</editStatus>
+        <type>string</type>
+        <description>Location of the LogXML output file.</description>
+    </property>
+    <property>
+        <name>validate.policy.pattern</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>Comma separated list of pattern for policy validation. Defualt value is, distribution.policy.s60,distribution.policy </description>
+    </property>
+    
+    <property>
+        <name>internal.api.config</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>Location of the config to parse the build content.</description>
+    </property>
+    <property>
+        <name>internal.api.output.prebuild</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>Location of the prebuild ado header content.</description>
+    </property>
+    <property>
+        <name>internal.api.output.postbuild</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>Location of the postbuild ado header content.</description>
+    </property>
+    <property>
+        <name>required.ant.version</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>The version of Apache Ant required by Helium.</description>
+    </property>
+    <property>
+        <name>sbs.hlm.scanlog</name>
+        <editStatus>allowed</editStatus>
+        <type>boolean</type>
+        <description>Enable helium scanlog for raptor. (experimental temporary solution)</description>
+    </property>
+    <property>
+        <name>ivy.file</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Location of ivy jar.</description>
+    </property>
+    <property>
+        <name>ivy.filename</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Name of ivy jar.</description>
+    </property>
+    <property>
+        <name>logging.output.file</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Location of generated logging config.</description>
+    </property>
+    <property>
+        <name>last.major.helium.version</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Last major helium version</description>
+    </property>
+    <property>
+        <name>database.file</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Location of helium database</description>
+    </property>
+    <property>
+        <name>teamlevel.ci.system</name>
+        <editStatus>allowed</editStatus>
+        <type>boolean</type>
+        <description>Change release tag from team level to product level</description>
+    </property>
+    <property>
+        <name>teamlevel.folder.number</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>Folder name which contains those tasks to change the release tag</description>
+    </property>
+    <property>
+        <name>programlevel.release.tag</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>Program level release tag name</description>
+    </property>
+    <property>
+        <name>sms.server</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>Server that sends SMSs</description>
+    </property>
+    <property>
+        <name>data.model.xsl</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>Data Model extra content</description>
+    </property>
+    <property>
+        <name>ci.min.ba.maintain</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>Minimal number of build area to keep.</description>
+    </property>
+    <property>
+        <name>ci.session.file</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>Location of the session file which will be created by Helium.</description>
+    </property>
+    <property>
+        <name>ci.project.config</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>Location of the configuration that will be generated for the Cruise Control HLMSynergy modificationset.</description>
+    </property>
+    <property>
+        <name>signals.buildexception.signalname</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>Name of the signal configuration that is used when a signal is fired after catching a BuildException failure.</description>
+    </property>
+    <property>
+        <name>hlm.enable.asserts</name>
+        <editStatus>recommended</editStatus>
+        <type>string</type>
+        <description>Enable helium asserts. Build will fail if this is enabled and asserts fail.</description>
+    </property>       
+    <property>
+        <name>python.modules.path</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>Python modules path.</description>
+    </property>
+    <property>
+        <name>metadata.dbfile</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Location of build metadata database.</description>
+    </property>
+    <group>
+        <name>Environment</name>
+        <description/>
+        <propertyRef usage="required">tools.ivy.config.file</propertyRef>
+    </group>
+    <group>
+        <name>Policy validation</name>
+        <description>Properties which drive the policy validation.</description>
+        <propertyRef usage="optional">validate.policy.csv</propertyRef>
+        <propertyRef usage="optional">validate.policy.log</propertyRef>
+        <propertyRef usage="optional">validate.policy.ignoreroot</propertyRef>
+        <propertyRef usage="optional">validate.policy.pattern</propertyRef>
+    </group>
+    <group>
+        <name>preparation</name>
+        <description>Preparing the build area.</description>
+        <propertyRef usage="required">prep.config.file</propertyRef>
+        <propertyRef usage="optional">prep.delivery.file</propertyRef>
+    </group>
+    <group>
+        <name>localFreeSpace</name>
+        <description>Checking for disk space on local machine.</description>
+        <propertyRef usage="required">build.drive</propertyRef>
+        <propertyRef usage="optional">local.free.space</propertyRef>
+    </group>
+    <group>
+        <name>remoteFreeSpace</name>
+        <description>Checking for disk space on network disk.</description>
+        <propertyRef usage="required">network.drive</propertyRef>
+        <propertyRef usage="required">network.free.space</propertyRef>
+    </group>
+    <group>
+        <name>compilation</name>
+        <description>Main compilation.</description>
+        <propertyRef usage="required">sysdef.configurations.list</propertyRef>
+        <!--<propertyRef usage="required">sysdef.configurations</propertyRef>-->
+        <propertyRef usage="required">build.system</propertyRef>
+        <propertyRef usage="optional">build.system.ebs</propertyRef>
+        <propertyRef usage="optional">ido.build.filter</propertyRef>
+    </group>
+    <group>
+        <name>sisFiles</name>
+        <description>Creating SIS files.</description>
+        <propertyRef usage="optional">sis.config.file</propertyRef>
+    </group>
+    <group>
+        <name>rombuild</name>
+        <description>Creating ROM images.</description>
+        <propertyRef usage="optional">rombuild.config.file</propertyRef>
+        <propertyRef usage="optional">rombuild.config.file.parsed</propertyRef>
+        <propertyRef usage="required">roms.spec.name</propertyRef>
+        <propertyRef usage="optional">rombuild.using.var</propertyRef>
+    </group>
+    <!--<group>
+        <name>uda</name>
+        <description>Creating UDA images.</description>
+        <propertyRef usage="required">uda.config</propertyRef>
+        <propertyRef usage="required">uda.config.name</propertyRef>
+    </group>-->
+    <group>
+        <name>subcon</name>
+        <description>Creating a subcon build area and testing the creation of subcon images.</description>
+        <propertyRef usage="optional">subcon.build.drive</propertyRef>
+        <propertyRef usage="optional">subcon.prep.config.file</propertyRef>
+        <propertyRef usage="optional">subcon.rombuild.config.file</propertyRef>
+    </group>
+    <group>
+        <name>archive</name>
+        <description>Zipping the build area.</description>
+        <propertyRef usage="optional">zips.ee.spec.name</propertyRef>
+        <propertyRef usage="optional">zip.config.file</propertyRef>
+        <propertyRef usage="optional">zip.config.file.parsed</propertyRef>
+        <propertyRef usage="optional">zips.build.dir</propertyRef>
+        <propertyRef usage="optional">zip.wa.file</propertyRef>
+    </group>
+    <group>
+        <name>publish</name>
+        <description>Publishing the build to the network.</description>
+        <propertyRef usage="optional">publish</propertyRef>
+        <propertyRef usage="optional">is.published</propertyRef>
+        <propertyRef usage="optional">publish.root.dir</propertyRef>
+        <propertyRef usage="optional">publish.dir</propertyRef>
+        <propertyRef usage="optional">publish.subdir</propertyRef>
+        <propertyRef usage="optional">publish.base.dir</propertyRef>
+        <propertyRef usage="optional">publish.fileset.ids</propertyRef>
+        <propertyRef usage="optional">publish.release.subdir</propertyRef>
+        <propertyRef usage="optional">publish.release.dir</propertyRef>
+    </group>
+    <group>
+        <name>mobilecrash</name>
+        <description>Mobilecrash configuration.</description>
+        <propertyRef usage="optional">ee.rom.output.dir</propertyRef>
+        <propertyRef usage="optional">core.rom.output.dir</propertyRef>
+        <propertyRef usage="optional">selge.ini.network.dir</propertyRef>
+    </group>
+    <group>
+        <name>ReleaseNotes</name>
+        <description>Release notes generation.</description>
+        <propertyRef usage="optional">relnotes.config.dir</propertyRef>
+        <propertyRef usage="optional">releasenotes.logo</propertyRef>
+        <propertyRef usage="optional">releasenotes.output</propertyRef>
+        <propertyRef usage="optional">releasenotes.output.dir</propertyRef>
+        <propertyRef usage="optional">releasenotes.props</propertyRef>
+        <propertyRef usage="optional">releasenotes.scan2log</propertyRef>
+        <propertyRef usage="optional">releasenotes.temp.errors</propertyRef>
+        <propertyRef usage="optional">releasenotes.temp.output</propertyRef>
+        <propertyRef usage="optional">releasenotes.temp.props</propertyRef>
+        <propertyRef usage="optional">releasenotes.temp.props2</propertyRef>
+        <propertyRef usage="optional">releasenotes.template</propertyRef>
+    </group>
+    <group>
+        <name>DeltaZip</name>
+        <description/>
+        <propertyRef usage="optional">md5.signature.file</propertyRef>
+        <propertyRef usage="optional">md5.split</propertyRef>
+        <propertyRef usage="optional">old.md5.file.present</propertyRef>
+        <propertyRef usage="optional">delta.exclude.commasep</propertyRef>
+        <propertyRef usage="optional">old.md5.file</propertyRef>
+        <propertyRef usage="optional">delta.ant.file</propertyRef>
+        <propertyRef usage="optional">delta.zip.delete.file</propertyRef>
+        <propertyRef usage="optional">delta.zip.file</propertyRef>
+        <propertyRef usage="optional">delta.zip.location</propertyRef>
+        <propertyRef usage="optional">delta.zip.temp.location</propertyRef>
+    </group>
+    <group>
+        <name>CCM</name>
+        <description/>
+        <propertyRef usage="optional">ccm.base.dir</propertyRef>
+        <propertyRef usage="optional">ccm.home.dir</propertyRef>
+        <propertyRef usage="optional">ccm.database</propertyRef>
+        <propertyRef usage="optional">ccm.enabled</propertyRef>
+        <propertyRef usage="optional">ccmgetinput</propertyRef>
+        <propertyRef usage="optional">ccm.database.path</propertyRef>
+        <propertyRef usage="optional">ccm.engine.host</propertyRef>
+        <propertyRef usage="optional">ccm.user.login</propertyRef>
+        <propertyRef usage="optional">ccm.user.password</propertyRef>        
+        <propertyRef usage="optional">ccm.cache.xml</propertyRef>
+    </group>
+    <group>
+        <name>EC</name>
+        <description/>
+        <propertyRef usage="optional">ec.allow.duplicates</propertyRef>
+        <propertyRef usage="optional">ec.emake</propertyRef>
+        <propertyRef usage="optional">ec.history.dir</propertyRef>
+        <propertyRef usage="optional">ec.historyfile</propertyRef>
+        <propertyRef usage="optional">ec.makefile.file</propertyRef>
+        <propertyRef usage="optional">ec.maxagents</propertyRef>
+        <propertyRef usage="optional">ec.history.option</propertyRef>
+        <propertyRef usage="optional">ec.scripts.dir</propertyRef>
+        <propertyRef usage="optional">ec.sysdef2make</propertyRef>
+        <propertyRef usage="optional">ec.tools.dir</propertyRef>
+        <propertyRef usage="optional">ec.build.class</propertyRef>
+        <propertyRef usage="optional">sbs.implicit.tools.build</propertyRef>
+        <propertyRef usage="optional">sbs.tools.config</propertyRef>
+        <propertyRef usage="optional">ec.mem.limit</propertyRef>
+        <propertyRef usage="optional">skip.compile-ec-patch</propertyRef>
+        <propertyRef usage="optional">archive.using.ec</propertyRef>
+    </group>
+    <group>
+        <name>cMaker</name>
+        <description/>
+        <propertyRef usage="optional">cmaker.component.dir</propertyRef>
+        <propertyRef usage="optional">cmaker.config.dir</propertyRef>
+        <propertyRef usage="optional">cmaker.pp.version</propertyRef>
+        <propertyRef usage="optional">cmaker.s60.version</propertyRef>
+        <propertyRef usage="optional">cmaker.log.label</propertyRef>
+    </group>
+    <group>
+        <name>IDO - Codescanner</name>
+        <description>Codescanner related Ant properties.</description>
+        <propertyRef usage="optional">ido.codescanner.config</propertyRef>
+        <propertyRef usage="optional">ido.codescanner.output.dir</propertyRef>
+        <propertyRef usage="optional">ido.codescanner.output.type</propertyRef>
+        <propertyRef usage="optional">skip.codescanner</propertyRef>
+    </group>
+    <group>
+        <name>iMaker - integration</name>
+        <description>New iMaker integration support.</description>
+        <propertyRef usage="optional">rombuild.buildinfo.template</propertyRef>
+        <propertyRef usage="optional">rombuild.buildinfo.output</propertyRef>
+        <propertyRef usage="optional">imaker.engine</propertyRef>
+    </group>
+    <group>
+        <name>ImageTool</name>
+        <description>ImageTool configuration.</description>
+        <propertyRef usage="required">imagetool.destination</propertyRef>
+        <propertyRef usage="required">imagetool.images</propertyRef>
+        <propertyRef usage="optional">imagetool.cfg.xml.parsed</propertyRef>
+        <propertyRef usage="optional">imagetool.log</propertyRef>
+        <propertyRef usage="optional">imagetool.output.dir</propertyRef>
+        <propertyRef usage="optional">imagetool.tooldir</propertyRef>
+    </group>
+    <group>
+        <name>Diamonds</name>
+        <description/>
+        <propertyRef usage="required">diamonds.host</propertyRef>
+        <propertyRef usage="required">diamonds.path</propertyRef>
+        <propertyRef usage="required">diamonds.port</propertyRef>
+        <propertyRef usage="optional">diamonds.mail</propertyRef>
+        <propertyRef usage="optional">log.target</propertyRef>
+        <propertyRef usage="optional">call.cleanup</propertyRef>
+        <propertyRef usage="optional">diamonds.listener.configuration.file</propertyRef>
+        <propertyRef usage="optional">diamonds.compile.summary</propertyRef>
+        <propertyRef usage="optional">diamonds.schema</propertyRef>
+        <propertyRef usage="optional">diamonds.build.id</propertyRef>
+        <propertyRef usage="optional">diamonds.build.url</propertyRef>
+        <propertyRef usage="optional">diamonds.target.list.to.log</propertyRef>
+    </group>
+    <group>
+        <name>Localisation</name>
+        <description/>
+        <propertyRef usage="optional">loc.output.dir</propertyRef>
+        <propertyRef usage="optional">loc.output.filename</propertyRef>
+        <propertyRef usage="optional">loc.temp.dir</propertyRef>
+        <propertyRef usage="optional">localisation.files.china</propertyRef>
+        <propertyRef usage="optional">localisation.files.japan</propertyRef>
+        <propertyRef usage="optional">localisation.files.western</propertyRef>
+        <propertyRef usage="optional">localisation.makefile.target</propertyRef>
+        <propertyRef usage="optional">localisation.s60locfiles.dir</propertyRef>
+        <propertyRef usage="optional">localisation.tool</propertyRef>
+        <propertyRef usage="optional">localisation.buildfile</propertyRef>
+        <propertyRef usage="optional">isis_mktarget.list</propertyRef>
+        <propertyRef usage="optional">localisation.language.file</propertyRef>
+    </group>
+    <group>
+        <name>ATS</name>
+        <description/>
+        <propertyRef usage="optional">ats.ctc.host</propertyRef>
+        <propertyRef usage="optional">ats.testrun.name</propertyRef>
+        <propertyRef usage="optional">ats.plan.name</propertyRef>
+        <propertyRef usage="optional">ats.aste.testrun.name</propertyRef>
+        <propertyRef usage="optional">ats.aste.plan.name</propertyRef>
+        <propertyRef usage="optional">ats.trace.enabled</propertyRef>
+        <propertyRef usage="optional">ats.ctc.enabled</propertyRef>
+        <propertyRef usage="optional">ats.obey.pkgfiles.rule</propertyRef>
+        <propertyRef usage="optional">ats.flashfiles.minlimit</propertyRef>
+        <propertyRef usage="optional">ats.sisfiles.minlimit</propertyRef>
+        <propertyRef usage="optional">ats.email.list</propertyRef>
+        <propertyRef usage="optional">ats.target.platform</propertyRef>
+        <propertyRef usage="optional">ats.flash.images</propertyRef>
+        <propertyRef usage="optional">ats.test.timeout</propertyRef>
+        <propertyRef usage="optional">ats.product.hwid</propertyRef>
+        <propertyRef usage="optional">ats.drop.file</propertyRef>
+        <propertyRef usage="optional">ats.aste.drop.file</propertyRef>
+        <propertyRef usage="optional">ats.aste.email.list</propertyRef>
+        <propertyRef usage="optional">ats.product.name</propertyRef>
+        <propertyRef usage="optional">ats.script.type</propertyRef>
+        <propertyRef usage="optional">ats.drop.location</propertyRef>
+        <propertyRef usage="optional">ats.server</propertyRef>
+        <propertyRef usage="optional">ats.password</propertyRef>
+        <propertyRef usage="optional">ats.username</propertyRef>
+        <propertyRef usage="optional">ats.report.location</propertyRef>
+        <propertyRef usage="optional">enabled.ats</propertyRef>
+        <propertyRef usage="optional">enabled.aste</propertyRef>
+        <propertyRef usage="optional">skip.ats.sending</propertyRef>
+        <propertyRef usage="optional">eunit.test.package</propertyRef>
+        <propertyRef usage="optional">eunitexerunner.flags</propertyRef>
+        <propertyRef usage="optional">drop.file.counter</propertyRef>
+        <propertyRef usage="optional">exclude.test.layers</propertyRef>
+    </group>
+    <group>
+        <name>Company</name>
+        <description/>
+        <propertyRef usage="optional">email.ldap.server</propertyRef>
+        <propertyRef usage="optional">email.ldap.rootdn</propertyRef>
+        <propertyRef usage="optional">email.smtp.server</propertyRef>
+        <propertyRef usage="optional">sms.server</propertyRef>
+        <propertyRef usage="optional">ldap.organization.unit.rootdn</propertyRef>
+        <propertyRef usage="optional">ldap.people.rootdn</propertyRef>
+    </group>
+    <group>
+        <name>Release</name>
+        <description/>
+        <propertyRef usage="optional">s60.build.robot.date</propertyRef>
+        <propertyRef usage="optional">s60.build.robot.path</propertyRef>
+    </group>
+    <group>
+        <name>Qt</name>
+        <description/>
+        <propertyRef usage="optional">qt.dir</propertyRef>
+        <propertyRef usage="optional">qt.configure.log.name</propertyRef>
+        <propertyRef usage="optional">qt.qmake.ant.template</propertyRef>
+        <propertyRef usage="optional">qt.qmake.makefile.template</propertyRef>
+        <propertyRef usage="optional">qt.configure.args</propertyRef>
+        <propertyRef usage="optional">qt.qmake.default.args</propertyRef>
+        <propertyRef usage="optional">qmake.enabled</propertyRef>
+    </group>
+    <group>
+        <name>Misc</name>
+        <description/>
+        <propertyRef usage="optional">absolute.prep.root.dir</propertyRef>
+        <propertyRef usage="optional">ado.mapping.file</propertyRef>
+        <propertyRef usage="optional">ado.quality.mapping.file</propertyRef>
+        <propertyRef usage="optional">antlib.import.module.path</propertyRef>
+        <propertyRef usage="optional">binary.root</propertyRef>
+        <propertyRef usage="optional">branch.name</propertyRef>
+        <propertyRef usage="optional">build.cache.dir</propertyRef>
+        <propertyRef usage="optional">build.cache.log.dir</propertyRef>
+        <propertyRef usage="optional">build.drive.notdefined</propertyRef>
+        <propertyRef usage="optional">build.duplicates.log</propertyRef>
+        <propertyRef usage="optional">build.errors.limit</propertyRef>
+        <propertyRef usage="optional">build.id</propertyRef>
+        <propertyRef usage="optional">build.log.dir</propertyRef>
+        <propertyRef usage="optional">build.signal.status.dir</propertyRef>
+        <propertyRef usage="optional">build.status.email.template</propertyRef>
+        <propertyRef usage="optional">build.log</propertyRef>
+        <propertyRef usage="optional">build.logging.key.stages</propertyRef>
+        <propertyRef usage="optional">build.logging.start.stage</propertyRef>
+        <propertyRef usage="optional">build.name</propertyRef>
+        <propertyRef usage="optional">build.output.dir</propertyRef>
+        <propertyRef usage="optional">build.property.cache.file</propertyRef>
+        <propertyRef usage="optional">build.sisfiles.dir</propertyRef>
+        <propertyRef usage="optional">build.summary.file</propertyRef>
+        <propertyRef usage="optional">build.system.sbs</propertyRef>
+        <propertyRef usage="optional">build.temp.dir</propertyRef>
+        <propertyRef usage="optional">build.type</propertyRef>
+        <propertyRef usage="optional">build.version</propertyRef>
+        <propertyRef usage="optional">cache.dir</propertyRef>
+        <propertyRef usage="optional">log4j.cache.dir</propertyRef>
+        <propertyRef usage="optional">canonical.sysdef.file</propertyRef>
+        <propertyRef usage="optional">ccmtask.python.script.file</propertyRef>
+        <propertyRef usage="optional">codescanner.config</propertyRef>
+        <propertyRef usage="optional">codescanner.format</propertyRef>
+        <propertyRef usage="optional">codescanner.log.unique</propertyRef>
+        <propertyRef usage="optional">common.overlay.dir</propertyRef>
+        <propertyRef usage="optional">compile.signal.input</propertyRef>
+        <propertyRef usage="optional">compile.symbianos</propertyRef>
+        <propertyRef usage="optional">compile.sysdef.dtd.stub</propertyRef>
+        <propertyRef usage="optional">core.build.version</propertyRef>
+        <propertyRef usage="optional">create.bom.workarea.root</propertyRef>
+        <propertyRef usage="optional">ctool.china.conf</propertyRef>
+        <propertyRef usage="optional">ctool.dir</propertyRef>
+        <propertyRef usage="optional">ctool.japan.conf</propertyRef>
+        <propertyRef usage="optional">ctool.region.china</propertyRef>
+        <propertyRef usage="optional">ctool.western.conf</propertyRef>
+        <propertyRef usage="optional">current.env.config</propertyRef>
+        <propertyRef usage="optional">customer.makefile.target</propertyRef>
+        <propertyRef usage="optional">data.model.file</propertyRef>
+        <propertyRef usage="optional">data.model.parsed</propertyRef>
+        <propertyRef usage="optional">database.file</propertyRef>
+        <propertyRef usage="optional">delta.zip.file.size</propertyRef>
+        <propertyRef usage="optional">disable.analysis.tool</propertyRef>
+        <propertyRef usage="optional">documentation.host</propertyRef>
+        <propertyRef usage="optional">documentation.path.root</propertyRef>
+        <propertyRef usage="optional">documentation.path</propertyRef>
+        <propertyRef usage="optional">documentation.url.root</propertyRef>
+        <propertyRef usage="optional">ec.mode</propertyRef>
+        <propertyRef usage="optional">ee.makefile.target</propertyRef>
+        <propertyRef usage="optional">ee_roms.log.file</propertyRef>
+        <propertyRef usage="optional">epocroot</propertyRef>
+        <propertyRef usage="optional">error.email.to.list</propertyRef>
+        <propertyRef usage="optional">eunit.prepare.zip</propertyRef>
+        <propertyRef usage="optional">ext.java.lib.dir</propertyRef>
+        <propertyRef usage="optional">failonerror</propertyRef>
+        <propertyRef usage="optional">file-comparison.bcomp_conf</propertyRef>
+        <propertyRef usage="optional">file-comparison.bcomp_path</propertyRef>
+        <propertyRef usage="optional">file-comparison.left_name</propertyRef>
+        <propertyRef usage="optional">file-comparison.left_side</propertyRef>
+        <propertyRef usage="optional">file-comparison.output</propertyRef>
+        <propertyRef usage="optional">file-comparison.regexp.from</propertyRef>
+        <propertyRef usage="optional">file-comparison.regexp.to</propertyRef>
+        <propertyRef usage="optional">file-comparison.right_name</propertyRef>
+        <propertyRef usage="optional">file-comparison.right_side</propertyRef>
+        <propertyRef usage="optional">genxml.output.file.suffix</propertyRef>
+        <propertyRef usage="optional">genxml.output.file</propertyRef>
+        <propertyRef usage="optional">getenv.tool.location</propertyRef>
+        <propertyRef usage="optional">helium.build.dir</propertyRef>
+        <propertyRef usage="optional">helium.doc.dir</propertyRef>
+        <propertyRef usage="optional">helium.ccm.workarea.dir</propertyRef>
+        <propertyRef usage="optional">helium.svn.url</propertyRef>
+        <propertyRef usage="optional">helium.dir</propertyRef>
+        <propertyRef usage="optional">helium.java.lib.dir</propertyRef>
+        <propertyRef usage="optional">helium.svn.workarea.dir</propertyRef>
+        <propertyRef usage="optional">helium.version</propertyRef>
+        <propertyRef usage="optional">ido.cenrep.root</propertyRef>
+        <propertyRef usage="optional">ido.cenrep.target</propertyRef>
+        <propertyRef usage="optional">ido.keep.old</propertyRef>
+        <propertyRef usage="optional">ido.romtree</propertyRef>
+        <propertyRef usage="optional">ido.template.robot.ready</propertyRef>
+        <propertyRef usage="optional">image_creation.copyto</propertyRef>
+        <propertyRef usage="optional">image_creation.drive</propertyRef>
+        <propertyRef usage="optional">imaker.command</propertyRef>
+        <propertyRef usage="optional">imaker.fmpp.ant</propertyRef>
+        <propertyRef usage="optional">imaker.fmpp.makefile</propertyRef>
+        <propertyRef usage="optional">internal.api.config</propertyRef>
+        <propertyRef usage="optional">internal.api.output.postbuild</propertyRef>
+        <propertyRef usage="optional">internal.api.output.prebuild</propertyRef>
+        <propertyRef usage="optional">ivy.file</propertyRef>
+        <propertyRef usage="optional">ivy.filename</propertyRef>
+        <propertyRef usage="optional">last.major.helium.version</propertyRef>
+        <propertyRef usage="optional">log.build.build_id</propertyRef>
+        <propertyRef usage="optional">log.build.category</propertyRef>
+        <propertyRef usage="optional">log.build.computer</propertyRef>
+        <propertyRef usage="optional">log.build.user</propertyRef>
+        <propertyRef usage="optional">log4j.configuration</propertyRef>
+        <propertyRef usage="optional">logging.output.file</propertyRef>
+        <propertyRef usage="optional">major.version</propertyRef>
+        <propertyRef usage="optional">metadata.db.file</propertyRef>
+        <propertyRef usage="optional">minor.version</propertyRef>
+        <propertyRef usage="optional">notes.database</propertyRef>
+        <propertyRef usage="optional">notes.release.dir</propertyRef>
+        <propertyRef usage="optional">notes.server</propertyRef>
+        <propertyRef usage="optional">number.of.threads</propertyRef>
+        <propertyRef usage="optional">overlays.log.file</propertyRef>
+        <propertyRef usage="optional">parse_abld_what.tool</propertyRef>
+        <propertyRef usage="optional">prep.build.dir</propertyRef>
+        <propertyRef usage="optional">prep.delivery.modificationset</propertyRef>
+        <propertyRef usage="optional">prep.root.dir</propertyRef>
+        <propertyRef usage="optional">product.family</propertyRef>
+        <propertyRef usage="optional">product.list</propertyRef>
+        <propertyRef usage="optional">product.printname</propertyRef>
+        <propertyRef usage="optional">product.type</propertyRef>
+        <propertyRef usage="optional">programlevel.release.tag</propertyRef>
+        <propertyRef usage="optional">publish.ccm.folder</propertyRef>
+        <propertyRef usage="optional">read.build.int</propertyRef>
+        <propertyRef usage="optional">build.int.db.dir</propertyRef>
+        <propertyRef usage="optional">release.dir.root</propertyRef>
+        <propertyRef usage="optional">remote.builds.config.file</propertyRef>
+        <propertyRef usage="optional">required.ant.version</propertyRef>
+        <propertyRef usage="optional">robot.email.to</propertyRef>
+        <propertyRef usage="optional">rombuild.makefile.name</propertyRef>
+        <propertyRef usage="optional">s60.delta.config.prefix</propertyRef>
+        <propertyRef usage="optional">s60.getenv.trigger.location</propertyRef>
+        <propertyRef usage="optional">sbs.config</propertyRef>
+        <propertyRef usage="optional">skip.sbs.layer.generation</propertyRef>
+        <propertyRef usage="optional">sbs.hlm.scanlog</propertyRef>
+        <propertyRef usage="optional">skip.build.duplicates</propertyRef>
+        <propertyRef usage="optional">skip.policy-validation</propertyRef>
+        <propertyRef usage="optional">sms.number</propertyRef>
+        <propertyRef usage="optional">src.classes</propertyRef>
+        <propertyRef usage="optional">src.dir</propertyRef>
+        <propertyRef usage="optional">src</propertyRef>
+        <propertyRef usage="optional">subcon.log.file</propertyRef>
+        <propertyRef usage="optional">subcon.makefile.target</propertyRef>
+        <propertyRef usage="optional">subcon.zips.dir</propertyRef>
+        <propertyRef usage="optional">sysdef.clean.configurations.list</propertyRef>
+        <propertyRef usage="optional">team</propertyRef>
+        <propertyRef usage="optional">teamlevel.ci.system</propertyRef>
+        <propertyRef usage="optional">teamlevel.folder.number</propertyRef>
+        <propertyRef usage="optional">temp.build.dir</propertyRef>
+        <propertyRef usage="optional">trace.log.file</propertyRef>
+        <propertyRef usage="optional">trace.makefile.target</propertyRef>
+        <propertyRef usage="optional">tracing.csv.file</propertyRef>
+        <propertyRef usage="optional">tsrc.data.dir</propertyRef>
+        <propertyRef usage="optional">tsrc.path.list</propertyRef>
+        <propertyRef usage="optional">uda.makefile.target</propertyRef>
+        <propertyRef usage="optional">unix.password.available</propertyRef>
+        <propertyRef usage="optional">unix.password</propertyRef>
+        <propertyRef usage="optional">unix.username.available</propertyRef>
+        <propertyRef usage="optional">unix.username</propertyRef>
+        <propertyRef usage="optional">unsubst.after.build</propertyRef>
+        <propertyRef usage="optional">validate.policy.log.xml</propertyRef>
+        <propertyRef usage="optional">validate.properties.at.startup</propertyRef>
+        <propertyRef usage="optional">variant.image.targetpath</propertyRef>
+        <propertyRef usage="optional">week.number</propertyRef>
+        <propertyRef usage="optional">zip.ee.log.file</propertyRef>
+        <propertyRef usage="optional">zip.localised.log.file</propertyRef>
+        <propertyRef usage="optional">zip.subcon.log.file</propertyRef>
+        <propertyRef usage="optional">zip.subcon_roms.log.file</propertyRef>
+        <propertyRef usage="optional">zip.trace_roms.log.file</propertyRef>
+        <propertyRef usage="optional">zip.uda_roms.log.file</propertyRef>
+        <propertyRef usage="optional">zips.flashfiles.dir</propertyRef>
+        <propertyRef usage="optional">zips.loc.dir</propertyRef>
+        <propertyRef usage="optional">flash.config.enabled</propertyRef>
+        <propertyRef usage="optional">release.images.dir</propertyRef>
+        <propertyRef usage="optional">data.model.xsl</propertyRef>
+        <propertyRef usage="optional">ci.min.ba.maintain</propertyRef>
+        <propertyRef usage="optional">ci.session.file</propertyRef>
+        <propertyRef usage="optional">ci.project.config</propertyRef>
+        <propertyRef usage="optional">archive.max.number.of.threads</propertyRef>
+        <propertyRef usage="optional">signals.buildexception.signalname</propertyRef>
+        <propertyRef usage="optional">hlm.enable.asserts</propertyRef>
+        <propertyRef usage="optional">python.modules.path</propertyRef>
+        <propertyRef usage="optional">metadata.dbfile</propertyRef>
+    </group>
+</heliumDataModel>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : test_ci.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test_ci" xmlns:au="org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <property environment="env" />
+    <property name="publish.root.dir" value="${env.TEMP}" />
+    <property name="helium.dir" location="../../.." />
+    <import file="../../../helium.ant.xml" />
+    <import file="../ci.ant.xml" />
+    <!-- Test for delete folders: Creates configuration and Folder structure then delete folders, config files and test existance of the folders -->
+    <target name="test-delete-folders-from-list">
+        <!-- Create configuration files which will contain the dir list to delete -->
+        <mkdir dir="${env.TEMP}\data\helium\del_config" />
+        <echo file="${env.TEMP}\data\helium\del_config\file1-1.txt">${env.TEMP}/data/helium/dir1${line.separator}</echo>
+        <echo file="${env.TEMP}\data\helium\del_config\file2-1.txt">${env.TEMP}/data/helium/dir2${line.separator}</echo>
+        <!-- Create dir structure based on config -->
+        <mkdir dir="${env.TEMP}\data\helium\dir1\dir1-1" />
+        <mkdir dir="${env.TEMP}\data\helium\dir1\dir1-2" />
+        <mkdir dir="${env.TEMP}\data\helium\dir2\dir2-1" />
+        <mkdir dir="${env.TEMP}\data\helium\dir2\dir2-2" />
+
+        <echo file="${env.TEMP}\data\helium\dir1\dir1-1\file1-1.txt">1-1</echo>
+        <echo file="${env.TEMP}\data\helium\dir1\dir1-2\file1-2.txt">1-2</echo>
+        <echo file="${env.TEMP}\data\helium\dir2\dir2-1\file2-1.txt">2-1</echo>
+        <echo file="${env.TEMP}\data\helium\dir2\dir2-2\file2-2.txt">2-2</echo>
+
+        <property name="ci.cleanup.env.dir" value="${env.TEMP}/data/helium/del_config" />
+        <runtarget target="delete-folders-from-list" />
+
+        <au:assertFileDoesntExist file="${env.TEMP}\data\helium\dir1" />
+        <au:assertFileDoesntExist file="${env.TEMP}\data\helium\dir2" />
+        <au:assertFileDoesntExist file="${env.TEMP}\data\helium\dir1\dir1-1\file1-1.txt" />
+        <au:assertFileDoesntExist file="${env.TEMP}\data\helium\dir1\dir1-2\file1-2.txt" />
+        <au:assertFileDoesntExist file="${env.TEMP}\data\helium\dir2\dir2-1\file2-1.txt" />
+        <au:assertFileDoesntExist file="${env.TEMP}\data\helium\dir2\dir2-2\file2-2.txt" />
+        <au:assertFileDoesntExist file="${env.TEMP}\data\helium\del_config\file1-1.txt" />
+        <au:assertFileDoesntExist file="${env.TEMP}\data\helium\del_config\file2-1.txt" />
+    </target>
+</project>

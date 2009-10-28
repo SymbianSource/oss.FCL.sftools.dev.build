@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : test_preparation.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test_preparation" xmlns:au="org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <property environment="env" />
+    <property name="publish.root.dir" value="${env.TEMP}" />
+    <property name="build.name" value="buildtest" />
+    <property name="major.version" value="0" />
+    <property name="minor.version" value="00" />
+    <property name="build.tag.ext" value="" />
+    <property name="build.tag.ext" value="" />
+
+    <property name="build.number" value="0" />
+    <property name="prep.root.dir" value="../../../build/test/preproot" />
+
+    <property name="helium.dir" location="../../.." />
+    <!--<import file="../../../helium.ant.xml"/>-->
+
+    <!-- in the normal run we should not have the same build.drive content in the second run -->
+    <property name="build.drive" value="Z:" />
+    <import file="../../../helium.ant.xml" />
+
+    <!-- Simple Synergy testing. -->
+    <target name="test-ccm">
+        <hlm:python>
+import ccm, gc
+import logging
+logging.basicConfig(level=logging.DEBUG)
+gc.set_debug(gc.DEBUG_STATS)
+session = ccm.open_session(database="fa1f5132")
+session = ccm.open_session(database="fa1f5132")
+session = ccm.open_session(database="fa1f5132")
+        </hlm:python>
+    </target>
+
+
+    <target name="-test-prep-drive">
+        <runtarget target="prep-drive" />
+        <echo file="${build.drive}/prepdrive-test.txt">foo</echo>
+        <au:assertFileExists file="${build.drive}/prepdrive-test.txt" />
+        <!-- sleep to be sure to get a new timestamp in the next run -->
+        <sleep seconds="1" />
+        <runtarget target="prep-drive" />
+        <au:assertFileDoesntExist file="${build.drive}/prepdrive-test.txt" />
+    </target>
+
+
+    <!-- checking the updated path -->
+    <target name="-test-update-file-path">
+        <runtarget target="prep-drive" />
+        <echo file="${build.drive}/newpath-test.txt">foo</echo>
+        <sleep seconds="1" />
+        <au:assertFileExists file="${helium.dir}/build/test/preproot/buildtest_0.00.0/newpath-test.txt" />
+        <delete file="${build.drive}/newpath-test.txt" />
+    </target>
+
+    <!-- we should keep the content of the build.drive -->
+    <target name="-test-prep-drive2">
+        <property name="prep.build.dir.keep" value="1" />
+        <runtarget target="prep-drive" />
+        <echo file="${build.drive}/prepdrive-test.txt">foo</echo>
+        <au:assertFileExists file="${build.drive}/prepdrive-test.txt" />
+        <runtarget target="prep-drive" />
+        <au:assertFileExists file="${build.drive}/prepdrive-test.txt" />
+        <delete file="${build.drive}/prepdrive-test.txt" />
+    </target>
+
+    <target name="test-prep-drive-invalid">
+        <if>
+            <os family='windows'/>
+            <then>
+                <exec osfamily="windows" executable="python" failonerror="true" outputproperty="testbuild.drive">
+                    <arg value="${helium.dir}/tools/common/python/scripts/searchnextdrive.py"/>               
+                </exec>
+                <au:expectfailure>
+                    <antcall target="prep-drive">
+                        <param name="prep.build.dir" value="${testbuild.drive}:\Build_${testbuild.drive}\viramana\ido_ba\ido_lodo_50_ivalo\20090723181916_pf_5250_200930"/>
+                        <param name="build.drive.notdefined" value="true"/>
+                    </antcall>
+                </au:expectfailure>
+            </then>
+        </if>
+    </target>
+    <target name="test-prep-drive-valid">
+        <if>
+            <os family='windows'/>
+            <then>
+                <tempfile property="prep.temp.build.dir" destDir="${env.TEMP}"/>
+                <mkdir dir="${prep.temp.build.dir}"/>
+                <antcall target="prep-drive">
+                    <param name="prep.build.dir" value="${prep.temp.build.dir}"/>
+                    <param name="build.drive.notdefined" value="true"/>
+                </antcall>
+                <au:assertFileExists file="${build.drive}"/>
+                <hlm:unsubst drive="${build.drive}"/>
+                <delete dir="${prep.temp.build.dir}"/>
+            </then>
+        </if>
+    </target>
+
+    <!--<import file="../../../helium.ant.xml"/>
+    
+     TODO: should these run on build.xml -->
+    <!--<target name="test-build-int-not-set">    
+        <runtarget target="get-build-number"/>
+        <assertFileExists file="${env.TEMP}/buildtest/builds/buildtest_0.00__build_int_db.txt"/>
+        <echo>${build.number}</echo>
+        <delete file="${env.TEMP}/buildtest/builds/buildtest_0.00__build_int_db.txt"/>
+    </target>
+    
+    <target name="test-build-int-exists">
+        <propertyfile file="${env.TEMP}/buildtest/builds/buildtest_0.00__build_int_db.txt" comment="build.int db">
+            <entry key="build.int" type="int" default="001" operation="+" pattern="000"/>
+        </propertyfile>    
+        <runtarget target="get-build-number"/>
+        <assertFileExists file="${env.TEMP}/buildtest/builds/buildtest_0.00__build_int_db.txt"/>
+        <echo>${build.number}</echo>
+        <delete file="${env.TEMP}/buildtest/builds/buildtest_0.00__build_int_db.txt"/>
+        <assertPropertyEquals name="build.number" value="002"/>
+    </target>-->
+
+
+    <!-- Change synergy release tag  -->
+    <target name="-test-ccm-release-tag-change">
+        <property name="teamlevel.ci.system" value="true" />
+        <property name="teamlevel.folder.number" value="to1tobet#90" />
+        <property name="ccm.database" value="to1tobet" />
+
+        <!-- Change releage tag as 'mc/TOWEC010' -->
+        <var name="programlevel.release.tag" value="mc/TOWEC010" />
+        <antcall target="change-release-tag" />
+
+        <!-- Change releage tag as 'mc/TOTEC010' -->
+        <var name="programlevel.release.tag" value="mc/TOTEC010" />
+        <antcall target="change-release-tag" />
+
+        <script language="jython" setbeans="false">
+import ccm
+
+curDb = project.getProperty('ccm.database')
+releaseTag = project.getProperty('programlevel.release.tag')
+task = "to1tobet#3656"
+session = ccm.open_session(database=curDb)
+cmdline = "task "+ task + " -sh release"
+result = session.execute(cmdline)
+searchStartStr = r"Task " + task + ": " + releaseTag
+strExists = str(result).find(searchStartStr)
+project.setProperty("r.tag", str(strExists))
+        </script>
+
+        <au:assertTrue>
+            <equals arg1="${r.tag}" arg2="0" />
+        </au:assertTrue>
+    </target>
+
+    <!-- Test for check the to get substituted drives -->
+    <target name="test-backup-subst-drives">
+        <antcall target="backup-subst-drives" />
+        <if>
+            <os family="windows"/>
+            <then>
+                <au:assertFileExists file="${cache.dir}\hlmsubsteddrives.bat" />
+            </then>
+        </if>
+    </target>
+
+</project>

@@ -1,0 +1,352 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : test_common.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test_common" xmlns:au="org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <property environment="env"/>
+    
+    <property name="helium.dir" location="../../.." />
+    <import file="../../../helium.ant.xml"/>
+        
+    <target name="test-text-config">
+        <hlm:configuration file="${helium.dir}/tests/data/ant_config_test.txt"/>
+        <au:assertPropertyEquals name="text.a" value="text.value.A"/>
+        <au:assertPropertyEquals name="text.b" value="text.value.B"/>
+        <au:assertPropertyEquals name="text.c" value="text.value.A"/>
+    </target>
+
+    
+    <target name="test-xml-config">
+        <hlm:configuration file="${helium.dir}/tests/data/ant_config_test.xml"/>
+        <au:assertPropertyEquals name="xml.c" value="C"/>
+        <au:assertPropertyEquals name="xml.d" value="D"/>
+    </target>
+    
+    
+    <target name="test-text-config-from-fileset">
+        <hlm:configuration>
+            <fileset file="../../../tests/data/ant_config_test.txt"/>
+        </hlm:configuration>
+        <au:assertPropertyEquals name="text.a" value="text.value.A"/>
+        <au:assertPropertyEquals name="text.b" value="text.value.B"/>
+    </target>
+    
+    
+    <target name="test-xml-config-from-fileset">
+        <hlm:configuration>
+            <fileset file="../../../tests/data/ant_config_test.xml"/>
+        </hlm:configuration>
+        <au:assertPropertyEquals name="xml.c" value="C"/>
+        <au:assertPropertyEquals name="xml.d" value="D"/>
+    </target>
+    
+    
+    <target name="test-password-log-filtering">
+        <property name="password" value="foobarbaz"/>
+        <if>
+            <available file="${build.output.dir}" type="dir"/>
+            <then>
+                <record name="${build.log}" action="start"/>
+                <echo>Before password filtering</echo>
+                <hlm:filterRecordStartMacro/>
+                <echo>Logging password: ${password}</echo>
+                <hlm:filterRecordStopMacro pattern="${password}"/>
+                <echo>After password filtering</echo>
+                <record name="${build.log}" action="stop"/>
+            </then>
+        </if>
+    </target>
+    
+    
+    <target name="test-record">
+        <echo file="${helium.dir}/record-test.txt">foo</echo>
+        <record name="${helium.dir}/record-test.txt" action="stop" append="true"/>
+        <loadfile srcFile="${helium.dir}/record-test.txt" property="record.test"/>
+        <au:assertPropertyEquals name="record.test" value="foo"/>
+        <delete file="${helium.dir}/record-test.txt"/>
+    </target>
+    
+    
+    <target name="test-python-task">
+        <hlm:python script="${helium.dir}/tests/data/PythonTest.py" outputProperty="correct_output" resultProperty="correct_result"/>
+        <au:assertPropertyEquals name="correct_output" value="test complete!"/>
+        <au:assertPropertyEquals name="correct_result" value="0"/>
+        <hlm:python script="PythonTest.py" resultProperty="no_file_result"/>     
+        <au:assertPropertyEquals name="no_file_result" value="2"/>
+    </target>
+    
+    
+    <target name="test-assert">
+        <assert>
+            <bool>
+                <isset property="foobar"/>    
+            </bool>
+        </assert>
+    </target>
+    
+    
+    <target name="test-hlm-assert">
+        <hlm:assert>
+            <isset property="foobar"/>
+        </hlm:assert>
+        <au:assertLogContains text="Warning: "/>        
+    </target>
+            
+    <target name="test-hlm-assertFileExists">
+        <hlm:assertFileExists file="missingFile.txt"/>
+        <au:assertLogContains text="Warning: "/>
+        <property name="hlm.enable.asserts" value="true"/>
+        <trycatch property="hlm-assertFileExists.thrown">
+            <try>
+                <hlm:assertFileExists file="missingFile.txt"/>
+            </try>
+        </trycatch>
+        <au:assertPropertySet name="hlm-assertFileExists.thrown"/>
+        <echo file="assert_test_tempFile.txt">Foobar</echo>
+        <hlm:assertFileExists file="assert_test_tempFile.txt"/>
+        <delete file="assert_test_tempFile.txt"/>
+    </target>
+    
+    
+    <target name="test-jepp">
+        <script language="jython" setbeans="false">
+print "It works!"
+print dir(project)
+print project.getName()
+import re
+print re.match(r"foo(?=bar)", r"foobar")
+
+import net.sf.antcontrib.logic
+runtarget = net.sf.antcontrib.logic.RunTargetTask()
+print runtarget
+runtarget.setProject(project)
+runtarget.setTarget('hello')
+runtarget.execute()
+
+#from java.lang import Class
+#tasks = project.getTaskDefinitions()
+#signal_macro_def = tasks.get('signal')
+#signal_macro = signal_macro_def.newInstance()
+#signal_macro.setDynamicAttribute('name', 'foobar')
+#signal_macro.setProject(project)
+#print signal_macro
+#print dir(signal_macro)
+#signal_macro = signal_macro.cast('MacroInstance')
+#signal_macro = project.createTask('org.apache.tools.ant.taskdefs.MacroInstance')
+#print dir(signal_macro)
+#signal_macro.execute()
+        </script>
+    </target>
+
+    
+    <target name="try-xmltask">
+        <xmltask dest="xmltask_test.xml">
+            <insert path="/"  >
+            <![CDATA[
+            <test/>
+            ]]>
+            </insert>
+        </xmltask>
+        <script language="jython" setbeans="false">
+result = ",".join([str(i) for i in range(10000)])
+project.setProperty("xml.test.list", str(result))
+        </script>
+        <echo>${xml.test.list}</echo>
+        <for param="number" list="${xml.test.list}">
+            <sequential>
+                <xmltask source="xmltask_test.xml"
+                         dest="xmltask_test.xml">
+                    <insert path="/test">
+                       <![CDATA[
+            <element>@{number}</element>
+            ]]>
+                   </insert>
+                </xmltask>
+            </sequential>
+        </for>
+    </target>
+    
+    
+    <!-- Tests the assertXmlEqual task. -->
+    <target name="test-assertXmlEqual">
+        <string id="control.xml" value="&lt;foo/&gt;"/>
+        <string id="test_good.xml" value="&lt;foo/&gt;"/>
+        <string id="test_bad.xml" value="&lt;foobar/&gt;"/>
+        <hlm:assertXmlEqual control="control.xml" test="test_good.xml" failonerror="false"/>
+        <trycatch property="hlm-assertXmlEqual.thrown">
+            <try>
+                <hlm:assertXmlEqual control="control.xml" test="test_bad.xml"/>
+            </try>
+        </trycatch>
+        <au:assertPropertySet name="hlm-assertXmlEqual.thrown"/>
+    </target>
+    
+    
+    <target name="test-prettyprintxml-filter">
+        <loadfile srcfile="${helium.dir}/tests/data/config_test.cfg.xml" property="xml.test.content">
+            <filterchain>
+                <tokenfilter>
+                    <filetokenizer/>
+                    <hlm:prettyprintxml/>
+                </tokenfilter>
+            </filterchain>
+        </loadfile>
+        <echo>Pretty-printed XML:
+            
+${xml.test.content}</echo>
+    </target>
+    
+    
+    <!--<target name="test-ccm-task">
+        <ccm/>
+    </target>-->
+    
+    <!-- Tests the touch functionality. -->
+    <target name="test-hlm-touch">
+        <hlm:touch>
+            <path>
+                <pathelement path="${helium.dir}/build"/>
+            </path>
+        </hlm:touch>
+    </target>
+    
+    <!-- Test parsemodel -->
+    <target name="test-parsemodel-description">
+        <hlm:parsemodel output="${helium.build.dir}/test_helium_data_model.xml_parsed" input="${helium.dir}/tests/data/data_model_validation_test.xml"/>            
+        <!-- Check if parsed file exist -->
+        <au:assertFileExists file="${helium.build.dir}/test_helium_data_model.xml_parsed" />
+        <xpathtest xmlfile="${helium.build.dir}/test_helium_data_model.xml_parsed">  
+            <namespace uri="" prefix=""/>
+            <!-- Check property description has been rendered as Media Wiki Syntax -->
+            <xpath expression="/heliumDataModel/property[description = '&lt;p&gt;Test property one.&lt;/p&gt;']"/>
+            <!-- Check group description has been rendered as Media Wiki Syntax -->
+            <xpath expression="/heliumDataModel/group[description = '&lt;p&gt;Group description test.&lt;/p&gt;']"/>
+            <!-- Check ** has been removed from property description -->
+            <xpath expression="/heliumDataModel/property[description = '&lt;p&gt;Test property Three.&lt;/p&gt;']"/>
+        </xpathtest>
+    </target>
+    
+    <!-- Test user flow graph creation -->
+    <target name="test-helium-user-graph">
+        <runtarget target="helium-user-graph"/>
+        <!--<au:assertFileExists file="${helium.dir}/build/doc/user-graph.html"/>-->
+        <au:assertFileExists file="${helium.dir}/build/doc/images/user-graph.dot.png"/>
+        <!--<sequential>
+            <au:assertTrue>
+                <isfileselected file="${helium.dir}/build/doc/user-graph.html">
+                    <contains text="area shape"/>
+                </isfileselected>
+            </au:assertTrue>
+        </sequential>-->
+    </target>
+    
+    
+    <target name="test-tempRecordMacro">
+        <delete file="${build.cache.log.dir}/test.log" failonerror="false"/>
+        <delete file="${build.cache.log.dir}/test.log.xml" failonerror="false"/>
+        <delete file="${build.cache.log.dir}/test.sqlite" failonerror="false"/>
+        <delete file="${metadata.dbfile}" failonerror="false"/>
+        <hlm:tempRecordStartMacro name="test.log" />
+        <echo>ERROR: an error</echo>
+        <echo>WARNING: a warning</echo>
+        <echo>INFO: some useless message</echo>
+        <hlm:tempRecordStopMacro name="test.log" database="${build.cache.log.dir}/test.sqlite"/>
+        <au:assertTrue>
+            <and>
+                <hlm:hasSeverity file="${build.cache.log.dir}/signals/test.log.status.xml" severity="error"/>
+                <hlm:hasSeverity file="${build.cache.log.dir}/signals/test.log.status.xml" severity="warning"/>
+                <hlm:hasSeverity file="${build.cache.log.dir}/signals/test.log.status.xml" severity="info"/>
+            </and>
+        </au:assertTrue>
+    </target> 
+
+    <target name="test-helium_project_path">
+        <delete file="${build.cache.log.dir}/project-compile.cmaker.html" failonerror="false"/>
+        <fmpp sourceFile="${helium.dir}/doc/src/api/project.html.ftl" outputFile="${build.cache.log.dir}/project-compile.cmaker.html">
+            <data expandProperties="yes">
+                ant: antProperties()
+                doc: xml(${helium.dir}/tests/data/test_database.xml)
+                data: xml(${helium.dir}/tests/data/data_model_validation_test.xml)
+            </data>            
+        </fmpp>
+        <au:assertFileExists file="${build.cache.log.dir}/project-compile.cmaker.html"/>
+        <sequential>
+            <au:assertTrue>
+                <isfileselected file="${build.cache.log.dir}/project-compile.cmaker.html">
+                    <contains text="Location"/>
+                </isfileselected>
+            </au:assertTrue>
+            <au:assertTrue>
+                <isfileselected file="${build.cache.log.dir}/project-compile.cmaker.html">
+                    <contains text="helium/tools/compile/cmaker.ant.xml"/>
+                </isfileselected>
+            </au:assertTrue>
+            <au:assertTrue>
+                <isfileselected file="${build.cache.log.dir}/project-compile.cmaker.html">
+                    <contains text="http://helium.nmp.nokia.com/trac/browser/helium/trunk/helium/tools/compile/cmaker.ant.xml"/>
+                </isfileselected>
+            </au:assertTrue>
+        </sequential>
+    </target>
+
+    <target name="test-sisfiles">
+        <tempfile destdir="${build.cache.dir}" property="sisfiles.tempconfig.file" suffix=".xml"/>
+        <tempfile destdir="${build.cache.dir}" property="sis.config.file.parsed" suffix=".xml"/>
+        <if>
+            <os family='windows'/>
+            <then>
+                <property name="echocmd" value="${helium.dir}/tools/common/test/echo.bat"/>
+            </then>
+            <else>
+                <property name="echocmd" value="echo"/>
+            </else>
+        </if>
+        <echoxml  file="${sisfiles.tempconfig.file}">
+            <build>
+                <config abstract="true">
+                    <set name="makesis.tool" value="${echocmd}"/>
+                    <set name="signsis.tool" value="${echocmd}"/>
+                    <set name="build.sisfiles.dir" value="${build.cache.dir}/sisfilestest"/>
+                    <set name="key" value=""/>
+                    <set name="cert" value=""/>
+                    <config>
+                        <set name="name" value=""/>
+                        <set name="path" value=""/>
+                    </config>
+                </config>
+            </build>
+        </echoxml>
+        <antcall target="sisfiles">
+            <param name="sis.config.file" value="${sisfiles.tempconfig.file}"/>
+            <param name="sis.config.file.parsed" value="${sis.config.file.parsed}"/>
+            <param name="build.sisfiles.dir" value="${build.cache.dir}/helium/temp_drive/output/sisfiles"/>
+            <param name="temp.build.dir" value="${build.cache.dir}/helium/temp_drive/output/temp_build_files"/>
+            <param name="build.drive" value="${build.cache.dir}/helium/temp_drive/"/>
+            <param name="build.cache.log.dir" value="${build.cache.dir}/helium/temp_drive/output/logs"/>
+            <param name="metadata.dbfile" value="${build.cache.dir}/helium/temp_drive/output/logs/${build.id}_metadata.sqlite"/>
+        </antcall>
+        <au:assertFileExists file="${build.cache.dir}/helium/temp_drive/output/temp_build_files/sis_build.ant.xml"/>
+        <delete file="${sisfiles.tempconfig.file}"/>
+        <delete file="${sis.config.file.parsed}"/>
+        <delete dir="${build.cache.dir}/helium/temp_drive"/>
+    </target>
+</project>
+

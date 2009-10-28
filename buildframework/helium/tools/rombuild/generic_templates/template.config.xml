@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : template.config.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<flash_config>
+    <image_set>
+        <product>${rommake.product.name}</product>
+        <type_designator>${version.product.type}</type_designator>
+        <image_type>${image.type}</image_type>
+        <sw_version>${core.version.info}</sw_version>
+        <image type="core" path="${core.image.path}" name="${core.image.name}.core.fpsx" />
+        <image type="language" id="${languagepack.id}" path="${languagepack.image.path}" name="${languagepack.image.name}.language.fpsx" />
+        <image type="customer" id="${customer.id}" path="${customer.image.path}" name="${customer.image.name}.customer.fpsx" build="${customer.image.version.name}"/>
+        <image type="uda" id="${uda.id}" path="${uda.image.path}" name="${uda.image.name}.uda.fpsx"/>
+        <image type="massmemory" id="${massmemory.id}" path="${massmemory.image.path}" name="${massmemory.image.name}.massmemory.fpsx"/>
+        <image type="memorycard" id="${memorycard.id}" path="${memorycard.image.path}" name="${memorycard.image.name}.memorycard.fpsx"/>
+        <fwid>${fota.fwid}</fwid>
+        <description>Vanilla ${description}</description>
+        <date>${release.date}</date>
+    </image_set>
+</flash_config>

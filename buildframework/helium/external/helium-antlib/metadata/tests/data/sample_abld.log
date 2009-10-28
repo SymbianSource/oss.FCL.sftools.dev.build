@@ -1,0 +1,488 @@
+
+x:\>set
+ALLUSERSPROFILE=C:\Documents and Settings\All Users
+ANT_ARGS=-lib "E:\BUILD_E\ido-config-cc-svn\helium-4.0.x_lat\helium\external\helium-antlib\bin" -lib "E:\BUILD_E\ido-config-cc-svn\helium-4.0.x_lat\helium\tools\common\java\lib" -lib "E:\BUILD_E\ido-config-cc-svn\helium-4.0.x_lat\helium\external\antlibs" -lib "E:\BUILD_E\ido-config-cc-svn\helium-4.0.x_lat\helium\external\antlibs\internal" -lib "E:\BUILD_E\ido-config-cc-svn\helium-4.0.x_lat\helium\external\jep_1.6_2.5" -logger com.nokia.ant.HeliumLogger   -listener com.nokia.helium.diamonds.ant.HeliumListener  -listener com.nokia.ant.listener.internaldata.Listener  -Dant.executor.class=com.nokia.helium.core.ant.HeliumExecutor  -listener com.nokia.ant.listener.TracingLogger
+ANT_CMD_LINE_ARGS=-Dhelium.dir "E:\BUILD_E\ido-config-cc-svn\helium-4.0.x_lat\helium" -listener nokia.ant.XmlLogger -DXmlLogger.file E:\BUILD_E\ido-config-cc-svn\cruisecontrol/../robot/log.xml -Dcclastbuildtimestamp 20090702114112 "-Dcvstimestamp=2009-07-02 12:11:44 GMT" -Dbuildforced false -Dcclastgoodbuildtimestamp 20090606000000 -Dcctimestamp 20090702131144 -Dlabel build.33 -Dprojectname ido_abs_tb92-nightly -Dlastbuildsuccessful false -Dbuild.system ec-helium -Dconfiguration.dir E:\BUILD_E\ido-config-cc-svn\cruisecontrol/../idos/abs/branches/tb92-nightly -Dbuild.drive x: -Ds60.grace.cache E:\BUILD_E\ido-config-cc-svn\build/ido_abs_tb92-nightly_grace_cache.txt -Dskip.codescanner true -Dcc.output.dir E:\BUILD_E\ido-config-cc-svn\build -buildfile E:\BUILD_E\ido-config-cc-svn\cruisecontrol/config/wrapper.xml test-publish-prop ido-build
+ANT_HOME=C:\APPS\ant_1.7
+ANT_OPTS=-Xmx896M -Dlog4j.configuration=com/nokia/log4j.xml
+APPDATA=C:\Documents and Settings\varamana\Application Data
+APTLMHOST=@oupelic4.emea.nsn-net.net
+ARMLMD_LICENSE_FILE=8224@falic01.europe.nokia.com;8224@salmg01.nmp.nokia.com;
+ARMROOT=\
+ARMV5VER=:ARM/Thumb C/C++ Compiler, RVCT2.2 [Build 593]
+CCDIR=E:\BUILD_E\ido-config-cc-svn\helium-4.0.x_lat\helium\external\CruiseControl\
+CC_BAT=E:\BUILD_E\ido-config-cc-svn\helium-4.0.x_lat\helium\external\CruiseControl\real_cruisecontrol.bat
+CC_OPTS= -Ddashboard.config=E:\BUILD_E\ido-config-cc-svn\build\helium-dashboard-config.xml -Xms512m -Xmx1024m
+CLASSPATH=e:\BUILD_E\ido-config-cc-svn\helium-4.0.x_lat\helium\external\CruiseControl\lib;%CLASSPATH%
+CLIENTNAME=4GBD01728
+ClusterLog=C:\EESP\Cluster\cluster.log
+CMTHOME=C:\APPS\cmt
+CommonProgramFiles=C:\Program Files\Common Files
+COMPUTERNAME=FASYM011
+ComSpec=C:\EESP\system32\cmd.exe
+COPYCMD=/y
+CRUISE_PATH=C:\Apps\j2sdk_1.6.0_02\lib\tools.jar
+CTCHOME=C:\APPS\ctc
+DERBY_HOME=C:\APPS\j2sdk_1.6.0_02\JavaDB
+DIAMONDS_ANT_ARGS= -listener com.nokia.helium.diamonds.ant.HeliumListener
+EMAKEFLAGS=--no-print-directory --emake-volatile=.def,.info,.class,.mmp --emake-reg-roots=-\HKEY_CLASSES_ROOT
+EMAKE_CM=fawec001
+EMAKE_EMULATION=symbian
+EMAKE_ROOT=\;c:\apps
+EPOCROOT=\
+EXEC="C:\Apps\j2sdk_1.6.0_02\bin\java"  -Ddashboard.config=E:\BUILD_E\ido-config-cc-svn\build\helium-dashboard-config.xml -Xms512m -Xmx1024m -Djmx.remote.x.server.connection.timeout=-1 -Djmx.remote.x.client.connection.check.period=0 -jar "E:\BUILD_E\ido-config-cc-svn\helium-4.0.x_lat\helium\external\CruiseControl\lib\cruisecontrol-launcher.jar" -webapppath E:\BUILD_E\ido-config-cc-svn\helium-4.0.x_lat\helium\external\CruiseControl/webapps/cruisecontrol -dashboard E:\BUILD_E\ido-config-cc-svn\helium-4.0.x_lat\helium\external\CruiseControl/webapps/dashboard -webport 8080 -rmiport 1099
+FILTERWHAT_FILE=\output\logs\about_what.log
+FLEXLM_BATCH=1
+FLEXLM_TIMEOUT=900000
+FP_NO_HOST_CHECK=NO
+HELIUM_CACHE_DIR=C:\DOCUME~1\varamana\LOCALS~1\Temp\2\helium\varamana
+HELIUM_HOME=E:\BUILD_E\ido-config-cc-svn\helium-4.0.x_lat\helium
+HLM_ENABLE_MEM_TRACING=1
+HLM_MEM_TRACING_ANT_ARGS= -listener com.nokia.ant.listener.TracingLogger
+HOME=h:\
+HOMEDRIVE=C:
+HOMEPATH=\Documents and Settings\varamana
+include=C:\apps\msvc6\VC98\ATL\INCLUDE;C:\apps\msvc6\VC98\INCLUDE;C:\apps\msvc6\VC98\MFC\INCLUDE;C:\apps\msvc6\VC98\atl\include;C:\apps\msvc6\VC98\mfc\include;C:\apps\msvc6\VC98\include
+INTERNAL_DATA_ANT_ARGS= -listener com.nokia.ant.listener.internaldata.Listener
+JAVA_1_3_1_HOME=C:\APPS\j2sdk_1.3.1_06
+JAVA_HOME=C:\Apps\j2sdk_1.6.0_02
+JAVA_PATH="C:\Apps\j2sdk_1.6.0_02\bin\java"
+JEP_HOME=E:\BUILD_E\ido-config-cc-svn\helium-4.0.x_lat\helium\external\jep_1.6_2.5
+LAUNCHER=E:\BUILD_E\ido-config-cc-svn\helium-4.0.x_lat\helium\external\CruiseControl\lib\cruisecontrol-launcher.jar
+lib=C:\apps\msvc6\VC98\LIB;C:\apps\msvc6\VC98\MFC\LIB;C:\apps\msvc6\VC98\mfc\lib;C:\apps\msvc6\VC98\lib
+LIBDIR=E:\BUILD_E\ido-config-cc-svn\helium-4.0.x_lat\helium\external\CruiseControl\lib
+LM_LICENSE_FILE=C:\APPS\licenses\emea.dat;1700@saslmg02.nmp.nokia.com;C:\APPS\licenses\PCLint.dat;6969@saslmg04.nmp.nokia.com;
+LOGONSERVER=\\CAWDC101
+MSDevDir=C:\apps\msvc6\Common\msdev98
+MSVCDir=C:\apps\msvc6\VC98
+MSVC_ENV_BAT=c:\APPS\msvc6\VC98\Bin\VCVARS32.BAT
+MWCSym2Includes=C:\APPS\carbide\x86Build\Symbian_Support\MSL\MSL_C\MSL_Common\Include;C:\APPS\carbide\x86Build\Symbian_Support\MSL\MSL_C\MSL_Win32\Include;C:\APPS\carbide\x86Build\Symbian_Support\MSL\MSL_C\MSL_X86;C:\APPS\carbide\x86Build\Symbian_Support\MSL\MSL_C++\MSL_Common\Include;C:\APPS\carbide\x86Build\Symbian_Support\MSL\MSL_Extras\MSL_Common\Include;C:\APPS\carbide\x86Build\Symbian_Support\MSL\MSL_Extras\MSL_Win32\Include;C:\APPS\carbide\x86Build\Symbian_Support\Win32-x86 Support\Headers\Win32 SDK
+MWSym2Libraries=C:\APPS\carbide\x86Build\Symbian_Support\Win32-x86 Support\Libraries\Win32 SDK;C:\APPS\carbide\x86Build\Symbian_Support\Runtime\Runtime_x86\Runtime_Win32\Libs
+MWSym2LibraryFiles=MSL_All_MSE_Symbian_D.lib;gdi32.lib;user32.lib;kernel32.lib;
+NOKIA_LICENSE_FILE=C:\APPS\licenses\emea.dat;
+NUMBER_OF_PROCESSORS=4
+OS=Windows_NT
+Path=C:\apps\msvc6\Common\msdev98\BIN;C:\apps\msvc6\VC98\BIN;C:\apps\msvc6\Common\TOOLS\WINNT;C:\apps\msvc6\Common\TOOLS;e:\BUILD_E\ido-config-cc-svn\sbs\bin;e:\BUILD_E\slick-svn\bin;c:\ECloud\i686_win32\bin;C:\Program Files\HP\NCU;c:\apps\actperl\bin\;c:\apps\rvct22_593\bin;c:\apps\atool;\epoc32\tools;\epoc32\gcc\bin;c:\apps\ue;c:\apps\ccm65\bin;c:\apps\carbide\x86build\symbian_tools\command_line_tools;c:\apps\symdec;c:\apps\actpython\.;C:\Symbian\SITK\stat\bin;C:\Symbian\SITK;C:\Symbian\SITK\edgd\bin\;C:\Symbian\SITK\cbr;C:\Symbian\SITK\ucc\bin;C:\Symbian\SITK\ucc\SyncService\bin;C:\Symbian\SITK\ucc\TestDriverService\bin;C:\Symbian\SITK\sqlite-db-creator;C:\Symbian\SITK\testdriver\product;C:\Symbian\SITK\imgcheck;C:\Symbian\SITK\SystemModelGenerator;C:\Symbian\SITK/sbs/bin;;c:\program files\hp\ncu;c:\program files\windows resource kits\tools\;c:\eesp\system32;c:\eesp\system32\wbem;c:\apps\msvc6\common\tools\winnt;c:\apps\msvc6\common\msdev98\bin;c:\apps\msvc6\vc98\bin;c:\progra~1\winzip;c:\apps\wget;c:\apps\ant_1.7\bin;c:\apps\understand\bin\pc-win95;c:\etpwin\system32;c:\etpwin\system32\wbem;c:\apps\sbs\bin;c:\apps\pclint;c:\apps\cltools;c:\apps\codescanner;c:\apps\symrec;c:\apps\gracecli\bin;c:\apps\7zip;c:\apps\ctc;c:\apps\unzip;c:\apps\bc;c:\apps\cmt\;c:\apps\j2sdk_1.6.0_02;E:\BUILD_E\ido-config-cc-svn\helium-4.0.x_lat\helium\external\jep_1.6_2.5;\epoc32\tools;\epoc32\gcc\bin;\epoc32\tools\build;\epoc32\rombuild;E:\BUILD_E\ido-config-cc-svn\helium-4.0.x_lat\helium\tools\common\bin;E:\BUILD_E\ido-config-cc-svn\helium-4.0.x_lat\helium\external\unxutils;E:\BUILD_E\ido-config-cc-svn\helium-4.0.x_lat\helium\external\filedisk;E:\BUILD_E\ido-config-cc-svn\helium-4.0.x_lat\helium\external\info-zip;E:\BUILD_E\ido-config-cc-svn\helium-4.0.x_lat\helium\external\Subversion\bin;E:\BUILD_E\ido-config-cc-svn\helium-4.0.x_lat\helium\external\graphviz\bin;E:\BUILD_E\ido-config-cc-svn\helium-4.0.x_lat\helium\external\LSC_5.2;\tools;\tools\ncp_tools;C:\APPS\ctc;C:\EESP\system32;C:\EESP;C:\EESP\System32\Wbem\;C:\EESP\system32;C:\EESP;C:\EESP\System32\Wbem;C:\ETPWIN\system32;C:\ETPWIN;C:\ETPWIN\System32\Wbem
+PATHEXT=.COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.py;.pyw
+PERL=C:\APPS\actperl\bin\perl.exe
+PERL5LIB=E:\BUILD_E\ido-config-cc-svn\helium-4.0.x_lat\helium\tools\common\packages
+PID=8296
+ppd_tools=\tools\
+PROCESSOR_ARCHITECTURE=x86
+PROCESSOR_IDENTIFIER=x86 Family 15 Model 5 Stepping 10, AuthenticAMD
+PROCESSOR_LEVEL=15
+PROCESSOR_REVISION=050a
+ProgramFiles=C:\Program Files
+PROMPT=$P$G
+PYTHONPATH=E:\BUILD_E\ido-config-cc-svn\helium-4.0.x_lat\helium\external\python\lib\2.5;E:\BUILD_E\ido-config-cc-svn\helium-4.0.x_lat\helium\tools\common\python\lib;e:\BUILD_E\ido-config-cc-svn\sbs\python
+RVCT22BIN=C:\APPS\rvct22_593\bin
+RVCT22INC=C:\APPS\rvct22_593\include
+RVCT22LIB=C:\APPS\rvct22_593\lib
+RVCT22_ASMOPT=--licretry --fastlicense --sitelicense
+RVCT22_CCOPT=--licretry --fastlicense --sitelicense
+RVCT22_LINKOPT=--licretry --fastlicense --sitelicense
+SBS_HOME=e:\BUILD_E\ido-config-cc-svn\sbs
+SESSIONNAME=RDP-Tcp#22
+SIGNALING_ANT_ARGS= -Dant.executor.class=com.nokia.helium.core.ant.HeliumExecutor
+SITK_PATHS=C:\Symbian\SITK\stat\bin;C:\Symbian\SITK;C:\Symbian\SITK\edgd\bin\;C:\Symbian\SITK\cbr;C:\Symbian\SITK\ucc\bin;C:\Symbian\SITK\ucc\SyncService\bin;C:\Symbian\SITK\ucc\TestDriverService\bin;C:\Symbian\SITK\sqlite-db-creator;C:\Symbian\SITK\testdriver\product;C:\Symbian\SITK\imgcheck;C:\Symbian\SITK\SystemModelGenerator;C:\Symbian\SITK/sbs/bin;
+spp_tools=\tools\
+SYMBIANBUILD_DEPENDENCYOFF=1
+SYMSEE_VERSION=9.1.0
+SystemDrive=C:
+SystemRoot=C:\EESP
+TEAM=xxxxxx
+TEMP=C:\DOCUME~1\varamana\LOCALS~1\Temp\2
+TESTED_ANT=C:\APPS\ant_1.7
+TESTED_JAVA=C:\Apps\j2sdk_1.6.0_02
+TMP=C:\DOCUME~1\varamana\LOCALS~1\Temp\2
+USERDNSDOMAIN=noe.nokia.com
+USERDOMAIN=NOE
+USERNAME=varamana
+USERPROFILE=C:\Documents and Settings\varamana
+windir=C:\EESP
+_JAVACMD=C:\Apps\j2sdk_1.6.0_02\bin\java.exe
+_USE_CLASSPATH=yes
+
+x:\>emake --emake-build-label=ido_abs_tb92-nightly_5.2.33.dfs_build --emake-class=default --emake-priority=normal --emake-maxagents=0 --emake-job-limit=0 --emake-mem-limit=1000000000 --emake-history=merge --emake-annodetail=basic,history,file,waiting --emake-annofile=x:\output\logs\ido_abs_tb92-nightly_5.2.33.dfs_build.emake.anno.xml --emake-historyfile=x:/emake.data --emake-debug=g --emake-logfile=x:\output\logs\ido_abs_tb92-nightly_5.2.33.dfs_build.emake.g.dlog --emake-root=\;c:\apps;E:\BUILD_E\ido-config-cc-svn\helium-4.0.x_lat\helium --emake-autodepend=1 -k -i -f x:/dfs_build.make LOGBUILDTIME="" VERBOSE="" SAVESPACE="" dfs_build 
+WARNING EC1137: Unrecognized option '--no-print-directory' in EMAKEFLAGS.
+Starting build: 50896
+WARNING EC1137: Unrecognized option '--no-print-directory' in EMAKEFLAGS.
+===-------------------------------------------------
+=== dfs_build
+===-------------------------------------------------
+=== dfs_build started Thu Jul  2 13:13:58 2009
+emake -f dfs_build.make dfs_build-bldmake_bldfiles
+make[1]: Entering directory `x:/'
+=== dfs_build == \sf/os/graphics/group
+-- bldmake bldfiles 
+++ Started at Thu Jul  2 13:13:58 2009
++++ HiRes Start 1246536838.91662
+cd \sf/os/graphics/group && bldmake bldfiles   -keepgoing   
++++ HiRes End 1246536840.97909
+++ Finished at Thu Jul  2 13:14:01 2009
+=== dfs_build == \sf/os/textandloc/group
+-- bldmake bldfiles 
+++ Started at Thu Jul  2 13:13:58 2009
++++ HiRes Start 1246536839.05724
+cd \sf/os/textandloc/group && bldmake bldfiles   -keepgoing   
+WARNING: Should install MSVC6 Service Pack 3
+WARNING: Should install MSVC6 Service Pack 3
+WARNING: Should install MSVC6 Service Pack 3
+WARNING: Should install MSVC6 Service Pack 3
+WARNING: Should install MSVC6 Service Pack 3
+WARNING: Should install MSVC6 Service Pack 3
+WARNING: Should install MSVC6 Service Pack 3
+WARNING: Should install MSVC6 Service Pack 3
+WARNING: Should install MSVC6 Service Pack 3
+WARNING: Should install MSVC6 Service Pack 3
+WARNING: Should install MSVC6 Service Pack 3
+WARNING: Should install MSVC6 Service Pack 3
+WARNING: Should install MSVC6 Service Pack 3
+WARNING: Should install MSVC6 Service Pack 3
+WARNING: Should install MSVC6 Service Pack 3
+WARNING: Should install MSVC6 Service Pack 3
+WARNING: Should install MSVC6 Service Pack 3
+WARNING: Should install MSVC6 Service Pack 3
++++ HiRes End 1246536842.55719
+++ Finished at Thu Jul  2 13:14:02 2009
+make[1]: Leaving directory `x:/'
+emake -f dfs_build.make dfs_build-abld_export
+make[1]: Entering directory `x:/'
+=== dfs_build == \sf/os/graphics/group
+-- abld export 
+++ Started at Thu Jul  2 13:14:02 2009
++++ HiRes Start 1246536843.01031
+cd \sf/os/graphics/group && abld export   -keepgoing   
+  emake -r  -k -f "\EPOC32\BUILD\sf\os\graphics\group\EXPORT.make" EXPORT VERBOSE=-s KEEPGOING=-k
+make[2]: Entering directory `X:/sf/os/graphics/group'
+copy "\sf\os\graphics\graphics_plat\openvg_binding_api\inc\vg\vgcontext.h" "\epoc32\include\platform\vg\vgcontext.h"
+        1 file(s) copied.
+copy "\sf\os\graphics\graphics_plat\openvg_binding_api\inc\vg\vgcontext_symbian.h" "\epoc32\include\platform\vg\vgcontext_symbian.h"
+        1 file(s) copied.
+copy "\sf\os\graphics\graphics_plat\m3g_core_api\inc\M3G\m3g_core.h" "\epoc32\include\platform\M3G\m3g_core.h"
+        1 file(s) copied.
+copy "\sf\os\graphics\graphicsaccelaration\3d_opengl_es_1_1\group\opengles_nokia.iby" "\epoc32\rom\include\opengles_nokia.iby"
+        1 file(s) copied.
+copy "\sf\os\graphics\graphicsaccelaration\2d_openvg_1_1\rom\openvg_nokia.iby" "\epoc32\rom\include\core\os\openvg_nokia.iby"
+        1 file(s) copied.
+copy "\sf\os\graphics\graphicsaccelaration\egl\group\egl_sw_gce.iby" "\epoc32\rom\include\egl_sw_gce.iby"
+        1 file(s) copied.
+copy "\sf\os\graphics\graphicsaccelaration\egl\group\egl_sw_nongce.iby" "\epoc32\rom\include\egl_sw_nongce.iby"
+        1 file(s) copied.
+copy "\sf\os\graphics\graphicsaccelaration\egl\implementation\products\egl\3.0\include\eglInternalApi.h" "\epoc32\include\platform\eglInternalApi.h"
+        1 file(s) copied.
+copy "\sf\os\graphics\graphicsaccelaration\egl\implementation\products\egl\3.0\include\oglcontextapi.h" "\epoc32\include\platform\oglContextApi.h"
+        1 file(s) copied.
+copy "\sf\os\graphics\graphicsaccelaration\egl\implementation\products\egl\3.0\include\ovgContextApi.h" "\epoc32\include\platform\ovgContextApi.h"
+        1 file(s) copied.
+copy "\sf\os\graphics\graphicsaccelaration\egl\implementation\products\egl\3.0\include\EGL\eglWrapper.h" "\epoc32\include\platform\EGL\eglWrapper.h"
+        1 file(s) copied.
+copy "\sf\os\graphics\graphicsaccelaration\egl\implementation\products\egl\3.0\src\symbian\eglsymbianpaniccodes.h" "\epoc32\include\platform\eglsymbianpaniccodes.h"
+        1 file(s) copied.
+copy "\sf\os\graphics\graphicsaccelaration\egl\implementation\libs\hg\3.1\hgDefs.h" "\epoc32\include\platform\hgDefs.h"
+        1 file(s) copied.
+copy "\sf\os\graphics\graphicsaccelaration\egl\implementation\libs\hg\3.1\hgPublicDefs.h" "\epoc32\include\platform\hgPublicDefs.h"
+        1 file(s) copied.
+copy "\sf\os\graphics\graphicsaccelaration\vgi\rom\libvgi.iby" "\epoc32\rom\include\core\os\libvgi.iby"
+        1 file(s) copied.
+copy "\sf\os\graphics\m3g\m3gcore11\rom\m3gcore.iby" "\epoc32\rom\include\core\os\m3gcore.iby"
+        1 file(s) copied.
+make[2]: Leaving directory `X:/sf/os/graphics/group'
++++ HiRes End 1246536843.8853
+++ Finished at Thu Jul  2 13:14:03 2009
+=== dfs_build == \sf/os/textandloc/group
+-- abld export 
+++ Started at Thu Jul  2 13:14:02 2009
++++ HiRes Start 1246536843.04156
+cd \sf/os/textandloc/group && abld export   -keepgoing   
+  emake -r  -k -f "\EPOC32\BUILD\sf\os\textandloc\group\EXPORT.make" EXPORT VERBOSE=-s KEEPGOING=-k
+make[2]: Entering directory `X:/sf/os/textandloc/group'
+Creating \sf\os\textandloc\inc
+copy "\sf\os\textandloc\textandloc_plat\findutil_api\inc\FindUtil.h" "\epoc32\include\platform\FindUtil.h"
+        1 file(s) copied.
+copy "\sf\os\textandloc\textandloc_plat\japanese_language_utilities_api\inc\jplangutil.h" "\epoc32\include\platform\mw\jplangutil.h"
+        1 file(s) copied.
+copy "\sf\os\textandloc\textandloc_plat\character_conversion_nonpublic_api\inc\JapaneseCharConv.h" "\epoc32\include\platform\JapaneseCharConv.h"
+        1 file(s) copied.
+copy "\sf\os\textandloc\textandloc_plat\sortutil_api\inc\SortUtil.h" "\epoc32\include\platform\SortUtil.h"
+        1 file(s) copied.
+copy "\sf\os\textandloc\textandloc_pub\character_conversion_api\inc\GBK.H" "\epoc32\include\GBK.H"
+        1 file(s) copied.
+copy "\sf\os\textandloc\textandloc_pub\character_conversion_api\inc\JISX0208.H" "\epoc32\include\JISX0208.H"
+        1 file(s) copied.
+copy "\sf\os\textandloc\textandloc_pub\character_conversion_api\inc\GB2312.H" "\epoc32\include\GB2312.H"
+        1 file(s) copied.
+copy "\sf\os\textandloc\textandloc_pub\character_conversion_api\inc\CharacterSetConverter.h" "\epoc32\include\CharacterSetConverter.h"
+        1 file(s) copied.
+copy "\sf\os\textandloc\textandloc_pub\character_conversion_api\inc\CONVDATA.H" "\epoc32\include\CONVDATA.H"
+        1 file(s) copied.
+copy "\sf\os\textandloc\textandloc_pub\character_conversion_api\inc\JISX0201.H" "\epoc32\include\JISX0201.H"
+        1 file(s) copied.
+copy "\sf\os\textandloc\textandloc_pub\character_conversion_api\inc\UTF.H" "\epoc32\include\UTF.H"
+        1 file(s) copied.
+copy "\sf\os\textandloc\textandloc_pub\character_conversion_api\inc\JISX0212.H" "\epoc32\include\JISX0212.H"
+        1 file(s) copied.
+copy "\sf\os\textandloc\textandloc_pub\character_conversion_api\inc\CharacterSetConverter.inl" "\epoc32\include\CharacterSetConverter.inl"
+        1 file(s) copied.
+copy "\sf\os\textandloc\textandloc_pub\character_conversion_api\inc\BIG5.H" "\epoc32\include\BIG5.H"
+        1 file(s) copied.
+copy "\sf\os\textandloc\textandloc_pub\character_conversion_api\inc\CONVNAMES.H" "\epoc32\include\CONVNAMES.H"
+        1 file(s) copied.
+copy "\sf\os\textandloc\textandloc_pub\character_conversion_api\inc\CHARCONV.H" "\epoc32\include\CHARCONV.H"
+        1 file(s) copied.
+copy "\sf\os\textandloc\textandloc_pub\character_conversion_api\inc\SHIFTJIS.H" "\epoc32\include\SHIFTJIS.H"
+        1 file(s) copied.
+copy "\sf\os\textandloc\textandloc_pub\character_conversion_plugin_provider_api\inc\CONVUTILS.H" "\epoc32\include\CONVUTILS.H"
+        1 file(s) copied.
+copy "\sf\os\textandloc\textandloc_pub\character_conversion_plugin_provider_api\inc\CONVGENERATEDCPP.H" "\epoc32\include\CONVGENERATEDCPP.H"
+        1 file(s) copied.
+copy "\sf\os\textandloc\textandloc_pub\directory_localizer_api\inc\DirectoryLocalizer.rh" "\epoc32\include\mw\DirectoryLocalizer.rh"
+        1 file(s) copied.
+copy "\sf\os\textandloc\textandloc_pub\directory_localizer_api\inc\CDirectoryLocalizer.h" "\epoc32\include\mw\CDirectoryLocalizer.h"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\localizer\rom\DirectoryLocalizer.iby" "\epoc32\rom\include\core\mw\directorylocalizer.iby"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\localizer\rom\DirectoryLocalizerResources.iby" "\epoc32\rom\include\language\mw\directorylocalizerresources.iby"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\localizer\loc\DirectoryLocalizer.loc" "\epoc32\include\platform\mw\loc\sc\directorylocalizer.loc"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconvplugin\Data\Win1250.snm" "\epoc32\release\winscw\udeb\z\Resource\charconv\Win1250.snm"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconvplugin\Data\Win1251.snm" "\epoc32\release\winscw\udeb\z\Resource\charconv\Win1251.snm"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconvplugin\Data\Win1252.snm" "\epoc32\release\winscw\udeb\z\Resource\charconv\Win1252.snm"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconvplugin\Data\Win1253.snm" "\epoc32\release\winscw\udeb\z\Resource\charconv\Win1253.snm"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconvplugin\Data\Win1254.snm" "\epoc32\release\winscw\udeb\z\Resource\charconv\Win1254.snm"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconvplugin\Data\Win1255.snm" "\epoc32\release\winscw\udeb\z\Resource\charconv\Win1255.snm"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconvplugin\Data\Win1256.snm" "\epoc32\release\winscw\udeb\z\Resource\charconv\Win1256.snm"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconvplugin\Data\Win1257.snm" "\epoc32\release\winscw\udeb\z\Resource\charconv\Win1257.snm"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconvplugin\Data\Win874.snm" "\epoc32\release\winscw\udeb\z\Resource\charconv\Win874.snm"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconvplugin\Data\TIS_620.snm" "\epoc32\release\winscw\udeb\z\Resource\charconv\TIS_620.snm"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconvplugin\Data\KOI8U.snm" "\epoc32\release\winscw\udeb\z\Resource\charconv\KOI8U.snm"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconvplugin\Data\KOI8R.snm" "\epoc32\release\winscw\udeb\z\Resource\charconv\KOI8R.snm"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconvplugin\Data\Win1258.snm" "\epoc32\release\winscw\udeb\z\Resource\charconv\Win1258.snm"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconvplugin\Data\iscii.snm" "\epoc32\release\winscw\udeb\z\Resource\charconv\iscii.snm"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconvplugin\Data\EUCKR.snm" "\epoc32\release\winscw\udeb\z\Resource\charconv\EUCKR.snm"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconvplugin\Data\iso2022kr.snm" "\epoc32\release\winscw\udeb\z\Resource\charconv\iso2022kr.snm"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconvplugin\Data\ksc5601.snm" "\epoc32\release\winscw\udeb\z\Resource\charconv\ksc5601.snm"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconvplugin\Data\Win1250.snm" "\epoc32\data\z\Resource\charconv\Win1250.snm"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconvplugin\Data\Win1251.snm" "\epoc32\data\z\Resource\charconv\Win1251.snm"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconvplugin\Data\Win1252.snm" "\epoc32\data\z\Resource\charconv\Win1252.snm"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconvplugin\Data\Win1253.snm" "\epoc32\data\z\Resource\charconv\Win1253.snm"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconvplugin\Data\Win1254.snm" "\epoc32\data\z\Resource\charconv\Win1254.snm"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconvplugin\Data\Win1255.snm" "\epoc32\data\z\Resource\charconv\Win1255.snm"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconvplugin\Data\Win1256.snm" "\epoc32\data\z\Resource\charconv\Win1256.snm"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconvplugin\Data\Win1257.snm" "\epoc32\data\z\Resource\charconv\Win1257.snm"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconvplugin\Data\Win874.snm" "\epoc32\data\z\Resource\charconv\Win874.snm"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconvplugin\Data\TIS_620.snm" "\epoc32\data\z\Resource\charconv\TIS_620.snm"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconvplugin\Data\KOI8U.snm" "\epoc32\data\z\Resource\charconv\KOI8U.snm"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconvplugin\Data\KOI8R.snm" "\epoc32\data\z\Resource\charconv\KOI8R.snm"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconvplugin\Data\Win1258.snm" "\epoc32\data\z\Resource\charconv\Win1258.snm"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconvplugin\Data\iscii.snm" "\epoc32\data\z\Resource\charconv\iscii.snm"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconvplugin\Data\EUCKR.snm" "\epoc32\data\z\Resource\charconv\EUCKR.snm"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconvplugin\Data\iso2022kr.snm" "\epoc32\data\z\Resource\charconv\iso2022kr.snm"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconvplugin\Data\ksc5601.snm" "\epoc32\data\z\Resource\charconv\ksc5601.snm"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconvplugin\rom\CharConvPlugin.iby" "\epoc32\rom\include\core\mw\charconvplugin.iby"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconvplugin\rom\CharConvPluginPictograph.IBY" "\epoc32\rom\include\core\mw\charconvpluginpictograph.iby"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconvplugin\rom\CharConvPluginPictograph_Variant.iby" "\epoc32\rom\include\customer\mw\charconvpluginpictograph_Variant.iby"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconvplugin\rom\CharConvPlugin_Variant.IBY" "\epoc32\rom\include\customer\mw\charconvplugin_Variant.iby"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\findutil\rom\Findutil.iby" "\epoc32\rom\include\core\mw\findutil.iby"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\findutil\rom\Findutil_Variant.iby" "\epoc32\rom\include\customer\mw\findutil_Variant.iby"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\numbergrouping\rom\NumberGrouping.iby" "\epoc32\rom\include\core\mw\numbergrouping.iby"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\numbergrouping\conf\numbergrouping.confml" "\epoc32\rom\config\confml_data\s60\numbergrouping.confml"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\numbergrouping\conf\numbergrouping_101F8775.crml" "\epoc32\rom\config\confml_data\s60\numbergrouping_101F8775.crml"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\gamerecognizer\rom\GameRecognizer.iby" "\epoc32\rom\include\core\mw\gamerecognizer.iby"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\jplangutil\rom\JPLangUtil.iby" "\epoc32\rom\include\core\mw\jplangutil.iby"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\sortutil\rom\Sortutil.iby" "\epoc32\rom\include\core\mw\sortutil.iby"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\sortutil\rom\SortUtil_Variant.iby" "\epoc32\rom\include\customer\mw\sortutil_Variant.iby"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\aknjapanesereading\rom\AknJapaneseReading.iby" "\epoc32\rom\include\core\mw\aknjapanesereading.iby"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconv\ongoing\group\CNVTOOL.BAT" "\epoc32\tools\CNVTOOL.BAT"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconv\ongoing\group\SNMTOOL.BAT" "\epoc32\tools\SNMTOOL.BAT"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconv\ongoing\group\CHARCONV.BAT" "\epoc32\tools\CHARCONV.BAT"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconv\ongoing\group\CHARCONV.PL" "\epoc32\tools\CHARCONV.PL"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconv\ongoing\group\CNVTOOL.PL" "\epoc32\tools\CNVTOOL.PL"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconv\ongoing\group\SNMTOOL.PL" "\epoc32\tools\SNMTOOL.PL"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconv\ongoing\group\PARSER.PM" "\epoc32\tools\PARSER.PM"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconv\ongoing\group\WRITER.PM" "\epoc32\tools\WRITER.PM"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconv\ongoing\group\UTF.PM" "\epoc32\tools\UTF.PM"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconv\ongoing\group\CHARCONV_EXE.IPR" "\epoc32\engdoc\tools\CHARCONV_EXE.IPR"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconv\ongoing\group\CHARCONV_PERLTOOLS.IPR" "\epoc32\engdoc\tools\CHARCONV_PERLTOOLS.IPR"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconv\ongoing\group\CNVAPI.RTF" "\epoc32\engdoc\charconv\CNVAPI.RTF"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconv\ongoing\group\CNVTOOL.RTF" "\epoc32\engdoc\charconv\CNVTOOL.RTF"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconv\ongoing\group\SNMTOOL.RTF" "\epoc32\engdoc\charconv\SNMTOOL.RTF"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconv\ongoing\group\AUTODETECT.RTF" "\epoc32\engdoc\charconv\AUTODETECT.RTF"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconv\ongoing\data\generateddat\big5.dat" "\epoc32\tools\charconv\big5.dat"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconv\ongoing\data\generateddat\cp1252.dat" "\epoc32\tools\charconv\cp1252.dat"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconv\ongoing\data\generateddat\gb12345.dat" "\epoc32\tools\charconv\gb12345.dat"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconv\ongoing\data\generateddat\gb2312.dat" "\epoc32\tools\charconv\gb2312.dat"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconv\ongoing\data\generateddat\gbk.dat" "\epoc32\tools\charconv\gbk.dat"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconv\ongoing\data\generateddat\iso88591.dat" "\epoc32\tools\charconv\iso88591.dat"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconv\ongoing\data\generateddat\iso885910.dat" "\epoc32\tools\charconv\iso885910.dat"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconv\ongoing\data\generateddat\iso885913.dat" "\epoc32\tools\charconv\iso885913.dat"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconv\ongoing\data\generateddat\iso885914.dat" "\epoc32\tools\charconv\iso885914.dat"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconv\ongoing\data\generateddat\iso885915.dat" "\epoc32\tools\charconv\iso885915.dat"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconv\ongoing\data\generateddat\iso88592.dat" "\epoc32\tools\charconv\iso88592.dat"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconv\ongoing\data\generateddat\iso88593.dat" "\epoc32\tools\charconv\iso88593.dat"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconv\ongoing\data\generateddat\iso88594.dat" "\epoc32\tools\charconv\iso88594.dat"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconv\ongoing\data\generateddat\iso88595.dat" "\epoc32\tools\charconv\iso88595.dat"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconv\ongoing\data\generateddat\iso88596.dat" "\epoc32\tools\charconv\iso88596.dat"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconv\ongoing\data\generateddat\iso88597.dat" "\epoc32\tools\charconv\iso88597.dat"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconv\ongoing\data\generateddat\iso88598.dat" "\epoc32\tools\charconv\iso88598.dat"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconv\ongoing\data\generateddat\iso88599.dat" "\epoc32\tools\charconv\iso88599.dat"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconv\ongoing\data\generateddat\shiftjis.dat" "\epoc32\tools\charconv\shiftjis.dat"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconv\ongoing\data\generateddat\shiftjisdirectmap.dat" "\epoc32\tools\charconv\shiftjisdirectmap.dat"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconv\ongoing\data\generateddat\gsm7_turkish_single.dat" "\epoc32\tools\charconv\gsm7_turkish_single.dat"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconv\ongoing\data\generateddat\turkish_locking_gsm7ext.dat" "\epoc32\tools\charconv\turkish_locking_gsm7ext.dat"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconv\ongoing\data\generateddat\turkish_locking_single.dat" "\epoc32\tools\charconv\turkish_locking_single.dat"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconv\ongoing\include\PictographObserver.h" "\sf\os\textandloc\inc\PictographObserver.h"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconv\ongoing\include\CnvPictographShared.h" "\sf\os\textandloc\inc\CnvPictographShared.h"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconv\ongoing\include\CnvShiftJisDirectmap.h" "\sf\os\textandloc\inc\CnvShiftJisDirectmap.h"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconv\ongoing\data\snm\basic.snm" "\epoc32\release\winscw\udeb\z\Resource\charconv\basic.snm"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconv\ongoing\data\snm\basic.snm" "\epoc32\data\z\Resource\charconv\basic.snm"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconv\ongoing\rom\CHARCONV.IBY" "\epoc32\rom\include\core\mw\charconv.iby"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconv\ongoing\rom\CHARCONV_CHINESE_SIMPLFIED.IBY" "\epoc32\rom\include\customer\mw\charconv_chinese_simplfied.iby"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconv\ongoing\rom\CHARCONV_CHINESE_TRADITIONAL.IBY" "\epoc32\rom\include\customer\mw\charconv_chinese_traditional.iby"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconv\ongoing\rom\CHARCONV_CODEPAGE.iby" "\epoc32\rom\include\core\mw\charconv_codepage.iby"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconv\ongoing\rom\CHARCONV_ISO8859X.IBY" "\epoc32\rom\include\core\mw\charconv_iso8859x.iby"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconv\ongoing\rom\CHARCONV_JAPANESE.IBY" "\epoc32\rom\include\customer\mw\charconv_japanese.iby"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconv\ongoing\rom\Charconv_Pictographs_Variant.Iby" "\epoc32\rom\include\customer\mw\charconv_pictographs_variant.iby"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconv\ongoing\rom\charconv_gsm7_turkish_Variant.iby" "\epoc32\rom\include\customer\mw\charconv_gsm7_turkish_Variant.iby"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconv\ongoing\rom\charconv_gsm7_turkish_Variant.iby" "\epoc32\rom\include\charconv_gsm7_turkish_Variant.iby"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconv\ongoing\rom\CHARCONV.IBY" "\epoc32\rom\include\charconv.iby"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconv\ongoing\rom\CharConv_All_Plugins.iby" "\epoc32\rom\include\charconv_all_plugins.iby"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconv\ongoing\rom\CHARCONV_CHINESE_SIMPLFIED.IBY" "\epoc32\rom\include\charconv_chinese_simplfied.iby"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconv\ongoing\rom\CHARCONV_CHINESE_TRADITIONAL.IBY" "\epoc32\rom\include\charconv_chinese_traditional.iby"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconv\ongoing\rom\CHARCONV_JAPANESE.IBY" "\epoc32\rom\include\charconv_japanese.iby"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconv\ongoing\rom\CHARCONV_CODEPAGE.iby" "\epoc32\rom\include\charconv_codepage.iby"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconv\ongoing\rom\CHARCONV_ISO8859X.IBY" "\epoc32\rom\include\charconv_iso8859x.iby"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\charconv\ongoing\rom\charconv_gsm7_turkish.iby" "\epoc32\rom\include\charconv_gsm7_turkish.iby"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\inlinetext\inc\inlinetextbase.h" "\epoc32\include\platform\mw\inlinetextbase.h"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\inlinetext\inc\inlinetextcompositesource.h" "\epoc32\include\platform\mw\inlinetextcompositesource.h"
+        1 file(s) copied.
+copy "\sf\os\textandloc\charconvfw\inlinetext\inc\inlinetextnomatchesindicatorsource.h" "\epoc32\include\platform\mw\inlinetextnomatchesindicatorsource.h"
+        1 file(s) copied.
+make[2]: Leaving directory `X:/sf/os/textandloc/group'
++++ HiRes End 1246536844.10405
+++ Finished at Thu Jul  2 13:14:04 2009
+make[1]: Leaving directory `x:/'
+emake -f dfs_build.make dfs_build-abld_makefile-tools
+make[1]: Entering directory `x:/'
+=== dfs_build == \sf/os/graphics/group
+-- abld makefile 
+++ Started at Thu Jul  2 13:14:05 2009
++++ HiRes Start 1246536845.63642
+cd \sf/os/graphics/group && abld makefile   -keepgoing   tools
+This project does not support platform or  program "TOOLS"
++++ HiRes End 1246536847.1364
+++ Finished at Thu Jul  2 13:14:07 2009
+=== dfs_build == \sf/os/textandloc/group
+-- abld makefile 
+++ Started at Thu Jul  2 13:14:05 2009
++++ HiRes Start 1246536845.6208

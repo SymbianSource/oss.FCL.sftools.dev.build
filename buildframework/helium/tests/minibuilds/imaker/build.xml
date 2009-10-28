@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="minibuild.ido" default="help" xmlns:au="org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <property environment="env"/>
+    <import file="../site/${env.TEAM}.ant.xml" />
+	<dirname property="config.dir" file="${ant.file.minibuild.ido}"/>
+	
+    <!-- Enable Helium internal assertion checking. -->
+    <property name="hlm.enable.asserts" value="1" />
+
+    <property name="build.name" value="minibuild_imaker" />
+    <property name="build.family" value="minibuild_imaker" />
+    <property name="major.version" value="0" />
+    <property name="minor.version" value="0" />
+	<property name="ccm.enabled" value="true"/>
+
+	<!-- Configuring the build system -->
+    <property name="build.system" value="ec-helium" />
+    
+    <property name="ec.cluster.manager" value="fawec001"/>
+    <property name="ec.build.class" value="ISISBR"/>
+    
+    <property name="rvct.version" value="22_616"/>
+
+    <!-- Configuring get latest env. -->
+	<property name="s60.grace.service" value="s60_devices_sw" />
+	<property name="s60.grace.product" value="DFS70.91.91" />
+	<property name="s60.grace.release" value="S60.91_\d{6}_hw70" />
+	<property name="prep.root.dir" value="E:\Build_E\${env.USERNAME}\ido_ba\${build.name}" />
+
+
+    <import file="${helium.dir}/helium.ant.xml"/>
+
+    <!-- Need to define custom preparation steps. -->
+	<target name="ido-prep" depends="prep-drive,preparation-getenv"/>
+
+    <!-- Run the full sequence of target for the minibuild. ,mini-build-prep,compile-main,zip-ee,mini-build-check-->
+    <target name="do-mini-build" depends="ido-update-build-area,
+    										mini-build-cleanup,
+                                            mini-build-install-new-imaker,
+    										imaker-build,
+    	                                    mini-build-check"/>
+    
+    
+    <!--ant code coverage for mini-builds-->
+    <target name="mini-build">
+        <antcall target="database">
+            <param name="home.files.only" value="false"/>
+        </antcall>
+        <mkdir dir="${helium.build.dir}/temp"/>
+        <property name="config.temp.build.dir" location="${config.dir}/build"/>
+        <hlm:coveragerecord name="${helium.build.dir}/temp/test.minibuild-ido.xml" action="start"/>
+        <runtarget target="do-mini-build"/>
+        <hlm:coveragerecord name="${helium.build.dir}/temp/test.minibuild-ido.xml" action="stop"/>
+        <fmpp sourcefile="${helium.dir}/tools/common/templates/coveragerecord.txt.ftl"
+            outputfile="${helium.build.dir}/temp/test_minibuild.txt">
+            <data expandProperties="yes">
+                doc: xml(${helium.build.dir}/temp/test.minibuild-ido.xml)
+                database: xml(${database.file})
+            </data>
+        </fmpp>
+        <loadfile srcfile="${helium.build.dir}/temp/test_minibuild.txt" property="ant.coverage.summary"/>
+        <echo>
+The summary of Ant code coverage:
+
+${ant.coverage.summary}</echo>
+		<fmpp sourcefile="${helium.dir}/tools/common/templates/coveragerecord.html.ftl"
+			  outputfile="${helium.build.dir}/temp/test_minibuild.html">
+			<data expandProperties="yes">
+            	doc: xml(${helium.build.dir}/temp/test.minibuild-ido.xml)
+                database: xml(${database.file})
+			</data>
+		</fmpp>
+    </target>
+
+    <target name="mini-build-install-new-imaker">
+        <!-- Export custom image configuration file. -->
+        <copy file="config/image_conf_naming.mk" tofile="${build.drive}/epoc32/rom/config/image_conf_naming.mk"/>
+        <!--hlm:bldmakeBldfilesMacro dir="${build.drive}/imaker_rnd/group"/>
+        <hlm:abldMacro dir="${build.drive}/imaker_rnd/group" command="cleanexport" platform=""/>
+        <hlm:abldMacro dir="${build.drive}/imaker_rnd/group" command="export" platform=""/-->
+    </target>
+	
+	<target name="minibuild-build-roms" depends="build-roms,imaker-merge-rom-xml"/>
+	
+    <target name="build-roms-ec">
+        <antcall target="minibuild-build-roms">
+            <reference refid="imaker.rom.config" torefid="imaker.rom.config"/>
+            <param name="build.system" value="ec-helium"/>
+        	<param name="release.images.dir" value="${build.output.dir}/imaker_ec"/>        	
+       </antcall>
+    </target>
+	
+    <target name="build-roms-ebs">
+        <antcall target="minibuild-build-roms">
+            <reference refid="imaker.rom.config" torefid="imaker.rom.config"/>
+            <param name="build.system" value="ebs"/>
+            <param name="release.images.dir" value="${build.output.dir}/imaker_ebs"/>         
+       </antcall>
+    </target>
+	
+	<!-- test target. -->
+	<target name="imaker-build" depends="build-roms-ec,build-roms-ebs">
+	</target>
+
+    
+    <target name="check-diamonds">
+		<loadfile srcfile="${build.log.dir}/${build.id}_diamonds-log-start.xml" property="diamonds.log.start"/>
+        <echo>${diamonds.log.start}</echo>
+        <loadresource property="diamonds.log.start.output">
+            <url url="${diamonds.build.url}?fmt=xml"/>
+        </loadresource>
+        <echo>${diamonds.log.start.output}</echo>
+	</target>
+    
+    <target name="mini-build-cleanup">
+        <delete verbose="true" includeemptydirs="true">
+            <fileset dir="${build.drive}/" casesensitive="false">
+                <include name="makefile"/>
+                <include name="*.mk"/>
+            	<include name="ecloud_tmp_*/**"/>
+            	<include name="emake.*"/>            	
+                <include name="epoc32/build/**"/>
+                <include name="epoc32/rombuild/*/**"/>
+                <include name="output/**"/>
+                <include name="timestart.txt"/>
+                <include name="timestop.txt"/>
+            </fileset>
+        </delete>
+    	<mkdir dir="${build.drive}/output/logs"/>
+    </target>
+    
+    
+    <target name="mini-build-check">
+    </target>
+	
+	<!-- Rom configuration -->
+    <hlm:imakerconfigurationset id="imaker.rom.config">
+        <imakerconfiguration>
+            <makefileset>
+                <include name="**/${product.name}*/*ui.mk"/>
+            </makefileset>
+            <targetset>
+                <include name="^core$"/>
+                <include name="^langpack_01.*$"/>
+                <include name="^langpack_02.*$"/><!---->
+                <include name="^custvariant_.*$"/>
+            </targetset>
+            <variableset>
+                <variable name="USE_FOTI" value="0"/>
+                <variable name="USE_FOTA" value="1"/>
+                <variable name="TYPE" value="rnd"/>
+            </variableset>
+        </imakerconfiguration>
+                <imakerconfiguration>
+            <makefileset>
+                <include name="**/${product.name}*/*ui.mk"/>
+            </makefileset>
+            <targetset>
+                <include name="^core$"/>
+                <include name="^langpack_01.*$"/>
+                <include name="^langpack_02.*$"/><!---->
+                <include name="^custvariant_.*$"/>
+            </targetset>
+            <variableset>
+                <variable name="USE_FOTI" value="0"/>
+                <variable name="USE_FOTA" value="1"/>
+                <variable name="TYPE" value="prd"/>
+            </variableset>
+        </imakerconfiguration>
+    </hlm:imakerconfigurationset>	
+</project>
+
+    

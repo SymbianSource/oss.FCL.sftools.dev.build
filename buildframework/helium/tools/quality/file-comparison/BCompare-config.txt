@@ -1,0 +1,5 @@
+load "%1" "%2"
+filter "*.oby"
+select all
+compare rules-based
+file-report layout:side-by-side options:display-mismatches,ignore-unimportant,line-numbers output-to:"%3.html" output-options:html-color

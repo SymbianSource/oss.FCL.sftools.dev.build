@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : tools_ivy_settings.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<!-- Ivy settings file for environment tools and dependency libraries. -->
+<ivysettings>
+    
+    <typedef name="tool" classname="com.nokia.ivy.ToolResolver"/>
+    <caches useOrigin="true"/>
+    <settings validate="false" defaultResolver="external"/>
+    
+    <property name="ivy.checksums" value="" override="true"/>
+    
+    <resolvers>
+        <filesystem name="download">
+            <ivy pattern="${helium.dir}/config/ivy/modules/[module]-[revision].ivy.xml" />
+        </filesystem>
+        
+        <chain name="external">
+            <ibiblio name="ibiblio" m2compatible="true" />
+        </chain>
+        
+        <url name="helium-svn">
+            <ivy pattern="http://helium.nmp.nokia.com/svn/[module]/branches/[revision]/bin/ivy.xml" />
+        </url>
+
+        <dual name="tool-resolver">
+            <filesystem name="ivy-tool-resolver">
+                <ivy pattern="${helium.dir}/config/ivy/modules/[module]-[revision].ivy.xml" />
+            </filesystem>
+            
+            <tool name="artifact-tool-resolver" validate="false">
+                <artifact pattern="[name]"/>
+            </tool>
+        </dual>
+    </resolvers>
+
+    
+    <triggers>
+        <ant-build  antfile="${helium.dir}/config/ivy/install/build-[artifact].ant.xml"
+                    target="install"
+                       event="post-download-artifact"
+                       prefix="artifact"/>
+                       
+      <ant-call target="unzip-egg" prefix="artifact"
+          event="post-download-artifact" filter="ext=zip AND type=egg"/>
+      <ant-call target="unzip-jar" prefix="artifact"
+          event="post-download-artifact" filter="ext=zip AND type=jar"/>
+      <ant-call target="gunzip-egg" prefix="artifact"
+          event="post-download-artifact" filter="ext=tar.gz AND type=egg"/>
+      <ant-call target="bunzip-egg" prefix="artifact"
+          event="post-download-artifact" filter="ext=tar.bz2 AND type=egg"/>
+    </triggers>
+
+    
+    <modules>
+        <module organisation="SWEPT" name=".*" resolver="tool-resolver" />
+        <module organisation="python" name=".*" resolver="download" />
+        <module organisation="java" name=".*" resolver="download" />
+        <module organisation="helium-external" name=".*" resolver="helium-svn" />
+    </modules>
+    
+</ivysettings>

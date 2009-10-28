@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : test_macro.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test_macro" xmlns:hlm="http://www.nokia.com/helium">
+    <property environment="env" />
+    <property name="helium.dir" location="../../.." />
+    <import file="../../../helium.ant.xml" />
+    
+    <target name="test-update-metadata">
+        <mkdir dir="${helium.build.dir}/GRACE"/>
+        <copy todir="${helium.build.dir}/GRACE/">
+            <fileset dir="${helium.dir}/tests/data/symrec/GRACE" includes="service/product/release_1/*"/>
+        </copy>
+        <copy file="${helium.dir}/tests/data/symrec/GRACE/service/product/release_1/test1.zip" tofile="${helium.build.dir}/GRACE/service/product/release_1/test3.zip"/>
+        <hlm:updateMetadataMacro file="${helium.build.dir}/GRACE/service/product/release_1/release_metadata.xml" archive="${helium.build.dir}/GRACE/service/product/release_1/test3.zip" />
+        <xpathtest xmlfile="${helium.build.dir}/GRACE/service/product/release_1/release_metadata.xml">  
+            <namespace uri="" prefix=""/>
+            <xpath expression="/releaseInformation/releaseFiles/package[@name='test3.zip']"/> 
+        </xpathtest>
+        <hlm:updateMetadataMacro file="${helium.build.dir}/GRACE/service/product/release_1/release_metadata.xml" archive="${helium.build.dir}/GRACE/service/product/release_1/test3.zip" 
+            filters="foo,bar"/>
+        <xpathtest xmlfile="${helium.build.dir}/GRACE/service/product/release_1/release_metadata.xml">  
+            <namespace uri="" prefix=""/>
+            <xpath expression="/releaseInformation/releaseFiles/package[@name='test3.zip']"/> 
+            <xpath expression="/releaseInformation/releaseFiles/package[@name='test3.zip' and @filters='foo,bar']"/> 
+        </xpathtest>
+        <delete dir="${helium.build.dir}/GRACE" />
+    </target>
+
+</project>

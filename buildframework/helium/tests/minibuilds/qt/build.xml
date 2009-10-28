@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="minibuild.qt" default="mini-build" xmlns:au="org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium" basedir=".">
+    <property environment="env" />
+    <import file="../site/${env.TEAM}.ant.xml" optional="true"/>
+    <dirname property="config.dir" file="${ant.file.minibuild.qt}" />
+
+    <!-- Enable Helium internal assertion checking. -->
+    <property name="hlm.enable.asserts" value="1" />
+    
+    <!-- Configure Qt building -->
+    <property name="compile.sysdef.dtd.stub" location="${helium.dir}/tools/common/dtd/sysdef_dtd_1_5_1.xml" />
+    <property name="qmake.enabled" value="true" />
+    <property name="qt.dir" location="${build.drive}/sf/mw/qt" />
+    
+    <property name="build.name" value="minibuild_qt" />
+    <property name="build.family" value="test_minibuilds" />
+    <property name="major.version" value="0" />
+    <property name="minor.version" value="0" />
+    <property name="publish.root.dir" location="${build.drive}/release" />
+
+    <!-- For Grace upload-->
+    <property name="release.grace.service" value="Test_Helium" />
+    <property name="release.grace.product" value="minibuild_qt" />
+    <property name="release.label" value="${major.version}.${minor.version}" />
+
+    <!-- build configuration -->
+    <property name="sysdef.configurations.list" value="build_tools,build" />
+    <path id="system.definition.files">
+        <fileset dir="." includes="*.sysdef.xml" />
+    </path>
+
+    <property name="build.system" value="ec-helium" />
+
+    <!-- Synergy is not configured -->
+    <property name="skip.password.validation" value="1" />
+    <property name="zip.config.file" value="${helium.dir}/tests/minibuilds/qt/config/qmake_zip_cfg.xml"/>
+    <property name="zips.ee.spec.name" value="ee"/>
+
+
+    <import file="${helium.dir}/helium.ant.xml" />
+
+    <!-- Run the full sequence of target for the minibuild. ,mini-build-prep,compile-main,zip-ee,mini-build-check-->
+    <target name="do-mini-build" depends="mini-build-cleanup,mini-build-prep,export-tools,
+      compile-main,zip-ee, mini-build-check" />
+
+
+
+    <!--ant code coverage for mini-builds-->
+    <target name="mini-build">
+        <antcall target="database">
+            <param name="home.files.only" value="false"/>
+        </antcall>
+        <mkdir dir="${helium.build.dir}/temp" />
+        <hlm:coveragerecord name="${helium.build.dir}/temp/test_minibuild.xml" action="start" />
+        <runtarget target="do-mini-build" />
+        <hlm:coveragerecord name="${helium.build.dir}/temp/test_minibuild.xml" action="stop" />
+        <fmpp sourcefile="${helium.dir}/tools/common/templates/coveragerecord.txt.ftl" outputfile="${helium.build.dir}/temp/test_minibuild.txt">
+            <data expandProperties="yes">
+                doc: xml(${helium.build.dir}/temp/test_minibuild.xml)
+                database: xml(${database.file})
+            </data>
+        </fmpp>
+        <loadfile srcfile="${helium.build.dir}/temp/test_minibuild.txt" property="ant.coverage.summary" />
+        <echo>
+The summary of Ant code coverage:
+
+${ant.coverage.summary}</echo>
+        <fmpp sourcefile="${helium.dir}/tools/common/templates/coveragerecord.html.ftl" outputfile="${helium.build.dir}/temp/test_minibuild.html">
+            <data expandProperties="yes">
+                    doc: xml(${helium.build.dir}/temp/test_minibuild.xml)
+                    database: xml(${database.file})
+             </data>
+        </fmpp>
+    </target>
+        
+    <!-- Prepare the minibuild. -->
+    <target name="mini-build-prep" depends="prep" />
+
+    <!-- Stubbing few targets for easy testing with dragonfly ... -->
+    <target name="prep-drive" depends="build-number" />
+    <target name="dragonfly-prep-drive" />
+    <target name="do-prep-work-area" />
+    <target name="create-bom" />
+    <target name="check-env-prep" />
+    <target name="prep-copy">
+        <property name="qt.zip" value="qt-embedded-s60-commercial-src-4.5.0-garden.zip" />
+        <!-- Qt prerelease are accessible from the outside world too. -->
+        <if>
+            <not><available file="${build.drive}/${qt.zip}"/></not>
+            <then>
+                <get src="http://pepper.troll.no/s60prereleases/testpackages/garden05/${qt.zip}" dest="${build.drive}/${qt.zip}"/>
+            </then>
+        </if>
+        <mkdir dir="${qt.dir}"/>
+        <delete>
+            <fileset dir="${qt.dir}">
+                <include name="**/bld.inf"/>
+                <include name="**/*.mmp"/>
+            </fileset>
+        </delete>
+        <unzip src="${build.drive}/${qt.zip}" dest="${qt.dir}/../">
+            <mapper>
+                <regexpmapper from="^qt([^/]*)/(.*)$$" to="qt/\2"/>
+            </mapper>
+        </unzip>
+    </target>
+
+
+
+    <!-- Check that the XML data returned from Diamonds via the REST interface
+    is the same as what is sent. 
+        
+    Currently there are some differences between the formats so some edits to the
+    XML content are made before using XMLUnit to compare the content.
+    -->
+    <target name="check-diamonds">
+        <loadfile srcfile="${build.log.dir}/${build.id}_diamonds-log-start.xml" property="diamonds.log.start">
+            <filterchain>
+                <tokenfilter>
+                    <filetokenizer />
+                    <hlm:prettyprintxml />
+                </tokenfilter>
+            </filterchain>
+        </loadfile>
+        <echo>Data sent to Diamonds:
+            
+${diamonds.log.start}</echo>
+        <loadresource property="diamonds.log.start.output">
+            <url url="${diamonds.build.url}?fmt=xml" />
+            <filterchain>
+                <tokenfilter>
+                    <filetokenizer />
+                    <hlm:prettyprintxml />
+                </tokenfilter>
+            </filterchain>
+        </loadresource>
+        <echo>Data returned from Diamonds:
+            
+${diamonds.log.start.output}</echo>
+        <echo file="${helium.dir}/diamonds_build.xml">${diamonds.log.start}</echo>
+        <!--xmltask source="${helium.dir}/diamonds_build.xml" dest="${helium.dir}/diamonds_build_edit.xml">
+            
+            <cut path="/diamonds-build/tool" buffer="toolElements"/>
+            <cut path="/diamonds-build/locations" buffer="temp"/>
+        </xmltask-->
+        <!--<loadfile srcfile="${helium.dir}/diamonds_build_edit.xml" property="diamonds.log.start.edited"/>
+        <echo>Data sent massaged to match what is received:
+            
+${diamonds.log.start.edited}</echo>-->
+        <!-- TODO: make assertXmlEqual work with direct string input -->
+        <string id="control.id" value="${diamonds.log.start}" />
+        <string id="test.id" value="${diamonds.log.start.output}" />
+        <hlm:assertXmlEqual control="control.id" test="test.id" failonerror="true" />
+    </target>
+
+    <!-- Export tools under epoc32/tools -->
+    <target name="cmaker-qt" depends="cmaker-export,cmaker-what" />
+    <target name="export-tools">
+        <antcall target="cmaker-qt">
+            <param name="cmaker.config.dir" location="${qt.dir}/group/cmaker"/>
+        </antcall>
+    </target>
+
+    <target name="mini-build-cleanup">
+        <delete verbose="true" includeemptydirs="true">         
+            <fileset dir="${build.drive}/" casesensitive="false">
+                <include name="makefile" />
+                <include name="*.mk" />
+                <include name="*.make" />
+                <include name="ecloud_tmp_*/**" />
+                <include name="emake.*" />
+                <include name="epoc32/build/**" />
+                <include name="epoc32/rombuild/imaker_temp/**" />
+                <include name="epoc32/rombuild/${product.name}/**" />
+                <include name="epoc32/rom/config/*/**/foti*.*" />
+                <include name="output/**" />
+                <include name="timestart.txt" />
+                <include name="timestop.txt" />
+                <include name="epoc32/tools/qmake.exe" />
+                <include name="epoc32/tools/rcc.exe" />
+                <include name="epoc32/tools/uic.exe" />
+                <include name="epoc32/tools/moc.exe" />
+                <include name="sf/mw/qt/src/**/bld.inf" />
+                <include name="sf/mw/qt/src/**/*.mmp" />
+                <exclude name="output/build_area/localised/**" />
+            </fileset>
+        </delete>
+    </target>
+
+    <target name="mini-build-check">
+        <!-- Checking that the qmake command line have been generated correctly -->
+        <if>
+            <or>
+                <equals arg1="${build.system}" arg2="ec-helium" />
+                <equals arg1="${build.system}" arg2="sbs-ec" />
+            </or>
+            <then>
+                <au:assertFileExists file="${temp.build.dir}/run-qmake-build.mk" />
+                <loadfile property="qmake.build.makefile" srcFile="${temp.build.dir}/run-qmake-build.mk"/>
+                <au:assertTrue>
+                    <and>
+                        <contains string="${qmake.build.makefile}" substring="qmake -listgen -r src.pro" />
+                        <contains string="${qmake.build.makefile}" substring="qmake -listgen -platform symbian-abld -r examples.pro" />
+                    </and>
+                </au:assertTrue>
+            </then>
+            <else>
+                <xpathtest xmlfile="${temp.build.dir}/run-qmake-build.ant.xml">  
+                    <namespace uri="" prefix=""/>
+                    <xpath expression="/project/target[@name='all']/parallel/sequential/if/then/exec/arg[@value='-listgen']"/>
+                    <xpath expression="/project/target[@name='all']/parallel/sequential/if/then/exec/arg[@line='-r']"/>
+                    <xpath expression="/project/target[@name='all']/parallel/sequential/if/then/exec/arg[@line='-platform symbian-abld -r -listgen']"/>
+                </xpathtest>
+            </else>
+        </if>
+        
+        <!-- Check if prep has set some prop correctly... -->
+        <echo>'${arm.compiler.version}'</echo>
+        <au:assertMatches string="${arm.compiler.version}" pattern="RVCT2\.2 \[Build 616\]" casesensitive="false" multiline="true" />
+
+        <!-- Check if compile-main step did what expected... -->
+        <au:assertFileExists file="${canonical.sysdef.file}" />
+        <au:assertFileExists file="${qt.dir}/src/bld.inf" />
+        <au:assertFileExists file="${qt.dir}/examples/bld.inf" />
+        <au:assertFileExists file="${build.drive}/epoc32/tools/qmake.bat" />
+        <au:assertFileExists file="${build.drive}/epoc32/tools/moc.bat" />
+        <hlm:assertFileExists file="${build.log.dir}/${build.id}_build.qmake.generated.txt"/>
+        <hlm:assertFileExists file="${build.log.dir}/${build.id}_build_tools.qmake.generated.txt"/>
+        <loadfile srcFile="${build.log.dir}/${build.id}_build.qmake.generated.txt" property="qmake.generated.output"/>
+        <au:assertMatches string="${qmake.generated.output}" pattern="[^/]+/+[^/]+" />
+
+    </target>
+
+    <!-- Never fail the build. -->
+    <hlm:signalInput id="compileSignalInput" failbuild="never">
+        <hlm:notifierListRef refid="defaultSignalFailNotifier" />
+    </hlm:signalInput>
+    
+</project>
+

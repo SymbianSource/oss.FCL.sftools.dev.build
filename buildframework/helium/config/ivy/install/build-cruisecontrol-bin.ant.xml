@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : build-cruisecontrol-bin.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="build-cruisecontrol" xmlns:ivy="antlib:org.apache.ivy.ant">
+    <description>Cruise Control installation script.</description>
+    <target name="install">
+        <property name="cc.temp.dir" value="${helium.dir}/build/cruisecontrol_temp"/>
+        <property name="hlm.external.dir" value="${helium.dir}/external"/>
+        <echo>
+        unzipping artifact: 
+        organisation=${artifact.organisation} 
+        module=${artifact.module} 
+        revision=${artifact.revision}
+        artifact=${artifact.artifact}
+        type=${artifact.type}
+        ext=${artifact.ext}
+        origin=${artifact.origin}
+        local=${artifact.local}
+        size=${artifact.size}
+        file=${artifact.file}
+        helium.dir=${helium.dir}
+        </echo>
+        <delete failonerror="false">
+            <fileset dir="${hlm.external.dir}/CruiseControl">
+                <exclude name="cruisecontrol.bat"/>
+                <exclude name="distribution.policy.S60"/>
+            </fileset>
+        </delete>
+        <delete dir="${cc.temp.dir}" failonerror="false"/>
+        <mkdir dir="${cc.temp.dir}"/>
+        <unzip src="${artifact.file}" dest="${cc.temp.dir}">
+            <mapper>
+                <regexpmapper from="^cruisecontrol-bin-[^/\\]*[/\\](.*)$$" to="\1"/>
+            </mapper>
+        </unzip>
+        
+        <!-- Generating version file. -->
+        <echo file="${cc.temp.dir}/${artifact.module}_${artifact.revision}.txt">
+            unzipping artifact: 
+            organisation=${artifact.organisation} 
+            module=${artifact.module} 
+            revision=${artifact.revision}
+            artifact=${artifact.artifact}
+            type=${artifact.type}
+            ext=${artifact.ext}
+            origin=${artifact.origin}
+            local=${artifact.local}
+            size=${artifact.size}
+            file=${artifact.file}
+            helium.dir=${helium.dir}
+        </echo>        
+        
+        <if>
+            <available file="${hlm.external.dir}/CruiseControl/cruisecontrol.bat"/>
+            <then>
+                <move file="${cc.temp.dir}/cruisecontrol.bat" tofile="${cc.temp.dir}/real_cruisecontrol.bat"/>
+            </then>
+        </if>
+        
+        <move todir="${hlm.external.dir}/CruiseControl">
+            <fileset dir="${cc.temp.dir}"/>
+        </move>
+        <delete dir="${cc.temp.dir}" failonerror="false"/>
+    </target>
+</project>

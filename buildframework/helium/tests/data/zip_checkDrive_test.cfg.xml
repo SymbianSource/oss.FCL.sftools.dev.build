@@ -1,0 +1,43 @@
+<?xml    version="1.0"    encoding="UTF-8"?>
+<build>
+    <config name="wvdo_sources" abstract="true">
+        <set name="archive.tool" value="7za"/>
+       <set name="root.dir" value="C:\"/>
+                
+        <config name="wvdo_sources_1">
+            <set name="name" value="${build.id}_wvdo_sources_3"/>
+            <set name="root.dir" value="\\bhwec0100\build_e$\swbuild\ido_wa\wv_domain\wv_domain\"/>
+                 <set name="include" value="flashapi\"/>
+        </config>
+        
+        <config name="wvdo_sources_2">
+            <set name="name" value="${build.id}_wvdo_sources_3"/>
+            <set name="root.dir" value="\\bhwec0100\build_e$\swbuild\ido_wa\wv_domain"/>
+                 <set name="include" value="flashapi\"/>
+        </config>
+        
+        <config name="wvdo_sources_3">
+            <set name="name" value="${build.id}_wvdo_sources_3"/>
+            <set name="root.dir" value="Y:\wv_domain\"/>
+                 <set name="include" value="flashapi\"/>
+        </config>
+        
+        <config name="wvdo_sources_4">
+            <set name="name" value="${build.id}_wvdo_sources_3"/>
+                 <set name="include" value="flashapi\"/>
+        </config>
+        
+        <config name="medo_sources_1">
+            <set name="name" value="${build.id}_medo_sources_1"/>
+            <set name="root.dir" value="\\bhwec0100\build_e$\swbuild\ido_wa\Messaging_Domain\Messaging_Domain\"/>
+            <set name="include" value="messagingextensions\"/>
+        </config>
+        
+        <config name="medo_sources_2">
+            <set name="name" value="${build.id}_medo_sources_2"/>
+            <set name="root.dir" value="\\bhwec0100\build_e$\swbuild\ido_wa\Messaging_Domain\Messaging_Domain\"/>
+            <set name="include" value="messagingextensions\"/>
+        </config>
+        
+     </config>
+</build>

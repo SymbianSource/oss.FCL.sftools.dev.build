@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema targetNamespace="http://www.nokia.com/helium"
+           xmlns:ant="ant.apache.org"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+    <xs:import schemaLocation="ant.xsd"/>
+    
+    <xs:element name="configuration">
+    <xs:complexType>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="fileset" type="ant:filesetType"/>
+        </xs:choice>
+        <xs:attribute name="file" type="xs:string"/>
+    </xs:complexType>
+    </xs:element>
+    <xs:element name="database">
+    <xs:complexType>
+        <xs:attribute name="output" type="xs:string"/>
+    </xs:complexType>
+    </xs:element>
+    <xs:element name="logextract">
+    <xs:complexType>
+        <xs:complexContent>
+            <xs:extension base="ant:resourceCollectionContainerType">
+                <xs:attribute name="file" type="xs:string"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    </xs:element>
+    <xs:element name="signal">
+    <xs:complexType>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="fileset" type="ant:filesetType"/>
+        </xs:choice>
+        <xs:attribute name="name" type="xs:string"/>
+        <xs:attribute name="result" type="xs:string"/>
+    </xs:complexType>
+    </xs:element>
+    <xs:element name="dependencies">
+    <xs:complexType>
+        <xs:attribute name="format" type="xs:string"/>
+    </xs:complexType>
+    </xs:element>
+    
+    <xs:element name="fooMacro">
+        <xs:complexType/>
+    </xs:element>
+    <xs:element name="compileHtmlscanlogMacro">
+        <xs:complexType>
+            <xs:attribute name="input" type="xs:string"/>
+            <xs:attribute name="output" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="cmakerMacro">
+        <xs:complexType>
+            <xs:attribute name="ncp" type="xs:string"/>
+            <xs:attribute name="s60" type="xs:string"/>
+            <xs:attribute name="action" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="compileGenxmlMacro">
+        <xs:complexType>
+            <xs:attribute name="input" type="xs:string"/>
+            <xs:attribute name="output" type="xs:string"/>
+            <xs:attribute name="configuration" type="xs:string"/>
+            <xs:attribute name="log" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="compileEbsMacro">
+        <xs:complexType>
+            <xs:attribute name="input" type="xs:string"/>
+            <xs:attribute name="log" type="xs:string"/>
+            <xs:attribute name="threads" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="buildEbsXmlMacro">
+        <xs:complexType>
+            <xs:attribute name="input" type="xs:string"/>
+            <xs:attribute name="logname" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="logHtmlMacro">
+        <xs:complexType>
+            <xs:attribute name="input" type="xs:string"/>
+            <xs:attribute name="output" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="bldmakeBldfilesMacro">
+        <xs:complexType>
+            <xs:attribute name="dir" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="abldMacro">
+        <xs:complexType>
+            <xs:attribute name="dir" type="xs:string"/>
+            <xs:attribute name="command" type="xs:string"/>
+            <xs:attribute name="platform" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="filterRecordStartMacro">
+        <xs:complexType/>
+    </xs:element>
+    <xs:element name="filterRecordStopMacro">
+        <xs:complexType>
+            <xs:attribute name="pattern" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="updateStatusMacro">
+        <xs:complexType/>
+    </xs:element>
+    <xs:element name="createCshelpBldinfMacro">
+        <xs:complexType>
+            <xs:attribute name="delivery" type="xs:string"/>
+            <xs:attribute name="product" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="createDeltaZipMacro">
+        <xs:complexType>
+            <xs:attribute name="variant" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="rombuildImakerMacro">
+        <xs:complexType>
+            <xs:attribute name="product" type="xs:string"/>
+            <xs:attribute name="target" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="ecImakerMacro">
+        <xs:complexType>
+            <xs:attribute name="makefile.target" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="preECImakerMacro">
+        <xs:complexType/>
+    </xs:element>
+    <xs:element name="imakerMacro">
+        <xs:complexType>
+            <xs:attribute name="product" type="xs:string"/>
+            <xs:attribute name="target" type="xs:string"/>
+            <xs:attribute name="makefile" type="xs:string"/>
+            <xs:attribute name="cmd" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="ccmAvailableMacro">
+        <xs:complexType>
+            <xs:attribute name="resultproperty" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="publishMacro">
+        <xs:complexType/>
+    </xs:element>
+    <xs:element name="rombuildMacro">
+        <xs:complexType>
+            <xs:attribute name="stage" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="diskspaceMacro">
+        <xs:complexType>
+            <xs:attribute name="drive" type="xs:string"/>
+            <xs:attribute name="space" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="notifyMacro">
+        <xs:complexType>
+            <xs:attribute name="message" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="netrcPasswordMacro">
+        <xs:complexType>
+            <xs:attribute name="output-prop" type="xs:string"/>
+            <xs:attribute name="result-prop" type="xs:string"/>
+            <xs:attribute name="type" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="netrcUsernameMacro">
+        <xs:complexType>
+            <xs:attribute name="output-prop" type="xs:string"/>
+            <xs:attribute name="result-prop" type="xs:string"/>
+            <xs:attribute name="type" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="compileGenxmlMergeMacro">
+        <xs:complexType>
+            <xs:attribute name="input" type="xs:string"/>
+            <xs:attribute name="output" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="declareIdMacro">
+        <xs:complexType>
+            <xs:attribute name="id" type="xs:ID"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="mailTargetCompletedMacro">
+        <xs:complexType>
+            <xs:attribute name="section" type="xs:string"/>
+            <xs:attribute name="sms" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="zipContentMacro">
+        <xs:complexType>
+            <xs:attribute name="type" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="deleteFotaConfMacro">
+        <xs:complexType>
+            <xs:attribute name="product" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="rombuildValueMacro">
+        <xs:complexType>
+            <xs:attribute name="product.name" type="xs:string"/>
+            <xs:attribute name="outputproperty" type="xs:string"/>
+            <xs:attribute name="rombuild.value" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="assert">
+        <xs:complexType>
+            <xs:attribute name="message" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="assertFileExists">
+        <xs:complexType>
+            <xs:attribute name="file" type="xs:string"/>
+            <xs:attribute name="message" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="referenceToFileMacro">
+        <xs:complexType>
+            <xs:attribute name="refid" type="xs:string"/>
+            <xs:attribute name="output" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="xmlToFmtlMacro">
+        <xs:complexType>
+            <xs:attribute name="input" type="xs:string"/>
+            <xs:attribute name="xmlroot" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="tempRecordStartMacro">
+        <xs:complexType>
+            <xs:attribute name="name" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="tempRecordStopMacro">
+        <xs:complexType>
+            <xs:attribute name="name" type="xs:string"/>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

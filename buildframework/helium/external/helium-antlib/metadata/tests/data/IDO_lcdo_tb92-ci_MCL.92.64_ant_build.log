@@ -1,0 +1,129 @@
+zip-binaries:
+   [length] t:\output\temp_build_files\IDO_lcdo_tb92-ci_MCL.92.64_nonhw_binaries_includefile.txt does not exist
+
+ats-test:
+log file not exists
+log file not exists
+
+ats-aste:
+log file not exists
+log file not exists
+
+ido-zip-wa:
+     [echo] Zipping wa
+      [zip] Building zip: t:\output\src\IDO_lcdo_tb92-ci_MCL.92.64_sources.zip
+
+build-log-extracts:
+Converting t:\output\logs\IDO_lcdo_tb92-ci_MCL.92.64.sysdef_GenxmlMerge.log...
+Converting t:\output\logs\IDO_lcdo_tb92-ci_MCL.92.64__armv5_winscw_armv5.test_dfs_build.sbs_ant_output.log...
+Extracted log is uptodate: t:\output\logs\IDO_lcdo_tb92-ci_MCL.92.64__armv5_winscw_armv5.test_dfs_build_compile.log
+Converting t:\output\logs\IDO_lcdo_tb92-ci_MCL.92.64_ant_build.log...
+Converting t:\output\logs\IDO_lcdo_tb92-ci_MCL.92.64_bom.log...
+Extracted log is uptodate: t:\output\logs\IDO_lcdo_tb92-ci_MCL.92.64_ccm_get_input.log
+Extracted log is uptodate: t:\output\logs\IDO_lcdo_tb92-ci_MCL.92.64_validate-policy.log
+
+log-merge:
+[dependset] Warning: t:\output\logs\IDO_lcdo_tb92-ci_MCL.92.64_bom.log.xml modified in the future.
+     [echo] Merging all *.log.xml files
+     [echo] Inserting t:\output\logs\IDO_lcdo_tb92-ci_MCL.92.64.sysdef_GenxmlMerge.log.xml into summary.
+     [echo] Inserting t:\output\logs\IDO_lcdo_tb92-ci_MCL.92.64__armv5_winscw_armv5.test_dfs_build.sbs_ant_output.log.xml into summary.
+     [echo] Inserting t:\output\logs\IDO_lcdo_tb92-ci_MCL.92.64__armv5_winscw_armv5.test_dfs_build_compile.log.xml into summary.
+     [echo] Inserting t:\output\logs\IDO_lcdo_tb92-ci_MCL.92.64_ant_build.log.xml into summary.
+     [echo] Inserting t:\output\logs\IDO_lcdo_tb92-ci_MCL.92.64_bom.log.xml into summary.
+     [echo] Inserting t:\output\logs\IDO_lcdo_tb92-ci_MCL.92.64_ccm_get_input.log.xml into summary.
+     [echo] Inserting t:\output\logs\IDO_lcdo_tb92-ci_MCL.92.64_info.log.xml into summary.
+     [echo] Inserting t:\output\logs\IDO_lcdo_tb92-ci_MCL.92.64_validate-policy.log.xml into summary.
+
+render-log-summary:
+     [fmpp] File processed.
+
+build-log-summary:
+
+prep-publish:
+
+ido-publish-sites:
+   [script] Publishing \\vagrp006\GROUPS5\SP_IDO\LCDo\CI_builds
+   [script] execute
+      [IDO] data.drive.letter is already defined to E
+      [IDO] Build.drive: t:, the drive exists: true
+      [IDO] Build drive substing skipped
+      [IDO] data.drive.letter is already defined to E
+      [IDO] Category folder name: idos
+      [IDO] Type: ido
+      [IDO] Updated build.family to ido_lcdo_tb92-ci_sbs-ec_sbs-ec
+[IDO] Using S60 version: tb92
+Trying to override old definition of task http://www.nokia.com/helium:diskspaceMacro
+Trying to override old definition of task http://www.nokia.com/helium:diskspaceMacro
+
+prep-publish:
+    [mkdir] Created dir: \\vagrp006\GROUPS5\SP_IDO\LCDo\CI_builds\tb92-ci\MCL.92.64
+
+publish:
+     [copy] Copying 26 files to \\vagrp006\GROUPS5\SP_IDO\LCDo\CI_builds\tb92-ci\MCL.92.64
+     [echo] ERROR: There are 5214 changes in the publish directory. Uploading the changes again...
+
+ido-recopy:
+      [IDO] data.drive.letter is already defined to E
+      [IDO] Build.drive: t:, the drive exists: true
+      [IDO] Build drive substing skipped
+      [IDO] data.drive.letter is already defined to E
+      [IDO] Category folder name: idos
+      [IDO] Type: ido
+      [IDO] Updated build.family to ido_lcdo_tb92-ci_sbs-ec_sbs-ec
+[IDO] Using S60 version: tb92
+Trying to override old definition of task http://www.nokia.com/helium:diskspaceMacro
+Trying to override old definition of task http://www.nokia.com/helium:diskspaceMacro
+
+ido-create-ado-mapping:
+[hlm:referenceToFileMacro] Creating t:\output\temp_build_files\null903042207.txt using system.definition.files
+[hlm:referenceToFileMacro] E:\Build_E\idoconfiguration\running\common\sysdefs\build.sysdef.xml
+[hlm:referenceToFileMacro] E:\Build_E\ido_wa\IDO_lcdo_tb92-ci\LC_Domain\LC_Domain\btservices\layers.sysdef.xml
+[hlm:referenceToFileMacro] E:\Build_E\ido_wa\IDO_lcdo_tb92-ci\LC_Domain\LC_Domain\printing\layers.sysdef.xml
+[hlm:referenceToFileMacro] E:\Build_E\ido_wa\IDO_lcdo_tb92-ci\LC_Domain\LC_Domain\remoteconn\layers.sysdef.xml
+[hlm:referenceToFileMacro] E:\Build_E\ido_wa\IDO_lcdo_tb92-ci\LC_Domain\LC_Domain\usbservices\layers.sysdef.xml
+[hlm:referenceToFileMacro] E:\Build_E\ido_wa\IDO_lcdo_tb92-ci\LC_Domain_osext\LC_Domain_osext\btaudioadaptation_stub\layers.sysdef.xml
+[hlm:referenceToFileMacro] E:\Build_E\ido_wa\IDO_lcdo_tb92-ci\LC_Domain_osext\LC_Domain_osext\shortlinksrv\layers.sysdef.xml
+[hlm:referenceToFileMacro] E:\Build_E\ido_wa\IDO_lcdo_tb92-ci\SystemSW_Domain_OSExt\SystemSW_Domain_OSExt\devicesrv\layers.sysdef.xml
+
+ido-prep-copy:
+     [fmpp] File processed.
+
+all:
+   [delete] Deleting directory t:\sf\app\printing_old
+   [delete] Deleting directory t:\sf\mw\btservices_old
+   [delete] Deleting directory t:\sf\mw\usbservices_old
+   [delete] Deleting directory t:\sf\mw\remoteconn_old
+   [delete] Deleting directory t:\sf\os\devicesrv_old
+   [delete] Deleting directory t:\sf\adaptation\stubs\btaudioadaptation_stub_old
+   [delete] Deleting directory t:\sf\os\shortlinksrv_old
+     [fmpp] File processed.
+
+all:
+    [mkdir] Created dir: t:\sf\app\printing
+    [mkdir] Created dir: t:\sf\adaptation\stubs\btaudioadaptation_stub
+    [mkdir] Created dir: t:\sf\os\shortlinksrv
+    [mkdir] Created dir: t:\sf\mw\remoteconn
+    [mkdir] Created dir: t:\sf\os\devicesrv
+    [mkdir] Created dir: t:\sf\mw\btservices
+    [mkdir] Created dir: t:\sf\mw\usbservices
+     [copy] Copying 30 files to t:\sf\adaptation\stubs\btaudioadaptation_stub
+     [copy] Copying 359 files to t:\sf\os\shortlinksrv
+     [copy] Copying 496 files to t:\sf\app\printing
+     [copy] Copying 1584 files to t:\sf\mw\remoteconn
+     [copy] Copying 2341 files to t:\sf\mw\btservices
+     [copy] Copying 1767 files to t:\sf\mw\usbservices
+     [copy] Copying 6833 files to t:\sf\os\devicesrv
+
+IDO-additions.final:
+Deferred failure: Yes
+
+BUILD FAILED
+
+compileSignal: Expected result was 0, actual result was 1 : compile-signal
+E:\Build_E\idoconfiguration\running\common\ido-additions.ant.xml:110: if=pending.failure
+	at com.nokia.helium.core.ant.HeliumExecutor.executeTargets(HeliumExecutor.java:98)
+	at org.apache.tools.ant.Project.executeTargets(Project.java:1181)
+	at org.apache.tools.ant.Main.runBuild(Main.java:698)
+	at org.apache.tools.ant.Main.startAnt(Main.java:199)
+	at org.apache.tools.ant.launch.Launcher.run(Launcher.java:257)
+	at org.apache.tools.ant.launch.Launcher.main(Launcher.java:104)

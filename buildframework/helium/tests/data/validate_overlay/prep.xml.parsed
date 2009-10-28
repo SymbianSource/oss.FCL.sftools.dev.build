@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<prepSpec>
+    <config>
+				<exclude name="abld.bat"/>
+				<exclude name=".static_wa"/>
+				<exclude name="_ccmwaid.inf"/>
+				<exclude name="documentation/*"/>
+				<exclude name="documents/*"/>
+				<exclude name="doc/*"/>
+		</config>
+<!-- Other possible excludable folders -->
+<!--				<exclude name="e32test/*"/> -->
+<!--				<exclude name="f32test/*"/> -->
+<!--				<exclude name="WINCW/*"/> -->
+<!--				<exclude name="WINC/*"/> -->
+<!--				<exclude name="WINS/*"/> -->
+<!--				<exclude name="bwins/*"/> -->
+<!--				<exclude name="swins/*"/> -->
+<!--				<exclude name="WINSCW/*"/> -->
+		
+		<source label="Symbian" basedir="\\fasamba\dfs\r1120_isis\NT\Build_and_Release\GRACE\MC\SOS\__SymbianOS_9.3\SymbianOS_93_2007_wk30">
+				<unzip name="MCL_93_200730_src_generic_part1.zip"/>
+				<unzip name="MCL_93_200730_src_generic_part2.zip"/>
+				<unzip name="MCL_93_200730_src_generic_part3.zip"/>
+				<unzip name="MCL_93_200730_src_cedar.zip"/>
+				<unzip name="MCL_93_200730_src_common_other_sources_part2.zip"/>
+
+				<!-- This is required to generate all the .jar files correctly under \epoc32\tools\ -->
+				<unzip name="MCL_93_200730_src_product.zip" dest="z:/src"/>
+
+				<unzip name="MCL_93_200730_epoc32.zip"/>
+				<unzip name="MCL_93_200730_epoc32_RELEASE_ARMV5.zip"/>
+		</source>
+
+		<!-- Unzip (ICF/ICD)'s if there are any -->
+		<source name="icds" basedir="">
+			<unzipicds dest="z:\">
+				<!-- Unzipping from following location
+						 * S60
+						 * common
+						 * product
+					-->
+				<location name="E:\wbernard\ccm_wa\fa1f5132\0734/S60/S60/Symbian_ICD_ICF/93_200730" />
+				<location name="E:\wbernard\ccm_wa\fa1f5132\mc-fa1f5132#loc_0734\mc\mc_build\mc_5132_build../../../mc_overlay/mc_5132_overlay/common/files/Symbian_ICD_ICF/93_200730" />
+			</unzipicds>
+		</source>
+
+		<!-- copying  s60 content -->
+		<source label="S60" basedir="E:\wbernard\ccm_wa\fa1f5132\0734">
+			<copy name="S60/s60"	 dest="s60" />
+		</source>
+
+
+		<source label="PPD" basedir="E:\wbernard\ccm_wa\fa1f5132\0734">
+			<copy name="ppd_sw/ppd_sw"					dest="ppd_sw"/>			
+		</source>
+		
+		<source label="IBUSAL51" basedir="E:\wbernard\ccm_wa\fa1f5132\0734/">
+			<copy name="IBUSAL_RapidoYawe/IBUSAL_RapidoYawe"/>
+		</source>
+		
+		<!-- temporary fix to handle two naviscroll projects -->
+		<source label="naviscroll" basedir="E:\wbernard\ccm_wa\fa1f5132\0734/">
+		    <copy name="naviscroll-old/naviscroll/naviscroll" dest="Ibusal_internal/Navi/naviscroll" />
+		</source>
+		<source label="sensor_server_adaptation" basedir="E:\wbernard\ccm_wa\fa1f5132\0734/">
+		    <copy name="sensor_server_adaptation-old/sensor_server_adaptation/sensor_server_adaptation" dest="Ibusal_internal/Navi/sensor_server_adaptation" />
+		</source>
+		<!-- this is for new driver  - requires change in sys_def to be compiled -->
+		<source label="naviscroll" basedir="E:\wbernard\ccm_wa\fa1f5132\0734/">
+		    <copy name="naviscroll-new/naviscroll/naviscroll" dest="ncp_sw/corecom/bbc_components/ibusal_rapidoyawe/naviscroll" />
+		</source>
+		<source label="sensor_server_adaptation" basedir="E:\wbernard\ccm_wa\fa1f5132\0734/">
+		    <copy name="sensor_server_adaptation-new/sensor_server_adaptation/sensor_server_adaptation" dest="ncp_sw/corecom/bbc_components/ibusal_rapidoyawe/sensor_server_adaptation" />
+		</source>
+
+   <source label="MULTIMEDIA_SW" basedir="E:\wbernard\ccm_wa\fa1f5132\0734">
+		 	<copy name="multimedia_sw"				 dest="multimedia_sw"/>
+	 </source>
+
+		<source label="NSS_ICONS" basedir="\\fasamba\dfs\r1120_isis\NT\Build_and_Release\GRACE\MC\NSS">
+					 <unzip name="nss_sources_3_2_wk32.zip" dest="ppd_sw/nss_sw"/>
+		</source>
+
+		<source label="CELLMO" basedir="\\fasamba\dfs\r1120_isis\NT\Build_and_Release\GRACE\MC\Cellmo\product">
+				<!-- product cellmo copy -->
+				<copy name="\Releases\IBUSAL_CellMo\2007_wk15_PB\2007wk15v14\product\rm187_rapido_v1_1_flsh_image.hex"	tofile="epoc32/rom/config/platform/product/dsp.hex"/>
+				<copy name="\Releases\IBUSAL_CellMo\2007_wk15_PB\2007wk15v14\product\nalo.axf"			tofile="epoc32/rom/config/platform/product/nalo.axf"/>
+				<copy name="\Releases\IBUSAL_CellMo\2007_wk15_PB\2007wk15v14\product\naloext.axf"		tofile="epoc32/rom/config/platform/product/naloext.axf"/>
+				<copy name="\Releases\IBUSAL_CellMo\2007_wk15_PB\2007wk15v14\product\3rd.bin" 			tofile="epoc32/rom/config/platform/product/3rd.bin"/>
+				<copy name="\Releases\IBUSAL_CellMo\2007_wk15_PB\2007wk15v14\product\rm235_07wk15v14.out"	tofile="epoc32/rom/config/platform/product/isa.out"/>
+				<!-- product Edge cellmo copy -->
+        			<copy name="\Releases\IBUSAL_CellMo\2007_wk15_PB\2007wk15v14\product_chn\wg41s_edge_rapido_v1_1_flsh_image.hex"	tofile="epoc32/rom/config/platform/product_edge/dsp.hex"/>
+				<copy name="\Releases\IBUSAL_CellMo\2007_wk15_PB\2007wk15v14\product_chn\nalo.axf"			tofile="epoc32/rom/config/platform/product_edge/nalo.axf"/>
+				<copy name="\Releases\IBUSAL_CellMo\2007_wk15_PB\2007wk15v14\product_chn\naloext.axf"		tofile="epoc32/rom/config/platform/product_edge/naloext.axf"/>
+				<copy name="\Releases\IBUSAL_CellMo\2007_wk15_PB\2007wk15v14\product_chn\3rd.bin" 			tofile="epoc32/rom/config/platform/product_edge/3rd.bin"/>
+				<copy name="\Releases\IBUSAL_CellMo\2007_wk15_PB\2007wk15v14\product_chn\rm236_07wk15v14.out"	tofile="epoc32/rom/config/platform/product_edge/isa.out"/>
+		</source>
+
+		<source label="T9TegicDelivery" basedir="E:\wbernard\ccm_wa\fa1f5132\0734">
+				<copy name="T9TegicDelivery\T9TegicDelivery" dest="S60\mw\inputmethods\textinput\T9TegicDelivery" />
+		</source>
+
+		<!-- Copying ppd patch sw -->
+		<source label="psw" basedir="z:">
+				<copy name="psw\ncp_psw\psw"/>
+				<copy name="psw\ncp_psw\platform_psw\psw"/>
+				<copy name="psw\ncp_psw\platform_psw\platform_product_psw\psw"/>
+				<copy name="psw\s60_32_psw\psw"/>
+				<copy name="psw\s60_32_psw\51.32_psw\psw"/>
+				<copy name="psw\ncp_psw\platform_psw\ncp_psw"/>
+		</source>
+	        
+ 
+   	<!-- Apply the overlays first -->
+		<source label="mc" basedir="E:\wbernard\ccm_wa\fa1f5132\mc-fa1f5132#loc_0734\mc\mc_build\mc_5132_build../../..">
+				<copy name="mc_overlay/mc_5132_overlay/common/files"/>
+        <copy name="mc_overlay/mc_5132_overlay/common/files" dest="mc/mc_overlay/mc_5132_overlay/common/files" />
+				<!-- bvsupport <copy name="mc_overlay/mc_5132_overlay/mc_5132_overlay/files"/>-->
+
+				<copy name="mc_build" dest="mc/mc_build"/>
+				<copy name="mc_config" dest="mc/mc_config"/> <!-- variation folder will be there -->
+				<copy name="mc_sw" dest="mc/mc_sw"/>
+
+		    <!-- This is required for FMTx Increment 6 -->
+		    <copy name="mc_config\mc_5132_config\mc_5132\include\ProductStaticFeatures.hrh" tofile="epoc32\include\oem\ProductStaticFeatures.hrh"/>
+				
+				<!-- SPP CARBON CHANGE:  markhyvo: 						-->
+		    <copy name="mc_config\mc_5132_config\mc_5132\include\ProductVariant.hrh" tofile="epoc32\include\oem\ProductVariant.hrh"/>
+        <copy name="mc_config\mc_5132_config\mc_5132\include\ProductVariant.hrh" tofile="S60\misc\release\bldvariant\common\ProductVariant.hrh"/>
+        <copy name="mc_config\mc_5132_config\mc_5132\include\ProductVariant.hrh" tofile="config\s60_32_config\51.32_config\config\inc\ProductVariant.hrh"/>
+		</source>
+
+		<!-- Copying helium from its location. -->
+		<source label="mc" basedir="E:\buildbot\slaves\fasym015-win32\fasym015-win32\build\helium/../">
+			<copy name="helium" dest="mc/helium"/>
+		</source>
+   
+    <!-- desw config -->
+	  <source label="desw" basedir="z:">
+        <copy name="\s60\mw\uiresources\uiresources_dom\icon_build_locations_api\inc\iconlocations.hrh" tofile="\epoc32\include\oem\iconlocations.hrh" />
+	      <copy name="\multimedia_sw\me_scd_desw\me_scd_desw\variation\product\DeSwFlagsproduct.hrh" tofile="\epoc32\include\oem\DeSwFlagsproduct.hrh" />
+		</source>
+   
+    <source label="PP_manual_exports" basedir="z:">
+			<!-- NCP manual exports required before bldmake bldfiles phase where  bldvariant is included-->
+		  <copy name="config/ncp_config/config/inc/feature_settings.hrh" tofile="epoc32/include/oem/feature_settings.hrh"/>
+			<copy name="config/s60_32_config/51.32_config/config/inc/spp_feature_settings.hrh" tofile="epoc32/include/oem/spp_feature_settings.hrh"/>
+			<copy name="config/ncp_config/config/inc/ncp_feature_consts.hrh" tofile="epoc32/include/oem/ncp_feature_consts.hrh"/>
+			<copy name="config/ncp_config/platform_config/config/inc/ncp_feature_settings.hrh" tofile="epoc32/include/oem/ncp_feature_settings.hrh"/>
+			<copy name="config/ncp_config/platform_config/config/inc/adaptation_conf.h" tofile="epoc32/include/internal/adaptation_conf.h"/>
+    	<copy name="config/ncp_config/platform_config/config/inc/adaptation_features.hrh" tofile="epoc32/include/oem/adaptation_features.hrh"/>
+		  <copy name="config/ncp_config/platform_config/config/inc/Symbian.hrh" tofile="epoc32/include/oem/Symbian.hrh"/>
+			<copy name="config/ncp_config/config/inc/spp_variant.cfg" tofile="EPOC32/tools/variant/spp_variant.cfg"/>
+      <copy name="config/ncp_config/config/inc/ncp_consts.hrh" tofile="epoc32/include/oem/ncp_consts.hrh"/>
+	    <copy name="ncp_sw/corecom/aasw/AaCommonTools/config/audio_sw_conf.hrh" tofile="epoc32/include/internal/audio_sw_conf.hrh"/>
+	    <copy name="ncp_sw/corecom/aasw/AaCommonTools/config/audio_sw_external_conf.hrh" tofile="epoc32/include/internal/audio_sw_external_conf.hrh"/>
+			
+			<copy name="config\s60_32_config\config\inc\bldvariant.hrh"			tofile="epoc32\include\oem\bldvariant.hrh"/>
+      <copy name="config\s60_32_config\config\inc\bldpublic.hrh"			tofile="epoc32\include\oem\bldpublic.hrh"/>
+      <copy name="config\s60_32_config\config\inc\bldprivate.hrh"			tofile="epoc32\include\oem\bldprivate.hrh"/>
+      <copy name="config\s60_32_config\config\inc\bldcodeline.hrh"			tofile="epoc32\include\oem\bldcodeline.hrh"/>
+      <copy name="config\s60_32_config\config\inc\privateruntimeids.hrh"		tofile="epoc32\include\oem\privateruntimeids.hrh"/>
+      <copy name="config\s60_32_config\config\inc\publicruntimeids.hrh"		tofile="epoc32\include\oem\publicruntimeids.hrh"/>
+      <copy name="config\s60_32_config\config\inc\PublicStaticFeatures.hrh"		tofile="epoc32\include\oem\PublicStaticFeatures.hrh"/>
+      <copy name="config\s60_32_config\config\inc\PrivateStaticFeatures.hrh"	tofile="epoc32\include\oem\PrivateStaticFeatures.hrh"/>
+      <copy name="config\s60_32_config\config\inc\PlatformStaticFeatures.hrh"	tofile="epoc32\include\oem\PlatformStaticFeatures.hrh"/>
+			<!-- bsf files needed to export here so that variation information is valid on time-->
+	    <copy name="config/ncp_config/config/tools/ARM11.bsf" tofile="epoc32/tools/ARM11.bsf"/>
+	    <copy name="config/ncp_config/config/tools/ARM11_arm.bsf" tofile="epoc32/tools/ARM11_arm.bsf"/>
+	    <copy name="config/ncp_config/config/tools/ARM926_arm.bsf" tofile="epoc32/tools/ARM926_arm.bsf"/>
+	    <copy name="config/ncp_config/config/tools/ARM9E.bsf" tofile="epoc32/tools/ARM9E.bsf"/>
+	    <copy name="config/ncp_config/config/tools/config.bsf" tofile="epoc32/tools/config.bsf"/>
+	    <copy name="config/ncp_config/config/tools/variant.bsf" tofile="epoc32/tools/variant.bsf"/>
+	    <copy name="config/ncp_config/platform_config/config/tools/platform.bsf" tofile="epoc32/tools/platform.bsf"/>
+	    <!-- <copy name="config/ncp_config/platform_config/config/tools/platform.bsf" tofile="epoc32/tools/platform.bsf"/>
+	    <copy name="config/ncp_config/platform_config/config/tools/platform.bsf" tofile="epoc32/tools/platform.bsf"/>
+	    <copy name="config/ncp_config/platform_config/platform_product_config/config/tools/product.bsf" tofile="epoc32/tools/product.bsf"/>
+	    <copy name="config/ncp_config/platform_config/platform_devlon_config/config/tools/devlon51.bsf" tofile="epoc32/tools/devlon51.bsf"/>-->
+	    <copy name="config/ncp_config/platform_config/platform_product_config/config/tools/product.bsf" tofile="epoc32/tools/product.bsf"/>
+	    <copy name="config/ncp_config/platform_config/platform_product_edge_config/config/tools/product_edge.bsf" tofile="epoc32/tools/product_edge.bsf"/>
+	    <!--<copy name="config/ncp_config/platform_config/platform_product_config/config/tools/product.bsf" tofile="epoc32/tools/product.bsf"/>
+	    <copy name="config/ncp_config/platform_config/platform_product_config/config/tools/product.bsf" tofile="epoc32/tools/product.bsf"/>
+	    <copy name="config/ncp_config/platform_config/platform_devlon_r3_config/config/tools/devlon51_r3.bsf" tofile="epoc32/tools/devlon51_r3.bsf"/>	    
+	    <copy name="config/ncp_config/platform_config/platform_devlon_config/config/tools/devlon70.bsf" tofile="epoc32/tools/devlon70.bsf"/>-->
+	    <copy name="config/ncp_config/platform_config/platform_product_config/config/inc/ncp_feature_settings.hrh" tofile="epoc32/include/config/platform/product/ncp_feature_settings.hrh"/>
+	    <copy name="config/ncp_config/platform_config/platform_devlon_config/config/inc/ncp_feature_settings.hrh" tofile="epoc32/include/config/platform/devlon51/ncp_feature_settings.hrh"/>
+	    <copy name="config/ncp_config/platform_config/platform_product_config/config/inc/ncp_feature_settings.hrh" tofile="epoc32/include/config/platform/product/ncp_feature_settings.hrh"/>
+	    <copy name="config/ncp_config/platform_config/platform_product_edge_config/config/inc/ncp_feature_settings.hrh" tofile="epoc32/include/config/platform/product_edge/ncp_feature_settings.hrh"/>
+	    <copy name="config/ncp_config/platform_config/platform_product_config/config/inc/ncp_feature_settings.hrh" tofile="epoc32/include/config/platform/product/ncp_feature_settings.hrh"/>
+	    <copy name="config/ncp_config/platform_config/platform_product_config/config/inc/ncp_feature_settings.hrh" tofile="epoc32/include/config/platform/product/ncp_feature_settings.hrh"/>
+	    <copy name="config/ncp_config/platform_config/platform_devlon_r3_config/config/inc/ncp_feature_settings.hrh" tofile="epoc32/include/config/platform/devlon51_r3/ncp_feature_settings.hrh"/>
+      <copy name="config/ncp_config/platform_config/platform_devlon_config/config/inc/ncp_feature_settings.hrh" tofile="epoc32/include/config/platform/devlon70/ncp_feature_settings.hrh"/>
+	    <del name="config/ncp_config/platform_config/config/tools/platform.bsf"/>
+	    <del name="config/ncp_config/platform_config/config/tools/platform.bsf"/>
+	    <del name="config/ncp_config/platform_config/platform_product_config/config/tools/product.bsf"/>
+	    <del name="config/ncp_config/platform_config/platform_devlon_config/config/tools/devlon51.bsf"/>
+	    <del name="config/ncp_config/platform_config/platform_product_config/config/tools/product.bsf"/>
+	    <del name="config/ncp_config/platform_config/platform_product_config/config/tools/product.bsf"/>
+	    <del name="config/ncp_config/platform_config/platform_devlon_r3_config/config/tools/devlon51_r3.bsf"/>	    
+	    <del name="config/ncp_config/platform_config/platform_devlon_config/config/tools/devlon70.bsf"/>
+	  </source>
+
+    
+		<!-- NCP manual exports required due to missing bld.inf -->
+		<source label="NCP_config" basedir="z:">
+				<!-- Copying spp modified tools -->
+				<copy name="tools\ncp_tools\toolsmod_93" />
+                                <!-- 
+				<copy name="config\s60_32_config\51.32_config\51.32_${product.base.name}_config\config\inc\spp_feature_settings.hrh" tofile="epoc32\include\oem\spp_feature_settings.hrh"/>
+                                 -->
+				<copy name="config\s60_32_config\51.32_config\config\rom\config\my_romfiles.txt" tofile="epoc32\rombuild\my_romfiles.txt"/>
+		</source>
+
+		<source label="S60_config" basedir="z:">
+				<copy name="src\cedar\generic\utils\Symbian_OS_v9.3.hrh" tofile="epoc32\INCLUDE\variant\Symbian_OS_v9.3.hrh"/>
+				<copy name="src\cedar\generic\utils\Symbian_OS_v9.3_cbrtargetalias.cfg" tofile="epoc32\tools\variant\cbrtargetalias.cfg"/>
+				
+				
+		<!-- SPP CARBON CHANGE:  markhyvo: 		<copy name="S60\misc\release\bldvariant\elaf\data\bldvariant.hrh" tofile="epoc32\include\oem\bldvariant.hrh"/>  -->
+				<!-- variant.cfg is absoultely critical as it is being used during "bldmake bldfiles",
+						 otherwise the makefiles won't generte correctly -->
+				<copy name="S60\misc\release\bldvariant\common\variant.cfg" tofile="EPOC32\tools\variant\variant.cfg"/>
+				<copy name="S60\misc\release\bldvariant\common\features.hrh" tofile="epoc32\include\oem\features.hrh"/>
+				<copy name="S60\misc\release\bldvariant\common\defaultcaps.hrh" tofile="epoc32\include\oem\defaultcaps.hrh"/>
+		    <copy name="S60\misc\release\S60Exports\tools\S60IBYMACROS.PM" tofile="epoc32\tools\S60IBYMACROS.PM"/>
+		    
+		    <!--On S60 3.2 w16 platform_paths.hrh has changed place -->
+		    <copy name="S60\osext\systemswextensions\sysswext_dom\platform_path_definitions_api\inc\platform_paths.hrh"  tofile="epoc32\include\domain\osextensions\platform_paths.hrh"/>
+		    <copy name="S60\osext\systemswextensions\sysswext_dom\platform_path_definitions_api\inc\platform_paths.hrh"  tofile="epoc32\include\oem\platform_paths.hrh"/>
+		    <copy name="S60\osext\systemswextensions\sysswext_dom\platform_path_definitions_api\inc\platform_paths.hrh"  tofile="epoc32\include\oem\domain\osextensions\platform_paths.hrh"/>
+		    
+		</source>
+
+<!--  BRANCH 04-06-07: Petraisa: Merge task fa1f5132#18403 -->	
+		<source label="custom_manual_exports" basedir="z:">
+			<!-- Export screensaver -->
+			<copy name="/ppd_sw/nss_sw/nss_graphics/nseries3_theme_3_1/Nseries3_screensaver_1.swf" tofile="epoc32/data/Z/private/10207114/import/10281cc3/Nseries3_screensaver_1.swf" />
+		</source>		 
+
+<!-- BRANCH_END 04-06-07: Petraisa -->
+		<!-- unzip possbile patches for nightly build -->
+		<source name="patches" basedir="">
+			<unzipicds dest="z:\">
+				<location name="\\jknfs05\cms_wa\5132_wa\MC\patch\0734" />
+				<include name="*" />
+			</unzipicds>
+		</source>
+		
+</prepSpec>

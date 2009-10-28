@@ -1,0 +1,43 @@
+<?xml version="1.0" ?>
+<build>
+	
+
+	<config abstract="true" name="wvdo_sources">
+		<config name="wvdo_sources_1">
+			<set name="include" value="flashapi\"/>
+			<set name="root.dir" value="X:\wv_domain\wv_domain\"/>
+			<set name="name" value="${build.id}_wvdo_sources_3"/>
+			<set name="archive.tool" value="7za"/>
+		</config>
+		<config name="wvdo_sources_2">
+			<set name="include" value="flashapi\"/>
+			<set name="root.dir" value="X:\wv_domain\"/>
+			<set name="name" value="${build.id}_wvdo_sources_3"/>
+			<set name="archive.tool" value="7za"/>
+		</config>
+		<config name="wvdo_sources_3">
+			<set name="include" value="flashapi\"/>
+			<set name="root.dir" value="Y:\wv_domain\"/>
+			<set name="name" value="${build.id}_wvdo_sources_3"/>
+			<set name="archive.tool" value="7za"/>
+		</config>
+		<config name="wvdo_sources_4">
+			<set name="include" value="flashapi\"/>
+			<set name="name" value="${build.id}_wvdo_sources_3"/>
+			<set name="archive.tool" value="7za"/>
+			<set name="root.dir" value="C:\"/>
+		</config>
+		<config name="medo_sources_1">
+			<set name="include" value="messagingextensions\"/>
+			<set name="root.dir" value="X:\Messaging_Domain\Messaging_Domain\"/>
+			<set name="name" value="${build.id}_medo_sources_1"/>
+			<set name="archive.tool" value="7za"/>
+		</config>
+		<config name="medo_sources_2">
+			<set name="include" value="messagingextensions\"/>
+			<set name="root.dir" value="X:\Messaging_Domain\Messaging_Domain\"/>
+			<set name="name" value="${build.id}_medo_sources_2"/>
+			<set name="archive.tool" value="7za"/>
+		</config>
+	</config>
+</build>

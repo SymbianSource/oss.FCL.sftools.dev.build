@@ -1,0 +1,118 @@
+
+    1: Copyright (c) 2004 Infrae. All rights reserved.
+    2: 
+    3: Redistribution and use in source and binary forms, with or without
+    4: modification, are permitted provided that the following conditions are
+    5: met:
+    6: 
+    7:   1. Redistributions of source code must retain the above copyright
+    8:      notice, this list of conditions and the following disclaimer.
+    9:    
+   10:   2. Redistributions in binary form must reproduce the above copyright
+   11:      notice, this list of conditions and the following disclaimer in
+   12:      the documentation and/or other materials provided with the
+   13:      distribution.
+   14: 
+   15:   3. Neither the name of Infrae nor the names of its contributors may
+   16:      be used to endorse or promote products derived from this software
+   17:      without specific prior written permission.
+   18: 
+   19: THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+   20: "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+   21: LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+   22: A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL INFRAE OR
+   23: CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+   24: EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+   25: PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+   26: PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+   27: LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+   28: NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+   29: SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+----
+
+    3: Copyright (c) 1999-2003 by Secret Labs AB
+    4: Copyright (c) 1999-2003 by Fredrik Lundh
+    5: 
+    6: By obtaining, using, and/or copying this software and/or its
+    7: associated documentation, you agree that you have read, understood,
+    8: and will comply with the following terms and conditions:
+    9: 
+   10: Permission to use, copy, modify, and distribute this software and its
+   11: associated documentation for any purpose and without fee is hereby
+   12: granted, provided that the above copyright notice appears in all
+   13: copies, and that both that copyright notice and this permission notice
+   14: appear in supporting documentation, and that the name of Secret Labs
+   15: AB or the author not be used in advertising or publicity pertaining to
+   16: distribution of the software without specific, written prior
+   17: permission.
+   18: 
+   19: SECRET LABS AB AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO
+   20: THIS SOFTWARE, INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND
+   21: FITNESS.  IN NO EVENT SHALL SECRET LABS AB OR THE AUTHOR BE LIABLE FOR
+   22: ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+   23: WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+   24: ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
+   25: OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+----
+
+    1: Zope Public License (ZPL) Version 2.0
+    2: -----------------------------------------------
+    3: 
+    4: This software is Copyright (c) Zope Corporation (tm) and
+    5: Contributors. All rights reserved.
+    6: 
+    7: This license has been certified as open source. It has also
+    8: been designated as GPL compatible by the Free Software
+    9: Foundation (FSF).
+   10: 
+   11: Redistribution and use in source and binary forms, with or
+   12: without modification, are permitted provided that the
+   13: following conditions are met:
+   14: 
+   15: 1. Redistributions in source code must retain the above
+   16:    copyright notice, this list of conditions, and the following
+   17:    disclaimer.
+   18: 
+   19: 2. Redistributions in binary form must reproduce the above
+   20:    copyright notice, this list of conditions, and the following
+   21:    disclaimer in the documentation and/or other materials
+   22:    provided with the distribution.
+   23: 
+   24: 3. The name Zope Corporation (tm) must not be used to
+   25:    endorse or promote products derived from this software
+   26:    without prior written permission from Zope Corporation.
+   27: 
+   28: 4. The right to distribute this software or to use it for
+   29:    any purpose does not give you the right to use Servicemarks
+   30:    (sm) or Trademarks (tm) of Zope Corporation. Use of them is
+   31:    covered in a separate agreement (see
+   32:    http://www.zope.com/Marks).
+   33: 
+   34: 5. If any files are modified, you must cause the modified
+   35:    files to carry prominent notices stating that you changed
+   36:    the files and the date of any change.
+   37: 
+   38: Disclaimer
+   39: 
+   40:   THIS SOFTWARE IS PROVIDED BY ZOPE CORPORATION ``AS IS''
+   41:   AND ANY EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT
+   42:   NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY
+   43:   AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN
+   44:   NO EVENT SHALL ZOPE CORPORATION OR ITS CONTRIBUTORS BE
+   45:   LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+   46:   EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+   47:   LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+   48:   LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+   49:   HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+   50:   CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+   51:   OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+   52:   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+   53:   DAMAGE.
+   54: 
+   55: 
+   56: This software consists of contributions made by Zope
+   57: Corporation and many individuals on behalf of Zope
+   58: Corporation.  Specific attributions are listed in the
+   59: accompanying credits file.

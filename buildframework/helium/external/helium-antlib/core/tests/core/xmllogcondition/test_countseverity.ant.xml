@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : test_countseverity.ant.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test-countseverity" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>Helium antlib core countseverity tests.</description>
+    <taskdef resource="com/nokia/helium/core/ant/antlib.xml" uri="http://www.nokia.com/helium" />
+
+    <!-- is called prior to the test -->
+    <target name="setUp">
+    </target>
+
+    <!-- is called after the test, even if that caused an error -->
+    <target name="tearDown">
+    </target>
+
+    <fileset id="empty_folder.path" dir="data/empty_folder" />
+    <target name="test-countseverity-no-property">
+        <au:expectfailure>
+            <hlm:countSeverity severity="error" file="./data/helium_minibuild_ido_compile.log.xml" />
+        </au:expectfailure>
+    </target>
+
+    <!-- the actual test case -->
+    <target name="test-countseverity-error">
+        <!-- Check for errors -->
+        <hlm:countSeverity severity="error" file="./data/helium_minibuild_ido_compile.log.xml" property="errors"/>
+        <au:assertTrue>
+            <equals arg1="${errors}" arg2="1"/>
+        </au:assertTrue>
+    </target>
+
+    <target name="test-countseverity-warning">
+        <!-- Check for warnings -->
+        <hlm:countSeverity severity="warning" file="./data/helium_minibuild_ido_compile.log.xml" property="warnings"/>
+        <echo message="Warnings: ${warnings}"/>
+        <au:assertTrue>
+            <equals arg1="${warnings}" arg2="2"/>
+        </au:assertTrue>
+    </target>
+
+    <target name="test-countseverity-info">
+        <!-- Check for infos -->
+        <hlm:countSeverity severity="infos" file="./data/helium_minibuild_ido_compile.log.xml" property="infos"/>
+        <au:assertTrue>
+            <equals arg1="${infos}" arg2="0"/>
+        </au:assertTrue>
+    </target>
+
+</project>

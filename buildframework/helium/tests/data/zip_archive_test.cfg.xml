@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<build>
+    <archiveSpec>
+        <set name="name" value="python_libs"/>
+        <set name="include" value="lib\*.egg"/>
+    </archiveSpec>
+    <config>
+        <set name="max.uncompressed.size" value="2000000"/>
+        <set name="root.dir" value="c:/Temp/python"/>
+        <set name="max.files.per.archive" value="65000"/>
+        <set name="archive.tool" value="zip"/>
+        <set name="archives.dir" value="c:\temp\output\build_area"/>
+        <set name="temp.build.dir" value="c:/Temp/output/temp_build_files"/>
+    </config>
+</build>

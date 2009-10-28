@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : build-jar.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="helium-build-jar" default="help" xmlns:au="org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>
+    Called by hlm-jar.bat to build helium java code
+    </description>
+
+    <property environment="env" />
+
+    <property name="build.temp.dir" location="${env.TEMP}/helium/java" />
+    <property name="src.dir" location="${helium.dir}/tools/common/java/src" />
+    <property name="ext.java.lib.dir" location="${helium.dir}/external/antlibs" />
+    <property name="helium.java.lib.dir" location="${helium.dir}/tools/common/java/lib" />
+
+
+    <!-- Builds the Java source code for our custom Ant stuff. -->
+    <target name="build-java-src" description="Builds the internal Ant custom tasks">
+        <delete dir="${build.temp.dir}" />
+        <mkdir dir="${build.temp.dir}" />
+        <copy todir="${build.temp.dir}/class">
+            <fileset dir="${src.dir}">
+                <include name="**/*.properties" />
+                <include name="**/*.xml" />
+            </fileset>
+        </copy>
+        <javac srcdir="${src.dir}" destdir="${build.temp.dir}/class" source="1.6" target="1.6" debug="true">
+            <classpath>
+                <fileset dir="${ext.java.lib.dir}" includes="**/*.jar" />
+                <fileset dir="${helium.dir}/external/helium-antlib" includes="**/*.jar" />
+            </classpath>
+            <exclude name="nokia/cruisecontrol/**" />
+        </javac>
+    </target>
+
+
+    <!-- Builds the .jar file with our custom Ant tasks and loggers in. -->
+    <target name="jar" depends="build-java-src" description="Builds jar for internal Ant custom tasks">
+        <property file="${helium.dir}/config/version.txt" />
+        <mkdir dir="${build.temp.dir}/lib" />
+        <delete file="${build.temp.dir}/lib/nokia_ant.jar" />
+        <copy file="${src.dir}/com/nokia/ant/antlib.xml" todir="${build.temp.dir}/class/com/nokia/ant" />
+
+        <jar basedir="${build.temp.dir}/class" destfile="${build.temp.dir}/lib/nokia_ant.jar" update="true">
+            <manifest>
+                <attribute name="Built-By" value="${user.name}" />
+                <section name="common">
+                    <attribute name="Implementation-Title" value="Helium" />
+                    <attribute name="Implementation-Version" value="${helium.version}" />
+                    <attribute name="Implementation-Vendor" value="Nokia" />
+                </section>
+            </manifest>
+        </jar>
+
+        <move file="${build.temp.dir}/lib/nokia_ant.jar" tofile="${helium.java.lib.dir}/nokia_ant.jar" />
+    </target>
+
+</project>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bom>
+  <build>bom_validate_102</build>
+  <content>
+    <project>
+      <name>wv_domain-bh1spp#wv.91_helium_dev:project:tr1nss#1</name>
+      <database>bh1spp</database>
+      <baseline overridden="false">flashlite_3_1-bh1spp#wv.mcl_200929:project:bh1s60#1</baseline>
+      <baseline overridden="false">helix_flash_video-bh1spp#wv.mcl_200929:project:bh1s60#1</baseline>
+      <baseline overridden="false">webvideo-bh1spp#wv.mcl_200929:project:tr1nss#1</baseline>
+      <baseline overridden="true">wv_domain-bh1spp#wv.mcl_200929:project:tr1nss#1</baseline>
+      <folder>
+        <name overridden="true">bh1spp#1369: swbuild's Assigned Or Completed Tasks for Release wv_domain/wv.91</name>
+      </folder>
+      <folder>
+        <name overridden="true">bh1spp#1594: wv_domain 9.1 All completed tasks</name>
+        <task overridden="false">
+          <id>bh1s60#51236</id>
+          <synopsis>Testing Task for Helium</synopsis>
+          <owner>swbuild</owner>
+        </task>
+      </folder>
+    </project>
+    <input>
+      <name>N/A</name>
+      <year>0</year>
+      <week>0</week>
+      <version>N/A</version>
+      <icds/>
+    </input>
+    <input>
+      <name>s60</name>
+      <year>0</year>
+      <week>0</week>
+      <version>None</version>
+      <source>
+        <type>grace</type>
+        <service>s60_devices_sw</service>
+        <product>DFS70.91.91</product>
+        <release>S60.91_200927_hw70</release>
+      </source>
+    </input>
+  </content>
+</bom>

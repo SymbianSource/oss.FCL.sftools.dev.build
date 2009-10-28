@@ -1,0 +1,1506 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : rom_image_config.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<build>
+    <spec name="mc" abstract="true">
+        <set name="fota.version" value="${fota.a.build}"/>
+        <set name="ui.platform" value="mc5132"/>
+        <set name="zips.loc.dir" value="${zips.loc.dir}" />
+        <set name="languages.xml.location" value="${localisation.language.file}" />
+        <set name="variation.dir" value="${build.drive}\mc\mc_config\mc_5132_config\PRODUCT\variation" />
+        <set name="rombuild.config.file" value="${rombuild.config.file.parsed}" />
+        <set name="version.product.name" value="N00"/>
+        <set name="imaker.languagepack.automation" value="0"/>
+        <set name="enable.romsymbol" value="1"/>
+        <set name="today" value="$(TODAY)"/>
+        <set name="customer.id" value="00"/> <!-- customer id is 00 in case of EE. -->
+        <set name="customer.revision" value="00"/> <!-- customer revision is 00 in case of EE. -->
+        <set name="uda.revision" value="00"/> <!-- uda revision is 00 in case of EE. -->
+    
+        <set name="rommake.flags" value="-es60ibymacros -DXTI_TRACES -DNO_PLATSEC"/>
+        <set name="version.bandvariant" value="0"/>
+        <set name="version.pd.milestone" value="${major.version}"/>
+        <set name="version.pr" value="${pr}"/>
+        <set name="version.m.step" value="${m.step}"/>
+        <set name="version.bandvariant" value="0"/>
+        <set name="version.rimcycle" value="${minor.version}"/>
+
+        <set name="image.version.name" value="${version.pr}.${build.number}${fota.version}" />
+        <set name="rombuild.id" value="${rommake.product.type}_${image.version.name}"/>
+
+        <set name="rom.output.dir" value="${build.output.dir}"/>
+        <set name="image.type" value="prd,rnd"/>
+        <set name="customer.type" value="vanilla"/>
+        <set name="image.master.iby" value="\epoc32\rom\master.oby"/>
+        <set name="image.variant.iby" value="\epoc32\rom\mc_5132_variant_imaker.oby"/>
+        <set name="image.override.iby" value="\epoc32\rom\override.oby"/>
+        <set name="version.copyright" value="(C) Nokia"/>
+        <set name="build.drive" value="${build.drive}"/>
+        <set name="customer.image.version.name" value="${image.version.name}" />
+    
+        <!-- Should we build and include foti and fota apps images. -->
+        <set name="use.foti" value="1"/>
+        <set name="use.fota" value="1"/>
+        <set name="release.date" value="${fota.release.date}"/>
+
+        <set name="enable.mobile.crash.sender" value="1" />
+
+        <set name="bb5.product.info" value="69"/>
+        <set name="flash.size" value="2048"/>
+        <set name="mytraces.binaries" value="" />
+        <set name="use.platsecbin" value="1"/>
+
+        <!-- Template full outputdir  (used by iMaker for ROM generation) -->
+        <set name="flash.output.dir" value="${rom.output.dir}/development_flash_images/engineering_english/${image.type}"/>
+        <set name="core.output.dir" value="${rom.output.dir}/${core.image.path}"/>
+        <set name="languagepack.output.dir" value="${rom.output.dir}/${languagepack.image.path}"/>
+        <set name="customer.output.dir" value="${rom.output.dir}/${customer.image.path}"/>
+        <set name="uda.output.dir" value="${rom.output.dir}${uda.image.path}"/>
+        <set name="eraseuda.output.dir" value="${rom.output.dir}"/>
+        
+        <!-- Template relative paths  -->
+        <set name="core.image.path" value="release_flash_images/${image.type}/core" />
+        <set name="languagepack.image.path" value="release_flash_images/${image.type}/language/${languagepack.id}_${description}" />
+        <set name="customer.image.path" value="release_flash_images/${image.type}/customer/${customer.type}/${customer.id}_${description}" />
+        <set name="uda.image.path" value="release_flash_images/${image.type}/user_data/${image.type}/${uda.id}_${description}" />
+        <set name="flash.config.path" value="release_flash_images/${image.type}/customer/${customer.type}/${customer.id}_${description}" />
+
+        <!-- Template names  -->
+        <set name="flash.image.name" value="${rombuild.id}_${image.type}_${flash.id}"/>    
+        <set name="eraseuda.image.name" value="${rombuild.id}_${build.version}"/>    
+        <set name="core.image.name" value="${rombuild.id}_${image.type}"/>
+        <set name="languagepack.image.name" value="${rombuild.id}_${languagepack.id}_${image.type}"/>
+        <set name="customer.image.name" value="${rommake.product.type}_${customer.image.version.name}_${customer.id}.${customer.revision}_${image.type}"/>
+        <set name="uda.image.name" value="${rombuild.id}_${uda.id}.${uda.revision}_${image.type}"/>
+        <set name="flash.config.name" value="${languagepack.image.name}_${customer.image.version.name}.${customer.id}.${customer.revision}_${image.type}.config.xml"/>
+
+        <!-- Template publish paths (used for flash config files generation) -->
+        <set name="rom.publish.dir" value="${image.version.name}"/>
+        <set name="core.publish.dir" value="${rom.publish.dir}/${core.image.path}"/>
+        <set name="languagepack.publish.dir" value="${rom.publish.dir}/${languagepack.image.path}"/>
+        <set name="customer.publish.dir" value="${customer.image.version.name}/${customer.image.path}"/>
+        <set name="uda.publish.dir" value="${rom.publish.dir}${uda.image.path}"/>
+        <!-- To be commented in when publish.dir is publish directories are up to date in common.ant.xml
+        <set name="flash.config.publish.dir" value="${publish.root.dir}/${build.name}/releases/${rom.publish.dir}/${flash.config.path}"/> 
+            -->
+        <set name="flash.config.publish.dir" value="${build.output.dir}/${flash.config.path}"/> 
+
+        <!-- fwid generation -->
+        <set name="rofs1.fwid.id" value="core"/>
+        <set name="rofs2.fwid.id" value="language"/>
+        <set name="rofs3.fwid.id" value="customer"/>
+        <set name="rofs1.fwid.version" value="${version.product.type}_${core.version.info}"/>
+        <set name="rofs2.fwid.version" value="${rofs2.version.info}"/>
+        <set name="rofs3.fwid.version" value="${rofs3.version.info}"/>
+        <set name="fota.fwid" value="${rofs1.fwid.version}_${rofs2.fwid.version}_${rofs3.fwid.version}"/>
+
+        <!-- BB5 version info -->
+        <set name="image.type.version" value="$(if $(subst rnd,,$(TYPE)),,RD)$(if $(subst subcon,,$(TYPE)),,SC)" /> <!-- RD for rnd, SC for subcon, empty string otherwise -->
+        <set name="core.version.info" value="${image.version.name}${image.type.version}" />
+        <set name="rofs1.version.info" value="${core.version.info}"/>
+        <set name="rofs2.version.info" value="${image.version.name}.${languagepack.id}.${languagepack.revision}${image.type.version}"/>
+        <set name="rofs3.version.info" value="${customer.image.version.name}.${customer.id}.${customer.revision}${image.type.version}"/>
+
+        <!-- Core version string format-->
+        <set name="core.template" value="${core.version.info}\\n${today}\\n${version.product.type}"/>
+        <set name="languagepack.template" value="${rofs2.version.info}\\n${today}\\n${version.product.type}" />
+        <set name="variant.template" value="${languagepack.template}" /> <!-- Backward compatibility -->
+        <set name="customer.template" value="${rofs3.version.info}\\n${today}\\n${version.product.type}"/>
+        <set name="model.template" value="${version.copyright} ${version.product.name}"/>
+        <set name="uda.template" value="${pr}.${version.bandvariant}.${build.number}${fota.version}\\n${today}\\n${product.type}\\n${copyright} ${version.product.name} (${uda.id})"/>
+
+        <!-- default localisation settings -->
+        <set name="variation" value="western"/>
+        <set name="languagepack.revision" value="1"/>
+        <set name="customer.revision" value="1"/>
+        <set name="description" value=""/>
+
+        <!-- Do not build target in parallel by default -->
+        <set name="build.parallel" value="false" />
+
+        <!-- templates to generate the makefiles -->
+        <set name="output.makefile.filename" value="${rombuild.makefile.name}"/>
+        <set name="main.makefile.template" value="${build.drive}\mc\mc_config\mc_5132_config\rombuild\main.mk"/>
+        <set name="flash.makefile.template" value="${build.drive}\mc\mc_config\mc_5132_config\rombuild\flash.mk"/>
+        <set name="core.makefile.template" value="${build.drive}\mc\mc_config\mc_5132_config\rombuild\core.mk"/>
+        <set name="languagepack.makefile.template" value="${build.drive}\mc\mc_config\mc_5132_config\rombuild\languagepack.mk"/>
+        <set name="customer.makefile.template" value="${build.drive}\mc\mc_config\mc_5132_config\rombuild\customer.mk"/>
+        <set name="uda.makefile.template" value="${build.drive}\mc\mc_config\mc_5132_config\rombuild\uda.mk"/>
+        <set name="eraseuda.makefile.template" value="${build.drive}\mc\mc_config\mc_5132_config\rombuild\eraseuda.mk"/>
+        <set name="flash.config.template" value="${build.drive}\mc\mc_config\mc_5132_config\rombuild\template.config.xml"/>
+        <set name="flash.config.makefile.template" value="${build.drive}\mc\mc_config\mc_5132_config\rombuild\flash_config.mk"/>
+        <set name="makeupct_core.makefile.template" value="${build.drive}\mc\mc_config\mc_5132_config\rombuild\makeupct_core.mk"/>
+
+
+        <spec name="PRODUCT" abstract="true">
+    
+            <set name="config.name" value="PRODUCT"/>
+            <set name="version.bandvariant" value="0"/>
+
+            <set name="rommake.hwid" value="2048"/>
+            <set name="version.product.type" value="RM-235"/>
+            <set name="rommake.product.name" value="PRODUCT"/>
+            <set name="rommake.product.type" value="RM-235"/>
+
+            <spec name="ee_group" abstract="true">
+                <set name="image.type" value="rnd,prd"/>
+                <set name="variant.txt.path" value="\epoc32\data\z\resource\versions\langsw.${config.name}.txt"/>
+                <set name="image.type.version" value="EE$(if $(subst rnd,,$(TYPE)),,RD)" /> <!-- EE for Prd, EERD for R&D -->
+
+                <!-- GUI images -->
+                <spec name="ee_roms" abstract="true">
+                    <set name="build.parallel" value="true" />                  
+                    
+                    <spec name="ee_rnd" abstract="true">
+                        <set name="image.type" value="rnd"/>
+                        
+                        <spec type="flash">                            
+                            <set name="flash.id" value="ui" />
+                            <set name="use.foti" value="0"/>
+                            <set name="use.fota" value="0"/>                       
+                        </spec>                    
+                        
+                        <spec type="eraseuda"/>
+                    </spec>
+
+                    <spec name="ee_prd" abstract="true">
+                        <set name="image.type" value="prd"/>
+                        
+                        <spec type="flash">                            
+                            <set name="flash.id" value="ui" />
+                            <set name="use.foti" value="1"/>
+                            <set name="use.fota" value="1"/>                       
+                        </spec>                                        
+                        
+                        <spec type="eraseuda"/>
+                    </spec>
+                </spec>
+    
+                <spec name="subcon_roms" abstract="true">
+                    <set name="build.parallel" value="true" />
+                    <set name="image.type" value="subcon"/>
+                    
+                    <spec type="flash">
+                        <set name="flash.id" value="ui" />
+                    </spec>
+    
+                    <spec type="eraseuda"/>
+                </spec>
+    
+    
+                <spec name="traces" abstract="true">
+                    <set name="build.parallel" value="false" />
+                    <set name="flash.output.dir" value="${rom.output.dir}/${rommake.product.name}/${flash.id}_traces"/>    
+                        
+        
+                    <spec type="flash">
+                        <set name="flash.id" value="wakeup_trace" />
+                        <set name="image.type" value="rnd"/>
+                        <set name="mytraces.binaries" value="
+                            estart.exe,
+                            ekern.exe,
+                            efile.exe,
+                            Starter.exe,
+                            StarterClient.dll,
+                            SysLangUtil.dll,
+                            SysStart.exe" />
+                    </spec>
+        
+                    <spec type="flash">
+                        <set name="flash.id" value="telephony" />
+                        <set name="image.type" value="rnd"/>
+                        <set name="mytraces.binaries" value="
+                            ETELMM.DLL,
+                            ETELPCKT.DLL,
+                            ETELSAT.DLL,
+                            FLOGGER.DLL,
+                            flogsvr.exe,
+                            COMSDBGUTIL.DLL,
+                            COMSDBGSVR.DLL,
+                            COMSDBGSVR.EXE,
+                            COMSDBGSVR.LIB"/>
+                    </spec>
+        
+                    <spec type="flash">
+                        <set name="flash.id" value="audio" />
+                        <set name="image.type" value="rnd"/>
+                        <set name="mytraces.binaries" value="
+                            audiopolicyserver.dll,
+                            audiopolicyapimsgs.dll,
+                            audiopolicyclient.dll,
+                            MMFDevSound.dll,
+                            MmfAudioServerProxy.dll,
+                            MmfDevSoundProxy.dll,
+                            DevSoundEffectCI.dll,
+                            DevSoundCI.dll,
+                            MmRmProxy.dll,
+                            Aamm.dll,
+                            Lac.dll,
+                            AudioStream.dll,
+                            AudioServer.dll,
+                            AudioServerProxy.dll,
+                            AudioServerCommon.dll,
+                            EapGwc.dll,
+                            EAPControlModule.dll,
+                            RawGwc.dll,
+                            RawHwDevice.dll,
+                            DevSoundAdaptationLayer.dll,
+                            MmfDevSoundServer.dll,
+                            MuMdrcEqTune.dll,
+                            mumdrceqcoeff.dll,
+                            mumdrceqfirgeq.dll,
+                            mumdrceqgwc.dll,
+                            mumdrceqloud.dll,
+                            MuMdrcGwc.dll,
+                            NokiaDSY.DLL,
+                            MmRmServer.dll,
+                            Bal.dll,
+                            BalBuffers.dll,
+                            BalBufferManager.dll,
+                            Gwc.dll,
+                            DspMemMapper.dll,
+                            GatewayserverAVC.exe,
+                            GatewayserverclientAVC.dll"/>
+                    </spec>
+        
+                    <spec type="flash">
+                        <set name="flash.id" value="videotelephony" />
+                        <set name="image.type" value="rnd"/>
+                        <set name="mytraces.binaries" value="
+                            euser.dll,
+                            CamServerCore.dll,
+                            CamServerCore.exe,
+                            DisplaySink.dll,
+                            VTImageConverter.dll,
+                            VTImageTransforms.dll,
+                            ECam.dll,
+                            ECamPluginSupport.dll,
+                            ECamAdvSettings.dll,
+                            PVOSCLBASE.DLL,
+                            PVOSCLERROR.DLL,
+                            PVOSCLMEMORY.DLL,
+                            PVOSCLUTIL.DLL,
+                            PVOSCLIO.DLL,
+                            PVMF.DLL,
+                            PVGENERALTOOLS.DLL,
+                            PV324M.DLL,
+                            PVVIDEOENCMDFNODE.DLL,
+                            PVM4VH263DEC.DLL,
+                            PVVIDEODECNODE.DLL,
+                            PVDEVSOUNDPLAY.DLL,
+                            PVDEVSOUNDREC.DLL,
+                            PVSYMBIANNODEADAPTERS.DLL,
+                            PVCAMSRCNODE.DLL,
+                            PVDISPSINKNODE.DLL,
+                            PVSYMBIANADAPTERS.DLL,
+                            PV2WAYENGINE.DLL,
+                            PV2WAYSYMBIANADAPTER.DLL,
+                            PvThreadMessaging.dll,
+                            PvLogger.dll,
+                            PVOSCLPROC.DLL,
+                            PVVIDEOPARSERNODE.DLL,
+                            Gatewayserver.exe,
+                            Gatewayserverclient.dll,
+                            VidRecMediaDevice.dll,
+                            VideoSource.dll,
+                            Videoteleng.dll,
+                            cscallctrl.dll,
+                            vtlogger.dll,
+                            videotelui.exe,
+                            videotelui.app,
+                            Phone.exe,
+                            PhoneEngine.dll"/>
+                    </spec>
+        
+                    <spec type="flash">
+                        <set name="flash.id" value="mms" />
+                        <set name="image.type" value="rnd"/>
+                        <set name="mytraces.binaries" value="
+                            mmscli.dll,
+                            mmssrv.dll,
+                            mmstransport.dll,
+                            mmscodec.dll,
+                            mmsmessage.dll,
+                            mmsserversettings.dll,
+                            mmscodecclient.dll,
+                            mmsappadapter.dll,
+                            mmswatcher.dll,
+                            MmsPushHandler.dll,
+                            mmsgenutils.dll,
+                            mmssettings.dll,
+                            mmsui.dll,
+                            mmsdatautils.dll,
+                            mmsuiutils.dll,
+                            notui.dll"/>
+                    </spec>
+        
+                    <spec type="flash">
+                        <set name="flash.id" value="sms" />
+                        <set name="image.type" value="rnd"/>
+                        <set name="mytraces.binaries" value="
+                            smseditor.exe,
+                            smsviewer.exe,
+                            smsstrict.dll,
+                            gsmu.dll,
+                            smsu.dll,
+                            smsprot.prt,
+                            wapprot.prt,
+                            msexe.exe,
+                            msgs.dll,
+                            watcher.exe,
+                            schsendexe.exe,
+                            schsend.dll,
+                            smum.dll,
+                            smcm.dll,
+                            smss.dll"/>
+                    </spec>
+        
+                    <spec type="flash">
+                        <set name="flash.id" value="networking" />
+                        <set name="image.type" value="rnd"/>
+                        <set name="mytraces.binaries" value="
+                            tcpip6.PRT,
+                            genericnif.NIF,
+                            connmon.DLL,
+                            nifman.DLL,
+                            esock.DLL,
+                            esocksvr.DLL,
+                            eintsock.DLL,
+                            subconparams.DLL,
+                            eintsock_transport.DLL,
+                            ipcpr.DLL,
+                            shimcpr.DLL"/>
+                    </spec>
+        
+                    <spec type="flash">
+                        <set name="flash.id" value="tsy" />
+                        <set name="image.type" value="rnd"/>
+                        <set name="mytraces.binaries" value="
+                            phonetsy.tsy,
+                            commontsy.dll,
+                            nokiatsy.dll,
+                            simatktsy.dll,
+                            FLOGGER.DLL,
+                            flogsvr.exe,
+                            COMSDBGUTIL.DLL,
+                            COMSDBGSVR.DLL,
+                            COMSDBGSVR.EXE,
+                            COMSDBGSVR.LIB"/>
+                    </spec>
+        
+                    <spec type="flash">
+                        <set name="flash.id" value="email" />
+                        <set name="image.type" value="rnd"/>
+                        <set name="mytraces.binaries" value="
+                            MsgMailUtils.dll,
+                            MailPlainView.dll,
+                            MsgMailEditor.exe,
+                            MsgMailViewer.exe,
+                            AutoSend.exe,
+                            Imcm.dll,
+                            Imps.dll,
+                            Pops.dll,
+                            Imut.dll,
+                            Smts.dll,
+                            MailHtmlView.dll"/>
+                    </spec>
+        
+                    <spec type="flash">
+                        <set name="flash.id" value="ibusal" />
+                        <set name="image.type" value="rnd"/>
+                        <set name="mytraces.binaries" value="
+                            dataport.csy,
+                            ftserverif.dll,
+                            ftserver.exe,
+                            ftdconnmonplugin.dll,
+                            ftdsysteminfoplugin.dll,
+                            ftdversioninfoplugin.dll,
+                            SAServer.EXE,
+                            SAServer.DLL,
+                            SAClient.DLL,
+                            SAIscService.DLL,
+                            AccessoryAdaptation.DLL,
+                            SAAccessoryService.DLL,
+                            StartupAdaptation.DLL,
+                            SAStartupService.DLL,
+                            SALanguageService.DLL,
+                            SASimUtilsService.DLL,
+                            SAAlarmService.DLL,
+                            SystemAdaptationExt.DLL,
+                            VibraAdaptation.DLL,
+                            LightsAdaptation.DLL,
+                            EmAdaptation.DLL,
+                            SAVibraService.DLL,
+                            SALightsService.DLL,
+                            SAEmService.DLL,
+                            ISA_KERNEL_IF.dll,
+                            IscIsiMultiplexer.ldd,
+                            Isimessage.dll,
+                            isimsg.dll,
+                            IscApi.dll,
+                            IscDriver.ldd,
+                            IscDriverExtension.ldd,
+                            IscMultiplexerBase.dll,
+                            IscDataTransmissionBase.dll,
+                            NokiaDSY.DLL,
+                            DosSrv.dll,
+                            DosServer.exe,
+                            DSClient.dll,
+                            CommonDSY.DLL,
+                            SIMATKTSY.dll,
+                            NOKIATSY.DLL,
+                            CUSTOMAPIEXT.DLL,
+                            COMMONTSY.DLL,
+                            PHONETSY.TSY"/>
+                    </spec>
+    
+                    <spec type="flash">
+                        <set name="flash.id" value="drm" />
+                        <set name="image.type" value="rnd"/>
+                        <set name="mytraces.binaries" value="
+                            RoapHandler.DLL"/>
+                    </spec>
+    
+                    <spec type="flash">
+                        <set name="flash.id" value="DVB-H" />
+                        <set name="image.type" value="rnd"/>
+                        <set name="mytraces.binaries" value="
+                            ECommerceMgrClient.dll,
+                            ECommerceManager.exe,
+                            ECRoapPlugin.dll,
+                            DVBHPDD.PDD,
+                            ESGMANAGER.EXE,
+                            IPDCDATABASEN.DLL,
+                            IPDCMANAGER.EXE,
+                            IPDCMGRCLIENT.DLL,
+                            RecManager.dll,
+                            DvrClient.dll,
+                            RbfClient.dll,
+                            RbfWrapper.dll,
+                            RbfServer.exe,
+                            DvbhMgr.exe,
+                            DvbhMgrClient.dll,
+                            IPDCLOGGER.DLL,
+                            MobileTv.exe,
+                            FCastManagerClient.dll,
+                            FCastManagerServer.exe,
+                            fcastserver.exe,
+                            fcastclient.dll,
+                            rightsserver.exe,
+                            ROAPHandler.dll,
+                            RNAVCONTROLLER.DLL"/>
+                    </spec>
+                </spec>
+            </spec>
+        
+            <!-- Language pack and Variant -->
+            <spec name="variants" abstract="true">
+                <set name="build.parallel" value="false" />        
+                <!-- core -->
+                <spec type="core">
+                    <set name="core.id" value="00" />
+                    <spec type="makeupct_core" />
+                </spec>-->
+         
+                <!-- western group -->
+                <spec name="western" abstract="true">
+                    <set name="build.parallel" value="true" />
+                    <spec type="languagepack">
+                        <set name="languagepack.id" value="01" />
+                        <set name="default" value="01"/>
+                        <set name="languages" value="01,02,03,05,04,13"/>
+                        <set name="description" value="EURO1"/>
+                        <set name="variation" value="western"/>
+                    </spec> 
+                    <spec type="languagepack">
+                        <set name="languagepack.id" value="02"/>
+                        <set name="default" value="01"/>
+                        <set name="languages" value="01,02,03,14,05,18"/>
+                        <set name="description" value="EURO2"/>
+                    </spec>
+                    <spec type="languagepack">
+                        <set name="languagepack.id" value="03"/>
+                        <set name="default" value="01"/>
+                        <set name="languages" value="01,09,06,08,15,07"/>
+                        <set name="description" value="SCANDINAVIA"/>
+                    </spec>
+                    <spec type="languagepack">
+                        <set name="languagepack.id" value="04"/>
+                        <set name="default" value="01"/>
+                        <set name="languages" value="01,03,49,16,67,68"/>
+                        <set name="description" value="BALTIAN"/>
+                    </spec>
+                    <spec type="languagepack">
+                        <set name="languagepack.id" value="05"/>
+                        <set name="default" value="01"/>
+                        <set name="languages" value="01,03,93,16,78,42,17"/>
+                        <set name="description" value="RUSSIAN"/>
+                    </spec>
+                    <spec type="languagepack">
+                        <set name="languagepack.id" value="06"/>
+                        <set name="default" value="01"/>
+                        <set name="languages" value="01,25,26,03,27,17"/>
+                        <set name="description" value="EURO3"/>
+                    </spec>
+                    <spec type="languagepack">
+                        <set name="languagepack.id" value="07"/>
+                        <set name="default" value="01"/>
+                        <set name="languages" value="01,03,45,28,79,54"/>
+                        <set name="description" value="BALKANS"/>
+                    </spec>
+                    <spec type="languagepack">
+                        <set name="languagepack.id" value="08"/>
+                        <set name="default" value="01"/>
+                        <set name="languages" value="01,02,37"/>
+                        <set name="description" value="ARABIC1"/>
+                    </spec>
+                    <spec type="languagepack">
+                        <set name="languagepack.id" value="09"/>
+                        <set name="default" value="01"/>
+                        <set name="languages" value="01,57,37,16,78,04"/>
+                        <set name="description" value="HEBREW"/>
+                    </spec>
+                    <spec type="languagepack">
+                        <set name="languagepack.id" value="10"/>
+                        <set name="default" value="01"/>
+                        <set name="languages" value="01,13"/>
+                        <set name="description" value="AFRICA1"/>
+                    </spec>
+                    <spec type="languagepack">
+                        <set name="languagepack.id" value="13"/>
+                        <set name="default" value="01"/>
+                        <set name="languages" value="01,39"/>
+                        <set name="description" value="APAC2"/>
+                    </spec>
+                    <spec type="languagepack">
+                        <set name="languagepack.id" value="16"/>
+                        <set name="default" value="161"/>
+                        <set name="languages" value="161,33"/>
+                        <set name="description" value="THAI"/>
+                    </spec>
+                    <spec type="languagepack">
+                        <set name="languagepack.id" value="18"/>
+                        <set name="default" value="01"/>
+                        <set name="languages" value="01,96"/>
+                        <set name="description" value="VIETNAM"/>
+                    </spec>
+                    <spec type="languagepack">
+                        <set name="languagepack.id" value="19"/>
+                        <set name="default" value="10"/>
+                        <set name="languages" value="10,51,76,83"/>
+                        <set name="description" value="AMERICAS"/>
+                    </spec>
+                    <spec type="languagepack">
+                        <set name="languagepack.id" value="21"/>
+                        <set name="default" value="01"/>
+                        <set name="languages" value="04,44,401,402,01,03,13"/>
+                        <set name="description" value="SPAIN"/>
+                    </spec>
+                    <spec type="languagepack">
+                        <set name="languagepack.id" value="22"/>
+                        <set name="default" value="01"/>
+                        <set name="languages" value="01,37,50,94"/>
+                        <set name="description" value="ARABIC2"/>
+                    </spec>
+                    <spec type="languagepack">
+                        <set name="languagepack.id" value="23"/>
+                        <set name="default" value="01"/>
+                        <set name="languages" value="01,02,18,03,05"/>
+                        <set name="description" value="AFRICA2"/>
+                    </spec>
+    
+                    <spec name="customer_variants" abstract="true">
+                        <set name="customer.revision" value="1"/>
+                        <set name="build.parallel" value="true"/>
+                        <spec name="vanilla_customer_variants" abstract="true">
+                            <spec type="customer">
+                                <set name="customer.id" value="51"/>
+                                <set name="description" value="GENERAL"/>
+                            </spec>
+                            <spec type="customer">
+                                <set name="customer.id" value="52"/>
+                                <set name="description" value="SPECIFIC"/>
+                                <set name="compatible.languagepack" value="01,02,03"/>
+                            </spec>
+                        </spec>
+                        
+                        <!-- Variant team customer variants HERE ! -->
+                        <spec name="vt_customer_variants" abstract="true">
+                            <set name="customer.type" value="operatorcountry"/>
+                            <spec type="customer">
+                                <!-- re-build variant -->
+                                <set name="customer.id" value="100"/>
+                                <set name="customer.revision" value="2"/>
+                                <set name="description" value=""/>
+                                <set name="compatible.languagepack" value="03"/>
+                            </spec>
+                            <spec type="customer">
+                                <!-- re-use previous variant -->
+                                <set name="customer.image.version.name" value="10.30${fota.version}"/>
+                                
+                                <set name="customer.id" value="101"/>
+                                <set name="description" value="OPERATOR_UK"/>
+                                <set name="compatible.languagepack" value="01"/>
+                                
+                            </spec>
+                        </spec>
+                        <!-- END Variant team customer variants ! -->
+                    </spec>
+                </spec>
+         
+                <!-- china group -->
+                <spec  name="china" abstract="true">
+                    <set name="build.parallel" value="true" />
+                    <set name="variation" value="china" />
+                    <spec type="languagepack">
+                        <set name="languagepack.id" value="11"/>
+                        <set name="default" value="29"/>
+                        <set name="languages" value="29,157"/>
+                        <set name="description" value="CHINESE_TAIWAN"/>
+                    </spec>
+                    <spec type="languagepack">
+                        <set name="languagepack.id" value="12"/>
+                        <set name="default" value="159"/>
+                        <set name="languages" value="159,31,326,327"/>
+                        <set name="description" value="APAC1"/>
+                    </spec>
+                    <spec type="languagepack">
+                        <set name="languagepack.id" value="15"/>
+                        <set name="default" value="158"/>
+                        <set name="languages" value="158,30,31"/>
+                        <set name="description" value="HONGKONG"/>
+                    </spec>
+                    <spec type="languagepack">
+                        <set name="languagepack.id" value="20"/>
+                        <set name="default" value="159"/>
+                        <set name="languages" value="159,31"/>
+                        <set name="description" value="CHINA_PRC"/>
+                    </spec>
+                </spec>
+            
+                <!-- japan group -->
+                <spec  name="japan" abstract="true">
+                    <set name="build.parallel" value="true" />
+                    <set name="variation" value="japan" />
+                    <spec  type="languagepack">
+                        <set name="languagepack.id" value="14"/>
+                        <set name="default" value="160"/>
+                        <set name="languages" value="160,32"/>
+                        <set name="description" value="JAPAN"/>
+                    </spec>
+                </spec>
+            </spec>
+        </spec>
+
+        <!--
+          PRODUCT edge configuration
+        -->
+        <spec name="PRODUCT_edge" abstract="true">
+            <set name="config.name" value="PRODUCT_edge"/>
+            <set name="version.bandvariant" value="1"/>
+            <set name="zips.loc.dir" value="${zips.loc.dir}" />
+            <set name="variation" value="western"/>
+            <set name="config.name" value="PRODUCT_edge"/>
+            <set name="rommake.product.name" value="PRODUCT_edge"/>
+            <set name="version.product.type" value="RM-236"/>
+            <set name="rommake.product.type" value="RM-236"/>
+      
+            <set name="rommake.hwid" value="2100"/>
+
+            <spec name="ee_group" abstract="true">
+                <set name="image.type" value="rnd,prd"/>
+                <set name="variant.txt.path" value="\epoc32\data\z\resource\versions\langsw.${config.name}.txt"/>
+                <set name="image.type.version" value="EE$(if $(subst rnd,,$(TYPE)),,RD)" /> <!-- EE for Prd, EERD for R&D -->
+                
+
+                <!-- GUI images -->
+                <spec name="ee_roms" abstract="true">
+                    <set name="build.parallel" value="true" />                  
+                    
+                    <spec name="ee_rnd" abstract="true">
+                        <set name="image.type" value="rnd"/>
+                        
+                        <spec type="flash">                            
+                            <set name="flash.id" value="ui" />
+                            <set name="use.foti" value="0"/>
+                            <set name="use.fota" value="0"/>                       
+                        </spec>                    
+                        
+                        <spec type="eraseuda"/>
+                    </spec>
+
+                    <spec name="ee_prd" abstract="true">
+                        <set name="image.type" value="prd"/>
+                        
+                        <spec type="flash">                            
+                            <set name="flash.id" value="ui" />
+                            <set name="use.foti" value="1"/>
+                            <set name="use.fota" value="1"/>                       
+                        </spec>                                        
+                        
+                        <spec type="eraseuda"/>
+                    </spec>
+                </spec>
+    
+                <spec name="subcon_roms" abstract="true">
+                    <set name="build.parallel" value="true" />
+                    <set name="image.type" value="subcon"/>
+                    
+                    <spec type="flash">
+                        <set name="flash.id" value="ui" />
+                    </spec>
+    
+                    <spec type="eraseuda"/>
+                </spec>
+    
+    
+                <spec name="traces" abstract="true">
+                    <set name="build.parallel" value="false" />
+                    <set name="flash.output.dir" value="${rom.output.dir}/${rommake.product.name}/${flash.id}_traces"/>    
+                        
+        
+                    <spec type="flash">
+                        <set name="flash.id" value="wakeup_trace" />
+                        <set name="image.type" value="rnd"/>
+                        <set name="mytraces.binaries" value="
+                            estart.exe,
+                            ekern.exe,
+                            efile.exe,
+                            Starter.exe,
+                            StarterClient.dll,
+                            SysLangUtil.dll,
+                            SysStart.exe" />
+                    </spec>
+        
+                    <spec type="flash">
+                        <set name="flash.id" value="telephony" />
+                        <set name="image.type" value="rnd"/>
+                        <set name="mytraces.binaries" value="
+                            ETELMM.DLL,
+                            ETELPCKT.DLL,
+                            ETELSAT.DLL,
+                            FLOGGER.DLL,
+                            flogsvr.exe,
+                            COMSDBGUTIL.DLL,
+                            COMSDBGSVR.DLL,
+                            COMSDBGSVR.EXE,
+                            COMSDBGSVR.LIB"/>
+                    </spec>
+        
+                    <spec type="flash">
+                        <set name="flash.id" value="audio" />
+                        <set name="image.type" value="rnd"/>
+                        <set name="mytraces.binaries" value="
+                            audiopolicyserver.dll,
+                            audiopolicyapimsgs.dll,
+                            audiopolicyclient.dll,
+                            MMFDevSound.dll,
+                            MmfAudioServerProxy.dll,
+                            MmfDevSoundProxy.dll,
+                            DevSoundEffectCI.dll,
+                            DevSoundCI.dll,
+                            MmRmProxy.dll,
+                            Aamm.dll,
+                            Lac.dll,
+                            AudioStream.dll,
+                            AudioServer.dll,
+                            AudioServerProxy.dll,
+                            AudioServerCommon.dll,
+                            EapGwc.dll,
+                            EAPControlModule.dll,
+                            RawGwc.dll,
+                            RawHwDevice.dll,
+                            DevSoundAdaptationLayer.dll,
+                            MmfDevSoundServer.dll,
+                            MuMdrcEqTune.dll,
+                            mumdrceqcoeff.dll,
+                            mumdrceqfirgeq.dll,
+                            mumdrceqgwc.dll,
+                            mumdrceqloud.dll,
+                            MuMdrcGwc.dll,
+                            NokiaDSY.DLL,
+                            MmRmServer.dll,
+                            Bal.dll,
+                            BalBuffers.dll,
+                            BalBufferManager.dll,
+                            Gwc.dll,
+                            DspMemMapper.dll,
+                            GatewayserverAVC.exe,
+                            GatewayserverclientAVC.dll"/>
+                    </spec>
+        
+                    <spec type="flash">
+                        <set name="flash.id" value="videotelephony" />
+                        <set name="image.type" value="rnd"/>
+                        <set name="mytraces.binaries" value="
+                            euser.dll,
+                            CamServerCore.dll,
+                            CamServerCore.exe,
+                            DisplaySink.dll,
+                            VTImageConverter.dll,
+                            VTImageTransforms.dll,
+                            ECam.dll,
+                            ECamPluginSupport.dll,
+                            ECamAdvSettings.dll,
+                            PVOSCLBASE.DLL,
+                            PVOSCLERROR.DLL,
+                            PVOSCLMEMORY.DLL,
+                            PVOSCLUTIL.DLL,
+                            PVOSCLIO.DLL,
+                            PVMF.DLL,
+                            PVGENERALTOOLS.DLL,
+                            PV324M.DLL,
+                            PVVIDEOENCMDFNODE.DLL,
+                            PVM4VH263DEC.DLL,
+                            PVVIDEODECNODE.DLL,
+                            PVDEVSOUNDPLAY.DLL,
+                            PVDEVSOUNDREC.DLL,
+                            PVSYMBIANNODEADAPTERS.DLL,
+                            PVCAMSRCNODE.DLL,
+                            PVDISPSINKNODE.DLL,
+                            PVSYMBIANADAPTERS.DLL,
+                            PV2WAYENGINE.DLL,
+                            PV2WAYSYMBIANADAPTER.DLL,
+                            PvThreadMessaging.dll,
+                            PvLogger.dll,
+                            PVOSCLPROC.DLL,
+                            PVVIDEOPARSERNODE.DLL,
+                            Gatewayserver.exe,
+                            Gatewayserverclient.dll,
+                            VidRecMediaDevice.dll,
+                            VideoSource.dll,
+                            Videoteleng.dll,
+                            cscallctrl.dll,
+                            vtlogger.dll,
+                            videotelui.exe,
+                            videotelui.app,
+                            Phone.exe,
+                            PhoneEngine.dll"/>
+                    </spec>
+        
+                    <spec type="flash">
+                        <set name="flash.id" value="mms" />
+                        <set name="image.type" value="rnd"/>
+                        <set name="mytraces.binaries" value="
+                            mmscli.dll,
+                            mmssrv.dll,
+                            mmstransport.dll,
+                            mmscodec.dll,
+                            mmsmessage.dll,
+                            mmsserversettings.dll,
+                            mmscodecclient.dll,
+                            mmsappadapter.dll,
+                            mmswatcher.dll,
+                            MmsPushHandler.dll,
+                            mmsgenutils.dll,
+                            mmssettings.dll,
+                            mmsui.dll,
+                            mmsdatautils.dll,
+                            mmsuiutils.dll,
+                            notui.dll"/>
+                    </spec>
+        
+                    <spec type="flash">
+                        <set name="flash.id" value="sms" />
+                        <set name="image.type" value="rnd"/>
+                        <set name="mytraces.binaries" value="
+                            smseditor.exe,
+                            smsviewer.exe,
+                            smsstrict.dll,
+                            gsmu.dll,
+                            smsu.dll,
+                            smsprot.prt,
+                            wapprot.prt,
+                            msexe.exe,
+                            msgs.dll,
+                            watcher.exe,
+                            schsendexe.exe,
+                            schsend.dll,
+                            smum.dll,
+                            smcm.dll,
+                            smss.dll"/>
+                    </spec>
+        
+                    <spec type="flash">
+                        <set name="flash.id" value="networking" />
+                        <set name="image.type" value="rnd"/>
+                        <set name="mytraces.binaries" value="
+                            tcpip6.PRT,
+                            genericnif.NIF,
+                            connmon.DLL,
+                            nifman.DLL,
+                            esock.DLL,
+                            esocksvr.DLL,
+                            eintsock.DLL,
+                            subconparams.DLL,
+                            eintsock_transport.DLL,
+                            ipcpr.DLL,
+                            shimcpr.DLL"/>
+                    </spec>
+        
+                    <spec type="flash">
+                        <set name="flash.id" value="tsy" />
+                        <set name="image.type" value="rnd"/>
+                        <set name="mytraces.binaries" value="
+                            phonetsy.tsy,
+                            commontsy.dll,
+                            nokiatsy.dll,
+                            simatktsy.dll,
+                            FLOGGER.DLL,
+                            flogsvr.exe,
+                            COMSDBGUTIL.DLL,
+                            COMSDBGSVR.DLL,
+                            COMSDBGSVR.EXE,
+                            COMSDBGSVR.LIB"/>
+                    </spec>
+        
+                    <spec type="flash">
+                        <set name="flash.id" value="email" />
+                        <set name="image.type" value="rnd"/>
+                        <set name="mytraces.binaries" value="
+                            MsgMailUtils.dll,
+                            MailPlainView.dll,
+                            MsgMailEditor.exe,
+                            MsgMailViewer.exe,
+                            AutoSend.exe,
+                            Imcm.dll,
+                            Imps.dll,
+                            Pops.dll,
+                            Imut.dll,
+                            Smts.dll,
+                            MailHtmlView.dll"/>
+                    </spec>
+        
+                    <spec type="flash">
+                        <set name="flash.id" value="ibusal" />
+                        <set name="image.type" value="rnd"/>
+                        <set name="mytraces.binaries" value="
+                            dataport.csy,
+                            ftserverif.dll,
+                            ftserver.exe,
+                            ftdconnmonplugin.dll,
+                            ftdsysteminfoplugin.dll,
+                            ftdversioninfoplugin.dll,
+                            SAServer.EXE,
+                            SAServer.DLL,
+                            SAClient.DLL,
+                            SAIscService.DLL,
+                            AccessoryAdaptation.DLL,
+                            SAAccessoryService.DLL,
+                            StartupAdaptation.DLL,
+                            SAStartupService.DLL,
+                            SALanguageService.DLL,
+                            SASimUtilsService.DLL,
+                            SAAlarmService.DLL,
+                            SystemAdaptationExt.DLL,
+                            VibraAdaptation.DLL,
+                            LightsAdaptation.DLL,
+                            EmAdaptation.DLL,
+                            SAVibraService.DLL,
+                            SALightsService.DLL,
+                            SAEmService.DLL,
+                            ISA_KERNEL_IF.dll,
+                            IscIsiMultiplexer.ldd,
+                            Isimessage.dll,
+                            isimsg.dll,
+                            IscApi.dll,
+                            IscDriver.ldd,
+                            IscDriverExtension.ldd,
+                            IscMultiplexerBase.dll,
+                            IscDataTransmissionBase.dll,
+                            NokiaDSY.DLL,
+                            DosSrv.dll,
+                            DosServer.exe,
+                            DSClient.dll,
+                            CommonDSY.DLL,
+                            SIMATKTSY.dll,
+                            NOKIATSY.DLL,
+                            CUSTOMAPIEXT.DLL,
+                            COMMONTSY.DLL,
+                            PHONETSY.TSY"/>
+                    </spec>
+    
+                    <spec type="flash">
+                        <set name="flash.id" value="drm" />
+                        <set name="image.type" value="rnd"/>
+                        <set name="mytraces.binaries" value="
+                            RoapHandler.DLL"/>
+                    </spec>
+    
+                    <spec type="flash">
+                        <set name="flash.id" value="DVB-H" />
+                        <set name="image.type" value="rnd"/>
+                        <set name="mytraces.binaries" value="
+                            ECommerceMgrClient.dll,
+                            ECommerceManager.exe,
+                            ECRoapPlugin.dll,
+                            DVBHPDD.PDD,
+                            ESGMANAGER.EXE,
+                            IPDCDATABASEN.DLL,
+                            IPDCMANAGER.EXE,
+                            IPDCMGRCLIENT.DLL,
+                            RecManager.dll,
+                            DvrClient.dll,
+                            RbfClient.dll,
+                            RbfWrapper.dll,
+                            RbfServer.exe,
+                            DvbhMgr.exe,
+                            DvbhMgrClient.dll,
+                            IPDCLOGGER.DLL,
+                            MobileTv.exe,
+                            FCastManagerClient.dll,
+                            FCastManagerServer.exe,
+                            fcastserver.exe,
+                            fcastclient.dll,
+                            rightsserver.exe,
+                            ROAPHandler.dll,
+                            RNAVCONTROLLER.DLL"/>
+                    </spec>
+                </spec>
+            </spec>
+
+            <spec name="variants" abstract="true">
+                <set name="variation" value="china"/>
+                <set name="build.parallel" value="false" />      
+                <!-- core -->
+                <spec type="core">
+                    <set name="core.id" value="00" />
+                    <set name="image.type" value="rnd,prd"/>
+                    <spec type="makeupct_core" />
+                </spec>
+
+                <!-- customer -->
+                <spec  type="customer">
+                    <set name="customer.id" value="01"/>
+                    <set name="customer.revision" value="1"/>
+                    <set name="description" value="edge_customer_variant"/>
+                </spec>
+
+                <spec type="languagepack">
+                    <set name="languagepack.id" value="20"/>
+                    <set name="default" value="159"/>
+                    <set name="languages" value="159,31"/>
+                    <set name="description" value="CHINA"/>
+                </spec>
+            </spec>
+        </spec>
+  
+    
+        <!-- PRODUCT Americas/lta configuration -->
+        <spec name="PRODUCT_lta" abstract="true">
+            <set name="config.name" value="PRODUCT_lta"/>      
+            <set name="version.bandvariant" value="0"/>
+            <set name="zips.loc.dir" value="${zips.loc.dir}" />
+            <set name="variation" value="western"/>
+            <set name="config.name" value="PRODUCT_lta"/>
+            <set name="rommake.product.name" value="PRODUCT_lta"/>
+            <set name="version.product.type" value="RM-342"/>
+            <set name="rommake.product.type" value="RM-342"/>
+      
+            <set name="rommake.hwid" value="4200"/>
+            
+            <spec name="ee_group" abstract="true">
+            
+                <set name="build.parallel" value="true" />
+                <set name="image.type" value="rnd,prd"/>
+                <set name="variant.txt.path" value="\epoc32\data\z\resource\versions\langsw.${config.name}.txt"/>
+                <set name="image.type.version" value="EE$(if $(subst rnd,,$(TYPE)),,RD)" /> <!-- EE for Prd, EERD for R&D -->
+
+                <!-- GUI images -->
+                <spec name="ee_roms" abstract="true">
+                    <set name="build.parallel" value="true" />                  
+                    
+                    <spec name="ee_rnd" abstract="true">
+                        <set name="image.type" value="rnd"/>
+                        
+                        <spec type="flash">                            
+                            <set name="flash.id" value="ui" />
+                            <set name="use.foti" value="0"/>
+                            <set name="use.fota" value="0"/>                       
+                        </spec>                    
+                        
+                        <spec type="eraseuda"/>
+                    </spec>
+
+                    <spec name="ee_prd" abstract="true">
+                        <set name="image.type" value="prd"/>
+                        
+                        <spec type="flash">                            
+                            <set name="flash.id" value="ui" />
+                            <set name="use.foti" value="1"/>
+                            <set name="use.fota" value="1"/>                       
+                        </spec>                                        
+                        
+                        <spec type="eraseuda"/>
+                    </spec>
+                </spec>
+    
+                <spec name="subcon_roms" abstract="true">
+                    <set name="build.parallel" value="true" />
+                    <set name="image.type" value="subcon"/>
+                    
+                    <spec type="flash">
+                        <set name="flash.id" value="ui" />
+                    </spec>
+    
+                    <spec type="eraseuda"/>
+                </spec>
+        
+                <spec name="traces" abstract="true">
+                    <set name="build.parallel" value="false" />
+                    <set name="flash.output.dir" value="${rom.output.dir}/${rommake.product.name}/${flash.id}_traces"/>    
+                        
+        
+                    <spec type="flash">
+                        <set name="flash.id" value="wakeup_trace" />
+                        <set name="image.type" value="rnd"/>
+                        <set name="mytraces.binaries" value="
+                            estart.exe,
+                            ekern.exe,
+                            efile.exe,
+                            Starter.exe,
+                            StarterClient.dll,
+                            SysLangUtil.dll,
+                            SysStart.exe" />
+                    </spec>
+        
+                    <spec type="flash">
+                        <set name="flash.id" value="telephony" />
+                        <set name="image.type" value="rnd"/>
+                        <set name="mytraces.binaries" value="
+                            ETELMM.DLL,
+                            ETELPCKT.DLL,
+                            ETELSAT.DLL,
+                            FLOGGER.DLL,
+                            flogsvr.exe,
+                            COMSDBGUTIL.DLL,
+                            COMSDBGSVR.DLL,
+                            COMSDBGSVR.EXE,
+                            COMSDBGSVR.LIB"/>
+                    </spec>
+        
+                    <spec type="flash">
+                        <set name="flash.id" value="audio" />
+                        <set name="image.type" value="rnd"/>
+                        <set name="mytraces.binaries" value="
+                            audiopolicyserver.dll,
+                            audiopolicyapimsgs.dll,
+                            audiopolicyclient.dll,
+                            MMFDevSound.dll,
+                            MmfAudioServerProxy.dll,
+                            MmfDevSoundProxy.dll,
+                            DevSoundEffectCI.dll,
+                            DevSoundCI.dll,
+                            MmRmProxy.dll,
+                            Aamm.dll,
+                            Lac.dll,
+                            AudioStream.dll,
+                            AudioServer.dll,
+                            AudioServerProxy.dll,
+                            AudioServerCommon.dll,
+                            EapGwc.dll,
+                            EAPControlModule.dll,
+                            RawGwc.dll,
+                            RawHwDevice.dll,
+                            DevSoundAdaptationLayer.dll,
+                            MmfDevSoundServer.dll,
+                            MuMdrcEqTune.dll,
+                            mumdrceqcoeff.dll,
+                            mumdrceqfirgeq.dll,
+                            mumdrceqgwc.dll,
+                            mumdrceqloud.dll,
+                            MuMdrcGwc.dll,
+                            NokiaDSY.DLL,
+                            MmRmServer.dll,
+                            Bal.dll,
+                            BalBuffers.dll,
+                            BalBufferManager.dll,
+                            Gwc.dll,
+                            DspMemMapper.dll,
+                            GatewayserverAVC.exe,
+                            GatewayserverclientAVC.dll"/>
+                    </spec>
+        
+                    <spec type="flash">
+                        <set name="flash.id" value="videotelephony" />
+                        <set name="image.type" value="rnd"/>
+                        <set name="mytraces.binaries" value="
+                            euser.dll,
+                            CamServerCore.dll,
+                            CamServerCore.exe,
+                            DisplaySink.dll,
+                            VTImageConverter.dll,
+                            VTImageTransforms.dll,
+                            ECam.dll,
+                            ECamPluginSupport.dll,
+                            ECamAdvSettings.dll,
+                            PVOSCLBASE.DLL,
+                            PVOSCLERROR.DLL,
+                            PVOSCLMEMORY.DLL,
+                            PVOSCLUTIL.DLL,
+                            PVOSCLIO.DLL,
+                            PVMF.DLL,
+                            PVGENERALTOOLS.DLL,
+                            PV324M.DLL,
+                            PVVIDEOENCMDFNODE.DLL,
+                            PVM4VH263DEC.DLL,
+                            PVVIDEODECNODE.DLL,
+                            PVDEVSOUNDPLAY.DLL,
+                            PVDEVSOUNDREC.DLL,
+                            PVSYMBIANNODEADAPTERS.DLL,
+                            PVCAMSRCNODE.DLL,
+                            PVDISPSINKNODE.DLL,
+                            PVSYMBIANADAPTERS.DLL,
+                            PV2WAYENGINE.DLL,
+                            PV2WAYSYMBIANADAPTER.DLL,
+                            PvThreadMessaging.dll,
+                            PvLogger.dll,
+                            PVOSCLPROC.DLL,
+                            PVVIDEOPARSERNODE.DLL,
+                            Gatewayserver.exe,
+                            Gatewayserverclient.dll,
+                            VidRecMediaDevice.dll,
+                            VideoSource.dll,
+                            Videoteleng.dll,
+                            cscallctrl.dll,
+                            vtlogger.dll,
+                            videotelui.exe,
+                            videotelui.app,
+                            Phone.exe,
+                            PhoneEngine.dll"/>
+                    </spec>
+        
+                    <spec type="flash">
+                        <set name="flash.id" value="mms" />
+                        <set name="image.type" value="rnd"/>
+                        <set name="mytraces.binaries" value="
+                            mmscli.dll,
+                            mmssrv.dll,
+                            mmstransport.dll,
+                            mmscodec.dll,
+                            mmsmessage.dll,
+                            mmsserversettings.dll,
+                            mmscodecclient.dll,
+                            mmsappadapter.dll,
+                            mmswatcher.dll,
+                            MmsPushHandler.dll,
+                            mmsgenutils.dll,
+                            mmssettings.dll,
+                            mmsui.dll,
+                            mmsdatautils.dll,
+                            mmsuiutils.dll,
+                            notui.dll"/>
+                    </spec>
+        
+                    <spec type="flash">
+                        <set name="flash.id" value="sms" />
+                        <set name="image.type" value="rnd"/>
+                        <set name="mytraces.binaries" value="
+                            smseditor.exe,
+                            smsviewer.exe,
+                            smsstrict.dll,
+                            gsmu.dll,
+                            smsu.dll,
+                            smsprot.prt,
+                            wapprot.prt,
+                            msexe.exe,
+                            msgs.dll,
+                            watcher.exe,
+                            schsendexe.exe,
+                            schsend.dll,
+                            smum.dll,
+                            smcm.dll,
+                            smss.dll"/>
+                    </spec>
+        
+                    <spec type="flash">
+                        <set name="flash.id" value="networking" />
+                        <set name="image.type" value="rnd"/>
+                        <set name="mytraces.binaries" value="
+                            tcpip6.PRT,
+                            genericnif.NIF,
+                            connmon.DLL,
+                            nifman.DLL,
+                            esock.DLL,
+                            esocksvr.DLL,
+                            eintsock.DLL,
+                            subconparams.DLL,
+                            eintsock_transport.DLL,
+                            ipcpr.DLL,
+                            shimcpr.DLL"/>
+                    </spec>
+        
+                    <spec type="flash">
+                        <set name="flash.id" value="tsy" />
+                        <set name="image.type" value="rnd"/>
+                        <set name="mytraces.binaries" value="
+                            phonetsy.tsy,
+                            commontsy.dll,
+                            nokiatsy.dll,
+                            simatktsy.dll,
+                            FLOGGER.DLL,
+                            flogsvr.exe,
+                            COMSDBGUTIL.DLL,
+                            COMSDBGSVR.DLL,
+                            COMSDBGSVR.EXE,
+                            COMSDBGSVR.LIB"/>
+                    </spec>
+        
+                    <spec type="flash">
+                        <set name="flash.id" value="email" />
+                        <set name="image.type" value="rnd"/>
+                        <set name="mytraces.binaries" value="
+                            MsgMailUtils.dll,
+                            MailPlainView.dll,
+                            MsgMailEditor.exe,
+                            MsgMailViewer.exe,
+                            AutoSend.exe,
+                            Imcm.dll,
+                            Imps.dll,
+                            Pops.dll,
+                            Imut.dll,
+                            Smts.dll,
+                            MailHtmlView.dll"/>
+                    </spec>
+        
+                    <spec type="flash">
+                        <set name="flash.id" value="ibusal" />
+                        <set name="image.type" value="rnd"/>
+                        <set name="mytraces.binaries" value="
+                            dataport.csy,
+                            ftserverif.dll,
+                            ftserver.exe,
+                            ftdconnmonplugin.dll,
+                            ftdsysteminfoplugin.dll,
+                            ftdversioninfoplugin.dll,
+                            SAServer.EXE,
+                            SAServer.DLL,
+                            SAClient.DLL,
+                            SAIscService.DLL,
+                            AccessoryAdaptation.DLL,
+                            SAAccessoryService.DLL,
+                            StartupAdaptation.DLL,
+                            SAStartupService.DLL,
+                            SALanguageService.DLL,
+                            SASimUtilsService.DLL,
+                            SAAlarmService.DLL,
+                            SystemAdaptationExt.DLL,
+                            VibraAdaptation.DLL,
+                            LightsAdaptation.DLL,
+                            EmAdaptation.DLL,
+                            SAVibraService.DLL,
+                            SALightsService.DLL,
+                            SAEmService.DLL,
+                            ISA_KERNEL_IF.dll,
+                            IscIsiMultiplexer.ldd,
+                            Isimessage.dll,
+                            isimsg.dll,
+                            IscApi.dll,
+                            IscDriver.ldd,
+                            IscDriverExtension.ldd,
+                            IscMultiplexerBase.dll,
+                            IscDataTransmissionBase.dll,
+                            NokiaDSY.DLL,
+                            DosSrv.dll,
+                            DosServer.exe,
+                            DSClient.dll,
+                            CommonDSY.DLL,
+                            SIMATKTSY.dll,
+                            NOKIATSY.DLL,
+                            CUSTOMAPIEXT.DLL,
+                            COMMONTSY.DLL,
+                            PHONETSY.TSY"/>
+                    </spec>
+    
+                    <spec type="flash">
+                        <set name="flash.id" value="drm" />
+                        <set name="image.type" value="rnd"/>
+                        <set name="mytraces.binaries" value="
+                            RoapHandler.DLL"/>
+                    </spec>
+    
+                    <spec type="flash">
+                        <set name="flash.id" value="DVB-H" />
+                        <set name="image.type" value="rnd"/>
+                        <set name="mytraces.binaries" value="
+                            ECommerceMgrClient.dll,
+                            ECommerceManager.exe,
+                            ECRoapPlugin.dll,
+                            DVBHPDD.PDD,
+                            ESGMANAGER.EXE,
+                            IPDCDATABASEN.DLL,
+                            IPDCMANAGER.EXE,
+                            IPDCMGRCLIENT.DLL,
+                            RecManager.dll,
+                            DvrClient.dll,
+                            RbfClient.dll,
+                            RbfWrapper.dll,
+                            RbfServer.exe,
+                            DvbhMgr.exe,
+                            DvbhMgrClient.dll,
+                            IPDCLOGGER.DLL,
+                            MobileTv.exe,
+                            FCastManagerClient.dll,
+                            FCastManagerServer.exe,
+                            fcastserver.exe,
+                            fcastclient.dll,
+                            rightsserver.exe,
+                            ROAPHandler.dll,
+                            RNAVCONTROLLER.DLL"/>
+                    </spec>
+                </spec>
+            </spec>
+
+            <spec name="variants" abstract="true">
+                <set name="variation" value="western"/>
+                <set name="build.parallel" value="false" /> 
+                <!-- core -->
+                <spec type="core">
+                    <set name="core.id" value="00" />
+                    <set name="image.type" value="rnd,prd"/>
+                    <spec type="makeupct_core" />
+                </spec>
+
+                <!-- customer -->
+                <spec  type="customer">
+                    <set name="customer.id" value="01"/>
+                    <set name="description" value="lta_customer_variant"/>
+                    <set name="customer.revision" value="1"/>
+                </spec>
+
+                <spec type="languagepack">
+                    <set name="languagepack.id" value="19" />
+                    <set name="default" value="10"/>
+                    <set name="languages" value="10,51,76,83"/>
+                    <set name="description" value="AMERICAS"/>
+                </spec>
+            </spec>
+        </spec>    
+        
+        <spec type="uda_roms" abstract="true">
+            <spec type="uda">
+                <set name="uda.id" value="01"/>    
+                <set name="uda.content.dir" value="${build.drive}/mc/mc_config/.../uda_01"/>    
+            </spec>
+        </spec> 
+    </spec>
+</build>

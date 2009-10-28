@@ -1,0 +1,335 @@
+<?xml version="1.0"?>
+<!-- 
+============================================================================ 
+Name        : test_signaling.ant.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test-signaling-config" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>
+        signalInput and notifierList test configuration
+    </description>
+    <dirname property="project.dir.signaling" file="${ant.file.test-signaling-config}" />
+
+    <property name="build.summary.file" location="${project.dir.signaling}/data/ido_tedo_mcl_devlon52_ec_MCL.52.105_summary.log.xml" />
+    <taskdef resource="org/apache/tools/ant/types/conditions/antlib.xml" />
+    <taskdef resource="com/nokia/helium/signal/ant/antlib.xml" uri="http://www.nokia.com/helium" />
+
+    <hlm:notifierList id="defaultsignalnotifier">
+        <hlm:executeTaskNotifier>
+            <echo>Signal: ${signal.name}</echo>
+        </hlm:executeTaskNotifier>
+        <hlm:emailNotifier defaultTemplate="${project.dir.signaling}/email_default.html.ftl" title="[signal] ${signal.name}" smtp="${email.smtp.server}" ldap="${email.ldap.server}" from="I_EXT_HELIUM@nokia.com" />
+    </hlm:notifierList>
+
+    <hlm:notifierList id="compilesignalnotifier">
+        <hlm:executeTaskNotifier>
+            <echo>Signal: ${signal.name}</echo>
+        </hlm:executeTaskNotifier>
+        <hlm:emailNotifier defaultTemplate="${project.dir.signaling}/email_default.html.ftl" title="[signal] ${signal.name}" smtp="${email.smtp.server}" ldap="${email.ldap.server}" />
+    </hlm:notifierList>
+
+
+    <hlm:signalInput id="compilesignalinput" failbuild="now">
+        <hlm:notifierListRef refid="compilesignalnotifier" />
+    </hlm:signalInput>
+
+    <property name="number.of.errors" value="4" />
+
+    <hlm:signalInput id="fotasignalinput" failbuild="defer" />
+
+    <hlm:signalInput id="validSignalInput" failbuild="defer">
+        <hlm:notifierListRef refid="defaultsignalnotifier" />
+    </hlm:signalInput>
+
+    <hlm:signalListenerConfig id="compileSignal" target="compile-signal-test" message="Errors happened during compilation">
+        <signalNotifierInput>
+            <signalInput refid="compilesignalinput" />
+        </signalNotifierInput>
+        <targetCondition >
+            <not>
+                <equals arg1="0" arg2="${number.of.errors}" />
+            </not>
+        </targetCondition>
+    </hlm:signalListenerConfig>
+
+    <hlm:signalInput id="publishsignalinput" failbuild="never" />
+
+    <hlm:signalInput id="input-fail-build-now" failbuild="now" />
+
+    <hlm:signalInput id="input-fail-build-defer" failbuild="defer" />
+    <hlm:signalInput id="input-fail-build-never" failbuild="never" />
+
+    <hlm:signalListenerConfig id="fotaSignal" target="fota" message="Fota execution finished">
+        <signalNotifierInput>
+            <signalInput refid="fotasignalinput" />
+        </signalNotifierInput>
+        <targetCondition  />
+    </hlm:signalListenerConfig>
+
+    <hlm:signalListenerConfig id="publishSignal" target="publish" message="Errors due to publish">
+        <signalNotifierInput>
+            <signalInput refid="publishsignalinput" />
+        </signalNotifierInput>
+        <targetCondition  />
+    </hlm:signalListenerConfig>
+    <!--hlm:signallist id="all-signals">
+        <hlm:notifierlistref refid="defaultsignalnotifier" />
+        <hlm:configref refid="compileSignal" />
+        <hlm:configref refid="fotaSignal" />
+    </hlm:signallist-->
+
+    <!--Invalid configurations -->
+    <hlm:notifierList id="invalid-notifier1" />
+
+    <hlm:notifierList id="invalid-notifier2">
+        <!--hlm:notifier type="test" senderlist="${env.username}" /-->
+    </hlm:notifierList>
+
+    <hlm:notifierList id="invalid-notifier3">
+        <!--hlm:notifier type="email" /-->
+    </hlm:notifierList>
+
+    <hlm:notifierList id="invalid-notifier4">
+        <!--hlm:notifier senderlist="${env.username}" /-->
+    </hlm:notifierList>
+
+
+    <hlm:signalInput id="invalid-input2" failbuild="never">
+        <hlm:notifierListRef refid="noreference" />
+    </hlm:signalInput>
+
+    <hlm:signalInput id="invalid-input3" failbuild="never">
+        <hlm:notifierListRef refid="invalid-notifier1" />
+    </hlm:signalInput>
+
+    <hlm:signalInput id="invalid-input4" failbuild="never">
+        <hlm:notifierListRef refid="invalid-notifier2" />
+    </hlm:signalInput>
+
+    <hlm:signalInput id="invalid-input5" failbuild="never">
+        <hlm:notifierListRef refid="invalid-notifier3" />
+    </hlm:signalInput>
+
+    <hlm:signalInput id="invalid-input6" failbuild="never">
+        <hlm:notifierListRef refid="invalid-notifier4" />
+    </hlm:signalInput>
+
+    <hlm:signalListenerConfig id="noreferenceSignal" target="target-invalid-config1" message="Errors happened during compilation">
+        <signalNotifierInput>
+            <hlm:signalInput refid="noreference" />
+        </signalNotifierInput>
+        <targetCondition>
+            <not>
+                <equals arg1="0" arg2="${number.of.errors}" />
+            </not>
+        </targetCondition>
+    </hlm:signalListenerConfig>
+
+    <hlm:signalListenerConfig id="noTarget" target="no-target" message="Errors happened during compilation" >
+        <targetCondition />
+    </hlm:signalListenerConfig>
+
+    <hlm:signalListenerConfig id="invalidInputSignal" target="target-invalid-config4" message="Errors happened during compilation">
+        <!-- <hlm:signalInput refid="invalid-input2" /> -->
+        <targetCondition >
+            <not>
+                <equals arg1="0" arg2="${number.of.errors}" />
+            </not>
+        </targetCondition>
+    </hlm:signalListenerConfig>
+
+    <hlm:signalListenerConfig id="invalidInput3" target="target-invalid-config5" message="Errors happened during compilation">
+        <signalNotifierInput>
+            <signalInput refid="invalid-input3" />
+        </signalNotifierInput>
+        <targetCondition >
+            <not>
+                <equals arg1="0" arg2="${number.of.errors}" />
+            </not>
+        </targetCondition>
+    </hlm:signalListenerConfig>
+
+    <hlm:signalListenerConfig id="invalidInput4" target="target-invalid-config6" message="Errors happened during compilation">
+        <signalNotifierInput>
+            <signalInput refid="invalid-input4" />
+        </signalNotifierInput>
+        <targetCondition >
+            <not>
+                <equals arg1="0" arg2="${number.of.errors}" />
+            </not>
+        </targetCondition>
+    </hlm:signalListenerConfig>
+
+    <hlm:signalListenerConfig id="invalidInput5" target="target-invalid-config7" message="Errors happened during compilation">
+        <signalNotifierInput>
+            <signalInput refid="invalid-input5" />
+        </signalNotifierInput>
+
+        <targetCondition >
+            <not>
+                <equals arg1="0" arg2="${number.of.errors}" />
+            </not>
+        </targetCondition>
+    </hlm:signalListenerConfig>
+
+    <hlm:signalListenerConfig id="invalidInput6" target="target-invalid-config8" message="Errors happened during compilation">
+        <signalNotifierInput>
+            <signalInput refid="invalid-input6" />
+        </signalNotifierInput>
+        <targetCondition >
+            <not>
+                <equals arg1="0" arg2="${number.of.errors}" />
+            </not>
+        </targetCondition>
+    </hlm:signalListenerConfig>
+
+    <hlm:signalListenerConfig id="invalidInput7" target="target-invalid-config9" message="Errors happened during compilation">
+        <signalNotifierInput>
+            <signalInput refid="invalid-input7" />
+        </signalNotifierInput>
+        <targetCondition >
+            <not>
+                <equals arg1="0" arg2="${number.of.errors}" />
+            </not>
+        </targetCondition>
+    </hlm:signalListenerConfig>
+
+    <hlm:signalListenerConfig id="validInput" target="test-valid-config1">
+        <targetCondition >
+        </targetCondition>
+    </hlm:signalListenerConfig>
+
+    <hlm:signalListenerConfig id="validSignal1" target="target-valid-config2" message="Errors during testing">
+        <signalNotifierInput>
+            <signalInput refid="validSignalInput" />
+        </signalNotifierInput>
+        <targetCondition>
+            <hlm:hasSeverity severity="error" file="${build.summary.file}" />
+        </targetCondition>
+    </hlm:signalListenerConfig>
+
+    <hlm:signalListenerConfig id="validSignal2" target="target-valid-config3" message="Errors during testing">
+        <signalNotifierInput>
+            <signalInput refid="validSignalInput" />
+        </signalNotifierInput>
+
+        <targetCondition >
+            <!-- <xml severity="error" file="./data/helium_minibuild_ido_compile.log.xml" /> -->
+        </targetCondition>
+    </hlm:signalListenerConfig>
+
+    <hlm:signalListenerConfig id="validSignal3" target="target-valid-config4" message="Errors during testing">
+        <signalNotifierInput>
+            <signalInput refid="validSignalInput" />
+        </signalNotifierInput>
+        <targetCondition >
+            <!-- <not><equals arg1="0" arg2="${number.of.error}"/></not> -->
+        </targetCondition>
+    </hlm:signalListenerConfig>
+
+    <hlm:signalListenerConfig id="validSignal4" target="target-valid-config5" message="Errors during testing">
+        <signalNotifierInput>
+            <signalInput refid="validSignalInput" />
+        </signalNotifierInput>
+        <targetCondition >
+            <!--<not><equals arg1="0" arg2="0"/></not> -->
+        </targetCondition>
+    </hlm:signalListenerConfig>
+
+    <hlm:signalListenerConfig id="validSignal5" target="fail-now-false-condition" message="Errors during testing">
+        <signalNotifierInput>
+            <signalInput refid="input-fail-build-now" />
+        </signalNotifierInput>
+        <targetCondition>
+            <not>
+                <equals arg1="0" arg2="0" />
+            </not>
+        </targetCondition>
+    </hlm:signalListenerConfig>
+
+    <hlm:signalListenerConfig id="validSignal6" target="fail-now-true-condition" message="Errors during testing">
+        <signalNotifierInput>
+            <signalInput refid="input-fail-build-now" />
+        </signalNotifierInput>
+        <targetCondition >
+            <not>
+                <equals arg1="0" arg2="${number.of.errors}" />
+            </not>
+        </targetCondition>
+    </hlm:signalListenerConfig>
+
+    <hlm:signalListenerConfig id="failNow" target="fail-no-condition" message="Errors during testing" >
+        <signalNotifierInput>
+            <signalInput refid="input-fail-build-never" />
+        </signalNotifierInput>
+        <targetCondition />
+    </hlm:signalListenerConfig>
+
+    <hlm:signalListenerConfig id="failbuildDefer" target="fail-defer-false-condition" message="Errors during testing">
+        <signalNotifierInput>
+            <signalInput refid="input-fail-build-defer" />
+        </signalNotifierInput>
+        <targetCondition >
+            <not>
+                <equals arg1="0" arg2="0" />
+            </not>
+        </targetCondition>
+    </hlm:signalListenerConfig>
+
+    <hlm:signalListenerConfig id="inputFailDefer" target="fail-defer-true-condition" message="Errors during testing">
+        <signalNotifierInput>
+            <signalInput refid="input-fail-build-defer" />
+        </signalNotifierInput>
+        <targetCondition>
+            <not>
+                <equals arg1="0" arg2="${number.of.errors}" />
+            </not>
+        </targetCondition>
+    </hlm:signalListenerConfig>
+
+    <hlm:signalListenerConfig id="inputFailNever1" target="fail-defer-never-condition" message="Errors during testing">
+        <signalNotifierInput>
+            <signalInput refid="input-fail-build-never" />
+        </signalNotifierInput>
+
+        <targetCondition>
+            <not>
+                <equals arg1="0" arg2="0" />
+            </not>
+        </targetCondition>
+    </hlm:signalListenerConfig>
+
+    <hlm:signalListenerConfig id="failbuildNever2" target="fail-never-true-condition" message="Errors during testing">
+        <signalNotifierInput>
+            <signalInput refid="input-fail-build-never" />
+        </signalNotifierInput>
+
+        <targetCondition  >
+            <not>
+                <equals arg1="0" arg2="${number.of.errors}" />
+            </not>
+        </targetCondition>
+    </hlm:signalListenerConfig>
+
+    <target name="test-wrong-type">
+        <au:expectfailure>
+            <hlm:signalInput id="invalid-input1" failbuild="wrong-type" />
+        </au:expectfailure>
+    </target>
+</project>

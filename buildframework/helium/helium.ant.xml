@@ -1,0 +1,367 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : helium.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="helium" xmlns:hlm="http://www.nokia.com/helium">
+    <description>
+    Main full build targets and properties
+    </description>
+
+    <!-- Check the Ant version is what we expect. -->
+    <property name="required.ant.version" value="1.7.0"/>
+    <fail message="Incorrect version of Ant found. Please check you have Ant ${required.ant.version}.">
+        <condition>
+            <and>
+                <os family="windows"/>
+                <not>
+                    <antversion exactly="${required.ant.version}"/>
+                </not>
+            </and>
+        </condition>
+    </fail>
+    
+    
+    <!-- Load the current Helium version. -->
+    <property file="${helium.dir}/config/version.txt"/>
+
+    <!-- Libraries
+    ======================================================================-->
+    <import file="helium_preinclude.ant.xml"/>
+    
+    <property name="cache.dir" location="${env.TEMP}/helium/${env.USERNAME}"/>
+    <property name="helium.build.dir" location="${helium.dir}/build"/>
+    
+    <hlm:typedef file="${helium.dir}/tools/common/common.antlib.xml" uri="http://www.nokia.com/helium"/> 
+    
+    <property name="logging.output.file" location="${cache.dir}/logging.${env.PID}.conf" />
+    <fmpp sourceFile="${helium.dir}/config/logging.conf.ftl" outputFile="${logging.output.file}" quiet="true">
+        <data expandProperties="yes">
+            ant: antProperties()
+        </data>
+    </fmpp>
+     
+    <!-- Properties
+    ======================================================================-->
+    <property name="team" value="${env.TEAM}"/>
+
+    <!-- See if 'bn' is defined as a shortcut for build.number. -->
+    <if>
+        <isset property="bn"/>
+        <then>
+            <property name="build.number" value="${bn}"/>
+        </then>
+    </if>
+    
+    <!-- If build.drive not define then search the next free drive -->
+    <if>
+        <not>
+            <isset property="build.drive"/>        
+        </not>    
+        <then>
+            <property name="build.drive.notdefined" value="true"/> 
+            <exec osfamily="windows" executable="python" failonerror="true" outputproperty="build.drive">
+                <arg value="${helium.dir}/tools/common/python/scripts/searchnextdrive.py"/>               
+            </exec>
+            <if>
+                <equals arg1="${build.drive}" arg2="Error: No free drive!"/>
+                <then>            
+                    <fail message="ERROR: Failed to assign build drive, please check you are not running out of drives." />    
+                </then>
+            </if>
+            <echo> Using build drive ${build.drive} </echo>
+        </then>
+    </if>
+    
+    <if>
+        <and>
+            <isset property="major.version"/>
+            <isset property="minor.version"/>
+        </and>
+        <then>
+            <property name="core.build.version" value="${major.version}.${minor.version}"/>
+        </then>
+        <else>
+            <property name="core.build.version" value="${env.USERNAME}"/>
+        </else>
+    </if>
+    
+    <if>
+        <and>
+            <isset property="read.build.int"/>
+            <not>
+                <isset property="build.number"/>
+            </not>
+        </and>
+        <then>
+            <if>
+                <isset property="build.tag"/>
+                <then>
+                    <property name="build.tag.ext" value="${build.tag}."/>
+                </then>
+                <else>
+                    <property name="build.tag.ext" value=""/>
+                    <property name="build.tag" value=""/>
+                </else>
+            </if>
+            <!-- Use an internal directory to store text files for assigning build number information. -->
+            <property name="build.int.db.dir" location="${publish.root.dir}/internal/build_int_db"/>
+            <mkdir dir="${build.int.db.dir}"/>
+            <property name="build.int.db.file" value="${build.int.db.dir}/${build.name}_${core.build.version}_${build.tag}_build_int_db.txt"/>
+            <if>
+                <available file="${build.int.db.file}"/>
+                <then>
+                    <echo>Reading from existing build number property file.</echo>
+                    <property file="${build.int.db.file}"/>
+                    <echo>Build int = ${build.int}</echo>
+                    <!-- Read the comments in the file too, for history information. -->
+                    <loadfile property="build.int.db.file.comments" srcFile="${build.int.db.file}">
+                        <filterchain>
+                            <linecontains>
+                                <contains value="# history: "/>
+                            </linecontains>
+                        </filterchain>
+                    </loadfile>
+                    <!-- Set the property in case nothing was found. -->
+                    <property name="build.int.db.file.comments" value=""/>
+                    <echo>History comments:
+${build.int.db.file.comments}</echo>
+                    <property name="build.number" value="${build.tag.ext}${build.int}"/>
+                    <echo>Writing incremented build int back to file.</echo>
+                    <propertyfile file="${build.int.db.file}" comment="build.int database file">
+                        <entry key="build.int" type="int" default="001" operation="+" pattern="000"/>
+                    </propertyfile>
+                    <tstamp>
+                        <format property="build.int.db.file.tstamp" pattern="dd/MM/yyyy-HH:mm:ss"/>
+                    </tstamp>
+                    <concat destfile="${build.int.db.file}" append="true">
+${build.int.db.file.comments}
+# history: ${env.COMPUTERNAME};${env.USERNAME};${build.int.db.file.tstamp};${build.int}
+                    </concat>
+                </then>
+                <else>
+                    <echo>Build number property file not found. Creating a new one.</echo>
+                    <property name="new.build.int" value="001"/>
+                    <property name="build.number" value="${build.tag.ext}${new.build.int}"/>
+                    <echo>Build number = ${build.number}</echo>
+                    <propertyfile file="${build.int.db.file}" comment="build.int database file">
+                        <entry key="build.int" type="int" default="001" operation="+" pattern="000"/>
+                    </propertyfile>
+                </else>
+            </if>
+        </then>
+    </if>
+
+
+    <!-- Define a number of properties that should be consistent amongst all builds. They can be overridden
+    within any config or team Ant file though. -->
+    <property name="build.name" value="helium"/>
+    <if>
+        <and>
+            <isset property="core.build.version"/>
+            <isset property="build.number"/>
+        </and>
+        <then>
+            <property name="build.version" value="${core.build.version}.${build.number}"/>
+        </then>
+        <else>
+            <property name="build.version" value="${env.USERNAME}"/>
+        </else>
+    </if>
+    
+    <property name="build.id" value="${build.name}_${build.version}"/>
+    <property name="build.type" value="core"/>
+    <property name="epocroot" value="\"/>
+    <property name="data.model.file" location="${helium.dir}/config/helium_data_model.xml"/>
+    <property name="data.model.parsed" location="${helium.build.dir}/datamodel.out"/>
+    <condition property="data.model.xsl" value="${helium.dir}/extensions/nokia/config/helium_nokia_data_model.xsl" else="${helium.dir}/config/helium_data_model.xsl">
+        <available file="${helium.dir}/extensions/nokia/config/helium_nokia_data_model.xsl"/>
+    </condition>
+    <property name="database.file" location="${helium.dir}/build/database.xml"/>
+    <property name="ccm.base.dir" location="${ccm.home.dir}\${minor.version}"/>
+    <property name="prep.build.dir" location="${prep.root.dir}/${build.id}"/>
+    <property name="build.output.dir" location="${build.drive}/output"/>
+    <property name="build.sisfiles.dir" location="${build.output.dir}/sisfiles"/>
+    <property name="zips.build.dir" location="${build.output.dir}/build_area/engineering_english"/>
+    <property name="zips.loc.dir" location="${build.output.dir}/build_area/localised"/>
+    <property name="subcon.zips.dir" location="${build.output.dir}/build_area/subcon"/>
+    <property name="zips.flashfiles.dir" location="${build.output.dir}/zips_flashfiles"/>
+    <property name="build.log.dir" location="${build.output.dir}/logs"/>
+    <property name="build.signal.status.dir" location="${build.log.dir}/signals"/>
+    <property name="build.status.email.template" location="${helium.dir}/tools/common/templates/log/email_status.html.ftl" />
+    <property name="metadata.dbfile" location="${build.log.dir}/${build.id}_metadata.sqlite"/>
+    <property name="temp.build.dir" location="${build.output.dir}/temp_build_files"/>
+    <property name="failonerror" value="false"/>
+    <property name="build.errors.limit" value="0"/>
+    <property name="unsubst.after.build" value="no"/>
+    <property name="validate.properties.at.startup" value="yes"/>
+    <property name="zip.wa.file" value="${build.drive}/output/src/${build.id}_sources.zip"/>
+
+    <!-- Cache related properties. -->
+    <property name="build.cache.dir" location="${cache.dir}/${build.id}"/>
+    <property name="build.cache.log.dir" location="${build.cache.dir}/logs"/>
+    <mkdir dir="${build.cache.log.dir}"/>
+    
+    <property name="tracing.csv.file" location="${build.cache.dir}/logs/${build.id}_traces.csv"/>
+    
+    <!-- Publish dir configuration. Defines subdir first and next toplevel properties. -->
+    <property name="publish.subdir" value="${build.name}/builds/${core.build.version}/${build.id}"/>
+    <property name="publish.release.subdir" value="${build.name}/releases/${core.build.version}/${build.id}"/>
+    <property name="publish.dir" location="${publish.root.dir}/${publish.subdir}"/>
+    <property name="publish.release.dir" location="${publish.root.dir}/${publish.release.subdir}"/>
+    <condition property="is.published" else="false">
+        <isset property="publish"/>
+    </condition>
+    
+    <property name="release.images.dir" value="${build.output.dir}/release_flash_images"/>
+    <property name="binary.root" value="${build.drive}/epoc32/release/armv5/urel" />
+    <property name="python.dir" value="${helium.dir}/external/python/lib/2.5"/>
+    <property name="python.tools" value="${helium.dir}/external/python/bin"/>
+
+    <!-- EBS is selected as the default build system, but ec for Electric Cloud could be used. -->
+    <property name="build.system" value="ebs"/>
+    <property name="genxml.output.file" location="${temp.build.dir}/${build.id}.${sysdef.configuration}.xml" />
+    <property name="canonical.sysdef.file" value="${build.output.dir}/build/canonical_system_definition.xml"/>
+    <property name="build.system.${build.system}" value="Not used"/>
+    <property name="build.summary.file" location="${build.log.dir}/summary/${build.id}_summary.log.xml"/>
+    <property name="error.summary.file" location="${build.log.dir}/summary/${build.id}_error_summary.log.xml"/>
+    <property name="build.logging.start.stage" value="check-env-prep"/>
+    <property name="build.logging.key.stages" value="prep,build-ebs-main,postbuild,flashfiles,java-certification-rom,zip-main,publish-generic,variants-core,variants-elaf,variants-china,variants-thai,variants-japan,variants,mobilecrash-prep,localise-tutorial-content,hdd-images,zip-flashfiles,zip-localisation,data-packaging-prep"/>
+    <property name="build.log" value="${build.log.dir}/${build.id}_ant_build.log"/>
+    <property name="overlays.log.file" location="${build.log.dir}/${build.id}_overlays.xml"/>
+    <property name="diamonds.listener.configuration.file" location="${helium.dir}/config/diamonds_config.xml.ftl"/>
+    <property name="antlib.import.module.path" location="${helium.dir}/tools/hlm-antlib-imports"/>
+    
+    <!-- Following are temporarily defined here until global tools available-->
+    <property name="ec.scripts.dir" location="${helium.dir}/external/symbiantools/ectools/"/>
+    <property name="ec.history.dir" location="${publish.root.dir}\${product.family}\ec_history"/>
+    <property name="ec.tools.dir" location="${helium.dir}/external/symbiantools/ectools/tools/"/>
+    <property name="release.label" value="${build.version}"/>
+    <property name="ec.mode" value="parallel" />
+    <property name="ec.allow.duplicates" value="0" />
+    <property name="roms.spec.name" value=""/>
+    <property name="zip.ee.log.file" location="${build.log.dir}/${build.id}_ee_zip.log" />
+    <property name="zip.localised.log.file" location="${build.log.dir}/${build.id}_localised_zip.log" />
+    <property name="zip.subcon.log.file" value="${build.log.dir}/${build.id}_subcon_zip.log" />
+    <property name="zip.subcon_roms.log.file" location="${build.log.dir}/${build.id}_subcon_roms_zip.log" />
+    <property name="zip.trace_roms.log.file" location="${build.log.dir}/${build.id}_trace_roms_zip.log" />
+    <property name="zip.uda_roms.log.file" location="${build.log.dir}/${build.id}_uda_roms_zip.log" />
+    <property name="rombuild.makefile.name" value="image_conf_helium.mk" />
+    <property name="loc.temp.dir" location="${temp.build.dir}/locfiles"/>
+    <property name="loc.output.dir" location="${build.output.dir}/build_area/localised"/>
+    <property name="loc.output.filename" location="${build.id}_locfiles.zip"/>
+    
+    <property name="tools.ivy.config.file" location="${helium.dir}/config/ivy/tools_ivy_settings.xml" />
+    
+    <property name="build.property.cache.file" location="${build.log.dir}/build_properties_cache.txt" />
+    <property name="ccmtask.python.script.file" location="${helium.dir}/tools/preparation/synergy/ccmtask.jep" />
+
+    <if>
+        <available file="${build.property.cache.file}"/>
+        <then>
+            <property file="${build.property.cache.file}"/>
+        </then>
+    </if>
+
+    
+
+    <!-- Default number of threads is 2 * NUMBER_OF_PROCESSORS, but this can be overridden by defining the
+    property manually. -->
+    <if>
+        <not>
+            <isset property="number.of.threads"/>
+        </not>
+        <then>
+            <if>
+                <isset property="env.NUMBER_OF_PROCESSORS"/>
+                <then>
+                    <math result="number.of.threads" operand1="${env.NUMBER_OF_PROCESSORS}" operation="*" operand2="2" datatype="int"/>
+                </then>
+                <else>
+                    <property name="number.of.threads" value="2"/>
+                </else>
+            </if>
+        </then>
+    </if>
+     
+
+    <!-- Import basic targets.
+        
+    The intention would be to split the targets into separate files somewhat
+    matching the build phases located inside \nbuild and import each one here.
+    -->
+    <import file="extensions/nokia/build.xml" optional="true"/>
+    <import file="tools/preparation/preparation.ant.xml"/>
+    <import file="tools/common/common.ant.xml"/>
+    <import file="tools/common/testing.ant.xml"/>
+    <import file="tools/compile/compile.ant.xml"/>
+    <import file="tools/common/docs.ant.xml"/>
+    <import file="tools/localisation/localisation.ant.xml"/>
+    <import file="tools/publish/publish.ant.xml"/>
+    <import file="tools/metadata/metadata.ant.xml"/>
+    <import file="tools/release/release.ant.xml"/>
+    <import file="tools/rombuild/rombuild.ant.xml"/>
+    <import file="tools/uda/uda.ant.xml"/>
+    <import file="tools/quality/quality.ant.xml"/>
+    <import file="tools/relnotes/relnotes.ant.xml"/>
+    <import file="tools/integration/integration.ant.xml"/>
+    <import file="tools/startup/antserver/remote.ant.xml" />
+    <import file="tools/testing/testing.ant.xml" />
+    <import file="tools/startup/bootstrap/bootstrap.ant.xml"/>
+    <import file="tools/iad/iad.ant.xml"/>
+    <import file="config/signaling_config_default.ant.xml"/>
+    <import file="config/metadata_filter_config_default.ant.xml"/>
+
+    <!-- Checking required properties from datamodel if "validate.properties.at.startup=yes" 
+        
+    Comment this out until it is done more correctly.-->
+    <!--<if>
+        <and>
+            <isset property="validate.properties.at.startup"/>
+            <equals arg1="${validate.properties.at.startup}" arg2="yes"/>
+        </and>
+        <then>
+            <runtarget target="validate-at-startup"/>
+        </then>
+    </if>-->
+    
+    <!-- Top level build execution targets.
+        
+    All of these should simply depend on other targets. They should not contain any tasks.
+    -->
+    
+    <!-- Top-level target for platform builds. -->
+    <target name="platform-build"
+            depends="prep,prebuild,compile-main,postbuild,ee-roms,zip-ee,publish-generic,
+                     report,final"
+            description="The default platform build"/>
+    
+    <!-- Top-level target for IBUSAL builds. -->
+    <target name="ibusal-build"
+            depends="prep-drive,init-build-area,prebuild,build-info,log-build-env,
+                     check-env-prep,diamonds,prep-copy,set-arm-version,
+                     create-canonical-sysdef-file,compile-main,zip-ee"
+            description="The default IBUSAL build"/>
+
+    <!-- Top-level target for IDO builds. -->
+    <target name="ido-build"
+            depends="diamonds,compile-clean,compile-main,ee-roms"
+            description="IDO build"/>
+</project>

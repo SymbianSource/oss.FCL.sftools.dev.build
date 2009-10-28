@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<releaseInformation>
+    <releaseDetails>
+        <releaseID>
+            <service name="minibuild"/>
+            <product name="PF5250"/>
+            <release name="PF5250_minibuild_630"/>
+        </releaseID>
+    </releaseDetails>
+    <releaseFiles>
+    <package s60filter="" name="s60_app_organizer_clock.zip" default="true" type="zip" filters="" extract="single"/>
+  <package s60filter="" name="s60_app_organizer_clock_binary.zip" default="true" type="zip" filters="" extract="single"/>
+  <package s60filter="" name="s60_mw_classicui_and_app_radio.zip" default="true" type="zip" filters="" extract="single"/>
+    <package s60filter="" name="s60_mw_classicui_and_app_radio_internal.zip" default="true" type="zip" filters="" extract="double"/>
+  </releaseFiles>
+    <externalFiles/>
+
+	<filters>
+		<!-- Filter definitions -->
+		<!-- 	code = code used in package attribute "filters" 
+					text = Filter name
+					description = filter description
+		-->
+    <filter text="Emulator binaries" code="foo" description="Files needed for emulator."/> 
+    <filter text="complementary binaries and sources" code="bar" description="complementary components binaries and sources"/>
+    <filter text="source files" code="test" description="symbian and S60 source files"/>
+	</filters>
+    
+</releaseInformation>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : remote.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="startup.remote">
+    <description>Local actions to setup remote builds.</description>
+    
+    <!-- Tars a complete work area to distribute to other machines. -->
+    <target name="tar-work-area">
+        <tstamp>
+            <format property="workarea.timestamp" pattern="yyyyMMdd_HHmmss"/>
+        </tstamp>
+        <echo message="In 10s the \${minor.version} directory will be tarred from the ${ccm.home.dir} directory into ${ccm.home.dir}\WorkArea_${env.COMPUTERNAME}_${workarea.timestamp}.tgz. Press Ctrl-C to stop."/>
+        <sleep seconds="10"/>
+        <shellscript shell="cmd.exe" tmpsuffix=".bat" dir="${ccm.home.dir}">
+            <arg value="/c"/>
+            <arg value="call"/>
+            tar --create ${minor.version} | gzip  >${ccm.home.dir}\WorkArea_${env.COMPUTERNAME}_${workarea.timestamp}.tgz
+        </shellscript>
+    </target>
+
+
+    <!-- Uploads a tarball to a network location. -->
+    <target name="upload-work-area" depends="tar-work-area">
+        <copy file="${ccm.home.dir}\WorkArea_${env.COMPUTERNAME}_${workarea.timestamp}.tgz" todir="${work.area.temp.dir}"/>
+        <property name="work.area.cache.file" value="${work.area.temp.dir}\WorkArea_${env.COMPUTERNAME}_${workarea.timestamp}.tgz"/>
+    </target>
+
+
+    <!-- Generates an Ant file containing commands to execute to run remote builds. -->
+    <target name="gen-remote-tasks">
+        <xslt in="${remote.builds.config.file}" out="${build.cache.dir}/${build.id}_remote_builds.ant.xml" style="${helium.dir}/tools/startup/antserver/remote_builds_to_ant_script.xslt" force="true"/>
+    </target>
+
+
+    <!-- Distributes a work area to remote machines. -->
+    <target name="distribute-work-area" depends="upload-work-area,gen-remote-tasks">
+        <ant antfile="${build.cache.dir}/${build.id}_remote_builds.ant.xml" target="do-distribute-work-area"/>
+    </target>
+    
+    
+    <!-- Checks that a remote machine has an Ant server running. -->
+    <target name="check-server">
+        <property name="machine" value="localhost"/>
+        <remoteant machine="${machine}">
+            <runtarget target="config"/>
+        </remoteant>
+    </target>
+
+
+    <!-- Starts the remote builds defined in the remote build configuration file. -->
+    <target name="start-remote-builds" depends="gen-remote-tasks">        
+        <ant antfile="${build.cache.dir}/${build.id}_remote_builds.ant.xml" target="do-start-remote-builds"/>
+        <!-- Sleep is needed to give enough time for the remote build operation to get sent. -->
+        <sleep seconds="5"/>
+    </target>
+    
+</project>

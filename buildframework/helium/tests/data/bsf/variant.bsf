@@ -1,0 +1,11 @@
+#<bsf>#
+
+# This BSF file is to support building for ARMV6 architecture. The options specified here are same as for ARMV5 except
+# the --cpu 6 option in INVARIANT_OPTIONS. This specifies to compiler to compile for generic ARMV6. If any other
+# specific options are required such as --cpu ARM1136J-S, --memaccess -UL41, etc, then it can be done via a different
+# BSF file
+
+CUSTOMIZES ARMV5
+
+VIRTUALVARIANT
+COMPILEWITHPARENT

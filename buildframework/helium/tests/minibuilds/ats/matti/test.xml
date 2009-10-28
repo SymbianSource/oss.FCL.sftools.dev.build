@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- 
+============================================================================ 
+Name        : matti.demo.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+Contains the template for the test.xml file output. The test.xml file contains
+information on the files used to create the drop file.
+============================================================================
+--><test>
+  <name>001__1</name>
+  <target>
+    <device alias="STIF" rank="none">
+      <property name="HARNESS" value="STIF"/>
+      <property name="TYPE" value=""/>
+      <property name="HARDWARE" value=""/>
+    </device>
+  </target>
+  <plan passrate="100" enabled="true" name="MATTI test " significant="false" harness="STIF">
+    <session name="session" harness="STIF" enabled="true" passrate="100"><set name="MATTI test set0" harness="STIF" enabled="true" passrate="100">
+    			<target>
+          	<device alias="STIF" rank="master"/>
+        	</target>
+    			<case name="MATTI test case" passrate="100" harness="STIF" enabled="true" significant="false"> 
+          <flash target-alias="STIF" images="ATS3Drop\images\test_file.fpsx" />
+          	<flash target-alias="STIF" images="ATS3Drop\images\test_file_3rd.fpsx" />
+          	<flash target-alias="STIF" images="ATS3Drop\images\test_file_another.fpsx" />
+          	
+          <step name="Create logs folder" harness="STIF" enabled="true" passrate="100" significant="false">
+          <command>makedir</command>
+                        <params>
+                            <param dir="c:\logs\testability"/>
+                        </params>
+          </step>
+          <step name="Copy sis" harness="STIF" enabled="true" passrate="100" significant="false">
+                        <command>install</command>
+                        <params>
+                            <param src="ATS3Drop\sis\another_test_file_matti_install.sis"/>
+                            <param dst="E:\another_test_file_matti_install.sis"/>
+                            <param overwrite="false"/>
+                        </params>
+                    </step>
+
+                    <step name="Install SIS" harness="STIF" enabled="true" passrate="100" significant="false">
+	                    <command>install-software</command>
+		    								<params>
+                            <param sisPackageName="E:\another_test_file_matti_install.sis"/>
+                            <param upgradeAllowed="true"/>
+                            <param optionalItemsAllowed="true"/>
+                            <param OCSP_Done="true"/>
+                            <param ignoreOCSPWarnings="true"/>
+                            <param untrustedAllowed="true"/>
+                            <param packageInfoAllowed="true"/>
+                            <param userCapGranted="true"/>
+                            <param killApp="true"/>
+                            <param overWriteAllowed="true"/>
+                            <param downloadAllowed="false"/>
+                            <param downloadUsername="user"/>
+                            <param downloadPassword="passwd"/>
+                            <param installDrive="C"/>
+                            <param upgradeData="true"/>
+                            <param timeout="40"/>                       	
+										    </params>
+										</step>
+          	<step name="Copy sis" harness="STIF" enabled="true" passrate="100" significant="false">
+                        <command>install</command>
+                        <params>
+                            <param src="ATS3Drop\sis\test_file_matti_install.sis"/>
+                            <param dst="E:\test_file_matti_install.sis"/>
+                            <param overwrite="false"/>
+                        </params>
+                    </step>
+
+                    <step name="Install SIS" harness="STIF" enabled="true" passrate="100" significant="false">
+	                    <command>install-software</command>
+		    								<params>
+                            <param sisPackageName="E:\test_file_matti_install.sis"/>
+                            <param upgradeAllowed="true"/>
+                            <param optionalItemsAllowed="true"/>
+                            <param OCSP_Done="true"/>
+                            <param ignoreOCSPWarnings="true"/>
+                            <param untrustedAllowed="true"/>
+                            <param packageInfoAllowed="true"/>
+                            <param userCapGranted="true"/>
+                            <param killApp="true"/>
+                            <param overWriteAllowed="true"/>
+                            <param downloadAllowed="false"/>
+                            <param downloadUsername="user"/>
+                            <param downloadPassword="passwd"/>
+                            <param installDrive="C"/>
+                            <param upgradeData="true"/>
+                            <param timeout="40"/>                       	
+										    </params>
+										</step>
+          	          
+          <step name="Test case" harness="STIF" enabled="true" passrate="100" significant="false">
+                        <command>execute</command>
+                        <params>
+    			    							<param dir="C:\ruby\bin\"/>
+    			    							<param file="C:\ruby\bin\ruby.exe"/>
+                            <param parameters="&#x00A7;TEST_RUN_ROOT&#x00A7;\ATS3Drop\MATTISCRIPTS\test.rb"/>
+                            <param timeout="60"/>
+                            <param local="true"/>
+                            <param async="false"/>
+			    									<param needs-connection="true"/>
+                        </params>
+                    </step>
+          </case>
+      </set></session>
+  </plan>
+  
+  
+  <files>
+  	<file>ATS3Drop\images\test_file.fpsx</file>
+    <file>ATS3Drop\images\test_file_3rd.fpsx</file>
+    <file>ATS3Drop\images\test_file_another.fpsx</file>
+    <file>ATS3Drop\sis\another_test_file_matti_install.sis</file>
+    <file>ATS3Drop\sis\test_file_matti_install.sis</file>
+    <file>ATS3Drop\MATTISCRIPTS\test.rb</file>
+    </files>
+  
+</test>

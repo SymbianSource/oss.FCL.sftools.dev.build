@@ -1,0 +1,486 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : localisation-32.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="localisation-32" xmlns:hlm="http://www.nokia.com/helium">
+    <description>
+      S60 3.2 localisation.
+    </description>
+
+    <!-- Should be overriden in team configuration! -->
+    <!--<property name="localisation.tool" value="localisation-s60-localise" />-->
+    <property name="localisation.tool" value="localise-resources" />
+    <property name="parse_abld_what.tool" location="${build.drive}\s60\tools\build_platforms\build\tools\parse_what_log.pl" />
+    <property name="ctool.dir" location="${build.drive}/s60/tools/toolsextensions/ConfigurationTool" />
+    <property name="ctool.western.conf" value="-master_conf s60 -impl \epoc32\rom\config\confml_data\s60 -confml \epoc32\rom\config\confml_data\s60" />
+    <property name="ctool.china.conf" value="-master_conf china -impl \epoc32\rom\config\confml_data\s60 -confml \epoc32\rom\config\confml_data\${ctool.region.china}" />
+    <property name="ctool.japan.conf" value="-master_conf japan -impl \epoc32\rom\config\confml_data\s60 -confml \epoc32\rom\config\confml_data\${ctool.region.japan}" />
+
+    <property name="localisation.buildfile" value="isis" />
+    <property name="s60.delta.config.prefix" value="S60_variant_"/>
+
+
+    <!--<property name="localisation.variation" value="western" />-->
+
+    <property name="localisation.language.file" location="${build.drive}/epoc32/tools/s60tools/languages.xml" />
+    <property name="localisation.s60locfiles.dir" location="${build.drive}/s60/misc/release/s60locfiles" />
+    <property name="localisation.makefile.target" value="variants" />
+    <property name="customer.makefile.target" value="customer_variants" />
+
+    
+    <!-- Additional input file per region -->
+    <property name="localisation.files.western" value="" />
+    <property name="localisation.files.china" value="" />
+    <property name="localisation.files.japan" value="" />
+    
+    <!-- ctool translation -->
+    <property name="ctool.region.china" value="apac"/>
+    
+    <!-- The createDeltaZipMacro enables to create regional variant like china and japan.
+    e.g:
+         <pre><hlm:createDeltaZipMacro variant="china" type="armv5" ctool="true"/></pre>
+    -->
+    <macrodef name="createDeltaZipMacro" uri="http://www.nokia.com/helium">
+        <attribute name="variant"/>
+        <attribute name="type" default=""/>
+        <attribute name="ctool" default="false"/>
+        <attribute name="force" default="false"/>
+        <sequential>
+            <mkdir dir="${build.log.dir}"/>
+            <if>
+                <and>
+                    <available file="${zips.loc.dir}/delta_@{variant}_package.zip" />
+                    <isfalse value="@{force}"/>
+                </and>                    
+                <then>
+                    <echo>Unzipping ${zips.loc.dir}/delta_@{variant}_package.zip</echo>
+                    <unzip src="${zips.loc.dir}/delta_@{variant}_package.zip" dest="${build.drive}/" overwrite="true" />
+                </then>
+                <else>
+                    <if>
+                        <equals arg1="@{type}" arg2=""/>
+                        <then>
+                            <var name="internal.variant.type" value="@{type}"/>
+                        </then>
+                        <else>
+                            <var name="internal.variant.type" value="_@{type}"/>
+                        </else>
+                    </if>
+                    <echo>Generating ${build.drive}\epoc32\tools\s60tools\variant_build_@{variant}${internal.variant.type}.xml</echo>
+                    <hlm:compileGenxmlMacro input="-x ${canonical.sysdef.file}"
+                                          configuration="${s60.delta.config.prefix}@{variant}${internal.variant.type}"
+                                          output="${build.drive}\epoc32\tools\s60tools\variant_build_@{variant}${internal.variant.type}.xml"
+                                          log="${build.log.dir}/${build.id}.variant_build_@{variant}${internal.variant.type}_genxml.log"/>
+
+                    <echo>Building ${build.drive}\epoc32\tools\s60tools\variant_build_@{variant}${internal.variant.type}.xml</echo>
+                    <hlm:compileEbsMacro input="${build.drive}\epoc32\tools\s60tools\variant_build_@{variant}${internal.variant.type}.xml" log="${build.log.dir}/${build.id}.@{variant}${internal.variant.type}_compile.log" />
+                    <hlm:compileHtmlscanlogMacro input="${build.log.dir}/${build.id}.@{variant}${internal.variant.type}_compile.log" output="${build.log.dir}/${build.id}.@{variant}${internal.variant.type}_scan2.html" />
+                    
+                    <if>
+                        <istrue value="@{ctool}"/>
+                        <then>
+                            <property name="ctool.region.@{variant}" value="@{variant}"/>
+                            <echo>Region ctool: ${ctool.region.@{variant}} (@{variant}).</echo>
+                            <preset.exec executable="cmd" dir="${ctool.dir}/" failonerror="true" output="${build.log.dir}/${build.id}.configtool_@{variant}_log.txt">
+                                <arg line="/c cli_build.cmd ${ctool.@{variant}.conf} -report ${build.log.dir}/${build.id}.configtool_@{variant}_delta.txt -ignore_errors"/>
+                            </preset.exec>
+                        </then>
+                    </if>
+                    <preset.exec executable="perl" dir="${build.drive}/" failonerror="true">
+                        <arg value="${parse_abld_what.tool}"/>
+                        <arg line="-i ${build.log.dir}/${build.id}.@{variant}${internal.variant.type}_compile.log -filter \epoc32 -zip ${zips.loc.dir}/delta_@{variant}_package -ex productvariant.hrh"/>
+                    </preset.exec>
+                    <if>
+                        <istrue value="@{ctool}"/>
+                        <then>
+                            <preset.exec executable="${build.drive}\epoc32\tools\zip.exe" dir="${build.drive}/" input="${build.log.dir}/${build.id}.configtool_@{variant}_delta.txt">
+                                <arg line="-r -u ${zips.loc.dir}/delta_@{variant}_package -@"/>
+                            </preset.exec>
+                        </then>
+                    </if>
+                    <var name="internal.variant.type" unset="true"/>
+                </else>
+            </if>
+        </sequential>
+    </macrodef>
+
+
+    <!-- The createDeltaWesternZipMacro enables to create western regional variant
+    e.g: build western variation using the results from S60_postbuild config
+         and enabling configuration tool support.
+         <pre><hlm:createDeltaWesternZipMacro configs="S60_postbuild" ctool="true"/></pre>
+    -->
+    <macrodef name="createDeltaWesternZipMacro"  uri="http://www.nokia.com/helium">
+        <attribute name="configs"/>
+        <attribute name="ctool" default="false"/>
+        <sequential>
+            <mkdir dir="${zips.loc.dir}"/>
+            <for list="@{configs}" delimiter="," param="conf" >
+                <sequential>
+                    <if>
+                        <istrue value="@{ctool}"/>
+                        <then>
+                            <preset.exec executable="cmd" dir="${ctool.dir}/" failonerror="true" output="${build.log.dir}/${build.id}.configtool_western_log.txt">
+                                <arg line="/c cli_build.cmd ${ctool.western.conf} -report ${build.log.dir}/${build.id}.configtool_western_delta.txt -ignore_errors"/>
+                            </preset.exec>
+                        </then>
+                    </if>
+                    <preset.exec executable="perl" dir="${build.drive}/" failonerror="true">
+                        <arg value="${parse_abld_what.tool}"/>
+                        <arg line="-i ${build.log.dir}/${build.id}.@{conf}_compile.log -filter \epoc32 -zip ${zips.loc.dir}/delta_western_package -ex productvariant.hrh"/>
+                    </preset.exec>
+                    <if>
+                        <istrue value="@{ctool}"/>
+                        <then>
+                            <preset.exec executable="${build.drive}\epoc32\tools\zip.exe" dir="${build.drive}/" input="${build.log.dir}/${build.id}.configtool_western_delta.txt">
+                                <arg line="-r -u ${zips.loc.dir}/delta_western_package -@"/>
+                            </preset.exec>
+                        </then>
+                    </if>
+                </sequential>
+            </for>
+        </sequential>
+    </macrodef>
+
+    <!--
+        Target to be run after the compile-main to zipup western variation.
+        <deprecated>Please consider using binary variation to solve that problem.</deprecated>
+    -->
+    <target name="localisation-postbuild-western">
+        <mkdir dir="${zips.loc.dir}"/>
+
+        <antcall target="compile-main">
+            <param name="sysdef.configurations.list" value="S60_bldmelast" />
+        </antcall>
+
+        <preset.exec executable="perl" dir="${build.drive}/" failonerror="true">
+            <arg value="${parse_abld_what.tool}"/>
+            <arg line="-i ${build.log.dir}/${build.id}.S60_bldmelast_compile.log -filter \epoc32 -zip ${zips.loc.dir}/delta_western_package -ex productvariant.hrh"/>
+        </preset.exec>
+        <copy file="${build.drive}\epoc32\release\ARMV5\urel\elocl.dll" tofile="${build.drive}\epoc32\release\ARMV5\urel\elocl.01" />
+        <copy file="${build.drive}\epoc32\release\ARMV5\udeb\elocl.dll" tofile="${build.drive}\epoc32\release\ARMV5\udeb\elocl.01" />
+    </target>
+
+
+    <!--
+        This targe generate the language pack related files using informations from the XML configuration file.
+        The generated files are:
+            * languages.[product].[langid].txt
+            * lang.[product].[langid].txt
+            * /epoc32/rom/config/[platform]/.../[product]/variant_[langid].iby
+        <deprecated>This feature is now supported by iMaker, please update your  Makefile templates to migrate the language data from XML.</deprecated>
+    -->
+    <target name="localisation-create-languagepack" depends="rombuild-prepare-input">
+        <for list="${product.list}" delimiter="," param="product.name" >
+            <sequential>
+                <echo>Language Pack configuration for @{product.name}</echo>
+                <exec executable="python" dir="${build.drive}/" failonerror="${failonerror}">                    
+                    <arg line="${helium.dir}/tools/localisation/create_language_pack.py @{product.name} ${rombuild.config.file.parsed}"/>
+                </exec>        
+            </sequential>
+        </for>    
+    </target>
+
+    <!--
+        Developement target that generated the languages.mk using the information from
+        the languages.xml file provided by S60.
+        <deprecated>Those information will be generated throught Carbon.</deprecated>
+    -->
+    <target name="localisation-create-system-languages-mk">
+        <echo>Generating ${build.drive}/epoc32/rom/config/language/system_languages.mk</echo>
+        <mkdir dir="${build.drive}/epoc32/rom/config/language"/>
+        <hlm:python>
+""" Create a makefile that contains all languages.  """
+import localisation
+import sys
+import ant
+            
+languages = localisation.Languages(ant.get_property(r'${localisation.language.file}'))
+output = open(ant.get_property(r'${build.drive}')+r'\epoc32\rom\config\language\system_languages.mk', "w+")
+
+output.write("############################################\n")
+output.write("# DO NOT EDIT - File generated by Helium\n")
+output.write("############################################\n")
+output.write("system_languages\t\t\t\t=\\\n")
+lids = languages.get_language_ids()
+lids.sort()
+lids.reverse()
+while len(lids)>0:
+    lid = lids.pop()
+    endofline = "\\"
+    if (len(lids)==0):
+        endofline = ""
+    output.write ("%s\t\t\t\t%s %s" % (languages.get_name(lid), lid, endofline))
+    output.write("\n")
+output.close()
+    </hlm:python>
+    </target>
+
+    <!--
+        This target run the generation of cenrep variation on language pack and customer variants configuration folders.
+        <deprecated>S60 3.2 only for 3.2.3 use iMaker</deprecated>
+    -->
+    <target name="localisation-create-cenrep" depends="localisation-create-language-cenrep,localisation-create-customer-cenrep"/>
+
+    <!--
+        This target run the generation of cenrep variation on language pack configuration folders.
+        <deprecated>S60 3.2 only for 3.2.3 use iMaker</deprecated>
+    -->
+    <target name="localisation-create-language-cenrep" depends="rombuild-prepare-input">
+        <for list="${product.list}" delimiter="," param="product.name" >
+            <sequential>
+                <echo>Cenrep generation for @{product.name} languagepack</echo>
+                <exec executable="python" dir="${build.drive}/" failonerror="${failonerror}">
+                    <arg line="${helium.dir}/tools/localisation/create_variant_cenrep.py @{product.name} ${rombuild.config.file.parsed} languagepack"/>
+                </exec>
+            </sequential>
+        </for>
+    </target>
+
+    <!--
+        This target run the generation of cenrep variation on customer variants configuration folders.
+        <deprecated>S60 3.2 only for 3.2.3 use iMaker</deprecated>
+    -->
+    <target name="localisation-create-customer-cenrep" depends="rombuild-prepare-input">
+        <for list="${product.list}" delimiter="," param="product.name" >
+            <sequential>
+                <echo>Cenrep generation for @{product.name} customer variant</echo>
+                <exec executable="python" dir="${build.drive}/" failonerror="${failonerror}">                    
+                    <arg line="${helium.dir}/tools/localisation/create_variant_cenrep.py @{product.name} ${rombuild.config.file.parsed} customer"/>
+                </exec>        
+            </sequential>
+        </for>    
+    </target>
+    
+    <!-- Localisation configuration -->
+    <target name="localisation-create-config">
+        <record name="${build.log.dir}/${build.id}_localisation_config.log" action="start"/>
+        <antcall target="localisation-create-languagepack" />
+        <antcall target="localisation-create-cenrep" />
+        <copy file="${helium.dir}/tools/localisation/templates/rom/mc_variant_imaker.oby" todir="${build.drive}/epoc32/rom"/>
+        <record name="${build.log.dir}/${build.id}_localisation_config.log" action="stop"/>
+    </target>
+
+    <!-- Localise resources using either EC / EBS based on build system type-->
+    <target name="localise-resources">
+        <copy file="${helium.dir}/tools/localisation/localiser/isis_EClocaliser.pl" todir="${build.drive}/epoc32/tools"/>
+        <copy file="${helium.dir}/tools/localisation/localiser/ECLocaliser.pm" todir="${build.drive}/epoc32/tools"/>
+        <propertycopy name="localisation.files.region" from="localisation.files.${localisation.region}" />
+        <property name="isis_mktarget.list" value="${localisation.region}_${localisation.buildfile},${localisation.region}_${localisation.buildfile}_what,${localisation.region}_${localisation.buildfile}_check"/>
+        <if>
+            <equals arg1="${build.system}" arg2="ec-helium" />
+            <then>
+                <!-- localisation build for EC -->
+                <echo message="isis_EClocaliser.pl ${localisation.files} ${localisation.files.region} -b=${localisation.region}_${localisation.buildfile} --ecbuild -state=0 -c=&quot;${localisation.languages}&quot; -dest=&quot;${zips.loc.dir}&quot; -s60locfiles=&quot;${localisation.s60locfiles.dir}&quot; -l=&quot;${localisation.log}&quot; -h" />
+                <exec executable="perl" dir="${build.drive}/" failonerror="${failonerror}">
+                    <arg line="${build.drive}/epoc32/tools/isis_EClocaliser.pl ${localisation.files} ${localisation.files.region} -state=0 -b=${localisation.region}_${localisation.buildfile} --ecbuild -c=&quot;${localisation.languages}&quot; -dest=&quot;${zips.loc.dir}&quot; -s60locfiles=&quot;${localisation.s60locfiles.dir}&quot; -l=&quot;${localisation.log}&quot; -nolocal -k"/>
+                </exec>
+                <antcall target="localisation-emake"/>
+            </then>
+            <else>
+                <!-- localisation build for TBS -->
+                <echo message="isis_EClocaliser.pl ${localisation.files} ${localisation.files.region} -b=${localisation.region}_${localisation.buildfile} --noecbuild -state=0 -c=&quot;${localisation.languages}&quot; -dest=&quot;${zips.loc.dir}&quot; -s60locfiles=&quot;${localisation.s60locfiles.dir}&quot; -l=&quot;${localisation.log}&quot; -h" />
+                <exec executable="perl" dir="${build.drive}/" failonerror="${failonerror}">
+                    <arg line="${build.drive}/epoc32/tools/isis_EClocaliser.pl ${localisation.files} ${localisation.files.region} -state=0 -b=${localisation.region}_${localisation.buildfile} --noecbuild -c=&quot;${localisation.languages}&quot; -dest=&quot;${zips.loc.dir}&quot; -s60locfiles=&quot;${localisation.s60locfiles.dir}&quot; -l=&quot;${localisation.log}&quot; -nolocal -k"/>
+                </exec>
+                <antcall target="localisation-ebs"/>
+            </else>
+        </if>        
+        <!-- localisation build cleanup -->
+        <echo message="isis_EClocaliser.pl -b=${localisation.region}_${localisation.buildfile} -state=2 -dest=&quot;${zips.loc.dir}&quot; -h" />
+        <exec executable="perl" dir="${build.drive}/" failonerror="${failonerror}">
+            <arg line="${build.drive}/epoc32/tools/isis_EClocaliser.pl ${localisation.files} ${localisation.files.region} -b=${build.log.dir}/${build.id}.${localisation.region}_${localisation.buildfile} -state=2 -c=&quot;${localisation.languages}&quot; -dest=&quot;${zips.loc.dir}&quot; -s60locfiles=&quot;${localisation.s60locfiles.dir}&quot; -l=&quot;${localisation.log}&quot; -nolocal -k"/>
+        </exec>
+    </target>
+
+
+    <!-- Localise resources using EBS-->
+    <target name="localisation-ebs" if="build.system.ebs" depends="set-arm-version" >
+        <for list="${isis_mktarget.list}" delimiter="," param="mktarget">
+            <sequential>
+                <antcall target="compile-ebs">
+                    <param name="sysdef.configuration" value="@{mktarget}"/>
+                    <param name="genxml.output.file" location="${build.drive}/@{mktarget}.xml"/>
+                </antcall>
+                <!-- <echo message="isis_EClocaliser.pl ${localisation.files} ${localisation.files.region} -b=${localisation.region}_${localisation.buildfile} -state=1 -c=&quot;${localisation.languages}&quot; -dest=&quot;${zips.loc.dir}&quot; -s60locfiles=&quot;${localisation.s60locfiles.dir}&quot; -l=&quot;${localisation.log}&quot; -h" />
+                <exec executable="perl" dir="${build.drive}/" failonerror="${failonerror}">
+                    <arg line="${build.drive}/epoc32/tools/isis_EClocaliser.pl -b=${localisation.region}_${localisation.buildfile} -state=1 -dest=&quot;${zips.loc.dir}&quot; -k"/>
+                </exec>
+                -->
+            </sequential>
+        </for>
+    </target>
+
+
+    <!-- Localise resources using EC-->
+    <target name="localisation-emake" if="build.system.ec-helium" depends="set-arm-version" >
+        <propertycopy name="localisation.files.region" from="localisation.files.${localisation.region}" />
+        <for list="${isis_mktarget.list}" delimiter="," param="mktarget">
+            <sequential>
+                <hlm:recordStartMacro name="@{mktarget}.log" emacsmode="true"/>
+                <hlm:emakeMacro name="localisation" makefile="${build.drive}/${localisation.region}_${localisation.buildfile}.make" target="@{mktarget}" dir="${build.drive}/" annodetail="basic,history,file,waiting"/>
+                <hlm:recordStopMacro name="@{mktarget}.log"/>
+            </sequential>
+        </for>
+    </target>
+
+
+    <!-- S60 localiser tool -->
+    <target name="localisation-s60-localiser">
+        <propertycopy name="localisation.files.region" from="localisation.files.${localisation.region}" />
+        <echo message="s60Localiser.pl ${localisation.files} ${localisation.files.region} -c=&quot;${localisation.languages}&quot; -dest=&quot;${zips.loc.dir}&quot; -s60locfiles=&quot;${localisation.s60locfiles.dir}&quot; -l=&quot;${localisation.log}&quot;" />
+        <exec executable="perl" dir="${build.drive}/" failonerror="${failonerror}">
+            <arg line="${build.drive}/epoc32/tools/s60Localiser.pl ${localisation.files} ${localisation.files.region} -c=&quot;${localisation.languages}&quot; -dest=&quot;${zips.loc.dir}&quot; -s60locfiles=&quot;${localisation.s60locfiles.dir}&quot; -l=&quot;${localisation.log}&quot;"/>
+        </exec>    
+    </target>
+    
+    
+    <!-- Build localised content -->
+    <target name="localisation-build" depends="rombuild-prepare-input">
+        <record name="${build.log.dir}/${build.id}_localisation_build.log" action="start"/>
+        <copy file="${parse_abld_what.tool}" todir="${build.drive}/epoc32/tools/s60tools" failonerror="false"/>
+        <mkdir dir="${zips.loc.dir}"/>    
+        
+        <!-- get all variation available -->    
+        <exec executable="python" outputproperty="localisation.variation" dir="${build.drive}/" failonerror="${failonerror}">
+            <arg line="${helium.dir}/tools/localisation/getallvariantion.py ${localisation.language.file}"/> 
+        </exec>
+
+        <!-- get all variation available -->    
+        <echo>We will create zip variation for ${localisation.variation}</echo>
+        <for list="${localisation.variation}" delimiter="," param="variant">
+            <sequential>    
+                <hlm:createDeltaZipMacro variant="@{variant}" />
+                <!-- getting all languages to localise -->
+                <var name="localisation.languages" unset="true"/>
+                <exec executable="python" outputproperty="localisation.languages" dir="${build.drive}/" failonerror="${failonerror}">
+                    <arg line="${helium.dir}/tools/localisation/getalllanguages.py ${localisation.language.file} @{variant}"/> 
+                </exec>
+                
+                <echo>Localising ${localisation.languages}</echo>
+                <propertyregex property="localisation.log" input="${build.log.dir}/localisation_${localisation.languages}.html" regexp="\s+" replace="_" override="true"/>
+                <echo>Localising using ${localisation.tool}.</echo>
+                <antcall target="${localisation.tool}">
+                    <param name="localisation.region" value="@{variant}"/>
+                </antcall>
+                
+                <for list="${product.list}" delimiter="," param="product.name" >
+                    <sequential>
+                        <for list="${localisation.languages}" delimiter=" " param="lid" >
+                            <sequential>
+                                <exec executable="python" dir="${build.drive}/epoc32/rom" failonerror="${failonerror}">
+                                    <arg line="${helium.dir}/tools/localisation/createlocales.py @{product.name} @{lid} -include Override.oby"/> 
+                                </exec>
+                            </sequential>
+                        </for>
+                    </sequential>
+                </for>
+            </sequential>
+        </for>
+        <record name="${build.log.dir}/${build.id}_localisation_build.log" action="stop"/>
+    </target>
+    
+    
+    <!--
+        Target to rebuild locales 
+        This could be useful for incremental changes/test.
+    -->
+    <target name="localisation-create-locales"> 
+        <record name="${build.log.dir}/${build.id}_create_locales.log" action="start"/>
+        
+        <!-- get all variation available -->    
+        <exec executable="python" outputproperty="localisation.variation" dir="${build.drive}/" failonerror="${failonerror}">
+            <arg line="${helium.dir}/tools/localisation/getallvariantion.py ${localisation.language.file}"/> 
+        </exec>
+                
+        <!-- get all variation available -->    
+        <echo>We will create zip variation for ${localisation.variation}</echo>
+        <for list="${localisation.variation}" delimiter="," param="variant">
+            <sequential>
+                <hlm:createDeltaZipMacro variant="@{variant}" />
+                <!-- getting all languages to localise -->
+                <var name="localisation.languages" unset="true"/>
+                <exec executable="python" outputproperty="localisation.languages" dir="${build.drive}/" failonerror="${failonerror}">
+                    <arg line="${helium.dir}/tools/localisation/getalllanguages.py ${localisation.language.file} @{variant}"/> 
+                </exec>
+           
+                <for list="${product.list}" delimiter="," param="product.name" >
+                    <sequential>
+                        <for list="${localisation.languages}" delimiter=" " param="lid" >
+                            <sequential>
+                                <exec executable="python" dir="${build.drive}/epoc32/rom" failonerror="${failonerror}">
+                                    <arg line="${helium.dir}/tools/localisation/createlocales.py @{product.name} @{lid} -include Override.oby"/> 
+                                </exec>
+                            </sequential>
+                        </for>
+                    </sequential>
+                </for>
+            </sequential>
+        </for>
+        <record name="${build.log.dir}/${build.id}_create_locales.log" action="stop"/>
+    </target>    
+
+    
+    <!-- Creates localised rom images -->
+    <target name="localisation-roms" depends="rombuild-create-makefile,flash-config-file"> 
+        <!-- get product path -->
+        <record name="${build.log.dir}/${build.id}_localisation_roms.log" action="start"/>
+        <hlm:preECImakerMacro/>
+        <for list="${product.list}" delimiter="," param="product.name" >
+            <sequential>
+                <hlm:rombuildImakerMacro product="@{product.name}" target="${localisation.makefile.target}" />
+            </sequential>
+        </for>
+        <hlm:ecImakerMacro makefile.target="${localisation.makefile.target}" />
+        <record name="${build.log.dir}/${build.id}_localisation_roms.log" action="stop"/>
+        <hlm:logextract file="${build.log.dir}/${build.id}_localisation_roms.log"/>
+    </target>
+
+    
+    <!-- Creates customer rom images -->
+    <target name="customer-roms" depends="rombuild-create-makefile,flash-config-file"> 
+        <!-- get product path -->
+        <record name="${build.log.dir}/${build.id}_customer_roms.log" action="start"/>
+        <hlm:preECImakerMacro/>
+        <for list="${product.list}" delimiter="," param="product.name" >
+            <sequential>
+                <hlm:rombuildImakerMacro product="@{product.name}" target="${customer.makefile.target}" />
+            </sequential>
+        </for>
+        <hlm:ecImakerMacro makefile.target="${customer.makefile.target}" />
+        <record name="${build.log.dir}/${build.id}_customer_roms.log" action="stop"/>
+        <hlm:logextract file="${build.log.dir}/${build.id}_customer_roms.log"/>
+    </target>
+
+    
+    <!-- Runs localisation for product builds.
+    
+    Creates:
+    * Localisation configuration
+    * Build localised content
+    * Localised rom images
+    
+     -->
+    <target name="localisation" depends="localisation-create-config,precompile-ec,localisation-build,localisation-roms"> 
+        <antcall target="postcompile-ec"/>
+    </target>
+
+</project>

@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : imaker.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="rombuild.imaker" xmlns:hlm="http://www.nokia.com/helium">
+    <description>
+        ROM image creation using iMaker (future implementation).
+    </description>
+
+    <!-- Defining the default rom image creation templates. -->
+    <property name="imaker.fmpp.makefile" location="${helium.dir}/tools/common/templates/imaker/build_imaker_roms_signing.mk.ftl"/>
+    <property name="imaker.fmpp.ant" location="${helium.dir}/tools/common/templates/imaker/build_imaker_roms.ant.xml.ftl"/>
+    
+    
+    <!-- The iMaker task. -->
+    <macrodef name="imaker" uri="http://www.nokia.com/helium">
+        <element name="config"/>
+        <attribute name="engine" default="ebs"/>
+        <attribute name="name" default=""/>
+        <attribute name="signal" default="true"/>
+        <sequential>
+            <hlm:tempRecordStartMacro name="${build.id}@{name}.roms.log"/>
+            <hlm:imaker2tdd property="internal.imaker.tdd" dir="${build.drive}/">
+                <config/>
+            </hlm:imaker2tdd>
+            <echo>
+Generated TDD:
+${internal.imaker.tdd}
+            </echo>
+            <mkdir dir="${build.log.dir}"/>
+            <if>
+                <matches pattern="ec(-helium)?" string="@{engine}"/>
+                <then>
+                    <fmpp sourceFile="${imaker.fmpp.makefile}"
+                        outputFile="${temp.build.dir}/build_imaker_roms@{name}.mk">
+                        <data expandProperties="yes">
+                            data: ${internal.imaker.tdd}
+                            ant: antProperties()
+                        </data>
+                    </fmpp>
+                    <exec executable="${ec.emake}" dir="${build.drive}/">
+                        <arg value="--emake-build-label=${build.id}@{name}-ROMS"/>
+                        <arg value="--emake-class=${ec.build.class}"/>
+                        <arg value="--emake-annofile=${build.log.dir}\${build.id}@{name}.ROMS.emake.anno.xml"/>
+                        <arg value="--emake-autodepend=1"/>
+                        <arg value="--emake-annodetail=basic,history,file,waiting"/>                            
+                        <arg line="-f ${temp.build.dir}/build_imaker_roms@{name}.mk all"/>
+                    </exec>
+                </then>
+                <else>
+                    <fmpp sourceFile="${imaker.fmpp.ant}"
+                        outputFile="${temp.build.dir}/build_imaker_roms@{name}.ant.xml">
+                        <data expandProperties="yes">
+                            data: ${internal.imaker.tdd}
+                            ant: antProperties()
+                        </data>
+                    </fmpp>
+                    <ant antfile="${temp.build.dir}/build_imaker_roms@{name}.ant.xml" target="all" />
+                </else>
+            </if>
+            
+            <hlm:tempRecordStopMacro name="${build.id}@{name}.roms.log" filterref="filterset.imaker"/>
+            <!-- Todo: metadata: insert assertions for metadata parsing here -->
+            <if>
+                <istrue value="@{signal}"/>
+                <then>
+                    <hlm:signalMacro logfile="${build.log.dir}/${build.id}@{name}.roms.log" 
+                        signal.input="rombuildSignalInput" />
+                </then>
+            </if>
+        </sequential>
+    </macrodef>
+
+    <!--
+        This task implements the transformation of iMaker introspection into a TDD for FMPP.
+        Syntax will be like:
+        <pre>
+        <hlm:imaker2tdd property="internal.imaker.tdd">
+            <imakerconfigurationset>
+                <imakerconfiguration>
+                    <makefileset>
+                        <include name="**/PRODUCT/*ui.mk"/>
+                    </makefileset>
+                    <categoryset>
+                        <include name="build"/>
+                        <include name="release"/>
+                        <include name="test"/>
+                    </categoryset>
+                </imakerconfiguration>
+            </imakerconfigurationset>
+        </hlm:imaker2tdd>                 
+        </pre>
+    -->
+    
+    <scriptdef name="imaker2tdd" language="jython" uri="http://www.nokia.com/helium">
+        <element name="imakerconfigurationset" classname="com.nokia.ant.types.imaker.ConfigurationSet"/>
+        <attribute name="property"/>
+        <attribute name="file"/>
+        <attribute name="dir"/>
+        <![CDATA[
+import imaker
+import traceback
+import ant
+import logging
+logging.getLogger('imaker.api').addHandler(ant.AntHandler(self))
+try:
+    imaker.ant_task_configuration(project, self, elements, attributes)
+except Exception, e:
+    traceback.print_exc()
+    # Propagate the exception
+    raise e
+]]>
+    </scriptdef>
+
+    <!--
+       This task merges all files mentioned in the fileset and output them in filename output file. 
+    -->
+    <scriptdef name="mergeConfigXML" language="beanshell"  uri="http://www.nokia.com/helium">
+        <element name="fileset" type="fileset"/>
+        <attribute name="filename"/>
+<![CDATA[
+import java.io.File;
+import org.dom4j.Node;
+import org.dom4j.io.SAXReader;
+import org.dom4j.DocumentHelper;
+import org.dom4j.Element;
+import org.dom4j.Document;
+import org.dom4j.io.OutputFormat;
+import org.dom4j.io.XMLWriter;
+
+Document document = DocumentHelper.createDocument();
+Element root = document.addElement("build");
+Element rootConfig = root.addElement( "config" );
+rootConfig.addAttribute("abstract", "true");
+rootConfig.addAttribute("name", "ee-roms");
+
+filesets = elements.get("fileset");
+for (i = 0; i < filesets.size(); ++i) {
+        ds = filesets.get(i).getDirectoryScanner(project);
+        ds.scan();
+        String[] files = ds.getIncludedFiles();
+        for (j = 0; j < files.length ; ++j) {
+           romconf = new File(ds.getBasedir(), files[j]);
+           self.log("Adding " + romconf + ".");
+           SAXReader reader = new SAXReader();
+           Document document = reader.read(romconf);
+           Node node = document.selectSingleNode("//build/config");
+           rootConfig.add(node.detach());
+        }
+}
+// lets write to a file
+OutputFormat format = OutputFormat.createPrettyPrint();
+XMLWriter writer = new XMLWriter(new FileWriter(attributes.get("filename")), format);
+writer.write( document );
+writer.close();
+]]>
+    </scriptdef>
+    
+    <!--
+       This target is an helper to recompose the rom image configuration using the output of iMaker.
+    -->
+    <target name="imaker-merge-rom-xml">
+        <mkdir dir="${temp.build.dir}"/>
+        <property name="rombuild.config.file.parsed" location="${build.output.dir}/rom_config.xml.parsed" />
+        <hlm:mergeConfigXML filename="${rombuild.config.file.parsed}">
+            <fileset dir="${release.images.dir}" includes="**/*.iconfig.xml"/>    
+        </hlm:mergeConfigXML>
+    </target>
+
+    <!-- Future official target for building roms using iMaker.
+         To configure that target you have to define an imakerconfigurationset type identified by
+         'imaker.rom.config'.
+    -->
+    <target name="build-roms" depends="rombuild-imaker-create-buildinfo">
+        <property name="imaker.engine" value="${build.system}" />
+        <property name="imaker.rom.name" value=""/>
+        <hlm:imaker engine="${imaker.engine}" name="${imaker.rom.name}">
+            <config>
+                <imakerconfigurationset refid="imaker.rom.config"/>
+            </config>
+        </hlm:imaker>
+        <if>
+            <istrue value="${blocks.enabled}" />
+            <then>
+                <mkdir dir="${blocks.config.dir}" />
+                <exec executable="python">
+                    <arg value="-m"/>
+                    <arg value="packager.cli"/>
+                    <arg value="--epocroot=${build.drive}/" />
+                    <arg value="--config=${blocks.config.dir}" />
+                    <arg value="--datasource=imaker-romdir" />
+                    <arg value="-Dname=roms" />
+                    <arg value="-Dversion=1" />
+                    <arg value="-Ddir=${release.images.dir}" />
+                    <arg value="--updateData" />
+                </exec>
+            </then>
+        </if>
+    </target>
+    
+</project>

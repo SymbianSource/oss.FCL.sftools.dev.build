@@ -1,0 +1,35 @@
+Primary details (Multiple Kernels):
+
+Kernel 1:
+Uids:                    1000007a 1000008b 100041af 6bf50df9
+Entry point:             f8008108
+Code start addr:         f8008000
+Data start addr:         f803dfec
+DataBssLinearBase:       64000000
+Text size:               00035fec
+Code size:               00035fec
+Data size:               000001f8
+BssSize:                 00001a38
+Total data size:         00001c30
+Heap min:                00008000
+Heap max:                00ffc000
+Stack size:              00001000
+Dll ref table:           00000000
+Export directory:        f803a1c8
+Export dir count:        00000328
+Hardware variant:        09080001
+Flags:                   8500002a
+Secure ID:               100041af
+Vendor ID:               70000001
+Capability:              00000000 000fffff
+Tools Version:           2.01(576)
+Module Version:          10.0
+Exception Descriptor:    00000000
+Priority:                350
+
+Summary of file sizes in rom:
+Overhead (bootstrap+gaps+sectioning)	10723
+Overhead (directory size)	25232
+\epoc32\release\ARMV5\urel\__ekern.exe	221788
+\epoc32\release\ARMV5\urel\elocd.ldd	15192
+\epoc32\release\ARMV5\urel\__medint.pdd	2320

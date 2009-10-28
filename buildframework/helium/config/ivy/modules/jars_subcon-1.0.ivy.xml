@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : jars_subcon-1.0.ivy.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<ivy-module version="1.3">
+    <info 
+        organisation="java"
+        module="jars_subcon"
+        revision="1.0"/>
+        
+    <publications>
+        <!-- License: Apache 1.1 -->
+        <artifact name="xmltask-v1.15.1" ext="jar" type="jar" url="http://kent.dl.sourceforge.net/sourceforge/xmltask/xmltask-v1.15.1.jar"/>
+        <!-- License: LGPL, SPL -->
+        <artifact name="bsh-2.1b0" ext="jar" type="jar" url="http://helium.nmp.nokia.com/svn/beanshell/branches/2.1b0/bin/bsh-2.1b0.jar"/>
+        <!-- License: LGPL -->
+        <artifact name="xia" ext="jar" type="jar" url="http://www.jeckle.de/freeStuff/xia/xia.jar"/>
+        <!-- License: LGPL and BSD -->
+        <artifact name="bliki-3.0.7" ext="zip" type="jar" url="http://heanet.dl.sourceforge.net/sourceforge/plog4u/bliki.3.0.7.zip"/>
+        <!-- License: LGPL -->
+        <artifact name="antform" ext="zip" type="jar" url="http://surfnet.dl.sourceforge.net/sourceforge/antforms/antform-bin-2.0beta2.zip"/>
+
+        <artifact name="xia_source" ext="zip" type="zip" url="http://www.jeckle.de/freeStuff/xia/xia.zip"/>
+        <artifact name="bsh-2.1b0_source" ext="zip" type="zip" url="http://helium.nmp.nokia.com/svn/beanshell/branches/2.1b0/bsh-2.1b0-sources.zip"/>
+        <artifact name="wsdl4j-1.5.1-sources" ext="zip" type="zip" url="http://mirrors.ibiblio.org/pub/mirrors/maven2/wsdl4j/wsdl4j/1.5.1/wsdl4j-1.5.1-sources.jar"/>
+        <artifact name="freemarker-2.3.13-sources" ext="zip" type="zip" url="http://mirrors.ibiblio.org/pub/mirrors/maven2/org/freemarker/freemarker/2.3.13/freemarker-2.3.13-sources.jar"/>
+        <artifact name="mail-1.4.1-sources" ext="zip" type="zip" url="http://mirrors.ibiblio.org/pub/mirrors/maven2/javax/mail/mail/1.4.1/mail-1.4.1-sources.jar"/>
+    </publications>
+</ivy-module>

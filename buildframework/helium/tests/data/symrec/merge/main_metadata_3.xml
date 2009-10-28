@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<releaseInformation>
+	<releaseDetails>
+		<releaseID>
+			<service name="service"/>
+			<product name="product"/>
+			<release name="release_1"/>
+		</releaseID>
+	</releaseDetails>
+	<releaseFiles>
+		<package default="true" extract="single" type=".zip" name="test3_1.zip"  md5checksum="433fd286bcf7e55be9d0e7e88f0cd84c" size="112"/>
+		<package default="true" extract="single" type=".zip" name="test3_2.zip"  md5checksum="433fd286bcf7e55be9d0e7e88f0cd84c" size="112"/>
+	</releaseFiles>
+	<externalFiles/>
+</releaseInformation>

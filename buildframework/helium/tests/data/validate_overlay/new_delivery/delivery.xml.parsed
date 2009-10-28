@@ -1,0 +1,77 @@
+<?xml version="1.0" ?>
+<build>
+    <spec name="mc_5132" abstract="true">
+        <set name="database" value="fa1f5132"/>
+        <set name="dir" value="E:\wbernard\ccm_wa\fa1f5132\0740"/>
+        <set name="threads" value="4"/> 
+        <set name="release" value="mc/integration"/> 
+        
+        <spec name="ppd_sw-MCL_200726:project:sa1spp#1" type="snapshot"/>
+        <spec name="IBUSAL_RapidoYawe-jk1f5132#0732:project:jk1imeng#1" type="snapshot"/>
+        
+        <!-- temporary fix to handle two naviscroll projects -->
+        <spec name="naviscroll-jk1f5132#0728_2:project:tr1imeng#1" type="snapshot">
+	        <set name="dir" value="E:\wbernard\ccm_wa\fa1f5132\0740\naviscroll-old"/>
+        </spec>
+        <spec name="sensor_server_adaptation-jk1f5132#0728_2:project:tr1imeng#1" type="snapshot">
+	        <set name="dir" value="E:\wbernard\ccm_wa\fa1f5132\0740\sensor_server_adaptation-old"/>
+        </spec>
+        
+        <!-- this is for new driver  - requires change in sys_def to be compiled -->
+        <spec name="naviscroll-jk1f5132#0732:project:tr1imeng#1" type="snapshot">
+	        <set name="dir" value="E:\wbernard\ccm_wa\fa1f5132\0740\naviscroll-new"/>
+        </spec>
+        <spec name="sensor_server_adaptation-jk1f5132#0732:project:tr1imeng#1" type="snapshot">
+	        <set name="dir" value="E:\wbernard\ccm_wa\fa1f5132\0740\sensor_server_adaptation-new"/>
+        </spec>
+
+        <spec name="S60-S60.32_200726:project:sa1spp#1" type="snapshot">
+        	<set name="threads" value="10"/>
+        </spec>
+        
+        <spec name="T9TegicDelivery-tr1s60#AppBaseDo_direct_200707:project:ccm51#1" type="snapshot"/>
+        
+        <spec name="multimedia_sw" abstract="true">
+        	<set name="threads" value="1"/>
+	        <set name="dir" value="E:\wbernard\ccm_wa\fa1f5132\0740\multimedia_sw"/>
+        	<spec name="maps-bh1cfloc#1.1_200725:project:tr1cfloc#1" type="snapshot"/>
+        	<spec name="fmtx-dev_200725:project:tr1nss#1" type="snapshot"/>
+        	<spec name="InternetRadio-InternetRadioA32_0726:project:sa1nssx4#1" type="snapshot"/>
+        	
+        	<!-- VOIP baselines -->
+	        <spec name="multimedia_sw" abstract="true">
+				<set name="dir" value="E:\wbernard\ccm_wa\fa1f5132\0740\multimedia_sw\VoIP"/>
+				<spec name="ipappservices_Domain_direct-ou1cfspd#Sawfish_2007wk27:project:he1cfsip#1" type="snapshot" />
+				<spec name="iptelephony-ou1cfspd#Sawfish_2007wk27:project:ou1s60rt#1" type="snapshot" />
+				<spec name="brandingserver-bh1s60#IMPPDo_Int_200725:project:tr1cfmsg#1" type="snapshot" />
+				<spec name="presencefw-IMPECDo_Int_200721:project:tr1cfmsg#1" type="snapshot" />
+				<spec name="simpledatamodeladapter-Sawfish_VoIP_2007_wk27:project:ou1cfspd#1" type="snapshot" />
+				<spec name="sipvoipcontactsextension-Sawfish_VoIP_2007_wk27:project:ou1cfspd#1" type="snapshot" />
+	  			<spec name="calllineidentificationxsp-Sawfish_VoIP_2007_wk27:project:ou1cfspd#1" type="snapshot" />
+  				<spec name="callloggingxsp-Sawfish_VoIP_2007_wk20:project:ou1cfspd#1" type="snapshot" />
+			    <spec name="callmenuxsp-Sawfish_VoIP_2007_wk20:project:ou1cfspd#1" type="snapshot" />
+  				<spec name="callstateidentificationxsp-Sawfish_VoIP_2007_wk27:project:ou1cfspd#1" type="snapshot" />
+  				<spec name="calltypeidentificationxsp-Sawfish_VoIP_2007_wk20:project:ou1cfspd#1" type="snapshot" />
+  				<spec name="logsserviceextension-Sawfish_VoIP_2007_wk27:project:ou1cfspd#1" type="snapshot" />
+			</spec>
+			
+			<spec name="me_scd_desw-release5_200729v1:project:fa1cfspd#1" type="snapshot" />			
+	
+			<spec name="productconceptfw-s6032_2007_wk27:project:tr1nss#1" type="checkout">
+	    		<set name="tasks" value="tr1nss#34759" />
+	    		<set name="threads" value="5"/>
+			</spec>
+	
+			<spec name="MCNaviscroll-0726_Inc7.1:project:fa1f5132#1" type="snapshot" />	
+			<spec name="WLANSniffer2-2007_wk21:project:e002sa08#1" type="snapshot" />
+	
+			<!-- Jan: 27.06.2007: adding phone activation thingie -->
+			<spec name="phoneactivation_2.0-he1dcm#07wk31_4:project:e003sa26#1" type="snapshot"/>
+
+	    </spec>
+    </spec>
+</build>
+
+
+	
+	

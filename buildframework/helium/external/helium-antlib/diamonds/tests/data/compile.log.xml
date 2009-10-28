@@ -1,0 +1,2301 @@
+<?xml version="1.0" encoding="utf-8"?>
+<log filename="m:\output\logs\ido_tedo_mcl_devlon52_ec_MCL.52.105.s60_build_compile.log">
+    <build>
+        <task name="s60_build">
+            <task name="\s60\mw\telephonyservices\telsrv_dom\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\telsrv_sdk\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\cbs\CbsServer\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\cbs\cbsui\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\convergedcallengine\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\networkhandling\networkhandlingengine\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\aiwdialdata\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\CallUI\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\dialutils\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\EnPolicy\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\phoneclient\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\phoneserver\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\satengine\SatServer\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\satui\satapp\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\satui\satplugin\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\utils\phoneparser\group">
+            </task>
+            <task name="\s60\app\telephony\tel_dom\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\Blacklist\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneui\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuicontrol\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuistates\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuiutils\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuiview\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuivoipextension\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\silenceactionplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\PhoneCntFinder\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\audiohandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\callhandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\contacthandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\loghandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\phonemodel\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\aiwcallimageplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\PsetNotesUi\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\pslncallimageplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\telephonysettings\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\SSSettings\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\dialer\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\BubbleManager\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\ConnectUtil\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\ServiceRequest\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\SFIUtils\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\Ussd\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\vmbx\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\TelephonyDeviceMode\group">
+            </task>
+            <task name="\s60\app\videotelephony\videotel_dom\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoengine\PacketVideoEngineBinaries\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoplugins\DisplaySink\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoplugins\VideoSource\group">
+            </task>
+            <task name="\s60\app\videotelephony\vtengines\videoteleng\Group">
+            </task>
+            <task name="\s60\app\videotelephony\vtengines\videotelcomms\group">
+            </task>
+            <task name="\s60\app\videotelephony\vtuis\videotelui\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\telsrv_dom\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\telsrv_sdk\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\cbs\CbsServer\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\cbs\cbsui\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\convergedcallengine\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\networkhandling\networkhandlingengine\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\aiwdialdata\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\CallUI\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\dialutils\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\EnPolicy\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\phoneclient\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\phoneserver\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\satengine\SatServer\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\satui\satapp\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\satui\satplugin\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\utils\phoneparser\group">
+            </task>
+            <task name="\s60\app\telephony\tel_dom\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\Blacklist\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneui\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuicontrol\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuistates\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuiutils\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuiview\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuivoipextension\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\silenceactionplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\PhoneCntFinder\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\audiohandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\callhandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\contacthandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\loghandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\phonemodel\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\aiwcallimageplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\PsetNotesUi\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\pslncallimageplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\telephonysettings\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\SSSettings\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\dialer\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\BubbleManager\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\ConnectUtil\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\ServiceRequest\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\SFIUtils\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\Ussd\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\vmbx\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\TelephonyDeviceMode\group">
+            </task>
+            <task name="\s60\app\videotelephony\videotel_dom\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoengine\PacketVideoEngineBinaries\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoplugins\DisplaySink\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoplugins\VideoSource\group">
+            </task>
+            <task name="\s60\app\videotelephony\vtengines\videoteleng\Group">
+            </task>
+            <task name="\s60\app\videotelephony\vtengines\videotelcomms\group">
+            </task>
+            <task name="\s60\app\videotelephony\vtuis\videotelui\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\telsrv_dom\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\telsrv_sdk\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\cbs\CbsServer\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\cbs\cbsui\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\convergedcallengine\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\networkhandling\networkhandlingengine\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\aiwdialdata\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\CallUI\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\dialutils\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\EnPolicy\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\phoneclient\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\phoneserver\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\satengine\SatServer\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\satui\satapp\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\satui\satplugin\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\utils\phoneparser\group">
+            </task>
+            <task name="\s60\app\telephony\tel_dom\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\Blacklist\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneui\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuicontrol\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuistates\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuiutils\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuiview\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuivoipextension\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\silenceactionplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\PhoneCntFinder\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\audiohandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\callhandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\contacthandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\loghandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\phonemodel\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\aiwcallimageplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\PsetNotesUi\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\pslncallimageplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\telephonysettings\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\SSSettings\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\dialer\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\BubbleManager\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\ConnectUtil\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\ServiceRequest\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\SFIUtils\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\Ussd\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\vmbx\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\TelephonyDeviceMode\group">
+            </task>
+            <task name="\s60\app\videotelephony\videotel_dom\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoengine\PacketVideoEngineBinaries\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoplugins\DisplaySink\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoplugins\VideoSource\group">
+            </task>
+            <task name="\s60\app\videotelephony\vtengines\videoteleng\Group">
+            </task>
+            <task name="\s60\app\videotelephony\vtengines\videotelcomms\group">
+            </task>
+            <task name="\s60\app\videotelephony\vtuis\videotelui\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\telsrv_dom\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\telsrv_sdk\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\cbs\CbsServer\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\cbs\cbsui\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\convergedcallengine\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\networkhandling\networkhandlingengine\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\aiwdialdata\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\CallUI\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\dialutils\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\EnPolicy\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\phoneclient\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\phoneserver\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\satengine\SatServer\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\satui\satapp\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\satui\satplugin\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\utils\phoneparser\group">
+            </task>
+            <task name="\s60\app\telephony\tel_dom\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\Blacklist\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneui\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuicontrol\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuistates\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuiutils\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuiview\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuivoipextension\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\silenceactionplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\PhoneCntFinder\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\audiohandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\callhandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\contacthandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\loghandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\phonemodel\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\aiwcallimageplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\PsetNotesUi\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\pslncallimageplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\telephonysettings\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\SSSettings\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\dialer\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\BubbleManager\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\ConnectUtil\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\ServiceRequest\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\SFIUtils\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\Ussd\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\vmbx\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\TelephonyDeviceMode\group">
+            </task>
+            <task name="\s60\app\videotelephony\videotel_dom\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoengine\PacketVideoEngineBinaries\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoplugins\DisplaySink\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoplugins\VideoSource\group">
+            </task>
+            <task name="\s60\app\videotelephony\vtengines\videoteleng\Group">
+            </task>
+            <task name="\s60\app\videotelephony\vtengines\videotelcomms\group">
+            </task>
+            <task name="\s60\app\videotelephony\vtuis\videotelui\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\telsrv_dom\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\telsrv_sdk\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\cbs\CbsServer\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\cbs\cbsui\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\convergedcallengine\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\networkhandling\networkhandlingengine\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\aiwdialdata\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\CallUI\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\dialutils\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\EnPolicy\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\phoneclient\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\phoneserver\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\satengine\SatServer\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\satui\satapp\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\satui\satplugin\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\utils\phoneparser\group">
+            </task>
+            <task name="\s60\app\telephony\tel_dom\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\Blacklist\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneui\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuicontrol\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuistates\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuiutils\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuiview\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuivoipextension\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\silenceactionplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\PhoneCntFinder\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\audiohandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\callhandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\contacthandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\loghandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\phonemodel\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\aiwcallimageplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\PsetNotesUi\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\pslncallimageplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\telephonysettings\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\SSSettings\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\dialer\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\BubbleManager\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\ConnectUtil\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\ServiceRequest\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\SFIUtils\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\Ussd\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\vmbx\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\TelephonyDeviceMode\group">
+            </task>
+            <task name="\s60\app\videotelephony\videotel_dom\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoengine\PacketVideoEngineBinaries\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoplugins\DisplaySink\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoplugins\VideoSource\group">
+            </task>
+            <task name="\s60\app\videotelephony\vtengines\videoteleng\Group">
+            </task>
+            <task name="\s60\app\videotelephony\vtengines\videotelcomms\group">
+            </task>
+            <task name="\s60\app\videotelephony\vtuis\videotelui\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\telsrv_dom\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\telsrv_sdk\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\cbs\CbsServer\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\cbs\cbsui\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\convergedcallengine\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\networkhandling\networkhandlingengine\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\aiwdialdata\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\CallUI\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\dialutils\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\EnPolicy\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\phoneclient\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\phoneserver\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\satengine\SatServer\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\satui\satapp\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\satui\satplugin\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\utils\phoneparser\group">
+            </task>
+            <task name="\s60\app\telephony\tel_dom\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\Blacklist\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneui\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuicontrol\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuistates\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuiutils\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuiview\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuivoipextension\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\silenceactionplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\PhoneCntFinder\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\audiohandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\callhandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\contacthandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\loghandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\phonemodel\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\aiwcallimageplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\PsetNotesUi\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\pslncallimageplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\telephonysettings\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\SSSettings\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\dialer\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\BubbleManager\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\ConnectUtil\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\ServiceRequest\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\SFIUtils\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\Ussd\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\vmbx\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\TelephonyDeviceMode\group">
+            </task>
+            <task name="\s60\app\videotelephony\videotel_dom\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoengine\PacketVideoEngineBinaries\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoplugins\DisplaySink\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoplugins\VideoSource\group">
+            </task>
+            <task name="\s60\app\videotelephony\vtengines\videoteleng\Group">
+            </task>
+            <task name="\s60\app\videotelephony\vtengines\videotelcomms\group">
+            </task>
+            <task name="\s60\app\videotelephony\vtuis\videotelui\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\telsrv_dom\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\telsrv_sdk\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\cbs\CbsServer\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\cbs\cbsui\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\convergedcallengine\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\networkhandling\networkhandlingengine\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\aiwdialdata\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\CallUI\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\dialutils\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\EnPolicy\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\phoneclient\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\phoneserver\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\satengine\SatServer\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\satui\satapp\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\satui\satplugin\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\utils\phoneparser\group">
+            </task>
+            <task name="\s60\app\telephony\tel_dom\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\Blacklist\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneui\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuicontrol\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuistates\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuiutils\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuiview\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuivoipextension\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\silenceactionplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\PhoneCntFinder\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\audiohandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\callhandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\contacthandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\loghandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\phonemodel\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\aiwcallimageplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\PsetNotesUi\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\pslncallimageplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\telephonysettings\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\SSSettings\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\dialer\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\BubbleManager\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\ConnectUtil\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\ServiceRequest\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\SFIUtils\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\Ussd\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\vmbx\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\TelephonyDeviceMode\group">
+            </task>
+            <task name="\s60\app\videotelephony\videotel_dom\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoengine\PacketVideoEngineBinaries\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoplugins\DisplaySink\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoplugins\VideoSource\group">
+            </task>
+            <task name="\s60\app\videotelephony\vtengines\videoteleng\Group">
+            </task>
+            <task name="\s60\app\videotelephony\vtengines\videotelcomms\group">
+            </task>
+            <task name="\s60\app\videotelephony\vtuis\videotelui\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\telsrv_dom\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\telsrv_sdk\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\cbs\CbsServer\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\cbs\cbsui\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\convergedcallengine\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\networkhandling\networkhandlingengine\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\aiwdialdata\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\CallUI\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\dialutils\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\EnPolicy\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\phoneclient\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\phoneserver\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\satengine\SatServer\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\satui\satapp\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\satui\satplugin\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\utils\phoneparser\group">
+            </task>
+            <task name="\s60\app\telephony\tel_dom\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\Blacklist\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneui\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuicontrol\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuistates\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuiutils\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuiview\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuivoipextension\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\silenceactionplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\PhoneCntFinder\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\audiohandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\callhandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\contacthandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\loghandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\phonemodel\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\aiwcallimageplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\PsetNotesUi\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\pslncallimageplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\telephonysettings\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\SSSettings\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\dialer\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\BubbleManager\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\ConnectUtil\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\ServiceRequest\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\SFIUtils\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\Ussd\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\vmbx\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\TelephonyDeviceMode\group">
+            </task>
+            <task name="\s60\app\videotelephony\videotel_dom\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoengine\PacketVideoEngineBinaries\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoplugins\DisplaySink\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoplugins\VideoSource\group">
+            </task>
+            <task name="\s60\app\videotelephony\vtengines\videoteleng\Group">
+            </task>
+            <task name="\s60\app\videotelephony\vtengines\videotelcomms\group">
+            </task>
+            <task name="\s60\app\videotelephony\vtuis\videotelui\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\telsrv_dom\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\telsrv_sdk\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\cbs\CbsServer\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\cbs\cbsui\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\convergedcallengine\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\networkhandling\networkhandlingengine\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\aiwdialdata\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\CallUI\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\dialutils\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\EnPolicy\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\phoneclient\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\phoneserver\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\satengine\SatServer\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\satui\satapp\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\satui\satplugin\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\utils\phoneparser\group">
+            </task>
+            <task name="\s60\app\telephony\tel_dom\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\Blacklist\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneui\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuicontrol\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuistates\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuiutils\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuiview\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuivoipextension\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\silenceactionplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\PhoneCntFinder\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\audiohandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\callhandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\contacthandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\loghandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\phonemodel\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\aiwcallimageplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\PsetNotesUi\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\pslncallimageplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\telephonysettings\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\SSSettings\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\dialer\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\BubbleManager\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\ConnectUtil\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\ServiceRequest\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\SFIUtils\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\Ussd\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\vmbx\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\TelephonyDeviceMode\group">
+            </task>
+            <task name="\s60\app\videotelephony\videotel_dom\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoengine\PacketVideoEngineBinaries\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoplugins\DisplaySink\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoplugins\VideoSource\group">
+            </task>
+            <task name="\s60\app\videotelephony\vtengines\videoteleng\Group">
+            </task>
+            <task name="\s60\app\videotelephony\vtengines\videotelcomms\group">
+            </task>
+            <task name="\s60\app\videotelephony\vtuis\videotelui\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\telsrv_dom\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\telsrv_sdk\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\cbs\CbsServer\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\cbs\cbsui\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\convergedcallengine\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\networkhandling\networkhandlingengine\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\aiwdialdata\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\CallUI\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\dialutils\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\EnPolicy\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\phoneclient\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\phoneserver\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\satengine\SatServer\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\satui\satapp\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\satui\satplugin\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\utils\phoneparser\group">
+            </task>
+            <task name="\s60\app\telephony\tel_dom\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\Blacklist\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneui\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuicontrol\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuistates\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuiutils\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuiview\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuivoipextension\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\silenceactionplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\PhoneCntFinder\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\audiohandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\callhandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\contacthandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\loghandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\phonemodel\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\aiwcallimageplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\PsetNotesUi\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\pslncallimageplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\telephonysettings\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\SSSettings\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\dialer\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\BubbleManager\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\ConnectUtil\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\ServiceRequest\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\SFIUtils\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\Ussd\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\vmbx\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\TelephonyDeviceMode\group">
+            </task>
+            <task name="\s60\app\videotelephony\videotel_dom\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoengine\PacketVideoEngineBinaries\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoplugins\DisplaySink\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoplugins\VideoSource\group">
+            </task>
+            <task name="\s60\app\videotelephony\vtengines\videoteleng\Group">
+            </task>
+            <task name="\s60\app\videotelephony\vtengines\videotelcomms\group">
+            </task>
+            <task name="\s60\app\videotelephony\vtuis\videotelui\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\telsrv_dom\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\telsrv_sdk\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\cbs\CbsServer\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\cbs\cbsui\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\convergedcallengine\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\networkhandling\networkhandlingengine\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\aiwdialdata\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\CallUI\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\dialutils\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\EnPolicy\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\phoneclient\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\phoneserver\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\satengine\SatServer\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\satui\satapp\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\satui\satplugin\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\utils\phoneparser\group">
+            </task>
+            <task name="\s60\app\telephony\tel_dom\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\Blacklist\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneui\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuicontrol\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuistates\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuiutils\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuiview\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuivoipextension\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\silenceactionplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\PhoneCntFinder\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\audiohandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\callhandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\contacthandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\loghandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\phonemodel\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\aiwcallimageplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\PsetNotesUi\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\pslncallimageplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\telephonysettings\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\SSSettings\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\dialer\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\BubbleManager\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\ConnectUtil\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\ServiceRequest\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\SFIUtils\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\Ussd\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\vmbx\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\TelephonyDeviceMode\group">
+            </task>
+            <task name="\s60\app\videotelephony\videotel_dom\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoengine\PacketVideoEngineBinaries\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoplugins\DisplaySink\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoplugins\VideoSource\group">
+            </task>
+            <task name="\s60\app\videotelephony\vtengines\videoteleng\Group">
+            </task>
+            <task name="\s60\app\videotelephony\vtengines\videotelcomms\group">
+            </task>
+            <task name="\s60\app\videotelephony\vtuis\videotelui\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\telsrv_dom\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\telsrv_sdk\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\cbs\CbsServer\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\cbs\cbsui\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\convergedcallengine\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\networkhandling\networkhandlingengine\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\aiwdialdata\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\CallUI\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\dialutils\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\EnPolicy\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\phoneclient\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\phoneserver\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\satengine\SatServer\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\satui\satapp\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\satui\satplugin\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\utils\phoneparser\group">
+            </task>
+            <task name="\s60\app\telephony\tel_dom\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\Blacklist\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneui\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuicontrol\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuistates\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuiutils\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuiview\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuivoipextension\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\silenceactionplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\PhoneCntFinder\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\audiohandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\callhandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\contacthandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\loghandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\phonemodel\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\aiwcallimageplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\PsetNotesUi\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\pslncallimageplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\telephonysettings\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\SSSettings\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\dialer\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\BubbleManager\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\ConnectUtil\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\ServiceRequest\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\SFIUtils\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\Ussd\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\vmbx\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\TelephonyDeviceMode\group">
+            </task>
+            <task name="\s60\app\videotelephony\videotel_dom\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoengine\PacketVideoEngineBinaries\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoplugins\DisplaySink\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoplugins\VideoSource\group">
+            </task>
+            <task name="\s60\app\videotelephony\vtengines\videoteleng\Group">
+            </task>
+            <task name="\s60\app\videotelephony\vtengines\videotelcomms\group">
+            </task>
+            <task name="\s60\app\videotelephony\vtuis\videotelui\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\telsrv_dom\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\telsrv_sdk\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\cbs\CbsServer\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\cbs\cbsui\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\convergedcallengine\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\networkhandling\networkhandlingengine\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\aiwdialdata\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\CallUI\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\dialutils\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\EnPolicy\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\phoneclient\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\phoneserver\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\satengine\SatServer\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\satui\satapp\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\satui\satplugin\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\utils\phoneparser\group">
+            </task>
+            <task name="\s60\app\telephony\tel_dom\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\Blacklist\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneui\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuicontrol\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuistates\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuiutils\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuiview\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuivoipextension\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\silenceactionplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\PhoneCntFinder\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\audiohandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\callhandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\contacthandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\loghandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\phonemodel\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\aiwcallimageplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\PsetNotesUi\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\pslncallimageplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\telephonysettings\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\SSSettings\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\dialer\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\BubbleManager\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\ConnectUtil\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\ServiceRequest\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\SFIUtils\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\Ussd\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\vmbx\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\TelephonyDeviceMode\group">
+            </task>
+            <task name="\s60\app\videotelephony\videotel_dom\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoengine\PacketVideoEngineBinaries\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoplugins\DisplaySink\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoplugins\VideoSource\group">
+            </task>
+            <task name="\s60\app\videotelephony\vtengines\videoteleng\Group">
+            </task>
+            <task name="\s60\app\videotelephony\vtengines\videotelcomms\group">
+            </task>
+            <task name="\s60\app\videotelephony\vtuis\videotelui\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\telsrv_dom\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\telsrv_sdk\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\cbs\CbsServer\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\cbs\cbsui\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\convergedcallengine\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\networkhandling\networkhandlingengine\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\aiwdialdata\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\CallUI\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\dialutils\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\EnPolicy\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\phoneclient\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\phoneserver\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\satengine\SatServer\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\satui\satapp\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\satui\satplugin\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\utils\phoneparser\group">
+            </task>
+            <task name="\s60\app\telephony\tel_dom\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\Blacklist\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneui\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuicontrol\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuistates\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuiutils\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuiview\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuivoipextension\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\silenceactionplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\PhoneCntFinder\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\audiohandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\callhandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\contacthandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\loghandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\phonemodel\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\aiwcallimageplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\PsetNotesUi\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\pslncallimageplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\telephonysettings\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\SSSettings\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\dialer\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\BubbleManager\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\ConnectUtil\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\ServiceRequest\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\SFIUtils\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\Ussd\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\vmbx\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\TelephonyDeviceMode\group">
+            </task>
+            <task name="\s60\app\videotelephony\videotel_dom\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoengine\PacketVideoEngineBinaries\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoplugins\DisplaySink\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoplugins\VideoSource\group">
+            </task>
+            <task name="\s60\app\videotelephony\vtengines\videoteleng\Group">
+            </task>
+            <task name="\s60\app\videotelephony\vtengines\videotelcomms\group">
+            </task>
+            <task name="\s60\app\videotelephony\vtuis\videotelui\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\telsrv_dom\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\telsrv_sdk\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\cbs\CbsServer\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\cbs\cbsui\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\convergedcallengine\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\networkhandling\networkhandlingengine\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\aiwdialdata\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\CallUI\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\dialutils\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\EnPolicy\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\phoneclient\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\phoneserver\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\satengine\SatServer\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\satui\satapp\group">
+                <message priority="warning"><![CDATA[..\satuisrc\csatuiviewappui.cpp:2558: warning: variable / argument 'aError' is not used in function]]></message>
+                <message priority="remark"><![CDATA[M:\epoc32\include\domain\applications\BrowserUiInternalCRKeys.h:6: note: Please include BrowserUiSDKCRKeys.h in place of BrowserUiInternalCRKeys.h]]></message>
+                <message priority="warning"><![CDATA[..\satuisrc\csatuiviewappui.cpp:2558: warning: variable / argument 'aError' is not used in function]]></message>
+                <message priority="remark"><![CDATA[M:\epoc32\include\domain\applications\BrowserUiInternalCRKeys.h:6: note: Please include BrowserUiSDKCRKeys.h in place of BrowserUiInternalCRKeys.h]]></message>
+            </task>
+            <task name="\s60\mw\telephonyservices\satui\satplugin\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\utils\phoneparser\group">
+            </task>
+            <task name="\s60\app\telephony\tel_dom\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\Blacklist\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneui\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuicontrol\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuistates\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuiutils\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuiview\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuivoipextension\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\silenceactionplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\PhoneCntFinder\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\audiohandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\callhandling\group">
+                <message priority="warning"><![CDATA[..\src\cpesinglecallobserver.cpp:328: warning: variable / argument 'aAttended' is not used in function]]></message>
+                <message priority="warning"><![CDATA[..\src\cpesinglecallobserver.cpp:328: warning: variable / argument 'aDestination' is not used in function]]></message>
+            </task>
+            <task name="\s60\app\telephony\phoneengine\contacthandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\loghandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\phonemodel\group">
+                <message priority="warning"><![CDATA[..\src\cpemessagehandler.cpp:310: warning: variable / argument 'aCallId' is not used in function]]></message>
+                <message priority="warning"><![CDATA[..\src\cpemessagehandler.cpp:310: warning: variable / argument 'aCallId' is not used in function]]></message>
+            </task>
+            <task name="\s60\app\telephony\phonesettings\aiwcallimageplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\PsetNotesUi\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\pslncallimageplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\telephonysettings\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\SSSettings\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\dialer\group">
+                <message priority="warning"><![CDATA[..\src\cdialervideocontainer.cpp:164: warning: variable / argument 'aIndex' is not used in function]]></message>
+            </task>
+            <task name="\s60\app\telephony\phoneuis\BubbleManager\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\ConnectUtil\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\ServiceRequest\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\SFIUtils\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\Ussd\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\vmbx\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\TelephonyDeviceMode\group">
+            </task>
+            <task name="\s60\app\videotelephony\videotel_dom\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoengine\PacketVideoEngineBinaries\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoplugins\DisplaySink\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoplugins\VideoSource\group">
+            </task>
+            <task name="\s60\app\videotelephony\vtengines\videoteleng\Group">
+                <message priority="warning"><![CDATA[..\LOGGER\src\CVtLogger.cpp:20: warning: illegal #pragma]]></message>
+                <message priority="warning"><![CDATA[..\LOGGER\src\CVtLogger.cpp:371: warning: illegal #pragma]]></message>
+                <message priority="warning"><![CDATA[..\CALLCTRL\src\CVtCtlFactory.cpp:20: warning: illegal #pragma]]></message>
+                <message priority="warning"><![CDATA[..\CALLCTRL\src\CVtCtlFactory.cpp:69: warning: illegal #pragma]]></message>
+                <message priority="warning"><![CDATA[..\CALLCTRL\src\CVtCtlCallControl.cpp:20: warning: illegal #pragma]]></message>
+                <message priority="warning"><![CDATA[..\CALLCTRL\src\CVtCtlCallControl.cpp:251: warning: illegal #pragma]]></message>
+                <message priority="warning"><![CDATA[..\CALLCTRL\src\CVtCtlSessionContainer.cpp:20: warning: illegal #pragma]]></message>
+                <message priority="warning"><![CDATA[..\CALLCTRL\src\CVtCtlSessionContainer.cpp:456: warning: illegal #pragma]]></message>
+                <message priority="warning"><![CDATA[..\CALLCTRL\src\CVtCtlCallStatusMonitor.cpp:20: warning: illegal #pragma]]></message>
+                <message priority="warning"><![CDATA[..\CALLCTRL\src\CVtCtlCallStatusMonitor.cpp:226: warning: illegal #pragma]]></message>
+                <message priority="warning"><![CDATA[..\CALLCTRL\src\CVtCtlLineMonitor.cpp:20: warning: illegal #pragma]]></message>
+                <message priority="warning"><![CDATA[..\CALLCTRL\src\CVtCtlLineMonitor.cpp:130: warning: illegal #pragma]]></message>
+                <message priority="warning"><![CDATA[..\CALLCTRL\src\CVtCtlVideoCall.cpp:20: warning: illegal #pragma]]></message>
+                <message priority="warning"><![CDATA[..\CALLCTRL\src\CVtCtlVideoCall.cpp:241: warning: illegal #pragma]]></message>
+                <message priority="warning"><![CDATA[..\CALLCTRL\src\VtCtlPanic.cpp:20: warning: illegal #pragma]]></message>
+                <message priority="warning"><![CDATA[..\CALLCTRL\src\VtCtlPanic.cpp:35: warning: illegal #pragma]]></message>
+                <message priority="warning"><![CDATA[..\LOGGER\src\CVtLogger.cpp:20: warning: illegal #pragma]]></message>
+                <message priority="warning"><![CDATA[..\LOGGER\src\CVtLogger.cpp:371: warning: illegal #pragma]]></message>
+                <message priority="warning"><![CDATA[..\CALLCTRL\src\CVtCtlFactory.cpp:20: warning: illegal #pragma]]></message>
+                <message priority="warning"><![CDATA[..\CALLCTRL\src\CVtCtlFactory.cpp:69: warning: illegal #pragma]]></message>
+                <message priority="warning"><![CDATA[..\CALLCTRL\src\CVtCtlCallControl.cpp:20: warning: illegal #pragma]]></message>
+                <message priority="warning"><![CDATA[..\CALLCTRL\src\CVtCtlCallControl.cpp:251: warning: illegal #pragma]]></message>
+                <message priority="warning"><![CDATA[..\CALLCTRL\src\CVtCtlSessionContainer.cpp:20: warning: illegal #pragma]]></message>
+                <message priority="warning"><![CDATA[..\CALLCTRL\src\CVtCtlSessionContainer.cpp:456: warning: illegal #pragma]]></message>
+                <message priority="warning"><![CDATA[..\CALLCTRL\src\CVtCtlCallStatusMonitor.cpp:20: warning: illegal #pragma]]></message>
+                <message priority="warning"><![CDATA[..\CALLCTRL\src\CVtCtlCallStatusMonitor.cpp:226: warning: illegal #pragma]]></message>
+                <message priority="warning"><![CDATA[..\CALLCTRL\src\CVtCtlLineMonitor.cpp:20: warning: illegal #pragma]]></message>
+                <message priority="warning"><![CDATA[..\CALLCTRL\src\CVtCtlLineMonitor.cpp:130: warning: illegal #pragma]]></message>
+                <message priority="warning"><![CDATA[..\CALLCTRL\src\CVtCtlVideoCall.cpp:20: warning: illegal #pragma]]></message>
+                <message priority="warning"><![CDATA[..\CALLCTRL\src\CVtCtlVideoCall.cpp:241: warning: illegal #pragma]]></message>
+                <message priority="warning"><![CDATA[..\CALLCTRL\src\VtCtlPanic.cpp:20: warning: illegal #pragma]]></message>
+                <message priority="warning"><![CDATA[..\CALLCTRL\src\VtCtlPanic.cpp:35: warning: illegal #pragma]]></message>
+            </task>
+            <task name="\s60\app\videotelephony\vtengines\videotelcomms\group">
+            </task>
+            <task name="\s60\app\videotelephony\vtuis\videotelui\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\telsrv_dom\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\telsrv_sdk\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\cbs\CbsServer\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\cbs\cbsui\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\convergedcallengine\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\networkhandling\networkhandlingengine\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\aiwdialdata\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\CallUI\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\dialutils\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\EnPolicy\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\phoneclient\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\phoneserver\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\satengine\SatServer\group">
+                <message priority="warning"><![CDATA["\s60\mw\telephonyservices\satengine\SatServer\SystemState\src\csatsystemstate.cpp", line 66: Warning:  #550-D: variable "err" was set but never used]]></message>
+                <message priority="warning"><![CDATA["\s60\mw\telephonyservices\satengine\SatServer\Engine\src\csatapnhandler.cpp", line 34: Warning:  #177-D: variable "KMaxAccessPointName" was declared but never referenced]]></message>
+                <message priority="warning"><![CDATA["\s60\mw\telephonyservices\satengine\SatServer\Engine\src\csatapnhandler.cpp", line 38: Warning:  #177-D: variable "KSatMaxApnName" was declared but never referenced]]></message>
+                <message priority="warning"><![CDATA["\s60\mw\telephonyservices\satengine\SatServer\SystemState\src\csatsystemstate.cpp", line 66: Warning:  #550-D: variable "err" was set but never used]]></message>
+                <message priority="warning"><![CDATA["\s60\mw\telephonyservices\satengine\SatServer\Engine\src\csatapnhandler.cpp", line 34: Warning:  #177-D: variable "KMaxAccessPointName" was declared but never referenced]]></message>
+                <message priority="warning"><![CDATA["\s60\mw\telephonyservices\satengine\SatServer\Engine\src\csatapnhandler.cpp", line 38: Warning:  #177-D: variable "KSatMaxApnName" was declared but never referenced]]></message>
+            </task>
+            <task name="\s60\mw\telephonyservices\satui\satapp\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\satui\satplugin\group">
+                <message priority="warning"><![CDATA["\s60\mw\telephonyservices\satui\satplugin\aisatpluginsrc\caisatplugin.cpp", line 188: Warning:  #550-D: variable "error" was set but never used]]></message>
+                <message priority="warning"><![CDATA["\s60\mw\telephonyservices\satui\satplugin\aisatpluginsrc\caisatplugin.cpp", line 188: Warning:  #550-D: variable "error" was set but never used]]></message>
+            </task>
+            <task name="\s60\mw\telephonyservices\utils\phoneparser\group">
+                <message priority="critical"><![CDATA["\s60\mw\telephonyservices\utils\phoneparser\src\cphoneparserfeatures.cpp", line 81: Warning: C2874W: self may be used before being set]]></message>
+            </task>
+            <task name="\s60\app\telephony\tel_dom\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\Blacklist\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneui\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuicontrol\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuistates\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuiutils\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuiview\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuivoipextension\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\silenceactionplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\PhoneCntFinder\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\audiohandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\callhandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\contacthandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\loghandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\phonemodel\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\aiwcallimageplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\PsetNotesUi\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\pslncallimageplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\telephonysettings\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\SSSettings\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\dialer\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\BubbleManager\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\ConnectUtil\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\ServiceRequest\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\SFIUtils\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\Ussd\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\vmbx\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\TelephonyDeviceMode\group">
+            </task>
+            <task name="\s60\app\videotelephony\videotel_dom\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoengine\PacketVideoEngineBinaries\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoplugins\DisplaySink\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoplugins\VideoSource\group">
+            </task>
+            <task name="\s60\app\videotelephony\vtengines\videoteleng\Group">
+            </task>
+            <task name="\s60\app\videotelephony\vtengines\videotelcomms\group">
+            </task>
+            <task name="\s60\app\videotelephony\vtuis\videotelui\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\telsrv_dom\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\telsrv_sdk\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\cbs\CbsServer\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\cbs\cbsui\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\convergedcallengine\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\networkhandling\networkhandlingengine\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\aiwdialdata\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\CallUI\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\dialutils\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\EnPolicy\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\phoneclient\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\phoneserver\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\satengine\SatServer\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\satui\satapp\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\satui\satplugin\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\utils\phoneparser\group">
+            </task>
+            <task name="\s60\app\telephony\tel_dom\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\Blacklist\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneui\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuicontrol\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuistates\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuiutils\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuiview\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuivoipextension\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\silenceactionplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\PhoneCntFinder\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\audiohandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\callhandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\contacthandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\loghandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\phonemodel\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\aiwcallimageplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\PsetNotesUi\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\pslncallimageplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\telephonysettings\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\SSSettings\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\dialer\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\BubbleManager\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\ConnectUtil\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\ServiceRequest\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\SFIUtils\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\Ussd\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\vmbx\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\TelephonyDeviceMode\group">
+            </task>
+            <task name="\s60\app\videotelephony\videotel_dom\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoengine\PacketVideoEngineBinaries\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoplugins\DisplaySink\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoplugins\VideoSource\group">
+            </task>
+            <task name="\s60\app\videotelephony\vtengines\videoteleng\Group">
+            </task>
+            <task name="\s60\app\videotelephony\vtengines\videotelcomms\group">
+            </task>
+            <task name="\s60\app\videotelephony\vtuis\videotelui\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\telsrv_dom\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\telsrv_sdk\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\cbs\CbsServer\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\cbs\cbsui\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\convergedcallengine\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\networkhandling\networkhandlingengine\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\aiwdialdata\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\CallUI\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\dialutils\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\EnPolicy\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\phoneclient\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\phoneserver\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\satengine\SatServer\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\satui\satapp\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\satui\satplugin\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\utils\phoneparser\group">
+            </task>
+            <task name="\s60\app\telephony\tel_dom\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\Blacklist\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneui\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuicontrol\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuistates\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuiutils\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuiview\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuivoipextension\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\silenceactionplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\PhoneCntFinder\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\audiohandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\callhandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\contacthandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\loghandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\phonemodel\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\aiwcallimageplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\PsetNotesUi\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\pslncallimageplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\telephonysettings\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\SSSettings\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\dialer\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\BubbleManager\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\ConnectUtil\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\ServiceRequest\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\SFIUtils\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\Ussd\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\vmbx\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\TelephonyDeviceMode\group">
+            </task>
+            <task name="\s60\app\videotelephony\videotel_dom\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoengine\PacketVideoEngineBinaries\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoplugins\DisplaySink\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoplugins\VideoSource\group">
+            </task>
+            <task name="\s60\app\videotelephony\vtengines\videoteleng\Group">
+            </task>
+            <task name="\s60\app\videotelephony\vtengines\videotelcomms\group">
+            </task>
+            <task name="\s60\app\videotelephony\vtuis\videotelui\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\telsrv_dom\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\telsrv_sdk\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\cbs\CbsServer\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\cbs\cbsui\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\convergedcallengine\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\networkhandling\networkhandlingengine\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\aiwdialdata\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\CallUI\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\dialutils\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\EnPolicy\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\phoneclient\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\phoneserver\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\satengine\SatServer\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\satui\satapp\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\satui\satplugin\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\utils\phoneparser\group">
+            </task>
+            <task name="\s60\app\telephony\tel_dom\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\Blacklist\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneui\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuicontrol\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuistates\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuiutils\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuiview\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuivoipextension\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\silenceactionplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\PhoneCntFinder\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\audiohandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\callhandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\contacthandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\loghandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\phonemodel\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\aiwcallimageplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\PsetNotesUi\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\pslncallimageplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\telephonysettings\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\SSSettings\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\dialer\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\BubbleManager\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\ConnectUtil\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\ServiceRequest\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\SFIUtils\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\Ussd\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\vmbx\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\TelephonyDeviceMode\group">
+            </task>
+            <task name="\s60\app\videotelephony\videotel_dom\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoengine\PacketVideoEngineBinaries\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoplugins\DisplaySink\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoplugins\VideoSource\group">
+            </task>
+            <task name="\s60\app\videotelephony\vtengines\videoteleng\Group">
+            </task>
+            <task name="\s60\app\videotelephony\vtengines\videotelcomms\group">
+            </task>
+            <task name="\s60\app\videotelephony\vtuis\videotelui\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\telsrv_dom\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\telsrv_sdk\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\cbs\CbsServer\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\cbs\cbsui\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\convergedcallengine\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\networkhandling\networkhandlingengine\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\aiwdialdata\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\CallUI\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\dialutils\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\EnPolicy\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\phoneclient\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\phoneserver\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\satengine\SatServer\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\satui\satapp\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\satui\satplugin\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\utils\phoneparser\group">
+            </task>
+            <task name="\s60\app\telephony\tel_dom\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\Blacklist\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneui\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuicontrol\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuistates\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuiutils\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuiview\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuivoipextension\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\silenceactionplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\PhoneCntFinder\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\audiohandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\callhandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\contacthandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\loghandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\phonemodel\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\aiwcallimageplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\PsetNotesUi\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\pslncallimageplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\telephonysettings\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\SSSettings\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\dialer\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\BubbleManager\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\ConnectUtil\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\ServiceRequest\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\SFIUtils\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\Ussd\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\vmbx\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\TelephonyDeviceMode\group">
+            </task>
+            <task name="\s60\app\videotelephony\videotel_dom\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoengine\PacketVideoEngineBinaries\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoplugins\DisplaySink\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoplugins\VideoSource\group">
+            </task>
+            <task name="\s60\app\videotelephony\vtengines\videoteleng\Group">
+            </task>
+            <task name="\s60\app\videotelephony\vtengines\videotelcomms\group">
+            </task>
+            <task name="\s60\app\videotelephony\vtuis\videotelui\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\telsrv_dom\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\telsrv_sdk\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\cbs\CbsServer\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\cbs\cbsui\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\convergedcallengine\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\networkhandling\networkhandlingengine\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\aiwdialdata\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\CallUI\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\dialutils\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\EnPolicy\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\phoneclient\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\phoneserver\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\satengine\SatServer\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\satui\satapp\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\satui\satplugin\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\utils\phoneparser\group">
+            </task>
+            <task name="\s60\app\telephony\tel_dom\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\Blacklist\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneui\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuicontrol\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuistates\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuiutils\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuiview\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuivoipextension\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\silenceactionplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\PhoneCntFinder\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\audiohandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\callhandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\contacthandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\loghandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\phonemodel\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\aiwcallimageplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\PsetNotesUi\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\pslncallimageplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\telephonysettings\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\SSSettings\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\dialer\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\BubbleManager\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\ConnectUtil\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\ServiceRequest\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\SFIUtils\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\Ussd\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\vmbx\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\TelephonyDeviceMode\group">
+            </task>
+            <task name="\s60\app\videotelephony\videotel_dom\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoengine\PacketVideoEngineBinaries\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoplugins\DisplaySink\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoplugins\VideoSource\group">
+            </task>
+            <task name="\s60\app\videotelephony\vtengines\videoteleng\Group">
+            </task>
+            <task name="\s60\app\videotelephony\vtengines\videotelcomms\group">
+            </task>
+            <task name="\s60\app\videotelephony\vtuis\videotelui\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\telsrv_dom\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\telsrv_sdk\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\cbs\CbsServer\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\cbs\cbsui\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\convergedcallengine\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\networkhandling\networkhandlingengine\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\aiwdialdata\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\CallUI\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\dialutils\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\EnPolicy\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\phoneclient\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\phoneclientserver\phoneserver\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\satengine\SatServer\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\satui\satapp\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\satui\satplugin\group">
+            </task>
+            <task name="\s60\mw\telephonyservices\utils\phoneparser\group">
+            </task>
+            <task name="\s60\app\telephony\tel_dom\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\Blacklist\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneui\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuicontrol\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuistates\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuiutils\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuiview\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\phoneuivoipextension\group">
+            </task>
+            <task name="\s60\app\telephony\phoneapp\silenceactionplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\PhoneCntFinder\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\audiohandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\callhandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\contacthandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\loghandling\group">
+            </task>
+            <task name="\s60\app\telephony\phoneengine\phonemodel\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\aiwcallimageplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\PsetNotesUi\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\pslncallimageplugin\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\telephonysettings\group">
+            </task>
+            <task name="\s60\app\telephony\phonesettings\SSSettings\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\dialer\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\BubbleManager\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\ConnectUtil\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\ServiceRequest\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\SFIUtils\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\Ussd\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\vmbx\group">
+            </task>
+            <task name="\s60\app\telephony\phoneuis\TelephonyDeviceMode\group">
+            </task>
+            <task name="\s60\app\videotelephony\videotel_dom\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoengine\PacketVideoEngineBinaries\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoplugins\DisplaySink\group">
+            </task>
+            <task name="\s60\app\videotelephony\packetvideoplugins\VideoSource\group">
+            </task>
+            <task name="\s60\app\videotelephony\vtengines\videoteleng\Group">
+            </task>
+            <task name="\s60\app\videotelephony\vtengines\videotelcomms\group">
+            </task>
+            <task name="\s60\app\videotelephony\vtuis\videotelui\group">
+            </task>
+        </task>
+    </build>
+</log>

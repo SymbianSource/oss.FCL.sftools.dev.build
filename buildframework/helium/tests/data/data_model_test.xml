@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<heliumDataModel xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="..\tools\common\schema\helium_data_model.xsd">
+    <property>
+        <name>test.property.1</name>
+        <usage>required</usage>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Test property one.</description>
+    </property>
+    <property>
+        <name>test.property.2</name>
+        <usage>optional</usage>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Test property two.</description>
+    </property>
+    <property>
+        <name>test.property.3</name>
+        <usage>optional</usage>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Test property three.</description>
+    </property>    
+    <group>
+        <name>testGroup</name>
+        <description/>
+        <propertyRef usage="required">test.property.2</propertyRef>
+        <propertyRef usage="optional">test.property.3</propertyRef>
+        <propertyRef usage="optional">test.property.1</propertyRef>
+    </group>
+</heliumDataModel>

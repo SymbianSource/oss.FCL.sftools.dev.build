@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : antserver.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="startup.antserver" default="server">
+    <description>Running a remote server to handle backup build requests.</description>
+    
+    <!-- Starts an Ant server for handling a remote build invocation. -->
+    <target name="server">
+        <antserver/>
+    </target>
+
+
+    <!-- Untars a work area from the network cache directory. -->
+    <target name="untar-work-area">
+        <delete dir="${ccm.base.dir}"/>
+        <echo message="Untarring ${work.area.cache.file}"/>
+        <shellscript shell="cmd.exe" tmpsuffix=".bat" dir="${ccm.home.dir}">
+            <arg value="/c"/>
+            <arg value="call"/>
+            gzip --decompress &lt;${work.area.cache.file} | tar --extract
+        </shellscript>
+        <echo message="${work.area.cache.file} untarred."/>
+    </target>
+
+
+    <!-- Runs a remote build. -->
+    <target name="run-build">
+        <exec executable="${bld-bat-dir}\${bld-bat-file}" dir="${bld-bat-dir}" failonerror="${failonerror}">
+            <arg line="${args}"/>
+        </exec>
+    </target>
+    
+</project>

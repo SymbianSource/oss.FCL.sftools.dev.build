@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : bootstrap.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="startup.bootstrap" default="install-dependencies" xmlns:ivy="antlib:org.apache.ivy.ant">
+    <description>
+    Download libraries to bootstrap helium
+    </description>
+
+    <property name="build.type" value="subcon" />
+    <property name="tools.ivy.config.file" location="${helium.dir}/config/ivy/tools_ivy_settings.xml" />
+
+    <!-- Set proxy using Nokia settings by default -->
+    <target name="proxy" unless="proxy.disabled">
+        <property name="proxy.host" value="172.16.42.137" />
+        <property name="proxy.port" value="8080" />
+        <setproxy proxyhost="${proxy.host}" proxyport="${proxy.port}" />
+    </target>
+
+    <property name="ivy.filename" value="ivy-2.0.0-beta2.jar" />
+    <property name="ivy.file" value="${helium.dir}/external/antlibs/${ivy.filename}" />
+    <available file="${ivy.file}" property="ivy.file.present" />
+
+    <!-- Download ivy jar -->
+    <target name="get-ivy" unless="ivy.file.present" depends="proxy">
+        <mkdir dir="${helium.dir}/external/antlibs" />
+        <get src="http://mirrors.ibiblio.org/pub/mirrors/maven2/org/apache/ivy/ivy/2.0.0-beta2/${ivy.filename}" dest="${ivy.file}" />
+    </target>
+
+    <!-- Install CruiseControl if not already installed -->
+    <target name="install-cruisecontrol">
+        <if>
+            <not>
+                <available file="${helium.dir}/external/CruiseControl/real_cruisecontrol.bat" />
+            </not>
+            <then>
+                <antcall target="install-dependencies">
+                    <param name="build.type" value="ido_install" />
+                </antcall>
+            </then>
+        </if>
+    </target>
+
+    <!-- Clean CruiseControl installation -->
+    <target name="clean-cruisecontrol">
+        <delete includeemptydirs="true">
+            <fileset dir="${helium.dir}/external/CruiseControl">
+                <exclude name="cruisecontrol.bat" />
+                <exclude name="distribution.policy.S60" />
+            </fileset>
+        </delete>
+    </target>
+
+
+    <!-- Set libs for bootstrap -->
+    <target name="set-libs">
+        <path id="lib.path">
+            <fileset dir="${helium.dir}/external/antlibs" includes="**/*.jar" />
+        </path>
+
+        <!-- External tasks. -->
+        <taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpathref="lib.path" />
+    </target>
+
+    <!-- Clean the Ivy cache. This is important if Ivy file content is changed. -->
+    <target name="clean-ivy-cache" depends="set-libs">
+        <ivy:configure file="${tools.ivy.config.file}" />
+        <ivy:cleancache />
+    </target>
+
+    <!-- Private: unzip jars -->
+    <target name="unzip-jar">
+        <unzip src="${artifact.file}" dest="${helium.dir}/external/antlibs" />
+    </target>
+    <!-- Private: unzip eggs -->
+    <target name="unzip-egg">
+        <unzip src="${artifact.file}" dest="${helium.dir}/external/python/lib/2.5" />
+    </target>
+    <!-- Private: ungzip eggs -->
+    <target name="gunzip-egg">
+        <gunzip src="${artifact.file}" dest="${artifact.file}.tar" />
+        <untar src="${artifact.file}.tar" dest="${helium.dir}/external/python/lib/2.5" />
+    </target>
+    <!-- Private: unbzip egg -->
+    <target name="bunzip-egg">
+        <bunzip2 src="${artifact.file}" dest="${artifact.file}.tar" />
+        <untar src="${artifact.file}.tar" dest="${helium.dir}/external/python/lib/2.5" />
+    </target>
+
+    <!-- Install libraries main target -->
+    <target name="install-dependencies" depends="proxy,set-libs">
+        <ivy:configure file="${tools.ivy.config.file}" />
+        <ivy:resolve file="${helium.dir}/config/ivy/ivy.xml" conf="${build.type}" haltonfailure="false" />
+
+        <ivy:retrieve pattern="${helium.dir}/external/antlibs/[artifact]-[revision].[ext]" type="jar" />
+        <ivy:retrieve pattern="${helium.dir}/external/python/lib/2.5/[artifact]-[revision].[ext]" type="egg" />
+        <ivy:retrieve pattern="${helium.dir}/external/sources/[artifact]-[revision].[ext]" type="zip" />
+
+        <delete>
+            <fileset dir="${helium.dir}/external/antlibs" includes="ant-optional*.jar" />
+            <fileset dir="${helium.dir}/external/antlibs" includes="ant-1.5.jar" />
+        </delete>
+
+        <taskdef resource="net/sf/antcontrib/antlib.xml" classpathref="lib.path" />
+
+        <if>
+            <not>
+                <available file="${helium.dir}/external/python/lib/2.5/easy-install.pth" />
+            </not>
+            <then>
+                <copy file="${helium.dir}/tools/startup/bootstrap/easy-install.pth" todir="${helium.dir}/external/python/lib/2.5" />
+                <copy file="${helium.dir}/tools/startup/bootstrap/site.py" todir="${helium.dir}/external/python/lib/2.5" />
+            </then>
+        </if>
+    </target>
+
+</project>

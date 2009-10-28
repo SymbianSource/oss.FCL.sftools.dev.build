@@ -1,0 +1,11 @@
+from java.io import File
+counter = project.getProperty(".unique.counter")
+if counter == None:
+	counter = 0
+else:
+	counter = int(counter) + 1
+project.setProperty(".unique.counter", str(counter))
+
+targetname = "%016d_%s" % (counter, File(str(source)).getName())
+print("Conversion: %s" %  targetname);
+self.addMappedName(targetname)

@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : build.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="helium-ccc-build" default="build"> 
+
+	<property name="build.temp.dir" location="${ant.file.helium-ccc-build}/../../build" />
+	<property name="bin.dir" location="${ant.file.helium-ccc-build}/../bin" />
+	<property name="cc.version" value="2.8.2" />
+	<property name="helium.custom.version" value="1" />
+
+
+	<property name="cc.dir.name" value="cruisecontrol-bin-${cc.version}"/>
+	<property name="cc.root.dir" location="${build.temp.dir}/${cc.dir.name}" />
+	<property name="cc.overlay.dir" location="${build.temp.dir}/delta/${cc.dir.name}" />
+	<property name="cc.zip" location="${ant.file.helium-ccc-build}/../../official/${cc.dir.name}.zip" />
+
+	<fileset id="ref.overlay" dir="${cc.overlay.dir}/..">
+		<include name="**"/>
+		<exclude name="**/.svn/**"/>
+	</fileset>
+
+	
+	<target name="clean" description="Cleanup" unless="skip.clean">
+		<delete dir="${build.temp.dir}"/>
+	</target>
+	
+	<target name="create-output-dirs">
+    	<mkdir dir="${build.temp.dir}"/>
+    	<mkdir dir="${build.temp.dir}/classes"/>
+    	<mkdir dir="${cc.overlay.dir}/lib"/>		
+	</target>
+
+	<target name="check-get-cc">
+		<echo>${cc.zip}</echo>
+		<available file="${cc.zip}" property="cc.zip.present"/>
+	</target>
+
+	<target name="get-cc" depends="check-get-cc" unless="cc.zip.present">
+		<mkdir dir="${cc.zip}/.."/>
+		<get src="http://kent.dl.sourceforge.net/sourceforge/cruisecontrol/${cc.dir.name}.zip" dest="${cc.zip}" />
+	</target>
+	
+	<target name="unzip-cc" depends="create-output-dirs,get-cc">
+		<mkdir dir="${cc.zip}/.."/>
+		<unzip src="${cc.zip}" dest="${build.temp.dir}">
+			<patternset>
+				<include name="*/lib/**"/>
+				<include name="*/webapps/dashboard/WEB-INF/classes/**"/>
+			</patternset>
+		</unzip>
+	</target>
+	
+    <!-- Building CruiseControl customization. -->
+    <target name="build" description="Builds CruiseControl specific Helium extensions" depends="unzip-cc">
+        <javac srcdir="${ant.file.helium-ccc-build}/../src" destdir="${build.temp.dir}/classes" debug="true" source="1.5" target="1.5">
+            <classpath>
+                <fileset dir="${cc.root.dir}/lib" includes="*.jar"/>
+                <pathelement path="${cc.root.dir}/webapps/dashboard/WEB-INF/classes"/>
+            </classpath>
+            <include name="**"/>
+        </javac>
+        <jar destfile="${cc.overlay.dir}/lib/nokia_helium_cc.jar">
+	    	<fileset dir="${build.temp.dir}/classes">
+				<include name="**/*.class"/>
+        	</fileset>
+        </jar>
+    	<copy todir="${cc.overlay.dir}">
+    		<fileset dir="${ant.file.helium-ccc-build}/../overlay">
+    			<include name="**"/>
+    			<exclude name="**/.svn/**"/>
+    		</fileset>
+    	</copy>
+    	
+    	<echo file="${cc.overlay.dir}/HELIUM-README.txt" message=""/>
+    	<script language="beanshell">
+files = project.getReference("ref.overlay");
+String result = "";
+for(i = files.iterator();i.hasNext();) {
+	file = i.next();
+    String filename = file.getFile().getAbsolutePath().substring(file.getBaseDir().getAbsolutePath().length() + 1);		
+    result += filename + "\n";
+}
+project.setProperty("overlay.content", result);
+  	    </script>
+    	<copy file="${ant.file.helium-ccc-build}/../templates/HELIUM-README.txt" tofile="${cc.overlay.dir}/HELIUM-README.txt" overwrite="true">
+			<filterchain>
+				<expandproperties/>
+			</filterchain>
+    	</copy>
+    </target>
+	
+	<!-- Packaging the delivery -->
+	<target name="create-release" depends="build">
+		<copy todir="${bin.dir}">
+			<fileset dir="${cc.overlay.dir}" includes="**"/>
+		</copy>
+	</target>
+	
+		
+	<target name="all" depends="clean,build"/>
+	
+	<target name="junit" depends="unzip-cc">
+        <delete dir="${build.temp.dir}/junit_classes" failonerror="false"/>
+        <mkdir dir="${build.temp.dir}/junit_classes" />
+		<path id="cc.classpath">
+			<fileset dir="${cc.root.dir}/lib" includes="*.jar"/>
+			<pathelement path="${cc.root.dir}/webapps/dashboard/WEB-INF/classes"/>
+			<fileset dir="${ant.file.helium-ccc-build}/../bin/lib" includes="*.jar"/>
+		</path>
+
+		<javac srcdir="${ant.file.helium-ccc-build}/../tests/src" destdir="${build.temp.dir}/junit_classes" debug="true" source="1.5" target="1.5">
+            <classpath refid="cc.classpath" />
+            <include name="**/*.java" />
+        </javac>
+        
+        <path id="build.classpath">
+            <pathelement location="${build.temp.dir}/junit_classes" />
+        </path>
+        <junit fork="yes" printsummary="yes" haltonfailure="no" showoutput="yes">
+            <formatter type="brief" usefile="false"/>
+            <classpath refid="build.classpath" />
+            <classpath refid="cc.classpath" />
+            
+            <batchtest fork="yes" todir="${build.temp.dir}/junit_test">
+                <fileset dir="${ant.file.helium-ccc-build}/../tests/src">
+                    <include name="**/*Test*.java"/>
+                </fileset>
+            </batchtest>
+        </junit>
+	</target>
+</project>

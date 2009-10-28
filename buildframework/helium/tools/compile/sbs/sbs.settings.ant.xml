@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : sbs.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="compile.sbs.settings" xmlns:hlm="http://www.nokia.com/helium">
+    <description>
+        sbs default settings input.
+    </description>
+
+    <if>
+        <not>
+            <isset property="sbs.config"/>
+        </not>
+        <then>
+            <property name="sbs.config" value="armv5" />
+            <property name="sbs.tools.config" value="tools_rel" />
+        </then>
+    </if>
+
+    <hlm:argSet id="sbs.default.var">
+        <hlm:arg name="config" value="${sbs.config}" />
+        <hlm:arg name="enable-filter" value="true" />
+    </hlm:argSet>
+
+    <hlm:argSet id="sbs.clean.default.var">
+        <hlm:arg name="config" value="${sbs.config}" />
+        <hlm:arg name="command" value="REALLYCLEAN" />
+        <hlm:arg name="enable-filter" value="true" />
+    </hlm:argSet>
+
+    <hlm:sbsMakeOptions engine="emake" id="sbs-ec.make.options.default">
+        <hlm:makeOption name="--emake-emulation" value="gmake" />
+        <hlm:makeOption name="--emake-annodetail" value="basic,history,waiting" />
+        <hlm:makeOption name="--emake-class" value="${ec.build.class}"/>
+    </hlm:sbsMakeOptions>
+
+    <hlm:argSet id="sbs.implicit.tools.var">
+        <hlm:arg name="config" value="${sbs.tools.config}" />
+        <hlm:arg name="enable-filter" value="true" />
+    </hlm:argSet>
+
+    <hlm:sbsMakeOptions engine="gmake" id="sbs.make.options.default"/>
+</project>

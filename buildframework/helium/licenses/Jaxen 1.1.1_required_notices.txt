@@ -1,0 +1,266 @@
+    4:  Copyright 2003-2006 The Werken Company. All Rights Reserved.
+    5:  
+    6:  Redistribution and use in source and binary forms, with or without
+    7:  modification, are permitted provided that the following conditions are
+    8:  met:
+    9: 
+   10:   * Redistributions of source code must retain the above copyright
+   11:     notice, this list of conditions and the following disclaimer.
+   12: 
+   13:   * Redistributions in binary form must reproduce the above copyright
+   14:     notice, this list of conditions and the following disclaimer in the
+   15:     documentation and/or other materials provided with the distribution.
+   16: 
+   17:   * Neither the name of the Jaxen Project nor the names of its
+   18:     contributors may be used to endorse or promote products derived 
+   19:     from this software without specific prior written permission.
+   20: 
+   21: THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+   22: IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+   23: TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+   24: PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER
+   25: OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+   26: EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+   27: PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+   28: PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+   29: LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+   30: NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+   31: SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+   32: 
+   33:  */
+
+--
+
+    8:  * ====================================================================
+    9:  *
+   10:  * Copyright 2000-2005 bob mcwhirter & James Strachan.
+   11:  * All rights reserved.
+   12:  *
+   13:  *
+   14:  * Redistribution and use in source and binary forms, with or without
+   15:  * modification, are permitted provided that the following conditions are
+   16:  * met:
+   17:  * 
+   18:  *   * Redistributions of source code must retain the above copyright
+   19:  *     notice, this list of conditions and the following disclaimer.
+   20:  * 
+   21:  *   * Redistributions in binary form must reproduce the above copyright
+   22:  *     notice, this list of conditions and the following disclaimer in the
+   23:  *     documentation and/or other materials provided with the distribution.
+   24:  * 
+   25:  *   * Neither the name of the Jaxen Project nor the names of its
+   26:  *     contributors may be used to endorse or promote products derived 
+   27:  *     from this software without specific prior written permission.
+   28:  * 
+   29:  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+   30:  * IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+   31:  * TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+   32:  * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER
+   33:  * OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+   34:  * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+   35:  * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+   36:  * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+   37:  * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+   38:  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+   39:  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+   40:  *
+   41:  * ====================================================================
+
+--
+
+    4:  Copyright 2005 Elliotte Rusty Harold. All Rights Reserved.
+    5:  
+    6: Redistribution and use in source and binary forms, with or without
+    7: modification, are permitted provided that the following conditions are
+    8: met:
+    9: 
+   10:   * Redistributions of source code must retain the above copyright
+   11:     notice, this list of conditions and the following disclaimer.
+   12: 
+   13:   * Redistributions in binary form must reproduce the above copyright
+   14:     notice, this list of conditions and the following disclaimer in the
+   15:     documentation and/or other materials provided with the distribution.
+   16: 
+   17:   * Neither the name of the Jaxen Project nor the names of its
+   18:     contributors may be used to endorse or promote products derived 
+   19:     from this software without specific prior written permission.
+   20: 
+   21: THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+   22: IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+   23: TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+   24: PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER
+   25: OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+   26: EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+   27: PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+   28: PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+   29: LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+   30: NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+   31: SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+   32: 
+   33:  */
+
+--
+
+    5:  * Copyright 2000-2004 Jason Hunter & Brett McLaughlin.
+    6:  * All rights reserved.
+    7:  *
+    8:  * Redistribution and use in source and binary forms, with or without
+    9:  * modification, are permitted provided that the following conditions are
+   10:  * met:
+   11:  * 
+   12:  *   * Redistributions of source code must retain the above copyright
+   13:  *     notice, this list of conditions and the following disclaimer.
+   14:  * 
+   15:  *   * Redistributions in binary form must reproduce the above copyright
+   16:  *     notice, this list of conditions and the following disclaimer in the
+   17:  *     documentation and/or other materials provided with the distribution.
+   18:  * 
+   19:  *   * Neither the name of the Jaxen Project nor the names of its
+   20:  *     contributors may be used to endorse or promote products derived 
+   21:  *     from this software without specific prior written permission.
+   22:  * 
+   23:  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+   24:  * IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+   25:  * TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+   26:  * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER
+   27:  * OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+   28:  * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+   29:  * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+   30:  * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+   31:  * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+   32:  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+   33:  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+   34:  *
+   35:  * ====================================================================
+
+--
+
+    6:  * ====================================================================
+    7:  *
+    8:  * Copyright 2007 Elliotte Rusty Harold
+    9:  * All rights reserved.
+   10:  *
+   11:  * Redistribution and use in source and binary forms, with or without
+   12:  * modification, are permitted provided that the following conditions are
+   13:  * met:
+   14:  * 
+   15:  *   * Redistributions of source code must retain the above copyright
+   16:  *     notice, this list of conditions and the following disclaimer.
+   17:  * 
+   18:  *   * Redistributions in binary form must reproduce the above copyright
+   19:  *     notice, this list of conditions and the following disclaimer in the
+   20:  *     documentation and/or other materials provided with the distribution.
+   21:  * 
+   22:  *   * Neither the name of the Jaxen Project nor the names of its
+   23:  *     contributors may be used to endorse or promote products derived 
+   24:  *     from this software without specific prior written permission.
+   25:  * 
+   26:  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+   27:  * IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+   28:  * TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+   29:  * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER
+   30:  * OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+   31:  * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+   32:  * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+   33:  * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+   34:  * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+   35:  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+   36:  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+   37:  *
+   38:  * ====================================================================
+
+--
+
+   13:  * ====================================================================
+   14:  *
+   15:  * Copyright (C) 2000-2002 bob mcwhirter &amp; James Strachan.
+   16:  * All rights reserved.
+   17:  *
+   18:  * Redistribution and use in source and binary forms, with or without
+   19:  * modification, are permitted provided that the following conditions
+   20:  * are met:
+   21:  *
+   22:  * 1. Redistributions of source code must retain the above copyright
+   23:  *    notice, this list of conditions, and the following disclaimer.
+   24:  *
+   25:  * 2. Redistributions in binary form must reproduce the above copyright
+   26:  *    notice, this list of conditions, and the disclaimer that follows
+   27:  *    these conditions in the documentation and/or other materials
+   28:  *    provided with the distribution.
+   29:  *
+   30:  * 3. The name "Jaxen" must not be used to endorse or promote products
+   31:  *    derived from this software without prior written permission.  For
+   32:  *    written permission, please contact license@jaxen.org.
+   33:  *
+   34:  * 4. Products derived from this software may not be called "Jaxen", nor
+   35:  *    may "Jaxen" appear in their name, without prior written permission
+   36:  *    from the Jaxen Project Management (pm@jaxen.org).
+   37:  *
+   38:  * In addition, we request (but do not require) that you include in the
+   39:  * end-user documentation provided with the redistribution and/or in the
+   40:  * software itself an acknowledgement equivalent to the following:
+   41:  *     "This product includes software developed by the
+   42:  *      Jaxen Project (http://www.jaxen.org/)."
+   43:  * Alternatively, the acknowledgment may be graphical using the logos
+   44:  * available at http://www.jaxen.org/
+   45:  *
+   46:  * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
+   47:  * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+   48:  * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+   49:  * DISCLAIMED.  IN NO EVENT SHALL THE Jaxen AUTHORS OR THE PROJECT
+   50:  * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+   51:  * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+   52:  * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
+   53:  * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+   54:  * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+   55:  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
+   56:  * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+   57:  * SUCH DAMAGE.
+   58:  *
+   59:  * ====================================================================
+
+
+Copyright © 1994-2000 World Wide Web Consortium, (Massachusetts Institute of Technology, 
+Institut National de Recherche en Informatique et en Automatique, Keio University). 
+All Rights Reserved. http://www.w3.org/Consortium/Legal/
+
+This W3C work (including software, documents, or other related items) is 
+being provided by the copyright holders under the following license. By obtaining, 
+using and/or copying this work, you (the licensee) agree that you have read, understood, 
+and will comply with the following terms and conditions:
+
+Permission to use, copy, and modify this software and its documentation, with or without 
+modification,  for any purpose and without fee or royalty is hereby granted, provided that
+you include the following on ALL copies of the software and documentation or portions 
+thereof, including modifications, that you make:
+
+   1. The full text of this NOTICE in a location viewable to users of the redistributed or 
+	derivative work.
+   2. Any pre-existing intellectual property disclaimers, notices, or terms and conditions. 
+	If none exist, a short notice of the following form (hypertext is preferred, text 
+	is permitted) should be used within the body of any redistributed or derivative 
+	code: "Copyright © [$date-of-software] World Wide Web Consortium, (Massachusetts 
+	Institute of Technology, Institut National de Recherche en Informatique et en 
+	Automatique, Keio University). All Rights Reserved. http://www.w3.org/Consortium/
+	Legal/"
+   3. Notice of any changes or modifications to the W3C files, including the date changes 
+	were made. (We recommend you provide URIs to the location from which the code is 
+	derived.)
+
+THIS SOFTWARE AND DOCUMENTATION IS PROVIDED "AS IS," AND COPYRIGHT HOLDERS MAKE NO 
+EPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO, 
+WARRANTIES OF MERCHANTABILITY OR FITNESS FOR ANY PARTICULAR PURPOSE OR THAT THE USE OF 
+THE SOFTWARE OR DOCUMENTATION WILL NOT INFRINGE ANY THIRD PARTY PATENTS, COPYRIGHTS, 
+TRADEMARKS OR OTHER RIGHTS.
+
+COPYRIGHT HOLDERS WILL NOT BE LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL 
+DAMAGES ARISING OUT OF ANY USE OF THE SOFTWARE OR DOCUMENTATION.
+
+The name and trademarks of copyright holders may NOT be used in advertising or publicity 
+pertaining to the software without specific, written prior permission. Title to copyright 
+in this software and any associated documentation will at all times remain with copyright 
+holders.
+
+DOCUMENTTYPE6 (6)TypeUnitOrDepartmentHereTypeYourNameHereTypeDateHere
+
+

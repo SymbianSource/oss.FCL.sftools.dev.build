@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bom>
+  <build>ido_raptor_mcl_abs_MCL.52.57</build>
+  <content>
+    <project>
+      <name>ABS_domain-abs.mcl_sbs_hewec001:project:tr1s60#1</name>
+      <database>tr1s60</database>
+      <baseline overridden="false">2D_OpenVG_1_0-S60_5.0_2008_wk37_t:project:ou1ape3#1</baseline>
+      <baseline overridden="false">3d_opengl_es_1_1-S60_5.0_2008_wk33:project:ou1ape3#1</baseline>
+      <baseline overridden="true">ABS_domain-abs.mcl_200843:project:tr1s60#1</baseline>
+      <baseline overridden="false">ActiveIdle2-tr1s60#abs.mcl_200843:project:he1s60#1</baseline>
+      <baseline overridden="false">AknGlobalUI-abs.mcl_200843:project:tr1s60#1</baseline>
+      <baseline overridden="false">AknIcon-tr1s60#abs.mcl_200843:project:ccm51#1</baseline>
+      <baseline overridden="false">AknInputLanguage-tr1s60#abs.50_200817:project:ccm51#1</baseline>
+      <baseline overridden="false">AknJapaneseReading-tr1s60#abs.50_200817:project:ccm51#1</baseline>
+      <baseline overridden="false">AknLayoutCompiler-tr1s60#abs.mcl_200839:project:ccm51#1</baseline>
+      <baseline overridden="false">AknPictograph-tr1s60#abs.mcl_200839:project:ccm51#1</baseline>
+      <baseline overridden="false">AknPictographBitmaps-tr1s60#abs.mcl_200839:project:ccm51#1</baseline>
+      <baseline overridden="false">AknSkinContent-tr1s60#abs.mcl_200843:project:ccm51#1</baseline>
+      <baseline overridden="false">AknSkinDescCompiler-tr1s60#abs.50_200813:project:ccm51#1</baseline>
+      <baseline overridden="false">AknSkins-tr1s60#abs.mcl_200843:project:ccm51#1</baseline>
+      <baseline overridden="false">AppShell-tr1s60#abs.mcl_200843:project:ou1s60ui#1</baseline>
+      <baseline overridden="false">Arabica-abs.50_200830:project:tr1s60#1</baseline>
+      <baseline overridden="false">AvKon-tr1s60#abs.mcl_200843:project:ccm51#1</baseline>
+      <baseline overridden="false">Bitmaps2-tr1s60#abs.mcl_200835:project:ccm51#1</baseline>
+      <baseline overridden="false">Charconv-tr1s60#abs.mcl_200843:project:ccm51#1</baseline>
+      <baseline overridden="false">Charconvplugin-tr1s60#abs.50_200813:project:ccm51#1</baseline>
+      <baseline overridden="false">Color-tr1s60#abs.50_200817:project:ccm51#1</baseline>
+      <baseline overridden="false">CommonAdapter-tr1s60#abs.50_200813:project:ccm51#1</baseline>
+      <baseline overridden="false">CommonDialogs-tr1s60#abs.mcl_200843:project:ccm51#1</baseline>
+      <baseline overridden="false">CommonUi-tr1s60#abs.mcl_200843:project:ccm51#1</baseline>
+      <baseline overridden="false">Csxhelp-tr1s60#abs.mcl_200843:project:bh1s60#1</baseline>
+      <baseline overridden="false">DirectoryLocalizerEx-tr1s60#abs.50_200817:project:e003sa01#1</baseline>
+      <baseline overridden="false">EikStd-tr1s60#abs.mcl_200843:project:ccm51#1</baseline>
+      <baseline overridden="false">Exa_CommonDialogs-tr1s60#abs.50_200817:project:e003sa01#1</baseline>
+      <baseline overridden="false">Exa_HierarchicalColumnList-tr1s60#abs.50_200817:project:e003sa01#1</baseline>
+      <baseline overridden="false">Findutil-tr1s60#abs.mcl_200843:project:ccm51#1</baseline>
+      <baseline overridden="false">FontProvider-abs.mcl_200843:project:tr1s60#1</baseline>
+      <baseline overridden="false">GSLangPlugin-abs.mcl_200843:project:tr1s60#1</baseline>
+      <baseline overridden="false">Icons-abs.mcl_200843:project:tr1s60#1</baseline>
+      <baseline overridden="false">JPLangUtil-tr1s60#abs.50_200817:project:ccm51#1</baseline>
+      <baseline overridden="false">Localizer-tr1s60#abs.50_200821:project:ccm51#1</baseline>
+      <baseline overridden="false">M3GCore11-tr1s60#abs.50_200813:project:tr1gfx#1</baseline>
+      <baseline overridden="false">Matsutake-tr1s60#abs.50_200817:project:ccm51#1</baseline>
+      <baseline overridden="false">OemNokia-abs.mcl_200839:project:tr1s60#1</baseline>
+      <baseline overridden="false">Psln-tr1s60#abs.mcl_200841:project:ccm51#1</baseline>
+      <baseline overridden="false">PtiAtokCore-tr1s60#abs.50_200817:project:ccm51#1</baseline>
+      <baseline overridden="false">PtiEngine-tr1s60#abs.mcl_200837:project:ccm51#1</baseline>
+      <baseline overridden="false">PtiT9Core-tr1s60#abs.50_200832:project:ccm51#1</baseline>
+      <baseline overridden="false">PtiT9Core_stub-abs.50_200813:project:tr1s60#1</baseline>
+      <baseline overridden="false">S60Helps-tr1s60#abs.mcl_200841:project:ccm51#1</baseline>
+      <baseline overridden="false">SVGTopt-tr1s60#abs.mcl_200843:project:ccm51#1</baseline>
+      <baseline overridden="false">ServiceHandler-tr1s60#abs.50_200813:project:ccm51#1</baseline>
+      <baseline overridden="false">SortUtil-tr1s60#abs.50_200817:project:ccm51#1</baseline>
+      <baseline overridden="false">SvgtViewerPlugin-tr1s60#abs.mcl_200841:project:bh1s60#1</baseline>
+      <baseline overridden="false">UserDict-tr1s60#abs.50_200813:project:ccm51#1</baseline>
+      <baseline overridden="false">VariatedBitmaps-tr1s60#abs.50_200817:project:ccm51#1</baseline>
+      <baseline overridden="false">XercesC-abs.50_200830:project:tr1s60#1</baseline>
+      <baseline overridden="false">Xuikon-tr1s60#abs.mcl_200843:project:ou1s60ui#1</baseline>
+      <baseline overridden="false">XuikonTestTools-tr1s60#abs.mcl_200839:project:ou1s60ui#1</baseline>
+      <baseline overridden="false">activeidle-tr1s60#abs.mcl_200843:project:he1s60#1</baseline>
+      <baseline overridden="false">aiwconsumerbasics-abs.50_200813:project:tr1s60#1</baseline>
+      <baseline overridden="false">aknfep-tr1s60#abs.mcl_200843:project:ccm51#1</baseline>
+      <baseline overridden="false">aknlayout2-tr1s60#abs.mcl_200843:project:ccm51#1</baseline>
+      <baseline overridden="false">applicationinterworkingfw-abs.50_200813:project:tr1s60#1</baseline>
+      <baseline overridden="false">backsteppingservice-hs_2008w42:project:ou1s60ui#1</baseline>
+      <baseline overridden="false">cdl-tr1s60#abs.mcl_200839:project:ccm51#1</baseline>
+      <baseline overridden="false">cdlcompiler-abs.50_200830:project:tr1s60#1</baseline>
+      <baseline overridden="false">cdlcompilertoolkit-abs.50_200826:project:tr1s60#1</baseline>
+      <baseline overridden="false">classicui-abs.mcl_200843:project:tr1s60#1</baseline>
+      <baseline overridden="false">classicui_dom-abs.mcl_200843:project:tr1s60#1</baseline>
+      <baseline overridden="false">classicui_sdk-abs.mcl_200843:project:tr1s60#1</baseline>
+      <baseline overridden="false">commonuis-abs.mcl_200843:project:tr1s60#1</baseline>
+      <baseline overridden="false">contentpublishingservice-hs_2008w42:project:ou1s60ui#1</baseline>
+      <baseline overridden="false">coreuiapps-abs.mcl_200843:project:tr1s60#1</baseline>
+      <baseline overridden="false">coreuiapps_dom-abs.mcl_200839:project:tr1s60#1</baseline>
+      <baseline overridden="false">eikctl-abs.mcl_200843:project:tr1s60#1</baseline>
+      <baseline overridden="false">fonts-tr1s60#abs.mcl_200843:project:ccm51#1</baseline>
+      <baseline overridden="false">gamerecognizer-tr1s60#abs.50_200817:project:ccm51#1</baseline>
+      <baseline overridden="false">gditools-tr1s60#abs.mcl_200839:project:ccm51#1</baseline>
+      <baseline overridden="false">gfxtools-abs.mcl_200839:project:tr1s60#1</baseline>
+      <baseline overridden="false">graphics-tr1s60#abs.mcl_200843:project:bs1s60#1</baseline>
+      <baseline overridden="false">graphics_dom-abs.mcl_200833:project:tr1s60#1</baseline>
+      <baseline overridden="false">graphicsaccelaration-abs.mcl_200837:project:tr1s60#1</baseline>
+      <baseline overridden="false">graphicsadapt_dom-abs.50_200825_001:project:tr1s60#1</baseline>
+      <baseline overridden="false">graphicsadapt_sdk-abs.50_200813:project:tr1s60#1</baseline>
+      <baseline overridden="false">graphicsadaptations-abs.mcl_200837:project:tr1s60#1</baseline>
+      <baseline overridden="false">graphicsuis-tr1s60#abs.mcl_200841:project:bs1s60#1</baseline>
+      <baseline overridden="false">graphicsuis_dom-abs.mcl_200841:project:tr1s60#1</baseline>
+      <baseline overridden="false">hitchcock-abs.mcl_200839:project:tr1s60#1</baseline>
+      <baseline overridden="false">iconsd-tr1s60#abs.mcl_200833:project:sa1ui#1</baseline>
+      <baseline overridden="false">inputmethods-abs.mcl_200843:project:tr1s60#1</baseline>
+      <baseline overridden="false">inputmethods_dom-abs.mcl_200843:project:tr1s60#1</baseline>
+      <baseline overridden="false">inputmethods_sdk-abs.mcl_200841:project:tr1s60#1</baseline>
+      <baseline overridden="false">layouts-abs.mcl_200843:project:tr1s60#1</baseline>
+      <baseline overridden="false">locales-abs.mcl_200841:project:tr1s60#1</baseline>
+      <baseline overridden="false">loce32-tr1s60#abs.mcl_200841:project:ccm51#1</baseline>
+      <baseline overridden="false">m3gapi-tr1s60#abs.50_200813:project:ou1s60ui#1</baseline>
+      <baseline overridden="false">numbergrouping-tr1s60#abs.50_200826:project:ccm51#1</baseline>
+      <baseline overridden="false">ocrsrv-abs.50_200830:project:tr1s60#1</baseline>
+      <baseline overridden="false">palette-tr1s60#abs.50_200817:project:ccm51#1</baseline>
+      <baseline overridden="false">peninputarc-tr1s60#abs.mcl_200843:project:be1s60pr#1</baseline>
+      <baseline overridden="false">peninputcommonctrls-abs.mcl_200843:project:tr1s60#1</baseline>
+      <baseline overridden="false">peninputcommonlayout-tr1s60#abs.mcl_200843:project:be1s60pr#1</baseline>
+      <baseline overridden="false">peninputgenerichwr-tr1s60#abs.mcl_200843:project:be1s60pr#1</baseline>
+      <baseline overridden="false">peninputgenericitut-abs.mcl_200843:project:tr1s60#1</baseline>
+      <baseline overridden="false">peninputgenericvkb-tr1s60#abs.mcl_200843:project:be1s60pr#1</baseline>
+      <baseline overridden="false">peninputhwrboxcn-abs.mcl_200843:project:tr1s60#1</baseline>
+      <baseline overridden="false">peninputhwrfscn-abs.mcl_200843:project:tr1s60#1</baseline>
+      <baseline overridden="false">peninputhwrtrui-tr1s60#abs.mcl_200843:project:be1s60pr#1</baseline>
+      <baseline overridden="false">peninputvkbcn-abs.mcl_200843:project:tr1s60#1</baseline>
+      <baseline overridden="false">pictographs-abs.mcl_200839:project:tr1s60#1</baseline>
+      <baseline overridden="false">power_save_display_mode_stub-abs.50_200813:project:tr1s60#1</baseline>
+      <baseline overridden="false">pticpicore-tr1s60#abs.mcl_200843:project:be1s60pr#1</baseline>
+      <baseline overridden="false">ptidecumacore-abs.mcl_200843:project:tr1s60#1</baseline>
+      <baseline overridden="false">ptienginev2-abs.mcl_200841:project:tr1s60#1</baseline>
+      <baseline overridden="false">ptihanwangcore-abs.mcl_200837:project:tr1s60#1</baseline>
+      <baseline overridden="false">ptiindicphoneticcore-abs.50_200817:project:tr1s60#1</baseline>
+      <baseline overridden="false">ptivocore-abs.mcl_200843:project:tr1s60#1</baseline>
+      <baseline overridden="false">ptixt9core-abs.50_200830:project:tr1s60#1</baseline>
+      <baseline overridden="false">reszip-tr1s60#abs.50_200817:project:ccm51#1</baseline>
+      <baseline overridden="false">s60config-abs.mcl_200843:project:tr1s60#1</baseline>
+      <baseline overridden="false">sapi_actionhandler-tr1s60#abs.mcl_200843:project:ou1s60ui#1</baseline>
+      <baseline overridden="false">sapi_backstepping-hs_2008w42:project:ou1s60ui#1</baseline>
+      <baseline overridden="false">sapi_contentpublishing-tr1s60#abs.mcl_200843:project:ou1s60ui#1</baseline>
+      <baseline overridden="false">screensaver-tr1s60#abs.mcl_200843:project:ccm51#1</baseline>
+      <baseline overridden="false">skincompiler-abs.50_200813:project:tr1s60#1</baseline>
+      <baseline overridden="false">skins-abs.mcl_200843:project:tr1s60#1</baseline>
+      <baseline overridden="false">srsf-mui.mcl_200843:project:tr1nss#1</baseline>
+      <baseline overridden="false">srsfenginestub-mui.mcl_200843:project:tr1nss#1</baseline>
+      <baseline overridden="false">svgtviewer-tr1s60#abs.mcl_200841:project:bs1s60#1</baseline>
+      <baseline overridden="false">tactileclickplugin_stub-tr1s60#abs.50_200813:project:e003sa01#1</baseline>
+      <baseline overridden="false">tactilefeedback-tr1s60#abs.mcl_200839:project:e003sa01#1</baseline>
+      <baseline overridden="false">textinput-abs.mcl_200843:project:tr1s60#1</baseline>
+      <baseline overridden="false">tfxserver-abs.mcl_200843:project:tr1s60#1</baseline>
+      <baseline overridden="false">themeinstaller-tr1s60#abs.50_200819:project:ou1s60ui#1</baseline>
+      <baseline overridden="false">toollibraries-abs.50_200830:project:tr1s60#1</baseline>
+      <baseline overridden="false">uiaccelerator-abs.mcl_200841:project:tr1s60#1</baseline>
+      <baseline overridden="false">uiacceltk-abs.mcl_200839:project:tr1s60#1</baseline>
+      <baseline overridden="false">uiconfig-abs.mcl_200843:project:tr1s60#1</baseline>
+      <baseline overridden="false">uifw-abs.mcl_200843:project:tr1s60#1</baseline>
+      <baseline overridden="false">uigraphics-abs.mcl_200843:project:tr1s60#1</baseline>
+      <baseline overridden="false">uiklaf-tr1s60#abs.50_200824:project:ccm51#1</baseline>
+      <baseline overridden="false">uiresources-abs.mcl_200843:project:tr1s60#1</baseline>
+      <baseline overridden="false">uiresources_dom-abs.mcl_200843:project:tr1s60#1</baseline>
+      <baseline overridden="false">uiresources_sdk-abs.mcl_200843:project:tr1s60#1</baseline>
+      <baseline overridden="false">uishellservices-tr1s60#abs.mcl_200843:project:bh1s60pm#1</baseline>
+      <baseline overridden="false">uishellservices_dom-tr1s60#abs.mcl_200843:project:bh1s60pm#1</baseline>
+      <baseline overridden="false">uitools-abs.mcl_200839:project:tr1s60#1</baseline>
+      <baseline overridden="false">uitools_dom-abs.mcl_200839:project:tr1s60#1</baseline>
+      <baseline overridden="false">uitools_sdk-abs.50_200817:project:tr1s60#1</baseline>
+      <baseline overridden="false">uiutils-abs.mcl_200843:project:tr1s60#1</baseline>
+      <baseline overridden="false">uniteditorex-abs.50_200817:project:tr1s60#1</baseline>
+      <baseline overridden="false">vcommand-mui.mcl_200843:project:tr1nss#1</baseline>
+      <baseline overridden="false">voiceservices-abs.mcl_200843:project:tr1s60#1</baseline>
+      <baseline overridden="false">voicesrv_dom-abs.mcl_200841:project:tr1s60#1</baseline>
+      <baseline overridden="false">voiceui-mui.mcl_200843:project:tr1nss#1</baseline>
+      <baseline overridden="false">voiceuis-abs.mcl_200843:project:tr1s60#1</baseline>
+      <baseline overridden="false">widgeteditors-tr1s60#abs.50_200819:project:ou1s60ui#1</baseline>
+      <baseline overridden="false">xcfw-tr1s60#abs.mcl_200839:project:ou1s60ui#1</baseline>
+      <baseline overridden="false">xmlui-abs.mcl_200843:project:tr1s60#1</baseline>
+      <baseline overridden="false">xmlui_dom-abs.mcl_200843:project:tr1s60#1</baseline>
+      <baseline overridden="false">xmluifw-abs.mcl_200843:project:tr1s60#1</baseline>
+      <folder>
+        <name overridden="true">tr1s60#5856: all completed tasks for release ABS_domain/abs.mcl for collaborative projects</name>
+        <task overridden="false">
+            <id>e002sa09#10745</id>
+            <synopsis>ActiveIdle2: Error:DPEE-7KEGRT: S60SW Language Variant Testing - E.T.: S60 5.0 PF52.50 wk41: Control panel: Truncation in menu item home screen theme (MCL)</synopsis>
+        </task>
+      </folder>
+      <folder>
+        <name overridden="true">tr1s60#6130: wbernard's Assigned Or Completed Tasks for Release ABS_domain/abs.mcl</name>
+      </folder>
+    </project>
+  </content>
+</bom>

@@ -1,0 +1,10 @@
+File block for dir 'Bootdata' @offs=0x5bf34, size=56
+File block for dir '101F72A6' @offs=0x5bf6c, size=112
+File block for dir 'Fonts' @offs=0x5bfdc, size=210
+File block for dir '101f7a85' @offs=0x5c0b0, size=60
+File block for dir '10009d8f' @offs=0x5c0ec, size=54
+Reading file \epoc32\data\Z\Resource\ICL\jpegcodec_extra.rsc to image
+File '\epoc32\data\Z\Resource\ICL\jpegcodec_extra.rsc' size: 000000ca
+Reading file \epoc32\release\ARMV5\urel\jpegcodec.dll to image
+Original file:'\epoc32\release\ARMV5\urel\jpegcodec.dll' is compressed by method:101f7afc
+Compressed executable File '\epoc32\release\ARMV5\urel\jpegcodec.dll' size: 00015e80, mode:101f7afc

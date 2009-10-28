@@ -1,0 +1,169 @@
+<#--
+============================================================================ 
+Name        : 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+
+<#if ant?keys?seq_contains("tracurl")>
+    <#assign helium_browser_trunk=ant.tracurl>
+<#else>
+    <#assign helium_browser_trunk="">
+</#if>
+
+<#macro helium_api_navbar>
+<!-- ========= start of top navbar ======= -->
+<a name="navbar_top"><!-- --></a>
+<a href="#skip-navbar_top" title="skip navigation links"></a>
+<table border="0" width="100%" cellpadding="1" cellspacing="0" summary="">
+<tr>
+<td colspan="2" bgcolor="#eeeeff" class="navbarcell1">
+<a name="navbar_top_firstrow"><!-- --></a>
+<table border="0" cellpadding="0" cellspacing="3" summary="">
+  <tr align="center" valign="top">
+  <td bgcolor="#ffffff" class="navbarcell1"> &#160;<a href="overview-summary.html"><font class="navbarfont1"><b>overview</b></font>&#160;</a></td>
+
+  <td bgcolor="#ffffff" class="navbarcell1">    <a href="deprecated-list.html"><font class="navbarfont1"><b>deprecated</b></font></a>&#160;</td>
+    
+  <td bgcolor="#eeeeff" class="navbarcell1">    <a href="properties-table.html"><font class="navbarfont1"><b>properties-table</b></font></a>&#160;</td>  
+  <td bgcolor="#eeeeff" class="navbarcell1">    <a href="index-1.html"><font class="navbarfont1"><b>index</b></font></a>&#160;</td>
+  <td bgcolor="#eeeeff" class="navbarcell1">    <a href="help.html"><font class="navbarfont1"><b>help</b></font></a>&#160;</td>
+  </tr>
+</table>
+</td>
+<td align="right" valign="top" rowspan="3"><em>
+<b>Helium API</b></em>
+
+</td>
+</tr>
+
+<tr>
+<td bgcolor="white" class="navbarcell2"><font size="-2">
+&#160;prev&#160;
+&#160;next</font></td>
+<td bgcolor="white" class="navbarcell2"><font size="-2">
+  <a href="index.html?overview-summary.html" target="_top"><b>frames</b></a>  &#160;
+&#160;<a href="overview-summary.html" target="_top"><b>no frames</b></a>  &#160;
+
+&#160;<script type="text/javascript">
+  <!--
+  if(window==top) {
+    document.writeln('<a href="allclasses-noframe.html"><b>all classes</b></a>');
+  }
+  //-->
+</script>
+<noscript>
+  <a href="allclasses-noframe.html"><b>all classes</b></a>
+</noscript>
+
+
+</font></td>
+</tr>
+</table>
+<a name="skip-navbar_top"></a>
+<!-- ========= end of top navbar ========= -->
+</#macro>
+
+
+
+<#macro helium_api_head_section title>
+
+<head>
+    <meta name="keywords" content="helium"/>
+    <meta http-equiv="content-type" content="text/html+xml; charset=iso-8859-1"/>
+    <link rel="stylesheet" href="stylesheet.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:   '',
+        VERSION:    '0'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+
+    <script type="text/javascript" src="../_static/interface.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    
+    <title>${title}</title>
+</head>
+
+</#macro>
+
+
+<#macro helium_api_header title>
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE HTML PUBLIC "-//w3c//dtd xhtml 1.0 strict//en"
+      "http://www.w3.org/tr/xhtml1/dtd/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<@helium_api_head_section title="${title}"/>
+
+<body>
+    <@helium_api_navbar/>
+    <hr/>
+</#macro>
+
+
+<#macro helium_api_html_footer>
+    <hr/>
+    <@helium_api_navbar/>
+    <font size="-2">Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies). All rights reserved. License: http://www.eclipse.org/legal/epl-v10.html</font>
+ </body>
+
+</html>
+
+</#macro>
+
+
+<#macro helium_api_location_path location>
+    <#assign target_line=""/>
+    <#assign res = location?matches(":(\\d+):$") />
+    <#list res as m>
+        <#assign target_line="#L${m?groups[1]}"/>
+    </#list>      
+    <#assign location_path=location/>
+    <#if location?index_of("helium\\") &gt; 0>
+        <#assign location_path=location?substring(location?last_index_of('helium\\'))/>
+    </#if>
+       <#assign target_url=location_path?replace("\\", "/")?replace(":(\\d+):", "", 'ri') />
+    <tt class="docutils literal"><a href="${helium_browser_trunk}/${target_url}${target_line}">${location_path}</a></tt>  
+</#macro>
+
+<#macro helium_project_path location>
+    <#assign location_path=location/>
+    <#if location?index_of("helium\\") &gt; 0>
+        <#assign location_path=location?substring(location?last_index_of('helium\\'))/>
+    </#if>
+       <#assign target_url=location_path?replace("\\", "/")?replace(":(\\d+):", "", 'ri') />
+    <tt class="docutils literal"><a href="${helium_browser_trunk}/${target_url}">${target_url}</a></tt>  
+</#macro>
+
+<#-- Macros for recursively handling random HTML elements inside documentation elements. -->
+<#macro tt> <tt><#recurse></tt> </#macro>
+
+<#macro p><p><#recurse></p></#macro>
+
+<#macro ul><ul><#recurse></ul></#macro>
+
+<#macro li><li><#recurse></li></#macro>
+
+<#macro b><b><#recurse></b></#macro>
+
+<#macro pre><pre>${.node?html}</pre></#macro>
+
+<#macro @text>${.node?trim}</#macro>
+

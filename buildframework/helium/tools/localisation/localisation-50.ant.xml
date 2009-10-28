@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : localisation-50.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="localisation-50">
+    <description>
+        S60 5.0+ localisation.
+    </description>
+
+    <!-- Main target for 5.0 build localisation process. -->
+    <target name="localisation-50-build" depends="localisation-switch-loc-generator,localisation-dtd"/> 
+   
+    <!-- 
+            This target launch the localisation of DTD files. 
+            This is handled by the DTDLocaliser.pl script from S60.  
+    --> 
+    <target name="localisation-dtd"> 
+        <exec dir="${build.drive}/" executable="perl.exe" failonerror="false"> 
+            <arg value="${build.drive}/epoc32/tools/DTDLocaliser.pl"/> 
+            <arg value="-l"/> 
+            <arg value="${build.log.dir}/${build.id}.dtd_localisation.log}"/> 
+        </exec> 
+    </target> 
+     
+     
+    <!-- 
+            This target launch the switch_loc_generator (for 5.0 build only). 
+    --> 
+    <target name="localisation-switch-loc-generator"> 
+        <exec dir="${build.drive}/" executable="perl.exe" failonerror="false"> 
+            <arg line="${build.drive}/epoc32/tools/switch_loc_generator.pl"/> 
+        </exec> 
+    </target> 
+</project>

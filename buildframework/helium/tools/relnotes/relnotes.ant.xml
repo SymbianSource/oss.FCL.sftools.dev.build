@@ -1,0 +1,339 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : relnotes.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="relnotes" default="release-notes" xmlns:hlm="http://www.nokia.com/helium">
+    <description>
+    Generates a release note by modifying a template (that you can edit yourself) with
+    values from the build and Synergy.
+    
+    * Modifies a RTF template with values from build
+    * Adds table of errors and warnings
+    * Generates list of baselines, projects and tasks used
+    </description>
+
+    <property name="releasenotes.output.dir" value="${build.output.dir}/relnotes"/>
+    <property name="releasenotes.logo" value="${relnotes.config.dir}/logo.png"/>
+    <property name="releasenotes.props" value="${relnotes.config.dir}/relnotes.properties"/>
+    <property name="releasenotes.temp.props" value="${temp.build.dir}/relnotes.properties"/>
+    <property name="releasenotes.temp.props2" value="${temp.build.dir}/relnotes2.properties"/>
+    <property name="releasenotes.template" value="${relnotes.config.dir}/template.rtf"/>
+    <property name="releasenotes.output" value="${releasenotes.output.dir}/${build.id}_relnotes.rtf"/>
+    <property name="releasenotes.temp.errors" value="${temp.build.dir}/errors.csv"/>
+    <property name="releasenotes.temp.output" value="${temp.build.dir}/tempDocument.rtf"/>
+    <property name="releasenotes.scan2log" value="${build.log.dir}/${build.id}.${product.family}_scan2.html"/>
+    
+    <import file="${relnotes.config.dir}/relnotes_properties.ant.xml" optional="true"/>
+    
+    <!-- Private: -->
+    <target name="release-notes-variant-configuration" depends="rombuild-prepare-input">
+        
+        <script language="jython" setbeans="false">
+tagnames = ""
+for product in project.getProperty("product.list").split(","):
+    tagnames += "Type%sVariantTableHere\n" %  product 
+project.setProperty("variant.product.tagnames", tagnames)
+        </script>
+        <replace file="${releasenotes.output}" token="TypeVariantTableHere" value="${variant.product.tagnames}" summary="true"/>
+        <for list="${product.list}" delimiter="," param="product.name" >
+            <sequential>            
+                <exec executable="python" dir="${helium.dir}/tools/relnotes" failonerror="${failonerror}">
+                    <arg value="getVariantConfiguration.py"/>
+                    <arg value="@{product.name}"/>
+                    <arg value="${localisation.language.file}"/>
+                    <arg value="${rombuild.config.file.parsed}"/>
+                    <arg value="${temp.build.dir}/variant_@{product.name}.csv"/>
+                </exec>
+                <hlm:python>
+import ant
+import rtfutils
+rn = rtfutils.RTFUtils(ant.get_property(r'${releasenotes.output}'))
+rn.rtftable(ant.get_property(r'${temp.build.dir}/variant_@{product.name}.csv'), ant.get_property(r'${releasenotes.temp.output}'), ant.get_property(r'Type@{product.name}VariantTableHere'))
+                </hlm:python>
+  
+                <delete file="${releasenotes.output}"/>
+                <move file="${releasenotes.temp.output}" tofile="${releasenotes.output}"/>
+            </sequential>
+        </for>
+    </target>
+    
+    <!-- Private: Create error list in release notes -->
+    <target name="release-notes-error-summary">
+        <exec executable="python" dir="${helium.dir}/tools/relnotes" failonerror="${failonerror}">
+            <arg value="readHTML.py"/>
+            <arg value="${releasenotes.scan2log}"/>
+            <arg value="${releasenotes.temp.errors}"/>
+        </exec>
+        <hlm:python>
+import ant
+import rtfutils
+rn = rtfutils.RTFUtils(ant.get_property(r'${releasenotes.output}'))
+rn.rtftable(ant.get_property(r'${releasenotes.temp.errors}'), ant.get_property(r'${releasenotes.temp.output}'), 'TypeErrorTableSummaryHere')
+        </hlm:python>
+        <delete file="${releasenotes.output}"/>
+        <move file="${releasenotes.temp.output}" tofile="${releasenotes.output}"/>
+    </target>
+    
+    <!-- Private: Add logo to release notes -->
+    <target name="release-notes-logo">
+        <hlm:python>
+import ant
+import rtfutils
+rn = rtfutils.RTFUtils(ant.get_property(r'${releasenotes.output}'))
+rn.rtfimage(ant.get_property(r'${releasenotes.logo}'), ant.get_property(r'${releasenotes.temp.output}'), 'AddProductImageHere')
+        </hlm:python>
+        <move file="${releasenotes.temp.output}" tofile="${releasenotes.output}"/>
+    </target>
+    
+    <!-- Private: Find project and baseline of what is running helium -->
+    <target name="release-notes-getcmprojectname">
+        <script language="jython" setbeans="false">
+import nokia.nokiaccm
+import ccm.extra
+import traceback
+import os
+import logging
+#logging.basicConfig(level=logging.DEBUG)
+session = None
+try:
+    database = project.getProperty('ccm.database')
+    username = project.getProperty('ccm.user.login')
+    password = project.getProperty('ccm.user.password')
+    engine = project.getProperty('ccm.engine.host')
+    dbpath = project.getProperty('ccm.database.path')     
+    waroot = project.getProperty('create.bom.workarea.root')
+    if database != None:
+        session = nokia.nokiaccm.open_session(username, password, database=database)
+    else:
+        session = nokia.nokiaccm.open_session(username, password, engine, dbpath)
+        
+    cmproject = ccm.extra.get_toplevel_project(session, waroot)
+    if cmproject == None:
+        print 'Error: ' + waroot + ' must be a synergy project and still be in database'
+    else:
+        project.setProperty("ccm.toplevel.project", str(cmproject))
+    session.close()
+except Exception, ex:
+    print 'Caught exception: ' + str(ex)
+    traceback.print_exc()
+        </script>
+        
+        <hlm:python outputproperty="ccm.toplevel.baseline">
+import nokia.nokiaccm
+import traceback
+import ant
+import logging
+logging.disable(logging.INFO)
+session = None
+try:
+    database = ant.get_property(r'${ccm.database}')
+    username = ant.get_property(r'${ccm.user.login}')
+    password = ant.get_property(r'${ccm.user.password}')
+    engine = ant.get_property(r'${ccm.engine.host}')
+    dbpath = ant.get_property(r'${ccm.database.path}')
+    if database != None:
+        session = nokia.nokiaccm.open_session(username, password, database=database)
+    else:
+        session = nokia.nokiaccm.open_session(username, password, engine, dbpath)
+        
+    cmproject = session.create(ant.get_property(r'${ccm.toplevel.project}'))
+    print cmproject.baseline
+    session.close()
+except Exception, ex:
+    print 'Caught exception: ' + str(ex)
+    traceback.print_exc()
+        </hlm:python>
+    </target>
+    
+    <!-- Private: 
+    Look at property 'project.startswith' and find complete CM name
+    Output property: '${project.startswith}.project'
+    -->
+    <target name="release-notes-getprojectname">
+        <hlm:python outputproperty="release.notes.temp">
+import amara
+import ant
+
+bomfile = open(r"${build.log.dir}/${build.id}_BOM.xml")
+bom = amara.parse(bomfile)
+
+for p in bom.bom.content.project:
+    if (str(p.name).startswith(ant.get_property(r'${project.startswith}'))):
+        print str(p.name)
+bomfile.close()
+        </hlm:python>
+        <script language="jython" setbeans="false">
+project.setProperty(project.getProperty('project.startswith') + '.project', project.getProperty('release.notes.temp'))
+        </script>
+        
+    </target>
+    
+    <!-- Private: Write projects, baselines and task list for MC and IBUSAL -->
+    <target name="release-notes-ccm" depends="get-ccm-password,release-notes-getcmprojectname,create-bom">
+        
+        <hlm:python>
+import amara
+import nokia.nokiaccm
+import ant
+
+class BOMToFile(object):
+    """
+    Read BOM and output in text
+    """
+    def __init__(self, session, project_name, project, output_dir):
+        self.project_name = project_name
+        self.project = project
+        self.output_dir = output_dir
+        self.session = session
+      
+    def writeprojects(self):
+        fileout = file(self.output_dir + '/' + self.project_name + '_projects.txt', 'w')
+        
+        i = 1
+        for project in self.project.baseline:
+            fileout.write(str(i) + ") " + str(project) + "\n")
+            
+            i += 1
+        fileout.close()
+        
+    def writebaselines(self):
+        fileout = file(self.output_dir + '/' + self.project_name + '_baselines.txt', 'w')    
+        
+        i = 1
+        for project in self.project.baseline:
+            fileout.write(str(i) + ") " + str(project) + "\n")
+            
+            cmproject = self.session.create(str(project))
+            
+            try:
+                baseline = str(cmproject.baseline).strip()
+                if baseline == "None":
+                    fileout.write(str(i) + ") " + str(project) + "\n")
+                else:
+                    fileout.write(str(i) + ") " + baseline + "\n")
+                i += 1
+            except Exception, ex:
+                print ex
+        fileout.close()
+            
+    def writetasks(self):
+        if self.project.xml_properties.has_key("task"):
+            fileout = file(self.output_dir + '/' + self.project_name + '_tasks.txt', 'w')
+            
+            i = 1
+            for task in self.project.task:
+                fileout.write(str(i) + ") Task " + str(task) + "\n")
+                i += 1
+            fileout.close()
+
+bomfile = open(r"${build.log.dir}/${build.id}_BOM.xml")
+bom = amara.parse(bomfile)
+database = ant.get_property(r'${ccm.database}')
+username = ant.get_property(r'${ccm.user.login}')
+password = ant.get_property(r'${ccm.user.password}')
+engine = ant.get_property(r'${ccm.engine.host}')
+dbpath = ant.get_property(r'${ccm.database.path}')
+if database != None:
+    session = nokia.nokiaccm.open_session(username, password, database=database)
+else:
+    session = nokia.nokiaccm.open_session(username, password, engine, dbpath)
+
+for p in bom.bom.content.project:
+    if p.name == ant.get_property(r'${ccm.toplevel.project}'):
+        btof = BOMToFile(session, 'MC', p, ant.get_property(r'${releasenotes.output.dir}'))
+        
+        btof.writeprojects()
+        btof.writebaselines()
+            
+        btof.writetasks()
+            
+    if (str(p.name).startswith('IBUSAL')):
+        btof = BOMToFile(session, 'IBUSAL', p, ant.get_property(r'${releasenotes.output.dir}'))
+        
+        btof.writeprojects()
+            
+        btof.writetasks()
+            
+session.close()
+bomfile.close()
+
+        </hlm:python>
+    </target>
+    
+    <!-- Private: Read BOM and write ICF list -->
+    <target name="release-notes-icfs" depends="create-bom">
+        <exec executable="python" dir="${helium.dir}/tools/relnotes" failonerror="${failonerror}">
+            <arg value="icf2txt.py"/>
+            <arg value="${build.log.dir}/${build.id}_BOM.xml"/>            
+            <arg value="${releasenotes.output.dir}/icdicf.txt"/>
+        </exec>
+    </target>
+    
+    <!-- Private: -->
+    <target name="release-notes-test" if="hlm.enable.asserts">
+        <hlm:python>
+import ccm
+#check for ccm session leaks
+assert (len(ccm.running_sessions()) == 0)
+        </hlm:python>
+    </target>
+        
+    <!-- 
+    Generates a product release note based on a template in config dir
+    -->
+    <target name="release-notes" description="Generates a product release note based off a template in config dir">        
+        <mkdir dir="${releasenotes.output.dir}"/>
+        
+        <copy file="${releasenotes.props}" tofile="${releasenotes.temp.props}">
+            <filterchain>
+                <expandproperties/>
+            </filterchain>
+        </copy>
+          
+        <hlm:python>
+import ant
+import rtfutils
+rn = rtfutils.RTFUtils(ant.get_property(r'${releasenotes.output}'))
+rn.rtfconvert(ant.get_property(r'${releasenotes.temp.props}'), ant.get_property(r'${releasenotes.temp.props2}'))
+        </hlm:python>
+        
+        <property file="${releasenotes.temp.props2}"/>                
+        <copy file="${releasenotes.template}" tofile="${releasenotes.output}" overwrite="true"/>
+
+        <antcall target="release-notes-logo" />
+        <antcall target="release-notes-error-summary" />
+        <antcall target="release-notes-variant-configuration" />
+            
+        <delete file="${releasenotes.temp.errors}"/>
+        <delete file="${releasenotes.temp.output}"/>
+        <delete file="${releasenotes.temp.props}"/>
+        <delete file="${releasenotes.temp.props2}"/>
+        
+        <antcall target="release-notes-ccm"/>
+        
+        <antcall target="release-notes-icfs"/>
+    
+        <antcall target="release-notes-replace"/>
+        
+        <antcall target="release-notes-test"/>
+    </target>
+
+</project>

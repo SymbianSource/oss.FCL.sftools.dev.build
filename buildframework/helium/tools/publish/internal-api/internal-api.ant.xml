@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : internal-api.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="internal-api" xmlns:hlm="http://www.nokia.com/helium">
+    <description>List and zip up the included files for an IDO build.</description>
+
+    <property name="internal.api.output.prebuild" location="${build.output.dir}/${build.id}_prebuild.dat"/>
+    <property name="internal.api.output.postbuild" location="${build.output.dir}/${build.id}_postbuild.dat"/>
+    
+    <!-- Default configuration for internal API content scanning -->
+    <path id="internal.api.scanner">
+        <fileset dir="${build.drive}/" casesensitive="false">
+            <!-- ADO content -->
+            <include name="S60/mw/*/inc/**"/>
+            <include name="S60/app/*/inc/**"/>
+            <include name="S60/osext/*/inc/**"/>
+            <include name="S60/tools/*/inc/**"/>
+            
+            <!-- Subsystem level -->
+            <include name="S60/mw/*/*/inc/**"/>
+            <include name="S60/app/*/*/inc/**"/>
+            <include name="S60/osext/*/*/inc/**"/>
+            <include name="S60/tools/*/*/inc/**"/>
+        </fileset>
+    </path>
+
+    <!--
+        Dump internal.api.scanner content before a build starts.
+    -->
+    <target name="publish-prebuild-internal-api">
+        <hlm:path2file file="${internal.api.output.prebuild}">
+            <path refid="internal.api.scanner"/>
+        </hlm:path2file>        
+    </target>
+    
+    <!--
+        Dump internal.api.scanner content after a build has finished.
+    -->
+    <target name="publish-postbuild-internal-api">
+        <hlm:path2file file="${internal.api.output.postbuild}">
+            <path refid="internal.api.scanner"/>
+        </hlm:path2file>        
+    </target>
+
+    <!--
+        Run create_zips.pl to create internal api zip-files, which include those ADO/subsystem 
+        inc-dirs to which 1 or more headers were exported during the build time and prefix all 
+        the generated zip filenames with a build.id for consistency.
+    -->
+    <target name="publish-create-internal-api-zip">
+        <property name="internal.api.output.delta" location="${build.output.dir}/${build.id}_delta.dat"/>
+        <mkdir dir="${zips.build.dir}"/>
+        <hlm:path2file file="${internal.api.output.prebuild}" reference="internal.api.path.prebuild"/>
+        <hlm:path2file file="${internal.api.output.postbuild}" reference="internal.api.path.postbuild"/>
+        <hlm:path2file file="${internal.api.output.delta}">
+            <path>
+                <difference>
+                    <path refid="internal.api.path.postbuild"/>
+                    <path refid="internal.api.path.prebuild"/>
+                </difference>
+            </path>
+        </hlm:path2file>        
+        <copy file="${internal.api.output.delta}" tofile="${internal.api.output.delta}.parsed">
+            <filterchain>
+                <tokenfilter>
+                    <replaceregex pattern="^${build.drive}(/|\\)" replace="" flags="i"/>
+                </tokenfilter>
+            </filterchain>
+        </copy>
+        
+        <if>
+            <not>
+                <length file="${internal.api.output.delta}" length="0" />
+            </not>
+            <then>
+                <zip destfile="${zips.build.dir}/${build.id}_internal_headers.zip" basedir="${build.drive}/" includesfile="${internal.api.output.delta}.parsed"/>
+            </then>
+        </if>
+    </target>
+
+
+</project>

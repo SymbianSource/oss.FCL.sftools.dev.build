@@ -1,0 +1,5 @@
+TARGETNAME=filedisk
+TARGETPATH=..\obj
+TARGETTYPE=DRIVER
+INCLUDES=..\inc
+SOURCES=filedisk.c filedisk.rc

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : test_serializepath.ant.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test-serializepath" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>Helium antlib core serializepath tests.</description>
+
+    <taskdef resource="com/nokia/helium/core/ant/antlib.xml" uri="http://www.nokia.com/helium" />
+
+    <!-- is called prior to the test -->
+    <target name="setUp">
+    </target>
+
+    <!-- is called after the test, even if that caused an error -->
+    <target name="tearDown">
+        <delete file="dump.txt" failonerror="false" />
+    </target>
+
+    <fileset id="empty_folder.path" dir="data/empty_folder" />
+
+    <!-- the actual test case -->
+    <target name="test-serializepath-emptydump">
+        <!-- Creating an empty file -->
+        <hlm:path2file file="dump.txt" />
+        <au:assertFileExists file="dump.txt" />
+        <hlm:path2file file="dump.txt" reference="path2file.empty"/>
+        <au:assertTrue>
+            <resourcecount refid="path2file.empty" when="eq" count="0" />
+        </au:assertTrue>
+    </target>
+
+    <!-- the actual test case -->
+    <target name="test-serializepath-data">
+        <!-- Creating an empty file -->
+        <hlm:path2file file="dump.txt">
+            <path>
+                <fileset dir="${ant.file.test-serializepath}/../data">
+                    <include name="**/test.txt"/>    
+                </fileset>
+            </path>
+        </hlm:path2file>
+        <au:assertFileExists file="dump.txt" />
+        <hlm:path2file file="dump.txt" reference="path2file.data"/>
+        <au:assertTrue>
+            <resourcecount refid="path2file.data" when="eq" count="2" />
+        </au:assertTrue>
+    </target>
+
+    <!-- the actual test case -->
+    <target name="test-serializepath-noattribute">
+        <!-- Creating an empty file -->
+        <au:expectfailure>
+            <hlm:path2file/>
+        </au:expectfailure>
+    </target>
+
+    <target name="test-serializepath-nofile-reference">
+        <!-- Creating an empty file -->
+        <au:expectfailure>
+            <hlm:path2file reference="ref.not.defined"/>
+        </au:expectfailure>
+    </target>
+</project>

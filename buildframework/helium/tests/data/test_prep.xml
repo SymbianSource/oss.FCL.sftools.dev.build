@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<prepSpec>
+    <config>
+        <exclude name="abld.bat"/>
+        <exclude name=".static_wa"/>
+        <exclude name="_ccmwaid.inf"/>
+    </config>
+    <source label="Symbian" basedir="${symbian.release.dir}">
+        <unzip name="${symbian.zip.prefix}${symbian.release}_src_generic_part1.zip"/>
+        <unzip name="${symbian.zip.prefix}${symbian.release}_src_generic_part2.zip"/>
+        <unzip name="${symbian.zip.prefix}${symbian.release}_src_generic_part3.zip"/>
+        <unzip name="${symbian.zip.prefix}${symbian.release}_src_cedar.zip"/>
+        <unzip name="${symbian.zip.prefix}${symbian.release}_epoc32.zip">
+            <include name="epoc32/tools/*"/>
+            <include name="epoc32/gcc/*"/>
+            <include name="epoc32/rom/include/mscomp.iby"/>
+            <include name="epoc32/rom/include/staccomp.iby"/>
+            <include name="epoc32/rom/include/profiler.iby"/>
+            <include name="epoc32/INCLUDE/variant/Symbian_OS_v9.3.hrh"/>
+        </unzip>
+        <unzip name="${symbian.zip.prefix}${symbian.release}_epoc32_RELEASE_ARMV5.zip">
+            <include name="epoc32/RELEASE/ARMV5/UDEB/mscomp.dll"/>
+            <include name="epoc32/RELEASE/ARMV5/UDEB/staccomp.dll"/>
+            <include name="epoc32/RELEASE/ARMV5/UREL/mscomp.dll"/>
+            <include name="epoc32/RELEASE/ARMV5/UREL/staccomp.dll"/>
+            <!-- Crypto binaries -->
+            <include name="epoc32/RELEASE/ARMV5/lib/hash.lib"/>
+            <include name="epoc32/RELEASE/ARMV5/udeb/hash.dll"/>
+            <include name="epoc32/RELEASE/ARMV5/urel/hash.dll"/>
+            <include name="epoc32/RELEASE/ARMV5/lib/random.lib"/>
+            <include name="epoc32/RELEASE/ARMV5/udeb/random.dll"/>
+            <include name="epoc32/RELEASE/ARMV5/urel/random.dll"/>
+            <include name="epoc32/RELEASE/ARMV5/lib/randsvr.lib"/>
+            <include name="epoc32/RELEASE/ARMV5/udeb/randsvr.exe"/>
+            <include name="epoc32/RELEASE/ARMV5/urel/randsvr.exe"/>
+            <include name="epoc32/RELEASE/ARMV5/lib/pbe.lib"/>
+            <include name="epoc32/RELEASE/ARMV5/udeb/pbe.dll"/>
+            <include name="epoc32/RELEASE/ARMV5/urel/pbe.dll"/>
+            <include name="epoc32/RELEASE/ARMV5/lib/cryptography.lib"/>
+            <include name="epoc32/RELEASE/ARMV5/udeb/strong_cryptography.dll"/>
+            <include name="epoc32/RELEASE/ARMV5/urel/strong_cryptography.dll"/>
+            <include name="epoc32/RELEASE/ARMV5/udeb/weak_cryptography.dll"/>
+            <include name="epoc32/RELEASE/ARMV5/urel/weak_cryptography.dll"/>
+        </unzip>
+    </source>
+
+    
+    <!-- unzip ICF/ICD's for this baseline-->
+		<source name="icds" basedir="">
+			<unzipicds dest="${build.drive}\">
+				<!-- Unzipping from following location
+						 * S60
+						 * common
+						 * product
+				  -->
+				<location name="${ccm.base.dir}/S60/S60/Symbian_ICD_ICF/${symbian.release}">
+				</location>
+				<location name="${ccm.base.dir}/mc/mc_overlay/mc_4032_overlay/common/files/Symbian_ICD_ICF/${symbian.release}" />
+				<location name="${ccm.base.dir}/mc/mc_overlay/mc_4032_overlay/${product.name}_overlay/files/Symbian_ICD_ICF/${symbian.release}" />
+				
+				<include name="src/*" />
+			</unzipicds>
+		</source>
+ 
+    <source label="S60" basedir="${s60.release.dir}">
+        <unzip name="S60_3_2_${s60.version}_epoc32.zip" if="NO_NCP">
+            <!-- use default commdb for chip build -->
+    	    <include name="epoc32/data/Z/private/10202be9/cccccc00.cre"/>
+        </unzip>
+    </source>
+    
+    <source label="S60" basedir="${ccm.base.dir}/S60">
+        <copy name="S60" dest="s60"/>
+    </source>
+ 
+    <source label="ME" basedir="${ccm.base.dir}">
+        <copy name="me_scd_desw/me_scd_desw" dest="me/me_scd_desw"/>
+    </source>
+    
+    <source label="ppd_sw" basedir="${ccm.base.dir}">
+        <copy name="ppd_sw/ppd_sw" dest="ppd_sw"/>
+        <copy name="ppd_sw/ppd_sw/s60_dd/T9TegicDelivery" dest="s60/mw/inputmethods/textinput/T9TegicDelivery"/>
+    </source>
+
+    <source label="multimedia_sw" basedir="${ccm.base.dir}">
+        <copy name="productconceptfw/productconceptfw" dest="multimedia_sw/productconceptfw"/>
+    </source>
+
+    <source label="extra_apps" basedir="${ccm.base.dir}">
+        <copy name="DvbhTestApplication/DvbhTestApplication" dest="extra_apps/DvbhTestApplication"/>
+    </source>
+
+    <source label="chipset" basedir="${ccm.base.dir}/IBUSAL_chipset/IBUSAL_chipset">
+        <copy name="config" dest="config" unless="NO_NCP"/>
+        <copy name="ncp_sw" dest="ncp_sw" unless="NO_NCP"/>
+        <copy name="psw" dest="psw" unless="NO_NCP"/>
+        <copy name="tools" dest="tools" unless="NO_NCP"/>
+    </source>
+   
+    <source label="mc" basedir="${ccm.base.dir}">
+        <copy name="mc/mc_build" dest="mc/mc_build"/>
+        <copy name="mc/mc_config" dest="mc/mc_config"/>
+        <copy name="mc/mc_overlay/mc_4032_overlay" dest="mc/mc_overlay/mc_4032_overlay"/>
+<!--         <copy name="mc/mc_sw/mc_4032_sw/common" dest="mc/mc_sw/mc_4032_sw/common"/> -->
+<!--         <copy name="mc/mc_sw/mc_4032_sw/${product.name}" dest="mc/mc_sw/mc_4032_sw/${product.name}"/> -->
+        <copy name="mc/helium" dest="mc/helium"/>
+    </source>
+
+    <source label="chipset_cellmo" basedir="${ibusal.cellmo.dir}">
+        <copy name="product4" dest="${build.drive}/epoc32/include/product4/cellmo" unless="NO_NCP"/>
+        <copy name="product4" dest="${build.drive}/output/development_flash_images/cellmo/product4" unless="NO_NCP"/>
+        <copy name="product" dest="${build.drive}/epoc32/include/product/cellmo" unless="NO_NCP"/>
+        <copy name="product" dest="${build.drive}/output/development_flash_images/cellmo/product" unless="NO_NCP"/>
+    </source>
+
+
+
+    <source label="overlays" basedir="${build.drive}">
+        <copy name="mc/mc_overlay/mc_4032_overlay/common/files"/>
+        <copy name="mc/mc_overlay/mc_4032_overlay/${product.name}_overlay/files"/>
+
+		<!-- manual exports required before bldmake bldfiles phase -->
+        <copy name="mc/mc_config/mc_4032_config/${product.name}/include/ProductVariant.hrh" tofile="epoc32/include/oem/ProductVariant.hrh"/>
+        <copy name="mc/mc_config/mc_4032_config/${product.name}/include/ProductVariant.hrh" tofile="S60/misc/release/bldvariant/common/ProductVariant.hrh"/>
+        <copy name="mc/mc_config/mc_4032_config/${product.name}/include/ProductVariant.hrh" tofile="config/ncp_config/platform_config/config/inc/productvariant.hrh"/>
+        <copy name="me/me_scd_desw/variation/product/DeSwFlagsproduct.hrh" tofile="epoc32/include/oem/DeSwFlagsproduct.hrh"/>
+		<!--Ensure correct iby version gets exported regardless of timestamp: -->
+        <copy name="mc/mc_config/mc_4032_config/common/rom/include/NCPCenrep_variant.iby" tofile="config/ncp_config/config/rom/include/NCPCenrep_variant.iby"/>
+		<!--Ensure correct certificate gets exported regardless of timestamp: -->
+        <copy name="mc/mc_config/mc_4032_config/common/certificates/S60_root_certificates/rnd/swicertstore.dat" tofile="s60/mw/securityservices/pkiutilities/certificates/data/swicertstore.dat"/>
+
+
+    	<!-- S60 manual exports required before bldmake bldfiles phase phase where  bldvariant is included-->
+
+        <!-- special copy for subcon package -->
+        <copy name="mc/mc_config/mc_4032_config/common/certificates/S60_root_certificates/s60_licensees/swicertstore.dat" tofile="epoc32/data/z/resource/swicertstore.dat_for_s60_licensees"/>
+
+        <!-- special copy for localisation -->
+        <copy name="S60/tools/build_platforms/build/tools/parse_what_log.pl" tofile="epoc32/tools/s60tools/parse_what_log.pl"/>
+        <copy name="S60/tools/build_platforms/build/tools/add_build_definition_filter.pl" tofile="epoc32/tools/s60tools/add_build_definition_filter.pl"/>
+
+
+      <!-- chipset overlay;  manual exports required due to missing bld.inf-->
+    	<!-- from \build\ncp_build\build\variation.txt -->
+        <copy name="/psw/ncp_psw/psw" unless="NO_NCP"/>
+        <copy name="/tools/toolsmod_93" unless="NO_NCP"/>
+    	<!-- from \build\ncp_build\platform_build\build\variation.txt -->
+        <copy name="/psw/ncp_psw/platform_psw/psw" unless="NO_NCP"/>
+    	<!-- from \build\ncp_build\platform_build\platform_product_build\build\variation.txt -->
+        <copy name="/psw/ncp_psw/platform_psw/platform_product_psw/psw" unless="NO_NCP"/>
+  
+      <!-- chipset manual exports required before bldmake bldfiles phase where  bldvariant is included-->
+        <copy name="config/ncp_config/config/inc/feature_settings.hrh" tofile="epoc32/include/oem/feature_settings.hrh" unless="NO_NCP"/>
+        <copy name="config/ncp_config/config/inc/st_consts.hrh" tofile="epoc32/include/oem/st_consts.hrh" unless="NO_NCP"/>
+        <copy name="config/ncp_config/platform_config/config/inc/adaptation_features.hrh" tofile="epoc32/include/oem/adaptation_features.hrh" unless="NO_NCP"/>
+        <copy name="config/ncp_config/platform_config/config/inc/st_feature_settings.hrh" tofile="epoc32/include/oem/st_feature_settings.hrh" unless="NO_NCP"/>
+        <copy name="config/ncp_config/platform_config/config/inc/st_features_common.hrh" tofile="epoc32/include/oem/st_features_common.hrh" unless="NO_NCP"/>
+        <copy name="config/ncp_config/config/inc/spp_variant.cfg" tofile="epoc32/tools/variant/spp_variant.cfg" unless="NO_NCP"/>
+        <copy name="config/ncp_config/platform_config/config/inc/spp_feature_settings.hrh" tofile="epoc32/include/oem/spp_feature_settings.hrh" unless="NO_NCP"/>
+        <copy name="config/ncp_config/platform_config/config/inc/ncp_feature_settings.hrh" tofile="epoc32/include/oem/ncp_feature_settings.hrh" unless="NO_NCP"/>
+        <copy name="config/ncp_config/config/inc/ncp_feature_consts.hrh" tofile="epoc32/include/oem/ncp_feature_consts.hrh" unless="NO_NCP"/>
+        <copy name="config/ncp_config/config/inc/ncp_consts.hrh" tofile="epoc32/include/oem/ncp_consts.hrh" unless="NO_NCP"/>
+        <copy name="config/ncp_config/platform_config/config/inc/adaptation_conf.h" tofile="epoc32/include/internal/adaptation_conf.h" unless="NO_NCP"/>
+        <copy name="config/ncp_config/platform_config/config/inc/st_settings.hrh" tofile="epoc32/include/st_settings.hrh" unless="NO_NCP"/>
+        <copy name="ncp_sw/corecom/aasw/AaCommonTools/config/audio_sw_external_conf.hrh" tofile="epoc32/include/internal/audio_sw_external_conf.hrh" unless="NO_NCP"/>
+        <copy name="ncp_sw/corecom/aasw/AaCommonTools/config/audio_sw_conf.hrh" tofile="epoc32/include/internal/audio_sw_conf.hrh" unless="NO_NCP"/>
+
+      <!-- chipset manual exports required before bldmake bldfiles phase so build does not hang -->
+        <copy name="config/ncp_config/config/tools" dest="epoc32/tools" unless="NO_NCP"/>
+
+      <!-- fix for LightService-->
+        <copy name="/config/ncp_config/platform_config/config/inc/ncp_feature_settings.hrh" tofile="/epoc32/include/config/platform/ncp_feature_settings.hrh" unless="NO_NCP"/>
+        <copy name="/config/ncp_config/platform_config/config/inc/st_feature_settings.hrh" tofile="/epoc32/include/config/platform/st_feature_settings.hrh" unless="NO_NCP"/>
+        <copy name="/config/ncp_config/platform_config/config/inc/st_features_common.hrh" tofile="/epoc32/include/st_features_common.hrh" unless="NO_NCP"/>
+        <copy name="/config/ncp_config/platform_config/config/inc/st_features_common.hrh" tofile="/epoc32/include/config/platform/st_features_common.hrh" unless="NO_NCP"/>
+        <copy name="/config/ncp_config/platform_config/config/inc/VariationItemValues.hrh" tofile="/epoc32/include/oem/VariationItemValues.hrh" unless="NO_NCP"/>
+        <copy name="/config/ncp_config/platform_config/config/inc/VariationItemValues.hrh" tofile="/epoc32/include/config/platform/VariationItemValues.hrh" unless="NO_NCP"/>
+        <copy name="/config/ncp_config/platform_config/config/inc/VariationItemDetailedValues.hrh" tofile="/epoc32/include/oem/VariationItemDetailedValues.hrh" unless="NO_NCP"/>
+        <copy name="/config/ncp_config/platform_config/config/inc/VariationItemDetailedValues.hrh" tofile="/epoc32/include/config/platform/VariationItemDetailedValues.hrh" unless="NO_NCP"/>
+        <copy name="/config/ncp_config/platform_config/config/inc/st_features.hrh" tofile="/epoc32/include/st_features.hrh" unless="NO_NCP"/>
+        <copy name="/config/ncp_config/platform_config/config/inc/casw_light_settings.hrh" tofile="/epoc32/include/oem/casw_light_settings.hrh" unless="NO_NCP"/>
+        <copy name="/config/ncp_config/platform_config/config/inc/casw_light_settings.hrh" tofile="/epoc32/include/config/platform/casw_light_settings.hrh" unless="NO_NCP"/>
+        <copy name="/config/ncp_config/platform_config/config/inc/adaptation_features.hrh" tofile="/epoc32/include/config/platform/adaptation_features.hrh" unless="NO_NCP"/>
+        <copy name="/config/ncp_config/platform_config/config/tools/platform.bsf" tofile="/epoc32/tools/platform.bsf" unless="NO_NCP"/>
+
+        <copy name="/config/ncp_config/platform_config/platform_product_config/config/inc/ncp_feature_settings.hrh" tofile="/epoc32/include/config/platform/product4/ncp_feature_settings.hrh" unless="NO_NCP"/>
+        <copy name="/config/ncp_config/platform_config/platform_product_config/config/inc/VariationItemValues.hrh" tofile="/epoc32/include/config/platform/product4/VariationItemValues.hrh" unless="NO_NCP"/>
+        <copy name="/config/ncp_config/platform_config/platform_product_config/config/inc/VariationItemDetailedValues.hrh" tofile="/epoc32/include/config/platform/product4/VariationItemDetailedValues.hrh" unless="NO_NCP"/>
+        <copy name="/config/ncp_config/platform_config/platform_product_config/config/inc/st_feature_settings.hrh" tofile="/epoc32/include/config/platform/product4/st_feature_settings.hrh" unless="NO_NCP"/>
+        <copy name="/config/ncp_config/platform_config/platform_product_config/config/inc/casw_light_settings.hrh" tofile="/epoc32/include/config/platform/product4/casw_light_settings.hrh" unless="NO_NCP"/>
+        <copy name="/config/ncp_config/platform_config/platform_product_config/config/rom/config/x_conf_product4.txt" tofile="/ncp_sw/spp_core4.0/base_ca_product/stn8815/product/product4/x_conf_product4.txt" unless="NO_NCP"/>
+        <copy name="/config/ncp_config/platform_config/platform_product_config/config/tools/product4.bsf" tofile="/epoc32/tools/product4.bsf" unless="NO_NCP"/>
+
+        <copy name="/config/ncp_config/platform_config/platform_product_config/config/inc/ncp_feature_settings.hrh" tofile="/epoc32/include/config/platform/product/ncp_feature_settings.hrh" unless="NO_NCP"/>
+        <copy name="/config/ncp_config/platform_config/platform_product_config/config/inc/VariationItemValues.hrh" tofile="/epoc32/include/config/platform/product/VariationItemValues.hrh" unless="NO_NCP"/>
+        <copy name="/config/ncp_config/platform_config/platform_product_config/config/inc/VariationItemDetailedValues.hrh" tofile="/epoc32/include/config/platform/product/VariationItemDetailedValues.hrh" unless="NO_NCP"/>
+        <copy name="/config/ncp_config/platform_config/platform_product_config/config/inc/st_feature_settings.hrh" tofile="/epoc32/include/config/platform/product/st_feature_settings.hrh" unless="NO_NCP"/>
+        <copy name="/config/ncp_config/platform_config/platform_product_config/config/inc/casw_light_settings.hrh" tofile="/epoc32/include/config/platform/product/casw_light_settings.hrh" unless="NO_NCP"/>
+        <copy name="/config/ncp_config/platform_config/platform_product_config/config/tools/product.bsf" tofile="/epoc32/tools/product.bsf" unless="NO_NCP"/>
+
+      <!-- temporary chipset manual exports -->
+        <copy name="config/s60_32_config/config/rom/include/commsdat_db_variant.iby" tofile="epoc32/rom/include/commsdat_db_variant.iby" unless="NO_NCP"/>
+        <copy name="config/s60_32_config/config/rom/include/commsdat.iby" tofile="epoc32/rom/include/commsdat.iby" unless="NO_NCP"/>
+        <copy name="config/s60_32_config/config/rombuild/s60_romfiles.txt" tofile="epoc32/rombuild/s60_romfiles.txt" unless="NO_NCP"/>
+        <copy name="ncp_sw/spp_core4.0/product/targets/product/variant.mmh" tofile="epoc32/include/product/variant.mmh" unless="NO_NCP"/>
+    </source>
+
+    <source label="Temporary unzip of DVB-H" basedir="${build.drive}">
+        <unzip name="me/me_scd_desw/source/JugnooTSW.zip"/>
+    </source>
+
+ 
+</prepSpec>

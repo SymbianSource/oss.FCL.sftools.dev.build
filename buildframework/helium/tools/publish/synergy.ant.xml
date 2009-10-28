@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : synergy.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="publish.synergy" xmlns:hlm="http://www.nokia.com/helium">
+    <description>
+    Synergy publishing related targets
+    </description>
+
+    <!-- Validate all the inputs for the publish-tasks-to-folder target. -->
+    <target name="publish-tasks-to-folder-check" if="publish.ccm.folder">
+        <if>
+            <available file="${build.log.dir}/${build.id}_bom.xml" />
+            <then>
+                <property name="do.publish-tasks-to-folder" value="true" />
+            </then>
+        </if>
+    </target>
+
+    <!-- Copies all the task found in the BOM into defined folder. -->
+    <target name="publish-tasks-to-folder" depends="publish-tasks-to-folder-check" if="do.publish-tasks-to-folder">
+        <mkdir dir="${temp.build.dir}" />
+        <fmpp sourceFile="${helium.dir}/tools/common/templates/ido/task-publish.ant.xml.ftl" outputFile="${temp.build.dir}/task-publish.ant.xml">
+            <freemarkerLinks expandProperties="yes">
+                macro: ${helium.dir}/tools/common/templates/macro
+            </freemarkerLinks>
+            <data expandProperties="yes">
+                bom: xml(${build.log.dir}/${build.id}_bom.xml)
+                ant: antProperties()
+            </data>
+        </fmpp>
+        <hlm:assertFileExists file="${temp.build.dir}/task-publish.ant.xml" />
+        <ant antfile="${temp.build.dir}/task-publish.ant.xml" dir="${build.drive}/" />
+    </target>
+
+    <!-- Change team level release tag to program level release tag -->
+    <target name="change-release-tag" if="teamlevel.ci.system">
+        <if>
+            <isset property="ccm.cache.xml" />
+            <then>
+                <hlm:createSessionMacro database="${ccm.database}" reference="releasetag.session" cache="${ccm.cache.xml}"/>
+            </then>
+            <else>
+                <hlm:createSessionMacro database="${ccm.database}" reference="releasetag.session" />
+            </else>
+        </if>
+        <hlm:ccm verbose="false">
+            <hlm:sessionset refid="releasetag.session" />
+            <hlm:changereleasetag folder="${teamlevel.folder.number}" releasetag="${programlevel.release.tag}" />
+        </hlm:ccm>
+        <if>
+            <not>
+                <isset property="ccm.cache.xml" />
+            </not>
+            <then>
+                <hlm:ccm verbose="false">
+                    <hlm:sessionset refid="releasetag.session" />
+                    <hlm:close />
+                </hlm:ccm>
+            </then>
+        </if>
+    </target>
+
+</project>

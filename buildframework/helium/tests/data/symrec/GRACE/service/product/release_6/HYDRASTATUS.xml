@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<release xmlns="http://hydra.nokia.com/schema/hydrastatus">
+  <name>5.0</name>
+  <state>Created</state>
+  <service>service</service>
+  <ctime>2009-06-23T14:29:47+00:00</ctime>
+  <owner>a</owner>
+  <direction>OUT</direction>
+  <total-file-count>1</total-file-count>
+  <total-file-size>236313771</total-file-size>
+  <transports>
+    <transport>
+      <peer>z</peer>
+      <direction>OUT</direction>
+      <state>Done</state>
+      <file-count>1</file-count>
+      <file-size>236313771</file-size>
+      <retries>0</retries>
+    </transport>
+  </transports>
+</release>

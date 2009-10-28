@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : eunit.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="_testing.eunit">
+    <description>
+        Testing using EUnit. (For WINSCW)
+    </description>
+
+    <!-- Unzip test package to build drive. -->
+    <target name="prepare-eunit" if="enabled.ats">
+        <unzip src="${eunit.prepare.zip}" dest="${build.drive}/" />
+    </target>
+
+    <!-- Runs eunittests for Java code -->
+    <target name="eunittest" depends="prepare-eunit">
+        <for list="${eunit.dlls}" delimiter="," param="eunit.dll">
+            <sequential>
+                <exec executable="${build.drive}/epoc32/release/winscw/udeb/EUnitExeRunner.exe" dir="${build.drive}/epoc32/release/winscw/udeb" failonerror="${failonerror}">
+                    <arg line="@{eunit.dll}" />
+                </exec>
+            </sequential>
+        </for>
+        <copy file="${build.drive}\epoc32\winscw\c\shared\Eunit\logs\Eunit_Log.xml" tofile="${build.log.dir}\${build.id}_Eunit_Log.xml" />
+    </target>
+
+</project>

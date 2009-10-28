@@ -1,0 +1,11 @@
+Copy the driver (filedisk.sys) to %systemroot%\system32\drivers\.
+
+Optionally edit filedisk.reg for automatic/manually start and
+number of devices.
+
+Import filedisk.reg to the Registry.
+
+Reboot.
+
+Use the program filedisk.exe to mount/umount files, for an example
+of use see the file example.txt.

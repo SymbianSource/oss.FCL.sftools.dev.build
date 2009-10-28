@@ -1,0 +1,604 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : preparation.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="preparation" xmlns:hlm="http://www.nokia.com/helium">
+    <description>Preparation of a build area and other build initialization.</description>
+    
+    <!-- includes all necessary stuff -->
+    <property name="ccmgetinput" value="ccmgetinput" />
+
+    <import file="bom/bom.ant.xml" />
+    <import file="password.ant.xml" />
+    <import file="ido-prep.ant.xml" />
+    <import file="overlays.ant.xml" />
+    <import file="synergy/ccmgetinput.ant.xml" />
+    <import file="synergy/buildmanagement.ant.xml" />
+    <import file="ivy/dependencies.ant.xml"/>
+
+
+    <!--
+        Gets a release from GRACE.
+        TODO: Improve interface with customer configuration, getenv_options should be replaced by set of properties.
+    -->
+    <target name="preparation-getenv" if="base_release.path" depends="init-build-area">
+        <!-- Making sure we have nothing to pass -->
+        <property name="base_release.path" value=""/>
+        <property name="base_release.getenv_options" value=""/>
+        <!-- Using the cleaned version of getenv.pl -->
+        <property name="getenv.tool.location" location="${helium.dir}/tools/preparation/getenv.pl"/>
+        <hlm:tempRecordStartMacro name="${build.id}_getenv.log"/>        
+        <trycatch>
+            <try>
+                <if>
+                    <not>
+                        <equals arg1="${base_release.getenv_options}" arg2="" />
+                    </not>
+                    <then>
+                        <exec executable="perl" dir="${build.drive}/" failonerror="true">
+                            <arg value="${getenv.tool.location}"/>
+                            <arg value="-start"/>
+                            <arg value="-nosoap"/>            
+                            <arg value="-path"/>
+                            <arg value="${base_release.path}"/>
+                            <arg line="${base_release.getenv_options}"/>
+                        </exec>
+                    </then>
+                    <else>
+                        <exec executable="perl" dir="${build.drive}/" failonerror="true">
+                            <arg value="${getenv.tool.location}"/>
+                            <arg value="-start"/>
+                            <arg value="-nosoap"/>            
+                            <arg value="-path"/>
+                            <arg value="${base_release.path}"/>
+                        </exec>
+                    </else>
+                </if>
+            </try>
+            <catch>
+                <echo message="Error: getenv failed"/>
+            </catch>
+        </trycatch>
+        <hlm:tempRecordStopMacro name="${build.id}_getenv.log" filterref="filterset.getenv"/>
+    </target>
+
+        
+    <!-- Removes an older build area from a machine, based on a count of 
+    how many build areas to maintain at a time.
+    -->
+    <target name="delete-old-build-area" if="build.area.limit">
+        <dirset id="build.area.dirs" dir="${prep.root.dir}" includes="${build.name}*"/>
+        <if>
+            <resourcecount when="greater" count="${build.area.limit}">
+                <dirset refid="build.area.dirs"/>
+            </resourcecount>
+            <then>
+                <pathconvert property="build.area">
+                    <first count="1">
+                        <sort xmlns:rcmp="antlib:org.apache.tools.ant.types.resources.comparators">
+                            <rcmp:date/>
+                            <dirset refid="build.area.dirs"/>
+                        </sort>
+                    </first>
+                </pathconvert>
+                <echo>${build.area}</echo>
+                <shellscript shell="cmd.exe" tmpsuffix=".bat" dir="${prep.root.dir}">
+                    <arg value="/c"/>
+                    <arg value="call"/>
+                    rmdir /s/q ${build.area}
+                </shellscript>
+            </then>
+        </if>
+    </target>
+
+
+    <!-- Defines the start of a build from logging point of view. -->
+    <target name="log-build-start">
+        <tstamp>
+            <format property="log.build.start_time" pattern="yyyy-MM-dd'T'HH:mm:ss" />
+        </tstamp>
+        <!-- Used in ROM configuration files for version date. -->
+        <tstamp>
+            <format property="today" pattern="dd-MM-yyyy" />
+        </tstamp>
+    </target>
+
+
+ 
+     <!-- Prepares the Synergy configuration input for processing.
+     
+     This inserts Ant properties to the config file. --> 
+    <target name="ccm-prepare-input" if="prep.delivery.file">        
+        <property name="prep.delivery.conf.parsed" location="${build.cache.dir}/delivery.xml.parsed" />
+        <copy file="${prep.delivery.file}" tofile="${prep.delivery.conf.parsed}" overwrite="true">
+            <filterchain>
+                <expandproperties />
+            </filterchain>
+        </copy>
+    </target>
+    
+
+    <!-- Checks the build drive is available. -->
+    <target name="check-env-build-drive">
+        <available file="${build.drive}/" property="build.drive.available" />
+        <fail unless="build.drive.available" />
+    </target>
+
+    <!-- Macro to check enough disk space available or not. Notify build manager
+    in case of insufficient disk space. -->
+    <macrodef name="diskspaceMacro" uri="http://www.nokia.com/helium">
+        <attribute name="drive"/>
+        <attribute name="space"/>
+        <sequential>
+            <trycatch>
+                <try>
+                    <exec executable="python" failonerror="true">
+                        <arg value="${helium.dir}/tools/preparation/freedisk.py" />
+                        <arg value="--drive" />
+                        <arg value="@{drive}" />
+                        <arg value="--space" />
+                        <arg value="@{space}" />
+                    </exec>
+                </try>
+                <catch>
+                    <hlm:notifyMacro message="${env.COMPUTERNAME} has insufficient disk space on drive @{drive} for ${build.id}. Build will continue..."/>
+                </catch>
+            </trycatch>
+        </sequential>
+    </macrodef>
+    
+    
+    <!-- Checks there is sufficient disk space on the local machine and on the network. -->
+    <target name="check-free-space">
+        <if>
+            <isset property="local.free.space"/>
+            <then>
+                <echo message="drive: ${build.drive}"/>
+                <echo message="Required Space: ${local.free.space}MB"/>
+                <if>
+                    <not>
+                        <hasfreespace partition="${build.drive}" needed="${local.free.space}M"/>
+                    </not>
+                    <then>
+                        <hlm:notifyMacro message="${env.COMPUTERNAME} has insufficient disk space on drive ${build.drive} for ${build.id}. Build will continue..."/>
+                    </then>
+                </if>
+            </then>
+        </if>
+        <if>
+            <isset property="network.free.space"/>
+            <then>
+                <hlm:diskspaceMacro drive="${network.drive}" space="${network.free.space}"/>
+            </then>
+        </if>
+    </target>
+
+
+    <!-- Checks that filedisk is on the machine.
+    
+    TODO: do we still need this if filedisk is in /external? Also should handle
+    tools dependencies in more structured way. 
+    -->
+    <target name="check-env-filedisk" depends="check-env-build-drive">
+        <available file="${env.SystemRoot}/system32/filedisk.exe" property="filedisk.available" />
+        <fail unless="filedisk.available" />
+    </target>
+
+
+    <!-- Gets the ARM compiler license text. -->
+    <target name="get-arm-license">
+        <exec executable="armcc.exe" outputproperty="arm.compiler.version.text" failonerror="${failonerror}">
+            <arg value="--vsn" />
+        </exec>
+        <echo message="ARM compiler version text: ${arm.compiler.version.text}" />
+    </target>
+
+
+    <!-- Checks if there was any error getting the ARM license information. -->
+    <target name="check-env-arm-license" depends="get-arm-license">
+        <!-- Fail if the compiler version string contains error text. -->
+        <fail message="Error with ARM compiler configuration.">
+            <condition>
+                <contains string="${arm.compiler.version.text}" substring="Error" />
+            </condition>
+        </fail>
+    </target>
+
+
+    <!-- Sets the ARM compiler version to a property so it can be set in the environment
+    during compilation. -->
+    <target name="set-arm-version" depends="check-env-arm-license" unless="not.using.rvct">
+        <loadresource property="arm.compiler.version">
+            <propertyresource name="arm.compiler.version.text"/>
+            <filterchain>
+                <linecontainsregexp>
+                    <regexp pattern="ARM/Thumb C/C\+\+ Compiler" />
+                </linecontainsregexp>
+            </filterchain>
+        </loadresource>
+        <echo message="ARM compiler version: ${arm.compiler.version}" />
+    </target>
+
+
+    <!-- Prepares the preparation configuration by inserting Ant properties. -->
+    <target name="prep-prepare-input" if="prep.config.file">
+        <property name="prep.config.file.parsed" location="${build.output.dir}/prep.xml.parsed" />
+        <copy file="${prep.config.file}" tofile="${prep.config.file.parsed}" overwrite="true">
+            <filterchain>
+                <expandproperties />
+            </filterchain>
+        </copy>
+    </target>
+
+
+    <!-- Checks that all the build area inputs are available. -->
+    <target name="check-env-prep" depends="prep-prepare-input">
+        <preset.exec executable="${env.PERL}" failonerror="true">
+            <arg value="${helium.dir}/tools/preparation/prep_build_area.pl" />
+            <arg value="-config" />
+            <arg value="${prep.config.file.parsed}" />
+            <arg value="-destdir" />
+            <arg value="${build.drive}${env.EPOCROOT}" />
+            <arg value="-dry-run" />
+            <arg value="yes" />
+        </preset.exec>
+    </target>
+
+
+    <!-- Generates a starting XML file for the build summary. -->
+    <target name="build-info" depends="log-build-start">
+        <dirname file="${build.summary.file}" property="build.summary.file.dir"/>
+        <mkdir dir="${build.summary.file.dir}"/>
+        <xmltask dest="${build.log.dir}/${build.id}_info.log.xml">
+            <insert path="/">
+                <![CDATA[
+            <info>
+                <id>${build.id}</id>
+                <number>${build.number}</number>
+                <startTime>${log.build.start_time}</startTime>
+                <machine>${env.COMPUTERNAME}</machine>
+                <publish>
+                    <status>${is.published}</status>
+                    <location>${publish.dir}</location>
+                </publish>
+            </info>
+                ]]>
+            </insert>
+        </xmltask>
+    </target>
+    
+    <propertyset id="password.list.ref">
+        <propertyref name="ccm.password.rc" />
+        <propertyref name="ccm.user.password" />
+        <propertyref name="release.grace.password" />
+        <propertyref name="unix.password" />
+        <propertyref name="release.notes.password" />
+        <propertyref name="nwiki.password" />
+        <propertyref name="noe.password" />
+        <propertyref name="ats3.password" />
+        <propertyref name="hydra.password" />
+    </propertyset>
+    
+    <!-- Logs the Ant property build environment. -->
+    <target name="log-build-env">
+        <echoproperties destfile="${build.log.dir}/${build.id}_ant_env.log">
+            <!-- Do not log passwords... -->
+            <propertyset negate="true">
+                <propertyset refid="password.list.ref"/>
+            </propertyset>
+        </echoproperties>
+    </target>
+    
+    
+    <!-- Create a free substed drive for running the build on.
+        
+    Helium can now subst/unsubst build drive automatically. If you don't define the property "build.drive" then helium will search the next available build drive and assign it to in "build.drive" property.
+    To unsubst the build drive after the build use property "unsubst.after.build=yes", the value "no" will let the drive still in subst.
+        
+    This target will: 
+    * Rename the prep directory if it exists and we don't have prep.build.dir.keep defined. 
+    * Create a new directory for prepping the build area.
+    * Subst that directory to the build drive.
+    -->
+    <target name="prep-drive">
+      
+      <!-- Just un-subst the drive if build.drive is predefined. -->
+        <propertyregex property="prep.build.dir.drive" input="${prep.build.dir}" regexp="^([^:]*:\\).*" select="\1" />
+        <fail message="${prep.build.dir.drive} could not be located">
+            <condition>
+                <and>
+                    <os family='windows'/>
+                    <not>
+                        <available file="${prep.build.dir.drive}"/>
+                    </not>
+                </and>
+            </condition>
+        </fail>
+        <if>
+            <and>
+                <not>
+                    <isset property="env.HLM_SUBCON"/>
+                </not>
+                <isset property="use.dragonfly"/>
+            </and>
+            <then>
+                <antcall target="dragonfly-prep-drive"/>
+            </then>
+            <else>
+                <if>
+                    <not>
+                        <isset property="build.drive.notdefined"/>
+                    </not>
+                    <then>
+                        <echo>Unsubsting any existing path substed to ${build.drive}.
+If this fails, it is because there was no substed drive.</echo>
+                        <hlm:unsubst drive="${build.drive}" failonerror="${failonerror}"/>
+                    </then>   
+                </if>    
+                <tstamp>
+                    <format property="old.prep.dir.timestamp" pattern="yyyyMMdd'_'HHmmss" />
+                </tstamp>
+                <if>
+                    <not>
+                        <isset property="prep.build.dir.keep"/>
+                    </not>
+                    <then>
+                        <script language="jython" setbeans="false">
+from java.io import *
+import time
+prep_build_dir_str = project.getProperty('prep.build.dir')
+prep_build_dir = File(prep_build_dir_str)
+print prep_build_dir
+if prep_build_dir.exists(): 
+    timestamp = time.strftime("%Y%m%d_%H%M%S", time.localtime(time.time()))
+    renamed_prep_build_dir = File('%s.%s' % (prep_build_dir_str, timestamp))
+    print renamed_prep_build_dir
+    result = prep_build_dir.renameTo(renamed_prep_build_dir)
+    if result:
+        print 'Dir rename successful.'
+    else:
+        print 'Dir rename failed!'
+
+        raise Exception('Could not rename prep dir')
+                        </script>
+                    </then>
+                </if>
+                <!-- Create a new directory for the build and subst it to a drive. -->
+                <mkdir dir="${prep.build.dir}" />
+                <exec osfamily="windows" executable="subst.exe" failonerror="false">
+                    <arg value="${build.drive}" />
+                    <arg value="${prep.build.dir}" />
+                </exec>
+                <antcall target="backup-subst-drives"/>
+            </else>
+        </if>
+    </target>
+
+    <!-- To initialization prep-drive-->
+    <target name="init-drive" depends="prep-drive"/>
+
+    <!-- To initialization substituted drive-->
+    <target name="restore-subst-drives">
+        <if>
+            <available file="${cache.dir}/hlmsubsteddrives.bat" type="file"/>
+            <then>
+                <exec dir="${cache.dir}" executable="${cache.dir}/hlmsubsteddrives.bat" osfamily="windows" failonerror="false"/>
+            </then>
+        </if>
+    </target>
+    
+     
+    <!-- Creates several initial directories in a new build area. -->
+    <target name="init-build-area" depends="check-env-build-drive">
+        <mkdir dir="${build.output.dir}" />
+        <mkdir dir="${build.log.dir}" />
+        <mkdir dir="${temp.build.dir}" />
+    </target>
+    
+    
+    <!-- Basic initialization for a build, including starting the main ant_build log.
+        It also copies the additional logs from the temp directory into the build area. -->
+    <target name="init" depends="get-ccm-password">
+        <runtarget target="build-number"/>
+        <runtarget target="init-build-area"/>
+        <runtarget target="start-ant-log"/>
+    </target>
+    
+    <!-- Starting the main ant_build log -->
+    <target name="start-ant-log" depends="build-info">
+        <record name="${build.log}" append="true" loglevel="info"/>
+        <echo>Start main Ant build log: ${build.log}</echo>
+    
+        <echo>Copying temp logs from ${build.cache.log.dir} into the build area.</echo>
+        <copy todir="${build.log.dir}" verbose="true" failonerror="false">
+            <fileset dir="${build.cache.log.dir}">
+                <include name="*.log"/>
+                <include name="*.xml"/>
+            </fileset>
+        </copy>
+    </target>
+    
+    <!-- This target exists as a trigger for initiating the Diamonds logger. If 
+          it is not included in the build sequence, the build will not be logged to 
+          Diamonds. Also  build.property.cache.file will be there contains all the diamonds related properties 
+    --> 
+    <target name="diamonds">
+        <mkdir dir="${build.log.dir}" />
+        <var name="diamonds.build.url"  value="http://${diamonds.host}:${diamonds.port}${diamonds.build.id}"/>
+        <echoproperties destfile="${build.property.cache.file}">
+            <propertyset>
+                <propertyref prefix="diamonds.build.url"/>
+                <propertyref prefix="diamonds.host"/>
+                <propertyref prefix="diamonds.port"/>
+                <propertyref prefix="diamonds.build.id"/>
+            </propertyset>
+        </echoproperties>
+    </target>    
+   
+    <!-- The ido-clean-prep is to be run after compile-clean but before prep copy in order to move old sources away.
+    It uses the "ido.src.root" property.
+    If property "ido.keep.old" is defined, the old files are renamed to a timestamped directory  
+    if not defined the directory for the old  files is "${ido.src.root}.old"
+    <deprecated>IDO which have now implemented the new ADO sysdef structure should use ido-prep-clean.</deprecated>
+    -->
+    <target name="ido-clean-prep" if="ido.src.root" >
+        <if>
+            <isset property="ido.keep.old"/>
+            <then>
+                <tstamp>
+                    <format property="ido.clean.src.extension" pattern="yyyyMMdd'_'HHmmss" />
+                </tstamp>
+            </then>
+            <else>
+                <property name="ido.clean.src.extension" value="old" />
+            </else>
+        </if>
+        <move todir="${ido.src.root}.${ido.clean.src.extension}"  failonerror="false" >
+            <fileset dir="${ido.src.root}" />
+        </move>
+    </target>
+
+
+    <!-- Preps the build area by copying and unzipping all the inputs. -->
+    <target name="prep-copy" depends="prep-prepare-input">
+        <preset.exec executable="${env.PERL}" output="${build.log.dir}/${build.id}_buildarea_prep.log" failonerror="true">
+            <arg value="${helium.dir}/tools/preparation/prep_build_area.pl" />
+            <arg value="-config" />
+            <arg value="${prep.config.file.parsed}" />
+            <arg value="-destdir" />
+            <arg value="${build.drive}${env.EPOCROOT}" />
+            <arg value="-zipdir" />
+            <arg value="${build.drive}/unzip" />
+        </preset.exec>
+        <!-- Delete Symbian file to force S60 version to compile -->
+        <delete file="${build.drive}/epoc32/tools/j2me/hromize.exe" />
+        <!-- parsing the generated log -->
+        <hlm:metadatarecord database="${metadata.dbfile}">
+            <hlm:textmetadatainput>
+                <fileset casesensitive="false" file="${build.log.dir}/${build.id}_buildarea_prep.log" />
+                <metadatafilterset refid="filterset.buildarea.prep" />
+            </hlm:textmetadatainput>
+        </hlm:metadatarecord>
+        <hlm:generateBuildStatus file="${build.id}_buildarea_prep.log" />
+    </target>
+    
+    <condition property="run.ccm">
+        <and>
+            <not>
+                <equals arg1="${ccm.enabled}" arg2="false" casesensitive="true"/>
+            </not>
+            <isset property="ccm.enabled"/>
+        </and>
+    </condition>
+    
+    <!-- Wrapper target to call prep-work-area during the build.
+         log will get recorded under the log directory.
+         Property ccm.enabled has to be set to 'true' to enable that step!
+         prep-work-area-check-errors is also run so it emits a signal in case of errors.
+      -->
+    <target name="do-prep-work-area">
+        <runtarget target="prep-work-area"/>
+    </target>
+    <!-- <deprecated>Please use do-prep-work-area</deprecated> -->
+    <target name="do-ccm-get-input" depends="do-prep-work-area"/>
+    
+    
+    <!-- Wrapper target to call start-remote-builds during the build.
+         log will get recorded under the log directory.
+         Property remote.builds.enabled has to be defined to enable that step!
+      -->
+    <target name="do-start-remote-builds" if="remote.builds.enabled">
+        <runtarget target="start-remote-builds"/>
+    </target>
+    
+    
+    <!-- check-env-prep has to be called after getting the delivery else it doesn't works for the first build. -->
+    <target name="do-prep" depends="check-tool-dependencies,check-free-space,do-prep-work-area,
+                                    do-start-remote-builds,check-env-prep,diamonds,create-bom,log-build-env,prep-copy,
+                                    set-arm-version,scan-overlays" />
+    
+    <!-- Macro to notify user by email/sms -->
+    <macrodef name="notifyMacro" uri="http://www.nokia.com/helium">
+        <attribute name="message"/>
+        <sequential>
+            <runtarget target="lookup-email" />
+            <tstamp>
+                <format property="time.failure" pattern="yyyy-MM-dd_HH.mm.ss" />
+            </tstamp>
+            <preset.mail tolist="${email.from}" subject="${env.COMPUTERNAME} prep stage problem!" message="@{message}" />
+            <!-- Get the first part of email address to use with SMS gateway -->
+            <propertyregex property="email.from.name" input="${email.from}" regexp="(.*?)@" select="\1" />
+            <preset.mail tolist="${email.from.name}@${sms.server}" subject="" message="@{message}" />
+        </sequential>
+    </macrodef>
+    
+    
+    <!-- Fails the build if prep did not succeed. -->
+    <target name="prep-fail">
+        <if>
+            <available file="${build.log}"/>
+            <then>
+                <record name="${build.log}" action="stop" append="true"/>
+            </then>
+        </if>
+        <hlm:metadatarecord database="${metadata.dbfile}">
+            <hlm:antmetadatainput>
+                <fileset casesensitive="false" file="${build.log.dir}/${build.id}_ant_build.log" />
+                <metadatafilterset refid="filterset.ant.output" />
+            </hlm:antmetadatainput>
+        </hlm:metadatarecord>
+        <hlm:generateBuildStatus file="${build.id}_ant_build.log" />
+        <!-- Todo: metadata: insert assertions for metadata parsing here -->
+    </target>
+    
+    <!-- Set properties for track full build event. -->
+    <target name="set-fullbuild-properties">
+        <property name="log.target" value="yes"/>
+        <property name="call.cleanup" value="no"/>
+    </target>
+    
+    <!-- Top-level target for preparing the build area. -->
+    <target name="prep" depends="set-fullbuild-properties,init-drive,init">
+        <trycatch property="build.exception">
+            <try>
+                <runtarget target="do-prep" />
+            </try>
+            <catch>
+                <echo message="Build has failed during prep: ${build.exception}" />
+                <runtarget target="prep-fail" />
+                <fail />
+            </catch>
+        </trycatch>
+    </target>
+
+    
+    <!-- Can be used to unsubst the drive . -->
+    <target name="remove-drive">
+        <if>
+            <os family="windows"/>
+            <then>
+                <hlm:unsubst drive="${build.drive}"/>
+            </then>
+        </if>
+    </target>
+    
+    
+</project>

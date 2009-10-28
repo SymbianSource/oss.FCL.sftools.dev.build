@@ -1,0 +1,24 @@
+*********************************************************************************************************************************
+* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies). 
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Symbian Foundation License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.symbianfoundation.org/legal/sfl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description:
+* Version 1.0.1 
+* - Changed all source files to use Symbian foundation specific headers.
+* - Fixed a minor bug. 
+* - Updated the mingw_make.exe to same version as in iMaker (3.81-3). Added gpl.licence.txt
+* - Added cmaker_version.txt and cmaker_readme.txt
+*
+* Version 1.0.0 
+* - First version of cmaker
+
+cmaker - The config maker, version 1.0.1, 04-Feb-2009, svn@844.

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : eggs-1.0.ivy.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<ivy-module version="1.3">
+    <info 
+        organisation="python"
+        module="eggs"
+        revision="1.0"/>
+        
+        <publications>
+        <artifact name="4Suite_XML" ext="egg" type="egg" url="http://pypi.python.org/packages/2.5/4/4Suite-XML/4Suite_XML-1.0.2-py2.5-win32.egg"/>
+        <artifact name="Amara" ext="egg" type="egg" url="http://pypi.python.org/packages/2.5/A/Amara/Amara-1.2.0.2-py2.5.egg"/>
+        <artifact name="Jinja" ext="egg" type="egg" url="http://pypi.python.org/packages/2.5/J/Jinja/Jinja-1.2-py2.5-win32.egg"/>
+        <artifact name="Pygments" ext="egg" type="egg" url="http://pypi.python.org/packages/2.5/P/Pygments/Pygments-0.10-py2.5.egg"/>
+        
+        <!-- Sphinx must be unzipped -->
+        <artifact name="Sphinx" ext="egg" type="egg" url="http://pypi.python.org/packages/2.5/S/Sphinx/Sphinx-0.4.1-py2.5.egg"/>
+        
+        <artifact name="simplejson" ext="egg" type="egg" url="http://pypi.python.org/packages/2.5/s/simplejson/simplejson-1.7.1-py2.5.egg"/>
+        
+        <!-- Helium version has been modified -->
+        <artifact name="ZSI" ext="egg" type="egg" url="http://pypi.python.org/packages/2.5/Z/ZSI/ZSI-2.0_rc3-py2.5.egg"/>
+        
+        <artifact name="PyXML" ext="egg" type="egg" url="http://code.enthought.com/enstaller/eggs/windows/xp/PyXML-0.8.4.0002-py2.5-win32.egg"/>
+        <artifact name="docutils" ext="egg" type="egg" url="http://code.enthought.com/enstaller/eggs/windows/xp/docutils-0.3.9.0002-py2.5.egg"/>
+        <artifact name="epydoc" ext="egg" type="egg" url="http://code.enthought.com/enstaller/eggs/windows/xp/epydoc-2.0.0002-py2.5.egg"/>
+        <artifact name="nose" ext="egg" type="egg" url="http://code.enthought.com/enstaller/eggs/windows/xp/nose-0.9.3.0002-py2.5.egg"/>
+        
+                
+        <artifact name="distutils" ext="zip" type="egg" url="http://www.python.org/community/sigs/current/distutils-sig/download/Distutils-1.0.2.zip"/>
+        <artifact name="logilab-common" ext="tar.gz" type="egg" url="ftp://ftp.logilab.fr/pub/common/logilab-common-0.32.0.tar.gz"/>
+        
+        <artifact name="mocker" ext="tar.bz2" type="egg" url="http://launchpad.net/mocker/trunk/0.10.1/+download/mocker-0.10.1.tar.bz2"/>
+        <artifact name="path" ext="zip" type="egg" url="http://pypi.python.org/packages/source/p/path.py/path-2.2.zip#md5=941660081788282887f652510d80e64e"/>
+        <artifact name="psyco" ext="tar.gz" type="egg" url="http://mesh.dl.sourceforge.net/sourceforge/psyco/psyco-1.6-src.tar.gz"/>
+        <artifact name="pylint" ext="tar.gz" type="egg" url="ftp://ftp.logilab.fr/pub/pylint/pylint-0.14.0.tar.gz"/>
+        <artifact name="pyrtf" ext="tar.gz" type="egg" url="http://kent.dl.sourceforge.net/sourceforge/pyrtf/PyRTF-0.45.tar.gz"/>
+        <artifact name="lxml" ext="egg" type="egg" url="http://pypi.python.org/packages/2.5/l/lxml/lxml-2.0.6-py2.5-win32.egg"/>
+        <!--
+        <artifact name="mock" ext="py" type="egg" url="http://www.voidspace.org.uk/cgi-bin/voidspace/downman.py?section=python&file=mock.py"/>
+        -->
+      </publications>
+
+
+</ivy-module>

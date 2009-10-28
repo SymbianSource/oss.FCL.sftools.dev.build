@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<diamonds-build>
+    <schema>10</schema>    
+    <stages>
+      <stage>    
+            <name>build</name>
+            <started>2009-02-03T01:17:52</started>
+            <finished>2009-02-03T01:17:52</finished>
+     </stage>
+    </stages>
+</diamonds-build>

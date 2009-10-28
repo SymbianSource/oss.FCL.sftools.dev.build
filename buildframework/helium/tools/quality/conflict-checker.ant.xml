@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : conflict-checker.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="quality.conflict-checker" xmlns:hlm="http://www.nokia.com/helium">
+    <description>
+        Analyse the content created from two different components.
+    </description>
+
+    <property name="build.duplicates.log" location="${build.log.dir}/${build.id}_build_duplicates.xml" />
+
+    <!--
+        This macro extract the list of files generated/exported several time from different component 
+        during the build . It uses the output of "abld -what" commands to extract the information.
+        The output is an XML file that can be transform to anything using XSLT of FMPP.
+        e.g:
+        <pre>
+        <hlm:checkBuildDuplicatesMacro output="${build.duplicates.log}">
+               <fileset dir="${build.log.dir}">
+                <include name="${build.id}.*_compile.log"/>
+                <include name="${build.id}.what.cmaker.log"/>
+                <exclude name="${build.id}.*_output_build.log"/>
+            </fileset>
+        </hlm:checkBuildDuplicatesMacro>
+        </pre>
+    -->
+    <scriptdef name="checkBuildDuplicatesMacro" language="jython" uri="http://www.nokia.com/helium">
+        <attribute name="output" />
+        <element name="fileset" type="fileset" />
+        <![CDATA[
+import integration.ant
+integration.ant.check_build_duplicates_task(project, self, attributes, elements)
+        ]]>
+    </scriptdef>
+
+    <!-- 
+       Check if the build duplicated needs to be run.
+    -->
+    <target name="check-build-duplicates">
+        <if>
+            <or>
+                <equals arg1="${build.system}" arg2="sbs" />
+                <equals arg1="${build.system}" arg2="sbs-ec" />
+            </or>
+            <then>
+                <property name="skip.build.duplicates" value="" />
+            </then>
+        </if>
+    </target>
+
+    <!-- Parse all the build log and extract files that are generated/exported
+        several times.
+    -->
+    <target name="integration-build-duplicates" depends="check-build-duplicates" unless="skip.build.duplicates">
+        <hlm:checkBuildDuplicatesMacro output="${build.duplicates.log}">
+            <fileset dir="${build.log.dir}">
+                <include name="${build.id}.*_compile.log" />
+                <include name="${build.id}.what.cmaker.log" />
+                <exclude name="${build.id}.*_output_build.log" />
+            </fileset>
+        </hlm:checkBuildDuplicatesMacro>
+    </target>
+
+    <!-- Render the build duplicates xml file into an HTML output. -->
+    <target name="render-build-duplicates" depends="integration-build-duplicates" unless="skip.build.duplicates">
+        <fmpp sourceFile="${helium.dir}/tools/common/templates/integration/build-duplicates.html.ftl" outputFile="${build.log.dir}/${build.id}_build-duplicates.html">
+            <freemarkerLinks expandProperties="yes">
+                            macro: ${helium.dir}/tools/common/templates/macro
+                        </freemarkerLinks>
+            <data expandProperties="yes">
+                            doc: xml(${build.duplicates.log})
+                            ant: antProperties()
+                        </data>
+        </fmpp>
+    </target>
+
+</project>

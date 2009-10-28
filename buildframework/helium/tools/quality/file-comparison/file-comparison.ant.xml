@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : file-comparison.ant.xml
+Part of     : Helium
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="quality.file-comparison" xmlns:hlm="http://www.nokia.com/helium">
+    <description>
+    File comparison integration using Beyond Compare.
+    </description>
+
+    <property name="file-comparison.bcomp_path" location="C:\APPS\bc\BComp.exe" />
+    <property name="file-comparison.bcomp_conf" location="${helium.dir}/tools/quality/file-comparison/BCompare-config.txt" />
+    <property name="file-comparison.output" location="${build.output.dir}/file_comparison" />
+    <property name="file-comparison.left_name" value="left" />
+    <property name="file-comparison.right_name" value="right" />
+    <property name="file-comparison.regexp.from" value="(.*)" />
+    <property name="file-comparison.regexp.to" value="\1" />
+
+    <!--
+        Target to run the file-comparison with Beyond Compare.
+        Compares two filesets: file-comparison.left_side and file-comparison.right_side.
+        It is also possible to use regexps to replace text in file names.
+    -->
+    <target name="file-comparison">
+        <trycatch property="file-comparison.exception">
+            <try>
+                <copy todir="${file-comparison.output}/${file-comparison.left_name}">
+                    <fileset refid="file-comparison.left_side" />
+                    <regexpmapper from="${file-comparison.regexp.from}" to="${file-comparison.regexp.to}" />
+                </copy>
+                <copy todir="${file-comparison.output}/${file-comparison.right_name}">
+                    <fileset refid="file-comparison.right_side" />
+                    <regexpmapper from="${file-comparison.regexp.from}" to="${file-comparison.regexp.to}" />
+                </copy>
+                <exec executable="${file-comparison.bcomp_path}">
+                    <arg value="@${file-comparison.bcomp_conf}" />
+                    <arg value="/closescript"/>
+                    <arg value="${file-comparison.output}/${file-comparison.left_name}" />
+                    <arg value="${file-comparison.output}/${file-comparison.right_name}" />
+                    <arg value="${file-comparison.output}/file_comparison_report" />
+                </exec>
+                <delete dir="${file-comparison.output}/${file-comparison.left_name}" />
+                <delete dir="${file-comparison.output}/${file-comparison.right_name}" />
+            </try>
+            <catch>
+                <echo>WARNING: Caught exception in file-comparison target: ${file-comparison.exception}</echo>
+            </catch>
+        </trycatch>
+    </target>
+
+</project>

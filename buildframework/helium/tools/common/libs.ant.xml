@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : libs.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="libs">
+    <description>
+        Ant task definition declarations.
+    </description>
+
+    
+    <path id="lib.path">
+        <fileset dir="${helium.dir}/external/antlibs" includes="**/*.jar"/>
+        <fileset dir="${helium.dir}/tools/common/java/lib" includes="nokia_ant.jar"/>
+    </path>
+    
+    <!-- External tasks. -->
+    <taskdef resource="net/sf/antcontrib/antlib.xml" classpathref="lib.path"/>
+    <taskdef resource="org/apache/ant/antunit/antlib.xml" classpathref="lib.path" uri="org.apache.ant.antunit"/>
+    <taskdef name="xmltask" classname="com.oopsconsultancy.xmltask.ant.XmlTask" classpathref="lib.path"/>
+    <taskdef name="antform" classname="com.sardak.antform.AntForm" classpathref="lib.path" onerror="ignore"/>
+    <taskdef resource="org/tigris/subversion/svnant/svnantlib.xml" classpathref="lib.path" onerror="ignore"/>
+    <taskdef resource="org/apache/ivy/ant/antlib.xml" uri="antlib:org.apache.ivy.ant" classpathref="lib.path"/>
+    <property name="ant.regexp.regexpimpl" value="org.apache.tools.ant.util.regexp.JakartaOroRegexp" classpathref="lib.path"/>
+    <taskdef name="xinclude" classname="de.jeckle.AntExtension.XIncludeTask"/>
+    <!--<taskdef name="xcluder" classname="gr.abiss.xcluder.XercesXcluder" classpathref="lib.path" />-->
+    <taskdef name="fmpp" classname="fmpp.tools.AntTask" classpathref="lib.path" onerror="report"/>
+    <taskdef name="xpathtest" classname="se.jtech.ant.xpath.XPathEvaluatorTask" classpathref="lib.path" onerror="ignore"/>
+    <taskdef classpathref="lib.path" resource="emma_ant.properties" />
+    
+    <!-- Nokia internal tasks. -->
+    <taskdef resource="com/nokia/ant/antlib.xml" classpathref="lib.path" uri="http://www.nokia.com/helium"/>
+
+
+    <!-- This step load the com.nokia.ant.BSFJepEngine class and activate the BSF 
+       registration mechanism.
+    -->
+    <if>
+        <not>
+            <available classname="com.nokia.ant.BSFJepEngine"/>
+        </not>
+        <then>
+            <echo>Jepp is not installed.</echo>    
+        </then>    
+    </if>    
+        
+</project>

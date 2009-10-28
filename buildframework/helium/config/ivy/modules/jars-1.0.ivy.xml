@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : jars-1.0.ivy.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<ivy-module version="1.3">
+    <info 
+        organisation="java"
+        module="jars"
+        revision="1.0"/>
+        
+        <publications>
+        <artifact name="jera" ext="jar" type="jar" url="http://www.jera.com/tools/anttasks/JeraAntTasks.jar"/>
+        <!-- License: GPL -->
+        <artifact name="antdoclet" ext="zip" type="jar" url="http://download.berlios.de/antdoclet/antdoclet-1.1.zip"/>
+        <artifact name="svnant" ext="zip" type="jar" url="http://subclipse.tigris.org/files/documents/906/32898/svnant-1.0.0.zip"/>
+        <artifact name="sqlitejdbc" ext="jar" type="jar" url="http://files.zentus.com/sqlitejdbc/sqlitejdbc-v054.jar"/>
+     </publications>
+</ivy-module>

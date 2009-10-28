@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : validate-policy.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="quality.validate-policy" xmlns:hlm="http://www.nokia.com/helium">
+    <description>
+    Policy file validation.
+    </description>
+
+    <property name="validate.policy.log" location="${build.log.dir}/${build.id}_validate-policy.summary.xml" />
+    <property name="validate.policy.log.xml" location="${build.log.dir}/${build.id}_validate-policy.log.xml" />
+    <property name="validate.policy.csv" location="${helium.dir}/tests/minibuilds/compile/distribution.policy.extended_for_sf.id_status.csv" />
+    <property name="validate.policy.ignoreroot" value="false" />
+    <property name="validate.policy.pattern" value="distribution.policy.s60,distribution.policy" />
+
+    <!-- Default path settings for policy validation. -->
+    <path id="reference.policy.path.list">
+        <pathelement path="${build.drive}/s60" />
+    </path>
+
+    <!--
+    This task scan the directory provided by the path element, and valitate the content of the 
+    Distribution.policy.S60 file using some default rules. IDs could also be validate using a CSV input file.
+    'ignoreroot' specifies to ignore the toplevel directory.
+    
+    e.g.
+    <pre>
+      <hlm:validatePolicyMacro output="${validate.policy.log}"
+          ids="${validate.policy.csv}"
+          ignoreroot="${validate.policy.ignoreroot}">
+          <path refid="reference.policy.path.list"/>
+      </hlm:validatePolicyMacro>
+    </pre>
+  -->
+    <scriptdef name="validatePolicyMacro" language="jython" uri="http://www.nokia.com/helium">
+        <attribute name="output" />
+        <attribute name="ignoreroot" />
+        <attribute name="ids" />
+        <attribute name="pattern" />
+        <element name="path" type="path" />
+        <![CDATA[
+import integration.quality
+import os
+ignoreroot = False
+if (attributes.get('ignoreroot') != None) and (str(attributes.get('ignoreroot')).lower() == "true"):
+    self.log("Ignoring root path.")
+    ignoreroot = True
+
+output = None
+if attributes.get('output') is not None:
+    self.log("Creating %s" % str(attributes.get('output')))
+    output = open(str(attributes.get('output')), "w+")
+    output.write("<?xml version=\"1.0\"?>\n<policyvalidation>\n")
+components_per_file = {}
+
+pattern = ['distribution.policy.s60']
+if attributes.get('pattern') != None:
+    pattern = str(attributes.get('pattern')).split(',')
+
+validator = integration.quality.PolicyValidator(pattern, ignoreroot=ignoreroot)
+
+if attributes.get('ids') is not None:
+    self.log("Loading policy ids from: %s" % str(attributes.get('ids')))
+    if not os.path.exists(str(attributes.get('ids'))):
+        self.log("ERROR: Could not find: %s" % str(attributes.get('ids')), project.MSG_ERR)
+    else:
+        for result in validator.load_policy_ids(str(attributes.get('ids'))):
+            self.log(str("%s: - %s - %s" % (result[0], result[1], result[2])), project.MSG_ERR)
+            if output is not None:
+                output.write("    <error type=\"%s\" message=\"%s\" value=\"%s\"/>\n" % (result[0], result[1], result[2]))
+
+for eid in range(elements.get("path").size()):
+    iterator = elements.get("path").get(int(eid)).iterator()
+    while iterator.hasNext():
+        path = str(iterator.next())
+        self.log("Scanning " + path)
+        for result in validator.validate(path):
+            self.log("%s: %s" % (result[0], result[1]), project.MSG_ERR)
+            if output is not None:
+                output.write("    <error type=\"%s\" message=\"%s\" value=\"%s\"/>\n" % (result[0], result[1], result[2]))
+    
+if output is not None:
+    output.write("</policyvalidation>\n")
+    output.close()
+    ]]>
+  </scriptdef>
+
+    <!--
+    Parse all the path defined by 'reference.policy.path.list' and check all policy files.
+    It generates an XML log defined by property 'validate.policy.log'.
+  -->
+    <target name="integration-validate-policy">
+        <mkdir dir="${build.log.dir}"/>
+        <hlm:validatePolicyMacro output="${validate.policy.log}" ids="${validate.policy.csv}" ignoreroot="${validate.policy.ignoreroot}" pattern="${validate.policy.pattern}">
+            <path refid="reference.policy.path.list" />
+        </hlm:validatePolicyMacro>
+        <hlm:metadatarecord database="${metadata.dbfile}">
+            <hlm:policymetadatainput>
+                <fileset casesensitive="false" file="${validate.policy.log}/" />
+            </hlm:policymetadatainput>
+        </hlm:metadatarecord>
+        <hlm:generateBuildStatus file="${build.id}_validate_policy.log" />
+    </target>
+
+    <!--
+    Render the policy validation xml file ('validate.policy.log') into an text output.
+  -->
+    <target name="render-validate-policy" depends="integration-validate-policy">
+        <if>
+            <not>
+                <istrue value="${metadata.enable}" />
+            </not>
+            <then>
+                <fmpp sourceFile="${helium.dir}/tools/common/templates/integration/validate-policy.log.ftl" outputFile="${build.log.dir}/${build.id}_validate-policy.log">
+                    <freemarkerLinks expandProperties="yes">
+                      macro: ${helium.dir}/tools/common/templates/macro
+                  </freemarkerLinks>
+                    <data expandProperties="yes">
+                      doc: xml(${validate.policy.log})
+                      ant: antProperties()
+                    </data>
+                </fmpp>
+                <fmpp sourceFile="${helium.dir}/tools/common/templates/integration/validate-policy.log.xml.ftl" outputFile="${validate.policy.log.xml}">
+                    <freemarkerLinks expandProperties="yes">
+                      macro: ${helium.dir}/tools/common/templates/macro
+                  </freemarkerLinks>
+                    <data expandProperties="yes">
+                      doc: xml(${validate.policy.log})
+                      ant: antProperties()
+                    </data>
+                </fmpp>
+            </then>
+            <else>
+                <!-- Todo: check and if required convert as metadata template -->
+            </else>
+        </if>
+    </target>
+
+    <!-- Target that will apply regular IDO validation rules on Helium. -->
+    <target name="validate-helium-policy">
+        <hlm:validatePolicyMacro>
+            <path>
+                <pathelement path="${helium.dir}/" />
+            </path>
+        </hlm:validatePolicyMacro>
+    </target>
+
+    <!--
+      Internal target that set an intermediate property to disable policy validation execution.
+    -->
+    <target name="ido-validate-policy-skip">
+        <if>
+            <istrue value="${skip.policy-validation}"/>
+            <then>
+                <property name="do.skip.policy-validation" value="1"/>
+            </then>
+        </if>
+    </target>
+    
+    <!-- Policy validation target for IDO. Only detected ADO will get scanned. -->    
+    <target name="ido-validate-policy" depends="ido-create-ado-mapping,ido-validate-policy-skip" unless="do.skip.policy-validation">
+        <hlm:iniKeys2Path ini="${ado.quality.mapping.file}" pathid="reference.policy.path.list"/>
+        <runtarget target="render-validate-policy" />
+    </target>
+
+</project>

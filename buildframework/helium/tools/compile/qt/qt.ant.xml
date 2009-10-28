@@ -1,0 +1,124 @@
+<?xml version="1.0"?>
+<!--
+============================================================================
+Name        : qt.ant.xml
+Part of     : Helium
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="qt" xmlns:hlm="http://www.nokia.com/helium">
+    <description>
+    Qt build support.
+    </description>
+    
+    <property name="qt.dir" location="${build.drive}/qt"/>
+    <property name="qt.configure.log.name" value="${build.id}_configure-qt.log"/>
+    <property name="qt.qmake.ant.template" location="${helium.dir}/tools/compile/qt/templates/run-qmake.ant.xml.ftl" />
+    <property name="qt.qmake.makefile.template" location="${helium.dir}/tools/compile/qt/templates/run-qmake.mk.ftl" />
+    <property name="qt.configure.args" value="-platform win32-mwc -xplatform symbian-abld -confirm-license"/>
+    <property name="qt.qmake.default.args" value="-platform symbian-abld -r"/>
+    
+    <!-- This target will run the configure tool under Qt (qt.dir) in order to create the
+        qmake tool and configure the Qt project for symbian building.
+        <deprecated>This target and its configuration are not maintained anymore, please consider building Qt using 
+         Symbian toolchain.</deprecated> 
+     -->
+    <target name="configure-qt">
+        <hlm:recordStartMacro name="${qt.configure.log.name}"/>
+        <exec dir="${qt.dir}" executable="${qt.dir}/configure.exe" failonerror="false">
+            <arg line="${qt.configure.args}"/>
+        </exec>
+        <hlm:recordStopMacro name="${qt.configure.log.name}"/>
+        <hlm:metadatarecord database="${metadata.dbfile}">
+            <hlm:textmetadatainput>
+                <fileset casesensitive="false" file="${build.log.dir}/${qt.configure.log.name}"/>
+                <metadatafilterset refid="filterset.qt.configure" />
+            </hlm:textmetadatainput>
+        </hlm:metadatarecord>
+        <hlm:generateBuildStatus file="${qt.configure.log.name}" />
+    </target>
+
+    <!--
+        Executing qmake on all Qt components defined under the system definition file.
+        It must use schema v1.5.0+, and Qt unit must define a proFile attibute.   
+     -->
+    <target name="run-qmake" if="qmake.enabled">
+        <!-- Generating the build steps from the sysdef information -->
+        <hlm:generate-layers />
+        <if>
+            <or>
+                <equals arg1="${build.system}" arg2="ec-helium" />
+                <equals arg1="${build.system}" arg2="sbs-ec" />
+            </or>
+            <then>
+                <fmpp sourceFile="${qt.qmake.makefile.template}"
+                    outputFile="${temp.build.dir}/run-qmake-${sysdef.configuration}.mk">
+                    <data expandProperties="yes">
+                        data: xml(${build.drive}/output/build/canonical_system_definition_${sysdef.configuration}.xml)
+                        ant: antProperties()
+                    </data>
+                </fmpp>
+                <hlm:assertFileExists file="${temp.build.dir}/run-qmake-${sysdef.configuration}.mk" />
+    
+                <!-- Running the qmake steps -->
+                <hlm:emakeMacro name="run-qmake-${sysdef.configuration}" makefile="${temp.build.dir}/run-qmake-${sysdef.configuration}.mk"
+                    target="all" dir="${build.drive}/" log="${build.log.dir}/${build.id}_${sysdef.configuration}.qmake.log"
+                    annodetail="basic,history,file,waiting"
+                    failonerror="false" />
+                <hlm:assertFileExists file="${build.log.dir}/${build.id}_${sysdef.configuration}.qmake.log" />
+            </then>
+            <else>
+                <fmpp sourceFile="${qt.qmake.ant.template}"
+                    outputFile="${temp.build.dir}/run-qmake-${sysdef.configuration}.ant.xml">
+                    <data expandProperties="yes">
+                        data: xml(${build.drive}/output/build/canonical_system_definition_${sysdef.configuration}.xml)
+                        ant: antProperties()
+                    </data>
+                </fmpp>
+                <hlm:assertFileExists file="${temp.build.dir}/run-qmake-${sysdef.configuration}.ant.xml" />
+    
+                <!-- Running the qmake steps -->
+                <ant antfile="${temp.build.dir}/run-qmake-${sysdef.configuration}.ant.xml" dir="${build.drive}/"
+                    output="${build.log.dir}/${build.id}_${sysdef.configuration}.qmake.log"/>
+                <hlm:assertFileExists file="${build.log.dir}/${build.id}_${sysdef.configuration}.qmake.log" />
+            </else>
+        </if>
+        <copy file="${build.log.dir}/${build.id}_${sysdef.configuration}.qmake.log" tofile="${build.log.dir}/${build.id}_${sysdef.configuration}.qmake.generated.txt">
+            <filterchain>
+                <linecontainsregexp>
+                    <regexp pattern="Generating"/>
+                </linecontainsregexp>
+            </filterchain>
+        </copy>
+        <replaceregexp file="${build.log.dir}/${build.id}_${sysdef.configuration}.qmake.generated.txt" match="^\s*(?:\[exec\])?\s*Generating[^/\\]*." replace="" byline="true"/>
+        <hlm:assertFileExists file="${build.log.dir}/${build.id}_${sysdef.configuration}.qmake.generated.txt"/>
+        <hlm:metadatarecord database="${metadata.dbfile}">
+            <hlm:textmetadatainput>
+                <fileset casesensitive="false" file="${build.log.dir}/${build.id}_${sysdef.configuration}.qmake.log" />
+                <metadatafilterset>
+                    <metadatafilter priority="error" regex="^Error processing project file:" description="qt error" />
+                    <metadatafilter priority="error" regex="^'.*' is not recognized as an internal or external command," description="qt error" />
+                    <metadatafilter priority="error" regex="^Result: [1-9][0-9]*" description="qt error" />
+                    <metadatafilter priority="warning" regex="^WARNING:" description="qt error" />
+                    <metadatafilter priority="info" regex="INFO:" description="qt error" />
+                </metadatafilterset>
+            </hlm:textmetadatainput>
+        </hlm:metadatarecord>
+        <hlm:signalMacro logfile="${build.id}_${sysdef.configuration}.qmake.log" 
+            signal.input="signalRunQMakeInput" />
+    </target>
+</project>

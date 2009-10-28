@@ -1,0 +1,84 @@
+Buildfile: functionality\test_regex.ant.xml
+
+test-readdata:
+     [fmpp] args.size:6
+     [fmpp] arg-list:E:\Build_E\eclipse_fasym013\helium-antlib-trunk\sf\metadata\tests\output\log_all_filterfile.db
+     [fmpp] arg-list:LOG_ALL_FILTERFILE
+     [fmpp] arg-list:10
+     [fmpp] arg-list:-1
+     [fmpp] arg-list:where priority='WARNING'
+     [fmpp] arg-list:true
+     [fmpp] offset-1
+     [fmpp] recordLimit10
+     [fmpp] Initializing the db
+     [fmpp] updating queries
+     [fmpp] adding table details
+     [fmpp] adding record size
+     [fmpp] updateQuery:-1
+     [fmpp] sqlquery:SELECT COUNT(*) AS COUNT FROM LOG_ALL_FILTERFILE where priority='WARNING'
+     [fmpp] record count:36
+     [fmpp] recordcount:36
+     [fmpp] updatequery:10
+     [fmpp] maxoffset:4
+     [fmpp] iterator constructor called
+     [fmpp] checking any more element
+     [fmpp] SQLTemplateModelIterator:offset:0
+     [fmpp] adding table details
+     [fmpp] adding record size
+     [fmpp] updateQuery:0
+     [fmpp] adding records
+     [fmpp] actual query:where priority='WARNING'
+     [fmpp] sql querySELECT * from LOG_ALL_FILTERFILE where priority='WARNING' limit 10 offset 0;
+     [fmpp] no. of columns from query result:3
+     [fmpp] record size in getRecords:10
+     [fmpp] actual query:where priority='WARNING'
+     [fmpp] sql querySELECT * from LOG_ALL_FILTERFILE where priority='WARNING' limit 10 offset 0;
+     [fmpp] no. of columns from query result:3
+     [fmpp] record size in getRecords:10
+     [fmpp] checking any more element
+     [fmpp] SQLTemplateModelIterator:offset:10
+     [fmpp] adding table details
+     [fmpp] adding record size
+     [fmpp] updateQuery:10
+     [fmpp] adding records
+     [fmpp] actual query:where priority='WARNING'
+     [fmpp] sql querySELECT * from LOG_ALL_FILTERFILE where priority='WARNING' limit 10 offset 10;
+     [fmpp] no. of columns from query result:3
+     [fmpp] record size in getRecords:10
+     [fmpp] actual query:where priority='WARNING'
+     [fmpp] sql querySELECT * from LOG_ALL_FILTERFILE where priority='WARNING' limit 10 offset 10;
+     [fmpp] no. of columns from query result:3
+     [fmpp] record size in getRecords:10
+     [fmpp] checking any more element
+     [fmpp] SQLTemplateModelIterator:offset:20
+     [fmpp] adding table details
+     [fmpp] adding record size
+     [fmpp] updateQuery:20
+     [fmpp] adding records
+     [fmpp] actual query:where priority='WARNING'
+     [fmpp] sql querySELECT * from LOG_ALL_FILTERFILE where priority='WARNING' limit 10 offset 20;
+     [fmpp] no. of columns from query result:3
+     [fmpp] record size in getRecords:10
+     [fmpp] actual query:where priority='WARNING'
+     [fmpp] sql querySELECT * from LOG_ALL_FILTERFILE where priority='WARNING' limit 10 offset 20;
+     [fmpp] no. of columns from query result:3
+     [fmpp] record size in getRecords:10
+     [fmpp] checking any more element
+     [fmpp] SQLTemplateModelIterator:offset:30
+     [fmpp] adding table details
+     [fmpp] adding record size
+     [fmpp] updateQuery:30
+     [fmpp] adding records
+     [fmpp] actual query:where priority='WARNING'
+     [fmpp] sql querySELECT * from LOG_ALL_FILTERFILE where priority='WARNING' limit 10 offset 30;
+     [fmpp] no. of columns from query result:3
+     [fmpp] record size in getRecords:6
+     [fmpp] actual query:where priority='WARNING'
+     [fmpp] sql querySELECT * from LOG_ALL_FILTERFILE where priority='WARNING' limit 10 offset 30;
+     [fmpp] no. of columns from query result:3
+     [fmpp] record size in getRecords:6
+     [fmpp] checking any more element
+     [fmpp] File processed.
+
+BUILD SUCCESSFUL
+Total time: 0 seconds

@@ -1,0 +1,1336 @@
+Buildfile: functionality\test_regex.ant.xml
+
+test-readdata:
+     [fmpp] args.size:1
+     [fmpp] arg-list:E:\Build_E\eclipse_fasym013\helium-antlib-trunk\sf\metadata\tests\functionality/../output/log_all_filterfile.db
+     [fmpp] QueryModel:select * from priority
+     [fmpp] query in SQLTemplateModelselect * from priority
+     [fmpp] QueryModel:select * from component
+     [fmpp] query in SQLTemplateModelselect * from component
+     [fmpp] QueryModel:select * from logpath
+     [fmpp] query in SQLTemplateModelselect * from logpath
+     [fmpp] isDataRead:false
+     [fmpp] sql queryselect * from priority
+     [fmpp] data:0
+     [fmpp] data:''
+     [fmpp] data:1
+     [fmpp] data:ERROR
+     [fmpp] data:2
+     [fmpp] data:WARNING
+     [fmpp] data:3
+     [fmpp] data:CRITICAL
+     [fmpp] data:4
+     [fmpp] data:REMARK
+     [fmpp] indexmap size5
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:3
+     [fmpp] datalist size1
+     [fmpp] QueryModel:select count(logText) as COUNT from metadata_table where priority_id=3
+     [fmpp] query in SQLTemplateModelselect count(logText) as COUNT from metadata_table where priority_id=3
+     [fmpp] isDataRead:false
+     [fmpp] sql queryselect count(logText) as COUNT from metadata_table where priority_id=3
+     [fmpp] data:2
+     [fmpp] indexmap size1
+     [fmpp] sql queryselect count(logText) as COUNT from metadata_table where priority_id=3
+     [fmpp] columnName:COUNT
+     [fmpp] resultSet MetaData column Count=1
+     [fmpp] adding records
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:2
+     [fmpp] datalist size1
+     [fmpp] QueryModel:select count(logText) as COUNT from metadata_table where priority_id=2
+     [fmpp] query in SQLTemplateModelselect count(logText) as COUNT from metadata_table where priority_id=2
+     [fmpp] isDataRead:false
+     [fmpp] sql queryselect count(logText) as COUNT from metadata_table where priority_id=2
+     [fmpp] data:36
+     [fmpp] indexmap size1
+     [fmpp] sql queryselect count(logText) as COUNT from metadata_table where priority_id=2
+     [fmpp] columnName:COUNT
+     [fmpp] resultSet MetaData column Count=1
+     [fmpp] adding records
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:1
+     [fmpp] datalist size1
+     [fmpp] QueryModel:select count(logText) as COUNT from metadata_table where priority_id=1
+     [fmpp] query in SQLTemplateModelselect count(logText) as COUNT from metadata_table where priority_id=1
+     [fmpp] isDataRead:false
+     [fmpp] sql queryselect count(logText) as COUNT from metadata_table where priority_id=1
+     [fmpp] data:32
+     [fmpp] indexmap size1
+     [fmpp] sql queryselect count(logText) as COUNT from metadata_table where priority_id=1
+     [fmpp] columnName:COUNT
+     [fmpp] resultSet MetaData column Count=1
+     [fmpp] adding records
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] QueryModel:select count(logText) as COUNT from metadata_table where priority_id=0
+     [fmpp] query in SQLTemplateModelselect count(logText) as COUNT from metadata_table where priority_id=0
+     [fmpp] isDataRead:false
+     [fmpp] sql queryselect count(logText) as COUNT from metadata_table where priority_id=0
+     [fmpp] data:0
+     [fmpp] indexmap size1
+     [fmpp] sql queryselect count(logText) as COUNT from metadata_table where priority_id=0
+     [fmpp] columnName:COUNT
+     [fmpp] resultSet MetaData column Count=1
+     [fmpp] adding records
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:4
+     [fmpp] datalist size1
+     [fmpp] QueryModel:select count(logText) as COUNT from metadata_table where priority_id=4
+     [fmpp] query in SQLTemplateModelselect count(logText) as COUNT from metadata_table where priority_id=4
+     [fmpp] isDataRead:false
+     [fmpp] sql queryselect count(logText) as COUNT from metadata_table where priority_id=4
+     [fmpp] data:12
+     [fmpp] indexmap size1
+     [fmpp] sql queryselect count(logText) as COUNT from metadata_table where priority_id=4
+     [fmpp] columnName:COUNT
+     [fmpp] resultSet MetaData column Count=1
+     [fmpp] adding records
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:3
+     [fmpp] datalist size1
+     [fmpp] QueryModel:select * from metadata_table where priority_id=3
+     [fmpp] query in SQLTemplateModelselect * from metadata_table where priority_id=3
+     [fmpp] iterator constructor called
+     [fmpp] checking any more element
+     [fmpp] getting records
+     [fmpp] sql queryselect * from metadata_table where priority_id=3 limit 5000 offset 0;
+     [fmpp] columnName:component_id
+     [fmpp] columnName:priority_id
+     [fmpp] columnName:logText
+     [fmpp] columnName:lineNumber
+     [fmpp] columnName:logname_id
+     [fmpp] resultSet MetaData column Count=5
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] next:count:0
+     [fmpp] logtext:next:mingw_make.exe: error
+     [fmpp] checking any more element
+     [fmpp] isDataRead:false
+     [fmpp] sql queryselect * from component
+     [fmpp] data:0
+     [fmpp] data:z:/sf/app/camera/group/bld.inf
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:1
+     [fmpp] logtext:next:mingw_make.exe: error
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:2
+     [fmpp] datalist size1
+     [fmpp] QueryModel:select * from metadata_table where priority_id=2
+     [fmpp] query in SQLTemplateModelselect * from metadata_table where priority_id=2
+     [fmpp] iterator constructor called
+     [fmpp] checking any more element
+     [fmpp] getting records
+     [fmpp] sql queryselect * from metadata_table where priority_id=2 limit 5000 offset 0;
+     [fmpp] columnName:component_id
+     [fmpp] columnName:priority_id
+     [fmpp] columnName:logText
+     [fmpp] columnName:lineNumber
+     [fmpp] columnName:logname_id
+     [fmpp] resultSet MetaData column Count=5
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] next:count:0
+     [fmpp] logtext:next:WARNING:
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:1
+     [fmpp] logtext:next:LINK : warning
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:2
+     [fmpp] logtext:next::10: warning: cannot find matching deallocation function
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:3
+     [fmpp] logtext:next:100) : WARNING: TEST123
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:4
+     [fmpp] logtext:next:MAKEDEF WARNING: TEST
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:5
+     [fmpp] logtext:next:TEST 123 \\(10) : Warning: (400)
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:6
+     [fmpp] logtext:next:BLDMAKE WARNING: bldm warning
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:7
+     [fmpp] logtext:next:MAKEDEF WARNING: make warning
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:8
+     [fmpp] logtext:next:atest(100) : warning C aasdfa
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:9
+     [fmpp] logtext:next:testas 100: warning: test123
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:10
+     [fmpp] logtext:next:usage Usage Warning: warn1
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:11
+     [fmpp] logtext:next:abcd mwld.exe: abcd
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:12
+     [fmpp] logtext:next:Command line warning abcd
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:13
+     [fmpp] logtext:next:anything ERROR: bad relocation: test123
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:14
+     [fmpp] logtext:next:10 warning in component1
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:15
+     [fmpp] logtext:next:EventType: Error Source: SweepNTabcde
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:16
+     [fmpp] logtext:next:WARN	test
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:17
+     [fmpp] logtext:next:abcd :10: warning: cannot find matching deallocation function 100:note abcd
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:18
+     [fmpp] logtext:next:WARNING:
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:19
+     [fmpp] logtext:next:LINK : warning
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:20
+     [fmpp] logtext:next::10: warning: cannot find matching deallocation function
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:21
+     [fmpp] logtext:next:100) : WARNING: TEST123
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:22
+     [fmpp] logtext:next:MAKEDEF WARNING: TEST
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:23
+     [fmpp] logtext:next:TEST 123 \\(10) : Warning: (400)
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:24
+     [fmpp] logtext:next:BLDMAKE WARNING: bldm warning
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:25
+     [fmpp] logtext:next:MAKEDEF WARNING: make warning
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:26
+     [fmpp] logtext:next:atest(100) : warning C aasdfa
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:27
+     [fmpp] logtext:next:testas 100: warning: test123
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:28
+     [fmpp] logtext:next:usage Usage Warning: warn1
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:29
+     [fmpp] logtext:next:abcd mwld.exe: abcd
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:30
+     [fmpp] logtext:next:Command line warning abcd
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:31
+     [fmpp] logtext:next:anything ERROR: bad relocation: test123
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:32
+     [fmpp] logtext:next:10 warning in component1
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:33
+     [fmpp] logtext:next:EventType: Error Source: SweepNTabcde
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:34
+     [fmpp] logtext:next:WARN	test
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:35
+     [fmpp] logtext:next:abcd :10: warning: cannot find matching deallocation function 100:note abcd
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:1
+     [fmpp] datalist size1
+     [fmpp] QueryModel:select * from metadata_table where priority_id=1
+     [fmpp] query in SQLTemplateModelselect * from metadata_table where priority_id=1
+     [fmpp] iterator constructor called
+     [fmpp] checking any more element
+     [fmpp] getting records
+     [fmpp] sql queryselect * from metadata_table where priority_id=1 limit 5000 offset 0;
+     [fmpp] columnName:component_id
+     [fmpp] columnName:priority_id
+     [fmpp] columnName:logText
+     [fmpp] columnName:lineNumber
+     [fmpp] columnName:logname_id
+     [fmpp] resultSet MetaData column Count=5
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] next:count:0
+     [fmpp] logtext:next:test FATAL ERROR(S):abcd
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:1
+     [fmpp] logtext:next:): Missing file:
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:2
+     [fmpp] logtext:next:abcd FLEXlm error:
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:3
+     [fmpp] logtext:next:ABLD ERROR: 1234
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:4
+     [fmpp] logtext:next:BLDMAKE ERROR: 43543
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:5
+     [fmpp] logtext:next:fatal error U1077 error occured
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:6
+     [fmpp] logtext:next:test warning U4010
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:7
+     [fmpp] logtext:next:make[10]: ***abcd
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:8
+     [fmpp] logtext:next:make[10]: abcd not remade because of errors
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:9
+     [fmpp] logtext:next:ERROR: build error
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:10
+     [fmpp] logtext:next:ERROR EC95940: ec error
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:11
+     [fmpp] logtext:next:Errors caused tool to abort. asdfasdf
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:12
+     [fmpp] logtext:next:test no rule to make target
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:13
+     [fmpp] logtext:next:ERROR,.*no rule to make.*,
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:14
+     [fmpp] logtext:next:ERROR	testing
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:15
+     [fmpp] logtext:next:"abcd , line 100: Error: 100abcd:. abcd
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:16
+     [fmpp] logtext:next:test FATAL ERROR(S):abcd
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:17
+     [fmpp] logtext:next:): Missing file:
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:18
+     [fmpp] logtext:next:abcd FLEXlm error:
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:19
+     [fmpp] logtext:next:ABLD ERROR: 1234
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:20
+     [fmpp] logtext:next:BLDMAKE ERROR: 43543
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:21
+     [fmpp] logtext:next:fatal error U1077 error occured
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:22
+     [fmpp] logtext:next:test warning U4010
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:23
+     [fmpp] logtext:next:make[10]: ***abcd
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:24
+     [fmpp] logtext:next:make[10]: abcd not remade because of errors
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:25
+     [fmpp] logtext:next:ERROR: build error
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:26
+     [fmpp] logtext:next:ERROR EC95940: ec error
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:27
+     [fmpp] logtext:next:Errors caused tool to abort. asdfasdf
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:28
+     [fmpp] logtext:next:test no rule to make target
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:29
+     [fmpp] logtext:next:ERROR,.*no rule to make.*,
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:30
+     [fmpp] logtext:next:ERROR	testing
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:31
+     [fmpp] logtext:next:"abcd , line 100: Error: 100abcd:. abcd
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] QueryModel:select * from metadata_table where priority_id=0
+     [fmpp] query in SQLTemplateModelselect * from metadata_table where priority_id=0
+     [fmpp] iterator constructor called
+     [fmpp] checking any more element
+     [fmpp] getting records
+     [fmpp] sql queryselect * from metadata_table where priority_id=0 limit 5000 offset 0;
+     [fmpp] columnName:component_id
+     [fmpp] columnName:priority_id
+     [fmpp] columnName:logText
+     [fmpp] columnName:lineNumber
+     [fmpp] columnName:logname_id
+     [fmpp] resultSet MetaData column Count=5
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:4
+     [fmpp] datalist size1
+     [fmpp] QueryModel:select * from metadata_table where priority_id=4
+     [fmpp] query in SQLTemplateModelselect * from metadata_table where priority_id=4
+     [fmpp] iterator constructor called
+     [fmpp] checking any more element
+     [fmpp] getting records
+     [fmpp] sql queryselect * from metadata_table where priority_id=4 limit 5000 offset 0;
+     [fmpp] columnName:component_id
+     [fmpp] columnName:priority_id
+     [fmpp] columnName:logText
+     [fmpp] columnName:lineNumber
+     [fmpp] columnName:logname_id
+     [fmpp] resultSet MetaData column Count=5
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] next:count:0
+     [fmpp] logtext:next:REMARK: 
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:1
+     [fmpp] logtext:next:INFO:
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:2
+     [fmpp] logtext:next:anything Command line warning D4025 : test
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:3
+     [fmpp] logtext:next:REMARK: test remark anything
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:4
+     [fmpp] logtext:next:EventType: Error Source: GNU Make.
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:5
+     [fmpp] logtext:next:INFO: any info match
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:6
+     [fmpp] logtext:next:REMARK: 
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:7
+     [fmpp] logtext:next:INFO:
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:8
+     [fmpp] logtext:next:anything Command line warning D4025 : test
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:9
+     [fmpp] logtext:next:REMARK: test remark anything
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:10
+     [fmpp] logtext:next:EventType: Error Source: GNU Make.
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] next:count:11
+     [fmpp] logtext:next:INFO: any info match
+     [fmpp] checking any more element
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] indexmap size1
+     [fmpp] indexmap size1
+     [fmpp] QueryModel:0
+     [fmpp] datalist size1
+     [fmpp] QueryModel:select * from metadata_table where component_id=0 order by priority_id
+     [fmpp] query in SQLTemplateModelselect * from metadata_table where component_id=0 order by priority_id
+     [fmpp] iterator constructor called
+     [fmpp] checking any more element
+     [fmpp] getting records
+     [fmpp] sql queryselect * from metadata_table where component_id=0 order by priority_id limit 5000 offset 0;
+     [fmpp] columnName:component_id
+     [fmpp] columnName:priority_id
+     [fmpp] columnName:logText
+     [fmpp] columnName:lineNumber
+     [fmpp] columnName:logname_id
+     [fmpp] resultSet MetaData column Count=5
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] adding records
+     [fmpp] next:count:0
+     [fmpp] logtext:next:test FATAL ERROR(S):abcd
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:1
+     [fmpp] datalist size1
+     [fmpp] next:count:1
+     [fmpp] logtext:next:): Missing file:
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:1
+     [fmpp] datalist size1
+     [fmpp] next:count:2
+     [fmpp] logtext:next:abcd FLEXlm error:
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:1
+     [fmpp] datalist size1
+     [fmpp] next:count:3
+     [fmpp] logtext:next:ABLD ERROR: 1234
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:1
+     [fmpp] datalist size1
+     [fmpp] next:count:4
+     [fmpp] logtext:next:BLDMAKE ERROR: 43543
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:1
+     [fmpp] datalist size1
+     [fmpp] next:count:5
+     [fmpp] logtext:next:fatal error U1077 error occured
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:1
+     [fmpp] datalist size1
+     [fmpp] next:count:6
+     [fmpp] logtext:next:test warning U4010
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:1
+     [fmpp] datalist size1
+     [fmpp] next:count:7
+     [fmpp] logtext:next:make[10]: ***abcd
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:1
+     [fmpp] datalist size1
+     [fmpp] next:count:8
+     [fmpp] logtext:next:make[10]: abcd not remade because of errors
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:1
+     [fmpp] datalist size1
+     [fmpp] next:count:9
+     [fmpp] logtext:next:ERROR: build error
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:1
+     [fmpp] datalist size1
+     [fmpp] next:count:10
+     [fmpp] logtext:next:ERROR EC95940: ec error
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:1
+     [fmpp] datalist size1
+     [fmpp] next:count:11
+     [fmpp] logtext:next:Errors caused tool to abort. asdfasdf
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:1
+     [fmpp] datalist size1
+     [fmpp] next:count:12
+     [fmpp] logtext:next:test no rule to make target
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:1
+     [fmpp] datalist size1
+     [fmpp] next:count:13
+     [fmpp] logtext:next:ERROR,.*no rule to make.*,
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:1
+     [fmpp] datalist size1
+     [fmpp] next:count:14
+     [fmpp] logtext:next:ERROR	testing
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:1
+     [fmpp] datalist size1
+     [fmpp] next:count:15
+     [fmpp] logtext:next:"abcd , line 100: Error: 100abcd:. abcd
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:1
+     [fmpp] datalist size1
+     [fmpp] next:count:16
+     [fmpp] logtext:next:test FATAL ERROR(S):abcd
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:1
+     [fmpp] datalist size1
+     [fmpp] next:count:17
+     [fmpp] logtext:next:): Missing file:
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:1
+     [fmpp] datalist size1
+     [fmpp] next:count:18
+     [fmpp] logtext:next:abcd FLEXlm error:
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:1
+     [fmpp] datalist size1
+     [fmpp] next:count:19
+     [fmpp] logtext:next:ABLD ERROR: 1234
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:1
+     [fmpp] datalist size1
+     [fmpp] next:count:20
+     [fmpp] logtext:next:BLDMAKE ERROR: 43543
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:1
+     [fmpp] datalist size1
+     [fmpp] next:count:21
+     [fmpp] logtext:next:fatal error U1077 error occured
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:1
+     [fmpp] datalist size1
+     [fmpp] next:count:22
+     [fmpp] logtext:next:test warning U4010
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:1
+     [fmpp] datalist size1
+     [fmpp] next:count:23
+     [fmpp] logtext:next:make[10]: ***abcd
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:1
+     [fmpp] datalist size1
+     [fmpp] next:count:24
+     [fmpp] logtext:next:make[10]: abcd not remade because of errors
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:1
+     [fmpp] datalist size1
+     [fmpp] next:count:25
+     [fmpp] logtext:next:ERROR: build error
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:1
+     [fmpp] datalist size1
+     [fmpp] next:count:26
+     [fmpp] logtext:next:ERROR EC95940: ec error
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:1
+     [fmpp] datalist size1
+     [fmpp] next:count:27
+     [fmpp] logtext:next:Errors caused tool to abort. asdfasdf
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:1
+     [fmpp] datalist size1
+     [fmpp] next:count:28
+     [fmpp] logtext:next:test no rule to make target
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:1
+     [fmpp] datalist size1
+     [fmpp] next:count:29
+     [fmpp] logtext:next:ERROR,.*no rule to make.*,
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:1
+     [fmpp] datalist size1
+     [fmpp] next:count:30
+     [fmpp] logtext:next:ERROR	testing
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:1
+     [fmpp] datalist size1
+     [fmpp] next:count:31
+     [fmpp] logtext:next:"abcd , line 100: Error: 100abcd:. abcd
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:1
+     [fmpp] datalist size1
+     [fmpp] next:count:32
+     [fmpp] logtext:next:WARNING:
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:2
+     [fmpp] datalist size1
+     [fmpp] next:count:33
+     [fmpp] logtext:next:LINK : warning
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:2
+     [fmpp] datalist size1
+     [fmpp] next:count:34
+     [fmpp] logtext:next::10: warning: cannot find matching deallocation function
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:2
+     [fmpp] datalist size1
+     [fmpp] next:count:35
+     [fmpp] logtext:next:100) : WARNING: TEST123
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:2
+     [fmpp] datalist size1
+     [fmpp] next:count:36
+     [fmpp] logtext:next:MAKEDEF WARNING: TEST
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:2
+     [fmpp] datalist size1
+     [fmpp] next:count:37
+     [fmpp] logtext:next:TEST 123 \\(10) : Warning: (400)
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:2
+     [fmpp] datalist size1
+     [fmpp] next:count:38
+     [fmpp] logtext:next:BLDMAKE WARNING: bldm warning
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:2
+     [fmpp] datalist size1
+     [fmpp] next:count:39
+     [fmpp] logtext:next:MAKEDEF WARNING: make warning
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:2
+     [fmpp] datalist size1
+     [fmpp] next:count:40
+     [fmpp] logtext:next:atest(100) : warning C aasdfa
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:2
+     [fmpp] datalist size1
+     [fmpp] next:count:41
+     [fmpp] logtext:next:testas 100: warning: test123
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:2
+     [fmpp] datalist size1
+     [fmpp] next:count:42
+     [fmpp] logtext:next:usage Usage Warning: warn1
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:2
+     [fmpp] datalist size1
+     [fmpp] next:count:43
+     [fmpp] logtext:next:abcd mwld.exe: abcd
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:2
+     [fmpp] datalist size1
+     [fmpp] next:count:44
+     [fmpp] logtext:next:Command line warning abcd
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:2
+     [fmpp] datalist size1
+     [fmpp] next:count:45
+     [fmpp] logtext:next:anything ERROR: bad relocation: test123
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:2
+     [fmpp] datalist size1
+     [fmpp] next:count:46
+     [fmpp] logtext:next:10 warning in component1
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:2
+     [fmpp] datalist size1
+     [fmpp] next:count:47
+     [fmpp] logtext:next:EventType: Error Source: SweepNTabcde
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:2
+     [fmpp] datalist size1
+     [fmpp] next:count:48
+     [fmpp] logtext:next:WARN	test
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:2
+     [fmpp] datalist size1
+     [fmpp] next:count:49
+     [fmpp] logtext:next:abcd :10: warning: cannot find matching deallocation function 100:note abcd
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:2
+     [fmpp] datalist size1
+     [fmpp] next:count:50
+     [fmpp] logtext:next:WARNING:
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:2
+     [fmpp] datalist size1
+     [fmpp] next:count:51
+     [fmpp] logtext:next:LINK : warning
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:2
+     [fmpp] datalist size1
+     [fmpp] next:count:52
+     [fmpp] logtext:next::10: warning: cannot find matching deallocation function
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:2
+     [fmpp] datalist size1
+     [fmpp] next:count:53
+     [fmpp] logtext:next:100) : WARNING: TEST123
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:2
+     [fmpp] datalist size1
+     [fmpp] next:count:54
+     [fmpp] logtext:next:MAKEDEF WARNING: TEST
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:2
+     [fmpp] datalist size1
+     [fmpp] next:count:55
+     [fmpp] logtext:next:TEST 123 \\(10) : Warning: (400)
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:2
+     [fmpp] datalist size1
+     [fmpp] next:count:56
+     [fmpp] logtext:next:BLDMAKE WARNING: bldm warning
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:2
+     [fmpp] datalist size1
+     [fmpp] next:count:57
+     [fmpp] logtext:next:MAKEDEF WARNING: make warning
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:2
+     [fmpp] datalist size1
+     [fmpp] next:count:58
+     [fmpp] logtext:next:atest(100) : warning C aasdfa
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:2
+     [fmpp] datalist size1
+     [fmpp] next:count:59
+     [fmpp] logtext:next:testas 100: warning: test123
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:2
+     [fmpp] datalist size1
+     [fmpp] next:count:60
+     [fmpp] logtext:next:usage Usage Warning: warn1
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:2
+     [fmpp] datalist size1
+     [fmpp] next:count:61
+     [fmpp] logtext:next:abcd mwld.exe: abcd
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:2
+     [fmpp] datalist size1
+     [fmpp] next:count:62
+     [fmpp] logtext:next:Command line warning abcd
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:2
+     [fmpp] datalist size1
+     [fmpp] next:count:63
+     [fmpp] logtext:next:anything ERROR: bad relocation: test123
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:2
+     [fmpp] datalist size1
+     [fmpp] next:count:64
+     [fmpp] logtext:next:10 warning in component1
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:2
+     [fmpp] datalist size1
+     [fmpp] next:count:65
+     [fmpp] logtext:next:EventType: Error Source: SweepNTabcde
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:2
+     [fmpp] datalist size1
+     [fmpp] next:count:66
+     [fmpp] logtext:next:WARN	test
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:2
+     [fmpp] datalist size1
+     [fmpp] next:count:67
+     [fmpp] logtext:next:abcd :10: warning: cannot find matching deallocation function 100:note abcd
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:2
+     [fmpp] datalist size1
+     [fmpp] next:count:68
+     [fmpp] logtext:next:mingw_make.exe: error
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:3
+     [fmpp] datalist size1
+     [fmpp] next:count:69
+     [fmpp] logtext:next:mingw_make.exe: error
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:3
+     [fmpp] datalist size1
+     [fmpp] next:count:70
+     [fmpp] logtext:next:REMARK: 
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:4
+     [fmpp] datalist size1
+     [fmpp] next:count:71
+     [fmpp] logtext:next:INFO:
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:4
+     [fmpp] datalist size1
+     [fmpp] next:count:72
+     [fmpp] logtext:next:anything Command line warning D4025 : test
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:4
+     [fmpp] datalist size1
+     [fmpp] next:count:73
+     [fmpp] logtext:next:REMARK: test remark anything
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:4
+     [fmpp] datalist size1
+     [fmpp] next:count:74
+     [fmpp] logtext:next:EventType: Error Source: GNU Make.
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:4
+     [fmpp] datalist size1
+     [fmpp] next:count:75
+     [fmpp] logtext:next:INFO: any info match
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:4
+     [fmpp] datalist size1
+     [fmpp] next:count:76
+     [fmpp] logtext:next:REMARK: 
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:4
+     [fmpp] datalist size1
+     [fmpp] next:count:77
+     [fmpp] logtext:next:INFO:
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:4
+     [fmpp] datalist size1
+     [fmpp] next:count:78
+     [fmpp] logtext:next:anything Command line warning D4025 : test
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:4
+     [fmpp] datalist size1
+     [fmpp] next:count:79
+     [fmpp] logtext:next:REMARK: test remark anything
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:4
+     [fmpp] datalist size1
+     [fmpp] next:count:80
+     [fmpp] logtext:next:EventType: Error Source: GNU Make.
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:4
+     [fmpp] datalist size1
+     [fmpp] next:count:81
+     [fmpp] logtext:next:INFO: any info match
+     [fmpp] checking any more element
+     [fmpp] indexmap size5
+     [fmpp] QueryModel:4
+     [fmpp] datalist size1
+     [fmpp] File processed.
+
+BUILD SUCCESSFUL
+Total time: 1 second

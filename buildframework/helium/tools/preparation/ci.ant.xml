@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : ci.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="ci" xmlns:hlm="http://www.nokia.com/helium">
+    <description>
+    CI related targets
+    </description>
+    
+    <!-- Delete all the folders based on configurations file inside dir-path, optional attribute pool-size's default value is 4 -->
+    <target name="delete-folders-from-list" if = "ci.cleanup.env.dir">
+        <exec osfamily="windows" executable="python" failonerror="true" outputproperty="delete.folders.drive">
+            <arg value="${helium.dir}/tools/common/python/scripts/searchnextdrive.py"/>               
+        </exec>
+        <hlm:deleteFoldersFromDirMacro dir-path="${ci.cleanup.env.dir}" delete-folders-drive="${delete.folders.drive}"/>
+    </target>
+
+    <!-- Delete all the folders based on configurations file inside dir-path, optional attribute pool-size's default value is 4 -->
+    <scriptdef name="deleteFoldersFromDirMacro" language="jython" uri="http://www.nokia.com/helium">
+        <attribute name="dir-path" />
+        <attribute name="pool-size" />
+        <attribute name="delete-folders-drive" />
+import os
+import fileutils
+import threadpool
+import subprocess
+import sys
+
+dir_path = str(attributes.get('dir-path'))
+del_folder_drive = attributes.get('delete-folders-drive')
+pool_size = attributes.get('pool-size')
+if pool_size != None:
+    pool_size = str(pool_size)
+else:
+    pool_size = "4"
+delete_dirs = []
+found_inputs = []
+# Read config files
+self.log(str("Scanning %s." % dir_path))
+for path_ in os.listdir(dir_path):
+    self.log(str("Checking %s." % path_))
+    filename = os.path.join(dir_path, path_)
+    if (os.path.isfile(filename)):
+        found_inputs.append(filename)
+        file_ = open(filename)
+        for delete_dir in file_.readlines():
+            delete_dir = os.path.normpath(delete_dir.strip())
+            if (len(delete_dir) > 0) and  os.path.isdir(delete_dir):
+                delete_dirs.append(delete_dir)
+        file_.close()
+    
+# Delete all dirs based on config
+for dir_ in delete_dirs:
+    try:
+        if os.sep == '\\':
+            fileutils.subst(del_folder_drive, dir_)
+            self.log(str("substed for deleling folders"))
+            self.log(str("Removing %s\\" % del_folder_drive))
+            fileutils.rmtree("%s\\" % del_folder_drive)
+            fileutils.unsubst(del_folder_drive)
+            self.log(str("unsbusted substed for deleling folders"))
+        else:
+            self.log(str("Removing %s" % dir_))
+            fileutils.rmtree(dir_)
+    except Exception, e:
+        if os.sep == '\\':
+            fileutils.unsubst(del_folder_drive)
+            self.log(str("unsbusted for deleling folders"))
+        self.log(str("ERROR: %s" % e))
+
+# Delete all config files
+for path_ in found_inputs:
+    self.log(str("Deleting %s." % path_))
+    os.remove(path_)
+    </scriptdef>
+
+    <!-- Macro for the folders to be deleted in a file based on the folder creation time  
+    If the folders are created at the same time, then it will delete only one of them (this 
+    needs to be handled properly in the future releases if required)-->
+    <scriptdef name="BADeleteMacro" language="jython" uri="http://www.nokia.com/helium">
+        <attribute name="outputdir"/>
+        <attribute name="rootdir"/>
+        <attribute name="no.ba.remain"/>
+        <![CDATA[
+import os
+import time
+ctime_dict = {}
+root_dir = str(attributes.get('rootdir'))
+output_dir = str(attributes.get('outputdir'))
+for dir_ in os.listdir(root_dir):
+    if (os.path.isdir(os.path.join(root_dir, dir_))):
+        dir_ctime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(os.path.getctime(os.path.join(root_dir, dir_))))
+        ctime_dict[dir_ctime] = dir_
+ctime_list = ctime_dict.keys()
+ctime_list.sort()
+self.log(str("ctime_list: %s" % ctime_list))
+filename = time.strftime('%Y%m%d%H%M%S', time.localtime())
+filename = os.path.join(output_dir, filename + '_file_delete.txt')
+self.log(str("Creating %s" % filename))
+file_ = open(filename, 'w+')
+count = len(ctime_list)
+ba_to_leave = int(str(attributes.get('no.ba.remain')))
+self.log(str("Leaving %d build areas." % ba_to_leave)) 
+if (ba_to_leave > 0):
+    for ctime_entry in ctime_list:
+        print count
+        if (ba_to_leave >= count):
+            break
+        file_.write(os.path.join(root_dir, ctime_dict[ctime_entry]) + '\n')
+        count -= 1
+file_.close()
+        ]]>
+    </scriptdef>
+
+    <!-- This target flags the Build areas for deletion. So the cleanup build robot could remove them. -->
+    <target name="flag-ba-for-deletion" if = "ci.cleanup.env.dir">
+        <mkdir dir="${ci.cleanup.env.dir}"/>
+        <if>
+            <not>
+                <isset property="ci.min.ba.maintain"/>
+            </not>
+            <then>
+                <property name="ci.min.ba.maintain" value="2"/>
+            </then>
+        </if>
+        <hlm:BADeleteMacro outputdir="${ci.cleanup.env.dir}" rootdir="${prep.root.dir}" no.ba.remain="${ci.min.ba.maintain}"/>
+    </target>
+    
+    <!-- This task monitor the sessions available under the session file and update/create new ones if needed. -->
+    <scriptdef name="monitorCCMSession" language="jython" uri="http://www.nokia.com/helium">
+        <attribute name="delivery"/>
+        <attribute name="sessionfile"/>
+import ccm
+import nokia.nokiaccm
+import configuration
+import os
+import logging
+import traceback
+logging.basicConfig(level=logging.INFO)
+
+databases = []
+delivery = str(attributes.get('delivery'))
+sessionFile = str(attributes.get('sessionfile'))
+configBuilder = configuration.NestedConfigurationBuilder(open(delivery, 'r'))
+configSet = configBuilder.getConfiguration()
+for config in configSet.getConfigurations():
+    if config['database'] not in databases:
+        databases.append(config['database'])
+
+config = configuration.PropertiesConfiguration()
+if os.path.exists(sessionFile):
+    self.log(str("Opening the file %s..." % sessionFile))
+    config.load(open(sessionFile, 'r'))
+else:
+    self.log(str("File %s will be created..." % sessionFile))
+        
+for database in databases:
+    self.log(str("Checking %s..." % database))
+    update_session = True
+    if config.has_key(database):
+        sessionid = config[database]
+        # test if valid
+        self.log(str("Is session %s still valid?..." % sessionid))
+        if ccm.session_exists(sessionid, database=database):
+            self.log(str("Yes."))
+            update_session = False
+
+    if update_session:
+        try:
+            self.log(str("Opening a new session for %s..." % database))
+            session = nokia.nokiaccm.open_session(database=database)
+            session.close_on_exit = False        
+            config[database] = session.addr()
+        except Exception, exc:
+            traceback.print_exc()
+            raise exc
+    
+self.log(str("Updating the file %s..." % sessionFile))
+config.store(open(sessionFile, 'w+'))    
+    </scriptdef>
+
+    <!-- Task that generates an XML configuration of the work that will be done by ccm-get-input. -->
+    <macrodef name="findProjects" uri="http://www.nokia.com/helium">
+        <attribute name="delivery"/>
+        <attribute name="sessionfile"/>
+        <attribute name="output"/>
+        <sequential>
+            <hlm:python>
+import ccm
+import configuration
+import os
+import logging
+import amara
+
+logging.basicConfig(level=logging.INFO)
+
+delivery = str(r'@{delivery}')
+sessionFile = str(r'@{sessionfile}')
+outputFilename = str(r'@{output}')
+        
+sconfig = configuration.PropertiesConfiguration()
+
+print "Opening the file %s..." % sessionFile
+sconfig.load(open(sessionFile, 'r'))
+
+configBuilder = configuration.NestedConfigurationBuilder(open(delivery, 'r'))
+configSet = configBuilder.getConfiguration()
+projects = []        
+for config in configSet.getConfigurations():        
+    if config.type == "checkout" and not config.get_boolean('skip.ci', False): 
+        try:
+            sessionid = sconfig[config['database']]
+            session = ccm.Session(None, None, None, ccm_addr=sessionid, close_on_exit=False)
+            ccmproject = session.create(config.name)
+            wapath = os.path.join(config['dir'], ccmproject.name, ccmproject.name)
+            result = session.get_workarea_info(wapath)
+            print "Found wa for project %s." % result['project'].objectname
+            if config.has_key('ci.custom.query'):
+                projects.append({u'database': unicode(config['database']), u'action': u'checkout', u'name': unicode(result['project'].objectname), u'customQuery': unicode(config['ci.custom.query'])})
+            else: 
+                projects.append({u'database': unicode(config['database']), u'action': u'checkout', u'name': unicode(result['project'].objectname)})    
+        except ccm.CCMException, exc:
+            projects.append({u'database': unicode(config['database']), u'action': u'to_be_checkout', u'name': unicode(config.name)})
+    elif config.type == "snapshot" and not config.get_boolean('skip.ci', False):
+        sessionid = sconfig[config['database']]
+        session = ccm.Session(None, None, None, ccm_addr=sessionid, close_on_exit=False)
+        ccmproject = session.create(config.name)
+        versionfile = os.path.join(config['dir'], ccmproject.name, 'project.version')
+        if (os.path.exists(versionfile)):
+            stream = open(versionfile, "r")
+            projectname = stream.read().strip()
+            stream.close()
+            if (projectname != config.name):
+                if config.has_key('ci.custom.query'):
+                    projects.append({u'database': unicode(config['database']), u'action': u'snapshot_update', u'name': unicode(config.name), u'customQuery': unicode(config['ci.custom.query'])})
+                else:
+                    projects.append({u'database': unicode(config['database']), u'action': u'snapshot_update', u'name': unicode(config.name)})
+        else:
+            if config.has_key('ci.custom.query'):
+                projects.append({u'database': unicode(config['database']), u'action': u'snapshot', u'name': unicode(config.name), u'customQuery': unicode(config['ci.custom.query'])})
+            else:    
+                projects.append({u'database': unicode(config['database']), u'action': u'snapshot', u'name': unicode(config.name)})
+
+doc = amara.create_document()
+root = doc.xml_create_element(u"config")
+doc.xml_append(root)
+
+for project in projects:
+    p = doc.xml_create_element(u"project", attributes=project)
+    root.xml_append(p)
+        
+output = open(outputFilename, "w+")
+output.write(doc.xml())
+output.close()
+            </hlm:python>
+        </sequential>
+    </macrodef>
+
+    <!-- Validate input for the ci-monitor-ccm-session target -->
+    <target name="ci-monitor-ccm-session-validate" depends="ccm-prepare-input">
+        <if>
+            <and>
+                <available file="${prep.delivery.conf.parsed}"/>
+                <isset property="ci.session.file"/>                
+                <isset property="run.ccm"/>
+            </and>
+            <then>
+                <property name="do.ci-monitor-ccm-session" value="true"/>
+            </then>
+            <else>
+                <echo>Delivery file not available or 'ci.session.file' not defined or ccm.enabled not set to true.</echo>
+            </else>
+        </if>
+    </target>
+    
+    <!-- Validate input for the ci-prep-wa-create-list target. --> 
+    <target name="ci-prep-wa-create-list-validate" depends="ci-monitor-ccm-session-validate" if="do.ci-monitor-ccm-session">
+        <if>
+            <and>
+                <isset property="ci.project.config"/>             
+            </and>
+            <then>
+                <property name="do.ci-prep-wa-create-list" value="true"/>
+            </then>
+            <else>
+                <echo>'ci.project.config' not defined.</echo>
+            </else>
+        </if>
+    </target>
+
+    <!-- Bootstrapper target for Cruise Control. It generates a session file compatible with CCM task. -->
+    <target name="ci-monitor-ccm-session" depends="ci-monitor-ccm-session-validate" if="do.ci-monitor-ccm-session">
+        <hlm:monitorCCMSession delivery="${prep.delivery.conf.parsed}" sessionfile="${ci.session.file}"/>
+    </target>
+
+    <!-- Bootstrapper target for Cruise Control. This target output the future work that ccm-get-input will be doing. -->
+    <target name="ci-prep-wa-create-list" depends="ci-prep-wa-create-list-validate" if="do.ci-prep-wa-create-list">
+        <hlm:findProjects delivery="${prep.delivery.conf.parsed}" sessionfile="${ci.session.file}" output="${ci.project.config}"/>
+    </target>
+
+</project>

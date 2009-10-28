@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : build-logilab-common.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="build-xincluder" xmlns:ivy="antlib:org.apache.ivy.ant">
+    <description>xincluder installation script.</description>
+    <target name="install">
+        <property environment="env"/>
+        <echo>
+          unzipping artifact: 
+          organisation=${artifact.organisation} 
+          module=${artifact.module} 
+          revision=${artifact.revision}
+          artifact=${artifact.artifact}
+          type=${artifact.type}
+          ext=${artifact.ext}
+          origin=${artifact.origin}
+          local=${artifact.local}
+          size=${artifact.size}
+          file=${artifact.file}
+          helium.dir=${helium.dir}
+        </echo>
+        
+        <gunzip src="${artifact.file}" dest="${artifact.file}.tar"/>
+        <mkdir dir="${env.TEMP}/xincluder"/>
+        <untar src="${artifact.file}.tar" dest="${env.TEMP}/xincluder"/>
+        
+        <move todir="${helium.dir}/external/antlibs" flatten="true" overwrite="true">
+            <fileset dir="${env.TEMP}/xincluder" includes="**/xincluder*.jar"/>
+        </move>
+        
+        <mkdir dir="${helium.dir}/external/sources"/>
+        <copy file="${artifact.file}" todir="${helium.dir}/external/sources"/>
+    </target>
+</project>

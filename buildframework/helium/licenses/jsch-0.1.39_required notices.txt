@@ -1,0 +1,28 @@
+
+    5: Copyright (c) 2002,2003,2004,2005,2006,2007,2008 Atsuhiko Yamanaka, JCraft,Inc. 
+    6: All rights reserved.
+    7: 
+    8: Redistribution and use in source and binary forms, with or without
+    9: modification, are permitted provided that the following conditions are met:
+   10: 
+   11:   1. Redistributions of source code must retain the above copyright notice,
+   12:      this list of conditions and the following disclaimer.
+   13: 
+   14:   2. Redistributions in binary form must reproduce the above copyright 
+   15:      notice, this list of conditions and the following disclaimer in 
+   16:      the documentation and/or other materials provided with the distribution.
+   17: 
+   18:   3. The names of the authors may not be used to endorse or promote products
+   19:      derived from this software without specific prior written permission.
+   20: 
+   21: THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED WARRANTIES,
+   22: INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+   23: FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL JCRAFT,
+   24: INC. OR ANY CONTRIBUTORS TO THIS SOFTWARE BE LIABLE FOR ANY DIRECT, INDIRECT,
+   25: INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+   26: LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA,
+   27: OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+   28: LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+   29: NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
+   30: EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+

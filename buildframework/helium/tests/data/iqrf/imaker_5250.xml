@@ -1,0 +1,1279 @@
+<?xml version="1.0" encoding="ASCII"?>
+<IMaker xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns="iqrf" query="help-config">
+  <result>
+    <interfaces name="An interface">
+      <configurationElements name="BLDROBY" description="For passing extra oby files (from command line) to the buildrom.pl" values="(string)"/>
+      <configurationElements name="BLDROM_OPT" description="The default buildrom.pl options" values="(string)"/>
+      <configurationElements name="BLDROPT" description="For passing extra parameters (from command line) to the buildrom.pl" values="(string)"/>
+      <configurationElements name="CONFIGROOT" description="Define the default configuration root directory." values="(string)"/>
+      <configurationElements name="CORE_CDPROMFILE" description="The name of the core Code Demand Paging rom file (Code paging)." values="(string)"/>
+      <configurationElements name="CORE_DIR" description="The working directory, when creating core image" values="(string)"/>
+      <configurationElements name="CORE_E2FNAME" description="The core elf2flash filename. This is the final core flash file." values="(string)"/>
+      <configurationElements name="CORE_FWIDFILE" description="The (generated) _core_fwid.txt file name." values="(string)"/>
+      <configurationElements name="CORE_IMEISVFILE" description="The (generated) _core_imeisv.txt file name." values="(string)"/>
+      <configurationElements name="CORE_IMEISVINFO" description="The content string for the imeisv.txt file." values="(string)"/>
+      <configurationElements name="CORE_MODELFILE" description="The (generated) _core_model.txt file name." values="(string)"/>
+      <configurationElements name="CORE_MODELINFO" description="The content string for the model.txt file." values="(string)"/>
+      <configurationElements name="CORE_MSTOBY" description="The generated master oby file name, which includes the CORE_OBY files" values="(string)"/>
+      <configurationElements name="CORE_NAME" description="The full name of the core image" values="(string)"/>
+      <configurationElements name="CORE_NDPROMFILE" description="The name of the core Non Demand Paging rom file." values="(string)"/>
+      <configurationElements name="CORE_OBY" description="The oby file(s) included to the core image creation" values="(string)"/>
+      <configurationElements name="CORE_ODPROMFILE" description="The name of the core On Demand Paging rom file (Rom paging)." values="(string)"/>
+      <configurationElements name="CORE_OPT" description="The core specific buildrom options" values="(string)"/>
+      <configurationElements name="CORE_PLATFILE" description="The (generated) _core_platform.txt file name." values="(string)"/>
+      <configurationElements name="CORE_PLATINFO" description="The content string for the fwid.txt file." values="(string)"/>
+      <configurationElements name="CORE_PRODFILE" description="The (generated) _core_product.txt file name." values="(string)"/>
+      <configurationElements name="CORE_ROFSFILE" description="The name of the core rofs file." values="(string)"/>
+      <configurationElements name="CORE_ROMVER" description="The rom version parameter passed to the version.iby" values="(string)"/>
+      <configurationElements name="CORE_SWVERFILE" description="The (generated) _core_sw.txt version file name. This generated file is included in the CORE_VERIBY file." values="(string)"/>
+      <configurationElements name="CORE_SWVERINFO" description="The content string for the sw.txt file." values="(string)"/>
+      <configurationElements name="CORE_TIME" description="The time defined to the core image" values="(string)"/>
+      <configurationElements name="CORE_UDEBFILE" description="The name of the core udeb file. See USE_UDEB." values="(string)"/>
+      <configurationElements name="CORE_VERIBY" description="The name of the generated core *version.iby, which included version files and info" values="(string)"/>
+      <configurationElements name="CORE_VERSION" description="The version of the core. Used in sw.txt generation." values="(string)"/>
+      <configurationElements name="COREPLAT_NAME" description="Name of the core platform" values="(string)"/>
+      <configurationElements name="CUSTVARIANT_DIR" description="Configure the directory where to included the customer variant content. By default all content under /content is included to the image as it exists in the folder." values="(string)"/>
+      <configurationElements name="DEFAULT_LANGUAGE" description="Default language is the language where the device will boot to (SIM language overrides this selection)" values="(string)"/>
+      <configurationElements name="FLASH_EXT" description="The flash file extension." values="(string)"/>
+      <configurationElements name="HWID" description="Hardware Id" values="([0-9]4)"/>
+      <configurationElements name="HWID_LIST" description="Possible Hardware Ids of the product." values="([0-9]4)*"/>
+      <configurationElements name="KEEPTEMP" description="Keep the buildrom.pl temp files (copied to the WORKDIR). E.g. tmp1.oby tmp2.oby..tmp9.oby" values="([0|1])"/>
+      <configurationElements name="LABEL" description="A label to the NAME of the image" values="(string)"/>
+      <configurationElements name="LANGID" description="Language id used in the lang.txt generation" values="(string)"/>
+      <configurationElements name="LANGUAGES" description="Languages are the languages that are taken to the image (SC language is is defaulting to 01 in languages.txt)" values="(string)"/>
+      <configurationElements name="NAME" description="The name of the image" values="(string)"/>
+      <configurationElements name="OPERATOR_OBY" description="The name for generated operator oby, which is a file generated based on an operator specific content." values="(string)"/>
+      <configurationElements name="OPERATOR_OBYGEN" description="The name, path, rule for collecting content to the operator specific oby (E.g. operator.oby | /epoc32/rom/include/operator | *.iby collects all iby files from operator folder)." values="(string)|(string)|(string)"/>
+      <configurationElements name="PRODUCT_MODEL" description="The model of the product" values="(string)"/>
+      <configurationElements name="PRODUCT_NAME" description="Name of the product" values="(string)"/>
+      <configurationElements name="PRODUCT_REVISION" description="The reision of the product" values="(string)"/>
+      <configurationElements name="RELEASEDIR" description="The RELEASEDIR is used in the RELEASE step that copies the created files to a separate folder defined by the RELEASEDIR." values="(string)"/>
+      <configurationElements name="RELEASEFILES" description="The RELEASEFILES define the source files that are copied in the RELEASE step. The files must be given as a space delimited list. Wildcards can be used. E.g. \epoc32\rombuild\product\theflash.fpsx \epoc32\rombuild\product\*.log" values="(string)"/>
+      <configurationElements name="RELEASENAME" description="The RELEASENAME is used in the RELEASE step that copies the created files to a separate folder with a new name." values="(string)"/>
+      <configurationElements name="ROFS2_DIR" description="The working directory, when creating the rofs2 image" values="(string)"/>
+      <configurationElements name="ROFS2_E2FNAME" description="The rofs2 elf2flash filename. This is the final rofs2 flash file." values="(string)"/>
+      <configurationElements name="ROFS2_FOOTER" description="This variable can contain a footer section for the rofs2 master oby." values="(string)"/>
+      <configurationElements name="ROFS2_FWIDFILE" description="The (generated) _rofs2_fwid.txt file name." values="(string)"/>
+      <configurationElements name="ROFS2_FWIDINFO" description="The content string for the fwid2.txt file." values="(string)"/>
+      <configurationElements name="ROFS2_HEADER" description="This variable can contain a header section for the rofs2 master oby." values="(string)"/>
+      <configurationElements name="ROFS2_MSTOBY" description="The (generated) rofs2 master oby file name. This file includes the ROFS2_OBY files and other parameters" values="(string)"/>
+      <configurationElements name="ROFS2_NAME" description="The full name of the rofs2 image" values="(string)"/>
+      <configurationElements name="ROFS2_OBY" description="The oby file(s) included to the rofs2 image creation" values="(string)"/>
+      <configurationElements name="ROFS2_OPT" description="The rofs2 specific buildrom options" values="(string)"/>
+      <configurationElements name="ROFS2_ROMVER" description="The rofs2 ROM version string" values="(string)"/>
+      <configurationElements name="ROFS2_TIME" description="The time defined to the rofs2 image." values="(string)"/>
+      <configurationElements name="ROFS2_VERIBY" description="The (generated) version iby file name for the rofs2 image. This file included the version text files and other version parameters." values="(string)"/>
+      <configurationElements name="ROFS3_CUSTFILE" description="The (generated) source file name for customersw.txt." values="(string)"/>
+      <configurationElements name="ROFS3_CUSTINFO" description="The content string for the customersw.txt." values="(string)"/>
+      <configurationElements name="ROFS3_DIR" description="The working directory, when creating the rofs3 image" values="(string)"/>
+      <configurationElements name="ROFS3_E2FNAME" description="The rofs3 elf2flash filename. This is the final rofs3 flash file." values="(string)"/>
+      <configurationElements name="ROFS3_FOOTER" description="This variable can contain a footer section for the rofs3 master oby." values="(string)"/>
+      <configurationElements name="ROFS3_FWIDFILE" description="The (generated) _rofs3_fwid.txt file name." values="(string)"/>
+      <configurationElements name="ROFS3_FWIDINFO" description="The content string for the fwid3.txt file." values="(string)"/>
+      <configurationElements name="ROFS3_HEADER" description="This variable can contain a header section for the rofs3 master oby." values="(string)"/>
+      <configurationElements name="ROFS3_MSTOBY" description="The (generated) version iby file name for the rofs3 image. This file included the version text files and other version parameters." values="(string)"/>
+      <configurationElements name="ROFS3_NAME" description="The full name of the rofs3 image" values="(string)"/>
+      <configurationElements name="ROFS3_OBY" description="The oby file(s) included to the rofs3 image creation" values="(string)"/>
+      <configurationElements name="ROFS3_OPT" description="The rofs3 specific buildrom options" values="(string)"/>
+      <configurationElements name="ROFS3_ROMVER" description="The rofs3 ROM version string" values="(string)"/>
+      <configurationElements name="ROFS3_TIME" description="The time defined to the rofs3 image." values="(string)"/>
+      <configurationElements name="ROFS3_VERIBY" description="The (generated) version iby file name for the rofs3 image. This file included the version text files and other version parameters." values="(string)"/>
+      <configurationElements name="SOS_VERSION" description="Symbian OS version number. The value is used in the version info generation (platform.txt).(see USE_VERGEN)" values="([0-9]+.[0-9]+)"/>
+      <configurationElements name="SWUPD_EXT" description="The software update file extension." values="(string)"/>
+      <configurationElements name="TYPE" description="Defines the image type." values="(rnd|prd|subcon)"/>
+      <configurationElements name="USE_OVERRIDE" description="Define whether the override.pm Buildrom.pl plugin is used (Includes automatically also \epoc32\rom\override.oby)." values="([0|1])"/>
+      <configurationElements name="USE_PAGING" description="Define the usage of On Demand Pagin (ODP). (E.g. 0,rom,code)." values="((0|rom|code[:[(1|2|3)]+]?))"/>
+      <configurationElements name="USE_ROFS" description="Define the rofs sections in use. A comma separated list can be given of possible values. (E.g. 1,2,3)." values="([[dummy|]0..6][,[dummy|]0..6]*)"/>
+      <configurationElements name="USE_ROMFILE" description="Define whether the \epoc32\rombuild\romfiles.txt is used. Files in romfiles are automatically moved to ROM, everything else in core is moved to ROFS1." values="([0|1])"/>
+      <configurationElements name="USE_ROMSYMGEN" description="Generate the rom symbol file. 0=Do not generate, 1=Generate" values="([0|1])"/>
+      <configurationElements name="USE_UDEB" description="Include the usage of the debug binary *.txt to define the list of binaries that are taken from udeb folder instead of the urel." values="([0|1|full])"/>
+      <configurationElements name="USE_VERGEN" description="Use iMaker version info generation" values="([0|1])"/>
+      <configurationElements name="BLDROBY" description="For passing extra oby files (from command line) to the buildrom.pl" values="(string)"/>
+      <configurationElements name="BLDROM_OPT" description="The default buildrom.pl options" values="(string)"/>
+      <configurationElements name="BLDROPT" description="For passing extra parameters (from command line) to the buildrom.pl" values="(string)"/>
+      <configurationElements name="CONFIGROOT" description="Define the default configuration root directory." values="(string)"/>
+      <configurationElements name="CORE_CDPROMFILE" description="The name of the core Code Demand Paging rom file (Code paging)." values="(string)"/>
+      <configurationElements name="CORE_DIR" description="The working directory, when creating core image" values="(string)"/>
+      <configurationElements name="CORE_E2FNAME" description="The core elf2flash filename. This is the final core flash file." values="(string)"/>
+      <configurationElements name="CORE_FWIDFILE" description="The (generated) _core_fwid.txt file name." values="(string)"/>
+      <configurationElements name="CORE_IMEISVFILE" description="The (generated) _core_imeisv.txt file name." values="(string)"/>
+      <configurationElements name="CORE_IMEISVINFO" description="The content string for the imeisv.txt file." values="(string)"/>
+      <configurationElements name="CORE_MODELFILE" description="The (generated) _core_model.txt file name." values="(string)"/>
+      <configurationElements name="CORE_MODELINFO" description="The content string for the model.txt file." values="(string)"/>
+      <configurationElements name="CORE_MSTOBY" description="The generated master oby file name, which includes the CORE_OBY files" values="(string)"/>
+      <configurationElements name="CORE_NAME" description="The full name of the core image" values="(string)"/>
+      <configurationElements name="CORE_NDPROMFILE" description="The name of the core Non Demand Paging rom file." values="(string)"/>
+      <configurationElements name="CORE_OBY" description="The oby file(s) included to the core image creation" values="(string)"/>
+      <configurationElements name="CORE_ODPROMFILE" description="The name of the core On Demand Paging rom file (Rom paging)." values="(string)"/>
+      <configurationElements name="CORE_OPT" description="The core specific buildrom options" values="(string)"/>
+      <configurationElements name="CORE_PLATFILE" description="The (generated) _core_platform.txt file name." values="(string)"/>
+      <configurationElements name="CORE_PLATINFO" description="The content string for the fwid.txt file." values="(string)"/>
+      <configurationElements name="CORE_PRODFILE" description="The (generated) _core_product.txt file name." values="(string)"/>
+      <configurationElements name="CORE_ROFSFILE" description="The name of the core rofs file." values="(string)"/>
+      <configurationElements name="CORE_ROMVER" description="The rom version parameter passed to the version.iby" values="(string)"/>
+      <configurationElements name="CORE_SWVERFILE" description="The (generated) _core_sw.txt version file name. This generated file is included in the CORE_VERIBY file." values="(string)"/>
+      <configurationElements name="CORE_SWVERINFO" description="The content string for the sw.txt file." values="(string)"/>
+      <configurationElements name="CORE_TIME" description="The time defined to the core image" values="(string)"/>
+      <configurationElements name="CORE_UDEBFILE" description="The name of the core udeb file. See USE_UDEB." values="(string)"/>
+      <configurationElements name="CORE_VERIBY" description="The name of the generated core *version.iby, which included version files and info" values="(string)"/>
+      <configurationElements name="CORE_VERSION" description="The version of the core. Used in sw.txt generation." values="(string)"/>
+      <configurationElements name="COREPLAT_NAME" description="Name of the core platform" values="(string)"/>
+      <configurationElements name="CUSTVARIANT_DIR" description="Configure the directory where to included the customer variant content. By default all content under /content is included to the image as it exists in the folder." values="(string)"/>
+      <configurationElements name="DEFAULT_LANGUAGE" description="Default language is the language where the device will boot to (SIM language overrides this selection)" values="(string)"/>
+      <configurationElements name="FLASH_EXT" description="The flash file extension." values="(string)"/>
+      <configurationElements name="HWID" description="Hardware Id" values="([0-9]4)"/>
+      <configurationElements name="HWID_LIST" description="Possible Hardware Ids of the product." values="([0-9]4)*"/>
+      <configurationElements name="KEEPTEMP" description="Keep the buildrom.pl temp files (copied to the WORKDIR). E.g. tmp1.oby tmp2.oby..tmp9.oby" values="([0|1])"/>
+      <configurationElements name="LABEL" description="A label to the NAME of the image" values="(string)"/>
+      <configurationElements name="LANGID" description="Language id used in the lang.txt generation" values="(string)"/>
+      <configurationElements name="LANGUAGES" description="Languages are the languages that are taken to the image (SC language is is defaulting to 01 in languages.txt)" values="(string)"/>
+      <configurationElements name="NAME" description="The name of the image" values="(string)"/>
+      <configurationElements name="OPERATOR_OBY" description="The name for generated operator oby, which is a file generated based on an operator specific content." values="(string)"/>
+      <configurationElements name="OPERATOR_OBYGEN" description="The name, path, rule for collecting content to the operator specific oby (E.g. operator.oby | /epoc32/rom/include/operator | *.iby collects all iby files from operator folder)." values="(string)|(string)|(string)"/>
+      <configurationElements name="PRODUCT_MODEL" description="The model of the product" values="(string)"/>
+      <configurationElements name="PRODUCT_NAME" description="Name of the product" values="(string)"/>
+      <configurationElements name="PRODUCT_REVISION" description="The reision of the product" values="(string)"/>
+      <configurationElements name="RELEASEDIR" description="The RELEASEDIR is used in the RELEASE step that copies the created files to a separate folder defined by the RELEASEDIR." values="(string)"/>
+      <configurationElements name="RELEASEFILES" description="The RELEASEFILES define the source files that are copied in the RELEASE step. The files must be given as a space delimited list. Wildcards can be used. E.g. \epoc32\rombuild\product\theflash.fpsx \epoc32\rombuild\product\*.log" values="(string)"/>
+      <configurationElements name="RELEASENAME" description="The RELEASENAME is used in the RELEASE step that copies the created files to a separate folder with a new name." values="(string)"/>
+      <configurationElements name="ROFS2_DIR" description="The working directory, when creating the rofs2 image" values="(string)"/>
+      <configurationElements name="ROFS2_E2FNAME" description="The rofs2 elf2flash filename. This is the final rofs2 flash file." values="(string)"/>
+      <configurationElements name="ROFS2_FOOTER" description="This variable can contain a footer section for the rofs2 master oby." values="(string)"/>
+      <configurationElements name="ROFS2_FWIDFILE" description="The (generated) _rofs2_fwid.txt file name." values="(string)"/>
+      <configurationElements name="ROFS2_FWIDINFO" description="The content string for the fwid2.txt file." values="(string)"/>
+      <configurationElements name="ROFS2_HEADER" description="This variable can contain a header section for the rofs2 master oby." values="(string)"/>
+      <configurationElements name="ROFS2_MSTOBY" description="The (generated) rofs2 master oby file name. This file includes the ROFS2_OBY files and other parameters" values="(string)"/>
+      <configurationElements name="ROFS2_NAME" description="The full name of the rofs2 image" values="(string)"/>
+      <configurationElements name="ROFS2_OBY" description="The oby file(s) included to the rofs2 image creation" values="(string)"/>
+      <configurationElements name="ROFS2_OPT" description="The rofs2 specific buildrom options" values="(string)"/>
+      <configurationElements name="ROFS2_ROMVER" description="The rofs2 ROM version string" values="(string)"/>
+      <configurationElements name="ROFS2_TIME" description="The time defined to the rofs2 image." values="(string)"/>
+      <configurationElements name="ROFS2_VERIBY" description="The (generated) version iby file name for the rofs2 image. This file included the version text files and other version parameters." values="(string)"/>
+      <configurationElements name="ROFS3_CUSTFILE" description="The (generated) source file name for customersw.txt." values="(string)"/>
+      <configurationElements name="ROFS3_CUSTINFO" description="The content string for the customersw.txt." values="(string)"/>
+      <configurationElements name="ROFS3_DIR" description="The working directory, when creating the rofs3 image" values="(string)"/>
+      <configurationElements name="ROFS3_E2FNAME" description="The rofs3 elf2flash filename. This is the final rofs3 flash file." values="(string)"/>
+      <configurationElements name="ROFS3_FOOTER" description="This variable can contain a footer section for the rofs3 master oby." values="(string)"/>
+      <configurationElements name="ROFS3_FWIDFILE" description="The (generated) _rofs3_fwid.txt file name." values="(string)"/>
+      <configurationElements name="ROFS3_FWIDINFO" description="The content string for the fwid3.txt file." values="(string)"/>
+      <configurationElements name="ROFS3_HEADER" description="This variable can contain a header section for the rofs3 master oby." values="(string)"/>
+      <configurationElements name="ROFS3_MSTOBY" description="The (generated) version iby file name for the rofs3 image. This file included the version text files and other version parameters." values="(string)"/>
+      <configurationElements name="ROFS3_NAME" description="The full name of the rofs3 image" values="(string)"/>
+      <configurationElements name="ROFS3_OBY" description="The oby file(s) included to the rofs3 image creation" values="(string)"/>
+      <configurationElements name="ROFS3_OPT" description="The rofs3 specific buildrom options" values="(string)"/>
+      <configurationElements name="ROFS3_ROMVER" description="The rofs3 ROM version string" values="(string)"/>
+      <configurationElements name="ROFS3_TIME" description="The time defined to the rofs3 image." values="(string)"/>
+      <configurationElements name="ROFS3_VERIBY" description="The (generated) version iby file name for the rofs3 image. This file included the version text files and other version parameters." values="(string)"/>
+      <configurationElements name="SOS_VERSION" description="Symbian OS version number. The value is used in the version info generation (platform.txt).(see USE_VERGEN)" values="([0-9]+.[0-9]+)"/>
+      <configurationElements name="SWUPD_EXT" description="The software update file extension." values="(string)"/>
+      <configurationElements name="TYPE" description="Defines the image type." values="(rnd|prd|subcon)"/>
+      <configurationElements name="USE_OVERRIDE" description="Define whether the override.pm Buildrom.pl plugin is used (Includes automatically also \epoc32\rom\override.oby)." values="([0|1])"/>
+      <configurationElements name="USE_PAGING" description="Define the usage of On Demand Pagin (ODP). (E.g. 0,rom,code)." values="((0|rom|code[:[(1|2|3)]+]?))"/>
+      <configurationElements name="USE_ROFS" description="Define the rofs sections in use. A comma separated list can be given of possible values. (E.g. 1,2,3)." values="([[dummy|]0..6][,[dummy|]0..6]*)"/>
+      <configurationElements name="USE_ROMFILE" description="Define whether the \epoc32\rombuild\romfiles.txt is used. Files in romfiles are automatically moved to ROM, everything else in core is moved to ROFS1." values="([0|1])"/>
+      <configurationElements name="USE_ROMSYMGEN" description="Generate the rom symbol file. 0=Do not generate, 1=Generate" values="([0|1])"/>
+      <configurationElements name="USE_UDEB" description="Include the usage of the debug binary *.txt to define the list of binaries that are taken from udeb folder instead of the urel." values="([0|1|full])"/>
+      <configurationElements name="USE_VERGEN" description="Use iMaker version info generation" values="([0|1])"/>
+      <configurationElements name="BLDROBY" description="For passing extra oby files (from command line) to the buildrom.pl" values="(string)"/>
+      <configurationElements name="BLDROM_OPT" description="The default buildrom.pl options" values="(string)"/>
+      <configurationElements name="BLDROPT" description="For passing extra parameters (from command line) to the buildrom.pl" values="(string)"/>
+      <configurationElements name="CONFIGROOT" description="Define the default configuration root directory." values="(string)"/>
+      <configurationElements name="CORE_CDPROMFILE" description="The name of the core Code Demand Paging rom file (Code paging)." values="(string)"/>
+      <configurationElements name="CORE_DIR" description="The working directory, when creating core image" values="(string)"/>
+      <configurationElements name="CORE_E2FNAME" description="The core elf2flash filename. This is the final core flash file." values="(string)"/>
+      <configurationElements name="CORE_FWIDFILE" description="The (generated) _core_fwid.txt file name." values="(string)"/>
+      <configurationElements name="CORE_IMEISVFILE" description="The (generated) _core_imeisv.txt file name." values="(string)"/>
+      <configurationElements name="CORE_IMEISVINFO" description="The content string for the imeisv.txt file." values="(string)"/>
+      <configurationElements name="CORE_MODELFILE" description="The (generated) _core_model.txt file name." values="(string)"/>
+      <configurationElements name="CORE_MODELINFO" description="The content string for the model.txt file." values="(string)"/>
+      <configurationElements name="CORE_MSTOBY" description="The generated master oby file name, which includes the CORE_OBY files" values="(string)"/>
+      <configurationElements name="CORE_NAME" description="The full name of the core image" values="(string)"/>
+      <configurationElements name="CORE_NDPROMFILE" description="The name of the core Non Demand Paging rom file." values="(string)"/>
+      <configurationElements name="CORE_OBY" description="The oby file(s) included to the core image creation" values="(string)"/>
+      <configurationElements name="CORE_ODPROMFILE" description="The name of the core On Demand Paging rom file (Rom paging)." values="(string)"/>
+      <configurationElements name="CORE_OPT" description="The core specific buildrom options" values="(string)"/>
+      <configurationElements name="CORE_PLATFILE" description="The (generated) _core_platform.txt file name." values="(string)"/>
+      <configurationElements name="CORE_PLATINFO" description="The content string for the fwid.txt file." values="(string)"/>
+      <configurationElements name="CORE_PRODFILE" description="The (generated) _core_product.txt file name." values="(string)"/>
+      <configurationElements name="CORE_ROFSFILE" description="The name of the core rofs file." values="(string)"/>
+      <configurationElements name="CORE_ROMVER" description="The rom version parameter passed to the version.iby" values="(string)"/>
+      <configurationElements name="CORE_SWVERFILE" description="The (generated) _core_sw.txt version file name. This generated file is included in the CORE_VERIBY file." values="(string)"/>
+      <configurationElements name="CORE_SWVERINFO" description="The content string for the sw.txt file." values="(string)"/>
+      <configurationElements name="CORE_TIME" description="The time defined to the core image" values="(string)"/>
+      <configurationElements name="CORE_UDEBFILE" description="The name of the core udeb file. See USE_UDEB." values="(string)"/>
+      <configurationElements name="CORE_VERIBY" description="The name of the generated core *version.iby, which included version files and info" values="(string)"/>
+      <configurationElements name="CORE_VERSION" description="The version of the core. Used in sw.txt generation." values="(string)"/>
+      <configurationElements name="COREPLAT_NAME" description="Name of the core platform" values="(string)"/>
+      <configurationElements name="CUSTVARIANT_DIR" description="Configure the directory where to included the customer variant content. By default all content under /content is included to the image as it exists in the folder." values="(string)"/>
+      <configurationElements name="DEFAULT_LANGUAGE" description="Default language is the language where the device will boot to (SIM language overrides this selection)" values="(string)"/>
+      <configurationElements name="FLASH_EXT" description="The flash file extension." values="(string)"/>
+      <configurationElements name="HWID" description="Hardware Id" values="([0-9]4)"/>
+      <configurationElements name="HWID_LIST" description="Possible Hardware Ids of the product." values="([0-9]4)*"/>
+      <configurationElements name="KEEPTEMP" description="Keep the buildrom.pl temp files (copied to the WORKDIR). E.g. tmp1.oby tmp2.oby..tmp9.oby" values="([0|1])"/>
+      <configurationElements name="LABEL" description="A label to the NAME of the image" values="(string)"/>
+      <configurationElements name="LANGID" description="Language id used in the lang.txt generation" values="(string)"/>
+      <configurationElements name="LANGUAGES" description="Languages are the languages that are taken to the image (SC language is is defaulting to 01 in languages.txt)" values="(string)"/>
+      <configurationElements name="NAME" description="The name of the image" values="(string)"/>
+      <configurationElements name="OPERATOR_OBY" description="The name for generated operator oby, which is a file generated based on an operator specific content." values="(string)"/>
+      <configurationElements name="OPERATOR_OBYGEN" description="The name, path, rule for collecting content to the operator specific oby (E.g. operator.oby | /epoc32/rom/include/operator | *.iby collects all iby files from operator folder)." values="(string)|(string)|(string)"/>
+      <configurationElements name="PRODUCT_MODEL" description="The model of the product" values="(string)"/>
+      <configurationElements name="PRODUCT_NAME" description="Name of the product" values="(string)"/>
+      <configurationElements name="PRODUCT_REVISION" description="The reision of the product" values="(string)"/>
+      <configurationElements name="RELEASEDIR" description="The RELEASEDIR is used in the RELEASE step that copies the created files to a separate folder defined by the RELEASEDIR." values="(string)"/>
+      <configurationElements name="RELEASEFILES" description="The RELEASEFILES define the source files that are copied in the RELEASE step. The files must be given as a space delimited list. Wildcards can be used. E.g. \epoc32\rombuild\product\theflash.fpsx \epoc32\rombuild\product\*.log" values="(string)"/>
+      <configurationElements name="RELEASENAME" description="The RELEASENAME is used in the RELEASE step that copies the created files to a separate folder with a new name." values="(string)"/>
+      <configurationElements name="ROFS2_DIR" description="The working directory, when creating the rofs2 image" values="(string)"/>
+      <configurationElements name="ROFS2_E2FNAME" description="The rofs2 elf2flash filename. This is the final rofs2 flash file." values="(string)"/>
+      <configurationElements name="ROFS2_FOOTER" description="This variable can contain a footer section for the rofs2 master oby." values="(string)"/>
+      <configurationElements name="ROFS2_FWIDFILE" description="The (generated) _rofs2_fwid.txt file name." values="(string)"/>
+      <configurationElements name="ROFS2_FWIDINFO" description="The content string for the fwid2.txt file." values="(string)"/>
+      <configurationElements name="ROFS2_HEADER" description="This variable can contain a header section for the rofs2 master oby." values="(string)"/>
+      <configurationElements name="ROFS2_MSTOBY" description="The (generated) rofs2 master oby file name. This file includes the ROFS2_OBY files and other parameters" values="(string)"/>
+      <configurationElements name="ROFS2_NAME" description="The full name of the rofs2 image" values="(string)"/>
+      <configurationElements name="ROFS2_OBY" description="The oby file(s) included to the rofs2 image creation" values="(string)"/>
+      <configurationElements name="ROFS2_OPT" description="The rofs2 specific buildrom options" values="(string)"/>
+      <configurationElements name="ROFS2_ROMVER" description="The rofs2 ROM version string" values="(string)"/>
+      <configurationElements name="ROFS2_TIME" description="The time defined to the rofs2 image." values="(string)"/>
+      <configurationElements name="ROFS2_VERIBY" description="The (generated) version iby file name for the rofs2 image. This file included the version text files and other version parameters." values="(string)"/>
+      <configurationElements name="ROFS3_CUSTFILE" description="The (generated) source file name for customersw.txt." values="(string)"/>
+      <configurationElements name="ROFS3_CUSTINFO" description="The content string for the customersw.txt." values="(string)"/>
+      <configurationElements name="ROFS3_DIR" description="The working directory, when creating the rofs3 image" values="(string)"/>
+      <configurationElements name="ROFS3_E2FNAME" description="The rofs3 elf2flash filename. This is the final rofs3 flash file." values="(string)"/>
+      <configurationElements name="ROFS3_FOOTER" description="This variable can contain a footer section for the rofs3 master oby." values="(string)"/>
+      <configurationElements name="ROFS3_FWIDFILE" description="The (generated) _rofs3_fwid.txt file name." values="(string)"/>
+      <configurationElements name="ROFS3_FWIDINFO" description="The content string for the fwid3.txt file." values="(string)"/>
+      <configurationElements name="ROFS3_HEADER" description="This variable can contain a header section for the rofs3 master oby." values="(string)"/>
+      <configurationElements name="ROFS3_MSTOBY" description="The (generated) version iby file name for the rofs3 image. This file included the version text files and other version parameters." values="(string)"/>
+      <configurationElements name="ROFS3_NAME" description="The full name of the rofs3 image" values="(string)"/>
+      <configurationElements name="ROFS3_OBY" description="The oby file(s) included to the rofs3 image creation" values="(string)"/>
+      <configurationElements name="ROFS3_OPT" description="The rofs3 specific buildrom options" values="(string)"/>
+      <configurationElements name="ROFS3_ROMVER" description="The rofs3 ROM version string" values="(string)"/>
+      <configurationElements name="ROFS3_TIME" description="The time defined to the rofs3 image." values="(string)"/>
+      <configurationElements name="ROFS3_VERIBY" description="The (generated) version iby file name for the rofs3 image. This file included the version text files and other version parameters." values="(string)"/>
+      <configurationElements name="SOS_VERSION" description="Symbian OS version number. The value is used in the version info generation (platform.txt).(see USE_VERGEN)" values="([0-9]+.[0-9]+)"/>
+      <configurationElements name="SWUPD_EXT" description="The software update file extension." values="(string)"/>
+      <configurationElements name="TYPE" description="Defines the image type." values="(rnd|prd|subcon)"/>
+      <configurationElements name="USE_OVERRIDE" description="Define whether the override.pm Buildrom.pl plugin is used (Includes automatically also \epoc32\rom\override.oby)." values="([0|1])"/>
+      <configurationElements name="USE_PAGING" description="Define the usage of On Demand Pagin (ODP). (E.g. 0,rom,code)." values="((0|rom|code[:[(1|2|3)]+]?))"/>
+      <configurationElements name="USE_ROFS" description="Define the rofs sections in use. A comma separated list can be given of possible values. (E.g. 1,2,3)." values="([[dummy|]0..6][,[dummy|]0..6]*)"/>
+      <configurationElements name="USE_ROMFILE" description="Define whether the \epoc32\rombuild\romfiles.txt is used. Files in romfiles are automatically moved to ROM, everything else in core is moved to ROFS1." values="([0|1])"/>
+      <configurationElements name="USE_ROMSYMGEN" description="Generate the rom symbol file. 0=Do not generate, 1=Generate" values="([0|1])"/>
+      <configurationElements name="USE_UDEB" description="Include the usage of the debug binary *.txt to define the list of binaries that are taken from udeb folder instead of the urel." values="([0|1|full])"/>
+      <configurationElements name="USE_VERGEN" description="Use iMaker version info generation" values="([0|1])"/>
+      <configurationElements name="BLDROBY" description="For passing extra oby files (from command line) to the buildrom.pl" values="(string)"/>
+      <configurationElements name="BLDROM_OPT" description="The default buildrom.pl options" values="(string)"/>
+      <configurationElements name="BLDROPT" description="For passing extra parameters (from command line) to the buildrom.pl" values="(string)"/>
+      <configurationElements name="CONFIGROOT" description="Define the default configuration root directory." values="(string)"/>
+      <configurationElements name="CORE_CDPROMFILE" description="The name of the core Code Demand Paging rom file (Code paging)." values="(string)"/>
+      <configurationElements name="CORE_DIR" description="The working directory, when creating core image" values="(string)"/>
+      <configurationElements name="CORE_E2FNAME" description="The core elf2flash filename. This is the final core flash file." values="(string)"/>
+      <configurationElements name="CORE_FWIDFILE" description="The (generated) _core_fwid.txt file name." values="(string)"/>
+      <configurationElements name="CORE_IMEISVFILE" description="The (generated) _core_imeisv.txt file name." values="(string)"/>
+      <configurationElements name="CORE_IMEISVINFO" description="The content string for the imeisv.txt file." values="(string)"/>
+      <configurationElements name="CORE_MODELFILE" description="The (generated) _core_model.txt file name." values="(string)"/>
+      <configurationElements name="CORE_MODELINFO" description="The content string for the model.txt file." values="(string)"/>
+      <configurationElements name="CORE_MSTOBY" description="The generated master oby file name, which includes the CORE_OBY files" values="(string)"/>
+      <configurationElements name="CORE_NAME" description="The full name of the core image" values="(string)"/>
+      <configurationElements name="CORE_NDPROMFILE" description="The name of the core Non Demand Paging rom file." values="(string)"/>
+      <configurationElements name="CORE_OBY" description="The oby file(s) included to the core image creation" values="(string)"/>
+      <configurationElements name="CORE_ODPROMFILE" description="The name of the core On Demand Paging rom file (Rom paging)." values="(string)"/>
+      <configurationElements name="CORE_OPT" description="The core specific buildrom options" values="(string)"/>
+      <configurationElements name="CORE_PLATFILE" description="The (generated) _core_platform.txt file name." values="(string)"/>
+      <configurationElements name="CORE_PLATINFO" description="The content string for the fwid.txt file." values="(string)"/>
+      <configurationElements name="CORE_PRODFILE" description="The (generated) _core_product.txt file name." values="(string)"/>
+      <configurationElements name="CORE_ROFSFILE" description="The name of the core rofs file." values="(string)"/>
+      <configurationElements name="CORE_ROMVER" description="The rom version parameter passed to the version.iby" values="(string)"/>
+      <configurationElements name="CORE_SWVERFILE" description="The (generated) _core_sw.txt version file name. This generated file is included in the CORE_VERIBY file." values="(string)"/>
+      <configurationElements name="CORE_SWVERINFO" description="The content string for the sw.txt file." values="(string)"/>
+      <configurationElements name="CORE_TIME" description="The time defined to the core image" values="(string)"/>
+      <configurationElements name="CORE_UDEBFILE" description="The name of the core udeb file. See USE_UDEB." values="(string)"/>
+      <configurationElements name="CORE_VERIBY" description="The name of the generated core *version.iby, which included version files and info" values="(string)"/>
+      <configurationElements name="CORE_VERSION" description="The version of the core. Used in sw.txt generation." values="(string)"/>
+      <configurationElements name="COREPLAT_NAME" description="Name of the core platform" values="(string)"/>
+      <configurationElements name="CUSTVARIANT_DIR" description="Configure the directory where to included the customer variant content. By default all content under /content is included to the image as it exists in the folder." values="(string)"/>
+      <configurationElements name="DEFAULT_LANGUAGE" description="Default language is the language where the device will boot to (SIM language overrides this selection)" values="(string)"/>
+      <configurationElements name="FLASH_EXT" description="The flash file extension." values="(string)"/>
+      <configurationElements name="HWID" description="Hardware Id" values="([0-9]4)"/>
+      <configurationElements name="HWID_LIST" description="Possible Hardware Ids of the product." values="([0-9]4)*"/>
+      <configurationElements name="KEEPTEMP" description="Keep the buildrom.pl temp files (copied to the WORKDIR). E.g. tmp1.oby tmp2.oby..tmp9.oby" values="([0|1])"/>
+      <configurationElements name="LABEL" description="A label to the NAME of the image" values="(string)"/>
+      <configurationElements name="LANGID" description="Language id used in the lang.txt generation" values="(string)"/>
+      <configurationElements name="LANGUAGES" description="Languages are the languages that are taken to the image (SC language is is defaulting to 01 in languages.txt)" values="(string)"/>
+      <configurationElements name="NAME" description="The name of the image" values="(string)"/>
+      <configurationElements name="OPERATOR_OBY" description="The name for generated operator oby, which is a file generated based on an operator specific content." values="(string)"/>
+      <configurationElements name="OPERATOR_OBYGEN" description="The name, path, rule for collecting content to the operator specific oby (E.g. operator.oby | /epoc32/rom/include/operator | *.iby collects all iby files from operator folder)." values="(string)|(string)|(string)"/>
+      <configurationElements name="PRODUCT_MODEL" description="The model of the product" values="(string)"/>
+      <configurationElements name="PRODUCT_NAME" description="Name of the product" values="(string)"/>
+      <configurationElements name="PRODUCT_REVISION" description="The reision of the product" values="(string)"/>
+      <configurationElements name="RELEASEDIR" description="The RELEASEDIR is used in the RELEASE step that copies the created files to a separate folder defined by the RELEASEDIR." values="(string)"/>
+      <configurationElements name="RELEASEFILES" description="The RELEASEFILES define the source files that are copied in the RELEASE step. The files must be given as a space delimited list. Wildcards can be used. E.g. \epoc32\rombuild\product\theflash.fpsx \epoc32\rombuild\product\*.log" values="(string)"/>
+      <configurationElements name="RELEASENAME" description="The RELEASENAME is used in the RELEASE step that copies the created files to a separate folder with a new name." values="(string)"/>
+      <configurationElements name="ROFS2_DIR" description="The working directory, when creating the rofs2 image" values="(string)"/>
+      <configurationElements name="ROFS2_E2FNAME" description="The rofs2 elf2flash filename. This is the final rofs2 flash file." values="(string)"/>
+      <configurationElements name="ROFS2_FOOTER" description="This variable can contain a footer section for the rofs2 master oby." values="(string)"/>
+      <configurationElements name="ROFS2_FWIDFILE" description="The (generated) _rofs2_fwid.txt file name." values="(string)"/>
+      <configurationElements name="ROFS2_FWIDINFO" description="The content string for the fwid2.txt file." values="(string)"/>
+      <configurationElements name="ROFS2_HEADER" description="This variable can contain a header section for the rofs2 master oby." values="(string)"/>
+      <configurationElements name="ROFS2_MSTOBY" description="The (generated) rofs2 master oby file name. This file includes the ROFS2_OBY files and other parameters" values="(string)"/>
+      <configurationElements name="ROFS2_NAME" description="The full name of the rofs2 image" values="(string)"/>
+      <configurationElements name="ROFS2_OBY" description="The oby file(s) included to the rofs2 image creation" values="(string)"/>
+      <configurationElements name="ROFS2_OPT" description="The rofs2 specific buildrom options" values="(string)"/>
+      <configurationElements name="ROFS2_ROMVER" description="The rofs2 ROM version string" values="(string)"/>
+      <configurationElements name="ROFS2_TIME" description="The time defined to the rofs2 image." values="(string)"/>
+      <configurationElements name="ROFS2_VERIBY" description="The (generated) version iby file name for the rofs2 image. This file included the version text files and other version parameters." values="(string)"/>
+      <configurationElements name="ROFS3_CUSTFILE" description="The (generated) source file name for customersw.txt." values="(string)"/>
+      <configurationElements name="ROFS3_CUSTINFO" description="The content string for the customersw.txt." values="(string)"/>
+      <configurationElements name="ROFS3_DIR" description="The working directory, when creating the rofs3 image" values="(string)"/>
+      <configurationElements name="ROFS3_E2FNAME" description="The rofs3 elf2flash filename. This is the final rofs3 flash file." values="(string)"/>
+      <configurationElements name="ROFS3_FOOTER" description="This variable can contain a footer section for the rofs3 master oby." values="(string)"/>
+      <configurationElements name="ROFS3_FWIDFILE" description="The (generated) _rofs3_fwid.txt file name." values="(string)"/>
+      <configurationElements name="ROFS3_FWIDINFO" description="The content string for the fwid3.txt file." values="(string)"/>
+      <configurationElements name="ROFS3_HEADER" description="This variable can contain a header section for the rofs3 master oby." values="(string)"/>
+      <configurationElements name="ROFS3_MSTOBY" description="The (generated) version iby file name for the rofs3 image. This file included the version text files and other version parameters." values="(string)"/>
+      <configurationElements name="ROFS3_NAME" description="The full name of the rofs3 image" values="(string)"/>
+      <configurationElements name="ROFS3_OBY" description="The oby file(s) included to the rofs3 image creation" values="(string)"/>
+      <configurationElements name="ROFS3_OPT" description="The rofs3 specific buildrom options" values="(string)"/>
+      <configurationElements name="ROFS3_ROMVER" description="The rofs3 ROM version string" values="(string)"/>
+      <configurationElements name="ROFS3_TIME" description="The time defined to the rofs3 image." values="(string)"/>
+      <configurationElements name="ROFS3_VERIBY" description="The (generated) version iby file name for the rofs3 image. This file included the version text files and other version parameters." values="(string)"/>
+      <configurationElements name="SOS_VERSION" description="Symbian OS version number. The value is used in the version info generation (platform.txt).(see USE_VERGEN)" values="([0-9]+.[0-9]+)"/>
+      <configurationElements name="SWUPD_EXT" description="The software update file extension." values="(string)"/>
+      <configurationElements name="TYPE" description="Defines the image type." values="(rnd|prd|subcon)"/>
+      <configurationElements name="USE_OVERRIDE" description="Define whether the override.pm Buildrom.pl plugin is used (Includes automatically also \epoc32\rom\override.oby)." values="([0|1])"/>
+      <configurationElements name="USE_PAGING" description="Define the usage of On Demand Pagin (ODP). (E.g. 0,rom,code)." values="((0|rom|code[:[(1|2|3)]+]?))"/>
+      <configurationElements name="USE_ROFS" description="Define the rofs sections in use. A comma separated list can be given of possible values. (E.g. 1,2,3)." values="([[dummy|]0..6][,[dummy|]0..6]*)"/>
+      <configurationElements name="USE_ROMFILE" description="Define whether the \epoc32\rombuild\romfiles.txt is used. Files in romfiles are automatically moved to ROM, everything else in core is moved to ROFS1." values="([0|1])"/>
+      <configurationElements name="USE_ROMSYMGEN" description="Generate the rom symbol file. 0=Do not generate, 1=Generate" values="([0|1])"/>
+      <configurationElements name="USE_UDEB" description="Include the usage of the debug binary *.txt to define the list of binaries that are taken from udeb folder instead of the urel." values="([0|1|full])"/>
+      <configurationElements name="USE_VERGEN" description="Use iMaker version info generation" values="([0|1])"/>
+      <configurationElements name="BLDROBY" description="For passing extra oby files (from command line) to the buildrom.pl" values="(string)"/>
+      <configurationElements name="BLDROM_OPT" description="The default buildrom.pl options" values="(string)"/>
+      <configurationElements name="BLDROPT" description="For passing extra parameters (from command line) to the buildrom.pl" values="(string)"/>
+      <configurationElements name="CONFIGROOT" description="Define the default configuration root directory." values="(string)"/>
+      <configurationElements name="CORE_CDPROMFILE" description="The name of the core Code Demand Paging rom file (Code paging)." values="(string)"/>
+      <configurationElements name="CORE_DIR" description="The working directory, when creating core image" values="(string)"/>
+      <configurationElements name="CORE_E2FNAME" description="The core elf2flash filename. This is the final core flash file." values="(string)"/>
+      <configurationElements name="CORE_FWIDFILE" description="The (generated) _core_fwid.txt file name." values="(string)"/>
+      <configurationElements name="CORE_IMEISVFILE" description="The (generated) _core_imeisv.txt file name." values="(string)"/>
+      <configurationElements name="CORE_IMEISVINFO" description="The content string for the imeisv.txt file." values="(string)"/>
+      <configurationElements name="CORE_MODELFILE" description="The (generated) _core_model.txt file name." values="(string)"/>
+      <configurationElements name="CORE_MODELINFO" description="The content string for the model.txt file." values="(string)"/>
+      <configurationElements name="CORE_MSTOBY" description="The generated master oby file name, which includes the CORE_OBY files" values="(string)"/>
+      <configurationElements name="CORE_NAME" description="The full name of the core image" values="(string)"/>
+      <configurationElements name="CORE_NDPROMFILE" description="The name of the core Non Demand Paging rom file." values="(string)"/>
+      <configurationElements name="CORE_OBY" description="The oby file(s) included to the core image creation" values="(string)"/>
+      <configurationElements name="CORE_ODPROMFILE" description="The name of the core On Demand Paging rom file (Rom paging)." values="(string)"/>
+      <configurationElements name="CORE_OPT" description="The core specific buildrom options" values="(string)"/>
+      <configurationElements name="CORE_PLATFILE" description="The (generated) _core_platform.txt file name." values="(string)"/>
+      <configurationElements name="CORE_PLATINFO" description="The content string for the fwid.txt file." values="(string)"/>
+      <configurationElements name="CORE_PRODFILE" description="The (generated) _core_product.txt file name." values="(string)"/>
+      <configurationElements name="CORE_ROFSFILE" description="The name of the core rofs file." values="(string)"/>
+      <configurationElements name="CORE_ROMVER" description="The rom version parameter passed to the version.iby" values="(string)"/>
+      <configurationElements name="CORE_SWVERFILE" description="The (generated) _core_sw.txt version file name. This generated file is included in the CORE_VERIBY file." values="(string)"/>
+      <configurationElements name="CORE_SWVERINFO" description="The content string for the sw.txt file." values="(string)"/>
+      <configurationElements name="CORE_TIME" description="The time defined to the core image" values="(string)"/>
+      <configurationElements name="CORE_UDEBFILE" description="The name of the core udeb file. See USE_UDEB." values="(string)"/>
+      <configurationElements name="CORE_VERIBY" description="The name of the generated core *version.iby, which included version files and info" values="(string)"/>
+      <configurationElements name="CORE_VERSION" description="The version of the core. Used in sw.txt generation." values="(string)"/>
+      <configurationElements name="COREPLAT_NAME" description="Name of the core platform" values="(string)"/>
+      <configurationElements name="CUSTVARIANT_DIR" description="Configure the directory where to included the customer variant content. By default all content under /content is included to the image as it exists in the folder." values="(string)"/>
+      <configurationElements name="DEFAULT_LANGUAGE" description="Default language is the language where the device will boot to (SIM language overrides this selection)" values="(string)"/>
+      <configurationElements name="FLASH_EXT" description="The flash file extension." values="(string)"/>
+      <configurationElements name="HWID" description="Hardware Id" values="([0-9]4)"/>
+      <configurationElements name="HWID_LIST" description="Possible Hardware Ids of the product." values="([0-9]4)*"/>
+      <configurationElements name="KEEPTEMP" description="Keep the buildrom.pl temp files (copied to the WORKDIR). E.g. tmp1.oby tmp2.oby..tmp9.oby" values="([0|1])"/>
+      <configurationElements name="LABEL" description="A label to the NAME of the image" values="(string)"/>
+      <configurationElements name="LANGID" description="Language id used in the lang.txt generation" values="(string)"/>
+      <configurationElements name="LANGUAGES" description="Languages are the languages that are taken to the image (SC language is is defaulting to 01 in languages.txt)" values="(string)"/>
+      <configurationElements name="NAME" description="The name of the image" values="(string)"/>
+      <configurationElements name="OPERATOR_OBY" description="The name for generated operator oby, which is a file generated based on an operator specific content." values="(string)"/>
+      <configurationElements name="OPERATOR_OBYGEN" description="The name, path, rule for collecting content to the operator specific oby (E.g. operator.oby | /epoc32/rom/include/operator | *.iby collects all iby files from operator folder)." values="(string)|(string)|(string)"/>
+      <configurationElements name="PRODUCT_MODEL" description="The model of the product" values="(string)"/>
+      <configurationElements name="PRODUCT_NAME" description="Name of the product" values="(string)"/>
+      <configurationElements name="PRODUCT_REVISION" description="The reision of the product" values="(string)"/>
+      <configurationElements name="RELEASEDIR" description="The RELEASEDIR is used in the RELEASE step that copies the created files to a separate folder defined by the RELEASEDIR." values="(string)"/>
+      <configurationElements name="RELEASEFILES" description="The RELEASEFILES define the source files that are copied in the RELEASE step. The files must be given as a space delimited list. Wildcards can be used. E.g. \epoc32\rombuild\product\theflash.fpsx \epoc32\rombuild\product\*.log" values="(string)"/>
+      <configurationElements name="RELEASENAME" description="The RELEASENAME is used in the RELEASE step that copies the created files to a separate folder with a new name." values="(string)"/>
+      <configurationElements name="ROFS2_DIR" description="The working directory, when creating the rofs2 image" values="(string)"/>
+      <configurationElements name="ROFS2_E2FNAME" description="The rofs2 elf2flash filename. This is the final rofs2 flash file." values="(string)"/>
+      <configurationElements name="ROFS2_FOOTER" description="This variable can contain a footer section for the rofs2 master oby." values="(string)"/>
+      <configurationElements name="ROFS2_FWIDFILE" description="The (generated) _rofs2_fwid.txt file name." values="(string)"/>
+      <configurationElements name="ROFS2_FWIDINFO" description="The content string for the fwid2.txt file." values="(string)"/>
+      <configurationElements name="ROFS2_HEADER" description="This variable can contain a header section for the rofs2 master oby." values="(string)"/>
+      <configurationElements name="ROFS2_MSTOBY" description="The (generated) rofs2 master oby file name. This file includes the ROFS2_OBY files and other parameters" values="(string)"/>
+      <configurationElements name="ROFS2_NAME" description="The full name of the rofs2 image" values="(string)"/>
+      <configurationElements name="ROFS2_OBY" description="The oby file(s) included to the rofs2 image creation" values="(string)"/>
+      <configurationElements name="ROFS2_OPT" description="The rofs2 specific buildrom options" values="(string)"/>
+      <configurationElements name="ROFS2_ROMVER" description="The rofs2 ROM version string" values="(string)"/>
+      <configurationElements name="ROFS2_TIME" description="The time defined to the rofs2 image." values="(string)"/>
+      <configurationElements name="ROFS2_VERIBY" description="The (generated) version iby file name for the rofs2 image. This file included the version text files and other version parameters." values="(string)"/>
+      <configurationElements name="ROFS3_CUSTFILE" description="The (generated) source file name for customersw.txt." values="(string)"/>
+      <configurationElements name="ROFS3_CUSTINFO" description="The content string for the customersw.txt." values="(string)"/>
+      <configurationElements name="ROFS3_DIR" description="The working directory, when creating the rofs3 image" values="(string)"/>
+      <configurationElements name="ROFS3_E2FNAME" description="The rofs3 elf2flash filename. This is the final rofs3 flash file." values="(string)"/>
+      <configurationElements name="ROFS3_FOOTER" description="This variable can contain a footer section for the rofs3 master oby." values="(string)"/>
+      <configurationElements name="ROFS3_FWIDFILE" description="The (generated) _rofs3_fwid.txt file name." values="(string)"/>
+      <configurationElements name="ROFS3_FWIDINFO" description="The content string for the fwid3.txt file." values="(string)"/>
+      <configurationElements name="ROFS3_HEADER" description="This variable can contain a header section for the rofs3 master oby." values="(string)"/>
+      <configurationElements name="ROFS3_MSTOBY" description="The (generated) version iby file name for the rofs3 image. This file included the version text files and other version parameters." values="(string)"/>
+      <configurationElements name="ROFS3_NAME" description="The full name of the rofs3 image" values="(string)"/>
+      <configurationElements name="ROFS3_OBY" description="The oby file(s) included to the rofs3 image creation" values="(string)"/>
+      <configurationElements name="ROFS3_OPT" description="The rofs3 specific buildrom options" values="(string)"/>
+      <configurationElements name="ROFS3_ROMVER" description="The rofs3 ROM version string" values="(string)"/>
+      <configurationElements name="ROFS3_TIME" description="The time defined to the rofs3 image." values="(string)"/>
+      <configurationElements name="ROFS3_VERIBY" description="The (generated) version iby file name for the rofs3 image. This file included the version text files and other version parameters." values="(string)"/>
+      <configurationElements name="SOS_VERSION" description="Symbian OS version number. The value is used in the version info generation (platform.txt).(see USE_VERGEN)" values="([0-9]+.[0-9]+)"/>
+      <configurationElements name="SWUPD_EXT" description="The software update file extension." values="(string)"/>
+      <configurationElements name="TYPE" description="Defines the image type." values="(rnd|prd|subcon)"/>
+      <configurationElements name="USE_OVERRIDE" description="Define whether the override.pm Buildrom.pl plugin is used (Includes automatically also \epoc32\rom\override.oby)." values="([0|1])"/>
+      <configurationElements name="USE_PAGING" description="Define the usage of On Demand Pagin (ODP). (E.g. 0,rom,code)." values="((0|rom|code[:[(1|2|3)]+]?))"/>
+      <configurationElements name="USE_ROFS" description="Define the rofs sections in use. A comma separated list can be given of possible values. (E.g. 1,2,3)." values="([[dummy|]0..6][,[dummy|]0..6]*)"/>
+      <configurationElements name="USE_ROMFILE" description="Define whether the \epoc32\rombuild\romfiles.txt is used. Files in romfiles are automatically moved to ROM, everything else in core is moved to ROFS1." values="([0|1])"/>
+      <configurationElements name="USE_ROMSYMGEN" description="Generate the rom symbol file. 0=Do not generate, 1=Generate" values="([0|1])"/>
+      <configurationElements name="USE_UDEB" description="Include the usage of the debug binary *.txt to define the list of binaries that are taken from udeb folder instead of the urel." values="([0|1|full])"/>
+      <configurationElements name="USE_VERGEN" description="Use iMaker version info generation" values="([0|1])"/>
+      <configurationElements name="BLDROBY" description="For passing extra oby files (from command line) to the buildrom.pl" values="(string)"/>
+      <configurationElements name="BLDROM_OPT" description="The default buildrom.pl options" values="(string)"/>
+      <configurationElements name="BLDROPT" description="For passing extra parameters (from command line) to the buildrom.pl" values="(string)"/>
+      <configurationElements name="CONFIGROOT" description="Define the default configuration root directory." values="(string)"/>
+      <configurationElements name="CORE_CDPROMFILE" description="The name of the core Code Demand Paging rom file (Code paging)." values="(string)"/>
+      <configurationElements name="CORE_DIR" description="The working directory, when creating core image" values="(string)"/>
+      <configurationElements name="CORE_E2FNAME" description="The core elf2flash filename. This is the final core flash file." values="(string)"/>
+      <configurationElements name="CORE_FWIDFILE" description="The (generated) _core_fwid.txt file name." values="(string)"/>
+      <configurationElements name="CORE_IMEISVFILE" description="The (generated) _core_imeisv.txt file name." values="(string)"/>
+      <configurationElements name="CORE_IMEISVINFO" description="The content string for the imeisv.txt file." values="(string)"/>
+      <configurationElements name="CORE_MODELFILE" description="The (generated) _core_model.txt file name." values="(string)"/>
+      <configurationElements name="CORE_MODELINFO" description="The content string for the model.txt file." values="(string)"/>
+      <configurationElements name="CORE_MSTOBY" description="The generated master oby file name, which includes the CORE_OBY files" values="(string)"/>
+      <configurationElements name="CORE_NAME" description="The full name of the core image" values="(string)"/>
+      <configurationElements name="CORE_NDPROMFILE" description="The name of the core Non Demand Paging rom file." values="(string)"/>
+      <configurationElements name="CORE_OBY" description="The oby file(s) included to the core image creation" values="(string)"/>
+      <configurationElements name="CORE_ODPROMFILE" description="The name of the core On Demand Paging rom file (Rom paging)." values="(string)"/>
+      <configurationElements name="CORE_OPT" description="The core specific buildrom options" values="(string)"/>
+      <configurationElements name="CORE_PLATFILE" description="The (generated) _core_platform.txt file name." values="(string)"/>
+      <configurationElements name="CORE_PLATINFO" description="The content string for the fwid.txt file." values="(string)"/>
+      <configurationElements name="CORE_PRODFILE" description="The (generated) _core_product.txt file name." values="(string)"/>
+      <configurationElements name="CORE_ROFSFILE" description="The name of the core rofs file." values="(string)"/>
+      <configurationElements name="CORE_ROMVER" description="The rom version parameter passed to the version.iby" values="(string)"/>
+      <configurationElements name="CORE_SWVERFILE" description="The (generated) _core_sw.txt version file name. This generated file is included in the CORE_VERIBY file." values="(string)"/>
+      <configurationElements name="CORE_SWVERINFO" description="The content string for the sw.txt file." values="(string)"/>
+      <configurationElements name="CORE_TIME" description="The time defined to the core image" values="(string)"/>
+      <configurationElements name="CORE_UDEBFILE" description="The name of the core udeb file. See USE_UDEB." values="(string)"/>
+      <configurationElements name="CORE_VERIBY" description="The name of the generated core *version.iby, which included version files and info" values="(string)"/>
+      <configurationElements name="CORE_VERSION" description="The version of the core. Used in sw.txt generation." values="(string)"/>
+      <configurationElements name="COREPLAT_NAME" description="Name of the core platform" values="(string)"/>
+      <configurationElements name="CUSTVARIANT_DIR" description="Configure the directory where to included the customer variant content. By default all content under /content is included to the image as it exists in the folder." values="(string)"/>
+      <configurationElements name="DEFAULT_LANGUAGE" description="Default language is the language where the device will boot to (SIM language overrides this selection)" values="(string)"/>
+      <configurationElements name="FLASH_EXT" description="The flash file extension." values="(string)"/>
+      <configurationElements name="HWID" description="Hardware Id" values="([0-9]4)"/>
+      <configurationElements name="HWID_LIST" description="Possible Hardware Ids of the product." values="([0-9]4)*"/>
+      <configurationElements name="KEEPTEMP" description="Keep the buildrom.pl temp files (copied to the WORKDIR). E.g. tmp1.oby tmp2.oby..tmp9.oby" values="([0|1])"/>
+      <configurationElements name="LABEL" description="A label to the NAME of the image" values="(string)"/>
+      <configurationElements name="LANGID" description="Language id used in the lang.txt generation" values="(string)"/>
+      <configurationElements name="LANGUAGES" description="Languages are the languages that are taken to the image (SC language is is defaulting to 01 in languages.txt)" values="(string)"/>
+      <configurationElements name="NAME" description="The name of the image" values="(string)"/>
+      <configurationElements name="OPERATOR_OBY" description="The name for generated operator oby, which is a file generated based on an operator specific content." values="(string)"/>
+      <configurationElements name="OPERATOR_OBYGEN" description="The name, path, rule for collecting content to the operator specific oby (E.g. operator.oby | /epoc32/rom/include/operator | *.iby collects all iby files from operator folder)." values="(string)|(string)|(string)"/>
+      <configurationElements name="PRODUCT_MODEL" description="The model of the product" values="(string)"/>
+      <configurationElements name="PRODUCT_NAME" description="Name of the product" values="(string)"/>
+      <configurationElements name="PRODUCT_REVISION" description="The reision of the product" values="(string)"/>
+      <configurationElements name="RELEASEDIR" description="The RELEASEDIR is used in the RELEASE step that copies the created files to a separate folder defined by the RELEASEDIR." values="(string)"/>
+      <configurationElements name="RELEASEFILES" description="The RELEASEFILES define the source files that are copied in the RELEASE step. The files must be given as a space delimited list. Wildcards can be used. E.g. \epoc32\rombuild\product\theflash.fpsx \epoc32\rombuild\product\*.log" values="(string)"/>
+      <configurationElements name="RELEASENAME" description="The RELEASENAME is used in the RELEASE step that copies the created files to a separate folder with a new name." values="(string)"/>
+      <configurationElements name="ROFS2_DIR" description="The working directory, when creating the rofs2 image" values="(string)"/>
+      <configurationElements name="ROFS2_E2FNAME" description="The rofs2 elf2flash filename. This is the final rofs2 flash file." values="(string)"/>
+      <configurationElements name="ROFS2_FOOTER" description="This variable can contain a footer section for the rofs2 master oby." values="(string)"/>
+      <configurationElements name="ROFS2_FWIDFILE" description="The (generated) _rofs2_fwid.txt file name." values="(string)"/>
+      <configurationElements name="ROFS2_FWIDINFO" description="The content string for the fwid2.txt file." values="(string)"/>
+      <configurationElements name="ROFS2_HEADER" description="This variable can contain a header section for the rofs2 master oby." values="(string)"/>
+      <configurationElements name="ROFS2_MSTOBY" description="The (generated) rofs2 master oby file name. This file includes the ROFS2_OBY files and other parameters" values="(string)"/>
+      <configurationElements name="ROFS2_NAME" description="The full name of the rofs2 image" values="(string)"/>
+      <configurationElements name="ROFS2_OBY" description="The oby file(s) included to the rofs2 image creation" values="(string)"/>
+      <configurationElements name="ROFS2_OPT" description="The rofs2 specific buildrom options" values="(string)"/>
+      <configurationElements name="ROFS2_ROMVER" description="The rofs2 ROM version string" values="(string)"/>
+      <configurationElements name="ROFS2_TIME" description="The time defined to the rofs2 image." values="(string)"/>
+      <configurationElements name="ROFS2_VERIBY" description="The (generated) version iby file name for the rofs2 image. This file included the version text files and other version parameters." values="(string)"/>
+      <configurationElements name="ROFS3_CUSTFILE" description="The (generated) source file name for customersw.txt." values="(string)"/>
+      <configurationElements name="ROFS3_CUSTINFO" description="The content string for the customersw.txt." values="(string)"/>
+      <configurationElements name="ROFS3_DIR" description="The working directory, when creating the rofs3 image" values="(string)"/>
+      <configurationElements name="ROFS3_E2FNAME" description="The rofs3 elf2flash filename. This is the final rofs3 flash file." values="(string)"/>
+      <configurationElements name="ROFS3_FOOTER" description="This variable can contain a footer section for the rofs3 master oby." values="(string)"/>
+      <configurationElements name="ROFS3_FWIDFILE" description="The (generated) _rofs3_fwid.txt file name." values="(string)"/>
+      <configurationElements name="ROFS3_FWIDINFO" description="The content string for the fwid3.txt file." values="(string)"/>
+      <configurationElements name="ROFS3_HEADER" description="This variable can contain a header section for the rofs3 master oby." values="(string)"/>
+      <configurationElements name="ROFS3_MSTOBY" description="The (generated) version iby file name for the rofs3 image. This file included the version text files and other version parameters." values="(string)"/>
+      <configurationElements name="ROFS3_NAME" description="The full name of the rofs3 image" values="(string)"/>
+      <configurationElements name="ROFS3_OBY" description="The oby file(s) included to the rofs3 image creation" values="(string)"/>
+      <configurationElements name="ROFS3_OPT" description="The rofs3 specific buildrom options" values="(string)"/>
+      <configurationElements name="ROFS3_ROMVER" description="The rofs3 ROM version string" values="(string)"/>
+      <configurationElements name="ROFS3_TIME" description="The time defined to the rofs3 image." values="(string)"/>
+      <configurationElements name="ROFS3_VERIBY" description="The (generated) version iby file name for the rofs3 image. This file included the version text files and other version parameters." values="(string)"/>
+      <configurationElements name="SOS_VERSION" description="Symbian OS version number. The value is used in the version info generation (platform.txt).(see USE_VERGEN)" values="([0-9]+.[0-9]+)"/>
+      <configurationElements name="SWUPD_EXT" description="The software update file extension." values="(string)"/>
+      <configurationElements name="TYPE" description="Defines the image type." values="(rnd|prd|subcon)"/>
+      <configurationElements name="USE_OVERRIDE" description="Define whether the override.pm Buildrom.pl plugin is used (Includes automatically also \epoc32\rom\override.oby)." values="([0|1])"/>
+      <configurationElements name="USE_PAGING" description="Define the usage of On Demand Pagin (ODP). (E.g. 0,rom,code)." values="((0|rom|code[:[(1|2|3)]+]?))"/>
+      <configurationElements name="USE_ROFS" description="Define the rofs sections in use. A comma separated list can be given of possible values. (E.g. 1,2,3)." values="([[dummy|]0..6][,[dummy|]0..6]*)"/>
+      <configurationElements name="USE_ROMFILE" description="Define whether the \epoc32\rombuild\romfiles.txt is used. Files in romfiles are automatically moved to ROM, everything else in core is moved to ROFS1." values="([0|1])"/>
+      <configurationElements name="USE_ROMSYMGEN" description="Generate the rom symbol file. 0=Do not generate, 1=Generate" values="([0|1])"/>
+      <configurationElements name="USE_UDEB" description="Include the usage of the debug binary *.txt to define the list of binaries that are taken from udeb folder instead of the urel." values="([0|1|full])"/>
+      <configurationElements name="USE_VERGEN" description="Use iMaker version info generation" values="([0|1])"/>
+    </interfaces>
+    <configurations name="image_conf_product52.mk" filePath="\epoc32\rom\config\platform\product52\image_conf_product52.mk" targetrefs="//@result/@targets.0 //@result/@targets.1 //@result/@targets.2 //@result/@targets.3 //@result/@targets.4 //@result/@targets.5 //@result/@targets.6 //@result/@targets.7 //@result/@targets.8 //@result/@targets.9 //@result/@targets.10 //@result/@targets.11 //@result/@targets.12 //@result/@targets.13 //@result/@targets.14 //@result/@targets.15 //@result/@targets.16 //@result/@targets.17 //@result/@targets.18 //@result/@targets.19 //@result/@targets.20 //@result/@targets.21 //@result/@targets.22 //@result/@targets.23 //@result/@targets.24 //@result/@targets.25 //@result/@targets.26 //@result/@targets.27 //@result/@targets.28 //@result/@targets.29 //@result/@targets.30 //@result/@targets.31 //@result/@targets.32 //@result/@targets.33 //@result/@targets.34 //@result/@targets.35 //@result/@targets.36 //@result/@targets.37">
+      <settings name="BLDROBY" ref="//@result/@interfaces.0/@configurationElements.0"/>
+      <settings name="BLDROM_OPT" value="-p -v -nosymbols   -D_IMAGE_TYPE_RND" ref="//@result/@interfaces.0/@configurationElements.1"/>
+      <settings name="BLDROPT" ref="//@result/@interfaces.0/@configurationElements.2"/>
+      <settings name="CONFIGROOT" value="/epoc32/rom/config" ref="//@result/@interfaces.0/@configurationElements.3"/>
+      <settings name="CORE_CDPROMFILE" value="/epoc32/rombuild/odpcoderomfiles.txt" ref="//@result/@interfaces.0/@configurationElements.4"/>
+      <settings name="CORE_DIR" value="/epoc32/rombuild/product52/core" ref="//@result/@interfaces.0/@configurationElements.5"/>
+      <settings name="CORE_E2FNAME" value="/epoc32/rombuild/product52/core/elf2flash/product52_5230_rnd" ref="//@result/@interfaces.0/@configurationElements.6"/>
+      <settings name="CORE_FWIDFILE" value="/epoc32/rombuild/product52/core/product52_5230_rnd_core_fwid.txt" ref="//@result/@interfaces.0/@configurationElements.7"/>
+      <settings name="CORE_IMEISVFILE" value="/epoc32/rombuild/product52/core/product52_5230_rnd_core_imeisv.txt" ref="//@result/@interfaces.0/@configurationElements.8"/>
+      <settings name="CORE_IMEISVINFO" value="00" ref="//@result/@interfaces.0/@configurationElements.9"/>
+      <settings name="CORE_MODELFILE" value="/epoc32/rombuild/product52/core/product52_5230_rnd_core_model.txt" ref="//@result/@interfaces.0/@configurationElements.10"/>
+      <settings name="CORE_MODELINFO" value="S60" ref="//@result/@interfaces.0/@configurationElements.11"/>
+      <settings name="CORE_MSTOBY" value="/epoc32/rombuild/product52/core/product52_5230_rnd_core_master.oby" ref="//@result/@interfaces.0/@configurationElements.12"/>
+      <settings name="CORE_NAME" value="/epoc32/rombuild/product52/core/product52_5230_rnd" ref="//@result/@interfaces.0/@configurationElements.13"/>
+      <settings name="CORE_NDPROMFILE" value="/epoc32/rombuild/romfiles.txt" ref="//@result/@interfaces.0/@configurationElements.14"/>
+      <settings name="CORE_OBY" value="/epoc32/rom/ncp.oby" ref="//@result/@interfaces.0/@configurationElements.15"/>
+      <settings name="CORE_ODPROMFILE" value="/epoc32/rombuild/odpromfiles.txt" ref="//@result/@interfaces.0/@configurationElements.16"/>
+      <settings name="CORE_OPT" value="-p -v -nosymbols   -D_IMAGE_TYPE_RND -D_EABI=ARMV5 -D_ASIC_VER_11  -Dproduct52  -DLCD_SHELL" ref="//@result/@interfaces.0/@configurationElements.17"/>
+      <settings name="CORE_PLATFILE" value="/epoc32/rombuild/product52/core/product52_5230_rnd_core_platform.txt" ref="//@result/@interfaces.0/@configurationElements.18"/>
+      <settings name="CORE_PLATINFO" value="SymbianOSMajorVersion=9\nSymbianOSMinorVersion=4\n" ref="//@result/@interfaces.0/@configurationElements.19"/>
+      <settings name="CORE_PRODFILE" value="/epoc32/rombuild/product52/core/product52_5230_rnd_core_product.txt" ref="//@result/@interfaces.0/@configurationElements.20"/>
+      <settings name="CORE_ROFSFILE" value="/epoc32/rombuild/odpcoderofsfiles.txt" ref="//@result/@interfaces.0/@configurationElements.21"/>
+      <settings name="CORE_ROMVER" value="0.01(0)" ref="//@result/@interfaces.0/@configurationElements.22"/>
+      <settings name="CORE_SWVERFILE" value="/epoc32/rombuild/product52/core/product52_5230_rnd_core_sw.txt" ref="//@result/@interfaces.0/@configurationElements.23"/>
+      <settings name="CORE_SWVERINFO" value="V 52.2008.29.xx RND\n14-07-08\nRX-47\n(c) Nokia" ref="//@result/@interfaces.0/@configurationElements.24"/>
+      <settings name="CORE_TIME" value="14/07/2008" ref="//@result/@interfaces.0/@configurationElements.25"/>
+      <settings name="CORE_UDEBFILE" value="/epoc32/rombuild/mytraces.txt" ref="//@result/@interfaces.0/@configurationElements.26"/>
+      <settings name="CORE_VERIBY" value="/epoc32/rombuild/product52/core/product52_5230_rnd_core_version.iby" ref="//@result/@interfaces.0/@configurationElements.27"/>
+      <settings name="CORE_VERSION" value="V 52.2008.29.xx RND" ref="//@result/@interfaces.0/@configurationElements.28"/>
+      <settings name="COREPLAT_NAME" value="platform" ref="//@result/@interfaces.0/@configurationElements.29"/>
+      <settings name="CUSTVARIANT_DIR" ref="//@result/@interfaces.0/@configurationElements.30"/>
+      <settings name="DEFAULT_LANGUAGE" value="SC" ref="//@result/@interfaces.0/@configurationElements.31"/>
+      <settings name="FLASH_EXT" value=".fpsx" ref="//@result/@interfaces.0/@configurationElements.32"/>
+      <settings name="HWID" value="5161 5210 5211 5220 5230* 5240" ref="//@result/@interfaces.0/@configurationElements.33"/>
+      <settings name="HWID_LIST" value="5161 5210 5211 5220 5230 5240" ref="//@result/@interfaces.0/@configurationElements.34"/>
+      <settings name="KEEPTEMP" value="0" ref="//@result/@interfaces.0/@configurationElements.35"/>
+      <settings name="LABEL" ref="//@result/@interfaces.0/@configurationElements.36"/>
+      <settings name="LANGID" value="01" ref="//@result/@interfaces.0/@configurationElements.37"/>
+      <settings name="LANGUAGES" value="SC" ref="//@result/@interfaces.0/@configurationElements.38"/>
+      <settings name="NAME" value="product52_5230_rnd" ref="//@result/@interfaces.0/@configurationElements.39"/>
+      <settings name="OPERATOR_OBY" value="/epoc32/rombuild/product52/rofs3/product52_5230_rnd_rofs3_operator.oby" ref="//@result/@interfaces.0/@configurationElements.40"/>
+      <settings name="OPERATOR_OBYGEN" value="/epoc32/rombuild/product52/rofs3/product52_5230_rnd_rofs3_operator.oby | /epoc32/rom/include/operator | *.iby" ref="//@result/@interfaces.0/@configurationElements.41"/>
+      <settings name="PRODUCT_MODEL" value="N00" ref="//@result/@interfaces.0/@configurationElements.42"/>
+      <settings name="PRODUCT_NAME" value="product52" ref="//@result/@interfaces.0/@configurationElements.43"/>
+      <settings name="PRODUCT_REVISION" value="01" ref="//@result/@interfaces.0/@configurationElements.44"/>
+      <settings name="RELEASEDIR" value="/flash_images/product52" ref="//@result/@interfaces.0/@configurationElements.45"/>
+      <settings name="RELEASEFILES" value="/epoc32/rombuild/product52/product52_5230_rnd.fpsx /epoc32/rombuild/product52/core/product52_5230_rnd.rom.log /epoc32/rombuild/product52/core/product52_5230_rnd.rofs1.log /epoc32/rombuild/product52/rofs2/product52_5230_rnd.rofs2.log /epoc32/rombuild/product52/rofs3/product52_5230_rnd.rofs3.log" ref="//@result/@interfaces.0/@configurationElements.46"/>
+      <settings name="RELEASENAME" value="product52_rnd_20080714082810_haismail" ref="//@result/@interfaces.0/@configurationElements.47"/>
+      <settings name="ROFS2_DIR" value="/epoc32/rombuild/product52/rofs2" ref="//@result/@interfaces.0/@configurationElements.48"/>
+      <settings name="ROFS2_E2FNAME" value="/epoc32/rombuild/product52/rofs2/elf2flash/product52_5230_rnd" ref="//@result/@interfaces.0/@configurationElements.49"/>
+      <settings name="ROFS2_FOOTER" ref="//@result/@interfaces.0/@configurationElements.50"/>
+      <settings name="ROFS2_FWIDFILE" value="/epoc32/rombuild/product52/rofs2/product52_5230_rnd_rofs2_fwid.txt" ref="//@result/@interfaces.0/@configurationElements.51"/>
+      <settings name="ROFS2_FWIDINFO" value="id=language\nversion=01\n" ref="//@result/@interfaces.0/@configurationElements.52"/>
+      <settings name="ROFS2_HEADER" value="#include &lt;data_caging_paths_for_iby.hrh> \n\n// TEMPORARY FIXES BEGIN\n // Enable faster variant creation, to be removed when iby header hierarchy is fixed\n #define __platform_OBY__  // Define platform.oby out\n #include &lt;Variant\Header.iby>\n #include &lt;header.iby>  // Symbian common definitions\n // TEMPORARY FIXES END\n" ref="//@result/@interfaces.0/@configurationElements.53"/>
+      <settings name="ROFS2_MSTOBY" value="/epoc32/rombuild/product52/rofs2/product52_5230_rnd_rofs2_master.oby" ref="//@result/@interfaces.0/@configurationElements.54"/>
+      <settings name="ROFS2_NAME" value="/epoc32/rombuild/product52/rofs2/product52_5230_rnd" ref="//@result/@interfaces.0/@configurationElements.55"/>
+      <settings name="ROFS2_OBY" ref="//@result/@interfaces.0/@configurationElements.56"/>
+      <settings name="ROFS2_OPT" ref="//@result/@interfaces.0/@configurationElements.57"/>
+      <settings name="ROFS2_ROMVER" value="0.01(0)" ref="//@result/@interfaces.0/@configurationElements.58"/>
+      <settings name="ROFS2_TIME" value="14/07/2008" ref="//@result/@interfaces.0/@configurationElements.59"/>
+      <settings name="ROFS2_VERIBY" value="/epoc32/rombuild/product52/rofs2/product52_5230_rnd_rofs2_version.iby" ref="//@result/@interfaces.0/@configurationElements.60"/>
+      <settings name="ROFS3_CUSTFILE" value="/epoc32/rombuild/product52/rofs3/product52_5230_rnd_rofs3_customersw.txt" ref="//@result/@interfaces.0/@configurationElements.61"/>
+      <settings name="ROFS3_CUSTINFO" value="V 0.00.0\n14-07-08" ref="//@result/@interfaces.0/@configurationElements.62"/>
+      <settings name="ROFS3_DIR" value="/epoc32/rombuild/product52/rofs3" ref="//@result/@interfaces.0/@configurationElements.63"/>
+      <settings name="ROFS3_E2FNAME" value="/epoc32/rombuild/product52/rofs3/elf2flash/product52_5230_rnd" ref="//@result/@interfaces.0/@configurationElements.64"/>
+      <settings name="ROFS3_FOOTER" ref="//@result/@interfaces.0/@configurationElements.65"/>
+      <settings name="ROFS3_FWIDFILE" value="/epoc32/rombuild/product52/rofs3/product52_5230_rnd_rofs3_fwid.txt" ref="//@result/@interfaces.0/@configurationElements.66"/>
+      <settings name="ROFS3_FWIDINFO" value="id=customer\nversion=V 0.00.0 RND Customer\n" ref="//@result/@interfaces.0/@configurationElements.67"/>
+      <settings name="ROFS3_HEADER" value="#include &lt;data_caging_paths_for_iby.hrh> \n\n// TEMPORARY FIXES BEGIN\n // Enable faster variant creation, to be removed when iby header hierarchy is fixed\n #define __platform_OBY__  // Define platform.oby out\n #include &lt;Variant\Header.iby>\n #include &lt;header.iby>  // Symbian common definitions\n // TEMPORARY FIXES END\n" ref="//@result/@interfaces.0/@configurationElements.68"/>
+      <settings name="ROFS3_MSTOBY" value="/epoc32/rombuild/product52/rofs3/product52_5230_rnd_rofs3_master.oby" ref="//@result/@interfaces.0/@configurationElements.69"/>
+      <settings name="ROFS3_NAME" value="/epoc32/rombuild/product52/rofs3/product52_5230_rnd" ref="//@result/@interfaces.0/@configurationElements.70"/>
+      <settings name="ROFS3_OBY" value="/epoc32/rombuild/product52/rofs3/product52_5230_rnd_rofs3_operator.oby" ref="//@result/@interfaces.0/@configurationElements.71"/>
+      <settings name="ROFS3_OPT" ref="//@result/@interfaces.0/@configurationElements.72"/>
+      <settings name="ROFS3_ROMVER" value="0.01(0)" ref="//@result/@interfaces.0/@configurationElements.73"/>
+      <settings name="ROFS3_TIME" value="14/07/2008" ref="//@result/@interfaces.0/@configurationElements.74"/>
+      <settings name="ROFS3_VERIBY" value="/epoc32/rombuild/product52/rofs3/product52_5230_rnd_rofs3_version.iby" ref="//@result/@interfaces.0/@configurationElements.75"/>
+      <settings name="SOS_VERSION" value="9.4" ref="//@result/@interfaces.0/@configurationElements.76"/>
+      <settings name="SWUPD_EXT" value=".swupd" ref="//@result/@interfaces.0/@configurationElements.77"/>
+      <settings name="TYPE" value="rnd" ref="//@result/@interfaces.0/@configurationElements.78"/>
+      <settings name="USE_OVERRIDE" value="0" ref="//@result/@interfaces.0/@configurationElements.79"/>
+      <settings name="USE_PAGING" value="code:123" ref="//@result/@interfaces.0/@configurationElements.80"/>
+      <settings name="USE_ROFS" value="1" ref="//@result/@interfaces.0/@configurationElements.81"/>
+      <settings name="USE_ROMFILE" value="1" ref="//@result/@interfaces.0/@configurationElements.82"/>
+      <settings name="USE_ROMSYMGEN" value="0" ref="//@result/@interfaces.0/@configurationElements.83"/>
+      <settings name="USE_UDEB" value="0" ref="//@result/@interfaces.0/@configurationElements.84"/>
+      <settings name="USE_VERGEN" value="0" ref="//@result/@interfaces.0/@configurationElements.85"/>
+    </configurations>
+    <configurations name="image_conf_product52_ui.mk" filePath="\epoc32\rom\config\platform\product52\image_conf_product52_ui.mk" targetrefs="//@result/@targets.38 //@result/@targets.39 //@result/@targets.40 //@result/@targets.41 //@result/@targets.42 //@result/@targets.43 //@result/@targets.44 //@result/@targets.45 //@result/@targets.46 //@result/@targets.47 //@result/@targets.48 //@result/@targets.49 //@result/@targets.50 //@result/@targets.51 //@result/@targets.52 //@result/@targets.53 //@result/@targets.54 //@result/@targets.55 //@result/@targets.56 //@result/@targets.57 //@result/@targets.58 //@result/@targets.59 //@result/@targets.60 //@result/@targets.61 //@result/@targets.62 //@result/@targets.63 //@result/@targets.64 //@result/@targets.65 //@result/@targets.66 //@result/@targets.67 //@result/@targets.68 //@result/@targets.69 //@result/@targets.70 //@result/@targets.71 //@result/@targets.72 //@result/@targets.73 //@result/@targets.74 //@result/@targets.75">
+      <settings name="BLDROBY" ref="//@result/@interfaces.0/@configurationElements.86"/>
+      <settings name="BLDROM_OPT" value="-p -v -nosymbols -eoverride  -D_IMAGE_TYPE_RND" ref="//@result/@interfaces.0/@configurationElements.87"/>
+      <settings name="BLDROPT" ref="//@result/@interfaces.0/@configurationElements.88"/>
+      <settings name="CONFIGROOT" value="/epoc32/rom/config" ref="//@result/@interfaces.0/@configurationElements.89"/>
+      <settings name="CORE_CDPROMFILE" value="/epoc32/rombuild/odpcoderomfiles.txt" ref="//@result/@interfaces.0/@configurationElements.90"/>
+      <settings name="CORE_DIR" value="/epoc32/rombuild/product52/core" ref="//@result/@interfaces.0/@configurationElements.91"/>
+      <settings name="CORE_E2FNAME" value="/epoc32/rombuild/product52/core/elf2flash/product52_5230_rnd" ref="//@result/@interfaces.0/@configurationElements.92"/>
+      <settings name="CORE_FWIDFILE" value="/epoc32/rombuild/product52/core/product52_5230_rnd_core_fwid.txt" ref="//@result/@interfaces.0/@configurationElements.93"/>
+      <settings name="CORE_IMEISVFILE" value="/epoc32/rombuild/product52/core/product52_5230_rnd_core_imeisv.txt" ref="//@result/@interfaces.0/@configurationElements.94"/>
+      <settings name="CORE_IMEISVINFO" value="00" ref="//@result/@interfaces.0/@configurationElements.95"/>
+      <settings name="CORE_MODELFILE" value="/epoc32/rombuild/product52/core/product52_5230_rnd_core_model.txt" ref="//@result/@interfaces.0/@configurationElements.96"/>
+      <settings name="CORE_MODELINFO" value="S60" ref="//@result/@interfaces.0/@configurationElements.97"/>
+      <settings name="CORE_MSTOBY" value="/epoc32/rombuild/product52/core/product52_5230_rnd_core_master.oby" ref="//@result/@interfaces.0/@configurationElements.98"/>
+      <settings name="CORE_NAME" value="/epoc32/rombuild/product52/core/product52_5230_rnd" ref="//@result/@interfaces.0/@configurationElements.99"/>
+      <settings name="CORE_NDPROMFILE" value="/epoc32/rombuild/romfiles.txt" ref="//@result/@interfaces.0/@configurationElements.100"/>
+      <settings name="CORE_OBY" value="/epoc32/rom/master.oby /epoc32/rom/ppd.oby /epoc32/rom/rnd.oby /epoc32/rom/override.oby /epoc32/rombuild/product52/core/product52_5230_rnd_core_collected.oby /epoc32/rom/include/symbianos.iby /epoc32/rom/variant/patchdata.iby" ref="//@result/@interfaces.0/@configurationElements.101"/>
+      <settings name="CORE_ODPROMFILE" value="/epoc32/rombuild/odpromfiles.txt" ref="//@result/@interfaces.0/@configurationElements.102"/>
+      <settings name="CORE_OPT" value="-p -v -nosymbols -eoverride  -D_IMAGE_TYPE_RND -D_EABI=ARMV5 -D_ASIC_VER_11 -DUSE_MULTIROFS -Dproduct52  -es60ibymacros -DSECTION -DRND_CONTENT " ref="//@result/@interfaces.0/@configurationElements.103"/>
+      <settings name="CORE_PLATFILE" value="/epoc32/rombuild/product52/core/product52_5230_rnd_core_platform.txt" ref="//@result/@interfaces.0/@configurationElements.104"/>
+      <settings name="CORE_PLATINFO" value="SymbianOSMajorVersion=9\nSymbianOSMinorVersion=4\n" ref="//@result/@interfaces.0/@configurationElements.105"/>
+      <settings name="CORE_PRODFILE" value="/epoc32/rombuild/product52/core/product52_5230_rnd_core_product.txt" ref="//@result/@interfaces.0/@configurationElements.106"/>
+      <settings name="CORE_ROFSFILE" value="/epoc32/rombuild/odpcoderofsfiles.txt" ref="//@result/@interfaces.0/@configurationElements.107"/>
+      <settings name="CORE_ROMVER" value="0.01(0)" ref="//@result/@interfaces.0/@configurationElements.108"/>
+      <settings name="CORE_SWVERFILE" value="/epoc32/rombuild/product52/core/product52_5230_rnd_core_sw.txt" ref="//@result/@interfaces.0/@configurationElements.109"/>
+      <settings name="CORE_SWVERINFO" value="V 52.50.2008.23. RnD\n13-06-08\nRX-47\n(c)NMP" ref="//@result/@interfaces.0/@configurationElements.110"/>
+      <settings name="CORE_TIME" value="14/07/2008" ref="//@result/@interfaces.0/@configurationElements.111"/>
+      <settings name="CORE_UDEBFILE" value="/epoc32/rombuild/mytraces.txt" ref="//@result/@interfaces.0/@configurationElements.112"/>
+      <settings name="CORE_VERIBY" value="/epoc32/rombuild/product52/core/product52_5230_rnd_core_version.iby" ref="//@result/@interfaces.0/@configurationElements.113"/>
+      <settings name="CORE_VERSION" value="V 52.50.2008.23. RnD" ref="//@result/@interfaces.0/@configurationElements.114"/>
+      <settings name="COREPLAT_NAME" value="platform" ref="//@result/@interfaces.0/@configurationElements.115"/>
+      <settings name="CUSTVARIANT_DIR" ref="//@result/@interfaces.0/@configurationElements.116"/>
+      <settings name="DEFAULT_LANGUAGE" value="01" ref="//@result/@interfaces.0/@configurationElements.117"/>
+      <settings name="FLASH_EXT" value=".fpsx" ref="//@result/@interfaces.0/@configurationElements.118"/>
+      <settings name="HWID" value="5161 5210 5211 5220 5230* 5240" ref="//@result/@interfaces.0/@configurationElements.119"/>
+      <settings name="HWID_LIST" value="5161 5210 5211 5220 5230 5240" ref="//@result/@interfaces.0/@configurationElements.120"/>
+      <settings name="KEEPTEMP" value="0" ref="//@result/@interfaces.0/@configurationElements.121"/>
+      <settings name="LABEL" ref="//@result/@interfaces.0/@configurationElements.122"/>
+      <settings name="LANGID" value="01" ref="//@result/@interfaces.0/@configurationElements.123"/>
+      <settings name="LANGUAGES" value="01" ref="//@result/@interfaces.0/@configurationElements.124"/>
+      <settings name="NAME" value="product52_5230_rnd" ref="//@result/@interfaces.0/@configurationElements.125"/>
+      <settings name="OPERATOR_OBY" ref="//@result/@interfaces.0/@configurationElements.126"/>
+      <settings name="OPERATOR_OBYGEN" value=" | /epoc32/rom/include/operator | *.iby" ref="//@result/@interfaces.0/@configurationElements.127"/>
+      <settings name="PRODUCT_MODEL" value="N00" ref="//@result/@interfaces.0/@configurationElements.128"/>
+      <settings name="PRODUCT_NAME" value="product52" ref="//@result/@interfaces.0/@configurationElements.129"/>
+      <settings name="PRODUCT_REVISION" value="01" ref="//@result/@interfaces.0/@configurationElements.130"/>
+      <settings name="RELEASEDIR" value="/flash_images/product52" ref="//@result/@interfaces.0/@configurationElements.131"/>
+      <settings name="RELEASEFILES" value="/epoc32/rombuild/product52/product52_5230_rnd.fpsx /epoc32/rombuild/product52/core/product52_5230_rnd.rom.log /epoc32/rombuild/product52/core/product52_5230_rnd.rofs1.log /epoc32/rombuild/product52/rofs2/product52_5230_rnd.rofs2.log /epoc32/rombuild/product52/rofs3/product52_5230_rnd.rofs3.log" ref="//@result/@interfaces.0/@configurationElements.132"/>
+      <settings name="RELEASENAME" value="product52_rnd_20080714082814_haismail" ref="//@result/@interfaces.0/@configurationElements.133"/>
+      <settings name="ROFS2_DIR" value="/epoc32/rombuild/product52/rofs2" ref="//@result/@interfaces.0/@configurationElements.134"/>
+      <settings name="ROFS2_E2FNAME" value="/epoc32/rombuild/product52/rofs2/elf2flash/product52_5230_rnd" ref="//@result/@interfaces.0/@configurationElements.135"/>
+      <settings name="ROFS2_FOOTER" ref="//@result/@interfaces.0/@configurationElements.136"/>
+      <settings name="ROFS2_FWIDFILE" value="/epoc32/rombuild/product52/rofs2/product52_5230_rnd_rofs2_fwid.txt" ref="//@result/@interfaces.0/@configurationElements.137"/>
+      <settings name="ROFS2_FWIDINFO" value="id=language\nversion=01\n" ref="//@result/@interfaces.0/@configurationElements.138"/>
+      <settings name="ROFS2_HEADER" value="#include &lt;data_caging_paths_for_iby.hrh> \n\n// TEMPORARY FIXES BEGIN\n // Enable faster variant creation, to be removed when iby header hierarchy is fixed\n #define __platform_OBY__  // Define platform.oby out\n #include &lt;Variant\Header.iby>\n #include &lt;header.iby>  // Symbian common definitions\n // TEMPORARY FIXES END\n" ref="//@result/@interfaces.0/@configurationElements.139"/>
+      <settings name="ROFS2_MSTOBY" value="/epoc32/rombuild/product52/rofs2/product52_5230_rnd_rofs2_master.oby" ref="//@result/@interfaces.0/@configurationElements.140"/>
+      <settings name="ROFS2_NAME" value="/epoc32/rombuild/product52/rofs2/product52_5230_rnd" ref="//@result/@interfaces.0/@configurationElements.141"/>
+      <settings name="ROFS2_OBY" value="&lt;Variant.oby> &lt;ppd_variant.oby> &lt;ppd_locales.iby> /epoc32/rom/override.oby /epoc32/rombuild/product52/rofs2/product52_5230_rnd_rofs2_language_collected.oby /epoc32/rombuild/product52/rofs2/product52_5230_rnd_rofs2_customer_collected.oby" ref="//@result/@interfaces.0/@configurationElements.142"/>
+      <settings name="ROFS2_OPT" value="-p -v -nosymbols -eoverride  -D_IMAGE_TYPE_RND -D_EABI=ARMV5 -D_ASIC_VER_11 -DUSE_MULTIROFS -Dproduct52  -es60ibymacros -elocalise -DRND_CONTENT" ref="//@result/@interfaces.0/@configurationElements.143"/>
+      <settings name="ROFS2_ROMVER" value="0.01(0)" ref="//@result/@interfaces.0/@configurationElements.144"/>
+      <settings name="ROFS2_TIME" value="14/07/2008" ref="//@result/@interfaces.0/@configurationElements.145"/>
+      <settings name="ROFS2_VERIBY" value="/epoc32/rombuild/product52/rofs2/product52_5230_rnd_rofs2_version.iby" ref="//@result/@interfaces.0/@configurationElements.146"/>
+      <settings name="ROFS3_CUSTFILE" value="/epoc32/rombuild/product52/rofs3/product52_5230_rnd_rofs3_customersw.txt" ref="//@result/@interfaces.0/@configurationElements.147"/>
+      <settings name="ROFS3_CUSTINFO" value="V 52.50.2008.23. RnD\n14-07-08" ref="//@result/@interfaces.0/@configurationElements.148"/>
+      <settings name="ROFS3_DIR" value="/epoc32/rombuild/product52/rofs3" ref="//@result/@interfaces.0/@configurationElements.149"/>
+      <settings name="ROFS3_E2FNAME" value="/epoc32/rombuild/product52/rofs3/elf2flash/product52_5230_rnd" ref="//@result/@interfaces.0/@configurationElements.150"/>
+      <settings name="ROFS3_FOOTER" ref="//@result/@interfaces.0/@configurationElements.151"/>
+      <settings name="ROFS3_FWIDFILE" value="/epoc32/rombuild/product52/rofs3/product52_5230_rnd_rofs3_fwid.txt" ref="//@result/@interfaces.0/@configurationElements.152"/>
+      <settings name="ROFS3_FWIDINFO" value="id=customer\nversion=V 52.50.2008.23. RnD RND Customer\n" ref="//@result/@interfaces.0/@configurationElements.153"/>
+      <settings name="ROFS3_HEADER" value="#include &lt;data_caging_paths_for_iby.hrh> \n\n// TEMPORARY FIXES BEGIN\n // Enable faster variant creation, to be removed when iby header hierarchy is fixed\n #define __platform_OBY__  // Define platform.oby out\n #include &lt;Variant\Header.iby>\n #include &lt;header.iby>  // Symbian common definitions\n // TEMPORARY FIXES END\n" ref="//@result/@interfaces.0/@configurationElements.154"/>
+      <settings name="ROFS3_MSTOBY" value="/epoc32/rombuild/product52/rofs3/product52_5230_rnd_rofs3_master.oby" ref="//@result/@interfaces.0/@configurationElements.155"/>
+      <settings name="ROFS3_NAME" value="/epoc32/rombuild/product52/rofs3/product52_5230_rnd" ref="//@result/@interfaces.0/@configurationElements.156"/>
+      <settings name="ROFS3_OBY" value=" /epoc32/rombuild/product52/rofs3/product52_5230_rnd_rofs3_collected.oby" ref="//@result/@interfaces.0/@configurationElements.157"/>
+      <settings name="ROFS3_OPT" value="-p -v -nosymbols -eoverride  -D_IMAGE_TYPE_RND -D_EABI=ARMV5 -D_ASIC_VER_11 -DUSE_MULTIROFS -Dproduct52  -es60ibymacros" ref="//@result/@interfaces.0/@configurationElements.158"/>
+      <settings name="ROFS3_ROMVER" value="0.01(0)" ref="//@result/@interfaces.0/@configurationElements.159"/>
+      <settings name="ROFS3_TIME" value="14/07/2008" ref="//@result/@interfaces.0/@configurationElements.160"/>
+      <settings name="ROFS3_VERIBY" value="/epoc32/rombuild/product52/rofs3/product52_5230_rnd_rofs3_version.iby" ref="//@result/@interfaces.0/@configurationElements.161"/>
+      <settings name="SOS_VERSION" value="9.4" ref="//@result/@interfaces.0/@configurationElements.162"/>
+      <settings name="SWUPD_EXT" value=".swupd" ref="//@result/@interfaces.0/@configurationElements.163"/>
+      <settings name="TYPE" value="rnd" ref="//@result/@interfaces.0/@configurationElements.164"/>
+      <settings name="USE_OVERRIDE" value="1" ref="//@result/@interfaces.0/@configurationElements.165"/>
+      <settings name="USE_PAGING" value="code:123" ref="//@result/@interfaces.0/@configurationElements.166"/>
+      <settings name="USE_ROFS" value="1,2,3" ref="//@result/@interfaces.0/@configurationElements.167"/>
+      <settings name="USE_ROMFILE" value="1" ref="//@result/@interfaces.0/@configurationElements.168"/>
+      <settings name="USE_ROMSYMGEN" value="0" ref="//@result/@interfaces.0/@configurationElements.169"/>
+      <settings name="USE_UDEB" value="1" ref="//@result/@interfaces.0/@configurationElements.170"/>
+      <settings name="USE_VERGEN" value="1" ref="//@result/@interfaces.0/@configurationElements.171"/>
+    </configurations>
+    <configurations name="image_conf_product.mk" filePath="\epoc32\rom\config\platform\product\image_conf_product.mk" targetrefs="//@result/@targets.76 //@result/@targets.77 //@result/@targets.78 //@result/@targets.79 //@result/@targets.80 //@result/@targets.81 //@result/@targets.82 //@result/@targets.83 //@result/@targets.84 //@result/@targets.85 //@result/@targets.86 //@result/@targets.87 //@result/@targets.88 //@result/@targets.89 //@result/@targets.90 //@result/@targets.91 //@result/@targets.92 //@result/@targets.93 //@result/@targets.94 //@result/@targets.95 //@result/@targets.96 //@result/@targets.97 //@result/@targets.98 //@result/@targets.99 //@result/@targets.100 //@result/@targets.101 //@result/@targets.102 //@result/@targets.103 //@result/@targets.104 //@result/@targets.105 //@result/@targets.106 //@result/@targets.107 //@result/@targets.108 //@result/@targets.109 //@result/@targets.110 //@result/@targets.111 //@result/@targets.112 //@result/@targets.113">
+      <settings name="BLDROBY" ref="//@result/@interfaces.0/@configurationElements.172"/>
+      <settings name="BLDROM_OPT" value="-p -v -nosymbols   -D_IMAGE_TYPE_RND" ref="//@result/@interfaces.0/@configurationElements.173"/>
+      <settings name="BLDROPT" ref="//@result/@interfaces.0/@configurationElements.174"/>
+      <settings name="CONFIGROOT" value="/epoc32/rom/config" ref="//@result/@interfaces.0/@configurationElements.175"/>
+      <settings name="CORE_CDPROMFILE" value="/epoc32/rombuild/odpcoderomfiles.txt" ref="//@result/@interfaces.0/@configurationElements.176"/>
+      <settings name="CORE_DIR" value="/epoc32/rombuild/product/core" ref="//@result/@interfaces.0/@configurationElements.177"/>
+      <settings name="CORE_E2FNAME" value="/epoc32/rombuild/product/core/elf2flash/product_5230_rnd" ref="//@result/@interfaces.0/@configurationElements.178"/>
+      <settings name="CORE_FWIDFILE" value="/epoc32/rombuild/product/core/product_5230_rnd_core_fwid.txt" ref="//@result/@interfaces.0/@configurationElements.179"/>
+      <settings name="CORE_IMEISVFILE" value="/epoc32/rombuild/product/core/product_5230_rnd_core_imeisv.txt" ref="//@result/@interfaces.0/@configurationElements.180"/>
+      <settings name="CORE_IMEISVINFO" value="00" ref="//@result/@interfaces.0/@configurationElements.181"/>
+      <settings name="CORE_MODELFILE" value="/epoc32/rombuild/product/core/product_5230_rnd_core_model.txt" ref="//@result/@interfaces.0/@configurationElements.182"/>
+      <settings name="CORE_MODELINFO" value="S60" ref="//@result/@interfaces.0/@configurationElements.183"/>
+      <settings name="CORE_MSTOBY" value="/epoc32/rombuild/product/core/product_5230_rnd_core_master.oby" ref="//@result/@interfaces.0/@configurationElements.184"/>
+      <settings name="CORE_NAME" value="/epoc32/rombuild/product/core/product_5230_rnd" ref="//@result/@interfaces.0/@configurationElements.185"/>
+      <settings name="CORE_NDPROMFILE" value="/epoc32/rombuild/romfiles.txt" ref="//@result/@interfaces.0/@configurationElements.186"/>
+      <settings name="CORE_OBY" value="/epoc32/rom/ncp.oby" ref="//@result/@interfaces.0/@configurationElements.187"/>
+      <settings name="CORE_ODPROMFILE" value="/epoc32/rombuild/odpromfiles.txt" ref="//@result/@interfaces.0/@configurationElements.188"/>
+      <settings name="CORE_OPT" value="-p -v -nosymbols   -D_IMAGE_TYPE_RND -D_EABI=ARMV5 -D_ASIC_VER_11  -Dproduct  -DLCD_SHELL" ref="//@result/@interfaces.0/@configurationElements.189"/>
+      <settings name="CORE_PLATFILE" value="/epoc32/rombuild/product/core/product_5230_rnd_core_platform.txt" ref="//@result/@interfaces.0/@configurationElements.190"/>
+      <settings name="CORE_PLATINFO" value="SymbianOSMajorVersion=9\nSymbianOSMinorVersion=4\n" ref="//@result/@interfaces.0/@configurationElements.191"/>
+      <settings name="CORE_PRODFILE" value="/epoc32/rombuild/product/core/product_5230_rnd_core_product.txt" ref="//@result/@interfaces.0/@configurationElements.192"/>
+      <settings name="CORE_ROFSFILE" value="/epoc32/rombuild/odpcoderofsfiles.txt" ref="//@result/@interfaces.0/@configurationElements.193"/>
+      <settings name="CORE_ROMVER" value="0.01(0)" ref="//@result/@interfaces.0/@configurationElements.194"/>
+      <settings name="CORE_SWVERFILE" value="/epoc32/rombuild/product/core/product_5230_rnd_core_sw.txt" ref="//@result/@interfaces.0/@configurationElements.195"/>
+      <settings name="CORE_SWVERINFO" value="V 52.2008.29.xx RND\n14-07-08\nRM-356\n(c) Nokia" ref="//@result/@interfaces.0/@configurationElements.196"/>
+      <settings name="CORE_TIME" value="14/07/2008" ref="//@result/@interfaces.0/@configurationElements.197"/>
+      <settings name="CORE_UDEBFILE" value="/epoc32/rombuild/mytraces.txt" ref="//@result/@interfaces.0/@configurationElements.198"/>
+      <settings name="CORE_VERIBY" value="/epoc32/rombuild/product/core/product_5230_rnd_core_version.iby" ref="//@result/@interfaces.0/@configurationElements.199"/>
+      <settings name="CORE_VERSION" value="V 52.2008.29.xx RND" ref="//@result/@interfaces.0/@configurationElements.200"/>
+      <settings name="COREPLAT_NAME" value="platform" ref="//@result/@interfaces.0/@configurationElements.201"/>
+      <settings name="CUSTVARIANT_DIR" ref="//@result/@interfaces.0/@configurationElements.202"/>
+      <settings name="DEFAULT_LANGUAGE" value="SC" ref="//@result/@interfaces.0/@configurationElements.203"/>
+      <settings name="FLASH_EXT" value=".fpsx" ref="//@result/@interfaces.0/@configurationElements.204"/>
+      <settings name="HWID" value="5230*" ref="//@result/@interfaces.0/@configurationElements.205"/>
+      <settings name="HWID_LIST" value="5230" ref="//@result/@interfaces.0/@configurationElements.206"/>
+      <settings name="KEEPTEMP" value="0" ref="//@result/@interfaces.0/@configurationElements.207"/>
+      <settings name="LABEL" ref="//@result/@interfaces.0/@configurationElements.208"/>
+      <settings name="LANGID" value="01" ref="//@result/@interfaces.0/@configurationElements.209"/>
+      <settings name="LANGUAGES" value="SC" ref="//@result/@interfaces.0/@configurationElements.210"/>
+      <settings name="NAME" value="product_5230_rnd" ref="//@result/@interfaces.0/@configurationElements.211"/>
+      <settings name="OPERATOR_OBY" value="/epoc32/rombuild/product/rofs3/product_5230_rnd_rofs3_operator.oby" ref="//@result/@interfaces.0/@configurationElements.212"/>
+      <settings name="OPERATOR_OBYGEN" value="/epoc32/rombuild/product/rofs3/product_5230_rnd_rofs3_operator.oby | /epoc32/rom/include/operator | *.iby" ref="//@result/@interfaces.0/@configurationElements.213"/>
+      <settings name="PRODUCT_MODEL" value="N00" ref="//@result/@interfaces.0/@configurationElements.214"/>
+      <settings name="PRODUCT_NAME" value="product" ref="//@result/@interfaces.0/@configurationElements.215"/>
+      <settings name="PRODUCT_REVISION" value="01" ref="//@result/@interfaces.0/@configurationElements.216"/>
+      <settings name="RELEASEDIR" value="/flash_images/product" ref="//@result/@interfaces.0/@configurationElements.217"/>
+      <settings name="RELEASEFILES" value="/epoc32/rombuild/product/product_5230_rnd.fpsx /epoc32/rombuild/product/core/product_5230_rnd.rom.log /epoc32/rombuild/product/core/product_5230_rnd.rofs1.log /epoc32/rombuild/product/rofs2/product_5230_rnd.rofs2.log /epoc32/rombuild/product/rofs3/product_5230_rnd.rofs3.log" ref="//@result/@interfaces.0/@configurationElements.218"/>
+      <settings name="RELEASENAME" value="product_rnd_20080714082818_haismail" ref="//@result/@interfaces.0/@configurationElements.219"/>
+      <settings name="ROFS2_DIR" value="/epoc32/rombuild/product/rofs2" ref="//@result/@interfaces.0/@configurationElements.220"/>
+      <settings name="ROFS2_E2FNAME" value="/epoc32/rombuild/product/rofs2/elf2flash/product_5230_rnd" ref="//@result/@interfaces.0/@configurationElements.221"/>
+      <settings name="ROFS2_FOOTER" ref="//@result/@interfaces.0/@configurationElements.222"/>
+      <settings name="ROFS2_FWIDFILE" value="/epoc32/rombuild/product/rofs2/product_5230_rnd_rofs2_fwid.txt" ref="//@result/@interfaces.0/@configurationElements.223"/>
+      <settings name="ROFS2_FWIDINFO" value="id=language\nversion=01\n" ref="//@result/@interfaces.0/@configurationElements.224"/>
+      <settings name="ROFS2_HEADER" value="#include &lt;data_caging_paths_for_iby.hrh> \n\n// TEMPORARY FIXES BEGIN\n // Enable faster variant creation, to be removed when iby header hierarchy is fixed\n #define __platform_OBY__  // Define platform.oby out\n #include &lt;Variant\Header.iby>\n #include &lt;header.iby>  // Symbian common definitions\n // TEMPORARY FIXES END\n" ref="//@result/@interfaces.0/@configurationElements.225"/>
+      <settings name="ROFS2_MSTOBY" value="/epoc32/rombuild/product/rofs2/product_5230_rnd_rofs2_master.oby" ref="//@result/@interfaces.0/@configurationElements.226"/>
+      <settings name="ROFS2_NAME" value="/epoc32/rombuild/product/rofs2/product_5230_rnd" ref="//@result/@interfaces.0/@configurationElements.227"/>
+      <settings name="ROFS2_OBY" ref="//@result/@interfaces.0/@configurationElements.228"/>
+      <settings name="ROFS2_OPT" ref="//@result/@interfaces.0/@configurationElements.229"/>
+      <settings name="ROFS2_ROMVER" value="0.01(0)" ref="//@result/@interfaces.0/@configurationElements.230"/>
+      <settings name="ROFS2_TIME" value="14/07/2008" ref="//@result/@interfaces.0/@configurationElements.231"/>
+      <settings name="ROFS2_VERIBY" value="/epoc32/rombuild/product/rofs2/product_5230_rnd_rofs2_version.iby" ref="//@result/@interfaces.0/@configurationElements.232"/>
+      <settings name="ROFS3_CUSTFILE" value="/epoc32/rombuild/product/rofs3/product_5230_rnd_rofs3_customersw.txt" ref="//@result/@interfaces.0/@configurationElements.233"/>
+      <settings name="ROFS3_CUSTINFO" value="V 0.00.0\n14-07-08" ref="//@result/@interfaces.0/@configurationElements.234"/>
+      <settings name="ROFS3_DIR" value="/epoc32/rombuild/product/rofs3" ref="//@result/@interfaces.0/@configurationElements.235"/>
+      <settings name="ROFS3_E2FNAME" value="/epoc32/rombuild/product/rofs3/elf2flash/product_5230_rnd" ref="//@result/@interfaces.0/@configurationElements.236"/>
+      <settings name="ROFS3_FOOTER" ref="//@result/@interfaces.0/@configurationElements.237"/>
+      <settings name="ROFS3_FWIDFILE" value="/epoc32/rombuild/product/rofs3/product_5230_rnd_rofs3_fwid.txt" ref="//@result/@interfaces.0/@configurationElements.238"/>
+      <settings name="ROFS3_FWIDINFO" value="id=customer\nversion=V 0.00.0 RND Customer\n" ref="//@result/@interfaces.0/@configurationElements.239"/>
+      <settings name="ROFS3_HEADER" value="#include &lt;data_caging_paths_for_iby.hrh> \n\n// TEMPORARY FIXES BEGIN\n // Enable faster variant creation, to be removed when iby header hierarchy is fixed\n #define __platform_OBY__  // Define platform.oby out\n #include &lt;Variant\Header.iby>\n #include &lt;header.iby>  // Symbian common definitions\n // TEMPORARY FIXES END\n" ref="//@result/@interfaces.0/@configurationElements.240"/>
+      <settings name="ROFS3_MSTOBY" value="/epoc32/rombuild/product/rofs3/product_5230_rnd_rofs3_master.oby" ref="//@result/@interfaces.0/@configurationElements.241"/>
+      <settings name="ROFS3_NAME" value="/epoc32/rombuild/product/rofs3/product_5230_rnd" ref="//@result/@interfaces.0/@configurationElements.242"/>
+      <settings name="ROFS3_OBY" value="/epoc32/rombuild/product/rofs3/product_5230_rnd_rofs3_operator.oby" ref="//@result/@interfaces.0/@configurationElements.243"/>
+      <settings name="ROFS3_OPT" ref="//@result/@interfaces.0/@configurationElements.244"/>
+      <settings name="ROFS3_ROMVER" value="0.01(0)" ref="//@result/@interfaces.0/@configurationElements.245"/>
+      <settings name="ROFS3_TIME" value="14/07/2008" ref="//@result/@interfaces.0/@configurationElements.246"/>
+      <settings name="ROFS3_VERIBY" value="/epoc32/rombuild/product/rofs3/product_5230_rnd_rofs3_version.iby" ref="//@result/@interfaces.0/@configurationElements.247"/>
+      <settings name="SOS_VERSION" value="9.4" ref="//@result/@interfaces.0/@configurationElements.248"/>
+      <settings name="SWUPD_EXT" value=".swupd" ref="//@result/@interfaces.0/@configurationElements.249"/>
+      <settings name="TYPE" value="rnd" ref="//@result/@interfaces.0/@configurationElements.250"/>
+      <settings name="USE_OVERRIDE" value="0" ref="//@result/@interfaces.0/@configurationElements.251"/>
+      <settings name="USE_PAGING" value="code:123" ref="//@result/@interfaces.0/@configurationElements.252"/>
+      <settings name="USE_ROFS" value="1" ref="//@result/@interfaces.0/@configurationElements.253"/>
+      <settings name="USE_ROMFILE" value="1" ref="//@result/@interfaces.0/@configurationElements.254"/>
+      <settings name="USE_ROMSYMGEN" value="0" ref="//@result/@interfaces.0/@configurationElements.255"/>
+      <settings name="USE_UDEB" value="0" ref="//@result/@interfaces.0/@configurationElements.256"/>
+      <settings name="USE_VERGEN" value="0" ref="//@result/@interfaces.0/@configurationElements.257"/>
+    </configurations>
+    <configurations name="image_conf_product_ui.mk" filePath="\epoc32\rom\config\platform\product\image_conf_product_ui.mk" targetrefs="//@result/@targets.114 //@result/@targets.115 //@result/@targets.116 //@result/@targets.117 //@result/@targets.118 //@result/@targets.119 //@result/@targets.120 //@result/@targets.121 //@result/@targets.122 //@result/@targets.123 //@result/@targets.124 //@result/@targets.125 //@result/@targets.126 //@result/@targets.127 //@result/@targets.128 //@result/@targets.129 //@result/@targets.130 //@result/@targets.131 //@result/@targets.132 //@result/@targets.133 //@result/@targets.134 //@result/@targets.135 //@result/@targets.136 //@result/@targets.137 //@result/@targets.138 //@result/@targets.139 //@result/@targets.140 //@result/@targets.141 //@result/@targets.142 //@result/@targets.143 //@result/@targets.144 //@result/@targets.145 //@result/@targets.146 //@result/@targets.147 //@result/@targets.148 //@result/@targets.149 //@result/@targets.150 //@result/@targets.151">
+      <settings name="BLDROBY" ref="//@result/@interfaces.0/@configurationElements.258"/>
+      <settings name="BLDROM_OPT" value="-p -v -nosymbols -eoverride  -D_IMAGE_TYPE_RND" ref="//@result/@interfaces.0/@configurationElements.259"/>
+      <settings name="BLDROPT" ref="//@result/@interfaces.0/@configurationElements.260"/>
+      <settings name="CONFIGROOT" value="/epoc32/rom/config" ref="//@result/@interfaces.0/@configurationElements.261"/>
+      <settings name="CORE_CDPROMFILE" value="/epoc32/rombuild/odpcoderomfiles.txt" ref="//@result/@interfaces.0/@configurationElements.262"/>
+      <settings name="CORE_DIR" value="/epoc32/rombuild/product/core" ref="//@result/@interfaces.0/@configurationElements.263"/>
+      <settings name="CORE_E2FNAME" value="/epoc32/rombuild/product/core/elf2flash/product_5230_rnd" ref="//@result/@interfaces.0/@configurationElements.264"/>
+      <settings name="CORE_FWIDFILE" value="/epoc32/rombuild/product/core/product_5230_rnd_core_fwid.txt" ref="//@result/@interfaces.0/@configurationElements.265"/>
+      <settings name="CORE_IMEISVFILE" value="/epoc32/rombuild/product/core/product_5230_rnd_core_imeisv.txt" ref="//@result/@interfaces.0/@configurationElements.266"/>
+      <settings name="CORE_IMEISVINFO" value="00" ref="//@result/@interfaces.0/@configurationElements.267"/>
+      <settings name="CORE_MODELFILE" value="/epoc32/rombuild/product/core/product_5230_rnd_core_model.txt" ref="//@result/@interfaces.0/@configurationElements.268"/>
+      <settings name="CORE_MODELINFO" value="S60" ref="//@result/@interfaces.0/@configurationElements.269"/>
+      <settings name="CORE_MSTOBY" value="/epoc32/rombuild/product/core/product_5230_rnd_core_master.oby" ref="//@result/@interfaces.0/@configurationElements.270"/>
+      <settings name="CORE_NAME" value="/epoc32/rombuild/product/core/product_5230_rnd" ref="//@result/@interfaces.0/@configurationElements.271"/>
+      <settings name="CORE_NDPROMFILE" value="/epoc32/rombuild/romfiles.txt" ref="//@result/@interfaces.0/@configurationElements.272"/>
+      <settings name="CORE_OBY" value="/epoc32/rom/master.oby /epoc32/rom/ppd.oby /epoc32/rom/rnd.oby /epoc32/rom/override.oby /epoc32/rombuild/product/core/product_5230_rnd_core_collected.oby /epoc32/rom/include/symbianos.iby /epoc32/rom/variant/patchdata.iby" ref="//@result/@interfaces.0/@configurationElements.273"/>
+      <settings name="CORE_ODPROMFILE" value="/epoc32/rombuild/odpromfiles.txt" ref="//@result/@interfaces.0/@configurationElements.274"/>
+      <settings name="CORE_OPT" value="-p -v -nosymbols -eoverride  -D_IMAGE_TYPE_RND -D_EABI=ARMV5 -D_ASIC_VER_11 -DUSE_MULTIROFS -Dproduct  -es60ibymacros -DSECTION -DRND_CONTENT " ref="//@result/@interfaces.0/@configurationElements.275"/>
+      <settings name="CORE_PLATFILE" value="/epoc32/rombuild/product/core/product_5230_rnd_core_platform.txt" ref="//@result/@interfaces.0/@configurationElements.276"/>
+      <settings name="CORE_PLATINFO" value="SymbianOSMajorVersion=9\nSymbianOSMinorVersion=4\n" ref="//@result/@interfaces.0/@configurationElements.277"/>
+      <settings name="CORE_PRODFILE" value="/epoc32/rombuild/product/core/product_5230_rnd_core_product.txt" ref="//@result/@interfaces.0/@configurationElements.278"/>
+      <settings name="CORE_ROFSFILE" value="/epoc32/rombuild/odpcoderofsfiles.txt" ref="//@result/@interfaces.0/@configurationElements.279"/>
+      <settings name="CORE_ROMVER" value="0.01(0)" ref="//@result/@interfaces.0/@configurationElements.280"/>
+      <settings name="CORE_SWVERFILE" value="/epoc32/rombuild/product/core/product_5230_rnd_core_sw.txt" ref="//@result/@interfaces.0/@configurationElements.281"/>
+      <settings name="CORE_SWVERINFO" value="V 52.50.2008.24 RnD\n13-06-08\nRM-356\n(c)NMP" ref="//@result/@interfaces.0/@configurationElements.282"/>
+      <settings name="CORE_TIME" value="14/07/2008" ref="//@result/@interfaces.0/@configurationElements.283"/>
+      <settings name="CORE_UDEBFILE" value="/epoc32/rombuild/mytraces.txt" ref="//@result/@interfaces.0/@configurationElements.284"/>
+      <settings name="CORE_VERIBY" value="/epoc32/rombuild/product/core/product_5230_rnd_core_version.iby" ref="//@result/@interfaces.0/@configurationElements.285"/>
+      <settings name="CORE_VERSION" value="V 52.50.2008.24 RnD" ref="//@result/@interfaces.0/@configurationElements.286"/>
+      <settings name="COREPLAT_NAME" value="platform" ref="//@result/@interfaces.0/@configurationElements.287"/>
+      <settings name="CUSTVARIANT_DIR" ref="//@result/@interfaces.0/@configurationElements.288"/>
+      <settings name="DEFAULT_LANGUAGE" value="01" ref="//@result/@interfaces.0/@configurationElements.289"/>
+      <settings name="FLASH_EXT" value=".fpsx" ref="//@result/@interfaces.0/@configurationElements.290"/>
+      <settings name="HWID" value="5230*" ref="//@result/@interfaces.0/@configurationElements.291"/>
+      <settings name="HWID_LIST" value="5230" ref="//@result/@interfaces.0/@configurationElements.292"/>
+      <settings name="KEEPTEMP" value="0" ref="//@result/@interfaces.0/@configurationElements.293"/>
+      <settings name="LABEL" ref="//@result/@interfaces.0/@configurationElements.294"/>
+      <settings name="LANGID" value="01" ref="//@result/@interfaces.0/@configurationElements.295"/>
+      <settings name="LANGUAGES" value="01" ref="//@result/@interfaces.0/@configurationElements.296"/>
+      <settings name="NAME" value="product_5230_rnd" ref="//@result/@interfaces.0/@configurationElements.297"/>
+      <settings name="OPERATOR_OBY" ref="//@result/@interfaces.0/@configurationElements.298"/>
+      <settings name="OPERATOR_OBYGEN" value=" | /epoc32/rom/include/operator | *.iby" ref="//@result/@interfaces.0/@configurationElements.299"/>
+      <settings name="PRODUCT_MODEL" value="N00" ref="//@result/@interfaces.0/@configurationElements.300"/>
+      <settings name="PRODUCT_NAME" value="product" ref="//@result/@interfaces.0/@configurationElements.301"/>
+      <settings name="PRODUCT_REVISION" value="01" ref="//@result/@interfaces.0/@configurationElements.302"/>
+      <settings name="RELEASEDIR" value="/flash_images/product" ref="//@result/@interfaces.0/@configurationElements.303"/>
+      <settings name="RELEASEFILES" value="/epoc32/rombuild/product/product_5230_rnd.fpsx /epoc32/rombuild/product/core/product_5230_rnd.rom.log /epoc32/rombuild/product/core/product_5230_rnd.rofs1.log /epoc32/rombuild/product/rofs2/product_5230_rnd.rofs2.log /epoc32/rombuild/product/rofs3/product_5230_rnd.rofs3.log" ref="//@result/@interfaces.0/@configurationElements.304"/>
+      <settings name="RELEASENAME" value="product_rnd_20080714082822_haismail" ref="//@result/@interfaces.0/@configurationElements.305"/>
+      <settings name="ROFS2_DIR" value="/epoc32/rombuild/product/rofs2" ref="//@result/@interfaces.0/@configurationElements.306"/>
+      <settings name="ROFS2_E2FNAME" value="/epoc32/rombuild/product/rofs2/elf2flash/product_5230_rnd" ref="//@result/@interfaces.0/@configurationElements.307"/>
+      <settings name="ROFS2_FOOTER" ref="//@result/@interfaces.0/@configurationElements.308"/>
+      <settings name="ROFS2_FWIDFILE" value="/epoc32/rombuild/product/rofs2/product_5230_rnd_rofs2_fwid.txt" ref="//@result/@interfaces.0/@configurationElements.309"/>
+      <settings name="ROFS2_FWIDINFO" value="id=language\nversion=01\n" ref="//@result/@interfaces.0/@configurationElements.310"/>
+      <settings name="ROFS2_HEADER" value="#include &lt;data_caging_paths_for_iby.hrh> \n\n// TEMPORARY FIXES BEGIN\n // Enable faster variant creation, to be removed when iby header hierarchy is fixed\n #define __platform_OBY__  // Define platform.oby out\n #include &lt;Variant\Header.iby>\n #include &lt;header.iby>  // Symbian common definitions\n // TEMPORARY FIXES END\n" ref="//@result/@interfaces.0/@configurationElements.311"/>
+      <settings name="ROFS2_MSTOBY" value="/epoc32/rombuild/product/rofs2/product_5230_rnd_rofs2_master.oby" ref="//@result/@interfaces.0/@configurationElements.312"/>
+      <settings name="ROFS2_NAME" value="/epoc32/rombuild/product/rofs2/product_5230_rnd" ref="//@result/@interfaces.0/@configurationElements.313"/>
+      <settings name="ROFS2_OBY" value="&lt;Variant.oby> &lt;ppd_variant.oby> &lt;ppd_locales.iby> /epoc32/rom/override.oby /epoc32/rombuild/product/rofs2/product_5230_rnd_rofs2_language_collected.oby /epoc32/rombuild/product/rofs2/product_5230_rnd_rofs2_customer_collected.oby" ref="//@result/@interfaces.0/@configurationElements.314"/>
+      <settings name="ROFS2_OPT" value="-p -v -nosymbols -eoverride  -D_IMAGE_TYPE_RND -D_EABI=ARMV5 -D_ASIC_VER_11 -DUSE_MULTIROFS -Dproduct  -es60ibymacros -elocalise -DRND_CONTENT" ref="//@result/@interfaces.0/@configurationElements.315"/>
+      <settings name="ROFS2_ROMVER" value="0.01(0)" ref="//@result/@interfaces.0/@configurationElements.316"/>
+      <settings name="ROFS2_TIME" value="14/07/2008" ref="//@result/@interfaces.0/@configurationElements.317"/>
+      <settings name="ROFS2_VERIBY" value="/epoc32/rombuild/product/rofs2/product_5230_rnd_rofs2_version.iby" ref="//@result/@interfaces.0/@configurationElements.318"/>
+      <settings name="ROFS3_CUSTFILE" value="/epoc32/rombuild/product/rofs3/product_5230_rnd_rofs3_customersw.txt" ref="//@result/@interfaces.0/@configurationElements.319"/>
+      <settings name="ROFS3_CUSTINFO" value="V 52.50.2008.24 RnD\n14-07-08" ref="//@result/@interfaces.0/@configurationElements.320"/>
+      <settings name="ROFS3_DIR" value="/epoc32/rombuild/product/rofs3" ref="//@result/@interfaces.0/@configurationElements.321"/>
+      <settings name="ROFS3_E2FNAME" value="/epoc32/rombuild/product/rofs3/elf2flash/product_5230_rnd" ref="//@result/@interfaces.0/@configurationElements.322"/>
+      <settings name="ROFS3_FOOTER" ref="//@result/@interfaces.0/@configurationElements.323"/>
+      <settings name="ROFS3_FWIDFILE" value="/epoc32/rombuild/product/rofs3/product_5230_rnd_rofs3_fwid.txt" ref="//@result/@interfaces.0/@configurationElements.324"/>
+      <settings name="ROFS3_FWIDINFO" value="id=customer\nversion=V 52.50.2008.24 RnD RND Customer\n" ref="//@result/@interfaces.0/@configurationElements.325"/>
+      <settings name="ROFS3_HEADER" value="#include &lt;data_caging_paths_for_iby.hrh> \n\n// TEMPORARY FIXES BEGIN\n // Enable faster variant creation, to be removed when iby header hierarchy is fixed\n #define __platform_OBY__  // Define platform.oby out\n #include &lt;Variant\Header.iby>\n #include &lt;header.iby>  // Symbian common definitions\n // TEMPORARY FIXES END\n" ref="//@result/@interfaces.0/@configurationElements.326"/>
+      <settings name="ROFS3_MSTOBY" value="/epoc32/rombuild/product/rofs3/product_5230_rnd_rofs3_master.oby" ref="//@result/@interfaces.0/@configurationElements.327"/>
+      <settings name="ROFS3_NAME" value="/epoc32/rombuild/product/rofs3/product_5230_rnd" ref="//@result/@interfaces.0/@configurationElements.328"/>
+      <settings name="ROFS3_OBY" value=" /epoc32/rombuild/product/rofs3/product_5230_rnd_rofs3_collected.oby" ref="//@result/@interfaces.0/@configurationElements.329"/>
+      <settings name="ROFS3_OPT" value="-p -v -nosymbols -eoverride  -D_IMAGE_TYPE_RND -D_EABI=ARMV5 -D_ASIC_VER_11 -DUSE_MULTIROFS -Dproduct  -es60ibymacros" ref="//@result/@interfaces.0/@configurationElements.330"/>
+      <settings name="ROFS3_ROMVER" value="0.01(0)" ref="//@result/@interfaces.0/@configurationElements.331"/>
+      <settings name="ROFS3_TIME" value="14/07/2008" ref="//@result/@interfaces.0/@configurationElements.332"/>
+      <settings name="ROFS3_VERIBY" value="/epoc32/rombuild/product/rofs3/product_5230_rnd_rofs3_version.iby" ref="//@result/@interfaces.0/@configurationElements.333"/>
+      <settings name="SOS_VERSION" value="9.4" ref="//@result/@interfaces.0/@configurationElements.334"/>
+      <settings name="SWUPD_EXT" value=".swupd" ref="//@result/@interfaces.0/@configurationElements.335"/>
+      <settings name="TYPE" value="rnd" ref="//@result/@interfaces.0/@configurationElements.336"/>
+      <settings name="USE_OVERRIDE" value="1" ref="//@result/@interfaces.0/@configurationElements.337"/>
+      <settings name="USE_PAGING" value="code:123" ref="//@result/@interfaces.0/@configurationElements.338"/>
+      <settings name="USE_ROFS" value="1,2,3" ref="//@result/@interfaces.0/@configurationElements.339"/>
+      <settings name="USE_ROMFILE" value="1" ref="//@result/@interfaces.0/@configurationElements.340"/>
+      <settings name="USE_ROMSYMGEN" value="0" ref="//@result/@interfaces.0/@configurationElements.341"/>
+      <settings name="USE_UDEB" value="1" ref="//@result/@interfaces.0/@configurationElements.342"/>
+      <settings name="USE_VERGEN" value="1" ref="//@result/@interfaces.0/@configurationElements.343"/>
+    </configurations>
+    <configurations name="image_conf_product.mk" filePath="\epoc32\rom\config\platform\product_oem\image_conf_product.mk" targetrefs="//@result/@targets.152 //@result/@targets.153 //@result/@targets.154 //@result/@targets.155 //@result/@targets.156 //@result/@targets.157 //@result/@targets.158 //@result/@targets.159 //@result/@targets.160 //@result/@targets.161 //@result/@targets.162 //@result/@targets.163 //@result/@targets.164 //@result/@targets.165 //@result/@targets.166 //@result/@targets.167 //@result/@targets.168 //@result/@targets.169 //@result/@targets.170 //@result/@targets.171 //@result/@targets.172 //@result/@targets.173 //@result/@targets.174 //@result/@targets.175 //@result/@targets.176 //@result/@targets.177 //@result/@targets.178 //@result/@targets.179 //@result/@targets.180 //@result/@targets.181 //@result/@targets.182 //@result/@targets.183 //@result/@targets.184 //@result/@targets.185 //@result/@targets.186 //@result/@targets.187 //@result/@targets.188 //@result/@targets.189">
+      <settings name="BLDROBY" ref="//@result/@interfaces.0/@configurationElements.344"/>
+      <settings name="BLDROM_OPT" value="-p -v -nosymbols   -D_IMAGE_TYPE_RND" ref="//@result/@interfaces.0/@configurationElements.345"/>
+      <settings name="BLDROPT" ref="//@result/@interfaces.0/@configurationElements.346"/>
+      <settings name="CONFIGROOT" value="/epoc32/rom/config" ref="//@result/@interfaces.0/@configurationElements.347"/>
+      <settings name="CORE_CDPROMFILE" value="/epoc32/rombuild/odpcoderomfiles.txt" ref="//@result/@interfaces.0/@configurationElements.348"/>
+      <settings name="CORE_DIR" value="/epoc32/rombuild/product/core" ref="//@result/@interfaces.0/@configurationElements.349"/>
+      <settings name="CORE_E2FNAME" value="/epoc32/rombuild/product/core/elf2flash/product_5230_rnd" ref="//@result/@interfaces.0/@configurationElements.350"/>
+      <settings name="CORE_FWIDFILE" value="/epoc32/rombuild/product/core/product_5230_rnd_core_fwid.txt" ref="//@result/@interfaces.0/@configurationElements.351"/>
+      <settings name="CORE_IMEISVFILE" value="/epoc32/rombuild/product/core/product_5230_rnd_core_imeisv.txt" ref="//@result/@interfaces.0/@configurationElements.352"/>
+      <settings name="CORE_IMEISVINFO" value="00" ref="//@result/@interfaces.0/@configurationElements.353"/>
+      <settings name="CORE_MODELFILE" value="/epoc32/rombuild/product/core/product_5230_rnd_core_model.txt" ref="//@result/@interfaces.0/@configurationElements.354"/>
+      <settings name="CORE_MODELINFO" value="S60" ref="//@result/@interfaces.0/@configurationElements.355"/>
+      <settings name="CORE_MSTOBY" value="/epoc32/rombuild/product/core/product_5230_rnd_core_master.oby" ref="//@result/@interfaces.0/@configurationElements.356"/>
+      <settings name="CORE_NAME" value="/epoc32/rombuild/product/core/product_5230_rnd" ref="//@result/@interfaces.0/@configurationElements.357"/>
+      <settings name="CORE_NDPROMFILE" value="/epoc32/rombuild/romfiles.txt" ref="//@result/@interfaces.0/@configurationElements.358"/>
+      <settings name="CORE_OBY" value="/epoc32/rom/ncp.oby" ref="//@result/@interfaces.0/@configurationElements.359"/>
+      <settings name="CORE_ODPROMFILE" value="/epoc32/rombuild/odpromfiles.txt" ref="//@result/@interfaces.0/@configurationElements.360"/>
+      <settings name="CORE_OPT" value="-p -v -nosymbols   -D_IMAGE_TYPE_RND -D_EABI=ARMV5 -D_ASIC_VER_11  -Dproduct  -DLCD_SHELL" ref="//@result/@interfaces.0/@configurationElements.361"/>
+      <settings name="CORE_PLATFILE" value="/epoc32/rombuild/product/core/product_5230_rnd_core_platform.txt" ref="//@result/@interfaces.0/@configurationElements.362"/>
+      <settings name="CORE_PLATINFO" value="SymbianOSMajorVersion=9\nSymbianOSMinorVersion=4\n" ref="//@result/@interfaces.0/@configurationElements.363"/>
+      <settings name="CORE_PRODFILE" value="/epoc32/rombuild/product/core/product_5230_rnd_core_product.txt" ref="//@result/@interfaces.0/@configurationElements.364"/>
+      <settings name="CORE_ROFSFILE" value="/epoc32/rombuild/odpcoderofsfiles.txt" ref="//@result/@interfaces.0/@configurationElements.365"/>
+      <settings name="CORE_ROMVER" value="0.01(0)" ref="//@result/@interfaces.0/@configurationElements.366"/>
+      <settings name="CORE_SWVERFILE" value="/epoc32/rombuild/product/core/product_5230_rnd_core_sw.txt" ref="//@result/@interfaces.0/@configurationElements.367"/>
+      <settings name="CORE_SWVERINFO" value="V 52.2008.29.xx RND\n14-07-08\nRM-356\n(c) Nokia" ref="//@result/@interfaces.0/@configurationElements.368"/>
+      <settings name="CORE_TIME" value="14/07/2008" ref="//@result/@interfaces.0/@configurationElements.369"/>
+      <settings name="CORE_UDEBFILE" value="/epoc32/rombuild/mytraces.txt" ref="//@result/@interfaces.0/@configurationElements.370"/>
+      <settings name="CORE_VERIBY" value="/epoc32/rombuild/product/core/product_5230_rnd_core_version.iby" ref="//@result/@interfaces.0/@configurationElements.371"/>
+      <settings name="CORE_VERSION" value="V 52.2008.29.xx RND" ref="//@result/@interfaces.0/@configurationElements.372"/>
+      <settings name="COREPLAT_NAME" value="platform" ref="//@result/@interfaces.0/@configurationElements.373"/>
+      <settings name="CUSTVARIANT_DIR" ref="//@result/@interfaces.0/@configurationElements.374"/>
+      <settings name="DEFAULT_LANGUAGE" value="SC" ref="//@result/@interfaces.0/@configurationElements.375"/>
+      <settings name="FLASH_EXT" value=".fpsx" ref="//@result/@interfaces.0/@configurationElements.376"/>
+      <settings name="HWID" value="5230*" ref="//@result/@interfaces.0/@configurationElements.377"/>
+      <settings name="HWID_LIST" value="5230" ref="//@result/@interfaces.0/@configurationElements.378"/>
+      <settings name="KEEPTEMP" value="0" ref="//@result/@interfaces.0/@configurationElements.379"/>
+      <settings name="LABEL" ref="//@result/@interfaces.0/@configurationElements.380"/>
+      <settings name="LANGID" value="01" ref="//@result/@interfaces.0/@configurationElements.381"/>
+      <settings name="LANGUAGES" value="SC" ref="//@result/@interfaces.0/@configurationElements.382"/>
+      <settings name="NAME" value="product_5230_rnd" ref="//@result/@interfaces.0/@configurationElements.383"/>
+      <settings name="OPERATOR_OBY" value="/epoc32/rombuild/product/rofs3/product_5230_rnd_rofs3_operator.oby" ref="//@result/@interfaces.0/@configurationElements.384"/>
+      <settings name="OPERATOR_OBYGEN" value="/epoc32/rombuild/product/rofs3/product_5230_rnd_rofs3_operator.oby | /epoc32/rom/include/operator | *.iby" ref="//@result/@interfaces.0/@configurationElements.385"/>
+      <settings name="PRODUCT_MODEL" value="N00" ref="//@result/@interfaces.0/@configurationElements.386"/>
+      <settings name="PRODUCT_NAME" value="product" ref="//@result/@interfaces.0/@configurationElements.387"/>
+      <settings name="PRODUCT_REVISION" value="01" ref="//@result/@interfaces.0/@configurationElements.388"/>
+      <settings name="RELEASEDIR" value="/flash_images/product" ref="//@result/@interfaces.0/@configurationElements.389"/>
+      <settings name="RELEASEFILES" value="/epoc32/rombuild/product/product_5230_rnd.fpsx /epoc32/rombuild/product/core/product_5230_rnd.rom.log /epoc32/rombuild/product/core/product_5230_rnd.rofs1.log /epoc32/rombuild/product/rofs2/product_5230_rnd.rofs2.log /epoc32/rombuild/product/rofs3/product_5230_rnd.rofs3.log" ref="//@result/@interfaces.0/@configurationElements.390"/>
+      <settings name="RELEASENAME" value="product_rnd_20080714082826_haismail" ref="//@result/@interfaces.0/@configurationElements.391"/>
+      <settings name="ROFS2_DIR" value="/epoc32/rombuild/product/rofs2" ref="//@result/@interfaces.0/@configurationElements.392"/>
+      <settings name="ROFS2_E2FNAME" value="/epoc32/rombuild/product/rofs2/elf2flash/product_5230_rnd" ref="//@result/@interfaces.0/@configurationElements.393"/>
+      <settings name="ROFS2_FOOTER" ref="//@result/@interfaces.0/@configurationElements.394"/>
+      <settings name="ROFS2_FWIDFILE" value="/epoc32/rombuild/product/rofs2/product_5230_rnd_rofs2_fwid.txt" ref="//@result/@interfaces.0/@configurationElements.395"/>
+      <settings name="ROFS2_FWIDINFO" value="id=language\nversion=01\n" ref="//@result/@interfaces.0/@configurationElements.396"/>
+      <settings name="ROFS2_HEADER" value="#include &lt;data_caging_paths_for_iby.hrh> \n\n// TEMPORARY FIXES BEGIN\n // Enable faster variant creation, to be removed when iby header hierarchy is fixed\n #define __platform_OBY__  // Define platform.oby out\n #include &lt;Variant\Header.iby>\n #include &lt;header.iby>  // Symbian common definitions\n // TEMPORARY FIXES END\n" ref="//@result/@interfaces.0/@configurationElements.397"/>
+      <settings name="ROFS2_MSTOBY" value="/epoc32/rombuild/product/rofs2/product_5230_rnd_rofs2_master.oby" ref="//@result/@interfaces.0/@configurationElements.398"/>
+      <settings name="ROFS2_NAME" value="/epoc32/rombuild/product/rofs2/product_5230_rnd" ref="//@result/@interfaces.0/@configurationElements.399"/>
+      <settings name="ROFS2_OBY" ref="//@result/@interfaces.0/@configurationElements.400"/>
+      <settings name="ROFS2_OPT" ref="//@result/@interfaces.0/@configurationElements.401"/>
+      <settings name="ROFS2_ROMVER" value="0.01(0)" ref="//@result/@interfaces.0/@configurationElements.402"/>
+      <settings name="ROFS2_TIME" value="14/07/2008" ref="//@result/@interfaces.0/@configurationElements.403"/>
+      <settings name="ROFS2_VERIBY" value="/epoc32/rombuild/product/rofs2/product_5230_rnd_rofs2_version.iby" ref="//@result/@interfaces.0/@configurationElements.404"/>
+      <settings name="ROFS3_CUSTFILE" value="/epoc32/rombuild/product/rofs3/product_5230_rnd_rofs3_customersw.txt" ref="//@result/@interfaces.0/@configurationElements.405"/>
+      <settings name="ROFS3_CUSTINFO" value="V 0.00.0\n14-07-08" ref="//@result/@interfaces.0/@configurationElements.406"/>
+      <settings name="ROFS3_DIR" value="/epoc32/rombuild/product/rofs3" ref="//@result/@interfaces.0/@configurationElements.407"/>
+      <settings name="ROFS3_E2FNAME" value="/epoc32/rombuild/product/rofs3/elf2flash/product_5230_rnd" ref="//@result/@interfaces.0/@configurationElements.408"/>
+      <settings name="ROFS3_FOOTER" ref="//@result/@interfaces.0/@configurationElements.409"/>
+      <settings name="ROFS3_FWIDFILE" value="/epoc32/rombuild/product/rofs3/product_5230_rnd_rofs3_fwid.txt" ref="//@result/@interfaces.0/@configurationElements.410"/>
+      <settings name="ROFS3_FWIDINFO" value="id=customer\nversion=V 0.00.0 RND Customer\n" ref="//@result/@interfaces.0/@configurationElements.411"/>
+      <settings name="ROFS3_HEADER" value="#include &lt;data_caging_paths_for_iby.hrh> \n\n// TEMPORARY FIXES BEGIN\n // Enable faster variant creation, to be removed when iby header hierarchy is fixed\n #define __platform_OBY__  // Define platform.oby out\n #include &lt;Variant\Header.iby>\n #include &lt;header.iby>  // Symbian common definitions\n // TEMPORARY FIXES END\n" ref="//@result/@interfaces.0/@configurationElements.412"/>
+      <settings name="ROFS3_MSTOBY" value="/epoc32/rombuild/product/rofs3/product_5230_rnd_rofs3_master.oby" ref="//@result/@interfaces.0/@configurationElements.413"/>
+      <settings name="ROFS3_NAME" value="/epoc32/rombuild/product/rofs3/product_5230_rnd" ref="//@result/@interfaces.0/@configurationElements.414"/>
+      <settings name="ROFS3_OBY" value="/epoc32/rombuild/product/rofs3/product_5230_rnd_rofs3_operator.oby" ref="//@result/@interfaces.0/@configurationElements.415"/>
+      <settings name="ROFS3_OPT" ref="//@result/@interfaces.0/@configurationElements.416"/>
+      <settings name="ROFS3_ROMVER" value="0.01(0)" ref="//@result/@interfaces.0/@configurationElements.417"/>
+      <settings name="ROFS3_TIME" value="14/07/2008" ref="//@result/@interfaces.0/@configurationElements.418"/>
+      <settings name="ROFS3_VERIBY" value="/epoc32/rombuild/product/rofs3/product_5230_rnd_rofs3_version.iby" ref="//@result/@interfaces.0/@configurationElements.419"/>
+      <settings name="SOS_VERSION" value="9.4" ref="//@result/@interfaces.0/@configurationElements.420"/>
+      <settings name="SWUPD_EXT" value=".swupd" ref="//@result/@interfaces.0/@configurationElements.421"/>
+      <settings name="TYPE" value="rnd" ref="//@result/@interfaces.0/@configurationElements.422"/>
+      <settings name="USE_OVERRIDE" value="0" ref="//@result/@interfaces.0/@configurationElements.423"/>
+      <settings name="USE_PAGING" value="code:123" ref="//@result/@interfaces.0/@configurationElements.424"/>
+      <settings name="USE_ROFS" value="1" ref="//@result/@interfaces.0/@configurationElements.425"/>
+      <settings name="USE_ROMFILE" value="1" ref="//@result/@interfaces.0/@configurationElements.426"/>
+      <settings name="USE_ROMSYMGEN" value="0" ref="//@result/@interfaces.0/@configurationElements.427"/>
+      <settings name="USE_UDEB" value="0" ref="//@result/@interfaces.0/@configurationElements.428"/>
+      <settings name="USE_VERGEN" value="0" ref="//@result/@interfaces.0/@configurationElements.429"/>
+    </configurations>
+    <configurations name="image_conf_product_oem_ui.mk" filePath="\epoc32\rom\config\platform\product_oem\image_conf_product_oem_ui.mk" targetrefs="//@result/@targets.190 //@result/@targets.191 //@result/@targets.192 //@result/@targets.193 //@result/@targets.194 //@result/@targets.195 //@result/@targets.196 //@result/@targets.197 //@result/@targets.198 //@result/@targets.199 //@result/@targets.200 //@result/@targets.201 //@result/@targets.202 //@result/@targets.203 //@result/@targets.204 //@result/@targets.205 //@result/@targets.206 //@result/@targets.207 //@result/@targets.208 //@result/@targets.209 //@result/@targets.210 //@result/@targets.211 //@result/@targets.212 //@result/@targets.213 //@result/@targets.214 //@result/@targets.215 //@result/@targets.216 //@result/@targets.217 //@result/@targets.218 //@result/@targets.219 //@result/@targets.220 //@result/@targets.221 //@result/@targets.222 //@result/@targets.223 //@result/@targets.224 //@result/@targets.225 //@result/@targets.226 //@result/@targets.227">
+      <settings name="BLDROBY" ref="//@result/@interfaces.0/@configurationElements.430"/>
+      <settings name="BLDROM_OPT" value="-p -v -nosymbols -eoverride  -D_IMAGE_TYPE_RND" ref="//@result/@interfaces.0/@configurationElements.431"/>
+      <settings name="BLDROPT" ref="//@result/@interfaces.0/@configurationElements.432"/>
+      <settings name="CONFIGROOT" value="/epoc32/rom/config" ref="//@result/@interfaces.0/@configurationElements.433"/>
+      <settings name="CORE_CDPROMFILE" value="/epoc32/rombuild/odpcoderomfiles.txt" ref="//@result/@interfaces.0/@configurationElements.434"/>
+      <settings name="CORE_DIR" value="/epoc32/rombuild/product/core" ref="//@result/@interfaces.0/@configurationElements.435"/>
+      <settings name="CORE_E2FNAME" value="/epoc32/rombuild/product/core/elf2flash/product_5230_rnd" ref="//@result/@interfaces.0/@configurationElements.436"/>
+      <settings name="CORE_FWIDFILE" value="/epoc32/rombuild/product/core/product_5230_rnd_core_fwid.txt" ref="//@result/@interfaces.0/@configurationElements.437"/>
+      <settings name="CORE_IMEISVFILE" value="/epoc32/rombuild/product/core/product_5230_rnd_core_imeisv.txt" ref="//@result/@interfaces.0/@configurationElements.438"/>
+      <settings name="CORE_IMEISVINFO" value="00" ref="//@result/@interfaces.0/@configurationElements.439"/>
+      <settings name="CORE_MODELFILE" value="/epoc32/rombuild/product/core/product_5230_rnd_core_model.txt" ref="//@result/@interfaces.0/@configurationElements.440"/>
+      <settings name="CORE_MODELINFO" value="S60" ref="//@result/@interfaces.0/@configurationElements.441"/>
+      <settings name="CORE_MSTOBY" value="/epoc32/rombuild/product/core/product_5230_rnd_core_master.oby" ref="//@result/@interfaces.0/@configurationElements.442"/>
+      <settings name="CORE_NAME" value="/epoc32/rombuild/product/core/product_5230_rnd" ref="//@result/@interfaces.0/@configurationElements.443"/>
+      <settings name="CORE_NDPROMFILE" value="/epoc32/rombuild/romfiles.txt" ref="//@result/@interfaces.0/@configurationElements.444"/>
+      <settings name="CORE_OBY" value="/epoc32/rom/master.oby /epoc32/rom/ppd.oby /epoc32/rom/rnd.oby /epoc32/rom/override.oby /epoc32/rombuild/product/core/product_5230_rnd_core_collected.oby /epoc32/rom/include/symbianos.iby /epoc32/rom/variant/patchdata.iby" ref="//@result/@interfaces.0/@configurationElements.445"/>
+      <settings name="CORE_ODPROMFILE" value="/epoc32/rombuild/odpromfiles.txt" ref="//@result/@interfaces.0/@configurationElements.446"/>
+      <settings name="CORE_OPT" value="-p -v -nosymbols -eoverride  -D_IMAGE_TYPE_RND -D_EABI=ARMV5 -D_ASIC_VER_11 -DUSE_MULTIROFS -Dproduct  -es60ibymacros -DSECTION -DRND_CONTENT " ref="//@result/@interfaces.0/@configurationElements.447"/>
+      <settings name="CORE_PLATFILE" value="/epoc32/rombuild/product/core/product_5230_rnd_core_platform.txt" ref="//@result/@interfaces.0/@configurationElements.448"/>
+      <settings name="CORE_PLATINFO" value="SymbianOSMajorVersion=9\nSymbianOSMinorVersion=4\n" ref="//@result/@interfaces.0/@configurationElements.449"/>
+      <settings name="CORE_PRODFILE" value="/epoc32/rombuild/product/core/product_5230_rnd_core_product.txt" ref="//@result/@interfaces.0/@configurationElements.450"/>
+      <settings name="CORE_ROFSFILE" value="/epoc32/rombuild/odpcoderofsfiles.txt" ref="//@result/@interfaces.0/@configurationElements.451"/>
+      <settings name="CORE_ROMVER" value="0.01(0)" ref="//@result/@interfaces.0/@configurationElements.452"/>
+      <settings name="CORE_SWVERFILE" value="/epoc32/rombuild/product/core/product_5230_rnd_core_sw.txt" ref="//@result/@interfaces.0/@configurationElements.453"/>
+      <settings name="CORE_SWVERINFO" value="V 52.50.2008.24 RnD\n13-06-08\nRM-356\n(c)NMP" ref="//@result/@interfaces.0/@configurationElements.454"/>
+      <settings name="CORE_TIME" value="14/07/2008" ref="//@result/@interfaces.0/@configurationElements.455"/>
+      <settings name="CORE_UDEBFILE" value="/epoc32/rombuild/mytraces.txt" ref="//@result/@interfaces.0/@configurationElements.456"/>
+      <settings name="CORE_VERIBY" value="/epoc32/rombuild/product/core/product_5230_rnd_core_version.iby" ref="//@result/@interfaces.0/@configurationElements.457"/>
+      <settings name="CORE_VERSION" value="V 52.50.2008.24 RnD" ref="//@result/@interfaces.0/@configurationElements.458"/>
+      <settings name="COREPLAT_NAME" value="platform" ref="//@result/@interfaces.0/@configurationElements.459"/>
+      <settings name="CUSTVARIANT_DIR" ref="//@result/@interfaces.0/@configurationElements.460"/>
+      <settings name="DEFAULT_LANGUAGE" value="01" ref="//@result/@interfaces.0/@configurationElements.461"/>
+      <settings name="FLASH_EXT" value=".fpsx" ref="//@result/@interfaces.0/@configurationElements.462"/>
+      <settings name="HWID" value="5230*" ref="//@result/@interfaces.0/@configurationElements.463"/>
+      <settings name="HWID_LIST" value="5230" ref="//@result/@interfaces.0/@configurationElements.464"/>
+      <settings name="KEEPTEMP" value="0" ref="//@result/@interfaces.0/@configurationElements.465"/>
+      <settings name="LABEL" ref="//@result/@interfaces.0/@configurationElements.466"/>
+      <settings name="LANGID" value="01" ref="//@result/@interfaces.0/@configurationElements.467"/>
+      <settings name="LANGUAGES" value="01" ref="//@result/@interfaces.0/@configurationElements.468"/>
+      <settings name="NAME" value="product_5230_rnd" ref="//@result/@interfaces.0/@configurationElements.469"/>
+      <settings name="OPERATOR_OBY" ref="//@result/@interfaces.0/@configurationElements.470"/>
+      <settings name="OPERATOR_OBYGEN" value=" | /epoc32/rom/include/operator | *.iby" ref="//@result/@interfaces.0/@configurationElements.471"/>
+      <settings name="PRODUCT_MODEL" value="N00" ref="//@result/@interfaces.0/@configurationElements.472"/>
+      <settings name="PRODUCT_NAME" value="product" ref="//@result/@interfaces.0/@configurationElements.473"/>
+      <settings name="PRODUCT_REVISION" value="01" ref="//@result/@interfaces.0/@configurationElements.474"/>
+      <settings name="RELEASEDIR" value="/flash_images/product" ref="//@result/@interfaces.0/@configurationElements.475"/>
+      <settings name="RELEASEFILES" value="/epoc32/rombuild/product/product_5230_rnd.fpsx /epoc32/rombuild/product/core/product_5230_rnd.rom.log /epoc32/rombuild/product/core/product_5230_rnd.rofs1.log /epoc32/rombuild/product/rofs2/product_5230_rnd.rofs2.log /epoc32/rombuild/product/rofs3/product_5230_rnd.rofs3.log" ref="//@result/@interfaces.0/@configurationElements.476"/>
+      <settings name="RELEASENAME" value="product_rnd_20080714082829_haismail" ref="//@result/@interfaces.0/@configurationElements.477"/>
+      <settings name="ROFS2_DIR" value="/epoc32/rombuild/product/rofs2" ref="//@result/@interfaces.0/@configurationElements.478"/>
+      <settings name="ROFS2_E2FNAME" value="/epoc32/rombuild/product/rofs2/elf2flash/product_5230_rnd" ref="//@result/@interfaces.0/@configurationElements.479"/>
+      <settings name="ROFS2_FOOTER" ref="//@result/@interfaces.0/@configurationElements.480"/>
+      <settings name="ROFS2_FWIDFILE" value="/epoc32/rombuild/product/rofs2/product_5230_rnd_rofs2_fwid.txt" ref="//@result/@interfaces.0/@configurationElements.481"/>
+      <settings name="ROFS2_FWIDINFO" value="id=language\nversion=01\n" ref="//@result/@interfaces.0/@configurationElements.482"/>
+      <settings name="ROFS2_HEADER" value="#include &lt;data_caging_paths_for_iby.hrh> \n\n// TEMPORARY FIXES BEGIN\n // Enable faster variant creation, to be removed when iby header hierarchy is fixed\n #define __platform_OBY__  // Define platform.oby out\n #include &lt;Variant\Header.iby>\n #include &lt;header.iby>  // Symbian common definitions\n // TEMPORARY FIXES END\n" ref="//@result/@interfaces.0/@configurationElements.483"/>
+      <settings name="ROFS2_MSTOBY" value="/epoc32/rombuild/product/rofs2/product_5230_rnd_rofs2_master.oby" ref="//@result/@interfaces.0/@configurationElements.484"/>
+      <settings name="ROFS2_NAME" value="/epoc32/rombuild/product/rofs2/product_5230_rnd" ref="//@result/@interfaces.0/@configurationElements.485"/>
+      <settings name="ROFS2_OBY" value="&lt;Variant.oby> &lt;ppd_variant.oby> &lt;ppd_locales.iby> /epoc32/rom/override.oby /epoc32/rombuild/product/rofs2/product_5230_rnd_rofs2_language_collected.oby /epoc32/rombuild/product/rofs2/product_5230_rnd_rofs2_customer_collected.oby" ref="//@result/@interfaces.0/@configurationElements.486"/>
+      <settings name="ROFS2_OPT" value="-p -v -nosymbols -eoverride  -D_IMAGE_TYPE_RND -D_EABI=ARMV5 -D_ASIC_VER_11 -DUSE_MULTIROFS -Dproduct  -es60ibymacros -elocalise -DRND_CONTENT" ref="//@result/@interfaces.0/@configurationElements.487"/>
+      <settings name="ROFS2_ROMVER" value="0.01(0)" ref="//@result/@interfaces.0/@configurationElements.488"/>
+      <settings name="ROFS2_TIME" value="14/07/2008" ref="//@result/@interfaces.0/@configurationElements.489"/>
+      <settings name="ROFS2_VERIBY" value="/epoc32/rombuild/product/rofs2/product_5230_rnd_rofs2_version.iby" ref="//@result/@interfaces.0/@configurationElements.490"/>
+      <settings name="ROFS3_CUSTFILE" value="/epoc32/rombuild/product/rofs3/product_5230_rnd_rofs3_customersw.txt" ref="//@result/@interfaces.0/@configurationElements.491"/>
+      <settings name="ROFS3_CUSTINFO" value="V 52.50.2008.24 RnD\n14-07-08" ref="//@result/@interfaces.0/@configurationElements.492"/>
+      <settings name="ROFS3_DIR" value="/epoc32/rombuild/product/rofs3" ref="//@result/@interfaces.0/@configurationElements.493"/>
+      <settings name="ROFS3_E2FNAME" value="/epoc32/rombuild/product/rofs3/elf2flash/product_5230_rnd" ref="//@result/@interfaces.0/@configurationElements.494"/>
+      <settings name="ROFS3_FOOTER" ref="//@result/@interfaces.0/@configurationElements.495"/>
+      <settings name="ROFS3_FWIDFILE" value="/epoc32/rombuild/product/rofs3/product_5230_rnd_rofs3_fwid.txt" ref="//@result/@interfaces.0/@configurationElements.496"/>
+      <settings name="ROFS3_FWIDINFO" value="id=customer\nversion=V 52.50.2008.24 RnD RND Customer\n" ref="//@result/@interfaces.0/@configurationElements.497"/>
+      <settings name="ROFS3_HEADER" value="#include &lt;data_caging_paths_for_iby.hrh> \n\n// TEMPORARY FIXES BEGIN\n // Enable faster variant creation, to be removed when iby header hierarchy is fixed\n #define __platform_OBY__  // Define platform.oby out\n #include &lt;Variant\Header.iby>\n #include &lt;header.iby>  // Symbian common definitions\n // TEMPORARY FIXES END\n" ref="//@result/@interfaces.0/@configurationElements.498"/>
+      <settings name="ROFS3_MSTOBY" value="/epoc32/rombuild/product/rofs3/product_5230_rnd_rofs3_master.oby" ref="//@result/@interfaces.0/@configurationElements.499"/>
+      <settings name="ROFS3_NAME" value="/epoc32/rombuild/product/rofs3/product_5230_rnd" ref="//@result/@interfaces.0/@configurationElements.500"/>
+      <settings name="ROFS3_OBY" value=" /epoc32/rombuild/product/rofs3/product_5230_rnd_rofs3_collected.oby" ref="//@result/@interfaces.0/@configurationElements.501"/>
+      <settings name="ROFS3_OPT" value="-p -v -nosymbols -eoverride  -D_IMAGE_TYPE_RND -D_EABI=ARMV5 -D_ASIC_VER_11 -DUSE_MULTIROFS -Dproduct  -es60ibymacros" ref="//@result/@interfaces.0/@configurationElements.502"/>
+      <settings name="ROFS3_ROMVER" value="0.01(0)" ref="//@result/@interfaces.0/@configurationElements.503"/>
+      <settings name="ROFS3_TIME" value="14/07/2008" ref="//@result/@interfaces.0/@configurationElements.504"/>
+      <settings name="ROFS3_VERIBY" value="/epoc32/rombuild/product/rofs3/product_5230_rnd_rofs3_version.iby" ref="//@result/@interfaces.0/@configurationElements.505"/>
+      <settings name="SOS_VERSION" value="9.4" ref="//@result/@interfaces.0/@configurationElements.506"/>
+      <settings name="SWUPD_EXT" value=".swupd" ref="//@result/@interfaces.0/@configurationElements.507"/>
+      <settings name="TYPE" value="rnd" ref="//@result/@interfaces.0/@configurationElements.508"/>
+      <settings name="USE_OVERRIDE" value="1" ref="//@result/@interfaces.0/@configurationElements.509"/>
+      <settings name="USE_PAGING" value="code:123" ref="//@result/@interfaces.0/@configurationElements.510"/>
+      <settings name="USE_ROFS" value="1,2,3" ref="//@result/@interfaces.0/@configurationElements.511"/>
+      <settings name="USE_ROMFILE" value="1" ref="//@result/@interfaces.0/@configurationElements.512"/>
+      <settings name="USE_ROMSYMGEN" value="0" ref="//@result/@interfaces.0/@configurationElements.513"/>
+      <settings name="USE_UDEB" value="1" ref="//@result/@interfaces.0/@configurationElements.514"/>
+      <settings name="USE_VERGEN" value="1" ref="//@result/@interfaces.0/@configurationElements.515"/>
+    </configurations>
+    <targets name="all" description="Create all image sections and symbol files."/>
+    <targets name="clean" description="Clean all target files."/>
+    <targets name="core" description="Create the core image (ROM,ROFS1)"/>
+    <targets name="core-image" description="Create the core image files (rom.img, rofs1.img)"/>
+    <targets name="custrofs2" description="Create an image from a variant with rofs2. Be sure to define the CUSTVARIANT_DIR."/>
+    <targets name="custuda" description="Create an image from a variant userdata folder. Be sure to define the CUSTVARIANT_DIR."/>
+    <targets name="custvariant" description="Create an image from a customer variant folder. Be sure to define the CUSTVARIANT_DIR."/>
+    <targets name="e2flash" description="Create the elf2flash (flash) file."/>
+    <targets name="f2image" description="Revert the Symbian image file (.img) from the elf2flash (flash) file.(See CORE_FLASH,ROFS2_FLASH,ROFS3_FLASH)"/>
+    <targets name="flash" description="Create all image sections files. Not any symbol files."/>
+    <targets name="flash-all" description="Create all image sections and symbol files."/>
+    <targets name="help" description="Print help on help targets."/>
+    <targets name="help-%" description="Print help on help items matching the pattern."/>
+    <targets name="help-%-list" description="Print a list of help items matching the pattern."/>
+    <targets name="help-config" description="Print a list of available configurations in the current working environment."/>
+    <targets name="help-target" description="Print help on all targets (same as help-target-*)."/>
+    <targets name="help-target-%" description="Print help on targets matching the pattern."/>
+    <targets name="help-target-%-list" description="Print a list of targets matching the pattern."/>
+    <targets name="help-target-%-wiki" description="Print wiki-formatted help on targets matching the pattern."/>
+    <targets name="help-variable" description="Print help on all variables (same as help-variable-*)."/>
+    <targets name="help-variable-%" description="Print help on variables matching the pattern."/>
+    <targets name="help-variable-%-all" description="Print full help on variables matching the pattern."/>
+    <targets name="help-variable-%-list" description="Print a list of variables matching the pattern."/>
+    <targets name="help-variable-%-value" description="Print a list of variables with values matching the pattern."/>
+    <targets name="help-variable-%-wiki" description="Print wiki-formatted help on variables matching the pattern."/>
+    <targets name="image" description="Create only the image file(s) (*.img)"/>
+    <targets name="print-*" description="Print the value of the given variable to the screen."/>
+    <targets name="release" description="Run the RELEASE step, that copies the created image files to the release folder. (See RELEASENAME,RELEASEDIR,RELEASEFILES)"/>
+    <targets name="rofs2" description="Create the rofs2 image"/>
+    <targets name="rofs2-image" description="Create the rofs2 image file (rofs2.img)"/>
+    <targets name="rofs3" description="Create the rofs3 image"/>
+    <targets name="rofs3-image" description="Create the rofs3 image file (rofs3.img)"/>
+    <targets name="romsymbol" description="Create the rom symbol file"/>
+    <targets name="step-*" description="Generic target to execute any step inside the iMaker configuration. Any step (e.g. BUILD_*,CLEAN_*) can be executed with step-STEPNAME. Example: step-ROFS2PRE executes the CLEAN_ROFS2PRE and BUILD_ROFS2PRE commands."/>
+    <targets name="toolinfo" description="Print info about the tool"/>
+    <targets name="uda-image" description="Create the User Data area (uda) flash file."/>
+    <targets name="variant" description="Create the variant image (rofs2,rofs3)"/>
+    <targets name="variant-image" description="Create the variant image files (rofs3.img,rofs3.img)"/>
+    <targets name="all" description="Create all image sections and symbol files."/>
+    <targets name="clean" description="Clean all target files."/>
+    <targets name="core" description="Create the core image (ROM,ROFS1)"/>
+    <targets name="core-image" description="Create the core image files (rom.img, rofs1.img)"/>
+    <targets name="custrofs2" description="Create an image from a variant with rofs2. Be sure to define the CUSTVARIANT_DIR."/>
+    <targets name="custuda" description="Create an image from a variant userdata folder. Be sure to define the CUSTVARIANT_DIR."/>
+    <targets name="custvariant" description="Create an image from a customer variant folder. Be sure to define the CUSTVARIANT_DIR."/>
+    <targets name="e2flash" description="Create the elf2flash (flash) file."/>
+    <targets name="f2image" description="Revert the Symbian image file (.img) from the elf2flash (flash) file.(See CORE_FLASH,ROFS2_FLASH,ROFS3_FLASH)"/>
+    <targets name="flash" description="Create all image sections files. Not any symbol files."/>
+    <targets name="flash-all" description="Create all image sections and symbol files."/>
+    <targets name="help" description="Print help on help targets."/>
+    <targets name="help-%" description="Print help on help items matching the pattern."/>
+    <targets name="help-%-list" description="Print a list of help items matching the pattern."/>
+    <targets name="help-config" description="Print a list of available configurations in the current working environment."/>
+    <targets name="help-target" description="Print help on all targets (same as help-target-*)."/>
+    <targets name="help-target-%" description="Print help on targets matching the pattern."/>
+    <targets name="help-target-%-list" description="Print a list of targets matching the pattern."/>
+    <targets name="help-target-%-wiki" description="Print wiki-formatted help on targets matching the pattern."/>
+    <targets name="help-variable" description="Print help on all variables (same as help-variable-*)."/>
+    <targets name="help-variable-%" description="Print help on variables matching the pattern."/>
+    <targets name="help-variable-%-all" description="Print full help on variables matching the pattern."/>
+    <targets name="help-variable-%-list" description="Print a list of variables matching the pattern."/>
+    <targets name="help-variable-%-value" description="Print a list of variables with values matching the pattern."/>
+    <targets name="help-variable-%-wiki" description="Print wiki-formatted help on variables matching the pattern."/>
+    <targets name="image" description="Create only the image file(s) (*.img)"/>
+    <targets name="print-*" description="Print the value of the given variable to the screen."/>
+    <targets name="release" description="Run the RELEASE step, that copies the created image files to the release folder. (See RELEASENAME,RELEASEDIR,RELEASEFILES)"/>
+    <targets name="rofs2" description="Create the rofs2 image"/>
+    <targets name="rofs2-image" description="Create the rofs2 image file (rofs2.img)"/>
+    <targets name="rofs3" description="Create the rofs3 image"/>
+    <targets name="rofs3-image" description="Create the rofs3 image file (rofs3.img)"/>
+    <targets name="romsymbol" description="Create the rom symbol file"/>
+    <targets name="step-*" description="Generic target to execute any step inside the iMaker configuration. Any step (e.g. BUILD_*,CLEAN_*) can be executed with step-STEPNAME. Example: step-ROFS2PRE executes the CLEAN_ROFS2PRE and BUILD_ROFS2PRE commands."/>
+    <targets name="toolinfo" description="Print info about the tool"/>
+    <targets name="uda-image" description="Create the User Data area (uda) flash file."/>
+    <targets name="variant" description="Create the variant image (rofs2,rofs3)"/>
+    <targets name="variant-image" description="Create the variant image files (rofs3.img,rofs3.img)"/>
+    <targets name="all" description="Create all image sections and symbol files."/>
+    <targets name="clean" description="Clean all target files."/>
+    <targets name="core" description="Create the core image (ROM,ROFS1)"/>
+    <targets name="core-image" description="Create the core image files (rom.img, rofs1.img)"/>
+    <targets name="custrofs2" description="Create an image from a variant with rofs2. Be sure to define the CUSTVARIANT_DIR."/>
+    <targets name="custuda" description="Create an image from a variant userdata folder. Be sure to define the CUSTVARIANT_DIR."/>
+    <targets name="custvariant" description="Create an image from a customer variant folder. Be sure to define the CUSTVARIANT_DIR."/>
+    <targets name="e2flash" description="Create the elf2flash (flash) file."/>
+    <targets name="f2image" description="Revert the Symbian image file (.img) from the elf2flash (flash) file.(See CORE_FLASH,ROFS2_FLASH,ROFS3_FLASH)"/>
+    <targets name="flash" description="Create all image sections files. Not any symbol files."/>
+    <targets name="flash-all" description="Create all image sections and symbol files."/>
+    <targets name="help" description="Print help on help targets."/>
+    <targets name="help-%" description="Print help on help items matching the pattern."/>
+    <targets name="help-%-list" description="Print a list of help items matching the pattern."/>
+    <targets name="help-config" description="Print a list of available configurations in the current working environment."/>
+    <targets name="help-target" description="Print help on all targets (same as help-target-*)."/>
+    <targets name="help-target-%" description="Print help on targets matching the pattern."/>
+    <targets name="help-target-%-list" description="Print a list of targets matching the pattern."/>
+    <targets name="help-target-%-wiki" description="Print wiki-formatted help on targets matching the pattern."/>
+    <targets name="help-variable" description="Print help on all variables (same as help-variable-*)."/>
+    <targets name="help-variable-%" description="Print help on variables matching the pattern."/>
+    <targets name="help-variable-%-all" description="Print full help on variables matching the pattern."/>
+    <targets name="help-variable-%-list" description="Print a list of variables matching the pattern."/>
+    <targets name="help-variable-%-value" description="Print a list of variables with values matching the pattern."/>
+    <targets name="help-variable-%-wiki" description="Print wiki-formatted help on variables matching the pattern."/>
+    <targets name="image" description="Create only the image file(s) (*.img)"/>
+    <targets name="print-*" description="Print the value of the given variable to the screen."/>
+    <targets name="release" description="Run the RELEASE step, that copies the created image files to the release folder. (See RELEASENAME,RELEASEDIR,RELEASEFILES)"/>
+    <targets name="rofs2" description="Create the rofs2 image"/>
+    <targets name="rofs2-image" description="Create the rofs2 image file (rofs2.img)"/>
+    <targets name="rofs3" description="Create the rofs3 image"/>
+    <targets name="rofs3-image" description="Create the rofs3 image file (rofs3.img)"/>
+    <targets name="romsymbol" description="Create the rom symbol file"/>
+    <targets name="step-*" description="Generic target to execute any step inside the iMaker configuration. Any step (e.g. BUILD_*,CLEAN_*) can be executed with step-STEPNAME. Example: step-ROFS2PRE executes the CLEAN_ROFS2PRE and BUILD_ROFS2PRE commands."/>
+    <targets name="toolinfo" description="Print info about the tool"/>
+    <targets name="uda-image" description="Create the User Data area (uda) flash file."/>
+    <targets name="variant" description="Create the variant image (rofs2,rofs3)"/>
+    <targets name="variant-image" description="Create the variant image files (rofs3.img,rofs3.img)"/>
+    <targets name="all" description="Create all image sections and symbol files."/>
+    <targets name="clean" description="Clean all target files."/>
+    <targets name="core" description="Create the core image (ROM,ROFS1)"/>
+    <targets name="core-image" description="Create the core image files (rom.img, rofs1.img)"/>
+    <targets name="custrofs2" description="Create an image from a variant with rofs2. Be sure to define the CUSTVARIANT_DIR."/>
+    <targets name="custuda" description="Create an image from a variant userdata folder. Be sure to define the CUSTVARIANT_DIR."/>
+    <targets name="custvariant" description="Create an image from a customer variant folder. Be sure to define the CUSTVARIANT_DIR."/>
+    <targets name="e2flash" description="Create the elf2flash (flash) file."/>
+    <targets name="f2image" description="Revert the Symbian image file (.img) from the elf2flash (flash) file.(See CORE_FLASH,ROFS2_FLASH,ROFS3_FLASH)"/>
+    <targets name="flash" description="Create all image sections files. Not any symbol files."/>
+    <targets name="flash-all" description="Create all image sections and symbol files."/>
+    <targets name="help" description="Print help on help targets."/>
+    <targets name="help-%" description="Print help on help items matching the pattern."/>
+    <targets name="help-%-list" description="Print a list of help items matching the pattern."/>
+    <targets name="help-config" description="Print a list of available configurations in the current working environment."/>
+    <targets name="help-target" description="Print help on all targets (same as help-target-*)."/>
+    <targets name="help-target-%" description="Print help on targets matching the pattern."/>
+    <targets name="help-target-%-list" description="Print a list of targets matching the pattern."/>
+    <targets name="help-target-%-wiki" description="Print wiki-formatted help on targets matching the pattern."/>
+    <targets name="help-variable" description="Print help on all variables (same as help-variable-*)."/>
+    <targets name="help-variable-%" description="Print help on variables matching the pattern."/>
+    <targets name="help-variable-%-all" description="Print full help on variables matching the pattern."/>
+    <targets name="help-variable-%-list" description="Print a list of variables matching the pattern."/>
+    <targets name="help-variable-%-value" description="Print a list of variables with values matching the pattern."/>
+    <targets name="help-variable-%-wiki" description="Print wiki-formatted help on variables matching the pattern."/>
+    <targets name="image" description="Create only the image file(s) (*.img)"/>
+    <targets name="print-*" description="Print the value of the given variable to the screen."/>
+    <targets name="release" description="Run the RELEASE step, that copies the created image files to the release folder. (See RELEASENAME,RELEASEDIR,RELEASEFILES)"/>
+    <targets name="rofs2" description="Create the rofs2 image"/>
+    <targets name="rofs2-image" description="Create the rofs2 image file (rofs2.img)"/>
+    <targets name="rofs3" description="Create the rofs3 image"/>
+    <targets name="rofs3-image" description="Create the rofs3 image file (rofs3.img)"/>
+    <targets name="romsymbol" description="Create the rom symbol file"/>
+    <targets name="step-*" description="Generic target to execute any step inside the iMaker configuration. Any step (e.g. BUILD_*,CLEAN_*) can be executed with step-STEPNAME. Example: step-ROFS2PRE executes the CLEAN_ROFS2PRE and BUILD_ROFS2PRE commands."/>
+    <targets name="toolinfo" description="Print info about the tool"/>
+    <targets name="uda-image" description="Create the User Data area (uda) flash file."/>
+    <targets name="variant" description="Create the variant image (rofs2,rofs3)"/>
+    <targets name="variant-image" description="Create the variant image files (rofs3.img,rofs3.img)"/>
+    <targets name="all" description="Create all image sections and symbol files."/>
+    <targets name="clean" description="Clean all target files."/>
+    <targets name="core" description="Create the core image (ROM,ROFS1)"/>
+    <targets name="core-image" description="Create the core image files (rom.img, rofs1.img)"/>
+    <targets name="custrofs2" description="Create an image from a variant with rofs2. Be sure to define the CUSTVARIANT_DIR."/>
+    <targets name="custuda" description="Create an image from a variant userdata folder. Be sure to define the CUSTVARIANT_DIR."/>
+    <targets name="custvariant" description="Create an image from a customer variant folder. Be sure to define the CUSTVARIANT_DIR."/>
+    <targets name="e2flash" description="Create the elf2flash (flash) file."/>
+    <targets name="f2image" description="Revert the Symbian image file (.img) from the elf2flash (flash) file.(See CORE_FLASH,ROFS2_FLASH,ROFS3_FLASH)"/>
+    <targets name="flash" description="Create all image sections files. Not any symbol files."/>
+    <targets name="flash-all" description="Create all image sections and symbol files."/>
+    <targets name="help" description="Print help on help targets."/>
+    <targets name="help-%" description="Print help on help items matching the pattern."/>
+    <targets name="help-%-list" description="Print a list of help items matching the pattern."/>
+    <targets name="help-config" description="Print a list of available configurations in the current working environment."/>
+    <targets name="help-target" description="Print help on all targets (same as help-target-*)."/>
+    <targets name="help-target-%" description="Print help on targets matching the pattern."/>
+    <targets name="help-target-%-list" description="Print a list of targets matching the pattern."/>
+    <targets name="help-target-%-wiki" description="Print wiki-formatted help on targets matching the pattern."/>
+    <targets name="help-variable" description="Print help on all variables (same as help-variable-*)."/>
+    <targets name="help-variable-%" description="Print help on variables matching the pattern."/>
+    <targets name="help-variable-%-all" description="Print full help on variables matching the pattern."/>
+    <targets name="help-variable-%-list" description="Print a list of variables matching the pattern."/>
+    <targets name="help-variable-%-value" description="Print a list of variables with values matching the pattern."/>
+    <targets name="help-variable-%-wiki" description="Print wiki-formatted help on variables matching the pattern."/>
+    <targets name="image" description="Create only the image file(s) (*.img)"/>
+    <targets name="print-*" description="Print the value of the given variable to the screen."/>
+    <targets name="release" description="Run the RELEASE step, that copies the created image files to the release folder. (See RELEASENAME,RELEASEDIR,RELEASEFILES)"/>
+    <targets name="rofs2" description="Create the rofs2 image"/>
+    <targets name="rofs2-image" description="Create the rofs2 image file (rofs2.img)"/>
+    <targets name="rofs3" description="Create the rofs3 image"/>
+    <targets name="rofs3-image" description="Create the rofs3 image file (rofs3.img)"/>
+    <targets name="romsymbol" description="Create the rom symbol file"/>
+    <targets name="step-*" description="Generic target to execute any step inside the iMaker configuration. Any step (e.g. BUILD_*,CLEAN_*) can be executed with step-STEPNAME. Example: step-ROFS2PRE executes the CLEAN_ROFS2PRE and BUILD_ROFS2PRE commands."/>
+    <targets name="toolinfo" description="Print info about the tool"/>
+    <targets name="uda-image" description="Create the User Data area (uda) flash file."/>
+    <targets name="variant" description="Create the variant image (rofs2,rofs3)"/>
+    <targets name="variant-image" description="Create the variant image files (rofs3.img,rofs3.img)"/>
+    <targets name="all" description="Create all image sections and symbol files."/>
+    <targets name="clean" description="Clean all target files."/>
+    <targets name="core" description="Create the core image (ROM,ROFS1)"/>
+    <targets name="core-image" description="Create the core image files (rom.img, rofs1.img)"/>
+    <targets name="custrofs2" description="Create an image from a variant with rofs2. Be sure to define the CUSTVARIANT_DIR."/>
+    <targets name="custuda" description="Create an image from a variant userdata folder. Be sure to define the CUSTVARIANT_DIR."/>
+    <targets name="custvariant" description="Create an image from a customer variant folder. Be sure to define the CUSTVARIANT_DIR."/>
+    <targets name="e2flash" description="Create the elf2flash (flash) file."/>
+    <targets name="f2image" description="Revert the Symbian image file (.img) from the elf2flash (flash) file.(See CORE_FLASH,ROFS2_FLASH,ROFS3_FLASH)"/>
+    <targets name="flash" description="Create all image sections files. Not any symbol files."/>
+    <targets name="flash-all" description="Create all image sections and symbol files."/>
+    <targets name="help" description="Print help on help targets."/>
+    <targets name="help-%" description="Print help on help items matching the pattern."/>
+    <targets name="help-%-list" description="Print a list of help items matching the pattern."/>
+    <targets name="help-config" description="Print a list of available configurations in the current working environment."/>
+    <targets name="help-target" description="Print help on all targets (same as help-target-*)."/>
+    <targets name="help-target-%" description="Print help on targets matching the pattern."/>
+    <targets name="help-target-%-list" description="Print a list of targets matching the pattern."/>
+    <targets name="help-target-%-wiki" description="Print wiki-formatted help on targets matching the pattern."/>
+    <targets name="help-variable" description="Print help on all variables (same as help-variable-*)."/>
+    <targets name="help-variable-%" description="Print help on variables matching the pattern."/>
+    <targets name="help-variable-%-all" description="Print full help on variables matching the pattern."/>
+    <targets name="help-variable-%-list" description="Print a list of variables matching the pattern."/>
+    <targets name="help-variable-%-value" description="Print a list of variables with values matching the pattern."/>
+    <targets name="help-variable-%-wiki" description="Print wiki-formatted help on variables matching the pattern."/>
+    <targets name="image" description="Create only the image file(s) (*.img)"/>
+    <targets name="print-*" description="Print the value of the given variable to the screen."/>
+    <targets name="release" description="Run the RELEASE step, that copies the created image files to the release folder. (See RELEASENAME,RELEASEDIR,RELEASEFILES)"/>
+    <targets name="rofs2" description="Create the rofs2 image"/>
+    <targets name="rofs2-image" description="Create the rofs2 image file (rofs2.img)"/>
+    <targets name="rofs3" description="Create the rofs3 image"/>
+    <targets name="rofs3-image" description="Create the rofs3 image file (rofs3.img)"/>
+    <targets name="romsymbol" description="Create the rom symbol file"/>
+    <targets name="step-*" description="Generic target to execute any step inside the iMaker configuration. Any step (e.g. BUILD_*,CLEAN_*) can be executed with step-STEPNAME. Example: step-ROFS2PRE executes the CLEAN_ROFS2PRE and BUILD_ROFS2PRE commands."/>
+    <targets name="toolinfo" description="Print info about the tool"/>
+    <targets name="uda-image" description="Create the User Data area (uda) flash file."/>
+    <targets name="variant" description="Create the variant image (rofs2,rofs3)"/>
+    <targets name="variant-image" description="Create the variant image files (rofs3.img,rofs3.img)"/>
+  </result>
+</IMaker>

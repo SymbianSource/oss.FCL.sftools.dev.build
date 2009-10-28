@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : nwiki.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="publish.nwiki" xmlns:hlm="http://www.nokia.com/helium">
+    <description>
+    Publishing to the nwiki
+    </description>
+
+    <!-- Macro to create a nwiki page
+         Notes:
+             - whatever page name is passed will be translated to upper case
+    -->
+    <macrodef name="nwikiCreatePageMacro" uri="http://www.nokia.com/helium">
+        <attribute name="username" />
+        <attribute name="password" />
+        <attribute name="domain" />
+        <attribute name="location" />
+        <attribute name="nwiki-formatted-data" />
+        <attribute name="page-name" />
+        <sequential>
+            <hlm:python>
+import urllib
+import urllib2
+
+passman=urllib2.HTTPPasswordMgrWithDefaultRealm()
+
+passman.add_password(None, '@{domain}', '@{username}', '@{password}')
+
+auth_handler = urllib2.HTTPBasicAuthHandler(passman)
+
+opener = urllib2.build_opener(auth_handler)
+
+urllib2.install_opener(opener)
+
+values = {'text':r"""@{nwiki-formatted-data}""",
+          'formtemplate':'',
+          'topicparent':'',
+          'cmd':'',
+          'sig':'--+Main.@{username}',
+          'unlock':'on',
+          'action':'Save'}
+
+post_data = urllib.urlencode(values)
+
+uppercase_page_name = "@{page-name}".upper()
+
+req = urllib2.Request(url='http://@{domain}/save/@{location}/'+uppercase_page_name,
+                      data=post_data)
+                      
+                      
+print "Wiki Page Created at: http://@{domain}/@{location}/"+uppercase_page_name
+                      
+f = urllib2.urlopen(req)
+       </hlm:python>
+        </sequential>
+    </macrodef>
+
+    <!-- This target removes dots from the wiki page name because nwiki cannot handle dots in the name -->
+    <target name="remove-build-version-dots">
+        <propertyregex property="wiki.build.version" input="${build.version}" regexp="([.]*)\.([.]*)" replace="\1\2" casesensitive="false" global="true" />
+        <echo message="build.version = ${build.version}" />
+        <echo message="wiki.build.version = ${wiki.build.version}" />
+    </target>
+
+    <!-- Reads the BOM.txt and uploads it to the nwiki 
+         Notes:
+              - it can't handle dots in build.name
+              - it wraps the BOM.txt in "pre" tags for
+                the wiki to interpret the text verbatim
+              - nwiki.domain is typically nwiki.nokia.com
+              - location could be, MBPVancouver for example
+    -->
+    <target name="create-wiki-bom" depends="remove-build-version-dots,get-nwiki-username,get-nwiki-password" if="publish">
+        <loadfile property="temp-bom-data" srcfile="${build.log.dir}/${build.name}_${build.version}_BOM.txt" failonerror="false">
+        </loadfile>
+        <if>
+            <isset property="temp-bom-data" />
+            <then>
+                <hlm:nwikiCreatePageMacro username="${nwiki.username}" password="${nwiki.password}" domain="${nwiki.domain}" location="${nwiki.location}" nwiki-formatted-data="&lt;pre&gt;${temp-bom-data}&lt;/pre&gt;" page-name="${build.name}_${wiki.build.version}_BOM" />
+            </then>
+        </if>
+    </target>
+
+    <!-- Reads the BOM_delta.txt and uploads it to the nwiki 
+         Known quirks:
+              - it can't handle dots in build.name
+              - it wraps the BOM_delta.txt in "pre" tags for
+                the wiki to interpret the text verbatim
+              - nwiki.domain is typically nwiki.nokia.com
+              - location could be, MBPVancouver for example
+    -->
+    <target name="create-wiki-bom-delta" depends="remove-build-version-dots,get-nwiki-username,get-nwiki-password" if="publish">
+        <loadfile property="temp-bom-delta-data" srcfile="${build.log.dir}/${build.name}_${build.version}_BOM_delta.txt" failonerror="false">
+        </loadfile>
+
+        <if>
+            <isset property="temp-bom-delta-data" />
+            <then>
+                <hlm:nwikiCreatePageMacro username="${nwiki.username}" password="${nwiki.password}" domain="${nwiki.domain}" location="${nwiki.location}" nwiki-formatted-data="&lt;pre&gt;${temp-bom-delta-data}&lt;/pre&gt;" page-name="${build.name}_${wiki.build.version}_BOM_delta" />
+            </then>
+        </if>
+    </target>
+
+    <!-- Retrieve the NWiki password from the .netrc file and store it into nwiki.password property. -->
+    <target name="get-nwiki-password">
+        <hlm:netrcPasswordMacro output-prop="nwiki.password" result-prop="nwiki.password.available" type="nwiki" />
+    </target>
+
+    <!-- Retrieve the NWiki username from the .netrc file and store it into nwiki.username property. -->
+    <target name="get-nwiki-username">
+        <hlm:netrcUsernameMacro output-prop="nwiki.username" result-prop="nwiki.username.available" type="nwiki" />
+    </target>
+
+
+</project>

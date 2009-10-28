@@ -1,0 +1,27 @@
+/*
+* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies). 
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Symbian Foundation License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.symbianfoundation.org/legal/sfl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description:
+* cmaker exports to epoc32/tools.
+*/
+
+
+PRJ_EXPORTS                         
+
+..\src\cmaker.cmd         \epoc32\tools\ //                         
+..\src\env.mk             \epoc32\tools\cmaker\ //                     
+..\src\functions.mk       \epoc32\tools\cmaker\ //                    
+..\src\settings.mk        \epoc32\tools\cmaker\ //                    
+..\src\tools.mk           \epoc32\tools\cmaker\ //                    
+..\src\utils.mk           \epoc32\tools\cmaker\ //
+     

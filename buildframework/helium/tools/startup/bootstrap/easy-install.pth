@@ -1,0 +1,22 @@
+import sys; sys.__plen = len(sys.path)
+./4Suite_XML-1.0.egg
+./Amara-1.0.egg
+./Distutils-1.0.2
+./docutils-1.0.egg
+./epydoc-1.0.egg
+./Jinja-1.0.egg
+./logilab-common-0.32.0
+./lxml-1.0.egg
+./mocker-0.10.1
+./nose-1.0.egg
+./path-2.2
+./psyco-1.6
+./Pygments-1.0.egg
+./pylint-0.14.0
+./PyRTF-0.45
+./PyXML-1.0.egg
+./setuptools-1.0.egg
+./simplejson-1.0.egg
+./Sphinx-1.0.egg
+./ZSI-1.0.egg
+import sys; new=sys.path[sys.__plen:]; del sys.path[sys.__plen:]; p=getattr(sys,'__egginsert',0); sys.path[p:p]=new; sys.__egginsert = p+len(new)

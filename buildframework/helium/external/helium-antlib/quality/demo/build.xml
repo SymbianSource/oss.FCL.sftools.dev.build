@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : build.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="helium-antlib-quality-demo" xmlns:hlm="http://www.nokia.com/helium">
+    <description>Helium Antlib quality demo.</description>
+
+    <taskdef resource="com/nokia/helium/quality/ant/antlib.xml" uri="http://www.nokia.com/helium" />
+
+    <property name="codescanner.output.dir" location="./cs" />
+    <property name="codescanner.output.type" value="html" />
+    <property name="codescanner.config" location="./codescanner_config.xml" />
+    <path id="src.path">
+        <pathelement path="../tests/data/src" />
+        <pathelement path="../tests/data/src2" />
+    </path>
+
+    <target name="demo-codescanner">
+        <hlm:codescanner dest="${codescanner.output.dir}" format="${codescanner.output.type}" configuration="${codescanner.config}">
+            <path refid="src.path" />
+        </hlm:codescanner>
+    </target>
+
+</project>

@@ -1,0 +1,13 @@
+
+criteria rules-based
+filter "-.svn\;-*.class"
+
+load %1 %2
+select diff.files
+expand all
+
+#file-report layout:side-by-side output-to:%3
+folder-report layout:side-by-side options:display-mismatches output-to:"bc_diff.txt"
+#file-report layout:side-by-side options:display-mismatches output-to:"bc_diff.txt"
+
+#copy lt->rt
