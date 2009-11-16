@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<build xmlns="http://symbian.com/xml/build"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://symbian.com/xml/build build/2_0.xsd">
+
+    <!-- a base interface -->
+
+	<interface name="Base.XYZ" flm="base.flm">
+		<param name='A'/>
+		<param name='B' default='baseB'/>
+		<param name='C' default='baseC'/>
+    </interface>
+    
+    <!-- extends the base interface -->
+
+	<interface name="Extended.XYZ" extends="Base.XYZ" flm="ext.flm">
+		<param name='D'/>
+		<param name='C' default='extC'/>
+    </interface>
+    
+    <!-- extends the base interface and uses its FLM -->
+
+	<interface name="Extended2.XYZ" extends="Base.XYZ">
+		<param name='D'/>
+		<param name='C' default='extC'/>
+    </interface>
+</build>

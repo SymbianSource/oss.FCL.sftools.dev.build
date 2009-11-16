@@ -1,0 +1,24 @@
+
+Testing a Cluster to See if it is Correctly Configured
+--------------------------------------------------------
+
+The tests in this directory can be seen only as examples of how to test a cluster.  They would have to be customised before use on any particular cluster.
+
+The tests here are aimed at:
+
+1) Testing that the configuration of each nodes and that services such as NIS,DNS and NTP are configured.
+  This requires that logins for the current user work on all nodes.
+2) Checking that raptor-relevant software is installed and that the compiler can obtain licenses.
+3) Testing that PVM is installed and will run without crashing (solves a problem that has occurred in the past).
+4) Tests that PVM can run commands on all nodes.
+
+
+Typically one would run headtest.sh which performs the tests relating to items 1-3. It causes "nodetest.sh" to be run on all nodes.
+
+e.g.
+	./headtest.sh node1 node2 node3
+
+pvmtest.sh can be used to check that pvm is working by running the compiler on each node via pvm.
+	./pvmtest node1 node2 node3
+
+None of these tests is automatic - one must simply observe the output.

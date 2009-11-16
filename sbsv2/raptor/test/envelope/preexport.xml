@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!-- This file is used to export meta data in a pre-run through of raptor. 
+	i.e. raptor -s <thisfile> EXPORT
+     when system included mmh files are removed from MMPs this can be removed. -->
+<SystemDefinition name="MCL" schema="1.4.0">
+  <systemModel>
+    <layer name="common">
+      <module name="preexports">
+        <component name="envelope">
+	<unit unitID='LMNAND2_LOGIC' name='base_integrator_logic_lmnand2' bldFile='cedar/generic/base/integrator/logic/lmnand2' />
+	<unit unitID='LMNAND2_LOGIC' name='base_integrator_logic_lmnand2' bldFile='cedar/generic/base/integrator/logic/lmnand2' />
+	<unit unitID='INTEGRATOR_LMNAND_EKA2' name='base_integrator_logic_lmnand' bldFile='cedar/generic/base/integrator/logic/lmnand' />
+	<unit unitID='INTEGRATOR_LMXX600_EKA2' name='base_integrator_logic_lmxx600' bldFile='cedar/generic/base/integrator/logic/lmxx600' />
+	<unit unitID='OMAP_H2' name='base_omaph2' bldFile='cedar/generic/base/omap/h2' />
+	<unit unitID='BASE_H2_UNISTORE2' name='base_h2_unistore2' bldFile='cedar/generic/base/omap/h2_restricted/unistore2' />
+	<unit unitID='BASE_H2_SDIO' name='base_h2_sdio' bldFile='cedar/generic/base/omap/h2_restricted/sdio' />
+        <unit unitID='esockdebug' name='esockdebug' bldFile='common/generic/comms-infras/esock/debug/MessageInterceptRegister/group' />
+        <unit unitID='commsdebugutility' name='commsdebugutility' bldFile='common/generic/comms-infras/commsdebugutility/group' />
+        <unit unitID='usblogger' name='usblogger' bldFile='common/generic/ser-comms/usb/logger/group' />
+        <unit unitID='packetlogger' name='packetlogger' bldFile='common/generic/networking/packetlogger/group' />
+        <unit unitID='commsfw' name='cflog' bldFile='common/generic/comms-infras/commsfw/group' />
+
+        </component>
+      </module>
+    </layer>
+  </systemModel>
+  
+  <build>
+  </build>
+
+</SystemDefinition>
+

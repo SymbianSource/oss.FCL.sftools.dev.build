@@ -87,9 +87,6 @@
 		<set name="CC.OPT.SOFTVFP_MAYBE_VFPV2" value="-m"/>
 		<set name="CC.VAL.SOFTVFP_MAYBE_VFPV2" value="soft-float"/>
 		<set name="CC.ARMV5" value="-march=armv5t"/>
-		<set name="LD.ARMV5" value=""/>
-		<set name="LD.ARMV6" value=""/>
-		<set name="LD.ARMV7" value=""/>
 		<set name="RELOCATABLE_IMAGE_OPTION" value=""/>
 		<set name="RVCTLIB" value=""/>
 		<set name="CC.NO_UNALIGNED_ACCESS" value=""/>
@@ -114,9 +111,6 @@
 		<set name="CC.OPT.SOFTVFP_MAYBE_VFPV2" value="-m"/>
 		<set name="CC.VAL.SOFTVFP_MAYBE_VFPV2" value="soft-float"/>
 		<set name="CC.ARMV5" value="-march=armv5t"/>
-		<set name="LD.ARMV5" value=""/>
-		<set name="LD.ARMV6" value=""/>
-		<set name="LD.ARMV7" value=""/>
 		<set name="RELOCATABLE_IMAGE_OPTION" value=""/>
 		<set name="RVCTLIB" value=""/>
 		<set name="CC.NO_UNALIGNED_ACCESS" value=""/>
@@ -179,9 +173,9 @@
 		<set name="CC.NO_UNALIGNED_ACCESS" value="--no_unaligned_access"/>
 		<set name="CC.SOFTVFP_MAYBE_VFPV2" value="softvfp"/>
 		<set name="CC.SOFTVFP_MAYBE_VFPV3" value="softvfp"/>
-		<set name="CC.ARMV5" value="--cpu=5TE"/>
-		<set name="CC.ARMV6" value="--cpu=6"/>
-		<set name="CC.ARMV7" value="--cpu=7-A"/>
+		<set name="CC.ARMV5" value="--cpu 5TE"/>
+		<set name="CC.ARMV6" value="--cpu 6"/>
+		<set name="CC.ARMV7" value="--cpu 7-A"/>
 	</var>
 
 	<var name="rvct4_0" extends="rvct">
@@ -208,12 +202,9 @@
 		<set name="CC.NO_UNALIGNED_ACCESS" value="--no_unaligned_access"/>
 		<set name="CC.SOFTVFP_MAYBE_VFPV2" value="softvfp+vfpv2"/>
 		<set name="CC.SOFTVFP_MAYBE_VFPV3" value="softvfp+vfpv3"/>
-		<set name="CC.ARMV5" value="--cpu=5TE"/>
-		<set name="CC.ARMV6" value="--cpu=6"/>
-		<set name="CC.ARMV7" value="--cpu=7-A"/>
-		<set name="LD.ARMV5" value="$(CC.ARMV5)"/>
-		<set name="LD.ARMV6" value="$(CC.ARMV6)"/>
-		<set name="LD.ARMV7" value="$(CC.ARMV7)"/>
+		<set name="CC.ARMV5" value="--cpu 5TE"/>
+		<set name="CC.ARMV6" value="--cpu 6"/>
+		<set name="CC.ARMV7" value="--cpu 7-A"/>
 	</var>
 
 	<var name="urel">

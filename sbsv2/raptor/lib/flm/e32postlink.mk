@@ -116,7 +116,7 @@ $(E32TARGET): $(LINK_TARGET) $(POSTLINKDEFFILE) $(ELF2E32) $(if $(HAVE_ORDERONLY
 	  $(if $(AUTOEXPORTS),--sysdef=$(call dblquote,$(AUTOEXPORTS)),) \
 	  $(if $(CANIGNORENONCALLABLE), \
 	    $(if $(IMPORTLIBRARYREQUIRED),,--ignorenoncallable),) \
-	  $(if $(CANHAVEEXPORTS), --defoutput="$(GENERATED_DEFFILE)" --dso=$(GENERATED_DSO)) \
+	  $(if $(CANHAVEEXPORTS), --defoutput=$(call dblquote,$(GENERATED_DEFFILE)) --dso=$(GENERATED_DSO)) \
 	  $(if $(filter $(VARIANTTYPE),$(DEBUGGABLE)),--debuggable,) \
 	  $(if $(POSTLINKER_SUPPORTS_WDP), \
 	    --codepaging=$(PAGEDCODE_OPTION) --datapaging=$(PAGEDDATA_OPTION), \

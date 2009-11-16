@@ -1,0 +1,40 @@
+/*
+* Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description: 
+* Component description file
+*
+*/
+
+
+PRJ_MMPFILES
+
+variant1/CreateStaticDLL_variant1.mmp
+invariant/CreateStaticDLL_invariant.mmp
+variant2/CreateStaticDLL_variant2.mmp
+variant3/CreateEXE_variant3.mmp
+invariant/CreateStaticLib.mmp
+
+PRJ_EXTENSIONS
+
+START EXTENSION utility.prebuilt
+OPTION PRE_PLATFORM armv5
+OPTION PRE_TYPE urel
+OPTION BINARIES release/dummy.lib release/fake.lib->relfake.lib
+END
+
+START EXTENSION utility.prebuilt
+OPTION PRE_PLATFORM armv5
+OPTION PRE_TYPE udeb
+OPTION BINARIES debug/dummy.lib debug/fake.lib->debfake.lib
+END

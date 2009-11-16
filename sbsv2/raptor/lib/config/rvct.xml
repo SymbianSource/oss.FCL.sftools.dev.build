@@ -3,6 +3,7 @@
 	<!-- RVCT build variant for RVCT compilers -->
 	<var name="rvct">
 		<set name="TOOLCHAIN" value="RVCT"/>
+		<set name="PLATMACROS.TOOLCHAIN" value="ARMCC"/>
 		<set name="CC" value="$(ARMCC)"/>
 		<set name="LD" value="$(ARMLD)"/>
 		<set name="ASM" value="$(ARMASM)"/>
@@ -32,6 +33,7 @@
 		<set name="FPMODE_OPTION" value="--fpmode ieee_no_fenv"/>
 		<set name="LD_ERRORS_CONTROL_OPTION" value=""/>
 		<set name="LD_WARNINGS_CONTROL_OPTION" value="--diag_suppress 6331"/>
+		<set name='LD_WARNINGS_SUPPRESSION_ARMLIBS' value='--diag_suppress 6780' />
 		<set name="LISTING_OPTION" value="-S"/>
 		<set name="EXCEPTIONS" value="--exceptions --exceptions_unwind"/>
 		<set name="NO_EXCEPTIONS" value="--no_exceptions --no_exceptions_unwind"/>
@@ -48,7 +50,6 @@
 		<set name="LD.ARMV5" value=""/>
 		<set name="LD.ARMV6" value=""/>
 		<set name="LD.ARMV7" value=""/>
-		<set name="ARMMACROS.VAR" value=""/>
 		<set name="CFLAGS" value=""/>
 		<set name="CIADEFS" value="__CIA__"/>
 		<append name="CDEFS" value='__SUPPORT_CPP_EXCEPTIONS__ _UNICODE __SYMBIAN32__ __ARMCC__ __EPOC32__ __MARM__ __EABI__ __PRODUCT_INCLUDE__="$(PRODUCT_INCLUDE)" $(MMPDEFS) $(ARMMACROS)'/>
@@ -98,10 +99,6 @@
 		<set name="USERINCLUDE" value=""/>
 		<set name="USER_LIBS_PATH_OPTION" value="--userlibpath"/>
 		<set name="VFE_OPTION" value="--no_vfe"/>
-		<set name="PLATMACROS.WINDOWS" value="ARMCC EPOC32 MARM EABI GENERIC_MARM MARM_ARMV5 $(PLATMACROS.CONFIG) $(PLATMACROS.VAR)"/>
-		<set name="PLATMACROS.LINUX" value="$(PLATMACROS.WINDOWS)"/>
-		<set name="PLATMACROS.CONFIG" value=""/>
-		<set name="PLATMACROS.VAR" value=""/>
 		<set name="NO_UNALIGNED_ACCESS" value="$(CC.NO_UNALIGNED_ACCESS)"/>
 	</var>
 </build>

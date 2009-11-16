@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+	<build xmlns="http://symbian.com/xml/build"
+			xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+			xsi:schemaLocation="http://symbian.com/xml/build build/2_0.xsd">
+
+		<!-- test feature variants -->
+		<var name="test_bv_1">
+			<set name='FEATUREVARIANTNAME' value='.one' />
+			<set name='FEATURELISTFILES'
+					value='$(SBS_HOME)/test/smoke_suite/test_resources/bv/listA.txt
+					$(SBS_HOME)/test/smoke_suite/test_resources/bv/listB.txt' />
+			<set name='VARIANT_HRH'
+					value='$(SBS_HOME)/test/smoke_suite/test_resources/bv/hrh/var1.hrh' />
+			<set name='SYSTEMINCLUDE'
+					value='$(SBS_HOME)/test/smoke_suite/test_resources/bv/var1
+					$(SBS_HOME)/test/smoke_suite/test_resources/bv/hrh' />   
+  		</var>
+		<var name="test_bv_2">
+			<set name='FEATUREVARIANTNAME' value='.two' />
+			<set name='FEATURELISTFILES'
+					value='$(SBS_HOME)/test/smoke_suite/test_resources/bv/listA.txt
+					$(SBS_HOME)/test/smoke_suite/test_resources/bv/listB.txt' />
+			<set name='VARIANT_HRH'
+					value='$(SBS_HOME)/test/smoke_suite/test_resources/bv/hrh/var2.hrh' />
+			<set name='SYSTEMINCLUDE'
+					value='$(SBS_HOME)/test/smoke_suite/test_resources/bv/var2
+					$(SBS_HOME)/test/smoke_suite/test_resources/bv/hrh' />
+		</var>
+		<var name="test_bv_3">
+			<set name='FEATUREVARIANTNAME' value='.three' />
+			<set name='FEATURELISTFILES'
+					value='$(SBS_HOME)/test/smoke_suite/test_resources/bv/listA.txt
+					$(SBS_HOME)/test/smoke_suite/test_resources/bv/listB.txt' />
+			<set name='VARIANT_HRH'
+					value='$(SBS_HOME)/test/smoke_suite/test_resources/bv/hrh/var3.hrh' />
+			<set name='SYSTEMINCLUDE'
+					value='$(SBS_HOME)/test/smoke_suite/test_resources/bv/var3
+					$(SBS_HOME)/test/smoke_suite/test_resources/bv/hrh' />
+		</var>
+	</build>

@@ -4,6 +4,7 @@
 	<!-- This is called gcce_base in case someone wants to use "gcce" as a configuration name -->
 	<var name="gcce_base">
 		<set name="TOOLCHAIN" value="GCCE"/>
+		<set name="PLATMACROS.TOOLCHAIN" value="GCCE"/>
 		<set name="CC" value="$(GCCECC)"/>
 		<set name="LD" value="$(GCCELD)"/>
 		<set name="ASM" value="$(GCCEASM)"/>
@@ -51,7 +52,6 @@
 		<set name="LD.ARMV5" value=""/>
 		<set name="LD.ARMV6" value=""/>
 		<set name="LD.ARMV7" value=""/>
-		<set name="ARMMACROS.VAR" value=""/>
 		<set name="CFLAGS" value=""/>
 		<set name="CIADEFS" value="__CIA__"/>
 		<append name="CDEFS" value='__SUPPORT_CPP_EXCEPTIONS__ _UNICODE __SYMBIAN32__ __GCCE__ __EPOC32__ __MARM__ __EABI__ __PRODUCT_INCLUDE__="$(PRODUCT_INCLUDE)" $(MMPDEFS) $(ARMMACROS)'/>
@@ -99,10 +99,6 @@
 		<set name="USERINCLUDE" value=""/>
 		<set name="USER_LIBS_PATH_OPTION" value="--userlibpath"/>
 		<set name="VFE_OPTION" value=""/>
-		<set name="PLATMACROS.WINDOWS" value="GCCE EPOC32 MARM EABI GENERIC_MARM MARM_ARMV5 $(PLATMACROS.CONFIG) $(PLATMACROS.VAR)"/>
-		<set name="PLATMACROS.LINUX" value="$(PLATMACROS.WINDOWS)"/>
-		<set name="PLATMACROS.CONFIG" value=""/>
-		<set name="PLATMACROS.VAR" value=""/>
 		<set name="NO_UNALIGNED_ACCESS" value="$(CC.NO_UNALIGNED_ACCESS)"/>
 	</var>
 </build>

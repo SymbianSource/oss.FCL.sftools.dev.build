@@ -1,0 +1,4 @@
+#include <variant/Symbian_OS.hrh>
+
+#define MACRO_TC_B
+

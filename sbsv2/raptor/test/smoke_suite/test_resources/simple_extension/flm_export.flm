@@ -1,0 +1,5 @@
+# SBSv2 test flm
+# This helps to test flm exports mechanism
+
+ALL::
+	echo " "  > $(EPOCROOT)/epoc32/build/flm_test_${FLM_EXPORT_1}_${FLM_EXPORT_2}

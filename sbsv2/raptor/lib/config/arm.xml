@@ -59,17 +59,16 @@
 		<set name="UNIX_SLASH_FOR_CC_ABS_PATHS" value="0"/>
 		<set name="UNRESOLVED_SYMBOL_REF_OPTION" value=""/>
 		<set name="DUMPBCINFO" value=""/>
-		<set name="MAKEDEFFILE" value="1"/>
-		<set name="PLATMACROS.WINDOWS" value="ARMCC EPOC32 MARM EABI GENERIC_MARM MARM_ARMV5 $(PLATMACROS.CONFIG) $(PLATMACROS.VAR)"/>
+		<set name="NO_UNALIGNED_ACCESS" value="$(CC.NO_UNALIGNED_ACCESS)"/>
+		<set name="PLATMACROS.WINDOWS" value="$(PLATMACROS.TOOLCHAIN) EPOC32 MARM EABI GENERIC_MARM MARM_ARMV5 $(PLATMACROS.CONFIG) $(PLATMACROS.VAR)"/>
 		<set name="PLATMACROS.LINUX" value="$(PLATMACROS.WINDOWS)"/>
 		<set name="PLATMACROS.CONFIG" value=""/>
 		<set name="PLATMACROS.VAR" value=""/>
-		<set name="NO_UNALIGNED_ACCESS" value="$(CC.NO_UNALIGNED_ACCESS)"/>
+		<set name="PLATMACROS.TOOLCHAIN" value=""/>
 	</var>
 	<var name="v5">
 		<set name="TRADITIONAL_PLATFORM" value="ARMV5"/>
 		<set name="VARIANTPLATFORM" value="armv5"/>
-		<set name="PLATMACROS.CONFIG" value=""/>
 		<set name="DEBUG_FORMAT" value="$(CC.DWARF2)"/>
 		<set name="TARGET_ARCH_OPTION" value="$(CC.ARMV5)"/>
 		<set name="LINKER_ARCH_OPTION" value="$(LD.ARMV5)"/>

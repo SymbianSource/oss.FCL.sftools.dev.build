@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<build xmlns="http://symbian.com/xml/build"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://symbian.com/xml/build build/2_0.xsd">
+
+  <!-- defaults for Raptor -->
+
+  <var name="defaults.init">
+    <!-- environment variables used in this configuration -->
+    <env name="EPOCROOT" default="/" type="path"/>
+
+    <!-- default parameter settings -->
+
+    <!-- Make command parameter file -->
+    <set name="makeEngine" value="make"/>
+
+    <!-- Location of the highest level makefile -->
+    <set name="topMakefile" value="$(EPOCROOT)/epoc32/build/Makefile"/>
+
+    <!-- Name of the build logging file -->
+    <set name="logFileName" value="$(EPOCROOT)/epoc32/build/Makefile.%TIME.log"/>
+
+    <!-- Default build configuration name -->
+    <set name="defaultConfig" value="default"/>
+
+    <!-- Names of standard build files -->
+    <set name="buildInformation" value="bld.inf"/>
+    <set name="systemDefinition" value="System_Definition.xml"/>
+
+    <!-- Standard directories -->
+    <set name="systemConfig" value="lib/config"/>
+    <set name="systemFLM" value="lib/flm"/>
+    <set name="systemPlugins" value="python/plugins"/>
+    <set name="systemDefinitionBase" value="."/>
+
+    <!-- Do not print any information messages? -->
+    <set name="quiet" value="false"/>
+
+    <!-- How many jobs to run in parallel? (for make -j) -->
+    <set name="jobs" value="4"/>
+
+    <!-- How many attempts to run a job before recording an error?
+    This is useful for builds that can have transient failures. -->
+    <set name="tries" value="1"/>
+
+    <!-- Carry on trying to build even if some commands fail? -->
+    <set name="keepGoing" value="false"/>
+
+    <!-- Can command line options override values in this file? -->
+    <set name="allowCommandLineOverrides" value="true"/>
+
+    <!-- Do we use a bld.inf or System_Definition.xml if both are in the CWD -->
+    <set name="preferBuildInfoToSystemDefinition" value="false"/>
+
+    <!-- Always use ignore OS detection? -->
+    <set name="ignoreOsDetection" value="false"/>
+
+    <!-- Always use a specific list of filters -->
+    <set name="filterList" value="FilterTerminal,FilterLogfile"/>
+
+  </var>
+
+</build>

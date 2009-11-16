@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<build xmlns="http://symbian.com/xml/build"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://symbian.com/xml/build http://symbian.com/xml/build/1_0.xsd">
+
+    <!-- test build specification -->
+
+    <spec name="world">
+        <interfaceRef ref="Symbian.EXE"/>
+	<var>
+	    <set name="SRC" value="$(ROOT)/src"/>
+	</var>
+    </spec>
+</build>

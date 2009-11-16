@@ -1,0 +1,20 @@
+
+#include <var.hrh>
+  
+targettype		None
+
+#ifdef CHILD1
+  #include "child1.mmp"
+  #warning "Child 1 selected"
+#endif
+#ifdef CHILD2
+  #include "child2.mmp"
+  #warning "Child 2 selected"
+#endif
+#ifdef CHILD3
+  #include "child3.mmp"
+  #warning "Child 3 selected"
+#endif
+
+
+

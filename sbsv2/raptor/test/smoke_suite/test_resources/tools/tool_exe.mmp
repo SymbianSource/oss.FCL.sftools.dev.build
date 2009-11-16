@@ -1,0 +1,29 @@
+/*
+* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description: 
+*
+*/
+
+TARGET			tool_exe.exe
+TARGETTYPE		EXE
+SOURCEPATH		../tools2
+SOURCE			tool_exe_a.cpp
+SOURCE			tool_exe_b.cpp
+USERINCLUDE		../tools2/inc1
+USERINCLUDE		../tools2/inc2
+SYSTEMINCLUDE		../tools2/sys1
+SYSTEMINCLUDE		../tools2/sys2
+STATICLIBRARY		tool_lib1.lib
+STATICLIBRARY		tool_lib2.lib
+#include "../inc/macrotests.mmh"

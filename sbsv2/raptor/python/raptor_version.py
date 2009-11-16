@@ -17,4 +17,4 @@
 
 def Version():
 	"""Raptor version string"""
-	return "2.10.1 [2009-10-27 sf prerelease]"
+	return "2.10.2 [2009-11-12 sf release]"

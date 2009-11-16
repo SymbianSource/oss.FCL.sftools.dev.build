@@ -60,7 +60,6 @@
 		<param name='EPOCALLOWDLLDATA' default=''/>
 		<param name='PLATMACROS.WINDOWS' default=''/>
 		<param name='PLATMACROS.LINUX' default=''/>
-		<param name='MAKEDEFFILE' default='1'/>
 		<param name='STDCPP' default=''/>
 		<param name='NOSTDCPP' default=''/>
 		<param name='NEWLIB' default=''/>
@@ -124,6 +123,7 @@
 		<param name='LD'/>
 		<param name='LD_ERRORS_CONTROL_OPTION'/>
 		<param name='LD_WARNINGS_CONTROL_OPTION'/>
+		<param name='LD_WARNINGS_SUPPRESSION_ARMLIBS' default='' />
 		<param name='LIBPATH'/>
 		<param name='LICENSERETRY_OPTION' default=''/>
 		<param name='LINKER_ADD_STATIC_RUNTIME'/>

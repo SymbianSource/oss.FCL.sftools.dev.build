@@ -1,19 +1,17 @@
-#
 # Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
 # which accompanies this distribution, and is available
 # at the URL "http://www.eclipse.org/legal/epl-v10.html".
-#
+# 
 # Initial Contributors:
 # Nokia Corporation - initial contribution.
 #
 # Contributors:
 #
-# Description: 
+# Description:
 # Run Trace Compiler on source files to generate trace headers and decode files
-#
 
 TRACE_PRJNAME:=$(basename $(notdir $(PROJECT_META)))
 # Find out TRACE_PATH
@@ -21,6 +19,13 @@ TRACE_PATH:=$(strip $(foreach DIR,$(USERINCLUDE),$(filter %/traces_$(TRACE_PRJNA
 ifeq ($(TRACE_PATH),)
 TRACE_PATH:=$(strip $(foreach DIR,$(USERINCLUDE),$(filter %/traces,$(DIR))))
 endif
+ifeq ($(TRACE_PATH),)
+TRACE_PATH:=$(strip $(foreach DIR,$(USERINCLUDE),$(filter %/traces_$(TARGET)_$(TARGETTYPE),$(DIR))))
+# Use target name instead of mmp file name
+TRACE_PRJNAME:=$(TARGET)_$(TARGETTYPE)
+endif
+
+$(if $(FLMDEBUG),$(info <debug>TRACE_PATH = $(TRACE_PATH)</debug>))
 
 # Run trace compiler only if TRACE_PATH exists
 ifneq ($(TRACE_PATH),)
@@ -37,6 +42,10 @@ $(if $(FLMDEBUG),$(info <debug>Trace Compiler sourcelist generation output: $(X)
 
 $(TRACE_MARKER) : $(SOURCE)
 
+TRACE_HEADERS:=$(foreach SRC,$(SOURCE),$(TRACE_PATH)/$(basename $(notdir $(SRC)))Traces.h)
+
+$(TRACE_HEADERS): $(TRACE_MARKER)
+
 ifeq ($(GUARD_$(call sanitise,$(TRACE_MARKER))),)
 GUARD_$(call sanitise,$(TRACE_MARKER)):=1
 
@@ -44,7 +53,6 @@ JAVA_COMMAND:=$(SBS_JAVATC)
 TRACE_COMPILER_PATH:=$(EPOCROOT)/epoc32/tools
 TRACE_COMPILER_START:=-classpath $(TRACE_COMPILER_PATH)/tracecompiler com.nokia.tracecompiler.TraceCompiler
 
-TRACE_HEADERS:=$(foreach SRC,$(SOURCE),$(TRACE_PATH)/$(basename $(notdir $(SRC)))Traces.h)
 
 # 1. Use pipe to send inputs to trace compiler to process
 # 2. Create a hash regarding to source names and put it in marker.
@@ -63,10 +71,12 @@ endef
 
 $(eval $(trace_compile))
 
-$(eval $(call GenerateStandardCleanTarget,$(TRACE_HEADERS) $(TRACE_PATH)/tracebuilder.cache $(TRACE_MARKER) $(TRACE_SOURCE_LIST),,))
+$(eval $(call GenerateStandardCleanTarget, $(TRACE_PATH)/tracebuilder.cache $(TRACE_MARKER) $(TRACE_SOURCE_LIST),,))
 
 # End sanity guard
 endif
+
+$(eval $(call GenerateStandardCleanTarget,$(TRACE_HEADERS),,))
 
 else
 # Indicate to following parts of the FLM that we actually won't run

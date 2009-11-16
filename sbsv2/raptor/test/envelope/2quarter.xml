@@ -1,0 +1,153 @@
+<?xml version="1.0"?>
+
+<SystemDefinition name="MCL" schema="1.4.0">
+  <systemModel>
+    <layer name="common">
+      <module name="allexports">
+        <component name="envelope">
+	<unit unitID='SCREENDRIVER' name='graphics_screendriver' bldFile='common/generic/GRAPHICS/ScreenDriver/Group' />
+	<unit unitID='C32BCA' name='networking_c32bca' bldFile='common/generic/NETWORKING/BasebandAdaptation/c32bca/group' />
+	<unit unitID='E32_EKA2' name='base_e32' bldFile='cedar/generic/BASE/E32' />
+	<unit unitID='E32_COMPSUPP' name='base_e32_compsupp' bldFile='cedar/generic/BASE/E32/compsupp' />
+	<unit unitID='SDCARD3C' name='base_e32_sd3c' bldFile='cedar/generic/base/e32/drivers/pbus/mmc/sdcard/sdcard3c' />
+	<unit unitID='SDCARD4C' name='base_e32_sd4c' bldFile='cedar/generic/base/e32/drivers/pbus/mmc/sdcard/sdcard4c' />
+	<unit unitID='LOCE32_ONGOING' name='base_loce32' bldFile='common/generic/BASE/LOCE32/ongoing' />
+	<unit unitID='F32_EKA2' name='base_f32' bldFile='cedar/generic/BASE/F32/GROUP' />
+	<unit unitID='F32TEST_EKA2' name='base_f32test' bldFile='cedar/generic/BASE/F32TEST/GROUP' />
+	<unit unitID='FATCHARSETCONV' name='syslibs_FATCharsetConv' bldFile='common/generic/syslibs/FATCharsetConv/GROUP' />
+	<unit unitID='HAL_EKA2' name='base_hal' bldFile='cedar/generic/BASE/HAL' />
+	<unit unitID='SYSAGENT2' name='syslibs_sysagent2' bldFile='common/generic/SYSLIBS/SYSAGENT2/GROUP' />
+	<unit unitID='SCHSVR_ONGOING' name='syslibs_schsvr' bldFile='common/generic/SYSLIBS/SCHSVR/ongoing/GROUP' />
+	<unit unitID='AUTHSERVER' name='security_authserver' bldFile='common/generic/security/authserver/group' />
+	<unit unitID='SYSSTART' name='app-framework_sysstart' bldFile='common/generic/app-framework/sysstart/group' />
+	<unit unitID='EMIME' name='app-framework_emime' bldFile='common/generic/APP-FRAMEWORK/EMIME/GROUP' />
+	<unit unitID='EZLIB' name='syslibs_ezlib' bldFile='common/generic/SYSLIBS/EZLIB/GROUP' />
+	<unit unitID='SECURITYCOMMON' name='security_common' bldFile='common/generic/SECURITY/COMMON/GROUP' />
+	<unit unitID='SECURITYCONFIG' name='security_config' bldFile='common/generic/security/securityconfig/group' />
+	<unit unitID='CRYPTOGRAPHY' name='security_crypto_weak' bldFile='common/generic/SECURITY/CRYPTO/GROUP' />
+	<unit unitID='STRONG_CRYPTO' name='security_crypto_strong' bldFile='common/generic/security/crypto/strong' />
+	<unit unitID='STDLIB' name='syslibs_stdlib' bldFile='common/generic/SYSLIBS/STDLIB/GROUP' />
+	<unit unitID='OECORE' name='openenv' bldFile='common/generic/openenv/core/group' />
+	<unit unitID='FEATREG' name='syslibs_featreg' bldFile='common/generic/syslibs/featreg/group' />
+	<unit unitID='ECOM_ONGOING' name='syslibs_ecom' bldFile='common/generic/SYSLIBS/ECOM/ongoing/GROUP' />
+	<unit unitID='PWRCLI' name='syslibs_pwrcli' bldFile='common/generic/SYSLIBS/PWRCLI/GROUP' />
+	<unit unitID='DOMAIN' name='base_domain' bldFile='cedar/generic/base/domain/group' />
+	<unit unitID='BAFL' name='syslibs_bafl' bldFile='common/generic/SYSLIBS/BAFL/GROUP' />
+	<unit unitID='CHARCONV_ONGOING' name='syslibs_charconv' bldFile='common/generic/SYSLIBS/Charconv/Ongoing/GROUP' />
+	<unit unitID='LOGENGONGOING' name='syslibs_logeng' bldFile='common/generic/SYSLIBS/LOGENG/ONGOING/GROUP' />
+	<unit unitID='FLOGGER' name='comms-infras_flogger' bldFile='common/generic/COMMS-INFRAS/Flogger/GROUP' />
+	<unit unitID='COMMSDEBUGUTILITY' name='comms-infras_commsdebugutility' bldFile='common/generic/comms-infras/commsdebugutility/GROUP' />
+	<unit unitID='CAF2' name='syslibs_caf2' bldFile='common/generic/syslibs/CAF2/GROUP' />
+	<unit unitID='CAF2CONFIG' name='syslibs_reccafconfig' bldFile='common/generic/syslibs/caf2/reccafconfig' />
+	<unit unitID='XML' name='syslibs_xml' bldFile='common/generic/syslibs/xml/group' />
+	<unit unitID='STORE' name='syslibs_store' bldFile='common/generic/SYSLIBS/Store/GROUP' />
+	<unit unitID='DBMS' name='syslibs_dbms' bldFile='common/generic/SYSLIBS/DBMS/GROUP' />
+	<unit unitID='DBMSSQL' name='syslibs_dbmssql' bldFile='common/generic/syslibs/dbms/esql/group' />
+	<unit unitID='CENTRALREPOSITORY' name='syslibs_centralrepository' bldFile='common/generic/syslibs/centralrepository/group' />
+	<unit unitID='SQL' name='syslibs_sql' bldFile='common/generic/syslibs/sql/group' />
+	<unit unitID='ROOTSERVER' name='comms-infras_rootserver' bldFile='common/generic/comms-infras/rootserver/GROUP' />
+	<unit unitID='COMMDB_SHIM' name='Comms Database SHIM' bldFile='common/generic/COMMS-INFRAS/Commdb/GROUP' />
+	<unit unitID='COMMSDAT' name='comms-infras_commsdat' bldFile='common/generic/COMMS-INFRAS/Commsdat/GROUP' />
+	<unit unitID='DEFAULTCOMMDB' name='comms-infras_defaultcommdb' bldFile='common/generic/COMMS-INFRAS/Commsdat/defaultcommdb/GROUP' />
+	<unit unitID='INSTALLDEFAULTCOMMDB' name='comms-infras_installdefaultcommdb' bldFile='common/generic/COMMS-INFRAS/Commsdat/installdefaultcommdb/GROUP' />
+	<unit unitID='C32' name='ser-comms_c32' bldFile='common/generic/SER-COMMS/C32/GROUP' />
+	<unit unitID='C32-config' name='ser-comms_c32-config' bldFile='common/generic/ser-comms/c32/data' />
+	<!-- excluding <unit unitID='ESOCK' name='comms-infras_esock' bldFile='common/generic/COMMS-INFRAS/ESOCK/version2/GROUP' /> -->
+	<unit unitID='ESOCK399' name='comms-infras_esock' bldFile='common/generic/COMMS-INFRAS/ESOCK/GROUP' />
+	<unit unitID='NIFMAN' name='comms-infras_nifman' bldFile='common/generic/COMMS-INFRAS/NIFMAN/GROUP' />
+	<unit unitID='DIALOG' name='networking_dialog' bldFile='common/generic/NETWORKING/DIALOG/GROUP' />
+	<unit unitID='DIALOG_DEFAULT' name='networking_dialog_default' bldFile='common/generic/networking/dialog/default' />
+	<unit unitID='NETCON' name='networking_netcon' bldFile='common/generic/NETWORKING/NETCON/GROUP' />
+	<unit unitID='COMMSFW' name='comms-infras_commsfw' bldFile='common/generic/comms-infras/commsfw/GROUP' />
+	<unit unitID='ELEMENTS' name='comms-infras_elements' bldFile='common/generic/COMMS-INFRAS/elements/group' />
+	<unit unitID='MBUFMAN' name='comms-infras_mbufmgr' bldFile='common/generic/comms-infras/mbufmgr/GROUP' />
+	<unit unitID='BCA' name='networking_bca' bldFile='common/generic/NETWORKING/BasebandAdaptation/bca/group' />
+	<!-- not including <unit unitID='ISC' name='networking_isc' bldFile='common/generic/NETWORKING/BasebandAdaptation/isc/group' /> -->
+	<unit unitID='DIAL' name='telephony_dial' bldFile='common/generic/TELEPHONY/DIAL/GROUP' />
+	<unit unitID='TELEPHONY_WATCHERS' name='telephony_watchers' bldFile='common/generic/telephony/watchers/group' />
+	<unit unitID='ETEL' name='telephony_etel' bldFile='common/generic/TELEPHONY/ETEL/GROUP' />
+	<unit unitID='ETEL3RDPARTY' name='telephony_etel3rdparty' bldFile='common/generic/TELEPHONY/ETel3rdParty/GROUP' />
+	<unit unitID='ETELMM' name='telephony_etelmm' bldFile='common/generic/TELEPHONY/ETELMM/GROUP' />
+	<unit unitID='ETELPCKT' name='telephony_etelpckt' bldFile='common/generic/TELEPHONY/etelpckt/group' />
+	<unit unitID='ETELSAT' name='telephony_etelsat' bldFile='common/generic/TELEPHONY/ETELSAT/GROUP' />
+	<unit unitID='ETELCDMA' name='telephony_etelcdma' bldFile='common/generic/telephony/etelcdma/group' />
+	<unit unitID='SMSSTACKV2' name='nbprotocols_smsstackv2' bldFile='common/generic/NBPROTOCOLS/SMSSTACKV2/GROUP' />
+	<unit unitID='CDMASMSSTACK' name='nbprotocols_cdmasmsstack' bldFile='common/generic/NBPROTOCOLS/CDMASMSSTACK/GROUP' />
+	<unit unitID='MMTSY' name='telephony_mmtsy' bldFile='common/generic/TELEPHONY/mmtsy/group' />
+	<unit unitID='CDMATSY' name='telephony_cdmatsy' bldFile='common/generic/TELEPHONY/cdmatsy/group' />
+	<unit unitID='SIMTSY' name='telephony_simtsy' bldFile='common/generic/TELEPHONY/simtsy/group' />
+	<unit unitID='TRP' name='telephony_trp' bldFile='common/generic/telephony/trp/group' />
+	<unit unitID='DND' name='networking_dnd' bldFile='common/generic/NETWORKING/dnd/group' />
+	<unit unitID='DHCP' name='networking_dhcp' bldFile='common/generic/NETWORKING/dhcp/group' />
+	<unit unitID='INSOCK' name='networking_insock' bldFile='common/generic/NETWORKING/insock/group' />
+	<unit unitID='NETWORKING_GENERAL' name='networking_general' bldFile='common/generic/networking/General/group' />
+	<unit unitID='IPEVENTNOTIFIER' name='networking_ipeventnotifier' bldFile='common/generic/networking/ipeventnotifier/group' />
+	<unit unitID='TCPIP6' name='networking_tcpip6' bldFile='common/generic/NETWORKING/TCPIP6/GROUP' />
+	<unit unitID='NETWORKING_EXAMPLECODE' name='IP Hook Examples' bldFile='common/generic/NETWORKING/examplecode/GROUP' />
+	<unit unitID='INHOOK6' name='networking_inhook6' bldFile='common/generic/NETWORKING/inhook6/group' />
+	<unit unitID='QOS' name='networking_qos' bldFile='common/generic/NETWORKING/QOS/GROUP' />
+	<unit unitID='QOSLIB' name='networking_qoslib' bldFile='common/generic/NETWORKING/QOSLIB/GROUP' />
+	<unit unitID='PFQOSLIB' name='networking_pfqoslib' bldFile='common/generic/NETWORKING/PFQOSLIB/GROUP' />
+	<unit unitID='NAPT' name='networking_napt' bldFile='common/generic/networking/napt/group' />
+	<!-- excluding <unit unitID='IPCPR' name='networking_ipcpr' bldFile='common/generic/NETWORKING/ip/version1/IPCPR/GROUP' /> -->
+	<!-- excluding <unit unitID='SHIMCPR' name='networking_shimcpr' bldFile='common/generic/comms-infras/nifman/version1/shimcpr/GROUP' /> -->
+	<!-- excluding <unit unitID='IPSCPR' name='networking_ipscpr' bldFile='common/generic/NETWORKING/umts/version1/ipscpr/GROUP' /> -->
+	<!-- excluding <unit unitID='REFERENCECPR' name='networking_ReferenceCPR' bldFile='common/generic/NETWORKING/ip/version1/referencecpr/GROUP' /> -->
+	<!-- excluding <unit unitID='REFERENCESCPR' name='networking_ReferenceSCPR' bldFile='common/generic/NETWORKING/umts/version1/referencescpr/GROUP' /> -->
+	<unit unitID='QOS3GPP' name='networking_qos3gpp' bldFile='common/generic/networking/umts/qos3gpp/group' />
+	<!-- excluding <unit unitID='UMTSGPRSSCPR' name='networking_UmtsGprsSCPR' bldFile='common/generic/NETWORKING/umts/version1/UmtsGprsSCPR/GROUP' /> -->
+	<unit unitID='IPPROTO' name='networking_ipproto' bldFile='common/generic/networking/ip/ipproto/group' />
+	<unit unitID='IPTRANSPORT' name='networking_iptransport' bldFile='common/generic/networking/ip/iptransport/group' />
+	<unit unitID='PDP' name='networking_pdp' bldFile='common/generic/networking/umts/pdp/group' />
+	<unit unitID='QOSIPSCPR' name='networking_qosipscpr' bldFile='common/generic/networking/umts/qosipscpr/group' />
+	<unit unitID='CSDAGT' name='networking_csdagt' bldFile='common/generic/NETWORKING/CSDAGT/GROUP' />
+	<unit unitID='PSDAGT' name='networking_psdagt' bldFile='common/generic/NETWORKING/PSDAGT/GROUP' />
+	<unit unitID='NULLAGT' name='networking_nullagt' bldFile='common/generic/NETWORKING/NULLAGT/GROUP' />
+	<unit unitID='GUQOS' name='networking_guqos' bldFile='common/generic/NETWORKING/GUQOS/GROUP' />
+	<unit unitID='UMTSIF' name='networking_umtsif' bldFile='common/generic/NETWORKING/UMTSIF/GROUP' />
+	<unit unitID='QOSEXTNAPI' name='networking_qosextnapi' bldFile='common/generic/networking/qosextnapi/group' />
+	<unit unitID='SPUD' name='networking_spud' bldFile='common/generic/NETWORKING/SPUD/GROUP' />
+	<unit unitID='EAP' name='networking_eap' bldFile='common/generic/networking/eap/group' />
+	<unit unitID='ETHER802' name='networking_ether802' bldFile='common/generic/NETWORKING/ETHER802/GROUP' />
+	<!-- excluding <unit unitID='PPP' name='networking_ppp' bldFile='common/generic/NETWORKING/PPP/version1/GROUP' /> -->
+	<unit unitID='PPP399' name='networking_ppp' bldFile='common/generic/NETWORKING/PPP/GROUP' />
+	<unit unitID='PREDCOMP' name='networking_predcomp' bldFile='common/generic/NETWORKING/PREDCOMP/GROUP' />
+	<unit unitID='MSCOMP' name='networking_mscomp' bldFile='common/generic/NETWORKING/MSComp/GROUP' />
+	<unit unitID='STACCOMP' name='networking_staccomp' bldFile='common/generic/NETWORKING/STACCOMP/GROUP' />
+	<unit unitID='SLIP' name='networking_slip' bldFile='common/generic/NETWORKING/SLIP/GROUP' />
+	<unit unitID='TUNNELNIF' name='networking_tunnelnif' bldFile='common/generic/NETWORKING/tunnelnif/group' />
+	<unit unitID='PACKETLOGGER' name='networking_packetlogger' bldFile='common/generic/NETWORKING/packetlogger/group' />
+	<unit unitID='RAWIPNIF' name='networking_rawipnif' bldFile='common/generic/NETWORKING/rawipnif/group' />
+	<unit unitID='WIFI_802_11' name='networking_802.11' bldFile='common/generic/networking/802.11/group' />
+	<unit unitID='USB' name='ser-comms_usb' bldFile='common/generic/SER-COMMS/USB/GROUP' />
+	<unit unitID='BLUETOOTH_MANAGER' name='bluetooth_manager' bldFile='common/generic/bluetooth/latest/bluetooth/manager' />
+	<unit unitID='BLUETOOTH_BTEXTNOTIFIERS' name='bluetooth_btextnotifiers' bldFile='common/generic/bluetooth/latest/bluetooth/BTExtNotifiers' />
+	<unit unitID='BLUETOOTH_CONFIG' name='bluetooth_config' bldFile='common/generic/bluetooth/latest/bluetooth/config' />
+	<unit unitID='BLUETOOTH_GAVDP' name='bluetooth_gavdp' bldFile='common/generic/bluetooth/latest/bluetooth/profiles/gavdp/group' />
+	<unit unitID='BLUETOOTH_ROM' name='bluetooth_rom' bldFile='common/generic/bluetooth/latest/bluetooth/rom' />
+	<unit unitID='BLUETOOTH_USER' name='bluetooth_user' bldFile='common/generic/bluetooth/latest/bluetooth/user' />
+	<unit unitID='HCI_V2_FRAMEWORK' name='bluetooth_hci_v2_framework' bldFile='common/generic/bluetooth/latest/bluetooth/hci_v2/framework/group' />
+	<unit unitID='BLUETOOTH_SDP' name='bluetooth_sdp' bldFile='common/generic/bluetooth/latest/bluetooth/sdp' />
+	<unit unitID='BLUETOOTH_REMOTECONTROL' name='bluetooth_remotecontrol' bldFile='common/generic/bluetooth/latest/bluetooth/remotecontrol/group' />
+	<unit unitID='BLUETOOTH_STACK' name='bluetooth_stack' bldFile='common/generic/bluetooth/latest/bluetooth/stack' />
+	<unit unitID='BLUETOOTH_HCI' name='bluetooth_hci' bldFile='common/generic/bluetooth/latest/bluetooth/hci' />
+	<unit unitID='BLUETOOTH_HCIPROXY' name='bluetooth_hciproxy' bldFile='common/generic/bluetooth/latest/bluetooth/HCIProxy' />
+	<unit unitID='HCI_V2_IMPLEMENTATIONS' name='bluetooth_hci_v2_implementations' bldFile='common/generic/bluetooth/latest/bluetooth/hci_v2/implementations/group' />
+	<unit unitID='IRDA' name='infra-red_irda' bldFile='common/generic/INFRA-RED/IRDA/GROUP' />
+	<unit unitID='INFRA-RED_CONFIG' name='infra-red_config' bldFile='common/generic/INFRA-RED/config' />
+	<unit unitID='BLUETOOTH_BTCOMM' name='bluetooth_btcomm' bldFile='common/generic/bluetooth/latest/bluetooth/btcomm' />
+	<unit unitID='MDF' name='multimedia_mdf' bldFile='common/generic/multimedia/mdf/group' />
+	<unit unitID='OPENMAX' name='multimedia_openmax' bldFile='common/generic/multimedia/openmax/group' />
+	<unit unitID='MMF' name='multimedia_mmf' bldFile='common/generic/MULTIMEDIA/MMF/GROUP' />
+	<unit unitID='COMMON' name='multimedia_common' bldFile='common/generic/MULTIMEDIA/MMCOMMON/GROUP' />
+	<unit unitID='CHAR' name='multimedia_mmf_char' bldFile='common/generic/MULTIMEDIA/char/mmf/group' />
+	<unit unitID='ICL' name='multimedia_icl' bldFile='common/generic/MULTIMEDIA/ICL/GROUP' />
+        </component>
+      </module>
+    </layer>
+  </systemModel>
+  
+  <build>
+  </build>
+
+</SystemDefinition>

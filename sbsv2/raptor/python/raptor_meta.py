@@ -1450,8 +1450,10 @@ class MMPRaptorBackend(MMPBackend):
 
 				# add in the minor number
 				minor = 0
-				if len(version) >  1:
+				if version[1] is not None:
 					minor = int(version[2],10)
+				else:
+					self.__Raptor.Warn("VERSION (%s) missing '.minor' in %s, using '.0'" % (toks[1],self.__currentMmpFile))
 
 				self.__versionhex = "%04x%04x" % (major, minor)
 				self.BuildVariant.AddOperation(raptor_data.Set(varname, "%d.%d" %(major, minor)))

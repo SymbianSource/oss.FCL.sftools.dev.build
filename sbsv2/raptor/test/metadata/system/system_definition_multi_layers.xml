@@ -1,0 +1,38 @@
+<SystemDefinition name="MCL" schema="2.0.0" > 
+	<systemModel>
+	    <layer name="First Layer">
+			<component name="simple">
+				<unit bldFile="test/smoke_suite/test_resources/simple" root="SBS_HOME" mrp="simple/test.mrp"/>
+			</component>
+			<component name="simple_dll">
+				<unit bldFile="test/smoke_suite/test_resources/simple_dll" root="SBS_HOME" mrp="simple_dll/test.mrp"/>
+			</component>
+		</layer>
+	    <layer name="Second Layer">
+			<component name="simple_export">
+				<unit bldFile="test/smoke_suite/test_resources/simple_export" root="SBS_HOME" mrp="simple_export/test.mrp"/>
+			</component>
+			<component name="simple_gui">
+				<unit bldFile="test/smoke_suite/test_resources/simple_gui" root="SBS_HOME" mrp="simple_gui/test.mrp"/>
+			</component>
+		</layer>
+	    <layer name="Third Layer">
+			<component name="simple_implib">
+				<unit bldFile="test/smoke_suite/test_resources/simple_implib" root="SBS_HOME" mrp="simple_implib/test.mrp"/>
+			</component>
+			<component name="simple_lib">
+				<unit bldFile="test/smoke_suite/test_resources/simple_lib" root="SBS_HOME" mrp="simple_lib/test.mrp"/>
+			</component>
+		</layer>
+	    <layer name="Fourth Layer">
+			<component name="simple_stringtable">
+				<unit bldFile="test/smoke_suite/test_resources/simple_stringtable" root="SBS_HOME" mrp="simple_stringtable/test.mrp"/>
+			</component>
+			<component name="simple_test">
+				<unit bldFile="test/smoke_suite/test_resources/simple_test" root="SBS_HOME" mrp="simple_test/test.mrp"/>
+			</component>
+		</layer>
+	    <layer name="Fifth Layer">
+		</layer>
+	</systemModel>
+</SystemDefinition>

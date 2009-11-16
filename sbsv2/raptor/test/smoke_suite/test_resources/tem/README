@@ -1,0 +1,10 @@
+A very simple TEM test
+
+This is more aimed at the TEM mechanism rather than TEMs themselves.
+
+There are several bld infs:
+bld.inf      - is expected to build without errors
+bad_bld.inf  - is expected to generate duplicate TEM calls
+bad2_bld.inf - is expected to ensure that options are passing through to TEM unchanged
+
+

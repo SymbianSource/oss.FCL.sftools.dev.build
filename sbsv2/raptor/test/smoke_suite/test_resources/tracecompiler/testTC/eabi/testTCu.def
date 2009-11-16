@@ -1,0 +1,16 @@
+EXPORTS
+	_ZN11CWlanHwInit13GetHwInitDataEPPKhRjS2_S3_ @ 1 NONAME
+	_ZN11CWlanHwInit13GetHwTestDataEjR5TDes8 @ 2 NONAME
+	_ZN11CWlanHwInit13GetMacAddressER8TMacAddr @ 3 NONAME
+	_ZN11CWlanHwInit13SetHwTestDataEjR6TDesC8 @ 4 NONAME
+	_ZN11CWlanHwInit17GetHwTestInitDataEPPKhRjS2_S3_ @ 5 NONAME
+	_ZN11CWlanHwInit4NewLEv @ 6 NONAME
+	_ZN11CWlanHwInitD0Ev @ 7 NONAME
+	_ZN11CWlanHwInitD1Ev @ 8 NONAME
+	_ZN11CWlanHwInitD2Ev @ 9 NONAME
+	_ZThn4_N11CWlanHwInit13GetHwInitDataEPPKhRjS2_S3_ @ 10 NONAME ; #<thunk>#
+	_ZThn4_N11CWlanHwInit13GetHwTestDataEjR5TDes8 @ 11 NONAME ; #<thunk>#
+	_ZThn4_N11CWlanHwInit13GetMacAddressER8TMacAddr @ 12 NONAME ; #<thunk>#
+	_ZThn4_N11CWlanHwInit13SetHwTestDataEjR6TDesC8 @ 13 NONAME ; #<thunk>#
+	_ZThn4_N11CWlanHwInit17GetHwTestInitDataEPPKhRjS2_S3_ @ 14 NONAME ; #<thunk>#
+

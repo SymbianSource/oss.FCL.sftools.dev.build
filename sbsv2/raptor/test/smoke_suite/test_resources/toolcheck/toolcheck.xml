@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<build xmlns="http://symbian.com/xml/build"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://symbian.com/xml/build build/2_0.xsd">
+
+ <var name="toolcheck"> 
+  <env name="TOOLCHECK1" default="toolcheck1$(DOTEXE)" type="tool" versionCommand="$(TOOLCHECK1)" versionResult="Version 12\.[0-9]{2}\.[0-9]{4}" /> 
+  <env name="TOOLCHECK2" default="toolcheck2$(DOTEXE)" type="tool" versionCommand="$(TOOLCHECK2)" versionResult="toolcheck2$(DOTEXE): command not found" />
+  <env name="TOOLCHECK3" default='mwccsym2$(DOTEXE)' type='tool' versionCommand='$(TOOLCHECK3) -version' versionResult='something you would never see'/>
+  <env name='TOOLCHECK4' default='$(SBS_GNUCPP)' type='tool' versionCommand='$(GNUCPP) --version' versionResult='something you would never see'/>
+  <env name='TOOLCHECK5' default='$(SBS_PYTHON)' type='tool' versionCommand='$(PYTHON) -V' versionResult='something you would never see'/>
+  <env name='TOOLCHECK6' default='$(SBS_HOME)/test/smoke_suite/test_resources/toolcheck/toolcheck6.py' type='tool' versionCommand='$(PYTHON) $(TOOLCHECK6)' versionResult='something toolcheck6 would print out to match tool check result'/>
+ </var>  
+</build>

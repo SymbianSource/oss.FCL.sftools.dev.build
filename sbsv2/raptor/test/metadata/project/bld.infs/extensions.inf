@@ -1,0 +1,66 @@
+/*
+* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description: 
+*
+*/
+PRJ_EXTENSIONS
+
+START EXTENSION test/dummyextension1
+	TARGET dummyoutput1.exe
+	SOURCES dummysource11.cpp dummysource12.cpp dummysource13.cpp
+	DEPENDENCIES dummylib11.lib dummylib12.lib
+	TOOL dummytool1.exe
+	OPTION option11 option11value
+	OPTION option12 $(MAKE_VAR)
+END
+
+START EXTENSION test/dummyextension2
+	TARGET dummyoutput2.exe
+	SOURCES dummysource21.cpp dummysource22.cpp dummysource23.cpp
+	DEPENDENCIES dummylib21.lib dummylib22.lib
+	TOOL dummytool2.exe
+	OPTION option21 option21value
+	OPTION option22 $(MAKE_VAR)
+END
+
+// Note that variable prefixed TEMs are supported only for Raptor testing
+START EXTENSION $(SBS_HOME)/test/dummyextension3
+	TARGET dummyoutput3.exe
+	SOURCES dummysource31.cpp dummysource32.cpp dummysource33.cpp
+	DEPENDENCIES dummylib31.lib dummylib32.lib
+	TOOL dummytool3.exe
+	OPTION option31 option31value
+	OPTION option32 $(MAKE_VAR)
+END
+
+
+PRJ_TESTEXTENSIONS
+
+START EXTENSION test/dummytestextension1
+	TARGET dummytestoutput1.exe
+	SOURCES dummytestsource11.cpp dummytestsource12.cpp dummytestsource13.cpp
+	DEPENDENCIES dummytestlib11.lib dummytestlib12.lib
+	TOOL dummytesttool1.exe
+	OPTION optiontest11 optiontest11value
+	OPTION optiontest12 $(MAKE_VAR)
+END
+
+START EXTENSION test/dummytestextension2
+	TARGET dummytestoutput2.exe
+	SOURCES dummytestsource21.cpp dummytestsource22.cpp dummytestsource23.cpp
+	DEPENDENCIES dummytestlib21.lib dummytestlib22.lib
+	TOOL dummytesttool2.exe
+	OPTION optiontest21 optiontest21value
+	OPTION optiontest22 $(MAKE_VAR)
+END
