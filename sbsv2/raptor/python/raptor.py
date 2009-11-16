@@ -32,6 +32,7 @@ import raptor_cache
 import raptor_cli
 import raptor_data
 import raptor_make
+import raptor_makefile
 import raptor_meta
 import raptor_utilities
 import raptor_version
@@ -54,8 +55,9 @@ hostplatform = os.environ["HOSTPLATFORM"].split(" ")
 hostplatform_dir = os.environ["HOSTPLATFORM_DIR"]
 
 # defaults can use EPOCROOT
+
 if "EPOCROOT" in os.environ:
-	epocroot = os.environ["EPOCROOT"].replace("\\","/")
+        epocroot = os.environ["EPOCROOT"].replace("\\","/")
 else:
 	if 'linux' in hostplatform:
 		epocroot=os.environ['HOME'] + os.sep + "epocroot"
@@ -68,7 +70,6 @@ if "SBS_BUILD_DIR" in os.environ:
 	sbs_build_dir = os.environ["SBS_BUILD_DIR"]
 else:
 	sbs_build_dir = (epocroot + "/epoc32/build").replace("//","/")
-
 
 
 # only use default XML from the epoc32 tree if it exists
@@ -105,75 +106,74 @@ defaults = {
 		}
 
 
-class ComponentGroup(object):
-	""" 	Some components that should be built togther 
-		e.g. a Layer in the system definition. 
-	""" 
-	def __init__(self, name, componentlist=[]):
-		self.components = componentlist
-		self.name = name
+
+class ModelNode(object):
+	""" Represents any node in a a tree of build information
+	    e.g. a tree of bld.infs, mmps and finally things like resource blocks and string table blocks.
+	    This is before they are produced into "build" specs.
+	"""
+
+	def __init__(self, id, parent = None):
+		self.id = id
+		self.type = type
+		self.specs = []
+		self.deps = []
+		self.children = set() 
+		self.unfurled = False
+		self.parent = parent
+
+	# Allow one to make a set
+	def __hash__(self):
+		return hash(self.id)
+
+	def __cmp__(self,other):
+		return cmp(self.id, other)
 
 	def __iter__(self):
-		return iter(self.components)
+		return iter(self.children)
 
 	def __getitem__(self,x):
 		if isinstance(x, slice):
-			return self.components[x.start:x.stop]
-		return self.components[x]
+			return self.children[x.start:x.stop]
+		return self.children[x]
 
 	def __setitem__(self,k, v):
-		self.components[k] = v
+		self.children[k] = v
 
 	def __len__(self):
-		return len(self.components)
+		return len(self.children)
 
-	def extend(self, c):
-		self.components.extend(c)
-	
-	def append(self, c):
-		self.components.append(c)
+	def add(self, item):
+		return self.children.add(item)
 
-	def GenerateSpecs(self, genericspecs, configs):
-		"""Return a build spec hierarchy for a ComponentGroup. This involves parsing the component MetaData (bld.infs, mmps). 
-		Takes a raptor object as a parameter (build), together with a list of Configurations.
+	def isunfurled(self, c):
+		return self.unfurled == False
 
-		Returns a tuple consisting of a list of specification objects and a list of dependency files
-		that relate to these specs.
+	def unfurl(self, build):
+		"""Find any children of this node by processing it, produces specs"""
+		pass
+
+	def unfurl_all(self, build):
+		"""Unfurl self and all children - preparatory e.g for realisation"""
+		if not self.unfurled:
+			self.unfurl(build)
+
+		self.realise_exports(build) # permit communication of dependencies between children
+
+		for c in self.children:
+			c.unfurl_all(build)
+		
+
+	def realise_exports(self, build):
+		"""Do the things that are needed such that we can fully unfurl all 
+		   sibling nodes.  i.e. this step is here to "take care" of the dependencies
+		   between siblings.  
 		"""
-
-		self.specs = []
-		self.specs.extend(genericspecs)
-		self.configs = configs
-		self.dependencies = set()
-
-		metaReader = None
-		if len (self.components):
-			try:
-				# create a MetaReader that is aware of the list of
-				# configurations that we are trying to build.
-				metaReader = raptor_meta.MetaReader(build, configs)
-
-				# convert the list of bld.inf files into a specification
-				# hierarchy suitable for all the configurations we are using.
-				self.specs.extend(metaReader.ReadBldInfFiles(self.components,build.doExportOnly))
-
-			except raptor_meta.MetaDataError, e:
-				log.Error(e.Text)
-
-		log.Info("Buildable specification group '%s'", name)
-		build.AttachSpecs(self.specs)
-
-		# Get a unique list of the dependency files that were created
-		if metaReader:
-			for c in metaReader.BuildPlatforms:
-				self.dependencies.update(c["METADEPS"])
-
-
-	def CreateMakefile(self, makefilename_base, engine, named = False):
-		if len(self.specs) <= 0:
-			return None
-
-		if named:
+		pass
+	
+	def realise_makefile(self, build, specs):
+		makefilename_base = build.topMakefile
+		if self.name is not None:
 			makefile = generic_path.Path(str(makefilename_base) + "_" + raptor_utilities.sanitise(self.name))
 		else:
 			makefile = generic_path.Path(str(makefilename_base))
@@ -181,15 +181,117 @@ class ComponentGroup(object):
 		# insert the start time into the Makefile name?
 		makefile.path = makefile.path.replace("%TIME", build.timestring)
 
-		engine.Write(makefile, self.specs, self.configs)
+		makefileset = build.maker.Write(makefile, specs, build.buildUnitsToBuild)
 
-		return makefile
+		return makefileset
+		
+
+	def realise(self, build):
+		"""Give the spec trees to the make engine and actually 
+		"build" the product represented by this model node"""	
+		# Must ensure that all children are unfurled at this point
+		self.unfurl_all(build)
+
+		sp = self.specs	
+
+		build.AssertBuildOK()
+
+		m = self.realise_makefile(build, sp)
+
+		return build.Make(m)
 
 
-	def GenerateMetadataSpecs(self, configs):
+class Project(ModelNode):
+	"""A project or, in symbian-speak, an MMP
+	"""
+	def __init__(self, filename, parent = None):
+		super(Project,self).__init__(filename, parent = parent)
+		# Assume that components are specified in mmp files for now
+		# One day that tyranny might end.
+		self.mmp_name = str(generic_path.Path.Absolute(filename))
+		self.id = self.mmp_name
+		self.unfurled = False
+
+	def makefile(self, makefilename_base, engine, named = False):
+		"""Makefiles for individual mmps not feasible at the moment"""
+		pass # Cannot, currently, "unfurl an mmp" directly but do want 
+		     # to be able to simulate the overall recursive unfurling of a build.
+
+class Component(ModelNode):
+	"""A group of projects or, in symbian-speak, a bld.inf.
+	"""
+	def __init__(self, filename):
+		super(Component,self).__init__(filename)
+		# Assume that components are specified in bld.inf files for now
+		# One day that tyranny might end.
+		self.bldinf = None # Slot for a bldinf object if we spot one later
+		self.bldinf_filename = generic_path.Path.Absolute(filename)
+
+		self.id = str(self.bldinf_filename)
+		self.exportspecs = []
+		self.depfiles = []
+		self.unfurled = False # We can parse this
+
+	def AddMMP(self, filename):
+		self.children.add(Project(filename))
+
+
+class Layer(ModelNode):
+	""" 	Some components that should be built togther 
+		e.g. a Layer in the system definition. 
+	""" 
+	def __init__(self, name, componentlist=[]):
+		super(Layer,self).__init__(name)
+		self.name = name
+
+		for c in componentlist:
+			self.children.add(Component(c))
+
+	def unfurl(self, build):
+		"""Discover the children of this layer. This involves parsing the component MetaData (bld.infs, mmps). 
+		Takes a raptor object as a parameter (build), together with a list of Configurations.
+
+		We currently have parsers that work on collections of components/bld.infs and that cannot
+		parse at a "finer" level.  So one can't 'unfurl' an mmp at the moment.  
+
+		Returns True if the object was successfully unfurled.
+		"""
+
+		# setup all our components
+		for c in self.children:
+			c.specs = []
+
+		self.configs = build.buildUnitsToBuild
+
+
+		metaReader = None
+		if len (self.children):
+			try:
+				# create a MetaReader that is aware of the list of
+				# configurations that we are trying to build.
+				metaReader = raptor_meta.MetaReader(build, build.buildUnitsToBuild)
+
+				# convert the list of bld.inf files into a specification
+				# hierarchy suitable for all the configurations we are using.
+				self.specs = list(build.generic_specs)
+				self.specs.extend(metaReader.ReadBldInfFiles(self.children, build.doExportOnly))
+
+			except raptor_meta.MetaDataError, e:
+				build.Error(e.Text)
+
+		self.unfurled = True
+
+
+	def meta_realise(self, build):
+		"""Generate specs that can be used to "take care of" finding out more
+		about this metaunit - i.e. one doesn't want to parse it immediately
+		but to create a makefile that will parse it. 
+		In this case it allows bld.infs to be parsed in parallel by make."""
+
 		# insert the start time into the Makefile name?
 
-		self.configs = build.GetConfig("build").GenerateBuildUnits()
+		buildconfig = build.GetConfig("build").GenerateBuildUnits(build.cache)
+		self.configs = build.buildUnitsToBuild
 
 		# Pass certain CLI flags through to the makefile-generating sbs calls
 		cli_options = ""
@@ -207,27 +309,38 @@ class ComponentGroup(object):
 			cli_options += " -q"
 
 		
-		nc = len(self.components)
-		number_blocks = 16
+		nc = len(self.children)
+		number_blocks = build.jobs
 		block_size = (nc / number_blocks) + 1
 		component_blocks = []
 		spec_nodes = []
 		
 		b = 0
+		childlist = list(self.children)
 		while b < nc:
-			component_blocks.append(self.components[b:b+block_size])
+			component_blocks.append(childlist[b:b+block_size])
 			b += block_size
 			
-		if len(component_blocks[-1]) <= 0:
+		while len(component_blocks[-1]) <= 0:
 			component_blocks.pop()
-		
+			number_blocks -= 1
+	
+		build.Info("Parallel Parsing: bld.infs split into %d blocks\n", number_blocks)
+		# Cause the binding makefiles to have the toplevel makefile's 
+		# name.  The bindee's have __pp appended.	
+		tm = build.topMakefile.Absolute()
+		binding_makefiles = raptor_makefile.MakefileSet(str(tm.Dir()), build.maker.selectors, makefiles=None, filenamebase=str(tm.File()))		
+		build.topMakefile = generic_path.Path(str(build.topMakefile) + "_pp")
+
 		loop_number = 0
 		for block in component_blocks:
 			loop_number += 1
 			specNode = raptor_data.Specification("metadata_" + self.name)
 
-			componentList = " ".join([str(c) for c in block])
-			configList = " ".join([c.name for c in configs])
+			componentList = " ".join([str(c.bldinf_filename) for c in block])
+
+			
+			configList = " ".join([c.name for c in self.configs if c.name != "build" ])
 			
 			makefile_path = str(build.topMakefile) + "_" + str(loop_number)
 			try:
@@ -247,8 +360,6 @@ class ComponentGroup(object):
 				var.AddOperation(raptor_data.Set("NO_BUILD", "1"))
 			specNode.AddVariant(var)
 	
-	
-	
 			try:
 				interface = build.cache.FindNamedInterface("build.makefiles")
 				specNode.SetInterface(interface)
@@ -256,15 +367,28 @@ class ComponentGroup(object):
 				build.Error("Can't find flm interface 'build.makefiles' ")
 				
 			spec_nodes.append(specNode)
-			
-			
+			binding_makefiles.addInclude(str(makefile_path)+"_all")
 
-		## possibly some error handling here?
+		ppstart = time.time()
+		build.Info("Parallel Parsing: time: Start %d", int(ppstart))
+		m = self.realise_makefile(build, spec_nodes)
+		m.close()
+		gen_result = build.Make(m)
 
-		self.specs = spec_nodes
+		ppfinish = time.time()
+		build.Info("Parallel Parsing: time: Finish %d", int(ppfinish))
+		build.Info("Parallel Parsing: time: Parse Duration %d", int(ppfinish - ppstart))
+		build.Debug("Binding Makefile base name is %s ", binding_makefiles.filenamebase)
+		binding_makefiles.close()
+		b = build.Make(binding_makefiles)
+		buildfinish = time.time()
+		build.Info("Parallel Parsing: time: Build Duration %d", int(buildfinish - ppfinish))
+		return b
 
 
-class BuildCompleteException(Exception):
+
+
+class BuildCannotProgressException(Exception):
 	pass
 
 # raptor module classes
@@ -326,8 +450,8 @@ class Raptor(object):
 		# things to initialise
 		self.args = []
 
-		self.componentGroups = []
-		self.orderComponentGroups = False
+		self.layers = []
+		self.orderLayers = False
 		self.commandlineComponents = []
 
 		self.systemModel = None
@@ -374,6 +498,9 @@ class Raptor(object):
 		return True
 
 	def AddConfigName(self, name):
+		if name == "build":
+			traceback.print_stack((sys.stdout))
+			sys.exit(1)
 		self.configNames.append(name)
 		return True
 
@@ -507,6 +634,8 @@ class Raptor(object):
 		type = type.lower()
 		if type == "on":
 			self.doParallelParsing = True
+		elif type == "slave":
+			self.isParallelParsingSlave = True
 		elif type == "off":
 			self.doParallelParsing = False
 		else:
@@ -529,7 +658,7 @@ class Raptor(object):
 
 	def PrintVersion(self,dummy):
 		global name
-		print name, "version", raptor_version.Version()
+		print name, "version", raptor_version.fullversion()
 		self.mission = Raptor.M_VERSION
 		return False
 
@@ -538,7 +667,7 @@ class Raptor(object):
 	def Introduction(self):
 		"""Print a header of useful information about Raptor"""
 
-		self.Info("%s: version %s\n", name, raptor_version.Version())
+		self.Info("%s: version %s\n", name, raptor_version.fullversion())
 
 		self.Info("%s %s", env, str(self.home))
 		self.Info("Set-up %s", str(self.raptorXML))
@@ -547,7 +676,7 @@ class Raptor(object):
 		
 		# the inherited environment
 		for e, value in os.environ.items():
-			self.Info("Environment %s=%s", e, value)
+			self.Info("Environment %s=%s", e, value.replace("]]>", "]]&gt;"))
 
 		# and some general debug stuff
 		self.Debug("Platform %s", "-".join(hostplatform))
@@ -704,9 +833,11 @@ class Raptor(object):
 
 
 		for c in set(configNames):
+			self.Debug("BuildUnit: %s", c)
 			try:		
 				x = self.GetConfig(c)
-				buildUnitsToBuild.update( x.GenerateBuildUnits() )
+				gb = x.GenerateBuildUnits(self.cache) 
+				buildUnitsToBuild.update( gb )
 			except Exception, e:
 				self.FatalError(str(e))
 
@@ -770,13 +901,13 @@ class Raptor(object):
 				systemModel.DumpLayerInfo(layer)
 
 				if systemModel.IsLayerBuildable(layer):
-					layersToBuild.append(ComponentGroup(layer,
+					layersToBuild.append(Layer(layer,
 							systemModel.GetLayerComponents(layer)))
 
 		return layersToBuild
 
 
-	# Add bld.inf or system definition xml to command line componentGroups (depending on preference)
+	# Add bld.inf or system definition xml to command line layers (depending on preference)
 	def FindSysDefIn(self, aDir = None):
 		# Find a system definition file
 
@@ -808,15 +939,6 @@ class Raptor(object):
 
 		return None
 
-	def AttachSpecs(self, groups):
-		# tell the specs which Raptor object they work for (so that they can
-		# access the cache and issue warnings and errors)
-		for spec in groups:
-			spec.SetOwner(self)
-			self.Info("Buildable specification '%s'", spec.name)
-			if self.debugOutput:
-				spec.DebugPrint()
-
 	def GenerateGenericSpecs(self, configsToBuild):
 		# if a Configuration has any config-wide interfaces
 		# then add a Specification node to call each of them.
@@ -832,7 +954,7 @@ class Raptor(object):
 					filter.AddConfigCondition(c.name)
 				else:
 					# create a new node
-					filter = raptor_data.Filter("config_wide")
+					filter = raptor_data.Filter(name = "config_wide")
 					filter.AddConfigCondition(c.name)
 					for i in iface.split():
 						spec = raptor_data.Specification(i)
@@ -842,50 +964,25 @@ class Raptor(object):
 					configWide[iface] = filter
 					genericSpecs.append(filter)
 
-		self.AttachSpecs(genericSpecs)
-
 		return genericSpecs
-
-
-	def WriteMetadataDepsMakefile(self, component_group):
-		""" Takes a list of (filename, target) tuples that indicate where """
-		# Create a Makefile that includes all the dependency information for this spec group
-		build_metamakefile_name = \
-				os.path.abspath(sbs_build_dir).replace('\\','/').rstrip('/') + \
-				'/metadata_%s.mk' % component_group.name.lower()
-		bmkmf = open(build_metamakefile_name, "w+")
-		bmkmf.write("# Build Metamakefile - Dependencies for metadata during the 'previous' build\n\n")
-		bmkmf.write("PARSETARGET:=%s\n" % build_metamakefile_name)
-		bmkmf.write("%s:  \n" % build_metamakefile_name)
-		bmkmf.write("\t@echo -e \"\\nRE-RUNNING SBS with previous parameters\"\n")
-		bmkmf.write("\t@echo pretend-sbs %s\n" % " ".join(self.args))
-		try:
-			for m in component_group.dependencies:
-				filename, target = m
-				bmkmf.write("-include %s\n\n" % filename)
-		finally:
-			bmkmf.close()
-
-		return build_metamakefile_name
 
 
 	def GetEvaluator(self, specification, configuration, gathertools=False):
 		""" this will perform some caching later """
-		return raptor_data.Evaluator(self, specification, configuration, gathertools=gathertools)
+		return raptor_data.Evaluator(specification, configuration, gathertools=gathertools, cache = self.cache)
 
 
-	def areMakefilesUptodate(self):
-		return False
-
-
-	def Make(self, makefile):
-
-		if self.maker.Make(makefile):
-			self.Info("The make-engine exited successfully.")
-			return True
+	def Make(self, makefileset):
+		if not self.noBuild and makefileset is not None:
+			if self.maker.Make(makefileset):
+				self.Info("The make-engine exited successfully.")
+				return True
+			else:
+				self.Error("The make-engine exited with errors.")
+				return False
 		else:
-			self.Error("The make-engine exited with errors.")
-			return False
+			self.Info("No build performed")
+
 
 
 	def Report(self):
@@ -898,10 +995,10 @@ class Raptor(object):
 		self.Info("Run time %s seconds" % self.runtime)
 
 	def AssertBuildOK(self):
-		"""Raise a BuildCompleteException if no further processing is required
+		"""Raise a BuildCannotProgressException if no further processing is required
 		"""
 		if self.Skip():
-			raise BuildCompleteException("")
+			raise BuildCannotProgressException("")
 
 		return True
 
@@ -937,13 +1034,12 @@ class Raptor(object):
 			schema = "http://symbian.com/xml/build/log/1_0.xsd"
 
 			self.out.write("<buildlog sbs_version=\"%s\" xmlns=\"%s\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"%s %s\">\n"
-						   % (raptor_version.Version(), namespace, namespace, schema))
+						   % (raptor_version.fullversion(), namespace, namespace, schema))
 			self.logOpen = True
 		except Exception,e:
 			self.out = sys.stdout # make sure that we can actually get errors out.
 			self.logOpen = False
-			self.FatalError("Unable to open the output logs: %s" % str(e))
-
+			self.FatalError("<error>Unable to open the output logs: %s" % str(e))
 
 	def CloseLog(self):
 		if self.logOpen:
@@ -1019,28 +1115,11 @@ class Raptor(object):
 		if format:
 			self.out.write(format % extras)
 
-
-	def MakeComponentGroup(self, cg):
-		if not self.maker:
-			self.maker = raptor_make.MakeEngine(self)
-
-		if self.maker == None:
-			self.Error("No make engine present")
-			return None
-
-		makefile = cg.CreateMakefile(self.topMakefile, self.maker, self.systemDefinitionOrderLayers)
-		if (not self.noBuild and makefile is not None) \
-				or self.doParallelParsing:
-			# run the build for a single group of specs
-			self.Make(makefile)
-		else:
-			self.Info("No build performed for %s" % cg.name)
-
-	def GetComponentGroupsFromCLI(self):
-		"""Returns the list of componentGroups as specified by the
+	def GetLayersFromCLI(self):
+		"""Returns the list of layers as specified by the
 		   commandline interface to Raptor e.g. parameters
 		   or the current directory"""
-		componentGroups=[]
+		layers=[]
 		# Look for bld.infs or sysdefs in the current dir if none were specified
 		if self.systemDefinitionFile == None and len(self.commandlineComponents) == 0:
 			if not self.preferBuildInfoToSystemDefinition:
@@ -1049,38 +1128,39 @@ class Raptor(object):
 				if self.systemDefinitionFile == None:
 					aComponent = self.FindComponentIn(cwd)
 					if aComponent:
-						componentGroups.append(ComponentGroup('default',[aComponent]))
+						layers.append(Layer('default',[aComponent]))
 			else:
 				aComponent = self.FindComponentIn(cwd)
 				if aComponent is None:
 					self.systemDefinitionFile = self.FindSysDefIn(cwd)
 				else:
-					componentGroups.append(ComponentGroup('default',[aComponent]))
+					layers.append(Layer('default',[aComponent]))
 
-			if len(componentGroups) <= 0 and  self.systemDefinitionFile == None:
+			if len(layers) <= 0 and  self.systemDefinitionFile == None:
 				self.Warn("No default bld.inf or system definition file found in current directory (%s)", cwd)
 
 		# If we now have a System Definition to parse then get the layers of components
 		if self.systemDefinitionFile != None:
 			systemModel = raptor_xml.SystemModel(self, self.systemDefinitionFile, self.systemDefinitionBase)
-			componentGroups = self.GatherSysModelLayers(systemModel, self.systemDefinitionRequestedLayers)
+			layers = self.GatherSysModelLayers(systemModel, self.systemDefinitionRequestedLayers)
 			
 		# Now get components specified on a commandline - build them after any
 		# layers in the system definition.
 		if len(self.commandlineComponents) > 0:
-			componentGroups.append(ComponentGroup('commandline',self.commandlineComponents))
+			layers.append(Layer('commandline',self.commandlineComponents))
 
 		# If we aren't building components in order then flatten down
 		# the groups
 		if not self.systemDefinitionOrderLayers:
 			# Flatten the layers into one group of components if
 			# we are not required to build them in order.
-			newcg = ComponentGroup("all")
-			for cg in componentGroups:
-				newcg.extend(cg)
-			componentGroups = [newcg]
+			newcg = Layer("all")
+			for cg in layers:
+				for c in cg:
+					newcg.add(c)
+			layers = [newcg]
 
-		return componentGroups
+		return layers
 
 	def Build(self):
 
@@ -1102,20 +1182,21 @@ class Raptor(object):
 
 			# find out what configurations to build
 			self.AssertBuildOK()
-			buildUnitsToBuild = set()
 			buildUnitsToBuild = self.GetBuildUnitsToBuild(self.configNames)
 
+			self.buildUnitsToBuild = buildUnitsToBuild
+
 			# find out what components to build, and in what way
-			componentGroups = []
+			layers = []
 
 			self.AssertBuildOK()
 			if len(buildUnitsToBuild) >= 0:
-				componentGroups = self.GetComponentGroupsFromCLI()
+				layers = self.GetLayersFromCLI()
 
-			componentCount = reduce(lambda x,y : x + y, [len(cg) for cg in componentGroups])
+			componentCount = reduce(lambda x,y : x + y, [len(cg) for cg in layers])
 
 			if not componentCount > 0:
-				raise BuildCompleteException("No components to build.")
+				raise BuildCannotProgressException("No components to build.")
 
 			# check the configurations (tools versions)
 			self.AssertBuildOK()
@@ -1127,31 +1208,30 @@ class Raptor(object):
 
 			self.AssertBuildOK()
 
+			# Setup a make engine.
+			if not self.maker:
+				self.maker = raptor_make.MakeEngine(self)
+				if self.maker == None:
+					self.Error("No make engine present")
 
-			# if self.doParallelParsing and not (len(componentGroups) == 1 and len(componentGroups[0]) == 1):
+			self.AssertBuildOK()
+
+			# if self.doParallelParsing and not (len(layers) == 1 and len(layers[0]) == 1):
 			if self.doParallelParsing:
 				# Create a Makefile to parse components in parallel and build them
-				for cg in componentGroups:
-					cg.GenerateMetadataSpecs(buildUnitsToBuild)
-					self.MakeComponentGroup(cg)
-				if self.noBuild:
-					self.Info("No build performed")
+				for l in layers:
+					l.meta_realise(self)
 			else:
 				# Parse components serially, creating one set of makefiles
 				# create non-component specs
-				self.AssertBuildOK()
-				generic_specs = self.GenerateGenericSpecs(buildUnitsToBuild)
+				self.generic_specs = self.GenerateGenericSpecs(buildUnitsToBuild)
 
 				self.AssertBuildOK()
-				for cg in componentGroups:
+				for l in layers:
 					# create specs for a specific group of components
-					cg.GenerateSpecs(generic_specs, buildUnitsToBuild)
-					self.WriteMetadataDepsMakefile(cg)	
+					l.realise(self)
 					
-					# generate the makefiles for one group of specs
-					self.MakeComponentGroup(cg)
-
-		except BuildCompleteException,b:
+		except BuildCannotProgressException,b:
 			if str(b) != "":
 				self.Info(str(b))
 
@@ -1212,22 +1292,13 @@ def Main(argv):
 	# object which represents a build
 	b = Raptor.CreateCommandlineBuild(argv)
 
-	# allow all objects to log to the
-	# build they're being used in
-	global build
-	global log
-	build = b
-	log = b
-
-
-	result = b.Build()
-
-	return result
+	return b.Build()
 
 
 def DisplayBanner():
 	"""Stuff that needs printing out for every command."""
 	pass
+
 
 
 

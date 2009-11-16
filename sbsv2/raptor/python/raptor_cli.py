@@ -148,6 +148,7 @@ parser.add_option("--pp",action="store",dest="parallel_parsing",
 				help="""Controls how metadata (e.g. bld.infs) are parsed in Parallel.
 					Possible values are:
 					"on"  - Parse bld.infs in parallel (should be faster on clusters/multicore machines)
+					"slave" - used internally by Raptor 
 					"off" - Parse bld.infs serially 
 				     """)
 

@@ -20,13 +20,16 @@ import hashlib
 import os
 import random
 import raptor
-import raptor_data
 import raptor_utilities
 import raptor_version
+import raptor_data
 import re
 import subprocess
 import time
 from raptor_makefile import *
+import raptor_version
+import traceback
+import sys
 
 # raptor_make module classes
 
@@ -35,7 +38,6 @@ class MakeEngine(object):
 	def __init__(self, Raptor):
 		self.raptor = Raptor
 		self.valid = True
-		self.makefileset = None
 		self.descrambler = None
 		self.descrambler_started = False
 
@@ -53,7 +55,7 @@ class MakeEngine(object):
 					
 		# find the variant and extract the values
 		try:
-			units = avar.GenerateBuildUnits()
+			units = avar.GenerateBuildUnits(Raptor.cache)
 			evaluator = Raptor.GetEvaluator( None, units[0] , gathertools=True)
 
 			# shell
@@ -123,7 +125,7 @@ TALON_RECIPEATTRIBUTES:=\
  component='$$COMPONENT_NAME'\
  bldinf='$$COMPONENT_META' mmp='$$PROJECT_META'\
  config='$$SBS_CONFIGURATION' platform='$$PLATFORM'\
- phase='$$MAKEFILE_GROUP' source='$$SOURCE
+ phase='$$MAKEFILE_GROUP' source='$$SOURCE'
 export TALON_RECIPEATTRIBUTES TALON_SHELL TALON_TIMEOUT
 USE_TALON:=%s
 
@@ -148,7 +150,7 @@ SHELL:=%s
 
 include %s
 
-""" 		% (  raptor.name, raptor_version.Version(),
+""" 		% (  raptor.name, raptor_version.fullversion(),
 			 " ".join(raptor.hostplatform),
 			 raptor.hostplatform_dir,
 			 self.raptor.filesystem,
@@ -168,14 +170,17 @@ include %s
 		"""Generate a set of makefiles, or one big Makefile."""
 
 		if not self.valid:
-			return
+			return None
+
+		self.raptor.Debug("Writing Makefile '%s'" % (str(toplevel)))
 
 		self.toplevel = toplevel
 
 		# create the top-level makefiles
+		makefileset = None
 
 		try:
-			self.makefileset = MakefileSet(directory = str(toplevel.Dir()),
+			makefileset = MakefileSet(directory = str(toplevel.Dir()),
 										   selectors = self.selectors,
 										   filenamebase = str(toplevel.File()),
 										   prologue = self.makefile_prologue,
@@ -190,11 +195,10 @@ include %s
 			self.many = not self.raptor.writeSingleMakefile
 
 			# add a makefile for each spec under each config
-			config_makefileset = self.makefileset
-
+			config_makefileset = makefileset
 			for c in configs:
 				if self.many:
-					config_makefileset = self.makefileset.createChild(c.name)
+					config_makefileset = makefileset.createChild(c.name)
 
 				# make sure the config_wide spec item is put out first so that it
 				# can affect everything.
@@ -207,16 +211,22 @@ include %s
 						ordered_specs.append(s)
 
 				if config_wide_spec is not None:
-					config_wide_spec.Configure(c)
+					config_wide_spec.Configure(c, cache = self.raptor.cache)
 					self.WriteConfiguredSpec(config_makefileset, config_wide_spec, c, True)
 
 				for s in ordered_specs:
-					s.Configure(c)
+					s.Configure(c, cache = self.raptor.cache)
 					self.WriteConfiguredSpec(config_makefileset, s, c, False)
 
-			self.makefileset.close()
+			makefileset.close()
 		except Exception,e:
-			self.raptor.Error("Failed to write makefile '%s': %s" % (str(toplevel),str(e)))
+			tb = traceback.format_exc()
+			if not self.raptor.debugOutput:
+				tb=""
+			self.raptor.Error("Failed to write makefile '%s': %s : %s" % (str(toplevel),str(e),tb))
+			makefileset = None
+
+		return makefileset
 
 
 	def WriteConfiguredSpec(self, parentMakefileSet, spec, config, useAllInterfaces):
@@ -233,9 +243,10 @@ include %s
 		guard = None
 		if hasInterface:
 			# find the Interface (it may be a ref)
-			iface = spec.GetInterface()
+			try:
+				iface = spec.GetInterface(self.raptor.cache)
 
-			if iface == None:
+			except raptor_data.MissingInterfaceError, e:	
 				self.raptor.Error("No interface for '%s'", spec.name)
 				return
 
@@ -268,12 +279,12 @@ include %s
 				md5hash.update(value)
 
 			# parameters required by the interface
-			for p in iface.GetParams():
+			for p in iface.GetParams(self.raptor.cache):
 				val = evaluator.Resolve(p.name)
 				addparam(p.name,val,p.default)
 
 			# Use Patterns to fetch a group of parameters
-			for g in iface.GetParamGroups():
+			for g in iface.GetParamGroups(self.raptor.cache):
 				for k,v in evaluator.ResolveMatching(g.patternre):
 					addparam(k,v,g.default)
 
@@ -301,7 +312,7 @@ include %s
 
 		# generate the call to the FLM
 		if iface is not None:
-			makefileset.addCall(spec.name, config.name, iface.name, useAllInterfaces, iface.GetFLMIncludePath(), parameters, guard)
+			makefileset.addCall(spec.name, config.name, iface.name, useAllInterfaces, iface.GetFLMIncludePath(self.raptor.cache), parameters, guard)
 
 		# recursive includes
 
@@ -341,7 +352,7 @@ include %s
 				return False
 
 		# Save file names to a list, to allow the order to be reversed
-		fileName_list = list(self.makefileset.makefileNames())
+		fileName_list = list(makefileset.makefileNames())
 
 		# Iterate through args passed to raptor, searching for CLEAN or REALLYCLEAN
 		clean_flag = False
@@ -401,7 +412,7 @@ include %s
 
 			# targets go at the end, if the makefile supports them
 			addTargets = self.raptor.targets[:]
-			ignoreTargets = self.makefileset.ignoreTargets(makefile)
+			ignoreTargets = makefileset.ignoreTargets(makefile)
 			if addTargets and ignoreTargets:
 				for target in self.raptor.targets:
 					if re.match(ignoreTargets, target):
@@ -409,6 +420,9 @@ include %s
 
 			if addTargets:
 				command += " " + " ".join(addTargets)
+
+			# Substitute the makefile name for any occurrence of #MAKEFILE#
+			command = command.replace("#MAKEFILE#", str(makefile))
 
 			self.raptor.Info("Executing '%s'", command)
 
@@ -496,7 +510,7 @@ include %s
 			looking = (os.system(command) != 0)
 			tries += 1
 		if looking:
-			self.raptor.Error("Failed to initilaise the talon shell for this build")
+			self.raptor.Error("Failed to initialise the talon shell for this build")
 			self.talonctl = ""
 			return False
 		

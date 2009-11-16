@@ -33,9 +33,7 @@ $(ALLTARGET):: $(RELEASEABLES)
 
 EXPORT::
 
-
 CLEANTARGETS:=
-CLEANEXPORTS:=
 RELEASEEXPORTS:=
 CREATABLEPATHS:=$(OUTPUTPATH) $(EXPORTPATH)
 
@@ -60,7 +58,6 @@ $(EXPORTEDSTRINGTABLEHEADER): $(STRINGTABLEHEADER)
 	$(GNUCP) '$(STRINGTABLEHEADER)' '$$@'  \
 	$(call endrule,exportstringtableheader) 
 
-CLEANEXPORTS:=$(EXPORTEDSTRINGTABLEHEADER)
 RELEASEEXPORTS:=$(EXPORTEDSTRINGTABLEHEADER)
 endef
 
@@ -83,24 +80,9 @@ $(if $(EXPORTPATH),,$(eval EXPORT:: $(STRINGTABLEHEADER)))
 $(eval $(genstringtable))
 
 
-## Clean up and log releasables (using eval to avoid target specific variables)
-$(eval $(call GenerateStandardCleanTarget,$(CLEANTARGETS),$(CREATABLEPATHS),))
-$(eval $(call GenerateStandardCleanTarget,$(CLEANEXPORTS),,CLEANEXPORT))
+## Clean up and log releasables
+$(call raptor_clean,$(CLEANTARGETS))
 # make the output directories while reading makefile - some build engines prefer this
 $(call makepath,$(CREATABLEPATHS))
-$(eval $(call whatmacro,$(RELEASEEXPORTS),WHATSTRINGTABLE))
+$(call raptor_release,$(RELEASEEXPORTS),STRINGTABLE)
 
-########################
-# SBSv1 example:
-########################
-# GENERATED_FILES= \
-#         $(EPOCROOT)epoc32\build\generated\http\WspParamConstants.cpp \
-#         $(EPOCROOT)epoc32\include\WspParamConstants.h
-# 
-# $(EPOCROOT)epoc32\build\generated\http\WspParamConstants.cpp : ..\strings\WspParamConstants.st
-#         perl -S ecopyfile.pl ..\strings\WspParamConstants.st $(EPOCROOT)epoc32\build\generated\http\WspParamConstants.st
-#         perl $(EPOCROOT)epoc32\tools\stringtable.pl $(EPOCROOT)epoc32\build\generated\http\WspParamConstants.st
-# 
-# $(EPOCROOT)epoc32\include\WspParamConstants.h : $(EPOCROOT)epoc32\build\generated\http\WspParamConstants.cpp
-#         perl -S ecopyfile.pl $(EPOCROOT)epoc32\build\generated\http\WspParamConstants.h $(EPOCROOT)epoc32\include\WspParamConstants.h
-# 

@@ -279,9 +279,6 @@ ifneq ($(IMPORTLIBTARGET_DSO),) # check that we haven't tried to specify this ta
 		$(call startrule,importlibtarget_unfrozen,FORCESUCCESS) \
 		$(GNUCP) $$(call dblquote,$$<) $$(call dblquote,$$@) \
 		$(call endrule,importlibtarget_unfrozen)
-
-       CLEANTARGETS:=$$(CLEANTARGETS) $(IMPORTLIBTARGET_DSO)
-
     endef
 
     define importlibtarget_unfrozen_ver
@@ -289,8 +286,6 @@ ifneq ($(IMPORTLIBTARGET_DSO),) # check that we haven't tried to specify this ta
 		$(call startrule,importlibversioned_unfrozen,FORCESUCCESS) \
 		$(GNUCP) "$(GENERATED_DSO)" "$$@" \
 		$(call endrule,importlibversioned_unfrozen)
-
-      CLEANTARGETS:=$$(CLEANTARGETS) $(IMPORTLIBTARGET_DSO)
     endef
 
     ifeq ($(EXPLICITVERSION),)
@@ -307,8 +302,6 @@ ifneq ($(IMPORTLIBTARGET_DSO),) # check that we haven't tried to specify this ta
 	   $(call startrule,importlibtarget,FORCESUCCESS) \
 	   $(GNUCP) "$$<" "$$@" \
 	   $(call endrule,importlibtarget)
-
-          CLEANTARGETS:=$$(CLEANTARGETS) $(IMPORTLIBTARGET_DSO)
       endef
 
       ifeq ($(EXPLICITVERSION),)
@@ -325,8 +318,6 @@ ifneq ($(IMPORTLIBTARGET_DSO),) # check that we haven't tried to specify this ta
 	 	  --dso=$$(call dblquote,$$@) 				   \
 	 	  --linkas=$(call dblquote,$(LINKASVERSIONED)) \
 	      $(call endrule,importlibversioned)
-
-              CLEANTARGETS:=$$(CLEANTARGETS) $(IMPORTLIBTARGETVERSIONED_DSO)
       endef
       $(eval $(importlibtargetversioned_func))
     endif #  ifneq ($(DEFFILE),)
@@ -335,7 +326,6 @@ endif #  ifneq ($(IMPORTLIBTARGET_DSO),)
 
 # ABIv1 .lib
 ifneq ($(IMPORTLIBTARGETVERSIONED_LIB),) # check that we haven't tried to specify this target already
-  CLEANTARGETS:=$(CLEANTARGETS) $(IMPORTLIBTARGETVERSIONED_LIB) $(IMPORTLIBTARGET_LIB)
 
   define abiv1_generatelib
 
@@ -534,7 +524,7 @@ $(ARTARGET): $(if $(MULTIFILE_ENABLED),$(MULTIFILEOBJECT),$(LINKOBJECTS)) $(STDC
 endef
 $(eval $(artarget_func))
 
-CLEANTARGETS:=$(CLEANTARGETS) $(VIAFILE) $(ARTARGET) $(if $(DUMPBCINFO),$(ARTARGET).elfdump,)
+CLEANTARGETS:=$(CLEANTARGETS) $(VIAFILE) $(if $(DUMPBCINFO),$(ARTARGET).elfdump,)
 endif
 
 
@@ -624,9 +614,7 @@ $(MAPFILE): $(LINK_TARGET)
 endef
 $(eval $(linktarget_func))
 
-CLEANTARGETS:=$(CLEANTARGETS) $(LINK_TARGET) $(if $(GENERATELINKERFEEDBACK),$(FEEDBACKFILE)) $(if $(MULTIFILE_ENABLED),$(MULTIFILEOBJECT))
-CLEANTARGETS:=$(CLEANTARGETS) $(VIAFILE)
-CLEANTARGETS:=$(CLEANTARGETS) $(MAPFILE)
+CLEANTARGETS:=$(CLEANTARGETS) $(VIAFILE) $(if $(GENERATELINKERFEEDBACK),$(FEEDBACKFILE)) $(if $(MULTIFILE_ENABLED),$(MULTIFILEOBJECT))
 WHATRELEASE:=$(WHATRELEASE) $(MAPFILE)
 
 endif # if TARGETTYPE lib
@@ -1132,7 +1120,6 @@ ifneq ($(filter ROMFILE,$(call uppercase,$(MAKECMDGOALS))),)
     PREVIOUSVARIANTTYPE:=$(VARIANTTYPE)
 
     WHATRELEASE:=$(WHATRELEASE) $(ROMFILENAME)
-    CLEANTARGETS:=$(CLEANTARGETS) $(ROMFILENAME)
 endif
 
 # Deal with test code batch files generation.
@@ -1143,7 +1130,6 @@ ifneq ($(TESTPATH),)
     BATCHFILE_CREATED_$(EPOCROOT)/epoc32/data/z/test/$(MODULE)/$(VARIANTPLATFORM).$(TESTPATH):=1
     TARGET_CREATED_$(EPOCROOT)/epoc32/data/z/test/$(MODULE)/$(VARIANTPLATFORM).$(TESTPATH)_$(TARGET):=1
     WHATRELEASE:=$(WHATRELEASE) $(EPOCROOT)/epoc32/data/z/test/$(MODULE)/$(VARIANTPLATFORM).$(TESTPATH)
-    CLEANTARGETS:=$(CLEANTARGETS) $(EPOCROOT)/epoc32/data/z/test/$(MODULE)/$(VARIANTPLATFORM).$(TESTPATH)
 endif
 
 ###################### End of Build ROMFILE target ######################
@@ -1183,10 +1169,10 @@ endif # FEATUREVARIANTNAME != ""
 $(call makepath,$(CREATABLEPATHS))
 
 ## Clean up
-$(eval $(call GenerateStandardCleanTarget,$(CLEANTARGETS) ,$(CREATABLEPATHS),))
+$(call raptor_clean,$(CLEANTARGETS))
 
-# For the abld -what target
-$(eval $(call whatmacro,$(filter-out %.sym,$(WHATRELEASE)),WHATARMV5))
+# For the --what option and the log file
+$(call raptor_release,$(filter-out %.sym,$(WHATRELEASE)))
 
 endif # FEATUREVARIANTNAME=="" or FEATUREVARIANT==1
 

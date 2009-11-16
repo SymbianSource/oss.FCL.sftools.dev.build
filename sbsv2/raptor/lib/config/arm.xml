@@ -119,6 +119,9 @@
 	<!-- GCCE 4.3.3 aliases -->
 	<alias name="armv5_urel_gcce4_3_3" meaning="arm.v5.urel.gcce4_3_3"/>
 	<alias name="armv5_udeb_gcce4_3_3" meaning="arm.v5.udeb.gcce4_3_3"/>
+
+	<alias name="armv5_urel_gcce4_4_1" meaning="arm.v5.urel.gcce4_4_1"/>
+	<alias name="armv5_udeb_gcce4_4_1" meaning="arm.v5.udeb.gcce4_4_1"/>
 	
 	<alias name="armv6_urel" meaning="arm.v6.urel.rvct2_2"/>
 	<alias name="armv6_udeb" meaning="arm.v6.udeb.rvct2_2"/>

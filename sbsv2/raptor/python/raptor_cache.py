@@ -143,7 +143,6 @@ class Cache:
 			self.WarnDuplicate("group", self.groups[obj.name], obj)
 			return
 
-		obj.SetOwner(self.raptor)
 		self.groups[obj.name] = obj
 
 	def FindNamedAlias(self, name):
@@ -154,7 +153,6 @@ class Cache:
 			self.WarnDuplicate("alias", self.aliases[obj.name], obj)
 			return
 
-		obj.SetOwner(self.raptor)
 		self.aliases[obj.name] = obj
 
 
@@ -176,7 +174,6 @@ class Cache:
 			self.WarnDuplicate("interface", self.interfaces[cacheID][obj.name], obj)
 			return
 
-		obj.SetOwner(self.raptor)
 		obj.cacheID = cacheID
 		self.interfaces[cacheID][obj.name] = obj
 
@@ -192,7 +189,6 @@ class Cache:
 				self.WarnDuplicate("variant", self.variants[obj.name], obj)
 				return
 
-			obj.SetOwner(self.raptor)
 			self.variants[obj.name] = obj
 
 

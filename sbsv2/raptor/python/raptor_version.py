@@ -15,6 +15,12 @@
 # raptor version information module
 #
 
-def Version():
+version=(2,11,0,"2009-11-16","pp-preview")
+
+def numericversion():
 	"""Raptor version string"""
-	return "2.10.2 [2009-11-12 sf release]"
+	return "%d.%d.%d" % version[:3]
+
+def fullversion():
+	"""Raptor version string"""
+	return "%d.%d.%d [%s %s]" % version

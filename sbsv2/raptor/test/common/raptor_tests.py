@@ -179,6 +179,11 @@ def clean_epocroot():
 
 def fix_id(input_id):
 	return input_id.zfill(4)
+
+
+def grep(file, string):
+	return
+
 	
 # Test classes ################################################################
 
@@ -186,13 +191,15 @@ class SmokeTest(object):
 	"""Base class for Smoke Test objects.
 	
 	Each test is defined (minimally) by,
-	1) a raptor command-line
-	2) a list of target files that should get built
+	1) an ID number as a string
+	2) a name
+	3) a raptor command-line
+	4) some parameters to check the command results against
 
 	The run() method will,
 	1) delete all the listed target files
 	2) execute the raptor command
-	3) check that the target files were created
+	3) check that the test results match the test parameters
 	4) count the warnings and errors reported
 	"""
 	
@@ -202,7 +209,7 @@ class SmokeTest(object):
 
 	def __init__(self):
 		
-		self.id = 0
+		self.id = "0"
 		self.name = "smoketest"
 		self.description = ""
 		self.command = "sbs --do_what_i_want"
@@ -261,23 +268,24 @@ class SmokeTest(object):
 			self.result = SmokeTest.FAIL
 		
 		# print the result of this run()
-		self.print_result(True)
+		self.print_result(internal = True)
 		
 		# if a previous run() failed then the overall result is a FAIL
 		if previousResult == SmokeTest.FAIL:
 			self.result = SmokeTest.FAIL
 	
-	def print_result(self, internal = False, value = ""):
+	def print_result(self, value = "", internal = False):
 		# the test passed :-)
 		
 		result = self.result
+			
+		string = ""
+		if not internal:
+			string += "\n" + self.name + ": "
 		
-		if value != "":
-			print value
+		if value:
+			print string + value
 		else:
-			string = ""
-			if not internal:
-				string += "\n" + self.name + ": "
 			if result == SmokeTest.PASS:
 				string += "PASSED"
 			elif result == SmokeTest.FAIL:
@@ -366,19 +374,27 @@ class SmokeTest(object):
 		# Any environment settings specific to this test
 		shellenv = os.environ.copy()
 		for ev in self.environ:
-			shellenv[ev] = self.environ[ev]	
+			shellenv[ev] = self.environ[ev]
 
 		if self.usebash:
 			shellpath = shellenv['PATH']
+			
+			if 'SBS_SHELL' in os.environ:
+				BASH = os.environ['SBS_SHELL']
+			else:
+				if self.onWindows:
+					if 'SBS_CYGWIN' in shellenv:
+						BASH = ReplaceEnvs("$(SBS_CYGWIN)/bin/bash.exe")
+					else:
+						BASH = ReplaceEnvs("$(SBS_HOME)/win32/cygwin/bin/bash.exe")
+				else:
+					BASH = ReplaceEnvs("$(SBS_HOME)/$(HOSTPLATFORM_DIR)/bin/bash")
+				
 			if self.onWindows:
 				if 'SBS_CYGWIN' in shellenv:
 					shellpath = ReplaceEnvs("$(SBS_CYGWIN)/bin") + ";" + shellpath
-					BASH=ReplaceEnvs("$(SBS_CYGWIN)/bin/bash.exe")
 				else:
 					shellpath = ReplaceEnvs("$(SBS_HOME)/win32/cygwin/bin") + ";" + shellpath
-					BASH=ReplaceEnvs("$(SBS_HOME)/win32/cygwin/bin/bash.exe")
-			else:
-				BASH=ReplaceEnvs("$(SBS_HOME)/$(HOSTPLATFORM_DIR)/bin/bash")
 
 			shellenv['SBSMAKEFILE']=ReplaceEnvs(self.makefile())
 			shellenv['SBSLOGFILE']=ReplaceEnvs(self.logfile())
@@ -645,5 +661,6 @@ class AntiTargetSmokeTest(SmokeTest):
 			else:
 				self.antitargets.append(["$(EPOCROOT)/epoc32/build/"+fragment+"/"+x for x in t])
 		return
+
 	
 # the end

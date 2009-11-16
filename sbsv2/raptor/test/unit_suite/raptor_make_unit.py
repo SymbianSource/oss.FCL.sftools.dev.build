@@ -71,14 +71,12 @@ class TestRaptorMake(unittest.TestCase):
 		svar.AddOperation(raptor_data.Set("EXEPARAM1", "parameter 1"))
 		svar.AddOperation(raptor_data.Set("EXEPARAM2", "parameter 2"))
 		spec.AddVariant(svar)
-		spec.SetOwner(aRaptor)
 		
 		# use a minimal Configuration
 		conf = raptor_data.Variant("myConfig")
 		cvar = raptor_data.Variant("CVAR")
 		cvar.AddOperation(raptor_data.Set("EXEPARAM3", "parameter 3"))
 		bldunit = raptor_data.BuildUnit("myConfig.CVAR",[conf,cvar])
-		conf.SetOwner(aRaptor)
 		
 		# delete any old Makefiles
 		m1 = testDir.Append("Makefile")
@@ -148,7 +146,6 @@ class TestRaptorMake(unittest.TestCase):
 		#
 		top1.AddChildSpecification(top1c1)
 		top1.AddChildSpecification(top1c2)
-		top1.SetOwner(aRaptor)
 		
 		# top 2 has no sub-nodes
 		top2 = raptor_data.Specification("top2")
@@ -157,7 +154,6 @@ class TestRaptorMake(unittest.TestCase):
 		top2v.AddOperation(raptor_data.Set("EXEPARAM1", "top2 p1"))
 		top2.AddVariant(top2v)
 		#
-		top2.SetOwner(aRaptor)
 		
 		# use a pair of minimal Configurations
 		
@@ -165,13 +161,11 @@ class TestRaptorMake(unittest.TestCase):
 		c1var = raptor_data.Variant()
 		c1var.AddOperation(raptor_data.Set("EXEPARAM2", "conf1 p2"))
 		buildunit1 = raptor_data.BuildUnit("conf1.c1var",[conf1,c1var])
-		conf1.SetOwner(aRaptor)
 		
 		conf2 = raptor_data.Variant("conf2")
 		c2var = raptor_data.Variant()
 		c2var.AddOperation(raptor_data.Set("EXEPARAM2", "conf2 p2"))
 		buildunit2 = raptor_data.BuildUnit("conf2.c2var",[conf2,c2var])
-		conf2.SetOwner(aRaptor)
 		
 		# delete any old Makefiles
 		makefiles = [testDir.Append("Makefile")]
@@ -205,6 +199,7 @@ class TestRaptorMake(unittest.TestCase):
 		aRaptor.LoadCache()
 		aRaptor.pruneDuplicateMakefiles = False
 		aRaptor.writeSingleMakefile = False
+		aRaptor.debugOutput = True
 		
 		# find the test directory
 		testDir = aRaptor.home.Append("test", "tmp")
@@ -258,7 +253,6 @@ class TestRaptorMake(unittest.TestCase):
 		#
 		top.Else.AddChildSpecification(childF)
 		
-		top.SetOwner(aRaptor)
 		
 		# Configurations
 		
@@ -267,42 +261,36 @@ class TestRaptorMake(unittest.TestCase):
 		confAv.AddOperation(raptor_data.Set("SWITCH", "confA switch"))
 		confAv.AddOperation(raptor_data.Set("TOGGLE", "confA toggle"))
 		b1 = raptor_data.BuildUnit("confA.confAv",[confA,confAv])
-		confA.SetOwner(aRaptor)
 		
 		confB = raptor_data.Variant("confB")	# hit
 		confBv = raptor_data.Variant()
 		confBv.AddOperation(raptor_data.Set("SWITCH", "confB switch"))
 		confBv.AddOperation(raptor_data.Set("TOGGLE", "confB toggle"))
 		b2 = raptor_data.BuildUnit("confB.confBv",[confB,confBv])
-		confB.SetOwner(aRaptor)
 		
 		confC = raptor_data.Variant("confC")
 		confCv = raptor_data.Variant()
 		confCv.AddOperation(raptor_data.Set("SWITCH", "confC switch"))
 		confCv.AddOperation(raptor_data.Set("TOGGLE", "confC toggle"))
 		b3 = raptor_data.BuildUnit("confC.confCv",[confC,confCv])
-		confC.SetOwner(aRaptor)
 		
 		confD = raptor_data.Variant("confD")
 		confDv = raptor_data.Variant()
 		confDv.AddOperation(raptor_data.Set("SWITCH", "ARM"))	# hit
 		confDv.AddOperation(raptor_data.Set("TOGGLE", "confD toggle"))
 		b4 = raptor_data.BuildUnit("confD.confDv",[confD,confDv])
-		confD.SetOwner(aRaptor)
 		
 		confE = raptor_data.Variant("confE")
 		confEv = raptor_data.Variant()
 		confEv.AddOperation(raptor_data.Set("SWITCH", "confE switch"))
 		confEv.AddOperation(raptor_data.Set("TOGGLE", "B"))		# hit
 		b5 = raptor_data.BuildUnit("confE.confEv",[confE,confEv])
-		confE.SetOwner(aRaptor)
 		
 		confF = raptor_data.Variant("confF")
 		confFv = raptor_data.Variant()
 		confFv.AddOperation(raptor_data.Set("SWITCH", "confF switch"))
 		confFv.AddOperation(raptor_data.Set("TOGGLE", "confF toggle"))
 		b6 = raptor_data.BuildUnit("confF.confFv",[confF,confFv])
-		confF.SetOwner(aRaptor)
 		
 		# delete any old Makefiles
 		makefiles = [testDir.Append("Makefile")]
@@ -322,7 +310,7 @@ class TestRaptorMake(unittest.TestCase):
 		
 		# create new Makefiles
 		maker = raptor_make.MakeEngine(aRaptor)
-		maker.Write(makefiles[0], [top], [b1,b2,b3,b4,b5,b6])
+		maker.Write(makefiles[0], specs=[top], configs=[b1,b2,b3,b4,b5,b6])
 		
 		# test and clean
 		self.failUnless(self.checkMakefiles(makefiles))
@@ -353,25 +341,19 @@ class TestRaptorMake(unittest.TestCase):
 		
 		f1 = raptor_data.Filter("f1")
 		f1.SetConfigCondition("c1")
-		f1.SetOwner(aRaptor)
 		
 		f2 = raptor_data.Filter("f2")
 		f2.SetConfigCondition("c2")
 		f2.SetInterface(iface)
-		f2.SetOwner(aRaptor)
 		
 		f3 = raptor_data.Filter("f3")
 		f3.SetConfigCondition("c3")
 		f3.SetInterface(iface)
-		f3.SetOwner(aRaptor)
 		
 		# Configurations
 		c1 = raptor_data.Variant("c1")
-		c1.SetOwner(aRaptor)
 		c2 = raptor_data.Variant("c2")
-		c2.SetOwner(aRaptor)
 		c3 = raptor_data.Variant("c3")
-		c3.SetOwner(aRaptor)
 
 		# Build Units
 		b1 = raptor_data.BuildUnit("c1",[c1])
