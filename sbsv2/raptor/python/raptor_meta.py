@@ -1450,7 +1450,7 @@ class MMPRaptorBackend(MMPBackend):
 
 				# add in the minor number
 				minor = 0
-				if len(version) >  1:
+				if len(version) >  1 and version[2] is not None:
 					minor = int(version[2],10)
 
 				self.__versionhex = "%04x%04x" % (major, minor)
