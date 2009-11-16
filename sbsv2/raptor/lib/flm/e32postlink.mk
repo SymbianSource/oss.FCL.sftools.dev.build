@@ -125,7 +125,7 @@ $(E32TARGET): $(LINK_TARGET) $(POSTLINKDEFFILE) $(ELF2E32) $(if $(HAVE_ORDERONLY
 	    --uncompressed, \
 	    $(if $(INFLATECOMPRESS),--compressionmethod inflate,$(if $(BYTEPAIRCOMPRESS),--compressionmethod bytepair,))) \
 	  --libpath="$(call concat,$(PATHSEP)$(CHAR_SEMIC),$(strip $(RUNTIME_LIBS_PATH) $(STATIC_LIBS_PATH)))" \
-	  $(if $(SAVESPACE),$(if $(EXPORTUNFROZEN),,;$(GNURM) -rf $(INTERMEDIATEPATH); true)) \
+	  $(if $(SAVESPACE),$(if $(EXPORTUNFROZEN),,&& { $(GNURM) -rf $(INTERMEDIATEPATH); true; })) \
 	$(call endrule,postlink)
 endef
 $(eval $(e32postlink))
