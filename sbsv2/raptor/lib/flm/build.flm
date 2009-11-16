@@ -34,7 +34,7 @@ endif
 define doexports
 PP_EXPORTS::
 	$(call startrule,makefile_generation_exports) \
-	$(SBS) --pp=slave --toolcheck=off --export-only $(component_list) $(config_list) -f- -m $(MAKEFILE_PATH).exports $(cli_options)  \
+	$(SBS) --pp=slave --toolcheck=off --export-only $(component_list) $(config_list) -f- -m $(MAKEFILE_PATH).exports $(CLI_OPTIONS)  \
 	$(call endrule,makefile_generation_exports)
 
 CLEANTARGETS:=$$(CLEANTARGETS) $(MAKEFILE_PATH).exports 
