@@ -25,8 +25,17 @@ if [[ "$packopt" == "s" ]]; then
 packtype=source
 fi
 
+
 echo "Raptor packager for Linux"
-export PACKAGER_HOME="$PWD"
+
+
+# Calculate SBS_HOME from where this script is started
+temp=$0
+SBS_HOME=$(cd ${temp%/*} && echo $PWD)
+export SBS_HOME=${SBS_HOME%/util/install-linux}
+
+
+export PACKAGER_HOME="$SBS_HOME/util/install-linux"
 
 echo "SBS_HOME is $SBS_HOME - this is the version that will be packaged."
 

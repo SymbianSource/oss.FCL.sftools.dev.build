@@ -17,6 +17,13 @@
 
 SHELL:=bash
 
+
+SBS_HOME=$(abspath $(dir $(word 1,$(MAKEFILE_LIST)))/..)
+export SBS_HOME
+
+$(info SBS_HOME=$(SBS_HOME))
+
+
 .PHONY:: all
 all::
 
