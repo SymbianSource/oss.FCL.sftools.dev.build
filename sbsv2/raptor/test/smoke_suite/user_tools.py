@@ -40,7 +40,7 @@ def run():
 		
 		t.command = "sbs -b smoke_suite/test_resources/simple/bld.inf -c armv5_urel" \
 				+ " -n --toolcheck off -f " + t.logfile() + " -m " + t.makefile() \
-				+ " && $(__CYGWIN__)/bin/grep.exe -ir 'TALON_SHELL:=C:/cygwin/bin/sh.exe' " + t.makefile() + ".default"
+				+ " && $(__CYGWIN__)/bin/grep.exe -ir 'TALON_SHELL:=C:/cygwin/bin/sh.exe' " + t.makefile() + "_all.default"
 				
 		t.mustmatch = [
 				"TALON_SHELL:=C:/cygwin/bin/sh.exe"

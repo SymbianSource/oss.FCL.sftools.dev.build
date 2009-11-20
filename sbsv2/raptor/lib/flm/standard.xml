@@ -5,11 +5,12 @@
 		<param name='ALWAYS_BUILD_AS_ARM' default=''/>
 		<param name='SET_ARMINC' default=''/>
 		<param name='ARMLIBS' default=''/>
-		<param name='ARMFPU' default='softvfp'/>
-		<param name='POSTLINKFPU' default='softvfp'/>
+		<param name='ARMFPU' default=''/>
 		<param name='ARMRT' default=''/>
+		<param name='BYTEPAIRCOMPRESSTARGET' default=''/>
 		<param name='TESTPATH' default=''/>
 		<param name='CAPABILITY'/>
+		<param name='COMPRESSTARGET' default=''/>
 		<param name='CPPONLYOPTION' default='-E'/>
 		<param name='LIBRARY'/>
 		<param name='LIBRARY_DEBUG'/>
@@ -20,6 +21,7 @@
 		<param name='EXPORTUNFROZEN' default=''/>
 		<param name='FEEDBACK_OPTION' default='--feedback=' />
 		<param name='FIRSTLIB' default=''/>
+		<param name='INFLATECOMPRESSTARGET' default=''/>
 		<param name='LINKEROPTION_ARMCC' default=''/>
 		<param name='LISTING_OPTION' default='-S'/>
 		<param name='MMPDEFS' default=''/>
@@ -91,8 +93,9 @@
 		<param name='CFLAGS'/>
 		<param name='COMMANDFILE_OPTION'/>
 		<param name='COMPILE_ONLY_OPTION'/>
+		<param name='COMPILER_FPU_DEFAULT'/>
+		<param name='COMPILER_FPU_OPTION'/>
 		<param name='COMPILER_CIA_FLAGS'/>
-		<param name='COMPILER_FPU_FLAGS'/>
 		<param name='COMPILER_INTERWORK_DEFINES'/>
 		<param name='COMPILER_SYSTEM_INCLUDE_OPTION'/>
 		<param name='COMPILER_THUMB_DEFINES'/>
@@ -144,6 +147,8 @@
 		<param name='PERL'/>
 		<param name='PERTURBSTARTTIME'/>
 		<param name='PERTURBMSECS' default='500'/>
+		<param name='POSTLINKER_COMPRESSION_DEFAULT'/>
+		<param name='POSTLINKER_FPU_DEFAULT'/>
 		<param name='PREPDEF'/>
 		<param name='PREINCLUDE'/>
 		<param name='PREINCLUDE_OPTION'/>

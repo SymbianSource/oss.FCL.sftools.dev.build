@@ -57,8 +57,8 @@
 		<append name="CDEFS" value='__SUPPORT_CPP_EXCEPTIONS__ _UNICODE __SYMBIAN32__ __GCCE__ __EPOC32__ __MARM__ __EABI__ __PRODUCT_INCLUDE__="$(PRODUCT_INCLUDE)" $(MMPDEFS) $(ARMMACROS)'/>
 		<!-- Note that the intention of ABLD for CIA compilation seems to be "-S -Wa,-adln", although this doesn't work -->
 		<set name="COMPILER_CIA_FLAGS" value="-marm"/>
-		<set name="COMPILER_DEFINES" value="-D__GCCE__"/>
-		<set name="COMPILER_FPU_FLAGS" value="$(CC.OPT.SOFTVFP_MAYBE_VFPV2)$(CC.VAL.SOFTVFP_MAYBE_VFPV2)"/>		
+		<set name="COMPILER_DEFINES" value="-D__GCCE__"/>		
+		<set name="COMPILER_FPU_OPTION" value="-mfloat-abi="/>		
 		<set name="COMPILER_INTERWORK_DEFINES" value="__MARM_INTERWORK__"/>
 		<set name="COMPILER_SYSTEM_INCLUDE_OPTION" value="-I"/>
 		<set name="COMPILER_THUMB_DEFINES" value="__MARM_THUMB__"/>

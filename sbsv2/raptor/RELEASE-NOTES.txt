@@ -1,6 +1,20 @@
 
 Release Notes for Symbian Build System v2
 
+version 2.11.0
+
+New Features:
+Parallel parsing of meta-data
+New keyword APPLY for MMP files
+SAX filter plugin base-class
+
+Defect Fixes:
+DPDEF142895 Raptor does the wrong thing with the ARMFPU keyword
+DPDEF143020 The savespace variant overrides elf2e32's return code
+DPDEF143046 BYTEPAIRCOMPRESSTARGET and INFLATECOMPRESSTARGET not in FLM interface
+Improved error reporting for --check and --what
+
+
 version 2.10.2
 
 Defect Fixes:

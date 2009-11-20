@@ -115,28 +115,24 @@ def clean_epocroot():
 	This method walks through epocroot and cleans every file and folder that is
 	not present in the manifest file
 	"""
+	print "Cleaning Epocroot..."
 	all_files = {} # dictionary to hold all files
 	folders = [] # holds all unique folders in manifest
+	host_platform = os.environ["HOSTPLATFORM_DIR"]
 	try:
 		mani = "./epocroot/manifest"
 		manifest = open(ReplaceEnvs(mani), "r")
-		# This is a fast algorithm to read the manifest file
-		while 1:
-            # The file is close to 3000 lines.
-            # If this value changes, increment the number to include all lines
-			lines = manifest.readlines(3000)
-			if not lines:
-				break
-			for line in lines:
-				# Get rid of newline char and add to dictionary
-				all_files[line.rstrip("\n")] = True
-				# This bit makes a record of unique folders into a list
-				end = 0
-				while end != -1: # Look through the parent folders
-					end = line.rfind("/")
-					line = line[:end]
-					if line not in folders:
-						folders.append(line)
+		for line in manifest:
+			line = line.replace("$(HOSTPLATFORM_DIR)", host_platform)
+			# Get rid of newline char and add to dictionary
+			all_files[line.rstrip("\n")] = True
+			# This bit makes a record of unique folders into a list
+			end = 0
+			while end != -1: # Look through the parent folders
+				end = line.rfind("/")
+				line = line[:end]
+				if line not in folders:
+					folders.append(line)
 		# This algorithm walks through epocroot and handles files and folders
 		walkpath = "./epocroot"
 		for (root, dirs, files) in os.walk(ReplaceEnvs(walkpath), topdown =
@@ -176,6 +172,8 @@ def clean_epocroot():
 								traceback.print_tb(sys.exc_traceback)
 	except IOError,e:
 		print e
+	
+	print "Epocroot Cleaned"
 
 def fix_id(input_id):
 	return input_id.zfill(4)

@@ -1214,6 +1214,7 @@ class MMPRaptorBackend(MMPBackend):
 		self.__Raptor = aRaptor
 		self.__debug("-----+++++ %s " % aMmpfilename)
 		self.BuildVariant = raptor_data.Variant(name = "mmp")
+		self.ApplyVariants = []
 		self.ResourceVariants = []
 		self.BitmapVariants = []
 		self.StringTableVariants = []
@@ -1227,9 +1228,10 @@ class MMPRaptorBackend(MMPBackend):
 		self.__systeminclude = ""
 		self.__bitmapSourcepath = self.__sourcepath
 		self.__current_resource = ""
+		self.__resourceFiles = []
 		self.__pageConflict = []
 		self.__debuggable = ""
-		self.__resourceFiles = []
+		self.__compressionKeyword = ""
 		self.sources = []
 		self.capabilities = []
 
@@ -1357,6 +1359,14 @@ class MMPRaptorBackend(MMPBackend):
 		elif varname == 'FEATUREVARIANT':
 			self.BuildVariant.AddOperation(raptor_data.Set(varname,"1"))
 			self.featureVariant = True
+		elif varname in ['COMPRESSTARGET', 'NOCOMPRESSTARGET', 'INFLATECOMPRESSTARGET', 'BYTEPAIRCOMPRESSTARGET']:
+			if self.__compressionKeyword:
+				self.__Raptor.Warn("%s keyword in %s overrides earlier use of %s" % (varname, self.__currentMmpFile, self.__compressionKeyword))
+				self.BuildVariant.AddOperation(raptor_data.Set(self.__compressionKeyword,""))
+				self.__debug( "Set switch " + varname + " OFF")
+			self.BuildVariant.AddOperation(raptor_data.Set(varname,"1"))
+			self.__debug( "Set switch " + varname + " ON")
+			self.__compressionKeyword = varname
 		else:
 			self.__debug( "Set switch "+toks[0]+" ON")
 			self.BuildVariant.AddOperation(raptor_data.Set(prefix+varname, "1"))
@@ -1537,7 +1547,8 @@ class MMPRaptorBackend(MMPBackend):
 					toks1 = re.sub("[,'\[\]]", "", toks1).replace("//","/")
 				self.__debug("Set "+toks[0]+" to " + toks1)
 				self.BuildVariant.AddOperation(raptor_data.Set(varname,toks1))
-
+		elif varname=='APPLY':
+			self.ApplyVariants.append(toks[1])
 		else:
 			self.__debug("Set "+toks[0]+" to " + str(toks[1]))
 			self.BuildVariant.AddOperation(raptor_data.Set(varname,"".join(toks[1])))
@@ -3154,6 +3165,16 @@ class MetaReader(object):
 			# now we have something worth adding to the component
 			mmpSpec.AddVariant(var)
 			componentNode.AddChild(mmpSpec)
+			
+			# if there are APPLY variants then add them to the mmpSpec too
+			for applyVar in backend.ApplyVariants:
+				try:
+					mmpSpec.AddVariant(self.__Raptor.cache.FindNamedVariant(applyVar))
+				except KeyError:
+					self.__Raptor.Error("APPLY unknown variant '%s' in %s",
+								        applyVar,
+								        str(mmpFileEntry.filename),
+								        bldinf=str(bldInfFile))
 
 			# resources, stringtables and bitmaps are sub-nodes of this project
 			# (do not add these for feature variant builds)

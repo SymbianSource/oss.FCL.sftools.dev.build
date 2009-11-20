@@ -17,10 +17,10 @@
 from raptor_tests import SmokeTest
 
 def run():
-	result = SmokeTest.PASS
 	t = SmokeTest()
 	t.description = "This testcase tests all mmp keywords including new implementation of 'paged/unpaged code/data'"
 	t.usebash = True
+	
 	t.id = "75a"
 	t.name = "mmp_1"
 	t.command = "sbs -b smoke_suite/test_resources/mmp/mmp1/group/bld.inf -c armv5 -f-"
@@ -45,8 +45,6 @@ def run():
 		".*armlink.*--verbose.*"
 	]
 	t.run()
-	if t.result == SmokeTest.FAIL:
-		result = SmokeTest.FAIL
 
 	t.id = "75b"
 	t.name = "mmp_2"
@@ -72,9 +70,6 @@ def run():
 	]
 	t.warnings = 2
 	t.run()
-	if t.result == SmokeTest.FAIL:
-		result = SmokeTest.FAIL
-	
 	
 	t.id = "75c"
 	t.name = "mmp_3"
@@ -117,9 +112,6 @@ def run():
 	t.mustnotmatch = []
 	t.warnings = 0
 	t.run()
-	if t.result == SmokeTest.FAIL:
-		result = SmokeTest.FAIL
-	
 	
 	t.id = "75d"
 	t.name = "mmp_4"
@@ -167,8 +159,6 @@ def run():
 		])
 	t.mustmatch = []
 	t.run()
-	if t.result == SmokeTest.FAIL:
-		result = SmokeTest.FAIL
 	
 	# Test keywords: version, firstlib, nocompresstarget
 	t.id = "75e"
@@ -189,8 +179,6 @@ def run():
 		"fuzzlib_lib/armv5/urel/uc_exe_.o",
 		])
 	t.run()
-	if t.result == SmokeTest.FAIL:
-		result = SmokeTest.FAIL
 
 	t.id = "75f"
 	t.name = "mmp_6"
@@ -199,15 +187,11 @@ def run():
 		"$(EPOCROOT)/epoc32/release/armv5/udeb/diagsuppress_test.dll",
 		"$(EPOCROOT)/epoc32/release/armv5/urel/diagsuppress_test.dll",
 		]
-
 	t.mustmatch = [
 					"--diag_suppress 6780",
 					"--diag_suppress 6331"
 					]
-
 	t.run()
-	if t.result == SmokeTest.FAIL:
-		result = SmokeTest.FAIL
 	
 	t.id = "75g"
 	t.name = "mmp_7"
@@ -216,13 +200,9 @@ def run():
 		"$(EPOCROOT)/epoc32/release/armv5/urel/diagsuppress_noarmlibs_test.dll",
 		"$(EPOCROOT)/epoc32/release/armv5/udeb/diagsuppress_noarmlibs_test.dll"
 		]
-
 	t.mustmatch = ["--diag_suppress 6331"]
 	t.mustnotmatch = ["--diag_suppress 6780"]
-
 	t.run()
-	if t.result == SmokeTest.FAIL:
-		result = SmokeTest.FAIL
 
 	# Test keyword: version
 	t.id = "75h"
@@ -238,13 +218,77 @@ def run():
 	t.mustnotmatch = []
 	t.warnings = 2
 	t.run()
-	if t.result == SmokeTest.FAIL:
-		result = SmokeTest.FAIL
 
+	# Test keyword: armfpu softvfp|vfpv2
+	# Both armv5 RVCT (9a+b) and GCCE (10) builds, as they differ in behaviour.
+	t.id = "75i"
+	t.name = "mmp_9a"
+	t.command = "sbs -b $(SBS_HOME)/test/smoke_suite/test_resources/mmp/mmp9_10/bld.inf -p armfpu_soft.mmp -c armv5_urel -f-"			
+	t.targets = []
+	t.mustmatch = ["--fpu softvfp", "--fpu=softvfp"]
+	t.mustnotmatch = ["--fpu vfpv2", "--fpu=vfpv2"]
+	t.warnings = 0
+	t.run()
+		
+	t.id = "75j"
+	t.name = "mmp_9b"
+	t.command = "sbs -b $(SBS_HOME)/test/smoke_suite/test_resources/mmp/mmp9_10/bld.inf -c armv5_urel REALLYCLEAN &&" \
+			+ " sbs -b $(SBS_HOME)/test/smoke_suite/test_resources/mmp/mmp9_10/bld.inf -p armfpu_vfpv2.mmp -c armv5_urel -f-"
+
+	t.mustmatch = ["--fpu vfpv2", "--fpu=vfpv2"]
+	t.mustnotmatch = ["--fpu softvfp", "--fpu=softvfp"]	
+	t.run()
+	
+	t.id = "75k"
+	t.name = "mmp_10"
+	t.command = "sbs -b $(SBS_HOME)/test/smoke_suite/test_resources/mmp/mmp9_10/bld.inf  -c armv5_urel_gcce4_3_2 REALLYCLEAN &&" \
+			+ " sbs -b $(SBS_HOME)/test/smoke_suite/test_resources/mmp/mmp9_10/bld.inf -c armv5_urel_gcce4_3_2 -f-"
+	t.countmatch = [
+		["-mfloat-abi=soft", 2],
+		["--fpu=softvfp", 2]
+	]
+	t.mustmatch = []
+	t.mustnotmatch = ["--fpu=vfpv2"]
+	t.run()
+	
+	# Test keywords: compresstarget, nocompresstarget, bytepaircompresstarget, inflatecompresstarget
+	t.id = "75l"
+	t.name = "mmp_11"
+	t.command = "sbs -b $(SBS_HOME)/test/smoke_suite/test_resources/mmp/mmp11/bld.inf -c armv5_urel -f-"
+	t.mustmatch_singleline = [
+		"elf2e32.*--output.*\/compress\.exe.*--compressionmethod=inflate",
+		"elf2e32.*--output.*\/nocompress\.exe.*--uncompressed",
+		"elf2e32.*--output.*\/bytepaircompress\.exe.*--compressionmethod=bytepair",
+		"elf2e32.*--output.*\/inflatecompress\.exe.*--compressionmethod=inflate",
+		"elf2e32.*--output.*\/combinedcompress\.exe.*--compressionmethod=bytepair",		
+		"COMPRESSTARGET keyword in .*combinedcompresstarget.mmp overrides earlier use of NOCOMPRESSTARGET",
+		"INFLATECOMPRESSTARGET keyword in .*combinedcompresstarget.mmp overrides earlier use of COMPRESSTARGET",
+		"BYTEPAIRCOMPRESSTARGET keyword in .*combinedcompresstarget.mmp overrides earlier use of INFLATECOMPRESSTARGET"
+	]
+	t.countmatch = []
+	t.mustnotmatch = []
+	t.warnings = 3
+	t.run()
+
+	# Test keyword: APPLY
+	t.id = "75m"
+	t.name = "apply"
+	t.command = "sbs -b smoke_suite/test_resources/mmp/apply/bld.inf -f- -k --configpath=test/config"
+	t.targets = [
+		"$(EPOCROOT)/epoc32/release/armv5/urel/test_mmp_apply.exe",
+		"$(EPOCROOT)/epoc32/release/armv5/udeb/test_mmp_apply.exe",
+		"$(EPOCROOT)/epoc32/release/winscw/urel/test_mmp_apply.exe",
+		"$(EPOCROOT)/epoc32/release/winscw/udeb/test_mmp_apply.exe"
+		]
+	t.mustmatch_singleline = ["-DAPPLYTESTEXPORTEDVAR",
+	                          "-DAPPLYTESTAPPENDCDEFS"]
+	t.countmatch = [["<error.*APPLY unknown variant 'no_such_var'", 2]]
+	t.errors = 2 # no_such_var for armv5 and winscw
+	t.warnings = 0
+	t.returncode = 1
+	t.run()
 
 	t.id = "75"
 	t.name = "mmp_keywords"
-	t.result = result
 	t.print_result()
 	return t
-
