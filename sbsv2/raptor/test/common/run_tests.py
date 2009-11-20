@@ -277,8 +277,18 @@ class Suite(TestRun):
 			# Save start/end times and save in dictionary for TMS
 			start_time = datetime.datetime.now()
 			try:
-				print "\n\nTEST " + str(test_number) + "/" + \
-						str(test_total) + ":\n",
+				test_number_text = "\n\nTEST " + str(test_number) + "/" + \
+						str(test_total) + ":"
+				
+				if self.fail_total > 0:
+					test_number_text += "    So far " + str(self.fail_total) + \
+							" FAILED"
+				if self.exception_total > 0:
+					test_number_text += "    So far " + str(self.exception_total) + \
+							" ERRONEOUS"
+				
+				print test_number_text
+				
 				test_object = test.run()
 				
 				end_time = datetime.datetime.now()
@@ -330,6 +340,7 @@ class Suite(TestRun):
 						traceback.print_tb(sys.exc_traceback)
 				self.exception_total += 1
 				self.error_tests.append(str(self.test_set[test_number - 1]))
+								
 				
 		if self.upload_location != None:
 			self.create_csv()
@@ -487,7 +498,7 @@ class SuiteRun(TestRun):
 		print "\n(Tests run using %s" %options_dir
 
 		# Summarise the entire test run
-		if self.suitepattern and (self.test_total < 1):
+		if self.suitepattern and (len(suites) < 1):
 			print "\nNo suites matched specification '" + self.suitepattern + \
 					"'\n"
 		else:

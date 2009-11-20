@@ -1050,7 +1050,7 @@ class Raptor(object):
 		except Exception,e:
 			self.out = sys.stdout # make sure that we can actually get errors out.
 			self.logOpen = False
-			self.FatalError("<error>Unable to open the output logs: %s" % str(e))
+			self.FatalError("Unable to open the output logs: %s" % str(e))
 
 	def CloseLog(self):
 		if self.logOpen:

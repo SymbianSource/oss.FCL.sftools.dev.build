@@ -89,3 +89,9 @@ ifeq ($(TOOLCHAIN),RVCT)
   OPTION_COMPILER:=$(OPTION_ARMCC)
   OPTION_REPLACE_COMPILER:=$(OPTION_REPLACE_ARMCC)
 endif
+
+# "ARMFPU" overrides for 'fpu-ness' in compiler and postlinker calls in .mmp files are currently only
+# supported for RVCT-based builds, GCCE builds always make use of the interface defined defaults.
+ifeq ($(TOOLCHAIN),GCCE)
+  ARMFPU:=
+endif

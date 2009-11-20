@@ -33,6 +33,8 @@ class Filter(object):
 	def formatError(self, message):
 		return "sbs: error: " + message + "\n"
 		
+	def formatWarning(self, message):
+		return "sbs: warning: " + message + "\n"	
 
 import sys
 import xml.sax

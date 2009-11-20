@@ -86,13 +86,12 @@
 		<set name="STATIC_LIBS_LIST" value=""/>
 		<set name="RUNTIME_LIBS_LIST" value="drtaeabi.dso dfpaeabi.dso dfprvct3_1.dso drtrvct3_1.dso"/>
 		<set name="ARMLIBS" value=""/>
-		<set name="CC.OPT.SOFTVFP_MAYBE_VFPV2" value="-m"/>
-		<set name="CC.VAL.SOFTVFP_MAYBE_VFPV2" value="soft-float"/>
+		<set name="CC.SOFTVFP_MAYBE_VFPV2" value="soft"/>
+		<set name="PL.SOFTVFP_MAYBE_VFPV2" value="softvfp"/>
 		<set name="CC.ARMV5" value="-march=armv5t"/>
 		<set name="RELOCATABLE_IMAGE_OPTION" value=""/>
 		<set name="RVCTLIB" value=""/>
 		<set name="CC.NO_UNALIGNED_ACCESS" value=""/>
-		<set name="CC.SOFTVFP_MAYBE_VFPV2" value=""/>
 		<set name="SPLIT_OPTION" value=""/>
 		<set name="NEED_ENTRYPOINT_LIBRARY" value=""/>
 		<set name="RVCTBIN" value="" />
@@ -101,29 +100,9 @@
 		<set name="KERNEL_STATIC_RUNTIME_LIB" value="ksrt3_1.lib"/>
 		<set name="NEED_ENTRYPOINT_LIBRARY" value="" />
 	</var>
-	
-    <var name="gcce4_3_3" extends="gcce_base">
-		<env name="GCCEBIN" type="path" />
-		<env name="GCCEVERSION" default="$(TOOLCHAINVERSION)" />
+
+	<var name="gcce4_3_3" extends="gcce4_3_2">
 		<set name="TOOLCHAINVERSION" value="4.3.3" />
-		<set name="OWN_LIBRARY_OPTION" value=""/>
-		<set name="STATIC_LIBS_LIST" value=""/>
-		<set name="RUNTIME_LIBS_LIST" value="drtaeabi.dso dfpaeabi.dso dfprvct3_1.dso drtrvct3_1.dso"/>
-		<set name="ARMLIBS" value=""/>
-		<set name="CC.OPT.SOFTVFP_MAYBE_VFPV2" value="-m"/>
-		<set name="CC.VAL.SOFTVFP_MAYBE_VFPV2" value="soft-float"/>
-		<set name="CC.ARMV5" value="-march=armv5t"/>
-		<set name="RELOCATABLE_IMAGE_OPTION" value=""/>
-		<set name="RVCTLIB" value=""/>
-		<set name="CC.NO_UNALIGNED_ACCESS" value=""/>
-		<set name="CC.SOFTVFP_MAYBE_VFPV2" value=""/>
-		<set name="SPLIT_OPTION" value=""/>
-		<set name="NEED_ENTRYPOINT_LIBRARY" value=""/>
-		<set name="RVCTBIN" value="" />
-		<set name="RVCTINC" value="" />
-		<set name="USER_STATIC_RUNTIME_LIB" value="usrt3_1.lib"/>
-		<set name="KERNEL_STATIC_RUNTIME_LIB" value="ksrt3_1.lib"/>
-		<set name="NEED_ENTRYPOINT_LIBRARY" value="" />
 	</var>
 	
 	<var name="gcce4_4_1" extends="gcce4_3_3">
@@ -153,6 +132,7 @@
 		<set name="NEED_ENTRYPOINT_LIBRARY" value="False"/>
 		<set name="CC.NO_UNALIGNED_ACCESS" value="--memaccess -UL41"/>
 		<set name="CC.SOFTVFP_MAYBE_VFPV2" value="softvfp"/>
+		<set name="PL.SOFTVFP_MAYBE_VFPV2" value="softvfp"/>
 		<set name="CC.ARMV5" value="--cpu 5T"/>
 		<set name="CC.ARMV6" value="--cpu 6"/>
 	</var>
@@ -179,7 +159,9 @@
 		<set name="NEED_ENTRYPOINT_LIBRARY" value="True"/>
 		<set name="CC.NO_UNALIGNED_ACCESS" value="--no_unaligned_access"/>
 		<set name="CC.SOFTVFP_MAYBE_VFPV2" value="softvfp"/>
+		<set name="PL.SOFTVFP_MAYBE_VFPV2" value="softvfp"/>
 		<set name="CC.SOFTVFP_MAYBE_VFPV3" value="softvfp"/>
+		<set name="PL.SOFTVFP_MAYBE_VFPV3" value="softvfp"/>
 		<set name="CC.ARMV5" value="--cpu 5TE"/>
 		<set name="CC.ARMV6" value="--cpu 6"/>
 		<set name="CC.ARMV7" value="--cpu 7-A"/>
@@ -208,7 +190,10 @@
 		<set name="NEED_ENTRYPOINT_LIBRARY" value="True"/>
 		<set name="CC.NO_UNALIGNED_ACCESS" value="--no_unaligned_access"/>
 		<set name="CC.SOFTVFP_MAYBE_VFPV2" value="softvfp+vfpv2"/>
+		<set name="PL.SOFTVFP_MAYBE_VFPV2" value="vfpv2"/>
 		<set name="CC.SOFTVFP_MAYBE_VFPV3" value="softvfp+vfpv3"/>
+		<!-- Not supported yet : <set name="PL.SOFTVFP_MAYBE_VFPV3" value="vfpv3"/> -->
+		<set name="PL.SOFTVFP_MAYBE_VFPV3" value="vfpv2"/>
 		<set name="CC.ARMV5" value="--cpu 5TE"/>
 		<set name="CC.ARMV6" value="--cpu 6"/>
 		<set name="CC.ARMV7" value="--cpu 7-A"/>

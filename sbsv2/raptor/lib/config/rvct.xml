@@ -54,7 +54,7 @@
 		<set name="CIADEFS" value="__CIA__"/>
 		<append name="CDEFS" value='__SUPPORT_CPP_EXCEPTIONS__ _UNICODE __SYMBIAN32__ __ARMCC__ __EPOC32__ __MARM__ __EABI__ __PRODUCT_INCLUDE__="$(PRODUCT_INCLUDE)" $(MMPDEFS) $(ARMMACROS)'/>
 		<set name="COMPILER_CIA_FLAGS" value=""/>
-		<set name="COMPILER_FPU_FLAGS" value="--fpu $(ARMFPU)"/>	
+		<set name="COMPILER_FPU_OPTION" value="--fpu "/>
 		<set name="COMPILER_DEFINES" value=""/>
 		<set name="COMPILER_INTERWORK_DEFINES" value="__MARM_INTERWORK__"/>
 		<set name="COMPILER_SYSTEM_INCLUDE_OPTION" value="-J"/>
