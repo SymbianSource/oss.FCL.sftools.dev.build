@@ -578,7 +578,7 @@ class Raptor(object):
 		return True
 
 	def SetNoExport(self, TrueOrFalse):
-		self.doExport = TrueOrFalse
+		self.doExport = not TrueOrFalse
 		return True
 
 	def SetNoBuild(self, TrueOrFalse):

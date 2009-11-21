@@ -2604,6 +2604,8 @@ class MetaReader(object):
 						self.__Raptor.Error("%s",e.Text)
 						if not self.__Raptor.keepGoing:
 							return []
+		else:
+			self.__Raptor.Info("Not Processing Exports (--noexport enabled)")
 
 		# this is a switch to return the function at this point if export
 		# only option is specified in the run

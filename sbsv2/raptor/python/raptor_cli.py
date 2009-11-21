@@ -87,7 +87,7 @@ parser.add_option("-e","--engine",action="store",dest="make_engine",
 parser.add_option("--export-only",action="store_true",dest="doExportOnly",
 				help="Generate exports only and do not create any make files.")
 
-parser.add_option("--noexport",action="store_false",dest="doExport",
+parser.add_option("--noexport",action="store_true",dest="doExport",
 				help="Don't export any files - useful in some builds when you know exports have already been done.")
 
 parser.add_option("-f","--logfile",action="store",dest="logfile",
