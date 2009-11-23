@@ -48,7 +48,7 @@ def run():
 	]
 	mustnotmatch = [
 		".*<recipe .*name='makefile_generation_export.*",
-		".*<error>.*"
+		".*<error[^><]*>.*"
 	]
 
 	warnings = 0
@@ -62,9 +62,4 @@ def run():
 	t.mustnotmatch = mustnotmatch
 	t.warnings = warnings
 	t.run()
-	if t.result == SmokeTest.FAIL:
-	        result = SmokeTest.FAIL
-	
-	t.result = result
-	t.print_result()
 	return t
