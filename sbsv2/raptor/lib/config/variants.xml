@@ -88,7 +88,11 @@
 		<set name="ARMLIBS" value=""/>
 		<set name="CC.SOFTVFP_MAYBE_VFPV2" value="soft"/>
 		<set name="PL.SOFTVFP_MAYBE_VFPV2" value="softvfp"/>
+		<set name="CC.SOFTVFP_MAYBE_VFPV3" value="soft"/>
+		<set name="PL.SOFTVFP_MAYBE_VFPV3" value="softvfp"/>
 		<set name="CC.ARMV5" value="-march=armv5t"/>
+		<set name="CC.ARMV6" value="-march=armv6t2"/>
+		<set name="CC.ARMV7" value="-march=armv7"/>
 		<set name="RELOCATABLE_IMAGE_OPTION" value=""/>
 		<set name="RVCTLIB" value=""/>
 		<set name="CC.NO_UNALIGNED_ACCESS" value=""/>
@@ -99,6 +103,8 @@
 		<set name="USER_STATIC_RUNTIME_LIB" value="usrt3_1.lib"/>
 		<set name="KERNEL_STATIC_RUNTIME_LIB" value="ksrt3_1.lib"/>
 		<set name="NEED_ENTRYPOINT_LIBRARY" value="" />
+		<set name="PLATMACROS.VAR" value="GCCE_4 GCCE_4_3"/>
+		<set name="ARMMACROS.VAR" value="__GCCE_4__ __GCCE_4_3__"/>
 	</var>
 
 	<var name="gcce4_3_3" extends="gcce4_3_2">
@@ -108,6 +114,8 @@
 	<var name="gcce4_4_1" extends="gcce4_3_3">
 		<set name="TOOLCHAINVERSION" value="4.4.1" />
 		<set name="RUNTIME_LIBS_LIST" value="drtaeabi.dso dfpaeabi.dso"/>
+		<set name="PLATMACROS.VAR" value="GCCE_4 GCCE_4_4"/>
+		<set name="ARMMACROS.VAR" value="__GCCE_4__ __GCCE_4_4__"/>
 	</var>
 	
 	<var name="rvct2_2" extends="rvct">
