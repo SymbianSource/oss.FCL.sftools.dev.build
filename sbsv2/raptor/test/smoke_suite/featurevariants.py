@@ -231,7 +231,7 @@ def run():
 	vmap = " -o " + vmapfile
 	
 	if 'SBS_BVCPP' in os.environ:
-		bvcpp = " -c " + os.environ['SBS_BVCPP']
+		bvcpp = " -c " + os.environ['SBS_BVCPP'].replace('\\','/')
 	else:
 		bvcpp = " -c $(SBS_HOME)/$(HOSTPLATFORM_DIR)/bv/bin/cpp"
 		if t.onWindows:

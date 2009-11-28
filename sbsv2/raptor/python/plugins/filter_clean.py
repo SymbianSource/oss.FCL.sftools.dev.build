@@ -93,8 +93,8 @@ class FilterClean(filter_interface.Filter):
 					dirs.add(directory)
 					
 			self.tmp.close()	# this also deletes the temporary file
-		except:
-			sys.stderr.write("sbs: could not access temporary file for FilterClean\n")
+		except Exception,e:
+			sys.stderr.write("sbs: problem reading temporary file for FilterClean: %s\n" % str(e))
 			self.ok = False
 		
 		# finally remove (empty) directories
