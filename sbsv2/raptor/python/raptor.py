@@ -575,10 +575,16 @@ class Raptor(object):
 
 	def SetExportOnly(self, TrueOrFalse):
 		self.doExportOnly = TrueOrFalse
+		if not self.doExport:
+			self.Error("The --noexport and --export-only options are incompatible - won't to do anything useful")
+			return False
 		return True
 
 	def SetNoExport(self, TrueOrFalse):
 		self.doExport = not TrueOrFalse
+		if self.doExportOnly:
+			self.Error("The --noexport and --export-only options are incompatible - won't to do anything useful")
+			return False
 		return True
 
 	def SetNoBuild(self, TrueOrFalse):
