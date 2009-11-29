@@ -40,13 +40,17 @@ DEFAULT_NEWLIB:=$(DEFAULT_SYMBIAN_NEWLIB)
 # Reset these variables as they change for every single target type
 # LINKER_ENTRYPOINT_ADORNMENT will be blank for GCCE; for RVCT it will look like "(uc_exe_.o)"
 # LINKER_ENTRYPOINT_DECORATION will be blank for RVCT; for GCCE it will look like "-u _E32Startup"
+# LINKER_SEPARATOR is a comma for GCCE as g++ is used for linking; for RVCT is should be a space, but
+# as make strips trailing spaces, we use the CHAR_SPACE variable.
 
 LINKER_ENTRYPOINT_ADORNMENT:=
 LINKER_ENTRYPOINT_DECORATION:=
+LINKER_SEPARATOR:=
 
 # For GCCE
 ifeq ($(TOOLCHAIN),GCCE)
-LINKER_ENTRYPOINT_DECORATION:=$(if $(call isoneof,$(TARGETTYPE),exexp exe),-u _E32Startup,-u _E32Dll)
+LINKER_ENTRYPOINT_DECORATION:=$(if $(call isoneof,$(TARGETTYPE),exexp exe),-Wl$(CHAR_COMMA)-u$(CHAR_COMMA)_E32Startup,-Wl$(CHAR_COMMA)-u$(CHAR_COMMA)_E32Dll)
+LINKER_SEPARATOR:=$(CHAR_COMMA)
 endif
 
 # For RVCT
@@ -74,6 +78,7 @@ ifeq ($(TOOLCHAIN),RVCT)
   ifeq ($(TARGETTYPE),kdll)
 	LINKER_ENTRYPOINT_ADORNMENT:=(L_ENTRY_.o)
   endif
+LINKER_SEPARATOR:=$(CHAR_SPACE)
 endif
 
 # "OPTION" metadata from the front-end can potentially be supplied simultaneously for both GCCE and RVCT,

@@ -53,7 +53,7 @@ def run():
 
 	warnings = 0
 		
-	t.id = "103"
+	t.id = "104"
 	t.name = "parallelparsing"
 	t.description = description
 	t.command = command 

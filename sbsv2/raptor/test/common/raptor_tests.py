@@ -100,8 +100,14 @@ def where(input_file):
 				except OSError, error:
 					pass
 	else:
-		(comIn, comOut) = os.popen4("which " + input_file)
-		output = comOut.read()
+		whichproc = subprocess.Popen(args=["which", input_file], 
+					stdout=subprocess.PIPE,
+					stderr=subprocess.STDOUT,
+					shell=False,
+					universal_newlines=True)
+		output = whichproc.stdout.readlines()
+		whichproc.wait()
+
 		if len(output) > 0:
 			locations.append(output[0:(len(output) - 1)])
 				
