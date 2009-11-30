@@ -121,36 +121,42 @@ def clean_epocroot():
 	This method walks through epocroot and cleans every file and folder that is
 	not present in the manifest file
 	"""
-	print "Cleaning Epocroot..."
+	epocroot = os.path.abspath(os.environ['EPOCROOT']).replace('\\','/')
+	print "Cleaning Epocroot: %s" % epocroot
 	all_files = {} # dictionary to hold all files
 	folders = [] # holds all unique folders in manifest
 	host_platform = os.environ["HOSTPLATFORM_DIR"]
 	try:
-		mani = "./epocroot/manifest"
+		mani = "$(EPOCROOT)/manifest"
 		manifest = open(ReplaceEnvs(mani), "r")
+		le = len(epocroot)
 		for line in manifest:
 			line = line.replace("$(HOSTPLATFORM_DIR)", host_platform)
+			line = line.replace("./", epocroot+"/").rstrip("\n")
 			# Get rid of newline char and add to dictionary
-			all_files[line.rstrip("\n")] = True
+			all_files[line] = True
 			# This bit makes a record of unique folders into a list
-			end = 0
-			while end != -1: # Look through the parent folders
-				end = line.rfind("/")
-				line = line[:end]
-				if line not in folders:
-					folders.append(line)
+			pos = line.rfind("/", le)
+			while pos > le: # Look through the parent folders
+				f = line[:pos]
+				if f not in folders:
+					folders.append(f)
+				pos = line.rfind("/", le, pos)
+				
+
 		# This algorithm walks through epocroot and handles files and folders
-		walkpath = "./epocroot"
+		walkpath = "$(EPOCROOT)"
 		for (root, dirs, files) in os.walk(ReplaceEnvs(walkpath), topdown =
 				False):
+			if root.find(".hg") != -1:
+				continue
+
 			# This loop handles all files
 			for name in files:
 				name = os.path.join(root, name).replace("\\", "/")
-				name = name.replace("./epocroot/", "./")
 								
 				if name not in all_files:
 					try:
-						name = ReplaceEnvs(name.replace("./", "./epocroot/"))
 						os.remove(name)
 					except:
 						# chmod to rw and try again
@@ -166,11 +172,10 @@ def clean_epocroot():
 			# This loop handles folders
 			for name in dirs:
 				name = os.path.join(root, name).replace("\\", "/")
-				name = name.replace("./epocroot/", "./")
 				if name not in all_files and name not in folders:
 					# Remove the folder fully with no errors if full
 					try:
-						rmtree(ReplaceEnvs(name.replace("./", "./epocroot/")))
+						rmtree(ReplaceEnvs(name))
 					except:
 						print "\nEPOCROOT-CLEAN ERROR:"
 						print (sys.exc_type.__name__ + ":"), \

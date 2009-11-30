@@ -45,7 +45,27 @@ def run():
 		componentpath+"/master_resource_ARMV5_UDEB.txt",
 		componentpath+"/master_resource_ARMV5_UREL.txt",
 		componentpath+"/master_resource_WINSCW_UDEB.txt",
-		componentpath+"/master_resource_WINSCW_UREL.txt"
+		componentpath+"/master_resource_WINSCW_UREL.txt",
+		componentpath+"/slave_bld_ARMV5_UDEB.txt",
+		componentpath+"/slave_bld_ARMV5_UREL.txt",
+		componentpath+"/slave_bld_WINSCW_UDEB.txt",
+		componentpath+"/slave_bld_WINSCW_UREL.txt",
+		componentpath+"/slave_final_ARMV5_UDEB.txt",
+		componentpath+"/slave_final_ARMV5_UREL.txt",
+		componentpath+"/slave_final_WINSCW_UDEB.txt",
+		componentpath+"/slave_final_WINSCW_UREL.txt",
+		componentpath+"/slave_lib_ARMV5_UDEB.txt",
+		componentpath+"/slave_lib_ARMV5_UREL.txt",
+		componentpath+"/slave_lib_WINSCW_UDEB.txt",
+		componentpath+"/slave_lib_WINSCW_UREL.txt",
+		componentpath+"/slave_makmake_ARMV5_UDEB.txt",
+		componentpath+"/slave_makmake_ARMV5_UREL.txt",
+		componentpath+"/slave_makmake_WINSCW_UDEB.txt",
+		componentpath+"/slave_makmake_WINSCW_UREL.txt",
+		componentpath+"/slave_resource_ARMV5_UDEB.txt",
+		componentpath+"/slave_resource_ARMV5_UREL.txt",
+		componentpath+"/slave_resource_WINSCW_UDEB.txt",
+		componentpath+"/slave_resource_WINSCW_UREL.txt"
 	]
 	t.run("windows") # we don't have make 3.79 on Linux
 	return t
