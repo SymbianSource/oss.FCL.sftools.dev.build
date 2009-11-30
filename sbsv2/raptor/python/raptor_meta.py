@@ -2513,7 +2513,7 @@ class MetaReader(object):
 		self.defaultPlatform = self.ExportPlatforms[0]
 
 
-	def ReadBldInfFiles(self, aComponentList, doExportOnly):
+	def ReadBldInfFiles(self, aComponentList, doexport, dobuild = True):
 		"""Take a list of bld.inf files and return a list of build specs.
 
 		The returned specification nodes will be suitable for all the build
@@ -2593,20 +2593,23 @@ class MetaReader(object):
 		# before we can do anything else (because raptor itself must do
 		# some exports before the MMP files that include them can be
 		# processed).
-		for i,p in enumerate(exportNodes):
-			exportPlatform = self.ExportPlatforms[i]
-			for s in p.GetChildSpecs():
-				try:
-					self.ProcessExports(s, exportPlatform)
+		if doexport:
+			for i,p in enumerate(exportNodes):
+				exportPlatform = self.ExportPlatforms[i]
+				for s in p.GetChildSpecs():
+					try:
+						self.ProcessExports(s, exportPlatform)
 
-				except MetaDataError, e:
-					self.__Raptor.Error("%s",e.Text)
-					if not self.__Raptor.keepGoing:
-						return []
+					except MetaDataError, e:
+						self.__Raptor.Error("%s",e.Text)
+						if not self.__Raptor.keepGoing:
+							return []
+		else:
+			self.__Raptor.Info("Not Processing Exports (--noexport enabled)")
 
 		# this is a switch to return the function at this point if export
 		# only option is specified in the run
-		if (self.__Raptor.doExportOnly):
+		if dobuild is not True:
 			self.__Raptor.Info("Processing Exports only")
 			return[]
 

@@ -274,7 +274,7 @@ class Layer(ModelNode):
 				# convert the list of bld.inf files into a specification
 				# hierarchy suitable for all the configurations we are using.
 				self.specs = list(build.generic_specs)
-				self.specs.extend(metaReader.ReadBldInfFiles(self.children, build.doExportOnly))
+				self.specs.extend(metaReader.ReadBldInfFiles(self.children, doexport = build.doExport, dobuild = not build.doExportOnly))
 
 			except raptor_meta.MetaDataError, e:
 				build.Error(e.Text)
@@ -355,6 +355,14 @@ class Layer(ModelNode):
 			var.AddOperation(raptor_data.Set("MAKEFILE_PATH", makefile_path))
 			var.AddOperation(raptor_data.Set("CONFIGS", configList))
 			var.AddOperation(raptor_data.Set("CLI_OPTIONS", cli_options))
+
+
+			# Allow the flm to skip exports. Note: this parameter
+			doexport_str = '1'
+			if not build.doExport:
+				doexport_str = ''
+			var.AddOperation(raptor_data.Set("DOEXPORT", doexport_str ))
+
 			# Pass on '-n' (if specified) to the makefile-generating sbs calls
 			if build.noBuild:
 				var.AddOperation(raptor_data.Set("NO_BUILD", "1"))
@@ -467,6 +475,7 @@ class Raptor(object):
 		self.maker = None
 		self.debugOutput = False
 		self.doExportOnly = False
+		self.doExport = True
 		self.noBuild = False
 		self.noDependInclude = False
 		self.projects = set()
@@ -566,6 +575,16 @@ class Raptor(object):
 
 	def SetExportOnly(self, TrueOrFalse):
 		self.doExportOnly = TrueOrFalse
+		if not self.doExport:
+			self.Error("The --noexport and --export-only options are incompatible - won't to do anything useful")
+			return False
+		return True
+
+	def SetNoExport(self, TrueOrFalse):
+		self.doExport = not TrueOrFalse
+		if self.doExportOnly:
+			self.Error("The --noexport and --export-only options are incompatible - won't to do anything useful")
+			return False
 		return True
 
 	def SetNoBuild(self, TrueOrFalse):
@@ -634,8 +653,6 @@ class Raptor(object):
 		type = type.lower()
 		if type == "on":
 			self.doParallelParsing = True
-		elif type == "slave":
-			self.isParallelParsingSlave = True
 		elif type == "off":
 			self.doParallelParsing = False
 		else:

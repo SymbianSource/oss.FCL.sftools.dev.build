@@ -87,6 +87,9 @@ parser.add_option("-e","--engine",action="store",dest="make_engine",
 parser.add_option("--export-only",action="store_true",dest="doExportOnly",
 				help="Generate exports only and do not create any make files.")
 
+parser.add_option("--noexport",action="store_true",dest="doExport",
+				help="Don't export any files - useful in some builds when you know exports have already been done.")
+
 parser.add_option("-f","--logfile",action="store",dest="logfile",
 				help="Name of the log file, or '-' for stdout.")
 
@@ -148,7 +151,6 @@ parser.add_option("--pp",action="store",dest="parallel_parsing",
 				help="""Controls how metadata (e.g. bld.infs) are parsed in Parallel.
 					Possible values are:
 					"on"  - Parse bld.infs in parallel (should be faster on clusters/multicore machines)
-					"slave" - used internally by Raptor 
 					"off" - Parse bld.infs serially 
 				     """)
 
@@ -261,6 +263,7 @@ def DoRaptor(Raptor, args):
 				 'quiet' : Raptor.RunQuietly,
 				 'debugoutput' : Raptor.SetDebugOutput,
 				 'doExportOnly' : Raptor.SetExportOnly,
+				 'doExport' : Raptor.SetNoExport,
 				 'keepgoing': Raptor.SetKeepGoing,
 				 'nobuild' : Raptor.SetNoBuild,
 				 'make_engine': Raptor.SetMakeEngine,

@@ -73,7 +73,6 @@
 		<param name='CC.VAL.SOFTVFP_MAYBE_VFPV2' default=''/>
 		<param name='CODE_SEGMENT_START' default=''/>
 		<param name='TOOLCHAIN' default=''/>
-		<param name='TOOLCHAINVERSION' default=''/>
 	</interface>
 	<interface name="Symbian.e32abiv2" extends="Symbian.mmp" flm="e32abiv2.flm">
 		<param name='SUPPORTS_STDCPP_NEWLIB' default='1'/>
@@ -163,6 +162,7 @@
 		<param name='RVCTBIN'/>
 		<param name='RVCTINC'/>
 		<param name='RVCTLIB'/>
+		<param name='RW_BASE'/>
 		<param name='RW_BASE_OPTION'/>
 		<param name='SBSV1MAKE'/>
 		<param name='NMAKE'/>

@@ -25,7 +25,7 @@ def run():
 		"$(SBS_HOME)/test/smoke_suite/test_resources/gnumakefile/master_bld_ARMV5_UDEB.txt",
 		"$(SBS_HOME)/test/smoke_suite/test_resources/gnumakefile/master_bld_ARMV5_UREL.txt",
 		"$(SBS_HOME)/test/smoke_suite/test_resources/gnumakefile/master_bld_WINSCW_UDEB.txt",
-		"$(SBS_HOME)/test/smoke_suite/test_resources/gnumakefile/master_bld_WINSCW_UREL.txt",
+	  	"$(SBS_HOME)/test/smoke_suite/test_resources/gnumakefile/master_bld_WINSCW_UREL.txt",
 		"$(SBS_HOME)/test/smoke_suite/test_resources/gnumakefile/master_final_ARMV5_UDEB.txt",
 		"$(SBS_HOME)/test/smoke_suite/test_resources/gnumakefile/master_final_ARMV5_UREL.txt",
 		"$(SBS_HOME)/test/smoke_suite/test_resources/gnumakefile/master_final_WINSCW_UDEB.txt",
@@ -41,7 +41,27 @@ def run():
 		"$(SBS_HOME)/test/smoke_suite/test_resources/gnumakefile/master_resource_ARMV5_UDEB.txt",
 		"$(SBS_HOME)/test/smoke_suite/test_resources/gnumakefile/master_resource_ARMV5_UREL.txt",
 		"$(SBS_HOME)/test/smoke_suite/test_resources/gnumakefile/master_resource_WINSCW_UDEB.txt",
-		"$(SBS_HOME)/test/smoke_suite/test_resources/gnumakefile/master_resource_WINSCW_UREL.txt"
+		"$(SBS_HOME)/test/smoke_suite/test_resources/gnumakefile/master_resource_WINSCW_UREL.txt",
+		"$(SBS_HOME)/test/smoke_suite/test_resources/gnumakefile/slave_bld_ARMV5_UDEB.txt",
+		"$(SBS_HOME)/test/smoke_suite/test_resources/gnumakefile/slave_bld_ARMV5_UREL.txt",
+		"$(SBS_HOME)/test/smoke_suite/test_resources/gnumakefile/slave_bld_WINSCW_UDEB.txt",
+		"$(SBS_HOME)/test/smoke_suite/test_resources/gnumakefile/slave_bld_WINSCW_UREL.txt",
+		"$(SBS_HOME)/test/smoke_suite/test_resources/gnumakefile/slave_final_ARMV5_UDEB.txt",
+		"$(SBS_HOME)/test/smoke_suite/test_resources/gnumakefile/slave_final_ARMV5_UREL.txt",
+		"$(SBS_HOME)/test/smoke_suite/test_resources/gnumakefile/slave_final_WINSCW_UDEB.txt",
+		"$(SBS_HOME)/test/smoke_suite/test_resources/gnumakefile/slave_final_WINSCW_UREL.txt",
+		"$(SBS_HOME)/test/smoke_suite/test_resources/gnumakefile/slave_lib_ARMV5_UDEB.txt",
+		"$(SBS_HOME)/test/smoke_suite/test_resources/gnumakefile/slave_lib_ARMV5_UREL.txt",
+		"$(SBS_HOME)/test/smoke_suite/test_resources/gnumakefile/slave_lib_WINSCW_UDEB.txt",
+		"$(SBS_HOME)/test/smoke_suite/test_resources/gnumakefile/slave_lib_WINSCW_UREL.txt",
+		"$(SBS_HOME)/test/smoke_suite/test_resources/gnumakefile/slave_makmake_ARMV5_UDEB.txt",
+		"$(SBS_HOME)/test/smoke_suite/test_resources/gnumakefile/slave_makmake_ARMV5_UREL.txt",
+		"$(SBS_HOME)/test/smoke_suite/test_resources/gnumakefile/slave_makmake_WINSCW_UDEB.txt",
+		"$(SBS_HOME)/test/smoke_suite/test_resources/gnumakefile/slave_makmake_WINSCW_UREL.txt",
+		"$(SBS_HOME)/test/smoke_suite/test_resources/gnumakefile/slave_resource_ARMV5_UDEB.txt",
+		"$(SBS_HOME)/test/smoke_suite/test_resources/gnumakefile/slave_resource_ARMV5_UREL.txt",
+		"$(SBS_HOME)/test/smoke_suite/test_resources/gnumakefile/slave_resource_WINSCW_UDEB.txt",
+		"$(SBS_HOME)/test/smoke_suite/test_resources/gnumakefile/slave_resource_WINSCW_UREL.txt"
 		]
 	t.run("windows") # we don't have make 3.79 on Linux
 	return t

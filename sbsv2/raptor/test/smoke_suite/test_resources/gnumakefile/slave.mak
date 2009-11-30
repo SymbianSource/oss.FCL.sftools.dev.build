@@ -9,34 +9,34 @@ do_nothing :
 
 
 MAKMAKE : 
-	echo SLAVE.MAK MAKMAKE >> master_makmake_$(PLATFORM)_$(CFG).txt
+	echo SLAVE.MAK MAKMAKE > slave_makmake_$(PLATFORM)_$(CFG).txt
 
 RESOURCE : 
-	echo SLAVE.MAK RESOURCE >> master_resource_$(PLATFORM)_$(CFG).txt
+	echo SLAVE.MAK RESOURCE > slave_resource_$(PLATFORM)_$(CFG).txt
 
 SAVESPACE : BLD
 
 BLD : 
-	echo SLAVE.MAK BLD >> master_bld_$(PLATFORM)_$(CFG).txt
+	echo SLAVE.MAK BLD > slave_bld_$(PLATFORM)_$(CFG).txt
  
 FREEZE : 
-	echo SLAVE.MAK FREEZE >> master_freeze_$(PLATFORM)_$(CFG).txt
+	echo SLAVE.MAK FREEZE > slave_freeze_$(PLATFORM)_$(CFG).txt
 
 LIB : 
-	echo SLAVE.MAK LIB >> master_lib_$(PLATFORM)_$(CFG).txt
+	echo SLAVE.MAK LIB > slave_lib_$(PLATFORM)_$(CFG).txt
 
 CLEANLIB : do_nothing
  
 FINAL : 
-	echo SLAVE.MAK FINAL >> master_final_$(PLATFORM)_$(CFG).txt
+	echo SLAVE.MAK FINAL >> slave_final_$(PLATFORM)_$(CFG).txt
 
 CLEAN : 
 	rm -f *.txt
  
 RELEASABLES : 
-	@echo $(DIRECTORY)/master_makmake_$(PLATFORM)_$(CFG).txt
-	@echo $(DIRECTORY)/master_resource_$(PLATFORM)_$(CFG).txt
-	@echo $(DIRECTORY)/master_bld_$(PLATFORM)_$(CFG).txt
-	@echo $(DIRECTORY)/master_lib_$(PLATFORM)_$(CFG).txt
-	@echo $(DIRECTORY)/master_final_$(PLATFORM)_$(CFG).txt
+	@echo $(DIRECTORY)/slave_makmake_$(PLATFORM)_$(CFG).txt
+	@echo $(DIRECTORY)/slave_resource_$(PLATFORM)_$(CFG).txt
+	@echo $(DIRECTORY)/slave_bld_$(PLATFORM)_$(CFG).txt
+	@echo $(DIRECTORY)/slave_lib_$(PLATFORM)_$(CFG).txt
+	@echo $(DIRECTORY)/slave_final_$(PLATFORM)_$(CFG).txt
 
