@@ -141,7 +141,6 @@ ifneq ($(IMPORTLIBRARYREQUIRED),) # no dso files for plugins, animation dlls etc
   ifeq ($($(BUILDMARKER_IMPORTLIBTARGET_DSO)),)
     IMPORTLIBTARGET_DSO:=$(TMP_IMPORTLIBTARGET_ROOT).dso
     IMPORTLIBTARGETVERSIONED_DSO:=$(VER_E32IMPORTLIBBASE).dso
-    $(eval $(BUILDMARKER_IMPORTLIBTARGET_DSO):=1)
   endif
 
   # ABIv1 .lib (for specific builds, toolchains and host OS platforms only)
@@ -156,7 +155,6 @@ ifneq ($(IMPORTLIBRARYREQUIRED),) # no dso files for plugins, animation dlls etc
     ifeq ($($(BUILDMARKER_IMPORTLIBTARGET_LIB)),)
       IMPORTLIBTARGET_LIB:=$(TMP_IMPORTLIBTARGET_ROOT).lib
       IMPORTLIBTARGETVERSIONED_LIB:=$(VER_E32IMPORTLIBBASE).lib
-      $(eval $(BUILDMARKER_IMPORTLIBTARGET_LIB):=1)
     endif
   endif
   endif
@@ -251,6 +249,10 @@ endif
 # ABIv2 .dso
 ifneq ($(IMPORTLIBTARGET_DSO),) # check that we haven't tried to specify this target already
 
+  # By Now we're committed to producing a target for this DSO so it's safe to
+  # set the marker that will prevent any further targets from being made.
+  $(eval $(BUILDMARKER_IMPORTLIBTARGET_DSO):=1)
+
   ifneq ($(EXPLICITVERSION),)
     TARGETS:=$(strip $(TARGETS) $(IMPORTLIBTARGETVERSIONED_DSO))
 
@@ -326,6 +328,10 @@ endif #  ifneq ($(IMPORTLIBTARGET_DSO),)
 
 # ABIv1 .lib
 ifneq ($(IMPORTLIBTARGETVERSIONED_LIB),) # check that we haven't tried to specify this target already
+
+  # By Now we're committed to producing a target for this DSO so it's safe to
+  # set the marker that will prevent any further targets from being made.
+  $(eval $(BUILDMARKER_IMPORTLIBTARGET_LIB):=1)
 
   define abiv1_generatelib
 
