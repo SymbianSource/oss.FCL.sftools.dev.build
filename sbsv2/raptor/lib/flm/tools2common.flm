@@ -102,6 +102,6 @@ $(call makepath,$(CREATABLEPATHS))
 ## Clean up
 $(call raptor_clean,$(CLEANTARGETS) $(OBJECTFILES))
 ## for the --what option and the log file
-$(call raptor_release,$(RELEASEABLES))
+$(call raptor_release,$(RELEASABLES))
 
 ## The End

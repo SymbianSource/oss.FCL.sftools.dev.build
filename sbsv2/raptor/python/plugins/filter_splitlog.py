@@ -16,6 +16,7 @@
 # Will ultimately do everything that scanlog does
 #
 
+import errno
 import os
 import sys
 import raptor
@@ -38,7 +39,7 @@ class FilterSplitlog(filter_interface.Filter):
 				if dirname and not os.path.isdir(dirname):
 					os.makedirs(dirname)
 			except os.error, e:
-				if e.errno != os.errno.EEXIST:
+				if e.errno != errno.EEXIST:
 					sys.stderr.write("%s : error: cannot create directory " +
 							"%s\n" % (raptor.name, dirname))
 					return False

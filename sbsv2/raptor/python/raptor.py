@@ -34,6 +34,7 @@ import raptor_data
 import raptor_make
 import raptor_makefile
 import raptor_meta
+import raptor_timing
 import raptor_utilities
 import raptor_version
 import raptor_xml
@@ -181,10 +182,16 @@ class ModelNode(object):
 		# insert the start time into the Makefile name?
 		makefile.path = makefile.path.replace("%TIME", build.timestring)
 
+		build.InfoDiscovery(object_type = "layers", count = 1)
+		build.InfoStartTime(object_type = "layer", task = "parse",
+				key = str(makefile.path))
 		makefileset = build.maker.Write(makefile, specs, build.buildUnitsToBuild)
+		build.InfoEndTime(object_type = "layer", task = "parse",
+				key = str(makefile.path))
 
 		return makefileset
 		
+
 
 	def realise(self, build):
 		"""Give the spec trees to the make engine and actually 
@@ -198,7 +205,15 @@ class ModelNode(object):
 
 		m = self.realise_makefile(build, sp)
 
-		return build.Make(m)
+		build.InfoStartTime(object_type = "layer", task = "build",
+				key = (str(m.directory) + "/" + str(m.filenamebase)))
+		result = build.Make(m)
+		build.InfoEndTime(object_type = "layer", task = "build",
+				key = (str(m.directory) + "/" + str(m.filenamebase)))
+		
+		
+		return result
+
 
 
 class Project(ModelNode):
@@ -307,6 +322,9 @@ class Layer(ModelNode):
 			
 		if build.quiet == True:
 			cli_options += " -q"
+			
+		if build.timing == True:
+			cli_options += " --timing"
 
 		
 		nc = len(self.children)
@@ -377,20 +395,22 @@ class Layer(ModelNode):
 			spec_nodes.append(specNode)
 			binding_makefiles.addInclude(str(makefile_path)+"_all")
 
-		ppstart = time.time()
-		build.Info("Parallel Parsing: time: Start %d", int(ppstart))
+		build.InfoDiscovery(object_type = "layers", count = 1)
+		build.InfoStartTime(object_type = "layer", task = "parse",
+				key = str(build.topMakefile))
 		m = self.realise_makefile(build, spec_nodes)
 		m.close()
 		gen_result = build.Make(m)
 
-		ppfinish = time.time()
-		build.Info("Parallel Parsing: time: Finish %d", int(ppfinish))
-		build.Info("Parallel Parsing: time: Parse Duration %d", int(ppfinish - ppstart))
+		build.InfoEndTime(object_type = "layer", task = "parse",
+				key = str(build.topMakefile))
+		build.InfoStartTime(object_type = "layer", task = "build",
+				key = str(build.topMakefile))
 		build.Debug("Binding Makefile base name is %s ", binding_makefiles.filenamebase)
 		binding_makefiles.close()
 		b = build.Make(binding_makefiles)
-		buildfinish = time.time()
-		build.Info("Parallel Parsing: time: Build Duration %d", int(buildfinish - ppfinish))
+		build.InfoEndTime(object_type = "layer", task = "build",
+				key = str(build.topMakefile))
 		return b
 
 
@@ -493,6 +513,7 @@ class Raptor(object):
 		# what platform and filesystem are we running on?
 		self.filesystem = raptor_utilities.getOSFileSystem()
 
+		self.timing = False
 		self.toolset = None
 
 		self.starttime = time.time()
@@ -648,11 +669,17 @@ class Raptor(object):
 			return False
 
 		return True
+	
+	def SetTiming(self, TrueOrFalse):
+		self.timing = TrueOrFalse
+		return True
 
 	def SetParallelParsing(self, type):
 		type = type.lower()
 		if type == "on":
 			self.doParallelParsing = True
+		elif type == "slave":
+			self.isParallelParsingSlave = True
 		elif type == "off":
 			self.doParallelParsing = False
 		else:
@@ -1048,10 +1075,11 @@ class Raptor(object):
 			self.out.write("<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?>\n")
 
 			namespace = "http://symbian.com/xml/build/log"
+			progress_namespace = "http://symbian.com/xml/build/log/progress"
 			schema = "http://symbian.com/xml/build/log/1_0.xsd"
 
-			self.out.write("<buildlog sbs_version=\"%s\" xmlns=\"%s\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"%s %s\">\n"
-						   % (raptor_version.fullversion(), namespace, namespace, schema))
+			self.out.write("<buildlog sbs_version=\"%s\" xmlns=\"%s\" xmlns:progress=\"%s\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"%s %s\">\n"
+						   % (raptor_version.fullversion(), namespace, progress_namespace, namespace, schema))
 			self.logOpen = True
 		except Exception,e:
 			self.out = sys.stdout # make sure that we can actually get errors out.
@@ -1088,6 +1116,30 @@ class Raptor(object):
 		"""
 		self.out.write("<info" + self.attributeString(attributes) + ">" +
 		               escape(format % extras) + "</info>\n")
+		
+	def InfoDiscovery(self, object_type, count):
+		if self.timing:
+			try:
+				self.out.write(raptor_timing.Timing.discovery_string(object_type = object_type,
+						count = count))
+			except Exception, exception:
+				Error(exception.Text, function = "InfoDiscoveryTime")
+		
+	def InfoStartTime(self, object_type, task, key):
+		if self.timing:
+			try:
+				self.out.write(raptor_timing.Timing.start_string(object_type = object_type,
+						task = task, key = key))
+			except Exception, exception:
+				Error(exception.Text, function = "InfoStartTime")
+		
+	def InfoEndTime(self, object_type, task, key):
+		if self.timing:
+			try:
+				self.out.write(raptor_timing.Timing.end_string(object_type = object_type,
+						task = task, key = key))
+			except Exception, exception:
+				Error(exception.Text, function = "InfoEndTime")
 
 	def Debug(self, format, *extras, **attributes):
 		"Send a debugging message to the configured channel"

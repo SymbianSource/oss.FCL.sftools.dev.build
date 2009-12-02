@@ -2652,8 +2652,8 @@ class MetaReader(object):
 
 		def LeftPortionOf(pth,sep):
 			""" Internal function to return portion of str that is to the left of sep. 
-			The partition is case-insentive."""
-			length = len((pth.lower().partition(sep.lower()))[0])
+			The split is case-insensitive."""
+			length = len((pth.lower().split(sep.lower()))[0])
 			return pth[0:length]
 			
 		modulePath = LeftPortionOf(LeftPortionOf(os.path.dirname(aBldInfPath), "group"), "ongoing")
@@ -2930,6 +2930,11 @@ class MetaReader(object):
 						expfile = open(expfilename, 'wb')
 						expfile.write(exportzip.read(file))
 						expfile.close()
+						
+						# Resurrect any file execution permissions present in the archived version
+						if (exportzip.getinfo(file).external_attr >> 16L) & 0100:
+							os.chmod(expfilename, stat.S_IMODE(os.stat(expfilename).st_mode) | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)						
+						
 						# Each file keeps its modified time the same as what it was before unzipping
 						accesstime = time.time()
 						datetime = exportzip.getinfo(file).date_time

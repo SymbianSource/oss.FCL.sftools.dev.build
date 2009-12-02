@@ -116,6 +116,10 @@ class TestRaptorCli(unittest.TestCase):
 	def SetExportOnly(self, yesOrNo):
 		self.doExportOnly = yesOrNo
 		return True
+
+	def SetNoExport(self, yesOrNo):
+		self.doExport = not yesOrNo
+		return True
 	
 	def SetKeepGoing(self, yesOrNo):
 		return True
@@ -130,6 +134,9 @@ class TestRaptorCli(unittest.TestCase):
 		return True
 
 	def SetToolCheck(self, toolcheck):
+		return True
+	
+	def SetTiming(self, yesOrNo):
 		return True
 
 	def SetParallelParsing(self, onoroff):
