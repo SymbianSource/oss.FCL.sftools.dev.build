@@ -141,12 +141,10 @@ class TestRaptorMeta(unittest.TestCase):
 		
 		# Get the version of CPP that we are using and hope it's correct
 		# since there is no tool check.
-		if raptor_utilities.getOSFileSystem() == "cygwin":
-			self.__gnucpp = os.environ[raptor.env] + "/win32/bv/bin/cpp" 
+		if os.environ.has_key('SBS_GNUCPP'):
+			self.__gnucpp = os.environ['SBS_GNUCPP']
 		else: 
 			self.__gnucpp = "cpp" 
-		if os.environ.has_key('GNUCPP'):
-			self.__gnucpp = os.environ['GNUCPP']
 	
 	def testPreProcessor(self):
 		# Just test for correct behaviour on failure, other tests excercise correct behaviour on success

@@ -297,9 +297,8 @@ class PreProcessor(raptor_utilities.ExternalTool):
 	def call(self, aArgs, sourcefilename):
 		""" Override call so that we can do our own error handling."""
 		tool = self._ExternalTool__Tool
+		commandline = tool + " " + aArgs + " " + str(sourcefilename)
 		try:
-			commandline = tool + " " + aArgs + " " + str(sourcefilename)
-
 			# the actual call differs between Windows and Unix
 			if raptor_utilities.getOSFileSystem() == "unix":
 				p = subprocess.Popen(commandline, \
@@ -345,7 +344,7 @@ class PreProcessor(raptor_utilities.ExternalTool):
 				raise MetaDataError("Errors in %s" % str(sourcefilename))
 
 		except Exception,e:
-			raise MetaDataError("Preprocessor exception: %s" % str(e))
+			raise MetaDataError("Preprocessor exception: '%s' : in command : '%s'" % (str(e), commandline))
 
 		return 0	# all OK
 
