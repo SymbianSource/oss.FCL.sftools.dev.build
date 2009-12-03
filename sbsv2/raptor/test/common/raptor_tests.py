@@ -170,6 +170,9 @@ def clean_epocroot():
 									
 			# This loop handles folders
 			for name in dirs:
+				if name.find(".hg") != -1:
+					continue
+				
 				name = os.path.join(root, name).replace("\\", "/")
 				if name not in all_files and name not in folders:
 					# Remove the folder fully with no errors if full
