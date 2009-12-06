@@ -133,7 +133,6 @@ def clean_epocroot():
 		for line in manifest:
 			line = line.replace("$(HOSTPLATFORM_DIR)", host_platform)
 			line = line.replace("./", epocroot+"/").rstrip("\n")
-			# Get rid of newline char and add to dictionary
 			all_files[line] = True
 			# This bit makes a record of unique folders into a list
 			pos = line.rfind("/", le)
@@ -171,6 +170,9 @@ def clean_epocroot():
 									
 			# This loop handles folders
 			for name in dirs:
+				if name.find(".hg") != -1:
+					continue
+				
 				name = os.path.join(root, name).replace("\\", "/")
 				if name not in all_files and name not in folders:
 					# Remove the folder fully with no errors if full

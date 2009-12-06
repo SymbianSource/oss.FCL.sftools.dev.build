@@ -30,13 +30,16 @@ def run():
 		'$(EPOCROOT)/epoc32/testunzip/archive/archivefile1.txt',
 		'$(EPOCROOT)/epoc32/testunzip/archive/archivefile2.txt',
 		'$(EPOCROOT)/epoc32/testunzip/archive/archivefile3.txt',
-		'$(EPOCROOT)/epoc32/testunzip/archive/archivefile4.txt'
+		'$(EPOCROOT)/epoc32/testunzip/archive/archivefile4.txt',
+		"$(EPOCROOT)/epoc32/testunzip/archive/archivefilelinuxbin"
 	]
+	
 	t.targets = [
 		'$(EPOCROOT)/epoc32/testunzip/archive/archivefile1.txt',
 		'$(EPOCROOT)/epoc32/testunzip/archive/archivefile2.txt',
 		'$(EPOCROOT)/epoc32/testunzip/archive/archivefile3.txt',
 		'$(EPOCROOT)/epoc32/testunzip/archive/archivefile4.txt',
+		"$(EPOCROOT)/epoc32/testunzip/archive/archivefilelinuxbin",
 		"$(EPOCROOT)/epoc32/build/" + markerfile
 	]
 	t.run()

@@ -297,9 +297,8 @@ class PreProcessor(raptor_utilities.ExternalTool):
 	def call(self, aArgs, sourcefilename):
 		""" Override call so that we can do our own error handling."""
 		tool = self._ExternalTool__Tool
+		commandline = tool + " " + aArgs + " " + str(sourcefilename)
 		try:
-			commandline = tool + " " + aArgs + " " + str(sourcefilename)
-
 			# the actual call differs between Windows and Unix
 			if raptor_utilities.getOSFileSystem() == "unix":
 				p = subprocess.Popen(commandline, \
@@ -345,7 +344,7 @@ class PreProcessor(raptor_utilities.ExternalTool):
 				raise MetaDataError("Errors in %s" % str(sourcefilename))
 
 		except Exception,e:
-			raise MetaDataError("Preprocessor exception: %s" % str(e))
+			raise MetaDataError("Preprocessor exception: '%s' : in command : '%s'" % (str(e), commandline))
 
 		return 0	# all OK
 
@@ -2652,8 +2651,8 @@ class MetaReader(object):
 
 		def LeftPortionOf(pth,sep):
 			""" Internal function to return portion of str that is to the left of sep. 
-			The partition is case-insentive."""
-			length = len((pth.lower().partition(sep.lower()))[0])
+			The split is case-insensitive."""
+			length = len((pth.lower().split(sep.lower()))[0])
 			return pth[0:length]
 			
 		modulePath = LeftPortionOf(LeftPortionOf(os.path.dirname(aBldInfPath), "group"), "ongoing")
@@ -2930,6 +2929,11 @@ class MetaReader(object):
 						expfile = open(expfilename, 'wb')
 						expfile.write(exportzip.read(file))
 						expfile.close()
+						
+						# Resurrect any file execution permissions present in the archived version
+						if (exportzip.getinfo(file).external_attr >> 16L) & 0100:
+							os.chmod(expfilename, stat.S_IMODE(os.stat(expfilename).st_mode) | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)						
+						
 						# Each file keeps its modified time the same as what it was before unzipping
 						accesstime = time.time()
 						datetime = exportzip.getinfo(file).date_time

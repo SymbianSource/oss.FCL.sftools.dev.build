@@ -129,5 +129,4 @@ class FilterCarbide(filter_interface.Filter):
 		FilterCarbide.stdout.write("Overall Errors: %d\n" % self.__errors)
 		FilterCarbide.stdout.write("Overall Warnings: %d\n\n" % self.__warnings)
 
-		return True if self.__errors == 0 else False
-
+		return (self.__errors == 0)

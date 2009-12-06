@@ -221,8 +221,8 @@ if not raptor_utilities.getOSPlatform().startswith("linux"):
 				# so we only check each one once
 				depset = set(deps)
 				deplistnodups = list(depset)
+				
 				# Do the check for each file 	
-
 				for dep in deplistnodups:
 					dep = os.path.abspath(dep).replace('\\', '/')
 					self.checksource(dep)

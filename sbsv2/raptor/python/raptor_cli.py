@@ -147,10 +147,15 @@ parser.add_option("--toolcheck",action="store",dest="toolcheck",
 
 				  "forced" -  Check all tool versions. Don't use cached results.
 			""")
+
+parser.add_option("--timing",action="store_true",dest="timing",
+			help="Show extra timing information for various processes in the build.")
+
 parser.add_option("--pp",action="store",dest="parallel_parsing",
 				help="""Controls how metadata (e.g. bld.infs) are parsed in Parallel.
 					Possible values are:
 					"on"  - Parse bld.infs in parallel (should be faster on clusters/multicore machines)
+					"slave" - used internally by Raptor 
 					"off" - Parse bld.infs serially 
 				     """)
 
@@ -277,6 +282,7 @@ def DoRaptor(Raptor, args):
 				 'what' :  Raptor.SetWhat,
 				 'tries' : Raptor.SetTries,
 				 'toolcheck' : Raptor.SetToolCheck,
+				 'timing' : Raptor.SetTiming,
 				 'source_target' : Raptor.AddSourceTarget,
 				 'command_file' : CommandFile,
 				'parallel_parsing' : Raptor.SetParallelParsing,
