@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 #
 # Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
@@ -65,14 +66,14 @@ def main():
 
 	recipe_re = re.compile(".*<recipe name='([^']+)'.*")
 	time_re = re.compile(".*<time start='([0-9]+\.[0-9]+)' *elapsed='([0-9]+\.[0-9]+)'.*")
-	status_re = re.compile(".*<status exit='([^']*)'.*")
+	status_re = re.compile(".*<status exit='(?P<exit>(ok|failed))'( *code='(?P<code>[0-9]+)')?.*")
 
 	alternating = 0
 	start_time = 0.0
 
 	
 	for l in f.xreadlines():
-		l2 = l.rstrip("\n")
+		l2 = l.rstrip("\n\r")
 		rm = recipe_re.match(l2)
 
 		if rm is not None:
@@ -82,26 +83,32 @@ def main():
 
 		tm = time_re.match(l2)
 		if tm is not None:
-			s = float(tm.groups()[0])
-			elapsed = float(tm.groups()[1])
+			try:
+				s = float(tm.groups()[0])
+				elapsed = float(tm.groups()[1])
 
-			if start_time == 0.0:
-				start_time = s
+				if start_time == 0.0:
+					start_time = s
 
-			s -= start_time
+				s -= start_time
 
-			#print s,elapsed
-			continue
+				#print s,elapsed
+				continue
+			except ValueError, e:
+				raise Exception("Parse problem: float conversion on these groups: %s\n%s" %(str(tm.groups()), str(e)))
+		else:
+			if l2.find("<time") is not -1:
+				raise Exception("unparsed timing status: %s\n"%l2)
 
 		sm = status_re.match(l2)
 
 		if sm is None:
 			continue
 
-		if sm.groups()[0] == 'ok':
+		if sm.groupdict()['exit'] == 'ok':
 			status = 0
 		else:
-			status = int(sm.groups()[0])
+			status = int(sm.groupdict()['code'])
 
 		st.add(s, elapsed, rname, status)
 
