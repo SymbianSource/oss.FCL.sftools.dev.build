@@ -222,6 +222,10 @@ class SystemModel(object):
 	def DumpInfo(self):
 		self.__Logger.Info("Found %d bld.inf references in %s within %d layers:", len(self.GetAllComponents()), self.__SystemDefinitionFile, len(self.GetLayerNames()))
 		self.__Logger.Info("\t%s", ", ".join(self.GetLayerNames()))
+		self.__Logger.InfoDiscovery(object_type = "layers",
+				count = len(self.GetLayerNames()))
+		self.__Logger.InfoDiscovery(object_type = "bld.inf references",
+				count = len(self.GetAllComponents()))
 
 	def __Read(self):
 		if not os.path.exists(self.__SystemDefinitionFile):

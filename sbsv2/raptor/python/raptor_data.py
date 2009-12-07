@@ -27,8 +27,13 @@ import sys
 import subprocess
 from tempfile import gettempdir
 from time import time, clock
+import traceback
+import raptor_cache
 
 
+class MissingInterfaceError(Exception):
+	def __init__(self, s):
+		Exception.__init__(self,s)
 
 # What host platforms we recognise
 # This allows us to tie some variants to one host platform and some to another
@@ -68,16 +73,14 @@ if not HostPlatform.IsKnown(HostPlatform.hostplatform):
 class Model(object):
 	"Base class for data-model objects"
 
+	__slots__ = ('host', 'source', 'cacheID')
+
 	def __init__(self):
-		self.owner = None	# Raptor object
 		self.source = None	# XML file
-		self.indent = " "	# for DebugPrint
 		self.host = None
 		self.cacheID = ""	# default set of cached objects
-
-
-	def SetOwner(self, aRaptor):
-		self.owner = aRaptor
+		# not using the cache parameter - there to make the 
+		# init for all Model objects "standard"
 
 
 	def SetSourceFile(self, filename):
@@ -91,10 +94,6 @@ class Model(object):
 	def AddChild(self, child):
 		raise InvalidChildError()
 
-
-	def DebugPrint(self, prefix = ""):
-		if self.owner:
-			self.owner.Debug("%s", prefix)
 
 	def Valid(self):
 		return False
@@ -139,8 +138,7 @@ class Reference(Model):
 	def Resolve(self):
 		raise BadReferenceError()
 
-	def GetModifiers(self):
-		cache = self.owner.cache
+	def GetModifiers(self, cache):
 		return [ cache.FindNamedVariant(m) for m in self.modifiers ]
 
 	def Valid(self):
@@ -154,20 +152,13 @@ class VariantContainer(Model):
 		self.variants = []
 
 
-	def SetOwner(self, aRaptor):
-		Model.SetOwner(self, aRaptor)
-		for v in self.variants:
-			v.SetOwner(aRaptor)
-
-
-	def DebugPrint(self, prefix = ""):
-		for v in self.variants:
-			v.DebugPrint(prefix)
+	def __str__(self):
+		return "\n".join([str(v) for v in self.variants])
 
 
 	def AddVariant(self, variant):
 		if type(variant) is types.StringTypes:
-			variant = VariantRef(variant)
+			variant = VariantRef(ref = variant)
 
 
 		# Only add the variant if it's not in the list
@@ -175,15 +166,19 @@ class VariantContainer(Model):
 		if not variant in self.variants:
 			self.variants.append(variant)
 
-	def GetVariants(self):
+	def GetVariants(self, cache):
 		# resolve any VariantRef objects into Variant objects
+		missing_variants = []
 		for i,var in enumerate(self.variants):
 			if isinstance(var, Reference):
 				try:
-					self.variants[i] = var.Resolve()
+					self.variants[i] = var.Resolve(cache=cache)
 
 				except BadReferenceError:
-					self.owner.Error("Missing variant '%s'", var.ref)
+					missing_variants.append(var.ref)
+
+		if len(missing_variants) > 0:
+			raise MissingVariantException("Missing variants '%s'", " ".join(missing_variants))
 
 		return self.variants
 
@@ -199,27 +194,25 @@ class Interface(Model):
 		self.params = []
 		self.paramgroups = []
 
-	def DebugPrint(self, prefix = ""):
-		self.owner.Debug("%s<interface name='%s'>", prefix, self.name)
-		self.owner.Debug("%s...", prefix)
-		self.owner.Debug("%s</interface>", prefix)
+	def __str__(self):
+		return "<interface name='%s'>" % self.name + "</interface>"
 
-	def FindParent(self):
+	def FindParent(self, cache):
 		try:
-			return self.owner.cache.FindNamedInterface(self.extends, self.cacheID)
+			return cache.FindNamedInterface(self.extends, self.cacheID)
 		except KeyError:
 			raise BadReferenceError("Cannot extend interface because it cannot be found: "+str(self.extends))
 
-	def GetParams(self):
+	def GetParams(self, cache):
 		if self.extends != None:
-			parent = self.FindParent()
+			parent = self.FindParent(cache)
 
 			# what parameter names do we have already?
 			names = set([x.name for x in self.params])
 
 			# pick up ones we don't have that are in our parent
 			pp = []
-			for p in parent.GetParams():
+			for p in parent.GetParams(cache):
 				if not p.name in names:
 					pp.append(p)
 
@@ -229,29 +222,29 @@ class Interface(Model):
 
 		return self.params
 
-	def GetParamGroups(self):
+	def GetParamGroups(self, cache):
 		if self.extends != None:
-			parent = self.FindParent()
+			parent = self.FindParent(cache)
 
 			# what parameter names do we have already?
 			patterns = set([x.pattern for x in self.paramgroups])
 
 			# pick up ones we don't have that are in our parent
-			for g in parent.GetParamGroups():
+			for g in parent.GetParamGroups(cache):
 				if not g.pattern in patterns:
 					self.paramgroups.append(g)
 
 		return self.paramgroups
 
 
-	def GetFLMIncludePath(self):
+	def GetFLMIncludePath(self, cache):
 		"absolute path to the FLM"
 
 		if self.flm == None:
 			if self.extends != None:
-				parent = self.FindParent()
+				parent = self.FindParent(cache)
 
-				return parent.GetFLMIncludePath()
+				return parent.GetFLMIncludePath(cache)
 			else:
 				raise InvalidPropertyError()
 
@@ -295,12 +288,12 @@ class Interface(Model):
 
 class InterfaceRef(Reference):
 
-	def DebugPrint(self, prefix = ""):
-		self.owner.Debug("%s<interfaceRef ref='%s'/>", prefix, self.ref)
+	def __str__(self):
+		return "<interfaceRef ref='%s'/>" % self.ref
 
-	def Resolve(self):
+	def Resolve(self, cache):
 		try:
-			return self.owner.cache.FindNamedInterface(self.ref, self.cacheID)
+			return cache.FindNamedInterface(self.ref, self.cacheID)
 		except KeyError:
 			raise BadReferenceError()
 
@@ -316,24 +309,13 @@ class Specification(VariantContainer):
 		self.parentSpec = None
 
 
-	def DebugPrint(self, prefix = ""):
-		self.owner.Debug("%s<spec name='%s'>", prefix, self.name)
-		if self.interface:
-			self.interface.DebugPrint(prefix + self.indent)
-		VariantContainer.DebugPrint(self, prefix + self.indent)
+	def __str__(self):
+		s = "<spec name='%s'>" % str(self.name)
+		s += VariantContainer.__str__(self)
 		for c in self.childSpecs:
-			c.DebugPrint(prefix + self.indent)
-		self.owner.Debug("%s</spec>", prefix)
-
-
-	def SetOwner(self, aRaptor):
-		VariantContainer.SetOwner(self, aRaptor)
-
-		if self.interface != None:
-			self.interface.SetOwner(aRaptor)
-
-		for s in self.childSpecs:
-			s.SetOwner(aRaptor)
+			s += str(c) + '\n'
+		s += "</spec>"
+		return s
 
 
 	def SetProperty(self, name, value):
@@ -343,10 +325,10 @@ class Specification(VariantContainer):
 			raise InvalidPropertyError()
 
 
-	def Configure(self, config):
+	def Configure(self, config, cache):
 		# configure all the children (some may be Filters or parents of)
 		for spec in self.GetChildSpecs():
-			spec.Configure(config)
+			spec.Configure(config, cache = cache)
 
 
 	def HasInterface(self):
@@ -358,10 +340,10 @@ class Specification(VariantContainer):
 		or isinstance(interface, InterfaceRef):
 			self.interface = interface
 		else:
-			self.interface = InterfaceRef(interface)
+			self.interface = InterfaceRef(ref = interface)
 
 
-	def GetInterface(self):
+	def GetInterface(self, cache):
 		"""return the Interface (fetching from the cache if it was a ref)
 		may return None"""
 
@@ -371,13 +353,11 @@ class Specification(VariantContainer):
 
 		if isinstance(self.interface, InterfaceRef):
 			try:
-				self.interface = self.interface.Resolve()
+				self.interface = self.interface.Resolve(cache=cache)
 				return self.interface
 
 			except BadReferenceError:
-				self.owner.Error("Missing interface %s", self.interface.ref)
-				return None
-
+				raise MissingInterfaceError("Missing interface %s" % self.interface.ref)
 
 	def AddChild(self, child):
 		if isinstance(child, Specification):
@@ -409,7 +389,7 @@ class Specification(VariantContainer):
 		return True
 
 
-	def GetAllVariantsRecursively(self):
+	def GetAllVariantsRecursively(self, cache):
 		"""Returns all variants contained in this node and in its ancestors.
 
 		The returned value is a list, the structure of which is [variants-in-parent,
@@ -419,11 +399,11 @@ class Specification(VariantContainer):
 		the variants themselves.
 		"""
 		if self.parentSpec:
-			variants = self.parentSpec.GetAllVariantsRecursively()
+			variants = self.parentSpec.GetAllVariantsRecursively(cache = cache)
 		else:
 			variants = []
 
-		variants.extend( self.GetVariants() )
+		variants.extend( self.GetVariants(cache = cache) )
 
 		return variants
 
@@ -438,22 +418,21 @@ class Filter(Specification):
 	If several Conditions are set, the test is an OR of all of them."""
 
 	def __init__(self, name = ""):
-		Specification.__init__(self, name)	# base class constructor
-		self.Else = Specification(name)     # same for Else part
+		Specification.__init__(self, name = name)	# base class constructor
+		self.Else = Specification(name = name)     # same for Else part
 		self.isTrue = True
 		self.configNames = set()            #
 		self.variableNames = set()          # TO DO: Condition class
 		self.variableValues = {}            #
 
-	def DebugPrint(self, prefix = ""):
-		self.owner.Debug("%s<filter name='%s'>", prefix, self.name)
-		self.owner.Debug("%s <if config='%s'>", prefix, " | ".join(self.configNames))
-		Specification.DebugPrint(self, prefix + self.indent)
-		self.owner.Debug("%s </if>", prefix)
-		self.owner.Debug("%s <else>", prefix)
-		self.Else.DebugPrint(prefix + self.indent)
-		self.owner.Debug("%s </else>", prefix)
-		self.owner.Debug("%s</filter>", prefix)
+	def __str__(self, prefix = ""):
+		s = "<filter name='%s'>\n"% self.name
+		s += "<if config='%s'>\n" % " | ".join(self.configNames)
+		s += Specification.__str__(self)
+		s += "</if>\n <else>\n"
+		s += str(self.Else)
+		s += " </else>\n</filter>\n"
+		return s
 
 
 	def SetConfigCondition(self, configName):
@@ -478,13 +457,14 @@ class Filter(Specification):
 			self.variableValues[variableName] = set([variableValues])
 
 
-	def Configure(self, buildUnit):
+	def Configure(self, buildUnit, cache):
 		self.isTrue = False
 
 		if buildUnit.name in self.configNames:
 			self.isTrue = True
 		elif self.variableNames:
-			evaluator = self.owner.GetEvaluator(self.parentSpec, buildUnit)
+
+			evaluator = Evaluator(self.parentSpec, buildUnit, cache=cache)
 
 			for variableName in self.variableNames:
 				variableValue = evaluator.Get(variableName)
@@ -495,14 +475,7 @@ class Filter(Specification):
 
 		# configure all the children too
 		for spec in self.GetChildSpecs():
-			spec.Configure(buildUnit)
-
-
-	def SetOwner(self, aRaptor):
-		# base class method
-		Specification.SetOwner(self, aRaptor)
-		# same for Else part
-		self.Else.SetOwner(aRaptor)
+			spec.Configure(buildUnit, cache=cache)
 
 
 	def HasInterface(self):
@@ -512,18 +485,18 @@ class Filter(Specification):
 			return self.Else.HasInterface()
 
 
-	def GetInterface(self):
+	def GetInterface(self, cache):
 		if self.isTrue:
-			return Specification.GetInterface(self)
+			return Specification.GetInterface(self, cache = cache)
 		else:
-			return self.Else.GetInterface()
+			return self.Else.GetInterface(cache = cache)
 
 
-	def GetVariants(self):
+	def GetVariants(self, cache):
 		if self.isTrue:
-			return Specification.GetVariants(self)
+			return Specification.GetVariants(self, cache = cache)
 		else:
-			return self.Else.GetVariants()
+			return self.Else.GetVariants(cache = cache)
 
 
 	def SetParentSpec(self, parent):
@@ -591,18 +564,17 @@ class ParameterGroup(Model):
 
 class Operation(Model):
 	"Base class for variant operations"
+	__slots__ = 'type'
 	def __init__(self):
 		Model.__init__(self)	# base class constructor
 		self.type = None
-
 
 	def Apply(self, oldValue):
 		pass
 
 
 class Append(Operation):
-	__slots__ = ('name','value','separator','owner')
-
+	__slots__ = ('name', 'value', 'separator')
 	def __init__(self, name = None, value = None, separator = " "):
 		Operation.__init__(self)	# base class constructor
 		self.name = name
@@ -610,9 +582,9 @@ class Append(Operation):
 		self.separator = separator
 
 
-	def DebugPrint(self, prefix = ""):
+	def __str__(self):
 		attributes = "name='" + self.name + "' value='" + self.value + "' separator='" + self.separator + "'"
-		self.owner.Debug("%s<append %s/>", prefix, attributes)
+		return "<append %s/>" % attributes
 
 
 	def Apply(self, oldValue):
@@ -641,6 +613,7 @@ class Append(Operation):
 
 
 class Prepend(Operation):
+	__slots__ = ('name', 'value', 'separator')
 	def __init__(self, name = None, value = None, separator = " "):
 		Operation.__init__(self)	# base class constructor
 		self.name = name
@@ -648,9 +621,9 @@ class Prepend(Operation):
 		self.separator = separator
 
 
-	def DebugPrint(self, prefix = ""):
+	def __str__(self, prefix = ""):
 		attributes = "name='" + self.name + "' value='" + self.value + "' separator='" + self.separator + "'"
-		self.owner.Debug("%s<prepend %s/>", prefix, attributes)
+		return "<prepend %s/>" % prefix
 
 
 	def Apply(self, oldValue):
@@ -679,8 +652,8 @@ class Prepend(Operation):
 
 
 class Set(Operation):
+	__slots__ = ('name', 'value', 'type', 'versionCommand', 'versionResult')
 	"""implementation of <set> operation"""
-	__slots__ = ('name','value', 'type', 'versionCommand', 'versionResult', 'owner')
 
 	def __init__(self, name = None, value = "", type = ""):
 		Operation.__init__(self)	# base class constructor
@@ -691,12 +664,12 @@ class Set(Operation):
 		self.versionResult = ""
 
 
-	def DebugPrint(self, prefix = ""):
+	def __str__(self):
 		attributes = "name='" + self.name + "' value='" + self.value + "' type='" + self.type + "'"
 		if type == "tool":
 			attributes += " versionCommand='" + self.versionCommand + "' versionResult='" + self.versionResult
 
-		self.owner.Debug("%s<set %s/>", prefix, attributes)
+		return "<set %s/>" % attributes
 
 
 	def Apply(self, oldValue):
@@ -724,6 +697,8 @@ class Set(Operation):
 	def Valid(self):
 		return (self.name != None and self.value != None)
 
+class BadToolValue(Exception):
+	pass
 
 class Env(Set):
 	"""implementation of <env> operator"""
@@ -733,7 +708,7 @@ class Env(Set):
 		self.default = default
 
 
-	def DebugPrint(self, prefix = ""):
+	def __str__(self):
 		attributes = "name='" + self.name + "' type='" + self.type + "'"
 		if default != None:
 			attributes += " default='" + self.default + "'"
@@ -741,7 +716,7 @@ class Env(Set):
 		if type == "tool":
 			attributes += " versionCommand='" + self.versionCommand + "' versionResult='" + self.versionResult + "'"
 
-		self.owner.Debug("%s<env %s/>", prefix, attributes)
+		return "<env %s/>" % attributes
 
 
 	def Apply(self, oldValue):
@@ -755,14 +730,12 @@ class Env(Set):
 					path = generic_path.Path(value)
 					value = str(path.Absolute())
 				except ValueError,e:
-					self.owner.Error("the environment variable %s is incorrect: %s" % (self.name, str(e)))
-					return "NO_VALUE_FOR_" + self.name
+					raise BadToolValue("the environment variable %s is incorrect: %s" % (self.name, str(e)))
 		except KeyError:
 			if self.default != None:
 				value = self.default
 			else:
-				self.owner.Error("%s is not set in the environment and has no default", self.name)
-				return "NO_VALUE_FOR_" + self.name
+				raise BadToolValue("%s is not set in the environment and has no default" % self.name)
 
 		return value
 
@@ -791,7 +764,7 @@ class BuildUnit(object):
 		self.operations = []
 		self.variantKey = ""
 
-	def GetOperations(self):
+	def GetOperations(self, cache):
 		"""Return all operations related to this BuildUnit.
 		
 		The result is cached, and so will only be computed once per BuildUnit.
@@ -800,7 +773,7 @@ class BuildUnit(object):
 		if self.variantKey != key:
 			self.variantKey = key
 			for v in self.variants:
-				self.operations.extend( v.GetAllOperationsRecursively() )
+				self.operations.extend( v.GetAllOperationsRecursively(cache=cache) )
 
 		return self.operations
 
@@ -820,7 +793,7 @@ class Config(object):
 	def ClearModifiers(self):
 		self.modifiers = []
 
-	def GenerateBuildUnits(self):
+	def GenerateBuildUnits(self,cache):
 		"""Returns a list of BuildUnits.
 
 		This function must be overridden by derived classes.
@@ -829,6 +802,8 @@ class Config(object):
 
 
 class Variant(Model, Config):
+
+	__slots__ = ('cache','name','host','extends','ops','variantRefs','allOperations')
 
 	def __init__(self, name = ""):
 		Model.__init__(self)
@@ -868,20 +843,10 @@ class Variant(Model, Config):
 	def Valid(self):
 		return self.name
 
-	def SetOwner(self, aRaptor):
-
-		Model.SetOwner(self, aRaptor)
-
-		for r in self.variantRefs:
-			r.SetOwner(aRaptor)
-
-		for op in self.ops:
-			op.SetOwner(aRaptor)
-
 	def AddOperation(self, op):
 		self.ops.append(op)
 
-	def GetAllOperationsRecursively(self):
+	def GetAllOperationsRecursively(self, cache):
 		"""Returns a list of all operations in this variant.
 
 		The list elements are themselves lists; the overall structure of the
@@ -892,16 +857,16 @@ class Variant(Model, Config):
 
 		if not self.allOperations:
 			if self.extends:
-				parent = self.owner.cache.FindNamedVariant(self.extends)
-				self.allOperations.extend( parent.GetAllOperationsRecursively() )
+				parent = cache.FindNamedVariant(self.extends)
+				self.allOperations.extend( parent.GetAllOperationsRecursively(cache = cache) )
 			for r in self.variantRefs:
-				for v in [ r.Resolve() ] + r.GetModifiers():
-					self.allOperations.extend( v.GetAllOperationsRecursively() )
+				for v in [ r.Resolve(cache = cache) ] + r.GetModifiers(cache = cache):
+					self.allOperations.extend( v.GetAllOperationsRecursively(cache = cache) )
 			self.allOperations.append(self.ops)
 
 		return self.allOperations
 
-	def GenerateBuildUnits(self):
+	def GenerateBuildUnits(self,cache):
 
 		name = self.name
 		vars = [self]
@@ -909,32 +874,32 @@ class Variant(Model, Config):
 		for m in self.modifiers:
 			name = name + "." + m.name
 			vars.append(m)
+		return [ BuildUnit(name=name, variants=vars) ]
 
-		return [ BuildUnit(name, vars) ]
-
-	def DebugPrint(self, prefix = ""):
-
-		self.owner.Debug("%s<var name='%s' extends='%s'>", prefix, self.name, self.extends)
+	def __str__(self):
+		s = "<var name='%s' extends='%s'>\n" % (self.name, self.extends)
 		for op in self.ops:
-			op.DebugPrint(prefix + self.indent)
+			s +=  str(op) + '\n'
+		s += "</var>"
+		return s
 
-		self.owner.Debug("%s</var>", prefix)
-
-
+import traceback
 class VariantRef(Reference):
 
 	def __init__(self, ref=None):
-		Reference.__init__(self, ref)
+		Reference.__init__(self, ref = ref)
 
-	def DebugPrint(self, prefix = ""):
-		self.owner.Debug("%s<varRef ref='%s'/>", prefix, self.ref)
+	def __str__(self):
+		return "<varRef ref='%s'/>" % self.ref
 
-	def Resolve(self):
+	def Resolve(self, cache):
 		try:
-			return self.owner.cache.FindNamedVariant(self.ref)
-		except KeyError:
+			return cache.FindNamedVariant(self.ref)
+		except KeyError, e:
 			raise BadReferenceError(self.ref)
 
+class MissingVariantException(Exception):
+	pass
 
 class Alias(Model, Config):
 
@@ -946,8 +911,8 @@ class Alias(Model, Config):
 		self.varRefs = []
 		self.variants = []
 
-	def DebugPrint(self, prefix = ""):
-		self.owner.Debug("%s<alias name='%s' meaning='%s'/>", prefix, self.name, self.meaning)
+	def __str__(self):
+		return "<alias name='%s' meaning='%s'/>" % (self.name, self.meaning)
 
 	def SetProperty(self, key, val):
 		if key == "name":
@@ -956,32 +921,31 @@ class Alias(Model, Config):
 			self.meaning = val
 
 			for u in val.split("."):
-				self.varRefs.append( VariantRef(u) )
+				self.varRefs.append( VariantRef(ref = u) )
 		else:
 			raise InvalidPropertyError()
-
-	def SetOwner(self, raptor):
-		Model.SetOwner(self, raptor)
-		for r in self.varRefs:
-			r.SetOwner(raptor)
 
 	def Valid(self):
 		return self.name and self.meaning
 
-	def GenerateBuildUnits(self):
+	def GenerateBuildUnits(self, cache):
 		if not self.variants:
+			missing_variants = []
 			for r in self.varRefs:
 				try:
-					self.variants.append( r.Resolve() )
+					self.variants.append( r.Resolve(cache=cache) )
 				except BadReferenceError:
-					self.owner.Error("Missing variant '%s'", r.ref)
+					missing_variants.append(r.ref)
+				
+			if len(missing_variants) > 0:
+				raise MissingVariantException("Missing variants '%s'", " ".join(missing_variants))
 
 		name = self.name
 
 		for v in self.modifiers:
 			name = name + "." + v.name
 
-		return [ BuildUnit(name, self.variants + self.modifiers) ]
+		return [ BuildUnit(name=name, variants=self.variants + self.modifiers) ]
 
 
 class AliasRef(Reference):
@@ -989,12 +953,12 @@ class AliasRef(Reference):
 	def __init__(self, ref=None):
 		Reference.__init__(self, ref)
 
-	def DebugPrint(self, prefix = ""):
-		self.owner.Debug("%s<aliasRef ref='%s'/>", prefix, self.ref)
+	def __str__(self):
+		return "<aliasRef ref='%s'/>" % self.ref
 
-	def Resolve(self):
+	def Resolve(self, cache):
 		try:
-			return self.owner.cache.FindNamedAlias(self.ref)
+			return cache.FindNamedAlias(self.ref)
 		except KeyError:
 			raise BadReferenceError(self.ref)
 
@@ -1018,41 +982,37 @@ class Group(Model, Config):
 		else:
 			raise InvalidChildError()
 
-	def SetOwner(self, raptor):
-		Model.SetOwner(self, raptor)
-		for r in self.childRefs:
-			r.SetOwner(raptor)
-
 	def Valid(self):
 		return self.name and self.childRefs
 
-	def DebugPrint(self, prefix = ""):
-
-		self.owner.Debug("<group name='%s'>", prefix, self.name)
-
+	def __str__(self):
+		s = "<group name='%s'>" % self.name
 		for r in self.childRefs:
-			r.DebugPrint(prefix + self.indent)
+			s += str(r)
+		s += "</group>"
+		return s
 
-		self.owner.Debug("%s</group>", prefix)
-
-	def GenerateBuildUnits(self):
-
+	def GenerateBuildUnits(self, cache):
 		units = []
 
+		missing_variants = []
 		for r in self.childRefs:
-			refMods = r.GetModifiers()
+			refMods = r.GetModifiers(cache)
 
 			try:
-				obj = r.Resolve()
+				obj = r.Resolve(cache=cache)
 			except BadReferenceError:
-				self.owner.Error("Missing variant '%s'", r.ref)
+				missing_variants.append(r.ref)
 			else:
 				obj.ClearModifiers()
 
 				for m in refMods + self.modifiers:
 					obj.AddModifier(m)
 
-				units.extend( obj.GenerateBuildUnits() )
+				units.extend( obj.GenerateBuildUnits(cache) )
+
+		if len(missing_variants) > 0:
+			raise MissingVariantException("Missing variants '%s'", " ".join(missing_variants))
 
 		return units
 
@@ -1062,18 +1022,26 @@ class GroupRef(Reference):
 	def __init__(self, ref=None):
 		Reference.__init__(self, ref)
 
-	def DebugPrint(self, prefix = ""):
-		mod = ".".join(self.modifiers)
-		self.owner.Debug("%s<groupRef ref='%s' mod='%s'/>", prefix, self.ref, mod)
+	def __str__(self):
+		return "<%s /><groupRef ref='%s' mod='%s'/>" % (prefix, self.ref, ".".join(self.modifiers))
 
-	def Resolve(self):
+	def Resolve(self, cache):
 		try:
-			return self.owner.cache.FindNamedGroup(self.ref)
+			return cache.FindNamedGroup(self.ref)
 		except KeyError:
 			raise BadReferenceError(self.ref)
 
+class ToolErrorException(Exception):
+	def __init__(self, s):
+		Exception.__init__(self,s)
+
 class Tool(object):
 	"""Represents a tool that might be used by raptor e.g. a compiler"""
+
+	# It's difficult and expensive to give each tool a log reference but a class one
+	# will facilitate debugging when that is needed without being a design flaw the
+	# rest of the time.
+	log = raptor_utilities.nulllog
 
 	# For use in dealing with tools that return non-ascii version strings.
 	nonascii = ""
@@ -1084,7 +1052,7 @@ class Tool(object):
 		nonascii += chr(c)
 		identity_chartable += " "
 
-	def __init__(self, name, command, versioncommand, versionresult, id="", log = raptor_utilities.nulllog):
+	def __init__(self, name, command, versioncommand, versionresult, id=""):
 		self.name = name
 		self.command = command
 		self.versioncommand = versioncommand
@@ -1097,7 +1065,6 @@ class Tool(object):
 		# version until someone proves that it's OK
 		self.valid = False
 
-		self.log=log
 
 	def expand(self, toolset):
 		self.versioncommand = toolset.ExpandAll(self.versioncommand)
@@ -1117,7 +1084,7 @@ class Tool(object):
 				# If it really is not a simple command then we won't be able to get a date and
 				# we won't be able to tell if it is altered or updated - too bad!
 				testfile = generic_path.Where(self.command)
-				self.log.Debug("toolcheck: tool '%s' was found on the path at '%s' ", self.command, testfile)
+				#self.log.Debug("toolcheck: tool '%s' was found on the path at '%s' ", self.command, testfile)
 				if testfile is None:
 					raise Exception("Can't be found in path")
 
@@ -1127,18 +1094,20 @@ class Tool(object):
 			testfile_stat = os.stat(testfile)
 			self.date = testfile_stat.st_mtime
 		except Exception,e:
-			self.log.Debug("toolcheck: '%s=%s' cannot be dated - this is ok, but the toolcheck won't be able to tell when a new  of the tool is installed. (%s)", self.name, self.command, str(e))
+			# We really don't mind if the tool could not be dated - for any reason
+			Tool.log.Debug("toolcheck: '%s=%s' cannot be dated - this is ok, but the toolcheck won't be able to tell when a new version of the tool is installed. (%s)", self.name, self.command, str(e))
+			pass
 	
 			
-	def check(self, shell, evaluator):
+	def check(self, shell, evaluator, log = raptor_utilities.nulllog):
 
 		self.vre = re.compile(self.versionresult)
 
 		try:
 			self.log.Debug("Pre toolcheck: '%s' for version '%s'", self.name, self.versionresult)
 			p = subprocess.Popen(args=[shell, "-c", self.versioncommand], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+			log.Debug("Checking tool '%s' for version '%s'", self.name, self.versionresult)
 			versionoutput,err = p.communicate()
-			self.log.Debug("Checking tool '%s' for version '%s'", self.name, self.versionresult)
 		except Exception,e:
 			versionoutput=None
 
@@ -1148,12 +1117,11 @@ class Tool(object):
 		versionoutput_a = versionoutput.translate(Tool.identity_chartable,"")
 
 		if versionoutput_a and self.vre.search(versionoutput_a) != None:
-			self.log.Debug("tool '%s' returned an acceptable version '%s' at %s", self.name, versionoutput_a, str(self.date))
+			log.Debug("tool '%s' returned an acceptable version '%s'", self.name, versionoutput_a)
 			self.valid = True
 		else:
-			self.log.Error("tool '%s' from config '%s' did not return version '%s' as required.\nCommand '%s' returned:\n%s\nCheck your environment and configuration.\n", self.name, self.id, self.versionresult, self.versioncommand, versionoutput_a)
 			self.valid = False
-		return self.valid
+			raise ToolErrorException("tool '%s' from config '%s' did not return version '%s' as required.\nCommand '%s' returned:\n%s\nCheck your environment and configuration.\n" % (self.name, self.id, self.versionresult, self.versioncommand, versionoutput_a))
 
 def envhash(irrelevant_vars):
 	"""Determine something unique about this environment to identify it.
@@ -1175,16 +1143,19 @@ class ToolSet(object):
 	write() is used to flush the cache to disc.
 	"""
 	# The raptor shell - this is not mutable.
-	hostbinaries = os.path.join(os.environ['SBS_HOME'], 
-	                            os.environ['HOSTPLATFORM_DIR'])
-	                            
-	if HostPlatform.IsHost('lin*'):
-		shell=os.path.join(hostbinaries, 'bin/bash')
+	if 'SBS_SHELL' in os.environ:
+		shell = os.environ['SBS_SHELL']
 	else:
-		if 'SBS_CYGWIN' in os.environ:
-			shell=os.path.join(os.environ['SBS_CYGWIN'], 'bin\\bash.exe')
+		hostbinaries = os.path.join(os.environ['SBS_HOME'], 
+	                                os.environ['HOSTPLATFORM_DIR'])
+	                            
+		if HostPlatform.IsHost('lin*'):
+			shell=os.path.join(hostbinaries, 'bin/bash')
 		else:
-			shell=os.path.join(hostbinaries, 'cygwin\\bin\\bash.exe')
+			if 'SBS_CYGWIN' in os.environ:
+				shell=os.path.join(os.environ['SBS_CYGWIN'], 'bin\\bash.exe')
+			else:
+				shell=os.path.join(hostbinaries, 'cygwin\\bin\\bash.exe')
 
 
 	irrelevant_vars = ['PWD','OLDPWD','PID','PPID', 'SHLVL' ]
@@ -1255,7 +1226,6 @@ class ToolSet(object):
 							except Exception, e:
 								log.Info("Ignoring garbled toolcheck cache: %s (%s)\n", self.cachefilename, str(e))
 								self.__toolcheckcache = {}
-								
 									
 						else:
 							log.Info("Toolcheck cache %s ignored - environment changed\n", self.cachefilename)
@@ -1316,8 +1286,11 @@ class ToolSet(object):
 
 			self.log.Debug("toolcheck done: %s -key: %s" % (tool.name, tool.key))
 
-			if not tool.check(ToolSet.shell, evaluator):
+			try:
+				tool.check(ToolSet.shell, evaluator, log = self.log)
+			except ToolErrorException, e:
 				self.valid = False
+				self.log.Error("%s\n" % str(e))
 
 			# Tool failures are cached just like successes - don't want to repeat them
 			cache[tool.key] =  { "name" : tool.name, "valid" : tool.valid, "age" : 0 , "date" : tool.date }
@@ -1356,6 +1329,8 @@ class ToolSet(object):
 				self.log.Info("Could not write toolcheck cache: %s", str(e))
 		return self.valid
 
+class UninitialisedVariableException(Exception):
+	pass
 
 class Evaluator(object):
 	"""Determine the values of variables under different Configurations.
@@ -1364,11 +1339,11 @@ class Evaluator(object):
 
 	refRegex = re.compile("\$\((.+?)\)")
 
-	def __init__(self, Raptor, specification, buildUnit, gathertools = False):
-		self.raptor = Raptor
+	def __init__(self, specification, buildUnit, cache, gathertools = False):
 		self.dict = {}
 		self.tools = []
 		self.gathertools = gathertools
+		self.cache = cache
 
 		specName = "none"
 		configName = "none"
@@ -1377,14 +1352,18 @@ class Evaluator(object):
 		opsLists = []
 
 		if buildUnit:
-			opsLists.extend( buildUnit.GetOperations() )
+			ol = buildUnit.GetOperations(cache)
+			self.buildUnit = buildUnit
+			
+			opsLists.extend( ol )
 
 		if specification:
-			for v in specification.GetAllVariantsRecursively():
-				opsLists.extend( v.GetAllOperationsRecursively() )
+			for v in specification.GetAllVariantsRecursively(cache):
+				opsLists.extend( v.GetAllOperationsRecursively(cache) )
 
 		tools = {}
 
+		unfound_values = []
 		for opsList in opsLists:
 			for op in opsList:
 				# applying an Operation to a non-existent variable
@@ -1394,13 +1373,20 @@ class Evaluator(object):
 				except KeyError:
 					oldValue = ""
 
-				newValue = op.Apply(oldValue)
+				try:
+					newValue = op.Apply(oldValue)
+				except BadToolValue, e:
+					unfound_values.append(str(e))
+					newValue = "NO_VALUE_FOR_" + op.name
+					
 				self.dict[op.name] = newValue
 			
 				if self.gathertools:
 					if op.type == "tool" and op.versionCommand and op.versionResult:
-						tools[op.name] = Tool(op.name, newValue, op.versionCommand, op.versionResult, configName, log = self.raptor)
+						tools[op.name] = Tool(op.name, newValue, op.versionCommand, op.versionResult, configName)
 
+		if len(unfound_values) > 0:
+			raise UninitialisedVariableException("\n".join(unfound_values))
 
 		if self.gathertools:
 			self.tools = tools.values()
@@ -1417,8 +1403,8 @@ class Evaluator(object):
 			unresolved = False
 			for k, v in self.dict.items():
 				if v.find('$(' + k + ')') != -1:
-					self.raptor.Error("Recursion Detected in variable '%s' in configuration '%s' ",k,configName)
-					expanded = "RECURSIVE_INVALID_STRING"
+						raise RecursionException("Recursion Detected in variable '%s' in configuration '%s' " % (k,configName))
+						expanded = "RECURSIVE_INVALID_STRING"
 				else:
 					expanded = self.ExpandAll(v, specName, configName)
 
@@ -1466,19 +1452,23 @@ class Evaluator(object):
 
 		refs = Evaluator.refRegex.findall(value)
 
+		# store up all the unset variables before raising an exception
+		# to allow us to find them all
+		unset_variables = [] 
+
 		for r in set(refs):
 			expansion = None
 
-			if r in self.raptor.override:
-				expansion = self.raptor.override[r]
-			elif r in self.dict:
+			if r in self.dict:
 				expansion = self.dict[r]
 			else:
 				# no expansion for $(r)
-				self.raptor.Error("Unset variable '%s' used in spec '%s' with config '%s'",
-							  	  r, spec, config)
+				unset_variables.append("Unset variable '%s' used in spec '%s' with config '%s'" % (r, spec, config))
 			if expansion != None:
 				value = value.replace("$(" + r + ")", expansion)
+
+		if len(unset_variables) > 0: # raise them all
+			raise UninitialisedVariableException(". ".join(unset_variables))
 
 		return value
 

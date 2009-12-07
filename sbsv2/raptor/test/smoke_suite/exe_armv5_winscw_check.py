@@ -15,6 +15,7 @@
 #
 
 from raptor_tests import CheckWhatSmokeTest
+import re
 
 def run():
 	t = CheckWhatSmokeTest()
@@ -44,4 +45,32 @@ def run():
 		"MISSING: $(EPOCROOT)/epoc32/release/winscw/urel/test.exe.map"
 	]
 	t.run()
+
+	t.id = "6a"
+	t.name = "exe_armv5_winscw_check_error"
+	t.command = "sbs -b no/such/bld.inf --check"
+	t.targets = []
+	t.missing = 0
+	t.errors = 2
+	t.returncode = 1
+	t.regexlinefilter = re.compile("^NEVER") # no literal stdout matching
+	t.stdout = []
+	t.mustmatch = [
+		"sbs: error:.*build info file does not exist",
+		"sbs: error: no CHECK information found",
+	]
+	t.run()
+
+	t.id = "6b"
+	t.name = "exe_armv5_winscw_what_error"
+	t.command = "sbs -b no/such/bld.inf --what"
+	t.mustmatch = [
+		"sbs: error:.*build info file does not exist",
+		"sbs: error: no WHAT information found",
+	]
+	t.run()
+
+	t.id = "6"
+	t.name = "exe_armv5_winscw_check"
+	t.print_result()
 	return t

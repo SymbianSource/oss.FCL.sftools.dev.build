@@ -100,8 +100,14 @@ def where(input_file):
 				except OSError, error:
 					pass
 	else:
-		(comIn, comOut) = os.popen4("which " + input_file)
-		output = comOut.read()
+		whichproc = subprocess.Popen(args=["which", input_file], 
+					stdout=subprocess.PIPE,
+					stderr=subprocess.STDOUT,
+					shell=False,
+					universal_newlines=True)
+		output = whichproc.stdout.readlines()
+		whichproc.wait()
+
 		if len(output) > 0:
 			locations.append(output[0:(len(output) - 1)])
 				
@@ -115,40 +121,41 @@ def clean_epocroot():
 	This method walks through epocroot and cleans every file and folder that is
 	not present in the manifest file
 	"""
+	epocroot = os.path.abspath(os.environ['EPOCROOT']).replace('\\','/')
+	print "Cleaning Epocroot: %s" % epocroot
 	all_files = {} # dictionary to hold all files
 	folders = [] # holds all unique folders in manifest
+	host_platform = os.environ["HOSTPLATFORM_DIR"]
 	try:
-		mani = "./epocroot/manifest"
+		mani = "$(EPOCROOT)/manifest"
 		manifest = open(ReplaceEnvs(mani), "r")
-		# This is a fast algorithm to read the manifest file
-		while 1:
-            # The file is close to 3000 lines.
-            # If this value changes, increment the number to include all lines
-			lines = manifest.readlines(3000)
-			if not lines:
-				break
-			for line in lines:
-				# Get rid of newline char and add to dictionary
-				all_files[line.rstrip("\n")] = True
-				# This bit makes a record of unique folders into a list
-				end = 0
-				while end != -1: # Look through the parent folders
-					end = line.rfind("/")
-					line = line[:end]
-					if line not in folders:
-						folders.append(line)
+		le = len(epocroot)
+		for line in manifest:
+			line = line.replace("$(HOSTPLATFORM_DIR)", host_platform)
+			line = line.replace("./", epocroot+"/").rstrip("\n")
+			all_files[line] = True
+			# This bit makes a record of unique folders into a list
+			pos = line.rfind("/", le)
+			while pos > le: # Look through the parent folders
+				f = line[:pos]
+				if f not in folders:
+					folders.append(f)
+				pos = line.rfind("/", le, pos)
+				
+
 		# This algorithm walks through epocroot and handles files and folders
-		walkpath = "./epocroot"
+		walkpath = "$(EPOCROOT)"
 		for (root, dirs, files) in os.walk(ReplaceEnvs(walkpath), topdown =
 				False):
+			if root.find(".hg") != -1:
+				continue
+
 			# This loop handles all files
 			for name in files:
 				name = os.path.join(root, name).replace("\\", "/")
-				name = name.replace("./epocroot/", "./")
 								
 				if name not in all_files:
 					try:
-						name = ReplaceEnvs(name.replace("./", "./epocroot/"))
 						os.remove(name)
 					except:
 						# chmod to rw and try again
@@ -163,12 +170,14 @@ def clean_epocroot():
 									
 			# This loop handles folders
 			for name in dirs:
+				if name.find(".hg") != -1:
+					continue
+				
 				name = os.path.join(root, name).replace("\\", "/")
-				name = name.replace("./epocroot/", "./")
 				if name not in all_files and name not in folders:
 					# Remove the folder fully with no errors if full
 					try:
-						rmtree(ReplaceEnvs(name.replace("./", "./epocroot/")))
+						rmtree(ReplaceEnvs(name))
 					except:
 						print "\nEPOCROOT-CLEAN ERROR:"
 						print (sys.exc_type.__name__ + ":"), \
@@ -176,9 +185,16 @@ def clean_epocroot():
 								traceback.print_tb(sys.exc_traceback)
 	except IOError,e:
 		print e
+	
+	print "Epocroot Cleaned"
 
 def fix_id(input_id):
 	return input_id.zfill(4)
+
+
+def grep(file, string):
+	return
+
 	
 # Test classes ################################################################
 
@@ -186,13 +202,15 @@ class SmokeTest(object):
 	"""Base class for Smoke Test objects.
 	
 	Each test is defined (minimally) by,
-	1) a raptor command-line
-	2) a list of target files that should get built
+	1) an ID number as a string
+	2) a name
+	3) a raptor command-line
+	4) some parameters to check the command results against
 
 	The run() method will,
 	1) delete all the listed target files
 	2) execute the raptor command
-	3) check that the target files were created
+	3) check that the test results match the test parameters
 	4) count the warnings and errors reported
 	"""
 	
@@ -202,7 +220,7 @@ class SmokeTest(object):
 
 	def __init__(self):
 		
-		self.id = 0
+		self.id = "0"
 		self.name = "smoketest"
 		self.description = ""
 		self.command = "sbs --do_what_i_want"
@@ -261,23 +279,24 @@ class SmokeTest(object):
 			self.result = SmokeTest.FAIL
 		
 		# print the result of this run()
-		self.print_result(True)
+		self.print_result(internal = True)
 		
 		# if a previous run() failed then the overall result is a FAIL
 		if previousResult == SmokeTest.FAIL:
 			self.result = SmokeTest.FAIL
 	
-	def print_result(self, internal = False, value = ""):
+	def print_result(self, value = "", internal = False):
 		# the test passed :-)
 		
 		result = self.result
+			
+		string = ""
+		if not internal:
+			string += "\n" + self.name + ": "
 		
-		if value != "":
-			print value
+		if value:
+			print string + value
 		else:
-			string = ""
-			if not internal:
-				string += "\n" + self.name + ": "
 			if result == SmokeTest.PASS:
 				string += "PASSED"
 			elif result == SmokeTest.FAIL:
@@ -366,19 +385,27 @@ class SmokeTest(object):
 		# Any environment settings specific to this test
 		shellenv = os.environ.copy()
 		for ev in self.environ:
-			shellenv[ev] = self.environ[ev]	
+			shellenv[ev] = self.environ[ev]
 
 		if self.usebash:
 			shellpath = shellenv['PATH']
+			
+			if 'SBS_SHELL' in os.environ:
+				BASH = os.environ['SBS_SHELL']
+			else:
+				if self.onWindows:
+					if 'SBS_CYGWIN' in shellenv:
+						BASH = ReplaceEnvs("$(SBS_CYGWIN)/bin/bash.exe")
+					else:
+						BASH = ReplaceEnvs("$(SBS_HOME)/win32/cygwin/bin/bash.exe")
+				else:
+					BASH = ReplaceEnvs("$(SBS_HOME)/$(HOSTPLATFORM_DIR)/bin/bash")
+				
 			if self.onWindows:
 				if 'SBS_CYGWIN' in shellenv:
 					shellpath = ReplaceEnvs("$(SBS_CYGWIN)/bin") + ";" + shellpath
-					BASH=ReplaceEnvs("$(SBS_CYGWIN)/bin/bash.exe")
 				else:
 					shellpath = ReplaceEnvs("$(SBS_HOME)/win32/cygwin/bin") + ";" + shellpath
-					BASH=ReplaceEnvs("$(SBS_HOME)/win32/cygwin/bin/bash.exe")
-			else:
-				BASH=ReplaceEnvs("$(SBS_HOME)/$(HOSTPLATFORM_DIR)/bin/bash")
 
 			shellenv['SBSMAKEFILE']=ReplaceEnvs(self.makefile())
 			shellenv['SBSLOGFILE']=ReplaceEnvs(self.logfile())
@@ -645,5 +672,6 @@ class AntiTargetSmokeTest(SmokeTest):
 			else:
 				self.antitargets.append(["$(EPOCROOT)/epoc32/build/"+fragment+"/"+x for x in t])
 		return
+
 	
 # the end

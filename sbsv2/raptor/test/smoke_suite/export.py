@@ -21,8 +21,9 @@ def run():
 	result = SmokeTest.PASS
 	
 	# This .inf file is created for clean_simple_export and
-	# reallyclean_simple_export tests to use, because of $$USER problem occuring
-	# at the front end.
+	# reallyclean_simple_export tests to use so that we can put the
+	# username into the output filenames - which helps a lot when
+	# several people run tests on the same computer (e.g. linux machines)
 	bld = open('smoke_suite/test_resources/simple_export/expbld.inf', 'w')
 	bld.write("PRJ_PLATFORMS\n"
 		"ARMV5 WINSCW\n\n"
@@ -69,7 +70,7 @@ def run():
 	t.id = "0023b"
 	t.name = "export_clean" 
 	t.command = "sbs -b smoke_suite/test_resources/simple_export/expbld.inf " \
-			+ "-c armv5 CLEAN"
+			+ "-c armv5 clean"
 	t.targets = [
 		"$(EPOCROOT)/epoc32/include/exported_1.h",
 		"$(EPOCROOT)/epoc32/include/exported_2.h",
@@ -89,7 +90,28 @@ def run():
 	t.id = "0023c"
 	t.name = "export_reallyclean" 
 	t.command = "sbs -b smoke_suite/test_resources/simple_export/expbld.inf " \
-			+ "-c armv5 REALLYCLEAN"
+			+ "-c armv5 reallyclean"
+	t.antitargets = [
+		'$(EPOCROOT)/epoc32/include/exported_1.h',
+		'$(EPOCROOT)/epoc32/include/exported_2.h',
+		'$(EPOCROOT)/epoc32/include/exported_3.h',
+		'$(EPOCROOT)/epoc32/include/exportedfilewithspacesremoved.doc',
+		'$(EPOCROOT)/epoc32/include/exported file with a space.doc',
+		'/tmp/$(USER)/simple_exp1.h',
+		'/tmp/$(USER)/simple_exp2.h',
+		'/tmp/$(USER)/simple_exp3.h',
+		'$(EPOCROOT)/epoc32/include/simple_exp4.h'
+	]
+	t.run()
+	if t.result == SmokeTest.FAIL:
+		result = SmokeTest.FAIL
+
+	# Check that the --noexport feature really does prevent exports from happening
+	t = AntiTargetSmokeTest()
+	t.id = "0023d"
+	t.name = "export_noexport" 
+	t.command = "sbs -b smoke_suite/test_resources/simple_export/expbld.inf " \
+			+ "-c armv5 --noexport -n"
 	t.antitargets = [
 		'$(EPOCROOT)/epoc32/include/exported_1.h',
 		'$(EPOCROOT)/epoc32/include/exported_2.h',

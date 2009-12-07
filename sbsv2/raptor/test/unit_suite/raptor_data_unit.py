@@ -84,26 +84,26 @@ class TestRaptorData(unittest.TestCase):
 		filter.AddChildSpecification(raptor_data.Specification("TrueSpec"))
 		filter.Else.AddChildSpecification(raptor_data.Specification("FalseSpec"))
 		
-		filter.Configure( raptor_data.BuildUnit("ARMV5",[]) )
+		filter.Configure( raptor_data.BuildUnit("ARMV5",[]), cache=None )
 		# check a positive test
-		iface = filter.GetInterface()
+		iface = filter.GetInterface(cache=None)
 		self.assertEqual(iface.name, "True.EXE")
-		vars = filter.GetVariants()
+		vars = filter.GetVariants(cache = None)
 		self.assertEqual(vars[0].name, "True_var")
 		kids = filter.GetChildSpecs()
 		self.assertEqual(kids[0].name, "TrueSpec")
 		
-		filter.Configure( raptor_data.BuildUnit("NOT_ARMV5",[]) )
+		filter.Configure( raptor_data.BuildUnit("NOT_ARMV5",[]) , cache = None)
 		# check a negative test
-		iface = filter.GetInterface()
+		iface = filter.GetInterface(cache = None)
 		self.assertEqual(iface.name, "False.EXE")
-		vars = filter.GetVariants()
+		vars = filter.GetVariants(cache = None)
 		self.assertEqual(vars[0].name, "False_var")
 		kids = filter.GetChildSpecs()
 		self.assertEqual(kids[0].name, "FalseSpec")
 		
 
-	def testSimpeVariant(self):
+	def testSimpleVariant(self):
 		var = raptor_data.Variant()
 		self.failUnless(var)
 		self.failIf( var.Valid() )
@@ -127,7 +127,7 @@ class TestRaptorData(unittest.TestCase):
 		self.failUnless( var.Valid() )
 
 		var.SetProperty("extends", "")
-		ops = var.GetAllOperationsRecursively()
+		ops = var.GetAllOperationsRecursively(None)
 
 		self.assertEqual( len(ops), 1 )
 		self.assertEqual( len(ops[0]), 2 )
@@ -158,16 +158,16 @@ class TestRaptorData(unittest.TestCase):
 		r.cache.AddVariant(varB)
 		r.cache.AddVariant(varC)
 
-		e = r.GetEvaluator(None, varA.GenerateBuildUnits()[0] )
+		e = r.GetEvaluator(None, varA.GenerateBuildUnits(r.cache)[0] )
 		self.assertEqual( e.Get("V1"), "1A" )
 		self.assertEqual( e.Get("V2"), "2A" )
 
-		e = r.GetEvaluator(None, varB.GenerateBuildUnits()[0] )
+		e = r.GetEvaluator(None, varB.GenerateBuildUnits(r.cache)[0] )
 		self.assertEqual( e.Get("V1"), "1A" )
 		self.assertEqual( e.Get("V2"), "2B" )
 		self.assertEqual( e.Get("V3"), "3B" )
 
-		e = r.GetEvaluator(None, varC.GenerateBuildUnits()[0] )
+		e = r.GetEvaluator(None, varC.GenerateBuildUnits(r.cache)[0] )
 		self.assertEqual( e.Get("V1"), "1A" )
 		self.assertEqual( e.Get("V2"), "2B" )
 		self.assertEqual( e.Get("V3"), "3C" )
@@ -201,15 +201,15 @@ class TestRaptorData(unittest.TestCase):
 		r.cache.AddVariant(varB)
 		r.cache.AddVariant(varC)
 
-		e = r.GetEvaluator(None, varA.GenerateBuildUnits()[0] )
+		e = r.GetEvaluator(None, varA.GenerateBuildUnits(r.cache)[0] )
 		self.assertEqual( e.Get("V1"), "1A" )
 		self.assertEqual( e.Get("V2"), "2A" )
 
-		e = r.GetEvaluator(None, varC.GenerateBuildUnits()[0] )
+		e = r.GetEvaluator(None, varC.GenerateBuildUnits(r.cache)[0] )
 		self.assertEqual( e.Get("V3"), "3C" )
 		self.assertEqual( e.Get("V4"), "4C" )
 
-		e = r.GetEvaluator(None, varB.GenerateBuildUnits()[0] )
+		e = r.GetEvaluator(None, varB.GenerateBuildUnits(r.cache)[0] )
 		self.assertEqual( e.Get("V1"), "1A" )
 		self.assertEqual( e.Get("V2"), "2B" )
 		self.assertEqual( e.Get("V3"), "3B" )
@@ -240,7 +240,7 @@ class TestRaptorData(unittest.TestCase):
 
 		self.failUnless( alias.Valid() )
 
-		e = r.GetEvaluator(None, alias.GenerateBuildUnits()[0] )
+		e = r.GetEvaluator(None, alias.GenerateBuildUnits(r.cache)[0] )
 		self.assertEqual( e.Get("V1"), "1A" )
 		self.assertEqual( e.Get("V2"), "2B" )
 		self.assertEqual( e.Get("V3"), "3C" )
@@ -294,14 +294,14 @@ class TestRaptorData(unittest.TestCase):
 		self.failUnless( group1.Valid() )
 		self.failUnless( group2.Valid() )
 
-		buildUnits = group1.GenerateBuildUnits()
+		buildUnits = group1.GenerateBuildUnits(r.cache)
 		self.assertEqual( len(buildUnits), 2 )
 		self.assertEqual( buildUnits[0].name, "A" )
 		self.assertEqual( buildUnits[1].name, "alias" )
 		self.assertEqual( buildUnits[1].variants[0].name, "B" )
 		self.assertEqual( buildUnits[1].variants[1].name, "C" )
 
-		buildUnits = group2.GenerateBuildUnits()
+		buildUnits = group2.GenerateBuildUnits(r.cache)
 		self.assertEqual( len(buildUnits), 3 )
 		self.assertEqual( buildUnits[0].name, "C.B" )
 		self.assertEqual( buildUnits[1].name, "A" )
@@ -316,7 +316,7 @@ class TestRaptorData(unittest.TestCase):
 
 		r.cache.Load( generic_path.Join(r.home, "test", "config", "arm.xml") )
 
-		buildUnits = r.cache.FindNamedGroup("G2").GenerateBuildUnits()
+		buildUnits = r.cache.FindNamedGroup("G2").GenerateBuildUnits(r.cache)
 
 		self.assertEqual( len(buildUnits), 8 )
 
@@ -345,10 +345,11 @@ class TestRaptorData(unittest.TestCase):
 		self.SetEnv("EPOCROOT", "/C")
 		aRaptor = raptor.Raptor()
 		cache = aRaptor.cache
+		aRaptor.debugOutput = True
 		cache.Load(generic_path.Join(aRaptor.home, "test", "config", "arm.xml"))
 		
 		var = cache.FindNamedVariant("ARMV5_UREL")
-		eval = aRaptor.GetEvaluator( None, var.GenerateBuildUnits()[0] )
+		eval = aRaptor.GetEvaluator( None, var.GenerateBuildUnits(aRaptor.cache)[0])
 		self.RestoreEnv("EPOCROOT")
 		
 		# test the Get method
@@ -366,13 +367,14 @@ class TestRaptorData(unittest.TestCase):
 		var.AddOperation(raptor_data.Env("RAPTOR_SAYS_NO"))
 
 		aRaptor = raptor.Raptor()
-		var.SetOwner(aRaptor)
-		
-		eval = aRaptor.GetEvaluator(None, var.GenerateBuildUnits()[0] )
-		badval = eval.Get("RAPTOR_SAYS_NO")
-		
-		self.assertEqual(badval, "NO_VALUE_FOR_RAPTOR_SAYS_NO")
-		self.assertEqual(aRaptor.errorCode, 1)
+	
+		try:	
+			eval = aRaptor.GetEvaluator(None, var.GenerateBuildUnits(aRaptor.cache)[0] )
+			badval = eval.Get("RAPTOR_SAYS_NO")
+		except raptor_data.UninitialisedVariableException, e:
+			return
+
+		self.assertTrue(False)
 
 	def checkForParam(self, params, name, default):
 		for p in params:
@@ -386,27 +388,27 @@ class TestRaptorData(unittest.TestCase):
 		cache.Load(generic_path.Join(aRaptor.home, "test", "config", "interface.xml"))
 		
 		base = cache.FindNamedInterface("Base.XYZ")
-		p = base.GetParams()
+		p = base.GetParams(cache)
 		self.failUnless(self.checkForParam(p, "A", None))
 		self.failUnless(self.checkForParam(p, "B", "baseB"))
 		self.failUnless(self.checkForParam(p, "C", "baseC"))
 		
 		extended = cache.FindNamedInterface("Extended.XYZ")
-		p = extended.GetParams()
+		p = extended.GetParams(cache)
 		self.failUnless(self.checkForParam(p, "A", None))
 		self.failUnless(self.checkForParam(p, "B", "baseB"))
 		self.failUnless(self.checkForParam(p, "C", "extC"))
 		self.failUnless(self.checkForParam(p, "D", None))
-		f = extended.GetFLMIncludePath()
+		f = extended.GetFLMIncludePath(cache=cache)
 		self.assertEqual(f.File(), "ext.flm")
 		
 		extended = cache.FindNamedInterface("Extended2.XYZ")
-		p = extended.GetParams()
+		p = extended.GetParams(cache)
 		self.failUnless(self.checkForParam(p, "A", None))
 		self.failUnless(self.checkForParam(p, "B", "baseB"))
 		self.failUnless(self.checkForParam(p, "C", "extC"))
 		self.failUnless(self.checkForParam(p, "D", None))
-		f = extended.GetFLMIncludePath()
+		f = extended.GetFLMIncludePath(cache)
 		self.assertEqual(f.File(), "base.flm")
 	
 	

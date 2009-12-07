@@ -24,12 +24,13 @@ endif
 
 EXETARGET:=$(RELEASEPATH)/$(TARGET)$(DOTEXE)
 
+INSTALLED:=
 ifneq ($(TOOLSPATH),)
 INSTALLED:=$(TOOLSPATH)/$(TARGET)$(DOTEXE)
 endif
 
 ## Target groups
-RELEASEABLES:=$(INSTALLED)
+RELEASABLES:=$(INSTALLED)
 TARGETS:=$(EXETARGET) $(INSTALLED)
 
 ## Common build steps (compiling and cleaning)

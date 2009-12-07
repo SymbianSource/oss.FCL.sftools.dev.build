@@ -24,36 +24,31 @@ CLEANTARGETS:=
 
 .PHONY:: PP_EXPORTS
 
+ifneq ($(filter win,$(HOSTPLATFORM)),)
+SBS:=$(subst \,/,$(SBS_HOME)/bin/sbs.bat)
+else
+SBS:=$(SBS_HOME)/bin/sbs
+endif
 
-SBS := $(subst \,/,$(SBS_HOME)/bin/sbs)
 
 define doexports
 PP_EXPORTS::
 	$(call startrule,makefile_generation_exports) \
-	export TALON_DESCRAMBLE=0; \
-	$(SBS) --export-only $(component_list) $(config_list) -f- -m $(SBS_BUILD_DIR)/makefiles_export.mk $(cli_options)  --mo=DESCRAMBLE:=  --mo=TALON_DESCRAMBLE:=0 | $(GNUSED) 's#]I*]>#XXX#' \
+	$(SBS) --toolcheck=off --export-only $(component_list) $(config_list) -f- -m $(MAKEFILE_PATH).exports $(CLI_OPTIONS)  \
 	$(call endrule,makefile_generation_exports)
 
-CLEANTARGETS:=$$(CLEANTARGETS) $(SBS_BUILD_DIR)/makefiles_export.mk
+CLEANTARGETS:=$$(CLEANTARGETS) $(MAKEFILE_PATH).exports 
 endef
 
 # Generate makefiles for particular bldinf
 # $(1) = source target source target......
 define generate_makefiles
 
-$$(info XXX component_list=$(COMPONENT_PATHS) makefile=$(MAKEFILE_PATH))
-
-ifeq ($(NO_BUILD),1)
 ALL:: $(MAKEFILE_PATH)
-else
-include $(MAKEFILE_PATH)
-endif
 
-$(MAKEFILE_PATH): $(COMPONENT_PATHS) | PP_EXPORTS 
+$(MAKEFILE_PATH): $(COMPONENT_PATHS) $(if $(DOEXPORT),| PP_EXPORTS )
 	$(call startrule,makefile_generation) \
-	export TALON_DESCRAMBLE=0; \
-	$(SBS) --toolcheck=off -n $(CLI_OPTIONS) $(component_list) $(config_list) -m $$@ -f- --mo=DESCRAMBLE:= --mo=TALON_DESCRAMBLE:=0  | $(GNUSED) 's#\]\][>]#XXX#' && \
-	$(MAKE) -j 8 -f $$@.resource_deps \
+	$(SBS) --noexport --toolcheck=off -n $(CLI_OPTIONS) $(component_list) $(config_list) -m $$@ -f- \
 	$(call endrule,makefile_generation)
 
 CLEANTARGETS:=$$(CLEANTARGETS) $(MAKEFILE_PATH) 
@@ -63,12 +58,18 @@ endef
 # Create config list for commands
 config_list:=$(addprefix -c ,$(CONFIGS))
 component_list:=$(addprefix -b ,$(COMPONENT_PATHS))
-$(info COMFIG_LIST: $(config_list))
 
-$(eval $(doexports))
+$(if $(FLMDEBUG),$(info <debug>build.flm: configlist: $(config_list)</debug>))
+
+# Do exports only if asked. This doesn't work brilliantly in emake
+# since exports are often duplicated in some components - leads to conflicts 
+# and rebuilds.  Better to export before trying to do parallel parsing at all.
+$(if $(DOEXPORT),$(eval $(doexports)),$(if $(FLMDEBUG),$(info <debug>build.flm: Exports off </debug>)))
 
 # Create the Makefiles
 $(eval $(call generate_makefiles))
+
+CREATABLEPATHS:=$(CREATABLEPATHS) $(dir $(MAKEFILE_PATH))
 
 $(eval $(call GenerateStandardCleanTarget,$(CLEANTARGETS),$(CREATABLEPATHS),))
 $(call makepath,$(CREATABLEPATHS))

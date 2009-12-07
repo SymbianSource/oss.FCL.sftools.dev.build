@@ -103,17 +103,17 @@ Section "Install Raptor" INSTALLRAPTOR
 	
     # Install Raptor
     SetOutPath "$INSTDIR\bin"
-    File /r ${RAPTOR_LOCATION}\bin\*.* 
+    File /r /x distribution.policy.s60 ${RAPTOR_LOCATION}\bin\*.* 
     SetOutPath "$INSTDIR\examples"
-    File /r ${RAPTOR_LOCATION}\examples\*.*
+    File /r /x distribution.policy.s60 ${RAPTOR_LOCATION}\examples\*.*
     SetOutPath "$INSTDIR\lib"
-    File /r ${RAPTOR_LOCATION}\lib\*.*
+    File /r /x distribution.policy.s60 ${RAPTOR_LOCATION}\lib\*.*
     SetOutPath "$INSTDIR\python"
-    File /r ${RAPTOR_LOCATION}\python\*.*
+    File /r /x distribution.policy.s60 ${RAPTOR_LOCATION}\python\*.*
     SetOutPath "$INSTDIR\schema"
-    File /r ${RAPTOR_LOCATION}\schema\*.*
+    File /r /x distribution.policy.s60 ${RAPTOR_LOCATION}\schema\*.*
     SetOutPath "$INSTDIR\win32"
-    File /r ${RAPTOR_LOCATION}\win32\*.*
+    File /r /x distribution.policy.s60 ${RAPTOR_LOCATION}\win32\*.*
     
     SetOutPath "$INSTDIR"
     File ${RAPTOR_LOCATION}\RELEASE-NOTES.txt

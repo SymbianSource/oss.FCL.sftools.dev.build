@@ -198,12 +198,16 @@ class Recipe(object):
 	def isError(self, aLine):
 		"""Convenience matcher for basic errors.
 		Override in sub-classes to specialise."""
-		return True if Recipe.error.match(aLine) else False
+		if Recipe.error.match(aLine):
+			return True
+		return False
 	
 	def isWarning(self, aLine):
 		"""Convenience matcher for basic warnings.
 		Override in sub-classes to specialise."""
-		return True if Recipe.warning.match(aLine) else False
+		if Recipe.warning.match(aLine):
+			return True
+		return False
 	
 	def getOutput(self):
 		""""Return a list of all output that isn't an error or a warning.
@@ -234,16 +238,17 @@ class Recipe(object):
 	
 	def isSuccess(self):
 		"Convenience method to get overall recipe status."
-		return True if self.getDetail(Recipe.exit) == "ok" else False
+		return (self.getDetail(Recipe.exit) == "ok")
 	
 	
 class Win32Recipe(Recipe):
 	"Win32 tailored recipe class."
 	def isError(self, aLine):
-		return True if mwError.match(aLine) else False
+		if mwError.match(aLine):
+			return True
+		return False
 	
 	def isWarning(self, aLine):
-		return True if mwWarning.match(aLine) else False
-
-
-	
+		if mwWarning.match(aLine):
+			return True
+		return False

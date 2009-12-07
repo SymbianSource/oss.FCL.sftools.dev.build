@@ -77,6 +77,7 @@
 
 	<var name="default.locations" extends="hostplatform.locations">
 		<env name='EPOCROOT' default='' type='path'/>
+		<env name='SBS_HOME' default='' type='path'/>
 		<!-- Place where intermediate files are built -->
 		<env name='SBS_BUILD_DIR' default='$(EPOCROOT)/epoc32/build' type='path'/>
 

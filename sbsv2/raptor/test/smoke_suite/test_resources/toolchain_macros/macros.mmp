@@ -1,0 +1,70 @@
+/*
+* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description: 
+*
+*/
+
+
+TARGET			macros
+TARGETTYPE		EXE
+UID				0x100039ce 0x00000001
+LIBRARY			euser.lib
+SYSTEMINCLUDE	/epoc32/include
+SOURCE			macros.cpp
+
+// Confirm macro presence in processing through warnings
+
+#ifdef ARMCC
+#warning ARMCC
+#endif
+
+#ifdef ARMCC_2
+#warning ARMCC_2
+#endif
+
+#ifdef ARMCC_2_2
+#warning ARMCC_2_2
+#endif
+
+#ifdef ARMCC_3
+#warning ARMCC_3
+#endif
+
+#ifdef ARMCC_3_1
+#warning ARMCC_3_1
+#endif
+
+#ifdef ARMCC_4
+#warning ARMCC_4
+#endif
+
+#ifdef ARMCC_4_0
+#warning ARMCC_4_0
+#endif
+
+#ifdef GCCE
+#warning GCCE
+#endif
+
+#ifdef GCCE_4
+#warning GCCE_4
+#endif
+
+#ifdef GCCE_4_3
+#warning GCCE_4_3
+#endif
+
+#ifdef GCCE_4_4
+#warning GCCE_4_4
+#endif

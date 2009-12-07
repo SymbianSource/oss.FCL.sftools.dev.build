@@ -74,14 +74,12 @@ def run():
 	e32def = dirname + 'e32def.h'
 	
 	deftestu = dirname + 'deftestu.def'
-	distpol = dirname + 'distribution.policy.s60'
 	
 	dst_cpp = sbsHome + path + 'test.cpp'
 	dst_bld = sbsHome + path + 'bld.inf'
 	dst_deftest = sbsHome + path + 'deftest.mmp'
 	dst_e32def = sbsHome + path + 'e32def.h'
 	dst_deftestu = sbsHome + path_eabi + 'deftestu.def'
-	dst_distpol = sbsHome + path_eabi + 'distribution.policy.s60'
 	
 		
 	if os.path.exists(dst_cpp):
@@ -92,7 +90,6 @@ def run():
 		shutil.copy(deftest, dst_deftest)
 		shutil.copy(e32def, dst_e32def)
 		shutil.copy(deftestu , dst_deftestu)
-		shutil.copy(distpol , dst_distpol)
 		dirname = sbsHome + path
 		
 	t = SmokeTest()
