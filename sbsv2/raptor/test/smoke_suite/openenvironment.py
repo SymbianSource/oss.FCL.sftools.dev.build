@@ -20,13 +20,11 @@ def run():
 	t = SmokeTest()
 	t.id = "39"
 	t.name = "openenvironment"
-	t.description = "Test STDEXE, STDLIB and STDDLL creation; Test open " + \
-			"environment project linking against a symbian environment " + \
-			"library; Test symbian environment project linking against an " + \
-			"open environment library"
+	t.description = """Test STDEXE, STDLIB and STDDLL creation; Test open environment project linking against a symbian environment
+		library; Test symbian environment project linking against an open environment library"""
 	t.usebash = True
-	t.command = "sbs -k -b smoke_suite/test_resources/oe/group/bld.inf -c armv5 " \
-			+ "-c winscw -m ${SBSMAKEFILE} -f ${SBSLOGFILE}; grep -E \"(armlink|checklib)\" ${SBSLOGFILE} "
+	t.command = "sbs -k -b smoke_suite/test_resources/oe/group/bld.inf -c armv5 -c winscw " + \
+		"-m ${SBSMAKEFILE} -f ${SBSLOGFILE}; grep -E \"(armlink|checklib|mwldsym2)\" ${SBSLOGFILE}"
 	t.targets = [
 		"$(EPOCROOT)/epoc32/release/armv5/urel/t_oedll.dll.sym",
 		"$(EPOCROOT)/epoc32/release/armv5/urel/symbian_test.lib",
@@ -213,7 +211,8 @@ def run():
 			'.*armlink.*symbian_exe_with_stdcpp.*scppnwdl.dso.*',
 			'.*armlink.*oedll.*scppnwdl.dso.*',
 			'.*armlink.*oeexe.*scppnwdl.dso.*',
-			'.*armlink.*symbian_newlib.exe.*stdnew.dso.*'
+			'.*armlink.*symbian_newlib.exe.*stdnew.dso.*',
+			'.*mwldsym2.*scppnwdl.lib.*symbian_exe_with_stdcpp.exe.*'
 		]
 	else: 
 		# these files will build for 9.4
