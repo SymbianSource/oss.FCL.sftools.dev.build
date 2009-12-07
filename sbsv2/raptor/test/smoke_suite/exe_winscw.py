@@ -21,7 +21,7 @@ def run():
 	t.id = "33"
 	t.name = "exe_winscw"
 	t.usebash = True
-	t.command = "sbs -b smoke_suite/test_resources/simple/bld.inf -c winscw; grep -E \"mwldsym2\" ${SBSLOGFILE}"
+	t.command = "sbs -b smoke_suite/test_resources/simple/bld.inf -c winscw -m ${SBSMAKEFILE} -f ${SBSLOGFILE}; grep -E \"mwldsym2\" ${SBSLOGFILE}"
 	t.targets = [
 		"$(EPOCROOT)/epoc32/release/winscw/udeb/test.exe",
 		"$(EPOCROOT)/epoc32/release/winscw/urel/test.exe",
