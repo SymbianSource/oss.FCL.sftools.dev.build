@@ -1,0 +1,108 @@
+
+from raptor_tests import SmokeTest, ReplaceEnvs
+
+def generate_files():
+	import os
+	
+	bldinf_path = ReplaceEnvs("$(SBS_HOME)/test/timing_tests/test_resources/parse_time/bld.inf")
+	bldinf = open(bldinf_path, "w")
+	bldinf_content = """/*
+* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description: 
+* Component description file for parse timing
+*
+*/
+
+prj_mmpfiles
+"""
+	test_dir = ReplaceEnvs("$(SBS_HOME)/test/timing_tests/test_resources/parse_time")
+	for number in range(0, 500):
+		mmp_path = ("parse_timing_" + str(number).zfill(3) + ".mmp")
+		mmp_file = open((test_dir + "/" + mmp_path), "w")
+		mmp_file.write("""/*
+* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description: 
+* Project description file for parse timing
+*
+*/
+
+targettype	none""")
+		mmp_file.close()
+		bldinf_content += (mmp_path + "\n")
+		
+	bldinf_content += "\nprj_exports\n"
+
+	for number1 in range(0, 10):
+		source_dir = ("export_source_" + str(number1))
+		try:
+			os.mkdir(test_dir + "/" + source_dir)
+		except:
+			pass
+		
+		for number2 in range (0, 5):
+			source_file = ("/file_" + str(number2) + ".txt ")
+			export_file = open((test_dir + "/" + source_dir + source_file), "w")
+			export_file.write(str(number2))
+			export_file.close()
+			
+			for number3 in range (0, 10):
+				dest_dir = ("epoc32/include/export_destination_" + \
+						str(number1) + str(number2) + str(number3))
+				
+				for number4 in range(0, 10):
+					bldinf_content += source_dir + source_file + dest_dir + \
+							"/export_destination_" + str(number4) + "\n"
+	bldinf.write(bldinf_content)
+	bldinf.close()
+	
+	
+def delete_files():
+	import shutil
+	
+	test_dir = "$(SBS_HOME)/test/timing_tests/test_resources/parse_time"
+	objects = os.listdir(test_dir)
+	for object in objects:
+		if os.path.isfile(object):
+			os.remove(object)
+		else:
+			shutil.rmtree(object)
+	
+
+def run():
+	
+	generate_files()
+	
+	t = SmokeTest()
+	
+	t.id = "1"
+	t.name = "parse_time_exports_mmps"
+	t.description = """Test to measure time taken to parse a large number of
+			exports and mmps"""
+	t.command = "sbs -b timing_tests/test_resources/parse_time/bld.inf " + \
+			"-c armv5_urel"
+	t.run()
+	
+	delete_files()
+	return t
