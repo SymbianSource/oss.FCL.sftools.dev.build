@@ -19,26 +19,54 @@ import os
 import stat
 
 def run():
-	# This particular file createstaticdll.dll is changed to be readonly to test
-	# 		if sbs CLEAN command actually gets rid of read only files
-	fileForClean = (os.environ['EPOCROOT'] + \
-			"/epoc32/release/armv5/urel/createstaticdll.dll")
-	if os.path.exists(fileForClean):
-		os.chmod(fileForClean, stat.S_IREAD)
+	
+	# build something; make it read-only; then try and clean it
 	
 	t = AntiTargetSmokeTest()
-	t.id = "10"
+	t.id = "10a"
 	t.name = "cleanreadonly" 
-	t.command = "sbs -b smoke_suite/test_resources/simple_dll/bld.inf -c armv5 CLEAN"
-	t.antitargets = [
+	t.command = "sbs -b smoke_suite/test_resources/simple_dll/bld.inf -c armv5"
+	t.targets = [
 		"$(EPOCROOT)/epoc32/release/armv5/udeb/createstaticdll.dll.sym",
-		"$(EPOCROOT)/epoc32/build/test/simple_dll/createstaticdll_dll/armv5/udeb/CreateStaticDLL.o",
 		"$(EPOCROOT)/epoc32/release/armv5/urel/createstaticdll.dll.sym",
-		"$(EPOCROOT)/epoc32/build/test/simple_dll/createstaticdll_dll/armv5/urel/CreateStaticDLL.o",
 		"$(EPOCROOT)/epoc32/release/armv5/lib/createstaticdll.dso",
 		"$(EPOCROOT)/epoc32/release/armv5/lib/createstaticdll{000a0000}.dso",
 		"$(EPOCROOT)/epoc32/release/armv5/udeb/createstaticdll.dll",
 		"$(EPOCROOT)/epoc32/release/armv5/urel/createstaticdll.dll"
 	]
+	t.addbuildtargets("smoke_suite/test_resources/simple_dll/bld.inf",
+	[
+	"createstaticdll_dll/armv5/udeb/CreateStaticDLL.o",
+	"createstaticdll_dll/armv5/urel/CreateStaticDLL.o"
+	])
 	t.run()
+	setupOK = (t.result != AntiTargetSmokeTest.FAIL)
+	
+	# This particular file createstaticdll.dll is changed to be readonly to test
+	# 		if sbs CLEAN command actually gets rid of read only files
+	fileForClean = os.environ['EPOCROOT'] + "/epoc32/release/armv5/urel/createstaticdll.dll"
+	if os.path.exists(fileForClean):
+		os.chmod(fileForClean, stat.S_IREAD)
+	
+	t.id = "10"
+	t.command = "sbs -b smoke_suite/test_resources/simple_dll/bld.inf -c armv5 CLEAN"
+	t.targets = []
+	t.antitargets = [
+		"$(EPOCROOT)/epoc32/release/armv5/udeb/createstaticdll.dll.sym",
+		"$(EPOCROOT)/epoc32/release/armv5/urel/createstaticdll.dll.sym",
+		"$(EPOCROOT)/epoc32/release/armv5/lib/createstaticdll.dso",
+		"$(EPOCROOT)/epoc32/release/armv5/lib/createstaticdll{000a0000}.dso",
+		"$(EPOCROOT)/epoc32/release/armv5/udeb/createstaticdll.dll",
+		"$(EPOCROOT)/epoc32/release/armv5/urel/createstaticdll.dll"
+	]
+	t.addbuildantitargets("smoke_suite/test_resources/simple_dll/bld.inf",
+	[
+	"createstaticdll_dll/armv5/udeb/CreateStaticDLL.o",
+	"createstaticdll_dll/armv5/urel/CreateStaticDLL.o"
+	])
+	t.run()
+	
+	if not setupOK:
+		t.result = AntiTargetSmokeTest.FAIL
+		
 	return t

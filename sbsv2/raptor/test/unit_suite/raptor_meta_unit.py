@@ -141,13 +141,11 @@ class TestRaptorMeta(unittest.TestCase):
 		
 		# Get the version of CPP that we are using and hope it's correct
 		# since there is no tool check.
-		if raptor_utilities.getOSFileSystem() == "cygwin":
-			self.__gnucpp = os.environ[raptor.env] + "/win32/bv/bin/cpp" 
+		if os.environ.has_key('SBS_GNUCPP'):
+			self.__gnucpp = os.environ['SBS_GNUCPP']
 		else: 
 			self.__gnucpp = "cpp" 
-		if os.environ.has_key('GNUCPP'):
-			self.__gnucpp = os.environ['GNUCPP']
-		
+	
 	def testPreProcessor(self):
 		# Just test for correct behaviour on failure, other tests excercise correct behaviour on success
 		preProcessor = raptor_meta.PreProcessor('cpp_that_does_not_exist', 
@@ -202,7 +200,8 @@ class TestRaptorMeta(unittest.TestCase):
 		bldInfFile = aRootBldInfLocation.Append(aBldInfFile)
 		self.failUnless(bldInfFile)
 		
-		bldInfObject = raptor_meta.BldInfFile(bldInfFile, self.__gnucpp, self.raptor)
+		depfiles=[]
+		bldInfObject = raptor_meta.BldInfFile(bldInfFile, self.__gnucpp, depfiles=depfiles, log=self.raptor)
 		
 		bp = bldInfObject.getBuildPlatforms(self.defaultPlatform)
 		self.assertEquals(bp, aExpectedBldInfPlatforms)
@@ -246,7 +245,8 @@ class TestRaptorMeta(unittest.TestCase):
 		bldInfTestRoot = self.__testRoot.Append('metadata/project/mmps/test_mmps')
 		
 		bldInfFile = bldInfTestRoot.Append('test_mmps.inf')
-		bldInfObject = raptor_meta.BldInfFile(bldInfFile, self.__gnucpp, self.raptor)
+		depfiles = []
+		bldInfObject = raptor_meta.BldInfFile(bldInfFile, self.__gnucpp, depfiles=depfiles, log=self.raptor)
 		testArmv5Platform = self.ARMV5
 		testArmv5Platform["TESTCODE"] = True
 		bldInfObject.getRomTestType(testArmv5Platform)
@@ -273,8 +273,9 @@ class TestRaptorMeta(unittest.TestCase):
 		bldInfTestRoot = self.__testRoot.Append('metadata/project/bld.infs')
 		bldInfMakefilePathTestRoot = str(self.__makefilePathTestRoot) + '/metadata/project/'
 		
+		depfiles = []
 		bldInfObject = raptor_meta.BldInfFile(bldInfTestRoot.Append('exports.inf'), 
-											  self.__gnucpp, self.raptor)
+											  self.__gnucpp, depfiles=depfiles, log=self.raptor)
 					
 		exports = bldInfObject.getExports(self.defaultPlatform)
 		
@@ -491,8 +492,9 @@ class TestRaptorMeta(unittest.TestCase):
 	def testBldInfExtensions(self):
 		bldInfTestRoot = self.__testRoot.Append('metadata/project/bld.infs')
 		bldInfMakefilePathTestRoot = str(self.__makefilePathTestRoot)+'/metadata/project/bld.infs'			
+		depfiles = []
 		bldInfObject = raptor_meta.BldInfFile(bldInfTestRoot.Append('extensions.inf'),
-											  self.__gnucpp, self.raptor)
+											  self.__gnucpp, depfiles=depfiles, log=self.raptor)
 		
 		extensions = bldInfObject.getExtensions(self.ARMV5)
 		
@@ -565,8 +567,9 @@ class TestRaptorMeta(unittest.TestCase):
 		
 	def testBldInfIncludes(self):
 		bldInfTestRoot = self.__testRoot.Append('metadata/project/bld.infs/includes')
+		depfiles=[]
 		bldInfObject = raptor_meta.BldInfFile(bldInfTestRoot.Append('top_level.inf'),
-											  self.__gnucpp, self.raptor)
+											  self.__gnucpp, depfiles=depfiles, log=self.raptor)
 		Root = str(bldInfTestRoot)
 		
 		mmpFiles = bldInfObject.getMMPList(self.ARMV5)
@@ -582,15 +585,19 @@ class TestRaptorMeta(unittest.TestCase):
 
 	def testMmpIncludes(self):
 		mmpTestRoot = self.__testRoot.Append('metadata/project/mmps/includes')
-		mmpMakefilePathTestRoot = str(self.__makefilePathTestRoot)+'/metadata/project/mmps/includes'			
+		mmpMakefilePathTestRoot = str(self.__makefilePathTestRoot)+'/metadata/project/mmps/includes'
+
+		depfiles=[]
 		bldInfObject = raptor_meta.BldInfFile(mmpTestRoot.Append('top_level.inf'),
-											  self.__gnucpp, self.raptor)
+										 self.__gnucpp, depfiles=depfiles, log=self.raptor)
 		
 		mmpFiles = bldInfObject.getMMPList(self.ARMV5)
+		mmpdeps = []
 		mmpFile = raptor_meta.MMPFile(mmpFiles['mmpFileList'][0].filename, 
 										   self.__gnucpp,
 										   bldInfObject,
-										   self.raptor)
+									           depfiles=mmpdeps,
+										   log=self.raptor)
 		
 		self.assertEquals(str(mmpFile.filename), 
 						  str(mmpTestRoot.Append("top_level.mmp")))
@@ -728,20 +735,32 @@ class TestRaptorMeta(unittest.TestCase):
 		
 		for t in defFileTests:
 			self.assertEquals(t.test(self.raptor), True)
-		
+	
+	def dummyMetaReader(self):
+		"make raptor_meta.MetaReader.__init__ into a none operation"
+		self.savedInit = raptor_meta.MetaReader.__init__
+
+		def DummyMetaReaderInit(self, aRaptor):
+			self._MetaReader__Raptor = aRaptor
+
+		raptor_meta.MetaReader.__init__ = DummyMetaReaderInit
+
+	def restoreMetaReader(self):
+		"make raptor_meta.MetaReader.__init__ operational again"
+		raptor_meta.MetaReader.__init__ = self.savedInit
+
 	def testApplyOsVariant(self):
+		self.dummyMetaReader()
+
 		# Mock output class
 		class OutputMock(object):
 			def write(self, text):
 				pass
 				
-		def MetaReaderInitFunction(self, aRaptor):
-			self._MetaReader__Raptor = aRaptor
-		
 		bu = raptor_data.BuildUnit("os_variant", [])
 					
 		self.raptor.keepGoing = False
-		raptor_meta.MetaReader.__init__ = MetaReaderInitFunction
+		
 		metaReader = raptor_meta.MetaReader(self.raptor)
 		metaReader.ApplyOSVariant(bu, ".")
 
@@ -749,6 +768,8 @@ class TestRaptorMeta(unittest.TestCase):
 		self.raptor.out = OutputMock()
 		metaReader = raptor_meta.MetaReader(self.raptor)	
 		metaReader.ApplyOSVariant(bu, ".")
+
+		self.restoreMetaReader()
 
 	def __assertEqualStringList(self, aListOne, aListTwo):
 		self.assertEquals(len(aListOne), len(aListTwo))
@@ -799,6 +820,8 @@ class TestRaptorMeta(unittest.TestCase):
 		self.__assertEqualStringList(results, ['--assignmentArgU=value1<->--assignmentArgV=value2'])
 	
 	def testModuleName(self):
+		self.dummyMetaReader()
+
 		# Test how we resolve known permutations of values given to the .mmp file OPTION_REPLACE keyword
 		mockBackend = raptor_meta.MetaReader(self.raptor)
 		
@@ -816,6 +839,8 @@ class TestRaptorMeta(unittest.TestCase):
 		for result in resultsDictList:
 			moduleName = mockBackend.ModuleName(result["bldinf"])
 			self.assertEquals(moduleName, result["result"])
+
+		self.restoreMetaReader()
 		
 # run all the tests
 

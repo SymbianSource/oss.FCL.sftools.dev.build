@@ -17,6 +17,8 @@
 
 import raptor
 import raptor_version
+import raptor_meta
+import raptor_utilities
 import re
 import unittest
 import generic_path
@@ -38,7 +40,7 @@ class TestRaptor(unittest.TestCase):
 		
 
 	def testVersion(self):
-		self.failUnless(re.match("^\d+\.\d+\.", raptor_version.Version()))
+		self.failUnless(re.match("^\d+\.\d+\.", raptor_version.fullversion()))
 
 
 	def testCLISupport(self):
@@ -56,10 +58,66 @@ class TestRaptor(unittest.TestCase):
 		r.SetSysDefBase("C:\\mysysdef")
 		r.AddBuildInfoFile("build.info")
 		r.SetTopMakefile("E:\\epoc32\\build\\Makefile")
+		
+		
+	def testComponentListParsing(self):
+		expected_spec_output = [
+				'test/smoke_suite/test_resources/simple/bld.inf',
+				'test/smoke_suite/test_resources/simple_export/bld.inf',
+				'test/smoke_suite/test_resources/simple_dll/bld.inf',
+				'test/smoke_suite/test_resources/simple_extension/bld.inf',
+				'test/smoke_suite/test_resources/simple_gui/Bld.inf',
+				'TOOLS2 SHOULD NOT APPEAR IN THE OUTPUT']
+		
+		r = raptor.Raptor()
+		null_log_instance = raptor_utilities.NullLog()
+		r.Info = null_log_instance.Info 
+		r.Debug = null_log_instance.Debug
+		r.Warn = null_log_instance.Warn
+		r.ConfigFile()
+		r.ProcessConfig()
+		# Note that tools2/bld.inf specifies tools2 as the only supported
+		# platform, so it should not appear in the component list at the end
+		r.CommandLine([
+				'-b', 'smoke_suite/test_resources/simple/bld.inf',
+				'-b', 'smoke_suite/test_resources/simple_dll/bld.inf',
+				'-b', 'smoke_suite/test_resources/simple_export/bld.inf',
+				'-b', 'smoke_suite/test_resources/simple_extension/bld.inf',
+				'-b', 'smoke_suite/test_resources/simple_gui/Bld.inf',
+				'-b', 'smoke_suite/test_resources/tools2/bld.inf',
+				'-c', 'armv5'])
+		# establish an object cache
+		r.LoadCache()
+		buildUnitsToBuild = r.GetBuildUnitsToBuild(r.configNames)
+		# find out what components to build, and in what way
+		layers = []
+		layers = r.GetLayersFromCLI()
+		
+		generic_specs = r.GenerateGenericSpecs(buildUnitsToBuild)
+		
+		specs = []
+		specs.extend(generic_specs)
+		metaReader = raptor_meta.MetaReader(r, buildUnitsToBuild)
+		specs.extend(metaReader.ReadBldInfFiles(layers[0].children,
+				False))
+
+		# See what components are actually built for the given configs
+		# should be only 5 since 1 is a tools component and we're building armv5
+		hits = 0
+		for c in layers[0].children:
+			if len(c.specs) > 0: 
+				# something will be built from this component because
+				# it has at least one spec
+				shortname = str(c.bldinf_filename)[len(os.environ['SBS_HOME'])+1:]
+				self.assertTrue(shortname in expected_spec_output)
+				hits += 1
+
+		# Ensure there actually are 5 build specs
+		self.assertEqual(hits, len(expected_spec_output) - 1)
+
 
 	def setUp(self):
 		self.r = raptor.Raptor()
-		self.r.out = OutputMock()
 		
 		self.cwd = generic_path.CurrentDir()
 		self.isFileReturningFalse = lambda: False
@@ -68,42 +126,44 @@ class TestRaptor(unittest.TestCase):
 		self.sysDef = self.cwd.Append(self.r.systemDefinition)
 		self.bldInf = self.cwd.Append(self.r.buildInformation)
 
-	def testCreateWarningForNonexistingBldInfAndSystemDefinitionFile(self): 
+	def testWarningIfSystemDefinitionFileDoesNotExist(self): 
 		"""Test if sbs creates warning if executed without specified 
 		component to build i.e. default bld.inf (bld.inf in current 
 		directory) or system definition file.
 
 		Uses an empty temporary directory for this."""
+		self.r.out = OutputMock()
 
 		d = tempfile.mkdtemp(prefix='raptor_test') 
 		cdir = os.getcwd()
 		os.chdir(d) 
-		self.r.GetComponentGroupsFromCLI()
+		layers = self.r.GetLayersFromCLI()
 		os.chdir(cdir) # go back
 		os.rmdir(d)
 		
 		self.assertTrue(self.r.out.warningWritten())
 
-	def testCreateWarningForExistingBldInf(self):
 		d = tempfile.mkdtemp(prefix='raptor_test') 
 		cdir = os.getcwd()
 		os.chdir(d)
 		f = open("bld.inf","w")
 		f.close()
-		self.r.GetComponentGroupsFromCLI()
+		layers = self.r.GetLayersFromCLI()
 		os.unlink("bld.inf")
 		os.chdir(cdir) # go back
 		os.rmdir(d)
 
-		self.assertFalse(self.r.out.warningWritten())
+		self.assertTrue(self.r.out.warningWritten())
 
-	def testCreateWarningForExistingSystemDefinitionFile(self): 
+	def testNoWarningIfSystemDefinitionFileExists(self): 
+		self.r.out = OutputMock()
+
 		d = tempfile.mkdtemp(prefix='raptor_test') 
 		cdir = os.getcwd()
 		os.chdir(d)
 		f = open("System_Definition.xml","w")
 		f.close()
-		self.r.GetComponentGroupsFromCLI()
+		layers = self.r.GetLayersFromCLI()
 		os.unlink("System_Definition.xml")
 		os.chdir(cdir) # go back
 		os.rmdir(d)
@@ -112,32 +172,38 @@ class TestRaptor(unittest.TestCase):
 	
 	# Test Info, Warn & Error functions can handle attributes
 	def testInfoAttributes(self):
+		self.r.out = OutputMock()
 		self.r.Info("hello %s", "world", planet="earth")
 		expected = "<info planet='earth'>hello world</info>\n"
 		self.assertEquals(self.r.out.actual, expected)
 		
 	def testWarnAttributes(self):
+		self.r.out = OutputMock()
 		self.r.Warn("look out", where="behind you")
 		expected = "<warning where='behind you'>look out</warning>\n"
 		self.assertEquals(self.r.out.actual, expected)
 		
 	def testErrorAttributes(self):
+		self.r.out = OutputMock()
 		self.r.Error("messed up %s and %s", "all", "sundry", bldinf="bld.inf")
 		expected = "<error bldinf='bld.inf'>messed up all and sundry</error>\n"
 		self.assertEquals(self.r.out.actual, expected)	
 		
 	# Test Info, Warn & Error functions to ensure XML control chars are escaped
 	def testInfoXMLEscaped(self):
+		self.r.out = OutputMock()
 		self.r.Info("h&l>o<&amp;")
 		expected = "<info>h&amp;l&gt;o&lt;&amp;amp;</info>\n"
 		self.assertEquals(self.r.out.actual, expected)
 		
 	def testWarnXMLEscaped(self):
+		self.r.out = OutputMock()
 		self.r.Warn("h&l>o<&amp;")
 		expected = "<warning>h&amp;l&gt;o&lt;&amp;amp;</warning>\n"
 		self.assertEquals(self.r.out.actual, expected)
 		
 	def testErrorXMLEscaped(self):
+		self.r.out = OutputMock()
 		self.r.Error("h&l>o<&amp;")
 		expected = "<error>h&amp;l&gt;o&lt;&amp;amp;</error>\n"
 		self.assertEquals(self.r.out.actual, expected)
@@ -146,14 +212,16 @@ class TestRaptor(unittest.TestCase):
 # Mock output class preserving output for checking
 # Can also check if any warning has been written
 class OutputMock(object):
-	actual = ""
+	warningRegExp = re.compile(".*warning.*")
+
+	def __init__(self):
+		self.actual = ""
 	
 	def write(self, text):
-		self.actual = text
+		self.actual += text
 		
 	def warningWritten(self):
-		regExp = re.compile(".*warning.*")
-		if regExp.match(self.actual):
+		if OutputMock.warningRegExp.match(self.actual):
 			return True
 		return False
 			

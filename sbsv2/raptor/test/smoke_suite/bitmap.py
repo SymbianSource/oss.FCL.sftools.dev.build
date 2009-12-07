@@ -40,10 +40,10 @@ def run():
 		"testbitmap_dll/testbitmap.mBm_bmconvcommands"
 	])
 	t.mustmatch = [
-		".*Makefile.bitmap:MIFCONV_TEST:=1.*"
+		".*Makefile(_all)?.bitmap:MIFCONV_TEST:=1.*"
 	]
 	t.mustnotmatch = [
-		".*Makefile.default:MIFCONV_TEST.*"
+		".*Makefile(_all)?.default:MIFCONV_TEST.*"
 	]
 	t.run()
 	return t

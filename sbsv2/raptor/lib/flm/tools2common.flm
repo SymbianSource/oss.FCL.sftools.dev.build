@@ -99,9 +99,9 @@ $(foreach SRC,$(cFILES),$(eval $(call compile2object,$(SRC),c)))
 # make the output directories while reading makefile - some build engines prefer this
 $(call makepath,$(CREATABLEPATHS))
 
-## Clean up (using eval to avoid target specific variables)
-$(eval $(call GenerateStandardCleanTarget,$(TARGETS) $(OBJECTFILES),$(CREATABLEPATHS),))
-## WHAT target
-$(eval $(call whatmacro,$(RELEASEABLES),WHATTOOLS2))
+## Clean up
+$(call raptor_clean,$(CLEANTARGETS) $(OBJECTFILES))
+## for the --what option and the log file
+$(call raptor_release,$(RELEASABLES))
 
 ## The End

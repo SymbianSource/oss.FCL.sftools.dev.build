@@ -71,6 +71,7 @@ class MMPParser(object):
 		self.assignment = \
 			( \
 			Line(CaselessKeyword('ARMFPU') + String()) ^ \
+			Line(CaselessKeyword('APPLY') + String()) ^ \
 			Line(CaselessKeyword('ASSPLIBRARY') + StringList()) ^ \
 			Line(CaselessKeyword('CAPABILITY') + StringList()) ^ \
 			Line(CaselessKeyword('DOCUMENT') + StringList()) ^ \

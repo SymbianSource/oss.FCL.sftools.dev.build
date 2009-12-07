@@ -15,6 +15,12 @@
 # raptor version information module
 #
 
-def Version():
+version=(2,11,1,"2009-12-16","symbian build system")
+
+def numericversion():
 	"""Raptor version string"""
-	return "2.10.2 [2009-11-12 sf release]"
+	return "%d.%d.%d" % version[:3]
+
+def fullversion():
+	"""Raptor version string"""
+	return "%d.%d.%d [%s %s]" % version

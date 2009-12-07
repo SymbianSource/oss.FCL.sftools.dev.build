@@ -20,9 +20,11 @@
 #
 #  Metadata supplied (or deduced from)
 #
-#   BYTEPAIRCOMPRESS
+#   ARMFPU
+#   BYTEPAIRCOMPRESSTARGET
 #   CAPABILITY
-#   DEBUGGABLE                     Can be "udeb" or "urel" or "udeb urel" or ""
+#   COMPRESSTARGET                    Not directly referenced, at least with the current approach to compression keywords
+#   DEBUGGABLE                        Can be "udeb" or "urel" or "udeb urel" or ""
 #   E32TARGET
 #   EPOCALLOWDLLDATA
 #   EPOCFIXEDPROCESS
@@ -31,8 +33,8 @@
 #   EPOCPROCESSPRIORITY
 #   EPOCSTACKSIZE
 #   EXPORTUNFROZEN
-#   INFLATECOMPRESS
-#   POSTLINKFPU
+#   INFLATECOMPRESSTARGET
+#   NOCOMPRESSTARGET
 #   POSTLINKTARGETTYPE
 #   SID
 #   SMPSAFE
@@ -44,12 +46,12 @@
 #  Other
 #
 #   ARMLIBS
-#   AUTOEXPORTS                    Symbols that must be assumed to exist for this TARGETTYPE in the format: export,ordinal;export,ordinal;..
-#   CANIGNORENONCALLABLE           If the TARGETTYPE allows it, disregard non-callable exports (v-tables, type information, etc.)
+#   AUTOEXPORTS                       Symbols that must be assumed to exist for this TARGETTYPE in the format: export,ordinal;export,ordinal;..
+#   CANIGNORENONCALLABLE              If the TARGETTYPE allows it, disregard non-callable exports (v-tables, type information, etc.)
 #   CANHAVEEXPORTS
 #   CLEANTARGETS
 #   ELF2E32
-#   EPOCDATALINKADDRESS            Redundant?
+#   EPOCDATALINKADDRESS               Redundant?
 #   EPOCROOT
 #   EXPTARGET
 #   GENERATED_DEFFILE
@@ -58,10 +60,12 @@
 #   IMPORTLIBRARYREQUIRED
 #   INTERMEDIATEPATH
 #   LINKASVERSIONED
-#   LINK_TARGET                    Postlinker elf input
+#   LINK_TARGET                       Postlinker elf input
 #   NAMEDSYMLKUP
 #   PAGEDCODE_OPTION
 #   POSTLINKDEFFILE
+#   POSTLINKER_COMPRESSION_DEFAULT    Default compression when either COMPRESSTARGET or no compression .mmp keyword is used
+#   POSTLINKER_FPU_DEFAULT
 #   POSTLINKER_SUPPORTS_WDP
 #   RUNTIME_LIBS_PATH
 #   SAVESPACE
@@ -93,7 +97,7 @@ $(E32TARGET): $(LINK_TARGET) $(POSTLINKDEFFILE) $(ELF2E32) $(if $(HAVE_ORDERONLY
 	  --version=$(VERSION) \
 	  --capability=$(FINAL_CAPABILITIES) \
 	  --linkas=$(call dblquote,$(LINKASVERSIONED)) \
-	  --fpu=$(POSTLINKFPU) \
+	  --fpu=$(if $(ARMFPU),$(ARMFPU),$(POSTLINKER_FPU_DEFAULT)) \
 	  --targettype=$(POSTLINKTARGETTYPE) \
 	  --output=$$(call dblquote,$$@) \
 	  --elfinput=$(call dblquote,$(LINK_TARGET)) \
@@ -121,9 +125,10 @@ $(E32TARGET): $(LINK_TARGET) $(POSTLINKDEFFILE) $(ELF2E32) $(if $(HAVE_ORDERONLY
 	  $(if $(POSTLINKER_SUPPORTS_WDP), \
 	    --codepaging=$(PAGEDCODE_OPTION) --datapaging=$(PAGEDDATA_OPTION), \
 	    $(POSTLINKER_PAGEDOPTION)) \
-	  $(if $(NOCOMPRESSTARGET), \
-	    --uncompressed, \
-	    $(if $(INFLATECOMPRESS),--compressionmethod inflate,$(if $(BYTEPAIRCOMPRESS),--compressionmethod bytepair,))) \
+	  $(if $(NOCOMPRESSTARGET),--uncompressed, \
+	    $(if $(INFLATECOMPRESSTARGET),--compressionmethod=inflate, \
+	      $(if $(BYTEPAIRCOMPRESSTARGET),--compressionmethod=bytepair, \
+	        --compressionmethod=$(POSTLINKER_COMPRESSION_DEFAULT)))) \
 	  --libpath="$(call concat,$(PATHSEP)$(CHAR_SEMIC),$(strip $(RUNTIME_LIBS_PATH) $(STATIC_LIBS_PATH)))" \
 	  $(if $(SAVESPACE),$(if $(EXPORTUNFROZEN),,&& { $(GNURM) -rf $(INTERMEDIATEPATH); true; })) \
 	$(call endrule,postlink)

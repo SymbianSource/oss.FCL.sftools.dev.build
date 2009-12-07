@@ -42,7 +42,8 @@
 		<set name="REL_OPTIMISATION" value="-O2"/>
 		<set name="STDLIB_OPTION" value="--no_scanlib"/>
 		<set name="RUNTIME_SYMBOL_VISIBILITY_OPTION" value="--dllimport_runtime"/>
-		<set name="RW_BASE_OPTION" value="--rw-base"/>
+		<set name="RW_BASE_OPTION" value="--rw-base" /> 
+		<set name="RW_BASE" value="$(RW_BASE_OPTION) 0x400000"/>
 		<set name="CODE_SEGMENT_START" value=""/>
 		<set name="PREINCLUDE" value="$(RVCT_PRE_INCLUDE)"/>
 		<set name="CC.DWARF2" value="--dwarf2"/>
@@ -54,7 +55,7 @@
 		<set name="CIADEFS" value="__CIA__"/>
 		<append name="CDEFS" value='__SUPPORT_CPP_EXCEPTIONS__ _UNICODE __SYMBIAN32__ __ARMCC__ __EPOC32__ __MARM__ __EABI__ __PRODUCT_INCLUDE__="$(PRODUCT_INCLUDE)" $(MMPDEFS) $(ARMMACROS)'/>
 		<set name="COMPILER_CIA_FLAGS" value=""/>
-		<set name="COMPILER_FPU_FLAGS" value="--fpu $(ARMFPU)"/>	
+		<set name="COMPILER_FPU_OPTION" value="--fpu "/>
 		<set name="COMPILER_DEFINES" value=""/>
 		<set name="COMPILER_INTERWORK_DEFINES" value="__MARM_INTERWORK__"/>
 		<set name="COMPILER_SYSTEM_INCLUDE_OPTION" value="-J"/>
@@ -75,7 +76,7 @@
 		<set name="LINKER_MISC_FLAGS" value="$(LICENSERETRY_OPTION)"/>
 		<set name="LINKER_NODEBUG_OPTION" value=""/>
 		<set name="LINKER_SCRIPT_FILE_OPTION" value=""/>
-		<set name="LINKER_SYMBOLS_OPTION" value="--symbols"/>
+		<set name="LINKER_SYMBOLS_OPTION" value="--symbols"/> 
 		<set name="LINKER_SYMBOLS_FILE_OPTION" value="--list"/>
 		<set name="SHARED_OBJECT_OPTION" value="--dll"/>
 		<set name="SID" value=""/>

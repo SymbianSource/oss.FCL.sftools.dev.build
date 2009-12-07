@@ -23,7 +23,11 @@ include $(SBS_HOME:\=/)/util/gccprogram.mk
 ifeq ($(filter win,$(HOSTPLATFORM)),win)
 PROCESS_C:=process_win.c
 CFLAGS:=-DHOST_WIN
+ifeq ($(SBS_MINGW),)
 LDFLAGS:=$(subst \,/,$(SBS_HOME:\=/)\win32\mingw\lib\libiberty.a)
+else
+LDFLAGS:=$(subst \,/,$(SBS_MINGW:\=/)\lib\libiberty.a)
+endif
 else
 PROCESS_C:=process.c
 CFLAGS:=-g

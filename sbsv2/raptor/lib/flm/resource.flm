@@ -101,8 +101,6 @@ $(INFOFILE)::
 	@if [ ! -f $$@ ]; then echo "DATADIR: /$(RSSBASENAME)" > $$@ ; fi
 	@echo -e "\n/z$(TARGETPATH)/$(TARGET_lower).rsc : $(RSSBASENAME).rpp" >> $$@
 
-CLEANTARGETS:=$$(CLEANTARGETS) $(DESTRPP) $(INFOFILE)
-
 endif
 endef
 
@@ -174,7 +172,6 @@ RELEASABLES:=$$(RELEASABLES) $(2)
 
    ifeq ($(TARGET_$(call sanitise,$2)),)
            TARGET_$(call sanitise,$2):=1
-        CLEANTARGETS:=$$(CLEANTARGETS) $2
 
         RESOURCE:: $2
         ## perform additional copies of binaries
@@ -201,7 +198,6 @@ define generateresource
 
         ifeq ($(TARGET_$(call sanitise,$1)),)
                 TARGET_$(call sanitise,$1):=1
-            CLEANTARGETS:=$$(CLEANTARGETS) $(1)
 
             $(if $(FLMDEBUG),$(info generateresource: $(1) from $(2) LANG:$(3)),)
 
@@ -236,7 +232,6 @@ define generateresourceheader
 
         ifeq ($(TARGET_$(call sanitise,$1)),)
                 TARGET_$(call sanitise,$1):=1
-                CLEANTARGETS:= $$(CLEANTARGETS) $(1)
                 $(if $(FLMDEBUG),$(info resourceheader: $(1) from $(2) LANG:$(3)))
 
                 RESOURCE:: $(1)
@@ -282,7 +277,6 @@ endif
 ifneq ($(RFIFILE),)
   RESOURCE:: $(RFIFILE)
   RELEASABLES:=$(RELEASABLES) $(RFIFILE)
-  CLEANTARGETS:=$(CLEANTARGETS) $(RFIFILE)
   CREATABLEPATHS:=$(CREATABLEPATHS) $(dir $(RFIFILE))
 
   RPPFILES:=$(foreach L,$(LANGUAGES:SC=sc),$(INTERBASE)_$(L).rpp)
@@ -291,11 +285,11 @@ endif
 
 
 ## Clean up
-$(eval $(call GenerateStandardCleanTarget,$(CLEANTARGETS),$(CREATABLEPATHS),))
+$(call raptor_clean,$(CLEANTARGETS))
 # make the output directories while reading makefile - some build engines prefer this
 $(call makepath,$(CREATABLEPATHS))
 
-# for the abld -what target
+# for the --what option and the log file
 RELEASABLES:=$(RELEASABLES) $(DESTRPP) $(INFOFILE)
-$(eval $(call whatmacro,$(RELEASABLES),WHATRESOURCES))
+$(call raptor_release,$(RELEASABLES),RESOURCE)
 

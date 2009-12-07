@@ -15,6 +15,7 @@
 #
 
 from raptor_tests import SmokeTest
+import os
 
 def run():
 	t = SmokeTest()
@@ -228,9 +229,13 @@ def run():
 	createvmap = "python $(SBS_HOME)/bin/createvmap.py"
 	vmapfile = "$(EPOCROOT)/epoc32/build/test.vmap"
 	vmap = " -o " + vmapfile
-	bvcpp = " -c $(SBS_HOME)/$(HOSTPLATFORM_DIR)/bv/bin/cpp"
-	if t.onWindows:
-		bvcpp += ".exe"
+	
+	if 'SBS_BVCPP' in os.environ:
+		bvcpp = " -c " + os.environ['SBS_BVCPP'].replace('\\','/')
+	else:
+		bvcpp = " -c $(SBS_HOME)/$(HOSTPLATFORM_DIR)/bv/bin/cpp"
+		if t.onWindows:
+			bvcpp += ".exe"
 
 	bvdata = "$(SBS_HOME)/test/smoke_suite/test_resources/bv"
 	

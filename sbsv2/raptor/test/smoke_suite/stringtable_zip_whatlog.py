@@ -25,16 +25,13 @@ def run():
 	markerfile = re.sub("(\\\\|\/|:|;| )", "_",
 			ReplaceEnvs("$(SBS_HOME)_test_smoke_suite_test_resources_simple_zip_export_archive.zip$(EPOCROOT)_epoc32_testunzip.unzipped"))
 	
-	result = CheckWhatSmokeTest.PASS
-	
 	t = CheckWhatSmokeTest()
 	t.id = "0069a"
 	t.name = "stringtable_zip_whatlog"
 	t.command = "sbs -b smoke_suite/test_resources/simple_stringtable/bld.inf -b smoke_suite/test_resources/simple_zip_export/bld.inf -f - -m ${SBSMAKEFILE} -c armv5_udeb.whatlog EXPORT"
 	componentpath1 = re.sub(r'\\','/',os.path.abspath("smoke_suite/test_resources/simple_stringtable"))
 	componentpath2 = re.sub(r'\\','/',os.path.abspath("smoke_suite/test_resources/simple_zip_export"))
-	t.regexlinefilter = \
-			re.compile("^<(whatlog|archive|stringtable>|archive|member>|zipmarker>)")
+	t.regexlinefilter = re.compile("^<(whatlog|archive|stringtable>|member>|zipmarker>)")
 	t.hostossensitive = False
 	t.usebash = True
 	t.targets = [
@@ -43,6 +40,7 @@ def run():
 		"$(EPOCROOT)/epoc32/testunzip/archive/archivefile2.txt",
 		"$(EPOCROOT)/epoc32/testunzip/archive/archivefile3.txt",
 		"$(EPOCROOT)/epoc32/testunzip/archive/archivefile4.txt",
+		"$(EPOCROOT)/epoc32/testunzip/archive/archivefilelinuxbin",
 		"$(EPOCROOT)/epoc32/build/" + markerfile
 		]
 	t.addbuildtargets('smoke_suite/test_resources/simple_stringtable/bld.inf', [
@@ -59,24 +57,18 @@ def run():
 		"<member>$(EPOCROOT)/epoc32/testunzip/archive/archivefile2.txt</member>",
 		"<member>$(EPOCROOT)/epoc32/testunzip/archive/archivefile3.txt</member>",
 		"<member>$(EPOCROOT)/epoc32/testunzip/archive/archivefile4.txt</member>",
+		"<member>$(EPOCROOT)/epoc32/testunzip/archive/archivefilelinuxbin</member>",
 		"<zipmarker>$(EPOCROOT)/epoc32/build/" + markerfile + "</zipmarker>"
 	]
 	t.run()
-	if t.result == CheckWhatSmokeTest.FAIL:
-		result = CheckWhatSmokeTest.FAIL
-	
 	
 	"Tests to check that up-to-date zip exports are reported"
 	t.id = "0069b"
 	t.name = "stringtable_zip_whatlog_rebuild"
 	t.targets = []
 	t.run()
-	if t.result == CheckWhatSmokeTest.FAIL:
-		result = CheckWhatSmokeTest.FAIL
-	
 	
 	t.id = "69"
 	t.name = "stringtable_zip_whatlog"	
-	t.result = result
 	t.print_result()
 	return t

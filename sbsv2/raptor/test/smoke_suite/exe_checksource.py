@@ -14,6 +14,10 @@
 # Description: 
 #
 
+# NB - the checksource filter can find the same problem twice
+# So the count of 5 errors here is not actually accurate (AFAIK there are only 4)
+
+
 from raptor_tests import SmokeTest
 
 def run():
@@ -30,7 +34,7 @@ def run():
 	t.command = cmd1 + " && " + cmd2 + " && " + cmd3
 
 	t.mustmatch = [
-		".* 6 checksource errors found.*"
+		".* 5 checksource errors found.*"
 		]
 	t.returncode = 1
 	t.run("windows")

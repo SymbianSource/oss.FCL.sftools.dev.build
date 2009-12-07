@@ -7,6 +7,7 @@
   <!-- build configurations for ARM compilers -->
 
   <var name="ARMV5_BASE">
+    <env name='SBS_HOME' default='' type='path'/>
     <env name='EPOCROOT'/>
     <env name='ARMROOT'/>
 
