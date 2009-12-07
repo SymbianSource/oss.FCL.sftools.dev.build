@@ -1,6 +1,21 @@
 
 Release Notes for Symbian Build System v2
 
+version 2.11.1
+
+Other Changes:
+GCCE 4.4.1 variant added
+Restored python 2.4 compatibility
+Minor TOOLS2 --what corrections
+Retain Linux execute permissions on unpacked :zip archives
+Prototype of extended timing API added
+Option --noexport added for parallel parsing
+Made --noexport and --export-only mutually exclusive
+SBS_PYTHONPATH insulates sbs from the global PYTHONPATH
+Removed spurious bracket in e32abiv2textnotifier2
+More robust to multiple import library definitions
+
+
 version 2.11.0
 
 New Features:
