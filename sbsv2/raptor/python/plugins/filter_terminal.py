@@ -113,6 +113,7 @@ class FilterTerminal(filter_interface.Filter):
 		"asmcompile" : "asmcompile" ,
 		"compile" : "compile" ,
 		"postlink" : "target",
+		"linknpostlink" : "linkntarget",
 		"resourcecompile" : "resource",
 		"genstringtable" : "strtable",
 		"tem" : "tem",
