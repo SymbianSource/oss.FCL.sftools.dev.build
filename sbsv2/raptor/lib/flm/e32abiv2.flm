@@ -384,8 +384,6 @@ endif
 # Generating the import library is enough if TARGETTYPE=implib #############
 
 ifneq ($(DOPOSTLINK),)
-# include $(FLMHOME)/e32postlink.mk
-
 # Capabilities
 ADDED_CAPABILITIES:=$(subst $(CHAR_SPACE),+,$(filter-out -%,$(CAPABILITY)))
 SUBTRACTED_CAPABILITIES:=$(subst $(CHAR_SPACE),,$(filter -%,$(CAPABILITY)))
@@ -611,7 +609,6 @@ endif
 # outside the relevant tags but it is also unavoidable.
 define linktarget_func
 ## The actual link target, dependencies and build step
-$(info LINK OBJECTS are $(LINKOBJECTS))
 $(E32TARGET): $(POSTLINKDEFFILE) $(ELF2E32) $(if $(MULTIFILE_ENABLED),$(MULTIFILEOBJECT) $(CIAFILES_LINKOBJECTS),$(LINKOBJECTS)) $(escaped_e32abiv2_LIBS) $(LINKER_ENTRYPOINT_LIBDEP) $(if $(SUPPORTS_STDCPP_NEWLIB),$(CHECKLIB)) $(if $(LINKERFEEDBACK_STAGE2),$(FEEDBACKFILE),) $(if $(HAVE_ORDERONLY),|,) $(EPOCROOT)/epoc32/build/TEM_LIB
 	$(if $(MULTIFILE_ENABLED),,@echo -n "" > $(VIAFILE);
 	$(call groupin10,$(LINKOBJECTS)) ;)
