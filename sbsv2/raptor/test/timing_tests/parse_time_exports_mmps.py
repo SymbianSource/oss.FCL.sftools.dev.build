@@ -4,7 +4,7 @@ import os
 
 def generate_files():
 	try:
-		os.makedirs(ReplaceEnvs("$(SBS_HOME)/test/timing_tests/test_resources/parse_time/bld.inf"))
+		os.makedirs(ReplaceEnvs("$(SBS_HOME)/test/timing_tests/test_resources/parse_time"))
 	except:
 		pass
 	bldinf_path = ReplaceEnvs("$(SBS_HOME)/test/timing_tests/test_resources/parse_time/bld.inf")
