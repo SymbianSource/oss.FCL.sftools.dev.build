@@ -672,6 +672,7 @@ $(E32TARGET): $(POSTLINKDEFFILE) $(ELF2E32) $(if $(MULTIFILE_ENABLED),$(MULTIFIL
 	$(call endrule,linknpostlink)
 
 $(MAPFILE): $(E32TARGET)
+$(LINK_TARGET): $(E32TARGET)
 endef
 $(eval $(linktarget_func))
 
