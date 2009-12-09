@@ -3,7 +3,10 @@ from raptor_tests import SmokeTest, ReplaceEnvs
 import os
 
 def generate_files():
-	
+	try:
+		os.mkdirs(ReplaceEnvs("$(SBS_HOME)/test/timing_tests/test_resources/parse_time/bld.inf"))
+	except:
+		pass
 	bldinf_path = ReplaceEnvs("$(SBS_HOME)/test/timing_tests/test_resources/parse_time/bld.inf")
 	bldinf = open(bldinf_path, "w")
 	bldinf_content = """/*
