@@ -1,8 +1,8 @@
 
 from raptor_tests import SmokeTest, ReplaceEnvs
+import os
 
 def generate_files():
-	import os
 	
 	bldinf_path = ReplaceEnvs("$(SBS_HOME)/test/timing_tests/test_resources/parse_time/bld.inf")
 	bldinf = open(bldinf_path, "w")
@@ -27,7 +27,7 @@ def generate_files():
 prj_mmpfiles
 """
 	test_dir = ReplaceEnvs("$(SBS_HOME)/test/timing_tests/test_resources/parse_time")
-	for number in range(0, 500):
+	for number in range(0, 250):
 		mmp_path = ("parse_timing_" + str(number).zfill(3) + ".mmp")
 		mmp_file = open((test_dir + "/" + mmp_path), "w")
 		mmp_file.write("""/*
@@ -61,7 +61,7 @@ targettype	none""")
 		except:
 			pass
 		
-		for number2 in range (0, 5):
+		for number2 in range (0, 10):
 			source_file = ("/file_" + str(number2) + ".txt ")
 			export_file = open((test_dir + "/" + source_dir + source_file), "w")
 			export_file.write(str(number2))
@@ -81,13 +81,14 @@ targettype	none""")
 def delete_files():
 	import shutil
 	
-	test_dir = "$(SBS_HOME)/test/timing_tests/test_resources/parse_time"
+	test_dir = ReplaceEnvs("$(SBS_HOME)/test/timing_tests/test_resources/parse_time")
 	objects = os.listdir(test_dir)
 	for object in objects:
-		if os.path.isfile(object):
-			os.remove(object)
+		object_path = (test_dir + "/" + object)
+		if os.path.isfile(object_path):
+			os.remove(object_path)
 		else:
-			shutil.rmtree(object)
+			shutil.rmtree(object_path)
 	
 
 def run():
@@ -100,8 +101,8 @@ def run():
 	t.name = "parse_time_exports_mmps"
 	t.description = """Test to measure time taken to parse a large number of
 			exports and mmps"""
-	t.command = "sbs -b timing_tests/test_resources/parse_time/bld.inf " + \
-			"-c armv5_urel"
+	t.command = "sbs -b timing_tests/test_resources/parse_time/bld.inf -n " + \
+			"-c armv5_urel --toolcheck=off --timing"
 	t.run()
 	
 	delete_files()
