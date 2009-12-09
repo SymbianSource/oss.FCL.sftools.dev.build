@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 #
 # Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
