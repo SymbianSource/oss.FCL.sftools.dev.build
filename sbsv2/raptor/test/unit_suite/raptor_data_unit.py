@@ -30,24 +30,18 @@ class TestRaptorData(unittest.TestCase):
 		
 		
 	def SetEnv(self, name, value):
-		# set environment variable and remember the old value
-		
-		try:
-			old = os.environ[name]
-			self.envStack[name] = old
-			os.environ[name] = value
-		except KeyError:
-			self.envStack[name] = None    # was not defined
+		# set environment variable and remember the old value (if there is one)		
+		if os.environ.has_key(name):
+			self.envStack[name] = os.environ[name]
+		os.environ[name] = value
 		
 			
 	def RestoreEnv(self, name):
 		# put environment back to its state before SetEnv
-		saved = self.envStack[name]
-		
-		if saved == None:
-			del os.environ[name]    # was not defined
+		if self.envStack.has_key(name):
+			os.environ[name] = self.envStack[name]
 		else:
-			os.environ[name] = saved
+			del os.environ[name]    # was not defined
 			
 			
 	def testSimpleSpecification(self):
@@ -359,6 +353,32 @@ class TestRaptorData(unittest.TestCase):
 		# test the Resolve wrt EPOCROOT
 		varcfg = eval.Resolve("VARIANT_CFG")
 		self.assertEqual(varcfg, "/C/variant/variant.cfg")
+		
+	def testProblematicEnvironment(self):
+		# ask for environment variable values that will break makefile parsing due to
+		# backslashes forming line continuation characters
+		self.SetEnv("ENVVAR_BSLASH_END1", "C:\\test1a\\;C:\\test1b\\")
+		self.SetEnv("ENVVAR_BSLASH_END2", "C:\\test2a\\;C:\\test2b\\\\")
+		self.SetEnv("ENVVAR_BSLASH_END3", "C:\\test3a\\;C:\\test3b\\\\\\")
+		var = raptor_data.Variant("my.var")
+		var.AddOperation(raptor_data.Env("ENVVAR_BSLASH_END1"))
+		var.AddOperation(raptor_data.Env("ENVVAR_BSLASH_END2"))
+		var.AddOperation(raptor_data.Env("ENVVAR_BSLASH_END3"))
+
+		aRaptor = raptor.Raptor()
+		eval = aRaptor.GetEvaluator(None, var.GenerateBuildUnits(aRaptor.cache)[0])
+		self.RestoreEnv("ENVVAR_BSLASH_END1")
+		self.RestoreEnv("ENVVAR_BSLASH_END2")
+		self.RestoreEnv("ENVVAR_BSLASH_END3")
+		
+		value = eval.Get("ENVVAR_BSLASH_END1")
+		self.assertEqual(value, "C:\\test1a\\;C:\\test1b\\\\")
+		
+		value = eval.Get("ENVVAR_BSLASH_END2")
+		self.assertEqual(value, "C:\\test2a\\;C:\\test2b\\\\")
+		
+		value = eval.Get("ENVVAR_BSLASH_END3")
+		self.assertEqual(value, "C:\\test3a\\;C:\\test3b\\\\\\\\")
 	
 	def testMissingEnvironment(self):
 		# ask for an environment variable that is not set
