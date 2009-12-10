@@ -724,14 +724,6 @@ class Env(Set):
 			value = os.environ[self.name]
 			
 			if value:
-				# if this value ends in an un-escaped backslash, then it will be treated as a line continuation character in makefile
-				# parsing - un-escaped backslashes at the end of values are therefore escaped
-				if value.endswith('\\'):
-					# an odd number of backslashes means there's one to escape
-					count = len(value) - len(value.rstrip('\\'))
-					if count % 2:
-						value += '\\'
-	
 				# if this value is a "path" or a "tool" then we need to make sure
 				# it is a proper absolute path in our preferred format.
 				if self.type == "path" or self.type == "tool":
@@ -739,7 +731,14 @@ class Env(Set):
 						path = generic_path.Path(value)
 						value = str(path.Absolute())
 					except ValueError,e:
-						raise BadToolValue("the environment variable %s is incorrect: %s" % (self.name, str(e)))
+						raise BadToolValue("the environment variable %s is incorrect: %s" % (self.name, str(e)))				
+				# if this value ends in an un-escaped backslash, then it will be treated as a line continuation character
+				# in makefile parsing - un-escaped backslashes at the end of values are therefore escaped
+				elif value.endswith('\\'):
+					# an odd number of backslashes means there's one to escape
+					count = len(value) - len(value.rstrip('\\'))
+					if count % 2:
+						value += '\\'	
 		except KeyError:
 			if self.default != None:
 				value = self.default
