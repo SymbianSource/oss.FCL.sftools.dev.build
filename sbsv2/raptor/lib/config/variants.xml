@@ -187,7 +187,6 @@
 		<set name="OWN_LIBRARY_OPTION" value="--library_interface=aeabi_clib"/>
 		<set name="RELOCATABLE_IMAGE_OPTION" value=""/>
 		<set name="SPLIT_OPTION" value=""/>
-		<set name="STDLIB_OPTION" value=""/>
 		<set name="PLATMACROS.VAR" value="ARMCC_4 ARMCC_4_0"/>
 		<set name="ARMMACROS.VAR" value="__ARMCC_4__ __ARMCC_4_0__"/>
 		<set name="SYMBIAN_LINK_FLAGS.VAR" value="--override_visibility"/>
