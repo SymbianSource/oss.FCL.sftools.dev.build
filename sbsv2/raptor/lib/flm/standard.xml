@@ -212,6 +212,10 @@
 		<param name='TARGETTYPE' default="dll"/>
 		<param name='UID1' default="10000079"/>
 	</interface>
+	<interface name="Symbian.pdll" extends="Symbian.e32abiv2" flm="e32abiv2dll.flm">
+		<param name='TARGETTYPE' default="pdll"/>
+		<param name='UID1' default="10000079"/>
+	</interface>
 	<interface name="Symbian.stddll" extends="Symbian.e32abiv2" flm="e32abiv2stddll.flm">
 		<param name='TARGETTYPE' default="stddll"/>
 		<param name='UID1' default="10000079"/>

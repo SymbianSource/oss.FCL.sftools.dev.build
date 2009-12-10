@@ -16,7 +16,7 @@
 # 
 #
 
-ifeq ($(TARGETTYPE),dll)
+ifneq ($(call isoneof,$(TARGETTYPE),dll pdll),)
 include $(FLMHOME)/e32abiv2defaults.mk
 
 # What we need to build a DLL
