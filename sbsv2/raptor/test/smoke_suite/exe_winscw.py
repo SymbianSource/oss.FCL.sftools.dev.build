@@ -20,7 +20,8 @@ def run():
 	t = SmokeTest()
 	t.id = "33"
 	t.name = "exe_winscw"
-	t.command = "sbs -b smoke_suite/test_resources/simple/bld.inf -c winscw"
+	t.usebash = True
+	t.command = "sbs -b smoke_suite/test_resources/simple/bld.inf -c winscw -m ${SBSMAKEFILE} -f ${SBSLOGFILE}; grep -E \"mwldsym2\" ${SBSLOGFILE}"
 	t.targets = [
 		"$(EPOCROOT)/epoc32/release/winscw/udeb/test.exe",
 		"$(EPOCROOT)/epoc32/release/winscw/urel/test.exe",
@@ -36,5 +37,9 @@ def run():
 		"test_/winscw/urel/test_UID_.o",
 		"test_/winscw/urel/test.UID.CPP"
 	])
+	# Check that the default operator new library is used
+	t.mustmatch = [
+		'.*mwldsym2.*scppnwdl.lib.*test.exe.*'
+		]
 	t.run()
 	return t
