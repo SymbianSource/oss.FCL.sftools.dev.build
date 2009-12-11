@@ -111,13 +111,20 @@ ifeq ($(SUPPORTS_STDCPP_NEWLIB),1)
     endif
   endif
 
+  # Operator new linking depends on both the use of the NEWLIB keyword and whether a component supports a standard
+  # CPP build.
   ifneq ($(NEWLIB),)
+    # If specified, always use the NEWLIB keyword value for operator new library linking
     NEWLIBFILE:=$(STATLIBDIR)/$(NEWLIB)
   else
-    ifeq ($(SYSTEM_TARGET),1)
-      NEWLIBFILE:=$(STATLIBDIR)/$(DEFAULT_SYSTEM_NEWLIB)
-    else
-      NEWLIBFILE:=$(STATLIBDIR)/$(DEFAULT_NORMAL_NEWLIB)
+    # If not performing a standard CPP build, link to an appropriate default Symbian new library.
+    # Standard CPP components defer to the toolchain supplied libraries.
+    ifneq ($(STDCPP_BUILD),1)
+      ifeq ($(SYSTEM_TARGET),1)
+        NEWLIBFILE:=$(STATLIBDIR)/$(DEFAULT_SYSTEM_NEWLIB)
+      else
+        NEWLIBFILE:=$(STATLIBDIR)/$(DEFAULT_NORMAL_NEWLIB)
+      endif
     endif
   endif
 endif
