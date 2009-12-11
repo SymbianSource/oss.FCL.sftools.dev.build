@@ -1,6 +1,11 @@
 
 Release Notes for Symbian Build System v2
 
+Next version
+
+Other Changes:
+Combine Linking and Postlinking into a single step
+
 version 2.11.1
 
 Other Changes:
