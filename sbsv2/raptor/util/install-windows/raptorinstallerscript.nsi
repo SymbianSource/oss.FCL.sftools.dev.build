@@ -114,6 +114,14 @@ Section "Install Raptor" INSTALLRAPTOR
     File /r /x distribution.policy.s60 ${RAPTOR_LOCATION}\schema\*.*
     SetOutPath "$INSTDIR\win32"
     File /r /x distribution.policy.s60 ${RAPTOR_LOCATION}\win32\*.*
+    SetOutPath "$INSTDIR\win32\bv"
+    File /r /x distribution.policy.s60 /x .hg ${WIN32SUPPORT}\bv\*.*
+    SetOutPath "$INSTDIR\win32\cygwin"
+    File /r /x distribution.policy.s60 /x .hg ${WIN32SUPPORT}\cygwin\*.*
+    SetOutPath "$INSTDIR\win32\mingw"
+    File /r /x distribution.policy.s60 /x .hg ${WIN32SUPPORT}\mingw\*.*
+    SetOutPath "$INSTDIR\win32\python252"
+    File /r /x distribution.policy.s60 /x .hg ${WIN32SUPPORT}\python252\*.*
     
     SetOutPath "$INSTDIR"
     File ${RAPTOR_LOCATION}\RELEASE-NOTES.txt
