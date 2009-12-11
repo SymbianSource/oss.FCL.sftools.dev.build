@@ -9,49 +9,14 @@ def generate_files():
 		pass
 	bldinf_path = ReplaceEnvs("$(SBS_HOME)/test/timing_tests/test_resources/parse_time/bld.inf")
 	bldinf = open(bldinf_path, "w")
-	bldinf_content = """/*
-* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
-* All rights reserved.
-* This component and the accompanying materials are made available
-* under the terms of the License "Eclipse Public License v1.0"
-* which accompanies this distribution, and is available
-* at the URL "http://www.eclipse.org/legal/epl-v10.html".
-*
-* Initial Contributors:
-* Nokia Corporation - initial contribution.
-*
-* Contributors:
-*
-* Description: 
-* Component description file for parse timing
-*
-*/
-
-prj_mmpfiles
+	bldinf_content = """prj_mmpfiles
 """
 	test_dir = ReplaceEnvs("$(SBS_HOME)/test/timing_tests/test_resources/parse_time")
 	for number in range(0, 250):
 		mmp_path = ("parse_timing_" + str(number).zfill(3) + ".mmp")
 		mmp_file = open((test_dir + "/" + mmp_path), "w")
-		mmp_file.write("""/*
-* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
-* All rights reserved.
-* This component and the accompanying materials are made available
-* under the terms of the License "Eclipse Public License v1.0"
-* which accompanies this distribution, and is available
-* at the URL "http://www.eclipse.org/legal/epl-v10.html".
-*
-* Initial Contributors:
-* Nokia Corporation - initial contribution.
-*
-* Contributors:
-*
-* Description: 
-* Project description file for parse timing
-*
-*/
-
-targettype	none""")
+		mmp_file.write("""targettype	none
+""")
 		mmp_file.close()
 		bldinf_content += (mmp_path + "\n")
 		
