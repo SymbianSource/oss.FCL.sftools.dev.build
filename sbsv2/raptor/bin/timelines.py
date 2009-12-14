@@ -25,6 +25,9 @@ from pygame.locals import *
 import time
 
 class Timeline(object):
+	"""A bar representing a number of recipes which were executed in 
+	   time sequence.  There is no guarantee about what host but in 
+	   theory they could have been executed on the same host."""
 
 	globalmax = 2.0
 
@@ -34,15 +37,13 @@ class Timeline(object):
 		self.ylevel = ylevel
 
 	def append(self, recipe):
+		"" add this recipe to this timeline if it happens after the latest recipe already in the timeline ""
 		if recipe.starttime + recipe.duration > self.maxtime:
 			self.maxtime = recipe.starttime + recipe.duration
 			if self.maxtime > Timeline.globalmax:
 				Timeline.globalmax = self.maxtime 
-			#print "maxtime:",self.maxtime
-			#print "xscale:",self.xscale
 		else:
 			pass
-			#print "bob",self.maxtime
 
 		self.recipes.append(recipe)
 
@@ -62,6 +63,9 @@ class Timeline(object):
 			r.draw(self.xscale, self.ylevel, coloff)
 
 class Recipe(object):
+	"""Represents a task completed in a raptor build. 
+	   Drawn as a colour-coded bar with different 
+	   colours for the various recipe types."""
 	STAT_OK = 0
 	colours = {
 		'compile': (0.5,0.5,1.0),
@@ -69,6 +73,7 @@ class Recipe(object):
 		'win32compile2object': (0.5,0.5,1.0),
 		'tools2linkexe': (0.5,1.0,0.5),
 		'link': (0.5,1.0,0.5),
+		'linkandpostlink': (0.5,1.0,0.5),
 		'win32stageonelink': (0.5,1.0,0.5),
 		'tools2lib': (0.5,1.0,1.0),
 		'win32stagetwolink': (1.0,0.1,1.0),
@@ -92,7 +97,6 @@ class Recipe(object):
 		else:
 			glColor4f(1.0*coloff, 0.6*coloff, 0.6*coloff,0.2)
 
-		print "ylevel: %s %f " % (self.name, ylevel)
 
 		x = self.starttime * scale
 		y = ylevel
@@ -148,7 +152,6 @@ def main():
 	for i in xrange(0,4):
 		ylevel += 0.6 
 		timelines.append(Timeline(ylevel))
-		print "TIMELINE", ylevel
 
 	f = sys.stdin
 
@@ -179,7 +182,6 @@ def main():
 
 			s -= start_time
 
-			#print s,elapsed
 			continue
 
 		sm = status_re.match(l2)
@@ -198,13 +200,10 @@ def main():
 			newdiff = s - t.maxtime
 			if newdiff < 0.0:
 				continue
-			#print "diff: %f" % (newdiff)
 			if olddiff > newdiff:
 				dest_timeline = t
 				olddiff = newdiff
-				#print "timeline selected: %d diff: %f" % (tnum,newdiff)
 			tnum += 1
-		#print "----------"
 
 		dest_timeline.append(Recipe(s, elapsed, rname, status))
 		event = pygame.event.poll()

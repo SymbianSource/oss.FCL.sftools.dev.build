@@ -150,7 +150,8 @@ class FilterWhat(filter_interface.Filter):
 							if self.current_bldinf != '':
 								self.end_bldinf()
 							self.current_bldinf = bi
-							self.start_bldinf(bi)
+							if bi != '':
+								self.start_bldinf(bi)
 							
 					
 						

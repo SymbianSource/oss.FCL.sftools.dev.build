@@ -92,7 +92,6 @@ def main():
 
 				s -= start_time
 
-				#print s,elapsed
 				continue
 			except ValueError, e:
 				raise Exception("Parse problem: float conversion on these groups: %s\n%s" %(str(tm.groups()), str(e)))
