@@ -6,6 +6,10 @@ Next version
 Other Changes:
 Combine Linking and Postlinking into a single step
 New 'Patchable Constants' target type: TARGETTYPE pdll
+Support exit codes from next version of the trace compiler which will issue them
+New (experimental) FilterWhatComp filter.  Simulates abld log output for use with parse_what.pl for packing up zips by component.
+New graphical build visualisation tool (bin/timelines.py). Requires pygame and PyOpenGL. 
+New a log analyser for recording the total time spent in each type of recipe in the build (recipestats.py). 
 
 version 2.11.2
 
