@@ -40,9 +40,9 @@ SYSTEMINCLUDE /epoc32/include
 LIBRARY       euser.lib
 
 #if defined(WINS)
-    deffile ./CREATESTATICDLLWINS.def
+    deffile ./CREATESTATICPDLLWINS.def
 #elif defined(MARM)
-    deffile ./CREATESTATICDLLARM.def
+    deffile ./CREATESTATICPDLLARM.def
 #endif
 nostrictdef
 

@@ -50,7 +50,7 @@ def run():
 	# Note that ABIv1 import libraries are only generated for RVCT-based armv5
 	# builds on Windows
 	
-	t.id = "000xa"
+	t.id = "0104a"
 	t.name = "pdll_armv5_rvct"
 	t.command = command % "armv5"
 	t.targets = map(lambda p: p % "armv5", maintargets + armv5targets)[:]	# Shallow, as we optionally extend later and then re-use
@@ -62,7 +62,7 @@ def run():
 		t.targets.extend(map(lambda x: x % "armv5", abiv1libtargets))
 		t.run("windows")
 		
-	t.id = "000xb"
+	t.id = "0104b"
 	t.name = "pdll_armv5_clean"
 	t.command = command % "armv5" + " clean"
 	t.targets = []
@@ -70,7 +70,7 @@ def run():
 	t.mustnotmatch = []
 	t.run()
 	
-	t.id = "000xc"
+	t.id = "0104c"
 	t.name = "pdll_armv5_gcce"
 	t.command = command % "gcce_armv5"
 	t.targets = map(lambda p: p % "armv5", maintargets + armv5targets)
@@ -80,15 +80,15 @@ def run():
 	t.mustnotmatch = mustnotmatch
 	t.run()
 
-	t.id = "000xd"
+	t.id = "0104d"
 	t.name = "pdll_armv5_gcce_clean"
-	t.command = command % "gcce_armv5" + "clean"
+	t.command = command % "gcce_armv5" + " clean"
 	t.targets = []
 	t.mustmatch = []
 	t.mustnotmatch = []
 	t.run()
 
-	t.id = "000xe"
+	t.id = "0104e"
 	t.name = "pdll_armv7_rvct"
 	t.command = command % "armv7"
 	t.targets = map(lambda p: p % "armv7", maintargets)[:]	# Shallow, as we optionally extend later and then re-use
@@ -97,7 +97,7 @@ def run():
 	t.mustnotmatch = mustnotmatch
 	t.run()
 	
-	t.id = "000xf"
+	t.id = "0104f"
 	t.name = "pdll_armv7_clean"
 	t.command = command % "armv7" + " clean"
 	t.targets = []
@@ -105,7 +105,7 @@ def run():
 	t.mustnotmatch = []
 	t.run()
 	
-	t.id = "000xg"
+	t.id = "0104g"
 	t.name = "pdll_armv7_gcce"
 	t.command = command % "arm.v7.udeb.gcce4_3_2 -c arm.v7.urel.gcce4_3_2"
 	t.targets = map(lambda p: p % "armv7", maintargets)
@@ -115,7 +115,7 @@ def run():
 	t.mustnotmatch = mustnotmatch
 	t.run()
 
-	t.id = "x"
+	t.id = "104"
 	t.name = "pdll_arm"
 	t.print_result()
 	return t

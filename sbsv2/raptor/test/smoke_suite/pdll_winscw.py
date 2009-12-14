@@ -18,7 +18,7 @@ from raptor_tests import SmokeTest
 
 def run():
 	t = SmokeTest()
-	t.id = "y"
+	t.id = "105"
 	t.name = "pdll_winscw"
 	t.command = "sbs -b smoke_suite/test_resources/simple_dll/pbld.inf -c winscw"
 	t.targets = [
