@@ -60,7 +60,7 @@ SOURCEARGS:=$(subst //,/,$(subst DEPTH=,-,$(subst $(CHAR_SPACE)FILE=,,$(SOURCE))
 
 BMCONVCMDFILE:=$(OUTPUTPATH)/$(BMTARGET)_bmconvcommands
 RELEASEABLES:=$(BITMAPHEADER) $(BITMAPFILE)
-CLEANTARGETS:=$(BITMAPHEADER) $(BITMAPFILE) $(BMCONVCMDFILE)
+CLEANTARGETS:=$(BMCONVCMDFILE)
 
 # The groupbmpin10 macro allows us to construct a command file, 10 
 # bitmap objects at a time to avoid limits on argument lengths and 
@@ -107,7 +107,6 @@ $(MBMCOPYFILES): $(BITMAPFILE)
 	$(GNUCP) $$< $$@ \
 	$(call endrule,bitmapcopy)
 
-CLEANTARGETS:=$(CLEANTARGETS) $(MBMCOPYFILES)
 endef
 
 
@@ -140,8 +139,7 @@ $(2): $(1)
 	$(call startrule,bmpfilecopy,FORCESUCCESS) \
 	$(GNUCP) $(1) $(2) && $(GNUCHMOD) +rw $(2) \
 	$(call endrule,bmpfilecopy)
-
-CLEANTARGETS:=$$(CLEANTARGETS) $(2)
+	
 endif
 
 BMPCOPYFILES:=$$(BMPCOPYFILES) $(2)
@@ -163,8 +161,6 @@ $(INFOFILE)::
 	@if [ ! -d $(EPOCROOT)/epoc32/localisation/group ]; then $(GNUMKDIR) -p $(EPOCROOT)/epoc32/localisation/group; fi
 	@if [ ! -f $$@ ]; then echo "DATADIR: /$(BMBASENAME)" > $$@ ; fi
 	@echo -e "\n/z$(TARGETPATH)/$(BMTARGET) : $(DEPTHBMP)" >> $$@
-
-CLEANTARGETS:=$$(CLEANTARGETS) $(INFOFILE)
 endef
 
 $(eval $(call bmpInfo))
@@ -172,11 +168,11 @@ $(eval $(call bmpInfo))
 # end of localisation #########################################################
 
 ## Clean up
-$(eval $(call GenerateStandardCleanTarget,$(CLEANTARGETS) ,$(CREATABLEPATHS)))
+$(call raptor_clean,$(CLEANTARGETS))
 $(call makepath,$(CREATABLEPATHS))
 $(call makepathfor,$(BITMAPHEADER))
 
 # for the abld -what target
 BMPRELEASEABLES:=$(RELEASEABLES) $(MBMCOPYFILES) $(BMPCOPYFILES) $(INFOFILE)
-$(eval $(call whatmacro,$(BMPRELEASEABLES),WHATBITMAP))
+$(call raptor_release,$(BMPRELEASEABLES),BITMAP)
 

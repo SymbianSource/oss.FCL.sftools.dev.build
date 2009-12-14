@@ -1,0 +1,4 @@
+EXPORTS
+	?NewLC@CMessenger@@SAPAV1@AAVCConsoleBase@@ABVTDesC16@@@Z @ 1 NONAME ; class CMessenger * CMessenger::NewLC(class CConsoleBase &, class TDesC16 const &)
+	?ShowMessage@CMessenger@@QAEXXZ @ 2 NONAME ; void CMessenger::ShowMessage(void)
+

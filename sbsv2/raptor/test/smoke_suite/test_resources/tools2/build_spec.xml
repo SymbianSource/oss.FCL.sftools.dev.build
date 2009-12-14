@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<build xmlns="http://symbian.com/xml/build"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://symbian.com/xml/build http://symbian.com/xml/build/1_0.xsd">
+
+    <!-- test tool build specification -->
+
+    <spec name="tool">
+	    <var>
+	        <set name="T2" value="$(SBS_HOME)/test/tools2"/>
+	        <set name="USERINCLUDE" value="$(T2)/inc1 $(T2)/inc2"/>
+	        <set name="SYSTEMINCLUDE" value="$(T2)/sys1 $(T2)/sys2"/>
+		</var>
+
+		<spec name="tool_executable">
+            <interfaceRef ref="Tools.EXE"/>
+	        <var>
+	            <set name="TARGET" value="tool_exe"/>
+	            <set name="TARGETTYPE" value="EXE"/>
+	            <append name="SOURCE" value="$(T2)/tool_exe_a.cpp"/>
+	            <append name="SOURCE" value="$(T2)/tool_exe_b.cpp"/>
+	            <append name="STATICLIBRARY" value="tool_lib1"/>
+	            <append name="STATICLIBRARY" value="tool_lib2"/>
+			</var>
+		</spec>
+
+		<spec name="tool_library_1">
+            <interfaceRef ref="Tools.LIB"/>
+	        <var>
+	            <set name="TARGET" value="libtool_lib1"/>
+	            <set name="TARGETTYPE" value="LIB"/>
+	            <append name="SOURCE" value="$(T2)/tool_lib1_a.cpp"/>
+	            <append name="SOURCE" value="$(T2)/tool_lib1_b.cpp"/>
+			</var>
+		</spec>
+
+		<spec name="tool_library_2">
+            <interfaceRef ref="Tools.LIB"/>
+	        <var>
+	            <set name="TARGET" value="libtool_lib2"/>
+	            <set name="TARGETTYPE" value="LIB"/>
+	            <append name="SOURCE" value="$(T2)/tool_lib2_a.cpp"/>
+	            <append name="SOURCE" value="$(T2)/tool_lib2_b.cpp"/>
+			</var>
+		</spec>
+    </spec>
+</build>

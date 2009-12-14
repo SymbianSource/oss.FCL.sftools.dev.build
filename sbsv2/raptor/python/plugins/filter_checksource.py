@@ -224,11 +224,11 @@ if not raptor_utilities.getOSPlatform().startswith("linux"):
 				
 				# Do the check for each file 	
 				for dep in deplistnodups:
-					dep = os.path.normpath(dep).replace('\\', '/')
+					dep = os.path.abspath(dep).replace('\\', '/')
 					self.checksource(dep)
 					
 			except Exception, e:
-				sys.stderr.write("sbs: could not access temporary file for FilterClean\n")
+				sys.stderr.write("sbs: FilterCheckSource failed: %s\n" % str(e))
 				
 			if self.errors == 0:
 				sys.stdout.write("No checksource errors found\n")
@@ -263,7 +263,7 @@ if not raptor_utilities.getOSPlatform().startswith("linux"):
 		def checkcase(self, path):
 			"""Checks the path matches the file system"""
 			
-			path = os.path.normpath(path)
+			path = os.path.abspath(path)
 			path = path.replace('\\', '/')
 			
 			if not os.path.exists(path):
@@ -277,7 +277,7 @@ if not raptor_utilities.getOSPlatform().startswith("linux"):
 			
 			for part in parts:
 				if not self.checkkeyignorecase(cacheItem, part):
-				
+
 					dirItems = os.listdir(dirBeingChecked)
 					
 					found = False

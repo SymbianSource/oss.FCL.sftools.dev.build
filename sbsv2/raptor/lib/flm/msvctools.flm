@@ -28,7 +28,6 @@ RELEASETARGET:=$(RELEASEPATH)/$(TARGET).$(if $(REQUESTEDTARGETEXT),$(REQUESTEDTA
 $(call makepath,$(RELEASEPATH))
 $(call makepath,$(BUILDPATH))
 
-CLEANTARGETS:=$(CLEANTARGETS) $(RELEASETARGET)
 RELEASEABLES:=$(RELEASEABLES) $(RELEASETARGET)
 
 GENDEBUGINFO:=$(if $(findstring deb,$(VARIANTTYPE)),1,)
@@ -157,7 +156,6 @@ endif
 
 ifneq ($(INSTALLPATH),)
   INSTALLTARGET:=$(INSTALLPATH)/$(TARGET).$(if $(REQUESTEDTARGETEXT),$(REQUESTEDTARGETEXT),$(TARGETTYPE))
-  CLEANTARGETS:=$(CLEANTARGETS) $(INSTALLTARGET)
   RELEASEABLES:=$(RELEASEABLES) $(INSTALLTARGET)
 
   define msvctoolsinstall
@@ -180,7 +178,7 @@ endif
 ifneq ($(GENDEBUGINFO),)
   BSCFILE:=$(RELEASEPATH)/$(TARGET).bsc
   BSCRESPONSEFILE:=$(BUILDPATH)/$(TARGET).brf
-  CLEANTARGETS:=$(CLEANTARGETS) $(BSCFILE) $(BSCRESPONSEFILE)
+  CLEANTARGETS:=$(CLEANTARGETS) $(BSCRESPONSEFILE)
   RELEASEABLES:=$(RELEASEABLES) $(BSCFILE)
 
   define msvctoolsgenbrowse  
@@ -207,6 +205,6 @@ ifeq ($(BASE_TYPE),staticlib)
 endif
 
 # clean up
-$(eval $(call GenerateStandardCleanTarget,$(CLEANTARGETS),,))
-# for the abld -what target
-$(eval $(call whatmacro,$(INSTALLTARGET),WHATTOOLS))
+$(call raptor_clean,$(CLEANTARGETS))
+# for the --what option and the log file
+$(call raptor_release,$(INSTALLTARGET))

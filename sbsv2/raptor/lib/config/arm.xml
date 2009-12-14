@@ -59,21 +59,22 @@
 		<set name="UNIX_SLASH_FOR_CC_ABS_PATHS" value="0"/>
 		<set name="UNRESOLVED_SYMBOL_REF_OPTION" value=""/>
 		<set name="DUMPBCINFO" value=""/>
-		<set name="MAKEDEFFILE" value="1"/>
-		<set name="PLATMACROS.WINDOWS" value="ARMCC EPOC32 MARM EABI GENERIC_MARM MARM_ARMV5 $(PLATMACROS.CONFIG) $(PLATMACROS.VAR)"/>
+		<set name="NO_UNALIGNED_ACCESS" value="$(CC.NO_UNALIGNED_ACCESS)"/>
+		<set name="PLATMACROS.WINDOWS" value="$(PLATMACROS.TOOLCHAIN) EPOC32 MARM EABI GENERIC_MARM MARM_ARMV5 $(PLATMACROS.CONFIG) $(PLATMACROS.VAR)"/>
 		<set name="PLATMACROS.LINUX" value="$(PLATMACROS.WINDOWS)"/>
 		<set name="PLATMACROS.CONFIG" value=""/>
 		<set name="PLATMACROS.VAR" value=""/>
-		<set name="NO_UNALIGNED_ACCESS" value="$(CC.NO_UNALIGNED_ACCESS)"/>
+		<set name="PLATMACROS.TOOLCHAIN" value=""/>
+		<set name="POSTLINKER_COMPRESSION_DEFAULT" value="inflate"/>		
 	</var>
 	<var name="v5">
 		<set name="TRADITIONAL_PLATFORM" value="ARMV5"/>
 		<set name="VARIANTPLATFORM" value="armv5"/>
-		<set name="PLATMACROS.CONFIG" value=""/>
 		<set name="DEBUG_FORMAT" value="$(CC.DWARF2)"/>
 		<set name="TARGET_ARCH_OPTION" value="$(CC.ARMV5)"/>
 		<set name="LINKER_ARCH_OPTION" value="$(LD.ARMV5)"/>
-		<set name="ARMFPU" value="$(CC.SOFTVFP_MAYBE_VFPV2)"/>
+		<set name="COMPILER_FPU_DEFAULT" value="$(CC.SOFTVFP_MAYBE_VFPV2)"/>
+		<set name="POSTLINKER_FPU_DEFAULT" value="$(PL.SOFTVFP_MAYBE_VFPV2)"/>
 		<set name="GENERATE_ABIV1_IMPLIBS" value="$(SUPPORTS_ABIV1_IMPLIBS)"/>
 	</var>
 	<var name="v6">
@@ -85,7 +86,8 @@
 		<set name="TARGET_ARCH_OPTION" value="$(CC.ARMV6)"/>
 		<set name="LINKER_ARCH_OPTION" value="$(LD.ARMV6)"/>
 		<set name="STATIC_RUNTIME_DIR" value="$(EPOCROOT)/epoc32/release/armv5/$(VARIANTTYPE)"/>
-		<set name="ARMFPU" value="$(CC.SOFTVFP_MAYBE_VFPV2)"/>
+		<set name="COMPILER_FPU_DEFAULT" value="$(CC.SOFTVFP_MAYBE_VFPV2)"/>
+		<set name="POSTLINKER_FPU_DEFAULT" value="$(PL.SOFTVFP_MAYBE_VFPV2)"/>
 	</var>
 	<var name="v7">
 		<set name="TRADITIONAL_PLATFORM" value="ARMV7"/>
@@ -95,7 +97,8 @@
 		<set name="DEBUG_FORMAT" value="$(CC.DWARF3)"/>
 		<set name="TARGET_ARCH_OPTION" value="$(CC.ARMV7)"/>
 		<set name="LINKER_ARCH_OPTION" value="$(LD.ARMV7)"/>
-		<set name="ARMFPU" value="$(CC.SOFTVFP_MAYBE_VFPV3)"/>
+		<set name="COMPILER_FPU_DEFAULT" value="$(CC.SOFTVFP_MAYBE_VFPV3)"/>
+		<set name="POSTLINKER_FPU_DEFAULT" value="$(PL.SOFTVFP_MAYBE_VFPV3)"/>
 	</var>
 	<var name="9e" extends="v5">
 		<set name="VARIANTPLATFORM" value="arm9e"/>
@@ -120,6 +123,9 @@
 	<!-- GCCE 4.3.3 aliases -->
 	<alias name="armv5_urel_gcce4_3_3" meaning="arm.v5.urel.gcce4_3_3"/>
 	<alias name="armv5_udeb_gcce4_3_3" meaning="arm.v5.udeb.gcce4_3_3"/>
+
+	<alias name="armv5_urel_gcce4_4_1" meaning="arm.v5.urel.gcce4_4_1"/>
+	<alias name="armv5_udeb_gcce4_4_1" meaning="arm.v5.udeb.gcce4_4_1"/>
 	
 	<alias name="armv6_urel" meaning="arm.v6.urel.rvct2_2"/>
 	<alias name="armv6_udeb" meaning="arm.v6.udeb.rvct2_2"/>

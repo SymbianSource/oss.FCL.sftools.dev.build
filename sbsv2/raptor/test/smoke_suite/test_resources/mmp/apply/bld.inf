@@ -1,0 +1,7 @@
+
+PRJ_EXPORTS
+apply_test_exported_variants.xml /epoc32/tools/makefile_templates/
+
+PRJ_MMPFILES
+test_mmp_apply.mmp
+

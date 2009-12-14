@@ -1,0 +1,23 @@
+
+# This FLM is for testing the retry mechanism in our rules.
+# It will fail on the first FAILURES invocations and then succeed.
+
+MY_COUNTER:=$(EPOCROOT)/epoc32/build/$(COUNTER)
+
+define retry_test
+ALL::
+	$(call startrule,retry_test) \
+	(TRY=1; \
+	while (( $$$$TRY <= $(FAILURES) )); do \
+		if [ ! -f $(MY_COUNTER).$$$$TRY ]; then \
+			touch $(MY_COUNTER).$$$$TRY; \
+			echo DELIBERATE FAILURE $$$$TRY for $(COUNTER); \
+			exit 1; \
+		fi; \
+		(( TRY=$$$$TRY + 1 )); \
+	done) && \
+	echo SUCCESS for $(COUNTER) && \
+	touch $(MY_COUNTER).ok \
+	$(call endrule,retry_test)
+endef
+$(eval $(retry_test))

@@ -1,0 +1,25 @@
+/*
+* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description: 
+*
+*/
+
+TARGET xver_20
+TARGETTYPE exe
+
+UID			0x100039ce 0x00000001
+LIBRARY			euser.lib testver{2.0}.lib
+SECUREID		0x10003a5c
+SYSTEMINCLUDE	/epoc32/include
+SOURCE			test.cpp 

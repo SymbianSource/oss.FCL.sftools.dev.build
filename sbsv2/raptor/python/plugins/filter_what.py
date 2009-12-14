@@ -41,6 +41,8 @@ class FilterWhat(filter_interface.Filter):
 		else:
 			self.outfile.write(filename+"\n")
 
+		self.prints += 1
+		
 
 	def open(self, build_parameters):
 		"initialise"
@@ -78,6 +80,7 @@ class FilterWhat(filter_interface.Filter):
 		"Regex for zip exports"
 		self.zip_export_regex = re.compile("^<member>.*")
 		
+		self.prints = 0
 		self.ok = True		
 		return self.ok
 	
@@ -87,6 +90,17 @@ class FilterWhat(filter_interface.Filter):
 		for line in text.splitlines():
 			line = line.rstrip()
 			
+			# we are normally the ONLY filter running so we have to pass on
+			# any errors and warnings that emerge
+			#
+			if line.startswith("<error"):
+				sys.stderr.write(self.formatError(line))
+				self.ok = False
+				continue
+			if line.startswith("<warning"):
+				sys.stderr.write(self.formatWarning(line))
+				continue
+				
 			if not line in self.repetitions:
 				self.repetitions[line] = 0
 				
@@ -120,6 +134,17 @@ class FilterWhat(filter_interface.Filter):
 				
 		return self.ok
 	
+	def summary(self):
+		if self.prints == 0:
+			if self.what:
+				message = "no WHAT information found"
+			else:
+				message = "no CHECK information found"
+				
+			sys.stderr.write(self.formatError(message))
+			self.ok = False
+		return self.ok
+		
 	def close(self):
 		if self.outfile_close:
 			self.outfile.close()

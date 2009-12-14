@@ -1,0 +1,41 @@
+/*
+* Copyright (c) 2006-2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description: 
+* t_oeexe.mmp
+*
+*/
+
+
+TARGET			test_oeexe.exe
+TARGETTYPE		stdexe
+romtarget
+ramtarget		sys/bin/
+SOURCEPATH		..
+
+// Emulator images have different export data
+#ifdef WINS
+SOURCE			test_oeexe_wins.cpp
+#else
+SOURCE			test_oeexe.cpp
+#endif
+
+LIBRARY			euser.lib t_oedll.lib
+
+// Standard Symbian Library Created by Simple_lib\simple.mmp
+STATICLIBRARY		etest.lib
+
+SYSTEMINCLUDE	/epoc32/include ..
+VENDORID		0x70000001
+capability		all -TCB
+

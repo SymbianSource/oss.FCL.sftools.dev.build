@@ -134,6 +134,15 @@ class Makefile(object):
 
 		return True
 
+	def addInclude(self, makefilename):
+		"""
+		"""
+		# create the directory if it does not exist
+
+		self.open()
+		# now we can write the values into the makefile
+		self.file.write("include %s\n" % (makefilename+"."+self.selector.name))
+
 	def close(self):
 		if self.file is not None:
 			if self.epilogue != None:
@@ -190,6 +199,11 @@ class MakefileSet(object):
 		   and write it to those (e.g. the exports makefile) """
 		for f in self.makefiles:
 			f.addCall(specname, configname, ifname, useAllInterfaces, flmpath, parameters, guard)
+
+	def addInclude(self, makefilename):
+		"""include a makefile from each of the makefiles in the set - has the selector name appended to it."""
+		for f in self.makefiles:
+			f.addInclude(makefilename)
 
 	def makefileNames(self):
 		for mf in self.makefiles:

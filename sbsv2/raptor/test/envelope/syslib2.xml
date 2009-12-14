@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+
+<SystemDefinition name="MCL" schema="1.4.0">
+  
+  <systemModel>
+    <layer name="common">
+      <module name="allexports">
+        <component name="envelope">
+          <unit unitID="001" name="featreg" bldFile="common/generic/syslibs/ezlib/group"/>
+          <unit unitID="001" name="featreg" bldFile="common/generic/syslibs/ecom/ongoing/group"/>
+          <unit unitID="001" name="charconv" bldFile="common/generic/syslibs/charconv/ongoing/group"/>
+	  <unit unitID="001" name="ezlib" bldFile="common/generic/syslibs/ezlib/group" />
+	  <unit unitID="001" name="caf2" bldFile="common/generic/syslibs/caf2/group" />
+	  <unit unitID="001" name="stdlib" bldFile="common/generic/syslibs/stdlib/group" />
+	  <unit unitID="001" name="FATCharsetConv" bldFile="common/generic/syslibs/FATCharsetConv/group" />
+	  <unit unitID="001" name="pwrcli" bldFile="common/generic/syslibs/pwrcli/group" />
+	  <unit unitID="001" name="SysAgent2" bldFile="common/generic/syslibs/SysAgent2/group" />
+	  <unit unitID="001" name="bafl" bldFile="common/generic/syslibs/bafl/initLocale/group" />
+	  <unit unitID="001" name="bafl" bldFile="common/generic/syslibs/bafl/group" />
+	  <unit unitID="001" name="dbms" bldFile="common/generic/syslibs/dbms/esql/group" />
+	  <unit unitID="001" name="dbms" bldFile="common/generic/syslibs/dbms/group" />
+	  <unit unitID="001" name="xml" bldFile="common/generic/syslibs/xml/group" />
+	  <unit unitID="001" name="featreg" bldFile="common/generic/syslibs/featreg/group" />
+	  <unit unitID="001" name="charconv" bldFile="common/generic/syslibs/charconv/ongoing/group" />
+	  <unit unitID="001" name="logeng" bldFile="common/generic/syslibs/logeng/ongoing/group" />
+	  <unit unitID="001" name="centralrepository" bldFile="common/generic/syslibs/centralrepository/group" />
+	  <unit unitID="001" name="schsvr" bldFile="common/generic/syslibs/schsvr/ongoing/group" />
+	  <unit unitID="001" name="store" bldFile="common/generic/syslibs/store/group" />
+	  <unit unitID="001" name="sql" bldFile="common/generic/syslibs/SQL/group" />
+        </component>
+      </module>
+    </layer>
+  </systemModel>
+  
+  <build>
+  </build>
+
+</SystemDefinition>

@@ -1,0 +1,64 @@
+/*
+* Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description: 
+*
+*/
+
+rls_string LOG_CALL_EVENT_TYPE	"Voice call"
+rls_string LOG_DATA_EVENT_TYPE	"Data call"
+rls_string LOG_FAX_EVENT_TYPE	"Fax"
+rls_string LOG_SHORT_MESSAGE_EVENT_TYPE	"Short message"
+rls_string LOG_MAIL_EVENT_TYPE	"Mail"
+rls_string LOG_TASK_SCHEDULER_EVENT_TYPE  "Task scheduler"
+rls_string LOG_PACKET_DATA_EVENT_TYPE	"Packet Data"
+rls_string LOG_LBS_SELF_LOCATE_EVENT_TYPE	"Location Requested by On Board Application"
+rls_string LOG_LBS_EXTERNAL_LOCATE_EVENT_TYPE	"Location Requested by Remote Party"
+rls_string LOG_LBS_TRANSMIT_LOCATION_EVENT_TYPE	"Location Sent to Remote Party"
+rls_string LOG_LBS_NETWORK_LOCATE_EVENT_TYPE	"Location Determined by Network"
+rls_string LOG_LBS_ASSISTANCE_DATA_EVENT_TYPE	"Location Data Obtained from Network"
+
+// Direction
+rls_string LOG_DIR_IN	"Incoming"
+rls_string LOG_DIR_OUT	"Outgoing"
+rls_string LOG_DIR_IN_ALT	"Incoming on alternate line"
+rls_string LOG_DIR_OUT_ALT	"Outgoing on alternate line"
+rls_string LOG_DIR_FETCHED	"Fetched"
+rls_string LOG_DIR_MISSED	"Missed call"
+rls_string LOG_DIR_MISSED_ALT	"Missed call on alternate line"
+
+// Delivery
+rls_string LOG_DEL_PENDING	"Pending"
+rls_string LOG_DEL_SENT		"Sent"
+rls_string LOG_DEL_FAILED	"Failed"
+rls_string LOG_DEL_NONE		"No delivery"
+rls_string LOG_DEL_DONE		"Delivered"
+rls_string LOG_DEL_NOT_SENT	"Not sent"
+rls_string LOG_DEL_SCHEDULED	"Scheduled"
+
+// Other
+rls_string LOG_REMOTE_UNKNOWN	"Unknown"
+rls_string LOG_REMOTE_MULTIPLE	"Multiple Parties"
+rls_string LOG_SUBJECT_NONE	"No subject"
+rls_string LOG_SUBJECT_DATA_MESSAGE	"Data Message"
+
+// Connection
+rls_string LOG_CON_CONNECTED		"Connected"
+rls_string LOG_CON_CONNECTING		"Connecting"
+rls_string LOG_CON_DISCONNECTING	"Disconnecting"
+rls_string LOG_CON_DISCONNECTED 	"Disconnected"
+rls_string LOG_CON_SUSPENDED		"Suspended"
+
+// Delivery
+rls_string LOG_DEL_NOTIFIED		"Notified"
+rls_string LOG_DEL_EXPIRED		"Expired"

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<build xmlns="http://symbian.com/xml/build" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symbian.com/xml/build build/2_0.xsd">
+	<!-- test trace compiler -->
+	<var name="tc_var_base">
+		<set name='USE_TRACE_COMPILER' value='1' />
+		<env name='JAVA_HOME' default='' type='path'/>
+		<env name='SBS_JAVATC' default='$(JAVA_HOME)/bin/java' type='tool' versionCommand='$(SBS_JAVATC) -version' versionResult='version \"1\.[5-9]' />
+	</var>
+	<var name="tc_var1" extends="tc_var_base">
+		<prepend name='SYSTEMINCLUDE' value='$(SBS_HOME)/test/smoke_suite/test_resources/tracecompiler/variant_source/var1' />
+	</var>
+	<var name="tc_var2" extends="tc_var_base">
+		<prepend name='SYSTEMINCLUDE' value='$(SBS_HOME)/test/smoke_suite/test_resources/tracecompiler/variant_source/var2' />
+	</var>
+
+</build>

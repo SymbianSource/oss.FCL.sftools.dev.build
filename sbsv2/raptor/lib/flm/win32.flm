@@ -111,13 +111,20 @@ ifeq ($(SUPPORTS_STDCPP_NEWLIB),1)
     endif
   endif
 
+  # Operator new linking depends on both the use of the NEWLIB keyword and whether a component supports a standard
+  # CPP build.
   ifneq ($(NEWLIB),)
+    # If specified, always use the NEWLIB keyword value for operator new library linking
     NEWLIBFILE:=$(STATLIBDIR)/$(NEWLIB)
   else
-    ifeq ($(SYSTEM_TARGET),1)
-      NEWLIBFILE:=$(STATLIBDIR)/$(DEFAULT_SYSTEM_NEWLIB)
-    else
-      NEWLIBFILE:=$(STATLIBDIR)/$(DEFAULT_NORMAL_NEWLIB)
+    # If not performing a standard CPP build, link to an appropriate default Symbian new library.
+    # Standard CPP components defer to the toolchain supplied libraries.
+    ifneq ($(STDCPP_BUILD),1)
+      ifeq ($(SYSTEM_TARGET),1)
+        NEWLIBFILE:=$(STATLIBDIR)/$(DEFAULT_SYSTEM_NEWLIB)
+      else
+        NEWLIBFILE:=$(STATLIBDIR)/$(DEFAULT_NORMAL_NEWLIB)
+      endif
     endif
   endif
 endif
@@ -243,7 +250,6 @@ endif
 ifeq ($(SUPPORTS_IMPORT_LIBRARY),1)
   ifneq ($(NOEXPORTLIBRARY),1)
     ifneq ($(TARGET_$(call sanitise,$(IMPORTLIBTARGET))),1)
-      CLEANTARGETS:=$(CLEANTARGETS) $(if $(or $(EXPORTUNFROZEN),$(DEFFILE)),$(IMPORTLIBTARGET))
       RELEASABLES:=$(RELEASABLES) $(if $(or $(EXPORTUNFROZEN),$(DEFFILE)),$(IMPORTLIBTARGET))
 
       # import libraries are generated to the UDEB release directory
@@ -290,7 +296,6 @@ ifneq ($(BASE_TYPE),importlib)
     BINTARGETSTATICLINK:=$(BINDIRSTATICLINK)/$(TARGET).$(if $(REQUESTEDTARGETEXT),$(REQUESTEDTARGETEXT),$(TARGETTYPE))
   endif
 
-  CLEANTARGETS:=$(CLEANTARGETS) $(BINTARGET) $(BINTARGETSTATICLINK)
   RELEASABLES:=$(RELEASABLES) $(BINTARGET) $(BINTARGETSTATICLINK)
 
   # work on a local source files list
@@ -463,7 +468,6 @@ ifneq ($(BASE_TYPE),importlib)
       # link map file (urel only)
       ifeq ($(VARIANTTYPE),urel)
         MAP:=$(OPT.MAP)$(BINTARGET).map
-        CLEANTARGETS:=$(CLEANTARGETS) $(BINTARGET).map
         RELEASABLES:=$(RELEASABLES) $(BINTARGET).map
       endif
     endif
@@ -677,12 +681,11 @@ ifneq ($(TESTPATH),)
   BATCHFILE_CREATED_$(BATCHDIR)$(MODULE)/$(VARIANTPLATFORM).$(TESTPATH):=1
   TARGET_CREATED_$(EPOCROOT)/epoc32/release/$(VARIANTPLATFORM)/$(VARIANTTYPE)/z/test/$(MODULE)/$(VARIANTPLATFORM).$(TESTPATH)_$(TARGET):=1
   RELEASABLES:=$(RELEASABLES) $(EPOCROOT)/epoc32/release/$(VARIANTPLATFORM)/$(VARIANTTYPE)/z/test/$(MODULE)/$(VARIANTPLATFORM).$(TESTPATH)
-  CLEANTARGETS:=$(CLEANTARGETS) $(EPOCROOT)/epoc32/release/$(VARIANTPLATFORM)/$(VARIANTTYPE)/z/test/$(MODULE)/$(VARIANTPLATFORM).$(TESTPATH)
 endif
 
 # clean up
-$(eval $(call GenerateStandardCleanTarget,$(CLEANTARGETS),$(CREATABLEPATHS),))
+$(call raptor_clean,$(CLEANTARGETS))
 # make the output directories while reading makefile - some build engines prefer this
 $(call makepath,$(CREATABLEPATHS))
-# for the abld -what target
-$(eval $(call whatmacro,$(RELEASABLES),WHATWINSCW))
+# for the --what option and the log file
+$(call raptor_release,$(RELEASABLES))

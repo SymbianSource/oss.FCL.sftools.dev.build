@@ -5,11 +5,12 @@
 		<param name='ALWAYS_BUILD_AS_ARM' default=''/>
 		<param name='SET_ARMINC' default=''/>
 		<param name='ARMLIBS' default=''/>
-		<param name='ARMFPU' default='softvfp'/>
-		<param name='POSTLINKFPU' default='softvfp'/>
+		<param name='ARMFPU' default=''/>
 		<param name='ARMRT' default=''/>
+		<param name='BYTEPAIRCOMPRESSTARGET' default=''/>
 		<param name='TESTPATH' default=''/>
 		<param name='CAPABILITY'/>
+		<param name='COMPRESSTARGET' default=''/>
 		<param name='CPPONLYOPTION' default='-E'/>
 		<param name='LIBRARY'/>
 		<param name='LIBRARY_DEBUG'/>
@@ -20,6 +21,7 @@
 		<param name='EXPORTUNFROZEN' default=''/>
 		<param name='FEEDBACK_OPTION' default='--feedback=' />
 		<param name='FIRSTLIB' default=''/>
+		<param name='INFLATECOMPRESSTARGET' default=''/>
 		<param name='LINKEROPTION_ARMCC' default=''/>
 		<param name='LISTING_OPTION' default='-S'/>
 		<param name='MMPDEFS' default=''/>
@@ -60,7 +62,6 @@
 		<param name='EPOCALLOWDLLDATA' default=''/>
 		<param name='PLATMACROS.WINDOWS' default=''/>
 		<param name='PLATMACROS.LINUX' default=''/>
-		<param name='MAKEDEFFILE' default='1'/>
 		<param name='STDCPP' default=''/>
 		<param name='NOSTDCPP' default=''/>
 		<param name='NEWLIB' default=''/>
@@ -72,7 +73,6 @@
 		<param name='CC.VAL.SOFTVFP_MAYBE_VFPV2' default=''/>
 		<param name='CODE_SEGMENT_START' default=''/>
 		<param name='TOOLCHAIN' default=''/>
-		<param name='TOOLCHAINVERSION' default=''/>
 	</interface>
 	<interface name="Symbian.e32abiv2" extends="Symbian.mmp" flm="e32abiv2.flm">
 		<param name='SUPPORTS_STDCPP_NEWLIB' default='1'/>
@@ -92,8 +92,9 @@
 		<param name='CFLAGS'/>
 		<param name='COMMANDFILE_OPTION'/>
 		<param name='COMPILE_ONLY_OPTION'/>
+		<param name='COMPILER_FPU_DEFAULT'/>
+		<param name='COMPILER_FPU_OPTION'/>
 		<param name='COMPILER_CIA_FLAGS'/>
-		<param name='COMPILER_FPU_FLAGS'/>
 		<param name='COMPILER_INTERWORK_DEFINES'/>
 		<param name='COMPILER_SYSTEM_INCLUDE_OPTION'/>
 		<param name='COMPILER_THUMB_DEFINES'/>
@@ -124,6 +125,7 @@
 		<param name='LD'/>
 		<param name='LD_ERRORS_CONTROL_OPTION'/>
 		<param name='LD_WARNINGS_CONTROL_OPTION'/>
+		<param name='LD_WARNINGS_SUPPRESSION_ARMLIBS' default='' />
 		<param name='LIBPATH'/>
 		<param name='LICENSERETRY_OPTION' default=''/>
 		<param name='LINKER_ADD_STATIC_RUNTIME'/>
@@ -144,6 +146,8 @@
 		<param name='PERL'/>
 		<param name='PERTURBSTARTTIME'/>
 		<param name='PERTURBMSECS' default='500'/>
+		<param name='POSTLINKER_COMPRESSION_DEFAULT'/>
+		<param name='POSTLINKER_FPU_DEFAULT'/>
 		<param name='PREPDEF'/>
 		<param name='PREINCLUDE'/>
 		<param name='PREINCLUDE_OPTION'/>
@@ -158,6 +162,7 @@
 		<param name='RVCTBIN'/>
 		<param name='RVCTINC'/>
 		<param name='RVCTLIB'/>
+		<param name='RW_BASE'/>
 		<param name='RW_BASE_OPTION'/>
 		<param name='SBSV1MAKE'/>
 		<param name='NMAKE'/>

@@ -1,6 +1,63 @@
 
 Release Notes for Symbian Build System v2
 
+version 2.11.2
+
+Defect Fixes:
+DPDEF143176 raptor does not respect STDCPP mmp file keyword
+
+
+version 2.11.1
+
+Other Changes:
+GCCE 4.4.1 variant added
+Restored python 2.4 compatibility
+Minor TOOLS2 --what corrections
+Retain Linux execute permissions on unpacked :zip archives
+Prototype of extended timing API added
+Option --noexport added for parallel parsing
+Made --noexport and --export-only mutually exclusive
+SBS_PYTHONPATH insulates sbs from the global PYTHONPATH
+Removed spurious bracket in e32abiv2textnotifier2
+More robust to multiple import library definitions
+
+
+version 2.11.0
+
+New Features:
+Parallel parsing of meta-data
+New keyword APPLY for MMP files
+SAX filter plugin base-class
+
+Defect Fixes:
+DPDEF142895 Raptor does the wrong thing with the ARMFPU keyword
+DPDEF143020 The savespace variant overrides elf2e32's return code
+DPDEF143046 BYTEPAIRCOMPRESSTARGET and INFLATECOMPRESSTARGET not in FLM interface
+Improved error reporting for --check and --what
+
+
+version 2.10.2
+
+Defect Fixes:
+DPDEF142958 regression - ARMV6 and __ARMV6__ are not defined for armv6_urel builds
+DPDEF142730 Raptor crashes with improper VERSION syntax
+DPDEF142928 RVCT 4.0: Linker error when the MMP files modifies the --cpu option
+
+
+version 2.10.1
+
+Defect Fixes:
+DPDEF142666 Cannot remove frozen exports from EABI DEF file in SBSv2
+DPDEF142745 OPTION_REPLACE problems with RVCT 4.0
+DPDEF140622 feature variant configuration file with non exist file set to 'FEATURELISTFILES'
+DPDEF141195 Raptor doesn't handle spaces in tool paths
+DPDEF142616 Raptor: Variables can be set unnecessarily prior to TEM execution
+DPDEF142455 Disable warning L6780W for certain components
+DPDEF142447 GCC-E: Raptor compiles CIA files as Thumb
+DPDEF142448 GCC-E: Raptor tries to build ABIV1 import libraries
+DPDEF142451 GCC-E: Raptor treats C files as C++ files.
+
+
 version 2.10.0
 
 New Features:

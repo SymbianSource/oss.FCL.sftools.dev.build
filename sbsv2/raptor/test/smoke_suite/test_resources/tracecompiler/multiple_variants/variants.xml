@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<build xmlns="http://symbian.com/xml/build" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symbian.com/xml/build build/2_0.xsd">
+
+	<var name="feature_variant_base">
+		<set name='USE_TRACE_COMPILER' value='1' />       
+		<set name='FEATURELISTFILES' value='$(SBS_HOME)/test/smoke_suite/test_resources/tracecompiler/multiple_variants/list.txt'/>
+		<env name='JAVA_HOME' default='C:/APPS/jdk_1.6.0_11' type='path'/>
+		<env name='SBS_JAVATC' default='$(JAVA_HOME)/bin/java' type='tool' versionCommand='$(SBS_JAVATC) -version' versionResult='version \"1\.[5-9]' />
+	</var>
+
+	<var name="phone1" extends="feature_variant_base">
+		<set name='FEATUREVARIANTNAME' value='.phone1'/>
+		<set name='VARIANT_HRH' value='$(SBS_HOME)/test/smoke_suite/test_resources/tracecompiler/multiple_variants/hrh/var1.hrh'/> 
+	</var>
+
+	<var name="phone2" extends="feature_variant_base">
+		<set name='FEATUREVARIANTNAME' value='.phone2'/> 
+		<set name='VARIANT_HRH' value='$(SBS_HOME)/test/smoke_suite/test_resources/tracecompiler/multiple_variants/hrh/var2.hrh'/> 
+	</var>
+
+	<var name="phone3" extends="feature_variant_base">
+		<set name='FEATUREVARIANTNAME' value='.phone3'/> 
+		<set name='VARIANT_HRH' value='$(SBS_HOME)/test/smoke_suite/test_resources/tracecompiler/multiple_variants/hrh/var3.hrh'/> 
+	</var>
+
+</build>
+

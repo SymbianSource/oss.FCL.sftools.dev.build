@@ -1,0 +1,19 @@
+<SystemDefinition name="MCL" schema="2.0.0" > 
+	<systemModel>
+	    <layer name="First Exporting Component">
+			<component name="first_exporting">
+				<unit bldFile="metadata_export_pre1" mrp="test/sysdef/metadata_export_pre1/test.mrp"/>
+			</component>
+		</layer>
+	    <layer name="Component Dependent On Exports">
+			<component name="dependent_on_exports">
+				<unit bldFile="dependent_on_exports" mrp="test/sysdef/dependent_on_exports/test.mrp"/>
+			</component>
+		</layer>
+	    <layer name="Second Exporting Component">
+			<component name="second_exporting">
+				<unit bldFile="metadata_export_pre2" mrp="test/sysdef/metadata_export_pre2/test.mrp"/>
+			</component>
+		</layer>
+	</systemModel>
+</SystemDefinition>
