@@ -5,7 +5,7 @@ Next version
 
 Other Changes:
 Combine Linking and Postlinking into a single step
-
+New 'Patchable Constants' target type: TARGETTYPE pdll
 
 version 2.11.2
 

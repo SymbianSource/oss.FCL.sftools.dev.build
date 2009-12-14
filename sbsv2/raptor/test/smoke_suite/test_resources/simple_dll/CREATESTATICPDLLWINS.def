@@ -1,0 +1,4 @@
+EXPORTS
+	?ShowMessage@CMessenger@@QAEXXZ @ 1 NONAME ; ?ShowMessage@CMessenger@@QAEXXZ
+	?NewLC@CMessenger@@SAPAV1@AAVCConsoleBase@@ABVTDesC16@@@Z @ 2 NONAME ; ?NewLC@CMessenger@@SAPAV1@AAVCConsoleBase@@ABVTDesC16@@@Z
+

@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -11,12 +11,12 @@
 # Contributors:
 #
 # Description:
-# ARMv5 EXE/DLL ABIv2 Function Like Makefile (FLM)
-# Build an e32 DLL (Dynamic Link Library)
+# ARMv5 PDLL ABIv2 Function Like Makefile (FLM)
+# Build an e32 PDLL (Patchable constants DLL)
 # 
 #
 
-ifeq ($(TARGETTYPE),dll)
+ifeq ($(TARGETTYPE),pdll)
 include $(FLMHOME)/e32abiv2defaults.mk
 
 # What we need to build a DLL
@@ -55,6 +55,7 @@ include $(FLMHOME)/e32abiv2.flm
 $(call vrestore)
 
 else
-$(error e32abiv2dll.flm called with wrong TARGETTYPE (should be 'dll' but is '$(TARGETTYPE)'))
+$(error e32abiv2pdll.flm called with wrong TARGETTYPE (should be 'pdll' but is '$(TARGETTYPE)'))
 endif
+
 
