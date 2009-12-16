@@ -22,6 +22,10 @@ import filter_interface
 
 class FilterWhat(filter_interface.Filter):
 
+	def __init__(self):
+		super(filter_interface.Filter,self).__init__(self)
+		self.path_prefix_to_strip = None
+		print "HELLO=------"
 	
 	def print_file(self, line, start, end):
 		"Ensure DOS slashes on Windows"
@@ -33,6 +37,10 @@ class FilterWhat(filter_interface.Filter):
 			filename = line[(start + 1):end].replace("/","\\")
 		else:
 			filename = line[(start + 1):end]
+
+		if self.path_prefix_to_strip:
+			if filename.startswith(self.path_prefix_to_strip):
+				filename = filename[len(self.path_prefix_to_strip):]
 			
 		if self.check:
 			if not os.path.isfile(filename):

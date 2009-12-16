@@ -23,11 +23,16 @@ import filter_what
 
 class FilterWhatComp(filter_what.FilterWhat):
 
+        def __init__(self): 
+		super(filter_what.FilterWhat,self).__init__()
+		self.path_prefix_to_strip = os.path.abspath(os.environ["EPOCROOT"])
+
 	def write(self, text):
 		"process some log text"
+		ok = True
 		
 		for line in text.splitlines():
-			ok =filter_what.FilterWhat.write(self, line)
+			ok = filter_what.FilterWhat.write(self, line)
 			if not ok:
 				break
 				
