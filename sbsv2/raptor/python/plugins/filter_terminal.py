@@ -312,7 +312,7 @@ class FilterTerminal(filter_interface.Filter):
 					r = Recipe.factory(self.recipe_dict['name'], "".join(self.recipeBody))
 					warnings = r.warnings()
 					info = r.info()
-					if len(warnings) > 0:
+					if len(warnings) or len(info):
 						if not self.analyseonly:
 							for L in self.recipeBody:
 								if not L.startswith('+'):
