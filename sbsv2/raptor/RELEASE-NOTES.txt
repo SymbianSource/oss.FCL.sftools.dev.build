@@ -3,13 +3,33 @@ Release Notes for Symbian Build System v2
 
 Next version
 
-Other Changes:
-Combine Linking and Postlinking into a single step
-New 'Patchable Constants' target type: TARGETTYPE pdll
-Support exit codes from next version of the trace compiler which will issue them
-New (experimental) FilterWhatComp filter.  Simulates abld log output for use with parse_what.pl for packing up zips by component.
-New graphical build visualisation tool (bin/timelines.py). Requires pygame and PyOpenGL. 
-New a log analyser for recording the total time spent in each type of recipe in the build (recipestats.py). 
+- Combine Linking and Postlinking into a single step
+- New 'Patchable Constants' target type: TARGETTYPE pdll
+- Support exit codes from next version of the trace compiler which will issue them
+- New sbs_filter script and batchfile to ease the use of sbs_filter.py.  
+    Allows filters to be executed over a log after a build has been done.
+    e.g.
+  	sbs_filter --filters=FilterWhat < logfile.log 
+    (This runs a "--what" without regenerating any makefiles or reparsing
+    the matadata.)
+- New (beta) FilterWhatComp filter.  Simulates abld log output for
+   use with parse_what.pl for packing up zips by component.  Whatcomp output
+   uses the incoming epocroot value.  i.e. if epocroot is relative then so is
+   the what output.  e.g. if EPOCROOT=\   then the output will be of the form
+   "\epoc32\release\armv5\...."  If it's "..\myepocroot" then the output will
+   be "..\myepocroot\epoc32\release\armv5".  If it's absolute then the what
+   output will also be absolute.
+- New FilterCheck filter.  This can be used with sbs_filter to perform the 
+   equivalent of --check using the log output from a build.  It is more
+   efficient than --check because the metadata is not parsed and no makefiles
+   are generated. e.g.
+  	sbs_filter --filters=FilterCheck < logfile.log 
+- New (beta) graphical build visualisation tool (bin/timelines.py). Requires pygame
+   and PyOpenGL. e.g.  python timelines.py < filename.log
+- New (beta) log analyser (recipestats.py) for recording the total time spent in 
+   each type of recipe in the build. e.g. python recipestats.py < filename.log > stats.csv
+   The output is in CSV format.  
+
 
 version 2.11.2
 
