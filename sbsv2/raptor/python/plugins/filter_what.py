@@ -25,7 +25,7 @@ class FilterWhat(filter_interface.Filter):
 	def __init__(self):
 		super(filter_interface.Filter,self).__init__(self)
 		self.path_prefix_to_strip = None
-		print "HELLO=------"
+		self.path_prefix_to_add_on = None
 	
 	def print_file(self, line, start, end):
 		"Ensure DOS slashes on Windows"
@@ -41,6 +41,8 @@ class FilterWhat(filter_interface.Filter):
 		if self.path_prefix_to_strip:
 			if filename.startswith(self.path_prefix_to_strip):
 				filename = filename[len(self.path_prefix_to_strip):]
+			if self.path_prefix_to_add_on != None:
+				filename += self.path_prefix_to_add_on
 			
 		if self.check:
 			if not os.path.isfile(filename):

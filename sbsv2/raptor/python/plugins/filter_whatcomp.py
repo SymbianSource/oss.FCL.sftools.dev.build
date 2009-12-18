@@ -24,8 +24,7 @@ import filter_what
 class FilterWhatComp(filter_what.FilterWhat):
 
         def __init__(self): 
-		super(filter_what.FilterWhat,self).__init__()
-		self.path_prefix_to_strip = os.path.abspath(os.environ["EPOCROOT"])
+		super(filter_what.FilterWhat, self).__init__()
 
 	def write(self, text):
 		"process some log text"
@@ -49,3 +48,9 @@ class FilterWhatComp(filter_what.FilterWhat):
 		
 	def end_bldinf(self):
 		self.outfile.write("++ Finished\n")
+
+        def open(self, build_parameters):
+		t = filter_what.FilterWhat.open(self, build_parameters)
+		self.path_prefix_to_strip = os.path.abspath(build_parameters.epocroot)
+		self.path_prefix_to_add_on = build_parameters.incoming_epocroot
+		return t
