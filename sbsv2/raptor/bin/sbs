@@ -79,7 +79,6 @@ if [ "$OSTYPE" == "cygwin" ]; then
 	__PYTHON__=$($u "$__PYTHON__")
 
 	export SBS_HOME=$($u "$SBS_HOME")
-	export EPOCROOT=$($u "$EPOCROOT")
 
 	export PATH=${__MINGW__}/bin:${__CYGWIN__}/bin:$SBS_HOME/$HOSTPLATFORM_DIR/bin:$PATH
 

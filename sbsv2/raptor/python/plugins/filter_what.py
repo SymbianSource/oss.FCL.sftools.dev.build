@@ -42,7 +42,7 @@ class FilterWhat(filter_interface.Filter):
 			if filename.startswith(self.path_prefix_to_strip):
 				filename = filename[len(self.path_prefix_to_strip):]
 			if self.path_prefix_to_add_on != None:
-				filename += self.path_prefix_to_add_on
+				filename = self.path_prefix_to_add_on + filename
 			
 		if self.check:
 			if not os.path.isfile(filename):
