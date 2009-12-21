@@ -2782,10 +2782,11 @@ class MetaReader(object):
 							# export the file
 							exportwhatlog += self.CopyExport(fromFile, toFile, bldinf_filename)
 						else:
-							exportwhatlog += ("<archive zipfile='" + str(fromFile) + "'>\n")
 							members = self.UnzipExport(fromFile, toFile,
 									str(exportPlatform['SBS_BUILD_DIR']),
 									bldinf_filename)
+							
+							exportwhatlog += ("<archive zipfile='" + str(fromFile) + "'>\n")
 							if members != None:
 								exportwhatlog += members
 							exportwhatlog += "</archive>\n"
