@@ -6,6 +6,7 @@ version 2.x.x
 Defect Fixes:
 Fix for: filter terminal flags up when recipe truncated
 SF bug 107: invalid XML output when a zip file is missing
+SF bug 518: unpaged keyword in mmp files is not parsed properly
 
 
 version 2.11.2
