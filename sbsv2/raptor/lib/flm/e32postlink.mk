@@ -85,7 +85,7 @@ ifeq ($(PAGED),1)
   POSTLINKER_PAGEDOPTION:=--paged
 endif
 ifeq ($(PAGED),0)
-  POSTLINKER_PAGEDOPTION:--unpaged
+  POSTLINKER_PAGEDOPTION:=--unpaged
 endif
 
 # Postlink target
