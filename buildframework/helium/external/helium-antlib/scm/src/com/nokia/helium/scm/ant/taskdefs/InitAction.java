@@ -24,7 +24,23 @@ import org.apache.maven.scm.repository.ScmRepository;
 
 import com.nokia.maven.scm.provider.ScmProviderExt;
 
+/**
+ * Create a new repository. In the following example the new_repo mercurial repository 
+ * will be created under /some/path/. E.g:
+ * 
+ * <pre>
+ * &lt;hlm:scm verbose="true" scmUrl="scm:hg:/some/path/new_repo"&gt;
+ *     &lt;hlm:checkout baseDir="scm:hg:/some/path/new_repo" /&gt;
+ * &lt;/hlm:scm&gt;
+ * </pre>
+ * 
+ * @ant.type name="init" category="SCM"
+ */
 public class InitAction extends BaseDirectoryScmAction {
+    
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void execute(ScmRepository repository) throws ScmException {
         ScmManager scmManager = getTask().getScmManager();

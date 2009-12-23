@@ -29,6 +29,7 @@ Description:
     <property name="ec.makefile.file" location="${build.drive}/Makefile"/>
 
     <property name="ec.sysdef2make" location="${helium.dir}/tools/compile/ec/sysdef2make.pl"/>
+    <property name="ec.sysdef2make.cmdline" value="-forcemake ((abld.*\-(w|what|c|check))|(abld.*resource))" />
     
     <property name="ec.historyfile" value="${build.drive}/emake.data"/>
     <property name="ec.mem.limit" value="1000000000"/>
@@ -41,12 +42,12 @@ Description:
     <!-- Converting cononical SDF into a Makefile. -->
     <target name="compile-genxml-ec" if="build.system.ec-helium">
         <!-- Using now the official script for GTI. -->
-        <exec executable="perl" dir="${build.drive}/" error="${build.log.dir}/${build.id}.${sysdef.configuration}.sysdef2make.log" failonerror="${failonerror}">
-            <arg line="${ec.sysdef2make} -n ${sysdef.configuration} -s ${env.EPOCROOT} -forcemake ((abld.*\-(w|what|c|check))|(abld.*resource)) ${canonical.sysdef.file}"/>
+        <exec executable="perl" dir="${build.drive}/" error="${compile.log.dir}/${build.id}.${sysdef.configuration}.sysdef2make.log" failonerror="${failonerror}">
+            <arg line="${ec.sysdef2make} -n ${sysdef.configuration} -s ${env.EPOCROOT} ${ec.sysdef2make.cmdline} ${canonical.sysdef.file}"/>
         </exec>
         <hlm:metadatarecord database="${metadata.dbfile}">
             <hlm:textmetadatainput>
-                <fileset casesensitive="false" file="${build.log.dir}/${build.id}.${sysdef.configuration}.sysdef2make.log"/>
+                <fileset casesensitive="false" file="${compile.log.dir}/${build.id}.${sysdef.configuration}.sysdef2make.log"/>
                 <metadatafilterset refid="filterset.genxml.ec" />
             </hlm:textmetadatainput>
         </hlm:metadatarecord>
@@ -283,8 +284,8 @@ project.setProperty(str(attributes.get('property')), str(file_path))
         <echo>Cleaning up the logs....</echo>
         <exec executable="perl" dir="${build.drive}/" failonerror="${failonerror}">
             <arg line="${helium.dir}/tools/compile/ec/ec_whatcheck.pl"/>
-            <redirector input="${build.log.dir}/${build.id}.${sysdef.configuration}_build_output.log"
-                output="${build.log.dir}/${build.id}.${sysdef.configuration}_compile.log"/>
+            <redirector input="${compile.log.dir}/${build.id}.${sysdef.configuration}_build_output.log"
+                output="${compile.log.dir}/${build.id}.${sysdef.configuration}_compile.log"/>
         </exec>
     </target>
 
@@ -308,13 +309,13 @@ project.setProperty(str(attributes.get('property')), str(file_path))
         <echo>emake debug flag: ${emake_debug_flag}</echo>
 
         <echo>Building ${sysdef.configuration}....</echo>
-        <echo file="${build.log.dir}/${build.id}.${sysdef.configuration}_run_emake.bat" level="info">
+        <echo file="${temp.build.dir}/${build.id}.${sysdef.configuration}_run_emake.bat" level="info">
 set
-${ec.emake} --emake-build-label=${build.id}.${sysdef.configuration} --emake-class=${ec.build.class} --emake-priority=normal --emake-maxagents=${ec.maxagents} --emake-job-limit=0 --emake-mem-limit=${ec.mem.limit} --emake-history=${ec.history.option} --emake-annodetail=basic,history,file,waiting --emake-annofile=${build.log.dir}\${build.id}.${sysdef.configuration}.emake.anno.xml --emake-historyfile=${ec.historyfile} --emake-debug=${emake_debug_flag} --emake-logfile=${build.log.dir}\${build.id}.${sysdef.configuration}.emake.g.dlog --emake-root=%EMAKE_ROOT%;${helium.dir} --emake-autodepend=1 -k -i -f ${build.drive}/${sysdef.configuration}.make LOGBUILDTIME=&quot;&quot; VERBOSE=&quot;&quot; SAVESPACE=&quot;&quot; ${sysdef.configuration}
+${ec.emake} --emake-build-label=${build.id}.${sysdef.configuration} --emake-class=${ec.build.class} --emake-priority=normal --emake-maxagents=${ec.maxagents} --emake-job-limit=0 --emake-mem-limit=${ec.mem.limit} --emake-history=${ec.history.option} --emake-annodetail=basic,history,file,waiting --emake-annofile=${compile.log.dir}\${build.id}.${sysdef.configuration}.emake.anno.xml --emake-historyfile=${ec.historyfile} --emake-debug=${emake_debug_flag} --emake-logfile=${compile.log.dir}\${build.id}.${sysdef.configuration}.emake.g.dlog --emake-root=%EMAKE_ROOT%;${helium.dir} --emake-autodepend=1 -k -i -f ${build.drive}/${sysdef.configuration}.make LOGBUILDTIME=&quot;&quot; VERBOSE=&quot;&quot; SAVESPACE=&quot;&quot; ${sysdef.configuration}
         </echo>
 
-        <exec executable="${build.log.dir}/${build.id}.${sysdef.configuration}_run_emake.bat"
-              dir="${build.drive}/" output="${build.log.dir}/${build.id}.${sysdef.configuration}_build_output.log"
+        <exec executable="${temp.build.dir}/${build.id}.${sysdef.configuration}_run_emake.bat"
+              dir="${build.drive}/" output="${compile.log.dir}/${build.id}.${sysdef.configuration}_build_output.log"
               failonerror="${failonerror}">
             <env key="SYMBIANBUILD_DEPENDENCYOFF" value="1" />
         </exec>
@@ -323,9 +324,9 @@ ${ec.emake} --emake-build-label=${build.id}.${sysdef.configuration} --emake-clas
         <antcall target="compile-ec-logs"/>
 
         <!-- Testing everything happens correctly. -->
-        <hlm:assertFileExists file="${build.log.dir}/${build.id}.${sysdef.configuration}_run_emake.bat"/>
-        <hlm:assertFileExists file="${build.log.dir}/${build.id}.${sysdef.configuration}_build_output.log"/>
-        <hlm:assertFileExists file="${build.log.dir}/${build.id}.${sysdef.configuration}_compile.log"/>
-        <hlm:calculateErrorsFromLog logfile="${build.log.dir}/${build.id}.${sysdef.configuration}_compile.log" />
+        <hlm:assertFileExists file="${temp.build.dir}/${build.id}.${sysdef.configuration}_run_emake.bat"/>
+        <hlm:assertFileExists file="${compile.log.dir}/${build.id}.${sysdef.configuration}_build_output.log"/>
+        <hlm:assertFileExists file="${compile.log.dir}/${build.id}.${sysdef.configuration}_compile.log"/>
+        <hlm:calculateErrorsFromLog logfile="${compile.log.dir}/${build.id}.${sysdef.configuration}_compile.log" />
     </target>
 </project>

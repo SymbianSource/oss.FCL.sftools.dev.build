@@ -29,6 +29,9 @@ public class SBSMakeOptions extends VariableSet {
     private Vector variables = new Vector();
     
     private String engine;
+
+    private String ppThreads;
+
     /**
      * Constructor
      */
@@ -69,4 +72,12 @@ public class SBSMakeOptions extends VariableSet {
     public String getEngine() {
         return engine;
     }
+    public void setPPThreads(String threads) {
+        ppThreads = threads;
+    }
+    
+    public String getPPThreads() {
+        return ppThreads;
+    }
+
 }

@@ -29,10 +29,14 @@ public class SMSNotifier extends DataType implements Notifier {
     }
     /**
      * Sends the data to the requested sender list with specified notifier
-     * @param senderList sends the data to the list of requested user.
+     * 
+     * @param signalName is the name of the signal that has been raised.
+     * @param failStatus indicates whether to fail the build or not
+     * @param notifierInput contains signal notifier info
+     * @param message is the message from the signal that has been raised.           
      */
     public void sendData(String signalName, boolean failStatus,
-            NotifierInput notifierInput) {
+            NotifierInput notifierInput, String message ) {
     }
 
     /**

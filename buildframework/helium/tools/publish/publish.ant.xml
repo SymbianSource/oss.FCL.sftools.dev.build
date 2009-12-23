@@ -128,30 +128,36 @@ Description:
     <hlm:mergeMetadataMacro file="${zip.config.file.parsed}" config="${zips.@{type}.spec.name}"/>
     </pre>
     -->
-    <scriptdef name="mergeMetadataMacro" language="jython" uri="http://www.nokia.com/helium">
+    <macrodef name="mergeMetadataMacro" uri="http://www.nokia.com/helium">
         <attribute name="file" />
         <attribute name="config" />
-        <![CDATA[
+        <sequential>
+            <hlm:python>
+                <![CDATA[
 import configuration
 import symrec
 import os
-import traceback
-# Nicer name
-self.setTaskName("merge-metadata")
+import sys
+import logging
+import ant
+
+LOGGER = logging.getLogger("metadatamerger")
+LOGGER.setLevel(level=logging.INFO)
+logging.basicConfig(level=logging.INFO)
 
 def merge_filelist(merger, filelist):
     for filename in filelist:
         try:
-            self.log(str("Merging %s" % filename))
+            LOGGER.info("Merging %s" % filename)
             merger.merge(filename)
             os.unlink(filename)
         except Exception, exc:
-            self.log("Warning: %s" % exc)
+            LOGGER.warning("Warning: %s" % exc)
 
 try:
-    builder = configuration.NestedConfigurationBuilder(open(str(attributes.get('file')), 'r'))
+    builder = configuration.NestedConfigurationBuilder(open(ant.get_property(r'@{file}')), 'r')
     configSet = builder.getConfiguration()
-    configs = configSet.getConfigurations(str(attributes.get('config')))
+    configs = configSet.getConfigurations(ant.get_property(r'@{config}'))
     
     if len(configs) > 0:
         filelist = []
@@ -159,7 +165,7 @@ try:
             if config.get_boolean("grace.metadata", False):
                 metadata = os.path.join(config['archives.dir'], config['name']+ ".metadata.xml")
                 if os.path.exists(metadata):
-                    self.log(str("Found %s" % metadata))
+                    LOGGER.info("Found %s" % metadata)
                     filelist.append(metadata)
         
         merger = None
@@ -167,22 +173,22 @@ try:
         if os.path.exists(metadata_main):
             merger = symrec.MetadataMerger(metadata_main)
             merge_filelist(merger, filelist)
-            self.log(str("Writing %s" % metadata_main))
+            LOGGER.info(str("Writing %s" % metadata_main))
             merger.save()
         elif len(filelist) > 0:
             input = filelist.pop(0)
             merger = symrec.MetadataMerger(input)
             merge_filelist(merger, filelist)
-            self.log(str("Writing %s" % metadata_main))
+            LOGGER.info(str("Writing %s" % metadata_main))
             merger.save(metadata_main)
             os.unlink(input)
 except Exception, e:
-    self.log('ERROR: %s' % e)
-    traceback.print_exc()
-    # Let's propagate at the moment
-    raise e
+    LOGGER.error('ERROR: %s' % e)
+    sys.exit(-1)
 ]]> 
-    </scriptdef>
+            </hlm:python>
+        </sequential>
+    </macrodef>
 
     <!-- This macro allows you to add or update one archive definition inside the release metadata files.
     e.g.:
@@ -190,39 +196,48 @@ except Exception, e:
         <hlm:updateMetadataMacro file="<path>/release_metadata.xml" archive="<path>/archive.zip" />
     </pre>
      -->
-    <scriptdef name="updateMetadataMacro" language="jython" uri="http://www.nokia.com/helium">
+    <macrodef name="updateMetadataMacro" uri="http://www.nokia.com/helium">
         <attribute name="file" />
         <attribute name="archive" />
-        <attribute name="filters" />
+        <attribute name="filters" default=""/>
+        <sequential>
+            <hlm:python>
         <![CDATA[
 import symrec
 import os
 import traceback
 import fileutils
-self.setTaskName("updateMetadataMacro")
-if attributes.get('file') is None:
+import ant
+import sys
+import logging
+
+LOGGER = logging.getLogger("metadataupdater")
+LOGGER.setLevel(level=logging.INFO)
+logging.basicConfig(level=logging.INFO)
+
+if ant.get_property(r'@{file}') is None:
     raise Exception('file attribute is not defined.')
-if attributes.get('archive') is None:
+if ant.get_property(r'@{archive}') is None:
     raise Exception('archive attribute is not defined.')
 filters = None
-if attributes.get('filters') is not None:
-    filters = str(attributes.get('filters')).split(r',')
+if ant.get_property(r'@{filters}') is not None:
+    filters = ant.get_property(r'@{filters}').split(r',')
 
 try:
-    filename = str(attributes.get('file'))
-    archive = str(attributes.get('archive'))
+    filename = ant.get_property(r'@{file}')
+    archive = ant.get_property(r'@{archive}')
     if not os.path.exists(filename):
         raise Exception("Could not find file: %s" % filename)
     if not os.path.exists(archive):
         raise Exception("Could not find file: %s" % archive)
 
-    self.log(str("Opening %s" % filename))
+    LOGGER.info(str("Opening %s" % filename))
     md = symrec.ReleaseMetadata(filename)
     if os.path.basename(archive) not in md.keys():
-        self.log(str("Adding %s to metadata" % os.path.basename(archive)))
+        LOGGER.info(str("Adding %s to metadata" % os.path.basename(archive)))
         md.add_package(os.path.basename(archive), md5checksum=fileutils.getmd5(archive), size=os.path.getsize(archive), filters=filters)
     else:
-        self.log(str("Updating %s to metadata" % os.path.basename(archive)))
+        LOGGER.info(str("Updating %s to metadata" % os.path.basename(archive)))
         result = md[os.path.basename(archive)]
         result['md5checksum'] = unicode(fileutils.getmd5(archive))
         result['size'] = unicode(os.path.getsize(archive))
@@ -231,12 +246,12 @@ try:
         md[os.path.basename(archive)] = result
     md.save()
 except Exception, e:
-    self.log('ERROR: %s' % e)
-    traceback.print_exc()
-    # Let's propagate at the moment
-    raise e
+    LOGGER.error('ERROR: %s' % e)
+    sys.exit(-1)
 ]]> 
-    </scriptdef>
+            </hlm:python>
+        </sequential>
+    </macrodef>
     
     <!-- This macro update the metadata file generated by the config provided by file.
     e.g:
@@ -244,22 +259,28 @@ except Exception, e:
     <hlm:updateMD5Macro file="${zip.config.file.parsed}" config="${zips.@{type}.spec.name}"/>
     </pre>
     -->
-    <scriptdef name="updateMD5Macro" language="jython" uri="http://www.nokia.com/helium">
+    <macrodef name="updateMD5Macro" uri="http://www.nokia.com/helium">
         <attribute name="file" />
         <attribute name="config" />
+        <sequential>
+            <hlm:python>
         <![CDATA[
 import configuration
 import archive
 import os
 import symrec
-import traceback       
+import ant
+import logging
+import sys
 
-self.setTaskName("update-md5")
+LOGGER = logging.getLogger("metadataMD5updater")
+LOGGER.setLevel(level=logging.INFO)
+logging.basicConfig(level=logging.INFO)
           
 # Reading the config from Ant
 try:
-    config_filename = str(attributes.get('file'))
-    spec_name = str(attributes.get('config'))
+    config_filename = ant.get_property(r'@{file}')
+    spec_name = ant.get_property(r'@{config}')
     # Loading the config file.                        
     builder = configuration.NestedConfigurationBuilder(open(config_filename, 'r'))
     configSet = builder.getConfiguration()
@@ -271,16 +292,16 @@ try:
             md5update.update()
             md5update.save()
         else:
-            self.log(str('WARNING: Could not find %s.' % os.path.join(configs[0]['archives.dir'], "release_metadata.xml")))
+            LOGGER.warning(str('WARNING: Could not find %s.' % os.path.join(configs[0]['archives.dir'], "release_metadata.xml")))
     else:
-        self.log('WARNING: No config.')
+        LOGGER.warning('WARNING: No config.')
 except Exception, e:
-    self.log('ERROR: %s' % e)
-    traceback.print_exc()
-    # Let's propagate at the moment
-    raise e
+    LOGGER.error('ERROR: %s' % e)
+    sys.exit(-1)
 ]]> 
-    </scriptdef>
+        </hlm:python>
+        </sequential>
+    </macrodef>
 
     <condition property="archive.using.ec">
         <or>
@@ -294,21 +315,27 @@ except Exception, e:
         <attribute name="type" />
         <attribute name="file" />
         <attribute name="ec" default="${archive.using.ec}"/>
+        <attribute name="failonemptyconfig" default="true"/>
+        <attribute name="phase" default="archive"/>
         <sequential>
             <if>
                 <not>
                     <isset property="zip.@{type}.log.file" />
                 </not>
                 <then>
-                    <property name="zip.@{type}.log.file" location="${build.log.dir}/${build.id}_@{type}_zip.log" />
+                    <property name="zip.@{type}.log.file" location="${@{phase}.log.dir}/${build.id}_@{type}_zip.log" />
                 </then>
             </if>
+            <mkdir dir="${@{phase}.log.dir}"/>
+            <mkdir dir="${post.log.dir}"/>
+            <property name="zip.@{type}.nopolicy.log.file" location="${@{phase}.log.dir}/${build.id}_@{type}_archive.nopolicy.log" />
+            <property name="zip.@{type}.policy.log.file" location="${@{phase}.log.dir}/${build.id}_@{type}_archive.policy.log" />
             <trycatch property="exception" reference="exception">
                 <try>
                     <!-- Don't print 'compressing' on console -->
                     <hlm:logtoconsole action="stop" />
                     <!-- Stops writing on ...ant_build.log file-->
-                    <hlm:startSpecificLogMacro name="${zip.@{type}.log.file}" />
+                    <hlm:startSpecificLogMacro name="${zip.@{type}.log.file}" phase="@{phase}"/>
             
                     <property name="zip.config.file.parsed" location="${temp.build.dir}/zip.cfg.xml.parsed" />
                     <copy file="@{file}" tofile="${zip.config.file.parsed}" overwrite="true">
@@ -316,12 +343,12 @@ except Exception, e:
                             <expandproperties />
                         </filterchain>
                     </copy>
-                    <hlm:updateArchiveConfig configtype="${zips.@{type}.spec.name}" configfileparsed="${zip.config.file.parsed}" usingec="@{ec}" />
+                    <hlm:updateArchiveConfig configtype="${zips.@{type}.spec.name}" configfileparsed="${zip.config.file.parsed}" usingec="@{ec}" failonemptyconfig="@{failonemptyconfig}"/>
                     <if>
                         <istrue value="@{ec}" />
                         <then>
                             <echo>emake.root.to.append=${emake.root.to.append}</echo>
-                            <hlm:emakeMacro name="archive-full-@{type}" makefile="${build.drive}/ZIP_${zips.@{type}.spec.name}.make" target="all" dir="${build.drive}" annodetail="basic,history,file,waiting" root="${emake.root.to.append}" failonerror="false" />
+                            <hlm:emakeMacro name="archive-full-@{type}" makefile="${build.drive}/ZIP_${zips.@{type}.spec.name}.make" target="all" dir="${build.drive}/" annodetail="basic,history,file,waiting" root="${emake.root.to.append}" failonerror="false" phase="archive"/>
                         </then>
                         <else>
                             <if>
@@ -358,12 +385,12 @@ prebuilder.cleanupSubstDrives()
                 <finally>
                     <!-- Todo: metadata: Convert to metadata structure -->
                     <!-- Stops log back to main log. -->
-                    <hlm:stopSpecificLogMacro name="${zip.@{type}.log.file}" />
+                    <hlm:stopSpecificLogMacro name="${zip.@{type}.log.file}" phase="@{phase}"/>
                     <hlm:logtoconsole action="resume" />
                 </finally>
             </trycatch>
             <hlm:assertFileExists file="${zip.@{type}.log.file}" />
-            <copy file="${zip.@{type}.log.file}" tofile="${build.log.dir}/${build.id}_@{type}_archive.nopolicy.log" verbose="true">
+            <copy file="${zip.@{type}.log.file}" tofile="${zip.@{type}.nopolicy.log.file}" verbose="true">
                 <filterchain>
                     <linecontainsregexp negate="true">
                         <regexp pattern="POLICY_(ERROR|WARNING|INFO)" />
@@ -372,15 +399,15 @@ prebuilder.cleanupSubstDrives()
             </copy>
             <hlm:metadatarecord database="${metadata.dbfile}">
                 <hlm:textmetadatainput>
-                    <fileset casesensitive="false" file="${build.log.dir}/${build.id}_@{type}_archive.nopolicy.log" />
+                    <fileset casesensitive="false" file="${zip.@{type}.nopolicy.log.file}" />
                     <metadatafilterset refid="filterset.archive.nopolicy" />
                 </hlm:textmetadatainput>
             </hlm:metadatarecord>
-            <hlm:signalMacro logfile="${build.log.dir}/${build.id}_@{type}_archive.nopolicy.log" 
+            <hlm:signalMacro logfile="${zip.@{type}.nopolicy.log.file}" 
                 signal.input="archiveErrorSignalInput" />
 
             <!-- Extracting policy errors from archiving. -->
-            <copy file="${zip.@{type}.log.file}" tofile="${build.log.dir}/${build.id}_@{type}_archive.policy.log" verbose="true">
+            <copy file="${zip.@{type}.log.file}" tofile="${zip.@{type}.policy.log.file}" verbose="true">
                 <filterchain>
                     <linecontainsregexp>
                         <regexp pattern="POLICY_(ERROR|WARNING|INFO)" />
@@ -390,14 +417,14 @@ prebuilder.cleanupSubstDrives()
                     </tokenfilter>
                 </filterchain>
             </copy>
-            <hlm:assertFileExists file="${build.log.dir}/${build.id}_@{type}_archive.policy.log" />
+            <hlm:assertFileExists file="${zip.@{type}.policy.log.file}" />
             <hlm:metadatarecord database="${metadata.dbfile}">
                 <hlm:textmetadatainput>
-                    <fileset casesensitive="false" file="${build.log.dir}/${build.id}_@{type}_archive.policy.log" />
+                    <fileset casesensitive="false" file="${zip.@{type}.policy.log.file}" />
                     <metadatafilterset refid="filterset.archive.policy" />
                 </hlm:textmetadatainput>
             </hlm:metadatarecord>
-            <hlm:signalMacro logfile="${build.log.dir}/${build.id}_@{type}_archive.policy.log" 
+            <hlm:signalMacro logfile="${zip.@{type}.policy.log.file}" 
                 signal.input="archivePolicyErrorSignalInput" />
         </sequential>
     </macrodef>
@@ -410,12 +437,16 @@ prebuilder.cleanupSubstDrives()
         <attribute name="configtype" />
         <attribute name="configfileparsed" />
         <attribute name="usingec" />
+        <attribute name="failonemptyconfig" />
         <![CDATA[
 import archive
 import configuration
 import logging
 import os
 
+failonemptyconfig = True      
+if attributes.get('failonemptyconfig'):
+    failonemptyconfig = str(attributes.get('failonemptyconfig')).lower() == "true"
 config_parsed_filename = str(attributes.get('configfileparsed'))
 config_type = str(attributes.get('configtype'))
 is_it_ec = str(attributes.get('usingec'))
@@ -430,14 +461,13 @@ if is_it_ec == "true":
     outputtype = 'make'
     outputext = '.make'
 
-if len(configs) > 0:
+if len(configs) > 0 or not failonemptyconfig:
     prebuilder = archive.ArchivePreBuilder(configuration.ConfigurationSet(configs), config_type, outputtype)
     if os.sep == '\\':
         toAppendEmakeRoot = prebuilder.checkRootDirValue(builder, config_parsed_filename, project.getProperty('build.drive'), config_type)
         if toAppendEmakeRoot is not None:
             project.setProperty("emake.root.to.append", str(toAppendEmakeRoot))
     prebuilder.writeTopLevel(os.path.join(project.getProperty('build.drive') + os.sep, 'ZIP_' + config_type + outputext), project.getProperty('temp.build.dir'), config_parsed_filename)       
-    
 else:
     raise Exception('There are no archive configs to build. Looked for %s' % config_type)
 ]]>
@@ -776,16 +806,58 @@ if not os.path.exists(md5lastbuild):
     by the "final" target last.
     -->
     <target name="publish-build-log" depends="prep-publish" if="publish">
-        <record name="${build.log}" action="stop" append="true" />
         <copy todir="${publish.dir}/logs" preservelastmodified="true" failonerror="false">
-            <fileset dir="${build.log.dir}" includes="${build.id}*_ant_build.log" />
+            <fileset dir="${build.log.dir}" includes="**/*.log" />
         </copy>
     </target>
 
+    <!-- Copy the debug log to the build area if available-->
+    <target name="copy-debug-logs">
+        <echo message="log4j.dir:${log4j.cache.dir}" /> 
+        <if>
+            <available file="${log4j.cache.dir}" />
+            <then>
+                <copy todir="${build.log.dir}/debug" failonerror="false">
+                    <fileset dir="${log4j.cache.dir}" includes="hlm_*.log" />
+                </copy>
+            </then>
+        </if>
+    </target>
+
+    <!-- Target to simulate that the build is failed because of processing
+    ant output
+    -->
+    <target name="raise-error">
+        <echo message="ERROR: Build failed due to exceptions" />
+    </target>
+
+    <!-- Update the build status by processing the ant build output log -->
+    <target name="build-status">
+        <hlm:metadatarecord database="${metadata.dbfile}">
+            <hlm:antmetadatainput>
+                <fileset casesensitive="false" file="${build.log.dir}/${build.id}_ant_build.log" />
+                <metadatafilterset refid="filterset.ant.output" />
+            </hlm:antmetadatainput>
+        </hlm:metadatarecord>
+
+        <hlm:signalMacro logfile="${build.id}_ant_build.log" 
+            signal.input="exceptionSignalInput" />
+    </target>
+
+    <!-- Exception handler to process the ant output log -->
+    <target name="hlm-exception-handler">
+        <if>
+            <available file="${build.log.dir}/${build.id}_ant_build.log"/>
+            <then>
+                <runtarget target="do-exception-handler" />
+            </then>
+        </if>
+    </target>
+
+    <target name="do-exception-handler" depends="raise-error, build-status, build-log-summary, copy-debug-logs, publish-build-log" />
 
     <!-- Does any wrap-up at the end of the build. This should be the last target for every top-level target. -->
-    <target name="final" depends="publish-build-log">
-    </target>
+    <target name="final" depends="build-status, build-log-summary, copy-debug-logs, publish-build-log" />
     
     <!-- This target will zip the WA depending on the ado mapping file -->
     <target name="zip-wa" depends="ido-create-ado-mapping" if="zip.wa">

@@ -104,6 +104,10 @@ public class MetaDataFilter extends DataType
         pattern = Pattern.compile(regex);
     }
     
+    /**
+     * Helper function to return the pattern
+     * @return the pattern of this filter.
+     */
     public Pattern getPattern() {
         return pattern;
     }

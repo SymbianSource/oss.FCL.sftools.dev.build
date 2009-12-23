@@ -6,7 +6,7 @@
         <set name="max.files.per.archive" value="65000"/>
         <set name="archive.tool" value="7za"/>
         <set name="archives.dir" value="${env.TEMP}"/>
-        <set name="temp.build.dir" value="${temp.build.dir}"/>
+        <set name="temp.build.dir" value="${env.TEMP}"/>
         <set name="name" value="python_libs"/>
         <set name="include" value="lib\*.egg"/>
     </config>

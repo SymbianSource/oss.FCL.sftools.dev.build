@@ -17,9 +17,8 @@
 
  
 package com.nokia.helium.signal.ant.types;
-
+import net.sf.antcontrib.logic.RunTargetTask;
 import org.apache.tools.ant.Project;
-import org.apache.tools.ant.types.Reference;
 import com.nokia.helium.core.ant.HlmExceptionHandler;
 import com.nokia.helium.signal.ant.taskdefs.*;
 import com.nokia.helium.signal.ant.SignalListener;
@@ -38,19 +37,12 @@ public class SignalExceptionHandler implements HlmExceptionHandler
      * @throws BuildException
      */
     public void handleException(Project project, String module, Exception e) {
-        log.debug("SignalExceptionHandler:handleException: start");
-        String refId = project.getProperty("signals.buildexception.signalinput");
-        if (refId != null) {
-            Signal signal = new Signal();
-            SignalNotifierInput signalNotifierInput = new SignalNotifierInput(); 
-            signal.add(signalNotifierInput);
-            Reference ref = new Reference(project, refId);
-            SignalInput signalInput = signalNotifierInput.createSignalInput();
-            signalInput.setRefid(ref);
-            signal.setProject(project);
-            signal.setName("buildExceptionSignal");
-            signal.setMessage(e.getMessage());
-            signal.execute();
+        String exceptionTarget = project.getProperty("exceptions.target");
+        if (exceptionTarget != null) {
+            RunTargetTask runTargetTask = new RunTargetTask();
+            runTargetTask.setProject(project);
+            runTargetTask.setTarget(exceptionTarget);
+            runTargetTask.execute();
         }
-    }
+   }
 }

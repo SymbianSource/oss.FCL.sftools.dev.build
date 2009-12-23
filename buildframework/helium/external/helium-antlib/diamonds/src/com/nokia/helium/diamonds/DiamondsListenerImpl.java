@@ -106,7 +106,6 @@ public class DiamondsListenerImpl implements DiamondsListener {
                         .getTemplateDir(), finishTemplateFile, output,
                         sourceList);
             } catch (Exception e) {
-                log.debug("diamonds:DiamondsListenerImpl:exception: ", e);
                 throw new DiamondsException(
                         "failed to convert the build finish template: "
                                 + e.getMessage());
@@ -118,7 +117,6 @@ public class DiamondsListenerImpl implements DiamondsListener {
                 diamondsClient.sendData(output, DiamondsConfig
                         .getDiamondsProperties().getDiamondsBuildID());
             } catch (Exception e) {
-                log.debug("diamonds:DiamondsListenerImpl: exception: ", e);
                 throw new DiamondsException("Failed to send data to diamonds: "
                         + e.getMessage());
             }
@@ -149,7 +147,7 @@ public class DiamondsListenerImpl implements DiamondsListener {
                         fullResultsFile.getAbsolutePath(), smtpServer,
                         ldapServer);
             } catch (Exception e) {
-                log.debug("Error sending diamonds final log: ", e);
+                log.error("Error sending diamonds final log: ", e);
             }
         }
     }
@@ -278,7 +276,6 @@ public class DiamondsListenerImpl implements DiamondsListener {
                 }
                 isInitialized = true;
             } catch (Exception e) {
-                log.debug("diamonds:DiamondsListenerImpl: ", e);
                 throw new DiamondsException("failed to connect to diamonds: "
                         + e.getMessage());
             }

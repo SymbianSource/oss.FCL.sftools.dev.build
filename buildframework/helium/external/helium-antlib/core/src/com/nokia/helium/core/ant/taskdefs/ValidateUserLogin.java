@@ -18,6 +18,7 @@
 package com.nokia.helium.core.ant.taskdefs;
 
 import org.apache.tools.ant.Task;
+import org.apache.tools.ant.Project;
 import org.apache.tools.ant.BuildException;
 import javax.naming.*;
 import javax.naming.directory.*;
@@ -138,6 +139,8 @@ public class ValidateUserLogin extends Task implements Condition
             DirContext authContext = new InitialDirContext(env);
             return true;
         } catch (NamingException e) {
+            // We are Ignoring the errors as no need to fail the build.
+            log("Not able to validate the user. " + e.getMessage(), Project.MSG_DEBUG);
             return false;  
         }
 

@@ -34,9 +34,9 @@ Description:
     <property name="ee.makefile.target" value="ee_roms" />
     <property name="subcon.makefile.target" value="subcon_roms" />
     <property name="trace.makefile.target" value="trace_roms" />
-    <property name="ee_roms.log.file" value="${build.log.dir}/${build.id}_ee_roms.log" />
-    <property name="trace.log.file" value="${build.log.dir}/${build.id}_trace_roms.log" />
-    <property name="subcon.log.file" value="${build.log.dir}/${build.id}_subcon_roms.log" />
+    <property name="ee_roms.log.file" value="${roms.log.dir}/${build.id}_ee_roms.log" />
+    <property name="trace.log.file" value="${roms.log.dir}/${build.id}_trace_roms.log" />
+    <property name="subcon.log.file" value="${roms.log.dir}/${build.id}_subcon_roms.log" />
 
     <!-- Properties for image-creation target which is being used by IDOs -->
     <property name="image_creation.copyto" value="${build.output.dir}/images" />
@@ -205,7 +205,7 @@ project.setProperty('rom.product.path', imaker.get_product_dir(r'@{product}'))
     <!-- Creates ee-images
      -->
     <target name="ee-roms" depends="rombuild-create-makefile" unless="no.ncp">
-        <hlm:startSpecificLogMacro name="${ee_roms.log.file}" />
+        <hlm:startSpecificLogMacro name="${ee_roms.log.file}" phase="roms"/>
         <hlm:preECImakerMacro />
         <for list="${product.list}" delimiter="," param="product.name">
             <sequential>
@@ -213,7 +213,7 @@ project.setProperty('rom.product.path', imaker.get_product_dir(r'@{product}'))
             </sequential>
         </for>
         <hlm:ecImakerMacro makefile.target="${ee.makefile.target}" />
-        <hlm:stopSpecificLogMacro name="${ee_roms.log.file}" />
+        <hlm:stopSpecificLogMacro name="${ee_roms.log.file}" phase="roms"/>
         <hlm:metadatarecord database="${metadata.dbfile}">
             <hlm:textmetadatainput>
                 <fileset casesensitive="false" file="${ee_roms.log.file}" />
@@ -228,7 +228,7 @@ project.setProperty('rom.product.path', imaker.get_product_dir(r'@{product}'))
 
     <!-- Creates subcon certified rom images with imaker tool -->
     <target name="subcon-roms" depends="rombuild-create-makefile" unless="no.ncp">
-        <hlm:startSpecificLogMacro name="${subcon.log.file}" />
+        <hlm:startSpecificLogMacro name="${subcon.log.file}" phase="roms"/>
         <mkdir dir="${subcon.build.drive}/output/development_flash_images/engineering_english/${product.name}/subcon" />
         <hlm:preECImakerMacro />
         <for list="${product.list}" delimiter="," param="product.name">
@@ -237,7 +237,7 @@ project.setProperty('rom.product.path', imaker.get_product_dir(r'@{product}'))
             </sequential>
         </for>
         <hlm:ecImakerMacro makefile.target="${ee.makefile.target}" />
-        <hlm:stopSpecificLogMacro name="${subcon.log.file}" />
+        <hlm:stopSpecificLogMacro name="${subcon.log.file}" phase="roms"/>
         <hlm:metadatarecord database="${metadata.dbfile}">
             <hlm:textmetadatainput>
                 <fileset casesensitive="false" file= "${subcon.log.file}"/>
@@ -282,7 +282,7 @@ for product in r'${product.list}'.split(','):
 
     <!-- Creates trace rom images -->
     <target name="trace-roms" depends="rombuild-create-makefile" unless="no.ncp">
-        <hlm:startSpecificLogMacro name="${trace.log.file}" />
+        <hlm:startSpecificLogMacro name="${trace.log.file}" phase="roms"/>
         <hlm:preECImakerMacro />
         <for list="${product.list}" delimiter="," param="product.name">
             <sequential>
@@ -290,7 +290,7 @@ for product in r'${product.list}'.split(','):
             </sequential>
         </for>
         <hlm:ecImakerMacro makefile.target="${ee.makefile.target}" />
-        <hlm:stopSpecificLogMacro name="${trace.log.file}" />
+        <hlm:stopSpecificLogMacro name="${trace.log.file}" phase="roms"/>
         <!-- Todo: Make sure that logfilter is added to the filterset -->
         <hlm:metadatarecord database="${metadata.dbfile}">
             <hlm:textmetadatainput>
@@ -331,9 +331,6 @@ for product in r'${product.list}'.split(','):
                     <isset property="rom.dryrun" />
                 </and>
                 <then>
-                    <exec executable="python" dir="${build.drive}/" failonerror="${failonerror}">
-                        <arg line="${helium.dir}/tools/rombuild/dryrun_parser.py ${build.drive}/dryrun_out.txt ${build.drive}/@{makefile.target}.make @{makefile.target}" />
-                    </exec>
                     <antcall target="compile-ec-helium">
                         <param name="skip.compile-ec-patch" value="yes" />
                         <param name="sysdef.configuration" value="@{makefile.target}" />

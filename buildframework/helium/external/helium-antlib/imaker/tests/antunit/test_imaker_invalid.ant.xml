@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : test_imaker_invalid.ant.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="helium-antlib-imaker-invalid-unittest" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>Helium Antlib imaker unittests.</description>
+
+    <taskdef resource="com/nokia/helium/imaker/ant/antlib.xml" uri="http://www.nokia.com/helium"/>
+    <property name="epocroot" location="${basedir}/../epocroot_invalid" />
+    <property name="epocroot.temp" location="${epocroot}/temp" />
+
+    <!-- is called prior to the test -->
+    <target name="setUp">
+        <echo>-------------------------------------------------------------------------------</echo>
+        <delete dir="${epocroot.temp}" failonerror="false" />
+        <delete dir="${epocroot}/epoc32" failonerror="false" />
+        <mkdir dir="${epocroot.temp}" />
+    </target>
+
+    <!-- is called after the test, even if that caused an error -->
+    <target name="tearDown">
+        <delete dir="${epocroot.temp}" failonerror="false" />
+        <delete dir="${epocroot}/epoc32" failonerror="false" />
+        <echo>-------------------------------------------------------------------------------</echo>
+    </target>
+
+    <target name="test-imaker-imakerconfiguration-targetset">
+        <au:expectfailure message="(return code: 1)">
+            <hlm:imaker epocroot="${epocroot}" output="${epocroot.temp}/output.log">
+                <hlm:imakerconfigurationset>
+                    <hlm:imakerconfiguration>
+                        <makefileset>
+                            <include name="**/product/*ui.mk" />
+                        </makefileset>
+                        <targetset>
+                            <include name="core" />
+                            <include name="langpack_\d+" />
+                        </targetset>
+                    </hlm:imakerconfiguration>
+                </hlm:imakerconfigurationset>
+            </hlm:imaker>
+        </au:expectfailure>
+        <au:assertFileDoesntExist file="${epocroot.temp}/output.log" />
+    </target>
+
+    <target name="test-imaker-imakerconfiguration-targetset-failonerror-false">
+        <hlm:imaker epocroot="${epocroot}" output="${epocroot.temp}/output.log" failonerror="false">
+            <hlm:imakerconfigurationset>
+                <hlm:imakerconfiguration>
+                    <makefileset>
+                        <include name="**/product/*ui.mk" />
+                    </makefileset>
+                    <targetset>
+                        <include name="core" />
+                        <include name="langpack_\d+" />
+                    </targetset>
+                </hlm:imakerconfiguration>
+            </hlm:imakerconfigurationset>
+        </hlm:imaker>
+        <au:assertLogContains text="*** No rule to make target" />
+        <au:assertFileDoesntExist file="${epocroot.temp}/output.log" />
+    </target>
+
+</project>

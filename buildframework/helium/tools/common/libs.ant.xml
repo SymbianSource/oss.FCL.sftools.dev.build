@@ -47,18 +47,5 @@ Description:
     
     <!-- Nokia internal tasks. -->
     <taskdef resource="com/nokia/ant/antlib.xml" classpathref="lib.path" uri="http://www.nokia.com/helium"/>
-
-
-    <!-- This step load the com.nokia.ant.BSFJepEngine class and activate the BSF 
-       registration mechanism.
-    -->
-    <if>
-        <not>
-            <available classname="com.nokia.ant.BSFJepEngine"/>
-        </not>
-        <then>
-            <echo>Jepp is not installed.</echo>    
-        </then>    
-    </if>    
         
 </project>

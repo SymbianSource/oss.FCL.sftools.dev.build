@@ -54,7 +54,7 @@ class MockResultSession(ccm.AbstractSession):
             result.status = -1  
         return result
 
-class MockOpener:
+class MockOpener(object):
     def __init__(self):
         self.failOnNewOpen = False
     
@@ -118,7 +118,7 @@ class CachedSessionProviderTest(unittest.TestCase):
         p = ccm.extra.CachedSessionProvider(opener=opener)
         db = p.get(database="fakedb")
         assert db is not None
-        del db
+        db.close()
         opener.failOnNewOpen = True
         db2 = p.get(database="fakedb")
         assert db2 is not None
@@ -142,7 +142,7 @@ class CachedSessionProviderTest(unittest.TestCase):
         db = p.get(database="fakedb")
         assert db is not None
         del db
-        del p
+        p.close()
         assert os.path.exists(self.session_cache), "Cache file %s is missing." % self.session_cache
         
         opener = MockOpener()

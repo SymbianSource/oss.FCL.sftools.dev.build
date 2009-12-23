@@ -21,6 +21,6 @@ if not defined JAVA_6_HOME (
 set TESTED_JAVA=C:\Apps\j2sdk_1.6.0_02
 ) ELSE  set TESTED_JAVA=%JAVA_6_HOME%
 if exist %TESTED_JAVA% (set JAVA_HOME=%TESTED_JAVA%)
-set ANT_ARGS=-lib %CD%\lib -lib %CD%\..\..\lib -lib %CD%\..\..\antlibs -lib %CD%\..\..\bin\helium-core.jar
+set ANT_ARGS=-lib %CD%\..\lib -lib %CD%\..\..\lib -lib %CD%\..\..\antlibs -lib %CD%\..\..\bin\helium-core.jar
 ant -Dant.executor.class=com.nokia.helium.core.ant.HeliumExecutor %*
 endlocal

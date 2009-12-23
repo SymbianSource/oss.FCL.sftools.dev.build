@@ -135,7 +135,7 @@ ${ant.coverage.summary}</echo>
     XML content are made before using XMLUnit to compare the content.
     -->
     <target name="check-diamonds">
-        <loadfile srcfile="${build.log.dir}/${build.id}_diamonds-log-start.xml" property="diamonds.log.start">
+        <loadfile srcfile="${diamonds.build.output.dir}/${build.id}_diamonds-log-start.xml" property="diamonds.log.start">
             <filterchain>
                 <tokenfilter>
                     <filetokenizer />
@@ -183,7 +183,7 @@ ${diamonds.log.start.edited}</echo>-->
     </target>
 
     <target name="mini-build-cleanup">
-        <delete verbose="true" includeemptydirs="true">         
+        <delete verbose="true" includeemptydirs="true" failonerror="false">         
             <fileset dir="${build.drive}/" casesensitive="false">
                 <include name="makefile" />
                 <include name="*.mk" />
@@ -221,7 +221,7 @@ ${diamonds.log.start.edited}</echo>-->
                 <au:assertTrue>
                     <and>
                         <contains string="${qmake.build.makefile}" substring="qmake -listgen -r src.pro" />
-                        <contains string="${qmake.build.makefile}" substring="qmake -listgen -platform symbian-abld -r examples.pro" />
+                        <contains string="${qmake.build.makefile}" substring="qmake -listgen -r examples.pro" />
                     </and>
                 </au:assertTrue>
             </then>
@@ -230,7 +230,7 @@ ${diamonds.log.start.edited}</echo>-->
                     <namespace uri="" prefix=""/>
                     <xpath expression="/project/target[@name='all']/parallel/sequential/if/then/exec/arg[@value='-listgen']"/>
                     <xpath expression="/project/target[@name='all']/parallel/sequential/if/then/exec/arg[@line='-r']"/>
-                    <xpath expression="/project/target[@name='all']/parallel/sequential/if/then/exec/arg[@line='-platform symbian-abld -r -listgen']"/>
+                    <xpath expression="/project/target[@name='all']/parallel/sequential/if/then/exec/arg[@line='-r -listgen']"/>
                 </xpathtest>
             </else>
         </if>
@@ -245,9 +245,9 @@ ${diamonds.log.start.edited}</echo>-->
         <au:assertFileExists file="${qt.dir}/examples/bld.inf" />
         <au:assertFileExists file="${build.drive}/epoc32/tools/qmake.bat" />
         <au:assertFileExists file="${build.drive}/epoc32/tools/moc.bat" />
-        <hlm:assertFileExists file="${build.log.dir}/${build.id}_build.qmake.generated.txt"/>
-        <hlm:assertFileExists file="${build.log.dir}/${build.id}_build_tools.qmake.generated.txt"/>
-        <loadfile srcFile="${build.log.dir}/${build.id}_build.qmake.generated.txt" property="qmake.generated.output"/>
+        <hlm:assertFileExists file="${compile.log.dir}/${build.id}_build.qmake.generated.txt"/>
+        <hlm:assertFileExists file="${compile.log.dir}/${build.id}_build_tools.qmake.generated.txt"/>
+        <loadfile srcFile="${compile.log.dir}/${build.id}_build.qmake.generated.txt" property="qmake.generated.output"/>
         <au:assertMatches string="${qmake.generated.output}" pattern="[^/]+/+[^/]+" />
 
     </target>

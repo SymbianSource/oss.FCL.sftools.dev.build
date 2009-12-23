@@ -374,6 +374,13 @@ RnD SDK creation
 .. index::
   single: feature - API Analysis
 
+NSIS installer file creation
+----------------------------
+
+* Installer executables based on the NSIS installation software can be created.
+
+  * Plugins include environment setting modification.
+
 API analysis
 ------------
 

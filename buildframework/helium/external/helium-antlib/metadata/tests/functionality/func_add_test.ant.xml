@@ -160,6 +160,26 @@ Description:
         </hlm:metadatarecord>
     </target>
 
+    <target name="test-old_schema">
+        <copy file="${project.dir}/../output/old_schema_log.sqlite" 
+            tofile="${project.dir}/../output/old_schema_log.sqlite_bak" />
+        <echo message="text log metadata input validation" />
+        <hlm:metadatarecord database="${project.dir}/../output/old_schema_log.sqlite">
+            <hlm:abldmetadatainput>
+                <fileset dir="${project.dir}/../data">
+                    <include  name="sample_abld.log"/>
+                </fileset>
+                <metadatafilterset refid="text_log_metadata_input" />
+            </hlm:abldmetadatainput>
+        </hlm:metadatarecord>
+
+        <delete file="${project.dir}/../output/old_schema_log.sqlite" />
+        <copy file="${project.dir}/../output/old_schema_log.sqlite_bak" 
+            tofile="${project.dir}/../output/old_schema_log.sqlite"
+            failonerror="false" />
+        
+    </target>
+
     <target name="ant_ido_logs">
         <delete file="${project.dir}/../output/ant_ido_logs.sqlite" failonerror="false" />
         <echo message="text log metadata input validation" />

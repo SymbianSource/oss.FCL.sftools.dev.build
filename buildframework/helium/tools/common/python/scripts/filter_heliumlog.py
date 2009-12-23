@@ -36,10 +36,11 @@ from optparse import OptionParser
 
 
 
-""" Log scanner for filter logs
+""" plugin that gets copied to raptor folder so that wehn raptor (SBS) runs it
+    knows the format of the log files.
 """
 class FilterHeliumLog(filter_interface.Filter):
-
+    """ Log scanner for filter logs"""
     def open(self, raptor_instance):
         """Open a log file for the various I/O methods to write to."""
         self.raptor = raptor_instance
@@ -55,7 +56,7 @@ class FilterHeliumLog(filter_interface.Filter):
                 dirname = str(self.raptor.logFileName.Dir())
                 if dirname and not os.path.isdir(dirname):
                     os.makedirs(dirname)
-            except Exception, e:
+            except Exception, e_error:
                 return False
             return  self.scanlog.initialize(self.logFileName)
         else:
@@ -64,10 +65,13 @@ class FilterHeliumLog(filter_interface.Filter):
         return True
 
     def write(self, text):
+        """write text to the open file"""
         return self.scanlog.write(text)
 
     def summary(self):
+        """write the summary log file"""
         return self.scanlog.summary()
 
     def close(self):
+        """close the log file"""
         return self.scanlog.close()

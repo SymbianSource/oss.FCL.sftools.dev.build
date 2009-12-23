@@ -24,7 +24,6 @@ import java.util.Enumeration;
 import java.io.ByteArrayOutputStream;
 
 import org.dom4j.Document;
-//import org.dom4j.DefaultDocumentType;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.dom4j.io.XMLWriter;
@@ -48,21 +47,17 @@ public class XMLRenderer {
     private Hashtable<String, String> properties;
     // the toplevel node.
     private BuildNode root;
-    private BuildEvent buildEvent;
-    
     // Helium content database. 
     private Document database;
     
     // Deps hashes: helper to remove duplicates.
     private Vector<String> targetList = new Vector<String>();
-    private Vector<String> taskList = new Vector<String>();
     private Vector<String> assertList = new Vector<String>();
     
     public XMLRenderer(BuildNode root, Document database, Hashtable<String, String> properties, BuildEvent event) {
         this.root = root; 
         this.database = database;
         this.properties = properties;
-        this.buildEvent = event;
     }
 
     /**
@@ -97,37 +92,6 @@ public class XMLRenderer {
             createTarget(root, targets);
         }
     }
-
-    /**
-     * Generating task only for TargetNode type of node
-     * @param node
-     * @param targets
-     */
-    protected void createTask(DataNode node, Element targets) {
-        if (node instanceof TaskNode) {            
-            TaskNode taskNode = (TaskNode)node;
-            if (!taskList.contains(taskNode.getName())) {
-                taskList.add(taskNode.getName());
-                Element target = targets.addElement("task");
-                target.addAttribute("id", "task@" + taskList.indexOf(taskNode.getName()));
-                target.addAttribute("name", taskNode.getName());                
-            }
-        }
-        for (Iterator<DataNode> i = node.iterator() ; i.hasNext() ; ) {
-            createTask(i.next(), targets);
-        }
-    }    
-    
-    /**
-     * Creating the task section.
-     * @param statistics
-     */
-    protected void createTasks(Element statistics) {
-        Element tasks = statistics.addElement("tasks");
-        if (root != null) {
-            createTask(root, tasks);
-        }
-    }
     
     /**
      * Creating the assert section.
@@ -154,7 +118,6 @@ public class XMLRenderer {
                 Element target = targets.addElement("assert");
                 target.addAttribute("id", "assert@" + assertList.indexOf(assertNode.getAssertName()));
                 target.addAttribute("name", assertNode.getAssertName());
-                //target.addAttribute("assertname", assertNode.getAssertName());
                 target.addAttribute("file", assertNode.getFilename());
                 target.addAttribute("line", "" + assertNode.getLine());
                 target.addAttribute("message", "" + assertNode.getMessage());
@@ -192,13 +155,6 @@ public class XMLRenderer {
             elt.addAttribute("startCommittedHeap", "" + targetNode.getStartCommittedHeap());
             elt.addAttribute("endUsedHeap", "" + targetNode.getEndUsedHeap());
             elt.addAttribute("endCommittedHeap", "" + targetNode.getEndCommittedHeap());
-        } else if (node instanceof TaskNode) {
-            TaskNode taskNode = (TaskNode)node;
-            elt = tree.addElement("taskRef");
-            elt.addAttribute("reference", "task@" + taskList.indexOf(taskNode.getName()));
-            elt.addAttribute("startTime", "" + taskNode.getStartTime().getTime());
-            elt.addAttribute("endTime", "" + taskNode.getEndTime().getTime());
-            elt.addAttribute("thread", "" + taskNode.getThreadId());
         } else if (node instanceof AssertNode) {
             AssertNode assertNode = (AssertNode)node;
             if (assertNode.getAssertName() != null) {
@@ -257,15 +213,12 @@ public class XMLRenderer {
     public String toString() {
         // Creating the XML document
         Document document = DocumentHelper.createDocument();
-        // DefaultDocumentType(String elementName, String publicID, String systemID) 
-        //document.setDocType(new DefaultDocumentType());
         Element statistics = document.addElement( "statistics" );
-        statistics.addAttribute("version", "1.0");
+        statistics.addAttribute("version", "1.1");
         
         // Creating the document content.
         insertDatabase(statistics);
         createTargets(statistics);
-        createTasks(statistics);
         createAsserts(statistics);
         createExecutionTree(statistics);
         createProperties(statistics);

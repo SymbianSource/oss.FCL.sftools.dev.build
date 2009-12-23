@@ -21,6 +21,9 @@ Description:
 ============================================================================
 -->
 <project name="quality">
+    <description>
+        Quality
+    </description>
     <import file="conflict-checker.ant.xml"/>
     <import file="internal-exports.ant.xml"/>
     <import file="mmp-to-target.ant.xml"/>

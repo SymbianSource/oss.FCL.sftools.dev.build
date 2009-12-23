@@ -92,12 +92,12 @@ out.close();
         </pre>
     -->
     <scriptdef name="toolMacro" language="beanshell" uri="http://www.nokia.com/helium">
-        <element name="toolvarset" classname="com.nokia.ant.types.VariableSet"/>
+        <element name="toolvarset" classname="com.nokia.helium.core.ant.types.VariableSet"/>
         <attribute name="name"/>
 <![CDATA[
 import com.nokia.ant.util.ToolsProcess;
 import com.nokia.tools.*;
-import com.nokia.ant.types.VariableSet;
+import com.nokia.helium.core.ant.types.VariableSet;
 import org.apache.tools.ant.types.Reference;
     Reference ref;
     java.lang.String toolName = attributes.get("name");
@@ -116,6 +116,68 @@ import org.apache.tools.ant.types.Reference;
             throw e;
         }
   }
+]]>
+    </scriptdef>
+    
+    <!-- ConE tool macro to run the command for each argument -->
+    <scriptdef name="conEToolMacro" language="beanshell" uri="http://www.nokia.com/helium">
+        <element name="arg" classname="com.nokia.ant.types.Variable"/>
+        <attribute name="name"/>
+<![CDATA[
+import com.nokia.ant.util.ToolsProcess;
+import com.nokia.tools.*;
+import com.nokia.ant.types.Variable;
+    conETool =  ToolsProcess.getTool("ConE");
+    vars = elements.get("arg");
+    for (i = 0; i < vars.size(); ++i) {
+        try {
+            var = (Variable)vars.get(i);
+            conETool.storeVariables(var.getName(), var.getValue());
+        } catch (Exception e) {
+            self.log("Error: " + e);
+            //self.log("Tool Argument Validation failure");
+            throw e;
+        }
+  }
+  conETool.execute(project);
+]]>
+    </scriptdef>
+    
+    
+    <!-- This macro will read the line from file which matches the regexp -->
+    <scriptdef name="grepMacro" language="beanshell" uri="http://www.nokia.com/helium">
+        <attribute name="filename"/>
+        <attribute name="output"/>
+        <attribute name="regexp"/>
+<![CDATA[
+import java.util.*;
+import java.io.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+if (attributes.get("filename") == null ||  attributes.get("output") == null || attributes.get("regexp") == null)
+    throw new BuildException("Filename/output/regexp attribute is not set for readLineMacro");
+    
+String search = attributes.get("regexp");
+String output = "";
+pattern = Pattern.compile(search);
+
+BufferedReader input =  new BufferedReader(new FileReader(attributes.get("filename")));
+try {
+        String line = null;
+        Matcher match = null;
+        while (( line = input.readLine()) != null) {
+             match = pattern.matcher(line);
+            if (match.find()) {
+                //self.log("Line containg " + search + " is = " + line + " returned vaue = " + match.group(1));
+                output = output + match.group(1) + ",";
+            }
+        }
+    } catch (IOException ex) {
+      ex.printStackTrace();
+    }
+    project.setNewProperty(attributes.get("output") , output);
+
 ]]>
     </scriptdef>
 
@@ -158,15 +220,9 @@ log2xml.symbian_log_footer(self)
         <attribute name="emacsmode" default="false"/>
         <sequential>
             <if>
-                <available file="${build.log}"/>
-                <then>
-                    <record name="${build.log}" action="stop" append="true"/>
-                </then>
-            </if>
-            <if>
                 <available file="${build.log.dir}" type="dir"/>
                 <then>
-                    <record name="${build.log.dir}/@{name}" action="start" append="true" emacsmode="@{emacsmode}"/>
+                    <hlm:record name="${build.log.dir}/@{name}" action="start" append="true" emacsmode="@{emacsmode}" loglevel="${ant.loglevel}"/>
                 </then>
             </if>
         </sequential>
@@ -180,13 +236,7 @@ log2xml.symbian_log_footer(self)
             <if>
                 <available file="${build.log.dir}/@{name}"/>
                 <then>
-                    <record name="${build.log.dir}/@{name}" action="stop" append="true"/>
-                </then>
-            </if>
-            <if>
-                <available file="${build.log}"/>
-                <then>
-                    <record name="${build.log}" action="start" append="true"/>
+                    <hlm:record name="${build.log.dir}/@{name}" action="stop" append="true"/>
                 </then>
             </if>
         </sequential>
@@ -196,15 +246,12 @@ log2xml.symbian_log_footer(self)
     <!--Macro to stop recording to the main log file (if present) and record to
         a separate log file that is filtered after logging is stopped. -->
     <macrodef name="filterRecordStartMacro" uri="http://www.nokia.com/helium">
+        <attribute name="pattern" default=""/>
+        <attribute name="category" default=""/>
         <sequential>
-            <if>
-                <available file="${build.log}"/>
-                <then>
-                    <record name="${build.log}" action="stop" append="true"/>
-                </then>
-            </if>
-            <echo>Start of filtering ${build.log} for passwords</echo>
-            <record name="${build.cache.log.dir}/temp_ant_build.log" action="start" loglevel="info"/>
+            <hlm:record name="${build.cache.log.dir}/temp_ant_build.log" action="start" loglevel="${ant.loglevel}">
+                <hlm:recordfilter category="@{category}" regexp="@{pattern}" />
+            </hlm:record>
         </sequential>
     </macrodef>
     
@@ -212,26 +259,14 @@ log2xml.symbian_log_footer(self)
     <!--Macro to stop recording the seperate filtered log file, filter the passwords
     and start recording in main log file -->
     <macrodef name="filterRecordStopMacro" uri="http://www.nokia.com/helium">
-        <attribute name="pattern"/>
         <attribute name="log" default="${build.log}"/>
         <attribute name="append" default="true"/>
         <sequential>
-            <record name="${build.cache.log.dir}/temp_ant_build.log" action="stop"/>                    
+            <hlm:record name="${build.cache.log.dir}/temp_ant_build.log" action="stop"/>                    
             <concat destfile="@{log}" append="@{append}">
                 <filelist dir="${build.cache.log.dir}" files="temp_ant_build.log"/>                        
-                <filterchain>
-                    <tokenfilter>
-                        <replaceregex pattern="@{pattern}" replace="****" flags="gi"/>
-                    </tokenfilter>
-                </filterchain>                        
             </concat>
             <delete file="${build.cache.log.dir}/temp_ant_build.log" failonerror="false"/>
-            <if>
-                <available file="${build.log}"/>
-                <then>
-                    <record name="${build.log}" action="start" append="true"/>
-                </then>
-            </if>
             <echo>End of filtering @{log} for passwords</echo>
         </sequential>
     </macrodef>
@@ -404,15 +439,12 @@ try:
         raise Exception("No entry found for Type: %s" % str(attributes.get("type")))
     (n_username, n_account, n_password) = netrc_info
     if attributes.get('output-prop') != None:
-        self.log("Output: %s" % attributes.get('output-prop'))
         project.setProperty(str(attributes.get('output-prop')), str(n_password))
 except Exception, e:
     result = "-1"
-    print "ERROR: %s" % e
+    print "Warning: %s" % e
 if attributes.get('result-prop') != None:
-    self.log("Result: %s" % attributes.get('result-prop'))
     project.setProperty(str(attributes.get('result-prop')), str(result))
-    self.log("%s: %s" % (attributes.get('result-prop'), project.getProperty(str(attributes.get('result-prop')))))
         ]]>
     </scriptdef>
 
@@ -433,16 +465,12 @@ try:
         raise Exception("No entry found for Type: %s" % str(attributes.get("type")))
     (n_username, n_account, n_password) = netrc_info
     if attributes.get('output-prop') != None:
-        self.log("Output: %s" % attributes.get('output-prop'))
         project.setProperty(str(attributes.get('output-prop')), str(n_username))
 except Exception, e:
     result = "-1"
-    print "ERROR: %s" % e
+    print "Warning: %s" % e
 if attributes.get('result-prop') != None:
-
-    self.log("Result: %s" % attributes.get('result-prop'))
     project.setProperty(str(attributes.get('result-prop')), str(result))
-    self.log("%s: %s" % (attributes.get('result-prop'), project.getProperty(str(attributes.get('result-prop')))))
         ]]>
     </scriptdef>
      
@@ -482,7 +510,8 @@ try:
         session = provider.get(username, password, database=database, reuse=False)
     else:
         session = provider.get(username, password, engine, dbpath, reuse=False)
-    del(session)
+    session.close()
+    provider.close()
 except Exception, e:
     print "ERROR: %s" % e
     if str(e).find("access denied") != -1:
@@ -495,7 +524,9 @@ project.setProperty(str(attributes.get('resultproperty')), str(result))
      </scriptdef>
 
     <!-- Extract logs from text file and process error/warnings/components name etc
-    into xml file.-->
+    into xml file.
+    <deprecated>Please consider using the metadata framework.</deprecated>
+    -->
     <scriptdef name="logextract" language="jython"  uri="http://www.nokia.com/helium">
         <attribute name="file" />
         <attribute name="outputfile" />
@@ -561,13 +592,7 @@ else:
         <attribute name="name"/>
         <sequential>
             <mkdir dir="${build.cache.log.dir}"/>
-            <if>
-                <available file="${build.log}"/>
-                <then>
-                    <record name="${build.log}" action="stop" append="true"/>
-                </then>
-            </if>
-            <record name="${build.cache.log.dir}/@{name}" action="start" loglevel="verbose"/>
+            <hlm:record name="${build.cache.log.dir}/@{name}" action="start" loglevel="${ant.loglevel}"/>
         </sequential>
     </macrodef>
 
@@ -578,12 +603,14 @@ else:
         build area preparation. -->
     <macrodef name="tempRecordStopMacro" uri="http://www.nokia.com/helium">
         <attribute name="name"/>
+        <attribute name="phase" default=""/>
         <attribute name="database" default="${metadata.dbfile}"/>
         <attribute name="filterref" default="filterset.temprecord"/>
         <sequential>
             <mkdir dir="${build.cache.log.dir}"/>
+            <mkdir dir="${build.log.dir}"/>
             <mkdir dir="${build.cache.log.dir}/signals"/>
-            <record name="${build.cache.log.dir}/@{name}" action="stop" loglevel="verbose"/>
+            <hlm:record name="${build.cache.log.dir}/@{name}" action="stop" loglevel="${ant.loglevel}"/>
             <!--Temporary solution, the logextract in general 
                 needs to be handled in a better way (not all logs needs to be processed,
                 logextract / counting errors could be merged and logextract should be
@@ -596,24 +623,30 @@ else:
                 </hlm:antmetadatainput>
             </hlm:metadatarecord>
             <hlm:generateBuildStatus dbfile="@{database}" output-dir="${build.cache.log.dir}/signals" file="@{name}" />
-            <copy todir="${build.log.dir}" failonerror="false">
-                <fileset casesensitive="false" file="${build.cache.log.dir}/@{name}" />
-            </copy>
+            <if>
+                <isset property="@{phase}.log.dir" />
+                <then>
+                    <mkdir dir="${@{phase}.log.dir}"/>
+                    <copy todir="${@{phase}.log.dir}" failonerror="false">
+                        <fileset casesensitive="false" file="${build.cache.log.dir}/@{name}" />
+                    </copy>
+                </then>
+                <else>
+                    <copy todir="${build.log.dir}" failonerror="false">
+                        <fileset casesensitive="false" file="${build.cache.log.dir}/@{name}" />
+                    </copy>
+                </else>
+            </if>            
             <copy todir="${build.signal.status.dir}" failonerror="false">
                 <fileset casesensitive="false" dir="${build.cache.log.dir}/signals" />
             </copy>
-            <if>
-                <available file="${build.log}"/>
-                <then>
-                    <record name="${build.log}" action="start" append="true"/>
-                </then>
-            </if>
         </sequential>
     </macrodef>
     
 
     <macrodef name="signalMacro" uri="http://www.nokia.com/helium">
         <attribute name="logfile"/>
+        <attribute name="phase" default=""/>
         <attribute name="signal.input" />
         <attribute name="skip.count" default="false" />
         <attribute name="result" default="not-set"/>
@@ -638,13 +671,29 @@ else:
                     <var name="signal.errors.total" value="@{result}" />
                 </else>
             </if>
+            <if>
+                <isset property="@{phase}.log.dir" />
+                <then>
+                    <var name="signal.log.dir" value="" unset="true"/>
+                    <property name="signal.log.dir" value="${@{phase}.log.dir}"/>
+                    <echo>signal.log.dir = ${signal.log.dir}</echo>
+                </then>
+                <else>
+                    <var name="signal.log.dir" value="" unset="true"/>
+                    <property name="signal.log.dir" value="${build.log.dir}"/>
+                </else>
+            </if>
             <hlm:generateBuildStatus output-dir="${build.signal.status.dir}/" 
                 file="${base.signal.log.file}" />
             <!-- signal for errors -->
             <hlm:signal name="@{signal.input}" result="${signal.errors.total}" >
                 <signalNotifierInput>
                     <signalInput refid="@{signal.input}" />
-                    <notifierInput file = "${build.signal.status.dir}/${base.signal.log.file}.status.html" />
+                    <notifierInput>
+                        <fileset dir="${build.log.dir}" >
+                            <include name="**/${base.signal.log.file}*" />
+                        </fileset>
+                    </notifierInput>
                 </signalNotifierInput>
             </hlm:signal>
         </sequential>
@@ -658,17 +707,19 @@ else:
         <attribute name="name"/>
         <attribute name="regexp" default=""/>
         <attribute name="backup" default="false"/>
+        <attribute name="phase" default=""/>
         
         <sequential>
             <if>
-                <available file="${build.log}"/>
+                <isset property="@{phase}.log.dir" />
                 <then>
-                    <echo>Stopping recording to main Ant build log.</echo>
-                    <record name="${build.log}" action="stop" append="true"/>
+                    <mkdir dir="${@{phase}.log.dir}"/>
                 </then>
-            </if>
+            </if> 
             <mkdir dir="@{name}/.."/>
-            <hlm:logrecord name="@{name}" action="start" loglevel="verbose" regexp="@{regexp}" backup="@{backup}"/>
+            <hlm:record name="@{name}" action="start" loglevel="verbose" >
+                <hlm:recordfilter category="@{phase}" regexp="@{regexp}" />
+            </hlm:record>
         </sequential>
     </macrodef>
 
@@ -677,15 +728,9 @@ else:
         a separate log file. -->
     <macrodef name="stopSpecificLogMacro">
         <attribute name="name"/>
+        <attribute name="phase" default=""/>
         <sequential>
-            <hlm:logrecord name="@{name}" action="stop" loglevel="verbose"/>
-            <if>
-                <available file="${build.log}"/>
-                <then>
-                    <record name="${build.log}" action="start" append="true"/>
-                    <echo>Starting recording to main Ant build log again.</echo>
-                </then>
-            </if>
+            <hlm:record name="@{name}" action="stop" loglevel="verbose"/>
         </sequential>
     </macrodef>
 

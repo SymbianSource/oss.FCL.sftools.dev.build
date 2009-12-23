@@ -70,9 +70,12 @@ public class HgScmProviderRepository extends
 
     /** {@inheritDoc} */
     public String toString() {
-        return "Hg Repository Interpreted from: " + orgUrl + ":\nProtocol: "
+        if (orgUrl != null) {
+            return "Hg Repository Interpreted from: " + orgUrl + ":\nProtocol: "
                 + orgUrl.getProtocol() + "\nHost: " + getHost() + "\nPort: "
                 + getPort() + "\nUsername: " + getUser() + "\nPassword: "
                 + getPassword() + "\nPath: " + orgUrl.getPath();
+        }
+        return "Hg Repository Interpreted from: " + url;
     }
 }

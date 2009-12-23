@@ -26,7 +26,7 @@ Description:
         <attribute name="input"/>
         <attribute name="output"/>
         <sequential>
-            <exec dir="${build.drive}/" executable="perl" failonerror="${failonerror}">
+            <exec executable="perl" dir="${build.drive}/" failonerror="${failonerror}">
                 <arg value="${epocroot}epoc32/tools/htmlscanlog.pl"/>
                 <arg value="-v"/>
                 <arg value="-v"/>
@@ -48,7 +48,7 @@ Description:
                 </not>
                 <then>
                     <fmpp sourceFile="${helium.dir}/tools/common/templates/diamonds/faults_metadata.ftl"
-                                 outputfile="${build.log.dir}/compile-main.xml">
+                                 outputfile="${diamonds.build.output.dir}/compile-main.xml">
                         <data expandProperties="yes">
                             dbPath: ${metadata.dbfile}
                             logpath: @{logfile} 
@@ -63,6 +63,7 @@ Description:
     <macrodef name="compileLogSignalMacro" uri="http://www.nokia.com/helium">
         <attribute name="compile.summary.file"/>
         <attribute name="error.limit"/>
+        <attribute name="phase" default="compile"/>
         <sequential>
             <hlm:metadataCountSeverity severity="ERROR" log="@{compile.summary.file}" 
                 db="${metadata.dbfile}" 
@@ -74,9 +75,8 @@ Description:
             <if>
                 <scriptcondition language="jython" value="false">
 errorsTotal = project.getProperty("build.errors.total")
-errorsLimit = project.getProperty("build.errors.limit")
-if int(errorsLimit) > -1:
-    if int(errorsTotal) > int(errorsLimit):
+if int(r'@{error.limit}') > -1:
+    if int(errorsTotal) > int(r'@{error.limit}'):
         self.setValue(1)
                 </scriptcondition>
                 <then>
@@ -88,7 +88,8 @@ if int(errorsLimit) > -1:
             </if>
             <echo message="compile result:${compile.result}" />
             <hlm:signalMacro skip.count="true" result="${compile.result}" 
-                logfile="@{compile.summary.file}" 
+                logfile="@{compile.summary.file}"
+                phase="@{phase}" 
                 signal.input="${compile.signal.input}" />
         </sequential>
     </macrodef>
@@ -148,11 +149,16 @@ if int(errorsLimit) > -1:
     <macrodef name="compileGenxmlMergeMacro" uri="http://www.nokia.com/helium">
         <attribute name="input"/>
         <attribute name="output"/>
+        <attribute name="logfile"/>
         <sequential>
+            <echo message="input:@{input}" />
+            <echo message="output:@{output}" />
+            <mkdir dir="${compile.log.dir}"/>
+            <mkdir dir="${temp.build.dir}"/>
             <copy todir="${build.drive}/" verbose="true">
                 <fileset dir="${helium.dir}/tools/common/dtd" includes="*.dtd"/>
             </copy>
-            <preset.exec executable="perl" dir="${build.drive}/" failonerror="${failonerror}" output="${build.log.dir}/${build.id}.sysdef_GenxmlMerge.log">
+            <preset.exec executable="perl" dir="${build.drive}/" failonerror="${failonerror}" output="@{logfile}">
                 <arg value="${epocroot}epoc32/tools/build/genxml.pl"/>
                 <arg value="-s"/>
                 <arg value="${epocroot}"/>
@@ -165,22 +171,24 @@ if int(errorsLimit) > -1:
                     <available file="@{output}"/>
                 </not>
                 <then>
+                    <echo file="@{logfile}" message="ERROR: Check @{input}" append="true"/>
                     <!-- Todo: metadata: Make sure that logfilter is added to the filterset -->
                     <hlm:metadatarecord database="${metadata.dbfile}">
                         <hlm:textmetadatainput>
-                            <fileset casesensitive="false" file="${build.log.dir}/${build.id}.sysdef_GenxmlMerge.log" />
-                            <metadatafilterset>
-                                <metadatafilter priority="ERROR" regex="^ERROR:" description="genxml error" />
-                                <metadatafilter priority="ERROR" regex="^Context:" description="genxml context error" />
-                            </metadatafilterset>
+                            <fileset casesensitive="false" file="@{logfile}" />
                             <metadatafilterset refid="filterset.genxml.merge" />
                         </hlm:textmetadatainput>
                     </hlm:metadatarecord>
                     <hlm:generateBuildStatus file="${build.id}.sysdef_GenxmlMerge.log" />
                     <hlm:signal name="canonicalSysDefFailSignal" result="1" >
                         <signalNotifierInput>
-                            <signalInput refid="canonicalSysDefFailSignalInput" />
-                            <notifierInput file = "${build.signal.status.dir}/${build.id}.sysdef_GenxmlMerge.log.status.html" />
+                            <signalInput refid="canonicalSysDefFailSignalInput" >
+                                <notifierInput>
+                                    <fileset dir="${build.log.dir}" >
+                                        <include name="**/${build.id}.sysdef_GenxmlMerge.log*" />
+                                    </fileset>
+                                </notifierInput>
+                            </signalInput>
                         </signalNotifierInput>
                     </hlm:signal>
                 </then>
@@ -233,7 +241,8 @@ if int(errorsLimit) > -1:
         <attribute name="dir"/>
         <attribute name="annodetail"/>
         <attribute name="root"/> 
-        <attribute name="failonerror"/> 
+        <attribute name="failonerror"/>
+        <attribute name="phase"/>
           self.setTaskName("emake");
           // check attributes
           if (attributes.get("name") == null)
@@ -244,6 +253,7 @@ if int(errorsLimit) > -1:
           self.log("Makefile: " + attributes.get("makefile"));
           String target = "all";
           String custom = "";
+          String annofileDir = "";
           if (attributes.get("target") != null)
             target = attributes.get("target");
           self.log("Target: " + target);
@@ -253,10 +263,12 @@ if int(errorsLimit) > -1:
             root = attributes.get("root");
           else
             root = "";
+          
           self.log("Custom: " + custom);
 
       // Create and configure exec target
           org.apache.tools.ant.taskdefs.ExecTask task = new org.apache.tools.ant.taskdefs.ExecTask();
+          task.setProject(self.getProject());
           task.setTaskName(self.getTaskName());
           String emake = com.nokia.ant.util.Helper.getProperty(project, "ec.emake");          
           task.setExecutable(emake);
@@ -285,9 +297,15 @@ if int(errorsLimit) > -1:
             self.log("--emake-root=" + eroot + ";" + heliumDir + ";" + root);
           }         
           task.createArg().setValue("--emake-root=" + eroot + ";" + heliumDir + ";" + root);
+          if (attributes.get("phase") != null) {
+            annofileDir = com.nokia.ant.util.Helper.getProperty(project, "build.log.dir") + "/" + attributes.get("phase");
+          }
+          else {
+            annofileDir = com.nokia.ant.util.Helper.getProperty(project, "build.log.dir");  
+          }
           if (attributes.get("annodetail") != null) {
             task.createArg().setValue("--emake-annodetail=" + attributes.get("annodetail"));            
-            task.createArg().setValue("--emake-annofile=" + com.nokia.ant.util.Helper.getProperty(project, "build.log.dir") + "/" + buildId + "-" + attributes.get("name") + ".anno.xml");
+            task.createArg().setValue("--emake-annofile=" + annofileDir + "/" + buildId + "-" + attributes.get("name") + ".emake.anno.xml");
           }
           task.createArg().setLine(custom);
           task.createArg().setLine("-f " + attributes.get("makefile"));

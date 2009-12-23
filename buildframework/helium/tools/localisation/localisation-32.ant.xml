@@ -65,6 +65,7 @@ Description:
         <attribute name="force" default="false"/>
         <sequential>
             <mkdir dir="${build.log.dir}"/>
+            <mkdir dir="${localisation.log.dir}"/>            
             <if>
                 <and>
                     <available file="${zips.loc.dir}/delta_@{variant}_package.zip" />
@@ -88,30 +89,30 @@ Description:
                     <hlm:compileGenxmlMacro input="-x ${canonical.sysdef.file}"
                                           configuration="${s60.delta.config.prefix}@{variant}${internal.variant.type}"
                                           output="${build.drive}\epoc32\tools\s60tools\variant_build_@{variant}${internal.variant.type}.xml"
-                                          log="${build.log.dir}/${build.id}.variant_build_@{variant}${internal.variant.type}_genxml.log"/>
+                                          log="${localisation.log.dir}/${build.id}.variant_build_@{variant}${internal.variant.type}_genxml.log"/>
 
                     <echo>Building ${build.drive}\epoc32\tools\s60tools\variant_build_@{variant}${internal.variant.type}.xml</echo>
-                    <hlm:compileEbsMacro input="${build.drive}\epoc32\tools\s60tools\variant_build_@{variant}${internal.variant.type}.xml" log="${build.log.dir}/${build.id}.@{variant}${internal.variant.type}_compile.log" />
-                    <hlm:compileHtmlscanlogMacro input="${build.log.dir}/${build.id}.@{variant}${internal.variant.type}_compile.log" output="${build.log.dir}/${build.id}.@{variant}${internal.variant.type}_scan2.html" />
+                    <hlm:compileEbsMacro input="${build.drive}\epoc32\tools\s60tools\variant_build_@{variant}${internal.variant.type}.xml" log="${localisation.log.dir}/${build.id}.@{variant}${internal.variant.type}_compile.log" />
+                    <hlm:compileHtmlscanlogMacro input="${localisation.log.dir}/${build.id}.@{variant}${internal.variant.type}_compile.log" output="${build.log.dir}/${build.id}.@{variant}${internal.variant.type}_scan2.html" />
                     
                     <if>
                         <istrue value="@{ctool}"/>
                         <then>
                             <property name="ctool.region.@{variant}" value="@{variant}"/>
                             <echo>Region ctool: ${ctool.region.@{variant}} (@{variant}).</echo>
-                            <preset.exec executable="cmd" dir="${ctool.dir}/" failonerror="true" output="${build.log.dir}/${build.id}.configtool_@{variant}_log.txt">
-                                <arg line="/c cli_build.cmd ${ctool.@{variant}.conf} -report ${build.log.dir}/${build.id}.configtool_@{variant}_delta.txt -ignore_errors"/>
+                            <preset.exec executable="cmd" dir="${ctool.dir}/" failonerror="true" output="${localisation.log.dir}/${build.id}.configtool_@{variant}_log.txt">
+                                <arg line="/c cli_build.cmd ${ctool.@{variant}.conf} -report ${localisation.log.dir}/${build.id}.configtool_@{variant}_delta.txt -ignore_errors"/>
                             </preset.exec>
                         </then>
                     </if>
                     <preset.exec executable="perl" dir="${build.drive}/" failonerror="true">
                         <arg value="${parse_abld_what.tool}"/>
-                        <arg line="-i ${build.log.dir}/${build.id}.@{variant}${internal.variant.type}_compile.log -filter \epoc32 -zip ${zips.loc.dir}/delta_@{variant}_package -ex productvariant.hrh"/>
+                        <arg line="-i ${localisation.log.dir}/${build.id}.@{variant}${internal.variant.type}_compile.log -filter \epoc32 -zip ${zips.loc.dir}/delta_@{variant}_package -ex productvariant.hrh"/>
                     </preset.exec>
                     <if>
                         <istrue value="@{ctool}"/>
                         <then>
-                            <preset.exec executable="${build.drive}\epoc32\tools\zip.exe" dir="${build.drive}/" input="${build.log.dir}/${build.id}.configtool_@{variant}_delta.txt">
+                            <preset.exec executable="${build.drive}\epoc32\tools\zip.exe" dir="${build.drive}/" input="${localisation.log.dir}/${build.id}.configtool_@{variant}_delta.txt">
                                 <arg line="-r -u ${zips.loc.dir}/delta_@{variant}_package -@"/>
                             </preset.exec>
                         </then>
@@ -133,24 +134,25 @@ Description:
         <attribute name="ctool" default="false"/>
         <sequential>
             <mkdir dir="${zips.loc.dir}"/>
+            <mkdir dir="${localisation.log.dir}"/>
             <for list="@{configs}" delimiter="," param="conf" >
                 <sequential>
                     <if>
                         <istrue value="@{ctool}"/>
                         <then>
-                            <preset.exec executable="cmd" dir="${ctool.dir}/" failonerror="true" output="${build.log.dir}/${build.id}.configtool_western_log.txt">
-                                <arg line="/c cli_build.cmd ${ctool.western.conf} -report ${build.log.dir}/${build.id}.configtool_western_delta.txt -ignore_errors"/>
+                            <preset.exec executable="cmd" dir="${ctool.dir}/" failonerror="true" output="${localisation.log.dir}/${build.id}.configtool_western_log.txt">
+                                <arg line="/c cli_build.cmd ${ctool.western.conf} -report ${localisation.log.dir}/${build.id}.configtool_western_delta.txt -ignore_errors"/>
                             </preset.exec>
                         </then>
                     </if>
                     <preset.exec executable="perl" dir="${build.drive}/" failonerror="true">
                         <arg value="${parse_abld_what.tool}"/>
-                        <arg line="-i ${build.log.dir}/${build.id}.@{conf}_compile.log -filter \epoc32 -zip ${zips.loc.dir}/delta_western_package -ex productvariant.hrh"/>
+                        <arg line="-i ${compile.log.dir}/${build.id}.@{conf}_compile.log -filter \epoc32 -zip ${zips.loc.dir}/delta_western_package -ex productvariant.hrh"/>
                     </preset.exec>
                     <if>
                         <istrue value="@{ctool}"/>
                         <then>
-                            <preset.exec executable="${build.drive}\epoc32\tools\zip.exe" dir="${build.drive}/" input="${build.log.dir}/${build.id}.configtool_western_delta.txt">
+                            <preset.exec executable="${build.drive}\epoc32\tools\zip.exe" dir="${build.drive}/" input="${localisation.log.dir}/${build.id}.configtool_western_delta.txt">
                                 <arg line="-r -u ${zips.loc.dir}/delta_western_package -@"/>
                             </preset.exec>
                         </then>
@@ -166,6 +168,7 @@ Description:
     -->
     <target name="localisation-postbuild-western">
         <mkdir dir="${zips.loc.dir}"/>
+        <mkdir dir="${localisation.log.dir}"/>
 
         <antcall target="compile-main">
             <param name="sysdef.configurations.list" value="S60_bldmelast" />
@@ -173,7 +176,7 @@ Description:
 
         <preset.exec executable="perl" dir="${build.drive}/" failonerror="true">
             <arg value="${parse_abld_what.tool}"/>
-            <arg line="-i ${build.log.dir}/${build.id}.S60_bldmelast_compile.log -filter \epoc32 -zip ${zips.loc.dir}/delta_western_package -ex productvariant.hrh"/>
+            <arg line="-i ${compile.log.dir}/${build.id}.S60_bldmelast_compile.log -filter \epoc32 -zip ${zips.loc.dir}/delta_western_package -ex productvariant.hrh"/>
         </preset.exec>
         <copy file="${build.drive}\epoc32\release\ARMV5\urel\elocl.dll" tofile="${build.drive}\epoc32\release\ARMV5\urel\elocl.01" />
         <copy file="${build.drive}\epoc32\release\ARMV5\udeb\elocl.dll" tofile="${build.drive}\epoc32\release\ARMV5\udeb\elocl.01" />
@@ -189,6 +192,7 @@ Description:
         <deprecated>This feature is now supported by iMaker, please update your  Makefile templates to migrate the language data from XML.</deprecated>
     -->
     <target name="localisation-create-languagepack" depends="rombuild-prepare-input">
+        <mkdir dir="${localisation.log.dir}"/>
         <for list="${product.list}" delimiter="," param="product.name" >
             <sequential>
                 <echo>Language Pack configuration for @{product.name}</echo>
@@ -272,11 +276,12 @@ output.close()
     
     <!-- Localisation configuration -->
     <target name="localisation-create-config">
-        <record name="${build.log.dir}/${build.id}_localisation_config.log" action="start"/>
+        <mkdir dir="${localisation.log.dir}"/>
+        <hlm:record name="${localisation.log.dir}/${build.id}_localisation_config.log" action="start"/>
         <antcall target="localisation-create-languagepack" />
         <antcall target="localisation-create-cenrep" />
         <copy file="${helium.dir}/tools/localisation/templates/rom/mc_variant_imaker.oby" todir="${build.drive}/epoc32/rom"/>
-        <record name="${build.log.dir}/${build.id}_localisation_config.log" action="stop"/>
+        <hlm:record name="${localisation.log.dir}/${build.id}_localisation_config.log" action="stop"/>
     </target>
 
     <!-- Localise resources using either EC / EBS based on build system type-->
@@ -307,7 +312,7 @@ output.close()
         <!-- localisation build cleanup -->
         <echo message="isis_EClocaliser.pl -b=${localisation.region}_${localisation.buildfile} -state=2 -dest=&quot;${zips.loc.dir}&quot; -h" />
         <exec executable="perl" dir="${build.drive}/" failonerror="${failonerror}">
-            <arg line="${build.drive}/epoc32/tools/isis_EClocaliser.pl ${localisation.files} ${localisation.files.region} -b=${build.log.dir}/${build.id}.${localisation.region}_${localisation.buildfile} -state=2 -c=&quot;${localisation.languages}&quot; -dest=&quot;${zips.loc.dir}&quot; -s60locfiles=&quot;${localisation.s60locfiles.dir}&quot; -l=&quot;${localisation.log}&quot; -nolocal -k"/>
+            <arg line="${build.drive}/epoc32/tools/isis_EClocaliser.pl ${localisation.files} ${localisation.files.region} -b=${temp.build.dir}/${build.id}.${localisation.region}_${localisation.buildfile} -state=2 -c=&quot;${localisation.languages}&quot; -dest=&quot;${zips.loc.dir}&quot; -s60locfiles=&quot;${localisation.s60locfiles.dir}&quot; -l=&quot;${localisation.log}&quot; -nolocal -k"/>
         </exec>
     </target>
 
@@ -336,7 +341,7 @@ output.close()
         <for list="${isis_mktarget.list}" delimiter="," param="mktarget">
             <sequential>
                 <hlm:recordStartMacro name="@{mktarget}.log" emacsmode="true"/>
-                <hlm:emakeMacro name="localisation" makefile="${build.drive}/${localisation.region}_${localisation.buildfile}.make" target="@{mktarget}" dir="${build.drive}/" annodetail="basic,history,file,waiting"/>
+                <hlm:emakeMacro name="localisation" makefile="${build.drive}/${localisation.region}_${localisation.buildfile}.make" target="@{mktarget}" dir="${build.drive}/" annodetail="basic,history,file,waiting" phase="localisation"/>
                 <hlm:recordStopMacro name="@{mktarget}.log"/>
             </sequential>
         </for>
@@ -355,7 +360,7 @@ output.close()
     
     <!-- Build localised content -->
     <target name="localisation-build" depends="rombuild-prepare-input">
-        <record name="${build.log.dir}/${build.id}_localisation_build.log" action="start"/>
+        <hlm:record name="${localisation.log.dir}/${build.id}_localisation_build.log" action="start"/>
         <copy file="${parse_abld_what.tool}" todir="${build.drive}/epoc32/tools/s60tools" failonerror="false"/>
         <mkdir dir="${zips.loc.dir}"/>    
         
@@ -395,7 +400,7 @@ output.close()
                 </for>
             </sequential>
         </for>
-        <record name="${build.log.dir}/${build.id}_localisation_build.log" action="stop"/>
+        <hlm:record name="${localisation.log.dir}/${build.id}_localisation_build.log" action="stop"/>
     </target>
     
     
@@ -403,8 +408,9 @@ output.close()
         Target to rebuild locales 
         This could be useful for incremental changes/test.
     -->
-    <target name="localisation-create-locales"> 
-        <record name="${build.log.dir}/${build.id}_create_locales.log" action="start"/>
+    <target name="localisation-create-locales">
+        <mkdir dir="${localisation.log.dir}"/>
+        <hlm:record name="${localisation.log.dir}/${build.id}_create_locales.log" action="start"/>
         
         <!-- get all variation available -->    
         <exec executable="python" outputproperty="localisation.variation" dir="${build.drive}/" failonerror="${failonerror}">
@@ -435,14 +441,15 @@ output.close()
                 </for>
             </sequential>
         </for>
-        <record name="${build.log.dir}/${build.id}_create_locales.log" action="stop"/>
+        <hlm:record name="${localisation.log.dir}/${build.id}_create_locales.log" action="stop"/>
     </target>    
 
     
     <!-- Creates localised rom images -->
     <target name="localisation-roms" depends="rombuild-create-makefile,flash-config-file"> 
+        <mkdir dir="${localisation.log.dir}"/>
         <!-- get product path -->
-        <record name="${build.log.dir}/${build.id}_localisation_roms.log" action="start"/>
+        <hlm:record name="${localisation.log.dir}/${build.id}_localisation_roms.log" action="start"/>
         <hlm:preECImakerMacro/>
         <for list="${product.list}" delimiter="," param="product.name" >
             <sequential>
@@ -450,15 +457,16 @@ output.close()
             </sequential>
         </for>
         <hlm:ecImakerMacro makefile.target="${localisation.makefile.target}" />
-        <record name="${build.log.dir}/${build.id}_localisation_roms.log" action="stop"/>
-        <hlm:logextract file="${build.log.dir}/${build.id}_localisation_roms.log"/>
+        <hlm:record name="${localisation.log.dir}/${build.id}_localisation_roms.log" action="stop"/>
+        <hlm:logextract file="${localisation.log.dir}/${build.id}_localisation_roms.log"/>
     </target>
 
     
     <!-- Creates customer rom images -->
     <target name="customer-roms" depends="rombuild-create-makefile,flash-config-file"> 
+        <mkdir dir="${localisation.log.dir}"/>
         <!-- get product path -->
-        <record name="${build.log.dir}/${build.id}_customer_roms.log" action="start"/>
+        <hlm:record name="${localisation.log.dir}/${build.id}_customer_roms.log" action="start"/>
         <hlm:preECImakerMacro/>
         <for list="${product.list}" delimiter="," param="product.name" >
             <sequential>
@@ -466,8 +474,8 @@ output.close()
             </sequential>
         </for>
         <hlm:ecImakerMacro makefile.target="${customer.makefile.target}" />
-        <record name="${build.log.dir}/${build.id}_customer_roms.log" action="stop"/>
-        <hlm:logextract file="${build.log.dir}/${build.id}_customer_roms.log"/>
+        <hlm:record name="${localisation.log.dir}/${build.id}_customer_roms.log" action="stop"/>
+        <hlm:logextract file="${localisation.log.dir}/${build.id}_customer_roms.log"/>
     </target>
 
     

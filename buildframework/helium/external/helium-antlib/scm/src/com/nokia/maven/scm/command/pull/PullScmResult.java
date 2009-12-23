@@ -20,6 +20,10 @@ package com.nokia.maven.scm.command.pull;
 
 import org.apache.maven.scm.ScmResult;
 
+/**
+ * 
+ *
+ */
 public class PullScmResult extends ScmResult
 {
     public PullScmResult( String commandLine, String providerMessage, String commandOutput, boolean success )

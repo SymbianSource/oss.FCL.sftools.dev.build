@@ -71,10 +71,8 @@ public class DiamondsClient {
         try {
             result = httpClient.executeMethod(postMethod);
         } catch (IOException e) {
-            log.info("IOException while sending http request");
-            log.debug("IOException while sending http request: ", e);
             isRecordOnly = true;
-            throw new DiamondsException("Exception in executeMethod");
+            throw new DiamondsException("IOException while sending http request." + e.getMessage());
             // e.printStackTrace();
         }
         return result;
@@ -89,8 +87,7 @@ public class DiamondsClient {
         } catch (Exception ex) {
             // ex.printStackTrace();
             isRecordOnly = true;
-            log.info("Failed to check url, defaulting to input.");
-            throw new DiamondsException("Exception verifying URL");
+            throw new DiamondsException("Failed to check url, defaulting to input. " + ex.getMessage());
         }
         return retURL;
     }
@@ -175,23 +172,19 @@ public class DiamondsClient {
                     log.debug("diamondsBuildID: " + diamondsBuildID);
                 } else {
                     isRecordOnly = true;
-                    log.debug("Connection Failed.");
-                    log
-                            .info("Diamonds data not sent, because of connection failure.");
+                    log.error("Diamonds data not sent, because of connection failure.");
                     //throw new DiamondsException("Connection Failed");
                 }
             }
         } catch (HttpException ex) {
             isRecordOnly = true;
-            log.debug("Connection Failed", ex);
-            log.info("Diamonds data not sent, because of httpexception.");
+            log.error("Diamonds data not sent, because of httpexception.", ex);
             // log.error("Failed: " + ex.toString());
             //throw new DiamondsException("Http Exception see the logs: "
             //        + ex.getMessage());
         } catch (IOException ex1) {
             isRecordOnly = true;
-            log.debug("Connection Failed. ", ex1);
-            log.info("Diamonds data not sent, because of io exception.");
+            log.error("Diamonds data not sent, because of io exception.", ex1);
             // log.error("Failed: " + ex.toString());
             //throw new DiamondsException("Network error, see the logs: "
             //        + ex1.getMessage());
@@ -215,8 +208,7 @@ public class DiamondsClient {
                 result = processPostMethodResult(httpClient
                         .executeMethod(postMethod));
             } catch (Exception e) {
-                log.debug("DiamondsClient:sendData by Http: ", e);
-                log.info("The final data via http not sent because errors: ", e);
+                log.error("sendData:The final data via http not sent because errors: ", e);
             }
         }
         return result;
@@ -233,8 +225,7 @@ public class DiamondsClient {
                     "[DIAMONDS_DATA]", null);
             log.debug("DiamondsClient:sendDataByEmail:succeeds");
         } catch (Exception e) {
-            log.debug("DiamondsClient:sendDataByEmail: ", e);
-            log.info("The final data via http not sent because errors: ", e);
+            log.error("sendDataByMail:The final data via http not sent because errors: ", e);
             return -1;
         }
         return 0;

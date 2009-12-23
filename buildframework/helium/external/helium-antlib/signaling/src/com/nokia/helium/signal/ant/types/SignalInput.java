@@ -22,13 +22,12 @@ package com.nokia.helium.signal.ant.types;
 import java.util.Vector;
 
 import org.apache.tools.ant.types.DataType;
-
-import com.nokia.helium.core.HlmAntLibException;
 import com.nokia.helium.core.ant.types.ReferenceType;
 import org.apache.log4j.Logger;
 
 import com.nokia.helium.signal.Notifier;
-import com.nokia.helium.signal.ant.SignalListener;
+
+import org.apache.tools.ant.BuildException;
 
 /**
  * SignalInput class which is a type to store input for signals
@@ -131,6 +130,6 @@ public class SignalInput extends DataType
             }
             return notifierList;
         }
-        throw new HlmAntLibException(SignalListener.MODULE_NAME, "No notifierlist reference");
+        throw new BuildException("No signal notifierlist reference defined.");
     }    
 }

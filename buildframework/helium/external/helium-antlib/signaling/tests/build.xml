@@ -22,16 +22,14 @@ Description:
 -->
 <project name="helium-antlib-signaling-unittest" xmlns:au="antlib:org.apache.ant.antunit">
     <description>Helium Antlib signaling tests.</description>
+    <import file="../../test-macros.ant.xml" />
 
     <property environment="env" />
     <dirname property="signaling.test.project.dir" file="${ant.file.helium-antlib-signaling-unittest}" />
     <property name="build.summary.file" location="${signaling.test.project.dir}/test_signal/data/ido_tedo_mcl_devlon52_ec_MCL.52.105_summary.log.xml" />
     <property name="build.id" value="test_new_hlm"/>
   
-    <property name="signaling.config.file" value="${signaling.test.project.dir}/test_signal/test_signaling_config.ant.xml" />
-    <property name="signaling.config.file" value="${signaling.test.project.dir}/test_signal/test_signaling_config.ant.xml" />
-
-    <import file="${signaling.test.project.dir}/test_signal/test_signaling.ant.xml" />
+    <import file="${signaling.test.project.dir}/test_signal/signaling_test.ant.xml" />
     
     <target name="unittest" depends="unittest-signaling,unittest-signaling-antunit" />
 
@@ -40,13 +38,7 @@ Description:
     </target>
 
     <target name="unittest-signaling-antunit">
-        <au:antunit>
-            <au:plainlistener />
-            <fileset dir=".">
-                <include name="**/test_*.ant.xml" />
-                <exclude name="**/test_signaling.ant.xml" />
-            </fileset>
-        </au:antunit>
+        <antunitModule name="signaling" />
     </target>
 
 </project>

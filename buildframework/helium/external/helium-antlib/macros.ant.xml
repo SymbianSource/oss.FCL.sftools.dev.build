@@ -24,7 +24,7 @@ Description:
     <description>Helium Antlib build macro.</description>
     
     <dirname property="helium.antlib.root.dir" file="${ant.file.build-macros}" />
-    <property name="build.temp.dir" location="${basedir}/../build" />
+    <property name="build.temp.dir" location="${helium.antlib.root.dir}/../build" />
     <property name="bin.dir" location="${basedir}/../bin" />
 
     <path id="helium.antlib.classpath">
@@ -71,7 +71,8 @@ Description:
                 <fileset dir="${build.temp.dir}/@{name}/classes" />
                 <fileset dir="${basedir}/src" includes="**/*.xml" />
                 <fileset dir="${basedir}/src" includes="**/*.*ftl" />
-
+                <fileset dir="${basedir}/src" includes="**/*.vm" />
+                
                 <manifest>
                     <section name="common">
                         <attribute name="Implementation-Title" value="@{name}" />
@@ -86,18 +87,67 @@ Description:
     <macrodef name="testModule">
         <attribute name="name" />
         <attribute name="dir" default="${helium.antlib.root.dir}" />
+        <attribute name="bindir" default="${bin.dir}" />
         <sequential>
+            <mkdir dir="${build.temp.dir}" />
             <if>
                 <available type="dir" file="${basedir}/tests"/>
                 <then>
-                    <exec osfamily="windows" executable="cmd" dir="${basedir}/tests">
-                        <env key="ANT_LIB_HOME" path="${helium.antlib.root.dir}"/>
-                        <arg line="/c build.bat unittest" />
-                    </exec>
-                    <exec osfamily="unix" executable="./bld.sh" dir="${basedir}/tests">
-                        <env key="ANT_LIB_HOME" path="${helium.antlib.root.dir}"/>
-                        <arg line="unittest" />
-                    </exec>
+                    <trycatch>
+                        <try>
+                            <!-- Temporarly replacing the jar file
+                                 with an instrumented one to do the 
+                                 actual coverage measurment
+                             -->
+                            <mkdir dir="${build.temp.dir}/@{name}/backup" />
+                            <delete>
+                                <fileset dir="${build.temp.dir}" includes="@{name}/**/*_antunit.emma" />
+                            </delete>
+                            <copy file="@{bindir}/helium-@{name}.jar" todir="${build.temp.dir}/@{name}/backup/" />
+                            <emma enabled="true">
+                                <instr destdir="@{bindir}/" metadatafile="${build.temp.dir}/@{name}/metadata_antunit.emma" merge="true" mode="overwrite">
+                                    <instrpath>
+                                        <fileset dir="@{bindir}" includes="helium-@{name}.jar" />
+                                    </instrpath>
+                                </instr>
+                            </emma>
+                            <exec osfamily="windows" executable="cmd" dir="${basedir}/tests">
+                                <env key="ANT_LIB_HOME" path="${helium.antlib.root.dir}" />
+                                <arg line="/c build.bat unittest" />
+                            </exec>
+                            <exec osfamily="unix" executable="./bld.sh" dir="${basedir}/tests">
+                                <env key="ANT_LIB_HOME" path="${helium.antlib.root.dir}" />
+                                <arg line="unittest" />
+                            </exec>
+                            <move todir="${build.temp.dir}/@{name}">
+                                <fileset dir="${basedir}/tests" includes="**/coverage.ec" />
+                                <chainedmapper>
+                                    <filtermapper>
+                                        <replacestring from="/" to="_" />
+                                    </filtermapper>
+                                    <regexpmapper from="^(.*)\.ec$$" to="\1_antunit.emma" />
+                                </chainedmapper>
+                            </move>
+                            <emma enabled="true">
+                                <report>
+                                    <infileset dir="${build.temp.dir}/@{name}/" includes="*_antunit.emma" />
+                                    <txt outfile="${build.temp.dir}/@{name}/coverage_antunit.txt" />
+                                    <html outfile="${build.temp.dir}/@{name}/coverage_antunit.html" />
+                                    <xml outfile="${build.temp.dir}/@{name}/coverage_antunit.xml" />
+                                </report>
+                            </emma>
+                            <if>
+                                <available file="${build.temp.dir}/@{name}/coverage_antunit.txt" />
+                                <then>
+                                    <loadfile property="message" srcFile="${build.temp.dir}/@{name}/coverage_antunit.txt" />
+                                    <echo message="${message}" />
+                                </then>
+                            </if>
+                        </try>
+                        <finally>
+                            <copy file="${build.temp.dir}/@{name}/backup/helium-@{name}.jar" todir="@{bindir}" overwrite="true" />
+                        </finally>
+                    </trycatch>
                 </then>
             </if>
         </sequential>
@@ -115,60 +165,72 @@ Description:
     <macrodef name="junitModule">
         <attribute name="name" />
         <attribute name="dir" default="${helium.antlib.root.dir}" />
+        <attribute name="bindir" default="${bin.dir}" />
         <sequential>
+            <mkdir dir="${build.temp.dir}" />
             <if>
                 <available type="dir" file="${basedir}/tests/src"/>
                 <then>
                     <echo>JUnit test module @{name}</echo>
                     <delete dir="${build.temp.dir}/@{name}/junit_classes"/>
+                    <delete>
+                        <fileset dir="${build.temp.dir}" includes="@{name}/**/*_junit.emma" />
+                    </delete>
                     <mkdir dir="${build.temp.dir}/@{name}/junit_classes" />
                     <javac srcdir="${basedir}/tests/src" destdir="${build.temp.dir}/@{name}/junit_classes" debug="true" source="1.5" target="1.5">
                         <classpath refid="helium.antlib.classpath" />
                         <classpath refid="helium.@{name}.classpath" />
+                        <classpath>
+                            <fileset dir="@{bindir}" includes="*-@{name}.jar" />
+                        </classpath>
                         <include name="**/*.java" />
                     </javac>
-                    
-                    <path id="build.classpath">
-                        <pathelement location="${build.temp.dir}/@{name}/classes" />
-                        <pathelement location="${build.temp.dir}/@{name}/junit_classes" />
-                    </path>
-                    
+            
+                    <copy file="@{bindir}/helium-@{name}.jar" todir="${build.temp.dir}/@{name}/" overwrite="true"/>
                     <emma enabled="true">
-                        <instr instrpathref="build.classpath"  
-                        destdir="${build.temp.dir}/@{name}/emma/instrumented"  
-                        metadatafile="${build.temp.dir}/@{name}/metadata.emma"
-                        merge="true">
-                            <filter excludes="org.apache.log4j.*" />
+                        <instr destdir="${build.temp.dir}/@{name}/" metadatafile="${build.temp.dir}/@{name}/metadata_junit.emma" merge="true" mode="overwrite">
+                            <instrpath>
+                                <fileset dir="${build.temp.dir}/@{name}/" includes="helium-@{name}.jar" />
+                            </instrpath>
                         </instr>
                     </emma>
                     
+                    <delete file="${build.temp.dir}/@{name}/coverage.emma" failonerror="false" />
                     <junit fork="yes" printsummary="yes" haltonfailure="yes" showoutput="yes">
                         <formatter type="brief" usefile="false"/>
-                        <jvmarg value="-Demma.coverage.out.file=${build.temp.dir}/@{name}/coverage.emma" />
-                        <jvmarg value="-Demma.coverage.out.merge=false" />
+                        <jvmarg value="-Demma.coverage.out.file=${build.temp.dir}/@{name}/coverage_junit.emma" />
+                        <jvmarg value="-Demma.coverage.out.merge=true" />
                         <jvmarg value="-Dtestdir=${basedir}" />
+                        <classpath>
+                            <pathelement path="${build.temp.dir}/@{name}/helium-@{name}.jar"/>
+                            <pathelement path="${helium.antlib.root.dir}/antlibs/*.jar"/>
+                            <pathelement path="${build.temp.dir}/@{name}/junit_classes" />
+                        </classpath>
                         <classpath refid="helium.antlib.classpath" />
                         <classpath refid="helium.@{name}.classpath" />
-                        <classpath>
-                            <pathelement path="${build.temp.dir}/@{name}/emma/instrumented"/>
-                            <pathelement path="${helium.antlib.root.dir}/antlibs/*.jar"/>
-                        </classpath>
                         <batchtest fork="yes" todir="${build.temp.dir}/@{name}/junit_test">
                             <fileset dir="${basedir}/tests/src">
                                 <include name="**/*Test*.java"/>
                             </fileset>
                         </batchtest>
                     </junit>
+                    <delete file="${build.temp.dir}/@{name}/helium-@{name}.jar" failonerror="false" />
                     
                     <emma enabled="true" >
                         <report>
-                            <infileset dir="${build.temp.dir}/@{name}" includes="*.emma" />
+                            <infileset dir="${build.temp.dir}/@{name}" includes="*_junit.emma" />
                             <txt outfile="${build.temp.dir}/@{name}/coverage.txt" />
                             <html outfile="${build.temp.dir}/@{name}/coverage.html" />
+                            <xml outfile="${build.temp.dir}/@{name}/coverage.xml" />
                         </report>
                     </emma>
-                    <loadfile property="message" srcFile="${build.temp.dir}/@{name}/coverage.txt"/>
-                    <echo message="${message}"/>
+                    <if>
+                        <available file="${build.temp.dir}/@{name}/coverage.txt" />
+                        <then>
+                            <loadfile property="message" srcFile="${build.temp.dir}/@{name}/coverage.txt"/>
+                            <echo message="${message}"/>
+                        </then>
+                    </if>
                 </then>
             </if>
         </sequential>

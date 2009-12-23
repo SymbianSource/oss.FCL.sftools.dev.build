@@ -37,8 +37,7 @@ if sys.platform == "win32":
     import win32api
     windows = True
 
-
-if __name__ == '__main__':
+def main():
     cmdarg = False
     cmdline = []
     timeout = None
@@ -95,3 +94,6 @@ if __name__ == '__main__':
             p = subprocess.Popen(' '.join(cmdline), stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
             print p.communicate()[0]
             sys.exit(p.returncode)
+
+if __name__ == '__main__':
+    main()

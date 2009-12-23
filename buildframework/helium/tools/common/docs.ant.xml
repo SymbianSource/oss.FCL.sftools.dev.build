@@ -110,10 +110,10 @@ Description:
             <fileset refid="python.library.files"/>
         </pathconvert>
         <echo>Python modules path: ${epydoc.python.modules.path}</echo>
-        <exec osfamily="windows" executable="python" dir="${helium.build.dir}" failonerror="true">        
-            <arg line="${python.tools}\epydoc"/>
+        <exec executable="python" dir="${helium.build.dir}" failonerror="true">        
+            <arg line="${python.tools}/epydoc"/>
             <arg value="-v"/>
-            <arg value="--config=${helium.dir}\config\epydoc.conf"/>
+            <arg value="--config=${helium.dir}/config/epydoc.conf"/>
             <arg value="--exclude=sgmllib"/>
             <arg line="${epydoc.python.modules.path}"/>
         </exec>
@@ -258,7 +258,7 @@ Description:
         <attribute name="src" default="${helium.build.dir}/temp/doc"/>
         <attribute name="output" default="${helium.build.dir}/doc"/>
         <sequential>
-            <property name="sphinx.lib.dir" location="${helium.dir}/external/python/lib/2.5/Sphinx-0.5.1-py2.5.egg/sphinx" />
+            <property name="sphinx.lib.dir" location="${helium.dir}/external/python/lib/common/Sphinx-0.5.1-py2.5.egg/sphinx" />
             <if>
                 <available file="${nokia.python.tools}/sphinxfixsearch.diff"/>
                 <then>
@@ -266,7 +266,7 @@ Description:
                 </then>
             </if>
             <exec executable="python" failonerror="${failonerror}">        
-                <arg file="${python.dir}/sphinx-build.py"/>
+                <arg file="${python.dir}/common/sphinx-build.py"/>
                 <arg value="-b" />
                 <arg value="html" />            
                 <arg value="-D" />
@@ -645,6 +645,7 @@ import string
 import amara
 import codecs
 import ant
+import docs
 
 setpath = r'${helium.dir}'+'/tools'
 
@@ -654,43 +655,11 @@ dbPath = r'${database.file}'
 dbPath = 'file:///'+ dbPath.replace('\\','/')
 dbPrj = amara.parse(dbPath)
 
-for root, dirs, files in os.walk(setpath, topdown=False):
-    for fname in files:
-        filePattern = re.compile('.ant.xml$')
-        fileMatch = filePattern.search(fname)
-        modulelist = []
-        if (fileMatch):
-            filePath = os.path.abspath(os.path.join(root, fname))
-            with open(filePath) as f:
-                filePathAmara = 'file:///'+ filePath.replace('\\','/')
-                curPrj=amara.parse(filePathAmara)
-                for line in f:
-                    linePattern = re.compile('^import')
-                    lineMatch = linePattern.search(line)
-                    if ((lineMatch) and (line.find('.')==-1)):
-                        newLine = line.replace('import','')
-                        newLine = newLine.replace(',','')
-                        moduleArray = newLine.split()
-                        for curModule in moduleArray:
-                            try:
-                                importModule = __import__(curModule)
-                                modulePath=importModule.__file__
-                                if (modulePath.find('\\helium\\tools')!= -1):
-                                    for projectList in dbPrj.antDatabase.project:
-                                        if (projectList.name==curPrj.project.name):
-                                            if not (curModule in modulelist):
-                                                print " Python module : " +curModule
-                                                moduleElement = projectList.pythonDependency.xml_create_element(u'module', content=u''+curModule)
-                                                projectList.pythonDependency.xml_append(moduleElement)
-                                            modulelist = modulelist + [curModule]
-                            except Exception, e:
-                                error ="yes"
-
+docs.find_python_dependencies(setpath, dbPath, dbPrj)
 
 file_object = codecs.open(r'${database.file}', 'w', "utf_8")
 file_object.write(dbPrj.xml(indent=u"yes"))
 file_object.close()
-    
         </hlm:python>
     </target>
     
@@ -841,12 +810,6 @@ dependancygraph.findLogFiles(r'${database.file}.parsed', r'${dependency.external
         
     </target>
     
-    <!-- Download data listening logs and extract data -->
-    <target name="parse-datalistening">
-        <exec executable="python" dir="${helium.dir}/tools/common/python/lib" failonerror="${failonerror}">
-            <arg value="parsedatalistening.py"/>
-        </exec>
-    </target>
 
     <!-- Creates user flow diagram -->
     <target name="helium-user-graph">

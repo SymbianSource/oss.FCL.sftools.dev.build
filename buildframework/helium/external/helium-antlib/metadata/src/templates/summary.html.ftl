@@ -97,27 +97,29 @@ build summary</title>
     </@helium_logger_node_head>
     <@helium_logger_node_content nodeid="${helium_node_id}">
         <#list component_ids as component_id>
-            <#assign helium_node_id = helium_node_id + 1>
-            <@helium_logger_node_head nodeid="${helium_node_id}" title="${component_table['${component_id}']}">
+            <#if "${component_table['${component_id}']}" != "general" >
+                <#assign helium_node_id = helium_node_id + 1>
+                <@helium_logger_node_head nodeid="${helium_node_id}" title="${component_table['${component_id}']}">
+                    <#list priority_ids as priority>
+                        <#assign priority_text = "${priority_table['${priority}']}"?lower_case>
+                        <#assign priority_count = "${table_info['select count(data) as COUNT from metadata where logpath_id=${logpath} and priority_id = ${priority} and component_id = ${component_id}'][0]['COUNT']}" >
+                        <@logfile_severity "${component_table['${component_id}']}", "${priority_text}", 
+                                "${priority_count}", 
+                                "${helium_node_id}" />
+                    </#list>
+                </@helium_logger_node_head>
+                <@helium_logger_node_content nodeid="${helium_node_id}">
                 <#list priority_ids as priority>
-                    <#assign priority_text = "${priority_table['${priority}']}"?lower_case>
-                    <#assign priority_count = "${table_info['select count(data) as COUNT from metadata where logpath_id=${logpath} and priority_id = ${priority} and component_id = ${component_id}'][0]['COUNT']}" >
-                    <@logfile_severity "${component_table['${component_id}']}", "${priority_text}", 
-                            "${priority_count}", 
-                            "${helium_node_id}" />
+                    <#list table_info['select * from metadata where logpath_id = ${logpath} and priority_id = ${priority} and component_id = ${component_id}'] as recordentry >
+                        <#-- <#if sublog?node_name == "logfile"> --> 
+                            <@logfile_entry_detail recordentry, "${helium_node_id}" />
+                        <#-- <#elseif sublog?node_name == "log">
+                            <@antlognode sublog/>
+                        </#if> -->
+                    </#list>
                 </#list>
-            </@helium_logger_node_head>
-            <@helium_logger_node_content nodeid="${helium_node_id}">
-            <#list priority_ids as priority>
-                <#list table_info['select * from metadata where logpath_id = ${logpath} and priority_id = ${priority} and component_id = ${component_id}'] as recordentry >
-                    <#-- <#if sublog?node_name == "logfile"> --> 
-                        <@logfile_entry_detail recordentry, "${helium_node_id}" />
-                    <#-- <#elseif sublog?node_name == "log">
-                        <@antlognode sublog/>
-                    </#if> -->
-                </#list>
-            </#list>
-            </@helium_logger_node_content>
+                </@helium_logger_node_content>
+            </#if>
         </#list>
     </@helium_logger_node_content>
 </#list>

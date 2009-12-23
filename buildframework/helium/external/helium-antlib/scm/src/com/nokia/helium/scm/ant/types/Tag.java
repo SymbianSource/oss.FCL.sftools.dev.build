@@ -20,6 +20,14 @@ package com.nokia.helium.scm.ant.types;
 
 import org.apache.tools.ant.types.DataType;
 
+/**
+ * The tag type store the value of a desired SCM tag.
+ * 
+ *  <pre>
+ *  &lt;tag name="release_1.0" /&gt;
+ *  </pre>
+ *
+ */
 public class Tag extends DataType {
 
     private String name;
@@ -34,6 +42,10 @@ public class Tag extends DataType {
         this.name = name;
     }
 
+    /**
+     * Get the tag value.
+     * @return the tag value
+     */
     public String getName() {
         return name;
     }

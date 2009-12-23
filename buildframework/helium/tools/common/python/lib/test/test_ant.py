@@ -32,6 +32,15 @@ def test_get_property():
     
     # Property was defined, should provide value
     assert ant.get_property('foo') == 'foo'
+
+
+def test_get_property_macro():
+    """ Test the support of get_property inside macro. """
+    # Property was not defined in Ant
+    assert ant.get_property('@{foo}') == None
+    
+    # Property was defined, should provide value
+    assert ant.get_property('foo') == 'foo'
     
     
 def test_get_previous_build_number():
@@ -51,3 +60,8 @@ def test_get_previous_build_number():
     assert ant.get_previous_build_number('oci.12') == 'oci.11'
     
     assert ant.get_previous_build_number('oci.patch.02') == 'oci.patch.01'
+    
+    assert ant.get_previous_build_number('oci.patch.10') == 'oci.patch.9'
+
+    assert ant.get_previous_build_number('oci.patch.010') == 'oci.patch.009'
+    

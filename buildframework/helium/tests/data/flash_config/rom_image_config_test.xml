@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <build>
-    <spec name="mc" abstract="true">
+    <config name="mc" abstract="true">
         <set name="target.dir" value="${release.images.dir}"/>
         <set name="today" value="$(TODAY)"/>
         
@@ -48,7 +48,7 @@
         <set name="eraseuda.makefile.template" value="${build.drive}\mc\mc_config\mc_5132_config\rombuild\eraseuda.mk"/>
         <set name="flash.config.template" value="${build.drive}\mc\mc_config\mc_5132_config\rombuild\template.config.xml"/>
         
-        <spec name="product" abstract="true">
+        <config name="product" abstract="true">
             <set name="config.name" value="product"/>
             <set name="rommake.hwid" value="2048"/>
             <set name="version.product.type" value="RM-235"/>
@@ -56,62 +56,62 @@
             <set name="rommake.product.type" value="RM-235"/>
             
             <!-- Language pack and Variant -->
-            <spec name="variants" abstract="true">
+            <config name="variants" abstract="true">
                 <set name="target.dir" value="${release.images.dir}"/>
                 <set name="build.parallel" value="false"/>
                 <!-- core -->
-                <spec type="core">
+                <config type="core">
                     <set name="core.id" value="00"/>
                     <set name="image.type" value="rnd,prd"/>
-                </spec>
+                </config>
                 
                 <!-- western group -->
-                <spec name="western" abstract="true">
+                <config name="western" abstract="true">
                     <set name="build.parallel" value="true"/>
-                    <spec type="languagepack">
+                    <config type="languagepack">
                         <set name="languagepack.id" value="01"/>
                         <set name="default" value="01"/>
                         <set name="languages" value="01,02,03,05,04,13"/>
                         <set name="description" value="EURO1"/>
                         <set name="variation" value="western"/>
                         <set name="revision" value="0"/>
-                    </spec>
-                    <spec type="languagepack">
+                    </config>
+                    <config type="languagepack">
                         <set name="languagepack.id" value="02"/>
                         <set name="default" value="01"/>
                         <set name="languages" value="01,02,03,14,05,18"/>
                         <set name="description" value="EURO2"/>
-                    </spec>
-                    <spec type="languagepack">
+                    </config>
+                    <config type="languagepack">
                         <set name="languagepack.id" value="23"/>
                         <set name="default" value="01"/>
                         <set name="languages" value="01,02,18,03,05"/>
                         <set name="description" value="AFRICA2"/>
-                    </spec>
-                </spec>
+                    </config>
+                </config>
                 
-                <spec name="customer_roms" abstract="true">
+                <config name="customer_roms" abstract="true">
                     <set name="build.parallel" value="true"/>
-                    <spec type="customer">
+                    <config type="customer">
                         <set name="customer.id" value="01"/>
                         <set name="description" value="vanilla_customer_variant"/>
                         <set name="compatible.languagepack" value="01,02,03"/>
-                    </spec>
-                </spec>
-            </spec>
+                    </config>
+                </config>
+            </config>
             
             <!-- china group -->
-            <spec name="china" abstract="true">
+            <config name="china" abstract="true">
                 <set name="build.parallel" value="true"/>
                 <set name="variation" value="china"/>
-                <spec type="languagepack">
+                <config type="languagepack">
                     <set name="languagepack.id" value="11"/>
                     <set name="default" value="29"/>
                     <set name="languages" value="29,157"/>
                     <set name="description" value="TAIWAN"/>
-                </spec>
-            </spec>
+                </config>
+            </config>
             
-        </spec>
-    </spec>
+        </config>
+    </config>
 </build>

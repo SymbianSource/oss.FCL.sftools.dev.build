@@ -24,7 +24,6 @@ import symrec
 import logging
 import os
 from xml.dom.minidom import *
-import amara
 
 logger = logging.getLogger("test.symrec")
 logging.basicConfig()
@@ -191,6 +190,7 @@ def test_symrec_to_tdd():
 
 
 def test_find_latest_metadata():
+    """ Check find latest metadata. """
     assert symrec.find_latest_metadata(os.path.join(os.environ['HELIUM_HOME'], "tests/data/symrec/override/none")) == None
     
     expected = os.path.normpath(os.path.join(os.environ['HELIUM_HOME'], "tests/data/symrec/override/one", "release_metadata.xml"))
@@ -201,7 +201,13 @@ def test_find_latest_metadata():
     filename = symrec.find_latest_metadata(os.path.dirname(expected))
     assert expected == filename, "Should be %s (%s)" % (expected, filename)
 
-
+def test_find_latest_metadata_invalid_path():
+    """ Check find latest metadata with an invalid path. """
+    path = os.path.join(os.environ['HELIUM_HOME'], "tests/data/symrec/override/invalid")
+    open(path, "w+").close()
+    assert symrec.find_latest_metadata(path) == None
+    os.remove(path)
+    
 def test_cached_release_validator():
     """ Testing the cached release metadata xml validator. """
     
@@ -242,3 +248,16 @@ def test_cached_release_validator():
     assert validator.is_valid() == True
     assert os.path.exists(cachefile), "Cache file has not been created"
     assert len(validator.load_cache()) == 3
+
+
+def test_ignore_whitespace_writexml():
+    myText = '''<foo>    
+     <bar attr1="value" attr2="&gt;">   foo bar  
+     </bar>
+     <bar x="y"/>    
+     </foo>'''
+    result1 =  xml.dom.minidom.parseString(myText).toprettyxml()
+    result2 =  xml.dom.minidom.parseString(result1).toprettyxml()
+    print logger.debug(result1)
+    print logger.debug(result2)
+    assert result1 == result2

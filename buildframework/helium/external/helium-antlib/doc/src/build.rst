@@ -76,6 +76,11 @@ To cleanup the generated files just run:
         [echo] Cleaning helium-signaling
       [delete] Deleting directory C:\development\workspace\helium-antlib-dragonfly-trunk\sf\build\signaling\classes
       [delete] Deleting: C:\development\workspace\helium-antlib-dragonfly-trunk\sf\bin\helium-signaling.jar
+      
+   clean:
+        [echo] Cleaning helium-logging
+      [delete] Deleting directory C:\development\workspace\helium-antlib-dragonfly-trunk\sf\build\logging\classes
+      [delete] Deleting: C:\development\workspace\helium-antlib-dragonfly-trunk\sf\bin\helium-logging.jar
    
    BUILD SUCCESSFUL
    Total time: 1 second

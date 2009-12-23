@@ -46,8 +46,8 @@ class CCMExtraException(ccm.CCMException):
 
 def Snapshot(project, targetdir, dir=None):
     """ This function can snapshot anything from Synergy, even prep/working projects """
-    assert (project != None, "a project object must be supplied")
-    assert (project.type == "project", "project must be of project type")
+    assert project != None, "a project object must be supplied"
+    assert project.type == "project", "project must be of project type"
     if not dir:
         dir = project.root_dir()
     targetdir = os.path.join(targetdir, dir.name)
@@ -60,68 +60,59 @@ def Snapshot(project, targetdir, dir=None):
         else:
             object.to_file(os.path.join(targetdir, object.name))
 
-class __FileSnapshot:
-    def __init__(self, object, targetdir):
-        self.object = object
-        self.targetdir = targetdir
-    def __call__(self):
-        _logger.info("Getting %s (%s)" % (os.path.join(self.targetdir, self.object.name), self.object))
-        self.object.to_file(os.path.join(self.targetdir, self.object.name))
-        return "Getting %s (%s)" % (os.path.join(self.targetdir, self.object.name), self.object)
 
-class __ProjectSnapshot:
-    def __init__(self, project, targetdir):
+class _FastSnapshot:
+    """ Snapshot Job executed by the thread pool. """
+    def __init__(self, pool, project, targetdir, callback, exc_hld):
+        """ Construtor, will store the parameter for the checkout. """
+        self.pool = pool
         self.project = project
         self.targetdir = targetdir
-    def __call__(self):
-        _logger.info("Snapshotting '%s' under '%s'" % (self.project, self.targetdir))
-        status = self.project['status']
-        if status == 'released' or status == 'sqa' or status == 'test' or status == 'integrate':
-            _logger.info("Using Synergy wa_snapshot")
-            return self.project.snapshot(self.targetdir, True)
-        else:
-            _logger.info("Non static project, using custom snapshot.")
-            Snapshot(self.project, self.targetdir)
-            return ""
+        self.callback = callback
+        self.exc_hld = exc_hld
 
-def __FastSnapshot(pool, project, targetdir, callback, exc_hld, dir=None):
-    if not dir:
-        dir = project.root_dir()
-    targetdir = os.path.join(targetdir, dir.name)    
-    os.makedirs(targetdir)
-    for object in dir.children(project):
-        if isinstance(object, ccm.Dir):
-            __FastSnapshot(pool, project, targetdir, callback, exc_hld, object)
-        elif isinstance(object, ccm.Project):
-            pool.addWork(__ProjectSnapshot(object, targetdir), callback=callback, exc_callback=exc_hld)
-        else:
-            _logger.info("Getting %s (%s)" % (os.path.join(targetdir, object.name), object))
-            object.to_file(os.path.join(targetdir, object.name))            
-            # Can't snapshot files in parallel.
-            #pool.addWork(__FileSnapshot(object, targetdir), callback=callback, exc_callback=exc_hld)
-    
+    def __call__(self):
+        """ Do the checkout, and then walkthrough the project hierarchy to find subproject to snapshot. """
+        _logger.info("Snapshotting %s under %s" % (self.project, self.targetdir))
+        self.project.snapshot(self.targetdir, False)
+        def walk(dir, targetdir):
+            for object in dir.children(self.project):
+                if isinstance(object, ccm.Dir):
+                    walk(object, os.path.join(targetdir, object.name))
+                elif isinstance(object, ccm.Project):
+                    _logger.info("Adding project %s" % object.objectname)
+                    self.pool.addWork(_FastSnapshot(self.pool, object, targetdir, self.callback, self.exc_hld))
+                    
+        if len(self.project.subprojects) > 0:
+            rootdir = self.project.root_dir()
+            walk(rootdir, os.path.join(self.targetdir, rootdir.name))
+        return ""
+
 def FastSnapshot(project, targetdir, threads=4):
-    """ Create snapshot running by running sbsnapshot concurently. """
-    assert (threads > 0, "Number of threads must be > 0.")
-    assert (project != None, "a project object must be supplied.")
-    assert (project.type == "project", "project must be of project type.")    
+    """ Create snapshot running by running snapshots concurrently.
+        Snapshot will be made recursively top-down, and each sub project will
+        be snapshotted in parallel. 
+    """
+    assert threads > 0, "Number of threads must be > 0."
+    assert project != None, "a project object must be supplied."
+    assert project.type == "project", "project must be of project type."
     
     # error handling
     exceptions = []
     results = []
     def handle_exception(request, exc_info):
-        _logger.error( "Exception occured in request #%s: %s" % (request.requestID, exc_info[1]))
+        _logger.error( "Exception occurred in request #%s: %s" % (request.requestID, exc_info[1]))
         exceptions.append(exc_info[1])                        
 
     def handle_result(request, result):        
         results.append(result)
    
     pool = threadpool.ThreadPool(threads)
-    __FastSnapshot(pool, project, targetdir, handle_result, handle_exception)
+    pool.addWork(_FastSnapshot(pool, project, targetdir, handle_result, handle_exception))
     pool.wait()
     
     if len(exceptions):
-        raise CCMExtraException("Errors occured during snapshot.", exceptions)
+        raise CCMExtraException("Errors occurred during snapshot.", exceptions)
 
     return "\n".join(results)
 
@@ -129,8 +120,8 @@ def FastSnapshot(project, targetdir, threads=4):
 
 def FastMaintainWorkArea(project, path, pst=None, threads=4, wat=False):
     """ Maintain the workarea of a project in parallel. """
-    assert (threads > 0, "Number of threads must be > 0.")
-    assert (isinstance(project, ccm.Project), "a valid project object must be supplied.")
+    assert threads > 0, "Number of threads must be > 0."
+    assert isinstance(project, ccm.Project), "a valid project object must be supplied."
             
     # error handling
     exceptions = []

@@ -22,10 +22,9 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
 import java.util.Vector;
 import java.util.Iterator;
-//import java.util.ArrayList;
 import org.apache.log4j.Logger;
-//import org.apache.tools.ant.types.FileSet;
 import com.nokia.helium.metadata.db.*;
+import java.util.Date;
 
 /**
  * This task provide a way to record the data in the Database.
@@ -114,6 +113,7 @@ public class MetaDataRecord extends Task {
             log.debug("Initializing DB: " + database);
             metadataDb = new MetaDataDb(database);
             log.debug("Parsing the input and writing to DB");
+            log("time before recording to db" + new Date());
             for ( MetaDataInput metadataInput : metadataList ) {
                 boolean removed = false;
                 Iterator<MetaDataDb.LogEntry> inputIterator = metadataInput.iterator();
@@ -125,6 +125,7 @@ public class MetaDataRecord extends Task {
                     metadataDb.addLogEntry(logEntry);
                 }
             }
+            log("time after recording to db" + new Date());
             log.debug("Successfully writen to DB");
         } catch (BuildException ex1) {
             if (failOnError) {

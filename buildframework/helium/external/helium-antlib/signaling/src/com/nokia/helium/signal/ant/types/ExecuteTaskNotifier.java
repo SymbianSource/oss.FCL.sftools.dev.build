@@ -19,15 +19,17 @@
 package com.nokia.helium.signal.ant.types;
 
 import java.util.ArrayList;
-import java.util.Vector;
 import java.util.List;
+import java.util.Vector;
+
 import org.apache.log4j.Logger;
 import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.BuildListener;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
-import org.apache.tools.ant.BuildListener;
 import org.apache.tools.ant.TaskContainer;
 import org.apache.tools.ant.types.DataType;
+
 import com.nokia.helium.signal.Notifier;
 
 /**
@@ -57,9 +59,17 @@ public class ExecuteTaskNotifier extends DataType implements Notifier,
     private Logger log = Logger.getLogger(ExecuteTaskNotifier.class);
     private List<Task> tasks = new ArrayList<Task>();
 
+    /**
+     * Method executes a series of given tasks on raising of the specified signal.
+     * 
+     * @param signalName is the name of the signal that has been raised.
+     * @param failStatus indicates whether to fail the build or not
+     * @param notifierInput contains signal notifier info
+     * @param message is the message from the signal that has been raised.           
+     */
     @SuppressWarnings("unchecked")
     public void sendData(String signalName, boolean failStatus,
-            NotifierInput notifierInput) {
+            NotifierInput notifierInput, String message ) {
         try {
             // Configure the project
             Project prj = getProject().createSubProject();
@@ -73,6 +83,7 @@ public class ExecuteTaskNotifier extends DataType implements Notifier,
             
             prj.setProperty("signal.name", signalName);
             prj.setProperty("signal.status", "" + failStatus);
+            prj.setProperty("signal.message", message );
             // Converting the list of inputs into a string.
             String inputs = "";
             if (notifierInput != null) {
@@ -85,7 +96,8 @@ public class ExecuteTaskNotifier extends DataType implements Notifier,
                 task.perform();
             }
         } catch (BuildException e) {
-            log.debug(e);
+            // We are Ignoring the errors as no need to fail the build.
+            log.debug(e.toString(), e);
         }
     }
 

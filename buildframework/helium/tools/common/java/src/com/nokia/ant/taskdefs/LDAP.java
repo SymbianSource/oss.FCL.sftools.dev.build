@@ -35,6 +35,7 @@ public class LDAP extends Task
     private String filter;
     private String key;
     private String property;
+    
         
     public void execute()
     {
@@ -72,7 +73,12 @@ public class LDAP extends Task
         } 
         catch (NamingException exc) 
         {
-            throw new BuildException(exc);
+            throw new BuildException(exc.getMessage());
+        }
+        catch (NullPointerException e) 
+        {
+            // As uer will not get affected due to this error not failing build.
+            log("Not able to retrive LDAP information for " + filter);
         }
     }
 

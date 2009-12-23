@@ -25,9 +25,17 @@ Description:
 	<systemModel>
 	 	<layer name="ats_test_layer">
 			<module name="mod_tsrc_test">
-				<unit unitID="sortutil_api" name="sortutilapi" bldFile="\s60\test_nested\tsrc\group" mrp="" />
+				
+			<!--STIF-->	 <unit unitID="phonebookengines" name="sortutilapi" bldFile="\sf\app\contacts\phonebookengines\VirtualPhonebook\tsrc\T_VPbkCntModel_CContact\group" mrp="" />
+			<!--EUNIT--> <!--unit unitID="mmccsubcontroller" name="sortutilapi" bldFile="\sf\mw\ipappsrv\multimediacommscontroller\mmccsubcontroller\tsrc\ut_rtpmediaclock\group" mrp="" /-->
+				
 			</module>
 	 	</layer>
+	 	<!--<layer name="qt_unit_test_layer">
+			<module name="mod_qt_test">
+				<unit unitID="qttestee" name="qttestee" bldFile="\s60\qt\unit" filter="" mrp=""/>
+			</module>
+	 	</layer> -->
 	</systemModel>
     <build>
         <option name="KEEPGOING" abldOption="-keepgoing" description="Causes make to keepgoing on errors" enable="Y"/>

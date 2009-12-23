@@ -49,6 +49,13 @@ class APIDeltaWriter(object):
         old_project_names = set([project[0].text for project in old_db.findall('/project')])
         new_project_names = set([project[0].text for project in new_db.findall('/project')])
         
+        dict_old_taskdef_names  = {}
+        dict_new_taskdef_names  = {}
+        for taskdef in old_db.findall('/project/taskdef'):
+            dict_old_taskdef_names[taskdef[0].text] = taskdef[1].text
+        for taskdef in new_db.findall('/project/taskdef'):
+            dict_new_taskdef_names[taskdef[0].text] = taskdef[1].text
+
         projects_removed = old_project_names.difference(new_project_names)
         for project in projects_removed:
             project_element = etree.SubElement(root, 'project', attrib={'state': 'removed'})
@@ -84,6 +91,17 @@ class APIDeltaWriter(object):
         for target in targets_added:
             target_element = etree.SubElement(root, 'target', attrib={'state': 'added'})
             target_element.text = target
+
+        taskdefs_removed = set(dict_old_taskdef_names.keys()) - set(dict_new_taskdef_names.keys()) 
+        for taskdefKey in taskdefs_removed:
+            taskdef_element = etree.SubElement(root, 'taskdef', attrib={'state': 'removed'})
+            taskdef_element.text = taskdefKey
+            taskdef_element.attrib['classname'] =  dict_old_taskdef_names[taskdefKey]
+        taskdefs_added = set(dict_new_taskdef_names.keys()) - set(dict_old_taskdef_names.keys())
+        for taskdefKey in taskdefs_added:
+            taskdef_element = etree.SubElement(root, 'taskdef', attrib={'state': 'added'})
+            taskdef_element.text = taskdefKey
+            taskdef_element.attrib['classname'] =  dict_new_taskdef_names[taskdefKey]
             
         etree.dump(root)
         tree = etree.ElementTree(root)

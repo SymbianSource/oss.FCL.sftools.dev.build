@@ -68,15 +68,12 @@ public class TemplateProcessor {
                 }
             }
         } catch (java.io.IOException e) {
-            log.warn("I/O Error during template conversion: " + e.getMessage());
             throw new TemplateProcessorException(
                     "I/O Error during template conversion: " + e.getMessage());
         } catch (org.xml.sax.SAXException e1) {
-            log.warn("XML parser error: " + e1);
             throw new TemplateProcessorException("XML parser error: "
                     + e1.getMessage());
         } catch (javax.xml.parsers.ParserConfigurationException e3) {
-            log.warn("Parser error: " + e3);
             throw new TemplateProcessorException("Parser error: "
                     + e3.getMessage());
         }
@@ -111,7 +108,6 @@ public class TemplateProcessor {
             convertTemplate(templateFile.getParent(), templateFile.getName(),
                     outputFile.toString(), sourceList);
         } else {
-            log.error("Template file is not defined.");
             throw new TemplateProcessorException("Template file not defined.");
         }
     }
@@ -145,16 +141,10 @@ public class TemplateProcessor {
                         .debug("diamonds:TemplateProcessor:adding template directory loader: "
                                 + templateDir);
             } catch (java.io.IOException ie) {
-                log.debug("Template directory configuring error.");
-                log.info("Template directory configuring error.");
                 throw new TemplateProcessorException(
                         "Template directory configuring error: " + ie);
             }
         } else {
-            log.debug("Template directory does not exist: "
-                    + templateDirFile.getAbsolutePath());
-            log.info("Template directory does not exist: "
-                    + templateDirFile.getAbsolutePath());
             throw new TemplateProcessorException(
                     "Template directory does not exist: "
                             + templateDirFile.getAbsolutePath());
@@ -164,14 +154,11 @@ public class TemplateProcessor {
             Map<String, Object> templateMap = getTemplateMap(sourceList);
             template.process(templateMap, new FileWriter(outputFile));
         } catch (freemarker.core.InvalidReferenceException ivx) {
-            log.warn("Invalid reference in configuration: ", ivx);
             throw new TemplateProcessorException(
                     "Invalid reference in config: " + ivx);
         } catch (freemarker.template.TemplateException e2) {
-            log.warn("TemplateException: ", e2);
             throw new TemplateProcessorException("TemplateException: " + e2);
         } catch (java.io.IOException e) {
-            log.warn("I/O Error during template conversion: " + e.getMessage());
             throw new TemplateProcessorException(
                     "I/O Error during template conversion: " + e);
         }

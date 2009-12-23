@@ -205,6 +205,8 @@ class FileScanner(AbstractScanner):
         LOGGER.debug('Scanning sub-root directories')
         for root_dir in self.find_subroots():
             for dirpath, subdirs, files in os.walk(unicode(root_dir)):
+                # Let's save the len before it's getting modified.
+                subdirsLen = len(subdirs)
                 subroot = dirpath[len(self.root_dir):]
 
                 dirs_to_remove = []
@@ -226,7 +228,8 @@ class FileScanner(AbstractScanner):
                 LOGGER.debug('Checking for empty directory: ' + dirpath)
                 # Check for including empty directories
                 if self.is_included(subroot) and not self.is_excluded(subroot):
-                    if len(files) == 0 and len(subdirs) == 0:
+                    if len(files) == 0 and subdirsLen == 0:
+                        LOGGER.debug('Including empty dir: ' + dirpath)
                         yield dirpath
                     
 
@@ -334,7 +337,14 @@ def rmtree(rootdir):
             remove(path)
         else:
             fcn(path)
-    return shutil.rmtree(rootdir, onerror=cb_handle_error)
+    
+    if 'java' in sys.platform:
+        import java.io
+        import org.apache.commons.io.FileUtils
+        f = java.io.File(rootdir)
+        org.apache.commons.io.FileUtils.deleteDirectory(f)
+    else:
+        return shutil.rmtree(rootdir, onerror=cb_handle_error)
 
 def destinsrc(src, dst):
     """ Fixed version of destinscr, that doesn't match dst with same root name."""
@@ -481,7 +491,9 @@ def read_symbian_policy_content(filename):
             match = re.match(r'^Category\s+([A-Z])\s*$', line, re.M|re.DOTALL)
             if match != None:
                 value = match.group(1)
+                fileh.close()
                 return value
+        fileh.close()
         if match == None:
             error = "Content of '%s' doesn't match r'^Category\s+([A-Z])\s*$'." % filename
     except Exception, exc:

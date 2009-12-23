@@ -17,8 +17,6 @@
 #Description:
 #===============================================================================
 
-"""
-"""
 import unittest
 import logging
 import StringIO

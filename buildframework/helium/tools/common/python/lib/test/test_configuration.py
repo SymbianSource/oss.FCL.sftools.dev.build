@@ -22,8 +22,7 @@ import StringIO
 import unittest
 import os
 import tempfile
-from path import path
-
+import sys
 import configuration
 
 _logger = logging.getLogger('test.configuration')
@@ -32,7 +31,7 @@ logging.basicConfig(level=logging.INFO)
 class NestedConfigurationBuilderTest(unittest.TestCase):
     def setUp(self):
         """ Setup. """
-        config_file = open('tests/data/config_test.cfg.xml', 'r')
+        config_file = open(os.path.join(os.environ['HELIUM_HOME'], 'tests/data/config_test.cfg.xml'), 'r')
         self._builder = configuration.NestedConfigurationBuilder(config_file)
         
     def test_config_parsing(self):
@@ -77,8 +76,8 @@ class NestedConfigurationBuilderTest(unittest.TestCase):
     def test_parent_interpolated_by_child(self):
         """ A child value can be interpolated into a parent template. """
         configs = self._builder.getConfigurations()
-        parent_config = configs[6]
-        child_config = configs[5]
+        parent_config = configs[5]
+        child_config = configs[6]
         assert parent_config['template'] == 'value -> from parent'
         assert child_config['template'] == 'value -> from child'
      
@@ -240,50 +239,45 @@ class PropertiesConfigurationTest(unittest.TestCase):
     """ Test plain text configuration files. """
     def test_text_config(self):
         """ Basic text properties can be read. """
-        config = configuration.PropertiesConfiguration(open('tests/data/ant_config_test.txt', 'r'))
+        config = configuration.PropertiesConfiguration(open(os.path.join(os.environ['HELIUM_HOME'], 'tests/data/ant_config_test.txt'), 'r'))
         
         assert config['text.a'] == 'text.value.A'
         assert config['text.b'] == 'text.value.B'
 
     def test_text_config_store(self):
         """ Basic text properties can be read. """
-        config = configuration.PropertiesConfiguration(open('tests/data/ant_config_test.txt', 'r'))
+        config = configuration.PropertiesConfiguration(open(os.path.join(os.environ['HELIUM_HOME'], 'tests/data/ant_config_test.txt'), 'r'))
 
         config['foo'] = "bar"
         
-        config.store(open('build/test.ini', "w+"))
-        config = configuration.PropertiesConfiguration(open('build/test.ini', 'r'))
+        config.store(open(os.path.join(os.environ['HELIUM_HOME'], 'build/test.ini'), "w+"))
+        config = configuration.PropertiesConfiguration(open(os.path.join(os.environ['HELIUM_HOME'], 'build/test.ini'), 'r'))
         
         assert config['text.a'] == 'text.value.A'
         assert config['text.b'] == 'text.value.B'
         assert config['foo'] == 'bar'
         
         
+if 'java' not in sys.platform:
+    class XMLConfigurationTest(unittest.TestCase):
+        """ Test XML format configuration files. """
         
-class XMLConfigurationTest(unittest.TestCase):
-    """ Test XML format configuration files. """
-    
-    def test_single_node_xml(self):
-        """ Properties can be read from 1 level of XML sub-elements. """
-        config = configuration.XMLConfiguration(open('tests/data/ant_config_test.xml', 'r'))
+        def test_single_node_xml(self):
+            """ Properties can be read from 1 level of XML sub-elements. """
+            config = configuration.XMLConfiguration(open(os.path.join(os.environ['HELIUM_HOME'], 'tests/data/ant_config_test.xml'), 'r'))
+            
+            assert config['foo'] == 'bar'
+            assert config['interpolated'] == 'foo value = bar'
+            
+        def test_nested_node_xml(self):
+            """ Properties can be read from multiple levels of XML sub-elements. """
+            config = configuration.XMLConfiguration(open(os.path.join(os.environ['HELIUM_HOME'], 'tests/data/ant_config_test.xml'), 'r'))
+            
+            assert config['xml.c'] == 'C'
+            
+        def test_xml_list(self):
+            """ Multiple XML elements can be read as a list. """
+            config = configuration.XMLConfiguration(open(os.path.join(os.environ['HELIUM_HOME'], 'tests/data/ant_config_test.xml'), 'r'))
+            
+            assert config['array.value'] == 'one,two,three'
         
-        assert config['foo'] == 'bar'
-        assert config['interpolated'] == 'foo value = bar'
-        
-    def test_nested_node_xml(self):
-        """ Properties can be read from multiple levels of XML sub-elements. """
-        config = configuration.XMLConfiguration(open('tests/data/ant_config_test.xml', 'r'))
-        
-        assert config['xml.c'] == 'C'
-        
-    def test_xml_list(self):
-        """ Multiple XML elements can be read as a list. """
-        config = configuration.XMLConfiguration(open('tests/data/ant_config_test.xml', 'r'))
-        
-        assert config['array.value'] == 'one,two,three'
-        
-        
-
-
-
-

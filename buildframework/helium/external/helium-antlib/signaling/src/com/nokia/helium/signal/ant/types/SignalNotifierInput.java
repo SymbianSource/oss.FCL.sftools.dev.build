@@ -23,8 +23,6 @@ import java.util.Vector;
 
 import org.apache.tools.ant.types.DataType;
 
-import org.apache.log4j.Logger;
-
 import org.apache.tools.ant.BuildException;
 
 
@@ -41,8 +39,6 @@ public class SignalNotifierInput extends DataType
     private Vector<SignalInput> signalInputs = new Vector<SignalInput>();
 
     private Vector<NotifierInput> notifierInputList = new Vector<NotifierInput>();
-
-    private Logger log = Logger.getLogger(SignalInput.class);
 
     /**
      * Helper function called by ant to create a new notifier for

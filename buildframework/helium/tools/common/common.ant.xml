@@ -113,15 +113,20 @@ Helium version ${helium.version}
     </target>
 
     <!-- Finds the build manager's (current user) email address from their username. -->
-    <target name="lookup-email" if="email.ldap.server">
+    <target name="lookup-email" >
         <if>
-            <not>
-                <isset property="email.from"/>
-            </not>
+            <isset property="email.ldap.server"/>
             <then>
-                <hlm:ldap url="${email.ldap.server}" rootdn="${email.ldap.rootdn}" filter="uid=${env.USERNAME}" outputproperty="email.from" key="mail"/>
-            </then>
-        </if>
+                <if>
+                    <not>
+                        <isset property="email.from"/>
+                    </not>
+                    <then>
+                        <hlm:ldap url="${email.ldap.server}" rootdn="${email.ldap.rootdn}" filter="uid=${env.USERNAME}" outputproperty="email.from" key="mail"/>
+                    </then>
+                </if>
+            </then>   
+        </if>        
     </target>
     
     <!-- To authenticate the noe password (read from .netrc file) for ${env.USERNAME}. -->
@@ -203,9 +208,9 @@ Helium version ${helium.version}
     A <tt>target</tt> property should be defined on the command line to specify which target's dependencies to analyse. -->
     <target name="execlist">
         <fail unless="target" message="target property not defined" />
-        <record name="execlist.txt" action="start" emacsmode="true"/>
+        <hlm:record name="execlist.txt" action="start" emacsmode="true"/>
         <hlm:dependencies target="${target}" format="executable"/>
-        <record name="execlist.txt" action="stop"/>
+        <hlm:record name="execlist.txt" action="stop"/>
         <exec executable="notepad.exe">
             <arg value="execlist.txt"/>
         </exec>

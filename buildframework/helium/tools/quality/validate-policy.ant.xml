@@ -25,8 +25,8 @@ Description:
     Policy file validation.
     </description>
 
-    <property name="validate.policy.log" location="${build.log.dir}/${build.id}_validate-policy.summary.xml" />
-    <property name="validate.policy.log.xml" location="${build.log.dir}/${build.id}_validate-policy.log.xml" />
+    <property name="validate.policy.log" location="${temp.build.dir}/${build.id}_validate-policy.summary.xml" />
+    <property name="validate.policy.log.xml" location="${temp.build.dir}/${build.id}_validate-policy.log.xml" />
     <property name="validate.policy.csv" location="${helium.dir}/tests/minibuilds/compile/distribution.policy.extended_for_sf.id_status.csv" />
     <property name="validate.policy.ignoreroot" value="false" />
     <property name="validate.policy.pattern" value="distribution.policy.s60,distribution.policy" />
@@ -109,6 +109,7 @@ if output is not None:
   -->
     <target name="integration-validate-policy">
         <mkdir dir="${build.log.dir}"/>
+        <mkdir dir="${post.log.dir}"/>
         <hlm:validatePolicyMacro output="${validate.policy.log}" ids="${validate.policy.csv}" ignoreroot="${validate.policy.ignoreroot}" pattern="${validate.policy.pattern}">
             <path refid="reference.policy.path.list" />
         </hlm:validatePolicyMacro>
@@ -117,7 +118,7 @@ if output is not None:
                 <fileset casesensitive="false" file="${validate.policy.log}/" />
             </hlm:policymetadatainput>
         </hlm:metadatarecord>
-        <hlm:generateBuildStatus file="${build.id}_validate_policy.log" />
+        <hlm:generateBuildStatus file="${build.id}_validate-policy.summary" />
     </target>
 
     <!--
@@ -129,7 +130,7 @@ if output is not None:
                 <istrue value="${metadata.enable}" />
             </not>
             <then>
-                <fmpp sourceFile="${helium.dir}/tools/common/templates/integration/validate-policy.log.ftl" outputFile="${build.log.dir}/${build.id}_validate-policy.log">
+                <fmpp sourceFile="${helium.dir}/tools/common/templates/integration/validate-policy.log.ftl" outputFile="${post.log.dir}/${build.id}_validate-policy.log">
                     <freemarkerLinks expandProperties="yes">
                       macro: ${helium.dir}/tools/common/templates/macro
                   </freemarkerLinks>
@@ -167,12 +168,9 @@ if output is not None:
       Internal target that set an intermediate property to disable policy validation execution.
     -->
     <target name="ido-validate-policy-skip">
-        <if>
+        <condition property="do.skip.policy-validation" value="1">
             <istrue value="${skip.policy-validation}"/>
-            <then>
-                <property name="do.skip.policy-validation" value="1"/>
-            </then>
-        </if>
+        </condition>
     </target>
     
     <!-- Policy validation target for IDO. Only detected ADO will get scanned. -->    

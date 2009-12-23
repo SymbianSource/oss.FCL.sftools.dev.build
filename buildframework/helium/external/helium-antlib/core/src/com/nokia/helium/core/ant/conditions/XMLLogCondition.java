@@ -87,8 +87,7 @@ public class XMLLogCondition extends ConditionType {
         if (severity == null)
             throw new BuildException("'severity' attribute is not defined");
 
-        this.log("Looking for severity '" + severity + "' under '"
-                + fileName.getAbsolutePath() + "'");
+        //this.log("Looking for severity '" + severity + "' under '" + fileName.getAbsolutePath() + "'");
         SAXParserFactory factory = SAXParserFactory.newInstance();
         try {
             SAXParser saxParser = factory.newSAXParser();

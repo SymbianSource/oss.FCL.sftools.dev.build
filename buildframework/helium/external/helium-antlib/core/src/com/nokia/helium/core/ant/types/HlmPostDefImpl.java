@@ -35,6 +35,6 @@ public class HlmPostDefImpl extends DataType implements HlmDefinition {
      * Do nothing.
      */
     public void execute(Project prj, String module, String[] targetNames) {
-        log.debug("HlmPostDefImpl:execute:" + module);
+        // Empty method. Implemented by extending classes.
     }
 }

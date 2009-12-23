@@ -29,7 +29,7 @@ Description:
         <set name="temp.build.dir" value="${env.TEMP}"/>
         <set name="name" value="helium_${helium.version}_subcon"/>
         <set name="include" value="helium/**/*"/>
-        <set name="exclude" value="helium/**/.svn,helium/build/**/*,helium/**/*.pyc,helium/**/*.pyo,helium/**/distribution.policy.s60,helium/**/hlm_debug.log"/>
+        <set name="exclude" value="helium/**/.svn,helium/build/**/*,helium/**/*.pyc,helium/**/*.pyo,helium/**/distribution.policy.s60,helium/**/hlm_debug.log,helium/tools/common/python/**/*.class"/>
         <set name="distribution.policy.s60" value="7"/>
         <set name="ignore.missing.policyfiles" value="true"/>
 

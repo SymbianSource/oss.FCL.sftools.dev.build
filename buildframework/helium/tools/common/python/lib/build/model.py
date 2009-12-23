@@ -23,10 +23,7 @@ import itertools
 import logging
 import re
 import os
-
-from amara import bindery
 import amara
-
 import ccm
 import ccm.extra
 import configuration
@@ -59,47 +56,20 @@ class SessionCreator(object):
 
 class BOM(object):
     """ The Bill of Materials for a build. """
-    def __init__(self, config, ccm_project=None, username=None, password=None, provider=None):
+    def __init__(self, config):
         """ Initialization.
         
         :param config: The build configuration properties.
         :param ccm_project: The Synergy project used for reading the BOM.
         """
         self.config = config
-        self._sessioncreator = SessionCreator(username=username, password=password, provider=provider)
-        self.ccm_project = ccm_project
         self.build = ""
         self._projects = []
-        if self.ccm_project != None: 
-            self._projects = [Project(ccm_project, config)]
         self._icd_icfs = []
         self._flags = []
         
-        self._capture_projects()
         self._capture_icd_icfs()
         self._capture_flags()
-    
-    def _capture_projects(self):
-        # grab data from new format of delivery.xml
-        configBuilder = configuration.NestedConfigurationBuilder(open(self.config['delivery'], 'r'))
-        for config in configBuilder.getConfiguration().getConfigurations():            
-            _logger.debug('Importing project %s from delivery config.' % str(config.name))            
-            ccm_project = self._sessioncreator.session(config['database']).create(config.name)
-            project = Project(self.__find_project(ccm_project, config), config)
-            self._projects.append(project)
-
-    def __find_project(self, project, config):
-        if (os.path.exists(os.path.join(config['dir'], project.name, "project.version"))):
-            return project
-        
-        path = os.path.join(config['dir'], project.name, project.name)
-        if (not os.path.exists(path)):
-            return project
-        try:
-            result = project.session.get_workarea_info(path)
-            return result['project']           
-        except ccm.CCMException:            
-            return project
         
     def _capture_icd_icfs(self):
         prep_xml_path = self.config['prep.xml']
@@ -153,6 +123,57 @@ class BOM(object):
             
     def __str__(self):
         return str(self._projects)
+
+class SimpleProject(object):
+    def __init__(self, tasks):
+        self.tasks = tasks
+        self.folders = []
+
+class SimpleBOM(BOM):
+    def __init__(self, config, bomxml):
+        BOM.__init__(self, config)
+        self._baselines = {}
+        bom = amara.parse(open(bomxml))
+        for p in bom.bom.content.project:
+            tasks = []
+            self._baselines[str(p.baseline)] = {}
+            for t in p.task:
+                tasks.append(str(t.id) + ': ' + str(t.synopsis))
+            self._projects.append(SimpleProject(tasks))
+    
+    def all_baselines(self):
+        return self._baselines
+
+class SynergyBOM(BOM):
+    def __init__(self, config, ccm_project=None, username=None, password=None, provider=None):
+        BOM.__init__(self, config)
+        self._sessioncreator = SessionCreator(username=username, password=password, provider=provider)
+        self.ccm_project = ccm_project
+        if self.ccm_project != None: 
+            self._projects = [Project(ccm_project, config)]
+        self._capture_projects()
+            
+    def __find_project(self, project, config):
+        if (os.path.exists(os.path.join(config['dir'], project.name, "project.version"))):
+            return project
+        
+        path = os.path.join(config['dir'], project.name, project.name)
+        if (not os.path.exists(path)):
+            return project
+        try:
+            result = project.session.get_workarea_info(path)
+            return result['project']           
+        except ccm.CCMException:            
+            return project
+            
+    def _capture_projects(self):
+        # grab data from new format of delivery.xml
+        configBuilder = configuration.NestedConfigurationBuilder(open(self.config['delivery'], 'r'))
+        for config in configBuilder.getConfiguration().getConfigurations():            
+            _logger.debug('Importing project %s from delivery config.' % str(config.name))            
+            ccm_project = self._sessioncreator.session(config['database']).create(config.name)
+            project = Project(self.__find_project(ccm_project, config), config)
+            self._projects.append(project)
         
     def close(self):
         self._sessioncreator.close()
@@ -182,7 +203,7 @@ class Project(object):
         if bproject != None:        
             self._baselines[unicode(bproject)] = {u'overridden':u'true'}
             # This section finds the baselines of all of the checked out projects
-            if project_status == "prep" or project_status == "working":
+            if project_status == "prep" or project_status == "working" or project_status == "shared":
                 for subproject in self._ccm_project.subprojects:
                     overridden = u'false'
                     subprojbaseline = subproject.baseline
@@ -239,7 +260,7 @@ class Project(object):
         if project == None:
             return []
         project_status = project['status']
-        if project_status == "prep" or project_status == "working":
+        if project_status == "prep" or project_status == "working" or project_status == "shared":
             result = [project]
             baseline = project.baseline
             if baseline != None:
@@ -597,18 +618,19 @@ class BOMXMLWriter(object):
                     fix_node = doc.xml_create_element(u'fix', content=(unicode(task)), attributes = {u'type': unicode(fix.__class__.__name__)})
                     project_node.xml_append(fix_node)
 
-        # Add ICD info to BOM
-        doc.bom.content.xml_append(doc.xml_create_element(u'input'))
-
-        # Add default values to unused fields so icds are visible in the BOM
-        empty_bom_str = u'N/A'
-        empty_bom_tm = u'0'
-        doc.bom.content.input.xml_append(doc.xml_create_element(u'name', content=(unicode(empty_bom_str))))
-        doc.bom.content.input.xml_append(doc.xml_create_element(u'year', content=(unicode(empty_bom_tm))))
-        doc.bom.content.input.xml_append(doc.xml_create_element(u'week', content=(unicode(empty_bom_tm))))
-        doc.bom.content.input.xml_append(doc.xml_create_element(u'version', content=(unicode(empty_bom_str))))
-
-        doc.bom.content.input.xml_append(doc.xml_create_element(u'icds'))
+        if self._bom._icd_icfs != []:
+            # Add ICD info to BOM
+            doc.bom.content.xml_append(doc.xml_create_element(u'input'))
+    
+            # Add default values to unused fields so icds are visible in the BOM
+            empty_bom_str = u'N/A'
+            empty_bom_tm = u'0'
+            doc.bom.content.input.xml_append(doc.xml_create_element(u'name', content=(unicode(empty_bom_str))))
+            doc.bom.content.input.xml_append(doc.xml_create_element(u'year', content=(unicode(empty_bom_tm))))
+            doc.bom.content.input.xml_append(doc.xml_create_element(u'week', content=(unicode(empty_bom_tm))))
+            doc.bom.content.input.xml_append(doc.xml_create_element(u'version', content=(unicode(empty_bom_str))))
+    
+            doc.bom.content.input.xml_append(doc.xml_create_element(u'icds'))
 
         # pylint: disable-msg=R0914
         for i, icd in enumerate(self._bom._icd_icfs):
@@ -631,6 +653,12 @@ class BOMXMLWriter(object):
             else:
                 s60_year = u'0'
                 s60_week = u'0'
+                if s60_version == None:
+                    res = re.match(r'.*\.(.*)_(\d{4})(\d{2})_(.*)', release)
+                    if res != None:
+                        s60_release = res.group(1) + '_' + res.group(4)
+                        s60_year = res.group(2)
+                        s60_week = res.group(3)
             s60_input_node.xml_append(doc.xml_create_element(u'name', content=(unicode("s60"))))
             s60_input_node.xml_append(doc.xml_create_element(u'year', content=(unicode(s60_year))))
             s60_input_node.xml_append(doc.xml_create_element(u'week', content=(unicode(s60_week))))

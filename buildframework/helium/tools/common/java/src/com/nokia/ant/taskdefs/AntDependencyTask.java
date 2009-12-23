@@ -39,7 +39,7 @@ public class AntDependencyTask extends Task
 {
     private ArrayList antFileSetList = new ArrayList();
     private String outputFile;
-
+    
     public AntDependencyTask()
     {
         setTaskName("AntDependencyTask");
@@ -87,10 +87,13 @@ public class AntDependencyTask extends Task
                     if (jar.getJarEntry(name) != null)
                         return fileName;
                 }
-                catch (IOException e) { e.printStackTrace(); }
+                catch (IOException e) { 
+                    // We are Ignoring the errors as no need to fail the build.
+                    log(e.getMessage(), Project.MSG_DEBUG);
+                }
             }
         }
-        log(name + " not found");
+        log(name + " not found", Project.MSG_DEBUG);
         return null;
     }
     
@@ -116,7 +119,8 @@ public class AntDependencyTask extends Task
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            // We are Ignoring the errors as no need to fail the build.
+            log("Not able to get the JAR file attribute information. " + e.getMessage(), Project.MSG_DEBUG);
         }
         return null;
     }
@@ -160,7 +164,10 @@ public class AntDependencyTask extends Task
                         vendor = "";
                     classlist.add(name + " [style=filled,shape=record,label=\"" + nameandversion + "|" + vendor + "\"];");
                 }
-                catch (IOException e) { e.printStackTrace(); }
+                catch (IOException e) { 
+                    // We are Ignoring the errors as no need to fail the build.
+                    e.printStackTrace(); 
+                }
             }
         }
 
@@ -176,15 +183,14 @@ public class AntDependencyTask extends Task
             if (entry != null)
             {
               /**/
-                System.out.println(name);
-            
+                log("File in " + name + " in jar file ", Project.MSG_DEBUG);
                 byte[] data = new byte[1024];
                 jar.getInputStream(entry).read(data);
                 for (String line : new String(data).split("\n"))
                 {
                     if (line.contains("License") || line.contains("LICENSE ") || line.contains("Copyright"))
                     {
-                        System.out.println(line.replace("*", "").trim());
+                        log("Replace License information with * " + line.replace("*", "").trim(), Project.MSG_INFO);
                         break;
                     }
                 }
@@ -216,7 +222,6 @@ public class AntDependencyTask extends Task
                                 url = new URL(mavenUrl + filename + "maven-metadata.xml");
                                 connection = (HttpURLConnection) url.openConnection();
                             }
-                            //System.out.println(url);
                             if (connection.getResponseCode() == HttpURLConnection.HTTP_OK)
                             {   
                                 
@@ -232,7 +237,6 @@ public class AntDependencyTask extends Task
                                 {
                                     String version = ((Element)tmpversion).getText();
                                     URL url2 = new URL(mavenUrl + specialfilename + "/" + version + "/" + end + "-" + version + ".pom");
-                                    //System.out.println(url2);
                                     HttpURLConnection connection2 = (HttpURLConnection) url2.openConnection();
                                     if (connection2.getResponseCode() == HttpURLConnection.HTTP_OK)
                                     {
@@ -249,9 +253,6 @@ public class AntDependencyTask extends Task
                                         String license = antDoc2.valueOf("/project/licenses/license/name");
                                         if (!license.equals(""))
                                         {
-                                            System.out.println(name);
-                                            //System.out.println(antDoc2.valueOf("/project/name"));
-                                            System.out.println(license);
                                             found = true;
                                             break;
                                         }
@@ -264,10 +265,13 @@ public class AntDependencyTask extends Task
                     
                 }
                 if (!found)
-                    System.out.println(name + " not found");
+                    log(name + " not found in " + jar, Project.MSG_INFO);
             }
         }
-        catch (Exception e) { e.printStackTrace(); }
+        catch (Exception e) {
+            // We are Ignoring the errors as no need to fail the build.
+            e.printStackTrace(); 
+        }
     }
     
     public boolean digitInString(String s) {
@@ -328,7 +332,9 @@ public class AntDependencyTask extends Task
                 output.write(value + "\n");
             
             output.close();
-        } catch (Exception e) { e.printStackTrace();
+        } catch (Exception e) {
+            // We are Ignoring the errors as no need to fail the build.
+            log("Exception occured while getting the ANT task dependency information. " + e.getMessage(), Project.MSG_DEBUG);
         }
     }
 

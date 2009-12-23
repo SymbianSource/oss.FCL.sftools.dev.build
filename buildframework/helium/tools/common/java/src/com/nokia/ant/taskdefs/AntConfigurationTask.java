@@ -20,7 +20,6 @@ package com.nokia.ant.taskdefs;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
-
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.types.FileSet;
@@ -94,7 +93,6 @@ public class AntConfigurationTask extends Task
                 while (resourceIter.hasNext())
                 {
                     FileResource filepath = (FileResource) resourceIter.next();
-                    log(filepath.toString());
                     importFile(filepath.getFile());
                 }
             }
@@ -119,15 +117,12 @@ public class AntConfigurationTask extends Task
             while (keysIter.hasNext())
             {
                 String key = (String) keysIter.next();
-                log(key);
                 getProject().setProperty(key, config.getString(key));
             }
         }
         catch (ConfigurationException e)
         {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            throw new BuildException(e.getMessage());
+            throw new BuildException("Not able to import the ANT file " + e.getMessage());
         }
     }
 }

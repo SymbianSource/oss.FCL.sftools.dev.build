@@ -166,17 +166,13 @@ public class TargetDiamondsListener extends DiamondsListenerImpl {
                 }
             } else {
                 log
-                        .debug("diamonds:TargetDiamondsListener:sendTargetData: exists("
+                        .debug("sendTargetData: exists("
                                 + templateFile.getAbsolutePath() + ") => false");
 
             }
         } catch (com.nokia.helium.core.TemplateProcessorException e1) {
-            log.debug(
-                    "diamonds:TargetDiamondsListener:sendTargetData:exception",
-                    e1);
-            throw new DiamondsException(
-                    "template conversion error while sending data for target:"
-                            + target + ":" + e1.getMessage());
+            throw new DiamondsException("template conversion error while sending data for target:"
+                    + target + ":" + e1.getMessage());
         }
         File outputFile = new File(output);
         if (outputFile.exists()) {

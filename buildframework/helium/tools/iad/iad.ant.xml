@@ -21,7 +21,9 @@ Description:
 ============================================================================
 -->
 <project name="iad">
-    
+    <description>
+        Targets related to iad
+    </description>
     <!-- Target to generate IAD sis packages. -->
     <target name="makeiadsis">
         <echo message="Building IAD SIS packages"/>

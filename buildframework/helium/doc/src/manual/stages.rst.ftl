@@ -229,10 +229,25 @@ Stage: Source preparation
 
 The build preparation consists in two parts:
 
- * Getting delivery content (Synergy, zips...),
+ * Getting delivery content (SCM, zips...),
  * Preparing the build area.
 
-How to get delivery content from Synergy?
+To get SCM source you just have to run::
+
+  hlm prep-work-area
+
+To create 'build of materials'::
+
+  hlm create-bom
+
+Synergy
+-------
+
+In order for the synergy commands to be executed you must define the property ccm.enabled=true in one of the your config files or on the command line. e.g. 
+
+.. code-block:: xml
+
+    <property name="ccm.enabled" value="true" />
 
 It is possible to automatically get content from Synergy using the Helium framework.
 To handle that you have to configure the delivery.xml file from your family build configuration folder and reference by the property prep.delivery.file.
@@ -320,9 +335,23 @@ Update: define type of the spec as update and name as the project to update.
     The following properties are required:
         - database: the name of the synergy database you want to use.
 
-To get synergy source you just have to run::
+Mercurial
+---------
 
-  hlm prep-work-area
+Add to ant configuration:
+
+.. code-block:: xml
+
+    <target name="prep-work-area">
+        <hlm:scm scmUrl="scm:hg:C:/Build_C/master"> 
+            <hlm:checkout baseDir="${r'$'}{ccm.project.wa_path}/GraphicsDomain"/>
+            <hlm:changelog baseDir="${r'$'}{ccm.project.wa_path}/GraphicsDomain" xmlbom="${r'$'}{build.log.dir}/${r'$'}{build.id}_bom.xml" />
+        </hlm:scm>
+    </target>
+
+For more information see API_
+
+.. _API: ../helium-antlib/api/doclet/index.SCM.html
 
 .. index::
   single: Stage - Compilation
@@ -355,7 +384,7 @@ The steps to configure a Helium build for main compilation are as follows:
         <pathelement path="${r'$'}{build.drive}/mc/mc_build/${r'$'}{product.family}_build/4032_System_Definition.xml"/>
     </path>
     
-  The order of the files is significant. If building Symbian OS, the Symbian System Definition file must come first. Here both ``fileset`` and ``pathelement`` are used. ``pathelement`` selects just one file whereas a ``fileset`` can use wildcards to select multiple files or handle problems of filenames changing across different platform releases.
+The order of the files is significant. If building Symbian OS, the Symbian System Definition file must come first. Here both ``fileset`` and ``pathelement`` are used. ``pathelement`` selects just one file whereas a ``fileset`` can use wildcards to select multiple files or handle problems of filenames changing across different platform releases.
 
 2. Determine if an existing build configuration in any of the build model sections of the files are suitable for what needs to be built. A build configuration typically looks something like this:
 
@@ -377,7 +406,7 @@ The steps to configure a Helium build for main compilation are as follows:
          <task><buildLayer command="abld -check build" targetList="default" unitParallel="Y" targetParallel="Y"/></task>
     </configuration>
 
-  A ``unitListRef`` includes a ``unitList`` defined somewhere else as part of this configuration. The ``buildLayer`` elements define ``abld`` steps to run on each component. If an existing configuration is not sufficient a new one must be defined in a separate file (which should be included in the ``path`` type).
+A ``unitListRef`` includes a ``unitList`` defined somewhere else as part of this configuration. The ``buildLayer`` elements define ``abld`` steps to run on each component. If an existing configuration is not sufficient a new one must be defined in a separate file (which should be included in the ``path`` type).
 
 3. Define the ``sysdef.configurations`` Ant property to contain a comma-separated list of build configuration names that must match the ``name`` attribute of the ``configuration``. Each configuration will be built in turn in the ``compile-main`` Ant target.
 
@@ -465,6 +494,26 @@ The propertes are:
    "``name``", "The name of the .pkg file to parse.", ""
    "``sis.name``", "The name of the .sis file to create. If omitted it will default to the name of the .pkg file.", ""
    "``path``", "The path where the .pkg file exists as input to building the .sis file.", ""
+   
+Configuration enhancements
+::::::::::::::::::::::::::
+
+*Since Helium 7.0.*
+
+The configuration method above will be replaced by a more flexible approach:
+
+.. csv-table:: Property descriptions
+   :header: "Property", "Description", "Values"
+
+   "``makesis.tool``", "The path for the makesis tool that builds a .sis file.", ""
+   "``signsis.tool``", "The path for the signsis tool that signs a .sis file to create a .sisx file.", ""
+   "``build.sisfiles.dir``", "The directory where the .sis file should be put.", ""
+   "``key``", "The key to use for signing.", ""
+   "``cert``", "The certificate to use for signing.", ""
+   "``input``", "The full path and filename of the input file. This can be a .pkg file, for generating a SIS file, a .sis file for signing, or a .sisx file for multiple signing.", ""
+   "``output``", "The full path and filename of the output file. This is only needed if the location or name needs to be different from the default, which is that the file extension changes appropriately.", ""
+
+Also a ``sis.config.name`` property is added that allows the name of a <config> block to be supplied. This can be overridden to allow particular subsets of configurations to be built.
 
 Checking Stub SIS files
 -----------------------
@@ -522,7 +571,7 @@ The imakerconfigurationset supports imakerconfiguration nested elements.
 .. csv-table:: Ant properties to modify
    :header: "Attribute", "Description", "Values"
 
-   "``regionalVariation``", "Enable regional variation switching.", "false"
+   "``regionalVariation``", "Enable regional variation switching. - Deprecated (always false)", "false"
 
 The imakerconfiguration supports three sub-types:
 
@@ -537,62 +586,78 @@ The imakerconfiguration supports three sub-types:
 Example of configuration:
 
 .. code-block:: xml
-     
-    <hlm:imakerconfigurationset>
-        <imakerconfiguration regionalVariation="true">
-            <makefileset>
-                <include name="**/devlon52/*ui.mk"/>
-            </makefileset>
-            <targetset>
-                <include name="^core${r'$'}" />
-                <include name="langpack_\d+" />
-                <include name="^custvariant_.*${r'$'}" />
-                <include name="^udaerase${r'$'}" />
-            </targetset>
-            <variableset>
-                <variable name="TYPE" value="rnd"/>
-                <variable name="USE_FOTI" value="0"/>
-                <variable name="USE_FOTA" value="1"/>
-            </variableset>
-        </imakerconfiguration>
-    </hlm:imakerconfigurationset>
+
+   <hlm:imakerconfigurationset>
+      <hlm:imakerconfiguration regionalVariation="true">
+         <makefileset>
+            <include name="**/product_name/*ui.mk" />
+         </makefileset>
+         <targetset>
+            <include name="^core${r'$'}" />
+            <include name="langpack_\d+" />
+            <include name="^custvariant_.*${r'$'}" />
+            <include name="^udaerase${r'$'}" />
+         </targetset>
+         <variableset>
+            <variable name="USE_FOTI" value="0" />
+            <variable name="USE_FOTA" value="1" />
+            <variable name="TYPE" value="rnd" />
+         </variableset>
+      </hlm:imakerconfiguration>
+   </hlm:imakerconfigurationset>
+
+
+Other example using product list and variable group:
+
+.. code-block:: xml
+
+   <hlm:imakerconfigurationset>
+      <hlm:imakerconfiguration>
+         <hlm:product list="product_name" ui="true" failonerror="false" />
+         <targetset>
+            <include name="^core${r'$'}" />
+            <include name="langpack_\d+" />
+            <include name="^custvariant_.*${r'$'}" />
+            <include name="^udaerase${r'$'}" />
+         </targetset>
+         <variableset>
+            <variable name="USE_FOTI" value="0" />
+            <variable name="USE_FOTA" value="1" />
+         </variableset>
+         <variablegroup>
+            <variable name="TYPE" value="rnd" />
+         </variablegroup>
+         <variablegroup>
+            <variable name="TYPE" value="subcon" />
+         </variablegroup>
+         <variablegroup>
+            <variable name="TYPE" value="prd" />
+         </variablegroup>
+      </hlm:imakerconfiguration>
+   </hlm:imakerconfigurationset>
+
 
 .. index::
    single: The iMaker Task
 
-The imaker task
----------------
+How to configure the target
+---------------------------
 
-.. csv-table:: Ant properties to modify
-   :header: "Attribute", "Description", "Values"
-
-   "``executor``", "Name of the build system to be used.", "ebs, helium-ec and ec"
-   "``name``", "Log and intermediate file differentiator.", ""
-   "``signal``", "Enable/disable signaling mechanism.", "true, false"
-
-Example:
+The target can be configured by defining an hlm:imakerconfigurationset element with the '''imaker.rom.config''' reference.
 
 .. code-block:: xml
+    
+    <hlm:imakerconfigurationset id="imaker.rom.config">
+    ...
+    </hlm:imakerconfigurationset>
 
-    <hlm:imaker executor="${r'$'}{build.system}" name="build">
-        <hlm:imakerconfigurationset>
-            <imakerconfiguration regionalVariation="true">
-                <makefileset>
-                   <include name="**/devlon52/*ui.mk"/>
-                </makefileset>
-                <targetset>
-                   <include name="core"/>
-                   <include name="langpack_\d+"/>
-                   <exclude name="cus.*"/>
-                </targetset>
-                <variableset>
-                    <variable name="TYPE" value="rnd"/>
-                </variableset>
-            </imakerconfiguration>
-        </hlm:imakerconfigurationset>
-    </hlm:imaker>
-
-
+The other configurable element is the engine. The '''imaker.engine''' property defines the reference
+to the engine configuration to use for building the roms. Helium defines two engines by default:
+* imaker.engine.default: multithreaded engine (hlm:defaultEngine type)
+* imaker.engine.ec: ECA engine - cluster base execution (hlm:emakeEngine type)
+  
+If the property is not defined Helium will guess the best engine to used based on the build.system property.
+ 
 .. index::
   single: Legacy ROM creation
 
@@ -1224,35 +1289,58 @@ An incremental build will use a previous completed product build as a starting p
 Cenrep creation (S60 3.2.3 - 5.x)
 :::::::::::::::::::::::::::::::::
 <#if !(ant?keys?seq_contains("sf"))>
-See: http://s60wiki.nokia.com/S60Wiki/Central_Repository_Usage
+See: http://configurationtools.nmp.nokia.com/builds/cone/docs/cli/generate.html?highlight=generate
 </#if>
 
-The target ``configtool`` can be used to run the Configuration Tool.
+The target ``ido-gen-cenrep`` can be used to run the ConE Tool to generate cenreps.
 
-Currently supported Configuration Tool arguments are:
+* IDO can use the ido-gen-cenrep to generate the cenreps which are IDO specific.
+* We should pass the sysdef.configurations.list as parameter to ido-gen-cenrep target. Else it will use the defualt one of helium.
 
-command_line | name
+Example:
+:::::::::::::::::::::::::::::::::
 
--master_conf    :   master_conf
--confml         :   confml
--impl           :   impl
--iby            :   iby
--ignore_errors  :   keepgoing(true - uses -ignore_errors, otherwise not, setting 
-                    true generates cenrep incase of errors, and signals has to be configured to stop the build
-                    in case of errors).
-
-Default values are:
+Below example will generate the cenrep only for IDO specific confml files.
 
 .. code-block:: xml
 
-    <hlm:argSet id="cnftool.refid">
-        <hlm:arg name="path" value="${r'$'}{build.drive}/s60/tools/toolsextensions/configurationtool" />
-        <hlm:arg name="master_conf" value="s60.confml" />
-        <hlm:arg name="confml" value="\epoc32\rom\config\confml_data\s60" />
-        <hlm:arg name="impl" value="\epoc32\rom\config\confml_data\s60" />
-        <hlm:arg name="iby" value="\epoc32\rom\include\" />
-        <hlm:arg name="keepgoing" value="false" />
-    </hlm:argSet>
+    <target name="ido-generate-cenrep">
+        <antcall target="ido-gen-cenrep">
+            <param name="sysdef.configurations.list" value="dfs_build"/>    
+        </antcall>
+    </target>
+
+Below example will generate the cenreps for S60 SDK.
+
+.. code-block:: xml
+
+    <target name="generate-s60-cenrep">
+        <hlm:conEToolMacro>
+            <arg name="output" value="<Path to output log file>"/>
+            <arg name="path" value="build.drive/epoc32/tools/" />
+            <arg name="-v" value="5" />
+            <arg name="-p" value="\epoc32\rom\config" />
+            <arg name="-o" value="\epoc32\release\winscw\urel\z " />
+            <arg name="-c" value="s60_root.confml" />
+        </hlm:conEToolMacro>
+    </target>
+
+By using conEToolMacro you can pass any arguments which are mentioned in the above link.
+
+.. code-block:: xml
+
+    <target name="generate-s60-cenrep">
+        <hlm:conEToolMacro>
+            <arg name="output" value="<Path to output log file>"/>
+            <arg name="path" value="<path to cone.cmd file>" />
+            <arg name="-v" value="<verbose level 0 - NONE (all), 1- CRITICAL, 2- ERROR, 3- WARNING, 4- INFO, 5- DEBUG>" />
+            <arg name="-p" value="<path to root folder containing conml file>" />
+            <arg name="-o" value="<path to output folder on the SDK to generate output files.> " />
+            <arg name="-c" value="<confml file name>" />
+        </hlm:conEToolMacro>
+    </target>
+        
+After running this command generated file can be found from <temp.build.dir>/<build.id>_cenrep_includefile.txt
 
 
 Running individual build commands
@@ -1341,7 +1429,7 @@ Core and variant images are created automatically in product-build. They can als
 Variation (S60 3.2.3 - 5.x)
 ---------------------------
 
-See ../tutorials/imaker/iMakerUseCaseCustomerVariantConfml.html
+See http://delivery.nmp.nokia.com/trac/imaker/wiki/iMakerUseCaseCustomerVariantConfml
 
 Variation (S60 3.2)
 -------------------
@@ -1594,16 +1682,16 @@ The naming of the target follows this template: customer``customer.id````image.t
 
 
 .. index::
-  single: ATS3 - STIF, TEF, RTEST, MTF and EUnit
+  single: ATS - STIF, TEF, RTEST, MTF and EUnit
 
-.. _`Stage-ATS3-label`:
+.. _`Stage-ATS-label`:
 
-Stage: ATS3 - STIF, TEF, RTEST, MTF and EUnit (also Qt)
+Stage: ATS - STIF, TEF, RTEST, MTF and EUnit (also Qt)
 =======================================================
 
 ATS testing is the automatic testing of the phone code once it has been compiled and linked to create a ROM image.
 
-Explanation of the process for getting ATS3 (`STIF`_ and `EUnit`_) tests compiled and executed by Helium, through the use of the ``ats-test`` target.
+Explanation of the process for getting ATS (`STIF`_ and `EUnit`_) tests compiled and executed by Helium, through the use of the ``ats-test`` target.
 
 http://developer.symbian.org/wiki/index.php/Symbian_Test_Tools
 
@@ -1618,7 +1706,7 @@ Prerequisites
 ----------------
 
 * `Harmonized Test Interface (HTI)`_ needs to be compiled and into the image.
-* The reader is expected to already have a working ATS3 setup in which test cases can be executed.  ATS3 server names, 
+* The reader is expected to already have a working ATS setup in which test cases can be executed.  ATS server names, 
   access rights and authentication etc. is supposed to be already taken care of.
 
 <#if !(ant?keys?seq_contains("sf"))>
@@ -1672,7 +1760,7 @@ A template of layer in layers.sysdef.xml
 
 **STEP 2: Configure ATS properties in build.xml**
 
-**(A)** Username and Password for the ATS3 should be set in the `.netrc file`_
+**(A)** Username and Password for the ATS should be set in the `.netrc file`_
 
 .. code-block:: text
 
@@ -1698,14 +1786,14 @@ Add the above line in the .netrc file and replace *ats_user_name* with your real
     **eunitexerunner.flags**       [recommended]   Flags for EUnit exerunner can be set by setting the value of this variable. The default flags are set to "/E S60AppEnv /R Off".
     **ats.email.list**             [recommended]   The property is needed if you want to get an email from ATS server after the tests are executed. There can be one to many semicolon(s) ";" separated email addresses.
     **ats.flashfiles.minlimit**    [recommended]   Limit of minimum number of flash files to execute ats-test target, otherwise ATSDrop.zip will not be generated. Default value is "2" files.
-    **ats.plan.name**              [recommended]   Modify the plan name if you have understanding of test.xml file or leave it as it is. Deafault value is "plan".
+    **ats.plan.name**              [recommended]   Modify the plan name if you have understanding of test.xml file or leave it as it is. Default value is "plan".
     **ats.product.hwid**           [recommended]   Product HardWare ID (HWID) attached to ATS. By default the value of HWID is not set.
     **ats.script.type**            [recommended]   There are two types of ats script files to send drop to ATS server, "runx" and "import"; only difference is that with "import" ATS doesn't have to have access rights to testdrop.zip file, as it is sent to the system over http and import doesn't need network shares. If that is not needed "import" should not be used. Default value is "runx" as "import" involves heavy processing on ATS server.
     **ats.target.platform**        [recommended]   Sets target platform for compiling test components. Default value is "armv5 urel".
-    **ats.test.timeout**           [recommended]   To set test commands execution time limit on ATS3 server, in seconds. Default value is "60".
-    **ats.testrun.name**           [recommended]   Modify the test-run name if you have understanding of test.xml file or leave it as it is. Deafault value is a string consist of build id, product name, major and minor versions.
-    **ats.trace.enabled**          [recommended]   Should be "True" if tracing is needed during the tests running on ATS3. Deafault value is "False", the values are case-sensitive.
-    **ats.ctc.enabled**            [recommended]   Should be "True" if coverage measurement and dynamic analysis (CTC) tool support is to be used by ATS. Deafault value is "False", the values are case-sensitive.
+    **ats.test.timeout**           [recommended]   To set test commands execution time limit on ATS server, in seconds. Default value is "60".
+    **ats.testrun.name**           [recommended]   Modify the test-run name if you have understanding of test.xml file or leave it as it is. Default value is a string consist of build id, product name, major and minor versions.
+    **ats.trace.enabled**          [recommended]   Should be "True" if tracing is needed during the tests running on ATS. Default value is "False", the values are case-sensitive. See http://s60wiki.nokia.com/S60Wiki/CATS/TraceTools
+    **ats.ctc.enabled**            [recommended]   Should be "True" if coverage measurement and dynamic analysis (CTC) tool support is to be used by ATS. Default value is "False", the values are case-sensitive.
     **ats.ctc.host**               [recommended]   CTC host, provided by CATS used to create coverage measurement reports. MON.sym files are copied to this location, for example "10.0.0.1". If not given, code coverage reports are not created
     **ats.obey.pkgfiles.rule**     [recommended]   If the property is set to "True", then the only test components which will have PKG files, will be included into the test.xml as a test-set. Which means, even if there's a test component (executable) but there's no PKG file, it should not be considered as a test component and hence not included into the test.xml as a separate test. By default the property value is False.
     **reference.ats.flash.images** [recommended]   Fileset for list of flash images (can be .fpsx, .C00, .V01 etc) It is recommended to set the fileset, default filset is given below which can be overwritten. set *dir=""* attribute of the filset to "${r'$'}{build.output.dir}/variant_images" if "variant-image-creation" target is being used.
@@ -1713,7 +1801,9 @@ Add the above line in the .netrc file and replace *ats_user_name* with your real
     **tsrc.path.list**             [allowed]       Contains list of the tsrc directories. Gets the list from system definition layer files. Assuming that the test components are defined already in te layers.sysdef.xml files to get compiled. Not recommended, but the property value can be set if there are no system definition file(s), and tsrc directories paths to set manually.
     **ats.report.location**        [allowed]       Sets ATS reports store location. Default location is "${r'$'}{publish.dir}/${r'$'}{publish.subdir}".
     **ats.multiset.enabled**       [allowed]       Should be "True" so a set is used for each pkg file in a component, this allows tests to run in parallel on several devices.
-
+    **ats.diamonds.signal**        [allowed]       Should be "true" so at end of the build diamonds is checked for test results and helium fails if tests failed.
+    **ats.delta.enabled**          [allowed]       Should be "true" so only ado's changed during do-prep-work-area are tested by ats.
+    **ats4.enabled**               [allowed]       Should be "true" if ats4 is to be used.
     ============================== =============== ===============
 
 
@@ -1722,7 +1812,7 @@ An example of setting up properties:
 .. code-block:: xml
 
     <property name="ats.server" value="4fio00105"  />
-    <property name="ats.drop.location" location="\\trwsimXX\ATS3_TEST_SHARE\" />
+    <property name="ats.drop.location" location="\\trwsimXX\ATS_TEST_SHARE\" />
     <property name="ats.email.list" value="temp.user@company.com; another.email@company.com" />
     <property name="ats.flashfiles.minlimit" value="2" />
     <property name="ats.product.name" value="PRODUCT" />
@@ -1747,10 +1837,6 @@ An example of setting up properties:
         <include name="**/${r'$'}{build.id}*.core.fpsx"/>
         <include name="**/${r'$'}{build.id}*.rofs2.fpsx"/>
         <include name="**/${r'$'}{build.id}*.rofs3.fpsx"/>
-        <include name="**/*rnd.C00"/>
-        <include name="**/*rnd.V01"/>
-        <include name="**/*.fpsx"/>
-        <include name="**/*_rnd.fpsx"/>
     </fileset>
     
 
@@ -1758,7 +1844,7 @@ An example of setting up properties:
 
 **STEP 3: Call target ats-test**
 
-To execute the target, a property should be set(``<property name="enabled.ats" value="1" />``).
+To execute the target, a property should be set(``<property name="enabled.ats" value="true" />``).
 
 Then call ``ats-test``, which will create the ATSDrop.zip (test package).
 
@@ -1767,9 +1853,20 @@ If property *ats.email.list* is set, an email (test report) will be sent when th
 CTC:
 ----
 
-CTC code coverage measurement can be created automatically by enabling property ``ats.ctc.enabled``
+CTC code coverage measurements reports can be created as part of Test Automation process.
 
-Also, property ``ats.ctc.host`` must be defined (See the description above)
+1. Build the src using ``build_ctc`` configuration, which is in ``build.sysdef.xml`` file, to create ``MON.sym`` files. It means that a property ``sysdef.configurations.list`` should be modified either add or replace current build configuration with ``build_ctc``
+
+2. Set the property, ``ats.ctc.host``, as described above, for sending the ``MON.sym`` files to the network drive. *(Please contact ATS server administrator and ask for the value to set this property)*
+
+3. Enable CTC process by setting up property ``ats.ctc.enabled`` to "true"
+
+4. Test drops are sent to the ATS server, where, after executing tests ``ctcdata.txt`` files are created. ``ctcdata.txt`` and ``MON.sym`` files are then further processed to create code coverage reports.
+
+5. View or download the Code coverage reports by following the link provided in the ATS report email (sent after the tests are executed on ATS)
+
+*NOTE: After receiving the email notification, it may take a few minutes before the code coverage reports are available.*
+
 
 Qt Tests:
 ---------
@@ -1782,12 +1879,12 @@ There are several ``.PKG`` files created after executing ``qmake``, but only one
 
 .. _`Skip-Sending-AtsDrop-label`:
 
-Skip Sending AtsDrop to ATS3
+Skip Sending AtsDrop to ATS
 ----------------------------
 
-By setting property of ``skip.ats.sending``, ``ats-test`` target only creates a drop file, and does not send the drop (or package) to ATS3 server.
+By setting property of ``skip.ats.sending``, ``ats-test`` target only creates a drop file, and does not send the drop (or package) to ATS server.
 
-Customizing the test.xml in ATS3
+Customizing the test.xml in ATS
 --------------------------------
 
 The user can customize the generated test.xml with files:
@@ -1887,12 +1984,12 @@ Example configuration:
 
 
 .. index::
-  single: ATS3 - ASTE
+  single: ATS - ASTE
 
-Stage: ATS3 - ASTE
+Stage: ATS - ASTE
 ===================
 
-Explanation of the process for getting ATS3 `ASTE`_ tests compiled and executed by Helium, through the use of the ``ats-aste`` target.
+Explanation of the process for getting ATS `ASTE`_ tests compiled and executed by Helium, through the use of the ``ats-aste`` target.
 
 <#if !(ant?keys?seq_contains("sf"))>
 .. _`ASTE`: http://s60wiki.nokia.com/S60Wiki/ASTE
@@ -1902,7 +1999,7 @@ Prerequisites
 --------------
 
 * `Harmonized Test Interface (HTI)`_ needs to be compiled and into the image.
-* The reader is expected to already have a working ATS3 setup in which test cases can be executed.  ATS3 server names, access rights and authentication etc. is supposed to be already taken care of.
+* The reader is expected to already have a working ATS setup in which test cases can be executed.  ATS server names, access rights and authentication etc. is supposed to be already taken care of.
 * `SW Test Asset`_ location and type of test should be known.
 
 <#if !(ant?keys?seq_contains("sf"))>
@@ -1920,7 +2017,7 @@ Two STEPS to setup ASTE with Helium
 
 **STEP 1: Configure ASTE properties in build.xml**
 
-**(A)** Username and Password for the ATS3 should be set in the `.netrc file`_
+**(A)** Username and Password for the ATS should be set in the `.netrc file`_
 
 .. code-block:: text
 
@@ -1943,16 +2040,16 @@ Add the above line in the .netrc file and replace *ats_user_name* with your real
     **Property Name**               **Edit Status** **Description**
     =============================== =============== ===============
     **ats.server**                  [must]          For example: "4fio00105" or "catstresrv001.cats.noklab.net:80". Default server port is "8080", but it is not allowed between intra and Noklab. Because of this we need to define server port as 80. The host can be different depending on site and/or product.
-    **ats.drop.location**           [must]          Server location (UNC path) to save the ATS3Drop file, before sending to the ATS. For example: \\\\trwsem00\\some_folder\\. In case, ``ats.script.type`` is set to "import", ATS doesn't need to have access to ats.drop.location,  its value can be any local folder on build machine, for example c:/temp (no network share needed).
+    **ats.drop.location**           [must]          Server location (UNC path) to save the ATSDrop file, before sending to the ATS. For example: \\\\trwsem00\\some_folder\\. In case, ``ats.script.type`` is set to "import", ATS doesn't need to have access to ats.drop.location,  its value can be any local folder on build machine, for example c:/temp (no network share needed).
     **ats.product.name**            [must]          Name of the product to be tested. For example: "PRODUCT".
     **ats.aste.testasset.location** [must]          Location of SW Test Assets, if the TestAsset is not packaged then it is first compressed to a ``.zip`` file. It should be a UNC path.
     **ats.aste.software.release**   [must]          Flash images releases, for example "SPP 51.32".
     **ats.aste.software.version**   [must]          Version of the software to be tested. For example: "W810"
     **ats.aste.email.list**         [recommended]   The property is needed if you want to get an email from ATS server after the tests are executed. There can be one to many semicolon(s) ";" separated email addresses.
     **ats.flashfiles.minlimit**     [recommended]   Limit of minimum number of flash files to execute ats-test target, otherwise ATSDrop.zip will not be generated. Default value is "2" files.
-    **ats.aste.plan.name**          [recommended]   Modify the plan name if you have understanding of test.xml file or leave it as it is. Deafault value is "plan".
+    **ats.aste.plan.name**          [recommended]   Modify the plan name if you have understanding of test.xml file or leave it as it is. Default value is "plan".
     **ats.product.hwid**            [recommended]   Product HardWare ID (HWID) attached to ATS. By default the value of HWID is not set.
-    **ats.test.timeout**            [recommended]   To set test commands execution time limit on ATS3 server, in seconds. Default value is "60".
+    **ats.test.timeout**            [recommended]   To set test commands execution time limit on ATS server, in seconds. Default value is "60".
     **ats.aste.testrun.name**       [recommended]   Modify the test-run name if you have understanding of test.xml file or leave it as it is. Default value is a string consists of build id, product name, major and minor versions.
     **ats.aste.test.type**          [recommended]   Type of test to run. Default is "smoke".
     **ats.aste.testasset.caseids**  [recommended]   These are the cases that which tests should be run from the TestAsset. For example, value can be set as "100,101,102,103,105,106,". A comma is needed to separate case IDs
@@ -1966,7 +2063,7 @@ An example of setting up properties:
 .. code-block:: xml
     
     <property name="ats.server" value="4fio00105"  />
-    <property name="ats.drop.location" value="\\trwsimXX\ATS3_TEST_SHARE\" />
+    <property name="ats.drop.location" value="\\trwsimXX\ATS_TEST_SHARE\" />
     <property name="ats.aste.email.list" value="temp.user@company.com; another.email@company.com" />
     <property name="ats.flashfiles.minlimit" value="2" />
     <property name="ats.product.name" value="PRODUCT" />
@@ -1989,10 +2086,6 @@ An example of setting up properties:
         <include name="**/${r'$'}{build.id}*.core.fpsx"/>
         <include name="**/${r'$'}{build.id}*.rofs2.fpsx"/>
         <include name="**/${r'$'}{build.id}*.rofs3.fpsx"/>
-        <include name="**/*rnd.C00"/>
-        <include name="**/*rnd.V01"/>
-        <include name="**/*.fpsx"/>
-        <include name="**/*_rnd.fpsx"/>
     </fileset>
     
 
@@ -2000,14 +2093,14 @@ An example of setting up properties:
 
 **STEP 2: Call target ats-aste**
 
-To execute the target, a property should be set(``<property name="enabled.aste" value="1" />``).
+To execute the target, a property should be set(``<property name="enabled.aste" value="true" />``).
 
 Then call ``ats-aste``, which will create the ATSDrop.zip (test package).
 
 If property ``ats.aste.email.list`` is set, an email (test report) will be sent when the tests are ready on ATS/ASTE.
 
 
-Skip Sending AtsDrop to ATS3
+Skip Sending AtsDrop to ATS
 ------------------------------
 
 click :ref:`Skip-Sending-AtsDrop-label`:
@@ -2018,15 +2111,15 @@ click :ref:`Skip-Sending-AtsDrop-label`:
 Stage: MATTI
 =============
 
-MATTI testing is very similar to ATS3 testing, so for details of how it all links together see :ref:`Stage-ATS3-label`: `and the matti website`_.
+MATTI testing is very similar to ATS testing, so for details of how it all links together see :ref:`Stage-ATS-label`: `and the matti website`_.
 
 <#if !(ant?keys?seq_contains("sf"))>
 .. _`and the matti website`:  http://trmatti1.nmp.nokia.com/help/
 </#if>  
 
-The set up of parameters is very similar (a few less parameters and it mostly uses ATS3 values). The main difference is that once the drop file has been uploaded to the ATS3 server it uses MATTI to perform the tests and not ATS3, this is achieved by calling the MATTIDrop.py script instead of the ATSE or ATS3 scripts when creating the drop file (the drop file contains the flash files and the ruby tests to be performed).
+The set up of parameters is very similar (a few less parameters and it mostly uses ATS values). The main difference is that once the drop file has been uploaded to the ATS server it uses MATTI to perform the tests and not ATS, this is achieved by calling the MATTIDrop.py script instead of the ATSE or ATS scripts when creating the drop file (the drop file contains the flash files and the ruby tests to be performed).
 
-The following parameters are the ones that are not listed in the ATS3 parameters, all other parameters required are as listed in the ATS3 section above.
+The following parameters are the ones that are not listed in the ATS parameters, all other parameters required are as listed in the ATS section above.
 
 * [must] - must be set by user
 * [recommended] - should be set by user but not mandatory
@@ -2053,36 +2146,25 @@ All you need to do is setup the following parameters:
 
 .. code-block:: xml
 
-    <property name="enabled.matti" value="1" />
-    <property name="enabled.ats" value="1" />
+    <property name="enabled.matti" value="true" />
     <property name="matti.scripts" value="${r'$'}{helium.dir}\testconfig\ats3\matti\script" />
     <property name="template.file" value="${r'$'}{helium.dir}\tools\common\python\lib\ats3\matti\template\matti_demo.xml" />
     <property name="ats.sis.images.dir" location="${r'$'}{build.drive}\output\matti\sis" />
-    <property name="ats.image.type" value="variant" />
     <property name="ats.product.name" value="" />
-    <property name="ats.email.list" value="" />
-    <property name="ats.plan.name" value="" />
-    <property name="ats.flashfiles.minlimit" value="2" />
-    <property name="ats.target.platform" value="armv5 urel" />
-    <property name="ats.script.type" value="import" />
-    <property name="ats.product.hwid" value="" />
-    <property name="core.build.version" value="1" />
-    <property name="ats.testrun.name" value="${r'$'}{build.id}_${r'$'}{ats.product.name}_${r'$'}{core.build.version}" />
     <property name="ats.test.timeout" value="60" />
-    <property name="ats.output.dir" location="${r'$'}{build.drive}\output\ats" />
 
-    <!--ats3 testing properties-->
+    <!--ATS testing properties-->
     <property name="tsrc.data.dir" value="data_rom" />
     <property name="ats.ctc.enabled" value="True" />
     <property name="ats.flashfiles.minlimit" value="2"/>
     <property name="ta.flag.list" value="TA_M, TA_MU, TA_MMAPPFW,TA_MM"/>
     <property name="ats.server" value="12345675:80"/>
 
-In order to upload and view the test run you need to have a valid user id and password that matches that in your .netrc file. To create the account open a web browser window and enter the name of the ats.server with /ats3 at the end e.g. http://123456:80/ats3. Click on the link in the top right hand corner to create the account. To view the test run once your account is active you need to click on the 'test runs' tab.
+In order to upload and view the test run you need to have a valid user id and password that matches that in your .netrc file. To create the account open a web browser window and enter the name of the ats.server with /ATS at the end e.g. http://123456:80/ATS. Click on the link in the top right hand corner to create the account. To view the test run once your account is active you need to click on the 'test runs' tab.
 
 To run the tests call the target `matti-test` (you will need to define the 'build.drive', 'build.number' and it is best to create the 'core.build.version' on the command line as well if you do not add it to the list of targets run that create the ROM image). e.g.
 ::
 
     hlm -Dbuild.number=001 -Dbuild.drive=z: -Dcore.build.version=001 matti-test
 
-If it displays the message 'Testdrop created!' with the file name then the MATTIDrops.py script has done what it needs to do. The next thing to check is that the drop file has been uploaded to the ATS3 server OK. If that is performed successfully then the rest of the testing needs to be performed by the ATS3 server. There is also a test.xml file created that contains details needed for debugging any problems that might occur. To determine if the tests have run correctly you need to read the test run details from the server.
+If it displays the message 'Testdrop created!' with the file name then the MATTIDrops.py script has done what it needs to do. The next thing to check is that the drop file has been uploaded to the ATS server OK. If that is performed successfully then the rest of the testing needs to be performed by the ATS server. There is also a test.xml file created that contains details needed for debugging any problems that might occur. To determine if the tests have run correctly you need to read the test run details from the server.

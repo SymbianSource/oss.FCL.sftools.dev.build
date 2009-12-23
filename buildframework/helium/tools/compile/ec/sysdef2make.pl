@@ -63,7 +63,7 @@ use lib "$ENV{EPOCROOT}epoc32/tools/build/lib";
 use XML::DOM;
 
 my @userFilters = ();
-my @forceMakeCommands = ("abld.*\-(w|what|c|check)[^a-zA-Z0-9]");
+my @forceMakeCommands = ("abld.*\-(w|what|c|check|checkwhat|cw)[^a-zA-Z0-9]");
 my $file = "";
 my $pathPrefix = "";
 
@@ -203,8 +203,13 @@ foreach my $layer ( $doc->getElementsByTagName('layer') ) {
              $bldFile !~ m{^\Q$pathPrefix\E}i ) {
             $bldFile = $pathPrefix.$bldFile;
         }
-        # Set bldFile to the unitID
-        $bldFiles{$unitID} = $bldFile ;
+        if (-d $bldFile) {
+	        # Set bldFile to the unitID
+    	    $bldFiles{$unitID} = $bldFile;
+        } else {
+            print(STDERR "ERROR: could not find $bldFile.\n");
+            next;
+        }
 
         # Set the default priority
         if ( ! $priority ) {
@@ -464,7 +469,7 @@ foreach my $xmlConfiguration ( $doc->getElementsByTagName('configuration') ) {
                     # It is more important to relay the -keepgoing to abld export
                     # than try to protect the environment from user who uses abldOption wrong
                     if ( @{$options{$executable.'Option'}} &&
-                         $command !~ m{abld.*\-(w|what|c|check)\s}i ) {
+                         $command !~ m{abld.*\-(w|what|c|check|checkwhat|cw)\s}i ) {
                         $option =" \$(".$executable."Option)";
                     }
 

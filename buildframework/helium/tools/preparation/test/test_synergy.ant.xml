@@ -21,6 +21,9 @@ Description:
 ============================================================================
 -->
 <project name="test_synergy" xmlns:au="org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>
+         Testing targets related to Synergy
+    </description>
     <property environment="env" />
     <property name="publish.root.dir" value="${env.TEMP}" />
     <property name="helium.dir" location="../../.." />

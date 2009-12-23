@@ -540,6 +540,9 @@ class PkgFileParser(object):
 
     def __init__(self, platform = None):
         self.platform = platform
+        if self.platform is not None and "_" in self.platform:
+            plat_tar = re.search(r"(.*)_(.*).pkg", self.platform)
+            self.build_platform, self.build_target = plat_tar.groups() 
 
     def get_pkg_files(self, location = None, with_full_path = True):
         """
@@ -640,6 +643,14 @@ class PkgFileParser(object):
         val1, val2 = result.groups()
 
         if val1 != "":
+            
+            #replacing delimiters (${platform} and ${target}) in PKG file templates, 
+            #for instance, QT tests PKG files have delimeters 
+            if "$(platform)" in val1.lower() and self.build_platform is not None:
+                val1 = val1.lower().replace("$(platform)", self.build_platform)
+            if "$(target)" in val1.lower() and self.build_target is not None:
+                val1 = val1.lower().replace("$(target)", self.build_target)
+
             if path.isabs(path(val1).normpath()):
                 map_src = str(path.joinpath(self.drive, val1).normpath())
             elif re.search(r"\A\w", val1, 1):
@@ -678,8 +689,13 @@ class PkgFileParser(object):
             if _test_type_ == "dependent":
                 file_type = "data" + ":%s" % _test_type_
             else:
-                file_type = "testmodule"
-        
+                if "qttest.lib" in _libraries_:
+                    file_type = "data" + ":qt:dependent" 
+                else:
+                    file_type = "testmodule"
+                    
+        elif ext == 'exe' and 'rtest' in _libraries_:
+            file_type = "testmodule:rtest"
         elif ext == "exe":
             if _test_type_ == "dependent":
                 file_type = "data" + ":%s" % _test_type_
@@ -700,8 +716,6 @@ class PkgFileParser(object):
                 file_type = "testscript:mtf"
             else:
                 file_type = "testscript"
-        elif ext == 'bat' and 'rtest' in _libraries_:
-            file_type = "testmodule"
         else:
             file_type = "data"
 

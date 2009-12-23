@@ -36,7 +36,7 @@ import org.apache.tools.ant.BuildException;
  *       &lt;/fileset&gt;
  *    &lt;/hlm:status&gt;
  * &lt;/hlm:scm &gt;
- *
+ * </pre>
  * 
  * @ant.type name="status" category="SCM"
  */

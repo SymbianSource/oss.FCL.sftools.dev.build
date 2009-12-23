@@ -151,13 +151,15 @@ public class EMAILNotifier extends DataType implements Notifier {
     /**
      * Rendering the template, and sending the result through email.
      * 
-     * @param signalName
-     *            - Name of the signal that has been raised.
+     * @param signalName - is the name of the signal that has been raised.
+     * @param failStatus - indicates whether to fail the build or not
+     * @param notifierInput - contains signal notifier info
+     * @param message - is the message from the signal that has been raised. 
      */
 
     @SuppressWarnings("unchecked")
     public void sendData(String signalName, boolean failStatus,
-            NotifierInput notifierInput) {
+            NotifierInput notifierInput, String message ) {
         if (notifyWhen != null
                 && (notifyWhen.equals("always") || (notifyWhen.equals("fail") && failStatus)
                         || (notifyWhen.equals("pass") && !failStatus))) {
@@ -175,36 +177,43 @@ public class EMAILNotifier extends DataType implements Notifier {
                 throw new HlmAntLibException(SignalListener.MODULE_NAME,
                         "ldap attribute has not been defined.");
             }
+            
+            String smtpUpdated = getProject().replaceProperties(smtp);
+            String ldapUpdated = getProject().replaceProperties(ldap);
+            String rootdnUpdated = getProject().replaceProperties(rootdn);
+            String additionalRecipientsUpdated = getProject().replaceProperties(additionalRecipients);
+
             log.debug("Sending data by e-mail.");
                 EmailDataSender emailSender;
-                if (rootdn != null)
+                if (rootdnUpdated != null)
                 {
                     String[] to = null;
-                    if (additionalRecipients != null)
+                    if (additionalRecipientsUpdated != null)
                     {
-                        to = additionalRecipients.split(",");
+                        to = additionalRecipientsUpdated.split(",");
                     }
-                    emailSender = new EmailDataSender(to, smtp, ldap, rootdn);
+                    emailSender = new EmailDataSender(to, smtpUpdated, ldapUpdated, rootdnUpdated);
                 }
                 else
                 {
                     emailSender = new EmailDataSender(
-                        additionalRecipients, smtp, ldap);
+                        additionalRecipientsUpdated, smtpUpdated, ldapUpdated);
                 }
                 if (from != null)
                 {
                     emailSender.setFrom(from);
                 }
-                log.debug("EmailNotifier:arlist: " + additionalRecipients);
+                log.debug("EmailNotifier:arlist: " + additionalRecipientsUpdated);
                 Project subProject = getProject().createSubProject();
                 subProject.setProperty("signal.name", signalName);
                 subProject.setProperty("signal.status", "" + failStatus);
+                subProject.setProperty("signal.message", "" + message);
                 
                 emailSender.addCurrentUserToAddressList();
                 String filePath = "";
                 File fileToSend = null;
                 if (notifierInput != null) {
-                    fileToSend = notifierInput.getFile(".html");
+                    fileToSend = notifierInput.getFile(".*.html");
                     if (fileToSend != null) {
                         filePath = fileToSend.toString();
                     }
@@ -224,6 +233,7 @@ public class EMAILNotifier extends DataType implements Notifier {
                         Hashtable<String, String> signalProperties = new Hashtable<String, String>();
                         signalProperties.put("signal.name", signalName);
                         signalProperties.put("signal.status", "" + failStatus);
+                        signalProperties.put("signal.message", "" + message);
                         sourceList.add(new PropertiesSource("signaling",
                                 signalProperties));
 

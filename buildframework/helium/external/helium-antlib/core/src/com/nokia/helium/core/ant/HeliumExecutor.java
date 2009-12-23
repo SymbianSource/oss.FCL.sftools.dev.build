@@ -67,7 +67,7 @@ public class HeliumExecutor extends DefaultExecutor {
      */
     public void executeTargets(Project project, String[] targetNames) {
         this.project = project;
-        log.debug("[HeliumExecutor] Running executeTargets");
+        log.debug("Running executeTargets");
         BuildException failure = null;
         try {
             loadModules(project);
@@ -75,6 +75,7 @@ public class HeliumExecutor extends DefaultExecutor {
             super.executeTargets(project, targetNames);
         } catch (BuildException e) {
             // Saving current issue
+            // We are Ignoring the errors as no need to fail the build.
             failure = e;
         }
 
@@ -119,7 +120,7 @@ public class HeliumExecutor extends DefaultExecutor {
         if (file == null) {
             return;
         }
-        log.debug("[HeliumExecutor] Loading " + moduleLib.getName());
+        log.debug("Loading " + moduleLib.getName());
         ImportTask task = new ImportTask();
         Target target = new Target();
         target.setName("");
@@ -152,13 +153,13 @@ public class HeliumExecutor extends DefaultExecutor {
             if (tempExceptionDefList != null) {
                 exceptionHandlers.put(moduleName, tempExceptionDefList);
             }
-            log.debug("HeliumExecutor:loadModule:pre-opsize"
+            log.debug("loadModule:pre-opsize"
                     + preOperations.size());
-            log.debug("HeliumExecutor:loadModule:post-opsize"
+            log.debug("loadModule:post-opsize"
                     + postOperations.size());
-            log.debug("HeliumExecutor:loadModule:exception-opsize"
+            log.debug("loadModule:exception-opsize"
                     + exceptionHandlers.size());
-            log.debug("[HeliumExecutor] Checking " + moduleLib);
+            log.debug("Checking " + moduleLib);
         }
     }
 
@@ -195,7 +196,7 @@ public class HeliumExecutor extends DefaultExecutor {
             URL url = findHeliumAntlibXml(moduleLib);
             if (url == null)
                 return null;
-            log.debug("[HeliumExecutor] Getting " + url);
+            log.debug("Getting " + url);
 
             JarURLConnection jarConnection = (JarURLConnection) url
                     .openConnection();
@@ -213,10 +214,10 @@ public class HeliumExecutor extends DefaultExecutor {
             }
             writer.close();
             reader.close();
-            log.debug("[HeliumExecutor] Temp file " + file.getAbsolutePath());
+            log.debug("Temp file " + file.getAbsolutePath());
             return file.getAbsolutePath();
         } catch (Exception ex) {
-            log.error("[HeliumExecutor] Error: ", ex);
+            log.error("Error: " + ex.getMessage(), ex);
             return null;
         }
     }
@@ -224,9 +225,9 @@ public class HeliumExecutor extends DefaultExecutor {
     private void doOperations(
             HashMap<String, Vector<HlmDefinition>> operations, Project prj,
             String[] targetNames) {
-        log.debug("HeliumExecutor:doOperations: start");
+        log.debug("doOperations: start");
         for (String moduleName : operations.keySet()) {
-            log.debug("HeliumExecutor:doOperations: module" + moduleName);
+            log.debug("doOperations: module" + moduleName);
             for (HlmDefinition definition : operations.get(moduleName)) {
                 definition.execute(prj, moduleName, targetNames);
             }
@@ -234,9 +235,8 @@ public class HeliumExecutor extends DefaultExecutor {
     }
 
     private void handleExceptions(Project prj, Exception e) {
-        log.debug("HeliumExecutor:handleExceptions: start");
         for (String moduleName : this.exceptionHandlers.keySet()) {
-            log.debug("HeliumExecutor:handleExceptions: module" + moduleName);
+            log.debug("handleExceptions: module" + moduleName);
             for (HlmExceptionHandler exceptionHandler : this.exceptionHandlers
                     .get(moduleName)) {
                 exceptionHandler.handleException(prj, moduleName, e);

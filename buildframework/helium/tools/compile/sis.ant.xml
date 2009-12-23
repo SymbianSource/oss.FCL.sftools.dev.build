@@ -23,6 +23,8 @@ Description:
 <project name="compile.sis" xmlns:hlm="http://www.nokia.com/helium">
     <description>Create SIS files.</description>
     
+    <property name="sis.config.name" value=""/>
+    
     <!-- Preprocesses the SIS configuration file to insert Ant properties. -->
     <target name="preprocess-sis-config" if="sis.config.file">
         <property name="sis.config.file.parsed" location="${build.output.dir}/sis.cfg.xml.parsed" />
@@ -38,20 +40,21 @@ Description:
     <target name="sisfiles" depends="preprocess-sis-config" if="sis.config.file">
         <hlm:tempRecordStartMacro name="${build.id}_sisfiles.log"/>        
         <mkdir dir="${build.sisfiles.dir}" />
+        <delete file="${temp.build.dir}/sis_build.ant.xml" failonerror="false"/>
         <hlm:python>
 import configuration
 import sis
 import os
 
 builder = configuration.NestedConfigurationBuilder(open(r'${sis.config.file.parsed}', 'r'))
-configSet = builder.getConfiguration()
-configs = configSet.getConfigurations()
+config_set = builder.getConfiguration()
+config_name = r'${sis.config.name}' if (len(r'${sis.config.name}') > 0) else None
 
-prebuilder = sis.SisPreBuilder(configSet)
+prebuilder = sis.SisPreBuilder(config_set, config_name)
 prebuilder.write(os.path.join(r'${temp.build.dir}', 'sis_build.ant.xml'))
         </hlm:python>
         <ant antfile="${temp.build.dir}/sis_build.ant.xml"/>
-        <hlm:tempRecordStopMacro name="${build.id}_sisfiles.log" filterref="filterset.sisfiles"/>
+        <hlm:tempRecordStopMacro name="${build.id}_sisfiles.log" filterref="filterset.sisfiles" phase="post"/>
         <hlm:metadatarecord xmlns:hlm="http://www.nokia.com/helium" database="${metadata.dbfile}">
             <hlm:textmetadatainput>
                 <fileset casesensitive="false" file="${build.cache.log.dir}/${build.id}_sisfiles.log"/>
@@ -61,4 +64,6 @@ prebuilder.write(os.path.join(r'${temp.build.dir}', 'sis_build.ant.xml'))
     </target>
 
 </project>
+
+
 

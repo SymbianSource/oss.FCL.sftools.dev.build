@@ -27,7 +27,7 @@ import os.path
 
 def get_property(property_name):
     """ This function return None if a property has not been replaced by Ant. """
-    if len(property_name) > 0 and property_name.startswith('${'):
+    if len(property_name) > 0 and (property_name.startswith('${') or property_name.startswith('@{')):
         return None
     return property_name
 
@@ -42,7 +42,9 @@ def get_previous_build_number(build_number):
             bn_num_int = int(bn_num)
             if bn_num_int > 1:
                 previous_bn_num_int = bn_num_int - 1
-                previous_bn_num = str(previous_bn_num_int).rjust(len(bn_num), '0')
+                previous_bn_num = str(previous_bn_num_int)
+                if bn_num.startswith('0'):
+                    previous_bn_num = previous_bn_num.rjust(len(bn_num), '0')
                 previous_bn = previous_bn_num
                 if bn_txt != None:
                     previous_bn = '%s%s' % (bn_txt, previous_bn_num)

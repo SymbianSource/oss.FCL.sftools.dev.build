@@ -20,6 +20,8 @@
 #ATS3-system
 #===============================================================================
 
+""" create the MATTI test drop file for use on the test server """
+
 import os
 import re
 import sys
@@ -28,9 +30,7 @@ import zipfile
 import logging 
 from optparse import OptionParser
 from xml.etree import ElementTree as et
-from xml.sax.saxutils import quoteattr
-from xml.dom.minidom import Document
-from jinja2 import Template, Environment, PackageLoader
+from jinja2 import Environment, PackageLoader
 
 # Shortcuts
 E = et.Element
@@ -56,7 +56,6 @@ class Configuration(object):
             self.flash_images = self._opts.flash_images.split(',')
         else:
             self.flash_images = []
-            logging.error("No flash files defined!")
         if not re.search(r'\A\s*?\Z', self._opts.sis_files):
             self.sis_files = self._opts.sis_files.split(',')
         else:
@@ -115,10 +114,10 @@ class MattiDrop(object):
 #        tmp_image_list = []
         os.chdir(os.path.normpath(self.configuration.matti_scripts))
         try:
-            for path, subdirs, names in os.walk(os.getcwd()):
+            for path, _, names in os.walk(os.getcwd()):
                 for name in names:
                     if re.search(r'.*?[.]rb\Z', name):
-                        tmp_case_list.append((os.path.normpath(os.path.join(path, name)), os.path.join("ATS3Drop", "MATTISCRIPTS", name)))
+                        tmp_case_list.append((os.path.normpath(os.path.join(path, name)), os.path.join("ats3", "matti", "script", name)))
             if tmp_case_list:
                 for tmp_case in tmp_case_list:
                     self.configuration.step_list.append(dict(path=os.path.join("&#x00A7;TEST_RUN_ROOT&#x00A7;", str(tmp_case[1])), name="Test case"))
@@ -147,12 +146,15 @@ class MattiDrop(object):
     def create_testxml(self):
         """This method will use Jinja2 template engine for test.xml creation"""
         os.chdir(self.tmp_path)
-        env = Environment(loader=PackageLoader('MattiDrops', 'template'))
-        template = env.from_string(open(self.configuration.template_location).read())
-        xml_file = open("test.xml", 'w')
-        xml_file.write(template.render(configuration=self.configuration))
-        xml_file.close()
-    
+        env = Environment(loader=PackageLoader('ats3.matti', 'template'))
+        if os.path.isfile(self.configuration.template_location):
+            template = env.from_string(open(self.configuration.template_location).read())
+            xml_file = open("test.xml", 'w')
+            xml_file.write(template.render(configuration=self.configuration))
+            xml_file.close()
+        else:
+            logging.error("No template file found")
+                
     def create_testdrop(self, output_file=None, file_list=None):
         """Creates testdrop zip-file to given location."""
         #env = Environment(loader=PackageLoader('MattiDrops', 'template'))
@@ -163,20 +165,29 @@ class MattiDrop(object):
                 logging.info("Adding files to testdrop:")
                 for src_file, drop_file in file_list:
                     logging.info("   + Adding: %s" % src_file.strip())
-                    zfile.write(str(src_file.strip()), str(drop_file))
+                    if os.path.isfile(src_file):
+                        zfile.write(str(src_file.strip()), str(drop_file))
+                    else:
+                        logging.error("invalid test file name supplied %s " % drop_file)
                 if self.configuration.flash_images:
                     for image in self.configuration.flash_images:
                         tmp = string.rsplit(image, os.sep)
                         image_name = tmp[len(tmp)-1] 
                         logging.info("   + Adding: %s" % image_name)
-                        zfile.write(image, os.path.join("ATS3Drop", "images", image_name))
+                        if  os.path.isfile(image):
+                            zfile.write(image, os.path.join("ATS3Drop", "images", image_name))
+                        else:
+                            logging.error("invalid flash file name supplied %s " % image_name)
                 if self.configuration.sis_enabled:
                     if self.configuration.sis_files:
                         for sis in self.configuration.sis_files:
                             tmp = string.rsplit(sis, os.sep)
                             sis_name = tmp[len(tmp)-1] 
                             logging.info("   + Adding: %s" % sis_name)
-                            zfile.write(sis, os.path.join("ATS3Drop", "sis", sis_name))
+                            if os.path.isfile(sis):
+                                zfile.write(sis, os.path.join("ATS3Drop", "sis", sis_name))
+                            else:
+                                logging.error("invalid sis file name supplied %s " % sis_name)
                 zfile.write(os.path.normpath(os.path.join(os.getcwd(),"test.xml")), "test.xml")
             finally:
                 logging.info("Testdrop created! %s" % output_file)            	   
@@ -186,10 +197,10 @@ class MattiDrop(object):
 def create_drop(configuration):
     """Testdrop creation"""
     if configuration:
-        md = MattiDrop(configuration)
-        md.fetch_testfiles()
-        md.create_testxml()
-        return md.create_testdrop(configuration.drop_file, md.fetch_testfiles())
+        m_drop = MattiDrop(configuration)
+        m_drop.fetch_testfiles()
+        m_drop.create_testxml()
+        return m_drop.create_testdrop(configuration.drop_file, m_drop.fetch_testfiles())
     else:
         logging.error("No configuration available for test drop creation")        
         
@@ -227,7 +238,7 @@ def main():
                    default="60")
     cli.add_option("--verbose", help="Increase output verbosity", 
                    action="store_true", default=True)
-    opts, tsrc_paths = cli.parse_args()
+    opts, _ = cli.parse_args()
 
     if opts.verbose:
         logging.basicConfig(level=logging.DEBUG)

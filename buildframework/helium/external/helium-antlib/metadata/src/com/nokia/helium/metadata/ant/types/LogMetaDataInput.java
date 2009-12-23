@@ -43,7 +43,11 @@ public abstract class LogMetaDataInput extends DataType implements
     private static Logger log = Logger.getLogger(LogMetaDataInput.class);
     
     private Vector<FileSet> fileSetList = new Vector<FileSet>();
+
+    private int currentFileIndex;
     
+    private boolean entryAddedForLog;
+
     private List<File> fileList;
     private Vector<MetaDataFilterSet> metadataFilterSets = new Vector<MetaDataFilterSet>();
     private Vector<MetaDataFilter> completeFilterList;
@@ -54,7 +58,6 @@ public abstract class LogMetaDataInput extends DataType implements
     
     
     public LogMetaDataInput() {
-        //initRecordInfo();
     }
 
     /**
@@ -83,7 +86,11 @@ public abstract class LogMetaDataInput extends DataType implements
         add(filterSet);
         return filterSet;
     }
-    
+
+    /**
+     * Helper function to return all the filters associated with this metadata input
+     * @return all the filters merged based on the order of definition.
+     */
     private Vector<MetaDataFilter> getCompleteFilters()throws Exception {
         Vector<MetaDataFilter> allFilter = new Vector<MetaDataFilter>();
         for (MetaDataFilterSet filterSet : metadataFilterSets) {
@@ -111,6 +118,10 @@ public abstract class LogMetaDataInput extends DataType implements
         return fileList;
     }
 
+    /**
+     * Internal function to get the entry
+     * @return the top most entry in the list.
+     */
     private MetaDataDb.LogEntry getEntry()throws Exception {
         if (logEntries != null && logEntries.size() > 0) {
             return logEntries.remove(0);
@@ -119,12 +130,65 @@ public abstract class LogMetaDataInput extends DataType implements
         }
     }
 
+    /**
+     * Helper function to return the file list of the metadata input
+     * @return file list of this metadata input.
+     */
     protected List<File> getFileList() {
         return fileList;
     }
 
-    abstract boolean isEntryAvailable() throws Exception ;
+    protected File getCurrentFile() {
+        List<File> fileList = getFileList();
+        return fileList.get(currentFileIndex); 
+    }
+
+    /**
+     * Function to check from the input stream if is there any entries available. Implemented by the sub classes.
+     * @return true if there are any entry available otherwise false.
+     */
     
+    boolean isEntryAvailable() throws Exception {
+        try {
+            int fileListSize = getFileList().size();
+            while (currentFileIndex < fileListSize) {
+                boolean entryCreated = false;
+                File currentFile = getCurrentFile();
+                entryCreated = isEntryCreated(currentFile);
+                if (entryCreated) {
+                    if (!entryAddedForLog) {
+                        entryAddedForLog = true;
+                    }
+                    return entryCreated;
+                }
+                if (!entryAddedForLog) {
+                    // If no entry, then logfile is added to the database.
+                    addEntry("default", "general", getCurrentFile().toString(), -1, "", -1);
+                    currentFileIndex ++;
+                    return true;
+                }
+                currentFileIndex ++;
+            }
+        } catch (Exception ex1 ) {
+            log.info("Exception processing stream: " + ex1.getMessage());
+            log.debug("exception while parsing the stream", ex1);
+            throw ex1;
+        }
+        return false;
+    }
+
+    /**
+     * Function to check from the input stream if is there any entries available.
+     * @param file for which the contents needs to be parsed for errors
+     * @return true if there are any entry available otherwise false.
+     */
+    abstract boolean isEntryCreated(File currentFile) throws Exception;
+
+    /**
+     * Returns the severity matches for the log text
+     * @param log text for which the severity needs to be identified.
+     * @return the severity of the input text
+     */
     protected String getSeverity(String logText) throws Exception {
         try {
             if (completeFilterList == null) {
@@ -133,7 +197,6 @@ public abstract class LogMetaDataInput extends DataType implements
             for ( MetaDataFilter filter : completeFilterList) {
                 Pattern pattern = filter.getPattern();
                 if ((pattern.matcher(logText)).matches()) {
-                    //log.debug("pattern matched");
                     return filter.getPriority();
                 }
             }
@@ -144,8 +207,32 @@ public abstract class LogMetaDataInput extends DataType implements
         return null;
     }
 
+
+    /**
+     * Helper function to store the entry which will be added to the database
+     * @param priority for the entry
+     * @param component of the entry
+     * @param logpath of the entry
+     * @param lineNo of the entry
+     * @param log text message of the entry
+     */
     protected void addEntry(String priority, String component, String logPath, int lineNo, 
             String logText) throws Exception {
+        addEntry(priority, component, logPath, lineNo, logText, -1);
+    }
+    
+
+    /**
+     * Helper function to store the entry which will be added to the database
+     * @param priority for the entry
+     * @param component of the entry
+     * @param logpath of the entry
+     * @param lineNo of the entry
+     * @param log text message of the entry
+     * @param elapsedTime of the component
+     */
+    protected void addEntry(String priority, String component, String logPath, int lineNo, 
+            String logText, float elapsedTime) throws Exception {
         //log.debug("adding entry to the list");
         File logPathFile = new File(logPath.trim());
         String baseDir = logPathFile.getParent();
@@ -153,9 +240,17 @@ public abstract class LogMetaDataInput extends DataType implements
         String uniqueLogPath = baseDir + "/" +  logPathFile.getName();
         logEntries.add(new MetaDataDb.LogEntry(
                 logText, priority, 
-                component, uniqueLogPath, lineNo));
+                component, uniqueLogPath, lineNo, elapsedTime));
     }
-
+    
+    /**
+     * Looks for the text which matches the filter regular expression and adds the entries to the database.
+     * @param logTextInfo text message to be searched with filter regular expressions
+     * @param priority for the entry
+     * @param currentComponent of the logtextInfo
+     * @param logpath fo;e fpr wjocj tje text info has to be looked for with filter expression
+     * @param lineNumber of the text message
+     */
     protected boolean findAndAddEntries(String logTextInfo, String currentComponent, 
             String logPath, int lineNumber)throws Exception {
         boolean entryAdded = false; 
@@ -164,20 +259,28 @@ public abstract class LogMetaDataInput extends DataType implements
         for (int i = 0; i < logText.length; i++) {
             severity = getSeverity(logText[i]);
             if ( severity != null) {
-                log.debug("found match: ----" + logText[i]);
                 addEntry(severity, currentComponent, logPath, 
-                        i + lineNumber, logText[i] );
+                        i + lineNumber, logText[i]);
                 if (!entryAdded) {
                     entryAdded = true;
                 }
             }
         }
         return entryAdded;
-    }    
+    }
+    
+    /**
+     * Log text are processed based on iterator. When ever the entry is found the entry is returned
+     * and the function is called again for further entries.
+     * @return the iterator object for the metadata input.
+     */
     public Iterator<MetaDataDb.LogEntry> iterator() {
         return metadataInputIterator;
     }
 
+    /**
+     * Class to process the files as stream and add the entries todb
+     */
     public class MetaDataInputIterator implements Iterator<MetaDataDb.LogEntry> {
         public boolean hasNext() {
             if (fileList == null) {
@@ -187,23 +290,29 @@ public abstract class LogMetaDataInput extends DataType implements
                 }
             }
             if (logEntries.size() > 0) {
-                log.debug("returning from existing entries");
                 return true;
             }
             boolean retValue = false;
             try {
                 retValue = isEntryAvailable();
             } catch ( Exception ex) {
-                throw new BuildException("Exception in metadata input.");
+                throw new BuildException("Exception while analysing errors from the log:", ex);
             }
             return retValue;
         }
 
+        /**
+         * Helper function to remove  entries if any
+         */
         public void remove() {
         }
         
+
+        /**
+         * Gets the next entry, which has been identified
+         * @return log entry to be added to the database.
+         */
         public MetaDataDb.LogEntry next() {
-            //log.debug("getting next element: " + logEntry);
             MetaDataDb.LogEntry entry = null;
             try {
                 entry = getEntry();

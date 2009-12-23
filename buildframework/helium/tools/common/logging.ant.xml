@@ -26,10 +26,10 @@ Description:
     </description>
     <!-- Merges all XML log files ending in ".log2.xml" in the build log directory
     into a single summary log file. -->
-    <target name="log-merge" unless="metadata.enable" >
+    <target name="log-merge"  unless="metadata.enable">
         <mkdir dir="${build.log.dir}"/>
         <dependset>
-            <srcfileset dir="${build.log.dir}" includes="${build.id}*.log.xml"/>
+            <srcfileset dir="${build.log.dir}" includes="**/${build.id}*.log.xml"/>
             <targetfileset file="${build.summary.file}"/>
         </dependset>
         <if>
@@ -49,7 +49,10 @@ Description:
                 <for param="file">
                     <path>
                         <fileset dir="${build.log.dir}">
-                            <include name="${build.id}*.log.xml"/>
+                            <include name="**/${build.id}*.log.xml"/>
+                        </fileset>
+                        <fileset dir="${temp.build.dir}">
+                            <include name="**/${build.id}*.log.xml"/>
                         </fileset>
                     </path>
                     <sequential>
@@ -76,17 +79,33 @@ log2xml.append_summary(project.getProperty('build.summary.file'), r'@{file}')
     
     <!-- Outputs an HTML readable version of the summary log. -->
     <target name="render-log-summary">
-        <fmpp sourceFile="${helium.dir}/tools/common/templates/log/summary_metadata.html.ftl"
-                     outputfile="${build.log.dir}/summary/${build.id}_summary.html">
-            <freemarkerLinks expandProperties="yes">
-                macro: ${helium.dir}/tools/common/templates/macro
-            </freemarkerLinks>
-            <data expandProperties="yes">
-                dbPath: ${metadata.dbfile}
-                loginfo: xml(${build.log.dir}/${build.id}_info.log.xml)
-                ant: antProperties()
-            </data>
-        </fmpp>
+        <if>
+            <and>
+                <available file="${build.log.dir}/${build.id}_info.log.xml"/>
+                <available file="${metadata.dbfile}"/>
+            </and>
+            <then>
+                <fmpp sourceFile="${helium.dir}/tools/common/templates/log/summary_metadata.html.ftl"
+                             outputfile="${build.log.dir}/${build.id}_summary.html">
+                    <freemarkerLinks expandProperties="yes">
+                        macro: ${helium.dir}/tools/common/templates/macro
+                    </freemarkerLinks>
+                    <data expandProperties="yes">
+                        dbPath: ${metadata.dbfile}
+                        loginfo: xml(${build.log.dir}/${build.id}_info.log.xml)
+                        ant: antProperties()
+                    </data>
+                </fmpp>
+                <if>
+                    <not>
+                        <available file="${build.log.dir}/${build.id}_summary.html"/>
+                    </not>
+                    <then>
+                        <echo message="Error: failed to generate Summary file" />
+                    </then>
+                </if>
+            </then>
+        </if>
     </target>
     
     <!-- Prepare email for build summary -->

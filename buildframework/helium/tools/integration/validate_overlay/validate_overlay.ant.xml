@@ -39,31 +39,20 @@ Description:
             <arg line="${prep.config.file.parsed}"/>                         
             <arg line="${build.cache.dir}/validate_overlay.input.xml"/>
         </preset.exec>
-        
         <hlm:python>
-import nokia.nokiaccm
 import sys
 import validateoverlay
 import ant
 import traceback
+import ccmutil
 session = None
 try:
-    database = ant.get_property(r'${ccm.database}')
-    username = ant.get_property(r'${ccm.user.login}')
-    password = ant.get_property(r'${ccm.user.password}')
-    engine = ant.get_property(r'${ccm.engine.host}')
-    dbpath = ant.get_property(r'${ccm.database.path}')
-    if database != None:
-        session = nokia.nokiaccm.open_session(username, password, database=database)
-    else:
-        session = nokia.nokiaccm.open_session(username, password, engine, dbpath)
-
-    objects = validateoverlay.get_additional_delivery_objects(session, ant.get_property(r'${prep.delivery.conf.parsed}'))
-    # overlay validation
-    #validate(session, inputfile, overlaydir, showBranchInfo, createtask=False, releasetag=None, extra_objects=[]):    
-    validateoverlay.validate(session, ant.get_property(r'${build.cache.dir}/validate_overlay.input.xml'), ant.get_property(r'${common.overlay.dir}'), True, False, None, objects, r'${build.cache.dir}\validate_overlay')
-    
-    session.close()
+    session = ccmutil.get_session(ant.get_property(r'${ccm.database}'), ant.get_property(r'${ccm.user.login}'), ant.get_property(r'${ccm.user.password}'), ant.get_property(r'${ccm.engine.host}'), ant.get_property(r'${ccm.database.path}'))
+    if session is not None:
+        objects = validateoverlay.get_additional_delivery_objects(session, ant.get_property(r'${prep.delivery.conf.parsed}'))
+        #overlay validation
+        validateoverlay.validate(session, ant.get_property(r'${build.cache.dir}/validate_overlay.input.xml'), ant.get_property(r'${common.overlay.dir}'), True, False, None, objects, r'${build.cache.dir}\validate_overlay')
+        session.close()
 except Exception, e:
     print "ERROR: %s" % e
     print traceback.format_exc()
@@ -94,27 +83,19 @@ sys.exit(0)
             <arg line="${build.cache.dir}/validate_overlay.input.xml"/>                     
         </preset.exec>
         <hlm:python>
-import nokia.nokiaccm
 import sys
 import validateoverlay
 import ant
 import traceback
+import ccmutil
 session = None
 try:
-    database = ant.get_property(r'${ccm.database}')
-    username = ant.get_property(r'${ccm.user.login}')
-    password = ant.get_property(r'${ccm.user.password}')
-    engine = ant.get_property(r'${ccm.engine.host}')
-    dbpath = ant.get_property(r'${ccm.database.path}')
-    if database != None:
-        session = nokia.nokiaccm.open_session(username, password, database=database)
-    else:
-        session = nokia.nokiaccm.open_session(username, password, engine, dbpath)
-    objects = validateoverlay.get_additional_delivery_objects(session, ant.get_property(r'${prep.delivery.conf.parsed}'))
-    # overlay validation    
-    validateoverlay.validate(session, ant.get_property(r'${build.cache.dir}/validate_overlay.input.xml'), ant.get_property(r'${common.overlay.dir}'), True, True, 'mc/integration', objects, r'${build.cache.dir}\validate_overlay')    
-    
-    session.close()
+    session = ccmutil.get_session(ant.get_property(r'${ccm.database}'), ant.get_property(r'${ccm.user.login}'), ant.get_property(r'${ccm.user.password}'), ant.get_property(r'${ccm.engine.host}'), ant.get_property(r'${ccm.database.path}'))
+    if session is not None:
+        objects = validateoverlay.get_additional_delivery_objects(session, ant.get_property(r'${prep.delivery.conf.parsed}'))
+        # overlay validation    
+        validateoverlay.validate(session, ant.get_property(r'${build.cache.dir}/validate_overlay.input.xml'), ant.get_property(r'${common.overlay.dir}'), True, True, 'mc/integration', objects, r'${build.cache.dir}\validate_overlay')    
+        session.close()
 except Exception, e:
     print "ERROR: %s" % e
     print traceback.format_exc()

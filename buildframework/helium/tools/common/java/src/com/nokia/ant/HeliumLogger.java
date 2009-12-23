@@ -25,9 +25,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 import java.util.Hashtable;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.Calendar;
 
 import org.apache.tools.ant.BuildEvent;
 import org.apache.tools.ant.Project;
@@ -71,7 +70,7 @@ public class HeliumLogger extends DefaultLogger {
 
     private Date targetStartTime;
 
-    private Hashtable targetTable;
+    private ArrayList<String> targetTable;
 
     private Hashtable tempStartTime;
 
@@ -88,7 +87,7 @@ public class HeliumLogger extends DefaultLogger {
         buildStartTime = new Date();
         endOfPreviousTarget = new Date();
 
-        targetTable = new Hashtable();
+        targetTable = new ArrayList<String>();
         tempStartTime = new Hashtable();
 
         // For Stage start time
@@ -140,12 +139,13 @@ public class HeliumLogger extends DefaultLogger {
      * Triggered when a target finishes.
      */
     public void targetFinished(BuildEvent event) {
-        String targetName = event.getTarget().getName();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String time = sdf.format(Calendar.getInstance().getTime());
+        
+        String targetName = time + "," + event.getTarget().getName();
 
         logTargetEvent(targetName, "finish");
-
         logTargetTime(targetName);
-
     }
 
     private void logTargetTime(String targetName) {
@@ -153,7 +153,7 @@ public class HeliumLogger extends DefaultLogger {
         long targetLengthMSecs = targetFinishTime.getTime()
                 - targetStartTime.getTime();
         Long outputSecs = TimeUnit.MILLISECONDS.toSeconds(targetLengthMSecs);
-        targetTable.put(outputSecs, targetName);
+        targetTable.add(targetName + "," + outputSecs.toString());
     }
 
     /**
@@ -164,27 +164,19 @@ public class HeliumLogger extends DefaultLogger {
             if (directory != null && new File(directory).exists()) {
                 try {
                     // Log target times to file
-                    String timesLogFileName = directory + File.separator
-                            + "targetTimesLog.csv";
+                    String timesLogFileName = directory + File.separator + project.getProperty("build.id") + "_targetTimesLog.csv";
                     File timesLogFile = new File(timesLogFileName);
-
-                    // Sort hashtable.
-                    Vector v = new Vector(targetTable.keySet());
-                    Collections.sort(v);
 
                     FileOutputStream timesLogFileStream = new FileOutputStream(
                             timesLogFileName, true);
                     DataOutputStream timesLogOut = new DataOutputStream(
                             timesLogFileStream);
                     // Display (sorted) hashtable.
-                    for (Enumeration e = v.elements(); e.hasMoreElements();) {
-                        Long key = (Long) e.nextElement();
-                        String val = (String) targetTable.get(key);
-                        timesLogOut.writeBytes(val + "," + key.toString()
-                                + "\n");
-                    }
+                    for (String s : targetTable)
+                        timesLogOut.writeBytes(s + "\n");
                     timesLogOut.close();
                 } catch (Exception ex) {
+                    // We are Ignoring the errors as no need to fail the build.
                     log.fatal("Exception has occurred", ex);
                     ex.printStackTrace();
                 }

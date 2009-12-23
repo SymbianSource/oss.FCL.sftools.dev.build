@@ -32,6 +32,7 @@ Description:
 
     <!-- Runs eunittests for Java code -->
     <target name="eunittest" depends="prepare-eunit">
+        <mkdir dir="${test.log.dir}"/>
         <for list="${eunit.dlls}" delimiter="," param="eunit.dll">
             <sequential>
                 <exec executable="${build.drive}/epoc32/release/winscw/udeb/EUnitExeRunner.exe" dir="${build.drive}/epoc32/release/winscw/udeb" failonerror="${failonerror}">
@@ -39,7 +40,7 @@ Description:
                 </exec>
             </sequential>
         </for>
-        <copy file="${build.drive}\epoc32\winscw\c\shared\Eunit\logs\Eunit_Log.xml" tofile="${build.log.dir}\${build.id}_Eunit_Log.xml" />
+        <copy file="${build.drive}\epoc32\winscw\c\shared\Eunit\logs\Eunit_Log.xml" tofile="${temp.build.dir}\${build.id}_Eunit_Log.xml" />
     </target>
 
 </project>

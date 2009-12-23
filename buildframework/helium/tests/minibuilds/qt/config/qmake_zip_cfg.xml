@@ -34,7 +34,7 @@ Description:
         <config>
             <set name="name" value="${build.id}_${sysdef.configuration}.qmake"/>
             <set name="scanners" value="default,input.file"/>
-            <set name="input.files" value="${build.log.dir}/${build.id}_${sysdef.configuration}.qmake.generated.txt"/>
+            <set name="input.files" value="${compile.log.dir}/${build.id}_${sysdef.configuration}.qmake.generated.txt"/>
             <set name="include" value="output/docs/"/>
         </config>
     </config>

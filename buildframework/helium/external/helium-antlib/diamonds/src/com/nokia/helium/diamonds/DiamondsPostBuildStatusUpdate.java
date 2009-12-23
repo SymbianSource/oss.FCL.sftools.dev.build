@@ -92,7 +92,7 @@ public class DiamondsPostBuildStatusUpdate extends HlmPostDefImpl {
             try {
                 DiamondsListenerImpl.mergeToFullResults(new File(outputFile));
             } catch (DiamondsException de) {
-                log.debug("[DiamondsExceptionStatusUpdate] => " + de.getMessage());
+                log.error("Not able to merge into full results XML file " + de.getMessage(), de);
             }
         }
     }

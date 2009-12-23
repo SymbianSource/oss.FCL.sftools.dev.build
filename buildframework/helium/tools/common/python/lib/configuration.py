@@ -43,16 +43,17 @@ _logger = logging.getLogger('configuration')
 logging.basicConfig(level=logging.INFO)
 
 class Configuration(object, UserDict.DictMixin):
-    """ Base Configuration objects. """
+    """ Base Configuration object. """
     
     key_re = re.compile(r'\${(?P<name>[._a-zA-Z0-9]+)}', re.M)
     
     def __init__(self, data=None):
         """ Initialization. """
-        if data == None:
-            data = {}
+        #super(UserDict.DictMixin, self).__init__(data)
         self.name = None
-        self.data = data
+        self.data = {}
+        if data is not None:
+            self.data.update(data)
 
     def __contains__(self, key):
         """ Check if a keys is defined in the dict. """
@@ -75,6 +76,10 @@ class Configuration(object, UserDict.DictMixin):
     def keys(self):
         """ Get the list of item keys. """
         return self.data.keys()
+    
+    def has_key(self, key):
+        """ Check if key exists. """
+        return self.data.has_key(key)
 
     def match_name(self, name):
         """ See if the given name matches the name of this configuration. """
@@ -88,6 +93,7 @@ class Configuration(object, UserDict.DictMixin):
             return default_value
 
     def get_list(self, key, default_value):
+        """ Get a value as a list. """
         try:
             itemlist = self.__getitem__(key)
             if not isinstance(itemlist, types.ListType):
@@ -97,6 +103,7 @@ class Configuration(object, UserDict.DictMixin):
             return default_value
         
     def get_int(self, key, default_value):
+        """ Get a value as an int. """
         try:
             value = self.__getitem__(key)
             return int(value)
@@ -104,6 +111,7 @@ class Configuration(object, UserDict.DictMixin):
             return default_value
         
     def get_boolean(self, key, default_value):
+        """ Get a value as a boolean. """
         try:
             value = self.__getitem__(key)
             return value == "true" or value == "yes" or value == "1"
@@ -121,6 +129,20 @@ class Configuration(object, UserDict.DictMixin):
                 for match in self.key_re.finditer(value):
                     for property_name in match.groups():
                         if self.has_key(property_name):
+                            # See if interpolation may cause infinite recursion
+                            raw_property_value = self.__getitem__(property_name, False)
+                            #print 'raw_property_value: ' + raw_property_value
+                            if raw_property_value == None:
+                                raw_property_value = ''
+                            if isinstance(raw_property_value, types.ListType):
+                                for prop in raw_property_value:
+                                    if re.search('\${' + property_name + '}', prop) != None:
+                                        raise Exception("Key '%s' will cause recursive interpolation with value %s" % (property_name, raw_property_value))
+                            else:
+                                if re.search('\${' + property_name + '}', raw_property_value) != None:
+                                    raise Exception("Key '%s' will cause recursive interpolation with value %s" % (property_name, raw_property_value))
+                                    
+                            # Get the property value
                             property_value = self.__getitem__(property_name)
                             if isinstance(property_value, types.ListType):
                                 property_value = ",".join(property_value)
@@ -130,9 +152,11 @@ class Configuration(object, UserDict.DictMixin):
         return value
     
     def __str__(self):
+        """ A string representation. """
         return self.__class__.__name__ + '[' + str(self.name) + ']'
         
     def __cmp__(self, other):
+        """ Compare with another object. """
         return cmp(self.__str__, other.__str__)
        
        
@@ -368,6 +392,7 @@ class PropertiesConfiguration(Configuration):
             
 
 class NestedConfiguration(Configuration):
+    """ A nested configuration that may have a parent or child configurations. """
     def __init__(self):
         """ Initialization. """
         Configuration.__init__(self, None)
@@ -376,6 +401,7 @@ class NestedConfiguration(Configuration):
         self.abstract = None
 
     def isBuildable(self):
+        """ Is this a buildable configuration? """
         return self.abstract == None
 
     def _addPropertyValue(self, key, value, parseList=True):
@@ -411,6 +437,7 @@ class NestedConfiguration(Configuration):
             self.data[key] = value
 
     def __getitem__(self, key, interpolate=True):
+        """ Get an item. """
         #print "__getitem__(%s, %s)" % (self.name, key)
         if self.data.has_key(key):
             value = super(NestedConfiguration, self).__getitem__(key, False)
@@ -425,9 +452,11 @@ class NestedConfiguration(Configuration):
         raise KeyError('Cannot find key: ' + key)
 
     def __setitem__(self, key, item):
+        """ Set the value of an item. """
         self.data[key] = item
 
     def __delitem__(self, key):
+        """ Remove an item. """
         del self.data[key]
 
     def __contains__(self, key):
@@ -439,6 +468,7 @@ class NestedConfiguration(Configuration):
         return False
             
     def keys(self):
+        """ Get the list of item keys. """
         myKeys = self.data.keys()
         if self.parent != None:
             parentKeys = self.parent.keys()
@@ -446,8 +476,17 @@ class NestedConfiguration(Configuration):
                 if not key in myKeys:
                     myKeys.append(key)
         return myKeys
+        
+    def has_key(self, key):
+        """ Check if key exists. """
+        if self.data.has_key(key):
+            return True
+        if self.parent != None:
+            return self.parent.has_key(key)
+        return False
 
     def match_name(self, name):
+        """ See if the configuration name matches the argument. """
         if self.name == name:
             return True
         if self.parent != None:
@@ -665,13 +704,13 @@ class NestedConfigurationBuilder(ConfigurationBuilder):
                 else:
                     raise Exception('Bad configuration xml element: ' + child.nodeName)
 
-        for childConfigNode in configChildNodes:
-            self.parseConfiguration(childConfigNode, configs, config)
-
         # Only save the buildable configurations
         if config.isBuildable():
             _logger.debug('Adding config to buildable set: ' + str(config))
             configs.append(config)
+            
+        for childConfigNode in configChildNodes:
+            self.parseConfiguration(childConfigNode, configs, config)
 
     def getNodeByReference(self, refName):
         """ Find a node based on a reference to it. """
@@ -700,6 +739,13 @@ class HierarchicalConfiguration(Configuration):
             value = self.interpolate(value)
         return value
         
+    def has_key(self, key):
+        """ Check if key exists. """
+        elements = self._root.xpath(_Key(key).to_xpath())
+        if len(elements) > 0:
+            return True
+        return False
+        
     
 class _Key(object):
     """ A hierarchical configuration key. """
@@ -709,6 +755,7 @@ class _Key(object):
         self.string = string
         
     def to_xpath(self):
+        """ Convert the key to XPath syntax. """
         return self.string.replace('.', '/')
         
         

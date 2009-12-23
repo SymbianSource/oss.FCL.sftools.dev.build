@@ -46,6 +46,9 @@ def print_space_report(drive, space_required):
         if sys.platform == "win32":
             import win32file
             free_bytes = win32file.GetDiskFreeSpaceEx(drive)[0]
+        elif 'java' in sys.platform:
+            import java.io
+            free_bytes = java.io.File(drive).getFreeSpace()
         else:
             import os
             import statvfs
@@ -61,14 +64,12 @@ def print_space_report(drive, space_required):
 
     free_space = free_bytes / (1024 * 1024)
 
-
     print "drive:", drive
     print "Required Space:", space_required
     print "Free Space:", free_space
     
     if space_required < free_space:
         print "Enough free space"
-        sys.exit(0)
     else:
         print "Not enough free space, exiting"
         sys.exit(-1)

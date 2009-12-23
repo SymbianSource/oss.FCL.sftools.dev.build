@@ -46,11 +46,11 @@ public class Listener implements BuildListener, SubBuildListener {
     // Root node.
     private BuildNode buildNode;
     
-    // Ant build Stack. Usefull to associate with current parent.
+    // Ant build Stack. Useful to associate with current parent.
     private EndLessStack<DataNode> buildEventStack = new EndLessStack<DataNode>();
     
     // default list of properties to extract.
-    private String[] propList = {"os.name", "user.name", "build.name", "build.number", "build.id", "build.system", "env.NUMBER_OF_PROCESSORS", "helium.version", "env.SYMSEE_VERSION", "diamonds.build.id"};
+    private String[] propList = {"os.name", "user.name", "build.name", "build.number", "build.id", "build.family", "build.system", "env.NUMBER_OF_PROCESSORS", "helium.version", "env.SYMSEE_VERSION", "diamonds.build.id"};
 
     // Memory bean 
     private MemoryMXBean mbean;
@@ -71,7 +71,8 @@ public class Listener implements BuildListener, SubBuildListener {
                     Database antDB = new Database((Project)buildNode.getReference(), null, null);
                     database = antDB.createDOM();
                 } catch (Exception e) {
-                    System.out.println("Warning: couldn't generate Ant DB.");
+                    // We are Ignoring the errors as no need to fail the build.
+                    log.debug("Error: couldn't generate Ant DB.", e);
                     database = null;
                 }
             }
@@ -88,8 +89,8 @@ public class Listener implements BuildListener, SubBuildListener {
                 log.debug(xml);
                 sender.sendData(xml);
             } catch (Exception e) {
-                log.debug("Warning: error generating the XML.");
-                e.printStackTrace();
+                // We are Ignoring the errors as no need to fail the build.
+                log.debug("Error: error generating the InterData database XML.", e);
             }
         }
     }
@@ -104,10 +105,10 @@ public class Listener implements BuildListener, SubBuildListener {
         Hashtable<String, String> properties = new Hashtable<String, String>();
         if (buildNode != null) {
             Project project = (Project)buildNode.getReference();
-            Hashtable projProps = project.getProperties();
+            Hashtable<String, String> projProps = project.getProperties();
             for (int i = 0; i < propList.length; i++) {
                 if (projProps.containsKey(propList[i])) {
-                    properties.put(propList[i], (String)projProps.get(propList[i]));
+                    properties.put(propList[i], projProps.get(propList[i]));
                 }
             }
         }
@@ -133,7 +134,6 @@ public class Listener implements BuildListener, SubBuildListener {
     }
 
     public synchronized void buildStarted(BuildEvent event) {
-        log.debug("buildStarted");
         if (buildNode == null) {
             // Create data node for a build
             buildNode = new BuildNode(null, event.getProject());
@@ -143,7 +143,6 @@ public class Listener implements BuildListener, SubBuildListener {
     }
 
     public synchronized void subBuildFinished(BuildEvent event) {
-        log.debug("subBuildFinished");
         if (buildNode != null) {
             BuildNode node = (BuildNode)buildNode.find(event.getProject());
             if (node != null) {
@@ -158,7 +157,6 @@ public class Listener implements BuildListener, SubBuildListener {
     }
 
     public synchronized void subBuildStarted(BuildEvent event) {
-        log.debug("subBuildStarted");
         DataNode parentNode = buildEventStack.peek();
         if (parentNode != null) {
             BuildNode node = new BuildNode(parentNode, event.getProject());
@@ -171,7 +169,6 @@ public class Listener implements BuildListener, SubBuildListener {
     }
 
     public synchronized void targetFinished(BuildEvent event) {
-        //log.debug("targetFinished");
         if (buildNode != null) {
             DataNode node = buildNode.find(event.getTarget());
             if (node != null) {
@@ -189,7 +186,6 @@ public class Listener implements BuildListener, SubBuildListener {
     }
 
     public synchronized void targetStarted(BuildEvent event) {
-        //log.debug("targetStarted");
         DataNode parentNode = buildEventStack.peek();
         if (parentNode != null) {
             TargetNode node = new TargetNode(parentNode, event.getTarget());
@@ -203,30 +199,11 @@ public class Listener implements BuildListener, SubBuildListener {
     }
 
     public synchronized void taskFinished(BuildEvent event) {
-        //log.debug("taskFinished");
-        if (buildNode != null) {
-            DataNode node = buildNode.find(event.getTask());
-            if (node != null) {
-                node.setEndTime(new Date());
-                node.setReference(null);
-            } else {
-                log.debug("taskFinished - could not find task.");
-            }
-        }
+        // Ignoring task information
     }
 
     public synchronized void taskStarted(BuildEvent event) {
-        //log.debug("taskStarted");
-        if (buildNode != null) {
-            DataNode parentNode = buildNode.find(event.getTask().getOwningTarget());
-            if (parentNode != null) {
-                //log.debug("taskStarted - pushing using owning parent");
-                new TaskNode(parentNode, event.getTask());
-            } else {
-                //log.debug("taskStarted - pushing using stack");
-                new TaskNode(buildEventStack.peek(), event.getTask());
-            }
-        }
+        // Ignoring task information
     }
     
     public void addAssertTask(HlmAssertMessage assertTask) { 
@@ -240,5 +217,4 @@ public class Listener implements BuildListener, SubBuildListener {
         }
         
     }
-    
 }

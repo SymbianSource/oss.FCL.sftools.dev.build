@@ -84,7 +84,6 @@ public class XMLMerger {
             mergeNode(root, dataRoot);
             write();
         } catch (DocumentException e) {
-            log.debug("Error merging: " + e);
             throw new XMLMergerException(e.getMessage());
         }
     }

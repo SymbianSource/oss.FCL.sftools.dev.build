@@ -35,7 +35,7 @@ so the signaling framework knows how to behave when a signal is raised.
         <hlm:targetCondition>
             </available file="some-file.txt" />
         </hlm:targetCondition>
-    </hlm:signalConfig>
+    </hlm:signalListenerConfig>
  
 A signal will then be triggered each time the **target-name** completed. The signalInput will then defined how it should be handled.
 
@@ -162,12 +162,12 @@ Target prep-work-area has extra log extraction added and output xml is read by a
        <hlm:notifierListRef refid="defaultSignalFailNotifier" />
    </hlm:signalInput>
    
-   <hlm:signalListenerConfig id="prepWorkAreaSignalWarn">
+   <hlm:signalListenerConfig id="prepWorkAreaSignalWarn" target="prep-work-area" message="Warnings happened during Preparing Work Area">>
         <signalNotifierInput>
             <signalInput refid="prepWorkAreaSignalInputWarn" />
             <notifierInput file="${build.log.dir}/${build.id}_ccm_get_input.log2.xml" />
         </signalNotifierInput>
-       <hlm:targetCondition name="prep-work-area" message="Warnings happened during Preparing Work Area">
+       <hlm:targetCondition> 
            <hlm:hasSeverity severity="error" file="${build.log.dir}/${build.id}_ccm_get_input.log2.xml"/>
        </hlm:targetCondition>
    </hlm:signalListenerConfig>

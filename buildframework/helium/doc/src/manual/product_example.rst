@@ -390,12 +390,6 @@ This file contains all the information necessary to create the rom image, i.e. w
               <set name="rommake.product.name" value="product"/>
               <set name="rommake.product.type" value="RM-num"/>
   
-              <spec type="TemplateBuilder">
-                  <set name="template.build.id" value="${pr}.${build.number}" />
-                  <set name="template.file" value="${build.drive}\config\s60_32_config\number_config\number_product_config\config\data\CenrepVar_product\data\VariantData_product_template.xml" />
-                  <set name="output.file" value="${build.drive}\config\s60_32_config\number_config\number_product_config\config\data\CenrepVar_product\data\VariantData_product.xml" />
-              </spec>
-  
               <spec name="ee_group" abstract="true">
                   <set name="image.type" value="rnd,prd"/>
                   <set name="variant.txt.path" value="\epoc32\data\z\resource\versions\langsw.${config.name}.txt"/>

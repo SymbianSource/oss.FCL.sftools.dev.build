@@ -4,7 +4,6 @@
 </info>
 <info>SBS_HOME E:/Build_E/ido-config-df/sbs</info>
 <info>Set-up E:/Build_E/ido-config-df/sbs/sbs_init.xml</info>
-<warning>E:/build_e/sbs_2.8.4/sbs/win32/mingw/bin/cpp.exe: x:/sf/mw/accesssec/eapol/eapol_framework/eapol_symbian/group/eapol.mmp:36:2: warning: #warning For R&D info: Protected Setup & Expanded EAP defined, EAPOLPROTECTED.DEF will be used.</warning>
 <info>Command-line-arguments -s z:\output/build/canonical_system_definition_build.xml -k -c armv5 -j 4 -m z:\output\logs/ido_imm_mcl_devlon70_robot_5.1.005__armv5_multiple_thread_build_Makefile --filters=FilterHeliumLog -f z:\output\logs/ido_imm_mcl_devlon70_robot_5.1.005__armv5_multiple_thread_build_compile.log</info>
 <recipe name='resourcedependencies' target='z:/epoc32/build/camera/c_87f62b1af2e7d874/gscameraplugin_dll/gscameraplugin_resource_plugins_27.rpp.d' host='fawec012' layer='app_layer' component='' bldinf='z:/sf/app/camera/group/bld.inf' mmp='z:/sf/app/camera/camerauis/cameraapp/generic/GsCamcorderPlugin/group/gscameraplugin.mmp' config='armv5_udeb' platform='' phase='RESOURCE_DEPS' source=''>
 <![CDATA[

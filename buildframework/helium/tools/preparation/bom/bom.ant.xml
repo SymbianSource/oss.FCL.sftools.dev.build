@@ -27,16 +27,13 @@ Description:
     
     <property name="create.bom.workarea.root" value="."/> 
     
-    <!-- The target create-bom creates a Bill-Of-Material based on the Synergy project 
+    <!-- The target create-bom creates a Bill-Of-Material based on the SCM project 
     The target can be run in the project's root directory or the directory can be given by
     setting the property create.bom.workarea.root. The IDO builds are expected to set it to their 
     projects work area directory. -->
-    <target name="create-bom" depends="get-ccm-password,old-bom-log,ccm-prepare-input,prep-prepare-input" if="prep.delivery.file">
-        <if>
-            <isset property="run.ccm"/>
-            <then>
-                <hlm:startSpecificLogMacro name="${build.log.dir}/${build.id}_bom.log" regexp="${ccm.user.password}"/>
-                <hlm:python>
+    <target name="create-bom" depends="get-ccm-password,old-bom-log,ccm-prepare-input,prep-prepare-input">
+        <hlm:startSpecificLogMacro name="${prep.log.dir}/${build.id}_bom.log" regexp="${ccm.user.password}" phase="prep"/>
+        <hlm:python>
 import os
 import build.model
 import configuration
@@ -48,6 +45,7 @@ import traceback
 
 session = None
 try:
+    runccm = ant.get_property(r'${run.ccm}')
     database = ant.get_property(r'${ccm.database}')
     username = ant.get_property(r'${ccm.user.login}')
     password = ant.get_property(r'${ccm.user.password}')
@@ -56,38 +54,45 @@ try:
     waroot = ant.get_property(r'${create.bom.workarea.root}')
     buildid = ant.get_property(r'${build.id}')
     buildlogdir = ant.get_property(r'${build.log.dir}')
-    cache = None
-    if ant.get_property(r'${ccm.cache.xml}') is not None:
-        cache = str(ant.get_property(r'${ccm.cache.xml}'))
-    provider = ccm.extra.CachedSessionProvider(opener=nokia.nokiaccm.open_session, cache=cache)
-        
-    configBuilder = configuration.NestedConfigurationBuilder(open(ant.get_property(r'${prep.delivery.conf.parsed}'), 'r'))
-    configSet = configBuilder.getConfiguration()
-    for config in configSet.getConfigurations():
-        waroot = config['dir']
-        print "Found wa for project %s" % waroot
-                    
-    if database != None:
-        session = provider.get(username, password, database=database)
-    else:
-        session = provider.get(username, password, engine, dbpath)
-        
-    ccmproject =  ccm.extra.get_toplevel_project(session, waroot)
-    
-    config_data = {'delivery': ant.get_property(r'${prep.delivery.conf.parsed}'), 'prep.xml': ant.get_property(r'${prep.config.file.parsed}'), 'build.id': buildid, 'ccm.database': database, 'symbian_rel_week': ant.get_property(r'${symbian.version.week}'), 'symbian_rel_ver': ant.get_property(r'${symbian.version}'), 'symbian_rel_year': ant.get_property(r'${symbian.version.year}'), 's60_version': ant.get_property(r'${s60.version}'), 's60_release': ant.get_property(r'${s60.release}'), 'currentRelease.xml': ant.get_property(r'${build.drive}') + "/currentRelease.xml"}
-    config = configuration.Configuration(config_data)
-    
+    deliveryfile = ant.get_property(r'${prep.delivery.conf.parsed}')
+    oldbom = ant.get_property(r'${old.bom.log}')
     bom = None
-    # let's only support the new spec model!
-    bom = build.model.BOM(config, ccmproject, username=username, password=password, provider=provider)
-    
-    xml_writer = build.model.BOMXMLWriter(bom)
-    xml_writer.write(r"%s/%s_bom.xml" % (buildlogdir, buildid))
-    
-    if os.path.exists(ant.get_property(r'${old.bom.log}')):
-        xml_delta_writer = build.model.BOMDeltaXMLWriter(bom, ant.get_property(r'${old.bom.log}'))
+    bomfilename = r"%s/%s_bom.xml" % (buildlogdir, buildid)
+    if runccm and deliveryfile:
+        cache = None
+        if ant.get_property(r'${ccm.cache.xml}') is not None:
+            cache = str(ant.get_property(r'${ccm.cache.xml}'))
+        provider = ccm.extra.CachedSessionProvider(opener=nokia.nokiaccm.open_session, cache=cache)
+            
+        configBuilder = configuration.NestedConfigurationBuilder(open(deliveryfile, 'r'))
+        configSet = configBuilder.getConfiguration()
+        for config in configSet.getConfigurations():
+            waroot = config['dir']
+            print "Found wa for project %s" % waroot
+                        
+        if database != None:
+            session = provider.get(username, password, database=database)
+        else:
+            session = provider.get(username, password, engine, dbpath)
+            
+        ccmproject =  ccm.extra.get_toplevel_project(session, waroot)
+        
+        config_data = {'delivery': deliveryfile, 'prep.xml': ant.get_property(r'${prep.config.file.parsed}'), 'build.id': buildid, 'ccm.database': database, 'symbian_rel_week': ant.get_property(r'${symbian.version.week}'), 'symbian_rel_ver': ant.get_property(r'${symbian.version}'), 'symbian_rel_year': ant.get_property(r'${symbian.version.year}'), 's60_version': ant.get_property(r'${s60.version}'), 's60_release': ant.get_property(r'${s60.release}'), 'currentRelease.xml': ant.get_property(r'${build.drive}') + "/currentRelease.xml"}
+        config = configuration.Configuration(config_data)
+        
+        # let's only support the new spec model!
+        bom = build.model.SynergyBOM(config, ccmproject, username=username, password=password, provider=provider)
+        
+        xml_writer = build.model.BOMXMLWriter(bom)
+        xml_writer.write(bomfilename)
+    if not bom and os.path.exists(bomfilename):
+        config_data = {'prep.xml': ant.get_property(r'${prep.config.file.parsed}'), 'build.id': buildid, 'symbian_rel_week': ant.get_property(r'${symbian.version.week}'), 'symbian_rel_ver': ant.get_property(r'${symbian.version}'), 'symbian_rel_year': ant.get_property(r'${symbian.version.year}'), 's60_version': ant.get_property(r'${s60.version}'), 's60_release': ant.get_property(r'${s60.release}'), 'currentRelease.xml': ant.get_property(r'${build.drive}') + "/currentRelease.xml"}
+        config = configuration.Configuration(config_data)
+        bom = build.model.SimpleBOM(config, bomfilename)
+    if os.path.exists(oldbom):
+        xml_delta_writer = build.model.BOMDeltaXMLWriter(bom, oldbom)
         xml_delta_writer.write(buildlogdir + "/" + buildid + "_bom_delta.xml")
-        delta_bom_content_validity = xml_delta_writer.validate_delta_bom_contents(buildlogdir + "/" + buildid + "_bom_delta.xml", "%s/%s_bom.xml" % (buildlogdir, buildid), ant.get_property(r'${old.bom.log}'))
+        delta_bom_content_validity = xml_delta_writer.validate_delta_bom_contents(buildlogdir + "/" + buildid + "_bom_delta.xml", bomfilename, oldbom)
         if((delta_bom_content_validity == False) and (ant.get_property(r'${hlm.enable.asserts}') is not None)):
             print 'Bom delta contents are not matching'
             raise Exception
@@ -96,128 +101,207 @@ try:
         elif(delta_bom_content_validity == False):
             print 'Bom delta contents are not matching.'
     else:
-        print 'Old BOM log cannot be found, skipping BOM delta creation.'
-    bom.close()
-    session.close()
+        print 'Old BOM log cannot be found ' + oldbom + ', skipping BOM delta creation.'
+    if runccm:
+        bom.close()
+    if session:
+        session.close()
 except Exception, ex:
     print 'Caught exception in BOM: ' + str(ex)
     traceback.print_exc()
-                </hlm:python>
-            
+        </hlm:python>
+        <if>
+            <available file="${build.log.dir}/${build.id}_bom.xml"/>
+            <then>
+                <echo>${build.log.dir}</echo>
+                <xmltask source="${build.log.dir}/${build.id}_bom.xml" dest="${build.log.dir}/${build.id}_bom.xml" outputter="simple">
+                    <replace path="//bom/build/text()" withText="${build.id}"/>
+                </xmltask>
+                <fmpp sourceRoot="${helium.dir}/tools/preparation/bom"
+                      outputRoot="${prep.log.dir}" includes="bom.html.*,bom.txt.*" removeExtensions="ftl">
+                    <freemarkerLinks expandProperties="yes">
+                        macro: ${helium.dir}/tools/common/templates/macro
+                    </freemarkerLinks>
+                    <data expandProperties="yes">
+                        doc: xml(${build.log.dir}/${build.id}_bom.xml)                
+                    </data>
+                </fmpp>
+                
+                <move file="${prep.log.dir}/bom.html" tofile="${build.log.dir}/${build.id}_bom.html"/>
+                <move file="${prep.log.dir}/bom.txt" tofile="${prep.log.dir}/${build.id}_bom.txt"/>
+
+                <!-- Transform bom data into the diamonds xml format: 
+                     * BOM folders are flattened into tasks.
+                     * Schema version is extracted from the appropriate FMPP template. -->
+                <fmpp sourcefile="${helium.dir}/tools/common/templates/diamonds/diamonds_header.ftl" 
+                      outputfile="${build.temp.dir}/diamonds_header.xml" quiet="true"/>
+                <loadfile srcfile="${build.temp.dir}/diamonds_header.xml" property="diamonds.schema.xml">
+                    <filterchain>
+                        <linecontains>
+                            <contains value="schema"/>
+                        </linecontains>
+                    </filterchain>
+                </loadfile>                
+                <mkdir dir="${diamonds.build.output.dir}" />
+                <xmltask source="${build.log.dir}/${build.id}_bom.xml" dest="${diamonds.build.output.dir}/create-bom.xml">           
+                    <insert path="bom/content" xml="${diamonds.schema.xml}" position="before"/>
+                    <remove path="bom/content/project/folder/name"/>
+                    <remove path="bom/build"/>
+                    <rename path="bom" to="diamonds-build"/>
+                </xmltask>                
+                <delete file="${build.temp.dir}/diamonds_header.xml"/>
+                <replace file="${diamonds.build.output.dir}/create-bom.xml" token="&lt;folder&gt;" value="&lt;!-- &lt;folder&gt; --&gt;"/>
+                <replace file="${diamonds.build.output.dir}/create-bom.xml" token="&lt;/folder&gt;" value="&lt;!-- &lt;/folder&gt; --&gt;"/>
+                <xmltask source="${diamonds.build.output.dir}/create-bom.xml" dest="${diamonds.build.output.dir}/create-bom.xml"
+                         outputter="simple">
+                    <remove path="//comment()"/>
+                </xmltask>
+             
+                <hlm:assertFileExists file="${diamonds.build.output.dir}/create-bom.xml"/>
+                <hlm:assertFileExists file="${build.log.dir}/${build.id}_bom.html"/>
+                <hlm:assertFileExists file="${prep.log.dir}/${build.id}_bom.txt"/>
+                
+                <runtarget target="collect-task-owner-email"/>
+            </then>
+            <else>
+                <echo>WARNING: ${build.log.dir}/${build.id}_bom.xml file not found.</echo>
+            </else>
+        </if>
+        
+        <if>
+            <available file="${old.bom.log}"/>
+            <then>
+                <hlm:assertFileExists file="${build.log.dir}/${build.id}_bom_delta.xml"/>
+                <fmpp sourceRoot="${helium.dir}/tools/preparation/bom"
+                      outputRoot="${prep.log.dir}" includes="bom_delta.*" removeExtensions="ftl">
+                    <freemarkerLinks expandProperties="yes">
+                        macro: ${helium.dir}/tools/common/templates/macro
+                    </freemarkerLinks>
+                    <data expandProperties="yes">
+                        doc: xml(${build.log.dir}/${build.id}_bom_delta.xml)                
+                    </data>
+                </fmpp>
+                                
+                <move file="${prep.log.dir}/bom_delta.html" tofile="${build.log.dir}/${build.id}_bom_delta.html"/>
+                <move file="${prep.log.dir}/bom_delta.txt" tofile="${prep.log.dir}/${build.id}_bom_delta.txt"/>
+                
+                <hlm:assertFileExists file="${build.log.dir}/${build.id}_bom_delta.html"/>
+            </then>
+        </if>
+        <hlm:stopSpecificLogMacro name="${prep.log.dir}/${build.id}_bom.log" phase="prep"/>
+    </target>
+    
+    <!-- Private: The target create-task-owner-email creates a property task.owners.email which will contain
+    the list of task owners email IDs seperated by comma, the newly created property can be used thereafter
+    to send emails.
+    This target is automatically called by create-bom target -->
+    <target name="collect-task-owner-email">
+        <if>
+            <available file="${build.log.dir}/${build.id}_bom_delta.xml"/>
+            <then>
+                <xmltask source="${build.log.dir}/${build.id}_bom_delta.xml" dest="${build.log.dir}/${build.id}_bom_delta.xml"> 
+                    <call path="/bomDelta/content/task">
+                        <param name="task.delta" path="text()"/>
+                        <actions>
+                            <var name="task.delta" value="@{task.delta}"/>
+                            <propertyregex property="delta.task.id" input="${task.delta}" regexp="^([^:]+):\s*" select="\1"/>
+                            <xmltask source="${build.log.dir}/${build.id}_bom.xml" dest="${build.log.dir}/${build.id}_bom.xml"> 
+                                <call path="/bom/content/project/folder/task/owner/text()[../../id[.='${delta.task.id}']]" >
+                                    <param name="task.owner" path="."/>
+                                    <actions>
+                                        <var name="task.owner" value="@{task.owner}"/>
+                                        <if>
+                                            <and>
+                                                <isset property="task.owners"/>
+                                            </and>
+                                            <then>
+                                                <var name="task.owners" value="${task.owners},${task.owner}"/>
+                                            </then>
+                                            <else>
+                                                <var name="task.owners" value="${task.owner}"/>
+                                            </else>
+                                        </if>
+                                    </actions>
+                                </call>
+                            </xmltask>
+                        </actions>
+                    </call>
+                </xmltask> 
+            </then>
+            <else>
                 <if>
                     <available file="${build.log.dir}/${build.id}_bom.xml"/>
                     <then>
-                        <echo>${build.log.dir}</echo>
-                        <fmpp sourceRoot="${helium.dir}/tools/preparation/bom"
-                              outputRoot="${build.log.dir}" includes="bom.html.*,bom.txt.*" removeExtensions="ftl">
-                            <freemarkerLinks expandProperties="yes">
-                                macro: ${helium.dir}/tools/common/templates/macro
-                            </freemarkerLinks>
-                            <data expandProperties="yes">
-                                doc: xml(${build.log.dir}/${build.id}_bom.xml)                
-                            </data>
-                        </fmpp>
-                        
-                        <move file="${build.log.dir}/bom.html" tofile="${build.log.dir}/${build.id}_bom.html"/>
-                        <move file="${build.log.dir}/bom.txt" tofile="${build.log.dir}/${build.id}_bom.txt"/>
-        
-                        <!-- Transform bom data into the diamonds xml format: 
-                             * BOM folders are flattened into tasks.
-                             * Schema version is extracted from the appropriate FMPP template. -->
-                        <fmpp sourcefile="${helium.dir}/tools/common/templates/diamonds/diamonds_header.ftl" 
-                              outputfile="${build.temp.dir}/diamonds_header.xml" quiet="true"/>
-                        <loadfile srcfile="${build.temp.dir}/diamonds_header.xml" property="diamonds.schema.xml">
-                            <filterchain>
-                                <linecontains>
-                                    <contains value="schema"/>
-                                </linecontains>
-                            </filterchain>
-                        </loadfile>                
-                        <xmltask source="${build.log.dir}/${build.id}_bom.xml" dest="${build.log.dir}/create-bom.xml">           
-                            <insert path="bom/content" xml="${diamonds.schema.xml}" position="before"/>
-                            <remove path="bom/content/project/folder/name"/>
-                            <remove path="bom/build"/>
-                            <rename path="bom" to="diamonds-build"/>
-                        </xmltask>                
-                        <delete file="${build.temp.dir}/diamonds_header.xml"/>
-                        <replace file="${build.log.dir}/create-bom.xml" token="&lt;folder&gt;" value="&lt;!-- &lt;folder&gt; --&gt;"/>
-                        <replace file="${build.log.dir}/create-bom.xml" token="&lt;/folder&gt;" value="&lt;!-- &lt;/folder&gt; --&gt;"/>
-                        <xmltask source="${build.log.dir}/create-bom.xml" dest="${build.log.dir}/create-bom.xml"
-                                 outputter="simple">
-                            <remove path="//comment()"/>
-                        </xmltask>
-                     
-                        <hlm:assertFileExists file="${build.log.dir}/create-bom.xml"/>
-                        <hlm:assertFileExists file="${build.log.dir}/${build.id}_bom.html"/>
-                        <hlm:assertFileExists file="${build.log.dir}/${build.id}_bom.txt"/>
+                        <xmltask source="${build.log.dir}/${build.id}_bom.xml" dest="${build.log.dir}/${build.id}_bom.xml"> 
+                            <call path="/bom/content/project/folder/task/owner">
+                                <param name="task.owner" path="text()"/>
+                                <actions>
+                                    <var name="task.owner" value="@{task.owner}"/>
+                                    <if>
+                                        <and>
+                                            <isset property="task.owners"/>
+                                        </and>
+                                        <then>
+                                            <var name="task.owners" value="${task.owners},${task.owner}"/>
+                                        </then>
+                                        <else>
+                                            <var name="task.owners" value="${task.owner}"/>
+                                        </else>
+                                    </if>
+                                </actions>
+                            </call>
+                        </xmltask> 
+                    </then>
+                </if>
+            </else>
+        </if>
+        <sortlist property="task.owners" override="true" value="${task.owners}"/>
+        <propertyregex property="task.owners" override="true" input="${task.owners}" regexp="([^,]+),.*\1" replace="\1" global='true'/>
+        <for list="${task.owners}" delimiter="," param="task.owner" >
+            <sequential>
+                <var name="task.owner" value="@{task.owner}"/>
+                <hlm:ldap url="${email.ldap.server}" rootdn="${email.ldap.rootdn}" filter="uid=${task.owner}" outputproperty="task.owner.email" key="mail"/>
+                <if>
+                    <and>
+                        <isset property="task.owners.email"/>
+                    </and>
+                    <then>
+                        <var name="task.owners.email" value="${task.owners.email},${task.owner.email}"/>
                     </then>
                     <else>
-                        <echo>WARNING: ${build.log.dir}/${build.id}_bom.xml file not found.</echo>
+                        <var name="task.owners.email" value="${task.owner.email}"/>
                     </else>
                 </if>
-                
-                <if>
-                    <isset property="old.bom.log.present"/>
-                    <then>
-                        <hlm:assertFileExists file="${build.log.dir}/${build.id}_bom_delta.xml"/>
-                        <fmpp sourceRoot="${helium.dir}/tools/preparation/bom"
-                              outputRoot="${build.log.dir}" includes="bom_delta.*" removeExtensions="ftl">
-                            <freemarkerLinks expandProperties="yes">
-                                macro: ${helium.dir}/tools/common/templates/macro
-                            </freemarkerLinks>
-                            <data expandProperties="yes">
-                                doc: xml(${build.log.dir}/${build.id}_bom_delta.xml)                
-                            </data>
-                        </fmpp>
-                                        
-                        <move file="${build.log.dir}/bom_delta.html" tofile="${build.log.dir}/${build.id}_bom_delta.html"/>
-                        <move file="${build.log.dir}/bom_delta.txt" tofile="${build.log.dir}/${build.id}_bom_delta.txt"/>
-                        
-                        <hlm:assertFileExists file="${build.log.dir}/${build.id}_bom_delta.html"/>
-                    </then>
-                </if>
-                <hlm:stopSpecificLogMacro name="${build.log.dir}/${build.id}_bom.log"/>
-            </then>
-        </if>
+            </sequential>
+        </for>
     </target>
 
-    <!-- Calculates the previous build number based on the current one. -->
-    <target name="previous-build-number" unless="previous.build.number">
-        <script language="jython" setbeans="false">
-import ant
-from com.nokia.ant.util import Helper
-buildnum = Helper.getProperty(project, "build.number")
-pbuildnum = ant.get_previous_build_number(buildnum)
-if pbuildnum != None:
-    project.setProperty("previous.build.number", pbuildnum)
-        </script>
-        <echo>Previous build number = ${previous.build.number}</echo>
-    </target>
-    
-    
     <!-- Finds the path to the last usable XML BOM log for creating a BOM delta. --> 
-    <target name="old-bom-log" unless="old.bom.log" depends="previous-build-number">
-        <property name="bom.log" value="${publish.dir}/logs/${build.id}_bom.xml"/>
+    <target name="old-bom-log" unless="old.bom.log">
+        <property name="old.bom.log.publish.dir" value="${publish.dir}" />
+        <property name="bom.log" value="${old.bom.log.publish.dir}/logs/${build.id}_bom.xml"/>
         <script language="jython" setbeans="false">
 import re
-try:
-    buildnumber = project.getProperty("build.number")
-    pbuildnumber = project.getProperty("previous.build.number")
-    bomlog = project.getProperty("bom.log")
-    old_bom_log = re.sub(r'\.(%s)([\/_])' % buildnumber, r'.' + pbuildnumber + r'\2', bomlog)
-    project.setProperty("old.bom.log", old_bom_log)
-except ValueError:
-    # Do nothing - old BOM cannot be calulated
-    self.log("Old BOM cannot be found")
+import ant
+import os
+from com.nokia.ant.util import Helper
+
+previousbuildnumber = 1
+buildnumber = Helper.getProperty(project, "build.number")
+bomlog = project.getProperty("bom.log")
+while(previousbuildnumber > 0 and previousbuildnumber != ''):
+    previousbuildnumber = ant.get_previous_build_number(buildnumber)
+    try:
+        old_bom_log = re.sub(r'\.(%s)([\/_])' % project.getProperty("build.number"), r'.' + previousbuildnumber + r'\2', bomlog)
+        if os.path.exists(old_bom_log):
+            break
+    except ValueError:
+        self.log("Old BOM cannot be found")
+    buildnumber = previousbuildnumber
+project.setProperty("old.bom.log", old_bom_log)
         </script>
         <echo>Previous BOM log: ${old.bom.log}</echo>
         <available file="${old.bom.log}" property="old.bom.log.present"/>
-        <if>
-            <isset property="old.bom.log.present"/>
-            <then>
-                <hlm:assertFileExists file="${old.bom.log}"/>
-            </then>
-        </if>
         <echo>Previous BOM log present: ${old.bom.log.present}</echo>
     </target>
     

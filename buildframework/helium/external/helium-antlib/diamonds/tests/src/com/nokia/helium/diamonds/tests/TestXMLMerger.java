@@ -25,6 +25,7 @@ import java.io.Reader;
 import java.io.BufferedReader;
 import java.io.IOException;
 import com.nokia.helium.diamonds.XMLMerger;
+import com.nokia.helium.diamonds.XMLMerger.XMLMergerException;
 
 import org.junit.*;
 import static org.junit.Assert.*;
@@ -140,6 +141,35 @@ public class TestXMLMerger {
         //System.out.println(readTextFile(merge.getAbsolutePath()));
         assertTrue("test XML matches control skeleton XML " + diff, diff.similar());
     }
+
+    /**
+     * Test the XMLMerger with xml file with no Root node.
+     */
+    @Test(expected=XMLMergerException.class)
+    public void test_mergeWithNoRootNode() throws Exception{
+		File merge = createTextFile("<?xml version=\"1.0\"?>\n");
+		XMLMerger merger = new XMLMerger(merge);
+	}
+    /**
+     * Test the XMLMerger with xml files with different root nodes to merge.
+     */
+    @Test(expected=XMLMergerException.class)
+    public void test_mergeWithDifferentRootNodes() throws Exception{
+		File merge = createTextFile("<?xml version=\"1.0\"?>\n<root/>");
+		File toBeMerged = createTextFile("<?xml version=\"1.0\"?>\n<root1/>\n");
+		XMLMerger merger = new XMLMerger(merge);
+		merger.merge(toBeMerged);
+	}
+    /**
+     * Test the XMLMerger with xml files with Wrong xml format
+     */
+    @Test(expected=XMLMergerException.class)
+    public void test_mergeWithWrongXML() throws Exception{
+        	File merge = createTextFile("<?xml version=\"1.0\"?>\n<root/>");
+        	File toBeMerged = createTextFile("<?xml version=\"1.0\"?>\n<root/><test/>\n");
+        	XMLMerger merger = new XMLMerger(merge);
+        	merger.merge(toBeMerged);
+	}
 
     /**
      * Load file content into a string. 

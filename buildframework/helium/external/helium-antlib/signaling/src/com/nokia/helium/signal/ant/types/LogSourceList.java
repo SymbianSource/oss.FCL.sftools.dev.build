@@ -20,9 +20,7 @@ package com.nokia.helium.signal.ant.types;
 
 import org.apache.tools.ant.types.DataType;
 import com.nokia.helium.core.LogSource;
-
-import com.nokia.helium.core.HlmAntLibException;
-import com.nokia.helium.signal.ant.SignalListener;
+import org.apache.tools.ant.BuildException;
 
 import java.util.Vector;
 
@@ -67,7 +65,7 @@ public class LogSourceList extends DataType {
      */
     public Vector<LogSource> getLogSourceList() {
         if (sourceList.isEmpty()) {
-            throw new HlmAntLibException(SignalListener.MODULE_NAME, "notifierlist is empty.");
+            throw new BuildException("Signal notifierlist is empty.");
         }
         return sourceList;
     }

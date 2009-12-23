@@ -48,6 +48,8 @@ import java.util.HashMap;
 public class SignalConfig extends DataType
 {
    
+    private static boolean warningPrinted;
+    
     private Vector<ReferenceType> signalInputListRef = new Vector<ReferenceType>();
     private HashMap<String, TargetCondition> targetConditionsMap = new HashMap<String, TargetCondition>();
     private Vector<TargetCondition> targetConditions = new Vector<TargetCondition>();
@@ -55,15 +57,19 @@ public class SignalConfig extends DataType
     private Vector<LogSourceList> sourceList = new Vector<LogSourceList>();
     
     private String configID;
-
+    
+   
     
     /**
      * {@inheritDoc}
      */
     public void setProject(Project project) {
         super.setProject(project);
-        getProject().log("signalConfig element is now deprecated. Please consider moving to signalListenerConfig element or" + 
+        if (!warningPrinted) {
+            getProject().log("signalConfig element is now deprecated. Please consider moving to signalListenerConfig element or" + 
                 " signal task nested element.", Project.MSG_WARN);
+            warningPrinted = true;
+        }
     }
     
     /**

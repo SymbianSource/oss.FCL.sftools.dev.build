@@ -40,6 +40,51 @@ def xml_setattr(node, attr, value):
     """ Create the attribute if needed. """
     node.setAttribute(attr, value)
 
+def is_child_text_only(node):
+    """ Returns true if child node are all from TEXT_NODE type. """
+    for child in node.childNodes:
+        if child.nodeType != xml.dom.minidom.Node.TEXT_NODE:
+            return False
+    return True
+
+
+def ignore_whitespace_writexml(self, writer, indent="", addindent="", newl=""):
+    """ This version of writexml will ignore whitespace text to alway render
+    the output in a structure way.
+    indent = current indentation
+    addindent = indentation to add to higher levels
+    newl = newline string
+    """
+    writer.write(indent + "<" + self.tagName)
+
+    attrs = self._get_attributes()
+    a_names = attrs.keys()
+    a_names.sort()
+
+    for a_name in a_names:
+        writer.write(" %s=\"" % a_name)
+        xml.dom.minidom._write_data(writer, attrs[a_name].value)
+        writer.write("\"")
+    if self.childNodes:
+        writer.write(">")
+        if is_child_text_only(self):
+            for node in self.childNodes:
+                node.writexml(writer, '', '', '')
+            writer.write("</%s>%s" % (self.tagName, newl))
+        else:
+            writer.write(newl)
+            for node in self.childNodes:
+                if node.nodeType == xml.dom.minidom.Node.TEXT_NODE and node.data.isspace():
+                    pass
+                else:
+                    node.writexml(writer, indent + addindent, addindent, newl)
+            writer.write("%s</%s>%s" % (indent, self.tagName, newl))
+    else:
+        writer.write("/>%s" % (newl))
+
+xml.dom.minidom.Element.writexml = ignore_whitespace_writexml
+
+
 class ServicePack(object):
     
     def __init__(self, node):
@@ -68,7 +113,7 @@ class ReleaseMetadata(object):
     
     def __init__(self, filename, service=None, product=None, release=None):
         self._filename = filename
-        if os.path.exists(filename):
+        if filename and os.path.exists(filename):
             self._xml = xml.dom.minidom.parse(open(filename, "r"))
             releaseInformation = self._xml.getElementsByTagName(u"releaseInformation")
             if releaseInformation != []:
@@ -238,7 +283,7 @@ class ReleaseMetadata(object):
 
     def xml(self):
         """ Returning the XML as a string. """
-        return self._xml.toxml()
+        return self._xml.toprettyxml()
         
     def save(self, filename = None):
         """ Saving the XML into the provided filename. """
@@ -413,15 +458,19 @@ class Metadata2TDD(ReleaseMetadata):
 
 def find_latest_metadata(releasedir):
     """ Finding the release latest release metadata file. """ 
-    metadatas = []
-    for filename in os.listdir(releasedir):
-        if re.match(r'^release_metadata(_\d+)?\.xml$', filename, re.I) is not None:
-            LOGGER.debug("Found %s" % filename)
-            metadatas.append(filename)
-    # reverse the order...
-    metadatas.sort(reverse=True)
-    if len(metadatas) > 0:
-        return os.path.normpath(os.path.join(releasedir, metadatas[0]))
+    try:
+        metadatas = []
+        for filename in os.listdir(releasedir):
+            if re.match(r'^release_metadata(_\d+)?\.xml$', filename, re.I) is not None:
+                LOGGER.debug("Found %s" % filename)
+                metadatas.append(filename)
+        # reverse the order...
+        metadatas.sort(reverse=True)
+        if len(metadatas) > 0:
+            return os.path.normpath(os.path.join(releasedir, metadatas[0]))
+    except Exception, exc:
+        LOGGER.error(exc)
+        return None
     return None
 
 class ValidateReleaseMetadataCached(ValidateReleaseMetadata):
@@ -470,8 +519,10 @@ class ValidateReleaseMetadataCached(ValidateReleaseMetadata):
 
     def update_cache(self, metadatas):
         if self.__cachefile is not None and os.path.exists(os.path.dirname(self.__cachefile)):
-            writer = csv.writer(open(self.__cachefile, "wb"))
+            f = open(self.__cachefile, "wb")
+            writer = csv.writer(f)
             writer.writerows(metadatas)
+            f.close()
 
 class ValidateTicklerReleaseMetadata(ValidateReleaseMetadataCached):
     """ This class validate if a metadata file is stored in the correct location and

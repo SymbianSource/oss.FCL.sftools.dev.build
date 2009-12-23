@@ -21,7 +21,6 @@ import os
 import amara
 import codecs
 import zipfile
-from Ft.Lib import Uri
 
 class Library:
     def __init__(self, name, license, version=''):
@@ -56,7 +55,7 @@ COLORS = ['pink', 'red', 'lightblue', 'orange', 'green', 'yellow', 'turquoise', 
 class ReadIvyConfig:
     def __init__(self, ivyfilename):
         self.ivyfilename = ivyfilename
-        self.ivyxml = amara.parse(Uri.OsPathToUri(ivyfilename))
+        self.ivyxml = amara.parse(open(ivyfilename))
         self.group = ModuleGroup()
 
     def readConfigurations(self):
@@ -84,7 +83,7 @@ class ReadIvyConfig:
                     ivydir = os.path.dirname(self.ivyfilename)
                     ivydir = os.path.join(ivydir, 'modules')
                     ivyjarfile = os.path.join(ivydir, module.name + '-1.0.ivy.xml')
-                    ivymodulexml = amara.parse(Uri.OsPathToUri(ivyjarfile))
+                    ivymodulexml = amara.parse(open(ivyjarfile))
                     license = ''
                     for artifact in ivymodulexml['ivy-module'].publications.xml_children:
                         if hasattr(artifact, 'data'):
@@ -280,7 +279,7 @@ def linkPythonLibs(libraries, destgraphfilename, subcon):
 
 def externalDependancies(database, output):
     out = open(output, 'w')
-    db = amara.parse(Uri.OsPathToUri(database))
+    db = amara.parse(open(database))
     out.write('digraph G {\n')
     for p in db.antDatabase.project:
         items = []
@@ -333,7 +332,7 @@ def appendLogs(t, p, output, macro=False):
 
 def findLogFiles(database, output):
     out = open(output, 'w')
-    db = amara.parse(Uri.OsPathToUri(database))
+    db = amara.parse(open(database))
     out.write('digraph G {\n')
     output = []
     

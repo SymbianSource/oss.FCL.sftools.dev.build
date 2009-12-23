@@ -398,4 +398,12 @@ Description:
         </hlm:scm>
     </target>
     
+    
+    <target name="demo-init" depends="setup">
+        <property name="temp.dir" location="${ant.file.demo}/../temp" />
+        <hlm:scm verbose="true" scmUrl="scm:hg:${temp.dir}/new">
+            <hlm:init />
+        </hlm:scm>
+    </target>
+
 </project>

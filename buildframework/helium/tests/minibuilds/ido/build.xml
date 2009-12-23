@@ -25,6 +25,7 @@ Description:
 	<import file="../site/${env.TEAM}.ant.xml" />
 	<dirname property="config.dir" file="${ant.file.minibuild.ido}" />
 
+  <property name="data.drive.letter" value="E" />
 	<!-- Enable Helium internal assertion checking. -->
 	<property name="hlm.enable.asserts" value="1" />
 
@@ -32,8 +33,10 @@ Description:
 	<property name="build.family" value="test_minibuild_ido" />
 	<property name="major.version" value="0" />
 	<property name="minor.version" value="0" />
-
-	<property name="ccm.project.wa_path" location="E:\Build_E\${env.USERNAME}\ido_wa\${build.name}" />
+	
+	<condition property="ccm.project.wa_path" value="${data.drive.letter}:\Build_${data.drive.letter}\${env.USERNAME}\ido_wa\${build.name}"  else="${build.name}\wa" > 
+	      <os family="windows"/>
+	</condition> 
 	<property name="ccm.enabled" value="true" />
 
 
@@ -47,15 +50,16 @@ Description:
 
 	<!-- Configuring the build system -->
 	<property name="build.system" value="ec-helium" />
-	<property name="rvct.version" value="22_616" />
+	<property name="rvct.version" value="22_686" />
 
 	<!-- Configuring get latest env. -->
-	<property name="s60.grace.service" value="S60RnD" />
-	<property name="s60.grace.product" value="pf_5250" />
-	<property name="s60.grace.release" value="pf_5250(?:_| )?\d{4}(?:\s*wk)?\d{2}" />
-	<!-- matching pf_5250_200816 and pf_5250 2008 wk16 -->
-	<property name="prep.root.dir" value="E:\Build_E\${env.USERNAME}\ido_ba\${build.name}" />
-
+	<property name="s60.grace.service" value="s60_devices_sw" />
+	<property name="s60.grace.product" value="DFS7x.92" />
+	<property name="s60.grace.release" value="mcl_\d{6}_hw79" />
+	<!-- matching mcl_200948_hw79 -->
+	<condition property="prep.root.dir" value="${data.drive.letter}:\Build_${data.drive.letter}\${env.USERNAME}\ido_ba\${build.name}" else="${build.name}\ido_ba" >
+    <os family="windows"/>
+  </condition>
 	<!-- Synergy configuration -->
 	<property name="ccm.database" value="tr1test1" />
 	<property name="prep.delivery.file" location="config/delivery.xml" />
@@ -114,6 +118,7 @@ ${ant.coverage.summary}</echo>
 		</fmpp>
 	</target>
 
+
 	<!-- Preparing the content on top of the env -->
 	<target name="ido-50-build" depends="ido-build-prep,compile-main,build-log-summary,render-internal-exports,update-policy-src-reference,render-validate-policy,localisation-50-build,ido-codescanner,rndsdk-create-api-descr-xml,ats-test,publish-tasks-to-folder,ido-sources-to-s60-build-robot" />
 	<target name="ido-build-prep" depends="ido-configure-prep,init,check-tool-dependencies,log-build-env,set-arm-version,check-free-space,diamonds,do-ccm-get-input,ido-prep-clean,ido-prep-copy,create-bom" />
@@ -150,7 +155,7 @@ ${ant.coverage.summary}</echo>
 	</target>
 
 	<target name="mini-build-cleanup">
-		<delete verbose="true" includeemptydirs="true">
+		<delete verbose="true" includeemptydirs="true" failonerror="false">
 			<fileset dir="${build.drive}/" casesensitive="false">
 				<include name="makefile" />
 				<include name="*.mk" />
@@ -168,8 +173,9 @@ ${ant.coverage.summary}</echo>
 
 	<target name="mini-build-check">
 		<!-- Check if prep has set some prop correctly... -->
+		<!-- remember to update the selection by the environment variable in hlm.bat when switching to other compiler version -->
 		<echo>'${arm.compiler.version}'</echo>
-		<au:assertMatches string="${arm.compiler.version}" pattern="RVCT2\.2 \[Build 616\]" casesensitive="false" multiline="true" />
+		<au:assertMatches string="${arm.compiler.version}" pattern="RVCT2\.2 \[Build 686\]" casesensitive="false" multiline="true" />
 
 		<!-- Check if compile-main step did what expected... -->
 		<au:assertFileExists file="${canonical.sysdef.file}" />
@@ -183,8 +189,8 @@ ${ant.coverage.summary}</echo>
 				<au:assertFileExists file="${build.drive}/helium_minibuild_ido_clean.make" />
 				<au:assertFileExists file="${build.drive}/emake.data" />
 
-				<au:assertFileExists file="${build.log.dir}/${build.id}.helium_minibuild_ido_run_emake.bat" />
-				<au:assertFileExists file="${build.log.dir}/${build.id}.helium_minibuild_ido_clean_run_emake.bat" />
+				<au:assertFileExists file="${temp.build.dir}/${build.id}.helium_minibuild_ido_run_emake.bat" />
+				<au:assertFileExists file="${temp.build.dir}/${build.id}.helium_minibuild_ido_clean_run_emake.bat" />
 			</then>
 		</if>
 	</target>

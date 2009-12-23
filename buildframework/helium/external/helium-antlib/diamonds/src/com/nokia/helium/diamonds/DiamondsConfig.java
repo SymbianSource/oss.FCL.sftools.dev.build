@@ -65,11 +65,11 @@ public final class DiamondsConfig {
         SAXReader saxReader = new SAXReader();
         Document document = null;
         try {
-            log.debug("diamonds:DiamondsConfig:reading configuration");
+            log.debug("Reading diamonds configuration.");
             document = saxReader.read(configFile);
         } catch (Exception e) {
-            log.debug("diamonds:DiamondsConfig:", e);
-            throw new DiamondsException("Diamonds configuration parsing error: "
+            // No need to fail the build due to internal Helium configuration errors.
+            log.debug("Diamonds configuration parsing error: "
                     + e.getMessage());
         }
         parseConfig(document);

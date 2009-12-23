@@ -93,3 +93,24 @@ Macros removed
 * ${macro}
     </#if>
 </#list>
+
+Ant Tasks added
+===============
+<#list doc.apiChanges.taskdef?sort as taskdef>
+    <#assign link = taskdef.@classname>
+    <#if taskdef.@state == 'added'>
+      <#if link?contains("com.nokia.helium")>
+* `${taskdef} <helium-antlib/api/doclet/${link}.html>`_
+      <#else>          
+* `${taskdef} <api/ant/${link}.html>`_
+      </#if>
+    </#if>  
+</#list>
+
+Ant Tasks removed
+=================
+<#list doc.apiChanges.taskdef?sort as taskdef>
+    <#if taskdef.@state == 'removed'>
+* ${taskdef}
+    </#if>
+</#list>

@@ -48,27 +48,25 @@ class PreBuilder(object):
     def __init__(self, configSet):
         self.configSet = configSet
         # Select the first configuration as a default, for referencing common properties
-        self.config = configSet.getConfigurations()[0]
+        self.config = None
+        configs = configSet.getConfigurations()
+        if len(configs) > 0:
+            self.config = configs[0]
 
     def writeBuildFile(self, taskList, buildFilePath, output='ant'):
         """ Converting a task list into output format and writing it into buildFilePath file. """
         writer = None
-        #if 'build.tool' in self.config:
-            # Choose appropriate build tool
-        #    print 'choosing build tool!'
-        #    pass
-        #else:
-        # Choose Ant by default for now
-        print self.config.keys()
         buildFileDir = os.path.dirname(buildFilePath)
-        if not os.path.exists(buildFileDir):
+        if len(buildFileDir) > 0 and not os.path.exists(buildFileDir):
             os.makedirs(buildFileDir)
         writer = get_writer(output, open(buildFilePath, 'w'))
         writer.write(taskList)
 
+
 class Task(object):
     """ Abstract Task object. """
     pass
+
         
 class Command(Task):
     """
@@ -127,6 +125,7 @@ class Command(Task):
         argsString = ' '.join(self._args)
         return "%s: %s: %s" % (self.name(), self.path(), argsString)
 
+
 class AntTask(Task):
     """ Interface that defines supports for an Ant task rendering. """
     
@@ -135,7 +134,8 @@ class AntTask(Task):
             e.g: Delete Class will use delete task from Ant, else convert into perl ... remove filename.__getCommandByStage
         """ 
         pass
-    
+
+
 class Delete(AntTask, Command):
     """ Implements file/directory deleletion mechanism. """
     
@@ -185,6 +185,7 @@ class Copy(AntTask, Command):
         node.setAttributeNS("", "failonerror", "false")
         node.setAttributeNS("", "file", self.srcFile)
         node.setAttributeNS("", "todir", self.todir)
+        node.setAttributeNS("", "overwrite", "true")
         return node
          
 
@@ -241,6 +242,7 @@ class AbstractOutputWriter:
     def __del__(self):
         self.close()
 
+
 class StringWriter(AbstractOutputWriter):
     """ Implements a Writer which is able to directly write to the output stream. """
     
@@ -295,6 +297,7 @@ class AntWriter(AbstractOutputWriter):
         projectnode = doc.createElementNS("", "project")
         projectnode.setAttributeNS("", "name", '')
         projectnode.setAttributeNS("", "default", "all")
+        projectnode.setAttributeNS("", "xmlns:hlm", "http://www.nokia.com/helium")
         doc.appendChild(projectnode)
         target = doc.createElementNS("", "target")
         target.setAttributeNS("", "name", "all")
@@ -308,7 +311,7 @@ class AntWriter(AbstractOutputWriter):
         for config in config_list:
             sequential = doc.createElementNS("", "sequential")
             outputfile = os.path.normpath(os.path.join(output_path, config + ".xml"))
-            exec_element = doc.createElementNS("", "exec")
+            exec_element = doc.createElementNS("", "hlm:exec")
             exec_element.setAttributeNS("", "executable", "python")
             exec_element.setAttributeNS("", "failonerror", "true")
 
@@ -347,6 +350,7 @@ class AntWriter(AbstractOutputWriter):
         projectnode = doc.createElementNS("", "project")
         projectnode.setAttributeNS("", "name", '')
         projectnode.setAttributeNS("", "default", "all")
+        projectnode.setAttributeNS("", "xmlns:hlm", "http://www.nokia.com/helium")
         doc.appendChild(projectnode)
 
         stages = self.__getCommandByStage(cmdList)
@@ -384,7 +388,7 @@ class AntWriter(AbstractOutputWriter):
         if issubclass(type(cmd), AntTask):
             return cmd.toAntTask(doc)
         else:
-            execnode = doc.createElementNS("", "exec")
+            execnode = doc.createElementNS("", "hlm:exec")
             execnode.setAttributeNS("", "executable", cmd.executable())
             execnode.setAttributeNS("", "dir", cmd.path())
             arg = doc.createElementNS("", "arg")
@@ -460,7 +464,6 @@ class MakeWriter(AbstractOutputWriter):
                 self.__commandToTarget(cmd)
                 return "id%s" % cmd.jobId()
             self._fileOut.write("stage%s : %s\n" % (stage, ' '.join([__toId(task) for task in stages[stage]])))
-        
 
     def __commandToTarget(self, cmd):
         """ Converting a Command into a Makefile target. """
@@ -481,6 +484,7 @@ __writerConstructors = { 'ant': AntWriter,
                          'make': MakeWriter,
                          'ebs': EBSWriter }
 
+
 def convert(cmdList, filename, outputtype="ant"):
     """ Helper to directly convert a command list into a specific runnable command format.
         e.g:
@@ -490,6 +494,7 @@ def convert(cmdList, filename, outputtype="ant"):
     """
     writer = __writerConstructors[outputtype](filename)
     writer(cmdList)
+
 
 def get_writer(buildTool, fileOut):
     """ Get a Writer for a specific format. """

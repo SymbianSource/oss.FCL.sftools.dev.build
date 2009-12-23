@@ -21,6 +21,9 @@ Description:
 ============================================================================
 -->
 <project name="test_getvariablevalue" xmlns:au="org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>
+        Get Variable Value Testing target
+    </description>
     <property environment="env"/>
     
     <property name="helium.dir" location="../../.." />
@@ -28,15 +31,17 @@ Description:
         
     
     <target name="test-getvariablevalue">
-        <hlm:argSet id="test.variableSet">
-            <variable name="v1" value="the_value"/>
-        </hlm:argSet>
+        <hlm:sbsinput id="test.variableSet">
+            <sbsOptions>
+                <arg name="v1" value="test"/>
+            </sbsOptions>
+        </hlm:sbsinput>
+        
         <hlm:getVariableValue name="v1" property="v1.value">
-            <hlm:argSet refid="test.variableSet"/>
+            <hlm:sbsinput refid="test.variableSet" />
         </hlm:getVariableValue>
         <au:assertTrue>
-            <equals arg1="${v1.value}" arg2="the_value"/>
+            <equals arg1="${v1.value}" arg2="test"/>
         </au:assertTrue>
     </target>    
 </project>
-

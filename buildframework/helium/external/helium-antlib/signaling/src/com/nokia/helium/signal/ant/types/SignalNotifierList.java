@@ -19,10 +19,9 @@
 package com.nokia.helium.signal.ant.types;
 
 import org.apache.tools.ant.types.DataType;
-
-import com.nokia.helium.core.HlmAntLibException;
+import org.apache.tools.ant.BuildException;
 import com.nokia.helium.signal.Notifier;
-import com.nokia.helium.signal.ant.SignalListener;
+
 
 import java.util.Vector;
 
@@ -59,7 +58,7 @@ public class SignalNotifierList extends DataType {
      */
     public Vector<Notifier> getNotifierList() {
         if (notifierlist.isEmpty()) {
-            throw new HlmAntLibException(SignalListener.MODULE_NAME, "notifierlist is empty.");
+            throw new BuildException(" Signal notifierlist is empty.");
         }
         return notifierlist;
     }

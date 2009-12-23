@@ -18,6 +18,7 @@
 #===============================================================================
 
 import os
+import shutil
 import re
 import fileutils
 import buildtools
@@ -329,3 +330,46 @@ class SignaturesDict(dict):
             string = string + filename + " " + str(both) + " " + " " + str(only_old) + " " + str(only_new) + " " + self[filename][0] + " " + self[filename][1] + "\n"
         
         return string
+
+def readEvalid(dir):
+    filesdict = {}
+    for root, _, files in os.walk(dir):
+        for name in files:
+            f = os.path.join(root, name)
+            directory = None
+            for md5line in open(f):
+                if md5line.startswith('Directory:'):
+                    directory = md5line.replace('Directory:', '').replace('\n', '')
+                if 'MD5=' in md5line:
+                    info = re.search(r'([ \S]+) TYPE=.*MD5=(\S+)', md5line)
+                    if info != None:
+                        assert directory
+                        filesdict[os.path.join(directory, info.group(1))] = info.group(2)
+    return filesdict
+    
+def changedFiles(atsevalidpre, atsevalidpost):
+    filesbefore = readEvalid(atsevalidpre)
+    filesafter = readEvalid(atsevalidpost)
+    
+    changedfiles = []
+    
+    for key in filesafter.keys():
+        if key not in filesbefore:
+            changedfiles.append(key)
+        else:
+            if filesafter[key] != filesbefore[key]:
+                changedfiles.append(key)
+    
+    return changedfiles
+    
+def evalidAdomapping(builddrive, dest, adomappingfile):
+    os.chdir(builddrive)
+    i = 0
+    if os.path.exists(dest):
+        shutil.rmtree(dest)
+    os.mkdir(dest)
+    for line in open(adomappingfile):
+        dir = line.split('=')[0].replace(r'\:', ':')
+        tmpfile = os.path.join(dest, str(i))
+        os.system('evalid -g ' + dir + ' ' + tmpfile)
+        i = i + 1

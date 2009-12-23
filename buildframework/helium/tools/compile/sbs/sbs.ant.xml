@@ -72,140 +72,133 @@ Description:
         </sequential>
     </macrodef>
 
-    <if>
-        <not>
-            <isset property="sbs.config"/>
-        </not>
-        <then>
-            <property name="sbs.config" value="armv5" />
-            <property name="sbs.tools.config" value="tools_rel" />
-        </then>
-    </if>
-
-    <import file="sbs.settings.ant.xml" />
-
     <!-- SBS build with gmake as engine type. Default is using sbs macro, to use old implementation to
     use using exec task, then sbs.using.exec needs to be set. -->
     <target name="compile-sbs" description="This is the main build that gets built for ARMV5 and WINSCW platforms">
+        <!-- only temporary once config file option starts to work, then no 
+        need to copy the plugin file -->
+
         <if>
             <or>
                 <equals arg1="${build.system}" arg2="sbs" />
                 <equals arg1="${build.system}" arg2="sbs-ec" />
             </or>
             <then>
-                <!-- Choosing the right command (either clean or normal command) and 
-                    the default command if no input is specified for sbs -->
-                <var name="sbs.cmd.reference" value="sbs" />
-                <var name="sbs.make.reference" value="${build.system}.make.options" />
-                <hlm:sbsMakeOptions id="sbs.internal.make.options" refid="${sbs.make.reference}" />
-                <if>
-                    <istrue value="${compile.cmd.clean}"/>
-                    <then>
-                        <var name="sbs.cmd.reference" value="${sbs.cmd.reference}.clean" />
-                    </then>
-                </if>
-                <if>
-                    <not>
-                        <isreference refid="${sbs.cmd.reference}.var"/>
-                    </not>
-                    <then>
-                        <var name="sbs.cmd.reference" value="${sbs.cmd.reference}.default" />
-                    </then>
-                </if>
-                <if>
-                    <not>
-                        <isreference refid="${sbs.make.reference}"/>
-                    </not>
-                    <then>
-                        <hlm:sbsMakeOptions id="sbs.internal.make.options" refid="${sbs.make.reference}.default" />
-                    </then>
-                </if>
-                <var name="sbs.cmd.reference" value="${sbs.cmd.reference}.var" />
-                <echo message="sbs build:${env.SBS_HOME}/python/plugins/filter_heliumlog.py" />
-
-                <!-- Generate the filtered layers -->
-                <hlm:generate-layers />
-
-                <!-- run arm license checking / setting arm version only for arm config --> 
-                <hlm:getVariableValue name="config" property="compilevalue.var">
-                    <hlm:argSet refid="${sbs.cmd.reference}" />
-                </hlm:getVariableValue>
-                <if>
-                    <not>
-                        <equals arg1="${compilevalue.var}" arg2="winscw"/>
-                    </not>
-                    <then>
-                        <runtarget target="set-arm-version"/>
-                    </then>
-                </if>
-
-                <!-- only temporary once config file option starts to work, then no 
-                need to copy the plugin file -->
-
                 <echo message="Copying helium filter plugin to sbs home" />
                 <copy file="${helium.dir}/tools/common/python/scripts/filter_metadatalog.py" todir="${env.SBS_HOME}/python/plugins/" failonerror="true" />
                 <copy file="${helium.dir}/tools/common/python/scripts/sbsscanlogmetadata.py" todir="${env.SBS_HOME}/python/plugins/" failonerror="true" />
-
-
-                <echo>Building with SBSv2</echo>
-                <echo message="build.drive:${build.drive}"/>
-                <echo message="build.log.dir:${build.log.dir}"/>
-                <echo message="sysdef.configuration:${sysdef.configuration}"/>
-                <echo message="canonical.sysdef.file:${canonical.sysdef.file}"/>
-                <echo message="env.SBS_HOME:${env.SBS_HOME}"/>
-                <!-- Implicit calls to tools configuration, for temporary once the sbs is working
-                    to execte all configuration at the same time, this could be removed. -->
-                <if>
-                    <istrue value="${sbs.implicit.tools.build}" />
-                    <then>
-                        <echo message="Implicit tools configuration build" />
-                        <hlm:sbsCompileMacro cmdreference = "sbs.implicit.tools.var" />
-                    </then>
-                </if>
-                <hlm:sbsCompileMacro cmdreference = "${sbs.cmd.reference}" />
+                <echo message="sbs.patternset: ${sbs.patternset}" />
+                <hlm:generate-layers />
+                <var name="sbs.inputs.list" value="" unset="true"/>
+                <hlm:getsbsinputs config="sbs.${sysdef.configuration}" outputProperty="sbs.inputs.list"/>
+                <for list="${sbs.inputs.list}" delimiter="," param="sbs.input">
+                    <sequential>
+                        <echo message="building raptor input: @{sbs.input}" />
+                        <hlm:getVariableValue name="--logfile" property="sbs.log.file">
+                            <hlm:sbsinput refid="@{sbs.input}" />
+                        </hlm:getVariableValue>
+                        <!-- run arm license checking / setting arm version only for arm config -->
+                        <hlm:getVariableValue name="-c" property="compilevalue.var" failOnerror="false">
+                            <hlm:sbsinput refid="@{sbs.input}" />
+                        </hlm:getVariableValue>
+                        <echo message="config parameter -c : ${compilevalue.var}" />
+                        <if>
+                            <and>
+                                <isset property="compilevalue.var"/>
+                                <matches string="${compilevalue.var}" pattern="arm.*"/>
+                            </and>
+                            <then>
+                                <runtarget target="set-arm-version"/>
+                            </then>
+                        </if>
+                        <var name="sbs.clean.log" value="${sbs.log.file}.clean.log"/>
+                        <!-- Generate the filtered layers -->
+                        <hlm:sbstask sbsinput="@{sbs.input}" sysdefFile="${build.drive}/output/build/canonical_system_definition_${sysdef.configuration}.xml" 
+                            layerPatternSetRef="${sbs.patternset}" errorOutput="${sbs.log.file}.sbs_error.log" 
+                            workingDir="${build.drive}/" failOnError="false" outputLog="${sbs.log.file}" cleanLog = "${sbs.clean.log}"
+                             statsLog="${compile.log.dir}/${build.id}_${sysdef.configuration}.info.xml" />
+                        <!-- run arm license checking / setting arm version only for arm config --> 
+                        <echo message="sbs.log.file: ${sbs.log.file}" />
+                        <hlm:sbsProcessOutputMacro sbs.log.file="${sbs.log.file}"
+                            sbs.clean.log.file="${sbs.clean.log}"  sbs.stats.file="${compile.log.dir}/${build.id}_${sysdef.configuration}.info.xml"
+                            sbs.ant.output.file="${sbs.log.file}" sbs.error.output.file="${sbs.log.file}.sbs_error.log"/>
+                    </sequential>
+                </for>
+                <hlm:assertFileExists file="${sbs.log.file}.sbs_error.log"/>
+                <hlm:assertFileExists file="${compile.log.dir}/${build.id}_${sysdef.configuration}.info.xml"/>
+                <hlm:assertFileExists file="${sbs.log.file}"/>
+                <hlm:assertFileExists file="${sbs.clean.log}"/>
             </then>
         </if>
     </target>
 
-    <macrodef name="sbsCompileMacro" uri="http://www.nokia.com/helium">
-        <attribute name="cmdreference" />
+    <macrodef name="sbsProcessOutputMacro" uri="http://www.nokia.com/helium">
+        <attribute name="sbs.clean.log.file" />
+        <attribute name="sbs.log.file" />
+        <attribute name="sbs.stats.file" />
+        <attribute name="sbs.error.output.file" />
+        <attribute name="sbs.ant.output.file" />
         <sequential>
-            <var name="sbs.log.file" value="" unset="true"/>
-            
-            <delete file="${build.log.dir}/${build.id}.${sysdef.configuration}_sbs_info.xml" failonerror="false"/>
-            <!-- sbs.log.file set by sbs tool execution, temporary -->
-            <hlm:toolMacro name="sbs">
-                <hlm:toolvarset refid="@{cmdreference}"/>
-            </hlm:toolMacro>
-            
-            <!-- update the resultes to database -->
-            <hlm:assertFileExists file="${build.log.dir}/${build.id}.${sysdef.configuration}_sbs_info.xml"/>
-            <echo message="Metadata enabled, storing build status in database" />
-            <echo message="sbs log file :${sbs.log.file}" />
+            <var name="sbs.scan2.template" value="scan2.html.ftl" />
+            <basename property="base.sbs.log" file="@{sbs.log.file}" suffix=".log"/>
             <hlm:metadatarecord database="${metadata.dbfile}">
-                <hlm:sbsmetadatainput>
-                    <fileset casesensitive="false" file="${sbs.log.file}"/>
+                <hlm:textmetadatainput>
+                    <fileset casesensitive="false" file="@{sbs.error.output.file}"/>
                     <metadatafilterset refid="filterset.sbs" />
-                </hlm:sbsmetadatainput>
+                </hlm:textmetadatainput>
             </hlm:metadatarecord>
-            <basename property="base.sbs.log.file" file="${sbs.log.file}" suffix=".log"/>
-            <echo message="base sbs log file :${base.sbs.log.file}" />
-            <fmpp sourceFile="${helium.dir}/tools/common/templates/log/scan2.html.ftl"
-                         outputfile="${sbs.log.file}.scan2.html">
+            <basename property="base.sbs.ant.output.log" file="@{sbs.ant.output.file}" />
+            <hlm:signalMacro logfile="@{sbs.error.output.file}" 
+                signal.input="raptorErrorSignalInput" phase="compile"/>
+            <!-- update the resultes to database -->
+            <echo message="Metadata enabled, storing build status in database" />
+            <echo message="sbs log file :@{sbs.log.file}" />
+            <echo message="sbs.clean.log.file :@{sbs.clean.log.file}" />
+            <trycatch property="hlm-sbs.parser.thrown">
+                <try>
+                    <hlm:metadatarecord database="${metadata.dbfile}">
+                        <hlm:sbsmetadatainput cleanLogFile="@{sbs.clean.log.file}">
+                            <fileset casesensitive="false" file="@{sbs.log.file}"/>
+                            <metadatafilterset refid="filterset.sbs" />
+                        </hlm:sbsmetadatainput>
+                    </hlm:metadatarecord>
+                </try>
+                <catch>
+                    <if>
+                        <istrue value="${skip.sbs.parser.exception}" />
+                        <then>
+                            <var name="sbs.scan2.template" value="scan2_text.html.ftl" />
+                            <hlm:metadatadelete database="${metadata-read-db}">
+                                <fileset casesensitive="false" file="@{sbs.log.file}"/>
+                            </hlm:metadatadelete>
+                            <hlm:metadatarecord database="${metadata-read-db}" >
+                                <hlm:textmetadatainput>
+                                    <fileset casesensitive="false" file="@{sbs.log.file}"/>
+                                </hlm:textmetadatainput>
+                            </hlm:metadatarecord>
+                        </then>
+                        <else>
+                            <fail message="failed during raptor log parsing: might be due to invalid xml output from raptor" />
+                        </else>
+                    </if>
+                </catch>
+            </trycatch>
+            <fmpp sourceFile="${helium.dir}/tools/common/templates/log/${sbs.scan2.template}"
+                         outputfile="@{sbs.log.file}.scan2.html">
                 <freemarkerLinks expandProperties="yes">
                     macro: ${helium.dir}/tools/common/templates/macro
                 </freemarkerLinks>
                 <data expandProperties="yes">
                     dbPath: ${metadata.dbfile}
-                    doc: xml(${build.log.dir}/${build.id}.${sysdef.configuration}_sbs_info.xml)
+                    doc: xml(@{sbs.stats.file})
                     ant: antProperties()
                 </data>
             </fmpp>
             <echo message="generating signal" />
-            <hlm:assertFileExists file="${sbs.log.file}.scan2.html"/>
-            <hlm:calculateErrorsFromLog logfile="${sbs.log.file}" />
-            <hlm:compileLogSignalMacro compile.summary.file="${base.sbs.log.file}" 
-                error.limit="${build.errors.limit}"/>
+            <hlm:assertFileExists file="@{sbs.log.file}.scan2.html"/>
+            <hlm:calculateErrorsFromLog logfile="@{sbs.log.file}" />
+            <hlm:compileLogSignalMacro compile.summary.file="${base.sbs.log}" 
+                error.limit="${build.errors.limit}" phase="compile"/>
             <!-- Blocks packaging configuration generation. -->
             <if>
                 <istrue value="${blocks.enabled}" />
@@ -226,11 +219,4 @@ Description:
             </if>
         </sequential>
     </macrodef>
-
-    <!-- Get the supported configuration(armv5, winscw) from system definition file.  This is 
-    temporary and will be moved to get values from carbon tool. -->
-    <target name="get-sbs-configs">
-        <hlm:getSBSConfigMacro sbs.sysdef.file="${canonical.sysdef.file}"/>
-        <echo message="configs:${sbs.configs}"/>
-    </target>
 </project>

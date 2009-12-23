@@ -24,7 +24,6 @@
 
 import buildtools
 import os
-import sys
 import codecs
 import fileutils
 import logging
@@ -288,16 +287,30 @@ class PolicyMapper(Mapper):
                     break
             
             value = self._config.get('policy.default.value', MISSING_POLICY)
-            if policyfile != None:
+            if policyfile != None:      #policy file present
                 try:
                     value = fileutils.read_policy_content(policyfile)
-                    if value not in self._binary.keys():
+                    if value not in self._binary.keys():    #check policy file is valid
                         _logger.error("POLICY_ERROR: policy file found %s but policy %s value not exists in csv" % (policyfile, value))
                 except Exception, exc:
                     _logger.error("POLICY_ERROR: %s" % exc)         
                     value = self._config.get('policy.default.value', MISSING_POLICY)
-            else:
-                _logger.error("POLICY_ERROR: could not find a policy file under: '%s'" % dirname)
+            else:       #no policy file present
+                filePresent = False
+                dirPresent = False
+                for ftype in os.listdir(dirname):   #see if files or directories are present
+                    if os.path.isdir(os.path.join(dirname, ftype)):
+                        dirPresent = True
+                    if os.path.isfile(os.path.join(dirname, ftype)):
+                        filePresent = True
+                        
+                if filePresent:    #files present : error     
+                    _logger.error("POLICY_ERROR: could not find a policy file under: '%s'" % dirname)
+                elif dirPresent and not filePresent:  #directories only : warning
+                    _logger.error("POLICY_WARNING: no policy file, no files present, but sub-folder present in : '%s'" % dirname)
+                else:       #no files no dirs : warning
+                    _logger.error("POLICY_WARNING: empty directory at : '%s'" % dirname)
+                
             # saving the policy value for that directory.
             self._policy_cache[dirname] = value
         return self._policy_cache[dirname]

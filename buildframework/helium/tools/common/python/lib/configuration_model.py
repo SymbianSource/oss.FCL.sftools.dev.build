@@ -18,7 +18,6 @@
 #===============================================================================
 
 import amara
-from amara import bindery
 import logging
 import types
 import copy

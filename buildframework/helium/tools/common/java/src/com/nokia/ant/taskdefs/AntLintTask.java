@@ -173,7 +173,6 @@ public class AntLintTask extends Task
     {
         try
         {
-            log("Running antlint..", Project.MSG_DEBUG);
             Project project = getProject();
             
             getConfiguration();//loads configuration file
@@ -214,7 +213,7 @@ public class AntLintTask extends Task
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            throw new BuildException("Exception occured while running AntLint task " + e.getMessage());
         }
         
         for (AntFile s : antFilelist)
@@ -263,7 +262,7 @@ public class AntLintTask extends Task
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            throw new BuildException("W: INVALID File Name: " + text + e.getMessage());
         }
     }
     
@@ -319,7 +318,7 @@ public class AntLintTask extends Task
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            throw new BuildException("Not able to read the ANT lint Configuration file " + configurationPath );
         }
 
     }
@@ -357,6 +356,15 @@ public class AntLintTask extends Task
                 {
                     checkDefName(text);
                 }
+                
+                List attributeList = node.elements("attribute");
+                for (Iterator iterator = attributeList.iterator(); iterator.hasNext();)
+                {
+                    Element attributeElement = (Element) iterator.next();
+                    String attributeName = attributeElement.attributeValue("name");
+                    checkDefName(attributeName);
+                }
+                
             }
             
             if (name.equals("scriptdef"))
@@ -464,10 +472,17 @@ public class AntLintTask extends Task
             new File(heliumpath + File.separator + "python").mkdirs();
             File file = new File(heliumpath + File.separator + "python" + File.separator + "target" + scriptdefname + ".py");
             PrintWriter output = new PrintWriter(new FileOutputStream(file));
-            output.write(text);
+            if (!text.equals(""))
+            {
+                output.write("def abc():");
+                for (String t : text.split("\n"))
+                    output.write("    " + t + "\n");
+            }
             output.close();
             checkPropertiesInText(text);
-            } catch (Exception e) { e.printStackTrace(); }
+            } catch (Exception e) { 
+                throw new BuildException("Not able to write python file " + scriptdefname + ".py" );
+             }
         }
         
         private void writeBeanshellFile(String scriptdefname, String text)
@@ -495,7 +510,9 @@ public class AntLintTask extends Task
             }
             output.write("} }");
             output.close();
-            } catch (Exception e) { e.printStackTrace(); }
+            } catch (Exception e) {
+                throw new BuildException("Not able to write Beanshell File " + scriptdefname + ".java" );
+            }
         }
         
         private void writeJepFile(String scriptdefname, String text)
@@ -511,13 +528,14 @@ public class AntLintTask extends Task
             new File(heliumpath + File.separator + "jep").mkdirs();
             File file = new File(heliumpath + File.separator + "jep" + File.separator + scriptdefname + "_jep.py");
             PrintWriter output = new PrintWriter(new FileOutputStream(file));
-            output.write("attributes = {} # pylint: disable-msg=C0103\n");
-            output.write("elements = {} # pylint: disable-msg=C0103\n");
-            output.write("project = None # pylint: disable-msg=C0103\n");
-            output.write("self = None # pylint: disable-msg=C0103\n");
+            output.write("def abc():\n");
+            output.write("    attributes = {} # pylint: disable-msg=C0103\n");
+            output.write("    elements = {} # pylint: disable-msg=C0103\n");
+            output.write("    project = None # pylint: disable-msg=C0103\n");
+            output.write("    self = None # pylint: disable-msg=C0103\n");
             text = text.replace(" File(", " self.File(");
-            
-            output.write(text);
+            for (String t : text.split("\n"))
+                output.write("    " + t + "\n");
             output.close();
             
             if (text.contains("import "))
@@ -535,7 +553,9 @@ public class AntLintTask extends Task
                 output2.write("    print '" + scriptdefname + " failed: ' + str(e)\n");
                 output2.close();
             }
-            } catch (Exception e) { e.printStackTrace(); }
+            } catch (Exception e) { 
+                throw new BuildException("Not able to write JEP File " + scriptdefname + "_jep.py" ); 
+              }
         }
         
         private void checkJepPropertiesInText(String text)
@@ -618,7 +638,9 @@ public class AntLintTask extends Task
             try {
             File model = new File(project.getProperty("data.model.parsed"));
             antDoc = xmlReader.read(model);
-            } catch (Exception e) { e.printStackTrace(); }
+            } catch (Exception e) { 
+                throw new BuildException("Not able to read data model file " + project.getProperty("data.model.parsed")); 
+             }
             
             List<Node> statements = antDoc.selectNodes("//property");
             
@@ -647,30 +669,34 @@ public class AntLintTask extends Task
             }
             catch (Exception e)
             {
-                e.printStackTrace();
+                throw new BuildException("Not able to match the target name for " + text);
             }
         }
         
         private void checkUseOfIf(Element node)
         {
             String target = node.attributeValue("name");
-            String targetxpath = "//target[@name='" + target + "']/if";
+            String targetxpath = "//target[@name='" + target + "']//if";
             
-            List conditiontest = node.selectNodes(targetxpath + "/then/property");
-            if (conditiontest != null && conditiontest.size() == 1)
+            List<Node> statements2 = node.selectNodes(targetxpath);
+            for (Node statement : statements2)
             {
-                if (node.selectSingleNode(targetxpath + "/else") == null)
+                List conditiontest = statement.selectNodes("./then/property");
+                if (conditiontest != null && conditiontest.size() == 1)
                 {
-                    log("W: Target " + target + " poor use of if-then-property statement, use condition task");
-                    currentFile.incWarningCount();
-                }
-                else
-                {
-                    List conditiontest2 = node.selectNodes(targetxpath + "/else/property");
+                    List conditiontest2 = statement.selectNodes("./else/property");
                     if (conditiontest2 != null && conditiontest2.size() == 1)
                     {
                         log("W: Target " + target + " poor use of if-else-property statement, use condition task");
                         currentFile.incWarningCount();
+                    }
+                    else
+                    {
+                        if (statement.selectNodes("./else").size() == 0)
+                        {
+                            log("W: Target " + target + " poor use of if-then-property statement, use condition task");
+                            currentFile.incWarningCount();
+                        }
                     }
                 }
             }
@@ -741,7 +767,7 @@ public class AntLintTask extends Task
             }
             catch (Exception e)
             {
-                e.printStackTrace();
+                throw new BuildException("Not able to match the Property Name for " + text);
             }
         }
         
@@ -759,7 +785,7 @@ public class AntLintTask extends Task
             }
             catch (Exception e)
             {
-                e.printStackTrace();
+                throw new BuildException("Not able to match the MacroDef Name for " + text);
             }
         }
         
@@ -779,7 +805,7 @@ public class AntLintTask extends Task
             }
             catch (Exception e)
             {
-                e.printStackTrace();
+                throw new BuildException("Not able to get Target Dependency for " + text);
             }
             finally
             {
@@ -827,7 +853,7 @@ public class AntLintTask extends Task
             }
             catch (Exception e)
             {
-                e.printStackTrace();
+                throw new BuildException("Not able to match Project Name for " + text);
             }
         }
     }

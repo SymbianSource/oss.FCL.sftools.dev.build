@@ -215,3 +215,4 @@ class ArchivePreBuilder(buildtools.PreBuilder):
 
         writer = buildtools.get_writer(self.writerType, outputname)
         writer.write(self.create_command_list(commands))
+        writer.close()

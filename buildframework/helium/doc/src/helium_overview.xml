@@ -77,6 +77,7 @@ Description:
             <component>svnant</component>
             <component>xmltask</component>
             <component>ivy</component>
+            <component>helium-antlib</component>
         </row>
     </layer>
     <layer>

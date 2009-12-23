@@ -88,8 +88,7 @@ public class SignalListener implements BuildListener {
             signalList.checkAndNotifyFailure(event.getTarget(),event.getProject());
             //}
         } catch (Exception e) {
-            log.debug("SignalListenerException: ", e);
-            throw new BuildException(e.getMessage());
+            throw new BuildException(e.getMessage(), e);
         }
     }
 

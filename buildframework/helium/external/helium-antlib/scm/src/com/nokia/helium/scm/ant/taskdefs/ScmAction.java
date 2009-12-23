@@ -21,6 +21,14 @@ import org.apache.maven.scm.ScmException;
 import org.apache.maven.scm.repository.ScmRepository;
 import org.apache.tools.ant.ProjectComponent;
 
+/**
+ * Abstract class which implements common setting between
+ * ScmAction implementations.
+ * 
+ * Any implementing action must implement the execute method as
+ * a execution of the action. The owning task should be used
+ * to log message to the user.  
+ */
 public abstract class ScmAction extends ProjectComponent {
     private ScmTask scmtask;
 
@@ -39,6 +47,10 @@ public abstract class ScmAction extends ProjectComponent {
         this.scmtask = task;
     }
 
+    /**
+     * Get the action name based on the classname.
+     * @return the lowercase class name. 
+     */
     public String getName() {
         String className = getClass().getName();
         String commandName = className

@@ -121,8 +121,7 @@ public class HeliumListener implements BuildListener {
             if (errorMessage == null) {
                 errorMessage = "";
             }
-            log
-                    .info("Diamonds Error, might not be logged properly, see debug log. "
+            log.error("Diamonds Error, might not be logged properly, see debug log. "
                             + errorMessage);
         }
         if (diamondsListeners != null) {
@@ -135,8 +134,7 @@ public class HeliumListener implements BuildListener {
                     if (errorMessage == null) {
                         errorMessage = "";
                     }
-                    log
-                            .info("Diamonds Error, might not be logged properly, see debug log. "
+                    log.error("Diamonds Error, might not be logged properly, see debug log. "
                                     + errorMessage);
                 }
             }
@@ -158,7 +156,6 @@ public class HeliumListener implements BuildListener {
             templateProcessor.convertTemplate(configFile,
                     outputFile.toString(), sourceList);
         } catch (Exception e) {
-            log.debug("Error: ", e);
             throw new BuildException(
                     "Diamonds configuration pre-parsing error: "
                             + e.getMessage());
@@ -166,7 +163,6 @@ public class HeliumListener implements BuildListener {
         try {
             DiamondsConfig.parseConfiguration(outputFile.toString());
         } catch (Exception e) {
-            log.debug("Error: ", e);
             throw new BuildException("Diamonds configuration parsing error: "
                     + e.getMessage());
         }
@@ -199,8 +195,7 @@ public class HeliumListener implements BuildListener {
                     if (errorMessage == null) {
                         errorMessage = "";
                     }
-                    log
-                            .info("Diamonds Error, might not be logged properly, see debug log. "
+                    log.error("Diamonds Error, might not be logged properly, see debug log. "
                                     + errorMessage);
                 }
 
@@ -217,8 +212,7 @@ public class HeliumListener implements BuildListener {
                 try {
                     diamondsListener.buildEnd(event);
                 } catch (Exception e) {
-                    log.debug("Error: ", e);
-                    log.info("Failed to log in diamonds: " + e);
+                    log.error("Failed to log in diamonds: " + e);
                 }
 
             }

@@ -77,7 +77,7 @@ Description:
                 <echo message="Error: getenv failed"/>
             </catch>
         </trycatch>
-        <hlm:tempRecordStopMacro name="${build.id}_getenv.log" filterref="filterset.getenv"/>
+        <hlm:tempRecordStopMacro name="${build.id}_getenv.log" filterref="filterset.getenv" phase="prep"/>
     </target>
 
         
@@ -205,7 +205,7 @@ Description:
 
     <!-- Gets the ARM compiler license text. -->
     <target name="get-arm-license">
-        <exec executable="armcc.exe" outputproperty="arm.compiler.version.text" failonerror="${failonerror}">
+        <exec executable="armcc" outputproperty="arm.compiler.version.text" failonerror="${failonerror}">
             <arg value="--vsn" />
         </exec>
         <echo message="ARM compiler version text: ${arm.compiler.version.text}" />
@@ -230,7 +230,7 @@ Description:
             <propertyresource name="arm.compiler.version.text"/>
             <filterchain>
                 <linecontainsregexp>
-                    <regexp pattern="ARM/Thumb C/C\+\+ Compiler" />
+                    <regexp pattern="ARM.* C/C\+\+ Compiler" />
                 </linecontainsregexp>
             </filterchain>
         </loadresource>
@@ -267,6 +267,7 @@ Description:
     <target name="build-info" depends="log-build-start">
         <dirname file="${build.summary.file}" property="build.summary.file.dir"/>
         <mkdir dir="${build.summary.file.dir}"/>
+        <mkdir dir="${prep.log.dir}"/>
         <xmltask dest="${build.log.dir}/${build.id}_info.log.xml">
             <insert path="/">
                 <![CDATA[
@@ -410,7 +411,12 @@ if prep_build_dir.exists():
     <target name="init-build-area" depends="check-env-build-drive">
         <mkdir dir="${build.output.dir}" />
         <mkdir dir="${build.log.dir}" />
-        <mkdir dir="${temp.build.dir}" />
+        <mkdir dir="${prep.log.dir}" />
+        <mkdir dir="${compile.log.dir}" />
+        <mkdir dir="${test.log.dir}" />
+        <mkdir dir="${post.log.dir}" />
+        <mkdir dir="${temp.build.dir}" />  
+        <mkdir dir="${diamonds.build.output.dir}" />       
     </target>
     
     
@@ -419,29 +425,32 @@ if prep_build_dir.exists():
     <target name="init" depends="get-ccm-password">
         <runtarget target="build-number"/>
         <runtarget target="init-build-area"/>
-        <runtarget target="start-ant-log"/>
-    </target>
-    
-    <!-- Starting the main ant_build log -->
-    <target name="start-ant-log" depends="build-info">
-        <record name="${build.log}" append="true" loglevel="info"/>
-        <echo>Start main Ant build log: ${build.log}</echo>
-    
+        <runtarget target="build-info"/>
+        
         <echo>Copying temp logs from ${build.cache.log.dir} into the build area.</echo>
-        <copy todir="${build.log.dir}" verbose="true" failonerror="false">
+        <copy todir="${prep.log.dir}" verbose="true" failonerror="false">
             <fileset dir="${build.cache.log.dir}">
                 <include name="*.log"/>
                 <include name="*.xml"/>
             </fileset>
         </copy>
+        
     </target>
+    
+    <!-- Starting the main ant_build log 
+    <deprecated>
+    Now this will be take care by the logging listener.
+    It will start the main ant logging when ever the build starts.
+    </deprecated>-->
+    <target name="start-ant-log" />
+    
     
     <!-- This target exists as a trigger for initiating the Diamonds logger. If 
           it is not included in the build sequence, the build will not be logged to 
           Diamonds. Also  build.property.cache.file will be there contains all the diamonds related properties 
     --> 
     <target name="diamonds">
-        <mkdir dir="${build.log.dir}" />
+        <mkdir dir="${diamonds.build.output.dir}" />
         <var name="diamonds.build.url"  value="http://${diamonds.host}:${diamonds.port}${diamonds.build.id}"/>
         <echoproperties destfile="${build.property.cache.file}">
             <propertyset>
@@ -479,7 +488,7 @@ if prep_build_dir.exists():
 
     <!-- Preps the build area by copying and unzipping all the inputs. -->
     <target name="prep-copy" depends="prep-prepare-input">
-        <preset.exec executable="${env.PERL}" output="${build.log.dir}/${build.id}_buildarea_prep.log" failonerror="true">
+        <preset.exec executable="${env.PERL}" output="${prep.log.dir}/${build.id}_buildarea_prep.log" failonerror="true">
             <arg value="${helium.dir}/tools/preparation/prep_build_area.pl" />
             <arg value="-config" />
             <arg value="${prep.config.file.parsed}" />
@@ -493,7 +502,7 @@ if prep_build_dir.exists():
         <!-- parsing the generated log -->
         <hlm:metadatarecord database="${metadata.dbfile}">
             <hlm:textmetadatainput>
-                <fileset casesensitive="false" file="${build.log.dir}/${build.id}_buildarea_prep.log" />
+                <fileset casesensitive="false" file="${prep.log.dir}/${build.id}_buildarea_prep.log" />
                 <metadatafilterset refid="filterset.buildarea.prep" />
             </hlm:textmetadatainput>
         </hlm:metadatarecord>
@@ -514,8 +523,9 @@ if prep_build_dir.exists():
          Property ccm.enabled has to be set to 'true' to enable that step!
          prep-work-area-check-errors is also run so it emits a signal in case of errors.
       -->
-    <target name="do-prep-work-area">
+    <target name="do-prep-work-area" depends="find-files-pre">
         <runtarget target="prep-work-area"/>
+        <runtarget target="find-files-post"/>
     </target>
     <!-- <deprecated>Please use do-prep-work-area</deprecated> -->
     <target name="do-ccm-get-input" depends="do-prep-work-area"/>
@@ -561,11 +571,11 @@ if prep_build_dir.exists():
         </if>
         <hlm:metadatarecord database="${metadata.dbfile}">
             <hlm:antmetadatainput>
-                <fileset casesensitive="false" file="${build.log.dir}/${build.id}_ant_build.log" />
+                <fileset casesensitive="false" file="${build.log.dir}/${build.id}_main.ant.log" />
                 <metadatafilterset refid="filterset.ant.output" />
             </hlm:antmetadatainput>
         </hlm:metadatarecord>
-        <hlm:generateBuildStatus file="${build.id}_ant_build.log" />
+        <hlm:generateBuildStatus file="${build.id}_main.ant.log" />
         <!-- Todo: metadata: insert assertions for metadata parsing here -->
     </target>
     

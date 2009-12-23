@@ -49,6 +49,9 @@ public class HgUpdateCommand extends
             ScmFileSet fileSet, ScmVersion tag) throws ScmException {
         File workingDir = fileSet.getBasedir();
 
+        // Find changes from last revision
+        int previousRevision = HgUtils.getCurrentRevisionNumber(getLogger(),
+                workingDir);
         // Update branch
         String[] updateCmd = new String[] {
                 "update",
@@ -65,30 +68,35 @@ public class HgUpdateCommand extends
         // Find changes from last revision
         int currentRevision = HgUtils.getCurrentRevisionNumber(getLogger(),
                 workingDir);
-        int previousRevision = currentRevision - 1;
-        String[] diffCmd = new String[] { HgCommandConstants.DIFF_CMD,
-                HgCommandConstants.REVISION_OPTION, "" + previousRevision };
+        List<ScmFile> updatedFiles = new ArrayList<ScmFile>();
+        List changes = new ArrayList();
+        String[] diffCmd = null;
+        if (currentRevision == 0) {
+            diffCmd = new String[] { HgCommandConstants.DIFF_CMD,
+                    "-c", "" + currentRevision};
+        } else {
+            diffCmd = new String[] { HgCommandConstants.DIFF_CMD,
+                    HgCommandConstants.REVISION_OPTION, "" + previousRevision,
+                    HgCommandConstants.REVISION_OPTION, "" + currentRevision};
+        }
         HgDiffConsumer diffConsumer = new HgDiffConsumer(getLogger(),
-                workingDir);
-        ScmResult diffResult = HgUtils.execute(diffConsumer, getLogger(),
+                    workingDir);
+        updateResult = HgUtils.execute(diffConsumer, getLogger(),
                 workingDir, diffCmd);
 
         // Now translate between diff and update file status
-        List<ScmFile> updatedFiles = new ArrayList<ScmFile>();
-        List changes = new ArrayList();
         List<ScmFile> diffFiles = diffConsumer.getChangedFiles();
         Map diffChanges = diffConsumer.getDifferences();
         for (ScmFile diffFile : diffFiles) {
             changes.add(diffChanges.get(diffFile.getPath()));
             if (diffFile.getStatus() == ScmFileStatus.MODIFIED) {
-                updatedFiles.add(new ScmFile(diffFile.getPath(),ScmFileStatus.PATCHED));
+                updatedFiles.add(new ScmFile(diffFile.getPath(), ScmFileStatus.PATCHED));
             } else {
                 updatedFiles.add(diffFile);
             }
         }
-
         return new UpdateScmResultWithRevision(updatedFiles, changes, String
-                .valueOf(currentRevision), diffResult);
+                .valueOf(currentRevision), updateResult);
     }
 
 }

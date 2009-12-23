@@ -111,7 +111,7 @@ public class XmlLogger implements BuildLogger {
         try {
             return DocumentBuilderFactory.newInstance().newDocumentBuilder();
         } catch (Exception exc) {
-            throw new ExceptionInInitializerError(exc);
+            throw new ExceptionInInitializerError(exc.getMessage());
         }
     }
 
@@ -191,12 +191,14 @@ public class XmlLogger implements BuildLogger {
             (new DOMElementWriter()).write(buildElement.element, out, 0, "\t");
             out.flush();
         } catch (IOException exc) {
-            throw new BuildException("Unable to write log file", exc);
+            throw new BuildException("Unable to write log file" + exc.getMessage());
         } finally {
             if (out != null) {
                 try {
                     out.close();
                 } catch (IOException e) {
+                    // We are Ignoring the errors as no need to fail the build.
+                    event.getProject().log("Not able to close the file handler " + e.getMessage(), Project.MSG_WARN);
                     e = null; // ignore
                 }
             }

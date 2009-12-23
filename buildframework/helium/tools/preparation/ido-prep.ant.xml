@@ -43,49 +43,87 @@ Description:
         <mkdir dir="${build.output.dir}/build"/>
         <mkdir dir="${temp.build.dir}"/>
         <tempfile property="prep.dynamic.sysdef.config" suffix=".txt" deleteonexit="false" destdir="${temp.build.dir}"/>
-        <hlm:referenceToFileMacro refid="system.definition.files" output="${prep.dynamic.sysdef.config}"/>
+        <trycatch property="error.message">
+            <try>
+                <hlm:referenceToFileMacro refid="system.definition.files" output="${prep.dynamic.sysdef.config}"/>
+            </try>
+            <catch>       
+                <propertyregex property="message" input="${error.message}"
+                  regexp=":(.*)$"
+                  select="\1" casesensitive="false" />
+                <fail message="Error: ${message}" />     
+            </catch>               
+        </trycatch>
         <trycatch>
             <try>
                 <pathconvert pathsep="," property="ado.quality.dirs.path">
                     <dirset refid="ado.quality.dirs"/>
-                </pathconvert>
+                </pathconvert>                              
             </try>
         </trycatch>
         <script language="jython" setbeans="false">
-import os
-import ant
-import shutil
-import fileutils
-import ido
-
-input = open(project.getProperty(r"prep.dynamic.sysdef.config"), 'r')
-output = open(project.getProperty(r"ado.mapping.file"), 'w')
-outputquality = open(project.getProperty(r"ado.quality.mapping.file"), 'w')
-components = {}
-for sysdef in input.readlines():
-    sysdef = sysdef.strip()
-    if len(sysdef) > 0:
-        print "Checking %s" % sysdef
-        os.path.dirname(sysdef)
-        location = ido.get_sysdef_location(sysdef)
-        if location != None:
-            sysdef = os.path.dirname(sysdef).replace('\\','/').replace(':','\\:')
-            component = os.path.normpath(os.path.join(project.getProperty(r"build.drive"), os.environ['EPOCROOT'], location)).replace('\\','/').replace(':','\\:')
-            print "%s=%s\n" % (sysdef, component)
-            output.write("%s=%s\n" % (sysdef, component))
-            
-            if project.getProperty("ado.quality.dirs.path") == None:
-                outputquality.write("%s=%s\n" % (sysdef, component))
-            else:
-                for dir in project.getProperty("ado.quality.dirs.path").split(','):
-                    if os.path.normpath(dir) == os.path.normpath(os.path.join(project.getProperty(r"build.drive"), os.environ['EPOCROOT'], location)):
-                        outputquality.write("%s=%s\n" % (sysdef, component))
-outputquality.close()
-output.close()
-input.close()        
+import idoprep
+idoprep.create_ado_mapping(project.getProperty(r"prep.dynamic.sysdef.config"), project.getProperty(r"ado.mapping.file"), project.getProperty(r"ado.quality.mapping.file"), project.getProperty(r"build.drive"), project.getProperty("ado.quality.dirs.path"))
         </script>
     </target>
     
+    <!-- Target to generate cenreps using cone tool -->
+    <target name="ido-gen-cenrep">
+        <for list="${sysdef.configurations.list}" delimiter="," param="sysdef.config">
+            <sequential>
+                <if>
+                    <available file="${compile.log.dir}/${build.id}.@{sysdef.config}_compile.log"/>
+                    <then>
+                        <hlm:grepMacro filename="${compile.log.dir}/${build.id}.@{sysdef.config}_compile.log" regexp="([^\\]*.confml)$" output="confml.file.list"/>
+                        <for list="${confml.file.list}" delimiter="," param="confml.file">
+                            <sequential>
+                                <var name="crml.regexp" unset="true"/>
+                                <propertyregex property="crml.regexp" input="@{confml.file}"  regexp="([^\.]*).confml" select="\1" />
+                                <hlm:conEToolMacro>
+                                    <arg name="output" value="${post.log.dir}/${build.id}_cenrep.cone.log"/>
+                                    <arg name="path" value="${build.drive}/epoc32/tools/" />
+                                    <arg name="-v" value="5" />
+                                    <arg name="-p" value="${build.drive}\epoc32\rom\config\assets\s60" />
+                                    <arg name="-o" value="${build.drive}\epoc32\release\winscw\urel\z" />
+                                    <arg name="-c" value="root.confml" />
+                                    <arg name="-i" value="${crml.regexp}" />
+                                </hlm:conEToolMacro>
+                                <hlm:conEToolMacro>
+                                    <arg name="output" value="${post.log.dir}/${build.id}_cenrep.cone.log"/>
+                                    <arg name="path" value="${build.drive}/epoc32/tools/" />
+                                    <arg name="-v" value="5" />
+                                    <arg name="-p" value="${build.drive}\epoc32\rom\config\assets\s60" />
+                                    <arg name="-o" value="${build.drive}\epoc32\release\winscw\udeb\z" />
+                                    <arg name="-c" value="root.confml" />
+                                    <arg name="-i" value="${crml.regexp}" />
+                                </hlm:conEToolMacro>
+                            </sequential>
+                        </for>
+                    </then>
+                </if>
+            </sequential>
+        </for>
+        <copy file="${post.log.dir}/${build.id}_cenrep.cone.log" tofile="${temp.build.dir}/${build.id}_cenrep_includefile.txt" overwrite="true">
+            <filterchain>
+                <linecontainsregexp>
+                    <regexp pattern="^\s*Generating file"/>
+                </linecontainsregexp>
+            </filterchain>
+        </copy>
+        <hlm:metadatarecord database="${metadata.dbfile}">
+            <hlm:textmetadatainput>
+                <fileset casesensitive="false" file="${post.log.dir}/${build.id}_cenrep.cone.log" />
+                <metadatafilterset>
+                    <metadatafilter priority="error" regex="^ERROR\s+:.*" description="cone error" />
+                    <metadatafilter priority="warning" regex="^WARNING\s+:.*" description="cone warnings" />
+                    <metadatafilter priority="info" regex="^INFO\s+:.*" description="cone info" />
+                </metadatafilterset>
+            </hlm:textmetadatainput>
+        </hlm:metadatarecord>
+        <hlm:metadataCountSeverity severity="ERROR" log="${build.id}_cenrep.cone.log" db="${metadata.dbfile}" property="cone.error.total"/>
+        <echo>ConE error: ${cone.error.total}</echo>
+        <hlm:generateBuildStatus file="${build.id}_cenrep.cone.log" />
+    </target>
     
     <!-- Target that uses the information from the system.definition.files to prepare the IDO build area.
         It relies on the fact that layer_real_source_path entity is declared in each ADO configuration.
@@ -175,12 +213,9 @@ project.setProperty("sysdef.clean.configurations.list", rev_names)
       Internal target that set an intermediate property to disable codescanner execution.
     -->
     <target name="ido-codescanner-skip">
-        <if>
+        <condition property="do.skip.codescanner" value="1">
             <istrue value="${skip.codescanner}"/>
-            <then>
-                <property name="do.skip.codescanner" value="1"/>
-            </then>
-        </if>
+        </condition>
     </target>
 
     <!--
@@ -314,99 +349,15 @@ project.addReference('substed.ado.src.path', path)
     extended to product builds.-->    
     <target name="ido-check-latest-release-grace" unless="use.dragonfly">
         <script language="jython" setbeans="false">
-import re
 import os
-import symrec
-import logging
-import traceback
-import ant
-            
-if not project.getProperty('s60.grace.server'):
-    raise Exception("Property 's60.grace.server' is not defined.")
-if not project.getProperty('s60.grace.service'):
-    raise Exception("Property 's60.grace.service' is not defined.")
-if not project.getProperty('s60.grace.product'):
-    raise Exception("Property 's60.grace.product' is not defined.")
-if not project.getProperty('s60.grace.release'):
-    raise Exception("Property 's60.grace.release' is not defined.")
-grace = project.getProperty('s60.grace.server')
-service = project.getProperty('s60.grace.service')
-product = project.getProperty('s60.grace.product')
-release = project.getProperty('s60.grace.release')
-revision = r'(_\d{3})?'
-if project.getProperty('s60.grace.revision') != None:
-    revision = project.getProperty('s60.grace.revision')
+import idoprep
 
-# Get the cache filename.
-cachefilename = project.getProperty('s60.grace.cache')
-if cachefilename:
-    self.log(str("Using cache file: %s" % cachefilename))
-
-checkmd5 = False
-if project.getProperty('s60.grace.checkmd5') != None:
-    checkmd5 = str(project.getProperty('s60.grace.checkmd5')).lower()
-    checkmd5 = ((checkmd5 == "true") or (checkmd5 == "1") or (checkmd5 == "on"))
-            
-branch = os.path.join(grace, service, product)
-if not os.path.exists(branch):
-    raise Exception("Error occurred: Could not find directory %s" % branch)
-    
-result = []
-for rel in os.listdir(branch):
-    relpath = os.path.join(branch, rel)
-    self.log("Checking: %s" % str(relpath))
-    res = re.match(r"%s%s$" % (release, revision), rel, re.I)
-    if res != None:
-        self.log("Found: %s" % str(relpath))
-        result.append(relpath)
-result.sort(reverse=True)
-use_tickler = False
-tickler_validation = str(project.getProperty('s60.grace.usetickler')).lower()
-if tickler_validation != None:
-    use_tickler = ((tickler_validation == "true") or (tickler_validation == "1"))
-validresults = []
-for rel in result:
-    try:
-        metadata_filename = symrec.find_latest_metadata(str(rel))
-        if metadata_filename is not None and os.path.exists(metadata_filename):
-            self.log(str("Validating: %s" % metadata_filename))
-            if (use_tickler):
-                validator = symrec.ValidateTicklerReleaseMetadata(metadata_filename, cachefilename)
-            else:
-                validator = symrec.ValidateReleaseMetadataCached(metadata_filename, cachefilename)
-            if validator.is_valid(checkmd5):
-                self.log(str("%s is valid." % rel))
-                validresults.append(rel)
-                break
-            else:
-                self.log(str("%s is not a valid release." % rel))
-        elif metadata_filename is None:
-            self.log(str("Could not find the release metadata file under %s" % rel))
-    except Exception, e:
-        self.log(str("WARNING: %s: %s" % (rel , e)))
-        self.log(str("%s is not a valid release." % rel))
-        traceback.print_exc()
-
-result = validresults
-if len(result) == 0:
-    raise Exception("Error finding GRACE release.")
-print result[0]
+result = idoprep.get_s60_env_details(project.getProperty('s60.grace.server'), project.getProperty('s60.grace.service'), project.getProperty('s60.grace.product'), project.getProperty('s60.grace.release'), project.getProperty('s60.grace.revision'), project.getProperty('s60.grace.cache'), project.getProperty('s60.grace.checkmd5'), project.getProperty('s60.grace.usetickler'))
 resultname = os.path.basename(result[0])
-vfile = os.path.join(project.getProperty('build.drive') + os.sep, 's60_version.txt')
-if (os.path.exists(vfile)):
-    self.log("Are we still up-to-date compare to %s" % str(vfile))
-    f = open(str(vfile), 'r')
-    version = f.readline()
-    self.log(str("'%s' == '%s'" % (version, resultname)))
-    project.setProperty('s60.getenv.path', str(result[0]))
-    project.setProperty('s60.getenv.release', str(resultname))
-    if version.strip() != resultname:
-        project.setProperty('s60.getenv.update', "1")
-    f.close()
-else:
-    self.log("Version file not found getting new environment...")
-    project.setProperty('s60.getenv.path', str(result[0]))
-    project.setProperty('s60.getenv.release', str(resultname))
+project.setProperty('s60.getenv.path', str(result[0]))
+project.setProperty('s60.getenv.release', str(resultname))
+version = idoprep.get_version(project.getProperty('build.drive'), resultname)
+if version is None or version.strip() != resultname:
     project.setProperty('s60.getenv.update', "1")
         </script>
     </target>
@@ -418,9 +369,6 @@ else:
 
     <!-- Creates the build area by getting the contents from GRACE release.-->    
     <target name="ido-update-build-area-grace" if="s60.getenv.update" depends="ido-check-latest-release" unless="use.dragonfly">
-        <!-- We must update the build area so let's get rid of the old one. -->
-        <hlm:unsubst drive="${build.drive}" failonerror="false"/>
-        
         <!-- Just get S60 for IDOs -->
         <echo>Location of the new S60 release:${s60.getenv.path}</echo>
         <tstamp>
@@ -508,9 +456,9 @@ project.setProperty('ido.variant.package', os.path.join(rel_path, variant_pkg))
             java.util.Properties props = new java.util.Properties();
             props.load(pin);
             org.apache.tools.ant.types.Path path = project.createDataType("path");
-            for (java.util.Iterator i = props.stringPropertyNames().iterator(); i.hasNext() ; ) {
+            for (java.util.Iterator i = props.stringPropertyNames().iterator(); i.hasNext() ; ) { 
                 org.apache.tools.ant.types.Path.PathElement pe = (org.apache.tools.ant.types.Path.PathElement)path.createPathElement();
-                pe.setPath(i.next());
+                pe.setPath(i.next()); 
             }
             self.log("Creating reference: " + attributes.get("pathid"));
             project.addReference(attributes.get("pathid"), path);

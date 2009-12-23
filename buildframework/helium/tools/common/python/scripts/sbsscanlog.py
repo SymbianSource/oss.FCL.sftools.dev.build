@@ -1,5 +1,5 @@
 #============================================================================ 
-#Name        : filter_heliumlog.py 
+#Name        : sbsscanlog.py 
 #Part of     : Helium 
 
 #Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
@@ -101,7 +101,9 @@ def getText(nodelist):
             rc = rc + node.data
     return rc
 
-class SBSScanlog():
+class SBSScanlog(object):
+    """parses the raptor logs and separates the info out into HTML and XML logs for writing to diamonds
+    and other logs"""
     def initialize(self, logFile):
         """Initialize helium log filter"""
     #try:

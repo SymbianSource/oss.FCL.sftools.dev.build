@@ -30,7 +30,7 @@ import org.apache.maven.scm.command.Command;
 import org.apache.maven.scm.provider.ScmProviderRepository;
 import org.apache.maven.scm.provider.hg.HgUtils;
 import org.apache.maven.scm.provider.hg.command.HgCommandConstants;
-import org.apache.maven.scm.provider.hg.repository.HgScmProviderRepository;
+import com.nokia.maven.scm.provider.hg.repository.HgScmProviderRepository;
 
 import com.nokia.maven.scm.command.init.InitScmResult;
 
@@ -39,32 +39,36 @@ public class HgInitCommand extends AbstractCommand implements Command {
     private static Logger log = Logger.getLogger(HgInitCommand.class);
 
     @Override
-    protected ScmResult executeCommand(ScmProviderRepository arg0,
-            ScmFileSet arg1, CommandParameters arg2) throws ScmException {
-        // TODO Auto-generated method stub
-        return null;
+    protected ScmResult executeCommand(ScmProviderRepository repository,
+            ScmFileSet basedir, CommandParameters args) throws ScmException {
+        return executeInitCommand(repository);
     }
 
     public InitScmResult executeInitCommand(ScmProviderRepository repository)
             throws ScmException {
         // Get the directory in which to create a new repository. Only local
         // filesystems supported.
-        log.info("executeInitCommand" + repository);
+        log.info("executeInitCommand: " + repository);
         HgScmProviderRepository hgRepo = (HgScmProviderRepository) repository;
         String uri = hgRepo.getURI();
-        String fileUri = uri.substring("scm:hg:file:/".length());
-        log.info(fileUri);
-        File hgRepoDir = new File(fileUri);
+        log.info(uri);
+        File hgRepoDir = new File(uri);
+        File hgRepoRootDir = hgRepoDir.getParentFile();
 
-        boolean workingDirReady = hgRepoDir.mkdirs();
-        if (!workingDirReady) {
-            throw new ScmException("Could not initiate test branch at: "
-                    + hgRepoDir);
+        if (!hgRepoRootDir.exists()) {
+            boolean workingDirReady = hgRepoRootDir.mkdirs();
+            if (!workingDirReady) {
+                throw new ScmException("Could not initiate test branch at: "
+                        + hgRepoRootDir);
+            }
         }
 
         // Create and run the command
-        String[] initCmd = new String[] { HgCommandConstants.INIT_CMD };
-        HgUtils.execute(new File("f:/hg"), initCmd);
-        return null;
+        String[] initCmd = new String[] { HgCommandConstants.INIT_CMD, hgRepoDir.getName()};
+        ScmResult result = HgUtils.execute(hgRepoRootDir, initCmd);
+        return new InitScmResult(result.getCommandLine(),
+                result.getProviderMessage(),
+                result.getCommandOutput(),
+                result.isSuccess());
     }
 }

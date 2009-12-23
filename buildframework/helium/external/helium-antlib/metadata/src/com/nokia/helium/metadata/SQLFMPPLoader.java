@@ -34,6 +34,7 @@ import freemarker.template.TemplateModelIterator;
 import com.nokia.helium.metadata.db.MetaDataDb;
 import org.apache.log4j.Logger;
 
+
 /**
  * Utility class to access the data from the database and used by FMPP
  * templates.
@@ -52,11 +53,11 @@ public class SQLFMPPLoader implements DataLoader {
      * @see fmpp.tdd.DataLoader#load(fmpp.Engine, java.util.List)
      */
     public Object load(Engine engine, List args) throws Exception {
-        log.debug("args.size:" + args.size());
+        //log.debug("args.size:" + args.size());
         java.util.ListIterator iter = args.listIterator();
         int argsSize = args.size();
         if (argsSize < 1) {
-            throw new Exception("input DB path should be provided");
+            throw new Exception("Input DB path should be provided to load into FMPP.");
         }
 
         /* arg[0] - dbpath
@@ -82,7 +83,7 @@ public class SQLFMPPLoader implements DataLoader {
          * @return returns the template model for the query 
          */
         public TemplateModel get(String query) {
-            log.debug("QueryModel:" + query);
+            //log.debug("QueryModel:" + query);
             return new QueryTemplateModel(query);
         }
 
@@ -111,7 +112,7 @@ public class SQLFMPPLoader implements DataLoader {
          * @param query for which the template model needs to be returned.
          */
         public QueryTemplateModel(String query) {
-            log.debug("query in SQLTemplateModel" + query);
+            //log.debug("query in SQLTemplateModel" + query);
             this.query = query;
         }
 
@@ -121,9 +122,9 @@ public class SQLFMPPLoader implements DataLoader {
          */
         public TemplateModel get(String key) {
             checkAndReadData();
-            log.debug("QueryModel:" + key);
+            //log.debug("QueryModel:" + key);
             List<String> dataList = indexMap.get(key);
-            log.debug("datalist size" + dataList.size());
+            //log.debug("datalist size" + dataList.size());
             if (dataList.size() ==  1 ) {
                 return new SimpleScalar((String)dataList.get(0));
             }
@@ -136,11 +137,11 @@ public class SQLFMPPLoader implements DataLoader {
          */
         private void checkAndReadData() {
             if (!isDataRead) {
-                log.debug("isDataRead:" + isDataRead);
+                //log.debug("isDataRead:" + isDataRead);
                 isDataRead = true;
                 indexMap = metadataDb.getIndexMap(query); 
             }
-            log.debug("indexmap size" + indexMap.size());
+            //log.debug("indexmap size" + indexMap.size());
         }
 
         /*
@@ -196,7 +197,7 @@ public class SQLFMPPLoader implements DataLoader {
          * @return the iterator model from which the data is accessed.
          */
         public TemplateModelIterator iterator() {
-            log.debug("iterator constructor called");
+            //log.debug("iterator constructor called");
             return new SQLTemplateModelIterator(query);
         }
     }
@@ -218,15 +219,17 @@ public class SQLFMPPLoader implements DataLoader {
         public TemplateModel next() {
             SimpleHash simpleHash = null;
             try {
-                log.debug("checking any more element");
+                //log.debug("checking any more element");
                 if (rowList != null && (count >= rowList.size())) {
                     finished = true;
                 }
-                log.debug("next:count:" + count);
+                //log.debug("next:count:" + count);
                 simpleHash = new SimpleHash(rowList.get(count));
                 count ++;
                 return simpleHash;
             } catch (Exception ex) {
+                // We are Ignoring the errors as no need to fail the build.
+                log.debug("Iteration exception" + ex.getMessage());
                 ex.printStackTrace();
             }
             return null;
@@ -235,10 +238,10 @@ public class SQLFMPPLoader implements DataLoader {
         public boolean hasNext() {
             if (rowList == null ||  READ_LIMIT <= count) {
                 if (!finished) {
-                    log.debug("getting records");
+                    //log.debug("Getting records");
                     rowList = metadataDb.getRecords(query, READ_LIMIT, currentOffsetIndex * READ_LIMIT);
                     count = 0;
-                    log.debug("rowList.size : " + rowList.size());
+                    //log.debug("rowList.size : " + rowList.size());
                     if (rowList.size() == 0) {
                         finished = true;
                     }

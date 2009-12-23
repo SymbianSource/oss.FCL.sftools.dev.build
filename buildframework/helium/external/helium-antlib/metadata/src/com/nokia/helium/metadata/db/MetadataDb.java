@@ -24,10 +24,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
-//import java.sql.DatabaseMetaData;
+
 import org.apache.log4j.Logger;
 import org.apache.tools.ant.BuildException;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
@@ -45,19 +45,23 @@ public class MetaDataDb
 
     private static final int LOG_ENTRY_CACHE_LIMIT = 500;
 
-    //private static final int RECORD_LIMIT recordLimit = 5000;
-    
+    private static final int DB_SCHEMA_VERSION = 1;
+
+
     private static final String[] INIT_TABLES = {
+        "CREATE TABLE schema (version INTEGER default " + DB_SCHEMA_VERSION + ")", 
         "CREATE TABLE metadata (priority_id INTEGER, component_id INTEGER, line_number INTEGER, data TEXT, logpath_id INTEGER)", 
         "CREATE TABLE component (id INTEGER PRIMARY KEY,component TEXT, logPath_id INTEGER, UNIQUE (logPath_id,component))", 
         "CREATE TABLE priority (id INTEGER PRIMARY KEY,priority TEXT)", 
-        "CREATE TABLE logfiles (id INTEGER PRIMARY KEY, path TEXT)"
+        "CREATE TABLE logfiles (id INTEGER PRIMARY KEY, path TEXT)",
+        "CREATE TABLE componenttime (cid INTEGER PRIMARY KEY, time DOUBLE default 0, UNIQUE (cid))"
     };
 
     private static final String INSERT_METADATA_ENTRY = "INSERT INTO metadata VALUES(?, ?, ?, ?, ?)";
     private static final String INSERT_LOGENTRY = "INSERT or IGNORE INTO logfiles VALUES(?, ?)";
     private static final String INSERT_PRIORITYENTRY = "INSERT INTO priority VALUES(?, ?)";
-    private static final String INSERT_COMPONENTENTRY = "INSERT or IGNORE INTO component VALUES((SELECT max(id) FROM component)+1, ?, ?) ";
+    private static final String INSERT_COMPONENTENTRY = "INSERT or IGNORE INTO component VALUES(?, ?, ?) ";;
+    private static final String INSERT_COMPONENT_TIME = "INSERT or IGNORE INTO componenttime VALUES(?, ?)";
     
     private String dbPath;
 
@@ -72,6 +76,7 @@ public class MetaDataDb
     private PreparedStatement insertMetaDataEntryStmt;
     private PreparedStatement insertLogEntryStmt;
     private PreparedStatement insertComponentStmt;
+    private PreparedStatement insertComponentTimeStmt;
     
     private int entryCacheSize;
 
@@ -90,18 +95,47 @@ public class MetaDataDb
         }
         catch (java.lang.ClassNotFoundException e)
         {
-            log.debug("No JDBC Driver found");
             throw new BuildException("JDBC Driver could not be found");
         }
         
         synchronized (MetaDataDb.class) {
             // See if the database needs to be initialized
             boolean initializeDatabase = false;
-            if (!new File(dbPath).exists())
+            File dbFile = new File(dbPath);
+            if (!dbFile.exists())
             {
                 initializeDatabase = true;
+            } else {
+                try {
+                    log.debug("checking for schema version of db");
+                    initializeConnection();
+                    Statement stmt = connection.createStatement();
+                    ResultSet rs = stmt.executeQuery("select version from schema");
+                    int version = -1;
+                    if ( rs.next()) {
+                        version = rs.getInt(1);
+                    }
+                    rs.close();
+                    stmt.close();
+                    log.debug("schema version of db:" + version);
+                    if (version != DB_SCHEMA_VERSION) {
+                        log.debug("Schema Not matched deleting db file");
+                        dbFile.delete();
+                        initializeDatabase = true;
+                    }
+                    finalizeConnection();
+                } catch (SQLException ex) {
+                    try {
+                        finalizeConnection();
+                    } catch (SQLException ex1) {
+                        throw new BuildException("Exception while finalizing Metadata database. ", ex1);
+                    }
+                    // We are Ignoring the errors as no need to fail the build.
+                    log.debug("Exception checking schema for db", ex);
+                    dbFile.delete();
+                    initializeDatabase = true;
+                }
             }
-    
             try
             {
                 initializeConnection();
@@ -123,8 +157,8 @@ public class MetaDataDb
                         statement.addBatch("INSERT INTO priority (priority) VALUES (\""
                                 + priorityValues[i] + "\")");
                     }
+                    statement.addBatch("INSERT INTO schema (version) VALUES (\"" + DB_SCHEMA_VERSION + " \")");
                     statement.addBatch("create unique index logfile_unique_1 on logfiles (path)");
-                    //statement.addBatch("create unique index component_unique_1 on component (component)");
     
                     int[] returnCodes = statement.executeBatch();
                     connection.commit();
@@ -135,8 +169,7 @@ public class MetaDataDb
             }
             catch (SQLException e)
             {
-                log.debug("problem initializing database",e);
-                throw new BuildException("Problem initializing database");
+                throw new BuildException("Problem while initializing Metadata database. ", e);
             }
         }
     }    
@@ -146,7 +179,7 @@ public class MetaDataDb
     {
         // The values assigned to these enums should match the 
         // automatically assigned values created in the database table
-        FATAL(1), ERROR(2), WARNING(3), INFO(4), REMARK(5), DEFAULT(6);
+        FATAL(1), ERROR(2), WARNING(3), INFO(4), REMARK(5), DEFAULT(6), CRITICAL(7);
         private final int value;
         Priority(int value)
         {
@@ -163,6 +196,11 @@ public class MetaDataDb
     };
 
 
+    /**
+     * Helper class to store the log entry , used to write to the database
+     * 
+     * @param databasePath The path to the database
+     */
     public static class LogEntry
     {
         private String text;
@@ -175,18 +213,36 @@ public class MetaDataDb
         
         private String logPath;
         
+        private float elapsedTime;
+
+    /**
+     * Constructor for the helper class 
+     */
         public LogEntry(String text, Priority priority, String component, 
-                String logPath, int lineNumber)
+                String logPath, int lineNumber, float time)
         {
             this.text = text;
             this.priority = priority;
             this.component = component;
             this.lineNumber = lineNumber;
             this.logPath = logPath;
+            this.elapsedTime = time;
         }
 
+    /**
+     * Constructor for the helper class 
+     */
+        public LogEntry(String text, Priority priority, String component, 
+                String logPath, int lineNumber)
+        {
+            this(text, priority, component, logPath, lineNumber, -1);
+        }
+
+    /**
+     * Constructor for the helper class 
+     */
         public LogEntry(String text, String priorityTxt, String component, String logPath, 
-                int lineNumber) throws Exception
+                int lineNumber, float time) throws Exception
         {
             Priority prty = null;
             String prtyText = priorityTxt.trim().toLowerCase();
@@ -202,6 +258,8 @@ public class MetaDataDb
                 prty = Priority.REMARK;
             } else if (prtyText.equals("default")) {
                 prty = Priority.DEFAULT;
+            } else if (prtyText.equals("critical")) {
+                prty = Priority.CRITICAL;
             } else {
                 log.debug("Error: priority " + prtyText + " is not acceptable by metadata and set to Error");
                 prty = Priority.ERROR;
@@ -214,8 +272,23 @@ public class MetaDataDb
             
             this.component = component;
             this.lineNumber = lineNumber;
+            this.elapsedTime = time;
         }
-        
+
+    /**
+     * Constructor for the helper class 
+     */
+        public LogEntry(String text, String priorityTxt, String component, String logPath, 
+                int lineNumber) throws Exception
+        {
+            this(text, priorityTxt, component, logPath, lineNumber, -1);
+        }
+
+    /**
+     * Helper function to return to getLogPath
+     * @
+     */
+
         public String getLogPath()
         {
             return logPath;
@@ -240,6 +313,10 @@ public class MetaDataDb
         public Priority getPriority()
         {
             return priority;
+        }
+        
+        public double getElapsedTime() {
+            return elapsedTime;
         }
 
         public void setPriority(Priority priority)
@@ -268,7 +345,6 @@ public class MetaDataDb
     public void finalizeStatements() throws SQLException {
         if (statementsInitialized) {
             if ( entryCacheSize > 0) {
-                //log.debug("writing to database");
                 entryCacheSize = 0;
                 writeLogDataToDB();
             }
@@ -291,8 +367,8 @@ public class MetaDataDb
                 finalizeConnection();
             }
         } catch (SQLException ex) {
-            log.debug("exception while finalizing the db", ex);
-            //throw ex;
+            // We are Ignoring the errors as no need to fail the build.
+            log.debug("Exception while finalizing the Metadata database. ", ex);
         }
     }
     
@@ -302,8 +378,7 @@ public class MetaDataDb
      */
     //Note: Always the query should be in "/" format only
     public Map<String, List<String>> getIndexMap(String query) {
-        Map<String, List<String>> indexMap = new HashMap<String, List<String>>();
-        log.debug("sql query" + query);
+        Map<String, List<String>> indexMap = new LinkedHashMap<String, List<String>>();
         try {
             initializeConnection();
             Statement stmt = connection.createStatement();
@@ -319,12 +394,13 @@ public class MetaDataDb
                         int type = rsmd.getColumnType(i);
                         if (type == java.sql.Types.INTEGER ) {
                             data = "" + rs.getInt(i);
+                        } else if (type == java.sql.Types.DOUBLE ) {
+                            data = "" + rs.getDouble(i);
                         } else {
                             data = rs.getString(i);
                         }
-                        log.debug("data:" + data);
                         if ( i == 1) {
-                            key = data;  
+                            key = data;
                         } else {
                             dataList.add(data);
                         }
@@ -335,8 +411,8 @@ public class MetaDataDb
             stmt.close();
             finalizeConnection();
         } catch (Exception ex) {
+            // We are Ignoring the errors as no need to fail the build.
             log.debug("Warning: Exception while getting the index map", ex);
-            //throw ex;
         }
         return indexMap;
     }
@@ -344,7 +420,6 @@ public class MetaDataDb
     //Note: Always the query should be in "/" format only
     public List<Map<String, Object>> getRecords(String query) {
         List<Map<String, Object>> rowList = new ArrayList<Map<String, Object>>();
-        log.debug("sql query" + query);
         try {
             initializeConnection();
             Statement stmt = connection.createStatement();
@@ -355,26 +430,19 @@ public class MetaDataDb
             List<String> columnNames = new ArrayList<String>();
             for (int i = 1; i <= numberOfColumns; i++) {
                 columnNames.add(rsmd.getColumnName(i));
-                log.debug("columnName:" + rsmd.getColumnName(i));
             }
-
-            log.debug("resultSet MetaData column Count=" + numberOfColumns);
             if (rs.isBeforeFirst()) {
                 while (rs.next()) {
-                    Map<String, Object> recordMap = new HashMap<String, Object>();
-                    log.debug("adding records");
+                    Map<String, Object> recordMap = new LinkedHashMap<String, Object>();
                     for (int i = 1; i <= numberOfColumns; i++) {
                         int type = rsmd.getColumnType(i);
                         String columnName = columnNames.get(i - 1);
-                        //log.debug("columnName:" + columnName);
                         if (type == java.sql.Types.INTEGER ) {
                             Integer data = new Integer(rs.getInt(i));
                             recordMap.put(columnName, data);
-                            log.debug("data:" + data);
                         } else {
                             String data = rs.getString(i);
                             recordMap.put(columnName, data );
-                            log.debug("data:" + data);
                         }
                     }
                     rowList.add(recordMap);
@@ -383,8 +451,8 @@ public class MetaDataDb
             stmt.close();
             finalizeConnection();
         } catch (Exception ex) {
-            log.debug("Warning: Exception while getting the record details", ex);
-            //throw ex;
+            // We are Ignoring the errors as no need to fail the build.
+            log.warn("Warning: Exception while getting the record details", ex);
         }
         return rowList;
     }
@@ -409,7 +477,6 @@ public class MetaDataDb
     private void updateIndexTables(LogEntry entry) throws SQLException
     {
         connection.setAutoCommit(false);
-        //log.debug("updating logpath: " + entry.getLogPath());
         insertLogEntryStmt.setNull(1, 4);
         insertLogEntryStmt.setString(2, entry.getLogPath());
         insertLogEntryStmt.addBatch();
@@ -418,7 +485,6 @@ public class MetaDataDb
         readConnection = DriverManager.getConnection(url);
         readConnection.setAutoCommit(false);
         Statement stmt = readConnection.createStatement();
-        log.debug("exiting synchronization---2");
         ResultSet rs = stmt.executeQuery("select id from logfiles where path='" +
                 entry.getLogPath().trim() + "'");
         int logPathId = 0;
@@ -427,7 +493,6 @@ public class MetaDataDb
         }
         stmt.close();
         readConnection.close();
-        log.debug("exiting synchronization---5");
         insertComponentStmt.setNull(1, 4);
         insertComponentStmt.setString(2, entry.getComponent());
         insertComponentStmt.setInt(3, logPathId);
@@ -452,27 +517,49 @@ public class MetaDataDb
         stmt.close();
     }
     
+    public void removeEntries(List<String> logPathList) throws Exception {
+        initializeConnection();
+        Statement stmt = connection.createStatement();
+        for (String logPath : logPathList) {
+            log.debug("logpath for delete: " + logPath);
+            log.debug("logpath delete query1 " + "DELETE FROM metadata WHERE logpath_id IN (SELECT id from logfiles WHERE path like '" + logPath + "')");
+            stmt.executeUpdate("DELETE FROM metadata WHERE logpath_id IN (SELECT id from logfiles WHERE path like '%" + logPath + "%')");
+            log.debug("logpath for delete2: " + "DELETE FROM component_time WHERE cid IN (select id from component where logpath_id in (select id from logfiles where path like '%" + logPath + "%'))");
+            stmt.executeUpdate("DELETE FROM componenttime WHERE cid IN (select id from component where logpath_id in (select id from logfiles where path like '%" + logPath + "%'))");
+            log.debug("logpath for delete3: " + "DELETE FROM component WHERE logpath_id IN (select id from logfiles where path like '%" + logPath + "%')");
+            stmt.executeUpdate("DELETE FROM component WHERE logpath_id IN (select id from logfiles where path like '%" + logPath + "%')");
+            log.debug("logpath for delete: " + "DELETE FROM logfiles WHERE path like ('%" + logPath + "%')");
+            stmt.executeUpdate("DELETE FROM logfiles WHERE path like ('%" + logPath + "%')");
+        }
+        stmt.close();
+        finalizeConnection();
+    }
+    
     public void addLogEntry(LogEntry entry) throws Exception
     {
        synchronized (MetaDataDb.class) {
             try {
                 if (!statementsInitialized) {
-                    log.debug("initializing statements for JDBC");
+                    log.debug("Initializing statements for JDBC");
                     initializeConnection();
-                    insertMetaDataEntryStmt = connection.prepareStatement("INSERT INTO metadata VALUES(?, ?, ?, ?, ?)");
-                    insertLogEntryStmt = connection.prepareStatement("INSERT or IGNORE INTO logfiles VALUES(?, ?)");
-                    insertComponentStmt = connection.prepareStatement("INSERT or IGNORE INTO component VALUES(?, ?, ?) ");
+                    insertMetaDataEntryStmt = connection.prepareStatement(INSERT_METADATA_ENTRY);
+                    insertLogEntryStmt = connection.prepareStatement(INSERT_LOGENTRY);
+                    insertComponentStmt = connection.prepareStatement(INSERT_COMPONENTENTRY);
+                    insertComponentTimeStmt = connection.prepareStatement(INSERT_COMPONENT_TIME);
                     statementsInitialized = true;
                 }
-                log.debug("MetaDataDB:entry:priority: " + entry.getPriority());
                 connection.setAutoCommit(false);
                 updateIndexTables(entry);
-                if ( entry.getPriority() != Priority.DEFAULT) {
+                double time = entry.getElapsedTime();
+                int logPathId = 0;
+                int componentId = 0;
+                Statement stmt = null;
+                ResultSet rs = null;
+                if ((time != -1) || entry.getPriority() != Priority.DEFAULT) {
                     readConnection = DriverManager.getConnection(url);
-                    Statement stmt = readConnection.createStatement();
-                    ResultSet rs = stmt.executeQuery("select id from logfiles where path='" +
+                    stmt = readConnection.createStatement();
+                    rs = stmt.executeQuery("select id from logfiles where path='" +
                             entry.getLogPath().trim() + "'");
-                    int logPathId = 0;
                     if ( rs.next()) {
                         logPathId = rs.getInt(1);
                     }
@@ -482,13 +569,27 @@ public class MetaDataDb
                     stmt = readConnection.createStatement();
                     rs = stmt.executeQuery("select id from component where component='" + 
                             entry.getComponent() + "' and logpath_id='" + logPathId + "'");
-                    int componentId = 0;
                     if ( rs.next()) {
                         componentId = rs.getInt(1);
                     }
                     rs.close();
                     stmt.close();
+                }
+                if (time != -1) {
+                    connection.setAutoCommit(false);
+                    insertComponentTimeStmt.setInt(1, componentId);
+                    insertComponentTimeStmt.setDouble(2, 0);
+                    insertComponentTimeStmt.addBatch();
+                    insertComponentTimeStmt.executeBatch();
+                    connection.commit();
+                    insertComponentTimeStmt.clearBatch();
+                    stmt = readConnection.createStatement();
+                    stmt.executeUpdate("UPDATE componenttime SET time= (time  + " + time + 
+                        ") WHERE cid = " + componentId );
+                    stmt.close();
                     readConnection.close();
+                }
+                if ( entry.getPriority() != Priority.DEFAULT) {
                     insertMetaDataEntryStmt.setInt(1, entry.getPriority().getValue());
                     insertMetaDataEntryStmt.setInt(2, componentId);
                     insertMetaDataEntryStmt.setInt(3, entry.getLineNumber());
@@ -496,14 +597,14 @@ public class MetaDataDb
                     insertMetaDataEntryStmt.addBatch();
                     entryCacheSize ++;
                     if (entryCacheSize >= LOG_ENTRY_CACHE_LIMIT) {
-                        log.debug("writing data to database");
                         writeLogDataToDB();
                         entryCacheSize = 0;
                     }
                 }
             } catch (SQLException ex) {
-                log.debug(" Exception while writing the record");
-                throw ex;
+                throw new BuildException("Exception while writing the records into Metadata DB", ex);
+            } catch (Exception ex1) {
+                throw new BuildException("Exception while writing the records into Metadata DB", ex1);
             }
         }
     }

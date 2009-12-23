@@ -45,8 +45,7 @@ public class HlmImportDef extends HlmPreDefImpl {
      * Will import the given file.
      */
     public void execute(Project prj, String module, String[] targetNames) {
-        log.debug("importdef:fileName" + file.toString());
-        log.debug("importdef:prj name" + prj.getName());
+        log.debug("importdef:prj name" + prj.getName() + ". fileName" + file.toString());
         ImportTask task = new ImportTask();
         Target target = new Target();
         target.setName("");

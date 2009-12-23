@@ -20,6 +20,14 @@ package com.nokia.helium.scm.ant.types;
 
 import org.apache.tools.ant.types.DataType;
 
+/**
+ * The revision element store a particular revision id. 
+
+ *  <pre>
+ *  &lt;revision name="release_1.0" /&gt;
+ *  </pre>
+ *
+ */
 public class Revision extends DataType {
 
     private String name;
@@ -35,6 +43,10 @@ public class Revision extends DataType {
         this.name = name;
     }
 
+    /**
+     * Get the revision.
+     * @return the revision.
+     */
     public String getName() {
         return name;
     }

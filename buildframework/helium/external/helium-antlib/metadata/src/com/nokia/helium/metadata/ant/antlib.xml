@@ -23,6 +23,7 @@ Description:
 <antlib>
     <!-- Task definition -->
     <taskdef name="metadatarecord" classname="com.nokia.helium.metadata.ant.taskdefs.MetaDataRecord"/>
+    <taskdef name="metadatadelete" classname="com.nokia.helium.metadata.ant.taskdefs.MetaDataDelete"/>
     <!-- Type definition -->
     <typedef name="textmetadatainput" classname="com.nokia.helium.metadata.ant.types.TextLogMetaDataInput"/>
     <typedef name="antmetadatainput" classname="com.nokia.helium.metadata.ant.types.AntLogMetaDataInput"/>

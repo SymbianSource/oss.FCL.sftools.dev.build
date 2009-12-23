@@ -516,6 +516,7 @@ class FolderCopyResult(Result):
 CHECKOUT_LOG_RULES = [[r'^Derive failed for', logging.ERROR],
                       [r'^Serious:', logging.ERROR],
                       [r'^Warning: .* failed.', logging.ERROR],
+                      [r'^Invalid work area', logging.ERROR],
                       [r'^WARNING:', logging.WARNING],
                       [r'^Warning:', logging.WARNING],]
 
@@ -1191,9 +1192,9 @@ class File(CCMObject):
             raise CCMException("Error retrieving content from object %s in %s (error status: %s)\n%s" % (self, path, result.status, result.output), result)
     
     def merge(self, ccm_object, task):
-        assert(ccm_object != None, "object must be defined.")
-        assert(task != None, "task must be defined.")
-        assert(task.type == "task", "task parameter must be of 'task' type.")
+        assert ccm_object != None, "object must be defined."
+        assert task != None, "task must be defined."
+        assert task.type == "task", "task parameter must be of 'task' type."
         result = self._session.execute("merge -task %s \"%s\" \"%s\"" % (task['displayname'], self, ccm_object))
         
         validity = 0
@@ -1343,7 +1344,7 @@ class Project(CCMObject):
     
     def snapshot(self, targetdir, recursive=False):
         """ Take a snapshot of the project. """
-        assert(targetdir != None, "targetdir must be defined.")
+        assert targetdir != None, "targetdir must be defined."
         if recursive:
             recursive = "-recurse"
         else:
@@ -1847,6 +1848,8 @@ def get_role_for_status(session, status):
     """  return role needed to modify project with a specific status. """
     if status == 'prep':
         return 'build_mgr'
+    elif status == 'shared':
+        return 'developer'
     elif status == 'working':
         return 'developer'
     else:

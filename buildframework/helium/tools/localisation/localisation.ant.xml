@@ -21,7 +21,9 @@ Description:
 ============================================================================
 -->
 <project name="localisation">
-
+    <description>
+        Localisation
+    </description>
     <import file="localisation-50.ant.xml" />
     <import file="localisation-32.ant.xml" />
 

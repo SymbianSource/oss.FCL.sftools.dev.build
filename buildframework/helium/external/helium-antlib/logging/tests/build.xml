@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : build.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="helium-antlib-unittest" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>Helium Antlib Logging unittests.</description>
+    
+    
+    <import file="../../test-macros.ant.xml" />
+    <dirname property="stages.test.dir" file="${ant.file.helium-antlib-unittest}"/>
+    <property name="template.dir" location="../src/templates"/>
+    <target name="unittest" depends="unittest-logging" />
+
+    <target name="unittest-logging">
+        <antunitModule name="logging" />
+    </target>
+    
+    <property environment="env"/>
+    
+    <taskdef resource="net/sf/antcontrib/antlib.xml"/>
+    
+    <property name="build.log.dir" location="${stages.test.dir}\logs"/>
+    <property name="build.log" location="${stages.test.dir}\logs\${build.id}_test.log"/>
+    <property name="build.cache.log.dir" location="${stages.test.dir}\logs"/>
+    <property name="build.id" value="ant-logging-test"/>
+    <property name="display" value="Message for testing"/>
+    <import file="stages_config.ant.xml" />       
+    
+    <target name="run-stages">
+        
+        <echo> Before calling target </echo> 
+        <echo>grace</echo>
+        
+        <antcall target="hello-test"/>
+        <antcall target="compile"/>
+        <ant antfile="${stages.test.dir}/prep-ccm-get-input.ant.xml" target="prep-ccm-get-input"/>
+        
+        <echo> After calling target </echo>
+    </target>
+    
+    <target name="compile" depends="creatbom,get-env"/>
+    
+    
+    <hlm:recordfilterset id="recordfilter.config">
+        <hlm:recordfilter category="info" regexp="ERROR" />
+    </hlm:recordfilterset>
+    
+    <target name="hello-test" depends="get-password">
+        
+        <hlm:record name="${build.log.dir}/${build.id}_stagetest.log" action="start" loglevel="info">
+            <hlm:recordfilterset refid="recordfilter.config"/>
+            <hlm:recordfilter category="unix" regexp="${unix.password}" />
+            <hlm:recordfilter category="synergy" regexp="synergy" />
+        </hlm:record>
+        
+        <antcall target="stagetest">
+            <param name="display" value="Inside stage test for first time synergy ERROR"/>
+        </antcall>
+        <antcall target="stagetest">
+            <param name="display" value="Inside stage test for second time grace INFO"/>
+        </antcall>
+        
+        <hlm:record name="${build.log.dir}/${build.id}_stagetest.log" action="stop" append="true" />
+        <echo>unix-password = ${unix.password}</echo>
+        <property name="ats.password" value="password"/>
+        <hlm:logreplace regexp="${ats.password}"/>
+        <echo>ats-password = ${ats.password}</echo>
+        <antcall target="get-env"/>
+        <antcall target="hello"/>
+        
+    </target>
+    
+    <target name="stagetest" >
+        <echo>${unix.password}</echo>
+        <echo>synergy</echo>
+        <echo> Hello... inside stagetest target ${display}</echo>
+    </target>
+    
+    <target name="creatbom">
+        <echo> Hello... inside creatbom target </echo>
+    </target>
+    
+    <target name="get-env">
+        <echo> Hello... inside get-env target ${display} </echo>
+    </target>
+    
+    <target name="hello">
+        <echo> Hello... inside hello target ${display} </echo>
+    </target>
+    
+    <target name="get-password">
+        <property name="unix.password" value="something"/>
+        <hlm:logreplace regexp="${unix.password}"/>
+    </target>
+
+</project>

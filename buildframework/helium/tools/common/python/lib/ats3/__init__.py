@@ -66,12 +66,12 @@ class Configuration(object):
         self.obey_pkgfiles = to_bool(self._opts.obey_pkgfiles)
         self.tsrc_paths_dict = {}
 
-        ats_nd = self._opts.ats_network_drive.strip()
+        ats_nd = self._opts.ctc_run_process_params.strip()
         if ats_nd != "":
             ats_nd = ats_nd.split("#")[0].strip()
             if ats_nd == "":
-                self._opts.ats_network_drive = ""
-                _logger.warning("Property \'ats.atsnetwork.drive\' is not set. Code coverage measurement report(s) will not be created.")
+                self._opts.ctc_run_process_params = ""
+                _logger.warning("Property \'ats.ctc.host\' is not set. Code coverage measurement report(s) will not be created.")
                 
         main_comps = []
                 
@@ -128,7 +128,7 @@ class Ats3TestPlan(object):
 
     def __init__(self, config):
         self.diamonds_build_url = config.diamonds_build_url
-        self.ats_network_drive = config.ats_network_drive
+        self.ctc_run_process_params = config.ctc_run_process_params
         self.testrun_name = config.testrun_name
         self.harness = config.harness
         self.device_type = config.device_type
@@ -233,33 +233,35 @@ class Ats3TestPlan(object):
         """ATS3 post actions."""
         actions = []
         temp_var = ""
+        include_ctc_runprocess = False
         report_path = self.file_store.joinpath(self.REPORT_PATH)
         
-        if self.ctc_enabled and adg.CTC_PATHS_LIST != [] and self.monsym_files != "":
+        if self.ctc_enabled and adg.CTC_PATHS_LIST != [] and self.monsym_files != "" and not "${" in self.monsym_files:
+            include_ctc_runprocess = True
             ctc_params = "--ctcdata_files="
             for cdl in adg.CTC_PATHS_LIST:
-                ctc_params += cdl + ";"
+                ctc_params += cdl + '\\ctcdata.txt' + ";"
                 temp_var = cdl
             
-            network_path = r"\\" + self.ats_network_drive.rsplit("#", 1)[0]
+            network_path = r"\\" + self.ctc_run_process_params.rsplit("#", 2)[0]
+            drop_count = self.ctc_run_process_params.rsplit("#", 1)[1]
             temp_var = temp_var.split("ctc_helium"+os.sep)[1]
             diamonds_id = temp_var.split(os.sep)[0]
             drop_id = temp_var.split(os.sep)[1].split(os.sep)[0]
+            drop_id = re.findall(".*drop(\d*)", drop_id.lower())[0] #extracting int part of drop name
+           
             output_path = os.path.join(network_path, "ctc_helium_http_root", diamonds_id, drop_id)
-            ctc_params += r" --output_dir_html=" + output_path  
+ 
             ctc_params += r" --monsym_files=" + self.monsym_files
             ctc_params += r" --diamonds_build_id=" + diamonds_id
-            
-            #ctc_params += r" --monsym_files=\\10.11.3.2\ctc_helium\<diamonds>\mon_syms\<number>\mon.sym"  
+            ctc_params += r" --drop_id=" + drop_id
+            ctc_params += r" --total_amount_of_drops=" + drop_count
             
             runprocess_action = ("RunProcessAction", 
-                            (("file", r"c:/apps/catsctc2html/catsctc2html.exe"),
-                             ("dir", r"c:/apps/catsctc2html/"),
+                            (("file", r"catsctc2html/catsctc2html.exe"), #this line will be executing on Windows machine.
                              ("parameters", ctc_params)))
             
-            #"&lt;a href=&quot;http://" + self.ats_network_drive.rsplit("#", 1)[0] + "/" + diamonds_id + "/" + drop_id + "/index.html&quot;&gt;CTC Coverage Reports&lt;/a&gt;"
-            email_url = " CTC report can be found from: http://" + self.ats_network_drive.rsplit("#", 1)[0] + "/" + diamonds_id + "/" + drop_id + "/index.html"
-            
+            email_url = " CTC report can be found from: " + self.diamonds_build_url
 
             email_action = ("SendEmailAction", 
                             (("subject", self.EMAIL_SUBJECT),
@@ -293,7 +295,7 @@ class Ats3TestPlan(object):
         diamonds_action = ("DiamondsAction", ())
 
         
-        if self.ctc_enabled == "True" and adg.CTC_PATHS_LIST != [] and self.monsym_files != "":
+        if include_ctc_runprocess:
             actions.append(runprocess_action)
             
         if self.diamonds_build_url:
@@ -360,7 +362,30 @@ def create_drop(config):
 
     test_plan.set_plan_harness()
 
-    generator = adg.Ats3TestDropGenerator()
+
+    #Checking if any non executable set exists
+    #if yes, delete the set
+    tesplan_counter = 0
+    for plan_sets in test_plan.sets:
+        tesplan_counter += 1
+        exe_flag = False
+        for srcanddst in plan_sets['src_dst']:
+            _ext = srcanddst[0].rsplit(".")[1]
+            #the list below are the files which are executable
+            #if none exists, set is not executable
+            for mat in ["dll", "ini", "cfg", "exe", "script"]:
+                if mat == _ext.lower():
+                    exe_flag = True
+                    break
+            if exe_flag: break
+        
+        if not exe_flag: #the set does not have executable, deleting the set
+            del test_plan.sets[tesplan_counter - 1]
+        
+    if config.ats4_enabled.lower() == 'true':
+        generator = adg.Ats3TemplateTestDropGenerator()
+    else:
+        generator = adg.Ats3TestDropGenerator()
     _logger.info("generating drop file: %s" % config.drop_file)
     generator.generate(test_plan, output_file=config.drop_file, config_file=config.config_file)
 
@@ -392,7 +417,7 @@ def main():
     cli.add_option("--ctc-enabled", help="CTC enabled", default="False")
     cli.add_option("--multiset-enabled", help="Multiset enabled", default="False")
     cli.add_option("--diamonds-build-url", help="Diamonds build url")
-    cli.add_option("--ats-network-drive", help="ATS Network drive where MON.sym files are stored")
+    cli.add_option("--ctc-run-process-params", help="ctc parameters include ctc host, drop id and total number of drops, separated by '#'")
     cli.add_option("--drop-file", help="Name for the final drop zip file",
                    default="ATS3Drop.zip")
     cli.add_option("--file-store", help="Destination path for reports.",
@@ -421,6 +446,7 @@ def main():
                    default="run")
     cli.add_option("--config", help="Path to the config file",
                    default="")
+    cli.add_option("--ats4-enabled", help="ATS4 enabled", default="False")
     cli.add_option("--obey-pkgfiles", help="If this option is True, then only test components having PKG file are executable and if the compnents don't have PKG files they will be ignored.", default="False")
     cli.add_option("--verbose", help="Increase output verbosity", 
                    action="store_true", default=False)

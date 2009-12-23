@@ -33,6 +33,7 @@ logging.basicConfig(level=logging.DEBUG)
 _logger = logging.getLogger('test.threadpool')
 
 class Job:
+    """Job: a job created, used to test threadpool"""
     def __init__(self, jid):
         self.__id = jid
         
@@ -45,14 +46,14 @@ class Job:
         time.sleep(1)
 
 class LeavingJob(Job):
-
+    """LeavingJob: sleeps and raises exception"""
     def work(self):
         time.sleep(1)
         raise Exception("Error!")
     
 
 class TestThreadPool(unittest.TestCase):
-
+    """TestThreadPool: sets up 6 jobs and clears them down again."""
     def test_thread_pool(self):
         """ Test the thread pool.
         """
@@ -64,7 +65,7 @@ class TestThreadPool(unittest.TestCase):
         pool.addWork(Job(5))
         pool.addWork(Job(6))
         pool.wait()
- 
+
     def test_thread_pool_leaving(self):
         """ Test the thread pool when exception happens.
         """
@@ -82,5 +83,3 @@ class TestThreadPool(unittest.TestCase):
         pool.wait()
         assert len(exceptions)==6
         _logger.debug(exceptions)
- 
- 

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : test_signaltask.ant.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test-stage" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>Helium Antlib Signal unittests.</description>
+    
+    
+    <property environment="env"/>
+
+    <import file="../stages_config.ant.xml" />
+    <import file="../build.xml" />        
+    <target name="test-stages" depends="run-stages">    
+        <au:assertFileExists file="${build.log.dir}/${build.id}_main.ant.log"/>
+        <au:assertFileExists file="${build.log.dir}/${build.id}_prep.ant.log"/>
+        <au:assertFileExists file="${build.log.dir}/${build.id}_compile.ant.log"/>
+        <au:assertFileExists file="${build.log.dir}/${build.id}_stagetest.log"/>
+        
+        
+        <loadfile srcfile="${build.log.dir}/${build.id}_stagetest.log" property="recordfilter.task.log">
+            <filterchain>
+                <linecontainsregexp>
+                    <regexp pattern="ERROR"/>
+                </linecontainsregexp>
+            </filterchain>
+        </loadfile>
+        <au:assertTrue message="record task is not doing the record filtering">
+            <not>
+                <isset property="recordfilter.task.log"/>
+            </not>
+        </au:assertTrue>
+        
+        <loadfile srcfile="${build.log.dir}/${build.id}_stagetest.log" property="passwordfilter.task.log">
+            <filterchain>
+                <linecontainsregexp>
+                    <regexp pattern="synergy"/>
+                </linecontainsregexp>
+            </filterchain>
+        </loadfile>
+        <au:assertTrue message="record task is not doing the password filtering">
+            <not>
+                <isset property="passwordfilter.task.log"/>
+            </not>
+        </au:assertTrue>
+        
+        <loadfile srcfile="${build.log.dir}/${build.id}_stagetest.log" property="passwordfilter.log">
+            <filterchain>
+                <linecontainsregexp>
+                    <regexp pattern="something"/>
+                </linecontainsregexp>
+            </filterchain>
+        </loadfile>
+        <au:assertTrue message="record task is not doing the password filtering">
+            <not>
+                <isset property="passwordfilter.log"/>
+            </not>
+        </au:assertTrue>
+    
+        
+    </target>
+ 
+</project>

@@ -28,7 +28,7 @@ import java.io.FileWriter;
 
 /**
  * This type define an input source that will be communicated to the notifiers.
- * Not used, deprecated and an xml and html file is generated fof signal modules.
+ * Not used, deprecated and an xml and html file is generated for signal modules.
  * @ant.type name="metadatasource" category="Metadata"
  * @deprecated
  * 

@@ -38,9 +38,7 @@ public class SignalStatusDef extends HlmPostDefImpl
      * @throws BuildException
      */
     public void execute(Project prj, String module, String[] targetNames) {
-        log.debug("SignalStatusDef:execute:");
         if (SignalStatusList.getDeferredSignalList().hasSignalInList()) {
-            log.debug("SignalStatusDef:execute: Error message: " + SignalStatusList.getDeferredSignalList().getErrorMsg());
             throw new BuildException(SignalStatusList.getDeferredSignalList().getErrorMsg());
         }
     }

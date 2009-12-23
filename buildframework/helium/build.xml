@@ -24,15 +24,14 @@ Description:
     <description>
         Helium targets to build helium itself.
     </description>
-    <property environment="env"/>
     
+    <import file="build-jar.ant.xml"/>
     <property name="build.drive" location="${env.TEMP}/helium/temp_drive"/>
     <mkdir dir="${build.drive}/"/> 
     
     <property file="${helium.dir}/config/version.txt"/>
     <property name="release.label" value="${helium.version}"/>
     
-    <import file="build-jar.ant.xml"/>
     <import file="helium.ant.xml"/>
     <import file="tools/startup/antserver/antserver.ant.xml"/>
          

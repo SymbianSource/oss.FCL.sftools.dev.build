@@ -162,14 +162,17 @@ public class PythonTask extends Task
             
                 // Delete temporary script file
                 boolean fileDeleted = tempfile.delete();
-                if (!fileDeleted)
+                if (!fileDeleted && iFailonerror)
                 {
                     throw new BuildException("Could not delete script file!");
                 }            
             }
             catch (IOException e)
             {
-                throw new BuildException(e.getMessage());
+                if (iFailonerror) {
+                    throw new BuildException(e.getMessage());
+                }
+                log("Error while running python task " + e.getMessage());
             }
             finally
             {

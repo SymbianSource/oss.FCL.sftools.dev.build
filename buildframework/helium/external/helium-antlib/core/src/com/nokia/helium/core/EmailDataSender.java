@@ -150,15 +150,16 @@ public class EmailDataSender {
             toListLength = toAddressList.length;
         InternetAddress[] addressList = new InternetAddress[toListLength];
         try {
-            log.debug("EmailDataSender:getToAddressList:length: "
+            log.debug("getToAddressList:length: "
                     + toListLength);
             for (int i = 0; i < toListLength; i++) {
-                log.debug("EmailDataSender:getToAddressList:address:"
+                log.debug("getToAddressList:address:"
                         + toAddressList[i]);
                 addressList[i] = new InternetAddress(toAddressList[i]);
             }
         } catch (Exception aex) {
-            log.error("EmailDataSender:AddressException: " + aex);
+            // We are Ignoring the errors as no need to fail the build.
+            log.error("AddressException: " + aex);
         }
         return addressList;
     }
@@ -217,10 +218,9 @@ public class EmailDataSender {
     public void sendData(String purpose, String fileToSend, String mimeType,
             String subject, String header, boolean compressData) {
         try {
-            log.debug("EmailDataSender:sendData:file: " + fileToSend);
-            log.debug("EmailDataSender:sendData:mimetype: " + mimeType);
+            log.debug("sendData:Send file: " + fileToSend + " and mimetype: " + mimeType);
             if (fileToSend != null) {
-                log.debug("EmailDataSender:sendData:smtp address: "
+                log.debug("sendData:smtp address: "
                         + smtpServerAddress);
                 InternetAddress[] toAddresses = getToAddressList();
                 Properties props = new Properties();
@@ -235,15 +235,14 @@ public class EmailDataSender {
                 MimeMultipart multipart = new MimeMultipart("related");
                 BodyPart messageBodyPart = new MimeBodyPart();
                 ByteArrayDataSource dataSrc = null;
-                log.debug("EmailDataSender:sendData:Send file: " + fileToSend);
                 String fileName = new File(fileToSend).getName();
                 if (compressData) {
-                    log.debug("EmailDataSender: Sending compressed data");
+                    log.debug("Sending compressed data");
                     dataSrc = compressFile(fileToSend);
                     dataSrc.setName(fileName + ".gz");
                     messageBodyPart.setFileName(fileName + ".gz");
                 } else {
-                    log.debug("EmailDataSender: Sending uncompressed data:");
+                    log.debug("Sending uncompressed data:");
                     dataSrc = new ByteArrayDataSource(new FileInputStream(
                             new File(fileToSend)), mimeType);
 
@@ -267,15 +266,21 @@ public class EmailDataSender {
                     InternetAddress fromAddress = getFromAddress(); 
                     message.setFrom(fromAddress);
                 } catch (Exception e) {
-                    log.debug("Error retrieving current user email address: " + e.getMessage());
+                    // We are Ignoring the errors as no need to fail the build.
+                    log.debug("Error retrieving current user email address: " + e.getMessage(), e);
                 }
                 message.addRecipients(Message.RecipientType.TO, toAddresses);
                 log.info("Sending email alert: " + subject);
                 Transport.send(message);
             }
         } catch (Exception e) {
-            log.info("Not sending e-mail signal because of errors");
-            log.debug("Failed sending e-mail: " + purpose + ": ", e);
+            String errorMessage = e.getMessage();
+            String fullErrorMessage = "Failed sending e-mail: " + purpose;
+            if (errorMessage != null) {
+                fullErrorMessage += " " + errorMessage;
+            }
+            // We are Ignoring the errors as no need to fail the build.
+            log.info(fullErrorMessage);
         }
     }
 
@@ -342,12 +347,11 @@ public class EmailDataSender {
             if (en.hasMore()) {
                 SearchResult sr = en.next();
                 String email = (String) sr.getAttributes().get("mail").get();
-                log.debug("EmailDataSender:getUserEmail:" + email);
+                log.debug("getUserEmail:" + email);
                 return email;
             }
         } catch (javax.naming.NameNotFoundException ex) {
-            log.debug("EmailDataSender:username:" + username + "finding error");
-            throw new HlmAntLibException("Error find user email");
+            throw new HlmAntLibException("Error finding user email for " + username );
         }
         throw new HlmAntLibException("Could not find user email in LDAP.");
     }

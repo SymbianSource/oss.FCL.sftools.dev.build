@@ -76,7 +76,7 @@ sys.exit(0)
                 </hlm:python>
             </try>
             <finally>
-                <hlm:tempRecordStopMacro name="${build.id}_ccm_get_input.log" filterref="filterset.prepWorkArea"/>
+                <hlm:tempRecordStopMacro name="${build.id}_ccm_get_input.log" filterref="filterset.prepWorkArea" phase="prep"/>
                 <hlm:assertFileExists file="${build.cache.log.dir}/${build.id}_ccm_get_input.log" />
             </finally>
         </trycatch>

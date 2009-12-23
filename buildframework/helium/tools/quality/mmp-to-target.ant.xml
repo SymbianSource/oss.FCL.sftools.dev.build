@@ -79,7 +79,8 @@ output.close()
         \src\common\generic\wap-stack\wapstack\group\wapstksrv.mmp : wapstksrv.dll        
     -->
     <target name="integration-mmp-to-target">
-        <hlm:mmpToTargetMacro output="${build.log.dir}/${build.id}_targets_from_mmps.txt">
+        <mkdir dir="${post.log.dir}" />
+        <hlm:mmpToTargetMacro output="${post.log.dir}/${build.id}_targets_from_mmps.txt">
             <fileset refid="mmp.to.target.config"/>
         </hlm:mmpToTargetMacro>
     </target>

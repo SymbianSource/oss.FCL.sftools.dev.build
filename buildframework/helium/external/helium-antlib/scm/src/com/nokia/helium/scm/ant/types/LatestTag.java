@@ -28,19 +28,43 @@ import java.util.regex.Pattern;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 
+/**
+ * The latestTag element will help you to find the latest revision based
+ * on a pattern.
+ * 
+ *  <pre>
+ *  &lt;latestTag name="1.0.*"&gt;
+ *     &lt;tagSet id="set.of.tags"/&gt;
+ *  latestTag
+ *  </pre>
+ * 
+ * @ant.type name="latestTag" category="SCM"
+ */
 public class LatestTag extends Tag {
 
     private String pattern;
     private List<TagSet> tagSets = new ArrayList<TagSet>();
     
+    /**
+     * Defines the pattern.
+     * @ant.required
+     */
     public void setPattern(String pattern) {
         this.pattern = pattern;
     }
     
+    /**
+     * Add a set of release to search the latest release in.
+     * @param tagSet
+     */
     public void add(TagSet tagSet) {
         tagSets.add(tagSet);
     }
 
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String getName() {
         if (pattern == null)
@@ -56,6 +80,11 @@ public class LatestTag extends Tag {
         return tags.get(0).getName();
     }
 
+    /**
+     * Get a reduce set of tags, only tag matching the pattern will be
+     * included.
+     * @return the reduce list of tags.
+     */
     protected List<Tag> getCleanedList() {
         Pattern pVer = getPattern();
         List<Tag> tags = new ArrayList<Tag>();
@@ -67,6 +96,15 @@ public class LatestTag extends Tag {
         return tags;
     }
     
+    /**
+     * Get the pattern as a regular expression.
+     * '*' will be transformed into (\d+) (which means only numbers
+     *  will be considered). Other character will be quoted.
+     * For example:
+     * 1.0.* => 1\.0\.(\d+)
+     * 
+     * @return the transformed pattern.
+     */
     protected Pattern getPattern() {
         // Quoting the current pattern
         getProject().log("pattern: " + pattern, Project.MSG_DEBUG);
@@ -79,6 +117,10 @@ public class LatestTag extends Tag {
         return Pattern.compile(qVer);
     }
     
+    /**
+     * Get the list of tags, from the tagSets. 
+     * @return a list of Tags objects.
+     */
     protected List<Tag> getTags() {
         List<Tag> tags = new ArrayList<Tag>();
         for (TagSet ts : tagSets) {
@@ -92,15 +134,30 @@ public class LatestTag extends Tag {
         return tags;
     }
     
+    /**
+     * This class implements the comparator interface, which will help to
+     * order the tag compare to the pattern. For example:
+     * 1.0.2 > 1.0.1 (for pattern 1.0.*)
+     * 1.1.1 > 1.0.2 (for pattern 1.*.*)
+     *
+     * @param <T> A Tag kind of class.
+     */
     public class TagComparator<T extends Tag> implements Comparator<T> {
         
         // Pattern to match for the comparison
         private Pattern pVer;
         
+        /**
+         * Configure the Comparator with the pattern.
+         * @param pattern
+         */
         public TagComparator(Pattern pattern) {
             pVer = pattern;
         }
         
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public int compare(T o1, T o2) {
             getProject().log("Comparing: " + o1.getName() + ">" + o2.getName(), Project.MSG_DEBUG);

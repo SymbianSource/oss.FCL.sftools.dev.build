@@ -80,6 +80,7 @@ public class StageDiamondsListener extends DiamondsListenerImpl {
             initStageTargetsMap();
             isTargetMapInitialized = true;
         }
+        log.debug("targetBegin targetName: " + targetName + " - currentStartTargetName:" + currentStartTargetName);
         if (currentStartTargetName == null) {
             findAndSetStartTimeForTargetInStageList(targetName);
         }
@@ -158,10 +159,8 @@ public class StageDiamondsListener extends DiamondsListenerImpl {
                     getDiamondsClient().sendData(output, DiamondsConfig
                             .getDiamondsProperties().getDiamondsBuildID());
                 } catch (com.nokia.helium.core.TemplateProcessorException e1) {
-                    log.debug("diamonds:StageDiamondsListener:exception: ", e1);
-                    throw new DiamondsException(
-                            "template conversion error while sending data for stage: "
-                                    + stageName + " : " + e1.getMessage());
+                    throw new DiamondsException("template conversion error while sending data for stage: "
+                            + stageName + " : " + e1.getMessage());
                 }
             }
         }
@@ -199,11 +198,13 @@ public class StageDiamondsListener extends DiamondsListenerImpl {
                 log.debug("Diamonds target missing: ", be);
             }
             if (arrayList != null) {
+                log.debug(" + Stage definition: " + stage.getStageName());
                 Enumeration<Target> targetEnum = arrayList.elements();
                 while (targetEnum.hasMoreElements()) {
                     // fast lookup
                     Target target = targetEnum.nextElement();
                     stageMap.put(target.getName(), INVALID_DATE);
+                    log.debug("   - Start target: " + target.getName());
                 }
                 stageTargetBeginList.add(stageMap);
 
@@ -211,6 +212,7 @@ public class StageDiamondsListener extends DiamondsListenerImpl {
                 String endTargetName = stage.getEndTargetName();
                 // fast lookup
                 stageTargetEndMap.put(endTargetName, stage);
+                log.debug("   - End target: " + endTargetName);
             }
         }
     }

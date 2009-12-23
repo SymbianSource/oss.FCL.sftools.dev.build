@@ -46,7 +46,7 @@ class InternalExportParser(symbian.log.Parser):
     def __init__(self, _file):
         """The constructor """
         symbian.log.Parser.__init__(self, _file)
-        self.__match_what = re.compile("abld(\.bat)?(\s+.*)*\s+-w(hat)?", re.I)
+        self.__match_what = re.compile("abld(\.bat)?(\s+.*)*\s+-(check)?w(hat)?", re.I)
         self.internalexports = {}
         
     def task(self, name, _cmd, _dir, content):
@@ -68,7 +68,7 @@ class AbldWhatParser(symbian.log.Parser):
     def __init__(self, _file):
         """The constructor """
         symbian.log.Parser.__init__(self, _file)
-        self.__match_what = re.compile(r"abld(\.bat)?(\s+.*)*\s+-w(hat)?", re.I)
+        self.__match_what = re.compile(r"abld(\.bat)?(\s+.*)*\s+-(check)?w(hat)?", re.I)
         self.__match_cmaker_what = re.compile(r"cmaker(\.cmd)?(\s+.*)*\s+ACTION=what", re.I)
         self.files_per_component = {}
         self.components_per_file = {}
@@ -180,5 +180,10 @@ class PolicyValidator(object):
                 for result in self.validate_content(filename):
                     yield result
             else:
-                yield ['missing', dirpath, None]
+                # report an error is the directory has no DP file
+                # and any files underneith.
+                for item in os.listdir(dirpath):
+                    if os.path.isfile(os.path.join(dirpath, item)):
+                        yield ['missing', dirpath, None]
+                        break
 

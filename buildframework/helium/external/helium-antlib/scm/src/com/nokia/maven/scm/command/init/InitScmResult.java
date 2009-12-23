@@ -20,7 +20,15 @@ package com.nokia.maven.scm.command.init;
 
 import org.apache.maven.scm.ScmResult;
 
+/**
+ * Class to store the result of the init command.  
+ *
+ */
 public class InitScmResult extends ScmResult {
+    
+    /**
+     * {@inheritDoc}
+     */
     public InitScmResult(String commandLine, String providerMessage,
             String commandOutput, boolean success) {
         super(commandLine, providerMessage, commandOutput, success);

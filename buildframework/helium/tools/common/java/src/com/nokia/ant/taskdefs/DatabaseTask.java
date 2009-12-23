@@ -76,9 +76,7 @@ public class DatabaseTask extends Task
         }
         catch (Exception e)
         {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            throw new BuildException(e.getMessage());
+            throw new BuildException("Not able to build the ANT project Database " + e.getMessage());
         }
     }
 

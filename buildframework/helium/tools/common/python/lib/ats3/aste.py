@@ -34,6 +34,8 @@ import zipfile
 
 from path import path
 import amara
+import ntpath as atspath
+import jinja2
 
 _logger = logging.getLogger('ats3')
 
@@ -355,6 +357,26 @@ class AsteComponentParser(object):
         test_plan.insert_set(image_files=self.flash_images,
                              test_timeout=list(self.test_timeout))
                                 
+class AsteTemplateTestDropGenerator(AsteTestDropGenerator):
+    def getlogdir(self, setd):
+        return self.ASTE_LOG_DIR
+    
+    def aslfiles(self, test_plan):
+        files = []
+        
+        testasset_location = path(test_plan["testasset_location"])
+        for file_ in list(testasset_location.walkfiles()):
+            if file_.endswith('.asl'):
+                files.append(file_.replace(testasset_location + os.sep, ""))
+        return files
+    
+    def generate_xml(self, test_plan):
+        loader = jinja2.ChoiceLoader([jinja2.FileSystemLoader(os.path.join(os.environ['HELIUM_HOME'], 'tools/common/python/lib/ats3/templates'))])
+        env = jinja2.Environment(loader=loader)
+        template = env.from_string(open(os.path.join(os.environ['HELIUM_HOME'], 'tools/common/python/lib/ats3/aste_template.xml')).read())
+        
+        xmltext = template.render(test_plan=test_plan, os=os, atspath=atspath, atsself=self).encode('ISO-8859-1')
+        return et.ElementTree(et.XML(xmltext))
 
 def create_drop(config):
     """Create a test drop."""    
@@ -363,7 +385,10 @@ def create_drop(config):
     test_plan = AsteTestPlan(config)
     parser = AsteComponentParser(config)
     parser.insert_test_set(test_plan) ######check here if something goes wrong, removed ", path(tsrc)"
-    generator = AsteTestDropGenerator()
+    if config.ats4_enabled.lower() == 'true':
+        generator = AsteTemplateTestDropGenerator()
+    else:
+        generator = AsteTestDropGenerator()
     _logger.info("generating drop file: %s" % config.drop_file)
     generator.generate(test_plan, output_file=config.drop_file)
 
@@ -405,6 +430,7 @@ def main():
                    default="English")     
     cli.add_option("--software-release", help="Software release or product name e.g. PPD 52.50",
                    default="")     
+    cli.add_option("--ats4-enabled", help="ATS4 enabled", default="False")
     cli.add_option("--verbose", help="Increase output verbosity",
                    action="store_true", default=False)
 

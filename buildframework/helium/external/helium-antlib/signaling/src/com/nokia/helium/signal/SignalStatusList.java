@@ -69,7 +69,7 @@ public final class SignalStatusList {
             statusBuffer.append(signalStatus);
             statusBuffer.append("\n");
         }
-        log.debug("SignalStatusList:getErrorMsg:msg:" + statusBuffer.toString());
+        log.debug("getErrorMsg:msg:" + statusBuffer.toString());
         return statusBuffer.toString();
     }
 
@@ -79,7 +79,7 @@ public final class SignalStatusList {
      * @return true if any signal are pending.
      */
     public boolean hasSignalInList() {
-        log.debug("SignalStatusList:hasDeferMsgInList:size:"
+        log.debug("asDeferMsgInList:size:"
                 + signals.size());
         return signals.size() > 0;
     }
@@ -88,10 +88,10 @@ public final class SignalStatusList {
      * Clear all deferred signals.
      */
     public void clearStatusList() {
-        log.debug("SignalStatusList:clearStatusList:size1:"
+        log.debug("clearStatusList:size1:"
                 + signals.size());
         signals.clear();
-        log.debug("SignalStatusList:clearStatusList:size2:"
+        log.debug("clearStatusList:size2:"
                 + signals.size());
     }
     

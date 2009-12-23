@@ -22,12 +22,12 @@ Description:
 -->
 <project name="helium-antlib-unittest" xmlns:au="antlib:org.apache.ant.antunit">
     <description>Helium antlib quality tests.</description>
+    
+    <import file="../../test-macros.ant.xml" />
+
     <target name="unittest" depends="unittest-quality" />
 
     <target name="unittest-quality">
-        <au:antunit>
-            <fileset dir="." includes="test_*.ant.xml" />
-            <au:plainlistener logLevel="info" />
-        </au:antunit>
+        <antunitModule name="quality" />
     </target>
 </project>

@@ -31,9 +31,17 @@ import com.nokia.maven.scm.command.tags.TagsScmResult;
 import com.nokia.maven.scm.command.info.InfoScmResult;
 import com.nokia.maven.scm.provider.ScmProviderExt;
 
+/**
+ * Extended SCM manager which implements the additional functionalities
+ * defined by the ExtendedScmManager.
+ *
+ */
 public class BasicExtendedScmManager extends BasicScmManager implements
         ExtendedScmManager {
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public PullScmResult pull(ScmRepository repository, File path)
             throws ScmException {
@@ -47,6 +55,9 @@ public class BasicExtendedScmManager extends BasicScmManager implements
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public TagsScmResult tags(ScmRepository repository, File path) throws ScmException {
         try {
@@ -59,6 +70,9 @@ public class BasicExtendedScmManager extends BasicScmManager implements
         }
     }
     
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public InfoScmResult info(ScmRepository repository, File path) throws ScmException {
         try {

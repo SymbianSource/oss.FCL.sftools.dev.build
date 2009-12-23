@@ -81,8 +81,7 @@ public class MetaDataLogCondition extends ConditionType {
         if (severity == null)
             throw new BuildException("'severity' attribute is not defined");
 
-        this.log("Looking for severity '" + severity + "' under '"
-                + fileName.getAbsolutePath() + "'");
+        //this.log("Looking for severity '" + severity + "' under '" + fileName.getAbsolutePath() + "'");
         
         MetaDataDb.Priority prty = null;
         if (severity.equalsIgnoreCase("ERROR")) {

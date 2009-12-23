@@ -17,12 +17,10 @@
 #Description:
 #===============================================================================
 
-
-import unittest, amara, os
+from __future__ import with_statement
+import unittest, os
 from rom import *
 import configuration
-
-
 
 class ImageTest( unittest.TestCase ):
     def setUp( self ):
@@ -40,7 +38,8 @@ class ImageTest( unittest.TestCase ):
         assert os.path.exists('mytraces.txt')
         
         # Check content
-        mytraces_lines = open( 'mytraces.txt', 'r' ).readlines()
+        with open('mytraces.txt') as f:
+            mytraces_lines = f.readlines()
         print mytraces_lines[0]
         assert mytraces_lines[0] == 'foo.dll\n'
         assert mytraces_lines[1] == 'bar.dll\n'

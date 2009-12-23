@@ -24,9 +24,16 @@ import org.apache.maven.scm.ScmFileSet;
 import org.apache.maven.scm.command.AbstractCommand;
 import org.apache.maven.scm.provider.ScmProviderRepository;
 
+/**
+ * Abstract class representing a tags command. 
+ * Tags consist in retrieving existing tags for a particular repository.
+ * 
+ */
 public abstract class AbstractTagsCommand extends AbstractCommand
 {
-    
+    /**
+     * {@inheritDoc} 
+     */
     public TagsScmResult executeCommand(ScmProviderRepository repository, ScmFileSet fileSet,
             CommandParameters parameters) throws ScmException
     {
@@ -34,6 +41,14 @@ public abstract class AbstractTagsCommand extends AbstractCommand
     }
     
     
+    /**
+     * Execute the tags operation on the repository.
+     * @param repository the repository to use for the action
+     * @param fileSetCommand 
+     * @param parameters
+     * @return a TagsScmResult representing the output of the command.
+     * @throws ScmException
+     */
     protected abstract TagsScmResult executeTagsCommand(ScmProviderRepository repository, ScmFileSet fileSetCommand, CommandParameters parameters) throws ScmException;
 
 }

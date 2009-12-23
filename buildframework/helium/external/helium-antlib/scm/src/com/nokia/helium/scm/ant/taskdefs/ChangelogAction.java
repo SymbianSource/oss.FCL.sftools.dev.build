@@ -20,6 +20,11 @@ package com.nokia.helium.scm.ant.taskdefs;
 import java.util.Date;
 import java.text.SimpleDateFormat;
 import java.util.Iterator;
+import java.io.*;
+
+import org.dom4j.Document;
+import org.dom4j.Element;
+import org.dom4j.io.SAXReader;
 
 import org.apache.maven.scm.ScmException;
 import org.apache.maven.scm.ScmRevision;
@@ -63,7 +68,7 @@ public class ChangelogAction extends BaseDirectoryScmAction {
     private String startVersion;
 
     private String endVersion;
-    private String xmlproperty;
+    private File xmlbom;
 
 
     /**
@@ -131,13 +136,13 @@ public class ChangelogAction extends BaseDirectoryScmAction {
     }
     
     /**
-     * Output property for xml output of changeset list
+     * File for xml output of changeset list
      * 
      * @ant.not-required
      */ 
-    public void setXMLProperty(String xmlproperty)
+    public void setXmlbom(File xmlbom)
     {
-        this.xmlproperty = xmlproperty;
+        this.xmlbom = xmlbom;
     }
 
     /**
@@ -164,7 +169,7 @@ public class ChangelogAction extends BaseDirectoryScmAction {
              }
              catch (Exception e)
              {
-                 throw new BuildException("Date Format not supported jash:" + e.getMessage());
+                 throw new ScmException("Date Format not supported:" + e.getMessage());
              }
          }
          else 
@@ -191,7 +196,7 @@ public class ChangelogAction extends BaseDirectoryScmAction {
         {
             getTask().log(changelogSet.toXML());
         }
-        else if (xmlproperty != null)
+        else if (xmlbom != null)
         {
             String output = "";
             for (Object o : changelogSet.getChangeSets())
@@ -206,8 +211,36 @@ public class ChangelogAction extends BaseDirectoryScmAction {
                 
                 output = output + "<task><id>" + revision + "</id><synopsis>" + c.getComment() + "</synopsis><completed>" + new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(c.getDate()) + "</completed></task>";
             }
-            
-            getProject().setProperty(xmlproperty, output);
+            String[] path = getTask().getScmUrl().split("/");
+            String xml = "<bom><build>untitled</build><content>\n";
+            String thisproject = "<project>" + "<name>" + path[path.length - 1] + "</name>" + "<baseline>" + getTask().getScmUrl() + "</baseline>" + "<database>mercurial</database>" + output + "</project>\n";
+            xml = xml + thisproject;
+            try {
+                if (xmlbom.exists())
+                {
+                    SAXReader xmlReader = new SAXReader();
+                    Document antDoc = xmlReader.read(xmlbom);
+                    for (Iterator iterator = antDoc.selectNodes("//project").iterator(); iterator.hasNext();)
+                    {
+                        boolean equal = false;
+                        Element e = (Element) iterator.next();
+                        for (Iterator iterator2 = antDoc.selectNodes("//baseline").iterator(); iterator2.hasNext();)
+                        {
+                              Element e2 = (Element) iterator2.next();
+                              if (e2.getText().equals(getTask().getScmUrl()))
+                                  equal = true;
+                        }
+                        if (!equal)
+                            xml = xml + e.asXML() + "\n";
+                    }
+                }
+                xml = xml + "</content></bom>";
+                
+                FileWriter fstream = new FileWriter(xmlbom);
+                BufferedWriter out = new BufferedWriter(fstream);
+                out.write(xml);
+                out.close();
+            } catch (Exception e) { e.printStackTrace(); }
         }
         else
         {

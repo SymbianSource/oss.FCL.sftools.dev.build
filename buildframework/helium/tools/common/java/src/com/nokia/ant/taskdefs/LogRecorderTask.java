@@ -315,6 +315,7 @@ public class LogRecorderTask extends Task implements SubBuildListener
             }
             catch (Exception e)
             {
+                // We are Ignoring the errors as no need to fail the build.
                 entry = new TextLogRecorderEntry(name);
             }
 

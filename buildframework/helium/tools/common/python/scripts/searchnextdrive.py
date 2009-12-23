@@ -22,13 +22,12 @@
     If none available it returns "Error: No free drive!". 
     win32 only!
 """
-import string
-from win32api import GetLogicalDriveStrings
+from fileutils import get_next_free_drive
+def search_next_free_drive():
+    try:
+        return get_next_free_drive()
+    except Exception, e:
+        return "Error: No free drive!"
 
-DRIVE_LABELS = sorted(list(set(string.ascii_uppercase) - set(GetLogicalDriveStrings())), reverse=True)
-if len(DRIVE_LABELS) != 0 :
-    print DRIVE_LABELS[0] + ":"
-else:
-    print "Error: No free drive!"
-        
-
+if __name__ == "__main__":
+    print search_next_free_drive()

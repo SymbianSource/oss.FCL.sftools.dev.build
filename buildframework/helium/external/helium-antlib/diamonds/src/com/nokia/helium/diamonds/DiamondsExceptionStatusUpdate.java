@@ -91,7 +91,7 @@ public class DiamondsExceptionStatusUpdate implements HlmExceptionHandler {
             if (SignalStatusList.getDeferredSignalList().hasSignalInList()) {
                 Vector<SignalStatus> signalList = SignalStatusList.getDeferredSignalList().getSignalStatusList();
                 timeFormat = new SimpleDateFormat(DiamondsConfig.getDiamondsProperties().getProperty("tstampformat"));
-                log.debug("[DiamondsExceptionStatusUpdate] => Build Status = " + buildStatus);
+                log.debug("Build Status = " + buildStatus);
                 int i = 0;
                 for (SignalStatus status : signalList) {
                     signalInformation.put("diamond.signal.name." + i, status.getName());
@@ -108,12 +108,12 @@ public class DiamondsExceptionStatusUpdate implements HlmExceptionHandler {
                 templateProcessor.convertTemplate(templateDir, templateFile, outputFile,sourceList);
 
                 /* send the generated XML file for diamonds client to update the signals information into Diamonds */
-                log.debug("[DiamondsExceptionStatusUpdate] => sending data to diamonds ..." + outputFile);
+                log.debug("sending data to diamonds ..." + outputFile);
                 diamondsClient.sendData(outputFile, DiamondsConfig.getDiamondsProperties().getDiamondsBuildID());
                 try {
                     DiamondsListenerImpl.mergeToFullResults(new File(outputFile));
                 } catch (DiamondsException de) {
-                    log.debug("[DiamondsExceptionStatusUpdate] => " + de.getMessage());
+                    log.error("Not able to merge into full results XML file " + de.getMessage(), de);
                 }
             }
             /* Check, is the signal is in now signal list?
@@ -124,7 +124,7 @@ public class DiamondsExceptionStatusUpdate implements HlmExceptionHandler {
                 Vector<SignalStatus> signalList = SignalStatusList.getNowSignalList().getSignalStatusList();
                 buildStatus = "failed";
                 timeFormat = new SimpleDateFormat(DiamondsConfig.getDiamondsProperties().getProperty("tstampformat"));
-                log.debug("[DiamondsExceptionStatusUpdate] => Build Status = " + buildStatus);
+                log.debug("Build Status = " + buildStatus);
                 int i = 0;
                 for (SignalStatus status : signalList) {
                     signalInformation.put("diamond.signal.name." + i, status.getName());
@@ -141,12 +141,12 @@ public class DiamondsExceptionStatusUpdate implements HlmExceptionHandler {
                 templateProcessor.convertTemplate(templateDir, templateFile, outputFile,sourceList);
 
                 /* send the generated XML file for diamonds client to update the signals information into Diamonds */
-                log.debug("[DiamondsExceptionStatusUpdate] => sending data to diamonds ..." + outputFile);
+                log.debug("sending data to diamonds ..." + outputFile);
                 diamondsClient.sendData(outputFile, DiamondsConfig.getDiamondsProperties().getDiamondsBuildID());
                 try {
                     DiamondsListenerImpl.mergeToFullResults(new File(outputFile));
                 } catch (DiamondsException de) {
-                    log.debug("[DiamondsExceptionStatusUpdate] => " + de.getMessage());
+                    log.error("Not able to merge into full results XML file " + de.getMessage(), de);
                 }
             }
             /* Generate the build status XML file required for diamonds to update the build status information,
@@ -165,7 +165,7 @@ public class DiamondsExceptionStatusUpdate implements HlmExceptionHandler {
             try {
                 DiamondsListenerImpl.mergeToFullResults(new File(outputFile));
             } catch (DiamondsException de) {
-                log.debug("[DiamondsExceptionStatusUpdate] => " + de.getMessage());
+                log.error("Not able to merge into full results XML file " + de.getMessage(), de);
             }
         }
 

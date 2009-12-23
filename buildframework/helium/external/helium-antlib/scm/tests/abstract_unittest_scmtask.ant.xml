@@ -279,6 +279,15 @@ Description:
         </hlm:scm>
     </target>
 
+    <target name="test-update-empty-repo">
+        <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/new">
+            <hlm:init />
+        </hlm:scm>
+        <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/new">
+            <hlm:update basedir="${repo.dir}/new" />
+        </hlm:scm>
+    </target>
+        
     <target name="test-update-basedir-tag" depends="test-checkin">
         <echo file="${repo.dir}/test1/not_in_repo2.txt">Not in repo2</echo>
         <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/test1">
@@ -511,6 +520,11 @@ Description:
         </hlm:scm>
         <au:assertLogContains text="revision:1:" />
         <au:assertLogContains text="revision:2:" />
+        
+        <hlm:scm verbose="false" scmUrl="scm:hg:${repo.dir}/changelog">
+            <hlm:changelog basedir="${repo.dir}/changelog" xmlbom="${repo.dir}/bom.xml"/>
+        </hlm:scm>
+        <au:assertFileExists file="${repo.dir}/bom.xml" />
     </target>
     
     <!--
@@ -619,4 +633,64 @@ Description:
         </au:expectfailure>
     </target>
 
+    
+    <!--
+     **************************************************************
+     ** Init
+     **************************************************************
+     -->
+    <target name="test-init">
+        <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/new">
+            <hlm:init />
+        </hlm:scm>
+        <au:assertFileExists file="${repo.dir}/new" />
+    </target>
+
+    
+    <!--
+     **************************************************************
+     ** Pull
+     **************************************************************
+     -->
+    <target name="test-pull">
+        <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/test1">
+            <hlm:checkout baseDir="${repo.dir}/pull" />
+        </hlm:scm>
+        <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/test1">
+            <hlm:tag baseDir="${repo.dir}/test1" name="tag_0.2" />
+        </hlm:scm>
+        <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/pull">
+            <hlm:pull baseDir="${repo.dir}/pull" />
+            <hlm:changelog baseDir="${repo.dir}/pull" numDays="1" />
+        </hlm:scm>
+        <au:assertLogContains text="files:.hgtags" />
+        <au:assertLogContains text="description:[maven-scm] copy for tag tag_0.2" />
+    </target>
+    
+    <!--
+     **************************************************************
+     ** Tags
+     **************************************************************
+     -->
+    <target name="test-tags">
+        <echo file="${repo.dir}/test1/content.txt">content...</echo>
+        <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/test1">
+            <hlm:add>
+                <fileset dir="${repo.dir}/test1">
+                    <include name="*.txt" />
+                </fileset>
+            </hlm:add>
+            <hlm:checkin message="Adding files .....">
+                <fileset dir="${repo.dir}/test1">
+                    <include name="*.txt" />
+                </fileset>
+            </hlm:checkin>            
+            <hlm:tag baseDir="${repo.dir}/test1" name="tag_0.1" />
+            <hlm:tags baseDir="${repo.dir}/test1" />
+        </hlm:scm>
+        <au:assertLogContains text=" * tag_0.1" />
+        <au:assertLogContains text=" * tip" />
+    </target>
+    
+    
 </project>

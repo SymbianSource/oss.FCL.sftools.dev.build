@@ -24,9 +24,13 @@ Description:
     <!-- Task definition -->
     <taskdef name="path2file" classname="com.nokia.helium.core.ant.taskdefs.SerializePathTask"/>
     <taskdef name="countSeverity" classname="com.nokia.helium.core.ant.taskdefs.XMLLogCount"/>
+    <taskdef name="getVariableValue" classname="com.nokia.helium.core.ant.taskdefs.GetValueFromVariableSet"/>
     <!-- Type definition -->
     <typedef name="hasSeverity" classname="com.nokia.helium.core.ant.conditions.XMLLogCondition"/>
     <typedef name="ldapauthenticate" classname="com.nokia.helium.core.ant.taskdefs.ValidateUserLogin" />
+
+    <typedef name="arg" classname="com.nokia.helium.core.ant.types.Variable"/>
+    <typedef name="argSet" classname="com.nokia.helium.core.ant.types.VariableSet"/>
 
     <!-- Type definition -->
     <typedef name="deflist" classname="com.nokia.helium.core.ant.types.HlmDefList"/>

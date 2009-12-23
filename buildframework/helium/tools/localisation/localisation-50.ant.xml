@@ -32,11 +32,12 @@ Description:
             This target launch the localisation of DTD files. 
             This is handled by the DTDLocaliser.pl script from S60.  
     --> 
-    <target name="localisation-dtd"> 
+    <target name="localisation-dtd">
+        <mkdir dir="${localisation.log.dir}"/>
         <exec dir="${build.drive}/" executable="perl.exe" failonerror="false"> 
             <arg value="${build.drive}/epoc32/tools/DTDLocaliser.pl"/> 
             <arg value="-l"/> 
-            <arg value="${build.log.dir}/${build.id}.dtd_localisation.log}"/> 
+            <arg value="${localisation.log.dir}/${build.id}.dtd_localisation.log}"/> 
         </exec> 
     </target> 
      

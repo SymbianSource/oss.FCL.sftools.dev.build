@@ -19,5 +19,5 @@
 
 
 module load java/1.6.0
-setenv ANT_ARGS "-lib ../../antlibs -lib ../../bin/helium-core.jar -lib ../../lib" 
+setenv ANT_ARGS "-lib ../../antlibs -lib ../lib -lib ../../lib -lib ../../bin/helium-core.jar " 
 ant -Dant.executor.class="com.nokia.helium.core.ant.HeliumExecutor" $*

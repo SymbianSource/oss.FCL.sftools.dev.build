@@ -43,9 +43,9 @@ mySocket.close()
     <!-- Executes compilation of a System Definition configuration using Symbian EBS tools. -->
     <target name="compile-ebs" if="build.system.ebs" depends="set-arm-version">    
         <hlm:assertFileExists file="${genxml.output.file}"/>
-        <hlm:compileEbsMacro input="${genxml.output.file}" log="${build.log.dir}/${build.id}.${sysdef.configuration}_compile.log" />
+        <hlm:compileEbsMacro input="${genxml.output.file}" log="${compile.log.dir}/${build.id}.${sysdef.configuration}_compile.log" />
         <!-- calculate below only if metadata is enabled, error is calculated before the signal is being sent.-->
-        <hlm:calculateErrorsFromLog logfile="${build.log.dir}/${build.id}.${sysdef.configuration}_compile.log" />
+        <hlm:calculateErrorsFromLog logfile="${compile.log.dir}/${build.id}.${sysdef.configuration}_compile.log" />
     </target>
 
     
@@ -69,7 +69,7 @@ project.setProperty("build.clients", client_list)
             </for>
             <preset.exec executable="perl" dir="${build.drive}/" failonerror="true">
                 <arg value="epoc32/tools/build/buildserver.pl"/>
-                <arg line="-d ${genxml.output.file} -p ${ebs.port.number} -l ${build.log.dir}/${build.id}.${sysdef.configuration}_compile.log"/>
+                <arg line="-d ${genxml.output.file} -p ${ebs.port.number} -l ${compile.log.dir}/${build.id}.${sysdef.configuration}_compile.log"/>
             </preset.exec>
         </parallel>
     </target>

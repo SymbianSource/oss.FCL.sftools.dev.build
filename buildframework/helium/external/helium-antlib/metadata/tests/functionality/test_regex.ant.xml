@@ -41,6 +41,102 @@ Description:
         <metadatafilterset filterfile="${metadata-filterfile}" />
     </hlm:metadatafilterset>
 
+    <!-- Test categorization for sbs scanlog
+    -->
+    <target name="test-categorization">
+        <delete file="${project.dir}/../output/categorization.sqlite" failonerror="false" />
+        <echo message="categorization validation" />
+        <hlm:metadatarecord database="${project.dir}/../output/categorization.sqlite">
+            <hlm:sbsmetadatainput cleanLogFile="${project.dir}/../data/categorization_clean.log">
+                <fileset dir="${project.dir}/../data/">
+                    <include  name="categorization.log"/>
+                </fileset>
+                <metadatafilterset refid="all-regex-filterfile" />
+            </hlm:sbsmetadatainput>
+        </hlm:metadatarecord>
+        <hlm:metadataCountSeverity severity="error" log="categorization.log" db="${project.dir}/../output/categorization.sqlite" property="cleanlog_errors"/>
+        <au:assertTrue>
+            <equals arg1="${cleanlog_errors}" arg2="2"/>
+        </au:assertTrue>
+    </target>
+
+    <!-- Test parser error
+    -->
+    <target name="test-parser-error">
+        <delete file="${project.dir}/../output/parser_error.sqlite" failonerror="false" />
+        <au:expectfailure>
+            <hlm:metadatarecord database="${project.dir}/../output/parser_error.sqlite">
+                <hlm:sbsmetadatainput>
+                    <fileset dir="${project.dir}/../data/">
+                        <include  name="parser_error.log"/>
+                    </fileset>
+                    <metadatafilterset refid="all-regex-filterfile" />
+                </hlm:sbsmetadatainput>
+            </hlm:metadatarecord>
+        </au:expectfailure>
+    </target>
+
+    <!-- Test parser error
+    -->
+    <target name="test-parser-error-keepgoing">
+        <delete file="${project.dir}/../output/parser_error.sqlite" failonerror="false" />
+        <hlm:metadatarecord database="${project.dir}/../output/parser_error.sqlite" failonerror="false">
+            <hlm:sbsmetadatainput>
+                <fileset dir="${project.dir}/../data/">
+                    <include  name="parser_error.log"/>
+                </fileset>
+                <metadatafilterset refid="all-regex-filterfile" />
+            </hlm:sbsmetadatainput>
+        </hlm:metadatarecord>
+    </target>
+
+
+    <!-- Test categorization without cleanLogFile
+    -->
+    <target name="test-categorization-nocleanlog">
+        <delete file="${project.dir}/../output/categorization.sqlite" failonerror="false" />
+        <echo message="categorization validation" />
+        <hlm:metadatarecord database="${project.dir}/../output/categorization.sqlite">
+            <hlm:sbsmetadatainput>
+                <fileset dir="${project.dir}/../data/">
+                    <include  name="categorization.log"/>
+                </fileset>
+                <metadatafilterset refid="all-regex-filterfile" />
+            </hlm:sbsmetadatainput>
+        </hlm:metadatarecord>
+        <hlm:metadataCountSeverity severity="error" log="categorization.log" db="${project.dir}/../output/categorization.sqlite" property="nocleanlog_errors"/>
+        <au:assertTrue>
+            <equals arg1="${nocleanlog_errors}" arg2="1"/>
+        </au:assertTrue>
+    </target>
+
+    <target name="test-log-entry-for-no-errors">
+        <delete file="${project.dir}/../output/log-entry-for-no-error.sqlite" failonerror="false" />
+        <echo message="categorization validation" />
+        <hlm:metadatarecord database="${project.dir}/../output/log-entry-for-no-error.sqlite">
+            <hlm:sbsmetadatainput>
+                <fileset dir="${project.dir}/../data/">
+                    <include  name="noerror.log"/>
+                </fileset>
+                <metadatafilterset refid="all-regex-filterfile" />
+            </hlm:sbsmetadatainput>
+        </hlm:metadatarecord>
+        <fmpp sourceFile="${project.dir}/../../src/templates/general_category.txt.ftl"
+                     outputfile="${project.dir}/../output/general_category.txt">
+            <freemarkerLinks expandProperties="yes">
+                macro: ${project.dir}/../../src/templates/macro
+            </freemarkerLinks>
+            <data expandProperties="yes">
+                dbPath: ${project.dir}/../output/log-entry-for-no-error.sqlite
+                ant: antProperties()
+            </data>
+        </fmpp>
+        <au:assertFileExists file="${project.dir}/../output/general_category.txt" message="Error in test cases"/>
+        <loadfile property="logEntry"
+              srcFile="${project.dir}/../output/general_category.txt"/>
+        <au:assertMatches string="${logEntry}" pattern="component : general : logfile : " 
+                     casesensitive="false"/>
+    </target>
 
     <!-- Check for all the regular expression defined in the filter file,
     The log file contains text for matching regular expression.
@@ -251,7 +347,7 @@ Description:
 
     <target name="test-policy_metadata_input">
         <property name="metadata-read-db" value="${project.dir}/../output/log_policy_metadata_input.sqlite"/>
-        <delete file="${metadata-policy-db}" failonerror="false" />
+        <delete file="${metadata-read-db}" failonerror="false" />
         <echo message="policy metadata input validation" />
         <echo message="database:${metadata-read-db}" />
         <au:assertFileExists file="${metadata-filterfile}" message="${metadata-filterfile} filter file does not exist"/>
@@ -274,7 +370,7 @@ Description:
 
     <target name="test-ant_log_metadata_input">
         <property name="metadata-read-db" value="${project.dir}/../output/log_ant_metadata_input.sqlite"/>
-        <delete file="${metadata-ant-db}" failonerror="false" />
+        <delete file="${metadata-read-db}" failonerror="false" />
         <echo message="ant log metadata input validation" />
         <echo message="database:${metadata-read-db}" />
         <au:assertFileExists file="${metadata-filterfile}" message="${metadata-filterfile} filter file does not exist"/>

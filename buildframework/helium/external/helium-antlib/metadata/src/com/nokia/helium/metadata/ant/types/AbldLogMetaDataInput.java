@@ -60,36 +60,41 @@ public class AbldLogMetaDataInput extends TextLogMetaDataInput {
     public AbldLogMetaDataInput() {
     }
 
-    public boolean isEntryAvailable() {
+    /**
+     * Function to check from the input stream if is there any entries available.
+     * @return true if there are any entry available otherwise false.
+     */
+    public boolean isEntryCreated(File currentFile) {
         String exceptions = "";
-        int currentFileIndex = getCurrentFileIndex();
         int lineNumber = getLineNumber(); 
         BufferedReader currentReader = getCurrentReader();
-        
         log.debug("Getting next set of log entries for Abld Input");
-        //log.debug("currentFileIndex" + currentFileIndex);
-        List<File> fileList = getFileList();
-        int fileListSize = fileList.size();
-        log.debug("fileList.size" + fileListSize);
-        while (currentFileIndex < fileListSize) {
-            try {
-                //log.debug("currentfileindex while getting file name: " + currentFileIndex);
-                File currentFile = fileList.get(currentFileIndex);
-                if (currentReader == null) {
-                    lineNumber = 0;
-                    setLineNumber(lineNumber);
-                    log.debug("Current abld log file name:" + currentFile);
-                    log.info("Processing file: " + currentFile);
-                    currentReader = new BufferedReader(new FileReader(currentFile));
-                    setCurrentReader(currentReader);
-                }
-                String logText = null;
-                while ((logText = currentReader.readLine()) != null) {
-                    lineNumber ++;
-                    setLineNumber(lineNumber);
-                    logText = logText.replaceFirst("'^\\s*\\[.+?\\]\\s*", "");
-                    if (logText.startsWith("++ Finished at")) {
-                        //log.debug("matching finished regex");
+        try {
+            if (currentReader == null) {
+                lineNumber = 0;
+                setLineNumber(lineNumber);
+                log.debug("Current abld log file name:" + currentFile);
+                log.debug("Processing file: " + currentFile);
+                currentReader = new BufferedReader(new FileReader(currentFile));
+                setCurrentReader(currentReader);
+            }
+            String logText = null;
+            while ((logText = currentReader.readLine()) != null) {
+                lineNumber ++;
+                setLineNumber(lineNumber);
+                logText = logText.replaceFirst("'^\\s*\\[.+?\\]\\s*", "");
+                if (logText.startsWith("++ Finished at")) {
+                    if (currentComponent != null && !entryCreated) {
+                        addEntry("DEFAULT", currentComponent, currentFile.toString(), 
+                                0, "" );
+                        entryCreated = true;
+                        recordText = false;
+                        return true;
+                    }
+                    entryCreated = false;
+                } else if (logText.startsWith("=== ")) {
+                    Matcher finishMatch = abldFinishedPattern.matcher(logText);
+                    if (finishMatch.matches()) {
                         if (currentComponent != null && !entryCreated) {
                             addEntry("DEFAULT", currentComponent, currentFile.toString(), 
                                     0, "" );
@@ -98,69 +103,46 @@ public class AbldLogMetaDataInput extends TextLogMetaDataInput {
                             return true;
                         }
                         entryCreated = false;
-                    } else if (logText.startsWith("=== ")) {
-                        //log.debug("trying to match with finish pattern =======");
-                        Matcher finishMatch = abldFinishedPattern.matcher(logText);
-                        if (finishMatch.matches()) {
-                            if (currentComponent != null && !entryCreated) {
-                                addEntry("DEFAULT", currentComponent, currentFile.toString(), 
-                                        0, "" );
-                                entryCreated = true;
-                                recordText = false;
-                                return true;
-                            }
-                            entryCreated = false;
-                        } else {
-                            //log.debug("trying to match the start pattern");
-                            Matcher componentMatch = abldComponentPattern.matcher(logText);
-                            if (componentMatch.matches()) {
-                                //log.debug("matched abldComponentPattern");
-                                currentComponent = componentMatch.group(2);
-                                recordText = true;
-                            }
-
-                            Matcher startMatch = abldStartedPattern.matcher(logText);
-                            if (startMatch.matches()) {
-                                //log.debug("matched abldStartedPattern");
-                                currentComponent = startMatch.group(1);
-                                recordText = true;
-                            }
-                        }
                     } else {
-                        if (recordText) {
-                            String severity = getSeverity(logText);
-                            if (severity != null) {
-                                //log.debug("severity:" + severity);
-                                //log.debug("currentFile:" + currentFile);
-                                //log.debug("lineNumber:" + lineNumber);
-                                //log.debug("logText:" + logText);
-                                entryCreated = true; 
-                                addEntry(severity, currentComponent, currentFile.toString(), 
-                                        lineNumber, logText );
-                                return true;
-                            }
+                        Matcher componentMatch = abldComponentPattern.matcher(logText);
+                        if (componentMatch.matches()) {
+                            currentComponent = componentMatch.group(2);
+                            recordText = true;
+                        }
+
+                        Matcher startMatch = abldStartedPattern.matcher(logText);
+                        if (startMatch.matches()) {
+                            currentComponent = startMatch.group(1);
+                            recordText = true;
+                        }
+                    }
+                } else {
+                    if (recordText) {
+                        String severity = getSeverity(logText);
+                        if (severity != null) {
+                            entryCreated = true; 
+                            addEntry(severity, currentComponent, currentFile.toString(), 
+                                    lineNumber, logText );
+                            return true;
                         }
                     }
                 }
-                currentReader.close();
-                currentReader = null;
-                setCurrentReader(currentReader);
-                currentFileIndex ++;
-                setCurrentFileIndex(currentFileIndex);
-                //log.debug("currentfileindex: " + currentFileIndex);
-                //log.debug("fileListSize: " + fileListSize);
-            } catch (Exception ex) {
-                log.debug("Exception in AbldLogMetadata", ex);
-               try {
-                   currentReader.close();
-               } catch ( IOException iex) {
-                   log.debug("Exception in closing reader");
-               }
-               currentReader = null;
-               setCurrentReader(null);
-               exceptions = exceptions + ex.getMessage() + "\n";
-               return false;
             }
+            currentReader.close();
+            currentReader = null;
+            setCurrentReader(currentReader);
+        } catch (Exception ex) {
+            log.debug("Exception in AbldLogMetadata", ex);
+           try {
+               currentReader.close();
+           } catch ( IOException iex) {
+               // We are Ignoring the errors as no need to fail the build. 
+               log.debug("Exception in closing reader", iex);
+           }
+           currentReader = null;
+           setCurrentReader(null);
+           exceptions = exceptions + ex.getMessage() + "\n";
+           return false;
         }
         if (!exceptions.equals("")) {
             throw new BuildException(exceptions);

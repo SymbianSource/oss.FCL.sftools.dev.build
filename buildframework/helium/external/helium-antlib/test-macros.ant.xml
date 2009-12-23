@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<!-- 
+============================================================================ 
+Name        : test-macros.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test-macros" xmlns:au="org.apache.ant.antunit">
+    <description>Helium Antlib test macro.</description>
+
+    <taskdef resource="org/apache/ant/antunit/antlib.xml" uri="org.apache.ant.antunit"/>
+
+    <dirname property="helium.antlib.root.dir" file="${ant.file.test-macros}" />
+    <property name="build.temp.dir" location="${helium.antlib.root.dir}/../build" />
+
+    <fileset dir="." includes="**/test_*.ant.xml" id="defaut.antunit"/>
+    
+    <macrodef name="antunitModule">
+        <attribute name="name" />
+        <attribute name="filesetid" default="defaut.antunit"/>
+        <sequential>
+            <mkdir dir="${build.temp.dir}/antunit/@{name}" />
+            <au:antunit>
+                <fileset refid="@{filesetid}" />
+                <au:plainlistener logLevel="info"/>
+                <au:xmllistener toDir="${build.temp.dir}/antunit/@{name}"/>
+            </au:antunit>
+        </sequential>
+    </macrodef>
+
+</project>

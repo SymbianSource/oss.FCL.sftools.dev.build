@@ -30,7 +30,7 @@ Description:
     <property name="genxml.output.file.suffix" value="genxml" />
     <property name="compile.sysdef.dtd.stub" location="${helium.dir}/tools/common/dtd/sysdef_dtd_1_4_0.xml" />
     <property name="compile.signal.input" value="compileSignalInput" />
-    <property name="diamonds.compile.summary" location="${build.log.dir}/${build.id}_compile_diamonds.xml" />
+    <property name="diamonds.compile.summary" location="${compile.log.dir}/${build.id}_compile_diamonds.xml" />
 
 
     <!-- including common compilation macros -->
@@ -57,7 +57,7 @@ Description:
 
     <!-- post operation for EC builds, submits the compile time and lists all the built components-->
     <target name="postcompile" depends="postcompile-ec,render-build-duplicates" unless="env.HLM_SUBCON">
-        <antcall target="submit-compile-time"/>
+        <runtarget target="submit-compile-time"/>
     </target>
     
     <!-- Pre-processes all System Definition input files.
@@ -81,7 +81,7 @@ Description:
         <for param="file">
             <resources refid="system.definition.files"/>
             <sequential>
-                <copy todir="${build.output.dir}/build/input"  verbose="true">
+                <copy todir="${build.output.dir}/build/input" verbose="true">
                     <fileset file="@{file}"/>
                     <filterchain>
                         <replaceregex pattern="bldFile=&quot;common" replace="bldFile=&quot;src\\\\common" flags="gi"/>
@@ -91,19 +91,12 @@ Description:
                         <expandproperties/>
                     </filterchain>
                     <mapper>
-                        <scriptmapper language="beanshell">
+                        <scriptmapper language="jython">
 <![CDATA[
-import java.io.File;
-String counter = project.getProperty(".unique.counter");
-int count;
-if (counter == null){
-    count = 0;
-}else{
-    count = Integer.valueOf(counter) + 1;
-}
-project.setProperty(".unique.counter", ""+count);
-targetname = (String.format("%016d",count) + "_"+new File(source).getName());
-self.addMappedName(targetname);
+import os
+(drive, _) = os.path.splitdrive(r'@{file}')
+path = r'@{file}'.replace(drive + os.sep, "", 1)
+self.addMappedName(path)
 ]]>
                         </scriptmapper>
                     </mapper>
@@ -115,14 +108,28 @@ self.addMappedName(targetname);
 
     <!-- Merges all preprocessed System Definition files into one combined file. -->
     <target name="create-canonical-sysdef-file" depends="preprocess-sysdef-files">
-        <pathconvert pathsep=" " property="system.definition.files.list">
-            <fileset dir="${build.output.dir}/build/input/" includes="*"/>
-            <chainedmapper>
-                <globmapper from="*" to="-x *" casesensitive="no"/>
-            </chainedmapper>
-        </pathconvert>
-        <hlm:compileGenxmlMergeMacro input="-x ${compile.sysdef.dtd.stub} ${system.definition.files.list}"
-                                    output="${canonical.sysdef.file}"/>
+        <if>
+            <istrue value="${schema.new}" />
+            <then>
+                <echo message="system model file: ${system.model.file}" />
+                <copy file="${system.model.file}" tofile="${build.drive}/sf/os/deviceplatformrelease/foundation_system/system_model/system_model.xml"/> 
+                <hlm:joinSysdef epocroot="${build.drive}" srcfile="${build.drive}/sf/os/deviceplatformrelease/foundation_system/system_model/system_model.xml" 
+                    destfile="${canonical.sysdef.file}.join.xml" />
+                <!-- <hlm:mergeSysdef epocroot="${epocroot}" destfile="${canonical.sysdef.file}" srcfile="${canonical.sysdef.file}.join.xml" downstreamfile="${epocroot}/layer2.sysdef.xml" /> -->
+                <hlm:downgradeSysdef epocroot="${build.drive}" srcfile="${canonical.sysdef.file}.join.xml" 
+                    destfile="${canonical.sysdef.file}"/>
+            </then>
+            <else>
+                <pathconvert pathsep=" " property="system.definition.files.list">
+                    <fileset dir="${build.output.dir}/build/input/" includes="**"/>
+                    <chainedmapper>
+                        <globmapper from="*" to="-x *" casesensitive="no"/>
+                    </chainedmapper>
+                </pathconvert>
+                <hlm:compileGenxmlMergeMacro input="-x ${compile.sysdef.dtd.stub} ${system.definition.files.list}"
+                                            output="${canonical.sysdef.file}" logfile="${compile.log.dir}/${build.id}.sysdef_GenxmlMerge.log"/>
+            </else>
+        </if>
     </target>
 
     <!--
@@ -150,7 +157,7 @@ self.addMappedName(targetname);
                 <hlm:compileGenxmlMacro input="-x ${canonical.sysdef.file}"
                                         configuration="${sysdef.configuration}"
                                         output="${genxml.output.file}"
-                                        log="${build.log.dir}/${build.id}.${sysdef.configuration}_${genxml.output.file.suffix}.log" />
+                                        log="${compile.log.dir}/${build.id}.${sysdef.configuration}_${genxml.output.file.suffix}.log" />
             </then>
         </if>
     </target>
@@ -221,21 +228,21 @@ for line in fileinput.input(["${genxml.output.file}"], inplace=True):
                         <isfalse value="${compile.discard.result}"/>
                     </not>
                     <then>
-                        <delete file="${build.log.dir}/${build.id}.${sysdef.configuration}_compile.log.xml" failonerror="false"/>
+                        <delete file="${compile.log.dir}/${build.id}.${sysdef.configuration}_compile.log.xml" failonerror="false"/>
                     </then>
                 </if>
             </then>
             <else>
-                <exec executable="perl" dir="${build.drive}/" output="${build.log.dir}/${build.id}.${sysdef.configuration}_scan1.log" failonerror="${failonerror}">
+                <exec executable="perl" dir="${build.drive}/" output="${compile.log.dir}/${build.id}.${sysdef.configuration}_scan1.log" failonerror="${failonerror}">
                     <arg value="${epocroot}epoc32/tools/scanlog.pl"/>
-                    <arg file="${build.log.dir}/${build.id}.${sysdef.configuration}_compile.log"/>
+                    <arg file="${compile.log.dir}/${build.id}.${sysdef.configuration}_compile.log"/>
                 </exec>
                 <exec executable="perl" dir="${build.drive}/" failonerror="${failonerror}">
                     <arg value="${epocroot}epoc32/tools/htmlscanlog.pl"/>
                     <arg value="-v"/>
                     <arg value="-v"/>
                     <arg value="-l"/>
-                    <arg file="${build.log.dir}/${build.id}.${sysdef.configuration}_compile.log"/>
+                    <arg file="${compile.log.dir}/${build.id}.${sysdef.configuration}_compile.log"/>
                     <arg value="-o"/>
                     <arg file="${build.log.dir}/${build.id}.${sysdef.configuration}_scan2.html"/>
                 </exec>
@@ -249,12 +256,12 @@ for line in fileinput.input(["${genxml.output.file}"], inplace=True):
                     <then>
                         <hlm:metadatarecord database="${metadata.dbfile}">
                             <hlm:abldmetadatainput>
-                                <fileset casesensitive="false" file="${build.log.dir}/${build.id}.${sysdef.configuration}_compile.log" />
+                                <fileset casesensitive="false" file="${compile.log.dir}/${build.id}.${sysdef.configuration}_compile.log" />
                                 <metadatafilterset refid="filterset.compile" />
                             </hlm:abldmetadatainput>
                         </hlm:metadatarecord>
                         <hlm:compileLogSignalMacro compile.summary.file="${build.id}.${sysdef.configuration}_compile.log" 
-                            error.limit="${build.errors.limit}" />
+                            error.limit="${build.errors.limit}" phase="compile"/>
                         <!-- Todo: metadata: insert assertions for metadata parsing here -->
                     </then>
                 </if>
@@ -356,56 +363,36 @@ f.write(output)
 
     <!-- Creates a .csv log of the sizes of all the binaries created in the build. -->
     <target name="binary-sizes-log" if="binary.sizes.output">
-        <hlm:startSpecificLogMacro name="${build.log.dir}/${build.id}_binary_sizes.log"/>
+        <hlm:startSpecificLogMacro name="${compile.log.dir}/${build.id}_binary_sizes.log" phase="compile"/>
         <property name="binary.sizes.output.file" location="${build.log.dir}/${build.id}_flash_image_size_data.csv"/>
         <pathconvert pathsep=";" property="build.logs.list">
-            <fileset dir="${build.log.dir}" includes="*_build.log" excludes="*ant_build.log;*_zipup_build.log"/>
+            <fileset dir="${compile.log.dir}" includes="*_build.log" excludes="*ant_build.log;*_zipup_build.log"/>
         </pathconvert>
         <pathconvert pathsep=";" property="binary.sizes.rom.logs.list">
             <fileset refid="binary.sizes.rom.logs"/>
         </pathconvert>
         <hlm:python>
 import logging
-
-import build.io
+import compilation
 import sysdef.api
-import sysdef.io
-
 #logging.basicConfig(level=logging.DEBUG)
 logging.basicConfig(level=logging.INFO)
 
 logging.info('Reading the System Sefinition information')
 sysDef = sysdef.api.SystemDefinition(r'${canonical.sysdef.file}')
 
+bnsizelogger = compilation.BinarySizeLogger(sysDef)
 # Read in the output binaries of each unit
-logging.info('Reading the output binaries created by each unit.')
-build_logs = r'${build.logs.list}'.split(';')
-if len(build_logs) == 0:
-    raise Exception('List of build logs is empty!')
-logging.info("The list of log files:\n")
-logging.info("\n".join(build_logs))
-for logpath in build_logs:
-    binaries_reader = build.io.AbldLogWhatReader(logpath)
-    sysDef.merge_binaries(binaries_reader)
+bnsizelogger.read_output_binaries_per_unit(r'${build.logs.list}'.split(';'))
 
 # Read in the binary sizes listed in the ROM output logs
-logging.info('Reading the binary sizes of each binary from ROM logs.')
-rom_logs = r'${binary.sizes.rom.logs.list}'.split(';')
-if len(rom_logs) == 0:
-    raise Exception('List of ROM logs is empty!')
-logging.info("The list of log files:\n")
-logging.info("\n".join(rom_logs))
-for log in rom_logs:
-    binary_sizes_reader = build.io.RombuildLogBinarySizeReader(log)
-    sysDef.merge_binary_sizes(binary_sizes_reader)
+bnsizelogger.read_binary_sizes_in_rom_output_logs(r'${binary.sizes.rom.logs.list}'.split(';'))
 
 # Write out a .csv file containing
-size_writer = sysdef.io.FlashImageSizeWriter(r'${binary.sizes.output.file}')
-size_writer.write(sysDef, r'${sysdef.configurations.list}'.split(','))
-size_writer.close()
+bnsizelogger.write2csvfile(r'${binary.sizes.output.file}', r'${sysdef.configurations.list}'.split(','))
         </hlm:python>
         <hlm:assertFileExists file="${binary.sizes.output.file}"/>
-        <hlm:stopSpecificLogMacro name="${build.log.dir}/${build.id}_binary_sizes.log"/>
+        <hlm:stopSpecificLogMacro name="${compile.log.dir}/${build.id}_binary_sizes.log" phase="compile"/>
     </target>
 
 

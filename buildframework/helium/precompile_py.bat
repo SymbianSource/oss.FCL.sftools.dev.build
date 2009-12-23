@@ -17,7 +17,6 @@ rem Description:
 rem
 
 setlocal
-
-python %HELIUM_HOME%\tools\common\python\lib\precompile.py --modulepath %HELIUM_HOME%\tools\common\python\lib
-
+@echo precompiling the archiving module to generate the .pyc files for running in parallel
+python %HELIUM_HOME%\tools\common\python\lib\createZipInput.py
 endlocal

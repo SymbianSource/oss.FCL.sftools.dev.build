@@ -21,6 +21,9 @@ Description:
 ============================================================================
 -->
 <project name="test_common" xmlns:au="org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>
+        Testing targets
+    </description>
     <property environment="env"/>
     
     <property name="helium.dir" location="../../.." />
@@ -66,9 +69,9 @@ Description:
             <then>
                 <record name="${build.log}" action="start"/>
                 <echo>Before password filtering</echo>
-                <hlm:filterRecordStartMacro/>
+                <hlm:filterRecordStartMacro pattern="${password}"/>
                 <echo>Logging password: ${password}</echo>
-                <hlm:filterRecordStopMacro pattern="${password}"/>
+                <hlm:filterRecordStopMacro/>
                 <echo>After password filtering</echo>
                 <record name="${build.log}" action="stop"/>
             </then>
@@ -223,7 +226,7 @@ ${xml.test.content}</echo>
     <target name="test-hlm-touch">
         <hlm:touch>
             <path>
-                <pathelement path="${helium.dir}/build"/>
+                <pathelement path="${helium.build.dir}"/>
             </path>
         </hlm:touch>
     </target>
@@ -247,11 +250,11 @@ ${xml.test.content}</echo>
     <!-- Test user flow graph creation -->
     <target name="test-helium-user-graph">
         <runtarget target="helium-user-graph"/>
-        <!--<au:assertFileExists file="${helium.dir}/build/doc/user-graph.html"/>-->
-        <au:assertFileExists file="${helium.dir}/build/doc/images/user-graph.dot.png"/>
+        <!--<au:assertFileExists file="${helium.build.dir}/doc/user-graph.html"/>-->
+        <au:assertFileExists file="${helium.build.dir}/doc/images/user-graph.dot.png"/>
         <!--<sequential>
             <au:assertTrue>
-                <isfileselected file="${helium.dir}/build/doc/user-graph.html">
+                <isfileselected file="${helium.build.dir}/doc/user-graph.html">
                     <contains text="area shape"/>
                 </isfileselected>
             </au:assertTrue>
@@ -264,11 +267,13 @@ ${xml.test.content}</echo>
         <delete file="${build.cache.log.dir}/test.log.xml" failonerror="false"/>
         <delete file="${build.cache.log.dir}/test.sqlite" failonerror="false"/>
         <delete file="${metadata.dbfile}" failonerror="false"/>
+        <var name="build.log.dir" value="${build.cache.dir}/helium/temp_drive/output/logs" unset="true"/>
+        <var name="test.log.dir" value="${build.cache.dir}/helium/temp_drive/output/logs/test" unset="true"/>        
         <hlm:tempRecordStartMacro name="test.log" />
         <echo>ERROR: an error</echo>
         <echo>WARNING: a warning</echo>
         <echo>INFO: some useless message</echo>
-        <hlm:tempRecordStopMacro name="test.log" database="${build.cache.log.dir}/test.sqlite"/>
+        <hlm:tempRecordStopMacro name="test.log" database="${build.cache.log.dir}/test.sqlite" phase="test"/>
         <au:assertTrue>
             <and>
                 <hlm:hasSeverity file="${build.cache.log.dir}/signals/test.log.status.xml" severity="error"/>
@@ -310,15 +315,9 @@ ${xml.test.content}</echo>
     <target name="test-sisfiles">
         <tempfile destdir="${build.cache.dir}" property="sisfiles.tempconfig.file" suffix=".xml"/>
         <tempfile destdir="${build.cache.dir}" property="sis.config.file.parsed" suffix=".xml"/>
-        <if>
+        <condition property="echocmd" value="${helium.dir}/tools/common/test/echo.bat" else="echo">
             <os family='windows'/>
-            <then>
-                <property name="echocmd" value="${helium.dir}/tools/common/test/echo.bat"/>
-            </then>
-            <else>
-                <property name="echocmd" value="echo"/>
-            </else>
-        </if>
+        </condition>
         <echoxml  file="${sisfiles.tempconfig.file}">
             <build>
                 <config abstract="true">
@@ -342,11 +341,31 @@ ${xml.test.content}</echo>
             <param name="build.drive" value="${build.cache.dir}/helium/temp_drive/"/>
             <param name="build.cache.log.dir" value="${build.cache.dir}/helium/temp_drive/output/logs"/>
             <param name="metadata.dbfile" value="${build.cache.dir}/helium/temp_drive/output/logs/${build.id}_metadata.sqlite"/>
+            <param name="build.log.dir" value="${build.cache.dir}/helium/temp_drive/output/logs"/>            
+            <param name="post.log.dir" value="${build.cache.dir}/helium/temp_drive/output/logs/post"/>
+            
         </antcall>
         <au:assertFileExists file="${build.cache.dir}/helium/temp_drive/output/temp_build_files/sis_build.ant.xml"/>
         <delete file="${sisfiles.tempconfig.file}"/>
         <delete file="${sis.config.file.parsed}"/>
-        <delete dir="${build.cache.dir}/helium/temp_drive"/>
     </target>
+
+    <target name="test-exec">
+        <au:expectfailure>
+            <hlm:exec executable="123"/>
+        </au:expectfailure>
+        <hlm:exec executable="perl" outputproperty="testexec">
+            <arg value="-e"/>
+            <arg value="print 'hi'"/>
+        </hlm:exec>
+        <au:assertPropertyEquals name="testexec" value="hi"/>
+    </target>
+    
+    
+    <target name="test-grep-macro">
+        <hlm:grepMacro filename="${helium.dir}/tests/data/logs/test_log.log" regexp="([^\\]*.confml)$" output="confml.file.list"/>
+        <au:assertPropertySet name="confml.file.list"/>
+    </target>
+
 </project>
 

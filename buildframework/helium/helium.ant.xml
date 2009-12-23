@@ -24,7 +24,9 @@ Description:
     <description>
     Main full build targets and properties
     </description>
-
+    
+    <import file="build-jar.ant.xml"/>
+    
     <!-- Check the Ant version is what we expect. -->
     <property name="required.ant.version" value="1.7.0"/>
     <fail message="Incorrect version of Ant found. Please check you have Ant ${required.ant.version}.">
@@ -46,7 +48,6 @@ Description:
     ======================================================================-->
     <import file="helium_preinclude.ant.xml"/>
     
-    <property name="cache.dir" location="${env.TEMP}/helium/${env.USERNAME}"/>
     <property name="helium.build.dir" location="${helium.dir}/build"/>
     
     <hlm:typedef file="${helium.dir}/tools/common/common.antlib.xml" uri="http://www.nokia.com/helium"/> 
@@ -188,22 +189,32 @@ ${build.int.db.file.comments}
     
     <property name="build.id" value="${build.name}_${build.version}"/>
     <property name="build.type" value="core"/>
-    <property name="epocroot" value="\"/>
+    <condition property="epocroot" value="${env.EPOCROOT}" else="${env.EPOCROOT}/">
+        <matches pattern="^.*[\\/]$" string="${env.EPOCROOT}" />
+    </condition>
     <property name="data.model.file" location="${helium.dir}/config/helium_data_model.xml"/>
     <property name="data.model.parsed" location="${helium.build.dir}/datamodel.out"/>
     <condition property="data.model.xsl" value="${helium.dir}/extensions/nokia/config/helium_nokia_data_model.xsl" else="${helium.dir}/config/helium_data_model.xsl">
         <available file="${helium.dir}/extensions/nokia/config/helium_nokia_data_model.xsl"/>
     </condition>
-    <property name="database.file" location="${helium.dir}/build/database.xml"/>
+    <property name="database.file" location="${helium.build.dir}/database.xml"/>
     <property name="ccm.base.dir" location="${ccm.home.dir}\${minor.version}"/>
     <property name="prep.build.dir" location="${prep.root.dir}/${build.id}"/>
     <property name="build.output.dir" location="${build.drive}/output"/>
+    <property name="diamonds.build.output.dir" location="${build.output.dir}/diamonds"/>
     <property name="build.sisfiles.dir" location="${build.output.dir}/sisfiles"/>
     <property name="zips.build.dir" location="${build.output.dir}/build_area/engineering_english"/>
     <property name="zips.loc.dir" location="${build.output.dir}/build_area/localised"/>
     <property name="subcon.zips.dir" location="${build.output.dir}/build_area/subcon"/>
     <property name="zips.flashfiles.dir" location="${build.output.dir}/zips_flashfiles"/>
     <property name="build.log.dir" location="${build.output.dir}/logs"/>
+    <property name="prep.log.dir" location="${build.log.dir}/prep"/>
+    <property name="compile.log.dir" location="${build.log.dir}/compile"/>
+    <property name="test.log.dir" location="${build.log.dir}/test"/>
+    <property name="archive.log.dir" location="${build.log.dir}/archive"/>
+    <property name="roms.log.dir" location="${build.log.dir}/roms"/>       
+    <property name="post.log.dir" location="${build.log.dir}/post"/>
+    <property name="localisation.log.dir" location="${build.log.dir}/localisation"/>    
     <property name="build.signal.status.dir" location="${build.log.dir}/signals"/>
     <property name="build.status.email.template" location="${helium.dir}/tools/common/templates/log/email_status.html.ftl" />
     <property name="metadata.dbfile" location="${build.log.dir}/${build.id}_metadata.sqlite"/>
@@ -232,7 +243,7 @@ ${build.int.db.file.comments}
     
     <property name="release.images.dir" value="${build.output.dir}/release_flash_images"/>
     <property name="binary.root" value="${build.drive}/epoc32/release/armv5/urel" />
-    <property name="python.dir" value="${helium.dir}/external/python/lib/2.5"/>
+    <property name="python.dir" value="${helium.dir}/external/python/lib"/>
     <property name="python.tools" value="${helium.dir}/external/python/bin"/>
 
     <!-- EBS is selected as the default build system, but ec for Electric Cloud could be used. -->
@@ -244,7 +255,7 @@ ${build.int.db.file.comments}
     <property name="error.summary.file" location="${build.log.dir}/summary/${build.id}_error_summary.log.xml"/>
     <property name="build.logging.start.stage" value="check-env-prep"/>
     <property name="build.logging.key.stages" value="prep,build-ebs-main,postbuild,flashfiles,java-certification-rom,zip-main,publish-generic,variants-core,variants-elaf,variants-china,variants-thai,variants-japan,variants,mobilecrash-prep,localise-tutorial-content,hdd-images,zip-flashfiles,zip-localisation,data-packaging-prep"/>
-    <property name="build.log" value="${build.log.dir}/${build.id}_ant_build.log"/>
+    <property name="build.log" value="${build.log.dir}/${build.id}_main.ant.log"/>
     <property name="overlays.log.file" location="${build.log.dir}/${build.id}_overlays.xml"/>
     <property name="diamonds.listener.configuration.file" location="${helium.dir}/config/diamonds_config.xml.ftl"/>
     <property name="antlib.import.module.path" location="${helium.dir}/tools/hlm-antlib-imports"/>
@@ -267,11 +278,12 @@ ${build.int.db.file.comments}
     <property name="loc.temp.dir" location="${temp.build.dir}/locfiles"/>
     <property name="loc.output.dir" location="${build.output.dir}/build_area/localised"/>
     <property name="loc.output.filename" location="${build.id}_locfiles.zip"/>
-    
+    <property name="exceptions.target" value="hlm-exception-handler"/>
     <property name="tools.ivy.config.file" location="${helium.dir}/config/ivy/tools_ivy_settings.xml" />
     
-    <property name="build.property.cache.file" location="${build.log.dir}/build_properties_cache.txt" />
+    <property name="build.property.cache.file" location="${diamonds.build.output.dir}/build_properties_cache.txt" />
     <property name="ccmtask.python.script.file" location="${helium.dir}/tools/preparation/synergy/ccmtask.jep" />
+    <property name="ant.loglevel" value="verbose"/>
 
     <if>
         <available file="${build.property.cache.file}"/>
@@ -280,7 +292,8 @@ ${build.int.db.file.comments}
         </then>
     </if>
 
-    
+
+
 
     <!-- Default number of threads is 2 * NUMBER_OF_PROCESSORS, but this can be overridden by defining the
     property manually. -->
@@ -327,6 +340,7 @@ ${build.int.db.file.comments}
     <import file="tools/startup/bootstrap/bootstrap.ant.xml"/>
     <import file="tools/iad/iad.ant.xml"/>
     <import file="config/signaling_config_default.ant.xml"/>
+    <import file="config/stages_config_default.ant.xml"/>
     <import file="config/metadata_filter_config_default.ant.xml"/>
 
     <!-- Checking required properties from datamodel if "validate.properties.at.startup=yes" 

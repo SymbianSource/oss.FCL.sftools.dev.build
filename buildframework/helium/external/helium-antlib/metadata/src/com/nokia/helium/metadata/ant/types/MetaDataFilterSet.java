@@ -22,6 +22,8 @@ import java.io.*;
 import java.util.*;
 import org.apache.tools.ant.types.Reference;
 import org.apache.tools.ant.types.DataType;
+import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.Project;
 import org.apache.log4j.Logger;
 import fmpp.models.CsvSequence;
 import freemarker.template.TemplateSequenceModel;
@@ -92,14 +94,15 @@ public class MetaDataFilterSet extends DataType
             try {
                 filterSetObject = refId.getReferencedObject();
             } catch ( Exception ex) {
-                log.info("Reference id of the filter is not valid");
-                throw ex;
+                log.debug("Reference id of the metadata filter is not valid.", ex); 
+                throw new BuildException("Reference id of the metadata filter is not valid " + ex.getMessage(), ex);
             }
             if (filterSetObject != null && filterSetObject instanceof MetaDataFilterSet) {
                 allFilters.addAll(((MetaDataFilterSet)filterSetObject).getAllFilters());
                 return allFilters;
             }
-            throw new Exception ("filterset object is not instance of MetaDataFilterSet");
+            log.debug("Filterset object is not instance of MetaDataFilterSet");
+            throw new Exception ("Filterset object is not instance of MetaDataFilterSet");
         }
         // Add any nested filtersets
         for (MetaDataFilterSet filterSet : filterSets) {
@@ -108,7 +111,11 @@ public class MetaDataFilterSet extends DataType
         
         return removeInvalidFilters(allFilters);
     }
-    
+
+    /**
+     * Helper function called to remove any invalid filters
+     * @return only the valid filters
+     */
     private Vector<MetaDataFilter> removeInvalidFilters(Vector<MetaDataFilter> filterList) {
         ListIterator<MetaDataFilter> iter = filterList.listIterator();
         while (iter.hasNext()) {
@@ -116,8 +123,7 @@ public class MetaDataFilterSet extends DataType
             String priority = filter.getPriority();
             String regEx = filter.getRegex();
             if (priority == null || regEx == null) {
-                log.info("Warning: invalid filter removed");
-                log.debug("Warning: some filter is invalid removing it");
+                log("Warning: some filter is invalid removing it", Project.MSG_WARN);
                 iter.remove();
             }
         }
@@ -166,7 +172,10 @@ public class MetaDataFilterSet extends DataType
         }
     }
 
-    
+    /**
+     * Helper function to add the filters from the csv files
+     * @param csv file path from which the filters needs to be added.
+     */
     private void addCSVFromFile(String csvPath) throws Exception {
         CsvSequence csvs = new CsvSequence();
         csvs.setSeparator(',');
@@ -174,22 +183,22 @@ public class MetaDataFilterSet extends DataType
         try {
             csvs.load(new FileReader(new File(filterFile)));
         } catch (java.io.FileNotFoundException fex) {
-            log.error("File not found:" + filterFile);
+            log.debug("Metadata CSV file not found:", fex);
             throw fex;
         } catch (fmpp.util.StringUtil.ParseException pex) {
-            log.error("parser exception");
+            log.debug("FMPP not able parse the Metadata CSV file. ", pex);
             throw pex;
         } catch (java.io.IOException iex) {
-            log.error("I/O exception");
+            log.debug("Metadata I/O Exception. " + iex.getMessage(), iex);
             throw iex;
         }
         int size = 0;
         try {
-            log.debug("filter CSV record size: " + csvs.size());
+                log.debug("filter CSV record size: " + csvs.size());
                 size = csvs.size();
             } catch (Exception ex) {
-                log.info("Warning: filter parsing error");
-                log.debug("Exception in processing csv file");
+                // We are Ignoring the errors as no need to fail the build.
+                log.debug("Exception in processing csv file " + filterFile, ex);
             }
             for (int i = 0; i < size; i++) {
                 try {
@@ -197,8 +206,8 @@ public class MetaDataFilterSet extends DataType
                     .get(i);
                     int modelSize = model.size();
                     if (modelSize != 3 ) {
-                        log.debug("csv row size:" + size);
-                        throw new Exception("filter format is invalid");
+                        log.debug("Metadata CSV file filter file format is invalid. It has row size " + size);
+                        throw new Exception("Metadata CSV file filter file format is invalid. It has row size " + size);
                     }
                     MetaDataFilter filter = new MetaDataFilter();
                     filter.setPriority(model.get(0).toString());
@@ -206,8 +215,8 @@ public class MetaDataFilterSet extends DataType
                     filter.setDescription(model.get(2).toString());
                     filters.add(filter);
                 } catch (Exception ex) {
-                    log.info("Warning: filter parsing error");
-                    log.debug("Exception in processing csv file");
+                    // We are Ignoring the errors as no need to fail the build.
+                    log.debug("Exception in processing Metadate csv file " + filterFile, ex);
                 }
             }
     }

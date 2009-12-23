@@ -147,8 +147,8 @@ public class SignalList {
         return targetsMap.get(targetName);
     }
 
-    protected void sendNotifications(Vector<Notifier> notifierList, String signalName) {
-        sendNotifications(notifierList, signalName, false, null);
+    protected void sendNotifications(Vector<Notifier> notifierList, String signalName, String errorMessage ) {
+        sendNotifications( notifierList, signalName, false, null, errorMessage );
     }
 
     public void processForSignal(Project prj, SignalNotifierInput signalNotifierInput, String signalName, String targetName, 
@@ -165,7 +165,7 @@ public class SignalList {
         }
         NotifierInput notifierInput = signalNotifierInput.getNotifierInput();
         sendNotifications(notifierList, signalName, failBuild,
-                notifierInput);
+                notifierInput, errorMessage );
         if (failBuild) {
             String failStatus = "now";
             if (signalInput != null) {
@@ -174,17 +174,17 @@ public class SignalList {
                 log.debug("Could not find config for signal: " + signalName);
             }
             if (failStatus == null || failStatus.equals("now")) {
+                log.debug("Adding now signal. Signal name is " + signalName);
                 SignalStatusList.getNowSignalList().addSignalStatus(new SignalStatus(signalName,
                         errorMessage, targetName, new Date()));
                 throw new BuildException(new SignalStatus(signalName,
                         errorMessage, targetName, new Date()).toString());
             } else if (failStatus.equals("defer")) {
-                log.debug("SignalList:adding defer signal:");
-                log.info("Signal " + signalName + " will be deferred.");
+                log.debug("Adding deffer signal. Signal " + signalName + " will be deferred.");
                 SignalStatusList.getDeferredSignalList().addSignalStatus(new SignalStatus(
                         signalName, errorMessage, targetName, new Date()));
             } else if (failStatus.equals("never")) {
-                log.debug("SignalList:adding never signal:");
+                log.debug("Adding never signal. Signal name is " + signalName);
                 SignalStatusList.getNeverSignalList().addSignalStatus(new SignalStatus(signalName,
                         errorMessage, targetName, new Date()));
             } else if (!failStatus.equals("never")) {
@@ -204,13 +204,13 @@ public class SignalList {
      * @param notifierList
      */
     protected void sendNotifications(Vector<Notifier> notifierList, String signalName,
-            boolean failStatus, NotifierInput notifierInput) {
+            boolean failStatus, NotifierInput notifierInput, String errorMessage ) {
         if (notifierList == null) {
             return;
         }
         for (Notifier notifier : notifierList) {
             if (notifier != null) {
-                notifier.sendData(signalName, failStatus, notifierInput);
+                notifier.sendData(signalName, failStatus, notifierInput, errorMessage );
             }
         }
     }
@@ -241,7 +241,7 @@ public class SignalList {
                 }
                 processForSignal(prj, config.getSignalNotifierInput(), signalName, 
                         targetName, errorMessage, condition != null);
-                log.debug("SignalList:fail:signalName: " + signalName);
+                log.debug("checkAndNotifyFailure: SignalName: " + signalName);
             }
         }
         return retValue;
@@ -251,7 +251,7 @@ public class SignalList {
         Condition retCondition = null;
         Vector<Condition> conditionList = targetCondition.getConditions();
         for (Condition condition : conditionList) {
-            log.debug("SignalList:getErrorMessage:" + condition.eval());
+            log.debug("getFailureCondition:" + condition.eval());
             if (condition.eval()) {
                 retCondition = condition;
                 break;
@@ -346,17 +346,17 @@ public class SignalList {
         }
         log.debug("failStatus: " + failStatus);
         if (failStatus == null || failStatus.equals("now")) {
+            log.debug("Adding now signal. Signal name is " + signalName);
             SignalStatusList.getNowSignalList().addSignalStatus(new SignalStatus(signalName,
                     errorMessage, targetName, new Date()));
             throw new BuildException(new SignalStatus(signalName,
                     errorMessage, targetName, new Date()).toString());
         } else if (failStatus.equals("defer")) {
-            log.debug("SignalList1:adding defer signal:");
-            log.info("Signal " + signalName + " will be deferred.");
+            log.debug("Adding deffer signal. Signal name is " + signalName);
             SignalStatusList.getDeferredSignalList().addSignalStatus(new SignalStatus(
                     signalName, errorMessage, targetName, new Date()));
         } else if (failStatus.equals("never")) {
-            log.debug("SignalList1:adding never signal:");
+            log.debug("Adding never signal. Signal name is " + signalName);
             SignalStatusList.getNeverSignalList().addSignalStatus(new SignalStatus(signalName,
                     errorMessage, targetName, new Date()));
         } else if (!failStatus.equals("never")) {
@@ -365,7 +365,7 @@ public class SignalList {
             throw new BuildException(new SignalStatus(signalName,
                     errorMessage, targetName, new Date()).toString());
         } else {
-            log.info("Signal " + signalName
+            log.debug("Signal " + signalName
                     + " set to be ignored by the configuration.");
         }
     }
@@ -396,7 +396,7 @@ public class SignalList {
                     if (configCurrent != null && configCurrent instanceof SignalConfig) {
                         signalName = refid;
                     }
-                    log.debug("SignalList:fail:signalName: " + signalName);
+                    log.debug("checkAndNotify:signalName: " + signalName);
                     notifierList = config.getSignalInput().getSignalNotifierList();
                     if (notifierList == null) {
                         Object obj = (Object) prj
@@ -407,24 +407,24 @@ public class SignalList {
                         }
                     }
                     failStatus = config.getSignalInput().getFailBuild();
-                    log.debug("SignalList:failStatus:" + failStatus);
+                    log.debug("checkAndNotify:failStatus:" + failStatus);
                     buildFailed = condition != null;
                     sendNotify(notifierList, signalName, buildFailed,
                             fileList);
                 }
                 if (buildFailed) {
                     if (failStatus == null || failStatus.equals("now")) {
+                        log.debug("Adding now signal. Signal name is " + signalName);
                         SignalStatusList.getNowSignalList().addSignalStatus(new SignalStatus(signalName,
                                 errorMessage, targetName, new Date()));
                         throw new BuildException(new SignalStatus(signalName,
                                 errorMessage, targetName, new Date()).toString());
                     } else if (failStatus.equals("defer")) {
-                        log.debug("SignalList1:adding defer signal:");
-                        log.info("Signal " + signalName + " will be deferred.");
+                        log.debug("Signal " + signalName + " will be deferred.");
                         SignalStatusList.getDeferredSignalList().addSignalStatus(new SignalStatus(
                                 signalName, errorMessage, targetName, new Date()));
                     } else if (failStatus.equals("never")) {
-                        log.debug("SignalList1:adding never signal:");
+                        log.debug("Adding never signal. Signal name is " + signalName);
                         SignalStatusList.getNeverSignalList().addSignalStatus(new SignalStatus(signalName,
                                 errorMessage, targetName, new Date()));
                     } else if (!failStatus.equals("never")) {
@@ -433,7 +433,7 @@ public class SignalList {
                         throw new BuildException(new SignalStatus(signalName,
                                 errorMessage, targetName, new Date()).toString());
                     } else {
-                        log.info("Signal " + signalName
+                        log.debug("Signal " + signalName
                                 + " set to be ignored by the configuration.");
                     }
                 }

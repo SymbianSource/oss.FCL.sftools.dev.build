@@ -20,6 +20,8 @@ package com.nokia.helium.signal.ant.types;
 
 
 import java.io.File;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.Vector;
 import org.apache.tools.ant.types.DataType;
 import org.apache.tools.ant.types.FileSet;
@@ -55,29 +57,50 @@ public class NotifierInput extends DataType
     }
     
     /**
-     * Updates the list of filelist from the input fileset.
-     *  @param fileSetList input fileset list
+     * Return a file from the input fileset.
+     *  @param pattern pattern to match from the input fileset
      *  @return the matched files including the base dir. 
      */
     public File getFile(String pattern) {
+        File fileToReturn = null;
         if (file != null) {
-            return file;
+            if (file.toString().matches(pattern)) {
+                fileToReturn = file;
+            }
+            return fileToReturn;
         }
-        File fileFromList = null;
         for (FileSet fs : fileSetList) {
             DirectoryScanner ds = fs.getDirectoryScanner(getProject());
             String[] includedFiles = ds.getIncludedFiles();
             for ( String filePath : includedFiles ) {
                 if (filePath.matches(pattern)) {
-                    fileFromList = new File(ds.getBasedir(), filePath);
-                    log.debug("matched file for pattern: " + pattern + ":" + fileFromList);
+                    fileToReturn = new File(ds.getBasedir(), filePath);
+                    log.debug("matched file for pattern: " + pattern + ":" + fileToReturn);
                     break;
                 }
             }
         }
-        return fileFromList;
+        return fileToReturn;
     }
 
+    /**
+     * Returns the list of filelist from the input fileset.
+     *  @param pattern pattern to match from the input fileset
+     *  @return the matched files including the base dir. 
+     */
+    public List<File> getFileList(String pattern) {
+        List<File> fileList = new ArrayList<File>();
+        for (FileSet fs : fileSetList) {
+            DirectoryScanner ds = fs.getDirectoryScanner(getProject());
+            String[] includedFiles = ds.getIncludedFiles();
+            for ( String filePath : includedFiles ) {
+                if (filePath.matches(pattern)) {
+                    fileList.add(new File(ds.getBasedir(), filePath));
+                }
+            }
+        }
+        return fileList;
+    }
 
     /**
      * Helper function called by ant to set the input file.

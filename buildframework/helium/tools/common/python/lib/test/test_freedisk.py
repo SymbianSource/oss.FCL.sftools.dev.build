@@ -26,6 +26,13 @@ import logging
 import os, string
 import sys
 
+class FreeDiskTest(unittest.TestCase):
+        
+    def test_freedisk(self):
+        sys.path.append(os.path.join(os.environ['HELIUM_HOME'], 'tools/preparation'))
+        import freedisk
+        freedisk.print_space_report(os.environ['HELIUM_HOME'], 1)
+
 if sys.platform == "win32":
     from win32api import GetLogicalDriveStrings
     

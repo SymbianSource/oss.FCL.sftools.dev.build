@@ -25,14 +25,33 @@ import java.util.List;
 import org.apache.maven.scm.ScmResult;
 import org.apache.maven.scm.ScmTag;
 
+/**
+ *  Class to store the result from the tags operation.
+ *
+ */
 public class TagsScmResult extends ScmResult {
     private List<ScmTag> scmVersions = new ArrayList<ScmTag>();
 
+    /**
+     * Default constructor.
+     * @param commandLine
+     * @param providerMessage
+     * @param commandOutput
+     * @param success
+     */
     public TagsScmResult(String commandLine, String providerMessage,
             String commandOutput, boolean success) {
         super(commandLine, providerMessage, commandOutput, success);
     }
 
+    /**
+     * This constructor stores also the ScmTag retrieved.
+     * @param commandLine
+     * @param providerMessage
+     * @param commandOutput
+     * @param success
+     * @param scmVersions
+     */
     public TagsScmResult(String commandLine, String providerMessage,
             String commandOutput, boolean success,
             Enumeration<ScmTag> scmVersions) {
@@ -43,6 +62,10 @@ public class TagsScmResult extends ScmResult {
         }
     }
 
+    /**
+     * Get the list of tags from the command.
+     * @return
+     */
     public List<ScmTag> getTags() {
         return scmVersions;
     }

@@ -24,7 +24,9 @@ Description:
     <description>Helium Antlib build file.</description>
     
     <property environment="env" />
-    
+
+    <dirname property="helium.antlib.root.dir" file="${ant.file.helium-antlib}" />    
+
     <import file="macros.ant.xml" />    
     
     
@@ -52,23 +54,41 @@ Description:
     
     <target name="junit" description="Runs jUnit tests">
         <subantPreset target="junit"/>
+        <antcall target="merge-coverage" />
     </target>
     
     
     <target name="unittest" description="Runs AntUnit tests">
         <subantPreset target="unittest"/>
+        <antcall target="merge-coverage" />
     </target>
     
-    
+        
     <target name="test" description="Runs all tests">
         <subantPreset target="test"/>
+        <antcall target="merge-coverage" />
     </target>
     
-
     <target name="clean" description="Cleans build outputs">
         <subantPreset target="clean"/>
     </target>
 
+    <target name="merge-coverage">
+        <emma enabled="true">
+            <report>
+                <sourcepath>
+                    <dirset dir="${helium.antlib.root.dir}" >
+                        <include name="**/src" /> 
+                    </dirset>
+                </sourcepath>
+                <infileset dir="${build.temp.dir}" includes="**/*.emma" />
+                <txt outfile="${build.temp.dir}/coverage.txt" />
+                <html outfile="${build.temp.dir}/coverage.html" />
+                <xml outfile="${build.temp.dir}/coverage.xml" />
+            </report>
+        </emma>
+    </target>
+    
 </project>
 
 

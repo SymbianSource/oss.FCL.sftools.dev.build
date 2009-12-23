@@ -72,18 +72,21 @@ for dir_ in delete_dirs:
     try:
         if os.sep == '\\':
             fileutils.subst(del_folder_drive, dir_)
-            self.log(str("substed for deleling folders"))
+            self.log(str("substed for deleting folders"))
             self.log(str("Removing %s\\" % del_folder_drive))
             fileutils.rmtree("%s\\" % del_folder_drive)
             fileutils.unsubst(del_folder_drive)
-            self.log(str("unsbusted substed for deleling folders"))
+            self.log(str("unsubsted substed for deleting folders"))
         else:
             self.log(str("Removing %s" % dir_))
             fileutils.rmtree(dir_)
     except Exception, e:
         if os.sep == '\\':
-            fileutils.unsubst(del_folder_drive)
-            self.log(str("unsbusted for deleling folders"))
+            try:
+                fileutils.unsubst(del_folder_drive)
+                self.log(str("unsubsted for deleling folders"))
+            except Exception, e2:
+                self.log(str("failed when unsubsting for failed deleting folders... process will continue anyway"))
         self.log(str("ERROR: %s" % e))
 
 # Delete all config files
@@ -133,14 +136,11 @@ file_.close()
     <!-- This target flags the Build areas for deletion. So the cleanup build robot could remove them. -->
     <target name="flag-ba-for-deletion" if = "ci.cleanup.env.dir">
         <mkdir dir="${ci.cleanup.env.dir}"/>
-        <if>
+        <condition property="ci.min.ba.maintain" value="2">
             <not>
                 <isset property="ci.min.ba.maintain"/>
             </not>
-            <then>
-                <property name="ci.min.ba.maintain" value="2"/>
-            </then>
-        </if>
+        </condition>
         <hlm:BADeleteMacro outputdir="${ci.cleanup.env.dir}" rootdir="${prep.root.dir}" no.ba.remain="${ci.min.ba.maintain}"/>
     </target>
     
@@ -268,7 +268,7 @@ for project in projects:
     root.xml_append(p)
         
 output = open(outputFilename, "w+")
-output.write(doc.xml())
+output.write(doc.xml(indent=u"yes"))
 output.close()
             </hlm:python>
         </sequential>
@@ -286,7 +286,7 @@ output.close()
                 <property name="do.ci-monitor-ccm-session" value="true"/>
             </then>
             <else>
-                <echo>Delivery file not available or 'ci.session.file' not defined or ccm.enabled not set to true.</echo>
+                <echo>'prep.delivery.file' not available or 'ci.session.file' not defined or 'ccm.enabled' not set to true.</echo>
             </else>
         </if>
     </target>
@@ -294,9 +294,7 @@ output.close()
     <!-- Validate input for the ci-prep-wa-create-list target. --> 
     <target name="ci-prep-wa-create-list-validate" depends="ci-monitor-ccm-session-validate" if="do.ci-monitor-ccm-session">
         <if>
-            <and>
-                <isset property="ci.project.config"/>             
-            </and>
+            <isset property="ci.project.config"/>
             <then>
                 <property name="do.ci-prep-wa-create-list" value="true"/>
             </then>

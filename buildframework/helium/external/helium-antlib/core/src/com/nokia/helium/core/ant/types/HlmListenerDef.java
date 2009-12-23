@@ -20,6 +20,7 @@ package com.nokia.helium.core.ant.types;
 
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.BuildListener;
+import org.apache.log4j.Logger;
 
 /**
  * This class implements a listener registration action.
@@ -29,6 +30,7 @@ import org.apache.tools.ant.BuildListener;
 public class HlmListenerDef extends HlmPreDefImpl {
 
     private String classname;
+    private Logger log = Logger.getLogger(HlmListenerDef.class);
 
     public void setClassname(String classname) {
         this.classname = classname;
@@ -44,11 +46,11 @@ public class HlmListenerDef extends HlmPreDefImpl {
                     .newInstance();
             prj.addBuildListener(listener);
         } catch (ClassNotFoundException ex) {
-            ex.printStackTrace();
+            log.debug("Class not found exception:" + ex.getMessage(), ex);
         } catch (InstantiationException ex1) {
-            ex1.printStackTrace();
+            log.debug("Class Instantiation exception:" + ex1.getMessage(), ex1);
         } catch (IllegalAccessException ex1) {
-            ex1.printStackTrace();
+            log.debug("Illegal Class Access exception:" + ex1.getMessage(), ex1);
         }
     }
 }

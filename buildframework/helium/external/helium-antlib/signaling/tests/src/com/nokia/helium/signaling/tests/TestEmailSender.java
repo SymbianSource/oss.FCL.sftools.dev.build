@@ -49,7 +49,7 @@ public class TestEmailSender {
         en.setLdap("test");
         NotifierInput input = new NotifierInput();
         input.setFile(new File(System.getProperty("testdir") + "/tests/test_signal/data/test.log_status.html"));
-        en.sendData("test", true, input);
+        en.sendData("test", true, input, "Test Message");
     }
 
    

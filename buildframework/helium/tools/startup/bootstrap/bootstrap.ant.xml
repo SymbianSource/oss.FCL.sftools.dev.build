@@ -46,7 +46,7 @@ Description:
     </target>
 
     <!-- Install CruiseControl if not already installed -->
-    <target name="install-cruisecontrol">
+    <target name="install-cruisecontrol" unless="env.HLM_SUBCON">
         <if>
             <not>
                 <available file="${helium.dir}/external/CruiseControl/real_cruisecontrol.bat" />

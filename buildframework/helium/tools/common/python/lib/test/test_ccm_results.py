@@ -31,8 +31,6 @@ logger = logging.getLogger('test.ccm_results')
 logging.basicConfig(level=logging.INFO)
 
 class CounterHandler(logging.Handler):
-    """ 
-    """
     def __init__(self, level=logging.NOTSET):
         logging.Handler.__init__(self, level)
         self.warnings = 0
@@ -218,9 +216,9 @@ Update complete.
         session = MockResultSession(behave)
         result = session.execute('test_update', ccm.UpdateResult(session))
         #logger.debug(result.output)
-        assert(len(result.output['tasks'])==4, "Number of tasks doesn't match.")
-        assert(len(result.output['modifications'])==4, "Number of modifications doesn't match.")
-        assert(len(result.output['errors'])==1, "Number of errors doesn't match.")
+        assert len(result.output['tasks']) == 4, "Number of tasks doesn't match."
+        assert len(result.output['modifications']) == 4, "Number of modifications doesn't match."
+        assert len(result.output['errors']) == 1, "Number of errors doesn't match."
 
     def test_update_result_serious_failure(self):
         """ Validating UpdateResult with serious failure."""        
@@ -255,10 +253,10 @@ Update failed.
         #logger.debug(len(result.output['errors']))
         #logger.debug(len(result.output['warnings']))
         
-        assert ((len(result.output['tasks'])==0), "Number of tasks doesn't match.")
-        assert ((len(result.output['modifications'])==0), "Number of modifications doesn't match.")
-        assert ((len(result.output['errors'])==3), "Number of errors doesn't match.")
-        assert ((len(result.output['warnings'])==5), "Number of warnings doesn't match.")
+        assert (len(result.output['tasks']) == 0), "Number of tasks doesn't match."
+        assert (len(result.output['modifications']) == 0), "Number of modifications doesn't match."
+        assert (len(result.output['errors']) == 1), "Number of errors doesn't match."
+        assert (len(result.output['warnings']) == 5), "Number of warnings doesn't match."
 
 
     def test_UpdateTemplateInformation_result(self):        
@@ -279,12 +277,12 @@ Folder Templates and Folders:
         session = MockResultSession(behave)
         result = session.execute('test_update', ccm.UpdateTemplateInformation(session))
         #logger.debug(result.output)
-        assert(result.output['baseline_selection_mode']== "Latest Baseline Projects", "BSM doesn't match.")
-        assert(result.output['prep_allowed']== False, "Prep allowed doesn't match.")
-        assert(result.output['version_matching']== "*abs.50*", "Version matching doesn't match.")
-        assert(result.output['release_purpose']== "", "Release purpose doesn't match.")
-        assert(result.output['modifiable_in_database']== "tr1s60", "Modifiable in Database doesn't match.")
-        assert(result.output['in_use_for_release']== True, "In Use For Release doesn't match.")
+        assert result.output['baseline_selection_mode'] == "Latest Baseline Projects", "BSM doesn't match."
+        assert result.output['prep_allowed'] == False, "Prep allowed doesn't match."
+        assert result.output['version_matching'] == "*abs.50*", "Version matching doesn't match."
+        assert result.output['release_purpose'] == "", "Release purpose doesn't match."
+        assert result.output['modifiable_in_database'] == "tr1s60", "Modifiable in Database doesn't match."
+        assert result.output['in_use_for_release'] == True, "In Use For Release doesn't match."
     
     def test_ConflictsResult_result(self):        
         """ Validating ConflictsResult."""                

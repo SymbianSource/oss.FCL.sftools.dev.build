@@ -21,10 +21,13 @@
 
 """
 
+from __future__ import with_statement
 import unittest
 import delta_zip
 import logging
 import os
+import sys
+import tempfile
 
 class DeltaZipTest( unittest.TestCase ):
     
@@ -48,9 +51,9 @@ class DeltaZipTest( unittest.TestCase ):
         
         sig = delta_zip.MD5SignatureBuilderEBS(self.root, 1, self.output2, '', output)
         sig.write_build_file()
-        
+        if sys.platform == 'win32':
+            assert os.path.splitdrive(self.root)[0] + os.sep not in open(output).read()
         assert os.path.exists(output)
-
     def test_DeltaZipBuilder(self):
         if not os.path.exists(self.output):
             os.mkdir(self.output)
@@ -101,6 +104,19 @@ Inclusion(s):
       
         delta = delta_zip.DeltaZipBuilder(self.root, self.output, oldmd5output, md5output)
         delta.create_delta_zip(deltazipfile, deletefile, 1, deltaantfile)
+
+    def test_changedFiles(self):
+        dir1 = tempfile.mkdtemp()
+        dir2 = tempfile.mkdtemp()
+        
+        with open(os.path.join(dir1, '1'), 'w') as f1:
+            f1.write('Directory:%s\n' % self.helium_home)
+            f1.write('myfile1 TYPE=unknown format MD5=34dcda0d351c75e4942b55e1b2e2422g')
+        with open(os.path.join(dir2, '2'), 'w') as f2:
+            f2.write('Directory:%s\n' % self.helium_home)
+            f2.write('myfile1 TYPE=unknown format MD5=34dcda0d351c75e4542b55e1b2e2422g')
+        
+        assert delta_zip.changedFiles(dir1, dir2) == [os.path.join(self.helium_home, 'myfile1')]
 
     def tearDown(self):
         """ Restore path """

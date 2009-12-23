@@ -52,82 +52,69 @@ public class AntLogMetaDataInput extends TextLogMetaDataInput {
     
     private boolean entryCreated;
     
+    /**
+     * Constructor
+     */
     public AntLogMetaDataInput() {
     }
 
-    public boolean isEntryAvailable() {
+    /**
+     * Function to check from the input stream if is there any entries available.
+     * @return true if there are any entry available otherwise false.
+     */
+    public boolean isEntryCreated(File currentFile) {
         String exceptions = "";
-        int currentFileIndex = getCurrentFileIndex();
         int lineNumber = getLineNumber(); 
         BufferedReader currentReader = getCurrentReader();
-        log.debug("Getting next set of log entries for Ant Input");
-        //log.debug("currentFileIndex" + currentFileIndex);
-        List<File> fileList = getFileList();
-        //log.debug("is filelist empty" + fileList.isEmpty());
-        int fileListSize = fileList.size();
-        log.debug("fileList.size" + fileListSize);
-        while (currentFileIndex < fileListSize) {
-            try {
-                lineNumber ++;
-                setLineNumber(lineNumber);
-                log.debug("currentfileindex while getting file name: " + currentFileIndex);
-                File currentFile = fileList.get(currentFileIndex);
-                if (currentReader == null) {
-                    setLineNumber(0);
-                    log.debug("Current Text log file name:" + currentFile);
-                    log.info("Processing file: " + currentFile);
-                    currentReader = new BufferedReader(new FileReader(currentFile));
-                    setCurrentReader(currentReader);
-                }
-                String logText = "";
-                while ((logText = currentReader.readLine()) != null) {
-                    //log.debug("logtext : " + logText + " line-number: " + lineNumber);
-                    //log.debug("logtext : " + logText + " line-number: " + lineNumber);
-                    Matcher match = antTargetPattern.matcher(logText); 
-                    if (match.matches()) {
-                        if (currentComponent != null && !entryCreated) {
-                            addEntry("DEFAULT", currentComponent, currentFile.toString(), 
-                                    0, "" );
-                            entryCreated = true;
-                            return true;
-                        }
-                        entryCreated = false;
-                        currentComponent = match.group(1);
-                        //log.debug("currentComponent:" + currentComponent);
-                    }
-                    logText = logText.replaceFirst("^[ ]*\\[.+?\\][ ]*", "");
-                    String severity = getSeverity(logText);
-                    if (severity != null) {
-//                        log.debug("severity:" + severity);
-//                        log.debug("currentFile:" + currentFile);
-//                        log.debug("lineNumber:" + lineNumber);
-//                        log.debug("logText:" + logText);
+        try {
+            if (currentReader == null) {
+                setLineNumber(0);
+                log.debug("Current Text log file name:" + currentFile);
+                log.debug("Processing file: " + currentFile);
+                currentReader = new BufferedReader(new FileReader(currentFile));
+                setCurrentReader(currentReader);
+            }
+            String logText = "";
+            while ((logText = currentReader.readLine()) != null) {
+                Matcher match = antTargetPattern.matcher(logText); 
+                if (match.matches()) {
+                    if (currentComponent != null && !entryCreated) {
+                        addEntry("DEFAULT", currentComponent, currentFile.toString(), 
+                                0, "" );
                         entryCreated = true;
-                        // If there is no current component which means
-                        // it is a redirected output, using file name as comp name
-                        if (currentComponent == null ) {
-                            currentComponent = currentFile.getName();
-                        }
-                        addEntry(severity, currentComponent, currentFile.toString(), 
-                                lineNumber, logText );
-                        logText = "";
                         return true;
                     }
+                    entryCreated = false;
+                    currentComponent = match.group(1);
                 }
+                logText = logText.replaceFirst("^[ ]*\\[.+?\\][ ]*", "");
+                String severity = getSeverity(logText);
+                if (severity != null) {
+                    entryCreated = true;
+                    // If there is no current component which means
+                    // it is a redirected output, using file name as comp name
+                    if (currentComponent == null ) {
+                        currentComponent = currentFile.getName();
+                    }
+                    addEntry(severity, currentComponent, currentFile.toString(), 
+                            lineNumber, logText );
+                    logText = "";
+                    return true;
+                }
+            }
+            currentReader.close();
+            currentReader = null;
+            setCurrentReader(currentReader);
+            if (isAdditionalEntry()) {
+                return true;
+            }
+        } catch (Exception ex) {
+            log.debug("Exception in AntLogMetadata", ex);
+            try {
                 currentReader.close();
-                currentReader = null;
-                setCurrentReader(currentReader);
-                currentFileIndex ++;
-                setCurrentFileIndex(currentFileIndex);
-                //log.debug("currentfileindex: " + currentFileIndex);
-                //log.debug("fileListSize: " + fileListSize);
-            } catch (Exception ex) {
-                log.debug("Exception in AntLogMetadata", ex);
-                try {
-                    currentReader.close();
-                } catch ( IOException iex) {
-                    log.debug("Exception in closing reader");
-                }
+            } catch ( IOException iex) {
+                // We are Ignoring the errors as no need to fail the build.
+                log.debug("Exception in closing reader", iex);
                 currentReader = null;
                 setCurrentReader(null);
                 exceptions = exceptions + ex.getMessage() + "\n";
@@ -137,7 +124,6 @@ public class AntLogMetaDataInput extends TextLogMetaDataInput {
         if (!exceptions.equals("")) {
             throw new BuildException(exceptions);
         }
-        
         return false;
     }
 }

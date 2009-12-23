@@ -91,7 +91,7 @@ public class GetValueFromVariableSet extends Task {
             }
         }
 
-        throw new BuildException("Could not find '" + name + "' variable.");
+        //throw new BuildException("Could not find '" + name + "' variable.");
     }
 
 }

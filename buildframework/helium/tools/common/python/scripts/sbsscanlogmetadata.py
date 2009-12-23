@@ -33,39 +33,75 @@ from optparse import OptionParser
 
 IGNORE_TEXT_REG_EX = "warning: no newline at end of file"
 
-WARNING_TAG = "<warning>.*</warning>"
+STREAM_REGEX =  {   "clean" : [r'<clean', r'</clean'],
+                    "whatlog" : [r'<whatlog', r'</whatlog'],
+                    "warning" : [r'<warning', r'</warning']
+                }
 
-class SBSScanlogMetadata():
+class SBSScanlogMetadata(object):
+    """parses the raptor meatadata logs and separates the info out into HTML and XML logs for writing 
+    to diamonds and other logs"""
+    
+    def initializeLogPath(self):
+        index = self.logFileName.rfind(".")
+        if index < 0:
+            index = len(self.logFileName)
+        for stream in STREAM_REGEX.keys():
+            self.stream_path[stream] = self.logFileName[:index] + "." + stream + \
+                        self.logFileName[index:]            
+        if os.environ.has_key('SBS_CLEAN_LOG_FILE'):
+            self.stream_path['clean'] = os.environ['SBS_CLEAN_LOG_FILE']
+            
     def initialize(self, logFile):
         """Initialize helium log filter"""
         self.ignoreTextCompileObject = re.compile(IGNORE_TEXT_REG_EX);
-        self.warningCompileObject = re.compile(WARNING_TAG);
-        self.startRecording = False
-        self.logFileName = logFile
-        self.warningFileName = "%s%s" % (logFile, "exceptions.xml")
-        self.inReceipe = False
+        self.logFileName = str(logFile)
+        self.streamStatus = {}
+        self.streams = {}
+        self.stream_path = {}
         self.start_time = datetime.datetime.now()
-        self.loggerout = open(str(self.logFileName),"w")
-        self.warningout = open(str(self.warningFileName),"w")
+        self.loggerout = open(self.logFileName,"w")
+        self.compiled_stream_object = {}
         print "logName: %s\n" % self.logFileName
+        self.initializeLogPath()
+        for stream in STREAM_REGEX.keys():
+            self.compiled_stream_object[stream] = []
+            self.streams[stream] = open(self.stream_path[stream], "w")
+            self.streamStatus[stream] = False
+            for  searchString in STREAM_REGEX[stream]:
+                self.compiled_stream_object[stream].append(re.compile(searchString))
         return True
 
     def open(self, logFile):
-        self.logFileName = logFile
-        self.initialize(logFile)
+        self.logFileName = str(logFile)
+        return self.initialize(logFile)
         
         
     def write(self, text):
         """ callback function which is to process the logs"""
+        stream_list = STREAM_REGEX.keys()
         for textLine in text.splitlines():
             textLine = textLine + '\n'
+            if textLine.startswith("<?xml ") or textLine.startswith("<buildlog ") \
+                or textLine.startswith("</buildlog"):
+                self.loggerout.write(textLine)
+                for stream in stream_list:
+                    self.streams[stream].write(textLine)
+                continue
             if(self.ignoreTextCompileObject.search(textLine)):
                 continue
+            for stream in stream_list:
+                if( (not self.streamStatus[stream]) and self.compiled_stream_object[stream][0].search(textLine)!= None):
+                    self.streamStatus[stream] = True
+                if (self.streamStatus[stream] and self.compiled_stream_object[stream][1].search(textLine)!= None):
+                    self.streams[stream].write(textLine)
+                    self.streamStatus[stream] = False
+                    break
+    
+                if(self.streamStatus[stream]):
+                    self.streams[stream].write(textLine)
+                    break
 
-            #only temporary until the fix for special character handling from raptor is available
-            if(self.warningCompileObject.search(textLine)):
-                self.warningout.write(textLine + "\n")
-                continue
             self.loggerout.write(textLine)
         return True
         
@@ -78,11 +114,13 @@ class SBSScanlogMetadata():
         """Close the log file"""
 
         try:
-            self.warningout.close()
             self.loggerout.close()
+            for stream in self.streams.keys():
+                self.streams[stream].close()
             return True
         except:
             self.loggerout = None
+            self.streams = None
         return False
 
 if __name__ == "__main__":

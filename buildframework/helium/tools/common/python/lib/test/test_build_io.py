@@ -21,7 +21,7 @@
 
 import logging
 import unittest
-
+import os
 import build.io
 
 
@@ -33,25 +33,24 @@ class AbldLogWhatReaderTest(unittest.TestCase):
     
     def test_abld_what_parsing(self):
         """ Basic abld -what section parsing. """ 
-        reader = build.io.AbldLogWhatReader('tests/data/build/io/abld_what.log')
+        reader = build.io.AbldLogWhatReader(os.path.join(os.environ['HELIUM_HOME'], 'tests/data/build/io/abld_what.log'))
         reader_iter = iter(reader)
         (component1, binaries1) = reader_iter.next()
-        assert component1 == 'ibusal_chipset_product2'
-        assert binaries1 == [r'\epoc32\release\ARMV5\UDEB\_product2_accelerometerpdd.pdd',
-                             r'\epoc32\release\ARMV5\UDEB\_product2_accelerometerpdd.pdd.map']
+        assert component1 == 'ibusal_chipset_product'
+        assert binaries1 == [r'\epoc32\release\ARMV5\UDEB\_product_NaviScrollPdd.pdd',
+                             r'\epoc32\release\ARMV5\UDEB\_product_NaviScrollPdd.pdd.map']
         
         (component2, binaries2) = reader_iter.next()
-        assert component2 == 'ibusal_chipset_product'
-        assert binaries2 == [r'\epoc32\release\ARMV5\UDEB\_product_NaviScrollPdd.pdd',
-                             r'\epoc32\release\ARMV5\UDEB\_product_NaviScrollPdd.pdd.map']
-
+        assert component2 == 'ibusal_chipset_product2'
+        assert binaries2 == [r'\epoc32\release\ARMV5\UDEB\_product2_accelerometerpdd.pdd',
+                             r'\epoc32\release\ARMV5\UDEB\_product2_accelerometerpdd.pdd.map']
 
 class RombuildLogBinarySizeReaderTest(unittest.TestCase):
     """ Test reading Symbian ROM build logs for extracting binaries and their sizes. """
     
     def test_rom_log_parsing(self):
         """ Basic ROM log binary size parsing. """ 
-        reader = build.io.RombuildLogBinarySizeReader('tests/data/build/io/test_rom.log')
+        reader = build.io.RombuildLogBinarySizeReader(os.path.join(os.environ['HELIUM_HOME'], 'tests/data/build/io/test_rom.log'))
         reader_iter = iter(reader)
         (binary, size, rom_type) = reader_iter.next()
         assert binary == r'\epoc32\release\ARMV5\urel\__ekern.exe'
@@ -70,7 +69,7 @@ class RombuildLogBinarySizeReaderTest(unittest.TestCase):
         
     def test_rofs_log_parsing(self):
         """ Basic ROFS log binary size parsing. """ 
-        reader = build.io.RombuildLogBinarySizeReader('tests/data/build/io/test_rofs.log')
+        reader = build.io.RombuildLogBinarySizeReader(os.path.join(os.environ['HELIUM_HOME'], 'tests/data/build/io/test_rofs.log'))
         reader_iter = iter(reader)
         (binary, size, rom_type) = reader_iter.next()
         assert binary == r'\epoc32\data\Z\Resource\ICL\jpegcodec_extra.rsc'

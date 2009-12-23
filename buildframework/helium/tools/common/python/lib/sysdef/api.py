@@ -125,7 +125,9 @@ class Unit(SysDefElement):
     
     def __getpath(self):
         """ Path getter. """
-        return os.path.join(os.path.sep, self.__xml.getAttribute('bldFile'))
+        if self.__xml.hasAttribute('bldFile'):
+            return os.path.join(os.path.sep, self.__xml.getAttribute('bldFile'))
+        return os.path.join(os.sep, os.path.dirname(self.__xml.getAttribute('mrp')))
             
     def __getfilters(self):
         """ filter getter. """
@@ -172,7 +174,7 @@ class Layer(_UnitGroup):
             self._units.append(unit)
             self._sysDef.addElement(unit)
 
-        for moduleNode in recursive_node_scan(self._xml, 'module') + recursive_node_scan(self._xml, 'component'):
+        for moduleNode in recursive_node_scan(self._xml, 'module') + recursive_node_scan(self._xml, 'collection'):
             module = Module(moduleNode, self._sysDef)
             self._modules.append(module)
             self._module_count += 1

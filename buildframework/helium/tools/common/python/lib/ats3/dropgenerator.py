@@ -40,7 +40,8 @@ import atsconfigparser
 # pylint: disable-msg=W0404
 from ntpath import sep as atssep
 import ntpath as atspath
-from ntpath import sep as sossep
+
+import jinja2
 
 _logger = logging.getLogger('ats')
 
@@ -172,7 +173,7 @@ class Ats3TestDropGenerator(object):
     def generate_steps_logdir(self, setd, case):
         """generates STIF log dir."""
         
-        _qt_test_ = check_qt_harness(setd)
+        _qt_test_ = self.check_qt_harness(setd)
         if _qt_test_:
             step = SE(case, "step", name="Create QT log dir", harness=setd["test_harness"], **self.defaults)
         else:
@@ -181,7 +182,7 @@ class Ats3TestDropGenerator(object):
         if setd["test_harness"] == "STIF":
             SE(SE(step, "params"), "param", dir=self.STIF_LOG_DIR)
         if setd["test_harness"] == "GENERIC":
-            if check_mtf_harness(setd):
+            if self.check_mtf_harness(setd):
                 SE(SE(step, "params"), "param", dir=self.MTF_LOG_DIR)
             else:
                 SE(SE(step, "params"), "param", dir=self.TEF_LOG_DIR)
@@ -362,7 +363,7 @@ class Ats3TestDropGenerator(object):
         SE(params, "param", parameters="writefile")
         SE(params, "param", file=path(r"z:\sys\bin\ctcman.exe"))
             
-        if test_plan["ats_network_drive"].strip() != "":
+        if test_plan["ctc_run_process_params"].strip() != "":
             #preparing local-path for CTC step
             #getting '39865' as diamonds ID out of 'http://diamonds.nmp.nokia.com/diamonds/builds/39865/'
             if test_plan["diamonds_build_url"].rfind("/", 0):
@@ -370,12 +371,15 @@ class Ats3TestDropGenerator(object):
             else:
                 diamonds_id = test_plan["diamonds_build_url"].rsplit(r"/", 1)[1]
             
-            #separating network id and drop number from 10.11.3.2\share#ats\drop2.zip
+            #separating network id and drop number from 10.11.3.2\share#ats\drop2.zip#3
             #'drop2' from the other part of the string conjuncted with a # sign
-            ats_network = r"\\" + test_plan["ats_network_drive"].rsplit("#", 1)[0] #network host
-            temp_drop_id = path(test_plan["ats_network_drive"].rsplit("#", 1)[1].rsplit(".", 1)[0]).normpath() #drop ID
-            drop_id = temp_drop_id.rsplit(atssep, 1)[1]
-            
+            ats_network = r"\\" + test_plan["ctc_run_process_params"].rsplit("#", 2)[0] #network host
+            temp_drop_id = path(test_plan["ctc_run_process_params"].rsplit("#", 2)[1].rsplit(".", 1)[0]).normpath() #drop ID
+            if atssep in temp_drop_id:
+                drop_id = temp_drop_id.rsplit(atssep, 1)[1]
+            else:
+                drop_id = temp_drop_id
+
             ats_network_path = atspath.join(ats_network, "ctc_helium" , diamonds_id, drop_id, setd["name"], "ctcdata")
             ctc_helium_path_list.append(ats_network_path)
             
@@ -405,24 +409,20 @@ class Ats3TestDropGenerator(object):
         if setd["test_harness"] == "STIF":
             SE(params, "param", path=path(self.STIF_LOG_DIR).joinpath(r"*"))
         if setd["test_harness"] == "GENERIC":
-            if check_mtf_harness(setd):
+            if self.check_mtf_harness(setd):
                 SE(params, "param", path=path(self.MTF_LOG_DIR).joinpath(r"*"))
             else:
                 SE(params, "param", path=path(self.TEF_LOG_DIR).joinpath(r"*"))
         elif setd["test_harness"] == "STIFUNIT":
             SE(params, "param", path=path(self.STIFUNIT_LOG_DIR).joinpath(r"*"))
         elif setd["test_harness"] == "EUNIT":
-            if check_qt_harness(setd):
+            if self.check_qt_harness(setd):
                 SE(params, "param", path=path(self.QT_LOG_DIR).joinpath(r"*"))
             else:
                 SE(params, "param", path=path(self.EUNIT_LOG_DIR).joinpath(r"*"))
 
-    def generate_steps(self, setd, case, test_plan):
-        """Generate the test plan <step>s."""
-        # Flash images.
-        images = self.drop_path_root.joinpath("images")
-        pmds = self.drop_path_root.joinpath("pmds")
-        
+    
+    def get_sorted_images(self, setd):
         sorted_images = []
         for image_file in setd["image_files"]:
             if 'core' in image_file.name:
@@ -436,11 +436,21 @@ class Ats3TestDropGenerator(object):
         for image_file in setd["image_files"]:
             if 'core' not in image_file.name and 'rofs2' not in image_file.name and 'rofs3' not in image_file.name:
                 sorted_images.append(image_file.name)
-                
+        if "rofs" in sorted_images[0]:
+            return setd["image_files"]
+        return sorted_images
+    
+    def generate_steps(self, setd, case, test_plan):
+        """Generate the test plan <step>s."""
+        # Flash images.
+        images = self.drop_path_root.joinpath("images")
+        pmds = self.drop_path_root.joinpath("pmds")
+        
+        sorted_images = self.get_sorted_images(setd)
         for image_file in sorted_images:
             flash = SE(case, "flash", images=images.joinpath(image_file))
             flash.set("target-alias", "DEFAULT_%s" % setd["test_harness"])
-
+            
         if not test_plan.custom_dir is None:
             insert_custom_file(case, test_plan.custom_dir.joinpath("prestep_custom.xml"))
 
@@ -515,8 +525,11 @@ class Ats3TestDropGenerator(object):
                 else:
                     SE(params, "param", {'result-file': self.TEF_LOG_DIR + os.sep + filename.replace('.script', '.htm')})
                 SE(params, "param", timeout=time_out)
-                SE(params, "param", parser="TEFTestResultParser")
-            if 'testmodule' in file1[2]:
+                if file1[2] == "testscript:mtf":
+                    SE(params, "param", parser="MTFResultParser")
+                else:
+                    SE(params, "param", parser="TEFTestResultParser")
+            if file1[2] == 'testmodule:rtest':
                 filename = file1[1]
                 filename = filename[file1[1].rfind(os.sep)+1:]
                 step = SE(case, "step", 
@@ -754,7 +767,7 @@ class Ats3TestDropGenerator(object):
                             drop_set.add(drop_file)
                             yield (drop_file, file_path.normpath())
             for drop_dir, sub_dir, files in pkg_files:
-                drop_file = drop_dir.joinpath(sub_dir)
+                drop_file = drop_dir.joinpath(sub_dir.replace('\\', os.sep))
                 drop_file = drop_file.normpath()
                 file_path = path(files)
                 if drop_file not in drop_set:
@@ -767,6 +780,25 @@ class Ats3TestDropGenerator(object):
         for drop_file, _ in self.drop_files(test_plan):
             SE(files_elem, "file").text = drop_file
         return files_elem
+        
+    def check_mtf_harness(self, _setd_):
+        for _srcdst_ in _setd_['src_dst']:
+            if _srcdst_[2] == "testscript:mtf":
+                return True
+        return False
+
+    def check_qt_harness(self, _setd_):
+        _setd_ = _setd_
+        is_qt_test = False
+        if _setd_.has_key("sis_files"):
+            _dict_key_ = "sis_files"
+        else:
+            _dict_key_ = "src_dst"
+            
+        for _srcdst_ in _setd_[_dict_key_]:
+            if "testmodule:qt" == _srcdst_[2]:
+                is_qt_test = True
+        return is_qt_test 
 
 def generate_target(test_plan, root):
     """Generate targets"""
@@ -839,28 +871,8 @@ def insert_custom_file(xmltree, filename):
     else: 
         _logger.info("Included file %s" % ( filename))
 
-def check_qt_harness(_setd_):
-    _setd_ = _setd_
-    is_qt_test = False
-    if _setd_.has_key("sis_files"):
-        _dict_key_ = "sis_files"
-    else:
-        _dict_key_ = "src_dst"
-        
-    for _srcdst_ in _setd_[_dict_key_]:
-        if "testmodule:qt" == _srcdst_[2]:
-            is_qt_test = True
-    return is_qt_test 
-
-def check_mtf_harness(_setd_):
-    for _srcdst_ in _setd_['src_dst']:
-        if _srcdst_[2] == "testscript:mtf":
-            return True
-    return False
-
 def generate_post_actions(test_plan):
     """Generate post actions."""
-    import string
     actions = []
     
     if not test_plan.custom_dir is None:
@@ -878,3 +890,76 @@ def generate_post_actions(test_plan):
         insert_custom_file(actions, test_plan.custom_dir.joinpath("postpostaction.xml"))
 
     return actions
+    
+    
+class Ats3TemplateTestDropGenerator(Ats3TestDropGenerator):
+
+    STIF_LOG_DIR = r"c:\logs\testframework"
+    TEF_LOG_DIR = r"c:\logs\testexecute"
+    MTF_LOG_DIR = r"c:\logs\testresults"
+    STIFUNIT_LOG_DIR = r"c:\logs\testframework"
+    EUNIT_LOG_DIR = r"c:\Shared\EUnit\logs"
+    #QT_LOG_DIR = r"c:\private\Qt\logs"
+    QT_LOG_DIR = r"c:\shared\EUnit\logs"
+    CTC_LOG_DIR = r"c:\data\ctc"
+
+    def stif_init_file(self, src_dst):
+        ini = cfg = dll = has_tf_ini = False
+        ini_file = None
+        cfg_files = dll_files = []
+
+        for tf_ini in src_dst:
+            if "testframework.ini" in tf_ini[1].lower():
+                has_tf_ini = True
+        
+        for file1 in src_dst:
+            if "testframework.ini" in file1[1].lower() and file1[2] == "engine_ini" and has_tf_ini:
+                ini_file = file1
+            elif file1[2] == "engine_ini" and not has_tf_ini:
+                pipe_ini = open(file1[0], 'r')
+                if "[engine_defaults]" in str(pipe_ini.readlines()).lower():
+                    ini_file = file1
+        return ini_file
+
+    def ctcnetworkpath(self, setd, test_plan):
+        #preparing local-path for CTC step
+        #getting '39865' as diamonds ID out of 'http://diamonds.nmp.nokia.com/diamonds/builds/39865/'
+        if test_plan["diamonds_build_url"].rfind("/", 0):
+            diamonds_id = test_plan["diamonds_build_url"].rsplit(r"/", 2)[1]
+        else:
+            diamonds_id = test_plan["diamonds_build_url"].rsplit(r"/", 1)[1]
+        
+        #separating network id and drop number from 10.11.3.2\share#ats\drop2.zip#3
+        #'drop2' from the other part of the string conjuncted with a # sign
+        ats_network = r"\\" + test_plan["ctc_run_process_params"].rsplit("#", 2)[0] #network host
+        temp_drop_id = path(test_plan["ctc_run_process_params"].rsplit("#", 2)[1].rsplit(".", 1)[0]).normpath() #drop ID
+        if atssep in temp_drop_id:
+            drop_id = temp_drop_id.rsplit(atssep, 1)[1]
+        else:
+            drop_id = temp_drop_id
+
+        return atspath.join(ats_network, "ctc_helium" , diamonds_id, drop_id, setd["name"], "ctcdata")
+
+    def getlogdir(self, setd):
+        if setd["test_harness"] == "STIF":
+            return self.STIF_LOG_DIR
+        elif setd["test_harness"] == "STIFUNIT":
+            return self.STIFUNIT_LOG_DIR
+        elif setd["test_harness"] == "GENERIC":
+            if self.check_mtf_harness(setd):
+                return self.MTF_LOG_DIR
+            else:
+                return self.TEF_LOG_DIR
+        elif setd["test_harness"] == "EUNIT":
+            if self.check_qt_harness(setd):
+                return self.QT_LOG_DIR
+            else:
+                return self.EUNIT_LOG_DIR
+
+    def generate_xml(self, test_plan):
+        loader = jinja2.ChoiceLoader([jinja2.FileSystemLoader(os.path.join(os.environ['HELIUM_HOME'], 'tools/common/python/lib/ats3/templates')), jinja2.FileSystemLoader(test_plan.custom_dir)])
+        env = jinja2.Environment(loader=loader)
+        template = env.from_string(open(os.path.join(os.environ['HELIUM_HOME'], 'tools/common/python/lib/ats3/ats4_template.xml')).read())
+        
+        xmltext = template.render(test_plan=test_plan, os=os, atspath=atspath, atsself=self).encode('ISO-8859-1')
+        return et.ElementTree(et.XML(xmltext))

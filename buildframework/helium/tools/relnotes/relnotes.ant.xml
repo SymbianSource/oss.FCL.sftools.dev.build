@@ -106,11 +106,12 @@ rn.rtfimage(ant.get_property(r'${releasenotes.logo}'), ant.get_property(r'${rele
     <!-- Private: Find project and baseline of what is running helium -->
     <target name="release-notes-getcmprojectname">
         <script language="jython" setbeans="false">
-import nokia.nokiaccm
 import ccm.extra
 import traceback
 import os
 import logging
+import ccmutil
+
 #logging.basicConfig(level=logging.DEBUG)
 session = None
 try:
@@ -120,12 +121,10 @@ try:
     engine = project.getProperty('ccm.engine.host')
     dbpath = project.getProperty('ccm.database.path')     
     waroot = project.getProperty('create.bom.workarea.root')
-    if database != None:
-        session = nokia.nokiaccm.open_session(username, password, database=database)
-    else:
-        session = nokia.nokiaccm.open_session(username, password, engine, dbpath)
-        
+    
+    session = ccmutil.get_session(database, username, password, engine, dbpath)
     cmproject = ccm.extra.get_toplevel_project(session, waroot)
+    
     if cmproject == None:
         print 'Error: ' + waroot + ' must be a synergy project and still be in database'
     else:
@@ -135,12 +134,11 @@ except Exception, ex:
     print 'Caught exception: ' + str(ex)
     traceback.print_exc()
         </script>
-        
         <hlm:python outputproperty="ccm.toplevel.baseline">
-import nokia.nokiaccm
 import traceback
 import ant
 import logging
+import ccmutil
 logging.disable(logging.INFO)
 session = None
 try:
@@ -149,11 +147,7 @@ try:
     password = ant.get_property(r'${ccm.user.password}')
     engine = ant.get_property(r'${ccm.engine.host}')
     dbpath = ant.get_property(r'${ccm.database.path}')
-    if database != None:
-        session = nokia.nokiaccm.open_session(username, password, database=database)
-    else:
-        session = nokia.nokiaccm.open_session(username, password, engine, dbpath)
-        
+    session = ccmutil.get_session(database, username, password, engine, dbpath)
     cmproject = session.create(ant.get_property(r'${ccm.toplevel.project}'))
     print cmproject.baseline
     session.close()
@@ -172,7 +166,7 @@ except Exception, ex:
 import amara
 import ant
 
-bomfile = open(r"${build.log.dir}/${build.id}_BOM.xml")
+bomfile = open(r"${temp.build.dir}/${build.id}_BOM.xml")
 bom = amara.parse(bomfile)
 
 for p in bom.bom.content.project:
@@ -188,93 +182,28 @@ project.setProperty(project.getProperty('project.startswith') + '.project', proj
     
     <!-- Private: Write projects, baselines and task list for MC and IBUSAL -->
     <target name="release-notes-ccm" depends="get-ccm-password,release-notes-getcmprojectname,create-bom">
-        
         <hlm:python>
 import amara
-import nokia.nokiaccm
 import ant
+import bomtofile
+import ccmutil
 
-class BOMToFile(object):
-    """
-    Read BOM and output in text
-    """
-    def __init__(self, session, project_name, project, output_dir):
-        self.project_name = project_name
-        self.project = project
-        self.output_dir = output_dir
-        self.session = session
-      
-    def writeprojects(self):
-        fileout = file(self.output_dir + '/' + self.project_name + '_projects.txt', 'w')
-        
-        i = 1
-        for project in self.project.baseline:
-            fileout.write(str(i) + ") " + str(project) + "\n")
-            
-            i += 1
-        fileout.close()
-        
-    def writebaselines(self):
-        fileout = file(self.output_dir + '/' + self.project_name + '_baselines.txt', 'w')    
-        
-        i = 1
-        for project in self.project.baseline:
-            fileout.write(str(i) + ") " + str(project) + "\n")
-            
-            cmproject = self.session.create(str(project))
-            
-            try:
-                baseline = str(cmproject.baseline).strip()
-                if baseline == "None":
-                    fileout.write(str(i) + ") " + str(project) + "\n")
-                else:
-                    fileout.write(str(i) + ") " + baseline + "\n")
-                i += 1
-            except Exception, ex:
-                print ex
-        fileout.close()
-            
-    def writetasks(self):
-        if self.project.xml_properties.has_key("task"):
-            fileout = file(self.output_dir + '/' + self.project_name + '_tasks.txt', 'w')
-            
-            i = 1
-            for task in self.project.task:
-                fileout.write(str(i) + ") Task " + str(task) + "\n")
-                i += 1
-            fileout.close()
-
-bomfile = open(r"${build.log.dir}/${build.id}_BOM.xml")
+bomfile = open(r"${temp.build.dir}/${build.id}_BOM.xml")
 bom = amara.parse(bomfile)
-database = ant.get_property(r'${ccm.database}')
-username = ant.get_property(r'${ccm.user.login}')
-password = ant.get_property(r'${ccm.user.password}')
-engine = ant.get_property(r'${ccm.engine.host}')
-dbpath = ant.get_property(r'${ccm.database.path}')
-if database != None:
-    session = nokia.nokiaccm.open_session(username, password, database=database)
-else:
-    session = nokia.nokiaccm.open_session(username, password, engine, dbpath)
-
+session = ccmutil.get_session(ant.get_property(r'${ccm.database}'), ant.get_property(r'${ccm.user.login}'), ant.get_property(r'${ccm.user.password}'), ant.get_property(r'${ccm.engine.host}'), ant.get_property(r'${ccm.database.path}'))
 for p in bom.bom.content.project:
     if p.name == ant.get_property(r'${ccm.toplevel.project}'):
-        btof = BOMToFile(session, 'MC', p, ant.get_property(r'${releasenotes.output.dir}'))
-        
-        btof.writeprojects()
-        btof.writebaselines()
-            
-        btof.writetasks()
+        bomwriter = bomtofile.BOMWriter(session, 'MC', p, ant.get_property(r'${releasenotes.output.dir}'))
+        bomwriter.writeprojects()
+        bomwriter.writebaselines()
+        bomwriter.writetasks()
             
     if (str(p.name).startswith('IBUSAL')):
-        btof = BOMToFile(session, 'IBUSAL', p, ant.get_property(r'${releasenotes.output.dir}'))
-        
-        btof.writeprojects()
-            
-        btof.writetasks()
-            
+        bomwriter = bomtofile.BOMWriter(session, 'IBUSAL', p, ant.get_property(r'${releasenotes.output.dir}'))
+        bomwriter.writeprojects()
+        bomwriter.writetasks()
 session.close()
 bomfile.close()
-
         </hlm:python>
     </target>
     
@@ -282,7 +211,7 @@ bomfile.close()
     <target name="release-notes-icfs" depends="create-bom">
         <exec executable="python" dir="${helium.dir}/tools/relnotes" failonerror="${failonerror}">
             <arg value="icf2txt.py"/>
-            <arg value="${build.log.dir}/${build.id}_BOM.xml"/>            
+            <arg value="${temp.build.dir}/${build.id}_BOM.xml"/>            
             <arg value="${releasenotes.output.dir}/icdicf.txt"/>
         </exec>
     </target>

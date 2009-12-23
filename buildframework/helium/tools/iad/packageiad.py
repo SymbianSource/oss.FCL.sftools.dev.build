@@ -16,6 +16,9 @@
 #
 #Description:
 #===============================================================================
+
+""" packageIAD.py module """
+
 import os
 import sys
 import xml.dom.minidom
@@ -23,12 +26,17 @@ import iadinfo
 import zipfile
 import encodings.utf_8
 
-class IADPackager :
 
-    def __init__ (self) :
+class IADPackager :
+    """ package IAD class "
+    """
+    
+    def __init__(self) :
+        """ class init method """
         self.hasStub = False
 
-    def getBldDirs (self, layer, bldDirs) :
+    def getBldDirs(self, layer, bldDirs) :
+        """ get the list of build directories """
         units = layer.getElementsByTagName ("unit")
         for unit in units :
             dir = unit.getAttribute ("bldFile").rstrip ('\\/')
@@ -37,31 +45,33 @@ class IADPackager :
                 i = dir.rfind ("/")
             bldDirs.append (dir[:i + 1])
     
-    def getLayer (self, configuration, layers, bldDirs) :
+    def getLayer(self, configuration, layers, bldDirs) :
+        """ get each layer info """
         layerRef = configuration.getElementsByTagName ("layerRef")[0].getAttribute ("layerName")
         for layer in layers :
             if layer.getAttribute ("name") == layerRef :
                 self.getBldDirs (layer, bldDirs)
     
-    def createInfoFiles (self, sisInfo) :
+    def createInfoFiles(self, sisInfo) :
+        """ create the INfo files depends.xml etc."""
         depends = xml.dom.minidom.parse ("depends.xml")
         info = xml.dom.minidom.parseString (sisInfo)
         
         infoFile = file ("sisinfo.xml", "w")
-        platDeps = info.getElementsByTagName("platform_dependency")
         packageDeps = info.getElementsByTagName("package_dependency")
         for packageDep in packageDeps :
-            p = depends.createElement ("package")
-            depends.childNodes[1].appendChild (p)
+            pack = depends.createElement ("package")
+            depends.childNodes[1].appendChild (pack)
             for child in packageDep.childNodes :
-                p.appendChild (child)
+                pack.appendChild (child)
         infoFile.write (info.toxml ())
         infoFile.close()
         depFile = file ("depends.xml", "w")
         depFile.write (depends.toxml ())
         depFile.close()
     
-    def createSis (self, packageDir, packageName) :
+    def createSis(self, packageDir, packageName, makesis) :
+        """ create the .sis file """
         sisReader = iadinfo.IADHandler()
         os.chdir (packageDir)
         sisPackage = packageName + ".sis"
@@ -69,14 +79,15 @@ class IADPackager :
         print "Creating", sisPackage
         cmd = makesis + " package.pkg " + sisPackage
         os.system (cmd)
-        self.createInfoFiles (sisReader.getInfo (sisPackage))
+        self.createInfoFiles (sisReader.getInfo(sisPackage))
         if os.path.exists(stubPackage) :
             print "Creating stub SIS file", stubPackage
             self.hasStub = True
             cmd = makesis + " -s package.pkg " + stubPackage
             os.system (cmd)
         
-    def createPackage (self, topDir, packageName) :
+    def createPackage(self, topDir, packageName) :
+        """ create the Data Package """
         print "Creating package", packageName
         os.chdir (topDir)
         zipFile = packageName + ".zip"
@@ -93,27 +104,31 @@ class IADPackager :
         zip.close()
         
     
-    def processSisDir (self, sisDir) :
-        for root, dirs, files in os.walk (sisDir):
+    def processSisDir(self, sisDir, makesis) :
+        """ handle the directory used to create the .sis file """
+        for root, dirs, _ in os.walk (sisDir):
             for name in dirs :
-                self.createSis (os.path.join (root, name), name)
+                self.createSis (os.path.join (root, name), name, makesis)
                 self.createPackage (root, name)
 
-makesis = sys.argv[3] + "\\epoc32\\tools\\makesis.exe"
-signsis = sys.argv[3] + "\\epoc32\\tools\\signsis.exe"
+def main(sysdefFile, sysdefconfigs, bldDrive):
+    """ main to called when imported """
+    makesis = bldDrive + "\\epoc32\\tools\\makesis.exe"
+    
+    sysdef = xml.dom.minidom.parse (sysdefFile)
+    configurations = sysdef.getElementsByTagName ("configuration")
+    layers = sysdef.getElementsByTagName ("layer")
+    bldDirs = []
+    
+    packager = IADPackager()
+    
+    for configuration in configurations :
+        if configuration.getAttribute ("name") == sysdefconfigs :
+            packager.getLayer (configuration, layers, bldDirs)
+     
+    
+    for bldDir in bldDirs :
+        packager.processSisDir (bldDrive + bldDir + "sis\\", makesis)
 
-sysdef = xml.dom.minidom.parse (sys.argv[1])
-configurations = sysdef.getElementsByTagName ("configuration")
-layers = sysdef.getElementsByTagName ("layer")
-bldDirs = []
-
-packager = IADPackager()
-
-for configuration in configurations :
-    if configuration.getAttribute ("name") == sys.argv[2] :
-        packager.getLayer (configuration, layers, bldDirs)
- 
-
-for bldDir in bldDirs :
-    packager.processSisDir (sys.argv[3] + bldDir + "sis\\")
-
+if __name__ == "__main__":
+    main(sys.argv[1], sys.argv[2], sys.argv[3])

@@ -48,14 +48,14 @@ build.xml
 
 
 
-To declare a new signal to the framework you need to define a new signalConfig reference.
+To declare a new signal to the framework you need to define a new signalListenerConfig reference.
 You also need to create a signalInput configuration to define your signal behaviour.
 
 .. code-block:: xml
  
    <hlm:signalInput id="customActionSignalInput" failbuild="defer"/>
    
-   <hlm:signalListenerConfig id="customActionSignal" name="custom-action" message="custom-action target ended.">
+   <hlm:signalListenerConfig id="customActionSignal" target="custom-action" message="custom-action target ended.">
       <signalNotifierInput>
           <signalInput refid="customActionSignalInput" />
           <notifierInput file="${artifact}" />
@@ -63,13 +63,13 @@ You also need to create a signalInput configuration to define your signal behavi
       <hlm:targetCondition>
          <not><available file="${artifact}"/></not>            
       </hlm:targetCondition>
-   </hlm:signalConfig>
+   </hlm:signalListenerConfig>
 
 
-The signalListenerConfig defines which target to listen and raise signal for. The target name is defined through the **name** attribute.
+The signalListenerConfig defines which target to listen and raise signal for. The target name is defined through the **target** attribute.
 Then the nested **targetCondition** element is used to configure how the signal should be triggered.
 This element accepts any nested `Ant conditions <http://ant.apache.org/manual/CoreTasks/conditions.html>`_.
-In this case the signal will get raised only id the file is not present after the execution of the **custom-action** target.
+In this case the signal will get raised only if the file is not present after the execution of the **custom-action** target.
 
 The framework then uses the defined signalInput from the signalNotifierInput configuration to know how to behave when the signal is raised. In the previous example it will
 simply keep running and fail the build at the end. Then files defined by the nested notifierInput will be passed to the notifier.

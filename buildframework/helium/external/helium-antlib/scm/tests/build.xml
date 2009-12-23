@@ -23,15 +23,13 @@ Description:
 <project name="helium-antlib-unittest" xmlns:au="antlib:org.apache.ant.antunit">
     <description>Helium Antlib SCM unittests.</description>
 
-    <taskdef resource="org/apache/ant/antunit/antlib.xml" uri="org.apache.ant.antunit" />
+    
+    <import file="../../test-macros.ant.xml" />
 
     <target name="unittest" depends="unittest-scm" />
 
     <target name="unittest-scm">
-        <au:antunit>
-            <fileset dir="." includes="**/test_*.ant.xml" />
-            <au:plainlistener />
-        </au:antunit>
+        <antunitModule name="scm" />
     </target>
 
 </project>

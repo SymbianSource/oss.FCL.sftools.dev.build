@@ -98,32 +98,32 @@ Description:
 
     <target name="test-scanlog-metadata-1">
         <echo message="log.dir:${env.TEMP}/" />
-        <delete file="${env.TEMP}/test-scanlog-metadata-1.log" failonerror="false"/>
-        <delete file="${env.TEMP}/test-metadata-1.sqlite" failonerror="false"/>
-        <delete file="${env.TEMP}/test-scanlog-metadata-1.log.scan2.html" failonerror="false"/>
+        <delete file="${helium.dir}\tests\data\test-scanlog-metadata-1.log" failonerror="false"/>
+        <delete file="${helium.dir}\tests\data\test-metadata-1.sqlite" failonerror="false"/>
+        <delete file="${helium.dir}\tests\data\test-scanlog-metadata-1.log.scan2.html" failonerror="false"/>
         
-        <hlm:scanlogMetadataTest log="${helium.dir}\tests\data\scanlog\S60.MCL_7952_200932_5000__all_variants_multiple_thread_pf_7952_build_compile.log"
-            output="${env.TEMP}/test-scanlog-metadata-1.log" />
-        <hlm:assertFileExists file="${env.TEMP}/test-scanlog-metadata-1.log"/>
-        <hlm:metadatarecord database="${env.TEMP}/test-metadata-1.sqlite">
+        <hlm:scanlogMetadataTest log="${helium.dir}/tests/data/scanlog/all_regex_type.log"
+            output="${helium.dir}/tests/data/test-scanlog-metadata-1.log" />
+        <hlm:assertFileExists file="${helium.dir}/tests/data/test-scanlog-metadata-1.log"/>
+        <hlm:metadatarecord database="${helium.dir}/tests/data/test-metadata-1.sqlite">
             <hlm:sbsmetadatainput>
-                <fileset casesensitive="false" file="${env.TEMP}/test-scanlog-metadata-1.log"/>
+                <fileset casesensitive="false" file="${helium.dir}/tests/data/test-scanlog-metadata-1.log"/>
                 <metadatafilterset refid="filterset.sbs" />
             </hlm:sbsmetadatainput>
         </hlm:metadatarecord>
         <fmpp sourceFile="${helium.dir}/tools/common/templates/log/scan2.html.ftl"
-                     outputfile="${env.TEMP}/test-scanlog-metadata-1.log.scan2.html">
+                     outputfile="${helium.dir}/tests/data/test-scanlog-metadata-1.log.scan2.html">
             <freemarkerLinks expandProperties="yes">
                 macro: ${helium.dir}/tools/common/templates/macro
             </freemarkerLinks>
             <data expandProperties="yes">
-                dbPath: ${env.TEMP}/test-metadata-1.sqlite
+                dbPath: ${helium.dir}/tests/data/test-metadata-1.sqlite
                 doc: xml(${helium.dir}/tests/data/scanlog/all_regex_type.log_sbs_info.xml)
                 ant: antProperties()
             </data>
         </fmpp>
-        <hlm:generateBuildStatus dbfile="${env.TEMP}/test-metadata-1.sqlite" output-dir="${env.TEMP}" file="test-scanlog-metadata-1.log"/>
-        <hlm:assertFileExists file="${env.TEMP}/test-scanlog-metadata-1.log.scan2.html"/>
+        <hlm:generateBuildStatus dbfile="${helium.dir}/tests/data/test-metadata-1.sqlite" output-dir="${helium.dir}/tests/data/" file="test-scanlog-metadata-1.log"/>
+        <hlm:assertFileExists file="${helium.dir}/tests/data/test-scanlog-metadata-1.log.scan2.html"/>
     </target>
     
     <target name="test-metadata-signal">

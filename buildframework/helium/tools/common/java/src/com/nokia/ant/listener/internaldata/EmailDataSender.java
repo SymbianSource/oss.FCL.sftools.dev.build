@@ -106,7 +106,8 @@ public class EmailDataSender {
             log.debug("Sending data.");
             Transport.send(message);
         } catch (Exception e) {
-            log.error("Internal data failure: " + e.getMessage());
+            // We are Ignoring the errors as no need to fail the build.
+            log.debug("Internal data failure: " + e.getMessage(), e);
         }        
     }
 

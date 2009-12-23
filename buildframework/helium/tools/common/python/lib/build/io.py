@@ -43,7 +43,9 @@ class AbldLogWhatReader(symbian.log.Parser):
         self.parse()
 
     def __iter__(self):
-        for key in self._releasable.keys():
+        keys = self._releasable.keys()
+        keys.sort()
+        for key in keys:
             yield (key, self._releasable[key])
     
     def task(self, name, cmdline, path, output):

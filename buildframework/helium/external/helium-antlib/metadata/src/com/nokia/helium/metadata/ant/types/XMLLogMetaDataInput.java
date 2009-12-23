@@ -19,12 +19,9 @@ package com.nokia.helium.metadata.ant.types;
 
 import java.io.*;
 import java.util.*;
-//import javax.xml.parsers.SAXParser;
-//import javax.xml.parsers.SAXParserFactory;
 import org.apache.log4j.Logger;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
-//import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.XMLEvent;
 
 
@@ -40,20 +37,28 @@ abstract class XMLLogMetaDataInput extends LogMetaDataInput {
 
     private XMLStreamReader xmlStreamReader;
     
-    private int currentFileIndex;
+    private boolean inParsing;
     
+
+    /**
+     * Constructor
+     */
     public XMLLogMetaDataInput() {
         try {
+            inParsing = true;
             xmlInputFactory = XMLInputFactory.newInstance();
             xmlInputFactory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES,Boolean.TRUE);
             xmlInputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES,Boolean.FALSE);
             xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING , Boolean.TRUE);
         } catch (Exception ex) {
-            ex.printStackTrace();
+         // We are Ignoring the errors as no need to fail the build.
+            log.debug("Exception while initializing stax processing",ex);
         }
     }
     
-
+    /**
+     * Closes the xml stream
+     */
     private void close() {
         try {
             if (xmlStreamReader != null) {
@@ -61,106 +66,83 @@ abstract class XMLLogMetaDataInput extends LogMetaDataInput {
                 xmlStreamReader = null;
             }
         } catch (Exception ex) {
-            log.info("Exception whil closing xml stream" + ex.getMessage());
-            log.debug("exception while closing xml stream",ex);
+         // We are Ignoring the errors as no need to fail the build.
+            log.debug("Exception while closing xml stream", ex);
         }
         
     }
-   
-    protected File getCurrentFile() {
-        List<File> fileList = getFileList();
-        return fileList.get(currentFileIndex); 
-    }
-    
-    boolean isEntryAvailable() throws Exception {
-        //log.debug("Getting next set of log entries for xml Input");
-        //log.debug("currentFileIndex" + currentFileIndex);
-        int fileListSize = getFileList().size();
-        //log.debug("fileList.size" + fileListSize);
 
-        //if ( isEntryCreatedForRemainingText() ) {
-        //    log.debug("Entry creating from remaining text");
-        //    return true;
-        //}
-        try {
-            while (currentFileIndex < fileListSize) {
-                boolean entryCreated = false;
-                File currentFile = getCurrentFile();
-                    if (xmlStreamReader == null) {
-                        log.info("Processing file: " + currentFile);
-                        xmlStreamReader = xmlInputFactory.createXMLStreamReader(
-                                currentFile.toString(), new BufferedInputStream(new FileInputStream(currentFile)));
-                    //First the START_DOCUMENT is the first event directly pointed to.
-                    }
-                int eventType = xmlStreamReader.getEventType();
-                while (xmlStreamReader.hasNext()) {
-                    eventType = xmlStreamReader.next();
-                    switch (eventType) {
-                    case XMLEvent.START_ELEMENT:
-                        //log.debug("XMLEvent:START_ELEMENT");
-                        entryCreated = startElement(xmlStreamReader);
-                        break;
-                    case XMLEvent.END_ELEMENT:
-                        //log.debug("XMLEvent:END_ELEMENT");
-                        entryCreated = endElement(xmlStreamReader);
-                        //log.debug("XMLEvent:END_ELEMENT: entryCreated: " +entryCreated);
-                        break;
-                    case XMLEvent.PROCESSING_INSTRUCTION:
-                        //log.debug("XMLEvent:PI_DATA");
-                        //printPIData(xmlr);
-                        break;
-                    case XMLEvent.CHARACTERS:
-                        //log.debug("XMLEvent:chacacters");
-                        entryCreated = characters(xmlStreamReader);
-                        break;
-                    case XMLEvent.COMMENT:
-                        log.debug("XMLEvent:COMMENT");
-                        break;
-                    case XMLEvent.START_DOCUMENT:
-                        log.debug("XMLEvent:START_DOCUMENT");
-                        break;
-                    case XMLEvent.END_DOCUMENT:
-                        log.debug("XMLEvent:END_DOCUMENT");
-                        break;
-                    case XMLEvent.ENTITY_REFERENCE:
-                        log.debug("XMLEvent:ENTITY_REFERENCE");
-                        break;
-                    case XMLEvent.ATTRIBUTE:
-                        log.debug("XMLEvent:ATTRIBUTE");
-                        break;
-                    case XMLEvent.DTD:
-                        log.debug("XMLEvent:DTD");
-                        break;
-                    case XMLEvent.CDATA:
-                        log.debug("XMLEvent:CDATA");
-                        break;
-                    case XMLEvent.SPACE:
-                        log.debug("XMLEvent:chacacters");
-                        break;
-                    default:
-                        break;
-                    }
-                    if ( entryCreated) {
-                        return true; 
-                    }
-                }
-                if (xmlStreamReader != null) {
-                    close();
-                }
-                currentFileIndex ++;
+    /**
+     * Function to check from the input stream if is there any entries available.
+     * @param file for which the contents needs to be parsed for errors
+     * @return true if there are any entry available otherwise false.
+     */
+    boolean isEntryCreated(File currentFile) throws Exception {
+        boolean entryCreated = false;
+        if (inParsing ) {
+            if (xmlStreamReader == null) {
+                log.debug("Processing file: " + currentFile);
+                xmlStreamReader = xmlInputFactory.createXMLStreamReader(
+                        currentFile.toString(), new BufferedInputStream(new FileInputStream(currentFile)));
             }
-        } catch (Exception ex1 ) {
-            log.info("Exception processing xml stream: " + ex1.getMessage());
-            log.debug("exception while parsing the stream", ex1);
-            close();
+            int eventType = xmlStreamReader.getEventType();
+            while (xmlStreamReader.hasNext()) {
+                eventType = xmlStreamReader.next();
+                switch (eventType) {
+                case XMLEvent.START_ELEMENT:
+                    entryCreated = startElement(xmlStreamReader);
+                    break;
+                case XMLEvent.END_ELEMENT:
+                    entryCreated = endElement(xmlStreamReader);
+                    break;
+                case XMLEvent.CHARACTERS:
+                    entryCreated = characters(xmlStreamReader);
+                    break;
+                default:
+                    break;
+                }
+                if ( entryCreated) {
+                    return true; 
+                }
+            }
+            if (xmlStreamReader != null) {
+                close();
+            }
+            inParsing = false;
+        }
+        if (isAdditionalEntry()) {
+            return true;
         }
         return false;
     }
 
-    
+    /**
+     * Function to check if is there any additionaly entry. This is being used for example during streaming
+     * recorded and at the end of streaming use the recorded data to add any additional entry. Used by
+     * @return true if there are any additional entries which are to be recorded in the database.
+     */
+    public boolean isAdditionalEntry() {
+        return false;
+    }
+
+    /**
+     * Function implemented by the subclasses to process the start event of xml stream callback.
+     * @param streamReader: the input stream reader which contains the xml data to be parsed for recording data.
+     * @return true if there are any element to be added to the database.
+     */
     abstract boolean startElement (XMLStreamReader streamReader) throws Exception ;
 
+    /**
+     * Function implemented by the subclasses to process the end event of xml stream callback.
+     * @param streamReader: the input stream reader which contains the xml data to be parsed for recording data.
+     * @return true if there are any element to be added to the database.
+     */
     abstract boolean endElement(XMLStreamReader streamReader) throws Exception;
-    
+
+    /**
+     * Function implemented by the subclasses to process the characters event of xml stream callback.
+     * @param streamReader: the input stream reader which contains the xml data to be parsed for recording data.
+     * @return true if there are any element to be added to the database.
+     */
     abstract boolean characters (XMLStreamReader streamReader);
 }

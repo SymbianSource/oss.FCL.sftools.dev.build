@@ -273,7 +273,7 @@ sub Initialise()
 
 		while (<RDRFH>)
 		{
-				if ( /^\s*<option (\w+)>/ )
+				if ( /^\s*<option ([A-Za-z0-9\.]+)>/ )				
 				{
 					my $option = lc($1);
 					$self->{ __platform }->{ $option } = $option; # if ($option =~ /^(armv5|winscw)$/i);
@@ -1484,7 +1484,9 @@ sub ChangeMMPsAndMKs
 				{
 					my $uf = $f;
 					$uf =~ s/\.(mmp|mk)$//i;
-					if ( $uf =~ m/$mmp$/i )
+					# Following reqular expression is changed to match with strings starting with a slash or backslash
+					# in order to prevent similarly ending but unidentical files to match with each other.
+					if ( $uf =~ m/[\/\\]$mmp$/i )
 					{
 						__OUT::Print ("  + Found '$mmp' match => '$f'\n");
 						$self->{__mmpstype}->{$mmp}->{path} = $f;
@@ -1810,7 +1812,7 @@ sub xcopy
 		# if distination file exist then clear read flag
 		if (-f $dist)
 		{
-				chmod ($dist , 0755);
+				chmod (0755 , $dist);
 		}
 		else
 		{

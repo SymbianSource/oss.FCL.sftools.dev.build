@@ -29,13 +29,13 @@ Description:
 
     <!-- Only for backward compatibility -->
     <hlm:notifierList id="defaultSignalFailNotifier">
-        <hlm:emailNotifier templateSrc="${helium.dir}/tools/common/templates/log/email_new.html.ftl" title="[signal] ${signal.name}"
+        <hlm:emailNotifier templateSrc="${helium.dir}/tools/common/templates/log/email_new.html.ftl" title="[signal] ${signal.name} - [message] ${signal.message}"
             smtp="${email.smtp.server}" ldap="${email.ldap.server}" notifyWhen="fail">
         </hlm:emailNotifier>
     </hlm:notifierList>
 
     <hlm:notifierList id="defaultFailNotifier">
-        <hlm:emailNotifier defaultTemplate="${helium.dir}/tools/common/templates/log/email_default.html.ftl" title="[signal] ${signal.name}"
+        <hlm:emailNotifier defaultTemplate="${helium.dir}/tools/common/templates/log/email_default.html.ftl" title="[signal] ${signal.name} - [message] ${signal.message}"
             smtp="${email.smtp.server}" ldap="${email.ldap.server}" notifyWhen="fail">
         </hlm:emailNotifier>
     </hlm:notifierList>
@@ -100,6 +100,10 @@ Description:
 
 
     <hlm:signalInput id="compileSignalInput" failbuild="defer">
+        <hlm:notifierListRef refid="defaultFailNotifier" />
+    </hlm:signalInput>
+
+    <hlm:signalInput id="raptorErrorSignalInput" failbuild="now">
         <hlm:notifierListRef refid="defaultFailNotifier" />
     </hlm:signalInput>
 
@@ -185,7 +189,12 @@ Description:
         </hlm:targetCondition>
         <signalNotifierInput>
             <signalInput refid="prepWorkAreaSignalInput" />
-            <notifierInput file = "${build.cache.log.dir}/signals/${build.id}_ccm_get_input.log.status.html" />
+            <notifierInput>
+                <fileset dir="${build.cache.log.dir}" >
+                    <include name="signals/${build.id}_ccm_get_input*" />
+                    <include name="${build.id}_ccm_get_input*" />
+                </fileset>
+            </notifierInput>
         </signalNotifierInput>
     </hlm:signalListenerConfig>
 
@@ -195,7 +204,11 @@ Description:
         </targetCondition>
         <signalNotifierInput>
             <signalInput refid="preparationSignalInput" />
-            <notifierInput file = "${build.signal.status.dir}/${build.id}_ant_build.log.status.html" />
+            <notifierInput>
+                <fileset dir="${build.log.dir}" >
+                    <include name="**/${build.id}_main.ant*" />
+                </fileset>
+            </notifierInput>
         </signalNotifierInput>
     </hlm:signalListenerConfig>
 
@@ -205,7 +218,11 @@ Description:
         </targetCondition>
         <signalNotifierInput>
             <signalInput refid="eeRomsSignalInput" />
-            <notifierInput file = "${build.signal.status.dir}/${build.id}_ee_roms.log.html" />
+            <notifierInput>
+                <fileset dir="${build.log.dir}" >
+                    <include name="**/${build.id}_ee_roms*" />
+                </fileset>
+            </notifierInput>
         </signalNotifierInput>
     </hlm:signalListenerConfig>
 
@@ -215,7 +232,11 @@ Description:
         </hlm:targetCondition>
         <signalNotifierInput>
             <signalInput refid="subconRomsSignalInput" />
-            <notifierInput file = "${build.signal.status.dir}/${build.id}_subcon.log.status.html" />
+            <notifierInput>
+                <fileset dir="${build.log.dir}" >
+                    <include name="**/${build.id}_subcon*" />
+                </fileset>
+            </notifierInput>
         </signalNotifierInput>
     </hlm:signalListenerConfig>
 
@@ -226,7 +247,11 @@ Description:
         </hlm:targetCondition>
         <signalNotifierInput>
             <signalInput refid="traceRomsSignalInput" />
-            <notifierInput file = "${build.signal.status.dir}/${build.id}_trace_roms.log.html" />
+            <notifierInput>
+                <fileset dir="${build.log.dir}" >
+                    <include name="**/${build.id}_trace_roms*" />
+                </fileset>
+            </notifierInput>
         </signalNotifierInput>
     </hlm:signalListenerConfig>
 
@@ -236,7 +261,11 @@ Description:
         </hlm:targetCondition>
         <signalNotifierInput>
             <signalInput refid="fotaSignalInput" />
-            <notifierInput file = "${build.signal.status.dir}/${build.id}_fota.log.status.html" />
+            <notifierInput>
+                <fileset dir="${build.log.dir}" >
+                    <include name="**/${build.id}_fota*" />
+                </fileset>
+            </notifierInput>
         </signalNotifierInput>
     </hlm:signalListenerConfig>
 
@@ -246,7 +275,11 @@ Description:
         </hlm:targetCondition>
         <signalNotifierInput>
             <signalInput refid="dataPackagingSignalInput" />
-            <notifierInput file = "${build.signal.status.dir}/${build.id}_dp.log.status.html" />
+            <notifierInput>
+                <fileset dir="${build.log.dir}" >
+                    <include name="**/${build.id}_dp*" />
+                </fileset>
+            </notifierInput>
         </signalNotifierInput>
     </hlm:signalListenerConfig>
 
@@ -260,27 +293,39 @@ Description:
         </targetCondition>
         <signalNotifierInput>
             <signalInput refid="atsSignalInput" />
-            <notifierInput file = "${build.signal.status.dir}/${build.id}_ats.log.status.html" />
+            <notifierInput>
+                <fileset dir="${build.log.dir}" >
+                    <include name="**/${build.id}_ats*" />
+                </fileset>
+            </notifierInput>
         </signalNotifierInput>
     </hlm:signalListenerConfig>
 
     <hlm:signalListenerConfig id="asteSignal" target="ats-aste" message="ASTE finished">
         <hlm:targetCondition>
-            <hlm:hasSeverity severity="error" file="${build.signal.status.dir}/${build.id}_ats.log.status.xml" />
+            <hlm:hasSeverity severity="error" file="${build.signal.status.dir}/${build.id}_aste.log.status.xml" />
         </hlm:targetCondition>
         <signalNotifierInput>
             <signalInput refid="atsSignalInput" />
-            <notifierInput file = "${build.signal.status.dir}/${build.id}_ats.log.status.html" />
+            <notifierInput>
+                <fileset dir="${build.log.dir}" >
+                    <include name="**/${build.id}_aste*" />
+                </fileset>
+            </notifierInput>
         </signalNotifierInput>
     </hlm:signalListenerConfig>
 
     <hlm:signalListenerConfig id="mattiSignal" target="matti-test" message="ATS MATTI creation finished">
         <targetCondition>
-            <hlm:hasSeverity severity="error" file="${build.signal.status.dir}/${build.id}_ats.log.status.xml" />
+            <hlm:hasSeverity severity="error" file="${build.signal.status.dir}/${build.id}_matti.log.status.xml" />
         </targetCondition>
         <signalNotifierInput>
             <signalInput refid="atsSignalInput" />
-            <notifierInput file = "${build.signal.status.dir}/${build.id}_ats.log.status.html" />
+            <notifierInput>
+                <fileset dir="${build.log.dir}" >
+                    <include name="**/${build.id}_matti*" />
+                </fileset>
+            </notifierInput>
         </signalNotifierInput>
     </hlm:signalListenerConfig>
 
@@ -308,11 +353,18 @@ Description:
 
     <hlm:signalListenerConfig id="signalValidatePolicyInvalidOrMissing" target="render-validate-policy" message="Policy file validation">
         <targetCondition>
-            <hlm:hasSeverity severity="error" file="${build.signal.status.dir}/${build.id}_validate_policy.log.status.xml" />
+            <hlm:hasSeverity severity="error" file="${build.signal.status.dir}/${build.id}_validate-policy.summary.status.xml" />
         </targetCondition>
         <signalNotifierInput>
             <signalInput refid="signalValidatePolicyInvalidOrMissingInput" />
-            <notifierInput file = "${build.signal.status.dir}/${build.id}_validate_policy.log.status.html" />
+            <notifierInput>
+                <fileset dir="${build.log.dir}" >
+                    <include name="**/${build.id}_validate-policy*" />
+                </fileset>
+                <fileset dir="${build.log.dir}" >
+                    <include name="**/${build.id}_validate-policy*" />
+                </fileset>
+            </notifierInput>
         </signalNotifierInput>
     </hlm:signalListenerConfig>
 
@@ -331,11 +383,19 @@ Description:
         </targetCondition>
         <signalNotifierInput>
             <signalInput refid="getenvSignalInput" />
-            <notifierInput file = "${build.signal.status.dir}/${build.id}_getenv.log.status.html" />
+            <notifierInput>
+                <fileset dir="${build.log.dir}" >
+                    <include name="**/${build.id}_getenv*" />
+                </fileset>
+            </notifierInput>
         </signalNotifierInput>
     </hlm:signalListenerConfig>
 
     <hlm:signalInput id="signalConfigureQtInput" failbuild="defer">
+        <hlm:notifierListRef refid="defaultFailNotifier" />
+    </hlm:signalInput>
+
+    <hlm:signalInput id="exceptionSignalInput" failbuild="defer">
         <hlm:notifierListRef refid="defaultFailNotifier" />
     </hlm:signalInput>
 
@@ -345,16 +405,13 @@ Description:
         </targetCondition>
         <signalNotifierInput>
             <signalInput refid="signalConfigureQtInput" />
-            <notifierInput file = "${build.signal.status.dir}/${qt.configure.log.name}.status.html" />
+            <notifierInput>
+                <fileset dir="${build.log.dir}" >
+                    <include name="**/${qt.configure.log.name}*" />
+                </fileset>
+            </notifierInput>
         </signalNotifierInput>
     </hlm:signalListenerConfig>
-
-    <!-- Signal configuration for a signal sent when the build fails completely. -->
-    <hlm:signalInput id="buildExceptionSignalInput" failbuild="never">
-        <hlm:notifierListRef refid="defaultFailNotifier"/>
-    </hlm:signalInput>
-
-    <property name="signals.buildexception.signalinput" value="buildExceptionSignalInput"/>
 
     <hlm:signalInput id="signalRunQMakeInput" failbuild="defer">
         <hlm:notifierListRef refid="defaultFailNotifier" />
@@ -366,12 +423,16 @@ Description:
 
     <hlm:signalListenerConfig id="sisFilesSignal" target="sisfiles" message="sisfiles finished">
         <hlm:targetCondition>
-            <hlm:hasSeverity severity="error" file="${build.signal.status.dir}/${build.id}_sisfiles.log.status.xml"  />
+            <hlm:hasSeverity severity="error" file="${build.signal.status.dir}/${build.id}_sisfiles.log.status.xml" 
+ />
         </hlm:targetCondition>
         <signalNotifierInput>
             <signalInput refid="sisfilesSignalInput" />
-            <notifierInput file = "${build.signal.status.dir}/${build.id}_sisfiles.log.status.html" />
+            <notifierInput>
+                <fileset dir="${build.log.dir}" >
+                    <include name="**/${build.id}_sisfiles*" />
+                </fileset>
+            </notifierInput>
         </signalNotifierInput>
     </hlm:signalListenerConfig>
-
 </project>

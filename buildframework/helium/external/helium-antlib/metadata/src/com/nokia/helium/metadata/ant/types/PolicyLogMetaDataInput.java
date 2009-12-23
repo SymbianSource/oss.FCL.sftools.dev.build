@@ -46,11 +46,18 @@ public class PolicyLogMetaDataInput extends XMLLogMetaDataInput {
     
     private Map<String, String> currentAttributeMap;
     
-    
+
+    /**
+     * Constructor
+     */
     public PolicyLogMetaDataInput() {
     }
     
 
+    /**
+     * Helper function to return the attributes of the stream reader
+     * @returns the attributes as a map.
+     */
     private Map<String, String> getAttributes(XMLStreamReader streamReader) {
         int count = streamReader.getAttributeCount() ;
         if (count > 0 ) {
@@ -65,16 +72,24 @@ public class PolicyLogMetaDataInput extends XMLLogMetaDataInput {
     }
 
    
-    
+    /**
+     * Function to process the start event of xml stream callback.
+     * @param streamReader: the input stream reader which contains the xml data to be parsed for recording data.
+     * @return true if there are any element to be added to the database.
+     */
     boolean startElement (XMLStreamReader streamReader) {
         String tagName = streamReader.getLocalName();
-        //log.debug("startElement: " + tagName);
         if (tagName.equalsIgnoreCase("error")) {
             currentAttributeMap = getAttributes(streamReader);
         }
         return false;
     }
 
+    /**
+     * Function to process the end event of xml stream callback.
+     * @param streamReader: the input stream reader which contains the xml data to be parsed for recording data.
+     * @return true if there are any element to be added to the database.
+     */
     boolean endElement(XMLStreamReader streamReader) throws Exception {
         boolean retValue = false;
         try {
@@ -111,7 +126,11 @@ public class PolicyLogMetaDataInput extends XMLLogMetaDataInput {
         }
         return retValue;
     }
-
+    
+     /* Function to process the characters event of xml stream callback.
+     * @param streamReader: the input stream reader which contains the xml data to be parsed for recording data.
+     * @return true if there are any element to be added to the database.
+     */
     boolean characters (XMLStreamReader streamReader) {
         return false;
     }

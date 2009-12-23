@@ -135,6 +135,10 @@ def handle_configuration(project, task, elements, attributes, configuration,  co
 
     configs = imaker.api.scan_configs(includes, excludes)
     targets = {}
+    if len(configs) == 0:
+        for inc in includes:
+            task.log("WARNING: Could not find configurations to build roms for '%s'" % inc)
+        
     for config in configs:
         task.log("Configuration: %s" % config)
         if config not in targets:

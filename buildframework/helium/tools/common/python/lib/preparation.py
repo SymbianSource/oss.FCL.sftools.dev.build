@@ -170,6 +170,7 @@ class PreparationCheckout(PreparationAction):
     def __init__(self, config, builder):
         """ Initialization. """
         PreparationAction.__init__(self, config, builder)
+        self.__role = None
 
     def check(self):
         """ Checks if all synergy resources are available. """
@@ -236,26 +237,33 @@ class PreparationCheckout(PreparationAction):
                 _logger.info("Using version: '%s'" % version)
 
             try:
+                self.__setRole(session)
                 result = project.checkout(session.create(self._config['release']), version=version, purpose=purpose)
                 ccm.log_result(result, ccm.CHECKOUT_LOG_RULES, _logger)
             except ccm.CCMException, exc:
                 ccm.log_result(exc.result, ccm.CHECKOUT_LOG_RULES, _logger)
                 raise exc
+            finally:
+                self.__restoreRole(session)
             _logger.info('Checkout complete')
             
             if result.project != None and result.project.exists():                
                 _logger.info("Project checked out: '%s'" % result.project)
                 
-                
-                _logger.info("Maintaining the workarea...")
-                if self.get_threads() == 1:
-                    _logger.info(result.project.work_area(True, True, True, self._config['dir'], result.project.name))
-                else:
-                    #pool = self._builder.session(self._config['database'], self.get_threads())
-                    _logger.info(ccm.extra.FastMaintainWorkArea(result.project, self._config['dir'], result.project.name, self.get_threads()))
+                try:
+                    self.__setRole(session)
+                    _logger.info("Maintaining the workarea...")
+                    if self.get_threads() == 1:
+                        output = result.project.work_area(True, True, True, self._config['dir'], result.project.name)
+                    else:
+                        output = ccm.extra.FastMaintainWorkArea(result.project, self._config['dir'], result.project.name, self.get_threads())
+                    ccm.log_result(output, ccm.CHECKOUT_LOG_RULES, _logger)
+                finally:
+                    self.__restoreRole(session)
                 self.__setup_project(project, result.project)
             else:
                 raise Exception("Error checking out '%s'" % project)
+
         _logger.info("++ Finished at %s" % time.strftime("%H:%M:%S", time.localtime()))
 
     def __find_project(self, project):
@@ -278,14 +286,30 @@ class PreparationCheckout(PreparationAction):
                 fileutils.rmtree(os.path.dirname(path))
             return None
 
-    def __setup_project(self, project, coproject):
-        """ Private method. """
-        session = self.get_session()
-        role = session.role
+    def __setRole(self, session):
+        """ Updating the role of a session. """
+        self.__role = session.role
         if self._config.has_key('purpose'):
             co_role = ccm.get_role_for_purpose(session, self._config['purpose'])
             _logger.info("Switching user to role: %s" % co_role)
             session.role = co_role
+            _logger.info("Switched user to role: %s" % session._get_role())
+
+    
+    def __restoreRole(self, session):
+        """ Restoring to default user role. """
+        if self.__role:
+            _logger.info("Switching user to role: %s" % self.__role)
+
+            session.role = self.__role
+            self.__role = None
+            _logger.info("Switched user to role: %s" % session._get_role())
+
+            
+    def __setup_project(self, project, coproject):
+        """ Private method. """
+        session = self.get_session()
+        self.__setRole(session)
         
         newprojs = []
         if not self._config.get_boolean('use.reconfigure.template', False):
@@ -335,8 +359,7 @@ class PreparationCheckout(PreparationAction):
         # Running check conflicts
         self._check_conflicts(coproject)
         
-        _logger.info("Switching user to role: %s" % role)
-        session.role = role
+        self.__restoreRole(session)
 
     def _sync(self, coproject):
         """ Run the sync if the 'sync' property is defined to true in the 

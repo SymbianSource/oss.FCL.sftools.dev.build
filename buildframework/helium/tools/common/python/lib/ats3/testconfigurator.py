@@ -98,7 +98,7 @@ class Ats3ComponentParser(object):
         src_dst = []
         pmd_files = []
         trace_activation_files = []
-
+        
         if not os.path.exists( self.tsrc_dir ):
             _logger.error("Missing test source directory: %s", self.tsrc_dir)
         else:
