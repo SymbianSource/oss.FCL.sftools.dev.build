@@ -1,7 +1,7 @@
 
 Release Notes for Symbian Build System v2
 
-version 2.x.x
+version 2.11.3
 
 Defect Fixes:
 Fix for: filter terminal flags up when recipe truncated
