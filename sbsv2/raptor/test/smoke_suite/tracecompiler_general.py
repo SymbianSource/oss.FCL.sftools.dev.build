@@ -1,12 +1,12 @@
 
-from raptor_tests import SmokeTest
+from raptor_tests import CheckWhatSmokeTest
 from raptor_tests import AntiTargetSmokeTest
 
 def run():
-	result = SmokeTest.PASS
+	result = CheckWhatSmokeTest.PASS
 	failed = []
 
-	t = SmokeTest()
+	t = CheckWhatSmokeTest()
 	t.description = "Testcases (ID 0101a - 0101d) test trace compiler"
 	# General test for trace compiler, which generates
 	# 1. trace headers like <source>Traces.h
@@ -49,11 +49,15 @@ def run():
 		"testtc_dll/armv5/urel/testTC{000a0000}.def",
 		"testtc_dll/tracecompile_testTC_1000008d.done"
 	])
+	t.stdout = [
+		"<build>$(EPOCROOT)/epoc32/OST_Dictionaries/testTC_0x1000008d_Dictionary.xml</build>",
+		"<build>$(EPOCROOT)/epoc32/include/internal/SymbianTraces/autogen/testTC_0x1000008d_TraceDefinitions.h</build>"
+		]		
 	# Trace compiler doesn't work on Linux for time being. Once it's fixed, will apply all 
 	# trace compiler tests to linux as well.
 	t.run("windows")
-	if t.result == SmokeTest.FAIL:
-		result = SmokeTest.FAIL
+	if t.result == CheckWhatSmokeTest.FAIL:
+		result = CheckWhatSmokeTest.FAIL
 		failed.append(t.name)
 
 	# General CLEAN test for trace compiler outputs
@@ -70,11 +74,11 @@ def run():
 		"testtc_dll/tracecompile_testTC_1000008d.done"
 	])
 	t.run("windows")
-	if t.result == SmokeTest.FAIL:
-		result = SmokeTest.FAIL
+	if t.result == CheckWhatSmokeTest.FAIL:
+		result = CheckWhatSmokeTest.FAIL
 		failed.append(t.name)
 		
-	t = SmokeTest()
+	t = CheckWhatSmokeTest()
 	t.id = "101c"
 	t.name = "TC_bv_path"
 	t.command = "sbs -b smoke_suite/test_resources/tracecompiler/TC_featurevariant/group/bld.inf -c armv5.tracecompiler" 
@@ -97,16 +101,20 @@ def run():
 		"helloworld_exe/armv5/urel/HelloWorld_urel_objects.via",
 		"helloworld_exe/tracecompile_HelloWorld_e78a5aa3.done"
 	])
+	t.stdout = [
+		"<build>$(EPOCROOT)/epoc32/OST_Dictionaries/HelloWorld_0xe78a5aa3_Dictionary.xml</build>",
+		"<build>$(EPOCROOT)/epoc32/include/internal/SymbianTraces/autogen/HelloWorld_0xe78a5aa3_TraceDefinitions.h</build>"
+		]		
 	t.run("windows")
-	if t.result == SmokeTest.FAIL:
-		result = SmokeTest.FAIL
+	if t.result == CheckWhatSmokeTest.FAIL:
+		result = CheckWhatSmokeTest.FAIL
 		failed.append(t.name)
 	
 	# 101d-101f test trace compiler auto mechanism, which is used to avoid wasting time on source 
 	# containing no osttraces.
 	# Trace compiler only runs when there are osttraces code in source. Raptor decides this by
 	# checking whether there is a "traces" or "traces_<prj_name>" folder in USERINCLUDE in a mmp file. 
-	t = SmokeTest()
+	t = CheckWhatSmokeTest()
 	t.id = "101d"
 	t.name = "TC_autorun1"
 	# Run - USERINCLUDE ../traces_autorun1
@@ -122,8 +130,8 @@ def run():
 		"test_/tracecompile_autorun1_00000001.done"
 	])
 	t.run("windows")
-	if t.result == SmokeTest.FAIL:
-		result = SmokeTest.FAIL
+	if t.result == CheckWhatSmokeTest.FAIL:
+		result = CheckWhatSmokeTest.FAIL
 		failed.append(t.name)
 	
 	t = AntiTargetSmokeTest()
@@ -146,8 +154,8 @@ def run():
 		"test_/tracecompile_autorun2_00000001.done"
 	])
 	t.run("windows")
-	if t.result == SmokeTest.FAIL:
-		result = SmokeTest.FAIL
+	if t.result == CheckWhatSmokeTest.FAIL:
+		result = CheckWhatSmokeTest.FAIL
 		failed.append(t.name)
 
 	t = AntiTargetSmokeTest()
@@ -170,8 +178,8 @@ def run():
 		"test_/tracecompile_autorun3_00000001.done"
 	])
 	t.run("windows")
-	if t.result == SmokeTest.FAIL:
-		result = SmokeTest.FAIL
+	if t.result == CheckWhatSmokeTest.FAIL:
+		result = CheckWhatSmokeTest.FAIL
 		failed.append(t.name)
 
 	# Test trace compiler doesn't run when it is switched off
@@ -194,8 +202,8 @@ def run():
 		"test_/tracecompile_autorun1_00000001.done"
 	])
 	t.run("windows")
-	if t.result == SmokeTest.FAIL:
-		result = SmokeTest.FAIL
+	if t.result == CheckWhatSmokeTest.FAIL:
+		result = CheckWhatSmokeTest.FAIL
 		failed.append(t.name)
 	
 
@@ -203,7 +211,7 @@ def run():
 	t.result = result
 
 	print "\nOverall Result : " + result.upper() + "\n"
-	if result == SmokeTest.FAIL:
+	if result == CheckWhatSmokeTest.FAIL:
 		print len(failed), "tests failed:"
 		for x in failed:
 			print x
