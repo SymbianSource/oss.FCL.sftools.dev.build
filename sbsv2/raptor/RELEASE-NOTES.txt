@@ -4,6 +4,7 @@ Release Notes for Symbian Build System v2
 version 2.11.3
 
 Defect Fixes:
+DPDEF142616 Raptor: Variables can be set unnecessarily prior to TEM execution
 Fix for: filter terminal flags up when recipe truncated
 SF bug 170: invalid XML output when a zip file is missing
 SF bug 518: unpaged keyword in mmp files is not parsed properly
