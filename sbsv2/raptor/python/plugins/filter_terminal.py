@@ -105,7 +105,7 @@ class FilterTerminal(filter_interface.Filter):
 
 	attribute_re = re.compile("([a-z][a-z0-9]*)='([^']*)'",re.I)
 	maxdots = 40 # if one prints dots then don't print masses
-	recipelinelimit = 200 # don't scan ultra-long recipes in case we run out of memory
+	recipelinelimit = 1024 # don't scan ultra-long recipes in case we run out of memory
 
 	# recipes that we think most users are interested in
 	# and the mapping that we will use to output them as
@@ -282,6 +282,7 @@ class FilterTerminal(filter_interface.Filter):
 			# This variable holds all recipe information
 			self.failed = False # Recipe status
 			self.recipeBody = []
+			self.recipelineExceeded = 0
 			return		
 		elif text.startswith("</recipe>"):
 			# detect the end of a recipe
@@ -311,7 +312,7 @@ class FilterTerminal(filter_interface.Filter):
 					r = Recipe.factory(self.recipe_dict['name'], "".join(self.recipeBody))
 					warnings = r.warnings()
 					info = r.info()
-					if len(warnings) > 0:
+					if len(warnings) or len(info):
 						if not self.analyseonly:
 							for L in self.recipeBody:
 								if not L.startswith('+'):
@@ -336,6 +337,11 @@ class FilterTerminal(filter_interface.Filter):
 		elif text.startswith("]]>"):
 			if self.inRecipe:
 				self.inBody = False
+				if self.recipelineExceeded > 0:
+					self.recipeBody.append("[filter_terminal: OUTPUT TRUNCATED: " + \
+						"Recipe output limit exceeded; see logfile for full output " + \
+						"(%s lines shown out of %s)]" % (FilterTerminal.recipelinelimit, \
+						FilterTerminal.recipelinelimit + self.recipelineExceeded))
 		elif text.startswith("<info>Copied"):
 			if not self.analyseonly and not self.quiet:
 				start = text.find(" to ") + 4
@@ -365,8 +371,11 @@ class FilterTerminal(filter_interface.Filter):
 			# we have to keep the output until we find out
 			# if the recipe failed. But not all of it if it turns
 			# out to be very long
-			if len(self.recipeBody) < FilterTerminal.recipelinelimit:
+			if len(self.recipeBody) <= FilterTerminal.recipelinelimit:
 				self.recipeBody.append(text)
+			else:
+				self.recipelineExceeded += 1
+
 
 	def logit(self):
 		""" log a message """

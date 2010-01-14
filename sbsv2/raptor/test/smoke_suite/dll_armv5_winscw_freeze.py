@@ -86,6 +86,22 @@ sbs -b smoke_suite/test_resources/unfrozen/freeze.inf -p unfrozensymbols_for_fre
 			
 	t.run()
 	
+
+	t.id = "0012d"
+	t.name = "efreeze_info"
+	
+	t.command = "sbs -b smoke_suite/test_resources/unfrozen/freeze.inf" \
+			+ " -p unfrozensymbols_for_freeze.mmp -c winscw freeze"
+			
+	t.mustmatch = [
+		"EFREEZE: DEF file up to date"
+	]
+	t.warnings = 0
+	t.errors = 0
+			
+	t.run()
+
+
 	t.id = "12"
 	t.name = "dll_armv5_winscw_freeze"
 	t.print_result()
