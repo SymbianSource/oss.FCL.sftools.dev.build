@@ -11,6 +11,16 @@ New (experimental) FilterWhatComp filter.  Simulates abld log output for use wit
 New graphical build visualisation tool (bin/timelines.py). Requires pygame and PyOpenGL. 
 New a log analyser for recording the total time spent in each type of recipe in the build (recipestats.py). 
 
+
+version 2.11.3
+
+Defect Fixes:
+DPDEF142616 Raptor: Variables can be set unnecessarily prior to TEM execution
+Fix for: filter terminal flags up when recipe truncated
+SF bug 170: invalid XML output when a zip file is missing
+SF bug 518: unpaged keyword in mmp files is not parsed properly
+
+
 version 2.11.2
 
 Defect Fixes:
