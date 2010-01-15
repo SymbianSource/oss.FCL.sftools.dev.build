@@ -43,6 +43,7 @@
 		<param name='OPT.l'/>
 		<param name='STATICLIBRARY'/>
 		<param name='TARGETTYPE' default="EXE"/>
+		<param name='LINKER_OPTIONS' default=''/>	
 	</interface>
 
 	<interface name="Tools.lib" extends="Tools.common" flm="tools2lib.flm">
