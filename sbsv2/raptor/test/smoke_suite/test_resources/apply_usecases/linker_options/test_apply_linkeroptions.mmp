@@ -3,5 +3,5 @@ TARGETTYPE      EXE
 
 SOURCE          test_apply_linkeroptions.cpp
 
-// Link to mingw libs: some_mingw_lib 
+// Link to mingw libs: libwsock32.a 
 APPLY		apply_tools2_linker_options
