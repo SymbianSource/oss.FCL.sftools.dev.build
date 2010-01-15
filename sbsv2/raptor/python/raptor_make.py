@@ -470,15 +470,18 @@ include %s
 					makeenv['TALON_BUILDID']=str(self.buildID)
 					makeenv['TALON_TIMEOUT']=str(self.talontimeout)
 				if self.raptor.filesystem == "unix":
-					p = subprocess.Popen(command, bufsize=65535,
-									     stdout=subprocess.PIPE,
-									     stderr=subprocess.STDOUT,
-									     close_fds=True, env=makeenv, shell=True)
+					p = subprocess.Popen([command], bufsize=65535,
+						stdout=subprocess.PIPE,
+						stderr=subprocess.STDOUT,
+						close_fds=True, env=makeenv, shell=True)
 				else:
-					p = subprocess.Popen(command, bufsize=65535,
-									     stdout=subprocess.PIPE,
-									     stderr=subprocess.STDOUT,
-									     universal_newlines=True, env=makeenv)
+					p = subprocess.Popen(args = 
+						[raptor_data.ToolSet.shell, '-c', command, '2>' + makefile+'.stderr'],
+						bufsize=65535,
+						stdout=subprocess.PIPE,
+						stderr=subprocess.STDOUT,
+						shell = False,
+						universal_newlines=True, env=makeenv)
 				stream = p.stdout
 
 
