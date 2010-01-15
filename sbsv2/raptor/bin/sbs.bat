@@ -43,7 +43,11 @@
 @IF "%__CYGWIN__%"=="" SET __CYGWIN__=%SBS_HOME%\win32\cygwin
 
 @REM add to the search path
-@SET PATH=%__MINGW__%\bin;%__CYGWIN__%\bin;%SBS_HOME%\win32\bin;%PATH%
+@REM (make sure that we don't get into trouble if there are Path and PATH variables)
+@SET PATH_TEMP=%__MINGW__%\bin;%__CYGWIN__%\bin;%SBS_HOME%\win32\bin;%PATH%
+@SET PATH=
+@SET PATH=%PATH_TEMP%
+@SET PATH_TEMP=
 
 @REM Make sure that /tmp is not set incorrectly for sbs
 @umount -u /tmp >NUL  2>NUL
