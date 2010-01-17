@@ -52,7 +52,7 @@ endif
 define tools2linkexe
 $(EXETARGET): $(OBJECTFILES) $(STATICLIBS)
 	$(call startrule,tools2linkexe) \
-	$(LINKER) $(CFLAGS) $(LFLAGS) $(OPT.O)"$(EXETARGET)" $(call dblquote,$(OBJECTFILES)) $(LLIBS) \
+	$(LINKER) $(CFLAGS) $(LFLAGS) $(OPT.O)"$(EXETARGET)" $(call dblquote,$(OBJECTFILES)) $(LLIBS) $(LINKER_OPTIONS) \
 	$(if $(SAVESPACE),; $(GNURM) -rf $(OUTPUTPATH); true,) \
 	$(call endrule,tools2linkexe)
 
