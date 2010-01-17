@@ -61,22 +61,29 @@ try:
 	the_raptor.out.open(raptor_params, the_raptor.filterList.split(','), pbox)
 	
 except Exception, e:
-	sys.stderr.write("filter exception: %s\n" % str(e))
+	sys.stderr.write("error: problem while creating filters %s\n" % str(e))
 	traceback.print_exc()
 	sys.exit(1)
 		
 # read stdin a line at a time and pass it to the Raptor object
-line = " "
-while line:
-	line = sys.stdin.readline()
-	the_raptor.out.write(line)
+try:
+	line = " "
+	while line:
+		line = sys.stdin.readline()
+		the_raptor.out.write(line)
+except:
+	sys.stderr.write("error: problem while filtering: %s\n" % str(e))
+	traceback.print_exc()
+	sys.exit(1)
 
-# from Raptor.CloseLog()
-if not the_raptor.out.summary():
-	the_raptor.errorCode = 1
+the_raptor_errorCode = 0
+
+# Print the summary (this can't return errors)
+the_raptor.out.summary()
 	
 if not the_raptor.out.close():
-	the_raptor.errorCode = 1
+	print "BADCLOSE"
+	the_raptor.errorCode = 2
 	
 # return the error code
 sys.exit(the_raptor.errorCode)

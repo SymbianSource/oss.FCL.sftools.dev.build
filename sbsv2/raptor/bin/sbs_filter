@@ -78,6 +78,7 @@ fi
 
 FILTER_START="$SBS_HOME/bin/sbs_filter.py"
 
+STATE=0
 if [ -e "$FILTER_START" ]; then
 	# run the source version
 	${__PYTHON__} "$FILTER_START" "$@"
@@ -88,3 +89,4 @@ else
 	echo "Cannot start sbs_filter - $FILTER_START not found." 1>&2
 	echo "Check your SBS_HOME environment variable." 1>&2
 fi
+
