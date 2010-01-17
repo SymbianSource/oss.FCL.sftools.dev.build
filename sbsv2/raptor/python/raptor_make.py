@@ -30,6 +30,8 @@ import time
 from raptor_makefile import *
 import traceback
 import sys
+from xml.sax.saxutils import escape
+
 
 # raptor_make module classes
 
@@ -403,7 +405,7 @@ include %s
 			command = self.buildCommand
 
 			if self.makefileOption:
-				command += " " + self.makefileOption + " " + '"' + str(makefile) + '"'
+				command += " " + self.makefileOption + " " + ' "' + str(makefile) + '" '
 
 			if self.raptor.keepGoing and self.keepGoingOption:
 				command += " " + self.keepGoingOption
@@ -416,7 +418,13 @@ include %s
 			command += " " + self.defaultMakeOptions
 			# Can supply options on the commandline to override default settings.
 			if len(self.raptor.makeOptions) > 0:
-				command += " " + " ".join(self.raptor.makeOptions)
+				for o in self.raptor.makeOptions:
+					if o.find(";") != -1:
+						command += "  " + "'" + o + "'"
+					elif o.find("\\") != -1:
+						command += "  " + o.replace("\\","\\\\")
+					else:
+						command += "  " + o
 
 			# Switch off dependency file including?
 			if self.raptor.noDependInclude:
@@ -449,6 +457,11 @@ include %s
 			if addTargets:
 				command += " " + " ".join(addTargets)
 
+			# Send stderr to a file so that it can't mess up the log (e.g.
+			# clock skew messages from some build engines.
+			stderrfilename = makefile+'.stderr'
+			command += " 2>'%s' " % stderrfilename
+
 			# Substitute the makefile name for any occurrence of #MAKEFILE#
 			command = command.replace("#MAKEFILE#", str(makefile))
 
@@ -469,6 +482,7 @@ include %s
 					makeenv['TALON_SHELL']=self.talonshell
 					makeenv['TALON_BUILDID']=str(self.buildID)
 					makeenv['TALON_TIMEOUT']=str(self.talontimeout)
+
 				if self.raptor.filesystem == "unix":
 					p = subprocess.Popen([command], bufsize=65535,
 						stdout=subprocess.PIPE,
@@ -476,7 +490,7 @@ include %s
 						close_fds=True, env=makeenv, shell=True)
 				else:
 					p = subprocess.Popen(args = 
-						[raptor_data.ToolSet.shell, '-c', command, '2>' + makefile+'.stderr'],
+						[raptor_data.ToolSet.shell, '-c', command],
 						bufsize=65535,
 						stdout=subprocess.PIPE,
 						stderr=subprocess.STDOUT,
@@ -489,6 +503,14 @@ include %s
 				while line:
 					line = stream.readline()
 					self.raptor.out.write(line)
+
+				try:
+					e = open(stderrfilename,"r")
+					for line in e:
+						self.raptor.out.write(escape(line))
+					e.close()
+				except Exception,e:
+					self.raptor.Error("Couldn't complete stderr output for %s - '%s'", str(e), command)
 
 				# should be done now
 				returncode = p.wait()
