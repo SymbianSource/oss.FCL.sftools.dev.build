@@ -62,7 +62,7 @@ try:
 	
 except Exception, e:
 	sys.stderr.write("filter exception: %s\n" % str(e))
-	traceback.print_ex()
+	traceback.print_exc()
 	sys.exit(1)
 		
 # read stdin a line at a time and pass it to the Raptor object

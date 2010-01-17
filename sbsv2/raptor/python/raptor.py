@@ -58,12 +58,15 @@ hostplatform_dir = os.environ["HOSTPLATFORM_DIR"]
 # defaults can use EPOCROOT
 
 if "EPOCROOT" in os.environ:
-        epocroot = os.environ["EPOCROOT"].replace("\\","/")
+	incoming_epocroot = os.environ["EPOCROOT"]
+        epocroot = incoming_epocroot.replace("\\","/")
 else:
 	if 'linux' in hostplatform:
 		epocroot=os.environ['HOME'] + os.sep + "epocroot"
 		os.environ["EPOCROOT"] = epocroot
+		incoming_epocroot = epocroot
 	else:
+		incoming_epocroot = "\\"
 		epocroot = "/"
 		os.environ["EPOCROOT"] = os.sep
 
@@ -1334,6 +1337,8 @@ class Raptor(object):
 class BuildStats(object):
 
 	def __init__(self, raptor_instance):
+		self.incoming_epocroot = incoming_epocroot
+		self.epocroot = epocroot
 		self.logFileName = raptor_instance.logFileName
 		self.quiet = raptor_instance.quiet
 		self.doCheck = raptor_instance.doCheck
