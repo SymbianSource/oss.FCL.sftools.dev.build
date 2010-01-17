@@ -418,7 +418,13 @@ include %s
 			command += " " + self.defaultMakeOptions
 			# Can supply options on the commandline to override default settings.
 			if len(self.raptor.makeOptions) > 0:
-				command += " " + " ".join(self.raptor.makeOptions)
+				for o in self.raptor.makeOptions:
+					if o.find(";") != -1:
+						command += "  " + "'" + o + "'"
+					elif o.find("\\") != -1:
+						command += "  " + o.replace("\\","\\\\")
+					else:
+						command += "  " + o
 
 			# Switch off dependency file including?
 			if self.raptor.noDependInclude:
@@ -454,7 +460,7 @@ include %s
 			# Send stderr to a file so that it can't mess up the log (e.g.
 			# clock skew messages from some build engines.
 			stderrfilename = makefile+'.stderr'
-			command += ' 2>"%s"' % stderrfilename
+			command += " 2>'%s' " % stderrfilename
 
 			# Substitute the makefile name for any occurrence of #MAKEFILE#
 			command = command.replace("#MAKEFILE#", str(makefile))
