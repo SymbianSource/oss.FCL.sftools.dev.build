@@ -23,7 +23,7 @@ import filter_interface
 class FilterWhat(filter_interface.Filter):
 
 	def __init__(self):
-		super(filter_interface.Filter,self).__init__(self)
+		super(filter_interface.Filter,self).__init__()
 		self.path_prefix_to_strip = None
 		self.path_prefix_to_add_on = None
 	
