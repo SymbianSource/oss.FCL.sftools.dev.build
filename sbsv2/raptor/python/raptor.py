@@ -59,7 +59,7 @@ hostplatform_dir = os.environ["HOSTPLATFORM_DIR"]
 
 if "EPOCROOT" in os.environ:
 	incoming_epocroot = os.environ["EPOCROOT"]
-        epocroot = incoming_epocroot.replace("\\","/")
+	epocroot = incoming_epocroot.replace("\\","/")
 else:
 	if 'win' in hostplatform:
 		incoming_epocroot = os.sep
