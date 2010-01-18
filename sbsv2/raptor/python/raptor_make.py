@@ -419,10 +419,8 @@ include %s
 			# Can supply options on the commandline to override default settings.
 			if len(self.raptor.makeOptions) > 0:
 				for o in self.raptor.makeOptions:
-					if o.find(";") != -1:
+					if o.find(";") != -1 or  o.find("\\") != -1:
 						command += "  " + "'" + o + "'"
-					elif o.find("\\") != -1:
-						command += "  " + o.replace("\\","\\\\")
 					else:
 						command += "  " + o
 
