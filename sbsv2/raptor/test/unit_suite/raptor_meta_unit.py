@@ -256,18 +256,23 @@ class TestRaptorMeta(unittest.TestCase):
 	
 	def __testExport(self, aExportObject, aSource, aDestination, aAction):			
 		self.assertEquals(aExportObject.getSource(), aSource)
-		self.assertEqualsOrContains(aExportObject.getDestination(), aDestination)
+		self.assertEqualsOrContainsPath(aExportObject.getDestination(), aDestination)
 		self.assertEquals(aExportObject.getAction(), aAction)
 	
-	def assertEqualsOrContains(self, aPathStringOrPathStringList, aPathString):
-		# If aPathStringOrPathStringList is a list, which it might well be, we should
+	def assertEqualsOrContainsPath(self, aRequirement, aCandidate):
+		# If aRequirement is a list, which it might well be, we should
 		# assert that aPathString is contained in it
-		# If aPathStringOrPathStringList is not a list, it will be a string, and 
+		# If aRequirement not a list, it will be a string, and 
 		# we should assert equality of the strings
-		if isinstance(aPathStringOrPathStringList, list):
-			self.assert_(aPathString in aPathStringOrPathStringList)
+		# On windows we shouldn't care about the case of the drive letter.
+
+		if isinstance(aRequirement, list):
+			pathsequal = False
+			for r in aRequirement:
+				pathsequal = path_compare_notdrivelettercase(r,aCandidate) or pathsequal
+			self.assertTrue(pathsequal)
 		else:
-			self.assertEquals(aPathStringOrPathStringList, aPathString)
+			self.assertTrue(path_compare_notdrivelettercase(aRequirement,aCandidate))
 		
 	def testBldInfExports(self):
 		bldInfTestRoot = self.__testRoot.Append('metadata/project/bld.infs')
@@ -646,10 +651,8 @@ class TestRaptorMeta(unittest.TestCase):
 				m.deffile = self.deffilekeyword
 				m.nostrictdef = self.nostrictdef
 				f = m.resolveDefFile(self.target, self.platform)
-				del m
-				if self.resolveddeffile == f:
-					return True
-				return False
+				
+				return path_compare_notdrivelettercase(self.resolveddeffile,f)
 		
 		defFileTests = []
 		
@@ -734,7 +737,8 @@ class TestRaptorMeta(unittest.TestCase):
 				])
 		
 		for t in defFileTests:
-			self.assertEquals(t.test(self.raptor), True)
+			result = t.test(self.raptor)
+			self.assertEquals(result, True)
 	
 	def dummyMetaReader(self):
 		"make raptor_meta.MetaReader.__init__ into a none operation"
@@ -841,6 +845,16 @@ class TestRaptorMeta(unittest.TestCase):
 			self.assertEquals(moduleName, result["result"])
 
 		self.restoreMetaReader()
+
+
+def path_compare_notdrivelettercase(aRequirement, aCandidate):
+	if sys.platform.startswith("win"):
+		if aRequirement[1] == ":":
+			aRequirement = aRequirement[0].lower() + aRequirement[1:]
+			aCandidate = aCandidate[0].lower() + aCandidate[1:]
+
+	return aRequirement == aCandidate
+
 		
 # run all the tests
 
