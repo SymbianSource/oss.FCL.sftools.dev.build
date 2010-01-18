@@ -81,7 +81,7 @@ ARMV7BUILD:=
 # to be target specific to the unique targets
 # that we have created.
 
-UNIQ:=$(TEMPLATE_EXTENSION_MAKEFILE)$(PLATFORM)$(TO_ROOT)$(TO_BLDINF)$(EPOCBLD)$(EXTENSION_ROOT)$(TEMCOUNT)
+UNIQ:=$(TEMPLATE_EXTENSION_MAKEFILE)$(VARIANTPLATFORM)$(TO_ROOT)$(TO_BLDINF)$(EPOCBLD)$(EXTENSION_ROOT)$(TEMCOUNT)
 UNIQ:=$(word 1,$(shell echo $(UNIQ) | $(GNUMD5SUM)))
 
 # Work out the other FINAL target if we're building both udeb and urel
