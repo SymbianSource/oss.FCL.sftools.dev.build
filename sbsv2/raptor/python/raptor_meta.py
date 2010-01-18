@@ -2449,7 +2449,8 @@ class MetaReader(object):
 			key = str(detail['VARIANT_HRH']) \
 			 	+ str(detail['EPOCROOT']) \
 		    	+ detail['SYSTEMINCLUDE'] \
-		    	+ detail['PLATFORM']
+		    	+ detail['PLATFORM'] \
+		    	+ detail['PLATMACROS']
 
 		    # Keep a short version of the key for use in filenames.
 			uniq = hashlib.md5()
@@ -2485,11 +2486,7 @@ class MetaReader(object):
 			# Is this an unseen build platform?
 			# concatenate all the values we care about in a fixed order
 			# and use that as a signature for the platform.
-			items = ['PLATFORM', 'EPOCROOT', 'VARIANT_HRH', 'SYSTEMINCLUDE', 'TESTCODE']
-			if raptor_utilities.getOSPlatform().startswith("win"):
-				items.append('PLATMACROS.WINDOWS')
-			else:
-				items.append('PLATMACROS.LINUX')
+			items = ['PLATFORM', 'PLATMACROS', 'EPOCROOT', 'VARIANT_HRH', 'SYSTEMINCLUDE', 'TESTCODE']
 
 			items.extend(interfaces)
 			platform = ""
