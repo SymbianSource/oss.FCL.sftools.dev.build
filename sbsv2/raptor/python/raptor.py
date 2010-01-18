@@ -61,14 +61,14 @@ if "EPOCROOT" in os.environ:
 	incoming_epocroot = os.environ["EPOCROOT"]
         epocroot = incoming_epocroot.replace("\\","/")
 else:
-	if 'linux' in hostplatform:
+	if 'win' in hostplatform:
+		incoming_epocroot = os.sep
+		epocroot = "/"
+		os.environ["EPOCROOT"] = os.sep
+	else:
 		epocroot=os.environ['HOME'] + os.sep + "epocroot"
 		os.environ["EPOCROOT"] = epocroot
 		incoming_epocroot = epocroot
-	else:
-		incoming_epocroot = "\\"
-		epocroot = "/"
-		os.environ["EPOCROOT"] = os.sep
 
 if "SBS_BUILD_DIR" in os.environ:
 	sbs_build_dir = os.environ["SBS_BUILD_DIR"]
