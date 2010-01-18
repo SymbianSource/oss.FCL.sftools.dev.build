@@ -23,29 +23,35 @@ def run():
 	t.usebash = True
 	result = SmokeTest.PASS
 
-	abs_epocroot = os.path.abspath(os.environ["EPOCROOT"]).replace("\\","/")
+	abs_epocroot = os.path.abspath(os.environ["EPOCROOT"])
 	cwd = os.getcwd().replace("\\","/")
 
-	relative_epocroot = os.path.relpath(abs_epocroot,cwd).replace("\\","/")
+	relative_epocroot = os.path.relpath(abs_epocroot.replace("\\","/"),cwd)
 
 	
-
 	description = """This tests the whatcomp filter.  As a byproduct it uses (and thus smoke-tests) sbs_filter.py"""
 	command = "sbs -b smoke_suite/test_resources/simple/bld.inf -c %s -m ${SBSMAKEFILE} -f ${SBSLOGFILE} what  && " + \
-		  "EPOCROOT=%s sbs_filter --filters FilterWhatComp < ${SBSLOGFILE} &&" % relative_epocroot + \
-		  "EPOCROOT=%s sbs_filter --filters FilterWhatComp < ${SBSLOGFILE}"  % abs_epocroot
+		  "EPOCROOT='%s' sbs_filter --filters FilterWhatComp < ${SBSLOGFILE} &&" % relative_epocroot + \
+		  "EPOCROOT='%s' sbs_filter --filters FilterWhatComp < ${SBSLOGFILE}"  % abs_epocroot
 	targets = [
 		]	
 	buildtargets = [
 		]
-	mustmatch = [
+
+	mustmatch_pre = [
 		"-- abld -w",
-		"Chdir .*/smoke_suite/test_resources/simple",
+		".*Chdir .*/smoke_suite/test_resources/simple.*",
 		relative_epocroot + "/epoc32/release/armv5/urel/test.exe",
 		relative_epocroot + "/epoc32/release/armv5/urel/test.exe.map",
 		abs_epocroot + "/epoc32/release/armv5/urel/test.exe",
 		abs_epocroot + "/epoc32/release/armv5/urel/test.exe.map",
 	] 
+	
+	if os.sep == '\\':
+		mustmatch = [ i.replace("\\", "\\\\" ).replace("/","\\\\") for i in mustmatch_pre ]
+	else:
+		mustmatch = mustmatch_pre
+
 	mustnotmatch = [
 	"error: no (CHECK|WHAT) information found"
 	]
