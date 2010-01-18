@@ -458,7 +458,8 @@ include %s
 				command += " " + " ".join(addTargets)
 
 			# Send stderr to a file so that it can't mess up the log (e.g.
-			# clock skew messages from some build engines.
+			# clock skew messages from some build engines scatter their
+			# output across our xml.
 			stderrfilename = makefile+'.stderr'
 			command += " 2>'%s' " % stderrfilename
 
@@ -504,13 +505,6 @@ include %s
 					line = stream.readline()
 					self.raptor.out.write(line)
 
-				try:
-					e = open(stderrfilename,"r")
-					for line in e:
-						self.raptor.out.write(escape(line))
-					e.close()
-				except Exception,e:
-					self.raptor.Error("Couldn't complete stderr output for %s - '%s'", str(e), command)
 
 				# should be done now
 				returncode = p.wait()
@@ -518,6 +512,17 @@ include %s
 				# Report end-time of the build
 				self.raptor.InfoEndTime(object_type = "makefile",
 						task = "build", key = str(makefile))
+
+				# Take all the stderr output that went into the .stderr file
+				# and put it back into the log, but safely so it can't mess up
+				# xml parsers.
+				try:
+					e = open(stderrfilename,"r")
+					for line in e:
+						self.raptor.out.write(escape(line))
+					e.close()
+				except Exception,e:
+					self.raptor.Error("Couldn't complete stderr output for %s - '%s'", command, str(e))
 
 				if returncode != 0  and not self.raptor.keepGoing:
 					self.Tidy()
