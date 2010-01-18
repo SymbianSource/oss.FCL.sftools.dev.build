@@ -76,13 +76,11 @@ except:
 	traceback.print_exc()
 	sys.exit(1)
 
-the_raptor_errorCode = 0
 
 # Print the summary (this can't return errors)
 the_raptor.out.summary()
 	
 if not the_raptor.out.close():
-	print "BADCLOSE"
 	the_raptor.errorCode = 2
 	
 # return the error code
