@@ -25,7 +25,7 @@ TRACE_PATH:=$(strip $(foreach DIR,$(USERINCLUDE),$(filter %/traces_$(TARGET)_$(T
 TRACE_PRJNAME:=$(TARGET)_$(TARGETTYPE)
 endif
 
-TRACE_DICTIONARY:=$(EPOCROOT)/epoc32/OST_Dictionaries/$(TRACE_PRJNAME)_0x$(UID_TC)_Dictionary.xml
+TRACE_DICTIONARY:=$(EPOCROOT)/epoc32/ost_dictionaries/$(TRACE_PRJNAME)_0x$(UID_TC)_Dictionary.xml
 AUTOGEN_HEADER:=$(EPOCROOT)/epoc32/include/internal/SymbianTraces/autogen/$(TRACE_PRJNAME)_0x$(UID_TC)_Traces.h
 
 $(if $(FLMDEBUG),$(info <debug>TRACE_PATH = $(TRACE_PATH)</debug>))
