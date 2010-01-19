@@ -1,6 +1,12 @@
 
 Release Notes for Symbian Build System v2
 
+version 2.11.4
+
+Defect Fixes:
+fix for ARM9E + ARMV5 pre-processing confusion
+
+
 version 2.11.3
 
 Defect Fixes:
