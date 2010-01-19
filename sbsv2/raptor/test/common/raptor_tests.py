@@ -165,8 +165,9 @@ def clean_epocroot():
 						except:							
 							print "\nEPOCROOT-CLEAN ERROR:"
 							print (sys.exc_type.__name__ + ":"), \
-									sys.exc_value, "\n", \
-									traceback.print_tb(sys.exc_traceback)
+									sys.exc_value
+							if sys.exc_type.__name__ == "WindowsError":
+								print traceback.print_tb(sys.exc_traceback)
 									
 			# This loop handles folders
 			for name in dirs:

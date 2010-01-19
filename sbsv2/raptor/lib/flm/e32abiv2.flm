@@ -640,7 +640,7 @@ endif
 # Users can turn TC on by setting it to 1 in user config.
 ifneq ($(USE_TRACE_COMPILER),)
   include $(FLMHOME)/tracecompiler.mk
-  WHATRELEASE:=$(WHAT_RELEASE) $(TRACE_DICTIONARY) $(AUTOGEN_HEADER)
+  WHATRELEASE:=$(WHATRELEASE) $(TRACE_DICTIONARY) $(AUTOGEN_HEADER)
 endif
 
 CC_CPPONLY_ARGS:=$(SYMBIAN_CCFLAGS) $(if $(DEBUG_INFO),-g) $(DEBUG_FORMAT) \
