@@ -3,10 +3,14 @@ Release Notes for Symbian Build System v2
 
 Next version
 
-SF bug 1570: Adding then removing a capability can produce incorrect result: e.g. ALL TCB -TCB becomes ALL -TCB but it should be just ALL
+- Default to using Python 2.6.4 on windows (no change in compatibility with 
+  older versions of Python).
+- SF bug 1570: Adding then removing a capability can produce incorrect 
+  result: e.g. ALL TCB -TCB becomes ALL -TCB but it should be just ALL
 - Combine Linking and Postlinking into a single step
 - New 'Patchable Constants' target type: TARGETTYPE pdll
-- Support exit codes from next version of the trace compiler which will issue them
+- Support exit codes from next version of the trace compiler which will issue 
+  them
 - New sbs_filter script and batchfile to ease the use of sbs_filter.py.  
     Allows filters to be executed over a log after a build has been done.
     e.g.
