@@ -15,15 +15,22 @@
 #
 
 from raptor_tests import SmokeTest
+import sys
 
 def run():
 	t = SmokeTest()
 	t.usebash = True
 	result = SmokeTest.PASS
 
+
+	if sys.platform.startswith("win"):
+		elf2e32 = "$(EPOCROOT)/epoc32/tools/elf2e32.exe"
+	else:
+		elf2e32 = "$(EPOCROOT)/epoc32/tools/elf2e32"
+
 	description = """This test attempts to check that an exe gets the capabilities that we requested.  It's ARM specific since it uses elf2e32. Tries to demonstrate capabilties being turned off then on in the mmp."""
 	command = "sbs -b smoke_suite/test_resources/simple/capability.inf -c %s -m ${SBSMAKEFILE} -f ${SBSLOGFILE} && " + \
-			"$(EPOCROOT)/epoc32/tools/elf2e32   --dump=s  --e32input=$(EPOCROOT)/epoc32/release/armv5/urel/test_capability.exe"
+			  elf2e32 + " --dump=s  --e32input=$(EPOCROOT)/epoc32/release/armv5/urel/test_capability.exe"
 	targets = [
 		"$(EPOCROOT)/epoc32/release/armv5/urel/test_capability.exe",
 		"$(EPOCROOT)/epoc32/release/armv5/urel/test_capability.exe.map"
@@ -33,7 +40,7 @@ def run():
 	mustmatch = [
 		"\s*Secure ID: 10003a5c$",
 		"\s*Vendor ID: 00000000$",
-		"\s*Capabilities: 00000000 000ffebe$",
+		"\s*Capabilities: 00000000 000fffbf$",
 		"\s*CommDD$",
 		"\s*PowerMgmt$",
 		"\s*MultimediaDD$",

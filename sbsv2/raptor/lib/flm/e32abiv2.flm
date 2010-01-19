@@ -385,7 +385,7 @@ endif
 
 ifneq ($(DOPOSTLINK),)
 # Capabilities
-FINAL_CAPABILITIES:=$(if $(CAPABILITIES),$(CAPABILITIES),NONE)
+FINAL_CAPABILITIES:=$(if $(CAPABILITY),$(CAPABILITY),NONE)
 
 # Paging options for the old postlinker
 POSTLINKER_PAGEDOPTION:=--defaultpaged
