@@ -43,8 +43,8 @@ def run():
 		"$(EPOCROOT)/epoc32/include/internal/symbiantraces/autogen/testTC_0x1000008d_TraceDefinitions.h"
 		]
 	t.stdout = [
-		"<whatlog bldinf='I:/team/sbsv2/raptor/test/smoke_suite/test_resources/tracecompiler/testTC/group/bld.inf' mmp='I:/team/sbsv2/raptor/test/smoke_suite/test_resources/tracecompiler/testTC/group/testTC.mmp' config='armv5_urel.tracecompiler'>",
-		"<whatlog bldinf='I:/team/sbsv2/raptor/test/smoke_suite/test_resources/tracecompiler/testTC/group/bld.inf' mmp='I:/team/sbsv2/raptor/test/smoke_suite/test_resources/tracecompiler/testTC/group/testTC.mmp' config='armv5_udeb.tracecompiler'>",
+		"<whatlog bldinf='$(SBS_HOME)/test/smoke_suite/test_resources/tracecompiler/testTC/group/bld.inf' mmp='$(SBS_HOME)/test/smoke_suite/test_resources/tracecompiler/testTC/group/testTC.mmp' config='armv5_urel.tracecompiler'>",
+		"<whatlog bldinf='$(SBS_HOME)/test/smoke_suite/test_resources/tracecompiler/testTC/group/bld.inf' mmp='$(SBS_HOME)/test/smoke_suite/test_resources/tracecompiler/testTC/group/testTC.mmp' config='armv5_udeb.tracecompiler'>",
 		"<build>$(EPOCROOT)/epoc32/release/armv5/lib/testTC.dso</build>",
 		"<build>$(EPOCROOT)/epoc32/release/armv5/lib/testTC{000a0000}.dso</build>",
 		"<build>$(EPOCROOT)/epoc32/release/armv5/lib/testTC{000a0000}.lib</build>",
