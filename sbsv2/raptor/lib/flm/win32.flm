@@ -49,8 +49,8 @@ LIBDIR:=
 LINKER_FIRSTSTATLIB:=
 MAINLINKAS:=
 NEWLIBFILE:=
-RELEASEABLES:=
-TC_RELEASEABLES:=
+RELEASABLES:=
+TC_RELEASABLES:=
 STATLIBDIR:=
 STDCPP_BUILD:=
 STDCPPTAGFILE:=
@@ -219,7 +219,7 @@ endif
 # Users can turn TC on by setting it to 1 in user config.
 ifneq ($(USE_TRACE_COMPILER),) 
   include $(FLMHOME)/tracecompiler.mk
-  TC_RELEASEABLES:=$(TRACE_DICTIONARY) $(AUTOGEN_HEADER)
+  TC_RELEASABLES:=$(TRACE_DICTIONARY) $(AUTOGEN_HEADER)
 endif
 
 
@@ -252,7 +252,7 @@ endif
 ifeq ($(SUPPORTS_IMPORT_LIBRARY),1)
   ifneq ($(NOEXPORTLIBRARY),1)
     ifneq ($(TARGET_$(call sanitise,$(IMPORTLIBTARGET))),1)
-      RELEASEABLES:=$(RELEASEABLES) $(if $(or $(EXPORTUNFROZEN),$(DEFFILE)),$(IMPORTLIBTARGET))
+      RELEASABLES:=$(RELEASABLES) $(if $(or $(EXPORTUNFROZEN),$(DEFFILE)),$(IMPORTLIBTARGET))
 
       # import libraries are generated to the UDEB release directory
       ifneq ($(VARIANTTYPE),udeb)
@@ -298,7 +298,7 @@ ifneq ($(BASE_TYPE),importlib)
     BINTARGETSTATICLINK:=$(BINDIRSTATICLINK)/$(TARGET).$(if $(REQUESTEDTARGETEXT),$(REQUESTEDTARGETEXT),$(TARGETTYPE))
   endif
 
-  RELEASEABLES:=$(RELEASEABLES) $(BINTARGET) $(BINTARGETSTATICLINK)
+  RELEASABLES:=$(RELEASABLES) $(BINTARGET) $(BINTARGETSTATICLINK)
 
   # work on a local source files list
   SRCFILES:=$(SOURCE)
@@ -470,7 +470,7 @@ ifneq ($(BASE_TYPE),importlib)
       # link map file (urel only)
       ifeq ($(VARIANTTYPE),urel)
         MAP:=$(OPT.MAP)$(BINTARGET).map
-        RELEASEABLES:=$(RELEASEABLES) $(BINTARGET).map
+        RELEASABLES:=$(RELEASABLES) $(BINTARGET).map
       endif
     endif
   endif
@@ -660,8 +660,8 @@ endif # neq $(BASE_TYPE),importlib
 
 # Global targets
 .PHONY:: $(ALLTARGET)
-$(ALLTARGET):: $(RELEASEABLES)
-TARGET:: $(RELEASEABLES)
+$(ALLTARGET):: $(RELEASABLES)
+TARGET:: $(RELEASABLES)
 
 ifeq ($(TARGET_$(call sanitise,$(IMPORTLIBTARGET))),1)
   LIBRARY:: $(IMPORTLIBTARGET)
@@ -682,7 +682,7 @@ ifneq ($(TESTPATH),)
   $(eval $(call MakeTestBatchFiles,$(TARGET),$(BATCHDIR)$(MODULE)/$(VARIANTPLATFORM).$(TESTPATH)))
   BATCHFILE_CREATED_$(BATCHDIR)$(MODULE)/$(VARIANTPLATFORM).$(TESTPATH):=1
   TARGET_CREATED_$(EPOCROOT)/epoc32/release/$(VARIANTPLATFORM)/$(VARIANTTYPE)/z/test/$(MODULE)/$(VARIANTPLATFORM).$(TESTPATH)_$(TARGET):=1
-  RELEASEABLES:=$(RELEASEABLES) $(EPOCROOT)/epoc32/release/$(VARIANTPLATFORM)/$(VARIANTTYPE)/z/test/$(MODULE)/$(VARIANTPLATFORM).$(TESTPATH)
+  RELEASABLES:=$(RELEASABLES) $(EPOCROOT)/epoc32/release/$(VARIANTPLATFORM)/$(VARIANTTYPE)/z/test/$(MODULE)/$(VARIANTPLATFORM).$(TESTPATH)
 endif
 
 # clean up
@@ -690,4 +690,4 @@ $(call raptor_clean,$(CLEANTARGETS))
 # make the output directories while reading makefile - some build engines prefer this
 $(call makepath,$(CREATABLEPATHS))
 # for the --what option and the log file
-$(call raptor_release,$(RELEASEABLES) $(TC_RELEASEABLES))
+$(call raptor_release,$(RELEASABLES) $(TC_RELEASABLES))
