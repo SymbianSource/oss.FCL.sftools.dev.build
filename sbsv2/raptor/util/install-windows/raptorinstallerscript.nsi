@@ -1,4 +1,4 @@
-# Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -120,8 +120,8 @@ Section "Install Raptor" INSTALLRAPTOR
     File /r /x distribution.policy.s60 /x .hg ${WIN32SUPPORT}\cygwin\*.*
     SetOutPath "$INSTDIR\win32\mingw"
     File /r /x distribution.policy.s60 /x .hg ${WIN32SUPPORT}\mingw\*.*
-    SetOutPath "$INSTDIR\win32\python252"
-    File /r /x distribution.policy.s60 /x .hg ${WIN32SUPPORT}\python252\*.*
+    SetOutPath "$INSTDIR\win32\python264"
+    File /r /x distribution.policy.s60 /x .hg ${WIN32SUPPORT}\python264\*.*
     
     SetOutPath "$INSTDIR"
     File ${RAPTOR_LOCATION}\RELEASE-NOTES.txt
