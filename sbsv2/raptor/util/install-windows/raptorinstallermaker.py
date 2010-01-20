@@ -33,7 +33,7 @@ parser = optparse.OptionParser()
 parser.add_option("-s", "--sbs-home", dest="sbshome",
                   help="Path to use as SBS_HOME environment variable. If not present the script exits.")
 parser.add_option("-w", "--win32-support", dest="win32support",
-                  help="Path to use as SBS_HOME environment variable. If not present the script exits.")
+                  help="Path to Win32 support directory. If not present the script exits.")
 
 (options, args) = parser.parse_args()
 
@@ -49,7 +49,7 @@ else:
 	win32supportdirs = ["bv", "cygwin", "mingw", "python264"]
 	for dir in win32supportdirs:
 		if not os.path.isdir(os.path.join(options.win32support, dir)):
-			print "ERROR: directory %s does not exist. Cannot build installer. Exiting..."
+			print "ERROR: directory %s does not exist. Cannot build installer. Exiting..." % dir
 			sys.exit(2)
 
 def parseconfig(xmlFile="raptorinstallermaker.xml"):
@@ -57,7 +57,7 @@ def parseconfig(xmlFile="raptorinstallermaker.xml"):
 
 def generateinstallerversionheader(sbshome = None):
 	shellenv = os.environ.copy()
-	shellenv["PYTHONPATH"] = os.path.join(os.environ["SBS_HOME"], "python")
+	shellenv["PYTHONPATH"] = os.path.join(sbshome, "python")
 	
 	raptorversioncommand = "python -c \"import raptor_version; print raptor_version.numericversion()\""
 	
