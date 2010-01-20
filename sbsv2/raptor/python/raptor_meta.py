@@ -1453,7 +1453,7 @@ class MMPRaptorBackend(MMPBackend):
 			for cap in toks[1]:
 				cap = cap.lower()
 				self.__debug("Setting  "+toks[0]+": " + cap)
-				if cap.lower() != "all":
+				if cap != "all":
 					if not cap.startswith("-"):
 						if not cap.startswith("+"):
 							cap = "+" + cap	

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -20,7 +20,6 @@ import sys
 def run():
 	t = SmokeTest()
 	t.usebash = True
-	result = SmokeTest.PASS
 
 
 	if sys.platform.startswith("win"):
@@ -66,7 +65,7 @@ def run():
 	warnings = 0
 	
 	t.id = "0107"
-	t.name = "capability"
+	t.name = "capability_arm"
 	t.description = description
 	t.command = command % "arm.v5.urel.gcce4_4_1"
 	t.targets = targets
