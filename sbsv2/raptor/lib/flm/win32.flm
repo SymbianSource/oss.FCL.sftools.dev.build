@@ -205,7 +205,7 @@ BINTARGET:=$(BINDIR)/$(TARGET).$(if $(REQUESTEDTARGETEXT),$(REQUESTEDTARGETEXT),
 # Run trace compiler #####################################
 TRACE_MARKER_PATH:=$(OUTPUTPATH)
 
-ifeq ($(UID3),)
+ifeq ($(subst 0,,$(UID3)),)
   ifeq ($(UID2),)
     USE_TRACE_COMPILER:=
   else
