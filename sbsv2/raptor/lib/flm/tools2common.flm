@@ -1,4 +1,4 @@
-# Copyright (c) 2006-2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2006-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -18,17 +18,28 @@
 
 ## Input parameters
 
-OUTPUTPATH:=$(OUTPUTPATH)/$(TARGET)_$(TARGETTYPE)/tools2/$(VARIANTTYPE)$(TOOLPLATFORMDIR)
-
 ifeq ($(OSTYPE),cygwin)
 CDEFS.TOOLS2:=$(CDEFS.WIN32) $(CDEFS)
 CFLAGS:=$(CFLAGS.WIN32) $(CFLAGS) $(OPTION_GCC)
 COMPILER_PATH:=$(COMPILER_PATH.WIN32)
+OUTPUTPATH:=$(OUTPUTPATH)/$(TARGET)_$(TARGETTYPE)/tools2/$(VARIANTTYPE)$(TOOLPLATFORMDIR)
 else
+ifneq ($(TOOLS2WIN32),)
+# Build win32 tools in Linux
+CDEFS.TOOLS2:=$(CDEFS.WIN32) $(CDEFS)
+CFLAGS:=$(CFLAGS.WIN32) $(CFLAGS) $(OPTION_GCC)
+COMPILER_PATH:=$(COMPILER_PATH.WIN32)
+OUTPUTPATH:=$(OUTPUTPATH)/$(TARGET)_$(TARGETTYPE)/tools2/$(VARIANTTYPE)
+else
+# Build linux tools in Linux
 CDEFS.TOOLS2:=$(CDEFS.LINUX) $(CDEFS)
 CFLAGS:=$(CFLAGS) $(OPTION_GCC)
 COMPILER_PATH=$(COMPILER_PATH.LINUX)
+OUTPUTPATH:=$(OUTPUTPATH)/$(TARGET)_$(TARGETTYPE)/tools2/$(VARIANTTYPE)$(TOOLPLATFORMDIR)
 endif
+endif
+
+
 CDEFS.TOOLS2:=$(call makemacrodef,$(OPT.D),$(CDEFS.TOOLS2))
 
 ## Locally used variables

@@ -5,7 +5,18 @@
 	These can be referenced from the command-line or in configurations.
 	
 	-->
-  
+ 	
+	<!-- This variant enables building win32 tools in Linux. Tools2 only -->
+	<var name="win32">
+		<set name='TOOLS2WIN32' value='1'/>
+		<env name='MINGW_LINUX_PREFIX' default='i586-mingw32msvc'/>
+		<env name='GCC' default='$(MINGW_LINUX_PREFIX)-g++' type='tool'/>
+		<env name='ARCHIVER' default='$(MINGW_LINUX_PREFIX)-ar' type='tool'/>
+		<env name='RANLIB' default='$(MINGW_LINUX_PREFIX)-ranlib' type='tool'/>
+		<set name='RELEASEPATH' value='$(EPOCROOT)/epoc32/release/tools2/$(VARIANTTYPE)'/>
+		<set name='DOTEXE' value='.exe'/>
+	</var>
+
 	<!-- This variant turns debug info on for arm only -->
 	<var name="debug_info">
 		<set name='DEBUG_INFO' value='1'/>
