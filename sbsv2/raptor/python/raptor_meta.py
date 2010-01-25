@@ -1451,7 +1451,12 @@ class MMPRaptorBackend(MMPBackend):
 
 		elif varname=='CAPABILITY':
 			for cap in toks[1]:
+				cap = cap.lower()
 				self.__debug("Setting  "+toks[0]+": " + cap)
+				if cap != "all":
+					if not cap.startswith("-"):
+						if not cap.startswith("+"):
+							cap = "+" + cap	
 				self.capabilities.append(cap)
 		elif varname=='DEFFILE':
 			self.__defFileRoot = self.__currentMmpFile
@@ -2198,18 +2203,21 @@ class MMPRaptorBackend(MMPBackend):
 			self.ResourceVariants[i].AddOperation(raptor_data.Set("MAIN_REQUESTEDTARGETEXT", self.__TARGETEXT.lower()))
 
 		# Create Capability variable in one SET operation (more efficient than multiple appends)
-		self.BuildVariant.AddOperation(raptor_data.Set("CAPABILITY"," ".join(self.capabilities)))
+		
+		self.BuildVariant.AddOperation(raptor_data.Set("CAPABILITY","".join(self.capabilities)))
 
 		# Resolve combined capabilities as hex flags, for configurations that require them
 		capabilityFlag1 = 0
 		capabilityFlag2 = 0			# Always 0
 
-		for capability in [c.lower() for c in self.capabilities]:
+		for capability in self.capabilities:
 			invert = 0
 
 			if capability.startswith('-'):
 				invert = 0xffffffff
-				capability = capability.lstrip('-')
+				capability = capability[1:]
+			elif capability.startswith('+'):
+				capability = capability[1:]
 
 			if MMPRaptorBackend.supportedCapabilities.has_key(capability):
 				capabilityFlag1 = capabilityFlag1 ^ invert
@@ -2449,7 +2457,8 @@ class MetaReader(object):
 			key = str(detail['VARIANT_HRH']) \
 			 	+ str(detail['EPOCROOT']) \
 		    	+ detail['SYSTEMINCLUDE'] \
-		    	+ detail['PLATFORM']
+		    	+ detail['PLATFORM'] \
+		    	+ detail['PLATMACROS']
 
 		    # Keep a short version of the key for use in filenames.
 			uniq = hashlib.md5()
@@ -2485,11 +2494,7 @@ class MetaReader(object):
 			# Is this an unseen build platform?
 			# concatenate all the values we care about in a fixed order
 			# and use that as a signature for the platform.
-			items = ['PLATFORM', 'EPOCROOT', 'VARIANT_HRH', 'SYSTEMINCLUDE', 'TESTCODE']
-			if raptor_utilities.getOSPlatform().startswith("win"):
-				items.append('PLATMACROS.WINDOWS')
-			else:
-				items.append('PLATMACROS.LINUX')
+			items = ['PLATFORM', 'PLATMACROS', 'EPOCROOT', 'VARIANT_HRH', 'SYSTEMINCLUDE', 'TESTCODE']
 
 			items.extend(interfaces)
 			platform = ""

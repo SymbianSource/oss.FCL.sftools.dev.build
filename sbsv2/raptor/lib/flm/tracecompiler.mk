@@ -63,9 +63,9 @@ $(TRACE_MARKER) : $(PROJECT_META)
 	( echo -en "$(TRACE_PRJNAME)\n$(PROJECT_META)\n"; \
 	  $(GNUCAT) $(TRACE_SOURCE_LIST); \
 	  echo -en "*ENDOFSOURCEFILES*\n" ) | \
-	$(JAVA_COMMAND) $(TRACE_COMPILER_START) $(UID_TC) && \
-	$(GNUMD5SUM) $(TRACE_SOURCE_LIST) > $(TRACE_MARKER) ; \
-	$(GNUCAT) $(TRACE_SOURCE_LIST) \
+	$(JAVA_COMMAND) $(TRACE_COMPILER_START) $(UID_TC) &&  \
+	$(GNUMD5SUM) $(TRACE_SOURCE_LIST) > $(TRACE_MARKER) && \
+	{ $(GNUCAT) $(TRACE_SOURCE_LIST) ; true ; } \
 	$(call endrule,tracecompile)
 endef
 

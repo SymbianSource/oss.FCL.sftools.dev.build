@@ -151,6 +151,23 @@
 		<param name='MAKEDEF'/>
 	</interface>
 
+	<interface name="Emulator.pdll" extends="Emulator.win32" flm="win32pdll.flm">
+		<param name='CHECKLIB' default=''/>
+		<param name='LD'/>
+		<param name='LFLAGS_INFGEN'/>
+		<param name='OPT.CHECKLIB.STDCPP'/>
+		<param name='OPT.CHECKLIB.SYMCPP'/>
+		<param name='OPT.CHECKLIB.WIN32'/>
+		<param name='OPT.HEAPCOMMIT'/>
+		<param name='OPT.HEAPRESERVE'/>
+		<param name='OPT.IMAGEBASE'/>
+		<param name='OPT.IMPLIB'/>
+		<param name='OPT.LIBFILE'/>
+		<param name='OPT.LIBPATH'/>
+		<param name='OPT.NOIMPLIB'/>
+		<param name='MAKEDEF'/>
+	</interface>
+
 	<interface name="Emulator.stddll" extends="Emulator.dll" flm="win32stddll.flm">
 		<param name='LFLAGS_SYMGEN'/>
 		<param name='SYMLOOKUPUTIL'/>

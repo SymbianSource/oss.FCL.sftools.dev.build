@@ -21,7 +21,7 @@ set HOSTPLATFORM_DIR=win32
 
 setlocal
 set __PYTHON__=%SBS_PYTHON%
-if "%__PYTHON__%"=="" set __PYTHON__=%SBS_HOME%\win32\python252\python.exe
+if "%__PYTHON__%"=="" set __PYTHON__=%SBS_HOME%\win32\python264\python.exe
 
 set __TEST_SUITE__=%SBS_HOME%\test\common\run_tests.pyc
 set __TEST_SUITE_PY__=%SBS_HOME%\test\common\run_tests.py

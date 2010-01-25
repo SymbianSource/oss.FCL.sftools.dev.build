@@ -35,28 +35,6 @@ fi
 if [ ! -d "$SBS_HOME/$HOSTPLATFORM_DIR" ]; then
 cat 1>&2 <<EOERROR
 Error: sbs has not been installed with support for your platform: "${HOSTPLATFORM}".
-
-The utilites for your platform should be in "$SBS_HOME/$HOSTPLATFORM_DIR" but sbs
-cannot find them there.
-
-sbs is supported on:
-	win32
-	linux i386 libc2_3 (Redhat 4)
-
-sbs has been known to work (but is not supported) on:
-	linux x86_64 libc2_5  (e.g. Centos/Redhat 5.3 64-bit)
-	linux i386 libc2_8  (e.g. Fedora 9 32-bit)
-	linux x86_64 libc2_10 (e.g. Fedora 11 64-bit)
-
-Even with the appropriate utilities it may be necessary to install 32-bit
-compatibility versions of some libraries (e.g. glibc) on these platforms,
-particularly for 3rd party tools which are not built natively such as
-compilers.
-
-It may be possible to build and install the utilities for your platform by
-entering $SBS_HOME/util and running
-	make -k
-A full development environment is required however.
 EOERROR
 	exit 1
 fi
@@ -96,17 +74,18 @@ else
 fi
 
 
-# call raptor_start.py with the arguments
+# call sbs_filter.py with the arguments
 
-RAPTOR_START="$SBS_HOME/python/raptor_start.py"
+FILTER_START="$SBS_HOME/bin/sbs_filter.py"
 
-if [ -e "$RAPTOR_START" ]; then
+if [ -e "$FILTER_START" ]; then
 	# run the source version
-	${__PYTHON__} "$RAPTOR_START" "$@"
-elif [ -e "$RAPTOR_START"c ]; then
+	${__PYTHON__} "$FILTER_START" "$@"
+elif [ -e "$FILTER_START"c ]; then
 	# run the compiled version
-	${__PYTHON__} "$RAPTOR_START"c "$@"
+	${__PYTHON__} "$FILTER_START"c "$@"
 else
-	echo "Cannot start SBSV2 - $RAPTOR_START not found." 1>&2
+	echo "Cannot start sbs_filter - $FILTER_START not found." 1>&2
 	echo "Check your SBS_HOME environment variable." 1>&2
 fi
+
