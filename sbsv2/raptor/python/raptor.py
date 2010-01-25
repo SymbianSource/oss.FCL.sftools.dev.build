@@ -11,7 +11,7 @@
 #
 # Contributors:
 #
-# Description: 
+# Description:
 # raptor module
 # This module represents the running Raptor program. Raptor is started
 # either by calling the Main() function, which creates an instance of
@@ -58,14 +58,17 @@ hostplatform_dir = os.environ["HOSTPLATFORM_DIR"]
 # defaults can use EPOCROOT
 
 if "EPOCROOT" in os.environ:
-        epocroot = os.environ["EPOCROOT"].replace("\\","/")
+	incoming_epocroot = os.environ["EPOCROOT"]
+	epocroot = incoming_epocroot.replace("\\","/")
 else:
-	if 'linux' in hostplatform:
-		epocroot=os.environ['HOME'] + os.sep + "epocroot"
-		os.environ["EPOCROOT"] = epocroot
-	else:
+	if 'win' in hostplatform:
+		incoming_epocroot = os.sep
 		epocroot = "/"
 		os.environ["EPOCROOT"] = os.sep
+	else:
+		epocroot=os.environ['HOME'] + os.sep + "epocroot"
+		os.environ["EPOCROOT"] = epocroot
+		incoming_epocroot = epocroot
 
 if "SBS_BUILD_DIR" in os.environ:
 	sbs_build_dir = os.environ["SBS_BUILD_DIR"]
@@ -119,7 +122,7 @@ class ModelNode(object):
 		self.type = type
 		self.specs = []
 		self.deps = []
-		self.children = set() 
+		self.children = set()
 		self.unfurled = False
 		self.parent = parent
 
@@ -163,15 +166,15 @@ class ModelNode(object):
 
 		for c in self.children:
 			c.unfurl_all(build)
-		
+
 
 	def realise_exports(self, build):
-		"""Do the things that are needed such that we can fully unfurl all 
+		"""Do the things that are needed such that we can fully unfurl all
 		   sibling nodes.  i.e. this step is here to "take care" of the dependencies
-		   between siblings.  
+		   between siblings.
 		"""
 		pass
-	
+
 	def realise_makefile(self, build, specs):
 		makefilename_base = build.topMakefile
 		if self.name is not None:
@@ -190,16 +193,16 @@ class ModelNode(object):
 				key = str(makefile.path))
 
 		return makefileset
-		
+
 
 
 	def realise(self, build):
-		"""Give the spec trees to the make engine and actually 
-		"build" the product represented by this model node"""	
+		"""Give the spec trees to the make engine and actually
+		"build" the product represented by this model node"""
 		# Must ensure that all children are unfurled at this point
 		self.unfurl_all(build)
 
-		sp = self.specs	
+		sp = self.specs
 
 		build.AssertBuildOK()
 
@@ -210,8 +213,8 @@ class ModelNode(object):
 		result = build.Make(m)
 		build.InfoEndTime(object_type = "layer", task = "build",
 				key = (str(m.directory) + "/" + str(m.filenamebase)))
-		
-		
+
+
 		return result
 
 
@@ -229,7 +232,7 @@ class Project(ModelNode):
 
 	def makefile(self, makefilename_base, engine, named = False):
 		"""Makefiles for individual mmps not feasible at the moment"""
-		pass # Cannot, currently, "unfurl an mmp" directly but do want 
+		pass # Cannot, currently, "unfurl an mmp" directly but do want
 		     # to be able to simulate the overall recursive unfurling of a build.
 
 class Component(ModelNode):
@@ -252,9 +255,9 @@ class Component(ModelNode):
 
 
 class Layer(ModelNode):
-	""" 	Some components that should be built togther 
-		e.g. a Layer in the system definition. 
-	""" 
+	""" 	Some components that should be built togther
+		e.g. a Layer in the system definition.
+	"""
 	def __init__(self, name, componentlist=[]):
 		super(Layer,self).__init__(name)
 		self.name = name
@@ -263,11 +266,11 @@ class Layer(ModelNode):
 			self.children.add(Component(c))
 
 	def unfurl(self, build):
-		"""Discover the children of this layer. This involves parsing the component MetaData (bld.infs, mmps). 
+		"""Discover the children of this layer. This involves parsing the component MetaData (bld.infs, mmps).
 		Takes a raptor object as a parameter (build), together with a list of Configurations.
 
 		We currently have parsers that work on collections of components/bld.infs and that cannot
-		parse at a "finer" level.  So one can't 'unfurl' an mmp at the moment.  
+		parse at a "finer" level.  So one can't 'unfurl' an mmp at the moment.
 
 		Returns True if the object was successfully unfurled.
 		"""
@@ -300,7 +303,7 @@ class Layer(ModelNode):
 	def meta_realise(self, build):
 		"""Generate specs that can be used to "take care of" finding out more
 		about this metaunit - i.e. one doesn't want to parse it immediately
-		but to create a makefile that will parse it. 
+		but to create a makefile that will parse it.
 		In this case it allows bld.infs to be parsed in parallel by make."""
 
 		# insert the start time into the Makefile name?
@@ -310,44 +313,44 @@ class Layer(ModelNode):
 
 		# Pass certain CLI flags through to the makefile-generating sbs calls
 		cli_options = ""
-			
+
 		if build.debugOutput == True:
 			cli_options += " -d"
-				
+
 		if build.ignoreOsDetection == True:
 			cli_options += " -i"
-			
+
 		if build.keepGoing == True:
 			cli_options += " -k"
-			
+
 		if build.quiet == True:
 			cli_options += " -q"
-			
+
 		if build.timing == True:
 			cli_options += " --timing"
 
-		
+
 		nc = len(self.children)
 		number_blocks = build.jobs
 		block_size = (nc / number_blocks) + 1
 		component_blocks = []
 		spec_nodes = []
-		
+
 		b = 0
 		childlist = list(self.children)
 		while b < nc:
 			component_blocks.append(childlist[b:b+block_size])
 			b += block_size
-			
+
 		while len(component_blocks[-1]) <= 0:
 			component_blocks.pop()
 			number_blocks -= 1
-	
+
 		build.Info("Parallel Parsing: bld.infs split into %d blocks\n", number_blocks)
-		# Cause the binding makefiles to have the toplevel makefile's 
-		# name.  The bindee's have __pp appended.	
+		# Cause the binding makefiles to have the toplevel makefile's
+		# name.  The bindee's have __pp appended.
 		tm = build.topMakefile.Absolute()
-		binding_makefiles = raptor_makefile.MakefileSet(str(tm.Dir()), build.maker.selectors, makefiles=None, filenamebase=str(tm.File()))		
+		binding_makefiles = raptor_makefile.MakefileSet(str(tm.Dir()), build.maker.selectors, makefiles=None, filenamebase=str(tm.File()))
 		build.topMakefile = generic_path.Path(str(build.topMakefile) + "_pp")
 
 		loop_number = 0
@@ -357,16 +360,16 @@ class Layer(ModelNode):
 
 			componentList = " ".join([str(c.bldinf_filename) for c in block])
 
-			
+
 			configList = " ".join([c.name for c in self.configs if c.name != "build" ])
-			
+
 			makefile_path = str(build.topMakefile) + "_" + str(loop_number)
 			try:
 				os.unlink(makefile_path) # until we have dependencies working properly
 			except Exception,e:
 				# print "couldn't unlink %s: %s" %(componentMakefileName, str(e))
 				pass
-			
+
 			# add some basic data in a component-wide variant
 			var = raptor_data.Variant()
 			var.AddOperation(raptor_data.Set("COMPONENT_PATHS", componentList))
@@ -385,13 +388,13 @@ class Layer(ModelNode):
 			if build.noBuild:
 				var.AddOperation(raptor_data.Set("NO_BUILD", "1"))
 			specNode.AddVariant(var)
-	
+
 			try:
 				interface = build.cache.FindNamedInterface("build.makefiles")
 				specNode.SetInterface(interface)
 			except KeyError:
 				build.Error("Can't find flm interface 'build.makefiles' ")
-				
+
 			spec_nodes.append(specNode)
 			binding_makefiles.addInclude(str(makefile_path)+"_all")
 
@@ -430,7 +433,7 @@ class Raptor(object):
 
 
 	M_BUILD = 1
-	M_VERSION = 2	
+	M_VERSION = 2
 
 	def __init__(self, home = None):
 
@@ -554,7 +557,7 @@ class Raptor(object):
 			self.Warn("ignoring target %s because --what or --check is specified.\n", target)
 		else:
 			self.targets.append(target)
-			
+
 	def AddSourceTarget(self, filename):
 		# source targets are sanitised and then added as if they were a "normal" makefile target
 		# in addition they have a default, empty, top-level target assigned in order that they can
@@ -615,7 +618,7 @@ class Raptor(object):
 	def SetNoDependInclude(self, TrueOrFalse):
 		self.noDependInclude = TrueOrFalse
 		return True
-		
+
 	def SetKeepGoing(self, TrueOrFalse):
 		self.keepGoing = TrueOrFalse
 		return True
@@ -669,7 +672,7 @@ class Raptor(object):
 			return False
 
 		return True
-	
+
 	def SetTiming(self, TrueOrFalse):
 		self.timing = TrueOrFalse
 		return True
@@ -717,9 +720,9 @@ class Raptor(object):
 		self.Info("Set-up %s", str(self.raptorXML))
 		self.Info("Command-line-arguments %s", " ".join(self.args))
 		self.Info("Current working directory %s", os.getcwd())
-		
+
 		# the inherited environment
-		for e, value in os.environ.items():
+		for e, value in sorted( os.environ.items() ):
 			self.Info("Environment %s=%s", e, value.replace("]]>", "]]&gt;"))
 
 		# and some general debug stuff
@@ -822,7 +825,7 @@ class Raptor(object):
 				return self.home.Append(aGenericPath)
 			else:
 				return aGenericPath
-		
+
 		# make generic paths absolute (if required)
 		self.configPath = map(mkAbsolute, self.configPath)
 		self.cache.Load(self.configPath)
@@ -859,12 +862,12 @@ class Raptor(object):
 		return x
 
 	def GetBuildUnitsToBuild(self, configNames):
-		"""Return a list of the configuration objects that correspond to the 
+		"""Return a list of the configuration objects that correspond to the
 		   list of configuration names in the configNames parameter.
 
 		raptor.GetBuildUnitsToBuild(["armv5", "winscw"])
 		>>> [ config1, config2, ... , configN ]
-		""" 
+		"""
 
 		if len(configNames) == 0:
 			# use default config
@@ -878,9 +881,9 @@ class Raptor(object):
 
 		for c in set(configNames):
 			self.Debug("BuildUnit: %s", c)
-			try:		
+			try:
 				x = self.GetConfig(c)
-				gb = x.GenerateBuildUnits(self.cache) 
+				gb = x.GenerateBuildUnits(self.cache)
 				buildUnitsToBuild.update( gb )
 			except Exception, e:
 				self.FatalError(str(e))
@@ -894,7 +897,7 @@ class Raptor(object):
 		return buildUnitsToBuild
 
 	def CheckToolset(self, evaluator, configname):
-		"""Check the toolset for a particular config, allow other objects access 
+		"""Check the toolset for a particular config, allow other objects access
 		to the toolset for this build (e.g. the raptor_make class)."""
 		if self.toolset is None:
 			if self.toolcheck == 'on':
@@ -968,7 +971,7 @@ class Raptor(object):
 
 
 	def FindComponentIn(self, aDir = None):
-		# look for a bld.inf 
+		# look for a bld.inf
 
 		if aDir is None:
 			dir = generic_path.CurrentDir()
@@ -1109,14 +1112,14 @@ class Raptor(object):
 		for a,v in dictionary.items():
 			atts += " " + a + "='" + v + "'"
 		return atts
-	
+
 	def Info(self, format, *extras, **attributes):
 		"""Send an information message to the configured channel
 				(XML control characters will be escaped)
 		"""
 		self.out.write("<info" + self.attributeString(attributes) + ">" +
 		               escape(format % extras) + "</info>\n")
-		
+
 	def InfoDiscovery(self, object_type, count):
 		if self.timing:
 			try:
@@ -1124,7 +1127,7 @@ class Raptor(object):
 						count = count))
 			except Exception, exception:
 				Error(exception.Text, function = "InfoDiscoveryTime")
-		
+
 	def InfoStartTime(self, object_type, task, key):
 		if self.timing:
 			try:
@@ -1132,7 +1135,7 @@ class Raptor(object):
 						task = task, key = key))
 			except Exception, exception:
 				Error(exception.Text, function = "InfoStartTime")
-		
+
 	def InfoEndTime(self, object_type, task, key):
 		if self.timing:
 			try:
@@ -1154,7 +1157,7 @@ class Raptor(object):
 		"""Send a warning message to the configured channel
 				(XML control characters will be escaped)
 		"""
-		self.out.write("<warning" + self.attributeString(attributes) + ">" + 
+		self.out.write("<warning" + self.attributeString(attributes) + ">" +
 		               escape(format % extras) + "</warning>\n")
 
 	def FatalError(self, format, *extras, **attributes):
@@ -1165,7 +1168,7 @@ class Raptor(object):
 		   further errors are probably triggered by the first.
 		"""
 		if not self.fatalErrorState:
-			self.out.write("<error" + self.attributeString(attributes) + ">" + 
+			self.out.write("<error" + self.attributeString(attributes) + ">" +
 			               (format % extras) + "</error>\n")
 			self.errorCode = 1
 			self.fatalErrorState = True
@@ -1174,7 +1177,7 @@ class Raptor(object):
 		"""Send an error message to the configured channel
 				(XML control characters will be escaped)
 		"""
-		self.out.write("<error" + self.attributeString(attributes) + ">" + 
+		self.out.write("<error" + self.attributeString(attributes) + ">" +
 		               escape(format % extras) + "</error>\n")
 		self.errorCode = 1
 
@@ -1212,7 +1215,7 @@ class Raptor(object):
 		if self.systemDefinitionFile != None:
 			systemModel = raptor_xml.SystemModel(self, self.systemDefinitionFile, self.systemDefinitionBase)
 			layers = self.GatherSysModelLayers(systemModel, self.systemDefinitionRequestedLayers)
-			
+
 		# Now get components specified on a commandline - build them after any
 		# layers in the system definition.
 		if len(self.commandlineComponents) > 0:
@@ -1246,7 +1249,7 @@ class Raptor(object):
 			self.Introduction()
 			# establish an object cache
 			self.AssertBuildOK()
-			
+
 			self.LoadCache()
 
 			# find out what configurations to build
@@ -1299,7 +1302,7 @@ class Raptor(object):
 				for l in layers:
 					# create specs for a specific group of components
 					l.realise(self)
-					
+
 		except BuildCannotProgressException,b:
 			if str(b) != "":
 				self.Info(str(b))
@@ -1326,7 +1329,7 @@ class Raptor(object):
 		build.ProcessConfig()
 		build.CommandLine(argv)
 
-		return build 
+		return build
 
 
 
@@ -1334,6 +1337,8 @@ class Raptor(object):
 class BuildStats(object):
 
 	def __init__(self, raptor_instance):
+		self.incoming_epocroot = incoming_epocroot
+		self.epocroot = epocroot
 		self.logFileName = raptor_instance.logFileName
 		self.quiet = raptor_instance.quiet
 		self.doCheck = raptor_instance.doCheck

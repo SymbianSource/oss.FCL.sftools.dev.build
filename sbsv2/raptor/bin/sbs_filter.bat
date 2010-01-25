@@ -14,40 +14,21 @@
 @rem Description: 
 @rem
 
-@SETLOCAL
-@SET HOSTPLATFORM=win 32
-@SET HOSTPLATFORM_DIR=win32
-
-
 @REM Automatically find SBS_HOME if it is not set
 @IF NOT "%SBS_HOME%"==""  goto foundhome
 @SET RAPTORBINDIR=%~dp0
 @SET WD=%cd%
-@cd /d %RAPTORBINDIR%\..
+@cd %RAPTORBINDIR%\..
 @SET SBS_HOME=%cd%
-@cd /d %WD%
+@cd %WD%
 :foundhome 
-
-@REM Use the python set by the environment if possible
-@SET __PYTHON__=%SBS_PYTHON%
-@IF "%__PYTHON__%"=="" SET __PYTHON__=%SBS_HOME%\win32\python264\python.exe
-@SET PYTHONPATH=%SBS_PYTHONPATH%
-@IF "%PYTHONPATH%"=="" SET PYTHONPATH=%SBS_HOME%\win32\python264
-
-@REM Use the mingw set by the environment if possible
-@SET __MINGW__=%SBS_MINGW%
-@IF "%__MINGW__%"=="" SET __MINGW__=%SBS_HOME%\win32\mingw
 
 @REM Use the cygwin set by the environment if possible
 @SET __CYGWIN__=%SBS_CYGWIN%
 @IF "%__CYGWIN__%"=="" SET __CYGWIN__=%SBS_HOME%\win32\cygwin
 
 @REM add to the search path
-@REM (make sure that we don't get into trouble if there are Path and PATH variables)
-@SET PATH_TEMP=%__MINGW__%\bin;%__CYGWIN__%\bin;%SBS_HOME%\win32\bin;%PATH%
-@SET PATH=
-@SET PATH=%PATH_TEMP%
-@SET PATH_TEMP=
+@SET PATH=%__CYGWIN__%\bin;%PATH%
 
 @REM Make sure that /tmp is not set incorrectly for sbs
 @umount -u /tmp >NUL  2>NUL
@@ -59,8 +40,8 @@
 @REM prevent raptor from potentially creating read-only files:
 @set CYGWIN=nontsec nosmbntsec
 
-@REM Run Raptor with all the arguments.
-@%__PYTHON__% %SBS_HOME%\python\raptor_start.py %*
+@REM Run with all the arguments.
+@bash %SBS_HOME%\bin\sbs_filter %*
 
 @ENDLOCAL
 @cmd /c exit /b %ERRORLEVEL%

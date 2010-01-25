@@ -1,0 +1,50 @@
+/*
+* Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description: 
+*
+*/
+
+TARGET        createstaticpdll.dll
+TARGETTYPE    pdll
+
+UID             0xE800004C
+CAPABILITY   All -TCB
+
+
+VENDORID 0x70000001
+
+SOURCEPATH    .
+SOURCE        CreateStaticDLL.cpp
+
+#ifdef ARMV6
+SOURCE        armv6_specific.cpp
+#endif
+#ifdef ARMV7
+SOURCE        armv7_specific.cpp
+#endif
+
+USERINCLUDE   .
+SYSTEMINCLUDE /epoc32/include
+
+LIBRARY       euser.lib
+
+#if defined(WINS)
+    deffile ./CREATESTATICPDLLWINS.def
+#elif defined(MARM)
+    deffile ./CREATESTATICPDLLARM.def
+#endif
+nostrictdef
+
+#include "../inc/macrotests.mmh"
+

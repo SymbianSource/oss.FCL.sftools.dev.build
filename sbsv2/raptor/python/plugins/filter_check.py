@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2006-2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -12,15 +12,18 @@
 # Contributors:
 #
 # Description: 
-# raptor version information module
+# Filter class for doing --what and --check operations
 #
 
-version=(2,12,0,"2010-01-25","symbian build system")
+import os
+import sys
+import re
+import filter_interface
+import filter_what
 
-def numericversion():
-	"""Raptor version string"""
-	return "%d.%d.%d" % version[:3]
+class FilterCheck(filter_what.FilterWhat):
 
-def fullversion():
-	"""Raptor version string"""
-	return "%d.%d.%d [%s %s]" % version
+        def __init__(self): 
+		super(filter_what.FilterWhat,self).__init__()
+		self.check = True
+

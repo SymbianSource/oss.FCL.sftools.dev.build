@@ -517,6 +517,18 @@ class SuiteRun(TestRun):
 		return keys
 
 
+# Make SBS_HOME, EPOCROOT have uppercase drive letters to match os.getcwd() and
+# thus stop all those insane test problems which result from one being uppercase
+# and the other lowercase
+
+if sys.platform.startswith("win"):
+	sh = os.environ['SBS_HOME']
+	if sh[1] == ':':
+		os.environ['SBS_HOME'] = sh[0].upper() + sh[1:]
+	er = os.environ['EPOCROOT']
+	if er[1] == ':':
+		os.environ['EPOCROOT'] = er[0].upper() + er[1:]
+
 # Clean epocroot before running tests
 raptor_tests.clean_epocroot()
 run_tests = SuiteRun(suitepattern = options.suite, testpattern = options.tests,

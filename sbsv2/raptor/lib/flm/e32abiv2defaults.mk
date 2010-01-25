@@ -59,7 +59,7 @@ ifeq ($(TOOLCHAIN),RVCT)
 	LINKER_ENTRYPOINT_ADORNMENT:=(uc_exe_.o)
   endif
 
-  ifeq ($(call isoneof,$(TARGETTYPE),ani textnotifier2 stddll plugin fsy pdl dll),1)
+  ifeq ($(call isoneof,$(TARGETTYPE),ani textnotifier2 stddll plugin fsy pdl dll pdll),1)
 	LINKER_ENTRYPOINT_ADORNMENT:=(uc_dll_.o)
   endif
 

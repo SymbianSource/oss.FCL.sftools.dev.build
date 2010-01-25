@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -30,40 +30,51 @@ import unzip
 tempdir = ""
 
 parser = optparse.OptionParser()
-parser.add_option("-s", "--sbs_home", dest="sbs_home",
+parser.add_option("-s", "--sbs-home", dest="sbshome",
                   help="Path to use as SBS_HOME environment variable. If not present the script exits.")
+parser.add_option("-w", "--win32-support", dest="win32support",
+                  help="Path to Win32 support directory. If not present the script exits.")
 
 (options, args) = parser.parse_args()
 
-if options.sbs_home == None:
+if options.sbshome == None:
 	print "ERROR: no SBS_HOME passed in. Exiting..."
 	sys.exit(2)
 
+if options.win32support == None:
+	print "ERROR: no win32support directory specified. Unable to proceed. Exiting..."
+	sys.exit(2)
+else:
+	# Required irectories inside the win32-support repository
+	win32supportdirs = ["bv", "cygwin", "mingw", "python264"]
+	for dir in win32supportdirs:
+		if not os.path.isdir(os.path.join(options.win32support, dir)):
+			print "ERROR: directory %s does not exist. Cannot build installer. Exiting..." % dir
+			sys.exit(2)
 
 def parseconfig(xmlFile="raptorinstallermaker.xml"):
 	pass
 
-def generateinstallerversionheader(sbs_home = None):
-	os.environ["SBS_HOME"] = sbs_home
-	os.environ["PATH"] = os.path.join(os.environ["SBS_HOME"], "bin") + os.pathsep + os.environ["PATH"]
+def generateinstallerversionheader(sbshome = None):
+	shellenv = os.environ.copy()
+	shellenv["PYTHONPATH"] = os.path.join(sbshome, "python")
 	
-	versioncommand = "sbs -v"
+	raptorversioncommand = "python -c \"import raptor_version; print raptor_version.numericversion()\""
 	
-	# Raptor version string looks like this
-	# sbs version 2.5.0 [2009-02-20 release]
+	# Raptor version is obtained from raptor_version module's numericversion function.
 	sbs_version_matcher = re.compile(".*(\d+\.\d+\.\d+).*", re.I)
 	
 	# Create Raptor subprocess
-	sbs = subprocess.Popen(versioncommand, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-	
+	versioncommand = subprocess.Popen(raptorversioncommand, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=shellenv)
+	raptorversion = ""
 	# Get all the lines matching the RE
-	for line in sbs.stdout.readlines():
+	for line in versioncommand.stdout.readlines():
 		res = sbs_version_matcher.match(line)
 		if res:
 			raptorversion = res.group(1)
 			print "Successfully determined Raptor version %s" % raptorversion
 
-	sbs.wait() # Wait for process to end
+	versioncommand.wait() # Wait for process to end
 	
 	raptorversion_nsis_header_string = "# Raptor version file\n\n!define RAPTOR_VERSION %s\n" % raptorversion
 	
@@ -94,11 +105,16 @@ def cleanup():
 	global tempdir
 	print "Cleaning up temporary directory %s" % tempdir
 	shutil.rmtree(tempdir,True)
+	try:
+		os.remove("raptorversion.nsh")
+		print "Successfully deleted raptorversion.nsh."
+	except:
+		print "ERROR: failed to remove raptorversion.nsh - remove manually if needed."
 	print "Done."
 
 makensispath = unzipnsis(".\\NSIS.zip")
-generateinstallerversionheader(options.sbs_home)
-nsiscommand = makensispath + " /DRAPTOR_LOCATION=%s raptorinstallerscript.nsi" % options.sbs_home
+generateinstallerversionheader(options.sbshome)
+nsiscommand = makensispath + " /DRAPTOR_LOCATION=%s /DWIN32SUPPORT=%s raptorinstallerscript.nsi" % (options.sbshome, options.win32support)
 print "nsiscommand = %s" % nsiscommand
 runmakensis(nsiscommand)
 cleanup()

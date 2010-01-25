@@ -26,6 +26,7 @@
 		<set name="INTERFACE.exe" value="Emulator.exe"/>
 		<set name="INTERFACE.stdexe" value="Emulator.stdexe"/>
 		<set name="INTERFACE.dll" value="Emulator.dll"/>
+		<set name="INTERFACE.pdll" value="Emulator.pdll"/>
 		<set name="INTERFACE.stddll" value="Emulator.stddll"/>
 		<set name="INTERFACE.exexp" value="Emulator.exexp"/>
 		<set name="INTERFACE.fsy" value="Emulator.fsy"/>

@@ -22,6 +22,10 @@ import filter_interface
 
 class FilterWhat(filter_interface.Filter):
 
+	def __init__(self):
+		super(filter_interface.Filter,self).__init__()
+		self.path_prefix_to_strip = None
+		self.path_prefix_to_add_on = None
 	
 	def print_file(self, line, start, end):
 		"Ensure DOS slashes on Windows"
@@ -33,6 +37,12 @@ class FilterWhat(filter_interface.Filter):
 			filename = line[(start + 1):end].replace("/","\\")
 		else:
 			filename = line[(start + 1):end]
+
+		if self.path_prefix_to_strip:
+			if filename.startswith(self.path_prefix_to_strip):
+				filename = filename[len(self.path_prefix_to_strip):]
+			if self.path_prefix_to_add_on != None:
+				filename = self.path_prefix_to_add_on + filename
 			
 		if self.check:
 			if not os.path.isfile(filename):
@@ -42,6 +52,12 @@ class FilterWhat(filter_interface.Filter):
 			self.outfile.write(filename+"\n")
 
 		self.prints += 1
+
+	def start_bldinf(self, bldinf):
+		pass
+
+	def end_bldinf(self):
+		pass
 		
 
 	def open(self, build_parameters):
@@ -79,6 +95,10 @@ class FilterWhat(filter_interface.Filter):
 		
 		"Regex for zip exports"
 		self.zip_export_regex = re.compile("^<member>.*")
+
+		"Regex for determining bld.inf name"
+		self.whatlog_regex = re.compile("^<whatlog *bldinf='(?P<bldinf>[^']*)'.*")
+		self.current_bldinf = ''
 		
 		self.prints = 0
 		self.ok = True		
@@ -105,6 +125,7 @@ class FilterWhat(filter_interface.Filter):
 				self.repetitions[line] = 0
 				
 			if self.repetitions[line] == 0:
+				
 				if self.regex.match(line) and (self.what or self.check):
 					"Print the whole line"
 					self.print_file(line, (-1), len(line))
@@ -129,6 +150,20 @@ class FilterWhat(filter_interface.Filter):
 					end = line.rfind("<")
 					
 					self.print_file(line, start, end)
+
+				else:
+					"work out what the 'current' bldinf file is"
+					m = self.whatlog_regex.match(line)
+					if m:
+						bi = m.groupdict()['bldinf']
+						if self.current_bldinf != bi:
+							if self.current_bldinf != '':
+								self.end_bldinf()
+							self.current_bldinf = bi
+							if bi != '':
+								self.start_bldinf(bi)
+							
+					
 						
 			self.repetitions[line] += 1
 				
