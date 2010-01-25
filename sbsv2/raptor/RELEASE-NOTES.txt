@@ -49,6 +49,7 @@ New Features:
   The output is in CSV format.  
 
 Defect Fixes:
+- fix for ARM9E + ARMV5 pre-processing confusion
 - SF bug 1570: Adding then removing a capability can produce incorrect 
   result: e.g. ALL TCB -TCB becomes ALL -TCB but it should be just ALL
 
