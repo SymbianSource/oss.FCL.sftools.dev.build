@@ -6,8 +6,7 @@ version 2.12.0
 New Features:
 - New 'Patchable Constants' target type: TARGETTYPE pdll
 - Combine Linking and Postlinking into a single step - performance improvement.
-- Support exit codes from next version of the trace compiler which will issue 
-  them
+- Support exit codes from next version of the trace compiler which will issue them
 - New sbs_filter script and batchfile to ease the use of sbs_filter.py.  
   Allows filters to be executed over a log after a build has been done.
     e.g.
@@ -49,6 +48,7 @@ New Features:
 
 Defect Fixes:
 - fix for ARM9E + ARMV5 pre-processing confusion
+- SF bug 1606: template_ext.flm wrongly creates dependencies to OTHER_CFG targets
 - SF bug 1570: Adding then removing a capability can produce incorrect 
   result: e.g. ALL TCB -TCB becomes ALL -TCB but it should be just ALL
 
