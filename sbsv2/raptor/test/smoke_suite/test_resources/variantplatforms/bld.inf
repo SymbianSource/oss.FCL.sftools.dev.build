@@ -1,0 +1,43 @@
+/*
+* Copyright (c) 2010 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description: 
+*
+*/
+
+PRJ_PLATFORMS
+armv5 armv6 armv7
+
+PRJ_EXPORTS
+variantplatforms.flm /epoc32/tools/makefile_templates/tools/variantplatforms.flm
+variantplatforms.xml /epoc32/tools/makefile_templates/tools/variantplatforms.xml
+
+/* 
+   set the FLM parameter based on the pre-processing macros, so that we can
+   test that this bld.inf is actually processed for each of the platforms
+   that we expect - including ones that are extensions of ARMV5 (eg. ARM9E)
+*/ 
+#if defined(ARM9E)
+#define PARAMETER arm9e
+#elif defined(ARMV7)
+#define PARAMETER armv7
+#elif defined(ARMV6)
+#define PARAMETER armv6
+#else
+#define PARAMETER armv5
+#endif
+
+PRJ_EXTENSIONS
+start extension tools/variantplatforms
+option VP PARAMETER
+end

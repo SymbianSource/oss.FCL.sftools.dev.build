@@ -33,9 +33,8 @@ def run():
 	cmd3 = "grep -i '.*checksource errors found.*' ${SBSLOGFILE}"
 	t.command = cmd1 + " && " + cmd2 + " && " + cmd3
 
-	t.mustmatch = [
-		".* 5 checksource errors found.*"
-		]
+	t.mustmatch_singleline = ["[1-9] checksource errors found"]
+	
 	t.returncode = 1
 	t.run("windows")
 	return t
