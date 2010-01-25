@@ -58,7 +58,7 @@ def run():
 	warnings = 0
 	
 	t.id = "0106"
-	t.name = "filter_whatcomp_sbs_filter"
+	t.name = "whatcomp"
 	t.description = description
 	t.command = command % "arm.v5.urel.gcce4_4_1"
 	t.targets = targets

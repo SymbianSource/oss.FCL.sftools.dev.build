@@ -37,14 +37,14 @@ def run():
 	
 	count = 0	
 	for toolchain in sorted(toolchains.keys()):
-		t.id = "0103" + string.ascii_lowercase[count]
+		t.id = "0095" + string.ascii_lowercase[count]
 		t.name = rootname % (toolchain, "clean")
 		t.command = rootcommand + toolchain + " clean"
 		t.mustmatch_singleline = []
 		t.run()
 		count += 1
 		
-		t.id = "0103" + string.ascii_lowercase[count]
+		t.id = "0095" + string.ascii_lowercase[count]
 		t.name = rootname % (toolchain, "build")
 		t.command = rootcommand + toolchain
 		mustmatch = []	
@@ -54,7 +54,7 @@ def run():
 		t.run()
 		count += 1
 
-	t.id = "103"
+	t.id = "95"
 	t.name = "toolchain_macros"
 	t.print_result()
 	return t

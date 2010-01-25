@@ -21,7 +21,7 @@ def run():
 
 	t.description = "Ensure Raptor builds Qt applications successfully"	
 
-	t.id = "00xx"	# TO DO: update ID
+	t.id = "0107"
 	t.name = "qt_helloworld"
 	t.command = "cd smoke_suite/test_resources/qt && qmake -spec symbian-sbsv2 && sbs"
 	t.targets = [
