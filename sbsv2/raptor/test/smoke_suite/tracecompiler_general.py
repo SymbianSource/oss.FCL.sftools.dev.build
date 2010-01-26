@@ -1,3 +1,18 @@
+#
+# Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+#
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+#
+# Contributors:
+#
+# Description: 
+#
 
 from raptor_tests import SmokeTest
 from raptor_tests import AntiTargetSmokeTest
@@ -199,7 +214,7 @@ def run():
 		failed.append(t.name)
 	
 
-	t.name = "traceccompiler_general"
+	t.name = "tracecompiler_general"
 	t.result = result
 
 	print "\nOverall Result : " + result.upper() + "\n"
