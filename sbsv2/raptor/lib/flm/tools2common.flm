@@ -18,7 +18,7 @@
 
 ## Input parameters
 
-ifeq ($(OSTYPE),cygwin)
+ifeq ($(filter win,$(HOSTPLATFORM)),win)
 CDEFS.TOOLS2:=$(CDEFS.WIN32) $(CDEFS)
 CFLAGS:=$(CFLAGS.WIN32) $(CFLAGS) $(OPTION_GCC)
 COMPILER_PATH:=$(COMPILER_PATH.WIN32)

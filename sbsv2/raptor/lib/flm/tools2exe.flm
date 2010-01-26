@@ -16,7 +16,7 @@
 #
 
 ## Outputs - externally relevant targets that this FLM generates
-ifeq ($(OSTYPE),cygwin)
+ifeq ($(filter win,$(HOSTPLATFORM)),win)
 SYSTEMLIBS:=$(LIBS.WIN32)
 else
 ifneq ($(TOOLS2WIN32),)
