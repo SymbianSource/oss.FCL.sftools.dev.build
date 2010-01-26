@@ -23,9 +23,9 @@
 @IF NOT "%SBS_HOME%"==""  goto foundhome
 @SET RAPTORBINDIR=%~dp0
 @SET WD=%cd%
-@cd %RAPTORBINDIR%\..
+@cd /d %RAPTORBINDIR%\..
 @SET SBS_HOME=%cd%
-@cd %WD%
+@cd /d %WD%
 :foundhome 
 
 @REM Use the python set by the environment if possible
