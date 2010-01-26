@@ -1453,10 +1453,9 @@ class MMPRaptorBackend(MMPBackend):
 			for cap in toks[1]:
 				cap = cap.lower()
 				self.__debug("Setting  "+toks[0]+": " + cap)
-				if cap != "all":
-					if not cap.startswith("-"):
-						if not cap.startswith("+"):
-							cap = "+" + cap	
+				if not cap.startswith("-"):
+					if not cap.startswith("+"):
+						cap = "+" + cap	
 				self.capabilities.append(cap)
 		elif varname=='DEFFILE':
 			self.__defFileRoot = self.__currentMmpFile
@@ -2215,9 +2214,7 @@ class MMPRaptorBackend(MMPBackend):
 
 			if capability.startswith('-'):
 				invert = 0xffffffff
-				capability = capability[1:]
-			elif capability.startswith('+'):
-				capability = capability[1:]
+			capability = capability[1:]
 
 			if MMPRaptorBackend.supportedCapabilities.has_key(capability):
 				capabilityFlag1 = capabilityFlag1 ^ invert
