@@ -94,10 +94,12 @@ def run():
 		rm -rf $(EPOCROOT)/epoc32/include/dependency.rh
 		sbs -f- --noexport -b smoke_suite/test_resources/dependencies/bld.inf -c default -c tools2_rel"""
 	t.mustnotmatch = []
+	# Note that the resource build does not exhibit a missing dependency as its dependency files are generated in a separate stage where
+	# the target file isn't actually a target of that stage
 	t.mustmatch.extend([
-		"<warning>Missing dependency detected: $(EPOCROOT)/epoc32/include/dependency.h</warning>",
-		"<warning>Missing dependency detected: $(EPOCROOT)/epoc32/include/dependency.rh</warning>",		
+		"<warning>Missing dependency detected: .*/epoc32/include/dependency.h</warning>"
 		])
+	t.warnings = 1
 	t.run()
 	
 	t.id = "0098d"
@@ -117,6 +119,7 @@ def run():
 	t.targets = targets
 	t.mustmatch = []
 	t.countmatch = []
+	t.warnings = 0
 	t.errors = 1 # We expect an error from the first build due to the deliberate dependency file corruption
 	t.run()
 

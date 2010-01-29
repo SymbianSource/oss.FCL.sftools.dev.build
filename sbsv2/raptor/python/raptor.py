@@ -501,6 +501,7 @@ class Raptor(object):
 		self.doExport = True
 		self.noBuild = False
 		self.noDependInclude = False
+		self.noDependGenerate = False
 		self.projects = set()
 
 		self.cache = raptor_cache.Cache(self)
@@ -617,6 +618,10 @@ class Raptor(object):
 
 	def SetNoDependInclude(self, TrueOrFalse):
 		self.noDependInclude = TrueOrFalse
+		return True
+
+	def SetNoDependGenerate(self, TrueOrFalse):
+		self.noDependGenerate = TrueOrFalse
 		return True
 
 	def SetKeepGoing(self, TrueOrFalse):

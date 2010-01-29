@@ -176,6 +176,19 @@ include %s
 			 talon_settings,
 			 self.raptor.systemFLM.Append('globals.mk') )
 
+		# Unless dependency generated has been disabled via the CLI, use a .DEFAULT target to
+		# trap missing dependencies (ignoring user config files that we know are usually absent)
+		if not Raptor.noDependGenerate:
+			self.makefile_prologue += """
+$(FLMHOME)/user/final.mk:
+$(FLMHOME)/user/default.flm:
+$(FLMHOME)/user/globals.mk:
+
+.DEFAULT:
+	@echo "<warning>Missing dependency detected: $@</warning>"
+
+"""
+
 		# Only output timings if requested on CLI
 		if self.raptor.timing:
 			self.makefile_prologue += "\n# Print Start-time of Makefile parsing\n" \
