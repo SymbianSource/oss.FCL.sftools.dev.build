@@ -20,7 +20,7 @@ import re
 def run():
 	t = CheckWhatSmokeTest()
 	t.description = "Trace Compiler Whatlog test"
-	t.id = "xxx"
+	t.id = "112"
 	t.name = "tracecompiler_whatlog"
 	t.usebash = True
 	t.command = "sbs -b smoke_suite/test_resources/tracecompiler/testTC/group/bld.inf -c armv5.tracecompiler -m ${SBSMAKEFILE} -f ${SBSLOGFILE} && cat ${SBSLOGFILE}"
