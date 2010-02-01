@@ -50,6 +50,7 @@ LINKER_FIRSTSTATLIB:=
 MAINLINKAS:=
 NEWLIBFILE:=
 RELEASABLES:=
+TC_RELEASABLES:=
 STATLIBDIR:=
 STDCPP_BUILD:=
 STDCPPTAGFILE:=
@@ -204,7 +205,7 @@ BINTARGET:=$(BINDIR)/$(TARGET).$(if $(REQUESTEDTARGETEXT),$(REQUESTEDTARGETEXT),
 # Run trace compiler #####################################
 TRACE_MARKER_PATH:=$(OUTPUTPATH)
 
-ifeq ($(UID3),)
+ifeq ($(subst 0,,$(UID3)),)
   ifeq ($(UID2),)
     USE_TRACE_COMPILER:=
   else
@@ -218,6 +219,7 @@ endif
 # Users can turn TC on by setting it to 1 in user config.
 ifneq ($(USE_TRACE_COMPILER),) 
   include $(FLMHOME)/tracecompiler.mk
+  TC_RELEASABLES:=$(TRACE_DICTIONARY) $(AUTOGEN_HEADER)
 endif
 
 
@@ -688,4 +690,4 @@ $(call raptor_clean,$(CLEANTARGETS))
 # make the output directories while reading makefile - some build engines prefer this
 $(call makepath,$(CREATABLEPATHS))
 # for the --what option and the log file
-$(call raptor_release,$(RELEASABLES))
+$(call raptor_release,$(RELEASABLES) $(TC_RELEASABLES))
