@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2006-2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2006-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -13,9 +13,10 @@
 #
 # Description: 
 # raptor version information module
-#
 
-version=(2,12,0,"2010-01-25","symbian build system")
+# replace CHANGESET with the Hg changeset for ANY release
+
+version=(2,12,1,"2010-01-29","symbian build system","CHANGESET")
 
 def numericversion():
 	"""Raptor version string"""
@@ -23,4 +24,4 @@ def numericversion():
 
 def fullversion():
 	"""Raptor version string"""
-	return "%d.%d.%d [%s %s]" % version
+	return "%d.%d.%d [%s %s %s]" % version

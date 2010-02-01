@@ -22,7 +22,7 @@ def run():
 	t.usebash = True
 
 	# Introduce LINKER_OPTIONS for tools2 linker
-	t.id = "xx"
+	t.id = "0108"
 	t.name = "apply_linker_options"
 	t.command = "sbs -b smoke_suite/test_resources/apply_usecases/linker_options/bld.inf -c tools2 -f -"
 	t.targets = [
