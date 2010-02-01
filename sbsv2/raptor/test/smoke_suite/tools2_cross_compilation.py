@@ -20,7 +20,7 @@ def run():
 	t = SmokeTest()	
 	t.description = "Tests Raptor can build win32 tools on linux"
 
-	t.id = "105a"
+	t.id = "111a"
 	t.name = "tools2_cross_compilation_pdrtran" 
 	t.command = "sbs -b smoke_suite/test_resources/tools2/pdrtran/BLD.INF -c tools2 -c tools2.win32"
 
@@ -65,7 +65,7 @@ def run():
 	t.run("linux")
 
 	
-	t.id = "105b"
+	t.id = "111b"
 	t.name = "tools2_cross_compilation_libs"
 	t.command = "sbs -b smoke_suite/test_resources/tools2/bld.inf -c tools2.win32 -c tools2"
 
@@ -115,7 +115,7 @@ def run():
 
 
 	t.usebash = True
-	t.id = "105c"
+	t.id = "111c"
 	t.name = "tools2_cross_compilation_toolcheck_linux"
 	t.command = "$(EPOCROOT)/epoc32/tools/pdrtran smoke_suite/test_resources/tools2/pdrtran/TEST.PD $(EPOCROOT)/epoc32/build/TEST_PDRTRAN.PDR"
 	t.targets = [
@@ -127,7 +127,7 @@ def run():
 	t.run("linux")
 
 	
-	t.id = "105d"
+	t.id = "111d"
 	t.name = "tools2_cross_compilation_toolcheck_windows"
 	t.command = "file $(EPOCROOT)/epoc32/tools/pdrtran.exe"
 	t.targets = []
@@ -137,7 +137,7 @@ def run():
 	t.run("linux")
 
 
-	t.id = "105"
+	t.id = "111"
 	t.name = "tools2_cross_compilation"
 	t.print_result()
 	return t
