@@ -438,8 +438,12 @@ include %s
 						command += "  " + o
 
 			# Switch off dependency file including?
-			if self.raptor.noDependInclude:
+			if self.raptor.noDependInclude or self.raptor.noDependGenerate:
 				command += " NO_DEPEND_INCLUDE=1"
+			
+			# Switch off dependency file generation (and, implicitly, inclusion)?
+			if self.raptor.noDependGenerate:
+				command += " NO_DEPEND_GENERATE=1"
 			
 			if self.usetalon:
 				# use the descrambler if we set it up

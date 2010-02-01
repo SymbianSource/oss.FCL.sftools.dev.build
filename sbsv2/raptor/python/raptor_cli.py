@@ -277,7 +277,7 @@ def DoRaptor(Raptor, args):
 				 'make_engine': Raptor.SetMakeEngine,
 				 'make_option': Raptor.AddMakeOption,
 				 'noDependInclude': Raptor.SetNoDependInclude,
-				 'noDependGenerate': Raptor.SetNoDependInclude,
+				 'noDependGenerate': Raptor.SetNoDependGenerate,
 				 'number_of_jobs': Raptor.SetJobs,
 				 'project_name' :  Raptor.AddProject,
 				 'filter_list' : Raptor.FilterList,

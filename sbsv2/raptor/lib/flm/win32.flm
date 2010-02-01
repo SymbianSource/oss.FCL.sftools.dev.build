@@ -150,7 +150,7 @@ else
 endif
 
 # get the compiler to generate dependencies for us?
-ifeq ($(DEPEND_SKIP),)
+ifeq ($(NO_DEPEND_GENERATE),)
   CFLAGS:=$(CFLAGS) $(OPT.DEPEND)
 endif
 
@@ -379,19 +379,20 @@ ifneq ($(BASE_TYPE),importlib)
 	  $(call startrule,win32compile2object,,$(1)) \
 	  $(CC) $$(if $$(filter %.C,$(1)),-lang c) $(CFLAGS) $(OPTION_CW) \
 	  $(if $(STDCPP_BUILD),$$(if $$(filter %.c %.C,$(1)),,$$(call makemacrodef,$(OPT.DEFINE),$(STDCPP_WCHAR_DEF))),) \
-	  $(DEFINES) $(INCLUDES) $(OPT.OUT)"$$@" "$(1)" && \
-	  $(GNUSED) 's#\\\\\(.\)#/\1#g;s#/ #\\\ #g;s#\([A-Za-z]:\)\\\\#\1/#g;1,1s#.*: .* \(.\)\?$$$$#$(call mapwin32file,$(1),.o): $1 \1#' $(call mapwin32file,$(1),.dep) > $(call mapwin32file,$(1),.o.d) \
+	  $(DEFINES) $(INCLUDES) $(OPT.OUT)"$$@" "$(1)" \
+	  $(if $(NO_DEPEND_GENERATE),,&& $(GNUSED) 's#\\\\\(.\)#/\1#g;s#/ #\\\ #g;s#\([A-Za-z]:\)\\\\#\1/#g;1,1s#.*: .* \(.\)\?$$$$#$(call mapwin32file,$(1),.o): $1 \1#' $(call mapwin32file,$(1),.dep) > $(call mapwin32file,$(1),.o.d)) \
 	  $(call endrule,win32compile2object)
 
-    CLEANTARGETS:=$$(CLEANTARGETS) $(call mapwin32file,$(1),.dep)
-
-    CLEANTARGETS:=$$(CLEANTARGETS) $(DEPENDFILENAME)
-    ifneq "$(DEPENDFILE)" ""
-    ifeq ($(NO_DEPEND_INCLUDE),)
-      ifeq "$(filter %CLEAN,$(call uppercase,$(MAKECMDGOALS)))" ""
-        -include $(DEPENDFILE)
-      endif
+    ifeq ($(NO_DEPEND_GENERATE),)
+      CLEANTARGETS:=$$(CLEANTARGETS) $(call mapwin32file,$(1),.dep) $(DEPENDFILENAME)
     endif
+    
+    ifneq ($(DEPENDFILE),)
+      ifeq ($(NO_DEPEND_INCLUDE),)
+        ifeq ($(filter %CLEAN,$(call uppercase,$(MAKECMDGOALS))),)
+          -include $(DEPENDFILE)
+        endif
+      endif
     endif
 
     # individual source file compilation
@@ -419,27 +420,31 @@ ifneq ($(BASE_TYPE),importlib)
   STDMWCINCLUDEPATHS:=$(if $(MWCSym2Includes),$(MWCSym2Includes),$(MWCSYM2INCLUDES))
 
   define win32resourcecompile
-    # Note that two calls are made to the resource compiler here.  There seems to be no means to override the
-    # default behaviour of dumping dependency files into the CWD when using -MD.  So - we compile once for real,
-    # and then pipe dependency output through SED afterwards to create the dependency file where we want it
+    # Note that, if dependency files are required, two calls are made to the resource compiler here.
+    # There seems to be no means to override the default behaviour of dumping dependency files into the CWD when using -MD.
+    # So - we compile once for real, and then pipe dependency output through SED afterwards to create the dependency file where we want it
 
     $(eval DEPENDFILENAME:=$(call mapwin32file,$(1),.res.d))
     $(eval DEPENDFILE:=$(wildcard $(DEPENDFILENAME)))
 
     $(call mapwin32file,$(1),.res): $(1) $(PROJECT_META) $(if $(DEPENDFILE),,RESOURCE BITMAP EXPORT)
 	  $(call startrule,win32resourcecompile,,$(1)) \
-	  MWCIncludes='$(STDMWCINCLUDEPATHS)' $(RC) $(OPT.OUT)"$$@" "$(1)" && \
-	  MWCIncludes='$(STDMWCINCLUDEPATHS)' $(RC) -make $(OPT.OUT)"$$@" "$(1)" | \
-	  $(GNUSED) 's#\\\\\(.\)#/\1#g;s#/ #\\\ #g;s#\([A-Za-z]:\)\\\\#\1/#g;1,1s#.*: .* \(.\)\?$$$$#$(call mapwin32file,$(1),.res): $1 \1#' > $(call mapwin32file,$(1),.res.d) \
+	  MWCIncludes='$(STDMWCINCLUDEPATHS)' $(RC) $(OPT.OUT)"$$@" "$(1)" \
+	  $(if $(NO_DEPEND_GENERATE),,&& \
+	    MWCIncludes='$(STDMWCINCLUDEPATHS)' $(RC) -make $(OPT.OUT)"$$@" "$(1)" | \
+	    $(GNUSED) 's#\\\\\(.\)#/\1#g;s#/ #\\\ #g;s#\([A-Za-z]:\)\\\\#\1/#g;1,1s#.*: .* \(.\)\?$$$$#$(call mapwin32file,$(1),.res): $1 \1#' > $(call mapwin32file,$(1),.res.d)) \
 	  $(call endrule,win32resourcecompile)
 
-    CLEANTARGETS:=$$(CLEANTARGETS) $(DEPENDFILENAME)
-    ifneq "$(DEPENDFILE)" ""
-    ifeq ($(NO_DEPEND_INCLUDE),)
-      ifeq "$(filter %CLEAN,$(call uppercase,$(MAKECMDGOALS)))" ""
-        -include $(DEPENDFILE)
-      endif
+    ifeq ($(NO_DEPEND_GENERATE),)
+      CLEANTARGETS:=$$(CLEANTARGETS) $(DEPENDFILENAME)
     endif
+    
+    ifneq ($(DEPENDFILE),)
+      ifeq ($(NO_DEPEND_INCLUDE),)
+        ifeq ($(filter %CLEAN,$(call uppercase,$(MAKECMDGOALS))),)
+          -include $(DEPENDFILE)
+        endif
+      endif
     endif
 
   endef

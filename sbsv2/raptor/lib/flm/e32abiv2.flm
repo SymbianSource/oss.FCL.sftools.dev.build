@@ -773,19 +773,22 @@ $(1): $(2) $(PROJECT_META) $(if $(MULTIFILE_ENABLED),,$(if $(DEPENDFILE),,RESOUR
 			$(if $(USERINCLUDE),$(COMPILER_SYSTEM_INCLUDE_OPTION),)$(call concat, $(COMPILER_SYSTEM_INCLUDE_OPTION),$(call dblquote,$(USERINCLUDE)))      \
 			$(if $(SYSTEMINCLUDE),$(COMPILER_SYSTEM_INCLUDE_OPTION),)$(call concat, $(COMPILER_SYSTEM_INCLUDE_OPTION),$(call dblquote,$(SYSTEMINCLUDE)))  \
 			$(if $(NOHIDEALL),--no_hide_all,) \
-			$(DEPEND_OPTION) $(call dblquote,$(1).d) \
-                        $(if $(LINKERFEEDBACK_STAGE2),$(FEEDBACK_OPTION)$(call dblquote,$(FEEDBACKFILE))) \
+			$(if $(NO_DEPEND_GENERATE),,$(DEPEND_OPTION) $(call dblquote,$(1).d)) \
+			$(if $(LINKERFEEDBACK_STAGE2),$(FEEDBACK_OPTION)$(call dblquote,$(FEEDBACKFILE))) \
 			$(if $(MULTIFILE_ENABLED),--multifile $(OUTPUT_OPTION) $(MULTIFILEOBJECT) \
 			--via $$(call dblquote, $(MULTIFILE_VIAFILE)),$(OUTPUT_OPTION) $$@ $$(call dblquote, $$<))  \
 	$(call endrule,compile)
 
-CLEANTARGETS:=$$(CLEANTARGETS) $(DEPENDFILENAME)
-ifneq "$(DEPENDFILE)" ""
-ifeq ($(NO_DEPEND_INCLUDE),)
-  ifeq "$(filter %CLEAN,$(call uppercase,$(MAKECMDGOALS)))" ""
-    -include $(DEPENDFILE)
-  endif
+ifeq ($(NO_DEPEND_GENERATE),)
+  CLEANTARGETS:=$$(CLEANTARGETS) $(DEPENDFILENAME)
 endif
+
+ifneq ($(DEPENDFILE),)
+  ifeq ($(NO_DEPEND_INCLUDE),)
+    ifeq ($(filter %CLEAN,$(call uppercase,$(MAKECMDGOALS))),)
+      -include $(DEPENDFILE)
+    endif
+  endif
 endif
 
 # individual source file compilation
@@ -866,19 +869,22 @@ $(LISTINGTARGET): $(1) $(PROJECT_META)  $(if $(DEPENDFILE),,RESOURCE BITMAP EXPO
 			$(if $(USERINCLUDE),$(COMPILER_SYSTEM_INCLUDE_OPTION),)$(call concat, $(COMPILER_SYSTEM_INCLUDE_OPTION),$(call dblquote,$(USERINCLUDE)))      \
 			$(if $(SYSTEMINCLUDE),$(COMPILER_SYSTEM_INCLUDE_OPTION),)$(call concat, $(COMPILER_SYSTEM_INCLUDE_OPTION),$(call dblquote,$(SYSTEMINCLUDE)))  \
 			$(if $(NOHIDEALL),--no_hide_all,) \
-			$(DEPEND_OPTION) $(call dblquote,$(DEPENDFILENAME)) \
+			$(if $(NO_DEPEND_GENERATE),,$(DEPEND_OPTION) $(call dblquote,$(DEPENDFILENAME))) \
 			$$(call dblquote, $$<) $(OUTPUT_OPTION) $$(@) \
 	$(call endrule,e32listing)
 
 CLEANTARGETS:=$$(CLEANTARGETS) $(LISTINGTARGET)
 
-CLEANTARGETS:=$$(CLEANTARGETS) $(DEPENDFILENAME)
-ifneq "$(DEPENDFILE)" ""
-ifeq ($(NO_DEPEND_INCLUDE),)
-  ifeq "$(filter %CLEAN,$(call uppercase,$(MAKECMDGOALS)))" ""
-    -include $(DEPENDFILE)
-  endif
+ifeq ($(NO_DEPEND_GENERATE),))
+  CLEANTARGETS:=$$(CLEANTARGETS) $(DEPENDFILENAME)
 endif
+
+ifneq ($(DEPENDFILE),)
+  ifeq ($(NO_DEPEND_INCLUDE),)
+    ifeq ($(filter %CLEAN,$(call uppercase,$(MAKECMDGOALS))),)
+      -include $(DEPENDFILE)
+    endif
+  endif
 endif
 
 endef
@@ -985,18 +991,20 @@ $(eval e32abiv2_PREFILE_OPTIONS:= $(LICENSERETRY_OPTION) $(PREPROCESSOR_OPTION) 
 $(e32abiv2_PREFILE): $1 $(PROJECT_META) $(if $(DEPENDFILE),,RESOURCE BITMAP EXPORT)
 	$(call startrule,cia2cpp,,$1) \
 	$(if $(PERTURBSTARTTIME),$(RANSLEEP) $(PERTURBMSECS) ;,) \
-	$(CC) $(e32abiv2_PREFILE_OPTIONS) $(OUTPUT_OPTION) $$@ $$(call dblquote,$1) && \
-	$(CC) -M $(e32abiv2_PREFILE_OPTIONS) --depend_format=unix \
-	  $(OUTPUT_OPTION) $$@ $$(call dblquote,$1) > $(call dblquote,$(e32abiv2_PREFILE).d) \
+	$(CC) $(e32abiv2_PREFILE_OPTIONS) $(OUTPUT_OPTION) $$@ $$(call dblquote,$1) \
+	$(if $(NO_DEPEND_GENERATE),,&& $(CC) -M $(e32abiv2_PREFILE_OPTIONS) --depend_format=unix $(OUTPUT_OPTION) $$@ $$(call dblquote,$1) > $(call dblquote,$(e32abiv2_PREFILE).d)) \
 	$(call endrule,cia2cpp)
 
-CLEANTARGETS:=$$(CLEANTARGETS) $(DEPENDFILENAME)
-ifneq "$(DEPENDFILE)" ""
-ifeq ($(NO_DEPEND_INCLUDE),)
-  ifeq "$(filter %CLEAN,$(call uppercase,$(MAKECMDGOALS)))" ""
-    -include $(DEPENDFILE)
-  endif
+ifeq ($(NO_DEPEND_GENERATE),)
+  CLEANTARGETS:=$$(CLEANTARGETS) $(DEPENDFILENAME)
 endif
+
+ifneq ($(DEPENDFILE),)
+  ifeq ($(NO_DEPEND_INCLUDE),)
+    ifeq ($(filter %CLEAN,$(call uppercase,$(MAKECMDGOALS))),)
+      -include $(DEPENDFILE)
+    endif
+  endif
 endif
 
 endef
@@ -1027,21 +1035,26 @@ $(1): $(2) $(PROJECT_META) $(if $(DEPENDFILE),,RESOURCE BITMAP EXPORT)
 	$(call startrule,asmcompile,,$(2)) \
 		$(if $(PERTURBSTARTTIME),$(RANSLEEP) $(PERTURBMSECS) ;,) \
 		$(CC) $(e32abiv2_asm_OPTIONS) \
-		$(DEPEND_OPTION) $(call dblquote,$(DEPENDFILENAME)) \
+		$(if $(NO_DEPEND_GENERATE),,$(DEPEND_OPTION) $(call dblquote,$(DEPENDFILENAME))) \
 	 	$$(call dblquote, $$<) $(OUTPUT_OPTION) $$@ \
 	$(call endrule,asmcompile)
+ifeq ($(NO_DEPEND_GENERATE),)
 	$(call startrule,asmdependencies) \
 		$(CC) -M $(subst --no_rtti,,$(e32abiv2_asm_OPTIONS)) --depend_format=unix \
 	  	$(OUTPUT_OPTION) $$@ $$(call dblquote,$2) > $(call dblquote,$(DEPENDFILENAME)) \
 	$(call endrule,asmdependencies)
-
-CLEANTARGETS:=$$(CLEANTARGETS) $(DEPENDFILENAME)
-ifneq "$(DEPENDFILE)" ""
-ifeq ($(NO_DEPEND_INCLUDE),)
-  ifeq "$(filter %CLEAN,$(call uppercase,$(MAKECMDGOALS)))" ""
-    -include $(DEPENDFILE)
-  endif
 endif
+
+ifeq ($(NO_DEPEND_GENERATE),)
+  CLEANTARGETS:=$$(CLEANTARGETS) $(DEPENDFILENAME)
+endif
+
+ifneq ($(DEPENDFILE),)
+  ifeq ($(NO_DEPEND_INCLUDE),)
+    ifeq ($(filter %CLEAN,$(call uppercase,$(MAKECMDGOALS))),)
+      -include $(DEPENDFILE)
+    endif
+  endif
 endif
 
 CREATABLEPATHS:=$$(CREATABLEPATHS) $(INTERMEDIATEPATH)
