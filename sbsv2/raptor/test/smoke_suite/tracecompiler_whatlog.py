@@ -14,13 +14,21 @@
 # Description: 
 #
 
-from raptor_tests import CheckWhatSmokeTest,AntiTargetSmokeTest
+from raptor_tests import CheckWhatSmokeTest,SmokeTest
 import re
 
 def run():
+	t = SmokeTest()
+	t.description = "Trace Compiler Whatlog Clean"
+	t.id = "112a"
+	t.name = "tracecompiler_whatlog_clean"
+	t.usebash = True
+	t.command = "sbs -b smoke_suite/test_resources/tracecompiler/testTC/group/bld.inf -c armv5.tracecompiler CLEAN"
+	t.run("windows")
+
 	t = CheckWhatSmokeTest()
 	t.description = "Trace Compiler Whatlog test"
-	t.id = "112"
+	t.id = "112b"
 	t.name = "tracecompiler_whatlog"
 	t.usebash = True
 	t.command = "sbs -b smoke_suite/test_resources/tracecompiler/testTC/group/bld.inf -c armv5.tracecompiler -m ${SBSMAKEFILE} -f ${SBSLOGFILE} && cat ${SBSLOGFILE}"
@@ -57,6 +65,7 @@ def run():
 		"<build>$(EPOCROOT)/epoc32/include/internal/SymbianTraces/autogen/testTC_0x1000008d_TraceDefinitions.h</build>"
 		]		
 	t.run("windows")
+	t.id = "112"
 
 	return t
 
