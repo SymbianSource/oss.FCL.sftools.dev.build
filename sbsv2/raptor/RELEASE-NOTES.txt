@@ -9,9 +9,15 @@ next version
 	-c tools2.win32 -c tools2
   It only applies to platform tools2 on Linux
 
+- Add a workaround to enable the Qt team to link their code against Symbian DLL's
+
 version 2.12.1
 
-- Add a workaround to enable the Qt team to link their code against Symbian DLL's
+Defect Fixes:
+- SF Bug 1494 - sbs --what does not report Trace Compiler output
+- sbs -c winscw.tracecompiler uses wrong UID and doesn't generate traces
+- SF Bug 1519 - Raptor output files may contain unescaped left angle brackets as XML character data
+
 
 version 2.12.0
 

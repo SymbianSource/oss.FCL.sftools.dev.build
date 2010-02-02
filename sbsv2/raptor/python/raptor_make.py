@@ -497,12 +497,22 @@ include %s
 						universal_newlines=True, env=makeenv)
 				stream = p.stdout
 
-
+				inRecipe = False
 				line = " "
 				while line:
 					line = stream.readline()
-					self.raptor.out.write(line)
-
+					
+					if line.startswith("<recipe"):
+						inRecipe = True
+					elif line.startswith("</recipe"):
+						inRecipe = False
+					
+					# unless we are inside a "recipe", any line not starting
+					# with "<" is free text that must be escaped.
+					if inRecipe or line.startswith("<"):
+						self.raptor.out.write(line)
+					else:
+						self.raptor.out.write(escape(line))
 
 				# should be done now
 				returncode = p.wait()
