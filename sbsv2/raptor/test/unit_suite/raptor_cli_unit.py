@@ -130,9 +130,11 @@ class TestRaptorCli(unittest.TestCase):
 		return True
 	
 	def SetNoDependInclude(self, yesOrNo):
+		self.noDependInclude = yesOrNo
 		return True
 
 	def SetNoDependGenerate(self, yesOrNo):
+		self.noDependGenerate = yesOrNo
 		return True
 		
 	def SetJobs(self, N):
