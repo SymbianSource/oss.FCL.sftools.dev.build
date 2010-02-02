@@ -37,6 +37,9 @@
 
 	<var name="techview">
 	</var>
+	<var name="unhide_ci_refs">
+		<set name='REFERENCES_STV_DEFAULT' value='TRUE'/>
+	</var>
 
 	<var name="test">
 		<set name='TESTCODE' value='TRUE'/>

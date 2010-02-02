@@ -73,6 +73,7 @@
 		<env name='SBS_BVCPP' default="$(SBS_HOME)/$(HOSTPLATFORM_DIR)/bv/bin/cpp.exe" type='tool'/>
 		<env name='SBS_PERL' default='perl.exe' type='tool'/>
 		<env name='SBS_PYTHON' default='$(SBS_HOME)/$(HOSTPLATFORM_DIR)/python264/python.exe' type='tool'/>
+		<set name='UNHIDE_CI_REFS' value='$(SBS_HOME)/$(HOSTPLATFORM_DIR)/bin/unhide_ci_refs.exe' type='tool'/>
 	</var>
 
 	<var name="default.locations" extends="hostplatform.locations">

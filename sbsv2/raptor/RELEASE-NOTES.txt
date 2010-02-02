@@ -9,6 +9,10 @@ next version
 	-c tools2.win32 -c tools2
   It only applies to platform tools2 on Linux
 
+version 2.12.1
+
+- Add a workaround to enable the Qt team to link their code against Symbian DLL's
+
 version 2.12.0
 
 New Features:

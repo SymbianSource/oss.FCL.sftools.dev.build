@@ -75,6 +75,7 @@
 		<param name='TOOLCHAIN' default=''/>
 	</interface>
 	<interface name="Symbian.e32abiv2" extends="Symbian.mmp" flm="e32abiv2.flm">
+		<param name='REFERENCES_STV_DEFAULT' default=''/>
 		<param name='SUPPORTS_STDCPP_NEWLIB' default='1'/>
 		<param name='HAS_DEDICATED_OP_NEWDEL_LIB' default='1'/>
 		<param name='DEFAULT_STDCPP_NEWLIB'/>
@@ -102,6 +103,7 @@
 		<param name='CPP_LANG_OPTION'/>
 		<param name='CPPFILT'/>
 		<param name='CREATEVMAP'/>
+		<param name='UNHIDE_CI_REFS'/>
 		<param name='CREATEVMAPCPP'/>
 		<param name='DEBUG_FORMAT'/>
 		<param name='DEBUG_INFO'/>
