@@ -25,10 +25,13 @@ CAPABILITY   All -TCB
 VENDORID 0x70000001
 
 SOURCEPATH    .
-SOURCE        CreateStaticDLL.cpp
+SOURCE        tcwinsStaticDLL.cpp
+SOURCE        tcwinsfiletwo.cpp
 
 USERINCLUDE   .
 SYSTEMINCLUDE /epoc32/include
+SYSTEMINCLUDE /epoc32/include/internal
+USERINCLUDE traces
 
 LIBRARY       euser.lib
 
