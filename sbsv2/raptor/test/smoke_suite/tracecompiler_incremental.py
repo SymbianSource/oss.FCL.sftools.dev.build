@@ -19,19 +19,23 @@ from raptor_tests import SmokeTest
 def run():
 	t = SmokeTest()
 	t.description = "Test incremental rebuilding with TC on"
-
 	t.id = "114a"
+	t.name = "tracecompiler_incremental_clean"
+	t.usebash = True
+	t.command = "sbs -b smoke_suite/test_resources/tracecompiler/testTC/group/bld.inf -c armv5_urel.tracecompiler CLEAN"
+	t.run("windows")
+
+	t.id = "114b"
 	t.name = "tracecompiler_incremental_prebuild"
-	t.usebash = 1
-	t.command = "sbs -b smoke_suite/test_resources/tracecompiler/testTC/group/bld.inf -c armv5.tracecompiler.udeb -f - -m ${SBSMAKEFILE}"
+	t.command = "sbs -b smoke_suite/test_resources/tracecompiler/testTC/group/bld.inf -c armv5_urel.tracecompiler -f - -m ${SBSMAKEFILE}"
 	t.countmatch = [ ["name='compile'",3] ]
 	t.targets = [
 		"$(EPOCROOT)/epoc32/release/armv5/lib/testTC.dso",
 		"$(EPOCROOT)/epoc32/release/armv5/lib/testTC{000a0000}.dso",
 		"$(EPOCROOT)/epoc32/release/armv5/lib/testTC{000a0000}.lib",
 		"$(EPOCROOT)/epoc32/release/armv5/lib/testTC.lib",
-		"$(EPOCROOT)/epoc32/release/armv5/udeb/testTC.dll",
-		"$(EPOCROOT)/epoc32/release/armv5/udeb/testTC.dll.map",
+		"$(EPOCROOT)/epoc32/release/armv5/urel/testTC.dll",
+		"$(EPOCROOT)/epoc32/release/armv5/urel/testTC.dll.map",
 		"$(SBS_HOME)/test/smoke_suite/test_resources/tracecompiler/testTC/traces/wlanhwinitTraces.h",
 		"$(SBS_HOME)/test/smoke_suite/test_resources/tracecompiler/testTC/traces/wlanhwinitmainTraces.h",
 		"$(SBS_HOME)/test/smoke_suite/test_resources/tracecompiler/testTC/traces/wlanhwinitpermparserTraces.h",	
@@ -41,9 +45,9 @@ def run():
 		]
 	t.run()
 
-	t.id = "114b"
+	t.id = "114c"
 	t.name = "tracecompiler_incremental_rebuild"
-	t.command = "touch smoke_suite/test_resources/tracecompiler/testTC/src/wlanhwinit.cpp && sbs -b smoke_suite/test_resources/tracecompiler/testTC/group/bld.inf -c armv5.tracecompiler.udeb -f - -m ${SBSMAKEFILE}"
+	t.command = "touch smoke_suite/test_resources/tracecompiler/testTC/src/wlanhwinit.cpp && sbs -b smoke_suite/test_resources/tracecompiler/testTC/group/bld.inf -c armv5_urel.tracecompiler -f - -m ${SBSMAKEFILE}"
 	t.countmatch = [ ["name='compile'",1] ]
 	t.targets = []
 	t.run()
