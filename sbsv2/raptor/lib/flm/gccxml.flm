@@ -200,7 +200,7 @@ endif
 define gccxmlprocesssource
 
   $(eval DEPENDFILENAME:=$(call mapsource2output,$(1),.xml.d))
-  $(eval DEPENDFILE:=$(DEPENDFILENAME))
+  $(eval DEPENDFILE:=$(wildcard $(DEPENDFILENAME)))
 
   $(call mapsource2output,$(1),.xml): $(1) $(if $(DEPENDFILE),,RESOURCE BITMAP EXPORT)
 	$(call startrule,gccxmlprocesssource) \
@@ -214,12 +214,12 @@ define gccxmlprocesssource
 	$(call endrule,gccxmlprocesssource)
 
     CLEANTARGETS:=$$(CLEANTARGETS) $(DEPENDFILENAME)
-    ifneq "$(DEPENDFILE)" ""
-    ifeq ($(NO_DEPEND_INCLUDE),)
-      ifeq "$(filter %CLEAN,$(call uppercase,$(MAKECMDGOALS)))" ""
-        -include $(DEPENDFILE)
+    ifneq ($(DEPENDFILE),)
+      ifeq ($(NO_DEPEND_INCLUDE),)
+        ifeq ($(filter %CLEAN,$(call uppercase,$(MAKECMDGOALS))),)
+          -include $(DEPENDFILE)
+        endif
       endif
-    endif
     endif
 
 endef
