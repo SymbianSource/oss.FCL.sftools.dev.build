@@ -43,14 +43,14 @@ def run():
 		"$(EPOCROOT)/epoc32/ost_dictionaries/testTC_0x1000008d_Dictionary.xml",
 		"$(EPOCROOT)/epoc32/include/internal/symbiantraces/autogen/testTC_0x1000008d_TraceDefinitions.h"
 		]
-	t.run()
+	t.run("windows")
 
 	t.id = "114c"
 	t.name = "tracecompiler_incremental_rebuild"
 	t.command = "touch smoke_suite/test_resources/tracecompiler/testTC/src/wlanhwinit.cpp && sbs -b smoke_suite/test_resources/tracecompiler/testTC/group/bld.inf -c armv5_urel.tracecompiler -f - -m ${SBSMAKEFILE}"
 	t.countmatch = [ ["name='compile'",1] ]
 	t.targets = []
-	t.run()
+	t.run("windows")
 
 	t.id = "114"
 	t.name = "tracecompiler_incremental"
