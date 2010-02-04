@@ -176,9 +176,9 @@ include %s
 			 talon_settings,
 			 self.raptor.systemFLM.Append('globals.mk') )
 
-		# Unless dependency generated has been disabled via the CLI, use a .DEFAULT target to
+		# Unless dependency processing has been eschewed via the CLI, use a .DEFAULT target to
 		# trap missing dependencies (ignoring user config files that we know are usually absent)
-		if not Raptor.noDependGenerate:
+		if not Raptor.noDependGenerate and not Raptor.noDependInclude:
 			self.makefile_prologue += """
 $(FLMHOME)/user/final.mk:
 $(FLMHOME)/user/default.flm:
