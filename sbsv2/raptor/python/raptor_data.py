@@ -884,6 +884,20 @@ class Variant(Model, Config):
 			vars.append(m)
 		return [ BuildUnit(name=name, variants=vars) ]
 
+	def isChildOf(self, progenitor, cache):
+		r = False
+		pname = self.extends
+		while pname is not None and pname is not '':
+			parent = cache.FindNamedVariant(pname)
+			if parent is None:
+				break
+			if parent.name == progenitor:
+				r = True
+				break
+			pname = parent.extends
+
+		return r
+
 	def __str__(self):
 		s = "<var name='%s' extends='%s'>\n" % (self.name, self.extends)
 		for op in self.ops:
