@@ -16,6 +16,7 @@
 
 from raptor_tests import AntiTargetSmokeTest
 from raptor_meta import BldInfFile
+import os
 
 def run():
 	t = AntiTargetSmokeTest()
@@ -181,6 +182,10 @@ def run():
 		]
 	t.targets = hostPlatformTargets
 	t.run(hostPlatform)
+	
+	# clean-up
+	os.remove("smoke_suite/test_resources/dependencies/dependency.cpp")
+	os.remove("smoke_suite/test_resources/dependencies/dependency.rss")
 
 	t.id = "98"
 	t.name = "dependencies"

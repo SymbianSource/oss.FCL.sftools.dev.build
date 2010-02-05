@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2006-2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2006-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -178,13 +178,14 @@ include %s
 
 		# Unless dependency processing has been eschewed via the CLI, use a .DEFAULT target to
 		# trap missing dependencies (ignoring user config files that we know are usually absent)
-		if not Raptor.noDependGenerate and not Raptor.noDependInclude:
+		if not (self.raptor.noDependGenerate or self.raptor.noDependInclude):
 			self.makefile_prologue += """
+
 $(FLMHOME)/user/final.mk:
 $(FLMHOME)/user/default.flm:
 $(FLMHOME)/user/globals.mk:
 
-.DEFAULT:
+.DEFAULT::
 	@echo "<warning>Missing dependency detected: $@</warning>"
 
 """
