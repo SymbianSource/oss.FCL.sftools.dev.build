@@ -631,7 +631,7 @@ class Raptor(object):
 		return True
 
 	def SetMakeEngine(self, makeEngine):
-		self.makeEngineName = makeEngine
+		self.makeEngine = makeEngine
 		return True
 
 	def AddMakeOption(self, makeOption):
@@ -1283,7 +1283,7 @@ class Raptor(object):
 			# Setup a make engine.
 			if not self.maker:
 				try:
-					self.maker = raptor_make.MakeEngine(self, self.makeEngineName)
+					self.maker = raptor_make.MakeEngine(self, self.makeEngine)
 				except raptor_make.BadMakeEngineException,e:
 					self.Error("Unable to use make engine: %s " % str(e))
 					
