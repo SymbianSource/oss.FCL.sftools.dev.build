@@ -55,7 +55,7 @@ class MakeEngine(object):
 		else:
 			raise BadMakeEngineException("'%s' does not appear to be a make engine - no settings found for it" % engine)
 
-		if not avar.isChildOf("make_engine", Raptor.cache):
+		if not avar.isDerivedFrom("make_engine", Raptor.cache):
 			raise BadMakeEngineException("'%s' is not a build engine (it's a variant but it does not extend 'make_engine')" % engine)
 					
 		# find the variant and extract the values

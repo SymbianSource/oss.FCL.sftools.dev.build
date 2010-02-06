@@ -884,19 +884,20 @@ class Variant(Model, Config):
 			vars.append(m)
 		return [ BuildUnit(name=name, variants=vars) ]
 
-	def isChildOf(self, progenitor, cache):
-		r = False
+	def isDerivedFrom(self, progenitor, cache):
+		if self.name == progenitor:
+			return True
+
 		pname = self.extends
 		while pname is not None and pname is not '':
 			parent = cache.FindNamedVariant(pname)
 			if parent is None:
 				break
 			if parent.name == progenitor:
-				r = True
-				break
+				return True
 			pname = parent.extends
 
-		return r
+		return False
 
 	def __str__(self):
 		s = "<var name='%s' extends='%s'>\n" % (self.name, self.extends)
@@ -950,7 +951,7 @@ class Alias(Model, Config):
 	def Valid(self):
 		return self.name and self.meaning
 
-	def GenerateBuildUnits(self, cache):
+	def Resolve(self, cache):
 		if not self.variants:
 			missing_variants = []
 			for r in self.varRefs:
@@ -962,6 +963,9 @@ class Alias(Model, Config):
 			if len(missing_variants) > 0:
 				raise MissingVariantException("Missing variants '%s'", " ".join(missing_variants))
 
+	def GenerateBuildUnits(self, cache):
+		self.Resolve(cache)
+
 		name = self.name
 
 		for v in self.modifiers:
@@ -969,6 +973,12 @@ class Alias(Model, Config):
 
 		return [ BuildUnit(name=name, variants=self.variants + self.modifiers) ]
 
+	def isDerivedFrom(self, progenitor, cache):
+		self.Resolve(cache)
+		if len(self.variants) == 1:
+			return self.variants[0].isDerivedFrom(progenitor,cache)
+		else:
+			return False
 
 class AliasRef(Reference):
 
