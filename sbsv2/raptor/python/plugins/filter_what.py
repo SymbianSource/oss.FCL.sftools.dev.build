@@ -26,6 +26,7 @@ class FilterWhat(filter_interface.Filter):
 		super(filter_interface.Filter,self).__init__()
 		self.path_prefix_to_strip = None
 		self.path_prefix_to_add_on = None
+		self.check = False
 	
 	def print_file(self, line, start, end):
 		"Ensure DOS slashes on Windows"

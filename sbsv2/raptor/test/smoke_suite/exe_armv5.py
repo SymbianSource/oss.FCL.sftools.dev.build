@@ -117,6 +117,17 @@ def run():
 	if t.result == SmokeTest.FAIL:
 		result = SmokeTest.FAIL	
 
+	t.id = "0001d"
+	t.command = "rm $(EPOCROOT)/epoc32/release/armv5/udeb/test.exe.map; sbs_filter  --filters=FilterCheck < ${SBSLOGFILE}"
+	t.targets = []
+	t.mustmatch = ["MISSING"]
+	t.mustnotmatch = []
+	t.warnings = 1
+	t.returncode = 2
+	t.run()
+
+	if t.result == SmokeTest.FAIL:
+		result = SmokeTest.FAIL	
 	t.id = "1"
 	t.name = "exe_armv5"
 	t.result = result
