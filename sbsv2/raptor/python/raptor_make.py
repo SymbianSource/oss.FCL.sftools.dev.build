@@ -40,7 +40,7 @@ class BadMakeEngineException(Exception):
 
 class MakeEngine(object):
 
-	def __init__(self, Raptor, engine):
+	def __init__(self, Raptor, engine="make_engine"):
 		self.raptor = Raptor
 		self.valid = True
 		self.descrambler = None
