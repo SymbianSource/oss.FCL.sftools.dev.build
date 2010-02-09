@@ -64,7 +64,8 @@ class FilterWhat(filter_interface.Filter):
 		"initialise"
 		
 		self.buildparameters = build_parameters
-		self.check = build_parameters.doCheck
+		if build_parameters.doCheck:
+			self.check = True
 		self.what = build_parameters.doWhat
 
 		self.outfile = sys.stdout
