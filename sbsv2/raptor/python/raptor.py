@@ -1287,15 +1287,17 @@ class Raptor(object):
 			if self.toolcheck != 'off':
 				self.CheckConfigs(buildUnitsToBuild)
 			else:
-				self.Info(" Not Checking Tool Versions")
+				self.Info("Not Checking Tool Versions")
 
 			self.AssertBuildOK()
 
 			# Setup a make engine.
 			if not self.maker:
-				self.maker = raptor_make.MakeEngine(self)
-				if self.maker == None:
-					self.Error("No make engine present")
+				try:
+					self.maker = raptor_make.MakeEngine(self, self.makeEngine)
+				except raptor_make.BadMakeEngineException,e:
+					self.Error("Unable to use make engine: %s " % str(e))
+					
 
 			self.AssertBuildOK()
 

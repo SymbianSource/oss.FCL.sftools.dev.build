@@ -33,18 +33,19 @@ import sys
 from xml.sax.saxutils import escape
 
 
+class BadMakeEngineException(Exception):
+	pass
+
 # raptor_make module classes
 
 class MakeEngine(object):
 
-	def __init__(self, Raptor):
+	def __init__(self, Raptor, engine="make_engine"):
 		self.raptor = Raptor
 		self.valid = True
 		self.descrambler = None
 		self.descrambler_started = False
 
-		engine = Raptor.makeEngine
-		
 		# look for an alias first as this gives end-users a chance to modify
 		# the shipped variant rather than completely replacing it.
 		if engine in Raptor.cache.aliases:
@@ -52,8 +53,10 @@ class MakeEngine(object):
 		elif engine in Raptor.cache.variants:
 			avar = Raptor.cache.FindNamedVariant(engine)
 		else:
-			Raptor.Error("No settings found for build engine '%s'", engine)
-			return
+			raise BadMakeEngineException("'%s' does not appear to be a make engine - no settings found for it" % engine)
+
+		if not avar.isDerivedFrom("make_engine", Raptor.cache):
+			raise BadMakeEngineException("'%s' is not a build engine (it's a variant but it does not extend 'make_engine')" % engine)
 					
 		# find the variant and extract the values
 		try:
@@ -105,14 +108,13 @@ class MakeEngine(object):
 				self.selectors = []
 
 		except KeyError:
-			Raptor.Error("Bad '%s' configuration found.", engine)
 			self.valid = False
-			return
+			raise BadMakeEngineException("Bad '%s' configuration found." % engine)
 
 		# there must at least be a build command...
 		if not self.buildCommand:
-				Raptor.Error("No build command for '%s'", engine)
-				self.valid = False
+			self.valid = False
+			raise BadMakeEngineException("No build command for '%s'"% engine)
 
 
 		if self.usetalon:
@@ -515,12 +517,22 @@ include %s
 						universal_newlines=True, env=makeenv)
 				stream = p.stdout
 
-
+				inRecipe = False
 				line = " "
 				while line:
 					line = stream.readline()
-					self.raptor.out.write(line)
-
+					
+					if line.startswith("<recipe"):
+						inRecipe = True
+					elif line.startswith("</recipe"):
+						inRecipe = False
+					
+					# unless we are inside a "recipe", any line not starting
+					# with "<" is free text that must be escaped.
+					if inRecipe or line.startswith("<"):
+						self.raptor.out.write(line)
+					else:
+						self.raptor.out.write(escape(line))
 
 				# should be done now
 				returncode = p.wait()
