@@ -47,6 +47,7 @@ class FilterCheckComp(filter_what.FilterWhat):
 			dir = os.path.dirname(bldinf)
 
 		self.outfile.write("=== %s == %s\n" % (dir, dir))
+		self.outfile.write("=== check == %s\n" % (dir))
 		self.outfile.write("-- abld -w \nChdir %s \n++ Started at\n" % dir)
 		
 	def end_bldinf(self):
@@ -54,6 +55,12 @@ class FilterCheckComp(filter_what.FilterWhat):
 
 	def open(self, build_parameters):
 		t = filter_what.FilterWhat.open(self, build_parameters)
+		if t:
+			self.outfile.write("===-------------------------------------------------\n")
+			self.outfile.write("=== check\n")
+			self.outfile.write("===-------------------------------------------------\n")
+			self.outfile.write("=== check started Thu Feb 11 10:02:21 2010\n")
+
 		self.path_prefix_to_strip = os.path.abspath(build_parameters.epocroot)
 		self.path_prefix_to_add_on = build_parameters.incoming_epocroot
 		return t
