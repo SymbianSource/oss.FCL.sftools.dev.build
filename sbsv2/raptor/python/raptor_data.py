@@ -975,10 +975,10 @@ class Alias(Model, Config):
 
 	def isDerivedFrom(self, progenitor, cache):
 		self.Resolve(cache)
-		if len(self.variants) == 1:
-			return self.variants[0].isDerivedFrom(progenitor,cache)
-		else:
-			return False
+		for v in self.variants:
+			if v.isDerivedFrom(progenitor,cache):
+				return True
+		return False
 
 class AliasRef(Reference):
 
