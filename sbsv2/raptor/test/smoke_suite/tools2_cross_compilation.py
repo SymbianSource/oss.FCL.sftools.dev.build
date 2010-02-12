@@ -22,7 +22,7 @@ def run():
 
 	t.id = "111a"
 	t.name = "tools2_cross_compilation_pdrtran" 
-	t.command = "sbs -b smoke_suite/test_resources/tools2/pdrtran/BLD.INF -c tools2 -c tools2.win32"
+	t.command = "sbs -b smoke_suite/test_resources/tools2/cross/BLD.INF -p PDRTRAN.MMP -c tools2 -c tools2.win32"
 
 	t.targets = [
 			"$(EPOCROOT)/epoc32/release/tools2/deb/pdrtran.exe",
@@ -32,7 +32,7 @@ def run():
 			"$(EPOCROOT)/epoc32/tools/pdrtran.exe",
 			"$(EPOCROOT)/epoc32/tools/pdrtran"
 			]
-	t.addbuildtargets("smoke_suite/test_resources/tools2/pdrtran/BLD.INF", [
+	t.addbuildtargets("smoke_suite/test_resources/tools2/cross/BLD.INF", [
 			"pdrtran_/pdrtran_exe/tools2/deb/PDRTRAN.o",
 			"pdrtran_/pdrtran_exe/tools2/deb/LEXICAL.o",
 			"pdrtran_/pdrtran_exe/tools2/deb/PDRREADR.o",
@@ -117,7 +117,7 @@ def run():
 	t.usebash = True
 	t.id = "111c"
 	t.name = "tools2_cross_compilation_toolcheck_linux"
-	t.command = "$(EPOCROOT)/epoc32/tools/pdrtran smoke_suite/test_resources/tools2/pdrtran/TEST.PD $(EPOCROOT)/epoc32/build/TEST_PDRTRAN.PDR"
+	t.command = "$(EPOCROOT)/epoc32/tools/pdrtran smoke_suite/test_resources/tools2/cross/TEST.PD $(EPOCROOT)/epoc32/build/TEST_PDRTRAN.PDR"
 	t.targets = [
 		 	"$(EPOCROOT)/epoc32/build/TEST_PDRTRAN.PDR"
 			]
@@ -134,6 +134,38 @@ def run():
 	t.mustmatch = [
 			"MS Windows"
 			]		
+	t.run("linux")
+
+
+	t.id = "111e"
+	t.name = "tools2_cross_compilation_platmacro_linux"
+	t.command = "sbs -b smoke_suite/test_resources/tools2/cross/BLD.INF -p platmacros.mmp -c tools2"
+	t.targets = [
+			"$(EPOCROOT)/epoc32/tools/test_platmacros"
+			]
+	t.mustmatch = [
+			"TOOLS2_LINUX"
+			]
+	t.mustnotmatch = [
+			"TOOLS2_WINDOWS"
+			]
+	t.warnings = 1
+	t.run("linux")
+
+
+	t.id = "111f"
+	t.name = "tools2_cross_compilation_platmacro_windows"
+	t.command = "sbs -b smoke_suite/test_resources/tools2/cross/BLD.INF -p platmacros.mmp -c tools2.win32"
+	t.targets = [
+			"$(EPOCROOT)/epoc32/tools/test_platmacros.exe"
+			]
+	t.mustmatch = [
+			"TOOLS2_WINDOWS"
+			]
+	t.mustnotmatch = [
+			"TOOLS2_LINUX"
+			]
+	t.warnings = 1
 	t.run("linux")
 
 

@@ -12,8 +12,8 @@
 * Contributors:
 *
 * Description: 
-* PC-side Font converter tools
-*
+* Cross compilation of win32 tools on Linux 
+* 
 */
 
 PRJ_PLATFORMS
@@ -21,3 +21,4 @@ TOOLS2
 
 PRJ_MMPFILES
 PDRTRAN.MMP
+platmacros.mmp

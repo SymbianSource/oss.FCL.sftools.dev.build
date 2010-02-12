@@ -6,7 +6,7 @@
 	
 	-->
  	
-	<!-- This variant enables building win32 tools in Linux. Tools2 only -->
+	<!-- This variant enables building win32 tools in Linux. Tools2 on Linux only -->
 	<var name="win32">
 		<set name='TOOLS2WIN32' value='1'/>
 		<env name='SBS_MINGW_LINUX_PREFIX' default='i586-mingw32msvc'/>
@@ -15,6 +15,7 @@
 		<env name='RANLIB' default='$(SBS_MINGW_LINUX_PREFIX)-ranlib' type='tool'/>
 		<set name='RELEASEPATH' value='$(EPOCROOT)/epoc32/release/tools2/$(VARIANTTYPE)'/>
 		<set name='DOTEXE' value='.exe'/>
+		<set name='PLATMACROS.LINUX' value='$(PLATMACROS.WINDOWS)'/>
 	</var>
 
 	<!-- This variant turns debug info on for arm only -->
