@@ -36,9 +36,9 @@ class FilterWhat(filter_interface.Filter):
 				actually starts at 'start + 1' """
 
 		abs_filename = line[(start + 1):end]
-		filename = abs_filename.replace("/","\\")
+		filename = abs_filename
 
-		# Hack drive letters for case insensitivity on windows
+		# Adjust drive letters for case insensitivity on windows
 
 		path_prefix_to_strip = self.path_prefix_to_strip
 		if "win" in self.buildparameters.platform:
@@ -47,7 +47,7 @@ class FilterWhat(filter_interface.Filter):
 
 		if path_prefix_to_strip:
 			if "win" in self.buildparameters.platform:
-				path_prefix_to_strip = path_prefix_to_strip[0].upper()+path_prefix_to_strip[1:]
+				path_prefix_to_strip = path_prefix_to_strip[0].upper()+path_prefix_to_strip[1:].replace("/","\\")
 			if filename.startswith(path_prefix_to_strip):
 				filename = filename[len(path_prefix_to_strip):]
 			if self.path_prefix_to_add_on != None:

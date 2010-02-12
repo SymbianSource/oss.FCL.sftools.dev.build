@@ -104,7 +104,8 @@ def run():
 	t.run()	
 	if t.result == SmokeTest.FAIL:
 		result = SmokeTest.FAIL	
-		
+	
+
 	t.id = "0001c"
 	t.name = "exe_armv5_gcce"
 	t.command = command % "gcce_armv5"
@@ -117,10 +118,12 @@ def run():
 	if t.result == SmokeTest.FAIL:
 		result = SmokeTest.FAIL	
 
+	import os
+	abs_epocroot = os.path.abspath(os.environ["EPOCROOT"])
 	t.id = "0001d"
 	t.command = "rm $(EPOCROOT)/epoc32/release/armv5/udeb/test.exe.map; sbs_filter  --filters=FilterCheck < ${SBSLOGFILE}"
 	t.targets = []
-	t.mustmatch = ["MISSING"]
+	t.mustmatch = ["MISSING: *" + abs_epocroot + ".epoc32.release.armv5.udeb.test\.exe\.map"]
 	t.mustnotmatch = []
 	t.warnings = 1
 	t.returncode = 2
