@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<build xmlns="http://symbian.com/xml/build"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://symbian.com/xml/build build/2_0.xsd">
+
+	<var name="make_changes">
+	<set name="bitmap.selector.iface" value="\.(bitmap|extension|mifconv|akniconinterfaces|removegtfiles|skingenerator|cryptoprep|builder|help_files|version_update)$"/>
+		<set name="resource.selector.iface" value="\.(resource|extension|mif2cdlindex|nativejava|genericcopy)$"/>
+   <set name="default.selector.iface" value="\.(?!export$|bitmap$|resource$|mifconv$|mif2cdlindex$|nativejava$|akniconinterfaces$|removegtfiles$|genericcopy$|skingenerator$|cryptoprep$|builder$|help_files$|version_update$).*$"/>
+    <!-- 4.5 min -->
+	  <set name='TALON_TIMEOUT' value='540000'/> 
+  </var>
+
+	<!-- emake -->
+	<alias name="emake" meaning="emake_engine.make_changes"/>  
+
+	<!-- gnu make -->
+	<alias name="make" meaning="make_engine.make_changes"/>
+	<alias name="dfstestmake" meaning="make_engine.make_changes"/>
+
+	
+</build>

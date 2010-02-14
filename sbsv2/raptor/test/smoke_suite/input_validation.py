@@ -36,8 +36,20 @@ def run():
 
 	t.id = "43562b"
 	t.mustmatch = ["Unable to use make engine: 'arm' is not a build engine \(it's a variant but it does not extend 'make_engine'"]
-	t.name = "validate_makeengine_is_a_non_makenegine_variant"
+	t.name = "validate_makeengine_is_a_non_makengine_variant"
 	t.command = base_command + " -e arm"
+	t.run()
+
+	# aliases can be of the form name='blah' meaning='x.y.z'  i.e. where the alias is for a sequence of variants
+	# this tests that we detect that at least one of these variants has make_engine as a parent
+	# it is possible for one of them not to and we mustn't bomb-out just because of that
+	t.id = "43562c"
+	t.mustmatch = []
+	t.name = "validate_real_dfs_modded_makeengine_alias"
+	t.command = "export HOME=$SBS_HOME/test/custom_options/dfsconfig;  " + base_command + " -e dfstestmake -c arm.v5.urel.gcce4_4_1"
+	t.errors = 0
+	t.warnings = 0
+	t.returncode = 0
 	t.run()
 	
 	t.id = "43562"
