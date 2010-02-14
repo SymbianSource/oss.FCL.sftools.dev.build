@@ -48,15 +48,19 @@ class FilterCheckComp(filter_what.FilterWhat):
 
 		self.outfile.write("=== %s == %s\n" % (dir, dir))
 		self.outfile.write("=== check == %s\n" % (dir))
-		self.outfile.write("-- abld -w \nChdir %s \n++ Started at\n" % dir)
-		
+		self.outfile.write("-- sbs_filter --filters=FilterCheckComp\n++ Started at Thu Feb 11 10:05:19 2010\nChdir %s\n" % dir)
+
 	def end_bldinf(self):
-		self.outfile.write("++ Finished at\n")
+		self.outfile.write("++ Finished at Thu Feb 11 10:05:20 2010\n")
+
+	def close(self):
+		self.outfile.write("++ Finished at Thu Feb 11 10:05:20 2010\n")
+		self.outfile.write("=== check finished Thu Feb 11 10:05:20 2010\n")
 
 	def open(self, build_parameters):
 		t = filter_what.FilterWhat.open(self, build_parameters)
 		if t:
-			self.outfile.write("===-------------------------------------------------\n")
+			self.outfile.write("\n===-------------------------------------------------\n")
 			self.outfile.write("=== check\n")
 			self.outfile.write("===-------------------------------------------------\n")
 			self.outfile.write("=== check started Thu Feb 11 10:02:21 2010\n")
