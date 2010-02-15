@@ -24,7 +24,7 @@ import filter_what
 class FilterCheckComp(filter_what.FilterWhat):
 
 	def __init__(self):
-		super(filter_what.FilterWhat, self).__init__()
+		super(FilterCheckComp, self).__init__()
 		self.check = True
 
 	def write(self, text):

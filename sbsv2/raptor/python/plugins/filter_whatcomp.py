@@ -24,7 +24,7 @@ import filter_what
 class FilterWhatComp(filter_what.FilterWhat):
 
         def __init__(self): 
-		super(filter_what.FilterWhat, self).__init__()
+		super(FilterWhatComp, self).__init__()
 
 	def write(self, text):
 		"process some log text"
