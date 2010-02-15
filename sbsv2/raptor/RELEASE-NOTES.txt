@@ -3,6 +3,7 @@ Release Notes for Symbian Build System v2
 
 next version
 
+- Fix platform macros for cross compilation on Linux
 - New build win32 tools on Linux.  
   To enable it, use variant '.win32'. To build both windows and linux binaries,
   use:
