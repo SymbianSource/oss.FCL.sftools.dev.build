@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -14,7 +14,7 @@
 # Description: 
 #
 
-1# Unit Test for the Raptor_cli (command line interface) module
+# Unit Test for the Raptor_cli (command line interface) module
 
 import raptor_cli
 import sys
@@ -42,6 +42,8 @@ class TestRaptorCli(unittest.TestCase):
 		self.allowCommandLineOverrides = True
 		self.ignoreOsDetection = False
 		self.filterList = "filter_terminal,filter_logfile"
+		self.noDependInclude = False
+		self.noDependGenerate = False
 		
 	def AddConfigName(self,configname):
 		self.listconfig.append(configname)
@@ -128,6 +130,11 @@ class TestRaptorCli(unittest.TestCase):
 		return True
 	
 	def SetNoDependInclude(self, yesOrNo):
+		self.noDependInclude = yesOrNo
+		return True
+
+	def SetNoDependGenerate(self, yesOrNo):
+		self.noDependGenerate = yesOrNo
 		return True
 		
 	def SetJobs(self, N):
@@ -187,7 +194,9 @@ class TestRaptorCli(unittest.TestCase):
 				'--export-only',
 				'--source-target', 'some_source_file.cpp',
 				'--source-target', 'some_resource_file.rss',
-				'--pp', 'on']
+				'--pp', 'on',
+				'--no-depend-include',
+				'--no-depend-generate']
 		
 		raptor_cli.GetArgs(self,args)
 		self.assertEqual(self.RunningQuiet,False)
@@ -206,6 +215,8 @@ class TestRaptorCli(unittest.TestCase):
 		self.assertEqual(self.targets[0], 'some_source_file.cpp')
 		self.assertEqual(self.targets[1], 'some_resource_file.rss')
 		self.assertEqual(self.pp, 'on')
+		self.assertEqual(self.noDependInclude, True)
+		self.assertEqual(self.noDependGenerate, True)
 
 # run all the tests
 

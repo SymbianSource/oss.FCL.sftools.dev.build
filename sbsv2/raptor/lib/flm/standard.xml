@@ -106,7 +106,6 @@
 		<param name='DEBUG_FORMAT'/>
 		<param name='DEBUG_INFO'/>
 		<param name='DEPEND_OPTION'/>
-		<param name='DEPEND_SKIP' default=''/>
 		<param name='ELF2E32'/>
 		<param name='EFREEZE'/>
 		<param name='EFREEZE_REMOVE_OPTION' default=''/>

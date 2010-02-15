@@ -31,7 +31,7 @@ def run():
 	t.usebash = True
 	t.errors = 1
 	t.returncode = 1
-	base_command = "sbs -b smoke_suite/test_resources/make_engine_errors/bld.inf -f-"
+	base_command = "sbs --no-depend-generate -b smoke_suite/test_resources/make_engine_errors/bld.inf -f-"
 	
 	t.id = "113a"
 	t.name = "gmake_engine_errors"
