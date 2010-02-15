@@ -1,12 +1,17 @@
 Release Notes for Symbian Build System v2
 
-next version
+version 2.12.2
 
 Defect Fixes:
 - SF Bug 1569 - excessive recompilation in incremental tracecompiler builds
-- Better error messages for make-engine selection.  e.g. "sbs -e arm" will now produce a useful error message rather than a traceback. "arm" is a real variant but it's not a make engine.  In the past sbs would have tried to use it and would have failed with a complicated traceback. Also doesn't traceback for non-existent make engines.
+- Better error messages for make-engine selection.
+  e.g. "sbs -e arm" will now produce a useful error message rather than 
+  a traceback. "arm" is a real variant but it's not a make engine.  In
+  the past sbs would have tried to use it and would have failed with a
+  complicated traceback. Also doesn't traceback for non-existent make engines.
 - sbs_filter chose wrong embedded default python version. Set to 2.6.4 now.
 - FilterCheck did not check files when run from sbs_filter
+
 
 version 2.12.1
 
