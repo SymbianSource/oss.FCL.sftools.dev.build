@@ -71,7 +71,7 @@ try:
 	while line:
 		line = sys.stdin.readline()
 		the_raptor.out.write(line)
-except:
+except Exception,e:
 	sys.stderr.write("error: problem while filtering: %s\n" % str(e))
 	traceback.print_exc()
 	sys.exit(1)

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2006-2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2006-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -884,6 +884,21 @@ class Variant(Model, Config):
 			vars.append(m)
 		return [ BuildUnit(name=name, variants=vars) ]
 
+	def isDerivedFrom(self, progenitor, cache):
+		if self.name == progenitor:
+			return True
+
+		pname = self.extends
+		while pname is not None and pname is not '':
+			parent = cache.FindNamedVariant(pname)
+			if parent is None:
+				break
+			if parent.name == progenitor:
+				return True
+			pname = parent.extends
+
+		return False
+
 	def __str__(self):
 		s = "<var name='%s' extends='%s'>\n" % (self.name, self.extends)
 		for op in self.ops:
@@ -936,7 +951,7 @@ class Alias(Model, Config):
 	def Valid(self):
 		return self.name and self.meaning
 
-	def GenerateBuildUnits(self, cache):
+	def Resolve(self, cache):
 		if not self.variants:
 			missing_variants = []
 			for r in self.varRefs:
@@ -948,6 +963,9 @@ class Alias(Model, Config):
 			if len(missing_variants) > 0:
 				raise MissingVariantException("Missing variants '%s'", " ".join(missing_variants))
 
+	def GenerateBuildUnits(self, cache):
+		self.Resolve(cache)
+
 		name = self.name
 
 		for v in self.modifiers:
@@ -955,6 +973,12 @@ class Alias(Model, Config):
 
 		return [ BuildUnit(name=name, variants=self.variants + self.modifiers) ]
 
+	def isDerivedFrom(self, progenitor, cache):
+		self.Resolve(cache)
+		for v in self.variants:
+			if v.isDerivedFrom(progenitor,cache):
+				return True
+		return False
 
 class AliasRef(Reference):
 
