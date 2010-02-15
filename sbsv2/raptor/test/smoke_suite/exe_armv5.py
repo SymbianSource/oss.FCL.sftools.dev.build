@@ -118,12 +118,15 @@ def run():
 	if t.result == SmokeTest.FAIL:
 		result = SmokeTest.FAIL	
 
+
+	# Test for the Check Filter to ensure that it reports 
+	# missing files properly when used from sbs_filter.py:
 	import os
 	abs_epocroot = os.path.abspath(os.environ["EPOCROOT"])
 	t.id = "0001d"
 	t.command = "rm $(EPOCROOT)/epoc32/release/armv5/udeb/test.exe.map; sbs_filter  --filters=FilterCheck < ${SBSLOGFILE}"
 	t.targets = []
-	t.mustmatch = ["MISSING: *" + abs_epocroot + ".epoc32.release.armv5.udeb.test\.exe\.map"]
+	t.mustmatch = ["MISSING:[ 	]+" + abs_epocroot.replace("\\","\\\\") + ".epoc32.release.armv5.udeb.test\.exe\.map.*"]
 	t.mustnotmatch = []
 	t.warnings = 1
 	t.returncode = 2
