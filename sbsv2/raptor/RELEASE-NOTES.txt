@@ -11,8 +11,8 @@ Defect Fixes:
   complicated traceback. Also doesn't traceback for non-existent make engines.
 - sbs_filter chose wrong embedded default python version. Set to 2.6.4 now.
 - FilterCheck did not check files when run from sbs_filter
-- Escape filenames with special XML characters inside <member> tags
 - Remove old references to python 2.5.2
+- Escape filenames with special XML characters inside <member> tags
 
 
 version 2.12.1
