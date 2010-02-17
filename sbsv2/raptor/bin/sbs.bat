@@ -30,9 +30,8 @@
 
 @REM Use the python set by the environment if possible
 @SET __PYTHON__=%SBS_PYTHON%
-@IF "%__PYTHON__%"=="" SET __PYTHON__=%SBS_HOME%\win32\python264\python.exe
-@SET PYTHONPATH=%SBS_PYTHONPATH%
-@IF "%PYTHONPATH%"=="" SET PYTHONPATH=%SBS_HOME%\win32\python264
+@IF "%__PYTHON__%"=="" SET __PYTHON__=python.exe
+@IF NOT "%SBS_PYTHONPATH%"=="" SET PYTHONPATH=%SBS_PYTHONPATH%
 
 @REM Use the mingw set by the environment if possible
 @SET __MINGW__=%SBS_MINGW%
