@@ -31,6 +31,7 @@ import raptor_xml
 import generic_path
 import subprocess
 import zipfile
+from xml.sax.saxutils import escape
 from mmpparser import *
 
 import time
@@ -2901,7 +2902,7 @@ class MetaReader(object):
 				for file in files:
 					if not file.endswith('/'):
 						expfilename = str(generic_path.Join(destination, file))
-						exportwhatlog += "<member>" + expfilename + "</member>\n"
+						exportwhatlog += "<member>" + escape(expfilename) + "</member>\n"
 
 				self.__Raptor.PrintXML("<clean bldinf='" + bldinf_filename + "' mmp='' config=''>\n")
 				self.__Raptor.PrintXML("<zipmarker>" + markerfilename + "</zipmarker>\n")
@@ -2946,7 +2947,7 @@ class MetaReader(object):
 						os.utime(expfilename,(accesstime, modifiedtime))
 
 						filecount += 1
-						exportwhatlog+="<member>" + expfilename + "</member>\n"
+						exportwhatlog+="<member>" + escape(expfilename) + "</member>\n"
 					except IOError, e:
 						message = "Could not unzip %s to %s: file %s: %s" %(source, destination, expfilename, str(e))
 						if not self.__Raptor.keepGoing:

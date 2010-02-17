@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -375,7 +375,7 @@ ifneq ($(BASE_TYPE),importlib)
     $(eval DEPENDFILENAME:=$(call mapwin32file,$(1),.o.d))
     $(eval DEPENDFILE:=$(wildcard $(DEPENDFILENAME)))
 
-    $(call mapwin32file,$(1),.o): $(1) $(PROJECT_META) $(if $(DEPENDFILE),,RESOURCE BITMAP EXPORT) $(if $(USE_TRACE_COMPILER),$(TRACE_MARKER))
+    $(call mapwin32file,$(1),.o): $(1) $(PROJECT_META) $(if $(DEPENDFILE),,RESOURCE BITMAP EXPORT) | $(if $(USE_TRACE_COMPILER),$(TRACE_MARKER))
 	  $(call startrule,win32compile2object,,$(1)) \
 	  $(CC) $$(if $$(filter %.C,$(1)),-lang c) $(CFLAGS) $(OPTION_CW) \
 	  $(if $(STDCPP_BUILD),$$(if $$(filter %.c %.C,$(1)),,$$(call makemacrodef,$(OPT.DEFINE),$(STDCPP_WCHAR_DEF))),) \

@@ -28,7 +28,7 @@ def run():
 	if 'SBS_PYTHON' in os.environ:
 		pythonRun = "$(SBS_PYTHON)"
 	else:
-		pythonRun = "$(SBS_HOME)/win32/python252/python.exe"
+		pythonRun = "$(SBS_HOME)/win32/python264/python.exe"
 
 	# Build something using the .whatlog variant.  Take the build log and give it to sbsv2cache.py, deducing
 	# the location of the generated cache file from the verbose output.  If generated, dump the cache file to

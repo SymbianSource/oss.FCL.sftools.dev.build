@@ -67,8 +67,8 @@ if [ "$OSTYPE" == "cygwin" ]; then
 
 	__MINGW__=${SBS_MINGW:-$SBS_HOME/$HOSTPLATFORM_DIR/mingw}
 	__CYGWIN__=${SBS_CYGWIN:-$SBS_HOME/$HOSTPLATFORM_DIR/cygwin}
-	__PYTHON__=${SBS_PYTHON:-$SBS_HOME/$HOSTPLATFORM_DIR/python252/python.exe}
-	export PYTHONPATH=${SBS_PYTHONPATH:-$SBS_HOME/$HOSTPLATFORM_DIR/python252}
+	__PYTHON__=${SBS_PYTHON:-$SBS_HOME/$HOSTPLATFORM_DIR/python264/python.exe}
+	export PYTHONPATH=${SBS_PYTHONPATH:-$SBS_HOME/$HOSTPLATFORM_DIR/python264}
 
     # Command for unifying path strings. For example, "c:\some\path" and
     # "/cygdrive/c/some/path" will both be converted into "c:/some/path".

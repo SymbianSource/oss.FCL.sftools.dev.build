@@ -26,6 +26,7 @@ class FilterWhat(filter_interface.Filter):
 		super(filter_interface.Filter,self).__init__()
 		self.path_prefix_to_strip = None
 		self.path_prefix_to_add_on = None
+		self.check = False
 	
 	def print_file(self, line, start, end):
 		"Ensure DOS slashes on Windows"
@@ -33,19 +34,27 @@ class FilterWhat(filter_interface.Filter):
 		"""Use chars between enclosing tags ("<>", "''", etc)
 				start = opening tag, so the line we need
 				actually starts at 'start + 1' """
-		if "win" in self.buildparameters.platform:
-			filename = line[(start + 1):end].replace("/","\\")
-		else:
-			filename = line[(start + 1):end]
 
-		if self.path_prefix_to_strip:
-			if filename.startswith(self.path_prefix_to_strip):
-				filename = filename[len(self.path_prefix_to_strip):]
+		abs_filename = line[(start + 1):end]
+		filename = abs_filename
+
+		# Adjust drive letters for case insensitivity on windows
+
+		path_prefix_to_strip = self.path_prefix_to_strip
+		if "win" in self.buildparameters.platform:
+			filename = filename[0].upper()+filename[1:]
+			filename = filename.replace("/","\\")
+
+		if path_prefix_to_strip:
+			if "win" in self.buildparameters.platform:
+				path_prefix_to_strip = path_prefix_to_strip[0].upper()+path_prefix_to_strip[1:].replace("/","\\")
+			if filename.startswith(path_prefix_to_strip):
+				filename = filename[len(path_prefix_to_strip):]
 			if self.path_prefix_to_add_on != None:
 				filename = self.path_prefix_to_add_on + filename
 			
 		if self.check:
-			if not os.path.isfile(filename):
+			if not os.path.isfile(abs_filename):
 				print "MISSING:", filename
 				self.ok = False
 		else:
@@ -63,8 +72,10 @@ class FilterWhat(filter_interface.Filter):
 	def open(self, build_parameters):
 		"initialise"
 		
+
 		self.buildparameters = build_parameters
-		self.check = build_parameters.doCheck
+		if build_parameters.doCheck:
+			self.check = True
 		self.what = build_parameters.doWhat
 
 		self.outfile = sys.stdout
