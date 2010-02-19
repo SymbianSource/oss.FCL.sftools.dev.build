@@ -230,6 +230,8 @@ class FilterTerminal(filter_interface.Filter):
 			# detect the status report from a recipe
 			if text.find('failed') != -1:
 				self.failed = True
+				if text.find("reason='timeout'") != -1:
+					self.timedout = True
 			else:
 				self.failed = False
 			return
@@ -282,6 +284,7 @@ class FilterTerminal(filter_interface.Filter):
 
 			# This variable holds all recipe information
 			self.failed = False # Recipe status
+			self.timedout = False # Did it Timeout?
 			self.recipeBody = []
 			self.recipelineExceeded = 0
 			return		
@@ -298,16 +301,30 @@ class FilterTerminal(filter_interface.Filter):
 				
 				if self.failed == True:
 					if not self.analyseonly:
-						sys.stderr.write("\n FAILED %s for %s: %s\n" % \
+						reason=""
+						if self.timedout:
+							reason="(timeout)"
+
+						sys.stderr.write("\n FAILED %s %s for %s: %s\n" % \
 								(self.recipe_dict['name'],
+								reason,
 								self.recipe_dict['config'],
 								self.recipe_dict['name_to_user']))
 	
 						mmppath = generic_path.Path(self.recipe_dict['mmp']).From(generic_path.CurrentDir()).GetShellPath()
-						sys.stderr.write("  mmp: %s\n" % mmppath)
-						for L in self.recipeBody:
-							if not L.startswith('+'):
-								sys.stdout.write("   %s\n" % L.rstrip())
+						if mmppath is not "":
+							sys.stderr.write("  mmp: %s\n" % mmppath)
+						if self.timedout:
+							sys.stderr.write( \
+"""    Timeouts may be due to network related issues (e.g. license servers),
+    tool bugs or abnormally large components. TALON_TIMEOUT can be adjusted 
+    in the make engine configuration if required.  Make engines may have 
+    their own timeouts that Raptor cannot influence
+""")
+						else:
+							for L in self.recipeBody:
+								if not L.startswith('+'):
+									sys.stdout.write("   %s\n" % L.rstrip())
 					self.err_count += 1
 				else:
 					r = Recipe.factory(self.recipe_dict['name'], "".join(self.recipeBody))

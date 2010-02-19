@@ -38,7 +38,7 @@ sbs_semaphore talon_sem;
 
 #define TALON_ATTEMPT_STRMAX 32
 #define RECIPETAG_STRMAX 2048
-#define STATUS_STRMAX 100
+#define STATUS_STRMAX 120
 
 #define TALONDELIMITER '|'
 #define VARNAMEMAX 100
@@ -549,14 +549,18 @@ int main(int argc, char *argv[])
 
 			if (dotagging) 
 			{
-				char *forcesuccessstr = force_success == 0 ? "" : " forcesuccess='FORCESUCCESS'";
+				char *flagsstr = force_success == 0 ? "" : " flags='FORCESUCCESS'";
+				char *reasonstr = "" ;
+
+				if (p->causeofdeath == PROC_TIMEOUTDEATH)
+					reasonstr = " reason='timeout'";
 
 				if (p->returncode != 0)
 				{
 					char *exitstr = retries > 0 ? "retry" : "failed";
-					snprintf(status, STATUS_STRMAX - 1, "\n<status exit='%s' code='%d' attempt='%d'%s />", exitstr, p->returncode, attempt, forcesuccessstr );
+					snprintf(status, STATUS_STRMAX - 1, "\n<status exit='%s' code='%d' attempt='%d'%s%s />", exitstr, p->returncode, attempt, flagsstr, reasonstr );
 				} else {
-					snprintf(status, STATUS_STRMAX - 1, "\n<status exit='ok' attempt='%d'%s />", attempt, forcesuccessstr );
+					snprintf(status, STATUS_STRMAX - 1, "\n<status exit='ok' attempt='%d'%s%s />", attempt, flagsstr, reasonstr );
 				}
 				status[STATUS_STRMAX-1] = '\0';
 	
