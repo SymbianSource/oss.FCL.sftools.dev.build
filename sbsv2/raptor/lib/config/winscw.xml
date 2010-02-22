@@ -41,6 +41,7 @@
 		<set name="INTERFACE.pdd" value="Emulator.pdd"/>
 		<set name="INTERFACE.pdl" value="Emulator.pdl"/>
 		<set name="INTERFACE.plugin" value="Emulator.plugin"/>
+		<set name="INTERFACE.plugin3" value="Emulator.plugin3"/>
 		<set name="INTERFACE.resource" value="Emulator.resource"/>
 		<set name="INTERFACE.textnotifier2" value="Emulator.textnotifier2"/>
 		<set name="INTERFACE.var" value="Emulator.var"/>
