@@ -13,10 +13,10 @@
 #
 # Description: 
 #
+include settings.mk
 
-SHELL:=$(TALON)
 TALON_RECIPEATTRIBUTES:=name='$$RECIPENAME' host='$$HOSTNAME'
-export TALON_RECIPEATTRIBUTES
+export TALON_RECIPEATTRIBUTES 
 
 
 $(info SHELL="$(SHELL)")

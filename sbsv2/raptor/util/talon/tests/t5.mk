@@ -13,6 +13,7 @@
 #
 # Description: 
 #
+include settings.mk
 
 all:
 	||"echo this command should cause a bash error which should be visible"

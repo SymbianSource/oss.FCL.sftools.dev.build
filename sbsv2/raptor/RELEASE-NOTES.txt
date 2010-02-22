@@ -1,6 +1,5 @@
 Release Notes for Symbian Build System v2
 
-- SF Bug 1861 - [Raptor] More helpful console message in case of Error 128 (timeout)
 
 next version
 
@@ -8,6 +7,8 @@ Defect Fixes:
 - DPDEF142718 Incremental rebuild fails if dependent files deleted
   --no-depend-generate added to suppress the generation and processing of dependency files
   .DEFAULT target introduced for all non --no-depend-generate and/or --no-depend-include builds
+- SF Bug 1861 - [Raptor] More helpful console message in case of Error 128 (timeout)
+- SF Bug 2000 - Talon fails when installed in a path containing the string '-c' (windows only)
 
 
 version 2.12.2

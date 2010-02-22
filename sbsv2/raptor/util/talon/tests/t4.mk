@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -14,7 +14,7 @@
 # Description: 
 #
 
-SHELL:=$(TALON)
+include settings.mk
 TALON_TIMEOUT:=4000
 TALON_RETRIES:=4
 TALON_RECIPEATTRIBUTES:=platform='$$PLATFORM' mmp='$$MMP' bldinf='$$BLDINF'
