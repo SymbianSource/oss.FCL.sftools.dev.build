@@ -6,6 +6,7 @@ Defect Fixes:
 - DPDEF142718 Incremental rebuild fails if dependent files deleted
   --no-depend-generate added to suppress the generation and processing of dependency files
   .DEFAULT target introduced for all non --no-depend-generate and/or --no-depend-include builds
+- Add support for PLUGIN3 TARGETTYPEs
 
 
 version 2.12.2
