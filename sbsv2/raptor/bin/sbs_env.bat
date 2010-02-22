@@ -48,11 +48,7 @@
 @SET PATH_TEMP=
 
 @REM Tell CYGWIN not to map unix security attributes to windows to
-@REM prevent raptor from potentially creating read-only files:
-@REM
-@REM
-@REM
-
+@REM prevent raptor from potentially creating read-only files.
 @REM Assume Cygwin 1.5 CLI.
 @SET __MOUNTOPTIONS__=-u
 @SET __UMOUNTOPTIONS__=-u

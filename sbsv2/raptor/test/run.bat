@@ -14,8 +14,6 @@
 @rem Description: 
 @rem
 
-@echo off
-
 @SETLOCAL
 @CALL %SBS_HOME%\bin\sbs_env.bat
 

@@ -15,7 +15,7 @@
 @rem
 
 @SETLOCAL
-@CALL sbs_env.bat
+@CALL "%~dp0\sbs_env.bat"
 
 @REM Run with all the arguments.
 @bash %SBS_HOME%\bin\sbs_filter %*

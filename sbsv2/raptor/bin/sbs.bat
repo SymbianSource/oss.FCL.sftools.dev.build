@@ -15,7 +15,7 @@
 @rem
 
 @SETLOCAL
-@CALL sbs_env.bat
+@CALL "%~dp0sbs_env.bat"
 
 @REM Run Raptor with all the arguments.
 @%__PYTHON__% %SBS_HOME%\python\raptor_start.py %*
