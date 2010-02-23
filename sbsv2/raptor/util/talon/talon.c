@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of the License "Eclipse Public License v1.0"
@@ -32,6 +32,10 @@
 #include "sema.h"
 #include "buffer.h"
 #include "../config.h"
+
+#ifdef HAS_GETCOMMANDLINE
+#include "chomp.h"
+#endif
 
 /* The output semaphore. */
 sbs_semaphore talon_sem;
@@ -221,166 +225,6 @@ char *read_recipe_from_file(const char *filename)
 	}
 	return recipe;
 }
-
-#ifdef HAS_GETCOMMANDLINE
-/*
-   Get rid of the path to talon from a commandline string on windows find the 
-   -c (if it's there) and step past it to after the quote on the first command:
-
-   "g:\program files\talon\talon.exe" -c "gcc -c . . ."
-                                          ^------ Returns a pointer to here
-
-   Take care of the possibilty that there might be spaces in the command
-   if it is quoted.
-
-   A state-machine is flexible but not all that easy to write.  Should investigate
-   the possiblity of using the Ragel state machine generator perhaps.
-
-*/
-#define CH_START 0
-#define CH_PRE 1
-#define CH_EXQUOTE 2
-#define CH_INQUOTE 3
-#define CH_POST 4
-#define CH_MINUS 5
-#define CH_C 6
-#define CH_PRECOMMAND 7
-#define CH_COMMAND 8
-#define CH_ERR 9
-
-char * chompCommand(char command[])
-{
-	char *result = command;
-	int state = CH_START;
-
-	while (state != CH_COMMAND && state != CH_ERR)
-	{
-		DEBUG(("startstate: %d, char %c ",state, *result));
-		switch (*result)
-		{
-			case ' ':
-				switch (state)
-				{
-					case CH_START:
-					case CH_PRE:
-						state = CH_PRE;
-						break;
-					case CH_EXQUOTE:
-						state = CH_POST;
-						break;
-					case CH_INQUOTE:
-						break;
-					case CH_POST:
-						break;
-					case CH_MINUS:
-						state = CH_C;
-						break;
-					case CH_C:
-						state = CH_PRECOMMAND;
-						break;
-					case CH_PRECOMMAND:
-						break;
-					default:
-						state = CH_ERR;
-						break;
-				}
-			break;
-			case 'c':
-				switch (state)
-				{
-					case CH_START:
-					case CH_PRE:
-						state = CH_EXQUOTE;
-						break;
-					case CH_EXQUOTE:
-					case CH_INQUOTE:
-						break;
-					case CH_POST:
-						state = CH_ERR;
-						break;
-					case CH_MINUS:
-						state = CH_C;
-						break;
-					case CH_C:
-					case CH_PRECOMMAND:
-					default:
-						state = CH_ERR;
-						break;
-				}
-			break;
-			case '-':
-				switch (state)
-				{
-					case CH_START:
-					case CH_PRE:
-						state = CH_EXQUOTE;
-						break;
-					case CH_EXQUOTE:
-					case CH_INQUOTE:
-						break;
-					case CH_POST:
-						state = CH_MINUS;
-						break;
-					case CH_MINUS:
-					case CH_C:
-					case CH_PRECOMMAND:
-					default:
-						state = CH_ERR;
-						break;
-				}
-			break;
-			case '"':
-				switch (state)
-				{
-					case CH_START:
-					case CH_PRE:
-					case CH_EXQUOTE:
-						state = CH_INQUOTE;
-						break;
-					case CH_INQUOTE:
-						state = CH_EXQUOTE;
-						break;
-					case CH_POST:
-					case CH_MINUS:
-					case CH_C:
-						state = CH_ERR;
-						break;
-					case CH_PRECOMMAND:
-						state = CH_COMMAND;
-						break;
-					default:
-						state = CH_ERR;
-						break;
-				}
-
-			break;
-			default:
-				switch (state)
-				{
-					case CH_START:
-					case CH_PRE:
-						state = CH_EXQUOTE;
-						break;
-					case CH_INQUOTE:
-					case CH_EXQUOTE:
-						break;
-					default:
-						state = CH_ERR;
-						break;
-				}
-			break;
-		}
-		DEBUG((stderr,"endstate: %d\n",state));
-		result ++;
-		
-	}
-
-	if (state == CH_ERR)
-		return NULL;
-
-	return result;
-}
-#endif
 
 int main(int argc, char *argv[])
 {
