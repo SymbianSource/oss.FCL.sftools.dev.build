@@ -36,6 +36,7 @@ USERINCLUDE     ../traces
 OS_LAYER_SYSTEMINCLUDE
 SYSTEMINCLUDE   /epoc32/include/libc
 SYSTEMINCLUDE   /epoc32/include/internal
+SYSTEMINCLUDE   /epoc32/include/platform
 
 LIBRARY         euser.lib
 LIBRARY		iscapi.lib

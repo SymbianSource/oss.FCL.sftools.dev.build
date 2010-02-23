@@ -30,7 +30,7 @@ SOURCE        tcwinsfiletwo.cpp
 
 USERINCLUDE   .
 SYSTEMINCLUDE /epoc32/include
-SYSTEMINCLUDE /epoc32/include/internal
+SYSTEMINCLUDE /epoc32/include/platform
 USERINCLUDE traces
 
 LIBRARY       euser.lib

@@ -14,7 +14,7 @@ UID		0 0xE78A5AA3
 USERINCLUDE	..\inc  
 USERINCLUDE	..\traces
 SYSTEMINCLUDE	\epoc32\include
-SYSTEMINCLUDE	\epoc32\include\internal
+SYSTEMINCLUDE	\epoc32\include\platform
 
 SOURCEPATH	..\src
 SOURCE		HelloWorld.cpp
