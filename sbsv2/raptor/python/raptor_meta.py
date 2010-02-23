@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -2276,7 +2276,8 @@ class MMPRaptorBackend(MMPBackend):
 		explicitly or implicitly, otherwise it is an error
 		""" 
 		if self.getTargetType() == 'implib' and defFile == '':
-			self.__Raptor.Error("No DEF File for IMPLIB target type in " + self.__currentMmpFile)
+			self.__Raptor.Error("No DEF File for IMPLIB target type in " + \
+							self.__currentMmpFile, bldinf=self.__bldInfFilename)
 
 	def resolveDefFile(self, aTARGET, aBuildPlatform):
 		"""Returns a fully resolved DEFFILE entry depending on .mmp file location and TARGET, DEFFILE and NOSTRICTDEF

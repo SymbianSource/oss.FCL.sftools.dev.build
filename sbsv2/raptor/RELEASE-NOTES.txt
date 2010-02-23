@@ -3,6 +3,7 @@ Release Notes for Symbian Build System v2
 next version
 
 Defect Fixes:
+- SF Bug 1571 - Raptor cannot report error or warning message in wrong implib project
 - DPDEF142718 Incremental rebuild fails if dependent files deleted
   --no-depend-generate added to suppress the generation and processing of dependency files
   .DEFAULT target introduced for all non --no-depend-generate and/or --no-depend-include builds
