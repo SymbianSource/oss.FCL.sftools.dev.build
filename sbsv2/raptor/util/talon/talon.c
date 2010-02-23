@@ -246,11 +246,6 @@ int main(int argc, char *argv[])
 
 	
 	recipe = chompCommand(commandline);
-	if (recipe == NULL)
-	{
-		error("talon: error: unable to locate argument start in '%s'\n", commandline);
-		return 1;
-	}
 	if (recipe)
 	{
 		/* there was a -c so extract the quoted commands */
