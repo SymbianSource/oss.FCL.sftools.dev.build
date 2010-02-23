@@ -2,14 +2,11 @@ Release Notes for Symbian Build System v2
 
 next version
 
-- Fix platform macros for cross compilation on Linux
-- New build win32 tools on Linux.  
-  To enable it, use variant '.win32'. To build both windows and linux binaries,
-  use:
-	-c tools2.win32 -c tools2
-  It only applies to platform tools2 on Linux
-
-- Add a workaround to enable the Qt team to link their code against Symbian DLL's
+New Features:
+- New support for cross-compiling win32 tools on Linux.  
+  To enable it, use "sbs -c tools2.win32 -c tools2" on Linux
+- New workaround to enable the Qt team to link their code against Symbian DLL's
+- New prototype support for reading System Definition v3 files
 
 
 version 2.12.2

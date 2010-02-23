@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -158,7 +158,7 @@ class SystemModelComponent(generic_path.Path):
 	def GetSystemDefinitionBase(self):
 		return self.__SystemDefinitionBase
 
-	def GetSystemDefinitionFile(self):
+	def GetSystemDefinitionVersion(self):
 		return self.__SystemDefinitionVersion
 
 	def GetLayerName(self):
@@ -166,7 +166,7 @@ class SystemModelComponent(generic_path.Path):
 
 	def GetContainerName(self, aContainerType):
 		if self.__ContainerNames.has_key(aContainerType):
-		  return self.__ContainerNames[aContainerType]
+			return self.__ContainerNames[aContainerType]
 		return ""
 
 
@@ -297,7 +297,7 @@ class SystemModel(object):
 		# the <layer> context of captured "bldFile" attributes is recorded as we go
 		# For 3.0 and later, process any architectural topmost element, use the topmost element with an id as the "layer"
 		for child in self.__SystemDefinitionElement.childNodes:
-			if child.localName == "systemModel" or child.localName == "layer" or child.localName == "package" or child.localName == "collection" or child.localName == "component":
+			if child.localName in ["systemModel", "layer", "package", "collection", "component"]:
 				self.__ProcessSystemModelElement(child)
 
 	def __CreateComponent(self, aBldInfFile, aUnitElement):
