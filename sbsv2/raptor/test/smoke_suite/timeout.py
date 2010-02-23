@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -21,9 +21,7 @@ def run():
 	t = SmokeTest()
 	t.description = "test that long commands time out and get retried"
 	
-	exitCode = "15"
-	if t.onWindows:
-		exitCode = "128" # why are they different?
+	exitCode = "128"
 
 	t.id = "60a"
 	t.name = "timeout"
@@ -31,7 +29,7 @@ def run():
 	t.command = "sbs -b smoke_suite/test_resources/timeout/bld.inf -f-"
 
 	t.mustmatch = [
-		"status exit='failed' code='" + exitCode + "' attempt='1'",
+		"status exit='failed' code='" + exitCode + "' attempt='1' *reason='timeout'",
 	]
 	t.errors = -1
 	t.returncode = 1
@@ -43,9 +41,9 @@ def run():
 	t.command = "sbs -b smoke_suite/test_resources/timeout/bld.inf -t 3 -f-"
 
 	t.mustmatch = [
-		"status exit='retry' code='" + exitCode + "' attempt='1'",
-		"status exit='retry' code='" + exitCode + "' attempt='2'",
-		"status exit='failed' code='" + exitCode + "' attempt='3'",
+		"status exit='retry' code='" + exitCode + "' attempt='1' *reason='timeout'",
+		"status exit='retry' code='" + exitCode + "' attempt='2' *reason='timeout'",
+		"status exit='failed' code='" + exitCode + "' attempt='3' *reason='timeout'",
 	]
 	t.errors = -1
 	t.returncode = 1

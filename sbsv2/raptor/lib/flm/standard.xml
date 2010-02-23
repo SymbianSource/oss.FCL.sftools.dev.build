@@ -237,6 +237,8 @@
 	</interface>
 	<interface name="Symbian.plugin" extends="Symbian.dll" flm="e32abiv2plugin.flm">
 	</interface>
+	<interface name="Symbian.plugin3" extends="Symbian.dll" flm="e32abiv2plugin.flm">
+	</interface>
 	<interface name="Symbian.textnotifier2" extends="Symbian.dll" flm="e32abiv2textnotifier2.flm">
 	</interface>
 	<interface name="Symbian.implib" extends="Symbian.dll" flm="e32abiv2implib.flm">

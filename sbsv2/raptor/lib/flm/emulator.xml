@@ -231,6 +231,9 @@
 	<interface name="Emulator.plugin" extends="Emulator.dll" flm="win32plugin.flm">
 	</interface>
 
+	<interface name="Emulator.plugin3" extends="Emulator.dll" flm="win32plugin.flm">
+	</interface>
+
 	<interface name="Emulator.textnotifier2" extends="Emulator.dll" flm="win32textnotifier2.flm">
 	</interface>
 
