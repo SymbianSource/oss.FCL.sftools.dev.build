@@ -1,5 +1,11 @@
 Release Notes for Symbian Build System v2
 
+version 2.12.3
+
+Defect Fixes:
+- Don't print trace "what" information if we do not run the trace compiler.
+
+
 version 2.12.2
 
 Defect Fixes:

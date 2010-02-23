@@ -25,8 +25,9 @@ TRACE_PATH:=$(strip $(foreach DIR,$(USERINCLUDE),$(filter %/traces_$(TARGET)_$(T
 TRACE_PRJNAME:=$(TARGET)_$(TARGETTYPE)
 endif
 
-TRACE_DICTIONARY:=$(EPOCROOT)/epoc32/ost_dictionaries/$(TRACE_PRJNAME)_0x$(UID_TC)_Dictionary.xml
-AUTOGEN_HEADER:=$(EPOCROOT)/epoc32/include/internal/SymbianTraces/autogen/$(TRACE_PRJNAME)_0x$(UID_TC)_TraceDefinitions.h
+# initialise (so what output will be correct if we don't actually run the TC)
+TRACE_DICTIONARY:=
+AUTOGEN_HEADER:=
 
 $(if $(FLMDEBUG),$(info <debug>TRACE_PATH = $(TRACE_PATH)</debug>))
 
@@ -51,6 +52,9 @@ $(TRACE_HEADERS): $(TRACE_MARKER)
 
 ifeq ($(GUARD_$(call sanitise,$(TRACE_MARKER))),)
 GUARD_$(call sanitise,$(TRACE_MARKER)):=1
+
+TRACE_DICTIONARY:=$(EPOCROOT)/epoc32/ost_dictionaries/$(TRACE_PRJNAME)_0x$(UID_TC)_Dictionary.xml
+AUTOGEN_HEADER:=$(EPOCROOT)/epoc32/include/internal/SymbianTraces/autogen/$(TRACE_PRJNAME)_0x$(UID_TC)_TraceDefinitions.h
 
 JAVA_COMMAND:=$(SBS_JAVATC)
 TRACE_COMPILER_PATH:=$(EPOCROOT)/epoc32/tools
