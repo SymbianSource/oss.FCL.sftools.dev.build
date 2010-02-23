@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of the License "Eclipse Public License v1.0"
@@ -176,11 +176,15 @@ proc *process_run(char executable[], char *args[], int timeout)
 		p->returncode = WEXITSTATUS(status);
 		DEBUG(("process exited normally \n"));
 	} else {
-		p->causeofdeath = PROC_SOMEODDDEATH;
-		if (WIFSIGNALED(status))
-			p->returncode = WTERMSIG(status);
-		else
+		if (p->causeofdeath == PROC_TIMEOUTDEATH)
 			p->returncode = 128;
+		else {	
+			p->causeofdeath = PROC_SOMEODDDEATH;
+			if (WIFSIGNALED(status))
+				p->returncode = WTERMSIG(status);
+			else
+				p->returncode = 128;
+		}
 		DEBUG(("process terminated \n"));
 	}
 	

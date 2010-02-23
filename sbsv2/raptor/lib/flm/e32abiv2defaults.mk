@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -59,7 +59,7 @@ ifeq ($(TOOLCHAIN),RVCT)
 	LINKER_ENTRYPOINT_ADORNMENT:=(uc_exe_.o)
   endif
 
-  ifeq ($(call isoneof,$(TARGETTYPE),ani textnotifier2 stddll plugin fsy pdl dll pdll),1)
+  ifeq ($(call isoneof,$(TARGETTYPE),ani textnotifier2 stddll plugin plugin3 fsy pdl dll pdll),1)
 	LINKER_ENTRYPOINT_ADORNMENT:=(uc_dll_.o)
   endif
 
