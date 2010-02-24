@@ -33,6 +33,10 @@
 #include "buffer.h"
 #include "../config.h"
 
+#ifdef HAS_GETCOMMANDLINE
+#include "chomp.h"
+#endif
+
 /* The output semaphore. */
 sbs_semaphore talon_sem;
 
@@ -231,7 +235,6 @@ int main(int argc, char *argv[])
 
 #ifdef HAS_GETCOMMANDLINE
 	char *commandline= GetCommandLine();
-	DEBUG(("talon: commandline: %s\n", commandline));
 	/*
 	 * The command line should be either,
 	 * talon -c "some shell commands"
@@ -240,21 +243,13 @@ int main(int argc, char *argv[])
 	 *
 	 * talon could be an absolute path and may have a .exe extension.
 	 */
-	recipe = strstr(commandline, "-c");
+
+	
+	recipe = chompCommand(commandline);
 	if (recipe)
 	{
 		/* there was a -c so extract the quoted commands */
 
-		while (*recipe != '"' && *recipe != '\0')
-			recipe++;
-
-		if (*recipe != '"')    /* we found -c but no following quote */
-		{
-			error("talon: error: unquoted recipe in shell call '%s'\n", commandline);
-			return 1;
-		}
-		recipe++;
-		
 		int recipelen = strlen(recipe);
 		if (recipelen > 0 && recipe[recipelen - 1] == '"')
 			recipe[recipelen - 1] = '\0'; /* remove trailing quote */
