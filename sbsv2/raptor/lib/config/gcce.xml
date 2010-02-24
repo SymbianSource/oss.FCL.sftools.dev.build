@@ -101,5 +101,25 @@
 		<set name="USER_LIBS_PATH_OPTION" value="--userlibpath"/>
 		<set name="VFE_OPTION" value=""/>
 		<set name="NO_UNALIGNED_ACCESS" value="$(CC.NO_UNALIGNED_ACCESS)"/>
+		<set name="OWN_LIBRARY_OPTION" value=""/>
+		<set name="STATIC_LIBS_LIST" value=""/>
+		<set name="ARMLIBS" value=""/>
+		<set name="CC.SOFTVFP_MAYBE_VFPV2" value="soft"/>
+		<set name="PL.SOFTVFP_MAYBE_VFPV2" value="softvfp"/>
+		<set name="CC.SOFTVFP_MAYBE_VFPV3" value="soft"/>
+		<set name="PL.SOFTVFP_MAYBE_VFPV3" value="softvfp"/>
+		<set name="CC.ARMV5" value="-march=armv5t"/>
+		<set name="CC.ARMV6" value="-march=armv6t2"/>
+		<set name="CC.ARMV7" value="-march=armv7"/>
+		<set name="RELOCATABLE_IMAGE_OPTION" value=""/>
+		<set name="RVCTLIB" value=""/>
+		<set name="CC.NO_UNALIGNED_ACCESS" value=""/>
+		<set name="SPLIT_OPTION" value=""/>
+		<set name="NEED_ENTRYPOINT_LIBRARY" value=""/>
+		<set name="RVCTBIN" value="" />
+		<set name="RVCTINC" value="" />
+		<set name="USER_STATIC_RUNTIME_LIB" value="usrt3_1.lib"/>
+		<set name="KERNEL_STATIC_RUNTIME_LIB" value="ksrt3_1.lib"/>
+		<set name="NEED_ENTRYPOINT_LIBRARY" value="" />
 	</var>
 </build>
