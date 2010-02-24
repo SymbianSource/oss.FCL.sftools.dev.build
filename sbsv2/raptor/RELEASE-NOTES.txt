@@ -11,6 +11,7 @@ Defect Fixes:
   .DEFAULT target introduced for all non --no-depend-generate and/or --no-depend-include builds
 - Add support for PLUGIN3 TARGETTYPEs
 - Fixing logfile corruption for large GCCXML builds by suppressing zip output
+- Stop copying .bmp files to epoc32/localisation and fix the "what" reporting
 
 
 version 2.12.2
