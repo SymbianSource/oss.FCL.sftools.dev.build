@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -2177,6 +2177,9 @@ class MMPRaptorBackend(MMPBackend):
 		self.BuildVariant.AddOperation(raptor_data.Set("DEFFILEKEYWORD", deffile_keyword))
 		self.__debug("Set DEFFILEKEYWORD to '%s'",deffile_keyword)
 
+		# If target type is "implib" it must have a def file
+		self.checkImplibDefFile(resolvedDefFile)
+
 		# if this target type has a default TARGETPATH other than "" for
 		# resources then we need to add that default to all resources which
 		# do not explicitly set the TARGETPATH themselves.
@@ -2267,6 +2270,14 @@ class MMPRaptorBackend(MMPBackend):
 	def getTargetType(self):
 		"""Target type in lower case - the standard format"""
 		return self.__targettype.lower()
+
+	def checkImplibDefFile(self, defFile):
+		"""Project with target type implib must have DEFFILE defined 
+		explicitly or implicitly, otherwise it is an error
+		""" 
+		if self.getTargetType() == 'implib' and defFile == '':
+			self.__Raptor.Error("No DEF File for IMPLIB target type in " + \
+							self.__currentMmpFile, bldinf=self.__bldInfFilename)
 
 	def resolveDefFile(self, aTARGET, aBuildPlatform):
 		"""Returns a fully resolved DEFFILE entry depending on .mmp file location and TARGET, DEFFILE and NOSTRICTDEF
