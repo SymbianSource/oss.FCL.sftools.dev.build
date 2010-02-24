@@ -71,7 +71,7 @@ endef
 # $(2) list of further variable arguments to group in 150 element calls
 define groupcallin50
 	$(if $2,$1 $(foreach L,$(wordlist 1,50,$2),$(L)),)
-	$(if $2,$(call groupcallin50,$1,$(wordlist 51,$(words $2),$2)),true)
+	$(if $2,$(call groupcallin50,$1,$(wordlist 51,$(words $2),$2)),@true)
 endef
 
 # echos content to a file in groups performing optional search/replace based on passed args
@@ -235,7 +235,7 @@ $(foreach SRCFILE,$(SOURCE),$(eval $(call gccxmlprocesssource,$(SRCFILE))))
 # note: the main call here needs to reside outside of start/endrule in order to avoid command line length issues.
 define gccxmlpackage
   $(TEMPGXPARCHIVE): $(MMPXMLFILE) $(SRCXMLFILES) $(DEFFILE)
-	  $$(call groupcallin50,$(ZIP) -j $$@,$$^ $(RFIFILES)) ;
+	  $$(call groupcallin50,@$(ZIP) -j $$@ > /dev/null 2>&1,$$^ $(RFIFILES)) ;
 	  $(call startrule,gccxmlpackage) \
 	  $(GNURM) -f $(GXPARCHIVE) && \
 	  $(GNUCP) $$@ $(GXPARCHIVE) \
