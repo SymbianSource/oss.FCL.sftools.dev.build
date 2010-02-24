@@ -29,16 +29,16 @@
    the possiblity of using the Ragel state machine generator perhaps.
 
 */
-#define CH_START 0
-#define CH_PRE 1
-#define CH_EXQUOTE 2
-#define CH_INQUOTE 3
-#define CH_POST 4
-#define CH_MINUS 5
-#define CH_C 6
-#define CH_PRECOMMAND 7
-#define CH_COMMAND 8
-#define CH_ERR 9
+#define CH_START 0 	/* start state */
+#define CH_PRE 1	/* spaces before executable name */
+#define CH_EXQUOTE 2    /* part of the executable name, outside quotes */
+#define CH_INQUOTE 3	/* part of the executable name, in a quoted region */
+#define CH_POST 4	/* spaces after executable name */
+#define CH_MINUS 5	/* start of -c option */
+#define CH_C 6		/* end of -c option */
+#define CH_PRECOMMAND 7 /* spaces before shell commands */
+#define CH_COMMAND 8	/* first character of shell command */
+#define CH_ERR 9	/* Error! */
 
 #include "log.h"
 #include "chomp.h"
