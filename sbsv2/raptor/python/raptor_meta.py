@@ -2686,15 +2686,6 @@ class MetaReader(object):
 
 		specName = getSpecName(component.bldinf_filename, fullPath=True)
 
-		if isinstance(component.bldinf, raptor_xml.SystemModelComponent):
-			# this component came from a system_definition.xml
-			layer = component.bldinf.GetContainerName("layer")
-			componentName = component.bldinf.GetContainerName("component")
-		else:
-			# this is a plain old bld.inf file from the command-line
-			layer = ""
-			componentName = ""
-
 		# exports are independent of build platform
 		for i,ep in enumerate(self.ExportPlatforms):
 			specNode = raptor_data.Specification(name = specName)
@@ -2705,8 +2696,8 @@ class MetaReader(object):
 			# add some basic data in a component-wide variant
 			var = raptor_data.Variant(name='component-wide')
 			var.AddOperation(raptor_data.Set("COMPONENT_META", str(component.bldinf_filename)))
-			var.AddOperation(raptor_data.Set("COMPONENT_NAME", componentName))
-			var.AddOperation(raptor_data.Set("COMPONENT_LAYER", layer))
+			var.AddOperation(raptor_data.Set("COMPONENT_NAME", component.componentname))
+			var.AddOperation(raptor_data.Set("COMPONENT_LAYER", component.layername))
 			specNode.AddVariant(var)
 
 			# add this bld.inf Specification to the export platform
@@ -2737,8 +2728,8 @@ class MetaReader(object):
 				# add some basic data in a component-wide variant
 				var = raptor_data.Variant(name='component-wide-settings-' + plat)
 				var.AddOperation(raptor_data.Set("COMPONENT_META",str(component.bldinf_filename)))
-				var.AddOperation(raptor_data.Set("COMPONENT_NAME", componentName))
-				var.AddOperation(raptor_data.Set("COMPONENT_LAYER", layer))
+				var.AddOperation(raptor_data.Set("COMPONENT_NAME", component.componentname))
+				var.AddOperation(raptor_data.Set("COMPONENT_LAYER", component.layername))
 				var.AddOperation(raptor_data.Set("MODULE", modulename))
 				var.AddOperation(raptor_data.Append("OUTPUTPATHOFFSET", outputDir, '/'))
 				var.AddOperation(raptor_data.Append("OUTPUTPATH", outputDir, '/'))

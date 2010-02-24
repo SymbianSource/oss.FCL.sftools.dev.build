@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -20,11 +20,10 @@ def run():
 	t = SmokeTest()
 	t.id = "48"
 	t.name = "sysdef_layers"
-	t.description = "Test system_definition.xml layer processing"
-	t.command = 'sbs -s ' + \
-			'smoke_suite/test_resources/sysdef/system_definition_order_layer_test.xml' + \
-			' -l "Metadata Export" -l "Build Generated Source" -l ' + \
-			'"Component with Layer Dependencies" -o'
+	t.usebash = True
+	t.description = "Test system_definition.xml layer processing and log reporting"
+	t.command = 'sbs -f- -s smoke_suite/test_resources/sysdef/system_definition_order_layer_test.xml ' + \
+			'-l "Metadata Export" -l "Build Generated Source" -l "Component with Layer Dependencies" -o'
 	t.targets = [
 		"$(SBS_HOME)/test/smoke_suite/test_resources/sysdef/build_gen_source/exported.inf",
 		"$(SBS_HOME)/test/smoke_suite/test_resources/sysdef/build_gen_source/exported.mmh",
@@ -88,5 +87,9 @@ def run():
 		"helloworld_exe/winscw/urel/helloworld_UID_.o",
 		"helloworld_reg_exe/helloworld_reg__private_10003a3f_apps_sc.rpp"
 		])
+	t.countmatch = [
+		["<recipe .*layer='Component with Layer Dependencies' component='dependent'.*>", 43],
+		["<recipe .*layer='Build Generated Source' component='build generated source'.*>", 7]		
+		]
 	t.run()
 	return t
