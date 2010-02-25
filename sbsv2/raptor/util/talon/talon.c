@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of the License "Eclipse Public License v1.0"
@@ -33,12 +33,16 @@
 #include "buffer.h"
 #include "../config.h"
 
+#ifdef HAS_GETCOMMANDLINE
+#include "chomp.h"
+#endif
+
 /* The output semaphore. */
 sbs_semaphore talon_sem;
 
 #define TALON_ATTEMPT_STRMAX 32
 #define RECIPETAG_STRMAX 2048
-#define STATUS_STRMAX 100
+#define STATUS_STRMAX 120
 
 #define TALONDELIMITER '|'
 #define VARNAMEMAX 100
@@ -231,7 +235,6 @@ int main(int argc, char *argv[])
 
 #ifdef HAS_GETCOMMANDLINE
 	char *commandline= GetCommandLine();
-	DEBUG(("talon: commandline: %s\n", commandline));
 	/*
 	 * The command line should be either,
 	 * talon -c "some shell commands"
@@ -240,21 +243,13 @@ int main(int argc, char *argv[])
 	 *
 	 * talon could be an absolute path and may have a .exe extension.
 	 */
-	recipe = strstr(commandline, "-c");
+
+	
+	recipe = chompCommand(commandline);
 	if (recipe)
 	{
 		/* there was a -c so extract the quoted commands */
 
-		while (*recipe != '"' && *recipe != '\0')
-			recipe++;
-
-		if (*recipe != '"')    /* we found -c but no following quote */
-		{
-			error("talon: error: unquoted recipe in shell call '%s'\n", commandline);
-			return 1;
-		}
-		recipe++;
-		
 		int recipelen = strlen(recipe);
 		if (recipelen > 0 && recipe[recipelen - 1] == '"')
 			recipe[recipelen - 1] = '\0'; /* remove trailing quote */
@@ -549,14 +544,18 @@ int main(int argc, char *argv[])
 
 			if (dotagging) 
 			{
-				char *forcesuccessstr = force_success == 0 ? "" : " forcesuccess='FORCESUCCESS'";
+				char *flagsstr = force_success == 0 ? "" : " flags='FORCESUCCESS'";
+				char *reasonstr = "" ;
+
+				if (p->causeofdeath == PROC_TIMEOUTDEATH)
+					reasonstr = " reason='timeout'";
 
 				if (p->returncode != 0)
 				{
 					char *exitstr = retries > 0 ? "retry" : "failed";
-					snprintf(status, STATUS_STRMAX - 1, "\n<status exit='%s' code='%d' attempt='%d'%s />", exitstr, p->returncode, attempt, forcesuccessstr );
+					snprintf(status, STATUS_STRMAX - 1, "\n<status exit='%s' code='%d' attempt='%d'%s%s />", exitstr, p->returncode, attempt, flagsstr, reasonstr );
 				} else {
-					snprintf(status, STATUS_STRMAX - 1, "\n<status exit='ok' attempt='%d'%s />", attempt, forcesuccessstr );
+					snprintf(status, STATUS_STRMAX - 1, "\n<status exit='ok' attempt='%d'%s%s />", attempt, flagsstr, reasonstr );
 				}
 				status[STATUS_STRMAX-1] = '\0';
 	

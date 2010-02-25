@@ -3,9 +3,15 @@ Release Notes for Symbian Build System v2
 next version
 
 Defect Fixes:
+- SF Bug 2000 - [Raptor] Talon fails when installed in a path containing the string '-c' (windows only)
+- SF Bug 1861 - [Raptor] More helpful console message in case of timeouts
+- SF Bug 1571 - Raptor cannot report error or warning message in wrong implib project
 - DPDEF142718 Incremental rebuild fails if dependent files deleted
   --no-depend-generate added to suppress the generation and processing of dependency files
   .DEFAULT target introduced for all non --no-depend-generate and/or --no-depend-include builds
+- Add support for PLUGIN3 TARGETTYPEs
+- Fixing logfile corruption for large GCCXML builds by suppressing zip output
+- Stop copying .bmp files to epoc32/localisation and fix the "what" reporting
 
 
 version 2.12.2

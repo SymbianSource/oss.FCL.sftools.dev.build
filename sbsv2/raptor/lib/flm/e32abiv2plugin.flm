@@ -16,7 +16,7 @@
 # 
 #
 
-ifeq ($(TARGETTYPE),plugin)
+ifneq ($(filter plugin plugin3,$(TARGETTYPE)),)
 include $(FLMHOME)/e32abiv2defaults.mk
 
 # Default Linker settings for this target type
@@ -50,6 +50,10 @@ endif
 # We could check the UID rather than forcing it
 # but there seems to be no point in that.
 UID2:=10009D8D
+ifeq ($(TARGETTYPE),plugin3)
+UID2:=10009D93
+POSTLINKTARGETTYPE:=PLUGIN3
+endif
 
 
 RESOURCEPATH:=Resource/Plugins
@@ -64,5 +68,5 @@ include $(FLMHOME)/e32abiv2.flm
 $(call vrestore)
 
 else
-$(error $e32abiv2plugin.flm called with wrong TARGETTYPE (should be 'plugin' but is '$(TARGETTYPE)'))
+$(error $e32abiv2plugin.flm called with wrong TARGETTYPE (should be 'plugin' or 'plugin3' but is '$(TARGETTYPE)'))
 endif

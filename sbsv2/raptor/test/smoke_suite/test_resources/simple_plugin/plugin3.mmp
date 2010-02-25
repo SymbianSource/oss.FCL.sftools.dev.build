@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of the License "Eclipse Public License v1.0"
@@ -12,10 +12,18 @@
 * Contributors:
 *
 * Description: 
+* Example ECOMP plugin3 component, with no UID listed
 *
 */
 
-PRJ_MMPFILES
-plugin.mmp
-plugin_with_deffile.mmp
-plugin3.mmp
+
+
+TARGET			plugin3.dll
+TARGETTYPE		plugin3
+CAPABILITY		Protserv
+VENDORID		0x70000001
+SOURCEPATH		.
+SOURCE			plugin.cpp
+SYSTEMINCLUDE 	/epoc32/include
+SYSTEMINCLUDE 	/epoc32/include/ecom 
+LIBRARY			euser.lib apmime.lib efsrv.lib
