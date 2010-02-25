@@ -48,12 +48,6 @@ def run():
 		"$(EPOCROOT)/epoc32/release/winscw/urel/z/resource/apps/helloworld.rsc",
 		"$(EPOCROOT)/epoc32/localisation/group/helloworld.info",
 		"$(EPOCROOT)/epoc32/localisation/helloworld/rsc/helloworld.rpp",
-		"$(EPOCROOT)/epoc32/localisation/helloworld/mbm/icon2m.bmp",
-		"$(EPOCROOT)/epoc32/localisation/helloworld/mbm/icon3m.bmp",
-		"$(EPOCROOT)/epoc32/localisation/helloworld/mbm/icon4m.bmp",
-		"$(EPOCROOT)/epoc32/localisation/helloworld/mbm/icon24.bmp",
-		"$(EPOCROOT)/epoc32/localisation/helloworld/mbm/icon32.bmp",
-		"$(EPOCROOT)/epoc32/localisation/helloworld/mbm/icon48.bmp",
 		"$(EPOCROOT)/epoc32/localisation/group/helloworld_reg.info",
 		"$(EPOCROOT)/epoc32/localisation/helloworld_reg/rsc/helloworld_reg.rpp"
 		]

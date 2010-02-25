@@ -77,41 +77,24 @@
 	<var name="whatlog">
 		<set name='WHATLOG' value='TRUE'/>
 	</var>
-
+	
 	<var name="gcce4_3_2" extends="gcce_base">
 		<env name="SBS_GCCE432BIN" type="path" />
 		<set name="GCCEBIN" value="$(SBS_GCCE432BIN)" />
-		<set name="OWN_LIBRARY_OPTION" value=""/>
-		<set name="STATIC_LIBS_LIST" value=""/>
 		<set name="RUNTIME_LIBS_LIST" value="drtaeabi.dso dfpaeabi.dso dfprvct3_1.dso drtrvct3_1.dso"/>
-		<set name="ARMLIBS" value=""/>
-		<set name="CC.SOFTVFP_MAYBE_VFPV2" value="soft"/>
-		<set name="PL.SOFTVFP_MAYBE_VFPV2" value="softvfp"/>
-		<set name="CC.SOFTVFP_MAYBE_VFPV3" value="soft"/>
-		<set name="PL.SOFTVFP_MAYBE_VFPV3" value="softvfp"/>
-		<set name="CC.ARMV5" value="-march=armv5t"/>
-		<set name="CC.ARMV6" value="-march=armv6t2"/>
-		<set name="CC.ARMV7" value="-march=armv7"/>
-		<set name="RELOCATABLE_IMAGE_OPTION" value=""/>
-		<set name="RVCTLIB" value=""/>
-		<set name="CC.NO_UNALIGNED_ACCESS" value=""/>
-		<set name="SPLIT_OPTION" value=""/>
-		<set name="NEED_ENTRYPOINT_LIBRARY" value=""/>
-		<set name="RVCTBIN" value="" />
-		<set name="RVCTINC" value="" />
-		<set name="USER_STATIC_RUNTIME_LIB" value="usrt3_1.lib"/>
-		<set name="KERNEL_STATIC_RUNTIME_LIB" value="ksrt3_1.lib"/>
-		<set name="NEED_ENTRYPOINT_LIBRARY" value="" />
 		<set name="PLATMACROS.VAR" value="GCCE_4 GCCE_4_3"/>
 		<set name="ARMMACROS.VAR" value="__GCCE_4__ __GCCE_4_3__"/>
 	</var>
 
-	<var name="gcce4_3_3" extends="gcce4_3_2">
+	<var name="gcce4_3_3" extends="gcce_base">
 		<env name="SBS_GCCE433BIN" type="path" />
 		<set name="GCCEBIN" value="$(SBS_GCCE433BIN)" />
+		<set name="RUNTIME_LIBS_LIST" value="drtaeabi.dso dfpaeabi.dso dfprvct3_1.dso drtrvct3_1.dso"/>
+		<set name="PLATMACROS.VAR" value="GCCE_4 GCCE_4_3"/>
+		<set name="ARMMACROS.VAR" value="__GCCE_4__ __GCCE_4_3__"/>
 	</var>
 	
-	<var name="gcce4_4_1" extends="gcce4_3_3">
+	<var name="gcce4_4_1" extends="gcce_base">
 		<env name="SBS_GCCE441BIN" type="path" />
 		<set name="GCCEBIN" value="$(SBS_GCCE441BIN)" />
 		<set name="RUNTIME_LIBS_LIST" value="drtaeabi.dso dfpaeabi.dso"/>
