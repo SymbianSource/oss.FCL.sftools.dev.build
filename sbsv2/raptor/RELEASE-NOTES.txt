@@ -3,6 +3,7 @@ Release Notes for Symbian Build System v2
 next version
 
 New Features:
+- Add support for Cygwin 1.7.
 - New support for cross-compiling win32 tools on Linux.  
   To enable it, use "sbs -c tools2.win32 -c tools2" on Linux
 - New workaround to enable the Qt team to link their code against Symbian DLL's
