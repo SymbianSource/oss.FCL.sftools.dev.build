@@ -44,10 +44,9 @@ Var INSTALL_TYPE # Type of installer ("USR" or "SYS")
 
 # Custom includes (depend on above variables so much be here)
 !include "raptorinstallerutils.nsh" # Functions and macros for handling environment variables
-!include "raptorversion.nsh" # Define the RAPTOR_VERSION variable
+# !include "raptorversion.nsh" # Define the RAPTOR_VERSION variable
 
 # Defines
-# !define /date DATE_STAMP "%Y-%m-%d-%H-%M-%S"
 !define INSTALLER_NAME "Raptor v${RAPTOR_VERSION}"
 !define RAPTOR "sbs"
 !define INSTALLER_FILENAME "${RAPTOR}-${RAPTOR_VERSION}.exe"
@@ -112,16 +111,16 @@ Section "Install Raptor" INSTALLRAPTOR
     File /r /x distribution.policy.s60 ${RAPTOR_LOCATION}\python\*.*
     SetOutPath "$INSTDIR\schema"
     File /r /x distribution.policy.s60 ${RAPTOR_LOCATION}\schema\*.*
-    SetOutPath "$INSTDIR\win32"
-    File /r /x distribution.policy.s60 ${RAPTOR_LOCATION}\win32\*.*
+    SetOutPath "$INSTDIR\win32\bin"
+    File /r /x distribution.policy.s60 ${RAPTOR_LOCATION}\win32\bin\*.*
     SetOutPath "$INSTDIR\win32\bv"
-    File /r /x distribution.policy.s60 /x .hg ${WIN32SUPPORT}\bv\*.*
+    File /r /x distribution.policy.s60 /x .hg ${BV_LOCATION}\*.*
     SetOutPath "$INSTDIR\win32\cygwin"
-    File /r /x distribution.policy.s60 /x .hg ${WIN32SUPPORT}\cygwin\*.*
+    File /r /x distribution.policy.s60 /x .hg ${CYGWIN_LOCATION}\*.*
     SetOutPath "$INSTDIR\win32\mingw"
-    File /r /x distribution.policy.s60 /x .hg ${WIN32SUPPORT}\mingw\*.*
+    File /r /x distribution.policy.s60 /x .hg ${MINGW_LOCATION}\*.*
     SetOutPath "$INSTDIR\win32\python264"
-    File /r /x distribution.policy.s60 /x .hg ${WIN32SUPPORT}\python264\*.*
+    File /r /x distribution.policy.s60 /x .hg ${PYTHON_LOCATION}\*.*
     
     SetOutPath "$INSTDIR"
     File ${RAPTOR_LOCATION}\RELEASE-NOTES.txt
