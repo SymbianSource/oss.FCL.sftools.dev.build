@@ -1,4 +1,4 @@
-# Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -13,15 +13,34 @@
 # Description:
 # Run Trace Compiler on source files to generate trace headers and decode files
 
+# Set project name as <mmp_name>
 TRACE_PRJNAME:=$(basename $(notdir $(PROJECT_META)))
+
+TARGETEXT:=$(if $(REQUESTEDTARGETEXT),$(REQUESTEDTARGETEXT),$(POSTLINKFILETYPE))
+
 # Find out TRACE_PATH
+# first look for .*/traces/traces_<target_name>_<target_extension>
+TRACE_PATH:=$(strip $(foreach DIR,$(USERINCLUDE),$(filter %/traces/traces_$(TARGET)_$(TARGETEXT),$(DIR))))
+
+ifneq ($(TRACE_PATH),)
+# set project name as <target_name>_<target_extension> instead of <mmp_name>
+TRACE_PRJNAME:=$(TARGET)_$(TARGETEXT)
+endif
+
+# if not found look for .*/traces_<mmp_name>
+ifeq ($(TRACE_PATH),)
 TRACE_PATH:=$(strip $(foreach DIR,$(USERINCLUDE),$(filter %/traces_$(TRACE_PRJNAME),$(DIR))))
+endif
+
+# if not found look for .*/traces
 ifeq ($(TRACE_PATH),)
 TRACE_PATH:=$(strip $(foreach DIR,$(USERINCLUDE),$(filter %/traces,$(DIR))))
 endif
+
+# if not found look for .*/traces_<target_name>_<target_type>
 ifeq ($(TRACE_PATH),)
 TRACE_PATH:=$(strip $(foreach DIR,$(USERINCLUDE),$(filter %/traces_$(TARGET)_$(TARGETTYPE),$(DIR))))
-# Use target name instead of mmp file name
+# set project name as <target_name>_<target_type> instead of <mmp_name>
 TRACE_PRJNAME:=$(TARGET)_$(TARGETTYPE)
 endif
 
@@ -33,8 +52,6 @@ $(if $(FLMDEBUG),$(info <debug>TRACE_PATH = $(TRACE_PATH)</debug>))
 
 # Run trace compiler only if TRACE_PATH exists
 ifneq ($(TRACE_PATH),)
-
-
 TRACE_MARKER:=$(TRACE_MARKER_PATH)/tracecompile_$(TRACE_PRJNAME)_$(UID_TC).done
 TRACE_HEADERS:=
 
@@ -72,7 +89,7 @@ $(TRACE_MARKER) : $(PROJECT_META)
 	( echo -en "$(TRACE_PRJNAME)\n$(PROJECT_META)\n"; \
 	  $(GNUCAT) $(TRACE_SOURCE_LIST); \
 	  echo -en "*ENDOFSOURCEFILES*\n" ) | \
-	$(JAVA_COMMAND) $(TRACE_COMPILER_START) $(UID_TC) &&  \
+	$(JAVA_COMMAND) $(TRACE_COMPILER_START) -vb $(UID_TC) &&  \
 	$(GNUMD5SUM) $(TRACE_SOURCE_LIST) > $(TRACE_MARKER) && \
 	{ $(GNUCAT) $(TRACE_SOURCE_LIST) ; true ; } \
 	$(call endrule,tracecompile)
