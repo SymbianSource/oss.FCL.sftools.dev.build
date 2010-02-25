@@ -15,6 +15,12 @@ Defect Fixes:
 - Stop copying .bmp files to epoc32/localisation and fix the "what" reporting
 
 
+version 2.12.3
+
+Defect Fixes:
+- Don't print trace "what" information if we do not run the trace compiler.
+     
+     
 version 2.12.2
 
 Defect Fixes:
