@@ -82,7 +82,7 @@ def run():
 		"helloworld_reg_exe/helloworld_reg__private_10003a3f_apps_sc.rpp"
 		])
 	t.countmatch = [
-		["<recipe .*layer='Component with Layer Dependencies' component='dependent'.*>", 43],
+		["<recipe .*layer='Component with Layer Dependencies' component='dependent'.*>", 37],
 		["<recipe .*layer='Build Generated Source' component='build generated source'.*>", 7]		
 		]
 	t.run()
