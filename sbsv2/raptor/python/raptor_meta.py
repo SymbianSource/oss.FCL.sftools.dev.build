@@ -2835,8 +2835,10 @@ class MetaReader(object):
 
 			sourceMTime = 0
 			destMTime = 0
+			sourceStat = 0
 			try:
-				sourceMTime = os.stat(source_str)[stat.ST_MTIME]
+				sourceStat = os.stat(source_str)
+				sourceMTime = sourceStat[stat.ST_MTIME]
 				destMTime = os.stat(dest_str)[stat.ST_MTIME]
 			except OSError, e:
 				if sourceMTime == 0:
@@ -2850,6 +2852,9 @@ class MetaReader(object):
 				if os.path.exists(dest_str):
 					os.chmod(dest_str,stat.S_IREAD | stat.S_IWRITE)
 				shutil.copyfile(source_str, dest_str)
+
+				# Ensure that the destination file remains executable if the source was also:
+				os.chmod(dest_str,sourceStat[stat.ST_MODE] | stat.S_IREAD | stat.S_IWRITE | stat.S_IWGRP ) 
 				self.__Raptor.Info("Copied %s to %s", source_str, dest_str)
 			else:
 				self.__Raptor.Info("Up-to-date: %s", dest_str)
