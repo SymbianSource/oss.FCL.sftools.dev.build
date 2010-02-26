@@ -3,6 +3,8 @@ Release Notes for Symbian Build System v2
 next version
 
 Defect Fixes:
+- SF Bug 2042 - [Raptor] component field empty in recipe
+- SF Bug 2007 - [Raptor] GCCE 4.4.1 builds require 4.3.1 and 4.3.2 SBS_GCCE???BIN env vars etc.
 - SF Bug 2000 - [Raptor] Talon fails when installed in a path containing the string '-c' (windows only)
 - SF Bug 1861 - [Raptor] More helpful console message in case of timeouts
 - SF Bug 1571 - Raptor cannot report error or warning message in wrong implib project
