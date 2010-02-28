@@ -99,10 +99,17 @@ endef
 
 
 else
+
+  ifneq ($(filter win,$(HOST_PLATFORM)),)
+    TALON_HOSTNAME_VAR:=$$COMPUTERNAME
+  else
+    TALON_HOSTNAME_VAR:=$$HOSTNAME
+  endif
+
 TALON_RECIPEATTRIBUTES:=\
  name='$$RECIPE'\
  target='$$TARGET'\
- host='$$HOSTNAME'\
+ host='$(TALON_HOSTNAME_VAR)'\
  layer='$$COMPONENT_LAYER'\
  component='$$COMPONENT_NAME'\
  bldinf='$$COMPONENT_META' mmp='$$PROJECT_META'\
