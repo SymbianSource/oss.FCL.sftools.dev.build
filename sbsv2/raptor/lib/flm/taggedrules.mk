@@ -99,8 +99,6 @@ endef
 
 
 else
-
-
 TALON_RECIPEATTRIBUTES:=\
  name='$$RECIPE'\
  target='$$TARGET'\
