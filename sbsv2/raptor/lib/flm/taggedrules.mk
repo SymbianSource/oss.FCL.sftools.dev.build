@@ -100,12 +100,11 @@ endef
 
 else
 
-TALON_HOSTNAME_VAR:=$$HOSTNAME
 
 TALON_RECIPEATTRIBUTES:=\
  name='$$RECIPE'\
  target='$$TARGET'\
- host='$(TALON_HOSTNAME_VAR)'\
+ host='$$HOSTNAME'\
  layer='$$COMPONENT_LAYER'\
  component='$$COMPONENT_NAME'\
  bldinf='$$COMPONENT_META' mmp='$$PROJECT_META'\
