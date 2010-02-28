@@ -62,7 +62,7 @@ $(TARGET):: $(BINDIR)/$(TARGET)$(PROGRAMEXT)
 $(foreach SOURCEFILE,$(SOURCES),$(c2obj))
 
 $(BINDIR)/$(TARGET)$(PROGRAMEXT): $$(OBJECTS)
-	gcc $(LDFLAGS) $$^ -o $$@
+	gcc  $$^ $(LDFLAGS)  -o $$@
 	
 $$(shell mkdir -p $(OUTPUTPATH)/$(TARGET))
 

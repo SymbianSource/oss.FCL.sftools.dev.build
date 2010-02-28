@@ -29,6 +29,7 @@ LDFLAGS:=$(subst \,/,$(SBS_HOME:\=/)\win32\mingw\lib\libiberty.a)
 else
 LDFLAGS:=$(subst \,/,$(SBS_MINGW:\=/)\lib\libiberty.a)
 endif
+LDFLAGS:=$(LDFLAGS) -Wl,-lws2_32
 else
 CHOMP_C:=
 PROCESS_C:=process.c

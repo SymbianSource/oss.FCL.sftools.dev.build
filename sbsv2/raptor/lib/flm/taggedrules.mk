@@ -100,11 +100,7 @@ endef
 
 else
 
-  ifneq ($(filter win,$(HOSTPLATFORM)),)
-    TALON_HOSTNAME_VAR:=$$COMPUTERNAME
-  else
-    TALON_HOSTNAME_VAR:=$$HOSTNAME
-  endif
+TALON_HOSTNAME_VAR:=$$HOSTNAME
 
 TALON_RECIPEATTRIBUTES:=\
  name='$$RECIPE'\

@@ -21,6 +21,7 @@
 #define HAS_GETCOMMANDLINE 1
 #define HAS_MILLISECONDSLEEP 1
 #define HAS_MSVCRT 1
+#define HAS_WINSOCK2 1
 #else
 #define HAS_POLL 1
 #define HAS_SETENV 1
