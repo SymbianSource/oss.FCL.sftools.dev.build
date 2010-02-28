@@ -343,9 +343,6 @@ int main(int argc, char *argv[])
 	while (isspace(*recipe))
 		recipe++;
 
-
-
-
 	/* turn debugging on? */
 	char *debugstr=talon_getenv("TALON_DEBUG");
 
@@ -360,7 +357,6 @@ int main(int argc, char *argv[])
 	/* Make sure that the agent's hostname can be put into the host attribute */
 	char hostname[HOSTNAME_MAX];
 	int hostresult=0;
-
 	
 	hostresult = gethostname(hostname, HOSTNAME_MAX-1);
 	if (0 != hostresult)
