@@ -238,7 +238,7 @@ class Project(ModelNode):
 class Component(ModelNode):
 	"""A group of projects or, in symbian-speak, a bld.inf.
 	"""
-	def __init__(self, filename):
+	def __init__(self, filename, layername="", componentname=""):
 		super(Component,self).__init__(filename)
 		# Assume that components are specified in bld.inf files for now
 		# One day that tyranny might end.
@@ -249,21 +249,34 @@ class Component(ModelNode):
 		self.exportspecs = []
 		self.depfiles = []
 		self.unfurled = False # We can parse this
+		
+		# Extra metadata optionally supplied with system definition file gathered components
+		self.layername = layername
+		self.componentname = componentname
 
 	def AddMMP(self, filename):
 		self.children.add(Project(filename))
 
 
 class Layer(ModelNode):
-	""" 	Some components that should be built togther
+	""" Some components that should be built togther
 		e.g. a Layer in the system definition.
+		
+		Components that come from system definition files can
+		have extra surrounding metadata that we need to pass
+		on for use in log output.
 	"""
 	def __init__(self, name, componentlist=[]):
 		super(Layer,self).__init__(name)
 		self.name = name
 
 		for c in componentlist:
-			self.children.add(Component(c))
+			if isinstance(c, raptor_xml.SystemModelComponent):
+				# this component came from a system_definition.xml
+				self.children.add(Component(c, c.GetContainerName("layer"), c.GetContainerName("component")))
+			else:
+				# this is a plain old bld.inf file from the command-line
+				self.children.add(Component(c))
 
 	def unfurl(self, build):
 		"""Discover the children of this layer. This involves parsing the component MetaData (bld.infs, mmps).

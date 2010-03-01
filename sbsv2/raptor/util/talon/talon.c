@@ -16,6 +16,11 @@
 */
 
 
+#ifdef HAS_WINSOCK2
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#define WIN32_LEAN_AND_MEAN
+#endif
 
 
 #include <stdlib.h>
@@ -48,6 +53,8 @@ sbs_semaphore talon_sem;
 #define VARNAMEMAX 100
 #define VARVALMAX 1024
 
+#define HOSTNAME_MAX 100
+
 
 #include "log.h"
 
@@ -55,6 +62,7 @@ sbs_semaphore talon_sem;
 /* Make all output handling binary */
 unsigned int _CRT_fmode = _O_BINARY;
 #endif
+
 
 double getseconds(void)
 {
@@ -129,7 +137,7 @@ void prependattributes(buffer *b, char *attributes)
 				att++;
 			} while ( e < (VARNAMEMAX-1) && (isalnum(*att) || *att == '_'));
 			envvarname[e] = '\0';
-/* DEBUG(("envvarname: %s\n", envvarname)); */
+			/* DEBUG(("envvarname: %s\n", envvarname));*/ 
 			v = talon_getenv(envvarname);
 			if (v)
 			{
@@ -233,6 +241,18 @@ int main(int argc, char *argv[])
 	char *recipe = NULL;
 	int talon_returncode = 0;
 
+#ifdef HAS_WINSOCK2
+	WSADATA wsaData;
+
+	WSAStartup(MAKEWORD(2,2), &wsaData);
+
+	/* We ignore the result as we are only doing this to use gethostname
+	   and if that fails then leaving the host attribute blank is perfectly
+	   acceptable.
+	*/
+
+#endif
+
 #ifdef HAS_GETCOMMANDLINE
 	char *commandline= GetCommandLine();
 	/*
@@ -331,6 +351,20 @@ int main(int argc, char *argv[])
 	}
 
 	DEBUG(("talon: recipe: %s\n", recipe));
+
+	/* Make sure that the agent's hostname can be put into the host attribute */
+	char hostname[HOSTNAME_MAX];
+	int hostresult=0;
+	
+	hostresult = gethostname(hostname, HOSTNAME_MAX-1);
+	if (0 != hostresult)
+	{
+		DEBUG(("talon: failed to get hostname: %d\n", hostresult));
+		hostname[0] = '\0';
+	}
+
+	talon_setenv("HOSTNAME", hostname);
+	DEBUG(("talon: setenv: hostname: %s\n", hostname));
 
 	
 	char varname[VARNAMEMAX];

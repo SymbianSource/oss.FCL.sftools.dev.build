@@ -3,5 +3,5 @@
 // OST_TRACE_COMPILER_IN_USE flag has been added by Trace Compiler
 // REMOVE BEFORE CHECK-IN TO VERSION CONTROL
 #define OST_TRACE_COMPILER_IN_USE
-#include <OpenSystemTrace.h>
+#include <opensystemtrace.h>
 #endif
