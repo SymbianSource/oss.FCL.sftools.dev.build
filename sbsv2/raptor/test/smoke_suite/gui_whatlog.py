@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -30,12 +30,6 @@ def run():
 	t.usebash = True
 	t.targets = [
 		"$(EPOCROOT)/epoc32/data/z/resource/apps/helloworld.mbm",
-		"$(EPOCROOT)/epoc32/localisation/helloworld/mbm/icon24.bmp",
-		"$(EPOCROOT)/epoc32/localisation/helloworld/mbm/icon2m.bmp",
-		"$(EPOCROOT)/epoc32/localisation/helloworld/mbm/icon32.bmp",
-		"$(EPOCROOT)/epoc32/localisation/helloworld/mbm/icon3m.bmp",
-		"$(EPOCROOT)/epoc32/localisation/helloworld/mbm/icon48.bmp",
-		"$(EPOCROOT)/epoc32/localisation/helloworld/mbm/icon4m.bmp",
 		"$(EPOCROOT)/epoc32/localisation/group/helloworld.info",
 		"$(EPOCROOT)/epoc32/release/winscw/udeb/z/resource/apps/helloworld.mbm",
 		"$(EPOCROOT)/epoc32/release/winscw/urel/z/resource/apps/helloworld.mbm",
@@ -122,13 +116,6 @@ def run():
 	t.stdout = [
 		"<whatlog bldinf='"+componentpath+"/Bld.inf' mmp='"+componentpath+"/HelloWorld.mmp' config='armv5_udeb.whatlog'>",
 		"<bitmap>$(EPOCROOT)/epoc32/data/z/resource/apps/helloworld.mbm</bitmap>",
-		"<bitmap>$(EPOCROOT)/epoc32/localisation/helloworld/mbm/icon24.bmp</bitmap>",
-		"<bitmap>$(EPOCROOT)/epoc32/localisation/helloworld/mbm/icon2m.bmp</bitmap>",
-		"<bitmap>$(EPOCROOT)/epoc32/localisation/helloworld/mbm/icon32.bmp</bitmap>",
-		"<bitmap>$(EPOCROOT)/epoc32/localisation/helloworld/mbm/icon3m.bmp</bitmap>",
-		"<bitmap>$(EPOCROOT)/epoc32/localisation/helloworld/mbm/icon48.bmp</bitmap>",
-		"<bitmap>$(EPOCROOT)/epoc32/localisation/helloworld/mbm/icon4m.bmp</bitmap>",
-		"<bitmap>$(EPOCROOT)/epoc32/localisation/group/helloworld.info</bitmap>",
 		"<resource>$(EPOCROOT)/epoc32/include/helloworld.rsg</resource>",
 		"<resource>$(EPOCROOT)/epoc32/data/z/resource/apps/helloworld.rsc</resource>",
 		"<resource>$(EPOCROOT)/epoc32/localisation/helloworld/rsc/helloworld.rpp</resource>",
@@ -142,13 +129,6 @@ def run():
 		"<bitmap>$(EPOCROOT)/epoc32/data/z/resource/apps/helloworld.mbm</bitmap>",
 		"<bitmap>$(EPOCROOT)/epoc32/release/winscw/udeb/z/resource/apps/helloworld.mbm</bitmap>",
 		"<bitmap>$(EPOCROOT)/epoc32/release/winscw/urel/z/resource/apps/helloworld.mbm</bitmap>",
-		"<bitmap>$(EPOCROOT)/epoc32/localisation/helloworld/mbm/icon24.bmp</bitmap>",
-		"<bitmap>$(EPOCROOT)/epoc32/localisation/helloworld/mbm/icon2m.bmp</bitmap>",
-		"<bitmap>$(EPOCROOT)/epoc32/localisation/helloworld/mbm/icon32.bmp</bitmap>",
-		"<bitmap>$(EPOCROOT)/epoc32/localisation/helloworld/mbm/icon3m.bmp</bitmap>",
-		"<bitmap>$(EPOCROOT)/epoc32/localisation/helloworld/mbm/icon48.bmp</bitmap>",
-		"<bitmap>$(EPOCROOT)/epoc32/localisation/helloworld/mbm/icon4m.bmp</bitmap>",
-		"<bitmap>$(EPOCROOT)/epoc32/localisation/group/helloworld.info</bitmap>",
 		"<resource>$(EPOCROOT)/epoc32/include/helloworld.rsg</resource>",
 		"<resource>$(EPOCROOT)/epoc32/data/z/resource/apps/helloworld.rsc</resource>",
 		"<resource>$(EPOCROOT)/epoc32/release/winscw/udeb/z/resource/apps/helloworld.rsc</resource>",

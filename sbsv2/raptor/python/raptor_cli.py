@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2006-2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2006-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -47,7 +47,7 @@ FREEZE         Freeze exported functions in a .DEF file
 LIBRARY        Create import libraries from frozen .DEF files
 LISTING        Create assembler listing files for source files
 REALLYCLEAN    Same as CLEAN but also remove exported files
-RESOURCE       Create resource files and AIFs
+RESOURCE       Create resource files
 ROMFILE        Create an IBY file to be included in a ROM
 TARGET         Create main executables
 WHAT           List all releaseable targets
@@ -119,6 +119,9 @@ parser.add_option("-n","--nobuild",action="store_true",dest="nobuild",
 
 parser.add_option("--no-depend-include",action="store_true",dest="noDependInclude",
 				help="Do not include generated dependency files. This is only useful for extremely large non-incremental builds.")
+
+parser.add_option("--no-depend-generate",action="store_true",dest="noDependGenerate",
+				help="Do not generate dependency files. This is only useful for extremely large non-incremental builds.  Implies --no-depend-include.")
 				
 parser.add_option("-o","--orderlayers",action="store_true",dest="sys_def_order_layers",
 				help="Build layers in the System Definition XML file in the order listed or, if given, in the order of -l options.")
@@ -274,6 +277,7 @@ def DoRaptor(Raptor, args):
 				 'make_engine': Raptor.SetMakeEngine,
 				 'make_option': Raptor.AddMakeOption,
 				 'noDependInclude': Raptor.SetNoDependInclude,
+				 'noDependGenerate': Raptor.SetNoDependGenerate,
 				 'number_of_jobs': Raptor.SetJobs,
 				 'project_name' :  Raptor.AddProject,
 				 'filter_list' : Raptor.FilterList,
@@ -285,8 +289,8 @@ def DoRaptor(Raptor, args):
 				 'timing' : Raptor.SetTiming,
 				 'source_target' : Raptor.AddSourceTarget,
 				 'command_file' : CommandFile,
-				'parallel_parsing' : Raptor.SetParallelParsing,
-			 	'version' : Raptor.PrintVersion
+				 'parallel_parsing' : Raptor.SetParallelParsing,
+			 	 'version' : Raptor.PrintVersion
 				}
 
 	# Check if Quiet mode has been specified (otherwise we will make noise)

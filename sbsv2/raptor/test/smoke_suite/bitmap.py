@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2000-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -26,13 +26,6 @@ def run():
 	t.targets = [
 		"$(EPOCROOT)/epoc32/include/testbitmap.mbg",
 		"$(EPOCROOT)/epoc32/data/z/resource/apps/testbitmap.mBm",
-		"$(EPOCROOT)/epoc32/localisation/group/testbitmap.info",
-		"$(EPOCROOT)/epoc32/localisation/testbitmap/mbm/def2m.bmp",
-		"$(EPOCROOT)/epoc32/localisation/testbitmap/mbm/def3m.bmp",
-		"$(EPOCROOT)/epoc32/localisation/testbitmap/mbm/def4m.bmp",
-		"$(EPOCROOT)/epoc32/localisation/testbitmap/mbm/def24.bmp",
-		"$(EPOCROOT)/epoc32/localisation/testbitmap/mbm/def32.bmp",
-		"$(EPOCROOT)/epoc32/localisation/testbitmap/mbm/def48.bmp",
 		"$(EPOCROOT)/epoc32/tools/makefile_templates/test/mifconv.xml",
 		"$(EPOCROOT)/epoc32/tools/makefile_templates/test/mifconv.flm"
 		]
