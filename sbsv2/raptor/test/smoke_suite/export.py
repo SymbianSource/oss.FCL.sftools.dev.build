@@ -75,7 +75,7 @@ def run():
 	t.command = "ls -l ${EPOCROOT}/epoc32/include/executable_file"
 	t.mustmatch = [ "^.rwxrwxr.x .*executable_file.*$" ]
 	t.targets = []
-	t.run()
+	t.run("linux")
 	t.usebash = False
 
 	if t.result == SmokeTest.FAIL:
