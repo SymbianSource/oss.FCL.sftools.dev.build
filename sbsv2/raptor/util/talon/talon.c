@@ -244,12 +244,10 @@ int main(int argc, char *argv[])
 #ifdef HAS_WINSOCK2
 	WSADATA wsaData;
 
-	int wsaresult;
-
-	wsaresult = WSAStartup(MAKEWORD(2,2), &wsaData);
+	WSAStartup(MAKEWORD(2,2), &wsaData);
 
 	/* We ignore the result as we are only doing this to use gethostname
-	   and if that fails then leaving the host atrtibute blank is perfectly
+	   and if that fails then leaving the host attribute blank is perfectly
 	   acceptable.
 	*/
 
