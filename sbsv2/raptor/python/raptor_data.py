@@ -1026,7 +1026,7 @@ class Group(Model, Config):
 
 	def GenerateBuildUnits(self, cache):
 		units = []
-
+		
 		missing_variants = []
 		for r in self.childRefs:
 			refMods = r.GetModifiers(cache)
@@ -1055,7 +1055,7 @@ class GroupRef(Reference):
 		Reference.__init__(self, ref)
 
 	def __str__(self):
-		return "<%s /><groupRef ref='%s' mod='%s'/>" % (prefix, self.ref, ".".join(self.modifiers))
+		return "<groupRef ref='%s' mod='%s'/>" % (self.ref, ".".join(self.modifiers))
 
 	def Resolve(self, cache):
 		try:

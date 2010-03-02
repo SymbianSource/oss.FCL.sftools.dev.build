@@ -21,7 +21,7 @@ def run():
 	t.description = """Raptor should keep going and build as much as possible with the -k option specified."""
 	
 	command = "sbs -b smoke_suite/test_resources/simple/bld.inf -k"
-	
+	config = " --configpath=test/smoke_suite/test_resources/keepgoing"
 	targets = [
 		"$(EPOCROOT)/epoc32/release/armv5/udeb/test.exe",
 		"$(EPOCROOT)/epoc32/release/armv5/udeb/test.exe.map",
@@ -69,6 +69,16 @@ def run():
 	t.command = command + " -c armv5 -c armv5.bogus"
 	t.targets = targets
 	t.addbuildtargets("smoke_suite/test_resources/simple/bld.inf", buildtargets)
+	t.mustmatch = ["sbs: error: Unknown build configuration 'armv5.bogus'"]
+	t.warnings = 0
+	t.errors = 1
+	t.returncode = 1
+	t.run()
+	
+	# using groups with bad sub-groups should build any independent groups
+	t.id = "115b"
+	t.name = "keepgoing_bad_subgroup"
+	t.command = command + config + " -c lots_of_products"
 	t.mustmatch = ["sbs: error: Unknown build configuration 'armv5.bogus'"]
 	t.warnings = 0
 	t.errors = 1

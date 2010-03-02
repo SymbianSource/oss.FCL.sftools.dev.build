@@ -889,7 +889,6 @@ class Raptor(object):
 
 		buildUnitsToBuild = set()
 
-
 		for c in set(configNames):
 			self.Debug("BuildUnit: %s", c)
 			try:
