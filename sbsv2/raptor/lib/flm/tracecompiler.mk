@@ -1,4 +1,4 @@
-# Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -13,20 +13,40 @@
 # Description:
 # Run Trace Compiler on source files to generate trace headers and decode files
 
+# Set project name as <mmp_name>
 TRACE_PRJNAME:=$(basename $(notdir $(PROJECT_META)))
+
+TARGETEXT:=$(if $(REQUESTEDTARGETEXT),$(REQUESTEDTARGETEXT),$(POSTLINKFILETYPE))
+
 # Find out TRACE_PATH
+# first look for .*/traces/traces_<target_name>_<target_extension>
+TRACE_PATH:=$(strip $(foreach DIR,$(USERINCLUDE),$(filter %/traces/traces_$(TARGET)_$(TARGETEXT),$(DIR))))
+
+ifneq ($(TRACE_PATH),)
+# set project name as <target_name>_<target_extension> instead of <mmp_name>
+TRACE_PRJNAME:=$(TARGET)_$(TARGETEXT)
+endif
+
+# if not found look for .*/traces_<mmp_name>
+ifeq ($(TRACE_PATH),)
 TRACE_PATH:=$(strip $(foreach DIR,$(USERINCLUDE),$(filter %/traces_$(TRACE_PRJNAME),$(DIR))))
+endif
+
+# if not found look for .*/traces
 ifeq ($(TRACE_PATH),)
 TRACE_PATH:=$(strip $(foreach DIR,$(USERINCLUDE),$(filter %/traces,$(DIR))))
 endif
+
+# if not found look for .*/traces_<target_name>_<target_type>
 ifeq ($(TRACE_PATH),)
 TRACE_PATH:=$(strip $(foreach DIR,$(USERINCLUDE),$(filter %/traces_$(TARGET)_$(TARGETTYPE),$(DIR))))
-# Use target name instead of mmp file name
+# set project name as <target_name>_<target_type> instead of <mmp_name>
 TRACE_PRJNAME:=$(TARGET)_$(TARGETTYPE)
 endif
 
-TRACE_DICTIONARY:=$(EPOCROOT)/epoc32/ost_dictionaries/$(TRACE_PRJNAME)_0x$(UID_TC)_Dictionary.xml
-AUTOGEN_HEADER:=$(EPOCROOT)/epoc32/include/internal/SymbianTraces/autogen/$(TRACE_PRJNAME)_0x$(UID_TC)_TraceDefinitions.h
+# initialise (so what output will be correct if we don't actually run the TC)
+TRACE_DICTIONARY:=
+AUTOGEN_HEADER:=
 
 $(if $(FLMDEBUG),$(info <debug>TRACE_PATH = $(TRACE_PATH)</debug>))
 
@@ -51,6 +71,9 @@ $(TRACE_HEADERS): $(TRACE_MARKER)
 
 ifeq ($(GUARD_$(call sanitise,$(TRACE_MARKER))),)
 GUARD_$(call sanitise,$(TRACE_MARKER)):=1
+
+TRACE_DICTIONARY:=$(EPOCROOT)/epoc32/ost_dictionaries/$(TRACE_PRJNAME)_0x$(UID_TC)_Dictionary.xml
+AUTOGEN_HEADER:=$(EPOCROOT)/epoc32/include/internal/SymbianTraces/autogen/$(TRACE_PRJNAME)_0x$(UID_TC)_TraceDefinitions.h
 
 JAVA_COMMAND:=$(SBS_JAVATC)
 TRACE_COMPILER_PATH:=$(EPOCROOT)/epoc32/tools

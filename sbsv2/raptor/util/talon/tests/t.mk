@@ -14,6 +14,7 @@
 # Description: 
 #
 
+include settings.mk
 
 HOSTNAME:=fred
 COMPONENT_LAYER:=base

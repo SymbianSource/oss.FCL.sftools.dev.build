@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2002-2006 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2002-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of the License "Eclipse Public License v1.0"
@@ -43,7 +43,7 @@ void CWlanHwInit::ConstructL()
 
 EXPORT_C CWlanHwInit* CWlanHwInit::NewL()
     {
-    OstTrace0( TRACE_API, CWLANHWINIT_NEWL, "CWlanHwInit::NewL()" );
+    OstTrace0( TRACE_BORDER, CWLANHWINIT_NEWL, "CWlanHwInit::NewL()" );
     OstTrace0( TRACE_NORMAL, DUP1_CWLANHWINIT_NEWL, "CWlanHwInit::NewL()" );  
     CWlanHwInit* self = new( ELeave ) CWlanHwInit;
     CleanupStack::PushL( self );
@@ -55,7 +55,7 @@ EXPORT_C CWlanHwInit* CWlanHwInit::NewL()
 EXPORT_C CWlanHwInit::~CWlanHwInit()
     {
     TraceDump( INFO_LEVEL, ( _L( "CWlanHwInit::~CWlanHwInit()" ) ) );
-    OstTrace0( TRACE_API, DUP1_CWLANHWINIT_CWLANHWINIT, "CWlanHwInit::~CWlanHwInit()" );
+    OstTrace0( TRACE_BORDER, DUP1_CWLANHWINIT_CWLANHWINIT, "CWlanHwInit::~CWlanHwInit()" );
     OstTrace0( TRACE_NORMAL, DUP2_CWLANHWINIT_CWLANHWINIT, "CWlanHwInit::~CWlanHwInit()" );  
     delete iMain;
     iMain = NULL;
@@ -72,7 +72,7 @@ EXPORT_C void CWlanHwInit::GetHwInitData(
     TUint& aFwLength )
     {
     TraceDump( INFO_LEVEL, ( _L( "CWlanHwInit::GetHwInitData()" ) ) );
-    OstTrace0( TRACE_API, DUP1_CWLANHWINIT_GETHWINITDATA, "CWlanHwInit::GetHwInitData()" );
+    OstTrace0( TRACE_BORDER, DUP1_CWLANHWINIT_GETHWINITDATA, "CWlanHwInit::GetHwInitData()" );
     OstTrace0( TRACE_NORMAL, CWLANHWINIT_GETHWINITDATA, "CWlanHwInit::GetHwInitData()" );
     
     //BOB10d initialization data block is in one piece (NVS + FW)
@@ -97,7 +97,7 @@ EXPORT_C TInt CWlanHwInit::GetMacAddress(
     TMacAddr& aMacAddress )
     {
     TraceDump( INFO_LEVEL, ( _L( "CWlanHwInit::GetMacAddress()" ) ) );
-    OstTrace0( TRACE_API, CWLANHWINIT_GETMACADDRESS, "CWlanHwInit::GetMacAddress()" );
+    OstTrace0( TRACE_BORDER, CWLANHWINIT_GETMACADDRESS, "CWlanHwInit::GetMacAddress()" );
     OstTrace0( TRACE_NORMAL, DUP1_CWLANHWINIT_GETMACADDRESS, "CWlanHwInit::GetMacAddress()" ); 
     return iMain->GetMacAddress( aMacAddress );
     }
@@ -113,7 +113,7 @@ EXPORT_C void CWlanHwInit::GetHwTestInitData(
     TUint& aFwLength )
     {
     TraceDump( INFO_LEVEL, ( _L( "CWlanHwInit::GetHwTestInitData()" ) ) );
-    OstTrace0( TRACE_API, CWLANHWINIT_GETHWTESTINITDATA, "CWlanHwInit::GetHwTestInitData()" );
+    OstTrace0( TRACE_BORDER, CWLANHWINIT_GETHWTESTINITDATA, "CWlanHwInit::GetHwTestInitData()" );
     OstTrace0( TRACE_NORMAL, DUP1_CWLANHWINIT_GETHWTESTINITDATA, "CWlanHwInit::GetHwTestInitData()" );
     
     //BOB10d initialization data block is in one piece (NVS + FW)
@@ -139,7 +139,7 @@ EXPORT_C TInt CWlanHwInit::GetHwTestData(
     TDes8& aData )
     {
     TraceDump( INFO_LEVEL, ( _L( "CWlanHwInit::GetHwTestData()" ) ) );
-    OstTrace0( TRACE_API, DUP1_CWLANHWINIT_GETHWTESTDATA, "CWlanHwInit::GetHwTestData()" );   
+    OstTrace0( TRACE_BORDER, DUP1_CWLANHWINIT_GETHWTESTDATA, "CWlanHwInit::GetHwTestData()" );   
     OstTrace0( TRACE_NORMAL, CWLANHWINIT_GETHWTESTDATA, "CWlanHwInit::GetHwTestData()" );  
     return iMain->GetHwTestData( aId, aData );
     }
@@ -153,7 +153,7 @@ EXPORT_C TInt CWlanHwInit::SetHwTestData(
     TDesC8& aData )
     {
     TraceDump( INFO_LEVEL, ( _L( "CWlanHwInit::SetHwTestData()" ) ) );
-    OstTrace0( TRACE_API, DUP1_CWLANHWINIT_SETHWTESTDATA, "CWlanHwInit::SetHwTestData()" ); 
+    OstTrace0( TRACE_BORDER, DUP1_CWLANHWINIT_SETHWTESTDATA, "CWlanHwInit::SetHwTestData()" ); 
     OstTrace0( TRACE_NORMAL, CWLANHWINIT_SETHWTESTDATA, "CWlanHwInit::SetHwTestData()" );
     return iMain->SetHwTestData( aId, aData );
     }

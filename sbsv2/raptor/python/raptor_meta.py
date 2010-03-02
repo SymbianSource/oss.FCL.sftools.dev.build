@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -2177,6 +2177,9 @@ class MMPRaptorBackend(MMPBackend):
 		self.BuildVariant.AddOperation(raptor_data.Set("DEFFILEKEYWORD", deffile_keyword))
 		self.__debug("Set DEFFILEKEYWORD to '%s'",deffile_keyword)
 
+		# If target type is "implib" it must have a def file
+		self.checkImplibDefFile(resolvedDefFile)
+
 		# if this target type has a default TARGETPATH other than "" for
 		# resources then we need to add that default to all resources which
 		# do not explicitly set the TARGETPATH themselves.
@@ -2267,6 +2270,14 @@ class MMPRaptorBackend(MMPBackend):
 	def getTargetType(self):
 		"""Target type in lower case - the standard format"""
 		return self.__targettype.lower()
+
+	def checkImplibDefFile(self, defFile):
+		"""Project with target type implib must have DEFFILE defined 
+		explicitly or implicitly, otherwise it is an error
+		""" 
+		if self.getTargetType() == 'implib' and defFile == '':
+			self.__Raptor.Error("No DEF File for IMPLIB target type in " + \
+							self.__currentMmpFile, bldinf=self.__bldInfFilename)
 
 	def resolveDefFile(self, aTARGET, aBuildPlatform):
 		"""Returns a fully resolved DEFFILE entry depending on .mmp file location and TARGET, DEFFILE and NOSTRICTDEF
@@ -2675,15 +2686,6 @@ class MetaReader(object):
 
 		specName = getSpecName(component.bldinf_filename, fullPath=True)
 
-		if isinstance(component.bldinf, raptor_xml.SystemModelComponent):
-			# this component came from a system_definition.xml
-			layer = component.bldinf.GetContainerName("layer")
-			componentName = component.bldinf.GetContainerName("component")
-		else:
-			# this is a plain old bld.inf file from the command-line
-			layer = ""
-			componentName = ""
-
 		# exports are independent of build platform
 		for i,ep in enumerate(self.ExportPlatforms):
 			specNode = raptor_data.Specification(name = specName)
@@ -2694,8 +2696,8 @@ class MetaReader(object):
 			# add some basic data in a component-wide variant
 			var = raptor_data.Variant(name='component-wide')
 			var.AddOperation(raptor_data.Set("COMPONENT_META", str(component.bldinf_filename)))
-			var.AddOperation(raptor_data.Set("COMPONENT_NAME", componentName))
-			var.AddOperation(raptor_data.Set("COMPONENT_LAYER", layer))
+			var.AddOperation(raptor_data.Set("COMPONENT_NAME", component.componentname))
+			var.AddOperation(raptor_data.Set("COMPONENT_LAYER", component.layername))
 			specNode.AddVariant(var)
 
 			# add this bld.inf Specification to the export platform
@@ -2726,8 +2728,8 @@ class MetaReader(object):
 				# add some basic data in a component-wide variant
 				var = raptor_data.Variant(name='component-wide-settings-' + plat)
 				var.AddOperation(raptor_data.Set("COMPONENT_META",str(component.bldinf_filename)))
-				var.AddOperation(raptor_data.Set("COMPONENT_NAME", componentName))
-				var.AddOperation(raptor_data.Set("COMPONENT_LAYER", layer))
+				var.AddOperation(raptor_data.Set("COMPONENT_NAME", component.componentname))
+				var.AddOperation(raptor_data.Set("COMPONENT_LAYER", component.layername))
 				var.AddOperation(raptor_data.Set("MODULE", modulename))
 				var.AddOperation(raptor_data.Append("OUTPUTPATHOFFSET", outputDir, '/'))
 				var.AddOperation(raptor_data.Append("OUTPUTPATH", outputDir, '/'))
@@ -2824,8 +2826,10 @@ class MetaReader(object):
 
 			sourceMTime = 0
 			destMTime = 0
+			sourceStat = 0
 			try:
-				sourceMTime = os.stat(source_str)[stat.ST_MTIME]
+				sourceStat = os.stat(source_str)
+				sourceMTime = sourceStat[stat.ST_MTIME]
 				destMTime = os.stat(dest_str)[stat.ST_MTIME]
 			except OSError, e:
 				if sourceMTime == 0:
@@ -2839,6 +2843,9 @@ class MetaReader(object):
 				if os.path.exists(dest_str):
 					os.chmod(dest_str,stat.S_IREAD | stat.S_IWRITE)
 				shutil.copyfile(source_str, dest_str)
+
+				# Ensure that the destination file remains executable if the source was also:
+				os.chmod(dest_str,sourceStat[stat.ST_MODE] | stat.S_IREAD | stat.S_IWRITE | stat.S_IWGRP ) 
 				self.__Raptor.Info("Copied %s to %s", source_str, dest_str)
 			else:
 				self.__Raptor.Info("Up-to-date: %s", dest_str)

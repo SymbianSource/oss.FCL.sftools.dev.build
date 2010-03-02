@@ -108,7 +108,6 @@
 		<param name='DEBUG_FORMAT'/>
 		<param name='DEBUG_INFO'/>
 		<param name='DEPEND_OPTION'/>
-		<param name='DEPEND_SKIP' default=''/>
 		<param name='ELF2E32'/>
 		<param name='EFREEZE'/>
 		<param name='EFREEZE_REMOVE_OPTION' default=''/>
@@ -239,6 +238,8 @@
 	<interface name="Symbian.ani" extends="Symbian.dll" flm="e32abiv2ani.flm">
 	</interface>
 	<interface name="Symbian.plugin" extends="Symbian.dll" flm="e32abiv2plugin.flm">
+	</interface>
+	<interface name="Symbian.plugin3" extends="Symbian.dll" flm="e32abiv2plugin.flm">
 	</interface>
 	<interface name="Symbian.textnotifier2" extends="Symbian.dll" flm="e32abiv2textnotifier2.flm">
 	</interface>

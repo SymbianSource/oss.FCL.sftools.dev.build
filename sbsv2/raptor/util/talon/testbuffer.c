@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of the License "Eclipse Public License v1.0"
@@ -12,7 +12,10 @@
 * Contributors:
 *
 * Description: 
-*
+* This program reads from stdin into a "buffer" structure. It is designed to be
+* run from within valgrind to detect memory corruption errors.
+* The buffer is then written to /tmp/outfile where it can be compared
+* with the input to determine if they are the same
 */
 
 

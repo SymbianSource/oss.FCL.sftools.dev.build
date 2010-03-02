@@ -4,7 +4,7 @@ TARGETTYPE		EXE
 UID			0x100039ce 0x10000002
 LIBRARY			euser.lib
 SYSTEMINCLUDE		/epoc32/include
-SYSTEMINCLUDE		/epoc32/include/internal
+SYSTEMINCLUDE		/epoc32/include/platform
 SOURCEPATH		../src
 SOURCE			inv_source.cpp
 

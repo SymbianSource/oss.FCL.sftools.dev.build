@@ -89,7 +89,6 @@
 		<param name='OPT.DEFINE'/>
 		<param name='OPT.DEFFILE'/>
 		<param name='OPT.DEPEND'/>
-		<param name='DEPEND_SKIP' default=''/>
 		<param name='OPT.EXPORT'/>
 		<param name='OPT.IMPORTLIB'/>
 		<param name='OPT.LISTING'/>
@@ -230,6 +229,9 @@
 	</interface>
 
 	<interface name="Emulator.plugin" extends="Emulator.dll" flm="win32plugin.flm">
+	</interface>
+
+	<interface name="Emulator.plugin3" extends="Emulator.dll" flm="win32plugin.flm">
 	</interface>
 
 	<interface name="Emulator.textnotifier2" extends="Emulator.dll" flm="win32textnotifier2.flm">
