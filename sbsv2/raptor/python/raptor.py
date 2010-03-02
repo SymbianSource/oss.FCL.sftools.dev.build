@@ -902,7 +902,6 @@ class Raptor(object):
 
 		buildUnitsToBuild = set()
 
-
 		for c in set(configNames):
 			self.Debug("BuildUnit: %s", c)
 			try:
@@ -910,7 +909,7 @@ class Raptor(object):
 				gb = x.GenerateBuildUnits(self.cache)
 				buildUnitsToBuild.update( gb )
 			except Exception, e:
-				self.FatalError(str(e))
+				self.Error(str(e))
 
 		for b in buildUnitsToBuild:
 			self.Info("Buildable configuration '%s'", b.name)
