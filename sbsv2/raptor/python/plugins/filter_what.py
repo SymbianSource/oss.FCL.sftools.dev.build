@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2008-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -162,17 +162,16 @@ class FilterWhat(filter_interface.Filter):
 					
 					self.print_file(line, start, end)
 
-				else:
-					"work out what the 'current' bldinf file is"
-					m = self.whatlog_regex.match(line)
-					if m:
-						bi = m.groupdict()['bldinf']
-						if self.current_bldinf != bi:
-							if self.current_bldinf != '':
-								self.end_bldinf()
-							self.current_bldinf = bi
-							if bi != '':
-								self.start_bldinf(bi)
+			"work out what the 'current' bldinf file is"
+			m = self.whatlog_regex.match(line)
+			if m:
+				bi = m.groupdict()['bldinf']
+				if self.current_bldinf != bi:
+					if self.current_bldinf != '':
+						self.end_bldinf()
+					self.current_bldinf = bi
+					if bi != '':
+						self.start_bldinf(bi)
 							
 					
 						

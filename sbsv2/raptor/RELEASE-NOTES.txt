@@ -3,6 +3,7 @@ Release Notes for Symbian Build System v2
 version 2.12.4
 
 Defect Fixes:
+- SF Bug 2113 - [Raptor] what/check filters can assign files to the wrong components
 - SF Bug 2081 - [Raptor] - Exported file executable permissions not maintained (linux)
 - Fix: host attribute in recipes was blank in windows, windows cluster builds.
 - SF Bug 1912 - Raptor should take python from the path [if not set with SBS_PYTHON or bundled with Raptor]
