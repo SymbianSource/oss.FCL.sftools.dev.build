@@ -102,7 +102,6 @@
 		<set name='UNZIP' value="$(SBS_UNZIP)" type='tool'/>
 		<set name='PERL' value='$(SBS_PERL)' type='tool'/>
 		<set name='PYTHON' value='$(SBS_PYTHON)' type='tool' versionCommand='$(PYTHON) -V' versionResult='Python 2\.[456].*'/>
-		<set name='UNHIDE_CI_REFS' value='$(SBS_HOME)/$(HOSTPLATFORM_DIR)/bin/unhide_ci_refs.exe' type='tool'/>
 		
 		<set name='DEFAULT_PLATFORMS' value='ARMV5 ARMV7 WINSCW'/>
 		<set name='BASE_DEFAULT_PLATFORMS' value='ARMV5 ARMV7 WINSCW ARMV5SMP'/>

@@ -777,7 +777,6 @@ $(1): $(2) $(PROJECT_META) $(if $(MULTIFILE_ENABLED),,$(if $(DEPENDFILE),,RESOUR
 			$(if $(LINKERFEEDBACK_STAGE2),$(FEEDBACK_OPTION)$(call dblquote,$(FEEDBACKFILE))) \
 			$(if $(MULTIFILE_ENABLED),--multifile $(OUTPUT_OPTION) $(MULTIFILEOBJECT) \
 			--via $$(call dblquote, $(MULTIFILE_VIAFILE)),$(OUTPUT_OPTION) $$@ $$(call dblquote, $$<))  \
-			$(if $(REFERENCES_STV_DEFAULT),&& $(UNHIDE_CI_REFS) $$@,) \
 	$(call endrule,compile)
 
 ifeq ($(NO_DEPEND_GENERATE),)
@@ -967,7 +966,6 @@ $(e32abiv2_OFILE): $(e32abiv2_CPPFILE) $(PROJECT_META)
 	 		$(if $(USERINCLUDE),$(COMPILER_SYSTEM_INCLUDE_OPTION),)$$(call concat, $(COMPILER_SYSTEM_INCLUDE_OPTION),$$(call dblquote,$(USERINCLUDE)))     \
 	 		$(if $(SYSTEMINCLUDE),$(COMPILER_SYSTEM_INCLUDE_OPTION),)$$(call concat, $(COMPILER_SYSTEM_INCLUDE_OPTION),$$(call dblquote,$(SYSTEMINCLUDE))) \
 	 		$$(call dblquote, $$<) $(OUTPUT_OPTION) $$@ \
-			$(if $(REFERENCES_STV_DEFAULT),&& $(UNHIDE_CI_REFS) $$@,) \
 	$(call endrule,cia2cpp2o)
 
 
