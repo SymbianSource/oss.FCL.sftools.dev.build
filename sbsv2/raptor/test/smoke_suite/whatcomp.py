@@ -78,11 +78,11 @@ def run():
 	t.command = "sbs_filter --filters=FilterWhatComp < smoke_suite/test_resources/logexamples/what_component_repeated.log"
 	t.targets = []
 	t.mustmatch = [ 
-		"Chdir y:/ext/app/emailwizard",
+		"Chdir y:.ext.app.emailwizard",
 		".*epoc32.data.something",
-		"Chdir y:/sf/mw/gsprofilesrv/ftuwizardmodel.*",
+		"Chdir y:.sf.mw.gsprofilesrv.ftuwizardmodel.*",
 		".*epoc32.release.armv5.something",
-		"Chdir y:/ext/app/emailwizard.*"
+		"Chdir y:.ext.app.emailwizard.*"
 		]
 
 	t.mustnotmatch = []
