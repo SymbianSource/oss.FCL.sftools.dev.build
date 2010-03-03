@@ -45,6 +45,7 @@
 
 :localpython
 @SET __PYTHON__=%__LOCAL_PYTHON__%
+@SET SBS_PYTHON=%__PYTHON__%
 @SET PYTHONPATH=
 
 :sbspythonpath
@@ -73,7 +74,7 @@
 
 @REM Tell CYGWIN not to map unix security attributes to windows to
 @REM prevent raptor from potentially creating read-only files:
-@set CYGWIN=nontsec nosmbntsec
+@SET CYGWIN=nontsec nosmbntsec
 
 @REM Run Raptor with all the arguments.
 @%__PYTHON__% %SBS_HOME%\python\raptor_start.py %*

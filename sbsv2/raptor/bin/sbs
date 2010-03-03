@@ -91,6 +91,7 @@ if [ "$OSTYPE" == "cygwin" ]; then
 		__PYTHON__=$SBS_PYTHON
 	elif [ -f "$__LOCAL_PYTHON__" ]; then
 		__PYTHON__=$__LOCAL_PYTHON__
+		export SBS_PYTHON=$__PYTHON__
 		export PYTHONPATH=
 	else
 		__PYTHON__=python.exe
