@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of the License "Eclipse Public License v1.0"
@@ -19,14 +19,6 @@
 
 /*
 *  You need tracecompiler to run this test.
-*
-*  If you run this test from Raptor test frame you need to zip your tracecompiler
-*  and put it under "$(SBS_HOME)/test/manual_tests/test_resources/" first, then Raptor will unzip it later. 
-*  This is because Raptor test frame removes tracecompiler from epoc32/tools/ at the very beginning, 
-*  so you have to export to put it "back there" again.
-*
-*  If you run this test NOT from Raptor test frame you do not need to do the above.
-*  Please just remove PRJ_EXPORTS and its contents below.    
 */
 
 PRJ_PLATFORMS
