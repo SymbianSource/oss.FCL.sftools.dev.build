@@ -1,5 +1,8 @@
 Release Notes for Symbian Build System v2
 
+next version
+- SF Bug 2125 - [Raptor] - tracecompiler what output incorrect if mmp basename contains '.' e.g. fred.prd.mmp 
+
 version 2.12.4
 
 Defect Fixes:
