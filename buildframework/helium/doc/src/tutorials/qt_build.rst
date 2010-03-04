@@ -26,7 +26,10 @@ Then qmake building needs to be activated by defining the ``qmake.enabled`` prop
 Then you can configure your Qt components by using the proFile attribute under the system definition files.
 The proFile attribute defines the name of the pro file relatively to the path defined by the bldFile attribute.
 Default qMake command line parameters can be overridden by using the optional qmakeArgs attribute. 
-Example::
+
+Example
+
+.. code-block:: xml
    
    <?xml version="1.0"?>
    <!DOCTYPE SystemDefinition SYSTEM "sysdef_1_5_1.dtd" []>

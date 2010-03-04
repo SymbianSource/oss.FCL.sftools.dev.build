@@ -20,6 +20,7 @@ Description:
 
 ============================================================================
 -->
+<!--* @package iad -->
 <project name="iad">
     <description>
         Targets related to iad
@@ -33,7 +34,7 @@ Description:
             </path>
             <sequential>
                 <exec executable="python" dir="${build.log.dir}" failonerror="true">
-                    <arg value="${helium.dir}/tools/iad/packageiad.py"/>
+                    <arg line="-m packageiad"/>
                     <arg value="@{sysdef.file}"/>
                     <arg value="${sysdef.configurations}"/>
                     <arg value="${build.drive}"/>

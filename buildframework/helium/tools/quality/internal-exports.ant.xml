@@ -20,6 +20,7 @@ Description:
 
 ============================================================================
 -->
+<!--* @package quality -->
 <project name="quality.internal-exports" xmlns:hlm="http://www.nokia.com/helium">
     <description>
         Analyse the content generated under the source tree.

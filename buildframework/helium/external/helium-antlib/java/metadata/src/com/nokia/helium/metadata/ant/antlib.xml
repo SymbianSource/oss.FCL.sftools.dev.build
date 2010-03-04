@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : antlib.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<antlib>
+    <!-- Task definition -->
+    <taskdef name="metadatarecord" classname="com.nokia.helium.metadata.ant.taskdefs.MetaDataRecord"/>
+    <taskdef name="metadatadelete" classname="com.nokia.helium.metadata.ant.taskdefs.MetaDataDelete"/>
+    <!-- Type definition -->
+    <typedef name="textmetadatainput" classname="com.nokia.helium.metadata.ant.types.TextLogMetaDataInput"/>
+    <typedef name="antmetadatainput" classname="com.nokia.helium.metadata.ant.types.AntLogMetaDataInput"/>
+    <typedef name="abldmetadatainput" classname="com.nokia.helium.metadata.ant.types.AbldLogMetaDataInput"/>
+    <typedef name="sbsmetadatainput" classname="com.nokia.helium.metadata.ant.types.SBSLogMetaDataInput"/>
+    <typedef name="policymetadatainput" classname="com.nokia.helium.metadata.ant.types.PolicyLogMetaDataInput"/>
+    <typedef name="metadatafilterset" classname="com.nokia.helium.metadata.ant.types.MetaDataFilterSet"/>
+    <typedef name="metadatafilter" classname="com.nokia.helium.metadata.ant.types.MetaDataFilter"/>
+    
+    <typedef name="metadataHasSeverity" classname="com.nokia.helium.metadata.ant.conditions.MetaDataLogCondition"/>
+    <typedef name="metadataCountSeverity" classname="com.nokia.helium.metadata.ant.taskdefs.MetaDataLogCount"/>
+</antlib>

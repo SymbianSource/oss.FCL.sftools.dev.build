@@ -1,0 +1,115 @@
+<?xml version="1.0"?>
+<!-- 
+============================================================================ 
+Name        : test_coverity.ant.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+
+<project name="test-quality" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>Helium Antlib coverity unittests.</description>
+
+    <taskdef resource="com/nokia/helium/quality/ant/antlib.xml" uri="http://www.nokia.com/helium" />
+    
+    <dirname property="test.coverity.dir" file="${ant.file.test-quality}/test"/>
+    <property name="working.dir" value="${test.coverity.dir}" />
+    <property name="build.drive" value="${test.coverity.dir}" />
+    
+    <dirname property="project.dir" file="${ant.file.test-quality}" />
+    
+    <hlm:coverityoptions id="coverity.config.options">
+        <arg name="--template" value=""/>
+        <arg name="--comptype" value="armcc"/>
+        <arg name="--compiler" value="armcc.exe"/>
+        <arg name="--config" value="${test.coverity.dir}/config/coverity_config.xml"/>
+    </hlm:coverityoptions>
+    
+    <hlm:coverityoptions id="coverity.analyze.options">
+        <hlm:arg name="--all" value=""/>
+        <hlm:arg name="--symbian" value=""/>
+        <hlm:arg name="--append" value=""/>
+        <hlm:arg name="--enable-callgraph-metrics" value=""/>
+        <hlm:arg name="--dir" value="${test.coverity.dir}/analyze"/>
+    </hlm:coverityoptions>
+    
+    <hlm:coverityoptions id="coverity.emit.options">
+        <arg name="--replay" value=""/>
+        <arg name="--replay-processes" value="4"/>
+        <arg name="--config" value="${test.coverity.dir}/config/coverity_config.xml"/>
+        <arg name="--dir" value="${test.coverity.dir}/analyze"/>
+    </hlm:coverityoptions>
+
+    <target name="test-coverity-command">
+        <au:expectfailure>
+            <hlm:coverity command="-configure" dir="${build.drive}/">
+                <hlm:coverityoptions refid="coverity.config.options"/>
+            </hlm:coverity >
+        </au:expectfailure>
+    </target>
+    
+    <target name="test-coverity-config">
+        <hlm:coverity command="cov-configure" dir="${build.drive}/" execute="false">
+            <hlm:coverityoptions refid="coverity.config.options"/>
+        </hlm:coverity >
+        <au:assertLogContains text="cov-configure"/>
+        <au:assertLogContains text="--comptype armcc"/>
+        <au:assertLogContains text="--template"/>
+    </target>
+    
+    <target name="test-coverity-link">
+        <hlm:coverity command="cov-link" dir="${build.drive}/" execute="false">
+            <hlm:arg name="--collect" value=""/>
+            <hlm:arg name="-of" value="${test.coverity.dir}/all.link"/>
+            <hlm:arg name="--dir" value="${test.coverity.dir}"/>
+        </hlm:coverity >
+        <au:assertLogContains text="cov-link"/>
+        <au:assertLogContains text="--collect"/>
+        <au:assertLogContains text="-of"/>
+    </target>
+    
+    <target name="test-coverity-analyze">
+        <hlm:coverity command="cov-analyze" dir="${build.drive}/" execute="false">
+            <hlm:coverityoptions refid="coverity.analyze.options"/>
+        </hlm:coverity >
+        <au:assertLogContains text="cov-analyze"/>
+        <au:assertLogContains text="--symbian"/>
+        <au:assertLogContains text="--append"/>
+        <au:assertLogContains text="--enable-callgraph-metrics"/>
+    </target>
+    
+    <target name="test-coverity-emit">
+        <hlm:coverity command="cov-build" dir="${build.drive}/" execute="false">
+            <hlm:coverityoptions refid="coverity.emit.options"/>
+        </hlm:coverity >
+        <au:assertLogContains text="cov-build"/>
+        <au:assertLogContains text="--replay-processes 4"/>
+        <au:assertLogContains text="--replay"/>
+    </target>
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
+    
+
+</project>

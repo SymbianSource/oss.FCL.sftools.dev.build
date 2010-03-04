@@ -20,12 +20,11 @@ Description:
 
 ============================================================================
 -->
+<!--* @package integration -->
 <project name="integration" xmlns:hlm="http://www.nokia.com/helium">
     <description>
         Targets related to integration
     </description>
-    <!-- include overlay validation/merge tools -->    
-    <import file="validate_overlay/validate_overlay.ant.xml" />
 
     <import file="patching.ant.xml" />
 

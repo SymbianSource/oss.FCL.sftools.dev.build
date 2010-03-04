@@ -20,14 +20,27 @@ Description:
 
 ============================================================================
 -->
+<!--* @package compile -->
 <project name="qt" xmlns:hlm="http://www.nokia.com/helium">
     <description>
     Qt build support.
     </description>
     
+    <!-- The location of the ant template to run qmake commands.
+    @type string
+    -->
     <property name="qt.qmake.ant.template" location="${helium.dir}/tools/compile/qt/templates/run-qmake.ant.xml.ftl" />
+    <!-- The location of the makefile template to run qmake commands.
+    @type string
+    -->
     <property name="qt.qmake.makefile.template" location="${helium.dir}/tools/compile/qt/templates/run-qmake.mk.ftl" />
+    <!-- The command lines argument passed to the configure tool.
+    @type string
+    -->
     <property name="qt.configure.args" value="-platform win32-mwc -xplatform symbian-abld -confirm-license"/>
+    <!-- Setting default arguments to qMake command line, if the qmakeArgs is defined from the system definition file then those arguments are discarded.
+    @type string
+    -->
     <property name="qt.qmake.default.args" value="-r"/>
 
     <!--

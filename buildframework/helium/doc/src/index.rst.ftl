@@ -79,11 +79,7 @@ This section lists all the available tutorials on Helium and how to configure an
    tutorials/configuration/SimplestConfiguration
    tutorials/configuration/UseHlmTasksInConfiguration
    tutorials/rom_image
-   tutorials/variant
    tutorials/qt_build
-<#if !ant?keys?seq_contains("sf")>
-   nokia/blacktusk/howto-setup-blacktusk-with-helium
-</#if>
 
 .. raw:: html
 
@@ -114,18 +110,19 @@ here for specific information about a task or action.
 .. raw:: html
 
    <script type="text/javascript" language="JavaScript"><!--
-   function HideContent(d) {
-   if(d.length < 1) { return; }
-   document.getElementById(d).style.display = "none";
-   }
-   function ShowContent(d) {
-   if(d.length < 1) { return; }
-   document.getElementById(d).style.display = "block";
-   }
-   function ReverseContentDisplay(d) {
-   if(d.length < 1) { return; }
-   if(document.getElementById(d).style.display == "none") { document.getElementById(d).style.display = "block"; }
-   else { document.getElementById(d).style.display = "none"; }
+    function ReverseContentDisplay(d) {
+        if(d.length < 1) { return; }
+    
+         var elem = document.getElementsByTagName('div');
+         for(var i = 0; i < elem.length; i++)
+         {
+             if(elem[i].style.display == "block" && elem[i] != document.getElementById(d)) {
+                 elem[i].style.display = "none";
+             }
+         }
+    
+        if(document.getElementById(d).style.display == "none") { document.getElementById(d).style.display = "block"; }
+        else { document.getElementById(d).style.display = "none"; }
    }
    //--></script>
    <ul><li class="toctree-l1"><a href="javascript:ReverseContentDisplay('stages')">Stages</a></li></ul>
@@ -156,7 +153,6 @@ here for specific information about a task or action.
    :maxdepth: 1
    
 <#if !ant?keys?seq_contains("sf")>
-   nokia/rndsdk_user_manual
    nokia/quality
 </#if>
    manual/debugging
@@ -207,16 +203,14 @@ Helium Framework configuration
 ==============================
 
 .. toctree::
+   :maxdepth: 3
+   
+   helium-antlib/index
+   
+.. toctree::
    :maxdepth: 1
    
-   tutorials/configuration/HowtoCreateANewSignal
-   manual/signaling
-   manual/configuringdiamonds
    manual/cruisecontrol
-   manual/antlogging
-* helium-antlib_
-
-.. _helium-antlib: helium-antlib
 
 <#if !ant?keys?seq_contains("sf")>
 Customer docs

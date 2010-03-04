@@ -55,7 +55,7 @@ Description:
 	<!-- Configuring get latest env. -->
 	<property name="s60.grace.service" value="s60_devices_sw" />
 	<property name="s60.grace.product" value="DFS7x.92" />
-	<property name="s60.grace.release" value="mcl_\d{6}_hw79" />
+	<property name="s60.grace.release" value="92_\d{6}_hw79" />
 	<!-- matching mcl_200948_hw79 -->
 	<condition property="prep.root.dir" value="${data.drive.letter}:\Build_${data.drive.letter}\${env.USERNAME}\ido_ba\${build.name}" else="${build.name}\ido_ba" >
     <os family="windows"/>
@@ -120,8 +120,8 @@ ${ant.coverage.summary}</echo>
 
 
 	<!-- Preparing the content on top of the env -->
-	<target name="ido-50-build" depends="ido-build-prep,compile-main,build-log-summary,render-internal-exports,update-policy-src-reference,render-validate-policy,localisation-50-build,ido-codescanner,rndsdk-create-api-descr-xml,ats-test,publish-tasks-to-folder,ido-sources-to-s60-build-robot" />
-	<target name="ido-build-prep" depends="ido-configure-prep,init,check-tool-dependencies,log-build-env,set-arm-version,check-free-space,diamonds,do-ccm-get-input,ido-prep-clean,ido-prep-copy,create-bom" />
+	<target name="ido-50-build" depends="ido-build-prep,compile-main,build-log-summary,render-internal-exports,update-policy-src-reference,render-validate-policy,localisation-50-build,ido-codescanner,ats-test,publish-tasks-to-folder,ido-sources-to-s60-build-robot" />
+	<target name="ido-build-prep" depends="ido-configure-prep,init,check-tool-dependencies,log-build-env,set-arm-version,check-free-space,diamonds,do-prep-work-area,ido-prep-clean,ido-prep-copy,create-bom" />
 
 	<!-- needed to defined skip.prep-drive -->
 	<target name="ido-configure-prep">

@@ -641,12 +641,12 @@ print(MAKEFILE "define STARTTASK\n");
 print(MAKEFILE "\@echo === \$(CONFIGURATION) == \$\*\n");
 print(MAKEFILE "\t\@echo -- \$\(1\) \n");
 print(MAKEFILE "\t-\@perl -e \"print '++ Started at '.localtime().\\\"\\n\\\"\"\n");
-print(MAKEFILE "\t-\@perl -e \"use Time::HiRes; print '+++ HiRes Start '.Time::HiRes::time().\\\"\\n\\\";\"\n");
+print(MAKEFILE "\t-\@python -c \"import time; print '+++ HiRes Start ',time.time();\"\n");
 print(MAKEFILE "endef\n\n");
 
 
 print(MAKEFILE "define ENDTASK\n");
-print(MAKEFILE "\t\-\@perl -e \"use Time::HiRes; print '+++ HiRes End '.Time::HiRes::time().\\\"\\n\\\";\"\n");
+print(MAKEFILE "\t\-\@python -c \"import time; print '+++ HiRes End ',time.time();\"\n");
 print(MAKEFILE "\t-\@perl -e \"print '++ Finished at '.localtime().\\\"\\n\\\"\"\n");
 print(MAKEFILE "endef\n\n");
 

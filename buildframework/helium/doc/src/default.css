@@ -733,6 +733,7 @@ pre {
     border-left: none;
     border-right: none;
     overflow: auto;
+    word-wrap: break-word;
 }
 
 td.linenos pre {

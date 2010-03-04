@@ -22,7 +22,7 @@ build.xml:
         Helium pre include test.
         </description>
         <property environment="env"/>
-        <import file="${env.HELIUM_HOME}\helium_preinclude.ant.xml"/>   
+        <import file="${helium.dir}\helium_preinclude.ant.xml"/>   
             
         <target name="test">
            <hlm:logtoconsole action="stop"/>
@@ -31,7 +31,7 @@ build.xml:
            <echo>Should print something.</echo>       
         </target>
         
-        <import file="${env.HELIUM_HOME}\helium.ant.xml"/>           
+        <import file="${helium.dir}\helium.ant.xml"/>           
     </project>    
 
 

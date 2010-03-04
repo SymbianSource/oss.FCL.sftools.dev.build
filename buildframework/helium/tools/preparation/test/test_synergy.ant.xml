@@ -25,14 +25,15 @@ Description:
          Testing targets related to Synergy
     </description>
     <property environment="env" />
-    <property name="publish.root.dir" value="${env.TEMP}" />
+    <property name="publish.root.dir" value="${helium.dir}/tests/data/output/" />
     <property name="helium.dir" location="../../.." />
     <import file="../../../helium.ant.xml" />
 
     <target name="test-ccm-preparation-log-extraction">
-        <delete file="${env.TEMP}/temp.log" failonerror="false"/>
-        <delete file="${env.TEMP}/temp.sqlite" failonerror="false"/>
-        <echo file="${env.TEMP}/temp.log">
+        <delete file="${helium.dir}/tests/data/output/temp.log" failonerror="false"/>
+        <delete dir="${helium.dir}/tests/data/output/temp_db" failonerror="false"/>
+        <mkdir dir="${helium.dir}/tests/data/output/"/> 
+        <echo file="${helium.dir}/tests/data/output/temp.log">
    [python] INFO:ccm.extra:Using CachedSessionProvider.
    [python] INFO:preparation.ccmgetinput:Get a session for databasexxx
    [python] INFO:ccm:Database path set using the GSCM database.
@@ -86,19 +87,19 @@ Description:
    [python] INFO:ccm.extra:Closing the CachedSessionProvider.
    [python] INFO:ccm.extra:Cleaning up opened sessions.
         </echo>
-        <hlm:metadatarecord database="${env.TEMP}/temp.sqlite">
+        <hlm:metadatarecord  database="${helium.dir}/tests/data/output/temp_db">
             <hlm:textmetadatainput>
-                <fileset casesensitive="false" file="${env.TEMP}/temp.log" />
+                <fileset casesensitive="false" file="${helium.dir}/tests/data/output/temp.log" />
                 <metadatafilterset refid="filterset.test.ccm" />
             </hlm:textmetadatainput>
         </hlm:metadatarecord>
-        <hlm:generateBuildStatus dbfile="${env.TEMP}/temp.sqlite" output-dir="${env.TEMP}/signals" file="temp.log" />
+        <hlm:generateBuildStatus dbfile="${helium.dir}/tests/data/output/temp_db" output-dir="${helium.dir}/tests/data/output/signals" file="temp.log" />
         <au:assertTrue>
             <and>
                 <not>
-                    <hlm:hasSeverity severity="error" file="${env.TEMP}/signals/temp.log.status.xml"/>
+                    <hlm:hasSeverity severity="error" file="${helium.dir}/tests/data/output/signals/temp.log.status.xml"/>
                 </not>
-                <hlm:hasSeverity severity="warning" file="${env.TEMP}/signals/temp.log.status.xml"/>
+                <hlm:hasSeverity severity="warning" file="${helium.dir}/tests/data/output/signals/temp.log.status.xml"/>
             </and>
         </au:assertTrue>
     </target>

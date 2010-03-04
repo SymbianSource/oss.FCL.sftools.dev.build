@@ -1,0 +1,23 @@
+Some text...
+
+ERROR: This is an error!
+
+WARNING: This is a warning.
+
+
+copy "\conf\test1.confml" "\epoc32\rom\config\assets\s60\confml\test1.confml"
+copy "\conf\test2.confml" "\epoc32\rom\config\assets\s60\confml\test2.confml"
+copy "\conf\test3.confml" "\epoc32\rom\config\assets\s60\confml\test3.confml"
+copy "\conf\test4.confml" "\epoc32\rom\config\assets\s60\confml\test4.confml"
+\epoc32\rom\config\assets\s60\confml\test1.confml
+\epoc32\rom\config\assets\s60\confml\test2.confml
+\epoc32\rom\config\assets\s60\confml\test3.confml
+\epoc32\rom\config\assets\s60\confml\test4.confml
+
+More text...
+
+
+
+
+
+

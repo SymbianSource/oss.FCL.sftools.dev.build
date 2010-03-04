@@ -1,0 +1,170 @@
+<?xml version="1.0"?>
+<!-- 
+============================================================================ 
+Name        : test.sysdef.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<!DOCTYPE SystemDefinition [
+ <!ELEMENT SystemDefinition (systemModel?, build?)>
+ <!ATTLIST SystemDefinition
+  name CDATA #REQUIRED
+  schema CDATA #REQUIRED>
+ <!ELEMENT systemModel (layer+)>
+ <!ELEMENT layer (logicalset* | module*)*>
+ <!ATTLIST layer
+  name CDATA #REQUIRED
+  levels CDATA #IMPLIED
+  span CDATA #IMPLIED>
+ <!ELEMENT logicalset (logicalsubset* | module* | unit* | package* | prebuilt*)*>
+ <!ATTLIST logicalset 
+  name CDATA #REQUIRED
+  levels CDATA #IMPLIED  
+  span CDATA #IMPLIED
+  level CDATA #IMPLIED>
+ <!ELEMENT logicalsubset (module* | unit* | package* | prebuilt*)*>
+ <!ATTLIST logicalsubset name CDATA #REQUIRED>
+ <!ELEMENT module (component* | unit* | package* | prebuilt*)*>
+ <!ATTLIST module
+  name CDATA #REQUIRED
+  level CDATA #IMPLIED>
+ <!ELEMENT component (unit* | package* | prebuilt*)*>
+ <!ATTLIST component name CDATA #REQUIRED>
+ <!ELEMENT unit EMPTY>
+ <!ATTLIST unit
+  unitID ID #REQUIRED
+  name CDATA #REQUIRED
+  mrp CDATA #REQUIRED
+  filter CDATA #IMPLIED
+  bldFile CDATA #REQUIRED
+  priority CDATA #IMPLIED
+  contract CDATA #IMPLIED>
+ <!ELEMENT package EMPTY>
+ <!ATTLIST package
+  name CDATA #REQUIRED
+  mrp CDATA #REQUIRED
+  filter CDATA #IMPLIED
+  contract CDATA #IMPLIED>
+ <!ELEMENT prebuilt EMPTY>
+ <!ATTLIST prebuilt
+  name CDATA #REQUIRED
+  version CDATA #REQUIRED
+  late (Y|N) #IMPLIED
+  filter CDATA #IMPLIED
+  contract CDATA #IMPLIED>
+ <!ELEMENT build (option* | target+ | targetList+ | unitList+ | configuration+)*>
+ <!ELEMENT unitList (unitRef+)>
+ <!ATTLIST unitList
+  name ID #REQUIRED
+  description CDATA #REQUIRED>
+ <!ELEMENT unitRef EMPTY>
+ <!ATTLIST unitRef unit IDREF #REQUIRED>
+ <!ELEMENT targetList EMPTY>
+ <!ATTLIST targetList
+  name ID #REQUIRED
+  description CDATA #REQUIRED
+  target IDREFS #REQUIRED>
+ <!ELEMENT target EMPTY>
+ <!ATTLIST target
+  name ID #REQUIRED
+  abldTarget CDATA #REQUIRED
+  description CDATA #REQUIRED>
+ <!ELEMENT option EMPTY>
+ <!ATTLIST option
+  name ID #REQUIRED
+  abldOption CDATA #REQUIRED
+  description CDATA #REQUIRED
+  enable (Y | N | y | n) #REQUIRED>
+ <!ELEMENT configuration (unitListRef+ | layerRef+ | task+)*>
+ <!ATTLIST configuration
+  name ID #REQUIRED
+  description CDATA #REQUIRED
+  filter CDATA #REQUIRED>
+ <!ELEMENT task ( unitListRef* , (buildLayer | specialInstructions))>
+ <!ELEMENT unitListRef EMPTY>
+ <!ATTLIST unitListRef unitList IDREF #REQUIRED>
+ <!ELEMENT layerRef EMPTY>
+ <!ATTLIST layerRef layerName CDATA #REQUIRED>
+ <!ELEMENT buildLayer EMPTY>
+ <!ATTLIST buildLayer
+  command CDATA #REQUIRED
+  targetList IDREFS #IMPLIED
+  unitParallel (Y | N | y | n) #REQUIRED
+  targetParallel (Y | N | y | n) #IMPLIED>
+ <!ELEMENT specialInstructions EMPTY>
+ <!ATTLIST specialInstructions
+  name CDATA #REQUIRED
+  cwd CDATA #REQUIRED
+  command CDATA #REQUIRED>
+ <!ENTITY layer_real_source_path "/sf/os/mm" >
+]>
+<SystemDefinition name="test_model" schema="1.4.0">
+    <systemModel>
+        <layer name="include_layer_set">
+            <module name="multimedia_mdf">
+                <unit name="mmdevicefw" unitID="sos.mmdevicefw" bldFile="sf\os\mm\mmdevicefw\mdf\group" mrp="sf\os\mm\mmdevicefw\mdf\group\multimedia_mdf.mrp"/>
+            </module>
+            <module name="multimedia_testframework">
+                <unit name="mmtestfw" unitID="sos.mmtestfw" bldFile="sf\os\mm\mmtestenv\mmtestfw\group" mrp="sf\os\mm\mmtestenv\mmtestfw\group\multimedia_testframework_source.mrp"/>
+            </module>
+        </layer>
+        <layer name="exclude_layer_set">
+            <module name="mmimg_component_test_rom">
+                <unit name="mdfunittest" unitID="sos.mdfunittest" bldFile="sf\os\mm\mmdevicefw\mdfunittest\codecapi\audio\tsrc\group" mrp="" filter="mmimg_component_test_rom"/>
+            </module>
+        </layer>
+        <layer name="include_exclude_matcher">
+            <module name="mmimg_component_test_rom">
+                <unit name="mdfunittest" unitID="sos.mdfunittest" bldFile="sf\os\mm\mmdevicefw\mdfunittest\codecapi\audio\tsrc\group" mrp="" filter="mmimg_component_test_rom"/>
+            </module>
+        </layer>
+        <layer name="include_exclude_non-matcher">
+            <module name="mmimg_component_test_rom">
+                <unit name="mdfunittest" unitID="sos.mdfunittest" bldFile="sf\os\mm\mmdevicefw\mdfunittest\codecapi\audio\tsrc\group" mrp="" filter="mmimg_component_test_rom"/>
+            </module>
+        </layer>
+
+        <layer name="api_test_layer">
+          <module name="camera_api_tests">
+          	<unit unitID="imm.camera.camcorder_ui_constants_api" mrp="" bldFile="sf/app/camera/camera_plat/camcorder_ui_constants_api/tsrc/group"  name="camcorder_ui_constants_api"  />
+          </module>
+          <module name="active_palette_2_api_tests">
+          	<unit unitID="imm.camera.active_palette_2_api" mrp="" bldFile="sf/app/camera/camera_plat/active_palette_2_api/tsrc/group"  name="active_palette_2_api"  />
+          </module>
+        </layer>
+        
+        <layer name="unit_test_layer">
+          <module name="camera_unit_tests">
+          </module>
+        </layer>
+
+        <layer name="use_layer_real_Def_layer">
+          <module name="gallery">
+            <unit unitID="imm.gallery" mrp="" bldFile="&layer_real_source_path;/group" name="gallery" />
+          </module>
+        </layer>
+        
+        <layer name="use_no_name_layer">
+          <module name="noNameLayer">
+            <unit unitID="nomrp.gallery" name="gallery" />
+            <unit unitID="noname.gallery" mrp="" bldFile="&layer_real_source_path;/group" />
+          </module>
+        </layer>
+
+  </systemModel>
+</SystemDefinition>

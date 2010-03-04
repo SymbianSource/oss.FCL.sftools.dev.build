@@ -43,7 +43,7 @@ Description:
     <import file="../../../helium.ant.xml" />
 
     <!-- Simple Synergy testing. -->
-    <target name="test-ccm">
+    <target name="-test-ccm">
         <hlm:python>
 import ccm, gc
 import logging
@@ -92,7 +92,7 @@ session = ccm.open_session(database="fa1f5132")
             <os family='windows'/>
             <then>
                 <exec osfamily="windows" executable="python" failonerror="true" outputproperty="testbuild.drive">
-                    <arg value="${helium.dir}/tools/common/python/scripts/searchnextdrive.py"/>               
+                    <arg line="-m searchnextdrive"/>               
                 </exec>
                 <au:expectfailure>
                     <antcall target="prep-drive">

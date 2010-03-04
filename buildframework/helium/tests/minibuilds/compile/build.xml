@@ -35,8 +35,8 @@ Description:
 	<property name="publish.root.dir" location="${build.drive}/release" />
 
 	<!-- For Grace upload-->
-	<property name="release.grace.service" value="Test_Helium" />
-	<property name="release.grace.product" value="minibuild_compile" />
+	<property name="hydra.service" value="Helium" />
+	<property name="hydra.product" value="minibuild_compile" />
 	<property name="release.label" value="${major.version}.${minor.version}" />
 
 	<!-- build configuration -->
@@ -173,18 +173,6 @@ print "New subdir: %s" % old
 ]]>
 		</script>
 	</target>
-
-	<!-- Upload to Grace -->
-	<target name="minibuild-grace-upload">
-		<echo message="Uploading files into Grace ${release.grace.dir}" />
-		<hlm:retry retryCount="${grace.upload.retryCount}" sleepTime="1000">
-			<copy file="${build.drive}\output\build_area\engineering_english\ant\sf_app_organizer_clock.zip" tofile="${release.grace.dir}\${build.name}_${major.version}.${minor.version}.${build.id}_sf_app_organizer_clock.zip" />
-		</hlm:retry>
-		<antcall target="release-grace-content">
-			<param name="release-grace-content" value="${cache.dir}" />
-		</antcall>
-	</target>
-
 
 	<!-- Check that the XML data returned from Diamonds via the REST interface
     is the same as what is sent. 

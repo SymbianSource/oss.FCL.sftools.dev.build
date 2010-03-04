@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<antDatabase>
+  <project>
+    <name>test.project1</name>
+    <target>
+      <name>test-target1</name>
+    </target>
+    <macro>
+      <name>testMacro1</name>
+    </macro>
+    <property>
+      <name>test.property1</name>
+    </property>
+    <taskdef>
+      <name>testtask1</name>
+      <classname>xyz.testtask1</classname>
+    </taskdef>
+  </project>
+</antDatabase>

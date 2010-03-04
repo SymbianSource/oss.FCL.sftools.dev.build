@@ -25,7 +25,7 @@ public class ToolsProcessException extends Exception {
 
     /**
      * Constructor
-     * @param String exception message
+     * @param message exception message
      */    
     public ToolsProcessException(String message) {
         super("ToolsProcessException:" + message);

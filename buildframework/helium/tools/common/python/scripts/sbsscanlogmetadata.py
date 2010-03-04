@@ -1,5 +1,5 @@
 #============================================================================ 
-#Name        : filter_heliumlog.py 
+#Name        : sbsscanlogmetadata.py
 #Part of     : Helium 
 
 #Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
@@ -34,14 +34,14 @@ from optparse import OptionParser
 IGNORE_TEXT_REG_EX = "warning: no newline at end of file"
 
 STREAM_REGEX =  {   "clean" : [r'<clean', r'</clean'],
-                    "whatlog" : [r'<whatlog', r'</whatlog'],
+                    "what" : [r'<whatlog', r'</whatlog'],
                     "warning" : [r'<warning', r'</warning']
                 }
 
 class SBSScanlogMetadata(object):
     """parses the raptor meatadata logs and separates the info out into HTML and XML logs for writing 
     to diamonds and other logs"""
-    
+
     def initializeLogPath(self):
         index = self.logFileName.rfind(".")
         if index < 0:
@@ -51,6 +51,8 @@ class SBSScanlogMetadata(object):
                         self.logFileName[index:]            
         if os.environ.has_key('SBS_CLEAN_LOG_FILE'):
             self.stream_path['clean'] = os.environ['SBS_CLEAN_LOG_FILE']
+        if os.environ.has_key('SBS_WHAT_LOG_FILE'):
+            self.stream_path['what'] = os.environ['SBS_WHAT_LOG_FILE']
             
     def initialize(self, logFile):
         """Initialize helium log filter"""
@@ -68,6 +70,9 @@ class SBSScanlogMetadata(object):
             self.compiled_stream_object[stream] = []
             self.streams[stream] = open(self.stream_path[stream], "w")
             self.streamStatus[stream] = False
+            self.streams[stream].write(\
+"""<?xml version="1.0" encoding="ISO-8859-1" ?>
+<buildlog sbs_version="" xmlns="http://symbian.com/xml/build/log" xmlns:progress="http://symbian.com/xml/build/log/progress" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symbian.com/xml/build/log http://symbian.com/xml/build/log/1_0.xsd">""")
             for  searchString in STREAM_REGEX[stream]:
                 self.compiled_stream_object[stream].append(re.compile(searchString))
         return True
@@ -85,8 +90,6 @@ class SBSScanlogMetadata(object):
             if textLine.startswith("<?xml ") or textLine.startswith("<buildlog ") \
                 or textLine.startswith("</buildlog"):
                 self.loggerout.write(textLine)
-                for stream in stream_list:
-                    self.streams[stream].write(textLine)
                 continue
             if(self.ignoreTextCompileObject.search(textLine)):
                 continue
@@ -99,6 +102,9 @@ class SBSScanlogMetadata(object):
                     break
     
                 if(self.streamStatus[stream]):
+                    if textLine.startswith("<?xml ") or textLine.startswith("<buildlog ") \
+                        or textLine.startswith("</buildlog"):
+                        continue
                     self.streams[stream].write(textLine)
                     break
 
@@ -116,6 +122,7 @@ class SBSScanlogMetadata(object):
         try:
             self.loggerout.close()
             for stream in self.streams.keys():
+                self.streams[stream].write('</buildlog>')
                 self.streams[stream].close()
             return True
         except:

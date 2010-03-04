@@ -1,0 +1,46 @@
+<!--
+============================================================================ 
+Name        : ivysettings.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================    
+-->
+<ivysettings>
+    <caches useOrigin="true" defaultCacheDir="${build.temp.dir}/ivy"/>
+    <property name="ivy.default.ivy.user.dir" value="${build.temp.dir}/ivy"/>
+    <settings defaultResolver="helium-sf-build"/>
+    <include url="${ivy.default.settings.dir}/ivysettings-public.xml"/>
+    <include url="${ivy.default.settings.dir}/ivysettings-shared.xml"/>
+    <include url="${ivy.default.settings.dir}/ivysettings-local.xml"/>
+    <include url="${ivy.default.settings.dir}/ivysettings-main-chain.xml"/>
+    <include url="${ivy.default.settings.dir}/ivysettings-default-chain.xml"/>
+
+    <resolvers>
+        <chain name="helium-sf-build" returnFirst="true">
+            <filesystem name="sf-deps">
+                <ivy pattern="${sf.source.root.dir}/deps/[organisation]/[module]/[revision]/ivy.xml" />
+                <artifact pattern="${sf.source.root.dir}/deps/[organisation]/[module]/[revision]/[artifact]-[revision].[ext]" />
+            </filesystem>
+            <filesystem>
+                <artifact pattern="${module.bin.dir}/[artifact].[ext]" />
+            </filesystem>
+            <resolver ref="local"/>
+        </chain>
+    </resolvers>
+
+</ivysettings>
+

@@ -20,6 +20,7 @@ Description:
 
 ============================================================================
 -->
+<!--* @package preparation -->
 <project name="buildmanagement" xmlns:hlm="http://www.nokia.com/helium">
     <description>
         Runs the build manager Synergy operations.

@@ -20,10 +20,32 @@ Description:
 
 ============================================================================
 -->
+<!--* @package testing -->
 <project name="_testing.eunit">
     <description>
         Testing using EUnit. (For WINSCW)
     </description>
+    
+    <!--* @property eunit.prepare.zip
+    Name of eunit zip file. Need to unzip into build area to start eunit test
+    @type string
+    @editable required
+    @scope public
+    -->
+    
+    <!--* @property eunit.prepare.zip
+    Name of eunit zip file. Need to unzip into build area to start eunit test
+    @type string
+    @editable required
+    @scope public
+    -->
+    
+    <!--* @property eunitexerunner.flags
+    Flags for EUnit exerunner can be set by setting the value of this variable. The default flags are set to "/E S60AppEnv /R Off".
+    @type string
+    @editable required
+    @scope public
+    -->
 
     <!-- Unzip test package to build drive. -->
     <target name="prepare-eunit" if="enabled.ats">

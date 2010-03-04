@@ -87,16 +87,6 @@ Description:
         <delete file="${helium.dir}/record-test.txt"/>
     </target>
     
-    
-    <target name="test-python-task">
-        <hlm:python script="${helium.dir}/tests/data/PythonTest.py" outputProperty="correct_output" resultProperty="correct_result"/>
-        <au:assertPropertyEquals name="correct_output" value="test complete!"/>
-        <au:assertPropertyEquals name="correct_result" value="0"/>
-        <hlm:python script="PythonTest.py" resultProperty="no_file_result"/>     
-        <au:assertPropertyEquals name="no_file_result" value="2"/>
-    </target>
-    
-    
     <target name="test-assert">
         <assert>
             <bool>
@@ -129,7 +119,7 @@ Description:
     </target>
     
     
-    <target name="test-jepp">
+    <target name="test-jython">
         <script language="jython" setbeans="false">
 print "It works!"
 print dir(project)
@@ -202,22 +192,6 @@ project.setProperty("xml.test.list", str(result))
         <au:assertPropertySet name="hlm-assertXmlEqual.thrown"/>
     </target>
     
-    
-    <target name="test-prettyprintxml-filter">
-        <loadfile srcfile="${helium.dir}/tests/data/config_test.cfg.xml" property="xml.test.content">
-            <filterchain>
-                <tokenfilter>
-                    <filetokenizer/>
-                    <hlm:prettyprintxml/>
-                </tokenfilter>
-            </filterchain>
-        </loadfile>
-        <echo>Pretty-printed XML:
-            
-${xml.test.content}</echo>
-    </target>
-    
-    
     <!--<target name="test-ccm-task">
         <ccm/>
     </target>-->
@@ -251,68 +225,13 @@ ${xml.test.content}</echo>
     <target name="test-helium-user-graph">
         <runtarget target="helium-user-graph"/>
         <!--<au:assertFileExists file="${helium.build.dir}/doc/user-graph.html"/>-->
-        <au:assertFileExists file="${helium.build.dir}/doc/images/user-graph.dot.png"/>
-        <!--<sequential>
-            <au:assertTrue>
-                <isfileselected file="${helium.build.dir}/doc/user-graph.html">
-                    <contains text="area shape"/>
-                </isfileselected>
-            </au:assertTrue>
-        </sequential>-->
+        <au:assertFileExists file="${docs.build.dir}/images/user-graph.dot.png"/>
+        <delete dir="${docs.build.dir}"/>
     </target>
-    
-    
-    <target name="test-tempRecordMacro">
-        <delete file="${build.cache.log.dir}/test.log" failonerror="false"/>
-        <delete file="${build.cache.log.dir}/test.log.xml" failonerror="false"/>
-        <delete file="${build.cache.log.dir}/test.sqlite" failonerror="false"/>
-        <delete file="${metadata.dbfile}" failonerror="false"/>
-        <var name="build.log.dir" value="${build.cache.dir}/helium/temp_drive/output/logs" unset="true"/>
-        <var name="test.log.dir" value="${build.cache.dir}/helium/temp_drive/output/logs/test" unset="true"/>        
-        <hlm:tempRecordStartMacro name="test.log" />
-        <echo>ERROR: an error</echo>
-        <echo>WARNING: a warning</echo>
-        <echo>INFO: some useless message</echo>
-        <hlm:tempRecordStopMacro name="test.log" database="${build.cache.log.dir}/test.sqlite" phase="test"/>
-        <au:assertTrue>
-            <and>
-                <hlm:hasSeverity file="${build.cache.log.dir}/signals/test.log.status.xml" severity="error"/>
-                <hlm:hasSeverity file="${build.cache.log.dir}/signals/test.log.status.xml" severity="warning"/>
-                <hlm:hasSeverity file="${build.cache.log.dir}/signals/test.log.status.xml" severity="info"/>
-            </and>
-        </au:assertTrue>
-    </target> 
 
-    <target name="test-helium_project_path">
-        <delete file="${build.cache.log.dir}/project-compile.cmaker.html" failonerror="false"/>
-        <fmpp sourceFile="${helium.dir}/doc/src/api/project.html.ftl" outputFile="${build.cache.log.dir}/project-compile.cmaker.html">
-            <data expandProperties="yes">
-                ant: antProperties()
-                doc: xml(${helium.dir}/tests/data/test_database.xml)
-                data: xml(${helium.dir}/tests/data/data_model_validation_test.xml)
-            </data>            
-        </fmpp>
-        <au:assertFileExists file="${build.cache.log.dir}/project-compile.cmaker.html"/>
-        <sequential>
-            <au:assertTrue>
-                <isfileselected file="${build.cache.log.dir}/project-compile.cmaker.html">
-                    <contains text="Location"/>
-                </isfileselected>
-            </au:assertTrue>
-            <au:assertTrue>
-                <isfileselected file="${build.cache.log.dir}/project-compile.cmaker.html">
-                    <contains text="helium/tools/compile/cmaker.ant.xml"/>
-                </isfileselected>
-            </au:assertTrue>
-            <au:assertTrue>
-                <isfileselected file="${build.cache.log.dir}/project-compile.cmaker.html">
-                    <contains text="http://helium.nmp.nokia.com/trac/browser/helium/trunk/helium/tools/compile/cmaker.ant.xml"/>
-                </isfileselected>
-            </au:assertTrue>
-        </sequential>
-    </target>
 
     <target name="test-sisfiles">
+        <delete dir="${build.cache.dir}/helium/temp_drive/output/logs/${build.id}_metadata_db"/>
         <tempfile destdir="${build.cache.dir}" property="sisfiles.tempconfig.file" suffix=".xml"/>
         <tempfile destdir="${build.cache.dir}" property="sis.config.file.parsed" suffix=".xml"/>
         <condition property="echocmd" value="${helium.dir}/tools/common/test/echo.bat" else="echo">
@@ -340,10 +259,9 @@ ${xml.test.content}</echo>
             <param name="temp.build.dir" value="${build.cache.dir}/helium/temp_drive/output/temp_build_files"/>
             <param name="build.drive" value="${build.cache.dir}/helium/temp_drive/"/>
             <param name="build.cache.log.dir" value="${build.cache.dir}/helium/temp_drive/output/logs"/>
-            <param name="metadata.dbfile" value="${build.cache.dir}/helium/temp_drive/output/logs/${build.id}_metadata.sqlite"/>
+            <param name="metadata.dbfile" value="${build.cache.dir}/helium/temp_drive/output/logs/${build.id}_metadata_db"/>
             <param name="build.log.dir" value="${build.cache.dir}/helium/temp_drive/output/logs"/>            
             <param name="post.log.dir" value="${build.cache.dir}/helium/temp_drive/output/logs/post"/>
-            
         </antcall>
         <au:assertFileExists file="${build.cache.dir}/helium/temp_drive/output/temp_build_files/sis_build.ant.xml"/>
         <delete file="${sisfiles.tempconfig.file}"/>

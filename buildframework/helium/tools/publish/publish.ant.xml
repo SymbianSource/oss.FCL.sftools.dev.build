@@ -20,17 +20,41 @@ Description:
 
 ============================================================================
 -->
+<!--* @package publishing -->
 <project name="publish" xmlns:hlm="http://www.nokia.com/helium">
     <description>
     Zipping, delta zipping and copying targets
     </description>
+    
+    <!--* @property delta.zip.file.size
+    Define the file size of the zipped up released file, this is then used by delta zipping code to determine if a delta zip is required or a full zip should be created. The delta zip will only be published if it is less than 1/2 the size of this property
+    @type string
+    @editable required
+    @scope public
+    -->
 
-    <import file="subcon.ant.xml" />
+    <!--* @property file-comparison.left_side
+    The fileset id used on the left side of comparison.
+    @type string
+    @editable required
+    @scope public
+    -->
+
+    <!--* @property file-comparison.right_side
+    The fileset id used on the right side of comparison.
+    @type string
+    @editable required
+    @scope public
+    -->
+
     <import file="internal-api/internal-api.ant.xml" />
     <import file="nwiki.ant.xml" />
     <import file="synergy.ant.xml" />
     <import file="test/test2_publishing_to_diamonds.ant.xml" />
 
+    <!-- Set the maximum number of threads running for archiving (for a parallel job).
+    @type integer
+    -->
     <property name="archive.max.number.of.threads" value="8" />
     
     <fileset id="publish.files" dir="${build.output.dir}">
@@ -71,6 +95,9 @@ Description:
     </fileset>
 
     <!-- list of filesets -->
+    <!-- The fileset id which will be upload
+    @type string
+    -->
     <property name="publish.fileset.ids" value="publish.files1,publish.files2,publish.files3,publish.files4" />
 
     <fileset id="helium.files" dir="${helium.dir}">
@@ -110,6 +137,10 @@ Description:
 
     <!-- Parses the zip configuration file. Expands all the ant properties. -->
     <target name="preprocess-zip-config">
+        <!-- Path to the parsed file of zip specification file
+        @type string
+        @scope private
+        -->
         <property name="zip.config.file.parsed" location="${temp.build.dir}/zip.cfg.xml.parsed" />
         <copy file="${zip.config.file}" tofile="${zip.config.file.parsed}" overwrite="true">
             <filterchain>
@@ -337,6 +368,10 @@ except Exception, e:
                     <!-- Stops writing on ...ant_build.log file-->
                     <hlm:startSpecificLogMacro name="${zip.@{type}.log.file}" phase="@{phase}"/>
             
+                    <!-- Path to the parsed file of zip specification file
+                    @type string
+                    @scope private
+                    -->
                     <property name="zip.config.file.parsed" location="${temp.build.dir}/zip.cfg.xml.parsed" />
                     <copy file="@{file}" tofile="${zip.config.file.parsed}" overwrite="true">
                         <filterchain>
@@ -355,6 +390,9 @@ except Exception, e:
                                 <isgreaterthan arg1="${number.of.threads}" arg2="${archive.max.number.of.threads}"/>
                                 <then>
                                     <ant antfile="${build.drive}/ZIP_${zips.@{type}.spec.name}.xml">
+                                        <!-- how many parallel threads can run
+                                        @type string
+                                        -->
                                         <property name="number.of.threads" value="${archive.max.number.of.threads}"/>
                                     </ant>
                                 </then>
@@ -502,24 +540,6 @@ else:
         <hlm:zipContentMacro type="trace_roms" file="${zip.config.file}" />
     </target>
 
-
-    <!-- Zips the trace rom content -->
-    <target name="zip-uda-roms" unless="skip-zips">
-        <hlm:zipContentMacro type="uda_roms" file="${zip.config.file}" />
-    </target>
-
-
-    <!-- Zips .loc files into individual packages. -->
-    <target name="zip-loc-files">
-        <mkdir dir="${temp.loc.dir}" />
-        <exec executable="perl" dir="${build.drive}/" failonerror="${failonerror}">
-            <arg file="${helium.dir}/tools/publish/get_loc_files.pl" />
-            <arg value="${build.drive}" />
-        </exec>
-        <zip destfile="${loc.output.dir}/${loc.output.filename}" basedir="${temp.loc.dir}" />
-    </target>
-
-
     <!-- Publishes the content defined by the filesets at the top of this project.
     
     The files are split into 4 filesets to parallelize the publish operation:
@@ -621,51 +641,78 @@ except Exception:
         </hlm:python>
     </target>
 
-
     <!-- Reports on the status of the build, through other targets. -->
-    <target name="report" depends="binary-sizes-log" unless="env.HLM_SUBCON">
-        <antcall target="rndsdk-create-api-descr-xml" />
-    </target>
-
+    <target name="report" depends="binary-sizes-log"/>
 
     <!-- Delta zips -->
 
+    <!-- Output location
+    @type string
+    @scope private
+    -->
     <property name="delta.zip.location" value="${build.output.dir}/build_area/delta_zip" />
+    <!-- Temp location
+    @type string
+    @scope private
+    -->
     <property name="delta.zip.temp.location" value="${temp.build.dir}/delta_zip" />
+    <!-- The zip file
+    @type string
+    @scope private
+    -->
     <property name="delta.zip.file" value="${delta.zip.location}/${build.id}_delta_zip.zip" />
+    <!-- Define the file size of the zipped up released file, this is then used by delta zipping code to determine if a delta zip is required or a full zip should be created. The delta zip will only be published if it is less than 1/2 the size of this property
+    @type string
+    -->
     <property name="delta.zip.file.size" value="11000000" />
     <!--default value of approx 11GB-->
 
+    <!-- Special Instructions file for SymDEC
+    @type string
+    @scope private
+    -->
     <property name="delta.zip.delete.file" value="${delta.zip.location}/specialInstructions.xml" />
+    <!-- Temp file
+    @type string
+    @scope private
+    -->
     <property name="delta.ant.file" value="${delta.zip.temp.location}/delta_zip.ant.xml" />
+    <!-- Output location of md5 file
+    @type string
+    @scope private
+    -->
     <property name="md5.signature.file" value="${delta.zip.location}/${build.id}.md5" />
+    <!-- Number of partial md5 files to use during creation
+    @type string
+    @scope private
+    -->
     <property name="md5.split" value="100" />
     <!-- old.md5.file needs to be specified by the user -->
 
 
-    <!-- Private: Patch evalid tool -->
+    <!-- Patch evalid tool. @scope private-->
     <target name="patch-evalid">
         <patch patchfile="${helium.dir}/tools/publish/evalidmd5.patch" originalfile="${build.drive}/epoc32/tools/evalidmd5.pm" />
     </target>
 
 
-    <!-- Private: Revert evalid patch -->
+    <!-- Revert evalid patch. @scope private-->
     <target name="unpatch-evalid">
         <patch reverse="true" patchfile="${helium.dir}/tools/publish/evalidmd5.patch" originalfile="${build.drive}/epoc32/tools/evalidmd5.pm" />
     </target>
 
 
-    <!-- Private: Copy extra tool for evalid -->
+    <!-- Copy extra tool for evalid. @scope private-->
     <target name="pre-build-md5" depends="patch-evalid">
         <copy todir="${build.drive}\epoc32\tools" file="${helium.dir}/tools/publish/evalid_multiple.pl" />
     </target>
 
 
-    <!-- Private: Revert patches -->
+    <!-- Revert patches. @scope private-->
     <target name="post-build-md5" depends="unpatch-evalid" />
 
 
-    <!-- Private: Generate a list of checksums for all files in the build area using EBS system -->
+    <!-- Generate a list of checksums for all files in the build area using EBS system. @scope private-->
     <target name="build-md5-ebs" depends="pre-build-md5">
         <mkdir dir="${delta.zip.location}" />
         <hlm:python failonerror="true">
@@ -678,7 +725,7 @@ builder.build(r"${md5.signature.file}")
         <antcall target="post-build-md5" />
     </target>
 
-    <!-- Private: Generate a list of checksums for all files in the build area using EC system -->
+    <!-- Generate a list of checksums for all files in the build area using EC system. @scope private-->
     <target name="build-md5-ec" depends="pre-build-md5">
         <mkdir dir="${delta.zip.location}" />
         <echo>delta.zip.temp.location: ${delta.zip.temp.location}</echo>
@@ -695,6 +742,10 @@ builder.build("${md5.signature.file}")
 
     <!-- Generate a list of checksums for all files in the build area -->
     <target name="build-md5">
+        <!-- Comma seperated excluded directories from the zip
+        @type string
+        @scope public
+        -->
         <property name="delta.exclude.commasep" value="epoc32_save.zip,output/**/*,delta_zips/**/*,temp/**/*,epoc32/**/*.sym,epoc32/BUILD/**/*" />
         <echo>build MD5 started</echo>
         <if>
@@ -754,6 +805,10 @@ print md5file.replace('.md5', '')
 
     <!-- Set prop old.md5.file to md5 file from last build in publish dir -->
     <target name="delta-use-last-build">
+        <!-- Location of current build md5 file
+        @type string
+        @scope private
+        -->
         <property name="md5.current.build" value="${publish.dir}/build_area/delta_zip/${build.id}.md5" />
         <hlm:python outputproperty="old.md5.file">
 import re
@@ -796,7 +851,7 @@ if not os.path.exists(md5lastbuild):
         </fileset>
 
         <antcall target="grace-upload">
-            <reference refid="grace.delta.zips.id" torefid="gracezips" />
+            <reference refid="grace.delta.zips.id" torefid="release.zips" />
         </antcall>
     </target>
 
@@ -835,19 +890,19 @@ if not os.path.exists(md5lastbuild):
     <target name="build-status">
         <hlm:metadatarecord database="${metadata.dbfile}">
             <hlm:antmetadatainput>
-                <fileset casesensitive="false" file="${build.log.dir}/${build.id}_ant_build.log" />
+                <fileset casesensitive="false" file="${build.log}" />
                 <metadatafilterset refid="filterset.ant.output" />
             </hlm:antmetadatainput>
         </hlm:metadatarecord>
 
-        <hlm:signalMacro logfile="${build.id}_ant_build.log" 
+        <hlm:signalMacro logfile="${build.log}" 
             signal.input="exceptionSignalInput" />
     </target>
 
     <!-- Exception handler to process the ant output log -->
     <target name="hlm-exception-handler">
         <if>
-            <available file="${build.log.dir}/${build.id}_ant_build.log"/>
+            <available file="${build.log}"/>
             <then>
                 <runtarget target="do-exception-handler" />
             </then>

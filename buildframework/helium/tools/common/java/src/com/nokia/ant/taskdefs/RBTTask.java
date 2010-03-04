@@ -56,7 +56,6 @@ package com.nokia.ant.taskdefs;
  *                              deconfigure=&quot;yes&quot; /&gt;
  * </pre>
  * 
- * @author hacs
  * @ant.task category="SCM"
  */
 public class RBTTask extends AbstractScmBaseTask {
@@ -151,7 +150,7 @@ public class RBTTask extends AbstractScmBaseTask {
    * Set whether to leave the folders writable in the baseline project
    * created.
    * 
-   * @param leaveFolderswritable
+   * @param leaveFoldersWritable
    *            indicates whether to leave folders writable.
    * @ant.not-required Default is no.
    */
@@ -172,8 +171,8 @@ public class RBTTask extends AbstractScmBaseTask {
   /**
    * Set whether to rebadge object versions in the rebaseline.pl script.
    * 
-   * @param password
-   *            Synergy Password
+   * @param rebadgeObjectVersions
+   *            indicates whether to rebadge object versions to a given release tag.
    * @ant.not-required Default is no.
    */
   public void setRebadgeObjectVersions(Boolean rebadgeObjectVersions) {
@@ -182,7 +181,7 @@ public class RBTTask extends AbstractScmBaseTask {
   }
 
   /**
-   * Returnt the releaseBaseline.
+   * Return the releaseBaseline.
    * 
    * @return the releaseBaseline.
    */
@@ -193,8 +192,8 @@ public class RBTTask extends AbstractScmBaseTask {
   /**
    * Set whether to release the newly created baseline or not.
    * 
-   * @param release
-   *            the release to set
+   * @param releaseBaseline
+   *            indicates whether to release the newly created baseline 
    */
   public void setReleaseBaseline(Boolean releaseBaseline) {
     this.releaseBaseline = releaseBaseline;
@@ -402,7 +401,7 @@ public class RBTTask extends AbstractScmBaseTask {
   /**
    * Set new baseline name to use.
    * 
-   * @param baselineName
+   * @param newBaselineName
    *            is the new baseline name to set.
    * @ant.not-required
    */

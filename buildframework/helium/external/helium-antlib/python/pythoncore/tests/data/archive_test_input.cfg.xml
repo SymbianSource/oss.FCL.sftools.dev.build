@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<build>
+    <config>
+        <set name="max.uncompressed.size" value="2000000"/>
+        <set name="root.dir" value="${env.TEMP}/python"/>
+        <set name="max.files.per.archive" value="65000"/>
+        <set name="archive.tool" value="7za"/>
+        <set name="archives.dir" value="${env.TEMP}"/>
+        <set name="temp.build.dir" value="${env.TEMP}"/>
+        <set name="name" value="python_libs"/>
+        <set name="include" value="lib\*.egg"/>
+    </config>
+</build>

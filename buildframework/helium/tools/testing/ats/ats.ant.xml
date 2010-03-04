@@ -20,33 +20,90 @@ Description:
 
 ============================================================================
 -->
+<!--* @package testing -->
 <project name="_testing.ats" xmlns:hlm="http://www.nokia.com/helium">
     <description>
-        ATS testing targets.
+    ATS testing targets.
     </description>
+    
+    <!--* @property enabled.ats
+    Value must be set to execute ats-test target.
+    @type boolean
+    @editable required
+    @scope public
+    -->
+    
+    <!--* @property enabled.aste
+    Value must be set to execute ats-aste target.
+    @type boolean
+    @editable required
+    @scope public
+    -->
+    
+    <!--* @property ats.product.name
+    Name of the product to be tested. For example: "PRODUCT"
+    @type string
+    @editable required
+    @scope public
+    -->
+    
+    <!--* @property ats.drop.location
+    Server location (UNC path) to save the ATS3Drop file, before sending to the ATS. For example: \\trwsem00\some_folder\. In case, ``ats.script.type`` is set to "import", ATS doesn't need to have access to ats.drop.location, its value can be any local folder on build machine, for example c:\temp (no network share needed).
+    @type string
+    @editable required
+    @scope public
+    -->
+    
+    <!--* @property ats.server
+    For example: "4fio00105" or "catstresrv001.cats.noklab.net:80". Default server port is "8080", but it is not allowed between intra and Noklab. Because of this we need to define server port as 80. The host can be different depending on site and/or product.
+    @type string
+    @editable required
+    @scope public
+    -->
+    
+    <!--* @property ats.password
+    Password for ATS. This password might be different from NOE or HTTP/UNIX password.
+    @type string
+    @editable required
+    @scope public
+    -->
+    
+    <!--* @property ats.username
+    Username for ATS server. This is NOT the NOE or HTTP/UNIX username.
+    @type string
+    @editable required
+    @scope public
+    -->
+    
+    
     <!-- -->
     <fileset id="reference.ats.flash.images" dir="${release.images.dir}">
-        <include name="**/${build.id}*.core.fpsx" />
-        <include name="**/${build.id}*.rofs2.fpsx" />
-        <include name="**/${build.id}*.rofs3.fpsx" />
+        <include name="**/*.fpsx" />
         <include name="**/*rnd.C00" />
         <include name="**/*rnd.V01" />
-        <include name="**/*.fpsx" />
-        <include name="**/*_rnd.fpsx" />
     </fileset>
     
+    <!-- Limit of minimum number of flash files to execute ats-test target, otherwise ATSDrop.zip will not be generated. Default value is "2" files.
+    @type string
+    @scope public
+    -->
     <property name="ats.flashfiles.minlimit" value="2" />
 
     <fileset id="reference.ats.sis.images" dir="${ats.sis.images.dir}">
         <include name="**/*.sis" />
     </fileset>
+    <!-- Limit of minimum number of sis files to execute matti-test target, otherwise MATTI-drop.zip will not be generated. Default value is "1" files.
+    @type string
+    @scope public
+    -->
     <property name="ats.sisfiles.minlimit" value="1" />
     
     <var name="drop.file.counter" value="0" />
 
-    <!-- 
-    The target creates ATSDrop.zip file which also includes test.xml file; and sends the drop to ATS. 
+    <!-- The target creates ATSDrop.zip file which also includes test.xml file; and sends the drop to ATS.
+
     The layer definition, in system definition file, for tsrc directory should look like:
+    
     <pre>
     <layer name="name_test_layer">
         <module name="module_name">
@@ -149,9 +206,13 @@ if '1.6.0' in version:
                 <condition property="ats.import.arg" value="-import" else="">
                     <equals arg1="${ats.script.type}" arg2="import" />
                 </condition>
-                <java classname="com.nokia.ats.util.server.CommandLineClient" fork="true">
+                <condition property="ats4.libs" value="${helium.dir}/extensions/nokia/external/ats4" else="${helium.dir}/external/antlibs">
+                    <available type="dir" file="${helium.dir}/extensions/nokia/external/ats4"/>
+                </condition>
+                <java classname="com.nokia.ats.util.server.CommandLineClient" fork="true" maxmemory="512m">
                     <classpath>
                         <pathelement path="${java.class.path}"/>
+                        <fileset dir="${ats4.libs}" includes="*.jar"/>
                     </classpath>
                     <arg line="-url http://${ats.server}/ServerService -path ${ats.drop.location.file} ${ats.import.arg}"/>
                 </java>
@@ -181,7 +242,7 @@ if '1.6.0' in version:
 flashfilescount = len(r'${ats.flash.images}'.split(','))
 mincount = int(r'${ats.flashfiles.minlimit}')
 if flashfilescount < mincount:
-    raise Exception('Not enough flash files, check reference.ats.flash.images')
+    raise Exception('Not enough flash files, check reference.ats.flash.images and build.id, found: ' + r'${ats.flash.images}' + ', looking in: ' + r'${release.images.dir}')
 ]]>
         </hlm:python>
     </target>
@@ -196,9 +257,22 @@ if flashfilescount < mincount:
     <!-- Sets values common for ATS, this is a dependent target and shouldn't be used as an individual target -->
     <target name="ats-common">
         <property name="ats.config.file" value="" />
+        <property name="ats.specific.pkg" value="" />
         <property name="ats4.enabled" value="False" />
+        <!-- Product HardWare ID (HWID) attached to ATS. By default the value of HWID is not set.
+        @type string
+        @scope public
+        -->
         <property name="ats.product.hwid" value="" />
+        <!-- To set test commands execution time limit on ATS3 server, in seconds. Default value is "60".
+        @type string
+        @scope public
+        -->
         <property name="ats.test.timeout" value="60" />
+        <!-- Sets ATS reports store location. Default location is "${publish.dir}/${publish.subdir}"
+        @type string
+        @scope public
+        -->
         <property name="ats.report.location" value="${publish.dir}/${publish.subdir}" />
         <condition property="internal.ats.diamonds.arg" value="--diamonds-build-url=http://${diamonds.host}${diamonds.build.id}" else="">
             <isset property="diamonds.build.url" />
@@ -208,21 +282,61 @@ if flashfilescount < mincount:
     <!-- Sets default values for the ATS (STIF and EUnit), this is a dependent target and shouldn't be used as an individual target -->
     <target name="ats-set-defaults-stifeunit" depends="ats-common,lookup-email">
         <!-- Default values for the properties -->
+        <!-- The property is needed if you want to get an email from ATS server after the tests are executed. There can be one to many semicolon(s) ";" separated email addresses.
+        @type string
+        @scope public
+        -->
         <property name="ats.email.list" value="${email.from}" />
+        <!-- The default value is "data" and refers to the 'data' directory under 'tsrc' directory.
+        @type string
+        @scope public
+        -->
         <property name="tsrc.data.dir" value="data" />
+        <!-- Modify the plan name if you have understanding of test.xml file or leave it as it is. Default value is "plan"
+        @type string
+        @scope public
+        -->
         <property name="ats.plan.name" value="plan" />
+        <!-- Modify the test-run name if you have understanding of test.xml file or leave it as it is. Default value is a string consist of build id, product name, major and minor versions
+        @type string
+        @scope public
+        -->
         <property name="ats.testrun.name" value="${build.id}_${ats.product.name}" />
+        <!-- CTC host, provided by CATS used to create coverage measurement reports. MON.sym files are copied to this location, for example "10.0.0.1". If not given, code coverage reports are not created
+        @type string
+        @scope public
+        -->
         <property name="ats.ctc.host" value="" />
         <condition property="ats.version" value="4" else="3">
             <istrue value="${ats4.enabled}" />
         </condition>
         <var name="ats.drop.file" value="ATS${ats.version}Drop${drop.file.counter}.zip" />
         
+        <!-- Sets target platform for compiling test components. Default value is "armv5 urel".
+        @type string
+        @scope public
+        -->
         <property name="ats.target.platform" value="armv5 urel" />
+        <!-- Should be "True" if tracing is needed during the tests running on ATS3. Default value is "False", the values are case-sensitive.
+        @type string
+        @scope public
+        -->
         <property name="ats.trace.enabled" value="False" />
+        <!-- Should be "True" if coverage measurement and dynamic analysis (CTC) tool support is to be used by ATS. Default value is "False", the values are case-sensitive.
+        @type string
+        @scope public
+        -->
         <property name="ats.ctc.enabled" value="False" />
         <property name="ats.multiset.enabled" value="False" />
+        <!-- Flags for EUnit exerunner can be set by setting the value of this variable. The default flags are set to "/E S60AppEnv /R Off".
+        @type string
+        @scope public
+        -->
         <property name="eunitexerunner.flags" value="/E S60AppEnv /R Off" />
+        <!-- If the property is set to "True", then the only test components which will have PKG files, will be included into the test.xml as a test-set. Which means, even if there's a test component (executable) but there's no PKG file, it should not be considered as a test component and hence not included into the test.xml as a separate test. By default the property value is False.
+        @type string
+        @scope public
+        -->
         <property name="ats.obey.pkgfiles.rule" value="False" />
     </target>
 
@@ -234,8 +348,20 @@ if flashfilescount < mincount:
         <property name="ats.aste.software.version" value="${build.id}" />
         <property name="ats.aste.language" value="English" />
         <property name="ats.aste.software.release" value="${build.name}" />
+        <!-- Modify the plan name if you have understanding of test.xml file or leave it as it is. Default value is "plan"
+        @type string
+        @scope public
+        -->
         <property name="ats.aste.plan.name" value="plan" />
+        <!-- Modify the test-run name if you have understanding of test.xml file or leave it as it is. Default value is a string consist of build id, product name, major and minor versions
+        @type string
+        @scope public
+        -->
         <property name="ats.aste.testrun.name" value="${build.id}_${ats.product.name}_${major.version}.${minor.version}" />
+        <!-- The property is needed if you want to get an email from ATS server after the tests are executed. There can be one to many semicolon(s) ";" separated email addresses.
+        @type string
+        @scope public
+        -->
         <property name="ats.aste.email.list" value="" />
     </target>
 
@@ -299,7 +425,7 @@ project.setProperty('ats.drops.count', str(len(modules)))
                         <runtarget target="ats-set-defaults-stifeunit" />
                         <echo>${ats.drop.file}</echo>
                         <exec executable="python">
-                            <arg value="${helium.dir}/tools/common/python/lib/ats3/__init__.py" />
+                            <arg line="-m ats3.__init__" />
                             <arg value="--device-type=${ats.product.name}" />
                             <arg value="--device-hwid=${ats.product.hwid}" />
                             <arg value="${internal.ats.diamonds.arg}" />
@@ -323,6 +449,7 @@ project.setProperty('ats.drops.count', str(len(modules)))
                             <arg value="--config=${ats.config.file}" />
                             <arg value="--obey-pkgfiles=${ats.obey.pkgfiles.rule}" />
                             <arg value="--ats4-enabled=${ats4.enabled}" />
+                            <arg value="--specific-pkg=${ats.specific.pkg}" />
                             <arg value="--verbose" />
                             <arg line="${module.tsrc.@{module}}" />
                         </exec>
@@ -339,7 +466,7 @@ project.setProperty('ats.drops.count', str(len(modules)))
     <target name="do-ats-aste" depends="ats-set-flash-image-path, ats-set-defaults-aste" if="enabled.aste">
         <mkdir dir="${build.output.dir}/ats" />
         <exec executable="python">
-            <arg value="${helium.dir}/tools/common/python/lib/ats3/aste.py" />
+            <arg line="-m ats3.aste" />
             <arg value="--report-email=${ats.aste.email.list}" />
             <arg value="--device-type=${ats.product.name}" />
             <arg value="--flash-images=${ats.flash.images}" />
@@ -440,7 +567,7 @@ project.setNewProperty('ats.ctc.monsyms', ';'.join([ "//%s/%s" % (server, x) for
             <else>
                 <!-- execute the MattiDrops.py script with parameters-->
                 <exec executable="python" resultproperty="script.response">
-                    <arg value="${helium.dir}/tools/common/python/lib/ats3/matti/MattiDrops.py" />
+                    <arg line="-m ats3.matti.MattiDrops" />
                     <arg value="--build-drive=${build.drive}" />
                     <arg value="--matti-scripts=${matti.scripts}" />
                     <arg value="--flash-images=${ats.flash.images}" />
@@ -463,6 +590,10 @@ project.setNewProperty('ats.ctc.monsyms', ';'.join([ "//%s/%s" % (server, x) for
                         <equals arg1="${script.response}" arg2="0" />
                     </not>
                     <then>
+                        <!-- Skips sending drop package file to ATS/ASTE after its creation.
+                        @type boolean
+                        @scope public
+                        -->
                         <property name="skip.ats.sending" value="1" />
                     </then>
                 </if>
@@ -471,7 +602,15 @@ project.setNewProperty('ats.ctc.monsyms', ';'.join([ "//%s/%s" % (server, x) for
         </if>
     </target>
     
+    <!-- Temp dir
+    @type string
+    @scope private
+    -->
     <property name="ats.evalid.pre" value="${temp.build.dir}/${build.id}_atsevalidpre" />
+    <!-- Temp dir
+    @type string
+    @scope private
+    -->
     <property name="ats.evalid.post" value="${temp.build.dir}/${build.id}_atsevalidpost" />
     
     <!-- Call before preperation -->

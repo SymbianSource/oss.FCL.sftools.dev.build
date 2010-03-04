@@ -30,6 +30,11 @@ Description:
     
 <h2>Target ${target.name}</h2>
 
+<b>Scope: </b>${target.scope}<br/>
+
+<p><b>Description</b></p>
+<p>${target.description}</p>
+
 <p><b>Location</b></p>
 <p><@helium_api_location_path location="${target.location}"/></p>
 
@@ -43,9 +48,17 @@ Description:
 <#if target.ifDependency?length == 0 && target.unlessDependency?length == 0>
 <p>No conditions on target execution.</p>
 </#if>
+
+<#if target.deprecated?length &gt; 0>
+    <h3>Deprecated :</h3>
+    <p>
+    ${target.deprecated}
+    </p>
+</#if>
 <hr/>
 
-<h3>Description</h3>
+
+<h3>Documentation</h3>
 <p>
 <#recurse target.documentation>
 </p>
@@ -74,49 +87,11 @@ Description:
 <h3>Property dependencies</h3>
 
 <#assign propertyList=target.propertyDependency?sort>
-
-<p> 
-<table class="docutils" width="50%">
-    <tr>
-        <th class="head">Name</th><th class="head">Edit status</th>
-    </tr>
-    <tr>
-        <td colspan="2">User editable properties</td>
-    </tr>
+<ul>
     <#list propertyList as property>
-        <#list data.heliumDataModel.property as propDataModel>
-            <#if property == propDataModel.name>
-                <#if propDataModel.editStatus == "must" || propDataModel.editStatus == "recommended" || propDataModel.editStatus == "allowed">
-                    <tr>
-                        <td><a href="property-${property}.html" title="${propDataModel.description}" target="classframe"><tt class="docutils literal">${property}</tt></a></td><td><a href="help.html" title="Help" target="classframe">${propDataModel.editStatus}</a></td>
-                    </tr>
-                </#if>
-            </#if>
-        </#list>
+    <li>${property}</li>
     </#list>
-    <tr>
-        <td colspan="2">Internal properties</td>
-    </tr>
-    <#list propertyList as property>
-        <#list data.heliumDataModel.property as propDataModel>
-            <#if property == propDataModel.name>
-                <#if propDataModel.editStatus == "never" || propDataModel.editStatus == "discouraged">
-                    <tr>
-                        <td><a href="property-${property}.html" title="${propDataModel.description}" target="classframe"><tt class="docutils literal">${property}</tt></a></td><td><a href="help.html" title="Help" target="classframe">${propDataModel.editStatus}</a></td>
-                    </tr>
-                </#if>
-            </#if>
-        </#list>
-    </#list>
-</table>
-</p>
-
-<#if target.deprecated?size &gt; 0>
-    <h3>Deprecated :</h3>
-    <p>
-    ${target.deprecated}
-    </p>
-</#if>
+</ul>
 <hr/>
 
 

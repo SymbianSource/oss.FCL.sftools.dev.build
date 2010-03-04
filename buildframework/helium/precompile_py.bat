@@ -18,5 +18,5 @@ rem
 
 setlocal
 @echo precompiling the archiving module to generate the .pyc files for running in parallel
-python %HELIUM_HOME%\tools\common\python\lib\createZipInput.py
+python -m CreateZipInput
 endlocal

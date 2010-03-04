@@ -20,6 +20,7 @@ Description:
 
 ============================================================================
 -->
+<!--* @package quality -->
 <project name="quality.mmp-to-target" xmlns:hlm="http://www.nokia.com/helium">
     <description>
         Generate the list of targets from the project files.

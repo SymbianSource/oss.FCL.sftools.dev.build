@@ -20,6 +20,7 @@ Description:
 
 ============================================================================
 -->
+<!--* @package framework -->
 <project name="libs">
     <description>
         Ant task definition declarations.
@@ -47,5 +48,6 @@ Description:
     
     <!-- Nokia internal tasks. -->
     <taskdef resource="com/nokia/ant/antlib.xml" classpathref="lib.path" uri="http://www.nokia.com/helium"/>
+    <taskdef resource="com/nokia/helium/ant/data/antlib.xml" classpathref="lib.path" uri="http://www.nokia.com/helium"/>
         
 </project>

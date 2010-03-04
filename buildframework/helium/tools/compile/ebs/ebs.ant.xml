@@ -20,6 +20,7 @@ Description:
 
 ============================================================================
 -->
+<!--* @package compile -->
 <project name="compile.ebs" xmlns:hlm="http://www.nokia.com/helium">
     <description>
         EBS compilation targets.
@@ -45,7 +46,6 @@ mySocket.close()
         <hlm:assertFileExists file="${genxml.output.file}"/>
         <hlm:compileEbsMacro input="${genxml.output.file}" log="${compile.log.dir}/${build.id}.${sysdef.configuration}_compile.log" />
         <!-- calculate below only if metadata is enabled, error is calculated before the signal is being sent.-->
-        <hlm:calculateErrorsFromLog logfile="${compile.log.dir}/${build.id}.${sysdef.configuration}_compile.log" />
     </target>
 
     

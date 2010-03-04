@@ -156,28 +156,9 @@ public class Database
         SAXReader xmlReader = new SAXReader();
         Document antDoc = xmlReader.read(new File(antFile));
 
-        XPath xpath = DocumentHelper.createXPath("//hlm:signalConfig");
+        XPath xpath = DocumentHelper.createXPath("//hlm:signalListenerConfig");
         xpath.setNamespaceURIs(map);
-
         List signalNodes = xpath.selectNodes(antDoc);
-        for (Iterator iterator = signalNodes.iterator(); iterator.hasNext();)
-        {
-            signaldoc = antDoc;
-            Element propertyNode = (Element) iterator.next();
-            String signalid = propertyNode.attributeValue("id");
-
-            String signaltarget = signalName(signalid, signaldoc);
-            List existinglist = globalSignalList.get(signaltarget);
-            String failbuild = signalType(signalid, signaldoc);
-            if (existinglist == null)
-                existinglist = new ArrayList<String>();
-            existinglist.add(signalid + "," + failbuild);
-            globalSignalList.put(signaltarget, existinglist);
-        }
-
-        xpath = DocumentHelper.createXPath("//hlm:signalListenerConfig");
-        xpath.setNamespaceURIs(map);
-        signalNodes = xpath.selectNodes(antDoc);
         for (Iterator iterator = signalNodes.iterator(); iterator.hasNext();)
         {
             signaldoc = antDoc;
@@ -194,23 +175,9 @@ public class Database
         }
     }
 
-    private String signalName(String signalid, Document antDoc)
-    {
-        XPath xpath = DocumentHelper.createXPath("//hlm:signalConfig[@id='" + signalid + "']/hlm:targetCondition");
-        xpath.setNamespaceURIs(map);
-        List signalNodes2 = xpath.selectNodes(antDoc);
-
-        for (Iterator iterator2 = signalNodes2.iterator(); iterator2.hasNext();)
-        {
-            Element propertyNode2 = (Element) iterator2.next();
-            return propertyNode2.attributeValue("name");
-        }
-        return null;
-    }
-
     private String signalType(String signalid, Document antDoc)
     {
-        XPath xpath2 = DocumentHelper.createXPath("//hlm:signalConfig[@id='" + signalid + "']/hlm:inputRef|//hlm:signalListenerConfig[@id='" + signalid + "']/signalNotifierInput/signalInput");
+        XPath xpath2 = DocumentHelper.createXPath("//hlm:signalListenerConfig[@id='" + signalid + "']/signalNotifierInput/signalInput");
         xpath2.setNamespaceURIs(map);
         List signalNodes3 = xpath2.selectNodes(antDoc);
 

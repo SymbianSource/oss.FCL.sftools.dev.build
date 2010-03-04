@@ -242,7 +242,7 @@ property:
         <name>eunit.test.package</name>
         <editStatus>recommended</editStatus>
         <type>string</type>
-        <description>The EUnit package name to be unzipped on the environment, for executing EUnit tests."</description>
+        <description>The EUnit package name to be unzipped on the environment, for executing EUnit tests.</description>
     </property>
     <property>
         <name>eunitexerunner.flags</name>
@@ -387,18 +387,6 @@ property:
         <editStatus>allowed</editStatus>
         <type>string</type>
         <description>This is the email template path where it updates the build status based on metadata database contents. The default file could (email_status.html.ftl under tools\common\template\log)be used as the base and any additional info could be added</description>
-    </property>
-    <property>
-        <name>build.logging.key.stages</name>
-        <editStatus>discouraged</editStatus>
-        <type>string</type>
-        <description> Defines which stages are considered as key stages and logged.</description>
-    </property>
-    <property>
-        <name>build.logging.start.stage</name>
-        <editStatus>discouraged</editStatus>
-        <type>string</type>
-        <description>Defines at which point logging is started.</description>
     </property>
     <property>
         <name>build.name</name>
@@ -576,12 +564,6 @@ property:
         <description>Version of S60(require cmaker.pp.version to be set) configuration to be exported</description>
     </property>
     <property>
-        <name>common.overlay.dir</name>
-        <editStatus>must</editStatus>
-        <type>string</type>
-        <description>Location of the common overlay.</description>
-    </property>
-    <property>
         <name>current.env.config</name>
         <editStatus>never</editStatus>
         <type>string</type>
@@ -616,12 +598,6 @@ property:
         <editStatus>allowed</editStatus>
         <type>string</type>
         <description>configuration for the japanese variant.</description>
-    </property>
-    <property>
-        <name>customer.makefile.target</name>
-        <editStatus>never</editStatus>
-        <type>string</type>
-        <description>Default makefile target for running customer iMaker ROM building.</description>
     </property>
     <property>
         <name>data.model.file</name>
@@ -792,6 +768,12 @@ property:
         <description>Ensures the cleanup-all target is called when the build finishes.</description>
     </property>
     <property>
+        <name>sbs.inputs.list</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>list of , separated input list, and each entry from list is arguments for sbs call.</description>
+    </property>
+    <property>
         <name>skip.sbs.parser.exception</name>
         <editStatus>allowed</editStatus>
         <type>string</type>
@@ -871,12 +853,6 @@ property:
         <description>this along with week.number used to find proper history file based on releases.</description>
     </property>
     <property>
-        <name>ec.scripts.dir</name>
-        <editStatus>discouraged</editStatus>
-        <type>string</type>
-        <description>ec scripts location</description>
-    </property>
-    <property>
         <name>ec.sysdef2make</name>
         <editStatus>never</editStatus>
         <type>string</type>
@@ -887,12 +863,6 @@ property:
         <editStatus>allowed</editStatus>
         <type>string</type>
         <description>Extra command line parameters for the sysdef2make call.</description>
-    </property>
-    <property>
-        <name>ec.tools.dir</name>
-        <editStatus>discouraged</editStatus>
-        <type>string</type>
-        <description>Location of EC-tools. Passed to environment variable EC_TOOLS_DIR, when calling ecbuild_electric.cmd to execute Electric Cloud build.</description>
     </property>
     <property>
         <name>email.ldap.server</name>
@@ -1025,18 +995,6 @@ property:
         <editStatus>allowed</editStatus>
         <type>string</type>
         <description>If defined it skips the buildtools emake patching.</description>
-    </property>
-    <property>
-        <name>ee_roms.log.file</name>
-        <editStatus>never</editStatus>
-        <type>string</type>
-        <description>ee log file location</description>
-    </property>
-    <property>
-        <name>ee.makefile.target</name>
-        <editStatus>allowed</editStatus>
-        <type>string</type>
-        <description>Defines make target that is run when creating engineer english images.</description>
     </property>
     <property>
         <name>epocroot</name>
@@ -1187,72 +1145,6 @@ property:
         <description>The tools dependencies Ivy settings configuration file.</description>
     </property>
     <property>
-        <name>loc.output.dir</name>
-        <editStatus>never</editStatus>
-        <type>string</type>
-        <description>The directory that will contain the zipped .loc files zip package.</description>
-    </property>
-    <property>
-        <name>loc.output.filename</name>
-        <editStatus>never</editStatus>
-        <type>string</type>
-        <description>The filename of the zip-loc-files target output zip file.</description>
-    </property>
-    <property>
-        <name>loc.temp.dir</name>
-        <editStatus>never</editStatus>
-        <type>string</type>
-        <description>The location of temporary directory used during zip-loc-files.</description>
-    </property>
-    <property>
-        <name>localisation.files.china</name>
-        <editStatus>recommended</editStatus>
-        <type>string</type>
-        <description>Localisation files for the China region.</description>
-    </property>
-    <property>
-        <name>localisation.files.japan</name>
-        <editStatus>recommended</editStatus>
-        <type>string</type>
-        <description>Localisation files for the Japan region.</description>
-    </property>
-    <property>
-        <name>localisation.files.western</name>
-        <editStatus>recommended</editStatus>
-        <type>string</type>
-        <description>Localisation files for the western region.</description>
-    </property>
-    <property>
-        <name>localisation.makefile.target</name>
-        <editStatus>allowed</editStatus>
-        <type>string</type>
-        <description>Makefile target that is executed when creating localised rom images (target localisation-roms).</description>
-    </property>
-    <property>
-        <name>localisation.s60locfiles.dir</name>
-        <editStatus>never</editStatus>
-        <type>string</type>
-        <description>Location of Series 60 localisation input files. Internal property that does not normally needs to be set.</description>
-    </property>
-    <property>
-        <name>localisation.tool</name>
-        <editStatus>never</editStatus>
-        <type>string</type>
-        <description>This key defines which tool should be used to localise the build area (localisation-mcss-localiser or localisation-s60-localiser).</description>
-    </property>
-    <property>
-        <name>localisation.buildfile</name>
-        <editStatus>never</editStatus>
-        <type>string</type>
-        <description>begining of the localisation buildfile name</description>
-    </property>
-    <property>
-        <name>isis_mktarget.list</name>
-        <editStatus>never</editStatus>
-        <type>string</type>
-        <description>Comma separated list of file names(main, what, check file names)</description>
-    </property>
-    <property>
         <name>log.build.build_id</name>
         <editStatus>never</editStatus>
         <type>string</type>
@@ -1329,12 +1221,6 @@ property:
         <editStatus>allowed</editStatus>
         <type>string</type>
         <description>how many parallel threads can run</description>
-    </property>
-    <property>
-        <name>overlays.log.file</name>
-        <editStatus>never</editStatus>
-        <type>string</type>
-        <description>The path to the overlays output log file.</description>
     </property>
     <property>
         <name>parse_abld_what.tool</name>
@@ -1494,14 +1380,8 @@ property:
         <description>Defines the name of the release note template used.</description>
     </property>
     <property>
-        <name>rombuild.using.var</name>
-        <editStatus>allowed</editStatus>
-        <type>boolean</type>
-        <description>Define this property if you build is using Symbian Binary Variation.</description>
-    </property>
-    <property>
         <name>rombuild.buildinfo.template</name>
-        <editStatus>never</editStatus>
+        <editStatus>allowed</editStatus>
         <type>string</type>
         <description>FMPP template to generate a buildinfo makefile.</description>
     </property>
@@ -1510,18 +1390,6 @@ property:
         <editStatus>never</editStatus>
         <type>string</type>
         <description>Location of the output file.</description>
-    </property>
-    <property>
-        <name>rombuild.makefile.name</name>
-        <editStatus>allowed</editStatus>
-        <type>string</type>
-        <description>The filename of the output makefile generated by Helium for iMaker.</description>
-    </property>
-    <property>
-        <name>roms.spec.name</name>
-        <editStatus>never</editStatus>
-        <type>string</type>
-        <description>Used to select spec-section in rom image configuration for building. Used only for makefpsx.</description>
     </property>
     <property>
         <name>s60.delta.config.prefix</name>
@@ -1554,12 +1422,6 @@ property:
         <description>The path to the subcon ROMs log.</description>
     </property>
     <property>
-        <name>subcon.makefile.target</name>
-        <editStatus>never</editStatus>
-        <type>string</type>
-        <description>The name of the makefile target for making subcon ROMs.</description>
-    </property>
-    <property>
         <name>subcon.zips.dir</name>
         <editStatus>never</editStatus>
         <type>string</type>
@@ -1576,24 +1438,6 @@ property:
         <editStatus>never</editStatus>
         <type>string</type>
         <description>Directory to store temporary files generated during the process.</description>
-    </property>
-    <property>
-        <name>trace.log.file</name>
-        <editStatus>never</editStatus>
-        <type>string</type>
-        <description>The path to the trace ROMs log.</description>
-    </property>
-    <property>
-        <name>trace.makefile.target</name>
-        <editStatus>never</editStatus>
-        <type>string</type>
-        <description>The name of the makefile target for making trace ROMs.</description>
-    </property>
-    <property>
-        <name>uda.makefile.target</name>
-        <editStatus>never</editStatus>
-        <type>string</type>
-        <description>The name of the makefile target for making UDA images.</description>
     </property>
     <property>
         <name>zip.ee.log.file</name>
@@ -1660,12 +1504,6 @@ property:
         <editStatus>recommended</editStatus>
         <type>string</type>
         <description>The amount of free space needed on the build machine in Mbs.</description>
-    </property>
-    <property>
-        <name>localisation.language.file</name>
-        <editStatus>never</editStatus>
-        <type>string</type>
-        <description>Defined where to find languages.xml.</description>
     </property>
     <property>
         <name>network.free.space</name>
@@ -1884,30 +1722,6 @@ property:
         <description>Java source files location for helium library</description>
     </property>
     <property>
-        <name>subcon.build.drive</name>
-        <editStatus>never</editStatus>
-        <type>string</type>
-        <description>Build drive for subcon build</description>
-    </property>
-    <property>
-        <name>subcon.prep.config.file</name>
-        <editStatus>must</editStatus>
-        <type>string</type>
-        <description> Subcon prep configuration file location </description>
-    </property>
-    <property>
-        <name>subcon.rombuild.config.file</name>
-        <editStatus>never</editStatus>
-        <type>string</type>
-        <description>A ROM configuration file for verifying subcon ROMS.</description>
-    </property>
-    <property>
-        <name>rombuild.config.file</name>
-        <editStatus>must</editStatus>
-        <type>string</type>
-        <description>This key defines where this parsed file will be located.</description>
-    </property>
-    <property>
         <name>rombuild.config.file.parsed</name>
         <editStatus>never</editStatus>
         <type>string</type>
@@ -1948,24 +1762,6 @@ property:
         <editStatus>never</editStatus>
         <type>string</type>
         <description>Unix password</description>
-    </property>
-    <property>
-        <name>image_creation.copyto</name>
-        <editStatus>never</editStatus>
-        <type>string</type>
-        <description>Path for copying the image files default is output/images</description>
-    </property>
-    <property>
-        <name>image_creation.drive</name>
-        <editStatus>never</editStatus>
-        <type>string</type>
-        <description>Drive (environment) to use for creating images</description>
-    </property>
-    <property>
-        <name>variant.image.targetpath</name>
-        <editStatus>never</editStatus>
-        <type>string</type>
-        <description>Path for copying the variant image files default is under output/variant_images</description>
     </property>
     <property>
         <name>zips.ee.spec.name</name>
@@ -2452,12 +2248,6 @@ property:
         <description>Location of ido variant</description>
     </property>
     <property>
-        <name>overlay.files.path</name>
-        <editStatus>never</editStatus>
-        <type>string</type>
-        <description>List of overlay files to scan overlay structure and create a report</description>
-    </property>
-    <property>
         <name>project.spec.name</name>
         <editStatus>allowed</editStatus>
         <type>string</type>
@@ -2499,6 +2289,69 @@ property:
         <type>string</type>
         <description>Temp release notes</description>
     </property>
+    <property>
+        <name>target.times.log.file</name>
+        <editStatus>allowed</editStatus>
+        <type>string</type>
+        <description>The location and name of the target times log file. Default value is: ${build.log.dir}/${build.id}_targetTimesLog.csv</description>
+    </property>
+    
+    
+    <property>
+        <name>coverity.analyze.dir</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>coverity analyze directory location</description>
+    </property>
+    <property>
+        <name>coverity.config.dir</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>coverity config directory location</description>
+    </property>
+    <property>
+        <name>coverity.inter.dir</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>coverity intermidiate directory location</description>
+    </property>
+    <property>
+        <name>coverity.link.dir</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>coverity link directory location</description>
+    </property>
+    <property>
+        <name>coverity.log.dir</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>coverity log directory location</description>
+    </property>
+    <property>
+        <name>coverity.no.thread</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>Number of parallel coverity emit threads can run.</description>
+    </property>
+    <property>
+        <name>coverity.output.dir</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>coverity output directory location</description>
+    </property>
+    <property>
+        <name>coverity.report.dir</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>coverity report directory location</description>
+    </property>
+    <property>
+        <name>coverity.report.file</name>
+        <editStatus>never</editStatus>
+        <type>string</type>
+        <description>coverity report file name</description>
+    </property>
+    
     
     <group>
         <name>Environment</name>
@@ -2522,7 +2375,6 @@ property:
         <propertyRef usage="optional">ado.quality.dirs.path</propertyRef>
         <propertyRef usage="optional">s60.getenv.path</propertyRef>
         <propertyRef usage="optional">ido.variant</propertyRef>
-        <propertyRef usage="optional">overlay.files.path</propertyRef>
     </group>
     <group>
         <name>localFreeSpace</name>
@@ -2557,23 +2409,7 @@ property:
     <group>
         <name>rombuild</name>
         <description>Creating ROM images.</description>
-        <propertyRef usage="optional">rombuild.config.file</propertyRef>
         <propertyRef usage="optional">rombuild.config.file.parsed</propertyRef>
-        <propertyRef usage="required">roms.spec.name</propertyRef>
-        <propertyRef usage="optional">rombuild.using.var</propertyRef>
-    </group>
-    <!--<group>
-        <name>uda</name>
-        <description>Creating UDA images.</description>
-        <propertyRef usage="required">uda.config</propertyRef>
-        <propertyRef usage="required">uda.config.name</propertyRef>
-    </group>-->
-    <group>
-        <name>subcon</name>
-        <description>Creating a subcon build area and testing the creation of subcon images.</description>
-        <propertyRef usage="optional">subcon.build.drive</propertyRef>
-        <propertyRef usage="optional">subcon.prep.config.file</propertyRef>
-        <propertyRef usage="optional">subcon.rombuild.config.file</propertyRef>
     </group>
     <group>
         <name>archive</name>
@@ -2662,13 +2498,12 @@ property:
         <propertyRef usage="optional">ec.makefile.file</propertyRef>
         <propertyRef usage="optional">ec.maxagents</propertyRef>
         <propertyRef usage="optional">ec.history.option</propertyRef>
-        <propertyRef usage="optional">ec.scripts.dir</propertyRef>
         <propertyRef usage="optional">ec.sysdef2make</propertyRef>
         <propertyRef usage="optional">ec.sysdef2make.cmdline</propertyRef>
-        <propertyRef usage="optional">ec.tools.dir</propertyRef>
         <propertyRef usage="optional">ec.build.class</propertyRef>
         <propertyRef usage="optional">schema.new</propertyRef>
         <propertyRef usage="optional">sbs.implicit.tools.build</propertyRef>
+        <propertyRef usage="optional">sbs.inputs.list</propertyRef>
         <propertyRef usage="optional">sbs.tools.config</propertyRef>
         <propertyRef usage="optional">ec.mem.limit</propertyRef>
         <propertyRef usage="optional">skip.compile-ec-patch</propertyRef>
@@ -2724,22 +2559,6 @@ property:
         <propertyRef usage="optional">diamonds.build.url</propertyRef>
         <propertyRef usage="optional">diamonds.target.list.to.log</propertyRef>
         <propertyRef usage="optional">diamonds.log.file</propertyRef>
-    </group>
-    <group>
-        <name>Localisation</name>
-        <description/>
-        <propertyRef usage="optional">loc.output.dir</propertyRef>
-        <propertyRef usage="optional">loc.output.filename</propertyRef>
-        <propertyRef usage="optional">loc.temp.dir</propertyRef>
-        <propertyRef usage="optional">localisation.files.china</propertyRef>
-        <propertyRef usage="optional">localisation.files.japan</propertyRef>
-        <propertyRef usage="optional">localisation.files.western</propertyRef>
-        <propertyRef usage="optional">localisation.makefile.target</propertyRef>
-        <propertyRef usage="optional">localisation.s60locfiles.dir</propertyRef>
-        <propertyRef usage="optional">localisation.tool</propertyRef>
-        <propertyRef usage="optional">localisation.buildfile</propertyRef>
-        <propertyRef usage="optional">isis_mktarget.list</propertyRef>
-        <propertyRef usage="optional">localisation.language.file</propertyRef>
     </group>
     <group>
         <name>ATS</name>
@@ -2832,8 +2651,6 @@ property:
         <propertyRef usage="optional">build.signal.status.dir</propertyRef>
         <propertyRef usage="optional">build.status.email.template</propertyRef>
         <propertyRef usage="optional">build.log</propertyRef>
-        <propertyRef usage="optional">build.logging.key.stages</propertyRef>
-        <propertyRef usage="optional">build.logging.start.stage</propertyRef>
         <propertyRef usage="optional">build.name</propertyRef>
         <propertyRef usage="optional">build.output.dir</propertyRef>
         <propertyRef usage="optional">build.property.cache.file</propertyRef>
@@ -2851,7 +2668,6 @@ property:
         <propertyRef usage="optional">codescanner.config</propertyRef>
         <propertyRef usage="optional">codescanner.format</propertyRef>
         <propertyRef usage="optional">codescanner.log.unique</propertyRef>
-        <propertyRef usage="optional">common.overlay.dir</propertyRef>
         <propertyRef usage="optional">compile.signal.input</propertyRef>
         <propertyRef usage="optional">compile.symbianos</propertyRef>
         <propertyRef usage="optional">compile.sysdef.dtd.stub</propertyRef>
@@ -2863,7 +2679,6 @@ property:
         <propertyRef usage="optional">ctool.region.china</propertyRef>
         <propertyRef usage="optional">ctool.western.conf</propertyRef>
         <propertyRef usage="optional">current.env.config</propertyRef>
-        <propertyRef usage="optional">customer.makefile.target</propertyRef>
         <propertyRef usage="optional">data.model.file</propertyRef>
         <propertyRef usage="optional">data.model.parsed</propertyRef>
         <propertyRef usage="optional">database.file</propertyRef>
@@ -2874,8 +2689,6 @@ property:
         <propertyRef usage="optional">documentation.path</propertyRef>
         <propertyRef usage="optional">documentation.url.root</propertyRef>
         <propertyRef usage="optional">ec.mode</propertyRef>
-        <propertyRef usage="optional">ee.makefile.target</propertyRef>
-        <propertyRef usage="optional">ee_roms.log.file</propertyRef>
         <propertyRef usage="optional">epocroot</propertyRef>
         <propertyRef usage="optional">error.email.to.list</propertyRef>
         <propertyRef usage="optional">eunit.prepare.zip</propertyRef>
@@ -2907,8 +2720,6 @@ property:
         <propertyRef usage="optional">ido.keep.old</propertyRef>
         <propertyRef usage="optional">ido.romtree</propertyRef>
         <propertyRef usage="optional">ido.template.robot.ready</propertyRef>
-        <propertyRef usage="optional">image_creation.copyto</propertyRef>
-        <propertyRef usage="optional">image_creation.drive</propertyRef>
         <propertyRef usage="optional">imaker.command</propertyRef>
         <propertyRef usage="optional">imaker.fmpp.ant</propertyRef>
         <propertyRef usage="optional">imaker.fmpp.makefile</propertyRef>
@@ -2931,7 +2742,6 @@ property:
         <propertyRef usage="optional">notes.release.dir</propertyRef>
         <propertyRef usage="optional">notes.server</propertyRef>
         <propertyRef usage="optional">number.of.threads</propertyRef>
-        <propertyRef usage="optional">overlays.log.file</propertyRef>
         <propertyRef usage="optional">parse_abld_what.tool</propertyRef>
         <propertyRef usage="optional">prep.build.dir</propertyRef>
         <propertyRef usage="optional">prep.delivery.modificationset</propertyRef>
@@ -2948,7 +2758,6 @@ property:
         <propertyRef usage="optional">remote.builds.config.file</propertyRef>
         <propertyRef usage="optional">required.ant.version</propertyRef>
         <propertyRef usage="optional">robot.email.to</propertyRef>
-        <propertyRef usage="optional">rombuild.makefile.name</propertyRef>
         <propertyRef usage="optional">s60.delta.config.prefix</propertyRef>
         <propertyRef usage="optional">s60.getenv.trigger.location</propertyRef>
         <propertyRef usage="optional">sbs.config</propertyRef>
@@ -2961,19 +2770,15 @@ property:
         <propertyRef usage="optional">src.dir</propertyRef>
         <propertyRef usage="optional">src</propertyRef>
         <propertyRef usage="optional">subcon.log.file</propertyRef>
-        <propertyRef usage="optional">subcon.makefile.target</propertyRef>
         <propertyRef usage="optional">subcon.zips.dir</propertyRef>
         <propertyRef usage="optional">sysdef.clean.configurations.list</propertyRef>
         <propertyRef usage="optional">team</propertyRef>
         <propertyRef usage="optional">teamlevel.ci.system</propertyRef>
         <propertyRef usage="optional">teamlevel.folder.number</propertyRef>
         <propertyRef usage="optional">temp.build.dir</propertyRef>
-        <propertyRef usage="optional">trace.log.file</propertyRef>
-        <propertyRef usage="optional">trace.makefile.target</propertyRef>
         <propertyRef usage="optional">tracing.csv.file</propertyRef>
         <propertyRef usage="optional">tsrc.data.dir</propertyRef>
         <propertyRef usage="optional">tsrc.path.list</propertyRef>
-        <propertyRef usage="optional">uda.makefile.target</propertyRef>
         <propertyRef usage="optional">unix.password.available</propertyRef>
         <propertyRef usage="optional">unix.password</propertyRef>
         <propertyRef usage="optional">unix.username.available</propertyRef>
@@ -2981,7 +2786,6 @@ property:
         <propertyRef usage="optional">unsubst.after.build</propertyRef>
         <propertyRef usage="optional">validate.policy.log.xml</propertyRef>
         <propertyRef usage="optional">validate.properties.at.startup</propertyRef>
-        <propertyRef usage="optional">variant.image.targetpath</propertyRef>
         <propertyRef usage="optional">week.number</propertyRef>
         <propertyRef usage="optional">zip.ee.log.file</propertyRef>
         <propertyRef usage="optional">zip.localised.log.file</propertyRef>
@@ -3005,6 +2809,7 @@ property:
         <propertyRef usage="optional">exceptions.target</propertyRef>
         <propertyRef usage="optional">ant.loglevel</propertyRef>
         <propertyRef usage="optional">project.spec.name</propertyRef>
+        <propertyRef usage="optional">target.times.log.file</propertyRef>
     </group>
     <group>
         <name>Documentation</name>
@@ -3029,5 +2834,18 @@ property:
         <propertyRef usage="optional">s60.release</propertyRef>
         <propertyRef usage="optional">bom.log</propertyRef>
         <propertyRef usage="required">build.number</propertyRef>
+    </group>
+    <group>
+        <name>coverity</name>
+        <description>Coverity Prevent code coverage tool Properties</description>
+        <propertyRef usage="optional">coverity.analyze.dir</propertyRef>
+        <propertyRef usage="optional">coverity.config.dir</propertyRef>
+        <propertyRef usage="optional">coverity.inter.dir</propertyRef>
+        <propertyRef usage="optional">coverity.link.dir</propertyRef>
+        <propertyRef usage="optional">coverity.log.dir</propertyRef>
+        <propertyRef usage="optional">coverity.no.thread</propertyRef>
+        <propertyRef usage="optional">coverity.output.dir</propertyRef>
+        <propertyRef usage="optional">coverity.report.dir</propertyRef>
+        <propertyRef usage="optional">coverity.report.file</propertyRef>
     </group>
 </heliumDataModel>

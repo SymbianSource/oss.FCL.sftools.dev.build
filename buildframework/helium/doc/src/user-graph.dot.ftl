@@ -55,14 +55,9 @@ strict digraph G {
     
     subgraph cluster_2 {
         node [style=filled];
+        "ROM Image" -> "Helium Stages"[dir=none];
         <#if !(ant?keys?seq_contains("sf"))>
-            "ROM Image" -> "Variant Creation"[dir=none];
-            "Variant Creation" -> "Helium Stages"[dir=none];
             "Helium Stages" -> "Helium Nokia Stages"[dir=none];
-            "Helium Nokia Stages" -> "SDK Creation"[dir=none];
-        <#else>
-            "ROM Image" -> "Variant Creation"[dir=none];
-            "Variant Creation" -> "Helium Stages"[dir=none];
         </#if>
         label = "Advanced";
     }
@@ -94,7 +89,6 @@ strict digraph G {
             Raptor [fontcolor=navyblue,fontsize=12,shape=box,href="http://s60wiki.nokia.com/S60Wiki/Raptor"];
             "Electric Cloud" [fontcolor=navyblue,fontsize=12,shape=box,href="http://www.connecting.nokia.com/nmp/tpm/nmpglosw.nsf/document/ES21T6K9FM4?OpenDocument"];
             ATS [fontcolor=navyblue,fontsize=12,shape=box,href="manual/stages.html#stage-ats3-stif-and-eunit"];
-            BlackTusk [fontcolor=navyblue,fontsize=12,shape=box,href="nokia/blacktusk/howto-setup-blacktusk-with-helium.html"];
     }
     </#if>
     
@@ -110,7 +104,7 @@ strict digraph G {
     Start -> "ROM Image" [lhead=cluster_2];
     Start -> "Helium Developer Guide" [lhead=cluster_4];
     <#if !(ant?keys?seq_contains("sf"))>
-        "SDK Creation" -> "Electric Cloud"[dir=none, lhead=cluster_2_1, ltail=cluster_2];
+        "Helium Nokia Stages" -> "Electric Cloud"[dir=none, lhead=cluster_2_1, ltail=cluster_2];
     </#if>
     "DOS Scripting" -> NOSE[dir=none, lhead=cluster_4_1, ltail=cluster_4];
    
@@ -129,9 +123,7 @@ strict digraph G {
     "Configure Helium" [fontcolor=navyblue,fontsize=12,shape=box,href="manual/configuring.html"];
     "Helium Stages" [fontcolor=navyblue,fontsize=12,shape=box,href="manual/stages.html"];
     
-
     "ROM Image" [fontcolor=navyblue,fontsize=12,shape=box,href="tutorials/rom_image.html"];
-    "Variant Creation" [fontcolor=navyblue,fontsize=12,shape=box,href="tutorials/variant.html"];
     
     <#if !(ant?keys?seq_contains("sf"))>
         "Setting up Helium at Nokia" [fontcolor=navyblue,fontsize=12,shape=box,href="nokia/nokia.html"];
@@ -140,7 +132,6 @@ strict digraph G {
         "Helium Wiki" [fontcolor=navyblue,fontsize=12,shape=box,href="http://delivery.nmp.nokia.com/trac/helium/wiki"];
         "Helium Forum" [fontcolor=navyblue,fontsize=12,shape=box,href="http://forums.connecting.nokia.com/forums/forum.jspa?forumID=262"];
         MCL [fontcolor=navyblue,fontsize=12,shape=box,href="http://s60wiki.nokia.com/S60Wiki/S60_Software_Asset_Management/Organization/Delivery_Services/Howto_build_DFS70.91.91_/_S60.MCL_with_Helium"];
-        "SDK Creation" [fontcolor=navyblue,fontsize=12,shape=box,href="nokia/rndsdk_user_manual.html"];
         IDO [fontcolor=navyblue,fontsize=12,shape=box,href="ido/index.html"];
         TeamCI [fontcolor=navyblue,fontsize=12,shape=box,href="teamci/index.html"];
         "Helium Test Plan" [fontcolor=navyblue,fontsize=12,shape=box,href="nokia/testing.html"];

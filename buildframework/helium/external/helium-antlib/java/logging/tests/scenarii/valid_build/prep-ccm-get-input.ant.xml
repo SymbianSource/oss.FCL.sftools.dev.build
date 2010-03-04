@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : prep-ccm-get-input.ant.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="prep-ccm-get-input" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>Helium Antlib Logging unittests.</description>
+        
+    
+    <property environment="env"/>
+    
+    
+    <target name="prep-ccm-get-input" depends="get-synergy-password">
+        
+        <echo>synergy.password=${synergy.password}</echo>
+        <antcall target="prep">
+            <param name="display" value="Inside prep target for second time"/>
+        </antcall>
+        <hlm:record name="${build.log.dir}/${build.id}_init.log" action="start" loglevel="info">
+            <hlm:recordfilter category="synergy" regexp="${synergy.password}" />
+        </hlm:record>
+        <echo>synergy.password=${synergy.password}</echo>
+        
+        <hlm:record name="${build.log.dir}/${build.id}_init.log" action="stop" append="true" />
+        <antcall target="ccm-get-input"/>
+        
+    </target>
+    
+    <target name="prep">
+        <echo> Hello... Inside Prep target ${display}</echo>
+    </target>
+    
+    <target name="ccm-get-input">
+        <echo> Hello... Inside ccm-get-input target </echo>
+    </target>
+    
+    <target name="get-synergy-password">
+        <property name="synergy.password" value="ccmpassword"/>
+        <hlm:logreplace regexp="${synergy.password}"/>
+        <echo>synergy.password=${synergy.password}</echo>
+    </target>
+    
+
+</project>

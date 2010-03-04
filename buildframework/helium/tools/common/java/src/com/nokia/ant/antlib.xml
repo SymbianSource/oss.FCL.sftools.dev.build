@@ -23,36 +23,21 @@ Description:
 <antlib>
    
     <taskdef name="antdependency" classname="com.nokia.ant.taskdefs.AntDependencyTask"/>
-    <taskdef name="antlint" classname="com.nokia.ant.taskdefs.AntLintTask"/>
     <taskdef name="ccm" classname="com.nokia.ant.taskdefs.CcmTask" onerror="report"/>
     <taskdef name="configuration" classname="com.nokia.ant.taskdefs.AntConfigurationTask"/>
     <taskdef name="coveragerecord" classname="com.nokia.ant.taskdefs.CoverageRecorderTask"/>
-    <taskdef name="database" classname="com.nokia.ant.taskdefs.DatabaseTask"/>
     <taskdef name="deconfigure" classname="com.nokia.ant.taskdefs.DeconfigureTask"/>
     <taskdef name="fastcopy" classname="com.nokia.ant.taskdefs.CopyParallelTask"/>
-    <!-- <taskdef name="getVariableValue" classname="com.nokia.ant.taskdefs.GetValueFromVariableSet"/> -->
     <taskdef name="logrecord" classname="com.nokia.ant.taskdefs.LogRecorderTask"/>
     <taskdef name="logtoconsole" classname="com.nokia.ant.taskdefs.StopLogToConsole"/>
     <taskdef name="parsemodel" classname="com.nokia.ant.taskdefs.ModelPropertiesTask"/>
-    <taskdef name="python" classname="com.nokia.ant.taskdefs.PythonTask"/>
+    
     <taskdef name="rebaseline" classname="com.nokia.ant.taskdefs.RebaselineTask"/>
-    <taskdef name="hlmassertmessage" classname="com.nokia.ant.taskdefs.HlmAssertMessage"/>
-    <taskdef name="retry" classname="com.nokia.ant.taskdefs.RetryTask"/>
     <taskdef name="rebaseanddeconf" classname="com.nokia.ant.taskdefs.RBTTask"/>
-    <typedef name="ldap" classname="com.nokia.ant.taskdefs.LDAP" />
-    
-    <!-- <typedef name="arg" classname="com.nokia.ant.types.Variable"/> -->
-    <!-- <typedef name="cmdVar" classname="com.nokia.ant.types.Variable"/> -->
-    <!-- <typedef name="makeOption" classname="com.nokia.ant.types.Variable"/> -->
-    
-    <!-- <typedef name="argSet" classname="com.nokia.ant.types.VariableSet"/> --> 
-    <!-- <typedef name="cmdVarSet" classname="com.nokia.ant.types.VariableSet"/> -->
-    
+        
     <typedef name="logfilter" classname="com.nokia.ant.types.LogFilter"/> 
     <typedef name="logfilterset" classname="com.nokia.ant.types.LogFilterSet"/>
     
-    <typedef name="prettyprintxml" classname="com.nokia.ant.filters.PrettyPrintXmlFilter"/>
-    <!-- <typedef name="sbsMakeOptions" classname="com.nokia.ant.types.SBSMakeOptions"/> -->
     <typedef name="session" classname="com.nokia.ant.types.ccm.Session"/> 
     <typedef name="sessionset" classname="com.nokia.ant.types.ccm.SessionSet"/> 
     <typedef name="typedef" classname="com.nokia.ant.TypedefURIFix"/>

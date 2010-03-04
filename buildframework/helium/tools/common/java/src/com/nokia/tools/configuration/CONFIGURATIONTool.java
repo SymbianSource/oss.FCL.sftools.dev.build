@@ -31,7 +31,7 @@ public class CONFIGURATIONTool implements Tool {
      * Sets the command line variables to be used to execute and validates for
      * the required parameters
      * 
-     * @param VariableSet
+     * @param varSet
      *            variable(name / value list)
      */
     public void execute(VariableSet varSet, Project prj)

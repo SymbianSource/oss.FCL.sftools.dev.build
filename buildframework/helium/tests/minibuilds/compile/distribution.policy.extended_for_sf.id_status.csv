@@ -1,0 +1,5 @@
+ID,Include in build?,Regexp,Symbian Foundation License,Eclipse Public License,Supplier,Description,Contact,Other Notes
+0,Yes,Nokia,,,Nokia,Free to deliver,,
+1,No,Nokia,,,Nokia,Nokia internal sw,,
+3,Yes,Nokia,Yes,No,Nokia,Symbian Foundation License,,
+7,Yes,Nokia,No,Yes,Nokia,Eclipse Public License,,

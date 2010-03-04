@@ -1,0 +1,352 @@
+<?xml version="1.0"?>
+<!-- 
+============================================================================ 
+Name        : func_add_test.ant.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test-metadata-regex" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>Helium Antlib metadata unittests.</description>
+    
+    <dirname property="project.dir" file="${ant.file.test-metadata-regex}" />
+
+    <path id="lib.path">
+        <fileset dir="${project.dir}/../../../../bin" includes="*.jar"/>
+    </path>
+    
+    <taskdef resource="com/nokia/helium/metadata/ant/antlib.xml" classpathref="lib.path" uri="http://www.nokia.com/helium" />
+    <taskdef name="fmpp" classname="fmpp.tools.AntTask" classpathref="lib.path" onerror="report"/>
+
+
+    <hlm:metadatafilterset id="all-regex-filterfile">
+        <metadatafilterset filterfile="${project.dir}/../data/metadata_regex.csv" />
+    </hlm:metadatafilterset>
+
+    <target name="s60-clean-log">
+        <delete file="${project.dir}/../output/log_s60_filterfile.sqlite" failonerror="false"/>
+        <echo message="all regular expression validation" />
+        <echo message="database:${project.dir}/../output/log_s60_filterfile.sqlite" />
+        <hlm:metadatarecord database="${project.dir}/../output/log_s60_filterfile.sqlite">
+            <hlm:sbsmetadatainput>
+                <fileset dir="${project.dir}/../data/">
+                    <include  name="mcl_7952_200950_wk50_02_dfs_build_sf_armv5.log"/>
+                </fileset>
+                <metadatafilterset refid="all-regex-filterfile" />
+            </hlm:sbsmetadatainput>
+        </hlm:metadatarecord>
+    </target>
+
+
+    <hlm:metadatafilterset id="text_log_metadata_input">
+        <metadatafilterset filterfile="${project.dir}/../data/common.csv" />
+    </hlm:metadatafilterset>
+
+
+    <target name="log-metadata-input">
+        <delete file="${project.dir}/../output/log_text_metadata_input.sqlite" failonerror="false" />
+        <echo message="text log metadata input validation" />
+        <echo message="database:${project.dir}/../output/log_text_metadata_input.sqlite" />
+        <parallel>
+            <hlm:metadatarecord database="${project.dir}/../output/log_text_metadata_input.sqlite">
+                <hlm:sbsmetadatainput>
+                    <fileset dir="${project.dir}/../data/">
+                        <include  name="mcl_7952_201002_wk02_010_dfs_build_sf_tools.log"/>
+                    </fileset>
+                    <metadatafilterset refid="text_log_metadata_input" />
+                </hlm:sbsmetadatainput>
+            </hlm:metadatarecord>
+            <!--
+            <hlm:metadatarecord database="${project.dir}/../output/log_text_metadata_input.sqlite">
+                <hlm:textmetadatainput>
+                    <fileset dir="${project.dir}/../data/">
+                        <include  name="pf_5250_2009_wk50_TUE.roms_part1.log"/>
+                    </fileset>
+                    <metadatafilterset refid="text_log_metadata_input" />
+                </hlm:textmetadatainput>
+            </hlm:metadatarecord>
+            -->
+        </parallel>
+    </target>
+
+    <target name="log-metadata-read">
+        <delete file="${project.dir}/../output/log_text_metadata_input.sqlite" failonerror="false" />
+        <echo message="text log metadata input validation" />
+        <echo message="database:${project.dir}/../output/log_text_metadata_input.sqlite" />
+        <parallel>
+            <hlm:metadataread database="${project.dir}/../output/log_text_metadata_input.sqlite">
+                <fileset dir="${project.dir}/../data/">
+                    <include  name="pf_5250_2009_wk50_TUE.roms.log"/>
+                </fileset>
+            </hlm:metadataread>
+            
+            <hlm:metadataread database="${project.dir}/../output/log_text_metadata_input.sqlite">
+                <fileset dir="${project.dir}/../data/">
+                    <include  name="pf_5250_2009_wk50_TUE.roms1.log"/>
+                </fileset>
+            </hlm:metadataread>
+        </parallel>
+    </target>
+
+    <target name="parallel-record_test">
+        <!-- <delete file="${project.dir}/../output/s60_parallel.sqlite" failonerror="false" /> -->
+        <!-- 
+        <parallel>
+            <sequential>
+                <echo message="sbs parallel input validation" />
+                <echo message="database:${project.dir}/../output/s60_parallel.db" />
+                <hlm:metadatarecord database="${project.dir}/../output/s60_parallel.sqlite">
+                    <hlm:sbsmetadatainput>
+                        <fileset dir="${project.dir}/../data/">
+                            <include  name="*s60_1.log"/>
+                        </fileset>
+                        <metadatafilterset refid="text_log_metadata_input" />
+                    </hlm:sbsmetadatainput>
+                </hlm:metadatarecord>
+            </sequential>
+            <sequential>
+                <echo message="sbs parallel input validation" />
+                <echo message="database:${project.dir}/../output/s60_parallel.sqlite" />
+                <hlm:metadatarecord database="${project.dir}/../output/s60_parallel.sqlite">
+                    <hlm:sbsmetadatainput>
+                        <fileset dir="${project.dir}/../data/">
+                            <include  name="*s60_2.log"/>
+                        </fileset>
+                        <metadatafilterset refid="text_log_metadata_input" />
+                    </hlm:sbsmetadatainput>
+                </hlm:metadatarecord>
+            </sequential>
+            <sequential>
+                <echo message="sbs parallel input validation" />
+                <echo message="database:${project.dir}/../output/s60_parallel.sqlite" />
+                <hlm:metadatarecord database="${project.dir}/../output/s60_parallel.sqlite">
+                    <hlm:sbsmetadatainput>
+                        <fileset dir="${project.dir}/../data/">
+                            <include  name="*s60_3.log"/>
+                        </fileset>
+                        <metadatafilterset refid="text_log_metadata_input" />
+                    </hlm:sbsmetadatainput>
+                </hlm:metadatarecord>
+            </sequential>
+        </parallel> -->
+        <fmpp sourceFile="${project.dir}/../../src/templates/scan2.html.ftl"
+                     outputfile="${project.dir}/../output/s60_scan2.html">
+            <freemarkerLinks expandProperties="yes">
+                macro: ${project.dir}/../../src/templates
+            </freemarkerLinks>
+            <data expandProperties="yes">
+                dbPath: ${project.dir}/../output/s60_parallel.sqlite
+                doc: xml(${project.dir}/../data/s60_info.xml)
+                ant: antProperties()
+            </data>
+        </fmpp>
+        <hlm:generateBuildStatus dbfile="${project.dir}/../output/s60_parallel.sqlite" output-dir="${env.TEMP}" file="test-scanlog-metadata-1.log"/>
+    </target>
+
+
+    <target name="all-s60-logs">
+        <delete file="${project.dir}/../output/all_s60_logs_db" failonerror="false" />
+        <echo message="all s60 logs being processed" />
+        <hlm:metadatarecord database="${project.dir}/../output/all_s60_logs_db">
+            <hlm:sbsmetadatainput>
+                <fileset dir="${project.dir}/../data/s60_logs/logs/compile">
+                    <include  name="92_7952_RAPTOR_201004_wk04_02_dfs_build_export.log"/>
+                    <include  name="92_7952_RAPTOR_201004_wk04_02.qt_tools2_compile.log"/>
+                    <include  name="92_7952_RAPTOR_201004_wk04_02_dfs_build_ncp_dfs_variants.log"/>
+                    <include  name="92_7952_RAPTOR_201004_wk04_02_dfs_build_ncp_tools.log"/>
+                    <include  name="92_7952_RAPTOR_201004_wk04_02_dfs_build_sf_dfs_variants.log"/>
+                    <include  name="92_7952_RAPTOR_201004_wk04_02_dfs_build_sf_tools.log"/>
+                    <include  name="92_7952_RAPTOR_201004_wk04_02_s60_bldmelast_arm9e.log"/>
+                </fileset>
+                <metadatafilterset refid="all-regex-filterfile" />
+            </hlm:sbsmetadatainput>
+        </hlm:metadatarecord>
+    </target>
+
+    <target name="all-ido-logs">
+        <delete file="${project.dir}/../output/all_ido_logs.sqlite" failonerror="false" />
+        <echo message="text log metadata input validation" />
+        <hlm:metadatarecord database="${project.dir}/../output/all_ido_logs.sqlite">
+            <hlm:textmetadatainput>
+                <fileset dir="${project.dir}/../data/ido_logs">
+                    <include  name="*.log"/>
+                    <exclude name="*_ant_*.log"/>
+                </fileset>
+                <metadatafilterset refid="text_log_metadata_input" />
+            </hlm:textmetadatainput>
+            <hlm:antmetadatainput>
+                <fileset dir="${project.dir}/../data/ido_logs">
+                    <include  name="*_ant_*.log"/>
+                </fileset>
+                <metadatafilterset refid="text_log_metadata_input" />
+            </hlm:antmetadatainput>
+        </hlm:metadatarecord>
+    </target>
+
+    <target name="abld-ido-logs">
+        <delete file="${project.dir}/../output/abld_ido_logs.sqlite" failonerror="false" />
+        <echo message="text log metadata input validation" />
+        <hlm:metadatarecord database="${project.dir}/../output/abld_ido_logs.sqlite">
+            <hlm:abldmetadatainput>
+                <fileset dir="${project.dir}/../data/ido_abld_logs">
+                    <include  name="*_compile*.log"/>
+                </fileset>
+                <metadatafilterset refid="text_log_metadata_input" />
+            </hlm:abldmetadatainput>
+        </hlm:metadatarecord>
+    </target>
+
+    <target name="test-old-schema">
+        <copy file="${project.dir}/../output/old_schema_log.sqlite" 
+            tofile="${project.dir}/../output/old_schema_log.sqlite_bak" />
+        <echo message="text log metadata input validation" />
+        <hlm:metadatarecord database="${project.dir}/../output/old_schema_log.sqlite">
+            <hlm:abldmetadatainput>
+                <fileset dir="${project.dir}/../data">
+                    <include  name="sample_abld.log"/>
+                </fileset>
+                <metadatafilterset refid="text_log_metadata_input" />
+            </hlm:abldmetadatainput>
+        </hlm:metadatarecord>
+
+        <delete file="${project.dir}/../output/old_schema_log.sqlite" />
+        <copy file="${project.dir}/../output/old_schema_log.sqlite_bak" 
+            tofile="${project.dir}/../output/old_schema_log.sqlite"
+            failonerror="false" />
+        
+    </target>
+
+    <target name="ant-ido-logs">
+        <delete file="${project.dir}/../output/ant_ido_logs.sqlite" failonerror="false" />
+        <echo message="text log metadata input validation" />
+        <hlm:metadatarecord database="${project.dir}/../output/ant_ido_logs.sqlite">
+            <hlm:antmetadatainput>
+                <fileset dir="${project.dir}/../data/ido_logs">
+                    <include  name="*_ant_*.log"/>
+                </fileset>
+                <metadatafilterset refid="text_log_metadata_input" />
+            </hlm:antmetadatainput>
+        </hlm:metadatarecord>
+    </target>
+
+    <target name="readdata">
+        <delete file="${project.dir}/../output/readdata.html" failonerror="false" />
+        <fmpp sourceFile="${project.dir}/../../src/templates/readdata.xml.ftl"
+                     outputfile="${project.dir}/../output/readdata.html">
+            <freemarkerLinks expandProperties="yes">
+                macro: ${project.dir}/../../src/templates
+            </freemarkerLinks>
+            <data expandProperties="yes">
+                dbPath: ${project.dir}/../output/log_text_metadata_input.sqlite
+                ant: antProperties()
+            </data>
+        </fmpp>
+    </target>
+
+    <target name="readormdata">
+        <delete file="${project.dir}/../output/readdata.html" failonerror="false" />
+        <fmpp sourceFile="${project.dir}/../../src/templates/readormdata.xml.ftl"
+                     outputfile="${project.dir}/../output/readdata.html">
+            <freemarkerLinks expandProperties="yes">
+                macro: ${project.dir}/../../src/templates
+            </freemarkerLinks>
+            <data expandProperties="yes">
+                dbPath: ${project.dir}/../output/log_text_metadata_input.sqlite
+                logFile: mcl_7952_201002_wk02_010_dfs_build_sf_tools.log
+                ant: antProperties()
+            </data>
+        </fmpp>
+    </target>
+
+    <target name="generatescanlog">
+        <delete file="${project.dir}/../output/scan2.html" failonerror="false" />
+        <fmpp sourceFile="${project.dir}/../../src/templates/scan2.html.ftl"
+                     outputfile="${project.dir}/../output/scan2.html">
+            <freemarkerLinks expandProperties="yes">
+                macro: ${project.dir}/../../src/templates
+            </freemarkerLinks>
+            <data expandProperties="yes">
+                dbPath: ${project.dir}/../output/ido_gsdo_tb92-release_9.0.2735_metadata.sqlite
+                doc: xml(${project.dir}/../output/ido_gsdo_tb92-release_9.0.2735_tools_dfs_build_clean.log.info.xml)
+                ant: antProperties()
+            </data>
+        </fmpp>
+    </target>
+
+    <target name="generatebuildstatus">
+        <delete file="${project.dir}/../output/build_status.xml" failonerror="false" />
+        <fmpp sourceFile="${project.dir}/../../src/templates/build_status.xml.ftl"
+                     outputfile="${project.dir}/../output/build_status.xml">
+            <freemarkerLinks expandProperties="yes">
+                macro: ${project.dir}/../../src/templates
+            </freemarkerLinks>
+            <data expandProperties="yes">
+                dbPath: ${project.dir}/../output/all_s60_logs_db
+                doc: xml(${project.dir}/../output/log_text_metadata_input.xml)
+                ant: antProperties()
+            </data>
+        </fmpp>
+    </target>
+
+
+    <target name="generate-diamond-faults">
+        <delete file="${project.dir}/../output/diamonds_faults.xml" failonerror="false" />
+        <fmpp sourceFile="${project.dir}/../../src/templates/diamonds_faults.ftl"
+                     outputfile="${project.dir}/../output/diamonds_faults.xml">
+            <freemarkerLinks expandProperties="yes">
+                macro: ${project.dir}/../../src/templates
+            </freemarkerLinks>
+            <data expandProperties="yes">
+                dbPath: ${project.dir}/../output/all_s60_logs_db
+                doc: xml(${project.dir}/../output/log_text_metadata_input.xml)
+                ant: antProperties()
+            </data>
+        </fmpp>
+    </target>
+
+
+    <target name="generate-summary">
+        <delete file="${project.dir}/../output/summary.html" failonerror="false" />
+        <fmpp sourceFile="${project.dir}/../../src/templates/summary_metadata.html.ftl"
+                     outputfile="${project.dir}/../output/summary.html">
+            <freemarkerLinks expandProperties="yes">
+                macro: ${project.dir}/../../src/templates/macro
+            </freemarkerLinks>
+            <data expandProperties="yes">
+                dbPath: ${project.dir}/../output/all_s60_logs_db
+                loginfo: xml(${project.dir}/../output/log_text_metadata_input.xml)
+                ant: antProperties()
+            </data>
+        </fmpp>
+    </target>
+
+    <target name="generate-cc-summary">
+        <property name="build.id" value="100.test" />
+        <delete file="${project.dir}/../output/cc-summary.html" failonerror="false" />
+        <fmpp sourceFile="${project.dir}/../../src/templates/cc_summary.html.ftl"
+                     outputfile="${project.dir}/../output/cc-summary.html">
+            <freemarkerLinks expandProperties="yes">
+                macro: ${project.dir}/../../src/templates/macro
+            </freemarkerLinks>
+            <data expandProperties="yes">
+                dbPath: ${project.dir}/../output/all_ido_logs.sqlite
+                loginfo: xml(${project.dir}/../data/ido_logs/IDO_lcdo_tb92-ci_MCL.92.64_info.log.xml)
+                ant: antProperties()
+            </data>
+        </fmpp>
+    </target>
+</project>

@@ -20,12 +20,11 @@ Description:
 
 ============================================================================
 -->
+<!--* @package framework -->
 <project name="common" xmlns:hlm="http://www.nokia.com/helium" xmlns:cs="antlib:com.puppycrawl.tools.checkstyle">
     <description>
-        Common targets for all helium tools.
+        Common targets for all Helium tools.
     </description>
-    
-    <import file="logging.ant.xml"/>
     
     <!--=======================================================================
     Preset definitions -->
@@ -77,10 +76,29 @@ Helium version ${helium.version}
      -->
     <target name="build-number">
         <fail unless="build.number" message="build.number property not defined" />
+        <!-- Version of the build.
+        @type string
+        @scope private
+        -->
         <property name="build.version" value="${core.build.version}.${build.number}"/>
+        <!-- A unique ID for the build.
+        @type string
+        @scope private
+        -->
         <property name="build.id" value="${build.name}_${build.version}"/>
+        <!-- This is the directory where the build area is prepared. Once created it is substed to the build.drive.
+        @type string
+        @scope private
+        -->
         <property name="prep.build.dir" location="${prep.root.dir}/${build.id}"/>
+        <!-- Directory where the build is published (includes build.id)
+        @type string
+        -->
         <property name="publish.dir" location="${publish.root.dir}/${build.name}/builds/${core.build.version}/${build.id}"/>
+        <!-- The directory where the release of this build is published to on the local network.
+        @type string
+        @scope private
+        -->
         <property name="publish.release.dir" location="${publish.root.dir}/${build.name}/releases/${core.build.version}/${build.id}"/>
     </target>
 
@@ -198,7 +216,7 @@ Helium version ${helium.version}
     Example: <tt>hlm -Dtarget=compile-main deps</tt>
     -->
     <target name="deps">
-        <fail unless="target" message="target property not defined" />
+        <fail unless="target" message="target property not defined, example: hlm -Dtarget=compile-main deps" />
         <hlm:dependencies target="${target}" format="nested"/>
     </target>
     
@@ -297,76 +315,12 @@ hlm -Dbuild.system=ec-helium   use electric cloud build system
         <echo message="Helium version: ${helium.version}" />
     </target>
         
-    
-    <!-- Creates a database of the current configuration. -->
-    <target name="create-data-model-db">        
-        <echoproperties format="text" destfile="${build.cache.dir}/database.txt">        
-            <propertyset negate="true">
-                <propertyref prefix="ant."/>
-                <propertyref prefix="os."/>
-                <propertyref prefix="file."/>
-                <propertyref prefix="java."/>
-                <propertyref prefix="sun."/>
-                <propertyref prefix="awt."/>
-                <propertyref prefix="env."/>
-                <propertyref prefix="user."/>
-                <propertyref prefix="line."/>
-                <propertyref prefix="path."/>
-                <propertyref prefix="python."/>
-                <propertyref prefix="TODAY"/>
-                <propertyref prefix="DSTAMP"/>
-                <propertyref prefix="TSTAMP"/>
-                <propertyref prefix="sig"/>
-                <propertyref name="basedir"/>
-                <propertyset refid="password.list.ref"/>
-            </propertyset>
-        </echoproperties>
-    </target>
-    
-    <!--Macro to Assert Ant configuration against a Helium data model.-->
-    <macrodef name="checkDataModelMacro" uri="http://www.nokia.com/helium">
-        <attribute name="datamodel"/>
-        <attribute name="config"/>
-        <attribute name="assert" default="false"/>
-        <sequential>
-            <hlm:python>
-import logging
-import ant
-import configuration
-import configuration_model
-
-datamodel_file = ant.get_property(r'@{datamodel}')
-config_file = ant.get_property(r'@{config}')
-model = configuration_model.DataModel(str(datamodel_file))
-db_file = open(str(config_file), 'r')
-config = configuration.PropertiesConfiguration(db_file)
-
-items = model.validate_config(config)
-
-logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
-for item in items:
-    item.log(logging.getLogger())
-    
-assert_attr = ant.get_property(r'@{assert}')
-if assert_attr != None and str(assert_attr) == 'true':
-    for item in items:
-        if isinstance(item, configuration_model.MissingFromDataModelItem):
-            raise Exception(str(item))
-            </hlm:python>
-        </sequential>
-    </macrodef>
-        
         
     <!-- Checks the Ant configuration against a Helium data model. -->
-    <target name="check" depends="create-data-model-db">
-        <xslt in="${data.model.file}" out="${data.model.parsed}" style="${data.model.xsl}"/>
-        <hlm:checkDataModelMacro datamodel="${data.model.parsed}" config="${build.cache.dir}/database.txt"/>
-    </target>
-    
-    <!--Assert Ant configuration against a Helium data model.-->
-    <target name="assert-datamodel-correct" depends="create-data-model-db">
-        <xslt in="${data.model.file}" out="${data.model.parsed}" style="${data.model.xsl}"/>
-        <hlm:checkDataModelMacro datamodel="${data.model.parsed}" config="${build.cache.dir}/database.txt" assert="true"/>
+    <target name="check">
+        <hlm:antconfiglint>
+            <WrongTypePropertyCheck/>
+        </hlm:antconfiglint>
     </target>
     
     
@@ -374,29 +328,24 @@ if assert_attr != None and str(assert_attr) == 'true':
         
     This lists all the targets and information about them. -->
     <target name="database">
-        <!-- Projects with no targets or non project files -->
-        <fileset id="database.extra.files" dir="${helium.dir}">
-            <include name="tools/**/*.antlib.xml"/>
-            <include name="tools/**/*.ant.xml"/>
-            <include name="extensions/nokia/tools/**/*.antlib.xml"/>
-            <include name="extensions/nokia/tools/**/*.ant.xml"/>
-            <include name="extensions/nokia/*.ant.xml"/>
-            <include name="config/signaling_config_default.ant.xml"/>
-        </fileset>
-        
-        <mkdir dir="${helium.build.dir}"/>
-        <property name="home.files.only" value="false"/>
-        <hlm:database output="${database.file}" refid="database.extra.files" homeFilesOnly="${home.files.only}"/>
+        <mkdir dir="${basedir}/build"/>
+        <hlm:database output="${database.file}">
+            <fileset dir="${helium.dir}">
+                <include name="config/signaling_config_default.ant.xml"/>
+                <include name="config/stages_config_default.ant.xml"/>
+                <include name="config/metadata_filter_config_default.ant.xml"/>
+            </fileset>
+        </hlm:database>
     </target>
     
     
     <!-- Looks for lint-style issues with the Ant files in Helium, using the antlint task. -->
-    <target name="antlint" depends="check">
+    <target name="antlint">
         <delete dir="${helium.build.dir}/jep"/>
         <delete dir="${helium.build.dir}/python"/>
         <delete dir="${helium.build.dir}/beanshell"/>
         <delete file="${helium.build.dir}/test_jython.xml"/>
-        <hlm:antlint configfile="${helium.dir}/config/antlint_config.xml">
+        <hlm:antlint>
             <fileset id="antlint.files" dir="${helium.dir}">
                 <include name="*.ant.xml"/>
                 <include name="tools/**/*.ant.xml"/>
@@ -411,9 +360,30 @@ if assert_attr != None and str(assert_attr) == 'true':
                 <include name="extensions/nokia/**/build.xml"/>
                 <include name="extensions/nokia/**/*.antlib.xml"/>
                 <include name="extensions/nokia/**/*.ant.xml"/>
+                <exclude name="external/helium-antlib/**/data/*.xml"/>
             </fileset>
+            <checker name="CheckTabCharacter" severity="error" />
+            <checker name="CheckPropertyName" severity="warning">([a-z0-9[\\d\\_\\.\\@\\{\\}\\$]]*)</checker>
+            <checker name="CheckTargetName" severity="warning">([a-z0-9[\\d\\-]]*)</checker>
+            <checker name="CheckIndentation" severity="error"/>
+            <checker name="CheckPresetDefMacroDefName" severity="warning">([a-z0-9][a-zA-Z0-9]*)</checker>       
+            <checker name="CheckProjectName" severity="warning">([a-z0-9[\\d\\.\\_\\-]]*)</checker>
+            <checker name="CheckDescription" severity="warning"/>
+            <checker name="CheckFileName" severity="warning" >^build.xml$|ant.xml$|antlib.xml$</checker>
+            <checker name="CheckRunTarget" severity="warning"/>
+            <checker name="CheckAntCall" severity="warning"/>
+            <checker name="CheckScriptSize" severity="warning"/>
+            <checker name="CheckUseOfIfInTargets" severity="warning"/>
+            <checker name="CheckJepJythonScript" severity="error" />
+            <checker name="CheckPropertiesInDataModel" severity="warning"/>
+            <checker name="CheckScriptCondition" severity="warning"/>
+            <checker name="CheckPythonTasks" severity="warning"/>
+            <checker name="CheckUseOfEqualsTask" severity="warning"/>
+            <checker name="CheckScriptDefNameAttributes" severity="error"/>
+            <checker name="CheckScriptDefStyle" severity="warning"/>
+            <checker name="CheckScriptDef" severity="error"/>
+            <checker name="CheckDuplicateNames" severity="warning"/>
         </hlm:antlint>
-        
         <fileset id="jep.files" dir="${helium.build.dir}">
             <include name="jep/**/*.py"/>
             <include name="python/**/*.py"/>
@@ -467,30 +437,6 @@ if assert_attr != None and str(assert_attr) == 'true':
                 <hlm:unsubst drive="${build.drive}"/>
             </then>
         </if>                
-    </target>
-    
-    
-    <!-- validate only requires properties at startup -->
-    <target name="validate-at-startup" depends="create-data-model-db">
-        <hlm:python>
-import logging
-import configuration
-import configuration_model
-
-model = configuration_model.DataModel(r'${data.model.file}')
-db_file = open(r'${build.cache.dir}/database.txt', 'r')
-config = configuration.PropertiesConfiguration(db_file)
-
-items = model.validate_config_at_startup(config)
-            
-_checks_logger = logging.getLogger('config_check')
-_handler = logging.StreamHandler()
-_handler.setFormatter(logging.Formatter('%(levelname)s: %(message)s'))
-_checks_logger.addHandler(_handler)
-_checks_logger.setLevel(logging.INFO)
-for item in items:
-    item.log(_checks_logger)
-        </hlm:python>
     </target>
     
     

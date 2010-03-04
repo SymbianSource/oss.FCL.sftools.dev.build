@@ -20,22 +20,50 @@ Description:
 
 ============================================================================
 -->
+<!--* @package compile -->
 <project name="compile.ec" xmlns:hlm="http://www.nokia.com/helium">
     <description>
         EC compilation targets.
     </description>
 
+    <!-- Location of emake tool.
+    @type string
+    @scope private
+    -->
     <property name="ec.emake" value="emake"/>
+    <!-- Location of the Makefile generated to run the EC build.
+    @type string
+    @scope private
+    -->
     <property name="ec.makefile.file" location="${build.drive}/Makefile"/>
 
+    <!-- Location of sysdef2make.pl file, which is used to translate system definition files to make files. Internal property that normally does not require changes.
+    @type string
+    @scope private
+    -->
     <property name="ec.sysdef2make" location="${helium.dir}/tools/compile/ec/sysdef2make.pl"/>
+    <!-- Extra command line parameters for the sysdef2make call.
+    @type string
+    -->
     <property name="ec.sysdef2make.cmdline" value="-forcemake ((abld.*\-(w|what|c|check))|(abld.*resource))" />
     
+    <!-- Temporary location of the EC history file used by the current build.
+    @type string
+    @scope private
+    -->
     <property name="ec.historyfile" value="${build.drive}/emake.data"/>
+    <!-- memory limit for EC execution. See user guide for more details
+    @type string
+    @scope private
+    -->
     <property name="ec.mem.limit" value="1000000000"/>
     
     <!-- This can be used to query cluster manager to find information about the build. Set
     to default as all the clusture supports default class id.-->
+    <!-- Build class for Electric Cloud. No default value.
+    @type string
+    @scope private
+    -->
     <property name="ec.build.class" value="default"/>
     
 
@@ -151,7 +179,14 @@ project.setProperty("ec.historyfile.previous", file_name)
                 <var name="ec.history.option" value="create"/>
             </then>
             <else>
+                <!-- Maximum number of agent to be used
+                @type string
+                -->
                 <property name="ec.maxagents" value="0"/>    
+                <!-- Should be create for single node build and merge for multi node build.
+                @type string
+                @scope private
+                -->
                 <property name="ec.history.option" value="merge"/>
                 <if>
                     <isset property="week.number"/>
@@ -327,6 +362,5 @@ ${ec.emake} --emake-build-label=${build.id}.${sysdef.configuration} --emake-clas
         <hlm:assertFileExists file="${temp.build.dir}/${build.id}.${sysdef.configuration}_run_emake.bat"/>
         <hlm:assertFileExists file="${compile.log.dir}/${build.id}.${sysdef.configuration}_build_output.log"/>
         <hlm:assertFileExists file="${compile.log.dir}/${build.id}.${sysdef.configuration}_compile.log"/>
-        <hlm:calculateErrorsFromLog logfile="${compile.log.dir}/${build.id}.${sysdef.configuration}_compile.log" />
     </target>
 </project>

@@ -34,6 +34,8 @@ Description:
                         <#if (!ant?keys?seq_contains('keep.internals'))>
                         <exclude name="**/internal/**"/>
                         </#if>
+                        <exclude name="**/.hg/**"/>
+                        <exclude name="**/.svn/**"/>
                     </fileset>
                 </copy>
                 <exec executable="attrib" dir="${data[component]}">

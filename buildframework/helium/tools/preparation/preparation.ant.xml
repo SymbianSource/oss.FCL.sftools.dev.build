@@ -20,16 +20,26 @@ Description:
 
 ============================================================================
 -->
+<!--* @package preparation -->
 <project name="preparation" xmlns:hlm="http://www.nokia.com/helium">
     <description>Preparation of a build area and other build initialization.</description>
     
+    <!--* @property prep.config.file
+    Defines configuration file used in prep-copy target. The file defines how files are copied and extracted into build area.
+    @type string
+    @editable required
+    @scope public
+    -->
+    
     <!-- includes all necessary stuff -->
+    <!-- To check which ccmgetinput helium will be use
+    @type string
+    -->
     <property name="ccmgetinput" value="ccmgetinput" />
 
     <import file="bom/bom.ant.xml" />
     <import file="password.ant.xml" />
     <import file="ido-prep.ant.xml" />
-    <import file="overlays.ant.xml" />
     <import file="synergy/ccmgetinput.ant.xml" />
     <import file="synergy/buildmanagement.ant.xml" />
     <import file="ivy/dependencies.ant.xml"/>
@@ -44,6 +54,10 @@ Description:
         <property name="base_release.path" value=""/>
         <property name="base_release.getenv_options" value=""/>
         <!-- Using the cleaned version of getenv.pl -->
+        <!-- Defines the location of the getenv.pl script.
+        @type string
+        @scope private
+        -->
         <property name="getenv.tool.location" location="${helium.dir}/tools/preparation/getenv.pl"/>
         <hlm:tempRecordStartMacro name="${build.id}_getenv.log"/>        
         <trycatch>
@@ -86,13 +100,20 @@ Description:
     -->
     <target name="delete-old-build-area" if="build.area.limit">
         <dirset id="build.area.dirs" dir="${prep.root.dir}" includes="${build.name}*"/>
+        <resourcecount property="build.area.count">
+            <dirset refid="build.area.dirs"/>
+        </resourcecount>
         <if>
-            <resourcecount when="greater" count="${build.area.limit}">
-                <dirset refid="build.area.dirs"/>
-            </resourcecount>
+            <scriptcondition language="jython">
+                <![CDATA[
+if project.getProperty("build.area.count") > project.getProperty("build.area.limit"):
+    self.value = True
+                ]]>
+            </scriptcondition>
             <then>
+                <math result="num.to.delete" operand1="${build.area.count}" operation="-" operand2="${build.area.limit}" datatype="int"/>
                 <pathconvert property="build.area">
-                    <first count="1">
+                    <first count="${num.to.delete}">
                         <sort xmlns:rcmp="antlib:org.apache.tools.ant.types.resources.comparators">
                             <rcmp:date/>
                             <dirset refid="build.area.dirs"/>
@@ -151,7 +172,8 @@ Description:
             <trycatch>
                 <try>
                     <exec executable="python" failonerror="true">
-                        <arg value="${helium.dir}/tools/preparation/freedisk.py" />
+                        <arg value="-m" />
+                        <arg value="freedisk" />
                         <arg value="--drive" />
                         <arg value="@{drive}" />
                         <arg value="--space" />
@@ -249,22 +271,14 @@ Description:
     </target>
 
 
-    <!-- Checks that all the build area inputs are available. -->
+    <!-- Obsolete. Left as placeholder. 
+         Earlier: Checks that all the build area inputs are available.  -->
     <target name="check-env-prep" depends="prep-prepare-input">
-        <preset.exec executable="${env.PERL}" failonerror="true">
-            <arg value="${helium.dir}/tools/preparation/prep_build_area.pl" />
-            <arg value="-config" />
-            <arg value="${prep.config.file.parsed}" />
-            <arg value="-destdir" />
-            <arg value="${build.drive}${env.EPOCROOT}" />
-            <arg value="-dry-run" />
-            <arg value="yes" />
-        </preset.exec>
     </target>
 
 
     <!-- Generates a starting XML file for the build summary. -->
-    <target name="build-info" depends="log-build-start">
+    <target name="build-info" depends="start-ant-log,log-build-start">
         <dirname file="${build.summary.file}" property="build.summary.file.dir"/>
         <mkdir dir="${build.summary.file.dir}"/>
         <mkdir dir="${prep.log.dir}"/>
@@ -412,11 +426,8 @@ if prep_build_dir.exists():
         <mkdir dir="${build.output.dir}" />
         <mkdir dir="${build.log.dir}" />
         <mkdir dir="${prep.log.dir}" />
-        <mkdir dir="${compile.log.dir}" />
-        <mkdir dir="${test.log.dir}" />
-        <mkdir dir="${post.log.dir}" />
         <mkdir dir="${temp.build.dir}" />  
-        <mkdir dir="${diamonds.build.output.dir}" />       
+        <mkdir dir="${diamonds.build.output.dir}" />
     </target>
     
     
@@ -437,14 +448,6 @@ if prep_build_dir.exists():
         
     </target>
     
-    <!-- Starting the main ant_build log 
-    <deprecated>
-    Now this will be take care by the logging listener.
-    It will start the main ant logging when ever the build starts.
-    </deprecated>-->
-    <target name="start-ant-log" />
-    
-    
     <!-- This target exists as a trigger for initiating the Diamonds logger. If 
           it is not included in the build sequence, the build will not be logged to 
           Diamonds. Also  build.property.cache.file will be there contains all the diamonds related properties 
@@ -462,52 +465,9 @@ if prep_build_dir.exists():
         </echoproperties>
     </target>    
    
-    <!-- The ido-clean-prep is to be run after compile-clean but before prep copy in order to move old sources away.
-    It uses the "ido.src.root" property.
-    If property "ido.keep.old" is defined, the old files are renamed to a timestamped directory  
-    if not defined the directory for the old  files is "${ido.src.root}.old"
-    <deprecated>IDO which have now implemented the new ADO sysdef structure should use ido-prep-clean.</deprecated>
-    -->
-    <target name="ido-clean-prep" if="ido.src.root" >
-        <if>
-            <isset property="ido.keep.old"/>
-            <then>
-                <tstamp>
-                    <format property="ido.clean.src.extension" pattern="yyyyMMdd'_'HHmmss" />
-                </tstamp>
-            </then>
-            <else>
-                <property name="ido.clean.src.extension" value="old" />
-            </else>
-        </if>
-        <move todir="${ido.src.root}.${ido.clean.src.extension}"  failonerror="false" >
-            <fileset dir="${ido.src.root}" />
-        </move>
-    </target>
+    <!-- Used to prep the build area, now only a placeholder target for the customer -->
+    <target name="prep-copy" />
 
-
-    <!-- Preps the build area by copying and unzipping all the inputs. -->
-    <target name="prep-copy" depends="prep-prepare-input">
-        <preset.exec executable="${env.PERL}" output="${prep.log.dir}/${build.id}_buildarea_prep.log" failonerror="true">
-            <arg value="${helium.dir}/tools/preparation/prep_build_area.pl" />
-            <arg value="-config" />
-            <arg value="${prep.config.file.parsed}" />
-            <arg value="-destdir" />
-            <arg value="${build.drive}${env.EPOCROOT}" />
-            <arg value="-zipdir" />
-            <arg value="${build.drive}/unzip" />
-        </preset.exec>
-        <!-- Delete Symbian file to force S60 version to compile -->
-        <delete file="${build.drive}/epoc32/tools/j2me/hromize.exe" />
-        <!-- parsing the generated log -->
-        <hlm:metadatarecord database="${metadata.dbfile}">
-            <hlm:textmetadatainput>
-                <fileset casesensitive="false" file="${prep.log.dir}/${build.id}_buildarea_prep.log" />
-                <metadatafilterset refid="filterset.buildarea.prep" />
-            </hlm:textmetadatainput>
-        </hlm:metadatarecord>
-        <hlm:generateBuildStatus file="${build.id}_buildarea_prep.log" />
-    </target>
     
     <condition property="run.ccm">
         <and>
@@ -527,8 +487,6 @@ if prep_build_dir.exists():
         <runtarget target="prep-work-area"/>
         <runtarget target="find-files-post"/>
     </target>
-    <!-- <deprecated>Please use do-prep-work-area</deprecated> -->
-    <target name="do-ccm-get-input" depends="do-prep-work-area"/>
     
     
     <!-- Wrapper target to call start-remote-builds during the build.
@@ -543,7 +501,7 @@ if prep_build_dir.exists():
     <!-- check-env-prep has to be called after getting the delivery else it doesn't works for the first build. -->
     <target name="do-prep" depends="check-tool-dependencies,check-free-space,do-prep-work-area,
                                     do-start-remote-builds,check-env-prep,diamonds,create-bom,log-build-env,prep-copy,
-                                    set-arm-version,scan-overlays" />
+                                    set-arm-version" />
     
     <!-- Macro to notify user by email/sms -->
     <macrodef name="notifyMacro" uri="http://www.nokia.com/helium">
@@ -581,7 +539,13 @@ if prep_build_dir.exists():
     
     <!-- Set properties for track full build event. -->
     <target name="set-fullbuild-properties">
+        <!-- Enables logging of the start and end of individual targets.
+        @type string
+        -->
         <property name="log.target" value="yes"/>
+        <!-- Ensures the cleanup-all target is called when the build finishes.
+        @type string
+        -->
         <property name="call.cleanup" value="no"/>
     </target>
     

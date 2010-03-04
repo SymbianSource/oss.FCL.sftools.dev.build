@@ -70,8 +70,8 @@ Properties added
     </#if>
 </#list>
 
-Properties removed
-==================
+Properties removed or made private
+==================================
 <#list doc.apiChanges.property?sort as property>
     <#if property.@state == 'removed'>
 * ${property}

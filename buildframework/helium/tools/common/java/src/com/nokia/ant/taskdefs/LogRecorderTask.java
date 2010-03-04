@@ -47,11 +47,13 @@ import java.io.File;
  * and is closed on a buildFinished event.
  * </p>
  *
- * @ant.task name="record" category="Utility" 
+ * @ant.task name="record" category="Utility"
+ * @Deprecated Start using hlm:record task. 
  * @see LogRecorderEntry
  * @version 0.5
  * @since Ant 1.4
  */
+@Deprecated
 public class LogRecorderTask extends Task implements SubBuildListener
 {
 
@@ -99,7 +101,8 @@ public class LogRecorderTask extends Task implements SubBuildListener
      * @since Ant 1.7
      */
     public void init()
-    {
+    {   
+        log("Deprecated Start using hlm:record task", Project.MSG_WARN); 
         getProject().addBuildListener(this);
     }
 

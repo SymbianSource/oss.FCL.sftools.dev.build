@@ -40,7 +40,7 @@ public class CMTTool implements Tool {
     /**
      * Sets the command line variables to be used to execute and validates
      * for the required parameters 
-     * @param VariableSet variable(name / value list)
+     * @param varSet variable(name / value list)
      */    
        public void execute(VariableSet varSet, Project prj)throws ToolsProcessException {
         String input = null; 

@@ -30,7 +30,6 @@ Description:
     
     <property name="helium.dir" location="${test.scanlog.dir}/../../../.."/>
     <import file="${helium.dir}/helium.ant.xml"/>
-
     <!-- Macro to process the log to generate scanlog. -->
     <macrodef name="scanlogTest" uri="http://www.nokia.com/helium">
         <attribute name="log"/>
@@ -50,8 +49,12 @@ Description:
     <macrodef name="scanlogMetadataTest" uri="http://www.nokia.com/helium">
         <attribute name="log"/>
         <attribute name="output"/>
+        <attribute name="whatlog" default="@{output}.what.log"/>
+        <attribute name="cleanlog" default="@{output}.clean.log"/>
         <sequential>
             <exec executable="python" dir="${test.scanlog.dir}" failonerror="false">
+                <env key="SBS_WHAT_LOG_FILE" value="@{whatlog}" />
+                <env key="SBS_CLEAN_LOG_FILE" value="@{cleanlog}" />
                 <arg value="sbsscanlogmetadata.py"/>
                 <arg value="--log"/>
                 <arg value="@{log}"/>
@@ -95,38 +98,226 @@ Description:
         <hlm:assertFileExists file="${env.TEMP}/test-scanlog-3.log.xml"/>
         <hlm:assertFileExists file="${env.TEMP}/test-scanlog-3.log.scan2.html"/>
     </target>
-
-    <target name="test-scanlog-metadata-1">
-        <echo message="log.dir:${env.TEMP}/" />
-        <delete file="${helium.dir}\tests\data\test-scanlog-metadata-1.log" failonerror="false"/>
-        <delete file="${helium.dir}\tests\data\test-metadata-1.sqlite" failonerror="false"/>
-        <delete file="${helium.dir}\tests\data\test-scanlog-metadata-1.log.scan2.html" failonerror="false"/>
-        
-        <hlm:scanlogMetadataTest log="${helium.dir}/tests/data/scanlog/all_regex_type.log"
-            output="${helium.dir}/tests/data/test-scanlog-metadata-1.log" />
-        <hlm:assertFileExists file="${helium.dir}/tests/data/test-scanlog-metadata-1.log"/>
-        <hlm:metadatarecord database="${helium.dir}/tests/data/test-metadata-1.sqlite">
+    
+    <target name="s60-compilation-logs">
+        <mkdir dir="${helium.dir}/tests/data/output/" />
+        <delete file="${helium.dir}\tests\data\test-s60.db" failonerror="false"/>
+        <delete file="${helium.dir}\tests\data\test-s60.scan2.html" failonerror="false"/>
+        <hlm:metadatarecord database="${helium.dir}/tests/data/output/test-s60.db">
             <hlm:sbsmetadatainput>
-                <fileset casesensitive="false" file="${helium.dir}/tests/data/test-scanlog-metadata-1.log"/>
+                <fileset dir="${helium.dir}/tests/data/scanlog/s60_logs/logs/compile" casesensitive="false">
+                    <include  name="92_7952_RAPTOR_201004_wk04_02_dfs_build_export.log"/>
+                    <include  name="92_7952_RAPTOR_201004_wk04_02_dfs_build_ncp_dfs_variants.log"/>
+                    <include  name="92_7952_RAPTOR_201004_wk04_02_dfs_build_sf_tools.log"/>
+                    <include  name="92_7952_RAPTOR_201004_wk04_02_dfs_build_sf_dfs_variants.log"/>
+                </fileset>
                 <metadatafilterset refid="filterset.sbs" />
             </hlm:sbsmetadatainput>
         </hlm:metadatarecord>
-        <fmpp sourceFile="${helium.dir}/tools/common/templates/log/scan2.html.ftl"
+        <fmpp sourceFile="${helium.dir}/tools/common/templates/log/scan2_orm.html.ftl"
+                     outputfile="${helium.dir}/tests/data/output/92_7952_RAPTOR_201004_wk04_02_dfs_build_export.log.html">
+            <freemarkerLinks expandProperties="yes">
+                macro: ${helium.dir}/tools/common/templates/macro
+            </freemarkerLinks>
+            <data expandProperties="yes">
+                dbPath: ${helium.dir}/tests/data/output/test-s60.db
+                doc: xml(${helium.dir}/tests/data/scanlog/s60_logs/logs/compile/92_7952_RAPTOR_201004_wk04_02_dfs_build_export.log.info.xml)
+                ant: antProperties()
+            </data>
+        </fmpp>
+        <fmpp sourceFile="${helium.dir}/tools/common/templates/log/scan2_orm.html.ftl"
+                     outputfile="${helium.dir}/tests/data/output/92_7952_RAPTOR_201004_wk04_02_dfs_build_ncp_dfs_variants.log.html">
+            <freemarkerLinks expandProperties="yes">
+                macro: ${helium.dir}/tools/common/templates/macro
+            </freemarkerLinks>
+            <data expandProperties="yes">
+                dbPath: ${helium.dir}/tests/data/output/test-s60.db
+                doc: xml(${helium.dir}/tests/data/scanlog/s60_logs/logs/compile/92_7952_RAPTOR_201004_wk04_02_dfs_build_ncp_dfs_variants.log.info.xml)
+                ant: antProperties()
+            </data>
+        </fmpp>
+        <fmpp sourceFile="${helium.dir}/tools/common/templates/log/scan2_orm.html.ftl"
+                     outputfile="${helium.dir}/tests/data/output/92_7952_RAPTOR_201004_wk04_02_dfs_build_sf_tools.log">
+            <freemarkerLinks expandProperties="yes">
+                macro: ${helium.dir}/tools/common/templates/macro
+            </freemarkerLinks>
+            <data expandProperties="yes">
+                dbPath: ${helium.dir}/tests/data/output/test-s60.db
+                doc: xml(${helium.dir}/tests/data/scanlog/s60_logs/logs/compile/92_7952_RAPTOR_201004_wk04_02_dfs_build_sf_tools.log.info.xml)
+                ant: antProperties()
+            </data>
+        </fmpp>
+        <fmpp sourceFile="${helium.dir}/tools/common/templates/log/scan2_orm.html.ftl"
+                     outputfile="${helium.dir}/tests/data/output/92_7952_RAPTOR_201004_wk04_02_dfs_build_sf_dfs_variants.log.html">
+            <freemarkerLinks expandProperties="yes">
+                macro: ${helium.dir}/tools/common/templates/macro
+            </freemarkerLinks>
+            <data expandProperties="yes">
+                dbPath: ${helium.dir}/tests/data/output/test-s60.db
+                doc: xml(${helium.dir}/tests/data/scanlog/s60_logs/logs/compile/92_7952_RAPTOR_201004_wk04_02_dfs_build_sf_dfs_variants.log.info.xml)
+                ant: antProperties()
+            </data>
+        </fmpp>
+    </target>
+
+    <target name="diamonds-faults">
+        <fmpp sourceFile="${helium.dir}/tools/common/templates/diamonds/faults_metadata.ftl"
+                outputfile="${helium.dir}/tests/data/output/compile-main.xml">
+            <data expandProperties="yes">
+                  dbPath: ${helium.dir}/tests/data/output/test-s60.db
+                  logpath: 92_7952_RAPTOR_201004_wk04_02_dfs_build_export.log 
+                  ant: antProperties()
+            </data>
+        </fmpp>
+        <fmpp sourceFile="${helium.dir}/tools/common/templates/diamonds/faults_metadata.ftl"
+                outputfile="${helium.dir}/tests/data/output/compile-main-tools.xml">
+            <data expandProperties="yes">
+                  dbPath: ${helium.dir}/tests/data/output/test-s60.db
+                  logpath: 92_7952_RAPTOR_201004_wk04_02_dfs_build_sf_tools.log
+                  ant: antProperties()
+            </data>
+        </fmpp>
+        <fmpp sourceFile="${helium.dir}/tools/common/templates/diamonds/faults_metadata.ftl"
+                outputfile="${helium.dir}/tests/data/output/compile-main-ncp.xml">
+            <data expandProperties="yes">
+                  dbPath: ${helium.dir}/tests/data/output/test-s60.db
+                  logpath: 92_7952_RAPTOR_201004_wk04_02_dfs_build_ncp_dfs_variants.log 
+                  ant: antProperties()
+            </data>
+        </fmpp>
+        <fmpp sourceFile="${helium.dir}/tools/common/templates/diamonds/faults_metadata.ftl"
+                       outputfile="${helium.dir}/tests/data/output/compile-main-dfs.xml">
+            <data expandProperties="yes">
+                  dbPath: ${helium.dir}/tests/data/output/test-s60.db
+                  logpath: 92_7952_RAPTOR_201004_wk04_02_dfs_build_sf_dfs_variants.log 
+                  ant: antProperties()
+            </data>
+        </fmpp>
+    </target>
+
+    <target name="email-status-html">
+        <fmpp sourceFile="${helium.dir}/tools/common/templates/log/email_status.html.ftl"
+                       outputfile="${helium.dir}/tests/data/output/email_status.html">
+            <data expandProperties="yes">
+                  dbPath: ${helium.dir}/tests/data/output/test-s60.db
+                  logpath: 92_7952_RAPTOR_201004_wk04_02_dfs_build_sf_dfs_variants.log 
+                  ant: antProperties()
+            </data>
+        </fmpp>
+    </target>
+
+    <target name="summary-html">
+        
+        <fmpp sourceFile="${helium.dir}/tools/common/templates/log/summary_metadata.html.ftl"
+                outputfile="${helium.dir}/tests/data/output/summary.html">
+            <freemarkerLinks expandProperties="yes">
+                    macro: ${helium.dir}/tools/common/templates/macro
+            </freemarkerLinks>
+            <data expandProperties="yes">
+                    dbPath: ${helium.dir}/tests/data/output/test-s60.db
+                    loginfo: xml(${helium.dir}/tests/data/scanlog/s60_logs/logs/92_7952_RAPTOR_201004_wk04_02_info.log.xml)
+                    ant: antProperties()
+            </data>
+        </fmpp>
+    </target>
+
+    <target name="scanlog-metadata-1">
+        <echo message="log.dir:${env.TEMP}/" />
+        <property name="sbslog" value="${helium.dir}/tests/data/test-scanlog-metadata-1.log" />
+        <property name="whatlog" value="${helium.dir}/tests/data/test-scanlog-metadata-1.log.what1.log" />
+        <property name="cleanlog" value="${helium.dir}/tests/data/test-scanlog-metadata-1.log.clean1.log" />
+        <delete file="${sbslog}" failonerror="false"/>
+        <delete file="${whatlog}" failonerror="false"/>
+        <delete file="${cleanlog}" failonerror="false"/>
+        <delete dir="${helium.dir}\tests\data\test-metadata-1_db" failonerror="false"/>
+        <delete file="${sbslog}.scan2.html" failonerror="false"/>
+        <hlm:scanlogMetadataTest whatlog="${whatlog}" cleanlog="${cleanlog}" log="${helium.dir}/tests/data/scanlog/all_regex_type.log"
+            output="${sbslog}" />
+        <hlm:assertFileExists file="${sbslog}"/>
+        <hlm:metadatarecord  database="${helium.dir}/tests/data/test-metadata-1_db">
+            <hlm:sbsmetadatainput whatLogFile="${whatlog}">
+                <fileset casesensitive="false" file="${sbslog}"/>
+                <metadatafilterset refid="filterset.sbs" />
+            </hlm:sbsmetadatainput>
+        </hlm:metadatarecord>
+        <hlm:assertFileExists file="${cleanlog}"/>
+        <hlm:assertFileExists file="${whatlog}"/>
+        <hlm:assertFileExists file="${sbslog}"/>
+        <hlm:assertFileExists file="${sbslog}.sbs_error.log"/>
+        <fmpp sourceFile="${helium.dir}/tools/common/templates/log/scan2_orm.html.ftl"
                      outputfile="${helium.dir}/tests/data/test-scanlog-metadata-1.log.scan2.html">
             <freemarkerLinks expandProperties="yes">
                 macro: ${helium.dir}/tools/common/templates/macro
             </freemarkerLinks>
             <data expandProperties="yes">
-                dbPath: ${helium.dir}/tests/data/test-metadata-1.sqlite
+                dbPath: ${helium.dir}/tests/data/test-metadata-1_db
+                whatLogPath: ${whatlog}
                 doc: xml(${helium.dir}/tests/data/scanlog/all_regex_type.log_sbs_info.xml)
                 ant: antProperties()
             </data>
         </fmpp>
-        <hlm:generateBuildStatus dbfile="${helium.dir}/tests/data/test-metadata-1.sqlite" output-dir="${helium.dir}/tests/data/" file="test-scanlog-metadata-1.log"/>
+        <hlm:generateBuildStatus dbfile="${helium.dir}/tests/data/test-metadata-1_db" output-dir="${helium.dir}/tests/data/" file="test-scanlog-metadata-1.log"/>
         <hlm:assertFileExists file="${helium.dir}/tests/data/test-scanlog-metadata-1.log.scan2.html"/>
     </target>
-    
+
+    <target name="scanlog-metadata-text">
+        <echo message="log.dir:${env.TEMP}/" />
+        <delete file="${helium.dir}\tests\data\test-scanlog-metadata-text.log" failonerror="false"/>
+        <delete dir="${helium.dir}\tests\data\test-metadata-1_db" failonerror="false"/>
+        <delete file="${helium.dir}\tests\data\test-scanlog-metadata-text.scan2.html" failonerror="false"/>
+        
+        <hlm:scanlogMetadataTest log="${helium.dir}/tests/data/scanlog/all_regex_type.log"
+            output="${helium.dir}/tests/data/test-scanlog-metadata-text.log" />
+        <hlm:assertFileExists file="${helium.dir}/tests/data/test-scanlog-metadata-text"/>
+        <hlm:metadatarecord  database="${helium.dir}/tests/data/test-metadata-1_db">
+            <hlm:textmetadatainput>
+                <fileset casesensitive="false" file="${helium.dir}/tests/data/test-scanlog-metadata-1.log"/>
+                <metadatafilterset refid="filterset.sbs" />
+            </hlm:textmetadatainput>
+        </hlm:metadatarecord>
+        <fmpp sourceFile="${helium.dir}/tools/common/templates/log/scan2_text_orm.html.ftl"
+                     outputfile="${helium.dir}/tests/data/test-scanlog-metadata-1.log.scan2.html">
+            <freemarkerLinks expandProperties="yes">
+                macro: ${helium.dir}/tools/common/templates/macro
+            </freemarkerLinks>
+            <data expandProperties="yes">
+                dbPath: ${helium.dir}/tests/data/test-metadata-1_db
+                doc: xml(${helium.dir}/tests/data/scanlog/all_regex_type.log_sbs_info.xml)
+                ant: antProperties()
+            </data>
+        </fmpp>
+        <hlm:generateBuildStatus dbfile="${helium.dir}/tests/data/test-metadata-1_db" output-dir="${helium.dir}/tests/data/" file="test-scanlog-metadata-1.log"/>
+        <hlm:assertFileExists file="${helium.dir}/tests/data/test-scanlog-metadata-1.log.scan2.html"/>
+    </target>
+
+    <target name="scanlog-metadata-whatlog-test">
+        <echo message="log.dir:${env.TEMP}/" />
+        <delete dir="${helium.dir}\tests\data\test-metadata-1_db" failonerror="false"/>
+        <delete file="${helium.dir}\tests\data\test-scanlog-metadata-text.scan2.html" failonerror="false"/>
+
+        <hlm:scanlogMetadataTest log="${helium.dir}/tests/data/scanlog/ido_gsdo_tb92-release_9.0.2859_armv5_dfs_build.log"
+            output="${helium.dir}/tests/data/test-scanlog-metadata-1.log" />
+        
+        <hlm:metadatarecord  database="${helium.dir}/tests/data/test-metadata-1_db">
+            <hlm:sbsmetadatainput whatLogFile="${helium.dir}/tests/data/test-scanlog-metadata-1.whatlog.log">
+                <fileset casesensitive="false" file="${helium.dir}/tests/data/test-scanlog-metadata-1.log"/>
+                <metadatafilterset refid="filterset.sbs" />
+            </hlm:sbsmetadatainput>
+        </hlm:metadatarecord>
+        <fmpp sourceFile="${helium.dir}/tools/common/templates/log/scan2_orm.html.ftl"
+                     outputfile="${helium.dir}/tests/data/test-scanlog-metadata-1.log.scan2.html">
+            <freemarkerLinks expandProperties="yes">
+                macro: ${helium.dir}/tools/common/templates/macro
+            </freemarkerLinks>
+            <data expandProperties="yes">
+                dbPath: ${helium.dir}/tests/data/test-metadata-1_db
+                whatLogPath: ${helium.dir}\tests\data/test-scanlog-metadata-1.what.log
+                doc: xml(${helium.dir}/tests/data/scanlog/all_regex_type.log_sbs_info.xml)
+                ant: antProperties()
+            </data>
+        </fmpp>
+    </target>    
     <target name="test-metadata-signal">
-        <antcall target="test-scanlog-metadata-1" />
+        <antcall target="scanlog-metadata-1" />
     </target>
 </project>

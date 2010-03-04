@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : build.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="helium-antlib-unittestvalid-build" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>Helium Antlib Logging unittests.</description>
+    <property environment="env"/>
+
+    <property name="stages.test.dir" location="${temp.dir}" />
+    <property name="template.dir" location="../src/templates" />
+    
+    <property name="build.log.dir" location="${stages.test.dir}/logs"/>
+    <property name="build.cache.log.dir" location="${stages.test.dir}/logs"/>
+    <property name="build.id" value="ant-logging-test"/>
+    <property name="build.log" value="${stages.test.dir}/logs/${build.id}_test.log"/>
+    <property name="display" value="Message for testing"/>
+    <import file="stages_config.ant.xml" />
+    
+    <target name="build">
+        <antcall target="test-stages"/>
+    </target>
+    
+    
+    <target name="run-stages">
+        <antcall target="start-ant-log"/>
+        <antcall target="para-test7"/>
+        <hlm:record name="${build.log.dir}/${build.id}_recorder.log" action="start" loglevel="info" backup="false">
+            <hlm:recordfilterset refid="recordfilter.config"/>
+            <hlm:recordfilter category="unix" regexp="${unix.password}" />
+            <hlm:recordfilter category="synergy" regexp="synergy" />
+        </hlm:record>
+        <antcall target="para-test7"/>
+        <echo> chekcsyn value = synergy </echo>
+        <hlm:record name="${build.log.dir}/${build.id}_recorder.log" action="stop" append="true" />
+        
+        <antcall target="hello-test"/>
+        <antcall target="compile-dfs"/>
+        <antcall target="para-test7"/>
+        <antcall target="compile-nonhw"/>
+        
+        <antcall target="start-end"/>
+        
+        <ant antfile="prep-ccm-get-input.ant.xml" target="prep-ccm-get-input">
+            <property name="display" value="First time i am going in"/>
+        </ant> 
+        
+        <antcall target="parallel-test"/>
+    </target>
+    
+    <target name="compile" depends="creatbom,get-password"/>
+    
+    
+    <hlm:recordfilterset id="recordfilter.config">
+        <hlm:recordfilter category="info" regexp="ERROR" />
+    </hlm:recordfilterset>
+    
+    <target name="temp">
+        <echo> Inside the temp target </echo>
+    </target>
+    
+    <target name="compile-dfs">
+        <antcall target="compile">
+            <param name="display" value="First time in compile target"/>
+        </antcall>
+    </target>
+    <target name="compile-nonhw" >
+        <antcall target="compile">
+            <param name="display" value="second time in compile target"/>
+        </antcall>
+    </target>
+    
+    <target name="hello-test" depends="temp,get-password">
+        
+        <hlm:record name="${build.log.dir}/${build.id}_stagetest.log" action="start" loglevel="info">
+            <hlm:recordfilterset refid="recordfilter.config"/>
+            <hlm:recordfilter category="unix" regexp="${unix.password}" />
+            <hlm:recordfilter category="synergy" regexp="synergy" />
+        </hlm:record>
+        
+        <antcall target="stagetest">
+            <param name="display" value="Inside stage test for second time grace INFO"/>
+        </antcall>
+        
+        <hlm:record name="${build.log.dir}/${build.id}_stagetest.log" action="stop" append="true" />
+        
+        <property name="ats.password" value="password"/>
+        <hlm:logreplace regexp="${ats.password}"/>
+        <echo>ats-password = ${ats.password}</echo>
+        
+        <antcall target="hello"/>
+        
+    </target>
+    
+    <target name="stagetest" >
+        <echo> Hello... inside stagetest target ${display}</echo>
+    </target>
+    
+    <target name="creatbom">
+        <echo> Hello... inside creatbom target ${display}</echo>
+    </target>
+    
+    <target name="hello">
+        <echo> Hello... inside hello target ${display} </echo>
+    </target>
+    
+    <target name="recorder">
+        <echo> Hello... inside recorder target </echo>
+    </target>
+    
+    <target name="get-password">
+        <echo> Inside the get-password target </echo>
+        <property name="unix.password" value="something"/>
+        <hlm:logreplace regexp="${unix.password}"/>
+    </target>
+    
+    <target name="start-ant-log">
+        <hlm:triggerlogger/> 
+    </target>
+    
+    <target name="start" depends="recorder,hello">
+        <antcall target="temp"/>
+    </target>
+    
+    
+    <target name="end" depends="creatbom">
+        <antcall target="temp"/>
+    </target>
+    
+    <target name="start-end" depends="start">
+        <echo> Ended start-end target</echo>
+        <antcall target="end"/>
+    </target>
+    
+    
+    <target name="parallel-test">
+        <parallel>
+            <sequential>
+                <antcall target="para-test4"/>
+                <antcall target="para-test-record"/>
+            </sequential>
+            <antcall target="para-test7"/>
+            <antcall target="paratest"/>
+        </parallel>
+    </target>
+    
+    <target name="paratest" depends="para-test1,para-test2,para-test3"/>
+        
+    <target name="paratestrecord" depends="para-test5,para-test6"/>
+    
+    
+    <target name="para-test1">
+        <echo>Inside para-test1 </echo>
+    </target>
+    
+    <target name="para-test2">
+        <echo>Inside para-test2 </echo>
+    </target>
+    
+    <target name="para-test3">
+        <echo>Inside para-test3 </echo>
+    </target>
+    
+    <target name="para-test-record">
+        <hlm:record name="${build.log.dir}/${build.id}_paratestrecord.log" action="start" loglevel="info"/>
+        <antcall target="paratestrecord"/>
+        <hlm:record name="${build.log.dir}/${build.id}_paratestrecord.log" append="true" action="stop" loglevel="info"/>
+    </target>
+    
+    <target name="para-test4">
+        <echo>Inside para-test4 </echo>
+    </target>
+    
+    <target name="para-test5">
+        <echo>Inside para-test5 </echo>
+    </target>
+    
+    <target name="para-test6">
+        <echo>Inside para-test6 </echo>
+    </target>
+    
+    <target name="para-test7">
+        <echo>Inside para-test7 </echo>
+    </target>
+
+    
+    <target name="test-stages" depends="clean-up,run-stages">    
+        <au:assertFileExists file="${build.log.dir}/${build.id}_main.ant.log"/>
+        <au:assertFileExists file="${build.log.dir}/${build.id}_prep.ant.log"/>
+        <au:assertFileExists file="${build.log.dir}/${build.id}_compile.ant.log"/>
+        <au:assertFileExists file="${build.log.dir}/${build.id}_stagetest.log"/>
+        <au:assertFileExists file="${build.log.dir}/${build.id}_post.ant.log"/>
+        <au:assertFileExists file="${build.log.dir}/${build.id}_init.log"/>
+        <au:assertFileExists file="${build.log.dir}/${build.id}_recorder.log"/>
+        <au:assertFileExists file="${build.log.dir}/${build.id}_startend.ant.log"/>
+        
+        <loadfile srcfile="${build.log.dir}/${build.id}_stagetest.log" property="recordfilter.task.log">
+            <filterchain>
+                <linecontainsregexp>
+                    <regexp pattern="ERROR"/>
+                </linecontainsregexp>
+            </filterchain>
+        </loadfile>
+        <au:assertTrue message="record task is not doing the record filtering">
+            <not>
+                <isset property="recordfilter.task.log"/>
+            </not>
+        </au:assertTrue>
+        
+        <loadfile srcfile="${build.log.dir}/${build.id}_stagetest.log" property="passwordfilter.task.log">
+            <filterchain>
+                <linecontainsregexp>
+                    <regexp pattern="synergy"/>
+                </linecontainsregexp>
+            </filterchain>
+        </loadfile>
+        <au:assertTrue message="record task is not doing the password filtering">
+            <not>
+                <isset property="passwordfilter.task.log"/>
+            </not>
+        </au:assertTrue>
+        
+        <loadfile srcfile="${build.log.dir}/${build.id}_stagetest.log" property="passwordfilter.log">
+            <filterchain>
+                <linecontainsregexp>
+                    <regexp pattern="something"/>
+                </linecontainsregexp>
+            </filterchain>
+        </loadfile>
+        <au:assertTrue message="record task is not doing the password filtering">
+            <not>
+                <isset property="passwordfilter.log"/>
+            </not>
+        </au:assertTrue>
+    
+    </target>
+    
+    <target name="clean-up">
+        <delete dir="${build.log.dir}"/>
+    </target>
+
+</project>

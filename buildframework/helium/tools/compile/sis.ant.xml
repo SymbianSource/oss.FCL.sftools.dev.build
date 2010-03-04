@@ -20,9 +20,13 @@ Description:
 
 ============================================================================
 -->
+<!--* @package compile -->
 <project name="compile.sis" xmlns:hlm="http://www.nokia.com/helium">
     <description>Create SIS files.</description>
     
+    <!-- Common Configuration config name. Override to select a specific config group.
+    @type string
+    -->
     <property name="sis.config.name" value=""/>
     
     <!-- Preprocesses the SIS configuration file to insert Ant properties. -->

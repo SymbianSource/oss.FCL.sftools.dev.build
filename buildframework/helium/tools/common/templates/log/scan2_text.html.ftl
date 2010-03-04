@@ -44,7 +44,7 @@ Description:
 
 <td align="center">${hours?string("00")}:${minutes?string("00")}:${seconds?string("00")}</td>
 <#list priority_ids as priority>
-    <#assign count = table_info['select count(data) as COUNT from metadata where priority_id in (select id from priority      where priority like \'${priority}\') and logpath_id in (select id from logfiles where path like \'%${logfile}%\') and component_id = \'${component}\' '][0]['COUNT'] >
+    <#assign count = table_info['select count(data) as COUNT from metadata where priority_id in (select id from priority      where priority like \'${priority}\') and logpath_id in (select id from logfiles where path like \'%${logfile}\') and component_id = \'${component}\' '][0]['COUNT'] >
     <#if count &gt; 0>
         <#assign color = color_list['${priority}']>
         <td align="center" bgcolor="${color}"><a href="#section${href_c_id}${href_id}">${count}</a></td>
@@ -57,7 +57,7 @@ Description:
 </#macro>
 
 <#macro print_list_text priority component href_id>
-<#assign count = table_info['select count(data) as COUNT from metadata where component_id=\'${component}\' and priority_id in (select id from priority where priority like \'${priority}\') and logpath_id in (select id from logfiles where path like \'%${logfile}%\')'][0]['COUNT'] >
+<#assign count = table_info['select count(data) as COUNT from metadata where component_id=\'${component}\' and priority_id in (select id from priority where priority like \'${priority}\') and logpath_id in (select id from logfiles where path like \'%${logfile}\')'][0]['COUNT'] >
 <#if count &gt; 0>
 <#if component_table?keys?seq_contains("${component}")>
     <#if component_table["${component}"] != "general">
@@ -94,8 +94,8 @@ Description:
     <#assign table_info = pp.loadData('com.nokia.helium.metadata.SQLFMPPLoader',
         "${dbPath}") >
 <#-- overall summary -->
-<#assign component_table = table_info['select id, component from component where logpath_id in (select id from logfiles where path like \'%${logfile}%\') ORDER BY component'] >
-<#assign general_id = table_info['select id from component where logpath_id in (select id from logfiles where path like \'%${logfile}%\') and component like \'%general%\''] >
+<#assign component_table = table_info['select id, component from component where logpath_id in (select id from logfiles where path like \'%${logfile}\') ORDER BY component'] >
+<#assign general_id = table_info['select id from component where logpath_id in (select id from logfiles where path like \'%${logfile}\') and component like \'%general%\''] >
 
 <html>
 <head><title>${logfile}</title></head>
@@ -119,7 +119,7 @@ Description:
 <#assign priority_ids = color_list?keys>
 <#list priority_ids as priority>
     <@add_severity_count severity='${priority}' 
-        count = table_info['select count(data) as COUNT from metadata where priority_id in (select id from priority where priority like \'${priority}\') and logpath_id in (select id from logfiles where path like \'%${logfile}%\')'][0]['COUNT'] color=color_list['${priority}'] />
+        count = table_info['select count(data) as COUNT from metadata where priority_id in (select id from priority where priority like \'${priority}\') and logpath_id in (select id from logfiles where path like \'%${logfile}\')'][0]['COUNT'] color=color_list['${priority}'] />
 </#list>
 </tr>
 </table>
@@ -158,7 +158,7 @@ Description:
 
 <#assign href_pid = 0>
 <#list priority_ids as p_id>
-<#assign p_count = table_info['select count(data) as COUNT from metadata where priority_id in (select id from priority where priority like \'${p_id}\') and logpath_id in (select id from logfiles where path like \'%${logfile}%\')'][0]['COUNT'] >
+<#assign p_count = table_info['select count(data) as COUNT from metadata where priority_id in (select id from priority where priority like \'${p_id}\') and logpath_id in (select id from logfiles where path like \'%${logfile}\')'][0]['COUNT'] >
 <#if p_count &gt; 0>
     <h3><a>${p_id} Details By Component</a></h3>
 </#if>

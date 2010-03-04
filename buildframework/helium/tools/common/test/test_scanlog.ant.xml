@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : test_common.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test_scanlog" xmlns:au="org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>
+        Testing targets
+    </description>
+    <property environment="env"/>
+    
+    
+    <property name="helium.dir" location="../../.." />
+    <import file="../../../helium.ant.xml"/>
+    <property name="scanlog.temp.dir" location="${helium.build.dir}/antunit/scanlog" />
+
+    <target name="setUp">
+        <delete dir="${scanlog.temp.dir}" failonerror="false" />
+        <mkdir dir="${scanlog.temp.dir}" />
+    </target>
+
+    <target name="tearDown">
+        <!--delete dir="${scanlog.temp.dir}" failonerror="false" /-->
+    </target>
+    
+    <target name="test-scanlog-generation">
+        <unzip src="${helium.dir}/tests/data/minibuild_ido_sbs_0.0.1_metadata_db.zip" dest="${scanlog.temp.dir}" />
+        <fmpp sourceFile="${helium.dir}/tools/common/templates/log/scan2_orm.html.ftl"
+                     outputfile="${scanlog.temp.dir}/scanlog.scan2.html">
+            <freemarkerLinks expandProperties="yes">
+                macro: ${helium.dir}/tools/common/templates/macro
+            </freemarkerLinks>
+            <data expandProperties="yes">
+                dbPath: ${scanlog.temp.dir}/minibuild_ido_sbs_0.0.1_metadata_db
+                whatLogPath: "v:/output/logs/compile/minibuild_ido_sbs_0.0.1_armv5_helium_minibuild_ido.log.whatlog.log"
+                doc: xml(${scanlog.temp.dir}/minibuild_ido_sbs_0.0.1_armv5_helium_minibuild_ido.log.info.xml)
+                ant: antProperties()
+            </data>
+        </fmpp>
+    </target>
+    
+</project>
+

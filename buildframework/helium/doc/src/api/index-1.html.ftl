@@ -28,7 +28,7 @@ Description:
     <h1>Index</h1>
     <dl>
         <#assign indexlist = {}>
-        <#list data.heliumDataModel.property.name as propertyName>
+        <#list doc.antDatabase.project.property.name as propertyName>
             <#assign indexlist = indexlist + {propertyName: "property"}>
         </#list>
         <#list doc.antDatabase.project.target.name as targetName>

@@ -20,13 +20,47 @@ Description:
 
 ============================================================================
 -->
-<project name="localisation-50">
+<!--* @package localisation -->
+<project name="localisation-50" xmlns:hlm="http://www.nokia.com/helium">
     <description>
         S60 5.0+ localisation.
     </description>
 
     <!-- Main target for 5.0 build localisation process. -->
     <target name="localisation-50-build" depends="localisation-switch-loc-generator,localisation-dtd"/> 
+
+    <!-- Regional variation support for 5.0 -->
+    <!-- Location of the parse_what_log.pl tool.
+    @type string
+    -->
+    <property name="parse_abld_what.tool" location="${build.drive}\s60\tools\build_platforms\build\tools\parse_what_log.pl" />
+    <!-- Location of the configuration tool.
+    @type string
+    -->
+    <property name="ctool.dir" location="${build.drive}/s60/tools/toolsextensions/ConfigurationTool" />
+    <!-- configuration for the western variant.
+    @type string
+    -->
+    <property name="ctool.western.conf" value="-master_conf s60 -impl \epoc32\rom\config\confml_data\s60 -confml \epoc32\rom\config\confml_data\s60" />
+    <!-- configuration for the chinese variant.
+    @type string
+    -->
+    <property name="ctool.china.conf" value="-master_conf china -impl \epoc32\rom\config\confml_data\s60 -confml \epoc32\rom\config\confml_data\${ctool.region.china}" />
+    <!-- configuration for the japanese variant.
+    @type string
+    -->
+    <property name="ctool.japan.conf" value="-master_conf japan -impl \epoc32\rom\config\confml_data\s60 -confml \epoc32\rom\config\confml_data\${ctool.region.japan}" />
+    <!-- Define the prefix part of the configuration name that builds delta variant.
+    @type string
+    -->
+    <property name="s60.delta.config.prefix" value="S60_variant_"/>
+
+    <!-- ctool translation -->
+    <!-- .
+    @type string
+    @scope private
+    -->
+    <property name="ctool.region.china" value="apac"/>
    
     <!-- 
             This target launch the localisation of DTD files. 
@@ -49,5 +83,115 @@ Description:
         <exec dir="${build.drive}/" executable="perl.exe" failonerror="false"> 
             <arg line="${build.drive}/epoc32/tools/switch_loc_generator.pl"/> 
         </exec> 
-    </target> 
+    </target>
+    
+    
+    <!-- The createDeltaZipMacro enables to create regional variant like china and japan.
+    e.g:
+         <pre><hlm:createDeltaZipMacro variant="china" type="armv5" ctool="true"/></pre>
+    -->
+    <macrodef name="createDeltaZipMacro" uri="http://www.nokia.com/helium">
+        <attribute name="variant"/>
+        <attribute name="type" default=""/>
+        <attribute name="ctool" default="false"/>
+        <attribute name="force" default="false"/>
+        <sequential>
+            <mkdir dir="${build.log.dir}"/>
+            <mkdir dir="${localisation.log.dir}"/>            
+            <if>
+                <and>
+                    <available file="${zips.loc.dir}/delta_@{variant}_package.zip" />
+                    <isfalse value="@{force}"/>
+                </and>                    
+                <then>
+                    <echo>Unzipping ${zips.loc.dir}/delta_@{variant}_package.zip</echo>
+                    <unzip src="${zips.loc.dir}/delta_@{variant}_package.zip" dest="${build.drive}/" overwrite="true" />
+                </then>
+                <else>
+                    <if>
+                        <equals arg1="@{type}" arg2=""/>
+                        <then>
+                            <var name="internal.variant.type" value="@{type}"/>
+                        </then>
+                        <else>
+                            <var name="internal.variant.type" value="_@{type}"/>
+                        </else>
+                    </if>
+                    <echo>Generating ${build.drive}\epoc32\tools\s60tools\variant_build_@{variant}${internal.variant.type}.xml</echo>
+                    <hlm:compileGenxmlMacro input="-x ${canonical.sysdef.file}"
+                                          configuration="${s60.delta.config.prefix}@{variant}${internal.variant.type}"
+                                          output="${build.drive}\epoc32\tools\s60tools\variant_build_@{variant}${internal.variant.type}.xml"
+                                          log="${localisation.log.dir}/${build.id}.variant_build_@{variant}${internal.variant.type}_genxml.log"/>
+
+                    <echo>Building ${build.drive}\epoc32\tools\s60tools\variant_build_@{variant}${internal.variant.type}.xml</echo>
+                    <hlm:compileEbsMacro input="${build.drive}\epoc32\tools\s60tools\variant_build_@{variant}${internal.variant.type}.xml" log="${localisation.log.dir}/${build.id}.@{variant}${internal.variant.type}_compile.log" />
+                    <hlm:compileHtmlscanlogMacro input="${localisation.log.dir}/${build.id}.@{variant}${internal.variant.type}_compile.log" output="${build.log.dir}/${build.id}.@{variant}${internal.variant.type}_scan2.html" />
+                    
+                    <if>
+                        <istrue value="@{ctool}"/>
+                        <then>
+                            <property name="ctool.region.@{variant}" value="@{variant}"/>
+                            <echo>Region ctool: ${ctool.region.@{variant}} (@{variant}).</echo>
+                            <preset.exec executable="cmd" dir="${ctool.dir}/" failonerror="true" output="${localisation.log.dir}/${build.id}.configtool_@{variant}_log.txt">
+                                <arg line="/c cli_build.cmd ${ctool.@{variant}.conf} -report ${localisation.log.dir}/${build.id}.configtool_@{variant}_delta.txt -ignore_errors"/>
+                            </preset.exec>
+                        </then>
+                    </if>
+                    <preset.exec executable="perl" dir="${build.drive}/" failonerror="true">
+                        <arg value="${parse_abld_what.tool}"/>
+                        <arg line="-i ${localisation.log.dir}/${build.id}.@{variant}${internal.variant.type}_compile.log -filter \epoc32 -zip ${zips.loc.dir}/delta_@{variant}_package -ex productvariant.hrh"/>
+                    </preset.exec>
+                    <if>
+                        <istrue value="@{ctool}"/>
+                        <then>
+                            <preset.exec executable="${build.drive}\epoc32\tools\zip.exe" dir="${build.drive}/" input="${localisation.log.dir}/${build.id}.configtool_@{variant}_delta.txt">
+                                <arg line="-r -u ${zips.loc.dir}/delta_@{variant}_package -@"/>
+                            </preset.exec>
+                        </then>
+                    </if>
+                    <var name="internal.variant.type" unset="true"/>
+                </else>
+            </if>
+        </sequential>
+    </macrodef>
+
+
+    <!-- The createDeltaWesternZipMacro enables to create western regional variant
+    e.g: build western variation using the results from S60_postbuild config
+         and enabling configuration tool support.
+         <pre><hlm:createDeltaWesternZipMacro configs="S60_postbuild" ctool="true"/></pre>
+    -->
+    <macrodef name="createDeltaWesternZipMacro"  uri="http://www.nokia.com/helium">
+        <attribute name="configs"/>
+        <attribute name="ctool" default="false"/>
+        <sequential>
+            <mkdir dir="${zips.loc.dir}"/>
+            <mkdir dir="${localisation.log.dir}"/>
+            <for list="@{configs}" delimiter="," param="conf" >
+                <sequential>
+                    <if>
+                        <istrue value="@{ctool}"/>
+                        <then>
+                            <preset.exec executable="cmd" dir="${ctool.dir}/" failonerror="true" output="${localisation.log.dir}/${build.id}.configtool_western_log.txt">
+                                <arg line="/c cli_build.cmd ${ctool.western.conf} -report ${localisation.log.dir}/${build.id}.configtool_western_delta.txt -ignore_errors"/>
+                            </preset.exec>
+                        </then>
+                    </if>
+                    <preset.exec executable="perl" dir="${build.drive}/" failonerror="true">
+                        <arg value="${parse_abld_what.tool}"/>
+                        <arg line="-i ${compile.log.dir}/${build.id}.@{conf}_compile.log -filter \epoc32 -zip ${zips.loc.dir}/delta_western_package -ex productvariant.hrh"/>
+                    </preset.exec>
+                    <if>
+                        <istrue value="@{ctool}"/>
+                        <then>
+                            <preset.exec executable="${build.drive}\epoc32\tools\zip.exe" dir="${build.drive}/" input="${localisation.log.dir}/${build.id}.configtool_western_delta.txt">
+                                <arg line="-r -u ${zips.loc.dir}/delta_western_package -@"/>
+                            </preset.exec>
+                        </then>
+                    </if>
+                </sequential>
+            </for>
+        </sequential>
+    </macrodef>
+    
 </project>

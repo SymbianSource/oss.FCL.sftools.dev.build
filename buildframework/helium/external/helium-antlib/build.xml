@@ -20,75 +20,11 @@ Description:
 
 ============================================================================
 -->
-<project name="helium-antlib" default="build" xmlns:au="antlib:org.apache.ant.antunit">
-    <description>Helium Antlib build file.</description>
-    
+<project name="sf" default="build">
     <property environment="env" />
-
-    <dirname property="helium.antlib.root.dir" file="${ant.file.helium-antlib}" />    
-
-    <import file="macros.ant.xml" />    
-    
-    
-    <path id="subant.build.files">
-        <fileset dir="." includes="core/build.xml" />
-        <fileset dir="." includes="signaling/build.xml" />
-        <fileset dir="." includes="*/build.xml" />
-    </path>
-
-    
-    <target name="compile" description="Compile class files">
-        <subantPreset target="compile"/>
-    </target>
-    
-    
-    <target name="jar" description="Create jar files">
-        <subantPreset target="jar"/>
-    </target>
-    
-    
-    <target name="build" description="Runs compile and jar">
-        <subantPreset target="build"/>
-    </target>
-    
-    
-    <target name="junit" description="Runs jUnit tests">
-        <subantPreset target="junit"/>
-        <antcall target="merge-coverage" />
-    </target>
-    
-    
-    <target name="unittest" description="Runs AntUnit tests">
-        <subantPreset target="unittest"/>
-        <antcall target="merge-coverage" />
-    </target>
-    
-        
-    <target name="test" description="Runs all tests">
-        <subantPreset target="test"/>
-        <antcall target="merge-coverage" />
-    </target>
-    
-    <target name="clean" description="Cleans build outputs">
-        <subantPreset target="clean"/>
-    </target>
-
-    <target name="merge-coverage">
-        <emma enabled="true">
-            <report>
-                <sourcepath>
-                    <dirset dir="${helium.antlib.root.dir}" >
-                        <include name="**/src" /> 
-                    </dirset>
-                </sourcepath>
-                <infileset dir="${build.temp.dir}" includes="**/*.emma" />
-                <txt outfile="${build.temp.dir}/coverage.txt" />
-                <html outfile="${build.temp.dir}/coverage.html" />
-                <xml outfile="${build.temp.dir}/coverage.xml" />
-            </report>
-        </emma>
-    </target>
-    
+    <property name="helium.source.root.dir" location="${ant.file.sf}/.." />
+    <property name="sf.source.root.dir" location="${ant.file.sf}/.." />
+    <import file="${env.BUILDER_HOME}/build.xml"/>
 </project>
 
 

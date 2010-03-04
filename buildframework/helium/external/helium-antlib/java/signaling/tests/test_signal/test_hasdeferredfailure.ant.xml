@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : test_hasdeferredfailure.ant.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test-hasdeferredfailure" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+
+    <description>
+        Test deferred failure signal
+    </description>
+
+    <taskdef resource="com/nokia/helium/core/ant/antlib.xml" uri="http://www.nokia.com/helium"/>
+    <taskdef resource="com/nokia/helium/signal/ant/antlib.xml" uri="http://www.nokia.com/helium"/>
+
+    <dirname property="project.dir.signalhasdefer" file="${ant.file.test-signaltask}" />
+    <property name="build.summary.file" location="${project.dir.signalhasdefer}/data/ido_tedo_mcl_devlon52_ec_MCL.52.105_summary.log.xml" />
+
+    <property environment="env" />
+    <property name="email.input.file" location="${signaling.test.project.dir}/test_signal/ido_tedo_mcl_devlon52_ec_MCL.52.105_summary.log.xml" />
+
+    <!-- Deferred signal -->
+    <hlm:notifierList id="testDeferredSignalNotifiers">
+        <hlm:executeTaskNotifier>
+            <echo>Signal: ${signal.name}</echo>
+        </hlm:executeTaskNotifier>
+    </hlm:notifierList>
+
+    <hlm:signalInput id="testDeferredSignalInput" failBuild="defer">
+        <hlm:notifierListRef refid="testDeferredSignalNotifiers"/>
+    </hlm:signalInput>
+
+    <!-- Fail now signal -->
+    <hlm:notifierList id="testSignalNotifiers">
+        <hlm:executeTaskNotifier>
+            <echo>Signal: ${signal.name}</echo>
+        </hlm:executeTaskNotifier>
+    </hlm:notifierList>
+
+    <hlm:signalInput id="testSignalInput" failBuild="now">
+        <hlm:notifierListRef refid="testSignalNotifiers"/>
+    </hlm:signalInput>
+
+    <!-- is called prior to the test -->
+    <target name="setUp">
+        <!-- cleaning deferred pending failures. -->
+        <hlm:clearDeferredFailures/>
+    </target>
+
+    <!-- is called after the test, even if that caused an error -->
+    <target name="tearDown">
+        <!-- cleaning deferred pending failures. -->
+        <hlm:clearDeferredFailures/>
+    </target>
+
+    <target name="test-no-pending-failure">
+        <au:assertFalse>
+            <hlm:hasDeferredFailure/>
+        </au:assertFalse>
+    </target>
+
+    <target name="raise-signal">
+        <!-- This raise a  testSignal. -->
+        <hlm:signal name="testDeferredSignal" result="1" >
+            <signalNotifierInput>
+                <hlm:signalInput refid="testDeferredSignalInput" />
+            </signalNotifierInput>
+        </hlm:signal>
+    </target>
+
+    <target name="test-pending-failure" depends="raise-signal">
+        <au:assertTrue>
+            <hlm:hasDeferredFailure/>
+        </au:assertTrue>
+    </target>
+
+    <target name="test-pending-failure-named" depends="raise-signal">
+        <au:assertTrue>
+            <hlm:hasDeferredFailure name="testDeferredSignal"/>
+        </au:assertTrue>
+    </target>
+
+    <target name="test-pending-failure-named-missing" depends="raise-signal">
+        <au:assertFalse>
+            <hlm:hasDeferredFailure name="testFooSignal"/>
+        </au:assertFalse>
+    </target>
+
+</project>

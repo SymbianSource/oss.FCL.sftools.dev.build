@@ -18,21 +18,15 @@
 package com.nokia.ant;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.DataOutputStream;
 import java.io.PrintStream;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.concurrent.TimeUnit;
-import java.util.Hashtable;
-import java.util.ArrayList;
 import java.util.Calendar;
 
-import org.apache.tools.ant.BuildEvent;
-import org.apache.tools.ant.Project;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.tools.ant.BuildEvent;
 import org.apache.tools.ant.DefaultLogger;
+import org.apache.tools.ant.Project;
 
 /**
  * Logger class that can connect to Ant and log information regarding to build
@@ -52,47 +46,15 @@ public class HeliumLogger extends DefaultLogger {
 
     private static boolean stopLogToConsole;
 
-    private Date endOfPreviousTarget;
-
     private Project project;
-
     private Log log = LogFactory.getLog(HeliumLogger.class);
 
-    private boolean isInitialized;
-
-    private String directory;
-
-    private SimpleDateFormat timeFormat;
-
-    private Date buildStartTime;
-
-    private Date buildEndTime;
-
-    private Date targetStartTime;
-
-    private ArrayList<String> targetTable;
-
-    private Hashtable tempStartTime;
-
-    private StringBuffer allStages;
 
     /**
      * Ant call this function when bjuild start.
      */
     public void buildStarted(BuildEvent event) {
         project = event.getProject();
-
-        // Record build start time
-        endOfPreviousTarget = new Date();
-        buildStartTime = new Date();
-        endOfPreviousTarget = new Date();
-
-        targetTable = new ArrayList<String>();
-        tempStartTime = new Hashtable();
-
-        // For Stage start time
-        allStages = new StringBuffer("\t<stages>");
-
         super.buildStarted(event);
     }
 
@@ -100,24 +62,31 @@ public class HeliumLogger extends DefaultLogger {
      * Triggered when a target starts.
      */
     public void targetStarted(BuildEvent event) {
+        /** The "if" condition to test on execution. */
+        String ifCondition = "";
+        /** The "unless" condition to test on execution. */
+        String unlessCondition = "";
         String targetName = event.getTarget().getName();
-        targetStartTime = new Date();
-
         logTargetEvent(targetName, "start");
 
-        if (!isInitialized) {
-            initializeLogger();
-        }
-        if (isInitialized) {
-            // Record the target start time
-            tempStartTime.put(targetName, new Date());
-        }
-        super.targetStarted(event);
-    }
+        /**get the values needed from the event **/
+        ifCondition = event.getTarget().getIf();
+        unlessCondition = event.getTarget().getUnless();
+        project = event.getProject();
 
-    private void initializeLogger() {
-        directory = project.getProperty("build.log.dir");
-        isInitialized = true;
+        super.targetStarted(event);
+
+        /**if the target is not going to execute (due to 'if' or 'unless' conditions) 
+        print a message telling the user why it is not going to execute**/
+        if (!testIfCondition(ifCondition) && ifCondition != null) {
+            project.log("Skipped because property '"
+                + project.replaceProperties(ifCondition)
+                + "' not set.", Project.MSG_INFO);
+        } else if (!testUnlessCondition(unlessCondition) && unlessCondition != null) {
+            project.log("Skipped because property '"
+                + project.replaceProperties(unlessCondition)
+                + "' set.", Project.MSG_INFO);
+        }
     }
 
     /**
@@ -145,44 +114,15 @@ public class HeliumLogger extends DefaultLogger {
         String targetName = time + "," + event.getTarget().getName();
 
         logTargetEvent(targetName, "finish");
-        logTargetTime(targetName);
-    }
-
-    private void logTargetTime(String targetName) {
-        Date targetFinishTime = new Date();
-        long targetLengthMSecs = targetFinishTime.getTime()
-                - targetStartTime.getTime();
-        Long outputSecs = TimeUnit.MILLISECONDS.toSeconds(targetLengthMSecs);
-        targetTable.add(targetName + "," + outputSecs.toString());
     }
 
     /**
      * Triggered when the build finishes.
      */
     public void buildFinished(BuildEvent event) {
-        if (isInitialized) {
-            if (directory != null && new File(directory).exists()) {
-                try {
-                    // Log target times to file
-                    String timesLogFileName = directory + File.separator + project.getProperty("build.id") + "_targetTimesLog.csv";
-                    File timesLogFile = new File(timesLogFileName);
-
-                    FileOutputStream timesLogFileStream = new FileOutputStream(
-                            timesLogFileName, true);
-                    DataOutputStream timesLogOut = new DataOutputStream(
-                            timesLogFileStream);
-                    // Display (sorted) hashtable.
-                    for (String s : targetTable)
-                        timesLogOut.writeBytes(s + "\n");
-                    timesLogOut.close();
-                } catch (Exception ex) {
-                    // We are Ignoring the errors as no need to fail the build.
-                    log.fatal("Exception has occurred", ex);
-                    ex.printStackTrace();
-                }
-            }
-            cleanup();
-        }
+        // re-enabling output of messages at the end of the build
+        stopLogToConsole = false;
+        cleanup();
         super.buildFinished(event);
     }
 
@@ -226,5 +166,36 @@ public class HeliumLogger extends DefaultLogger {
         if (!stopLogToConsole) {
             stream.println(message);
         }
+    }
+    
+    /**
+     * Tests whether or not the "if" condition is satisfied.
+     *
+     * @return whether or not the "if" condition is satisfied. If no
+     *         condition (or an empty condition) has been set,
+     *         <code>true</code> is returned.
+     */
+    private boolean testIfCondition(String ifCondition) {
+        if ("".equals(ifCondition)) {
+            return true;
+        }
+
+        String test = project.replaceProperties(ifCondition);
+        return project.getProperty(test) != null;
+    }
+
+    /**
+     * Tests whether or not the "unless" condition is satisfied.
+     *
+     * @return whether or not the "unless" condition is satisfied. If no
+     *         condition (or an empty condition) has been set,
+     *         <code>true</code> is returned.
+     */
+    private boolean testUnlessCondition(String unlessCondition) {
+        if ("".equals(unlessCondition)) {
+            return true;
+        }
+        String test = project.replaceProperties(unlessCondition);
+        return project.getProperty(test) == null;
     }
 }

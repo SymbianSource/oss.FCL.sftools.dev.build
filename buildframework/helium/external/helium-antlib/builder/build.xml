@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : build.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="helium-antlib" default="build" xmlns:au="antlib:org.apache.ant.antunit" xmlns:ivy="antlib:org.apache.ivy.ant" xmlns:ac="antlib:net.sf.antcontrib">
+    <!--
+    <property name="bin.dir" location="${build.dir}/bin" />
+    <property name="build.dir" location="${ant.file.helium-antlib}/../../build" />
+    <property name="helium.dir" location="${ant.file.helium-antlib}/../../build/helium" />
+    <property name="antlib.dir" location="${helium.dir}/external/antlib" />
+    <property name="ivy.dep.file" location="${ant.file.helium-antlib}/../../config/${config}/ivy.xml"/>
+     
+    <target name="configure-ivy">
+        <ivy:settings file="${ant.file.helium-antlib}/../../config/${config}/ivysettings.xml" />
+    </target>
+
+    <target name="get-deps" depends="configure-ivy">
+      <mkdir dir="${helium.dir}" />
+      <mkdir dir="${antlib.dir}" />
+      <ivy:retrieve pattern="${antlib.dir}/[artifact]-[revision].[ext]"
+          ivypattern="${antlib.dir}/[artifact]-[revision].[ext]" conf="${config}" sync="true"/>
+    </target>
+  
+    <target name="build-helium" depends="get-deps">
+    </target>
+    -->
+    <condition property="platform" value="win32" else="unix">
+        <os family="windows"/>
+    </condition>
+    <property name="helium.source.root.dir" location=".." />
+    <property name="build.temp.dir" location="${helium.source.root.dir}/build" />
+    <property name="sf.source.root.dir" location=".." />
+    <property name="component" value="*" />
+    <fileset id="ant.build.files" dir="${helium.source.root.dir}">
+        <include name="*/${component}/build.xml" />
+        <exclude name="builder/**" />
+        <exclude name="*/builder/**" />
+    </fileset>
+  
+    <target name="get-build-list">
+        <ivy:buildlist reference="ivy.buildlist.path">
+            <fileset refid="ant.build.files"/>
+        </ivy:buildlist>
+    </target>
+
+    <target name="report" depends="get-build-list">
+        <subant target="report" buildpathref="ivy.buildlist.path">
+            <property name="builder.dir" location="${ant.file.helium-antlib}/.." />
+        </subant>
+    </target>
+  
+    <target name="compile" depends="get-build-list">
+        <subant target="compile" buildpathref="ivy.buildlist.path">
+            <property name="builder.dir" location="${ant.file.helium-antlib}/.." />
+            <property name="helium.source.root.dir" value="${helium.source.root.dir}"/>
+            <property name="sf.source.root.dir" value="${sf.source.root.dir}"/>
+        </subant>
+    </target>
+
+    <target name="build" depends="get-build-list">
+        <subant target="package" buildpathref="ivy.buildlist.path">
+            <property name="builder.dir" location="${ant.file.helium-antlib}/.." />
+            <property name="helium.source.root.dir" value="${helium.source.root.dir}"/>
+            <property name="sf.source.root.dir" value="${sf.source.root.dir}"/>
+            <property name="platform" value="${platform}"/>
+        </subant>
+    </target>
+
+    <target name="clean" depends="get-build-list">
+        <subant target="clean" buildpathref="ivy.buildlist.path">
+            <property name="builder.dir" location="${ant.file.helium-antlib}/.." />
+            <property name="helium.source.root.dir" value="${helium.source.root.dir}"/>
+            <property name="sf.source.root.dir" value="${sf.source.root.dir}"/>
+        </subant>
+    </target>
+  
+    <target name="test" depends="get-build-list,build">
+        <ac:for param="file" keepgoing="true">
+            <path refid="ivy.buildlist.path" />
+            <sequential>
+                <echo>Testing: @{file}</echo>
+                <ant antfile="@{file}" dir="@{file}/.." target="test" inheritAll="false">
+                    <property name="builder.dir" location="${ant.file.helium-antlib}/.." />
+                </ant>
+            </sequential>
+        </ac:for>
+    </target>
+    <!-- TODO: remove after CI tools are cleaned up -->
+    <target name="unittest" depends="test"/>
+    
+    <target name="junit" depends="get-build-list">
+        <subant target="junit" buildpathref="ivy.buildlist.path">
+            <property name="builder.dir" location="${ant.file.helium-antlib}/.." />
+        </subant>
+    </target>
+    
+    <target name="antunit" depends="get-build-list">
+        <subant target="antunit" buildpathref="ivy.buildlist.path">
+            <property name="builder.dir" location="${ant.file.helium-antlib}/.." />
+        </subant>
+    </target>
+    
+    <target name="quality" depends="get-build-list">
+        <ac:for param="file" keepgoing="true">
+            <path refid="ivy.buildlist.path" />
+            <sequential>
+                <echo>${ant.file.helium-antlib}</echo>
+                <ant antfile="@{file}" dir="@{file}/.." target="quality" inheritAll="false">
+                    <property name="builder.dir" location="${ant.file.helium-antlib}/.." />
+                    <property name="helium.source.root.dir" value="${helium.source.root.dir}"/>
+                    <property name="sf.source.root.dir" value="${sf.source.root.dir}"/>
+                    <property name="platform" value="${platform}"/>
+                </ant>
+            </sequential>
+        </ac:for>
+    </target>
+
+    <target name="checkstyle" depends="get-build-list">
+        <ac:for param="file" keepgoing="true">
+            <path refid="ivy.buildlist.path" />
+            <sequential>
+                <ant antfile="@{file}" dir="@{file}/.." target="checkstyle" inheritAll="false">
+                    <property name="builder.dir" location="${ant.file.helium-antlib}/.." />
+                    <property name="helium.source.root.dir" value="${helium.source.root.dir}"/>
+                    <property name="sf.source.root.dir" value="${sf.source.root.dir}"/>
+                    <property name="platform" value="${platform}"/>
+                </ant>
+            </sequential>
+        </ac:for>
+    </target>
+
+    <target name="textdoc">
+        <copy todir="${build.temp.dir}/doctmp" overwrite="true">
+            <fileset dir="${sf.source.root.dir}/doc/src"/>
+        </copy>
+        <copy todir="${build.temp.dir}/doctmp" overwrite="true" flatten="true">
+            <fileset dir="${sf.source.root.dir}" includes="**/*.rst"/>
+        </copy>
+        <rstMacro version="1.0" src="${build.temp.dir}/doctmp"/>
+    </target>
+    
+    <!-- Macro to generate html docs from rst. -->
+    <macrodef name="rstMacro">
+        <attribute name="version"/>
+        <attribute name="src" default="${sf.source.root.dir}/doc/src"/>
+        <attribute name="output" default="${build.temp.dir}/doc"/>
+        <sequential>
+            <property name="sphinx.lib.dir" location="${sf.source.root.dir}/doc/tools/Sphinx-0.5.1-py2.5.egg/sphinx" />
+            <exec executable="python" failonerror="${failonerror}">
+                <env key="PYTHONPATH" path="${sf.source.root.dir}/doc/tools" />
+                <arg file="${sf.source.root.dir}/doc/tools/sphinx-build.py"/>
+                <arg value="-b" />
+                <arg value="html" />            
+                <arg value="-D" />
+                <arg value="version=@{version}" />
+                <arg value="-D" />
+                <arg value="release=@{version}" />
+                <arg file="@{src}" />
+                <arg file="@{output}" />
+            </exec>
+        </sequential>
+    </macrodef>
+</project>

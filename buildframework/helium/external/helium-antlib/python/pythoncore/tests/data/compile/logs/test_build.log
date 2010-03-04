@@ -1,0 +1,462 @@
+===-------------------------------------------------
+=== Stage=1
+===-------------------------------------------------
+=== Stage=1 started Thu Jan 28 13:23:40 2010
+=== Stage=1 == posmsgpluginreferenceimpl
+-- bldmake bldfiles -keepgoing
+--- EBS_CLIENT5 Executed ID 5
+++ Started at Thu Jan 28 13:23:41 2010
++++ HiRes Start 1264665221.03126
+Chdir \s60/adaptation/stubs/posmsgpluginreferenceimpl/group
++++ HiRes End 1264665227.49992
+++ Finished at Thu Jan 28 13:23:47 2010
+=== Stage=1 == locationtools
+-- bldmake bldfiles -keepgoing
+--- EBS_CLIENT6 Executed ID 6
+++ Started at Thu Jan 28 13:23:41 2010
++++ HiRes Start 1264665221.04688
+Chdir \s60/tools/locationtools/group
++++ HiRes End 1264665228.43741
+++ Finished at Thu Jan 28 13:23:48 2010
+=== Stage=1 == locationrefapp
+-- bldmake bldfiles -keepgoing
+--- EBS_CLIENT2 Executed ID 4
+++ Started at Thu Jan 28 13:23:41 2010
++++ HiRes Start 1264665221.03126
+Chdir \s60/refapp/locationrefapp/group
++++ HiRes End 1264665228.45304
+++ Finished at Thu Jan 28 13:23:48 2010
+=== Stage=1 == location
+-- bldmake bldfiles -keepgoing
+--- EBS_CLIENT1 Executed ID 3
+++ Started at Thu Jan 28 13:23:41 2010
++++ HiRes Start 1264665221.03126
+Chdir \s60/app/location/group
++++ HiRes End 1264665229.93739
+++ Finished at Thu Jan 28 13:23:49 2010
+=== Stage=1 == locationextensions
+-- bldmake bldfiles -keepgoing
+--- EBS_CLIENT7 Executed ID 1
+++ Started at Thu Jan 28 13:23:40 2010
++++ HiRes Start 1264665220.90626
+Chdir \s60/osext/locationextensions/group
++++ HiRes End 1264665230.49989
+++ Finished at Thu Jan 28 13:23:50 2010
+=== Stage=1 == locationservices
+-- bldmake bldfiles -keepgoing
+--- EBS_CLIENT3 Executed ID 2
+++ Started at Thu Jan 28 13:23:41 2010
++++ HiRes Start 1264665221.01563
+Chdir \s60/mw/locationservices/group
++++ HiRes End 1264665233.57797
+++ Finished at Thu Jan 28 13:23:53 2010
+=== Stage=1 finished Thu Jan 28 13:23:53 2010
+===-------------------------------------------------
+=== Stage=2
+===-------------------------------------------------
+=== Stage=2 started Thu Jan 28 13:23:53 2010
+=== Stage=2 == locationtools
+-- abld export -keepgoing
+--- EBS_CLIENT5 Executed ID 12
+++ Started at Thu Jan 28 13:23:53 2010
++++ HiRes Start 1264665233.57797
+Chdir \s60/tools/locationtools/group
+  make -r  -k -f "\EPOC32\BUILD\s60\tools\locationtools\group\EXPORT.make" EXPORT VERBOSE=-s KEEPGOING=-k
+make: Nothing to done for `EXPORT'.
++++ HiRes End 1264665235.18733
+++ Finished at Thu Jan 28 13:23:55 2010
+=== Stage=2 == location
+-- abld export -keepgoing
+--- EBS_CLIENT2 Executed ID 9
+++ Started at Thu Jan 28 13:23:53 2010
++++ HiRes Start 1264665233.57797
+Chdir \s60/app/location/group
+  make -r  -k -f "\EPOC32\BUILD\s60\app\location\group\EXPORT.make" EXPORT VERBOSE=-s KEEPGOING=-k
+make: Nothing to done for `EXPORT'.
++++ HiRes End 1264665235.24983
+++ Finished at Thu Jan 28 13:23:55 2010
+=== Stage=2 == locationextensions
+-- abld export -keepgoing
+--- EBS_CLIENT0 Executed ID 7
+++ Started at Thu Jan 28 13:23:53 2010
++++ HiRes Start 1264665233.57797
+Chdir \s60/osext/locationextensions/group
+  make -r  -k -f "\EPOC32\BUILD\s60\osext\locationextensions\group\EXPORT.make" EXPORT VERBOSE=-s KEEPGOING=-k
+make: Nothing to done for `EXPORT'.
++++ HiRes End 1264665235.28108
+++ Finished at Thu Jan 28 13:23:55 2010
+=== Stage=2 == locationservices
+-- abld export -keepgoing
+--- EBS_CLIENT1 Executed ID 8
+++ Started at Thu Jan 28 13:23:53 2010
++++ HiRes Start 1264665233.57797
+Chdir \s60/mw/locationservices/group
+  make -r  -k -f "\EPOC32\BUILD\s60\mw\locationservices\group\EXPORT.make" EXPORT VERBOSE=-s KEEPGOING=-k
+copy "\s60\mw\locationservices\supl\locationomasuplprotocolhandler\asnconverter\inc\epos_comasuplasndecoder.h" "\s60\mw\locationservices\supl\locationomasuplprotocolhandler\inc\epos_comasuplasndecoder.h"
+        1 file(s) copied.
+copy "\s60\mw\locationservices\supl\locationomasuplprotocolhandler\asnconverter\inc\epos_comasuplasnmessagebase.h" "\s60\mw\locationservices\supl\locationomasuplprotocolhandler\inc\epos_comasuplasnmessagebase.h"
+        1 file(s) copied.
+copy "\s60\mw\locationservices\supl\locationomasuplprotocolhandler\asnconverter\inc\epos_comasuplend.h" "\s60\mw\locationservices\supl\locationomasuplprotocolhandler\inc\epos_comasuplend.h"
+        1 file(s) copied.
+copy "\s60\mw\locationservices\supl\locationomasuplprotocolhandler\asnconverter\inc\epos_comasuplinit.h" "\s60\mw\locationservices\supl\locationomasuplprotocolhandler\inc\epos_comasuplinit.h"
+        1 file(s) copied.
+copy "\s60\mw\locationservices\supl\locationomasuplprotocolhandler\asnconverter\inc\epos_comasupllocationid.h" "\s60\mw\locationservices\supl\locationomasuplprotocolhandler\inc\epos_comasupllocationid.h"
+        1 file(s) copied.
+copy "\s60\mw\locationservices\supl\locationomasuplprotocolhandler\asnconverter\inc\epos_comasuplnotification.h" "\s60\mw\locationservices\supl\locationomasuplprotocolhandler\inc\epos_comasuplnotification.h"
+        1 file(s) copied.
+copy "\s60\mw\locationservices\supl\locationomasuplprotocolhandler\asnconverter\inc\epos_comasuplpos.h" "\s60\mw\locationservices\supl\locationomasuplprotocolhandler\inc\epos_comasuplpos.h"
+        1 file(s) copied.
+copy "\s60\mw\locationservices\supl\locationomasuplprotocolhandler\asnconverter\inc\epos_comasuplposinit.h" "\s60\mw\locationservices\supl\locationomasuplprotocolhandler\inc\epos_comasuplposinit.h"
+        1 file(s) copied.
+copy "\s60\mw\locationservices\supl\locationomasuplprotocolhandler\asnconverter\inc\epos_comasuplresponse.h" "\s60\mw\locationservices\supl\locationomasuplprotocolhandler\inc\epos_comasuplresponse.h"
+        1 file(s) copied.
+copy "\s60\mw\locationservices\supl\locationomasuplprotocolhandler\asnconverter\inc\epos_comasuplauthresponse.h" "\s60\mw\locationservices\supl\locationomasuplprotocolhandler\inc\epos_comasuplauthresponse.h"
+        1 file(s) copied.
+copy "\s60\mw\locationservices\supl\locationomasuplprotocolhandler\asnconverter\inc\epos_comasuplauthrequest.h" "\s60\mw\locationservices\supl\locationomasuplprotocolhandler\inc\epos_comasuplauthrequest.h"
+        1 file(s) copied.
+copy "\s60\mw\locationservices\supl\locationomasuplprotocolhandler\asnconverter\inc\epos_comasuplsessionid.h" "\s60\mw\locationservices\supl\locationomasuplprotocolhandler\inc\epos_comasuplsessionid.h"
+        1 file(s) copied.
+copy "\s60\mw\locationservices\supl\locationomasuplprotocolhandler\asnconverter\inc\epos_comasuplstart.h" "\s60\mw\locationservices\supl\locationomasuplprotocolhandler\inc\epos_comasuplstart.h"
+        1 file(s) copied.
+copy "\s60\mw\locationservices\supl\locationomasuplprotocolhandler\asnconverter\inc\epos_suplconstants.h" "\s60\mw\locationservices\supl\locationomasuplprotocolhandler\inc\epos_suplconstants.h"
+        1 file(s) copied.
+copy "\s60\mw\locationservices\supl\locationomasuplprotocolhandler\asnconverter\inc\epos_tomasuplposmethod.h" "\s60\mw\locationservices\supl\locationomasuplprotocolhandler\inc\epos_tomasuplposmethod.h"
+        1 file(s) copied.
+copy "\s60\mw\locationservices\supl\locationomasuplprotocolhandler\asnconverter\inc\epos_tomasuplqop.h" "\s60\mw\locationservices\supl\locationomasuplprotocolhandler\inc\epos_tomasuplqop.h"
+        1 file(s) copied.
+copy "\s60\mw\locationservices\supl\locationomasuplprotocolhandler\asnconverter\inc\epos_tomasuplecellinfo.h" "\s60\mw\locationservices\supl\locationomasuplprotocolhandler\inc\epos_tomasuplecellinfo.h"
+        1 file(s) copied.
++++ HiRes End 1264665236.84356
+++ Finished at Thu Jan 28 13:23:56 2010
+=== Stage=2 == posmsgpluginreferenceimpl
+-- abld export -keepgoing
+--- EBS_CLIENT4 Executed ID 11
+++ Started at Thu Jan 28 13:23:53 2010
++++ HiRes Start 1264665233.57797
+Chdir \s60/adaptation/stubs/posmsgpluginreferenceimpl/group
+  make -r  -k -f "\EPOC32\BUILD\s60\adaptation\stubs\posmsgpluginreferenceimpl\group\EXPORT.make" EXPORT VERBOSE=-s KEEPGOING=-k
+Nothing to do
++++ HiRes End 1264665238.60916
+++ Finished at Thu Jan 28 13:23:58 2010
+=== Stage=2 == locationrefapp
+-- abld export -keepgoing
+--- EBS_CLIENT3 Executed ID 10
+++ Started at Thu Jan 28 13:23:53 2010
++++ HiRes Start 1264665233.57797
+Chdir \s60/refapp/locationrefapp/group
+  make -r  -k -f "\EPOC32\BUILD\s60\refapp\locationrefapp\group\EXPORT.make" EXPORT VERBOSE=-s KEEPGOING=-k
+Nothing to do
++++ HiRes End 1264665238.62478
+++ Finished at Thu Jan 28 13:23:58 2010
+=== Stage=2 finished Thu Jan 28 13:23:58 2010
+===-------------------------------------------------
+=== Stage=3
+===-------------------------------------------------
+=== Stage=3 started Thu Jan 28 13:23:58 2010
+=== Stage=3 == location
+-- abld makefile -keepgoing tools
+--- EBS_CLIENT2 Executed ID 15
+++ Started at Thu Jan 28 13:23:58 2010
++++ HiRes Start 1264665238.62478
+Chdir \s60/app/location/group
+This project does not support platform or  program "TOOLS"
++++ HiRes End 1264665240.03101
+++ Finished at Thu Jan 28 13:24:00 2010
+=== Stage=3 == posmsgpluginreferenceimpl
+-- abld makefile -keepgoing tools
+--- EBS_CLIENT4 Executed ID 17
+++ Started at Thu Jan 28 13:23:58 2010
++++ HiRes Start 1264665238.62478
+Chdir \s60/adaptation/stubs/posmsgpluginreferenceimpl/group
+This project does not support platform or  program "TOOLS"
++++ HiRes End 1264665240.04664
+++ Finished at Thu Jan 28 13:24:00 2010
+=== Stage=3 == locationtools
+-- abld makefile -keepgoing tools
+--- EBS_CLIENT5 Executed ID 18
+++ Started at Thu Jan 28 13:23:58 2010
++++ HiRes Start 1264665238.62478
+Chdir \s60/tools/locationtools/group
+This project does not support platform or  program "TOOLS"
++++ HiRes End 1264665240.12476
+++ Finished at Thu Jan 28 13:24:00 2010
+=== Stage=3 == locationextensions
+-- abld makefile -keepgoing tools
+--- EBS_CLIENT0 Executed ID 13
+++ Started at Thu Jan 28 13:23:58 2010
++++ HiRes Start 1264665238.62478
+Chdir \s60/osext/locationextensions/group
+This project does not support platform or  program "TOOLS"
++++ HiRes End 1264665240.12476
+++ Finished at Thu Jan 28 13:24:00 2010
+=== Stage=3 == locationservices
+-- abld makefile -keepgoing tools
+--- EBS_CLIENT1 Executed ID 14
+++ Started at Thu Jan 28 13:23:58 2010
++++ HiRes Start 1264665238.62478
+Chdir \s60/mw/locationservices/group
+This project does not support platform or  program "TOOLS"
++++ HiRes End 1264665240.18726
+++ Finished at Thu Jan 28 13:24:00 2010
+=== Stage=3 == locationrefapp
+-- abld makefile -keepgoing tools
+--- EBS_CLIENT3 Executed ID 16
+++ Started at Thu Jan 28 13:23:58 2010
++++ HiRes Start 1264665238.62478
+Chdir \s60/refapp/locationrefapp/group
+This project does not support platform or  program "TOOLS"
++++ HiRes End 1264665240.20289
+++ Finished at Thu Jan 28 13:24:00 2010
+=== Stage=3 finished Thu Jan 28 13:24:00 2010
+===-------------------------------------------------
+=== Stage=4
+===-------------------------------------------------
+=== Stage=4 started Thu Jan 28 13:24:00 2010
+=== Stage=4 == locationextensions
+-- abld library -keepgoing tools
+--- EBS_CLIENT0 Executed ID 19
+++ Started at Thu Jan 28 13:24:00 2010
++++ HiRes Start 1264665240.21851
+Chdir \s60/osext/locationextensions/group
+This project does not support platform or  program "TOOLS"
++++ HiRes End 1264665240.79663
+++ Finished at Thu Jan 28 13:24:00 2010
+=== Stage=4 finished Thu Jan 28 13:24:00 2010
+===-------------------------------------------------
+=== Stage=5
+===-------------------------------------------------
+=== Stage=5 started Thu Jan 28 13:24:00 2010
+=== Stage=5 == locationservices
+-- abld library -keepgoing tools
+--- EBS_CLIENT0 Executed ID 20
+++ Started at Thu Jan 28 13:24:00 2010
++++ HiRes Start 1264665240.79663
+Chdir \s60/mw/locationservices/group
+This project does not support platform or  program "TOOLS"
++++ HiRes End 1264665241.406
+++ Finished at Thu Jan 28 13:24:01 2010
+=== Stage=5 finished Thu Jan 28 13:24:01 2010
+===-------------------------------------------------
+=== Stage=6
+===-------------------------------------------------
+=== Stage=6 started Thu Jan 28 13:24:01 2010
+=== Stage=6 == location
+-- abld library -keepgoing tools
+--- EBS_CLIENT0 Executed ID 21
+++ Started at Thu Jan 28 13:24:01 2010
++++ HiRes Start 1264665241.406
+Chdir \s60/app/location/group
+This project does not support platform or  program "TOOLS"
++++ HiRes End 1264665241.99974
+++ Finished at Thu Jan 28 13:24:01 2010
+=== Stage=6 finished Thu Jan 28 13:24:01 2010
+===-------------------------------------------------
+=== Stage=7
+===-------------------------------------------------
+=== Stage=7 started Thu Jan 28 13:24:01 2010
+=== Stage=7 == locationrefapp
+-- abld library -keepgoing tools
+--- EBS_CLIENT0 Executed ID 22
+++ Started at Thu Jan 28 13:24:01 2010
++++ HiRes Start 1264665241.99974
+Chdir \s60/refapp/locationrefapp/group
+This project does not support platform or  program "TOOLS"
++++ HiRes End 1264665242.59348
+++ Finished at Thu Jan 28 13:24:02 2010
+=== Stage=7 finished Thu Jan 28 13:24:02 2010
+===-------------------------------------------------
+=== Stage=8
+===-------------------------------------------------
+=== Stage=8 started Thu Jan 28 13:24:02 2010
+=== Stage=8 == posmsgpluginreferenceimpl
+-- abld library -keepgoing tools
+--- EBS_CLIENT0 Executed ID 23
+++ Started at Thu Jan 28 13:24:02 2010
++++ HiRes Start 1264665242.59348
+Chdir \s60/adaptation/stubs/posmsgpluginreferenceimpl/group
+This project does not support platform or  program "TOOLS"
++++ HiRes End 1264665243.18723
+++ Finished at Thu Jan 28 13:24:03 2010
+=== Stage=8 finished Thu Jan 28 13:24:03 2010
+===-------------------------------------------------
+=== Stage=9
+===-------------------------------------------------
+=== Stage=9 started Thu Jan 28 13:24:03 2010
+=== Stage=9 == locationtools
+-- abld library -keepgoing tools
+--- EBS_CLIENT0 Executed ID 24
+++ Started at Thu Jan 28 13:24:03 2010
++++ HiRes Start 1264665243.18723
+Chdir \s60/tools/locationtools/group
+This project does not support platform or  program "TOOLS"
++++ HiRes End 1264665243.78097
+++ Finished at Thu Jan 28 13:24:03 2010
+=== Stage=9 finished Thu Jan 28 13:24:03 2010
+===-------------------------------------------------
+=== Stage=10
+===-------------------------------------------------
+=== Stage=10 started Thu Jan 28 13:24:03 2010
+=== Stage=10 == locationextensions
+-- abld target -keepgoing tools rel
+--- EBS_CLIENT0 Executed ID 25
+++ Started at Thu Jan 28 13:24:03 2010
++++ HiRes Start 1264665243.78097
+Chdir \s60/osext/locationextensions/group
+This project does not support platform, build or  program "TOOLS"
++++ HiRes End 1264665244.35909
+++ Finished at Thu Jan 28 13:24:04 2010
+=== Stage=10 finished Thu Jan 28 13:24:04 2010
+===-------------------------------------------------
+=== Stage=11
+===-------------------------------------------------
+=== Stage=11 started Thu Jan 28 13:24:04 2010
+=== Stage=11 == locationservices
+-- abld target -keepgoing tools rel
+--- EBS_CLIENT0 Executed ID 26
+++ Started at Thu Jan 28 13:24:04 2010
++++ HiRes Start 1264665244.35909
+Chdir \s60/mw/locationservices/group
+This project does not support platform, build or  program "TOOLS"
++++ HiRes End 1264665244.95283
+++ Finished at Thu Jan 28 13:24:04 2010
+=== Stage=11 finished Thu Jan 28 13:24:04 2010
+===-------------------------------------------------
+=== Stage=12
+===-------------------------------------------------
+=== Stage=12 started Thu Jan 28 13:24:04 2010
+=== Stage=12 == location
+-- abld target -keepgoing tools rel
+--- EBS_CLIENT0 Executed ID 27
+++ Started at Thu Jan 28 13:24:04 2010
++++ HiRes Start 1264665244.95283
+Chdir \s60/app/location/group
+This project does not support platform, build or  program "TOOLS"
++++ HiRes End 1264665245.53095
+++ Finished at Thu Jan 28 13:24:05 2010
+=== Stage=12 finished Thu Jan 28 13:24:05 2010
+===-------------------------------------------------
+=== Stage=13
+===-------------------------------------------------
+=== Stage=13 started Thu Jan 28 13:24:05 2010
+=== Stage=13 == locationrefapp
+-- abld target -keepgoing tools rel
+--- EBS_CLIENT0 Executed ID 28
+++ Started at Thu Jan 28 13:24:05 2010
++++ HiRes Start 1264665245.53095
+Chdir \s60/refapp/locationrefapp/group
+This project does not support platform, build or  program "TOOLS"
++++ HiRes End 1264665246.10906
+++ Finished at Thu Jan 28 13:24:06 2010
+=== Stage=13 finished Thu Jan 28 13:24:06 2010
+===-------------------------------------------------
+=== Stage=14
+===-------------------------------------------------
+=== Stage=14 started Thu Jan 28 13:24:06 2010
+=== Stage=14 == posmsgpluginreferenceimpl
+-- abld target -keepgoing tools rel
+--- EBS_CLIENT0 Executed ID 29
+++ Started at Thu Jan 28 13:24:06 2010
++++ HiRes Start 1264665246.10906
+Chdir \s60/adaptation/stubs/posmsgpluginreferenceimpl/group
+This project does not support platform, build or  program "TOOLS"
++++ HiRes End 1264665246.71843
+++ Finished at Thu Jan 28 13:24:06 2010
+=== Stage=14 finished Thu Jan 28 13:24:06 2010
+===-------------------------------------------------
+=== Stage=15
+===-------------------------------------------------
+=== Stage=15 started Thu Jan 28 13:24:06 2010
+=== Stage=15 == locationtools
+-- abld target -keepgoing tools rel
+--- EBS_CLIENT0 Executed ID 30
+++ Started at Thu Jan 28 13:24:06 2010
++++ HiRes Start 1264665246.71843
+Chdir \s60/tools/locationtools/group
+This project does not support platform, build or  program "TOOLS"
++++ HiRes End 1264665247.29655
+++ Finished at Thu Jan 28 13:24:07 2010
+=== Stage=15 finished Thu Jan 28 13:24:07 2010
+===-------------------------------------------------
+=== Stage=16
+===-------------------------------------------------
+=== Stage=16 started Thu Jan 28 13:24:07 2010
+=== Stage=16 == locationextensions
+-- abld final -keepgoing tools rel
+--- EBS_CLIENT0 Executed ID 31
+++ Started at Thu Jan 28 13:24:07 2010
++++ HiRes Start 1264665247.29655
+Chdir \s60/osext/locationextensions/group
+This project does not support platform, build or  program "TOOLS"
++++ HiRes End 1264665247.89029
+++ Finished at Thu Jan 28 13:24:07 2010
+=== Stage=16 finished Thu Jan 28 13:24:07 2010
+===-------------------------------------------------
+=== Stage=17
+===-------------------------------------------------
+=== Stage=17 started Thu Jan 28 13:24:07 2010
+=== Stage=17 == locationservices
+-- abld final -keepgoing tools rel
+--- EBS_CLIENT0 Executed ID 32
+++ Started at Thu Jan 28 13:24:07 2010
++++ HiRes Start 1264665247.89029
+Chdir \s60/mw/locationservices/group
+This project does not support platform, build or  program "TOOLS"
++++ HiRes End 1264665248.48403
+++ Finished at Thu Jan 28 13:24:08 2010
+=== Stage=17 finished Thu Jan 28 13:24:08 2010
+===-------------------------------------------------
+=== Stage=18
+===-------------------------------------------------
+=== Stage=18 started Thu Jan 28 13:24:08 2010
+=== Stage=18 == location
+-- abld final -keepgoing tools rel
+--- EBS_CLIENT0 Executed ID 33
+++ Started at Thu Jan 28 13:24:08 2010
++++ HiRes Start 1264665248.48403
+Chdir \s60/app/location/group
+This project does not support platform, build or  program "TOOLS"
++++ HiRes End 1264665249.07777
+++ Finished at Thu Jan 28 13:24:09 2010
+=== Stage=18 finished Thu Jan 28 13:24:09 2010
+===-------------------------------------------------
+=== Stage=19
+===-------------------------------------------------
+=== Stage=19 started Thu Jan 28 13:24:09 2010
+=== Stage=19 == locationrefapp
+-- abld final -keepgoing tools rel
+--- EBS_CLIENT0 Executed ID 34
+++ Started at Thu Jan 28 13:24:09 2010
++++ HiRes Start 1264665249.07777
+Chdir \s60/refapp/locationrefapp/group
+This project does not support platform, build or  program "TOOLS"
++++ HiRes End 1264665249.67152
+++ Finished at Thu Jan 28 13:24:09 2010
+=== Stage=19 finished Thu Jan 28 13:24:09 2010
+===-------------------------------------------------
+=== Stage=20
+===-------------------------------------------------
+=== Stage=20 started Thu Jan 28 13:24:09 2010
+=== Stage=20 == posmsgpluginreferenceimpl
+-- abld final -keepgoing tools rel
+--- EBS_CLIENT0 Executed ID 35
+++ Started at Thu Jan 28 13:24:09 2010
++++ HiRes Start 1264665249.67152
+Chdir \s60/adaptation/stubs/posmsgpluginreferenceimpl/group
+This project does not support platform, build or  program "TOOLS"
++++ HiRes End 1264665250.24963
+++ Finished at Thu Jan 28 13:24:10 2010
+=== Stage=20 finished Thu Jan 28 13:24:10 2010
+===-------------------------------------------------
+=== Stage=21
+===-------------------------------------------------
+=== Stage=21 started Thu Jan 28 13:24:10 2010
+=== Stage=21 == locationtools
+-- abld final -keepgoing tools rel
+--- EBS_CLIENT0 Executed ID 36
+++ Started at Thu Jan 28 13:24:10 2010
++++ HiRes Start 1264665250.24963
+Chdir \s60/tools/locationtools/group
+This project does not support platform, build or  program "TOOLS"
++++ HiRes End 1264665250.82775
+++ Finished at Thu Jan 28 13:24:10 2010
+=== Stage=21 finished Thu Jan 28 13:24:10 2010

@@ -28,14 +28,14 @@ Description:
                 <#list ant['do.robot.release']?split(',') as project>
                     <#if name?replace('\\', '/')?lower_case?contains("/${project}/${project}"?lower_case)>
                     <#-- 7za u test.7z  output/analysisdata/ -->
-                    <exec executable="7za" dir="${data[name]}/../">
+                    <exec executable="7za" dir="${name}/../">
                         <arg value="u"/>
                         <arg value="-xr!*/internal/*"/>
                         <arg value="-xr!*/doc/*"/>
                         <arg value="-xr!_ccmwaid.inf"/>
                         <arg value="-xr!abld.bat"/>
                         <arg value="${ant['build.output.dir']}/s60Sources.7z"/>
-                        <arg value="${data[name]?split("/")?last}/"/>
+                        <arg value="${name?split("/")?last}/"/>
                     </exec>                    
                     </#if>
                 </#list>

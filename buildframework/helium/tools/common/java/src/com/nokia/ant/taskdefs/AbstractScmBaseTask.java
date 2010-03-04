@@ -30,7 +30,6 @@ import org.apache.tools.ant.taskdefs.LogStreamHandler;
  * <code>AbstractScmBaseTask</code> is an abstract class for GSCM related tasks
  * such as rebaseline and deconfigure.
  * 
- * @author hacs
  * @ant.task category="SCM"
  * 
  */

@@ -24,10 +24,10 @@ Description:
     <description>
         Targets to test publishing to diamonds
     </description>
-    <!-- Private: -->
+    <!-- @scope private -->
     <target name="xtest-diamonds" depends="setup-test-publishing-to-diamonds,diamonds,xtest-diamonds-validate-policy,xtest-diamonds-check-tool-dependencies"/>
     
-    <!-- Private: -->
+    <!-- @scope private -->
     <target name="setup-test-publishing-to-diamonds">
         <property name="build.family" value="helium_test"/>
         <property name="email.from" value="none"/>
@@ -55,7 +55,7 @@ Description:
     </target>
 --> 
     
-    <!-- Private: -->
+    <!-- @scope private -->
     <target name="xtest-diamonds-check-tool-dependencies">
         <antcall target="check-tool-dependencies">
         </antcall>            
@@ -71,7 +71,7 @@ Description:
         </xpathtest>
     </target> 
     
-    <!-- Private: -->
+    <!-- @scope private -->
     <target name="xtest-diamonds-validate-policy">
         <antcall target="render-validate-policy">
         </antcall>            

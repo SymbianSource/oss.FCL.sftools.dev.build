@@ -1,0 +1,618 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : helium-docs.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<!--* @package framework -->
+<project name="internal.helium.docs" xmlns:hlm="http://www.nokia.com/helium" xmlns:ivy="antlib:org.apache.ivy.ant">
+    <description>
+    Documentation generation targets specific to Helium.
+    </description>
+    
+    <!-- Location of documentation source that is specific to Helium.
+    @type string
+    @scope private
+    -->
+    <property name="helium.doc.src.dir" location="${helium.dir}/doc" />
+    
+    <!-- Generate an overview of Helium as HTML tables. -->
+    <target name="overview-to-html">
+        <fmpp sourceFile="${helium.doc.src.dir}/src/helium_overview.html.ftl"
+              outputFile="${docs.build.dir}/temp/doc/helium_overview.html"
+              replaceExtension="html.ftl, html" expert="true">
+            <data expandProperties="yes">
+                doc: xml(${helium.doc.src.dir}/src/helium_overview.xml)
+            </data>
+        </fmpp>
+    </target>
+
+    
+    <!-- Macro to generate the tools dependency xml output. -->
+    <macrodef name="createToolsTableMacro" uri="http://www.nokia.com/helium">
+        <attribute name="dir"/>
+        <attribute name="failonerror"/>
+        <attribute name="configs"/>
+        <sequential>
+            <ivy:configure file="${tools.ivy.config.file}" override="true"/>
+            <ivy:resolve file="${helium.dir}/config/ivy/ivy.xml" conf="@{configs}" haltonfailure="@{failonerror}"/>
+            <ivy:report todir="@{dir}" outputpattern="tool-dependencies-[conf].xml"
+                        conf="@{configs}" xml="true" graph="false" xsl="false"/>
+        </sequential>
+    </macrodef>
+
+    
+    <!-- Generates the tools dependency xml output. used in the retrieving Helium section to
+    list the tools used within Helium. -->
+    <target name="tools-rst-table">
+        <hlm:createToolsTableMacro dir="${docs.build.dir}/ivy" failonerror="false" 
+            configs="core,ido"/>
+        <fmpp sourceFile="${helium.doc.src.dir}/src/manual/tool-dependencies.rst.ftl" includes="*.dot.ftl"
+              outputFile="${docs.build.dir}/temp/doc/nokia/tool-dependencies.rst_include"
+              replaceExtension="dot.ftl, dot">
+            <data expandProperties="yes">
+                doc: xml(${docs.build.dir}/ivy/tool-dependencies-ido.xml)
+            </data>
+        </fmpp>
+    </target>
+    
+    
+    <!-- Create a complete dependency graph of Helium libraries. 
+        
+    Currently this does not work correctly but it is useful for future testing of repreport. -->
+    <target name="libraries-dependencies">
+        <ivy:settings file="${tools.ivy.config.file}"/>
+        <!--<ivy:resolve file="${helium.dir}/config/ivy/ivy.xml" conf="" haltonfailure="false"/>-->
+        <delete file="@{dir}/ivy-repository-report.xml"/>
+        <ivy:repreport todir="${docs.build.dir}/ivy" organisation="S60_SAM"
+                    xml="true" graph="false" xsl="false"/>
+        <!--<fmpp sourceFile="${doc.src.dir}/src/manual/tool-dependencies.rst.ftl" includes="*.dot.ftl"
+              outputFile="${docs.build.dir}/temp/doc/manual/tool-dependencies.rst_include"
+              replaceExtension="dot.ftl, dot">
+            <data expandProperties="yes">
+                doc: xml(${docs.build.dir}/doc/ivy/tool-dependencies-ido.xml)
+            </data>
+        </fmpp>-->
+    </target>
+
+    
+    <!-- Generate Python API documentation using epydoc. -->
+    <target name="python-apidocs">
+        <mkdir dir="${docs.build.dir}/api/python"/>
+        <pathconvert pathsep=" " property="epydoc.python.modules.path">
+            <fileset refid="python.library.files"/>
+        </pathconvert>
+        <echo>Python modules path: ${epydoc.python.modules.path}</echo>
+        <exec executable="python" dir="${docs.build.dir}" failonerror="true">        
+            <arg line="${python.tools}/epydoc"/>
+            <arg value="-v"/>
+            <arg value="--config=${helium.dir}/config/epydoc.conf"/>
+            <arg value="--exclude=sgmllib"/>
+            <arg line="${epydoc.python.modules.path}"/>
+        </exec>
+    </target>
+    
+    
+    <!-- Generate Java API documentation using javadoc. -->
+    <target name="java-apidocs" depends="install-cruisecontrol">
+        <path id="classpath-javadoc">
+            <fileset dir="${helium.dir}/external/CruiseControl/lib" includes="*.jar"/>
+            <fileset dir="${helium.dir}/external" includes="**/*.jar"/>
+            <pathelement path="${helium.dir}/external/CruiseControl/webapps/dashboard/WEB-INF/classes"/>
+        </path>
+        <javadoc classpathref="classpath-javadoc" 
+            destdir="${docs.build.dir}/api/java" useexternalfile="true">
+            <packageset dir="tools/common/java/src" defaultexcludes="yes"/>
+            <packageset dir="tools/common/java/test" defaultexcludes="yes"/>
+            <doctitle><![CDATA[<h1>API Documentation</h1>]]></doctitle>
+        </javadoc>
+    </target>
+    
+    
+    <!-- Generate Ant API documentation using antdoclet. -->
+    <target name="antdoclet">
+        <path id="doclet-classpath">
+            <pathelement path="${java.class.path}/"/>
+            <pathelement path="${helium.dir}/external/CruiseControl/webapps/dashboard/WEB-INF/classes"/>
+        </path>
+        <mkdir dir="${docs.build.dir}/api/ant"/>
+
+        <!-- First copy the "static" resources (images, static html files) -->
+        <copy todir="${docs.build.dir}/api/ant" overwrite="true">
+            <fileset dir="${helium.dir}/doc/src/antdoclet/html">
+                <exclude name="*.vm"/>
+            </fileset>
+        </copy>
+      
+        <!-- Now invoke AntDoclet to generate the "dynamic" content from the templates -->
+        <javadoc access="private" sourcepath="${helium.dir}/tools/common/java/src/"
+                 destdir="${docs.build.dir}/api/ant"
+                 packagenames="com.nokia.ant,com.nokia.ant.filters,com.nokia.ant.types.imaker,com.nokia.ant.types,com.nokia.ant.listerner,com.nokia.ant.taskdefs,com.nokia.ant.taskdefs.ccm.commands,com.nokia.cruisecontrol,com.nokia.cruisecontrol.sourcecontrol,com.nokia.fmpp,nokia.ivy"
+                 docletpathref="doclet-classpath" source="1.6"
+                 useexternalfile="true">
+            <doclet name="com.neuroning.antdoclet.AntDoclet">
+                <param name="-doctitle" value="${build.name}" />
+                <param name="-templatesdir" value="${doc.src.dir}/src/antdoclet/html"/>
+                <param name="-templates" value="main.vm"/>
+            </doclet>
+        </javadoc>
+        <move file="velocity.log" tofile="build/velocity.log" failonerror="false"/>
+    </target>
+
+        
+    <!-- Builds the Helium API documentation. -->
+    <target name="helium-apidocs" depends="clean-helium-apidocs,database,
+                    find-python-dependencies,helium-api-dependency-images,helium-api-html-docs"/>
+    
+    
+    <target name="helium-prep-textdocs">
+        <copy todir="${docs.build.dir}/temp/doc/nokia" failonerror="false">
+            <fileset dir="${nokia.dir}/doc/src">
+                <include name="**/*.rst"/>
+                <include name="**/*.css"/>
+                <include name="**/*.jpg"/>
+            </fileset>
+        </copy>
+        
+        <mkdir dir="${docs.build.dir}/temp/doc/minibuilds"/>
+        <copy todir="${docs.build.dir}/temp/doc/minibuilds" failonerror="false">
+            <fileset dir="${helium.dir}/tests/minibuilds/">
+                <include name="*/doc/**/*"/>
+            </fileset>
+        </copy>
+
+        <!-- Including Helium antlib doc -->
+        <mkdir dir="${docs.build.dir}/temp/doc/helium-antlib"/>
+        <copy todir="${docs.build.dir}/temp/doc/helium-antlib" failonerror="false" flatten="true">
+            <fileset dir="${helium.dir}/external/helium-antlib">
+                <include name="**/*.rst"/>
+                <include name="**/*.css"/>
+                <include name="**/*.jpg"/>
+            </fileset>
+        </copy>
+    </target>
+    
+        
+    <!-- Generate all documentation. -->
+    <target name="add-policies-to-docs" unless="env.HLM_SUBCON">
+        <hlm:updatePolicy policy="7" filename="distribution.policy.S60">         
+            <dirset dir="${helium.dir}" includes="${docs.build.dir}/**/*"/>        
+        </hlm:updatePolicy>   
+    </target>
+    
+    
+    <!-- Creates XML and .rst documents describing the difference between
+    this version of Helium and the previous major release. -->
+    <target name="release-diff" depends="database" unless="env.HLM_SUBCON">
+        <mkdir dir="${docs.build.dir}"/>
+        <!-- URL for the database.xml of last major release
+        @type string
+        @scope private
+        -->
+        <property name="last.major.release.database.url" value="${documentation.url.root}/${last.major.helium.version}/database.xml"/>
+        <hlm:python>
+import urllib
+import helium.documentation
+
+old_db_file = urllib.urlopen(r'${last.major.release.database.url}')
+writer = helium.documentation.APIDeltaWriter(old_db_file, r'${database.file}')
+writer.write(r'${docs.build.dir}/api_changes.xml')
+        </hlm:python>
+        <if>
+            <available file="${docs.build.dir}/api_changes.xml"/>
+            <then>
+                <fmpp sourceFile="${helium.doc.src.dir}/src/api_changes.rst.ftl" outputFile="${docs.build.dir}/temp/doc/api_changes.rst">
+                    <data expandProperties="yes">
+                        doc: xml(${docs.build.dir}/api_changes.xml)
+                        old_release: ${last.major.helium.version}
+                        new_release: ${helium.version}
+                    </data>
+                </fmpp>
+            </then>
+        </if>
+    </target>
+    
+    
+    <!-- Generate docs for Symbian Foundataion -->
+    <target name="docs-sf">
+        <delete dir="${docs.build.dir}"/>
+        <antcall target="helium-subcon-release"/>
+        <unzip src="${docs.build.dir}/helium_${helium.version}_subcon.zip" dest="${docs.build.dir}/helium_${helium.version}_subcon" overwrite="true" />
+        <!---->
+        <exec executable="cmd" dir="${docs.build.dir}/helium_${helium.version}_subcon/helium">
+            <env key="HELIUM_HOME" value="${docs.build.dir}/helium_${helium.version}_subcon/helium"/>
+            <env key="PYTHONPATH" value="${env.PYTHONPATH}"/>
+            <env key="ANT_ARGS" value="${env.ANT_ARGS}"/>
+            <arg line="/C hlm.bat"/>
+            <arg value="docs"/>
+            <arg value="-Dpython.tools=${python.tools}"/>
+            <arg value="-Dsf=true"/>
+        </exec>
+    </target>
+    
+    
+    <!-- Clean old build/doc dir. -->
+    <target name="clean-doc-dir">
+        <delete dir="build/doc"/>
+        <delete dir="build/temp/doc"/>        
+    </target>
+    
+    
+    <!-- Connect to home drive if it is not connected for .netrc file. -->
+    <target name="check-home-drive">
+        <exec executable="cmd">
+            <arg value="/c"/>
+            <arg value="${helium.dir}/tools/common/bin/check_home_drv.bat"/>
+            <arg value=">nul"/>
+        </exec>
+    </target>
+    
+    
+    <!-- Upload generated HTML docs to the Helium server. -->
+    <target name="upload-docs" depends="check-home-drive">
+        <!-- The full path on the host server where the Helium documentation is stored.
+        @type string
+        @scope private
+        -->
+        <property name="documentation.path" value="${documentation.path.root}"/>
+        <property name="docs.zip" value="${docs.build.dir}/helium-docs.zip"/>
+
+        <!-- Python API docs. -->
+        <delete file="${docs.zip}"/>
+        <zip destfile="${docs.zip}">
+            <fileset dir="${docs.build.dir}" includes="**/*"/>
+        </zip>
+        <sshexec host="${documentation.host}"
+                 username="${user.name}"
+                 keyfile="${env.HOME}/.ssh/id_rsa_openssh.ppk"
+                 trust="true"
+                 command="mkdir -p ${documentation.path}"/>
+        <scp todir="${user.name}@${documentation.host}:${documentation.path}"
+          keyfile="${env.HOME}/.ssh/id_rsa_openssh.ppk"
+          passphrase=""
+          trust="true"
+          sftp="true"
+          file="${docs.zip}"/>
+        <sshexec host="${documentation.host}"
+                 username="${user.name}"
+                 keyfile="${env.HOME}/.ssh/id_rsa_openssh.ppk"
+                 trust="true"
+                 command="cd ${documentation.path}; unzip -u -o helium-docs.zip; chmod -R 777 ."/>
+    </target>
+    
+    
+    <!-- Upload generated HTML docs to the Helium server. -->
+    <target name="upload-release-docs">
+        <!-- The full path on the host server where the Helium documentation is stored.
+        @type string
+        @scope private
+        -->
+        <property name="documentation.path" value="${documentation.path.root}/${helium.version}"/>
+        <antcall target="upload-docs"/>
+    </target>
+    
+    
+    <!-- create slides from images -->
+    <target name="slides">
+        <mkdir dir="${docs.build.dir}/slides"/>
+    
+        <copy todir="${docs.build.dir}/slides">
+            <fileset dir="${doc.src.dir}/slides"/>
+        </copy>
+
+        <copy todir="${docs.build.dir}/slides/images">
+            <fileset dir="${doc.src.dir}/slides/images"/>
+        </copy>
+    
+        <for param="document">
+            <fileset dir="${docs.build.dir}/slides" includes="**/*.rst"/>
+            <sequential>
+                <propertyregex property="document.no.ext" input="@{document}" regexp="\.rst$" replace="" override="true"/>
+                <if>
+                    <not>
+                        <uptodate srcfile="@{document}" targetfile="${document.no.ext}.html"/>
+                    </not>
+                    <then>
+                        <echo>Building doc: @{document}</echo>
+                        <exec executable="python" dir="${doc.src.dir}" failonerror="${failonerror}">
+                            <arg value="${nokia.python.tools}/rst2s5.py"/>
+                            <arg value="@{document}"/>
+                            <arg value="${document.no.ext}.html"/>
+                        </exec>
+                    </then>
+                </if>
+            </sequential>
+        </for>
+    </target>
+
+        
+    <!-- Generate HTML documentation from .rst documents. Used for DP
+    
+    TODO: Refactor to just have one target. -->
+    <target name="textdocs-old" depends="overview-to-html">
+        <mkdir dir="${docs.build.dir}"/>
+        <copy todir="${docs.build.dir}-old">
+            <fileset dir="${doc.src.dir}/src" excludes="cover.rst"/>
+            <fileset dir="${nokia.dir}/doc/src"/>
+        </copy>
+        
+        <copy todir="${docs.build.dir}-old/images">
+            <fileset dir="${doc.src.dir}/images"/>
+        </copy>
+        
+        <for param="document">
+            <fileset dir="${docs.build.dir}-old">
+                <include name="**/*.rst" />
+                <exclude name="index.rst" /><!-- index.rst is the top-level doc for new-style docs -->
+            </fileset>
+            <sequential>
+                <propertyregex property="document.no.ext" input="@{document}" regexp="\.rst$" replace="" override="true"/>
+                <if>
+                    <not>
+                        <uptodate srcfile="@{document}" targetfile="${document.no.ext}.html"/>
+                    </not>
+                    <then>
+                        <echo>Building doc: @{document}</echo>                        
+                        <exec executable="python" dir="${doc.src.dir}" failonerror="${failonerror}">
+                            <!--<env key="PYTHONPATH" value="${helium.dir}\${python25.lib};tools\common\python\lib"/>-->
+                            <arg value="${nokia.python.tools}\rst2html.py"/>
+                            <arg line="--traceback --no-toc-backlinks"/>
+                            <!-- -stylesheet-path nokia_style.css -->
+                            <arg value="@{document}"/>
+                            <arg value="${document.no.ext}.html"/>
+                        </exec>
+                    </then>
+                </if>
+            </sequential>
+        </for>
+    </target>
+    
+    
+    <!-- Search Python internal module used in helium -->
+    <target name="find-python-dependencies" depends="database">    
+        <hlm:assertPropertySet property="helium.dir" message="Property helium.dir is not defined." />
+        <hlm:assertPropertySet property="database.file" message="Property database.file is not defined."/>
+        <hlm:python failonerror="true">
+import re
+import os
+import amara
+import codecs
+import ant
+import docs
+
+setpath = r'${helium.dir}'+'/tools'
+
+print "Searching under "+setpath
+
+dbPath = r'${database.file}'
+dbPath = 'file:///'+ dbPath.replace('\\','/')
+dbPrj = amara.parse(dbPath)
+
+docs.find_python_dependencies(setpath, dbPath, dbPrj)
+
+file_object = codecs.open(r'${database.file}', 'w', "utf_8")
+file_object.write(dbPrj.xml(indent=u"yes"))
+file_object.close()
+        </hlm:python>
+    </target>
+    
+    
+    <!-- Reads the Java libraries and extracts a list of their versions. -->
+    <target name="library-versions">    
+        <script language="jython" setbeans="false">
+import java.io
+import java.util.jar
+antlibsDir = java.io.File('external/antlibs')
+print antlibsDir
+jarFiles = antlibsDir.listFiles()
+for jar in jarFiles:
+    if jar.getName().endswith('jar'):
+        jarFile = java.util.jar.JarFile(jar)
+        manifest = jarFile.getManifest()
+        attributes = manifest.getMainAttributes()
+        implementationVersion = attributes.getValue('Implementation-Version')
+        print jar.getName() + ': ' + str(implementationVersion)
+        </script>
+    </target>
+    
+    
+    <!-- Generates a subcon dependancy diagram based on Egg and Jars files -->
+    <target name="dependency-diagram-subcon">
+        <fileset id="subcon.jar.files" dir="${helium.dir}">
+            <include name="external/antlibs/*.jar"/>
+            <include name="external/jep/**/*.jar"/>
+            <include name="external/helium-antlib/bin/**/*.jar"/>
+            <include name="tools/**/*.jar"/>
+        </fileset>
+        <antcall target="dependency-diagram">
+            <reference refid="subcon.jar.files" torefid="jar.files"/>
+            <param name="python.exclude.dir" value="${helium.dir}\external\python\lib\2.5\internal"/>
+            <param name="dependency.grph" value="${docs.build.dir}/images/dependencies_subcon.grph"/>
+            <param name="subcon" value="true"/>
+        </antcall>
+    </target>
+    
+    
+    <fileset id="jar.files" dir="${helium.dir}">
+        <include name="external/antlibs/**/*.jar"/>
+        <include name="external/jep/**/*.jar"/>
+        <include name="external/helium-antlib/**/*.jar"/>
+        <include name="tools/**/*.jar"/>
+        <include name="extensions/nokia/external/antlibs/**/*.jar"/>
+    </fileset>
+    
+    
+    <!-- Generates a dependancy diagram based on Egg and Jars files -->
+    <target name="dependency-diagram">
+        <mkdir dir="${docs.build.dir}/images"/>
+        <mkdir dir="${temp.build.dir}"/>
+        <!-- Location of dependency.grph
+        @type string
+        @scope private
+        -->
+        <property name="dependency.grph" value="${docs.build.dir}/images/dependencies.grph"/>
+        
+        <!---->
+        <copy todir="${temp.build.dir}/dependencylibs" flatten="true">
+            <fileset refid="jar.files"/>
+        </copy>
+        
+        <hlm:antdependency outputFile="${temp.build.dir}/antdependencies.grph">
+            <fileset dir="${temp.build.dir}/dependencylibs" includes="*.jar"/>
+        </hlm:antdependency>
+        
+        <taskdef name="jaranalyzer" classname="com.kirkk.analyzer.textui.JarAnalyzerTask"/>
+        <jaranalyzer srcdir="${temp.build.dir}/dependencylibs" destfile="${dependency.grph}" summaryclass="com.kirkk.analyzer.textui.DOTSummary"/>
+        
+        <loadfile srcfile="${temp.build.dir}/antdependencies.grph" property="antdependencies"/>
+        <replace file="${dependency.grph}" token="}" value="${antdependencies}}"/>
+        
+        <antcall target="dependency-grouping"/>
+        
+        <exec executable="dot">
+            <arg line="-Tpng -Grankdir=LR -Nshape=box -Nfontsize=9 -Nwidth=0.3 -Nheight=0.2 ${dependency.grph} -O"/>
+        </exec>
+        
+        <delete dir="${temp.build.dir}/dependencylibs"/>
+    </target>
+    
+    
+    <!-- @scope private -->
+    <target name="dependency-grouping">
+        <!-- Location of dependency.grph
+        @type string
+        @scope private
+        -->
+        <property name="dependency.grph" value="${docs.build.dir}/images/dependencies.grph"/>
+        <mkdir dir="${docs.build.dir}/images"/>
+        <!-- Location of nokia internal python library
+        @type string
+        -->
+        <property name="python.internal.dir" value="${nokia.dir}\external\python\lib\2.5"/>
+        <!-- subcon
+        @type string
+        -->
+        <property name="subcon" value=""/>
+        <!-- Ivy configuration file
+        @type string
+        @scope private
+        -->
+        <property name="ivy.xml.file" value="${helium.dir}/config/ivy/ivy.xml"/>
+        <hlm:python>
+import os
+import dependancygraph
+
+dependancygraph.createGraph(r'${ivy.xml.file}', r'${dependency.grph}', r'${python.dir}', r'${python.internal.dir}', r'${subcon}')
+        </hlm:python>
+        <!--
+        <exec executable="dot">
+            <arg line="-Tpng -Grankdir=LR -Nshape=box -Nfontsize=9 -Nwidth=0.3 -Nheight=0.2 ${dependency.egg.grph} -O"/>
+        </exec>
+        -->
+    </target>
+    
+    
+    <!-- Generates a dependancy diagram of ant projects to helium external files -->
+    <target name="dependency-external">
+        <!-- Location of dependencies_external.grph
+        @type string
+        @scope private
+        -->
+        <property name="dependency.external.grph" value="${docs.build.dir}/images/dependencies_external.grph"/>
+        <copy file="${database.file}" tofile="${database.file}.parsed" overwrite="true">
+            <filterchain>
+                <expandproperties/>
+            </filterchain>
+        </copy>
+        <hlm:python>
+import os
+import dependancygraph
+
+dependancygraph.externalDependancies(r'${database.file}.parsed', r'${dependency.external.grph}')
+        </hlm:python>
+        <!---->
+        <exec executable="dot">
+            <arg line="-Tpng -Grankdir=LR -Nshape=box -Nfontsize=9 -Nwidth=0.3 -Nheight=0.2 ${dependency.external.grph} -O"/>
+        </exec>
+    </target>
+    
+    
+    <!-- Convert db file. @scope private-->
+    <target name="dependency-db-convert" depends="database">
+        <copy file="${database.file}" tofile="${database.file}.parsed" overwrite="true">
+            <filterchain>
+                <expandproperties/>
+            </filterchain>
+        </copy>
+    </target>
+    
+    
+    <!-- Generates a dependancy diagram of log files -->
+    <target name="dependency-logs">
+        <!-- Location of dependencies_external.grph
+        @type string
+        @scope private
+        -->
+        <property name="dependency.external.grph" value="${docs.build.dir}/images/dependencies_log.grph"/>
+        
+        <antcall target="dependency-db-convert" inheritAll="false">
+            <param name="build.drive" value="build.drive"/>
+            <param name="build.id" value="build.id"/>
+            <param name="build.log.dir" value="/output/logs"/>
+        </antcall>
+        
+        <hlm:python>
+import os
+import dependancygraph
+
+dependancygraph.findLogFiles(r'${database.file}.parsed', r'${dependency.external.grph}')
+        </hlm:python>
+        <!---->
+        <exec executable="dot">
+            <arg line="-Tpng -Grankdir=LR -Nshape=box -Nfontsize=9 -Nwidth=0.3 -Nheight=0.2 ${dependency.external.grph} -O"/>
+        </exec>
+    </target>
+    
+
+    <!-- Creates user flow diagram -->
+    <target name="helium-user-graph">
+        <mkdir dir="${docs.build.dir}/api"/>
+        <fmpp sourcefile="${helium.dir}/doc/src/user-graph.dot.ftl" outputfile="${docs.build.dir}/temp/doc/user-graph.dot">
+            <data expandProperties="yes">
+              ant: antProperties()
+            </data>
+        </fmpp>
+        <for param="dot.file">
+            <fileset dir="${docs.build.dir}/temp/doc" includes="user-graph.dot"/>
+            <sequential>
+                <echo>Processing dot file: @{dot.file}</echo>
+                <exec executable="dot" dir="${docs.build.dir}/temp/doc/">
+                    <arg line="-Tcmap @{dot.file} -O"/>
+                </exec>
+                <exec executable="dot" dir="${docs.build.dir}/api">
+                    <arg line="-Tpng @{dot.file} -O"/>
+                </exec>
+            </sequential>
+        </for>
+        <move todir="${docs.build.dir}/images" overwrite="true">
+            <fileset dir="${docs.build.dir}/temp/doc" includes="user-graph.dot.png"/>
+        </move>
+    </target>
+
+</project>

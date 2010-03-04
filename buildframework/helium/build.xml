@@ -29,11 +29,58 @@ Description:
     <property name="build.drive" location="${env.TEMP}/helium/temp_drive"/>
     <mkdir dir="${build.drive}/"/> 
     
+    <!-- @property helium.version
+    @type string
+    @scope private -->
     <property file="${helium.dir}/config/version.txt"/>
     <property name="release.label" value="${helium.version}"/>
+
+    <!-- Override docs targets to do more for Helium. -->
+    <target name="apidocs" depends="python-apidocs,java-apidocs,antdoclet,internal.docs.apidocs"/>
+    <!-- Generate rst files for docs -->
+    <target name="prep-textdocs" depends="overview-to-html,tools-rst-table,dependency-diagram,
+        dependency-logs,release-diff,helium-user-graph,helium-prep-textdocs,internal.docs.prep-textdocs"/>
+    <!-- generate all the user documentation for helium -->
+    <target name="docs" depends="clean-doc-dir,database,apidocs,textdocs,add-policies-to-docs"/>
     
     <import file="helium.ant.xml"/>
     <import file="tools/startup/antserver/antserver.ant.xml"/>
          
+    
+    
+    
+    <target name="must-property-comments">
+        <!--<xslt in="${data.model.file}" out="${data.model.parsed}" style="${data.model.xsl}"/>-->
+        <for param="ant.file">
+            <fileset dir="${helium.dir}" includes="helium.ant.xml">
+            </fileset>
+            <sequential>     
+                <script language="jython">
+import re
+import java.io
+import org.dom4j
+import org.dom4j.io
+
+model = org.dom4j.io.SAXReader().read(java.io.File(project.getProperty("helium.dir") + '/build/datamodel.out'))
+
+user_props = model.selectNodes('//property[editStatus="must"]')
+indent = '    '
+out = open('required_properties.txt', 'w')
+for prop in user_props:
+#    print prop
+    property_comment = indent + "&lt;!--* @property " + prop.elementTextTrim('name') + "\n"
+    property_comment += indent + prop.elementTextTrim('description') + "\n"
+    property_comment += indent + "@type " + prop.elementTextTrim('type') + "\n"
+    property_comment += indent + "@editable required\n"
+    property_comment += indent + "@scope public\n"
+    property_comment += indent + "--&gt;\n\n"
+    print property_comment
+    out.write(property_comment)
+
+out.close()
+                </script>
+            </sequential>
+        </for>                               
+    </target>
 </project>
 

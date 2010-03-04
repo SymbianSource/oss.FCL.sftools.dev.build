@@ -20,6 +20,7 @@ Description:
 
 ============================================================================
 -->
+<!--* @package preparation -->
 <project name="preparation.dependencies" xmlns:ivy="antlib:org.apache.ivy.ant" xmlns:hlm="http://www.nokia.com/helium">
     <description>Analysis of dependencies for build area preparation.</description>
     

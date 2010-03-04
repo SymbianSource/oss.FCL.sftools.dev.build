@@ -20,6 +20,7 @@ Description:
 
 ============================================================================
 -->
+<!--* @package publishing -->
 <project name="publish.synergy" xmlns:hlm="http://www.nokia.com/helium">
     <description>
     Synergy publishing related targets

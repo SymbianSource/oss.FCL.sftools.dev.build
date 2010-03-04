@@ -72,7 +72,7 @@ The configuration file format defines one or more builds::
 
   <BuildProcessDefinition>
       <remoteBuilds>
-          <build machine="vcbldsrv12" ccmhomedir="${r'$'}{ccm.home.dir}" basedir="${r'$'}{ccm.base.dir}" executable="hlm" dir="${r'$'}{mc_4031_build.dir}\PRODUCT" args="product-build -Dbuild.number=${r'$'}{build.number} -Dprep.root.dir=d:\pmackay"/>
+          <build machine="vcbldsrv12" ccmhomedir="${r'$'}{ccm.home.dir}" basedir="${r'$'}{ccm.base.dir}" executable="hlm" dir="${r'$'}{_build.dir}\PRODUCT" args="product-build -Dbuild.number=${r'$'}{build.number} -Dprep.root.dir=d:\"/>
       </remoteBuilds>
   </BuildProcessDefinition>
 
@@ -135,7 +135,7 @@ At the start of preparation a new directory is created for the build and subst'e
 How to prepare the build area?
 ------------------------------
 
-A key part of build preparation is initialising the build drive by copying or unzipping the input files. The ``build.prep.config.file`` should reference a file that follows the prep XML file format (e.g. mc\mc_build\mc_4031_build\prep.xml). A suggestion is that this file is called prep.xml by default.
+A key part of build preparation is initialising the build drive by copying or unzipping the input files. The ``build.prep.config.file`` should reference a file that follows the prep XML file format (e.g. build/_build/prep.xml). A suggestion is that this file is called prep.xml by default.
 
 The XML format of the prep file is as follows:
 
@@ -219,7 +219,7 @@ This information is extracted from the filesystem, it uses the sources defined i
 Flags:
 ``````
 
-Flags are extracted from the ProductVariant.hrh (mc_config/${r'$'}{build.configuration}_config/${r'$'}{product.name}/include/ProductVariant.hrh).
+Flags are extracted from the ProductVariant.hrh (config/${r'$'}{build.configuration}_config/${r'$'}{product.name}/include/ProductVariant.hrh).
 
 .. index::
   single: Stage - Source preparation
@@ -259,8 +259,8 @@ Example of configuration:
 .. code-block:: xml
 
     <build>
-        <config name="mc_5132" abstract="true">
-            <set name="database" value="fa1f5132"/>
+        <config name="" abstract="true">
+            <set name="database" value="fa1f"/>
             <set name="host" value="${r'$'}{ccm.engine.host}" />
             <set name="dbpath" value="${r'$'}{ccm.database.path}" />
         
@@ -271,13 +271,13 @@ Example of configuration:
             <set name="release" value="${r'$'}{release.tag}" />
             
             <config name="ppd_sw-PPD51.32_200810:project:sa1spp#1" type="checkout" >
-               <set name="folders" value="jk1f5132#1820" />
+               <set name="folders" value="jk1f#1820" />
             </config>
             
             <config name="WLANSniffer2-2007_wk21:project:e002sa08#1" type="snapshot" />
             
-            <config name="NSeries08_Themes-1:project:fa1f5132#1" type="checkout" >
-               <set name="tasks" value="jk1f5132#1763" />
+            <config name="NSeries08_Themes-1:project:fa1f#1" type="checkout" >
+               <set name="tasks" value="jk1f#1763" />
                <set name="skip.ci" value="true"/> 
             </config>
             
@@ -287,7 +287,7 @@ Example of configuration:
             </config>
             
             <config name="S60-S60.32_200810:project:sa1spp#1" type="checkout" >
-               <set name="folders" value="jk1f5132#1983" />
+               <set name="folders" value="jk1f#1983" />
             </config>
 
             <config name="ppd_sw-username:project:sa1spp#1" type="update"/>
@@ -378,10 +378,10 @@ The steps to configure a Helium build for main compilation are as follows:
 
     <path id="system.definition.files">
         <fileset dir="${r'$'}{build.drive}/src/common/generic/tools/build" includes="System_Definition*.xml"/>
-        <pathelement path="${r'$'}{build.drive}/mc/mc_build/ibusal_40_build/ibusal_40/IBUSAL40_System_Definition.xml"/>
+        <pathelement path="${r'$'}{build.drive}/build/ibusal_40_build/ibusal_40/IBUSAL40_System_Definition.xml"/>
         <fileset dir="${r'$'}{build.drive}/s60/tools/build_platforms/build/data" includes="S60_System*.xml"/>
         <pathelement path="${r'$'}{build.drive}/me/me_scd_desw/sysdef/System_Definition_PRODUCT.xml"/>
-        <pathelement path="${r'$'}{build.drive}/mc/mc_build/${r'$'}{product.family}_build/4032_System_Definition.xml"/>
+        <pathelement path="${r'$'}{build.drive}/build/${r'$'}{product.family}_build/_System_Definition.xml"/>
     </path>
     
 The order of the files is significant. If building Symbian OS, the Symbian System Definition file must come first. Here both ``fileset`` and ``pathelement`` are used. ``pathelement`` selects just one file whereas a ``fileset`` can use wildcards to select multiple files or handle problems of filenames changing across different platform releases.
@@ -436,16 +436,6 @@ EC build could be configured to be running in parallel (default) or in serial mo
     hlm <build target> -Dbuild.system=ec-helium -Dec.mode=serial
 
 Also the --emake-debug could be configured either by the environment using the EMAKE_DEBUG variable or using the ``emake_debug_flag`` property. Its default value is 'g'.
-
-
-SBS (Raptor) compilation
-------------------------
-
-.. toctree::
-   :maxdepth: 1
-
-   sbs
-
 
 .. index::
   single: Stage - Post Build
@@ -522,318 +512,6 @@ This step involves checking stub sis files published to ``z:/epoc32/data/z/syste
     hlm check-stub-sis
     
 It checks all files in the target folder and renames the invalid sis files with .bak extention. 
-
-.. index::
-  single: S60 3.2 Localisation
-
-Stage: S60 3.2 Localisation
-===========================
-
-.. csv-table:: Ant property descriptions
-   :header: "Property", "Description", "Default Values"
-
-   "``localisation.language.file``", "This defines where to find the languages.xml database.", "/epoc32/tools/s60tools/languages.xml"
-   "``rombuild.config.file``", "This key defines  where this parsed file will be located.", ""
-   "``localisation.files``", "This key  defines which files should be used to localise the build.", "-i ${r'$'}{build.drive}/epoc32/tools/s60tools/LocInfo_input_S60.txt"
-   "``localisation.tool``", "This key defines which tool should be used to localise the build area (localise-resources or localisation-s60-localiser).", "localise-resources"
-
-The process uses the information from the languages.xml to know what languages have to be localised. In order to have language pack configured correctly you also have to configure them (as explained in the next section).
-
-.. index::
-  single: Creation of core, language pack and customer variant images
-
-Creation of core, language pack and customer variant images
------------------------------------------------------------
-
-Core, language pack and customer variant images are created automatically in product-build. 
-They can also be created separately calling localisation target::
-
-  hlm -Dbuild.number=xx localisation
-
-
-Stage: ROM creation
-===================
-
-Called by ``build-roms`` target.
-
-.. index::
-   single: imakerconfigurationset type
-
-The imakerconfigurationset type
--------------------------------
-
-Information on how to configure the properties is given below:
-
-The imakerconfigurationset supports imakerconfiguration nested elements.
-
-'''imakerconfiguration''' element:
-
-.. csv-table:: Ant properties to modify
-   :header: "Attribute", "Description", "Values"
-
-   "``regionalVariation``", "Enable regional variation switching. - Deprecated (always false)", "false"
-
-The imakerconfiguration supports three sub-types:
-
-.. csv-table:: Ant properties to modify
-   :header: "Sub-type", "Description"
-
-   "``makefileset``", "Defines the list of iMaker configuration to run image creation on."
-   "``targetset``", "List of regular expression used to match which target need to be executed."
-   "``variableset``", "List of variable to set when executing iMaker."
-
-
-Example of configuration:
-
-.. code-block:: xml
-
-   <hlm:imakerconfigurationset>
-      <hlm:imakerconfiguration regionalVariation="true">
-         <makefileset>
-            <include name="**/product_name/*ui.mk" />
-         </makefileset>
-         <targetset>
-            <include name="^core${r'$'}" />
-            <include name="langpack_\d+" />
-            <include name="^custvariant_.*${r'$'}" />
-            <include name="^udaerase${r'$'}" />
-         </targetset>
-         <variableset>
-            <variable name="USE_FOTI" value="0" />
-            <variable name="USE_FOTA" value="1" />
-            <variable name="TYPE" value="rnd" />
-         </variableset>
-      </hlm:imakerconfiguration>
-   </hlm:imakerconfigurationset>
-
-
-Other example using product list and variable group:
-
-.. code-block:: xml
-
-   <hlm:imakerconfigurationset>
-      <hlm:imakerconfiguration>
-         <hlm:product list="product_name" ui="true" failonerror="false" />
-         <targetset>
-            <include name="^core${r'$'}" />
-            <include name="langpack_\d+" />
-            <include name="^custvariant_.*${r'$'}" />
-            <include name="^udaerase${r'$'}" />
-         </targetset>
-         <variableset>
-            <variable name="USE_FOTI" value="0" />
-            <variable name="USE_FOTA" value="1" />
-         </variableset>
-         <variablegroup>
-            <variable name="TYPE" value="rnd" />
-         </variablegroup>
-         <variablegroup>
-            <variable name="TYPE" value="subcon" />
-         </variablegroup>
-         <variablegroup>
-            <variable name="TYPE" value="prd" />
-         </variablegroup>
-      </hlm:imakerconfiguration>
-   </hlm:imakerconfigurationset>
-
-
-.. index::
-   single: The iMaker Task
-
-How to configure the target
----------------------------
-
-The target can be configured by defining an hlm:imakerconfigurationset element with the '''imaker.rom.config''' reference.
-
-.. code-block:: xml
-    
-    <hlm:imakerconfigurationset id="imaker.rom.config">
-    ...
-    </hlm:imakerconfigurationset>
-
-The other configurable element is the engine. The '''imaker.engine''' property defines the reference
-to the engine configuration to use for building the roms. Helium defines two engines by default:
-* imaker.engine.default: multithreaded engine (hlm:defaultEngine type)
-* imaker.engine.ec: ECA engine - cluster base execution (hlm:emakeEngine type)
-  
-If the property is not defined Helium will guess the best engine to used based on the build.system property.
- 
-.. index::
-  single: Legacy ROM creation
-
-.. _ROM-creation-label:
-
-Stage: Legacy ROM creation
-==========================
-
-A S60 3.2 build uses the localisation target which calls localisation-roms. A S60 5.0 build only requires the localisation-roms target since localisation is done differently.
-
-There are 2 targets used to create the ROM images these are 'ee-roms' and 'localisation-roms'. The 'ee-roms' target
-builds an Engineering English version and the 'localisation-roms' target builds all the localised ROM images. Both require
-some configuration particularly the 'localisation-roms' target so that it knows which variants to build etc. This configuration
-is explained below but 1st here is an example of how to create the EE ROM image using Helium::
-
-  hlm -Dbuild.number=xx ee-roms
-  
-where xx is the build number.
-
-To see an example of how to build the localised versions click :ref:`localised example <localisation-label>`:
-
-.. index::
-  single: ROM Image configuration
-
-Legacy ROM Image configuration
-------------------------------
-
-Engineering English ROMs, including debug/trace images, can be configured per build configuration. The path to the configuration file is defined by the ``rombuild.config.file`` property. The :ref:`common-configuration-format-label` is used, e.g.
-
-.. code-block:: xml
-
-    <?xml version="1.0" encoding="UTF-8"?>
-    <build>
-        <config name="PRODUCT" abstract="true">
-            <set name="rommake.cmt.path" value="${r'$'}{build.drive}\epoc32\rombuild"/>
-            ....
-            <!-- GUI images -->
-            <set name="rommake.args" value="-rebldxld -es60ibymacros -DS60_IN_ROM"/>
-            
-            <config name="ee_roms">
-                <config name="flash">
-                    <set name="image.type" value="rnd"/>
-                </config>
-            </config>
-        </config>
-    </build>
-
-The properties that can be set for configuring each ROM image are described below:
-
-.. csv-table:: Property descriptions
-   :header: "Property", "Description", "Values"
-
-   "``output.makefile.template``", "This defines the name of the output makefile (MUST NOT contain path info).", "${r'$'}{rombuild.makefile.name}"
-   "``main.makefile.template``", "This defines the location of the main part of the makefile (template).", "${r'$'}{mc_5132_build.dir}/imaker.mk"
-   "``flash.makefile.template``", "This defines template location for flash makefile targets (ee roms).", "${r'$'}{mc_5132_build.dir}/flash.mk"
-   "``mytraces.file``", "The path for the mytraces.txt file that contains the list of debug binaries to include. (Template)", ""
-   "``version.product.name``", "The name of the product that appears in the version string.", "e.g. N91"
-   "``version.pd.milestone``", "The current PD milestone.", ""
-   "``version.pr``", "The current PR branch number.", ""
-   "``version.bandvariant``", "The band variant.", ""
-   "``version.buildnumber``", "The build number. This should be set to the Ant property.", "${r'$'}{build.number} (default)"
-   "``version.variant``", "The variant version number.", ""
-   "``version.product.type``", "The product type shown in the version string.", "e.g. RM43"
-   "``version.rimcycle``", "The year and week of the current RIM cycle.", ""
-   "``rom.id``", "An identifier for the ROM image filenames. Currently based on Ant ``build.id`` property.", ""
-   "``rommake.hwid``", "The hardware ID provided to the ROM build tool.", ""
-   "``rommake.product.name``", "The product name provided to the ROM build tool.", "e.g. devlon4"
-   "``rom.output.dir``", "The directory where the ROM image files will be copied.", ""
-   "``cmt``", "The CMT to use (if included).", ""
-   "``image.ui``", "The UI type.", "gui, text"
-   "``image.iby``", "The path for the top-level .iby file", ".iby path"
-   "``image.nocmt``", "Whether the image should include a CMT or not", "true, false (default)"
-   "``image.name.extension``", "A text extension added to the image filename.", "Optional"
-   "``version.copyright``", "Copyright text used in the version string.", ""
-   "``core.template``", "The template for the core version string format.", ""
-   "``variant.template``", "The template for the variant version string format.", ""
-   "``uda.template``", "The template for the UDA version string format.", ""
-   "``model.template``", "The template for the model version string format.", ""
-   "``core.txt.path``", "Path to the sw.txt version file.", ""
-   "``variant.txt.path``", "Path to the langsw.txt version file.", ""
-   "``model.txt.path``", "Path to the model.txt version file.", ""
-   "``uda.txt.path``", "Path to the UDA version file.", ""
-   "``mytraces.binaries``", "A list of binaries that should be ``UDEB``. The list will be included in ``mytraces.txt``. Either comma-separated items can be used or multiple properties defined.", ""
-   "``build.parallel``", "Defines if a group is buildable in parallel.", "true/false"
-
-
-Ant properties can be used and they will be replaced by their values before the file is processed.
-
-All abstract ``<config>`` element will be considered as makefile group target. You have to ensure that you defined an ee_roms abstract spec to be able to build EE roms.
-
-This example configuration will build one rom during ee_roms call that will use flash template:
-
-.. code-block:: xml
-    
-   <config name="ee_roms" abstract="true">
-       <config name="flash">
-            <set name="flash.id" value="ui_rom" />
-       </config>
-   </config>
-
-Mandatory keys:
-    "``flash.id``" defines a uniq id for the rom creation, used to define makefile template.
-
-
-.. index::
-  single: Main makefile template
-
-Main makefile template
-----------------------
-
-The ROM image creation tools use a makefile template to generate a target for each image. The main.makefile.template is used as the top-level part of the makefile, you can define any common custom steps in there. The template allows us to easily add any custom dependencies before creating the variant (also post steps could be added). The current version of the main makefile template should look like that, dont't forget it is tied to the product family.
-
-.. index::
-  single: Xinclude
-  
-.. _`Xinclude-label`:
-
-Xinclude
----------
-
-Xinclude is a generic tool to include lists of files in tasks. However, Xinclude for ROM creation is deprecated, so please ensure you are using iMaker for all ROM image creation. Click on :ref:`iMaker-label` for details.  
-
-
-.. _localisation-label:
-  
-Legacy Customer variant configuration 
-:::::::::::::::::::::::::::::::::::::
-To create a new customer variant, just add a spec of the type customer: e.g:
-
-.. code-block:: xml
-
-  <config type="customer">
-      <set name="customer.id" value="100"/>
-      <set name="customer.revision" value="2"/>
-      <set name="description" value=""/>
-      <set name="compatible.languagepack" value="01,03"/>
-  </config>
-
-
-This specification must be added in the specification of the appropriate region (western, china, japan or thai).
-
-For each customer specification, helium creates 
-  * the customer variant image 
-  * the flash configuration file (during publishing.).
-
-If compatible.languagepack property is omitted, the system assumes the customer variant is compatible with all language packs. A flash configuration file is created for each language pack.
-
-In case a variant created with a previous build is re-used with the current build, an extra property must be declared: e.g:
-
-.. code-block:: xml
-
-  <config type="customer">
-      <set name="customer.image.version.name" value="10.30"/>
-      <set name="customer.id" value="101"/>
-      <set name="description" value="OPERATOR_UK"/>
-      <set name="compatible.languagepack" value="01"/>
-  </config>
-
-
-customer.image.version.name is the build ID with which the re-used variant was created.
-
-
-.. index::
-  single: Trace image creation
-
-Trace image creation
---------------------
-Initial support for recompiling and creating rom images is provided by the build-traces target. This feature will be refactored and revised, so the details will still change.
-
-.. csv-table:: Ant property descriptions
-   :header: "Property", "Description", "Values"
-
-   "``tracebuild.tracetype``", "This defines the type of traces to create", "general, phone or all"
-   "``tracebuild.product``", "This defines the product for which to create images.", ""
-   "``tracebuild.variant``", "This defines the imaker target to use in image creation", ""
-
 
 .. index::
   single: Stage - Publishing
@@ -1050,23 +728,6 @@ Subcon zipping
 
 Subcon zipping is also configured using the same XML format as ``zip-ee`` and implemented in the ``zip-subcon`` target. A ``zips.subcon.spec.name`` property must be defined but currently it is still a separate configuration file.
 
-.. index::
-  single: Zipping .loc files
-
-Zipping .loc files
-------------------
-
-```zip-loc-files``` -target finds, sorts into language specific folders and archives all the .loc files from the build area. Usage::
-
-   hlm -Dbuild.number=XX zip-loc-files
-
-The following properties are needed (default values defined in helium.ant.xml):
-
-- loc.temp.dir - the temporary directory used by zip-loc-files
-- loc.output.dir - the directory where the output zip file is stored
-- loc.output.filename - the name of the output-file (xxx.zip)
-- loc.files.zipper - The location of the tool (should not be changed)
-  
 
 .. index::
   single: Stage - Releasing
@@ -1132,11 +793,11 @@ Usage::
 
 Define in your build configuration the path to the config of relnotes::
 
-  e.g. <property name="relnotes.config.dir" value="${r'$'}{helium.dir}/../mc_config/${r'$'}{product.family}_config/${r'$'}{build.name}/relnotes"/>
+  e.g. <property name="relnotes.config.dir" value="${r'$'}{helium.dir}/../config/${r'$'}{product.family}_config/${r'$'}{build.name}/relnotes"/>
 
 The contents of "config_template" in helium/extensions/nokia/config/relnotes should be copied to the appropriate directory::
 
-  e.g. mc/mc_config/mc_5132_config/mc_5132/relnotes
+  e.g. config/config//relnotes
 
 Contents of template:
  * logo.png : the logo of your product
@@ -1202,7 +863,7 @@ A shortcut can also be used::
 Setting the team property
 :::::::::::::::::::::::::
 
-SET TEAM=<team-name> (this defines which team specific .xml file from /mc/mc_build/teams is used for build configuration).
+SET TEAM=<team-name> (this defines which team specific .xml file from /build/teams is used for build configuration).
 
 Also see :ref: `Team-Properties-label` for more information.
 
@@ -1237,7 +898,7 @@ build-main
 
 Before this phase it is needed to run the prebuild command (hlm prebuild -Dbuild.number=123) which creates necessary folders to the build area.
 
-Build-main phase is used to compile the components defined in the build.configuration property which refers to defined configuration in System_Definition.xml file(s) (ANT property system.definition.files in /mc/mc_build/PLATFORM/PLATFORM_build.ant.xml). The command to run is: hlm build-main -Dbuild.number=123
+Build-main phase is used to compile the components defined in the build.configuration property which refers to defined configuration in System_Definition.xml file(s) (ANT property system.definition.files in /build/PLATFORM/PLATFORM_build.ant.xml). The command to run is: hlm build-main -Dbuild.number=123
 
 
 .. index::
@@ -1249,7 +910,7 @@ product-build
 A product build executes the typical stages for building product software and ROM images. Generally this involves building all the software completely from scratch. It can be run using the command:
   hlm product-build -Dbuild.number=123
 
-This can be run from a product build configuration directory, e.g. <tt>/mc/mc_build/mc_4031_build/cogsworth</tt>.
+This can be run from a product build configuration directory, e.g. <tt>/build/_build/cogsworth</tt>.
 
 Product-build command combines all needed subcommands for doing a build. The subcommands run in product-build are:
 prep -> Prepares the build area (see prep instructions above)
@@ -1386,302 +1047,6 @@ After several builds have been run it is necessary to clean the build machine of
 
 
 .. index::
-  single: Advanced Usage
-
-Advanced Usage
-=================
-
-
-.. index::
-  single: UDA (using iMaker)
-
-UDA (using iMaker)
-------------------
-
-UDA creation using iMaker follows the same process, it uses a template that requires the following keys to be defined.
-
-"``uda.id``" this key defines uniquely the uda.
-"``content.dir``" defines the location of UDA content.
-
-This is a simple example of uda spec:
-
-::
-
-    <config name="uda">
-      <set name="uda.id" value="myuda" />
-      <set name="content.dir" value="${r'$'}{build.drive}/uda1/" />
-    </config>
-
-To build the uda you have to run the following Ant target: (use uda.makefile.target to specify which rom you want to build)
-  hlm uda-roms -Dteam=kawa -Dbuild.number=xx
-
-
-.. index::
-  single: Core and Variant images creation
-
-Core and Variant images creation
---------------------------------
-
-Core and variant images are created automatically in product-build. They can also be created separately calling do-localisation target::
-
-  hlm localisation-roms -Dteam=kawa -Dbuild.number=xx
-
-Variation (S60 3.2.3 - 5.x)
----------------------------
-
-See http://delivery.nmp.nokia.com/trac/imaker/wiki/iMakerUseCaseCustomerVariantConfml
-
-Variation (S60 3.2)
--------------------
-
-In the new process the variation handling deviate from regular Nokia variation rule as the backup/export/restore process from Creator.pl has been dropped. Now each variant is self contained, which means the content must be reference from the variation folder! On the same way  language pack configuration is automated, which means that branching files like ``languages.txt``, ``lang.txt``... is strictly forbiden.
-
-Structure and Naming
-::::::::::::::::::::
-
-The variation folder naming must match that rule ``.+_${r'$'}{variant.id}``.
-
-Finally your variation folder must have the following structure::
-
-    + variation
-        + euro1_01
-            + data
-                + VariantData_01.xml
-        + euro2_02
-            + data
-                + VariantData_02.xml
-        + japan_15
-            + data
-                + VariantData_15.xml
-        + ...
-
-
-Cenrep variation
-::::::::::::::::
-
-
-Developer has to create a VariantData_${r'$'}{variant.id}.xml file for each variant that references product one (SPP/PRODUCT process).
-
-Example of an dummy PRODUCT variant configuration:
-
-.. code-block:: xml
-
-    <?xml version="1.0" encoding="UTF-8"?>
-    <Variant xmlns:xi="http://www.w3.org/2001/xinclude">
-        <xi:include href="file:\\\%EPOCROOT%\spp_config\s60_32_config\PLATFORM_config\PLATFORM_PRODUCT_config\config\data\CenrepVar_PRODUCT\data\VariantData_PRODUCT.xml"/>
-    </Variant>
-
-
-To rebuild cenrep configuration using Customisation Tool for all variants you can use the following command:
-    hlm -Dbuild.number=xx localisation-create-cenrep
-
-Note: for Xinclude information see :ref:`Xinclude-label`:
-
-.. index::
-  single: iMaker image creation template
-
-iMaker image creation template
-------------------------------
-
-::
-
-   ###############################################################################
-   # iMaker templates
-   ###############################################################################
-   
-   # defining helium in the build area if not set by the environment
-   HELIUM_HOME?=\mc\helium
-   PYTHONPATH?=$(HELIUM_HOME)\install\python\lib\python2.4\win32;$(HELIUM_HOME)\tools\common\python\lib
-   
-   # using winimage from helium delivery.
-   WINIMAGE_TOOL=$(HELIUM_HOME)/tools/localisation/exports/winimage.exe
-   
-   CALL_IMAKER_PLATFORM=imaker -p$(PRODUCT_NAME) -c$(COREPLAT_NAME) -f $(E32ROMCFG)/helium_features.mk
-   CALL_IMAKER=imaker -p$(PRODUCT_NAME) -c$(COREPLAT_NAME) $(if $(UI_PLATFORM),-u$(UI_PLATFORM)) -f $(E32ROMCFG)/helium_features.mk
-   CALL_TARGET=imaker -p$(PRODUCT_NAME) -c$(COREPLAT_NAME) -f $(E32ROMCFG)/$(COREPLAT_NAME)/$(PRODUCT_NAME)/mc_imaker.mk
-   
-   transfer_option=$(foreach option,$1,$(if $($(option)),"$(option)=$($(option))",))
-   
-   #
-   # Variation handling
-   #
-   unzip_%:
-       @echo Unzipping variation $*...
-       -@unzip -o -qq -d $(subst \,/,$(EPOCROOT)) /output/build_area/localised/delta_$*_package.zip
-   
-   
-   include helium_features.mk
-   ###############################################################################   
-
-
-.. index::
-  single: Flash makefile template
-
-Flash makefile template
------------------------
-
-This is the currently used template for flash rom type.
-
-::
-
-   ###############################################################################
-   # Flash template
-   ###############################################################################
-   
-   flash${r'$'}{flash.id}${r'$'}{image.type}: TYPE=${r'$'}{image.type}
-   flash${r'$'}{flash.id}${r'$'}{image.type}: NAME=${r'$'}{build.id}_$(TYPE)$(if ${r'$'}{flash.id},_${r'$'}{flash.id},)
-   flash${r'$'}{flash.id}${r'$'}{image.type}: WORKDIR=${r'$'}{rom.output.dir}/${r'$'}{rommake.product.name}/${r'$'}{image.type}
-   flash${r'$'}{flash.id}${r'$'}{image.type}: OBYPARSE_UDEBFILE=${r'$'}{mytraces.file}
-   flash${r'$'}{flash.id}${r'$'}{image.type}: FEAT_UDEBFILE=$(if "${r'$'}{mytraces.binaries}",1,0)
-   flash${r'$'}{flash.id}${r'$'}{image.type}: BLDROM_OPTVAR=${r'$'}{rommake.flags}
-   flash${r'$'}{flash.id}${r'$'}{image.type}: HWID=${r'$'}{rommake.hwid}
-   flash${r'$'}{flash.id}${r'$'}{image.type}: OPTION_LIST=TYPE NAME WORKDIR OBYPARSE_UDEBFILE CORE_UDEBFILE BLDROM_OPTVAR HWID
-   flash${r'$'}{flash.id}${r'$'}{image.type}: unzip_western
-      -@echo $(CALL_IMAKER) $(call transfer_option,$(OPTION_LIST)) flash
-      -@$(CALL_IMAKER) $(call transfer_option,$(OPTION_LIST)) flash
-    
-The target is using target specific variable to override the default iMaker values. The script also makes sure that the current environment is western, so do not need anymore to switch between environments. You can customize your target as needed, e.g. call custom scripts...
-
-.. Note::
-        Don't forget that all template are parsed and concatenated, which means a modification in the main one could affect any target one.
-
-.. index::
-  single: Create a customize makefile target
-
-How to create a customize makefile target
------------------------------------------
-
-In order to create a custom makefile target for rom image creation you have to first create the makefile template: You will call your target test for example. In that case you have to create a test.mk file that should define your target. E.g
-
-::
-   
-   ###############################################################################
-   # Test template
-   ###############################################################################
-   
-   flash_${r'$'}{target.name}_${r'$'}{image.type}: TYPE=${r'$'}{image.type}
-   flash_${r'$'}{target.name}_${r'$'}{image.type}: OPTION_LIST=TYPE
-      -@echo $(CALL_IMAKER) $(call transfer_option,$(OPTION_LIST)) flash
-      -@$(CALL_IMAKER) $(call transfer_option,$(OPTION_LIST)) flash
-
-Then you have to declare it into your configuration file, just add the following line to your main configuration:
-::
-   
-   <set name="test.makefile.template" />
-
-Then to create a ROM according to that template just add a specification to the configuration file::
-   
-   <config name="test">
-       <set name="image.type" value="rnd,prd" />
-       <set name="target.name" value="ui_rom" />
-   </config>
- 
-This will create two targets in the generated makefiles: test_ui_rom_rnd and test_ui_rom_prd.
-
-.. index::
-  single: Language pack configuration
-
-Language pack configuration
----------------------------
-
-Please read the ``ROM Image configuration (using iMaker)`` part first to have a better understanding of this part.
-
-.. index::
-  single: Main Language configuration
-
-Main configuration
-------------------
-
-These keys must be defined in order to enbable localisation/variation process.
-
-.. csv-table:: Configuration property descriptions
-   :header: "Property", "Description", "Values"
-
-   "``zips.loc.dir``", "The directory where to find variation delta packages.", "${r'$'}{zips.loc.dir}"
-   "``languages.xml.location``", "This defines where to find the languages.xml database.", "${r'$'}{localisation.language.file}"
-   "``variation.dir``", "This defines the path where variation for a product is located.", "${r'$'}{mc_5132_config.dir}\${r'$'}{product.name}\variation"
-   "``rombuild.config.file``", "That key defines where this parsed file will be located.", "${r'$'}{rombuild.config.file.parsed}"
-   "``core.makefile.template``", "This defines what template to use for core creation.", "${r'$'}{mc_5132_build.dir}/core.mk"
-   "``languagepack.makefile.template``", "This defines what template to use for core creation.", "${r'$'}{mc_5132_build.dir}/languagepack.mk"
-   "``operator.makefile.template``", "This defines what template to use for core creation.", "${r'$'}{mc_5132_build.dir}/operator.mk"
-
-Other keys could be defined accordingly to the template you are using.
-
-
-.. index::
-  single: Language pack configuration
-
-Legacy Language pack configuration
-----------------------------------
-
-Language pack could be defined into the rom image configuration, the name of the template is "``languagepack``" (this is used to render the correct makefile template).
-Example of configuration:
-
-.. code-block:: xml
-   
-   <config name="languagepack">
-       <set name="languagepack.id" value="01" />
-       <set name="description" value="01" />
-          <set name="default" value="01" />
-       <set name="languages" value="01,02,03" />
-       <set name="variation" value="western" />
-   </config>
-
-The following fields are mandatories to define a correct language pack:
-"``variant.id``" defines the variant id from the variant chart.
-"``description``" defines variant content (must not contains space).
-"``default``" default language id.
-"``languages``" comma separated list of languages to be included.
-"``variation``" defines which variation to use (western, china, japan) You can define western variation at top level and override it on target.
-
-
-.. index::
-  single: Customer Variant configuration
-
-Legacy Customer variant configuration
--------------------------------------
-
-Customer variant could be define the same way.
-Example:
-
-.. code-block:: xml
-   
-   <config name="customer_variants" abstract="true">
-   ...
-
-      <set name="variation.dir" value="\path\to\customer\variants" />
-      <config name="customer">
-          <set name="customer.id" value="20" />
-          <set name="description" value="OPERATOR" />
-      </config>
-      <config name="customer">
-          <set name="customer.id" value="10" />
-          <set name="description" value="orange" />
-          ...
-      </config>
-        <config name="customer">
-              <set name="customer.id" value="11" />
-              <set name="description" value="orange_fr" />
-        </config>
-      ...
-   </config>
-      
-Only description and customer.id and variation.dir are mandatory for customer variants.
-
-The variant creation process is now working without any copy on top of epoc32 directory, you can override epoc32 content directly from the variant directory.
-
-To run the creation of all images under the '''customer_variants''' group, just call the following command line on your configuration:
-
-  hlm customer-roms -Dteam=kawa -Dbuild.number=xx 
-
-If you just want to build one particular customer variant just invoke the following command:
-
-  hlm customer-roms -Dteam=kawa -Dbuild.number=xx -Dcustomer.makefile.target=customer99rnd
-  
-The naming of the target follows this template: customer``customer.id````image.type``.
-
-
-.. index::
   single: ATS - STIF, TEF, RTEST, MTF and EUnit
 
 .. _`Stage-ATS-label`:
@@ -1804,6 +1169,7 @@ Add the above line in the .netrc file and replace *ats_user_name* with your real
     **ats.diamonds.signal**        [allowed]       Should be "true" so at end of the build diamonds is checked for test results and helium fails if tests failed.
     **ats.delta.enabled**          [allowed]       Should be "true" so only ado's changed during do-prep-work-area are tested by ats.
     **ats4.enabled**               [allowed]       Should be "true" if ats4 is to be used.
+    **ats.specific.pkg**           [allowed]       Text in name of pkg files to use eg. 'sanity' would only use xxxsanity.pkg files from components.
     ============================== =============== ===============
 
 
@@ -2147,7 +1513,7 @@ All you need to do is setup the following parameters:
 .. code-block:: xml
 
     <property name="enabled.matti" value="true" />
-    <property name="matti.scripts" value="${r'$'}{helium.dir}\testconfig\ats3\matti\script" />
+    <property name="matti.scripts" value="${r'$'}{helium.dir}/tests/data/matti" />
     <property name="template.file" value="${r'$'}{helium.dir}\tools\common\python\lib\ats3\matti\template\matti_demo.xml" />
     <property name="ats.sis.images.dir" location="${r'$'}{build.drive}\output\matti\sis" />
     <property name="ats.product.name" value="" />

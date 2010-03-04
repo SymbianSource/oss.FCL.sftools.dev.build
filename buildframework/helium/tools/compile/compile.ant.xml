@@ -20,19 +20,41 @@ Description:
 
 ============================================================================
 -->
+<!--* @package compile -->
 <project name="compile" xmlns:hlm="http://www.nokia.com/helium">
     <description>
         Targets related to compile stage. It includes cmaker,
         ec, ebs, sbs, sbs-ec build system.
     </description>
+    
+    <!--* @property sysdef.configurations.list
+    Comma-separated list of System Definition configuration names to be built in the compile-main stage.
+    @type string
+    @editable required
+    @scope public
+    -->
 
     <!-- Property declaration -->
+    <!-- Suffix used in genxml related output files. This value is added into file names to show that they are genxml related. Used in log files, genxml output files and component list for EE images. Normally does not need to be set.
+    @type string
+    @scope private
+    -->
     <property name="genxml.output.file.suffix" value="genxml" />
+    <!-- Path of sysdef dtd
+    @type string
+    -->
     <property name="compile.sysdef.dtd.stub" location="${helium.dir}/tools/common/dtd/sysdef_dtd_1_4_0.xml" />
+    <!-- Name of the signal input to be able to override the compile-main target.
+    @type string
+    @scope private
+    -->
     <property name="compile.signal.input" value="compileSignalInput" />
+    <!-- Compilation summary file for diamonds.
+    @type string
+    @scope private
+    -->
     <property name="diamonds.compile.summary" location="${compile.log.dir}/${build.id}_compile_diamonds.xml" />
-
-
+    
     <!-- including common compilation macros -->
     <hlm:typedef file="${helium.dir}/tools/compile/compile.antlib.xml" uri="http://www.nokia.com/helium"/>
     <import file="cmaker.ant.xml" />
@@ -41,6 +63,7 @@ Description:
     <import file="sbs/sbs.ant.xml" />
     <import file="sis.ant.xml" />
     <import file="qt/qt.ant.xml" />
+    <import file="coverity.ant.xml" />
 
     <!-- A few basic steps (directory creation) that are needed before starting compilation. -->
     <target name="prebuild">
@@ -53,12 +76,13 @@ Description:
     </target>
 
     <!-- Does all the necessary steps before starting the component build -->
-    <target name="precompile" depends="record-compile-start-time,create-canonical-sysdef-file,precompile-ec"/>
+    <target name="precompile" depends="record-compile-start-time,create-canonical-sysdef-file,precompile-ec,run-coverity-configure"/>
 
     <!-- post operation for EC builds, submits the compile time and lists all the built components-->
-    <target name="postcompile" depends="postcompile-ec,render-build-duplicates" unless="env.HLM_SUBCON">
+    <target name="postcompile" depends="postcompile-ec,render-build-duplicates,post-coverity" unless="env.HLM_SUBCON">
         <runtarget target="submit-compile-time"/>
     </target>
+    
     
     <!-- Pre-processes all System Definition input files.
 
@@ -108,6 +132,7 @@ self.addMappedName(path)
 
     <!-- Merges all preprocessed System Definition files into one combined file. -->
     <target name="create-canonical-sysdef-file" depends="preprocess-sysdef-files">
+        <mkdir dir="${compile.log.dir}" />
         <if>
             <istrue value="${schema.new}" />
             <then>
@@ -123,7 +148,7 @@ self.addMappedName(path)
                 <pathconvert pathsep=" " property="system.definition.files.list">
                     <fileset dir="${build.output.dir}/build/input/" includes="**"/>
                     <chainedmapper>
-                        <globmapper from="*" to="-x *" casesensitive="no"/>
+                        <globmapper from="*" to="-x '*'" casesensitive="no"/>
                     </chainedmapper>
                 </pathconvert>
                 <hlm:compileGenxmlMergeMacro input="-x ${compile.sysdef.dtd.stub} ${system.definition.files.list}"
@@ -132,9 +157,8 @@ self.addMappedName(path)
         </if>
     </target>
 
-    <!--
-      Supports a cleaning of binaries before starting compilation, based on a SysDef configuration.
-      <deprecated>Please consider using ido-prep-clean target.</deprecated>
+    <!-- Supports a cleaning of binaries before starting compilation, based on a SysDef configuration.
+    @deprecated Please consider using ido-prep-clean target.
     -->
     <target name="compile-clean" depends="create-canonical-sysdef-file"
       if="sysdef.clean.configuration">
@@ -364,6 +388,10 @@ f.write(output)
     <!-- Creates a .csv log of the sizes of all the binaries created in the build. -->
     <target name="binary-sizes-log" if="binary.sizes.output">
         <hlm:startSpecificLogMacro name="${compile.log.dir}/${build.id}_binary_sizes.log" phase="compile"/>
+        <!-- File containing data related to flash image size
+        @type string
+        @scope private
+        -->
         <property name="binary.sizes.output.file" location="${build.log.dir}/${build.id}_flash_image_size_data.csv"/>
         <pathconvert pathsep=";" property="build.logs.list">
             <fileset dir="${compile.log.dir}" includes="*_build.log" excludes="*ant_build.log;*_zipup_build.log"/>

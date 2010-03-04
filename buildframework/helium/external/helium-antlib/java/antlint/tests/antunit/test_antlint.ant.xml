@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : test_antlint.ant.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test-antlint" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>Helium Antlib AntLint unittests.</description>
+    
+    <!-- is called prior to the test -->
+    <target name="setUp">
+        <echo>-------------------------------------------------------------------------------</echo>
+        <delete dir="../output" failonerror="false" />
+    </target>
+
+    <!-- is called after the test, even if that caused an error -->
+    <target name="tearDown">
+        <delete dir="../output" failonerror="false" />
+        <echo>-------------------------------------------------------------------------------</echo>
+    </target>
+
+    <target name="test-antlint">
+        <au:expectfailure>
+            <runtarget target="antlint"/>    
+            <au:assertLogContains text="W: Description not specified!" level="info"/>
+            <au:assertLogContains text="W: Project name not specified!" level="info"/>
+            <au:assertLogContains text="W: INVALID File Name:" level="info"/>
+            <au:assertLogContains text="E: 234: Bad indentation!" level="info"/>
+            <au:assertLogContains text="E: 229: Tabs should not be used!" level="info"/>
+            <au:assertLogContains text="W: INVALID Project Name: Sample" level="info"/>
+            <au:assertLogContains text="W: INVALID Property Name: check-property-name" level="info"/>
+            <au:assertLogContains text="W: INVALID PRESETDEF/MACRODEF Name: check_PresetDef.Name" level="info"/>
+            <au:assertLogContains text="W: INVALID Target Name: Check_target.Name" level="info"/>
+            <au:assertLogContains text="runtarget> calls the target smile that has dependencies!" level="info"/>
+            <au:assertLogContains text="antcall> is used with no param elements and calls the target hello that has no dependencies!" level="info"/>
+            <au:assertLogContains text="W: Target check-script-size has a script with 1098 characters, code should be inside a python file" level="info"/>
+            <au:assertLogContains text="W: Target check-use-of-if-in-targets poor use of if statement, use " level="info"/>
+            <au:assertLogContains text="W: Target check-use-of-if-else-in-targets poor use of if-else-property statement, use condition task" level="info"/>
+            <au:assertLogContains text="W: Target check-use-of-if-then-in-targets poor use of if-then-property statement, use condition task" level="info"/>
+            <au:assertLogContains text="W: test.script.property not in data model" level="info"/>
+            <au:assertLogContains text="W: Target check-prop-in-scriptcondition poor use of if-else-property statement, use condition task" level="info"/>
+            <au:assertLogContains text="W: build.errors.total not in data model" level="info"/>
+            <au:assertLogContains text="W: s60.getenv.path not in data model" level="info"/>
+            <au:assertLogContains text="W: test.boolean1 uses 'equals' should use 'istrue' task" level="info"/>
+            <au:assertLogContains text="W: test.boolean2 uses 'equals' should use 'istrue' task" level="info"/>
+            <au:assertLogContains text="E: ${ found in target_check-jython-script" level="info"/>
+            <au:assertLogContains text="W: ${ found in scriptcondition_check-scriptcondition" level="info"/>
+            <au:assertLogContains text="W: Target check-scriptcondition poor use of if-else-property statement, use condition task" level="info"/>
+            <au:assertLogContains text="W: INVALID PRESETDEF/MACRODEF Name: foo_Macro" level="info"/>
+            <au:assertLogContains text="W: test.scriptdef.property not in data model" level="info"/>
+            <au:assertLogContains text="E: Scriptdef check-scriptdef does not use attr2" level="info"/>
+            <au:assertLogContains text="W: Scriptdef check-scriptdef-style doesn't reference attributes directly, poor style" level="info"/>
+            <au:assertLogContains text="E: ${ found in check-script" level="info"/>
+            <au:assertLogContains text="E: Scriptdef check-scriptdef-attributes does not have attribute target" level="info"/>
+
+        </au:expectfailure>
+    </target>
+    
+    <target name="antlint">
+        <antlint>
+            <fileset id="antlint.files" dir="${antlint.test.dir}/data">
+                <include name="*.xml"/>
+                <include name="*.ant.xml"/>
+                <include name="*build.xml"/>
+                <include name="*.antlib.xml"/>
+            </fileset>
+            <checker name="CheckTabCharacter" severity="error" />
+            <checker name="CheckPropertyName" severity="warning">([a-z0-9[\\d\\_\\.\\@\\{\\}\\$]]*)</checker>
+            <checker name="CheckTargetName" severity="warning">([a-z0-9[\\d\\-]]*)</checker>
+            <checker name="CheckIndentation" severity="error"/>
+            <checker name="CheckPresetDefMacroDefName" severity="warning">([a-z0-9][a-zA-Z0-9]*)</checker>       
+            <checker name="CheckProjectName" severity="warning">([a-z0-9[\\d\\.\\_\\-]]*)</checker>
+            <checker name="CheckDescription" severity="warning"/>
+            <checker name="CheckFileName" severity="warning" >^build.xml$|ant.xml$|antlib.xml$</checker>
+            <checker name="CheckRunTarget" severity="warning"/>
+            <checker name="CheckAntCall" severity="warning"/>
+            <checker name="CheckScriptSize" severity="warning"/>
+            <checker name="CheckUseOfIfInTargets" severity="warning"/>
+            <checker name="CheckJepJythonScript" severity="error" />
+            <checker name="CheckPropertiesInDataModel" severity="warning"/>
+            <checker name="CheckScriptCondition" severity="warning"/>
+            <checker name="CheckPythonTasks" severity="warning"/>
+            <checker name="CheckUseOfEqualsTask" severity="warning"/>
+            <checker name="CheckScriptDefNameAttributes" severity="error"/>
+            <checker name="CheckScriptDefStyle" severity="warning"/>
+            <checker name="CheckScriptDef" severity="error"/>
+            <checker name="CheckDuplicateNames" severity="warning"/>
+        </antlint>
+    </target>
+</project>

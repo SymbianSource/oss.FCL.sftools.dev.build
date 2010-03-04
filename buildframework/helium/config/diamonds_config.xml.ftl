@@ -59,7 +59,10 @@ Description:
             and sends it.-->
             
         <target name="create-bom"/>
-
+        
+        <target name="post-coverity" template-file="coverity.xml.ftl"
+            logfile="${ant['diamonds.coverity.report.file']}"/>
+        
         <target name="rndsdk-create-api-descr-xml" template-file="apimetrics.xml.ftl"
             logfile="${ant['build.drive']}/output/apidescr/apidescr.xml"/>
             

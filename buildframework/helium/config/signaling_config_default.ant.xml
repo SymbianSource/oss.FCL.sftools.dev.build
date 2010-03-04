@@ -106,6 +106,10 @@ Description:
     <hlm:signalInput id="raptorErrorSignalInput" failbuild="now">
         <hlm:notifierListRef refid="defaultFailNotifier" />
     </hlm:signalInput>
+    
+    <hlm:signalInput id="coveritySignalInput" failbuild="now">
+        <hlm:notifierListRef refid="defaultFailNotifier" />
+    </hlm:signalInput>
 
     <hlm:signalInput id="eeRomsSignalInput" failbuild="never">
         <hlm:notifierListRef refid="defaultAlwaysNotifier" />
@@ -157,10 +161,6 @@ Description:
         <hlm:notifierListRef refid="fotaSignalInput" />
     </hlm:signalInput>
 
-    <hlm:signalInput id="btSmokeTestNotifySignalInput" failbuild="never">
-        <hlm:notifierListRef refid="defaultFailNotifier" />
-    </hlm:signalInput>
-
     <hlm:signalInput id="archivePolicyErrorSignalInput" failbuild="never">
         <hlm:notifierListRef refid="defaultFailNotifier" />
     </hlm:signalInput>
@@ -200,7 +200,7 @@ Description:
 
     <hlm:signalListenerConfig id="preparationSignal" target="prep-fail" message="Errors during preparation">
         <targetCondition>
-            <hlm:hasSeverity severity="error" file="${build.signal.status.dir}/${build.id}_ant_build.log.status.xml" />
+            <hlm:hasSeverity severity="error" file="${build.signal.status.dir}/${build.id}_main.ant*.status.xml" />
         </targetCondition>
         <signalNotifierInput>
             <signalInput refid="preparationSignalInput" />
@@ -212,19 +212,6 @@ Description:
         </signalNotifierInput>
     </hlm:signalListenerConfig>
 
-    <hlm:signalListenerConfig id="eeRomsSignal" target="ee-roms" message="Errors happened during ee rom image">
-        <targetCondition>
-            <hlm:hasSeverity severity="error" file="${build.signal.status.dir}/${build.id}_ee_roms.log.status.xml" />
-        </targetCondition>
-        <signalNotifierInput>
-            <signalInput refid="eeRomsSignalInput" />
-            <notifierInput>
-                <fileset dir="${build.log.dir}" >
-                    <include name="**/${build.id}_ee_roms*" />
-                </fileset>
-            </notifierInput>
-        </signalNotifierInput>
-    </hlm:signalListenerConfig>
 
     <hlm:signalListenerConfig id="subconRomsSignal" target="subcon-roms" message="Errors happened during subcon rom image">
         <hlm:targetCondition>
@@ -338,12 +325,6 @@ Description:
     <hlm:signalListenerConfig id="testAlertsSignal" target="check-signal" message="Test alert signal">
         <signalNotifierInput>
             <signalInput refid="testAlertsSignalInput" />
-        </signalNotifierInput>
-    </hlm:signalListenerConfig>
-
-    <hlm:signalListenerConfig id="btSmokeTestNotifySignal" target="blacktusk-signal" message="Blacktusk signal">
-        <signalNotifierInput>
-            <signalInput refid="btSmokeTestNotifySignalInput" />
         </signalNotifierInput>
     </hlm:signalListenerConfig>
 

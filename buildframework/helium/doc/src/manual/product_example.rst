@@ -25,10 +25,10 @@ The following is an example of the file structure required, 'mc' is the product 
 
   \mc
     \helium   #contains the helium tool set.
-    \mc_build #contains the build command files and build configuration files (mostly ant configuration files).
+    \build #contains the build command files and build configuration files (mostly ant configuration files).
         languages.xml
         team.ant.xml
-        \mc_number_build
+        \number_build
             delivery.xml
             prep.xml
             rom_image_comfig.xml
@@ -40,20 +40,20 @@ The following is an example of the file structure required, 'mc' is the product 
                 bld.bat
        \teams
           teamName.ant.xml
-    \mc_config    #contains configuration files specific to the product being build e.g. which components to include.
+    \config    #contains configuration files specific to the product being build e.g. which components to include.
         \product
             \rom
                 \include
-                    mc_product_override.iby
+                    product_override.iby
         \product_edge
             \rom
                 \include
-                    mc_product_override.iby
+                    product_override.iby
         \product_lta
             \rom
                 \include
-                    mc_product_override.iby
-    \mc_overlay       #these contain files that are to overwite code supplied by S60 in the same structure as is saved in the S60 code under 2 different folders
+                    product_override.iby
+    \overlay       #these contain files that are to overwite code supplied by S60 in the same structure as is saved in the S60 code under 2 different folders
         \common       #contains overlay files common to all products
             \files
                 \config
@@ -68,8 +68,8 @@ The following is an example of the file structure required, 'mc' is the product 
                 .
                 .
                 .
-    \mc_sw      #contains any extra software required for the build i.e. new features to be added that are not yet in the main line code.
-        \mc_nummber_sw
+    \sw      #contains any extra software required for the build i.e. new features to be added that are not yet in the main line code.
+        \nummber_sw
             \exports
             
 
@@ -94,7 +94,7 @@ This uses the TEAM variable set up in the PC control panel environment variables
 .. code-block:: xml
 
   <?xml version="1.0" encoding="UTF-8"?>
-  <project name="mc_tools.nbuild.team">
+  <project name="tools.nbuild.team">
       <property name="team" value="${env.TEAM}"/>
       <import file="teams/${team}.ant.xml"/>
   </project>
@@ -129,7 +129,7 @@ This file contains the list of projects that should be checkedout or copied (sna
 .. code-block:: xml
 
   <build>
-      <spec name="mc_number" abstract="true">
+      <spec name="number" abstract="true">
           <set name="database" value="${ccm.database}"/>
           <set name="dir" value="${ccm.base.dir}" />
           <set name="threads" value="6" />
@@ -195,14 +195,14 @@ This file takes the checked out projects (and snapshots) and copies them to the 
                * product
             -->
           <location name="${ccm.base.dir}/S60/S60/Symbian_ICD_ICF/${symbian.release}" />
-          <location name="${mc_number_build.dir}../../../mc_overlay/${product.family}_overlay/common/files/s60/Symbian_ICD_ICF/${symbian.release}" />
+          <location name="${number_build.dir}../../../overlay/${product.family}_overlay/common/files/s60/Symbian_ICD_ICF/${symbian.release}" />
         </unzipicds>
       </source>
   
       <!-- Unzip (ICF/ICD)'s if there are any -->
       <source name="product_icds" basedir="">
         <unzipicds dest="${build.drive}\">
-          <location name="${mc_number_build.dir}../../../mc_overlay/${product.family}_overlay/common/files/s60/Symbian_ICD_ICF/product_ICF" />
+          <location name="${number_build.dir}../../../overlay/${product.family}_overlay/common/files/s60/Symbian_ICD_ICF/product_ICF" />
         </unzipicds>
       </source>
   
@@ -265,7 +265,7 @@ This file contains all the information necessary to create the rom image, i.e. w
           <set name="ui.platform" value="mcnumber"/>
           <set name="zips.loc.dir" value="${zips.loc.dir}" />
           <set name="languages.xml.location" value="${localisation.language.file}" />
-          <set name="variation.dir" value="${build.drive}\mc\mc_config\mc_number_config\product\variation" />
+          <set name="variation.dir" value="${build.drive}\mc\config\number_config\product\variation" />
           <set name="rombuild.config.file" value="${rombuild.config.file.parsed}" />
           <set name="version.product.name" value="N78"/>
           <set name="imaker.languagepack.automation" value="0"/>
@@ -299,7 +299,7 @@ This file contains all the information necessary to create the rom image, i.e. w
           <set name="customer.type" value="vanilla"/>
           <set name="uda.type" value="vanilla"/>
           <set name="image.master.iby" value="\epoc32\rom\master.oby"/>
-          <set name="image.variant.iby" value="\epoc32\rom\mc_number_variant_imaker.oby"/>
+          <set name="image.variant.iby" value="\epoc32\rom\number_variant_imaker.oby"/>
           <set name="include.rnd.oby" value="$(if $(subst rnd,,$(TYPE)),0,1)" /> <!-- include rnd applications only in rnd images -->
           <set name="image.override.iby" value="\epoc32\rom\override.oby"/>
           <set name="version.copyright" value="(C) Nokia"/>
@@ -369,16 +369,16 @@ This file contains all the information necessary to create the rom image, i.e. w
   
           <!-- templates to generate the makefiles -->
           <set name="output.makefile.filename" value="${rombuild.makefile.name}"/>
-          <set name="main.makefile.template" value="${build.drive}\mc\mc_config\mc_number_config\rombuild\main.mk"/>
-          <set name="flash.makefile.template" value="${build.drive}\mc\mc_config\mc_number_config\rombuild\flash.mk"/>
-          <set name="core.makefile.template" value="${build.drive}\mc\mc_config\mc_number_config\rombuild\core.mk"/>
-          <set name="languagepack.makefile.template" value="${build.drive}\mc\mc_config\mc_number_config\rombuild\languagepack.mk"/>
-          <set name="customer.makefile.template" value="${build.drive}\mc\mc_config\mc_number_config\rombuild\customer.mk"/>
-          <set name="uda.makefile.template" value="${build.drive}\mc\mc_config\mc_number_config\rombuild\uda.mk"/>
-          <set name="eraseuda.makefile.template" value="${build.drive}\mc\mc_config\mc_number_config\rombuild\eraseuda.mk"/>
-          <set name="flash.config.template" value="${build.drive}\mc\mc_config\mc_number_config\rombuild\template.config.xml"/>
-          <set name="flash.config.makefile.template" value="${build.drive}\mc\mc_config\mc_number_config\rombuild\flash_config.mk"/>
-          <set name="makeupct_core.makefile.template" value="..\..\mc\mc_config\mc_number_config\rombuild\makeupct_core.mk"/>
+          <set name="main.makefile.template" value="${build.drive}\mc\config\number_config\rombuild\main.mk"/>
+          <set name="flash.makefile.template" value="${build.drive}\mc\config\number_config\rombuild\flash.mk"/>
+          <set name="core.makefile.template" value="${build.drive}\mc\config\number_config\rombuild\core.mk"/>
+          <set name="languagepack.makefile.template" value="${build.drive}\mc\config\number_config\rombuild\languagepack.mk"/>
+          <set name="customer.makefile.template" value="${build.drive}\mc\config\number_config\rombuild\customer.mk"/>
+          <set name="uda.makefile.template" value="${build.drive}\mc\config\number_config\rombuild\uda.mk"/>
+          <set name="eraseuda.makefile.template" value="${build.drive}\mc\config\number_config\rombuild\eraseuda.mk"/>
+          <set name="flash.config.template" value="${build.drive}\mc\config\number_config\rombuild\template.config.xml"/>
+          <set name="flash.config.makefile.template" value="${build.drive}\mc\config\number_config\rombuild\flash_config.mk"/>
+          <set name="makeupct_core.makefile.template" value="..\..\mc\config\number_config\rombuild\makeupct_core.mk"/>
           
           <spec name="product" abstract="true">
       
@@ -555,7 +555,7 @@ This file contains all the information necessary to create the rom image, i.e. w
           -->
           <spec name="product_edge" abstract="true">
               <set name="config.name" value="product_edge"/>
-              <set name="variation.dir" value="${build.drive}\mc\mc_config\mc_number_config\product_edge\variation" />
+              <set name="variation.dir" value="${build.drive}\mc\config\number_config\product_edge\variation" />
               <set name="version.bandvariant" value="1"/>
               <set name="zips.loc.dir" value="${zips.loc.dir}" />
               <set name="variation" value="western"/>
@@ -733,22 +733,22 @@ This file contains all the initial product specific configuration required  by h
       <property name="local.free.space" value="102400" />
   
       #these are the configuration files specific to each variant
-      <property name="product.variant.config" location="${build.drive}/mc/mc_build/mc_family_build/dummy_variant_config.xml" />
-      <property name="product_edge.variant.config" location="${build.drive}/mc/mc_build/mc_family_build/dummy_variant_config.xml" />
-      <property name="product_lta.variant.config" location="${build.drive}/mc/mc_build/mc_family_build/dummy_variant_config.xml" />
+      <property name="product.variant.config" location="${build.drive}/build/family_build/dummy_variant_config.xml" />
+      <property name="product_edge.variant.config" location="${build.drive}/build/family_build/dummy_variant_config.xml" />
+      <property name="product_lta.variant.config" location="${build.drive}/build/family_build/dummy_variant_config.xml" />
   
       <property name="build.errors.limit" value="-1" />
       <property name="flash.config.enabled" value="enabled" />
       
        <!-- -->
-      <import file="../mc_family_build.ant.xml"/>                 #include the family product config file
+      <import file="../family_build.ant.xml"/>                 #include the family product config file
 
       <path id="system.definition.files">                       #locations of various system configuration files.
-          <pathelement path="${build.drive}/mc/mc_build/mc_family_build/family_System_Definition.xml"/>
-          <pathelement path="${build.drive}/mc/mc_build/mc_family_build/family_SDF_loc.xml"/>
-          <pathelement path="${build.drive}/mc/mc_build/ibusal_51_build/IBUSAL51_System_Definition.xml" />
+          <pathelement path="${build.drive}/build/family_build/family_System_Definition.xml"/>
+          <pathelement path="${build.drive}/build/family_build/family_SDF_loc.xml"/>
+          <pathelement path="${build.drive}/build/ibusal_51_build/IBUSAL51_System_Definition.xml" />
           <fileset dir="${build.drive}/s60/tools/build_platforms/build/data" includes="S60_System*.xml"/>
-          <pathelement path="${build.drive}/mc/mc_build/mc_family_build/product/product_System_Definition.xml" />
+          <pathelement path="${build.drive}/build/family_build/product/product_System_Definition.xml" />
           <pathelement path="${build.drive}/MULTIMEDIA_SW/ME_SCD_DESW/ME_SCD_DESW/sysdef/System_Definition_product.xml" />
       </path>
   
@@ -831,9 +831,9 @@ This file contains all the configuration required by a particular team, it lists
  
  
 .. index::
-  single: Example - mc_product_override.iby file
+  single: Example - product_override.iby file
 
-mc_product_override.iby file
+product_override.iby file
 ------------------------------
  
  This file contains details of files that will be used to create the ROM image. ::
@@ -844,23 +844,23 @@ mc_product_override.iby file
   
   // Variating ActiveIdle theme
   
-  #ifdef MC_ACTIVEIDLE_VARIANT
-  #ifndef __MC_NO_FMTX_IN_ROM
-  data-override=concat3(ZPRIVATE\10207254\themes\271012080\270513751\271063149\1.0\AI.,MC_ACTIVEIDLE_VARIANT,.o0000)           PRIVATE\10207254\themes\271012080\270513751\271063149\1.0\AI.o0000
-  data-override=concat3(ZPRIVATE\10207254\themes\271012080\270513751\271063147\1.0\CI.,MC_ACTIVEIDLE_VARIANT,.o0000)           PRIVATE\10207254\themes\271012080\270513751\271063147\1.0\CI.o0000
-  ROM_IMAGE[2] data-override=concat3(ZPRIVATE\10207254\themes\271012080\270513751\271063149\1.0\AI.,MC_ACTIVEIDLE_VARIANT,.o0001)                                 PRIVATE\10207254\themes\271012080\270513751\271063149\1.0\AI.o0001
-  ROM_IMAGE[2] data-override=concat3(ZPRIVATE\10207254\themes\271012080\270513751\271063147\1.0\CI.,MC_ACTIVEIDLE_VARIANT,.o0001)                                 PRIVATE\10207254\themes\271012080\270513751\271063147\1.0\CI.o0001
-  #endif // __MC_NO_FMTX_IN_ROM
-  #endif // MC_ACTIVEIDLE_VARIANT
+  #ifdef ACTIVEIDLE_VARIANT
+  #ifndef __NO_FMTX_IN_ROM
+  data-override=concat3(ZPRIVATE\10207254\themes\271012080\270513751\271063149\1.0\AI.,ACTIVEIDLE_VARIANT,.o0000)           PRIVATE\10207254\themes\271012080\270513751\271063149\1.0\AI.o0000
+  data-override=concat3(ZPRIVATE\10207254\themes\271012080\270513751\271063147\1.0\CI.,ACTIVEIDLE_VARIANT,.o0000)           PRIVATE\10207254\themes\271012080\270513751\271063147\1.0\CI.o0000
+  ROM_IMAGE[2] data-override=concat3(ZPRIVATE\10207254\themes\271012080\270513751\271063149\1.0\AI.,ACTIVEIDLE_VARIANT,.o0001)                                 PRIVATE\10207254\themes\271012080\270513751\271063149\1.0\AI.o0001
+  ROM_IMAGE[2] data-override=concat3(ZPRIVATE\10207254\themes\271012080\270513751\271063147\1.0\CI.,ACTIVEIDLE_VARIANT,.o0001)                                 PRIVATE\10207254\themes\271012080\270513751\271063147\1.0\CI.o0001
+  #endif // __NO_FMTX_IN_ROM
+  #endif // ACTIVEIDLE_VARIANT
   
   // Variantion ends
   
   
   // Product customisation
   #include <commontsy.var>
-  #ifdef MC_PRODUCT_CUSTOMISATION_VAR
-  define __MC_PRODUCT_CUSTOMISATION_VAR__ MC_PRODUCT_CUSTOMISATION_VAR
-  file-override=ABI_DIR\BUILD_DIR\COMMONTSY.__MC_PRODUCT_CUSTOMISATION_VAR__.DLL    Sys\Bin\COMMONTSY.DLL
+  #ifdef PRODUCT_CUSTOMISATION_VAR
+  define __PRODUCT_CUSTOMISATION_VAR__ PRODUCT_CUSTOMISATION_VAR
+  file-override=ABI_DIR\BUILD_DIR\COMMONTSY.__PRODUCT_CUSTOMISATION_VAR__.DLL    Sys\Bin\COMMONTSY.DLL
   #endif
   
   

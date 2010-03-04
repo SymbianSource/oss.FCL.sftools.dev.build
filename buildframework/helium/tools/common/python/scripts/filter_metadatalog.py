@@ -1,5 +1,5 @@
 #============================================================================ 
-#Name        : filter_heliumlog.py 
+#Name        : filter_metadatalog.py
 #Part of     : Helium 
 
 #Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).

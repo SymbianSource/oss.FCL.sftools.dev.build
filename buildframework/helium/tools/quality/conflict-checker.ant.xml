@@ -20,11 +20,16 @@ Description:
 
 ============================================================================
 -->
+<!--* @package quality -->
 <project name="quality.conflict-checker" xmlns:hlm="http://www.nokia.com/helium">
     <description>
         Analyse the content created from two different components.
     </description>
 
+    <!-- Default name of the build duplicates log file.
+    @type string
+    @scope private
+    -->
     <property name="build.duplicates.log" location="${temp.build.dir}/${build.id}_build_duplicates.xml" />
 
     <!--

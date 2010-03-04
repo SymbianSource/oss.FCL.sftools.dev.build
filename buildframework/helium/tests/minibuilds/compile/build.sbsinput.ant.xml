@@ -51,7 +51,7 @@ Description:
         <sbsInput refid="helium_minibuild_compile_input_armv5" />
     </hlm:sbsinput>
     
-    <hlm:sbsbuild id="helium_minibuild_compile">
+    <hlm:sbsbuild id="sbs.helium_minibuild_compile">
         <sbsInput refid="helium_minibuild_compile_input" />
     </hlm:sbsbuild> 
     

@@ -20,11 +20,15 @@ Description:
 
 ============================================================================
 -->
+<!--* @package preparation -->
 <project name="preparation.bom" xmlns:hlm="http://www.nokia.com/helium">    
     <description>
     Creates a Bill-Of-Materials record based on the Synergy inputs.
     </description>
     
+    <!-- Your synergy work area directory (Set as the parent of the helium dir by default).
+    @type string
+    -->
     <property name="create.bom.workarea.root" value="."/> 
     
     <!-- The target create-bom creates a Bill-Of-Material based on the SCM project 
@@ -191,10 +195,10 @@ except Exception, ex:
         <hlm:stopSpecificLogMacro name="${prep.log.dir}/${build.id}_bom.log" phase="prep"/>
     </target>
     
-    <!-- Private: The target create-task-owner-email creates a property task.owners.email which will contain
+    <!-- The target create-task-owner-email creates a property task.owners.email which will contain
     the list of task owners email IDs seperated by comma, the newly created property can be used thereafter
     to send emails.
-    This target is automatically called by create-bom target -->
+    This target is automatically called by create-bom target. @scope private-->
     <target name="collect-task-owner-email">
         <if>
             <available file="${build.log.dir}/${build.id}_bom_delta.xml"/>
@@ -278,7 +282,14 @@ except Exception, ex:
 
     <!-- Finds the path to the last usable XML BOM log for creating a BOM delta. --> 
     <target name="old-bom-log" unless="old.bom.log">
+        <!-- Publish dir location of the old bom log.
+        @type string
+        -->
         <property name="old.bom.log.publish.dir" value="${publish.dir}" />
+        <!-- Location of XML BOM log.
+        @type string
+        @scope private
+        -->
         <property name="bom.log" value="${old.bom.log.publish.dir}/logs/${build.id}_bom.xml"/>
         <script language="jython" setbeans="false">
 import re

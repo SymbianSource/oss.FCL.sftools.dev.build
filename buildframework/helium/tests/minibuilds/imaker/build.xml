@@ -20,10 +20,10 @@ Description:
 
 ============================================================================
 -->
-<project name="minibuild.ido" default="help" xmlns:au="org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+<project name="minibuild.imaker" default="help" xmlns:au="org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
     <property environment="env"/>
     <import file="../site/${env.TEAM}.ant.xml" />
-	<dirname property="config.dir" file="${ant.file.minibuild.ido}"/>
+    <dirname property="config.dir" file="${ant.file.minibuild.ido}"/>
 	
     <!-- Enable Helium internal assertion checking. -->
     <property name="hlm.enable.asserts" value="1" />
@@ -32,9 +32,14 @@ Description:
     <property name="build.family" value="minibuild_imaker" />
     <property name="major.version" value="0" />
     <property name="minor.version" value="0" />
-	<property name="ccm.enabled" value="true"/>
-
-	<!-- Configuring the build system -->
+    <property name="ccm.enabled" value="true"/>
+    <property name="ncp.version" value="79"/>
+    <property name="s60.version" value="52"/>
+    <tstamp><format property="build.year" pattern="yyyy"/></tstamp>
+    <tstamp><format property="build.week" pattern="ww"/></tstamp>
+    <property name="rombuild.buildinfo.template" location="${build.drive}/build/s60_52_build/build/helium_conf/imaker_conf/image_conf_buildinfo.mk.ftl"/>
+    
+    <!-- Configuring the build system -->
     <property name="build.system" value="ec-helium" />
     
     <property name="ec.cluster.manager" value="fawec001"/>
@@ -43,22 +48,25 @@ Description:
     <property name="rvct.version" value="22_616"/>
 
     <!-- Configuring get latest env. -->
-	<property name="s60.grace.service" value="s60_devices_sw" />
-	<property name="s60.grace.product" value="DFS7x.92" />
-	<property name="s60.grace.release" value="mcl_\d{6}_hw79" />
-	<property name="prep.root.dir" value="E:\Build_E\${env.USERNAME}\ido_ba\${build.name}" />
+    <property name="s60.grace.service" value="s60_devices_sw" />
+    <property name="s60.grace.product" value="DFS7x.92" />
+    <property name="s60.grace.release" value="92_\d{6}_hw79" />
+    <property name="prep.root.dir" value="E:\Build_E\${env.USERNAME}\ido_ba\${build.name}" />
 
 
     <import file="${helium.dir}/helium.ant.xml"/>
 
     <!-- Need to define custom preparation steps. -->
-	<target name="ido-prep" depends="prep-drive,preparation-getenv"/>
+	  <target name="ido-prep" depends="prep-drive,preparation-getenv"/>
 
     <!-- Run the full sequence of target for the minibuild. ,mini-build-prep,compile-main,zip-ee,mini-build-check-->
     <target name="do-mini-build" depends="ido-update-build-area,
     										mini-build-cleanup,
                                             mini-build-install-new-imaker,
-    										imaker-build,
+                                            mini-build-prepare,
+                                            build-roms,
+                                            fota-a-build,
+                                            build-icreatordp,
     	                                    mini-build-check"/>
     
     
@@ -138,10 +146,10 @@ ${ant.coverage.summary}</echo>
             <fileset dir="${build.drive}/" casesensitive="false">
                 <include name="makefile"/>
                 <include name="*.mk"/>
-            	<include name="ecloud_tmp_*/**"/>
-            	<include name="emake.*"/>            	
+                <include name="ecloud_tmp_*/**"/>
+                <include name="emake.*"/>
                 <include name="epoc32/build/**"/>
-                <include name="epoc32/rombuild/*/**"/>
+                <!--<include name="epoc32/rombuild/*/**"/>-->
                 <include name="output/**"/>
                 <include name="timestart.txt"/>
                 <include name="timestop.txt"/>
@@ -151,6 +159,10 @@ ${ant.coverage.summary}</echo>
     </target>
     
     
+    <target name="mini-build-prepare">
+    	<hlm:hackMacro file="${build.drive}/epoc32/rom/config/${product.platform}/${product.name}/customer/custvariant_01_test/content/variant.mk" keyword="CUSTVARIANT_COMPLP" regex="(custvariant\s*$)" replace="\1\nCUSTVARIANT_COMPLP=01 02"/>
+    </target>
+
     <target name="mini-build-check">
     </target>
 	
@@ -172,22 +184,23 @@ ${ant.coverage.summary}</echo>
                 <variable name="TYPE" value="rnd"/>
             </variableset>
         </imakerconfiguration>
-                <imakerconfiguration>
+        <!--imakerconfiguration>
             <makefileset>
                 <include name="**/${product.name}/*ui.mk"/>
             </makefileset>
             <targetset>
                 <include name="^core$"/>
                 <include name="^langpack_01.*$"/>
-                <include name="^langpack_02.*$"/><!---->
+                <include name="^langpack_02.*$"/>
                 <include name="^custvariant_.*$"/>
             </targetset>
             <variableset>
                 <variable name="USE_FOTI" value="0"/>
                 <variable name="USE_FOTA" value="1"/>
+                <variable name="USE_FOTAXML" value="1"/>
                 <variable name="TYPE" value="prd"/>
             </variableset>
-        </imakerconfiguration>
+        </imakerconfiguration-->
     </hlm:imakerconfigurationset>	
 </project>
 

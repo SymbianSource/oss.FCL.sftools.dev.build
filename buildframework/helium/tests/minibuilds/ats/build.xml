@@ -30,6 +30,7 @@ Description:
     <property name="build.name" value="minibuild_ats" />
     <property name="major.version" value="0" />
     <property name="minor.version" value="0" />
+    <property name="build.version" value="${major.version}.${minor.version}"/>
     <property name="build.drive" value="z:" />
     <property name="build.id" value="${build.name}_${build.version}"/>
     <property name="diamonds.host" value="diamonds.nmp.nokia.com"/>
