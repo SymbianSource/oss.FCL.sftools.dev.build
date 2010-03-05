@@ -64,13 +64,8 @@ def run():
 		"testtc_dll/armv5/urel/testTC{000a0000}.def",
 		"testtc_dll/tracecompile_testTC_1000008d.done"
 	])
-	# Trace compiler doesn't work on Linux for time being. Once it's fixed, will apply all 
-	# trace compiler tests to linux as well.
-	t.run("windows")
-	if t.result == SmokeTest.FAIL:
-		result = SmokeTest.FAIL
-		failed.append(t.name)
-
+	t.run()
+	
 	# General CLEAN test for trace compiler outputs
 	t = AntiTargetSmokeTest()
 	t.id = "101b"
@@ -84,11 +79,8 @@ def run():
 	t.addbuildantitargets('smoke_suite/test_resources/tracecompiler/TC_autorun/bld.inf', [
 		"testtc_dll/tracecompile_testTC_1000008d.done"
 	])
-	t.run("windows")
-	if t.result == SmokeTest.FAIL:
-		result = SmokeTest.FAIL
-		failed.append(t.name)
-		
+	t.run()
+			
 	t = SmokeTest()
 	t.id = "101c"
 	t.name = "TC_bv_path"
@@ -112,11 +104,8 @@ def run():
 		"helloworld_exe/armv5/urel/HelloWorld_urel_objects.via",
 		"helloworld_exe/tracecompile_HelloWorld_e78a5aa3.done"
 	])
-	t.run("windows")
-	if t.result == SmokeTest.FAIL:
-		result = SmokeTest.FAIL
-		failed.append(t.name)
-	
+	t.run()
+
 	# 101d-101f test trace compiler auto mechanism, which is used to avoid wasting time on source 
 	# containing no osttraces.
 	# Trace compiler only runs when there are osttraces code in source. Raptor decides this by
@@ -136,10 +125,7 @@ def run():
 		"test_/armv5/urel/test.o",
 		"test_/tracecompile_autorun1_00000001.done"
 	])
-	t.run("windows")
-	if t.result == SmokeTest.FAIL:
-		result = SmokeTest.FAIL
-		failed.append(t.name)
+	t.run()
 	
 	t = AntiTargetSmokeTest()
 	t.id = "101e"
@@ -160,10 +146,7 @@ def run():
 	t.addbuildantitargets('smoke_suite/test_resources/tracecompiler/TC_autorun/bld.inf', [
 		"test_/tracecompile_autorun2_00000001.done"
 	])
-	t.run("windows")
-	if t.result == SmokeTest.FAIL:
-		result = SmokeTest.FAIL
-		failed.append(t.name)
+	t.run()
 
 	t = AntiTargetSmokeTest()
 	t.id = "101f"
@@ -184,10 +167,7 @@ def run():
 	t.addbuildantitargets('smoke_suite/test_resources/tracecompiler/TC_autorun/bld.inf', [
 		"test_/tracecompile_autorun3_00000001.done"
 	])
-	t.run("windows")
-	if t.result == SmokeTest.FAIL:
-		result = SmokeTest.FAIL
-		failed.append(t.name)
+	t.run()
 
 	# Test trace compiler doesn't run when it is switched off
 	# Trace compiler switch is off by default. To turn it on use variant ".tracecompiler". 
@@ -208,21 +188,11 @@ def run():
 	t.addbuildantitargets('smoke_suite/test_resources/tracecompiler/TC_autorun/bld.inf', [
 		"test_/tracecompile_autorun1_00000001.done"
 	])
-	t.run("windows")
-	if t.result == SmokeTest.FAIL:
-		result = SmokeTest.FAIL
-		failed.append(t.name)
-	
+	t.run()
 
+
+	t.id = "101"
 	t.name = "tracecompiler_general"
-	t.result = result
-
-	print "\nOverall Result : " + result.upper() + "\n"
-	if result == SmokeTest.FAIL:
-		print len(failed), "tests failed:"
-		for x in failed:
-			print x
-		print	
-
+	t.print_result()
 	return t
 
