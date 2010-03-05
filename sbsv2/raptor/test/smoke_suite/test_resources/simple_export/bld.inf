@@ -26,6 +26,7 @@ simple_exp2.h exported_2.h
 simple_exp3.h exported_3.h
 "file with a space.doc" "exportedfilewithspacesremoved.doc"
 "file with a space.doc" "exported file with a space.doc"
+executable_file	executable_file
 
 simple_exp1.h /tmp/$$(USER)/  //
 simple_exp2.h \tmp\$$(USER)/  //

@@ -178,6 +178,20 @@ include %s
 			 talon_settings,
 			 self.raptor.systemFLM.Append('globals.mk') )
 
+		# Unless dependency processing has been eschewed via the CLI, use a .DEFAULT target to
+		# trap missing dependencies (ignoring user config files that we know are usually absent)
+		if not (self.raptor.noDependGenerate or self.raptor.noDependInclude):
+			self.makefile_prologue += """
+
+$(FLMHOME)/user/final.mk:
+$(FLMHOME)/user/default.flm:
+$(FLMHOME)/user/globals.mk:
+
+.DEFAULT::
+	@echo "<warning>Missing dependency detected: $@</warning>"
+
+"""
+
 		# Only output timings if requested on CLI
 		if self.raptor.timing:
 			self.makefile_prologue += "\n# Print Start-time of Makefile parsing\n" \
@@ -427,8 +441,12 @@ include %s
 						command += "  " + o
 
 			# Switch off dependency file including?
-			if self.raptor.noDependInclude:
+			if self.raptor.noDependInclude or self.raptor.noDependGenerate:
 				command += " NO_DEPEND_INCLUDE=1"
+			
+			# Switch off dependency file generation (and, implicitly, inclusion)?
+			if self.raptor.noDependGenerate:
+				command += " NO_DEPEND_GENERATE=1"
 			
 			if self.usetalon:
 				# use the descrambler if we set it up

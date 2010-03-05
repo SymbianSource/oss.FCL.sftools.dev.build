@@ -57,8 +57,8 @@ def run():
 	]
 	warnings = 0
 	
-	t.id = "0106"
-	t.name = "whatcomp"
+	t.id = "0106a"
+	t.name = "whatcomp_basic"
 	t.description = description
 	t.command = command % "arm.v5.urel.gcce4_4_1"
 	t.targets = targets
@@ -67,5 +67,27 @@ def run():
 	t.warnings = warnings
 	t.run()
 
+	t.id = "0106a"
+	t.name = "whatcomp_component_repeated"
+	t.description = """
+			It is possible for what information about a component to not be grouped
+			(i.e. for multiple whatlogs tags relating to a single component to be 
+			interspersed with whatlog tags relating to other components).  
+			Raptor must cope with that and must *not* report missing files under 
+			the wrong component name."""
+	t.command = "sbs_filter --filters=FilterWhatComp < smoke_suite/test_resources/logexamples/what_component_repeated.log"
+	t.targets = []
+	t.mustmatch = [] 
+	t.mustmatch_multiline = [ 
+		"Chdir y:.ext.app.emailwizard.*epoc32.data.something.*"+
+		"Chdir y:.sf.mw.gsprofilesrv.ftuwizardmodel.*epoc32.release.armv5.something.*"+
+		"Chdir y:.ext.app.emailwizard.*epoc32.data.something_else"
+		]
+
+	t.mustnotmatch = []
+	t.warnings = 0
+	t.run()
+
+	t.id = "0106"
 	t.print_result()
 	return t
