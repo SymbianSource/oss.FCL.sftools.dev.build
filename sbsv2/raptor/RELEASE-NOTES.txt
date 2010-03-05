@@ -5,7 +5,7 @@ version 2.12.4
 Defect Fixes:
 - SF Bug 2125 - [Raptor] - tracecompiler what output incorrect if mmp basename contains '.' e.g. fred.prd.mmp 
 - SF Bug 2113 - [Raptor] what/check filters can assign files to the wrong components
-- SF Bug 2081 - [Raptor] - Exported file executable permissions not maintained (linux)
+- SF Bug 2081/1971 - [Raptor] - Exported file executable permissions not maintained (linux)
 - SF Bug 1912 - Raptor should take python from the path [if not set with SBS_PYTHON or bundled with Raptor]
 - SF Bug 2042 - [Raptor] component field empty in recipe
 - SF Bug 2007 - [Raptor] GCCE 4.4.1 builds require 4.3.1 and 4.3.2 SBS_GCCE???BIN env vars etc.
