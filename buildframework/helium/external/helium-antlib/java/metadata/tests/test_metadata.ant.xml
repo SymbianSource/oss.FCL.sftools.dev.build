@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : test_metadata.ant.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test-metadata" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>Helium antlib metadata tests.</description>
+
+    <taskdef resource="com/nokia/helium/metadata/ant/antlib.xml" uri="http://www.nokia.com/helium" />
+    <taskdef name="fmpp" classname="fmpp.tools.AntTask" onerror="report"/>
+
+    <target name="check-metadata">
+        <hlm:metadatarecord srcfile="${basedir}\data\gensis.txt" database="${basedir}\out.sqlite">
+            <fileset dir="data" includes="gensis.txt"/>
+            <hlm:textlogparser>
+                <!-- Single set defined by csv file 
+                <hlm:metadatafilterset filterFile="${basedir}\data\common.csv"/>-->
+                <!-- Set defined by nested single filter and another nested set -->
+                <hlm:metadatafilterset>
+                    <hlm:metadatafilter priority="error" regex=".*Warning: Could not find file.*" description="Test pattern for missing file."/>
+                    <!--<hlm:metadatafilterset>
+                        <hlm:metadatafilter priority="warning" regex="File not found" description="Test pattern for missing file."/>
+                    </hlm:metadatafilterset>-->
+                </hlm:metadatafilterset>
+            </hlm:textlogparser>
+        </hlm:metadatarecord>
+        <!--<au:assertLogContains text="Successfully executed codescanner"/>
+        <au:assertLogContains text="Output format: xml,html"/>
+        <au:assertFileExists file="${codescanner.output.dir}/problemIndex.xml"/>-->
+    </target>
+    
+    
+    <target name="render-scanlog">
+        <property name="build.logs.dir" value="${bmd.test.project.dir}/test_bmd" />
+        <fmpp sourceFile="${basedir}/../src/templates/readdata.xml.ftl"
+                      outputFile="${basedir}/readdata.xml">
+            <freemarkerLinks expandProperties="yes">
+                macro: ${basedir}/../src/templates
+            </freemarkerLinks>
+            <data>
+                templatedir: "${basedir}/src/templates"
+                template: "components_status.xml.ftl"
+                dbPath: "tests/out.sqlite"
+                countOnly: "true"
+                tableName: "out"
+                queryString: "where priority='WARNING' or priority='error'"
+                limit: "500"
+                ant: antProperties()
+            </data>
+        </fmpp>
+    </target>
+
+</project>
+
+

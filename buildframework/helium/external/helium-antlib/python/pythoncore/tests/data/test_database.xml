@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<antDatabase>
+  <project>
+    <name>compile.cmaker</name>
+    <documentation> 
+      <p>cMaker support.</p>
+    </documentation>
+    <default/>
+    <pythonDependency/>
+    <target>
+      <name>cmaker-install</name>
+      <ifDependency/>
+      <unlessDependency/>
+      <description/>
+      <tasks>3</tasks>
+      <location>C:\Helium_svn\helium\tools\compile\cmaker.ant.xml:78:</location>
+      <log>${build.id}_install.cmaker.log</log>
+      <executable>${build.drive}/epoc32/tools/make.exe</executable>
+      <documentation> 
+        <p>Installing CMaker.</p>
+      </documentation>
+      <propertyDependency>build.id</propertyDependency>
+      <propertyDependency>build.drive</propertyDependency>
+      <propertyDependency>cmaker.component.dir</propertyDependency>
+      <source>&lt;target name="cmaker-install"&gt;
+        &lt;hlm:recordStartMacro xmlns:hlm="http://www.nokia.com/helium" name="${build.id}_install.cmaker.log" emacsmode="true"/&gt;
+        &lt;exec executable="${build.drive}/epoc32/tools/make.exe" dir="${cmaker.component.dir}"&gt;
+            &lt;arg line="install"/&gt;
+        &lt;/exec&gt;
+        &lt;hlm:recordStopMacro xmlns:hlm="http://www.nokia.com/helium" name="${build.id}_install.cmaker.log"/&gt;
+    &lt;/target&gt;</source>
+    </target>
+    <target>
+      <name>cmaker-export</name>
+      <ifDependency>enable.cmaker</ifDependency>
+      <unlessDependency/>
+      <description/>
+      <tasks>3</tasks>
+      <location>C:\Helium_svn\helium\tools\compile\cmaker.ant.xml:87:</location>
+      <dependency type="direct">cmaker-install</dependency>
+      <log>${build.id}.export.cmaker.log</log>
+      <documentation> 
+        <p>CMaker export configuration.</p>
+      </documentation>
+      <propertyDependency>build.id</propertyDependency>
+      <propertyDependency>cmaker.pp.version</propertyDependency>
+      <propertyDependency>cmaker.s60.version</propertyDependency>
+      <source>&lt;target name="cmaker-export" depends="cmaker-install" if="enable.cmaker"&gt;
+        &lt;hlm:recordStartMacro xmlns:hlm="http://www.nokia.com/helium" name="${build.id}.export.cmaker.log" emacsmode="true"/&gt;
+        &lt;hlm:cmakerMacro xmlns:hlm="http://www.nokia.com/helium" ncp="${cmaker.pp.version}" s60="${cmaker.s60.version}" action="export"/&gt;
+        &lt;hlm:recordStopMacro xmlns:hlm="http://www.nokia.com/helium" name="${build.id}.export.cmaker.log"/&gt;
+    &lt;/target&gt;</source>
+    </target>
+  </project>
+</antDatabase>

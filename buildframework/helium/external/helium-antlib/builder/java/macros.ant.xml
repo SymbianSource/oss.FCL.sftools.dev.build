@@ -1,0 +1,338 @@
+<?xml version="1.0"?>
+<!-- 
+============================================================================ 
+Name        : build.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="build-macros" xmlns:ivy="antlib:org.apache.ivy.ant" xmlns:au="org.apache.ant.antunit"
+    xmlns:cs="antlib:com.puppycrawl.tools.checkstyle">
+    <import file="common.ant.xml" />
+    
+    <target name="clean">
+        <delete dir="${module.temp.dir}" />
+    </target>
+
+    <target name="resolve">
+        <mkdir dir="${lib.dir}"/> <!-- not usually necessary, ivy creates the directory IF there are dependencies -->
+        <ivy:settings file="${ivy.settings.dir}/ivysettings.xml" />
+        
+        <!-- the call to resolve is not mandatory, retrieve makes an implicit call if we don't -->
+        <ivy:resolve file="${ivy.file}" log="download-only"/>
+        <ivy:retrieve pattern="${lib.dir}/[artifact].[ext]" log="download-only"/>
+    </target>
+
+    <target name="report" depends="resolve" description="--> generates a report of dependencies">
+        <ivy:report todir="${build.dir}"/>
+    </target>
+
+    <target name="quality" depends="checkstyle" />
+    
+    <target name="checkstyle" depends="resolve">
+        <mkdir dir="${module.temp.dir}"/>
+        <echo>Running checkstyle on ${ant.project.name}.</echo>
+        <cs:checkstyle config="${builder.dir}/java/config/java_checkstyle_config.xml">
+            <classpath>
+                <path refid="lib.path.id" />
+                <pathelement location="${jar.file}" />
+            </classpath>
+            <fileset dir="${src.dir}" includes="**/*.java"/>
+            <formatter type="plain"/>
+            <formatter type="xml" toFile="${module.temp.dir}/checkstyle_errors.xml"/>
+        </cs:checkstyle>
+    </target>
+    
+    <target name="compile" depends="resolve" description="--> compile the project">
+        <mkdir dir="${classes.dir}" />
+        <javac srcdir="${src.dir}" destdir="${classes.dir}" classpathref="lib.path.id" debug="true" source="1.6" target="1.6" listfiles="true"> 
+            <compilerarg value="-Xlint:unchecked" />
+            <compilerarg value="-Xlint:deprecation" />
+            <compilerarg value="-Werror" />
+        </javac>
+    </target>
+
+    <target name="ivy-new-version"  unless="ivy.new.revision">
+        <!-- default module version prefix value 
+        <property name="module.version.prefix" value="${module.version.target}-dev-b" />
+        -->
+        <!-- asks to ivy an available version number
+        <ivy:info file="${ivy.file}" />
+        <ivy:buildnumber 
+            organisation="${ivy.organisation}" module="${ivy.module}" 
+            revision="${module.version.prefix}" defaultBuildNumber="1" revSep=""/> -->
+    </target>
+
+    <target name="local-version">
+        <!--<tstamp>
+            <format property="now" pattern="yyyyMMddHHmmss"/>
+        </tstamp>
+        <property name="ivy.new.revision" value="${module.version.target}-local-${now}"/>-->
+    </target>
+    
+    <target name="version" depends="ivy-new-version">
+        <!-- create version file in classpath for later inclusion in jar 
+        <mkdir dir="${classes.dir}"/>
+        <echo message="version=${ivy.new.revision}" file="${classes.dir}/${ant.project.name}.properties" append="false" />
+-->
+        <!-- load generated version properties file 
+        <property file="${classes.dir}/${ant.project.name}.properties" />-->
+    </target>
+    
+    <target name="package" depends="local-version,version,compile" description="--> make a jar file for this project">
+        <delete dir="${module.bin.dir}"/>
+        <mkdir dir="${module.bin.dir}" />
+        <jar destfile="${module.bin.dir}/${ant.project.name}.jar">
+            <fileset dir="${classes.dir}" />
+            <fileset dir="${src.dir}" includes="**/*.xml" />
+            <fileset dir="${src.dir}" includes="**/*.*ftl" />
+            <fileset dir="${src.dir}" includes="**/*.vm" />
+            <manifest>
+                <section name="common">
+                    <attribute name="Implementation-Title" value="${ant.project.name}" />
+                    <attribute name="Implementation-Vendor" value="Nokia" />
+                </section>
+            </manifest>
+        </jar>
+
+        <copy file="${module.bin.dir}/${ant.project.name}.jar" todir="${bin.dir}" />
+        <!--
+        <mkdir dir="${bin.dir}/com.nokia.helium/${ant.project.name}/${version}" />
+        <copy file="${bin.dir}/com.nokia.helium/${ant.project.name}/${version}/${ant.project.name}.jar" todir="${module.bin.dir}" />
+        [organisation]/[module]/[color]/[revision]/[artifact].[ext] 
+        
+        pubrevision="${version}"
+        pubdate="${now}"
+        -->
+        <ivy:publish artifactspattern="${bin.dir}/[artifact].[ext]" 
+                        resolver="local"
+                        status="integration"
+                        forcedeliver="true"
+                        pubrevision="1.0"
+                        overwrite="true"
+        />
+    </target>
+
+
+    <target name="test" depends="junit,antunit"/>
+
+    <target name="junit">
+        <junitModule name="${ant.project.name}"/>
+        <if>
+            <resourcecount count="0" when="gt">
+                <fileset dir="${build.temp.dir}/" includes="*/*.emma" />
+            </resourcecount>
+            <then>
+                <emma enabled="true" verbosity="quiet">
+                    <report sourcepath="${src.dir}">
+                        <infileset dir="${build.temp.dir}/" includes="*/*.emma" />
+                        <txt outfile="${build.temp.dir}/coverage.txt" />
+                        <html outfile="${build.temp.dir}/coverage.html" />
+                        <xml outfile="${build.temp.dir}/coverage.xml" />
+                    </report>
+                </emma>
+            </then>
+        </if>
+    </target>
+    
+    <target name="antunit">
+        <antunitModule name="${ant.project.name}"/>
+        <if>
+            <resourcecount count="0" when="gt">
+                <fileset dir="${build.temp.dir}/" includes="*/*.emma" />
+            </resourcecount>
+            <then>
+                <emma enabled="true" verbosity="quiet">
+                    <report sourcepath="${src.dir}">
+                        <infileset dir="${build.temp.dir}/" includes="*/*.emma" />
+                        <txt outfile="${build.temp.dir}/coverage.txt" />
+                        <html outfile="${build.temp.dir}/coverage.html" />
+                        <xml outfile="${build.temp.dir}/coverage.xml" />
+                    </report>
+                </emma>
+            </then>
+        </if>
+    </target>
+    <target name="unittest" depends="antunit"/>
+    
+    <macrodef name="antunitModule">
+        <attribute name="name" />
+        <attribute name="dir" default="${helium.antlib.root.dir}" />
+        <attribute name="bindir" default="${bin.dir}" />
+        <sequential>
+            <mkdir dir="${build.temp.dir}" />
+            <if>
+                <available type="dir" file="${basedir}/tests"/>
+                <then>
+                    <trycatch property="antunitModule.error">
+                        <try>
+                            <!-- Temporarly replacing the jar file
+                                 with an instrumented one to do the 
+                                 actual coverage measurment
+                             -->
+                            <mkdir dir="${build.temp.dir}/@{name}/backup" />
+                            <delete>
+                                <fileset dir="${build.temp.dir}" includes="@{name}/**/*_antunit.emma" />
+                            </delete>
+                            <copy file="@{bindir}/@{name}.jar" todir="${build.temp.dir}/@{name}/backup/" />
+                            <emma enabled="true" verbosity="quiet">
+                                <instr destdir="@{bindir}/" metadatafile="${build.temp.dir}/@{name}/metadata_antunit.emma" merge="true" mode="overwrite">
+                                    <instrpath>
+                                        <fileset dir="@{bindir}" includes="@{name}.jar" />
+                                    </instrpath>
+                                </instr>
+                            </emma>
+                            <exec osfamily="windows" executable="cmd" dir="${basedir}/tests" failonerror="true">
+                                <env key="ANT_ARGS" value="-lib ${lib.dir} -lib @{bindir}/@{name}.jar -lib ${builder.dir}/antlibs" />
+                                <arg line="/c build.bat unittest -Dbuilder.dir=${builder.dir}" />
+                            </exec>
+                            <exec osfamily="unix" executable="./bld.sh" dir="${basedir}/tests" failonerror="true">
+                                <env key="ANT_ARGS" value="-lib ${lib.dir} -lib @{bindir}/@{name}.jar -lib ${builder.dir}/antlibs" />
+                                <arg line="unittest -Dbuilder.dir=${builder.dir}" />
+                            </exec>
+                            <move todir="${build.temp.dir}/@{name}">
+                                <fileset dir="${basedir}/tests" includes="**/coverage.ec" />
+                                <chainedmapper>
+                                    <filtermapper>
+                                        <replacestring from="/" to="_" />
+                                        <replacestring from="\" to="_" />
+                                    </filtermapper>
+                                    <regexpmapper from="^(.*)\.ec$$" to="\1_antunit.emma" />
+                                </chainedmapper>
+                            </move>
+                            <emma enabled="true" verbosity="quiet">
+                                <report>
+                                    <infileset dir="${build.temp.dir}/@{name}/" includes="*_antunit.emma" />
+                                    <txt outfile="${build.temp.dir}/@{name}/coverage_antunit.txt" />
+                                    <html outfile="${build.temp.dir}/@{name}/coverage_antunit.html" />
+                                    <xml outfile="${build.temp.dir}/@{name}/coverage_antunit.xml" />
+                                </report>
+                            </emma>
+                            <if>
+                                <available file="${build.temp.dir}/@{name}/coverage_antunit.txt" />
+                                <then>
+                                    <loadfile property="message" srcFile="${build.temp.dir}/@{name}/coverage_antunit.txt" />
+                                    <echo message="${message}" />
+                                </then>
+                            </if>
+                        </try>
+                        <catch>
+                            <fail message="${antunitModule.error}" />
+                        </catch>
+                        <finally>
+                            <copy file="${build.temp.dir}/@{name}/backup/@{name}.jar" todir="@{bindir}" overwrite="true" />
+                            <delete>
+                                <fileset dir="${build.temp.dir}" includes="@{name}/backup/*.jar" />
+                            </delete>                                
+                        </finally>
+                    </trycatch>
+                </then>
+            </if>
+        </sequential>
+    </macrodef>
+    
+    
+    <path id="emma.classpath">
+        <fileset dir="${builder.dir}/antlibs">
+            <include name="**/*.jar" />
+        </fileset>
+    </path>
+    <taskdef resource="net/sf/antcontrib/antlib.xml" classpathref="emma.classpath"/>
+    <taskdef classpathref="emma.classpath" resource="emma_ant.properties" />
+    
+    <macrodef name="junitModule">
+        <attribute name="name" />
+        <attribute name="dir" default="${helium.antlib.root.dir}" />
+        <attribute name="bindir" default="${bin.dir}" />
+        <sequential>
+            <mkdir dir="${build.temp.dir}" />
+            <if>
+                <available type="dir" file="${basedir}/tests/src"/>
+                <then>
+                    <echo>JUnit test module @{name}</echo>
+                    <delete dir="${build.temp.dir}/@{name}/junit_classes"/>
+                    <delete>
+                        <fileset dir="${build.temp.dir}" includes="@{name}/**/*_junit.emma" />
+                        <fileset dir="${build.temp.dir}" includes="@{name}/backup/*.jar" />
+                    </delete>
+                    <mkdir dir="${build.temp.dir}/@{name}/junit_classes" />
+                    <javac srcdir="${basedir}/tests/src" destdir="${build.temp.dir}/@{name}/junit_classes" debug="true"> 
+                        <classpath>
+                            <fileset dir="${module.temp.dir}">
+                                <include name="**/*.jar"/>
+                            </fileset>
+                        </classpath>
+                        <include name="**/*.java" />
+                    </javac>
+            
+                    <mkdir dir="${build.temp.dir}/@{name}/backup" />
+                    <copy file="@{bindir}/@{name}.jar" todir="${build.temp.dir}/@{name}/backup/" overwrite="true"/>
+                    <emma enabled="true" verbosity="quiet">
+                        <instr destdir="${build.temp.dir}/@{name}/backup/" metadatafile="${build.temp.dir}/@{name}/metadata_junit.emma" merge="true" mode="overwrite">
+                            <instrpath>
+                                <fileset dir="${build.temp.dir}/@{name}/backup/" includes="@{name}.jar" />
+                            </instrpath>
+                        </instr>
+                    </emma>
+                    
+                    <delete file="${build.temp.dir}/@{name}/coverage.emma" failonerror="false" />
+                    <junit fork="yes" printsummary="yes" haltonfailure="yes">
+                        <formatter type="brief" usefile="false"/>
+                        <jvmarg value="-Demma.coverage.out.file=${build.temp.dir}/@{name}/coverage_junit.emma" />
+                        <jvmarg value="-Demma.coverage.out.merge=true" />
+                        <jvmarg value="-Dtestdir=${basedir}" />
+                        <classpath>
+                            <fileset dir="${build.temp.dir}/@{name}/backup/">
+                                <include name="**/*.jar"/>
+                            </fileset>
+                            <fileset dir="${lib.dir}">
+                                <include name="**/*.jar"/>
+                            </fileset>
+                            <fileset dir="${builder.dir}/antlibs">
+                                <include name="**/*.jar"/>
+                            </fileset>
+                            <pathelement path="${build.temp.dir}/@{name}/junit_classes" />
+                        </classpath>
+                        <batchtest fork="yes" todir="${build.temp.dir}/@{name}/junit_test">
+                            <fileset dir="${basedir}/tests/src">
+                                <include name="**/*Test*.java"/>
+                            </fileset>
+                        </batchtest>
+                    </junit>
+                    <delete dir="${build.temp.dir}/@{name}/backup/" failonerror="false" />
+                    
+                    <emma enabled="true" verbosity="quiet">
+                        <report>
+                            <infileset dir="${build.temp.dir}/@{name}" includes="*_junit.emma" />
+                            <txt outfile="${build.temp.dir}/@{name}/coverage.txt" />
+                            <html outfile="${build.temp.dir}/@{name}/coverage.html" />
+                            <xml outfile="${build.temp.dir}/@{name}/coverage.xml" />
+                        </report>
+                    </emma>
+                    <if>
+                        <available file="${build.temp.dir}/@{name}/coverage.txt" />
+                        <then>
+                            <loadfile property="message" srcFile="${build.temp.dir}/@{name}/coverage.txt"/>
+                            <echo message="${message}"/>
+                        </then>
+                    </if>
+                </then>
+            </if>
+        </sequential>
+    </macrodef>
+    
+</project>

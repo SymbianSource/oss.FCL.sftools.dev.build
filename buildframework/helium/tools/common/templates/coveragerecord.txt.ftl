@@ -61,8 +61,8 @@ Ant Code Coverage
 +---------+-------+-----------+-----------+
 |type     |total  |executed   |%executed  |
 +=========+=======+===========+===========+
-|target   |${totalTargets}      |${execTargets}      |${(execTargets/totalTargets*100)?int}     |
+|target   |${totalTargets}      |${execTargets}      |<#if totalTargets!=0>${(execTargets/totalTargets*100)?int}<#else>N/A</#if>     |
 +---------+-------+-----------+-----------+
-|task     |${totalTasks}      |${execTasks}        |${(execTasks/totalTasks*100)?int}     |
+|task     |${totalTasks}      |${execTasks}        |<#if totalTasks!=0>${(execTasks/totalTasks*100)?int}<#else>N/A</#if>     |
 +---------+-------+-----------+-----------+
 

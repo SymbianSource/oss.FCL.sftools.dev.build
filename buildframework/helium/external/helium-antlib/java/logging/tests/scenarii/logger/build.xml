@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : build.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test-recorder" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>Helium Antlib logger unittests.</description>
+    
+    <target name="test-recorder">
+        <echo message="something to be not be recorded" />
+        <hlm:record name="${temp.dir}/record.log" action="start" />
+        <echo message="something to be recorded" />
+        <hlm:record name="${temp.dir}/record.log" action="stop" />
+        <echo message="something to be not be recorded" />
+ 
+        <loadfile property="message" srcFile="${temp.dir}/record.log" />
+        <au:assertTrue message="message not recorded">
+            <contains string="${message}" substring="something to be recorded" />
+        </au:assertTrue>
+    </target>
+
+    <target name="test-recorder-backup">
+        <echo message="something to be not be recorded" />
+        <hlm:record name="${temp.dir}/record.log" action="start" />
+        <echo message="something to be recorded 1st" />
+        <hlm:record name="${temp.dir}/record.log" action="stop" />
+        
+        <echo message="something to be not be recorded" />
+        <hlm:record name="${temp.dir}/record.log" action="start" backup="true" />
+        <echo message="something to be recorded 2nd" />
+        <hlm:record name="${temp.dir}/record.log" action="stop" />
+        
+        <echo message="something to be not be recorded" />
+        <hlm:record name="${temp.dir}/record.log" action="start" backup="true" backupProperty="backup.log"/>
+        <echo message="something to be recorded 3rd" />
+        <hlm:record name="${temp.dir}/record.log" action="stop" />
+        <echo message="something to be not be recorded" />
+ 
+        <au:assertFileExists file="${backup.log}" />
+        <au:assertFileExists file="${temp.dir}/record.log" />
+        <loadfile property="message" srcFile="${temp.dir}/record.log" />
+        <au:assertTrue message="3rd message should be recorded">
+            <contains string="${message}" substring="something to be recorded 3rd" />
+        </au:assertTrue>
+        <au:assertFalse message="1st message should not be recorded">
+            <contains string="${message}" substring="something to be recorded 1st" />
+        </au:assertFalse>
+        <au:assertFalse message="2nd message should not be recorded">
+            <contains string="${message}" substring="something to be recorded 2nd" />
+        </au:assertFalse>
+    </target>
+
+    <target name="test-recorder-append">
+        <echo message="something to be not be recorded" />
+        <hlm:record name="${temp.dir}/record.log" action="start" />
+        <echo message="something to be recorded" />
+        <hlm:record name="${temp.dir}/record.log" action="stop" />
+        <echo message="something to be not be recorded" />
+        <hlm:record name="${temp.dir}/record.log" action="start" append="true" />
+        <echo message="something else to be recorded" />
+        <hlm:record name="${temp.dir}/record.log" action="stop" />
+        <echo message="something to be not be recorded" />
+ 
+        <loadfile property="message" srcFile="${temp.dir}/record.log" />
+        <au:assertTrue message="message not recorded">
+            <contains string="${message}" substring="something to be recorded" />
+        </au:assertTrue>
+        <au:assertTrue message="second message not recorded">
+            <contains string="${message}" substring="something else to be recorded" />
+        </au:assertTrue>
+    </target>
+
+    <target name="antcall-record">
+        <hlm:record name="${temp.dir}/record.log" action="start" append="true" />
+        <echo message="${message}" />
+        <hlm:record name="${temp.dir}/record.log" action="stop" />        
+    </target>
+    
+    <target name="test-recorder-append-antcall">
+        <echo message="Antcall: something to be not be recorded" />
+        <antcall target="antcall-record">
+            <param name="message" value="something to be recorded" />
+        </antcall>
+        <echo message="Antcall: something to be not be recorded" />
+        <antcall target="antcall-record">
+            <param name="message" value="something else to be recorded" />
+        </antcall>
+        <echo message="Antcall: something to be not be recorded" />
+ 
+        <loadfile property="message" srcFile="${temp.dir}/record.log" />
+        <echo>${message}</echo>
+        <au:assertTrue message="Antcall: message not recorded">
+            <contains string="${message}" substring="something to be recorded" />
+        </au:assertTrue>
+        <au:assertTrue message="Antcall: second message not recorded">
+            <contains string="${message}" substring="something else to be recorded" />
+        </au:assertTrue>
+    </target>
+
+    <target name="test-recorder-filtering">
+        <hlm:record name="${temp.dir}/record.log" action="start" >
+            <hlm:recordfilter category="unix" regexp="badtext" />
+        </hlm:record>
+        <echo>Some sensitive test output badtext</echo>
+        <hlm:record name="${temp.dir}/record.log" action="stop"/>
+        <loadfile srcfile="${temp.dir}/record.log" property="message"/>
+        <au:assertTrue>
+            <contains string="${message}" substring="Some sensitive test output ********"/>
+        </au:assertTrue>
+    </target>
+
+</project>

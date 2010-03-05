@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : test_antdata.ant.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<!--* @package test-package -->
+<project name="helium-antlib-antdata-unittest" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>Helium Antlib antdata unittests.</description>
+
+    <taskdef resource="com/nokia/helium/ant/data/antlib.xml" uri="http://www.nokia.com/helium"/>
+
+
+    <!-- is called prior to the test -->
+    <target name="setUp">
+
+    </target>
+
+    <!-- is called after the test, even if that caused an error 
+        
+    @scope private -->
+    <target name="tearDown">
+
+    </target>
+
+    <target name="test-database">
+        <echo>${basedir}</echo>
+        <hlm:database output="test_db.xml"/>
+        <delete file="test_db.xml"/>
+    </target>
+
+    
+    <target name="test-database-with-fileset">
+        <echo>${basedir}</echo>
+        <hlm:database output="test_db2.xml">
+            <fileset dir="${basedir}/../data" includes="external_project.ant.xml"/>
+        </hlm:database>
+        <!--<delete file="test_db.xml"/>-->
+    </target>
+    
+    
+    <target name="test-database-private">
+        <hlm:database output="test_db.xml" scope="private"/>
+        <delete file="test_db.xml"/>
+    </target>
+    
+    <!-- Test property.
+    @type integer -->
+    <property name="should.be.int" value="not an int"/>
+    <target name="test-antconfiglint">
+        <au:expectfailure>
+            <hlm:antconfiglint>
+                <WrongTypePropertyCheck/>
+            </hlm:antconfiglint>
+        </au:expectfailure>
+    </target>
+
+</project>
+
+
+

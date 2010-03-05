@@ -29,27 +29,26 @@ Description:
     </font>
     <br/>
 
-    <table border="0" width="100%" summary="">
-    <tr>
-    <td style="white-space: nowrap">
-    <#assign targetlist=doc.antDatabase.project.target.name?sort>
-    <#list targetlist as targetvar>
-    
-      <#list doc.antDatabase.project.target as targetref>
-        <#if targetvar == targetref.name>
-          <#if targetref.deprecated?size &gt; 0>
-          <font class="frameitemfont">
-              <a href="target-${targetvar}.html" title="${targetvar}" target="classframe">${targetvar}</a>
-              <br/>${targetref.deprecated}
-          </font>
-          <br/>
-          </#if>
-        </#if>
-      </#list>
-    
+    <#assign targetInfo = {}>
+    <#list doc.antDatabase.project.target as target>
+        <#assign targetInfo = targetInfo + {target.name: target.deprecated}>
     </#list>
-    </td>
-    </tr>
+    <table border="0" width="100%" summary="">
+        <#list targetInfo?keys?sort as name>
+        <#if targetInfo[name]?length &gt; 0>
+        <tr>
+            <td style="white-space: nowrap">
+            <font class="frameitemfont">
+                <a href="target-${name}.html" title="${name}" target="classframe">${name}</a>
+                <br/>
+            </font>
+            </td>
+            <td style="white-space: nowrap">
+            <#recurse targetInfo[name]>
+            </td>
+        </tr>
+        </#if>
+        </#list>
     </table>
 
     <br/>
@@ -58,25 +57,26 @@ Description:
     </font>
     <br/>
 
-    <table border="0" width="100%" summary="">
-    <tr>
-    <td style="white-space: nowrap">
-    <#assign propertylist=data.heliumDataModel.property.name?sort>
-    <#list propertylist as propertyvar>
-      <#list data.heliumDataModel.property as propertyref>
-      <#if propertyvar == propertyref.name>
-        <#if propertyref.deprecated?size &gt; 0>
-        <font class="frameitemfont">
-        <a href="property-${propertyvar}.html" title="${propertyvar}" target="classframe">${propertyvar}</a>
-        <br/>${propertyref.deprecated}
-        </font>
-        <br/>
-        </#if>
-      </#if>
-      </#list>
+    <#assign propertyInfo = {}>
+    <#list doc.antDatabase.project.property as property>
+        <#assign propertyInfo = propertyInfo + {property.name: property.deprecated}>
     </#list>
-    </td>
-    </tr>
+    <table border="0" width="100%" summary="">
+        <#list propertyInfo?keys?sort as name>
+        <#if propertyInfo[name]?length &gt; 0>
+        <tr>
+            <td style="white-space: nowrap">
+            <font class="frameitemfont">
+                <a href="property-${name}.html" title="${name}" property="classframe">${name}</a>
+                <br/>
+            </font>
+            </td>
+            <td style="white-space: nowrap">
+            <#recurse propertyInfo[name]>
+            </td>
+        </tr>
+        </#if>
+        </#list>
     </table>
 
 

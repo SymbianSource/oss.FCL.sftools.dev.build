@@ -1,0 +1,89 @@
+<!-- 
+============================================================================ 
+Name        : antlib.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test_project" default="check-target">
+    <description>A test Ant project.
+    
+    Bit more text.
+    
+    And some more.
+    </description>
+    
+    <import file="random.xml" optional="true"/>
+    
+    <typedef file="common.antlib.xml"/>
+    
+    <!-- This is a property comment summary.
+        
+    Here is a longer description of this property.
+        
+    @scope public
+    @editable recommended
+    @deprecated Since 6.0.
+    -->
+    <property name="property1" value="value1"/>
+    
+    <path id="helium.antdata.classpath">
+        <fileset dir="${helium.antlib.root.dir}/bin" includes="*.jar"/>
+        <fileset dir="${helium.antlib.root.dir}/antdata/lib" includes="*.jar"/>
+    </path>
+    
+    <!-- This target is for testing the generation of documentation.
+        
+    So this comment is also for testing if the comments can be extracted.
+
+    Some vague usage twaddle:
+
+     <runtarget target="check-target"/>
+    
+    @deprecated Lets pretend this target is deprecated.
+    -->
+    <target name="check-target" if="foo" unless="bar" depends="dep1, dep2" description="A test target">
+        <antcall target="sub_test_target"/>
+        <echo>${property1}</echo>
+        <exec executable="python.exe" output="foo.log"/>
+        <signal name="fooSignal"/>
+    </target>
+    
+    <target name="dep1"/>
+    <target name="dep2"/>
+    
+    <!-- @scope public -->
+    <macrodef name="test_macro">
+        <attribute name="dir"/>
+        <sequential>
+            <echo>Cool macro!</echo>
+        </sequential>
+    </macrodef>
+    
+    <!-- @property user.defined.property
+        
+    This property must be defined by the user.
+    
+    Here is a bit more description.
+    @editable required
+    @scope public
+    -->
+
+</project>
+
+
+

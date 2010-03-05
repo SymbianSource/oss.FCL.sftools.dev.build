@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : sample.antlib.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<antlib xmlns:au="org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    
+    
+    <!-- A simple test macro -->
+    <macrodef name="foo_Macro" uri="http://www.nokia.com/helium">
+        <sequential>
+            <echo>foo</echo>
+            <runtarget target="hello"/>
+        </sequential>
+    </macrodef>
+    
+    <macrodef name="pow" uri="http://www.nokia.com/helium">
+        <sequential>
+            <echo>pow</echo>
+        </sequential>
+    </macrodef>
+    
+    <scriptdef  name="check-prop-in-scriptdef" language="jython">
+result = None
+if project.getProperty("test.scriptdef.property")is not None:
+    result = "found"
+    </scriptdef>    
+    
+    <scriptdef name="check-scriptdef" language="jython">
+        <attribute name="attr0"/>
+        <attribute name="attr2"/>
+target = str(attributes.get('attr0'))    
+    </scriptdef>    
+    
+    <scriptdef name="check-scriptdef-style" language="jython" uri="http://www.nokia.com/helium">
+        <attribute name="output" />
+        <element name="fileset" type="fileset" />
+        <![CDATA[
+import integration.ant
+integration.ant.check_build_duplicates_task(project, self, attributes, elements)
+        ]]>
+    </scriptdef>
+    
+    <scriptdef name="check-script" language="jython">
+result = None
+if ${build.drive} is None:
+    result = "Not found"
+    </scriptdef>
+    
+    <scriptdef name="check-scriptdef-attributes" language="jython">
+target = str(attributes.get('target'))    
+    </scriptdef>
+</antlib>

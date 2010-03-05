@@ -20,6 +20,7 @@ Description:
 
 ============================================================================
 -->
+<!--* @package integration -->
 <project name="patching">
     <description>Patching of S60 files.</description>
     

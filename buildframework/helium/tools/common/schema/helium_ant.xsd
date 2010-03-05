@@ -118,20 +118,6 @@
             <xs:attribute name="variant" type="xs:string"/>
         </xs:complexType>
     </xs:element>
-    <xs:element name="rombuildImakerMacro">
-        <xs:complexType>
-            <xs:attribute name="product" type="xs:string"/>
-            <xs:attribute name="target" type="xs:string"/>
-        </xs:complexType>
-    </xs:element>
-    <xs:element name="ecImakerMacro">
-        <xs:complexType>
-            <xs:attribute name="makefile.target" type="xs:string"/>
-        </xs:complexType>
-    </xs:element>
-    <xs:element name="preECImakerMacro">
-        <xs:complexType/>
-    </xs:element>
     <xs:element name="imakerMacro">
         <xs:complexType>
             <xs:attribute name="product" type="xs:string"/>

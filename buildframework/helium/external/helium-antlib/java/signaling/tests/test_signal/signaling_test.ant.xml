@@ -1,0 +1,272 @@
+<?xml version="1.0"?>
+<!-- 
+============================================================================ 
+Name        : test_signaling.ant.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test-signaling" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>
+        Test all the helium signals
+    </description>
+
+    <dirname property="project.dir.signaling" file="${ant.file.test-signaling}" />
+
+    <taskdef resource="com/nokia/helium/core/ant/antlib.xml" uri="http://www.nokia.com/helium" />
+    <import file="test_signaling_config.ant.xml" />
+
+    <property name="build.summary.file" location="${project.dir.signaling}/data/ido_tedo_mcl_devlon52_ec_MCL.52.105_summary.log.xml" />
+
+    <target name="target-valid-config1">
+        <echo message="valid configuration1" />
+    </target>
+
+    <target name="target-valid-config2">
+        <echo message="valid configuration2" />
+    </target>
+
+    <target name="target-valid-config3">
+        <echo message="valid configuration3" />
+    </target>
+
+    <target name="target-valid-config4">
+        <echo message="valid configuration4" />
+    </target>
+
+    <target name="target-valid-config5">
+        <echo message="valid configuration5" />
+    </target>
+
+    <target name="target-invalid-config1">
+        <echo message="invalid configuration1" />
+    </target>
+
+    <target name="target-invalid-config2">
+        <echo message="invalid configuration2" />
+    </target>
+
+    <target name="target-invalid-config3">
+        <echo message="invalid configuration3" />
+    </target>
+
+    <target name="target-invalid-config4">
+        <echo message="invalid configuration4" />
+    </target>
+
+    <target name="target-invalid-config5">
+        <echo message="invalid configuration5" />
+    </target>
+
+    <target name="target-invalid-config6">
+        <echo message="invalid configuration6" />
+    </target>
+
+    <target name="target-invalid-config7">
+        <echo message="invalid configuration7" />
+    </target>
+
+    <target name="target-invalid-config8">
+        <echo message="invalid configuration8" />
+    </target>
+
+    <target name="target-invalid-config9">
+        <echo message="invalid configuration9" />
+    </target>
+
+    <target name="test-case1">
+        <echo message="testing config without signal input" />
+        <antcall target="target-valid-config1" inheritRefs="true"/>
+    </target>
+
+    <target name="test-case2">
+        <echo message="testing config without signal input" />
+        <antcall target="target-valid-config2" inheritRefs="true" />
+    </target>
+
+    <target name="test-case3">
+        <echo message="testing config without signal input" />
+        <antcall target="target-valid-config3" inheritRefs="true" />
+    </target>
+
+    <target name="test-case4">
+        <echo message="testing config without signal input" />
+        <antcall target="target-valid-config4" inheritRefs="true" />
+    </target>
+
+    <target name="test-case5">
+        <echo message="testing config without signal input" />
+        <antcall target="target-valid-config5" inheritRefs="true" />
+    </target>
+
+    <target name="test-case6">
+        <echo message="testing config without signal input" />
+        <au:expectfailure>
+            <antcall target="target-invalid-config1" inheritRefs="true" />
+        </au:expectfailure>
+    </target>
+
+    <target name="test-case7">
+        <echo message="testing when the named target is not exists, so signal" />
+        <antcall target="target-invalid-config2" inheritRefs="true" />
+    </target>
+
+    <target name="test-case8">
+        <!-- This test case is not valid anymore, now the attribute validation is done 
+    	     at Ant parsing level -->
+        <!--echo message="testing config without signal input" />
+        <au:expectfailure>
+            <antcall target="target-invalid-config3" inheritRefs="true" />
+        </au:expectfailure-->
+    </target>
+
+    <target name="test-case9">
+        <echo message="testing config without signal input" />
+        <au:expectfailure>
+            <antcall target="target-invalid-config4" inheritRefs="true" />
+        </au:expectfailure>
+    </target>
+
+    <target name="test-case10">
+        <echo message="testing config without signal input" />
+        <au:expectfailure>
+            <antcall target="target-invalid-config5" inheritRefs="true" />
+        </au:expectfailure>
+    </target>
+
+    <target name="test-case11">
+        <echo message="testing config without signal input" />
+        <au:expectfailure>
+            <antcall target="target-invalid-config6" inheritRefs="true" />
+        </au:expectfailure>
+    </target>
+
+    <target name="test-signal-exception">
+        <property name="exceptions.target" value="final-exception-target"/>
+        <echo message="signal exception target" />
+        <fail message="fail for signal exception" />
+    </target>
+
+    <target name="final-exception-target">
+        <echo message="final-exception-target executed" />
+    </target>
+    
+    <target name="test-case12">
+        <echo message="testing config without signal input" />
+        <au:expectfailure>
+            <antcall target="target-invalid-config7" inheritRefs="true" />
+        </au:expectfailure>
+    </target>
+
+    <target name="test-case13">
+        <echo message="testing config without signal input" />
+        <au:expectfailure>
+            <antcall target="target-invalid-config8" inheritRefs="true" />
+        </au:expectfailure>
+    </target>
+
+    <target name="test-case14">
+        <echo message="testing config without signal input" />
+        <au:expectfailure>
+            <antcall target="target-invalid-config9" inheritRefs="true" />
+        </au:expectfailure>
+    </target>
+
+    <!-- functionality testing -->
+    <target name="fail-now-false-condition">
+        <echo message="fail-now-false-condition target: configured to fail now - false condition" />
+    </target>
+
+    <target name="fail-now-true-condition">
+        <echo message="fail-now-true-condition target: configured to fail now - true condition" />
+    </target>
+
+    <target name="fail-no-condition">
+        <echo message="fail-now-false-condition target: configured to fail now - true condition" />
+    </target>
+
+    <target name="fail-defer-false-condition">
+        <echo message="fail-defer-false-condition target: configured to fail later - false condition" />
+    </target>
+
+    <target name="fail-defer-true-condition">
+        <echo message="${number.of.errors}" />
+        <echo message="fail-defer-true-condition target: configured to fail later - true condition" />
+    </target>
+
+    <target name="fail-never-false-condition">
+        <echo message="fail-never-false-condition target: configured to fail never - false condition" />
+    </target>
+
+    <target name="fail-never-true-condition">
+        <echo message="fail-never-true-condition target: configured to fail never - true condition" />
+    </target>
+
+    <target name="test-fail-now-false-condition">
+        <antcall target="fail-now-false-condition" inheritRefs="true" />
+    </target>
+
+    <target name="compile-signal-test">
+        <au:expectfailure>
+            <echo message="compile-signal failure test" />
+        </au:expectfailure>
+    </target>
+
+    <target name="test-compile-signal-test">
+        <au:expectfailure>
+            <antcall target="compile-signal-test" inheritRefs="true" />
+        </au:expectfailure>
+    </target>
+
+    <target name="test-fail-now-true-condition">
+        <au:expectfailure>
+            <antcall target="fail-now-true-condition" inheritRefs="true" />
+        </au:expectfailure>
+    </target>
+
+    <target name="test-fail-no-condition" >
+        <antcall target="fail-no-condition" inheritRefs="true" />
+    </target>
+
+    <target name="test-fail-defer-false-condition">
+        <antcall target="fail-defer-false-condition" inheritRefs="true" />
+    </target>
+
+    <target name="test-fail-defer-true-condition">
+        <antcall target="fail-defer-true-condition" inheritRefs="true"/>
+        <au:assertTrue>
+            <hlm:hasDeferredFailure name="inputFailDefer"/>
+        </au:assertTrue>
+        <hlm:clearDeferredFailures/>
+    </target>
+
+    <target name="test-fail-never-false-condition">
+        <antcall target="fail-never-false-condition" inheritRefs="true" />
+    </target>
+
+    <target name="test-fail-never-true-condition">
+        <antcall target="fail-never-true-condition" inheritRefs="true" />
+    </target>
+
+
+    <target name="test-all" depends="test-fail-all, test-case-all,test-compile-signal-test" />
+    <target name="test-fail-all" depends="test-fail-now-false-condition, test-fail-now-true-condition,
+                test-fail-no-condition,test-fail-defer-false-condition, test-fail-defer-true-condition,
+                test-fail-never-false-condition, fail-never-false-condition, fail-never-true-condition" />
+    <target name="test-case-all" depends="test-case1, test-case2, test-case3, test-case4, test-case5, test-case6,
+                test-case7,test-case8,test-case9,test-case10,test-case11,test-case12,test-case13,test-case14" />
+</project>

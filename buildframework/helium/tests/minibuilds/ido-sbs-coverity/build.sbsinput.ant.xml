@@ -1,0 +1,292 @@
+<?xml version="1.0"?>
+<!-- 
+============================================================================ 
+Name        : 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="ido_sbs_input" xmlns:au="org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>
+        ido sbs input
+    </description>
+
+    <import file="common.sbsinput.ant.xml" />
+    <patternset id="build_layers" >
+        <include name="os_layer" />
+        <include name="bldfirst_mw_layer" />
+        <include name="bldfirst_app_layer" />
+        <include name="mw_layer" />
+        <include name="complementary_layer" />
+        <include name="app_layer" />
+        <include name="tools_layer" />
+        <include name="stubs_layer" />
+        <include name="addon_layer" />
+    </patternset>
+
+    <patternset id="dfs_build_layers" >
+        <include name="os_layer" />
+        <include name="bldfirst_mw_layer" />
+        <include name="bldfirst_app_layer" />
+        <include name="mw_layer" />
+        <include name="complementary_layer" />
+        <include name="app_layer" />
+        <include name="tools_layer" />
+        <include name="addon_layer" />
+    </patternset>
+
+    <patternset id="test_layers" >
+        <include name="api_test_layer" />
+        <include name="unit_test_layer" />
+        <include name="perf_test_layer" />
+        <include name="module_test_layer" />
+        <include name="qt_unit_test_layer" />
+    </patternset>
+
+
+    <hlm:sbsinput id="build_input_tools">
+        <sbsInput refid="tools-${build.system}" />
+        <sbsOptions>
+            <arg name="--logfile" value="${compile.log.dir}/${build.id}_tools_rel_build.log" />
+        </sbsOptions>
+    </hlm:sbsinput>
+
+    <hlm:sbsinput id="build_input_armv5">
+        <sbsInput refid="armv5-${build.system}" />
+        <sbsOptions>
+            <arg name="--logfile" value="${compile.log.dir}/${build.id}_armv5_build.log" />
+        </sbsOptions>
+    </hlm:sbsinput>
+
+    <hlm:sbsinput id="build_input">
+        <sbsInput refid="build_input_tools" />
+        <sbsInput refid="build_input_armv5" />
+    </hlm:sbsinput>
+
+    <hlm:sbsinput id="build_input_clean_tools">
+        <sbsInput refid="tools-${build.system}-clean" />
+        <sbsOptions>
+            <arg name="--logfile" value="${compile.log.dir}/${build.id}_tools_rel_build_clean.log" />
+            <arg name="--makefile" value="${compile.log.dir}/${build.id}_tools_rel_build_clean" />
+        </sbsOptions>
+    </hlm:sbsinput>
+
+    <hlm:sbsinput id="build_input_clean_armv5">
+        <sbsInput refid="armv5-${build.system}-clean" />
+        <sbsOptions>
+            <arg name="--logfile" value="${compile.log.dir}/${build.id}_armv5_build_clean.log" />
+            <arg name="--makefile" value="${compile.log.dir}/${build.id}_armv5_build_clean" />
+        </sbsOptions>
+    </hlm:sbsinput>
+
+    <hlm:sbsbuild id="sbs.build_clean">
+        <sbsInput refid="build_input_clean_tools" />
+        <sbsInput refid="build_input_clean_armv5" />
+    </hlm:sbsbuild>
+
+    <hlm:sbsinput id="helium_minibuild_ido_input_tools">
+        <sbsInput refid="tools-${build.system}" />
+        <sbsOptions>
+            <arg name="--logfile" value="${compile.log.dir}/${build.id}_tools_helium_minibuild_ido.log" />
+            <arg name="--makefile" value="${compile.log.dir}/${build.id}_tools_helium_minibuild_ido" />
+        </sbsOptions>
+    </hlm:sbsinput>
+        
+    <hlm:sbsinput id="helium_minibuild_ido_input_armv5">
+        <sbsInput refid="armv5-${build.system}" />
+        <sbsOptions>
+            <arg name="--logfile" value="${compile.log.dir}/${build.id}_armv5_helium_minibuild_ido.log" />
+            <arg name="--makefile" value="${compile.log.dir}/${build.id}_armv5_helium_minibuild_ido" />
+        </sbsOptions>
+    </hlm:sbsinput>
+
+    <hlm:sbsinput id="helium_minibuild_ido_input">
+        <sbsInput refid="helium_minibuild_ido_input_tools" />
+        <sbsInput refid="helium_minibuild_ido_input_armv5" />
+    </hlm:sbsinput>
+    
+    <hlm:sbsbuild id="sbs.helium_minibuild_ido">
+        <sbsInput refid="helium_minibuild_ido_input" />
+    </hlm:sbsbuild> 
+
+    <hlm:sbsinput id="helium_minibuild_ido_input_clean">
+        <sbsInput refid="helium_minibuild_ido_clean_tools" />
+        <sbsInput refid="helium_minibuild_ido_clean_armv5" />
+    </hlm:sbsinput>
+    
+    <hlm:sbsinput id="helium_minibuild_ido_input_clean_tools">
+        <sbsInput refid="tools-${build.system}-clean"/>
+        <sbsOptions>
+            <arg name="--logfile" value="${compile.log.dir}/${build.id}_tools_helium_minibuild_ido_clean.log" />
+            <arg name="--makefile" value="${compile.log.dir}/${build.id}_tools_helium_minibuild_ido_clean" />
+        </sbsOptions>
+    </hlm:sbsinput>
+        
+    <hlm:sbsinput id="helium_minibuild_ido_input_clean_armv5">
+        <sbsInput refid="armv5-${build.system}-clean" />
+        <sbsOptions>
+            <arg name="--logfile" value="${compile.log.dir}/${build.id}_armv5_helium_minibuild_ido_clean.log" />
+            <arg name="--makefile" value="${compile.log.dir}/${build.id}_armv5_helium_minibuild_ido_clean.log" />
+        </sbsOptions>
+    </hlm:sbsinput>
+
+    <hlm:sbsbuild id="sbs.helium_minibuild_ido_clean">
+        <sbsInput refid="helium_minibuild_ido_input_clean_tools" />
+        <sbsInput refid="helium_minibuild_ido_input_clean_armv5" />
+    </hlm:sbsbuild> 
+
+    <hlm:sbsinput id="sf_build_input_tools">
+        <sbsInput refid="tools-${build.system}" />
+        <sbsOptions>
+            <arg name="--logfile" value="${compile.log.dir}/${build.id}_tools_sf_build.log" />
+            <arg name="--makefile" value="${compile.log.dir}/${build.id}_tools_sf_build" />
+        </sbsOptions>
+    </hlm:sbsinput> 
+
+    <hlm:sbsinput id="sf_build_input_armv5">
+        <sbsInput refid="armv5-${build.system}" />
+        <sbsOptions>
+            <arg name="--logfile" value="${compile.log.dir}/${build.id}_armv5_sf_build.log" />
+            <arg name="--makefile" value="${compile.log.dir}/${build.id}_armv5_sf_build" />
+        </sbsOptions>
+    </hlm:sbsinput> 
+
+    <hlm:sbsinput id="sf_build_input">
+        <sbsInput refid="sf_build_input_tools" />
+        <sbsInput refid="sf_build_input_armv5" />
+    </hlm:sbsinput>
+    
+    <hlm:sbsbuild id="sbs.sf_build">
+        <sbsInput refid="sf_build_input" />
+    </hlm:sbsbuild>
+
+    <hlm:sbsinput id="sf_build_input_clean_tools">
+        <sbsInput refid="tools-${build.system}-clean" />
+        <sbsOptions>
+            <arg name="--logfile" value="${compile.log.dir}/${build.id}_tools_sf_build_clean.log" />
+            <arg name="--makefile" value="${compile.log.dir}/${build.id}_tools_sf_build_clean" />
+        </sbsOptions>
+    </hlm:sbsinput>
+
+    <hlm:sbsinput id="sf_build_input_armv5">
+        <sbsInput refid="armv5-${build.system}-clean" />
+        <sbsOptions>
+            <arg name="--logfile" value="${compile.log.dir}/${build.id}_armv5_sf_build_clean.log" />
+            <arg name="--makefile" value="${compile.log.dir}/${build.id}_armv5_sf_build_clean" />
+        </sbsOptions>
+    </hlm:sbsinput>
+
+    <hlm:sbsinput id="sf_build_input_clean">
+        <sbsInput refid="sf_build_input_clean_tools" />
+        <sbsInput refid="sf_build_input_clean_armv5" />
+    </hlm:sbsinput>
+    
+    <hlm:sbsbuild id="sbs.sf_build_clean">
+        <sbsInput refid="sf_build_input_clean" />
+    </hlm:sbsbuild>
+
+    <hlm:sbsinput id="nonhw_input_clean_tools">
+        <sbsInput refid="tools-${build.system}-clean" />
+        <sbsOptions>
+            <arg name="--logfile" value="${compile.log.dir}/${build.id}_tools_winscw_build_clean.log" />
+            <arg name="--makefile" value="${compile.log.dir}/${build.id}_tools_winscw_build_clean" />
+        </sbsOptions>
+    </hlm:sbsinput>
+
+    <hlm:sbsinput id="nonhw_input_clean_winscw">
+        <sbsInput refid="winscw-${build.system}-clean" />
+        <sbsOptions>
+            <arg name="--logfile" value="${compile.log.dir}/${build.id}_winscw_winscw_build_clean.log" />
+            <arg name="--makefile" value="${compile.log.dir}/${build.id}_winscw_winscw_build_clean" />
+        </sbsOptions>
+    </hlm:sbsinput>
+
+    <hlm:sbsinput id="nonhw_input_clean">
+        <sbsInput refid="nonhw_input_clean_tools" />
+        <sbsInput refid="nonhw_input_clean_winscw" />
+    </hlm:sbsinput>
+    
+    <hlm:sbsbuild id="sbs.nonhw_clean">
+        <sbsInput refid="nonhw_input_clean" />
+    </hlm:sbsbuild>
+
+    <hlm:sbsinput id="nonhw_input_tools">
+        <sbsInput refid="tools-${build.system}" />
+        <sbsOptions>
+            <arg name="--logfile" value="${compile.log.dir}/${build.id}_tools_build.log" />
+            <arg name="--makefile" value="${compile.log.dir}/${build.id}_tools_build" />
+        </sbsOptions>
+    </hlm:sbsinput>
+
+    <hlm:sbsinput id="nonhw_input_winscw">
+        <sbsInput refid="winscw-${build.system}" />
+        <sbsOptions>
+            <arg name="--logfile" value="${compile.log.dir}/${build.id}_winscw_build.log" />
+            <arg name="--makefile" value="${compile.log.dir}/${build.id}_winscw_build" />
+        </sbsOptions>
+    </hlm:sbsinput>
+
+    <hlm:sbsinput id="test_input_tools">
+        <sbsInput refid="test-${build.system}" />
+        <sbsOptions>
+            <arg name="--logfile" value="${compile.log.dir}/${build.id}_tools_test.log" />
+            <arg name="--makefile" value="${compile.log.dir}/${build.id}_tools_test" />
+        </sbsOptions>
+    </hlm:sbsinput>
+
+    <hlm:sbsinput id="test_input_armv5">
+        <sbsInput refid="test-${build.system}" />
+        <sbsOptions>
+            <arg name="--logfile" value="${compile.log.dir}/${build.id}_armv5_test.log" />
+            <arg name="--makefile" value="${compile.log.dir}/${build.id}_armv5_test" />
+        </sbsOptions>
+    </hlm:sbsinput>
+    
+    <hlm:sbsinput id="test_input">
+        <sbsInput refid="test_input_tools" />
+        <sbsInput refid="test_input_armv5" />
+    </hlm:sbsinput>
+    
+    <hlm:sbsbuild id="sbs.test">
+        <sbsInput refid="test_input" />
+    </hlm:sbsbuild>
+
+    <hlm:sbsinput id="test_input_clean_tools">
+        <sbsInput refid="test-${build.system}" />
+        <sbsOptions>
+            <arg name="--logfile" value="${compile.log.dir}/${build.id}_tools_test_clean.log" />
+            <arg name="--makefile" value="${compile.log.dir}/${build.id}_tools_test_clean" />
+        </sbsOptions>
+    </hlm:sbsinput>
+
+    <hlm:sbsinput id="test_input_clean_armv5">
+        <sbsInput refid="test-${build.system}" />
+        <sbsOptions>
+            <arg name="--logfile" value="${compile.log.dir}/${build.id}_armv5_test_clean.log" />
+            <arg name="--makefile" value="${compile.log.dir}/${build.id}_armv5_test_clean" />
+        </sbsOptions>
+    </hlm:sbsinput>
+    
+    <hlm:sbsinput id="test_input_clean">
+        <sbsInput refid="test_input_clean_tools" />
+        <sbsInput refid="test_input_clean_armv5" />
+    </hlm:sbsinput>
+    
+    <hlm:sbsbuild id="sbs.test_clean">
+        <sbsInput refid="test_input_clean" />
+    </hlm:sbsbuild>    
+</project>

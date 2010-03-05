@@ -26,12 +26,16 @@ Description:
 
     <!-- Enable Helium internal assertion checking. -->
     <property name="hlm.enable.asserts" value="1" />
-        
+    <property name="build.family" value="test" />
     <property name="build.name" value="minibuild_ats" />
     <property name="major.version" value="0" />
     <property name="minor.version" value="0" />
+    <property name="build.version" value="${major.version}.${minor.version}"/>
     <property name="build.drive" value="z:" />
-    
+    <property name="build.id" value="${build.name}_${build.version}"/>
+    <property name="diamonds.host" value="diamonds.nmp.nokia.com"/>
+    <property name="diamonds.port" value="8080"/>
+    <property name="diamonds.path" value="/diamonds/builds/"/>
     
     <property name="enabled.ats" value="1" />
 
@@ -48,6 +52,7 @@ Description:
 		<property name="ats.test.timeout" value="60" />
 		<property name="tsrc.data.dir" value="data_rom" />
 		<property name="ats.ctc.enabled" value="True" />
+		<property name="ats.ctc.host" value="10.11.3.2" />
 		<property name="ats.flashfiles.minlimit" value="2" />
 		
 		<property name="ta.flag.list" value="TA_M, TA_MU, TA_MMAPPFW,TA_MM"/>
@@ -71,7 +76,13 @@ Description:
     <!-- Synergy is not configured -->
     <property name="skip.password.validation" value="1"/>
     
-    
+<echo>
+DIAMONDS URL: ${diamonds.build.url}
+DIAMONDS HOST: ${diamonds.host}
+DIAMONDS BID: ${diamonds.build.id}
+
+DIAMONDS ATS TEST PAGE: http://${diamonds.host}${diamonds.build.id}#tab=4
+</echo>
     <import file="${helium.dir}/helium.ant.xml"/>
     
     <!-- Run the full sequence of target for the minibuild. ,mini-build-prep,compile-main,zip-ee,mini-build-check-->

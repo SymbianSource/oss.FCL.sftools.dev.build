@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : test_signaltask.ant.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test-signaltask" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>Helium Antlib Signal unittests.</description>
+    <dirname property="project.dir.signaltask" file="${ant.file.test-signaltask}" />
+    <taskdef resource="com/nokia/helium/core/ant/antlib.xml" uri="http://www.nokia.com/helium" />
+    <taskdef resource="com/nokia/helium/signal/ant/antlib.xml" uri="http://www.nokia.com/helium" />
+    <property environment="env" />
+    <property name="build.summary.file" location="${project.dir.signaltask}/data/ido_tedo_mcl_devlon52_ec_MCL.52.105_summary.log.xml" />
+
+    <!-- Deferred signal -->
+    <hlm:notifierList id="testDeferredSignalNotifiers">
+        <hlm:executeTaskNotifier>
+            <echo>Signal: ${signal.name}</echo>
+        </hlm:executeTaskNotifier>
+    </hlm:notifierList>
+
+    <hlm:signalInput id="testDeferredSignalInput" failBuild="defer">
+        <hlm:notifierListRef refid="testDeferredSignalNotifiers" />
+    </hlm:signalInput>
+
+    <!-- Fail now signal -->
+    <hlm:notifierList id="testSignalNotifiers">
+        <hlm:executeTaskNotifier>
+            <echo>Signal: ${signal.name}</echo>
+        </hlm:executeTaskNotifier>
+    </hlm:notifierList>
+
+    <hlm:signalInput id="testSignalInput" failBuild="now">
+        <hlm:notifierListRef refid="testSignalNotifiers" />
+    </hlm:signalInput>
+
+    <!-- is called prior to the test -->
+    <target name="setUp">
+        <!-- cleaning deferred pending failures. -->
+        <hlm:clearDeferredFailures />
+    </target>
+
+    <!-- is called after the test, even if that caused an error -->
+    <target name="tearDown">
+        <!-- cleaning deferred pending failures. -->
+        <hlm:clearDeferredFailures />
+    </target>
+
+    <target name="raise-deferred-failure">
+        <!-- This raise a  testSignal. -->
+        <hlm:signal name="testDeferredSignal" result="1" message="message">
+            <signalNotifierInput>
+                <hlm:signalInput refid="testDeferredSignalInput" />
+            </signalNotifierInput>
+        </hlm:signal>
+    </target>
+
+    <target name="raise-failure-now">
+        <!-- This raise a  testSignal. -->
+        <hlm:signal name="testSignal" result="1" message="message">
+            <signalNotifierInput>
+                <hlm:signalInput refid="testSignalInput" />
+            </signalNotifierInput>
+        </hlm:signal>
+    </target>
+
+    <target name="raise-no-failure">
+        <!-- This raise a  testSignal. -->
+        <hlm:signal name="testSignal" result="0" message="message">
+            <signalNotifierInput>
+                <hlm:signalInput refid="testSignalInput" />
+            </signalNotifierInput>
+        </hlm:signal>
+    </target>
+
+    <target name="test-raise-no-failure" depends="raise-no-failure" />
+
+    <target name="test-raise-failure-now">
+        <!-- Should fail the build now -->
+        <au:expectfailure>
+            <antcall target="raise-failure-now" />
+        </au:expectfailure>
+    </target>
+
+    <target name="test-raise-deferred-failure">
+        <!-- This will not fail the build -->
+        <antcall target="raise-deferred-failure" />
+    </target>
+
+    <target name="test-raise-deferred-now-failure">
+        <!-- This will not fail the build -->
+        <antcall target="raise-deferred-failure" />
+        <!-- But next one should. -->
+        <au:expectfailure expectedMessage="testSignal: message : raise-failure-now">
+            <antcall target="raise-failure-now" />
+        </au:expectfailure>
+    </target>
+
+    <target name="test-no-args">
+        <!-- This raise a  testSignal. -->
+        <au:expectfailure expectedMessage="'name' attribute is not defined.">
+            <hlm:signal />
+        </au:expectfailure>
+    </target>
+
+    <target name="test-name-args-not-existing">
+        <au:expectfailure expectedMessage="Could not find signal config for signal name: testNonExistingSignal">
+            <hlm:signal name="testNonExistingSignal" />
+        </au:expectfailure>
+    </target>
+
+    <target name="test-too-many-nested-element">
+        <au:expectfailure expectedMessage="One and only signal input can be defined">
+            <hlm:signal name="testNonExistingSignal">
+                <signalNotifierInput>
+                    <hlm:signalInput refid="testSignalInput" />
+                    <hlm:signalInput refid="testSignalInput" />
+                </signalNotifierInput>
+            </hlm:signal>
+        </au:expectfailure>
+    </target>
+
+</project>

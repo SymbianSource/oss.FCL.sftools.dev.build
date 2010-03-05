@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!-- 
+============================================================================ 
+Name        : build.ant.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test-variableset">
+    <description>Helium antlib core executor test config.</description>
+
+    <target name="target">
+        <echo>Running target.</echo>
+    </target>
+
+</project>

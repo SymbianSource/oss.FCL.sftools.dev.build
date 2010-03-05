@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<!-- 
+============================================================================ 
+Name        : aste_template.xml
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+Contains the template for the test.xml file output. The test.xml file contains
+information on the files used to create the drop file.
+============================================================================
+-->
+
+{% import 'ats4_macros.xml' as macros with context %}
+
+<testrun>
+    <metadata>
+        {% if test_plan['diamonds_build_url'] -%}
+        <meta name="diamonds-buildid">{{ test_plan['diamonds_build_url'] }}</meta> 
+        <meta name="diamonds-testtype">Smoke</meta>
+        {% endif %}
+        <meta name="name">{{ test_plan['testrun_name'] }}</meta> 
+    </metadata>
+    
+    <agents>
+        <agent alias="DEFAULT_{{ test_plan['harness'] }}">
+            <property name="hardware" value="{{ test_plan["device_type"] }}"/>
+        </agent>
+    </agents>
+    
+    {% include 'preset_custom.xml' ignore missing %}
+    
+    {% for setd in test_plan.sets -%}
+    <execution defaultAgent="DEFAULT_{{ test_plan['harness'] }}">        
+        <initialization>
+            {% include 'prestep_custom.xml' ignore missing %}
+        
+            {% if setd.image_files -%}
+            <task>
+                <type>FlashTask</type>
+                <parameters>
+                {% set i = 1 %}
+                {% for img in setd.image_files -%}
+                    <parameter name="image-{{ i }}" value="ATS3Drop\images\{{ os.path.basename(img) }}" />
+                    {% set i = i + 1 %}
+                {% endfor -%}
+                </parameters>
+            </task>
+            {% endif %}
+            
+            {% if setd["ctc_enabled"] == "True" -%}
+            {{ macros.ctc_initialization() }}
+            {% endif %}
+            
+            <task>
+                <type>CreateDirTask</type>
+                <parameters>                
+                    <parameter value="{{ atsself.getlogdir(setd) }}" name="dir"/>
+                </parameters>
+            </task>
+                      
+          {% if setd.has_key("sis_files") and setd["sis_files"] -%}
+              {% for sis_file in setd["sis_files"] -%}
+            <task>
+                <type>FileUploadTask</type>
+                <parameters>
+                    <parameter name="src" value="ATS3Drop\{{ setd.name }}\sis\{{ os.path.basename(sis_file) }}"/>
+                    <parameter name="dst" value="c:\testframework\{{ os.path.basename(sis_file) }}"/>
+                </parameters>
+            </task>
+              {% endfor -%}
+          {% else %}
+              {% if setd['src_dst'] != [] -%}
+                {% for file in setd['src_dst'] -%}            
+            <task>
+                <type>FileUploadTask</type>
+                <parameters>
+                    <parameter value="ATS3Drop\{{ setd.name }}\{{ file[1].replace(":", "") }}" name="src"/>
+                    <parameter value="{{ file[1] }}" name="dst"/>
+                </parameters>
+            </task>
+                {% endfor -%}
+              {% else %}
+                  {% for data_file in setd["data_files"] -%}
+            <task>
+                <type>FileUploadTask</type>
+                <parameters>
+                    <parameter name="src" value="ATS3Drop\{{ setd.name }}\data\{{ os.path.basename(data_file) }}"/>
+                    <parameter name="dst" value="e:\testing\data\{{ os.path.basename(data_file) }}"/>
+                </parameters>
+            </task>
+                  {% endfor -%}
+                  {% for data_file in setd["config_files"] -%}
+            <task>
+                <type>FileUploadTask</type>
+                <parameters>
+                    <parameter name="src" value="ATS3Drop\{{ setd.name }}\conf\{{ os.path.basename(data_file) }}"/>
+                    <parameter name="dst" value="e:\testing\conf\{{ os.path.basename(data_file) }}"/>
+                </parameters>
+            </task>
+                  {% endfor -%}
+                  {% for data_file in setd["testmodule_files"] -%}
+            <task>
+                <type>FileUploadTask</type>
+                <parameters>
+                    <parameter name="src" value="ATS3Drop\{{ setd.name }}\testmodules\{{ os.path.basename(data_file) }}"/>
+                    <parameter name="dst" value="c:\sys\bin\{{ os.path.basename(data_file) }}"/>
+                </parameters>
+            </task>
+                  {% endfor -%}
+              {% endif %}
+          {% endif %}
+          
+          {% if setd.engine_ini_file -%}
+              {% if (setd.has_key("sis_files") and setd["sis_files"]) or setd["src_dst"] == [] -%}
+            <task>
+                <type>FileUploadTask</type>
+                <parameters>
+                    <parameter name="src" value="ATS3Drop\{{ setd.name }}\init\{{ os.path.basename(setd["engine_ini_file"]) }}"/>
+                    <parameter name="dst" value="c:\testframework\{{ os.path.basename(setd["engine_ini_file"]) }}"/>
+                </parameters>
+            </task>
+              {% endif %}
+          {% endif %}
+          
+          {% for sis_file in setd["sis_files"] -%}
+            <task>
+               <type>InstallSisTask</type>
+               <parameters>
+                    <parameter name="timeout" value="{{ test_plan["test_timeout"] }}"/>
+                    <parameter name="upgrade-data " value="true"/>
+                    <parameter name="ignore-ocsp-warnings" value="true"/>
+                    <parameter name="ocsp-done" value="true"/>
+                    <parameter name="software-package" value="c:\testframework\{{ os.path.basename(sis_file) }}"/>
+               </parameters>
+            </task>
+          {% endfor -%}
+        </initialization>    
+        
+        {% include 'prerun_custom.xml' ignore missing %}
+
+        <task>
+           <type>SetTestAssetPackageTask</type>
+           <parameters>
+              <parameter name="file" value="ATS3Drop\TestAssets\TestAsset.zip"/>
+           </parameters>
+        </task>
+        
+        <task>
+           <type>ExecuteTestAssetTask</type>
+           <parameters>
+          {% set i = 1 %}     
+          {% for name in atsself.aslfiles(test_plan) -%}
+              <parameter name="script_{{ i }}" value="{{ name }}"/>
+              {% set i = i + 1 %}
+          {% endfor -%}
+           </parameters>
+        </task>
+        
+        {% include 'postrun_custom.xml' ignore missing %}
+        
+        <finalization>
+        {% if setd["ctc_enabled"] == "True" -%}
+        {{ macros.ctc_finalization(setd) }}
+        {% endif %}
+
+            <task>
+                <type>FileDownloadTask</type>
+                <parameters>
+                    <parameter value="{{ atsself.getlogdir(setd) }}\*" name="src"/>
+                </parameters>
+            </task>
+        {% include 'poststep_custom.xml' ignore missing %}
+        </finalization>
+        
+    </execution>    
+    {% endfor -%}
+    
+    {% include 'postset_custom.xml' ignore missing %}
+    
+    <postActions>
+        {% include 'prepostaction.xml' ignore missing %}
+        {% for action_type, parameters in test_plan.post_actions -%}
+            {% if action_type == 'RunProcessAction' %}
+        <action>
+            <type>{{ action_type }}</type>
+            <parameters>
+                {% for name, value in parameters -%}
+                <parameter name="{{ name }}" value="{{ value }}"/>
+                {% endfor -%}
+            </parameters>
+        </action>
+            {% endif %}
+        {% endfor -%}
+        {% if test_plan['report_email'] -%}
+        <action>
+            <type>EmailAction</type>
+            <parameters>
+                <parameter value="Release testing" name="subject"/>
+                <parameter value="{{ test_plan['report_email'] }}" name="to"/>
+                <parameter value="simplelogger" name="format"/>
+            </parameters>
+        </action>
+        {% endif %}
+        {% if test_plan['diamonds_build_url'] -%}
+        <action>
+            <type>DiamondsAction</type>
+        </action>
+        {% endif %}
+        {% include 'postpostaction.xml' ignore missing %}
+    </postActions>
+    
+</testrun>

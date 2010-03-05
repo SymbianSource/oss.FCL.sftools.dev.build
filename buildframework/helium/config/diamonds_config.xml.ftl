@@ -23,7 +23,7 @@ Description:
 <configuration>
 <config>
     <template-dir path="${ant['helium.dir']}/tools/common/templates/diamonds" />
-    <output-dir path="${ant['build.log.dir']}"/>
+    <output-dir path="${ant['diamonds.build.output.dir']}"/>
     <property name="smtpserver" value="email.smtp.server" />
     <property name="ldapserver" value="email.ldap.server" />
     <property name="initialiser-target-name" value="diamonds" />
@@ -47,12 +47,8 @@ Description:
     <targets>
         <target name="diamonds" template-file="tool.xml.ftl" 
             logfile="${ant['temp.build.dir']}/build/doc/ivy/tool-dependencies-${ant['build.type']}.xml" ant-properties="true"/>        
-        <#if (ant?keys?seq_contains('metadata.enable'))>
-            <target name="compile-main" />
-        <#else>
-            <target name="compile-main" template-file="compile.xml.ftl"
-                logfile="${ant['diamonds.compile.summary']}" ant-properties="true"/>
-        </#if>
+
+        <target name="compile-main" />
             
         <target name="ido-codescanner" template-file="codescanner.xml.ftl"
             logfile="${ant['ido.codescanner.output.dir']}/problemIndex.xml"/>
@@ -63,7 +59,10 @@ Description:
             and sends it.-->
             
         <target name="create-bom"/>
-
+        
+        <target name="post-coverity" template-file="coverity.xml.ftl"
+            logfile="${ant['diamonds.coverity.report.file']}"/>
+        
         <target name="rndsdk-create-api-descr-xml" template-file="apimetrics.xml.ftl"
             logfile="${ant['build.drive']}/output/apidescr/apidescr.xml"/>
             

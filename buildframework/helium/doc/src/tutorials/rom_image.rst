@@ -26,62 +26,8 @@ This section is targeting build managers and IDOs who need to configure Helium t
 
 In order to use Helium for ROM-image creation your ROMs need to be configured to
 be created using Helium. The creation is supported by the iMaker task which supports the  '''imakerconfigurationset'''
-element to configure what needs to be built.
-
-.. index::
-   single: How to Install iMaker
-
-How to Install iMaker
-=====================
-
-iMaker comes as part of S60 code and therefore should be automatically installed when S60 is installed. However, if you are not using S60
-it is also available via Helium under the 'helium_trunk/external/imaker/bin' directory, the main executable is called 'mingw_make.exe'.
-
-
-.. index::
-   single: ROM Creation Commands
-
-ROM Creation Commands
-======================
-
-To build an Engineering English (EE) version of the ROM use the target 'ee-roms' for localised images use the target
-'localisation'. These are both for product builds and need several parameters to be configured before they will work successfully.
-For details on how to configure helium for ROM image creation click :ref:`ROM-creation-label`.
-
-.. index::
-   single: Engineering English - brief description
-
-Engineering English - brief description
-----------------------------------------
-
-EE builds are the basic builds that contain all the required components but the only available language is English. 
-It is often used to prove that a build can be made or for basic testing, without the added complication of different languages.
-
-.. index::
-   single: Localisation - brief description
-
-Localisation - brief description
----------------------------------
-
-Localisation is the process used to create the different variants for different parts of the world. For each different language
-available in a phone there is one or more text files that contain the text to be displayed, e.g. contacts, options, exit, keypad locked,
-all have to be translated to the relevent language text. There are various regional variations as well which need to be implemented
-so the correct files need to be included, this is all part of the configuration for localisation.
-
+element to configure what needs to be built (please check the Helium Antlib documentation).
  
-.. index::
-   single: iMaker User Guide
-
-.. _iMaker-label:
-
-iMaker User Guide
-=================
-
-There is an `iMaker User Guide` available from helium in the \\helium-trunk\\external\\imaker\\doc folder 
-it is a PDF file (S60_iMaker_User_Guide.pdf) and explains 
-everything you need to know about iMaker. iMaker is based on `GNU Make`_ click on the link to view a .html version of `GNU Make`_ documentation. 
-
-.. _`GNU Make`: http://www.gnu.org/software/make/manual/make.html
 
 .. index::
    single: iMaker tutorials

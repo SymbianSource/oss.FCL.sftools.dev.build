@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<build>
+    <config name="test_spec" abstract="true">
+        <set name="A" value="foo"/>
+        <set name="B" value="parent: ${A}"/>
+        <!-- 0 -->
+        <config>
+            <set name="B" value="child -> ${A}"/>
+            <set name="C" value="missing value test ${does_not_exist}"/>
+            <set name="node.content">
+This is the value!
+            </set>
+        </config>
+        
+        <!-- 1 -->
+        <config>
+            <set name="C" value="one"/>
+            <set name="C" value="two"/>
+        </config>
+        
+        <!-- 2 -->
+        <config/>
+        
+        <!-- 3 -->
+        <config name="spec.with.type" type="test.type"/>
+        
+        <!-- 4 -->
+        <config>
+            <append name="A" value="bar"/>
+        </config>
+        
+        <!-- 5 -->
+        <config name="parent">
+            <set name="template" value="value -> ${my.value}"/>
+            <set name="my.value" value="from parent"/>
+    
+            <config name="child">
+                <set name="my.value" value="from child"/>
+            </config>
+        </config>
+
+        <!-- 6 -->
+        <config name="spec.with.type2" type="test.type"/>
+    
+    </config>
+    
+    
+    <config name="test_list" abstract="true">
+        <append name="include" value="foo_${custom.property}"/>
+        <config abstract="true">
+            <append name="include" value="bar1_${custom.property}"/>
+            <set name="include" value="bar2_${custom.property}"/>
+            <config name="test_list_config1">
+                    <set name="custom.property" value="config1"/>
+            </config>
+
+            <config name="test_list_config2">
+                    <set name="custom.property" value="config2"/>
+            </config>    
+        </config>
+    </config>
+
+</build>

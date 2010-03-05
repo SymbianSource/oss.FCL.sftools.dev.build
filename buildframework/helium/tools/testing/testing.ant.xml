@@ -20,8 +20,20 @@ Description:
 
 ============================================================================
 -->
+<!--* @package testing -->
 <project name="testing">
-
+    <description>
+    Testing  
+    </description>
+    
+    <!--* @property selge.ini.network.dir
+    \\\\vcfiler02\\pub\\flash_user\\Crashbin/working\\selge_ini_prep.
+    @type string
+    @editable required
+    @scope public
+    -->
+    
+    
     <!-- ATS testing -->
     <import file="ats/ats.ant.xml" />
 

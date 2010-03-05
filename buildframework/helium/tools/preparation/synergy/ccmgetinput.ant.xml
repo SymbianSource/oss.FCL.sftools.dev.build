@@ -20,16 +20,45 @@ Description:
 
 ============================================================================
 -->
+<!--* @package preparation -->
 <project name="ccmgetinput" xmlns:hlm="http://www.nokia.com/helium">
     <description>
       Retrieves content from Synergy
     </description>
+    
+    <!--* @property ccm.home.dir
+    Home directory of CCM operations.
+    @type string
+    @editable required
+    @scope public
+    -->
 
-    <hlm:logfilterset id="prepWorkArea.logextract.config">
-        <logfilter category="error" regex="^ERROR:" />
-        <logfilter category="warning" regex="^WARNING:" />
-        <logfilter category="info" regex="^INFO:" />
-    </hlm:logfilterset>
+    <!--* @property ccm.database
+    Name of the CCM database to use. No default value.
+    @type string
+    @editable required
+    @scope public
+    -->
+
+    <!--* @property ccm.engine.host
+    Engine host of CCM database. No default value.
+    @type string
+    @editable required
+    @scope public
+    -->
+    
+    <!--* @property prep.delivery.file
+    Defines configuration file used in synergy operations (ccm-get-input for example). This file contains definition of projects that are checkouted or snapshotted.
+    @type string
+    @editable required
+    @scope public
+    -->
+    
+    <hlm:recordfilterset id="prepWorkArea.logextract.config">
+        <hlm:recordfilter category="error" regexp="^ERROR:" />
+        <hlm:recordfilter category="warning" regexp="^WARNING:" />
+        <hlm:recordfilter category="info" regexp="^INFO:" />
+    </hlm:recordfilterset>
 
     
     <!-- This target uses an XML input file to retrieve content from Synergy.
@@ -58,7 +87,8 @@ builder = None
 try:
     configBuilder = configuration.NestedConfigurationBuilder(open(ant.get_property(r'${prep.delivery.conf.parsed}'), 'r'))
     configSet = configBuilder.getConfiguration()
-    builder = preparation.PreparationBuilder(configSet.getConfigurations(), ant.get_property(r'${ccm.user.login}'), ant.get_property(r'${ccm.user.password}'), cache=ant.get_property(r'${ccm.cache.xml}'))
+    password = ant.get_property(r'${ccm.user.password}')
+    builder = preparation.PreparationBuilder(configSet.getConfigurations(), ant.get_property(r'${ccm.user.login}'), password, cache=ant.get_property(r'${ccm.cache.xml}'))
     builder.check()
     builder.get_content()
     builder.close()
@@ -76,16 +106,10 @@ sys.exit(0)
                 </hlm:python>
             </try>
             <finally>
-                <hlm:tempRecordStopMacro name="${build.id}_ccm_get_input.log" filterref="filterset.prepWorkArea"/>
+                <hlm:tempRecordStopMacro name="${build.id}_ccm_get_input.log" filterref="filterset.prepWorkArea" phase="prep"/>
                 <hlm:assertFileExists file="${build.cache.log.dir}/${build.id}_ccm_get_input.log" />
             </finally>
         </trycatch>
     </target>
-
-    <!--
-        This target uses an XML input file to retrieve content from Synergy.
-        <deprecated>Please use prep-work-area</deprecated>
-    -->
-    <target name="ccm-get-input" depends="prep-work-area" />
 
 </project>

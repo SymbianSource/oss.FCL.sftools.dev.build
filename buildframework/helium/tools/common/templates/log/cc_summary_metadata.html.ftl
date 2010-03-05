@@ -75,7 +75,7 @@ Description:
 <tr>
 <td>"${component_table['${component_id}']}"</td>
     <#list colors?keys as type>
-        <#assign count = "${table_info['select count(data) as COUNT from metadata where logpath_id=${logpath} and (priority_id in (select id from priority where priority like \"${type}\"))'][0]['COUNT']}" >
+        <#assign count = "${table_info['select count(data) as COUNT from metadata where logpath_id=${logpath} and component_id=${component_id} and (priority_id in (select id from priority where priority like \"${type}\"))'][0]['COUNT']}" >
         <#if ( count?number &gt; 0)>
 <td align="center" bgcolor="#${colors[type]}">${count}</td>
         <#else>

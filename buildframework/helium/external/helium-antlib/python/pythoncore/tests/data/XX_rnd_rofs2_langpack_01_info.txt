@@ -1,0 +1,7 @@
+Generated `G:/output/release_flash_images/product/rnd/langpack/langpack_01/rofs2/XX_rnd_rofs2_langpack_01_info.txt' for documenting the language selections
+
+Name         : langpack_01
+Default Lang.: English (01)
+Languages    : English French German Italian Portuguese Spanish
+Language IDs : 01 02 03 05 13 04
+Region       : Western

@@ -7,9 +7,9 @@ Installation
 
 Install the following tools:
 
-* `ActivePython 2.5`_
+* `ActivePython 2.6`_
 
-.. _`ActivePython 2.5`: http://www.activestate.com/activepython/downloads
+.. _`ActivePython 2.6`: http://www.activestate.com/activepython/downloads
 
 * `ActivePerl 5.6.1`_
 

@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : test_imaker.ant.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="helium-antlib-imaker-unittest" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>Helium Antlib imaker unittests.</description>
+
+    <taskdef resource="com/nokia/helium/imaker/ant/antlib.xml" uri="http://www.nokia.com/helium"/>
+    <property name="epocroot" location="${basedir}/../epocroot_task" />
+    <property name="epocroot.temp" location="${epocroot}/temp" />
+
+    <!-- is called prior to the test -->
+    <target name="setUp">
+        <echo>-------------------------------------------------------------------------------</echo>
+        <delete dir="${epocroot.temp}" failonerror="false" />
+        <delete dir="${epocroot}/epoc32" failonerror="false" />
+        <mkdir dir="${epocroot.temp}" />
+    </target>
+
+    <!-- is called after the test, even if that caused an error -->
+    <target name="tearDown">
+        <delete dir="${epocroot.temp}" failonerror="false" />
+        <delete dir="${epocroot}/epoc32" failonerror="false" />
+        <echo>-------------------------------------------------------------------------------</echo>
+    </target>
+
+    <target name="test-imaker-noargs-noconfig">
+        <echo>Will fail because it can't find imaker.</echo>
+        <au:expectfailure>
+            <hlm:imaker />
+        </au:expectfailure>
+    </target>
+
+    <target name="test-imaker-epocroot">
+        <echo>Usin custom epocroot.</echo>
+        <hlm:imaker epocroot="${epocroot}" />
+    </target>
+
+    <target name="test-imaker-noargs">
+        <hlm:imaker epocroot="${epocroot}" output="${epocroot.temp}/output.log"/>
+        <au:assertFileDoesntExist file="${epocroot.temp}/output.log" />
+    </target>
+
+    <target name="test-imaker-empty-imakerconfigurationset">
+        <hlm:imaker epocroot="${epocroot}" output="${epocroot.temp}/output.log">
+            <hlm:imakerconfigurationset>
+            </hlm:imakerconfigurationset>
+        </hlm:imaker>
+        <au:assertFileDoesntExist file="${epocroot.temp}/output.log" />
+        <au:assertLogContains text="Nothing to build." />
+    </target>
+
+    <target name="test-imaker-empty-imakerconfiguration-accepted">
+        <hlm:imaker epocroot="${epocroot}" output="${epocroot.temp}/output.log">
+            <hlm:imakerconfiguration>
+            </hlm:imakerconfiguration>
+        </hlm:imaker>
+        <au:assertFileDoesntExist file="${epocroot.temp}/output.log" />
+        <au:assertLogContains text="Nothing to build." />
+    </target>
+
+    <target name="test-imaker-empty-imakerconfiguration">
+        <hlm:imaker epocroot="${epocroot}" output="${epocroot.temp}/output.log">
+            <hlm:imakerconfigurationset>
+                <hlm:imakerconfiguration>
+                </hlm:imakerconfiguration>
+            </hlm:imakerconfigurationset>
+        </hlm:imaker>
+        <au:assertFileDoesntExist file="${epocroot.temp}/output.log" />
+        <au:assertLogContains text="Nothing to build." />
+    </target>
+
+    <target name="test-imaker-imakerconfiguration-makefileset">
+        <hlm:imaker epocroot="${epocroot}" output="${epocroot.temp}/output.log">
+            <hlm:imakerconfigurationset>
+                <hlm:imakerconfiguration>
+                    <makefileset>
+                        <include name="**/product/*ui.mk" />
+                    </makefileset>
+                </hlm:imakerconfiguration>
+            </hlm:imakerconfigurationset>
+        </hlm:imaker>
+        <au:assertFileDoesntExist file="${epocroot.temp}/output.log" />
+        <au:assertLogContains text="Nothing to build." />
+    </target>
+    
+    <target name="test-imaker-imakerconfiguration-targetset">
+        <hlm:imaker epocroot="${epocroot}" output="${epocroot.temp}/output.log">
+            <hlm:imakerconfigurationset>
+                <hlm:imakerconfiguration>
+                    <makefileset>
+                        <include name="**/product/*ui.mk" />
+                    </makefileset>
+                    <targetset>
+                        <include name="core" />
+                        <include name="langpack_\d+" />
+                    </targetset>
+                </hlm:imakerconfiguration>
+            </hlm:imakerconfigurationset>
+        </hlm:imaker>
+        <au:assertFileExists file="${epocroot.temp}/output.log" />
+    </target>
+
+    <target name="test-imaker-imakerconfiguration-variableset">
+        <au:expectfailure message="The variable element doesn't define a 'name' attribute.">
+            <hlm:imaker epocroot="${epocroot}" output="${epocroot.temp}/output.log">
+                <hlm:imakerconfigurationset>
+                    <hlm:imakerconfiguration>
+                        <makefileset>
+                            <include name="**/product/*ui.mk" />
+                        </makefileset>
+                        <targetset>
+                            <include name="core" />
+                            <include name="langpack_\d+" />
+                        </targetset>
+                        <variableset>
+                            <variable />
+                        </variableset>
+                    </hlm:imakerconfiguration>
+                </hlm:imakerconfigurationset>
+            </hlm:imaker>
+        </au:expectfailure>
+        <au:assertFileDoesntExist file="${epocroot.temp}/output.log" />
+    </target>
+
+    <target name="test-imaker-imakerconfiguration-variablegroup">
+        <hlm:imaker epocroot="${epocroot}" output="${epocroot.temp}/output.log">
+            <hlm:imakerconfigurationset>
+                <hlm:imakerconfiguration>
+                    <makefileset>
+                        <include name="**/product/*ui.mk" />
+                    </makefileset>
+                    <targetset>
+                        <include name="core" />
+                        <include name="langpack_\d+" />
+                    </targetset>
+                    <variablegroup>
+                        <variable name="TYPE" value="rnd" />
+                    </variablegroup>
+                    <variablegroup>
+                        <variable name="TYPE" value="prd" />
+                    </variablegroup>
+                </hlm:imakerconfiguration>
+            </hlm:imakerconfigurationset>
+        </hlm:imaker>
+        <au:assertFileExists file="${epocroot.temp}/output.log" />
+    </target>
+
+    <target name="test-imaker-imakerconfiguration-variablegroup-refid">
+        <hlm:imakerconfigurationset id="config">
+            <hlm:imakerconfiguration>
+                <makefileset>
+                    <include name="**/product/*ui.mk" />
+                </makefileset>
+                <targetset>
+                    <include name="core" />
+                    <include name="langpack_\d+" />
+                </targetset>
+                <variablegroup>
+                    <variable name="TYPE" value="rnd" />
+                </variablegroup>
+                <variablegroup>
+                    <variable name="TYPE" value="prd" />
+                </variablegroup>
+            </hlm:imakerconfiguration>
+        </hlm:imakerconfigurationset>
+        <hlm:imaker epocroot="${epocroot}" output="${epocroot.temp}/output.log">
+            <hlm:imakerconfigurationset refid="config"/>
+        </hlm:imaker>
+        <au:assertFileExists file="${epocroot.temp}/output.log" />
+        <au:assertLogDoesntContain text="Nothing to build" />
+    </target>
+
+    <target name="test-imaker-imakerconfiguration-variablegroup-refid-subconfig">
+        <hlm:imakerconfiguration id="subconfig">
+            <makefileset>
+                <include name="**/product/*ui.mk" />
+            </makefileset>
+            <targetset>
+                <include name="core" />
+                <include name="langpack_\d+" />
+            </targetset>
+            <variablegroup>
+                <variable name="TYPE" value="rnd" />
+            </variablegroup>
+            <variablegroup>
+                <variable name="TYPE" value="prd" />
+            </variablegroup>
+        </hlm:imakerconfiguration>
+        <hlm:imakerconfigurationset id="config">
+            <hlm:imakerconfiguration refid="subconfig" />
+        </hlm:imakerconfigurationset>
+        <hlm:imaker epocroot="${epocroot}" output="${epocroot.temp}/output.log">
+            <hlm:imakerconfigurationset refid="config"/>
+        </hlm:imaker>
+        <au:assertFileExists file="${epocroot.temp}/output.log" />
+        <au:assertLogDoesntContain text="Nothing to build" />
+    </target>
+
+    <target name="test-imaker-imakerconfiguration-variablegroup-product">
+        <hlm:imaker epocroot="${epocroot}" output="${epocroot.temp}/output.log">
+            <hlm:imakerconfiguration>
+                <hlm:product list="product" ui="true" />
+                <targetset>
+                    <include name="core" />
+                    <include name="langpack_\d+" />
+                </targetset>
+                <variablegroup>
+                    <variable name="TYPE" value="rnd" />
+                </variablegroup>
+                <variablegroup>
+                    <variable name="TYPE" value="prd" />
+                </variablegroup>
+            </hlm:imakerconfiguration>
+        </hlm:imaker>
+        <au:assertFileExists file="${epocroot.temp}/output.log" />
+        <au:assertLogDoesntContain text="Nothing to build" />
+    </target>
+
+    <target name="test-imaker-imakerconfiguration-variablegroup-product-invalid">
+        <au:expectfailure message="Could not find a valid configuration for product_invalid">
+            <hlm:imaker epocroot="${epocroot}" output="${epocroot.temp}/output.log">
+                <hlm:imakerconfiguration>
+                    <hlm:product list="product_invalid" ui="true" />
+                    <targetset>
+                        <include name="core" />
+                        <include name="langpack_\d+" />
+                    </targetset>
+                    <variablegroup>
+                        <variable name="TYPE" value="rnd" />
+                    </variablegroup>
+                    <variablegroup>
+                        <variable name="TYPE" value="prd" />
+                    </variablegroup>
+                </hlm:imakerconfiguration>
+            </hlm:imaker>
+        </au:expectfailure>
+        <au:assertFileDoesntExist file="${epocroot.temp}/output.log" />
+    </target>
+
+    <target name="test-imaker-imakerconfiguration-variablegroup-product-invalid-notfail">
+        <hlm:imaker epocroot="${epocroot}" output="${epocroot.temp}/output.log">
+            <hlm:imakerconfiguration>
+                <hlm:product list="product_invalid" ui="true" failonerror="false" />
+                <targetset>
+                    <include name="core" />
+                    <include name="langpack_\d+" />
+                </targetset>
+                <variablegroup>
+                    <variable name="TYPE" value="rnd" />
+                </variablegroup>
+                <variablegroup>
+                    <variable name="TYPE" value="prd" />
+                </variablegroup>
+            </hlm:imakerconfiguration>
+        </hlm:imaker>
+        <au:assertFileDoesntExist file="${epocroot.temp}/output.log" />
+        <au:assertLogContains text="Could not find a valid configuration for product_invalid" />
+        <au:assertLogContains text="Nothing to build." />
+    </target>
+
+</project>

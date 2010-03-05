@@ -37,7 +37,7 @@ Description:
     <table border="0" width="100%" summary="">
     <tr>
     <td style="white-space: nowrap">
-    <#assign propertylist=data.heliumDataModel.property.name?sort>
+    <#assign propertylist=doc.antDatabase.project.property.name?sort>
     <#list propertylist as propertyvar>
     <font class="frameitemfont">
     <a href="property-${propertyvar}.html" title="${propertyvar}" target="classframe">${propertyvar}</a>

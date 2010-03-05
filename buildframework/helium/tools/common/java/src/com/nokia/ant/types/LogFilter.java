@@ -17,14 +17,16 @@
  
 package com.nokia.ant.types;
 
+import org.apache.tools.ant.Project;
 import org.apache.tools.ant.types.DataType;
 import java.util.regex.Pattern;
 
 /**
  * This object contains log filter information basically a regular expression to use to filter the properties based on type and category.
- *
+ * @Deprecated Start using hlm:recordfilter.
  * @ant.type name="logfilter"
  */
+@Deprecated
 public class LogFilter extends DataType
 {
     private String type;
@@ -33,6 +35,7 @@ public class LogFilter extends DataType
     private java.util.regex.Pattern compileRegex;
     
     public LogFilter() {
+        log("Deprecated Start using hlm:recordfilter", Project.MSG_WARN);
     }
     
     /**

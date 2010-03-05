@@ -67,9 +67,9 @@ public class BuildStatusDef extends HlmPostDefImpl
         
         if (!output.isEmpty())
         {
-            System.out.println("*** Configuration report ***");
+            log("*** Configuration report ***", Project.MSG_INFO);
             for (String x : output)
-                System.out.println(x);
+                log(x, Project.MSG_INFO);
         }
     }
     
@@ -143,6 +143,8 @@ public class BuildStatusDef extends HlmPostDefImpl
                 Target depTarget = findTarget(depTargetString, project, array);
                 targetCallsHeliumTarget(depTarget, project);
                 } catch (BuildException x) { 
+                    // We are Ignoring the errors as no need to fail the build.
+                    log("Exception occured while target defined outside helium are calling a private Helium target " + x.toString(), Project.MSG_DEBUG);
                     x = null;
                     }
             }
@@ -155,7 +157,9 @@ public class BuildStatusDef extends HlmPostDefImpl
                 try {
                 Target depTarget = findTarget(depTargetString, project, array);
                 targetCallsHeliumTarget(depTarget, project);
-                } catch (BuildException x) { 
+                } catch (BuildException x) {
+                    //We are Ignoring the errors as no need to fail the build.
+                    log("Exception occured while target defined outside helium are calling a private Helium target " + x.toString(), Project.MSG_DEBUG);
                     x = null;
                     }
             }
@@ -165,7 +169,11 @@ public class BuildStatusDef extends HlmPostDefImpl
             checkIfTargetPrivate(target, project);
         }
 
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) {
+            //We are Ignoring the errors as no need to fail the build.
+            log("Exception occured while target defined outside helium are calling a private Helium target " + e.getMessage(), Project.MSG_DEBUG);
+            e.printStackTrace();
+        }
     }
 
     private class AntTargetVisitor extends VisitorSupport
@@ -212,7 +220,10 @@ public class BuildStatusDef extends HlmPostDefImpl
         try {
         File file = new File(location);
         antDoc = xmlReader.read(file);
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) {
+            // We are Ignoring the errors as no need to fail the build.
+            log("Not able read the XML file. " + e.getMessage(), Project.MSG_WARN);
+        }
           
         String projectName = antDoc.valueOf("/project/@name");
         for (Iterator iterator = antDoc.selectNodes("//target").iterator(); iterator.hasNext();)
@@ -283,7 +294,10 @@ public class BuildStatusDef extends HlmPostDefImpl
             try {
             File model = new File(project.getProperty("data.model.file"));
             antDoc = xmlReader.read(model);
-            } catch (Exception e) { e.printStackTrace(); }
+            } catch (Exception e) {
+                // We are Ignoring the errors as no need to fail the build.
+                log("Not able read the data model file. " + e.getMessage(), Project.MSG_WARN);
+            }
             
             List<Node> statements = antDoc.selectNodes("//property");
             
@@ -326,7 +340,10 @@ public class BuildStatusDef extends HlmPostDefImpl
                 }
             }
         }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) {
+            // We are Ignoring the errors as no need to fail the build.
+            log("Not able read the Customer Properties " + e.getMessage(), Project.MSG_WARN);
+        }
           
         return props;
     }

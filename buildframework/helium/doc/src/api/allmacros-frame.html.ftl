@@ -38,7 +38,7 @@ Description:
 <table border="0" width="100%" summary="">
     <tr>
         <td style="white-space: nowrap">
-        <#assign macrolist=doc.antDatabase.project.macro.name?sort>
+        <#assign macrolist=doc['antDatabase/*/macro'].name?sort>
         <#list macrolist as macrovar>
             <font class="frameitemfont">
                 <a href="macro-${macrovar}.html" title="${macrovar}" target="classframe">${macrovar}</a>

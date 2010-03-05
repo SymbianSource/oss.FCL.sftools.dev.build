@@ -20,24 +20,18 @@ Description:
 
 ============================================================================
 -->
+<!--* @package framework -->
 <project name="internal.testing" xmlns:au="org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium"> 
     <description>
         Targets to test Helium itself.
     </description>
-    <import file="${helium.dir}/build-jar.ant.xml"/>
     
-    <fileset id="python.files" dir="${helium.dir}">
-        <include name="tools/**/*.py"/>
-        <include name="extensions/nokia/tools/**/*.py"/>
-        <exclude name="tools/startup/bootstrap/site.py"/>
-    </fileset>
-
     <!-- Runs all the unit testing targets. -->
-    <target name="unittest" depends="ju-unittest,check,ant-unittest,py-unittest"/>
+    <target name="unittest" depends="ju-unittest,ant-unittest,py-unittest"/>
     
     <!-- Unit testing -->
 
-    <!-- Setup environment for Python unit tests -->
+    <!-- Setup environment for Python unit tests. -->
     <target name="setup-py-unittest">
         <!-- Autogenerate test data for ArchivePreBuilderTest based on ANT properties -->
         <if>
@@ -55,10 +49,25 @@ Description:
 
     <!-- Do Python tests. -->
     <target name="do-py-unittest" depends="setup-py-unittest">
-        <property name="nose.args" value="nokiatest test"/>
+        <property name="nose.args" value="nokiacpythontest scripttests"/>
         <exec executable="python" failonerror="true">
+            <env key="TEST_DATA" value="${helium.dir}/tests"/>
             <arg line="${python.tools}/coverage.py -x ${python.tools}/nosetests-script.py -v ${nose.args}"/>
         </exec>
+        <script language="jython" setbeans="false">
+import sys
+import os
+os.putenv('TEST_DATA', os.path.join(os.environ['HELIUM_HOME'], 'tests'))
+sys.path.append(os.path.join(os.environ['HELIUM_HOME'], 'external/python/lib/common/nose-0.11.1-py2.6.egg'))
+sys.path.append(os.path.join(os.environ['HELIUM_HOME'], 'external/python/lib/common/mocker-0.10.1-py2.5.egg'))
+import nose
+args = project.getProperty('nose.args')
+if ' ' in args:
+    nose.run(argv=['-v', 'scripttests'])
+elif 'cpython' not in args:
+    nose.run(argv=['-v', args])
+print >> sys.stderr
+        </script>
     </target>
     
     <!-- Shortcut for Python unit tests. -->
@@ -67,34 +76,38 @@ Description:
         
     <!-- Create Python code coverage statistics. -->
     <target name="py-unittest-coverage">
-        <mkdir dir="${helium.dir}/build/coverage"/>
+        <mkdir dir="${helium.build.dir}/coverage"/>
         <pathconvert pathsep=" " property="python.modules.coverage">
-            <fileset refid="python.files"/>
+            <fileset dir="${helium.dir}">
+                <include name="tools/**/*.py"/>
+                <include name="extensions/nokia/tools/**/*.py"/>
+                <exclude name="tools/startup/bootstrap/site.py"/>
+            </fileset>
         </pathconvert>
         <exec executable="python" failonerror="true">
-            <arg line="${python.tools}/coverage.py -a -d ${helium.dir}/build/coverage ${python.modules.coverage}"/>
+            <arg line="${python.tools}/coverage.py -a -d ${helium.build.dir}/coverage ${python.modules.coverage}"/>
         </exec>
                         
         <!-- backup the old line coverage report and create the new one -->
-        <mkdir dir="${helium.dir}/build/coverage/report"/>        
+        <mkdir dir="${helium.build.dir}/coverage/report"/>        
         <if>
-            <available file="${helium.dir}/build/coverage/report/line_coverage.txt"/>
+            <available file="${helium.build.dir}/coverage/report/line_coverage.txt"/>
             <then>
-                <copy file="${helium.dir}/build/coverage/report/line_coverage.txt" tofile="${helium.dir}/build/coverage/report/line_coverage_old.txt" overwrite="true"/>
+                <copy file="${helium.build.dir}/coverage/report/line_coverage.txt" tofile="${helium.build.dir}/coverage/report/line_coverage_old.txt" overwrite="true"/>
             </then>    
         </if>        
-        <record name="${helium.dir}/build/coverage/report/line_coverage.txt" action="start"/>        
+        <hlm:record name="${helium.build.dir}/coverage/report/line_coverage.txt" action="start"/>        
         <exec executable="python" failonerror="true">
             <arg line="${python.tools}/coverage.py -r ${python.modules.coverage}"/>
         </exec>
-        <record name="${helium.dir}/build/coverage/report/line_coverage.txt" action="stop"/>
-        <replace file="${helium.dir}/build/coverage/report/line_coverage.txt">
+        <hlm:record name="${helium.build.dir}/coverage/report/line_coverage.txt" action="stop"/>
+        <replace file="${helium.build.dir}/coverage/report/line_coverage.txt">
             <replacetoken><![CDATA[[exec]]]></replacetoken>
             <replacevalue><![CDATA[]]></replacevalue>
         </replace>
         <hlm:python>
-for line in open(r'${helium.dir}/build/coverage/report/line_coverage.txt'):
-    if 'TOTAL' in line and '0%' in line:
+for line in open(r'${helium.build.dir}/coverage/report/line_coverage.txt'):
+    if 'TOTAL' in line and ' 0%' in line:
         raise Exception('Coverage at 0%')
         </hlm:python>
         <delete file="${helium.dir}/.coverage"/>
@@ -108,10 +121,15 @@ for line in open(r'${helium.dir}/build/coverage/report/line_coverage.txt'):
     <!-- Run Ant unit tests. -->
     <target name="ant-unittest">
         <mkdir dir="${helium.build.dir}/temp"/>
+        <mkdir dir="${helium.build.dir}/report/antunit"/>
         <au:antunit>
+            <propertyset>
+                <propertyref name="cache.dir"/>
+            </propertyset>
             <fileset dir="${helium.dir}" includes="tools/**/test_*.ant.xml"/>
             <fileset dir="${helium.dir}" includes="extensions/nokia/tools/**/test_*.ant.xml"/>
             <au:plainlistener/>
+            <au:xmllistener toDir="${helium.build.dir}/report/antunit"/>
         </au:antunit>
     </target>
     
@@ -119,8 +137,16 @@ for line in open(r'${helium.dir}/build/coverage/report/line_coverage.txt'):
     <!-- Run JUnit unit tests. -->
     <target name="ju-unittest" depends="build-java-src">
         <!-- Source location for test class -->
+        <!-- Source location for junit test class.
+        @type string
+        @scope private
+        -->
         <property name="src" location="tools/common/java/test" /> 
         <!-- Source classes location -->
+        <!-- Java source files location for helium library.
+        @type string
+        @scope private
+        -->
         <property name="src.classes" location="tools/common/java/src" />
         
         <delete dir="${build.temp.dir}/junit_classes"/>
@@ -163,61 +189,18 @@ for line in open(r'${helium.dir}/build/coverage/report/line_coverage.txt'):
             </batchtest>
         </junit>
         
-        <emma enabled="true" >
+        <emma enabled="true">
             <report>
+                <sourcepath>
+                    <dirset dir="${src.classes}" />
+                </sourcepath>
                 <infileset dir="${build.temp.dir}" includes="*.emma" />
-                <txt outfile="${build.temp.dir}/coverage.txt" />
+                <txt outfile="${build.temp.dir}/coverage.txt" depth="method" />
                 <html outfile="${build.temp.dir}/coverage.html" />
             </report>
         </emma>
         <loadfile property="message" srcFile="${build.temp.dir}/coverage.txt"/>
         <echo message="${message}"/>
-    </target>
-    
-    
-    <!-- iMaker Helium feature unittesting. -->
-    <target name="imaker-unittest" depends="rombuild-export-features">
-        <property name="imaker.unittest.args" value="" />
-        <for param="unittest.filename">
-            <path>
-                <fileset dir="${build.drive}/epoc32/rom/config/unittest" casesensitive="yes">        
-                    <include name="**/test_*.mk"/>
-                </fileset>
-            </path>
-            <sequential>
-                <echo>Running @{unittest.filename}</echo>
-                <exec executable="${imaker.command}" dir="${build.drive}/">
-                    <arg line="${imaker.unittest.args}"/>
-                    <arg line="-f @{unittest.filename}"/>
-                    <arg value="unittest"/>
-                </exec>
-            </sequential>
-        </for>
-    </target>
-    
-    <!-- Validates XML files against suitable schema or DTDs. -->
-    <target name="validate-xml">
-        <!--<schemavalidate fullchecking="false" noNamespaceFile="tools/common/schema/ant.xsd">
-            <Schema namespace="ant.apache.org"
-                    file="tools/common/schema/ant.xsd" />
-            <schema namespace="http://www.nokia.com/helium"
-                    file="tools/common/schema/helium_ant.xsd" />
-            <fileset dir="tools">
-                <include name="**/build.xml"/>
-                <include name="**/*.ant.xml"/>
-                <exclude name="**/test_*.ant.xml"/>
-            </fileset>
-        </schemavalidate>-->
-        <schemavalidate noNamespaceFile="tools/common/schema/helium_data_model.xsd"
-                        file="${data.model.file}"/>
-        <!--<schemavalidate noNamespaceFile="tools/common/schema/helium_config.xsd">
-            <fileset dir="testconfig">
-                <include name="**/delivery.xml"/>
-                <include name="**/*.cfg.xml"/>
-                <exclude name="**/test_*.ant.xml"/>
-            </fileset>
-        </schemavalidate>-->
-    </target>
-    
+    </target>    
     
 </project>

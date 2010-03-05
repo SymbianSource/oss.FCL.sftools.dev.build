@@ -147,11 +147,6 @@ Description:
         <@dumplog regex=".*validate_policy.xml"/>
     </@create_section>
     
-    <#elseif (signalname == 'btSmokeTestNotifySignal')>
-    <@create_section title="Smoke test status for the images" type="data">
-        <@dumplog regex=".*_blacktusk.log.xml"/>
-    </@create_section>
-    
     <#else>
     <@create_section title="Build status" type="data">
         <@dumplog regex=".*compile.log"/>

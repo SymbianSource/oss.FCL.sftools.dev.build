@@ -22,7 +22,48 @@ Standalone documents like this design document and the user guide are documented
 
 __ http://docutils.sourceforge.net/rst.html
 
-HTML documentation is generated in ``/helium/build/doc`` using the ``hlm doc`` command.
+HTML documentation is generated in ``/helium/build/doc`` using the ``hlm docs`` command.
+
+API documentation
+-----------------
+
+The Helium API documentation is generated directly from the Ant source files. Additional documentation for Ant objects (properties, targets, macros, etc) and special markup is defined in a similar style to JavaDoc, following these conventions:
+
+* Additional documentation is written as XML comments.
+* Typically the preceeding comment for an Ant object is assumed to relate to that object. A comment can be definitively noted as a Ant documentation comment by adding a ``*`` character at the start.
+
+  * Project comments must have the ``*`` character in order to avoid assuming that the copyright comment block is project documentation::
+  
+    <!--* comment text -->
+
+* The text format of the documentation can be formatted in MediaWiki format.
+* The first sentence of the comment is taken as the summary for short text fields. The rest of the text is the full documentation.
+* Specific metadata tags are defined using ``@``. Each tag should be on a newline and all tags should be after the general documentation paragraphs::
+
+    <!--* comment text
+    
+    @scope private
+    -->
+    
+* A number of tags are supported:
+
+.. csv-table:: Ant comment tags
+   :header: "Tag", "Applies to", "Description"
+
+   "scope", "All elements", "The scope or visibility of the element. Valid values are ``public`` (default), ``protected`` and ``private``."
+   "editable", "All types", "Whether this element should be overridden or defined by the user. Valid values are ``required`` and ``optional``"
+   "type", "Properties", "The type of the property value. Valid values are ``string`` (default), ``integer``, ``boolean``."
+   "deprecated", "All elements", "Documents that the element is deprecated and may be removed in a future release. The text should describe what to use instead."
+
+* Some properties (and other types) are only defined by the user, so there is no default declaration inside Helium. These can be documented completely within a comment::
+
+    <!--* @property name.of.property
+    This property must be defined by the user.
+    
+    @scope public
+    @editable required
+    @type integer
+    -->
 
 
 .. index::
@@ -74,9 +115,6 @@ The ``/helium`` directory structure consists of:
 ``/external``
     Applications and libraries that are maintained outside of the Helium team.
 
-``/testconfig``
-    Test build configurations.
-
 ``/tests``
     Test data for unit tests. All unit tests are co-located with the code under test.
 
@@ -106,40 +144,6 @@ All custom Ant tasks and loggers should be added under ``/tools/common/java/src`
 can be run from the ``/helium`` directory. This will update the ``nokia_ant.jar`` file in ``/tools/common/java/lib``.
 
 Each custom task must be defined inside the ``antlib.xml`` file inside ``/tools/common/java/src/nokia/ant``.
-
-
-.. index::
-  single: XML Schemas
-
-XML schemas
-===========
-
-A ``validate-xml`` command can be run to check the various Helium XML files against their schema (this is run in the automated unit tests).
-
-There are schema files for these XML file types:
-
-* Helium data model.
-
-
-.. index::
-  single: Helium Data Model
-
-Helium data model
-=================
-
-The Helium data model defines the configuration elements needed to configure Helium. It is defined in the file ``/config/helium_data_model.xml`` and contains:
-
-* A list of configuration elements with metadata:
-
-  * Name. Defines the name of the configuration element. Required.
-  * Type. Defines the type of the configuration element, i.e. if the configuration element is a string, integer, boolean or flag. Required.
-  * Usage. Defines the typical usage of the property. Must one of "must", "recommended", "allowed", "discouraged", "never". Required.
-  * Description. This should be in .rst format. Required.
-  * Deprecated. This is a optional element that defines the property is deprecated.
-
-* A list of groups that group together related configuration elements and their usage requirements within that group, i.e. if that feature is to be used, what configuration is required and what is optional. All required configuration elements in a group must be defined.
-  
-Any Ant configuration can be checked against the model by running ``hlm check``.
 
 
 .. index::
