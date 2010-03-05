@@ -16,15 +16,37 @@
 #
 #
 
-# Only build feature invariant binaries in non-product builds *and*
-# Only build feature variant binaries in product builds.
+# Feature/Binary Variation
 #
-# FEATUREVARIANTNAME != "" implies product build
-# FEATUREVARIANT == 1 implies a feature variant binary
+# FEATUREVARIANTNAME != "" implies a product build configuration
+# FEATUREVARIANT == 1 implies a .mmp defined feature variant binary
 #
-# test FEATUREVARIANTNAME=="" or FEATUREVARIANT==1
+# By default:
+#   Build all binaries in non-product builds *and*
+#   Only build feature variant binaries in product builds.
 #
-ifneq ($(or $(call equal,$(FEATUREVARIANTNAME),),$(call equal,$(FEATUREVARIANT),1)),)
+#   test FEATUREVARIANTNAME=="" or FEATUREVARIANT==1
+#
+# If FEATUREVARIANTSAFE is set:
+#   Only build feature invariant binaries in non-product builds *and*
+#   Only build feature variant binaries in product builds.
+#
+#   test (FEATUREVARIANTNAME=="" and FEATUREVARIANT=="") or
+#        (FEATUREVARIANTNAME!="" and FEATUREVARIANT==1)
+#
+
+DOBUILD:=
+ifeq ($(FEATUREVARIANTSAFE),)
+  DOBUILD:=$(if $(or $(call equal,$(FEATUREVARIANTNAME),),\
+                     $(call equal,$(FEATUREVARIANT),1)),1)
+else
+  DOBUILD:=$(if $(or $(and $(call equal,$(FEATUREVARIANTNAME),),\
+                           $(call equal,$(FEATUREVARIANT),)),\
+                     $(and $(call not,$(call equal,$(FEATUREVARIANTNAME),)),\
+                           $(call equal,$(FEATUREVARIANT),1))),1)
+endif
+
+ifeq ($(DOBUILD),1)
 
 $(if $(FLMDEBUG),$(info <flm name='e32abiv2' target='$(TARGET)' type='$(TARGETTYPE)' outputpath='$(OUTPUTPATH)' metasource='$(METASOURCE)' postlinkfiletype='$(POSTLINKFILETYPE)' />))
 
@@ -1250,7 +1272,7 @@ $(call raptor_clean,$(CLEANTARGETS))
 # For the --what option and the log file
 $(call raptor_release,$(filter-out %.sym,$(WHATRELEASE)))
 
-endif # FEATUREVARIANTNAME=="" or FEATUREVARIANT==1
+endif # DOBUILD
 
 ## The End
 

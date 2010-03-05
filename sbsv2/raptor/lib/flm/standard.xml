@@ -116,6 +116,7 @@
 		<param name='FEATURELISTFILES' default=''/>
 		<param name='FEATUREVARIANT' default=''/>
 		<param name='FEATUREVARIANTNAME' default=''/>
+		<param name='FEATUREVARIANTSAFE' default=''/>
 		<param name='FPMODE_OPTION'/>
 		<param name='FROMELF'/>
 		<param name='FULLVARIANTPATH'/>
