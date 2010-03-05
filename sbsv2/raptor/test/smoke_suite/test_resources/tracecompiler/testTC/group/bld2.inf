@@ -25,4 +25,4 @@ PRJ_PLATFORMS
 ARMV5
 
 PRJ_MMPFILES
-testTC.mmp
+test.TC.mmp

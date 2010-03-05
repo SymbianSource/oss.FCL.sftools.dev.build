@@ -72,8 +72,12 @@ $(TRACE_HEADERS): $(TRACE_MARKER)
 ifeq ($(GUARD_$(call sanitise,$(TRACE_MARKER))),)
 GUARD_$(call sanitise,$(TRACE_MARKER)):=1
 
-TRACE_DICTIONARY:=$(EPOCROOT)/epoc32/ost_dictionaries/$(TRACE_PRJNAME)_0x$(UID_TC)_Dictionary.xml
-AUTOGEN_HEADER:=$(EPOCROOT)/epoc32/include/internal/SymbianTraces/autogen/$(TRACE_PRJNAME)_0x$(UID_TC)_TraceDefinitions.h
+# The trace compiler likes to change . into _ so we must do the same in the case of mmps with a name like
+# fred.prd.mmp we want fred_prd
+TRACE_PRJNAME_SANITISED:=$(subst .,_,$(TRACE_PRJNAME))
+
+TRACE_DICTIONARY:=$(EPOCROOT)/epoc32/ost_dictionaries/$(TRACE_PRJNAME_SANITISED)_0x$(UID_TC)_Dictionary.xml
+AUTOGEN_HEADER:=$(EPOCROOT)/epoc32/include/internal/SymbianTraces/autogen/$(TRACE_PRJNAME_SANITISED)_0x$(UID_TC)_TraceDefinitions.h
 
 JAVA_COMMAND:=$(SBS_JAVATC)
 TRACE_COMPILER_PATH:=$(EPOCROOT)/epoc32/tools
@@ -91,7 +95,8 @@ $(TRACE_MARKER) : $(PROJECT_META)
 	  echo -en "*ENDOFSOURCEFILES*\n" ) | \
 	$(JAVA_COMMAND) $(TRACE_COMPILER_START) $(UID_TC) &&  \
 	$(GNUMD5SUM) $(TRACE_SOURCE_LIST) > $(TRACE_MARKER) && \
-	{ $(GNUCAT) $(TRACE_SOURCE_LIST) ; true ; } \
+	{ $(GNUTOUCH) $(TRACE_DICTIONARY) $(AUTOGEN_HEADER); \
+	 $(GNUCAT) $(TRACE_SOURCE_LIST) ; true ; } \
 	$(call endrule,tracecompile)
 endef
 
