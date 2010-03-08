@@ -18,9 +18,6 @@ from raptor_tests import SmokeTest
 from raptor_tests import AntiTargetSmokeTest
 
 def run():
-	result = SmokeTest.PASS
-	failed = []
-
 	t = SmokeTest()
 	t.description = "Testcases (ID 0101a - 0101d) test trace compiler"
 	# General test for trace compiler, which generates
