@@ -20,6 +20,7 @@ Description:
 
 ============================================================================
 -->
+<!--* @package compile -->
 <project name="compile.sbs" xmlns:hlm="http://www.nokia.com/helium">
     <description>
     Executes compilation of a System Model of System Definition file using Symbian SBS (Raptor) tools. 
@@ -43,6 +44,9 @@ Description:
 
     -->
 
+    <!-- skip sbs layer filtering (true) for new schema and false for schema 1.4.0
+    @type boolean
+    -->
     <property name="skip.sbs.layer.generation" value="false" />
     
     <!-- This target filters the canonical system definition file compare to the "raptor_${sysdef.configuration}" filter. -->
@@ -89,9 +93,18 @@ Description:
                 <copy file="${helium.dir}/tools/common/python/scripts/sbsscanlogmetadata.py" todir="${env.SBS_HOME}/python/plugins/" failonerror="true" />
                 <echo message="sbs.patternset: ${sbs.patternset}" />
                 <hlm:generate-layers />
-                <var name="sbs.inputs.list" value="" unset="true"/>
-                <hlm:getsbsinputs config="sbs.${sysdef.configuration}" outputProperty="sbs.inputs.list"/>
-                <for list="${sbs.inputs.list}" delimiter="," param="sbs.input">
+                <var name="sbs.internal.inputs.list" value="" unset="true"/>
+                <if>
+                    <istrue value="${schema.new}" />
+                    <then>
+                        <var name="sbs.internal.inputs.list" value="${sbs.inputs.list}"/>
+                    </then>
+                    <else>
+                        <var name="sbs.internal.inputs.list" value="" unset="true"/>
+                        <hlm:getsbsinputs config="sbs.${sysdef.configuration}" outputProperty="sbs.internal.inputs.list"/>
+                    </else>
+                </if>
+                <for list="${sbs.internal.inputs.list}" delimiter="," param="sbs.input">
                     <sequential>
                         <echo message="building raptor input: @{sbs.input}" />
                         <hlm:getVariableValue name="--logfile" property="sbs.log.file">
@@ -112,35 +125,83 @@ Description:
                             </then>
                         </if>
                         <var name="sbs.clean.log" value="${sbs.log.file}.clean.log"/>
+                        <var name="sbs.what.log" value="${sbs.log.file}.whatlog.log"/>
                         <!-- Generate the filtered layers -->
-                        <hlm:sbstask sbsinput="@{sbs.input}" sysdefFile="${build.drive}/output/build/canonical_system_definition_${sysdef.configuration}.xml" 
-                            layerPatternSetRef="${sbs.patternset}" errorOutput="${sbs.log.file}.sbs_error.log" 
-                            workingDir="${build.drive}/" failOnError="false" outputLog="${sbs.log.file}" cleanLog = "${sbs.clean.log}"
-                             statsLog="${compile.log.dir}/${build.id}_${sysdef.configuration}.info.xml" />
+                        <if>
+                            <isset property="run.coverity"/>
+                            <then>
+                                <hlm:coveritybuild  sbsinput="@{sbs.input}" 
+                                                    sysdeffile="${build.drive}/output/build/canonical_system_definition_${sysdef.configuration}.xml"
+                                                    layerpatternsetref="${sbs.patternset}" 
+                                                    workingdir="${build.drive}/" 
+                                                    execute="true"
+                                                    failonerror="false"
+                                                    outputlog="${sbs.log.file}" 
+                                                    cleanlog = "${sbs.clean.log}"
+                                                    whatlog = "${sbs.what.log}"
+                                                    erroroutput="${sbs.log.file}.sbs_error.log"
+                                                    statslog="${sbs.log.file}.info.xml">
+                                    <hlm:coverityoptions refid="coverity.build.options"/>
+                                </hlm:coveritybuild>
+                            </then>
+                            <elseif>
+                                <istrue value="${sbs.build.ctc}"/>
+                                <then>
+                                    <hlm:ctctask sbsinput="@{sbs.input}" 
+                                                    sysdefFile="${build.drive}/output/build/canonical_system_definition_${sysdef.configuration}.xml" 
+                                                    layerPatternSetRef="${sbs.patternset}" 
+                                                    errorOutput="${sbs.log.file}.sbs_error.log" 
+                                                    workingDir="${build.drive}/" 
+                                                    failOnError="false" 
+                                                    outputLog="${sbs.log.file}" 
+                                                    cleanLog = "${sbs.clean.log}"
+                                                    whatlog = "${sbs.what.log}"
+                                                    statsLog="${sbs.log.file}.info.xml" />                                
+                                </then>
+                            </elseif>
+                            <else>
+                                <hlm:sbstask sbsinput="@{sbs.input}" 
+                                                sysdefFile="${build.drive}/output/build/canonical_system_definition_${sysdef.configuration}.xml" 
+                                                layerPatternSetRef="${sbs.patternset}" 
+                                                errorOutput="${sbs.log.file}.sbs_error.log" 
+                                                workingDir="${build.drive}/" 
+                                                failOnError="false" 
+                                                outputLog="${sbs.log.file}" 
+                                                cleanLog = "${sbs.clean.log}"
+                                                whatlog = "${sbs.what.log}"
+                                                statsLog="${sbs.log.file}.info.xml" />
+                            </else>
+                        </if>
+                        <hlm:assertFileExists file="${sbs.log.file}"/>
+                        <hlm:assertFileExists file="${sbs.clean.log}"/>
+                        <hlm:assertFileExists file="${sbs.what.log}"/>
+                        <hlm:assertFileExists file="${sbs.log.file}.sbs_error.log"/>
+                        <hlm:assertFileExists file="${sbs.log.file}.info.xml"/>
                         <!-- run arm license checking / setting arm version only for arm config --> 
                         <echo message="sbs.log.file: ${sbs.log.file}" />
                         <hlm:sbsProcessOutputMacro sbs.log.file="${sbs.log.file}"
-                            sbs.clean.log.file="${sbs.clean.log}"  sbs.stats.file="${compile.log.dir}/${build.id}_${sysdef.configuration}.info.xml"
+                            sbs.clean.log.file="${sbs.clean.log}" sbs.what.log.file="${sbs.what.log}" 
+                            sbs.stats.file="${sbs.log.file}.info.xml"
                             sbs.ant.output.file="${sbs.log.file}" sbs.error.output.file="${sbs.log.file}.sbs_error.log"/>
                     </sequential>
                 </for>
-                <hlm:assertFileExists file="${sbs.log.file}.sbs_error.log"/>
-                <hlm:assertFileExists file="${compile.log.dir}/${build.id}_${sysdef.configuration}.info.xml"/>
-                <hlm:assertFileExists file="${sbs.log.file}"/>
-                <hlm:assertFileExists file="${sbs.clean.log}"/>
             </then>
         </if>
     </target>
-
+    
+    
     <macrodef name="sbsProcessOutputMacro" uri="http://www.nokia.com/helium">
         <attribute name="sbs.clean.log.file" />
+        <attribute name="sbs.what.log.file" />
         <attribute name="sbs.log.file" />
         <attribute name="sbs.stats.file" />
         <attribute name="sbs.error.output.file" />
         <attribute name="sbs.ant.output.file" />
         <sequential>
-            <var name="sbs.scan2.template" value="scan2.html.ftl" />
-            <basename property="base.sbs.log" file="@{sbs.log.file}" suffix=".log"/>
+            <var name="sbs.scan2.template" value="scan2_orm.html.ftl" />
+            <var name="base.sbs.log" value="" unset="true"/>
+            <basename property="base.sbs.log" file="@{sbs.log.file}" />
+            <echo message="base.sbs.log: ${base.sbs.log}" />
             <hlm:metadatarecord database="${metadata.dbfile}">
                 <hlm:textmetadatainput>
                     <fileset casesensitive="false" file="@{sbs.error.output.file}"/>
@@ -154,10 +215,11 @@ Description:
             <echo message="Metadata enabled, storing build status in database" />
             <echo message="sbs log file :@{sbs.log.file}" />
             <echo message="sbs.clean.log.file :@{sbs.clean.log.file}" />
+            <echo message="sbs.what.log.file :@{sbs.what.log.file}" />
             <trycatch property="hlm-sbs.parser.thrown">
                 <try>
-                    <hlm:metadatarecord database="${metadata.dbfile}">
-                        <hlm:sbsmetadatainput cleanLogFile="@{sbs.clean.log.file}">
+                    <hlm:metadatarecord  database="${metadata.dbfile}">
+                        <hlm:sbsmetadatainput whatLogFile="@{sbs.what.log.file}" cleanLogFile="@{sbs.clean.log.file}">
                             <fileset casesensitive="false" file="@{sbs.log.file}"/>
                             <metadatafilterset refid="filterset.sbs" />
                         </hlm:sbsmetadatainput>
@@ -167,13 +229,14 @@ Description:
                     <if>
                         <istrue value="${skip.sbs.parser.exception}" />
                         <then>
-                            <var name="sbs.scan2.template" value="scan2_text.html.ftl" />
-                            <hlm:metadatadelete database="${metadata-read-db}">
+                            <var name="sbs.scan2.template" value="scan2_text_orm.html.ftl" />
+                            <hlm:metadatadelete database="${metadata.dbfile}">
                                 <fileset casesensitive="false" file="@{sbs.log.file}"/>
                             </hlm:metadatadelete>
-                            <hlm:metadatarecord database="${metadata-read-db}" >
+                            <hlm:metadatarecord database="${metadata.dbfile}" >
                                 <hlm:textmetadatainput>
                                     <fileset casesensitive="false" file="@{sbs.log.file}"/>
+                                    <metadatafilterset refid="filterset.sbs" />
                                 </hlm:textmetadatainput>
                             </hlm:metadatarecord>
                         </then>
@@ -184,20 +247,20 @@ Description:
                 </catch>
             </trycatch>
             <fmpp sourceFile="${helium.dir}/tools/common/templates/log/${sbs.scan2.template}"
-                         outputfile="@{sbs.log.file}.scan2.html">
+                         outputfile="${build.log.dir}/${base.sbs.log}.scan2.html">
                 <freemarkerLinks expandProperties="yes">
                     macro: ${helium.dir}/tools/common/templates/macro
                 </freemarkerLinks>
                 <data expandProperties="yes">
                     dbPath: ${metadata.dbfile}
                     doc: xml(@{sbs.stats.file})
+                    whatLogPath: @{sbs.what.log.file}
                     ant: antProperties()
                 </data>
             </fmpp>
             <echo message="generating signal" />
-            <hlm:assertFileExists file="@{sbs.log.file}.scan2.html"/>
-            <hlm:calculateErrorsFromLog logfile="@{sbs.log.file}" />
-            <hlm:compileLogSignalMacro compile.summary.file="${base.sbs.log}" 
+            <hlm:assertFileExists file="${build.log.dir}/${base.sbs.log}.scan2.html"/>
+            <hlm:compileLogSignalMacro compile.summary.file="@{sbs.log.file}" 
                 error.limit="${build.errors.limit}" phase="compile"/>
             <!-- Blocks packaging configuration generation. -->
             <if>
@@ -219,4 +282,17 @@ Description:
             </if>
         </sequential>
     </macrodef>
+    
+    <scriptdef language="jython" name="getSbsHome" uri="http://www.nokia.com/helium">
+        <attribute name="property" />
+if attributes.get("property") is None:
+    raise Exception("property attribute has not been set.")
+if project.getProperty(attributes.get("property")) is None:
+    import symbian.raptor
+    sbs_home = symbian.raptor.getSBSHome()
+    if sbs_home is not None:
+        #self.log("Found SBS_HOME as " + sbs_home)
+        project.setNewProperty(attributes.get("property"), sbs_home)
+    </scriptdef>
+
 </project>
