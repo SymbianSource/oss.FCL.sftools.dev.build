@@ -479,7 +479,9 @@ include %s
 			# clock skew messages from some build engines scatter their
 			# output across our xml.
 			stderrfilename = makefile+'.stderr'
+			stdoutfilename = makefile+'.stdout'
 			command += " 2>'%s' " % stderrfilename
+			command += " >'%s' " % stdoutfilename
 
 			# Substitute the makefile name for any occurrence of #MAKEFILE#
 			command = command.replace("#MAKEFILE#", str(makefile))
@@ -517,22 +519,9 @@ include %s
 						universal_newlines=True, env=makeenv)
 				stream = p.stdout
 
-				inRecipe = False
 				line = " "
 				while line:
 					line = stream.readline()
-					
-					if line.startswith("<recipe"):
-						inRecipe = True
-					elif line.startswith("</recipe"):
-						inRecipe = False
-					
-					# unless we are inside a "recipe", any line not starting
-					# with "<" is free text that must be escaped.
-					if inRecipe or line.startswith("<"):
-						self.raptor.out.write(line)
-					else:
-						self.raptor.out.write(escape(line))
 
 				# should be done now
 				returncode = p.wait()
@@ -540,6 +529,30 @@ include %s
 				# Report end-time of the build
 				self.raptor.InfoEndTime(object_type = "makefile",
 						task = "build", key = str(makefile))
+
+				try:
+					e = open(stdoutfilename,"r")
+					inRecipe = False
+					for line in e:
+						if line.startswith("<recipe"):
+							inRecipe = True
+						elif line.startswith("</recipe"):
+							inRecipe = False
+						
+						# unless we are inside a "recipe", any line not starting
+						# with "<" is free text that must be escaped.
+						if inRecipe or line.startswith("<"):
+							self.raptor.out.write(line)
+						else:
+							self.raptor.out.write(escape(line))
+					e.close()
+				except Exception,e:
+					self.raptor.Error("Couldn't complete stdout output for %s - '%s'", command, str(e))
+
+				if returncode != 0  and not self.raptor.keepGoing:
+					self.Tidy()
+					return False
+
 
 				# Take all the stderr output that went into the .stderr file
 				# and put it back into the log, but safely so it can't mess up
