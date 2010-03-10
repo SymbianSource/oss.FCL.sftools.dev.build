@@ -2,6 +2,7 @@ Release Notes for Symbian Build System v2
 
 next version
 - SF Bug 2125 - [Raptor] - tracecompiler what output incorrect if mmp basename contains '.' e.g. fred.prd.mmp 
+- SF Bug 2191 - [Raptor] - When forcesuccess is enabled, exit status for a failed recipe is "retry" but should be "failed"
 
 version 2.12.4
 
