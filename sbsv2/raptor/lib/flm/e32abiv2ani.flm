@@ -25,7 +25,7 @@ POSTLINKTARGETTYPE:=ANI
 POSTLINKFILETYPE:=ani
 DOPOSTLINK:=1
 AUTOEXPORTS:=_Z15CreateCAnimDllLv,1;
-DEFFILE:=
+
 
 # Determine what kind of entrypoint option to set
 LINKER_ENTRYPOINT_LIBDEP:=$(STATIC_RUNTIME_DIR)/edll.lib
