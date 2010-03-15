@@ -586,7 +586,7 @@ int main(int argc, char *argv[])
 
 				if (p->returncode != 0)
 				{
-					char *exitstr = retries > 0 ? "retry" : "failed";
+					char *exitstr = force_success ? "failed" : retries > 0 ? "retry" : "failed";
 					snprintf(status, STATUS_STRMAX - 1, "\n<status exit='%s' code='%d' attempt='%d'%s%s />", exitstr, p->returncode, attempt, flagsstr, reasonstr );
 				} else {
 					snprintf(status, STATUS_STRMAX - 1, "\n<status exit='ok' attempt='%d'%s%s />", attempt, flagsstr, reasonstr );
