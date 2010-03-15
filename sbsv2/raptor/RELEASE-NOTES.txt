@@ -3,11 +3,12 @@ Release Notes for Symbian Build System v2
 next version
 
 New Features:
-- Add support for FEATUREVARIANTSAFE in BV builds.
+- Add support for FEATUREVARIANTSAFE in BV builds
 - Add support for Cygwin 1.7.
 - New support for cross-compiling win32 tools on Linux.  
   To enable it, use "sbs -c tools2.win32 -c tools2" on Linux
 - New prototype support for reading System Definition v3 files
+- Add support for MMP keyword EPOCNESTEDEXCEPTIONS
 
 
 version 2.12.4

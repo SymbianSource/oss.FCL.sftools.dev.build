@@ -20,6 +20,7 @@ ifeq ($(TARGETTYPE),none)
 include $(FLMHOME)/e32abiv2defaults.mk
 POSTLINKTARGETTYPE:=NONE
 POSTLINKFILETYPE:=none
+STATIC_RUNTIME_LIB:=
 
 
 # We are appending to CDEFS but we don't want this to affect

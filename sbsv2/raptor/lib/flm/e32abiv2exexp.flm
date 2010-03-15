@@ -30,7 +30,6 @@ CANIGNORENONCALLABLE:=1
 $(call vsave,CDEFS)
 # Determine what kind of entrypoint option to set
 FIRSTLIB_OBJECTFILE=uc_exe_.o
-STATIC_RUNTIME_LIB:=$(USER_STATIC_RUNTIME_LIB)
 
 ifeq ($(FIRSTLIB),)
 FIRSTLIB:=eexe.lib

@@ -9,7 +9,6 @@
   <var name="ARMV5_BASE">
     <env name='SBS_HOME' default='' type='path'/>
     <env name='EPOCROOT'/>
-    <env name='ARMROOT'/>
 
     <set name='FLMHOME' value='$(SBS_HOME)/lib/flm'/>
     <set name='TRADITIONAL_PLATFORM' value='ARMV5'/>

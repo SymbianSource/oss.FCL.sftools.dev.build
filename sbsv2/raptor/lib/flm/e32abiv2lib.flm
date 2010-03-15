@@ -25,6 +25,8 @@ endif
 
 POSTLINKFILETYPE:=lib
 MULTIFILE_ENABLED:=
+STATIC_RUNTIME_LIB:=
+
 include $(FLMHOME)/e32abiv2.flm
 
 else

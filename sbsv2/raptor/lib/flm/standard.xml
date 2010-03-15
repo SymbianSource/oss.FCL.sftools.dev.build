@@ -60,6 +60,7 @@
 		<param name='EPOCSTACKSIZE' default=''/>
 		<param name='EPOCFIXEDPROCESS' default=''/>
 		<param name='EPOCALLOWDLLDATA' default=''/>
+		<param name='EPOCNESTEDEXCEPTIONS' default=''/>
 		<param name='PLATMACROS.WINDOWS' default=''/>
 		<param name='PLATMACROS.LINUX' default=''/>
 		<param name='STDCPP' default=''/>
@@ -172,6 +173,7 @@
 		<param name='SPLIT_OPTION'/>
 		<param name='KERNEL_STATIC_RUNTIME_LIB'/>
 		<param name='USER_STATIC_RUNTIME_LIB'/>
+		<param name='USER_STATIC_RUNTIME_LIB_NESTED_EXCEPTIONS'/>
 		<param name='STATIC_LIBS_LIST'/>
 		<param name='STATIC_LIBS_PATH'/>
 		<param name='STATIC_LIBRARY_DIR'/>
