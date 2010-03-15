@@ -42,7 +42,6 @@ import filter_list
 import sys
 import types
 import time
-import re
 import traceback
 import pluginbox
 from xml.sax.saxutils import escape
@@ -232,8 +231,9 @@ class Project(ModelNode):
 
 	def makefile(self, makefilename_base, engine, named = False):
 		"""Makefiles for individual mmps not feasible at the moment"""
-		pass # Cannot, currently, "unfurl an mmp" directly but do want
-		     # to be able to simulate the overall recursive unfurling of a build.
+		pass 
+		# Cannot, currently, "unfurl an mmp" directly but do want
+		# to be able to simulate the overall recursive unfurling of a build.
 
 class Component(ModelNode):
 	"""A group of projects or, in symbian-speak, a bld.inf.
@@ -321,7 +321,6 @@ class Layer(ModelNode):
 
 		# insert the start time into the Makefile name?
 
-		buildconfig = build.GetConfig("build").GenerateBuildUnits(build.cache)
 		self.configs = build.buildUnitsToBuild
 
 		# Pass certain CLI flags through to the makefile-generating sbs calls
@@ -385,8 +384,7 @@ class Layer(ModelNode):
 			makefile_path = str(build.topMakefile) + "_" + str(loop_number)
 			try:
 				os.unlink(makefile_path) # until we have dependencies working properly
-			except Exception,e:
-				# print "couldn't unlink %s: %s" %(componentMakefileName, str(e))
+			except Exception:
 				pass
 
 			# add some basic data in a component-wide variant
@@ -859,32 +857,6 @@ class Raptor(object):
 
 		self.cache.Load(self.systemFLM)
 
-	def GetConfig(self, configname):
-		names = configname.split(".")
-
-		cache = self.cache
-
-		base = names[0]
-		mods = names[1:]
-
-		if base in cache.groups:
-			x = cache.FindNamedGroup(base)
-		elif base in cache.aliases:
-			x = cache.FindNamedAlias(base)
-		elif base in cache.variants:
-			x = cache.FindNamedVariant(base)
-		else:
-			raise Exception("Unknown build configuration '%s'" % configname)
-
-		x.ClearModifiers()
-
-
-		try:
-			for m in mods: x.AddModifier( cache.FindNamedVariant(m) )
-		except KeyError:
-			raise Exception("Unknown build configuration '%s'" % configname)
-		return x
-
 	def GetBuildUnitsToBuild(self, configNames):
 		"""Return a list of the configuration objects that correspond to the
 		   list of configuration names in the configNames parameter.
@@ -900,16 +872,7 @@ class Raptor(object):
 			else:
 				configNames.append(self.defaultConfig)
 
-		buildUnitsToBuild = set()
-
-		for c in set(configNames):
-			self.Debug("BuildUnit: %s", c)
-			try:
-				x = self.GetConfig(c)
-				gb = x.GenerateBuildUnits(self.cache)
-				buildUnitsToBuild.update( gb )
-			except Exception, e:
-				self.Error(str(e))
+		buildUnitsToBuild = raptor_data.GetBuildUnits(configNames, self.cache, self)
 
 		for b in buildUnitsToBuild:
 			self.Info("Buildable configuration '%s'", b.name)
@@ -1002,7 +965,6 @@ class Raptor(object):
 			dir = generic_path.Path(aDir)
 
 		bldInf = dir.Append(self.buildInformation)
-		componentgroup = []
 
 		if bldInf.isFile():
 			return bldInf
@@ -1149,7 +1111,7 @@ class Raptor(object):
 				self.out.write(raptor_timing.Timing.discovery_string(object_type = object_type,
 						count = count))
 			except Exception, exception:
-				Error(exception.Text, function = "InfoDiscoveryTime")
+				self.Error(exception.Text, function = "InfoDiscoveryTime")
 
 	def InfoStartTime(self, object_type, task, key):
 		if self.timing:
@@ -1157,7 +1119,7 @@ class Raptor(object):
 				self.out.write(raptor_timing.Timing.start_string(object_type = object_type,
 						task = task, key = key))
 			except Exception, exception:
-				Error(exception.Text, function = "InfoStartTime")
+				self.Error(exception.Text, function = "InfoStartTime")
 
 	def InfoEndTime(self, object_type, task, key):
 		if self.timing:
@@ -1165,7 +1127,7 @@ class Raptor(object):
 				self.out.write(raptor_timing.Timing.end_string(object_type = object_type,
 						task = task, key = key))
 			except Exception, exception:
-				Error(exception.Text, function = "InfoEndTime")
+				self.Error(exception.Text, function = "InfoEndTime")
 
 	def Debug(self, format, *extras, **attributes):
 		"Send a debugging message to the configured channel"
@@ -1279,6 +1241,9 @@ class Raptor(object):
 			self.AssertBuildOK()
 			buildUnitsToBuild = self.GetBuildUnitsToBuild(self.configNames)
 
+			if len(buildUnitsToBuild) == 0:
+				raise BuildCannotProgressException("No configurations to build.")
+			
 			self.buildUnitsToBuild = buildUnitsToBuild
 
 			# find out what components to build, and in what way

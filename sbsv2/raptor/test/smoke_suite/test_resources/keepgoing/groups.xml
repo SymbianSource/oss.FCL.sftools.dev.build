@@ -13,4 +13,10 @@
 	<groupRef ref='armv5' mod="zxcvbnm_p"/>
   </group>
   
+  <!-- This group just contains the one above to check multiple levels
+  -->
+  <group name="lots_of_products_2">
+    <groupRef ref="lots_of_products"/>
+  </group>
+  
 </build>

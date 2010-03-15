@@ -69,7 +69,7 @@ def run():
 	t.command = command + " -c armv5 -c armv5.bogus"
 	t.targets = targets
 	t.addbuildtargets("smoke_suite/test_resources/simple/bld.inf", buildtargets)
-	t.mustmatch = ["sbs: error: Unknown build configuration 'armv5.bogus'"]
+	t.mustmatch = ["sbs: error: Unknown build variant 'bogus'"]
 	t.warnings = 0
 	t.errors = 1
 	t.returncode = 1
@@ -79,9 +79,23 @@ def run():
 	t.id = "115b"
 	t.name = "keepgoing_bad_subgroup"
 	t.command = command + config + " -c lots_of_products"
-	t.mustmatch = ["sbs: error: Unknown build configuration 'armv5.bogus'"]
+	t.mustmatch = ["Unknown reference 'qwertyuio'",
+	               "Unknown reference 'asdfghjkl'",
+	               "Unknown reference 'zxcvbnm_p'"]
 	t.warnings = 0
-	t.errors = 1
+	t.errors = 3
+	t.returncode = 1
+	t.run()
+	
+	# using groups with bad sub-sub-groups should build any independent groups
+	t.id = "115c"
+	t.name = "keepgoing_bad_subsubgroup"
+	t.command = command + config + " -c lots_of_products_2"
+	t.mustmatch = ["Unknown reference 'qwertyuio'",
+	               "Unknown reference 'asdfghjkl'",
+	               "Unknown reference 'zxcvbnm_p'"]
+	t.warnings = 0
+	t.errors = 3
 	t.returncode = 1
 	t.run()
 	
