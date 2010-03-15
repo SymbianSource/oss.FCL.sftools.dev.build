@@ -36,6 +36,52 @@ from xml.sax.saxutils import escape
 class BadMakeEngineException(Exception):
 	pass
 
+def XMLEscapeLog(stream):
+	inRecipe = False
+
+	for line in stream:
+		if line.startswith("<recipe"):
+			inRecipe = True
+		elif line.startswith("</recipe"):
+			inRecipe = False
+			
+		# unless we are inside a "recipe", any line not starting
+		# with "<" is free text that must be escaped.
+		if inRecipe or line.startswith("<"):
+			yield line
+		else:
+			yield escape(line)
+
+def AnnoFileParseOutput(annofile):
+	af = open(annofile, "r")
+
+	inOutput = False
+	inParseJob = False
+	for line in af:
+		line = line.rstrip("\n\r")
+
+		if not inOutput:
+			if line.startswith("<output>"):
+				inOutput = True	
+				yield unescape(line[8:])+'\n'
+				# This is make output so don't unescape it.
+			elif line.startswith('<output src="prog">'):
+				line = line[19:]
+				inOutput = True	
+				yield unescape(line)+'\n'
+		else:
+			end_output = line.find("</output>")
+		
+			if end_output != -1:
+				line = line[:end_output]
+				inOutput = False
+			
+			yield unescape(line)+'\n'
+
+	af.close()
+
+
+
 # raptor_make module classes
 
 class MakeEngine(object):
@@ -81,6 +127,24 @@ class MakeEngine(object):
 			self.keepGoingOption = evaluator.Get("keep_going")
 			self.jobsOption = evaluator.Get("jobs")
 			self.defaultMakeOptions = evaluator.Get("defaultoptions")
+
+			# Logging
+			#  copylogfromannofile means, for emake, that we should ignore 
+			# emake's console output and instead extract output from its annotation
+			# file.  This is a workaround for a problem where some emake
+			# console output is lost.  The annotation file has a copy of this
+			# output in the "parse" job and it turns out to be uncorrupted.
+			self.copyLogFromAnnoFile = (evaluator.Get("copylogfromannofile") == "true")
+			self.annoFileName = None
+
+			if self.copyLogFromAnnoFile:
+				for o in self.raptor.makeOptions:
+					if o.startswith("--mo=--emake-annofile="):
+						self.annoFileName = o[22:]
+
+				if not self.annoFileName:
+					self.raptor.Info("Cannot copy log from annotation file as no annotation filename was specified via the option --mo=--emake-annofile=<filename>")
+					self.copyLogFromAnnoFile = False
 
 			# buffering
 			self.scrambled = (evaluator.Get("scrambled") == "true")
@@ -481,7 +545,13 @@ include %s
 			stderrfilename = makefile+'.stderr'
 			stdoutfilename = makefile+'.stdout'
 			command += " 2>'%s' " % stderrfilename
-			command += " >'%s' " % stdoutfilename
+
+			# Keep a copy of the stdout too in the case of using the 
+			# annofile - so that we can trap the problem that
+			# makes the copy-log-from-annofile workaround necessary
+			# and perhaps determine when we can remove it.
+			if self.copyLogFromAnnoFile:
+				command += " >'%s' " % stdoutfilename
 
 			# Substitute the makefile name for any occurrence of #MAKEFILE#
 			command = command.replace("#MAKEFILE#", str(makefile))
@@ -519,39 +589,22 @@ include %s
 						universal_newlines=True, env=makeenv)
 				stream = p.stdout
 
-				line = " "
-				while line:
-					line = stream.readline()
+				inRecipe = False
 
-				# should be done now
-				returncode = p.wait()
+				if not self.copyLogFromAnnoFile:
+					for l in XMLEscapeLog(stream):
+						self.raptor.out.write(l)
 
-				# Report end-time of the build
-				self.raptor.InfoEndTime(object_type = "makefile",
-						task = "build", key = str(makefile))
+					returncode = p.wait()
+				else:
+					returncode = p.wait()
 
-				try:
-					e = open(stdoutfilename,"r")
-					inRecipe = False
-					for line in e:
-						if line.startswith("<recipe"):
-							inRecipe = True
-						elif line.startswith("</recipe"):
-							inRecipe = False
-						
-						# unless we are inside a "recipe", any line not starting
-						# with "<" is free text that must be escaped.
-						if inRecipe or line.startswith("<"):
-							self.raptor.out.write(line)
-						else:
-							self.raptor.out.write(escape(line))
-					e.close()
-				except Exception,e:
-					self.raptor.Error("Couldn't complete stdout output for %s - '%s'", command, str(e))
-
-				if returncode != 0  and not self.raptor.keepGoing:
-					self.Tidy()
-					return False
+					annofilename = self.annoFileName.replace("#MAKEFILE#",makefile)
+					try:
+						for l in XMLEscapeLog(AnnoFileParseOutput(annofilename)):
+							self.raptor.out.write(l)
+					except Exception,e:
+						self.raptor.Error("Couldn't complete stdout output from annofile %s for %s - '%s'", annofile, command, str(e))
 
 
 				# Take all the stderr output that went into the .stderr file
@@ -564,6 +617,9 @@ include %s
 					e.close()
 				except Exception,e:
 					self.raptor.Error("Couldn't complete stderr output for %s - '%s'", command, str(e))
+				# Report end-time of the build
+				self.raptor.InfoEndTime(object_type = "makefile",
+						task = "build", key = str(makefile))
 
 				if returncode != 0  and not self.raptor.keepGoing:
 					self.Tidy()
@@ -679,6 +735,8 @@ include %s
 				self.raptor.Error("Failed in %s", command)
 				return False
 		return True
+
+
 
 # raptor_make module functions
 
