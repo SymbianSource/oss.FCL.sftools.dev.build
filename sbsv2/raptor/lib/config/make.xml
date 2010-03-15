@@ -47,6 +47,9 @@
 
 		<!-- is the text output with -j buffered or scrambled? -->
 		<set name="scrambled" value="true"/>
+
+		<!-- workaround for damaged log output from emake -->
+		<set name="copylogfromannofile" value="false"/>
 	</var>
 	
 	<alias name="make" meaning="make_engine"/>
@@ -67,6 +70,9 @@
 		<set name="build" value="$(EMAKE) HAVE_ORDERONLY= -r"/>
 		<set name="scrambled" value="false"/>
 		<set name='TALON_DESCRAMBLE' value=''/>
+
+		<!-- workaround for damaged log output from emake -->
+		<set name="copylogfromannofile" value="true"/>
 	</var>
 
 	<alias name="emake" meaning="emake_engine"/>

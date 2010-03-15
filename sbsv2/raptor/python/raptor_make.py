@@ -31,6 +31,7 @@ from raptor_makefile import *
 import traceback
 import sys
 from xml.sax.saxutils import escape
+from xml.sax.saxutils import unescape
 
 
 class BadMakeEngineException(Exception):
@@ -139,8 +140,9 @@ class MakeEngine(object):
 
 			if self.copyLogFromAnnoFile:
 				for o in self.raptor.makeOptions:
-					if o.startswith("--mo=--emake-annofile="):
-						self.annoFileName = o[22:]
+					if o.startswith("--emake-annofile="):
+						self.annoFileName = o[17:]
+						self.raptor.Info("annofile: " + o)
 
 				if not self.annoFileName:
 					self.raptor.Info("Cannot copy log from annotation file as no annotation filename was specified via the option --mo=--emake-annofile=<filename>")
@@ -599,12 +601,13 @@ include %s
 				else:
 					returncode = p.wait()
 
-					annofilename = self.annoFileName.replace("#MAKEFILE#",makefile)
+					annofilename = self.annoFileName.replace("#MAKEFILE#", makefile)
+					self.raptor.Info("copylogfromannofile: Copying log from annotation file %s to work around a potential problem with the console output", annofilename)
 					try:
 						for l in XMLEscapeLog(AnnoFileParseOutput(annofilename)):
 							self.raptor.out.write(l)
 					except Exception,e:
-						self.raptor.Error("Couldn't complete stdout output from annofile %s for %s - '%s'", annofile, command, str(e))
+						self.raptor.Error("Couldn't complete stdout output from annofile %s for %s - '%s'", annofilename, command, str(e))
 
 
 				# Take all the stderr output that went into the .stderr file
@@ -629,7 +632,7 @@ include %s
 				self.raptor.Error("Exception '%s' during '%s'", str(e), command)
 				self.Tidy()
 				# Still report end-time of the build
-				self.raptor.InfoEnd(object_type = "Building", task = "Makefile",
+				self.raptor.InfoEndTime(object_type = "Building", task = "Makefile",
 						key = str(makefile))
 				return False
 
