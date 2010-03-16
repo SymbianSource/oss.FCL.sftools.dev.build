@@ -143,6 +143,7 @@ class MMPParser(object):
 			CaselessKeyword('EPOCALLOWDLLDATA') ^ \
 			CaselessKeyword('EPOCCALLDLLENTRYPOINTS') ^ \
 			CaselessKeyword('EPOCFIXEDPROCESS') ^ \
+			CaselessKeyword('EPOCNESTEDEXCEPTIONS') ^ \
 			CaselessKeyword('EXPORTUNFROZEN') ^ \
 			CaselessKeyword('FEATUREVARIANT') ^ \
 			CaselessKeyword('BYTEPAIRCOMPRESSTARGET') ^ \

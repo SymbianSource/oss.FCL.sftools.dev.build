@@ -1,0 +1,11 @@
+TARGET			test_mmp_epocnestedexceptions.exe
+TARGETTYPE		EXE
+
+LIBRARY			euser.lib
+
+SYSTEMINCLUDE   /epoc32/include
+
+SOURCE			test.cpp
+
+EPOCNESTEDEXCEPTIONS
+

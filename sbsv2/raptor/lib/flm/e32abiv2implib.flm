@@ -32,7 +32,6 @@ SUPPORT_FREEZE:=1
 REQUESTEDTARGETEXT:=dll
 # if there is a LINKAS variable then this won't matter
 
-STATIC_RUNTIME_LIB:=
 
 # We are appending to CDEFS but we don't want this to affect
 # other invocations so we are going to save it on a stack
