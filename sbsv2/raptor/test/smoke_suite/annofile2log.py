@@ -30,9 +30,9 @@ def run():
 	
 	t.mustmatch_multiline = [ 
 		".*1a2.*" + 
-		"Starting build: 488235.*" +
-		"14009c12884.*" +
-		"---.*" +
+		"Starting build: 488235.{1,3}" +
+		"14009c12884.{1,4}" +
+		"---.{1,4}" +
 		"Finished build: 488235   Duration: 1:15 \(m:s\)   Cluster availability: 100%.*"
                 ]
 
