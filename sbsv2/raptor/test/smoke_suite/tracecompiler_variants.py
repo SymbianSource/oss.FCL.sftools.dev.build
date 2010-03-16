@@ -1,11 +1,23 @@
+#
+# Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+#
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+#
+# Contributors:
+#
+# Description: 
+#
 
 from raptor_tests import SmokeTest
 from raptor_tests import AntiTargetSmokeTest
 
 def run():
-	result = SmokeTest.PASS
-	failed = []
-
 	# 102a - 102b Test running trace compiler on one mmp with different source files controlled macros. 
 	t = AntiTargetSmokeTest()
 	t.description = "Testcases (ID 102a - 102c) test trace compiler running with variants and macros"
@@ -70,10 +82,7 @@ def run():
 		"variant_source_/winscw/udeb/var_source3.o",
 		"variant_source_/winscw/urel/var_source3.o"
 	])
-	t.run("windows")
-	if t.result == SmokeTest.FAIL:
-		result = SmokeTest.FAIL
-		failed.append(t.name)
+	t.run()
 
 	# 2nd time build includes var_source1 and var_source3 for variant_source.mmp
 	t = SmokeTest()
@@ -127,11 +136,7 @@ def run():
 		"variant_source_/winscw/urel/var_source3.o.d",
 		"variant_source_/tracecompile_variant_source_10000003.done"
 	])
-	t.run("windows")
-	if t.result == SmokeTest.FAIL:
-		result = SmokeTest.FAIL
-		failed.append(t.name)
-
+	t.run()
 
 	# Build multiple variants together, which involves different source files in one mmp
 	# Raptor only call trace compiler once no matter how many variants
@@ -171,11 +176,7 @@ def run():
 		"tc_variants_/armv5.phone3/urel/tc_c.o",
 		"tc_variants_/tracecompile_tc_variants_10000004.done"
 	])	
-	t.run("windows")
-	if t.result == SmokeTest.FAIL:
-		result = SmokeTest.FAIL
-		failed.append(t.name)
-
+	t.run()
 
 	# 102d and 102e is to test a very rare situation, where one mmpfile includes 3 children mmpfiles, 
 	# which are guarded by macros. They share some source file, and two share the same UID3. 
@@ -225,10 +226,7 @@ def run():
 		"child3_/tracecompile_child3_exe_11100002.done"
 	])
 	t.warnings = 3
-	t.run("windows")
-	if t.result == SmokeTest.FAIL:
-		result = SmokeTest.FAIL
-		failed.append(t.name)
+	t.run()
 
 	# Clean mmp A then build mmp B and C. As common.cpp is shared by A B and C, commonTraces.h would be 
 	# cleaned when cleaning mmp A. But as B and C aren't cleaned, Raptor wouldn't run trace compiler on
@@ -271,22 +269,12 @@ def run():
 		"child3_/tracecompile_child3_exe_11100002.done"
 	])
 	t.warnings = 3
-	t.run("windows")
-	if t.result == SmokeTest.FAIL:
-		result = SmokeTest.FAIL
-		failed.append(t.name)
+	t.run()
 
-
-	t.name = "tracecompiler_variants"
-	t.result = result
-
-	print "\nOverall Result : " + result.upper() + "\n"
-	if result == SmokeTest.FAIL:
-		print len(failed), "tests failed:"
-		for x in failed:
-			print x
-		print	
 
 	t.id = "102"
+	t.name = "tracecompiler_variants"
+	t.print_result()
+	
 	return t
 

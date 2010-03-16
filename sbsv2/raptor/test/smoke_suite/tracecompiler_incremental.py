@@ -23,7 +23,7 @@ def run():
 	t.name = "tracecompiler_incremental_clean"
 	t.usebash = True
 	t.command = "sbs -b smoke_suite/test_resources/tracecompiler/testTC/group/bld.inf -c armv5_urel.tracecompiler CLEAN"
-	t.run("windows")
+	t.run()
 
 	t.id = "114b"
 	t.name = "tracecompiler_incremental_prebuild"
@@ -32,8 +32,6 @@ def run():
 	t.targets = [
 		"$(EPOCROOT)/epoc32/release/armv5/lib/testTC.dso",
 		"$(EPOCROOT)/epoc32/release/armv5/lib/testTC{000a0000}.dso",
-		"$(EPOCROOT)/epoc32/release/armv5/lib/testTC{000a0000}.lib",
-		"$(EPOCROOT)/epoc32/release/armv5/lib/testTC.lib",
 		"$(EPOCROOT)/epoc32/release/armv5/urel/testTC.dll",
 		"$(EPOCROOT)/epoc32/release/armv5/urel/testTC.dll.map",
 		"$(SBS_HOME)/test/smoke_suite/test_resources/tracecompiler/testTC/traces/wlanhwinitTraces.h",
@@ -43,14 +41,14 @@ def run():
 		"$(EPOCROOT)/epoc32/ost_dictionaries/testTC_0x1000008d_Dictionary.xml",
 		"$(EPOCROOT)/epoc32/include/internal/symbiantraces/autogen/testTC_0x1000008d_TraceDefinitions.h"
 		]
-	t.run("windows")
+	t.run()
 
 	t.id = "114c"
 	t.name = "tracecompiler_incremental_rebuild"
 	t.command = "touch smoke_suite/test_resources/tracecompiler/testTC/src/wlanhwinit.cpp && sbs -b smoke_suite/test_resources/tracecompiler/testTC/group/bld.inf -c armv5_urel.tracecompiler -f - -m ${SBSMAKEFILE}"
 	t.countmatch = [ ["name='compile'",1] ]
 	t.targets = []
-	t.run("windows")
+	t.run()
 
 	t.id = "114"
 	t.name = "tracecompiler_incremental"
