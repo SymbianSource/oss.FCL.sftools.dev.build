@@ -4,6 +4,8 @@ next version
 - SF Bug 2125 - [Raptor] - tracecompiler what output incorrect if mmp basename contains '.' e.g. fred.prd.mmp 
 - Fix: extend tracecompiler tests to Linux
 - Fix: Amendment to SF Bug 1511 fix - removal of blanked DEFFILE keyword from e32abiv2ani.flm
+- Fix: improve robustness to bad -c options
+
 
 version 2.12.4
 
