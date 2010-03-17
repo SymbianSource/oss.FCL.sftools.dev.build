@@ -32,7 +32,6 @@
 		<set name='OPT.NOLOGO' value='-nologo'/>
 		<set name='OPT.OBJECTFILE' value='-Fo'/>
 		<set name='OPT.OUTFILE' value='-out:'/>
-		<set name='OPT.PDBFILE' value='-Fd'/>
 		<set name='OPT.PREINCLUDE' value='-FI '/>
 		<set name='OPT.SUBSYSTEM' value='-subsystem:'/>
 		<set name='OPT.SYSINCLUDE' value='-I '/>
@@ -44,7 +43,7 @@
 		<set name='CDEFS.REL' value='NDEBUG'/>
 		<set name='CFLAGS' value='$(OPT.COMPILE) $(OPT.NOLOGO) -Zp4 -GF'/>
 		<set name='CFLAGS.DEFAULT.WARNLEVEL' value='-W4'/>
-		<set name='CFLAGS.DEB' value='-Zi -Od'/>
+		<set name='CFLAGS.DEB' value='-Od'/>
 		<set name='CFLAGS.REL' value='-O1 -Op'/>
 		<set name='SHAREDFLAGS' value='kernel32.lib $(OPT.NOLOGO) -machine:IX86  -ignore:4089 -ignore:4005 -ignore:4098'/>
 		<set name='LD' value='$(MS_LINK)'/>
