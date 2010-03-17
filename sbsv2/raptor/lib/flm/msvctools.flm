@@ -58,9 +58,6 @@ INCLUDES:=$(PINCLUDE) $(UINCLUDE) $(SINCLUDE)
 # macros
 DEFINES:=$(call makemacrodef,$(OPT.DEFINE),$(CDEFS) $(BASE_MACRO) $(CFLAGS.ADD))
 
-# other
-CLEANTARGETS:=$(CLEANTARGETS)
-
 #compile
 define msvctoolscompile
   $(BUILDPATH)/$(basename $(notdir $(1))).obj: $(1) $(PROJECT_META) $(if $(HAVE_ORDERONLY),|,)  EXPORT
