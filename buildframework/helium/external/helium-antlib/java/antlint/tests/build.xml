@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : build.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="helium-antlint" xmlns:au="antlib:org.apache.ant.antunit">
+    <description>Helium Antlib Antlint tests.</description>
+    
+    <dirname property="antlint.test.dir" file="${ant.file.helium-antlib-antlint-unittest}"/>
+    <import file="${antlint.test.dir}/data/sample.ant.xml" />
+    <import file="${builder.dir}/java/test-macros.ant.xml"/>
+    
+    
+    <property name="data.model.parsed" location="${antlint.test.dir}/data/datamodel.out"/>
+
+    <target name="antlint">
+        <antlint>
+            <fileset id="antlint.files" dir="${antlint.test.dir}/data">
+                <include name="*.xml"/>
+                <include name="*.ant.xml"/>
+                <include name="*build.xml"/>
+                <include name="*.antlib.xml"/>
+            </fileset>
+            <checker name="CheckTabCharacter" severity="error" />
+            <checker name="CheckPropertyName" severity="warning">([a-z0-9[\\d\\_\\.\\@\\{\\}\\$]]*)</checker>
+            <checker name="CheckTargetName" severity="warning">([a-z0-9[\\d\\-]]*)</checker>
+            <checker name="CheckIndentation" severity="error"/>
+            <checker name="CheckPresetDefMacroDefName" severity="warning">([a-z0-9][a-zA-Z0-9]*)</checker>       
+            <checker name="CheckProjectName" severity="warning">([a-z0-9[\\d\\.\\_\\-]]*)</checker>
+            <checker name="CheckDescription" severity="warning"/>
+            <checker name="CheckFileName" severity="warning" >^build.xml$|ant.xml$|antlib.xml$</checker>
+            <checker name="CheckRunTarget" severity="warning"/>
+            <checker name="CheckAntCall" severity="warning"/>
+            <checker name="CheckScriptSize" severity="warning"/>
+            <checker name="CheckUseOfIfInTargets" severity="warning"/>
+            <checker name="CheckJepJythonScript" severity="error" />
+            <checker name="CheckPropertiesInDataModel" severity="warning"/>
+            <checker name="CheckScriptCondition" severity="warning"/>
+            <checker name="CheckPythonTasks" severity="warning"/>
+            <checker name="CheckUseOfEqualsTask" severity="warning"/>
+            <checker name="CheckScriptDefNameAttributes" severity="error"/>
+            <checker name="CheckScriptDefStyle" severity="warning"/>
+            <checker name="CheckScriptDef" severity="error"/>
+            <checker name="CheckDuplicateNames" severity="warning"/>
+        </antlint>
+    </target>
+</project>

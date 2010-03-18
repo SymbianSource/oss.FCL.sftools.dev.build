@@ -50,21 +50,22 @@ Description:
     </font>
     <p/>
     
-    <font size="+1" class="frameheadingfont">Projects</font>
+    <p>
+    <font class="frameheadingfont"><b>Packages</b></font>
+    <br/>
+    <#assign packagelist=doc.antDatabase.package.name?sort>
+    <#list packagelist as package>
+        <font class="frameitemfont"><a href="package-frame-${package}.html" target="packageframe">${package}</a></font>
+        <br/>
+    </#list>
+    </p>
+    
+    <font class="frameheadingfont"><b>Projects</b></font>
     <br/>
     <#assign projectlist=doc.antDatabase.project.name?sort>
     <#list projectlist as project>
-    <font class="frameitemfont"><a href="project-frame-${project}.html" target="packageframe">${project}</a></font>
-    <br/>
-    </#list>
-    
-    <p/>
-    <font size="+1" class="frameheadingfont">Property groups</font>
-    <br/>
-    <#assign grouplist=data.heliumDataModel.group.name?sort>
-    <#list grouplist as group>
-    <font class="frameitemfont"><a href="propertygroups-frame-${group}.html" target="packageframe">${group}</a></font>
-    <br/>
+        <font class="frameitemfont"><a href="project-frame-${project}.html" target="packageframe">${project}</a></font>
+        <br/>
     </#list>
     
     
@@ -76,3 +77,5 @@ Description:
     &#160;
 </body>
 </html>
+
+

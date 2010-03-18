@@ -20,6 +20,7 @@ Description:
 
 ============================================================================
 -->
+<!--* @package preparation -->
 <project name="ci" xmlns:hlm="http://www.nokia.com/helium">
     <description>
     CI related targets
@@ -28,7 +29,7 @@ Description:
     <!-- Delete all the folders based on configurations file inside dir-path, optional attribute pool-size's default value is 4 -->
     <target name="delete-folders-from-list" if = "ci.cleanup.env.dir">
         <exec osfamily="windows" executable="python" failonerror="true" outputproperty="delete.folders.drive">
-            <arg value="${helium.dir}/tools/common/python/scripts/searchnextdrive.py"/>               
+            <arg line="-m searchnextdrive"/>               
         </exec>
         <hlm:deleteFoldersFromDirMacro dir-path="${ci.cleanup.env.dir}" delete-folders-drive="${delete.folders.drive}"/>
     </target>
@@ -43,7 +44,8 @@ import fileutils
 import threadpool
 import subprocess
 import sys
-
+from java.io import IOException
+        
 dir_path = str(attributes.get('dir-path'))
 del_folder_drive = attributes.get('delete-folders-drive')
 pool_size = attributes.get('pool-size')
@@ -70,21 +72,12 @@ for path_ in os.listdir(dir_path):
 # Delete all dirs based on config
 for dir_ in delete_dirs:
     try:
-        if os.sep == '\\':
-            fileutils.subst(del_folder_drive, dir_)
-            self.log(str("substed for deleling folders"))
-            self.log(str("Removing %s\\" % del_folder_drive))
-            fileutils.rmtree("%s\\" % del_folder_drive)
-            fileutils.unsubst(del_folder_drive)
-            self.log(str("unsbusted substed for deleling folders"))
-        else:
-            self.log(str("Removing %s" % dir_))
-            fileutils.rmtree(dir_)
-    except Exception, e:
-        if os.sep == '\\':
-            fileutils.unsubst(del_folder_drive)
-            self.log(str("unsbusted for deleling folders"))
-        self.log(str("ERROR: %s" % e))
+        self.log(str("Removing %s" % dir_))
+        fileutils.rmtree(dir_)
+    except Exception, exc:
+        self.log(str("ERROR: %s" % exc))
+    except IOException, ioExc:
+        self.log(str("ERROR: %s" % ioExc))
 
 # Delete all config files
 for path_ in found_inputs:
@@ -133,14 +126,11 @@ file_.close()
     <!-- This target flags the Build areas for deletion. So the cleanup build robot could remove them. -->
     <target name="flag-ba-for-deletion" if = "ci.cleanup.env.dir">
         <mkdir dir="${ci.cleanup.env.dir}"/>
-        <if>
+        <condition property="ci.min.ba.maintain" value="2">
             <not>
                 <isset property="ci.min.ba.maintain"/>
             </not>
-            <then>
-                <property name="ci.min.ba.maintain" value="2"/>
-            </then>
-        </if>
+        </condition>
         <hlm:BADeleteMacro outputdir="${ci.cleanup.env.dir}" rootdir="${prep.root.dir}" no.ba.remain="${ci.min.ba.maintain}"/>
     </target>
     
@@ -197,7 +187,7 @@ self.log(str("Updating the file %s..." % sessionFile))
 config.store(open(sessionFile, 'w+'))    
     </scriptdef>
 
-    <!-- Task that generates an XML configuration of the work that will be done by ccm-get-input. -->
+    <!-- Task that generates an XML configuration of the work that will be done by prep-work-area. -->
     <macrodef name="findProjects" uri="http://www.nokia.com/helium">
         <attribute name="delivery"/>
         <attribute name="sessionfile"/>
@@ -268,7 +258,7 @@ for project in projects:
     root.xml_append(p)
         
 output = open(outputFilename, "w+")
-output.write(doc.xml())
+output.write(doc.xml(indent=u"yes"))
 output.close()
             </hlm:python>
         </sequential>
@@ -286,7 +276,7 @@ output.close()
                 <property name="do.ci-monitor-ccm-session" value="true"/>
             </then>
             <else>
-                <echo>Delivery file not available or 'ci.session.file' not defined or ccm.enabled not set to true.</echo>
+                <echo>'prep.delivery.file' not available or 'ci.session.file' not defined or 'ccm.enabled' not set to true.</echo>
             </else>
         </if>
     </target>
@@ -294,9 +284,7 @@ output.close()
     <!-- Validate input for the ci-prep-wa-create-list target. --> 
     <target name="ci-prep-wa-create-list-validate" depends="ci-monitor-ccm-session-validate" if="do.ci-monitor-ccm-session">
         <if>
-            <and>
-                <isset property="ci.project.config"/>             
-            </and>
+            <isset property="ci.project.config"/>
             <then>
                 <property name="do.ci-prep-wa-create-list" value="true"/>
             </then>
@@ -311,7 +299,7 @@ output.close()
         <hlm:monitorCCMSession delivery="${prep.delivery.conf.parsed}" sessionfile="${ci.session.file}"/>
     </target>
 
-    <!-- Bootstrapper target for Cruise Control. This target output the future work that ccm-get-input will be doing. -->
+    <!-- Bootstrapper target for Cruise Control. This target output the future work that prep-work-area will be doing. -->
     <target name="ci-prep-wa-create-list" depends="ci-prep-wa-create-list-validate" if="do.ci-prep-wa-create-list">
         <hlm:findProjects delivery="${prep.delivery.conf.parsed}" sessionfile="${ci.session.file}" output="${ci.project.config}"/>
     </target>

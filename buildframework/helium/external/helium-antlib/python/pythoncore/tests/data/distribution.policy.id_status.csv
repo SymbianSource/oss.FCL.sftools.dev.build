@@ -1,0 +1,5 @@
+ID,Include in build?,Description,Contract status,Supplier
+0,Yes,Public,Delivered,Company1
+1,No,Internal,Not delivered,Company1
+2,Yes,Some app,,Company2
+,,,, 

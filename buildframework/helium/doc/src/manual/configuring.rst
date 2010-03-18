@@ -12,7 +12,7 @@ Introduction
 
 This describes the key aspects of configuring a Helium build and other aspects of using the Helium build toolkit.
 
-Helium consists of several phases (the stages_ section explains these in detail) these are briefly outlined here:
+Helium consists of several phases (the   stages_ section explains these in detail) these are briefly outlined here:
 
 * pre-build   - performs several checks on the environment and creates the Bill of Materials (BOM) before copying the relevant files from synergy to the build area and unzipping them.
 * build       - compiles the  files.
@@ -105,7 +105,7 @@ Summary:
 Passwords
 =========
 
-Helium requires access to a few resources that require username and password authentication, like Synergy for SCM operations and a user's network login/password for GRACE upload. To avoid the need for a password dialog request, these details can be entered in a ``.netrc`` file located on the user's HOME drive. The HOME location is one of:
+Helium requires access to a few resources that require username and password authentication, like Synergy for SCM operations. To avoid the need for a password dialog request, these details can be entered in a ``.netrc`` file located on the user's HOME drive. The HOME location is one of:
 
 Windows
   H: drive
@@ -135,10 +135,6 @@ Nokia specific
 NOE::
 
   machine noe login <network-username> password <network-password>
-
-GRACE::
-
-  machine grace login <network-username> password <network-password>
   
 Lotus Notes::
 
@@ -284,90 +280,6 @@ To include an XML element with a ``hlm:`` prefix the Helium namespace must be de
     </project>
 
 .. index::
-  single: MC Helium configuration
-
-MC Helium configuration
------------------------
-
-Based on the former MC codeline policy the SAL organisation in MC has used a hierarchical structure for the Helium build configuration files. This is an example configuration that can be used as a guideline.
-
-.. index::
-  single: Product family and product properties
-
-Product family and product properties
-:::::::::::::::::::::::::::::::::::::
-
-These are set in hierarchical structure under mc_build::
-
-    /mc_build
-        /<SAL>
-            /<product>
-                /<variant>
-                
-E.g::
-
-    /mc_build
-        /mc_4032_build
-            mc_4032_build.ant.xml - product family configuration.
-            /PRODUCT
-                PRODUCT.ant.xml - product configuration.
-                /RM247
-                    build.xml - variant configuration.
-                /RM297
-                    build.xml
-            /PRODUCT
-                /RMxxx
-        /mc_5132_build
-            /PRODUCT
-       /teams
-           juno.ant.xml
-
-Ant files at each level contain the configuration for that level. Builds are run from the outermost directories, e.g. RM247 and ``<import>`` statements are used to import the files in the parent directories. The ``mc_4032_build.ant.xml`` file would import ``helium.ant.xml``.
-
-For an example of a product build click here.
-
-.. toctree::
-   :maxdepth: 1
-   
-   product_example.rst
-   
-
-.. index::
-  single: Team properties
-
-.. _`Team-Properties-label`:
-
-Team properties
-:::::::::::::::
-
-For the MC build configurations are a number of properties that are related to a team and/or site. 
-These are all combined in a single configuration file. All the team configuration files are stored under ``/mc/mc_build/teams``. 
-This allows different build configurations to be run in different locations, or handle multiple product family configurations at one site.
-
-In order for this to work in windows environment you may need to set up an environment variable called TEAM. So click 
-start->settings->control panel and double click on 'system' to open the system properties window. Click on the 'advanced' tab and then click the
-'environment variables' tab. Create a new variable preferably under the system varaibles but if you do not have permission to add one here then add
-it to the user variables make the variable name 'TEAM' (note capital letters) and the team name is what ever your team name is.
-
-Also see :ref:`Setting-Team_properties-label`:
-
-
-.. index::
-  single: Setting the team/site
-
-Setting the team/site
-:::::::::::::::::::::
-
-To enable running any build with any team/site configuration, the team must be defined separately from the build configuration files. The team name should be the same as the team configuration file under ``/mc/mc_build/teams`` without the "``.ant.xml``".
-
-The team can be set in one of the following ways (using the example of the ``juno.ant.xml`` file):
-
-* Define a ``TEAM`` environment variable, e.g. ``TEAM=juno``.
-* Add an Ant command line parameter to set the team, e.g::
-
-    hlm product-build -Dteam=juno
-
-.. index::
   single: System definition configuration files
 
 System definition configuration files
@@ -376,7 +288,7 @@ System definition configuration files
 Sysdef configuration defines the source code you actually want to compile with Helium. More information about the System definition
 files can be found from: http://developer.symbian.org/wiki/index.php/System_Definition. 
 
-Under helium/testconfig/mc/mc_build/ibusal_51_build/ is the file IBUSAL51_SystemDefinition.xml  which can be examined as a sample definition file.
+helium/tests/minibuilds/qt/minibuild_compile.sysdef.xml which can be examined as a sample definition file.
 It is used by the Helium test environment to test helium works. It consists of a list of components to compile and some special instructions to 
 perform whilst compiling the components e.g. run toucher.exe on certain directories. You will need to make sure this file exists and contains 
 the correct components when building and especialy for a product which consists of many hundreds of components. It should be possible to use 

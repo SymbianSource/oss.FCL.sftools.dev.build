@@ -37,7 +37,7 @@ Description:
     <target name="mini-build-check">
     	<!-- Check if prep has set some prop correctly... -->
         <echo>'${arm.compiler.version}'</echo>
-        <au:assertMatches string="${arm.compiler.version}" pattern="RVCT2\.2 \[Build 616\]" casesensitive="false" multiline="true"/>
+        <au:assertMatches string="${arm.compiler.version}" pattern="RVCT2\.2 \[Build 686\]" casesensitive="false" multiline="true"/>
 
         <!-- Check if compile-main step did what expected... -->
         <au:assertFileExists file="${canonical.sysdef.file}"/>
@@ -50,8 +50,9 @@ Description:
         </if>
     </target>
 	
-	
+
 	<import file="../ido/build.xml"/>
+    <import file="build.sbsinput.ant.xml" />
 </project>
 
     

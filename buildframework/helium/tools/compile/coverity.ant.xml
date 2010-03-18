@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : coverity.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="compile.coverity" xmlns:hlm="http://www.nokia.com/helium">
+    <description>
+        code-coverity measure.
+    </description>
+    
+    <!-- Coverity property declaration and types defination-->
+    <!-- coverity output directory location
+    @type string
+    @scope private
+    -->
+    <property name="coverity.output.dir" location="${build.output.dir}/coverity"/>
+    <!-- coverity log directory location
+    @type string
+    @scope private
+    -->
+    <property name="coverity.log.dir" location="${build.log.dir}/coverity"/>
+    <!-- coverity link directory location
+    @type string
+    @scope private
+    -->
+    <property name="coverity.link.dir" value="${coverity.output.dir}/coveritylink"/>
+    <!-- coverity config directory location
+    @type string
+    @scope private
+    -->
+    <property name="coverity.config.dir" value="${coverity.output.dir}/config"/>
+    <!-- coverity analyze directory location
+    @type string
+    @scope private
+    -->
+    <property name="coverity.analyze.dir" value="${coverity.link.dir}/analyze"/>
+    <!-- coverity intermidiate directory location
+    @type string
+    @scope private
+    -->
+    <property name="coverity.inter.dir" value="${coverity.output.dir}/intermidiate"/>
+    <!-- coverity report directory location
+    @type string
+    @scope private
+    -->
+    <property name="coverity.report.dir" value="${coverity.output.dir}/coverity_report_${build.id}"/>
+    <!-- coverity report file name
+    @type string
+    @scope private
+    -->
+    <property name="coverity.report.file" value="${build.id}_coverity_build_report.html"/>
+    <!-- coverity summary XML file name
+    @type string
+    @scope private
+    -->
+    <property name="coverity.summary.xml.file" value="${temp.build.dir}/${build.id}_coverity_build_summary.xml"/>
+    <!-- coverity checkers XML file name
+    @type string
+    @scope private
+    -->
+    <property name="coverity.checkers.xml.file" value="${temp.build.dir}/${build.id}_coverity_build_checkers.xml"/>
+    <!-- diamonds coverity report file name
+    @type string
+    @scope private
+    -->
+    <property name="diamonds.coverity.report.file" value="${temp.build.dir}/${build.id}_coverity_build_report.xml"/>
+    
+    <if>
+        <isset property="env.NUMBER_OF_PROCESSORS"/>
+        <then>
+            <math result="coverity.no.thread" operand1="${env.NUMBER_OF_PROCESSORS}" operation="*" operand2="2" datatype="int"/>
+        </then>
+        <else>
+            <!-- Number of parallel coverity emit threads can run.
+            @type string
+            @scope private
+            -->
+            <property name="coverity.no.thread" value="2"/>
+        </else>
+    </if>
+    
+    <!-- set property if coverity is enabled -->
+    <condition property="run.coverity">
+        <istrue value="${enabled.coverity}" />
+    </condition>
+    
+    <!-- cov-build command options -->
+    <hlm:coverityoptions id="coverity.build.options">
+        <arg name="--config" value="${coverity.config.dir}/coverity_config.xml"/>
+        <arg name="--dir" value="${coverity.inter.dir}"/>
+        <arg name="--auto-diff" value=""/>
+        <arg name="--preprocess-first" value=""/>
+        <arg name="--record-only" value=""/>
+    </hlm:coverityoptions>
+    
+    <!-- cov-build emit command options -->
+    <hlm:coverityoptions id="coverity.emit.options">
+        <arg name="--config" value="${coverity.config.dir}/coverity_config.xml"/>
+        <arg name="--dir" value="${coverity.inter.dir}"/>
+        <arg name="--replay" value=""/>
+        <arg name="--replay-processes" value="${coverity.no.thread}"/>
+    </hlm:coverityoptions>
+    
+    <!-- cov-config command options -->
+    <hlm:coverityoptions id="coverity.config.options">
+        <hlm:arg name="--config" value="${coverity.config.dir}/coverity_config.xml"/>
+        <hlm:arg name="--template" value=""/>
+        <hlm:arg name="--comptype" value="armcc"/>
+        <hlm:arg name="--compiler" value="armcc.exe"/>
+    </hlm:coverityoptions>
+    
+    <!-- cov-analyze command options -->
+    <hlm:coverityoptions id="coverity.analyze.options">
+        <hlm:arg name="--dir" value="${coverity.analyze.dir}"/>
+        <hlm:arg name="--all" value=""/>
+        <hlm:arg name="--symbian" value=""/>
+        <hlm:arg name="--append" value=""/>
+        <hlm:arg name="--enable-callgraph-metrics" value=""/>
+    </hlm:coverityoptions>
+
+    <!-- To run post coverity steps -->
+    <target name="post-coverity" if="run.coverity">
+        
+        <!-- To emit the file into defect database -->
+        <antcall target="run-coverity-emit"/>
+        
+        <!-- To analyze the sources file -->
+        <antcall target="run-coverity-analyze"/>
+        
+        <!-- To generate the HTML error pages -->
+        <antcall target="gen-coverity-report"/>
+    
+    </target>
+    
+    <!-- Run coverity configure if the enabled.coverity is set to true -->
+    <target name="run-coverity-configure" if="run.coverity">
+    
+        <hlm:coverity command="cov-configure" dir="${build.drive}/">
+            <hlm:coverityoptions refid="coverity.config.options"/>
+        </hlm:coverity >
+        
+    </target>
+    
+    <!-- Run coverity build with emit options if the enabled.coverity is set to true 
+     re-running the cov-build with replay option will reduce the build time by ~ 20% 
+    -->
+    <target name="run-coverity-emit" >
+        
+        <hlm:coverity command="cov-build" dir="${build.drive}/">
+            <hlm:coverityoptions refid="coverity.emit.options"/>
+        </hlm:coverity >
+        
+    </target>
+    
+    <!-- Run coverity-analyze if the enabled.coverity is set to true 
+     Sometimes the same file is compiled several times with different command-line options. 
+     Due to the inherent difficulty of tracking linkage information, the cov-analyze command cannot automatically determine which files are linked together. 
+     To avoid errors in function call resolution (especially in C code, which doesn't have any name mangling), use the cov-link command to get this information. 
+     
+     and also
+     
+     working with link files is faster than collecting data from the intermediate directory multiple times
+     
+     So run the cov-link commands and analyze the database using cov-analyze command.
+    
+    -->
+    <target name="run-coverity-analyze" >
+        
+        <mkdir dir="${coverity.link.dir}"/>
+        
+        <hlm:coverity command="cov-link" dir="${build.drive}/">
+            <hlm:arg name="--dir" value="${coverity.inter.dir}"/>
+            <hlm:arg name="--collect" value=""/>
+            <hlm:arg name="-of" value="${coverity.link.dir}/all.link"/>
+        </hlm:coverity >
+                
+        <hlm:coverity command="cov-link" dir="${build.drive}/">
+            <hlm:arg name="--dir" value="${coverity.inter.dir}"/>
+            <hlm:arg name="--compile-arg" value="armv5"/>
+            <hlm:arg name="-of" value="${coverity.link.dir}/armv5.link"/>
+            <hlm:arg name="${coverity.link.dir}/all.link" value=""/>
+        </hlm:coverity >
+             
+        <hlm:coverity command="cov-link" dir="${build.drive}/">
+            <hlm:arg name="--dir" value="${coverity.inter.dir}"/>
+            <hlm:arg name="--output-dir" value="${coverity.analyze.dir}"/>
+            <hlm:arg name="${coverity.link.dir}/armv5.link" value=""/>
+        </hlm:coverity >
+                
+        <hlm:coverity command="cov-analyze" dir="${build.drive}/">
+            <hlm:coverityoptions refid="coverity.analyze.options"/>
+        </hlm:coverity >
+        
+    </target>
+    
+    
+    <!-- Generate coverity report -->
+    <target name="gen-coverity-report">
+        
+        <!-- Read the summary file generated by cov-analyze and generate html file -->
+        <fmpp sourceFile="${helium.dir}/tools/common/templates/coverity/coverity.summary.html.ftl"
+              outputFile="${temp.build.dir}/${build.id}_coverity_build_summary.html">
+            <data   expandProperties="yes">
+                    ant: antProperties()
+                    covsummary: slicedText (${coverity.analyze.dir}/c/output/summary.txt)
+            </data>
+        </fmpp>
+        
+        <!-- To generate summary file for diamonds -->
+        <fmpp sourceFile="${helium.dir}/tools/common/templates/coverity/coverity.summary.xml.ftl"
+              outputFile="${coverity.summary.xml.file}">
+            <data   expandProperties="yes">
+                    ant: antProperties()
+                    covsummary: slicedText (${coverity.analyze.dir}/c/output/summary.txt)
+            </data>
+        </fmpp>
+        
+        <!-- Run this to get the static html pages -->
+        <hlm:coverity command="cov-format-errors" dir="${build.drive}/">
+            <hlm:arg name="--dir" value="${coverity.analyze.dir}"/>
+            <hlm:arg name="--filesort" value=""/>
+            <hlm:arg name="--functionsort" value=""/>
+        </hlm:coverity >
+        
+        <!-- Copy the summary file to resolve the xml load error -->
+        <copy file="${coverity.analyze.dir}/c/output/errors/summary.xml" tofile="${coverity.checkers.xml.file}" overwrite="true" failonerror="false">
+            <filterchain>
+                <linecontains negate="true">
+                    <contains value="config.dtd"/>
+                </linecontains>
+            </filterchain>
+        </copy>
+        
+        <!-- Insert summary tags into checkers file -->
+        <xmltask source="${coverity.checkers.xml.file}"  dest="${diamonds.coverity.report.file}" report="false">
+            <insert path="/coverity" file="${coverity.summary.xml.file}"/> 
+        </xmltask>
+        
+        <!-- collect all the html files into folder -->        
+        <copy todir="${coverity.report.dir}" overwrite="true" failonerror="false">
+            <fileset dir="${coverity.analyze.dir}/c/output/errors">
+                <exclude name="index.html"/>
+                <exclude name="**/*.xml"/>
+                <exclude name="summary.html"/>
+            </fileset>
+        </copy>
+        
+        <!-- Concatinate all the html pages to get the final error report page -->
+        <concat destfile="${coverity.report.dir}/${coverity.report.file}">
+            <fileset dir="${temp.build.dir}" includes="${build.id}_coverity_build_summary.html"/>
+            <fileset dir="${coverity.analyze.dir}/c/output/errors" includes="index.html"/>
+        </concat>
+        
+    </target>
+    
+    
+    <!-- To get the SBS variable value -->
+    <macrodef name="getSBSVariableValue" uri="http://www.nokia.com/helium">
+        <attribute name="variablename"/>
+        <attribute name="outputvar"/>
+        <attribute name="sbsinput"/>
+        <sequential>
+            <var name="output.var" unset="true"/>
+            <hlm:getVariableValue name="@{variablename}" property="output.var">
+                <hlm:sbsinput refid="@{sbsinput}" />
+            </hlm:getVariableValue>
+            <if>
+                <and>
+                    <isset property="output.var"/>
+                    <matches string="${output.var}" pattern="arm.*"/>
+                </and>
+                <then>
+                    <antcall target="set-arm-version"/>
+                </then>
+            </if>
+            <script language="beanshell"> <![CDATA[
+                curVal=project.getProperty("output.var"); 
+                project.setProperty("@{outputvar}",curVal);
+                ]]>
+            </script> 
+        </sequential>
+    </macrodef>
+    
+
+</project>

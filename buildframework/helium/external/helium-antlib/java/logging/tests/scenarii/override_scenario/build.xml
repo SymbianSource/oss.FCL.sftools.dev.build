@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : build.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="helium-antlib-unittestvalid-build" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>Helium Antlib Logging unittests.</description>
+    <property environment="env"/>
+    <property name="step1" value="1" />
+    <property name="step2" value="1" />
+        
+    <taskdef resource="com/nokia/helium/logger/ant/antlib.xml" uri="http://www.nokia.com/helium" />
+    
+    <hlm:stage id="stage1" starttarget="stage1" endtarget="stage1" />
+    <hlm:stage id="stage2" starttarget="stage2" endtarget="stage2" />
+    
+    <hlm:stagerecord id="record.default" defaultoutput="${temp.dir}/main.ant.log" loglevel="info" append="true"/>
+    <hlm:stagerecord id="record.stage1"  stagerefid="stage1" output="${temp.dir}/stage1.ant.log" loglevel="info" append="false"/>
+    <hlm:stagerecord id="record.stage2"  stagerefid="stage2" output="${temp.dir}/stage2.ant.log" loglevel="info" append="false"/>
+
+    <!-- Overriding the configuration -->
+    <hlm:stagerecord id="record.default" defaultoutput="${temp.dir}/main_override.ant.log" loglevel="info" append="true"/>
+    <hlm:stagerecord id="record.stage2"  stagerefid="stage2" output="${temp.dir}/stage2_override.ant.log" loglevel="info" append="true"/>
+
+    <target name="start-ant-log">
+        <hlm:triggerlogger/> 
+    </target>
+
+    <target name="build" depends="start-ant-log">
+        <echo>Main log start step1</echo>
+        <antcall target="stage1" />
+        <echo>Main log start step2</echo>
+        <antcall target="stage2" />
+        <echo>Main log start step3</echo>
+        <antcall target="stage1">
+            <param name="step1" value="2" />
+        </antcall>
+        <echo>Main log start step4</echo>
+        <antcall target="stage2">
+            <param name="step2" value="2" />
+        </antcall>
+        <echo>Main log start step5</echo>
+    </target>
+
+    <target name="stage1">
+        <echo>In stage1 (${step1})</echo>
+    </target>
+
+    <target name="stage2">
+        <echo>In stage2 (${step2})</echo>
+    </target>
+    
+</project>

@@ -21,7 +21,7 @@ Description:
 -->
 <#include "api.ftllib"/>
 
-<#list data.heliumDataModel.group as group>
+<#list doc.antDatabase.project.group as group>
 <@pp.changeOutputFile name="propertygroup-${group.name}.html" />
 
 <@helium_api_header title="Property group ${group.name}"/>
@@ -48,12 +48,12 @@ ${group.description}
         <td colspan="3">User editable properties</td>
     </tr>
     <#list propertyList as property>
-        <#list data.heliumDataModel.property as propDataModel>
+        <#list doc.antDatabase.project.property as propDataModel>
             <#if property == propDataModel.name>
-                <#if propDataModel.editStatus == "must" || propDataModel.editStatus == "recommended" || propDataModel.editStatus == "allowed">
+                <#if propDataModel.editable == "must" || propDataModel.editable == "recommended" || propDataModel.editable == "allowed">
                     <tr>
                         <td><a href="property-${property}.html" title="${propDataModel.description}" target="classframe"><tt class="docutils literal">${property}</tt></a></td>
-                        <td><a href="help.html" title="Help" target="classframe">${propDataModel.editStatus}</a></td>
+                        <td><a href="help.html" title="Help" target="classframe">${propDataModel.editable}</a></td>
                         <td>
                             <#if propDataModel.deprecated?size &gt; 0>
                                 ${propDataModel.deprecated}
@@ -68,12 +68,12 @@ ${group.description}
         <td colspan="3">Internal properties</td>
     </tr>
     <#list propertyList as property>
-        <#list data.heliumDataModel.property as propDataModel>
+        <#list doc.antDatabase.project.property as propDataModel>
             <#if property == propDataModel.name>
-                <#if propDataModel.editStatus == "never" || propDataModel.editStatus == "discouraged">
+                <#if propDataModel.editable == "never" || propDataModel.editable == "discouraged">
                     <tr>
                         <td><a href="property-${property}.html" title="${propDataModel.description}" target="classframe"><tt class="docutils literal">${property}</tt></a></td>
-                        <td><a href="help.html" title="Help" target="classframe">${propDataModel.editStatus}</a></td>
+                        <td><a href="help.html" title="Help" target="classframe">${propDataModel.editable}</a></td>
                         <td>
                             <#if propDataModel.deprecated?size &gt; 0>
                                 ${propDataModel.deprecated}

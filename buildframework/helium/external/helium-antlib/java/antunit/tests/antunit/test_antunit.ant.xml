@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : test_imaker.ant.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="helium-antlib-antunit-unittest" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>Helium Antlib imaker unittests.</description>
+
+    <taskdef resource="com/nokia/helium/antunit/ant/antlib.xml" uri="http://www.nokia.com/helium"/>
+    
+    <target name="test-antunit">
+        <au:antunit>
+            <fileset dir="../data_antunit" includes="antunit_*.ant.xml" />
+            <au:plainlistener logLevel="info"/>
+            <hlm:customListener>
+                <listener classname="org.apache.tools.ant.XmlLogger" />
+                <listener classname="invalid.Listener" />
+            </hlm:customListener>
+        </au:antunit>
+        <au:assertFileExists file="../log.xml" />
+        <delete file="../log.xml" failonerror="false" />
+    </target>
+</project>

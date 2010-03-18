@@ -11,6 +11,18 @@ New Features:
 - Add support for MMP keyword EPOCNESTEDEXCEPTIONS.
 
 
+version 2.12.5
+
+Defect Fixes:
+- Fix: Workaround for emake engine log corruption when clockskew errors occur (annofile2log). 
+  Allow Raptor to obtain log from emake annotation file where it is uncorrupted.  A new 
+  Make engine option "copyannofile2log" enables/disables this mode for emake. If this option is disabled
+  or if no annotation file is specified for the build then Raptor reads logs directly as normal.
+- SF Bug 2191 - [Raptor] - When forcesuccess is enabled, exit status for a failed recipe is "retry" but should be "failed"
+- Fix: extend tracecompiler tests to Linux
+- Fix: Amendment to SF Bug 1511 fix - removal of blanked DEFFILE keyword from e32abiv2ani.flm
+
+
 version 2.12.4
 
 Defect Fixes:

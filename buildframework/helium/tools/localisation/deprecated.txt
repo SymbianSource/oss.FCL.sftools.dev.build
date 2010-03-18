@@ -1,7 +1,0 @@
-List of deprecated/unsupported scripts:
- - get_languagepack_id.py (old process)
- - generate_tutorial_content_conf.py (need a requirement for that)
- - create_version.py (migrated it as an iMaker feature)
- - createlocales.py make template should now use iMaker feature to generate the languagepack
- - create_version.py make template should now use iMaker feature that handle version string generation
- 

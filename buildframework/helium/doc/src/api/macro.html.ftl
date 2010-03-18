@@ -20,7 +20,7 @@ Description:
 ============================================================================
 -->
 <#include "api.ftllib"/>
-<#list doc.antDatabase.project.macro as macro>
+<#list doc['antDatabase/*/macro'] as macro>
 <@pp.changeOutputFile name="macro-${macro.name}.html" />
 
 <@helium_api_header title="Macro ${macro.name}"/>
@@ -29,12 +29,17 @@ Description:
 
 <h2>Macro ${macro.name}</h2>
 
+<b>Scope: </b>${macro.scope}<br/>
+
+<p><b>Description</b></p>
+<p>${macro.description}</p>
+
 <p><b>Location</b></p>
 <p><@helium_api_location_path location="${macro.location}"/></p>
 
 <hr/>
 
-<h3>Description</h3>
+<h3>Documentation</h3>
 <p>
 <#recurse macro.documentation>
 </p>
@@ -43,6 +48,11 @@ Description:
 <p>Example: <pre>${macro.usage}</pre></p>
 
 <hr/>
+
+<h3>Source code</h3>
+<pre>
+    ${macro.source?html}
+</pre>
    
 <@helium_api_html_footer/>
 

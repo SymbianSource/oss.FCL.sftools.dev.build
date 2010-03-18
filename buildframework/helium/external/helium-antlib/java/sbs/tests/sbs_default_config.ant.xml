@@ -1,0 +1,190 @@
+<?xml version="1.0"?>
+<!-- 
+============================================================================ 
+Name        : test_diamonds.ant.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="sbs-default-config" xmlns:hlm="http://www.nokia.com/helium">
+    <description>Helium Antlib default sbs configuration.</description>
+    
+    <dirname property="project.dir" file="${ant.file.sbs-default-config}" />
+
+    <taskdef resource="com/nokia/helium/sbs/ant/antlib.xml" uri="http://www.nokia.com/helium" />
+    <taskdef resource="com/nokia/helium/core/ant/antlib.xml" uri="http://www.nokia.com/helium" />
+
+    <hlm:sbsbuild id="pf_7952">
+        <sbsInput refid="mainbuild-sbs-ec" >
+            <sbsOptions>
+                <arg line="-f armv5.log" />
+            </sbsOptions>
+        </sbsInput>
+    </hlm:sbsbuild>
+    
+    <hlm:sbsbuild id="sf_build">
+        <sbsInput refid="tools-sbs" />
+        <sbsInput refid="mainbuild-sbs" />
+    </hlm:sbsbuild>
+    
+    <!-- In future migrationg to 3.0 schema <sbsbuild> would also to handle layers and filters 
+        and also to include / exclude layers to be built 
+    -->
+
+    <!-- Common make options for particular engine values of it could be overridden by referencing it-->
+    <hlm:sbsmakeoptions id="commonEMakeOptions" engine="emake">
+        <arg name="--emake-emulation" value="gmake" />
+        <arg name="--emake-annodetail" value="basic,history,waiting" />
+        <arg name="--emake-class" value="${ec.build.class}" />
+        <arg name="--emake-historyfile" value="${ec.historyfile.dir}/raptor_clean.emake.data" />
+        <arg name="--case-sensitive" value="0" />
+    </hlm:sbsmakeoptions>
+        
+    <hlm:sbsmakeoptions id="commonGmakeOptions" engine="gmake" />
+
+    <hlm:sbsmakeoptions id="commonPVMGmakeOptions" engine="pvmgmake" />
+        
+    <!-- Tools specific make options inheriting the commone make option-->
+    <hlm:sbsmakeoptions id="toolsmake-sbs-ec">
+        <sbsmakeoptions refid="commonEMakeOptions" />
+        <arg name="--emake-maxagents" value="1" />
+    </hlm:sbsmakeoptions>
+            
+    <!-- Main build make option directly refering to common emake option -->
+    <hlm:sbsmakeoptions id="mainbuildmake-sbs-ec" engine="emake">
+        <sbsmakeoptions refid="commonEMakeOptions" />
+    </hlm:sbsmakeoptions>
+        
+    <!-- sbs input consists of sbs options and sbs make options, the sbs options remains same for all
+    the build system, the make options varies
+     -->
+    <hlm:sbsinput id="tools-sbs">
+        <sbsoptions>
+            <arg line="-c tools_rel -c tools2_rel" />
+            <arg name="-j" value="1" />
+        </sbsoptions>
+    </hlm:sbsinput>
+
+    <!-- sbs input for main build.
+     -->
+    <hlm:sbsinput id="mainbuild-sbs">
+        <sbsoptions>
+            <arg line="-c winscw -c armv5" />
+            <arg line="-f winscw.log" />
+        </sbsoptions>
+    </hlm:sbsinput>
+
+    <hlm:sbsinput id="mainbuild-sbs-ec">
+        <sbsoptions>
+            <arg line="-c winscw -c armv5" />
+            <arg line="-f winscw.log" />
+        </sbsoptions>
+        <sbsmakeoptions refid="mainbuildmake-sbs-ec" />
+    </hlm:sbsinput>
+
+    <!-- Main build make option directly refering to common emake option -->
+    <hlm:sbsmakeoptions id="common-inherit-ec-without-engine">
+        <arg name="--emake-emulation" value="gmake" />
+        <arg name="--emake-annodetail" value="basic,history,waiting" />
+        <arg name="--emake-class" value="${ec.build.class}" />
+        <arg name="--emake-historyfile" value="${ec.historyfile.dir}/raptor_clean.emake.data" />
+    </hlm:sbsmakeoptions>
+
+    <hlm:sbsmakeoptions id="common-inherit-ec-with-engine" engine="emake">
+        <arg name="--emake-emulation" value="gmake" />
+        <arg name="--emake-annodetail" value="basic,history,waiting" />
+        <arg name="--emake-class" value="${ec.build.class}" />
+        <arg name="--emake-historyfile" value="${ec.historyfile.dir}/raptor_clean.emake.data" />
+    </hlm:sbsmakeoptions>
+
+    <hlm:sbsmakeoptions id="common-inherit-ec-all-options" engine="emake">
+        <arg name="--emake-cm" value="fawec012" />
+        <arg name="--emake-root" value="X:\;c:\devtools " />
+        <arg name="--emake-emulation" value="gmake" />
+        <arg name="--emake-annodetail" value="basic,history,waiting" />
+        <arg name="--emake-annofile" value="c:\logs\emake.anno.xml" />
+        <arg name="--emake-class" value="${ec.build.class}" />
+        <arg name="--emake-historyfile" value="${ec.historyfile.dir}/raptor_clean.emake.data" />
+        <arg name="--emake-maxagents" value="1" />
+        <arg name="--emake-debug" value="c" />
+        <arg name="--emake-logfile" value="emake.c.dlog" />
+    </hlm:sbsmakeoptions>
+
+    <hlm:sbsinput id="engine-inherit1-sbs-ec">
+        <sbsoptions>
+            <arg line="-c winscw -c armv5" />
+            <arg line="-f winscw.log" />
+        </sbsoptions>
+        <sbsmakeoptions refid="common-inherit-ec-without-engine" />
+    </hlm:sbsinput>
+
+    <hlm:sbsinput id="engine-inherit2-sbs-ec">
+        <sbsoptions>
+            <arg line="-c winscw -c armv5" />
+            <arg line="-f winscw.log" />
+        </sbsoptions>
+        <sbsmakeoptions refid="common-inherit-ec-with-engine" />
+    </hlm:sbsinput>
+
+    <hlm:sbsinput id="engine-inherit3-sbs-ec">
+        <sbsoptions>
+            <arg line="-c winscw -c armv5" />
+        </sbsoptions>
+        <sbsmakeoptions refid="common-inherit-ec-with-engine" engine="ec-helium" />
+    </hlm:sbsinput>
+
+    <hlm:sbsinput id="engine-inherit4-sbs-ec">
+        <sbsoptions>
+            <arg line="-c winscw -c armv5" />
+            <arg line="-f winscw.log" />
+        </sbsoptions>
+        <sbsmakeoptions refid="common-inherit-ec-all-options" />
+    </hlm:sbsinput>
+
+    <hlm:sbsbuild id="inherit1">
+        <sbsInput refid="engine-inherit1-sbs-ec" >
+            <sbsOptions>
+                <arg line="-f armv5.log" />
+            </sbsOptions>
+        </sbsInput>
+    </hlm:sbsbuild>
+
+    <hlm:sbsbuild id="inherit2">
+        <sbsInput refid="engine-inherit2-sbs-ec" >
+            <sbsOptions>
+                <arg line="-f armv5.log" />
+            </sbsOptions>
+        </sbsInput>
+    </hlm:sbsbuild>
+
+    <hlm:sbsinput id="inherit3_sbs_input"> 
+        <sbsInput refid="engine-inherit3-sbs-ec" />
+        <sbsoptions>
+            <arg line="-f armv5.log" />
+        </sbsoptions>
+    </hlm:sbsinput>
+
+    <hlm:sbsbuild id="inherit3">
+        <sbsinput refid="inherit3_sbs_input" />
+    </hlm:sbsbuild>
+
+    <hlm:sbsbuild id="inherit4">
+        <sbsInput refid="engine-inherit4-sbs-ec" >
+        </sbsInput>
+    </hlm:sbsbuild>
+
+</project>

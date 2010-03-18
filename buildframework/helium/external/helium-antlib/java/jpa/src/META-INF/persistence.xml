@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : persistence.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<persistence xmlns="http://java.sun.com/xml/ns/persistence"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:schemaLocation="http://java.sun.com/xml/ns/persistence persistence_2_0.xsd"
+                version="2.0">
+    <persistence-unit name="metadata" transaction-type="RESOURCE_LOCAL">
+        <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+          <properties>
+                <!-- <property name="eclipselink.logging.level" value="ALL" /> -->
+           </properties>
+            <class>com.nokia.helium.jpa.entity.metadata.LogFile</class>
+            <class>com.nokia.helium.jpa.entity.metadata.Priority</class>
+            <class>com.nokia.helium.jpa.entity.metadata.Component</class>
+            <class>com.nokia.helium.jpa.entity.metadata.Metadata</class>
+            <class>com.nokia.helium.jpa.entity.metadata.MetadataEntry</class>
+            <class>com.nokia.helium.jpa.entity.metadata.ComponentTime</class>
+            <class>com.nokia.helium.jpa.entity.metadata.WhatLogEntry</class>
+            <class>com.nokia.helium.jpa.entity.Version</class>
+    </persistence-unit>
+</persistence>

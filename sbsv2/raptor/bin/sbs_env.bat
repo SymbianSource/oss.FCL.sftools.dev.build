@@ -39,6 +39,7 @@
 
 :sbspython
 @SET __PYTHON__=%SBS_PYTHON%
+@SET SBS_PYTHON=%__PYTHON__%
 @GOTO sbspythonpath
 
 :localpython

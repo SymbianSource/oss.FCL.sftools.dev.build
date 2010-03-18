@@ -31,6 +31,7 @@ import org.dom4j.Element;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -42,6 +43,7 @@ public class ModelPropertiesParser
     private String inputPath;
     private String outputPath;
     private Document doc;
+    private Logger log = Logger.getLogger(ModelPropertiesParser.class);
     
     public ModelPropertiesParser(String inputPath, String outputPath)
     {
@@ -78,7 +80,8 @@ public class ModelPropertiesParser
             out.write(doc);
           }
         } catch (Exception e) {
-            e.printStackTrace();
+            //We are Ignoring the errors as no need to fail the build.
+            log.debug("Not able to write into XML Document " + e.getMessage());
         }
     }
     

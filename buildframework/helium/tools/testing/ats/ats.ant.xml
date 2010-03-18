@@ -20,111 +20,231 @@ Description:
 
 ============================================================================
 -->
+<!--* @package testing -->
 <project name="_testing.ats" xmlns:hlm="http://www.nokia.com/helium">
-    <var name="drop.file.counter" value="0" />
     <description>
-        ATS testing targets.
+    ATS testing targets.
     </description>
+    
+    <!--* @property enabled.ats
+    Value must be set to execute ats-test target.
+    @type boolean
+    @editable required
+    @scope public
+    -->
+    
+    <!--* @property enabled.aste
+    Value must be set to execute ats-aste target.
+    @type boolean
+    @editable required
+    @scope public
+    -->
+    
+    <!--* @property ats.product.name
+    Name of the product to be tested. For example: "PRODUCT"
+    @type string
+    @editable required
+    @scope public
+    -->
+    
+    <!--* @property ats.drop.location
+    Server location (UNC path) to save the ATS3Drop file, before sending to the ATS. For example: \\trwsem00\some_folder\. In case, ``ats.script.type`` is set to "import", ATS doesn't need to have access to ats.drop.location, its value can be any local folder on build machine, for example c:\temp (no network share needed).
+    @type string
+    @editable required
+    @scope public
+    -->
+    
+    <!--* @property ats.server
+    For example: "4fio00105" or "catstresrv001.cats.noklab.net:80". Default server port is "8080", but it is not allowed between intra and Noklab. Because of this we need to define server port as 80. The host can be different depending on site and/or product.
+    @type string
+    @editable required
+    @scope public
+    -->
+    
+    <!--* @property ats.password
+    Password for ATS. This password might be different from NOE or HTTP/UNIX password.
+    @type string
+    @editable required
+    @scope public
+    -->
+    
+    <!--* @property ats.username
+    Username for ATS server. This is NOT the NOE or HTTP/UNIX username.
+    @type string
+    @editable required
+    @scope public
+    -->
+    
+    
     <!-- -->
     <fileset id="reference.ats.flash.images" dir="${release.images.dir}">
-        <include name="**/${build.id}*.core.fpsx" />
-        <include name="**/${build.id}*.rofs2.fpsx" />
-        <include name="**/${build.id}*.rofs3.fpsx" />
+        <include name="**/*.fpsx" />
         <include name="**/*rnd.C00" />
         <include name="**/*rnd.V01" />
-        <include name="**/*.fpsx" />
-        <include name="**/*_rnd.fpsx" />
     </fileset>
-    <property environment="env" />
+    
+    <!-- Limit of minimum number of flash files to execute ats-test target, otherwise ATSDrop.zip will not be generated. Default value is "2" files.
+    @type string
+    @scope public
+    -->
     <property name="ats.flashfiles.minlimit" value="2" />
 
     <fileset id="reference.ats.sis.images" dir="${ats.sis.images.dir}">
         <include name="**/*.sis" />
     </fileset>
+    <!-- Limit of minimum number of sis files to execute matti-test target, otherwise MATTI-drop.zip will not be generated. Default value is "1" files.
+    @type string
+    @scope public
+    -->
     <property name="ats.sisfiles.minlimit" value="1" />
+    
+    <var name="drop.file.counter" value="0" />
 
-    <!-- 
-    The target creates ATSDrop.zip file which also includes test.xml file; and sends the drop to ATS. 
+    <!-- The target creates ATSDrop.zip file which also includes test.xml file; and sends the drop to ATS.
+
     The layer definition, in system definition file, for tsrc directory should look like:
+    
     <pre>
     <layer name="name_test_layer">
-    
         <module name="module_name">
-        
             <unit id="unit_id" name="unti_name" bldFile="path_of_tsrc_folder_to_be_built" filter=""/>
-            
         </module>
-        
     </layer>
     </pre>
     -->
-
     <target name="ats-test" if="enabled.ats">
-        <hlm:filterRecordStartMacro/>
-        <runtarget target="copy-mon-sym" />
-        <runtarget target="ats-create-drop" />
-        <hlm:filterRecordStopMacro pattern="${ats.password}" log="${build.log.dir}/${build.id}_ats.log" append="false"/>
+        <mkdir dir="${test.log.dir}"/>
+        <hlm:filterRecordStartMacro pattern="${ats.password}" category="ats"/>
+        <trycatch property="exception" reference="exception">
+            <try>
+                <runtarget target="ats-delta"/>
+                <antcall target="create-canonical-sysdef-file" inheritRefs="true">
+                    <reference refid="ats.system.definition.files" torefid="system.definition.files" />
+                </antcall>
+                <runtarget target="copy-mon-sym" />
+                <runtarget target="ats-create-drop" />
+            </try>
+            <catch>
+                <if>
+                    <istrue value="${ats.delta.enabled}" />
+                    <then>
+                        <echo message="${exception}"/>
+                    </then>
+                    <else>
+                        <throw refid="exception"/>
+                    </else>
+                </if>
+            </catch>
+        </trycatch>
+        <hlm:filterRecordStopMacro log="${test.log.dir}/${build.id}_ats.log" append="false"/>
         <hlm:metadatarecord database="${metadata.dbfile}">
             <hlm:textmetadatainput>
-                <fileset casesensitive="false" file="${build.log.dir}/${build.id}_ats.log" />
+                <fileset casesensitive="false" file="${test.log.dir}/${build.id}_ats.log" />
                 <metadatafilterset refid="filterset.ats" />
             </hlm:textmetadatainput>
         </hlm:metadatarecord>
         <hlm:generateBuildStatus file="${build.id}_ats.log" />
     </target>
 
-    <!-- The target creates the ATS3drop.zip file including test.xml for ATS ASTE tests. This target is executable.-->
-
+    <!-- The target creates the ATSdrop.zip file including test.xml for ATS ASTE tests. This target is executable.-->
     <target name="ats-aste" if="enabled.aste">
-        <hlm:filterRecordStartMacro/>
+        <mkdir dir="${test.log.dir}"/>
+        <hlm:filterRecordStartMacro pattern="${ats.password}" category="ats"/>
         <runtarget target="do-ats-aste" />
-        <hlm:filterRecordStopMacro pattern="${ats.password}" log="${build.log.dir}/${build.id}_ats.log" append="false"/>
+        <hlm:filterRecordStopMacro log="${test.log.dir}/${build.id}_aste.log" append="false"/>
         <hlm:metadatarecord database="${metadata.dbfile}">
             <hlm:textmetadatainput>
-                <fileset casesensitive="false" file="${build.log.dir}/${build.id}_ats.log" />
+                <fileset casesensitive="false" file="${test.log.dir}/${build.id}_aste.log" />
                 <metadatafilterset refid="filterset.aste" />
             </hlm:textmetadatainput>
         </hlm:metadatarecord>
-        <hlm:generateBuildStatus file="${build.id}_ats.log" />
+        <hlm:generateBuildStatus file="${build.id}_aste.log" />
     </target>
 
     <!-- The target creates the MATTI_drop.zip file including test.xml for MATTI tests. This target is executable.-->
     <target name="matti-test" if="enabled.matti">
-        <hlm:filterRecordStartMacro/>
+        <mkdir dir="${test.log.dir}"/>
+        <hlm:filterRecordStartMacro pattern="${ats.password}" category="ats"/>
         <runtarget target="do-ats-matti" />
-        <hlm:filterRecordStopMacro pattern="${ats.password}" log="${build.log.dir}/${build.id}_matti.log" append="false"/>
+        <hlm:filterRecordStopMacro log="${test.log.dir}/${build.id}_matti.log" append="false"/>
         <hlm:metadatarecord database="${metadata.dbfile}">
             <hlm:textmetadatainput>
-                <fileset casesensitive="false" file="${build.log.dir}/${build.id}_matti.log" />
+                <fileset casesensitive="false" file="${test.log.dir}/${build.id}_matti.log" />
                 <metadatafilterset refid="filterset.matti" />
             </hlm:textmetadatainput>
         </hlm:metadatarecord>
         <hlm:generateBuildStatus file="${build.id}_matti.log" />
     </target>
 
-
     <!-- Sends drop file to ATS/ASTE. Please see `ats-test` for description. -->
     <target name="do-ats-test" depends="ats-username, ats-password" unless="skip.ats.sending">
-        <!-- Make the drop file visible to ATS3. -->
-        <mkdir dir="${ats.drop.location}" />
-        <copy file="${ats.drop.file}" tofile="${ats.drop.location.file}" />
-        <!-- Notify ATS3 about the drop. -->
-        <exec executable="cscript" dir="${build.drive}/" failonerror="false">
-            <env key="ats3.username" value="${ats.username}" />
-            <env key="ats3.password" value="${ats.password}" />
-            <env key="ats3.host" value="${ats.server}" />
-            <env key="ats3.pathToDrop" value="${ats.drop.location.file}"/>
-            <arg value="${helium.dir}/tools/testing/ats/${ats.wsh.testrun.file}" />
-        </exec>
+        <property name="ats.sending" value="true" />
+        <!-- Make the drop file visible to ATS. -->
+        
+        <var name="ats.drop.location.file" unset="true"/>
+        <if>
+            <isset property="ats.drop.location" />
+            <then>
+                <mkdir dir="${ats.drop.location}" />
+                <property name="ats.drop.location.file" location="${ats.drop.location}/${ats.drop.file}" />
+                <copy file="${build.output.dir}/ats/${ats.drop.file}" tofile="${ats.drop.location.file}" />
+            </then>
+            <else>
+                <property name="ats.drop.location.file" location="${build.output.dir}/ats/${ats.drop.file}" />
+            </else>
+        </if>
+
+        <!-- Notify ATS about the drop. -->
+        <if>
+            <istrue value="${ats4.enabled}" />
+            <then>
+                <hlm:python failonerror="true">
+version = r'${java.version}'
+if '1.6.0' in version:
+    assert int(version.split('_')[1]) > 6, 'Java 6 u7 required'
+                </hlm:python>
+                <condition property="ats.import.arg" value="-import" else="">
+                    <equals arg1="${ats.script.type}" arg2="import" />
+                </condition>
+                <condition property="ats4.libs" value="${helium.dir}/extensions/nokia/external/ats4" else="${helium.dir}/external/antlibs">
+                    <available type="dir" file="${helium.dir}/extensions/nokia/external/ats4"/>
+                </condition>
+                <java classname="com.nokia.ats.util.server.CommandLineClient" fork="true" maxmemory="512m">
+                    <classpath>
+                        <pathelement path="${java.class.path}"/>
+                        <fileset dir="${ats4.libs}" includes="*.jar"/>
+                    </classpath>
+                    <arg line="-url http://${ats.server}/ServerService -path ${ats.drop.location.file} ${ats.import.arg}"/>
+                </java>
+            </then>
+            <else>
+                <condition property="ats.wsh.testrun.file" value="wshTestRunImport.vbs" else="wshTestRunX.vbs">
+                    <equals arg1="${ats.script.type}" arg2="import" />
+                </condition>
+                <exec executable="cscript" dir="${build.drive}/" failonerror="false">
+                    <env key="ats3.username" value="${ats.username}" />
+                    <env key="ats3.password" value="${ats.password}" />
+                    <env key="ats3.host" value="${ats.server}" />
+                    <env key="ats3.pathToDrop" value="${ats.drop.location.file}"/>
+                    <arg value="${helium.dir}/tools/testing/ats/${ats.wsh.testrun.file}" />
+                </exec>
+            </else>
+        </if>
     </target>
-
-
 
     <!-- The target is dependent on "ats-test", should not be called independently. The target fetches flash files location -->
     <target name="ats-set-flash-image-path">
         <pathconvert pathsep="," property="ats.flash.images">
             <fileset refid="reference.ats.flash.images"/>
         </pathconvert>
+        <hlm:python failonerror="true">
+<![CDATA[
+flashfilescount = len(r'${ats.flash.images}'.split(','))
+mincount = int(r'${ats.flashfiles.minlimit}')
+if flashfilescount < mincount:
+    raise Exception('Not enough flash files, check reference.ats.flash.images and build.id, found: ' + r'${ats.flash.images}' + ', looking in: ' + r'${release.images.dir}')
+]]>
+        </hlm:python>
     </target>
 
     <!-- The target is dependent on "ats-test", should not be called independently. The target fetches flash files location -->
@@ -137,57 +257,111 @@ Description:
     <!-- Sets values common for ATS, this is a dependent target and shouldn't be used as an individual target -->
     <target name="ats-common">
         <property name="ats.config.file" value="" />
+        <property name="ats.specific.pkg" value="" />
+        <property name="ats4.enabled" value="False" />
+        <!-- Product HardWare ID (HWID) attached to ATS. By default the value of HWID is not set.
+        @type string
+        @scope public
+        -->
         <property name="ats.product.hwid" value="" />
+        <!-- To set test commands execution time limit on ATS3 server, in seconds. Default value is "60".
+        @type string
+        @scope public
+        -->
         <property name="ats.test.timeout" value="60" />
+        <!-- Sets ATS reports store location. Default location is "${publish.dir}/${publish.subdir}"
+        @type string
+        @scope public
+        -->
         <property name="ats.report.location" value="${publish.dir}/${publish.subdir}" />
-        <var name="ats.drop.file" value="${build.output.dir}/ats/ATSDrop${drop.file.counter}.zip" />
-        <if>
+        <condition property="internal.ats.diamonds.arg" value="--diamonds-build-url=http://${diamonds.host}${diamonds.build.id}" else="">
             <isset property="diamonds.build.url" />
-            <then>
-                <property name="internal.ats.diamonds.arg" value="--diamonds-build-url=http://${diamonds.host}${diamonds.build.id}" />
-            </then>
-            <else>
-                <property name="internal.ats.diamonds.arg" value="" />
-            </else>
-        </if>
+        </condition>
     </target>
 
     <!-- Sets default values for the ATS (STIF and EUnit), this is a dependent target and shouldn't be used as an individual target -->
     <target name="ats-set-defaults-stifeunit" depends="ats-common,lookup-email">
         <!-- Default values for the properties -->
+        <!-- The property is needed if you want to get an email from ATS server after the tests are executed. There can be one to many semicolon(s) ";" separated email addresses.
+        @type string
+        @scope public
+        -->
         <property name="ats.email.list" value="${email.from}" />
+        <!-- The default value is "data" and refers to the 'data' directory under 'tsrc' directory.
+        @type string
+        @scope public
+        -->
         <property name="tsrc.data.dir" value="data" />
+        <!-- Modify the plan name if you have understanding of test.xml file or leave it as it is. Default value is "plan"
+        @type string
+        @scope public
+        -->
         <property name="ats.plan.name" value="plan" />
+        <!-- Modify the test-run name if you have understanding of test.xml file or leave it as it is. Default value is a string consist of build id, product name, major and minor versions
+        @type string
+        @scope public
+        -->
         <property name="ats.testrun.name" value="${build.id}_${ats.product.name}" />
+        <!-- CTC host, provided by CATS used to create coverage measurement reports. MON.sym files are copied to this location, for example "10.0.0.1". If not given, code coverage reports are not created
+        @type string
+        @scope public
+        -->
         <property name="ats.ctc.host" value="" />
-        <condition property="ats.wsh.testrun.file" value="wshTestRunImport.vbs">
-            <equals arg1="${ats.script.type}" arg2="import" />
+        <condition property="ats.version" value="4" else="3">
+            <istrue value="${ats4.enabled}" />
         </condition>
-        <!-- if test run file is not explicitly mentioned, default is RunX-->
-        <property name="ats.wsh.testrun.file" value="wshTestRunX.vbs" />
-        <var name="ats.drop.file" value="ATS3Drop${drop.file.counter}.zip" />
+        <var name="ats.drop.file" value="ATS${ats.version}Drop${drop.file.counter}.zip" />
+        
+        <!-- Sets target platform for compiling test components. Default value is "armv5 urel".
+        @type string
+        @scope public
+        -->
         <property name="ats.target.platform" value="armv5 urel" />
+        <!-- Should be "True" if tracing is needed during the tests running on ATS3. Default value is "False", the values are case-sensitive.
+        @type string
+        @scope public
+        -->
         <property name="ats.trace.enabled" value="False" />
+        <!-- Should be "True" if coverage measurement and dynamic analysis (CTC) tool support is to be used by ATS. Default value is "False", the values are case-sensitive.
+        @type string
+        @scope public
+        -->
         <property name="ats.ctc.enabled" value="False" />
         <property name="ats.multiset.enabled" value="False" />
+        <!-- Flags for EUnit exerunner can be set by setting the value of this variable. The default flags are set to "/E S60AppEnv /R Off".
+        @type string
+        @scope public
+        -->
         <property name="eunitexerunner.flags" value="/E S60AppEnv /R Off" />
+        <!-- If the property is set to "True", then the only test components which will have PKG files, will be included into the test.xml as a test-set. Which means, even if there's a test component (executable) but there's no PKG file, it should not be considered as a test component and hence not included into the test.xml as a separate test. By default the property value is False.
+        @type string
+        @scope public
+        -->
         <property name="ats.obey.pkgfiles.rule" value="False" />
     </target>
 
     <!-- Sets default values for the ASTE, this is a dependent target and shouldn't be used as an individual target -->
     <target name="ats-set-defaults-aste" depends="ats-common">
-        <condition property="ats.wsh.testrun.file" value="wshTestRunImport.vbs">
-            <equals arg1="${ats.script.type}" arg2="import" />
-        </condition>
-        <!-- if test run file is not explicitly mentioned, default is RunX-->
-        <property name="ats.wsh.testrun.file" value="wshTestRunX.vbs" />
+        <var name="ats.drop.file" value="ATSAsteDrop.zip" />
         <property name="ats.aste.test.type" value="smoke" />
         <property name="ats.aste.testasset.caseids" value="100,101,102,103,105,106,107,108,109,110,111,112,113,114,115" />
         <property name="ats.aste.software.version" value="${build.id}" />
         <property name="ats.aste.language" value="English" />
         <property name="ats.aste.software.release" value="${build.name}" />
+        <!-- Modify the plan name if you have understanding of test.xml file or leave it as it is. Default value is "plan"
+        @type string
+        @scope public
+        -->
         <property name="ats.aste.plan.name" value="plan" />
+        <!-- Modify the test-run name if you have understanding of test.xml file or leave it as it is. Default value is a string consist of build id, product name, major and minor versions
+        @type string
+        @scope public
+        -->
         <property name="ats.aste.testrun.name" value="${build.id}_${ats.product.name}_${major.version}.${minor.version}" />
+        <!-- The property is needed if you want to get an email from ATS server after the tests are executed. There can be one to many semicolon(s) ";" separated email addresses.
+        @type string
+        @scope public
+        -->
         <property name="ats.aste.email.list" value="" />
     </target>
 
@@ -202,79 +376,27 @@ Description:
     -->
     <scriptdef name="getModuleTsrcMacro" language="jython" uri="http://www.nokia.com/helium">
         <attribute name="property" />
-        <attribute name="prefix"/>
-        
-import os
-import re
-import sysdef.api
-import pathaddition.match
+        <attribute name="prefix"/>        
 import traceback
-## using create-canonical-sysdef-file target, it works and gets tsrc paths
+import os
+import atsant
+from com.nokia.ant.util import Helper
 
-if project.getProperty('canonical.sysdef.file') == None :
-    raise Exception("'canonical.sysdef.file' property is not defined")
+canonicalsysdeffile = Helper.getProperty(project, 'canonical.sysdef.file')
+modules = atsant.files_to_test(canonicalsysdeffile, project.getProperty('exclude.test.layers'), project.getProperty('ido.build.filter'), project.getProperty('build.drive'))
 
-try:
-    sdf = sysdef.api.SystemDefinition(str(project.getProperty('canonical.sysdef.file')))
-    
-    modules = {}
-    paths_list = []
-    for la in sdf.layers:
-        if re.match(r".*_test_layer$", la):
-            try:
-                if re.search(r"\b%s\b" % la, project.getProperty('exclude.test.layers')):
-                    continue
-            except TypeError, exp:
-                pass
-
-            layer = sdf.layers[la]
-            for mod in layer.modules:
-                if mod.name not in modules:
-                    modules[mod.name] = []
-                for unit in mod.units:
-                    include_unit = True
-                    if project.getProperty('ido.build.filter') != None:
-                        if project.getProperty('ido.build.filter') != "":
-                            include_unit = False
-                            if hasattr(unit, 'filters'):
-                                if len(unit.filters) > 0:
-                                    for filter in unit.filters:
-                                        if re.search(r"\b%s\b" % filter, project.getProperty('ido.build.filter')):
-                                            include_unit = True
-                                        else:
-                                            include_unit = False
-                                elif len(unit.filters) == 0:
-                                    include_unit = True
-                            else:
-                                include_unit = False
-                        else:
-                            include_unit = False
-                            if hasattr(unit, 'filters'):                            
-                                if len(unit.filters) == 0:
-                                    include_unit = True
-                    if include_unit:
-                        #if pathaddition.match.ant_match(unit.path, "**/tsrc/**", False):
-                        modules[mod.name].append(os.path.join(project.getProperty('build.drive') + os.sep, unit.path))
-                        #else:
-                        #    project.log('tcrc not found in ' + str(unit.path))
-
-            #substituting paths in the modules dictionary from path list using keys
-            for name in modules.keys():
-                if not modules[name] == []:
-                    project.setProperty(str("%s.%s" % (attributes.get('prefix'), name)), str(" ".join(modules[name])))
-                else:
-                    del modules[name]
-
-            project.setProperty(str(attributes.get('property')), str(",".join(modules.keys())))
-            
-except Exception, e:
-    traceback.print_exc()
-    project.log("ERROR: could not generate tsrc path list. %s" % e)
+for name in modules.keys():    
+    if modules[name] == []:
+        del modules[name]
+    else:
+        project.setProperty("%s.%s" % (attributes.get('prefix'), name), " ".join(modules[name]))
+        
+project.setProperty(attributes.get('property'), ",".join(modules.keys()))
+project.setProperty('ats.drops.count', str(len(modules)))
     </scriptdef>
 
-    <!-- The target is dependent on "ats-test", should not be called individually. The target creates the ATS3drop.zip file including test:xml file -->
-    <target name="ats-create-drop" depends="create-canonical-sysdef-file, ats-set-flash-image-path">
-        <var name="ats.drop.location.file" value="${ats.drop.location}/ATS3Drop${drop.file.counter}.zip" />
+    <!-- The target is dependent on "ats-test", should not be called individually. The target creates the ATSdrop.zip file including test:xml file -->
+    <target name="ats-create-drop" depends="ats-set-flash-image-path">
         <mkdir dir="${build.output.dir}/ats" />
         <hlm:getModuleTsrcMacro property="module.list" prefix="module.tsrc" />
         <if>
@@ -290,48 +412,24 @@ except Exception, e:
                             }
                         } else {
                             self.log("Error: module.list not defined.");
-                                self.setValue(true);
+                            self.setValue(true);
                         }
                             ]]>
             </scriptcondition>
             <then>
                 <echo message="Error: No test modules found!" />
             </then>
-            <elseif>
-                <scriptcondition language="beanshell">
-                    <![CDATA[
-                        String flashfiles = project.getProperty("ats.flash.images");
-                        String value = project.getProperty("ats.flashfiles.minlimit");
-                        if (flashfiles != null && value != null) {
-                            int cond = Integer.valueOf(value).intValue();
-                            String[] out = flashfiles.split(",");
-                            if (out.length < cond ) {
-                                self.setValue(true);
-                            } else {
-                                self.setValue(false);
-                            }
-                        } else {
-                            self.log("Error: flashfiles not defined.");
-                            self.setValue(true);
-                        }
-                            ]]>
-                </scriptcondition>
-                <then>
-                    <echo message="Error: Not enough flash files!" />
-                </then>
-            </elseif>
             <else>
                 <for list="${module.list}" delimiter="," param="module">
                     <sequential>
                         <runtarget target="ats-set-defaults-stifeunit" />
-                        <var name="ats.drop.file" value="${build.output.dir}/ats/ATS3Drop${drop.file.counter}.zip" />
                         <echo>${ats.drop.file}</echo>
                         <exec executable="python">
-                            <arg value="${helium.dir}/tools/common/python/lib/ats3/__init__.py" />
+                            <arg line="-m ats3.__init__" />
                             <arg value="--device-type=${ats.product.name}" />
                             <arg value="--device-hwid=${ats.product.hwid}" />
                             <arg value="${internal.ats.diamonds.arg}" />
-                            <arg value="--drop-file=${ats.drop.file}" />
+                            <arg value="--drop-file=${build.output.dir}/ats/${ats.drop.file}" />
                             <arg value="--report-email=${ats.email.list}" />
                             <arg value="--plan-name=${ats.plan.name}" />
                             <arg value="--testrun-name=${ats.testrun.name}_@{module}" />
@@ -346,10 +444,12 @@ except Exception, e:
                             <arg value="--multiset-enabled=${ats.multiset.enabled}" />
                             <arg value="--file-store=${ats.report.location}" />
                             <arg value="--eunitexerunner-flags=${eunitexerunner.flags}" />
-                            <arg value="--ats-network-drive=${ats.ctc.host}#${ats.drop.file}" />
+                            <arg value="--ctc-run-process-params=${ats.ctc.host}#${ats.drop.file}#${ats.drops.count}" /> <!-- Three differnt value are combined with '#' character which is later parsed inside the script -->
                             <arg value="--monsym-files=${ats.ctc.monsyms}" />
                             <arg value="--config=${ats.config.file}" />
                             <arg value="--obey-pkgfiles=${ats.obey.pkgfiles.rule}" />
+                            <arg value="--ats4-enabled=${ats4.enabled}" />
+                            <arg value="--specific-pkg=${ats.specific.pkg}" />
                             <arg value="--verbose" />
                             <arg line="${module.tsrc.@{module}}" />
                         </exec>
@@ -364,55 +464,30 @@ except Exception, e:
 
     <!-- Please see ats-aste for description.-->
     <target name="do-ats-aste" depends="ats-set-flash-image-path, ats-set-defaults-aste" if="enabled.aste">
-
         <mkdir dir="${build.output.dir}/ats" />
-        <if>
-            <scriptcondition language="beanshell">
-                <![CDATA[
-                String flashfiles = project.getProperty("ats.flash.images");
-                String value = project.getProperty("ats.flashfiles.minlimit");
-                if (flashfiles != null && value != null) {
-                    int cond = Integer.valueOf(value).intValue();
-                    String[] out = flashfiles.split(",");
-                    if (out.length < cond ) {
-                        self.setValue(true);
-                    } else {
-                            self.setValue(false);
-                    }
-                } else {
-                    self.log("Error: flashfiles not defined.");
-                    self.setValue(true);
-                }
-                    ]]>
-            </scriptcondition>
-            <then>
-                <echo message="Error: Not enough flash files!" />
-            </then>
-            <else>
-                <exec executable="python">
-                    <arg value="${helium.dir}/tools/common/python/lib/ats3/aste.py" />
-                    <arg value="--report-email=${ats.aste.email.list}" />
-                    <arg value="--device-type=${ats.product.name}" />
-                    <arg value="--flash-images=${ats.flash.images}" />
-                    <arg value="--minimum-flash-images=${ats.flashfiles.minlimit}" />
-                    <arg value="--plan-name=${ats.aste.plan.name}" />
-                    <arg value="--testrun-name=${ats.aste.testrun.name}" />
-                    <arg value="--device-hwid=${ats.product.hwid}" />
-                    <arg value="--test-timeout=${ats.test.timeout}" />
-                    <arg value="--build-drive=${build.drive}" />
-                    <arg value="${internal.ats.diamonds.arg}" />
-                    <arg value="--drop-file=${ats.drop.file}" />
-                    <arg value="--test-type=${ats.aste.test.type}" />
-                    <arg value="--testasset-location=${ats.aste.testasset.location}" />
-                    <arg value="--testasset-caseids=${ats.aste.testasset.caseids}" />
-                    <arg value="--software-version=${ats.aste.software.version}" />
-                    <arg value="--device-language=${ats.aste.language}" />
-                    <arg value="--software-release=${ats.aste.software.release}" />
-                    <arg value="--verbose" />
-                </exec>
-                <runtarget target="do-ats-test" />
-            </else>
-        </if>
+        <exec executable="python">
+            <arg line="-m ats3.aste" />
+            <arg value="--report-email=${ats.aste.email.list}" />
+            <arg value="--device-type=${ats.product.name}" />
+            <arg value="--flash-images=${ats.flash.images}" />
+            <arg value="--minimum-flash-images=${ats.flashfiles.minlimit}" />
+            <arg value="--plan-name=${ats.aste.plan.name}" />
+            <arg value="--testrun-name=${ats.aste.testrun.name}" />
+            <arg value="--device-hwid=${ats.product.hwid}" />
+            <arg value="--test-timeout=${ats.test.timeout}" />
+            <arg value="--build-drive=${build.drive}" />
+            <arg value="${internal.ats.diamonds.arg}" />
+            <arg value="--drop-file=${build.output.dir}/ats/${ats.drop.file}" />
+            <arg value="--test-type=${ats.aste.test.type}" />
+            <arg value="--testasset-location=${ats.aste.testasset.location}" />
+            <arg value="--testasset-caseids=${ats.aste.testasset.caseids}" />
+            <arg value="--software-version=${ats.aste.software.version}" />
+            <arg value="--device-language=${ats.aste.language}" />
+            <arg value="--software-release=${ats.aste.software.release}" />
+            <arg value="--ats4-enabled=${ats4.enabled}" />
+            <arg value="--verbose" />
+        </exec>
+        <runtarget target="do-ats-test" />
     </target>
 
     <!--
@@ -420,16 +495,19 @@ except Exception, e:
         Then it copies the discovered files under the ftp server defined by ats.ctc.host.
         The target url is: ftp ://[server]/ctc_helium/[diamonds_id]/mon_syms/[id]/mon.sym 
     -->
-    <target name="copy-mon-sym" if="ats.ctc.enabled">
-        <fmpp sourceFile="${helium.dir}/tools/testing/ats/templates/monsym-file-list.txt.ftl"
-            outputFile="${temp.build.dir}/monsym-file-list.txt">
-            <data expandProperties="yes">
-                data: xml(${canonical.sysdef.file})
-                ant: antProperties()
-            </data>
-        </fmpp>
-        <hlm:path2file reference="mon.sym.list" file="${temp.build.dir}/monsym-file-list.txt" />
-        <script language="jython">
+    <target name="copy-mon-sym">
+        <if>
+            <istrue value="${ats.ctc.enabled}"/>
+            <then>
+                <fmpp sourceFile="${helium.dir}/tools/testing/ats/templates/monsym-file-list.txt.ftl"
+                    outputFile="${temp.build.dir}/monsym-file-list.txt">
+                    <data expandProperties="yes">
+                        data: xml(${canonical.sysdef.file})
+                        ant: antProperties()
+                    </data>
+                </fmpp>
+                <hlm:path2file reference="mon.sym.list" file="${temp.build.dir}/monsym-file-list.txt" />
+                <script language="jython">
 import os
 import ctc
 
@@ -449,8 +527,10 @@ monsyms = uploader.upload()
             
 # Using ; to separate the path because the target script is running on windows
 project.setNewProperty('ats.ctc.monsyms', ';'.join([ "//%s/%s" % (server, x) for x in monsyms]))
-        </script>
-        <echo>ats.ctc.monsyms: ${ats.ctc.monsyms}</echo>
+                </script>
+                <echo>ats.ctc.monsyms: ${ats.ctc.monsyms}</echo>
+            </then>
+        </if>
     </target>
 
     <!-- a dependant target please do not call directly use matti-test,
@@ -460,91 +540,124 @@ project.setNewProperty('ats.ctc.monsyms', ';'.join([ "//%s/%s" % (server, x) for
         <runtarget target="ats-set-defaults-stifeunit" />
         <!--need to set theseup for use by do-ats-test target-->
         <mkdir dir="${build.output.dir}/ats" />
-        <var name="ats.drop.location" value="${build.output.dir}/ats" />
-        <var name="ats.drop.file" value="${build.output.dir}/ats/ATS3Drop.zip" />
-        <var name="ats.drop.location.file" value="${ats.drop.file}" />
+        <var name="ats.drop.file" value="ATSMattiDrop.zip" />
         <if>
-            <!-- get the list of .fpsx files (and others) in the defined folder
-             to pass as a list to the python script-->
+            <!-- get the list of .sis files in the defined folder to pass as a list to the python script-->
             <scriptcondition language="beanshell">
                 <![CDATA[
-                    String flashfiles = project.getProperty("ats.flash.images");
-                    String value = project.getProperty("ats.flashfiles.minlimit");
-                    if (flashfiles != null && value != null) {
+                    String sisfiles = project.getProperty("ats.sis.images");
+                    String value = project.getProperty("ats.sisfiles.minlimit");
+                    if (sisfiles != null && value != null) {
                         int cond = Integer.valueOf(value).intValue();
-                        String[] out = flashfiles.split(",");
+                        String[] out = sisfiles.split(",");
                         if (out.length < cond ) {
                             self.setValue(true);
                         } else {
                             self.setValue(false);
                         }
                     } else {
-                        self.log("Error: flashfiles not defined.");
+                        self.log("Error: reference.ats.sis.images not defined.");
                         self.setValue(true);
                     }
                         ]]>
             </scriptcondition>
             <then>
-                <echo message="Error: Not enough flash files!" />
+                <echo message="Error: Not enough sis files check reference.ats.sis.images" />
             </then>
             <else>
-                <if>
-                    <!-- get the list of .sis files in the defined folder to pass as a list to the python script-->
-                    <scriptcondition language="beanshell">
-                        <![CDATA[
-                            String sisfiles = project.getProperty("ats.sis.images");
-                            String value = project.getProperty("ats.sisfiles.minlimit");
-                            if (sisfiles != null && value != null) {
-                                int cond = Integer.valueOf(value).intValue();
-                                String[] out = sisfiles.split(",");
-                                if (out.length < cond ) {
-                                    self.setValue(true);
-                                } else {
-                                    self.setValue(false);
-                                }
-                            } else {
-                                self.log("Error: sisfiles not defined.");
-                                self.setValue(true);
-                            }
-                                ]]>
-                    </scriptcondition>
+                <!-- execute the MattiDrops.py script with parameters-->
+                <exec executable="python" resultproperty="script.response">
+                    <arg line="-m ats3.matti.MattiDrops" />
+                    <arg value="--build-drive=${build.drive}" />
+                    <arg value="--matti-scripts=${matti.scripts}" />
+                    <arg value="--flash-images=${ats.flash.images}" />
+                    <arg value="--harness=STIF" />
+                    <arg value="--file-store=${ats.output.dir}" />
+                    <arg value="--testrun-name=${ats.testrun.name}" />
+                    <arg value="--device-type=${ats.product.name}" />
+                    <arg value="--device-hwid=${ats.product.hwid}" />
+                    <arg value="--diamonds-build-url=${internal.ats.diamonds.arg}" />
+                    <arg value="--drop-file=${build.output.dir}/ats/${ats.drop.file}" />
+                    <arg value="--minimum-flash-images=${ats.flashfiles.minlimit}" />
+                    <arg value="--plan-name=${ats.plan.name}" />
+                    <arg value="--sis-files=${ats.sis.images}" />
+                    <arg value="--template-loc=${template.file}" />
+                </exec>
+                <if> 
+                    <not>
+                        <!-- if the response is not 0 then need to create the skip.ats.sending
+                         flag so that do-ats-test is not run-->
+                        <equals arg1="${script.response}" arg2="0" />
+                    </not>
                     <then>
-                        <echo message="Error: Not enough sis files!" />
+                        <!-- Skips sending drop package file to ATS/ASTE after its creation.
+                        @type boolean
+                        @scope public
+                        -->
+                        <property name="skip.ats.sending" value="1" />
                     </then>
-                    <else>
-                        <!-- execute the MattiDrops.py script with parameters-->
-                        <exec executable="python" resultproperty="script.response">
-                            <arg value="${helium.dir}/tools/common/python/lib/ats3/matti/MattiDrops.py" />
-                            <arg value="--build-drive=${build.drive}" />
-                            <arg value="--matti-scripts=${matti.scripts}" />
-                            <arg value="--flash-images=${ats.flash.images}" />
-                            <arg value="--harness=STIF" />
-                            <arg value="--file-store=${ats.output.dir}" />
-                            <arg value="--testrun-name=${ats.testrun.name}" />
-                            <arg value="--device-type=${ats.product.name}" />
-                            <arg value="--device-hwid=${ats.product.hwid}" />
-                            <arg value="--diamonds-build-url=${internal.ats.diamonds.arg}" />
-                            <arg value="--drop-file=${ats.drop.file}" />
-                            <arg value="--minimum-flash-images=${ats.flashfiles.minlimit}" />
-                            <arg value="--plan-name=${ats.plan.name}" />
-                            <arg value="--sis-files=${ats.sis.images}" />
-                            <arg value="--template-loc=${template.file}" />
-                        </exec>
-                        <if> 
-                            <not>
-                                <!-- if the response is not 0 then need to create the skip.ats.sending
-                                 flag so that do-ats-test is not run-->
-                                <equals arg1="${script.response}" arg2="0" />
-                            </not>
-                            <then>
-                                <property name="skip.ats.sending" value="1" />
-                            </then>
-                        </if>
-                        <runtarget target="do-ats-test" />
-                    </else>
-                </if>    
+                </if>
+                <runtarget target="do-ats-test" />
             </else>
-        </if>    
+        </if>
     </target>
     
+    <!-- Temp dir
+    @type string
+    @scope private
+    -->
+    <property name="ats.evalid.pre" value="${temp.build.dir}/${build.id}_atsevalidpre" />
+    <!-- Temp dir
+    @type string
+    @scope private
+    -->
+    <property name="ats.evalid.post" value="${temp.build.dir}/${build.id}_atsevalidpost" />
+    
+    <!-- Call before preperation -->
+    <target name="find-files-pre" if="ats.delta.enabled">
+        <hlm:evalidMacro dir="${ats.evalid.pre}"/>
+    </target>
+    
+    <!-- Call after preperation -->
+    <target name="find-files-post" if="ats.delta.enabled">
+        <hlm:evalidMacro dir="${ats.evalid.post}"/>
+    </target>
+    
+    <!-- Run evalid on ido directories -->
+    <macrodef name="evalidMacro" uri="http://www.nokia.com/helium">
+        <attribute name="dir"/>
+        <sequential>
+            <runtarget target="ido-create-ado-mapping"/>
+            <hlm:python>
+import delta_zip
+delta_zip.evalidAdomapping(r'${build.drive}', r'@{dir}', r'${ado.mapping.file}')
+            </hlm:python>
+        </sequential>
+    </macrodef>
+    
+    <!-- Generate sysdef fileset based on evalid data -->
+    <target name="ats-delta" if="ats.delta.enabled">
+        <script language="jython">
+import ido
+from com.nokia.ant.util import Helper
+import delta_zip
+import os
+
+atspath = project.createDataType("path")
+i = project.getReference('system.definition.files').iterator()
+changedfiles = delta_zip.changedFiles(Helper.getProperty(project, 'ats.evalid.pre'), Helper.getProperty(project, 'ats.evalid.post'))
+while i.hasNext():
+    path = i.next().toString()
+    sysdefpath = os.path.abspath(os.path.join(project.getProperty('build.drive') + os.sep, ido.get_sysdef_location(path)))
+    for f in changedfiles:
+        if sysdefpath.lower() in os.path.abspath(f).lower():
+            pe = atspath.createPathElement()
+            pe.setPath(path)
+            break
+project.addReference('ats.system.definition.files', atspath)
+        </script>
+    </target>
+    
+    <!-- Common target to run ats, aste and matti -->
+    <target name="run-test" depends="ats-test,ats-aste,matti-test"/>
 </project>

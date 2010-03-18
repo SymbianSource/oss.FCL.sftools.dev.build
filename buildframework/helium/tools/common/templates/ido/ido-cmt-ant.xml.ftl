@@ -28,9 +28,10 @@ Description:
     <#if (cmtid > 1)>
     <#assign targetlist="${targetlist}" + ","/>
     </#if>
+    <basename property="componentbase${cmtid}" file="${data[component]}"/>
     <hlm:argSet id="cmttool.refid.${cmtid}">
         <hlm:arg name="input" value="${data[component]}" />
-        <hlm:arg name="output" value="${ant['build.log.dir']}/${ant['build.id']}_${ant['ido.name']}_${cmtid}.xml" />
+        <hlm:arg name="output" value="${ant['build.log.dir']}/${ant['build.id']}_${ant['ido.name']}_${r'$'}{componentbase${cmtid}}_${cmtid}.txt" />
         <hlm:arg name="pattern" value="**/*.h,**/*.cpp" />
     </hlm:argSet>
 
@@ -43,8 +44,5 @@ Description:
     <#assign cmtid=cmtid+1/>
     </#list>
     <target name="all" depends="${targetlist}" >
-      <move todir="${ant['build.output.dir']}/codecomplexity" overwrite="true" preservelastmodified="true" failonerror="${ant['failonerror']}">
-          <fileset dir="${ant['build.log.dir']}/CMTHTML"/>
-      </move>
     </target>
 </project>

@@ -71,7 +71,10 @@ public class CopyParallelTask extends Copy
             }
             catch (InterruptedException e)
             {
-                e.printStackTrace();
+                if (failonerror) {
+                    throw new BuildException("Copy parallel task has been interrupted " + e.getMessage());
+                }
+                log("Copy parallel task has been interrupted " + e.getMessage(), Project.MSG_ERR);
             }
        }
        

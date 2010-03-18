@@ -125,8 +125,28 @@ You can find more information on how to document Ant task using the Antdoclet pl
 Logging
 -------
 
-Developer must use standard Ant logging for any user log output.
+Developer must preferably use standard Ant logging for any user log output.
 Internal debug logging must be implemented using Log4J framework.
+
+ * ANT Listeners must use log4j logging framework - using Ant logging system might cause some looping issues.
+ * Ant Type and Task must use the Ant logging mechanism to report to the user.
+ * Generic framework (part of the code which doesn't links to Ant directly) must use Log4J. 
+ * Usage of System.out.println should be avoided.
+ * All the non-handled exceptions should be considered as errors and should be reported as such:
+    * use log("message", Project.MSG_ERR) under Ant
+    * log.error() otherwise.
+    * Exception to this rule must be clearly commented under the code.
+ * Debug information:
+    * Log4J framework (log.debug()) must be used to push information to the Helium debug log - so debug information are not
+      directly visible by the user.
+    * Ant logging framework can also be use to log Type/Task debug info (but log4j is preferred).
+    * PrintStackTrace method should be used on below scenario's:
+       * At the time of unknown exception.
+       * Should be used with exceptions other than BuildException.
+       * In case it is difficult to debug the issue with Exception.getMessage().
+       * use this method during debugging complex issue (this doesn't mean the line should remain in the code after development).
+       * When it is required to print the all the information about the occurring Exception. 
+
 
 This is an example on how to use logging:
 ::
@@ -144,3 +164,17 @@ This is an example on how to use logging:
 
 
 Please find more information on Log4J from the online manual: http://logging.apache.org/log4j/1.2/manual.html.
+
+
+Exception
+---------
+
+Exceptional event reporting and handling is crutial in software development. Developer must make sure it is done accordingly
+to the framework it is currently using:
+
+ * To report a build failure under Ant the BuildException must be used.
+    But we have to keep in mind that a BuildException is not tracked because it derives from the RuntimeError type.
+    So we have to be careful with those and try to limit their puprose to the original usage: Ant build failure.
+ * It is preferable to have meaningful exception type like: FileNotFoundException.
+ * Developer should try to avoid as much as possible the throw or catch raw type of exception like Exception, RuntimeError.  
+   

@@ -29,9 +29,8 @@ if not defined HELIUM_HOME (
 
 set HLM_DISABLE_INTERNAL_DATA=1
 
-set JEP_HOME=%HELIUM_HOME%\external\jep_1.6_2.5
 
-set ANT_ARGS=-lib "%HELIUM_HOME%\external\antlibs" -lib "%JEP_HOME%" -logger org.apache.tools.ant.DefaultLogger
+set ANT_ARGS=-lib "%HELIUM_HOME%\external\antlibs" -logger org.apache.tools.ant.DefaultLogger
 
 hlm -f build-jar.ant.xml jar
 

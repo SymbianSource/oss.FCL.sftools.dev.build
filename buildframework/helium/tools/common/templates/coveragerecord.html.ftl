@@ -58,7 +58,7 @@ Description:
 <h2>Ant Code Coverage</h2>
 <p>Total Targets: ${totalTargets}</p>
 <p>Executed Targets: ${execTargets}</p>
-<p>Percentage Targets: ${(execTargets/totalTargets*100)?int}</p>
+<p>Percentage Targets: <#if totalTargets!=0>${(execTargets/totalTargets*100)?int}<#else>N/A</#if></p>
 <p>Total Tasks: ${totalTasks}</p>
 <p>Executed Tasks: ${execTasks}</p>
-<p>Percentage Tasks: ${(execTasks/totalTasks*100)?int}</p>
+<p>Percentage Tasks: <#if totalTasks!=0>${(execTasks/totalTasks*100)?int}<#else>N/A</#if></p>

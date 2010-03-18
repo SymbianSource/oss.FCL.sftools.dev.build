@@ -28,10 +28,11 @@ public class CheckTools
             
             Process toolProcess = runtime.exec("python -V");
             InputStream err = toolProcess.getErrorStream();
-            if (!(toString(err).trim().startsWith("Python 2.5")))
+            String output = toString(err).trim();
+            if (!(output.startsWith("Python 2.5")) && !(output.startsWith("Python 2.6")))
             {
-                System.out.println("Error: Python 2.5 not found");
-                System.out.println(err);
+                System.out.println("Error: Python 2.5/2.6 not found");
+                System.out.println(output);
             }
             
             toolProcess = runtime.exec("java -version");

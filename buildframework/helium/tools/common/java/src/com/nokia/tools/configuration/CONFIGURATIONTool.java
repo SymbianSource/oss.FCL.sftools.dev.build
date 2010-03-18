@@ -17,10 +17,8 @@
 
 package com.nokia.tools.configuration;
 
-import java.util.Vector;
-import java.util.Enumeration;
-import com.nokia.ant.types.VariableSet;
-import com.nokia.ant.types.Variable;
+import com.nokia.helium.core.ant.types.VariableSet;
+import com.nokia.helium.core.ant.types.Variable;
 import com.nokia.tools.*;
 import org.apache.tools.ant.Project;
 
@@ -33,7 +31,7 @@ public class CONFIGURATIONTool implements Tool {
      * Sets the command line variables to be used to execute and validates for
      * the required parameters
      * 
-     * @param VariableSet
+     * @param varSet
      *            variable(name / value list)
      */
     public void execute(VariableSet varSet, Project prj)
@@ -47,11 +45,7 @@ public class CONFIGURATIONTool implements Tool {
         String report = null;
         String varName;
         String value;
-        Vector configSet = varSet.getVariables();
-        Enumeration e = configSet.elements();
-        Variable variable;
-        while (e.hasMoreElements()) {
-            variable = (Variable) e.nextElement();
+        for (Variable variable : varSet.getVariables()) {
             varName = variable.getName();
             value = variable.getValue();
             if (varName.equals("path")) {

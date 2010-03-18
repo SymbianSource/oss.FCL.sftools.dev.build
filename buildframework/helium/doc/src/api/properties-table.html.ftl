@@ -25,32 +25,36 @@ Description:
 
 <script type="text/javascript" src="properties-table.js"></script>
 
+    <#assign propertyInfo = {}>
+    <#list doc.antDatabase.project.property as property>
+        <#assign propertyInfo = propertyInfo + {property.name: property}>
+    </#list>
+        
     <center>
-    <h1>
-    Properties table(Sortable)
+    <h1>Properties table(Sortable)
     </h1>
+    
     <table class="sortable" border="1" cellpadding="5" ID="tableSort">
-    <tr>
-    <th onmouseover="this.style.cursor = 'pointer';"><font color="blue"><u>Property</u></font></th>
-    <th onmouseover="this.style.cursor = 'pointer';"><font color="blue"><u>Description</u></font></th>
-    <th onmouseover="this.style.cursor = 'pointer';"><font color="blue"><u>Edit Status</u></font></th>
-    <th onmouseover="this.style.cursor = 'pointer';"><font color="blue"><u>Type</u></font></th>
-    </tr>
-    <#assign propertySort=data.heliumDataModel.property.name?sort>
-    <#assign propertyTable=data.heliumDataModel.property>
-    <#list propertySort as propertyName>
-    <#list propertyTable as property>
-    <#if propertyName == property.name>
-    <tr>
-    <td><a href="property-${property.name}.html" title="${property.name}" target="classframe">${property.name}</a></td>
-    <td>${property.description}</td>
-    <td>${property.editStatus}</td>
-    <td>${property.type}</td>
-    </tr>
-    </#if>
-    </#list>
-    </#list>
+        <tr>
+            <th onmouseover="this.style.cursor = 'pointer';"><font color="blue"><u>Property</u></font></th>
+            <th onmouseover="this.style.cursor = 'pointer';"><font color="blue"><u>Description</u></font></th>
+            <th onmouseover="this.style.cursor = 'pointer';"><font color="blue"><u>Scope</u></font></th>
+            <th onmouseover="this.style.cursor = 'pointer';"><font color="blue"><u>Editable</u></font></th>
+            <th onmouseover="this.style.cursor = 'pointer';"><font color="blue"><u>Type</u></font></th>
+        </tr>
+        <#list propertyInfo?keys?sort as name>
+        <tr>
+            <td><a href="property-${name}.html" title="${name}" target="classframe">${name}</a></td>
+            <td>${propertyInfo[name].summary}</td>
+            <td>${propertyInfo[name].scope}</td>
+            <td>${propertyInfo[name].editable}</td>
+            <td>${propertyInfo[name].type}</td>
+        </tr>
+        </#list>
     </table>
 
 
 <@helium_api_html_footer/>
+
+
+

@@ -1,0 +1,72 @@
+<?xml version="1.0"?>
+<!-- 
+============================================================================ 
+Name        : test_ldap.ant.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test-ldap" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>Helium antlib core ldap tests.</description>
+
+    <typedef name="ldap" classname="com.nokia.helium.core.ant.taskdefs.LDAP"/>
+    <taskdef resource="com/nokia/helium/core/ant/antlib.xml" uri="http://www.nokia.com/helium"/>
+    
+    
+    <target name="setUp">
+        <property environment="env"/>
+        <property name="email.ldap.server" value="ldap://some.address.test:389"/>
+        <property name="email.ldap.rootdn" value="o=RootName"/>
+    </target>
+  
+    <target name="test-ldap-case-no-args">
+        <au:expectfailure expectedMessage="'url' attribute is not defined">
+            <hlm:ldap/>
+        </au:expectfailure>
+    </target>
+    
+    <target name="test-ldap-case-only-url-set">
+        <au:expectfailure expectedMessage="'rootdn' attribute is not defined">
+            <hlm:ldap url="test"/>
+        </au:expectfailure>
+    </target>
+    
+    <target name="test-ldap-case-url-rootdn-set">
+        <au:expectfailure expectedMessage="'filter' attribute is not defined">
+            <hlm:ldap url="test" rootdn="root"/>
+        </au:expectfailure>
+    </target>
+
+    <target name="test-ldap-case-url-rootdn-filter-set">
+        <au:expectfailure expectedMessage="'property' attribute is not defined">
+            <hlm:ldap url="test" rootdn="root" filter="filter"/>
+        </au:expectfailure>
+    </target>
+
+    <target name="test-ldap-case-url-rootdn-property-set">
+        <au:expectfailure expectedMessage="'key' attribute is not defined">
+            <hlm:ldap url="test" rootdn="root" filter="filter" outputproperty="email.from"/>
+        </au:expectfailure>
+    </target>
+
+    <target name="test-ldap-case-all-args-set">
+        <au:expectfailure expectedMessage="some.address.test:389">
+            <hlm:ldap url="${email.ldap.server}" rootdn="${email.ldap.rootdn}" filter="uid=${env.USERNAME}" outputproperty="email.from" key="mail"/>
+        </au:expectfailure>    
+    </target>
+    
+</project>

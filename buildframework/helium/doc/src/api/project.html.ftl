@@ -36,7 +36,7 @@ Description:
 </#if>
 <h3>Description</h3>
 <p>
-<#recurse project.documentation>
+${project.description}
 </p>
 <p/>
 <hr/>
@@ -45,22 +45,24 @@ Description:
 <h3>Targets</h3>
 <table class="docutils">
     <tr>
-        <th class="head">Target name</th><th class="head">Description</th>
+        <th class="head">Target name</th>
+        <th class="head">Description</th>
     </tr>
     <#assign targetInfo = {}>
     <#list project.target as target>
-        <#assign targetInfo = targetInfo + {target.name: target.documentation}>
+        <#assign targetInfo = targetInfo + {target.name: target.summary}>
     </#list>
     <#list targetInfo?keys?sort as name>
         <tr>
-            <td><a href="target-${name}.html" target="classframe">${name}</a></td><td><#recurse targetInfo[name]></td>
+            <td><a href="target-${name}.html" target="classframe">${name}</a></td>
+            <td><#recurse targetInfo[name]></td>
         </tr>
     </#list>
 </table>
 
 <h3>Properties</h3>
 
-<#assign propertymodel=data.heliumDataModel.property>
+<#assign propertymodel=doc.antDatabase.project.property>
 <#assign propertylist=project.property>
 <#list propertymodel as propertyInModel>
 <#list propertylist as propertyvar>
@@ -73,8 +75,8 @@ Description:
 </#list>
 </#list>
 
-<h3>File Includes</h3>
-<#assign filelist=project.fileDependency>
+<h3>Project dependencies</h3>
+<#assign filelist = project.projectDependency>
 <#list filelist as filelistvar>
 <font class="frameitemfont">
 ${filelistvar}
@@ -82,7 +84,7 @@ ${filelistvar}
 <br/>
 </#list>
 
-<h3>Python Modules</h3>
+<#--<h3>Python Modules</h3>
 <#assign pymodulelist=project.pythonDependency>
 <#list pymodulelist.module as pymodulevar>
   <#if pymodulevar?size &gt; 0>        
@@ -91,7 +93,7 @@ ${filelistvar}
     </font>  
   </#if>
 <br/>
-</#list>
+</#list>-->
         
 
 

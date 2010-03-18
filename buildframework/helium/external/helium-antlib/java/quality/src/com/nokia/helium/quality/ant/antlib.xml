@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : antlib.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<antlib>
+    <!-- Task definition -->
+    <taskdef name="codescanner" classname="com.nokia.helium.quality.ant.taskdefs.CodeScanner" onerror="ignore"/>
+    <taskdef name="coverity" classname="com.nokia.helium.quality.ant.taskdefs.Coverity" onerror="ignore"/>
+    
+    <!-- Type definition -->
+    <typedef name="coverityoptions" classname="com.nokia.helium.core.ant.types.VariableSet"/>
+    <typedef name="arg" classname="com.nokia.helium.core.ant.types.Variable"/>
+</antlib>

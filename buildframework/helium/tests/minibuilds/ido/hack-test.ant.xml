@@ -31,7 +31,7 @@ Description:
 	<target name="prepare-hack">
 		<mkdir dir="${hack.dir}"/>
 		<copy file="${build.drive}\epoc32\tools\variant\variant.cfg" todir="${hack.dir}" overwrite="true"/>
-		<copy file="${build.drive}\epoc32\rom\include\s60.iby" todir="${hack.dir}" overwrite="true"/>
+		<copy file="${build.drive}\epoc32\rom\ppd.oby" todir="${hack.dir}" overwrite="true"/>
 		<copy file="${build.drive}\epoc32\data\z\private\10202be9\101F8763.txt" todir="${hack.dir}" overwrite="true"/>
 	</target>
 
@@ -48,21 +48,21 @@ Description:
 	<target name="do-hack">
 		<!-- Hacking variant.cfg -->
 		<copy file="${hack.dir}/variant.cfg" tofile="${hack.dir}/variant_hacked.cfg" overwrite="true"/>
-		<hlm:hackMacro file="${hack.dir}/variant_hacked.cfg" keyword="ENABLE_ABIV2_MODE" regex="(.hrh\s*$)" replace="\1\nENABLE_ABIV2_MODE"/>
+		<hlm:hackMacro file="${hack.dir}/variant_hacked.cfg" keyword="ENABLE_ABIVX_MODE" regex="(.hrh\s*$)" replace="\1\nENABLE_ABIVX_MODE"/>
 		<copy file="${hack.dir}/variant_hacked.cfg" tofile="${hack.dir}/variant_skipped.cfg" overwrite="true"/>
-		<hlm:hackMacro file="${hack.dir}/variant_skipped.cfg" keyword="ENABLE_ABIV2_MODE" regex="(.hrh\s*$)" replace="\1\nENABLE_ABIV2_MODE"/>
+		<hlm:hackMacro file="${hack.dir}/variant_skipped.cfg" keyword="ENABLE_ABIVX_MODE" regex="(.hrh\s*$)" replace="\1\nENABLE_ABIVX_MODE"/>
 
 		<au:assertFilesDiffer expected="${hack.dir}/variant.cfg" actual="${hack.dir}/variant_hacked.cfg" />
 		<au:assertFilesMatch expected="${hack.dir}/variant_skipped.cfg" actual="${hack.dir}/variant_hacked.cfg" />
 
 		<!-- Hacking S60.iby -->
-		<copy file="${hack.dir}/s60.iby" tofile="${hack.dir}/s60_hacked.iby" overwrite="true"/>
-		<hlm:hackMacro file="${hack.dir}/s60_hacked.iby" keyword="&lt;foo\.iby&gt;" regex="#endif" replace="#include &lt;foo.iby&gt;\n#endif"/>
-		<copy file="${hack.dir}/s60_hacked.iby" tofile="${hack.dir}/s60_skipped.iby" overwrite="true"/>
-		<hlm:hackMacro file="${hack.dir}/s60_skipped.iby" keyword="&lt;foo\.iby&gt;" regex="#endif" replace="#include &lt;foo.iby&gt;\n#endif"/>
+		<copy file="${hack.dir}/ppd.oby" tofile="${hack.dir}/ppd_hacked.oby" overwrite="true"/>
+		<hlm:hackMacro file="${hack.dir}/ppd_hacked.oby" keyword="&lt;foo\.iby&gt;" regex="#endif" replace="#include &lt;foo.iby&gt;\n#endif"/>
+		<copy file="${hack.dir}/ppd_hacked.oby" tofile="${hack.dir}/ppd_skipped.oby" overwrite="true"/>
+		<hlm:hackMacro file="${hack.dir}/ppd_skipped.oby" keyword="&lt;foo\.iby&gt;" regex="#endif" replace="#include &lt;foo.iby&gt;\n#endif"/>
 
-		<au:assertFilesDiffer expected="${hack.dir}/s60.iby" actual="${hack.dir}/s60_hacked.iby" />
-		<au:assertFilesMatch expected="${hack.dir}/s60_skipped.iby" actual="${hack.dir}/s60_hacked.iby" />
+		<au:assertFilesDiffer expected="${hack.dir}/ppd.oby" actual="${hack.dir}/ppd_hacked.oby" />
+		<au:assertFilesMatch expected="${hack.dir}/ppd_skipped.oby" actual="${hack.dir}/ppd_hacked.oby" />
 
 		<!-- Hacking 101F8763.iby -->
 		<copy file="${hack.dir}/101F8763.txt" tofile="${hack.dir}/101F8763_hacked.txt" overwrite="true"/>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : antlib.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<antlib>
+    <!-- Task definition -->
+    <taskdef name="path2file" classname="com.nokia.helium.core.ant.taskdefs.SerializePathTask"/>
+    <taskdef name="countSeverity" classname="com.nokia.helium.core.ant.taskdefs.XMLLogCount"/>
+    <taskdef name="getVariableValue" classname="com.nokia.helium.core.ant.taskdefs.GetValueFromVariableSet"/>
+    <taskdef name="python" classname="com.nokia.helium.core.ant.taskdefs.PythonTask"/>
+    <taskdef name="retry" classname="com.nokia.helium.core.ant.taskdefs.RetryTask"/>
+    
+    <!-- Type definition -->
+    <typedef name="hasSeverity" classname="com.nokia.helium.core.ant.conditions.XMLLogCondition"/>
+    <typedef name="ldapauthenticate" classname="com.nokia.helium.core.ant.taskdefs.ValidateUserLogin" />
+    <typedef name="ldap" classname="com.nokia.helium.core.ant.taskdefs.LDAP" />
+    
+    <typedef name="arg" classname="com.nokia.helium.core.ant.types.Variable"/>
+    <typedef name="argSet" classname="com.nokia.helium.core.ant.types.VariableSet"/>
+
+    <!-- Type definition -->
+    <typedef name="deflist" classname="com.nokia.helium.core.ant.types.HlmDefList"/>
+    <typedef name="importdef" classname="com.nokia.helium.core.ant.types.HlmImportDef"/>
+    <typedef name="listenerdef" classname="com.nokia.helium.core.ant.types.HlmListenerDef"/>
+    
+    <typedef name="prettyprintxml" classname="com.nokia.helium.core.ant.filters.PrettyPrintXmlFilter"/> 
+</antlib>

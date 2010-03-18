@@ -23,22 +23,20 @@ def run():
 	t.id = "112a"
 	t.name = "tracecompiler_whatlog_clean"
 	t.usebash = True
-	t.command = "sbs -b smoke_suite/test_resources/tracecompiler/testTC/group/bld.inf -c armv5.tracecompiler CLEAN"
-	t.run("windows")
+	t.command = "sbs -b smoke_suite/test_resources/tracecompiler/testTC/group/bld2.inf -c armv5.tracecompiler CLEAN"
+	t.run()
 
 	t = CheckWhatSmokeTest()
 	t.description = "Trace Compiler Whatlog test"
 	t.id = "112b"
 	t.name = "tracecompiler_whatlog"
 	t.usebash = True
-	t.command = "sbs -b smoke_suite/test_resources/tracecompiler/testTC/group/bld.inf -c armv5.tracecompiler -m ${SBSMAKEFILE} -f ${SBSLOGFILE} && cat ${SBSLOGFILE}"
+	t.command = "sbs -b smoke_suite/test_resources/tracecompiler/testTC/group/bld2.inf -c armv5.tracecompiler -m ${SBSMAKEFILE} -f ${SBSLOGFILE} && cat ${SBSLOGFILE}"
 	t.hostossensitive = False
 	t.regexlinefilter = re.compile("^<(whatlog|export|build>|resource>|bitmap>)")
 	t.targets = [
 		"$(EPOCROOT)/epoc32/release/armv5/lib/testTC.dso",
 		"$(EPOCROOT)/epoc32/release/armv5/lib/testTC{000a0000}.dso",
-		"$(EPOCROOT)/epoc32/release/armv5/lib/testTC{000a0000}.lib",
-		"$(EPOCROOT)/epoc32/release/armv5/lib/testTC.lib",
 		"$(EPOCROOT)/epoc32/release/armv5/udeb/testTC.dll",
 		"$(EPOCROOT)/epoc32/release/armv5/udeb/testTC.dll.map",
 		"$(EPOCROOT)/epoc32/release/armv5/urel/testTC.dll",
@@ -47,24 +45,23 @@ def run():
 		"$(SBS_HOME)/test/smoke_suite/test_resources/tracecompiler/testTC/traces/wlanhwinitmainTraces.h",
 		"$(SBS_HOME)/test/smoke_suite/test_resources/tracecompiler/testTC/traces/wlanhwinitpermparserTraces.h",	
 		"$(SBS_HOME)/test/smoke_suite/test_resources/tracecompiler/testTC/traces/fixed_id.definitions",
-		"$(EPOCROOT)/epoc32/ost_dictionaries/testTC_0x1000008d_Dictionary.xml",
-		"$(EPOCROOT)/epoc32/include/internal/symbiantraces/autogen/testTC_0x1000008d_TraceDefinitions.h"
+		"$(EPOCROOT)/epoc32/ost_dictionaries/test_TC_0x1000008d_Dictionary.xml",
+		"$(EPOCROOT)/epoc32/include/internal/symbiantraces/autogen/test_TC_0x1000008d_TraceDefinitions.h"
 		]
 	t.stdout = [
-		"<whatlog bldinf='$(SBS_HOME)/test/smoke_suite/test_resources/tracecompiler/testTC/group/bld.inf' mmp='$(SBS_HOME)/test/smoke_suite/test_resources/tracecompiler/testTC/group/testTC.mmp' config='armv5_urel.tracecompiler'>",
-		"<whatlog bldinf='$(SBS_HOME)/test/smoke_suite/test_resources/tracecompiler/testTC/group/bld.inf' mmp='$(SBS_HOME)/test/smoke_suite/test_resources/tracecompiler/testTC/group/testTC.mmp' config='armv5_udeb.tracecompiler'>",
+		"<whatlog bldinf='$(SBS_HOME)/test/smoke_suite/test_resources/tracecompiler/testTC/group/bld2.inf' mmp='$(SBS_HOME)/test/smoke_suite/test_resources/tracecompiler/testTC/group/test.TC.mmp' config='armv5_urel.tracecompiler'>",
+		"<whatlog bldinf='$(SBS_HOME)/test/smoke_suite/test_resources/tracecompiler/testTC/group/bld2.inf' mmp='$(SBS_HOME)/test/smoke_suite/test_resources/tracecompiler/testTC/group/test.TC.mmp' config='armv5_udeb.tracecompiler'>",
 		"<build>$(EPOCROOT)/epoc32/release/armv5/lib/testTC.dso</build>",
 		"<build>$(EPOCROOT)/epoc32/release/armv5/lib/testTC{000a0000}.dso</build>",
-		"<build>$(EPOCROOT)/epoc32/release/armv5/lib/testTC{000a0000}.lib</build>",
-		"<build>$(EPOCROOT)/epoc32/release/armv5/lib/testTC.lib</build>",
 		"<build>$(EPOCROOT)/epoc32/release/armv5/udeb/testTC.dll</build>",
 		"<build>$(EPOCROOT)/epoc32/release/armv5/udeb/testTC.dll.map</build>",
 		"<build>$(EPOCROOT)/epoc32/release/armv5/urel/testTC.dll</build>",
 		"<build>$(EPOCROOT)/epoc32/release/armv5/urel/testTC.dll.map</build>",
-		"<build>$(EPOCROOT)/epoc32/ost_dictionaries/testTC_0x1000008d_Dictionary.xml</build>",
-		"<build>$(EPOCROOT)/epoc32/include/internal/SymbianTraces/autogen/testTC_0x1000008d_TraceDefinitions.h</build>"
+		"<build>$(EPOCROOT)/epoc32/ost_dictionaries/test_TC_0x1000008d_Dictionary.xml</build>",
+		"<build>$(EPOCROOT)/epoc32/include/internal/SymbianTraces/autogen/test_TC_0x1000008d_TraceDefinitions.h</build>"
 		]		
-	t.run("windows")
+	t.run()
+
 	t.id = "112"
 
 	return t

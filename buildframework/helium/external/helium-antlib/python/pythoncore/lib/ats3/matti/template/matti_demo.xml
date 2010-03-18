@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- 
+============================================================================ 
+Name        : matti.demo.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+Contains the template for the test.xml file output. The test.xml file contains
+information on the files used to create the drop file.
+============================================================================
+--><test>
+<name>{{ configuration.testrun_name }}</name>
+    <target>
+      <device alias="{{ configuration.harness }}" rank="none">
+          <property name="HARNESS" value="{{ configuration.harness }}"/>
+          <property name="TYPE" value="{{ configuration.device_type }}"/>
+          <property name="HARDWARE" value="{{ configuration.device_type }}"/>
+      </device>
+    </target>
+    <plan passrate="100" enabled="true" name="MATTI test {{ configuration.plan_name }}" significant="false" harness="{{ configuration.harness }}">
+        <session name="session" harness="{{ configuration.harness }}" enabled="true" passrate="100">
+            {%- set i = 0 -%}
+            <set name="MATTI test set{{ i }}" harness="{{ configuration.harness }}" enabled="true" passrate="100">
+                <target>
+                <device alias="{{ configuration.harness }}" rank="master"/>
+                </target>
+                    <case name="MATTI test case" passrate="100" harness="STIF" enabled="true" significant="false"> 
+              {% if configuration.image_list -%}
+                {% for flash in configuration.image_list -%}
+                <flash target-alias="{{ configuration.harness }}" images="{{ flash }}" />
+                {% endfor -%}
+              {% endif %}
+              <step name="Create logs folder" harness="STIF" enabled="true" passrate="100" significant="false">
+                  <command>makedir</command>
+                  <params>
+                      <param dir="c:\logs\testability"/>
+                  </params>
+              </step>
+              {% if configuration.sis_list -%}
+                {% for sis in configuration.sis_list -%}
+                <step name="Copy sis" harness="STIF" enabled="true" passrate="100" significant="false">
+                    <command>install</command>
+                    <params>
+                        <param src="{{ sis['path'] }}"/>
+                        <param dst="E:\{{ sis['dest'] }}"/>
+                        <param overwrite="false"/>
+                    </params>
+                </step>
+    
+                <step name="Install SIS" harness="STIF" enabled="true" passrate="100" significant="false">
+                    <command>install-software</command>
+                    <params>
+                        <param sisPackageName="E:\{{ sis['dest'] }}"/>
+                        <param upgradeAllowed="true"/>
+                        <param optionalItemsAllowed="true"/>
+                        <param OCSP_Done="true"/>
+                        <param ignoreOCSPWarnings="true"/>
+                        <param untrustedAllowed="true"/>
+                        <param packageInfoAllowed="true"/>
+                        <param userCapGranted="true"/>
+                        <param killApp="true"/>
+                        <param overWriteAllowed="true"/>
+                        <param downloadAllowed="false"/>
+                        <param downloadUsername="user"/>
+                        <param downloadPassword="passwd"/>
+                        <param installDrive="C"/>
+                        <param upgradeData="true"/>
+                        <param timeout="40"/>                           
+                    </params>
+                </step>
+                {% endfor -%}
+              {% endif %}          
+              {% for step in configuration.step_list -%}
+              <step name="{{ step['name'] }}" harness="{{ configuration.harness }}" enabled="true" passrate="100" significant="false">
+                  <command>execute</command>
+                  <params>
+                      <param dir="C:\ruby\bin\"/>
+                      <param file="C:\ruby\bin\ruby.exe"/>
+                      <param parameters="{{ step['path'] }}"/>
+                      <param timeout="60"/>
+                      <param local="true"/>
+                      <param async="false"/>
+                      <param needs-connection="true"/>
+                  </params>
+              </step>
+              {% endfor -%}
+              </case>
+          </set>
+          {%- set i = i + 1 -%}
+        </session>
+    </plan>
+  {% if configuration.report_email %}
+  <postAction>
+        <type>SendEmailAction</type>
+        <params>
+            <param name="subject" value="ATS3 report for &#x00A7;RUN_NAME&#x00A7; &#x00A7;RUN_START_DATE&#x00A7; &#x00A7;RUN_START_TIME&#x00A7;"/>
+            <param name="type" value="ATS3_REPORT"/>
+            <param name="send-files" value="true"/>
+            <param name="to" value="{{ configuration.report_email }}"/>
+        </params>
+    </postAction>
+  {% endif %}
+  {% if configuration.filelist %}
+  <files>
+    {% for img in configuration.image_list -%}
+    <file>{{ img }}</file>
+    {% endfor -%}
+    {% for sis in configuration.sis_list -%}
+    <file>{{ sis['path'] }}</file>
+    {% endfor -%}
+    {% for file in configuration.filelist -%}
+    <file>{{ file }}</file>
+    {% endfor -%}
+  </files>
+  {% endif %}
+</test>

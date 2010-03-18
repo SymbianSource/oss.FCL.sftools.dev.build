@@ -1,0 +1,43 @@
+#!/bin/bash
+
+#
+# Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+#
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+#
+# Contributors:
+#
+# Description: 
+#
+
+# loading the system wide settings from ~/.bashrc
+if [ -f ~/.bashrc ] ; then
+	. ~/.bashrc
+fi
+MODULE_VERSION="$(module --version 2>&1)"
+if [ "$?" == "0" ] ; then
+    module load "java/1.6.0"
+    module load "tww/ant/1.7.0"
+    module load tww/python/2.6.4
+fi
+
+export LANG="en_US.UTF-8"
+
+CWD=`pwd`
+
+cd $CWD
+
+export USERNAME=$USER
+export PATH=$PATH:.
+java -cp "./../../bin/helium-checktools.jar" com.nokia.helium.checktools.HeliumToolsCheckerMain -config "./tests/config/helium.basic.tools.config"
+
+if [ "$?" == "-1" ] ; then
+    echo *** Build aborted with error
+fi    
+

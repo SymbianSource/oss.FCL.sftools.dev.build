@@ -1,0 +1,106 @@
+<?xml version="1.0"?>
+<!-- 
+============================================================================ 
+Name        : test_sbs_coverity.ant.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+
+<project name="test-sbs-input" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>Helium Antlib sbs unittests.</description>
+
+    <taskdef resource="com/nokia/helium/core/ant/antlib.xml" uri="http://www.nokia.com/helium"/>
+    <taskdef resource="com/nokia/helium/sbs/ant/antlib.xml" uri="http://www.nokia.com/helium"/>
+    <taskdef name="getVariableValue" classname="com.nokia.helium.core.ant.taskdefs.GetValueFromVariableSet"/>
+    <dirname property="test.sbs.dir" file="${ant.file.test-sbs-input}"/>
+    <property name="working.dir" value="${test.sbs.dir}" />
+    
+    <dirname property="project.dir" file="${ant.file.test-sbs-input}" />
+
+    <property name="build.system" value="sbs" />
+
+    <import file="${project.dir}/sbs_default_config.ant.xml" />
+    
+    <hlm:coverityoptions id="coverity.build.options">
+        <arg name="--config" value="${test.sbs.dir}/coverity_config.xml"/>
+        <arg name="--dir" value="${test.sbs.dir}"/>
+        <arg name="--auto-diff" value=""/>
+        <arg name="--preprocess-first" value=""/>
+        <arg name="--record-only" value=""/>
+    </hlm:coverityoptions>
+
+    <target name="test-coverity-7952">
+        <hlm:getsbsinputs config="pf_7952" outputProperty="sbs-inputs"/>
+        <hlm:coveritybuild outputLog="tmp" sbsinput="${sbs-inputs}" sysdefFile="test.sysdef.xml" 
+            workingDir="${working.dir}" execute="false">
+            <hlm:coverityoptions refid="coverity.build.options"/>
+        </hlm:coveritybuild>
+        <au:assertLogContains text="--auto-diff  --record-only"/>
+        <au:assertLogContains text="cov-build"/>
+        <au:assertLogContains text="-c armv5"/>
+    </target>
+
+    <target name="test-coverity-without-sysdef">
+        <property name="build.system" value="sbs" />
+        <au:expectfailure>
+            <hlm:getsbsinputs config="pf_7952" outputProperty="sbs-inputs"/>
+            <hlm:coveritybuild outputLog="tmp" sbsinput="pf_7952" workingDir="${working.dir}" execute="false">
+                <hlm:coverityoptions refid="coverity.build.options"/>
+            </hlm:coveritybuild>
+        </au:expectfailure>
+    </target>
+
+    <target name="test-coverity-without-working-dir">
+        <property name="build.system" value="sbs" />
+        <au:expectfailure>
+            <hlm:getsbsinputs config="pf_7952" outputProperty="sbs-inputs"/>
+            <hlm:coveritybuild outputLog="tmp" sbsinput="${sbs-inputs}" sysdefFile="test.sysdef.xml" execute="false" >
+                <hlm:coverityoptions refid="coverity.build.options"/>
+            </hlm:coveritybuild>
+        </au:expectfailure>
+    </target>
+
+    <target name="test-coverity-sbs">
+        <property name="build.system" value="sbs" />
+        <hlm:getsbsinputs config="pf_7952" outputProperty="sbs-inputs"/>
+        <hlm:coveritybuild outputLog="tmp" sbsinput="${sbs-inputs}" sysdefFile="test.sysdef.xml" 
+            workingDir="${working.dir}" execute="false">
+            <hlm:coverityoptions refid="coverity.build.options"/>
+        </hlm:coveritybuild>
+        <au:assertLogContains text="--auto-diff  --record-only"/>
+        <au:assertLogContains text="cov-build"/>
+        <au:assertLogContains text="-c armv5"/>
+    </target>
+
+    <target name="test-coverity-sbs-ec">
+        <property name="build.system" value="sbs-ec" />
+        <hlm:getsbsinputs config="pf_7952" outputProperty="sbs-inputs"/>
+        <hlm:coveritybuild outputLog="tmp" sbsinput="${sbs-inputs}" sysdefFile="test.sysdef.xml" 
+            workingDir="${working.dir}" execute="false">
+            <hlm:coverityoptions refid="coverity.build.options"/>
+        </hlm:coveritybuild>
+        <au:assertLogContains text="cov-build"/>
+        <au:assertLogContains text="-c armv5"/>
+        <au:assertLogContains text="--auto-diff  --record-only"/>
+        <au:assertLogDoesntContain text="-e emake"/>
+        <au:assertLogDoesntContain text="--mo=--emake-annodetail=basic,history,waiting"/>
+         
+    </target>
+
+
+</project>
