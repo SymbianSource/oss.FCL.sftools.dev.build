@@ -30,7 +30,7 @@
 		<env name='SBS_GNUTOUCH' default='/bin/touch' type='tool'/>
 		<env name='SBS_GNUFIND' default='/usr/bin/find' type='tool'/>
 		<env name='SBS_GNUGREP' default='/bin/grep' type='tool'/>
-		<env name='SBS_GNUSORT' default='/bin/sort' type='tool'/>
+		<env name='SBS_GNUSORT' default='sort' type='tool'/>
 		<env name='SBS_SHELL' default="$(SBS_HOME)/$(HOSTPLATFORM_DIR)/bin/sh" type='tool'/>
 		<env name='SBS_ZIP' default="$(SBS_HOME)/$(HOSTPLATFORM_DIR)/bin/zip" type='tool'/>
 		<env name='SBS_UNZIP' default="$(SBS_HOME)/$(HOSTPLATFORM_DIR)/bin/unzip" type='tool'/>
