@@ -19,10 +19,10 @@ from raptor_tests import SmokeTest
 def run():
 
 	t = SmokeTest()
-	t.id = "87"
-	t.name = "terminal_filter_tests"
-	t.description = "terminal_filter_tests: Tests the terminal filter against" \
-			+ " log files to ensure it 'does the right thing'"
+	t.description = "Tests against log files to ensure it 'does the right thing'"
+	
+	t.id = "87a"
+	t.name = "terminal_filter_tests_log"
 	t.command = "$(SBS_HOME)/test/smoke_suite/test_resources/refilter/testfilterterminal"
 	t.countmatch = [
 		# One of each type of error occurs early in the 'sbs' call where there
@@ -36,4 +36,19 @@ def run():
 	]
 	t.errors = 4
 	t.run()
+	
+	t.id = "87b"
+	t.name = "terminal_filter_tests_configs"
+	t.command = "sbs -b smoke_suite/test_resources/simple/bld.inf"
+	t.countmatch = []
+	t.errors = 0
+	t.mustmatch_singleline = ["built 'armv5_urel'",
+							  "built 'armv5_udeb'",
+							  "built 'winscw_urel'",
+							  "built 'winscw_udeb'" ]
+	t.run()
+	
+	t.id = "87"
+	t.name = "terminal_filter_tests"
+	t.print_result()
 	return t

@@ -430,8 +430,105 @@ class TestRaptorData(unittest.TestCase):
 		self.failUnless(self.checkForParam(p, "D", None))
 		f = extended.GetFLMIncludePath(cache)
 		self.assertEqual(f.File(), "base.flm")
+
+	def testGetBuildUnits(self):
+		r = raptor.Raptor()
+
+		# <group name="g1">
+		g1 = raptor_data.Group("g1")
+		r.cache.AddGroup(g1)
+		
+		# <groupRef ref="g2" mod="A.B"/>
+		g2a = raptor_data.GroupRef()
+		g2a.SetProperty("ref", "g2")
+		g2a.SetProperty("mod", "A.B")
+		g1.AddChild(g2a)
+		
+		# <groupRef ref="g2" mod="C.D"/>
+		g2b = raptor_data.GroupRef()
+		g2b.SetProperty("ref", "g2")
+		g2b.SetProperty("mod", "C.D")
+		g1.AddChild(g2b)
+		
+		# <group name="g2">
+		g2 = raptor_data.Group("g2")
+		r.cache.AddGroup(g2)
+		
+		# <varRef ref="V" mod="E.F"/>
+		v2 = raptor_data.VariantRef()
+		v2.SetProperty("ref", "V")
+		v2.SetProperty("mod", "E.F")
+		g2.AddChild(v2)
+		
+		# <varRef ref="V" mod="G.H"/>
+		v3 = raptor_data.VariantRef()
+		v3.SetProperty("ref", "V")
+		v3.SetProperty("mod", "G.H")
+		g2.AddChild(v3)
+		
+		# <aliasRef ref="X" mod="I.J"/>
+		v4 = raptor_data.AliasRef()
+		v4.SetProperty("ref", "X")
+		v4.SetProperty("mod", "I.J")
+		g2.AddChild(v4)
+		
+		# <aliasRef ref="X" mod="K.L"/>
+		v5 = raptor_data.AliasRef()
+		v5.SetProperty("ref", "X")
+		v5.SetProperty("mod", "K.L")
+		g2.AddChild(v5)
+		
+		r.cache.AddVariant(raptor_data.Variant("A"))
+		r.cache.AddVariant(raptor_data.Variant("B"))
+		r.cache.AddVariant(raptor_data.Variant("C"))
+		r.cache.AddVariant(raptor_data.Variant("D"))
+		r.cache.AddVariant(raptor_data.Variant("E"))
+		r.cache.AddVariant(raptor_data.Variant("F"))
+		r.cache.AddVariant(raptor_data.Variant("G"))
+		r.cache.AddVariant(raptor_data.Variant("H"))
+		r.cache.AddVariant(raptor_data.Variant("I"))
+		r.cache.AddVariant(raptor_data.Variant("J"))
+		r.cache.AddVariant(raptor_data.Variant("K"))
+		r.cache.AddVariant(raptor_data.Variant("L"))
+		
+		r.cache.AddVariant(raptor_data.Variant("V"))
+		
+		# <alias name="X" meaning="A.B.C.D.E.F.G.H/>
+		alias = raptor_data.Alias("X")
+		alias.SetProperty("meaning", "A.B.C.D.E.F.G.H")
+		r.cache.AddAlias(alias)
+
+		r.cache.AddVariant(raptor_data.Variant("Y"))
+		r.cache.AddVariant(raptor_data.Variant("Z"))
 	
-	
+		units = raptor_data.GetBuildUnits(["g1.Y", "g1.Z"], r.cache, r)
+		
+		# <group name="g1">
+		#   <groupRef ref="g2" mod="A.B"/>    g2.A.B
+		#   <groupRef ref="g2" mod="C.D"/>    g2.C.D
+		# </group>
+		# <group name="g2">
+		#   <varRef ref="V" mod="E.F"/>       V.E.F
+		#   <varRef ref="V" mod="G.H"/>       V.G.H
+		#   <aliasRef ref="X" mod="I.J"/>     X.I.J
+		#   <aliasRef ref="X" mod="K.L"/>     X.K.L
+		# </group>
+		# <alias name="X" meaning="A.B.C.D.E.F.G.H/>
+		#
+		expected = [ "VEFABY", "VGHABY", "ABCDEFGHIJABY", "ABCDEFGHKLABY",
+				     "VEFCDY", "VGHCDY", "ABCDEFGHIJCDY", "ABCDEFGHKLCDY",
+		             "VEFABZ", "VGHABZ", "ABCDEFGHIJABZ", "ABCDEFGHKLABZ",
+				     "VEFCDZ", "VGHCDZ", "ABCDEFGHIJCDZ", "ABCDEFGHKLCDZ" ]
+		
+		self.failUnlessEqual(len(units), len(expected))
+		
+		for u in units:
+			vars = "".join([v.name for v in u.variants])
+			self.failUnless(vars in expected, vars + " was not expected")
+			expected.remove(vars)
+		
+		self.failUnless(len(expected) == 0, str(expected) + " not found")
+		
 # run all the tests
 
 from raptor_tests import SmokeTest

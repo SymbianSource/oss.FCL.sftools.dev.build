@@ -16,9 +16,19 @@
 #
 # set up the environment for some talon tests.
 
+eval `$SBS_HOME/bin/gethost.sh -e`
+
+if [[ "$HOSTPLATFORM" =~ "win" ]]; then
+TEST_SHELL=$(cygpath -w $SBS_HOME/win32/bin/talon.exe)
+TEST_TALON_SHELL=$(cygpath -w $SBS_CYGWIN/bin/bash.exe)
+else
+TEST_SHELL=$SBS_HOME/$HOSTPLATFORM_DIR/bin/talon
+TEST_TALON_SHELL=/bin/bash
+fi
+
 cat >settings.mk <<-endofsettings
-	SHELL:=$(cygpath -w $SBS_HOME/win32/bin/talon.exe)
-	TALON_SHELL:=$(cygpath -w $SBS_CYGWIN/bin/bash.exe)
+	SHELL:=$TEST_SHELL
+	TALON_SHELL:=$TEST_TALON_SHELL
 	TALON_BUILDID:=100
 	TALON_DEBUG:=""
 	export TALON_SHELL TALON_BUILDID TALON_DEBUG
