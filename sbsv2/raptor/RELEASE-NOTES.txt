@@ -1,6 +1,9 @@
 Release Notes for Symbian Build System v2
 
 next version
+
+Defect Fixes:
+- DPDEF144648 - Raptor failed to build tools_deb objects under Windows XP 
 - Fix: Workaround for emake engine log corruption when clockskew errors occur (annofile2log). 
   Allow Raptor to obtain log from emake annotation file where it is uncorrupted.  A new 
   Make engine option "copyannofile2log" enables/disables this mode for emake. If this option is disabled
