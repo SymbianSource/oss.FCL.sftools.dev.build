@@ -730,19 +730,31 @@ class Env(Set):
 			value = os.environ[self.name]
 			
 			if value:
-				# if this value is a "path" or a "tool" then we need to make sure
-				# it is a proper absolute path in our preferred format.
-				if self.type == "path" or self.type == "tool":
+				if self.type in ["path", "tool", "toolchainpath"]:
+					# if this value is some sort of path or tool then we need to make sure
+					# it is a proper absolute path in our preferred format.
 					try:
 						path = generic_path.Path(value)
 						value = str(path.Absolute())
 					except ValueError,e:
-						raise BadToolValue("the environment variable %s is incorrect: %s" % (self.name, str(e)))				
-				# if this value ends in an un-escaped backslash, then it will be treated as a line continuation character
-				# in makefile parsing - un-escaped backslashes at the end of values are therefore escaped
+						raise BadToolValue("the environment variable %s is incorrect: %s" % (self.name, str(e)))
+					
+					if self.type in ["tool", "toolchainpath"]:
+						# if  we're dealing with tool-related values, then make sure that we can get "safe"
+						# versions if they contain spaces - if we can't, that's an error, as they won't
+						# survive full usage in the toolcheck or when used and/or referenced in FLMs						
+						if ' ' in value:
+							path = generic_path.Path(value)
+							spaceSafeValue = path.GetSpaceSafePath()
+						
+							if not spaceSafeValue:
+								raise BadToolValue("the environment variable %s is incorrect - it is a '%s' type but contains spaces that cannot be neutralised: %s" % (self.name, self.type, value))
+							
+							value = spaceSafeValue	
 				elif value.endswith('\\'):
-					# an odd number of backslashes means there's one to escape
-					count = len(value) - len(value.rstrip('\\'))
+					# if this value ends in an un-escaped backslash, then it will be treated as a line continuation character
+					# in makefile parsing - un-escaped backslashes at the end of values are therefore escaped					
+					count = len(value) - len(value.rstrip('\\'))	# an odd number of backslashes means there's one to escape
 					if count % 2:
 						value += '\\'	
 		except KeyError:

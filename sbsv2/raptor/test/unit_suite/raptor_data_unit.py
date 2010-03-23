@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2006-2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2006-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -21,6 +21,7 @@ import os
 import raptor
 import raptor_cache
 import raptor_data
+import sys
 import unittest
 
 class TestRaptorData(unittest.TestCase):
@@ -35,6 +36,8 @@ class TestRaptorData(unittest.TestCase):
 			self.envStack[name] = os.environ[name]
 		os.environ[name] = value
 		
+	def isWin32(self):
+		return sys.platform.lower().startswith("win")		
 			
 	def RestoreEnv(self, name):
 		# put environment back to its state before SetEnv
@@ -355,7 +358,9 @@ class TestRaptorData(unittest.TestCase):
 		self.assertEqual(varcfg, "/C/variant/variant.cfg")
 		
 	def testProblematicEnvironment(self):
-		# ask for environment variable values that will break makefile parsing due to
+		aRaptor = raptor.Raptor()		
+		
+		# 1: ask for environment variable values that will break makefile parsing due to
 		# backslashes forming line continuation characters
 		self.SetEnv("ENVVAR_BSLASH_END1", "C:\\test1a\\;C:\\test1b\\")
 		self.SetEnv("ENVVAR_BSLASH_END2", "C:\\test2a\\;C:\\test2b\\\\")
@@ -365,7 +370,6 @@ class TestRaptorData(unittest.TestCase):
 		var.AddOperation(raptor_data.Env("ENVVAR_BSLASH_END2"))
 		var.AddOperation(raptor_data.Env("ENVVAR_BSLASH_END3"))
 
-		aRaptor = raptor.Raptor()
 		eval = aRaptor.GetEvaluator(None, var.GenerateBuildUnits(aRaptor.cache)[0])
 		self.RestoreEnv("ENVVAR_BSLASH_END1")
 		self.RestoreEnv("ENVVAR_BSLASH_END2")
@@ -379,6 +383,75 @@ class TestRaptorData(unittest.TestCase):
 		
 		value = eval.Get("ENVVAR_BSLASH_END3")
 		self.assertEqual(value, "C:\\test3a\\;C:\\test3b\\\\\\\\")
+		
+		# 2: check 'tool' and 'toolchain' type environment variable values for correct behaviour when paths contain spaces
+		# this is different depending on host OS platform and whether or not the paths/tools actually exist
+		epocroot = os.path.abspath(os.environ.get('EPOCROOT')).replace('\\','/').rstrip('/')
+		pathwithspaces = epocroot+"/epoc32/build/Program Files/Some tool installed with spaces/no_spaces/s p c/no_more_spaces"
+		toolwithspaces = pathwithspaces+"/testtool.exe"	
+		self.SetEnv("ENVVAR_TOOL_WITH_SPACES", toolwithspaces)
+		self.SetEnv("ENVVAR_TOOLCHAINPATH_WITH_SPACES", pathwithspaces)
+		toolVar = raptor_data.Variant("tool.var")
+		toolchainpathVar = raptor_data.Variant("toolchainpath.var")
+		toolVar.AddOperation(raptor_data.Env("ENVVAR_TOOL_WITH_SPACES", "", "tool"))
+		toolchainpathVar.AddOperation(raptor_data.Env("ENVVAR_TOOLCHAINPATH_WITH_SPACES", "", "toolchainpath"))
+		invalidValueException = "the environment variable %s is incorrect - it is a '%s' type but contains spaces that cannot be neutralised:"
+		
+		# 2a: paths/tools exist - on Windows we expect 8.3 paths post-evaluation, on all other platforms error exceptions
+		os.makedirs(pathwithspaces)
+		testtool = open(toolwithspaces,'wb')
+		testtool.close()
+		
+		exceptionText = ""
+		value = ""
+		try:
+			eval = aRaptor.GetEvaluator(None, toolVar.GenerateBuildUnits(aRaptor.cache)[0])
+			value = eval.Get("ENVVAR_TOOL_WITH_SPACES")
+		except Exception, e:
+			exceptionText = str(e)
+			
+		if self.isWin32():
+			self.assertTrue(value)
+			self.assertFalse(' ' in value)
+		else:
+			self.assertTrue(exceptionText.startswith(invalidValueException % ("ENVVAR_TOOL_WITH_SPACES", "tool")))
+
+		exceptionText = ""
+		value = ""
+		try:
+			eval = aRaptor.GetEvaluator(None, toolchainpathVar.GenerateBuildUnits(aRaptor.cache)[0])
+			value = eval.Get("ENVVAR_TOOLCHAINPATH_WITH_SPACES")
+		except Exception, e:
+			exceptionText = str(e)
+			
+		if self.isWin32():
+			self.assertTrue(value)
+			self.assertFalse(' ' in value)
+		else:
+			self.assertTrue(exceptionText.startswith(invalidValueException % ("ENVVAR_TOOLCHAINPATH_WITH_SPACES", "toolchainpath")))
+		
+		# 2b: paths/tools don't exist - should throw error exceptions on all platforms as 8.3 paths are only available
+		# for use if a path/tool exists
+		os.remove(toolwithspaces)
+		os.removedirs(pathwithspaces)
+
+		exceptionText = ""
+		try:
+			eval = aRaptor.GetEvaluator(None, toolVar.GenerateBuildUnits(aRaptor.cache)[0])
+		except Exception, e:
+			exceptionText = str(e)
+		self.assertTrue(exceptionText.startswith(invalidValueException % ("ENVVAR_TOOL_WITH_SPACES", "tool")))
+
+		exceptionText = ""
+		try:
+			eval = aRaptor.GetEvaluator(None, toolchainpathVar.GenerateBuildUnits(aRaptor.cache)[0])
+		except Exception, e:
+			exceptionText = str(e)			
+		self.assertTrue(exceptionText.startswith(invalidValueException % ("ENVVAR_TOOLCHAINPATH_WITH_SPACES", "toolchainpath")))
+
+		# clean-up
+		self.RestoreEnv("ENVVAR_TOOL_WITH_SPACES")
+		self.RestoreEnv("ENVVAR_TOOLCHAINPATH_WITH_SPACES")
 	
 	def testMissingEnvironment(self):
 		# ask for an environment variable that is not set

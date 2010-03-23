@@ -553,8 +553,7 @@ endif
 # Targettype is some type of DLL or EXE (or derivative)
 ifneq ($(LINK_TARGET),)
 
-escaped_located_ARMLIBS:=$(foreach L,$(ARMLIBS),$(call ruleEscape,$(wildcard $(subst $(CHAR_SPACE),?,$(RVCTLIB)/*/$(L)))))
-quoted_located_ARMLIBS:=$(foreach L,$(ARMLIBS),$(call dblquoteitem,$(wildcard $(RVCTLIB)/*/$(L))))
+located_ARMLIBS:=$(foreach L,$(ARMLIBS),$(wildcard $(RVCTLIB)/*/$(L)))
 located_STATICLIBRARIES:=$(foreach L,$(STATICLIBRARY),$(STATIC_LIBRARY_DIR)/$(L).lib)
 e32abiv2_LIBS:=$(EXPTARGET) $(LINKER_STUB_LIBRARY) $(if $(STATIC_RUNTIME_LIB),$(STATIC_RUNTIME_DIR)/$(STATIC_RUNTIME_LIB),) $(located_STATICLIBRARIES)
 # DLLS and EXEs - These objects are linked by a linker
@@ -567,12 +566,10 @@ ifneq ($(findstring $(TARGET).dso,$(RUNTIME_LIBS_LIST)),)
 REDUCED_RUNTIME_LIBS_LIST:=$(subst $(TARGET).dso,,$(RUNTIME_LIBS_LIST))
 
 ifeq ($(VARIANTTYPE),udeb)
-  e32abiv2_LIBS:=$(e32abiv2_LIBS) $(addprefix $(IMPORTLIBPATH)/,$(LIBRARY_DEBUG)) $(addprefix $(RUNTIME_LIBS_PATH)/,$(REDUCED_RUNTIME_LIBS_LIST)) 
+  e32abiv2_LIBS:=$(e32abiv2_LIBS) $(addprefix $(IMPORTLIBPATH)/,$(LIBRARY_DEBUG)) $(addprefix $(RUNTIME_LIBS_PATH)/,$(REDUCED_RUNTIME_LIBS_LIST)) $(located_ARMLIBS)
 else
-  e32abiv2_LIBS:=$(e32abiv2_LIBS) $(addprefix $(IMPORTLIBPATH)/,$(LIBRARY)) $(addprefix $(RUNTIME_LIBS_PATH)/,$(REDUCED_RUNTIME_LIBS_LIST)) 
+  e32abiv2_LIBS:=$(e32abiv2_LIBS) $(addprefix $(IMPORTLIBPATH)/,$(LIBRARY)) $(addprefix $(RUNTIME_LIBS_PATH)/,$(REDUCED_RUNTIME_LIBS_LIST)) $(located_ARMLIBS)
 endif
-quoted_e32abiv2_LIBS=$(e32abiv2_LIBS) $(quoted_located_ARMLIBS)
-escaped_e32abiv2_LIBS=$(e32abiv2_LIBS) $(escaped_located_ARMLIBS)
 
 else
 # NORMAL
@@ -585,19 +582,16 @@ endif
 ifeq ($(HAS_DEDICATED_OP_NEWDEL_LIB),1)
   e32abiv2_LIBS:=$(e32abiv2_LIBS) $(addprefix $(RUNTIME_LIBS_PATH)/,$(NEWLIB))
 endif
-quoted_e32abiv2_LIBS:=$(e32abiv2_LIBS) $(addprefix $(RUNTIME_LIBS_PATH)/,$(RUNTIME_LIBS_LIST)) $(call addquotedprefix,$(STATIC_LIBS_PATH)/,$(STATIC_LIBS_LIST)) $(quoted_located_ARMLIBS)
-escaped_e32abiv2_LIBS:=$(e32abiv2_LIBS) $(addprefix $(RUNTIME_LIBS_PATH)/,$(RUNTIME_LIBS_LIST)) $(addprefix $(call ruleEscape,$(STATIC_LIBS_PATH)/),$(STATIC_LIBS_LIST)) $(escaped_located_ARMLIBS)
+e32abiv2_LIBS:=$(e32abiv2_LIBS) $(addprefix $(RUNTIME_LIBS_PATH)/,$(RUNTIME_LIBS_LIST)) $(addprefix $(STATIC_LIBS_PATH)/,$(STATIC_LIBS_LIST)) $(located_ARMLIBS)
 
 endif
 else
 # ARM RUNTIME LIBS
 ifeq ($(VARIANTTYPE),udeb)
-  e32abiv2_LIBS:=$(e32abiv2_LIBS) $(addprefix $(IMPORTLIBPATH)/,$(LIBRARY_DEBUG)) 
+  e32abiv2_LIBS:=$(e32abiv2_LIBS) $(addprefix $(IMPORTLIBPATH)/,$(LIBRARY_DEBUG)) $(located_ARMLIBS)
 else
-  e32abiv2_LIBS:=$(e32abiv2_LIBS) $(addprefix $(IMPORTLIBPATH)/,$(LIBRARY))
+  e32abiv2_LIBS:=$(e32abiv2_LIBS) $(addprefix $(IMPORTLIBPATH)/,$(LIBRARY)) $(located_ARMLIBS)
 endif
-quoted_e32abiv2_LIBS=$(e32abiv2_LIBS) $(quoted_located_ARMLIBS)
-escaped_e32abiv2_LIBS=$(e32abiv2_LIBS) $(escaped_located_ARMLIBS)
 endif
 
 # NOTE: the groupin10 macro must be used before a call to the "startrule" macro
@@ -607,7 +601,7 @@ endif
 # outside the relevant tags but it is also unavoidable.
 define linktarget_func
 ## The actual link target, dependencies and build step
-$(E32TARGET): $(POSTLINKDEFFILE) $(ELF2E32) $(if $(MULTIFILE_ENABLED),$(MULTIFILEOBJECT) $(CIAFILES_LINKOBJECTS),$(LINKOBJECTS)) $(escaped_e32abiv2_LIBS) $(LINKER_ENTRYPOINT_LIBDEP) $(if $(SUPPORTS_STDCPP_NEWLIB),$(CHECKLIB)) $(if $(LINKERFEEDBACK_STAGE2),$(FEEDBACKFILE),) $(if $(HAVE_ORDERONLY),|,) $(EPOCROOT)/epoc32/build/TEM_LIB
+$(E32TARGET): $(POSTLINKDEFFILE) $(ELF2E32) $(if $(MULTIFILE_ENABLED),$(MULTIFILEOBJECT) $(CIAFILES_LINKOBJECTS),$(LINKOBJECTS)) $(e32abiv2_LIBS) $(LINKER_ENTRYPOINT_LIBDEP) $(if $(SUPPORTS_STDCPP_NEWLIB),$(CHECKLIB)) $(if $(LINKERFEEDBACK_STAGE2),$(FEEDBACKFILE),) $(if $(HAVE_ORDERONLY),|,) $(EPOCROOT)/epoc32/build/TEM_LIB
 	$(if $(MULTIFILE_ENABLED),,@echo -n "" > $(VIAFILE);
 	$(call groupin10,$(LINKOBJECTS)) ;)
 	$(call startrule,linkandpostlink) \
@@ -627,7 +621,7 @@ $(E32TARGET): $(POSTLINKDEFFILE) $(ELF2E32) $(if $(MULTIFILE_ENABLED),$(MULTIFIL
 	  $(if $(MULTIFILE_ENABLED),$(call dblquote,$(MULTIFILEOBJECT) $(CIAFILES_LINKOBJECTS)),$(COMMANDFILE_OPTION)$(call dblquote,$(VIAFILE))) \
       $(if $(GENERATELINKERFEEDBACK),$(FEEDBACK_OPTION)$(call dblquote,$(FEEDBACKFILE))) \
 	  $(if $(LINKER_ADD_STATIC_RUNTIME),$(if $(STATIC_RUNTIME_LIB),$(LINKER_GROUP_START_OPTION) $(STATIC_RUNTIME_DIR)/$(STATIC_RUNTIME_LIB) $(LINKER_GROUP_END_OPTION),)) \
-	  $(quoted_e32abiv2_LIBS) $(LINKER_DEFAULT_LIBS) && \
+	  $(call dblquote,$(e32abiv2_LIBS)) $(LINKER_DEFAULT_LIBS) && \
 	  $(ELF2E32) \
 	  --sid=0x$(if $(SID),$(SID),$(if $(UID3),$(UID3),0)) \
 	  --version=$(VERSION) \
@@ -768,7 +762,7 @@ $(1): $(2) $(PROJECT_META) $(if $(MULTIFILE_ENABLED),,$(if $(DEPENDFILE),,RESOUR
 			$(if $(USE_PROFILER_FEEDBACK),--profile=$(call dblquote,$(ARM_PROFILER_FILE)),) \
 			$(call makemacrodef,-D,$(COMPILER_INTERWORK_DEFINES) $(CDEFS))				\
 			$(if $(PREINCLUDE),$(PREINCLUDE_OPTION) ,)$(call concat, $(PREINCLUDE_OPTION) ,$(call dblquote,$(PREINCLUDE)))\
-			$(if $(SET_ARMINC),$(if $(RVCTINC),$(COMPILER_SYSTEM_INCLUDE_OPTION)$(call dblquoteitem,$(RVCTINC)),),)       \
+			$(if $(SET_ARMINC),$(if $(RVCTINC),$(COMPILER_SYSTEM_INCLUDE_OPTION)$(call dblquote,$(RVCTINC)),),)       \
 			$(COMPILER_SYSTEM_INCLUDE_OPTION)$$(call dblquote,$$(<D))                                                      \
 			$(if $(USERINCLUDE),$(COMPILER_SYSTEM_INCLUDE_OPTION),)$(call concat, $(COMPILER_SYSTEM_INCLUDE_OPTION),$(call dblquote,$(USERINCLUDE)))      \
 			$(if $(SYSTEMINCLUDE),$(COMPILER_SYSTEM_INCLUDE_OPTION),)$(call concat, $(COMPILER_SYSTEM_INCLUDE_OPTION),$(call dblquote,$(SYSTEMINCLUDE)))  \
@@ -864,7 +858,7 @@ $(LISTINGTARGET): $(1) $(PROJECT_META)  $(if $(DEPENDFILE),,RESOURCE BITMAP EXPO
 			$(OPTION_COMPILER) 						\
 			$(call makemacrodef,-D,$(COMPILER_INTERWORK_DEFINES) $(CDEFS))				\
 			$(if $(PREINCLUDE),$(PREINCLUDE_OPTION) ,)$(call concat, $(PREINCLUDE_OPTION) ,$(call dblquote,$(PREINCLUDE)))\
-			$(if $(SET_ARMINC),$(if $(RVCTINC),$(COMPILER_SYSTEM_INCLUDE_OPTION)$(call dblquoteitem,$(RVCTINC)),),)       \
+			$(if $(SET_ARMINC),$(if $(RVCTINC),$(COMPILER_SYSTEM_INCLUDE_OPTION)$(call dblquote,$(RVCTINC)),),)       \
 			$(COMPILER_SYSTEM_INCLUDE_OPTION)$$(call dblquote,$$(<D))                                                   \
 			$(if $(USERINCLUDE),$(COMPILER_SYSTEM_INCLUDE_OPTION),)$(call concat, $(COMPILER_SYSTEM_INCLUDE_OPTION),$(call dblquote,$(USERINCLUDE)))      \
 			$(if $(SYSTEMINCLUDE),$(COMPILER_SYSTEM_INCLUDE_OPTION),)$(call concat, $(COMPILER_SYSTEM_INCLUDE_OPTION),$(call dblquote,$(SYSTEMINCLUDE)))  \
@@ -985,7 +979,7 @@ $(eval e32abiv2_PREFILE_OPTIONS:= $(LICENSERETRY_OPTION) $(PREPROCESSOR_OPTION) 
        $(if $(PREINCLUDE),$(PREINCLUDE_OPTION) ,)$$(call concat, $(PREINCLUDE_OPTION) ,$$(call dblquote,$(PREINCLUDE))) \
        $(if $(USERINCLUDE),$(COMPILER_SYSTEM_INCLUDE_OPTION),)$$(call concat, $(COMPILER_SYSTEM_INCLUDE_OPTION),$$(call dblquote,$(USERINCLUDE))) \
        $(if $(SYSTEMINCLUDE),$(COMPILER_SYSTEM_INCLUDE_OPTION),)$$(call concat, $(COMPILER_SYSTEM_INCLUDE_OPTION),$$(call dblquote,$(SYSTEMINCLUDE))) \
-       $(if $(ARMINC),$(if $(RVCTINC), $(COMPILER_SYSTEM_INCLUDE_OPTION)$$(call dblquoteitem,$(RVCTINC)),),) )
+       $(if $(ARMINC),$(if $(RVCTINC), $(COMPILER_SYSTEM_INCLUDE_OPTION)$$(call dblquote,$(RVCTINC)),),) )
 
 
 $(e32abiv2_PREFILE): $1 $(PROJECT_META) $(if $(DEPENDFILE),,RESOURCE BITMAP EXPORT)

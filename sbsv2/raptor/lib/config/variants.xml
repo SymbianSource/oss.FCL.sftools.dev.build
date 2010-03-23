@@ -79,37 +79,40 @@
 	</var>
 	
 	<var name="gcce4_3_2" extends="gcce_base">
-		<env name="SBS_GCCE432BIN" type="path" />
+		<env name="SBS_GCCE432BIN" type="toolchainpath" />
 		<set name="GCCEBIN" value="$(SBS_GCCE432BIN)" />
+		<set name="GCCECC" value="$(GCCEBIN)/arm-none-symbianelf-g++$(DOTEXE)" type="tool" versionCommand="$(GCCECC) -dumpversion" versionResult="4.3.2"/>
 		<set name="RUNTIME_LIBS_LIST" value="drtaeabi.dso dfpaeabi.dso dfprvct3_1.dso drtrvct3_1.dso"/>
 		<set name="PLATMACROS.VAR" value="GCCE_4 GCCE_4_3"/>
 		<set name="ARMMACROS.VAR" value="__GCCE_4__ __GCCE_4_3__"/>
 	</var>
 
 	<var name="gcce4_3_3" extends="gcce_base">
-		<env name="SBS_GCCE433BIN" type="path" />
+		<env name="SBS_GCCE433BIN" type="toolchainpath" />
 		<set name="GCCEBIN" value="$(SBS_GCCE433BIN)" />
+		<set name="GCCECC" value="$(GCCEBIN)/arm-none-symbianelf-g++$(DOTEXE)" type="tool" versionCommand="$(GCCECC) -dumpversion" versionResult="4.3.3"/>
 		<set name="RUNTIME_LIBS_LIST" value="drtaeabi.dso dfpaeabi.dso dfprvct3_1.dso drtrvct3_1.dso"/>
 		<set name="PLATMACROS.VAR" value="GCCE_4 GCCE_4_3"/>
 		<set name="ARMMACROS.VAR" value="__GCCE_4__ __GCCE_4_3__"/>
 	</var>
 	
 	<var name="gcce4_4_1" extends="gcce_base">
-		<env name="SBS_GCCE441BIN" type="path" />
+		<env name="SBS_GCCE441BIN" type="toolchainpath" />
 		<set name="GCCEBIN" value="$(SBS_GCCE441BIN)" />
+		<set name="GCCECC" value="$(GCCEBIN)/arm-none-symbianelf-g++$(DOTEXE)" type="tool" versionCommand="$(GCCECC) -dumpversion" versionResult="4.4.1"/>
 		<set name="RUNTIME_LIBS_LIST" value="drtaeabi.dso dfpaeabi.dso"/>
 		<set name="PLATMACROS.VAR" value="GCCE_4 GCCE_4_4"/>
 		<set name="ARMMACROS.VAR" value="__GCCE_4__ __GCCE_4_4__"/>
 	</var>
 	
 	<var name="rvct2_2" extends="rvct">
-		<env name="RVCT22BIN" type="path"/>
-		<env name="RVCT22INC" type="path"/>
-		<env name="RVCT22LIB" type="path"/>
+		<env name="RVCT22BIN" type="toolchainpath"/>
+		<env name="RVCT22INC" type="toolchainpath"/>
+		<env name="RVCT22LIB" type="toolchainpath"/>
 		<set name="RVCTBIN" value="$(RVCT22BIN)"/>
 		<set name="RVCTINC" value="$(RVCT22INC)"/>
 		<set name="RVCTLIB" value="$(RVCT22LIB)"/>
-		<set name="ARMCC" value="&quot;$(RVCTBIN)/armcc$(DOTEXE)&quot;" type="tool" versionCommand="$(ARMCC) --vsn" versionResult="Compiler, RVCT2\.2\b"/>
+		<set name="ARMCC" value="$(RVCTBIN)/armcc$(DOTEXE)" type="tool" versionCommand="$(ARMCC) --vsn" versionResult="Compiler, RVCT2\.2\b"/>
 		<set name="OWN_LIBRARY_OPTION" value="-Ono_known_library"/>
 		<set name="RELOCATABLE_IMAGE_OPTION" value="--reloc"/>
 		<set name="SPLIT_OPTION" value="--split"/>
@@ -130,13 +133,13 @@
 	</var>
 
 	<var name="rvct3_1" extends="rvct">
-		<env name="RVCT31BIN" type="path"/>
-		<env name="RVCT31INC" type="path"/>
-		<env name="RVCT31LIB" type="path"/>
+		<env name="RVCT31BIN" type="toolchainpath"/>
+		<env name="RVCT31INC" type="toolchainpath"/>
+		<env name="RVCT31LIB" type="toolchainpath"/>
 		<set name="RVCTBIN" value="$(RVCT31BIN)"/>
 		<set name="RVCTINC" value="$(RVCT31INC)"/>
 		<set name="RVCTLIB" value="$(RVCT31LIB)"/>
-		<set name="ARMCC" value="&quot;$(RVCTBIN)/armcc$(DOTEXE)&quot;" type="tool" versionCommand="$(ARMCC) --version_number" versionResult="310[6-9]\d\d\b"/>
+		<set name="ARMCC" value="$(RVCTBIN)/armcc$(DOTEXE)" type="tool" versionCommand="$(ARMCC) --version_number" versionResult="310[6-9]\d\d\b"/>
 		<set name="OWN_LIBRARY_OPTION" value="--library_interface=aeabi_clib"/>
 		<set name="RELOCATABLE_IMAGE_OPTION" value=""/>
 		<set name="SPLIT_OPTION" value=""/>
@@ -160,13 +163,13 @@
 	</var>
 
 	<var name="rvct4_0" extends="rvct">
-		<env name="RVCT40BIN" type="path"/>
-		<env name="RVCT40INC" type="path"/>
-		<env name="RVCT40LIB" type="path"/>
+		<env name="RVCT40BIN" type="toolchainpath"/>
+		<env name="RVCT40INC" type="toolchainpath"/>
+		<env name="RVCT40LIB" type="toolchainpath"/>
 		<set name="RVCTBIN" value="$(RVCT40BIN)"/>
 		<set name="RVCTINC" value="$(RVCT40INC)"/>
 		<set name="RVCTLIB" value="$(RVCT40LIB)"/>
-		<set name="ARMCC" value="&quot;$(RVCTBIN)/armcc$(DOTEXE)&quot;" type="tool" versionCommand="$(ARMCC) --version_number" versionResult="400[4-9]\d\d\b"/>
+		<set name="ARMCC" value="$(RVCTBIN)/armcc$(DOTEXE)" type="tool" versionCommand="$(ARMCC) --version_number" versionResult="400[4-9]\d\d\b"/>
 		<set name="OWN_LIBRARY_OPTION" value="--library_interface=aeabi_clib"/>
 		<set name="RELOCATABLE_IMAGE_OPTION" value=""/>
 		<set name="SPLIT_OPTION" value=""/>

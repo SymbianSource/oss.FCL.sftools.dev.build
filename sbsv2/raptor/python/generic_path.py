@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2006-2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2006-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -19,6 +19,7 @@ import os
 import sys
 import re
 import types
+import ctypes
 
 # are we on windows, and if so what is the current drive letter
 isWin = sys.platform.lower().startswith("win")
@@ -265,7 +266,37 @@ class Path:
 
 		return self.path
 
+	def GetSpaceSafePath(self):
+		"""Returns a version of the path where spaces don't interfere with shell interpretation.
+		
+		This functionality only applies to Windows - paths containing spaces are assumed to be problematic
+		on non-Windows platforms.
+		
+		On Windows, the path is returned in Windows-specific 8.3 short path form - tilde are used to replace
+		spaces and fit path elements within 8.3 requirements.  As 8.3 format paths are not guaranteed to be
+		supported on all Windows installs, and can only be calculated if they exist, a newly formated path is
+		only returned if it is returned by the Windows API and tested to exist.
+		"""
+		
+		if not isWin:
+			return None
+		
+		from ctypes.wintypes import DWORD, LPSTR, MAX_PATH
 
+		GetShortPathNameA = ctypes.windll.kernel32.GetShortPathNameA
+		GetShortPathNameA.restype = DWORD
+		GetShortPathNameA.argtypes = LPSTR, LPSTR, DWORD
+		
+		buffer = ctypes.create_string_buffer(MAX_PATH)
+		GetShortPathNameA(self.path, buffer, MAX_PATH)
+		
+		spacesafe = buffer.value
+		
+		if not spacesafe or not os.path.exists(spacesafe):
+			return None
+		
+		return spacesafe
+		
 # Module functions
 
 def Join(*arguments):
