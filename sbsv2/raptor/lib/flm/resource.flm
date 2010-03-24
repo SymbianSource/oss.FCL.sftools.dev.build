@@ -112,7 +112,7 @@ endif
 $(call makepath,$(INTERBASE))
 
 # common pre-processor options
-CPPOPT:=-nostdinc -undef -D_UNICODE -include $(PRODUCT_INCLUDE)\
+CPPOPT:=-nostdinc -undef -Wno-trigraphs -D_UNICODE -include $(PRODUCT_INCLUDE)\
  -I$(dir $(SOURCE)) $(foreach I, $(USERINCLUDE),-I$(I) ) -I- $(foreach J,$(SYSTEMINCLUDE),-I$(J) )
 
 CREATABLEPATHS:=$(RSCDIR) $(RSGDIR) $(OUTPUTPATH)
