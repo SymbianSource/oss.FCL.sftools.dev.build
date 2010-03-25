@@ -2,8 +2,12 @@ Release Notes for Symbian Build System v2
 
 next version
 Defect Fixes:
+
+- SF Bug 385 - Raptor doesn't handle spaces in tool directory
+- DPDEF143018 - Raptor doesn't handle spaces in GCCE installation directory correctly
+- DPDEF141195 - Raptor doesn't handle spaces in tool paths
 - SF Bug 2172 - [Raptor] Resource builds warn on encountering trigraph-like strings
-- SF Bug 2308 - [Raptor]: PLUGIN3 TARGETTYPEs don't set resource output offsets correctly
+- SF Bug 2308 - [Raptor] PLUGIN3 TARGETTYPEs don't set resource output offsets correctly
 
 
 version 2.12.5
