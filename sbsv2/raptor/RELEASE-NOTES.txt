@@ -5,6 +5,7 @@ Defect Fixes:
 
 - SF Bug 385 - Raptor doesn't handle spaces in tool directory
 - DPDEF143018 - Raptor doesn't handle spaces in GCCE installation directory correctly
+- DPDEF143101 - GCC-E isn't tested as part of the tool checking mechanism
 - DPDEF141195 - Raptor doesn't handle spaces in tool paths
 - SF Bug 2172 - [Raptor] Resource builds warn on encountering trigraph-like strings
 - SF Bug 2308 - [Raptor] PLUGIN3 TARGETTYPEs don't set resource output offsets correctly
