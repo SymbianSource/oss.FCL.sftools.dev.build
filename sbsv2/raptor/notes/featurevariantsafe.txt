@@ -1,0 +1,12 @@
+
+By default, .mmp files that include FEATUREVARIANT will generate binaries for
+both "normal", non-binary variant, build configurations and binary variant
+build configurations.
+
+In order to ensure that only invariant binaries are created for invariant
+build configurations, and variant binaries for variant build configurations,
+the optional setting FEATUREVARIANTSAFE can be used. FEATUREVARIANTSAFE can be
+set via an os_properties.xml file and, when set, variant binaries will no
+longer be created for invariant build configurations.
+
+

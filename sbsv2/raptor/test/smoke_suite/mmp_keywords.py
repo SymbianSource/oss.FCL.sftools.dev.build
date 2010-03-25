@@ -288,6 +288,25 @@ def run():
 	t.returncode = 1
 	t.run()
 
+	# Test keyword: EPOCNESTEDEXCEPTIONS
+	t.id = "75n"
+	t.name = "epocnestedexceptions"
+	t.command = "sbs -b smoke_suite/test_resources/mmp/epocnestedexceptions/bld.inf -c armv5 -f-"
+
+	# When EPOCNESTEDEXCEPTIONS is specified in the MMP file, a different static
+	# run-time library should be used.
+	t.mustmatch_singleline = ["usrt_nx_\d_\d\.lib"]
+	t.mustnotmatch = ["usrt._.."]
+
+	t.countmatch = []
+
+	# The new static run-time libraries don't yet exist.
+	t.errors = 1
+	t.warnings = 2
+	t.targets = []
+
+	t.run()
+
 	t.id = "75"
 	t.name = "mmp_keywords"
 	t.print_result()

@@ -119,6 +119,7 @@
 		<set name="UNRESOLVED_SYMBOL_REF_OPTION" value=""/>
 		<set name="USER_LIBS_PATH_OPTION" value="--userlibpath"/>
 		<set name="USER_STATIC_RUNTIME_LIB" value="usrt3_1.lib"/>
+		<set name="USER_STATIC_RUNTIME_LIB_NESTED_EXCEPTIONS" value="usrt_nx_3_1.lib"/>
 		<set name="USERINCLUDE" value=""/>
 		<set name="VFE_OPTION" value=""/>
 

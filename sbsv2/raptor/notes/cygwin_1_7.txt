@@ -1,0 +1,17 @@
+
+Starting with Raptor 2.13.0, it is also possible to use Cygwin 1.7 instead of
+Cygwin 1.5. Some work was necessary to add support for Cygwin 1.7 due to a
+change in command line interface in some of the Cygwin tools.
+ 
+Due to this change in the command line interface, we have had to introduce the
+SBS_CYGWIN17 environment variable whose value should be the root directory of
+the Cygwin 1.7 installation. We hope this is temporary and that we can remove
+this at some point. The following bullet points indicate the order of
+precedence of the SBS_CYGWIN and SBS_CYGWIN17 environment variables.
+ 
+* SBS_CYGWIN set,   SBS_CYGWIN17 unset: assume Cygwin 1.5 is being used
+* SBS_CYGWIN set,   SBS_CYGWIN17 set:   assume Cygwin 1.7 is being used
+* SBS_CYGWIN unset, SBS_CYGWIN17 set:   assume Cygwin 1.7 is being used
+ 
+You will get errors if you set SBS_CYGWIN to be the root of a Cygwin 1.7
+installation directory and if SBS_CYGWIN17 is not defined correctly.

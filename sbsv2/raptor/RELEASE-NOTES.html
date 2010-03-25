@@ -1,9 +1,38 @@
-Release Notes for Symbian Build System v2
+<html>
+<head>
+<title>Release Notes for Symbian Build System v2</title>
+</head>
+<body>
 
+<h1>Release Notes for Symbian Build System v2</h1>
+
+<h2>version 2.13.0</h2>
+
+<h3>New Features</h3>
+<ul>
+
+<li><a href="notes/featurevariantsafe.txt">    Support for FEATUREVARIANTSAFE in BV builds              </a></li>
+<li><a href="notes/cygwin_1_7.txt">            Support for Cygwin 1.7                                   </a></li>
+<li><a href="notes/cross_compiling_tools.txt"> Support for cross-compiling win32 tools on Linux         </a></li>
+<li><a href="notes/system_definition_v3.txt">  Prototype support for reading System Definition v3 files </a></li>
+<li><a href="notes/epocnestedexceptions.txt">  New MMP keyword EPOCNESTEDEXCEPTIONS                     </a></li>
+
+</ul>
+
+<h3>Defect Fixes</h3>
+<ul>
+
+<li>to be integrated</li>
+
+</ul>
+
+<!-- older notes are plain text -->
+<pre>
 version 2.12.5
 
 Defect Fixes:
 - Fix: Workaround for emake engine log corruption when clockskew errors occur (annofile2log). 
+
   Allow Raptor to obtain log from emake annotation file where it is uncorrupted.  A new 
   Make engine option "copyannofile2log" enables/disables this mode for emake. If this option is disabled
   or if no annotation file is specified for the build then Raptor reads logs directly as normal.
@@ -15,9 +44,9 @@ Defect Fixes:
 version 2.12.4
 
 Defect Fixes:
-- SF Bug 2125 - [Raptor] - tracecompiler what output incorrect if mmp basename contains '.' e.g. fred.prd.mmp 
 - SF Bug 2113 - [Raptor] what/check filters can assign files to the wrong components
-- SF Bug 2081/1971 - [Raptor] - Exported file executable permissions not maintained (linux)
+- SF Bug 2081 - [Raptor] - Exported file executable permissions not maintained (linux)
+- Fix: host attribute in recipes was blank in windows, windows cluster builds.
 - SF Bug 1912 - Raptor should take python from the path [if not set with SBS_PYTHON or bundled with Raptor]
 - SF Bug 2042 - [Raptor] component field empty in recipe
 - SF Bug 2007 - [Raptor] GCCE 4.4.1 builds require 4.3.1 and 4.3.2 SBS_GCCE???BIN env vars etc.
@@ -29,7 +58,6 @@ Defect Fixes:
   .DEFAULT target introduced for all non --no-depend-generate and/or --no-depend-include builds
 - Add support for PLUGIN3 TARGETTYPEs
 - Fixing logfile corruption for large GCCXML builds by suppressing zip output
-- Fix: host attribute in recipes was blank in windows, windows cluster builds.
 - Stop copying .bmp files to epoc32/localisation and fix the "what" reporting
 
 
@@ -51,7 +79,7 @@ Defect Fixes:
 - sbs_filter chose wrong embedded default python version. Set to 2.6.4 now.
 - FilterCheck did not check files when run from sbs_filter
 - Remove old references to python 2.5.2
-- Escape filenames with special XML characters inside <member> tags
+- Escape filenames with special XML characters inside &lt;member&gt; tags
 
 
 version 2.12.1
@@ -288,7 +316,7 @@ DPDEF135436 SBSv2 - Python traceback when illegal characters appear on command l
 INC140156 SBSv2 crashes when build QtWebkit for ARMV5
 
 Other Changes:
-Add <info> to show which variant.hrh file is used.
+Add &lt;info&gt; to show which variant.hrh file is used.
 Replaced the corrupted awk.exe in cygwin distro.
 Fix previous trace compiler auto run mechanism.
 ROMFILE improvements.
@@ -596,7 +624,7 @@ version 2.2.5
 Defect Fixes:
 DEF127329 OMAP H4 Unistore2 Failure in Raptor 9.5 GT build
 DPDEF128632 SBSv2 : bld.inf ':zip' exports don't maintain timestamps, with an e32 impact
-DPDEF127399 SBSv2 -p <filename>.mmp options also builds .mk files
+DPDEF127399 SBSv2 -p [filename].mmp options also builds .mk files
 
 
 version 2.2.4
@@ -647,7 +675,7 @@ DS.1348 SBSv2 allow mixed slashes
 
 Defect Fixes:
 DPDEF127904	SBSv2 : recent installdefaultcommdb has broken the 9.4 build
-DPDEF128022	SBSv2: Unrecognised Keyword ['romtarget  <some_file>.dll'] warnings
+DPDEF128022	SBSv2: Unrecognised Keyword ['romtarget  some_file.dll'] warnings
 DPDEF127815	SBSv2: PAGED and EPOCCALLDLLENTRYPOINTS keywords not supported
 DPDEF127890	SBSv2:  TARGETPATH in mmps (also resources, bitmaps) must cope with backslashes
 DPDEF128229 SBSv2: some command invocations can fail, but could be "re-tried"
@@ -843,3 +871,6 @@ version 2.0.6
 
 The first release of SBSv2 in the SITK.
 
+</pre>
+</body>
+</html>
