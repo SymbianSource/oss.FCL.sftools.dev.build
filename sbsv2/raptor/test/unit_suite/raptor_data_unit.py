@@ -36,8 +36,8 @@ class TestRaptorData(unittest.TestCase):
 			self.envStack[name] = os.environ[name]
 		os.environ[name] = value
 		
-	def isWin32(self):
-		return sys.platform.lower().startswith("win")		
+	def isWin(self):
+		return 'win' in raptor.hostplatform
 			
 	def RestoreEnv(self, name):
 		# put environment back to its state before SetEnv
@@ -410,7 +410,7 @@ class TestRaptorData(unittest.TestCase):
 		except Exception, e:
 			exceptionText = str(e)
 			
-		if self.isWin32():
+		if self.isWin():
 			self.assertTrue(value)
 			self.assertFalse(' ' in value)
 		else:
@@ -424,7 +424,7 @@ class TestRaptorData(unittest.TestCase):
 		except Exception, e:
 			exceptionText = str(e)
 			
-		if self.isWin32():
+		if self.isWin():
 			self.assertTrue(value)
 			self.assertFalse(' ' in value)
 		else:
