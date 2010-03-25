@@ -2,6 +2,7 @@ Release Notes for Symbian Build System v2
 
 next version
 Defect Fixes:
+- SF Bug 2172 - [Raptor] Resource builds warn on encountering trigraph-like strings
 - SF Bug 2308 - [Raptor]: PLUGIN3 TARGETTYPEs don't set resource output offsets correctly
 
 
