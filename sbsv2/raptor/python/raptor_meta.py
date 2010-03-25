@@ -1722,7 +1722,7 @@ class MMPRaptorBackend(MMPBackend):
 	def getDefaultResourceTargetPath(self, targettype):
 		# the different default TARGETPATH values should come from the
 		# configuration rather than being hard-coded here.
-		if targettype == "plugin":
+		if targettype in ["plugin", "plugin3"]:
 			return "resource/plugins"
 		if targettype == "pdl":
 			return "resource/printers"
