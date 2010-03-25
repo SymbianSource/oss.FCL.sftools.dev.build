@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : build.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="helium-python-builder" xmlns:ivy="antlib:org.apache.ivy.ant"
+  xmlns:contrib="antlib:net.sf.antcontrib">
+  
+    <property name="bin.dir" location="${builder.dir}/../build/${ant.project.name}" />
+    <import file="../java/common.ant.xml" />
+    <dirname property="python.builder.dir" file="${ant.file.helium-python-builder}" />
+
+    <target name="resolve">
+        <ivy:settings file="${ivy.settings.dir}/ivysettings.xml" />
+        
+        <!-- the call to resolve is not mandatory, retrieve makes an implicit call if we don't -->
+        <ivy:resolve file="${ivy.file}" log="download-only"/>
+        <ivy:retrieve pattern="${lib.dir}/[artifact].[ext]" log="download-only"/>
+    </target>
+
+    <target name="checkstyle"/>
+    <target name="junit"/>
+    <target name="quality"/>
+
+    <target name="package" depends="clean,resolve">
+        <exec executable="python" failonerror="true" dir="${basedir}">
+            <env key="PYTHONPATH" path="${python.builder.dir}/lib/setuptools-0.6c11-py2.5.egg" />
+            <arg line="setup.py -q bdist_egg -d ${bin.dir}" />
+        </exec>
+        <delete dir="${basedir}/build"/>
+        <delete includeemptydirs="true">
+            <fileset dir="${basedir}/lib" includes="*.egg-info/"/>
+        </delete>
+        
+        <ivy:publish artifactspattern="${bin.dir}/[artifact]-0.1-py2.6.[ext]" 
+                        resolver="local"
+                        status="integration"
+                        forcedeliver="true"
+                        pubrevision="1.0"
+                        overwrite="true"
+        />
+    </target>
+    
+    <target name="test">
+        <condition property="target" value="pt" else="unittest">
+            <isset property="nose.args"/>
+        </condition>
+        
+        <property name="nose.args" value="${basedir}/lib/${ant.project.name}tests ${basedir}/lib/${ant.project.name}cpythontests"/>
+        <exec osfamily="windows" executable="cmd" dir="${basedir}" failonerror="true">
+            <env key="ANT_ARGS" value="-lib ${lib.dir} -lib ${builder.dir}\antlibs" />
+            <env key="JYTHONPATH" value="${builder.dir}\python\lib\jython-2.5-py2.5.egg" />
+            <env key="TEST_DATA" path="${basedir}/tests" />
+            <arg line="/c ant -f tests.ant.xml ${target} -Dbuilder.dir=${builder.dir}" />
+            <arg line='-Dnose.args="${nose.args}"'/>
+        </exec>
+        <exec osfamily="unix" executable="ant" dir="${basedir}" failonerror="true">
+            <env key="ANT_ARGS" value="-lib ${lib.dir} -lib ${builder.dir}/antlibs" />
+            <env key="JYTHONPATH" value="${builder.dir}/python/lib/jython-2.5-py2.5.egg" />
+            <env key="TEST_DATA" path="${basedir}/tests" />
+            <arg line="-f tests.ant.xml ${target} -Dbuilder.dir=${builder.dir}" />
+            <arg line='-Dnose.args="${nose.args}"'/>
+        </exec>
+    </target>  
+
+    <target name="clean">
+    </target>
+    
+</project>

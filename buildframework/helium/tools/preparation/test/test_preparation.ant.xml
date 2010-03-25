@@ -21,6 +21,9 @@ Description:
 ============================================================================
 -->
 <project name="test_preparation" xmlns:au="org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>
+         Preparation Testing targets
+    </description>
     <property environment="env" />
     <property name="publish.root.dir" value="${env.TEMP}" />
     <property name="build.name" value="buildtest" />
@@ -40,7 +43,7 @@ Description:
     <import file="../../../helium.ant.xml" />
 
     <!-- Simple Synergy testing. -->
-    <target name="test-ccm">
+    <target name="-test-ccm">
         <hlm:python>
 import ccm, gc
 import logging
@@ -69,7 +72,7 @@ session = ccm.open_session(database="fa1f5132")
         <runtarget target="prep-drive" />
         <echo file="${build.drive}/newpath-test.txt">foo</echo>
         <sleep seconds="1" />
-        <au:assertFileExists file="${helium.dir}/build/test/preproot/buildtest_0.00.0/newpath-test.txt" />
+        <au:assertFileExists file="${helium.build.dir}/test/preproot/buildtest_0.00.0/newpath-test.txt" />
         <delete file="${build.drive}/newpath-test.txt" />
     </target>
 
@@ -89,7 +92,7 @@ session = ccm.open_session(database="fa1f5132")
             <os family='windows'/>
             <then>
                 <exec osfamily="windows" executable="python" failonerror="true" outputproperty="testbuild.drive">
-                    <arg value="${helium.dir}/tools/common/python/scripts/searchnextdrive.py"/>               
+                    <arg line="-m searchnextdrive"/>               
                 </exec>
                 <au:expectfailure>
                     <antcall target="prep-drive">
@@ -182,5 +185,24 @@ project.setProperty("r.tag", str(strExists))
             </then>
         </if>
     </target>
+
+    <!-- Test for check the setting of arm.compiler.version property when RVCT is 2.x -->
+    <target name="test-set-arm-version2">
+         <!-- mocking the call of  "armcc - - vsn" in order to not depend on it. 
+         In real world should call  c:\APPS\rvct22_593\rvctcmdprompt.bat -->
+        <var name="arm.compiler.version.text" value="ARM/Thumb C/C++ Compiler, RVCT2.2 [Build 593]${line.separator}for support contact Target.Tools@nokia.com${line.separator}Software supplied by: ARM Limited" />
+        <runtarget target="set-arm-version" />
+        <au:assertPropertyEquals name="arm.compiler.version" value="ARM/Thumb C/C++ Compiler, RVCT2.2 [Build 593]${line.separator}"/>
+    </target>
+
+    <!-- Test for check the setting of arm.compiler.version property when RVCT is 4.x -->
+    <target name="test-set-arm-version4">
+         <!-- mocking the call of  "armcc - - vsn" in order to not depend on it.
+         In real world should call  c:\APPS\rvct40_400\rvctcmdprompt.bat -->
+        <var name="arm.compiler.version.text" value="ARM C/C++ Compiler, RVCT4.0 [Build 400]${line.separator}for support contact Target.Tools@nokia.com${line.separator}Software supplied by: ARM Limited" />
+        <runtarget target="set-arm-version" />
+        <au:assertPropertyEquals name="arm.compiler.version" value="ARM C/C++ Compiler, RVCT4.0 [Build 400]${line.separator}"/>
+    </target>
+
 
 </project>

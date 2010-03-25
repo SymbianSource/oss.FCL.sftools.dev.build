@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<buildlog sbs_version="2.12.3 [2010-02-23 symbian build system 007900c31eef]" xmlns="http://symbian.com/xml/build/log" xmlns:progress="http://symbian.com/xml/build/log/progress" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symbian.com/xml/build/log http://symbian.com/xml/build/log/1_0.xsd">
+<info>sbs: version 2.12.3 [2010-02-23 symbian build system 007900c31eef]
+</info>
+<info>SBS_HOME C:/apps/sbs</info>
+<info>Set-up C:/apps/sbs/sbs_init.xml</info>
+<info>Command-line-arguments -s G:\output\build\canonical_system_definition_dfs_build_export.xml --filters=FilterMetadataLog -k --logfile G:\output\logs\compile/92_7952_201006_32_dfs_build_export.log --makefile=G:\output\logs/makefile/92_7952_201006_32_dfs_build_export --export-only -e emake --mo=--emake-emulation=gmake --mo=--emake-annofile=#MAKEFILE#.emake.anno --mo=--emake-class=DFS_7x01-64 --mo=--emake-annodetail=basic,history,file,waiting --mo=--case-sensitive=0 --mo=--emake-root=G:/;\;C:\apps;E:\build_e\wbernard\hudson\workspace\TB92-64bit\helium-svn\helium;C:\apps\sbs</info>
+<info>Current working directory G:\</info>
+<info>Environment /S=BHTEST001</info>
+<info>Environment ABLD_TOOLSMOD_COMPATIBILITY_MODE=alpha</info>
+<info>Environment ALLUSERSPROFILE=C:\Documents and Settings\All Users</info>
+<info>Environment APTLMHOST=@oupelic4.emea.nsn-net.net</info>
+<info>Environment ARMLMD_LICENSE_FILE=8224@trelic01;8224@salmg01;28747@saslmg04;</info>
+<info>Environment ARMROOT=\</info>
+<info>Environment ARMV5VER=:ARM/Thumb C/C++ Compiler, RVCT2.2 [Build 686]</info>
+<info>Environment BASE=E:\build_e\wbernard\hudson</info>
+<info>Environment CLUSTERLOG=C:\ETPWIN\Cluster\cluster.log</info>
+<info>Environment CMTHOME=C:\APPS\cmt</info>
+<info>Environment COMMONPROGRAMFILES=C:\Program Files (x86)\Common Files</info>
+<info>Environment COMMONPROGRAMFILES(X86)=C:\Program Files (x86)\Common Files</info>
+<info>Environment COMMONPROGRAMW6432=C:\Program Files\Common Files</info>
+<info>Environment COMPUTERNAME=TRWEC090</info>
+<info>Environment COMSPEC=C:\ETPWIN\system32\cmd.exe</info>
+<info>Environment COPYCMD=/y</info>
+<info>Environment CTCHOME=C:\APPS\ctc</info>
+<info>Environment CTC_AGENT_DEBUG=*</info>
+<info>Environment CYGWIN=nontsec nosmbntsec</info>
+<info>Environment DERBY_HOME=C:\APPS\jdk_1.6.0_11\JavaDB</info>
+<info>Environment EMAKEFLAGS=--emake-reg-roots=-\HKEY_CLASSES_ROOT</info>
+<info>Environment EMAKE_CM=trwec001</info>
+<info>Environment EMAKE_EMULATION=symbian</info>
+<info>Environment EMAKE_ROOT=\;C:\apps</info>
+<info>Environment EPOCROOT=\</info>
+<info>Environment EXECUTOR_NUMBER=3</info>
+<info>Environment FLEXLM_BATCH=1</info>
+<info>Environment FLEXLM_TIMEOUT=900000</info>
+<info>Environment FP_NO_HOST_CHECK=NO</info>
+<info>Environment HELIUM_CACHE_DIR=e:\ec_temp\helium\wbernard</info>
+<info>Environment HELIUM_HOME=E:\build_e\wbernard\hudson\workspace\TB92-64bit\helium-svn\helium</info>
+<info>Environment HOME=h:\</info>
+<info>Environment HOSTPLATFORM=win 32</info>
+<info>Environment HOSTPLATFORM_DIR=win32</info>
+<info>Environment INCLUDE=C:\APPS\MSVC6\VC98\ATL\Include\;C:\APPS\MSVC6\VC98\MFC\Include\;C:\APPS\MSVC6\VC98\Include\</info>
+<info>Environment JAVA_1_3_1_HOME=C:\apps\j2sdk_1.3.1_06</info>
+<info>Environment JAVA_5_HOME=C:\APPS\jdk_1.5.0_17</info>
+<info>Environment JAVA_6_HOME=C:\APPS\jdk_1.6.0_11</info>
+<info>Environment JAVA_HOME=C:\APPS\jdk_1.6.0_11</info>
+<info>Environment LIB=C:\APPS\MSVC6\VC98\MFC\Lib\;C:\APPS\MSVC6\VC98\Lib\</info>
+<info>Environment MSDEVDIR=C:\APPS\MSVC6\Common\MSDev98</info>
+<info>Environment MWCSYM2INCLUDES=C:\APPS\carbide\x86Build\Symbian_Support\MSL\MSL_C\MSL_Common\Include;C:\APPS\carbide\x86Build\Symbian_Support\MSL\MSL_C\MSL_Win32\Include;C:\APPS\carbide\x86Build\Symbian_Support\MSL\MSL_C\MSL_X86;C:\APPS\carbide\x86Build\Symbian_Support\MSL\MSL_C++\MSL_Common\Include;C:\APPS\carbide\x86Build\Symbian_Support\MSL\MSL_Extras\MSL_Common\Include;C:\APPS\carbide\x86Build\Symbian_Support\MSL\MSL_Extras\MSL_Win32\Include;C:\APPS\carbide\x86Build\Symbian_Support\Win32-x86 Support\Headers\Win32 SDK</info>
+<info>Environment MWSYM2LIBRARIES=C:\APPS\carbide\x86Build\Symbian_Support\Win32-x86 Support\Libraries\Win32 SDK;C:\APPS\carbide\x86Build\Symbian_Support\Runtime\Runtime_x86\Runtime_Win32\Libs</info>
+<info>Environment MWSYM2LIBRARYFILES=MSL_All_MSE_Symbian_D.lib;gdi32.lib;user32.lib;kernel32.lib;</info>
+<info>Environment NODE_NAME=trwec090</info>
+<info>Environment NUMBER_OF_PROCESSORS=12</info>
+<info>Environment OS=Windows_NT</info>
+<info>Environment PATH=C:\apps\sbs\win32\mingw\bin;C:\apps\sbs\win32\cygwin\bin;C:\apps\sbs\win32\bin;c:\apps\actperl\bin\;c:\apps\rvct22_686\bin;c:\apps\atool;\epoc32\tools;\epoc32\gcc\bin;c:\apps\ue;c:\apps\ccm65\bin;c:\apps\carbide\x86Build\Symbian_Tools\Command_Line_Tools;C:\Program Files\HP\NCU;c:\ECloud\i686_win32\bin;C:\Program Files (x86)\Windows Resource Kits\Tools\;C:\ETPWIN\system32;C:\ETPWIN;C:\ETPWIN\System32\Wbem;C:\ETPWIN\sysWOW64;C:\PROGRA~2\PuTTY;C:\APPS\MSVC6\Common\Tools\WinNT;C:\APPS\MSVC6\Common\MSDev98\Bin;C:\APPS\MSVC6\Common\Tools;C:\APPS\MSVC6\VC98\bin;C:\EESP\System32;C:\APPS\pclint;C:\APPS\cmt\;C:\APPS\ctc;C:\APPS\prevent\bin;C:\APPS\cltools;C:\APPS\symrec;C:\APPS\7zip;C:\APPS\understand\bin\pc-win95;C:\APPS\unzip;C:\APPS\jdk_1.6.0_11\bin;C:\apps\mercurial;C:\APPS\ant_1.7\bin;C:\Program Files\subversion;C:\APPS\sbs\bin;C:\APPS\actpython\.;C:\APPS\blocks\bin;C:\APPS\codescanner;C:\APPS\symdec;C:\APPS\bc;\epoc32\gcc_mingw\bin;C:\ETPWIN\system32\WindowsPowerShell\v1.0;C:\APPS\MSVC6\VC98\Bin\;C:\APPS\MSVC6\Common\Tools\;C:\APPS\MSVC6\Common\MSDev98\Bin\;\epoc32\tools;\epoc32\gcc\bin;\epoc32\tools\build;\epoc32\rombuild;E:\build_e\wbernard\hudson\workspace\TB92-64bit\helium-svn\helium\extensions\nokia\external\unxutils;E:\build_e\wbernard\hudson\workspace\TB92-64bit\helium-svn\helium\extensions\nokia\external\Subversion\bin;E:\build_e\wbernard\hudson\workspace\TB92-64bit\helium-svn\helium\extensions\nokia\external\graphviz\bin;C:\APPS\ctc</info>
+<info>Environment PATHEXT=.COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.py;.pyw;.PSC1</info>
+<info>Environment PERL=C:\APPS\actperl\bin\perl.exe</info>
+<info>Environment PERL5LIB=E:\build_e\wbernard\hudson\workspace\TB92-64bit\helium-svn\helium\tools\common\packages</info>
+<info>Environment PID=6932</info>
+<info>Environment PROCESSOR_ARCHITECTURE=x86</info>
+<info>Environment PROCESSOR_ARCHITEW6432=AMD64</info>
+<info>Environment PROCESSOR_IDENTIFIER=AMD64 Family 16 Model 8 Stepping 0, AuthenticAMD</info>
+<info>Environment PROCESSOR_LEVEL=16</info>
+<info>Environment PROCESSOR_REVISION=0800</info>
+<info>Environment PROGRAMFILES=C:\Program Files (x86)</info>
+<info>Environment PROGRAMFILES(X86)=C:\Program Files (x86)</info>
+<info>Environment PROGRAMW6432=C:\Program Files</info>
+<info>Environment PROMPT=$P$G</info>
+<info>Environment PSMODULEPATH=C:\ETPWIN\system32\WindowsPowerShell\v1.0\Modules\</info>
+<info>Environment PYTHONPATH=C:\apps\sbs\win32\python264</info>
+<info>Environment PYTHONVERSION=2.6</info>
+<info>Environment RVCT22BIN=C:\APPS\rvct22_686\bin</info>
+<info>Environment RVCT22INC=C:\APPS\rvct22_686\include</info>
+<info>Environment RVCT22LIB=C:\APPS\rvct22_686\lib</info>
+<info>Environment RVCT22_ASMOPT=--licretry --fastlicense --sitelicense</info>
+<info>Environment RVCT22_CCOPT=--licretry --fastlicense --sitelicense</info>
+<info>Environment RVCT22_LINKOPT=--licretry --fastlicense --sitelicense</info>
+<info>Environment SBS_CLEAN_LOG_FILE=G:\output\logs\compile/92_7952_201006_32_dfs_build_export.log.clean.log</info>
+<info>Environment SBS_HOME=C:\apps\sbs</info>
+<info>Environment SBS_PYTHON=C:\APPS\actpython\python.exe</info>
+<info>Environment SYMSEE_VERSION=11.2.0</info>
+<info>Environment SYSTEMDRIVE=C:</info>
+<info>Environment SYSTEMROOT=C:\ETPWIN</info>
+<info>Environment TEAM=helium_tampere64.92</info>
+<info>Environment TEMP=e:\ec_temp</info>
+<info>Environment TESTED_ANT=C:\APPS\ant_1.7</info>
+<info>Environment TESTED_JAVA=C:\APPS\jdk_1.6.0_11</info>
+<info>Environment TMP=e:\ec_temp</info>
+<info>Environment TMPDIR=e:\ec_tmpdir</info>
+<info>Environment WINDIR=C:\ETPWIN</info>
+<info>Environment WORKSPACE=E:\build_e\wbernard\hudson\workspace\TB92-64bit</info>
+<info>Environment _JAVACMD=C:\APPS\jdk_1.6.0_11\bin\java.exe</info>
+<info>Environment _USE_CLASSPATH=no</info>
+<info>Environment __CYGWIN__=C:\apps\sbs\win32\cygwin</info>
+<info>Environment __MINGW__=C:\apps\sbs\win32\mingw</info>
+<info>Environment __PYTHON__=C:\APPS\actpython\python.exe</info>
+<info>Duplicate alias 'make' (the one from 'G:/epoc32/sbs_config\s60_sbs_config.xml' will override the one in 'C:/apps/sbs/lib/config\make.xml')</info>
+<info>Duplicate alias 'emake' (the one from 'G:/epoc32/sbs_config\s60_sbs_config.xml' will override the one in 'C:/apps/sbs/lib/config\make.xml')</info>
+<info>Buildable configuration 'armv5_urel'</info>
+<info>Buildable configuration 'armv5_udeb'</info>
+<info>Buildable configuration 'winscw_udeb'</info>
+<info>Buildable configuration 'winscw_urel'</info>
+<info>System Definition file G:/output/build/canonical_system_definition_dfs_build_export.xml</info>
+<info>Found 372 bld.inf references in G:/output/build/canonical_system_definition_dfs_build_export.xml within 10 layers:</info>
+<info>	ncp_layer, mw_layer, os_layer, bldfirst_mw_layer, bldfirst_app_layer, app_layer, tools_layer, addon_layer, unit_test_layer, complementary_layer</info>
+<info>Found 95 bld.inf references in layer "ncp_layer"</info>
+<info>Found 112 bld.inf references in layer "mw_layer"</info>
+<info>Found 25 bld.inf references in layer "os_layer"</info>
+<info>Found 2 bld.inf references in layer "bldfirst_mw_layer"</info>
+<info>Found 1 bld.inf references in layer "bldfirst_app_layer"</info>
+<info>Found 98 bld.inf references in layer "app_layer"</info>
+<info>Found 3 bld.inf references in layer "tools_layer"</info>
+<info>Found 30 bld.inf references in layer "addon_layer"</info>
+<info>Found 0 bld.inf references in layer "unit_test_layer"</info>
+<info>Found 6 bld.inf references in layer "complementary_layer"</info>
+<info>Toolcheck cache G:/epoc32/build/toolcheck_cache_.tmp ignored - environment changed
+</info>
+<info>OS version "vtb92sf" determined from file "G:/epoc32/data/buildinfo.txt"</info>
+<info>applying the OS variant to the configuration "armv5_urel".</info>
+<info>'armv5_urel' uses variant hrh file 'G:/epoc32/include/feature_settings.hrh'</info>
+<info>OS version "vtb92sf" determined from file "G:/epoc32/data/buildinfo.txt"</info>
+<info>applying the OS variant to the configuration "armv5_udeb".</info>
+<info>'armv5_udeb' uses variant hrh file 'G:/epoc32/include/feature_settings.hrh'</info>
+<info>OS version "vtb92sf" determined from file "G:/epoc32/data/buildinfo.txt"</info>
+<info>applying the OS variant to the configuration "winscw_udeb".</info>
+<info>'winscw_udeb' uses variant hrh file 'G:/epoc32/include/feature_settings.hrh'</info>
+<info>OS version "vtb92sf" determined from file "G:/epoc32/data/buildinfo.txt"</info>
+<info>applying the OS variant to the configuration "winscw_urel".</info>
+<info>'winscw_urel' uses variant hrh file 'G:/epoc32/include/feature_settings.hrh'</info>
+<info>Processing G:/sf/mw/svgt/group/bld.inf</info>
+<info>Copied G:/sf/mw/svgt/svgt_plat/svgt_api/inc/SVGImageLoadingObserver.h to G:/epoc32/include/platform/mw/SVGImageLoadingObserver.h</info>
+<info>Copied G:/sf/mw/svgt/svgt_plat/svgt_api/inc/SVGEngineInterfaceImpl.h to G:/epoc32/include/platform/mw/SVGEngineInterfaceImpl.h</info>
+<info>Copied G:/sf/mw/svgt/svgt_plat/svgt_api/inc/SvgListener.h to G:/epoc32/include/platform/mw/SVGListener.h</info>
+<info>Copied G:/sf/mw/svgt/svgt_plat/svgt_api/inc/SVGErrorImpl.h to G:/epoc32/include/platform/mw/SVGErrorImpl.h</info>
+<info>Copied G:/sf/mw/svgt/svgt_plat/svgt_api/inc/SvgJavaInterfaceImpl.h to G:/epoc32/include/platform/mw/SvgJavaInterfaceImpl.h</info>
+<info>Copied G:/sf/mw/svgt/svgt_plat/svgt_api/inc/SVGHyperlinkListener.h to G:/epoc32/include/platform/mw/SVGHyperlinkListener.h</info>
+<info>Copied G:/sf/mw/svgt/svgt_plat/svgt_api/inc/SVGAnimationListener.h to G:/epoc32/include/platform/mw/SVGAnimationListener.h</info>
+<info>Copied G:/sf/mw/svgt/svgt_plat/svgt_api/inc/SVGRequestObserver.h to G:/epoc32/include/platform/mw/SVGRequestObserver.h</info>
+<info>Copied G:/sf/mw/svgt/svgt_plat/svgt_api/inc/SVGRendererId.h to G:/epoc32/include/platform/mw/SVGRendererId.h</info>
+<info>Copied G:/sf/mw/svgt/svgt_plat/nvg_api/inc/nvg.h to G:/epoc32/include/platform/mw/nvg.h</info>
+<info>Copied G:/sf/mw/svgt/svgt_plat/nvg_api/inc/MVGImageBinder.h to G:/epoc32/include/platform/mw/MVGImageBinder.h</info>
+<info>Copied G:/sf/mw/svgt/svgt_plat/nvg_api/inc/NVGIcon.h to G:/epoc32/include/platform/mw/NVGIcon.h</info>
+<info>Copied G:/sf/mw/svgt/svgtopt/rom/SVGEngine.iby to G:/epoc32/rom/include/core/mw/SVGEngine.iby</info>
+<info>Copied G:/sf/mw/svgt/svgtopt/rom/SvgtPluginEcom.iby to G:/epoc32/rom/include/core/mw/SvgtPluginEcom.iby</info>
+<info>Copied G:/sf/mw/svgt/svgtopt/rom/nvgdecoder.iby to G:/epoc32/rom/include/core/mw/NVGDecoder.iby</info>
+<info>Copied G:/sf/mw/svgt/svgtopt/rom/NVGDecoder_SW.iby to G:/epoc32/rom/include/core/mw/NVGDecoder_SW.iby</info>
+<info>Copied G:/sf/mw/svgt/svgtopt/rom/VGRenderer.iby to G:/epoc32/rom/include/core/mw/VGRenderer.iby</info>
+<whatlog bldinf='G:/sf/mw/svgt/group/bld.inf' mmp='' config=''>
+<export destination='G:/epoc32/include/platform/mw/SVGImageLoadingObserver.h' source='G:/sf/mw/svgt/svgt_plat/svgt_api/inc/SVGImageLoadingObserver.h'/>
+<resource>G:/epoc32/include/hrv_gain_mappings.rsg</resource>
+<build>G:/epoc32/release/armv5/urel/ekeyb.dll</build>
+</whatlog>
+<clean bldinf='G:/sf/os/deviceplatformrelease/locfiles/group/set14/bld.inf' mmp='' config=''>
+<zipmarker>G:/epoc32/build/G__sf_os_deviceplatformrelease_locfiles_data_65.zipG__epoc32_include_platform_loc.unzipped</zipmarker>
+</clean>
+<whatlog bldinf='G:/sf/os/deviceplatformrelease/locfiles/group/set14/bld.inf' mmp='' config=''>
+<archive zipfile='G:/sf/os/deviceplatformrelease/locfiles/data/65.zip'>
+<member>G:/epoc32/include/platform/loc/65/101f6dd6_65.loc</member>
+<member>G:/epoc32/include/platform/loc/65/101f6dd7_65.loc</member>
+</archive>
+</whatlog>
+<info>The make-engine exited successfully.</info>
+<info>Run time 999 seconds</info>
+<info>Created/Updated toolcheck cache: G:/epoc32/build/toolcheck_cache_.tmp
+</info>
+</buildlog>

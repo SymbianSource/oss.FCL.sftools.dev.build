@@ -1,0 +1,270 @@
+<?xml version="1.0"?>
+<!-- 
+============================================================================ 
+Name        : test_sbs_input.ant.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+
+<project name="test-sbs-input" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>Helium Antlib sbs unittests.</description>
+
+    <taskdef resource="com/nokia/helium/core/ant/antlib.xml" uri="http://www.nokia.com/helium"/>
+    <taskdef resource="com/nokia/helium/sbs/ant/antlib.xml" uri="http://www.nokia.com/helium"/>
+    <taskdef name="getVariableValue" classname="com.nokia.helium.core.ant.taskdefs.GetValueFromVariableSet"/>
+    <dirname property="test.sbs.dir" file="${ant.file.test-sbs-input}"/>
+    <property name="working.dir" value="${test.sbs.dir}" />
+    <patternset id="includeLayerPatternSet" >
+        <include name="include_layer_.*"/>
+    </patternset>
+
+    <patternset id="includeNoneExistantLayerPatternSet" >
+        <include name="nonexistant_nclude_layer_.*"/>
+    </patternset>
+
+    <patternset id="emptySet" />
+
+    <patternset id="excludeLayerPatternSet" >
+        <exclude name="exclude_layer_.*" />
+    </patternset>
+
+    <patternset id="incExcludeLayerPatternSet" >
+        <include name="include_exclude_.*" />
+        <exclude name="include_exclude_non-matcher.*" />
+    </patternset>
+
+    <patternset id="includeSomeNoneExistantLayerPatternSet" >
+        <include name="include_exclude_.*" />
+        <exclude name="include_exclude_non-matcher.*" />
+        <include name="nonexistant_nclude_layer_.*"/>
+    </patternset>
+
+    <patternset id="includeUnitLayerPatternSet" >
+        <include name="api_test_layer" />
+    </patternset>
+
+    <patternset id="includeDefLayerPatternSet" >
+        <include name="use_layer_real_Def_layer" />
+    </patternset>
+
+    <patternset id="includeNoNameLayerPatternSet" >
+        <include name="use_no_name_layer" />
+    </patternset>
+
+    <dirname property="project.dir" file="${ant.file.test-sbs-input}" />
+
+    <property name="build.system" value="sbs" />
+
+    <import file="${project.dir}/sbs_default_config.ant.xml" />
+
+    <target name="test-7952">
+        <hlm:getsbsinputs config="pf_7952" outputProperty="sbs-inputs"/>
+        <hlm:sbstask outputLog="tmp" sbsinput="${sbs-inputs}" sysdefFile="test.sysdef.xml" 
+            workingDir="${working.dir}" execute="false"/>
+    </target>
+
+    <target name="test-without-sysdef">
+        <property name="build.system" value="sbs" />
+        <au:expectfailure>
+            <hlm:getsbsinputs config="pf_7952" outputProperty="sbs-inputs"/>
+            <hlm:sbstask outputLog="tmp" sbsinput="pf_7952" workingDir="${working.dir}" execute="false"/>
+        </au:expectfailure>
+    </target>
+
+    <target name="test-without-working-dir">
+        <property name="build.system" value="sbs" />
+        <au:expectfailure>
+            <hlm:getsbsinputs config="pf_7952" outputProperty="sbs-inputs"/>
+            <hlm:sbstask outputLog="tmp" sbsinput="${sbs-inputs}" sysdefFile="test.sysdef.xml" execute="false" />
+        </au:expectfailure>
+    </target>
+
+    <target name="test-sbs">
+        <property name="build.system" value="sbs" />
+        <hlm:getsbsinputs config="pf_7952" outputProperty="sbs-inputs"/>
+        <hlm:sbstask outputLog="tmp" sbsinput="${sbs-inputs}" sysdefFile="test.sysdef.xml" 
+            workingDir="${working.dir}" execute="false"/>
+    </target>
+
+    <target name="test-sbs-ec">
+        <property name="build.system" value="sbs-ec" />
+        <hlm:getsbsinputs config="pf_7952" outputProperty="sbs-inputs"/>
+        <hlm:sbstask outputLog="tmp" sbsinput="${sbs-inputs}" sysdefFile="test.sysdef.xml" 
+            workingDir="${working.dir}" execute="false"/>
+    </target>
+
+    <target name="test-all-layers">
+        <property name="build.system" value="sbs" />
+        <hlm:getsbsinputs config="pf_7952" outputProperty="sbs-inputs"/>
+        <hlm:sbstask outputLog="tmp" sbsinput="${sbs-inputs}" sysdefFile="test.sysdef.xml" 
+            workingDir="${working.dir}" execute="false"/>
+    </target>
+
+    <target name="test-include-layers">
+        <property name="build.system" value="sbs" />
+        <hlm:getsbsinputs config="pf_7952" outputProperty="sbs-inputs"/>
+        <hlm:sbstask outputLog="tmp" sbsinput="${sbs-inputs}" sysdefFile="test.sysdef.xml" 
+            layerPatternSetRef="includeLayerPatternSet" workingDir="${working.dir}"
+            execute="false"/>
+        <au:assertLogContains text="sbs" />
+        <au:expectfailure>
+            <au:assertLogContains text="-l exclude_layer_set" />
+        </au:expectfailure>
+        <au:expectfailure>
+            <au:assertLogContains text="-l include_exclude_matcher" />
+        </au:expectfailure>
+        <au:expectfailure>
+            <au:assertLogContains text="-l include_exclude_non-matcher" />
+        </au:expectfailure>
+    </target>
+
+    <target name="test-exclude-layers">
+        <property name="build.system" value="sbs-ec" />
+        <hlm:getsbsinputs config="pf_7952" outputProperty="sbs-inputs"/>
+        <hlm:sbstask outputLog="tmp" sbsinput="${sbs-inputs}" sysdefFile="test.sysdef.xml" 
+            layerPatternSetRef="excludeLayerPatternSet" 
+            workingDir="${working.dir}" execute="false"/>
+        <au:assertLogContains text="-l include_layer_set" />
+        <au:assertLogContains text="-l include_exclude_matcher" />
+        <au:assertLogContains text="-l include_exclude_non-matcher" />
+    </target>
+
+    <target name="test-nonexistant-layers">
+        <property name="build.system" value="sbs" />
+        <hlm:getsbsinputs config="pf_7952" outputProperty="sbs-inputs"/>
+        <hlm:sbstask outputLog="tmp" sbsinput="${sbs-inputs}" sysdefFile="test.sysdef.xml" 
+            layerPatternSetRef="includeNoneExistantLayerPatternSet" workingDir="${working.dir}"
+            execute="false"/>
+        <au:assertLogContains text="No matching layer" />
+    </target>
+
+    <target name="test-nonexistant-with-some-layers">
+        <property name="build.system" value="sbs" />
+        <hlm:getsbsinputs config="pf_7952" outputProperty="sbs-inputs"/>
+        <hlm:sbstask outputLog="tmp" sbsinput="${sbs-inputs}" sysdefFile="test.sysdef.xml" 
+            layerPatternSetRef="includeSomeNoneExistantLayerPatternSet" workingDir="${working.dir}"
+            execute="false"/>
+        <au:expectfailure>
+            <au:assertLogContains text="-l exclude_layer_set" />
+        </au:expectfailure>
+        <au:assertLogContains text="-l include_exclude_matcher" />
+        <au:expectfailure>
+            <au:assertLogContains text="-l include_exclude_non-matcher" />
+        </au:expectfailure>
+    </target>
+
+    <target name="test-include-unitID-layers">
+        <property name="build.system" value="sbs" />
+        <hlm:getsbsinputs config="pf_7952" outputProperty="sbs-inputs"/>
+        <hlm:sbstask outputLog="tmp" sbsinput="${sbs-inputs}" sysdefFile="test.sysdef.xml" 
+            layerPatternSetRef="includeUnitLayerPatternSet" workingDir="${working.dir}"
+            execute="false"/>
+        <au:assertLogContains text="sbs" />
+        <au:assertLogContains text="-l api_test_layer" />
+    </target>
+
+    <target name="test-include-exclude-layers">
+        <property name="build.system" value="sbs" />
+        <hlm:getsbsinputs config="pf_7952" outputProperty="sbs-inputs"/>
+        <hlm:sbstask outputLog="tmp" sbsinput="${sbs-inputs}" sysdefFile="test.sysdef.xml" 
+            layerPatternSetRef="incExcludeLayerPatternSet" 
+            workingDir="${working.dir}" execute="false"/>
+        <au:assertLogContains text="-l include_exclude_matcher" />
+    </target>
+
+    <target name="test-empty-pattern-set">
+        <property name="build.system" value="sbs-ec" />
+        <au:expectfailure>
+            <hlm:getsbsinputs config="pf_7952" outputProperty="sbs-inputs"/>
+            <hlm:sbstask outputLog="tmp" config="${sbs-inputs}" sysdefFile="test.sysdef.xml" 
+                layerPatternSetRef="emptySet" 
+                workingDir="${working.dir}" execute="false"/>
+        </au:expectfailure>
+    </target>
+
+    <target name="test-engine-inheritence1">
+        <property name="build.system" value="sbs-ec" />
+        <au:expectfailure>
+            <hlm:getsbsinputs config="inherit1" outputProperty="sbs-inputs"/>
+            <hlm:sbstask outputLog="tmp" sbsinput="${sbs-inputs}" sysdefFile="test.sysdef.xml" 
+                workingDir="${working.dir}" execute="false"/>
+        </au:expectfailure>
+    </target>
+
+    <target name="test-engine-inheritence2">
+        <property name="build.system" value="sbs-ec" />
+        <hlm:getsbsinputs config="inherit2" outputProperty="sbs-inputs"/>
+        <hlm:sbstask outputLog="tmp" sbsinput="${sbs-inputs}" sysdefFile="test.sysdef.xml" workingDir="${working.dir}" execute="false"/>
+        <au:assertLogContains text="-e emake" />
+    </target>
+
+    <target name="test-engine-inheritence3">
+        <property name="build.system" value="sbs-ec" />
+        <au:expectfailure>
+            <hlm:getsbsinputs config="inherit3" outputProperty="sbs-inputs"/>
+            <hlm:sbstask outputLog="tmp" sbsinput="${sbs-inputs}" sysdefFile="test.sysdef.xml" 
+                workingDir="${working.dir}" execute="false"/>
+        </au:expectfailure>
+    </target>
+
+    <target name="test-engine-inheritence4">
+        <property name="build.system" value="sbs-ec" />
+        <hlm:getsbsinputs config="inherit4" outputProperty="sbs-inputs"/>
+        <hlm:sbstask outputLog="tmp" sbsinput="${sbs-inputs}" sysdefFile="test.sysdef.xml" workingDir="${working.dir}" execute="false"/>
+        <au:assertLogContains text="-e emake" />
+        <au:assertLogContains text="logfile" />
+    </target>
+
+    <target name="test-getinputs">
+        <property name="build.system" value="sbs-ec" />
+        <hlm:getsbsinputs config="inherit3" outputProperty="sbs-inputs"/>
+        <echo message="sbs-inputs: ${sbs-inputs}" />
+        <getVariableValue name="-f" property="sbs.log.file">
+            <hlm:sbsinput refid="${sbs-inputs}" />
+        </getVariableValue>
+        <echo message="${sbs-inputs}" />
+    </target>
+
+    <target name="test-include-def-layer">
+        <property name="build.system" value="sbs" />
+        <hlm:getsbsinputs config="pf_7952" outputProperty="sbs-inputs"/>
+        <hlm:sbstask outputLog="tmp" sbsinput="${sbs-inputs}" sysdefFile="test.sysdef.xml" 
+            layerPatternSetRef="includeDefLayerPatternSet" workingDir="${working.dir}"
+            execute="false"/>
+        <au:assertLogContains text="sbs" />
+    </target>
+
+    <target name="test-include-error-layer">
+        <property name="build.system" value="sbs" />
+        <hlm:getsbsinputs config="pf_7952" outputProperty="sbs-inputs"/>
+        <hlm:sbstask outputLog="tmp" sbsinput="${sbs-inputs}" sysdefFile="test.sysdef.xml" 
+            layerPatternSetRef="includeNoNameLayerPatternSet" workingDir="${working.dir}"
+            execute="false"/>
+        <au:assertLogContains text="-l use_no_name_layer" />
+    </target>
+
+    <target name="test-ctc">
+        <property name="build.system" value="sbs" />
+        <hlm:getsbsinputs config="pf_7952" outputProperty="sbs-inputs"/>
+        <hlm:ctctask outputLog="tmp" sbsinput="${sbs-inputs}" sysdefFile="test.sysdef.xml" 
+            layerPatternSetRef="includeNoNameLayerPatternSet" workingDir="${working.dir}"
+            execute="false"/>
+        <au:assertLogContains text="-i m sbs" />
+    </target>
+
+</project>

@@ -81,9 +81,7 @@ public class TracingLogger implements BuildListener
         }
         catch (FileNotFoundException e)
         {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            throw new BuildException(e.getMessage());
+            throw new BuildException(e.getMessage(), e);
         }
     }
 

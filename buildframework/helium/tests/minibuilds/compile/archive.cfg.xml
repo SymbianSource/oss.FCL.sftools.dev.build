@@ -29,6 +29,8 @@ Description:
         <set name="temp.build.dir" value="${temp.build.dir}"/>
         
 
+        <config name="empty_minibuild_archive" abstract="true" />
+        
         <config name="minibuild_archive" abstract="true">
         	<set name="grace.service" value="minibuild"/>
         	<set name="grace.product" value="SF"/>
@@ -71,7 +73,6 @@ Description:
                 <set name="policy.csv" value="${config.dir}/distribution.policy.extended_for_sf.id_status.csv"/>
             </config>
     	</config>
-
 	</config>
 </build>
   

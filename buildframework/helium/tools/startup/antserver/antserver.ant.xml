@@ -20,6 +20,7 @@ Description:
 
 ============================================================================
 -->
+<!--* @package framework -->
 <project name="startup.antserver" default="server">
     <description>Running a remote server to handle backup build requests.</description>
     

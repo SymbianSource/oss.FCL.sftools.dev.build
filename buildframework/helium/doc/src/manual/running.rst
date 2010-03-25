@@ -96,7 +96,7 @@ To perform checking run the command::
 Build output
 ================
 
-When a build is running the targets being executed are listed on the screen there is no need to pipe this to a file as the ant targets are logged in the   ``\*_ant_build.log`` for product and IDO builds. Once the build is complete it will say on the screen whether the build was successful or failed. If it has failed it should give an indication of where and why it failed on the screen but for more information you must examine the output logs. If the build says it was successfult this does not necessarily mean that the build compiled all components successfully, you must examine the logs to check that all is compiled and linked correctly. See :ref:`Troubleshooting-label` for information on logs and where they kept.
+When a build is running the targets being executed are listed on the screen there is no need to pipe this to a file as the ant targets are logged in the   ``\*_main.ant.log`` for product and IDO builds. Once the build is complete it will say on the screen whether the build was successful or failed. If it has failed it should give an indication of where and why it failed on the screen but for more information you must examine the output logs. If the build says it was successfult this does not necessarily mean that the build compiled all components successfully, you must examine the logs to check that all is compiled and linked correctly. See :ref:`Troubleshooting-label` for information on logs and where they kept.
 
 The result of the build (compiled files, linked (flash) files etc.) are  stored in the usual folders and directories under the ``\epoc32`` directory.
 

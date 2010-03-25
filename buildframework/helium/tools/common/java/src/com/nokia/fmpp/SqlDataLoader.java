@@ -14,10 +14,16 @@ import freemarker.template.SimpleList;
 import fmpp.Engine;
 import fmpp.tdd.DataLoader;
 
+import org.apache.log4j.Logger;
+
+
+
 /**
  * 
  */
 public class SqlDataLoader implements DataLoader {
+    
+    private Logger log = Logger.getLogger(SqlDataLoader.class);
 
     private Engine engine;
 
@@ -61,7 +67,7 @@ public class SqlDataLoader implements DataLoader {
         ResultSet rs = connection.getMetaData().getTables(this.database, null,
                 null, null);
         while (rs.next()) {
-            System.out.println(rs.getString(3));
+            log.info(rs.getString(3));
             database.put(rs.getString(3), new ArrayList());
         }
         rs.close();
@@ -77,19 +83,18 @@ public class SqlDataLoader implements DataLoader {
                     tableName, null);
             List tableStructure = new ArrayList();
             while (rs.next()) {
-                //System.out.println("string4:"+rs.getString(4));
                 tableStructure.add(rs.getString(4));
             }
             String[] fieldNames = (String[]) tableStructure
                     .toArray(new String[] { });
             ArrayList list = new ArrayList();
             ArrayList rowList = new ArrayList();
-            System.out.println("offset" + offset);
+            log.info("offset" + offset);
             // recuperation des donnees
             String sql = "SELECT COUNT(*) AS COUNT FROM " + tableName + " where priority='WARNING';";
             Statement stmt = connection.createStatement();
             rs = stmt.executeQuery(sql);
-            System.out.println("record size of warning:" + rs.getInt("COUNT"));
+            log.info("record size of warning:" + rs.getInt("COUNT"));
             stmt.close();
             sql = "SELECT * FROM " + tableName + " limit 5 offset " + offset + ";";
             stmt = connection.createStatement();
@@ -99,7 +104,6 @@ public class SqlDataLoader implements DataLoader {
                     HashMap row = new HashMap();
                     for (int i = 0; i < fieldNames.length; i++) {
                         String fieldName = fieldNames[i];
-                        //System.out.println("fieldName:"+fieldName);
                         list.add(rs.getObject(i + 1));
                         //row.put(fieldName, rs.getObject(i + 1));
                     }

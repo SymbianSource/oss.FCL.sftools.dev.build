@@ -21,11 +21,13 @@ Description:
 ============================================================================
 -->
 <project name="xtest_publishing_to_diamonds" xmlns:hlm="http://www.nokia.com/helium">
-
-    <!-- Private: -->
+    <description>
+        Targets to test publishing to diamonds
+    </description>
+    <!-- @scope private -->
     <target name="xtest-diamonds" depends="setup-test-publishing-to-diamonds,diamonds,xtest-diamonds-validate-policy,xtest-diamonds-check-tool-dependencies"/>
     
-    <!-- Private: -->
+    <!-- @scope private -->
     <target name="setup-test-publishing-to-diamonds">
         <property name="build.family" value="helium_test"/>
         <property name="email.from" value="none"/>
@@ -53,27 +55,27 @@ Description:
     </target>
 --> 
     
-    <!-- Private: -->
+    <!-- @scope private -->
     <target name="xtest-diamonds-check-tool-dependencies">
         <antcall target="check-tool-dependencies">
         </antcall>            
-        <xpathtest xmlfile="${build.log.dir}/check-tool-dependencies.xml">  
+        <xpathtest xmlfile="${diamonds.build.output.dir}/check-tool-dependencies.xml">  
             <namespace uri="" prefix=""/>
             <xpath expression="/diamonds-build/tools/tool[name='java']"/>
             <xpath expression="/diamonds-build/tools/tool[name='ant']"/>
             <xpath expression="/diamonds-build/tools/tool[name='python']"/>
         </xpathtest>
-        <xpathtest xmlfile="${build.log.dir}/diamonds-start.log.xml">  
+        <xpathtest xmlfile="${diamonds.build.output.dir}/diamonds-start.log.xml">  
             <namespace uri="" prefix=""/>
             <xpath expression="/diamonds-build/build[build_system='ebs']"/> 
         </xpathtest>
     </target> 
     
-    <!-- Private: -->
+    <!-- @scope private -->
     <target name="xtest-diamonds-validate-policy">
         <antcall target="render-validate-policy">
         </antcall>            
-        <xpathtest xmlfile="${build.log.dir}/render-validate-policy.xml">  
+        <xpathtest xmlfile="${diamonds.build.output.dir}/render-validate-policy.xml">  
             <namespace uri="" prefix=""/>
             <xpath expression="/diamonds-build[schema &gt; 9]"/> 
         </xpathtest>

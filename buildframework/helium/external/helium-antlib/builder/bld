@@ -1,0 +1,67 @@
+#!/bin/bash
+
+#
+# Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+#
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+#
+# Contributors:
+#
+# Description: 
+#
+
+# loading the system wide settings from ~/.bashrc
+if [ -f ~/.bashrc ] ; then
+	. ~/.bashrc
+fi
+MODULE_VERSION="$(module --version 2>&1)"
+if [ "$?" == "0" ] ; then
+    module load "java/1.6.0"
+    module load "tww/ant/1.7.0"
+    module load mercurial
+    module load tww/python/2.6.4
+    module load "tww/p7zip/4.58"
+    module load ccm
+fi
+
+export LANG="en_US.UTF-8"
+
+if [ ! $EPOCROOT ]; then
+    export EPOCROOT="/"
+fi 
+
+BUILDER_HOME=$(cd ${0%/*} && pwd -P)
+
+CWD=`pwd`
+
+if [ ! -e "$BUILDER_HOME/../deps/amara/4Suite_XML/1.0.2/4Suite_XML-1.0.2.py2.6-unix.egg" ] ; then
+    cd $BUILDER_HOME/../deps/amara/4Suite_XML/1.0.2
+    tar xvfz 4Suite-XML-1.0.2.tar.gz > /dev/null
+    cd 4Suite-XML-1.0.2
+    python setup.py bdist_egg > /dev/null
+    mv dist/*.egg ../4Suite_XML-1.0.2.py2.6-unix.egg
+fi
+
+cd $CWD
+
+export PYTHONPATH=$BUILDER_HOME/python/lib/setuptools-0.6c11-py2.5.egg
+
+if [ ! -e "$BUILDER_HOME/../deps/lxml/lxml/2.2.1/lxml-2.2.1.py2.6-unix.egg" ] ; then
+    cd $BUILDER_HOME/../deps/lxml/lxml/2.2.1
+    tar xvfz lxml-1.3.6.tgz > /dev/null
+    cd lxml-1.3.6
+    python setup.py bdist_egg > /dev/null
+    mv dist/*.egg ../lxml-2.2.1.py2.6-unix.egg
+fi
+
+cd $CWD
+
+export USERNAME=$USER
+export PATH=$PATH:.
+ant -lib $BUILDER_HOME/antlibs $*

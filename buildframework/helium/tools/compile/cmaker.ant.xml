@@ -20,15 +20,33 @@ Description:
 
 ============================================================================
 -->
+<!--* @package compile -->
 <project name="compile.cmaker" xmlns:hlm="http://www.nokia.com/helium">
     <description>
         cMaker support.
     </description>
     
+    <!-- Location of the cmaker component to install it.
+    @type string
+    @scope private
+    -->
     <property name="cmaker.component.dir" location="${build.drive}/tools/cmaker"/>
+    <!-- Directory where to execute cMaker.
+    @type string
+    @scope private
+    -->
     <property name="cmaker.config.dir" location="${build.drive}/config"/>
+    <!-- Version of PP(NCP) configuration to be exported
+    @type string
+    -->
     <property name="cmaker.pp.version" value=""/>
+    <!-- Version of S60(require cmaker.pp.version to be set) configuration to be exported
+    @type string
+    -->
     <property name="cmaker.s60.version" value=""/>
+    <!-- Custom label added to the cmaker logs.
+    @type string
+    -->
     <property name="cmaker.log.label" value=""/>
 
     <!--
@@ -78,7 +96,7 @@ Description:
     <!--  Installing CMaker. -->    
     <target name="cmaker-install">
         <hlm:recordStartMacro name="${build.id}_install.cmaker.log" emacsmode="true"/>
-        <exec executable="${build.drive}/epoc32/tools/make.exe" dir="${cmaker.component.dir}">
+        <exec executable="${cmaker.component.dir}/bin/mingw_make.exe" dir="${cmaker.component.dir}">
             <arg line="install"/>
         </exec>
         <hlm:recordStopMacro name="${build.id}_install.cmaker.log"/>

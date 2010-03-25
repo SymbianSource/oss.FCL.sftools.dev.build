@@ -20,115 +20,11 @@ Description:
 
 ============================================================================
 -->
+<!--* @package rombuild -->
 <project name="rombuild.imaker" xmlns:hlm="http://www.nokia.com/helium">
     <description>
         ROM image creation using iMaker (future implementation).
     </description>
-
-    <!-- Defining the default rom image creation templates. -->
-    <property name="imaker.fmpp.makefile" location="${helium.dir}/tools/common/templates/imaker/build_imaker_roms_signing.mk.ftl"/>
-    <property name="imaker.fmpp.ant" location="${helium.dir}/tools/common/templates/imaker/build_imaker_roms.ant.xml.ftl"/>
-    
-    
-    <!-- The iMaker task. -->
-    <macrodef name="imaker" uri="http://www.nokia.com/helium">
-        <element name="config"/>
-        <attribute name="engine" default="ebs"/>
-        <attribute name="name" default=""/>
-        <attribute name="signal" default="true"/>
-        <sequential>
-            <hlm:tempRecordStartMacro name="${build.id}@{name}.roms.log"/>
-            <hlm:imaker2tdd property="internal.imaker.tdd" dir="${build.drive}/">
-                <config/>
-            </hlm:imaker2tdd>
-            <echo>
-Generated TDD:
-${internal.imaker.tdd}
-            </echo>
-            <mkdir dir="${build.log.dir}"/>
-            <if>
-                <matches pattern="ec(-helium)?" string="@{engine}"/>
-                <then>
-                    <fmpp sourceFile="${imaker.fmpp.makefile}"
-                        outputFile="${temp.build.dir}/build_imaker_roms@{name}.mk">
-                        <data expandProperties="yes">
-                            data: ${internal.imaker.tdd}
-                            ant: antProperties()
-                        </data>
-                    </fmpp>
-                    <exec executable="${ec.emake}" dir="${build.drive}/">
-                        <arg value="--emake-build-label=${build.id}@{name}-ROMS"/>
-                        <arg value="--emake-class=${ec.build.class}"/>
-                        <arg value="--emake-annofile=${build.log.dir}\${build.id}@{name}.ROMS.emake.anno.xml"/>
-                        <arg value="--emake-autodepend=1"/>
-                        <arg value="--emake-annodetail=basic,history,file,waiting"/>                            
-                        <arg line="-f ${temp.build.dir}/build_imaker_roms@{name}.mk all"/>
-                    </exec>
-                </then>
-                <else>
-                    <fmpp sourceFile="${imaker.fmpp.ant}"
-                        outputFile="${temp.build.dir}/build_imaker_roms@{name}.ant.xml">
-                        <data expandProperties="yes">
-                            data: ${internal.imaker.tdd}
-                            ant: antProperties()
-                        </data>
-                    </fmpp>
-                    <ant antfile="${temp.build.dir}/build_imaker_roms@{name}.ant.xml" target="all" />
-                </else>
-            </if>
-            
-            <hlm:tempRecordStopMacro name="${build.id}@{name}.roms.log" filterref="filterset.imaker"/>
-            <!-- Todo: metadata: insert assertions for metadata parsing here -->
-            <if>
-                <istrue value="@{signal}"/>
-                <then>
-                    <hlm:signalMacro logfile="${build.log.dir}/${build.id}@{name}.roms.log" 
-                        signal.input="rombuildSignalInput" />
-                </then>
-            </if>
-        </sequential>
-    </macrodef>
-
-    <!--
-        This task implements the transformation of iMaker introspection into a TDD for FMPP.
-        Syntax will be like:
-        <pre>
-        <hlm:imaker2tdd property="internal.imaker.tdd">
-            <imakerconfigurationset>
-                <imakerconfiguration>
-                    <makefileset>
-                        <include name="**/PRODUCT/*ui.mk"/>
-                    </makefileset>
-                    <categoryset>
-                        <include name="build"/>
-                        <include name="release"/>
-                        <include name="test"/>
-                    </categoryset>
-                </imakerconfiguration>
-            </imakerconfigurationset>
-        </hlm:imaker2tdd>                 
-        </pre>
-    -->
-    
-    <scriptdef name="imaker2tdd" language="jython" uri="http://www.nokia.com/helium">
-        <element name="imakerconfigurationset" classname="com.nokia.ant.types.imaker.ConfigurationSet"/>
-        <attribute name="property"/>
-        <attribute name="file"/>
-        <attribute name="dir"/>
-        <![CDATA[
-import imaker
-import traceback
-import ant
-import logging
-logging.getLogger('imaker.api').addHandler(ant.AntHandler(self))
-try:
-    imaker.ant_task_configuration(project, self, elements, attributes)
-except Exception, e:
-    traceback.print_exc()
-    # Propagate the exception
-    raise e
-]]>
-    </scriptdef>
 
     <!--
        This task merges all files mentioned in the fileset and output them in filename output file. 
@@ -179,24 +75,90 @@ writer.close();
     -->
     <target name="imaker-merge-rom-xml">
         <mkdir dir="${temp.build.dir}"/>
+        <!-- Locates the parsed configuration for ROM builds.
+        @type string
+        @scope private
+        -->
         <property name="rombuild.config.file.parsed" location="${build.output.dir}/rom_config.xml.parsed" />
         <hlm:mergeConfigXML filename="${rombuild.config.file.parsed}">
             <fileset dir="${release.images.dir}" includes="**/*.iconfig.xml"/>    
         </hlm:mergeConfigXML>
     </target>
 
-    <!-- Future official target for building roms using iMaker.
+    <!--
+        Implement a solution to create build information for imaker.
+    -->
+    <target name="rombuild-imaker-create-buildinfo">
+        <!-- FMPP template to generate a buildinfo makefile.
+        @type string
+        -->
+        <property name="rombuild.buildinfo.template" location="${helium.dir}/tools/common/templates/imaker/image_conf_buildinfo.mk.ftl" />
+        <!-- Location of the output file.
+        @type string
+        @scope private
+        -->
+        <property name="rombuild.buildinfo.output" location="${build.drive}${env.EPOCROOT}epoc32/rom/config/image_conf_buildinfo.mk" />
+        <fmpp sourceFile="${rombuild.buildinfo.template}" outputFile="${rombuild.buildinfo.output}">
+            <data expandProperties="yes">
+                ant: antProperties()
+            </data>
+        </fmpp>
+    </target>
+
+    <!--
+         Official target to build rom images using iMaker under Helium.
          To configure that target you have to define an imakerconfigurationset type identified by
          'imaker.rom.config'.
+         The accelerator will automatically be selected based on the build.system property. But this
+         default behaviour can be overriden by defining the reference of the engine to use via the 'imaker.engine'
+         property.
     -->
     <target name="build-roms" depends="rombuild-imaker-create-buildinfo">
-        <property name="imaker.engine" value="${build.system}" />
+        <mkdir dir="${roms.log.dir}"/>
+        <if>
+            <not>
+                <isset property="imaker.engine" />
+            </not>
+            <then>
+                <if>
+                    <or>
+                        <equals arg1="${build.system}" arg2="ec-helium" />
+                        <equals arg1="${build.system}" arg2="sbs-ec" />
+                    </or>
+                    <then>
+                        <!-- Defines which accelerator to use for running iMaker. (default value from build.system property)
+                        @type string
+                        @scope private
+                        -->
+                        <property name="imaker.engine" value="imaker.engine.ec" />
+                    </then>
+                </if>
+            </then>
+        </if>
+        <!-- Defines which accelerator to use for running iMaker. (default value from build.system property)
+        @type string
+        @scope private
+        -->
+        <property name="imaker.engine" value="imaker.engine.default" />        
         <property name="imaker.rom.name" value=""/>
-        <hlm:imaker engine="${imaker.engine}" name="${imaker.rom.name}">
-            <config>
-                <imakerconfigurationset refid="imaker.rom.config"/>
-            </config>
+        <hlm:imaker epocroot="${build.drive}/" engineRefid="${imaker.engine}"
+                        output="${roms.log.dir}/${build.id}${imaker.rom.name}.roms.log" verbose="true">
+            <hlm:imakerconfigurationset refid="imaker.rom.config" />
         </hlm:imaker>
+        <if>
+            <available file="${roms.log.dir}/${build.id}${imaker.rom.name}.roms.log" />
+            <then>
+                <echo message="WARNING: Nothing to build." file="${roms.log.dir}/${build.id}${imaker.rom.name}.roms.log" />
+            </then>
+        </if>
+        <hlm:metadatarecord database="${metadata.dbfile}">
+            <hlm:textmetadatainput>
+                <fileset casesensitive="false" file="${roms.log.dir}/${build.id}${imaker.rom.name}.roms.log" />
+                <metadatafilterset refid="filterset.imaker" />
+            </hlm:textmetadatainput>
+        </hlm:metadatarecord>
+        <hlm:signalMacro logfile="${roms.log.dir}/${build.id}${imaker.rom.name}.roms.log" 
+                         signal.input="rombuildSignalInput" />
         <if>
             <istrue value="${blocks.enabled}" />
             <then>
@@ -215,5 +177,17 @@ writer.close();
             </then>
         </if>
     </target>
+    
+    <!-- iMaker engine configuration -->
+    <hlm:defaultEngine id="imaker.engine.default" threads="${number.of.threads}" />
+
+    <hlm:emakeEngine id="imaker.engine.ec">
+        <arg value="--emake-emulation=symbian" />
+        <arg value="--emake-annofile=${roms.log.dir}/${build.id}${imaker.rom.name}.anno.xml"/>
+        <arg value="--emake-root=${env.EMAKE_ROOT}${path.separator}${helium.dir}"/>
+        <arg value="--emake-annodetail=basic,history,file,waiting"/>
+        <arg value="--emake-historyfile=${roms.log.dir}/${build.id}${imaker.rom.name}.emake.data" />
+        <arg value="--emake-class=${ec.build.class}" />
+    </hlm:emakeEngine>
     
 </project>

@@ -1,0 +1,185 @@
+<?xml version="1.0"?>
+<!-- 
+============================================================================ 
+Name        : 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="common_sbs_input" xmlns:au="org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>
+        Common sbs input config.
+    </description>
+    <!-- Common make options for particular engine values of it could be overridden by referencing it-->
+    <hlm:sbsmakeoptions id="commonEMakeOptions" engine="emake">
+        <arg name="--emake-emulation" value="gmake" />
+        <arg name="--emake-annodetail" value="basic,history,waiting" />
+        <arg name="--emake-class" value="${ec.build.class}" />
+        <arg name="--emake-historyfile" value="${build.log.dir}/ec_history/raptor_clean.emake.data" />
+        <arg name="--case-sensitive" value="0" />
+        <arg name="--emake-root" value="${env.EMAKE_ROOT};${helium.dir};${env.SBS_HOME}" />
+    </hlm:sbsmakeoptions>
+
+    <hlm:sbsmakeoptions id="commonGmakeOptions" engine="gmake" />
+    <hlm:sbsmakeoptions id="commonPVMGmakeOptions" engine="pvmgmake" />
+
+    <!-- Tools specific make options inheriting the commone make option-->
+    <hlm:sbsmakeoptions id="toolsmake-sbs-ec">
+        <sbsmakeoptions refid="commonEMakeOptions" />
+        <arg name="--emake-maxagents" value="1" />
+    </hlm:sbsmakeoptions>
+            
+    <!-- Main build make option directly refering to common emake option -->
+    <hlm:sbsmakeoptions id="mainbuildmake-sbs-ec">
+        <sbsmakeoptions refid="commonEMakeOptions" />
+    </hlm:sbsmakeoptions>
+
+    <!-- tools common sbs options -->
+    <hlm:sbsoptions id="commonSBS">
+        <arg line="-k" />
+        <arg name="--filters" value="FilterMetadataLog"/>
+    </hlm:sbsoptions>
+
+    <!-- tools common sbs options -->
+    <hlm:sbsoptions id="toolsCommonSBS">
+        <argset refid="commonSBS" />
+        <arg line="-c tools_rel -c tools2_rel" />
+        <arg line="-j 1" />
+    </hlm:sbsoptions>
+
+    <hlm:sbsoptions id="winscwSBSOptions">
+        <argset refid="commonSBS" />
+        <arg line="-c winscw" />
+    </hlm:sbsoptions>
+
+    <!-- Mainbuild common sbs options -->
+    <hlm:sbsoptions id="armv5CommonSBS">
+            <argset refid="commonSBS" />
+            <arg line="-c armv5" />
+    </hlm:sbsoptions>
+
+    <hlm:sbsoptions id="testCommonSBS">
+            <argset refid="commonSBS" />
+            <arg line="-c armv5.test" />
+    </hlm:sbsoptions>
+
+
+    <hlm:sbsoptions id="testCleanSBS">
+        <argset refid="testcommonSBS" />
+        <argset refid="cleanCommon" />
+    </hlm:sbsoptions>
+
+    <hlm:sbsoptions id="cleanCommon">
+            <arg line="REALLYCLEAN" />
+    </hlm:sbsoptions>
+
+    <!-- Mainbuild common sbs options -->
+    <hlm:sbsoptions id="armv5Clean">
+        <argset refid="armv5CommonSBS"/>
+        <argset refid="cleanCommon" />
+    </hlm:sbsoptions>
+
+
+    <!-- Mainbuild common sbs options -->
+    <hlm:sbsoptions id="toolsClean">
+        <argset refid="toolsCommonSBS"/>
+        <argset refid="cleanCommon" />
+    </hlm:sbsoptions>
+
+    <!-- Mainbuild common sbs options -->
+    <hlm:sbsoptions id="winscwClean">
+        <argset refid="winscwSBSOptions"/>
+        <argset refid="cleanCommon" />
+    </hlm:sbsoptions>
+
+    <!-- sbs input consists of sbs options and sbs make options, the sbs options remains same for all
+    the build system, the make options varies
+     -->
+    <hlm:sbsinput id="tools-sbs">
+        <sbsoptions refid="toolsCommonSBS" />
+    </hlm:sbsinput>
+
+    <hlm:sbsinput id="tools-sbs-clean">
+        <sbsoptions refid="toolsClean" />
+    </hlm:sbsinput>
+
+    <hlm:sbsinput id="tools-sbs-ec">
+        <sbsoptions refid="toolsCommonSBS" />
+        <sbsmakeoptions refid="toolsmake-sbs-ec" ppThreads="20"/>
+    </hlm:sbsinput>
+
+    <hlm:sbsinput id="tools-sbs-ec-clean">
+        <sbsoptions refid="toolsClean" />
+        <sbsmakeoptions refid="toolsmake-sbs-ec" ppThreads="20"/>
+    </hlm:sbsinput>
+
+    <!-- sbs input for main build.
+     -->
+    <hlm:sbsinput id="armv5-sbs">
+        <sbsoptions refid="armv5CommonSBS" />
+    </hlm:sbsinput>
+
+    <hlm:sbsinput id="armv5-sbs-clean">
+        <sbsoptions refid="armv5Clean" />
+    </hlm:sbsinput>
+
+    <!-- sbs input for main build.
+     -->
+    <hlm:sbsinput id="armv5-sbs-ec">
+        <sbsoptions refid="armv5CommonSBS" />
+        <sbsmakeoptions refid="mainbuildmake-sbs-ec" ppThreads="20"/>
+    </hlm:sbsinput>
+
+    <hlm:sbsinput id="armv5-sbs-ec-clean">
+        <sbsoptions refid="armv5Clean" />
+        <sbsmakeoptions refid="mainbuildmake-sbs-ec" ppThreads="20" />
+    </hlm:sbsinput>
+
+    <hlm:sbsinput id="winscw-sbs">
+        <sbsoptions refid="winscwSBSOptions" />
+    </hlm:sbsinput>
+
+    <hlm:sbsinput id="winscw-sbs-clean">
+        <sbsoptions refid="winscwClean" />
+    </hlm:sbsinput>
+
+    <hlm:sbsinput id="winscw-sbs-ec-clean">
+        <sbsoptions refid="winscwClean" />
+        <sbsmakeoptions refid="mainbuildmake-sbs-ec" ppThreads="20"/>
+    </hlm:sbsinput>
+
+    <hlm:sbsinput id="test-sbs">
+        <sbsoptions refid="testCommonSBS" />
+    </hlm:sbsinput>
+
+    <hlm:sbsinput id="test-sbs-clean">
+        <sbsoptions refid="testCleanSBS" />
+    </hlm:sbsinput>
+
+    <!-- sbs input for main build.
+     -->
+    <hlm:sbsinput id="test-sbs-ec">
+        <sbsoptions refid="testCommonSBS" />
+        <sbsmakeoptions refid="mainbuildmake-sbs-ec" ppThreads="20"/>
+    </hlm:sbsinput>
+
+    <hlm:sbsinput id="test-sbs-ec-clean">
+        <sbsoptions refid="testCleanSBS" />
+        <sbsmakeoptions refid="mainbuildmake-sbs-ec" ppThreads="20" />
+    </hlm:sbsinput>
+
+</project>

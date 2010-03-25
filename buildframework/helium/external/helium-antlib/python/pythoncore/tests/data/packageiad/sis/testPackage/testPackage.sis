@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+    <layer name="s60_osext_layer">
+    
+    <module name="networkingextensions">
+        <unit unitID="netdo.networkingextensions" mrp="" bldFile="s60/osext/networkingextensions/group" name="networkingextensions"/>
+    </module>

@@ -1,0 +1,409 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : build.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="demo" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>Helium Antlib SCM demo.</description>
+
+    <taskdef name="scm" classname="com.nokia.helium.scm.ant.taskdefs.ScmTask" uri="http://www.nokia.com/helium" />
+    <typedef name="latestTag" classname="com.nokia.helium.scm.ant.types.LatestTag" uri="http://www.nokia.com/helium" />
+    <typedef name="tagSet" classname="com.nokia.helium.scm.ant.types.TagSet" uri="http://www.nokia.com/helium" />
+
+    <target name="setup">
+        <delete dir="./temp" failonerror="false" />
+        <unzip src="hg_test1.zip" dest="./temp" />
+        <unzip src="hg_test2.zip" dest="./temp" />
+        <unzip src="hg_test3.zip" dest="./temp" />
+        <property name="test1.dir" location="./temp/test1" />
+        <property name="test2.dir" location="./temp/test2" />
+        <property name="test3.dir" location="./temp/test3" />
+    </target>
+
+    <target name="get-status">
+        <hlm:scm verbose="true" scmUrl="scm:hg:${ant.file.demo}/../temp/test1">
+            <hlm:status>
+                <fileset dir="${ant.file.demo}/../temp/test1">
+                    <include name="**" />
+                    <exclude name="**/.hg/**" />
+                </fileset>
+            </hlm:status>
+        </hlm:scm>
+    </target>
+
+    <target name="demo-status">
+        <antcall target="get-status" />
+        <echo file="${ant.file.demo}/../temp/test1/not_in_repo.txt">Not in repo</echo>
+        <antcall target="get-status" />
+        <hlm:scm verbose="true" scmUrl="scm:hg:${ant.file.demo}/../temp/test1">
+            <hlm:add>
+                <fileset dir="${ant.file.demo}/../temp/test1">
+                    <include name="**" />
+                    <exclude name="**/.hg/**" />
+                </fileset>
+            </hlm:add>
+        </hlm:scm>
+        <antcall target="get-status" />
+    </target>
+
+    <target name="demo-diff" depends="setup">
+        <echo file="${ant.file.demo}/../temp/test1/not_in_repo.txt">Not in repo</echo>
+        <hlm:scm verbose="true" scmUrl="scm:hg:${ant.file.demo}/../temp/test1">
+            <hlm:add>
+                <fileset dir="${ant.file.demo}/../temp/test1">
+                    <include name="**" />
+                    <exclude name="**/.hg/**" />
+                </fileset>
+            </hlm:add>
+        </hlm:scm>
+
+        <hlm:scm verbose="true" scmUrl="scm:hg:${ant.file.demo}/../temp/test1">
+            <hlm:diff>
+                <fileset dir="${ant.file.demo}/../temp/test1">
+                    <include name="**" />
+                    <exclude name="**/.hg/**" />
+                </fileset>
+            </hlm:diff>
+        </hlm:scm>
+    </target>
+
+
+    <!--DEMO "checkout" -->
+    <target name="demo-checkout" depends="setup">
+        <property name="temp.dir" location="${ant.file.demo}/../temp" />
+        <hlm:scm verbose="true" scmUrl="scm:hg:${temp.dir}/test3">
+            <!--Clone-->
+            <hlm:checkout baseDir="${temp.dir}/clones/clone" />
+
+            <!--Clone to revision '0'-->
+            <hlm:checkout baseDir="${temp.dir}/clones/clone_rev_0">
+                <hlm:revision name="0" />
+            </hlm:checkout>
+
+            <!--Clone to revision '1'-->
+            <hlm:checkout baseDir="${temp.dir}/clones/clone_rev_1">
+                <hlm:revision name="1" />
+            </hlm:checkout>
+        </hlm:scm>
+    </target>
+
+    <target name="demo-all" depends="setup">
+        <mkdir dir="${ant.file.demo}/../temp/cloned" />
+        <echo file="${ant.file.demo}/../temp/test1/not_in_repo.txt">Not in repo</echo>
+        <echo file="${ant.file.demo}/../temp/test1/not_in_repo2.txt">Not in repo2</echo>
+
+        <hlm:scm verbose="false" scmUrl="scm:hg:${test1.dir}">
+            <hlm:checkout baseDir="${ant.file.demo}/../temp/cloned" />
+            <hlm:add>
+                <fileset dir="${ant.file.demo}/../temp/test1">
+                    <include name="not_in_repo.txt" />
+                </fileset>
+            </hlm:add>
+            <hlm:checkin message="Adding not_in_repo.txt...">
+                <fileset dir="${ant.file.demo}/../temp/test1">
+                    <include name="not_in_repo.txt" />
+                </fileset>
+            </hlm:checkin>
+            <hlm:tag baseDir="${ant.file.demo}/../temp/test1" name="1.0.0" />
+            <hlm:add>
+                <fileset dir="${ant.file.demo}/../temp/test1">
+                    <include name="not_in_repo2.txt" />
+                </fileset>
+            </hlm:add>
+            <hlm:checkin message="Adding not_in_repo2.txt...">
+                <fileset dir="${ant.file.demo}/../temp/test1">
+                    <include name="not_in_repo2.txt" />
+                </fileset>
+            </hlm:checkin>
+            <hlm:tag baseDir="${ant.file.demo}/../temp/test1" name="1.0.1" />
+        </hlm:scm>
+
+
+        <hlm:scm verbose="false" scmUrl="scm:hg:${ant.file.demo}/../temp/cloned">
+            <hlm:pull baseDir="${ant.file.demo}/../temp/cloned" />
+            <hlm:update baseDir="${ant.file.demo}/../temp/cloned" />
+            <hlm:tags baseDir="${ant.file.demo}/../temp/cloned" reference="cloned.tags" />
+            <hlm:update baseDir="${ant.file.demo}/../temp/cloned">
+                <hlm:latestTag pattern="1.0.*">
+                    <hlm:tagSet refid="cloned.tags" />
+                </hlm:latestTag>
+            </hlm:update>
+        </hlm:scm>
+
+        <hlm:scm verbose="true" scmUrl="scm:hg:${ant.file.demo}/../temp/cloned">
+            <hlm:remove message="Nothing to remove...">
+                <fileset dir="${ant.file.demo}/../temp/cloned">
+                    <include name="*.txt" />
+                </fileset>
+            </hlm:remove>
+        </hlm:scm>
+
+    </target>
+
+    <target name="demo-export" depends="setup">
+        <mkdir dir="${ant.file.demo}/../temp/export" />
+
+        <hlm:scm verbose="false" scmUrl="scm:hg:${ant.file.demo}/../temp/test2">
+            <hlm:export baseDir="${ant.file.demo}/../temp/test2" destPath="${ant.file.demo}/../temp/export">
+                <tag name="2" />
+            </hlm:export>
+        </hlm:scm>
+    </target>
+
+    <!--DEMO "Tagging" -->
+    <target name="demo-tag" depends="setup">
+        <property name="temp.dir" location="${ant.file.demo}/../temp" />
+
+        <hlm:scm verbose="true" scmUrl="scm:hg:${temp.dir}/test1">
+            <hlm:checkout baseDir="${temp.dir}/tag" />
+        </hlm:scm>
+
+        <echo file="${temp.dir}/tag/newfile.txt">newly added</echo>
+
+        <hlm:scm verbose="false" scmUrl="scm:hg:${temp.dir}/tag">
+            <hlm:add>
+                <fileset dir="${temp.dir}/tag">
+                    <include name="*.txt" />
+                </fileset>
+            </hlm:add>
+            <hlm:checkin message="Adding files .....">
+                <fileset dir="${temp.dir}/tag">
+                    <include name="*.txt" />
+                </fileset>
+            </hlm:checkin>
+
+            <hlm:tag baseDir="${temp.dir}/tag" name="tag_0.1" level="local" />
+            <hlm:tag baseDir="${temp.dir}/tag" name="tag_0.2" />
+
+        </hlm:scm>
+    </target>
+
+    <!--DEMO "Branch" -->
+    <target name="demo-branch" depends="setup">
+        <property name="temp.dir" location="${ant.file.demo}/../temp" />
+
+        <hlm:scm verbose="true" scmUrl="scm:hg:${temp.dir}/test1">
+            <hlm:checkout baseDir="${temp.dir}/branch" revision="0" />
+        </hlm:scm>
+
+        <echo file="${temp.dir}/branch/newfile.txt">newly added</echo>
+        <echo file="${temp.dir}/branch/newfile2.txt">newly added</echo>
+        <echo file="${temp.dir}/branch/newfile3.txt">newly added</echo>
+
+        <hlm:scm verbose="false" scmUrl="scm:hg:${temp.dir}/branch">
+            <hlm:branch baseDir="${temp.dir}/branch" name="test_0.1" />
+            <hlm:add>
+                <fileset dir="${temp.dir}/branch">
+                    <include name="*.txt" />
+                </fileset>
+            </hlm:add>
+            <hlm:checkin message="Adding files .....">
+                <fileset dir="${temp.dir}/branch">
+                    <include name="*.txt" />
+                </fileset>
+            </hlm:checkin>
+        </hlm:scm>
+    </target>
+
+    <!--DEMO "update" -->
+    <target name="demo-update" depends="setup">
+        <property name="temp.dir" location="${ant.file.demo}/../temp" />
+
+        <!--Create the first revision -->
+        <echo file="${temp.dir}/test1/not_in_repo1.txt">Not in repo1</echo>
+        <hlm:scm verbose="true" scmUrl="scm:hg:${temp.dir}/test1">
+            <hlm:add>
+                <fileset dir="${temp.dir}/test1">
+                    <include name="not_in_repo1.txt" />
+                    <exclude name="**/.hg/**" />
+                </fileset>
+            </hlm:add>
+        </hlm:scm>
+        <hlm:scm verbose="true" scmUrl="scm:hg:${temp.dir}/test1">
+            <hlm:checkin message="Adding not_in_repo1.txt...">
+                <fileset dir="${temp.dir}/test1">
+                    <include name="not_in_repo1.txt" />
+                </fileset>
+            </hlm:checkin>
+        </hlm:scm>
+
+        <!--Create the second revision -->
+        <echo file="${temp.dir}/test1/not_in_repo2.txt">Not in repo2</echo>
+        <hlm:scm verbose="true" scmUrl="scm:hg:${temp.dir}/test1">
+            <hlm:add>
+                <fileset dir="${temp.dir}/test1">
+                    <include name="not_in_repo2.txt" />
+                    <exclude name="**/.hg/**" />
+                </fileset>
+            </hlm:add>
+        </hlm:scm>
+        <hlm:scm verbose="true" scmUrl="scm:hg:${temp.dir}/test1">
+            <hlm:checkin message="Adding not_in_repo2.txt...">
+                <fileset dir="${temp.dir}/test1">
+                    <include name="not_in_repo2.txt" />
+                </fileset>
+            </hlm:checkin>
+        </hlm:scm>
+
+        <!-- Update to first revision -->
+        <hlm:scm verbose="true" scmUrl="scm:hg:${temp.dir}/test1">
+            <hlm:update baseDir="${temp.dir}/test1">
+                <hlm:revision name="0" />
+            </hlm:update>
+        </hlm:scm>
+
+    </target>
+
+    <!--DEMO "Change Log" -->
+    <target name="demo-changelog" depends="setup">
+        <property name="temp.dir" location="${ant.file.demo}/../temp" />
+
+        <hlm:scm verbose="true" scmUrl="scm:hg:${temp.dir}/test1">
+            <hlm:checkout baseDir="${temp.dir}/changelog" />
+            <hlm:tag baseDir="${temp.dir}/changelog" name="tag_0.2" />
+            <hlm:branch baseDir="${temp.dir}/changelog" name="test_0.1" />
+        </hlm:scm>
+
+        <echo file="${temp.dir}/changelog/newfile.txt">newly added</echo>
+        <echo file="${temp.dir}/changelog/newfile2.txt">newly added</echo>
+        <echo file="${temp.dir}/changelog/newfile3.txt">newly added</echo>
+
+        <hlm:scm verbose="false" scmUrl="scm:hg:${temp.dir}/changelog">
+            <hlm:add>
+                <fileset dir="${temp.dir}/changelog">
+                    <include name="*.txt" />
+                </fileset>
+            </hlm:add>
+            <hlm:checkin message="Adding files .....">
+                <fileset dir="${temp.dir}/changelog">
+                    <include name="*.txt" />
+                </fileset>
+            </hlm:checkin>
+            <hlm:changelog basedir="${temp.dir}/changelog" startVersion="0" />
+        </hlm:scm>
+
+        <echo file="${temp.dir}/changelog/newfile4.txt">newly added</echo>
+        <echo file="${temp.dir}/changelog/newfile5.txt">newly added</echo>
+        <echo file="${temp.dir}/changelog/newfile6.txt">newly added</echo>
+
+        <hlm:scm verbose="false" scmUrl="scm:hg:${temp.dir}/changelog">
+            <hlm:add>
+                <fileset dir="${temp.dir}/changelog">
+                    <include name="*.txt" />
+                </fileset>
+            </hlm:add>
+            <hlm:checkin message="Adding files .....">
+                <fileset dir="${temp.dir}/changelog">
+                    <include name="*.txt" />
+                </fileset>
+            </hlm:checkin>
+            <!--hlm:changelog baseDir="${temp.dir}/changelog" numDays='1' /-->
+            <!--hlm:changelog baseDir="${temp.dir}/changelog" startDate="20090317 18:49:31" endDate="20090323 24:49:31" datePattern="yyyyMMdd HH:mm:ss" /-->
+            <!--hlm:changelog basedir="${temp.dir}/changelog" startVersion="0" /-->
+            <hlm:changelog basedir="${temp.dir}/changelog" startVersion="1" endVersion="2"/>
+            <!--hlm:changelog basedir="${temp.dir}/changelog" startVersion="1" endVersion="2" logOutput="xml" /-->
+        </hlm:scm>
+    </target>
+    
+    <!--DEMO "info" -->
+    <target name="demo-info" depends="setup">
+        <property name="temp.dir" location="${ant.file.demo}/../temp" />
+
+        <hlm:scm verbose="true" scmUrl="scm:hg:${temp.dir}/test1">
+            <hlm:checkout baseDir="${temp.dir}/info" />            
+        </hlm:scm>
+
+        <echo file="${temp.dir}/info/newfile.txt">newly added</echo>
+        <echo file="${temp.dir}/info/newfile2.txt">newly added</echo>
+        <echo file="${temp.dir}/info/newfile3.txt">newly added</echo>
+
+        <hlm:scm verbose="false" scmUrl="scm:hg:${temp.dir}/info">
+            <hlm:add>
+                <fileset dir="${temp.dir}/info">
+                    <include name="*.txt" />
+                </fileset>
+            </hlm:add>
+            <hlm:checkin message="Adding files .....">
+                <fileset dir="${temp.dir}/info">
+                    <include name="*.txt" />
+                </fileset>
+            </hlm:checkin>
+            <hlm:info baseDir="${ant.file.demo}/../temp/info"/>
+        </hlm:scm>
+    </target>
+      
+    <!--DEMO "failonerror-false" -->
+    <target name="demo-failonerror-false" depends="setup">
+        <property name="temp.dir" location="${ant.file.demo}/../temp" />        
+        <hlm:scm verbose="true" scmUrl="scm:hg:${temp.dir}/test1">
+            <hlm:checkout baseDir="${temp.dir}/tag" />
+        </hlm:scm>        
+        <echo file="${temp.dir}/tag/newfile.txt">newly added</echo>        
+        <hlm:scm verbose="false" scmUrl="scm:hg:${temp.dir}/tag" failonerror="false">
+            <hlm:add>
+                <fileset dir="${temp.dir}/tag">
+                    <include name="*.txt" />
+                </fileset>
+            </hlm:add>
+            <hlm:checkin message="Adding files .....">
+                <fileset dir="${temp.dir}/tag">
+                    <include name="*.txt" />
+                </fileset>
+            </hlm:checkin>            
+            <!-- Build should continue as failonerror="false" -->
+            <hlm:tag baseDir="${temp.dir}/tag" name="tag_0.2"/>
+            <hlm:tag baseDir="${temp.dir}/tag" name="tag_0.2"/>            
+        </hlm:scm>        
+        <echo> Build continue.... </echo>        
+    </target>
+    
+    <!--DEMO "failonerror-true" -->
+    <target name="demo-failonerror-true" depends="setup">
+        <property name="temp.dir" location="${ant.file.demo}/../temp" />
+        <hlm:scm verbose="true" scmUrl="scm:hg:${temp.dir}/test1">
+            <hlm:checkout baseDir="${temp.dir}/tag" />
+        </hlm:scm>
+        <echo file="${temp.dir}/tag/newfile.txt">newly added</echo>    
+        <hlm:scm verbose="false" scmUrl="scm:hg:${temp.dir}/tag" failonerror="true">
+            <hlm:add>
+                <fileset dir="${temp.dir}/tag">
+                    <include name="*.txt" />
+                </fileset>
+            </hlm:add>
+            <hlm:checkin message="Adding files .....">
+                <fileset dir="${temp.dir}/tag">
+                    <include name="*.txt" />
+                </fileset>
+            </hlm:checkin>            
+            <!-- Build should fail as failonerror="true" -->
+            <hlm:tag baseDir="${temp.dir}/tag" name="tag_0.3"/>
+            <hlm:tag baseDir="${temp.dir}/tag" name="tag_0.3"/>
+        </hlm:scm>
+    </target>
+    
+    
+    <target name="demo-init" depends="setup">
+        <property name="temp.dir" location="${ant.file.demo}/../temp" />
+        <hlm:scm verbose="true" scmUrl="scm:hg:${temp.dir}/new">
+            <hlm:init />
+        </hlm:scm>
+    </target>
+
+</project>

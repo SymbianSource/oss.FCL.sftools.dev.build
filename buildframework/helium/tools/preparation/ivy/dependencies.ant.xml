@@ -20,6 +20,7 @@ Description:
 
 ============================================================================
 -->
+<!--* @package preparation -->
 <project name="preparation.dependencies" xmlns:ivy="antlib:org.apache.ivy.ant" xmlns:hlm="http://www.nokia.com/helium">
     <description>Analysis of dependencies for build area preparation.</description>
     
@@ -39,7 +40,7 @@ Description:
     
     <!-- This is a test target for resolving the inputs for preparing the build area. -->
     <target name="resolve-build-inputs">
-        <record name="f:\resolve.txt" action="start" loglevel="verbose"/>
+        <hlm:record name="f:\resolve.txt" action="start" loglevel="verbose"/>
         <fmpp sourceRoot="${helium.dir}/tools/preparation/ivy/templates" outputRoot="${temp.build.dir}/ivy"
               replaceExtension="xml.ftl, ivy.xml">
             <data expandProperties="yes">
@@ -50,7 +51,7 @@ Description:
         <ivy:configure file="${build_area.ivy.config.file}"/>
         <ivy:resolve file="${temp.build.dir}/ivy/ivy_file.ivy.xml" haltonfailure="false"/>
         <ivy:artifactreport tofile="${build.log.dir}/build_area_artifacts.xml"/>
-        <record name="f:\resolve.txt" action="stop"/>
+        <hlm:record name="f:\resolve.txt" action="stop"/>
     </target>
     
 

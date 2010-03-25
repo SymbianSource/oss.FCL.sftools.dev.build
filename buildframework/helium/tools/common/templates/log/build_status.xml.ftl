@@ -27,7 +27,7 @@ Description:
 <#assign priority_ids = priority_table?keys>
 
 <#list priority_ids as priority>
-    <#assign priority_count = table_info['select count(data) as COUNT from metadata where priority_id = ${priority} and logpath_id in (select id from logfiles where path like \'%${logfile}%\')'][0]['COUNT'] >
+    <#assign priority_count = table_info['select count(data) as COUNT from metadata where priority_id = ${priority} and logpath_id in (select id from logfiles where path like \'%${logpath}%\')'][0]['COUNT'] >
     <#if (priority_count >= 0)>
         <${priority_table['${priority}']?lower_case} count= "${priority_count}" />
     </#if>

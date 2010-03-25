@@ -111,7 +111,7 @@ public class CoverageRecorderEntry implements BuildLogger, SubBuildListener {
         try {
             return DocumentBuilderFactory.newInstance().newDocumentBuilder();
         } catch (Exception exc) {
-            throw new ExceptionInInitializerError(exc);
+            throw new ExceptionInInitializerError(exc.getMessage());
         }
     }
     
@@ -430,7 +430,7 @@ public class CoverageRecorderEntry implements BuildLogger, SubBuildListener {
             (new DOMElementWriter()).write(buildElement.element, out, 0, "\t");
             out.flush();
         } catch (IOException exc) {
-            throw new BuildException("Unable to write log file", exc);
+            throw new BuildException("Unable to write log file " + exc.getMessage(), exc);
         } finally {
             if (out != null) {
                 try {

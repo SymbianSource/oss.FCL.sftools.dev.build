@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<build>
+    <config type="core">
+        <set name="CORE_NAME" value="RX-60_00_rnd"/>
+        <set name="ROFS2_NAME" value="RX-60_00.01_rnd"/>
+        <set name="ROFS3_NAME" value="RX-60_00_rnd"/>
+        <set name="LANGPACK_ID" value="01"/>
+        <set name="CUSTVARIANT_ID" value=""/>
+        <set name="PRODUCT_NAME" value="phone"/>
+        <set name="PRODUCT_TYPE" value="RX-60"/>
+        <set name="TYPE" value="rnd"/>
+        <set name="CORE_VERSION" value="V DFS79.92.0.0.1 RND"/>
+        <set name="LANGPACK_VERSION" value=""/>
+        <set name="ROFS3_VERSION" value="V DFS79.92.0.0.1 RND"/>
+        <set name="CORE_DIR" value="W:/output/release_flash_images/phone/rnd/core/RX-60_00_rnd"/>
+        <set name="ROFS2_DIR" value="W:/output/release_flash_images/phone/rnd/langpack/langpack_01/rofs2"/>
+        <set name="ROFS3_DIR" value="W:/output/release_flash_images/phone/rnd/customer/vanilla/rofs3"/>
+    </config>
+</build>

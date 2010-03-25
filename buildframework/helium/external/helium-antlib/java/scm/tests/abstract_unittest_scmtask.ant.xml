@@ -1,0 +1,696 @@
+<?xml version="1.0"?>
+<!-- 
+============================================================================ 
+Name        : abstract_unittest_scmtask.ant.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="abstract-unittest-scmtask" xmlns:hlm="http://www.nokia.com/helium" xmlns:au="antlib:org.apache.ant.antunit">
+    <description>Helium Antlib SCM abtract unittests.</description>
+    
+    <property name="repo.type" value="hg" />
+    <property name="temp.dir" location="${ant.file.abstract-unittest-scmtask}/../temp" />
+    <property name="repo.dir" location="${temp.dir}/repo/${repo.type}" />
+
+    <!-- Defining the features -->
+    <taskdef name="scm" classname="com.nokia.helium.scm.ant.taskdefs.ScmTask" uri="http://www.nokia.com/helium" />
+    <typedef name="latestTag" classname="com.nokia.helium.scm.ant.types.LatestTag" uri="http://www.nokia.com/helium" />
+    <typedef name="tagSet" classname="com.nokia.helium.scm.ant.types.TagSet" uri="http://www.nokia.com/helium" />
+
+
+    <target name="setUp">
+        <delete dir="${temp.dir}" failonerror="false" />
+        <mkdir dir="${temp.dir}" />
+        <mkdir dir="${repo.dir}" />
+        <unzip src="./data/${repo.type}_test1.zip" dest="${repo.dir}" />
+        <unzip src="./data/${repo.type}_test2.zip" dest="${repo.dir}" />
+        <unzip src="./data/${repo.type}_test3.zip" dest="${repo.dir}" />
+    </target>
+
+    <target name="tearDown">
+        <delete dir="${temp.dir}" />
+    </target>
+
+    <!--
+     **************************************************************
+     ** STATUS
+     **************************************************************
+    -->
+    <target name="test-status">
+        <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/test1">
+            <hlm:status>
+                <fileset dir="${repo.dir}/test1">
+                    <include name="**" />
+                    <exclude name="**/.${repo.type}/**" />
+                </fileset>
+            </hlm:status>
+        </hlm:scm>
+        <echo file="${repo.dir}/test1/not_in_repo.txt">Not in repo</echo>
+        <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/test1">
+            <hlm:status>
+                <fileset dir="${repo.dir}/test1">
+                    <include name="**" />
+                    <exclude name="**/.${repo.type}/**" />
+                </fileset>
+            </hlm:status>
+        </hlm:scm>
+        <au:assertLogContains text="[not_in_repo.txt:unknown]" />
+    </target>
+
+    <!--
+     **************************************************************
+     ** DIFF
+     **************************************************************
+    -->
+    <target name="test-diff">
+        <echo file="${repo.dir}/test1/not_in_repo.txt">Not in repo</echo>
+        <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/test1">
+            <hlm:add>
+                <fileset dir="${repo.dir}/test1">
+                    <include name="**" />
+                    <exclude name="**/.${repo.type}/**" />
+                </fileset>
+            </hlm:add>
+        </hlm:scm>
+        <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/test1">
+            <hlm:diff>
+                <fileset dir="${repo.dir}/test1">
+                    <include name="**" />
+                    <exclude name="**/.${repo.type}/**" />
+                </fileset>
+            </hlm:diff>
+        </hlm:scm>
+        <au:assertLogContains text="+Not in repo" />
+    </target>
+
+
+    <!--
+     **************************************************************
+     ** ADD
+     **************************************************************
+    -->
+    <target name="test-add">
+        <echo file="${repo.dir}/test1/not_in_repo.txt">Not in repo</echo>
+        <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/test1">
+            <hlm:add>
+                <fileset dir="${repo.dir}/test1">
+                    <include name="**" />
+                    <exclude name="**/.${repo.type}/**" />
+                </fileset>
+            </hlm:add>
+        </hlm:scm>
+        <au:assertLogContains text="[not_in_repo.txt:added]" />
+    </target>
+
+    <!--
+     **************************************************************
+     ** CHECKOUT
+     **************************************************************
+    -->
+    <target name="test-checkout-tip">
+        <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/test3">
+            <hlm:checkout baseDir="${repo.dir}/cloned" />
+        </hlm:scm>
+        <au:assertLogContains text="hg clone -r tip" />
+        <au:assertFileExists file="${repo.dir}/cloned/revision0.txt" />
+        <au:assertFileExists file="${repo.dir}/cloned/revision1.txt" />
+    </target>
+
+    <target name="test-checkout-revision">
+        <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/test3">
+            <hlm:checkout baseDir="${repo.dir}/cloned">
+                <revision name="1" />
+            </hlm:checkout>
+        </hlm:scm>
+        <au:assertLogContains text="hg clone -r 1" />
+        <au:assertFileExists file="${repo.dir}/cloned/revision0.txt" />
+        <au:assertFileDoesntExist file="${repo.dir}/cloned/revision2.txt" />
+    </target>
+
+    <target name="test-checkout-revision-error">
+        <au:expectfailure>
+            <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/test3">
+                <hlm:checkout baseDir="${repo.dir}/cloned" revision="3" />
+            </hlm:scm>
+        </au:expectfailure>
+    </target>
+
+    <!--
+     **************************************************************
+     ** CHECKIN
+     **************************************************************
+    -->
+    <target name="test-checkin-message-missing" depends="test-add">
+        <au:expectfailure>
+            <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/test1">
+                <hlm:checkin>
+                    <fileset dir="${repo.dir}/test1">
+                        <include name="not_in_repo.txt" />
+                        <exclude name="**/.${repo.type}/**" />
+                    </fileset>
+                </hlm:checkin>
+            </hlm:scm>
+        </au:expectfailure>
+    </target>
+
+    <target name="test-checkin" depends="test-add">
+        <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/test1">
+            <hlm:checkin message="Adding not_in_repo.txt...">
+                <fileset dir="${repo.dir}/test1">
+                    <include name="not_in_repo.txt" />
+                    <exclude name="**/.${repo.type}/**" />
+                </fileset>
+            </hlm:checkin>
+        </hlm:scm>
+    </target>
+
+
+    <!--
+     **************************************************************
+     ** TAGGING
+     **************************************************************
+    -->
+
+    <target name="test-tag-name-missing" depends="test-checkin">
+        <au:expectfailure>
+            <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/test1">
+                <hlm:tag baseDir="${repo.dir}/test1" />
+            </hlm:scm>
+        </au:expectfailure>
+    </target>
+
+    <target name="test-tag-basedir-missing" depends="test-checkin">
+        <au:expectfailure>
+            <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/test1">
+                <hlm:tag name="1.0.0" />
+            </hlm:scm>
+        </au:expectfailure>
+    </target>
+
+    <target name="test-tag" depends="setUp">
+        <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/test1">
+            <hlm:tag baseDir="${repo.dir}/test1" name="0.0.1" />
+        </hlm:scm>
+        <au:assertLogContains text="Tag '0.0.1' has been created successfully" />
+    </target>
+
+    <target name="test-tag-local" depends="setUp">
+        <echo file="${repo.dir}/test1/newfile.txt">newly added</echo>
+        <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/test1">
+            <hlm:add>
+                <fileset dir="${repo.dir}/test1">
+                    <include name="*.txt" />
+                </fileset>
+            </hlm:add>
+            <hlm:checkin message="Adding files .....">
+                <fileset dir="${repo.dir}/test1">
+                    <include name="*.txt" />
+                </fileset>
+            </hlm:checkin>
+            <hlm:tag baseDir="${repo.dir}/test1" name="0.0.2" level="local" />
+        </hlm:scm>
+        <au:assertLogContains text="Tag '0.0.2' has been created successfully" />
+    </target>
+
+    <!--
+     **************************************************************
+     ** Remove
+     **************************************************************
+    -->
+    <target name="test-remove-message-missing" depends="test-checkin">
+        <au:expectfailure>
+            <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/test1">
+                <hlm:remove />
+            </hlm:scm>
+        </au:expectfailure>
+    </target>
+
+    <target name="test-remove-nothing" depends="test-checkin">
+        <au:expectfailure>
+            <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/test1">
+                <hlm:remove message="Nothing to remove..." />
+            </hlm:scm>
+        </au:expectfailure>
+    </target>
+
+    <target name="test-remove" depends="test-checkin">
+        <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/test1">
+            <hlm:remove message="Nothing to remove...">
+                <fileset dir="${repo.dir}/test1">
+                    <include name="not_in_repo.txt" />
+                </fileset>
+            </hlm:remove>
+        </hlm:scm>
+        <au:assertFileDoesntExist file="${repo.dir}/test1/not_in_repo.txt" />
+    </target>
+
+
+    <!--
+     **************************************************************
+     ** Update
+     **************************************************************
+    -->
+    <target name="test-update-noarg" depends="test-checkin">
+        <au:expectfailure>
+            <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/test1">
+                <hlm:update />
+            </hlm:scm>
+        </au:expectfailure>
+    </target>
+
+    <target name="test-update-basedir" depends="test-checkin">
+        <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/test1">
+            <hlm:update basedir="${repo.dir}/test1" />
+        </hlm:scm>
+    </target>
+
+    <target name="test-update-empty-repo">
+        <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/new">
+            <hlm:init />
+        </hlm:scm>
+        <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/new">
+            <hlm:update basedir="${repo.dir}/new" />
+        </hlm:scm>
+    </target>
+        
+    <target name="test-update-basedir-tag" depends="test-checkin">
+        <echo file="${repo.dir}/test1/not_in_repo2.txt">Not in repo2</echo>
+        <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/test1">
+            <hlm:add>
+                <fileset dir="${repo.dir}/test1">
+                    <include name="**" />
+                    <exclude name="**/.${repo.type}/**" />
+                </fileset>
+            </hlm:add>
+        </hlm:scm>
+        <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/test1">
+            <hlm:checkin message="Adding not_in_repo2.txt...">
+                <fileset dir="${repo.dir}/test1">
+                    <include name="not_in_repo2.txt" />
+                </fileset>
+            </hlm:checkin>
+        </hlm:scm>
+        <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/test1">
+            <hlm:update basedir="${repo.dir}/test1">
+                <hlm:tag name="0" />
+            </hlm:update>
+        </hlm:scm>
+        <au:assertFileDoesntExist file="${repo.dir}/test1/not_in_repo2.txt" />
+    </target>
+
+    <target name="test-update-basedir-revision" depends="test-checkin">
+        <echo file="${repo.dir}/test1/not_in_repo2.txt">Not in repo2</echo>
+        <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/test1">
+            <hlm:add>
+                <fileset dir="${repo.dir}/test1">
+                    <include name="**" />
+                    <exclude name="**/.${repo.type}/**" />
+                </fileset>
+            </hlm:add>
+        </hlm:scm>
+        <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/test1">
+            <hlm:checkin message="Adding not_in_repo2.txt...">
+                <fileset dir="${repo.dir}/test1">
+                    <include name="not_in_repo2.txt" />
+                </fileset>
+            </hlm:checkin>
+        </hlm:scm>
+        <echo file="${repo.dir}/test1/not_in_repo3.txt">Not in repo3</echo>
+        <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/test1">
+            <hlm:add>
+                <fileset dir="${repo.dir}/test1">
+                    <include name="**" />
+                    <exclude name="**/.${repo.type}/**" />
+                </fileset>
+            </hlm:add>
+        </hlm:scm>
+        <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/test1">
+            <hlm:checkin message="Adding not_in_repo3.txt...">
+                <fileset dir="${repo.dir}/test1">
+                    <include name="not_in_repo3.txt" />
+                </fileset>
+            </hlm:checkin>
+        </hlm:scm>
+        <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/test1">
+            <hlm:update basedir="${repo.dir}/test1">
+                <hlm:revision name="0" />
+            </hlm:update>
+        </hlm:scm>
+        <au:assertFileDoesntExist file="${repo.dir}/test1/not_in_repo3.txt" />
+    </target>
+
+    <!--
+     **************************************************************
+     ** EXPORT
+     **************************************************************
+    -->
+    <target name="test-export-noarg">
+        <au:expectfailure>
+            <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/test2">
+                <hlm:export />
+            </hlm:scm>
+        </au:expectfailure>
+    </target>
+
+    <target name="test-export-basedir">
+        <au:expectfailure>
+            <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/test2">
+                <hlm:export basedir="${repo.dir}/test2" />
+            </hlm:scm>
+        </au:expectfailure>
+    </target>
+
+    <target name="test-export-basedir-destPath">
+        <mkdir dir="${repo.dir}/export" />
+        <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/test2">
+            <hlm:export basedir="${repo.dir}/test2" destpath="${repo.dir}/export" />
+        </hlm:scm>
+    </target>
+
+    <target name="test-export-basedir-destPath-tag-rev1">
+        <mkdir dir="${repo.dir}/export" />
+        <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/test2">
+            <hlm:export basedir="${repo.dir}/test2" destpath="${repo.dir}/export">
+                <tag name="1" />
+            </hlm:export>
+        </hlm:scm>
+        <au:assertFileDoesntExist file="${repo.dir}/export/file3.txt" />
+    </target>
+
+    <target name="test-export-basedir-destPath-tag-rev2">
+        <mkdir dir="${repo.dir}/export" />
+        <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/test2">
+            <hlm:export basedir="${repo.dir}/test2" destpath="${repo.dir}/export">
+                <tag name="2" />
+            </hlm:export>
+        </hlm:scm>
+        <au:assertFileExists file="${repo.dir}/export/file3.txt" />
+    </target>
+
+    <target name="test-export-basedir-destPath-invalid-tag">
+        <mkdir dir="${repo.dir}/export" />
+        <au:expectfailure>
+            <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/test2">
+                <hlm:export basedir="${repo.dir}/test2" destpath="${repo.dir}/export">
+                    <tag name="1.0.0" />
+                </hlm:export>
+            </hlm:scm>
+        </au:expectfailure>
+    </target>
+
+    <target name="test-export-basedir-destPath-2tags">
+        <mkdir dir="${repo.dir}/export" />
+        <au:expectfailure>
+            <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/test2">
+                <hlm:export basedir="${repo.dir}/test2" destpath="${repo.dir}/export">
+                    <tag name="1" />
+                    <tag name="2" />
+                </hlm:export>
+            </hlm:scm>
+        </au:expectfailure>
+    </target>
+
+    <!--
+     **************************************************************
+     ** Branch
+     **************************************************************
+    -->
+    <target name="test-branch-name-missing">
+        <au:expectfailure>
+            <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/test1">
+                <hlm:branch />
+            </hlm:scm>
+        </au:expectfailure>
+    </target>
+
+    <target name="test-branch-basedir-missing">
+        <au:expectfailure>
+            <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/test1">
+                <hlm:branch name="test branch" />
+            </hlm:scm>
+        </au:expectfailure>
+    </target>
+
+    <target name="test-branch" depends="setUp">
+        <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/test1">
+            <hlm:branch baseDir="${repo.dir}/test1" name="test branch 1.0" />
+        </hlm:scm>
+        <au:assertLogContains text="Branch 'test branch 1.0' has been created successfully." />
+    </target>
+
+    <!--
+     **************************************************************
+     ** Changelog
+     **************************************************************
+    -->
+    <target name="test-changelog-basedir-missing">
+        <au:expectfailure>
+            <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/test1">
+                <hlm:changelog />
+            </hlm:scm>
+        </au:expectfailure>
+    </target>
+
+    <target name="test-changelog" depends="setUp">
+
+        <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/test1">
+            <hlm:checkout baseDir="${repo.dir}/changelog" />
+            <hlm:tag baseDir="${repo.dir}/changelog" name="tag_0.2" />
+            <hlm:branch baseDir="${repo.dir}/changelog" name="test_0.1" />
+        </hlm:scm>
+
+        <echo file="${repo.dir}/changelog/newfile.txt">newly added</echo>
+        <echo file="${repo.dir}/changelog/newfile2.txt">newly added</echo>
+        <echo file="${repo.dir}/changelog/newfile3.txt">newly added</echo>
+
+        <hlm:scm verbose="false" scmUrl="scm:${repo.type}:${repo.dir}/changelog">
+            <hlm:add>
+                <fileset dir="${repo.dir}/changelog">
+                    <include name="*.txt" />
+                </fileset>
+            </hlm:add>
+            <hlm:checkin message="Adding files .....">
+                <fileset dir="${repo.dir}/changelog">
+                    <include name="*.txt" />
+                </fileset>
+            </hlm:checkin>
+            <hlm:changelog baseDir="${repo.dir}/changelog" numDays='1' />
+        </hlm:scm>
+
+        <au:assertLogContains text="tag:tip" />
+        <au:assertLogContains text="branch:test_0.1" />
+        <au:assertLogContains text="files:newfile.txt newfile2.txt newfile3.txt" />
+        
+        <echo file="${repo.dir}/changelog/newfile4.txt">newly added</echo>
+        <echo file="${repo.dir}/changelog/newfile5.txt">newly added</echo>
+        <echo file="${repo.dir}/changelog/newfile6.txt">newly added</echo>
+
+        <hlm:scm verbose="false" scmUrl="scm:hg:${repo.dir}/changelog">
+            <hlm:add>
+                <fileset dir="${repo.dir}/changelog">
+                    <include name="*.txt" />
+                </fileset>
+            </hlm:add>
+            <hlm:checkin message="Adding files .....">
+                <fileset dir="${repo.dir}/changelog">
+                    <include name="*.txt" />
+                </fileset>
+            </hlm:checkin>
+            <hlm:changelog basedir="${repo.dir}/changelog" startVersion="2" />
+        </hlm:scm>
+        <au:assertLogContains text="revision:2:" />
+        
+        <hlm:scm verbose="false" scmUrl="scm:hg:${repo.dir}/changelog">
+            <hlm:changelog basedir="${repo.dir}/changelog" startVersion="1" endVersion="2"/>
+        </hlm:scm>
+        <au:assertLogContains text="revision:1:" />
+        <au:assertLogContains text="revision:2:" />
+        
+        <hlm:scm verbose="false" scmUrl="scm:hg:${repo.dir}/changelog">
+            <hlm:changelog basedir="${repo.dir}/changelog" xmlbom="${repo.dir}/bom.xml"/>
+        </hlm:scm>
+        <au:assertFileExists file="${repo.dir}/bom.xml" />
+    </target>
+    
+    <!--
+     **************************************************************
+     ** Info
+     **************************************************************
+    -->
+    <target name="test-info-basedir-missing">
+        <au:expectfailure>
+            <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/test1">
+                <hlm:info />
+            </hlm:scm>
+        </au:expectfailure>
+    </target>
+
+    <target name="test-info-command" depends="setUp">
+        <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/test1">            
+            <hlm:checkout baseDir="${repo.dir}/info" /> 
+            <hlm:info baseDir="${repo.dir}/info"/>
+        </hlm:scm>
+
+        <au:assertLogContains text="hg id" />
+    </target>
+    
+    <target name="test-info-command-result" depends="setUp">
+        <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/test1">            
+            <hlm:checkout baseDir="${repo.dir}/info" /> 
+            <hlm:info baseDir="${repo.dir}/info"/>
+        </hlm:scm>
+
+        <au:assertLogContains text="00000000000" />
+    </target>
+    
+    <target name="test-info-command-result-failur" depends="setUp">
+        <au:expectfailure>
+            <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/test1">            
+                <hlm:checkout baseDir="${repo.dir}/info" /> 
+                <hlm:info baseDir="${repo.dir}/info"/>
+            </hlm:scm>
+            <au:assertLogContains text="00000000001" />
+        </au:expectfailure>
+    </target>
+    
+    <!--
+     **************************************************************
+     ** Keep Going (faile on error)
+     **************************************************************
+    -->
+    <target name="test-keepgoing-false" depends="setUp">
+        <echo file="${repo.dir}/test1/newfile.txt">newly added</echo>
+        <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/test1" failonerror="false">
+            <hlm:add>
+                <fileset dir="${repo.dir}/test1">
+                    <include name="*.txt" />
+                </fileset>
+            </hlm:add>
+            <hlm:checkin message="Adding files .....">
+                <fileset dir="${repo.dir}/test1">
+                    <include name="*.txt" />
+                </fileset>
+            </hlm:checkin>
+            <hlm:tag baseDir="${repo.dir}/test1" name="0.0.2" />
+            <hlm:tag baseDir="${repo.dir}/test1" name="0.0.2" />            
+        </hlm:scm>
+        <echo> Build Continue... </echo>
+        <au:assertLogContains text="Build Continue..." />
+    </target>
+    
+    <target name="test-keepgoing-true" depends="setUp">
+        <au:expectfailure>
+            <echo file="${repo.dir}/test1/newfile.txt">newly added</echo>
+            <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/test1" failonerror="true">
+                <hlm:add>
+                    <fileset dir="${repo.dir}/test1">
+                        <include name="*.txt" />
+                    </fileset>
+                </hlm:add>
+                <hlm:checkin message="Adding files .....">
+                    <fileset dir="${repo.dir}/test1">
+                        <include name="*.txt" />
+                    </fileset>
+                </hlm:checkin>
+                <hlm:tag baseDir="${repo.dir}/test1" name="0.0.3" />
+                <hlm:tag baseDir="${repo.dir}/test1" name="0.0.3" />
+            </hlm:scm>
+        </au:expectfailure>
+    </target>
+    
+    <target name="test-keepgoing-true-default" depends="setUp">
+        <au:expectfailure>
+            <echo file="${repo.dir}/test1/newfile.txt">newly added</echo>
+            <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/test1">
+                <hlm:add>
+                    <fileset dir="${repo.dir}/test1">
+                        <include name="*.txt" />
+                    </fileset>
+                </hlm:add>
+                <hlm:checkin message="Adding files .....">
+                    <fileset dir="${repo.dir}/test1">
+                        <include name="*.txt" />
+                    </fileset>
+                </hlm:checkin>
+                <hlm:tag baseDir="${repo.dir}/test1" name="0.0.3" />
+                <hlm:tag baseDir="${repo.dir}/test1" name="0.0.3" />
+            </hlm:scm>
+        </au:expectfailure>
+    </target>
+
+    
+    <!--
+     **************************************************************
+     ** Init
+     **************************************************************
+     -->
+    <target name="test-init">
+        <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/new">
+            <hlm:init />
+        </hlm:scm>
+        <au:assertFileExists file="${repo.dir}/new" />
+    </target>
+
+    
+    <!--
+     **************************************************************
+     ** Pull
+     **************************************************************
+     -->
+    <target name="test-pull">
+        <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/test1">
+            <hlm:checkout baseDir="${repo.dir}/pull" />
+        </hlm:scm>
+        <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/test1">
+            <hlm:tag baseDir="${repo.dir}/test1" name="tag_0.2" />
+        </hlm:scm>
+        <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/pull">
+            <hlm:pull baseDir="${repo.dir}/pull" />
+            <hlm:changelog baseDir="${repo.dir}/pull" numDays="1" />
+        </hlm:scm>
+        <au:assertLogContains text="files:.hgtags" />
+        <au:assertLogContains text="description:[maven-scm] copy for tag tag_0.2" />
+    </target>
+    
+    <!--
+     **************************************************************
+     ** Tags
+     **************************************************************
+     -->
+    <target name="test-tags">
+        <echo file="${repo.dir}/test1/content.txt">content...</echo>
+        <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/test1">
+            <hlm:add>
+                <fileset dir="${repo.dir}/test1">
+                    <include name="*.txt" />
+                </fileset>
+            </hlm:add>
+            <hlm:checkin message="Adding files .....">
+                <fileset dir="${repo.dir}/test1">
+                    <include name="*.txt" />
+                </fileset>
+            </hlm:checkin>            
+            <hlm:tag baseDir="${repo.dir}/test1" name="tag_0.1" />
+            <hlm:tags baseDir="${repo.dir}/test1" />
+        </hlm:scm>
+        <au:assertLogContains text=" * tag_0.1" />
+        <au:assertLogContains text=" * tip" />
+    </target>
+    
+    
+</project>

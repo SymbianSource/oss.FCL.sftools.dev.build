@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : test_signaltask.ant.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test-stage" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>Helium Antlib Signal unittests.</description>
+    <import file="run-scenario.ant.xml" />
+    <property environment="env"/>
+ 
+    <target name="test-scenario-valid-build">
+        <runScenario scenario="valid_build" target="build" />
+    </target>
+
+    <target name="test-override-scenario">
+        <runScenario scenario="override_scenario" target="build" />
+        <au:assertFileDoesntExist file="${temp.dir}/main.ant.log" />
+        <au:assertFileDoesntExist file="${temp.dir}/stage2.ant.log" />
+        <au:assertFileExists file="${temp.dir}/main_override.ant.log" />
+        <au:assertFileExists file="${temp.dir}/stage1.ant.log" />
+        <au:assertFileExists file="${temp.dir}/stage2_override.ant.log" />
+
+        <loadfile property="main.log" srcFile="${temp.dir}/main_override.ant.log" />
+        <au:assertTrue message="main_override.ant.log content is invalid: Main log start step1">
+            <contains string="${main.log}" substring="Main log start step1" />
+        </au:assertTrue>
+        <au:assertTrue message="main_override.ant.log content is invalid: Main log start step2">
+            <contains string="${main.log}" substring="Main log start step2" />
+        </au:assertTrue>
+        <au:assertTrue message="main_override.ant.log content is invalid: Main log start step3">
+            <contains string="${main.log}" substring="Main log start step3" />
+        </au:assertTrue>
+        <au:assertTrue message="main_override.ant.log content is invalid: Main log start step4">
+            <contains string="${main.log}" substring="Main log start step4" />
+        </au:assertTrue>
+        <au:assertTrue message="main_override.ant.log content is invalid: Main log start step5">
+            <contains string="${main.log}" substring="Main log start step5" />
+        </au:assertTrue>
+        
+        <loadfile property="stage1.log" srcFile="${temp.dir}/stage1.ant.log" />
+        <au:assertTrue message="stage1.ant.log content is invalid: In stage1">
+            <contains string="${stage1.log}" substring="In stage1 (1)" />
+        </au:assertTrue>
+        <au:assertTrue message="stage1.ant.log content is invalid: In stage1">
+            <contains string="${stage1.log}" substring="In stage1 (2)" />
+        </au:assertTrue>
+        <loadfile property="stage2.log" srcFile="${temp.dir}/stage2_override.ant.log" />
+        <au:assertTrue message="stage2.ant.log content is invalid: In stage1">
+            <contains string="${stage2.log}" substring="In stage2 (1)" />
+        </au:assertTrue>
+        <au:assertTrue message="stage2.ant.log content is invalid: In stage1">
+            <contains string="${stage2.log}" substring="In stage2 (2)" />
+        </au:assertTrue>
+    </target>
+
+    <target name="test-build-failure">
+        <au:expectfailure>
+            <runScenario scenario="build_failure" target="build" />
+        </au:expectfailure>
+        <au:assertFileExists file="${temp.dir}/main.ant.log" />
+        <au:assertFileExists file="${temp.dir}/stage1.ant.log" />
+        <au:assertFileExists file="${temp.dir}/stage2.ant.log" />
+        <loadfile property="main.log" srcFile="${temp.dir}/main.ant.log" />
+        <au:assertTrue message="main.ant.log content is invalid: Main log start step1">
+            <contains string="${main.log}" substring="Main log start step1" />
+        </au:assertTrue>
+        <au:assertTrue message="main.ant.log content is invalid: Main log start step2">
+            <contains string="${main.log}" substring="Main log start step2" />
+        </au:assertTrue>
+        <au:assertTrue message="main.ant.log content is invalid: Main log start step3">
+            <contains string="${main.log}" substring="Main log start step3" />
+        </au:assertTrue>
+        <au:assertTrue message="main.ant.log content is invalid: Main log start step4">
+            <not>
+                <contains string="${main.log}" substring="Main log start step4" />
+            </not>
+        </au:assertTrue>
+        <au:assertTrue message="main.ant.log content is invalid: Main log start step5">
+            <not>
+                <contains string="${main.log}" substring="Main log start step5" />
+            </not>
+        </au:assertTrue>
+        <au:assertTrue message="main.ant.log content is invalid: BUILD FAILED">
+            <contains string="${main.log}" substring="BUILD FAILED" />
+        </au:assertTrue>
+
+        
+        <loadfile property="stage1.log" srcFile="${temp.dir}/stage1.ant.log" />
+        <au:assertTrue message="stage1.ant.log content is invalid: In stage1">
+            <contains string="${stage1.log}" substring="In stage1 (1)" />
+        </au:assertTrue>
+        <au:assertTrue message="stage1.ant.log content is invalid: In stage1">
+            <contains string="${stage1.log}" substring="In stage1 (2)" />
+        </au:assertTrue>
+        <loadfile property="stage2.log" srcFile="${temp.dir}/stage2.ant.log" />
+        <au:assertTrue message="stage2.ant.log content is invalid: In stage1">
+            <contains string="${stage2.log}" substring="In stage2 (1)" />
+        </au:assertTrue>
+        <au:assertTrue message="stage2.ant.log content is invalid: In stage1">
+            <not>
+                <contains string="${stage2.log}" substring="In stage2 (2)" />
+            </not>
+        </au:assertTrue>
+    </target>
+    
+    <target name="test-backup-scenario">
+        <runScenario scenario="override_scenario" target="build" />
+        <runScenario scenario="override_scenario" target="build" />
+        
+        <au:assertLogContains text="Backing up of"/>
+        <au:assertFileDoesntExist file="${temp.dir}/main.ant.log" />
+        <au:assertFileDoesntExist file="${temp.dir}/stage2.ant.log" />
+        <au:assertFileExists file="${temp.dir}/main_override.ant.log" />
+        <au:assertFileExists file="${temp.dir}/stage1.ant.log" />
+        <au:assertFileExists file="${temp.dir}/stage2_override.ant.log" />
+    </target>
+
+</project>

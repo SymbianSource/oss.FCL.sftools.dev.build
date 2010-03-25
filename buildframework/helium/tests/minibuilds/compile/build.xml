@@ -35,8 +35,8 @@ Description:
 	<property name="publish.root.dir" location="${build.drive}/release" />
 
 	<!-- For Grace upload-->
-	<property name="release.grace.service" value="Test_Helium" />
-	<property name="release.grace.product" value="minibuild_compile" />
+	<property name="hydra.service" value="Helium" />
+	<property name="hydra.product" value="minibuild_compile" />
 	<property name="release.label" value="${major.version}.${minor.version}" />
 
 	<!-- build configuration -->
@@ -50,7 +50,8 @@ Description:
 
 	<!-- Archiving configuration-->
 	<property name="zip.config.file" location="archive.cfg.xml" />
-	<property name="zips.ee.spec.name" value="minibuild_archive" />
+    <property name="zips.ee.spec.name" value="minibuild_archive" />
+    <property name="zips.ee-empty.spec.name" value="empty_minibuild_archive" />
 
 	<!-- Synergy is not configured -->
 	<property name="skip.password.validation" value="1" />
@@ -97,7 +98,7 @@ ${ant.coverage.summary}</echo>
 	
     <!-- Test ec history option is create for single node build and merge is for multinode build. -->
     <target name="test-ec-history-option" if="build.system.ec-helium">
-        <loadfile srcfile="${build.log.dir}/${build.id}.${sysdef.configurations.list}_run_emake.bat" property="emake.bat.file"/>
+        <loadfile srcfile="${temp.build.dir}/${build.id}.${sysdef.configurations.list}_run_emake.bat" property="emake.bat.file"/>
         <if>
             <equals arg1="${ec.maxagents}" arg2="1" />
             <then>
@@ -173,18 +174,6 @@ print "New subdir: %s" % old
 		</script>
 	</target>
 
-	<!-- Upload to Grace -->
-	<target name="minibuild-grace-upload">
-		<echo message="Uploading files into Grace ${release.grace.dir}" />
-		<hlm:retry retryCount="${grace.upload.retryCount}" sleepTime="1000">
-			<copy file="${build.drive}\output\build_area\engineering_english\ant\sf_app_organizer_clock.zip" tofile="${release.grace.dir}\${build.name}_${major.version}.${minor.version}.${build.id}_sf_app_organizer_clock.zip" />
-		</hlm:retry>
-		<antcall target="release-grace-content">
-			<param name="release-grace-content" value="${cache.dir}" />
-		</antcall>
-	</target>
-
-
 	<!-- Check that the XML data returned from Diamonds via the REST interface
     is the same as what is sent. 
         
@@ -232,7 +221,7 @@ ${diamonds.log.start.edited}</echo>-->
 	</target>
 
 
-	<target name="mini-build-archive" depends="mini-build-archive-ant,mini-build-archive-ec-full" />
+	<target name="mini-build-archive" depends="mini-build-archive-ant,mini-build-archive-ec-full,mini-build-archive-ant-empty-config" />
 
 	<!-- This target will copy a part of the tree structure to test policy.remover mapper. -->
 	<target name="prepare-archiving">
@@ -265,6 +254,14 @@ ${diamonds.log.start.edited}</echo>-->
 			<param name="zipping.type" value="ant" />
 			<!-- Uses to set the target location -->
 		</antcall>
+	    
+    </target>
+ 
+    <target name="mini-build-archive-ant-empty-config">
+        <hlm:zipContentMacro type="ee-empty" ec="false" file="${zip.config.file}" failonemptyconfig="false" />
+        <au:expectfailure>
+            <hlm:zipContentMacro type="ee-empty" ec="false" file="${zip.config.file}" failonemptyconfig="true" />
+        </au:expectfailure>
 	</target>
 
 	<target name="do-mini-build-archive">
@@ -288,7 +285,7 @@ ${diamonds.log.start.edited}</echo>-->
 
 
 	<target name="mini-build-cleanup">
-		<delete verbose="true" includeemptydirs="true">		 
+		<delete verbose="true" includeemptydirs="true" failonerror="false">		 
 			<fileset dir="${build.drive}/" casesensitive="false">
 				<include name="makefile" />
 				<include name="*.mk" />
@@ -342,7 +339,7 @@ ${diamonds.log.start.edited}</echo>-->
 			<isset property="build.system.ec-helium" />
 			<then>
 				<au:assertFileExists file="${build.drive}/emake.data" />
-				<au:assertFileExists file="${build.log.dir}/${build.id}.helium_minibuild_compile_run_emake.bat" />
+				<au:assertFileExists file="${temp.build.dir}/${build.id}.helium_minibuild_compile_run_emake.bat" />
 			</then>
 		</if>
 
@@ -367,7 +364,7 @@ ${diamonds.log.start.edited}</echo>-->
 				<include name="fota" />
 			</targetset>
 		</imakerconfiguration>
-		<imakerconfiguration regionalVariation="true">
+		<imakerconfiguration>
 			<makefileset>
 			    <include name="**/${product.name}/*ui.mk"/>
 			</makefileset>
@@ -388,5 +385,6 @@ ${diamonds.log.start.edited}</echo>-->
 		<include name="s60/app/**/*.mmp" />
 	</fileset>
 
+    <import file="build.sbsinput.ant.xml" />
 </project>
 

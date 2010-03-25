@@ -31,7 +31,7 @@ Description:
     <appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
         <layout class="org.apache.log4j.PatternLayout">
                <param name="ConversionPattern" 
-                            value="%d{HH:mm:ss,SSS}  %-2p - %m  %n"/>
+                            value="%d{HH:mm:ss,SSS}  %-2p - %-20c{1} - %m  %n"/>
         </layout>
     <filter class="org.apache.log4j.varia.LevelMatchFilter">
       <param name="LevelToMatch" value="DEBUG" />
@@ -45,7 +45,7 @@ Description:
         <param name="append" value="false"/>
         <layout class="org.apache.log4j.PatternLayout">
                <param name="ConversionPattern" 
-                            value="%d{HH:mm:ss,SSS}  %-2p - %m  %n"/>
+                            value="%d{HH:mm:ss,SSS}  %-2p - %-20c{1} - %m  %n "/>
         </layout>
     <filter class="org.apache.log4j.varia.LevelMatchFilter">
       <param name="LevelToMatch" value="DEBUG" />
@@ -60,7 +60,7 @@ Description:
         <param name="append" value="false"/>
         <layout class="org.apache.log4j.PatternLayout">
                <param name="ConversionPattern" 
-                            value="%d{HH:mm:ss,SSS}  %-2p - %m  %n"/>
+                            value="%d{HH:mm:ss,SSS}  %-2p - %-20c{1} - %m  %n"/>
         </layout>
     <filter class="org.apache.log4j.varia.LevelMatchFilter">
       <param name="LevelToMatch" value="DEBUG" />

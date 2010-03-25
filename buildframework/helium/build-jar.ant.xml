@@ -25,11 +25,25 @@ Description:
     Called by hlm-jar.bat to build helium java code
     </description>
 
+    <!-- @property env
+    Load all environment variables. -->
     <property environment="env" />
 
+    <!-- @type string
+    @scope private
+    -->
     <property name="build.temp.dir" location="${env.TEMP}/helium/java" />
+    <!-- @type string
+    @scope private
+    -->
     <property name="src.dir" location="${helium.dir}/tools/common/java/src" />
+    <!-- @type string
+    @scope private
+    -->
     <property name="ext.java.lib.dir" location="${helium.dir}/external/antlibs" />
+    <!-- @type string
+    @scope private
+    -->
     <property name="helium.java.lib.dir" location="${helium.dir}/tools/common/java/lib" />
 
 

@@ -78,21 +78,8 @@ This section lists all the available tutorials on Helium and how to configure an
    
    tutorials/configuration/SimplestConfiguration
    tutorials/configuration/UseHlmTasksInConfiguration
-   tutorials/configuration/HowtoCreateANewSignal
    tutorials/rom_image
-   tutorials/variant
    tutorials/qt_build
-<#if !ant?keys?seq_contains("sf")>
-   nokia/blacktusk/howto-setup-blacktusk-with-helium
-
-* IDO_
-
-.. _IDO: ido
-
-* TeamCI_
-
-.. _TeamCI: teamci
-</#if>
 
 .. raw:: html
 
@@ -112,35 +99,132 @@ here for specific information about a task or action.
    :maxdepth: 1
 
 <#if !ant?keys?seq_contains("sf")>   
+   nokia/support
    nokia/nokia
    nokia/retrieving
 </#if>
    sf
    manual/running
    manual/configuring
-   manual/configuringdiamonds
-   manual/signaling
+   
+.. raw:: html
+
+   <script type="text/javascript" language="JavaScript"><!--
+    function ReverseContentDisplay(d) {
+        if(d.length < 1) { return; }
+    
+         var elem = document.getElementsByTagName('div');
+         for(var i = 0; i < elem.length; i++)
+         {
+             if(elem[i].style.display == "block" && elem[i] != document.getElementById(d)) {
+                 elem[i].style.display = "none";
+             }
+         }
+    
+        if(document.getElementById(d).style.display == "none") { document.getElementById(d).style.display = "block"; }
+        else { document.getElementById(d).style.display = "none"; }
+   }
+   //--></script>
+   <ul><li class="toctree-l1"><a href="javascript:ReverseContentDisplay('stages')">Stages</a></li></ul>
+   <div id="stages" style="display:none; position:absolute; border-style: solid; background-color: white; padding: 5px;">
+   
+.. toctree::
+   :maxdepth: 2
+   
    manual/stages
+   
+.. raw:: html
+
+   </div>
 <#if !ant?keys?seq_contains("sf")>
+   <ul><li class="toctree-l1"><a href="javascript:ReverseContentDisplay('nokiastages')">Nokia Stages</a></li></ul>
+   <div id="nokiastages" style="display:none; position:absolute; border-style: solid; background-color: white; padding: 5px;">
+
+.. toctree::
+   :maxdepth: 2
+   
    nokia/nokiastages
-   nokia/rndsdk_user_manual
+   
+.. raw:: html
+
+   </div>
+</#if>
+.. toctree::
+   :maxdepth: 1
+   
+<#if !ant?keys?seq_contains("sf")>
    nokia/quality
 </#if>
-   manual/cruisecontrol
    manual/debugging
    metrics
-   manual/APIs
-<#if !ant?keys?seq_contains("sf")>
-   api_changes
    
-* helium-antlib_
+.. raw:: html
 
-.. _helium-antlib: helium-antlib
+   <ul><li class="toctree-l1"><a href="javascript:ReverseContentDisplay('api')">API</a></li></ul>
+   <div id="api" style="display:none; position:absolute; border-style: solid; background-color: white; padding: 5px;">
+   
+* `Helium API`_
+* `Helium Antlib`_
+* `Ant Tasks`_
+
+.. _`Ant Tasks`: api/ant/index.html
+.. _`Helium API`: api/helium/index.html
+.. _`Helium Antlib`: helium-antlib/index.html
+
+<#if !(ant?keys?seq_contains("sf"))>
+* `Python API`_
+* `Java API`_
+* `IDO API`_
+* `DFS70501 API`_
+
+.. _`Python API`: api/python/index.html
+.. _`Java API`: api/java/index.html
+.. _`IDO API`: <#if ant['helium.version']?matches("^\\d+\\.0(?:\\.\\d+)?$")>../</#if>ido/api/helium/index.html
+.. _`DFS70501 API`: dfs70501/api/helium/index.html
+</#if>
+
+.. raw:: html
+
+   </div>
+   
+<#if !ant?keys?seq_contains("sf")>
+.. toctree::
+   :maxdepth: 1
+   
+   api_changes
+   nokia/releasenotes
 </#if>
 
 .. raw:: html
 
    </td><td>
+
+Helium Framework configuration
+==============================
+
+.. toctree::
+   :maxdepth: 3
+   
+   helium-antlib/index
+   
+.. toctree::
+   :maxdepth: 1
+   
+   manual/cruisecontrol
+
+<#if !ant?keys?seq_contains("sf")>
+Customer docs
+=============
+
+* IDO_
+
+.. _IDO: <#if ant['helium.version']?matches("^\\d+\\.0(?:\\.\\d+)?$")>../</#if>ido
+
+* TeamCI_
+
+.. _TeamCI: <#if ant['helium.version']?matches("^\\d+\\.0(?:\\.\\d+)?$")>../</#if>teamci
+
+</#if>
 
 Helium Architecture
 ===================

@@ -87,7 +87,7 @@ Description:
     <#assign table_info = pp.loadData('com.nokia.helium.metadata.SQLFMPPLoader',
         "${dbPath}") >
 
-<#assign error_count = table_info['select count(data) as COUNT from metadata where priority_id in (select id from priority where priority like \'ERROR\') and logpath_id in (select id from logfiles where path like \'%${logfile}%\')'][0]['COUNT'] >
+<#assign error_count = table_info['select count(data) as COUNT from metadata where priority_id in (select id from priority where priority like \'ERROR\') and logpath_id in (select id from logfiles where path like \'%${logpath}%\')'][0]['COUNT'] >
     <!-- section -->
     <#macro create_section title type>
            <div id="foldername">
@@ -100,15 +100,15 @@ Description:
        </#macro>
 <#if (error_count > 0)>
         <span class="errormessage">
-            ${logfile}...FAIL<br/>
-    <#list table_info['select * from metadata where priority_id in (select id from priority where priority like \'ERROR\') and logpath_id in (select id from logfiles where path like \'%${logfile}%\')'] as recordentry >
+            ${logpath}...FAIL<br/>
+    <#list table_info['select * from metadata where priority_id in (select id from priority where priority like \'ERROR\') and logpath_id in (select id from logfiles where path like \'%${logpath}%\')'] as recordentry >
             <ul>
             ${recordentry['data']}<br/>
             </ul>
     </#list>
         </span>
 <#else>
-    <span class="okmessage">${logfile}...OK<br/></span>
+    <span class="okmessage">${logpath}...OK<br/></span>
 </#if>
 </body>
 </html>

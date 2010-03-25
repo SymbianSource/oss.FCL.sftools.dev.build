@@ -8,13 +8,12 @@ Developer Documentation
 =======================
 .. toctree::
    :maxdepth: 1
+   :glob:
 
-   structure
-   build
+   *
    
-
-Documentation
-=============
+API Documentation
+=================
    * `Helium Antlib AntDoclet`_
    * `Helium Antlib Java API`_
    

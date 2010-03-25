@@ -1,4 +1,4 @@
-#!/bin/csh
+#!/bin/sh
 
 #
 # Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
@@ -16,8 +16,5 @@
 # Description: 
 #
 
-module load java/1.6.0
-module load "tww/ant/1.7.1"
-module load mercurial
-setenv ANT_ARGS "-lib antlibs -lib lib" 
-ant $*
+export BUILDER_HOME=builder
+$BUILDER_HOME/bld $*

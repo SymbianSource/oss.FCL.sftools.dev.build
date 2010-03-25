@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : antlib.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<antlib>
+    <!-- Task definition -->
+    <taskdef name="signal" classname="com.nokia.helium.signal.ant.taskdefs.Signal"/>
+    <taskdef name="clearDeferredFailures" classname="com.nokia.helium.signal.ant.taskdefs.ClearDeferredFailures"/>
+    
+    <!-- Type definition -->
+    <typedef name="hasDeferredFailure" classname="com.nokia.helium.signal.ant.conditions.DeferredFailureCondition"/>
+    <typedef name="signalInput" classname="com.nokia.helium.signal.ant.types.SignalInput"/> 
+    <typedef name="signalNotifierInput" classname="com.nokia.helium.signal.ant.types.SignalNotifierInput"/> 
+    <typedef name="signalListenerConfig" classname="com.nokia.helium.signal.ant.types.SignalListenerConfig"/>
+    <typedef name="notifierList" classname="com.nokia.helium.signal.ant.types.SignalNotifierList"/>
+    <typedef name="emailNotifier" classname="com.nokia.helium.signal.ant.types.EMAILNotifier"/>
+    <typedef name="infoNotifier" classname="com.nokia.helium.signal.ant.types.InfoNotifier"/>
+    <typedef name="executeTaskNotifier" classname="com.nokia.helium.signal.ant.types.ExecuteTaskNotifier"/>
+    <typedef name="xmlsource" classname="com.nokia.helium.signal.ant.types.XmlSource"/>
+</antlib>

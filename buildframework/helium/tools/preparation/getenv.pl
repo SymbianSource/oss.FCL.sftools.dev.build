@@ -420,20 +420,6 @@ sub FixPaths {
     }
 }
 
-# Make sure paths are as windows likes 'em
-# change '/' ==> '\\' and make sure last char is \\
-sub UnFixPaths {
-    my $tmpParam = shift;
-    $tmpParam =~ s/\//\\/g;
-    
-    if( substr( $tmpParam, -1 ) eq "\\" ) {
-        return $tmpParam;
-    }
-    else {
-        return $tmpParam."\\";
-    }
-}
-
 # smarter handling of logging
 sub printLog {
     foreach my $trace ( @_ ) {
@@ -612,7 +598,7 @@ sub RunWizard {
         }
         my $wantedService = $serviceList[ ReturnMenuIndex( "Please select GRACE Service.", @serviceNameList)];
         printLog( "selected: $wantedServer.$wantedService - accessing.." );
-		local *GRACETEST2;
+        local *GRACETEST2;
         if( opendir( GRACETEST2, $wantedServer.$wantedService ) ) {
             printLog( "serviceconnection tested OK" );
             $defaultServiceName = $wantedService
@@ -852,7 +838,7 @@ sub ParseDownloadDir {
     $releaseLocationInServer = $data->{releaseDetails}->{releaseID}->{service}->{name} . "/";
     $releaseLocationInServer .= $data->{releaseDetails}->{releaseID}->{product}->{name} ."/";
     $releaseLocationInServer .= $data->{releaseDetails}->{releaseID}->{release}->{name} ."/";
-	local *DEPTEST;
+    local *DEPTEST;
     
     # check if we can find this release from GRACE
     if( $graceServer ) {
@@ -883,7 +869,21 @@ sub GeneratePackageHash {
     my( $xmlDataHandle, $releaseInServer )  = @_;
     my $finalState = 0;
     printLog( "parse filenames to extract to packageHah" );
+    no strict 'refs';
         
+# Incase if we have only one package in the release to extract, then in the case
+# the Xml::Simple::XMLin is not creating keys inside $xmlDataHandle->{releaseFiles}->{package}
+# with package names. So to address it, the below part of code is done..
+####
+    if(exists $xmlDataHandle->{releaseFiles}->{package}->{name}){
+        my $pkgName = $xmlDataHandle->{releaseFiles}->{package}->{name};
+        my $tmphash = $xmlDataHandle->{releaseFiles}->{package};
+        delete $tmphash->{name} ;
+        delete $xmlDataHandle->{releaseFiles}->{package};
+        $xmlDataHandle->{releaseFiles}->{package}->{$pkgName} = $tmphash;
+    }
+#####
+
     # generate new hash of zips to DL for %packageHash
     # foreach my $key( sort { $xmlDataHandle{a}->{'state'} <=> $xmlDataHandle{b}->{'state'} } %{$xmlDataHandle->{releaseFiles}->{'package'} } ){
     foreach my $key( keys(%{$xmlDataHandle->{releaseFiles}->{package} } ) ) {
@@ -1083,7 +1083,7 @@ sub RemoveThisXmlFromFinalList {
         my $dependsOfReleaseToRemove = FixPaths( $currentReleaseXmlHandle->{releaseDetails}->{dependsOf}->{release}->{name} );
         
         my $dependsOf = $dependsOfServiceToRemove.$dependsOfProductToRemove.$dependsOfReleaseToRemove;
-		local *TMPTEST;
+        local *TMPTEST;
         
         # find out where the release came from
         if( $param_release_path ) {
@@ -1129,7 +1129,7 @@ sub ReductFilesFromFinalLists {
 #               if( $finalZip->{filename} eq $zips and
 #                       $finalZip->{path} eq %packageHash->{$zips}->{'path'} ) {
                 if( $finalZip->{filename} eq $zips ) {
-                            printLog( "removing $finalZip->{path} $finalZip->{filename} from dl list" );
+                            printLog( "removing $finalZip->{path}/$finalZip->{filename} from dl list" );
                             $finalZip->{default} = "false";
                 }
             }
@@ -1259,10 +1259,14 @@ sub GetEnv {
                 # unzip double zipped zips to $tmpDlDir
                 # there shouldnt be much of these anymore
                 printLog( "parent: double zipped - unzip to $tmpDlDir" );
-                my $extrCmd = "7za x -y \"";
+                my $extrCmd = q{7za x -y "};
                 $extrCmd .= $file->{path} . $file->{filename};
-                $extrCmd .= "\" -o" . $tmpDlDir;
-                $extrCmd .= " > NUL";
+                $extrCmd .= q{" -o} . $tmpDlDir;
+                if ( $^O =~ /linux/i){
+                    $extrCmd .= " > /dev/null";
+                }else{
+                    $extrCmd .= " > NUL";
+                }
                 print "system: $extrCmd\n" if( $param_print_only );
                 printLog( "parent: system: $extrCmd" );;
                 system( $extrCmd ) if( !$param_print_only );
@@ -1313,11 +1317,12 @@ sub GetEnv {
         }
 
         if( $somethingToCopy ) {
-            printLog( "move everything from $tmpDlDir to $tmpDir > NUL" ); 
-            my $moveCmd = "move $tmpDlDir\\*.* $tmpDir > NUL";
-            printLog( "running moveCmd: $moveCmd" );
-            system( $moveCmd ) if( !$param_print_only );
-    #       move( "$tmpDlDir/*.*", "$tmpDir" ) or die( "move failed: $!" );
+            printLog( "move everything from $tmpDlDir to $tmpDir" ); 
+            opendir( DLTEMP , $tmpDlDir );
+            for (grep( !/^\.\.?$/, readdir(DLTEMP))){
+                move("$tmpDlDir/$_", $tmpDir) or die("$tmpDlDir/$_ move failed :$!");
+            }
+            closedir( DLTEMP );
         }
         
         if( $returnValue == 0 ) {
@@ -1331,7 +1336,9 @@ sub GetEnv {
     }
     
     # current forking mechanism is leaving last package(s) to $tmpDir
-    UnzipFromTempToEnv( );
+    opendir(TEMPDIR,  $tmpDir);
+    UnzipFromTempToEnv() if(scalar(grep( !/^\.\.?$/, readdir(TEMPDIR))) > 0);
+    closedir(TEMPDIR);
 
     if( -e FixPaths( getcwd )."currentRelease.xml" ) {
         unlink( FixPaths( getcwd )."currentRelease.xml" ) if( ! $param_print_only );
@@ -1353,8 +1360,13 @@ sub GetEnv {
 sub UnzipFromTempToEnv {
     # extract from temp to extractDir
     printLog( "child: unzip from temp" );
-    my $finalUnzipCmd = "7za x -y \"".UnFixPaths( $tmpDir )."\\*.zip\" -o\"".UnFixPaths( getcwd )."\"";
-    $finalUnzipCmd .= " > NUL";
+    my $finalUnzipCmd = qq{7za x -y "$tmpDir/*.zip" -o"}.getcwd.q{"};
+    if ( $^O =~ /linux/i){
+        $finalUnzipCmd .= " > /dev/null";
+    }else{
+        $finalUnzipCmd .= " > NUL";
+    }
+
     print "system: $finalUnzipCmd\n" if( $param_print_only );
     printLog( "child: system: $finalUnzipCmd" );
     system( $finalUnzipCmd ) if( !$param_print_only );
@@ -1365,7 +1377,6 @@ sub UnzipFromTempToEnv {
     
     # empty temp dir
     printLog( "child: empty temp dir" );
-    $tmpDir =~ s/\//\\/g;
     printLog( "child: unlink: $tmpDir" );
 
     # dont handle errors - temp might be empty as well!

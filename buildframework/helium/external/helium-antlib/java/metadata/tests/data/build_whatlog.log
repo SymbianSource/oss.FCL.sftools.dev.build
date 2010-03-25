@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<buildlog sbs_version="2.12.3 [2010-02-23 symbian build system 007900c31eef]" xmlns="http://symbian.com/xml/build/log" xmlns:progress="http://symbian.com/xml/build/log/progress" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symbian.com/xml/build/log http://symbian.com/xml/build/log/1_0.xsd">
+<whatlog bldinf='G:/sf/mw/svgt/group/bld.inf' mmp='' config=''>
+<export destination='G:/epoc32/include/platform/mw/SVGImageLoadingObserver.h' source='G:/sf/mw/svgt/svgt_plat/svgt_api/inc/SVGImageLoadingObserver.h'/>
+<resource>G:/epoc32/include/hrv_gain_mappings.rsg</resource>
+<build>G:/epoc32/release/armv5/urel/ekeyb.dll</build>
+</whatlog>
+<whatlog bldinf='G:/sf/os/deviceplatformrelease/locfiles/group/set14/bld.inf' mmp='' config=''>
+<archive zipfile='G:/sf/os/deviceplatformrelease/locfiles/data/65.zip'>
+<member>G:/epoc32/include/platform/loc/65/101f6dd6_65.loc</member>
+<member>G:/epoc32/include/platform/loc/65/101f6dd7_65.loc</member>
+</archive>
+</whatlog>
+</buildlog>
