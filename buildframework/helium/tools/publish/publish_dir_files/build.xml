@@ -21,8 +21,9 @@ Description:
 ============================================================================
 -->
 <project name="published.root">
-
-    <property environment="env"/>
+    <description>
+        published.root
+    </description>    
     <property file="build_properties.txt"/>
     <import file="helium/helium.ant.xml"/>
 

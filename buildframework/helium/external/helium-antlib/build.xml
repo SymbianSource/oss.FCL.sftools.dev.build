@@ -20,55 +20,11 @@ Description:
 
 ============================================================================
 -->
-<project name="helium-antlib" default="build" xmlns:au="antlib:org.apache.ant.antunit">
-    <description>Helium Antlib build file.</description>
-    
+<project name="sf" default="build">
     <property environment="env" />
-    
-    <import file="macros.ant.xml" />    
-    
-    
-    <path id="subant.build.files">
-        <fileset dir="." includes="core/build.xml" />
-        <fileset dir="." includes="signaling/build.xml" />
-        <fileset dir="." includes="*/build.xml" />
-    </path>
-
-    
-    <target name="compile" description="Compile class files">
-        <subantPreset target="compile"/>
-    </target>
-    
-    
-    <target name="jar" description="Create jar files">
-        <subantPreset target="jar"/>
-    </target>
-    
-    
-    <target name="build" description="Runs compile and jar">
-        <subantPreset target="build"/>
-    </target>
-    
-    
-    <target name="junit" description="Runs jUnit tests">
-        <subantPreset target="junit"/>
-    </target>
-    
-    
-    <target name="unittest" description="Runs AntUnit tests">
-        <subantPreset target="unittest"/>
-    </target>
-    
-    
-    <target name="test" description="Runs all tests">
-        <subantPreset target="test"/>
-    </target>
-    
-
-    <target name="clean" description="Cleans build outputs">
-        <subantPreset target="clean"/>
-    </target>
-
+    <property name="helium.source.root.dir" location="${ant.file.sf}/.." />
+    <property name="sf.source.root.dir" location="${ant.file.sf}/.." />
+    <import file="${env.BUILDER_HOME}/build.xml"/>
 </project>
 
 

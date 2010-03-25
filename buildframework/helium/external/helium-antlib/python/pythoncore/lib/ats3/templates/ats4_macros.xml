@@ -1,0 +1,147 @@
+<!-- 
+============================================================================ 
+Name        : ats_template.xml
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+
+{% macro ctc_initialization() -%}
+            <task>
+                <type>CreateDirTask</type>
+                <parameters>
+                    <parameter value="{{ atsself.CTC_LOG_DIR }}" name="dir"/>
+                </parameters>
+            </task>
+            <task>
+                <type>NonTestExecuteTask</type>
+                <parameters>
+                    <parameter value="z:\sys\bin\ctcman.exe" name="file" />
+                </parameters>
+            </task>
+{%- endmacro %}
+
+{% macro ctc_finalization(setd) -%}
+            <task>
+                <type>NonTestExecuteTask</type>
+                <parameters>
+                    <parameter value="writelocal" name="parameters" />
+                    <parameter value="z:\sys\bin\ctcman.exe" name="file" />
+                </parameters>
+            </task>
+            <task>
+                <type>NonTestExecuteTask</type>
+                <parameters>
+                    <parameter value="writefile" name="parameters" />
+                    <parameter value="z:\sys\bin\ctcman.exe" name="file" />
+                </parameters>
+            </task>
+            
+            {% if test_plan["ctc_run_process_params"].strip() != "" -%}            
+            <task>
+              <type>FileDownloadTask</type>
+              <parameters>
+                  <parameter name="src" value="{{ atsself.CTC_LOG_DIR }}\ctcdata.txt"/>
+                  <parameter name="dst" value="{{ atsself.ctcnetworkpath(setd, test_plan) }}"/>
+              </parameters>
+            </task>
+            {% endif %}
+            
+            <task>
+              <type>FileDownloadTask</type>
+              <parameters>
+                  <parameter name="src" value="{{ atsself.CTC_LOG_DIR }}\ctcdata.txt"/>
+              </parameters>
+            </task>
+{%- endmacro %}
+
+{% macro generate_runsteps_stif(setd) -%}
+            {% set ini_file = atsself.stif_init_file(setd['src_dst']) %}
+            {% if ini_file -%}
+        <task>
+            <type>StifRunCasesTask</type>
+            <parameters>
+              	<parameter name="filter" value="*"/>
+              	<parameter name="timeout" value="{{ test_plan["test_timeout"] }}"/>
+              	<parameter name="engineini" value="{{ ini_file[1] }}"/>
+            </parameters>
+        </task>
+            {% else %}
+                {% for file in setd['src_dst'] -%}
+                    {% if setd["test_harness"] == "STIF" or setd["test_harness"] == "STIFUNIT" -%}
+                        {% if file[2] == "conf" and ".dll" not in file[1].lower() -%}
+        <task>
+            <type>StifRunCasesTask</type>
+            <parameters>
+              	<parameter name="module" value="TESTSCRIPTER"/>
+              	<parameter name="filter" value="*"/>
+              	<parameter name="timeout" value="{{ test_plan["test_timeout"] }}"/>
+              	<parameter name="testcase-file" value="{{ file[1] }}"/>
+            </parameters>
+        </task>
+                        {% endif %}
+                        {% if file[2] == "testmodule" -%}
+        <task>
+            <type>StifRunCasesTask</type>
+            <parameters>
+              	<parameter name="module" value="{{ os.path.basename(file[1]) }}"/>
+              	<parameter name="filter" value="*"/>
+              	<parameter name="timeout" value="{{ test_plan["test_timeout"] }}"/>
+            </parameters>
+        </task>
+                        {% endif %}
+                    {% endif %}
+                {% endfor -%}
+            {% endif %}
+{%- endmacro %}
+
+
+{% macro generate_runsteps_stif_single_set(setd) -%}
+            {% if setd["engine_ini_file"] != None -%}
+        <task>
+            <type>StifRunCasesTask</type>
+            <parameters>
+              	<parameter name="filter" value="*"/>
+              	<parameter name="timeout" value="{{ test_plan["test_timeout"] }}"/>
+              	<parameter name="engineini" value="c:\testframework\{{ os.path.basename(setd["engine_ini_file"]) }}"/>
+            </parameters>
+        </task>
+            {% elif setd["config_files"] != [] -%}
+                 {% for config_file in setd["config_files"] -%}
+        <task>
+            <type>StifRunCasesTask</type>
+            <parameters>
+              	<parameter name="module" value="TESTSCRIPTER"/>
+              	<parameter name="filter" value="*"/>
+              	<parameter name="timeout" value="{{ test_plan["test_timeout"] }}"/>
+              	<parameter name="testcase-file" value="e:\testing\conf\{{ os.path.basename(config_file) }}"/>
+            </parameters>
+        </task>
+                {% endfor -%}
+            {% else %}
+                {% for testmodule_file in setd["testmodule_files"] -%}
+        <task>
+            <type>StifRunCasesTask</type>
+            <parameters>
+              	<parameter name="module" value="{{ os.path.basename(testmodule_file) }}"/>
+              	<parameter name="filter" value="*"/>
+              	<parameter name="timeout" value="{{ test_plan["test_timeout"] }}"/>
+            </parameters>
+        </task>
+                {% endfor -%}
+            {% endif %}
+{%- endmacro %}

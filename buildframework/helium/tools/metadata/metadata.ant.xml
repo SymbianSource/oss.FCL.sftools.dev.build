@@ -20,6 +20,7 @@ Description:
 
 ============================================================================
 -->
+<!--* @package framework -->
 <project name="metadata" xmlns:hlm="http://www.nokia.com/helium">
     <description>
     Metadata related ant macros and targets
@@ -31,14 +32,15 @@ Description:
         <attribute name="file" />
         <sequential>
             <mkdir dir="@{output-dir}" />
-            <fmpp sourceFile="${helium.dir}/tools/common/templates/log/build_status.xml.ftl"
+            <var name="email.status.template" value="${build.status.email.template}" />
+            <fmpp sourceFile="${helium.dir}/tools/common/templates/log/build_status_orm.xml.ftl"
                          outputfile="@{output-dir}/@{file}.status.xml">
                 <freemarkerLinks expandProperties="yes">
                     macro: ${helium.dir}/tools/common/templates/macro
                 </freemarkerLinks>
                 <data expandProperties="yes">
                     dbPath: @{dbfile}
-                    logfile: @{file}
+                    logpath: @{file}
                     ant: antProperties()
                 </data>
             </fmpp>
@@ -49,7 +51,7 @@ Description:
                 </freemarkerLinks>
                 <data expandProperties="yes">
                     dbPath: @{dbfile}
-                    logfile: @{file}
+                    logpath: @{file}
                     ant: antProperties()
                 </data>
             </fmpp>

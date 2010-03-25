@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- 
+============================================================================ 
+Name        : ats_template.xml
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+Contains the template for the test.xml file output. The test.xml file contains
+information on the files used to create the drop file.
+============================================================================
+-->
+<test>
+    <name>{{ test_plan['testrun_name'] }}</name>
+    <buildid>{{ test_plan['diamonds_build_url'] }}</buildid>
+    <target>
+    {% if test_plan["harness"] == "MULTI_HARNESS" -%}
+        <device alias="DEFAULT_STIF" rank="none">        
+            <property name="HARNESS" value="STIF"/>
+            <property name="TYPE" value="{{ test_plan['device_type'] }}"/>
+            {% if test_plan["device_hwid"] != "" -%}
+            <property name="HWID" value="{{ test_plan["device_hwid"] }}"/>
+            {% endif %}
+        </device>
+        <device alias="DEFAULT_EUNIT" rank="none">        
+            <property name="HARNESS" value="EUNIT"/>
+            <property name="TYPE" value="{{ test_plan['device_type'] }}"/>
+            {% if test_plan["device_hwid"] != "" -%}
+            <property name="HWID" value="{{ test_plan["device_hwid"] }}"/>
+            {% endif %}
+        </device>
+    {% else %}
+        <device alias="DEFAULT_{{ test_plan['harness'] }}" rank="none">        
+            <property name="HARNESS" value="{{ test_plan['harness'] }}"/>
+            <property name="TYPE" value="{{ test_plan['device_type'] }}"/>
+            {% if test_plan["device_hwid"] != "" -%}
+            <property name="HWID" value="{{ test_plan["device_hwid"] }}"/>
+            {% endif %}
+        </device>
+    {% endif %}
+    </target>
+    
+    <plan passrate="100" enabled="true" name="{{ test_plan['testrun_name'] }} Plan" significant="false" harness="{{ test_plan['harness'] }}">
+        <session name="session" harness="{{ test_plan['harness'] }}" enabled="true" passrate="100" significant="false">
+            {% for setd in test_plan.sets -%}
+            <set name="{{ setd["name"] }}-{{ setd["component_path"] }}" harness="{{ test_plan['harness'] }}" enabled="true" passrate="100">
+              <target>
+                  <device alias="DEFAULT_{{ test_plan['harness'] }}" rank="master"/>
+              </target>
+              <case name="{{ setd.name }} case" passrate="100" harness="{{ setd.test_harness }}" enabled="true" significant="false"> 
+              
+              {% if setd["ctc_enabled"] == "True" -%}
+              <step name="Create CTC log dir" harness="{{ setd.test_harness }}" enabled="true" passrate="100" significant="false">
+                  <command>makedir</command>
+                  <params>
+                      <param dir="{{ atsself.CTC_LOG_DIR }}"/>
+                  </params>
+              </step>
+              <step name="CTC start" passrate="100" harness="{{ setd.test_harness }}" enabled="true" significant="false">
+                    <command>execute</command>
+                    <params>
+                        <param file="z:\sys\bin\ctcman.exe"/>
+                    </params>
+              </step>
+              {% endif %}
+              {% if setd.image_files -%}
+                {% for img in setd.image_files -%}
+                <flash target-alias="DEFAULT_{{ setd.test_harness }}" images="ATS3Drop\images\{{ os.path.basename(img) }}" />
+                {% endfor -%}
+              {% endif %}
+              <step name="Create logs folder" harness="{{ setd.test_harness }}" enabled="true" passrate="100" significant="false">
+                  <command>makedir</command>
+                  <params>
+                  {% if setd["test_harness"] == "GENERIC" -%}
+                      {% if atsself.check_mtf_harness(setd) -%}
+                      <param dir="{{ atsself.MTF_LOG_DIR }}"/>
+                      {% else %}
+                      <param dir="{{ atsself.TEF_LOG_DIR }}"/>
+                      {% endif %}
+                  {% endif %}
+                  {% if setd["test_harness"] == "EUNIT" -%}
+                      {% if atsself.check_qt_harness(setd) -%}
+                      <param dir="{{ atsself.QT_LOG_DIR }}"/>
+                      {% else %}
+                      <param dir="{{ atsself.EUNIT_LOG_DIR }}"/>
+                      {% endif %}
+                  {% endif %}
+                  </params>
+              </step>
+              
+              {% for sis_file in setd["sis_files"] -%}
+              <step name="Install sis: {{ os.path.basename(sis_file) }}" harness="{{ setd.test_harness }}" enabled="true" passrate="100" significant="false">
+                    <command>install</command>
+                    <params>
+                        <param src="ATS3Drop\{{ setd.name }}\sis\{{ os.path.basename(sis_file) }}"/>
+                        <param dst="c:\testframework\{{ os.path.basename(sis_file) }}"/>
+                    </params>
+              </step>
+              {% endfor -%}
+              
+              {% for data_file in setd["data_files"] -%}
+              <step name="Install data: {{ os.path.basename(data_file) }}" harness="{{ setd.test_harness }}" enabled="true" passrate="100" significant="false">
+                    <command>install</command>
+                    <params>
+                        <param src="ATS3Drop\{{ setd.name }}\{{ os.path.basename(data_file) }}"/>
+                        <param dst="e:\testing\data"/>
+                    </params>
+              </step>
+              {% endfor -%}
+              {% for data_file in setd["testmodule_files"] -%}
+              <step name="Install testmodule: {{ os.path.basename(data_file) }}" harness="{{ setd.test_harness }}" enabled="true" passrate="100" significant="false">
+                    <command>install</command>
+                    <params>
+                        <param src="ATS3Drop\{{ setd.name }}\{{ os.path.basename(data_file) }}"/>
+                        <param dst="c:\sys\bin"/>
+                    </params>
+              </step>
+              {% endfor -%}
+              {% for data_file in setd["config_files"] -%}
+              <step name="Install conf: {{ os.path.basename(data_file) }}" harness="{{ setd.test_harness }}" enabled="true" passrate="100" significant="false">
+                    <command>install</command>
+                    <params>
+                        <param src="ATS3Drop\{{ setd.name }}\{{ os.path.basename(data_file) }}"/>
+                        <param dst="e:\testing\conf"/>
+                    </params>
+              </step>
+              {% endfor -%}
+              
+              {% if setd.engine_ini_file -%}
+              <step name="Install engine: {{ os.path.basename(setd["engine_ini_file"]) }}" harness="{{ setd.test_harness }}" enabled="true" passrate="100" significant="false">
+                    <command>install</command>
+                    <params>
+                        <param src="ATS3Drop\{{ setd.name }}\{{ os.path.basename(setd["engine_ini_file"]) }}"/>
+                        <param dst="c:\testframework\{{ setd["test_harness"] }}"/>
+                    </params>
+              </step>
+              {% endif %}
+
+              {% for sis_file in setd["sis_files"] -%}
+              <step name="Install SIS to the device: {{ os.path.basename(sis_file) }}" harness="{{ setd.test_harness }}" enabled="true" passrate="100" significant="false">
+                  <command>install-software</command>
+                  <params>
+                      <param timeout="{{ test_plan["test_timeout"] }}"/>
+                      <param overWriteAllowed="true"/>
+                      <param upgradeData="true"/>
+                      <param downloadAllowed="false"/>
+                      <param packageInfoAllowed="true"/>
+                      <param untrustedAllowed="true"/>
+                      <param ignoreOCSPWarnings="true"/>
+                      <param userCapGranted="true"/>
+                      <param optionalItemsAllowed="true"/>
+                      <param killApp="true"/>
+                      <param installDrive="C"/>
+                      <param upgradeAllowed="true"/>
+                      <param OCSP_Done="true"/>
+                      <param sisPackageName="c:\testframework\{{ os.path.basename(sis_file) }}"/>
+                  </params>
+              </step>
+              {% endfor -%}
+               
+              {% if setd.src_dst -%}
+                {% for file in setd.src_dst -%}
+                <step name="Install {{ os.path.basename(file[1]) }}" harness="{{ setd.test_harness }}" enabled="true" passrate="100" significant="false">
+                    <command>install</command>
+                    <params>
+                        <param src="ATS3Drop\{{ setd.name }}\{{ file[1].replace(":","") }}"/>
+                        <param dst="{{ file[1] }}"/>
+                    </params>
+                </step>
+                
+                  {% if setd["test_harness"] == "GENERIC" -%}
+                <step passrate="100" harness="{{ setd.test_harness }}" enabled="true" name="Execute test: {{ os.path.basename(file[1]) }}" significant="false">
+                    <command>execute</command>
+                    <params>
+                      {% if 'testscript' in file[2] -%}
+                          {% if file[2] == "testscript:mtf" -%}
+                      <param file="testframework.exe"/>
+                      <param parser="MTFResultParser"/>
+                      <param result-file="{{ atsself.MTF_LOG_DIR  }}\{{ os.path.basename(file[1]).replace('.script', '.htm') }}"/>
+                          {% else %}
+                      <param file="testexecute.exe"/>
+                      <param parser="TEFTestResultParser"/>
+                      <param result-file="{{ atsself.TEF_LOG_DIR }}\{{ os.path.basename(file[1]).replace('.script', '.htm') }}"/>
+                          {% endif %}
+                      <param parameters="{{ file[1] }}"/>
+                      <param timeout="{{ test_plan["test_timeout"] }}"/>
+                      {% endif %}
+                      
+                      {% if 'testmodule' in file[2] -%}
+                      <param file="{{ file[1] }}"/>
+                      <param parser="RTestResultParser"/>
+                      <param result-file="{{ atsself.TEF_LOG_DIR  }}\{{ os.path.basename(file[1]).replace('.exe', '.htm') }}"/>
+                      <param timeout="{{ test_plan["test_timeout"] }}"/>
+                      {% endif %}
+                    </params>
+                </step>
+                  {% endif %}
+                  {% if setd["test_harness"] == "EUNIT" -%}
+                      {% if file[2] == "testmodule:qt" -%}
+                <step passrate="100" harness="{{ setd.test_harness }}" enabled="true" name="Execute test: {{ os.path.basename(file[1]) }}" significant="false">
+                    <command>execute</command>
+                    <params>
+                      <param file="{{ file[1] }}"/>                      
+                      <param parameters="-lightxml -o {{ atsself.QT_LOG_DIR }}\{{ os.path.basename(file[1]).replace('.' + file[1].rsplit(".")[1], '_log.xml') }}"/>
+                      <param result-file="{{ atsself.QT_LOG_DIR }}\{{ os.path.basename(file[1]).replace('.' + file[1].rsplit(".")[1], '_log.xml') }}"/>
+                      <param parser="QTestResultParser"/>
+                      <param delete-result="true"/>
+                      <param async="false"/>
+                      <param timeout="{{ test_plan["test_timeout"] }}"/>
+                    </params>
+                </step>
+                      {% endif %}
+                  {% endif %}
+                    
+                {% endfor -%}
+              {% endif %}
+                <step passrate="100" harness="{{ setd.test_harness }}" enabled="true" name="Fetch test module logs" significant="false">
+                  <command>fetch-log</command>
+                  <params>
+                    <param type="text"/>
+                    <param delete="true"/>
+                {% if setd["test_harness"] == "GENERIC" -%}
+                    {% if atsself.check_mtf_harness(setd) -%}
+                    <param path="{{ atsself.MTF_LOG_DIR }}\*"/>
+                    {% else %}
+                    <param path="{{ atsself.TEF_LOG_DIR }}\*"/>
+                    {% endif %}
+                {% endif %}
+                {% if setd["test_harness"] == "EUNIT" -%}
+                    {% if atsself.check_qt_harness(setd) -%}
+                    <param path="{{ atsself.QT_LOG_DIR }}\*"/>
+                    {% else %}
+                    <param path="{{ atsself.EUNIT_LOG_DIR }}\*"/>
+                    {% endif %}
+                {% endif %}
+                  </params>
+                </step>
+              </case>
+          </set>
+          {% endfor -%}
+        </session>
+    </plan>
+    
+    {% if test_plan.post_actions %}
+        {% for action_type, parameters in test_plan.post_actions -%}
+    <postAction>
+        <type>{{ action_type }}</type>
+        <params>
+            {% for name, value in parameters -%}
+            <param name="{{ name }}" value="{{ value }}"/>
+            {% endfor -%}
+        </params>
+    </postAction>
+        {% endfor -%}
+    {% endif %}
+  
+    <files>
+        {% for drop_file, _ in atsself.drop_files(test_plan) -%}
+        <file>{{ drop_file }}</file>
+        {% endfor -%}
+    </files>
+  
+</test>

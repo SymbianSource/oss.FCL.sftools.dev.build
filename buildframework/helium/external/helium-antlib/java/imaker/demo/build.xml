@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : build.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="helium-antlib-imaker-demo" xmlns:hlm="http://www.nokia.com/helium">
+    <description>Helium Antlib imaker demo.</description>
+
+    <taskdef resource="com/nokia/helium/imaker/ant/antlib.xml" uri="http://www.nokia.com/helium" />
+
+    <property name="epocroot" location="K:/" />
+    <property name="product" value="?product??" />
+    
+    <hlm:emakeEngine id="imaker.ec">
+        <arg value="--emake-annofile=${epocroot}/imaker.anno.xml"/>
+        <arg value="--emake-autodepend=1"/>
+        <arg value="--emake-annodetail=basic,history,file,waiting"/>                            
+    </hlm:emakeEngine>
+    <hlm:defaultEngine id="imaker.default"/>
+    
+    <property name="imaker.engine" value="default" />
+    
+    <target name="demo-imaker">
+        <hlm:imaker epocroot="${epocroot}" output="${epocroot}/imaker.log" verbose="true" engineRefid="imaker.${imaker.engine}">
+            <hlm:imakerconfigurationset>
+                <hlm:imakerconfiguration>
+                    <makefileset>
+                        <include name="**/${product}/*ui.mk" />
+                    </makefileset>
+                    <targetset>
+                        <include name="core" />
+                        <include name="langpack_01" />
+                    </targetset>
+                    <variableset>
+                        <variable name="USE_FOTI" value="1" />
+                        <variable name="USE_FOTA" value="1" />
+                    </variableset>
+                    <variablegroup>
+                        <variable name="TYPE" value="rnd" />
+                    </variablegroup>
+                    <variablegroup>
+                        <variable name="TYPE" value="subcon" />
+                    </variablegroup>
+                </hlm:imakerconfiguration>
+            </hlm:imakerconfigurationset>
+        </hlm:imaker>
+    </target>
+    
+</project>

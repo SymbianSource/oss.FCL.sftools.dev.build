@@ -116,7 +116,6 @@ public class TextLogRecorderEntry implements LogRecorderEntry, SubBuildListener
     
     public void setFilterSet(LogFilterSet o)
     {
-        System.out.println("setFilterSet: " + o);
         filterset = o;
     }
 

@@ -48,14 +48,11 @@ public final class ToolsProcess {
             log.debug("Found tool" + reqTool);
             return tool;
         } catch (ClassNotFoundException e1) {
-            log.debug("Tool not found exception:", e1);
             throw new ToolsProcessException("tool not supported: " + className);
         } catch (InstantiationException e2) {
-            log.debug("Tool instantiation exception: ", e2);
             throw new ToolsProcessException("tool " + toolClass
                     + "cannot be instantiated");
         } catch (IllegalAccessException e3) {
-            log.debug("Tool illegal access exception: ", e3);
             throw new ToolsProcessException("tool " + toolClass
                     + " cannot be accessed");
         }

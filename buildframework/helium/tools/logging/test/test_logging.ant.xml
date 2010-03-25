@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : test_logging.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test_logging" xmlns:au="org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>
+        Logging testing targets
+    </description>
+    <property environment="env"/>
+    
+    <property name="helium.dir" location="../../.." />
+    <property name="build.drive" location="${env.TEMP}/helium/temp_drive"/>
+    <import file="../../../helium.ant.xml"/>
+    
+                
+    <!--target name="test-tempRecordMacro">
+        <delete file="${build.cache.log.dir}/test.log" failonerror="false"/>
+        <delete file="${build.cache.log.dir}/test.log.xml" failonerror="false"/>
+        <delete file="${build.cache.log.dir}/test.sqlite" failonerror="false"/>
+        <delete file="${metadata.dbfile}" failonerror="false"/>
+        <property name="build.log.dir" value="${build.cache.dir}/helium/temp_drive/output/logs" />
+        <property name="test.log.dir" value="${build.cache.dir}/helium/temp_drive/output/logs/test" />        
+        <hlm:tempRecordStartMacro name="test.log" />
+        <echo>ERROR: an error</echo>
+        <echo>WARNING: a warning</echo>
+        <echo>INFO: some useless message</echo>
+        <hlm:tempRecordStopMacro name="test.log" database="${build.cache.log.dir}/test.sqlite" phase="test"/>
+        <au:assertTrue>
+            <and>
+                <hlm:hasSeverity file="${build.cache.log.dir}/signals/test.log.status.xml" severity="error"/>
+                <hlm:hasSeverity file="${build.cache.log.dir}/signals/test.log.status.xml" severity="warning"/>
+                <hlm:hasSeverity file="${build.cache.log.dir}/signals/test.log.status.xml" severity="info"/>
+            </and>
+        </au:assertTrue>
+    </target-->
+  
+    <!--target name="test-specificlogmacro-create">
+        <hlm:startSpecificLogMacro name="${env.TEMP}/record_test.log" phase="test"/>         
+        <echo>astalavista</echo>
+        <hlm:stopSpecificLogMacro name="${env.TEMP}/record_test.log" phase="test"/>         
+        
+        <au:assertFileExists file="${env.TEMP}/record_test.log"/>
+        
+        <loadfile property="file.message" srcFile="${env.TEMP}/record_test.log"/>               
+        <au:assertTrue message="Failed to match content!!">
+            <equals arg1="${file.message}" arg2="[echo] astalavista" trim="true"/>          
+        </au:assertTrue>        
+        <delete file="${env.TEMP}/record_test.log"/>        
+    </target-->
+    
+   
+    <!--target name="test-specificlogmacro-backup">
+        <touch file="${env.TEMP}/backup_test.log"/>        
+        <echo file="${env.TEMP}/backup_test.log">childhood memory</echo>
+        <hlm:startSpecificLogMacro name="${env.TEMP}/backup_test.log" backup="true" phase="test"/>         
+        <echo>Now a days</echo>        
+        <hlm:stopSpecificLogMacro name="${env.TEMP}/backup_test.log" phase="test"/>                                            
+        
+        <loadfile property="backup.message" srcFile="${backup.file.name}"/>        
+        <au:assertTrue message="Failed to match content!!">
+            <equals arg1="${backup.message}" arg2="childhood memory" trim="true"/>          
+        </au:assertTrue>
+        
+        <loadfile property="current.message" srcFile="${env.TEMP}/backup_test.log"/>               
+        <au:assertTrue message="Failed to match content!!">
+            <equals arg1="${current.message}" arg2="[echo] Now a days" trim="true"/>          
+        </au:assertTrue>
+        
+        <delete file="${env.TEMP}/backup_test.log"/>
+        <delete>
+            <fileset dir="${env.TEMP}" includes="backup_test.log.*"/>
+        </delete>
+    </target-->
+    
+    <target name="test-log4j-log-file">                
+        <au:assertFileExists file="${log4j.cache.dir}/hlm_debug.log" />        
+        <au:assertFileDoesntExist file="hlm_debug.log" />
+    </target>
+    
+     <!-- Check the build-property-cache-file exists or not -->
+    <target name="test-build-property-cache-file-exists">
+        <antcall target="diamonds"/>
+        <au:assertFileExists file="${build.property.cache.file}" />
+    </target>
+    
+    <!-- Check the build-property-cache-file contents-->
+    <target name="test-build-property-cache-file-content">
+        <antcall target="diamonds"/>
+        <loadfile property="test.data" srcFile="${build.property.cache.file}"/>
+        <au:assertMatches string="${test.data}" pattern="diamonds.build.url" />
+    </target>
+    
+    
+</project>
+

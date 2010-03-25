@@ -1,0 +1,4 @@
+
+text.a = text.value.A
+text.b : text.value.B
+text.c : ${text.a}

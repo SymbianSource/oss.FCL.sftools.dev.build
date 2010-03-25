@@ -22,16 +22,20 @@ Description:
 <?xml version="1.0"?>
 <project name="ido-ant-copy" default="all">
     <target name="all">
+        <#list data?keys as component>
+            <mkdir dir="${data[component]}"/>
+        </#list>
         <parallel threadCount="${r'$'}{number.of.threads}">
         <#list data?keys as component>
             <sequential>
-                <mkdir dir="${data[component]}"/>
                 <copy todir="${data[component]}" verbose="false" failonerror="false" overwrite="true">
                     <fileset dir="${component}" casesensitive="false" >
                         <exclude name="**/_ccmwaid.inf"/>
                         <#if (!ant?keys?seq_contains('keep.internals'))>
                         <exclude name="**/internal/**"/>
                         </#if>
+                        <exclude name="**/.hg/**"/>
+                        <exclude name="**/.svn/**"/>
                     </fileset>
                 </copy>
                 <exec executable="attrib" dir="${data[component]}">

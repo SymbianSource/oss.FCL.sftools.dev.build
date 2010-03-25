@@ -23,7 +23,13 @@ Description:
 <project name="internal-api" xmlns:hlm="http://www.nokia.com/helium">
     <description>List and zip up the included files for an IDO build.</description>
 
+    <!-- Location of the prebuild ado header content.
+    @type string
+    -->
     <property name="internal.api.output.prebuild" location="${build.output.dir}/${build.id}_prebuild.dat"/>
+    <!-- Location of the postbuild ado header content.
+    @type string
+    -->
     <property name="internal.api.output.postbuild" location="${build.output.dir}/${build.id}_postbuild.dat"/>
     
     <!-- Default configuration for internal API content scanning -->

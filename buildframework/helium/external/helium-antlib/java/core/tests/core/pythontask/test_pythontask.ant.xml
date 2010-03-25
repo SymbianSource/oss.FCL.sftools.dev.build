@@ -1,0 +1,94 @@
+<?xml version="1.0"?>
+<!-- 
+============================================================================ 
+Name        : test_pythontask.ant.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test-pythontask" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>Helium antlib core ldap tests.</description>
+
+    <typedef name="python" classname="com.nokia.helium.core.ant.taskdefs.PythonTask"/>
+    <taskdef resource="com/nokia/helium/core/ant/antlib.xml" uri="http://www.nokia.com/helium"/>
+    
+    <target name="test-python-task-case-default">
+        <hlm:python>
+import logging
+
+_logger = logging.getLogger('test_pythontask')
+_handler = logging.StreamHandler()
+_handler.setFormatter(logging.Formatter('%(levelname)s: %(message)s'))
+_logger.addHandler(_handler)
+_logger.setLevel(logging.INFO)
+_logger.info("Test python task successful")
+        </hlm:python>
+        <au:assertLogContains text="Test python task successful" level="info"/>
+    </target>
+    
+    <target name="test-python-task-case-outputproperty-set">
+        <hlm:python outputProperty="result">
+print "Testing python task"        
+        </hlm:python>
+        <au:assertEquals expected="Testing python task"
+                      actual="${result}" casesensitive="false"/>
+    </target>
+    
+    <target name="test-python-task-case-failonerror-set">
+        <au:expectfailure>
+            <hlm:python failonerror="true" outputProperty="result">
+import sys
+print "Testing failonerror"
+sys.exit(1)
+            </hlm:python>
+        </au:expectfailure>
+        <au:assertMatches string="${result}" pattern="Testing failonerror" 
+                      casesensitive="false"/>
+    </target>
+    
+    <target name="test-python-task-case-resultproperty-set">
+        <hlm:python resultproperty="result">
+import sys
+print "Testing failonerror"
+sys.exit(1)
+        </hlm:python>
+        <au:assertEquals actual="${result}" expected="1" 
+                      casesensitive="false"/>
+    </target>
+    
+    <target name="test-python-task-case-no-text-set">
+        <hlm:python resultproperty="result"/>
+        <au:assertTrue>
+            <not>
+                <isset property="${result}"/>
+            </not>
+        </au:assertTrue>
+    </target>
+    
+    <target name="test-python-task-case-invalid-script-set">
+        <au:expectfailure expectedmessage="Could not find">
+            <hlm:python failonerror="true" outputProperty="result" script="some_python_script.py"/>
+        </au:expectfailure>            
+    </target>
+
+    <target name="test-python-task-case-valid-script-set">
+        <hlm:python failonerror="true" outputProperty="result" script="./data/test_sample.py"/>
+        <au:assertEquals actual="${result}" expected="Test Sample python file successful" 
+                      casesensitive="false"/>
+    </target>
+    
+</project>

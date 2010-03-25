@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!--
+============================================================================ 
+Name        : ivy.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================  
+-->
+<ivy-module version="2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd">
+    <info
+        organisation="com.nokia.helium"
+        module="pythoncore"
+        status="integration">        
+  </info>
+  <publications>
+      <artifact type="egg"/>
+  </publications>
+  <dependencies>
+      <dependency org="amara" name="amara" rev="latest.integration" conf="default" />
+      <dependency org="lxml" name="lxml" rev="latest.integration" conf="default" />
+      <dependency org="org.apache.commons" name="commons-io" rev="latest.integration" conf="default" />
+      <dependency org="mocker" name="mocker" rev="latest.integration" conf="default" />
+      <dependency org="path" name="path" rev="latest.integration" conf="default" />
+      <dependency org="jinja" name="Jinja2" rev="latest.integration" conf="default" />
+      <dependency org="threadpool" name="threadpool" rev="latest.integration" conf="default" />
+      <dependency org="dom4j" name="dom4j" rev="latest.integration" conf="default" />
+  </dependencies>
+</ivy-module>

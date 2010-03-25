@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<config>
+    <foo>bar</foo>
+    <interpolated>foo value = ${foo}</interpolated>
+    <xml>
+        <c>C</c>
+        <d>D</d>
+    </xml>
+    <array>
+        <value>one</value>
+        <value>two</value>
+        <value>three</value>
+    </array>
+</config>

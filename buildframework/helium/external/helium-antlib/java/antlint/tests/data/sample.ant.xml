@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : test.tabchar.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="Sample" xmlns:hlm="http://www.nokia.com/helium">
+    <description>
+        Testing for tab character
+    </description>
+    
+    <taskdef resource="net/sf/antcontrib/antlib.xml"/>
+   
+    
+    <property name="check-property-name" value="test"/>
+    <property name="helium.build.dir" value="output"/>
+    
+    <presetdef name="check_PresetDef.Name" >
+        <echo>check PresetDef Name </echo>
+    </presetdef>
+    
+    <target name="hello">
+        <echo>Hello Checking Tab Character</echo>
+    </target>
+    
+    <target name="smile" depends="hello">
+        <echo>Print Smile</echo>
+    </target>
+      
+    <target name="Check_target.Name">
+        <echo>Checking target name</echo>
+    </target>  
+    
+    <target name="check-run-target">
+        <runtarget target="smile"/>
+    </target>
+    
+    <target name="check-ant-call">
+        <antcall target="hello"/>
+    </target>
+    
+    <target name="check-script-size">
+        <hlm:python>
+print check-script-size
+print check-script-size
+print check-script-size
+print check-script-size
+print check-script-size
+print check-script-size
+print check-script-size
+print check-script-size
+print check-script-size
+print check-script-size
+print check-script-size
+print check-script-size
+print check-script-size
+print check-script-size
+print check-script-size
+print check-script-size
+print check-script-size
+print check-script-size
+print check-script-size
+print check-script-size
+print check-script-size
+print check-script-size
+print check-script-size
+print check-script-size
+print check-script-size
+print check-script-size
+print check-script-size
+print check-script-size
+print check-script-size
+print check-script-size
+print check-script-size
+print check-script-size
+print check-script-size
+print check-script-size
+print check-script-size
+print check-script-size
+print check-script-size
+print check-script-size
+print check-script-size
+print check-script-size
+print check-script-size
+print check-script-size
+print check-script-size         
+print check-script-size
+print check-script-size
+        </hlm:python>
+    </target>
+    
+    <target name="check-use-of-if-in-targets">
+        <if>
+            <isset property="build.drive"/>
+            <then>
+                <echo> Using build drive ${build.drive} </echo>
+            </then>
+        </if>
+    </target>
+    
+    <target name="check-use-of-if-else-in-targets">
+        <if>
+            <and>
+                <isset property="major.version"/>
+                <isset property="minor.version"/>
+            </and>
+            <then>
+                <property name="core.build.version" value="1.0"/>
+            </then>
+            <else>
+                <property name="core.build.version" value="2.0"/>
+            </else>
+        </if>
+    </target>
+
+    <target name="check-use-of-if-then-in-targets">
+        <if>
+            <and>
+                <isset property="major.version"/>
+                <isset property="minor.version"/>
+            </and>
+            <then>
+                <property name="core.build.version" value="1.0"/>
+            </then>
+        </if>
+    </target>
+
+    <target name="check-prop-in-script">    
+        <script language="jython" setbeans="false">
+result = None
+if project.getProperty("test.script.property")is not None:
+    result = "found"
+        </script>
+    </target>
+
+    <target name="check-prop-in-scriptcondition">
+        <attribute name="phase" default="compile"/>
+        <sequential>
+            <if>
+                <scriptcondition language="jython" value="false">
+errorsTotal = project.getProperty("build.errors.total")
+if int(r'@{error.limit}') > -1:
+    if int(errorsTotal) > int(r'@{error.limit}'):
+        self.setValue(1)
+                </scriptcondition>
+                <then>
+                    <property name="compile.result" value="1"/>
+                </then>
+                <else>
+                    <property name="compile.result" value="0"/>
+                </else>
+            </if>
+        </sequential>
+    </target>
+
+    <target name="check-prop-in-pythontask">    
+        <hlm:python>
+from path import path
+print "Writing version file...."
+vfile = path(r'${build.drive}'+"/").joinpath('s60_version.txt')
+f = open(str(vfile), 'w')
+f.write(path(r'${s60.getenv.path}').name)
+f.close()
+        </hlm:python>   
+    </target>
+
+    <property name="test.boolean1" value="true"/>
+    <property name="test.boolean2" value="yes"/>
+    <property name="test.boolean3" value="yes"/>
+    
+    <target name="check-use-of-equals">
+        <if>
+            <and>
+                <equals arg1="test.boolean1" arg2="true"/>
+                <equals arg1="test.boolean2" arg2="yes"/>
+                <istrue value="test.boolean3"/>
+            </and>               
+            <then>
+                <echo>Equals</echo>
+            </then>
+        </if>
+    </target>
+
+    <target name="check-jython-script">
+        <script language="jython">
+if ${build.drive} is None:
+    print "Not found"        
+        </script>
+    </target>
+    
+    <target name="check-scriptcondition">
+        <attribute name="phase" default="compile"/>
+        <sequential>
+            <if>
+                <scriptcondition language="jython" value="false">
+errorsTotal = ${build.errors.total}
+if int(r'@{error.limit}') > -1:
+    if int(errorsTotal) > int(r'@{error.limit}'):
+        self.setValue(1)
+                </scriptcondition>
+                <then>
+                    <property name="compile.result" value="1"/>
+                </then>
+                <else>
+                    <property name="compile.result" value="0"/>
+                </else>
+            </if>
+        </sequential>
+    </target>
+
+    <target name="check-tabs">
+    	<echo>checking tab characters</echo>
+    </target>
+    
+    <target name="check-indentation">
+        <echo>checking indentation</echo>
+     </target>
+</project>

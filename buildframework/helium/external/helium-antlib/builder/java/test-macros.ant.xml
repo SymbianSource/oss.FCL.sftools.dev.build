@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<!-- 
+============================================================================ 
+Name        : build.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test-macros" xmlns:ivy="antlib:org.apache.ivy.ant" xmlns:au="antlib:org.apache.ant.antunit">
+    <import file="common.ant.xml" />
+  
+    <path id="classpath.anlibs">
+        <fileset dir="${builder.dir}/antlibs" includes="*.jar"/>
+    </path>
+    
+    <fileset id="unittests.filetset" dir="${basedir}" includes="**/test_*.ant.xml" />
+    
+    <target name="antunit">
+        <echo message="${antunit.result.dir}" />
+        <mkdir dir="${antunit.result.dir}" />
+        <au:antunit>
+            <fileset refid="unittests.filetset" />
+            <au:plainlistener logLevel="info"/>
+            <au:xmllistener toDir="${antunit.result.dir}"/>
+        </au:antunit>
+    </target>
+    <target name="unittest" depends="antunit"/>
+    
+</project>

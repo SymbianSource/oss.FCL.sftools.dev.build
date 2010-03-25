@@ -20,6 +20,7 @@ Description:
 
 ============================================================================
 -->
+<!--* @package publishing -->
 <project name="publish.nwiki" xmlns:hlm="http://www.nokia.com/helium">
     <description>
     Publishing to the nwiki
@@ -90,7 +91,7 @@ f = urllib2.urlopen(req)
               - location could be, MBPVancouver for example
     -->
     <target name="create-wiki-bom" depends="remove-build-version-dots,get-nwiki-username,get-nwiki-password" if="publish">
-        <loadfile property="temp-bom-data" srcfile="${build.log.dir}/${build.name}_${build.version}_BOM.txt" failonerror="false">
+        <loadfile property="temp-bom-data" srcfile="${prep.log.dir}/${build.name}_${build.version}_BOM.txt" failonerror="false">
         </loadfile>
         <if>
             <isset property="temp-bom-data" />
@@ -109,7 +110,7 @@ f = urllib2.urlopen(req)
               - location could be, MBPVancouver for example
     -->
     <target name="create-wiki-bom-delta" depends="remove-build-version-dots,get-nwiki-username,get-nwiki-password" if="publish">
-        <loadfile property="temp-bom-delta-data" srcfile="${build.log.dir}/${build.name}_${build.version}_BOM_delta.txt" failonerror="false">
+        <loadfile property="temp-bom-delta-data" srcfile="${prep.log.dir}/${build.name}_${build.version}_BOM_delta.txt" failonerror="false">
         </loadfile>
 
         <if>
@@ -123,6 +124,7 @@ f = urllib2.urlopen(req)
     <!-- Retrieve the NWiki password from the .netrc file and store it into nwiki.password property. -->
     <target name="get-nwiki-password">
         <hlm:netrcPasswordMacro output-prop="nwiki.password" result-prop="nwiki.password.available" type="nwiki" />
+        <hlm:logreplace regexp="${nwiki.password}"/>
     </target>
 
     <!-- Retrieve the NWiki username from the .netrc file and store it into nwiki.username property. -->

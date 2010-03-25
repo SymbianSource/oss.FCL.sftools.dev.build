@@ -16,5 +16,6 @@ rem
 rem Description: 
 rem
 
+set HLM_RVCT_VERSION=22_686
 ..\..\..\..\helium\hlm.bat %*
 

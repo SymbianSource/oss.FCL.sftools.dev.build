@@ -1,0 +1,96 @@
+<?xml version="1.0"?>
+<!-- 
+============================================================================ 
+Name        : build.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test-macros">
+    <import file="../java/common.ant.xml" />
+    <dirname property="python.builder.dir" file="${ant.file.test-macros}" />
+    
+    <target name="unittest" depends="pt,pt-coverage"/>
+    
+    <target name="pt">
+        <pathconvert pathsep=":" property="python.path">
+            <fileset dir="${python.builder.dir}/lib" includes="**/*.egg" excludes="jython*"/>
+            <fileset dir="${lib.dir}" includes="**/*.egg"/>
+            <dirset dir="${lib.dir}"/>
+            <fileset dir="${bin.dir}" includes="**/${ant.project.name}*.egg"/>
+            <dirset dir="${basedir}/lib"/>
+        </pathconvert>
+        <pathconvert pathsep=" " property="python.modules.coverage">
+            <fileset dir="${basedir}" includes="**/*.py"/>
+        </pathconvert>
+        <!---->
+        <exec executable="python" failonerror="true" dir="${lib.dir}">
+            <env key="PYTHONPATH" path="${python.path}" />
+            <arg line="${python.builder.dir}/lib/coverage.py -x ${python.builder.dir}/lib/nosetests-script.py --exe -v ${nose.args}"/>
+        </exec>
+        
+        <script language="jython" setbeans="false">
+import sys
+import os
+import shutil
+for p in project.getProperty('python.path').split(':'):
+    if 'amara' not in p:
+        sys.path.append(p)
+os.chdir(project.getProperty('lib.dir'))
+if os.path.exists('build'):
+    shutil.rmtree('build')
+import nose
+args = project.getProperty('nose.args')
+
+testdir = os.path.join(project.getProperty('basedir'), 'lib', project.getProperty('ant.project.name'))
+
+if ' ' in args:
+    nose.run(argv=['-v', testdir + 'tests'])
+elif 'cpython' not in args:
+    nose.run(argv=['-v', args])
+print >> sys.stderr
+        </script>
+        <delete includeemptydirs="true">
+            <fileset dir="${basedir}/lib" includes="*.egg-info/"/>
+        </delete>
+    </target>
+    
+    <target name="pt-coverage">
+        <mkdir dir="${lib.dir}/../coverage"/>
+        <exec executable="python" failonerror="true" dir="${lib.dir}">
+            <env key="PYTHONPATH" path="${python.path}" />
+            <arg line="${python.builder.dir}/lib/coverage.py -a -d ${lib.dir}/../coverage ${python.modules.coverage}"/>
+        </exec>
+        
+        <mkdir dir="${lib.dir}/../coverage/report"/>
+        <move file="${lib.dir}/../coverage/report/line_coverage.txt" tofile="${lib.dir}/../coverage/report/line_coverage_old.txt" overwrite="true" failonerror="false"/>
+        <record name="${lib.dir}/../coverage/report/line_coverage.txt" action="start"/>
+        <exec executable="python" failonerror="true" dir="${lib.dir}">
+            <env key="PYTHONPATH" path="${python.path}" />
+            <arg line="${python.builder.dir}/lib/coverage.py -r ${python.modules.coverage}"/>
+        </exec>
+        <record name="${lib.dir}/../coverage/report/line_coverage.txt" action="stop"/>
+        
+        <script language="jython" setbeans="false">
+for line in open(project.getProperty('lib.dir') + r'/../coverage/report/line_coverage.txt'):
+    if 'TOTAL' in line and ' 0%' in line:
+        raise Exception('Coverage at 0%')
+        </script>
+        <delete file="${basedir}/.coverage"/>
+    </target>
+    
+</project>

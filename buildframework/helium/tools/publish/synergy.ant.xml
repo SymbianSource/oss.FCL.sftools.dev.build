@@ -20,6 +20,7 @@ Description:
 
 ============================================================================
 -->
+<!--* @package publishing -->
 <project name="publish.synergy" xmlns:hlm="http://www.nokia.com/helium">
     <description>
     Synergy publishing related targets
@@ -27,12 +28,9 @@ Description:
 
     <!-- Validate all the inputs for the publish-tasks-to-folder target. -->
     <target name="publish-tasks-to-folder-check" if="publish.ccm.folder">
-        <if>
-            <available file="${build.log.dir}/${build.id}_bom.xml" />
-            <then>
-                <property name="do.publish-tasks-to-folder" value="true" />
-            </then>
-        </if>
+        <condition property="do.publish-tasks-to-folder" value="true">
+            <available file="${temp.build.dir}/${build.id}_bom.xml" />
+        </condition>
     </target>
 
     <!-- Copies all the task found in the BOM into defined folder. -->
@@ -43,7 +41,7 @@ Description:
                 macro: ${helium.dir}/tools/common/templates/macro
             </freemarkerLinks>
             <data expandProperties="yes">
-                bom: xml(${build.log.dir}/${build.id}_bom.xml)
+                bom: xml(${temp.build.dir}/${build.id}_bom.xml)
                 ant: antProperties()
             </data>
         </fmpp>

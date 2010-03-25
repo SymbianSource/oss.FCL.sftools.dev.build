@@ -20,6 +20,7 @@ Description:
 
 ============================================================================
 -->
+<!--* @package framework -->
 <project name="startup.remote">
     <description>Local actions to setup remote builds.</description>
     

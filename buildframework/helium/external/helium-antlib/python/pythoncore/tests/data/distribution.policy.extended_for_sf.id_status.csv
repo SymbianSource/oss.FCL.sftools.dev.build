@@ -1,0 +1,5 @@
+ID,Include in build?,Regexp,Symbian Foundation License,Eclipse Public License,Supplier,Description,Contact,Other Notes
+0,Yes,Nokia,,,Company1,Open,,
+1,No,Nokia,,,Company1,Private,,
+3,Yes,Public,Yes,No,Company1,XXX,,
+7,Yes,Public,No,Yes,Company1,YYY,,

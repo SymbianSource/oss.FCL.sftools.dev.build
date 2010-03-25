@@ -20,6 +20,7 @@ Description:
 
 ============================================================================
 -->
+<!--* @package quality -->
 <project name="quality.internal-exports" xmlns:hlm="http://www.nokia.com/helium">
     <description>
         Analyse the content generated under the source tree.
@@ -71,8 +72,8 @@ output.close()
         source tree. The files are sorted by components.
     -->
     <target name="integration-internal-exports">
-        <hlm:internalExportsMacro output="${build.log.dir}/${build.id}_internal_exports.xml">
-            <fileset dir="${build.log.dir}">
+        <hlm:internalExportsMacro output="${temp.build.dir}/${build.id}_internal_exports.xml">
+            <fileset dir="${compile.log.dir}">
                 <include name="${build.id}.*_compile.log"/>
                 <exclude name="${build.id}.*_output_build.log"/>
             </fileset>
@@ -88,7 +89,7 @@ output.close()
                 macro: ${helium.dir}/tools/common/templates/macro
             </freemarkerLinks>
             <data expandProperties="yes">
-                doc: xml(${build.log.dir}/${build.id}_internal_exports.xml)
+                doc: xml(${temp.build.dir}/${build.id}_internal_exports.xml)
                 ant: antProperties()
             </data>
         </fmpp>

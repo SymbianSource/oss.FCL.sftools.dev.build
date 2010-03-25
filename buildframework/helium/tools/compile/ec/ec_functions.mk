@@ -70,11 +70,11 @@ MAKEFILE_CMD_LINE:=$(foreach makefile,$(MAKEFILE_LIST), -f $(makefile))
 	@echo === automatic == $*
 	@echo -- bldmake_bldfiles-v-k
 	-@perl -e "print '++ Started at '.localtime().\"\n\""
-	-@perl -e "use Time::HiRes; print '+++ HiRes Start '.Time::HiRes::time().\"\n\";"
+	-@python -c "import time; print '+++ HiRes Start ',time.time();"
 	@echo Error 42 abld command issued when bldmake was not done first
 	@echo Error 42 This is a serious error in your build configuration and must be fixed.
 	@echo Error 42 In this build the error has been fixed automatically.
 	cd $* && bldmake bldfiles -v -k
-	-@perl -e "use Time::HiRes; print '+++ HiRes End '.Time::HiRes::time().\"\n\";"
+	-@python -c "import time; print '+++ HiRes End ',time.time();"
 	-@perl -e "print '++ Finished at '.localtime().\"\n\""
 

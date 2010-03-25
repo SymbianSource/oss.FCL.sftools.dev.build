@@ -29,7 +29,7 @@ public class Task extends DataType {
     
     /**
      * Sets the synergy address.
-     * @param addr string representing the ccm_addr
+     * @param name string representing the ccm_addr
      */
     public void setName(String name) {
         this.name = name;

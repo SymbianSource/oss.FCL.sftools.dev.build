@@ -1,0 +1,837 @@
+<?xml version="1.0"?>
+<!DOCTYPE SystemDefinition SYSTEM "sysdef_1_4_0.dtd" []>
+
+<SystemDefinition name="domain_build" schema="1.4.0">
+
+  <systemModel>
+
+<!-- START: New layer versions -->
+    <layer name="stubs_layer">
+    </layer>    
+
+    <layer name="complementary_layer">
+    </layer>    
+
+    <layer name="app_layer">
+    </layer>    
+
+    <layer name="mw_layer">
+    </layer>    
+
+    <layer name="os_layer">
+    </layer>    
+
+    <layer name="tools_layer">
+    </layer>    
+
+    <layer name="bldmefirst_layer">
+    </layer>
+
+    <layer name="bldmelast_layer">
+    </layer>
+
+    <layer name="addon_layer">
+    </layer>
+
+    <layer name="clean_only_layer">
+    </layer>
+
+    <layer name="bldfirst_mw_layer">
+    </layer>
+
+    <layer name="bldfirst_app_layer">
+    </layer>
+
+    <layer name="api_test_layer">
+    </layer>
+
+    <layer name="unit_test_layer">
+    </layer>
+
+    <layer name="perf_test_layer">
+    </layer>
+
+    <layer name="module_test_layer">
+    </layer>
+
+    <layer name="qt_unit_test_layer">
+    </layer>
+
+
+<!-- END: New layer versions -->
+    
+
+<!-- START: Old layer versions, will be removed at week 8 -->
+    <layer name="s60_stubs_layer">
+    </layer>    
+
+    <layer name="s60_complementary_layer">
+    </layer>    
+
+    <layer name="s60_app_layer">
+    </layer>    
+
+    <layer name="s60_mw_layer">
+    </layer>    
+
+    <layer name="s60_osext_layer">
+    </layer>    
+
+    <layer name="s60_bldmefirst_layer">
+    </layer>
+
+    <layer name="s60_bldmelast_layer">
+    </layer>
+
+    <layer name="mecevo_layer">
+    </layer>    
+<!-- END: Old layer versions, will be removed at week 8 -->
+
+  </systemModel>
+
+
+  <build> 
+    <option name="KEEPGOING" abldOption="-keepgoing" description="Causes make to keepgoing on errors" enable="Y"/>
+<!--    <option name="SAVESPACE" abldOption="-savespace" description="Causes the removal of intermediate files" enable="Y"/> -->
+    <target name="WINS" abldTarget="wins" description="MSVC Compiler"/>
+    <target name="WINS_REL" abldTarget="wins urel" description="MSVC Compiler"/>
+    <target name="WINS_DEB" abldTarget="wins udeb" description="MSVC Compiler"/>
+    <target name="WINSCW" abldTarget="winscw" description="CodeWarrior Compiler"/>
+    <target name="WINSCW_REL" abldTarget="winscw urel" description="CodeWarrior Compiler"/>
+    <target name="WINSCW_DEB" abldTarget="winscw udeb" description="CodeWarrior Compiler"/>
+    <target name="TOOLS" abldTarget="tools" description="MSVC Compiler for Tools"/>
+    <target name="TOOLS_REL" abldTarget="tools rel" description="MSVC Compiler for Tools Release mode only"/>
+    <target name="ARMV5" abldTarget="armv5" description="RVCT Compiler"/>
+    <target name="ARMV5_REL" abldTarget="armv5 urel" description="RVCT Compiler"/>
+    <target name="ARMV5_DEB" abldTarget="armv5 udeb" description="RVCT Compiler"/>
+    <target name="ARMV5_VAR" abldTarget="armv5.variants" description="RVCT Compiler"/>
+    <target name="ARMV5_ONLY" abldTarget="armv5" description="RVCT Compiler"/>
+
+
+    <!-- Aditional Targets -->
+    <target name="CWTOOLS" abldTarget="cwtools" description="CodeWarrior Compiler for Tools"/> <!-- Not supported -->
+    <target name="CWTOOLS_REL" abldTarget="cwtools rel" description="CodeWarrior Compiler for Tools Release mode only"/> <!-- Not supported -->
+    
+    <targetList name="default" description="Main Targets" target="WINSCW ARMV5"/>
+    <targetList name="default_winscw" description="Main Targets" target="WINSCW"></targetList>
+    <targetList name="default_armv5" description="Main Targets" target="ARMV5"/>
+    <targetList name="default_ctc" description="Main Targets" target="ARMV5_REL ARMV5_DEB"/>
+    <targetList name="default_rel" description="Main Targets for rel" target="WINSCW_REL ARMV5_REL"/>
+    <targetList name="default_deb" description="Main Targets for deb" target="WINSCW_DEB ARMV5_DEB"/>
+    <targetList name="default_tools" description="tools Targets" target="TOOLS"/>
+    <targetList name="tools_rel" description="tools Release Targets" target="TOOLS_REL"/>
+    <targetList name="cwtools" description="cwtools Targets" target="CWTOOLS"/>
+    <targetList name="cwtools_rel" description="cwtools Release Targets" target="CWTOOLS_REL"/>
+    <targetList name="armv5_variants" description="Main Targets" target="ARMV5_VAR"/>
+    <targetList name="armv5_only" description="Main Targets" target="ARMV5_ONLY"/>
+    <targetList name="armv5_urel" description="Main Targets" target="ARMV5_REL"/>
+
+   
+    <!--START: New configuration versions -->    
+    
+    <configuration name="build" description="build" filter ="raptor_build,no_stubs,${ido.build.filter}">
+      <layerRef layerName="os_layer"/>     
+      <layerRef layerName="bldfirst_mw_layer"/>
+      <layerRef layerName="bldfirst_app_layer"/>
+      <layerRef layerName="mw_layer"/>
+      <layerRef layerName="complementary_layer"/>
+      <layerRef layerName="app_layer"/>     
+      <layerRef layerName="stubs_layer"/>
+      <layerRef layerName="tools_layer"/>
+      <layerRef layerName="addon_layer"/>
+      
+      <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+      <task><buildLayer command="abld export" unitParallel="Y"/></task>
+      <task><buildLayer command="abld makefile" targetList="default_tools" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld library" targetList="default_tools" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="abld target" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld final" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld -what build" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld -check build" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld makefile" targetList="default_winscw" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld resource" targetList="default_winscw" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="abld library" targetList="default_winscw" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="abld makefile" targetList="default_armv5" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld resource" targetList="default_armv5" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld library" targetList="default_armv5" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="abld target" targetList="default" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld final" targetList="default" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="abld -what build" targetList="default" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld -check build" targetList="default" unitParallel="Y" targetParallel="Y"/></task>
+    </configuration>
+
+    <configuration name="dfs_build" description="armv5.variants build" filter ="raptor_dfs_build,dfs_build,${ido.build.filter}">
+      <layerRef layerName="os_layer"/>     
+      <layerRef layerName="bldfirst_mw_layer"/>
+      <layerRef layerName="bldfirst_app_layer"/>
+      <layerRef layerName="mw_layer"/>
+      <layerRef layerName="complementary_layer"/>
+      <layerRef layerName="app_layer"/>     
+      <layerRef layerName="tools_layer"/>
+      <layerRef layerName="addon_layer"/>
+      <layerRef layerName="ncp_layer"/>
+ 
+      <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+      <task><buildLayer command="abld export" unitParallel="Y"/></task>
+      <task><buildLayer command="abld makefile" targetList="default_tools" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld library" targetList="default_tools" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="abld target" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld final" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld -what build" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld -check build" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld makefile" targetList="armv5_variants" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld resource" targetList="armv5_urel" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld library" targetList="armv5_variants" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="abld target" targetList="armv5_variants" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld final" targetList="armv5_variants" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="abld -what build" targetList="armv5_variants" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld -check build" targetList="armv5_variants" unitParallel="Y" targetParallel="Y"/></task>
+    </configuration>
+
+    <configuration name="dfs_build_armv5_only" description="armv5 build" filter ="raptor_dfs_build_armv5_only,dfs_build,${ido.build.filter}">
+      <layerRef layerName="os_layer"/>     
+      <layerRef layerName="bldfirst_mw_layer"/>
+      <layerRef layerName="bldfirst_app_layer"/>
+      <layerRef layerName="mw_layer"/>
+      <layerRef layerName="complementary_layer"/>
+      <layerRef layerName="app_layer"/>     
+      <layerRef layerName="tools_layer"/>
+      <layerRef layerName="addon_layer"/>
+      <layerRef layerName="ncp_layer"/>
+      
+      <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+      <task><buildLayer command="abld export" unitParallel="Y"/></task>
+      <task><buildLayer command="abld makefile" targetList="default_tools" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld library" targetList="default_tools" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="abld target" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld final" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld -what build" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld -check build" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld makefile" targetList="armv5_only" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld resource" targetList="armv5_only" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld library" targetList="armv5_only" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="abld target" targetList="armv5_only" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld final" targetList="armv5_only" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="abld -what build" targetList="armv5_only" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld -check build" targetList="armv5_only" unitParallel="Y" targetParallel="Y"/></task>
+    </configuration>
+
+    <configuration name="nonhw" description="build" filter ="raptor_nonhw,oem_build,${ido.build.filter}">
+      <layerRef layerName="os_layer"/>     
+      <layerRef layerName="bldfirst_mw_layer"/>
+      <layerRef layerName="bldfirst_app_layer"/>
+      <layerRef layerName="mw_layer"/>
+      <layerRef layerName="complementary_layer"/>
+      <layerRef layerName="app_layer"/>
+      <layerRef layerName="stubs_layer"/>     
+      <layerRef layerName="tools_layer"/>
+      
+      <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+      <task><buildLayer command="abld export" unitParallel="Y"/></task>
+      <task><buildLayer command="abld makefile" targetList="default_tools" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld library" targetList="default_tools" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="abld target" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld final" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld -what build" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld -check build" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld makefile" targetList="default_winscw" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld resource" targetList="default_winscw" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="abld library" targetList="default_winscw" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="abld target" targetList="default_winscw" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld final" targetList="default_winscw" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="abld -what build" targetList="default_winscw" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld -check build" targetList="default_winscw" unitParallel="Y" targetParallel="Y"/></task>
+    </configuration>
+
+    <configuration name="checksource" description="Checksource run" filter ="raptor_checksource,no_stubs,${ido.build.filter}">
+      <layerRef layerName="os_layer"/>     
+      <layerRef layerName="bldfirst_mw_layer"/>
+      <layerRef layerName="bldfirst_app_layer"/>
+      <layerRef layerName="mw_layer"/>
+      <layerRef layerName="complementary_layer"/>
+      <layerRef layerName="app_layer"/>     
+      <layerRef layerName="tools_layer"/>
+      <layerRef layerName="addon_layer"/>
+      
+      <task><buildLayer command="abld -checksource build" targetList="default" unitParallel="Y" targetParallel="Y"/></task>
+    </configuration> 
+
+
+    <configuration name="build_ctc" description="build" filter ="raptor_build_ctc,no_stubs,${ido.build.filter}">
+      <layerRef layerName="os_layer"/>     
+      <layerRef layerName="bldfirst_mw_layer"/>
+      <layerRef layerName="bldfirst_app_layer"/>
+      <layerRef layerName="mw_layer"/>
+      <layerRef layerName="complementary_layer"/>
+      <layerRef layerName="app_layer"/>     
+      <layerRef layerName="stubs_layer"/>
+      <layerRef layerName="tools_layer"/>
+      <layerRef layerName="addon_layer"/>
+
+      <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+      <task><buildLayer command="abld export" unitParallel="Y"/></task>
+      <task><buildLayer command="abld makefile" targetList="default_tools" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld library" targetList="default_tools" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="abld target" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld final" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld -what build" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld -check build" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld makefile" targetList="default_armv5" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld resource" targetList="default_armv5" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld library" targetList="default_armv5" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="ctcwrap -i m abld target" targetList="default_ctc" unitParallel="Y" targetParallel="N"/></task>
+      <task><buildLayer command="abld final" targetList="default_armv5" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="abld -what build" targetList="default_armv5" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld -check build" targetList="default_armv5" unitParallel="Y" targetParallel="Y"/></task>
+    </configuration>
+
+    <configuration name="build_ctc_all" description="build" filter ="raptor_build_ctc_all,no_stubs,${ido.build.filter}">
+      <layerRef layerName="os_layer"/>     
+      <layerRef layerName="bldfirst_mw_layer"/>
+      <layerRef layerName="bldfirst_app_layer"/>
+      <layerRef layerName="mw_layer"/>
+      <layerRef layerName="complementary_layer"/>
+      <layerRef layerName="app_layer"/>     
+      <layerRef layerName="stubs_layer"/>
+      <layerRef layerName="tools_layer"/>
+      <layerRef layerName="addon_layer"/>
+
+      <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+      <task><buildLayer command="abld export" unitParallel="Y"/></task>
+      <task><buildLayer command="abld makefile" targetList="default_tools" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld library" targetList="default_tools" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="abld target" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld final" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld -what build" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld -check build" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld makefile" targetList="default_winscw" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld resource" targetList="default_winscw" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="abld library" targetList="default_winscw" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="abld makefile" targetList="default_armv5" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld resource" targetList="default_armv5" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld library" targetList="default_armv5" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="ctcwrap -i m abld target" targetList="default_ctc" unitParallel="Y" targetParallel="N"/></task>
+      <task><buildLayer command="abld final" targetList="default" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="abld -what build" targetList="default" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld -check build" targetList="default" unitParallel="Y" targetParallel="Y"/></task>
+    </configuration>    
+    
+    <configuration name="os" description="os build" filter="raptor_os">
+      <layerRef layerName="os_layer"/>     
+      <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+      <task><buildLayer command="abld export" unitParallel="Y"/></task>
+      <task><buildLayer command="abld makefile" targetList="default_tools" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld library" targetList="default_tools" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="abld target" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld final" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld -what build" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld -check build" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld makefile" targetList="default_winscw" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld resource" targetList="default_winscw" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="abld library" targetList="default_winscw" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="abld makefile" targetList="default_armv5" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld resource" targetList="default_armv5" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld library" targetList="default_armv5" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="abld target" targetList="default" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld final" targetList="default" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="abld -what build" targetList="default" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld -check build" targetList="default" unitParallel="Y" targetParallel="Y"/></task>
+    </configuration>
+
+    <configuration name="test" description="test build" filter="raptor_test,${ido.build.filter}">
+      <layerRef layerName="api_test_layer"/>     
+      <layerRef layerName="unit_test_layer"/>
+      <layerRef layerName="perf_test_layer"/>        
+      <layerRef layerName="module_test_layer"/>
+      <layerRef layerName="qt_unit_test_layer"/>
+      <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+      <task><buildLayer command="abld test export" unitParallel="Y"/></task>
+      <task><buildLayer command="abld test makefile" targetList="default_tools" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld test library" targetList="default_tools" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="abld test target" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld test final" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld test -what build" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld test -check build" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld test makefile" targetList="default_armv5" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld test resource" targetList="default_armv5" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld test library" targetList="default_armv5" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="abld test target" targetList="default_armv5" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld test final" targetList="default_armv5" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="abld test -what build" targetList="default_armv5" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld test -check build" targetList="default_armv5" unitParallel="Y" targetParallel="Y"/></task>
+    </configuration>
+    
+    <configuration name="test_all" description="test build" filter="raptor_test_all,${ido.build.filter}">
+      <layerRef layerName="api_test_layer"/>     
+      <layerRef layerName="unit_test_layer"/>
+      <layerRef layerName="perf_test_layer"/>        
+      <layerRef layerName="module_test_layer"/>
+      <layerRef layerName="qt_unit_test_layer"/>
+      <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+      <task><buildLayer command="abld test export" unitParallel="Y"/></task>
+      <task><buildLayer command="abld test makefile" targetList="default_tools" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld test library" targetList="default_tools" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="abld test target" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld test final" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld test -what build" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld test -check build" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld test makefile" targetList="default_winscw" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld test resource" targetList="default_winscw" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="abld test library" targetList="default_winscw" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="abld test makefile" targetList="default_armv5" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld test resource" targetList="default_armv5" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld test library" targetList="default_armv5" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="abld test target" targetList="default" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld test final" targetList="default" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="abld test -what build" targetList="default" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld test -check build" targetList="default" unitParallel="Y" targetParallel="Y"/></task>
+    </configuration>
+    
+    <configuration name="bldmefirst" description="bldmefirst part" filter="raptor_bldmefirst">
+      <layerRef layerName="bldmefirst_layer"/>
+      <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+      <task><buildLayer command="abld export" unitParallel="Y"/></task>
+    </configuration>
+
+    <configuration name="bldmelast" description="bldmelast part" filter="raptor_bldmelast">
+      <layerRef layerName="bldmelast_layer"/>
+      <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+      <task><buildLayer command="abld export" unitParallel="Y"/></task>
+    </configuration>
+
+
+    <configuration name="complementary" description="complementary build" filter ="raptor_complementary">
+      <layerRef layerName="complementary_layer"/>
+      <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+      <task><buildLayer command="abld export" unitParallel="Y"/></task>
+      <task><buildLayer command="abld makefile" targetList="default_tools" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld library" targetList="default_tools" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="abld target" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld final" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld -what build" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld -check build" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld makefile" targetList="default_winscw" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld resource" targetList="default_winscw" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="abld library" targetList="default_winscw" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="abld makefile" targetList="default_armv5" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld resource" targetList="default_armv5" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld library" targetList="default_armv5" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="abld target" targetList="default" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld final" targetList="default" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="abld -what build" targetList="default" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld -check build" targetList="default" unitParallel="Y" targetParallel="Y"/></task>
+    </configuration>
+
+
+
+
+    <configuration name="build_clean" description="clean" filter="raptor_build_clean,no_stubs,${ido.build.filter}">
+      <layerRef layerName="os_layer"/>     
+      <layerRef layerName="bldfirst_mw_layer"/>
+      <layerRef layerName="bldfirst_app_layer"/>
+      <layerRef layerName="mw_layer"/>
+      <layerRef layerName="complementary_layer"/>      
+      <layerRef layerName="app_layer"/> 
+      <layerRef layerName="stubs_layer"/>
+      <layerRef layerName="tools_layer"/>
+      <layerRef layerName="clean_only_layer"/>
+      <layerRef layerName="addon_layer"/>
+      <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+      <task><buildLayer command="abld makefile" targetList="default_tools" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld reallyclean" targetList="default_tools" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld makefile" targetList="default" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld reallyclean" targetList="default" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="bldmake clean" unitParallel="Y"/></task>
+    </configuration>
+
+    <configuration name="dfs_build_clean" description="clean" filter="raptor_dfs_build_clean,dfs_build,${ido.build.filter}">
+      <layerRef layerName="os_layer"/>     
+      <layerRef layerName="bldfirst_mw_layer"/>
+      <layerRef layerName="bldfirst_app_layer"/>
+      <layerRef layerName="mw_layer"/>
+      <layerRef layerName="complementary_layer"/>      
+      <layerRef layerName="app_layer"/> 
+      <layerRef layerName="tools_layer"/>
+      <layerRef layerName="clean_only_layer"/>
+      <layerRef layerName="addon_layer"/>
+      <layerRef layerName="ncp_layer"/>
+      <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+      <task><buildLayer command="abld makefile" targetList="default_tools" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld reallyclean" targetList="default_tools" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld makefile" targetList="default_armv5" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld reallyclean" targetList="default_armv5" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="bldmake clean" unitParallel="Y"/></task>
+    </configuration>
+
+    <configuration name="dfs_build_armv5_only_clean" description="clean" filter="raptor_dfs_build_armv5_only_clean,dfs_build,${ido.build.filter}">
+      <layerRef layerName="os_layer"/>     
+      <layerRef layerName="bldfirst_mw_layer"/>
+      <layerRef layerName="bldfirst_app_layer"/>
+      <layerRef layerName="mw_layer"/>
+      <layerRef layerName="complementary_layer"/>      
+      <layerRef layerName="app_layer"/> 
+      <layerRef layerName="tools_layer"/>
+      <layerRef layerName="clean_only_layer"/>
+      <layerRef layerName="addon_layer"/>
+      <layerRef layerName="ncp_layer"/>
+      <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+      <task><buildLayer command="abld makefile" targetList="default_tools" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld reallyclean" targetList="default_tools" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld makefile" targetList="default_armv5" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld reallyclean" targetList="default_armv5" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="bldmake clean" unitParallel="Y"/></task>
+    </configuration>
+
+    <configuration name="nonhw_clean" description="clean" filter="raptor_nonhw_clean,oem_build,${ido.build.filter}">
+      <layerRef layerName="os_layer"/>     
+      <layerRef layerName="bldfirst_mw_layer"/>
+      <layerRef layerName="bldfirst_app_layer"/>
+      <layerRef layerName="mw_layer"/>
+      <layerRef layerName="complementary_layer"/>
+      <layerRef layerName="app_layer"/> 
+      <layerRef layerName="tools_layer"/>
+      <layerRef layerName="clean_only_layer"/>
+      <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+      <task><buildLayer command="abld makefile" targetList="default_tools" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld reallyclean" targetList="default_tools" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld makefile" targetList="default_winscw" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld reallyclean" targetList="default_winscw" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="bldmake clean" unitParallel="Y"/></task>
+    </configuration>
+
+    <configuration name="stubs_clean" description="stubs clean" filter="raptor_stubs_clean,oem_build,${ido.build.filter}">
+      <layerRef layerName="stubs_layer"/>
+      <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+      <task><buildLayer command="abld makefile" targetList="default_tools" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld reallyclean" targetList="default_tools" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld makefile" targetList="default_winscw" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld reallyclean" targetList="default_winscw" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="bldmake clean" unitParallel="Y"/></task>
+    </configuration>
+
+    <configuration name="build_ctc_clean" description="clean" filter="raptor_build_ctc_clean,no_stubs,${ido.build.filter}">
+      <layerRef layerName="os_layer"/>     
+      <layerRef layerName="bldfirst_mw_layer"/>
+      <layerRef layerName="bldfirst_app_layer"/>
+      <layerRef layerName="mw_layer"/>
+      <layerRef layerName="complementary_layer"/>      
+      <layerRef layerName="app_layer"/> 
+      <layerRef layerName="stubs_layer"/>
+      <layerRef layerName="tools_layer"/>
+      <layerRef layerName="clean_only_layer"/>
+      <layerRef layerName="addon_layer"/>
+      <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+      <task><buildLayer command="abld makefile" targetList="default_tools" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld reallyclean" targetList="default_tools" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld makefile" targetList="default_armv5" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld reallyclean" targetList="default_armv5" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="bldmake clean" unitParallel="Y"/></task>
+    </configuration>
+
+    <configuration name="build_ctc_all_clean" description="clean" filter="raptor_build_ctc_all_clean,no_stubs,${ido.build.filter}">
+      <layerRef layerName="os_layer"/>     
+      <layerRef layerName="bldfirst_mw_layer"/>
+      <layerRef layerName="bldfirst_app_layer"/>
+      <layerRef layerName="mw_layer"/>
+      <layerRef layerName="complementary_layer"/>      
+      <layerRef layerName="app_layer"/> 
+      <layerRef layerName="stubs_layer"/>
+      <layerRef layerName="tools_layer"/>
+      <layerRef layerName="clean_only_layer"/>
+      <layerRef layerName="addon_layer"/>
+      <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+      <task><buildLayer command="abld makefile" targetList="default_tools" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld reallyclean" targetList="default_tools" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld makefile" targetList="default" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld reallyclean" targetList="default" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="bldmake clean" unitParallel="Y"/></task>
+    </configuration>
+
+    
+    <configuration name="os_clean" description="os clean" filter="raptor_os_clean">
+      <layerRef layerName="os_layer"/>
+      <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+      <task><buildLayer command="abld makefile" targetList="default_tools" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld reallyclean" targetList="default_tools" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld makefile" targetList="default" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld reallyclean" targetList="default" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="bldmake clean" unitParallel="Y"/></task>
+    </configuration>
+
+    <configuration name="test_clean" description="os clean" filter="raptor_test_clean">
+      <layerRef layerName="api_test_layer"/>     
+      <layerRef layerName="unit_test_layer"/>
+      <layerRef layerName="perf_test_layer"/>
+      <layerRef layerName="module_test_layer"/>    
+      <layerRef layerName="qt_unit_test_layer"/>
+      <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+      <task><buildLayer command="abld test makefile" targetList="default_tools" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld test reallyclean" targetList="default_tools" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld test makefile" targetList="default_armv5" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld test reallyclean" targetList="default_armv5" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="bldmake clean" unitParallel="Y"/></task>
+    </configuration>
+
+    <configuration name="test_all_clean" description="os clean" filter="raptor_test_all_clean">
+      <layerRef layerName="api_test_layer"/>     
+      <layerRef layerName="unit_test_layer"/>
+      <layerRef layerName="perf_test_layer"/>
+      <layerRef layerName="module_test_layer"/>    
+      <layerRef layerName="qt_unit_test_layer"/>
+      <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+      <task><buildLayer command="abld test makefile" targetList="default_tools" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld test reallyclean" targetList="default_tools" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld test makefile" targetList="default" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld test reallyclean" targetList="default" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="bldmake clean" unitParallel="Y"/></task>
+    </configuration>
+
+    <configuration name="bldmefirst_clean" description="bldmefirst clean" filter="raptor_bldmefirst_clean">
+      <layerRef layerName="bldmefirst_layer"/>
+      <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+      <task><buildLayer command="abld reallyclean" targetList="default_tools" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld reallyclean" targetList="default" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="bldmake clean" unitParallel="Y"/></task>
+    </configuration>
+
+    <configuration name="bldmelast_clean" description="bldmelast clean" filter="raptor_bldmelast_clean">
+      <layerRef layerName="bldmelast_layer"/>
+      <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+      <task><buildLayer command="abld reallyclean" targetList="default_tools" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld reallyclean" targetList="default" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="bldmake clean" unitParallel="Y"/></task>
+    </configuration>
+
+    <configuration name="complementary_clean" description="complementary build clean" filter ="raptor_complementary_clean">
+      <layerRef layerName="complementary_layer"/>
+      <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+      <task><buildLayer command="abld reallyclean" targetList="default_tools" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld reallyclean" targetList="default" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="bldmake clean" unitParallel="Y"/></task>
+    </configuration>
+
+    <!--END: New configuration versions -->    
+
+
+    <!--START: Old configuration versions, will be removed at week 8 -->    
+    
+    <configuration name="s60_build" description="S60 build" filter ="raptor_s60_build,no_stubs,${ido.s60_build.filter}">
+      <layerRef layerName="s60_osext_layer"/>     
+      <layerRef layerName="s60_mw_layer"/>
+      <layerRef layerName="s60_complementary_layer"/>
+      <layerRef layerName="s60_app_layer"/>     
+      <layerRef layerName="s60_stubs_layer"/>
+      <layerRef layerName="s60_tools_layer"/>
+      <layerRef layerName="addon_layer"/>
+      <layerRef layerName="mecevo_layer"/>
+      
+      <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+      <task><buildLayer command="abld export" unitParallel="Y"/></task>
+      <task><buildLayer command="abld makefile" targetList="default_tools" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld library" targetList="default_tools" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="abld target" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld final" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld -what build" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld -check build" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld makefile" targetList="default_winscw" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld resource" targetList="default_winscw" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="abld library" targetList="default_winscw" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="abld makefile" targetList="default_armv5" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld resource" targetList="default_armv5" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld library" targetList="default_armv5" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="abld target" targetList="default" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld final" targetList="default" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="abld -what build" targetList="default" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld -check build" targetList="default" unitParallel="Y" targetParallel="Y"/></task>
+    </configuration>
+
+    <configuration name="s60_build_ctc" description="S60 build" filter ="raptor_s60_build_ctc,no_stubs,${ido.s60_build.filter}">
+      <layerRef layerName="s60_osext_layer"/>     
+      <layerRef layerName="s60_mw_layer"/>
+      <layerRef layerName="s60_complementary_layer"/>
+      <layerRef layerName="s60_app_layer"/>     
+      <layerRef layerName="s60_stubs_layer"/>
+      <layerRef layerName="s60_tools_layer"/>
+      <layerRef layerName="addon_layer"/>
+      <layerRef layerName="mecevo_layer"/>
+            
+      <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+      <task><buildLayer command="abld export" unitParallel="Y"/></task>
+      <task><buildLayer command="abld makefile" targetList="default_tools" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld library" targetList="default_tools" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="abld target" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld final" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld -what build" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld -check build" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld makefile" targetList="default_winscw" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld resource" targetList="default_winscw" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="abld library" targetList="default_winscw" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="abld makefile" targetList="default_armv5" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld resource" targetList="default_armv5" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld library" targetList="default_armv5" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="ctcwrap -i m abld target" targetList="default_ctc" unitParallel="Y" targetParallel="N"/></task>
+      <task><buildLayer command="abld final" targetList="default" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="abld -what build" targetList="default" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld -check build" targetList="default" unitParallel="Y" targetParallel="Y"/></task>
+    </configuration>
+    
+    
+    <configuration name="s60_osext" description="S60 osext build" filter="raptor_s60_osext">
+      <layerRef layerName="s60_osext_layer"/>     
+      <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+      <task><buildLayer command="abld export" unitParallel="Y"/></task>
+      <task><buildLayer command="abld makefile" targetList="default_tools" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld library" targetList="default_tools" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="abld target" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld final" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld -what build" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld -check build" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld makefile" targetList="default_winscw" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld resource" targetList="default_winscw" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="abld library" targetList="default_winscw" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="abld makefile" targetList="default_armv5" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld resource" targetList="default_armv5" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld library" targetList="default_armv5" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="abld target" targetList="default" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld final" targetList="default" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="abld -what build" targetList="default" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld -check build" targetList="default" unitParallel="Y" targetParallel="Y"/></task>
+    </configuration>
+    
+    <configuration name="s60_test" description="S60 test build" filter="raptor_s60_test,${ido.s60_build.filter}">
+      <layerRef layerName="s60_api_test_layer"/>     
+      <layerRef layerName="s60_unit_test_layer"/>
+      <layerRef layerName="s60_perf_test_layer"/>        
+      <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+      <task><buildLayer command="abld test export" unitParallel="Y"/></task>
+      <task><buildLayer command="abld test makefile" targetList="default_tools" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld test library" targetList="default_tools" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="abld test target" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld test final" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld test -what build" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld test -check build" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld test makefile" targetList="default_winscw" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld test resource" targetList="default_winscw" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="abld test library" targetList="default_winscw" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="abld test makefile" targetList="default_armv5" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld test resource" targetList="default_armv5" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld test library" targetList="default_armv5" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="abld test target" targetList="default" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld test final" targetList="default" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="abld test -what build" targetList="default" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld test -check build" targetList="default" unitParallel="Y" targetParallel="Y"/></task>
+    </configuration>
+    
+    <configuration name="s60_bldmefirst" description="S60 bldmefirst part" filter="raptor_s60_bldmefirst">
+      <layerRef layerName="s60_bldmefirst_layer"/>
+      <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+      <task><buildLayer command="abld export" unitParallel="Y"/></task>
+    </configuration>
+
+    <configuration name="s60_bldmelast" description="S60 bldmelast part" filter="raptor_s60_bldmelast">
+      <layerRef layerName="s60_bldmelast_layer"/>
+      <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+      <task><buildLayer command="abld export" unitParallel="Y"/></task>
+    </configuration>
+
+
+    <configuration name="s60_complementary" description="S60 complementary build" filter ="raptor_s60_complementary">
+      <layerRef layerName="s60_complementary_layer"/>
+      <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+      <task><buildLayer command="abld export" unitParallel="Y"/></task>
+      <task><buildLayer command="abld makefile" targetList="default_tools" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld library" targetList="default_tools" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="abld target" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld final" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld -what build" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld -check build" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld makefile" targetList="default_winscw" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld resource" targetList="default_winscw" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="abld library" targetList="default_winscw" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="abld makefile" targetList="default_armv5" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld resource" targetList="default_armv5" unitParallel="N" targetParallel="Y"/></task>
+      <task><buildLayer command="abld library" targetList="default_armv5" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="abld target" targetList="default" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld final" targetList="default" unitParallel="N" targetParallel="N"/></task>
+      <task><buildLayer command="abld -what build" targetList="default" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld -check build" targetList="default" unitParallel="Y" targetParallel="Y"/></task>
+    </configuration>
+
+
+
+
+    <configuration name="s60_build_clean" description="S60 clean" filter="raptor_s60_build_clean,no_stubs,${ido.s60_build.filter}">
+      <layerRef layerName="s60_osext_layer"/>     
+      <layerRef layerName="s60_mw_layer"/>
+      <layerRef layerName="s60_complementary_layer"/>      
+      <layerRef layerName="s60_app_layer"/> 
+      <layerRef layerName="s60_stubs_layer"/>
+      <layerRef layerName="s60_tools_layer"/>
+      <layerRef layerName="s60_clean_only_layer"/>
+      <layerRef layerName="addon_layer"/>
+      <layerRef layerName="mecevo_layer"/>
+      <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+      <task><buildLayer command="abld makefile" targetList="default_tools" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld reallyclean" targetList="default_tools" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld makefile" targetList="default" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld reallyclean" targetList="default" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="bldmake clean" unitParallel="Y"/></task>
+    </configuration>
+
+    <configuration name="s60_build_ctc_clean" description="S60 clean" filter="raptor_s60_build_ctc_clean,no_stubs,${ido.s60_build.filter}">
+      <layerRef layerName="s60_osext_layer"/>     
+      <layerRef layerName="s60_mw_layer"/>
+      <layerRef layerName="s60_complementary_layer"/>      
+      <layerRef layerName="s60_app_layer"/> 
+      <layerRef layerName="s60_stubs_layer"/>
+      <layerRef layerName="s60_tools_layer"/>
+      <layerRef layerName="s60_clean_only_layer"/>
+      <layerRef layerName="addon_layer"/>
+      <layerRef layerName="mecevo_layer"/>
+      <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+      <task><buildLayer command="abld makefile" targetList="default_tools" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld reallyclean" targetList="default_tools" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld makefile" targetList="default" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld reallyclean" targetList="default" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="bldmake clean" unitParallel="Y"/></task>
+    </configuration>
+    
+    <configuration name="s60_osext_clean" description="S60 osext clean" filter="raptor_s60_osext_clean">
+      <layerRef layerName="s60_osext_layer"/>     
+      <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+      <task><buildLayer command="abld makefile" targetList="default_tools" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld reallyclean" targetList="default_tools" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld makefile" targetList="default" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld reallyclean" targetList="default" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="bldmake clean" unitParallel="Y"/></task>
+    </configuration>
+
+    <configuration name="s60_bldmefirst_clean" description="S60 bldmefirst clean" filter="raptor_s60_bldmefirst_clean">
+      <layerRef layerName="s60_bldmefirst_layer"/>
+      <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+      <task><buildLayer command="abld reallyclean" targetList="default_tools" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld reallyclean" targetList="default" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="bldmake clean" unitParallel="Y"/></task>
+    </configuration>
+
+    <configuration name="s60_bldmelast_clean" description="S60 bldmelast clean" filter="raptor_s60_bldmelast_clean">
+      <layerRef layerName="s60_bldmelast_layer"/>
+      <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+      <task><buildLayer command="abld reallyclean" targetList="default_tools" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld reallyclean" targetList="default" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="bldmake clean" unitParallel="Y"/></task>
+    </configuration>
+
+    <configuration name="s60_complementary_clean" description="S60 complementary build clean" filter ="raptor_s60_complementary_clean">
+      <layerRef layerName="s60_complementary_layer"/>
+      <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+      <task><buildLayer command="abld reallyclean" targetList="default_tools" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="abld reallyclean" targetList="default" unitParallel="Y" targetParallel="Y"/></task>
+      <task><buildLayer command="bldmake clean" unitParallel="Y"/></task>
+    </configuration>
+
+<!--END: Old configuration versions, will be removed at week 8 -->    
+
+  </build>
+
+</SystemDefinition>

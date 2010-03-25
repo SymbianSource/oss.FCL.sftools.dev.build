@@ -1,0 +1,595 @@
+<?xml version="1.0"?>
+<!-- 
+============================================================================ 
+Name        : test_regex.ant.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test-metadata-regex" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>Helium Antlib metadata unittests.</description>
+
+    <property environment="env" />
+    
+    <dirname property="project.dir" file="${ant.file.test-metadata-regex}" />
+    
+    <taskdef resource="com/nokia/helium/metadata/ant/antlib.xml" uri="http://www.nokia.com/helium" />
+    <taskdef name="fmpp" classname="fmpp.tools.AntTask" onerror="report"/>
+
+    <property name="metadata-filterfile" value="${project.dir}/../data/common.csv"/>
+    <property name="metadata-log-files" value="${project.dir}/../data/*.log"/>
+    
+    <hlm:metadatafilterset id="all-regex-filterfile">
+        <metadatafilterset filterfile="${metadata-filterfile}" />
+    </hlm:metadatafilterset>
+
+    <!-- Test categorization for sbs scanlog
+    -->
+    <target name="test-categorization">
+        <delete dir="${project.dir}/../output/categorization_db" failonerror="false" />
+        <echo message="categorization validation" />
+        <hlm:metadatarecord database="${project.dir}/../output/categorization_db">
+            <hlm:sbsmetadatainput cleanLogFile="${project.dir}/../data/categorization_clean.log">
+                <fileset dir="${project.dir}/../data/">
+                    <include  name="categorization.log"/>
+                </fileset>
+                <metadatafilterset refid="all-regex-filterfile" />
+            </hlm:sbsmetadatainput>
+        </hlm:metadatarecord>
+        <hlm:metadataCountSeverity severity="error" log="categorization.log" db="${project.dir}/../output/categorization_db" property="cleanlog_errors"/>
+        <au:assertTrue>
+            <equals arg1="${cleanlog_errors}" arg2="2"/>
+        </au:assertTrue>
+    </target>
+    <!-- Test parser error
+    -->
+    <target name="test-parser-error">
+        <delete dir="${project.dir}/../output/parser_error_db" failonerror="false" />
+        <au:expectfailure>
+            <hlm:metadatarecord database="${project.dir}/../output/parser_error_db">
+                <hlm:sbsmetadatainput>
+                    <fileset dir="${project.dir}/../data/">
+                        <include  name="parser_error.log"/>
+                    </fileset>
+                    <metadatafilterset refid="all-regex-filterfile" />
+                </hlm:sbsmetadatainput>
+            </hlm:metadatarecord>
+        </au:expectfailure>
+    </target>
+    <!-- Test parser error
+    -->
+    <target name="test-parser-error-keepgoing">
+        <delete dir="${project.dir}/../output/parser_error_db" failonerror="false" />
+        <hlm:metadatarecord database="${project.dir}/../output/parser_error_db" failonerror="false">
+            <hlm:sbsmetadatainput>
+                <fileset dir="${project.dir}/../data/">
+                    <include  name="parser_error.log"/>
+                </fileset>
+                <metadatafilterset refid="all-regex-filterfile" />
+            </hlm:sbsmetadatainput>
+        </hlm:metadatarecord>
+    </target>
+    <!-- Test categorization without cleanLogFile
+    -->
+    <target name="test-categorization-nocleanlog">
+        <delete dir="${project.dir}/../output/categorization_no_clean_db" failonerror="false" />
+        <echo message="categorization validation" />
+        <hlm:metadatarecord database="${project.dir}/../output/categorization_no_clean_db">
+            <hlm:sbsmetadatainput>
+                <fileset dir="${project.dir}/../data/">
+                    <include  name="categorization.log"/>
+                </fileset>
+                <metadatafilterset refid="all-regex-filterfile" />
+            </hlm:sbsmetadatainput>
+        </hlm:metadatarecord>
+        <hlm:metadataCountSeverity severity="error" log="categorization.log" db="${project.dir}/../output/categorization_no_clean_db" property="nocleanlog_errors"/>
+        <au:assertTrue>
+            <equals arg1="${nocleanlog_errors}" arg2="1"/>
+        </au:assertTrue>
+    </target>
+    
+    <target name="test-categorization-nocleanlog-failed-empty-recipe">
+        <delete dir="${project.dir}/../output/log-entry-failed-empty-recipe_db" failonerror="false" />
+        <echo message="categorization validation" />
+        <hlm:metadatarecord database="${project.dir}/../output/log-entry-failed-empty-recipe_db">
+            <hlm:sbsmetadatainput>
+                <fileset dir="${project.dir}/../data/">
+                    <include  name="categorization_failed_empty_recipe.log"/>
+                </fileset>
+                <metadatafilterset refid="all-regex-filterfile" />
+            </hlm:sbsmetadatainput>
+        </hlm:metadatarecord>
+        <hlm:metadataCountSeverity severity="error" log="categorization_failed_empty_recipe.log" db="${project.dir}/../output/log-entry-failed-empty-recipe_db" property="empty_nocleanlog_errors"/>
+        <au:assertTrue>
+            <equals arg1="${empty_nocleanlog_errors}" arg2="1"/>
+        </au:assertTrue>
+    </target>
+
+    <target name="test-categorization-nocleanlog-failed-error-in-recipe">
+        <delete dir="${project.dir}/../output/log-entry-failed-error-in-recipe_db" failonerror="false" />
+        <echo message="categorization validation" />
+        <hlm:metadatarecord database="${project.dir}/../output/log-entry-failed-error-in-recipe_db">
+            <hlm:sbsmetadatainput>
+                <fileset dir="${project.dir}/../data/">
+                    <include  name="categorization_failed_error_in_recipe.log"/>
+                </fileset>
+                <metadatafilterset refid="all-regex-filterfile" />
+            </hlm:sbsmetadatainput>
+        </hlm:metadatarecord>
+        <hlm:metadataCountSeverity severity="error" log="categorization_failed_error_in_recipe.log" db="${project.dir}/../output/log-entry-failed-error-in-recipe_db" property="empty_nocleanlog_errors"/>
+        <au:assertTrue>
+            <equals arg1="${empty_nocleanlog_errors}" arg2="1"/>
+        </au:assertTrue>
+    </target>
+
+<!-- 
+    <target name="test-log-entry-for-no-errors">
+        <delete dir="${project.dir}/../output/log-entry-for-no-error_db" failonerror="false" />
+        <echo message="categorization validation" />
+        <hlm:metadatarecord database="${project.dir}/../output/log-entry-for-no-error_db">
+            <hlm:sbsmetadatainput>
+                <fileset dir="${project.dir}/../data/">
+                    <include  name="noerror.log"/>
+                </fileset>
+                <metadatafilterset refid="all-regex-filterfile" />
+            </hlm:sbsmetadatainput>
+        </hlm:metadatarecord>
+        <fmpp sourceFile="${project.dir}/../../src/templates/general_category.txt.ftl"
+                     outputfile="${project.dir}/../output/general_category.txt">
+            <freemarkerLinks expandProperties="yes">
+                macro: ${project.dir}/../../src/templates/macro
+            </freemarkerLinks>
+            <data expandProperties="yes">
+                dbPath: ${project.dir}/../output/log-entry-for-no-error_db
+                ant: antProperties()
+            </data>
+        </fmpp>
+        <au:assertFileExists file="${project.dir}/../output/general_category.txt" message="Error in test cases"/>
+        <loadfile property="logEntry"
+              srcFile="${project.dir}/../output/general_category.txt"/>
+        <au:assertMatches string="${logEntry}" pattern="component : general : logfile : " 
+                     casesensitive="false"/>
+    </target>
+    -->
+    <!-- Check for all the regular expression defined in the filter file,
+    The log file contains text for matching regular expression.
+    -->
+    <target name="test-all-regex-filterfile">
+        <property name="metadata-read-db" value="${project.dir}/../output/log_all_filterfile_db"/>
+        <delete dir="${metadata-read-db}" failonerror="false"/>
+        <echo message="all regular expression validation" />
+        <echo message="database:${metadata-read-db}" />
+        <!-- do some checks that files are present and raise asserts if not present-->
+        <au:assertFileExists file="${metadata-filterfile}" message="${metadata-filterfile} filter file does not exist"/>
+        <mkdir dir="${project.dir}/../output"/>
+        
+        <hlm:metadatarecord database="${metadata-read-db}">
+            <hlm:sbsmetadatainput>
+                <fileset dir="${project.dir}/../data/">
+                    <include  name="*regex*.log"/>
+                </fileset>
+                <metadatafilterset refid="all-regex-filterfile" />
+            </hlm:sbsmetadatainput>
+        </hlm:metadatarecord>
+        <!-- check we have created the DB file-->
+        <au:assertTrue>
+            <available type="dir" file="${metadata-read-db}" />
+        </au:assertTrue>
+    </target>
+
+    <!-- To verify some lengthy text for recipe tag from 
+    sbs metadata input.
+    -->
+    <target name="test-recipe-lengthy-text">
+        <property name="metadata-read-db" value="${project.dir}/../output/log_lengthy_text_db"/>
+        <au:assertFileExists file="${metadata-filterfile}" message="${metadata-filterfile} filter file does not exist"/>
+        <delete dir="${metadata-read-db}" failonerror="false"/>
+        <echo message="all regular expression validation" />
+        <echo message="database:${metadata-read-db}" />
+        <hlm:metadatarecord database="${metadata-read-db}">
+            <hlm:sbsmetadatainput>
+                <fileset dir="${project.dir}/../data/">
+                    <include  name="receipe*.log"/>
+                </fileset>
+                <metadatafilterset refid="all-regex-filterfile" />
+            </hlm:sbsmetadatainput>
+        </hlm:metadatarecord>
+        <au:assertTrue>
+            <available type="dir" file="${metadata-read-db}" />
+        </au:assertTrue>
+    </target>
+
+    <!--modify the errors so regex=".*warning U4010" description="mingw error" is no longer 
+    an error but a warning-->
+    <hlm:metadatafilterset id="all-regex-combined">
+        <metadatafilter priority="WARNING" regex=".*warning U4010" description="mingw error" />
+        <metadatafilterset filterfile="${metadata-filterfile}" />
+    </hlm:metadatafilterset>
+
+    <property name="metadata-all-db" value="${project.dir}/../output/log_all_combined_db"/>
+
+    <target name="test-all-regex-combined">
+        <property name="metadata-read-db" value="${project.dir}/../output/log_all_combined_db"/>
+        <delete dir="${metadata-read-db}" failonerror="false" />
+        <echo message="all regular expression validation" />
+        <echo message="database:${metadata-read-db}" />
+        <au:assertFileExists file="${metadata-filterfile}" message="${metadata-filterfile} filter file does not exist"/>
+        <mkdir dir="${project.dir}/../output"/>
+
+        <hlm:metadatarecord database="${metadata-read-db}">
+            <hlm:sbsmetadatainput>
+                <fileset dir="${project.dir}/../data/">
+                    <include  name="*regex*.log"/>
+                </fileset>
+                <metadatafilterset refid="all-regex-combined" />
+            </hlm:sbsmetadatainput>
+        </hlm:metadatarecord>
+        <au:assertTrue>
+            <available type="dir" file="${metadata-read-db}" />
+        </au:assertTrue>
+    </target>
+
+
+    <property name="metadata-error-db" value="${project.dir}/../output/log_error_combined_db"/>
+    <!--create an invalid priority type, so contains message invalid 
+    priority and set to error as priority -->
+    <hlm:metadatafilterset id="all-regex-combined-error">
+        <metadatafilter priority="INCORRECT" regex=".*warning U4010" description="test error handling so incorrect priority" />
+        <metadatafilterset filterfile="${metadata-filterfile}" />
+    </hlm:metadatafilterset>
+    <!--create an invalid priority type, which contains warning invalid priority 
+    and continues with other data. 
+    -->
+    <target name="test-all-regex-combined-error">
+        <property name="metadata-read-db" value="${project.dir}/../output/log_error_combined_db"/>
+        <delete dir="${metadata-read-db}" failonerror="false" />
+        <echo message="all regular expression validation" />
+        <echo message="database:${metadata-read-db}" />
+        <au:assertFileExists file="${metadata-filterfile}" message="${metadata-filterfile} filter file does not exist"/>
+        <mkdir dir="${project.dir}/../output"/>
+
+        <hlm:metadatarecord database="${metadata-read-db}" >
+            <hlm:sbsmetadatainput>
+                <fileset dir="${project.dir}/../data/">
+                    <include  name="*regex*.log"/>
+                </fileset>
+                <metadatafilterset refid="all-regex-combined-error" />
+            </hlm:sbsmetadatainput>
+        </hlm:metadatarecord>
+        <!-- no need to check the DB file not present as it won't be-->
+    </target>
+    <!--try to add a different different filter type but not add the parameter so has an error-->
+    <hlm:metadatafilterset id="all-regex-combined-no-priority">
+        <metadatafilter regex=".*warning U4010" description="test error handling so incorrect priority" />
+        <metadatafilterset filterfile="${metadata-filterfile}" />
+    </hlm:metadatafilterset>
+    <!--try to add a different different filter type but not add the parameter so has an error-->
+    <target name="test-all-regex-combined-no-priority">
+        <property name="metadata-read-db" value="${project.dir}/../output/log_error_combined_db"/>
+        <delete dir="${metadata-read-db}" failonerror="false" />
+        <echo message="all regular expression validation" />
+        <echo message="database:${metadata-read-db}" />
+        <au:assertFileExists file="${metadata-filterfile}" message="${metadata-filterfile} filter file does not exist"/>
+        <mkdir dir="${project.dir}/../output"/>
+
+        <hlm:metadatarecord database="${metadata-read-db}">
+            <hlm:sbsmetadatainput>
+                <fileset dir="${project.dir}/../data/">
+                    <include  name="*regex*.log"/>
+                </fileset>
+                <metadatafilterset refid="all-regex-combined-no-priority" />
+            </hlm:sbsmetadatainput>
+        </hlm:metadatarecord>
+        <!-- no need to check the DB file not present as it won't be-->
+    </target>
+    
+
+    <!--try to add a different different filter type but not add the parameter so has an error-->
+    <hlm:metadatafilterset id="all-regex-combined-no-regex">
+        <metadatafilter priority="INCORRECT" description="test error handling so incorrect priority" />
+        <metadatafilter priority="WARNING" description="test error handling so incorrect priority" />
+        <metadatafilterset filterfile="${metadata-filterfile}" />
+    </hlm:metadatafilterset>
+
+    <!--try to add a different different filter type but not add the parameter so has an error-->
+    <target name="test-all-regex-combined-no-regex">
+        <property name="metadata-read-db" value="${project.dir}/../output/log_error_combined_db"/>
+        <delete dir="${metadata-read-db}" failonerror="false" />
+        <echo message="all regular expression validation" />
+        <echo message="database:${metadata-read-db}" />
+        <au:assertFileExists file="${metadata-filterfile}" message="${metadata-filterfile} filter file does not exist"/>
+        <mkdir dir="${project.dir}/../output"/>
+
+        <hlm:metadatarecord database="${metadata-read-db}">
+            <hlm:sbsmetadatainput>
+                <fileset dir="${project.dir}/../data/">
+                    <include  name="*regex*.log"/>
+                </fileset>
+                <metadatafilterset refid="all-regex-combined-no-regex" />
+            </hlm:sbsmetadatainput>
+        </hlm:metadatarecord>
+        <!-- no need to check the DB file not present as it won't be-->
+    </target>
+    <hlm:metadatafilterset id="text_log_metadata_input">
+        <metadatafilterset filterfile="${project.dir}/../data/common.csv" />
+    </hlm:metadatafilterset>
+
+    <target name="test-text_log_metadata_input">
+        <property name="metadata-read-db" value="${project.dir}/../output/log_text_metadata_input_db"/>
+        <delete dir="${metadata-read-db}" failonerror="false" />
+        <echo message="text log metadata input validation" />
+        <echo message="database:${metadata-read-db}" />
+        <au:assertFileExists file="${metadata-filterfile}" message="${metadata-filterfile} filter file does not exist"/>
+        <mkdir dir="${project.dir}/../output"/>
+
+        <hlm:metadatarecord database="${metadata-read-db}">
+            <hlm:textmetadatainput>
+                <fileset dir="${project.dir}/../data/">
+                    <include  name="*_fixslashes*.log"/>
+                </fileset>
+                <metadatafilterset refid="text_log_metadata_input" />
+            </hlm:textmetadatainput>
+        </hlm:metadatarecord>
+        <au:assertTrue>
+            <available type="dir" file="${metadata-read-db}" />
+        </au:assertTrue>
+    </target>
+
+    <hlm:metadatafilterset id="abld_log_metadata_input">
+        <metadatafilter priority="WARNING" regex=".*warning U4010" description="mingw error" />
+        <metadatafilterset filterfile="${project.dir}/../data/common.csv" />
+    </hlm:metadatafilterset>
+
+
+    <target name="test-abld_log_metadata_input">
+        <property name="metadata-read-db" value="${project.dir}/../output/log_abld_metadata_input_db"/>
+        <delete dir="${project.dir}/../output/log_abld_metadata_input_db" failonerror="false" />
+        <echo message="abld log metadata input validation" />
+        <echo message="database:${metadata-read-db}" />
+        <au:assertFileExists file="${metadata-filterfile}" message="${metadata-filterfile} filter file does not exist"/>
+        <mkdir dir="${project.dir}/../output"/>
+
+        <hlm:metadatarecord database="${metadata-read-db}">
+            <hlm:abldmetadatainput>
+                <fileset dir="${project.dir}/../data/">
+                    <include  name="*sample_abld.log"/>
+                </fileset>
+                <metadatafilterset refid="abld_log_metadata_input" />
+            </hlm:abldmetadatainput>
+        </hlm:metadatarecord>
+        <au:assertTrue>
+            <available type="dir" file="${metadata-read-db}" />
+        </au:assertTrue>
+    </target>
+
+
+    <target name="test-policy_metadata_input">
+        <property name="metadata-read-db" value="${project.dir}/../output/log_policy_metadata_input_db"/>
+        <delete dir="${metadata-read-db}" failonerror="false" />
+        <echo message="policy metadata input validation" />
+        <echo message="database:${metadata-read-db}" />
+        <au:assertFileExists file="${metadata-filterfile}" message="${metadata-filterfile} filter file does not exist"/>
+        <mkdir dir="${project.dir}/../output"/>
+
+        <hlm:metadatarecord database="${metadata-read-db}">
+            <hlm:policymetadatainput>
+                <fileset dir="${project.dir}/../data/">
+                    <include  name="*policy*.log"/>
+                </fileset>
+            </hlm:policymetadatainput>
+        </hlm:metadatarecord>
+        <au:assertTrue>
+            <available type="dir" file="${metadata-read-db}" />
+        </au:assertTrue>
+    </target>
+
+    <hlm:metadatafilterset id="ant_log_metadata_input">
+        <metadatafilterset filterfile="${project.dir}/../data/common.csv" />
+    </hlm:metadatafilterset>
+
+
+    <target name="test-ant_log_metadata_input">
+        <property name="metadata-read-db" value="${project.dir}/../output/log_ant_metadata_input_db"/>
+        <delete dir="${metadata-read-db}" failonerror="false" />
+        <echo message="ant log metadata input validation" />
+        <echo message="database:${metadata-read-db}" />
+        <au:assertFileExists file="${metadata-filterfile}" message="${metadata-filterfile} filter file does not exist"/>
+        <mkdir dir="${project.dir}/../output"/>
+
+        <hlm:metadatarecord database="${metadata-read-db}">
+            <hlm:antmetadatainput>
+                <fileset dir="${project.dir}/../data/">
+                    <include  name="*ant*.log"/>
+                </fileset>
+                <metadatafilterset refid="ant_log_metadata_input" />
+            </hlm:antmetadatainput>
+        </hlm:metadatarecord>
+        <au:assertTrue>
+            <available type="dir" file="${metadata-read-db}" />
+        </au:assertTrue>
+    </target>
+
+    <property name="metadata-read-ftl" value="${project.dir}/../../src/templates/readdata.xml.ftl"/>
+    <property name="metadata-read-output" value="${project.dir}/../output/readdata.html"/>
+<!-- 
+    <target name="test-readdata" depends="test-text_log_metadata_input" >
+        <property name="metadata-template-dir" value="${project.dir}/../../src/templates/" />
+        <property name="metadata-output-dir" value="${project.dir}/../output" />
+        <property name="metadata-read-ftl" value="${metadata-template-dir}/readdata.xml.ftl"/>
+        <property name="metadata-read-db" value="${metadata-output-dir}/log_text_metadata_input_db"/>
+        <property name="metadata-read-output" value="${metadata-output-dir}/readdata.html"/>
+        <delete file="${metadata-read-output}" failonerror="false" />
+        <au:assertFileExists file="${metadata-read-db}" message="${metadata-read-db} DB file was not created"/>
+        <fmpp sourceFile="${metadata-template-dir}/readdata.xml.ftl"
+                     outputfile="${metadata-output-dir}/readdata.html">
+            <freemarkerLinks expandProperties="yes">
+                macro: ${project.dir}/../../src/templates
+            </freemarkerLinks>
+            <data expandProperties="yes">
+                dbPath: ${metadata-read-db}
+                ant: antProperties()
+            </data>
+        </fmpp>
+        <fmpp sourceFile="${metadata-template-dir}/build_status.xml.ftl"
+                     outputfile="${metadata-output-dir}/build_status.xml">
+            <freemarkerLinks expandProperties="yes">
+                macro: ${project.dir}/../../src/templates
+            </freemarkerLinks>
+            <data expandProperties="yes">
+                dbPath: ${metadata-read-db}
+                logfile: ido_abs_mcl_devlon70_robot_MCL.70.500_fixslashes_raptor.log
+                ant: antProperties()
+            </data>
+        </fmpp>
+        <fmpp sourceFile="${metadata-template-dir}/email_new.html.ftl"
+                     outputfile="${metadata-output-dir}/build_status.html">
+            <freemarkerLinks expandProperties="yes">
+                macro: ${project.dir}/../../src/templates
+            </freemarkerLinks>
+            <data expandProperties="yes">
+                dbPath: ${metadata-read-db}
+                logfile: ido_abs_mcl_devlon70_robot_MCL.70.500_fixslashes_raptor.log
+                ant: antProperties()
+            </data>
+        </fmpp>
+        <au:assertFileExists file="${metadata-read-output}" message="${metadata-read-output} DB file was not created"/>
+    </target>
+-->
+
+    <target name="test-generate-summary" depends="test-text_log_metadata_input">
+        <property name="metadata-summary-ftl" value="${project.dir}/../../src/templates/summary.html.ftl"/>
+        <property name="metadata-summary-output" value="${project.dir}/../output/summary.html"/>
+        <property name="metadata-output-dir" value="${project.dir}/../output/" />
+        <delete file="${metadata-summary-output}" failonerror="false" />
+        <property name="metadata-read-db" value="${metadata-output-dir}/log_text_metadata_input_db"/>
+        
+        <fmpp sourceFile="${metadata-summary-ftl}"
+                     outputfile="${metadata-summary-output}">
+            <freemarkerLinks expandProperties="yes">
+                macro: ${project.dir}/../../src/templates/macro
+            </freemarkerLinks>
+            <data expandProperties="yes">
+                dbPath: ${metadata-read-db}
+                loginfo: xml(${project.dir}/../data/ido_abs_mcl_devlon70_robot_MCL.70.500_info.log)
+                ant: antProperties()
+            </data>
+        </fmpp>
+        <!-- check we have created the files -->
+        <au:assertTrue>
+            <available type="dir" file="${metadata-read-db}" />
+        </au:assertTrue>
+        <au:assertFileExists file="${metadata-summary-output}" message="${metadata-summary-output} summary output file was not created"/>
+    </target>
+    
+    <target name="test-countseverity">
+        <delete dir="${project.dir}/../output/dp_db" failonerror="false" />
+
+        <hlm:metadatarecord database="${project.dir}/../output/dp_db">
+            <hlm:textmetadatainput>
+                <fileset dir="${project.dir}/../data/">
+                    <include  name="*_fixslashes*.log"/>
+                </fileset>
+                <metadatafilterset refid="text_log_metadata_input" />
+            </hlm:textmetadatainput>
+        </hlm:metadatarecord>
+
+        <hlm:metadataCountSeverity severity="error" log="_fixslashes_raptor.log" db="${project.dir}/../output/dp_db" property="errors"/>
+        <echo message="${errors}" />
+        <au:assertTrue>
+            <equals arg1="${errors}" arg2="24"/>
+        </au:assertTrue>
+        <au:assertTrue>
+            <hlm:metadataHasSeverity severity="error" log="_fixslashes_raptor.log" db="${project.dir}/../output/dp_db" />
+        </au:assertTrue>
+        <au:assertFalse>
+            <hlm:metadataHasSeverity severity="fatal" log="_fixslashes_raptor.log" db="${project.dir}/../output/dp_db" />
+        </au:assertFalse>
+        
+    </target>
+    
+    <target name="test-very-long-warning">
+        <delete dir="${project.dir}/../output/very_long_warning_db" failonerror="false" />
+
+        <hlm:metadatarecord database="${project.dir}/../output/very_long_warning_db">
+            <hlm:textmetadatainput>
+                <fileset dir="${project.dir}/../data/">
+                    <include  name="very_long_warning.log"/>
+                </fileset>
+                <metadatafilterset>
+                    <metadatafilter priority="INFO" regex="^INFO:" description="info" />
+                    <metadatafilter priority="WARNING" regex=".*warning C4503:.*" description="warning" />
+                </metadatafilterset>
+            </hlm:textmetadatainput>
+        </hlm:metadatarecord>
+
+        <hlm:metadataCountSeverity severity="warning" log="very_long_warning.log" db="${project.dir}/../output/very_long_warning_db" property="warnings"/>
+        <echo message="test-very-long-warning: ${warnings}" />
+        <au:assertTrue>
+            <equals arg1="${warnings}" arg2="1"/>
+        </au:assertTrue>
+    </target>
+
+    <target name="test-whatlog-parsing">
+        <delete dir="${project.dir}/../output/whatlog_db" failonerror="false" />
+
+        <hlm:metadatarecord database="${project.dir}/../output/whatlog_db">
+            <hlm:sbsmetadatainput whatLogFile="${project.dir}/../data/build_whatlog.whatlog.log">
+                <fileset dir="${project.dir}/../data/">
+                    <include  name="build_whatlog.log"/>
+                </fileset>
+                <metadatafilterset>
+                    <metadatafilter priority="INFO" regex="^INFO:" description="info" />
+                    <metadatafilter priority="ERROR" regex="^ERROR:" description="error" />
+                    <metadatafilter priority="WARNING" regex=".*warning C4503:.*" description="warning" />
+                </metadatafilterset>
+            </hlm:sbsmetadatainput>
+        </hlm:metadatarecord>
+        <fmpp sourceFile="${project.dir}/../data/whatlog_result.ini.ftl"
+                     outputfile="${project.dir}/../output/whatlog_result.ini">
+            <data expandProperties="yes">
+                dbPath: ${project.dir}/../output/whatlog_db
+                ant: antProperties()
+            </data>
+        </fmpp>
+        <property file="${project.dir}/../output/whatlog_result.ini" />
+        <au:assertTrue message="Invalid number of logs">
+            <equals arg1="${number.of.logs}" arg2="2" />
+        </au:assertTrue>
+        <au:assertTrue message="Invalid number of whatlog entries">
+            <equals arg1="${number.of.whatlog.entries}" arg2="5" />
+        </au:assertTrue>
+    </target>
+
+    <target name="test-log-with-same-root-name">
+        <delete dir="${project.dir}/../output/log-with-same-root-name_db" failonerror="false"/>
+        <hlm:metadatarecord database="${project.dir}/../output/log-with-same-root-name_db">
+            <hlm:textmetadatainput>
+                <fileset dir="${project.dir}/../data/">
+                    <include name="log-with-same-root-name.log*"/>
+                </fileset>
+                <metadatafilterset>
+                    <metadatafilter priority="ERROR" regex="^ERROR:.*" description="error" />
+                </metadatafilterset>
+            </hlm:textmetadatainput>
+        </hlm:metadatarecord>
+        <hlm:metadataCountSeverity severity="error" log="log-with-same-root-name.log" db="${project.dir}/../output/log-with-same-root-name_db" property="log-with-same-root-name.log.error"/>
+        <au:assertTrue message="We should only find 1 error">
+            <equals arg1="${log-with-same-root-name.log.error}" arg2="1"/>
+        </au:assertTrue>
+    </target>
+
+</project>

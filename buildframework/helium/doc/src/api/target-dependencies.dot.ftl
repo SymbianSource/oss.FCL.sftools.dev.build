@@ -85,7 +85,7 @@ strict digraph G {
     "${targetMain.name}" -> "${targetMain.dependency[depTotal-1]}" [color=limegreen];
     </#if>
     <#list doc.antDatabase.project.target as targetDep>
-        <#if targetDep.name == targetMain.dependency && targetDep.name != "blacktusk-signal">
+        <#if targetDep.name == targetMain.dependency>
         <@targetFunc targetMain=targetDep caller=1 />
         </#if>
     </#list>

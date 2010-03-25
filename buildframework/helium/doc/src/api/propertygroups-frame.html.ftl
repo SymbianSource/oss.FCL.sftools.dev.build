@@ -19,7 +19,7 @@ Description:
 
 ============================================================================
 -->
-<#list data.heliumDataModel.group as group>
+<#list doc.antDatabase.project.group as group>
 <@pp.changeOutputFile name="propertygroups-frame-${group.name}.html" />
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE HTML PUBLIC "-//w3c//dtd xhtml 1.0 strict//en"

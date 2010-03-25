@@ -21,7 +21,9 @@ Description:
 ============================================================================
 -->
 <project name="metadata-filter-config" xmlns:hlm="http://www.nokia.com/helium">
-
+    <description>
+    Definitions of metadata filter inputs. 
+    </description>
     <hlm:metadatafilterset id="filterset.common">
         <metadatafilterset filterfile="${helium.dir}/config/metadata_regex.csv" />
     </hlm:metadatafilterset>
@@ -41,6 +43,12 @@ Description:
         <metadatafilter priority="info" regex="^INFO:" />
     </hlm:metadatafilterset>
 
+    <hlm:metadatafilterset id="filterset.qmake">
+        <metadatafilter priority="error" regex="^Error processing project file:" description="qt error" />
+        <metadatafilter priority="error" regex="^Result: [1-9][0-9]*" description="qt error" />
+        <metadatafilterset refid="filterset.common" />
+    </hlm:metadatafilterset>
+
     <hlm:metadatafilterset id="filterset.qt.configure">
         <metadatafilterset refid="filterset.common" />
     </hlm:metadatafilterset>
@@ -54,8 +62,9 @@ Description:
     </hlm:metadatafilterset>
 
     <hlm:metadatafilterset id="filterset.genxml.merge">
-        <metadatafilter priority="error" regex="^ERROR:" description="" />
-        <metadatafilter priority="error" regex="^Context:" description="" />
+        <metadatafilter priority="error" regex="^ERROR:.*" description="" />
+        <metadatafilter priority="error" regex=".*Context:.*" description="" />
+        <metadatafilter priority="error" regex=".*Can't open perl script.*" description="" />
     </hlm:metadatafilterset>
 
     <hlm:metadatafilterset id="filterset.buildarea.prep">
@@ -67,28 +76,12 @@ Description:
     </hlm:metadatafilterset>
 
     <hlm:metadatafilterset id="filterset.imaker">
+        <metadatafilter priority="error" regex="^\s*Total duration:\s+\d+:\d+\s+Status:\s+FAILED" description="" />
+        <metadatafilter priority="error" regex="^.+- DOESN'T EXIST" description="" />
         <metadatafilterset refid="filterset.common" />
     </hlm:metadatafilterset>
-
-    <hlm:metadatafilterset id="filterset.ee.roms">
-        <metadatafilterset refid="filterset.common" />
-    </hlm:metadatafilterset>
-
 
     <hlm:metadatafilterset id="filterset.temprecord">
-        <metadatafilterset refid="filterset.common" />
-    </hlm:metadatafilterset>
-
-
-    <hlm:metadatafilterset id="filterset.subcon.roms">
-        <metadatafilterset refid="filterset.common" />
-    </hlm:metadatafilterset>
-
-    <hlm:metadatafilterset id="filterset.trace.roms">
-        <metadatafilterset refid="filterset.common" />
-    </hlm:metadatafilterset>
-
-    <hlm:metadatafilterset id="filterset.uda.roms">
         <metadatafilterset refid="filterset.common" />
     </hlm:metadatafilterset>
     

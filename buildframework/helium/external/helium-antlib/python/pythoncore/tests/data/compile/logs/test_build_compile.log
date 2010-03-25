@@ -1,0 +1,32 @@
+===-------------------------------------------------
+=== Stage=40
+===-------------------------------------------------
+=== Stage=40 started Mon Nov 30 17:17:24 2009
+=== Stage=40 == devicecontentservices
+-- abld -what build armv5
+--- EBS_CLIENT1 Executed ID 56
+++ Started at Mon Nov 30 17:17:24 2009
++++ HiRes Start 1259581644.81704
+Chdir \s60/mw/devicecontentservices/group
+\epoc32\rom\config\confml_data\s60\policy_management.confml
+\epoc32\release\ARMV5\UREL\ProvisioningSC.EXE
+\epoc32\release\ARMV5\UREL\ProvisioningSC.EXE.map
++++ HiRes End 1259581667.42685
+++ Finished at Mon Nov 30 17:17:47 2009
+=== Stage=40 finished Mon Nov 30 17:17:47 2009
+===-------------------------------------------------
+=== Stage=41
+===-------------------------------------------------
+=== Stage=41 started Mon Nov 30 17:17:24 2009
+=== Stage=41 == devicecontrol
+-- abld -what build armv5
+--- EBS_CLIENT1 Executed ID 56
+++ Started at Mon Nov 30 17:17:24 2009
++++ HiRes Start 1259581644.81704
+Chdir \s60/mw/devicecontrol/group
+\epoc32\rom\config\confml_data\s60\policy_management.confml
+\epoc32\release\ARMV5\UREL\ProvisioningSC.EXE
+\epoc32\release\ARMV5\UREL\ProvisioningSC.EXE.map
++++ HiRes End 1259581667.42685
+++ Finished at Mon Nov 30 17:17:47 2009
+=== Stage=41 finished Mon Nov 30 17:17:47 2009

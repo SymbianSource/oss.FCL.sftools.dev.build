@@ -1,0 +1,443 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : logging.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<!--* @package framework -->
+<project name="logging" xmlns:hlm="http://www.nokia.com/helium">
+    <description>
+        Targets related to log parsing, rendaring, upload to diamonds etc.
+    </description>
+    
+    
+    <!-- This is where the preparation build logs are stored.
+    @type string
+    @scope private
+    -->
+    <property name="prep.log.dir" location="${build.log.dir}/prep"/>
+    <!-- This is where the compile logs are stored.
+    @type string
+    @scope private
+    -->
+    <property name="compile.log.dir" location="${build.log.dir}/compile"/>
+    <!-- This is where the ats test logs are stored.
+    @type string
+    @scope private
+    -->
+    <property name="test.log.dir" location="${build.log.dir}/test"/>
+    <!-- This is where the archive logs are stored.
+    @type string
+    @scope private
+    -->
+    <property name="archive.log.dir" location="${build.log.dir}/archive"/>
+    <!-- This is where the roms logs are stored.
+    @type string
+    @scope private
+    -->
+    <property name="roms.log.dir" location="${build.log.dir}/roms"/>       
+    <!-- This is where the post build logs are stored.
+    @type string
+    @scope private
+    -->
+    <property name="post.log.dir" location="${build.log.dir}/post"/>
+    <!-- This is where the localisation logs are stored.
+    @type string
+    @scope private
+    -->
+    <property name="localisation.log.dir" location="${build.log.dir}/localisation"/>    
+    
+    
+    <!-- Macro to record content to a separate log file without recording in the main log. -->
+    <macrodef name="recordStartMacro" uri="http://www.nokia.com/helium">
+        <attribute name="name"/>
+        <attribute name="emacsmode" default="false"/>
+        <sequential>
+            <if>
+                <available file="${build.log.dir}" type="dir"/>
+                <then>
+                    <hlm:record name="${build.log.dir}/@{name}" action="start" append="true" emacsmode="@{emacsmode}" loglevel="${ant.loglevel}"/>
+                </then>
+            </if>
+        </sequential>
+    </macrodef>
+
+
+    <!-- Macro to stop recording content to a separate log file without recording in the main log. -->
+    <macrodef name="recordStopMacro" uri="http://www.nokia.com/helium">
+        <attribute name="name"/>
+        <sequential>
+            <if>
+                <available file="${build.log.dir}/@{name}"/>
+                <then>
+                    <hlm:record name="${build.log.dir}/@{name}" action="stop" append="true"/>
+                </then>
+            </if>
+        </sequential>
+    </macrodef>
+
+    
+    <!--Macro to stop recording to the main log file (if present) and record to
+        a separate log file that is filtered after logging is stopped. -->
+    <macrodef name="filterRecordStartMacro" uri="http://www.nokia.com/helium">
+        <attribute name="pattern" default=""/>
+        <attribute name="category" default=""/>
+        <sequential>
+            <hlm:record name="${build.cache.log.dir}/temp_ant_build.log" action="start" loglevel="${ant.loglevel}">
+                <hlm:recordfilter category="@{category}" regexp="@{pattern}" />
+            </hlm:record>
+        </sequential>
+    </macrodef>
+    
+
+    <!--Macro to stop recording the seperate filtered log file, filter the passwords
+    and start recording in main log file -->
+    <macrodef name="filterRecordStopMacro" uri="http://www.nokia.com/helium">
+        <attribute name="log" default="${build.log}"/>
+        <attribute name="append" default="true"/>
+        <sequential>
+            <hlm:record name="${build.cache.log.dir}/temp_ant_build.log" action="stop"/>                    
+            <concat destfile="@{log}" append="@{append}">
+                <filelist dir="${build.cache.log.dir}" files="temp_ant_build.log"/>                        
+            </concat>
+            <delete file="${build.cache.log.dir}/temp_ant_build.log" failonerror="false"/>
+            <echo>End of filtering @{log} for passwords</echo>
+        </sequential>
+    </macrodef>
+    
+    
+    <!-- Extract logs from text file and process error/warnings/components name etc
+    into xml file.
+    @deprecated Please consider using the metadata framework.
+    -->
+    <scriptdef name="logextract" language="jython"  uri="http://www.nokia.com/helium">
+        <attribute name="file" />
+        <attribute name="outputfile" />
+        <element name="fileset" type="fileset"/>
+        <element name="logfilterset" classname="com.nokia.ant.types.LogFilterSet"/>
+        <![CDATA[
+import os.path
+import log2xml
+import java.io
+
+def convertFile(inputfile, outputfile, config):
+    if (outputfile != None):
+        print "output file not none"
+        print "output file: %s" % outputfile
+        targetfile = str(outputfile)
+    else:
+        #print "output file: %s" % outputfile
+        targetfile = "%s.xml" % inputfile
+        #print "targetFile %s" % targetfile
+    if not os.path.exists(targetfile) or \
+       (os.path.exists(targetfile) and os.path.getmtime(inputfile) > os.path.getmtime(targetfile)):
+        self.getProject().log("Converting %s..." % inputfile)
+        log2xml.convert(inputfile, targetfile, False, config)
+    else:
+        self.getProject().log("Extracted log is uptodate: %s" % inputfile)
+        
+config = log2xml.DEFAULT_CONFIGURATION
+logfilterset = elements.get("logfilterset")
+if logfilterset != None and logfilterset.size() > 0:
+    # if any logfilterset are dfined then
+    # it override the default configuration
+    config = {}
+    for filtersetid in range(logfilterset.size()):
+        filterset = logfilterset.get(filtersetid)
+        if filterset.isReference():
+            filterset = filterset.getRefid().getReferencedObject(project)
+        filters = filterset.getFilters()
+        for filterid in range(filters.size()):
+            if not filters.get(filterid).getCategory() in config:
+                config[filters.get(filterid).getCategory()] = []
+            config[filters.get(filterid).getCategory()].append(str(filters.get(filterid).getRegex()))
+
+fileset = elements.get("fileset")
+outputfile = attributes.get("outputfile")
+if fileset != None and fileset.size() > 0:
+    for filesetid in range(fileset.size()):
+        dirscanner = fileset.get(filesetid).getDirectoryScanner(project)
+        for filename in dirscanner.getIncludedFiles():
+            inputfile = str(java.io.File(dirscanner.getBasedir(), str(filename)).getAbsolutePath())
+            convertFile(inputfile, outputfile, config)
+elif attributes.get("file") != None:
+    inputfile = str(java.io.File(str(attributes.get("file"))).getAbsolutePath())
+    convertFile(inputfile, outputfile, config)
+else:
+    self.log("No input specified.")
+        ]]>
+    </scriptdef>
+    
+    
+    <!--Macro to stop recording to the main log file (if present) and record to
+        a separate log file into a temporary location (doesn't need the build aread to work). -->
+    <macrodef name="tempRecordStartMacro" uri="http://www.nokia.com/helium">
+        <attribute name="name"/>
+        <sequential>
+            <mkdir dir="${build.cache.log.dir}"/>
+            <hlm:record name="${build.cache.log.dir}/@{name}" action="start" loglevel="${ant.loglevel}"/>
+        </sequential>
+    </macrodef>
+
+
+    <!--Macro to restart  the main log file (if present) and stop recording to
+        a separate log file into a temporary location the file is next xml summarized 
+        and potentially copied to the build area (if exists). Else those files will get copied during the 
+        build area preparation. -->
+    <macrodef name="tempRecordStopMacro" uri="http://www.nokia.com/helium">
+        <attribute name="name"/>
+        <attribute name="phase" default=""/>
+        <attribute name="database" default="${metadata.dbfile}"/>
+        <attribute name="filterref" default="filterset.temprecord"/>
+        <sequential>
+            <mkdir dir="${build.cache.log.dir}"/>
+            <mkdir dir="${build.log.dir}"/>
+            <mkdir dir="${build.cache.log.dir}/signals"/>
+            <hlm:record name="${build.cache.log.dir}/@{name}" action="stop" loglevel="${ant.loglevel}"/>
+            <!--Temporary solution, the logextract in general 
+                needs to be handled in a better way (not all logs needs to be processed,
+                logextract / counting errors could be merged and logextract should be
+                executed on a need basis and not to process for all stopmacro.-->
+            <!-- Todo: metadata: replace logextract -->
+            <hlm:metadatarecord database="@{database}">
+                <hlm:antmetadatainput>
+                    <fileset casesensitive="false" file="${build.cache.log.dir}/@{name}" />
+                    <metadatafilterset refid="@{filterref}" />
+                </hlm:antmetadatainput>
+            </hlm:metadatarecord>
+            <hlm:generateBuildStatus dbfile="@{database}" output-dir="${build.cache.log.dir}/signals" file="@{name}" />
+            <if>
+                <isset property="@{phase}.log.dir" />
+                <then>
+                    <mkdir dir="${@{phase}.log.dir}"/>
+                    <copy todir="${@{phase}.log.dir}" failonerror="false">
+                        <fileset casesensitive="false" file="${build.cache.log.dir}/@{name}" />
+                    </copy>
+                </then>
+                <else>
+                    <copy todir="${build.log.dir}" failonerror="false">
+                        <fileset casesensitive="false" file="${build.cache.log.dir}/@{name}" />
+                    </copy>
+                </else>
+            </if>            
+            <copy todir="${build.signal.status.dir}" failonerror="false">
+                <fileset casesensitive="false" dir="${build.cache.log.dir}/signals" />
+            </copy>
+        </sequential>
+    </macrodef>
+    
+    
+    <!-- Macro to start logging to a separate log file.
+    
+    This will stop logging to the main ant_build log file until stopSpecificLogMacro
+    is called. -->
+    <macrodef name="startSpecificLogMacro" uri="http://www.nokia.com/helium">
+        <attribute name="name"/>
+        <attribute name="regexp" default=""/>
+        <attribute name="backup" default="false"/>
+        <attribute name="phase" default=""/>
+        
+        <sequential>
+            <if>
+                <isset property="@{phase}.log.dir" />
+                <then>
+                    <mkdir dir="${@{phase}.log.dir}"/>
+                </then>
+            </if> 
+            <mkdir dir="@{name}/.."/>
+            <hlm:record name="@{name}" action="start" loglevel="verbose" backup="@{backup}" backupProperty="backup.file.name">
+                <hlm:recordfilter category="@{phase}" regexp="@{regexp}" />
+            </hlm:record>
+        </sequential>
+    </macrodef>
+
+
+    <!--Macro to restart  the main log file (if present) and stop recording to
+        a separate log file. -->
+    <macrodef name="stopSpecificLogMacro" uri="http://www.nokia.com/helium">
+        <attribute name="name"/>
+        <attribute name="phase" default=""/>
+        <sequential>
+            <hlm:record name="@{name}" action="stop" loglevel="verbose"/>
+        </sequential>
+    </macrodef>
+
+    <!-- Temp BMD macro -->
+    <macrodef name="bmdLogExtractMacro" uri="http://www.nokia.com/helium">
+        <attribute name="log"/>
+        <attribute name="metadatafilterset" default="common"/>
+        <sequential>
+            <hlm:metadatarecord database="${metadata.dbfile}">
+                <hlm:textmetadatainput>
+                    <fileset casesensitive="false" file="@{log}"/>
+                    <metadatafilterset refid="@{metadatafilterset}" />
+                </hlm:textmetadatainput>
+            </hlm:metadatarecord>
+            <!-- todo: check to add for usage and add genbuildstatus macro -->
+            <basename property="log.name" file="@{log}"/>
+            <fmpp sourceFile="${helium.dir}/tools/common/templates/db2xml.xml.ftl"
+                         outputfile="@{log}.xml">
+                <data expandProperties="yes">
+                    dbPath: ${metadata.dbfile}
+                    log: ${log.name}
+                    ant: antProperties()
+                </data>
+            </fmpp>
+        </sequential>
+    </macrodef>
+    
+    
+    <!-- Merges all XML log files ending in ".log2.xml" in the build log directory
+    into a single summary log file. -->
+    <target name="log-merge"  unless="metadata.enable">
+        <mkdir dir="${build.log.dir}"/>
+        <dependset>
+            <srcfileset dir="${build.log.dir}" includes="**/${build.id}*.log.xml"/>
+            <targetfileset file="${build.summary.file}"/>
+        </dependset>
+        <if>
+            <not>
+                <available file="${build.summary.file}"/>
+            </not>
+            <then>
+                <echo>Merging all *.log.xml files</echo>        
+                <mkdir dir="${build.log.dir}/summary"/>
+                <xmltask  dest="${build.summary.file}">
+                    <insert path="/"  >
+                    <![CDATA[
+                    <logSummary/>
+                    ]]>
+                    </insert>
+                </xmltask>
+                <for param="file">
+                    <path>
+                        <fileset dir="${build.log.dir}">
+                            <include name="**/${build.id}*.log.xml"/>
+                        </fileset>
+                        <fileset dir="${temp.build.dir}">
+                            <include name="**/${build.id}*.log.xml"/>
+                        </fileset>
+                    </path>
+                    <sequential>
+                        <echo>Inserting @{file} into summary.</echo>
+                        <!--<xmltask source="${build.summary.file}"
+                                 dest="${build.summary.file}">
+                           <insert path="/logSummary" file="@{file}" />
+                        </xmltask>-->
+                        <hlm:assertPropertySet property="build.summary.file" message="Property build.summary.file is not defined." />
+                        <script language="jython" setbeans="false">
+# Temporary solution
+import log2xml
+log2xml.append_summary(project.getProperty('build.summary.file'), r'@{file}')
+                        </script>                        
+                    </sequential>
+                </for>
+            </then>
+            <else>
+                <echo>Summary XML log file does not need updating.</echo>
+            </else>
+        </if>
+    </target>
+    
+    
+    <!-- Outputs an HTML readable version of the summary log. -->
+    <target name="render-log-summary">
+        <if>
+            <and>
+                <available file="${build.log.dir}/${build.id}_info.log.xml"/>
+                <available file="${metadata.dbfile}"/>
+            </and>
+            <then>
+                <fmpp sourceFile="${helium.dir}/tools/common/templates/log/summary_metadata_orm.html.ftl"
+                             outputfile="${build.log.dir}/${build.id}_summary.html">
+                    <freemarkerLinks expandProperties="yes">
+                        macro: ${helium.dir}/tools/common/templates/macro
+                    </freemarkerLinks>
+                    <data expandProperties="yes">
+                        dbPath: ${metadata.dbfile}
+                        loginfo: xml(${build.log.dir}/${build.id}_info.log.xml)
+                        ant: antProperties()
+                    </data>
+                </fmpp>
+                <if>
+                    <not>
+                        <available file="${build.log.dir}/${build.id}_summary.html"/>
+                    </not>
+                    <then>
+                        <echo message="Error: failed to generate Summary file" />
+                    </then>
+                </if>
+            </then>
+        </if>
+    </target>
+    
+    <!-- Prepare email for build summary -->
+    <target name="logger-email" depends="log-merge">
+        <fmpp sourceRoot="${helium.dir}/tools/common/templates/log" includes="email.html.ftl" outputRoot="${build.log.dir}/summary"
+              replaceExtension="html.ftl, html">
+            <data expandProperties="yes">
+                doc: xml(${build.summary.file})
+                ant: antProperties()
+            </data>
+        </fmpp>        
+    </target>
+    
+
+    <!-- Test target to show how Diamond metadata could be rendered. -->
+    <target name="render-diamonds-data" depends="log-merge">
+        <mkdir dir="${build.log.dir}/summary/diamonds"/>
+        <fmpp sourceRoot="${helium.dir}/tools/common/templates/diamonds"
+              outputRoot="${build.log.dir}/summary/diamonds" includes="diamonds.xml.ftl"
+              replaceExtension="xml.ftl, xml">
+            <data expandProperties="yes">
+                doc: xml(${build.summary.file})
+                ant: antProperties()
+            </data>
+        </fmpp>
+    </target>
+
+    
+    <!-- Render the CC dashboad summary. -->
+    <target name="render-cc-summary" depends="log-merge">
+        <mkdir dir="${build.log.dir}/summary"/>
+        <fmpp sourceFile="${helium.dir}/tools/common/templates/log/cc_summary_metadata_orm.html.ftl"
+                     outputfile="${build.log.dir}/summary/${build.id}_cc_summary.html">
+            <data expandProperties="yes">
+                dbPath: ${metadata.dbfile}
+                ant: antProperties()
+            </data>
+        </fmpp>
+    </target>
+
+    
+    <!-- Creates a full summary log from all the build logs. -->
+    <target name="build-log-summary" depends="render-log-summary"/>
+    
+    <!-- Test target to check signal. -->
+    <target name="check-signal" />
+    
+    <!-- Starting the main ant_build log -->
+    <target name="start-ant-log" >
+        <hlm:triggerlogger/>
+    </target>
+    
+    
+    
+    
+</project>

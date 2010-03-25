@@ -20,6 +20,7 @@ Description:
 
 ============================================================================
 -->
+<!--* @package preparation -->
 <project name="buildmanagement" xmlns:hlm="http://www.nokia.com/helium">
     <description>
         Runs the build manager Synergy operations.
@@ -37,7 +38,7 @@ Description:
 
     <!-- Runs the build manager Synergy operations. -->
     <target name="build-manager" depends="build-manager-prepare-input">
-        <record name="${build.log.dir}/${build.id}_build_manager.log" action="start" />
+        <hlm:record name="${build.log.dir}/${build.id}_build_manager.log" action="start" />
         <echo>ccm.engine.host = ${ccm.engine.host}</echo>
         <echo>ccm.database.path = ${ccm.database.path}</echo>
         <hlm:python resultproperty="buildmanagement.result">
@@ -45,7 +46,7 @@ import buildmanagement
 
 buildmanagement.buildmanager(r'${ccm.engine.host}', r'${ccm.database.path}', r'${project.config.file.parsed}', r'${project.spec.name}')
         </hlm:python>
-        <record name="${build.log.dir}/${build.id}_build_manager.log" action="stop" />
+        <hlm:record name="${build.log.dir}/${build.id}_build_manager.log" action="stop" />
         <hlm:logextract file="${build.log.dir}/${build.id}_build_manager.log" />
         <!-- <hlm:signal name="buildManagementSignal" result="${buildmanagement.result}"/> -->
     </target>

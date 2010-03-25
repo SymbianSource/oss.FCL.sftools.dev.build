@@ -33,11 +33,43 @@ Description:
     </p>
     
     <ul>
+        <li><a href="#packages">Packages</a></li>
         <li><a href="#projects">Projects</a></li>
-        <li><a href="#propertygroups">Property groups</a></li>
     </ul>
     
-    <h2><a name="projects">Projects</a></h2>
+    <h2><a name="packages">Packages</a></h2>
+    <p>
+    Helium Ant project files are grouped into packages of related functionality.
+    </p>
+    <table class="docutils">
+        <tr>
+            <th class="head">Package</th>
+            <th class="head">Projects</th>
+            <th class="head">Description</th>
+        </tr>
+        <#assign packageInfo = {}>
+        <#list doc.antDatabase.package as package>
+            <#assign packageInfo = packageInfo + {package.name: package}>
+        </#list>
+        <#list packageInfo?keys?sort as name>
+            <tr>
+                <td valign="top"><a href="package-${name}.html" target="classframe">${name}</a></td>
+                <td>
+                    <#assign projectInfo = {}>
+                    <#list packageInfo[name].projectRef as projectRef>
+                        <#assign projectInfo = projectInfo + {projectRef.name: doc["antDatabase/project[name='${projectRef.name}']"].summary}>
+                    </#list>
+                    <#list projectInfo?keys?sort as name>
+                        <a href="project-${name}.html" project="classframe">${name}</a><br/>
+                    </#list>
+                </td>
+                <td><#recurse packageInfo[name].summary></td>
+            </tr>
+        </#list>
+    </table>
+    <br/>
+    
+    <#--<h2><a name="projects">Projects</a></h2>
     <p>
     Helium is configured into a set of Ant project files that group related functionality.
     </p>
@@ -48,7 +80,7 @@ Description:
         </tr>
         <#assign projectInfo = {}>
         <#list doc.antDatabase.project as project>
-            <#assign projectInfo = projectInfo + {project.name: project.documentation}>
+            <#assign projectInfo = projectInfo + {project.name: project}>
         </#list>
         <#list projectInfo?keys?sort as name>
             <tr>
@@ -57,23 +89,8 @@ Description:
             </tr>
         </#list>
     </table>
-    <br/>
-    
-    <h2><a name="propertygroups">Property groups</a></h2>
-    <p>
-    Property groups define a set of properties that relate to a specific feature or functionality in Helium.
-    </p>
-    <table class="docutils">
-        <tr>
-            <th class="head">Property group name</th>
-            <th class="head">Description</th>
-        </tr>
-        <#list data.heliumDataModel.group as group>
-            <tr>
-                <td><a href="propertygroup-${group.name}.html" target="classframe">${group.name}</a></td>
-                <td>${group.description}</td>
-            </tr>
-        </#list>
-    </table>    
+    <br/>-->
 
 <@helium_api_html_footer/>
+
+

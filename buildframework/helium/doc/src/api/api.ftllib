@@ -155,6 +155,8 @@ Description:
 <#-- Macros for recursively handling random HTML elements inside documentation elements. -->
 <#macro tt> <tt><#recurse></tt> </#macro>
 
+<#macro div><#recurse></#macro>
+
 <#macro p><p><#recurse></p></#macro>
 
 <#macro ul><ul><#recurse></ul></#macro>

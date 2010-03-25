@@ -21,6 +21,9 @@ Description:
 ============================================================================
 -->
 <project name="test_ci" xmlns:au="org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>
+         Testing Targets
+    </description>
     <property environment="env" />
     <property name="publish.root.dir" value="${env.TEMP}" />
     <property name="helium.dir" location="../../.." />
