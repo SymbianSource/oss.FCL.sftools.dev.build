@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : antlib.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<antlib>
+    <!-- Task definition -->
+    <taskdef name="sbstask" classname="com.nokia.helium.sbs.ant.taskdefs.SBSTask"/>
+    <taskdef name="ctctask" classname="com.nokia.helium.sbs.ant.taskdefs.CTCTask"/>
+    <taskdef name="coveritybuild" classname="com.nokia.helium.sbs.ant.taskdefs.SBSCoverity"/>
+    <taskdef name="getsbsinputs" classname="com.nokia.helium.sbs.ant.taskdefs.GetSBSInputs"/>
+    <!-- Type definition -->
+    <typedef name="sbsbuild" classname="com.nokia.helium.sbs.ant.types.SBSBuild"/>
+    <typedef name="sbsinput" classname="com.nokia.helium.sbs.ant.types.SBSInput"/>
+    <typedef name="sbsmakeoptions" classname="com.nokia.helium.sbs.ant.types.SBSMakeOptions"/>
+    <typedef name="sbsoptions" classname="com.nokia.helium.core.ant.types.VariableSet"/>
+    <typedef name="coverityoptions" classname="com.nokia.helium.core.ant.types.VariableSet"/>
+</antlib>

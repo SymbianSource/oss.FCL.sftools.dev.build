@@ -1,6 +1,0 @@
-TARGETNAME=filedisk
-TARGETPATH=obj
-TARGETTYPE=PROGRAM
-UMTYPE=console
-INCLUDES=..\sys\inc
-SOURCES=filedisk.c filedisk.rc

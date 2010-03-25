@@ -36,7 +36,7 @@ public class ModelPropertiesTask extends Task
     private String outputFile;
 
     private String inputFile;
-
+    
     public ModelPropertiesTask()
     {
         setTaskName("ModelPropertiesTask");
@@ -66,15 +66,11 @@ public class ModelPropertiesTask extends Task
         }
         catch (IOException ioe)
         {
-            log("Couldn't find model file");
-            ioe.printStackTrace();
-            throw new BuildException(ioe.getMessage());
+            throw new BuildException("Couldn't find model file" + ioe.getMessage());
         }
         catch (DocumentException be)
         {
-            log("Error in creating model dom object");
-            be.printStackTrace();
-            throw new BuildException(be.getMessage());
+            throw new BuildException("Error in creating model dom object " + be.getMessage());
         }
     }
 }

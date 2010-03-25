@@ -17,9 +17,8 @@
  
 package com.nokia.tools.cmt;
 
-import java.util.Enumeration;
-import com.nokia.ant.types.VariableSet;
-import com.nokia.ant.types.Variable;
+import com.nokia.helium.core.ant.types.VariableSet;
+import com.nokia.helium.core.ant.types.Variable;
 import com.nokia.tools.*;
 import java.io.File;
 import org.apache.tools.ant.Project;
@@ -27,16 +26,21 @@ import org.apache.tools.ant.types.FileSet;
 import java.io.FileWriter;
 import java.io.BufferedWriter;
 import org.apache.tools.ant.DirectoryScanner;
+import org.apache.log4j.Logger;
+
+
 
 /**
  * Command Line wrapper for configuration tools
  */
 public class CMTTool implements Tool {
+    
+    private Logger log = Logger.getLogger(CMTTool.class);
 
     /**
      * Sets the command line variables to be used to execute and validates
      * for the required parameters 
-     * @param VariableSet variable(name / value list)
+     * @param varSet variable(name / value list)
      */    
        public void execute(VariableSet varSet, Project prj)throws ToolsProcessException {
         String input = null; 
@@ -46,10 +50,7 @@ public class CMTTool implements Tool {
         String keepGoing = "false";
         String varName;
         String value;
-        Enumeration e = varSet.getVariables().elements();
-        Variable variable;
-        while (e.hasMoreElements()) {
-            variable = (Variable)e.nextElement();
+        for (Variable variable : varSet.getVariables()) {
             varName = variable.getName();
             value = variable.getValue();
             if (varName.equals("input")) {
@@ -62,8 +63,16 @@ public class CMTTool implements Tool {
                 pattern = value;
             }
         }
-           if (input == null || output == null || pattern == null) {
-               throw new ToolsProcessException("CMTTool Parameter missing");
+           if (input == null ) {
+               throw new ToolsProcessException("CMTTool 'input' Parameter missing");
+           }
+           
+           if ( output == null ) {
+               throw new ToolsProcessException("CMTTool 'output' Parameter missing");
+           }
+           
+           if ( pattern == null) {
+               throw new ToolsProcessException("CMTTool 'pattern' Parameter missing");
            }
            generateFileList(input, output,pattern, prj);
            try {
@@ -77,7 +86,9 @@ public class CMTTool implements Tool {
              task.createArg().setValue(output);
              task.execute();
              org.apache.tools.ant.taskdefs.ExecTask cmt2task = new org.apache.tools.ant.taskdefs.ExecTask();
-             cmt2task.setDir(new File(output).getParentFile()); 
+             File outputdir = new File(output.replace(".txt", "_cmt"));
+             outputdir.mkdir();
+             cmt2task.setDir(outputdir); 
              cmt2task.setTaskName("cmt2html");
              cmt2task.setExecutable("cmt2html.bat");
              cmt2task.createArg().setValue("-i");
@@ -85,7 +96,8 @@ public class CMTTool implements Tool {
              cmt2task.createArg().setValue("-nsb");
              cmt2task.execute();
         } catch (Exception e1) {
-            e1.printStackTrace();
+         // We are Ignoring the errors as no need to fail the build.
+            log.error(e1.getMessage());
         }       
     }
     
@@ -107,6 +119,8 @@ public class CMTTool implements Tool {
             }
             outputFile.close();
         } catch (Exception e) {
+            // We are Ignoring the errors as no need to fail the build.
+            log.error(e.getMessage());
             e.printStackTrace();
         }
     }

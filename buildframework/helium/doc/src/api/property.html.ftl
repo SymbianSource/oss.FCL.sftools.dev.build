@@ -21,7 +21,7 @@ Description:
 -->
 <#include "api.ftllib"/>
 
-<#list data.heliumDataModel.property as property>
+<#list doc.antDatabase.project.property as property>
 <@pp.changeOutputFile name="property-${property.name}.html" />
 
 <@helium_api_header title="property ${property.name}"/>
@@ -29,31 +29,20 @@ Description:
 
     
 <h2>Property ${property.name}</h2>
-<b>Type</b>
-<p>
-${property.type}
-</p>
-<b>Edit status</b>
-<p>
-${property.editStatus}
-</p>
-<b>Default value</b>
-<#assign ifDefined = false>
-<#list doc.antDatabase.project.property as propDatabase>
-    <#if propDatabase.name == property.name>       
-        <p>
-        <tt class="docutils literal">${propDatabase.defaultValue}</tt>
-        </p>
-        <#assign ifDefined = true>
-        <#break>
-    </#if>
-</#list>
-<#if ifDefined == false>
-    <p>
-    None defined.
-    </p>
-</#if>
-<#if property.deprecated?size &gt; 0>
+
+<b>Type: </b>${property.type}<br/>
+<b>Scope: </b>${property.scope}<br/>
+<b>Editable: </b>${property.editable}<br/>
+
+<b>Default value: </b>
+<#assign defaultValue = "Not defined">
+<#if property.defaultValue?size &gt; 0>
+    <#assign defaultValue = property.defaultValue>
+</#if>      
+<tt class="docutils literal">${defaultValue}</tt>
+<br/>
+
+<#if property.deprecated?length &gt; 0>
     <b>Deprecated</b>
     <p>
     ${property.deprecated}
@@ -62,10 +51,17 @@ ${property.editStatus}
 
 <hr/>
 
-<h3>Description</h3>
+<h3>Documentation</h3>
 <p>
-${property.description}
+${property.documentation}
 </p>
+
+<hr/>
+
+<h3>Source code</h3>
+<pre>
+    ${property.source?html}
+</pre>
 
 
 

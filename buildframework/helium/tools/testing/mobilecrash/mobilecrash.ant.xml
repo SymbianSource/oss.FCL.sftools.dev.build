@@ -20,6 +20,7 @@ Description:
 
 ============================================================================
 -->
+<!--* @package testing -->
 <project name="_testing.mobilecrash" xmlns:hlm="http://www.nokia.com/helium">
     <description>
     Supporting the MobileCrash crash analysis tool.

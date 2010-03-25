@@ -19,7 +19,7 @@ rem
 setlocal
 
 set HELIUM_HOME=.
-set PYTHONPATH=%HELIUM_HOME%\external\python\lib\2.5;%HELIUM_HOME%\tools\common\python\lib;%HELIUM_HOME%\tools\dp\iCreatorDP;c:\apps\sbs\python
+set PYTHONPATH=%HELIUM_HOME%\external\python\lib\2.5;%HELIUM_HOME%\tools\common\python\lib;%HELIUM_HOME%\tools\dp\iCreatorDP;c:\apps\sbs\python;%HELIUM_HOME%\extensions\nokia\external\python\lib\2.5;
 
 python external\python\bin\nosetests-script.py -v %*
 

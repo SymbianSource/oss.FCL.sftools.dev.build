@@ -20,10 +20,10 @@ Description:
 ============================================================================
 -->
 <locations>
-    <#if ant?keys?seq_contains("release.grace.dir") &&  !(ant["release.grace.dir"]?contains("${"))>
+    <#if ant?keys?seq_contains("release.hydra.dir")>
         <location>
-               <link>${ant["release.grace.dir"]}</link>
-               <description>GRACE server</description>
+               <link>${ant["release.hydra.dir"]}</link>
+               <description>Hydra server</description>
         </location>
     </#if>
     <#if ant?keys?seq_contains("publish.dir.list")>

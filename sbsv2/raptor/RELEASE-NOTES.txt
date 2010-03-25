@@ -1,6 +1,12 @@
 Release Notes for Symbian Build System v2
 
 next version
+Defect Fixes:
+- SF Bug 2172 - [Raptor] Resource builds warn on encountering trigraph-like strings
+- SF Bug 2308 - [Raptor]: PLUGIN3 TARGETTYPEs don't set resource output offsets correctly
+
+
+version 2.12.5
 
 Defect Fixes:
 - SF Bug 1939 - [Raptor] PAGED keyword in MMP files should imply byte pair compressed
@@ -9,7 +15,6 @@ Defect Fixes:
   Allow Raptor to obtain log from emake annotation file where it is uncorrupted.  A new 
   Make engine option "copyannofile2log" enables/disables this mode for emake. If this option is disabled
   or if no annotation file is specified for the build then Raptor reads logs directly as normal.
-- SF Bug 2125 - [Raptor] - tracecompiler what output incorrect if mmp basename contains '.' e.g. fred.prd.mmp 
 - SF Bug 2191 - [Raptor] - When forcesuccess is enabled, exit status for a failed recipe is "retry" but should be "failed"
 - Fix: extend tracecompiler tests to Linux
 - Fix: Amendment to SF Bug 1511 fix - removal of blanked DEFFILE keyword from e32abiv2ani.flm
@@ -19,9 +24,9 @@ Defect Fixes:
 version 2.12.4
 
 Defect Fixes:
+- SF Bug 2125 - [Raptor] - tracecompiler what output incorrect if mmp basename contains '.' e.g. fred.prd.mmp 
 - SF Bug 2113 - [Raptor] what/check filters can assign files to the wrong components
-- SF Bug 2081 - [Raptor] - Exported file executable permissions not maintained (linux)
-- Fix: host attribute in recipes was blank in windows, windows cluster builds.
+- SF Bug 2081/1971 - [Raptor] - Exported file executable permissions not maintained (linux)
 - SF Bug 1912 - Raptor should take python from the path [if not set with SBS_PYTHON or bundled with Raptor]
 - SF Bug 2042 - [Raptor] component field empty in recipe
 - SF Bug 2007 - [Raptor] GCCE 4.4.1 builds require 4.3.1 and 4.3.2 SBS_GCCE???BIN env vars etc.
@@ -33,6 +38,7 @@ Defect Fixes:
   .DEFAULT target introduced for all non --no-depend-generate and/or --no-depend-include builds
 - Add support for PLUGIN3 TARGETTYPEs
 - Fixing logfile corruption for large GCCXML builds by suppressing zip output
+- Fix: host attribute in recipes was blank in windows, windows cluster builds.
 - Stop copying .bmp files to epoc32/localisation and fix the "what" reporting
 
 

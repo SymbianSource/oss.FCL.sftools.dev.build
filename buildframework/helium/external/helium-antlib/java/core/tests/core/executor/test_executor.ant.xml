@@ -1,0 +1,83 @@
+<?xml version="1.0"?>
+<!-- 
+============================================================================ 
+Name        : test_executor.ant.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test-executor" xmlns:au="antlib:org.apache.ant.antunit">
+    <description>Helium antlib core executor tests.</description>
+
+    <target name="final-target-1">
+        <echo message="about to call final target" />
+        <fail message="test is failed for final target" />
+    </target>
+
+    <target name="test-final-target-1">
+        <property name="hlm.target.final" value="test_final_target" />
+        <au:expectfailure>
+            <antcall target="final-target-1" />
+        </au:expectfailure>
+    </target>
+
+    <target name="test-final-target-2">
+        <property name="hlm.target.final" value="test_final_target" />
+        <echo message="about to call final target" />
+    </target>
+
+    <target name="test-final-target-3" depends="test_final_target">
+        <!-- assumption is that always that the target would be running -->
+        <property name="hlm.target.final" value="test_final_target" />
+    </target>
+
+    <target name="test-final-target-4">
+        <!-- assumption is that always that the target would be running -->
+        <property name="hlm.target.final" value="non-exist-target" />
+    </target>
+
+
+    <target name="test_final_target">
+        <echo message="executing test_final_target by default at end" />
+    </target>
+    
+    <target name="test-executor">
+        <au:logcapturer/>
+        <exec osfamily="windows" executable="cmd">
+            <arg line="/C ant"/>
+            <arg value="-Dant.executor.class=com.nokia.helium.core.ant.HeliumExecutor"/>
+            <arg line="-lib ../../../../bin"/>
+            <arg line="-lib ../../../../lib"/>
+            <arg line="-lib ../../../../antlibs"/>
+            <arg line="target"/>
+        </exec>    
+        <exec osfamily="unix" executable="ant">
+            <arg value="-Dant.executor.class=com.nokia.helium.core.ant.HeliumExecutor"/>
+            <arg line="-lib ../../../../bin"/>
+            <arg line="-lib ../../../../lib"/>
+            <arg line="-lib ../../../../antlibs"/>
+            <arg line="target"/>
+        </exec>
+        <exec osfamily="unix" executable="ant">
+            <arg value="-Dant.executor.class=com.nokia.helium.core.ant.HeliumExecutor"/>
+            <arg line="-lib ../../../../bin"/>
+            <arg line="-lib ../../../../lib"/>
+            <arg line="-lib ../../../../antlibs"/>
+            <arg line="target"/>
+        </exec>
+    </target>
+</project>

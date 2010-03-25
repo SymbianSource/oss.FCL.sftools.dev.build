@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : package_definition.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<SystemDefinition schema="3.0.0" xmlns:qt="http://qt.nokia.com">
+  <package id="package5" name="Package 5" levels="demo">
+    <!-- the xml syntax of this file is voluntarly wrong. -->
+    <collection id="collection5" name="Collection 5" level="demo" />
+      <component id="component5" name="Component 5" purpose="development">
+        <unit bldFile="collection5/component5/group" mrp="" />
+      </component>
+    </collection>
+  </package>
+</SystemDefinition>

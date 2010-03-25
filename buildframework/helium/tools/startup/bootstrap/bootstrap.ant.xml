@@ -20,12 +20,19 @@ Description:
 
 ============================================================================
 -->
+<!--* @package framework -->
 <project name="startup.bootstrap" default="install-dependencies" xmlns:ivy="antlib:org.apache.ivy.ant">
     <description>
     Download libraries to bootstrap helium
     </description>
 
+    <!-- The general type of the build. This is used for checking the tools environment. Potential values include core, ido, product.
+    @type string
+    -->
     <property name="build.type" value="subcon" />
+    <!-- The tools dependencies Ivy settings configuration file.
+    @type string
+    -->
     <property name="tools.ivy.config.file" location="${helium.dir}/config/ivy/tools_ivy_settings.xml" />
 
     <!-- Set proxy using Nokia settings by default -->
@@ -35,7 +42,15 @@ Description:
         <setproxy proxyhost="${proxy.host}" proxyport="${proxy.port}" />
     </target>
 
+    <!-- Name of ivy jar.
+    @type string
+    @scope private
+    -->
     <property name="ivy.filename" value="ivy-2.0.0-beta2.jar" />
+    <!-- Location of ivy jar.
+    @type string
+    @scope private
+    -->
     <property name="ivy.file" value="${helium.dir}/external/antlibs/${ivy.filename}" />
     <available file="${ivy.file}" property="ivy.file.present" />
 
@@ -46,7 +61,7 @@ Description:
     </target>
 
     <!-- Install CruiseControl if not already installed -->
-    <target name="install-cruisecontrol">
+    <target name="install-cruisecontrol" unless="env.HLM_SUBCON">
         <if>
             <not>
                 <available file="${helium.dir}/external/CruiseControl/real_cruisecontrol.bat" />
@@ -86,20 +101,20 @@ Description:
         <ivy:cleancache />
     </target>
 
-    <!-- Private: unzip jars -->
+    <!-- unzip jars. @scope private-->
     <target name="unzip-jar">
         <unzip src="${artifact.file}" dest="${helium.dir}/external/antlibs" />
     </target>
-    <!-- Private: unzip eggs -->
+    <!-- unzip eggs. @scope private -->
     <target name="unzip-egg">
         <unzip src="${artifact.file}" dest="${helium.dir}/external/python/lib/2.5" />
     </target>
-    <!-- Private: ungzip eggs -->
+    <!-- ungzip eggs. @scope private -->
     <target name="gunzip-egg">
         <gunzip src="${artifact.file}" dest="${artifact.file}.tar" />
         <untar src="${artifact.file}.tar" dest="${helium.dir}/external/python/lib/2.5" />
     </target>
-    <!-- Private: unbzip egg -->
+    <!-- unbzip egg. @scope private -->
     <target name="bunzip-egg">
         <bunzip2 src="${artifact.file}" dest="${artifact.file}.tar" />
         <untar src="${artifact.file}.tar" dest="${helium.dir}/external/python/lib/2.5" />

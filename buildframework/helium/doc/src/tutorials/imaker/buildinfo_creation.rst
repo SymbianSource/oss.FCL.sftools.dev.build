@@ -72,10 +72,10 @@ The file image_conf_buildinfo.mk should be generated under /epoc32/rom/config, a
    BUILD_SUMMARY_FILE_2 = Z:\output\logs\summary\pf_5250_16_wk2008_summary.log2.xml
    BUILD_LOG = Z:\output\logs\pf_5250_16_wk2008_ant_build.log
    BUILD_NAME = pf_5250
-   BUILD_CACHE_LOG_DIR = C:\DOCUME~1\wbernard\LOCALS~1\Temp\helium\wbernard\pf_5250_16_wk2008\logs
+   BUILD_CACHE_LOG_DIR = C:\DOCUME~1\wbernard\LOCALS~1\Temp\helium\pf_5250_16_wk2008\logs
    BUILD_SYSTEM = ebs
    BUILD_LOG_DIR = Z:\output\logs
-   BUILD_CACHE_DIR = C:\DOCUME~1\wbernard\LOCALS~1\Temp\helium\wbernard\pf_5250_16_wk2008
+   BUILD_CACHE_DIR = C:\DOCUME~1\wbernard\LOCALS~1\Temp\helium\pf_5250_16_wk2008
    BUILD_OUTPUT_DIR = Z:\output
    BUILD_SUMMARY_FILE = Z:\output\logs\pf_5250_16_wk2008_build_summary.xml
    BUILD_VERSION = 0.0.1

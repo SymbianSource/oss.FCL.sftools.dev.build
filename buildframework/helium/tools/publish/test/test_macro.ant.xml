@@ -21,6 +21,9 @@ Description:
 ============================================================================
 -->
 <project name="test_macro" xmlns:hlm="http://www.nokia.com/helium">
+    <description>
+          Targets to test macro
+    </description>
     <property environment="env" />
     <property name="helium.dir" location="../../.." />
     <import file="../../../helium.ant.xml" />

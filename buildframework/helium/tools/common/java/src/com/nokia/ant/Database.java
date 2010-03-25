@@ -27,20 +27,21 @@ import java.io.OutputStream;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Target;
 import org.apache.tools.ant.Task;
-import org.apache.tools.ant.types.ResourceCollection;
 import org.apache.tools.ant.types.Reference;
+import org.apache.tools.ant.types.ResourceCollection;
 import org.apache.tools.ant.types.resources.FileResource;
-
 import org.dom4j.Attribute;
 import org.dom4j.CDATA;
 import org.dom4j.Comment;
@@ -52,10 +53,11 @@ import org.dom4j.Node;
 import org.dom4j.Text;
 import org.dom4j.Visitor;
 import org.dom4j.VisitorSupport;
+import org.dom4j.XPath;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.SAXReader;
 import org.dom4j.io.XMLWriter;
-import org.dom4j.XPath;
+
 
 /**
  * Reads the current ant project and a fileset and generates a xml file with a summary of targets,
@@ -71,7 +73,7 @@ public class Database
     private HashMap<String, List<String>> globalSignalList = new HashMap<String, List<String>>();
     private HashMap map = new HashMap();
     private Document signaldoc;
-
+    
     public Database(Project project, ResourceCollection rc, Task task)
     {
         this.project = project;
@@ -83,20 +85,20 @@ public class Database
     public Project getProject() {
         return project;
     }
-    
+
     public void setDebug(boolean debug) {
         this.debug = debug;
     }
-    
+
     public void setHomeFilesOnly(boolean homeFilesOnly) {
         this.homeFilesOnly = homeFilesOnly;
     }
-    
+
     public void log(String msg, int level) {
         if (task != null) {
             task.log(msg, level);
         } else if (debug) {            
-            System.out.println(msg);
+            project.log(msg, level);
         }
     }
 
@@ -129,9 +131,12 @@ public class Database
             String antFile = (String) antFilesIter.next();
             parseAntFile(root, antFile);
         }
+
+        buildTaskDefs( root );
+
         return outDoc;
     }
-    
+
     public void createXMLFile(File outputFile) {
         try {
             Document outDoc = createDOM();
@@ -142,45 +147,24 @@ public class Database
             XMLWriter out = new XMLWriter(outStream, OutputFormat.createPrettyPrint());
             out.write(outDoc);
         } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
             throw new BuildException(e.getMessage());
         }
     }
-    
+
     private void readSignals(Element root, String antFile) throws DocumentException, IOException
     {
         SAXReader xmlReader = new SAXReader();
         Document antDoc = xmlReader.read(new File(antFile));
-        
-        XPath xpath = DocumentHelper.createXPath("//hlm:signalConfig");
+
+        XPath xpath = DocumentHelper.createXPath("//hlm:signalListenerConfig");
         xpath.setNamespaceURIs(map);
-        
         List signalNodes = xpath.selectNodes(antDoc);
         for (Iterator iterator = signalNodes.iterator(); iterator.hasNext();)
         {
             signaldoc = antDoc;
             Element propertyNode = (Element) iterator.next();
             String signalid = propertyNode.attributeValue("id");
-            
-            String signaltarget = signalName(signalid, signaldoc);
-            List existinglist = globalSignalList.get(signaltarget);
-            String failbuild = signalType(signalid, signaldoc);
-            if (existinglist == null)
-                existinglist = new ArrayList<String>();
-            existinglist.add(signalid + "," + failbuild);
-            globalSignalList.put(signaltarget, existinglist);
-        }
-        
-        xpath = DocumentHelper.createXPath("//hlm:signalListenerConfig");
-        xpath.setNamespaceURIs(map);
-        signalNodes = xpath.selectNodes(antDoc);
-        for (Iterator iterator = signalNodes.iterator(); iterator.hasNext();)
-        {
-            signaldoc = antDoc;
-            Element propertyNode = (Element) iterator.next();
-            String signalid = propertyNode.attributeValue("id");
-            
+
             String signaltarget = propertyNode.attributeValue("target");
             List existinglist = globalSignalList.get(signaltarget);
             String failbuild = signalType(signalid, signaldoc);
@@ -190,32 +174,18 @@ public class Database
             globalSignalList.put(signaltarget, existinglist);
         }
     }
-    
-    private String signalName(String signalid, Document antDoc)
-    {
-        XPath xpath = DocumentHelper.createXPath("//hlm:signalConfig[@id='" + signalid + "']/hlm:targetCondition");
-        xpath.setNamespaceURIs(map);
-        List signalNodes2 = xpath.selectNodes(antDoc);
 
-        for (Iterator iterator2 = signalNodes2.iterator(); iterator2.hasNext();)
-        {
-            Element propertyNode2 = (Element) iterator2.next();
-            return propertyNode2.attributeValue("name");
-        }
-        return null;
-    }
-    
     private String signalType(String signalid, Document antDoc)
     {
-        XPath xpath2 = DocumentHelper.createXPath("//hlm:signalConfig[@id='" + signalid + "']/hlm:inputRef|//hlm:signalListenerConfig[@id='" + signalid + "']/signalNotifierInput/signalInput");
+        XPath xpath2 = DocumentHelper.createXPath("//hlm:signalListenerConfig[@id='" + signalid + "']/signalNotifierInput/signalInput");
         xpath2.setNamespaceURIs(map);
         List signalNodes3 = xpath2.selectNodes(antDoc);
-        
+
         for (Iterator iterator3 = signalNodes3.iterator(); iterator3.hasNext();)
         {
             Element propertyNode3 = (Element) iterator3.next();
             String signalinputid = propertyNode3.attributeValue("refid");
-            
+
             XPath xpath3 = DocumentHelper.createXPath("//hlm:signalInput[@id='" + signalinputid + "']");
             xpath3.setNamespaceURIs(map);
             List signalNodes4 = xpath3.selectNodes(antDoc);
@@ -227,7 +197,7 @@ public class Database
         }
         return null;
     }
-    
+
     /**
      * @param root
      * @param antFile
@@ -280,10 +250,10 @@ public class Database
         {
             Element argNode = (Element) iterator.next();
             String argValue = argNode.attributeValue("value");
-            
+
             if (argValue == null)
                 argValue = argNode.attributeValue("line");
-            
+
             if (argValue != null)
             {
                 Pattern filePattern = Pattern.compile(".pl|.py|.bat|.xml|.txt");
@@ -324,7 +294,7 @@ public class Database
     {
         return getAntFiles(getProject(), true);
     }
-    
+
     public ArrayList getAntFiles(Project project)
     {
         return getAntFiles(project, true);
@@ -342,16 +312,16 @@ public class Database
 
         Map targets = project.getTargets();
         Iterator targetsIter = targets.values().iterator();
-        
+
         String projectHome = null;
         try {
             projectHome = new File(project.getProperty("helium.dir")).getCanonicalPath();
-          
+
             while (targetsIter.hasNext())
             {
                 Target target = (Target) targetsIter.next();
                 String projectPath = new File(target.getLocation().getFileName()).getCanonicalPath();
-                
+
                 if (!antFiles.contains(projectPath))
                 {
                     if (homeOnly)
@@ -365,7 +335,7 @@ public class Database
                         antFiles.add(projectPath);
                 }
             }
-    
+
             if (rc != null)
             {
                 Iterator extraFilesIter = rc.iterator();
@@ -373,7 +343,7 @@ public class Database
                 {
                     FileResource f = (FileResource) extraFilesIter.next();
                     String extrafile = f.getFile().getCanonicalPath();
-                    
+
                     if (!antFiles.contains(f.toString()) && !f.getFile().getName().startsWith("test_"))
                     {
                         if (homeOnly)
@@ -388,13 +358,18 @@ public class Database
                     }
                 }
             }
-        
-        } catch (Exception e) { e.printStackTrace(); }
+
+        } catch (Exception e) { 
+            log(e.getMessage(), Project.MSG_ERR); 
+            e.printStackTrace();
+            }
         return antFiles;
     }
 
+    //--------------------------------- PRIVATE METHODS ------------------------------------------
+
     private void processMacro(Element macroNode, Element outProjectNode, String antFile)
-            throws IOException, DocumentException
+    throws IOException, DocumentException
     {
         String macroName = macroNode.attributeValue("name");
         log("Processing macro: " + macroName, Project.MSG_DEBUG);
@@ -416,7 +391,7 @@ public class Database
         // number.
         // TODO - Later we should find the line number from the XML input.
         addTextElement(outmacroNode, "location", antFile + ":1:");
-        
+
         List<Node> statements = macroNode.selectNodes("//scriptdef[@name='" + macroName + "']/attribute | //macrodef[@name='" + macroName + "']/attribute");
         String usage = "";
         for (Node statement : statements)
@@ -428,7 +403,7 @@ public class Database
                 defaultval = "<i>" + defaultval + "</i>";
             usage = usage + " " + statement.valueOf("@name") + "=\"" + defaultval + "\"";
         }
-        
+
         String macroElements = "";
         statements = macroNode.selectNodes("//scriptdef[@name='" + macroName + "']/element | //macrodef[@name='" + macroName + "']/element");
         for (Node statement : statements)
@@ -439,8 +414,8 @@ public class Database
             addTextElement(outmacroNode, "usage", "&lt;hlm:" + macroName + " " + usage + "/&gt;");
         else
             addTextElement(outmacroNode, "usage", "&lt;hlm:" + macroName + " " + usage + "&gt;\n" + macroElements + "&lt;/hlm:" + macroName + "&gt;");
-        
-        
+
+
         // Add dependencies
         // Enumeration dependencies = antmacro.getDependencies();
         // while (dependencies.hasMoreElements())
@@ -495,7 +470,7 @@ public class Database
             addTextElement(outmacroNode, "propertyDependency", property);
         }
     }
-    
+
     private void callAntTargetVisitor(Element targetNode, Element outTargetNode, Element outProjectNode)
     {
         // Add antcall/runtarget dependencies
@@ -511,26 +486,26 @@ public class Database
             Element dependencyElement = addTextElement(outTargetNode, "dependency", antcallTarget);
             dependencyElement.addAttribute("type", "exec");
         }
-        
+
         for (String log : logs)
         {
             addTextElement(outTargetNode, "log", log);
         }
-        
+
         if (globalSignalList.get(targetNode.attributeValue("name")) != null)
             signals.addAll(globalSignalList.get(targetNode.attributeValue("name")));
-        
+
         for (String signal : signals)
         {
             addTextElement(outTargetNode, "signal", signal);
         }
-        
+
         for (String executable : executables)
         {
             addTextElement(outTargetNode, "executable", executable);
         }
     }
-    
+
     private void processTarget(Element targetNode, Element outProjectNode) throws IOException, DocumentException
     {
         String targetName = targetNode.attributeValue("name");
@@ -556,7 +531,7 @@ public class Database
             {
                 Comment targetComment = (Comment) child;
                 commentText = targetComment.getStringValue().trim();
-                
+
                 log(targetName + " comment: " + commentText, Project.MSG_DEBUG);
             }
             else
@@ -566,26 +541,26 @@ public class Database
 
             Node previousNode = (Node) children.get(children.size() - 1);
         }
-        
+
         if (!commentText.contains("Private:"))
         {
             Element outTargetNode = outProjectNode.addElement("target");
-            
+
             addTextElement(outTargetNode, "name", targetNode.attributeValue("name"));
             addTextElement(outTargetNode, "ifDependency", targetNode.attributeValue("if"));
             addTextElement(outTargetNode, "unlessDependency", targetNode.attributeValue("unless"));
             addTextElement(outTargetNode, "description", targetNode.attributeValue("description"));
             addTextElement(outTargetNode, "tasks", String.valueOf(targetNode.elements().size()));
-    
+
             // Add location
             Project project = getProject();
             Target antTarget = (Target) project.getTargets().get(targetName);
-            
+
             if (antTarget == null)
                 return;
-            
+
             addTextElement(outTargetNode, "location", antTarget.getLocation().toString());
-    
+
             // Add dependencies
             Enumeration dependencies = antTarget.getDependencies();
             while (dependencies.hasMoreElements())
@@ -594,12 +569,12 @@ public class Database
                 Element dependencyElement = addTextElement(outTargetNode, "dependency", dependency);
                 dependencyElement.addAttribute("type", "direct");
             }
-            
+
             callAntTargetVisitor(targetNode, outTargetNode, outProjectNode);
-            
+
             // Process the comment text as MediaWiki syntax and convert to HTML
             insertDocumentation(outTargetNode, commentText);
-    
+
             // Get names of all properties used in this target
             ArrayList properties = new ArrayList();
             Visitor visitor = new AntPropertyVisitor(properties);
@@ -609,12 +584,12 @@ public class Database
                 String property = (String) iterator.next();
                 addTextElement(outTargetNode, "propertyDependency", property);
             }
-            
+
             // Add the raw XML content of the element
             String targetXml = targetNode.asXML();
             // Replace the CDATA end notation to avoid nested CDATA sections
             targetXml = targetXml.replace("]]>", "] ]>");
-            
+
             addTextElement(outTargetNode, "source", targetXml, true);
         }
     }
@@ -649,11 +624,11 @@ public class Database
             if (commentText.startsWith("-"))
                 commentText = commentText.replace("-", "");
             commentText = commentText.trim();
-            
+
             String commentTextCheck = commentText.replace("deprecated>", "").replace("tt>", "").replace("todo>", "");
             if (commentTextCheck.contains(">") && !commentTextCheck.contains("</pre>"))
                 log("Warning: Comment code needs <pre> tags around it: " + commentText, Project.MSG_WARN);
-            
+
             commentText = filterTextNewlines(commentText);
             commentText = wikiModel.render(commentText);
 
@@ -683,7 +658,7 @@ public class Database
         }
         // Get the documentation element as a document
         String documentationText = "<documentation>" + commentText +
-                                    "</documentation>";
+                                 "</documentation>";
         Document docDoc = DocumentHelper.parseText(documentationText);
         outNode.add(docDoc.getRootElement());
         log("HTML comment: " + commentText, Project.MSG_DEBUG);
@@ -727,6 +702,78 @@ public class Database
         return out.toString();
     }
 
+    /**
+     * Method adds taskdef nodes to the specified project.
+     * 
+     * @param outProjectNode
+     * @throws IOException
+     */
+    private void buildTaskDefs( Element root ) throws DocumentException, IOException
+    {
+        Element projectElement = root.addElement("project");
+        projectElement.addElement("name");
+        insertDocumentation(projectElement, "");
+        HashMap < String, String > tasks = getHeliumAntTasks();
+
+        for ( String taskName : tasks.keySet() ) {
+            String className = tasks.get( taskName );
+            log("Processing TaskDef: " + taskName, Project.MSG_DEBUG);
+
+            Element outTaskDefNode = projectElement.addElement("taskdef");
+            addTextElement( outTaskDefNode, "name", taskName );
+            addTextElement( outTaskDefNode, "classname",  className );
+        }
+    }
+
+    /**
+     * Method returns all the helium ant tasks in the project.
+     * 
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    private HashMap < String, String > getHeliumAntTasks() {
+
+        // 1. Get all the task definitions from the project
+        Hashtable <String, Class<?> > allTaskdefs = getProject().getTaskDefinitions();
+        // 2. Filter the list by applying criteria
+        return filterTasks( allTaskdefs );
+    }
+
+    /**
+     * Method is used to filter tasks. 
+     * 
+     * @param allTaskdefs
+     * @param criteria
+     */
+    private HashMap < String, String > filterTasks ( Hashtable<String, Class<?> > allTaskdefs ) {
+        HashMap <String, String> tasks = new HashMap <String, String>();
+
+        Enumeration <String> taskdefsenum = allTaskdefs.keys();
+        while ( taskdefsenum.hasMoreElements () ) {
+            String key = taskdefsenum.nextElement();
+            Class<?> clazz = allTaskdefs.get(key);
+            String className = clazz.getName();
+            if ( key.contains("nokia.com") && className.startsWith("com.nokia") && 
+                    className.contains("ant.taskdefs") ) {
+                tasks.put( getTaskName( key ), clazz.getName() );
+            }
+        }
+        return tasks;
+    }
+
+    /**
+     * Returns the task name delimiting the helium namespace.
+     * 
+     * @param text
+     * @return
+     */
+    private String getTaskName( String text ) {
+        int lastIndex = text.lastIndexOf(':');
+        return text.substring( lastIndex + 1 );
+    }
+
+    //----------------------------------- PRIVATE CLASSES -----------------------------------------
+
     private class AntPropertyVisitor extends VisitorSupport
     {
         private List propertyList;
@@ -753,7 +800,7 @@ public class Database
             String text = node.getText();
             extractUsedProperties(text);
         }
-        
+
         public void visit(Element node)
         {
             if (node.getName().equals("property"))
@@ -762,7 +809,7 @@ public class Database
                 if (!propertyList.contains(propertyName))
                 {
                     propertyList.add(propertyName);
-                   log("property matches :" + propertyName, Project.MSG_DEBUG);
+                    log("property matches :" + propertyName, Project.MSG_DEBUG);
                 }
             }
         }
@@ -821,7 +868,7 @@ public class Database
         {
             this.targetList = targetList;
         }
-        
+
         public AntTargetVisitor(List targetList, List logList, List signalList, List executableList)
         {
             this.targetList = targetList;
@@ -838,7 +885,7 @@ public class Database
                 String text = node.attributeValue("target");
                 extractTarget(text);
             }
-            
+
             if (!name.equals("include") && !name.equals("exclude"))
             {
                 String text = node.attributeValue("name");
@@ -854,12 +901,12 @@ public class Database
                 text = node.attributeValue("file");
                 addLog(text);
             }
-            
+
             if (name.equals("signal") || name.equals("execSignal"))
             {
                 String signalid = getProject().replaceProperties(node.attributeValue("name"));
                 String failbuild = signalType(signalid, signaldoc);
-                
+
                 if (signalList != null)
                 {
                     if (failbuild != null)
@@ -868,7 +915,7 @@ public class Database
                         signalList.add(signalid);
                 }
             }
-            
+
             if (name.equals("exec") || name.equals("preset.exec"))
             {
                 String text = node.attributeValue("executable");
@@ -876,7 +923,7 @@ public class Database
                 log("Executable: " + text, Project.MSG_DEBUG);
             }
         }
-        
+
         private void addLog(String text)
         {
             if (text != null && logList != null)

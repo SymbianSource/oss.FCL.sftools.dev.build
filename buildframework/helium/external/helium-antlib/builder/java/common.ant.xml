@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<!-- 
+============================================================================ 
+Name        : build.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="build-common-macros" xmlns:ivy="antlib:org.apache.ivy.ant" xmlns:au="org.apache.ant.antunit">
+    <!--<dirname property="helium.source.root.dir" file="${ant.file.build-common-macros}/../.." />-->
+    <dirname property="builder.dir" file="${ant.file.build-common-macros}/../" />
+    <property name="build.temp.dir" location="${builder.dir}/../build" />
+    <property name="bin.dir" location="${basedir}/../../bin" />
+    <property name="module.temp.dir" location="${build.temp.dir}/${ant.project.name}/" />
+    <property name="lib.dir" location="${module.temp.dir}/lib" />
+    <property name="classes.dir" location="${module.temp.dir}/classes" />
+    <property name="module.bin.dir" location="${module.temp.dir}/bin" />
+    <property name="antunit.result.dir" location="${module.temp.dir}/antunit" />
+    <property name="src.dir" location="${basedir}/src" />
+    <property name="ivy.file" location="${basedir}/ivy.xml" />
+    <property name="jar.file" location="${bin.dir}/${ant.project.name}.jar" />
+    <property name="module.version.target" value="1.0" />
+    <property name="ivy.settings.dir" location="${basedir}/../../settings" />
+    <path id="lib.path.id">
+        <fileset dir="${lib.dir}" />
+    </path>
+</project>

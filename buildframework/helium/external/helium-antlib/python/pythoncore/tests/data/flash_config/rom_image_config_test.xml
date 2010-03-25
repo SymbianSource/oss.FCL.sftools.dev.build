@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<build>
+    <config name="mc" abstract="true">
+        <set name="target.dir" value="${release.images.dir}"/>
+        <set name="today" value="$(TODAY)"/>
+        
+        <set name="rom.output.dir" value="${build.drive}\output\development_flash_images"/>
+        <set name="image.type" value="prd,rnd"/>
+        <set name="build.drive" value="${build.drive}"/>
+        <set name="build.version" value="0.0728.3.0.1"/>
+        
+        <!-- Template dirs  -->
+        <set name="core.image.path" value="${image.type}/core"/>
+        <set name="languagepack.image.path" value="${image.type}/language/${languagepack.id}_variant_${description}/"/>
+        <set name="customer.image.path" value="${image.type}/customer/vanilla/${customer.id}_variant_${description}"/>
+        <set name="flash.config.path" value="${customer.image.path}"/>
+        
+        <!-- Template outputdir  -->
+        <set name="flash.output.dir" value="${rom.output.dir}/${rommake.product.name}/${image.type}"/>
+        <set name="core.output.dir" value="${rom.output.dir}/${rommake.product.name}/${core.image.path}"/>
+        <set name="languagepack.output.dir" value="${rom.output.dir}/${rommake.product.name}/${languagepack.image.path}"/>
+        <set name="customer.output.dir" value="${rom.output.dir}/${rommake.product.name}/${customer.image.path}"/>
+        <set name="eraseuda.output.dir" value="${rom.output.dir}/${rommake.product.name}/${languagepack.image.path}"/>
+        
+        <!-- Flash image name -->
+        <set name="core.image.name" value="${version.product.type}_${build.version}_${image.type}"/>
+        <set name="languagepack.image.name" value="${version.product.type}_${build.version}_${image.type}_${languagepack.id}"/>
+        <set name="customer.image.name" value="${version.product.type}_${build.version}_${image.type}_${variant.id}_${build.id}_${customer.id}_${revision}"/>
+        <set name="eraseuda.image.name" value="${config.name}_${build.version}"/>
+        <set name="flash.config.name" value="${customer.image.name}.config.xml"/>
+        
+        <!-- default localisation settings -->
+        <set name="variation" value="western"/>
+        <set name="languagepack.revision" value="0"/>
+        <set name="description" value=""/>
+        
+        <!-- Do not build target in parallel by default -->
+        <set name="build.parallel" value="false"/>
+        
+        <!-- templates to generate the makefiles -->
+        <set name="output.makefile.filename" value="${rombuild.makefile.name}"/>
+        <set name="main.makefile.template" value="${build.drive}\mc\mc_config\mc_5132_config\rombuild\main.mk"/>
+        <set name="flash.makefile.template" value="${build.drive}\mc\mc_config\mc_5132_config\rombuild\flash.mk"/>
+        <set name="core.makefile.template" value="${build.drive}\mc\mc_config\mc_5132_config\rombuild\core.mk"/>
+        <set name="languagepack.makefile.template" value="${build.drive}\mc\mc_config\mc_5132_config\rombuild\languagepack.mk"/>
+        <set name="customer.makefile.template" value="${build.drive}\mc\mc_config\mc_5132_config\rombuild\customer.mk"/>
+        <set name="uda.makefile.template" value="${build.drive}\mc\mc_config\mc_5132_config\rombuild\uda.mk"/>
+        <set name="eraseuda.makefile.template" value="${build.drive}\mc\mc_config\mc_5132_config\rombuild\eraseuda.mk"/>
+        <set name="flash.config.template" value="${build.drive}\mc\mc_config\mc_5132_config\rombuild\template.config.xml"/>
+        
+        <config name="product" abstract="true">
+            <set name="config.name" value="product"/>
+            <set name="rommake.hwid" value="2048"/>
+            <set name="version.product.type" value="RM-235"/>
+            <set name="rommake.product.name" value="product"/>
+            <set name="rommake.product.type" value="RM-235"/>
+            
+            <!-- Language pack and Variant -->
+            <config name="variants" abstract="true">
+                <set name="target.dir" value="${release.images.dir}"/>
+                <set name="build.parallel" value="false"/>
+                <!-- core -->
+                <config type="core">
+                    <set name="core.id" value="00"/>
+                    <set name="image.type" value="rnd,prd"/>
+                </config>
+                
+                <!-- western group -->
+                <config name="western" abstract="true">
+                    <set name="build.parallel" value="true"/>
+                    <config type="languagepack">
+                        <set name="languagepack.id" value="01"/>
+                        <set name="default" value="01"/>
+                        <set name="languages" value="01,02,03,05,04,13"/>
+                        <set name="description" value="EURO1"/>
+                        <set name="variation" value="western"/>
+                        <set name="revision" value="0"/>
+                    </config>
+                    <config type="languagepack">
+                        <set name="languagepack.id" value="02"/>
+                        <set name="default" value="01"/>
+                        <set name="languages" value="01,02,03,14,05,18"/>
+                        <set name="description" value="EURO2"/>
+                    </config>
+                    <config type="languagepack">
+                        <set name="languagepack.id" value="23"/>
+                        <set name="default" value="01"/>
+                        <set name="languages" value="01,02,18,03,05"/>
+                        <set name="description" value="AFRICA2"/>
+                    </config>
+                </config>
+                
+                <config name="customer_roms" abstract="true">
+                    <set name="build.parallel" value="true"/>
+                    <config type="customer">
+                        <set name="customer.id" value="01"/>
+                        <set name="description" value="vanilla_customer_variant"/>
+                        <set name="compatible.languagepack" value="01,02,03"/>
+                    </config>
+                </config>
+            </config>
+            
+            <!-- china group -->
+            <config name="china" abstract="true">
+                <set name="build.parallel" value="true"/>
+                <set name="variation" value="china"/>
+                <config type="languagepack">
+                    <set name="languagepack.id" value="11"/>
+                    <set name="default" value="29"/>
+                    <set name="languages" value="29,157"/>
+                    <set name="description" value="TAIWAN"/>
+                </config>
+            </config>
+            
+        </config>
+    </config>
+</build>

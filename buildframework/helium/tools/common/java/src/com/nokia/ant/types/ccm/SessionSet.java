@@ -22,7 +22,8 @@ import java.util.Vector;
 
 /**
  * This class implement an Ant Datatype that represents a set of
- * synergy sessions. 
+ * synergy sessions.
+ * @ant.type name="sessionset" category="SCM"
  */
 public class SessionSet extends DataType {
     private Vector sessions = new Vector();

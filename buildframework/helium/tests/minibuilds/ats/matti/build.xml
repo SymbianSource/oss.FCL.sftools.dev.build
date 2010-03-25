@@ -20,7 +20,7 @@ Description:
 Contains the configuration variables for the minibuild testing of MATTI.
 ============================================================================
 -->
-<project name="minibuild.ats" default="minibuild-ats" xmlns:au="org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+<project name="minibuild.matti" default="minibuild-ats" xmlns:au="org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
     <property environment="env"/>
     <import file="../../site/${env.TEAM}.ant.xml" />
 
@@ -83,7 +83,7 @@ Contains the configuration variables for the minibuild testing of MATTI.
     
    <!-- Run the full sequence of target for the minibuild. ,mini-build-prep,compile-main,zip-ee,mini-build-check-->
     <!--target name="minibuild-matti" depends="mini-build-cleanup,mini-build-prep,compile-main,matti-test"/-->
-    <target name="minibuild-matti" depends="mini-build-prep,ee-roms,matti-test"/>
+    <target name="minibuild-matti" depends="mini-build-prep,build-roms,matti-test"/>
     
     <!-- Prepare the minibuild. -->
     <!--target name="mini-build-prep" depends="init-build-area,start-ant-log,diamonds,set-arm-version,prep-copy-symbiantools"/-->

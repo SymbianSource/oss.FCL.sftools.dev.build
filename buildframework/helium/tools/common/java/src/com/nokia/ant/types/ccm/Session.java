@@ -21,7 +21,8 @@ import org.apache.tools.ant.types.DataType;
 
 /**
  * This class abstract a synergy session.
- * It store the address to an already existing session. 
+ * It store the address to an already existing session.
+ * @ant.type name="session" category="SCM"
  */
 public class Session extends DataType {
     // store the ccm_addr value

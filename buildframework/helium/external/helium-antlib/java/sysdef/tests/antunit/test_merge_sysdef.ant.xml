@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : test_merge_sysdef.ant.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test-merge-sysdef" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>Helium antlib merge sysdef tests.</description>
+
+    <taskdef resource="com/nokia/helium/sysdef/ant/antlib.xml" uri="http://www.nokia.com/helium" />
+    <property name="epocroot" location="../../demo/data" />
+    <property name="epocroot.temp" location="${epocroot}/temp" />
+
+
+    <!-- is called prior to the test -->
+    <target name="setUp">
+        <delete dir="${epocroot.temp}/" failonerror="false" />
+        <mkdir dir="${epocroot.temp}" />
+        <hlm:joinSysdef epocroot="${epocroot}"
+                        srcfile="${epocroot}/root/system_definition_layer1.xml"
+                        destfile="${epocroot.temp}/layer1.sysdef.xml" />
+        <hlm:joinSysdef epocroot="${epocroot}"
+                        srcfile="${epocroot}/root/system_definition_layer2.xml"
+                        destfile="${epocroot.temp}/layer2.sysdef.xml" />
+    </target>
+
+    <!-- is called after the test, even if that caused an error -->
+    <target name="tearDown">
+        <delete dir="${epocroot.temp}" failonerror="false" />
+    </target>
+
+
+    <target name="test-noargs">
+        <au:expectfailure expectedMessage="'srcfile' attribute is not defined">
+            <hlm:mergeSysdef />
+        </au:expectfailure>
+        <au:assertFileDoesntExist file="${epocroot.temp}/output.sysdef.xml" />
+    </target>
+
+    <target name="test-srcfile">
+        <au:expectfailure expectedMessage="'destfile' attribute is not defined">
+            <hlm:mergeSysdef epocroot="${epocroot}" srcfile="${epocroot.temp}/layer1.sysdef.xml" />
+        </au:expectfailure>
+        <au:assertFileDoesntExist file="${epocroot.temp}/output.sysdef.xml" />
+    </target>
+            
+    <target name="test-srcfile-destfile">
+        <au:expectfailure expectedMessage="'downstreamfile' attribute is not defined">
+            <hlm:mergeSysdef epocroot="${epocroot}"
+                             srcfile="${epocroot.temp}/layer1.sysdef.xml"
+                             destfile="${epocroot.temp}/output.sysdef.xml" />
+        </au:expectfailure>
+        <au:assertFileDoesntExist file="${epocroot.temp}/output.sysdef.xml" />
+    </target>
+        
+    <target name="test-srcfile-destfile-wrong-epocroot">
+        <au:expectfailure expectedMessage="Could not find">
+            <hlm:mergeSysdef epocroot="${epocroot}/foobar"
+                             srcfile="${epocroot.temp}/layer1.sysdef.xml"
+                             downstreamfile="${epocroot.temp}/layer2.sysdef.xml"
+                             destfile="${epocroot.temp}/output.sysdef.xml" />
+        </au:expectfailure>
+        <au:assertFileDoesntExist file="${epocroot.temp}/output.sysdef.xml" />
+    </target>            
+
+    <target name="test-valid-input">
+        <hlm:mergeSysdef epocroot="${epocroot}"
+                         srcfile="${epocroot.temp}/layer1.sysdef.xml"
+                         downstreamfile="${epocroot.temp}/layer2.sysdef.xml"
+                         destfile="${epocroot.temp}/output.sysdef.xml" />
+        <au:assertFileExists file="${epocroot.temp}/output.sysdef.xml" />
+    </target>
+
+    <target name="test-invalid-downstream-file">
+        <echo>test-wrong-content</echo>
+        <au:expectfailure expectedMessage="Could not find downstream file ">
+            <hlm:mergeSysdef epocroot="${epocroot}"
+                             srcfile="${epocroot.temp}/layer1.sysdef.xml"
+                             downstreamfile="${epocroot.temp}/layer2_invalid.sysdef.xml"
+                             destfile="${epocroot.temp}/output.sysdef.xml" />
+        </au:expectfailure>
+        <au:assertFileDoesntExist file="${epocroot.temp}/output.sysdef.xml" />
+    </target>
+
+</project>

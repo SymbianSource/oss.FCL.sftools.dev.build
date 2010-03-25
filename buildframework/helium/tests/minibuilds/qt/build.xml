@@ -40,8 +40,8 @@ Description:
     <property name="publish.root.dir" location="${build.drive}/release" />
 
     <!-- For Grace upload-->
-    <property name="release.grace.service" value="Test_Helium" />
-    <property name="release.grace.product" value="minibuild_qt" />
+    <property name="hydra.service" value="Helium" />
+    <property name="hydra.product" value="minibuild_qt" />
     <property name="release.label" value="${major.version}.${minor.version}" />
 
     <!-- build configuration -->
@@ -135,7 +135,7 @@ ${ant.coverage.summary}</echo>
     XML content are made before using XMLUnit to compare the content.
     -->
     <target name="check-diamonds">
-        <loadfile srcfile="${build.log.dir}/${build.id}_diamonds-log-start.xml" property="diamonds.log.start">
+        <loadfile srcfile="${diamonds.build.output.dir}/${build.id}_diamonds-log-start.xml" property="diamonds.log.start">
             <filterchain>
                 <tokenfilter>
                     <filetokenizer />
@@ -183,7 +183,7 @@ ${diamonds.log.start.edited}</echo>-->
     </target>
 
     <target name="mini-build-cleanup">
-        <delete verbose="true" includeemptydirs="true">         
+        <delete verbose="true" includeemptydirs="true" failonerror="false">         
             <fileset dir="${build.drive}/" casesensitive="false">
                 <include name="makefile" />
                 <include name="*.mk" />
@@ -211,30 +211,55 @@ ${diamonds.log.start.edited}</echo>-->
     <target name="mini-build-check">
         <!-- Checking that the qmake command line have been generated correctly -->
         <if>
-            <or>
-                <equals arg1="${build.system}" arg2="ec-helium" />
-                <equals arg1="${build.system}" arg2="sbs-ec" />
-            </or>
+            <equals arg1="${build.system}" arg2="ec-helium" />
             <then>
                 <au:assertFileExists file="${temp.build.dir}/run-qmake-build.mk" />
                 <loadfile property="qmake.build.makefile" srcFile="${temp.build.dir}/run-qmake-build.mk"/>
                 <au:assertTrue>
                     <and>
                         <contains string="${qmake.build.makefile}" substring="qmake -listgen -r src.pro" />
-                        <contains string="${qmake.build.makefile}" substring="qmake -listgen -platform symbian-abld -r examples.pro" />
+                        <contains string="${qmake.build.makefile}" substring="qmake -listgen -r examples.pro" />
                     </and>
                 </au:assertTrue>
             </then>
-            <else>
-                <xpathtest xmlfile="${temp.build.dir}/run-qmake-build.ant.xml">  
+        </if>
+        <if>
+            <equals arg1="${build.system}" arg2="sbs-ec" />
+            <then>
+                <au:assertFileExists file="${temp.build.dir}/run-qmake-build.mk" />
+                <loadfile property="qmake.build.makefile" srcFile="${temp.build.dir}/run-qmake-build.mk"/>
+                <au:assertTrue>
+                    <and>
+                        <contains string="${qmake.build.makefile}" substring="qmake -listgen -r  -spec symbian-sbsv2 src.pro" />
+                        <contains string="${qmake.build.makefile}" substring="qmake -listgen -r  -spec symbian-sbsv2 examples.pro" />
+                    </and>
+                </au:assertTrue>
+            </then>
+        </if>
+        <if>
+            <equals arg1="${build.system}" arg2="sbs" />
+            <then>
+                <xpathtest xmlfile="${temp.build.dir}/run-qmake-build.ant.xml">
                     <namespace uri="" prefix=""/>
                     <xpath expression="/project/target[@name='all']/parallel/sequential/if/then/exec/arg[@value='-listgen']"/>
                     <xpath expression="/project/target[@name='all']/parallel/sequential/if/then/exec/arg[@line='-r']"/>
-                    <xpath expression="/project/target[@name='all']/parallel/sequential/if/then/exec/arg[@line='-platform symbian-abld -r -listgen']"/>
+                    <xpath expression="/project/target[@name='all']/parallel/sequential/if/then/exec/arg[@line='-r -listgen']"/>
+                    <xpath expression="/project/target[@name='all']/parallel/sequential/if/then/exec/arg[@line='-r -listgen']"/>
+                    <xpath expression="/project/target[@name='all']/parallel/sequential/if/then/exec/arg[@line='-spec symbian-sbsv2']"/>
                 </xpathtest>
-            </else>
+            </then>
         </if>
-        
+        <if>
+            <equals arg1="${build.system}" arg2="ebs" />
+            <then>
+                    <xpathtest xmlfile="${temp.build.dir}/run-qmake-build.ant.xml">
+                        <namespace uri="" prefix=""/>
+                        <xpath expression="/project/target[@name='all']/parallel/sequential/if/then/exec/arg[@value='-listgen']"/>
+                        <xpath expression="/project/target[@name='all']/parallel/sequential/if/then/exec/arg[@line='-r']"/>
+                        <xpath expression="/project/target[@name='all']/parallel/sequential/if/then/exec/arg[@line='-r -listgen']"/>
+                    </xpathtest>
+            </then>
+        </if>
         <!-- Check if prep has set some prop correctly... -->
         <echo>'${arm.compiler.version}'</echo>
         <au:assertMatches string="${arm.compiler.version}" pattern="RVCT2\.2 \[Build 616\]" casesensitive="false" multiline="true" />
@@ -245,9 +270,9 @@ ${diamonds.log.start.edited}</echo>-->
         <au:assertFileExists file="${qt.dir}/examples/bld.inf" />
         <au:assertFileExists file="${build.drive}/epoc32/tools/qmake.bat" />
         <au:assertFileExists file="${build.drive}/epoc32/tools/moc.bat" />
-        <hlm:assertFileExists file="${build.log.dir}/${build.id}_build.qmake.generated.txt"/>
-        <hlm:assertFileExists file="${build.log.dir}/${build.id}_build_tools.qmake.generated.txt"/>
-        <loadfile srcFile="${build.log.dir}/${build.id}_build.qmake.generated.txt" property="qmake.generated.output"/>
+        <hlm:assertFileExists file="${compile.log.dir}/${build.id}_build.qmake.generated.txt"/>
+        <hlm:assertFileExists file="${compile.log.dir}/${build.id}_build_tools.qmake.generated.txt"/>
+        <loadfile srcFile="${compile.log.dir}/${build.id}_build.qmake.generated.txt" property="qmake.generated.output"/>
         <au:assertMatches string="${qmake.generated.output}" pattern="[^/]+/+[^/]+" />
 
     </target>

@@ -9,17 +9,6 @@ Configure Helium for Qt building
 
 This tutorial explains how to update your configuration to enable Qt building.
 
-Configuring Qt
-==============
-
-Helium has a ready to use target which allows you to configure Qt. You just need to make sure the qt.dir
-property is configured with the correct location of your Qt source.
-Then you can run the target as follow::
-
- > hlm -Dbuild.drive=Q: -Dbuild.number=1 configure-qt
- ...
- 
-This target has now been depreciated in Helium 6.0, please consider building Qt using Symbian toolchain (SBS or SBSv2).
 
 Building Qt components
 ======================
@@ -37,7 +26,10 @@ Then qmake building needs to be activated by defining the ``qmake.enabled`` prop
 Then you can configure your Qt components by using the proFile attribute under the system definition files.
 The proFile attribute defines the name of the pro file relatively to the path defined by the bldFile attribute.
 Default qMake command line parameters can be overridden by using the optional qmakeArgs attribute. 
-Example::
+
+Example
+
+.. code-block:: xml
    
    <?xml version="1.0"?>
    <!DOCTYPE SystemDefinition SYSTEM "sysdef_1_5_1.dtd" []>

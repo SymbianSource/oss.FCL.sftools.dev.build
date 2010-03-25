@@ -32,4 +32,7 @@ Description:
     <taskdef resource="com/nokia/helium/scm/ant/antlib.xml" uri="http://www.nokia.com/helium"/>
     <taskdef resource="com/nokia/helium/metadata/ant/antlib.xml" uri="http://www.nokia.com/helium"/>
     <taskdef resource="com/nokia/helium/quality/ant/antlib.xml" uri="http://www.nokia.com/helium"/>
+    <taskdef resource="com/nokia/helium/imaker/ant/antlib.xml" uri="http://www.nokia.com/helium" />
+    <taskdef resource="com/nokia/helium/sbs/ant/antlib.xml" uri="http://www.nokia.com/helium" />
+    <taskdef resource="com/nokia/helium/logger/ant/antlib.xml" uri="http://www.nokia.com/helium" />
 </project>

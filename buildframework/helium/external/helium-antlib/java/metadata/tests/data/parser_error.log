@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<buildlog sbs_version="2.9.2 [2009-09-21 sf release]" xmlns="http://symbian.com/xml/build/log" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symbian.com/xml/build/log http://symbian.com/xml/build/log/1_0.xsd">
+<recipe name='compile' target='X:/epoc32/build/organizer/c_aff6bae36b1df6c4/srchuiresviewplugin_dll/armv5/urel/srchuiresultview.o' host='' layer='app_layer' component='' bldinf='X:/sf/app/organizer/group/bld.inf' mmp='X:/sf/app/organizer/searchui/searchapp/plugins/resultviewerplugin/group/srchuiresviewplugin.mmp' config='armv5_urel.product' platform='armv5' phase='ALL' source='X:/sf/app/organizer/searchui/searchapp/plugins/resultviewerplugin/src/srchuiresultview.cpp'>
+<![CDATA[
++ C:/APPS/rvct22_616/bin/armcc.exe -O2 --dwarf2 --dllimport_runtime --exceptions --exceptions_unwind --diag_suppress 161,611,654,997,1152,1300,1464,1488,2523,6318,6331 --diag_error 1267 --cpu 5T --enum_is_int -Ono_known_library --fpmode ieee_no_fenv --export_all_vtbl --memaccess -UL41 --no_vfe --apcs /inter -c --thumb -D__MARM_THUMB__ --fpu softvfp --cpp -D__MARM_INTERWORK__ -D__SUPPORT_CPP_EXCEPTIONS__ -D_UNICODE -D__SYMBIAN32__ -D__ARMCC__ -D__EPOC32__ -D__MARM__ -D__EABI__ '-D__PRODUCT_INCLUDE__="X:/epoc32/include/feature_settings.hrh"' -D__MARM_ARMV5__ -D__ARMCC_2__ -D__ARMCC_2_2__ -DNDEBUG -D__DLL__ --preinclude X:/epoc32/include/rvct/rvct.h -JX:/sf/app/organizer/searchui/searchapp/plugins/resultviewerplugin/src -JX:/sf/app/organizer/searchui/searchapp/plugins/resultviewerplugin/inc -JX:/sf/app/organizer/searchui/searchapp/inc -JX:/sf/app/organizer/searchui/searchapp/SrchUICommon/inc -JX:/epoc32/ -JX:/epoc32/include/config/platform -JX:/epoc32/include/baseport -JX:/epoc32/include -JX:/epoc32/include/ecom -JX:/epoc32/include -JX:/epoc32/include/mw -JX:/epoc32/include/platform/mw -JX:/epoc32/include/platform -JX:/epoc32/include/app -JX:/epoc32/include/platform/app -JX:/epoc32/include/platform/loc -JX:/epoc32/include/platform/mw/loc -JX:/epoc32/include/platform/app/loc -JX:/epoc32/include/platform/loc/sc -JX:/epoc32/include/platform/mw/loc/sc -JX:/epoc32/include/platform/app/loc/sc --depend_format=unix --depend X:/epoc32/build/organizer/c_aff6bae36b1df6c4/srchuiresviewplugin_dll/armv5/urel/srchuiresultview.o.d -o X:/epoc32/build/organizer/c_aff6bae36b1df6c4/srchuiresviewplugin_dll/armv5/urel/srchuiresultview.o X:/sf/app/organizer/searchui/searchapp/plugins/resultviewerplugin/src/srchuiresultview.cpp
+"X:\sf\app\organizer\searchui\searchapp\plugins\resultviewerplugin\src\srchuiresultview.cpp", line 339: Error:  #20: identifier "KSEARCH_HLP_SINGLE_RE" is undefined
+          	helpContext.iContext = KSEARCH_HLP_SINGLE_RE; // add correct help context when available
+          	                       ^
+X:\sf\app\organizer\searchui\searchapp\plugins\resultviewerplugin\src\srchuiresultview.cpp: 0 warnings, 1 error
+
+]]><time start='1253718692.38008' elapsed='1.094' />
+<error>
+<status exit='failed' code='1' attempt='3' />
+</recipe>
+make: *** [X:/epoc32/build/organizer/c_aff6bae36b1df6c4/srchuiresviewplugin_dll/armv5/urel/srchuiresultview.o] Error 1
+<clean bldinf='X:/sf/app/organizer/group/bld.inf' mmp='X:/sf/app/organizer/searchui/searchapp/plugins/resultviewerplugin/group/srchuiresviewplugin.mmp' config='armv5_udeb.product'>
+<file>X:/epoc32/release/armv5/udeb/srchuiresviewplugin.dll</file>
+<file>"X:/epoc32/build/organizer/c_aff6bae36b1df6c4/srchuiresviewplugin_dll/armv5/udeb/srchuiresviewplugin{000a0000}.def"</file>
+<file>"X:/epoc32/build/organizer/c_aff6bae36b1df6c4/srchuiresviewplugin_dll/armv5/udeb/srchuiresviewplugin{000a0000}.dso"</file>
+<file>X:/epoc32/release/armv5/udeb/srchuiresviewplugin.dll.sym</file>
+<file>X:/epoc32/build/organizer/c_aff6bae36b1df6c4/srchuiresviewplugin_dll/armv5/udeb/srchuiresviewplugin_udeb_objects.via</file>
+<file>X:/epoc32/release/armv5/udeb/srchuiresviewplugin.dll.map</file>
+<file>X:/epoc32/build/organizer/c_aff6bae36b1df6c4/srchuiresviewplugin_dll/armv5/udeb/srchuiresultview.o.d</file>
+<file>X:/epoc32/build/organizer/c_aff6bae36b1df6c4/srchuiresviewplugin_dll/armv5/udeb/srchuiresultcontainer.o.d</file>
+<file>X:/epoc32/build/organizer/c_aff6bae36b1df6c4/srchuiresviewplugin_dll/armv5/udeb/srchuiresultmodel.o.d</file>
+<file>X:/epoc32/build/organizer/c_aff6bae36b1df6c4/srchuiresviewplugin_dll/armv5/udeb/proxy.o.d</file>
+<file>X:/epoc32/build/organizer/c_aff6bae36b1df6c4/srchuiresviewplugin_dll/armv5/udeb/srchuiresultview.o</file>
+<file>X:/epoc32/build/organizer/c_aff6bae36b1df6c4/srchuiresviewplugin_dll/armv5/udeb/srchuiresultcontainer.o</file>
+<file>X:/epoc32/build/organizer/c_aff6bae36b1df6c4/srchuiresviewplugin_dll/armv5/udeb/srchuiresultmodel.o</file>
+<file>X:/epoc32/build/organizer/c_aff6bae36b1df6c4/srchuiresviewplugin_dll/armv5/udeb/proxy.o</file>
+<file>X:/epoc32/build/organizer/c_aff6bae36b1df6c4/srchuiresviewplugin_dll/armv5/udeb/srchuiresultview.o</file>
+<file>X:/epoc32/build/organizer/c_aff6bae36b1df6c4/srchuiresviewplugin_dll/armv5/udeb/srchuiresultcontainer.o</file>
+<file>X:/epoc32/build/organizer/c_aff6bae36b1df6c4/srchuiresviewplugin_dll/armv5/udeb/srchuiresultmodel.o</file>
+<file>X:/epoc32/build/organizer/c_aff6bae36b1df6c4/srchuiresviewplugin_dll/armv5/udeb/proxy.o</file>
+<file>X:/epoc32/release/armv5.product/udeb/srchuiresviewplugin.dll</file>
+<file>X:/epoc32/release/armv5.product/udeb/srchuiresviewplugin.dll.sym</file>
+<file>X:/epoc32/release/armv5.product/udeb/srchuiresviewplugin.dll.map</file>
+<dir>X:/epoc32/build/organizer/c_aff6bae36b1df6c4/srchuiresviewplugin_dll/armv5</dir>
+<dir>X:/epoc32/build/organizer/c_aff6bae36b1df6c4/srchuiresviewplugin_dll/armv5</dir>
+<dir>X:/epoc32/build/organizer/c_aff6bae36b1df6c4/srchuiresviewplugin_dll/armv5/udeb</dir>
+<dir>X:/epoc32/release/armv5/udeb</dir>
+<dir>X:/epoc32/release/armv5/lib</dir>
+<dir>X:/epoc32/release/armv5/lib</dir>
+<dir>X:/epoc32/release/armv5.product/udeb</dir>
+</clean>
+</buildlog>

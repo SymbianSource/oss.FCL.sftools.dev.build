@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : build.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="helium-diamonds" xmlns:au="antlib:org.apache.ant.antunit">
+    <description>Helium Antlib diamonds tests.</description>
+    
+    <dirname property="diamonds.unitest.dir" file="${ant.file.helium-antlib-diamonds-unittest}" />
+    <property environment="env" />
+    <import file="../../../../nokia/companyproperties.ant.xml" optional="true"/>
+    <import file="../../../../../extensions/nokia/external/helium-nokia-antlib/companyproperties.ant.xml" optional="true"/>
+    <property name="diamonds.output.dir" location="${diamonds.unitest.dir}/output" />
+    <property name="diamonds.template.dir" location="${diamonds.unitest.dir}/templates" />
+    <property name="build.family" value="test_new_hlm"/>
+    <property name="id" value="123"/>
+    <property name="name" value="${build.family}_${id}"/>
+    <property name="build.system" value="ec-helium"/>
+    <property name="diamonds.listener.configuration.file" location="${diamonds.unitest.dir}/config/diamonds_config.xml.ftl" />
+    <property name="compile.log.input" location="${diamonds.unitest.dir}/data/compile.log.xml" />
+    <property name="codescanner.log.input" location="${diamonds.unitest.dir}/data/problemIndex.xml" />
+    <property name="policy.log.input" location="${diamonds.unitest.dir}/data/policy.log.xml" />
+    <property name="invalid.target.input.file" location="${diamonds.unitest.dir}/data/invalid.target.input.log.xml" />
+    <property name="symsee.version" value="9.1.0" />
+
+    <import file="./test_diamonds.ant.xml" />
+
+    <target name="unittest" depends="unittest-diamonds" />
+    
+    <target name="unittest-diamonds" >
+        <delete dir="${diamonds.unitest.dir}/output" failonerror="false"/>
+        <mkdir dir="${diamonds.unitest.dir}/output"/>
+        <antcall target="test-all" />
+    </target>
+</project>

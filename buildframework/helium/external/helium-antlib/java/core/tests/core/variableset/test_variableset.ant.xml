@@ -1,0 +1,127 @@
+<?xml version="1.0"?>
+<!-- 
+============================================================================ 
+Name        : test_executor.ant.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test-variableset" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>Helium antlib core variableset tests.</description>
+
+    <typedef name="arg" classname="com.nokia.helium.core.ant.types.Variable"/>
+    <typedef name="argSet" classname="com.nokia.helium.core.ant.types.VariableSet"/>
+
+    <taskdef resource="com/nokia/helium/core/ant/antlib.xml" uri="http://www.nokia.com/helium"/>
+    <taskdef name="getVariableValue" classname="com.nokia.helium.core.ant.taskdefs.GetValueFromVariableSet"/>
+
+    <argSet id="common.argset">
+        <arg line="-c tools_rel -c tools2_rel" />
+        <arg name="-j" value="1" />
+    </argSet>
+
+    <argSet id="common.invalid.arg1" />
+
+    <argSet id="common.invalid.arg2">
+        <arg name="-j"/>
+    </argSet>
+
+    <argSet id="common.invalid.arg3">
+        <arg line="-c tools_rel -c tools2_rel" name="test" value="test"/>
+    </argSet>
+
+    <argSet id="override.argset.thread">
+        <argSet refid="common.argset" />
+        <arg name="-j" value="10" />
+    </argSet>
+
+    <argSet id="load.order1">
+        <arg name="--engine" value="emake" />
+        <argSet refid="common.argset" />
+    </argSet>
+
+    <target name="test-var-value-test1">
+        <getVariableValue name="-j" property="test.var">
+            <argSet refid="common.argset" />
+        </getVariableValue>
+        <echo message="test.var: ${test.var}" />
+        <au:assertTrue>
+            <equals arg1="${test.var}" arg2="1"/>
+        </au:assertTrue>
+    </target>
+
+    <target name="test-var-invalid-ref">
+        <au:expectfailure>
+            <getVariableValue name="-j" property="test.var">
+                <argSet refid="common.target" />
+            </getVariableValue>
+        </au:expectfailure>
+    </target>
+
+    <target name="test-var-override-test1">
+        <getVariableValue name="-j" property="test.var">
+            <argSet refid="override.argset.thread" />
+        </getVariableValue>
+        <echo message="test.var: ${test.var}" />
+        <au:assertTrue>
+            <equals arg1="${test.var}" arg2="10"/>
+        </au:assertTrue>
+    </target>
+
+    <target name="test-var-load-order1">
+        <getVariableValue name="--engine" property="test.var">
+            <argSet refid="load.order1" />
+        </getVariableValue>
+        <echo message="test.var: ${test.var}" />
+        <au:assertTrue>
+            <equals arg1="${test.var}" arg2="emake"/>
+        </au:assertTrue>
+    </target>
+
+    <target name="test-var-invalid-name">
+        <au:expectfailure>
+            <getVariableValue name="--engine" property="test.var">
+                <argSet refid="common.argset" />
+            </getVariableValue>
+        </au:expectfailure>
+    </target>
+
+    <target name="test-var-invalid-arg1">
+        <au:expectfailure>
+            <getVariableValue name="--engine" property="test.var">
+                <argSet refid="common.invalid.arg1" />
+            </getVariableValue>
+        </au:expectfailure>
+    </target>
+
+    <target name="test-var-invalid-arg2">
+        <au:expectfailure>
+            <getVariableValue name="--engine" property="test.var">
+                <argSet refid="common.invalid.arg2" />
+            </getVariableValue>
+        </au:expectfailure>
+    </target>
+
+    <target name="test-var-invalid-arg3">
+        <au:expectfailure>
+            <getVariableValue name="--engine" property="test.var">
+                <argSet refid="common.invalid.arg3" />
+            </getVariableValue>
+        </au:expectfailure>
+    </target>
+
+</project>

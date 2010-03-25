@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : test_core.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test_core" xmlns:au="org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>
+        Testing core targets
+    </description>
+    
+    <target name="test-prettyprintxml-filter">
+        <loadfile srcfile="./../data/config_test.cfg.xml" property="xml.test.content">
+            <filterchain>
+                <tokenfilter>
+                    <filetokenizer/>
+                    <hlm:prettyprintxml/>                
+                </tokenfilter>
+            </filterchain>
+        </loadfile>
+        <echo>Pretty-printed XML:
+            
+${xml.test.content}</echo>
+    </target>
+
+</project>
+

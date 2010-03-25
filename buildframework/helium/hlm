@@ -1,0 +1,129 @@
+#!/bin/bash
+
+#
+# Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+#
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+#
+# Contributors:
+#
+# Description: 
+#
+if [ ! $HELIUM_HOME ] ; then
+    export HELIUM_HOME=$(dirname $(readlink /proc/$$/fd/255))
+fi
+
+# For nokia specific enviroment configurations.
+if [ -f $HELIUM_HOME/extensions/nokia/env.sh ] ; then
+    . $HELIUM_HOME/extensions/nokia/env.sh
+fi
+
+export LANG="en_US.UTF-8"
+export ANT_ARGS="-lib $HELIUM_HOME/extensions/nokia/external/antlibs -lib $HELIUM_HOME/extensions/nokia/external/helium-nokia-antlib/bin -lib $HELIUM_HOME/external/helium-antlib/bin -lib $HELIUM_HOME/external/antlibs -lib $HELIUM_HOME/tools/common/java/lib -logger com.nokia.ant.HeliumLogger -Dant.executor.class=com.nokia.helium.core.ant.HeliumExecutor -listener com.nokia.helium.diamonds.ant.HeliumListener -listener com.nokia.helium.logger.ant.listener.StatusAndLogListener -listener com.nokia.helium.core.ant.listener.TargetTimesLogGeneratorListener"
+
+PYTHON_VERSION=`python -c "import sys; print sys.version[:3]"`
+PYTHON_VERSION2=$PYTHON_VERSION$HOSTTYPE
+PYTHONLIB=$HELIUM_HOME/external/python/lib/linux/$PYTHON_VERSION2
+
+TEMP_PYTHONPATH="$PYTHONLIB:$HELIUM_HOME/external/python/lib/common:$HELIUM_HOME/external/helium-antlib/python/pythoncore/lib:$HELIUM_HOME/tools/common/python/scripts:$HELIUM_HOME/extensions/nokia/external/python/lib/2.5:$HELIUM_HOME/extensions/nokia/tools/common/python/lib:$HELIUM_HOME/extensions/nokia/external/helium-nokia-antlib/python:$HELIUM_HOME/extensions/nokia/external/helium-nokia-antlib/python/pythonnokia/lib"
+
+TEMP_PERL5LIB="$HELIUM_HOME/tools/common/packages"
+if [ ! $PERL5LIB ] ; then
+    PERL5LIB=$TEMP_PERL5LIB
+else
+    PERL5LIB="$PERL5LIB:$TEMP_PERL5LIB"
+fi
+
+
+if [ $HOST ]; then
+    export COMPUTERNAME=$HOST
+elif [ $HOSTNAME ]; then
+    export COMPUTERNAME=$HOSTNAME
+else
+    export COMPUTERNAME=$(hostname)
+fi
+
+CWD=`pwd`
+
+if [ ! -e "$PYTHONLIB" ] ; then
+    mkdir $PYTHONLIB
+    cp $HELIUM_HOME/external/python/lib/common/site.py $PYTHONLIB
+fi
+
+export PYTHONPATH=$HELIUM_HOME/external/python/lib/common/setuptools-0.6c5-py2.5.egg
+
+if [ ! -e "$PYTHONLIB/4Suite_XML-1.0.2.egg" ] ; then
+    cp $HELIUM_HOME/external/python/lib/linux/easy-install.pth $PYTHONLIB
+    tar xvfz $HELIUM_HOME/external/python/lib/linux/4Suite-XML-1.0.2.tar.gz -C $PYTHONLIB > /dev/null
+    cd $PYTHONLIB/4Suite-XML-1.0.2
+    python setup.py bdist_egg > /dev/null
+    mv dist/*.egg $PYTHONLIB/4Suite_XML-1.0.2.egg
+fi
+
+if [ ! -e "$PYTHONLIB/lxml-1.3.6.egg" ] ; then
+    cp $HELIUM_HOME/external/python/lib/linux/easy-install.pth $PYTHONLIB
+    tar xvfz $HELIUM_HOME/external/python/lib/linux/lxml-1.3.6.tgz -C $PYTHONLIB > /dev/null
+    cd $PYTHONLIB/lxml-1.3.6
+    python setup.py bdist_egg > /dev/null
+    mv dist/*.egg $PYTHONLIB/lxml-1.3.6.egg
+fi
+
+if [ ! -e "$PYTHONLIB/PyXML-0.8.4.egg" ] ; then
+    cp $HELIUM_HOME/external/python/lib/linux/easy-install.pth $PYTHONLIB
+    tar xvfz $HELIUM_HOME/external/python/lib/linux/PyXML-0.8.4.tar.gz -C $PYTHONLIB > /dev/null
+    cd $PYTHONLIB/PyXML-0.8.4
+    python setup.py bdist > /dev/null
+    mv build/lib* $PYTHONLIB/PyXML-0.8.4.egg
+fi
+
+cd $CWD
+
+if [ ! $PYTHONPATH ] ; then
+    export PYTHONPATH=$TEMP_PYTHONPATH
+else
+    export PYTHONPATH="$PYTHONPATH:$TEMP_PYTHONPATH"
+fi
+
+TEMP_JYTHONPATH="$HELIUM_HOME/external/python/lib/2.5/jython-2.5-py2.5.egg:$PYTHONPATH"
+
+if [ ! $JYTHONPATH ] ; then
+    export JYTHONPATH=$TEMP_JYTHONPATH
+else
+    export JYTHONPATH="$JYTHONPATH:$TEMP_JYTHONPATH"
+fi
+
+export USERNAME=$USER
+export SYMSEE_VERSION="not_in_use"
+export PID=$$
+export TEMP="/tmp/$USER"
+if [ $JOB_ID ] ; then
+    export HELIUM_CACHE_DIR="$TEMP/helium/$USER/$JOB_ID"
+else
+    export HELIUM_CACHE_DIR="$TEMP/helium/$USER"
+fi
+export ANT_OPTS="-Dlog4j.configuration=com/nokia/log4j.xml -Dlog4j.cache.dir=$HELIUM_CACHE_DIR"
+export PYTHON_CACHEDIR="$HELIUM_CACHE_DIR/python"
+
+mkdir -p $HELIUM_CACHE_DIR
+
+if [ ! $EPOCROOT ]; then
+    export EPOCROOT="/"
+fi 
+
+if [ ! -f "$HELIUM_HOME/external/helium-antlib/bin/helium-checktools.jar" ] ; then
+    echo helium-checktools.jar not found
+else 
+    java -cp "$HELIUM_HOME/external/helium-antlib/bin/helium-checktools.jar" com.nokia.helium.checktools.HeliumToolsCheckerMain -config "$HELIUM_HOME/config/helium.basic.tools.config"
+
+    if [ $? -eq 0 ] ; then
+      exec ant -Dpython.cachedir=$PYTHON_CACHEDIR -Dhelium.dir=$HELIUM_HOME -Dpython.path=$PYTHONPATH -Dcache.dir=$HELIUM_CACHE_DIR $*
+    else
+        echo Build aborted with error
+    fi    
+fi   
