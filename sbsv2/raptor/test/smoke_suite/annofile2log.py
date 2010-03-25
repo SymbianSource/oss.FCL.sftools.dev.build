@@ -24,16 +24,12 @@ def run():
 	
 	t.usebash = True
 	t.errors = 0
-	t.returncode = 1
+	t.returncode = 0
 	t.exceptions = 0
 	t.command = "cd smoke_suite/test_resources/annofile2log && ( diff -wB <(python testanno2log.py <(bzip2 -dc scrubbed_ncp_dfs_resource.anno.bz2)) <(bzip2 -dc scrubbed_ncp_dfs_resource.stdout.bz2))"
 	
 	t.mustmatch_multiline = [ 
-		".*1a2.*" + 
-		"Starting build: 488235.{1,3}" +
-		"14009c12884.{1,4}" +
-		"---.{1,4}" +
-		"Finished build: 488235   Duration: 1:15 \(m:s\)   Cluster availability: 100%.*"
+		"^ *.?"
                 ]
 
 

@@ -1,9 +1,18 @@
 Release Notes for Symbian Build System v2
 
+
+
 next version
+- Fix: in copylogfromannofile mode, ensure that the build id and duration are included in the log. These are not critical but are useful.
+- Fix: remove unnecessary empty lines in log output in copylogfromannofile mode. 
+
+
+version 2.12.5
+
+Defect Fixes:
 - Fix: Workaround for emake engine log corruption when clockskew errors occur (annofile2log). 
   Allow Raptor to obtain log from emake annotation file where it is uncorrupted.  A new 
-  Make engine option "copyannofile2log" enables/disables this mode for emake. If this option is disabled
+  Make engine option "copylogfromannofile" enables/disables this mode for emake. If this option is disabled
   or if no annotation file is specified for the build then Raptor reads logs directly as normal.
 - SF Bug 2125 - [Raptor] - tracecompiler what output incorrect if mmp basename contains '.' e.g. fred.prd.mmp 
 - SF Bug 2191 - [Raptor] - When forcesuccess is enabled, exit status for a failed recipe is "retry" but should be "failed"
