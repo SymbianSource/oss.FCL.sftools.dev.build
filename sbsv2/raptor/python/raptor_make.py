@@ -71,7 +71,6 @@ def AnnoFileParseOutput(annofile):
 	af = open(annofile, "r")
 
 	inOutput = False
-	inParseJob = False
 
 	buildid = ""
 	for line in af:
