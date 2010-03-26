@@ -29,7 +29,7 @@ def run():
 	t.command = "sbs -b smoke_suite/test_resources/timeout/bld.inf -f-"
 
 	t.mustmatch = [
-		"status exit='failed' code='" + exitCode + "' attempt='1' *reason='timeout'",
+		"status exit='failed' code='" + exitCode + "' attempt='1' reason='timeout'",
 	]
 	t.errors = -1
 	t.returncode = 1
@@ -40,10 +40,10 @@ def run():
 	t.usebash = True
 	t.command = "sbs -b smoke_suite/test_resources/timeout/bld.inf -t 3 -f-"
 
-	t.mustmatch = [
-		"status exit='retry' code='" + exitCode + "' attempt='1' *reason='timeout'",
-		"status exit='retry' code='" + exitCode + "' attempt='2' *reason='timeout'",
-		"status exit='failed' code='" + exitCode + "' attempt='3' *reason='timeout'",
+	t.mustmatch_singleline = [
+		"status exit='retry' code='" + exitCode + "' attempt='1' reason='timeout'",
+		"status exit='retry' code='" + exitCode + "' attempt='2' reason='timeout'",
+		"status exit='failed' code='" + exitCode + "' attempt='3' reason='timeout'",
 	]
 	t.errors = -1
 	t.returncode = 1
