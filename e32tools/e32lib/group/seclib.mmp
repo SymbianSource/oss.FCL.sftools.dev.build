@@ -45,7 +45,7 @@ userinclude     ../../../imgtools/imglib/compress
 userinclude     ../setcap 
 userinclude     ../../e32lib/e32image/inc
 systeminclude   /epoc32/include
-
+OS_LAYER_SYSTEMINCLUDE
 OPTION          GCC -w
 
 //macro __PLACEMENT_NEW_INLINE
