@@ -117,6 +117,12 @@ class MakeEngine(object):
 			self.talonshell = str(evaluator.Get("TALON_SHELL"))
 			self.talontimeout = str(evaluator.Get("TALON_TIMEOUT"))
 			self.talonretries = str(evaluator.Get("TALON_RETRIES"))
+			
+			# Get the ####################################	
+			delete_on_failed_compile_s = evaluator.Get("DELETE_ON_FAILED_COMPILE")
+			self.delete_on_failed_compile = ""
+			if delete_on_failed_compile_s is not None and delete_on_failed_compile_s != "":
+				self.delete_on_failed_compile = "1"
 
 			# commands
 			self.initCommand = evaluator.Get("initialise")
@@ -230,6 +236,7 @@ OSTYPE:=%s
 FLMHOME:=%s
 SHELL:=%s
 THIS_FILENAME:=$(firstword $(MAKEFILE_LIST))
+DELETE_ON_FAILED_COMPILE:=%s 
 
 %s
 
@@ -241,6 +248,7 @@ include %s
 			 self.raptor.filesystem,
 			 str(self.raptor.systemFLM),
 			 self.shellpath,
+			 self.delete_on_failed_compile,
 			 talon_settings,
 			 self.raptor.systemFLM.Append('globals.mk') )
 
