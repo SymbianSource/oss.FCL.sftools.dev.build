@@ -34,7 +34,7 @@ miniCommandOption = "--co"  # update this if another "co" option is added
 # raptor_cli module attributes
 
 parser = OptionParser(prog = raptor.name,
-					  usage = """%prog [--help] [options] [variable=value] [target] ...
+					  usage = """%prog [--help] [options] [target] ...
 
 Targets:
 
@@ -247,13 +247,8 @@ def DoRaptor(Raptor, args):
 
 	# the leftover_args are either variable assignments of the form a=b
 	# or target names.
-	regex = re.compile("^(.+)=(.*)$")
 	for leftover in leftover_args:
-		assignment = regex.findall(leftover)
-		if len(assignment) > 0:
-			Raptor.SetEnv(assignment[0][0],assignment[0][1])
-		else:
-			Raptor.AddTarget(leftover)
+		Raptor.AddTarget(leftover)
 
 	# Define the dictionary of functions to be used.
 	# Attributes and function names can be added easily.
