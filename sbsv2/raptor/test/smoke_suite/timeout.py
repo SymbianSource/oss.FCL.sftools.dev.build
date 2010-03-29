@@ -26,9 +26,9 @@ def run():
 	t.id = "60a"
 	t.name = "timeout"
 	t.usebash = True
-	t.command = "sbs -b smoke_suite/test_resources/timeout/bld.inf -f-"
+	t.command = "sbs -b smoke_suite/test_resources/timeout/bld.inf -f -"
 
-	t.mustmatch = [
+	t.mustmatch_singleline = [
 		"status exit='failed' code='" + exitCode + "' attempt='1' reason='timeout'",
 	]
 	t.errors = -1
@@ -38,7 +38,7 @@ def run():
 	t.id = "60b"
 	t.name = "timeout with retries"
 	t.usebash = True
-	t.command = "sbs -b smoke_suite/test_resources/timeout/bld.inf -t 3 -f-"
+	t.command = "sbs -b smoke_suite/test_resources/timeout/bld.inf -t 3 -f -"
 
 	t.mustmatch_singleline = [
 		"status exit='retry' code='" + exitCode + "' attempt='1' reason='timeout'",
