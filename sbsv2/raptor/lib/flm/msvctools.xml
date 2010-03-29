@@ -42,7 +42,6 @@
 		<param name='OPT.LISTING'/>
 		<param name='OPT.OBJECTFILE'/>
 		<param name='OPT.OUTFILE'/>
-		<param name='OPT.PDBFILE'/>
 		<param name='OPT.PREINCLUDE'/>
 		<param name='OPT.SUBSYSTEM'/>
 		<param name='OPT.SYSINCLUDE'/>

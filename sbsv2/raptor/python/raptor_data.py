@@ -65,7 +65,7 @@ class HostPlatform(object):
 
 # Make sure not to start up on an unsupported platform
 if not HostPlatform.IsKnown(HostPlatform.hostplatform):
-	raise Exception("raptor_data module loaded on an unrecognised platform '%s'. Expected one of %s" % (hostplatform, str(hostplatforms)))
+	raise Exception("raptor_data module loaded on an unrecognised platform '%s'. Expected one of %s" % (HostPlatform.hostplatform, str(HostPlatform.hostplatforms)))
 
 
 # raptor_data module classes
@@ -139,7 +139,13 @@ class Reference(Model):
 		raise BadReferenceError()
 
 	def GetModifiers(self, cache):
-		return [ cache.FindNamedVariant(m) for m in self.modifiers ]
+		mods = []
+		for m in self.modifiers:
+			try:
+				mods.append(cache.FindNamedVariant(m))
+			except KeyError:
+				raise BadReferenceError(m)
+		return mods
 
 	def Valid(self):
 		return self.ref
@@ -710,7 +716,7 @@ class Env(Set):
 
 	def __str__(self):
 		attributes = "name='" + self.name + "' type='" + self.type + "'"
-		if default != None:
+		if self.default != None:
 			attributes += " default='" + self.default + "'"
 
 		if type == "tool":
@@ -724,19 +730,31 @@ class Env(Set):
 			value = os.environ[self.name]
 			
 			if value:
-				# if this value is a "path" or a "tool" then we need to make sure
-				# it is a proper absolute path in our preferred format.
-				if self.type == "path" or self.type == "tool":
+				if self.type in ["path", "tool", "toolchainpath"]:
+					# if this value is some sort of path or tool then we need to make sure
+					# it is a proper absolute path in our preferred format.
 					try:
 						path = generic_path.Path(value)
 						value = str(path.Absolute())
 					except ValueError,e:
-						raise BadToolValue("the environment variable %s is incorrect: %s" % (self.name, str(e)))				
-				# if this value ends in an un-escaped backslash, then it will be treated as a line continuation character
-				# in makefile parsing - un-escaped backslashes at the end of values are therefore escaped
+						raise BadToolValue("the environment variable %s is incorrect: %s" % (self.name, str(e)))
+					
+					if self.type in ["tool", "toolchainpath"]:
+						# if  we're dealing with tool-related values, then make sure that we can get "safe"
+						# versions if they contain spaces - if we can't, that's an error, as they won't
+						# survive full usage in the toolcheck or when used and/or referenced in FLMs						
+						if ' ' in value:
+							path = generic_path.Path(value)
+							spaceSafeValue = path.GetSpaceSafePath()
+						
+							if not spaceSafeValue:
+								raise BadToolValue("the environment variable %s is incorrect - it is a '%s' type but contains spaces that cannot be neutralised: %s" % (self.name, self.type, value))
+							
+							value = spaceSafeValue	
 				elif value.endswith('\\'):
-					# an odd number of backslashes means there's one to escape
-					count = len(value) - len(value.rstrip('\\'))
+					# if this value ends in an un-escaped backslash, then it will be treated as a line continuation character
+					# in makefile parsing - un-escaped backslashes at the end of values are therefore escaped					
+					count = len(value) - len(value.rstrip('\\'))	# an odd number of backslashes means there's one to escape
 					if count % 2:
 						value += '\\'	
 		except KeyError:
@@ -906,7 +924,6 @@ class Variant(Model, Config):
 		s += "</var>"
 		return s
 
-import traceback
 class VariantRef(Reference):
 
 	def __init__(self, ref=None):
@@ -918,7 +935,7 @@ class VariantRef(Reference):
 	def Resolve(self, cache):
 		try:
 			return cache.FindNamedVariant(self.ref)
-		except KeyError, e:
+		except KeyError:
 			raise BadReferenceError(self.ref)
 
 class MissingVariantException(Exception):
@@ -961,7 +978,7 @@ class Alias(Model, Config):
 					missing_variants.append(r.ref)
 				
 			if len(missing_variants) > 0:
-				raise MissingVariantException("Missing variants '%s'", " ".join(missing_variants))
+				raise MissingVariantException("Missing variants '%s'" % " ".join(missing_variants))
 
 	def GenerateBuildUnits(self, cache):
 		self.Resolve(cache)
@@ -1026,25 +1043,27 @@ class Group(Model, Config):
 
 	def GenerateBuildUnits(self, cache):
 		units = []
-
+		
 		missing_variants = []
 		for r in self.childRefs:
-			refMods = r.GetModifiers(cache)
-
 			try:
 				obj = r.Resolve(cache=cache)
 			except BadReferenceError:
 				missing_variants.append(r.ref)
 			else:
 				obj.ClearModifiers()
+				try:
+					refMods = r.GetModifiers(cache)
+				except BadReferenceError,e:
+					missing_variants.append(str(e))
+				else:
+					for m in refMods + self.modifiers:
+						obj.AddModifier(m)
 
-				for m in refMods + self.modifiers:
-					obj.AddModifier(m)
-
-				units.extend( obj.GenerateBuildUnits(cache) )
+					units.extend( obj.GenerateBuildUnits(cache) )
 
 		if len(missing_variants) > 0:
-			raise MissingVariantException("Missing variants '%s'", " ".join(missing_variants))
+			raise MissingVariantException("Missing variants '%s'" % " ".join(missing_variants))
 
 		return units
 
@@ -1055,7 +1074,7 @@ class GroupRef(Reference):
 		Reference.__init__(self, ref)
 
 	def __str__(self):
-		return "<%s /><groupRef ref='%s' mod='%s'/>" % (prefix, self.ref, ".".join(self.modifiers))
+		return "<groupRef ref='%s' mod='%s'/>" % (self.ref, ".".join(self.modifiers))
 
 	def Resolve(self, cache):
 		try:
@@ -1063,6 +1082,81 @@ class GroupRef(Reference):
 		except KeyError:
 			raise BadReferenceError(self.ref)
 
+def GetBuildUnits(configNames, cache, logger):
+	"""expand a list of config strings like "arm.v5.urel" into a list
+	of BuildUnit objects that can be queried for settings.
+	
+	The expansion tries to be tolerant of errors in the XML so that a
+	typo in one part of a group does not invalidate the whole group.
+	"""
+	
+	# turn dot-separated name strings into Model objects (Group, Alias, Variant)
+	models = []
+		
+	for c in set(configNames):
+		ok = True
+		names = c.split(".")
+
+		base = names[0]
+		mods = names[1:]
+
+		if base in cache.groups:
+			x = cache.FindNamedGroup(base)
+		elif base in cache.aliases:
+			x = cache.FindNamedAlias(base)
+		elif base in cache.variants:
+			x = cache.FindNamedVariant(base)
+		else:
+			logger.Error("Unknown build configuration '%s'" % base)
+			continue
+
+		x.ClearModifiers()
+
+		for m in mods:
+			if m in cache.variants:
+				x.AddModifier( cache.FindNamedVariant(m) )
+			else:
+				logger.Error("Unknown build variant '%s'" % m)
+				ok = False
+				
+		if ok:
+			models.append(copy.copy(x))
+
+	# turn Model objects into BuildUnit objects
+	#
+	# all objects have a GenerateBuildUnits method but don't use
+	# that for Groups because it is not tolerant of errors (the
+	# first error raises an exception and the rest of the group is
+	# abandoned)
+	units = []
+		
+	while len(models) > 0:
+		x = models.pop()
+		try:
+			if isinstance(x, (Alias, Variant)):
+				# these we just turn straight into BuildUnits
+				units.extend(x.GenerateBuildUnits(cache))
+			elif isinstance(x, Group):
+				# deal with each part of the group separately (later)
+				for child in x.childRefs:
+					modChild = copy.copy(child)
+					modChild.modifiers = child.modifiers + [m.name for m in x.modifiers]
+					models.append(modChild)
+			elif isinstance(x, Reference):
+				# resolve references and their modifiers
+				try:
+					obj = x.Resolve(cache)
+					modObj = copy.copy(obj)
+					modObj.modifiers = x.GetModifiers(cache)
+				except BadReferenceError,e:
+					logger.Error("Unknown reference '%s'" % str(e))
+				else:
+					models.append(modObj)
+		except Exception, e:
+			logger.Error(str(e))
+
+	return units
+	
 class ToolErrorException(Exception):
 	def __init__(self, s):
 		Exception.__init__(self,s)
@@ -1364,6 +1458,9 @@ class ToolSet(object):
 class UninitialisedVariableException(Exception):
 	pass
 
+class RecursionException(Exception):
+	pass
+
 class Evaluator(object):
 	"""Determine the values of variables under different Configurations.
 	Either of specification and buildUnit may be None."""
@@ -1436,7 +1533,6 @@ class Evaluator(object):
 			for k, v in self.dict.items():
 				if v.find('$(' + k + ')') != -1:
 						raise RecursionException("Recursion Detected in variable '%s' in configuration '%s' " % (k,configName))
-						expanded = "RECURSIVE_INVALID_STRING"
 				else:
 					expanded = self.ExpandAll(v, specName, configName)
 

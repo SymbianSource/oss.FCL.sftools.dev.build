@@ -22,7 +22,15 @@
 <h3>Defect Fixes</h3>
 <ul>
 
-<li>to be integrated</li>
+<li>                                                                  DPDEF143018      - Raptor doesn't handle spaces in GCCE installation directory correctly                                                </li>
+<li>                                                                  DPDEF143101      - GCC-E isn't tested as part of the tool checking mechanism                                                            </li>
+<li>                                                                  DPDEF141195      - Raptor doesn't handle spaces in tool paths                                                                           </li>
+<li><a href="http://developer.symbian.org/bugs/show_bug.cgi?id=2172"> SF Bug 2172 </a> - [Raptor] Resource builds warn on encountering trigraph-like strings                                                  </li>
+<li><a href="http://developer.symbian.org/bugs/show_bug.cgi?id=2308"> SF Bug 2308 </a> - [Raptor] PLUGIN3 TARGETTYPEs don't set resource output offsets correctly                                             </li>
+<li>                                                                  Fix: in copylogfromannofile mode, ensure that the build id and duration are included in the log.  These are not critical but are useful </li>
+<li>                                                                  Fix: remove unnecessary empty lines in log output in copylogfromannofile mode                                                           </li>
+<li><a href="http://developer.symbian.org/bugs/show_bug.cgi?id=1939"> SF Bug 1939 </a> - [Raptor] PAGED keyword in MMP files should imply byte pair compressed                                                </li>
+<li>                                                                  DPDEF144648      - Raptor failed to build tools_deb objects under Windows XP                                                            </li>
 
 </ul>
 
@@ -31,14 +39,15 @@
 version 2.12.5
 
 Defect Fixes:
-- Fix: Workaround for emake engine log corruption when clockskew errors occur (annofile2log). 
-
+- Fix: Workaround for emake engine log corruption when clockskew errors occur (annofile2log).
   Allow Raptor to obtain log from emake annotation file where it is uncorrupted.  A new 
-  Make engine option "copyannofile2log" enables/disables this mode for emake. If this option is disabled
+  Make engine option "copylogfromannofile" enables/disables this mode for emake. If this option is disabled
   or if no annotation file is specified for the build then Raptor reads logs directly as normal.
+- SF Bug 2125 - [Raptor] - tracecompiler what output incorrect if mmp basename contains '.' e.g. fred.prd.mmp 
 - SF Bug 2191 - [Raptor] - When forcesuccess is enabled, exit status for a failed recipe is "retry" but should be "failed"
 - Fix: extend tracecompiler tests to Linux
 - Fix: Amendment to SF Bug 1511 fix - removal of blanked DEFFILE keyword from e32abiv2ani.flm
+- Fix: improve robustness to bad -c options
 
 
 version 2.12.4

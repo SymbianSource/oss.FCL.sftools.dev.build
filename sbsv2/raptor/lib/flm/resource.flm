@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -112,7 +112,7 @@ endif
 $(call makepath,$(INTERBASE))
 
 # common pre-processor options
-CPPOPT:=-nostdinc -undef -D_UNICODE -include $(PRODUCT_INCLUDE)\
+CPPOPT:=-nostdinc -undef -Wno-trigraphs -D_UNICODE -include $(PRODUCT_INCLUDE)\
  -I$(dir $(SOURCE)) $(foreach I, $(USERINCLUDE),-I$(I) ) -I- $(foreach J,$(SYSTEMINCLUDE),-I$(J) )
 
 CREATABLEPATHS:=$(RSCDIR) $(RSGDIR) $(OUTPUTPATH)

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -136,6 +136,21 @@ class TestGenericPaths(unittest.TestCase):
 		path6 = generic_path.Path("m:/")
 		self.assertEqual(str(path6), "m:")
 		
+		# SpaceSafePath
+		
+		epocroot = os.path.abspath(os.environ.get('EPOCROOT')).replace('\\','/').rstrip('/')
+		pathwithspaces = epocroot+"/epoc32/build/Program Files/Some tool installed with spaces/no_spaces/s p c/no_more_spaces"
+		path7 = generic_path.Path(pathwithspaces)
+
+		# SpaceSafe paths on Windows are 8.3 format, and these can only be deduced if they actually exist.	
+		os.makedirs(pathwithspaces)
+		spacesafe = path7.GetSpaceSafePath()
+		self.assertTrue(spacesafe.endswith("PROGRA~1/SOMETO~1/NO_SPA~1/SPC~1/NO_MOR~1"))
+		
+		os.removedirs(pathwithspaces)
+		spacesafe = path7.GetSpaceSafePath()		
+		self.assertEqual(spacesafe, None)
+
 		
 	def testClassLinux(self):
 		if self.isWin32():
@@ -172,6 +187,15 @@ class TestGenericPaths(unittest.TestCase):
 		
 		path = generic_path.Path("some/thing/")
 		self.assertEqual(str(path), "some/thing")
+		
+		# SpaceSafePath
+		
+		# This doesn't mean much on non-Windows platforms, but we confirm nothing breaks if it is used
+		pathwithspaces = "/Program Files/Some tool installed with spaces/no_spaces/s p c/no_more_spaces"
+		path2 = generic_path.Path(pathwithspaces)
+	
+		spacesafe = path2.GetSpaceSafePath()		
+		self.assertEqual(spacesafe, None)
 		
  
 # run all the tests
