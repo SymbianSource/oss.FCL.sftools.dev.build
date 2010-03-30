@@ -25,7 +25,7 @@ def run():
 	t.description = "Attempt to override a makefile var at the command line."
 	t.usebash = True
 	
-	bldinf = "smoke_suite/test_resources/basics/helloworld/bld.inf"
+	bldinf = "smoke_suite/test_resources/basics/helloworld/Bld.inf"
 	cmd1 = "sbs -b %s REALLYCLEAN -m ${SBSMAKEFILE} -f ${SBSLOGFILE} HOSTPLATFORM_DIR=unlikelydir" % bldinf
 	cmd2 = "grep -i 'unlikelydir' ${SBSMAKEFILE}"
 	t.command = cmd1 + " && " + cmd2
