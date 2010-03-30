@@ -28,19 +28,17 @@ def run():
 	t.name = "paging_default"
 	t.command = cmd_prefix + "-p default.mmp" + cmd_suffix
 	t.mustmatch_singleline = [
-			".*--codepaging=default.*", 
-			".*--datapaging=default.*"
+			"--codepaging=default", 
+			"--datapaging=default"
 			]
-	t.run("windows") # Windows-only until we've updated the Linux version of elf2e32.
-	if t.result == "skip":
-		return t
+	t.run()
 
 	t.id = "0093b"
 	t.name = "paging_unpaged"
 	t.command = cmd_prefix + "-p unpaged.mmp" + cmd_suffix
 	t.mustmatch_singleline = [
-			".*--codepaging=unpaged.*", 
-			".*--datapaging=unpaged.*"
+			"--codepaging=unpaged", 
+			"--datapaging=unpaged"
 			]
 	t.run()
 
@@ -49,9 +47,9 @@ def run():
 	t.command = cmd_prefix + "-p paged.mmp" + cmd_suffix
 	# Either pagedcode or pageddata can imply bytepaircompresstarget 
 	t.mustmatch_singleline = [
-			".*--codepaging=paged.*", 
-			".*--datapaging=paged.*",
-			".*--compressionmethod=bytepair.*"
+			"--codepaging=paged", 
+			"--datapaging=default",
+			"--compressionmethod=bytepair"
 			]
 	t.run()
 
@@ -59,9 +57,9 @@ def run():
 	t.name = "paging_unpagedcode_pageddata"
 	t.command = cmd_prefix + "-p unpagedcode_pageddata.mmp" + cmd_suffix
 	t.mustmatch_singleline = [
-			".*--codepaging=unpaged.*", 
-			".*--datapaging=paged.*",
-			".*--compressionmethod=bytepair.*"
+			"--codepaging=unpaged", 
+			"--datapaging=paged",
+			"--compressionmethod=bytepair"
 			]
 	t.run()
 
@@ -69,9 +67,9 @@ def run():
 	t.name = "paging_pagedcode_unpageddata"
 	t.command = cmd_prefix + "-p pagedcode_unpageddata.mmp" + cmd_suffix
 	t.mustmatch_singleline = [
-			".*--codepaging=paged.*", 
-			".*--datapaging=unpaged.*",
-			".*--compressionmethod=bytepair.*"
+			"--codepaging=paged", 
+			"--datapaging=unpaged",
+			"--compressionmethod=bytepair"
 			]
 	t.run()
 
@@ -79,9 +77,9 @@ def run():
 	t.name = "paging_pagedcode_defaultdata"
 	t.command = cmd_prefix + "-p pagedcode_defaultdata.mmp" + cmd_suffix
 	t.mustmatch_singleline = [
-			".*--codepaging=paged.*", 
-			".*--datapaging=default.*",
-			".*--compressionmethod=bytepair.*"
+			"--codepaging=paged", 
+			"--datapaging=default",
+			"--compressionmethod=bytepair"
 			]
 	t.run()
 
@@ -89,15 +87,42 @@ def run():
 	t.name = "paging_paged_unpaged_no_bytepair"
 	t.command = cmd_prefix + "-p paged_unpaged.mmp" + cmd_suffix
 	t.mustmatch_singleline = [
-			".*--codepaging=unpaged.*", 
-			".*--datapaging=unpaged.*"
+			"--codepaging=unpaged", 
+			"--datapaging=unpaged"
 			]
 	t.mustnotmatch = [
-			".*--compressionmethod=bytepair.*"	
+			"--compressionmethod=bytepair"	
 			]
-	t.warnings = 4 # 2 in log 2 on screen
+	t.warnings = 2 # 1 in the log and 1 on screen
 	t.run()
 
+	# test the pre-WDP paging options --paged and --unpaged
+	# there is an os_properties.xml file in test/config that
+	# turns POSTLINKER_SUPPORTS_WDP off
+	
+	t.id = "0093g"
+	t.name = "paging_paged_no_wdp"
+	t.command = cmd_prefix + "-p paged.mmp --configpath=test/config" + cmd_suffix
+	t.mustmatch_singleline = [
+			"--paged", 
+			"--compressionmethod=bytepair"
+			]
+	t.mustnotmatch = []
+	t.warnings = 0
+	t.targets = [ "$(EPOCROOT)/epoc32/release/armv5/urel/paged.dll" ]
+	t.run()
+	
+	t.id = "0093h"
+	t.name = "paging_unpaged_no_wdp"
+	t.command = cmd_prefix + "-p unpaged.mmp --configpath=test/config" + cmd_suffix
+	t.mustmatch_singleline = [
+			"--unpaged", 
+			]
+	t.mustnotmatch = [
+			"--compressionmethod=bytepair"	
+			]
+	t.targets = [ "$(EPOCROOT)/epoc32/release/armv5/urel/unpaged.dll" ]
+	t.run()
 
 	t.id = "0093"
 	t.name = "paging"
