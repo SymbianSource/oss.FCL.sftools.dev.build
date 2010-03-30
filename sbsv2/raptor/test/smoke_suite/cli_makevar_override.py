@@ -32,6 +32,7 @@ def run():
 
 	t.mustmatch_singleline = ["2"]
 	
+	t.warnings = 1
 	t.returncode = 2
 	t.run()
 	return t
