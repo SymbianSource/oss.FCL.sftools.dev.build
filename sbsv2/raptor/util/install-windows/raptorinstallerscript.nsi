@@ -188,6 +188,7 @@ end:
 	
 	# Generate batch file to set environment variables for Raptor
 	StrCpy $RESULT "@REM Environment variables for ${INSTALLER_NAME}$\r$\nset SBS_HOME=$INSTDIR$\r$\nset PATH=%SBS_HOME%\bin;%PATH%$\r$\n"
+	SetOutPath "$INSTDIR"
 	!insertmacro WriteFile "RaptorEnv.bat" "$RESULT"
 SectionEnd
 
