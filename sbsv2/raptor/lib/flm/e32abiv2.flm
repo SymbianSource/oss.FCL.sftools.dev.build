@@ -50,6 +50,11 @@ ifeq ($(DOBUILD),1)
 
 $(if $(FLMDEBUG),$(info <flm name='e32abiv2' target='$(TARGET)' type='$(TARGETTYPE)' outputpath='$(OUTPUTPATH)' metasource='$(METASOURCE)' postlinkfiletype='$(POSTLINKFILETYPE)' />))
 
+# Enable DELETE_ON_FAILED_COMPILE work around for failed RVCT 2.2 compiles
+ifneq ($(DELETE_ON_FAILED_COMPILE),)
+RVCT22_DELETE_WORKAROUND:=|| { $$(GNURM) $$@; exit 1; }
+endif # ifneq ($(DELETE_ON_FAILED_COMPILE),)
+
 # Strip switch-type parameters
 #
 POSTLINKTARGETTYPE:=$(strip $(POSTLINKTARGETTYPE))
