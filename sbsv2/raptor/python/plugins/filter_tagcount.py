@@ -24,7 +24,6 @@ class FilterTagCounter(filter_interface.FilterSAX):
 		
 		If no parameters are passed then all tags are reported."""
 		self.interesting = params
-		print "counting : ", str(params)
 		super(FilterTagCounter, self).__init__()
 		
 	def startDocument(self):
