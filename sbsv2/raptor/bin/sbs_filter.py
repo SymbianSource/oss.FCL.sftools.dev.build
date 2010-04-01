@@ -58,7 +58,7 @@ try:
 	raptor_params = raptor.BuildStats(the_raptor)
 
 	# Open the requested plugins using the pluginbox
-	the_raptor.out.open(raptor_params, the_raptor.filterList.split(','), pbox)
+	the_raptor.out.open(raptor_params, the_raptor.filterList, pbox)
 	
 except Exception, e:
 	sys.stderr.write("error: problem while creating filters %s\n" % str(e))

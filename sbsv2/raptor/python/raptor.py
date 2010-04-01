@@ -1096,7 +1096,7 @@ class Raptor(object):
 			self.raptor_params = BuildStats(self)
 
 			# Open the requested plugins using the pluginbox
-			self.out.open(self.raptor_params, self.filterList.split(','), self.pbox)
+			self.out.open(self.raptor_params, self.filterList, self.pbox)
 
 			# log header
 			self.out.write("<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?>\n")

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2008-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -19,6 +19,7 @@
 import os
 import sys
 import raptor
+import re
 import filter_interface
 import pluginbox
 import traceback
@@ -64,8 +65,24 @@ class BootstrapFilter(filter_interface.Filter):
 		"""Nothing to do for stdout"""
 		return True
 
-
-
+def SplitList(listString):
+	"""turn a CLI filter string into a list of (class, param) pairs.
+	
+	for example, "foo[a,b],bar[c,d]"
+	
+	becomes [ ("foo", ["a","b"]) , ("bar", ["c","d"]) ]
+	"""
+	matches = re.findall("(\w+)(\[([^\[\]]*)\])?,?", listString)
+	
+	pairs = []
+	for m in matches:
+		classname = m[0]
+		if len(m[2]) > 0:
+			pairs.append( (classname, m[2].split(",")) )
+		else:
+			pairs.append( (classname, []) )
+	return pairs
+	
 class FilterList(filter_interface.Filter):
 
 	def __init__(self):
@@ -81,13 +98,19 @@ class FilterList(filter_interface.Filter):
 		# Find all the filter plugins
 		self.pbox = pbox
 		possiblefilters = self.pbox.classesof(filter_interface.Filter)
+		# turn "filternames" into a list of (classname, parameters) pairs
+		filterCalls = SplitList(filternames)
+		# look for each filter class in the box
 		unfound = []
 		self.filters = []
-		for f in filternames:
+		for (f, params) in filterCalls:
 			unfound.append(f) # unfound unless we find it
 			for pl in possiblefilters:
 				if pl.__name__.upper() == f.upper():
-					self.filters.append(pl())
+					if params:
+						self.filters.append(pl(params))
+					else:
+						self.filters.append(pl())
 					unfound = unfound[:-1]
 		if unfound != []:
 			raise ValueError("requested filters not found: %s \
