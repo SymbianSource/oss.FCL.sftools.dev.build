@@ -54,7 +54,7 @@ endef
 
 # Enable DELETE_ON_FAILED_COMPILE work around for failed RVCT 2.2 compiles
 ifneq ($(DELETE_ON_FAILED_COMPILE),)
-RVCT22_DELETE_HACK:=|| ($$(GNURM) $$@; exit 1;)
+RVCT22_DELETE_WORKAROUND:=|| { $$(GNURM) $$@; exit 1; }
 endif # ifneq ($(DELETE_ON_FAILED_COMPILE),)
 
 ALLTARGET:=ALL

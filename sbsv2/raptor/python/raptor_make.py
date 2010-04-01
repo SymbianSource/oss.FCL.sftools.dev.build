@@ -118,7 +118,7 @@ class MakeEngine(object):
 			self.talontimeout = str(evaluator.Get("TALON_TIMEOUT"))
 			self.talonretries = str(evaluator.Get("TALON_RETRIES"))
 			
-			# Get the ####################################	
+			# work around for RVCT 2.2 failed compiles
 			delete_on_failed_compile_s = evaluator.Get("DELETE_ON_FAILED_COMPILE")
 			self.delete_on_failed_compile = ""
 			if delete_on_failed_compile_s is not None and delete_on_failed_compile_s != "":

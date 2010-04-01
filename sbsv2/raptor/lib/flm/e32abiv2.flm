@@ -798,7 +798,7 @@ $(1): $(2) $(PROJECT_META) $(if $(MULTIFILE_ENABLED),,$(if $(DEPENDFILE),,RESOUR
 			$(if $(NO_DEPEND_GENERATE),,$(DEPEND_OPTION) $(call dblquote,$(1).d)) \
 			$(if $(LINKERFEEDBACK_STAGE2),$(FEEDBACK_OPTION)$(call dblquote,$(FEEDBACKFILE))) \
 			$(if $(MULTIFILE_ENABLED),--multifile $(OUTPUT_OPTION) $(MULTIFILEOBJECT) \
-			--via $$(call dblquote, $(MULTIFILE_VIAFILE)),$(OUTPUT_OPTION) $$@ $$(call dblquote, $$<)) $(if $(USE_RVCT22_DELETE_HACK),$(RVCT22_DELETE_HACK)) \
+			--via $$(call dblquote, $(MULTIFILE_VIAFILE)),$(OUTPUT_OPTION) $$@ $$(call dblquote, $$<)) $(if $(USE_RVCT22_DELETE_WORKAROUND),$(RVCT22_DELETE_WORKAROUND)) \
 	$(call endrule,compile)
 
 ifeq ($(NO_DEPEND_GENERATE),)
@@ -857,7 +857,7 @@ $(CPPONLYTARGET): $(1) $(PROJECT_META)  $(if $(DEPENDFILE),,RESOURCE BITMAP EXPO
 			$(if $(USERINCLUDE),$(COMPILER_SYSTEM_INCLUDE_OPTION),)$(call concat, $(COMPILER_SYSTEM_INCLUDE_OPTION),$(call dblquote,$(USERINCLUDE)))      \
 			$(if $(SYSTEMINCLUDE),$(COMPILER_SYSTEM_INCLUDE_OPTION),)$(call concat, $(COMPILER_SYSTEM_INCLUDE_OPTION),$(call dblquote,$(SYSTEMINCLUDE)))  \
 			$(if $(NOHIDEALL),--no_hide_all,) \
-			$$(call dblquote, $$<) $(OUTPUT_OPTION) $$(@) $(if $(USE_RVCT22_DELETE_HACK),$(RVCT22_DELETE_HACK)) \
+			$$(call dblquote, $$<) $(OUTPUT_OPTION) $$(@) $(if $(USE_RVCT22_DELETE_WORKAROUND),$(RVCT22_DELETE_WORKAROUND)) \
 	$(call endrule,e32cpponly)
 
 CLEANTARGETS:=$$(CLEANTARGETS) $(CPPONLYTARGET)
@@ -892,7 +892,7 @@ $(LISTINGTARGET): $(1) $(PROJECT_META)  $(if $(DEPENDFILE),,RESOURCE BITMAP EXPO
 			$(if $(SYSTEMINCLUDE),$(COMPILER_SYSTEM_INCLUDE_OPTION),)$(call concat, $(COMPILER_SYSTEM_INCLUDE_OPTION),$(call dblquote,$(SYSTEMINCLUDE)))  \
 			$(if $(NOHIDEALL),--no_hide_all,) \
 			$(if $(NO_DEPEND_GENERATE),,$(DEPEND_OPTION) $(call dblquote,$(DEPENDFILENAME))) \
-			$$(call dblquote, $$<) $(OUTPUT_OPTION) $$(@) $(if $(USE_RVCT22_DELETE_HACK),$(RVCT22_DELETE_HACK)) \
+			$$(call dblquote, $$<) $(OUTPUT_OPTION) $$(@) $(if $(USE_RVCT22_DELETE_WORKAROUND),$(RVCT22_DELETE_WORKAROUND)) \
 	$(call endrule,e32listing)
 
 CLEANTARGETS:=$$(CLEANTARGETS) $(LISTINGTARGET)
@@ -987,7 +987,7 @@ $(e32abiv2_OFILE): $(e32abiv2_CPPFILE) $(PROJECT_META)
 			$(call makemacrodef,-D,$(COMPILER_INTERWORK_DEFINES) $(CDEFS) $(CIADEFS)) $(CPP_LANG_OPTION)      \
 	 		$(if $(USERINCLUDE),$(COMPILER_SYSTEM_INCLUDE_OPTION),)$$(call concat, $(COMPILER_SYSTEM_INCLUDE_OPTION),$$(call dblquote,$(USERINCLUDE)))     \
 	 		$(if $(SYSTEMINCLUDE),$(COMPILER_SYSTEM_INCLUDE_OPTION),)$$(call concat, $(COMPILER_SYSTEM_INCLUDE_OPTION),$$(call dblquote,$(SYSTEMINCLUDE))) \
-	 		$$(call dblquote, $$<) $(OUTPUT_OPTION) $$@ $(if $(USE_RVCT22_DELETE_HACK),$(RVCT22_DELETE_HACK)) \
+	 		$$(call dblquote, $$<) $(OUTPUT_OPTION) $$@ $(if $(USE_RVCT22_DELETE_WORKAROUND),$(RVCT22_DELETE_WORKAROUND)) \
 	$(call endrule,cia2cpp2o)
 
 
@@ -1013,7 +1013,7 @@ $(eval e32abiv2_PREFILE_OPTIONS:= $(LICENSERETRY_OPTION) $(PREPROCESSOR_OPTION) 
 $(e32abiv2_PREFILE): $1 $(PROJECT_META) $(if $(DEPENDFILE),,RESOURCE BITMAP EXPORT)
 	$(call startrule,cia2cpp,,$1) \
 	$(if $(PERTURBSTARTTIME),$(RANSLEEP) $(PERTURBMSECS) ;,) \
-	$(CC) $(e32abiv2_PREFILE_OPTIONS) $(OUTPUT_OPTION) $$@ $$(call dblquote,$1) $(if $(USE_RVCT22_DELETE_HACK),$(RVCT22_DELETE_HACK)) \
+	$(CC) $(e32abiv2_PREFILE_OPTIONS) $(OUTPUT_OPTION) $$@ $$(call dblquote,$1) $(if $(USE_RVCT22_DELETE_WORKAROUND),$(RVCT22_DELETE_WORKAROUND)) \
 	$(if $(NO_DEPEND_GENERATE),,&& $(CC) -M $(e32abiv2_PREFILE_OPTIONS) --depend_format=unix $(OUTPUT_OPTION) $$@ $$(call dblquote,$1) > $(call dblquote,$(e32abiv2_PREFILE).d)) \
 	$(call endrule,cia2cpp)
 
@@ -1058,12 +1058,12 @@ $(1): $(2) $(PROJECT_META) $(if $(DEPENDFILE),,RESOURCE BITMAP EXPORT)
 		$(if $(PERTURBSTARTTIME),$(RANSLEEP) $(PERTURBMSECS) ;,) \
 		$(CC) $(e32abiv2_asm_OPTIONS) \
 		$(if $(NO_DEPEND_GENERATE),,$(DEPEND_OPTION) $(call dblquote,$(DEPENDFILENAME))) \
-	 	$$(call dblquote, $$<) $(OUTPUT_OPTION) $$@ $(if $(USE_RVCT22_DELETE_HACK),$(RVCT22_DELETE_HACK)) \
+	 	$$(call dblquote, $$<) $(OUTPUT_OPTION) $$@ $(if $(USE_RVCT22_DELETE_WORKAROUND),$(RVCT22_DELETE_WORKAROUND)) \
 	$(call endrule,asmcompile)
 ifeq ($(NO_DEPEND_GENERATE),)
 	$(call startrule,asmdependencies) \
 		$(CC) -M $(subst --no_rtti,,$(e32abiv2_asm_OPTIONS)) --depend_format=unix \
-	  	$(OUTPUT_OPTION) $$@ $$(call dblquote,$2) > $(call dblquote,$(DEPENDFILENAME)) $(if $(USE_RVCT22_DELETE_HACK),$(RVCT22_DELETE_HACK)) \
+	  	$(OUTPUT_OPTION) $$@ $$(call dblquote,$2) > $(call dblquote,$(DEPENDFILENAME)) $(if $(USE_RVCT22_DELETE_WORKAROUND),$(RVCT22_DELETE_WORKAROUND)) \
 	$(call endrule,asmdependencies)
 endif
 

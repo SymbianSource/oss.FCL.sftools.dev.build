@@ -55,7 +55,8 @@ def run():
 			"test_/armv5/urel/test5.o",
 			"test_/armv5/urel/test6.o"  ])
 	sbshome = os.environ["SBS_HOME"].replace("\\","/").rstrip("/")
-	t.command = base_command.replace("armv5", "armv5.fake_compiler") + " --configpath=%s/test/smoke_suite/test_resources/simple/makevariants" % sbshome
+	t.command = base_command.replace("armv5", "armv5.fake_compiler") + \
+	" --configpath=%s/test/smoke_suite/test_resources/simple/compilervariants" % sbshome
 	t.run()
 	
 	t.id = "116c"
@@ -63,6 +64,42 @@ def run():
 	t.errors = 0
 	t.returncode = 0
 	t.antitargets = [] # Remove the list of anti-targets
+	t.command = base_command + " reallyclean"
+	t.run()
+	
+	t.id = "116d"  # Use a redefined make_engine variant - object files *should* be present
+	t.name = "delete_on_failed_compile_build_redefined_make_engine"
+	t.errors = 0
+	t.returncode = 1
+	t.antitargets = [] # Remove the list of anti-targets
+	# All of these files should be present
+	t.addbuildtargets('smoke_suite/test_resources/simple/bld.inf', 
+		[	"test_/armv5/udeb/test.o",
+			"test_/armv5/udeb/test1.o",
+			"test_/armv5/udeb/test2.o",
+			"test_/armv5/udeb/test3.o",
+			"test_/armv5/udeb/test4.o",
+			"test_/armv5/udeb/test5.o",
+			"test_/armv5/udeb/test6.o",
+			"test_/armv5/urel/test.o",
+			"test_/armv5/urel/test1.o",
+			"test_/armv5/urel/test2.o",
+			"test_/armv5/urel/test3.o",
+			"test_/armv5/urel/test4.o",
+			"test_/armv5/urel/test5.o",
+			"test_/armv5/urel/test6.o"  ])
+	
+	t.command = base_command.replace("armv5", "armv5.fake_compiler") + " -e make_test " \
+	+ " --configpath=%s/test/smoke_suite/test_resources/simple/compilervariants " % sbshome \
+	+ " --configpath=%s/test/smoke_suite/test_resources/simple/makevariants" % sbshome
+	t.run()
+	
+	t.id = "116e"
+	t.name = "delete_on_failed_compile_reallyclean_03"
+	t.errors = 0
+	t.returncode = 0
+	t.antitargets = [] # Remove the list of anti-targets
+	t.targets = [] # Remove the list of targets
 	t.command = base_command + " reallyclean"
 	t.run()
 	

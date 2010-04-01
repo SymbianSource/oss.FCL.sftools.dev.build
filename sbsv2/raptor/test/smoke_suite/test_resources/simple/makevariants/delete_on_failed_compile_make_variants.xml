@@ -56,9 +56,5 @@
 	        <set name='DEFAULT_SHELL' value='$(SBS_SHELL)' type='tool'/>
 	        <set name='USE_TALON' value=''/>
 	</var>
-
-	<var name="fake_compiler">
-	        <set name='CC' value='fake_compiler'/>
-	</var>
-
 </build>
+
