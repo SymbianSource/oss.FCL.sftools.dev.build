@@ -139,6 +139,7 @@
 		<set name="PL.SOFTVFP_MAYBE_VFPV2" value="softvfp"/>
 		<set name="CC.ARMV5" value="--cpu 5T"/>
 		<set name="CC.ARMV6" value="--cpu 6"/>
+		<set name="USE_RVCT22_DELETE_WORKAROUND" value="1" />
 	</var>
 
 	<var name="rvct3_1" extends="rvct">
