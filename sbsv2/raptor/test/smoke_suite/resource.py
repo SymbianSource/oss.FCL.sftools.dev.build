@@ -15,20 +15,15 @@
 #
 
 from raptor_tests import SmokeTest
+from raptor_tests import ReplaceEnvs
+from raptor_meta import BldInfFile
 
 def run():
 	t = SmokeTest()
 	t.id = "30"
 	t.name =  "resource"
-	t.command = "sbs -b smoke_suite/test_resources/resource/group/bld.inf -b smoke_suite/test_resources/simple_gui/Bld.inf RESOURCE"
+	t.command = "sbs  -b smoke_suite/test_resources/simple_gui/Bld.inf RESOURCE"
 	t.targets = [
-		"$(EPOCROOT)/epoc32/include/testresource.rsg",
-		"$(EPOCROOT)/epoc32/include/testresource.hrh",
-		"$(EPOCROOT)/epoc32/data/z/resource/testresource/testresource.r01",
-		"$(EPOCROOT)/epoc32/data/z/resource/testresource/testresource.rsc",
-		"$(EPOCROOT)/epoc32/localisation/group/testresource.info",
-		"$(EPOCROOT)/epoc32/localisation/testresource/rsc/testresource.rpp",
-		
 		"$(EPOCROOT)/epoc32/data/z/resource/apps/helloworld.mbm",
 		"$(EPOCROOT)/epoc32/localisation/group/helloworld.info",
 		"$(EPOCROOT)/epoc32/release/winscw/udeb/z/resource/apps/helloworld.mbm",
@@ -45,6 +40,39 @@ def run():
 		"$(EPOCROOT)/epoc32/release/winscw/urel/z/private/10003a3f/apps/helloworld_reg.rsc"	
 		]
 	
+
+	t.addbuildtargets('smoke_suite/test_resources/simple_gui/Bld.inf', [
+		"helloworld_exe/helloworld.mbm_bmconvcommands",
+		"helloworld_exe/helloworld__resource_apps_sc.rpp",
+		"helloworld_exe/helloworld__resource_apps_sc.rpp.d",
+		"helloworld_reg_exe/helloworld_reg__private_10003a3f_apps_sc.rpp",
+		"helloworld_reg_exe/helloworld_reg__private_10003a3f_apps_sc.rpp.d"])
+
+	t.mustnotmatch = ["HelloWorld.rss.* warning: trigraph"]
+	
+	t.run()
+
+
+	t.id="30a"
+	t.name =  "no_depend_gen_resource"
+	t.usebash = True
+	t.description =  """Check that dependent resources still build correctly even when we turn dependency generation off.  This
+			    test cannot reliably ensure that the dependencies are correct
+			 """
+	buildLocation = ReplaceEnvs("$(EPOCROOT)/epoc32/build/") + BldInfFile.outputPathFragment('smoke_suite/test_resources/resource/group/bld.inf')
+	res_depfile= buildLocation+"/dependentresource_/dependentresource_resource_dependentresource_sc.rpp.d"
+
+	t.targets = [
+		"$(EPOCROOT)/epoc32/include/testresource.rsg",
+		"$(EPOCROOT)/epoc32/include/testresource.hrh",
+		"$(EPOCROOT)/epoc32/data/z/resource/testresource/testresource.r01",
+		"$(EPOCROOT)/epoc32/data/z/resource/testresource/testresource.rsc",
+		"$(EPOCROOT)/epoc32/release/armv5/urel/testresource.exe",
+		"$(EPOCROOT)/epoc32/localisation/group/testresource.info",
+		"$(EPOCROOT)/epoc32/localisation/testresource/rsc/testresource.rpp",
+		res_depfile
+		]
+
 	t.addbuildtargets('smoke_suite/test_resources/resource/group/bld.inf', [	
 		"testresource_/testresource_resource_testresource2_sc.rpp.d",
 		"testresource_/testresource_resource_testresource3_02.rpp",
@@ -56,14 +84,7 @@ def run():
 		"testresource_/testresource_resource_testresource_sc.rpp",
 		"testresource_/testresource_resource_testresource_sc.rpp.d"])
 
-	t.addbuildtargets('smoke_suite/test_resources/simple_gui/Bld.inf', [
-		"helloworld_exe/helloworld.mbm_bmconvcommands",
-		"helloworld_exe/helloworld__resource_apps_sc.rpp",
-		"helloworld_exe/helloworld__resource_apps_sc.rpp.d",
-		"helloworld_reg_exe/helloworld_reg__private_10003a3f_apps_sc.rpp",
-		"helloworld_reg_exe/helloworld_reg__private_10003a3f_apps_sc.rpp.d"])
+	t.command = "sbs -b smoke_suite/test_resources/resource/group/bld.inf  -c arm.v5.urel.gcce4_4_1 reallyclean ; sbs --no-depend-generate -j 16 -b smoke_suite/test_resources/resource/group/bld.inf -c arm.v5.urel.gcce4_4_1 -f ${SBSLOGFILE} -m ${SBSMAKEFILE} && grep 'epoc32.include.testresource.rsg' %s " % (res_depfile)
 
-	t.mustnotmatch = ["HelloWorld.rss.* warning: trigraph"]
-	
 	t.run()
 	return t

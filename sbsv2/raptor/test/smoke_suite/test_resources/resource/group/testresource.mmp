@@ -52,6 +52,12 @@ TARGETPATH              resource/testresource3
 LANG 02 sc
 END
 
+
+START RESOURCE          dependentresource.rss
+TARGETPATH              resource/dependentresource
+LANG sc
+END
+
 START BITMAP	testresource.mbm
 HEADER
 
