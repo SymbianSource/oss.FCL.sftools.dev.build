@@ -64,7 +64,7 @@ else
 endif
 
 # we create intermediate .rpp and .d files
-INTERBASE:=$(OUTPUTPATH)/$(TARGET_lower)$(if $(TARGETPATH),_$(subst /,_,$(TARGETPATH)),)
+INTERBASE:=$(OUTPUTPATH)/$(TARGET_lower)
 
 ################################## localisation ###########################$(GNUMKDIR)#############
 # Only make copies for full resource builds
@@ -117,12 +117,14 @@ CPPOPT:=-nostdinc -undef -Wno-trigraphs -D_UNICODE -include $(PRODUCT_INCLUDE)\
 
 CREATABLEPATHS:=$(RSCDIR) $(RSGDIR) $(OUTPUTPATH)
 
+# We intend to generate the resource in an intermediate locationand copy to the final destination to
+# ensure that when the "same" resource is built into separare locations it is 
+RSCCOPYDIRS:=$(RESBASE)
 # additional binary resource copies performed based on BINCOPYDIRS
-RSCCOPYDIRS:=
 ifneq ($(BINCOPYDIRS),)
-        RSCCOPYDIRS:=$(subst //,/,$(patsubst %,%/$(if $(TARGETPATH),/z/$(TARGETPATH),),$(BINCOPYDIRS)))
-        CREATABLEPATHS:=$(CREATABLEPATHS) $(RSCCOPYDIRS)
+        RSCCOPYDIRS:=$(RSCCOPYDIRS) $(subst //,/,$(patsubst %,%/$(if $(TARGETPATH),/z/$(TARGETPATH),),$(BINCOPYDIRS)))
 endif
+CREATABLEPATHS:=$(CREATABLEPATHS) $(RSCCOPYDIRS)
 
 ###############################################################################
 define preprocessresource
@@ -261,8 +263,8 @@ endif
 ifeq ($(HEADERONLY),)
         # generate a resource file for each language
         # For sc we generate $(RESBASE).rsc and define LANGUAGE_SC and LANGUAGE_sc.
-        $(foreach L,$(LANGUAGES:SC=sc),$(eval $(call preprocessresource,$(INTERBASE)_$(L).rpp,$(RESBASE).r$(L),$(L))))
-        $(foreach L,$(LANGUAGES:SC=sc),$(eval $(call generateresource,$(RESBASE).r$(L),$(INTERBASE)_$(L).rpp,$(L))))
+        $(foreach L,$(LANGUAGES:SC=sc),$(eval $(call preprocessresource,$(INTERBASE)_$(L).rpp,$(INTERBASE).r$(L),$(L))))
+        $(foreach L,$(LANGUAGES:SC=sc),$(eval $(call generateresource,$(INTERBASE).r$(L),$(INTERBASE)_$(L).rpp,$(L))))
 else
         # No resources are going to be made so unless we specifically ask for it, there will be no
         # preprocessed file from which to create the header:
