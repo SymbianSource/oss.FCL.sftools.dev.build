@@ -14,6 +14,9 @@ Defect Fixes:
 - Fix: remove unnecessary empty lines in log output in copylogfromannofile mode. 
 - SF Bug 1939 - [Raptor] PAGED keyword in MMP files should imply byte pair compressed
 - DPDEF144648 - Raptor failed to build tools_deb objects under Windows XP 
+- SF Bug 2134 - [Raptor] Raptor does not pass overridden make variables into its makefiles
+- Fix: do not allow data to be paged implicitly
+- Fix: Makefile Parse Performance in Resource stage is poor. Large size of included dependency files is a factor. In --no-depend-generate mode, create dependency files which only refer to other rsg/mbg files that are yet to be built - store no other dependencies.
 
 
 version 2.12.5

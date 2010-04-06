@@ -1304,16 +1304,15 @@ class MMPRaptorBackend(MMPBackend):
 		elif varname == 'PAGED':
 			self.BuildVariant.AddOperation(raptor_data.Set(varname, "1"))
 			self.__debug( "Set switch PAGE ON")
+			# PAGED is equivalent to PAGEDCODE
 			self.BuildVariant.AddOperation(raptor_data.Set("PAGEDCODE_OPTION", "paged"))
 			self.__debug( "Set switch PAGEDCODE ON")
-			self.BuildVariant.AddOperation(raptor_data.Set("PAGEDDATA_OPTION", "paged"))
-			self.__debug( "Set data PAGEDDATA ON")
 			self.__pageConflict.append("PAGEDCODE")
-			self.__pageConflict.append("PAGEDDATA")
 
 		elif varname == 'UNPAGED':
 			self.BuildVariant.AddOperation(raptor_data.Set("PAGED", "0"))
 			self.__debug( "Set switch PAGED OFF")
+			# UNPAGED is equivalent to UNPAGEDCODE *and* UNPAGEDDATA
 			self.BuildVariant.AddOperation(raptor_data.Set("PAGEDCODE_OPTION", "unpaged"))
 			self.__debug( "Set switch PAGEDCODE OFF")
 			self.BuildVariant.AddOperation(raptor_data.Set("PAGEDDATA_OPTION", "unpaged"))

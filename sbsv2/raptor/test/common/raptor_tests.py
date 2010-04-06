@@ -417,22 +417,26 @@ class SmokeTest(object):
 
 			p = subprocess.Popen(args=[BASH, '-c', command], 
 					stdout=subprocess.PIPE,
-					stderr=subprocess.STDOUT,
+					stderr=subprocess.PIPE,
 					env=shellenv,
 					shell=False,
 					universal_newlines=True)
 
-			self.output = p.communicate()[0]
+			(std_out, std_err) = p.communicate()
+			
+			self.output = std_out + std_err
 		else:
 			p = subprocess.Popen(command, 
 					stdout=subprocess.PIPE,
-					stderr=subprocess.STDOUT,
+					stderr=subprocess.PIPE,
 					env=shellenv,
 					shell=True,
 					universal_newlines=True)
 
-			self.output = p.communicate()[0]
-
+			(std_out, std_err) = p.communicate()
+			
+			self.output = std_out + std_err
+			
 		if debug_mode_active:
 			print self.output
 

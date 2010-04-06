@@ -437,7 +437,7 @@ class FilterTerminal(filter_interface.Filter):
 		if self.warn_count > 0 or self.err_count > 0:
 			sys.stdout.write("\n%s : warnings: %s\n" % (raptor.name,
 					self.warn_count))
-			sys.stdout.write("%s : errors: %s\n" % (raptor.name,
+			sys.stdout.write("%s : errors: %s\n\n" % (raptor.name,
 					self.err_count))
 		else:
 			sys.stdout.write("\nno warnings or errors\n\n")

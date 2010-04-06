@@ -113,7 +113,7 @@ $(call makepath,$(INTERBASE))
 
 # common pre-processor options
 CPPOPT:=-nostdinc -undef -Wno-trigraphs -D_UNICODE -include $(PRODUCT_INCLUDE)\
- -I$(dir $(SOURCE)) $(foreach I, $(USERINCLUDE),-I$(I) ) -I- $(foreach J,$(SYSTEMINCLUDE),-I$(J) )
+ -I$(dir $(SOURCE)) $(foreach I, $(USERINCLUDE),-iquote $(I) ) $(foreach J,$(SYSTEMINCLUDE),-I $(J) )
 
 CREATABLEPATHS:=$(RSCDIR) $(RSGDIR) $(OUTPUTPATH)
 
@@ -127,6 +127,8 @@ endif
 CREATABLEPATHS:=$(CREATABLEPATHS) $(RSCCOPYDIRS)
 
 ###############################################################################
+
+
 define preprocessresource
 # $(1) is the RPPFILE		(eg. /epoc32/build/xxx/b_sc.rpp)
 # $(2) is the related RESOURCEFILE if any (eg. /a/b.rsc)
@@ -136,12 +138,26 @@ define preprocessresource
     TARGET_$(call sanitise,$1):=1
     $(if $(FLMDEBUG),$(info preprocessresource: $(1) for $(2) LANG:$(3)))
 
+
+  # Correct dependency information when a header file can't be found:
+  # assume its in epoc32\include
+
+  ifneq ($(NO_DEPEND_GENERATE),)
+  # This version minimises the size of dependency files, to contain only enough information
+  # to allow the ordering to be correct.
+    DEPENDENCY_CORRECTOR:={ $(GNUSED) -n -r '1 p;\# [^ \/]+\.((rsg)|(mbg))#I {s#([^ \/]+\.((rsg)|(mbg)))(.*[\\\\])?$$$$$$$$# $(EPOCROOT)\/epoc32\/include\/\1 [\\\\]#ig; p}' && echo "" ; }
+  else
+  # Generate full dependency information with correction only
+    DEPENDENCY_CORRECTOR:=$(GNUSED)  -r 's% ([^ \/]+\.((rsg)|(mbg)))% $(EPOCROOT)\/epoc32\/include\/\1%ig'
+  endif
+
+
     RESOURCE_DEPS:: $(1).d
     $(1).d: $(SOURCE)
 	  $(call startrule,resourcedependencies,FORCESUCCESS) \
 	  $(GNUCPP) -C -DLANGUAGE_$(3) -DLANGUAGE_$(subst sc,SC,$(3)) $(call makemacrodef,-D,$(MMPDEFS))\
 	  $(CPPOPT) $(SOURCE) -M -MG -MT"$(1)" | \
-	  $(GNUSED)  -r 's# ([^ \/]+\.((rsg)|(mbg)))# $(EPOCROOT)\/epoc32\/include\/\1#ig' > $(1).d \
+	  $(DEPENDENCY_CORRECTOR) >$$@ \
 	  $(call endrule,resourcedependencies)
 
     $(1): $(1).d
@@ -158,7 +174,9 @@ define preprocessresource
     CLEANTARGETS:=$$(CLEANTARGETS) $(DEPENDFILENAME)
     ifneq "$(DEPENDFILE)" ""
       ifeq "$(filter %CLEAN,$(call uppercase,$(MAKECMDGOALS)))" ""
-        -include $(DEPENDFILE)
+        ifeq "$(filter RESOURCE_DEPS,$(call uppercase,$(MAKECMDGOALS)))" ""
+          -include $(DEPENDFILE)
+	endif
       endif
     endif
 
