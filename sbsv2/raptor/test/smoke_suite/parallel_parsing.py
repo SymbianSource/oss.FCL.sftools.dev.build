@@ -54,7 +54,7 @@ def run():
 	warnings = 0
 		
 	t.id = "104"
-	t.name = "parallelparsing"
+	t.name = "parallel_parsing"
 	t.description = description
 	t.command = command 
 	t.targets = targets

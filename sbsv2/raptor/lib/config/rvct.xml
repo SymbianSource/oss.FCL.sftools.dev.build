@@ -101,5 +101,6 @@
 		<set name="USER_LIBS_PATH_OPTION" value="--userlibpath"/>
 		<set name="VFE_OPTION" value="--no_vfe"/>
 		<set name="NO_UNALIGNED_ACCESS" value="$(CC.NO_UNALIGNED_ACCESS)"/>
+		<set name="USE_RVCT22_DELETE_WORKAROUND" value=""/>
 	</var>
 </build>

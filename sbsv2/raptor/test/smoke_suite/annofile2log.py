@@ -19,7 +19,7 @@ from raptor_tests import SmokeTest
 def run():
 	t = SmokeTest()
 	t.id = "43563"
-	t.name = "annofile2log_canned"
+	t.name = "annofile2log"
 	t.description = "test workaround for log corruption from a make engine whose name begins with 'e'"
 	
 	t.usebash = True
