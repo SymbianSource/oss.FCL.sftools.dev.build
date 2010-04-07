@@ -59,7 +59,7 @@ ifneq ($(or $(HEADER),$(HEADERONLY)),)
         # which produces the header.
         HEADLANG:=$(lastword $(LANGUAGES:SC=sc))
 else
-	HEADLANG:=
+        HEADLANG:=
     RESOURCEHEADER:=
 endif
 
@@ -119,7 +119,7 @@ CREATABLEPATHS:=$(RSCDIR) $(RSGDIR) $(OUTPUTPATH)
 
 # We intend to generate the resource in an intermediate locationand copy to the final destination to
 # ensure that when the "same" resource is built into separare locations it is 
-RSCCOPYDIRS:=$(RESBASE)
+RSCCOPYDIRS:=$(RSCDIR)
 # additional binary resource copies performed based on BINCOPYDIRS
 ifneq ($(BINCOPYDIRS),)
         RSCCOPYDIRS:=$(RSCCOPYDIRS) $(subst //,/,$(patsubst %,%/$(if $(TARGETPATH),/z/$(TARGETPATH),),$(BINCOPYDIRS)))
@@ -136,20 +136,22 @@ define preprocessresource
 
   ifeq ($(TARGET_$(call sanitise,$1)),)
     TARGET_$(call sanitise,$1):=1
-    $(if $(FLMDEBUG),$(info preprocessresource: $(1) for $(2) LANG:$(3)))
+    $(if $(FLMDEBUG),$(info <debug>preprocessresource: $(1) for $(2) LANG:$(3)</debug>))
 
 
-  # Correct dependency information when a header file can't be found:
-  # assume its in epoc32\include
-
-  ifneq ($(NO_DEPEND_GENERATE),)
-  # This version minimises the size of dependency files, to contain only enough information
-  # to allow the ordering to be correct.
-    DEPENDENCY_CORRECTOR:={ $(GNUSED) -n -r '1 p;\# [^ \/]+\.((rsg)|(mbg))#I {s#([^ \/]+\.((rsg)|(mbg)))(.*[\\\\])?$$$$$$$$# $(EPOCROOT)\/epoc32\/include\/\1 [\\\\]#ig; p}' && echo "" ; }
-  else
-  # Generate full dependency information with correction only
-    DEPENDENCY_CORRECTOR:=$(GNUSED)  -r 's% ([^ \/]+\.((rsg)|(mbg)))% $(EPOCROOT)\/epoc32\/include\/\1%ig'
-  endif
+    # Correct dependency information when a header file can't be found.
+    # If the c preprocessor can't find a dependency it appears as it did in the #include statement
+    # e.g. "filename.mbg" or "filename.rsg" in the dependency file.
+    # we can correct the dependencies by assuming that the file will be in epoc32\include as this is the default
+    ifneq ($(NO_DEPEND_GENERATE),)
+      # This version minimises the size of dependency files, to contain only .mbg and .rsg deps.
+      # It allows resources to be built in the right order but doesn't impose the weight of
+      # of full dependency information which can overwhelm make in large builds.
+      DEPENDENCY_CORRECTOR:={ $(GNUSED) -n -r '1 p;\% [^ \/]+\.((rsg)|(mbg))%I {s% ([^ \/]+\.((rsg)|(mbg)))% $(EPOCROOT)\/epoc32\/include\/\1%ig; p}' && echo "" ; }
+    else
+      # Generate full dependency information
+      DEPENDENCY_CORRECTOR:=$(GNUSED)  -r 's% ([^ \/]+\.((rsg)|(mbg)))% $(EPOCROOT)\/epoc32\/include\/\1%ig'
+    endif
 
 
     RESOURCE_DEPS:: $(1).d
@@ -176,7 +178,7 @@ define preprocessresource
       ifeq "$(filter %CLEAN,$(call uppercase,$(MAKECMDGOALS)))" ""
         ifeq "$(filter RESOURCE_DEPS,$(call uppercase,$(MAKECMDGOALS)))" ""
           -include $(DEPENDFILE)
-	endif
+        endif
       endif
     endif
 
@@ -234,6 +236,8 @@ define generateresource
 #       are any new copies to be made for this variant. e.g. winscw requires that we make
 #       some extra copies.
 
+        $(if $(FLMDEBUG),$(info <debug>resource copies of $(notdir $1) in: $(RSCCOPYDIRS)</debug>))
+        $(foreach F,$(sort $(patsubst %,%/$(notdir $(1)),$(RSCCOPYDIRS))),$(call copyresource,$(1),$(F)))
         $(foreach F,$(sort $(patsubst %,%/$(notdir $(1)),$(RSCCOPYDIRS))),$(call copyresource,$(1),$(F)))
 
         # individual source file compilation
@@ -252,7 +256,7 @@ define generateresourceheader
 
         ifeq ($(TARGET_$(call sanitise,$1)),)
                 TARGET_$(call sanitise,$1):=1
-                $(if $(FLMDEBUG),$(info resourceheader: $(1) from $(2) LANG:$(3)))
+                $(if $(FLMDEBUG),$(info <debug>resourceheader: $(1) from $(2) LANG:$(3)</debug>))
 
                 RESOURCE:: $(1)
 

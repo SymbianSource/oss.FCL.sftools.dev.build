@@ -43,10 +43,10 @@ def run():
 
 	t.addbuildtargets('smoke_suite/test_resources/simple_gui/Bld.inf', [
 		"helloworld_exe/helloworld.mbm_bmconvcommands",
-		"helloworld_exe/helloworld__resource_apps_sc.rpp",
-		"helloworld_exe/helloworld__resource_apps_sc.rpp.d",
-		"helloworld_reg_exe/helloworld_reg__private_10003a3f_apps_sc.rpp",
-		"helloworld_reg_exe/helloworld_reg__private_10003a3f_apps_sc.rpp.d"])
+		"helloworld_exe/helloworld_sc.rpp",
+		"helloworld_exe/helloworld_sc.rpp.d",
+		"helloworld_reg_exe/helloworld_reg_sc.rpp",
+		"helloworld_reg_exe/helloworld_reg_sc.rpp.d"])
 
 	t.mustnotmatch = ["HelloWorld.rss.* warning: trigraph"]
 	
@@ -57,10 +57,16 @@ def run():
 	t.name =  "no_depend_gen_resource"
 	t.usebash = True
 	t.description =  """Check that dependent resources still build correctly even when we turn dependency generation off.  This
-			    test cannot reliably ensure that the dependencies are correct
+			    test cannot really do this reliably, if you think about it, since it can't force make to try building resources
+			    in the 'wrong' order.  What it does attempt is to check that 
+			    the ultimately generated dependency file is ok.
+			    N.B.  It also attempts to ensure that the dependency file is 'minimal'  i.e. that it only references .mbg and .rsg files
+			    that might come from other parts of the same build.  This is important for performance in situations where --no-depend-generate
+			    is used because the weight of 'complete' dependency information would overwhelm make.
 			 """
 	buildLocation = ReplaceEnvs("$(EPOCROOT)/epoc32/build/") + BldInfFile.outputPathFragment('smoke_suite/test_resources/resource/group/bld.inf')
-	res_depfile= buildLocation+"/dependentresource_/dependentresource_resource_dependentresource_sc.rpp.d"
+	#res_depfile= buildLocation+"/dependentresource_/dependentresource_resource_dependentresource_sc.rpp.d"
+	res_depfile= buildLocation+"/dependentresource_/dependentresource_sc.rpp.d"
 
 	t.targets = [
 		"$(EPOCROOT)/epoc32/include/testresource.rsg",
@@ -74,17 +80,20 @@ def run():
 		]
 
 	t.addbuildtargets('smoke_suite/test_resources/resource/group/bld.inf', [	
-		"testresource_/testresource_resource_testresource2_sc.rpp.d",
-		"testresource_/testresource_resource_testresource3_02.rpp",
-		"testresource_/testresource_resource_testresource3_02.rpp.d",
-		"testresource_/testresource_resource_testresource3_sc.rpp",
-		"testresource_/testresource_resource_testresource3_sc.rpp.d",
-		"testresource_/testresource_resource_testresource_01.rpp",
-		"testresource_/testresource_resource_testresource_01.rpp.d",
-		"testresource_/testresource_resource_testresource_sc.rpp",
-		"testresource_/testresource_resource_testresource_sc.rpp.d"])
+		"testresource_/testresource_02.rpp",
+		"testresource_/testresource_02.rpp.d",
+		"testresource_/testresource_01.rpp",
+		"testresource_/testresource_01.rpp.d",
+		"testresource_/testresource_sc.rpp",
+		"testresource_/testresource_sc.rpp.d"])
 
-	t.command = "sbs -b smoke_suite/test_resources/resource/group/bld.inf  -c arm.v5.urel.gcce4_4_1 reallyclean ; sbs --no-depend-generate -j 16 -b smoke_suite/test_resources/resource/group/bld.inf -c arm.v5.urel.gcce4_4_1 -f ${SBSLOGFILE} -m ${SBSMAKEFILE} && grep 'epoc32.include.testresource.rsg' %s " % (res_depfile)
+	t.command = "sbs -b smoke_suite/test_resources/resource/group/bld.inf  -c armv5_urel reallyclean ; sbs --no-depend-generate -j 16 -b smoke_suite/test_resources/resource/group/bld.inf -c armv5_urel -f ${SBSLOGFILE} -m ${SBSMAKEFILE} && grep 'epoc32.include.testresource.rsg' %s && wc -l %s " % (res_depfile, res_depfile)
+
+	t.mustnotmatch = []
+
+	t.mustmatch = [
+			"3 .*.dependentresource_.dependentresource_sc.rpp.d"
+		      ]
 
 	t.run()
 	return t
