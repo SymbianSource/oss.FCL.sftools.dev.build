@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <build xmlns="http://symbian.com/xml/build" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symbian.com/xml/build ../../schema/build/2_0.xsd">
-	<!-- GCCE build variant for ARM compilers -->
-	<!-- This is called gcce_base in case someone wants to use "gcce" as a configuration name -->
+	<!-- build variant for GCCE ARM toolchains -->
 	<var name="gcce_base">
 		<set name="TOOLCHAIN" value="GCCE"/>
 		<set name="PLATMACROS.TOOLCHAIN" value="GCCE"/>
 
+		<!-- toolchain tools -->
+		<set name="GCCEAR" value="$(GCCEBIN)/arm-none-symbianelf-ar$(DOTEXE)"/>
+		<set name="GCCEASM" value="$(GCCEBIN)/arm-none-symbianelf-as$(DOTEXE)"/>
 		<set name="GCCECC" value="$(GCCEBIN)/arm-none-symbianelf-g++$(DOTEXE)"/>
 		<set name="GCCELD" value="$(GCCEBIN)/arm-none-symbianelf-g++$(DOTEXE)"/>
-		<set name="GCCEASM" value="$(GCCEBIN)/arm-none-symbianelf-as$(DOTEXE)"/>
-		<set name="GCCEAR" value="$(GCCEBIN)/arm-none-symbianelf-ar$(DOTEXE)"/>
 		<set name="FROMELF" value="$(GCCEBIN)/arm-none-symbianelf-readelf$(DOTEXE)"/>
 
 		<set name="CC" value="$(GCCECC)"/>
@@ -123,6 +123,6 @@
 		<set name="USERINCLUDE" value=""/>
 		<set name="VFE_OPTION" value=""/>
 
-		<append name="CDEFS" value='__SUPPORT_CPP_EXCEPTIONS__ _UNICODE __SYMBIAN32__ __GCCE__ __EPOC32__ __MARM__ __EABI__ __PRODUCT_INCLUDE__="$(PRODUCT_INCLUDE)" $(MMPDEFS) $(ARMMACROS)'/>
+		<append name="CDEFS" value="__GCCE__"/>
 	</var>
 </build>

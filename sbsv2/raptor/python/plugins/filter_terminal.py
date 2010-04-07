@@ -161,7 +161,7 @@ class FilterTerminal(filter_interface.Filter):
 
 		# list of strings to catch recipe warnings (must be lowercase)
 		self.recipe_warning_expr = ["warning:"]
-
+		
 	def isMakeWarning(self, text):
                 """A simple test for warnings.
                 Can be extended do to more comprehensive checking."""
@@ -200,6 +200,9 @@ class FilterTerminal(filter_interface.Filter):
 		# Only print errors and warnings?
 		if self.raptor.quiet:
 			self.quiet = True
+		
+		# the build configurations which were reported
+		self.built_configs = []
 		
 		# keep count of errors and warnings
 		self.err_count = 0
@@ -393,7 +396,9 @@ class FilterTerminal(filter_interface.Filter):
 				self.recipeBody.append(text)
 			else:
 				self.recipelineExceeded += 1
-
+		elif text.startswith("<info>Buildable configuration '"):
+			# <info>Buildable configuration 'name'</info>
+			self.built_configs.append(text[30:-8])
 
 	def logit(self):
 		""" log a message """
@@ -432,11 +437,14 @@ class FilterTerminal(filter_interface.Filter):
 		if self.warn_count > 0 or self.err_count > 0:
 			sys.stdout.write("\n%s : warnings: %s\n" % (raptor.name,
 					self.warn_count))
-			sys.stdout.write("%s : errors: %s\n" % (raptor.name,
+			sys.stdout.write("%s : errors: %s\n\n" % (raptor.name,
 					self.err_count))
 		else:
-			sys.stdout.write("\nno warnings or errors\n")
+			sys.stdout.write("\nno warnings or errors\n\n")
 
+		for bc in self.built_configs:
+			sys.stdout.write("built " + bc + "\n")
+			
 		sys.stdout.write("\nRun time %d seconds\n" % self.raptor.runtime);
 		sys.stdout.write("\n")
 		return True

@@ -63,5 +63,7 @@ def run():
 		"helloworld_reg_exe/helloworld_reg__private_10003a3f_apps_sc.rpp",
 		"helloworld_reg_exe/helloworld_reg__private_10003a3f_apps_sc.rpp.d"])
 
+	t.mustnotmatch = ["HelloWorld.rss.* warning: trigraph"]
+	
 	t.run()
 	return t

@@ -78,8 +78,7 @@ ShowInstDetails show
 
 ##################### Pages in the installer #####################
 !insertmacro MUI_PAGE_WELCOME
-# Temporarily useing RELEASE-NOTES.txt as there is not license.txt
-!insertmacro MUI_PAGE_LICENSE ${RAPTOR_LOCATION}\RELEASE-NOTES.txt
+!insertmacro MUI_PAGE_LICENSE ${RAPTOR_LOCATION}\license.txt
 !define MUI_PAGE_HEADER_TEXT "Installation type"
 Page custom UserOrSysInstall UserOrSysInstallLeave
 !define MUI_PAGE_CUSTOMFUNCTION_LEAVE DirLeave # Directory page exit function - disallow spaces in $INSTDIR
@@ -123,7 +122,9 @@ Section "Install Raptor" INSTALLRAPTOR
     File /r /x distribution.policy.s60 /x .hg ${PYTHON_LOCATION}\*.*
     
     SetOutPath "$INSTDIR"
-    File ${RAPTOR_LOCATION}\RELEASE-NOTES.txt
+    File ${RAPTOR_LOCATION}\RELEASE-NOTES.html
+    SetOutPath "$INSTDIR\notes"
+    File /r /x distribution.policy.s60 ${RAPTOR_LOCATION}\notes\*.*
     
     
     ${Unless} $INSTALL_TYPE == "NO_ENV"
@@ -187,6 +188,7 @@ end:
 	
 	# Generate batch file to set environment variables for Raptor
 	StrCpy $RESULT "@REM Environment variables for ${INSTALLER_NAME}$\r$\nset SBS_HOME=$INSTDIR$\r$\nset PATH=%SBS_HOME%\bin;%PATH%$\r$\n"
+	SetOutPath "$INSTDIR"
 	!insertmacro WriteFile "RaptorEnv.bat" "$RESULT"
 SectionEnd
 
@@ -333,7 +335,8 @@ Section "Uninstall"
     RmDir /r $INSTDIR\python
     RmDir /r $INSTDIR\schema
     RmDir /r $INSTDIR\win32
-    Delete $INSTDIR\RELEASE-NOTES.txt
+    Delete $INSTDIR\RELEASE-NOTES.html
+    RmDir /r $INSTDIR\notes
     Delete $INSTDIR\RaptorEnv.bat
     Delete $INSTDIR\${UNINSTALLER_FILENAME}
     

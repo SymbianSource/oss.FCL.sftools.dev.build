@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -20,19 +20,15 @@ def run():
 	t = SmokeTest()
 	t.id = "52"
 	t.name = "tools"
-	# Do not run with j > 1 because of known issues
-	t.command = "sbs -b smoke_suite/test_resources/tools/bld.inf -c tools -j1"
+	t.command = "sbs -b smoke_suite/test_resources/tools/bld.inf -c tools"
 	t.targets = [
 		"$(EPOCROOT)/epoc32/release/tools/deb/tool_exe.bsc",
 		"$(EPOCROOT)/epoc32/release/tools/deb/tool_exe.exe",
 		"$(EPOCROOT)/epoc32/release/tools/deb/tool_exe.ilk",
-		"$(EPOCROOT)/epoc32/release/tools/deb/tool_exe.pdb",
 		"$(EPOCROOT)/epoc32/release/tools/deb/tool_lib1.bsc",
 		"$(EPOCROOT)/epoc32/release/tools/deb/tool_lib1.lib",
-		"$(EPOCROOT)/epoc32/release/tools/deb/tool_lib1.pdb",
 		"$(EPOCROOT)/epoc32/release/tools/deb/tool_lib2.bsc",
 		"$(EPOCROOT)/epoc32/release/tools/deb/tool_lib2.lib",
-		"$(EPOCROOT)/epoc32/release/tools/deb/tool_lib2.pdb",
 		"$(EPOCROOT)/epoc32/release/tools/rel/tool_exe.exe",
 		"$(EPOCROOT)/epoc32/release/tools/rel/tool_lib1.lib",
 		"$(EPOCROOT)/epoc32/release/tools/rel/tool_lib2.lib",

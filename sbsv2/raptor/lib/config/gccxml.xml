@@ -1,21 +1,20 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <build xmlns="http://symbian.com/xml/build" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symbian.com/xml/build ../../schema/build/2_0.xsd">
-	<!-- build configurations for the gccxml_cc1plus C++ language processor -->
+	<!-- build variants for the gccxml_cc1plus C++ language processor -->
 	<var name="gccxml_base" extends="root">
 		<varRef ref="default.interfaces"/>
 		<varRef ref="default.locations"/>
-		<!-- picked up from the Environment -->
-		<env name='CPP' default='$(GNUCPP)' type='tool'/>
+		
+		<!-- tools and scripts -->
 		<env name='BMCONV' default="$(EPOCROOT)/epoc32/tools/bmconv$(DOTEXE)" type='tool'/>
-		<env name='CREATERFIFILE' default='$(PERL) $(SBS_HOME)/bin/createrfifile.pl ' type='path'/>
+		<set name='CC' value="$(EPOCROOT)/epoc32/tools/gccxml_cc1plus$(DOTEXE)" type='tool'/>
+		<env name='CPP' default='$(GNUCPP)' type='tool'/>
+		<env name='CREATERFIFILE' default='$(PERL) $(SBS_HOME)/bin/createrfifile.pl ' type='script'/>
 		<env name='GNUAWK' default='$(GNUPREFIX)gawk$(DOTEXE)' type='tool' versionCommand='$(GNUAWK) --version' versionResult='GNU Awk [3-9].*'/>
-		<env name='MAKEDEF' default='$(PERL) $(EPOCROOT)/epoc32/tools/makedef.pl' type='path'/>
-		<env name='PREPDEF' default='$(PERL) $(EPOCROOT)/epoc32/tools/prepdef.pl' type='path'/>
+		<env name='MAKEDEF' default='$(PERL) $(EPOCROOT)/epoc32/tools/makedef.pl' type='script'/>
+		<env name='PREPDEF' default='$(PERL) $(EPOCROOT)/epoc32/tools/prepdef.pl' type='script'/>
 		<env name='RCOMP' default='$(EPOCROOT)/epoc32/tools/rcomp$(DOTEXE)' type='tool'/>
-		<env name='RVCT22BIN' type='path'/>
-		<env name='RVCT22INC' type='path'/>
-		<env name='RVCT22LIB' type='path'/>
-		<env name='STRINGTABLE' default='$(PERL) $(EPOCROOT)/epoc32/tools/stringtable.pl' type='path'/>
+		<env name='STRINGTABLE' default='$(PERL) $(EPOCROOT)/epoc32/tools/stringtable.pl' type='script'/>
 
 		<!-- link to bld.inf and mmp platform names -->
 		<set name='TRADITIONAL_PLATFORM' value='GCCXML'/>
@@ -51,11 +50,13 @@
 		<env name='JAVATC' default='$(JAVA_HOME)/bin/java' type='tool'/>
 
 		<!-- note that gccxml_cc1plus should be version checked, but I've yet to find a reliable way of doing this -->
-		<set name='CC' value="$(EPOCROOT)/epoc32/tools/gccxml_cc1plus$(DOTEXE)" type='tool'/>
 		<set name='CDEFS' value='_UNICODE __SYMBIAN32__ __GCC32__ __EPOC32__ __MARM__ __MINGW32__ _STLP_LITTLE_ENDIAN __GCCXML__ __MARM_ARM4__ $(MMPDEFS)'/>
 		<set name='CFLAGS' value='-bi -nostdinc -Wall -Wno-ctor-dtor-privacy -Wno-unknown-pragmas -UWIN32 -fshort-wchar -quiet -w '/>
 
 		<!-- in support of TEMs - processed as if in an RVCT build -->
+		<env name='RVCT22BIN' type='toolchainpath'/>
+		<env name='RVCT22INC' type='toolchainpath'/>
+		<env name='RVCT22LIB' type='toolchainpath'/>
 		<set name='RVCTBIN' value='$(RVCT22BIN)'/>
 		<set name='RVCTINC' value='$(RVCT22INC)'/>
 		<set name='RVCTLIB' value='$(RVCT22LIB)'/>

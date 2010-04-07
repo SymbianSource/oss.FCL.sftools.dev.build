@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 1997-2009 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 1997-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of the License "Eclipse Public License v1.0"
@@ -66,6 +66,7 @@ RESOURCE TBUF r_example_text_Hello { buf="Hello World!"; }
 RESOURCE TBUF r_example_text_Item0 { buf="Item 0"; }
 RESOURCE TBUF r_example_text_Item1 { buf="Item 1"; }
 RESOURCE TBUF r_example_text_Item2 { buf="Item 2"; }
+RESOURCE TBUF r_example_text_Item3 { buf="This string generates a trigraph warning if not suppressed: <h>ID3?????????<m>"; }
 
 RESOURCE LOCALISABLE_APP_INFO r_lai
 	{

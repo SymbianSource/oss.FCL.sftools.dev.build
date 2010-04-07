@@ -16,7 +16,7 @@
 
 # replace CHANGESET with the Hg changeset for ANY release
 
-version=(2,12,5,"2010-03-18","symbian build system","CHANGESET")
+version=(2,13,0,"2010-03-31","symbian build system","CHANGESET")
 
 def numericversion():
 	"""Raptor version string"""

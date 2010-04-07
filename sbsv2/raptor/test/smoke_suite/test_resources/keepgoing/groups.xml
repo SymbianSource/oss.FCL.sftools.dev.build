@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<build xmlns="http://symbian.com/xml/build"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://symbian.com/xml/build build/2_0.xsd">
+
+  <!-- This group deliberately contains some non-existent products 
+  -->
+  <group name="lots_of_products">
+	<groupRef ref='armv5'/>
+	<groupRef ref='armv5' mod="qwertyuio"/>
+	<groupRef ref='armv5' mod="asdfghjkl"/>
+	<groupRef ref='armv5' mod="zxcvbnm_p"/>
+  </group>
+  
+  <!-- This group just contains the one above to check multiple levels
+  -->
+  <group name="lots_of_products_2">
+    <groupRef ref="lots_of_products"/>
+  </group>
+  
+</build>

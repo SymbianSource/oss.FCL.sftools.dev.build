@@ -1304,16 +1304,15 @@ class MMPRaptorBackend(MMPBackend):
 		elif varname == 'PAGED':
 			self.BuildVariant.AddOperation(raptor_data.Set(varname, "1"))
 			self.__debug( "Set switch PAGE ON")
+			# PAGED is equivalent to PAGEDCODE
 			self.BuildVariant.AddOperation(raptor_data.Set("PAGEDCODE_OPTION", "paged"))
 			self.__debug( "Set switch PAGEDCODE ON")
-			self.BuildVariant.AddOperation(raptor_data.Set("PAGEDDATA_OPTION", "paged"))
-			self.__debug( "Set data PAGEDDATA ON")
 			self.__pageConflict.append("PAGEDCODE")
-			self.__pageConflict.append("PAGEDDATA")
 
 		elif varname == 'UNPAGED':
 			self.BuildVariant.AddOperation(raptor_data.Set("PAGED", "0"))
 			self.__debug( "Set switch PAGED OFF")
+			# UNPAGED is equivalent to UNPAGEDCODE *and* UNPAGEDDATA
 			self.BuildVariant.AddOperation(raptor_data.Set("PAGEDCODE_OPTION", "unpaged"))
 			self.__debug( "Set switch PAGEDCODE OFF")
 			self.BuildVariant.AddOperation(raptor_data.Set("PAGEDDATA_OPTION", "unpaged"))
@@ -1335,6 +1334,7 @@ class MMPRaptorBackend(MMPBackend):
 			self.BuildVariant.AddOperation(raptor_data.Set("PAGEDCODE_OPTION", "unpaged"))
 			self.__debug( "Set switch " + varname + " ON")
 			self.__pageConflict.append(varname)
+			
 		elif varname == 'UNPAGEDDATA':
 			self.BuildVariant.AddOperation(raptor_data.Set("PAGEDDATA_OPTION", "unpaged"))
 			self.__debug( "Set switch " + varname + " ON")
@@ -1343,6 +1343,7 @@ class MMPRaptorBackend(MMPBackend):
 		elif varname == 'NOLINKTIMECODEGENERATION':
 			self.BuildVariant.AddOperation(raptor_data.Set("LTCG",""))
 			self.__debug( "Set switch " + varname + " OFF")
+			
 		elif varname == 'NOMULTIFILECOMPILATION':
 			self.BuildVariant.AddOperation(raptor_data.Set("MULTIFILE_ENABLED",""))
 			self.__debug( "Set switch " + varname + " OFF")
@@ -1352,21 +1353,19 @@ class MMPRaptorBackend(MMPBackend):
 				self.__debuggable = "udeb urel"
 			else:
 				self.__Raptor.Warn("DEBUGGABLE keyword ignored as DEBUGGABLE_UDEBONLY is already specified")
+		
 		elif varname == 'DEBUGGABLE_UDEBONLY':
 			if self.__debuggable != "":
 				self.__Raptor.Warn("DEBUGGABLE keyword has no effect as DEBUGGABLE or DEBUGGABLE_UDEBONLY is already set")
 			self.__debuggable = "udeb"
+		
 		elif varname == 'FEATUREVARIANT':
 			self.BuildVariant.AddOperation(raptor_data.Set(varname,"1"))
 			self.featureVariant = True
+		
 		elif varname in ['COMPRESSTARGET', 'NOCOMPRESSTARGET', 'INFLATECOMPRESSTARGET', 'BYTEPAIRCOMPRESSTARGET']:
-			if self.__compressionKeyword:
-				self.__Raptor.Warn("%s keyword in %s overrides earlier use of %s" % (varname, self.__currentMmpFile, self.__compressionKeyword))
-				self.BuildVariant.AddOperation(raptor_data.Set(self.__compressionKeyword,""))
-				self.__debug( "Set switch " + varname + " OFF")
-			self.BuildVariant.AddOperation(raptor_data.Set(varname,"1"))
-			self.__debug( "Set switch " + varname + " ON")
-			self.__compressionKeyword = varname
+			self.resolveCompressionKeyword(varname)
+		
 		else:
 			self.__debug( "Set switch "+toks[0]+" ON")
 			self.BuildVariant.AddOperation(raptor_data.Set(prefix+varname, "1"))
@@ -1722,7 +1721,7 @@ class MMPRaptorBackend(MMPBackend):
 	def getDefaultResourceTargetPath(self, targettype):
 		# the different default TARGETPATH values should come from the
 		# configuration rather than being hard-coded here.
-		if targettype == "plugin":
+		if targettype in ["plugin", "plugin3"]:
 			return "resource/plugins"
 		if targettype == "pdl":
 			return "resource/printers"
@@ -2247,12 +2246,21 @@ class MMPRaptorBackend(MMPBackend):
 			for x in self.__pageConflict:
 				if x == "PAGEDCODE" or x == "UNPAGEDCODE":
 					self.__Raptor.Warn("Both PAGEDCODE and UNPAGEDCODE are specified. The last one %s will take effect" % x)
+					if x == "PAGEDCODE":
+						self.resolveCompressionKeyword("BYTEPAIRCOMPRESSTARGET")
 					break
+		elif "PAGEDCODE" in self.__pageConflict:
+			self.resolveCompressionKeyword("BYTEPAIRCOMPRESSTARGET")
+				
 		if "PAGEDDATA" in self.__pageConflict and "UNPAGEDDATA" in self.__pageConflict:
 			for x in self.__pageConflict:
 				if x == "PAGEDDATA" or x == "UNPAGEDDATA":
 					self.__Raptor.Warn("Both PAGEDDATA and UNPAGEDDATA are specified. The last one %s will take effect" % x)
+					if x == "PAGEDDATA":
+						self.resolveCompressionKeyword("BYTEPAIRCOMPRESSTARGET")
 					break
+		elif "PAGEDDATA" in self.__pageConflict:
+			self.resolveCompressionKeyword("BYTEPAIRCOMPRESSTARGET")
 
 		# Set Debuggable
 		self.BuildVariant.AddOperation(raptor_data.Set("DEBUGGABLE", self.__debuggable))
@@ -2270,6 +2278,19 @@ class MMPRaptorBackend(MMPBackend):
 	def getTargetType(self):
 		"""Target type in lower case - the standard format"""
 		return self.__targettype.lower()
+
+	def resolveCompressionKeyword(self, aCompressionKeyword):
+		"""If a compression keyword is set more than once either explicitly
+		or implicitly a warning is given and the last one takes effect 
+		"""
+		if self.__compressionKeyword and self.__compressionKeyword != aCompressionKeyword:
+			self.__Raptor.Warn("%s keyword in %s overrides earlier use of %s" % \
+						(aCompressionKeyword, self.__currentMmpFile, self.__compressionKeyword))
+			self.BuildVariant.AddOperation(raptor_data.Set(self.__compressionKeyword, ""))
+			self.__debug( "Set switch " + self.__compressionKeyword + " OFF")
+		self.BuildVariant.AddOperation(raptor_data.Set(aCompressionKeyword,"1"))
+		self.__debug( "Set switch " + aCompressionKeyword + " ON")
+		self.__compressionKeyword = aCompressionKeyword
 
 	def checkImplibDefFile(self, defFile):
 		"""Project with target type implib must have DEFFILE defined 

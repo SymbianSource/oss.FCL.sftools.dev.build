@@ -37,7 +37,19 @@ from xml.sax.saxutils import unescape
 class BadMakeEngineException(Exception):
 	pass
 
+def string_following(prefix, str):
+	"""If str starts with prefix then return the rest of str, otherwise None"""
+	if str.startswith(prefix):
+		return str[len(prefix):]
+	else:
+		return None
+
 def XMLEscapeLog(stream):
+	""" A generator that reads a raptor log from a stream and performs an XML escape
+	    on all text between tags, which is usually make output that could contain
+	    illegal characters that upset XML-based log parsers.
+	    This function yields "xml-safe" output line by line.
+	"""
 	inRecipe = False
 
 	for line in stream:
@@ -54,22 +66,49 @@ def XMLEscapeLog(stream):
 			yield escape(line)
 
 def AnnoFileParseOutput(annofile):
+	""" A generator that extracts log output from an emake annotation file, 
+	    perform an XML-unescape on it and "yields" it line by line.  """
 	af = open(annofile, "r")
 
 	inOutput = False
-	inParseJob = False
+
+	buildid = ""
 	for line in af:
 		line = line.rstrip("\n\r")
 
+
 		if not inOutput:
-			if line.startswith("<output>"):
+			o = string_following("<output>", line)
+			if not o:
+				o = string_following('<output src="prog">', line)
+
+			if o:
 				inOutput = True	
-				yield unescape(line[8:])+'\n'
-				# This is make output so don't unescape it.
-			elif line.startswith('<output src="prog">'):
-				line = line[19:]
-				inOutput = True	
-				yield unescape(line)+'\n'
+				yield unescape(o)+'\n'
+				continue
+
+
+			o = string_following('<build id="',line)
+			if o:
+				buildid = o[:o.find('"')]
+				yield "Starting build: "+buildid+"\n"
+				continue 
+
+			o = string_following('<metric name="duration">', line)
+			if o:
+				secs = int(o[:o.find('<')])
+				if secs != 0:
+					duration = "%d:%d" % (secs/60, secs % 60)
+				else:
+					duration = "0:0"
+				continue 
+
+
+			o = string_following('<metric name="clusterAvailability">', line)
+			if o:
+				availability = o[:o.find('<')]
+				continue 
+				
 		else:
 			end_output = line.find("</output>")
 		
@@ -77,8 +116,10 @@ def AnnoFileParseOutput(annofile):
 				line = line[:end_output]
 				inOutput = False
 			
-			yield unescape(line)+'\n'
+			if line != "":	
+				yield unescape(line)+'\n'
 
+	yield "Finished build: %s   Duration: %s (m:s)   Cluster availability: %s%%\n" %(buildid,duration,availability)
 	af.close()
 
 
@@ -146,8 +187,8 @@ class MakeEngine(object):
 
 			if self.copyLogFromAnnoFile:
 				for o in self.raptor.makeOptions:
-					if o.startswith("--emake-annofile="):
-						self.annoFileName = o[17:]
+					self.annoFileName = string_following("--emake-annofile=", o)
+					if self.annoFileName:
 						self.raptor.Info("annofile: " + o)
 
 				if not self.annoFileName:

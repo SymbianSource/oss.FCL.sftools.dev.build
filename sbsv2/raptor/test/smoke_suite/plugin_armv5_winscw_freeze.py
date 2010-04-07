@@ -24,7 +24,8 @@ def run():
 		the correct FREEZE behaviour in each case.  The correct behaviour for a PLUGIN/PLUGIN3 is
 		indicative of all TARGETTYPEs where the build system defines known exports: FREEZE should do nothing
 		unless an explicit DEFFILE statement is present in the .mmp file.
-		Also confirms default UID2 settings for PLUGIN3 TARGETTYPEs."""
+		Also confirms default UID2 settings for PLUGIN3 TARGETTYPEs and default resource generation locations
+		for both PLUGIN and PLUGIN3."""
 	t.usebash = True
 	
 	t.command = """
@@ -34,7 +35,13 @@ def run():
 
 	t.targets = [
 		"smoke_suite/test_resources/simple_plugin/bwins/plugin2u.def",
-		"smoke_suite/test_resources/simple_plugin/eabi/plugin2u.def"		
+		"smoke_suite/test_resources/simple_plugin/eabi/plugin2u.def",
+		"$(EPOCROOT)/epoc32/data/z/resource/plugins/plugin.rsc",
+		"$(EPOCROOT)/epoc32/release/winscw/udeb/z/resource/plugins/plugin.rsc",
+		"$(EPOCROOT)/epoc32/release/winscw/urel/z/resource/plugins/plugin.rsc",
+		"$(EPOCROOT)/epoc32/data/z/resource/plugins/plugin3.rsc",
+		"$(EPOCROOT)/epoc32/release/winscw/udeb/z/resource/plugins/plugin3.rsc",
+		"$(EPOCROOT)/epoc32/release/winscw/urel/z/resource/plugins/plugin3.rsc"	
 		]
 	
 	t.antitargets = [

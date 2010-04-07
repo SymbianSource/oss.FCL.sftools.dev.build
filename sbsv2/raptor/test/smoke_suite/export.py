@@ -73,7 +73,7 @@ def run():
 	t.name = "export"
 	t.usebash = True
 	t.command = "ls -l ${EPOCROOT}/epoc32/include/executable_file"
-	t.mustmatch = [ "^.rwxrwxr.x .*executable_file.*$" ]
+	t.mustmatch = [ "^.rwxrwxr.x[\.\+]? .*executable_file.*$" ]
 	t.targets = []
 	t.run("linux")
 	t.usebash = False
