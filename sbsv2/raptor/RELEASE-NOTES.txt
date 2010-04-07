@@ -17,7 +17,7 @@ Defect Fixes:
 - SF Bug 2134 - [Raptor] Raptor does not pass overridden make variables into its makefiles
 - Fix: do not allow data to be paged implicitly
 - Fix: Makefile Parse Performance in Resource stage is poor. Large size of included dependency files is a factor. In --no-depend-generate mode, create dependency files which only refer to other rsg/mbg files that are yet to be built - store no other dependencies.
-- Fix: Poor performance: resources are rebuilt for winscw even if they were already preprocessed and compiled for an arm build. Change tactics - create resources once in an intermediate build directory, then copy to platform specific dirs (rather than creating directly in each destination). Thus when winscw build is done, only a copy is needed.
+- Fix: don't generate multiple copies of the same resource just because there are several target paths. Generate it once and copy that to the different target paths.
 
 
 version 2.12.5
