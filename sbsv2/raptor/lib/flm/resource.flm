@@ -117,9 +117,11 @@ CPPOPT:=-nostdinc -undef -Wno-trigraphs -D_UNICODE -include $(PRODUCT_INCLUDE)\
 
 CREATABLEPATHS:=$(RSCDIR) $(RSGDIR) $(OUTPUTPATH)
 
-# We intend to generate the resource in an intermediate locationand copy to the final destination to
-# ensure that when the "same" resource is built into separare locations it is 
+# We intend to generate the resource in an intermediate location and copy to the targetpath to
+# ensure that when the "same" resource is built into separare target paths, it doesn't have to be 
+# completely recreated each time - just copied.
 RSCCOPYDIRS:=$(RSCDIR)
+
 # additional binary resource copies performed based on BINCOPYDIRS
 ifneq ($(BINCOPYDIRS),)
         RSCCOPYDIRS:=$(RSCCOPYDIRS) $(subst //,/,$(patsubst %,%/$(if $(TARGETPATH),/z/$(TARGETPATH),),$(BINCOPYDIRS)))
@@ -147,6 +149,8 @@ define preprocessresource
       # This version minimises the size of dependency files, to contain only .mbg and .rsg deps.
       # It allows resources to be built in the right order but doesn't impose the weight of
       # of full dependency information which can overwhelm make in large builds.
+      # The strategy is to filter out lines (apart from the target line which is the first) which don't have .rsg or 
+      # .mbg dependencies in them. 
       DEPENDENCY_CORRECTOR:={ $(GNUSED) -n -r '1 p;\% [^ \/]+\.((rsg)|(mbg))%I {s% ([^ \/]+\.((rsg)|(mbg)))% $(EPOCROOT)\/epoc32\/include\/\1%ig; p}' && echo "" ; }
     else
       # Generate full dependency information
