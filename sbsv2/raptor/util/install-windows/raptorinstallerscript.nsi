@@ -44,10 +44,9 @@ Var INSTALL_TYPE # Type of installer ("USR" or "SYS")
 
 # Custom includes (depend on above variables so much be here)
 !include "raptorinstallerutils.nsh" # Functions and macros for handling environment variables
-!include "raptorversion.nsh" # Define the RAPTOR_VERSION variable
+# !include "raptorversion.nsh" # Define the RAPTOR_VERSION variable
 
 # Defines
-# !define /date DATE_STAMP "%Y-%m-%d-%H-%M-%S"
 !define INSTALLER_NAME "Raptor v${RAPTOR_VERSION}"
 !define RAPTOR "sbs"
 !define INSTALLER_FILENAME "${RAPTOR}-${RAPTOR_VERSION}.exe"
@@ -79,8 +78,7 @@ ShowInstDetails show
 
 ##################### Pages in the installer #####################
 !insertmacro MUI_PAGE_WELCOME
-# Temporarily useing RELEASE-NOTES.txt as there is not license.txt
-!insertmacro MUI_PAGE_LICENSE ${RAPTOR_LOCATION}\RELEASE-NOTES.txt
+!insertmacro MUI_PAGE_LICENSE ${RAPTOR_LOCATION}\license.txt
 !define MUI_PAGE_HEADER_TEXT "Installation type"
 Page custom UserOrSysInstall UserOrSysInstallLeave
 !define MUI_PAGE_CUSTOMFUNCTION_LEAVE DirLeave # Directory page exit function - disallow spaces in $INSTDIR
@@ -112,19 +110,21 @@ Section "Install Raptor" INSTALLRAPTOR
     File /r /x distribution.policy.s60 ${RAPTOR_LOCATION}\python\*.*
     SetOutPath "$INSTDIR\schema"
     File /r /x distribution.policy.s60 ${RAPTOR_LOCATION}\schema\*.*
-    SetOutPath "$INSTDIR\win32"
-    File /r /x distribution.policy.s60 ${RAPTOR_LOCATION}\win32\*.*
+    SetOutPath "$INSTDIR\win32\bin"
+    File /r /x distribution.policy.s60 ${RAPTOR_LOCATION}\win32\bin\*.*
     SetOutPath "$INSTDIR\win32\bv"
-    File /r /x distribution.policy.s60 /x .hg ${WIN32SUPPORT}\bv\*.*
+    File /r /x distribution.policy.s60 /x .hg ${BV_LOCATION}\*.*
     SetOutPath "$INSTDIR\win32\cygwin"
-    File /r /x distribution.policy.s60 /x .hg ${WIN32SUPPORT}\cygwin\*.*
+    File /r /x distribution.policy.s60 /x .hg ${CYGWIN_LOCATION}\*.*
     SetOutPath "$INSTDIR\win32\mingw"
-    File /r /x distribution.policy.s60 /x .hg ${WIN32SUPPORT}\mingw\*.*
+    File /r /x distribution.policy.s60 /x .hg ${MINGW_LOCATION}\*.*
     SetOutPath "$INSTDIR\win32\python264"
-    File /r /x distribution.policy.s60 /x .hg ${WIN32SUPPORT}\python264\*.*
+    File /r /x distribution.policy.s60 /x .hg ${PYTHON_LOCATION}\*.*
     
     SetOutPath "$INSTDIR"
-    File ${RAPTOR_LOCATION}\RELEASE-NOTES.txt
+    File ${RAPTOR_LOCATION}\RELEASE-NOTES.html
+    SetOutPath "$INSTDIR\notes"
+    File /r /x distribution.policy.s60 ${RAPTOR_LOCATION}\notes\*.*
     
     
     ${Unless} $INSTALL_TYPE == "NO_ENV"
@@ -188,6 +188,7 @@ end:
 	
 	# Generate batch file to set environment variables for Raptor
 	StrCpy $RESULT "@REM Environment variables for ${INSTALLER_NAME}$\r$\nset SBS_HOME=$INSTDIR$\r$\nset PATH=%SBS_HOME%\bin;%PATH%$\r$\n"
+	SetOutPath "$INSTDIR"
 	!insertmacro WriteFile "RaptorEnv.bat" "$RESULT"
 SectionEnd
 
@@ -334,7 +335,8 @@ Section "Uninstall"
     RmDir /r $INSTDIR\python
     RmDir /r $INSTDIR\schema
     RmDir /r $INSTDIR\win32
-    Delete $INSTDIR\RELEASE-NOTES.txt
+    Delete $INSTDIR\RELEASE-NOTES.html
+    RmDir /r $INSTDIR\notes
     Delete $INSTDIR\RaptorEnv.bat
     Delete $INSTDIR\${UNINSTALLER_FILENAME}
     

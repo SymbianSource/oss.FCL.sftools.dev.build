@@ -5,7 +5,19 @@
 	These can be referenced from the command-line or in configurations.
 	
 	-->
-  
+ 	
+	<!-- This variant enables building win32 tools in Linux. Tools2 on Linux only -->
+	<var name="win32">
+		<set name='TOOLS2WIN32' value='1'/>
+		<env name='SBS_MINGW_LINUX_PREFIX' default='i586-mingw32msvc'/>
+		<env name='GCC' default='$(SBS_MINGW_LINUX_PREFIX)-g++' type='tool'/>
+		<env name='ARCHIVER' default='$(SBS_MINGW_LINUX_PREFIX)-ar' type='tool'/>
+		<env name='RANLIB' default='$(SBS_MINGW_LINUX_PREFIX)-ranlib' type='tool'/>
+		<set name='RELEASEPATH' value='$(EPOCROOT)/epoc32/release/tools2/$(VARIANTTYPE)'/>
+		<set name='DOTEXE' value='.exe'/>
+		<set name='PLATMACROS.LINUX' value='$(PLATMACROS.WINDOWS)'/>
+	</var>
+
 	<!-- This variant turns debug info on for arm only -->
 	<var name="debug_info">
 		<set name='DEBUG_INFO' value='1'/>
@@ -122,8 +134,8 @@
 		<set name="STATIC_LIBS_LIST" value="h_t__uf.l(switch8.o)"/>
 		<set name="RUNTIME_LIBS_LIST" value="drtaeabi.dso dfpaeabi.dso dfprvct2_2.dso drtrvct2_2.dso"/>
 		<set name="USER_STATIC_RUNTIME_LIB" value="usrt2_2.lib"/>
+		<set name="USER_STATIC_RUNTIME_LIB_NESTED_EXCEPTIONS" value="usrt_nx_2_2.lib"/>
 		<set name="KERNEL_STATIC_RUNTIME_LIB" value="ksrt2_2.lib"/>
-		<set name="USRTLIB" value="usrt2_2.lib"/>
 		<set name="NEED_ENTRYPOINT_LIBRARY" value="False"/>
 		<set name="CC.NO_UNALIGNED_ACCESS" value="--memaccess -UL41"/>
 		<set name="CC.SOFTVFP_MAYBE_VFPV2" value="softvfp"/>
@@ -149,8 +161,8 @@
 		<set name="STATIC_LIBS_LIST" value="h_5.l"/>
 		<set name="RUNTIME_LIBS_LIST" value="drtaeabi.dso dfpaeabi.dso dfprvct3_1.dso drtrvct3_1.dso"/>
 		<set name="USER_STATIC_RUNTIME_LIB" value="usrt3_1.lib"/>
+		<set name="USER_STATIC_RUNTIME_LIB_NESTED_EXCEPTIONS" value="usrt_nx_3_1.lib"/>
 		<set name="KERNEL_STATIC_RUNTIME_LIB" value="ksrt3_1.lib"/>
-		<set name="USRTLIB" value="usrt3_1.lib"/>
 		<set name="NEED_ENTRYPOINT_LIBRARY" value="True"/>
 		<set name="CC.NO_UNALIGNED_ACCESS" value="--no_unaligned_access"/>
 		<set name="CC.SOFTVFP_MAYBE_VFPV2" value="softvfp"/>
@@ -179,8 +191,8 @@
 		<set name="STATIC_LIBS_LIST" value=""/>
 		<set name="RUNTIME_LIBS_LIST" value="drtaeabi.dso dfpaeabi.dso"/>
 		<set name="USER_STATIC_RUNTIME_LIB" value="usrt4_0.lib"/>
+		<set name="USER_STATIC_RUNTIME_LIB_NESTED_EXCEPTIONS" value="usrt_nx_4_0.lib"/>
 		<set name="KERNEL_STATIC_RUNTIME_LIB" value="ksrt4_0.lib"/>
-		<set name="USRTLIB" value="usrt4_0.lib"/>
 		<set name="NEED_ENTRYPOINT_LIBRARY" value="True"/>
 		<set name="CC.NO_UNALIGNED_ACCESS" value="--no_unaligned_access"/>
 		<set name="CC.SOFTVFP_MAYBE_VFPV2" value="softvfp+vfpv2"/>

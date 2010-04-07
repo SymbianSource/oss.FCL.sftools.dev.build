@@ -2989,7 +2989,7 @@ class MetaReader(object):
 			self.__Raptor.PrintXML("<zipmarker>" + markerfilename +	"</zipmarker>\n")
 			self.__Raptor.PrintXML("</clean>\n")
 
-		except IOError:
+		except IOError, e:
 			self.__Raptor.Warn("Problem while unzipping export %s to %s: %s",source,destination,str(e))
 
 		self.__Raptor.Info("Unzipped %d files from %s to %s", filecount, source, destination)
