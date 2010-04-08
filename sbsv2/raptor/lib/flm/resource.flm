@@ -225,7 +225,6 @@ define generateresource
 # $(2) is the preprocessed resource to make it from
 # $(3) is the language e.g. sc or 01 or 02
 
-    RELEASABLES:=$$(RELEASABLES) $(1)
 
         ifeq ($(TARGET_$(call sanitise,$1)),)
                 TARGET_$(call sanitise,$1):=1

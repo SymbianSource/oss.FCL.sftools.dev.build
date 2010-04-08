@@ -168,8 +168,8 @@ def run():
 		"createstaticdll_invariant_dll/armv5/urel/createstaticdll_invariant{000a0000}.def",
 		"createstaticdll_invariant_dll/armv5/urel/createstaticdll_invariant{000a0000}.dso",
 		
-		"dummy_inv_dll/dummy_inv__resource_apps_sc.rpp",
-		"dummy_inv_dll/dummy_inv__resource_apps_sc.rpp.d"
+		"dummy_inv_dll/dummy_inv_sc.rpp",
+		"dummy_inv_dll/dummy_inv_sc.rpp.d"
 		]
 
 	variantBuildTargetsDefaultTree = [
@@ -293,12 +293,12 @@ def run():
 		]
 	
 	variantBuildTargetsGeneric = [
-		"dummy_var1_dll/dummy_var1__resource_apps_sc.rpp",
-		"dummy_var1_dll/dummy_var1__resource_apps_sc.rpp.d",
-		"dummy_var2_dll/dummy_var2__resource_apps_sc.rpp",
-		"dummy_var2_dll/dummy_var2__resource_apps_sc.rpp.d",
-		"dummy_var3_exe/dummy_var3__resource_apps_sc.rpp",
-		"dummy_var3_exe/dummy_var3__resource_apps_sc.rpp.d"
+		"dummy_var1_dll/dummy_var1_sc.rpp",
+		"dummy_var1_dll/dummy_var1_sc.rpp.d",
+		"dummy_var2_dll/dummy_var2_sc.rpp",
+		"dummy_var2_dll/dummy_var2_sc.rpp.d",
+		"dummy_var3_exe/dummy_var3_sc.rpp",
+		"dummy_var3_exe/dummy_var3_sc.rpp.d"
 		]
 	
 	sbscommand = "sbs -b smoke_suite/test_resources/bv/bld.inf -c armv5 " + \
