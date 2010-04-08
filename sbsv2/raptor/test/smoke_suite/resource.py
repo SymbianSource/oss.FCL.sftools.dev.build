@@ -52,7 +52,6 @@ def run():
 	
 	t.run()
 
-
 	t.id="30a"
 	t.name =  "no_depend_gen_resource"
 	t.usebash = True
@@ -65,7 +64,6 @@ def run():
 			    is used because the weight of 'complete' dependency information would overwhelm make.
 			 """
 	buildLocation = ReplaceEnvs("$(EPOCROOT)/epoc32/build/") + BldInfFile.outputPathFragment('smoke_suite/test_resources/resource/group/bld.inf')
-	#res_depfile= buildLocation+"/dependentresource_/dependentresource_resource_dependentresource_sc.rpp.d"
 	res_depfile= buildLocation+"/dependentresource_/dependentresource_sc.rpp.d"
 
 	t.targets = [
@@ -96,4 +94,7 @@ def run():
 		      ]
 
 	t.run()
+
+	t.name = 'resource'
+	t.print_result()
 	return t
