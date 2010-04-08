@@ -112,8 +112,13 @@ endif
 $(call makepath,$(INTERBASE))
 
 # common pre-processor options
+
+# We really should be using -iquote with a recent cpp.  This is a note for when we do update:
+#CPPOPT:=-nostdinc -undef -Wno-trigraphs -D_UNICODE -include $(PRODUCT_INCLUDE)\
+# -I$(dir $(SOURCE)) $(foreach I, $(USERINCLUDE),-iquote $(I) ) $(foreach J,$(SYSTEMINCLUDE),-I $(J) )
+
 CPPOPT:=-nostdinc -undef -Wno-trigraphs -D_UNICODE -include $(PRODUCT_INCLUDE)\
- -I$(dir $(SOURCE)) $(foreach I, $(USERINCLUDE),-iquote $(I) ) $(foreach J,$(SYSTEMINCLUDE),-I $(J) )
+ -I$(dir $(SOURCE)) $(foreach I, $(USERINCLUDE),-I$(I) ) -I- $(foreach J,$(SYSTEMINCLUDE),-I$(J) )
 
 CREATABLEPATHS:=$(RSCDIR) $(RSGDIR) $(OUTPUTPATH)
 
@@ -236,12 +241,12 @@ define generateresource
 			$(call endrule,resourcecompile)
 
         endif
+
 #	Whether or not we have generated this resource for some other variant, check if there
 #       are any new copies to be made for this variant. e.g. winscw requires that we make
 #       some extra copies.
 
         $(if $(FLMDEBUG),$(info <debug>resource copies of $(notdir $1) in: $(RSCCOPYDIRS)</debug>))
-        $(foreach F,$(sort $(patsubst %,%/$(notdir $(1)),$(RSCCOPYDIRS))),$(call copyresource,$(1),$(F)))
         $(foreach F,$(sort $(patsubst %,%/$(notdir $(1)),$(RSCCOPYDIRS))),$(call copyresource,$(1),$(F)))
 
         # individual source file compilation
