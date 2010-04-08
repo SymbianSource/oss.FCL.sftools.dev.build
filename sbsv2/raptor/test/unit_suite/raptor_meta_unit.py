@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -569,7 +569,49 @@ class TestRaptorMeta(unittest.TestCase):
 							'STDVAR_TO_BLDINF':bldInfMakefilePathTestRoot,
 							'STDVAR_EXTENSION_ROOT':bldInfMakefilePathTestRoot}		
 							)
+	
+	def testBadBldInfs(self):
+		bldInfTestRoot = self.__testRoot.Append('metadata/project/bld.infs')
+		depfiles=[]
 		
+		class BadBldInfLogger(object):
+			"mock logger to capture Error messages from the parser."
+			
+			def __init__(self):
+				self.errors = []
+				self.debugOutput = False
+				
+			def Error(self, format, *extras, **attributes):
+				self.errors.append( ((format % extras), attributes) )
+		
+			def Debug(self, format, *extras, **attributes):
+				pass
+				
+		logger = BadBldInfLogger()
+		
+		# this bld.inf has END lines with no matching START
+		bldInfObject = raptor_meta.BldInfFile(bldInfTestRoot.Append('bad_lone_end.inf'),
+											  self.__gnucpp, depfiles=depfiles, 
+											  log=logger)
+		
+		# the PRJ_EXTENSIONS section is bad for ARMV5
+		extensions = bldInfObject.getExtensions(self.ARMV5)
+		#
+		self.assertEquals(len(logger.errors), 1)
+		err = logger.errors[0]
+		self.assertEquals(err[0], "unmatched END statement in PRJ_EXTENSIONS section")
+		self.assertTrue("bldinf" in err[1])
+		self.assertTrue(err[1]["bldinf"].endswith("bad_lone_end.inf"))
+		
+		# the PRJ_TESTEXTENSIONS section is bad for WINSCW
+		testextensions = bldInfObject.getTestExtensions(self.WINSCW)
+		#
+		self.assertEquals(len(logger.errors), 2)
+		err = logger.errors[1]
+		self.assertEquals(err[0], "unmatched END statement in PRJ_TESTEXTENSIONS section")
+		self.assertTrue("bldinf" in err[1])
+		self.assertTrue(err[1]["bldinf"].endswith("bad_lone_end.inf"))
+			
 	def testBldInfIncludes(self):
 		bldInfTestRoot = self.__testRoot.Append('metadata/project/bld.infs/includes')
 		depfiles=[]
