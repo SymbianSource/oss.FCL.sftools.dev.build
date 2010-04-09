@@ -1,0 +1,333 @@
+/*
+* Copyright (c) 2003-2010 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description: 
+* LOGWRAP.RSS
+*
+*/
+
+
+#include <testresource_badef.rh>
+#include <e32capability.h>
+
+#include "../inc/testresource.rh"
+#include "../inc/testresource.hrh"
+#include "testresource.rls"
+
+#include "testresource.mbg"
+#include <testresource.rsg>
+
+// MACRO statements in .mmp files should be reflected in resource preprocessing
+#ifndef SHOULD_BE_DEFINED
+#error "mmp MACRO SHOULD_BE_DEFINED is not defined!"
+#endif
+
+// Initial configuration
+RESOURCE CONFIG r_log_initial_config
+	{
+	size = 1000; // Maximum number of events
+	recent = 20; // Maximum size of recent lists
+	age = 2592000; // 30 days
+	}
+
+  RESOURCE ARRAY r_log_initial_events
+   	{
+   	items = 
+   		{
+  		ETYPE { uid = KLogCallEventType; description = LOG_CALL_EVENT_TYPE; },
+  		ETYPE { uid = KLogDataEventType; description = LOG_DATA_EVENT_TYPE; },
+  		ETYPE { uid = KLogFaxEventType; description = LOG_FAX_EVENT_TYPE; },
+  		ETYPE { uid = KLogShortMessageEventType; description = LOG_SHORT_MESSAGE_EVENT_TYPE; },
+  		ETYPE { uid = KLogTaskSchedulerEventType; description = LOG_TASK_SCHEDULER_EVENT_TYPE; },
+  		ETYPE { uid = KLogPacketDataEventType; description = LOG_PACKET_DATA_EVENT_TYPE; },
+
+
+  		ETYPE { uid = KLogLbsSelfLocateEventType; description = LOG_LBS_SELF_LOCATE_EVENT_TYPE; },
+  		ETYPE { uid = KLogLbsExternalLocateEventType; description = LOG_LBS_EXTERNAL_LOCATE_EVENT_TYPE; },
+ 		ETYPE { uid = KLogLbsTransmitLocationEventType; description = LOG_LBS_TRANSMIT_LOCATION_EVENT_TYPE; },
+ 		ETYPE { uid = KLogLbsNetworkLocateEventType; description = LOG_LBS_NETWORK_LOCATE_EVENT_TYPE; },
+ 		ETYPE { uid = KLogLbsAssistanceDataEventType; description = LOG_LBS_ASSISTANCE_DATA_EVENT_TYPE; }
+
+   		};
+   	}
+
+
+
+RESOURCE ARRAY r_log_security
+//
+// [See logwrap.rh for the definitions of SECURITY and CAPABILITY.]
+//
+// This structure defines settings for platform security in the Log engine.
+// All event types defined above in 'r_log_initial_events' need to be policed.
+// The server must always determine whether a client thread has the required
+// capability to read/write a log event(s) of a built-in type.  Each operation
+// may have from one to seven capabilities defined for it.  All operations on 
+// built in types _MUST_ have an associated security policy defined here.  If no
+// security is required, then use 'cap=ECapability_None'.  The CAPABILITY values
+// defined here will provide constructor arguments for TSecurityPolicy objects.
+// The maximum number of CAPABILITY(s) for each read or write operation is 7.
+// ( a read_caps or a write_caps { contains <= 7 CAPABILITY{}   statements }  )
+// Note that SID-based security isn't supported in the Log Engine.
+//
+	{
+	items = 
+		{
+		SECURITY 
+			{ 
+			uid = KLogCallEventType;	
+			read_caps=
+				{
+				CAPABILITY { cap=ECapabilityReadUserData; }
+				};
+			write_caps=
+				{
+				CAPABILITY { cap=ECapabilityWriteUserData; }
+				};
+			},
+		SECURITY 
+			{ 
+			uid=KLogDataEventType;	
+			read_caps=
+				{
+				CAPABILITY { cap=ECapabilityReadUserData; }
+				};
+			write_caps=
+				{
+				CAPABILITY { cap=ECapabilityWriteUserData; }
+				};
+			},
+		SECURITY 
+			{ 
+			uid=KLogFaxEventType;	
+			read_caps=
+				{
+				CAPABILITY { cap=ECapabilityReadUserData; }
+				};
+			write_caps=
+				{
+				CAPABILITY { cap=ECapabilityWriteUserData; }
+				};
+			},
+		SECURITY 
+			{ 
+			uid=KLogShortMessageEventType;	
+			read_caps=
+				{
+				CAPABILITY { cap=ECapabilityReadUserData; }
+				};
+			write_caps=
+				{
+				CAPABILITY { cap=ECapabilityWriteUserData; }
+				};
+			},
+		SECURITY 
+			{ 
+			uid=KLogTaskSchedulerEventType;	
+			read_caps=
+				{
+				CAPABILITY { cap=ECapabilityReadUserData; }
+				};
+			write_caps=
+				{
+				CAPABILITY { cap=ECapability_None; }
+				};
+			},
+		SECURITY 
+			{ 
+			uid=KLogPacketDataEventType;	
+			read_caps=
+				{
+				CAPABILITY { cap=ECapabilityReadUserData; }
+				};
+			write_caps=
+				{
+				CAPABILITY { cap=ECapabilityWriteUserData; }
+				};
+			},
+		SECURITY 
+			{ 
+			uid=KLogLbsSelfLocateEventType;	
+			read_caps=
+				{
+				CAPABILITY { cap=ECapabilityReadDeviceData; }
+				};
+			write_caps=
+				{
+				CAPABILITY { cap=ECapabilityWriteDeviceData; }
+				};
+			},
+		SECURITY 
+			{ 
+			uid=KLogLbsExternalLocateEventType;	
+			read_caps=
+				{
+				CAPABILITY { cap=ECapabilityReadDeviceData; }
+				};
+			write_caps=
+				{
+				CAPABILITY { cap=ECapabilityWriteDeviceData; }
+				};
+			},
+		SECURITY 
+			{ 
+			uid=KLogLbsTransmitLocationEventType;	
+			read_caps=
+				{
+				CAPABILITY { cap=ECapabilityReadDeviceData; }
+				};
+			write_caps=
+				{
+				CAPABILITY { cap=ECapabilityWriteDeviceData; }
+				};
+			},
+		SECURITY 
+			{ 
+			uid=KLogLbsNetworkLocateEventType;	
+			read_caps=
+				{
+				CAPABILITY { cap=ECapabilityReadDeviceData; }
+				};
+			write_caps=
+				{
+				CAPABILITY { cap=ECapabilityWriteDeviceData; }
+				};
+			},
+		SECURITY 
+			{ 
+			uid=KLogLbsAssistanceDataEventType;	
+			read_caps=
+				{
+				CAPABILITY { cap=ECapabilityReadDeviceData; }
+				};
+			write_caps=
+				{
+				CAPABILITY { cap=ECapabilityWriteDeviceData; }
+				};
+			}
+		};
+	}
+
+
+// Index entries
+RESOURCE ARRAY r_log_indexes
+	{
+	items =
+		{
+		INDEX
+			{
+			name = "Index1"; // do not translate
+			table = "Event"; // do not translate
+			keys = 
+				{
+				KEY { col = "Id"; } // do not translate
+				};
+			},
+		INDEX
+			{
+			name = "Index2"; // do not translate
+			table = "Event"; // do not translate
+			keys =
+				{
+				KEY { col = "ETime"; } // do not translate
+				};
+			},
+		INDEX
+			{
+			name = "Index3"; // do not translate
+			table = "String"; // do not translate
+			keys = 
+				{
+				KEY { col = "Id"; } // do not translate
+				};
+			}
+		};
+	}
+
+// Recent list setup
+RESOURCE ARRAY r_log_recent
+	{
+	items =
+		{
+		RECENT
+			{
+			id = KLogRecentIncomingCalls;
+			duplicate = ELogRemotePartyField|ELogContactField|ELogNumberField;
+			conditions = 
+				{
+				MATCH { field = ELogEventTypeField; value = KLogCallEventType; },
+				MATCH { field = ELogDirectionField; string = LOG_DIR_IN; },
+				MATCH { field = ELogDirectionField; string = LOG_DIR_IN_ALT; }
+				};
+			},
+		RECENT
+			{
+			id = KLogRecentOutgoingCalls;
+			duplicate = ELogRemotePartyField|ELogContactField|ELogNumberField;
+			conditions = 
+				{
+				MATCH { field = ELogEventTypeField; value = KLogCallEventType; },
+				MATCH { field = ELogDirectionField; string = LOG_DIR_OUT; },
+				MATCH { field = ELogDirectionField; string = LOG_DIR_OUT_ALT; }
+				};
+			},
+		RECENT
+			{
+			id = KLogRecentMissedCalls;
+			duplicate = ELogRemotePartyField|ELogContactField|ELogNumberField;
+			conditions = 
+				{
+				MATCH { field = ELogEventTypeField; value = KLogCallEventType; },
+				MATCH { field = ELogDirectionField; string = LOG_DIR_MISSED; },
+				MATCH { field = ELogDirectionField; string = LOG_DIR_MISSED_ALT; }
+				};
+			}
+		};
+	}
+
+
+// Direction
+RESOURCE LBUF r_log_dir_in { txt = LOG_DIR_IN; }
+RESOURCE LBUF r_log_dir_out { txt = LOG_DIR_OUT; }
+RESOURCE LBUF r_log_dir_in_alt { txt = LOG_DIR_IN_ALT; }
+RESOURCE LBUF r_log_dir_out_alt { txt = LOG_DIR_OUT_ALT; }
+RESOURCE LBUF r_log_dir_fetched { txt = LOG_DIR_FETCHED; }
+RESOURCE LBUF r_log_dir_missed { txt = LOG_DIR_MISSED; }
+RESOURCE LBUF r_log_dir_missed_alt { txt = LOG_DIR_MISSED_ALT; }
+
+
+// Delivery
+RESOURCE LBUF r_log_del_pending { txt = LOG_DEL_PENDING; }
+RESOURCE LBUF r_log_del_sent { txt = LOG_DEL_SENT; }
+RESOURCE LBUF r_log_del_failed { txt = LOG_DEL_FAILED; }
+/* R_LOG_DEL_NONE comes from the rsg that we're trying to depend on */
+RESOURCE LBUF r_log_del_none { txt = R_LOG_DEL_NONE; } 
+RESOURCE LBUF r_log_del_done { txt = LOG_DEL_DONE; }
+RESOURCE LBUF r_log_del_not_sent { txt = LOG_DEL_NOT_SENT; }
+RESOURCE LBUF r_log_del_scheduled { txt = LOG_DEL_SCHEDULED; }
+
+// Other
+RESOURCE LBUF r_log_remote_unknown { txt = LOG_REMOTE_UNKNOWN; }
+RESOURCE LBUF r_log_remote_multiple { txt = LOG_REMOTE_MULTIPLE; }
+RESOURCE LBUF r_log_subject_none { txt = LOG_SUBJECT_NONE; }
+RESOURCE LBUF r_log_subject_data_message { txt = LOG_SUBJECT_DATA_MESSAGE; }
+
+// Connection
+RESOURCE LBUF r_log_con_connected { txt = LOG_CON_CONNECTED; }
+RESOURCE LBUF r_log_con_connecting { txt = LOG_CON_CONNECTING; }
+RESOURCE LBUF r_log_con_disconnecting { txt = LOG_CON_DISCONNECTING; }
+RESOURCE LBUF r_log_con_disconnected{ txt = LOG_CON_DISCONNECTED; }
+RESOURCE LBUF r_log_con_suspended{ txt = LOG_CON_SUSPENDED; }
+
+// Delivery
+RESOURCE LBUF r_log_del_notified { txt = LOG_DEL_NOTIFIED; } 
+RESOURCE LBUF r_log_del_expired { txt = LOG_DEL_EXPIRED; }  
