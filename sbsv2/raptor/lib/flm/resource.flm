@@ -229,21 +229,26 @@ define generateresource
         ifeq ($(TARGET_$(call sanitise,$1)),)
                 TARGET_$(call sanitise,$1):=1
 
-            $(if $(FLMDEBUG),$(info generateresource: $(1) from $(2) LANG:$(3)),)
+            $(if $(FLMDEBUG),$(info generateresource: $(1) from $(2) LANG:$(3)),)	
+            $(if $(FLMDEBUG),$(info generateresource: copies: $(sort $(patsubst %,%/$(notdir $(1)),$(RSCCOPYDIRS)))))
 
+            CLEANTARGETS:=$$(CLEANTARGETS) $(1)
 
             RESOURCE:: $(1)
 
             $(1): $(2) $(RCOMP)
 			$(call startrule,resourcecompile,FORCESUCCESS) \
-			$(RCOMP) -m045,046,047 -u -o$(1) -s$(2) \
+			$(RCOMP) -m045,046,047 -u -o$(1) -s$(2) && \
+        		{ $(foreach F,$(sort $(patsubst %,%/$(notdir $(1)),$(RSCCOPYDIRS))),$(GNUCP) $(1) $(F) ; ) } \
 			$(call endrule,resourcecompile)
 
         endif
 
 #	Whether or not we have generated this resource for some other variant, check if there
 #       are any new copies to be made for this variant. e.g. winscw requires that we make
-#       some extra copies.
+#       some extra copies.  We tried to copy after running rcomp itself but we still need these
+#       targets for the sake of dependencies or, for example if someone merely adds a new copy 
+#       when the resource is up-to-date
 
         $(if $(FLMDEBUG),$(info <debug>resource copies of $(notdir $1) in: $(RSCCOPYDIRS)</debug>))
         $(foreach F,$(sort $(patsubst %,%/$(notdir $(1)),$(RSCCOPYDIRS))),$(call copyresource,$(1),$(F)))
