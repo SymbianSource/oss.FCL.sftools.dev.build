@@ -159,7 +159,7 @@ define preprocessresource
       DEPENDENCY_CORRECTOR:={ $(GNUSED) -n -r '1 p;\% [^ \/]+\.((rsg)|(mbg))%I {s% ([^ \/]+\.((rsg)|(mbg)))% $(EPOCROOT)\/epoc32\/include\/\1%ig; p}' && echo "" ; }
     else
       # Generate full dependency information
-      DEPENDENCY_CORRECTOR:=$(GNUSED)  -r 's% ([^ \/]+\.((rsg)|(mbg)))% $(EPOCROOT)\/epoc32\/include\/\1%ig'
+      DEPENDENCY_CORRECTOR:=$(GNUSED)  -r 's% ([^ \/]+\.((rsg)|(mbg)))% $(EPOCROOT)\/epoc32\/include\/\1%ig' 
     endif
 
 
@@ -168,7 +168,7 @@ define preprocessresource
 	  $(call startrule,resourcedependencies,FORCESUCCESS) \
 	  $(GNUCPP) -C -DLANGUAGE_$(3) -DLANGUAGE_$(subst sc,SC,$(3)) $(call makemacrodef,-D,$(MMPDEFS))\
 	  $(CPPOPT) $(SOURCE) -M -MG -MT"$(1)" | \
-	  $(DEPENDENCY_CORRECTOR) >$$@ \
+	  $$(DEPENDENCY_CORRECTOR) >$$@ \
 	  $(call endrule,resourcedependencies)
 
     $(1): $(1).d
