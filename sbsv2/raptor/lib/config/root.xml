@@ -11,6 +11,8 @@
 	-->
 
 	<var name="root">
+		<env name='FLMDEBUG' default=''/>	
+	
 		<varRef ref="root.places"/>
 		<varRef ref="root.properties"/>
 		
