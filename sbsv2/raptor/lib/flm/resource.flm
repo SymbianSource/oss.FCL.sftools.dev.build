@@ -155,7 +155,8 @@ define preprocessresource
       # It allows resources to be built in the right order but doesn't impose the weight of
       # of full dependency information which can overwhelm make in large builds.
       # The strategy is to filter out lines (apart from the target line which is the first) which don't have .rsg or 
-      # .mbg dependencies in them. 
+      # .mbg dependencies in them.   The first line can sometimes not contain the target but 
+      # have a lonely "\" so we use a pattern to recognise the target line in order not to get confused. 
       DEPENDENCY_CORRECTOR:={ $(GNUSED) -n -r '/.*: +.$$$$/ p;\%\.((rsg)|(mbg))%I {s% ([^ \/]+\.((rsg)|(mbg)))% $(EPOCROOT)\/epoc32\/include\/\1%ig; p}' && echo "" ; }
     else
       # Generate full dependency information
