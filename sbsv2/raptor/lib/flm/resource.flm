@@ -229,8 +229,8 @@ define generateresource
         ifeq ($(TARGET_$(call sanitise,$1)),)
                 TARGET_$(call sanitise,$1):=1
 
-            $(if $(FLMDEBUG),$(info generateresource: $(1) from $(2) LANG:$(3)),)	
-            $(if $(FLMDEBUG),$(info generateresource: copies: $(sort $(patsubst %,%/$(notdir $(1)),$(RSCCOPYDIRS)))))
+            $(if $(FLMDEBUG),$(info <debug>generateresource: $(1) from $(2) LANG:$(3)</debug>),)	
+            $(if $(FLMDEBUG),$(info <debug>generateresource: copies: $(sort $(patsubst %,%/$(notdir $(1)),$(RSCCOPYDIRS)))</debug>))
 
             CLEANTARGETS:=$$(CLEANTARGETS) $(1)
 
