@@ -351,7 +351,7 @@ sub GetAbsDirname($;$$)
 {
     (my $dir = shift()) =~ s/^>>?(?!>)//;
     my $absdir = "";
-    eval { local $SIG{__DIE__}; $absdir = Cwd::abs_path($dir) };
+    if (-e $dir) {$absdir = Cwd::abs_path($dir) };
     return(PathConv($absdir || File::Spec->rel2abs($dir,
         $dir !~ /^$gWorkdrive/i && $dir =~ /^([a-z]:)/i ? "$1/" : ""), shift(), shift()));
 }
