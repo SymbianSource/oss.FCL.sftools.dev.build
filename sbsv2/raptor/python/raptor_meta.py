@@ -2420,9 +2420,19 @@ class MetaReader(object):
 		# "export platform" but several "build platforms" can be associated
 		# with the same "export platform".
 		exports = {}
+		
+		# We sort configurations by name here.  This is solely to deal with situations
+		# where macros linked to builds end up being used in preprocessor conditionals
+		# within bld.inf files that then wrap exports under PRJ_EXPORTS statements.
+		# Having exports that are conditional on these macros isn't supported, but
+		# as there are areas of the source base that make this assumption, and
+		# fail if emulator macros are used instead of arm ones, we ensure that arm
+		# configurations come first when multiple configurations are active, and so are
+		# used first for determining exports.
+		sortedConfigsToBuild = sorted(configsToBuild,key=lambda config: config.name)
 
-		self.__Raptor.Debug("MetaReader: configsToBuild:  %s", [b.name for b in configsToBuild])
-		for buildConfig in configsToBuild:
+		self.__Raptor.Debug("MetaReader: sortedConfigsToBuild:  %s", [b.name for b in sortedConfigsToBuild])
+		for buildConfig in sortedConfigsToBuild:
 			# get everything we need to know about the configuration
 			evaluator = self.__Raptor.GetEvaluator(None, buildConfig)
 
