@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -18,39 +18,49 @@ from raptor_tests import SmokeTest, AntiTargetSmokeTest
 import os
 
 def run():
-	result = SmokeTest.PASS
 	
 	# This .inf file is created for clean_simple_export and
 	# reallyclean_simple_export tests to use so that we can put the
 	# username into the output filenames - which helps a lot when
 	# several people run tests on the same computer (e.g. linux machines)
 	bld = open('smoke_suite/test_resources/simple_export/expbld.inf', 'w')
-	bld.write("PRJ_PLATFORMS\n"
-		"ARMV5 WINSCW\n\n"
+	user = os.environ['USER']
+	bld.write("""
+	
+PRJ_PLATFORMS
+ARMV5 WINSCW
 
-		"PRJ_MMPFILES\n"
-		"simple.mmp\n\n"
+PRJ_MMPFILES
+simple.mmp
 
-		"PRJ_EXPORTS\n"
-		"simple_exp1.h exported_1.h\n"
-		"simple_exp2.h exported_2.h\n"
-		"simple_exp3.h exported_3.h\n"
-		"executable_file executable_file\n"
-		'"file with a space.doc" "exportedfilewithspacesremoved.doc"\n'
-		'"file with a space.doc" "exported file with a space.doc"\n\n'
+PRJ_EXPORTS
+#if !defined( WINSCW )
+// Exports conditional on build configuration macros aren't actually supported,
+// but we confirm that we preprocess in the context of an armv5 build when both
+// winscw and armv5 configurations are (implicitly, as there's no "-c" argument)
+// used.  This is in order to work around assumptions currently made in the
+// source base.
+simple_exp1.h exported_1.h
+#endif
+simple_exp2.h exported_2.h
+simple_exp3.h exported_3.h
+executable_file executable_file
+"file with a space.doc" "exportedfilewithspacesremoved.doc"
+"file with a space.doc" "exported file with a space.doc"
 
-		"simple_exp1.h /tmp/"+os.environ['USER']+"/  //\n"
-		"simple_exp2.h \\tmp\\"+os.environ['USER']+"/  //\n"
-		"simple_exp3.h /tmp/"+os.environ['USER']+"/simple_exp3.h \n"
-		"simple_exp4.h //")
+simple_exp1.h /tmp/%s/  //
+simple_exp2.h \\tmp\\%s/  //
+simple_exp3.h /tmp/%s/simple_exp3.h 
+simple_exp4.h //
+
+""" % (user, user, user))
 	bld.close()
 
 
 	t = SmokeTest()
 	t.id = "0023a"
 	t.name = "export"
-	t.command = "sbs -b smoke_suite/test_resources/simple_export/expbld.inf " \
-			+ "-c armv5 EXPORT"
+	t.command = "sbs -b smoke_suite/test_resources/simple_export/expbld.inf export"
 	t.targets = [
 		"$(EPOCROOT)/epoc32/include/exported_1.h",
 		"$(EPOCROOT)/epoc32/include/exported_2.h",
@@ -64,9 +74,7 @@ def run():
 		"$(EPOCROOT)/epoc32/include/simple_exp4.h"
 		]
 	t.run()
-	if t.result == SmokeTest.FAIL:
-		result = SmokeTest.FAIL
-
+	
 
 	t = SmokeTest()
 	t.id = "0023a1"
@@ -78,15 +86,11 @@ def run():
 	t.run("linux")
 	t.usebash = False
 
-	if t.result == SmokeTest.FAIL:
-		result = SmokeTest.FAIL
-
 
 	# Testing if clean deletes any exports which it is not supposed to
 	t.id = "0023b"
 	t.name = "export_clean" 
-	t.command = "sbs -b smoke_suite/test_resources/simple_export/expbld.inf " \
-			+ "-c armv5 clean"
+	t.command = "sbs -b smoke_suite/test_resources/simple_export/expbld.inf clean"
 	t.mustmatch = []
 	t.targets = [
 		"$(EPOCROOT)/epoc32/include/exported_1.h",
@@ -100,15 +104,12 @@ def run():
 		"/tmp/$(USER)/simple_exp3.h"
 		]
 	t.run()
-	if t.result == SmokeTest.FAIL:
-		result = SmokeTest.FAIL
 
 
 	t = AntiTargetSmokeTest()
 	t.id = "0023c"
 	t.name = "export_reallyclean" 
-	t.command = "sbs -b smoke_suite/test_resources/simple_export/expbld.inf " \
-			+ "-c armv5 reallyclean"
+	t.command = "sbs -b smoke_suite/test_resources/simple_export/expbld.inf reallyclean"
 	t.antitargets = [
 		'$(EPOCROOT)/epoc32/include/exported_1.h',
 		'$(EPOCROOT)/epoc32/include/exported_2.h',
@@ -122,15 +123,12 @@ def run():
 		'$(EPOCROOT)/epoc32/include/simple_exp4.h'
 	]
 	t.run()
-	if t.result == SmokeTest.FAIL:
-		result = SmokeTest.FAIL
 
 	# Check that the --noexport feature really does prevent exports from happening
 	t = AntiTargetSmokeTest()
 	t.id = "0023d"
 	t.name = "export_noexport" 
-	t.command = "sbs -b smoke_suite/test_resources/simple_export/expbld.inf " \
-			+ "-c armv5 --noexport -n"
+	t.command = "sbs -b smoke_suite/test_resources/simple_export/expbld.inf --noexport -n"
 	t.antitargets = [
 		'$(EPOCROOT)/epoc32/include/exported_1.h',
 		'$(EPOCROOT)/epoc32/include/exported_2.h',
@@ -144,11 +142,8 @@ def run():
 		'$(EPOCROOT)/epoc32/include/simple_exp4.h'
 	]
 	t.run()
-	if t.result == SmokeTest.FAIL:
-		result = SmokeTest.FAIL
 		
 	t.id = "23"
 	t.name = "export"
-	t.result = result
 	t.print_result()
 	return t
