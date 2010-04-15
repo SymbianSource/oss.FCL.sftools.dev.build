@@ -171,11 +171,13 @@ define preprocessresource
 	  $$(DEPENDENCY_CORRECTOR) >$$@ \
 	  $(call endrule,resourcedependencies)
 
+    ifeq "$(MAKEFILE_GROUP)" "RESOURCE"
     $(1): $(1).d
 	  $(call startrule,resourcepreprocess,FORCESUCCESS) \
 	  $(GNUCPP) -C -DLANGUAGE_$(3) -DLANGUAGE_$(subst sc,SC,$(3)) $(call makemacrodef,-D,$(MMPDEFS))\
 	  $(CPPOPT) $(SOURCE) -o $$@ \
 	  $(call endrule,resourcepreprocess)
+    endif
 
     CLEANTARGETS:= $$(CLEANTARGETS) $(1)
 
@@ -185,7 +187,7 @@ define preprocessresource
     CLEANTARGETS:=$$(CLEANTARGETS) $(DEPENDFILENAME)
     ifneq "$(DEPENDFILE)" ""
       ifeq "$(filter %CLEAN,$(call uppercase,$(MAKECMDGOALS)))" ""
-        ifeq "$(filter RESOURCE_DEPS,$(call uppercase,$(MAKECMDGOALS)))" ""
+        ifeq "$(MAKEFILE_GROUP)" "RESOURCE"
           -include $(DEPENDFILE)
         endif
       endif
@@ -206,8 +208,6 @@ RELEASABLES:=$$(RELEASABLES) $(2)
 
         RESOURCE:: $2
         ## perform additional copies of binaries
-        #
-        # Only certain builds require further copies of the generated resource binaries
         #
         $(2): $(1)
 		$(call startrule,resourcecopy,FORCESUCCESS) \
@@ -299,7 +299,10 @@ ifeq ($(HEADERONLY),)
         # generate a resource file for each language
         # For sc we generate $(RESBASE).rsc and define LANGUAGE_SC and LANGUAGE_sc.
         $(foreach L,$(LANGUAGES:SC=sc),$(eval $(call preprocessresource,$(INTERBASE)_$(L).rpp,$(INTERBASE).r$(L),$(L))))
-        $(foreach L,$(LANGUAGES:SC=sc),$(eval $(call generateresource,$(INTERBASE).r$(L),$(INTERBASE)_$(L).rpp,$(L))))
+
+        ifeq "$(MAKEFILE_GROUP)" "RESOURCE"
+            $(foreach L,$(LANGUAGES:SC=sc),$(eval $(call generateresource,$(INTERBASE).r$(L),$(INTERBASE)_$(L).rpp,$(L))))
+        endif
 else
         # No resources are going to be made so unless we specifically ask for it, there will be no
         # preprocessed file from which to create the header:
