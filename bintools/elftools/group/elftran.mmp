@@ -45,5 +45,5 @@ sourcepath      ../../../imgtools/imglib/compress
 source          byte_pair.cpp pagedCompress.cpp
 
 systeminclude   ../inc /epoc32/include ../../../imgtools/imglib/compress /epoc32/include/tools/
-
+OS_LAYER_SYSTEMINCLUDE
 VENDORID        0x70000001
