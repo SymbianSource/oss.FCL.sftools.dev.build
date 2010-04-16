@@ -18,8 +18,18 @@
 # e.g. total times and so on.
 
 import time
+import __future__
 
 class RecipeStats(object):
+	def __init__(self, name, count, time):
+		self.name=name
+		self.count=count
+		self.time=time
+
+	def add(self, duration):
+		self.time += duration
+
+class BuildStats(object):
 	STAT_OK = 0
 
 
@@ -31,7 +41,7 @@ class RecipeStats(object):
 		self.retryfails = 0
 		
 	def add(self, starttime, duration, name, status):
-		if status != RecipeStats.STAT_OK:
+		if status != BuildStats.STAT_OK:
 			self.failcount += 1
 			if name in self.failtypes:
 				self.failtypes[name] += 1
@@ -43,15 +53,16 @@ class RecipeStats(object):
 			return
 			
 		if name in self.stats:
-			(count, time) = self.stats[name]
-			self.stats[name] = (count + 1, time + duration)
+			r = self.stats[name]
+			r.add(duration)
 		else:
-			self.stats[name] = (1,duration)
+			self.stats[name] = RecipeStats(name,1,duration)
 
 	def recipe_csv(self):
-		s = "# name, time, count\n"
-		for (name,(count,time)) in self.stats.iteritems():
-			s += '"%s",%s,%d\n' % (name, str(time), count)
+		s = '"name", "time", "count"\n'
+		l = sorted(self.stats.values(), key= lambda r: r.time, reverse=True)
+		for r in l:
+			s += '"%s",%s,%d\n' % (r.name, str(r.time), r.count)
 		return s
 
 
@@ -62,7 +73,7 @@ import re
 def main():
 
 	f = sys.stdin
-	st = RecipeStats()
+	st = BuildStats()
 
 	recipe_re = re.compile(".*<recipe name='([^']+)'.*")
 	time_re = re.compile(".*<time start='([0-9]+\.[0-9]+)' *elapsed='([0-9]+\.[0-9]+)'.*")
@@ -111,7 +122,7 @@ def main():
 
 		st.add(s, elapsed, rname, status)
 
-	print st.recipe_csv()
+	print(st.recipe_csv())
 
 
 if __name__ == '__main__': main()
