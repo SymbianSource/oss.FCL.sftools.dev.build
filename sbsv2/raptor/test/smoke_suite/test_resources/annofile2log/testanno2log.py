@@ -27,7 +27,10 @@ from raptor_make import AnnoFileParseOutput
 retcode=0
 
 
-annofile = sys.argv[1]
+if len(sys.argv) > 1:
+	annofile = sys.argv[1]
+else:
+	annofile = sys.stdin
 
 sys.stdout.write("<build>\n")
 try:

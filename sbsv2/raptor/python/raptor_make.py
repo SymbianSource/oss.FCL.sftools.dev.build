@@ -68,7 +68,10 @@ def XMLEscapeLog(stream):
 def AnnoFileParseOutput(annofile):
 	""" A generator that extracts log output from an emake annotation file, 
 	    perform an XML-unescape on it and "yields" it line by line.  """
-	af = open(annofile, "r")
+	if isinstance(annofile,str):
+		af = open(annofile, "r")
+	else:
+		af = annofile
 
 	inOutput = False
 
