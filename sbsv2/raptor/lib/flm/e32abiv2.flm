@@ -48,7 +48,7 @@ endif
 
 ifeq ($(DOBUILD),1)
 
-$(if $(FLMDEBUG),$(info <flm name='e32abiv2' target='$(TARGET)' type='$(TARGETTYPE)' outputpath='$(OUTPUTPATH)' metasource='$(METASOURCE)' postlinkfiletype='$(POSTLINKFILETYPE)' />))
+$(if $(FLMDEBUG),$(info <debug><flm name='e32abiv2' target='$(TARGET)' type='$(TARGETTYPE)' outputpath='$(OUTPUTPATH)' metasource='$(METASOURCE)' postlinkfiletype='$(POSTLINKFILETYPE)' /></debug>))
 
 # Strip switch-type parameters
 #
