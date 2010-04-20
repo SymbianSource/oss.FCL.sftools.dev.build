@@ -210,6 +210,8 @@ RELEASABLES:=$$(RELEASABLES) $(2)
         RESOURCE:: $2
         ## perform additional copies of binaries
         #
+# On the build system that begins with 'e' this helps performance:
+#pragma runlocal
         $(2): $(1)
 		$(call startrule,resourcecopy,FORCESUCCESS) \
 		$(GNUCP) $$< $$@ \
