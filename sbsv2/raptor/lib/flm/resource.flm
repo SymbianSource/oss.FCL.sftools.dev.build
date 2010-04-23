@@ -48,6 +48,7 @@ RESBASE:=$(RSCDIR)/$(TARGET_lower)
 # Ensure that RELEASABLES and CLEANTARGETS cannot expand indefinitely in successive calls to this flm:
 CLEANTARGETS:=
 RELEASABLES:=
+CREATABLEPATHS:=
 
 # There is only one resource header (.rsg) file and we only
 # make that if we are asked.
@@ -76,7 +77,7 @@ ifeq ($(HEADERONLY),)
 
 RSSBASENAME:=$(call lowercase,$(basename $(notdir $(SOURCE))))
 DESTRPP:=$(EPOCROOT)/epoc32/localisation/$(RSSBASENAME)/rsc/$(RSSBASENAME).rpp
-$(call makepath,$(EPOCROOT)/epoc32/localisation/$(RSSBASENAME)/rsc)
+CREATABLEPATHS:=$(CREATABLEPATHS) $(EPOCROOT)/epoc32/localisation/$(RSSBASENAME)/rsc
 
 INFOFILE:=$(EPOCROOT)/epoc32/localisation/group/$(RSSBASENAME).info
 # If there are MULTIPLE languages then copy the .rpp for the last one
@@ -107,9 +108,6 @@ $(eval $(call CreateRppAndInfo))
 endif
 ################################# end of localisation ###################################
 
-# make the output directories while reading makefile - some build engines prefer this
-$(call makepath,$(INTERBASE))
-
 # common pre-processor options
 
 # We really should be using -iquote with a recent cpp.  This is a note for when we do update:
@@ -119,7 +117,7 @@ $(call makepath,$(INTERBASE))
 CPPOPT:=-nostdinc -undef -Wno-trigraphs -D_UNICODE -include $(PRODUCT_INCLUDE)\
  -I$(dir $(SOURCE)) $(foreach I, $(USERINCLUDE),-I$(I) ) -I- $(foreach J,$(SYSTEMINCLUDE),-I$(J) )
 
-CREATABLEPATHS:=$(RSCDIR) $(RSGDIR) $(OUTPUTPATH)
+CREATABLEPATHS:=$(CREATABLEPATHS) $(RSCDIR) $(RSGDIR) $(OUTPUTPATH) $(INTERBASE) 
 
 # We intend to generate the resource in an intermediate location and copy to the targetpath to
 # ensure that when the "same" resource is built into separare target paths, it doesn't have to be 
@@ -149,22 +147,33 @@ define preprocessresource
     # Correct dependency information when a header file can't be found.
     # If the c preprocessor can't find a dependency it appears as it did in the #include statement
     # e.g. "filename.mbg" or "filename.rsg" in the dependency file.
-    # we can correct the dependencies by assuming that the file will be in epoc32\include as this is the default
+
+ifneq ($(NO_DEPEND_GENERATE),)
+    # This version minimises the size of dependency files, to contain only .mbg and .rsg deps.
+    # It allows resources to be built in the right order but doesn't impose the weight of
+    # of full dependency information which can overwhelm make in large builds.
+    # The strategy is to filter out lines (apart from the target line which is the first) which don't have .rsg or 
+    # .mbg dependencies in them.   The first line can sometimes not contain the target but  
+    # have a lonely "\" so we use a pattern to recognise the target line in order not to get confused. 
+    DEPENDENCY_CORRECTOR:={ $(GNUGREP) -E " ([^ /]+)\.((rsg)|(mbg))" | $(GNUSED) -r 's%([^ ]*\.[^rm ][^sb ][^g ])%%g;s%[\\ ]+% %g' | { DEPS=''; read L; while [ $$$$? -eq 0 ]; do DEPS="$$$${DEPS} $$$$L"; read L; done; DEPTXT="$$$$RPP: \\\\\n"; DEPCOUNT=0; for i in $$$${DEPS}; do DEPTXT="$$$$DEPTXT \$$$$(EPOCROOT)/epoc32/include/$$$$i \\\\\n"; (( DEPCOUNT += 1 )) ; done; if [ $$$$DEPCOUNT -ne 0 ]; then  echo -e "$$$${DEPTXT%%\\\\\\n}\n"; fi ; } ; }
+else
+    # This can correct the dependencies by assuming that the file will be in epoc32\include as this is the default
     DEPENDENCY_CORRECTOR:=$(GNUSED)  -r 's% ([^ \/]+\.((rsg)|(mbg)))% $(EPOCROOT)\/epoc32\/include\/\1%ig' 
+endif
 
 
     ifeq "$1" "$4"
         RESOURCE_DEPS:: $1.d
         $1.d: $(SOURCE)
 	  $(call startrule,resourcedependencies,FORCESUCCESS) \
-	  $(GNUCPP) -C -DLANGUAGE_$(3) -DLANGUAGE_$(subst sc,SC,$3) $(call makemacrodef,-D,$(MMPDEFS))\
+	  RPP=$1; $(GNUCPP) -C -DLANGUAGE_$(3) -DLANGUAGE_$(subst sc,SC,$3) $(call makemacrodef,-D,$(MMPDEFS))\
 	  $(CPPOPT) $(SOURCE) -M -MG -MT"$1" | \
 	  $$(DEPENDENCY_CORRECTOR) >$$@ \
 	  $(call endrule,resourcedependencies)
 
-        $1: $1.d
     else
         $1: $4
+
     endif
     ifeq "$(MAKEFILE_GROUP)" "RESOURCE"
     $1: 
