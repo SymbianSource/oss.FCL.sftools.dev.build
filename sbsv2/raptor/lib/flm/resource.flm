@@ -207,20 +207,10 @@ define copyresource
 # $(1) is the source
 # $(2) is the destination
 
-RELEASABLES:=$$(RELEASABLES) $(2)
+   RELEASABLES:=$$(RELEASABLES) $(2)
+   $(if $(TARGET_$(call sanitise,$2)),,$(eval TARGET_$(call sanitise,$2):=1)$(info <copy source='$1'>$2</copy>))
+ 
 
-   ifeq ($(TARGET_$(call sanitise,$2)),)
-           TARGET_$(call sanitise,$2):=1
-
-        RESOURCE:: $2
-        ## perform additional copies of binaries
-        #
-        $(2): $(1)
-		$(call startrule,resourcecopy,FORCESUCCESS) \
-		$(GNUCP) $$< $$@ \
-		$(call endrule,resourcecopy)
-
-   endif
 
 endef # copyresource #
 
@@ -244,8 +234,7 @@ define generateresource
 
             $(1): $(2) $(RCOMP)
 			$(call startrule,resourcecompile,FORCESUCCESS) \
-			$(RCOMP) -m045,046,047 -u -o$(1) -s$(2) && \
-        		{ $(foreach F,$(sort $(patsubst %,%/$(notdir $(1)),$(RSCCOPYDIRS))),$(GNUCP) $(1) $(F) ; ) } \
+			$(RCOMP) -m045,046,047 -u -o$(1) -s$(2)  \
 			$(call endrule,resourcecompile)
 
         endif
@@ -256,8 +245,8 @@ define generateresource
 #       targets for the sake of dependencies or, for example if someone merely adds a new copy 
 #       when the resource is up-to-date
 
-        $(if $(FLMDEBUG),$(info <debug>resource copies of $(notdir $1) in: $(RSCCOPYDIRS)</debug>))
-        $(foreach F,$(sort $(patsubst %,%/$(notdir $(1)),$(RSCCOPYDIRS))),$(call copyresource,$(1),$(F)))
+        $(call copyresource,$1,$(sort $(patsubst %,%/$(notdir $1),$(RSCCOPYDIRS))))
+
 
         # individual source file compilation
         SOURCETARGET_$(call sanitise,$(SOURCE)): $(1)

@@ -79,18 +79,16 @@ def run():
 
 	t.addbuildtargets('smoke_suite/test_resources/resource/group/bld.inf', [	
 		"testresource_/testresource_02.rpp",
-		"testresource_/testresource_02.rpp.d",
 		"testresource_/testresource_01.rpp",
 		"testresource_/testresource_01.rpp.d",
-		"testresource_/testresource_sc.rpp",
-		"testresource_/testresource_sc.rpp.d"])
+		"testresource_/testresource_sc.rpp"])
 
 	t.command = "sbs -b smoke_suite/test_resources/resource/group/bld.inf  -c armv5_urel reallyclean ; sbs --no-depend-generate -j 16 -b smoke_suite/test_resources/resource/group/bld.inf -c armv5_urel -f ${SBSLOGFILE} -m ${SBSMAKEFILE} && grep 'epoc32.include.testresource.rsg' %s && wc -l %s " % (res_depfile, res_depfile)
 
 	t.mustnotmatch = []
 
 	t.mustmatch = [
-			"4 .*.dependentresource_.dependentresource_sc.rpp.d"
+			"3 .*.dependentresource_.dependentresource_sc.rpp.d"
 		      ]
 
 	t.run()

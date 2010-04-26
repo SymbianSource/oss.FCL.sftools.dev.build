@@ -829,6 +829,12 @@ class Raptor(object):
 				self.filterList += ",filterclean"
 				if is_suspicious_clean:
 					self.Warn('CLEAN, CLEANEXPORT and a REALLYCLEAN should not be combined with other targets as the result is unpredictable.')
+			else:
+				""" Copyfile implements the <copy> tag which is primarily useful with cluster builds.
+				    It allows file copying to occur on the primary build host rather than on the cluster.
+				    This is more efficient.
+				"""
+				self.filterList += ",filtercopyfile"
 
 		if not more_to_do:
 			self.skipAll = True		# nothing else to do
