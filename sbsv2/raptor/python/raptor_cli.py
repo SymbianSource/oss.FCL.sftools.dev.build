@@ -18,13 +18,8 @@
 # by a raptor.Raptor object.
 #
 
-import re
 import types
 import raptor
-import os
-import sys
-import tempfile
-from raptor_utilities import getOSPlatform
 
 from optparse import OptionParser # for parsing command line parameters
 
@@ -131,6 +126,18 @@ parser.add_option("-p","--project",action="append",dest="project_name",
 
 parser.add_option("-q","--quiet",action="store_true",dest="quiet",
 				help="Run quietly, not generating output messages.")
+
+parser.add_option("--query",action="append",dest="query",
+				help="""Access various build settings and options using a basic API. The current options are:
+				
+				* aliases - return all the values that can be sensibly used with the sbs -c option.
+				
+				* products - return all the values that can be "." appended to an alias to specialise it for a product build.
+				
+				* config[x] - return a set of values that represent the build configuration "x". Typically "x" will be an alias name or an alias followed by "." followed by a product.
+				
+				Multiple --query options can be given.
+				""")
 
 parser.add_option("-s","--sysdef",action="store",dest="sys_def_file",
 				help="System Definition XML filename.")
@@ -245,8 +252,7 @@ def DoRaptor(Raptor, args):
 	# parse the full set of arguments
 	(options, leftover_args) = parser.parse_args(expanded_args)
 
-	# the leftover_args are either variable assignments of the form a=b
-	# or target names.
+	# the leftover_args are target names.
 	for leftover in leftover_args:
 		Raptor.AddTarget(leftover)
 
@@ -275,6 +281,7 @@ def DoRaptor(Raptor, args):
 				 'noDependGenerate': Raptor.SetNoDependGenerate,
 				 'number_of_jobs': Raptor.SetJobs,
 				 'project_name' :  Raptor.AddProject,
+				 'query' : Raptor.AddQuery,
 				 'filter_list' : Raptor.FilterList,
 				 'ignore_os_detection': Raptor.IgnoreOsDetection,
 				 'check' :  Raptor.SetCheck,
