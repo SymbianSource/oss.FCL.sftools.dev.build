@@ -603,10 +603,14 @@ class CheckWhatSmokeTest(SmokeTest):
 		# paths in --what output are tailored to the host OS, hence slashes are converted appropriately
 		# .whatlog output is used verbatim from the build/TEM/EM output
 		self.hostossensitive = True
+		
+		# Indicate whether ouput is expected to appear only once. If so, set it to True
+		self.output_expected_only_once = False 
 	
 	def posttest(self):
 		outlines = self.output.splitlines()
-		
+		outlines_left = outlines 
+
 		ok = True
 		seen = []
 		
@@ -620,6 +624,7 @@ class CheckWhatSmokeTest(SmokeTest):
 				
 			if line in outlines:
 				seen.append(line)
+				outlines_left.remove(line) 
 			else:
 				print "OUTPUT NOT FOUND:", line
 				ok = False
@@ -631,6 +636,14 @@ class CheckWhatSmokeTest(SmokeTest):
 			if not line in seen:
 				print "UNEXPECTED OUTPUT:", line
 				ok = False
+				outlines_left.remove(line) 
+		
+		# and check for lines that we expected to see only once
+		if self.output_expected_only_once:
+			for line in outlines_left:
+				print "OUTPUT MORE THAN ONCE:", line
+				ok = False
+
 			
 		# do the base class things too
 		return (SmokeTest.posttest(self) and ok)	

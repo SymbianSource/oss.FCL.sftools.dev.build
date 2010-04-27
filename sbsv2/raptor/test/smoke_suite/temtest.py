@@ -98,6 +98,7 @@ def run():
 	t.id = "0018f"
 	t.name = "temwhat"
 	t.command = "sbs -b smoke_suite/test_resources/simple_extension/bld.inf --what"
+	t.output_expected_only_once = True	
 	t.stdout = [
 		# exports
 		'$(EPOCROOT)/epoc32/tools/makefile_templates/sbsv2test/clean.mk',
