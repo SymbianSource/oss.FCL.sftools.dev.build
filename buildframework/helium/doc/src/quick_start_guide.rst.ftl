@@ -38,18 +38,6 @@ This document is a quick start guide for Ant based Helium build framework. More 
 This quick start guide is aimed at getting you helium on the build machine and showing you how to run helium in the very
 simplest of ways. Further reading and configuration is required to perform a complete build of a component or a product.
 
-<#if !ant?keys?seq_contains("sf")>
-To set up your environment please follow the `Helium Environment Setup`_ also make sure you have correct SymSEE version mentioned in this link. 
-
-.. _`Helium Environment Setup`: nokia/nokia.html
-</#if>
-
-<#if ant?keys?seq_contains("sf")>
-To set up your environment please follow the steps of `Helium Environment Setup`_.
-
-.. _`Helium Environment Setup`: sf.html
-</#if>
-
 
 .. index::
   single: Helium configuration
@@ -65,6 +53,30 @@ Helium configuration
   - `Configure Helium  <manual/configuring.html>`_: `common configuration format <manual/configuring.html#common-configuration-format>`_ and `Helium stages <manual/stages.html>`_.
   - `Helium glossary <api/helium/properties-table.html>`_: lists the specific properties used in Helium.
 
+
+
+Installation
+=============
+
+<#if !ant?keys?seq_contains("sf")>
+The quickest way to get Helium is to check out from Subversion. Go to a directory and enter::
+
+    svn co http://helium.nmp.nokia.com/svn/helium/tags/helium-8.0
+    
+Modify the path for the version of Helium you need.
+
+Read `Retrieving Helium`_ for additional ways to get Helium.
+
+.. _`Retrieving Helium`: manual/retrieving.html
+
+</#if>
+
+<#if ant?keys?seq_contains("sf")>
+
+.. include:: sf.html
+
+</#if>
+
 .. index::
   single: Running builds with Helium
 
@@ -76,7 +88,7 @@ Running builds with Helium
 After configuring the framework, running builds with Helium is simple. The command-line interface is the same as for Apache Ant. 
 Please read `Running Ant <http://ant.apache.org/manual/running.html>`_ for more information.
 
-You start the build with ``hlm`` command. Navigate into 'helium' directory (should contain the file hlm.bat) and type::
+You start the build with ``hlm`` command. Navigate into 'helium' directory (should contain the file ``hlm.bat``) and type::
 
     hlm [target] [-D<property>=<value>] [-f <ant_build_file>] [-h] [-p -v]
     
@@ -107,17 +119,37 @@ The code is shown below::
     <!-- A simple test target that prints a simple message -->  This is a comment line <!--  --> 
                                                                 indicates comment text
     <target name="hello">                                       This is the target name 'hello'
-        <echo message="Hello!"/>                                what the task does echo the word 'hello'
+        <echo message="Hello!"/>                                what the task does echo the 
+                                                                word 'hello'
         <if>                                                    Conditional branch
-            <isset property="build.number"/>                    If the property build.number is present 
+            <isset property="build.number"/>                    If the property build.number is
+                                                                present 
             <then>                                              then 
-                <echo message="Ant libs found OK"/>             echo additional text 'Ant libs found OK'
+                <echo message="Ant libs found OK"/>             echo additional text 'Ant libs 
+                                                                found OK'
             </then>                                             end of 'then' action
         </if>                                                   end of 'if' action
     </target>                                                   end of target/task
     
     
-    <target name="hi" depends="hello"/>                         this is the called target which depends
-                                                                upon the target 'hello' being run before
+    <target name="hi" depends="hello"/>                         this is the called target which
+                                                                depends upon the target 'hello' 
+                                                                being run before
                                                                 this target is run.
     
+Users' Flow Diagram
+==========================
+
+The diagram below illustrates some pathways and key documents to review for different proficiency levels.
+
+.. raw:: html
+
+   <img src="user_graph.dot.png" alt="Flow Diagram" usemap="#flowdiagram" style="border-style: none"/>
+   <map name="flowdiagram" id="flowdiagram">
+
+.. raw:: html
+   :file: user_graph.dot.cmap
+
+.. raw:: html
+
+   </map>

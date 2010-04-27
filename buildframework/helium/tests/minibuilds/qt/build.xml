@@ -103,30 +103,7 @@ ${ant.coverage.summary}</echo>
     <target name="do-prep-work-area" />
     <target name="create-bom" />
     <target name="check-env-prep" />
-    <target name="prep-copy">
-        <property name="qt.zip" value="qt-embedded-s60-commercial-src-4.5.0-garden.zip" />
-        <!-- Qt prerelease are accessible from the outside world too. -->
-        <if>
-            <not><available file="${build.drive}/${qt.zip}"/></not>
-            <then>
-                <get src="http://pepper.troll.no/s60prereleases/testpackages/garden05/${qt.zip}" dest="${build.drive}/${qt.zip}"/>
-            </then>
-        </if>
-        <mkdir dir="${qt.dir}"/>
-        <delete>
-            <fileset dir="${qt.dir}">
-                <include name="**/bld.inf"/>
-                <include name="**/*.mmp"/>
-            </fileset>
-        </delete>
-        <unzip src="${build.drive}/${qt.zip}" dest="${qt.dir}/../">
-            <mapper>
-                <regexpmapper from="^qt([^/]*)/(.*)$$" to="qt/\2"/>
-            </mapper>
-        </unzip>
-    </target>
-
-
+    <target name="prep-copy" />
 
     <!-- Check that the XML data returned from Diamonds via the REST interface
     is the same as what is sent. 

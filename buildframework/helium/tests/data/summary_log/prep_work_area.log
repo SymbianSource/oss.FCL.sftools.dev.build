@@ -1,0 +1,28 @@
+
+The ' characters around the executable and arguments are
+not part of the command.
+[hlm:python]   
+[hlm:python] INFO:ccm.extra:Using CachedSessionProvider.
+[hlm:python] INFO:preparation.ccmgetinput:Get a session for ******
+[hlm:python] INFO:ccm:Database path set using the GSCM database.
+[hlm:python] INFO:ccm:Database engine set using the GSCM database.
+[hlm:python] INFO:ccm:Getting router address.
+[hlm:python] INFO:ccm:Opening session.
+[hlm:python] INFO:preparation.ccmgetinput:Checking 'TestDomain-50_200832:project:testDb#1'...Not Found!
+[hlm:python] INFO:ccm.extra:Closing the CachedSessionProvider.
+[hlm:python] INFO:ccm.extra:Cleaning up opened sessions.
+[hlm:python] ERROR: error found during preparation phase:
+[hlm:python] ERROR: Traceback (most recent call last):
+[hlm:python] ERROR:   File "\Temp\helium2718420524907497520.tmp", line 19, in <module>
+[hlm:python] ERROR:     builder.check()
+[hlm:python] ERROR:   File "build\bdist.win32\egg\preparation.py", line 587, in check
+[hlm:python] ERROR:     action.check()
+[hlm:python] ERROR:   File "build\bdist.win32\egg\preparation.py", line 174, in check
+[hlm:python] ERROR:     PreparationAction.check(self)
+[hlm:python] ERROR:   File "build\bdist.win32\egg\preparation.py", line 59, in check
+[hlm:python] ERROR:     self._check_object(self._config.name)
+[hlm:python] ERROR:   File "build\bdist.win32\egg\preparation.py", line 69, in _check_object
+[hlm:python] ERROR:     raise Exception("Could not find  object %s in the database." % fpn)
+[hlm:python] ERROR: Exception: Could not find  object TestDomain-50_200832:project:testDb#1 in the database.
+[hlm:python] ERROR: this is a critical error, build will fail now:
+[hlm:python] ERROR: Could not find  object TestDomain-50_200832:project:testDb#1 in the database.

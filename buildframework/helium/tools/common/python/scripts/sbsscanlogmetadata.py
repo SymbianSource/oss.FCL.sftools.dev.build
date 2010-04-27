@@ -16,18 +16,13 @@
 #
 #Description:
 #===============================================================================
-
+"""parses the raptor metadata logs and separates the info out into HTML and XML
+   logs for writing to diamonds and other logs"""
+    
 import os
 import sys
 import re
-import xml.sax
 import datetime
-import time
-from xml.sax.handler import ContentHandler
-from xml.dom.minidom import parse, parseString
-from xml.sax.saxutils import XMLGenerator
-from xml.sax.xmlreader import AttributesNSImpl
-import codecs
 from optparse import OptionParser
 
 
@@ -39,16 +34,17 @@ STREAM_REGEX =  {   "clean" : [r'<clean', r'</clean'],
                 }
 
 class SBSScanlogMetadata(object):
-    """parses the raptor meatadata logs and separates the info out into HTML and XML logs for writing 
-    to diamonds and other logs"""
+    """parses the raptor metadata logs and separates the info out into HTML and 
+    XML logs for writing to diamonds and other logs"""
 
     def initializeLogPath(self):
+        """retrieve the log file names from the environment variables """
         index = self.logFileName.rfind(".")
         if index < 0:
             index = len(self.logFileName)
         for stream in STREAM_REGEX.keys():
             self.stream_path[stream] = self.logFileName[:index] + "." + stream + \
-                        self.logFileName[index:]            
+                        self.logFileName[index:]
         if os.environ.has_key('SBS_CLEAN_LOG_FILE'):
             self.stream_path['clean'] = os.environ['SBS_CLEAN_LOG_FILE']
         if os.environ.has_key('SBS_WHAT_LOG_FILE'):
@@ -78,6 +74,7 @@ class SBSScanlogMetadata(object):
         return True
 
     def open(self, logFile):
+        """ open the log file"""
         self.logFileName = str(logFile)
         return self.initialize(logFile)
         
@@ -131,24 +128,23 @@ class SBSScanlogMetadata(object):
         return False
 
 if __name__ == "__main__":
-
-    """ standalone app """
-    cli = OptionParser(usage="%prog [options]")
-    cli.add_option("--log", help="Raptor log file")
-    cli.add_option("--output", help="Raptor log file")
+    # standalone app
+    _cli = OptionParser(usage="%prog [options]")
+    _cli.add_option("--log", help="Raptor log file")
+    _cli.add_option("--output", help="Raptor log file")
                    
-    opts, dummy_args = cli.parse_args()
-    if not opts.log:
-        cli.print_help()
+    _opts, _ = _cli.parse_args()
+    if not _opts.log:
+        _cli.print_help()
         sys.exit(-1)
 
-    filter = SBSScanlogMetadata()
-    filter.open(opts.output)
+    _sbsFilter = SBSScanlogMetadata()
+    _sbsFilter.open(_opts.output)
 
-    logFile = open(opts.log, 'r')
+    _logFile = open(_opts.log, 'r')
 
-    for line in logFile:
-        filter.write(line)
+    for line in _logFile:
+        _sbsFilter.write(line)
 
-    filter.summary()
-    filter.close()
+    _sbsFilter.summary()
+    _sbsFilter.close()

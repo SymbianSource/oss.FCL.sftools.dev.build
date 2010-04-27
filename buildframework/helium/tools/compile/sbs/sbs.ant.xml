@@ -24,26 +24,21 @@ Description:
 <project name="compile.sbs" xmlns:hlm="http://www.nokia.com/helium">
     <description>
     Executes compilation of a System Model of System Definition file using Symbian SBS (Raptor) tools. 
-
-    Should not be called directly but through compile-main by setting ${build.system.sbs} property.
-
-    Example:
-
-    hlm -Dsysdef.configurations.list=ALL -Dbuild.system=sbs compile-main
-    hlm "-Dsysdef.configurations.list=REALLYCLEAN,ALL" -Dbuild.system=sbs compile-main
     </description>
 
-    <!-- Executes compilation  of a System Model of System Definition file using Symbian SBS (Raptor) tools. 
 
-    Should not be called directly but through compile-main by setting ${build.system.sbs} property.
 
-    Example: 
-
-    hlm -Dsysdef.configurations.list=ALL -Dbuild.system=sbs compile-main
-    hlm "-Dsysdef.configurations.list=REALLYCLEAN,ALL" -Dbuild.system=sbs compile-main
-
+    <!--
+        Executes compilation  of a System Model of System Definition file using Symbian SBS (Raptor) tools. 
+        Should not be called directly but through compile-main by setting ${build.system.sbs} property.
     -->
 
+    <!--* @property sbs.build.ctc
+     This property enables Raptor compilation using ctc. 
+     @type boolean
+     @scope public
+     -->
+    
     <!-- skip sbs layer filtering (true) for new schema and false for schema 1.4.0
     @type boolean
     -->
@@ -91,25 +86,35 @@ Description:
                 <echo message="Copying helium filter plugin to sbs home" />
                 <copy file="${helium.dir}/tools/common/python/scripts/filter_metadatalog.py" todir="${env.SBS_HOME}/python/plugins/" failonerror="true" />
                 <copy file="${helium.dir}/tools/common/python/scripts/sbsscanlogmetadata.py" todir="${env.SBS_HOME}/python/plugins/" failonerror="true" />
-                <echo message="sbs.patternset: ${sbs.patternset}" />
-                <hlm:generate-layers />
                 <var name="sbs.internal.inputs.list" value="" unset="true"/>
                 <if>
                     <istrue value="${schema.new}" />
                     <then>
-                        <var name="sbs.internal.inputs.list" value="${sbs.inputs.list}"/>
+                        <hlm:downgradeSysdef epocroot="${build.drive}/" srcfile="${canonical.sysdef.file}" 
+                            destfile="${build.drive}/output/build/canonical_system_definition_${sysdef.configuration}.xml"/>
+                        <var name="sbs.patternset" unset="true"/>
+                        <if>
+                            <isreference refid="sysdef.filters.${sysdef.configuration}" />
+                            <then>
+                                <property name="sbs.patternset" value="sysdef.filters.${sysdef.configuration}" />
+                                <echo message="sbs.patternset: ${sbs.patternset}" />
+                            </then>
+                            <else>
+                                <echo message="The sysdef.${sysdef.configuration} patternset is not defined." />
+                            </else>
+                        </if>
                     </then>
                     <else>
-                        <var name="sbs.internal.inputs.list" value="" unset="true"/>
-                        <hlm:getsbsinputs config="sbs.${sysdef.configuration}" outputProperty="sbs.internal.inputs.list"/>
+                        <hlm:generate-layers />
                     </else>
                 </if>
+                <var name="sbs.internal.inputs.list" value="" unset="true"/>
+                <hlm:getsbsinputs config="sbs.${sysdef.configuration}" outputProperty="sbs.internal.inputs.list"/>
                 <for list="${sbs.internal.inputs.list}" delimiter="," param="sbs.input">
                     <sequential>
                         <echo message="building raptor input: @{sbs.input}" />
-                        <hlm:getVariableValue name="--logfile" property="sbs.log.file">
-                            <hlm:sbsinput refid="@{sbs.input}" />
-                        </hlm:getVariableValue>
+                        <var name="sbs.log.file" unset="true" />
+                        <property name="sbs.log.file" location="${compile.log.dir}/${build.id}_${sysdef.configuration}_@{sbs.input}_compile.log" />
                         <!-- run arm license checking / setting arm version only for arm config -->
                         <hlm:getVariableValue name="-c" property="compilevalue.var" failOnerror="false">
                             <hlm:sbsinput refid="@{sbs.input}" />
@@ -124,8 +129,6 @@ Description:
                                 <runtarget target="set-arm-version"/>
                             </then>
                         </if>
-                        <var name="sbs.clean.log" value="${sbs.log.file}.clean.log"/>
-                        <var name="sbs.what.log" value="${sbs.log.file}.whatlog.log"/>
                         <!-- Generate the filtered layers -->
                         <if>
                             <isset property="run.coverity"/>
@@ -137,10 +140,7 @@ Description:
                                                     execute="true"
                                                     failonerror="false"
                                                     outputlog="${sbs.log.file}" 
-                                                    cleanlog = "${sbs.clean.log}"
-                                                    whatlog = "${sbs.what.log}"
-                                                    erroroutput="${sbs.log.file}.sbs_error.log"
-                                                    statslog="${sbs.log.file}.info.xml">
+                                                    erroroutput="${sbs.log.file}.sbs_error.log">
                                     <hlm:coverityoptions refid="coverity.build.options"/>
                                 </hlm:coveritybuild>
                             </then>
@@ -153,10 +153,7 @@ Description:
                                                     errorOutput="${sbs.log.file}.sbs_error.log" 
                                                     workingDir="${build.drive}/" 
                                                     failOnError="false" 
-                                                    outputLog="${sbs.log.file}" 
-                                                    cleanLog = "${sbs.clean.log}"
-                                                    whatlog = "${sbs.what.log}"
-                                                    statsLog="${sbs.log.file}.info.xml" />                                
+                                                    outputLog="${sbs.log.file}" />                                
                                 </then>
                             </elseif>
                             <else>
@@ -166,22 +163,14 @@ Description:
                                                 errorOutput="${sbs.log.file}.sbs_error.log" 
                                                 workingDir="${build.drive}/" 
                                                 failOnError="false" 
-                                                outputLog="${sbs.log.file}" 
-                                                cleanLog = "${sbs.clean.log}"
-                                                whatlog = "${sbs.what.log}"
-                                                statsLog="${sbs.log.file}.info.xml" />
+                                                outputLog="${sbs.log.file}" />
                             </else>
                         </if>
                         <hlm:assertFileExists file="${sbs.log.file}"/>
-                        <hlm:assertFileExists file="${sbs.clean.log}"/>
-                        <hlm:assertFileExists file="${sbs.what.log}"/>
                         <hlm:assertFileExists file="${sbs.log.file}.sbs_error.log"/>
-                        <hlm:assertFileExists file="${sbs.log.file}.info.xml"/>
                         <!-- run arm license checking / setting arm version only for arm config --> 
                         <echo message="sbs.log.file: ${sbs.log.file}" />
                         <hlm:sbsProcessOutputMacro sbs.log.file="${sbs.log.file}"
-                            sbs.clean.log.file="${sbs.clean.log}" sbs.what.log.file="${sbs.what.log}" 
-                            sbs.stats.file="${sbs.log.file}.info.xml"
                             sbs.ant.output.file="${sbs.log.file}" sbs.error.output.file="${sbs.log.file}.sbs_error.log"/>
                     </sequential>
                 </for>
@@ -191,10 +180,7 @@ Description:
     
     
     <macrodef name="sbsProcessOutputMacro" uri="http://www.nokia.com/helium">
-        <attribute name="sbs.clean.log.file" />
-        <attribute name="sbs.what.log.file" />
         <attribute name="sbs.log.file" />
-        <attribute name="sbs.stats.file" />
         <attribute name="sbs.error.output.file" />
         <attribute name="sbs.ant.output.file" />
         <sequential>
@@ -214,12 +200,10 @@ Description:
             <!-- update the resultes to database -->
             <echo message="Metadata enabled, storing build status in database" />
             <echo message="sbs log file :@{sbs.log.file}" />
-            <echo message="sbs.clean.log.file :@{sbs.clean.log.file}" />
-            <echo message="sbs.what.log.file :@{sbs.what.log.file}" />
             <trycatch property="hlm-sbs.parser.thrown">
                 <try>
                     <hlm:metadatarecord  database="${metadata.dbfile}">
-                        <hlm:sbsmetadatainput whatLogFile="@{sbs.what.log.file}" cleanLogFile="@{sbs.clean.log.file}">
+                        <hlm:sbsmetadatainput>
                             <fileset casesensitive="false" file="@{sbs.log.file}"/>
                             <metadatafilterset refid="filterset.sbs" />
                         </hlm:sbsmetadatainput>
@@ -241,7 +225,8 @@ Description:
                             </hlm:metadatarecord>
                         </then>
                         <else>
-                            <fail message="failed during raptor log parsing: might be due to invalid xml output from raptor" />
+                            <loadfile property="sbs.error.output" srcfile="@{sbs.error.output.file}" failonerror="false"/>
+                            <fail message="failed during raptor log parsing: might be due to invalid xml output from raptor ${hlm-sbs.parser.thrown}. ${sbs.error.output}" />
                         </else>
                     </if>
                 </catch>
@@ -253,8 +238,7 @@ Description:
                 </freemarkerLinks>
                 <data expandProperties="yes">
                     dbPath: ${metadata.dbfile}
-                    doc: xml(@{sbs.stats.file})
-                    whatLogPath: @{sbs.what.log.file}
+                    logfilename: @{sbs.log.file}
                     ant: antProperties()
                 </data>
             </fmpp>

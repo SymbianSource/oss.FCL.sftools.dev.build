@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- 
 ============================================================================ 
-Name        : stages_config.xml 
+Name        : stages_config_default.ant.xml 
 Part of     : Helium 
 
 Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
@@ -31,29 +31,7 @@ Description:
     <!-- Comment out below line to skip displaying build stage summary at end of build process -->
     <hlm:stagesummary id="stage.summary" template="${helium.dir}\tools\common\templates\log\build_stages_summary.txt.ftl" />
     
-     <!-- Stages configuration -->
-    <hlm:stage id="preparation" starttarget="prep" endtarget="prep"/>
-    <hlm:stage id="compilation" starttarget="compile-main" endtarget="compile-main"/>
-    <hlm:stage id="romcreation" starttarget="build-roms" endtarget="build-roms"/>
-    <hlm:stage id="test" starttarget="run-test" endtarget="run-test"/>
-    <hlm:stage id="localisation" starttarget="localisation" endtarget="localisation"/>
-    <hlm:stage id="postbuild" starttarget="publish" endtarget="publish"/>
-    
-    
-    <!-- Stage record configuration -->
+    <!-- Default stage record configuration -->
     <hlm:stagerecord id="stage.default" defaultoutput="${build.log}" loglevel="${ant.loglevel}" append="false"/>
-       
-    <hlm:stagerecord id="stage.preparation" stagerefid="preparation" output="${build.log.dir}/${build.id}_prep.ant.log" loglevel="info" append="true"/>
-    
-    <hlm:stagerecord id="stage.compilation" stagerefid="compilation" output="${build.log.dir}/${build.id}_compile.ant.log" loglevel="info" append="true"/>
-    
-    <hlm:stagerecord id="stage.romcreation" stagerefid="romcreation" output="${build.log.dir}/${build.id}_roms.ant.log" loglevel="info" append="true"/>
-    
-    <hlm:stagerecord id="stage.test" stagerefid="test" output="${build.log.dir}/${build.id}_test.ant.log" loglevel="info" append="true"/>
-    
-    <hlm:stagerecord id="stage.localisation" stagerefid="localisation" output="${build.log.dir}/${build.id}_localisation.ant.log" loglevel="info" append="true"/>
-    
-    <hlm:stagerecord id="stage.postbuild" stagerefid="postbuild" output="${build.log.dir}/${build.id}_postbuild.ant.log" loglevel="info" append="true"/>
-    
     
 </project>

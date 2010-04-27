@@ -53,17 +53,19 @@ Description:
 	<property name="rvct.version" value="22_686" />
 
 	<!-- Configuring get latest env. -->
-	<property name="s60.grace.service" value="s60_devices_sw" />
-	<property name="s60.grace.product" value="DFS7x.92" />
-	<property name="s60.grace.release" value="92_\d{6}_hw79" />
+	<property name="s60.grace.service" value="S60RnD" />
+	<property name="s60.grace.product" value="pf_5250" />
+	<property name="s60.grace.release" value="pf_5250_\d{6}" />
+    
 	<!-- matching mcl_200948_hw79 -->
 	<condition property="prep.root.dir" value="${data.drive.letter}:\Build_${data.drive.letter}\${env.USERNAME}\ido_ba\${build.name}" else="${build.name}\ido_ba" >
-    <os family="windows"/>
-  </condition>
+        <os family="windows"/>
+    </condition>
 	<!-- Synergy configuration -->
-	<property name="ccm.database" value="tr1test1" />
+	<property name="ccm.database" value="tr1ido" />
+    <property name="ccm.project" value="MinibuildDomain-50_200832:project:tr1test1#1" />
 	<property name="prep.delivery.file" location="config/delivery.xml" />
-	<property name="publish.ccm.folder" value="tr1test1#2079" />
+	<property name="publish.ccm.folder" value="tr1ido#2311" />
 
 
 	<!-- Synergy is not configured -->
@@ -78,6 +80,7 @@ Description:
 
 	<import file="hack-test.ant.xml" />
 	<import file="${helium.dir}/helium.ant.xml" />
+    <import file="config/stages_config.ant.xml" />
 
 	<!-- Run the full sequence of target for the minibuild. ,mini-build-prep,compile-main,zip-ee,mini-build-check-->
 	<target name="do-mini-build" depends="ido-update-build-area,
@@ -193,6 +196,13 @@ ${ant.coverage.summary}</echo>
 				<au:assertFileExists file="${temp.build.dir}/${build.id}.helium_minibuild_ido_clean_run_emake.bat" />
 			</then>
 		</if>
+		
+		<!-- Check if stagelogging step did what expected... -->
+		<au:assertFileExists file="${build.log.dir}/${build.id}_ido_prep.ant.log" />
+		<au:assertFileExists file="${build.log.dir}/${build.id}_compile.ant.log" />
+		<au:assertFileExists file="${build.log.dir}/${build.id}_test.ant.log" />
+		<au:assertFileExists file="${build.log.dir}/${build.id}_localisation.ant.log" />
+		
 	</target>
 
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- 
 ============================================================================ 
-Name        : test_common.ant.xml 
+Name        : test_scanlog.ant.xml 
 Part of     : Helium 
 
 Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
@@ -30,31 +30,276 @@ Description:
     <property name="helium.dir" location="../../.." />
     <import file="../../../helium.ant.xml"/>
     <property name="scanlog.temp.dir" location="${helium.build.dir}/antunit/scanlog" />
-
+    
     <target name="setUp">
         <delete dir="${scanlog.temp.dir}" failonerror="false" />
         <mkdir dir="${scanlog.temp.dir}" />
     </target>
 
     <target name="tearDown">
-        <!--delete dir="${scanlog.temp.dir}" failonerror="false" /-->
+        <!-- delete dir="${scanlog.temp.dir}" failonerror="false" / -->
     </target>
     
     <target name="test-scanlog-generation">
-        <unzip src="${helium.dir}/tests/data/minibuild_ido_sbs_0.0.1_metadata_db.zip" dest="${scanlog.temp.dir}" />
+        <property name="sbs.log.file" location="${helium.dir}/tests/data/test-scanlog_helium_minibuild_ido_input_compile.log" />
+        <hlm:metadatarecord  database="${scanlog.temp.dir}/test-scanlog-generation_db">
+            <hlm:sbsmetadatainput>
+                <fileset casesensitive="false" file="${sbs.log.file}"/>
+                <metadatafilterset refid="filterset.sbs" />
+            </hlm:sbsmetadatainput>
+        </hlm:metadatarecord>
+        
         <fmpp sourceFile="${helium.dir}/tools/common/templates/log/scan2_orm.html.ftl"
                      outputfile="${scanlog.temp.dir}/scanlog.scan2.html">
             <freemarkerLinks expandProperties="yes">
                 macro: ${helium.dir}/tools/common/templates/macro
             </freemarkerLinks>
             <data expandProperties="yes">
-                dbPath: ${scanlog.temp.dir}/minibuild_ido_sbs_0.0.1_metadata_db
-                whatLogPath: "v:/output/logs/compile/minibuild_ido_sbs_0.0.1_armv5_helium_minibuild_ido.log.whatlog.log"
-                doc: xml(${scanlog.temp.dir}/minibuild_ido_sbs_0.0.1_armv5_helium_minibuild_ido.log.info.xml)
+                dbPath: ${scanlog.temp.dir}/test-scanlog-generation_db
+                logfilename: antProperty('sbs.log.file')
                 ant: antProperties()
             </data>
         </fmpp>
+        <au:assertFileExists file="${scanlog.temp.dir}/scanlog.scan2.html" />
+        <loadfile property="scanlog" srcFile="${scanlog.temp.dir}/scanlog.scan2.html" />
+        <au:assertTrue message="Time must be 00:00:13">
+            <contains string="${scanlog}" substring="00:00:13" />
+        </au:assertTrue>
+        <au:assertTrue message="Check for components">
+            <and>
+                <contains string="${scanlog}" substring="sf/mw/HelloWorldAPI/group" />
+                <contains string="${scanlog}" substring="sf/app/HelloWorldCons/group" />
+            </and>
+        </au:assertTrue>
     </target>
     
+    <target name="test-cc-summary-generation">
+        <condition property="sbs.log.file" value="${helium.dir}/tests/data/test-scanlog_linux_helium_minibuild_ido_input_compile.log">
+            <os family="unix" />
+        </condition>
+        <property name="sbs.log.file" location="${helium.dir}/tests/data/test-scanlog_helium_minibuild_ido_input_compile.log" />
+        <hlm:metadatarecord  database="${scanlog.temp.dir}/test-cc-summary-generation_db">
+            <hlm:sbsmetadatainput>
+                <fileset casesensitive="false" file="${sbs.log.file}"/>
+                <metadatafilterset refid="filterset.sbs" />
+            </hlm:sbsmetadatainput>
+        </hlm:metadatarecord>
+        
+        <fmpp sourceFile="${helium.dir}/tools/common/templates/log/cc_summary_metadata_orm.html.ftl"
+                     outputfile="${scanlog.temp.dir}/cc_summary.html">
+            <freemarkerLinks expandProperties="yes">
+                macro: ${helium.dir}/tools/common/templates/macro
+            </freemarkerLinks>
+            <data expandProperties="yes">
+                dbPath: ${scanlog.temp.dir}/test-cc-summary-generation_db
+                logfilename: antProperty('sbs.log.file')
+                ant: antProperties()
+            </data>
+        </fmpp>
+        <au:assertFileExists file="${scanlog.temp.dir}/cc_summary.html" />
+        <loadfile property="scanlog" srcFile="${scanlog.temp.dir}/cc_summary.html" />
+        <au:assertTrue message="Check for components">
+            <and>
+                <contains string="${scanlog}" substring="sf/mw/HelloWorldAPI/group" />
+                <contains string="${scanlog}" substring="sf/app/HelloWorldCons/group" />
+            </and>
+        </au:assertTrue>
+        <au:assertTrue message="Check for 23 errors">
+            <contains string="${scanlog}" substring="&gt;23&lt;/td&gt;" />
+        </au:assertTrue>
+        
+    </target>
+    
+    
+    <target name="scanlog-metadata-text">
+        <echo message="log.dir:${env.TEMP}/" />
+        
+        <hlm:scanlogMetadataTest log="${helium.dir}/tests/data/scanlog/all_regex_type.log"
+            output="${helium.dir}/tests/data/test-scanlog-metadata-text.log" />
+        <hlm:assertFileExists file="${helium.dir}/tests/data/test-scanlog-metadata-text"/>
+        <hlm:metadatarecord  database="${scanlog.temp.dir}/test-metadata-1_db">
+            <hlm:textmetadatainput>
+                <fileset casesensitive="false" file="${helium.dir}/tests/data/test-scanlog-metadata-1.log"/>
+                <metadatafilterset refid="filterset.sbs" />
+            </hlm:textmetadatainput>
+        </hlm:metadatarecord>
+        <fmpp sourceFile="${helium.dir}/tools/common/templates/log/scan2_text_orm.html.ftl"
+                     outputfile="${scanlog.temp.dir}/test-scanlog-metadata-1.log.scan2.html">
+            <freemarkerLinks expandProperties="yes">
+                macro: ${helium.dir}/tools/common/templates/macro
+            </freemarkerLinks>
+            <data expandProperties="yes">
+                dbPath: ${scanlog.temp.dir}/test-metadata-1_db
+                ant: antProperties()
+            </data>
+        </fmpp>
+        <hlm:generateBuildStatus dbfile="${scanlog.temp.dir}/test-metadata-1_db" output-dir="${helium.dir}/tests/data/" file="test-scanlog-metadata-1.log"/>
+        <hlm:assertFileExists file="${scanlog.temp.dir}/test-scanlog-metadata-1.log.scan2.html"/>
+    </target>
+
+
+
+    <hlm:signalInput id="testSBSScanlogInput" failbuild="now">
+        <hlm:notifierListRef refid="defaultFailNotifier" />
+    </hlm:signalInput>
+
+    <hlm:signalListenerConfig id="testSBSScanlog" target="test-scanlog-metadata-1" message="sbs scanlog processed">
+        <hlm:targetCondition>
+            <hlm:hasSeverity severity="error" file="${env.TEMP}/signals/test-scanlog-metadata-1.log.status.xml" />
+        </hlm:targetCondition>
+        <signalNotifierInput>
+            <signalInput refid="testSBSScanlogInput" />
+            <notifierInput file = "${env.TEMP}/signals/test-scanlog-metadata-1.log.status.html" />
+        </signalNotifierInput>
+    </hlm:signalListenerConfig>
+
+    <target name="scanlog-metadata-1">
+        <echo message="log.dir:${env.TEMP}/" />
+        <property name="sbslog" location="${helium.dir}/tests/data/scanlog/all_regex_type.log" />
+        <hlm:metadatarecord  database="${scanlog.temp.dir}/test-metadata-1_db">
+            <hlm:sbsmetadatainput>
+                <fileset casesensitive="false" file="${sbslog}"/>
+                <metadatafilterset refid="filterset.sbs" />
+            </hlm:sbsmetadatainput>
+        </hlm:metadatarecord>
+        <hlm:assertFileExists file="${sbslog}"/>
+        <hlm:assertFileExists file="${sbslog}.sbs_error.log"/>
+        <fmpp sourceFile="${helium.dir}/tools/common/templates/log/scan2_orm.html.ftl"
+                     outputfile="${scanlog.temp.dir}/test-scanlog-metadata-1.log.scan2.html">
+            <freemarkerLinks expandProperties="yes">
+                macro: ${helium.dir}/tools/common/templates/macro
+            </freemarkerLinks>
+            <data expandProperties="yes">
+                dbPath: ${scanlog.temp.dir}/test-metadata-1_db
+                ant: antProperties()
+            </data>
+        </fmpp>
+        <basename property="sbslog.basename" file="${sbslog}" />
+        <hlm:generateBuildStatus dbfile="${scanlog.temp.dir}/test-metadata-1_db" 
+            output-dir="${scanlog.temp.dir}" file="${sbslog.basename}"/>
+        <au:assertFileExists file="${scanlog.temp.dir}/test-scanlog-metadata-1.log.scan2.html"/>
+    </target>
+
+    
+    <target name="test-metadata-signal">
+        <antcall target="scanlog-metadata-1" />
+    </target>    
+    
+    <target name="test-diamonds-faults">
+        <condition property="sbs.log.file" value="${helium.dir}/tests/data/test-scanlog_linux_helium_minibuild_ido_input_compile.log">
+            <os family="unix" />
+        </condition>
+        <property name="sbs.log.file" location="${helium.dir}/tests/data/test-scanlog_helium_minibuild_ido_input_compile.log" />
+        <hlm:metadatarecord  database="${scanlog.temp.dir}/test-diamonds-faults_db">
+            <hlm:sbsmetadatainput>
+                <fileset casesensitive="false" file="${sbs.log.file}"/>
+                <metadatafilterset refid="filterset.sbs" />
+            </hlm:sbsmetadatainput>
+        </hlm:metadatarecord>
+
+        <fmpp sourceFile="${helium.dir}/tools/common/templates/diamonds/faults_metadata_orm.ftl"
+                outputfile="${scanlog.temp.dir}/compile-main.xml">
+            <data expandProperties="yes">
+                  dbPath: ${scanlog.temp.dir}/test-diamonds-faults_db
+                  ant: antProperties()
+            </data>
+        </fmpp>
+        <loadfile property="scanlog" srcFile="${scanlog.temp.dir}/compile-main.xml" />
+        <au:assertTrue message="Check for components">
+            <and>
+                <contains string="${scanlog}" substring="&lt;name&gt;sf/mw/HelloWorldAPI/group&lt;/name&gt;" />
+                <contains string="${scanlog}" substring="&lt;name&gt;sf/app/HelloWorldCons/group&lt;/name&gt;" />
+            </and>
+        </au:assertTrue>
+        <au:assertTrue message="Check for 23 errors">
+            <contains string="${scanlog}" substring="&gt;23&lt;/total&gt;" />
+        </au:assertTrue>
+        <au:assertTrue message="Check for 16 errors">
+            <contains string="${scanlog}" substring="&gt;16&lt;/total&gt;" />
+        </au:assertTrue>
+        <au:assertTrue message="Check for 7 errors">
+            <contains string="${scanlog}" substring="&gt;7&lt;/total&gt;" />
+        </au:assertTrue>
+    </target>
+
+    <target name="test-cc-summary-metadata-generation"> 
+        <hlm:metadatarecord  database="${scanlog.temp.dir}/test_metadata_db">
+            <hlm:antmetadatainput>
+                <fileset casesensitive="false" file="${helium.dir}/tests/data/test_minibuild_ido_ccm_get_input.log"/>
+                <fileset casesensitive="false" file="${helium.dir}/tests/data/test_minibuild_compile_roms.log"/>
+                <metadatafilterset refid="filterset.common" />
+            </hlm:antmetadatainput>
+            <hlm:sbsmetadatainput>
+                <fileset casesensitive="false" file="${helium.dir}/tests/data/test-scanlog_cc_summary_compile.log"/>
+                <metadatafilterset refid="filterset.sbs" />
+            </hlm:sbsmetadatainput>
+            <hlm:policymetadatainput>
+                <fileset casesensitive="false" file="${helium.dir}/tests/data/test_minibuild_compile_validate-policy.summary.xml"/>
+                <metadatafilterset refid="filterset.common" />
+            </hlm:policymetadatainput>
+        </hlm:metadatarecord>
+
+        <fmpp sourceFile="${helium.dir}/tools/common/templates/log/cc_summary_metadata_orm.html.ftl"
+                     outputfile="${scanlog.temp.dir}/cc_summary.html">
+            <data expandProperties="yes">
+                dbPath:  ${scanlog.temp.dir}/test_metadata_db
+                ant: antProperties()
+            </data>
+        </fmpp>
+        
+        <au:assertFileExists file="${scanlog.temp.dir}/cc_summary.html" />
+        <loadfile property="cclog" srcFile="${scanlog.temp.dir}/cc_summary.html" /> 
+        <au:assertTrue message="Check for synergy errors"> 
+            <contains string="${cclog}" substring="Exception: Could not find  object TestDomain-50_200832:project:testDb#1 in the database" /> 
+        </au:assertTrue> 
+        <au:assertTrue message="Check for build errors"> 
+            <contains string="${cclog}" substring="test-scanlog_cc_summary_compile.log" /> 
+        </au:assertTrue> 
+        <au:assertTrue message="Check for 24 build errors"> 
+            <contains string="${cclog}" substring="24" /> 
+        </au:assertTrue> 
+        <au:assertTrue message="Check for 23 build errors"> 
+            <contains string="${cclog}" substring="23" /> 
+        </au:assertTrue> 
+        <au:assertTrue message="Check for validate policy errors"> 
+            <and>
+                <contains string="${cclog}" substring="s60\test\tools\uitools\DOM" /> 
+                <contains string="${cclog}" substring="s60\test\tools\uitools\DOM\SAX2DOM" /> 
+            </and>                
+        </au:assertTrue> 
+        <au:assertTrue message="Check for Roms"> 
+            <contains string="${cclog}" substring="WARNING: Nothing to build" /> 
+        </au:assertTrue> 
+    </target>    
+
+    <target name="test-missing-files-clean-compile"> 
+        <property name="sbs.log.file" value="${helium.dir}/tests/data/test_helium_minibuild_ido_input_clean_armv5_compile.log"/>
+        <hlm:metadatarecord  database="${scanlog.temp.dir}/test_compile_clean_metadata_db">
+            <hlm:sbsmetadatainput>
+                <fileset casesensitive="false" file="${sbs.log.file}"/>
+                <metadatafilterset refid="filterset.sbs" />
+            </hlm:sbsmetadatainput>
+        </hlm:metadatarecord>
+
+        <fmpp sourceFile="${helium.dir}/tools/common/templates/log/scan2_orm.html.ftl"
+                     outputfile="${scanlog.temp.dir}/test_scan2.html">
+            <freemarkerLinks expandProperties="yes">
+                    macro: ${helium.dir}/tools/common/templates/macro
+            </freemarkerLinks>
+            <data expandProperties="yes">
+                dbPath: ${scanlog.temp.dir}/test_compile_clean_metadata_db
+                logfilename: ${sbs.log.file}
+                ant: antProperties()
+            </data>
+        </fmpp>
+        
+        <au:assertFileExists file="${scanlog.temp.dir}/test_scan2.html" />
+        <loadfile property="scanog" srcFile="${scanlog.temp.dir}/test_scan2.html" /> 
+        <au:assertFalse message="Check for Missing Files"> 
+            <contains string="${scanog}" substring="MISSING: " /> 
+        </au:assertFalse> 
+    </target>    
+   
+   
 </project>
 

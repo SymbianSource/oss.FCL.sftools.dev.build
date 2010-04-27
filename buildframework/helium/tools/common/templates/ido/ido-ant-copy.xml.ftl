@@ -21,7 +21,22 @@ Description:
 --> 
 <?xml version="1.0"?>
 <project name="ido-ant-copy" default="all">
-    <target name="all">
+    <target name="delete">
+        <parallel threadCount="${r'$'}{number.of.threads}">
+        <#list data?keys as component>
+            <sequential>
+                <#if ant?keys?seq_contains('ido.keep.old')>
+                <delete dir="${data[component]}_old" failonerror="false"/>
+                <move file="${data[component]}" todir="${data[component]}_old" failonerror="false"/>
+                <#else>
+                <delete dir="${data[component]}" failonerror="false"/>
+                </#if>
+            </sequential>
+        </#list>
+        </parallel>
+    </target>
+    
+    <target name="copy">
         <#list data?keys as component>
             <mkdir dir="${data[component]}"/>
         </#list>
@@ -38,11 +53,15 @@ Description:
                         <exclude name="**/.svn/**"/>
                     </fileset>
                 </copy>
-                <exec executable="attrib" dir="${data[component]}">
+                <#-- Below operation is not required on linux as copy task will changes 
+                the file permissions to write mode -->
+                <exec executable="attrib" osfamily="windows" dir="${data[component]}">
                     <arg line="-R /S /D .\*"/>
                 </exec>
             </sequential>
         </#list>
         </parallel>
     </target>
+    
+    <target name="all" depends="delete,copy" />
 </project>

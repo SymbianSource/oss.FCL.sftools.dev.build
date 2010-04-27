@@ -28,20 +28,6 @@ Description:
     </description>
     <import file="imaker.ant.xml" />
     
-    <!--* @property ee.rom.output.dir
-    /output/development_flash_images/engineering_english/logs
-    @type string
-    @editable required
-    @scope public
-    -->
-
-    <!--* @property core.rom.output.dir
-    /output/release_flash_images/rnd/core
-    @type string
-    @editable required
-    @scope public
-    -->
-
     <!-- should be overriden - default configuration -->
     <!-- The path to the iMaker executable file.
     @type string

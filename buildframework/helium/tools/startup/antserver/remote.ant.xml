@@ -24,6 +24,20 @@ Description:
 <project name="startup.remote">
     <description>Local actions to setup remote builds.</description>
     
+    <!--* @property work.area.temp.dir
+    A temporary network location to use if triggering remote builds from a central machine.
+    @type string
+    @editable required
+    @scope public
+    -->
+    
+    <!--* @property remote.builds.config.file
+    The configuration file for starting remote builds.
+    @type string
+    @editable required
+    @scope public
+    -->
+    
     <!-- Tars a complete work area to distribute to other machines. -->
     <target name="tar-work-area">
         <tstamp>

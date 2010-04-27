@@ -26,6 +26,34 @@ Description:
     Zipping, delta zipping and copying targets
     </description>
     
+    <!--* @property zip.config.file
+    The ZIP configuration XML file.
+    @type string
+    @editable required
+    @scope public
+    -->
+    
+    <!--* @property zips.ee.spec.name
+    The name of the configuration section for EE zipping.
+    @type string
+    @editable optional
+    @scope public
+    -->
+    
+    <!--* @property zips.localised.spec.name
+    The name of the configuration section for localisation zipping.
+    @type string
+    @editable optional
+    @scope public
+    -->
+    
+    <!--* @property zips.localised.spec.name
+    The name of the configuration section for subcon zipping.
+    @type string
+    @editable optional
+    @scope public
+    -->
+    
     <!--* @property delta.zip.file.size
     Define the file size of the zipped up released file, this is then used by delta zipping code to determine if a delta zip is required or a full zip should be created. The delta zip will only be published if it is less than 1/2 the size of this property
     @type string

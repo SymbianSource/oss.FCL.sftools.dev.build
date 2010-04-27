@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : emulator_zip.cfg.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<build>
+    <config name="emulator_zip">
+        <set name="root.dir" value="${build.drive}"/>
+        <set name="archive.tool" value="7za"/>
+        <set name="archives.dir" value="${build.output.dir}/ats"/>
+        <set name="temp.build.dir" value="${temp.build.dir}"/>
+        <set name="name" value="${build.id}_emulator_urel"/>
+        <set name="include" value="epoc32/data/**,epoc32/release/winscw/**,epoc32/tools/**,epoc32/winscw/**"/>
+    </config>
+</build>

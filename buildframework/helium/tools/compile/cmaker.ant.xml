@@ -84,7 +84,12 @@ Description:
             </if>
             <hlm:symbianLogHeaderMacro command="cmaker ${temp.cmaker.arg1} ${temp.cmaker.arg2} ACTION=@{action}"
                     config="CMAKER_@{action}" dir="${cmaker.config.dir}"/>
-            <exec executable="${build.drive}/epoc32/tools/cmaker.cmd" dir="${cmaker.config.dir}">
+            <exec executable="${build.drive}/epoc32/tools/cmaker.cmd" osfamily="windows" dir="${cmaker.config.dir}">
+                <arg line="${temp.cmaker.arg1}" />
+                <arg line="${temp.cmaker.arg2}" />
+                <arg value="ACTION=@{action}" />
+            </exec>
+            <exec executable="${build.drive}/epoc32/tools/cmaker.sh" osfamily="unix" dir="${cmaker.config.dir}">
                 <arg line="${temp.cmaker.arg1}" />
                 <arg line="${temp.cmaker.arg2}" />
                 <arg value="ACTION=@{action}" />
@@ -96,7 +101,10 @@ Description:
     <!--  Installing CMaker. -->    
     <target name="cmaker-install">
         <hlm:recordStartMacro name="${build.id}_install.cmaker.log" emacsmode="true"/>
-        <exec executable="${cmaker.component.dir}/bin/mingw_make.exe" dir="${cmaker.component.dir}">
+        <exec executable="${cmaker.component.dir}/bin/mingw_make.exe" osfamily="windows" dir="${cmaker.component.dir}" failonerror="true">
+            <arg line="install"/>
+        </exec>
+        <exec executable="make" osfamily="unix" dir="${cmaker.component.dir}" failonerror="true">
             <arg line="install"/>
         </exec>
         <hlm:recordStopMacro name="${build.id}_install.cmaker.log"/>

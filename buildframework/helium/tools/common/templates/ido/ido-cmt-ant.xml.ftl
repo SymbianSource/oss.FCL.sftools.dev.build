@@ -29,20 +29,17 @@ Description:
     <#assign targetlist="${targetlist}" + ","/>
     </#if>
     <basename property="componentbase${cmtid}" file="${data[component]}"/>
-    <hlm:argSet id="cmttool.refid.${cmtid}">
-        <hlm:arg name="input" value="${data[component]}" />
-        <hlm:arg name="output" value="${ant['build.log.dir']}/${ant['build.id']}_${ant['ido.name']}_${r'$'}{componentbase${cmtid}}_${cmtid}.txt" />
-        <hlm:arg name="pattern" value="**/*.h,**/*.cpp" />
-    </hlm:argSet>
-
     <target name="cmt-${cmtid}">
-        <hlm:toolMacro name="cmt">
-            <toolvarset refid="cmttool.refid.${cmtid}"/>
-        </hlm:toolMacro>
+        <hlm:cmt output="${ant['build.log.dir']}/${ant['build.id']}_${ant['ido.name']}_${r'$'}{componentbase${cmtid}}_${cmtid}.txt">
+            <fileset id="input" dir="${data[component]}">
+                <include name="**/*.h"/>
+                <include name="**/*.cpp"/>
+            </fileset>
+        </hlm:cmt>
     </target>
+
     <#assign targetlist="${targetlist}" + "cmt-${cmtid}"/>
     <#assign cmtid=cmtid+1/>
     </#list>
-    <target name="all" depends="${targetlist}" >
-    </target>
+    <target name="all" depends="${targetlist}" />
 </project>

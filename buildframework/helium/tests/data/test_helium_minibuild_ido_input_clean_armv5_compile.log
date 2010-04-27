@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<buildlog sbs_version="2.9.2 [2009-09-21 sf release]" xmlns="http://symbian.com/xml/build/log" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symbian.com/xml/build/log http://symbian.com/xml/build/log/1_0.xsd">
+<info>sbs: version 2.9.2 [2009-09-21 sf release]
+</info>
+<info>SBS_HOME C:/APPS/sbs</info>
+<info>Set-up C:/APPS/sbs/sbs_init.xml</info>
+<info>Current working directory R:\</info>
+<info>Environment LOGGING_ANT_ARGS= -listener com.nokia.helium.logger.ant.listener.StatusAndLogListener</info>
+<info>Environment RVCT22_ASMOPT=--licretry --fastlicense --sitelicense</info>
+<info>Environment RVCT22_LINKOPT=--licretry --fastlicense --sitelicense</info>
+<info>Environment _JAVACMD=C:\APPS\jdk_1.6.0_11\bin\java.exe</info>
+<info>Environment SYSTEMROOT=C:\EESP</info>
+<info>Environment JAVA_6_HOME=C:\APPS\jdk_1.6.0_11</info>
+<info>Environment RVCT22LIB=C:\APPS\rvct22_616\lib</info>
+<info>Environment TESTED_JAVA=C:\APPS\jdk_1.6.0_11</info>
+<info>Environment __MINGW__=C:\APPS\sbs\win32\mingw</info>
+<info>Environment JAVA_HOME=C:\APPS\jdk_1.6.0_11</info>
+<info>Environment __CYGWIN__=C:\APPS\sbs\win32\cygwin</info>
+<info>Environment HOSTPLATFORM=win 32</info>
+<info>Environment COMSPEC=C:\EESP\system32\cmd.exe</info>
+<info>Environment PYTHONPATH=</info>
+<info>Environment RVCT22INC=C:\APPS\rvct22_616\include</info>
+<info>Environment HOMEDRIVE=C:</info>
+<info>Environment SYSTEMDRIVE=C:</info>
+<info>Environment _USE_CLASSPATH=no</info>
+<info>Environment PROCESSOR_LEVEL=15</info>
+<info>Environment EPOCROOT=\</info>
+<info>Environment OS=Windows_NT</info>
+<info>Environment CTC_AGENT_DEBUG=*</info>
+<info>Environment CYGWIN=nontsec nosmbntsec</info>
+<info>Environment RVCT22_CCOPT=--licretry --fastlicense --sitelicense</info>
+<info>Environment M2=C:\Program Files\Apache Software Foundation\Maven 2.0.10\apache-maven-2.0.10\bin</info>
+<info>Environment TESTED_ANT=C:\APPS\ant_1.7</info>
+<info>Environment JAVA_1_3_1_HOME=C:\APPS\j2sdk_1.3.1_06</info>
+<info>Environment COMMONPROGRAMFILES=C:\Program Files\Common Files</info>
+<info>Environment PROCESSOR_ARCHITECTURE=x86</info>
+<info>Environment SBS_HOME=C:\APPS\sbs</info>
+<info>Environment M2_REPO=%USERPROFILES%\.m2\repository</info>
+<info>Environment SYMSEE_VERSION=10.3.0</info>
+<info>Environment PATHEXT=.COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.py;.pyw;.PSC1</info>
+<info>Environment CTCHOME=C:\APPS\ctc</info>
+<info>Environment WINDIR=C:\EESP</info>
+<info>Environment CMTHOME=C:\APPS\cmt</info>
+<info>Environment INTERNAL_DATA_ANT_ARGS= -listener com.nokia.helium.internaldata.ant.listener.Listener</info>
+<info>Environment PYTHONVERSION=2.6</info>
+<info>Environment PROGRAMFILES=C:\Program Files</info>
+<info>Environment PROCESSOR_REVISION=0207</info>
+<info>Environment SESSIONNAME=RDP-Tcp#2</info>
+<info>Environment FLEXLM_TIMEOUT=900000</info>
+<info>Environment COPYCMD=/y</info>
+<info>Environment HOSTPLATFORM_DIR=win32</info>
+<info>Buildable configuration 'armv5_urel'</info>
+<info>Buildable configuration 'armv5_udeb'</info>
+<info>System Definition file R:/output/build/canonical_system_definition_helium_minibuild_ido_clean.xml</info>
+<info>Found 2 bld.inf references in R:/output/build/canonical_system_definition_helium_minibuild_ido_clean.xml within 3 layers:</info>
+<info>	mw_layer, app_layer, osext_layer</info>
+<info>Found 1 bld.inf references in layer "mw_layer"</info>
+<info>Found 1 bld.inf references in layer "app_layer"</info>
+<info>Found 0 bld.inf references in layer "osext_layer"</info>
+<info>Loaded toolcheck cache: R:/epoc32/build/toolcheck_cache_.tmp
+</info>
+<info>Buildable specification 'config_wide'</info>
+<info>OS version "v94" determined from file "R:/epoc32/data/buildinfo.txt"</info>
+<info>applying the OS variant to the configuration "armv5_urel".</info>
+<warning>missing flag ENABLE_ABIV2_MODE in R:/epoc32/tools/variant/variant.cfg file. ABIV1 builds are not supported.</warning>
+<info>'armv5_urel' uses variant hrh file 'R:/epoc32/include/oem/bldvariant.hrh'</info>
+<info>OS version "v94" determined from file "R:/epoc32/data/buildinfo.txt"</info>
+<info>applying the OS variant to the configuration "armv5_udeb".</info>
+<warning>missing flag ENABLE_ABIV2_MODE in R:/epoc32/tools/variant/variant.cfg file. ABIV1 builds are not supported.</warning>
+<info>'armv5_udeb' uses variant hrh file 'R:/epoc32/include/oem/bldvariant.hrh'</info>
+<info>Processing R:/sf/mw/HelloWorldAPI/group/bld.inf</info>
+<info>Processing R:/sf/app/HelloWorldCons/group/bld.inf</info>
+<info>Copied R:/sf/mw/HelloWorldAPI/inc/HelloWorldAPI.h to R:/epoc32/include/HelloWorldAPI.h</info>
+<info>Copied R:/sf/mw/HelloWorldAPI/rom/HelloWorldAPI.iby to R:/epoc32/rom/include/core/mw/HelloWorldAPI.iby</info>
+<whatlog bldinf='R:/sf/mw/HelloWorldAPI/group/bld.inf' mmp='' config=''>
+<export destination='R:/epoc32/include/HelloWorldAPI.h' source='R:/sf/mw/HelloWorldAPI/inc/HelloWorldAPI.h'/>
+<export destination='R:/epoc32/rom/include/core/mw/HelloWorldAPI.iby' source='R:/sf/mw/HelloWorldAPI/rom/HelloWorldAPI.iby'/>
+</whatlog>
+<info>Copied R:/sf/app/HelloWorldCons/rom/helloworldcons.iby to R:/epoc32/rom/include/core/app/helloworldcons.iby</info>
+<whatlog bldinf='R:/sf/app/HelloWorldCons/group/bld.inf' mmp='' config=''>
+<export destination='R:/epoc32/rom/include/core/app/helloworldcons.iby' source='R:/sf/app/HelloWorldCons/rom/helloworldcons.iby'/>
+</whatlog>
+<warning>file 'R:/epoc32/tools/makefile_templates\s60\layers.sysdef.xml' uses schema '' which does not end with the expected version 'build/2_0.xsd'</warning>
+<warning>file 'R:/epoc32/tools/makefile_templates\s60\mifconv.xml' uses schema 'http://symbian.com/xml/build http://symbian.com/xml/build/1_0.xsd' which does not end with the expected version 'build/2_0.xsd'</warning>
+<info>Processing R:/sf/mw/HelloWorldAPI/group/HelloWorldAPI.mmp for platform armv5_urel + armv5_udeb</info>
+<info>Processing R:/sf/app/HelloWorldCons/group/HelloWorldCons.mmp for platform armv5_urel + armv5_udeb</info>
+<info>Buildable specification group 'sbs'</info>
+<info>Buildable specification 'config_wide'</info>
+<info>Buildable specification 'export_0'</info>
+<info>Buildable specification 'build_0'</info>
+<info>Running C:/APPS/sbs/win32/bin/talonctl.exe start</info>
+<info>Making R:/output/logs/compile/minibuild_ido_sbs_0.0.1_armv5_helium_minibuild_ido_clean.default</info>
+<info>Executing 'C:/APPS/sbs/win32/mingw/bin/make.exe HAVE_ORDERONLY=1 -r -f "R:/output/logs/compile/minibuild_ido_sbs_0.0.1_armv5_helium_minibuild_ido_clean.default" -k -j 4  TALON_DESCRAMBLE=1  REALLYCLEAN'</info>
+<clean bldinf='R:/sf/mw/HelloWorldAPI/group/bld.inf' mmp='R:/sf/mw/HelloWorldAPI/group/HelloWorldAPI.mmp' config='armv5_urel'>
+<file>R:/epoc32/build/helloworldapi/c_088d2b9a47a41362/helloworldapi_dll/armv5/urel/HelloWorldAPI.prep</file>
+<file>R:/epoc32/release/armv5/lib/HelloWorldAPI.dso</file>
+<file>R:/epoc32/release/armv5/lib/HelloWorldAPI{000a0000}.dso</file>
+<file>R:/epoc32/release/armv5/lib/HelloWorldAPI{000a0000}.lib</file>
+<file>R:/epoc32/release/armv5/lib/HelloWorldAPI.lib</file>
+<file>R:/epoc32/release/armv5/urel/HelloWorldAPI.dll</file>
+<file>"R:/epoc32/build/helloworldapi/c_088d2b9a47a41362/helloworldapi_dll/armv5/urel/HelloWorldAPI{000a0000}.def"</file>
+<file>"R:/epoc32/build/helloworldapi/c_088d2b9a47a41362/helloworldapi_dll/armv5/urel/HelloWorldAPI{000a0000}.dso"</file>
+<file>R:/epoc32/release/armv5/urel/HelloWorldAPI.dll.sym</file>
+<file>R:/epoc32/build/helloworldapi/c_088d2b9a47a41362/helloworldapi_dll/armv5/urel/HelloWorldAPI_urel_objects.via</file>
+<file>R:/epoc32/release/armv5/urel/HelloWorldAPI.dll.map</file>
+<file>R:/epoc32/build/helloworldapi/c_088d2b9a47a41362/helloworldapi_dll/armv5/urel/HelloWorldAPI.o.d</file>
+<file>R:/epoc32/build/helloworldapi/c_088d2b9a47a41362/helloworldapi_dll/armv5/urel/HelloWorldAPIDllMain.o.d</file>
+<file>R:/epoc32/build/helloworldapi/c_088d2b9a47a41362/helloworldapi_dll/armv5/urel/HelloWorldAPI.o</file>
+<file>R:/epoc32/build/helloworldapi/c_088d2b9a47a41362/helloworldapi_dll/armv5/urel/HelloWorldAPIDllMain.o</file>
+<file>R:/epoc32/build/helloworldapi/c_088d2b9a47a41362/helloworldapi_dll/armv5/urel/HelloWorldAPI.o</file>
+<file>R:/epoc32/build/helloworldapi/c_088d2b9a47a41362/helloworldapi_dll/armv5/urel/HelloWorldAPIDllMain.o</file>
+<dir>R:/epoc32/build/helloworldapi/c_088d2b9a47a41362/helloworldapi_dll</dir>
+<dir>R:/epoc32/build/helloworldapi/c_088d2b9a47a41362/helloworldapi_dll/armv5</dir>
+<dir>R:/epoc32/build/helloworldapi/c_088d2b9a47a41362/helloworldapi_dll/armv5/urel</dir>
+<dir>R:/epoc32/release/armv5/urel</dir>
+<dir>R:/epoc32/release/armv5/lib</dir>
+<dir>R:/epoc32/release/armv5/lib</dir>
+</clean>
+<whatlog bldinf='R:/sf/mw/HelloWorldAPI/group/bld.inf' mmp='R:/sf/mw/HelloWorldAPI/group/HelloWorldAPI.mmp' config='armv5_urel'>
+<build>R:/epoc32/release/armv5/lib/HelloWorldAPI.dso</build>
+<build>R:/epoc32/release/armv5/lib/HelloWorldAPI{000a0000}.dso</build>
+<build>R:/epoc32/release/armv5/lib/HelloWorldAPI.lib</build>
+<build>R:/epoc32/release/armv5/lib/HelloWorldAPI{000a0000}.lib</build>
+<build>R:/epoc32/release/armv5/urel/HelloWorldAPI.dll</build>
+<build>R:/epoc32/release/armv5/urel/HelloWorldAPI.dll.map</build>
+<build>R:/epoc32/release/armv5/urel/HelloWorldAPI.dll.map</build>
+</whatlog>
+<clean bldinf='R:/sf/app/HelloWorldCons/group/bld.inf' mmp='R:/sf/app/HelloWorldCons/group/HelloWorldCons.mmp' config='armv5_urel'>
+<file>R:/epoc32/release/armv5/urel/HelloWorldCons.exe</file>
+<file>"R:/epoc32/build/helloworldcons/c_1023100f16f808f0/helloworldcons_exe/armv5/urel/HelloWorldCons{000a0000}.def"</file>
+<file>"R:/epoc32/build/helloworldcons/c_1023100f16f808f0/helloworldcons_exe/armv5/urel/HelloWorldCons{000a0000}.dso"</file>
+<file>R:/epoc32/release/armv5/urel/HelloWorldCons.exe.sym</file>
+<file>R:/epoc32/build/helloworldcons/c_1023100f16f808f0/helloworldcons_exe/armv5/urel/HelloWorldCons_urel_objects.via</file>
+<file>R:/epoc32/release/armv5/urel/HelloWorldCons.exe.map</file>
+<file>R:/epoc32/build/helloworldcons/c_1023100f16f808f0/helloworldcons_exe/armv5/urel/HelloWorldCons.o.d</file>
+<file>R:/epoc32/build/helloworldcons/c_1023100f16f808f0/helloworldcons_exe/armv5/urel/HelloWorldCons.o</file>
+<file>R:/epoc32/build/helloworldcons/c_1023100f16f808f0/helloworldcons_exe/armv5/urel/HelloWorldCons.o</file>
+<dir>R:/epoc32/build/helloworldcons/c_1023100f16f808f0/helloworldcons_exe</dir>
+<dir>R:/epoc32/build/helloworldcons/c_1023100f16f808f0/helloworldcons_exe/armv5</dir>
+<dir>R:/epoc32/build/helloworldcons/c_1023100f16f808f0/helloworldcons_exe/armv5/urel</dir>
+<dir>R:/epoc32/release/armv5/urel</dir>
+<dir>R:/epoc32/release/armv5/lib</dir>
+<dir>R:/epoc32/release/armv5/lib</dir>
+</clean>
+<whatlog bldinf='R:/sf/app/HelloWorldCons/group/bld.inf' mmp='R:/sf/app/HelloWorldCons/group/HelloWorldCons.mmp' config='armv5_urel'>
+<build>R:/epoc32/release/armv5/urel/HelloWorldCons.exe</build>
+<build>R:/epoc32/release/armv5/urel/HelloWorldCons.exe.map</build>
+<build>R:/epoc32/release/armv5/urel/HelloWorldCons.exe.map</build>
+</whatlog>
+<clean bldinf='R:/sf/mw/HelloWorldAPI/group/bld.inf' mmp='R:/sf/mw/HelloWorldAPI/group/HelloWorldAPI.mmp' config='armv5_udeb'>
+<file>R:/epoc32/build/helloworldapi/c_088d2b9a47a41362/helloworldapi_dll/armv5/udeb/HelloWorldAPI.prep</file>
+<file>R:/epoc32/release/armv5/udeb/HelloWorldAPI.dll</file>
+<file>"R:/epoc32/build/helloworldapi/c_088d2b9a47a41362/helloworldapi_dll/armv5/udeb/HelloWorldAPI{000a0000}.def"</file>
+<file>"R:/epoc32/build/helloworldapi/c_088d2b9a47a41362/helloworldapi_dll/armv5/udeb/HelloWorldAPI{000a0000}.dso"</file>
+<file>R:/epoc32/release/armv5/udeb/HelloWorldAPI.dll.sym</file>
+<file>R:/epoc32/build/helloworldapi/c_088d2b9a47a41362/helloworldapi_dll/armv5/udeb/HelloWorldAPI_udeb_objects.via</file>
+<file>R:/epoc32/release/armv5/udeb/HelloWorldAPI.dll.map</file>
+<file>R:/epoc32/build/helloworldapi/c_088d2b9a47a41362/helloworldapi_dll/armv5/udeb/HelloWorldAPI.o.d</file>
+<file>R:/epoc32/build/helloworldapi/c_088d2b9a47a41362/helloworldapi_dll/armv5/udeb/HelloWorldAPIDllMain.o.d</file>
+<file>R:/epoc32/build/helloworldapi/c_088d2b9a47a41362/helloworldapi_dll/armv5/udeb/HelloWorldAPI.o</file>
+<file>R:/epoc32/build/helloworldapi/c_088d2b9a47a41362/helloworldapi_dll/armv5/udeb/HelloWorldAPIDllMain.o</file>
+<file>R:/epoc32/build/helloworldapi/c_088d2b9a47a41362/helloworldapi_dll/armv5/udeb/HelloWorldAPI.o</file>
+<file>R:/epoc32/build/helloworldapi/c_088d2b9a47a41362/helloworldapi_dll/armv5/udeb/HelloWorldAPIDllMain.o</file>
+<dir>R:/epoc32/build/helloworldapi/c_088d2b9a47a41362/helloworldapi_dll</dir>
+<dir>R:/epoc32/build/helloworldapi/c_088d2b9a47a41362/helloworldapi_dll/armv5</dir>
+<dir>R:/epoc32/build/helloworldapi/c_088d2b9a47a41362/helloworldapi_dll/armv5/udeb</dir>
+<dir>R:/epoc32/release/armv5/udeb</dir>
+<dir>R:/epoc32/release/armv5/lib</dir>
+<dir>R:/epoc32/release/armv5/lib</dir>
+</clean>
+<whatlog bldinf='R:/sf/mw/HelloWorldAPI/group/bld.inf' mmp='R:/sf/mw/HelloWorldAPI/group/HelloWorldAPI.mmp' config='armv5_udeb'>
+<build>R:/epoc32/release/armv5/lib/HelloWorldAPI.dso</build>
+<build>R:/epoc32/release/armv5/lib/HelloWorldAPI{000a0000}.dso</build>
+<build>R:/epoc32/release/armv5/lib/HelloWorldAPI.lib</build>
+<build>R:/epoc32/release/armv5/lib/HelloWorldAPI{000a0000}.lib</build>
+<build>R:/epoc32/release/armv5/udeb/HelloWorldAPI.dll</build>
+<build>R:/epoc32/release/armv5/udeb/HelloWorldAPI.dll.map</build>
+<build>R:/epoc32/release/armv5/udeb/HelloWorldAPI.dll.map</build>
+</whatlog>
+<clean bldinf='R:/sf/app/HelloWorldCons/group/bld.inf' mmp='R:/sf/app/HelloWorldCons/group/HelloWorldCons.mmp' config='armv5_udeb'>
+<file>R:/epoc32/release/armv5/udeb/HelloWorldCons.exe</file>
+<file>"R:/epoc32/build/helloworldcons/c_1023100f16f808f0/helloworldcons_exe/armv5/udeb/HelloWorldCons{000a0000}.def"</file>
+<file>"R:/epoc32/build/helloworldcons/c_1023100f16f808f0/helloworldcons_exe/armv5/udeb/HelloWorldCons{000a0000}.dso"</file>
+<file>R:/epoc32/release/armv5/udeb/HelloWorldCons.exe.sym</file>
+<file>R:/epoc32/build/helloworldcons/c_1023100f16f808f0/helloworldcons_exe/armv5/udeb/HelloWorldCons_udeb_objects.via</file>
+<file>R:/epoc32/release/armv5/udeb/HelloWorldCons.exe.map</file>
+<file>R:/epoc32/build/helloworldcons/c_1023100f16f808f0/helloworldcons_exe/armv5/udeb/HelloWorldCons.o.d</file>
+<file>R:/epoc32/build/helloworldcons/c_1023100f16f808f0/helloworldcons_exe/armv5/udeb/HelloWorldCons.o</file>
+<file>R:/epoc32/build/helloworldcons/c_1023100f16f808f0/helloworldcons_exe/armv5/udeb/HelloWorldCons.o</file>
+<dir>R:/epoc32/build/helloworldcons/c_1023100f16f808f0/helloworldcons_exe</dir>
+<dir>R:/epoc32/build/helloworldcons/c_1023100f16f808f0/helloworldcons_exe/armv5</dir>
+<dir>R:/epoc32/build/helloworldcons/c_1023100f16f808f0/helloworldcons_exe/armv5/udeb</dir>
+<dir>R:/epoc32/release/armv5/udeb</dir>
+<dir>R:/epoc32/release/armv5/lib</dir>
+<dir>R:/epoc32/release/armv5/lib</dir>
+</clean>
+<whatlog bldinf='R:/sf/app/HelloWorldCons/group/bld.inf' mmp='R:/sf/app/HelloWorldCons/group/HelloWorldCons.mmp' config='armv5_udeb'>
+<build>R:/epoc32/release/armv5/udeb/HelloWorldCons.exe</build>
+<build>R:/epoc32/release/armv5/udeb/HelloWorldCons.exe.map</build>
+<build>R:/epoc32/release/armv5/udeb/HelloWorldCons.exe.map</build>
+</whatlog>
+make.exe: Nothing to_be_done for `REALLYCLEAN'.
+<info>Making R:/output/logs/compile/minibuild_ido_sbs_0.0.1_armv5_helium_minibuild_ido_clean.resource</info>
+<info>Executing 'C:/APPS/sbs/win32/mingw/bin/make.exe HAVE_ORDERONLY=1 -r -f "R:/output/logs/compile/minibuild_ido_sbs_0.0.1_armv5_helium_minibuild_ido_clean.resource" -k -j 4  TALON_DESCRAMBLE=1  REALLYCLEAN'</info>
+make.exe: Nothing to_be_done for `REALLYCLEAN'.
+<info>Making R:/output/logs/compile/minibuild_ido_sbs_0.0.1_armv5_helium_minibuild_ido_clean.resource_deps</info>
+<info>Executing 'C:/APPS/sbs/win32/mingw/bin/make.exe HAVE_ORDERONLY=1 -r -f "R:/output/logs/compile/minibuild_ido_sbs_0.0.1_armv5_helium_minibuild_ido_clean.resource_deps" -k -j 4  TALON_DESCRAMBLE=1 '</info>
+make.exe: Nothing to_be_done for `RESOURCE_DEPS'.
+<info>Making R:/output/logs/compile/minibuild_ido_sbs_0.0.1_armv5_helium_minibuild_ido_clean.bitmap</info>
+<info>Executing 'C:/APPS/sbs/win32/mingw/bin/make.exe HAVE_ORDERONLY=1 -r -f "R:/output/logs/compile/minibuild_ido_sbs_0.0.1_armv5_helium_minibuild_ido_clean.bitmap" -k -j 4  TALON_DESCRAMBLE=1  REALLYCLEAN'</info>
+make.exe: Nothing to_be_done for `REALLYCLEAN'.
+<info>Making R:/output/logs/compile/minibuild_ido_sbs_0.0.1_armv5_helium_minibuild_ido_clean.export</info>
+<info>Executing 'C:/APPS/sbs/win32/mingw/bin/make.exe HAVE_ORDERONLY=1 -r -f "R:/output/logs/compile/minibuild_ido_sbs_0.0.1_armv5_helium_minibuild_ido_clean.export" -k -j 4  TALON_DESCRAMBLE=1  REALLYCLEAN'</info>
+<clean bldinf='R:/sf/mw/HelloWorldAPI/group/bld.inf' mmp='' config='armv5_urel'>
+<dir>R:/epoc32/include/</dir>
+<dir>R:/sf/mw/HelloWorldAPI/inc/</dir>
+<dir>R:/epoc32/rom/include/core/mw/</dir>
+<dir>R:/sf/mw/HelloWorldAPI/rom/</dir>
+</clean>
+<clean bldinf='R:/sf/app/HelloWorldCons/group/bld.inf' mmp='' config='armv5_urel'>
+<dir>R:/epoc32/rom/include/core/app/</dir>
+<dir>R:/sf/app/HelloWorldCons/rom/</dir>
+</clean>
+make.exe: Nothing to_be_done for `REALLYCLEAN'.
+<info>Running C:/APPS/sbs/win32/bin/talonctl.exe stop</info>
+<info>The make-engine exited successfully.</info>
+<info>Run time 3 seconds</info>
+<info>Could not write toolcheck cache: 'valid'</info>
+</buildlog>

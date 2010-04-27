@@ -55,6 +55,8 @@ Description:
                     ant: antProperties()
                 </data>
             </fmpp>
+            <hlm:assertFileExists file="@{output-dir}/@{file}.status.xml" />
+            <hlm:assertFileExists file="@{output-dir}/@{file}.status.html" />
         </sequential>
     </macrodef>
 </project>

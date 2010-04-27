@@ -109,7 +109,12 @@ Description:
             <ul>
             ${entry.text}<br/>
             </ul>
-    </#list>
+            </#list>
+<#list table_info['jpa']['select distinct w FROM Component c, WhatLogEntry w WHERE c.logPathID=${logfile.id} AND c.id=w.componentID AND w.missing=1'] as entry>
+            <ul>
+MISSING: ${entry.member}<br/>
+            </ul>
+</#list>
         </span>
 <#else>
     <span class="okmessage">${logfile.path}...OK<br/></span>

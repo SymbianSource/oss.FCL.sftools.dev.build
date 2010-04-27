@@ -40,8 +40,10 @@ Description:
         </sequential>
     </macrodef>
 
+    <!--
+      Generates compilation report for diamonds. 
+     -->
     <macrodef name="calculateErrorsFromLog" uri="http://www.nokia.com/helium">
-        <attribute name="logfile"/>
         <sequential>
             <if>
                 <not>
@@ -52,7 +54,6 @@ Description:
                                  outputfile="${diamonds.build.output.dir}/compile-main.xml">
                         <data expandProperties="yes">
                             dbPath: ${metadata.dbfile}
-                            logpath: @{logfile} 
                             ant: antProperties()
                         </data>
                     </fmpp>
@@ -66,10 +67,23 @@ Description:
         <attribute name="error.limit"/>
         <attribute name="phase" default="compile"/>
         <sequential>
-            <hlm:calculateErrorsFromLog logfile="@{compile.summary.file}" />
-            <hlm:metadataCountSeverity severity="ERROR" log="@{compile.summary.file}" 
-                db="${metadata.dbfile}" 
-                property="build.errors.total"/>
+            <hlm:calculateErrorsFromLog />
+            <var name="build.errors.total" unset="true" />
+            <var name="compile.result" unset="true" />
+            <if>
+                <equals arg1="${compile.signal.input}" arg2="compileCleanSignalInput" />
+                <then>
+                    <hlm:metadataCountSeverity severity="ERROR" log="@{compile.summary.file}"
+                        db="${metadata.dbfile}"
+                        countMissing="false"
+                        property="build.errors.total"/>
+                </then>
+                <else>
+                    <hlm:metadataCountSeverity severity="ERROR" log="@{compile.summary.file}"
+                        db="${metadata.dbfile}"
+                        property="build.errors.total"/>
+                </else>
+            </if>
                 
             <echo>Errors after compile-main: ${build.errors.total}</echo>
             <echo message="${build.errors.limit}" />
@@ -127,7 +141,7 @@ if int(r'@{error.limit}') > -1:
         <attribute name="log"/>
         <sequential>
             <preset.exec executable="perl" dir="${build.drive}/" failonerror="${failonerror}">
-                <arg value="${epocroot}epoc32/tools/build/genxml.pl"/>
+                <arg value="${build.drive}/epoc32/tools/build/genxml.pl"/>
                 <arg value="-o"/>
                 <arg value="@{output}"/>
                 <arg value="-l"/>
@@ -163,7 +177,7 @@ if int(r'@{error.limit}') > -1:
                 <fileset dir="${helium.dir}/tools/common/dtd" includes="*.dtd"/>
             </copy>
             <preset.exec executable="perl" dir="${build.drive}/" failonerror="${failonerror}">
-                <arg value="${epocroot}epoc32/tools/build/genxml.pl"/>
+                <arg value="${build.drive}/epoc32/tools/build/genxml.pl"/>
                 <arg value="-s"/>
                 <arg value="${epocroot}"/>
                 <arg value="-m"/>
@@ -187,7 +201,7 @@ if int(r'@{error.limit}') > -1:
         <attribute name="filter"/>
         <sequential>
             <preset.exec executable="perl" dir="${build.drive}/" failonerror="${failonerror}">
-                <arg value="${epocroot}epoc32/tools/build/genxml.pl"/>
+                <arg value="${build.drive}/epoc32/tools/build/genxml.pl"/>
                 <arg value="-s"/>
                 <arg value="${epocroot}"/>
                 <arg value="-m"/>

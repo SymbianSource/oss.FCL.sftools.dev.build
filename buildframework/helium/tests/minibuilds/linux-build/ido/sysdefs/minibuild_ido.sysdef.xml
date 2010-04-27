@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<!DOCTYPE SystemDefinition SYSTEM "http://helium.nmp.nokia.com/trac/browser/helium/trunk/helium/tools/common/dtd/sysdef_1_4_0.dtd?format=raw">
+<SystemDefinition name="helium_minibuild_compile" schema="1.4.0">
+	<systemModel>
+		<layer name="mw_layer"/>
+		<layer name="app_layer"/>
+		<layer name="osext_layer"/>
+	</systemModel>
+    <build>
+        <option name="KEEPGOING" abldOption="-keepgoing" description="Causes make to keepgoing on errors" enable="Y"/>
+<!--    <option name="SAVESPACE" abldOption="-savespace" description="Causes the removal of intermediate files" enable="Y"/> -->
+    <target name="WINS" abldTarget="wins" description="MSVC Compiler"/>
+    <target name="WINS_REL" abldTarget="wins urel" description="MSVC Compiler"/>
+    <target name="WINS_DEB" abldTarget="wins udeb" description="MSVC Compiler"/>
+    <target name="WINSCW" abldTarget="winscw" description="CodeWarrior Compiler"/>
+    <target name="WINSCW_REL" abldTarget="winscw urel" description="CodeWarrior Compiler"/>
+    <target name="WINSCW_DEB" abldTarget="winscw udeb" description="CodeWarrior Compiler"/>
+    <target name="TOOLS" abldTarget="tools" description="MSVC Compiler for Tools"/>
+    <target name="TOOLS_REL" abldTarget="tools rel" description="MSVC Compiler for Tools Release mode only"/>
+    <target name="ARMV5" abldTarget="armv5" description="RVCT Compiler"/>
+    <target name="ARMV5_REL" abldTarget="armv5 urel" description="RVCT Compiler"/>
+    <target name="ARMV5_DEB" abldTarget="armv5 udeb" description="RVCT Compiler"/>
+
+    <!-- Aditional Targets -->
+    <target name="CWTOOLS" abldTarget="cwtools" description="CodeWarrior Compiler for Tools"/> <!-- Not supported -->
+    <target name="CWTOOLS_REL" abldTarget="cwtools rel" description="CodeWarrior Compiler for Tools Release mode only"/> <!-- Not supported -->
+    
+    <targetList name="default" description="Main Targets" target="WINSCW ARMV5"/>
+    <targetList name="default_winscw" description="Main Targets" target="WINSCW"/>
+    <targetList name="default_armv5" description="Main Targets" target="ARMV5"/>
+    <targetList name="default_rel" description="Main Targets for rel" target="WINSCW_REL ARMV5_REL"/>
+    <targetList name="default_deb" description="Main Targets for deb" target="WINSCW_DEB ARMV5_DEB"/>
+    <targetList name="default_tools" description="tools Targets" target="TOOLS"/>
+    <targetList name="tools" description="tools Targets" target="TOOLS"/>
+        <targetList name="tools_rel" description="tools Release Targets" target="TOOLS_REL"/>
+    <targetList name="cwtools" description="cwtools Targets" target="CWTOOLS"/>
+    <targetList name="cwtools_rel" description="cwtools Release Targets" target="CWTOOLS_REL"/>
+  
+	    <configuration name="helium_minibuild_ido" description="" filter="raptor_helium_minibuild_ido">
+	    	<layerRef layerName="mw_layer"/>
+	    	<layerRef layerName="app_layer"/>
+	    	<layerRef layerName="osext_layer"/>
+	    	
+	        <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+	        <task><buildLayer command="abld export" unitParallel="Y"/></task>
+	        <task><buildLayer command="abld makefile" targetList="tools" unitParallel="Y" targetParallel="Y"/></task>
+	        <task><buildLayer command="abld library" targetList="tools" unitParallel="N" targetParallel="N"/></task>
+	        <task><buildLayer command="abld target" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+	        <task><buildLayer command="abld final" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+	        <task><buildLayer command="abld -what build" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+	        <task><buildLayer command="abld -check build" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+	        <task><buildLayer command="abld makefile" targetList="default_armv5" unitParallel="Y" targetParallel="Y"/></task>
+	        <task><buildLayer command="abld resource" targetList="default_armv5" unitParallel="N" targetParallel="N"/></task>
+	        <task><buildLayer command="abld library" targetList="default_armv5" unitParallel="N" targetParallel="N"/></task>
+	        <task><buildLayer command="abld target" targetList="default_armv5" unitParallel="Y" targetParallel="Y"/></task>
+	        <task><buildLayer command="abld final" targetList="default_armv5" unitParallel="N" targetParallel="N"/></task>
+	        <task><buildLayer command="abld -what build" targetList="default_armv5" unitParallel="Y" targetParallel="Y"/></task>
+	        <task><buildLayer command="abld -check build" targetList="default_armv5" unitParallel="Y" targetParallel="Y"/></task>
+	    </configuration>
+	    
+	    <configuration name="helium_minibuild_ido_clean" description="" filter="raptor_helium_minibuild_ido_clean">
+	    	<layerRef layerName="mw_layer"/>
+	    	<layerRef layerName="app_layer"/>
+	    	<layerRef layerName="osext_layer"/>
+	        <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+	        <task><buildLayer command="abld makefile" targetList="default_armv5" unitParallel="Y" targetParallel="Y"/></task>
+	        <task><buildLayer command="abld reallyclean" targetList="default_armv5" unitParallel="Y" targetParallel="Y"/></task>
+	        <task><buildLayer command="bldmake clean" unitParallel="Y"/></task>
+	    </configuration>
+    </build>
+    
+</SystemDefinition>

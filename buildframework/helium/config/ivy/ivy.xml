@@ -52,7 +52,7 @@ Description:
         <dependency org="SWEPT" name="ant" rev="1.7" conf="core"/>
         <dependency org="SWEPT" name="java" rev="1.6" conf="core"/>
         <dependency org="SWEPT" name="perl" rev="5.6.1" conf="core"/>
-        <dependency org="SWEPT" name="python" rev="2.5" conf="core"/>
+        <dependency org="SWEPT" name="python" rev="2.6" conf="core"/>
 
         <!-- Dependency for product builds -->
         <dependency org="SWEPT" name="unzip" rev="5.40" conf="product->default"/>
@@ -62,8 +62,8 @@ Description:
         <dependency org="SWEPT" name="ccm" rev="6.5" conf="ido->default"/>
         <dependency org="SWEPT" name="codescanner" rev="[2.0,2.1]" conf="ido->default"/>
         <dependency org="SWEPT" name="java13" rev="1.3.1" conf="ido->default"/>
-        <dependency org="SWEPT" name="sbs" rev="2.4" conf="ido->default"/>
-        <dependency org="SWEPT" name="ctc" rev="6.3" conf="ido->default"/>
+        <dependency org="SWEPT" name="sbs" rev="2.12" conf="ido->default"/>
+        <dependency org="SWEPT" name="ctc" rev="6.5" conf="ido->default"/>
         
         <!-- These dependencies are not in Ibiblio Maven2 so they need to be referenced explicitly by url -->
         <dependency org="python" name="eggs_subcon" rev="1.0" conf="subcon"/>

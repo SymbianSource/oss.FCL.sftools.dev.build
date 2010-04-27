@@ -111,7 +111,7 @@ import org.apache.tools.ant.types.Reference;
                 varSet = varSet.getRefid().getReferencedObject(project);
             }
             confTool.execute(varSet,project);
-        } catch (Exception e) {
+        } catch (BuildException e) {
             self.log("Error: " + e);
             //self.log("Tool Argument Validation failure");
             throw e;
@@ -131,14 +131,8 @@ import com.nokia.ant.types.Variable;
     conETool =  ToolsProcess.getTool("ConE");
     vars = elements.get("arg");
     for (i = 0; i < vars.size(); ++i) {
-        try {
-            var = (Variable)vars.get(i);
-            conETool.storeVariables(var.getName(), var.getValue());
-        } catch (Exception e) {
-            self.log("Error: " + e);
-            //self.log("Tool Argument Validation failure");
-            throw e;
-        }
+        var = (Variable)vars.get(i);
+        conETool.storeVariables(var.getName(), var.getValue());
   }
   conETool.execute(project);
 ]]>
@@ -582,25 +576,27 @@ except Exception, e:
         <attribute name="drive"/>
         <attribute name="failonerror"/>
 """ internal.codescanner.drive """
-import fileutils
-self.setTaskName('unsubst')
-drive = attributes.get('drive')
-failonerror = attributes.get('failonerror')
-if (failonerror == None or str(failonerror) == "true"):
-    failonerror = True
-else:
-    failonerror = False
-if drive == None or len(str(drive)) != 2:
-    raise Exception("'drive' attribute is missing or invalid. " + str(drive))
-drive = str(drive)
-try:
-    self.log(str("Unsubsting %s..." % drive))
-    fileutils.unsubst(drive)
-except Exception, e:
-    if failonerror:
-        raise e
+import os
+if os.sep == '\\':
+    import fileutils
+    self.setTaskName('unsubst')
+    drive = attributes.get('drive')
+    failonerror = attributes.get('failonerror')
+    if (failonerror == None or str(failonerror) == "true"):
+        failonerror = True
     else:
-        self.log(str("Error: %s" % e))
+        failonerror = False
+    if drive == None or len(str(drive)) != 2:
+        raise Exception("'drive' attribute is missing or invalid. " + str(drive))
+    drive = str(drive)
+    try:
+        self.log(str("Unsubsting %s..." % drive))
+        fileutils.unsubst(drive)
+    except Exception, e:
+        if failonerror:
+            raise e
+        else:
+            self.log(str("Error: %s" % e))
     </scriptdef>
     
     <!-- Touches the files in the paths given. -->

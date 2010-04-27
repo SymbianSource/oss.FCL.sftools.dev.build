@@ -16,5 +16,5 @@ rem
 rem Description: 
 rem
 
-..\..\..\..\helium\hlm.bat %*
+..\..\..\hlm.bat %*
 

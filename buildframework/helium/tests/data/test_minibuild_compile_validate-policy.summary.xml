@@ -1,0 +1,5 @@
+<?xml version="1.0"?>
+<policyvalidation>
+    <error type="missing" message="s60\test\tools\uitools\DOM" value="None"/>
+    <error type="missing" message="s60\test\tools\uitools\DOM\SAX2DOM" value="None"/>
+</policyvalidation>

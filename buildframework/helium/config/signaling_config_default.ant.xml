@@ -169,20 +169,6 @@ Description:
         <hlm:notifierListRef refid="defaultFailNotifier" />
     </hlm:signalInput>
 
-    <hlm:signalInput id="testSBSScanlogInput" failbuild="now">
-        <hlm:notifierListRef refid="defaultFailNotifier" />
-    </hlm:signalInput>
-
-    <hlm:signalListenerConfig id="testSBSScanlog" target="test-scanlog-metadata-1" message="sbs scanlog processed">
-        <hlm:targetCondition>
-            <hlm:hasSeverity severity="error" file="${env.TEMP}/signals/test-scanlog-metadata-1.log.status.xml" />
-        </hlm:targetCondition>
-        <signalNotifierInput>
-            <signalInput refid="testSBSScanlogInput" />
-            <notifierInput file = "${env.TEMP}/signals/test-scanlog-metadata-1.log.status.html" />
-        </signalNotifierInput>
-    </hlm:signalListenerConfig>
-
     <hlm:signalListenerConfig id="prepWorkAreaSignal" target="prep-work-area" message="Errors happened during Preparing Work Area">
         <hlm:targetCondition>
             <hlm:hasSeverity severity="error" file="${build.cache.log.dir}/signals/${build.id}_ccm_get_input.log.status.xml" />
@@ -416,4 +402,19 @@ Description:
             </notifierInput>
         </signalNotifierInput>
     </hlm:signalListenerConfig>
+    
+    <hlm:signalExceptionConfig id="signal.exception.post.build">
+        <hlm:notifierList>
+            <hlm:executeTaskNotifier>
+                <if>                
+                    <isset property="exceptions.target" />
+                    <then>
+                        <runtarget target="${exceptions.target}" />
+                    </then>
+                </if>
+            </hlm:executeTaskNotifier>
+        </hlm:notifierList>
+    </hlm:signalExceptionConfig>
 </project>
+
+            

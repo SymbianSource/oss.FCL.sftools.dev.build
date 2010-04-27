@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : build.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="helium-antlib-unittestvalid-buildstatus" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>Helium Antlib Logging unittests.</description>
+    <property environment="env"/>
+    <property name="step1" value="1" />
+    <property name="step2" value="1" />
+        
+    <taskdef resource="com/nokia/helium/logger/ant/antlib.xml" uri="http://www.nokia.com/helium" />
+    
+    <hlm:stage id="stage1" starttarget="stage1" endtarget="stage1" />
+    <hlm:stage id="stage2" starttarget="stage2" endtarget="stage3" />
+    
+    <hlm:stagerecord id="record.default" defaultoutput="${temp.dir}/main.ant.log" loglevel="info" />
+    <hlm:stagerecord id="record.stage1"  stagerefid="stage1" output="${temp.dir}/stage1.ant.log" loglevel="info" />
+    <hlm:stagerecord id="record.stage2"  stagerefid="stage2" output="${temp.dir}/stage2.ant.log" loglevel="info" />
+
+    <target name="start-ant-log">
+        <hlm:triggerlogger/> 
+    </target>
+
+    <target name="failure" depends="start-ant-log">
+        <echo>Main log start step1</echo>
+        <antcall target="stage1" />
+        <echo>Main log start step2</echo>
+    </target>
+    
+    <target name="success" depends="start-ant-log">
+        <echo>Main log start step1</echo>
+        <antcall target="stage2" />
+    </target>
+
+    <target name="stage1" depends="inter-stage-fail">
+        <echo>In stage1 (${step1})</echo>
+    </target>
+
+    <target name="stage2" depends="inter-stage-success">
+        <echo>In stage2 (${step2})</echo>
+    </target>
+    
+    <target name="inter-stage-fail">
+        <fail message="I am failing here" />
+    </target>
+    
+    <target name="stage3">
+        <fail message="In stage3 (${step1})" />
+    </target>
+    
+    <target name="inter-stage-success">
+        <echo message="I am success here" />
+    </target>
+    
+</project>

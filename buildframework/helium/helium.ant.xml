@@ -24,11 +24,10 @@ Description:
     <description>
     Main full build targets and properties
     </description>
-    
-    <import file="build-jar.ant.xml"/>
+    <property environment="env" />
     
     <!-- Load the current Helium version. -->
-    <!-- @property helium.version
+    <!--* @property helium.version
     @type string
     @scope private
     -->
@@ -78,9 +77,12 @@ Description:
     
     <!-- If build.drive not define then search the next free drive -->
     <if>
-        <not>
-            <isset property="build.drive"/>
-        </not>    
+        <and>
+            <not>
+                <isset property="build.drive"/>
+            </not>    
+            <os family="windows"/>
+        </and>
         <then>
             <!-- used to track if build.drive has predefined or not
             @type flag
@@ -99,6 +101,15 @@ Description:
             <echo> Using build drive ${build.drive} </echo>
         </then>
     </if>
+    
+    <!-- For unix os prep.build.dir is equivalent to build.drive -->
+    <condition property="prep.build.dir" value="${build.drive}">
+        <and>
+            <isset property="build.drive"/>
+            <os family="unix"/>
+        </and>
+    </condition>
+    
     
     <if>
         <and>
@@ -119,6 +130,16 @@ Description:
         </else>
     </if>
     
+    <!--* @property read.build.int
+    If defined, indicates that the build number should be read from an incrementing text file.
+    @type string
+    @scope public
+    -->
+    <!--* @property build.tag
+    If defined, defines the prefix for the build number when it is read from an incrementing text file.
+    @type string
+    @scope public
+    -->
     <if>
         <and>
             <isset property="read.build.int"/>
@@ -269,6 +290,17 @@ ${build.int.db.file.comments}
     @type string
     @scope private
     -->
+    
+    <!-- If build.drive not define then prep.buil.dir is the value for build.drive for unix os -->
+    <condition property="build.drive" value="${prep.build.dir}">
+        <and>
+            <not>
+                <isset property="build.drive"/>
+            </not>    
+            <os family="unix"/>
+        </and>
+    </condition>
+    
     <property name="build.output.dir" location="${build.drive}/output"/>
     <!-- This is where the diamonds output XML files are stored.
     @type string
@@ -327,9 +359,9 @@ ${build.int.db.file.comments}
     @scope private
     -->
     <property name="temp.build.dir" location="${build.output.dir}/temp_build_files"/>
-    <!-- failonerror attribute for exec
+    <!-- The 'failonerror' attribute for exec tasks.
     @type boolean
-    @scope private
+    @scope public
     -->
     <property name="failonerror" value="false"/>
     <!-- Maximum allowable errors in a build.
@@ -532,7 +564,7 @@ ${build.int.db.file.comments}
             <property file="${build.property.cache.file}"/>
         </then>
     </if>
-
+    
 
     <!-- Default number of threads is 2 * NUMBER_OF_PROCESSORS, but this can be overridden by defining the
     property manually. -->
@@ -571,6 +603,12 @@ ${build.int.db.file.comments}
     @scope public
     -->
      
+    <!--* @property diamonds.build.tags
+    
+    @type string
+    @editable optional
+    @scope public
+    -->
 
     <!-- Import basic targets.
         

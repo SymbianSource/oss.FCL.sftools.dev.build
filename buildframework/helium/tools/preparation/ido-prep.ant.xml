@@ -63,32 +63,54 @@ Description:
     <!-- Internal target that generates the '''ado.mapping.file'''.
      It is a INI file that contains ADO location as a key and target location as value.
     -->
-    <target name="ido-create-ado-mapping">        
+    <target name="ido-create-ado-mapping">
         <mkdir dir="${build.output.dir}/build"/>
         <mkdir dir="${temp.build.dir}"/>
-        <tempfile property="prep.dynamic.sysdef.config" suffix=".txt" deleteonexit="false" destdir="${temp.build.dir}"/>
-        <trycatch property="error.message">
-            <try>
-                <hlm:referenceToFileMacro refid="system.definition.files" output="${prep.dynamic.sysdef.config}"/>
-            </try>
-            <catch>       
-                <propertyregex property="message" input="${error.message}"
-                  regexp=":(.*)$"
-                  select="\1" casesensitive="false" />
-                <fail message="Error: ${message}" />     
-            </catch>               
-        </trycatch>
-        <trycatch>
-            <try>
-                <pathconvert pathsep="," property="ado.quality.dirs.path">
-                    <dirset refid="ado.quality.dirs"/>
-                </pathconvert>                              
-            </try>
-        </trycatch>
-        <script language="jython" setbeans="false">
+        <if>
+            <istrue value="${schema.new}" />
+            <then>
+                <hlm:createPackageMapping epocroot="${build.drive}" destFile="${ado.mapping.file}">
+                    <path refid="system.definition.files" />
+                </hlm:createPackageMapping>
+                <if>
+                    <isreference refid="ado.quality.dirs" />
+                    <then>
+                        <hlm:createPackageMapping epocroot="${build.drive}" destFile="${ado.quality.mapping.file}"
+                            filterDirSet="ado.quality.dirs" >
+                            <path refid="system.definition.files" />
+                        </hlm:createPackageMapping>
+                    </then>
+                    <else>
+                        <copy file="${ado.mapping.file}" tofile="${ado.quality.mapping.file}" overwrite="true" />
+                    </else>
+                </if>
+            </then>
+            <else>
+                <tempfile property="prep.dynamic.sysdef.config" suffix=".txt" deleteonexit="false" destdir="${temp.build.dir}"/>
+                <trycatch property="error.message">
+                    <try>
+                        <hlm:referenceToFileMacro refid="system.definition.files" output="${prep.dynamic.sysdef.config}"/>
+                    </try>
+                    <catch>       
+                        <propertyregex property="message" input="${error.message}"
+                          regexp=":(.*)$"
+                          select="\1" casesensitive="false" />
+                        <fail message="Error: ${message}" />     
+                    </catch>               
+                </trycatch>
+                <trycatch>
+                    <try>
+                        <pathconvert pathsep="," property="ado.quality.dirs.path">
+                            <dirset refid="ado.quality.dirs"/>
+                        </pathconvert>                              
+                    </try>
+                </trycatch>
+                <script language="jython" setbeans="false">
 import idoprep
 idoprep.create_ado_mapping(project.getProperty(r"prep.dynamic.sysdef.config"), project.getProperty(r"ado.mapping.file"), project.getProperty(r"ado.quality.mapping.file"), project.getProperty(r"build.drive"), project.getProperty("ado.quality.dirs.path"))
-        </script>
+                </script>
+            </else>
+        </if>
     </target>
     
     <!-- Target to generate cenreps using cone tool -->
@@ -172,6 +194,19 @@ idoprep.create_ado_mapping(project.getProperty(r"prep.dynamic.sysdef.config"), p
         <hlm:generateBuildStatus file="${build.id}_cenrep.cone.log" />
     </target>
     
+    <!--* @property keep.internals
+    Set to 'true' so ido-prep-copy includes 'internal' directories.
+    @type boolean
+    @scope public
+    -->
+
+    <!--* @property ido.prep.copy.template
+    Defines which template to use in order to achive the package copying.
+    @type boolean
+    @scope public
+    -->
+    <property name="ido.prep.copy.template" location="${helium.dir}/tools/common/templates/ido/ido-ant-copy.xml.ftl" />
+    
     <!-- Target that uses the information from the system.definition.files to prepare the IDO build area.
         It relies on the fact that layer_real_source_path entity is declared in each ADO configuration.
         
@@ -181,25 +216,7 @@ idoprep.create_ado_mapping(project.getProperty(r"prep.dynamic.sysdef.config"), p
     <target name="ido-prep-copy" depends="ido-create-ado-mapping">
         <mkdir dir="${temp.build.dir}"/>
         <tempfile property="prep.dynamic.config" suffix=".xml" deleteonexit="false" destdir="${temp.build.dir}"/>
-        
-        <!-- new implementation that only rely on Ant -->
-        <fmpp sourceFile="${helium.dir}/tools/common/templates/ido/ido-ant-delete.xml.ftl"
-                     outputFile="${prep.dynamic.config}.clean.xml">
-            <data expandProperties="yes">
-                    inputfile: antProperty(ado.mapping.file)
-                    ant: antProperties()
-                        data: eval('
-                                java.io.FileInputStream pin = new java.io.FileInputStream(filename);
-                                java.util.Properties props = new java.util.Properties();
-                                props.load(pin);
-                                return props;
-                                ', {filename:get(inputfile)})
-            </data>
-        </fmpp>
-        <ant antfile="${prep.dynamic.config}.clean.xml"/>
-        
-        <!-- new implementation that only rely on Ant -->
-        <fmpp sourceFile="${helium.dir}/tools/common/templates/ido/ido-ant-copy.xml.ftl"
+        <fmpp sourceFile="${ido.prep.copy.template}"
             outputFile="${prep.dynamic.config}">
             <data expandProperties="yes">
                 inputfile: antProperty(ado.mapping.file)
@@ -287,9 +304,12 @@ config = configuration.PropertiesConfiguration(stream=open(str(project.getProper
 prefix = pathaddition.relative.commonprefix(config.keys())
 if not os.path.exists(prefix):
     raise Exception("Could not find common prefix for the following paths:\n" + "\n".join(config.keys()))
-self.log(str('Substing %s' % prefix))
-drive = fileutils.get_next_free_drive()
-fileutils.subst(drive, prefix)
+if os.sep == '\\':
+    self.log(str('Substing %s' % prefix))
+    drive = fileutils.get_next_free_drive()
+    fileutils.subst(drive, prefix)
+else:
+    drive = prefix
 project.setProperty('internal.codescanner.drive', drive)
 
 # creating the structure form subst drive.
@@ -302,12 +322,21 @@ for location in config.keys():
     pe.setPath(location)
 project.addReference('substed.ado.src.path', path)
         </script>
-        <hlm:codescanner dest="${ido.codescanner.output.dir}"
-            format="${ido.codescanner.output.type}"
-            configuration="${ido.codescanner.config}">
-            <path refid="substed.ado.src.path"/>
-        </hlm:codescanner>
-        <hlm:unsubst drive="${internal.codescanner.drive}"/>
+        <trycatch property="codescanner.thrown">
+            <try>
+                <hlm:codescanner dest="${ido.codescanner.output.dir}"
+                    format="${ido.codescanner.output.type}"
+                    configuration="${ido.codescanner.config}">
+                    <path refid="substed.ado.src.path"/>
+                </hlm:codescanner>
+            </try>
+            <catch>
+                <fail message="${codescanner.thrown}" />
+            </catch>
+            <finally>
+                <hlm:unsubst drive="${internal.codescanner.drive}"/>
+            </finally>
+        </trycatch>
     </target>
 
         <!-- CMT Tool target. Complexity tool measures. Supported options for cmt tool macro is
@@ -445,7 +474,7 @@ project.addReference('substed.ado.src.path', path)
     -->
     <!--* @property s60.grace.usetickler
         Enable the detection of ready release using GRACE tickler mechanism.
-        @type string
+        @type boolean
         @editable required
         @scope public
     -->
@@ -479,8 +508,13 @@ if version is None or version.strip() != resultname:
         <tstamp>
             <format property="getenv.tstamp" pattern="yyyyMMddHHmmss"/>
         </tstamp>
+        <!-- For linux build prep.build.dir value should not be changed as 
+        as prep.build.dir <==> build.drive -->
+        <condition property="ba.root.dir" value="${prep.build.dir}" else="${prep.root.dir}/${getenv.tstamp}_${s60.getenv.release}">
+            <os family="unix"/>
+        </condition>
         <antcall target="init-drive">
-            <param name="prep.build.dir" location="${prep.root.dir}/${getenv.tstamp}_${s60.getenv.release}"/>            
+            <param name="prep.build.dir" location="${ba.root.dir}"/>            
         </antcall>
         <antcall target="preparation-getenv">
             <param name="base_release.path" value="${s60.getenv.path}"/>
@@ -567,7 +601,7 @@ project.setProperty('ido.variant.package', os.path.join(rel_path, variant_pkg))
             }
             self.log("Creating reference: " + attributes.get("pathid"));
             project.addReference(attributes.get("pathid"), path);
-        } catch (Exception e) {
+        } catch (java.io.IOException e) {
             throw new org.apache.tools.ant.BuildException(e);
         }
     </scriptdef>

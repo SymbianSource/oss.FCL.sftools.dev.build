@@ -46,14 +46,14 @@ Description:
                 <set name="include" value="**"/>
                 <set name="exclude" value="**/_ccmwaid.inf"/>
             </config>
-            <config>
+            <!--config>
 	            <set name="root.dir" value="${build.drive}\"/>
                 <set name="name" value="sf_app_organizer_clock_binary"/>
                 <set name="scanners" value="abld.what"/>
                 <set name="abld.buildpath" value="${clock.dir}\group"/>
                 <set name="include" value="**"/>
                 <set name="exclude" value="**/_ccmwaid.inf"/>
-            </config>
+            </config-->
             <config>
 	            <set name="root.dir" value="${build.drive}/"/>
                 <set name="name" value="sf_mw_classicui_and_app_radio"/>

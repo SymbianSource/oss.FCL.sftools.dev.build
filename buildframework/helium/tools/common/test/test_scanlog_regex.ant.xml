@@ -1,0 +1,805 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : test_scanlog_regex.ant.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test-scanlog-regex" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>
+        Testing scanlog dictionary
+    </description>
+    <property environment="env"/>
+    <property name="helium.dir" location="../../.." />
+    <import file="../../../helium.ant.xml"/>
+
+    <target name="test-scanlog-metadata-regex-1">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="CRITICAL" string="test Error: test error mingw_make.exe test error">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-2">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="ERROR" string="ant: cannot create regular file">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-3">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="ERROR" string="): Missing file:abcd">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-4">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="ERROR" string=" 1002) ERROR: test error">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-5">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="ERROR" string=" *** ERROR: test error">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-6">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="ERROR" string="ABCD is not recognized as an internal or external command">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-7">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="ERROR" string="MISSING:ABCD">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-8">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="ERROR" string="FLEXlm error: test error">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-9">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="ERROR" string="ABLD ERROR: test error">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-10">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="ERROR" string="BLDMAKE ERROR: test error">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-11">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="ERROR" string="FATAL ERROR(S): test error">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-12">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="ERROR" string="fatal error C1001: INTERNAL COMPILER ERROR">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-13">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="ERROR" string="fatal error U1077">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-14">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="ERROR" string="fatal error, this is really fatal">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-15">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="ERROR" string="warning U4010">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-16">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="ERROR" string="make.exe [1923]: ***">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-17">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="ERROR" string="make [1938]: ***">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-18">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="ERROR" string="make.exe[1938]: not remade"> 
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-19">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="ERROR" string="make.exe: not remade"> 
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-20">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="ERROR" string="make.exe: *** no rule"> 
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-21">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="ERROR" string="make.exe: *** No rule"> 
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-22">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="ERROR" string='""" "" , line 1: Error: 93:"'>
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-23">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="ERROR" string="error: Internal fault: test">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-24">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="ERROR" string="Exception: STATUS_ACCESS_VIOLATION">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-25">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="ERROR" string="ERROR: test error">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-26">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="ERROR" string="Error: test error">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-27">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="ERROR" string="ERROR&#09;test error">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-28">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="ERROR" string="elf2e32: Error: test error">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-29">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="ERROR" string="no such file or directory">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-30">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="ERROR" string="No such file or directory">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-31">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="ERROR" string="Exception: _test_exception__">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-32">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="ERROR" string="target abcd given more than once in the same rule">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-33">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="ERROR" string="ERROR EC102:">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-34">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="ERROR" string="ERROR EC102:">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-35">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="ERROR" string="Errors caused tool to abort.">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-36">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="ERROR" string="Traceback (most recent call last)">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-37">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="ERROR" string="Application encountered an unexpected error. Stopping.">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-38">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="ERROR" string="Unable to write dump file abcd">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-39">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="ERROR" string="Unable to connect to CM: test">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-40">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="ERROR" string="error : Incorrect slash in file">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-41">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="ERROR" string="error: Incorrect case for epoc32 tree in ">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-42">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="ERROR" string=": Incorrect case versus exclusion list in ">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-43">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="ERROR" string="The system cannot find the path specified">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-44">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="CRITICAL" string="Warning: #111-D">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-45">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="CRITICAL" string="Warning: #1166-D">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-46">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="CRITICAL" string="Warning: #117-D">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-47">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="CRITICAL" string="Warning: #128-D">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-48">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="CRITICAL" string="Warning: #1293-D">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-49">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="CRITICAL" string="Warning: #1441-D">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-50">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="CRITICAL" string="Warning: #170-D">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-51">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="CRITICAL" string="Warning: #174-D">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-52">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="CRITICAL" string="Warning: #175-D">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-53">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="CRITICAL" string="Warning: #185-D">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-54">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="CRITICAL" string="Warning: #186-D">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-55">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="CRITICAL" string="Warning: #223-D">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-56">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="CRITICAL" string="Warning: #231-D">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-57">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="CRITICAL" string="Warning: #257-D">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-58">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="CRITICAL" string="Warning: #284-D">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-59">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="CRITICAL" string="Warning: #368-D">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-60">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="CRITICAL" string="Warning: #414-D">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-61">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="CRITICAL" string="Warning: #430-D">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-62">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="CRITICAL" string="Warning: #47-D">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-63">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="CRITICAL" string="Warning: #514-D">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-64">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="CRITICAL" string="Warning: #546-D">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-65">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="CRITICAL" string="Warning: #68-D">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-66">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="CRITICAL" string="Warning: #69-D">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-67">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="CRITICAL" string="Warning: #830-D">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-68">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="CRITICAL" string="Warning: #940-D">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-69">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="CRITICAL" string="Warning: #836-D">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-70">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="CRITICAL" string="Warning: A1495E">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-71">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="CRITICAL" string="Warning: L6318W">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-72">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="CRITICAL" string="Warning: C2874W">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-73">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="CRITICAL" string="Warning: C4127">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-74">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="CRITICAL" string="Warning: C4355">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-75">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="CRITICAL" string="Warning: C4530">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-76">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="CRITICAL" string="Warning: C4702">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-77">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="CRITICAL" string="Warning: C4786">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-78">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="CRITICAL" string="Warning: LNK4049">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-79">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="WARNING" string="\\(1) : Warning: (100)">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-80">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="WARNING" string="100) : WARNING: test">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-81">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="WARNING" string="BLDMAKE WARNING: test">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-82">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="WARNING" string="MAKEDEF WARNING: test">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-83">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="WARNING" string="WARNING: test">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-84">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="WARNING" string="(1738) : warning C">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-85">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="WARNING" string="178: warning:">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-86">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="WARNING" string="Usage Warning:">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-87">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="WARNING" string="mwld.exe: test error">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-88">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="WARNING" string="Command line warning">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-89">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="WARNING" string="ERROR: bad relocation:">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-90">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="WARNING" string="1010 warning">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-91">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="WARNING" string="EventType: Error Source: SweepNT">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-92">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="WARNING" string="WARN&#09; warning">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-93">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="WARNING" string="LINK : warning">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-94">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="WARNING" string="elf2e32 : Warning : ">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-95">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="WARNING" string="Warning: test warning">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-96">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="REMARK" string='""" "", line 100: Warning: 1010:'>
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-97">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="REMARK" string="Command line warning D4025 : ">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-98">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="REMARK" string="REMARK: this is a test remark">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-99">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="REMARK" string="EventType: Error Source: GNU Make">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-100">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="REMARK" string=":37: warning: cannot find matching deallocation function">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-101">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="REMARK" string=":87: note: ">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-102">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="REMARK" string=": note: ">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-103">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="INFO" string="INFO: this is info">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-104">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="WARNING" string="line 1: Warning:', r': warning abcd:">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-105">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="REMARK" string='"blabla", line 786: Warning: 17264:'>
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-106">
+        <au:assertFalse>
+            <hlm:metadataRegexTest severity="WARNING" string='""", line 786: Warning: A1495E 1730:'>
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertFalse>
+    </target>
+    <target name="test-scanlog-metadata-regex-107">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="WARNING" string="Warning: test warning">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-108">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="ERROR" string="Error: test error">
+                <hlm:metadatafilterset refid="filterset.sbs"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    
+    
+    <target name="test-scanlog-metadata-regex-abld-not-supported">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="ERROR" string="ABLD is not supported with this build">
+                <hlm:metadatafilterset refid="filterset.compile"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+
+    <target name="test-scanlog-metadata-regex-bldmake-not-supported">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="ERROR" string="bldmake script can not be used in this env">
+                <hlm:metadatafilterset refid="filterset.compile"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    
+</project>

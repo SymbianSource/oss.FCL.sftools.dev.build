@@ -1,0 +1,338 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<buildlog sbs_version="2.12.5 [2010-03-18 symbian build system 7006bcce5299]" xmlns="http://symbian.com/xml/build/log" xmlns:progress="http://symbian.com/xml/build/log/progress" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symbian.com/xml/build/log http://symbian.com/xml/build/log/1_0.xsd">
+<info>sbs: version 2.12.5 [2010-03-18 symbian build system 7006bcce5299]
+</info>
+<info>SBS_HOME /APPS/sbs</info>
+<info>Set-up /APPS/sbs/sbs_init.xml</info>
+<info>Command-line-arguments -s m:\output\build\canonical_system_definition_helium_minibuild_ido.xml --logfile m:\output\logs\compile\minibuild_ido_sbs_0.0.10_helium_minibuild_ido_input.compile.log -c armv5 --filters=FilterMetadataLog -k -j 1 --makefile=m:\output\logs\compile/minibuild_ido_sbs_0.0.10_armv5_helium_minibuild_ido</info>
+<info>Current working directory m:\</info>
+<info>Environment ALLUSERSPROFILE=C:\Documents and Settings\All Users</info>
+<info>Environment ANT_ARGS=-lib "E:\Build_E\username\workspace\helium-trunk\helium\external\antlibs2" -logger com.nokia.ant.HeliumLogger   -listener com.nokia.helium.diamonds.ant.HeliumListener  -listener com.nokia.helium.internaldata.ant.listener.Listener  -Dant.executor.class=com.nokia.helium.core.ant.HeliumExecutor  -listener com.nokia.helium.logger.ant.listener.StatusAndLogListener  -listener com.nokia.helium.core.ant.listener.TargetTimesLogGeneratorListener</info>
+<info>Environment ANT_CMD_LINE_ARGS=-Dhelium.dir "E:\Build_E\username\workspace\helium-trunk\helium" -Dcache.dir "e:\ec_temp\helium\username" -Dbuild.drive m: -Dbuild.number 10 prep-copy compile-main</info>
+<info>Environment ANT_HOME=C:\APPS\ant_1.7</info>
+<info>Environment ANT_OPTS=-Xmx896M -Dlog4j.configuration=com/nokia/log4j.xml -Dlog4j.cache.dir=e:\ec_temp\helium\username  -Dpython.path=E:\Build_E\username\workspace\helium-trunk\helium\external\python\lib\2.5\jython-2.5-py2.5.egg;E:\Build_E\username\workspace\helium-trunk\helium\external\python\lib\2.6\4Suite_XML-1.0.2-py2.6-win32.egg;E:\Build_E\username\workspace\helium-trunk\helium\external\python\lib\2.6\PyXML-0.8.4-py2.6-win32.egg;E:\Build_E\username\workspace\helium-trunk\helium\external\python\lib\2.6\lxml-2.2.1-py2.6-win32.egg;E:\Build_E\username\workspace\helium-trunk\helium\external\python\lib\auto\4Suite_XML-1.0.2.py2.6-win32.egg;E:\Build_E\username\workspace\helium-trunk\helium\external\python\lib\auto\Jinja2-2.2.1.egg;E:\Build_E\username\workspace\helium-trunk\helium\external\python\lib\auto\PyRTF-0.45.egg;E:\Build_E\username\workspace\helium-trunk\helium\external\python\lib\auto\amara-1.2.0.1.egg;E:\Build_E\username\workspace\helium-trunk\helium\external\python\lib\auto\dp-1.0.egg;E:\Build_E\username\workspace\helium-trunk\helium\external\python\lib\auto\lxml-2.2.1.py2.6-win32.egg;E:\Build_E\username\workspace\helium-trunk\helium\external\python\lib\auto\mocker-0.10.1.egg;E:\Build_E\username\workspace\helium-trunk\helium\external\python\lib\auto\path-2.2.egg;E:\Build_E\username\workspace\helium-trunk\helium\external\python\lib\auto\pythoncore-1.0.egg;E:\Build_E\username\workspace\helium-trunk\helium\external\python\lib\auto\pythonnokia-1.0.egg;E:\Build_E\username\workspace\helium-trunk\helium\external\python\lib\common\Amara-1.2.0.1-py2.5.egg;E:\Build_E\username\workspace\helium-trunk\helium\external\python\lib\common\Jinja-1.2-py2.5-win32.egg;E:\Build_E\username\workspace\helium-trunk\helium\external\python\lib\common\Jinja2-2.2.1-py2.5.egg;E:\Build_E\username\workspace\helium-trunk\helium\external\python\lib\common\Pygments-0.10-py2.5.egg;E:\Build_E\username\workspace\helium-trunk\helium\external\python\lib\common\coverage-2.85-py2.5.egg;E:\Build_E\username\workspace\helium-trunk\helium\external\python\lib\common\epydoc-3.0beta1-py2.5.egg;E:\Build_E\username\workspace\helium-trunk\helium\external\python\lib\common\mocker-0.10.1-py2.5.egg;E:\Build_E\username\workspace\helium-trunk\helium\external\python\lib\common\nose-0.11.1-py2.6.egg;E:\Build_E\username\workspace\helium-trunk\helium\external\python\lib\common\path-2.2-py2.5.egg;E:\Build_E\username\workspace\helium-trunk\helium\external\python\lib\common\setuptools-0.6c5-py2.5.egg;E:\Build_E\username\workspace\helium-trunk\helium\external\python\lib\common\simplejson-1.9.1-py2.5-win32.egg;;E:\Build_E\username\workspace\helium-trunk\helium\external\python\lib\auto;E:\Build_E\username\workspace\helium-trunk\helium\external\python\lib\2.6;E:\Build_E\username\workspace\helium-trunk\helium\external\python\lib\common;E:\Build_E\username\workspace\helium-trunk\helium\tools\common\python\scripts;E:\Build_E\username\workspace\helium-trunk\helium\extensions\nokia\external\python\lib\2.6;E:\Build_E\username\workspace\helium-trunk\helium\extensions\nokia\tools\common\python\lib;C:\APPS\sbs\python</info>
+<info>Environment APPDATA=C:\Documents and Settings\username\Application Data</info>
+<info>Environment APR_ICONV_PATH=C:\Program Files\Subversion\iconv</info>
+<info>Environment ARMROOT=\</info>
+<info>Environment ARMV5VER=:ARM/Thumb C/C++ Compiler, RVCT2.2 [Build 686]</info>
+<info>Environment CLIENTNAME=4FIL41920</info>
+<info>Environment CLUSTERLOG=C:\ETPWIN\Cluster\cluster.log</info>
+<info>Environment CMTHOME=C:\APPS\cmt</info>
+<info>Environment COMMONPROGRAMFILES=C:\Program Files\Common Files</info>
+<info>Environment COMPUTERNAME=TRWEC089</info>
+<info>Environment COMSPEC=C:\ETPWIN\system32\cmd.exe</info>
+<info>Environment COPYCMD=/y</info>
+<info>Environment CTCHOME=C:\APPS\ctc</info>
+<info>Environment CTC_AGENT_DEBUG=*</info>
+<info>Environment CYGWIN=nontsec nosmbntsec</info>
+<info>Environment DERBY_HOME=C:\APPS\jdk_1.6.0_11\JavaDB</info>
+<info>Environment DIAMONDS_ANT_ARGS= -listener com.nokia.helium.diamonds.ant.HeliumListener</info>
+<info>Environment EMAKEFLAGS=--emake-reg-roots=-\HKEY_CLASSES_ROOT</info>
+<info>Environment EMAKE_CM=trwec001</info>
+<info>Environment EMAKE_EMULATION=symbian</info>
+<info>Environment EMAKE_ROOT=\;C:\apps</info>
+<info>Environment EPOCROOT=\</info>
+<info>Environment FLEXLM_BATCH=1</info>
+<info>Environment FLEXLM_TIMEOUT=900000</info>
+<info>Environment FP_NO_HOST_CHECK=NO</info>
+<info>Environment HELIUM_CACHE_DIR=e:\ec_temp\helium\username</info>
+<info>Environment HELIUM_HOME=E:\Build_E\username\workspace\helium-trunk\helium</info>
+<info>Environment HLM_RVCT_VERSION=22_686</info>
+<info>Environment HOME=h:\</info>
+<info>Environment HOMEDRIVE=C:</info>
+<info>Environment HOMEPATH=\Documents and Settings\username</info>
+<info>Environment HOSTPLATFORM=win 32</info>
+<info>Environment HOSTPLATFORM_DIR=win32</info>
+<info>Environment INCLUDE=C:\APPS\MSVC6\VC98\ATL\Include\;C:\APPS\MSVC6\VC98\MFC\Include\;C:\APPS\MSVC6\VC98\Include\</info>
+<info>Environment INTERNAL_DATA_ANT_ARGS= -listener com.nokia.helium.internaldata.ant.listener.Listener</info>
+<info>Environment JAVA_1_3_1_HOME=C:\apps\j2sdk_1.3.1_06</info>
+<info>Environment JAVA_5_HOME=C:\APPS\jdk_1.5.0_17</info>
+<info>Environment JAVA_6_HOME=C:\APPS\jdk_1.6.0_11</info>
+<info>Environment JAVA_HOME=C:\APPS\jdk_1.6.0_11</info>
+<info>Environment LIB=C:\APPS\MSVC6\VC98\MFC\Lib\;C:\APPS\MSVC6\VC98\Lib\</info>
+<info>Environment LOGGING_ANT_ARGS= -listener com.nokia.helium.logger.ant.listener.StatusAndLogListener</info>
+<info>Environment LOGONSERVER=\\SYWDC101</info>
+<info>Environment MSDEVDIR=C:\APPS\MSVC6\Common\MSDev98</info>
+<info>Environment MWCSYM2INCLUDES=C:\APPS\carbide\x86Build\Symbian_Support\MSL\MSL_C\MSL_Common\Include;C:\APPS\carbide\x86Build\Symbian_Support\MSL\MSL_C\MSL_Win32\Include;C:\APPS\carbide\x86Build\Symbian_Support\MSL\MSL_C\MSL_X86;C:\APPS\carbide\x86Build\Symbian_Support\MSL\MSL_C++\MSL_Common\Include;C:\APPS\carbide\x86Build\Symbian_Support\MSL\MSL_Extras\MSL_Common\Include;C:\APPS\carbide\x86Build\Symbian_Support\MSL\MSL_Extras\MSL_Win32\Include;C:\APPS\carbide\x86Build\Symbian_Support\Win32-x86 Support\Headers\Win32 SDK</info>
+<info>Environment MWSYM2LIBRARIES=C:\APPS\carbide\x86Build\Symbian_Support\Win32-x86 Support\Libraries\Win32 SDK;C:\APPS\carbide\x86Build\Symbian_Support\Runtime\Runtime_x86\Runtime_Win32\Libs</info>
+<info>Environment MWSYM2LIBRARYFILES=MSL_All_MSE_Symbian_D.lib;gdi32.lib;user32.lib;kernel32.lib;</info>
+<info>Environment NOKIA_LICENSE_FILE=C:\APPS\licenses\emea.dat;</info>
+<info>Environment NUMBER_OF_PROCESSORS=12</info>
+<info>Environment OS=Windows_NT</info>
+<info>Environment PATH=C:\APPS\sbs\win32\mingw\bin;C:\APPS\sbs\win32\cygwin\bin;C:\APPS\sbs\win32\bin;C:\APPS\rvct22_686\bin;C:\APPS\jdk_1.6.0_11\bin;C:\APPS\jdk_1.6.0_11\bin;C:\APPS\actpython\.;c:\apps\actperl\bin\;c:\apps\atool;\epoc32\tools;\epoc32\gcc\bin;c:\apps\ue;c:\apps\ccm65\bin;c:\apps\carbide\x86Build\Symbian_Tools\Command_Line_Tools;C:\Program Files\subversion;c:\ECloud\i686_win32\bin;C:\Program Files\HP\NCU;C:\Program Files\Windows Resource Kits\Tools\;C:\ETPWIN\system32;C:\ETPWIN;C:\ETPWIN\System32\Wbem;C:\PROGRA~1\PuTTY;C:\APPS\pclint;C:\APPS\cmt\;C:\APPS\cltools;C:\APPS\symrec;C:\APPS\gracecli\bin;C:\APPS\wget;C:\APPS\understand\bin\pc-win95;C:\APPS\unzip;C:\APPS\MSVC6\Common\Tools\WinNT;C:\APPS\MSVC6\Common\MSDev98\Bin;C:\APPS\MSVC6\Common\Tools;C:\APPS\MSVC6\VC98\bin;C:\EESP\System32;C:\APPS\ctc;C:\APPS\sbs\bin;C:\APPS\blocks\bin;C:\APPS\codescanner;C:\APPS\symdec;C:\APPS\7zip;C:\APPS\bc;\epoc32\gcc_mingw\bin;C:\Program Files\Subversion\bin;C:\Program Files\Mercurial;C:\APPS\ant_1.7\bin;C:\APPS\jdk_1.6.0_11\bin;C:\ETPWIN\system32\WindowsPowerShell\v1.0;C:\APPS\MSVC6\VC98\Bin\;C:\APPS\MSVC6\Common\Tools\;C:\APPS\MSVC6\Common\MSDev98\Bin\;E:\Build_E\username\workspace\helium-trunk\helium\extensions\nokia\external\graphviz\bin;\epoc32\tools;\epoc32\gcc\bin;\epoc32\tools\build;\epoc32\rombuild;E:\Build_E\username\workspace\helium-trunk\helium\extensions\nokia\external\unxutils;E:\Build_E\username\workspace\helium-trunk\helium\extensions\nokia\external\Subversion\bin;E:\Build_E\username\workspace\helium-trunk\helium\extensions\nokia\external\graphviz\bin;C:\APPS\ctc</info>
+<info>Environment PATHEXT=.COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.py;.pyw;.PSC1</info>
+<info>Environment PERL=C:\APPS\actperl\bin\perl.exe</info>
+<info>Environment PERL5LIB=E:\Build_E\username\workspace\helium-trunk\helium\tools\common\packages</info>
+<info>Environment PID=8848</info>
+<info>Environment PROCESSOR_ARCHITECTURE=x86</info>
+<info>Environment PROCESSOR_IDENTIFIER=x86 Family 16 Model 8 Stepping 0, AuthenticAMD</info>
+<info>Environment PROCESSOR_LEVEL=16</info>
+<info>Environment PROCESSOR_REVISION=0800</info>
+<info>Environment PROGRAMFILES=C:\Program Files</info>
+<info>Environment PROMPT=$P$G</info>
+<info>Environment PSMODULEPATH=C:\ETPWIN\system32\WindowsPowerShell\v1.0\Modules\</info>
+<info>Environment PYTHONVERSION=2.6</info>
+<info>Environment RVCT22BIN=C:\APPS\rvct22_686\bin</info>
+<info>Environment RVCT22INC=C:\APPS\rvct22_686\include</info>
+<info>Environment RVCT22LIB=C:\APPS\rvct22_686\lib</info>
+<info>Environment RVCT22_ASMOPT=--licretry --fastlicense --sitelicense</info>
+<info>Environment RVCT22_CCOPT=--licretry --fastlicense --sitelicense</info>
+<info>Environment RVCT22_LINKOPT=--licretry --fastlicense --sitelicense</info>
+<info>Environment SBS_HOME=C:\APPS\sbs</info>
+<info>Environment SBS_PYTHON=C:\APPS\sbs\win32\python264\python.exe</info>
+<info>Environment SESSIONNAME=RDP-Tcp#1</info>
+<info>Environment SIGNALING_ANT_ARGS= -Dant.executor.class=com.nokia.helium.core.ant.HeliumExecutor</info>
+<info>Environment SYMSEE_VERSION=10.3.0</info>
+<info>Environment SYSTEMDRIVE=C:</info>
+<info>Environment SYSTEMROOT=C:\ETPWIN</info>
+<info>Environment TARGET_TIMES_GENERATOR= -listener com.nokia.helium.core.ant.listener.TargetTimesLogGeneratorListener</info>
+<info>Environment TEMP=e:\ec_temp</info>
+<info>Environment TESTED_ANT=C:\APPS\ant_1.7</info>
+<info>Environment TESTED_JAVA=C:\APPS\jdk_1.6.0_11</info>
+<info>Environment TMP=e:\ec_temp</info>
+<info>Environment TMPDIR=e:\ec_tmpdir</info>
+<info>Environment USERNAME=username</info>
+<info>Environment USERPROFILE=C:\Documents and Settings\username</info>
+<info>Environment WINDIR=C:\ETPWIN</info>
+<info>Environment _JAVACMD=C:\APPS\jdk_1.6.0_11\bin\java.exe</info>
+<info>Environment _USE_CLASSPATH=no</info>
+<info>Environment __CYGWIN__=C:\APPS\sbs\win32\cygwin</info>
+<info>Environment __LOCAL_PYTHON__=C:\APPS\sbs\win32\python264\python.exe</info>
+<info>Environment __MINGW__=C:\APPS\sbs\win32\mingw</info>
+<info>Environment __PYTHON__=C:\APPS\sbs\win32\python264\python.exe</info>
+<info>Duplicate alias 'make' (the one from '/invalid/location/epoc32/sbs_config\s60_sbs_config.xml' will override the one in '/APPS/sbs/lib/config\make.xml')</info>
+<info>Duplicate alias 'emake' (the one from '/invalid/location/epoc32/sbs_config\s60_sbs_config.xml' will override the one in '/APPS/sbs/lib/config\make.xml')</info>
+<info>Buildable configuration 'armv5_urel'</info>
+<info>Buildable configuration 'armv5_udeb'</info>
+<info>System Definition file /output/build/canonical_system_definition_helium_minibuild_ido.xml</info>
+<info>Found 2 bld.inf references in /output/build/canonical_system_definition_helium_minibuild_ido.xml within 3 layers:</info>
+<info>	mw_layer, app_layer, osext_layer</info>
+<info>Found 1 bld.inf references in layer "mw_layer"</info>
+<info>Found 1 bld.inf references in layer "app_layer"</info>
+<info>Found 0 bld.inf references in layer "osext_layer"</info>
+<info>Toolcheck cache /invalid/location/epoc32/build/toolcheck_cache_.tmp ignored - environment changed
+</info>
+<info>OS version "vtb92sf" determined from file "/invalid/location/epoc32/data/buildinfo.txt"</info>
+<info>applying the OS variant to the configuration "armv5_urel".</info>
+<info>'armv5_urel' uses variant hrh file '/invalid/location/epoc32/include/feature_settings.hrh'</info>
+<info>OS version "vtb92sf" determined from file "/invalid/location/epoc32/data/buildinfo.txt"</info>
+<info>applying the OS variant to the configuration "armv5_udeb".</info>
+<info>'armv5_udeb' uses variant hrh file '/invalid/location/epoc32/include/feature_settings.hrh'</info>
+<info>Processing /sf/mw/HelloWorldAPI/group/bld.inf</info>
+<info>Processing /sf/app/HelloWorldCons/group/bld.inf</info>
+<info>Copied /sf/mw/HelloWorldAPI/inc/HelloWorldAPI.h to /invalid/location/epoc32/include/HelloWorldAPI.h</info>
+<info>Copied /sf/mw/HelloWorldAPI/rom/HelloWorldAPI.iby to /invalid/location/epoc32/rom/include/core/mw/HelloWorldAPI.iby</info>
+<whatlog bldinf='/sf/mw/HelloWorldAPI/group/bld.inf' mmp='' config=''>
+<export destination='/invalid/location/epoc32/include/HelloWorldAPI.h' source='/sf/mw/HelloWorldAPI/inc/HelloWorldAPI.h'/>
+<export destination='/invalid/location/epoc32/rom/include/core/mw/HelloWorldAPI.iby' source='/sf/mw/HelloWorldAPI/rom/HelloWorldAPI.iby'/>
+</whatlog>
+<info>Copied /sf/app/HelloWorldCons/rom/helloworldcons.iby to /invalid/location/epoc32/rom/include/core/app/helloworldcons.iby</info>
+<whatlog bldinf='/sf/app/HelloWorldCons/group/bld.inf' mmp='' config=''>
+<export destination='/invalid/location/epoc32/rom/include/core/app/helloworldcons.iby' source='/sf/app/HelloWorldCons/rom/helloworldcons.iby'/>
+</whatlog>
+<info>Processing /sf/mw/HelloWorldAPI/group/HelloWorldAPI.mmp for platform armv5_urel + armv5_udeb</info>
+<info>Processing /sf/app/HelloWorldCons/group/HelloWorldCons.mmp for platform armv5_urel + armv5_udeb</info>
+<info>Running /APPS/sbs/win32/bin/talonctl.exe start</info>
+<info>Making /output/logs/compile/minibuild_ido_sbs_0.0.10_armv5_helium_minibuild_ido_all.export</info>
+<info>Executing '/APPS/sbs/win32/mingw/bin/make.exe HAVE_ORDERONLY=1 -r -f  "/output/logs/compile/minibuild_ido_sbs_0.0.10_armv5_helium_minibuild_ido_all.export"  -k  TALON_DESCRAMBLE=1  2&gt;'/output/logs/compile/minibuild_ido_sbs_0.0.10_armv5_helium_minibuild_ido_all.export.stderr' '</info>
+make: Nothing_to_be_done for `EXPORT'.
+<info>Making /output/logs/compile/minibuild_ido_sbs_0.0.10_armv5_helium_minibuild_ido_all.bitmap</info>
+<info>Executing '/APPS/sbs/win32/mingw/bin/make.exe HAVE_ORDERONLY=1 -r -f  "/output/logs/compile/minibuild_ido_sbs_0.0.10_armv5_helium_minibuild_ido_all.bitmap"  -k  TALON_DESCRAMBLE=1  2&gt;'/output/logs/compile/minibuild_ido_sbs_0.0.10_armv5_helium_minibuild_ido_all.bitmap.stderr' '</info>
+make: Nothing_to_be_done for `BITMAP'.
+<info>Making /output/logs/compile/minibuild_ido_sbs_0.0.10_armv5_helium_minibuild_ido_all.resource_deps</info>
+<info>Executing '/APPS/sbs/win32/mingw/bin/make.exe HAVE_ORDERONLY=1 -r -f  "/output/logs/compile/minibuild_ido_sbs_0.0.10_armv5_helium_minibuild_ido_all.resource_deps"  -k  TALON_DESCRAMBLE=1  2&gt;'/output/logs/compile/minibuild_ido_sbs_0.0.10_armv5_helium_minibuild_ido_all.resource_deps.stderr' '</info>
+make: Nothing_to_be_done for `RESOURCE_DEPS'.
+<info>Making /output/logs/compile/minibuild_ido_sbs_0.0.10_armv5_helium_minibuild_ido_all.resource</info>
+<info>Executing '/APPS/sbs/win32/mingw/bin/make.exe HAVE_ORDERONLY=1 -r -f  "/output/logs/compile/minibuild_ido_sbs_0.0.10_armv5_helium_minibuild_ido_all.resource"  -k  TALON_DESCRAMBLE=1  2&gt;'/output/logs/compile/minibuild_ido_sbs_0.0.10_armv5_helium_minibuild_ido_all.resource.stderr' '</info>
+make: Nothing_to_be_done for `RESOURCE'.
+<info>Making /output/logs/compile/minibuild_ido_sbs_0.0.10_armv5_helium_minibuild_ido_all.default</info>
+<info>Executing '/APPS/sbs/win32/mingw/bin/make.exe HAVE_ORDERONLY=1 -r -f  "/output/logs/compile/minibuild_ido_sbs_0.0.10_armv5_helium_minibuild_ido_all.default"  -k  TALON_DESCRAMBLE=1  2&gt;'/output/logs/compile/minibuild_ido_sbs_0.0.10_armv5_helium_minibuild_ido_all.default.stderr' '</info>
+<clean bldinf='/sf/mw/HelloWorldAPI/group/bld.inf' mmp='/sf/mw/HelloWorldAPI/group/HelloWorldAPI.mmp' config='armv5_urel'>
+<file>/invalid/location/epoc32/build/helloworldapi/c_54e5c05b9f66e7e8/helloworldapi_dll/armv5/urel/HelloWorldAPI.prep</file>
+<file>/invalid/location/epoc32/release/armv5/urel/HelloWorldAPI.dll</file>
+<file>/invalid/location/epoc32/build/helloworldapi/c_54e5c05b9f66e7e8/helloworldapi_dll/armv5/urel/HelloWorldAPI{000a0000}.def</file>
+<file>"/invalid/location/epoc32/build/helloworldapi/c_54e5c05b9f66e7e8/helloworldapi_dll/armv5/urel/HelloWorldAPI{000a0000}.dso"</file>
+<file>/invalid/location/epoc32/build/helloworldapi/c_54e5c05b9f66e7e8/helloworldapi_dll/armv5/urel/HelloWorldAPI_urel_objects.via</file>
+<file>/invalid/location/epoc32/build/helloworldapi/c_54e5c05b9f66e7e8/helloworldapi_dll/armv5/urel/HelloWorldAPI.o.d</file>
+<file>/invalid/location/epoc32/build/helloworldapi/c_54e5c05b9f66e7e8/helloworldapi_dll/armv5/urel/HelloWorldAPIDllMain.o.d</file>
+<file>/invalid/location/epoc32/build/helloworldapi/c_54e5c05b9f66e7e8/helloworldapi_dll/armv5/urel/HelloWorldAPI.o</file>
+<file>/invalid/location/epoc32/build/helloworldapi/c_54e5c05b9f66e7e8/helloworldapi_dll/armv5/urel/HelloWorldAPIDllMain.o</file>
+<file>/invalid/location/epoc32/build/helloworldapi/c_54e5c05b9f66e7e8/helloworldapi_dll/armv5/urel/HelloWorldAPI.o</file>
+<file>/invalid/location/epoc32/build/helloworldapi/c_54e5c05b9f66e7e8/helloworldapi_dll/armv5/urel/HelloWorldAPIDllMain.o</file>
+</clean>
+<whatlog bldinf='/sf/mw/HelloWorldAPI/group/bld.inf' mmp='/sf/mw/HelloWorldAPI/group/HelloWorldAPI.mmp' config='armv5_urel'>
+<build>/invalid/location/epoc32/release/armv5/lib/HelloWorldAPI.dso</build>
+<build>/invalid/location/epoc32/release/armv5/lib/HelloWorldAPI{000a0000}.dso</build>
+<build>/invalid/location/epoc32/release/armv5/lib/HelloWorldAPI.lib</build>
+<build>/invalid/location/epoc32/release/armv5/lib/HelloWorldAPI{000a0000}.lib</build>
+<build>/invalid/location/epoc32/release/armv5/urel/HelloWorldAPI.dll</build>
+<build>/invalid/location/epoc32/release/armv5/urel/HelloWorldAPI.dll.map</build>
+<build>/invalid/location/epoc32/release/armv5/urel/HelloWorldAPI.dll.map</build>
+</whatlog>
+<clean bldinf='/sf/app/HelloWorldCons/group/bld.inf' mmp='/sf/app/HelloWorldCons/group/HelloWorldCons.mmp' config='armv5_urel'>
+<file>/invalid/location/epoc32/release/armv5/urel/HelloWorldCons.exe</file>
+<file>/invalid/location/epoc32/build/helloworldcons/c_7044fa8da0e80492/helloworldcons_exe/armv5/urel/HelloWorldCons{000a0000}.def</file>
+<file>"/invalid/location/epoc32/build/helloworldcons/c_7044fa8da0e80492/helloworldcons_exe/armv5/urel/HelloWorldCons{000a0000}.dso"</file>
+<file>/invalid/location/epoc32/build/helloworldcons/c_7044fa8da0e80492/helloworldcons_exe/armv5/urel/HelloWorldCons_urel_objects.via</file>
+<file>/invalid/location/epoc32/build/helloworldcons/c_7044fa8da0e80492/helloworldcons_exe/armv5/urel/HelloWorldCons.o.d</file>
+<file>/invalid/location/epoc32/build/helloworldcons/c_7044fa8da0e80492/helloworldcons_exe/armv5/urel/HelloWorldCons.o</file>
+<file>/invalid/location/epoc32/build/helloworldcons/c_7044fa8da0e80492/helloworldcons_exe/armv5/urel/HelloWorldCons.o</file>
+</clean>
+<whatlog bldinf='/sf/app/HelloWorldCons/group/bld.inf' mmp='/sf/app/HelloWorldCons/group/HelloWorldCons.mmp' config='armv5_urel'>
+<build>/invalid/location/epoc32/release/armv5/urel/HelloWorldCons.exe</build>
+<build>/invalid/location/epoc32/release/armv5/urel/HelloWorldCons.exe.map</build>
+<build>/invalid/location/epoc32/release/armv5/urel/HelloWorldCons.exe.map</build>
+</whatlog>
+<clean bldinf='/sf/mw/HelloWorldAPI/group/bld.inf' mmp='/sf/mw/HelloWorldAPI/group/HelloWorldAPI.mmp' config='armv5_udeb'>
+<file>/invalid/location/epoc32/build/helloworldapi/c_54e5c05b9f66e7e8/helloworldapi_dll/armv5/udeb/HelloWorldAPI.prep</file>
+<file>/invalid/location/epoc32/release/armv5/udeb/HelloWorldAPI.dll</file>
+<file>/invalid/location/epoc32/build/helloworldapi/c_54e5c05b9f66e7e8/helloworldapi_dll/armv5/udeb/HelloWorldAPI{000a0000}.def</file>
+<file>"/invalid/location/epoc32/build/helloworldapi/c_54e5c05b9f66e7e8/helloworldapi_dll/armv5/udeb/HelloWorldAPI{000a0000}.dso"</file>
+<file>/invalid/location/epoc32/build/helloworldapi/c_54e5c05b9f66e7e8/helloworldapi_dll/armv5/udeb/HelloWorldAPI_udeb_objects.via</file>
+<file>/invalid/location/epoc32/build/helloworldapi/c_54e5c05b9f66e7e8/helloworldapi_dll/armv5/udeb/HelloWorldAPI.o.d</file>
+<file>/invalid/location/epoc32/build/helloworldapi/c_54e5c05b9f66e7e8/helloworldapi_dll/armv5/udeb/HelloWorldAPIDllMain.o.d</file>
+<file>/invalid/location/epoc32/build/helloworldapi/c_54e5c05b9f66e7e8/helloworldapi_dll/armv5/udeb/HelloWorldAPI.o</file>
+<file>/invalid/location/epoc32/build/helloworldapi/c_54e5c05b9f66e7e8/helloworldapi_dll/armv5/udeb/HelloWorldAPIDllMain.o</file>
+<file>/invalid/location/epoc32/build/helloworldapi/c_54e5c05b9f66e7e8/helloworldapi_dll/armv5/udeb/HelloWorldAPI.o</file>
+<file>/invalid/location/epoc32/build/helloworldapi/c_54e5c05b9f66e7e8/helloworldapi_dll/armv5/udeb/HelloWorldAPIDllMain.o</file>
+</clean>
+<whatlog bldinf='/sf/mw/HelloWorldAPI/group/bld.inf' mmp='/sf/mw/HelloWorldAPI/group/HelloWorldAPI.mmp' config='armv5_udeb'>
+<build>/invalid/location/epoc32/release/armv5/lib/HelloWorldAPI.dso</build>
+<build>/invalid/location/epoc32/release/armv5/lib/HelloWorldAPI{000a0000}.dso</build>
+<build>/invalid/location/epoc32/release/armv5/lib/HelloWorldAPI.lib</build>
+<build>/invalid/location/epoc32/release/armv5/lib/HelloWorldAPI{000a0000}.lib</build>
+<build>/invalid/location/epoc32/release/armv5/udeb/HelloWorldAPI.dll</build>
+<build>/invalid/location/epoc32/release/armv5/udeb/HelloWorldAPI.dll.map</build>
+<build>/invalid/location/epoc32/release/armv5/udeb/HelloWorldAPI.dll.map</build>
+</whatlog>
+<clean bldinf='/sf/app/HelloWorldCons/group/bld.inf' mmp='/sf/app/HelloWorldCons/group/HelloWorldCons.mmp' config='armv5_udeb'>
+<file>/invalid/location/epoc32/release/armv5/udeb/HelloWorldCons.exe</file>
+<file>/invalid/location/epoc32/build/helloworldcons/c_7044fa8da0e80492/helloworldcons_exe/armv5/udeb/HelloWorldCons{000a0000}.def</file>
+<file>"/invalid/location/epoc32/build/helloworldcons/c_7044fa8da0e80492/helloworldcons_exe/armv5/udeb/HelloWorldCons{000a0000}.dso"</file>
+<file>/invalid/location/epoc32/build/helloworldcons/c_7044fa8da0e80492/helloworldcons_exe/armv5/udeb/HelloWorldCons_udeb_objects.via</file>
+<file>/invalid/location/epoc32/build/helloworldcons/c_7044fa8da0e80492/helloworldcons_exe/armv5/udeb/HelloWorldCons.o.d</file>
+<file>/invalid/location/epoc32/build/helloworldcons/c_7044fa8da0e80492/helloworldcons_exe/armv5/udeb/HelloWorldCons.o</file>
+<file>/invalid/location/epoc32/build/helloworldcons/c_7044fa8da0e80492/helloworldcons_exe/armv5/udeb/HelloWorldCons.o</file>
+</clean>
+<whatlog bldinf='/sf/app/HelloWorldCons/group/bld.inf' mmp='/sf/app/HelloWorldCons/group/HelloWorldCons.mmp' config='armv5_udeb'>
+<build>/invalid/location/epoc32/release/armv5/udeb/HelloWorldCons.exe</build>
+<build>/invalid/location/epoc32/release/armv5/udeb/HelloWorldCons.exe.map</build>
+<build>/invalid/location/epoc32/release/armv5/udeb/HelloWorldCons.exe.map</build>
+</whatlog>
+<recipe name='importlibtarget_prepfile' target='/invalid/location/epoc32/build/helloworldapi/c_54e5c05b9f66e7e8/helloworldapi_dll/armv5/urel/HelloWorldAPI.prep' host='trwec089' layer='mw_layer' component='' bldinf='/sf/mw/HelloWorldAPI/group/bld.inf' mmp='/sf/mw/HelloWorldAPI/group/HelloWorldAPI.mmp' config='armv5_urel' platform='armv5' phase='ALL' source=''>
+<![CDATA[
++ perl.exe /invalid/location/epoc32/tools/prepdef.pl /sf/mw/HelloWorldAPI/eabi/HelloWorldAPI.def /invalid/location/epoc32/build/helloworldapi/c_54e5c05b9f66e7e8/helloworldapi_dll/armv5/urel/HelloWorldAPI.prep
+
+]]><time start='1269459946.07847' elapsed='0.172' />
+<status exit='ok' attempt='1' flags='FORCESUCCESS' />
+</recipe>
+<recipe name='importlibversioned' target='/invalid/location/epoc32/release/armv5/lib/HelloWorldAPI{000a0000}.dso' host='trwec089' layer='mw_layer' component='' bldinf='/sf/mw/HelloWorldAPI/group/bld.inf' mmp='/sf/mw/HelloWorldAPI/group/HelloWorldAPI.mmp' config='armv5_urel' platform='armv5' phase='ALL' source=''>
+<![CDATA[
++ /invalid/location/epoc32/tools/elf2e32.exe --sid=0x06693702 --version=10.0 --definput=/invalid/location/epoc32/build/helloworldapi/c_54e5c05b9f66e7e8/helloworldapi_dll/armv5/urel/HelloWorldAPI.prep '--dso=/invalid/location/epoc32/release/armv5/lib/HelloWorldAPI{000a0000}.dso' '--linkas=HelloWorldAPI{000a0000}[06693702].dll'
+
+]]><time start='1269459946.25033' elapsed='0.094' />
+<status exit='ok' attempt='1' flags='FORCESUCCESS' />
+</recipe>
+<recipe name='importlibtarget' target='/invalid/location/epoc32/release/armv5/lib/HelloWorldAPI.dso' host='trwec089' layer='mw_layer' component='' bldinf='/sf/mw/HelloWorldAPI/group/bld.inf' mmp='/sf/mw/HelloWorldAPI/group/HelloWorldAPI.mmp' config='armv5_urel' platform='armv5' phase='ALL' source=''>
+<![CDATA[
++ /APPS/sbs/win32/cygwin/bin/cp.exe '/invalid/location/epoc32/release/armv5/lib/HelloWorldAPI{000a0000}.dso' /invalid/location/epoc32/release/armv5/lib/HelloWorldAPI.dso
+
+]]><time start='1269459946.35970' elapsed='0.125' />
+<status exit='ok' attempt='1' flags='FORCESUCCESS' />
+</recipe>
+<recipe name='importlibversioned_abiv1' target='/invalid/location/epoc32/release/armv5/lib/HelloWorldAPI{000a0000}.lib' host='trwec089' layer='mw_layer' component='' bldinf='/sf/mw/HelloWorldAPI/group/bld.inf' mmp='/sf/mw/HelloWorldAPI/group/HelloWorldAPI.mmp' config='armv5_urel' platform='armv5' phase='ALL' source=''>
+<![CDATA[
++ '[' -f /invalid/location/epoc32/tools/def2dll.pl -a -f /invalid/location/epoc32/build/helloworldapi/c_54e5c05b9f66e7e8/helloworldapi_dll/armv5/urel/HelloWorldAPI.prep ']'
++ perl.exe /invalid/location/epoc32/tools/def2dll.pl --path=/invalid/location/epoc32/release/armv5/lib --bldpath=/invalid/location/epoc32/build/helloworldapi/c_54e5c05b9f66e7e8/helloworldapi_dll/armv5/urel '--import=HelloWorldAPI{000a0000}' --deffile=/invalid/location/epoc32/build/helloworldapi/c_54e5c05b9f66e7e8/helloworldapi_dll/armv5/urel/HelloWorldAPI.prep '--linkAs=HelloWorldAPI{000a0000}[06693702].dll' --inter
+
+]]><time start='1269459946.51595' elapsed='0.547' />
+<status exit='ok' attempt='1' />
+</recipe>
+<recipe name='importlibtarget_abiv1' target='/invalid/location/epoc32/release/armv5/lib/HelloWorldAPI.lib' host='trwec089' layer='mw_layer' component='' bldinf='/sf/mw/HelloWorldAPI/group/bld.inf' mmp='/sf/mw/HelloWorldAPI/group/HelloWorldAPI.mmp' config='armv5_urel' platform='armv5' phase='ALL' source=''>
+<![CDATA[
++ '[' -f /invalid/location/epoc32/tools/def2dll.pl ']'
++ /APPS/sbs/win32/cygwin/bin/cp.exe '/invalid/location/epoc32/release/armv5/lib/HelloWorldAPI{000a0000}.lib' /invalid/location/epoc32/release/armv5/lib/HelloWorldAPI.lib
+
+]]><time start='1269459947.10968' elapsed='0.141' />
+<status exit='ok' attempt='1' />
+</recipe>
+<recipe name='compile' target='/invalid/location/epoc32/build/helloworldapi/c_54e5c05b9f66e7e8/helloworldapi_dll/armv5/urel/HelloWorldAPI.o' host='trwec089' layer='mw_layer' component='' bldinf='/sf/mw/HelloWorldAPI/group/bld.inf' mmp='/sf/mw/HelloWorldAPI/group/HelloWorldAPI.mmp' config='armv5_urel' platform='armv5' phase='ALL' source='/sf/mw/HelloWorldAPI/src/HelloWorldAPI.cpp'>
+<![CDATA[
++ /APPS/rvct22_686/bin/armcc.exe -O2 --dwarf2 --dllimport_runtime --exceptions --exceptions_unwind --diag_suppress 161,611,654,997,1152,1300,1464,1488,2523,6318,6331 --diag_error 1267 --cpu 5T --enum_is_int -Ono_known_library --fpmode ieee_no_fenv --export_all_vtbl --memaccess -UL41 --no_vfe --apcs /inter -c --thumb -D__MARM_THUMB__ --fpu softvfp --cpp -D__MARM_INTERWORK__ -DNDEBUG -D__SUPPORT_CPP_EXCEPTIONS__ -D_UNICODE -D__SYMBIAN32__ -D__ARMCC__ -D__EPOC32__ -D__MARM__ -D__EABI__ '-D__PRODUCT_INCLUDE__="/invalid/location/epoc32/include/feature_settings.hrh"' -D__MARM_ARMV5__ -D__ARMCC_2__ -D__ARMCC_2_2__ -D__DLL__ --preinclude /invalid/location/epoc32/include/rvct/rvct.h -J/sf/mw/HelloWorldAPI/src -J/sf/mw/HelloWorldAPI/inc -J/invalid/location/epoc32/include -J/invalid/location/epoc32/include --depend_format=unix --depend /invalid/location/epoc32/build/helloworldapi/c_54e5c05b9f66e7e8/helloworldapi_dll/armv5/urel/HelloWorldAPI.o.d -o /invalid/location/epoc32/build/helloworldapi/c_54e5c05b9f66e7e8/helloworldapi_dll/armv5/urel/HelloWorldAPI.o /sf/mw/HelloWorldAPI/src/HelloWorldAPI.cpp
+
+]]><time start='1269459947.32842' elapsed='0.766' />
+<status exit='ok' attempt='1' />
+</recipe>
+<recipe name='compile' target='/invalid/location/epoc32/build/helloworldapi/c_54e5c05b9f66e7e8/helloworldapi_dll/armv5/urel/HelloWorldAPIDllMain.o' host='trwec089' layer='mw_layer' component='' bldinf='/sf/mw/HelloWorldAPI/group/bld.inf' mmp='/sf/mw/HelloWorldAPI/group/HelloWorldAPI.mmp' config='armv5_urel' platform='armv5' phase='ALL' source='/sf/mw/HelloWorldAPI/src/HelloWorldAPIDllMain.cpp'>
+<![CDATA[
++ /APPS/rvct22_686/bin/armcc.exe -O2 --dwarf2 --dllimport_runtime --exceptions --exceptions_unwind --diag_suppress 161,611,654,997,1152,1300,1464,1488,2523,6318,6331 --diag_error 1267 --cpu 5T --enum_is_int -Ono_known_library --fpmode ieee_no_fenv --export_all_vtbl --memaccess -UL41 --no_vfe --apcs /inter -c --thumb -D__MARM_THUMB__ --fpu softvfp --cpp -D__MARM_INTERWORK__ -DNDEBUG -D__SUPPORT_CPP_EXCEPTIONS__ -D_UNICODE -D__SYMBIAN32__ -D__ARMCC__ -D__EPOC32__ -D__MARM__ -D__EABI__ '-D__PRODUCT_INCLUDE__="/invalid/location/epoc32/include/feature_settings.hrh"' -D__MARM_ARMV5__ -D__ARMCC_2__ -D__ARMCC_2_2__ -D__DLL__ --preinclude /invalid/location/epoc32/include/rvct/rvct.h -J/sf/mw/HelloWorldAPI/src -J/sf/mw/HelloWorldAPI/inc -J/invalid/location/epoc32/include -J/invalid/location/epoc32/include --depend_format=unix --depend /invalid/location/epoc32/build/helloworldapi/c_54e5c05b9f66e7e8/helloworldapi_dll/armv5/urel/HelloWorldAPIDllMain.o.d -o /invalid/location/epoc32/build/helloworldapi/c_54e5c05b9f66e7e8/helloworldapi_dll/armv5/urel/HelloWorldAPIDllMain.o /sf/mw/HelloWorldAPI/src/HelloWorldAPIDllMain.cpp
+
+]]><time start='1269459948.10964' elapsed='0.328' />
+<status exit='ok' attempt='1' />
+</recipe>
+<recipe name='linkandpostlink' target='/invalid/location/epoc32/release/armv5/urel/HelloWorldAPI.dll' host='trwec089' layer='mw_layer' component='' bldinf='/sf/mw/HelloWorldAPI/group/bld.inf' mmp='/sf/mw/HelloWorldAPI/group/HelloWorldAPI.mmp' config='armv5_urel' platform='armv5' phase='ALL' source=''>
+<![CDATA[
++ /APPS/rvct22_686/bin/armlink.exe --diag_suppress 6331 --bpabi --reloc --no_scanlib --datacompressor=off --dll --split --rw-base 0x400000 --symver_soname '--soname=HelloWorldAPI{000a0000}[06693702].dll' --entry=_E32Dll '/invalid/location/epoc32/release/armv5/urel/edll.lib(uc_dll_.o)' -o /invalid/location/epoc32/release/armv5/urel/HelloWorldAPI.dll.sym --symbols --list=/invalid/location/epoc32/release/armv5/urel/HelloWorldAPI.dll.map --via /invalid/location/epoc32/build/helloworldapi/c_54e5c05b9f66e7e8/helloworldapi_dll/armv5/urel/HelloWorldAPI_urel_objects.via /invalid/location/epoc32/release/armv5/urel/edllstub.lib /invalid/location/epoc32/release/armv5/urel/usrt2_2.lib /invalid/location/epoc32/release/armv5/lib/euser.dso /invalid/location/epoc32/release/armv5/lib/scppnwdl.dso /invalid/location/epoc32/release/armv5/lib/drtaeabi.dso /invalid/location/epoc32/release/armv5/lib/dfpaeabi.dso /invalid/location/epoc32/release/armv5/lib/dfprvct2_2.dso /invalid/location/epoc32/release/armv5/lib/drtrvct2_2.dso '/APPS/rvct22_686/lib/armlib/h_t__uf.l(switch8.o)'
++ /invalid/location/epoc32/tools/elf2e32.exe --sid=0x06693702 --version=10.0 --capability=NONE '--linkas=HelloWorldAPI{000a0000}[06693702].dll' --fpu=softvfp --targettype=DLL --output=/invalid/location/epoc32/release/armv5/urel/HelloWorldAPI.dll --elfinput=/invalid/location/epoc32/release/armv5/urel/HelloWorldAPI.dll.sym --uid1=0x10000079 --uid2=0x1000008d --uid3=0x06693702 --definput=/sf/mw/HelloWorldAPI/eabi/HelloWorldAPI.def '--defoutput=/invalid/location/epoc32/build/helloworldapi/c_54e5c05b9f66e7e8/helloworldapi_dll/armv5/urel/HelloWorldAPI{000a0000}.def' '--dso=/invalid/location/epoc32/build/helloworldapi/c_54e5c05b9f66e7e8/helloworldapi_dll/armv5/urel/HelloWorldAPI{000a0000}.dso' --debuggable --codepaging=default --datapaging=default --compressionmethod=inflate '--libpath=/invalid/location/epoc32/release/armv5/lib/;/APPS/rvct22_686/lib/armlib'
+
+]]><time start='1269459948.64087' elapsed='0.266' />
+<status exit='ok' attempt='1' />
+</recipe>
+<recipe name='compile' target='/invalid/location/epoc32/build/helloworldcons/c_7044fa8da0e80492/helloworldcons_exe/armv5/urel/HelloWorldCons.o' host='trwec089' layer='app_layer' component='' bldinf='/sf/app/HelloWorldCons/group/bld.inf' mmp='/sf/app/HelloWorldCons/group/HelloWorldCons.mmp' config='armv5_urel' platform='armv5' phase='ALL' source='/sf/app/HelloWorldCons/src/HelloWorldCons.cpp'>
+<![CDATA[
++ /APPS/rvct22_686/bin/armcc.exe -O2 --dwarf2 --dllimport_runtime --exceptions --exceptions_unwind --diag_suppress 161,611,654,997,1152,1300,1464,1488,2523,6318,6331 --diag_error 1267 --cpu 5T --enum_is_int -Ono_known_library --fpmode ieee_no_fenv --export_all_vtbl --memaccess -UL41 --no_vfe --apcs /inter -c --thumb -D__MARM_THUMB__ --fpu softvfp --cpp -D__MARM_INTERWORK__ -DNDEBUG -D__SUPPORT_CPP_EXCEPTIONS__ -D_UNICODE -D__SYMBIAN32__ -D__ARMCC__ -D__EPOC32__ -D__MARM__ -D__EABI__ '-D__PRODUCT_INCLUDE__="/invalid/location/epoc32/include/feature_settings.hrh"' -D__MARM_ARMV5__ -D__ARMCC_2__ -D__ARMCC_2_2__ -D__EXE__ --preinclude /invalid/location/epoc32/include/rvct/rvct.h -J/sf/app/HelloWorldCons/src -J/sf/app/HelloWorldCons/inc -J/invalid/location/epoc32/include -J/invalid/location/epoc32/include --depend_format=unix --depend /invalid/location/epoc32/build/helloworldcons/c_7044fa8da0e80492/helloworldcons_exe/armv5/urel/HelloWorldCons.o.d -o /invalid/location/epoc32/build/helloworldcons/c_7044fa8da0e80492/helloworldcons_exe/armv5/urel/HelloWorldCons.o /sf/app/HelloWorldCons/src/HelloWorldCons.cpp
+
+]]><time start='1269459948.96898' elapsed='0.391' />
+<status exit='ok' attempt='1' />
+</recipe>
+<recipe name='linkandpostlink' target='/invalid/location/epoc32/release/armv5/urel/HelloWorldCons.exe' host='trwec089' layer='app_layer' component='' bldinf='/sf/app/HelloWorldCons/group/bld.inf' mmp='/sf/app/HelloWorldCons/group/HelloWorldCons.mmp' config='armv5_urel' platform='armv5' phase='ALL' source=''>
+<![CDATA[
++ /APPS/rvct22_686/bin/armlink.exe --diag_suppress 6331 --bpabi --reloc --no_scanlib --datacompressor=off --dll --split --rw-base 0x400000 --symver_soname '--soname=HelloWorldCons{000a0000}[ed4525d1].exe' --entry=_E32Startup '/invalid/location/epoc32/release/armv5/urel/eexe.lib(uc_exe_.o)' -o /invalid/location/epoc32/release/armv5/urel/HelloWorldCons.exe.sym --symbols --list=/invalid/location/epoc32/release/armv5/urel/HelloWorldCons.exe.map --via /invalid/location/epoc32/build/helloworldcons/c_7044fa8da0e80492/helloworldcons_exe/armv5/urel/HelloWorldCons_urel_objects.via /invalid/location/epoc32/release/armv5/urel/usrt2_2.lib /invalid/location/epoc32/release/armv5/lib/euser.dso /invalid/location/epoc32/release/armv5/lib/helloworldapi.dso /invalid/location/epoc32/release/armv5/lib/scppnwdl.dso /invalid/location/epoc32/release/armv5/lib/drtaeabi.dso /invalid/location/epoc32/release/armv5/lib/dfpaeabi.dso /invalid/location/epoc32/release/armv5/lib/dfprvct2_2.dso /invalid/location/epoc32/release/armv5/lib/drtrvct2_2.dso '/APPS/rvct22_686/lib/armlib/h_t__uf.l(switch8.o)'
++ /invalid/location/epoc32/tools/elf2e32.exe --sid=0xed4525d1 --version=10.0 --capability=NONE '--linkas=HelloWorldCons{000a0000}[ed4525d1].exe' --fpu=softvfp --targettype=EXE --output=/invalid/location/epoc32/release/armv5/urel/HelloWorldCons.exe --elfinput=/invalid/location/epoc32/release/armv5/urel/HelloWorldCons.exe.sym --uid1=0x1000007a --uid2=0x00000000 --uid3=0xed4525d1 --debuggable --codepaging=default --datapaging=default --compressionmethod=inflate '--libpath=/invalid/location/epoc32/release/armv5/lib/;/APPS/rvct22_686/lib/armlib'
+
+]]><time start='1269459949.54708' elapsed='0.281' />
+<status exit='ok' attempt='1' />
+</recipe>
+<recipe name='compile' target='/invalid/location/epoc32/build/helloworldapi/c_54e5c05b9f66e7e8/helloworldapi_dll/armv5/udeb/HelloWorldAPI.o' host='trwec089' layer='mw_layer' component='' bldinf='/sf/mw/HelloWorldAPI/group/bld.inf' mmp='/sf/mw/HelloWorldAPI/group/HelloWorldAPI.mmp' config='armv5_udeb' platform='armv5' phase='ALL' source='/sf/mw/HelloWorldAPI/src/HelloWorldAPI.cpp'>
+<![CDATA[
++ /APPS/rvct22_686/bin/armcc.exe -O0 -g --dwarf2 --dllimport_runtime --exceptions --exceptions_unwind --diag_suppress 161,611,654,997,1152,1300,1464,1488,2523,6318,6331 --diag_error 1267 --cpu 5T --enum_is_int -Ono_known_library --fpmode ieee_no_fenv --export_all_vtbl --memaccess -UL41 --no_vfe --apcs /inter -c --thumb -D__MARM_THUMB__ --fpu softvfp --cpp -D__MARM_INTERWORK__ -D_DEBUG -D__SUPPORT_CPP_EXCEPTIONS__ -D_UNICODE -D__SYMBIAN32__ -D__ARMCC__ -D__EPOC32__ -D__MARM__ -D__EABI__ '-D__PRODUCT_INCLUDE__="/invalid/location/epoc32/include/feature_settings.hrh"' -D__MARM_ARMV5__ -D__ARMCC_2__ -D__ARMCC_2_2__ -D__DLL__ --preinclude /invalid/location/epoc32/include/rvct/rvct.h -J/sf/mw/HelloWorldAPI/src -J/sf/mw/HelloWorldAPI/inc -J/invalid/location/epoc32/include -J/invalid/location/epoc32/include --depend_format=unix --depend /invalid/location/epoc32/build/helloworldapi/c_54e5c05b9f66e7e8/helloworldapi_dll/armv5/udeb/HelloWorldAPI.o.d -o /invalid/location/epoc32/build/helloworldapi/c_54e5c05b9f66e7e8/helloworldapi_dll/armv5/udeb/HelloWorldAPI.o /sf/mw/HelloWorldAPI/src/HelloWorldAPI.cpp
+
+]]><time start='1269459949.90644' elapsed='0.500' />
+<status exit='ok' attempt='1' />
+</recipe>
+<recipe name='compile' target='/invalid/location/epoc32/build/helloworldapi/c_54e5c05b9f66e7e8/helloworldapi_dll/armv5/udeb/HelloWorldAPIDllMain.o' host='trwec089' layer='mw_layer' component='' bldinf='/sf/mw/HelloWorldAPI/group/bld.inf' mmp='/sf/mw/HelloWorldAPI/group/HelloWorldAPI.mmp' config='armv5_udeb' platform='armv5' phase='ALL' source='/sf/mw/HelloWorldAPI/src/HelloWorldAPIDllMain.cpp'>
+<![CDATA[
++ /APPS/rvct22_686/bin/armcc.exe -O0 -g --dwarf2 --dllimport_runtime --exceptions --exceptions_unwind --diag_suppress 161,611,654,997,1152,1300,1464,1488,2523,6318,6331 --diag_error 1267 --cpu 5T --enum_is_int -Ono_known_library --fpmode ieee_no_fenv --export_all_vtbl --memaccess -UL41 --no_vfe --apcs /inter -c --thumb -D__MARM_THUMB__ --fpu softvfp --cpp -D__MARM_INTERWORK__ -D_DEBUG -D__SUPPORT_CPP_EXCEPTIONS__ -D_UNICODE -D__SYMBIAN32__ -D__ARMCC__ -D__EPOC32__ -D__MARM__ -D__EABI__ '-D__PRODUCT_INCLUDE__="/invalid/location/epoc32/include/feature_settings.hrh"' -D__MARM_ARMV5__ -D__ARMCC_2__ -D__ARMCC_2_2__ -D__DLL__ --preinclude /invalid/location/epoc32/include/rvct/rvct.h -J/sf/mw/HelloWorldAPI/src -J/sf/mw/HelloWorldAPI/inc -J/invalid/location/epoc32/include -J/invalid/location/epoc32/include --depend_format=unix --depend /invalid/location/epoc32/build/helloworldapi/c_54e5c05b9f66e7e8/helloworldapi_dll/armv5/udeb/HelloWorldAPIDllMain.o.d -o /invalid/location/epoc32/build/helloworldapi/c_54e5c05b9f66e7e8/helloworldapi_dll/armv5/udeb/HelloWorldAPIDllMain.o /sf/mw/HelloWorldAPI/src/HelloWorldAPIDllMain.cpp
+
+]]><time start='1269459950.42205' elapsed='0.437' />
+<status exit='ok' attempt='1' />
+</recipe>
+<recipe name='linkandpostlink' target='/invalid/location/epoc32/release/armv5/udeb/HelloWorldAPI.dll' host='trwec089' layer='mw_layer' component='' bldinf='/sf/mw/HelloWorldAPI/group/bld.inf' mmp='/sf/mw/HelloWorldAPI/group/HelloWorldAPI.mmp' config='armv5_udeb' platform='armv5' phase='ALL' source=''>
+<![CDATA[
++ /APPS/rvct22_686/bin/armlink.exe --diag_suppress 6331 --bpabi --reloc --no_scanlib --datacompressor=off --debug --dll --split --rw-base 0x400000 --symver_soname '--soname=HelloWorldAPI{000a0000}[06693702].dll' --entry=_E32Dll '/invalid/location/epoc32/release/armv5/udeb/edll.lib(uc_dll_.o)' -o /invalid/location/epoc32/release/armv5/udeb/HelloWorldAPI.dll.sym --symbols --list=/invalid/location/epoc32/release/armv5/udeb/HelloWorldAPI.dll.map --via /invalid/location/epoc32/build/helloworldapi/c_54e5c05b9f66e7e8/helloworldapi_dll/armv5/udeb/HelloWorldAPI_udeb_objects.via /invalid/location/epoc32/release/armv5/udeb/edllstub.lib /invalid/location/epoc32/release/armv5/udeb/usrt2_2.lib /invalid/location/epoc32/release/armv5/lib/euser.dso /invalid/location/epoc32/release/armv5/lib/scppnwdl.dso /invalid/location/epoc32/release/armv5/lib/drtaeabi.dso /invalid/location/epoc32/release/armv5/lib/dfpaeabi.dso /invalid/location/epoc32/release/armv5/lib/dfprvct2_2.dso /invalid/location/epoc32/release/armv5/lib/drtrvct2_2.dso '/APPS/rvct22_686/lib/armlib/h_t__uf.l(switch8.o)'
++ /invalid/location/epoc32/tools/elf2e32.exe --sid=0x06693702 --version=10.0 --capability=NONE '--linkas=HelloWorldAPI{000a0000}[06693702].dll' --fpu=softvfp --targettype=DLL --output=/invalid/location/epoc32/release/armv5/udeb/HelloWorldAPI.dll --elfinput=/invalid/location/epoc32/release/armv5/udeb/HelloWorldAPI.dll.sym --uid1=0x10000079 --uid2=0x1000008d --uid3=0x06693702 --definput=/sf/mw/HelloWorldAPI/eabi/HelloWorldAPI.def '--defoutput=/invalid/location/epoc32/build/helloworldapi/c_54e5c05b9f66e7e8/helloworldapi_dll/armv5/udeb/HelloWorldAPI{000a0000}.def' '--dso=/invalid/location/epoc32/build/helloworldapi/c_54e5c05b9f66e7e8/helloworldapi_dll/armv5/udeb/HelloWorldAPI{000a0000}.dso' --debuggable --codepaging=default --datapaging=default --compressionmethod=inflate '--libpath=/invalid/location/epoc32/release/armv5/lib/;/APPS/rvct22_686/lib/armlib'
+
+]]><time start='1269459951.04702' elapsed='0.375' />
+<status exit='ok' attempt='1' />
+</recipe>
+<recipe name='compile' target='/invalid/location/epoc32/build/helloworldcons/c_7044fa8da0e80492/helloworldcons_exe/armv5/udeb/HelloWorldCons.o' host='trwec089' layer='app_layer' component='' bldinf='/sf/app/HelloWorldCons/group/bld.inf' mmp='/sf/app/HelloWorldCons/group/HelloWorldCons.mmp' config='armv5_udeb' platform='armv5' phase='ALL' source='/sf/app/HelloWorldCons/src/HelloWorldCons.cpp'>
+<![CDATA[
++ /APPS/rvct22_686/bin/armcc.exe -O0 -g --dwarf2 --dllimport_runtime --exceptions --exceptions_unwind --diag_suppress 161,611,654,997,1152,1300,1464,1488,2523,6318,6331 --diag_error 1267 --cpu 5T --enum_is_int -Ono_known_library --fpmode ieee_no_fenv --export_all_vtbl --memaccess -UL41 --no_vfe --apcs /inter -c --thumb -D__MARM_THUMB__ --fpu softvfp --cpp -D__MARM_INTERWORK__ -D_DEBUG -D__SUPPORT_CPP_EXCEPTIONS__ -D_UNICODE -D__SYMBIAN32__ -D__ARMCC__ -D__EPOC32__ -D__MARM__ -D__EABI__ '-D__PRODUCT_INCLUDE__="/invalid/location/epoc32/include/feature_settings.hrh"' -D__MARM_ARMV5__ -D__ARMCC_2__ -D__ARMCC_2_2__ -D__EXE__ --preinclude /invalid/location/epoc32/include/rvct/rvct.h -J/sf/app/HelloWorldCons/src -J/sf/app/HelloWorldCons/inc -J/invalid/location/epoc32/include -J/invalid/location/epoc32/include --depend_format=unix --depend /invalid/location/epoc32/build/helloworldcons/c_7044fa8da0e80492/helloworldcons_exe/armv5/udeb/HelloWorldCons.o.d -o /invalid/location/epoc32/build/helloworldcons/c_7044fa8da0e80492/helloworldcons_exe/armv5/udeb/HelloWorldCons.o /sf/app/HelloWorldCons/src/HelloWorldCons.cpp
+
+]]><time start='1269459951.48451' elapsed='0.516' />
+<status exit='ok' attempt='1' />
+</recipe>
+<recipe name='linkandpostlink' target='/invalid/location/epoc32/release/armv5/udeb/HelloWorldCons.exe' host='trwec089' layer='app_layer' component='' bldinf='/sf/app/HelloWorldCons/group/bld.inf' mmp='/sf/app/HelloWorldCons/group/HelloWorldCons.mmp' config='armv5_udeb' platform='armv5' phase='ALL' source=''>
+<![CDATA[
++ /APPS/rvct22_686/bin/armlink.exe --diag_suppress 6331 --bpabi --reloc --no_scanlib --datacompressor=off --debug --dll --split --rw-base 0x400000 --symver_soname '--soname=HelloWorldCons{000a0000}[ed4525d1].exe' --entry=_E32Startup '/invalid/location/epoc32/release/armv5/udeb/eexe.lib(uc_exe_.o)' -o /invalid/location/epoc32/release/armv5/udeb/HelloWorldCons.exe.sym --symbols --list=/invalid/location/epoc32/release/armv5/udeb/HelloWorldCons.exe.map --via /invalid/location/epoc32/build/helloworldcons/c_7044fa8da0e80492/helloworldcons_exe/armv5/udeb/HelloWorldCons_udeb_objects.via /invalid/location/epoc32/release/armv5/udeb/usrt2_2.lib /invalid/location/epoc32/release/armv5/lib/euser.dso /invalid/location/epoc32/release/armv5/lib/helloworldapi.dso /invalid/location/epoc32/release/armv5/lib/scppnwdl.dso /invalid/location/epoc32/release/armv5/lib/drtaeabi.dso /invalid/location/epoc32/release/armv5/lib/dfpaeabi.dso /invalid/location/epoc32/release/armv5/lib/dfprvct2_2.dso /invalid/location/epoc32/release/armv5/lib/drtrvct2_2.dso '/APPS/rvct22_686/lib/armlib/h_t__uf.l(switch8.o)'
++ /invalid/location/epoc32/tools/elf2e32.exe --sid=0xed4525d1 --version=10.0 --capability=NONE '--linkas=HelloWorldCons{000a0000}[ed4525d1].exe' --fpu=softvfp --targettype=EXE --output=/invalid/location/epoc32/release/armv5/udeb/HelloWorldCons.exe --elfinput=/invalid/location/epoc32/release/armv5/udeb/HelloWorldCons.exe.sym --uid1=0x1000007a --uid2=0x00000000 --uid3=0xed4525d1 --debuggable --codepaging=default --datapaging=default --compressionmethod=inflate '--libpath=/invalid/location/epoc32/release/armv5/lib/;/APPS/rvct22_686/lib/armlib'
+
+]]><time start='1269459952.18761' elapsed='0.391' />
+<status exit='ok' attempt='1' />
+</recipe>
+<info>Running /APPS/sbs/win32/bin/talonctl.exe stop</info>
+<info>The make-engine exited successfully.</info>
+<info>Run time 13 seconds</info>
+<info>Created/Updated toolcheck cache: /invalid/location/epoc32/build/toolcheck_cache_.tmp
+</info>
+</buildlog>

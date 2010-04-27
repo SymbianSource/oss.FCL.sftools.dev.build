@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : test_cmt.ant.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test-cmt" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>Helium antlib Quality CMT related tests.</description>
+
+    <taskdef resource="com/nokia/helium/quality/ant/antlib.xml" uri="http://www.nokia.com/helium" />
+    <property name="cmt.output.dir" location="./../output"/>
+    <property name="test.data.src" value="./../data/helloworldcons"/>
+    <property name="build.id" value="testbuild"/>
+    <property name="ido.name" value="cmttest"/>
+    <property name="cmt.id" value="1"/>
+
+    <basename property="componentbase" file="${test.data.src}"/>
+    
+    <!-- is called prior to the test -->
+    <target name="setUp">
+        <delete dir="${cmt.output.dir}" failonerror="false" />
+        <mkdir dir="${cmt.output.dir}/logs" />
+    </target>
+
+    <!-- is called after the test, even if that caused an error -->
+    <target name="tearDown">
+        <delete dir="${cmt.output.dir}" failonerror="false" />
+        <delete file="${test.data.src}\files.lst" failonerror="false" />
+    </target>
+
+    <condition property="do.cmt.test">
+        <os family="windows" />
+    </condition>
+
+
+    <!--
+     **************************************************************
+     ** test CMT for windows
+     **************************************************************
+    -->
+
+    <target name="test-cmt-with-all-reqd-params-set" if="do.cmt.test">
+        <hlm:cmt output="${cmt.output.dir}\logs\${build.id}_${ido.name}_${componentbase}_${cmt.id}.txt">
+            <fileset id="input" dir="${test.data.src}">
+                <include name="**/*.h"/>
+                <include name="**/*.cpp"/>
+            </fileset>
+        </hlm:cmt>
+        
+        <au:assertLogContains text="CMT run successfully? true"/>
+        <au:assertFileExists file="${cmt.output.dir}\logs\testbuild_cmttest_helloworldcons_1.txt"/>
+        <au:assertLogContains text="CMT2HTML run successfully? true"/>
+        <au:assertFileExists file="${cmt.output.dir}\logs\testbuild_cmttest_helloworldcons_1_cmt\CMTHTML\index.html"/>
+    </target>
+    
+    <!--
+     **************************************************************
+     ** test noargs
+     **************************************************************
+    -->
+    <target name="test-norargs-set" if="do.cmt.test">
+        <au:expectfailure expectedMessage="Nested Element 'fileset' missing for task 'cmt'.">
+            <hlm:cmt/>
+        </au:expectfailure>
+    </target>
+    
+    <!--
+     **************************************************************
+     ** test Only fileset set
+     **************************************************************
+    -->
+    <target name="test-only-fileset-set" if="do.cmt.test">
+        <au:expectfailure expectedMessage="Parameter 'output' missing for task 'cmt'.">
+            <hlm:cmt>
+                <fileset id="input" dir="${test.data.src}">
+                    <include name="**/*.h"/>
+                    <include name="**/*.cpp"/>
+                </fileset>
+            </hlm:cmt>
+        </au:expectfailure>
+    </target>
+
+    <!--
+     **************************************************************
+     ** test CMT for linux
+     **************************************************************
+    -->
+    <target name="test-cmt-linux" unless="do.cmt.test">
+        <hlm:cmt/>
+        <au:assertLogContains text="CMT supported only for windows"/>
+    </target>
+
+    
+</project>

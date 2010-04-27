@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : package_definition.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<SystemDefinition schema="3.0.0">
+  <package id="graphics" name="Graphics" levels="adaptation engines internal-adaptations device-interface internal-utils app-if">
+    <collection id="graphicsaccelaration" name="Graphics Acceleration" level="adaptation">
+      <component id="vgi" filter="s60" name="VGI">
+        <unit bldFile="graphicsaccelaration/vgi/group"/>
+      </component>
+    </collection>
+    <collection id="m3g" name="Mobile 3D Graphics" level="internal-adaptations">
+      <component id="m3gcore11" filter="s60" name="M3G Core 1.1">
+        <unit bldFile="m3g/m3gcore11/group"/>
+      </component>
+    </collection>
+    <collection id="graphicsresourceservices" name="Graphics Resource Services" level="engines">
+      <component id="graphicsresource" name="Graphics Resource" introduced="tb92" deprecated="tb92" purpose="optional">
+        <unit bldFile="graphicsresourceservices/graphicsresource/group" mrp="graphicsresourceservices/graphicsresource/group/graphics_graphicsresource.mrp"/>
+      </component>
+      <component id="graphicsresourceadaptation" name="Graphics Resource Adaptation" introduced="tb92" deprecated="tb92" purpose="optional">
+        <unit bldFile="graphicsresourceservices/graphicsresourceadaptation/group" mrp="graphicsresourceservices/graphicsresourceadaptation/group/graphics_graphicsresourceadapter.mrp"/>
+      </component>
+    </collection>
+    <collection id="graphicsutils" name="Graphics Utils" level="engines">
+      <component id="commongraphicsheaders" name="Common Graphics Headers" introduced="tb92" purpose="mandatory">
+        <unit bldFile="graphicsutils/commongraphicsheaders/group" mrp="graphicsutils/commongraphicsheaders/group/graphics_commonheader.mrp"/>
+      </component>
+    </collection>
+    <collection id="graphicshwdrivers" name="Graphics Hardware Drivers" level="adaptation">
+      <!-- displayldd to be moved here -->
+      <component id="surfacemgr" name="Surface Manager" introduced="tb92" purpose="optional">
+        <unit bldFile="graphicshwdrivers/surfacemgr/group" mrp="graphicshwdrivers/surfacemgr/group/graphics_surfacemanager.mrp"/>
+      </component>
+    </collection>
+    <collection id="graphicstest" name="Graphics Test" level="app-if">
+      <component id="graphicstestharness" name="Graphics Test Harness" introduced="8.1" purpose="development" filter="test">
+        <unit mrp="graphicstest/graphicstestharness/group/graphics_testharness.mrp" bldFile="graphicstest/graphicstestharness/group"/>
+      </component>
+      <component id="uibench" name="UI Bench" introduced="9.2" purpose="development">
+        <unit bldFile="graphicstest/uibench/group" mrp="graphicstest/uibench/group/graphics_ui_bench.mrp"/>
+      </component>
+    </collection>
+    <collection id="graphics_info" name="Graphics Info" level="app-if">
+      <component id="graphics_pub" filter="s60" name="Graphics Public Interfaces" class="api">
+           <!-- is this a real public API? -->
+        <!-- <unit bldFile="graphics_pub/group"/> -->
+      </component>
+      <component id="graphics_plat" filter="s60" name="Graphics Platform Interfaces" class="api">
+        <unit bldFile="graphics_plat/group"/>
+      </component>
+      <component id="graphicsdocs" name="Graphics Documentation" purpose="development" class="doc">
+        <unit mrp="graphics_info/graphicsdocs/graphics_documentation.mrp"/>
+      </component>
+      <component id="graphics_metadata" name="Graphics Metadata" class="config" introduced="tb91" purpose="development" target="desktop">
+        <unit mrp="graphics_info/graphics_metadata/graphics_metadata.mrp"/>
+      </component>
+    </collection>
+    <collection id="printingservices" name="Printing Services" level="app-if">
+      <component id="printerdriversupport" name="Printer Driver Support" purpose="optional">
+        <unit bldFile="printingservices/printerdriversupport/group" mrp="printingservices/printerdriversupport/group/graphics_pdrstore.mrp"/>
+      </component>
+      <component id="printerdrivers" name="Printer Drivers" purpose="optional" class="plugin">
+        <unit bldFile="printingservices/printerdrivers/group" mrp="printingservices/printerdrivers/group/graphics_printdrv.mrp"/>
+      </component>
+    </collection>
+    <collection id="fbs" name="Font and Bitmap Server" level="device-interface">
+      <component id="fontandbitmapserver" name="Font and Bitmap Server" purpose="mandatory">
+        <unit bldFile="fbs/fontandbitmapserver/group" mrp="fbs/fontandbitmapserver/group/graphics_fbserv.mrp"/>
+      </component>
+    </collection>
+    <collection id="opengles" name="OpenGLES" level="internal-adaptations">
+      <component id="openglesinterface" name="OpenGL ES Interface" introduced="8.0" purpose="optional">
+        <unit bldFile="opengles/openglesinterface/group" mrp="opengles/openglesinterface/group/graphics_openglesheaders.mrp"/>
+      </component>
+    </collection>
+    <collection id="openvg" name="OpenVG" level="internal-adaptations">
+      <component id="openvginterface" name="OpenVG Interface" introduced="tb91" purpose="optional">
+        <unit bldFile="openvg/openvginterface/group" mrp="openvg/openvginterface/group/graphics_openvgheaders.mrp"/>
+      </component>
+      <component id="openvg11" filter="s60" name="OpenVG 1.1">
+        <unit bldFile="openvg/openvginterface/group/openvg11"/>
+      </component>
+    </collection>
+    <collection id="egl" name="EGL" level="internal-adaptations">
+      <component id="eglinterface" name="EGL Interface" introduced="tb91" purpose="optional">
+        <unit bldFile="egl/eglinterface/group" mrp="egl/eglinterface/group/graphics_eglheaders.mrp"/>
+      </component>
+      <component id="eglswitch" name="EGL Switch" introduced="tb92" purpose="optional">
+        <unit bldFile="egl/eglswitch/group" mrp="egl/eglswitch/group/graphics_eglswitch.mrp"/>
+      </component>
+      <component id="eglrefimpl" name="EGL Reference Implementation" introduced="tb92" purpose="optional">
+        <unit bldFile="egl/eglrefimpl/group" mrp="egl/eglrefimpl/group/graphics_eglrefimpl.mrp"/>
+      </component>
+      <component id="egltest" name="EGL Tests" introduced="tb92" purpose="development">
+        <unit bldFile="egl/egltest/group" mrp="egl/egltest/group/graphics_egltest.mrp"/>
+      </component>
+    </collection>
+    <collection id="graphicsdeviceinterface" name="Graphics Device Interface" level="device-interface">
+      <component id="gdi" name="GDI" purpose="mandatory">
+        <unit bldFile="graphicsdeviceinterface/gdi/group" mrp="graphicsdeviceinterface/gdi/group/graphics_gdi.mrp"/>
+      </component>
+      <component id="bitgdi" name="BitGDI" purpose="mandatory">
+        <unit bldFile="graphicsdeviceinterface/bitgdi/group" mrp="graphicsdeviceinterface/bitgdi/group/graphics_bitgdi.mrp"/>
+      </component>
+      <component id="colourpalette" name="Colour Palette" introduced="7.0s" purpose="optional">
+        <unit bldFile="graphicsdeviceinterface/colourpalette/group" mrp="graphicsdeviceinterface/colourpalette/group/graphics_palette.mrp"/>
+      </component>
+      <component id="screendriver" name="Screen Driver" introduced="6.1" purpose="optional" class="plugin">
+        <unit bldFile="graphicsdeviceinterface/screendriver/group" mrp="graphicsdeviceinterface/screendriver/group/graphics_screendriver.mrp"/>
+      </component>
+      <component id="directgdi" name="DirectGDI" introduced="tb92" deprecated="tb92" purpose="optional">
+        <unit bldFile="graphicsdeviceinterface/directgdi/group" mrp="graphicsdeviceinterface/directgdi/group/graphics_directgdi.mrp"/>
+      </component>
+      <component id="directgdiinterface" name="DirectGDI Interface" introduced="tb92" deprecated="tb92" purpose="optional">
+        <unit bldFile="graphicsdeviceinterface/directgdiinterface/group" mrp="graphicsdeviceinterface/directgdiinterface/group/graphics_directgdiheaders.mrp"/>
+      </component>
+      <component id="directgdiadaptation" name="DirectGDI Adaptation" introduced="tb92" deprecated="tb92" purpose="optional">
+        <unit bldFile="graphicsdeviceinterface/directgdiadaptation/group" mrp="graphicsdeviceinterface/directgdiadaptation/group/graphics_directgdiadapter.mrp"/>
+      </component>
+    </collection>
+    <collection id="graphicstools" name="Graphics Tools" level="internal-utils">
+      <component id="gdi_tools" name="GDI Tools" purpose="development" target="desktop">
+        <unit bldFile="graphicstools/gdi_tools/group" mrp="graphicstools/gdi_tools/group/graphics_gditools.mrp"/>
+      </component>
+    </collection>
+    <collection id="graphicsapitest" name="Graphics API Tests" level="app-if">
+      <component id="graphicssvs" name="Graphics Verification Suite" introduced="tb91" purpose="development" filter="test">
+        <unit mrp="graphicsapitest/graphicssvs/group/graphicssvs.mrp" bldFile="graphicsapitest/graphicssvs/group"/>
+      </component>
+      <component id="screendriverhaitest" name="Screen Driver HAI Tests" introduced="tb91" purpose="development" filter="test">
+	<unit mrp="graphicsapitest/screendriverhaitest/group/screendriverhaitest.mrp" bldFile="graphicsapitest/screendriverhaitest/group"/>
+      </component>
+    </collection>
+  </package>
+</SystemDefinition>

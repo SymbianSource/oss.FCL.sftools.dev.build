@@ -20,7 +20,12 @@ Description:
 
 ============================================================================
 -->
-<!--* @package framework -->
+<!--* 
+Common targets.
+        
+@package framework
+    
+-->
 <project name="common" xmlns:hlm="http://www.nokia.com/helium" xmlns:cs="antlib:com.puppycrawl.tools.checkstyle">
     <description>
         Common targets for all Helium tools.
@@ -347,20 +352,13 @@ hlm -Dbuild.system=ec-helium   use electric cloud build system
         <delete file="${helium.build.dir}/test_jython.xml"/>
         <hlm:antlint>
             <fileset id="antlint.files" dir="${helium.dir}">
-                <include name="*.ant.xml"/>
-                <include name="tools/**/*.ant.xml"/>
-                <include name="tools/**/build.xml"/>
-                <include name="tools/**/*.antlib.xml"/>
-                <include name="config/**/*.ant.xml"/>
-                <include name="config/**/build.xml"/>
-                <include name="config/**/*.antlib.xml"/>
-                <include name="external/helium-antlib/**/*.ant.xml"/>
-                <include name="external/helium-antlib/**/build.xml"/>
-                <include name="external/helium-antlib/**/*.antlib.xml"/>
-                <include name="extensions/nokia/**/build.xml"/>
-                <include name="extensions/nokia/**/*.antlib.xml"/>
-                <include name="extensions/nokia/**/*.ant.xml"/>
-                <exclude name="external/helium-antlib/**/data/*.xml"/>
+                <include name="**/*.ant.xml"/>
+                <include name="**/build.xml"/>
+                <include name="**/*.antlib.xml"/>
+                <exclude name="tests/**"/>
+                <exclude name="external/**"/>
+                <exclude name="**/tests/data/**"/>
+                <exclude name="build/**"/>
             </fileset>
             <checker name="CheckTabCharacter" severity="error" />
             <checker name="CheckPropertyName" severity="warning">([a-z0-9[\\d\\_\\.\\@\\{\\}\\$]]*)</checker>
@@ -391,7 +389,7 @@ hlm -Dbuild.system=ec-helium   use electric cloud build system
         <antcall target="pylint" inheritRefs="true">
             <reference refid="jep.files" torefid="python.files" />
         </antcall>
-        <cs:checkstyle config="config/java_checkstyle_config.xml">
+        <cs:checkstyle config="builder/java/config/java_checkstyle_config.xml">
             <fileset dir="${helium.build.dir}/beanshell" includes="**/*.java"/>
             <formatter type="plain"/>
         </cs:checkstyle>

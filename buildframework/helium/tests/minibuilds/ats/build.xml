@@ -34,12 +34,12 @@ Description:
     <property name="build.drive" value="z:" />
     <property name="build.id" value="${build.name}_${build.version}"/>
     <property name="diamonds.host" value="diamonds.nmp.nokia.com"/>
-    <property name="diamonds.port" value="8080"/>
+    <property name="diamonds.port" value="80"/>
     <property name="diamonds.path" value="/diamonds/builds/"/>
     
-    <property name="enabled.ats" value="1" />
+    <property name="enabled.ats" value="true" />
 
-	<property name="skip.ats.sending" value="1"/>
+	<property name="skip.ats.sending" value="true"/>
 		<property name="ats.image.type" value="variant" />
 		<property name="ats.product.name" value="" />
 		<property name="ats.email.list" value="" />

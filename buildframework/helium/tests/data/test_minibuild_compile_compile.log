@@ -1,0 +1,5 @@
+
+
+R:\>emake --emake-build-label=minibuild_compile_0.0.1.helium_minibuild_compile --emake-class=s60 --emake-priority=normal --emake-maxagents=0 --emake-job-limit=0 --emake-mem-limit=1000000000 --emake-history=merge --emake-annodetail=basic,history,file,waiting --emake-annofile=R:\output\logs\compile\minibuild_compile_0.0.1.helium_minibuild_compile.emake.anno.xml --emake-historyfile=R:/emake.data --emake-debug=g --emake-logfile=R:\output\logs\compile\minibuild_compile_0.0.1.helium_minibuild_compile.emake.g.dlog --emake-root=;D:\harsha\projects\helium\helium-codebase4\helium --emake-autodepend=1 -k -i -f R:/helium_minibuild_compile.make LOGBUILDTIME="" VERBOSE="" SAVESPACE="" helium_minibuild_compile 
+'emake' is not recognized as an internal or external command,
+operable program or batch file.

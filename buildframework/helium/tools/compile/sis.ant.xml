@@ -24,6 +24,13 @@ Description:
 <project name="compile.sis" xmlns:hlm="http://www.nokia.com/helium">
     <description>Create SIS files.</description>
     
+    <!--* @property sis.config.file
+    The SIS configuration XML file.
+    @type string
+    @editable required
+    @scope public
+    -->
+    
     <!-- Common Configuration config name. Override to select a specific config group.
     @type string
     -->

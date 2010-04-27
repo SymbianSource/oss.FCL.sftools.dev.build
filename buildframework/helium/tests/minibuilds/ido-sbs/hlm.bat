@@ -22,5 +22,5 @@ set SBS_HOME=E:\APPS\sbs
 set PATH=%SBS_HOME%\bin;%PATH%
 )
 echo Using Raptor from: %SBS_HOME%
-..\..\..\..\helium\hlm.bat %*
+..\..\..\hlm.bat %*
 endlocal

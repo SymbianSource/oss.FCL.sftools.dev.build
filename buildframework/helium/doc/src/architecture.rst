@@ -1,3 +1,23 @@
+..  ============================================================================ 
+    Name        : architecture.rst
+    Part of     : Helium 
+    
+    Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+    All rights reserved.
+    This component and the accompanying materials are made available
+    under the terms of the License "Eclipse Public License v1.0"
+    which accompanies this distribution, and is available
+    at the URL "http://www.eclipse.org/legal/epl-v10.html".
+    
+    Initial Contributors:
+    Nokia Corporation - initial contribution.
+    
+    Contributors:
+    
+    Description:
+    
+    ============================================================================
+
 ###########################
 Helium Architecture
 ###########################
@@ -11,10 +31,11 @@ Helium Architecture
 Introduction
 ============
 
+This is a overview of the Helium toolkit and its dependencies as a stack.
+
 .. raw:: html
    :file: helium_overview.html
-   
-This is a overview of the Helium toolkit and its dependencies as a stack.
+
    
 .. index::
   single: Architectural Principles
@@ -56,9 +77,7 @@ Files created in Ant, Perl, Python or XML syntax must follow the `Style guide <c
 Configuration
 =============
 
-XML is recommended for defining configuration files. Ant configuration types and tasks should be used where most logical. If a more structured configuration is needed then a custom XML schema can be defined. Existing schemas should be reused where possible.
-
-(add existing schemas)
+XML is recommended for defining configuration files. Ant configuration types and tasks should be used where logical. If a more structured configuration is needed then a custom XML schema can be defined. Existing schemas should be reused where possible.
 
 .. index::
   single: APIs
@@ -87,10 +106,10 @@ Tools and scripts locations
 
 All tools used by Helium (which means called by Ant at some point during a build sequence, directly or indirectly) come from one of these locations:
 
-* **Inside /helium/tools**. Content is generally developed or imported by the Helium team and is our responsibility. We strive to test it using unit tests where possible and general build execution. It should follow Helium coding guidelines. This may be libraries closely integrated with Ant, or standalone tools called by Ant like iCreatorDP.
-* **Inside /helium/external**. These are tools provided by an external party, which could be open source projects or other teams in Nokia. Updates are the responsibility of the maintainer. Typically Helium developers will import the updates, but if agreed the supplier might also directly make the update. If the content is currently provided as a Synergy project it is desirable to simply use releases of that.
-* **Inside /epoc32**. This covers the Symbian toolchain, iMaker, etc. At the point where the tool is needed it should have been exported into /epoc32.
-* **Already Installed**. All language runtimes such as Java, Perl and Python.
+* Inside ``/helium/tools``. Content is generally developed or imported by the Helium team and is our responsibility. We strive to test it using unit tests where possible and general build execution. It should follow Helium coding guidelines. This may be libraries closely integrated with Ant, or standalone tools called by Ant like iCreatorDP.
+* Inside ``/helium/external``. These are tools provided by an external party, which could be open source projects or other teams in Nokia. Updates are the responsibility of the maintainer. Typically Helium developers will import the updates, but if agreed the supplier might also directly make the update. If the content is currently provided as a Synergy project it is desirable to simply use releases of that.
+* Inside ``/epoc32``. This covers the Symbian toolchain, iMaker, etc. At the point where the tool is needed it should have been exported into /epoc32.
+* Already Installed. All language runtimes such as Java, Perl and Python.
 
 .. index::
   single: Dependency Diagram
@@ -98,4 +117,4 @@ All tools used by Helium (which means called by Ant at some point during a build
 Dependency Diagram
 ==================
 
-.. image:: images/dependencies.grph.png
+.. image:: dependencies.grph.png

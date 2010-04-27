@@ -1,0 +1,10 @@
+<info>
+    <id>build.id</id>
+    <number>1</number>
+    <startTime>2010-03-24T19:05:47</startTime>
+    <machine>COMPUTERNAME</machine>
+    <publish>
+        <status>false</status>
+        <location>\\some\publish\dir</location>
+    </publish>
+</info>

@@ -27,7 +27,7 @@ Description:
     </description>
     
     <!-- Runs all the unit testing targets. -->
-    <target name="unittest" depends="ju-unittest,ant-unittest,py-unittest"/>
+    <target name="unittest" depends="ant-unittest,py-unittest"/>
     
     <!-- Unit testing -->
 
@@ -126,81 +126,14 @@ for line in open(r'${helium.build.dir}/coverage/report/line_coverage.txt'):
             <propertyset>
                 <propertyref name="cache.dir"/>
             </propertyset>
-            <fileset dir="${helium.dir}" includes="tools/**/test_*.ant.xml"/>
-            <fileset dir="${helium.dir}" includes="extensions/nokia/tools/**/test_*.ant.xml"/>
+            <fileset dir="${helium.dir}" includes="tools/**/test_*.ant.xml"/> 
+            <fileset dir="${helium.dir}" includes="extensions/nokia/tools/**/test_*.ant.xml"/> 
             <au:plainlistener/>
-            <au:xmllistener toDir="${helium.build.dir}/report/antunit"/>
+            <hlm:antcoveragelistener outputfile="${helium.build.dir}/report/antunit/ant_coverage.txt"/>
+            <au:xmllistener toDir="${helium.build.dir}/report/antunit" logLevel="info" />
         </au:antunit>
     </target>
     
-    
-    <!-- Run JUnit unit tests. -->
-    <target name="ju-unittest" depends="build-java-src">
-        <!-- Source location for test class -->
-        <!-- Source location for junit test class.
-        @type string
-        @scope private
-        -->
-        <property name="src" location="tools/common/java/test" /> 
-        <!-- Source classes location -->
-        <!-- Java source files location for helium library.
-        @type string
-        @scope private
-        -->
-        <property name="src.classes" location="tools/common/java/src" />
-        
-        <delete dir="${build.temp.dir}/junit_classes"/>
-        <mkdir dir="${build.temp.dir}/junit_classes" />
-                
-        <!-- Compile the test classes  -->
-        <javac srcdir="${src}" destdir="${build.temp.dir}/junit_classes" debug="true">    
-            <include name="**/*.java"/>
-            <classpath>                         
-                <pathelement path="${java.class.path}/"/>
-            </classpath>
-        </javac>
-        
-        <path id="build.classpath">
-            <pathelement location="${build.temp.dir}/class" />
-            <pathelement location="${build.temp.dir}/junit_classes" />
-        </path>
-        <emma enabled="true">
-            <instr instrpathref="build.classpath"  
-            destdir="${build.temp.dir}/emma/instrumented"  
-            metadatafile="${build.temp.dir}/metadata.emma"
-            merge="true">
-                <filter excludes="org.apache.log4j.*" />
-            </instr>
-        </emma>
-                                                    
-        <!-- Execute JUnit-->
-        <junit fork="yes" printsummary="yes" haltonfailure="no" showoutput="yes" >
-            <formatter type="brief" usefile="false"/>
-            <jvmarg value="-Demma.coverage.out.file=${build.temp.dir}/coverage.emma" />
-            <jvmarg value="-Demma.coverage.out.merge=false" />
-            <classpath>
-                <pathelement path="${build.temp.dir}/emma/instrumented"/>
-                <pathelement path="${java.class.path}/"/>
-            </classpath>    
-            <batchtest fork="yes" todir="${build.temp.dir}/junit_test">
-                <fileset dir="${src}">
-                    <include name="**/*Test*.java"/>
-                </fileset>
-            </batchtest>
-        </junit>
-        
-        <emma enabled="true">
-            <report>
-                <sourcepath>
-                    <dirset dir="${src.classes}" />
-                </sourcepath>
-                <infileset dir="${build.temp.dir}" includes="*.emma" />
-                <txt outfile="${build.temp.dir}/coverage.txt" depth="method" />
-                <html outfile="${build.temp.dir}/coverage.html" />
-            </report>
-        </emma>
-        <loadfile property="message" srcFile="${build.temp.dir}/coverage.txt"/>
-        <echo message="${message}"/>
-    </target>    
-    
+    <target name="antunit" depends="ant-unittest"/>
+
 </project>

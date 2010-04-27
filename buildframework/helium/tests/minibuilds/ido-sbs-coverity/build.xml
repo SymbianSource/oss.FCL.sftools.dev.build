@@ -29,6 +29,7 @@ Description:
     
     <!-- enable coverity -->
     <property name="enabled.coverity" value="true"/>
+    <property name="publish.ccm.folder" value="bh1test#310" />
     
     <!-- Run the full sequence of target for the minibuild. ,mini-build-prep,compile-main,zip-ee,mini-build-check-->
     <!--<target name="do-mini-build" depends="mini-build-cleanup,

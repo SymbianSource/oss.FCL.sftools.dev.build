@@ -28,8 +28,7 @@ Description:
 
     
     <path id="lib.path">
-        <fileset dir="${helium.dir}/external/antlibs" includes="**/*.jar"/>
-        <fileset dir="${helium.dir}/tools/common/java/lib" includes="nokia_ant.jar"/>
+        <fileset dir="${helium.dir}/external/antlibs2" includes="**/*.jar"/>
     </path>
     
     <!-- External tasks. -->
@@ -49,5 +48,8 @@ Description:
     <!-- Nokia internal tasks. -->
     <taskdef resource="com/nokia/ant/antlib.xml" classpathref="lib.path" uri="http://www.nokia.com/helium"/>
     <taskdef resource="com/nokia/helium/ant/data/antlib.xml" classpathref="lib.path" uri="http://www.nokia.com/helium"/>
+    
+    <!-- Nokia internal types. -->
+    <typedef resource="com/nokia/helium/ant/coverage/antlib.xml" uri="http://www.nokia.com/helium"/>
         
 </project>

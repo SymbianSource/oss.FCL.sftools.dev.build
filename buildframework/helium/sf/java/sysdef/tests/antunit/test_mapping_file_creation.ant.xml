@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : test_mapping_file_creation.ant.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test-merge-sysdef" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>Helium antlib merge sysdef tests.</description>
+
+    <taskdef resource="com/nokia/helium/sysdef/ant/antlib.xml" uri="http://www.nokia.com/helium" />
+    <property name="epocroot" location="../data/mapping" />
+    <property name="epocroot.temp" location="${epocroot}/temp" />
+
+    <!-- is called prior to the test -->
+    <target name="setUp">
+        <delete dir="${epocroot.temp}/" failonerror="false" />
+        <mkdir dir="${epocroot.temp}" />
+    </target>
+
+    <!-- is called after the test, even if that caused an error -->
+    <target name="tearDown">
+        <delete dir="${epocroot.temp}" failonerror="false" />
+    </target>
+
+    <dirset id="test.quality.dir" dir="../data/mapping">
+        <include name="**/valid*/"/>
+    </dirset>
+
+    <target name="test-mapping-creation-invalid-dir">
+        <hlm:createPackageMapping epocroot="${epocroot}" filterDirSet="${ado.quality.dir}" destFile="${epocroot.temp}/quality.ini">
+            <fileset dir="../data/mapping">
+                <include name="**/valid_package/package_definition.xml" />
+            </fileset>
+        </hlm:createPackageMapping>
+        <au:assertLogContains text="filteredDirSet is not valid" level="warning"/>
+    </target>
+
+    <target name="test-mapping-creation-no-quality-dir">
+        <hlm:createPackageMapping epocroot="${epocroot}" destFile="${epocroot.temp}/quality.ini">
+            <fileset dir="../data/mapping">
+                <include name="**/valid_package/package_definition.xml" />
+            </fileset>
+        </hlm:createPackageMapping>
+        <au:assertFileExists file="${epocroot.temp}/quality.ini" />
+        <au:assertLogContains text="filterDirSet attribute is not set" level="warning"/>
+    </target>
+
+    <target name="test-mapping-creation-no-quality-map-file">
+        <au:expectfailure message="destFile is not defined">
+            <hlm:createPackageMapping epocroot="${epocroot}">
+                <fileset dir="../data/mapping">
+                    <include name="**/valid_package/package_definition.xml" />
+                </fileset>
+            </hlm:createPackageMapping>
+            <au:assertLogContains text="destFile is must" />
+        </au:expectfailure>
+    </target>
+
+    <target name="test-mapping-creation-no-quality-map-file-invalid-base-dir">
+        <au:expectfailure message="Folder not exists: ${epocroot.temp}/invalid-folder">
+            <hlm:createPackageMapping epocroot="${epocroot}"
+                destFile="${epocroot.temp}/invalid-folder/quality.ini" >
+                <fileset dir="../data/mapping">
+                    <include name="**/valid_package/package_definition.xml" />
+                </fileset>
+            </hlm:createPackageMapping>
+        </au:expectfailure>
+    </target>
+
+    <target name="test-mapping-creation">
+        <hlm:createPackageMapping epocroot="${epocroot}" destFile="${epocroot.temp}/data.ini">
+            <fileset dir="../data/mapping">
+                <include name="**/valid_package/package_definition.xml" />
+            </fileset>
+        </hlm:createPackageMapping>
+        <hlm:createPackageMapping epocroot="${epocroot}"
+            filterDirSet="${ado.quality.dir}" destFile="${epocroot.temp}/quality.ini">
+            <fileset dir="../data/mapping">
+                <include name="**/valid_package/package_definition.xml" />
+            </fileset>
+        </hlm:createPackageMapping>
+        <au:assertFileExists file="${epocroot.temp}/data.ini" />
+        <loadfile property="pkg.mapping" srcfile="${epocroot.temp}/data.ini">
+            <filterchain>
+                <replaceregex pattern="\\(:|\\)" replace="\1" flags="g" />
+            </filterchain>
+        </loadfile>
+        <echo>${pkg.mapping}</echo>
+        <au:assertTrue message="valid_package should appear in the file">
+            <contains string="${pkg.mapping}" 
+                substring="valid_package" />
+        </au:assertTrue>
+    </target>
+
+    <target name="test-mapping-creation-from-refid">
+        <fileset dir="../data/mapping" id="valid.pkg.ref">
+            <include name="**/valid_package/package_definition.xml" />
+        </fileset>
+    
+        <hlm:createPackageMapping epocroot="${epocroot}" destFile="${epocroot.temp}/data.ini">
+            <fileset refid="valid.pkg.ref" />
+        </hlm:createPackageMapping>
+        
+        <au:assertFileExists file="${epocroot.temp}/data.ini" />
+        <loadfile property="pkg.mapping" srcfile="${epocroot.temp}/data.ini">
+            <filterchain>
+                <replaceregex pattern="\\(:|\\)" replace="\1" flags="g" />
+            </filterchain>
+        </loadfile>
+        <echo>${pkg.mapping}</echo>
+        <au:assertTrue message="valid_package should appear in the file">
+            <contains string="${pkg.mapping}" 
+                substring="/valid_package" />
+        </au:assertTrue>
+    </target>
+
+    <target name="test-mapping-creation-missing-pkgdata-file-failure">
+        <au:expectfailure message="The task must fail by default in case of missing package_data.xml file.">
+            <hlm:createPackageMapping epocroot="${epocroot}" destFile="${epocroot.temp}/data.ini">
+                <fileset dir="../data/mapping">
+                    <include name="**/valid_package/package_definition.xml" />
+                    <include name="**/missing_data_file_pkg/package_definition.xml" />
+                </fileset>
+            </hlm:createPackageMapping>
+        </au:expectfailure>
+        <au:assertFileDoesntExist file="${epocroot.temp}/data.ini" />
+        <au:assertLogContains text="Could not find:" level="error" />
+    </target>
+
+    <target name="test-mapping-creation-missing-pkgdata-file-keepgoing">
+        <hlm:createPackageMapping failonerror="false" epocroot="${epocroot}" destFile="${epocroot.temp}/data.ini">
+            <fileset dir="../data/mapping">
+                <include name="**/valid_package/package_definition.xml" />
+                <include name="**/missing_data_file_pkg/package_definition.xml" />
+            </fileset>
+        </hlm:createPackageMapping>
+        <au:assertFileExists file="${epocroot.temp}/data.ini" />
+        <loadfile property="pkg.mapping" srcfile="${epocroot.temp}/data.ini">
+            <filterchain>
+                <replaceregex pattern="\\(:|\\)" replace="\1" flags="g" />
+            </filterchain>
+        </loadfile>
+        <echo>${pkg.mapping}</echo>
+        <au:assertTrue message="valid_package should appear in the file">
+            <contains string="${pkg.mapping}" 
+                substring="/valid_package" />
+        </au:assertTrue>
+        <au:assertTrue message="valid_package should appear in the file">
+            <not>
+                <contains string="${pkg.mapping}" 
+                    substring="missing_data_file_pkg" />
+            </not>
+        </au:assertTrue>
+        <au:assertLogContains text="Could not find:" level="error" />
+    </target>
+
+    <target name="test-mapping-creation-with-invalid-pkgdata-file-failure">
+        <au:expectfailure message="The task must fail by default in case of invalid package_data.xml file.">
+            <hlm:createPackageMapping epocroot="${epocroot}" destFile="${epocroot.temp}/data.ini">
+                <fileset dir="../data/mapping">
+                    <include name="**/valid_package/package_definition.xml" />
+                    <include name="**/invalid_pkg_data/package_definition.xml" />
+                </fileset>
+            </hlm:createPackageMapping>
+        </au:expectfailure>
+        <au:assertFileDoesntExist file="${epocroot.temp}/data.ini" />
+        <au:assertLogContains text="root attribute under element PackageMap is missing in file:" level="error" />
+    </target>
+
+    <target name="test-mapping-creation-invalid-pkgdata-file-keepgoing">
+        <hlm:createPackageMapping failonerror="false" epocroot="${epocroot}" destFile="${epocroot.temp}/data.ini">
+            <fileset dir="../data/mapping">
+                <include name="**/valid_package/package_definition.xml" />
+                <include name="**/invalid_pkg_data/package_definition.xml" />
+            </fileset>
+        </hlm:createPackageMapping>
+        <au:assertFileExists file="${epocroot.temp}/data.ini" />
+        <loadfile property="pkg.mapping" srcfile="${epocroot.temp}/data.ini">
+            <filterchain>
+                <replaceregex pattern="\\(:|\\)" replace="\1" flags="g" />
+            </filterchain>
+        </loadfile>
+        <echo>${pkg.mapping}</echo>
+        <au:assertTrue message="valid_package should appear in the file">
+            <contains string="${pkg.mapping}" 
+                substring="/valid_package" />
+        </au:assertTrue>
+        <au:assertTrue message="valid_package should appear in the file">
+            <not>
+                <contains string="${pkg.mapping}" 
+                    substring="missing_data_file_pkg" />
+            </not>
+        </au:assertTrue>
+        <au:assertLogContains text="root attribute under element PackageMap is missing in file:" level="error" />
+    </target>
+
+    
+    <target name="test-mapping-creation-inexisting-pkg-file-failure">
+        <au:expectfailure message="The task must fail by default in case of missing package_data.xml file.">
+            <hlm:createPackageMapping epocroot="${epocroot}" destFile="${epocroot.temp}/data.ini">
+                <path>
+                    <pathelement path="../data/mapping/package_definition.xml" />
+                </path>
+            </hlm:createPackageMapping>
+        </au:expectfailure>
+        <au:assertFileDoesntExist file="${epocroot.temp}/data.ini" />
+        <au:assertLogContains text="Could not find package definition file:" level="error" />
+    </target>
+
+    <target name="test-mapping-creation-inexisting-pkg-file-keepgoing">
+        <hlm:createPackageMapping epocroot="${epocroot}" destFile="${epocroot.temp}/data.ini" failonerror="false">
+            <path>
+                <pathelement path="../data/mapping/package_definition.xml" />
+            </path>
+        </hlm:createPackageMapping>
+        <au:assertFileExists file="${epocroot.temp}/data.ini" />
+        <au:assertLogContains text="Could not find package definition file:" level="error" />
+    </target>
+    
+    
+    <target name="test-fail-without-attributes">
+        <au:expectfailure message="The task must fail without attributes.">
+            <hlm:createPackageMapping />            
+        </au:expectfailure>
+        <au:assertFileDoesntExist file="${epocroot.temp}/data.ini" />
+    </target>
+    
+    <target name="test-fail-without-destfile">
+        <au:expectfailure message="The task must fail without attributes.">
+            <hlm:createPackageMapping epocroot="${epocroot}"/>            
+        </au:expectfailure>
+        <au:assertFileDoesntExist file="${epocroot.temp}/data.ini" />
+    </target>
+
+    <target name="test-pass-without-nested-element">
+        <hlm:createPackageMapping epocroot="${epocroot}" destFile="${epocroot.temp}/data.ini"/>            
+        <au:assertFileExists file="${epocroot.temp}/data.ini" />
+    </target>
+</project>

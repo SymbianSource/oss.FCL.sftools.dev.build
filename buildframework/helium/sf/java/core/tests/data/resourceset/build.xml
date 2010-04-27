@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<!-- 
+============================================================================ 
+Name        : build.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test-resourceset" xmlns:hlm="http://www.nokia.com/helium">
+    <description>Helium antlib core resourceSet test config.</description>
+    <taskdef resource="com/nokia/helium/core/ant/antlib.xml" uri="http://www.nokia.com/helium" />
+
+    <hlm:resourceSet id="test1">
+        <path>
+            <pathelement path="${ant.file.test-resourceset}" />
+        </path>
+    </hlm:resourceSet>
+
+    <hlm:resourceSet id="test2">
+        <path>
+            <pathelement path="${ant.file.test-resourceset}" />
+        </path>
+        <path>
+            <pathelement path="${ant.file.test-resourceset}" />
+        </path>
+    </hlm:resourceSet>
+    
+    <hlm:resourceSet id="test.empty" />
+    
+</project>

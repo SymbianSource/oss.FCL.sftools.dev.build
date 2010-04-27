@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : build.xml
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="minibuild.ido-sbs-sysdef3" default="help" xmlns:au="org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium" basedir="..\ido">
+    <property environment="env"/>
+	<!--property name="config.temp.build.dir" location="${ant.file.minibuild.ido-sbs}/../build"/ -->
+	
+	<!-- Configuring raptor build system -->
+	<property name="build.system" value="sbs"/>
+    <property name="schema.new" value="true"/>
+
+    <!-- Synergy project for TB92 -->
+    <property name="ccm.project" value="MinibuildDomain-tr1ido#50_201013:project:tr1test1#1" />
+
+
+	<property name="build.name" value="minibuild_ido_sbs_sysdef3" />
+    <property name="build.family" value="test_minibuild_ido_sbs_sysdef3" />
+			
+    <target name="mini-build-check-blocks">
+        <if>
+            <istrue value="${blocks.enabled}" />
+            <then>
+                <au:assertFileExists file="${blocks.config.dir}/helloworld_api.blocks_component.xml" />
+                <au:assertFileExists file="${blocks.config.dir}/helloworldcons_app.blocks_component.xml" />
+            </then>
+        </if>
+    </target>
+
+	<import file="../ido-sbs/build.xml"/>
+
+    <!-- Looking for package definitions files -->
+    <path id="system.definition.files">
+        <fileset dir="${ccm.project.wa_path}" includes="*/*/*/package_definition.xml" />
+    </path>
+
+    <!-- Defining what layer to build -->
+    <patternset id="sysdef.filters.helium_minibuild_ido" >
+        <include name="mw" />
+        <include name="app" />
+    </patternset>
+
+    <patternset id="sysdef.filters.helium_minibuild_ido" >
+        <include name="mw" />
+        <include name="app" />
+    </patternset>
+
+    <patternset id="sysdef.filters.helium_minibuild_ido_clean" >
+        <include name="mw" />
+        <include name="app" />
+    </patternset>
+
+</project>
+
+    

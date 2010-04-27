@@ -1,3 +1,23 @@
+..  ============================================================================ 
+    Name        : running.rst
+    Part of     : Helium 
+    
+    Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+    All rights reserved.
+    This component and the accompanying materials are made available
+    under the terms of the License "Eclipse Public License v1.0"
+    which accompanies this distribution, and is available
+    at the URL "http://www.eclipse.org/legal/epl-v10.html".
+    
+    Initial Contributors:
+    Nokia Corporation - initial contribution.
+    
+    Contributors:
+    
+    Description:
+    
+    ============================================================================
+
 .. index::
   module: Running Helium
 
@@ -99,6 +119,33 @@ Build output
 When a build is running the targets being executed are listed on the screen there is no need to pipe this to a file as the ant targets are logged in the   ``\*_main.ant.log`` for product and IDO builds. Once the build is complete it will say on the screen whether the build was successful or failed. If it has failed it should give an indication of where and why it failed on the screen but for more information you must examine the output logs. If the build says it was successfult this does not necessarily mean that the build compiled all components successfully, you must examine the logs to check that all is compiled and linked correctly. See :ref:`Troubleshooting-label` for information on logs and where they kept.
 
 The result of the build (compiled files, linked (flash) files etc.) are  stored in the usual folders and directories under the ``\epoc32`` directory.
+
+.. index::
+  single: Running build operations
+
+Running build operations
+========================
+
+Setting the build number
+-------------------------
+
+The :hlm-p:`build.number` property is typically not defined in a configuration file, as it changes for every new build. It should be defined as a command line parameter::
+
+    -Dbuild.number=123
+
+A shortcut can also be used::    
+
+    -Dbn=123    
+
+.. index::
+  single: Setting the team property
+
+.. _Setting-Team_properties-label:
+
+Setting the team property
+--------------------------
+
+``SET TEAM=<team-name>`` (this defines which team-specific XML file from ``../site/${r'$'}{env.TEAM}.ant.xml`` is used for build configuration).
 
 
 .. index::

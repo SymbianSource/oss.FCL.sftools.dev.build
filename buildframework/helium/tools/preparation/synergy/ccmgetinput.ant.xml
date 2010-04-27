@@ -53,14 +53,7 @@ Description:
     @editable required
     @scope public
     -->
-    
-    <hlm:recordfilterset id="prepWorkArea.logextract.config">
-        <hlm:recordfilter category="error" regexp="^ERROR:" />
-        <hlm:recordfilter category="warning" regexp="^WARNING:" />
-        <hlm:recordfilter category="info" regexp="^INFO:" />
-    </hlm:recordfilterset>
-
-    
+        
     <!-- This target uses an XML input file to retrieve content from Synergy.
       -->
     <target name="prep-work-area" depends="log-build-start" if="run.ccm">
@@ -112,4 +105,57 @@ sys.exit(0)
         </trycatch>
     </target>
 
+    
+    <!--
+     This target will cleanup all snapshoted/checkout project from the disk. Checked out project will
+     also be deleted from the synergy database. 
+     -->
+    <target name="cleanup-work-area" if="run.ccm">
+        <hlm:tempRecordStartMacro name="${build.id}_cleanup_work_area.log" />
+        <runtarget target="get-ccm-password"/>
+        <runtarget target="ccm-prepare-input"/>
+        
+        <hlm:assertPropertySet property="prep.delivery.file" message="Property prep.delivery.file is not defined." />
+        <trycatch>
+            <try>
+                <hlm:python failonerror="true">
+import preparation
+import configuration
+import traceback
+import logging            
+import ant
+import sys
+import os.path
+
+# enabling logging
+logging.basicConfig(level=logging.INFO)
+
+builder = None           
+try:
+    configBuilder = configuration.NestedConfigurationBuilder(open(ant.get_property(r'${prep.delivery.conf.parsed}'), 'r'))
+    configSet = configBuilder.getConfiguration()
+    password = ant.get_property(r'${ccm.user.password}')
+    builder = preparation.PreparationBuilder(configSet.getConfigurations(), ant.get_property(r'${ccm.user.login}'), password, cache=ant.get_property(r'${ccm.cache.xml}'))
+    builder.cleanup()
+    builder.close()
+except Exception, e:
+    print "ERROR: error found during preparation phase:" 
+    for l in traceback.format_exc().splitlines(False):
+        print "ERROR: %s" % l         
+    print "ERROR: this is a critical error, build will fail now:"
+    for l in str(e).splitlines(False):
+        print "ERROR: %s" % l         
+    if builder != None:
+        builder.close()
+    sys.exit(-1)
+sys.exit(0)
+                </hlm:python>
+            </try>
+            <finally>
+                <hlm:tempRecordStopMacro name="${build.id}_cleanup_work_area.log" filterref="filterset.prepWorkArea" phase="prep"/>
+                <hlm:assertFileExists file="${build.cache.log.dir}/${build.id}_cleanup_work_area.log" />
+            </finally>
+        </trycatch>
+    </target>
+    
 </project>

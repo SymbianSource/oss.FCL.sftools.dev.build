@@ -92,7 +92,7 @@ writer.close();
         <!-- FMPP template to generate a buildinfo makefile.
         @type string
         -->
-        <property name="rombuild.buildinfo.template" location="${helium.dir}/tools/common/templates/imaker/image_conf_buildinfo.mk.ftl" />
+        <property name="rombuild.buildinfo.template" location="${helium.dir}/tools/rombuild/templates/image_conf_buildinfo.mk.ftl" />
         <!-- Location of the output file.
         @type string
         @scope private
@@ -146,7 +146,9 @@ writer.close();
             <hlm:imakerconfigurationset refid="imaker.rom.config" />
         </hlm:imaker>
         <if>
-            <available file="${roms.log.dir}/${build.id}${imaker.rom.name}.roms.log" />
+            <not>
+                <available file="${roms.log.dir}/${build.id}${imaker.rom.name}.roms.log" />
+            </not>
             <then>
                 <echo message="WARNING: Nothing to build." file="${roms.log.dir}/${build.id}${imaker.rom.name}.roms.log" />
             </then>

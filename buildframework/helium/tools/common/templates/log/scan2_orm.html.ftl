@@ -36,11 +36,11 @@ Description:
 <#assign seconds = (minutes_secs % 60)?floor>
     <td>${component.component}</td>
 <#--write each of the component tables information -->
-<td align="center">${hours?string("00")}:${minutes?string("00")}:${seconds?string("00")}</td>
+<td align="center">${hours?string?left_pad(2, "0")}:${minutes?string?left_pad(2, "0")}:${seconds?string?left_pad(2, "0")}</td>
 <#list color_list?keys as priority>
     <#assign count =  table_info['jpasingle']['select count(m.id) from MetadataEntry as m JOIN  m.priority as p JOIN m.component as c where UPPER(p.priority) like \'%${priority?upper_case}%\' and c.id=${component.id}'][0] >
-    <#if priority == 'error'>
-        <#assign count_check_missing_files = table_info['jpasingle']['select Count(w.id) from WhatLogEntry w, Component c where c.component=\'${component.component}\' and c.logPathID=${whatlogpath.id} and w.componentID=c.id and w.missing=1'][0]>
+    <#if priority == 'error' && !logfile?contains('_clean_')>
+        <#assign count_check_missing_files = table_info['jpasingle']['select Count(w.id) from WhatLogEntry w, Component c where c.component=\'${component.component}\' and c.logPathID=${logpath.id} and w.componentID=c.id and w.missing=1'][0]>
         <#assign count = count + count_check_missing_files>
     </#if>
     <#if count &gt; 0>
@@ -54,10 +54,12 @@ Description:
 </tr>
 </#macro>
 
+<#macro converttime time>${((time/3660)%60)?string?left_pad(2, "0")}:${((time/60)%60)?string?left_pad(2, "0")}:${(time%60)?string?left_pad(2, "0")}</#macro>
+
 <#macro print_list_text priority component href_id>
 <#assign count =  table_info['jpasingle']['select count(m.id) from MetadataEntry as m JOIN m.priority as p JOIN m.component as c where  UPPER(p.priority) like \'%${priority?upper_case}%\' and c.id=${component.id}'][0] >
-<#if priority == 'error'>
-    <#assign count_check_missing_files = table_info['jpasingle']['select Count(w.id) from WhatLogEntry w, Component c where c.component=\'${component.component}\' and c.logPathID=${whatlogpath.id} and w.componentID=c.id and w.missing=1'][0]>
+<#if priority == 'error' && !logfile?contains('_clean_')>
+    <#assign count_check_missing_files = table_info['jpasingle']['select Count(w.id) from WhatLogEntry w, Component c where c.component=\'${component.component}\' and c.logPathID=${logpath.id} and w.componentID=c.id and w.missing=1'][0]>
     <#assign count = count + count_check_missing_files>
 </#if>
 <#if count?? && count?number &gt; 0>
@@ -69,7 +71,7 @@ Description:
 <#list table_info['native:com.nokia.helium.jpa.entity.metadata.MetadataEntry']['select * from metadataentry INNER JOIN component ON component.component_id=metadataentry.component_id INNER JOIN priority ON priority.priority_id=metadataentry.priority_id where component.component_id=${component.id} and UPPER(priority.priority) like \'%${priority?upper_case}%\''] as entry >
 ${logfile}:${entry.lineNumber}>${entry.text}<br />
 </#list>
-<#list table_info['jpa']['select distinct w FROM Component c, WhatLogEntry w WHERE c.component=\'${component.component}\' AND c.logPathID=${whatlogpath.id} AND c.id=w.componentID AND w.missing=1'] as entry>
+<#list table_info['jpa']['select distinct w FROM Component c, WhatLogEntry w, LogFile l WHERE c.logPathID = l.id and LOWER(l.path) not like \'%_clean_%\' and c.component=\'${component.component}\' AND c.logPathID=${logpath.id} AND c.id=w.componentID AND w.missing=1'] as entry>
 ${logfile}: MISSING: ${entry.member}<br/>
 </#list>
 </#if>
@@ -78,7 +80,7 @@ ${logfile}: MISSING: ${entry.member}<br/>
 <#macro component_check_error component count >
 <#if count &gt; 0>
 <#list table_info['native:com.nokia.helium.jpa.entity.metadata.WhatLogEntry']['select * from whatlogentry where COMPONENT_ID=${component.id} and missing=1'] as whatlogentry>
-${whatlogpath.path}:${whatlogentry.member}<br/><br/>
+${logpath.id}:${whatlogentry.member}<br/><br/>
 </#list>
 </#if>
 </#macro>
@@ -94,16 +96,13 @@ ${whatlogpath.path}:${whatlogentry.member}<br/><br/>
 <#-- end of macros code starts here -->
 
 
-<#if (doc)??>
-    <#assign logfile = "${doc.sbsinfo.logfile.@name}"?replace("\\","/") >
-    <#assign whatlogfile = "${whatLogPath}"?replace("\\","/") >
-    <#assign time = "${doc.sbsinfo.duration.@time}" >
-
+<#if (logfilename)??>
+    <#assign logfile = "${logfilename}"?replace("\\","/") >
     <#assign table_info = pp.loadData('com.nokia.helium.metadata.ORMFMPPLoader',
         "${dbPath}") >
 <#-- overall summary -->
 <#assign logpath = table_info['jpasingle']['select l from LogFile l where LOWER(l.path) like \'%${logfile?lower_case}\''][0] >
-<#assign whatlogpath = table_info['jpasingle']['select l from LogFile l where LOWER(l.path) like \'%${whatlogfile?lower_case}\''][0] >
+<#assign time = table_info['jpasingle']['select et from ExecutionTime et where et.logPathID=${logpath.id}'][0] >
 <html>
 <head><title>${logfile}</title></head>
 <body>
@@ -119,16 +118,16 @@ ${whatlogpath.path}:${whatlogentry.member}<br/><br/>
     <th width="11%%">Info</th>
 </tr>
 <tr>
-<#-- need to create variables for the items tobe displayed in the comment title Overall_Total
+<#-- need to create variables for the items to be displayed in the comment title Overall_Total
 doing this the long winded way because I could not find a way to add items to a hash in a loop -->
 <#assign color_list={'error': 'FF0000', 'warning': 'FFF000', 'critical': 'FF7000', 'remark': 'FFCCFF', 'info': 'FFFFFF'}>
 <#assign priority_ids = color_list?keys>
 <td width="22%%">Total</td>
-<td width="12%%" align="center">${time}</td>
-<#assign count_check_errors = table_info['jpasingle']['select Count(w.id) from WhatLogEntry w JOIN w.component c where c.logPathID = ${whatlogpath.id} and w.missing=\'true\''][0]> 
+<td width="12%%" align="center"><@converttime time=time.time /></td>
+<#assign count_check_errors = table_info['jpasingle']['select Count(w.id) from WhatLogEntry w JOIN w.component c where c.logPathID=${logpath.id} and w.missing=\'true\''][0]> 
 <#list priority_ids as priority>
     <#assign count = table_info['jpasingle']['select Count(m.id) from MetadataEntry m JOIN m.priority p where m.logPathId=${logpath.id} and UPPER(p.priority) like \'%${priority?upper_case}%\''][0]>
-    <#if  '${priority}' == 'error'>
+    <#if  '${priority}' == 'error'  && !logfile?contains('_clean_')>
         <#assign count = count + count_check_errors>
     </#if>
     <@add_severity_count severity='${priority}' color=color_list['${priority}'] 

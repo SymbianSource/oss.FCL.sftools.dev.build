@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="hack-test" xmlns:au="org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+
+	<property name="hack.dir" location="${build.drive}/test_hack/"/>
+	
+	<!-- Running hack test. -->
+	<target name="run-hack" depends="prepare-hack,do-hack,cleanup-hack"/>
+
+	<!-- Getting real file to hack. -->
+	<target name="prepare-hack">
+		<mkdir dir="${hack.dir}"/>
+		<copy file="${build.drive}\epoc32\tools\variant\variant.cfg" todir="${hack.dir}" overwrite="true"/>
+		<copy file="${build.drive}\epoc32\rom\ppd.oby" todir="${hack.dir}" overwrite="true"/>
+		<copy file="${build.drive}\epoc32\data\z\private\10202be9\101F8763.txt" todir="${hack.dir}" overwrite="true"/>
+	</target>
+
+	<!-- Cleanup hack area. -->
+	<target name="cleanup-hack">
+        <delete verbose="true" includeemptydirs="true">
+            <fileset dir="${hack.dir}/" casesensitive="false">
+                <include name="**"/>
+            </fileset>
+        </delete>
+	</target>
+
+	<!-- Testing hackMacro by hacking s60.iby and variant.cfg. -->
+	<target name="do-hack">
+		<!-- Hacking variant.cfg -->
+		<copy file="${hack.dir}/variant.cfg" tofile="${hack.dir}/variant_hacked.cfg" overwrite="true"/>
+		<hlm:hackMacro file="${hack.dir}/variant_hacked.cfg" keyword="ENABLE_ABIVX_MODE" regex="(.hrh\s*$)" replace="\1\nENABLE_ABIVX_MODE"/>
+		<copy file="${hack.dir}/variant_hacked.cfg" tofile="${hack.dir}/variant_skipped.cfg" overwrite="true"/>
+		<hlm:hackMacro file="${hack.dir}/variant_skipped.cfg" keyword="ENABLE_ABIVX_MODE" regex="(.hrh\s*$)" replace="\1\nENABLE_ABIVX_MODE"/>
+
+		<au:assertFilesDiffer expected="${hack.dir}/variant.cfg" actual="${hack.dir}/variant_hacked.cfg" />
+		<au:assertFilesMatch expected="${hack.dir}/variant_skipped.cfg" actual="${hack.dir}/variant_hacked.cfg" />
+
+		<!-- Hacking S60.iby -->
+		<copy file="${hack.dir}/ppd.oby" tofile="${hack.dir}/ppd_hacked.oby" overwrite="true"/>
+		<hlm:hackMacro file="${hack.dir}/ppd_hacked.oby" keyword="&lt;foo\.iby&gt;" regex="#endif" replace="#include &lt;foo.iby&gt;\n#endif"/>
+		<copy file="${hack.dir}/ppd_hacked.oby" tofile="${hack.dir}/ppd_skipped.oby" overwrite="true"/>
+		<hlm:hackMacro file="${hack.dir}/ppd_skipped.oby" keyword="&lt;foo\.iby&gt;" regex="#endif" replace="#include &lt;foo.iby&gt;\n#endif"/>
+
+		<au:assertFilesDiffer expected="${hack.dir}/ppd.oby" actual="${hack.dir}/ppd_hacked.oby" />
+		<au:assertFilesMatch expected="${hack.dir}/ppd_skipped.oby" actual="${hack.dir}/ppd_hacked.oby" />
+
+		<!-- Hacking 101F8763.iby -->
+		<copy file="${hack.dir}/101F8763.txt" tofile="${hack.dir}/101F8763_hacked.txt" overwrite="true"/>
+		<hlm:hackMacro file="${hack.dir}/101F8763_hacked.txt" keyword="0xA int 0 0" regex="0xA int 1 0" replace="0xA int 0 0" encoding="UTF16"/>
+		<copy file="${hack.dir}/101F8763_hacked.txt" tofile="${hack.dir}/101F8763_skipped.txt" overwrite="true"/>
+		<hlm:hackMacro file="${hack.dir}/101F8763_skipped.txt" keyword="0xA int 0 0" regex="0xA int 1 0" replace="0xA int 0 0" encoding="UTF16"/>
+
+		<au:assertFilesDiffer expected="${hack.dir}/101F8763.txt" actual="${hack.dir}/101F8763_hacked.txt" />
+		<au:assertFilesMatch expected="${hack.dir}/101F8763_skipped.txt" actual="${hack.dir}/101F8763_hacked.txt" />
+	</target>
+
+</project>
+

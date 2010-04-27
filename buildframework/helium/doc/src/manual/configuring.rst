@@ -1,3 +1,23 @@
+..  ============================================================================ 
+    Name        : configuring.rst
+    Part of     : Helium 
+    
+    Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+    All rights reserved.
+    This component and the accompanying materials are made available
+    under the terms of the License "Eclipse Public License v1.0"
+    which accompanies this distribution, and is available
+    at the URL "http://www.eclipse.org/legal/epl-v10.html".
+    
+    Initial Contributors:
+    Nokia Corporation - initial contribution.
+    
+    Contributors:
+    
+    Description:
+    
+    ============================================================================
+    
 .. index::
   module: Configuring Helium
 
@@ -105,7 +125,7 @@ Summary:
 Passwords
 =========
 
-Helium requires access to a few resources that require username and password authentication, like Synergy for SCM operations. To avoid the need for a password dialog request, these details can be entered in a ``.netrc`` file located on the user's HOME drive. The HOME location is one of:
+Helium requires access to a few resources that require username and password authentication, like Synergy for SCM operations. To avoid the need for a password dialog request, these details can be entered in a ``.netrc`` file located on the user's ``HOME`` drive. The ``HOME`` location is one of:
 
 Windows
   H: drive
@@ -168,7 +188,7 @@ A default configuration of the signals is defined in ``config/helium_signals_def
 Viewing target dependencies
 ===========================
 
-The ``deps`` target can be used to display a list of the target dependencies for a given target. See the `manual page`_ for more information. Also the ``execlist`` command works in a similar way but shows a dialog showing a separated list of all the dependent targets and then just the top-level of dependencies, to help with continuing a build on the command line.
+The :hlm-t:`deps` target can be used to display a list of the target dependencies for a given target. See the `manual page`_ for more information. Also the :hlm-t:`execlist` command works in a similar way but shows a dialog showing a separated list of all the dependent targets and then just the top-level of dependencies, to help with continuing a build on the command line.
 
 .. _`manual page`: ../api/helium/target-deps.html
 
@@ -179,11 +199,11 @@ The ``deps`` target can be used to display a list of the target dependencies for
 Automating build number assignment
 ==================================
 
-Typically the build number for a build is defined on the command line. However it may be desirable to automate the allocation of a new build number using a simple text database file. To do this, add the property ``read.build.int`` to the configuration or the command line. This will look for a text file in this location::
+Typically the build number for a build is defined on the command line. However it may be desirable to automate the allocation of a new build number using a simple text database file. To do this, add the property :hlm-p:`read.build.int` to the configuration or the command line. This will look for a text file in this location::
 
     ${publish.root.dir}/${build.name}/builds/${build.name}_${core.build.version}_${build.tag}_build_int_db.txt
     
-If the file is not present it is created with a new build number value of "001". If it does exist the value is read from the file and then incremented and written back for the next build. A ``build.tag`` property can also be defined to start the build number with a text string if needed.
+If the file is not present it is created with a new build number value of "001". If it does exist the value is read from the file and then incremented and written back for the next build. A :hlm-p:`build.tag` property can also be defined to start the build number with a text string if needed.
 
 
 .. index::
@@ -282,18 +302,17 @@ To include an XML element with a ``hlm:`` prefix the Helium namespace must be de
 .. index::
   single: System definition configuration files
 
-System definition configuration files
+System Definition configuration files
 :::::::::::::::::::::::::::::::::::::
 
 Sysdef configuration defines the source code you actually want to compile with Helium. More information about the System definition
 files can be found from: http://developer.symbian.org/wiki/index.php/System_Definition. 
 
-helium/tests/minibuilds/qt/minibuild_compile.sysdef.xml which can be examined as a sample definition file.
-It is used by the Helium test environment to test helium works. It consists of a list of components to compile and some special instructions to 
+``helium/tests/minibuilds/qt/minibuild_compile.sysdef.xml`` can be examined as a sample definition file.
+It is used by the Helium test environment to test Helium works. It consists of a list of components to compile and some special instructions to 
 perform whilst compiling the components e.g. run toucher.exe on certain directories. You will need to make sure this file exists and contains 
 the correct components when building and especialy for a product which consists of many hundreds of components. It should be possible to use 
 the file supplied by S60, but you may need to copy the component compile lines from the file and add them to the existing file in helium in 
 order to make sure you also get the special instructions which are required to make the builds create a ROM image successfully (or any
 other action requested).
     
-  
