@@ -604,13 +604,14 @@ class CheckWhatSmokeTest(SmokeTest):
 		# .whatlog output is used verbatim from the build/TEM/EM output
 		self.hostossensitive = True
 		
-		# Indicate whether ouput is expected to appear only once. If so, set it to True
+		# Indicate whether output is expected to appear only once. If so, set it to True
 		self.output_expected_only_once = False 
 	
 	def posttest(self):
 		outlines = self.output.splitlines()
-		outlines_left = outlines 
-
+		if self.output_expected_only_once:
+			outlines_left = list(outlines) 
+		
 		ok = True
 		seen = []
 		
@@ -624,7 +625,8 @@ class CheckWhatSmokeTest(SmokeTest):
 				
 			if line in outlines:
 				seen.append(line)
-				outlines_left.remove(line) 
+				if self.output_expected_only_once:
+					outlines_left.remove(line) 
 			else:
 				print "OUTPUT NOT FOUND:", line
 				ok = False
@@ -636,7 +638,6 @@ class CheckWhatSmokeTest(SmokeTest):
 			if not line in seen:
 				print "UNEXPECTED OUTPUT:", line
 				ok = False
-				outlines_left.remove(line) 
 		
 		# and check for lines that we expected to see only once
 		if self.output_expected_only_once:

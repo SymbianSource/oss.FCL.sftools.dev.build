@@ -60,7 +60,17 @@ def run():
 		"<build>$(EPOCROOT)/epoc32/ost_dictionaries/test_TC_0x1000008d_Dictionary.xml</build>",
 		"<build>$(EPOCROOT)/epoc32/include/internal/SymbianTraces/autogen/test_TC_0x1000008d_TraceDefinitions.h</build>"
 		]		
-	t.run()
+	t.run("linux")
+	if t.result == CheckWhatSmokeTest.SKIP:
+		t.targets.extend([
+			'$(EPOCROOT)/epoc32/release/armv5/lib/testTC.lib',
+			'$(EPOCROOT)/epoc32/release/armv5/lib/testTC{000a0000}.lib'
+		])
+		t.stdout.extend([
+			'<build>$(EPOCROOT)/epoc32/release/armv5/lib/testTC.lib</build>',
+			'<build>$(EPOCROOT)/epoc32/release/armv5/lib/testTC{000a0000}.lib</build>'
+		])
+		t.run("windows")
 
 	t.id = "112"
 
