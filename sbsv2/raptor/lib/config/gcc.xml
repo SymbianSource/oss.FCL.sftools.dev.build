@@ -77,7 +77,7 @@
 		<set name='RELEASEPATH' value='$(EPOCROOT)/epoc32/release/tools2$$(TOOLPLATFORMDIR)'/>
 	</var>
 
-	<var name="tools2_deb" extends="tools2_base">
+	<var name="t_deb">
 		<set name='TOOLSPATH' value=''/> <!-- do not install -->
 		<set name='VARIANTTYPE' value='deb'/>
 
@@ -85,8 +85,9 @@
 		<append name='CDEFS' value='_DEBUG'/>
 		<append name='RELEASEPATH' value='/deb' separator=''/>
 	</var>
-
-	<var name="tools2_rel" extends="tools2_base">
+	<alias name="tools2_deb" meaning="tools2_base.t_deb"/>
+	
+	<var name="t_rel">
 		<set name='TOOLSPATH' value='$(EPOCTOOLS)'/> <!-- install -->
 		<set name='VARIANTTYPE' value='rel'/>
 
@@ -94,10 +95,11 @@
 		<append name='CDEFS' value='NDEBUG'/>
 		<append name='RELEASEPATH' value='/rel' separator=''/>
 	</var>
-
+	<alias name="tools2_rel" meaning="tools2_base.t_rel"/>
+	
 	<group name="tools2">
-		<varRef ref='tools2_rel'/>
-		<varRef ref='tools2_deb'/>
+		<aliasRef ref='tools2_rel'/>
+		<aliasRef ref='tools2_deb'/>
 	</group>
 
 </build>

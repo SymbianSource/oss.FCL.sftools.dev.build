@@ -65,6 +65,28 @@ def run():
 	t.mustnotmatch_singleline = []
 	t.run()
 	
+	t.name = "query_cli_config_bv"
+	t.command = "sbs --query=config[armv5_urel.test_bv_1] --configpath=test/smoke_suite/test_resources/bv"
+	t.mustmatch_singleline = [
+		"<sbs version='2.*'>",
+		"fullname='arm\.v5\.urel\.rvct._.\.test_bv_1'",
+		"outputpath='.*/epoc32/release/armv5.one/urel'",
+		"</sbs>"
+		]
+	t.mustnotmatch_singleline = []
+	t.run()
+	
+	t.name = "query_cli_config_others"
+	t.command = "sbs --query=config[winscw_urel] --query=config[tools2_rel]"
+	t.mustmatch_singleline = [
+		"<sbs version='2.*'>",
+		"outputpath='.*/epoc32/release/winscw/urel'",
+		"outputpath='.*/epoc32/release/tools2/rel'",
+		"</sbs>"
+		]
+	t.mustnotmatch_singleline = []
+	t.run()
+	
 	t.name = "query_cli_bad"
 	t.command = "sbs --query=nonsense"
 	t.mustmatch_singleline = [

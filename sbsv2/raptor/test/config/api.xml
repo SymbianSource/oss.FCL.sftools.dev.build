@@ -18,7 +18,8 @@
  	
  	<var name="buildme">
  		<set name="RELEASEPATH" value="/home/raptor"/>
- 		<set name="FULLVARIANTPATH" value="foo/bar"/>
+ 		<set name="VARIANTPLATFORM" value="foo"/>
+ 		<set name="VARIANTTYPE" value="bar"/>
  	</var>
  	
  	<var name="foo"/>

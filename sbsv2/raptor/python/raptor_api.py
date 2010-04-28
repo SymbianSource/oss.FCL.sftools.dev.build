@@ -23,25 +23,41 @@ class Reply(object):
 	"""object to return values from API calls.
 	"""
 	def __init__(self, text=""):
-		self.reply_text = text
+		self.text = text
 	
 	def __str__(self):
 		name = type(self).__name__.lower()
 		
-		str = "<" + name
-		end = "/>\n"
+		string = "<" + name
+		children = []
+		longend = False
 		
 		for attribute,value in self.__dict__.items():
-			if attribute != "reply_text":
-				str += " %s='%s'" % (attribute, value)
+			if attribute != "text":
+				if isinstance(value, Reply):
+					children.append(value)
+				else:
+					string += " %s='%s'" % (attribute, value)
 		
-		if self.reply_text:
-			str += ">" + self.reply_text
-			end = "</%s>\n" % name
+		if children or self.text:
+			string += ">"
+			longend = True
+		
+		if self.text:
+			string += self.text
+		
+		if children:
+			string += "\n"
+				
+		for c in children:
+			string += str(c)
 			
-		str += end
+		if longend:
+			string += "</%s>\n" % name
+		else:	
+			string += "/>\n"
 		
-		return str
+		return string
 
 class Alias(Reply):
 	pass
@@ -125,38 +141,59 @@ class Context(object):
 		dot-separated list of variants. For example "armv5_urel" or
 		"armv5_urel.savespace.vasco".
 		"""
-		
-		r = Config()
-		
 		names = name.split(".")
 		if names[0] in self.__raptor.cache.aliases:
 			x = self.__raptor.cache.FindNamedAlias(names[0])
 			
 			if len(names) > 1:
-				r.fullname = x.meaning + "." + ".".join(names[1:])
+				fullname = x.meaning + "." + ".".join(names[1:])
 			else:
-				r.fullname = x.meaning
+				fullname = x.meaning
 				
 		elif names[0] in self.__raptor.cache.variants:
-			r.fullname = name
+			fullname = name
 			
 		else:
 			raise BadQuery("'%s' is not an alias or a variant" % names[0])
 		
+		# create an evaluator for the named configuration
 		tmp = raptor_data.Alias("tmp")
-		tmp.SetProperty("meaning", r.fullname)
+		tmp.SetProperty("meaning", fullname)
 		
 		units = tmp.GenerateBuildUnits(self.__raptor.cache)
 		evaluator = self.__raptor.GetEvaluator(None, units[0])
 		
+		# get the outputpath
+		# this is messy as some configs construct the path inside the FLM
+		# rather than talking it from the XML: usually because of some
+		# conditional logic... but maybe some refactoring could avoid that.
 		releasepath = evaluator.Get("RELEASEPATH")
-		fullvariantpath = evaluator.Get("FULLVARIANTPATH")
+		if not releasepath:
+			raise BadQuery("could not get RELEASEPATH for config '%s'" % name)
 		
-		if releasepath and fullvariantpath:
-			r.outputpath = str(generic_path.Join(releasepath, fullvariantpath))
+		variantplatform = evaluator.Get("VARIANTPLATFORM")
+		varianttype = evaluator.Get("VARIANTTYPE")
+		featurevariantname = evaluator.Get("FEATUREVARIANTNAME")
+		
+		platform = evaluator.Get("TRADITIONAL_PLATFORM")
+		
+		if platform == "TOOLS2":
+			outputpath = releasepath.replace("$(TOOLPLATFORMDIR)", "")
 		else:
-			raise BadQuery("could not get outputpath for config '%s'" % name)
+			if not variantplatform:
+				raise BadQuery("could not get VARIANTPLATFORM for config '%s'" % name)
+			
+			if featurevariantname:
+				variantplatform += featurevariantname
+				
+			if not varianttype:
+				raise BadQuery("could not get VARIANTTYPE for config '%s'" % name)
+			
+			outputpath = str(generic_path.Join(releasepath, variantplatform, varianttype))
 		
+		r = Config()
+		r.fullname = fullname
+		r.outputpath = outputpath
 		return r
 		
 	def GetProducts(self):
