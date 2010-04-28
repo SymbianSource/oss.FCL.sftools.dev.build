@@ -152,10 +152,31 @@ ifneq ($(NO_DEPEND_GENERATE),)
     # This version minimises the size of dependency files, to contain only .mbg and .rsg deps.
     # It allows resources to be built in the right order but doesn't impose the weight of
     # of full dependency information which can overwhelm make in large builds.
-    # The strategy is to filter out lines (apart from the target line which is the first) which don't have .rsg or 
-    # .mbg dependencies in them.   The first line can sometimes not contain the target but  
-    # have a lonely "\" so we use a pattern to recognise the target line in order not to get confused. 
-    DEPENDENCY_CORRECTOR:={ $(GNUGREP) -E " ([^ /]+)\.((rsg)|(mbg))" | $(GNUSED) -r 's%([^ ]*\.[^rm ][^sb ][^g ])%%g;s%[\\ ]+% %g' | { DEPS=''; read L; while [ $$$$? -eq 0 ]; do DEPS="$$$${DEPS} $$$$L"; read L; done; DEPTXT="$$$$RPP: \\\\\n"; DEPCOUNT=0; for i in $$$${DEPS}; do DEPTXT="$$$$DEPTXT \$$$$(EPOCROOT)/epoc32/include/$$$$i \\\\\n"; (( DEPCOUNT += 1 )) ; done; if [ $$$$DEPCOUNT -ne 0 ]; then  echo -e "$$$${DEPTXT%%\\\\\\n}\n"; fi ; } ; }
+    # The strategy is filter lines which don't have .rsg or 
+    # .mbg dependencies in them and if to sift eah line to leave out non-relevant things like
+    # other header files, .hrh files etc.  In the end we don't print anything at all if we
+    # did not find the target.
+
+define  DEPENDENCY_CORRECTOR
+{ set +x; $(GNUSED) -rn '\% ([^ /]+)\.((rsg)|(mbg))%I {y/\\/ /;p;}'  |  \
+    { \
+    DEPTXT="$$$$RPP: \\\\\n"; \
+    DEPCOUNT=0; \
+    DEPS=''; read L; \
+    while [ $$$$? -eq 0 ]; do \
+        for i in $$$${L}; do \
+          if [[ ( "$$$${i%%.[Rr][Ss][Gg]}" != "$$$$i"  || "$$$${i%%.[Mm][Bb][Gg]}" != "$$$$i" ) && ( "$$$${i:1:1}" != ':' && "$$$${i:0:1}" != '/' ) ]];  then \
+            DEPTXT="$$$$DEPTXT \$$$$(EPOCROOT)/epoc32/include/$$$$i \\\\\n"; \
+            (( DEPCOUNT += 1 )) ; \
+          fi; \
+        done; \
+      read L; \
+    done; \
+    if [ $$$$DEPCOUNT -ne 0 ]; then  echo -e "$$$${DEPTXT%%\\\\\\n}\n"; fi ;\
+  } ;\
+} 
+endef
+
 else
     # This can correct the dependencies by assuming that the file will be in epoc32\include as this is the default
     DEPENDENCY_CORRECTOR:=$(GNUSED)  -r 's% ([^ \/]+\.((rsg)|(mbg)))% $(EPOCROOT)\/epoc32\/include\/\1%ig' 
@@ -205,13 +226,12 @@ endef # preprocessresource #
 ###############################################################################
 define copyresource
 # $(1) is the source
-# $(2) is the destination
+# $(2) is the space separated list of destinations which must be filenames
 
    RELEASABLES:=$$(RELEASABLES) $(2)
+
    $(if $(TARGET_$(call sanitise,$2)),,$(eval TARGET_$(call sanitise,$2):=1)$(info <copy source='$1'>$2</copy>))
  
-
-
 endef # copyresource #
 
 ###############################################################################
@@ -260,7 +280,7 @@ define generateresourceheader
 # $(2) is the preprocessed resource to make it from
 # $(3) is the language to use	(eg. sc)
 
-		RELEASABLES:= $$(RELEASABLES) $(1)
+        RELEASABLES:= $$(RELEASABLES) $(1)
 
         ifeq ($(TARGET_$(call sanitise,$1)),)
                 TARGET_$(call sanitise,$1):=1

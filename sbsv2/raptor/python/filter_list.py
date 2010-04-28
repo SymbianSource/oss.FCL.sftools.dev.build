@@ -81,6 +81,7 @@ class FilterList(filter_interface.Filter):
 		# Find all the filter plugins
 		self.pbox = pbox
 		possiblefilters = self.pbox.classesof(filter_interface.Filter)
+
 		filterdict = {}
 		for p in possiblefilters:
 			name = p.__name__.lower()
@@ -94,7 +95,7 @@ class FilterList(filter_interface.Filter):
 		for f in filternames:
 			found = False
 			if f.lower() in filterdict:
-				self.filters.append(filterdict[f.lower()])
+				self.filters.append(filterdict[f.lower()]())
 			else:
 				unfound.append(f)
 

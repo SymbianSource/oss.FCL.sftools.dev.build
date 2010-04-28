@@ -56,7 +56,7 @@ class FilterCopyFile(filter_interface.Filter):
 	def summary(self):
 		"finish off"
 		for source in self.files.keys():
-			print "<debug>self.files %s</debug>" % self.files[source]
+			#print "<debug>self.files %s</debug>" % self.files[source]
 			for dest in self.files[source]:
 				self.copyfile(source, dest)
 		
@@ -111,7 +111,6 @@ class FilterCopyFile(filter_interface.Filter):
 
 		except Exception,e:
 			message = "Could not export " + source_str + " to " + dest_str + " : " + str(e)
-			print message
 
 		return 
 	
