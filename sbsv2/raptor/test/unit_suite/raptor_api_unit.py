@@ -53,21 +53,26 @@ class TestRaptorApi(unittest.TestCase):
 
 		api = raptor_api.Context(r)
 		
+		if r.filesystem == "unix":
+			path = "/home/raptor/foo/bar"
+		else:
+			path = "C:/home/raptor/foo/bar"
+			
 		config = api.GetConfig("buildme")
 		self.failUnlessEqual(config.fullname, "buildme")
-		self.failUnlessEqual(config.outputpath, "/home/raptor/foo/bar")
+		self.failUnlessEqual(config.outputpath, path)
 		
 		config = api.GetConfig("buildme.foo")
 		self.failUnlessEqual(config.fullname, "buildme.foo")
-		self.failUnlessEqual(config.outputpath, "/home/raptor/foo/bar")
+		self.failUnlessEqual(config.outputpath, path)
 		
 		config = api.GetConfig("s1")
 		self.failUnlessEqual(config.fullname, "buildme.foo")
-		self.failUnlessEqual(config.outputpath, "/home/raptor/foo/bar")
+		self.failUnlessEqual(config.outputpath, path)
 		
 		config = api.GetConfig("s2.product_A")
 		self.failUnlessEqual(config.fullname, "buildme.foo.bar.product_A")
-		self.failUnlessEqual(config.outputpath, "/home/raptor/foo/bar")
+		self.failUnlessEqual(config.outputpath, path)
 		
 	def testProducts(self):
 		r = raptor.Raptor()

@@ -17,7 +17,8 @@
  	<var name="product_D"/>
  	
  	<var name="buildme">
- 		<set name="RELEASEPATH" value="/home/raptor"/>
+ 		<set name="RELEASEPATH" value="/home/raptor" host="lin.*"/>
+ 		<set name="RELEASEPATH" value="C:/home/raptor" host="win.*"/>
  		<set name="VARIANTPLATFORM" value="foo"/>
  		<set name="VARIANTTYPE" value="bar"/>
  	</var>
