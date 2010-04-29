@@ -14,11 +14,11 @@
 # Description: 
 #
 
-from raptor_tests import SmokeTest
+import raptor_tests
 
 def run():
 	
-	t = SmokeTest()
+	t = raptor_tests.SmokeTest()
 	t.description = "Test the --query command-line option"
 
 	t.name = "query_cli_alias"
@@ -78,10 +78,16 @@ def run():
 	
 	t.name = "query_cli_config_others"
 	t.command = "sbs --query=config[winscw_urel] --query=config[tools2_rel]"
+	
+	if t.onWindows:
+		t2 = "tools2"
+	else:
+		t2 = raptor_tests.ReplaceEnvs("tools2/$(HOSTPLATFORM_DIR)")
+		
 	t.mustmatch_singleline = [
 		"<sbs version='2.*'>",
 		"outputpath='.*/epoc32/release/winscw/urel'",
-		"outputpath='.*/epoc32/release/tools2/rel'",
+		"outputpath='.*/epoc32/release/%s/rel'" % t2,
 		"</sbs>"
 		]
 	t.mustnotmatch_singleline = []

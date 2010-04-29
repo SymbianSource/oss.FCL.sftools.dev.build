@@ -74,7 +74,8 @@
 		<set name='BLDINF_OUTPUTPATH' value='$(SBS_BUILD_DIR)'/>
 
 		<set name='OUTPUTPATH' value='$(SBS_BUILD_DIR)'/>
-		<set name='RELEASEPATH' value='$(EPOCROOT)/epoc32/release/tools2$$(TOOLPLATFORMDIR)'/>
+		<set name='RELEASEPATH' value='$(EPOCROOT)/epoc32/release/tools2' host='win.*'/>
+		<set name='RELEASEPATH' value='$(EPOCROOT)/epoc32/release/tools2/$(HOSTPLATFORM_DIR)' host='lin.*'/>
 	</var>
 
 	<var name="t_deb">
