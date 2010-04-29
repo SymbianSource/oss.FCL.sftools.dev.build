@@ -178,7 +178,7 @@ class Context(object):
 		platform = evaluator.Get("TRADITIONAL_PLATFORM")
 		
 		if platform == "TOOLS2":
-			outputpath = releasepath.replace("$(TOOLPLATFORMDIR)", "")
+			outputpath = releasepath
 		else:
 			if not variantplatform:
 				raise BadQuery("could not get VARIANTPLATFORM for config '%s'" % name)
