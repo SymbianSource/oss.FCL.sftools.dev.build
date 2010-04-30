@@ -156,14 +156,7 @@ def run():
 				]
 	t.warnings = 8
 	# ABIv1 .lib files are not generated on Linux
-	t.run("linux")
-	if t.result == SmokeTest.SKIP:
-		t.targets.extend([
-			"$(EPOCROOT)/epoc32/release/armv5/lib/unfrozensymbols.lib",
-			"$(EPOCROOT)/epoc32/release/armv5/lib/unfrozensymbols{000a0000}.lib",
-			"$(EPOCROOT)/epoc32/release/armv5/lib/unfrozensymbols2.lib",
-			"$(EPOCROOT)/epoc32/release/armv5/lib/unfrozensymbols2{000a0000}.lib"
-			])
-		t.run("windows")
+	t.run()
 	
+	t.print_result()
 	return t

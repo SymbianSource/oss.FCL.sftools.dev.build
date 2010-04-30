@@ -31,10 +31,6 @@ def run():
 		"$(EPOCROOT)/epoc32/release/%s/lib/createstaticpdll.dso",
 		"$(EPOCROOT)/epoc32/release/%s/lib/createstaticpdll{000a0000}.dso"
 		]
-	abiv1libtargets = [
-		"$(EPOCROOT)/epoc32/release/%s/lib/createstaticpdll.lib",
-		"$(EPOCROOT)/epoc32/release/%s/lib/createstaticpdll{000a0000}.lib"
-		]
 	buildtargets =  [
 		"createstaticpdll_dll/%s/udeb/CreateStaticDLL.o",
 		"createstaticpdll_dll/%s/urel/CreateStaticDLL.o"
@@ -47,9 +43,6 @@ def run():
 		".*ksrt.*"
 		]
 	
-	# Note that ABIv1 import libraries are only generated for RVCT-based armv5
-	# builds on Windows
-	
 	t.id = "0109a"
 	t.name = "pdll_armv5_rvct"
 	t.command = command % "armv5"
@@ -57,10 +50,7 @@ def run():
 	t.addbuildtargets('smoke_suite/test_resources/simple_dll/pbld.inf', map(lambda p: p % "armv5", buildtargets))
 	t.mustmatch = mustmatch
 	t.mustnotmatch = mustnotmatch
-	t.run("linux")
-	if t.result == AntiTargetSmokeTest.SKIP:
-		t.targets.extend(map(lambda x: x % "armv5", abiv1libtargets))
-		t.run("windows")
+	t.run()
 		
 	t.id = "0109b"
 	t.name = "pdll_armv5_clean"
@@ -74,7 +64,6 @@ def run():
 	t.name = "pdll_armv5_gcce"
 	t.command = command % "gcce_armv5"
 	t.targets = map(lambda p: p % "armv5", maintargets + armv5targets)
-	t.antitargets = map(lambda p: p % "armv5", abiv1libtargets)
 	t.addbuildtargets('smoke_suite/test_resources/simple_dll/pbld.inf', map(lambda p: p % "armv5", buildtargets))
 	t.mustmatch = mustmatch
 	t.mustnotmatch = mustnotmatch
@@ -109,7 +98,6 @@ def run():
 	t.name = "pdll_armv7_gcce"
 	t.command = command % "arm.v7.udeb.gcce4_3_2 -c arm.v7.urel.gcce4_3_2"
 	t.targets = map(lambda p: p % "armv7", maintargets)
-	t.antitargets = map(lambda p: p % "armv7", abiv1libtargets)
 	t.addbuildtargets('smoke_suite/test_resources/simple_dll/pbld.inf', map(lambda p: p % "armv7", buildtargets))
 	t.mustmatch = mustmatch
 	t.mustnotmatch = mustnotmatch

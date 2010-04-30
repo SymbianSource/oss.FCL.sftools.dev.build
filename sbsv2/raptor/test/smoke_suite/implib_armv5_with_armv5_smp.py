@@ -27,12 +27,7 @@ def run():
 		"$(EPOCROOT)/epoc32/release/armv5/lib/simple_implib.dso",
 		"$(EPOCROOT)/epoc32/release/armv5/lib/simple_implib{000a0000}.dso"
 		]
-	t.run("linux")
-	if t.result == SmokeTest.SKIP:
-		t.targets.extend([
-			"$(EPOCROOT)/epoc32/release/armv5/lib/simple_implib.lib",
-			"$(EPOCROOT)/epoc32/release/armv5/lib/simple_implib{000a0000}.lib"
-		])
-		t.run("windows")
-		
+	t.run()
+	
+	t.print_result()	
 	return t
