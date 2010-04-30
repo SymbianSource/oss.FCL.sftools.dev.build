@@ -1,0 +1,10 @@
+Raptor supports a new interface to the trace compiler that allows
+Raptor to specify the direcotry in which trace data should be written.
+This allows components to support a new convention for where trace files
+are stored.
+
+The new convention that prevents the clashes where building the same
+source file for different MMPs would previously have resulted in two
+build tasks trying to create the same trace file (header/dictionary).
+This caused build slowdowns and also made the trace data inaccurate.
+
