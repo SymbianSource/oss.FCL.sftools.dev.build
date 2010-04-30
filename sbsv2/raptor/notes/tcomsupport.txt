@@ -1,10 +1,51 @@
-Raptor supports a new interface to the trace compiler that allows
-Raptor to specify the direcotry in which trace data should be written.
-This allows components to support a new convention for where trace files
-are stored.
+New Trace Compiler
+-------------------
 
-The new convention that prevents the clashes where building the same
+Raptor supports an updated version of the Trace Compiler which has
+an improved commandline interface that allows Raptor to specify the
+directory in which trace data should be written.  This allows MMPs to
+implement a new convention for where trace files are stored.
+
+The new convention prevents clashes where building the same
 source file for different MMPs would previously have resulted in two
 build tasks trying to create the same trace file (header/dictionary).
 This caused build slowdowns and also made the trace data inaccurate.
+
+The standard for this directory is that the last twwo elements of the
+path should be
+
+   traces/traces_<targetname>_<ext>
+
+e.g.
+
+   traces/traces_euser_dll
+
+The new trace compiler also creates "autogen" headers in a new location
+under epoc32/include/platform rather than epoc32/incude/internal.
+
+Trace Headers Directory can now also be in SYSTEMINCLUDEs
+----------------------------------------------------------
+
+Some teams were having trouble getting qmake to generate MMPs with
+USERINCLUDEs set.  So they were specifying the trace header directory in
+their SYTEMINCLUDEs.  This change causes Raptor to look for the traces
+directory in bot SYSTEMINCLUDES and USERINCLUDES.
+
+
+Automatic Macro definition - OST_TRACE_COMPILER_IN_USE
+--------------------------------------------------------
+
+When Raptor notices that the trace compiler is required for an MMP (by
+looking for the traces/targetname_ext directory in the SYSTEMINCLUDES
+or USERINCLUDES) it causes the application to build with the
+OST_TRACE_COMPILER_IN_USE defined automatically
+
+
+Create Trace Directories During Makefile Parse
+-----------------------------------------------
+
+Some build engines consider it a "clash" when two jobs attempt to make the
+same directory.  This change causes some important trace output directories
+to be created during makefile parsing which removes the (small) possibilty
+that they would clash during the build part.
 
