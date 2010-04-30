@@ -42,8 +42,8 @@ def run():
 		"$(SBS_HOME)/test/smoke_suite/test_resources/tracecompiler/variant_source/traces/fixed_id.definitions",
 		"$(EPOCROOT)/epoc32/ost_dictionaries/invariant_source_0x10000002_Dictionary.xml",
 		"$(EPOCROOT)/epoc32/ost_dictionaries/variant_source_0x10000003_Dictionary.xml",
-		"$(EPOCROOT)/epoc32/include/internal/symbiantraces/autogen/invariant_source_0x10000002_TraceDefinitions.h",
-		"$(EPOCROOT)/epoc32/include/internal/symbiantraces/autogen/variant_source_0x10000003_TraceDefinitions.h"
+		"$(EPOCROOT)/epoc32/include/platform/symbiantraces/autogen/invariant_source_0x10000002_TraceDefinitions.h",
+		"$(EPOCROOT)/epoc32/include/platform/symbiantraces/autogen/variant_source_0x10000003_TraceDefinitions.h"
 		]
 	t.addbuildtargets('smoke_suite/test_resources/tracecompiler/variant_source/group/bld.inf', [
 		"invariant_source_/armv5/udeb/inv_source.o",
@@ -105,8 +105,8 @@ def run():
 		"$(SBS_HOME)/test/smoke_suite/test_resources/tracecompiler/variant_source/traces/var_source3Traces.h",
 		"$(EPOCROOT)/epoc32/ost_dictionaries/invariant_source_0x10000002_Dictionary.xml",
 		"$(EPOCROOT)/epoc32/ost_dictionaries/variant_source_0x10000003_Dictionary.xml",
-		"$(EPOCROOT)/epoc32/include/internal/symbiantraces/autogen/invariant_source_0x10000002_TraceDefinitions.h",
-		"$(EPOCROOT)/epoc32/include/internal/symbiantraces/autogen/variant_source_0x10000003_TraceDefinitions.h"
+		"$(EPOCROOT)/epoc32/include/platform/symbiantraces/autogen/invariant_source_0x10000002_TraceDefinitions.h",
+		"$(EPOCROOT)/epoc32/include/platform/symbiantraces/autogen/variant_source_0x10000003_TraceDefinitions.h"
 		]
 	t.addbuildtargets('smoke_suite/test_resources/tracecompiler/variant_source/group/bld.inf', [
 		"invariant_source_/armv5/udeb/inv_source.o",
@@ -159,7 +159,7 @@ def run():
 		"$(SBS_HOME)/test/smoke_suite/test_resources/tracecompiler/multiple_variants/traces/tc_bTraces.h",
 		"$(SBS_HOME)/test/smoke_suite/test_resources/tracecompiler/multiple_variants/traces/tc_cTraces.h",
 		"$(EPOCROOT)/epoc32/ost_dictionaries/tc_variants_0x10000004_Dictionary.xml",
-		"$(EPOCROOT)/epoc32/include/internal/symbiantraces/autogen/tc_variants_0x10000004_TraceDefinitions.h"
+		"$(EPOCROOT)/epoc32/include/platform/symbiantraces/autogen/tc_variants_0x10000004_TraceDefinitions.h"
 		]
 	t.addbuildtargets('smoke_suite/test_resources/tracecompiler/multiple_variants/group/bld.inf', [
 		"tc_variants_/armv5.phone1/udeb/tc_main.o",
@@ -195,18 +195,18 @@ def run():
 		"$(EPOCROOT)/epoc32/release/armv5/urel/child2.exe",
 		"$(EPOCROOT)/epoc32/release/armv5/udeb/child3.exe",
 		"$(EPOCROOT)/epoc32/release/armv5/urel/child3.exe",
-		"$(SBS_HOME)/test/smoke_suite/test_resources/tracecompiler/mum_children_mmps/traces_child1_exe/child1Traces.h",
-		"$(SBS_HOME)/test/smoke_suite/test_resources/tracecompiler/mum_children_mmps/traces_child1_exe/commonTraces.h",
-		"$(SBS_HOME)/test/smoke_suite/test_resources/tracecompiler/mum_children_mmps/traces_child2_exe/child2Traces.h",
-		"$(SBS_HOME)/test/smoke_suite/test_resources/tracecompiler/mum_children_mmps/traces_child2_exe/commonTraces.h",
-		"$(SBS_HOME)/test/smoke_suite/test_resources/tracecompiler/mum_children_mmps/traces_child3_exe/child3Traces.h",
-		"$(SBS_HOME)/test/smoke_suite/test_resources/tracecompiler/mum_children_mmps/traces_child3_exe/commonTraces.h",
+		"$(SBS_HOME)/test/smoke_suite/test_resources/tracecompiler/mum_children_mmps/traces/traces_child1_exe/child1Traces.h",
+		"$(SBS_HOME)/test/smoke_suite/test_resources/tracecompiler/mum_children_mmps/traces/traces_child1_exe/commonTraces.h",
+		"$(SBS_HOME)/test/smoke_suite/test_resources/tracecompiler/mum_children_mmps/traces/traces_child2_exe/child2Traces.h",
+		"$(SBS_HOME)/test/smoke_suite/test_resources/tracecompiler/mum_children_mmps/traces/traces_child2_exe/commonTraces.h",
+		"$(SBS_HOME)/test/smoke_suite/test_resources/tracecompiler/mum_children_mmps/traces/traces_child3_exe/child3Traces.h",
+		"$(SBS_HOME)/test/smoke_suite/test_resources/tracecompiler/mum_children_mmps/traces/traces_child3_exe/commonTraces.h",
 		"$(EPOCROOT)/epoc32/ost_dictionaries/child1_exe_0x11100001_Dictionary.xml",
 		"$(EPOCROOT)/epoc32/ost_dictionaries/child2_exe_0x11100002_Dictionary.xml",
 		"$(EPOCROOT)/epoc32/ost_dictionaries/child3_exe_0x11100002_Dictionary.xml",
-		"$(EPOCROOT)/epoc32/include/internal/symbiantraces/autogen/child1_exe_0x11100001_TraceDefinitions.h",
-		"$(EPOCROOT)/epoc32/include/internal/symbiantraces/autogen/child2_exe_0x11100002_TraceDefinitions.h",
-		"$(EPOCROOT)/epoc32/include/internal/symbiantraces/autogen/child3_exe_0x11100002_TraceDefinitions.h"
+		"$(EPOCROOT)/epoc32/include/platform/symbiantraces/autogen/child1_exe_0x11100001_TraceDefinitions.h",
+		"$(EPOCROOT)/epoc32/include/platform/symbiantraces/autogen/child2_exe_0x11100002_TraceDefinitions.h",
+		"$(EPOCROOT)/epoc32/include/platform/symbiantraces/autogen/child3_exe_0x11100002_TraceDefinitions.h"
 		]
 	t.addbuildtargets('smoke_suite/test_resources/tracecompiler/mum_children_mmps/group/bld.inf', [
 		"child1_/armv5/udeb/child1.o",
@@ -231,7 +231,7 @@ def run():
 	# Clean mmp A then build mmp B and C. As common.cpp is shared by A B and C, commonTraces.h would be 
 	# cleaned when cleaning mmp A. But as B and C aren't cleaned, Raptor wouldn't run trace compiler on
 	# B and C, thus commonTraces.h wouldn't be generated again, so be missing for mmp B and C.
-	# The solution is to use new trace path "traces_<TARGET>_<TARGETTYPE>" instead of "traces" so shared 
+	# The solution is to use new trace path "traces/traces_<TARGET>_<TARGETTYPE>" instead of "traces" so shared 
 	# source has different copy of trace headers for different projects.
 	t = SmokeTest()
 	t.id = "102e"
@@ -247,14 +247,14 @@ def run():
 		"$(EPOCROOT)/epoc32/release/armv5/urel/child2.exe",
 		"$(EPOCROOT)/epoc32/release/armv5/udeb/child3.exe",
 		"$(EPOCROOT)/epoc32/release/armv5/urel/child3.exe",
-		"$(SBS_HOME)/test/smoke_suite/test_resources/tracecompiler/mum_children_mmps/traces_child2_exe/child2Traces.h",
-		"$(SBS_HOME)/test/smoke_suite/test_resources/tracecompiler/mum_children_mmps/traces_child2_exe/commonTraces.h",
-		"$(SBS_HOME)/test/smoke_suite/test_resources/tracecompiler/mum_children_mmps/traces_child3_exe/child3Traces.h",
-		"$(SBS_HOME)/test/smoke_suite/test_resources/tracecompiler/mum_children_mmps/traces_child3_exe/commonTraces.h",
+		"$(SBS_HOME)/test/smoke_suite/test_resources/tracecompiler/mum_children_mmps/traces/traces_child2_exe/child2Traces.h",
+		"$(SBS_HOME)/test/smoke_suite/test_resources/tracecompiler/mum_children_mmps/traces/traces_child2_exe/commonTraces.h",
+		"$(SBS_HOME)/test/smoke_suite/test_resources/tracecompiler/mum_children_mmps/traces/traces_child3_exe/child3Traces.h",
+		"$(SBS_HOME)/test/smoke_suite/test_resources/tracecompiler/mum_children_mmps/traces/traces_child3_exe/commonTraces.h",
 		"$(EPOCROOT)/epoc32/ost_dictionaries/child2_exe_0x11100002_Dictionary.xml",
 		"$(EPOCROOT)/epoc32/ost_dictionaries/child3_exe_0x11100002_Dictionary.xml",
-		"$(EPOCROOT)/epoc32/include/internal/symbiantraces/autogen/child2_exe_0x11100002_TraceDefinitions.h",
-		"$(EPOCROOT)/epoc32/include/internal/symbiantraces/autogen/child3_exe_0x11100002_TraceDefinitions.h"
+		"$(EPOCROOT)/epoc32/include/platform/symbiantraces/autogen/child2_exe_0x11100002_TraceDefinitions.h",
+		"$(EPOCROOT)/epoc32/include/platform/symbiantraces/autogen/child3_exe_0x11100002_TraceDefinitions.h"
 		]
 	t.addbuildtargets('smoke_suite/test_resources/tracecompiler/mum_children_mmps/group/bld.inf', [
 		"child2_/armv5/udeb/child2.o",

@@ -20,26 +20,37 @@ TARGETEXT:=$(if $(REQUESTEDTARGETEXT),$(REQUESTEDTARGETEXT),$(POSTLINKFILETYPE))
 
 # Find out TRACE_PATH
 # first look for .*/traces/traces_<target_name>_<target_extension>
-TRACE_PATH:=$(strip $(foreach DIR,$(USERINCLUDE),$(filter %/traces/traces_$(TARGET)_$(TARGETEXT),$(DIR))))
+TRACE_PATH:=$(strip $(foreach DIR,$(USERINCLUDE) $(SYSTEMINCLUDE),$(filter %/traces/$(TARGET)_$(TARGETEXT),$(DIR))))
+
 
 ifneq ($(TRACE_PATH),)
 # set project name as <target_name>_<target_extension> instead of <mmp_name>
 TRACE_PRJNAME:=$(TARGET)_$(TARGETEXT)
 endif
 
+
+# if not found look for .*/traces_<target_name>_<target_type>
+ifeq ($(TRACE_PATH),)
+TRACE_PATH:=$(strip $(foreach DIR,$(USERINCLUDE) $(SYSTEMINCLUDE),$(filter %/traces_$(TARGET)_$(TARGETTYPE),$(DIR))))
+# set project name as <target_name>_<target_type> instead of <mmp_name>
+ifneq ($(TRACE_PATH),)
+TRACE_PRJNAME:=$(TARGET)_$(TARGETTYPE)
+endif
+endif
+
 # if not found look for .*/traces_<mmp_name>
 ifeq ($(TRACE_PATH),)
-TRACE_PATH:=$(strip $(foreach DIR,$(USERINCLUDE),$(filter %/traces_$(TRACE_PRJNAME),$(DIR))))
+TRACE_PATH:=$(strip $(foreach DIR,$(USERINCLUDE) $(SYSTEMINCLUDE),$(filter %/traces_$(TRACE_PRJNAME),$(DIR))))
 endif
 
 # if not found look for .*/traces
 ifeq ($(TRACE_PATH),)
-TRACE_PATH:=$(strip $(foreach DIR,$(USERINCLUDE),$(filter %/traces,$(DIR))))
+TRACE_PATH:=$(strip $(foreach DIR,$(USERINCLUDE) $(SYSTEMINCLUDE),$(filter %/traces,$(DIR))))
 endif
 
 # if not found look for .*/traces_<target_name>_<target_type>
 ifeq ($(TRACE_PATH),)
-TRACE_PATH:=$(strip $(foreach DIR,$(USERINCLUDE),$(filter %/traces_$(TARGET)_$(TARGETTYPE),$(DIR))))
+TRACE_PATH:=$(strip $(foreach DIR,$(USERINCLUDE) $(SYSTEMINCLUDE),$(filter %/traces_$(TARGET)_$(TARGETTYPE),$(DIR))))
 # set project name as <target_name>_<target_type> instead of <mmp_name>
 TRACE_PRJNAME:=$(TARGET)_$(TARGETTYPE)
 endif
@@ -76,14 +87,33 @@ GUARD_$(call sanitise,$(TRACE_MARKER)):=1
 # fred.prd.mmp we want fred_prd
 TRACE_PRJNAME_SANITISED:=$(subst .,_,$(TRACE_PRJNAME))
 
-TRACE_DICTIONARY:=$(EPOCROOT)/epoc32/ost_dictionaries/$(TRACE_PRJNAME_SANITISED)_0x$(UID_TC)_Dictionary.xml
-AUTOGEN_HEADER:=$(EPOCROOT)/epoc32/include/internal/SymbianTraces/autogen/$(TRACE_PRJNAME_SANITISED)_0x$(UID_TC)_TraceDefinitions.h
 
 JAVA_COMMAND:=$(SBS_JAVATC)
 TRACE_COMPILER_PATH:=$(EPOCROOT)/epoc32/tools
+
+#
+#try to find TraceCompilerMain.class (the new posix-like interface)
+#
+ifeq ($(trace_compile),)
+TCClass:=$(wildcard  $(TRACE_COMPILER_PATH)/tracecompiler/com/nokia/tracecompiler/TraceCompilerMain.class)
+
+ifneq ($(TCClass),) #New Interface
+TCAUTOGENDIR:=platform
+TRACE_COMPILER_START:=-classpath $(TRACE_COMPILER_PATH)/tracecompiler com.nokia.tracecompiler.TraceCompilerMain
+define trace_compile
+$(TRACE_MARKER) : $(PROJECT_META)
+	$(call startrule,tracecompile) \
+	( $(GNUCAT) $(TRACE_SOURCE_LIST); \
+	  echo -en "*ENDOFSOURCEFILES*\n" ) | \
+	$(JAVA_COMMAND) $(TRACE_COMPILER_START) -d --uid=$(UID_TC) --project=$(TRACE_PRJNAME) --mmp=$(PROJECT_META) --traces=$(TRACE_PATH) &&  \
+	$(GNUMD5SUM) $(TRACE_SOURCE_LIST) > $(TRACE_MARKER) && \
+	{ $(GNUTOUCH) $(TRACE_DICTIONARY) $(AUTOGEN_HEADER); \
+	 $(GNUCAT) $(TRACE_SOURCE_LIST) ; true ; } \
+	$(call endrule,tracecompile)
+endef
+else # Old inteface
+TCAUTOGENDIR:=internal
 TRACE_COMPILER_START:=-classpath $(TRACE_COMPILER_PATH)/tracecompiler com.nokia.tracecompiler.TraceCompiler
-
-
 # 1. Use pipe to send inputs to trace compiler to process
 # 2. Create a hash regarding to source names and put it in marker.
 # 3. Show source names that are processed by trace compiler
@@ -99,11 +129,18 @@ $(TRACE_MARKER) : $(PROJECT_META)
 	 $(GNUCAT) $(TRACE_SOURCE_LIST) ; true ; } \
 	$(call endrule,tracecompile)
 endef
+endif
+
+endif
+
+TRACE_DICTIONARY:=$(EPOCROOT)/epoc32/ost_dictionaries/$(TRACE_PRJNAME_SANITISED)_0x$(UID_TC)_Dictionary.xml
+AUTOGEN_HEADER:=$(EPOCROOT)/epoc32/include/$(TCAUTOGENDIR)/symbiantraces/autogen/$(TRACE_PRJNAME_SANITISED)_0x$(UID_TC)_TraceDefinitions.h
 
 $(eval $(trace_compile))
 
 $(eval $(call GenerateStandardCleanTarget, $(TRACE_PATH)/tracebuilder.cache $(TRACE_MARKER) $(TRACE_SOURCE_LIST),,))
 
+$(call makepath,$(TRACE_PATH) $(dir $(TRACE_DICTIONARY) $(AUTOGEN_HEADER)))
 # End sanity guard
 endif
 

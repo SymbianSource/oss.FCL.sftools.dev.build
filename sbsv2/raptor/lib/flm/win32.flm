@@ -220,6 +220,9 @@ endif
 ifneq ($(USE_TRACE_COMPILER),) 
   include $(FLMHOME)/tracecompiler.mk
   TC_RELEASABLES:=$(TRACE_DICTIONARY) $(AUTOGEN_HEADER)
+  ifneq ($(TRACE_PATH),)
+      CDEFS:=$(CDEFS) OST_TRACE_COMPILER_IN_USE
+  endif
 endif
 
 
