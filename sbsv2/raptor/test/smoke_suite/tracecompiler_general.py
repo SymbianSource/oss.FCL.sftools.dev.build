@@ -40,7 +40,7 @@ def run():
 		"$(SBS_HOME)/test/smoke_suite/test_resources/tracecompiler/testTC/traces/wlanhwinitpermparserTraces.h",	
 		"$(SBS_HOME)/test/smoke_suite/test_resources/tracecompiler/testTC/traces/fixed_id.definitions",
 		"$(EPOCROOT)/epoc32/ost_dictionaries/testTC_0x1000008d_Dictionary.xml",
-		"$(EPOCROOT)/epoc32/include/internal/symbiantraces/autogen/testTC_0x1000008d_TraceDefinitions.h"
+		"$(EPOCROOT)/epoc32/include/platform/symbiantraces/autogen/testTC_0x1000008d_TraceDefinitions.h"
 		]
 	t.addbuildtargets('smoke_suite/test_resources/tracecompiler/testTC/group/bld.inf', [
 		"testtc_dll/armv5/udeb/wlanhwinit.o",
@@ -90,7 +90,7 @@ def run():
 		"$(SBS_HOME)/test/smoke_suite/test_resources/tracecompiler/TC_featurevariant/traces/HelloWorldTraces.h",
 		"$(SBS_HOME)/test/smoke_suite/test_resources/tracecompiler/TC_featurevariant/traces/fixed_id.definitions",
 		"$(EPOCROOT)/epoc32/ost_dictionaries/HelloWorld_0xe78a5aa3_Dictionary.xml",
-		"$(EPOCROOT)/epoc32/include/internal/symbiantraces/autogen/HelloWorld_0xe78a5aa3_TraceDefinitions.h"
+		"$(EPOCROOT)/epoc32/include/platform/symbiantraces/autogen/HelloWorld_0xe78a5aa3_TraceDefinitions.h"
 		]
 	t.addbuildtargets('smoke_suite/test_resources/tracecompiler/TC_featurevariant/group/bld.inf', [
 		"helloworld_exe/armv5/udeb/HelloWorld.o",
