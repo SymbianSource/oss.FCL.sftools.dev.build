@@ -54,7 +54,7 @@ def run():
 		"invariant_source_/winscw/udeb/inv_source.o.d",
 		"invariant_source_/winscw/urel/inv_source.o",
 		"invariant_source_/winscw/urel/inv_source.o.d",
-		"invariant_source_/tracecompile_invariant_source_10000002.done",
+		"invariant_source_/tracecompile_invariant_source_exe_10000002.done",
 		"variant_source_/armv5/udeb/var_source1.o",
 		"variant_source_/armv5/udeb/var_source1.o.d",
 		"variant_source_/armv5/udeb/var_source2.o",
@@ -71,7 +71,7 @@ def run():
 		"variant_source_/winscw/urel/var_source1.o.d",
 		"variant_source_/winscw/urel/var_source2.o",
 		"variant_source_/winscw/urel/var_source2.o.d",
-		"variant_source_/tracecompile_variant_source_10000003.done"
+		"variant_source_/tracecompile_variant_source_exe_10000003.done"
 	])
 	t.antitargets = [
 		"$(SBS_HOME)/test/smoke_suite/test_resources/tracecompiler/variant_source/traces/var_source3Traces.h"
@@ -117,7 +117,7 @@ def run():
 		"invariant_source_/winscw/udeb/inv_source.o.d",
 		"invariant_source_/winscw/urel/inv_source.o",
 		"invariant_source_/winscw/urel/inv_source.o.d",
-		"invariant_source_/tracecompile_invariant_source_10000002.done",
+		"invariant_source_/tracecompile_invariant_source_exe_10000002.done",
 		"variant_source_/armv5/udeb/var_source1.o",
 		"variant_source_/armv5/udeb/var_source1.o.d",
 		"variant_source_/armv5/udeb/var_source3.o",
@@ -134,7 +134,7 @@ def run():
 		"variant_source_/winscw/urel/var_source1.o.d",
 		"variant_source_/winscw/urel/var_source3.o",
 		"variant_source_/winscw/urel/var_source3.o.d",
-		"variant_source_/tracecompile_variant_source_10000003.done"
+		"variant_source_/tracecompile_variant_source_exe_10000003.done"
 	])
 	t.run()
 
@@ -174,7 +174,7 @@ def run():
 		"tc_variants_/armv5.phone3/udeb/tc_c.o",
 		"tc_variants_/armv5.phone3/urel/tc_main.o",
 		"tc_variants_/armv5.phone3/urel/tc_c.o",
-		"tc_variants_/tracecompile_tc_variants_10000004.done"
+		"tc_variants_/tracecompile_tc_variants_exe_10000004.done"
 	])	
 	t.run()
 

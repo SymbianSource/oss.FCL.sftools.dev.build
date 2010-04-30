@@ -104,6 +104,7 @@ ifeq ($(trace_compile),)
 TCClass:=$(wildcard  $(TRACE_COMPILER_PATH)/tracecompiler/com/nokia/tracecompiler/TraceCompilerMain.class)
 
 ifneq ($(TCClass),) #New Interface
+TRACE_VER:=new
 TRACE_COMPILER_START:=-classpath $(TRACE_COMPILER_PATH)/tracecompiler com.nokia.tracecompiler.TraceCompilerMain
 define trace_compile
 $(TRACE_MARKER) : $(PROJECT_META)
@@ -117,9 +118,6 @@ $(TRACE_MARKER) : $(PROJECT_META)
 	$(call endrule,tracecompile)
 endef
 
-
-TRACE_DICTIONARY:=$(EPOCROOT)/epoc32/ost_dictionaries/$(TRACE_PRJNAME_SANITISED)_0x$(UID_TC)_Dictionary.xml
-AUTOGEN_HEADER:=$(EPOCROOT)/epoc32/include/platform/symbiantraces/autogen/$(TRACE_PRJNAME_SANITISED)_0x$(UID_TC)_TraceDefinitions.h
 else # Old inteface
 TRACE_COMPILER_START:=-classpath $(TRACE_COMPILER_PATH)/tracecompiler com.nokia.tracecompiler.TraceCompiler
 # 1. Use pipe to send inputs to trace compiler to process
@@ -137,10 +135,7 @@ $(TRACE_MARKER) : $(PROJECT_META)
 	 $(GNUCAT) $(TRACE_SOURCE_LIST) ; true ; } \
 	$(call endrule,tracecompile)
 endef
-
-
-TRACE_DICTIONARY:=$(EPOCROOT)/epoc32/ost_dictionaries/$(OLDTC_TRACE_PRJNAME_SANITISED)_0x$(UID_TC)_Dictionary.xml
-AUTOGEN_HEADER:=$(EPOCROOT)/epoc32/include/internal/symbiantraces/autogen/$(OLDTC_TRACE_PRJNAME_SANITISED)_0x$(UID_TC)_TraceDefinitions.h
+TRACE_VER:=old
 
 # End - new/old trace compiler
 endif
@@ -148,6 +143,13 @@ endif
 # End - tracecompile is defined
 endif
 
+ifeq ($(TRACE_VER),new)
+TRACE_DICTIONARY:=$(EPOCROOT)/epoc32/ost_dictionaries/$(TRACE_PRJNAME_SANITISED)_0x$(UID_TC)_Dictionary.xml
+AUTOGEN_HEADER:=$(EPOCROOT)/epoc32/include/platform/symbiantraces/autogen/$(TRACE_PRJNAME_SANITISED)_0x$(UID_TC)_TraceDefinitions.h
+else
+TRACE_DICTIONARY:=$(EPOCROOT)/epoc32/ost_dictionaries/$(OLDTC_TRACE_PRJNAME_SANITISED)_0x$(UID_TC)_Dictionary.xml
+AUTOGEN_HEADER:=$(EPOCROOT)/epoc32/include/internal/symbiantraces/autogen/$(OLDTC_TRACE_PRJNAME_SANITISED)_0x$(UID_TC)_TraceDefinitions.h
+endif
 
 $(eval $(trace_compile))
 
