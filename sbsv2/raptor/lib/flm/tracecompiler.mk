@@ -52,6 +52,7 @@ endif
 ifeq ($(TRACE_PATH),)
 TRACE_PATH:=$(strip $(foreach DIR,$(USERINCLUDE) $(SYSTEMINCLUDE),$(filter %/traces_$(TARGET)_$(TARGETTYPE),$(DIR))))
 # set project name as <target_name>_<target_type> instead of <mmp_name>
+# to trick old TCom into finding the path.
 TRACE_PRJNAME:=$(TARGET)_$(TARGETTYPE)
 endif
 
