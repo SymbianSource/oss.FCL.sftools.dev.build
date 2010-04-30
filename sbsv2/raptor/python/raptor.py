@@ -1239,11 +1239,11 @@ class Raptor(object):
 		import raptor_api
 		api = raptor_api.Context(self)
 		
-		print "<sbs version='%s'>" % raptor_version.fullversion()
+		print "<sbs version='%s'>" % raptor_version.numericversion()
 		
 		for q in self.queries:
 			try:
-				print api.StringQuery(q)
+				print api.stringquery(q)
 				
 			except Exception, e:
 				self.Error("exception '%s' with query '%s'", str(e), q)

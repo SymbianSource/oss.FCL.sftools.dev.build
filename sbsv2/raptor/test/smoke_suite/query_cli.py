@@ -24,7 +24,7 @@ def run():
 	t.name = "query_cli_alias"
 	t.command = "sbs --query=aliases"
 	t.mustmatch_singleline = [
-		"<sbs version='2.*'>",
+		"<sbs version='2\.\d+\.\d+'>",
 		"<alias.*name='armv5_urel'.*/>",
 		"<alias.*name='armv5_udeb'.*/>",
 		"<alias.*name='winscw_urel'.*/>",
@@ -42,7 +42,7 @@ def run():
 	t.name = "query_cli_product"
 	t.command = "sbs --query=products --configpath=test/smoke_suite/test_resources/bv"
 	t.mustmatch_singleline = [
-		"<sbs version='2.*'>",
+		"<sbs version='2\.\d+\.\d+'>",
 		"<product.*name='test_bv_1'.*/>",
 		"<product.*name='test_bv_2'.*/>",
 		"<product.*name='test_bv_3'.*/>",
@@ -57,7 +57,7 @@ def run():
 	t.name = "query_cli_config"
 	t.command = "sbs --query=config[armv5_urel]"
 	t.mustmatch_singleline = [
-		"<sbs version='2.*'>",
+		"<sbs version='2\.\d+\.\d+'>",
 		"fullname='arm\.v5\.urel\.rvct.*'",
 		"outputpath='.*/epoc32/release/armv5/urel'",
 		"</sbs>"
@@ -68,9 +68,9 @@ def run():
 	t.name = "query_cli_config_bv"
 	t.command = "sbs --query=config[armv5_urel.test_bv_1] --configpath=test/smoke_suite/test_resources/bv"
 	t.mustmatch_singleline = [
-		"<sbs version='2.*'>",
+		"<sbs version='2\.\d+\.\d+'>",
 		"fullname='arm\.v5\.urel\.rvct._.\.test_bv_1'",
-		"outputpath='.*/epoc32/release/armv5.one/urel'",
+		"outputpath='.*/epoc32/release/armv5\.one/urel'",
 		"</sbs>"
 		]
 	t.mustnotmatch_singleline = []
@@ -85,7 +85,7 @@ def run():
 		t2 = raptor_tests.ReplaceEnvs("tools2/$(HOSTPLATFORM_DIR)")
 		
 	t.mustmatch_singleline = [
-		"<sbs version='2.*'>",
+		"<sbs version='2\.\d+\.\d+'>",
 		"outputpath='.*/epoc32/release/winscw/urel'",
 		"outputpath='.*/epoc32/release/%s/rel'" % t2,
 		"</sbs>"
@@ -96,7 +96,7 @@ def run():
 	t.name = "query_cli_bad"
 	t.command = "sbs --query=nonsense"
 	t.mustmatch_singleline = [
-		"<sbs version='2.*'>",
+		"<sbs version='2\.\d+\.\d+'>",
 		"exception 'unknown query' with query 'nonsense'",
 		"</sbs>"
 		]

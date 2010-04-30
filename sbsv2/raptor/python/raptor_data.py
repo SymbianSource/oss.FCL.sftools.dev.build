@@ -829,7 +829,7 @@ class Config(object):
 
 class Variant(Model, Config):
 
-	__slots__ = ('cache','name','host','extends','ops','variantRefs','allOperations')
+	__slots__ = ('cache','name','type','host','extends','ops','variantRefs','allOperations')
 
 	def __init__(self, name = ""):
 		Model.__init__(self)

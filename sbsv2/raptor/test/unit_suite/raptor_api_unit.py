@@ -34,15 +34,15 @@ class TestRaptorApi(unittest.TestCase):
 
 		api = raptor_api.Context(r)
 	
-		aliases = api.GetAliases() # type == ""
+		aliases = api.getaliases() # type == ""
 		self.failUnlessEqual(len(aliases), 4)
 		self.failUnlessEqual(set(["alias_A","alias_B","s1","s2"]),
 							 set(a.name for a in aliases))
 		
-		aliases = api.GetAliases(None) # ignore type
+		aliases = api.getaliases(None) # ignore type
 		self.failUnlessEqual(len(aliases), 6)
 		
-		aliases = api.GetAliases("X") # type == "X"
+		aliases = api.getaliases("X") # type == "X"
 		self.failUnlessEqual(len(aliases), 1)
 		self.failUnlessEqual(aliases[0].name, "alias_D")
 		self.failUnlessEqual(aliases[0].meaning, "a.b.c.d")
@@ -58,19 +58,19 @@ class TestRaptorApi(unittest.TestCase):
 		else:
 			path = "C:/home/raptor/foo/bar"
 			
-		config = api.GetConfig("buildme")
+		config = api.getconfig("buildme")
 		self.failUnlessEqual(config.fullname, "buildme")
 		self.failUnlessEqual(config.outputpath, path)
 		
-		config = api.GetConfig("buildme.foo")
+		config = api.getconfig("buildme.foo")
 		self.failUnlessEqual(config.fullname, "buildme.foo")
 		self.failUnlessEqual(config.outputpath, path)
 		
-		config = api.GetConfig("s1")
+		config = api.getconfig("s1")
 		self.failUnlessEqual(config.fullname, "buildme.foo")
 		self.failUnlessEqual(config.outputpath, path)
 		
-		config = api.GetConfig("s2.product_A")
+		config = api.getconfig("s2.product_A")
 		self.failUnlessEqual(config.fullname, "buildme.foo.bar.product_A")
 		self.failUnlessEqual(config.outputpath, path)
 		
@@ -80,7 +80,7 @@ class TestRaptorApi(unittest.TestCase):
 
 		api = raptor_api.Context(r)
 		
-		products = api.GetProducts() # type == "product"
+		products = api.getproducts() # type == "product"
 		self.failUnlessEqual(len(products), 2)
 		self.failUnlessEqual(set(["product_A","product_C"]),
 							 set(p.name for p in products))

@@ -60,13 +60,21 @@ class Reply(object):
 		return string
 
 class Alias(Reply):
-	pass
+	def __init__(self, name, meaning):
+		super(Alias,self).__init__()
+		self.name = name
+		self.meaning = meaning
 
 class Config(Reply):
-	pass
+	def __init__(self, fullname, outputpath):
+		super(Config,self).__init__()
+		self.fullname = fullname
+		self.outputpath = outputpath
 
 class Product(Reply):
-	pass
+	def __init__(self, name):
+		super(Product,self).__init__()
+		self.name = name
 
 import generic_path
 import raptor
@@ -79,7 +87,7 @@ class Context(object):
 	For example,
 	
 	api = raptor_api.Context()
-	val = api.get(X)
+	val = api.getaliases("X")
 	"""
 	def __init__(self, initialiser=None):
 		# this object has a private Raptor object that can either be
@@ -90,7 +98,7 @@ class Context(object):
 		else:
 			self.__raptor = initialiser
 			
-	def StringQuery(self, query):
+	def stringquery(self, query):
 		"""turn a string into an API call and execute it.
 		
 		This is a convenience method for "lazy" callers.
@@ -99,24 +107,24 @@ class Context(object):
 		"""
 		
 		if query == "aliases":
-			aliases = self.GetAliases()
+			aliases = self.getaliases()
 			return "".join(map(str, aliases)).strip()
 		
 		elif query == "products":
-			variants = self.GetProducts()
+			variants = self.getproducts()
 			return "".join(map(str, variants)).strip()
 		
 		elif query.startswith("config"):
 			match = re.match("config\[(.*)\]", query)
 			if match:
-				config = self.GetConfig(match.group(1))
+				config = self.getconfig(match.group(1))
 				return str(config).strip()
 			else:
 				raise BadQuery("syntax error")
 		
 		raise BadQuery("unknown query")
 
-	def GetAliases(self, type=""):
+	def getaliases(self, type=""):
 		"""extract all aliases of a given type.
 		
 		the default type is "".
@@ -126,15 +134,12 @@ class Context(object):
 		
 		for a in self.__raptor.cache.aliases.values():
 			if a.type == type or type == None:
-				r = Alias()
 				# copy the members we want to expose
-				r.name = a.name
-				r.meaning = a.meaning
-				aliases.append(r)
+				aliases.append( Alias(a.name, a.meaning) )
 			
 		return aliases
 	
-	def GetConfig(self, name):
+	def getconfig(self, name):
 		"""extract the values for a given configuration.
 		
 		'name' should be an alias or variant followed optionally by a
@@ -191,22 +196,17 @@ class Context(object):
 			
 			outputpath = str(generic_path.Join(releasepath, variantplatform, varianttype))
 		
-		r = Config()
-		r.fullname = fullname
-		r.outputpath = outputpath
-		return r
+		return Config(fullname, outputpath)
 		
-	def GetProducts(self):
+	def getproducts(self):
 		"""extract all product variants."""
 		
 		variants = []
 		
 		for v in self.__raptor.cache.variants.values():
 			if v.type == "product":
-				r = Product()
 				# copy the members we want to expose
-				r.name = v.name
-				variants.append(r)
+				variants.append( Product(v.name) )
 			
 		return variants
 	
