@@ -170,20 +170,18 @@ ifneq ($(IMPORTLIBRARYREQUIRED),) # no dso files for plugins, animation dlls etc
     IMPORTLIBTARGETVERSIONED_DSO:=$(VER_E32IMPORTLIBBASE).dso
   endif
 
-  # ABIv1 .lib (for specific builds, toolchains and host OS platforms only)
+  # ABIv1 .lib (for specific kits and toolchains only)
   IMPORTLIBTARGET_LIB:=
   IMPORTLIBTARGETVERSIONED_LIB:=
   BUILDMARKER_IMPORTLIBTARGET_LIB:=TARGET_$(subst :,,$(VER_E32IMPORTLIBBASE)).lib
-  # Only for builds that require and support them, and only on windows
-  ifeq ($(OSTYPE),cygwin)
-  ifeq ($(GENERATE_ABIV1_IMPLIBS),1)
+  # Only for kits that require and tools that support them
+  ifneq ($(SUPPORTS_ABIV1_IMPLIBS),)
     WHATRELEASE:=$(WHATRELEASE) $(if $(EXPLICITVERSION),,$(TMP_IMPORTLIBTARGET_ROOT).lib)
     WHATRELEASE:=$(WHATRELEASE) $(VER_E32IMPORTLIBBASE).lib
     ifeq ($($(BUILDMARKER_IMPORTLIBTARGET_LIB)),)
       IMPORTLIBTARGET_LIB:=$(TMP_IMPORTLIBTARGET_ROOT).lib
       IMPORTLIBTARGETVERSIONED_LIB:=$(VER_E32IMPORTLIBBASE).lib
     endif
-  endif
   endif
 endif
 

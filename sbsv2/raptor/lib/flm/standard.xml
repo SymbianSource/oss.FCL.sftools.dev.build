@@ -122,7 +122,6 @@
 		<param name='FPMODE_OPTION'/>
 		<param name='FROMELF'/>
 		<param name='FULLVARIANTPATH'/>
-		<param name='GENERATE_ABIV1_IMPLIBS' default=''/>		
 		<param name='RVCT3_1' default=''/>
 		<param name='LD'/>
 		<param name='LD_ERRORS_CONTROL_OPTION'/>
@@ -179,6 +178,7 @@
 		<param name='STATIC_LIBS_PATH'/>
 		<param name='STATIC_LIBRARY_DIR'/>
 		<param name='STATIC_RUNTIME_DIR'/>
+		<param name='SUPPORTS_ABIV1_IMPLIBS'/>		
 		<param name='SYMBIAN_CCFLAGS'/>
 		<param name='SYMBIAN_LD_MESSAGE_OPTION'/>
 		<param name='SYMBIAN_LINK_FLAGS'/>

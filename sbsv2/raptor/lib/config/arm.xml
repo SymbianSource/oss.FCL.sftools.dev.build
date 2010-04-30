@@ -79,7 +79,6 @@
 		<set name="LINKER_ARCH_OPTION" value="$(LD.ARMV5)"/>
 		<set name="COMPILER_FPU_DEFAULT" value="$(CC.SOFTVFP_MAYBE_VFPV2)"/>
 		<set name="POSTLINKER_FPU_DEFAULT" value="$(PL.SOFTVFP_MAYBE_VFPV2)"/>
-		<set name="GENERATE_ABIV1_IMPLIBS" value="$(SUPPORTS_ABIV1_IMPLIBS)"/>
 	</var>
 	<var name="v6">
 		<set name="TRADITIONAL_PLATFORM" value="ARMV6"/>

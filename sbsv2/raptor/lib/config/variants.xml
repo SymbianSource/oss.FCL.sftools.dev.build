@@ -82,7 +82,7 @@
 		<!-- PLATMACROS.LINUX is set from PLATMACROS.WINDOWS -->
 		<append name="TRADITIONAL_PLATFORM" value='SMP' separator="" />
 		<append name="VARIANTPLATFORM" value="smp" separator=""/>
-		<set name="GENERATE_ABIV1_IMPLIBS" value=""/>
+		<set name="SUPPORTS_ABIV1_IMPLIBS" value=""/>
 	</var>
 
 	<!-- emit formatted releasable information into the logs for post-build parsing -->
