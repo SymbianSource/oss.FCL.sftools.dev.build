@@ -64,7 +64,8 @@ else
 endif
 
 # we create intermediate .rpp and .d files
-INTERBASE:=$(OUTPUTPATH)/$(TARGET_lower)_$(notdir $(SOURCE))
+INTERBASE_TMP:=$(OUTPUTPATH)/$(TARGET_lower)_$(notdir $(basename $(SOURCE)))
+INTERBASE:=$(OUTPUTPATH)/$(TARGET_lower)
 
 ################################## localisation ###########################$(GNUMKDIR)#############
 # Only make copies for full resource builds
@@ -91,7 +92,7 @@ RESOURCE_$(call sanitise,$(SOURCE)):=1
 
 RESOURCE:: $(DESTRPP) $(INFOFILE)
 
-$(DESTRPP): $(INTERBASE)_$(RPPLANG).rpp
+$(DESTRPP): $(INTERBASE_TMP)_$(RPPLANG).rpp
 	$(call startrule,rppfilecopy,FORCESUCCESS) \
 	$(GNUCP) $$< $$@ \
 	$(call endrule,rppfilecopy)
@@ -117,7 +118,7 @@ endif
 CPPOPT:=-nostdinc -undef -Wno-trigraphs -D_UNICODE -include $(PRODUCT_INCLUDE)\
  -I$(dir $(SOURCE)) $(foreach I, $(USERINCLUDE),-I$(I) ) -I- $(foreach J,$(SYSTEMINCLUDE),-I$(J) )
 
-CREATABLEPATHS:=$(CREATABLEPATHS) $(RSCDIR) $(RSGDIR) $(OUTPUTPATH) $(INTERBASE) 
+CREATABLEPATHS:=$(CREATABLEPATHS) $(RSCDIR) $(RSGDIR) $(OUTPUTPATH) $(INTERBASE_TMP) $(INTERBASE)
 
 # We intend to generate the resource in an intermediate location and copy to the targetpath to
 # ensure that when the "same" resource is built into separare target paths, it doesn't have to be 
@@ -185,6 +186,7 @@ endif
 
     ifeq "$1" "$4"
         RESOURCE_DEPS:: $1.d
+
         $1.d: $(SOURCE)
 	  $(call startrule,resourcedependencies,FORCESUCCESS) \
 	  RPP=$1; $(GNUCPP) -C -DLANGUAGE_$(3) -DLANGUAGE_$(subst sc,SC,$3) $(call makemacrodef,-D,$(MMPDEFS))\
@@ -192,12 +194,13 @@ endif
 	  $$(DEPENDENCY_CORRECTOR) >$$@ \
 	  $(call endrule,resourcedependencies)
 
-    else
-        $1: $4
+         $1 : $1.d
 
+    else
+         $1 : $4
     endif
-    ifeq "$(MAKEFILE_GROUP)" "RESOURCE"
-    $1: $4.d
+
+    $1:
 	  $(call startrule,resourcepreprocess,FORCESUCCESS) \
 	  $(GNUCPP) -C -DLANGUAGE_$3 -DLANGUAGE_$(subst sc,SC,$(3)) $(call makemacrodef,-D,$(MMPDEFS))\
 	  $(CPPOPT) $(SOURCE) -o $$@ \
@@ -206,6 +209,7 @@ endif
 
     CLEANTARGETS:= $$(CLEANTARGETS) $1
 
+    ifeq "$(MAKEFILE_GROUP)" "RESOURCE"
     ifeq "$1" "$4"
       $(eval DEPENDFILENAME:=$1.d)
       $(eval DEPENDFILE:=$(wildcard $(DEPENDFILENAME)))
@@ -214,7 +218,7 @@ endif
       ifneq "$(DEPENDFILE)" ""
         ifeq "$(filter %CLEAN,$(call uppercase,$(MAKECMDGOALS)))" ""
           ifeq "$(MAKEFILE_GROUP)" "RESOURCE"
-            -include $(DEPENDFILE)
+           -include $(DEPENDFILE)
           endif
         endif
       endif
@@ -230,7 +234,7 @@ define copyresource
 
    RELEASABLES:=$$(RELEASABLES) $(2)
 
-   $(if $(TARGET_$(call sanitise,$2)),,$(eval TARGET_$(call sanitise,$2):=1)$(info <copy source='$1'>$2</copy>))
+   $(if $(TARGET_$(call sanitise,$(firstword $2))),,$(eval TARGET_$(call sanitise,$(firstword $2)):=1)$(info <copy source='$1'>$2</copy>))
  
 endef # copyresource #
 
@@ -307,7 +311,7 @@ endef
 # We always create at least the header
 # even if we sometimes don't create the resources
 ifneq ($(RESOURCEHEADER),)
-        $(eval $(call generateresourceheader,$(RESOURCEHEADER),$(INTERBASE)_$(HEADLANG).rpp,$(HEADLANG)))
+        $(eval $(call generateresourceheader,$(RESOURCEHEADER),$(INTERBASE_TMP)_$(HEADLANG).rpp,$(HEADLANG)))
 endif
 
 # The one on which the others will depend i.e. they will 
@@ -315,20 +319,20 @@ endif
 # We only have to make one dependency file because all of
 # the other languages will benefit from this languages'
 # dependency file
-PRIMARYRPPFILE:=$(INTERBASE)_$(HEADLANG).rpp
+PRIMARYRPPFILE:=$(INTERBASE_TMP)_$(HEADLANG).rpp
 ifeq ($(HEADERONLY),)
         # generate a resource file for each language
         # For sc we generate $(RESBASE).rsc and define LANGUAGE_SC and LANGUAGE_sc.
-        $(foreach L,$(LANGUAGES:SC=sc),$(eval $(call preprocessresource,$(INTERBASE)_$(L).rpp,$(INTERBASE).r$(L),$(L),$(PRIMARYRPPFILE))))
+        $(foreach L,$(LANGUAGES:SC=sc),$(eval $(call preprocessresource,$(INTERBASE_TMP)_$(L).rpp,$(INTERBASE).r$(L),$(L),$(PRIMARYRPPFILE))))
 
         ifeq "$(MAKEFILE_GROUP)" "RESOURCE"
-            $(foreach L,$(LANGUAGES:SC=sc),$(eval $(call generateresource,$(INTERBASE).r$(L),$(INTERBASE)_$(L).rpp,$(L))))
+            $(foreach L,$(LANGUAGES:SC=sc),$(eval $(call generateresource,$(INTERBASE).r$(L),$(INTERBASE_TMP)_$(L).rpp,$(L))))
         endif
 else
         # No resources are going to be made so unless we specifically ask for it, there will be no
         # preprocessed file from which to create the header:
 
-        $(eval $(call preprocessresource,$(INTERBASE)_$(HEADLANG).rpp,,$(HEADLANG),$(PRIMARYRPPFILE)))
+        $(eval $(call preprocessresource,$(INTERBASE_TMP)_$(HEADLANG).rpp,,$(HEADLANG),$(PRIMARYRPPFILE)))
 
 endif
 
@@ -338,10 +342,10 @@ endif
 ifneq ($(RFIFILE),)
   RESOURCE:: $(RFIFILE)
   RELEASABLES:=$(RELEASABLES) $(RFIFILE)
-  CREATABLEPATHS:=$(CREATABLEPATHS) $(dir $(RFIFILE))
+  CREATABLEPATHS:=$(CREATABLEPATHS) $(dir $(RFIFILE))/
 
-  RPPFILES:=$(foreach L,$(LANGUAGES:SC=sc),$(INTERBASE)_$(L).rpp)
-  $(eval $(call generaterfifile,$(RFIFILE),$(RPPFILES),$(addsuffix .d,$(RPPFILES))))
+  RPPFILES:=$(foreach L,$(LANGUAGES:SC=sc),$(INTERBASE_TMP)_$(L).rpp)
+  #$(eval $(call generaterfifile,$(RFIFILE),$(RPPFILES),$(addsuffix .d,$(RPPFILES))))
 endif
 
 
