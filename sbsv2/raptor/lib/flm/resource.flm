@@ -64,7 +64,7 @@ else
 endif
 
 # we create intermediate .rpp and .d files
-INTERBASE:=$(OUTPUTPATH)/$(TARGET_lower)
+INTERBASE:=$(OUTPUTPATH)/$(TARGET_lower)_$(notdir $(SOURCE))
 
 ################################## localisation ###########################$(GNUMKDIR)#############
 # Only make copies for full resource builds
@@ -197,7 +197,7 @@ endif
 
     endif
     ifeq "$(MAKEFILE_GROUP)" "RESOURCE"
-    $1: 
+    $1: $4.d
 	  $(call startrule,resourcepreprocess,FORCESUCCESS) \
 	  $(GNUCPP) -C -DLANGUAGE_$3 -DLANGUAGE_$(subst sc,SC,$(3)) $(call makemacrodef,-D,$(MMPDEFS))\
 	  $(CPPOPT) $(SOURCE) -o $$@ \
