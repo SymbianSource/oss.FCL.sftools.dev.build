@@ -19,6 +19,11 @@
 # module only, as it is the only programatic interface considered public. The
 # command line --query option is also implemented using this module.
 
+# constants
+ALL = 1
+
+# objects
+
 class Reply(object):
 	"""object to return values from API calls.
 	"""
@@ -103,7 +108,7 @@ class Context(object):
 		
 		This is a convenience method for "lazy" callers.
 		
-		The return value is also converted into a string.
+		The return value is also converted into a well-formed XML string.
 		"""
 		
 		if query == "aliases":
@@ -128,12 +133,12 @@ class Context(object):
 		"""extract all aliases of a given type.
 		
 		the default type is "".
-		to get all aliases pass type=None
+		to get all aliases pass type=ALL
 		"""
 		aliases = []
 		
 		for a in self.__raptor.cache.aliases.values():
-			if a.type == type or type == None:
+			if type == ALL or a.type == type:
 				# copy the members we want to expose
 				aliases.append( Alias(a.name, a.meaning) )
 			

@@ -39,7 +39,7 @@ class TestRaptorApi(unittest.TestCase):
 		self.failUnlessEqual(set(["alias_A","alias_B","s1","s2"]),
 							 set(a.name for a in aliases))
 		
-		aliases = api.getaliases(None) # ignore type
+		aliases = api.getaliases(raptor_api.ALL) # ignore type
 		self.failUnlessEqual(len(aliases), 6)
 		
 		aliases = api.getaliases("X") # type == "X"
