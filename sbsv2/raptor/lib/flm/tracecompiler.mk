@@ -28,9 +28,9 @@ endef
 $(if $(FLMDEBUG),$(info <debug>INCLUDES=$(USERINCLUDE) $(SYSTEMINCLUDE)</debug>))
 $(if $(FLMDEBUG),$(info <debug>TARGET=$(TARGET) TARGETEXT=$(TARGETEXT)</debug>))
 
-# Find out TRACE_PATH  by looking for the trace folser in SYSTEMINCLUDE and USERINCLUDES
+# Find out TRACE_PATH  by looking for the trace folder in SYSTEMINCLUDE and USERINCLUDES
 # traces/traces_<target_name>_<target_extension>
-TRACE_PATH:=$(call get_trace_path,/traces/traces_$(TARGET)_$(TARGETEXT))
+TRACE_PATH:=$(call get_trace_path,/traces/traces_$(TRACE_RELEASABLE_ID))
 ifneq ($(TRACE_PATH),)
   TRACE_PRJNAME:=$(TRACE_RELEASABLE_ID)
 else # obsolete forms for compatibility
@@ -111,7 +111,7 @@ $(TRACE_MARKER) : $(PROJECT_META)
 	$(call startrule,tracecompile) \
 	( $(GNUCAT) $(TRACE_SOURCE_LIST); \
 	  echo -en "*ENDOFSOURCEFILES*\n" ) | \
-	$(JAVA_COMMAND) $(TRACE_COMPILER_START) -d --uid=$(UID_TC) --project=$(TRACE_PRJNAME) --mmp=$(PROJECT_META) --traces=$(TRACE_PATH) &&  \
+	$(JAVA_COMMAND) $(TRACE_COMPILER_START) $(if $(FLMDEBUG),-d,) --uid=$(UID_TC) --project=$(TRACE_PRJNAME) --mmp=$(PROJECT_META) --traces=$(TRACE_PATH) &&  \
 	$(GNUMD5SUM) $(TRACE_SOURCE_LIST) > $(TRACE_MARKER) && \
 	{ $(GNUTOUCH) $(TRACE_DICTIONARY) $(AUTOGEN_HEADER); \
 	 $(GNUCAT) $(TRACE_SOURCE_LIST) ; true ; } \
