@@ -53,6 +53,8 @@ $(if $(FLMDEBUG),$(info <debug><flm name='e32abiv2' target='$(TARGET)' type='$(T
 # Strip switch-type parameters
 #
 POSTLINKTARGETTYPE:=$(strip $(POSTLINKTARGETTYPE))
+TARGETEXT:=$(if $(REQUESTEDTARGETEXT),$(REQUESTEDTARGETEXT),$(POSTLINKFILETYPE))
+
 UID1:=$(strip $(UID1))
 UID2:=$(strip $(UID2))
 UID3:=$(strip $(UID3))
@@ -128,9 +130,9 @@ endif
 
 # Postlinkable targets need to be linked and elf2e32'd
 ifneq ($(DOPOSTLINK),)
-    E32TARGET:=$(RELEASABLEPATH)/$(TARGET)$(if $(EXPLICITVERSION),{$(VERSIONHEX)},).$(if $(REQUESTEDTARGETEXT),$(REQUESTEDTARGETEXT),$(POSTLINKFILETYPE))
-    LINK_TARGET:=$(RELEASABLEPATH)/$(TARGET)$(if $(EXPLICITVERSION),{$(VERSIONHEX)},).$(if $(REQUESTEDTARGETEXT),$(REQUESTEDTARGETEXT),$(POSTLINKFILETYPE)).sym
-    MAPFILE:=$(RELEASABLEPATH)/$(TARGET).$(if $(REQUESTEDTARGETEXT),$(REQUESTEDTARGETEXT),$(POSTLINKFILETYPE)).map
+    E32TARGET:=$(RELEASABLEPATH)/$(TARGET)$(if $(EXPLICITVERSION),{$(VERSIONHEX)},).$(TARGETEXT)
+    LINK_TARGET:=$(RELEASABLEPATH)/$(TARGET)$(if $(EXPLICITVERSION),{$(VERSIONHEX)},).$(TARGETEXT).sym
+    MAPFILE:=$(RELEASABLEPATH)/$(TARGET).$(TARGETEXT).map
 else
   E32TARGET:=
   LINK_TARGET:=
@@ -187,7 +189,7 @@ endif
 # put the hex version number in the right place
 ifeq ($(LINKAS),)
   LINKASNAME=$(TARGET)
-  LINKASTYPE=$(if $(REQUESTEDTARGETEXT),$(REQUESTEDTARGETEXT),$(POSTLINKFILETYPE))
+  LINKASTYPE=$(TARGETEXT)
 else
   SPLIT_LINKAS=$(subst ., ,$(LINKAS))
   LINKASNAME=$(word 1,$(SPLIT_LINKAS))
@@ -712,8 +714,12 @@ endif
 # USE_TRACE_COMPILER defaults to blank in Raptor config.
 # Users can turn TC on by setting it to 1 in user config.
 ifneq ($(USE_TRACE_COMPILER),)
+  # TARGETEXT is already set
   include $(FLMHOME)/tracecompiler.mk
   WHATRELEASE:=$(WHATRELEASE) $(TRACE_DICTIONARY) $(AUTOGEN_HEADER)
+  ifneq ($(TRACE_PATH),)
+      CDEFS:=$(CDEFS) OST_TRACE_COMPILER_IN_USE
+  endif
 endif
 
 CC_CPPONLY_ARGS:=$(SYMBIAN_CCFLAGS) $(if $(DEBUG_INFO),-g) $(DEBUG_FORMAT) \
@@ -864,7 +870,7 @@ endif
 define e32abiv2_listing
 # $1 is the sourcefile
 
-$(eval LISTINGTARGET:=$(strip $(call extractandmap,$(CPPFILEEXTENSIONS) $(CFILEEXTENSIONS),.$(subst _,.,$(call sanitise,$(FULLVARIANTPATH))).$(TARGET).$(if $(REQUESTEDTARGETEXT),$(REQUESTEDTARGETEXT),$(POSTLINKFILETYPE)).lst,$1)))
+$(eval LISTINGTARGET:=$(strip $(call extractandmap,$(CPPFILEEXTENSIONS) $(CFILEEXTENSIONS),.$(subst _,.,$(call sanitise,$(FULLVARIANTPATH))).$(TARGET).$(TARGETEXT).lst,$1)))
 $(eval DEPENDFILENAME:=$(call map2listfile,$1).d)
 $(eval DEPENDFILE:=$(wildcard $(DEPENDFILENAME)))
 
@@ -920,7 +926,7 @@ ifneq ($(SUPPORT_FREEZE),)
 # separate arguments are interpreted as a single argument when passed to bash
 FIVESPACES=$(BLANK)     $(BLANK)
 
-FREEZEGUARD:=TARGET_$(TARGET)_$(if $(REQUESTEDTARGETEXT),$(REQUESTEDTARGETEXT),$(POSTLINKFILETYPE))_$(IMPORTLIBPATH)_EFREEZE
+FREEZEGUARD:=TARGET_$(TARGET)_$(TARGETEXT)_$(IMPORTLIBPATH)_EFREEZE
 
 define e32freeze
 
