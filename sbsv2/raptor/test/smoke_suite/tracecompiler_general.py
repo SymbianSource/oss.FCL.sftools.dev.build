@@ -120,7 +120,7 @@ def run():
 	t.addbuildtargets('smoke_suite/test_resources/tracecompiler/TC_autorun/bld.inf', [
 		"test_/armv5/udeb/test.o",
 		"test_/armv5/urel/test.o",
-		"test_/tracecompile_test_exe_0000000.done"
+		"test_/tracecompile_test_exe_00000001.done"
 	])
 	t.run()
 	

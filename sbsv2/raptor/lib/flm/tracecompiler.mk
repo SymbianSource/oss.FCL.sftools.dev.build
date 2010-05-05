@@ -97,15 +97,26 @@ OLDTC_TRACE_PRJNAME_SANITISED:=$(subst .,_,$(OLDTC_TRACE_PRJNAME))
 JAVA_COMMAND:=$(SBS_JAVATC)
 TRACE_COMPILER_PATH:=$(EPOCROOT)/epoc32/tools
 
-#
-#try to find TraceCompilerMain.class (the new posix-like interface)
-#
+# declare the trace_compile macro but only do it once in the build
 ifeq ($(trace_compile),)
-TCClass:=$(wildcard  $(TRACE_COMPILER_PATH)/tracecompiler/com/nokia/tracecompiler/TraceCompilerMain.class)
 
-ifneq ($(TCClass),) #New Interface
-TRACE_VER:=new
+# Find out which macro to declare - the one supporting the new CLI 
+# or the old one.  First try to find TraceCompilerMain.class 
+# If it is there then it might be the new posix-like interface
+TRACE_VER:=
+TRACE_VSTR:=
+
+TCClass:=$(wildcard  $(TRACE_COMPILER_PATH)/tracecompiler/com/nokia/tracecompiler/TraceCompilerMain.class)
+ifneq ($(TCClass),) 
+# Get the version string from the TC (assume it's the new one)
 TRACE_COMPILER_START:=-classpath $(TRACE_COMPILER_PATH)/tracecompiler com.nokia.tracecompiler.TraceCompilerMain
+TRACE_VSTR:=$(firstword $(subst TraceCompiler version ,,$(shell $(JAVA_COMMAND) $(TRACE_COMPILER_START) --version)))
+# check if it looks like a version that supports the new cli interface: supporting up to verion 9 in the future.
+TRACE_VER:=$(findstring new,$(foreach version,2 3 4 5 6 7 8 9,$(patsubst $(version).%,new,$(TRACE_VSTR))))
+endif
+$(if $(FLMDEBUG),$(info <debug>TRACE_VSTR=$(TRACE_VSTR) TRACE_VER=$(TRACE_VER)</debug>))
+
+ifeq ($(TRACE_VER),new)
 define trace_compile
 $(TRACE_MARKER) : $(PROJECT_META)
 	$(call startrule,tracecompile) \
@@ -135,7 +146,6 @@ $(TRACE_MARKER) : $(PROJECT_META)
 	 $(GNUCAT) $(TRACE_SOURCE_LIST) ; true ; } \
 	$(call endrule,tracecompile)
 endef
-TRACE_VER:=old
 
 # End - new/old trace compiler
 endif
