@@ -12,8 +12,18 @@
 # Contributors:
 #
 # Description: 
-# Filter class for doing CLEAN, CLEANEXPORT and REALLYCLEAN efficiently.
+# Filter class for copying files in serial in python. This
+# is important in cluster builds where file copying is 
+# very inefficient.  
+# The one-to-many <copy> tag is searched for and copy
+# instructions are built up in a hash table.
+# <copy source='sourcefilename'>destfilename1 destfilename2 . . . .destfilenameN</copy>
+# destinations must be full filenames not directories.
 #
+# This filter monitors build progress
+# via the <progress> tags and flushes copies as build 
+# stages end (e.g. after resource so resources are ready for the next stage)
+# 
 
 import os
 import sys
@@ -48,19 +58,25 @@ class FilterCopyFile(filter_interface.Filter):
 					self.files[source].update(destinations)
 				else:
 					self.files[source] = set(destinations)
-				
+			elif line.startswith("<progress:end object_type='makefile' task='build'"):
+				self.flushcopies() # perform copies at end of each invocation of the make engine
+						  # to ensure dependencies are in place for the next one.
 				
 		return self.ok
 	
 	
 	def summary(self):
 		"finish off"
+		self.flushcopies()
+		return self.ok
+
+	def flushcopies(self):
 		for source in self.files.keys():
 			#print "<debug>self.files %s</debug>" % self.files[source]
 			for dest in self.files[source]:
 				self.copyfile(source, dest)
+		self.files = {}
 		
-		return self.ok
 
 
 	def close(self):

@@ -338,9 +338,6 @@ class Layer(ModelNode):
 		if build.quiet == True:
 			cli_options += " -q"
 
-		if build.timing == True:
-			cli_options += " --timing"
-
 		if build.noDependInclude == True:
 			cli_options += " --no-depend-include"
 
@@ -534,7 +531,7 @@ class Raptor(object):
 		# what platform and filesystem are we running on?
 		self.filesystem = raptor_utilities.getOSFileSystem()
 
-		self.timing = False
+		self.timing = True # Needed by filters such as copy_file to monitor progress
 		self.toolset = None
 
 		self.starttime = time.time()
@@ -696,7 +693,7 @@ class Raptor(object):
 		return True
 
 	def SetTiming(self, TrueOrFalse):
-		self.timing = TrueOrFalse
+		self.Info("--timing switch no longer has any effect - build timing is now permanently on")
 		return True
 
 	def SetParallelParsing(self, type):

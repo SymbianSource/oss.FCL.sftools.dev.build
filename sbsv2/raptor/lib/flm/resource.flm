@@ -90,12 +90,9 @@ define CreateRppAndInfo
 ifeq ($(RESOURCE_$(call sanitise,$(SOURCE))),)
 RESOURCE_$(call sanitise,$(SOURCE)):=1
 
-RESOURCE:: $(DESTRPP) $(INFOFILE)
+RESOURCE:: $(INFOFILE)
 
-$(DESTRPP): $(INTERBASE_TMP)_$(RPPLANG).rpp
-	$(call startrule,rppfilecopy,FORCESUCCESS) \
-	$(GNUCP) $$< $$@ \
-	$(call endrule,rppfilecopy)
+$(info <copy source='$(INTERBASE_TMP)_$(RPPLANG).rpp'>$(DESTRPP)</copy>)
 
 $(INFOFILE)::
 	@if [ ! -d $(EPOCROOT)/epoc32/localisation/group ]; then $(GNUMKDIR) -p $(EPOCROOT)/epoc32/localisation/group; fi
