@@ -32,15 +32,6 @@ their SYTEMINCLUDEs.  This change causes Raptor to look for the traces
 directory in bot SYSTEMINCLUDES and USERINCLUDES.
 
 
-Automatic Macro definition - OST_TRACE_COMPILER_IN_USE
---------------------------------------------------------
-
-When Raptor notices that the trace compiler is required for an MMP (by
-looking for the traces/targetname_ext directory in the SYSTEMINCLUDES
-or USERINCLUDES) it causes the application to build with the
-OST_TRACE_COMPILER_IN_USE defined automatically
-
-
 Create Trace Directories During Makefile Parse
 -----------------------------------------------
 
