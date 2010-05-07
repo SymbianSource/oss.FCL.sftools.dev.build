@@ -67,45 +67,6 @@ endif
 INTERBASE_TMP:=$(OUTPUTPATH)/$(TARGET_lower)_$(notdir $(basename $(SOURCE)))
 INTERBASE:=$(OUTPUTPATH)/$(TARGET_lower)
 
-################################## localisation ###########################$(GNUMKDIR)#############
-# Only make copies for full resource builds
-
-# Initialise to prevent RELEASABLES spill-over between calls
-DESTRPP:=
-INFOFILE:=
-
-ifeq ($(HEADERONLY),)
-
-RSSBASENAME:=$(call lowercase,$(basename $(notdir $(SOURCE))))
-DESTRPP:=$(EPOCROOT)/epoc32/localisation/$(RSSBASENAME)/rsc/$(RSSBASENAME).rpp
-CREATABLEPATHS:=$(CREATABLEPATHS) $(EPOCROOT)/epoc32/localisation/$(RSSBASENAME)/rsc
-
-INFOFILE:=$(EPOCROOT)/epoc32/localisation/group/$(RSSBASENAME).info
-# If there are MULTIPLE languages then copy the .rpp for the last one
-RPPLANG:=$(lastword $(LANGUAGES:SC=sc))
-
-# Copy .rpp files from epoc32/build/ to epoc32/localisation/x/rsc/x.rpp and create .info files in localisation
-define CreateRppAndInfo
-
-ifeq ($(RESOURCE_$(call sanitise,$(SOURCE))),)
-RESOURCE_$(call sanitise,$(SOURCE)):=1
-
-RESOURCE:: $(INFOFILE)
-
-$(info <copy source='$(INTERBASE_TMP)_$(RPPLANG).rpp'>$(DESTRPP)</copy>)
-
-$(INFOFILE)::
-	@if [ ! -d $(EPOCROOT)/epoc32/localisation/group ]; then $(GNUMKDIR) -p $(EPOCROOT)/epoc32/localisation/group; fi
-	@if [ ! -f $$@ ]; then echo "DATADIR: /$(RSSBASENAME)" > $$@ ; fi
-	@echo -e "\n/z$(TARGETPATH)/$(TARGET_lower).rsc : $(RSSBASENAME).rpp" >> $$@
-
-endif
-endef
-
-$(eval $(call CreateRppAndInfo))
-endif
-################################# end of localisation ###################################
-
 # common pre-processor options
 
 # We really should be using -iquote with a recent cpp.  This is a note for when we do update:
@@ -186,7 +147,7 @@ endif
 
         $1.d: $(SOURCE)
 	  $(call startrule,resourcedependencies,FORCESUCCESS) \
-	  RPP=$1; $(GNUCPP) -C -DLANGUAGE_$(3) -DLANGUAGE_$(subst sc,SC,$3) $(call makemacrodef,-D,$(MMPDEFS))\
+	  RPP=$1; $(GNUCPP) -DLANGUAGE_$(3) -DLANGUAGE_$(subst sc,SC,$3) $(call makemacrodef,-D,$(MMPDEFS))\
 	  $(CPPOPT) $(SOURCE) -M -MG -MT"$1" | \
 	  $$(DEPENDENCY_CORRECTOR) >$$@ \
 	  $(call endrule,resourcedependencies)
