@@ -1117,6 +1117,7 @@ ifneq ($(filter ROMFILE,$(call uppercase,$(MAKECMDGOALS))),)
         endif
 
 
+        DATATEXT:=
         ifeq ($(TESTCODE),TRUE)
         	# Add 'TEST' to the .iby filename
         	ROMTEST:=test
