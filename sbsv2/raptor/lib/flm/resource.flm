@@ -304,7 +304,7 @@ ifneq ($(RFIFILE),)
   CREATABLEPATHS:=$(CREATABLEPATHS) $(dir $(RFIFILE))/
 
   RPPFILES:=$(foreach L,$(LANGUAGES:SC=sc),$(INTERBASE_TMP)_$(L).rpp)
-  $(eval $(call generaterfifile,$(RFIFILE),$(RPPFILES),$(addsuffix .d,$(RPPFILES))))
+  $(eval $(call generaterfifile,$(RFIFILE),$(RPPFILES),$(PRIMARYRPPFILE).d))
 endif
 
 
