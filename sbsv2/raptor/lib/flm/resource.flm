@@ -112,7 +112,7 @@ ifneq ($(NO_DEPEND_GENERATE),)
     # It allows resources to be built in the right order but doesn't impose the weight of
     # of full dependency information which can overwhelm make in large builds.
     # The strategy is filter lines which don't have .rsg or 
-    # .mbg dependencies in them and if to sift eah line to leave out non-relevant things like
+    # .mbg dependencies in them and if to sift each line to leave out non-relevant things like
     # other header files, .hrh files etc.  In the end we don't print anything at all if we
     # did not find the target.
 
@@ -192,7 +192,7 @@ define copyresource
 
    RELEASABLES:=$$(RELEASABLES) $(2)
 
-   $(if $(TARGET_$(call sanitise,$(firstword $2))),,$(eval TARGET_$(call sanitise,$(firstword $2)):=1)$(info <copy source='$1'>$2</copy>))
+   $(info <copy source='$1'>$(foreach T,$2,$(if $(TARGET_$(call sanitise,$(T))),,$(T)$(eval TARGET_$(call sanitise,$(firstword $2)):=1)))</copy>)
  
 endef # copyresource #
 

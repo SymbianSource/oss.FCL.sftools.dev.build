@@ -25,15 +25,11 @@ def run():
 	t.command = "sbs  -b smoke_suite/test_resources/simple_gui/Bld.inf RESOURCE"
 	t.targets = [
 		"$(EPOCROOT)/epoc32/data/z/resource/apps/helloworld.mbm",
-		"$(EPOCROOT)/epoc32/localisation/group/helloworld.info",
 		"$(EPOCROOT)/epoc32/release/winscw/udeb/z/resource/apps/helloworld.mbm",
 		"$(EPOCROOT)/epoc32/release/winscw/urel/z/resource/apps/helloworld.mbm",
 		"$(EPOCROOT)/epoc32/include/helloworld.rsg",
 		"$(EPOCROOT)/epoc32/data/z/resource/apps/helloworld.rsc",
-		"$(EPOCROOT)/epoc32/localisation/helloworld/rsc/helloworld.rpp",
 		"$(EPOCROOT)/epoc32/data/z/private/10003a3f/apps/helloworld_reg.rsc",
-		"$(EPOCROOT)/epoc32/localisation/helloworld_reg/rsc/helloworld_reg.rpp",
-		"$(EPOCROOT)/epoc32/localisation/group/helloworld_reg.info",
 		"$(EPOCROOT)/epoc32/release/winscw/udeb/z/resource/apps/helloworld.rsc",
 		"$(EPOCROOT)/epoc32/release/winscw/urel/z/resource/apps/helloworld.rsc",
 		"$(EPOCROOT)/epoc32/release/winscw/udeb/z/private/10003a3f/apps/helloworld_reg.rsc",
@@ -72,8 +68,6 @@ def run():
 		"$(EPOCROOT)/epoc32/data/z/resource/testresource/testresource.r01",
 		"$(EPOCROOT)/epoc32/data/z/resource/testresource/testresource.rsc",
 		"$(EPOCROOT)/epoc32/release/armv5/urel/testresource.exe",
-		"$(EPOCROOT)/epoc32/localisation/group/testresource.info",
-		"$(EPOCROOT)/epoc32/localisation/testresource/rsc/testresource.rpp",
 		res_depfile
 		]
 
