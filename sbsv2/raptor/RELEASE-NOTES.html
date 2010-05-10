@@ -12,8 +12,10 @@
 <ul>
 
 <li><a href="http://developer.symbian.org/bugs/show_bug.cgi?id=2297"> SF Bug 2297 </a> Python exception in raptor_meta.py when processing bld.inf file </li>
-<li><a href="notes/localresourcecopying.txt">    fix performance: for cluster builds: do resource copying on local host.            </a></li>
-
+<li><a href="notes/localresourcecopying.txt">Fix: (performance in cluster builds) do resource copying on local host.</a></li>
+<li>Fix: don't generate multiple copies of the same resource just because there are several target paths. Generate it once and copy that to the different target paths. Helps when winscw is built after an arm build.</li>
+<li>Fix: (performance) remove unnecessary copying of rpp files into epoc32\localisation as they are not used.</li>
+<li>Fix: (performance) remove -C option when preprocessing rpp files - causes comments to be stripped from the rpp resulting in smaller files that improves performance.</li>
 </ul>
 
 <h2>version 2.13.0</h2>
@@ -43,11 +45,9 @@
 <li>DPDEF144648      - Raptor failed to build tools_deb objects under Windows XP                                                            </li>
 <li><a href="http://developer.symbian.org/bugs/show_bug.cgi?id=2134"> SF Bug 2134 </a> - [Raptor] Raptor does not pass overridden make variables into its makefiles                                           </li>
 <li>Fix : do not allow data to be paged implicitly</li>
-<li>Fix : Makefile Parse Performance in Resource stage is poor. Large size of included dependency files is a factor. In --no-depend-generate mode, create dependency files which only refer to other rsg/mbg files that are yet to be built - store no other dependencies.</li>
-<li>Fix : don't generate multiple copies of the same resource just because there are several target paths. Generate it once and copy that to the different target paths.</li>
 <li><a href="http://developer.symbian.org/bugs/show_bug.cgi?id=2302"> SF Bug 2302 </a> - sbs_filter refers to python.exe in win32/python264/                                                                  </li>
-<li>                                                                  Fix : ensure that FLMDEBUG is empty by default                                                                                          </li>
-
+<li>Fix : Makefile Parse Performance in Resource stage is poor. Large size of included dependency files is a factor. In --no-depend-generate mode, create dependency files which only refer to other rsg/mbg files that are yet to be built - store no other dependencies.</li>
+<li>Fix : ensure that FLMDEBUG is empty by default</li>
 </ul>
 
 <!-- older notes are plain text -->
