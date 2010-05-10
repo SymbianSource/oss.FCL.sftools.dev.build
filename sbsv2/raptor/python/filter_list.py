@@ -81,14 +81,24 @@ class FilterList(filter_interface.Filter):
 		# Find all the filter plugins
 		self.pbox = pbox
 		possiblefilters = self.pbox.classesof(filter_interface.Filter)
+
+		filterdict = {}
+		for p in possiblefilters:
+			name = p.__name__.lower()
+			if name in filterdict:
+				raise ValueError("filters found in SBS_HOME/python/plugins which have duplicate name: %s " % p.__name__)
+			else:
+				filterdict[name] = p
+
 		unfound = []
 		self.filters = []
 		for f in filternames:
-			unfound.append(f) # unfound unless we find it
-			for pl in possiblefilters:
-				if pl.__name__.upper() == f.upper():
-					self.filters.append(pl())
-					unfound = unfound[:-1]
+			found = False
+			if f.lower() in filterdict:
+				self.filters.append(filterdict[f.lower()]())
+			else:
+				unfound.append(f)
+
 		if unfound != []:
 			raise ValueError("requested filters not found: %s \
 			\nAvailable filters are: %s" % (str(unfound), self.format_output_list(possiblefilters)))

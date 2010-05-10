@@ -22,17 +22,6 @@ def run():
 	
 	t.description = "Test that a timing log is created and contains total parse and build durations"
 
-	t.id = "0103a"
-	t.name = "timing_off"
-	t.command = "sbs -b smoke_suite/test_resources/simple/bld.inf -f-"
-	t.mustnotmatch = [
-			".*progress:discovery.*",
-			".*progress:start.*",
-			".*progress:end.*"
-			]
-	t.run()
-
-
 	t.id = "0103b"
 	t.name = "timing_on"
 	t.command = "sbs -b smoke_suite/test_resources/simple/bld.inf --timing " + \
