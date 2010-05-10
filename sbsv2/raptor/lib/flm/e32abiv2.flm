@@ -1128,8 +1128,6 @@ ifneq ($(filter ROMFILE,$(call uppercase,$(MAKECMDGOALS))),)
                     DATATEXT:="data=/epoc32/data/z/test/$(MODULE)/$(VARIANTPLATFORM).$(TEST_OPTION).bat test/$(MODULE).$(TEST_OPTION).bat"
                 endif
             endif
-        else
-        	DATATEXT:=
         endif
 
         # ROMTARGET
