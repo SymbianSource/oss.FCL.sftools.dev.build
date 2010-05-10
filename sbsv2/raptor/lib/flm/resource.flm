@@ -67,6 +67,8 @@ endif
 INTERBASE_TMP:=$(OUTPUTPATH)/$(TARGET_lower)_$(notdir $(basename $(SOURCE)))
 INTERBASE:=$(OUTPUTPATH)/$(TARGET_lower)
 
+$(call makepath,$(INTERBASE))
+
 # common pre-processor options
 
 # We really should be using -iquote with a recent cpp.  This is a note for when we do update:
@@ -111,10 +113,9 @@ ifneq ($(NO_DEPEND_GENERATE),)
     # This version minimises the size of dependency files, to contain only .mbg and .rsg deps.
     # It allows resources to be built in the right order but doesn't impose the weight of
     # of full dependency information which can overwhelm make in large builds.
-    # The strategy is filter lines which don't have .rsg or 
-    # .mbg dependencies in them and if to sift each line to leave out non-relevant things like
-    # other header files, .hrh files etc.  In the end we don't print anything at all if we
-    # did not find the target.
+    # The strategy is filter lines which don't have .rsg or .mbg dependencies in them and
+    # to sift each line to leave out non-relevant things like other header files, .hrh 
+    # files etc.  In the end don't print anything at all if we did not find the target.
 
 define  DEPENDENCY_CORRECTOR
 { set +x; $(GNUSED) -rn '\% ([^ /]+)\.((rsg)|(mbg))%I {y/\\/ /;p;}'  |  \
@@ -224,7 +225,7 @@ define generateresource
 #	Whether or not we have generated this resource for some other variant, check if there
 #       are any new copies to be made for this variant. e.g. winscw requires that we make
 #       some extra copies.  We tried to copy after running rcomp itself but we still need these
-#       targets for the sake of dependencies or, for example if someone merely adds a new copy 
+#       targets for the sake of dependencies or, for example, if someone merely adds a new copy 
 #       when the resource is up-to-date
 
         $(call copyresource,$1,$(sort $(patsubst %,%/$(notdir $1),$(RSCCOPYDIRS))))
@@ -275,8 +276,8 @@ endif
 # The one on which the others will depend i.e. they will 
 # "sit in it's dependency slipstream" or in other words
 # We only have to make one dependency file because all of
-# the other languages will benefit from this languages'
-# dependency file
+# the other languages will benefit from the dependency file
+# belonging to this language.
 PRIMARYRPPFILE:=$(INTERBASE_TMP)_$(HEADLANG).rpp
 ifeq ($(HEADERONLY),)
         # generate a resource file for each language
@@ -303,7 +304,7 @@ ifneq ($(RFIFILE),)
   CREATABLEPATHS:=$(CREATABLEPATHS) $(dir $(RFIFILE))/
 
   RPPFILES:=$(foreach L,$(LANGUAGES:SC=sc),$(INTERBASE_TMP)_$(L).rpp)
-  #$(eval $(call generaterfifile,$(RFIFILE),$(RPPFILES),$(addsuffix .d,$(RPPFILES))))
+  $(eval $(call generaterfifile,$(RFIFILE),$(RPPFILES),$(addsuffix .d,$(RPPFILES))))
 endif
 
 
