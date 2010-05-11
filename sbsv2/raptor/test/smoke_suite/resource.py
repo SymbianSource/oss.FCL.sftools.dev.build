@@ -82,7 +82,7 @@ def run():
 	t.mustnotmatch = []
 
 	t.mustmatch = [
-			"3 .*.dependentresource_.dependentresource_dependentresource_sc.rpp.d"
+			"[23] .*.dependentresource_.dependentresource_dependentresource_sc.rpp.d"
 		      ]
 
 	t.run()

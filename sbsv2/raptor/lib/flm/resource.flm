@@ -118,25 +118,7 @@ ifneq ($(NO_DEPEND_GENERATE),)
     # files etc.  In the end don't print anything at all if we did not find the target.
 
 define  DEPENDENCY_CORRECTOR
-{ set +x; $(GNUSED) -rn '\% ([^ /]+)\.((rsg)|(mbg))%I {y%\\\\%\\/%;p;}'  |  \
-    { \
-    ENDL='\\\\\n'; \
-    DEPTXT="$$$$RPP: $$$${ENDL}" ; \
-    DEPCOUNT=0; \
-    DEPS=''; read L; \
-    while [ $$$$? -eq 0 ]; do \
-        for i in $$$${L}; do \
-          if [[ ( "$$$${i%%.[Rr][Ss][Gg]}" != "$$$$i"  || "$$$${i%%.[Mm][Bb][Gg]}" != "$$$$i" ) && ( "$$$${i:1:1}" != ':' && "$$$${i:0:1}" != '/' ) ]];  then \
-            DEPTXT="$$$$DEPTXT \$$$$(EPOCROOT)/epoc32/include/$$$$i $$$${ENDL}"; \
-            (( DEPCOUNT += 1 )) ; \
-          fi; \
-        done; \
-      read L; \
-    done; \
-    if [ $$$$DEPCOUNT -ne 0 ]; then  \
-      echo -e "$$$${DEPTXT:0:$$$$[ $$$${#DEPTXT} - 4 ]}\n"; fi ;\
-  } ;\
-} 
+{ $(DEPCRUNCH) --extensions rsg,mbg --assume '$$$$(EPOCROOT)/epoc32/include' ; } 
 endef
 
 else

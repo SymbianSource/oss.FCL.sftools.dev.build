@@ -33,6 +33,8 @@
 		<param name='GNUSED'/>
 		<param name='GNUSORT'/>
 		<param name='SBS_JAVATC' default=''/>
+		<param name='PYTHON'/>
+		<param name='DEPCRUNCH'/>
 		<param name='ZIP'/>
 		<param name='UNZIP'/>
 		<param name='GNUMD5SUM'/>

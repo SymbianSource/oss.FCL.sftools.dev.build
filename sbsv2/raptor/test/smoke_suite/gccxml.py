@@ -34,7 +34,7 @@ def run():
 		"helloworld_exe/gccxml/HelloWorld.mmp.xml",
 		"helloworld_exe/helloworld_HelloWorld_sc.rpp.d",
 		"helloworld_exe/gccxml/HelloWorld.rss.rfi",
-		"helloworld_reg_exe/helloworld_reg_sc.rpp.d",
+		"helloworld_reg_exe/helloworld_reg_HelloWorld_reg_sc.rpp.d",
 		"helloworld_exe/gccxml/HelloWorld_reg.rss.rfi",
 		"helloworld_exe/gccxml/urel/HelloWorld_Application.xml.d",
 		"helloworld_exe/gccxml/urel/HelloWorld_Application.xml",
