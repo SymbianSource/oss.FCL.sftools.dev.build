@@ -20,7 +20,6 @@
 
 import sys
 from  optparse import OptionParser
-import os
 import re
 
 class NoTargetException(Exception):

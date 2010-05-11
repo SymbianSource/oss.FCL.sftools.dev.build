@@ -131,7 +131,7 @@ endif
 
         $1.d: $(SOURCE)
 	  $(call startrule,resourcedependencies,FORCESUCCESS) \
-	  RPP=$1; $(GNUCPP) -DLANGUAGE_$(3) -DLANGUAGE_$(subst sc,SC,$3) $(call makemacrodef,-D,$(MMPDEFS))\
+	  $(GNUCPP) -DLANGUAGE_$(3) -DLANGUAGE_$(subst sc,SC,$3) $(call makemacrodef,-D,$(MMPDEFS))\
 	  $(CPPOPT) $(SOURCE) -M -MG -MT"$1" | \
 	  $$(DEPENDENCY_CORRECTOR) >$$@ \
 	  $(call endrule,resourcedependencies)
