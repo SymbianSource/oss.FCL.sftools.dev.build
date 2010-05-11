@@ -177,7 +177,7 @@ define copyresource
 
    RELEASABLES:=$$(RELEASABLES) $(2)
 
-   $(info <copy source='$1'>$(foreach T,$2,$(if $(TARGET_$(call sanitise,$(T))),,$(T)$(eval TARGET_$(call sanitise,$(firstword $2)):=1)))</copy>)
+   $(info <finalcopy source='$1'>$2</finalcopy>)
  
 endef # copyresource #
 
