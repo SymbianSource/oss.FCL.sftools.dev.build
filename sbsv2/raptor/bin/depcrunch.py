@@ -29,24 +29,35 @@ class NoTargetException(Exception):
 def depcrunch(file,extensions,assume):
 	target_pattern = r"^\s*(\S+):\s+"
 	target_re = re.compile(target_pattern)
-	extension_pattern = "[ \t]([^\/\\ \t]+\.(" + "|".join(["("+ t + ")" for t in extensions]) + "))\\b"
+	# Not the use of (?i) in the following expression.  re.I seems to cause re.findall
+	# to not actually find all files matching the extension whereas (?i) provides
+	# case insensitivity at the right point and it works.  Really don't understand this.
+	extension_pattern = r"\s([^/ \t]+\.((?i)" + "|".join([t for t in extensions]) + r"))\b"
 	extension_re = re.compile(extension_pattern)
 
 	target = None
 
 	deps = []
 
-	for l in file.xreadlines():
+	# Read through the dependencies.
+	for l in file:
 		l = l.replace("\\","/").rstrip("\n\r")
 
+		# Look out for the target name if 
+		# we have not found it yet
 		if not target:
 			t = target_re.match(l)
 			if t:
 				target = t.groups()[0]
-		
-		m = extension_re.match(l)
+
+		# Look for prerequisites matching the 
+		# extensions.  There may be one or more on 
+		# the same line as the target name.
+		# Don't use re.I - somehow prevents 
+		# all but one match in a line which may have several files
+		m = extension_re.findall(l)
 		if m:
-			deps.append(m.groups()[0])
+			deps.extend([d[0] for d in m])
 
 	if not target:
 		raise NoTargetException()
@@ -75,7 +86,7 @@ parser.add_option("-a", "--assume",
 
 
 if not options.extensions:
-	parser.error("you must specify a comma-separated list of file extensions with the -t option.")
+	parser.error("you must specify a comma-separated list of file extensions with the -e option.")
 	sys.exit(1)
 
 if not options.assume:
@@ -91,7 +102,7 @@ else:
 try:
 	depcrunch(file,options.extensions.split(","), options.assume)
 except NoTargetException,e:
-	sys.stderr.write("Target name not found in dependency file");
+	sys.stderr.write("Target name not found in dependency file\n");
 	sys.exit(2)
 	
 

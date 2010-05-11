@@ -192,7 +192,6 @@ class NullLog(object):
 
 nulllog = NullLog()
 
-
 def copyfile(_source, _destination):
 	"""Copy the source file to the destination file (create a directory
 	   to copy into if it does not exist). Don't copy if the destination
@@ -210,7 +209,6 @@ def copyfile(_source, _destination):
 			os.makedirs(str(destDir))
 			shutil.copyfile(source_str, dest_str)
 			return 
-
 		# Destination file exists so we have to think about updating it
 		sourceMTime = 0
 		destMTime = 0
@@ -218,11 +216,13 @@ def copyfile(_source, _destination):
 		try:
 			sourceStat = os.stat(source_str)
 			sourceMTime = sourceStat[stat.ST_MTIME]
+		except OSError, e:
+			message = "Source of copyfile does not exist:  " + str(source)
+			raise IOError(message)
+		try:
 			destMTime = os.stat(dest_str)[stat.ST_MTIME]
 		except OSError, e:
-			if sourceMTime == 0:
-				message = "Source of copyfile does not exist:  " + str(source)
-				print message
+			pass # destination doesn't have to exist
 
 		if destMTime == 0 or destMTime < sourceMTime:
 			if os.path.exists(dest_str):
@@ -234,6 +234,7 @@ def copyfile(_source, _destination):
 
 
 	except Exception,e:
-		message = "Could not export " + source_str + " to " + dest_str + " : " + str(e)
+		message = "Could not update " + dest_str + " from " + source_str + " : " + str(e)
+		raise IOError(message)
 
 	return 

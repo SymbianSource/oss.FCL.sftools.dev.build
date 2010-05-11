@@ -67,7 +67,6 @@ endif
 INTERBASE_TMP:=$(OUTPUTPATH)/$(TARGET_lower)_$(notdir $(basename $(SOURCE)))
 INTERBASE:=$(OUTPUTPATH)/$(TARGET_lower)
 
-$(call makepath,$(INTERBASE))
 
 # common pre-processor options
 
@@ -78,7 +77,7 @@ $(call makepath,$(INTERBASE))
 CPPOPT:=-nostdinc -undef -Wno-trigraphs -D_UNICODE -include $(PRODUCT_INCLUDE)\
  -I$(dir $(SOURCE)) $(foreach I, $(USERINCLUDE),-I$(I) ) -I- $(foreach J,$(SYSTEMINCLUDE),-I$(J) )
 
-CREATABLEPATHS:=$(CREATABLEPATHS) $(RSCDIR) $(RSGDIR) $(OUTPUTPATH) $(INTERBASE_TMP) $(INTERBASE)
+CREATABLEPATHS:=$(CREATABLEPATHS) $(RSCDIR) $(RSGDIR) $(OUTPUTPATH) 
 
 # We intend to generate the resource in an intermediate location and copy to the targetpath to
 # ensure that when the "same" resource is built into separare target paths, it doesn't have to be 

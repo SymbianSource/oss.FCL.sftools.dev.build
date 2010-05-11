@@ -24,7 +24,7 @@ def run():
 
 	t.id = "0103b"
 	t.name = "timing_on"
-	t.command = "sbs -b smoke_suite/test_resources/simple/bld.inf --timing " + \
+	t.command = "sbs -b smoke_suite/test_resources/simple/bld.inf" + \
 			"--filters=FilterLogfile,FilterTiming -f ${SBSLOGFILE} && " + \
 			"grep progress:duration ${SBSLOGFILE}.timings"
 	t.mustmatch = [
