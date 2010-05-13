@@ -1071,9 +1071,12 @@ class BldInfFile(MetaDataFile):
 			if (re.search(r'^\s*START ',extensionLine, re.I)):
 				start = extensionLine
 			elif re.search(r'^\s*END\s*$',extensionLine, re.I):
-				extensionObjects.append(Extension(self.filename, start, options, aBuildPlatform, self.__Raptor))
-				start = ""
-				options = []
+				if start == "":
+					self.log.Error("unmatched END statement in %s section", aType, bldinf=str(self.filename))
+				else:
+					extensionObjects.append(Extension(self.filename, start, options, aBuildPlatform, self.__Raptor))
+					start = ""
+					options = []
 			elif re.search(r'^\s*$',extensionLine, re.I):
 				continue
 			elif start:
@@ -3296,7 +3299,7 @@ class MetaReader(object):
 					self.__Raptor.Debug("Skipping %s", str(m.getMakefileName()))
 					continue
 				elif projectname in self.projectList:
-					projectList.remove(projectname)
+					self.projectList.remove(projectname)
 
 			self.__Raptor.Debug("%i makefile extension makefiles for %s",
 						len(makefileList), str(componentNode.component.bldinf.filename))

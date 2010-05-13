@@ -46,7 +46,7 @@ def run():
 		"$(SBS_HOME)/test/smoke_suite/test_resources/tracecompiler/testTC/traces/wlanhwinitpermparserTraces.h",	
 		"$(SBS_HOME)/test/smoke_suite/test_resources/tracecompiler/testTC/traces/fixed_id.definitions",
 		"$(EPOCROOT)/epoc32/ost_dictionaries/test_TC_0x1000008d_Dictionary.xml",
-		"$(EPOCROOT)/epoc32/include/internal/symbiantraces/autogen/test_TC_0x1000008d_TraceDefinitions.h"
+		"$(EPOCROOT)/epoc32/include/platform/symbiantraces/autogen/test_TC_0x1000008d_TraceDefinitions.h"
 		]
 	t.stdout = [
 		"<whatlog bldinf='$(SBS_HOME)/test/smoke_suite/test_resources/tracecompiler/testTC/group/bld2.inf' mmp='$(SBS_HOME)/test/smoke_suite/test_resources/tracecompiler/testTC/group/test.TC.mmp' config='armv5_urel.tracecompiler'>",
@@ -58,9 +58,19 @@ def run():
 		"<build>$(EPOCROOT)/epoc32/release/armv5/urel/testTC.dll</build>",
 		"<build>$(EPOCROOT)/epoc32/release/armv5/urel/testTC.dll.map</build>",
 		"<build>$(EPOCROOT)/epoc32/ost_dictionaries/test_TC_0x1000008d_Dictionary.xml</build>",
-		"<build>$(EPOCROOT)/epoc32/include/internal/SymbianTraces/autogen/test_TC_0x1000008d_TraceDefinitions.h</build>"
+		"<build>$(EPOCROOT)/epoc32/include/platform/symbiantraces/autogen/test_TC_0x1000008d_TraceDefinitions.h</build>"
 		]		
-	t.run()
+	t.run("linux")
+	if t.result == CheckWhatSmokeTest.SKIP:
+		t.targets.extend([
+			'$(EPOCROOT)/epoc32/release/armv5/lib/testTC.lib',
+			'$(EPOCROOT)/epoc32/release/armv5/lib/testTC{000a0000}.lib'
+		])
+		t.stdout.extend([
+			'<build>$(EPOCROOT)/epoc32/release/armv5/lib/testTC.lib</build>',
+			'<build>$(EPOCROOT)/epoc32/release/armv5/lib/testTC{000a0000}.lib</build>'
+		])
+		t.run("windows")
 
 	t.id = "112"
 

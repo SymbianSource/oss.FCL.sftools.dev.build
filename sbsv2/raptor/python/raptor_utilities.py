@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -20,6 +20,8 @@ import generic_path
 import os.path
 import re
 import sys
+import stat
+import shutil
 
 dosSlashRegEx = re.compile(r'\\')
 unixSlashRegEx = re.compile(r'/')
@@ -189,3 +191,50 @@ class NullLog(object):
 		return
 
 nulllog = NullLog()
+
+def copyfile(_source, _destination):
+	"""Copy the source file to the destination file (create a directory
+	   to copy into if it does not exist). Don't copy if the destination
+	   file exists and has an equal or newer modification time."""
+	source = generic_path.Path(str(_source).replace('%20',' '))
+	destination = generic_path.Path(str(_destination).replace('%20',' '))
+	dest_str = str(destination)
+	source_str = str(source)
+
+	try:
+
+
+		destDir = destination.Dir()
+		if not destDir.isDir():
+			os.makedirs(str(destDir))
+			shutil.copyfile(source_str, dest_str)
+			return 
+		# Destination file exists so we have to think about updating it
+		sourceMTime = 0
+		destMTime = 0
+		sourceStat = 0
+		try:
+			sourceStat = os.stat(source_str)
+			sourceMTime = sourceStat[stat.ST_MTIME]
+		except OSError, e:
+			message = "Source of copyfile does not exist:  " + str(source)
+			raise IOError(message)
+		try:
+			destMTime = os.stat(dest_str)[stat.ST_MTIME]
+		except OSError, e:
+			pass # destination doesn't have to exist
+
+		if destMTime == 0 or destMTime < sourceMTime:
+			if os.path.exists(dest_str):
+				os.chmod(dest_str,stat.S_IREAD | stat.S_IWRITE)
+			shutil.copyfile(source_str, dest_str)
+
+			# Ensure that the destination file remains executable if the source was also:
+			os.chmod(dest_str,sourceStat[stat.ST_MODE] | stat.S_IREAD | stat.S_IWRITE | stat.S_IWGRP ) 
+
+
+	except Exception,e:
+		message = "Could not update " + dest_str + " from " + source_str + " : " + str(e)
+		raise IOError(message)
+
+	return 

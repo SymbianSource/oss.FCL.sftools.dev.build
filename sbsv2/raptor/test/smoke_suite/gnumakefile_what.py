@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -23,7 +23,8 @@ def run():
 	t.name = "gnumakefile_what"
 	t.command = "sbs -b smoke_suite/test_resources/gnumakefile/bld.inf --what"
 	componentpath = re.sub(r'\\','/',os.path.abspath("smoke_suite/test_resources/gnumakefile"))
-
+	
+	t.output_expected_only_once = True
 	t.stdout = [
 	# Generated txt files by the gnumakefile
 		componentpath+"/master_bld_ARMV5_UDEB.txt",

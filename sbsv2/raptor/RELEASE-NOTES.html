@@ -6,6 +6,31 @@
 
 <h1>Release Notes for Symbian Build System v2</h1>
 
+<h2>next version</h2>
+
+<h3>New Features</h3>
+<ul>
+<li><a href="notes/tcomsupport.txt">           Support new Trace Compiler commandline interface, autogen header location   </a></li>
+</ul>
+
+<h3>Defect Fixes</h3>
+<ul>
+
+<li><a href="http://developer.symbian.org/bugs/show_bug.cgi?id=2605"> SF Bug 2605 </a> - [Raptor] ROMFILE creation using Raptor is not clean </li>
+<li><a href="http://developer.symbian.org/bugs/show_bug.cgi?id=2495"> SF Bug 2495 </a> - [Raptor] KDLL TARGETTYPEs do not support .def file freezing </li>
+<li><a href="http://developer.symbian.org/bugs/show_bug.cgi?id=2420"> SF Bug 2420 </a> - [Raptor] Output from recipes is mis-recognised as "what" output </li>
+<li><a href="http://developer.symbian.org/bugs/show_bug.cgi?id=2297"> SF Bug 2297 </a> Python exception in raptor_meta.py when processing bld.inf file </li>
+<li><a href="http://developer.symbian.org/bugs/show_bug.cgi?id=2174"> SF Bug 2174 </a> - [Raptor] -- layer option shows errors when bld.inf missing in another layer </li>
+<li><a href="notes/tcomsupport.txt">Fix: ensure trace paths exist before build starts to avoid clashes during the build with some make engines    </a></li>
+<li><a href="notes/tcomsupport.txt">Fix: permit traces header directory to be specified in systemincludes - helps Qt    </a></li>
+<li><a href="notes/localresourcecopying.txt">Fix: (performance in cluster builds) do resource copying on local host.</a></li>
+<li>Fix: don't generate multiple copies of the same resource just because there are several target paths. Generate it once and copy that to the different target paths. Helps when winscw is built after an arm build.</li>
+<li>Fix: (performance) remove unnecessary copying of rpp files into epoc32\localisation as they are not used.</li>
+<li>Fix: (performance) remove -C option when preprocessing rpp files - causes comments to be stripped from the rpp resulting in smaller files that improves performance.</li>
+
+</ul>
+
+
 <h2>version 2.13.0</h2>
 
 <h3>New Features</h3>
@@ -22,21 +47,20 @@
 <h3>Defect Fixes</h3>
 <ul>
 
-<li>                                                                  DPDEF143018      - Raptor doesn't handle spaces in GCCE installation directory correctly                                                </li>
-<li>                                                                  DPDEF143101      - GCC-E isn't tested as part of the tool checking mechanism                                                            </li>
-<li>                                                                  DPDEF141195      - Raptor doesn't handle spaces in tool paths                                                                           </li>
+<li>DPDEF143018      - Raptor doesn't handle spaces in GCCE installation directory correctly                                                </li>
+<li>DPDEF143101      - GCC-E isn't tested as part of the tool checking mechanism                                                            </li>
+<li>DPDEF141195      - Raptor doesn't handle spaces in tool paths                                                                           </li>
 <li><a href="http://developer.symbian.org/bugs/show_bug.cgi?id=2172"> SF Bug 2172 </a> - [Raptor] Resource builds warn on encountering trigraph-like strings                                                  </li>
 <li><a href="http://developer.symbian.org/bugs/show_bug.cgi?id=2308"> SF Bug 2308 </a> - [Raptor] PLUGIN3 TARGETTYPEs don't set resource output offsets correctly                                             </li>
-<li>                                                                  Fix: in copylogfromannofile mode, ensure that the build id and duration are included in the log.  These are not critical but are useful </li>
-<li>                                                                  Fix: remove unnecessary empty lines in log output in copylogfromannofile mode                                                           </li>
+<li>Fix: in copylogfromannofile mode, ensure that the build id and duration are included in the log.  These are not critical but are useful </li>
+<li>Fix: remove unnecessary empty lines in log output in copylogfromannofile mode                                                           </li>
 <li><a href="http://developer.symbian.org/bugs/show_bug.cgi?id=1939"> SF Bug 1939 </a> - [Raptor] PAGED keyword in MMP files should imply byte pair compressed                                                </li>
-<li>                                                                  DPDEF144648      - Raptor failed to build tools_deb objects under Windows XP                                                            </li>
+<li>DPDEF144648      - Raptor failed to build tools_deb objects under Windows XP                                                            </li>
 <li><a href="http://developer.symbian.org/bugs/show_bug.cgi?id=2134"> SF Bug 2134 </a> - [Raptor] Raptor does not pass overridden make variables into its makefiles                                           </li>
-<li>                                                                  Fix : do not allow data to be paged implicitly                                                                                          </li>
-<li>                                                                  Fix : sort build configurations by name for metadata preprocessing                                                                      </li>
+<li>Fix : do not allow data to be paged implicitly</li>
 <li><a href="http://developer.symbian.org/bugs/show_bug.cgi?id=2302"> SF Bug 2302 </a> - sbs_filter refers to python.exe in win32/python264/                                                                  </li>
-<li>                                                                  Fix : ensure that FLMDEBUG is empty by default                                                                                          </li>
-
+<li>Fix : Makefile Parse Performance in Resource stage is poor. Large size of included dependency files is a factor. In --no-depend-generate mode, create dependency files which only refer to other rsg/mbg files that are yet to be built - store no other dependencies.</li>
+<li>Fix : ensure that FLMDEBUG is empty by default</li>
 </ul>
 
 <!-- older notes are plain text -->

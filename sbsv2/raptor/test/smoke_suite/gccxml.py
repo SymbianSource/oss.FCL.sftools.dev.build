@@ -32,9 +32,9 @@ def run():
 		]
 	t.addbuildtargets('smoke_suite/test_resources/simple_gui/bld.inf', [
 		"helloworld_exe/gccxml/HelloWorld.mmp.xml",
-		"helloworld_exe/helloworld__resource_apps_sc.rpp.d",
+		"helloworld_exe/helloworld_HelloWorld_sc.rpp.d",
 		"helloworld_exe/gccxml/HelloWorld.rss.rfi",
-		"helloworld_reg_exe/helloworld_reg__private_10003a3f_apps_sc.rpp.d",
+		"helloworld_reg_exe/helloworld_reg_HelloWorld_reg_sc.rpp.d",
 		"helloworld_exe/gccxml/HelloWorld_reg.rss.rfi",
 		"helloworld_exe/gccxml/urel/HelloWorld_Application.xml.d",
 		"helloworld_exe/gccxml/urel/HelloWorld_Application.xml",
@@ -66,9 +66,9 @@ def run():
 	t.antitargets = ["$(EPOCROOT)/epoc32/release/gccxml/urel/helloworldexe.gxp"]
 	t.addbuildantitargets('smoke_suite/test_resources/simple_gui/bld.inf', [
 		"helloworld_exe/gccxml/HelloWorld.mmp.xml",
-		"helloworld_exe/helloworld__resource_apps_sc.rpp.d",
+		"helloworld_exe/helloworld_HelloWorld_sc.rpp.d",
 		"helloworld_exe/gccxml/HelloWorld.rss.rfi",
-		"helloworld_reg_exe/helloworld_reg__private_10003a3f_apps_sc.rpp.d",
+		"helloworld_reg_exe/helloworld_reg_HelloWorld_reg_sc.rpp.d",
 		"helloworld_exe/gccxml/HelloWorld_reg.rss.rfi",
 		"helloworld_exe/gccxml/urel/HelloWorld_Application.xml.d",
 		"helloworld_exe/gccxml/urel/HelloWorld_Application.xml",

@@ -40,7 +40,7 @@ def run():
 		"$(SBS_HOME)/test/smoke_suite/test_resources/tracecompiler/testTC/traces/wlanhwinitpermparserTraces.h",	
 		"$(SBS_HOME)/test/smoke_suite/test_resources/tracecompiler/testTC/traces/fixed_id.definitions",
 		"$(EPOCROOT)/epoc32/ost_dictionaries/testTC_0x1000008d_Dictionary.xml",
-		"$(EPOCROOT)/epoc32/include/internal/symbiantraces/autogen/testTC_0x1000008d_TraceDefinitions.h"
+		"$(EPOCROOT)/epoc32/include/platform/symbiantraces/autogen/testTC_0x1000008d_TraceDefinitions.h"
 		]
 	t.addbuildtargets('smoke_suite/test_resources/tracecompiler/testTC/group/bld.inf', [
 		"testtc_dll/armv5/udeb/wlanhwinit.o",
@@ -59,7 +59,7 @@ def run():
 		"testtc_dll/armv5/urel/wlanhwinitpermparser.o.d",	
 		"testtc_dll/armv5/urel/testTC_urel_objects.via",
 		"testtc_dll/armv5/urel/testTC{000a0000}.def",
-		"testtc_dll/tracecompile_testTC_1000008d.done"
+		"testtc_dll/tracecompile_testTC_dll_1000008d.done"
 	])
 	t.run()
 	
@@ -74,7 +74,7 @@ def run():
 		"$(SBS_HOME)/test/smoke_suite/test_resources/tracecompiler/testTC/traces/wlanhwinitpermparserTraces.h"
 		]
 	t.addbuildantitargets('smoke_suite/test_resources/tracecompiler/TC_autorun/bld.inf', [
-		"testtc_dll/tracecompile_testTC_1000008d.done"
+		"testtc_dll/tracecompile_testTC_dll_1000008d.done"
 	])
 	t.run()
 			
@@ -90,7 +90,7 @@ def run():
 		"$(SBS_HOME)/test/smoke_suite/test_resources/tracecompiler/TC_featurevariant/traces/HelloWorldTraces.h",
 		"$(SBS_HOME)/test/smoke_suite/test_resources/tracecompiler/TC_featurevariant/traces/fixed_id.definitions",
 		"$(EPOCROOT)/epoc32/ost_dictionaries/HelloWorld_0xe78a5aa3_Dictionary.xml",
-		"$(EPOCROOT)/epoc32/include/internal/symbiantraces/autogen/HelloWorld_0xe78a5aa3_TraceDefinitions.h"
+		"$(EPOCROOT)/epoc32/include/platform/symbiantraces/autogen/HelloWorld_0xe78a5aa3_TraceDefinitions.h"
 		]
 	t.addbuildtargets('smoke_suite/test_resources/tracecompiler/TC_featurevariant/group/bld.inf', [
 		"helloworld_exe/armv5/udeb/HelloWorld.o",
@@ -99,7 +99,7 @@ def run():
 		"helloworld_exe/armv5/urel/HelloWorld.o",
 		"helloworld_exe/armv5/urel/HelloWorld.o.d",
 		"helloworld_exe/armv5/urel/HelloWorld_urel_objects.via",
-		"helloworld_exe/tracecompile_HelloWorld_e78a5aa3.done"
+		"helloworld_exe/tracecompile_HelloWorld_exe_e78a5aa3.done"
 	])
 	t.run()
 
@@ -120,7 +120,7 @@ def run():
 	t.addbuildtargets('smoke_suite/test_resources/tracecompiler/TC_autorun/bld.inf', [
 		"test_/armv5/udeb/test.o",
 		"test_/armv5/urel/test.o",
-		"test_/tracecompile_autorun1_00000001.done"
+		"test_/tracecompile_test_exe_00000001.done"
 	])
 	t.run()
 	
@@ -141,7 +141,7 @@ def run():
 		"test_/armv5/urel/test.o",
 	])
 	t.addbuildantitargets('smoke_suite/test_resources/tracecompiler/TC_autorun/bld.inf', [
-		"test_/tracecompile_autorun2_00000001.done"
+		"test_/tracecompile_test_exe_00000001.done"
 	])
 	t.run()
 
@@ -162,7 +162,7 @@ def run():
 		"test_/armv5/urel/test.o",
 	])
 	t.addbuildantitargets('smoke_suite/test_resources/tracecompiler/TC_autorun/bld.inf', [
-		"test_/tracecompile_autorun3_00000001.done"
+		"test_/tracecompile_test_exe_00000001.done"
 	])
 	t.run()
 
@@ -183,7 +183,7 @@ def run():
 		"test_/armv5/urel/test.o"
 	])
 	t.addbuildantitargets('smoke_suite/test_resources/tracecompiler/TC_autorun/bld.inf', [
-		"test_/tracecompile_autorun1_00000001.done"
+		"test_/tracecompile_test_exe_00000001.done"
 	])
 	t.run()
 

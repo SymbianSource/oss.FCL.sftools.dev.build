@@ -11,7 +11,7 @@
 #
 # Contributors:
 #
-# Description: 
+# Description:
 # raptor_xml module
 #
 
@@ -67,15 +67,15 @@ def Read(Raptor, filename):
 	objects = []
 
 	fileVersion = build.getAttribute("xsi:schemaLocation")
-	
+
 	# ignore the file it matches the "invalid" schema
 	if fileVersion.endswith(xsdIgnore):
 		return objects
-		
+
 	# check that the file matches the expected schema
 	if not fileVersion.endswith(xsdVersion):
 		Raptor.Warn("file '%s' uses schema '%s' which does not end with the expected version '%s'", filename, fileVersion, xsdVersion)
-		
+
 	# create a Data Model object from each sub-element
 	for child in build.childNodes:
 		if child.namespaceURI == namespace \
@@ -183,6 +183,7 @@ class SystemModel(object):
 		self.__TotalComponents = 0
 		self.__LayerList = []
 		self.__LayerDetails = {}
+		self.__MissingBldInfs = {}
 
 		self.__DOM = None
 		self.__SystemDefinitionElement = None
@@ -208,9 +209,15 @@ class SystemModel(object):
 		return self.__LayerDetails[aLayer]
 
 	def IsLayerBuildable(self, aLayer):
+		if aLayer in self.__MissingBldInfs:
+			for missingbldinf in self.__MissingBldInfs[aLayer]:
+				self.__Logger.Error("System Definition layer \"%s\" from system definition file \"%s\" " + \
+								    "refers to non existent bld.inf file %s", aLayer, self.__SystemDefinitionFile, missingbldinf)
+
 		if len(self.GetLayerComponents(aLayer)):
 			return True
 		return False
+
 
 	def GetAllComponents(self):
 		components = []
@@ -275,7 +282,7 @@ class SystemModel(object):
 				self.__ComponentRoot = generic_path.Path(os.environ['SRCROOT'])
 			elif os.environ.has_key('SOURCEROOT'):
 				self.__ComponentRoot = generic_path.Path(os.environ['SOURCEROOT'])
-				
+
 			if self.__SystemDefinitionBase and self.__SystemDefinitionBase != ".":
 				self.__ComponentRoot = self.__SystemDefinitionBase
 				if os.environ.has_key('SRCROOT'):
@@ -380,7 +387,14 @@ class SystemModel(object):
 				bldinf = generic_path.Join(group, "bld.inf").FindCaseless()
 
 				if bldinf == None:
-					self.__Logger.Error("No bld.inf found at %s in %s", group.GetLocalString(), self.__SystemDefinitionFile)
+					# recording layers containing non existent bld.infs
+					bldinfname = group.GetLocalString()
+					bldinfname = bldinfname + 'bld.inf'
+					layer = self.__GetEffectiveLayer(aElement)
+					if not layer in self.__MissingBldInfs:
+						self.__MissingBldInfs[layer]=[]
+					self.__MissingBldInfs[layer].append(bldinfname)
+
 				else:
 					component = self.__CreateComponent(bldinf, aElement)
 					layer = component.GetLayerName()

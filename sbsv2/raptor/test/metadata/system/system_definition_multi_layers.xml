@@ -34,5 +34,14 @@
 		</layer>
 	    <layer name="Fifth Layer">
 		</layer>
+		<!--layer name="Sixth layer" deliberately omitted -->
+	    <layer name="Seventh Layer">
+			<component name="simple_stringtable">
+				<unit bldFile="test/smoke_suite/test_resources/simple_plugin" root="SBS_HOME" mrp="simple_plugin/test.mrp"/>
+			</component>
+			<component name="does_not_exist">
+				<unit bldFile="test/smoke_suite/test_resources/does_not_exist" root="SBS_HOME" mrp="does_not_exist/test.mrp"/>
+			</component>
+		</layer>
 	</systemModel>
 </SystemDefinition>

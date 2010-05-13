@@ -18,6 +18,7 @@
 		<param name='DUMPBCINFO' default=''/>
 		<param name='FLMDEBUG'  default=''/>
 		<param name='PLATFORM' default=''/>
+		<param name='PYTHON' default=''/> <!-- allow python scripts to be used in general flms -->
 		<param name='GNUMAKE38'/>
 		<param name='GNUCP'/>
 		<param name='GNUCAT'/>
@@ -84,6 +85,7 @@
 	</interface>
 	<interface name="base.resource" extends="base.flm" flm="resource.flm">
 		<param name='BINCOPYDIRS' default=''/>
+		<param name='DEPCRUNCH'/>
 		<param name='MMPDEFS' default=''/>
 		<param name='GNUCPP'/>
 		<param name='GNUSED'/>

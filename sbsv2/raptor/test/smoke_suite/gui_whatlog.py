@@ -30,13 +30,10 @@ def run():
 	t.usebash = True
 	t.targets = [
 		"$(EPOCROOT)/epoc32/data/z/resource/apps/helloworld.mbm",
-		"$(EPOCROOT)/epoc32/localisation/group/helloworld.info",
 		"$(EPOCROOT)/epoc32/release/winscw/udeb/z/resource/apps/helloworld.mbm",
 		"$(EPOCROOT)/epoc32/release/winscw/urel/z/resource/apps/helloworld.mbm",
 		"$(EPOCROOT)/epoc32/include/helloworld.rsg",
 		"$(EPOCROOT)/epoc32/data/z/resource/apps/helloworld.rsc",
-		"$(EPOCROOT)/epoc32/localisation/helloworld/rsc/helloworld.rpp",
-		"$(EPOCROOT)/epoc32/localisation/group/helloworld_reg.info",
 		"$(EPOCROOT)/epoc32/release/winscw/udeb/z/resource/apps/helloworld.rsc",
 		"$(EPOCROOT)/epoc32/release/winscw/urel/z/resource/apps/helloworld.rsc",
 		"$(EPOCROOT)/epoc32/release/armv5/udeb/helloworld.exe",
@@ -49,8 +46,8 @@ def run():
 		]
 	t.addbuildtargets('smoke_suite/test_resources/simple_gui/Bld.inf', [
 		"helloworld_exe/helloworld.mbm_bmconvcommands",
-		"helloworld_exe/helloworld__resource_apps_sc.rpp",
-		"helloworld_exe/helloworld__resource_apps_sc.rpp.d",
+		"helloworld_exe/helloworld_HelloWorld_sc.rpp",
+		"helloworld_exe/helloworld_HelloWorld_sc.rpp.d",
 		"helloworld_exe/armv5/udeb/HelloWorld_Application.o",
 		"helloworld_exe/armv5/udeb/HelloWorld_Application.o.d",
 		"helloworld_exe/armv5/udeb/HelloWorld_AppUi.o",
@@ -111,18 +108,14 @@ def run():
 		"helloworld_exe/winscw/urel/helloworld_UID_.dep",
 		"helloworld_exe/winscw/urel/helloworld_UID_.o",
 		"helloworld_exe/winscw/urel/helloworld_UID_.o.d",
-		"helloworld_reg_exe/helloworld_reg__private_10003a3f_apps_sc.rpp.d"
+		"helloworld_reg_exe/helloworld_reg_HelloWorld_reg_sc.rpp.d"
 	])
 	t.stdout = [
 		"<whatlog bldinf='"+componentpath+"/Bld.inf' mmp='"+componentpath+"/HelloWorld.mmp' config='armv5_udeb.whatlog'>",
 		"<bitmap>$(EPOCROOT)/epoc32/data/z/resource/apps/helloworld.mbm</bitmap>",
 		"<resource>$(EPOCROOT)/epoc32/include/helloworld.rsg</resource>",
 		"<resource>$(EPOCROOT)/epoc32/data/z/resource/apps/helloworld.rsc</resource>",
-		"<resource>$(EPOCROOT)/epoc32/localisation/helloworld/rsc/helloworld.rpp</resource>",
-		"<resource>$(EPOCROOT)/epoc32/localisation/group/helloworld.info</resource>",
 		"<resource>$(EPOCROOT)/epoc32/data/z/private/10003a3f/apps/helloworld_reg.rsc</resource>",
-		"<resource>$(EPOCROOT)/epoc32/localisation/helloworld_reg/rsc/helloworld_reg.rpp</resource>",
-		"<resource>$(EPOCROOT)/epoc32/localisation/group/helloworld_reg.info</resource>",
 		"<build>$(EPOCROOT)/epoc32/release/armv5/udeb/helloworld.exe</build>",
 		"<build>$(EPOCROOT)/epoc32/release/armv5/udeb/helloworld.exe.map</build>",
 		"<whatlog bldinf='"+componentpath+"/Bld.inf' mmp='"+componentpath+"/HelloWorld.mmp' config='winscw_urel.whatlog'>",
@@ -133,13 +126,9 @@ def run():
 		"<resource>$(EPOCROOT)/epoc32/data/z/resource/apps/helloworld.rsc</resource>",
 		"<resource>$(EPOCROOT)/epoc32/release/winscw/udeb/z/resource/apps/helloworld.rsc</resource>",
 		"<resource>$(EPOCROOT)/epoc32/release/winscw/urel/z/resource/apps/helloworld.rsc</resource>",
-		"<resource>$(EPOCROOT)/epoc32/localisation/helloworld/rsc/helloworld.rpp</resource>",
-		"<resource>$(EPOCROOT)/epoc32/localisation/group/helloworld.info</resource>",
 		"<resource>$(EPOCROOT)/epoc32/data/z/private/10003a3f/apps/helloworld_reg.rsc</resource>",
 		"<resource>$(EPOCROOT)/epoc32/release/winscw/udeb/z/private/10003a3f/apps/helloworld_reg.rsc</resource>",
 		"<resource>$(EPOCROOT)/epoc32/release/winscw/urel/z/private/10003a3f/apps/helloworld_reg.rsc</resource>",
-		"<resource>$(EPOCROOT)/epoc32/localisation/helloworld_reg/rsc/helloworld_reg.rpp</resource>",
-		"<resource>$(EPOCROOT)/epoc32/localisation/group/helloworld_reg.info</resource>",
 		"<build>$(EPOCROOT)/epoc32/release/winscw/urel/helloworld.exe</build>",
 		"<build>$(EPOCROOT)/epoc32/release/winscw/urel/helloworld.exe.map</build>",
 		"<whatlog bldinf='"+componentpath+"/Bld.inf' mmp='"+componentpath+"/HelloWorld.mmp' config='armv5_urel.whatlog'>",

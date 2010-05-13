@@ -26,7 +26,7 @@ def run():
 	t.errors = 0
 	t.returncode = 0
 	t.exceptions = 0
-	t.command = "cd smoke_suite/test_resources/annofile2log && ( diff -wB <(python testanno2log.py <(bzip2 -dc scrubbed_ncp_dfs_resource.anno.bz2)) <(bzip2 -dc scrubbed_ncp_dfs_resource.stdout.bz2))"
+	t.command = 'cd smoke_suite/test_resources/annofile2log && ( FROMANNO="`mktemp`" ; bzip2 -dc scrubbed_ncp_dfs_resource.anno.bz2 | python testanno2log.py  >"${FROMANNO}" && FROMSTDOUT="`mktemp`"; bzip2 -dc scrubbed_ncp_dfs_resource.stdout.bz2 > "${FROMSTDOUT}" && diff -wB "${FROMANNO}" "${FROMSTDOUT}"; RET=$? ; rm "${FROMANNO}" "${FROMSTDOUT}"; exit $RET )'
 	
 	t.mustmatch_multiline = [ 
 		"^ *.?"

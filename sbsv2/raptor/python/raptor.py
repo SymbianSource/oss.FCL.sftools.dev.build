@@ -338,9 +338,6 @@ class Layer(ModelNode):
 		if build.quiet == True:
 			cli_options += " -q"
 
-		if build.timing == True:
-			cli_options += " --timing"
-
 		if build.noDependInclude == True:
 			cli_options += " --no-depend-include"
 
@@ -534,7 +531,7 @@ class Raptor(object):
 		# what platform and filesystem are we running on?
 		self.filesystem = raptor_utilities.getOSFileSystem()
 
-		self.timing = False
+		self.timing = True # Needed by filters such as copy_file to monitor progress
 		self.toolset = None
 
 		self.starttime = time.time()
@@ -696,7 +693,7 @@ class Raptor(object):
 		return True
 
 	def SetTiming(self, TrueOrFalse):
-		self.timing = TrueOrFalse
+		self.Info("--timing switch no longer has any effect - build timing is now permanently on")
 		return True
 
 	def SetParallelParsing(self, type):
@@ -829,6 +826,12 @@ class Raptor(object):
 				self.filterList += ",filterclean"
 				if is_suspicious_clean:
 					self.Warn('CLEAN, CLEANEXPORT and a REALLYCLEAN should not be combined with other targets as the result is unpredictable.')
+			else:
+				""" Copyfile implements the <copy> tag which is primarily useful with cluster builds.
+				    It allows file copying to occur on the primary build host rather than on the cluster.
+				    This is more efficient.
+				"""
+				self.filterList += ",filtercopyfile"
 
 		if not more_to_do:
 			self.skipAll = True		# nothing else to do

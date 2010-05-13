@@ -90,13 +90,7 @@ class FilterWhat(filter_interface.Filter):
 		
 		# repetitions is for tracking repeated lines in the output log
 		# when --check and --what are called
-		self.repetitions = {}
-		
-		"Regex for old what output"
-		if "win" in self.buildparameters.platform:
-			self.regex = re.compile("^[a-zA-Z]:\S+$")
-		else:
-			self.regex = re.compile("^/\S+$")
+		self.repetitions = {}	
 		
 		"Regex for targets"
 		self.target_regex = re.compile("^<(build|stringtable|resource|bitmap)>.*")
@@ -136,10 +130,6 @@ class FilterWhat(filter_interface.Filter):
 				self.repetitions[line] = 0
 				
 			if self.repetitions[line] == 0:
-				
-				if self.regex.match(line) and (self.what or self.check):
-					"Print the whole line"
-					self.print_file(line, (-1), len(line))
 					
 				if self.target_regex.match(line):
 					"Grab the filename between <build> and </build>" 

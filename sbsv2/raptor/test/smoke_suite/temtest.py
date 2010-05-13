@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -98,6 +98,7 @@ def run():
 	t.id = "0018f"
 	t.name = "temwhat"
 	t.command = "sbs -b smoke_suite/test_resources/simple_extension/bld.inf --what"
+	t.output_expected_only_once = True	
 	t.stdout = [
 		# exports
 		'$(EPOCROOT)/epoc32/tools/makefile_templates/sbsv2test/clean.mk',

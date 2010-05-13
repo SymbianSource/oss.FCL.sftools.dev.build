@@ -109,6 +109,7 @@
 
 		<set name='BUILD_INCLUDE' value=''/>
 		<set name='CREATEVMAP' value='$(PYTHON) $(SBS_HOME)/bin/createvmap.py' type='script'/>
+		<set name='DEPCRUNCH' value='$(PYTHON) $(SBS_HOME)/bin/depcrunch.py' type='script'/>
 		<set name='CREATEVMAPCPP' value='$(SBS_BVCPP)' type='tool'/>
 		<set name='FEATURELISTFILES' value=''/>
 		<set name='FEATUREVARIANTNAME' value=''/>

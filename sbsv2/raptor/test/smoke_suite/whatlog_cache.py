@@ -42,14 +42,11 @@ def run():
 		
 	t.targets = [
 		"$(EPOCROOT)/epoc32/data/z/resource/apps/helloworld.mbm",
-		"$(EPOCROOT)/epoc32/localisation/group/helloworld.info",
 		"$(EPOCROOT)/epoc32/release/winscw/udeb/z/resource/apps/helloworld.mbm",
 		"$(EPOCROOT)/epoc32/release/winscw/urel/z/resource/apps/helloworld.mbm",
 		"$(EPOCROOT)/epoc32/include/helloworld.rsg",
 		"$(EPOCROOT)/epoc32/data/z/resource/apps/helloworld.rsc",
 		"$(EPOCROOT)/epoc32/data/z/private/10003a3f/apps/helloworld_reg.rsc",
-		"$(EPOCROOT)/epoc32/localisation/helloworld/rsc/helloworld.rpp",
-		"$(EPOCROOT)/epoc32/localisation/group/helloworld_reg.info",
 		"$(EPOCROOT)/epoc32/release/winscw/udeb/z/resource/apps/helloworld.rsc",
 		"$(EPOCROOT)/epoc32/release/winscw/urel/z/resource/apps/helloworld.rsc",
 		"$(EPOCROOT)/epoc32/release/winscw/udeb/z/private/10003a3f/apps/helloworld_reg.rsc",
@@ -64,8 +61,8 @@ def run():
 		]
 	t.addbuildtargets('smoke_suite/test_resources/simple_gui/Bld.inf', [
 		"helloworld_exe/helloworld.mbm_bmconvcommands",
-		"helloworld_exe/helloworld__resource_apps_sc.rpp",
-		"helloworld_exe/helloworld__resource_apps_sc.rpp.d",
+		"helloworld_exe/helloworld_HelloWorld_sc.rpp",
+		"helloworld_exe/helloworld_HelloWorld_sc.rpp.d",
 		"helloworld_exe/armv5/udeb/HelloWorld_Application.o",
 		"helloworld_exe/armv5/udeb/HelloWorld_Application.o.d",
 		"helloworld_exe/armv5/udeb/HelloWorld_AppUi.o",
@@ -126,7 +123,7 @@ def run():
 		"helloworld_exe/winscw/urel/helloworld_UID_.dep",
 		"helloworld_exe/winscw/urel/helloworld_UID_.o",
 		"helloworld_exe/winscw/urel/helloworld_UID_.o.d",
-		"helloworld_reg_exe/helloworld_reg__private_10003a3f_apps_sc.rpp.d"
+		"helloworld_reg_exe/helloworld_reg_HelloWorld_reg_sc.rpp.d"
 	])
 	t.countmatch = [
 		["\$self->{abldcache}->{.*\\\\test\\\\smoke_suite\\\\test_resources\\\\simple_gui target (armv5|winscw) (udeb|urel) -what\'} =", 4],
@@ -134,10 +131,6 @@ def run():
 		[".*\'.*\\\\\\\\epoc32\\\\\\\\data\\\\\\\\z\\\\\\\\resource\\\\\\\\apps\\\\\\\\helloworld.mbm\'", 4],
 		[".*\'.*\\\\\\\\epoc32\\\\\\\\data\\\\\\\\z\\\\\\\\resource\\\\\\\\apps\\\\\\\\helloworld.rsc\'", 4],
 		[".*\'.*\\\\\\\\epoc32\\\\\\\\include\\\\\\\\helloworld.rsg\'", 4],
-		[".*\'.*\\\\\\\\epoc32\\\\\\\\localisation\\\\\\\\group\\\\\\\\helloworld.info\'", 4],
-		[".*\'.*\\\\\\\\epoc32\\\\\\\\localisation\\\\\\\\group\\\\\\\\helloworld_reg.info\'", 4],
-		[".*\'.*\\\\\\\\epoc32\\\\\\\\localisation\\\\\\\\helloworld\\\\\\\\rsc\\\\\\\\helloworld.rpp\'", 4],
-		[".*\'.*\\\\\\\\epoc32\\\\\\\\localisation\\\\\\\\helloworld_reg\\\\\\\\rsc\\\\\\\\helloworld_reg.rpp\'", 4],
 		[".*\'.*\\\\\\\\epoc32\\\\\\\\release\\\\\\\\(armv5|winscw)\\\\\\\\(udeb|urel)\\\\\\\\helloworld.exe\'",4],
 		[".*\'.*\\\\\\\\epoc32\\\\\\\\release\\\\\\\\(armv5|winscw)\\\\\\\\(udeb|urel)\\\\\\\\helloworld.exe.map\'", 3],
 		[".*\'.*\\\\\\\\epoc32\\\\\\\\release\\\\\\\\winscw\\\\\\\\(udeb|urel)\\\\\\\\z\\\\\\\\private\\\\\\\\10003a3f\\\\\\\\apps\\\\\\\\helloworld_reg.rsc\'", 2],
