@@ -1491,9 +1491,9 @@ class MMPRaptorBackend(MMPBackend):
 
 				self.__versionhex = "%04x%04x" % (major, minor)
 				self.BuildVariant.AddOperation(raptor_data.Set(varname, "%d.%d" %(major, minor)))
-				self.BuildVariant.AddOperation(raptor_data.Set(varname+"HEX", self.__versionhex))
+				self.BuildVariant.AddOperation(raptor_data.Set("VERSIONHEX", self.__versionhex))
 				self.__debug("Set "+toks[0]+"  OPTION to " + toks[1])
-				self.__debug("Set "+toks[0]+"HEX OPTION to " + "%04x%04x" % (major,minor))
+				self.__debug("Set VERSIONHEX OPTION to " + self.__versionhex)
 
 			else:
 				self.__Raptor.Warn("Invalid version supplied to VERSION (%s), using default value" % toks[1])

@@ -1176,8 +1176,8 @@ ifneq ($(filter ROMFILE,$(call uppercase,$(MAKECMDGOALS))),)
 	        $(call startrule,rombuild)	\
 	        $(GNUMKDIR) -p $(ROMDIR) \
             $(if $(ROMFILE_CREATED_$(TOBLDINF)),,&& echo -e "// $(subst $(EPOC_ROOT)/,,$(ROMFILENAME))\n//\n$(DATATEXT)" > $(ROMFILENAME)) \
-            $(if $(BUILDROMTARGET),&& echo "$(ROMFILETYPE)=/epoc32/release/##$(ABIDIR)##/##BUILD##/$(TARGET).$(REQUESTEDTARGETEXT)   $(1)$(ROMDECORATIONS)" >> $(ROMFILENAME))	\
-	        $(if $(RAMTARGET),&& echo "$(ROMFILETYPE_RAM)=/epoc32/release/##$(ABIDIR)##/##BUILD##/$(TARGET).$(REQUESTEDTARGETEXT)   $(ROMPATH_RAM)$(ROMFILE_RAM)$(ROMDECORATIONS_RAM)" >> $(ROMFILENAME))	\
+            $(if $(BUILDROMTARGET),&& echo "$(ROMFILETYPE)=/epoc32/release/##$(ABIDIR)##/##BUILD##/$(TARGET)$(if $(EXPLICITVERSION),{$(VERSIONHEX)},).$(REQUESTEDTARGETEXT)   $(1)$(ROMDECORATIONS)" >> $(ROMFILENAME))	\
+	        $(if $(RAMTARGET),&& echo "$(ROMFILETYPE_RAM)=/epoc32/release/##$(ABIDIR)##/##BUILD##/$(TARGET)$(if $(EXPLICITVERSION),{$(VERSIONHEX)},).$(REQUESTEDTARGETEXT)   $(ROMPATH_RAM)$(ROMFILE_RAM)$(ROMDECORATIONS_RAM)" >> $(ROMFILENAME))	\
 	        $(call endrule,buildromfiletarget)
     endef
 
