@@ -82,7 +82,7 @@
 		<!-- PLATMACROS.LINUX is set from PLATMACROS.WINDOWS -->
 		<append name="TRADITIONAL_PLATFORM" value='SMP' separator="" />
 		<append name="VARIANTPLATFORM" value="smp" separator=""/>
-		<set name="GENERATE_ABIV1_IMPLIBS" value=""/>
+		<set name="SUPPORTS_ABIV1_IMPLIBS" value=""/>
 	</var>
 
 	<!-- emit formatted releasable information into the logs for post-build parsing -->
@@ -142,6 +142,7 @@
 		<set name="PL.SOFTVFP_MAYBE_VFPV2" value="softvfp"/>
 		<set name="CC.ARMV5" value="--cpu 5T"/>
 		<set name="CC.ARMV6" value="--cpu 6"/>
+		<set name="USE_RVCT22_DELETE_WORKAROUND" value="1" />
 	</var>
 
 	<var name="rvct3_1" extends="rvct">

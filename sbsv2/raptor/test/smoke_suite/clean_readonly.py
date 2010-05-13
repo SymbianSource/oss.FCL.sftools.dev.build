@@ -24,7 +24,7 @@ def run():
 	
 	t = AntiTargetSmokeTest()
 	t.id = "10a"
-	t.name = "cleanreadonly" 
+	t.name = "clean_readonly" 
 	t.command = "sbs -b smoke_suite/test_resources/simple_dll/bld.inf -c armv5"
 	t.targets = [
 		"$(EPOCROOT)/epoc32/release/armv5/udeb/createstaticdll.dll.sym",

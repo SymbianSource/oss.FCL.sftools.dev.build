@@ -1,0 +1,31 @@
+
+It is now possible to pass parameters from the command line into log filters.
+This works in the same way for both sbs and sbs_filter commands.
+
+For example:
+
+sbs --filters=Foo[param1,param2,param3]
+
+sbs_filter --filters=Bar[value] < build.log
+
+
+Multiple filters with parameters can be specified if needed,
+
+sbs --filters=Foo[param1,param2,param3],Bar[value]
+
+
+In the 2.13.0 release there are two filters which take parameters:
+
+1. sbs_filter --filters=FilterComp[wizard/group] < log
+
+Here the parameter is (part of) a bld.inf path and the filter only prints
+parts of the log which are attributable to the matching component. In the
+example above, the log elements from any bld.inf which has "wizard/group" 
+as part of its path will be printed: normally, passing the full path name
+will guarantee that only one component matches.
+
+2. sbs_filter --filters=FilterTagCounter[info,recipe] < log
+
+Here the parameters are a list of the element names to count. This is a
+simple analysis filter that shows you how many instances of XMl elements
+are in a log and how many characters of body text they have.

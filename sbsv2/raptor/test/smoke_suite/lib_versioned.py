@@ -49,22 +49,7 @@ def run():
 		"$(EPOCROOT)/epoc32/release/winscw/udeb/versionedlib.02.lib",
 		"$(EPOCROOT)/epoc32/release/winscw/udeb/versionedlib01.lib"
 		]
-
-	if sys.platform.lower().startswith("win"):
-		t.targets.extend (	
-		[
-		"$(EPOCROOT)/epoc32/release/armv5/lib/testver.lib",
-		"$(EPOCROOT)/epoc32/release/armv5/lib/versionedlib01.lib",
-		"$(EPOCROOT)/epoc32/release/armv5/lib/versioned.lib.03.lib",
-		"$(EPOCROOT)/epoc32/release/armv5/lib/versionedlib.02.lib",
-		"$(EPOCROOT)/epoc32/release/armv5/lib/testver{00020000}.lib",
-		"$(EPOCROOT)/epoc32/release/armv5/lib/testver{00030000}.lib",
-		"$(EPOCROOT)/epoc32/release/armv5/lib/versioned.lib{000a0000}.03.lib",
-		"$(EPOCROOT)/epoc32/release/armv5/lib/version.ed.lib.04.lib",
-		"$(EPOCROOT)/epoc32/release/armv5/lib/version.ed.lib{000a0000}.04.lib",
-		"$(EPOCROOT)/epoc32/release/armv5/lib/versionedlib01{000a0000}.lib",
-		"$(EPOCROOT)/epoc32/release/armv5/lib/versionedlib{000a0000}.02.lib"
-		] )
-		
 	t.run()
+	
+	t.print_result()
 	return t

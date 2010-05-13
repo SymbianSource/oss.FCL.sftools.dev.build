@@ -32,7 +32,7 @@ def run():
 	
 	t = SmokeTest()
 	t.id = "82"
-	t.name = "output_control_sbs_build_dir"
+	t.name = "output_control"
 	t.description = "Test building intermediate files into a location other than $EPOCROOT/epoc32/build. Use SBS_BUILD_DIR. environment variable."
 	t.sbs_build_dir = environ['EPOCROOT'].replace("\\","/").rstrip("/") + '/anotherbuilddir'
 	t.environ['SBS_BUILD_DIR'] = t.sbs_build_dir

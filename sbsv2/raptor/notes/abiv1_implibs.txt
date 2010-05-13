@@ -1,0 +1,14 @@
+
+The ABIv1 toolchain was deprecated in Symbian OS 9.4 but the build system
+continued to generate both ABIv1 (.lib) import libraries and ABIv2 (.dso)
+import libraries for convenience during the transition to ABIv2.
+
+This change now turns off the generation of ABIv1 import libraries by
+default but makes support switchable on a kit-by-kit basis. To turn on
+ABIv1 import library generation, add the following setting to the
+root.changes variant in epoc32/sbs_config/os_properties.xml
+
+<set name="SUPPORTS_ABIV1_IMPLIBS" value="1"/>
+
+An example properties file is available in the examples/os_properties.xml
+file distributed within the Raptor installation.

@@ -445,9 +445,10 @@ class Raptor(object):
 	created by the Main function. When operated by an IDE several Raptor
 	objects may be created and operated at the same time."""
 
-
+	# mission enumeration
 	M_BUILD = 1
-	M_VERSION = 2
+	M_QUERY = 2
+	M_VERSION = 3
 
 	def __init__(self, home = None):
 
@@ -517,7 +518,8 @@ class Raptor(object):
 		self.noDependInclude = False
 		self.noDependGenerate = False
 		self.projects = set()
-
+		self.queries = []
+		
 		self.cache = raptor_cache.Cache(self)
 		self.override = {env: str(self.home)}
 		self.targets = []
@@ -714,6 +716,11 @@ class Raptor(object):
 		self.projects.add(projectName.lower())
 		return True
 
+	def AddQuery(self, q):
+		self.queries.append(q)
+		self.mission = Raptor.M_QUERY
+		return True
+	
 	def FilterList(self, value):
 		self.filterList = value
 		return True
@@ -1060,7 +1067,7 @@ class Raptor(object):
 			self.raptor_params = BuildStats(self)
 
 			# Open the requested plugins using the pluginbox
-			self.out.open(self.raptor_params, self.filterList.split(','), self.pbox)
+			self.out.open(self.raptor_params, self.filterList, self.pbox)
 
 			# log header
 			self.out.write("<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?>\n")
@@ -1222,6 +1229,31 @@ class Raptor(object):
 
 		return layers
 
+	def Query(self):
+		"process command-line queries."
+		
+		if self.mission != Raptor.M_QUERY:
+			return 0
+		
+		# establish an object cache based on the current settings
+		self.LoadCache()
+			
+		# our "self" is a valid object for initialising an API Context
+		import raptor_api
+		api = raptor_api.Context(self)
+		
+		print "<sbs version='%s'>" % raptor_version.numericversion()
+		
+		for q in self.queries:
+			try:
+				print api.stringquery(q)
+				
+			except Exception, e:
+				self.Error("exception '%s' with query '%s'", str(e), q)
+		
+		print "</sbs>"	
+		return self.errorCode
+	
 	def Build(self):
 
 		if self.mission != Raptor.M_BUILD: # help or version requested instead.
@@ -1359,6 +1391,9 @@ def Main(argv):
 	# object which represents a build
 	b = Raptor.CreateCommandlineBuild(argv)
 
+	if b.mission == Raptor.M_QUERY:
+		return b.Query()
+	
 	return b.Build()
 
 
