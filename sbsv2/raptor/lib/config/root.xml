@@ -45,6 +45,7 @@
 		<set name='POSTLINKER_SUPPORTS_WDP' value='1'/>
 		<set name='SUPPORTS_STDCPP_NEWLIB' value='1'/>
 		<set name="RVCT_PRE_INCLUDE" value="$(EPOCINCLUDE)/rvct/rvct.h"/>
+		<set name="SUPPORTS_ABIV1_IMPLIBS" value=''/>
 	</var>
 	
 	<!-- Placeholder for the root.changes variant. This will typically be

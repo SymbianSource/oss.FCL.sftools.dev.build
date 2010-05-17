@@ -23,7 +23,7 @@ def run():
 
 	# Introduce LINKER_OPTIONS for tools2 linker
 	t.id = "0108"
-	t.name = "apply_linker_options"
+	t.name = "apply_usecases"
 	t.command = "sbs -b smoke_suite/test_resources/apply_usecases/linker_options/bld.inf -c tools2 -f -"
 	t.targets = [
 		"$(EPOCROOT)/epoc32/release/tools2/rel/test_apply_linkeroptions.exe"

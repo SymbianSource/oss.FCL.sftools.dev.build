@@ -67,7 +67,7 @@ def run():
 	t.warnings = warnings
 	t.run()
 
-	t.id = "0106a"
+	t.id = "0106b"
 	t.name = "whatcomp_component_repeated"
 	t.description = """
 			It is possible for what information about a component to not be grouped
@@ -89,5 +89,6 @@ def run():
 	t.run()
 
 	t.id = "0106"
+	t.name = "whatcomp"
 	t.print_result()
 	return t

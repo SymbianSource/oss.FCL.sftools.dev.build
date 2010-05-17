@@ -28,13 +28,7 @@ def run():
 		"$(EPOCROOT)/epoc32/release/armv5/lib/implib_implicit_def{000a0000}.dso",
 		"$(EPOCROOT)/epoc32/release/winscw/udeb/implib_implicit_def.lib"
 		]
-	t.run("linux")
-	if t.result == SmokeTest.SKIP:
-		t.targets.extend([
-			"$(EPOCROOT)/epoc32/release/armv5/lib/implib_implicit_def.lib",
-			"$(EPOCROOT)/epoc32/release/armv5/lib/implib_implicit_def{000a0000}.lib"
-			])
-		t.run("windows")
+	t.run()
 
 	t.id = "71b"
 	t.name = "implib_no_def"

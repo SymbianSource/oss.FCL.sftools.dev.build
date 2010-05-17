@@ -27,6 +27,7 @@ source	 	pl_elfexecutable.cpp  pl_elfexports.cpp  pl_elfimportrelocation.cpp  pl
 source	 	pl_elfrelocation.cpp  pl_elfrelocations.cpp  pl_symbol.cpp  polydll_fb_target.cpp  polydll_rebuild_target.cpp  usecasebase.cpp 
 source	 	byte_pair.cpp  pagedcompress.cpp checksum.cpp stdexe_target.cpp
 
+OS_LAYER_SYSTEMINCLUDE
 systeminclude    /epoc32/include  /epoc32/include/tools  
 userinclude		../source ../include
 
