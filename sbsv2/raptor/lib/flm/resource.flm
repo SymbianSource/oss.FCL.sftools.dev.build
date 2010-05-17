@@ -48,68 +48,25 @@ RESBASE:=$(RSCDIR)/$(TARGET_lower)
 # Ensure that RELEASABLES and CLEANTARGETS cannot expand indefinitely in successive calls to this flm:
 CLEANTARGETS:=
 RELEASABLES:=
+CREATABLEPATHS:=
 
 # There is only one resource header (.rsg) file and we only
 # make that if we are asked.
 RSGDIR:=$(EPOCROOT)/epoc32/include
+# If there are multiple LANGUAGES then it is the last one in the list
+# which produces the header.
+HEADLANG:=$(lastword $(LANGUAGES:SC=sc))
 ifneq ($(or $(HEADER),$(HEADERONLY)),)
         RESOURCEHEADER:=$(RSGDIR)/$(HEADER)
 
-        # If there are multiple LANGUAGES then it is the last one in the list
-        # which produces the header.
-        HEADLANG:=$(lastword $(LANGUAGES:SC=sc))
 else
-        HEADLANG:=
-    RESOURCEHEADER:=
+        RESOURCEHEADER:=
 endif
 
 # we create intermediate .rpp and .d files
+INTERBASE_TMP:=$(OUTPUTPATH)/$(TARGET_lower)_$(notdir $(basename $(SOURCE)))
 INTERBASE:=$(OUTPUTPATH)/$(TARGET_lower)
 
-################################## localisation ###########################$(GNUMKDIR)#############
-# Only make copies for full resource builds
-
-# Initialise to prevent RELEASABLES spill-over between calls
-DESTRPP:=
-INFOFILE:=
-
-ifeq ($(HEADERONLY),)
-
-RSSBASENAME:=$(call lowercase,$(basename $(notdir $(SOURCE))))
-DESTRPP:=$(EPOCROOT)/epoc32/localisation/$(RSSBASENAME)/rsc/$(RSSBASENAME).rpp
-$(call makepath,$(EPOCROOT)/epoc32/localisation/$(RSSBASENAME)/rsc)
-
-INFOFILE:=$(EPOCROOT)/epoc32/localisation/group/$(RSSBASENAME).info
-# If there are MULTIPLE languages then copy the .rpp for the last one
-RPPLANG:=$(lastword $(LANGUAGES:SC=sc))
-
-# Copy .rpp files from epoc32/build/ to epoc32/localisation/x/rsc/x.rpp and create .info files in localisation
-define CreateRppAndInfo
-
-ifeq ($(RESOURCE_$(call sanitise,$(SOURCE))),)
-RESOURCE_$(call sanitise,$(SOURCE)):=1
-
-RESOURCE:: $(DESTRPP) $(INFOFILE)
-
-$(DESTRPP): $(INTERBASE)_$(RPPLANG).rpp
-	$(call startrule,rppfilecopy,FORCESUCCESS) \
-	$(GNUCP) $$< $$@ \
-	$(call endrule,rppfilecopy)
-
-$(INFOFILE)::
-	@if [ ! -d $(EPOCROOT)/epoc32/localisation/group ]; then $(GNUMKDIR) -p $(EPOCROOT)/epoc32/localisation/group; fi
-	@if [ ! -f $$@ ]; then echo "DATADIR: /$(RSSBASENAME)" > $$@ ; fi
-	@echo -e "\n/z$(TARGETPATH)/$(TARGET_lower).rsc : $(RSSBASENAME).rpp" >> $$@
-
-endif
-endef
-
-$(eval $(call CreateRppAndInfo))
-endif
-################################# end of localisation ###################################
-
-# make the output directories while reading makefile - some build engines prefer this
-$(call makepath,$(INTERBASE))
 
 # common pre-processor options
 
@@ -120,7 +77,7 @@ $(call makepath,$(INTERBASE))
 CPPOPT:=-nostdinc -undef -Wno-trigraphs -D_UNICODE -include $(PRODUCT_INCLUDE)\
  -I$(dir $(SOURCE)) $(foreach I, $(USERINCLUDE),-I$(I) ) -I- $(foreach J,$(SYSTEMINCLUDE),-I$(J) )
 
-CREATABLEPATHS:=$(RSCDIR) $(RSGDIR) $(OUTPUTPATH)
+CREATABLEPATHS:=$(CREATABLEPATHS) $(RSCDIR) $(RSGDIR) $(OUTPUTPATH) 
 
 # We intend to generate the resource in an intermediate location and copy to the targetpath to
 # ensure that when the "same" resource is built into separare target paths, it doesn't have to be 
@@ -140,56 +97,71 @@ define preprocessresource
 # $(1) is the RPPFILE		(eg. /epoc32/build/xxx/b_sc.rpp)
 # $(2) is the related RESOURCEFILE if any (eg. /a/b.rsc)
 # $(3) is the LANGUAGE		(eg. sc or 01 or 02 ...)
+# $(4) is the "primary" language on which all the others depend
 
   ifeq ($(TARGET_$(call sanitise,$1)),)
     TARGET_$(call sanitise,$1):=1
-    $(if $(FLMDEBUG),$(info <debug>preprocessresource: $(1) for $(2) LANG:$(3)</debug>))
+    $(if $(FLMDEBUG),$$(info <debug>preprocessresource: $(1) for $(2) LANG:$(3) dep $(4)</debug>))
 
 
     # Correct dependency information when a header file can't be found.
     # If the c preprocessor can't find a dependency it appears as it did in the #include statement
     # e.g. "filename.mbg" or "filename.rsg" in the dependency file.
-    # we can correct the dependencies by assuming that the file will be in epoc32\include as this is the default
-    ifneq ($(NO_DEPEND_GENERATE),)
-      # This version minimises the size of dependency files, to contain only .mbg and .rsg deps.
-      # It allows resources to be built in the right order but doesn't impose the weight of
-      # of full dependency information which can overwhelm make in large builds.
-      # The strategy is to filter out lines (apart from the target line which is the first) which don't have .rsg or 
-      # .mbg dependencies in them.   The first line can sometimes not contain the target but  
-      # have a lonely "\" so we use a pattern to recognise the target line in order not to get confused. 
-      DEPENDENCY_CORRECTOR:={ $(GNUSED) -n -r '/.*: +.$$$$/ p;\%\.((rsg)|(mbg))%I {s% ([^ \/]+\.((rsg)|(mbg)))% __EPOCROOT\/epoc32\/include\/\1%ig;s% [^_][^_][^E][^ ]+%%g;s%__EPOCROOT%$(EPOCROOT)%g; p}' && echo "" ; }
-    else
-      # Generate full dependency information
-      DEPENDENCY_CORRECTOR:=$(GNUSED)  -r 's% ([^ \/]+\.((rsg)|(mbg)))% $(EPOCROOT)\/epoc32\/include\/\1%ig' 
-    endif
+
+ifneq ($(NO_DEPEND_GENERATE),)
+    # This version minimises the size of dependency files, to contain only .mbg and .rsg deps.
+    # It allows resources to be built in the right order but doesn't impose the weight of
+    # of full dependency information which can overwhelm make in large builds.
+    # The strategy is filter lines which don't have .rsg or .mbg dependencies in them and
+    # to sift each line to leave out non-relevant things like other header files, .hrh 
+    # files etc.  In the end don't print anything at all if we did not find the target.
+
+define  DEPENDENCY_CORRECTOR
+{ $(DEPCRUNCH) --extensions rsg,mbg --assume '$$$$(EPOCROOT)/epoc32/include' ; } 
+endef
+
+else
+    # This can correct the dependencies by assuming that the file will be in epoc32\include as this is the default
+    DEPENDENCY_CORRECTOR:=$(GNUSED)  -r 's% ([^ \/]+\.((rsg)|(mbg)))% $(EPOCROOT)\/epoc32\/include\/\1%ig' 
+endif
 
 
-    RESOURCE_DEPS:: $(1).d
-    $(1).d: $(SOURCE)
+    ifeq "$1" "$4"
+        RESOURCE_DEPS:: $1.d
+
+        $1.d: $(SOURCE)
 	  $(call startrule,resourcedependencies,FORCESUCCESS) \
-	  $(GNUCPP) -C -DLANGUAGE_$(3) -DLANGUAGE_$(subst sc,SC,$(3)) $(call makemacrodef,-D,$(MMPDEFS))\
-	  $(CPPOPT) $(SOURCE) -M -MG -MT"$(1)" | \
+	  $(GNUCPP) -DLANGUAGE_$(3) -DLANGUAGE_$(subst sc,SC,$3) $(call makemacrodef,-D,$(MMPDEFS))\
+	  $(CPPOPT) $(SOURCE) -M -MG -MT"$1" | \
 	  $$(DEPENDENCY_CORRECTOR) >$$@ \
 	  $(call endrule,resourcedependencies)
 
-    ifeq "$(MAKEFILE_GROUP)" "RESOURCE"
-    $(1): $(1).d
+         $1 : $1.d
+
+    else
+         $1 : $4
+    endif
+
+    $1:
 	  $(call startrule,resourcepreprocess,FORCESUCCESS) \
-	  $(GNUCPP) -C -DLANGUAGE_$(3) -DLANGUAGE_$(subst sc,SC,$(3)) $(call makemacrodef,-D,$(MMPDEFS))\
+	  $(GNUCPP) -C -DLANGUAGE_$3 -DLANGUAGE_$(subst sc,SC,$(3)) $(call makemacrodef,-D,$(MMPDEFS))\
 	  $(CPPOPT) $(SOURCE) -o $$@ \
 	  $(call endrule,resourcepreprocess)
     endif
 
-    CLEANTARGETS:= $$(CLEANTARGETS) $(1)
+    CLEANTARGETS:= $$(CLEANTARGETS) $1
 
-    $(eval DEPENDFILENAME:=$(1).d)
-    $(eval DEPENDFILE:=$(wildcard $(DEPENDFILENAME)))
-
-    CLEANTARGETS:=$$(CLEANTARGETS) $(DEPENDFILENAME)
-    ifneq "$(DEPENDFILE)" ""
-      ifeq "$(filter %CLEAN,$(call uppercase,$(MAKECMDGOALS)))" ""
-        ifeq "$(MAKEFILE_GROUP)" "RESOURCE"
-          -include $(DEPENDFILE)
+    ifeq "$(MAKEFILE_GROUP)" "RESOURCE"
+    ifeq "$1" "$4"
+      $(eval DEPENDFILENAME:=$1.d)
+      $(eval DEPENDFILE:=$(wildcard $(DEPENDFILENAME)))
+      
+      CLEANTARGETS:=$$(CLEANTARGETS) $(DEPENDFILENAME)
+      ifneq "$(DEPENDFILE)" ""
+        ifeq "$(filter %CLEAN,$(call uppercase,$(MAKECMDGOALS)))" ""
+          ifeq "$(MAKEFILE_GROUP)" "RESOURCE"
+           -include $(DEPENDFILE)
+          endif
         endif
       endif
     endif
@@ -200,23 +172,12 @@ endef # preprocessresource #
 ###############################################################################
 define copyresource
 # $(1) is the source
-# $(2) is the destination
+# $(2) is the space separated list of destinations which must be filenames
 
-RELEASABLES:=$$(RELEASABLES) $(2)
+   RELEASABLES:=$$(RELEASABLES) $(2)
 
-   ifeq ($(TARGET_$(call sanitise,$2)),)
-           TARGET_$(call sanitise,$2):=1
-
-        RESOURCE:: $2
-        ## perform additional copies of binaries
-        #
-        $(2): $(1)
-		$(call startrule,resourcecopy,FORCESUCCESS) \
-		$(GNUCP) $$< $$@ \
-		$(call endrule,resourcecopy)
-
-   endif
-
+   $(info <finalcopy source='$1'>$2</finalcopy>)
+ 
 endef # copyresource #
 
 ###############################################################################
@@ -239,8 +200,7 @@ define generateresource
 
             $(1): $(2) $(RCOMP)
 			$(call startrule,resourcecompile,FORCESUCCESS) \
-			$(RCOMP) -m045,046,047 -u -o$(1) -s$(2) && \
-        		{ $(foreach F,$(sort $(patsubst %,%/$(notdir $(1)),$(RSCCOPYDIRS))),$(GNUCP) $(1) $(F) ; ) } \
+			$(RCOMP) -m045,046,047 -u -o$(1) -s$(2)  \
 			$(call endrule,resourcecompile)
 
         endif
@@ -248,11 +208,11 @@ define generateresource
 #	Whether or not we have generated this resource for some other variant, check if there
 #       are any new copies to be made for this variant. e.g. winscw requires that we make
 #       some extra copies.  We tried to copy after running rcomp itself but we still need these
-#       targets for the sake of dependencies or, for example if someone merely adds a new copy 
+#       targets for the sake of dependencies or, for example, if someone merely adds a new copy 
 #       when the resource is up-to-date
 
-        $(if $(FLMDEBUG),$(info <debug>resource copies of $(notdir $1) in: $(RSCCOPYDIRS)</debug>))
-        $(foreach F,$(sort $(patsubst %,%/$(notdir $(1)),$(RSCCOPYDIRS))),$(call copyresource,$(1),$(F)))
+        $(call copyresource,$1,$(sort $(patsubst %,%/$(notdir $1),$(RSCCOPYDIRS))))
+
 
         # individual source file compilation
         SOURCETARGET_$(call sanitise,$(SOURCE)): $(1)
@@ -266,7 +226,7 @@ define generateresourceheader
 # $(2) is the preprocessed resource to make it from
 # $(3) is the language to use	(eg. sc)
 
-		RELEASABLES:= $$(RELEASABLES) $(1)
+        RELEASABLES:= $$(RELEASABLES) $(1)
 
         ifeq ($(TARGET_$(call sanitise,$1)),)
                 TARGET_$(call sanitise,$1):=1
@@ -293,22 +253,28 @@ endef
 # We always create at least the header
 # even if we sometimes don't create the resources
 ifneq ($(RESOURCEHEADER),)
-        $(eval $(call generateresourceheader,$(RESOURCEHEADER),$(INTERBASE)_$(HEADLANG).rpp,$(HEADLANG)))
+        $(eval $(call generateresourceheader,$(RESOURCEHEADER),$(INTERBASE_TMP)_$(HEADLANG).rpp,$(HEADLANG)))
 endif
 
+# The one on which the others will depend i.e. they will 
+# "sit in it's dependency slipstream" or in other words
+# We only have to make one dependency file because all of
+# the other languages will benefit from the dependency file
+# belonging to this language.
+PRIMARYRPPFILE:=$(INTERBASE_TMP)_$(HEADLANG).rpp
 ifeq ($(HEADERONLY),)
         # generate a resource file for each language
         # For sc we generate $(RESBASE).rsc and define LANGUAGE_SC and LANGUAGE_sc.
-        $(foreach L,$(LANGUAGES:SC=sc),$(eval $(call preprocessresource,$(INTERBASE)_$(L).rpp,$(INTERBASE).r$(L),$(L))))
+        $(foreach L,$(LANGUAGES:SC=sc),$(eval $(call preprocessresource,$(INTERBASE_TMP)_$(L).rpp,$(INTERBASE).r$(L),$(L),$(PRIMARYRPPFILE))))
 
         ifeq "$(MAKEFILE_GROUP)" "RESOURCE"
-            $(foreach L,$(LANGUAGES:SC=sc),$(eval $(call generateresource,$(INTERBASE).r$(L),$(INTERBASE)_$(L).rpp,$(L))))
+            $(foreach L,$(LANGUAGES:SC=sc),$(eval $(call generateresource,$(INTERBASE).r$(L),$(INTERBASE_TMP)_$(L).rpp,$(L))))
         endif
 else
         # No resources are going to be made so unless we specifically ask for it, there will be no
         # preprocessed file from which to create the header:
 
-        $(eval $(call preprocessresource,$(INTERBASE)_$(HEADLANG).rpp,,$(HEADLANG)))
+        $(eval $(call preprocessresource,$(INTERBASE_TMP)_$(HEADLANG).rpp,,$(HEADLANG),$(PRIMARYRPPFILE)))
 
 endif
 
@@ -318,10 +284,10 @@ endif
 ifneq ($(RFIFILE),)
   RESOURCE:: $(RFIFILE)
   RELEASABLES:=$(RELEASABLES) $(RFIFILE)
-  CREATABLEPATHS:=$(CREATABLEPATHS) $(dir $(RFIFILE))
+  CREATABLEPATHS:=$(CREATABLEPATHS) $(dir $(RFIFILE))/
 
-  RPPFILES:=$(foreach L,$(LANGUAGES:SC=sc),$(INTERBASE)_$(L).rpp)
-  $(eval $(call generaterfifile,$(RFIFILE),$(RPPFILES),$(addsuffix .d,$(RPPFILES))))
+  RPPFILES:=$(foreach L,$(LANGUAGES:SC=sc),$(INTERBASE_TMP)_$(L).rpp)
+  $(eval $(call generaterfifile,$(RFIFILE),$(RPPFILES),$(PRIMARYRPPFILE).d))
 endif
 
 

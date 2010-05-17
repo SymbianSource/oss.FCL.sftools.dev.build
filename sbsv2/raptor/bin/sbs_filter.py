@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Symbian Foundation License v1.0"
@@ -58,7 +58,7 @@ try:
 	raptor_params = raptor.BuildStats(the_raptor)
 
 	# Open the requested plugins using the pluginbox
-	the_raptor.out.open(raptor_params, the_raptor.filterList.split(','), pbox)
+	the_raptor.out.open(raptor_params, the_raptor.filterList, pbox)
 	
 except Exception, e:
 	sys.stderr.write("error: problem while creating filters %s\n" % str(e))

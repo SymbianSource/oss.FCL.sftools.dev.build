@@ -19,6 +19,13 @@ import filter_interface
 
 class FilterTagCounter(filter_interface.FilterSAX):
 	
+	def __init__(self, params = []):
+		"""parameters to this filter are the names of tags to print.
+		
+		If no parameters are passed then all tags are reported."""
+		self.interesting = params
+		super(FilterTagCounter, self).__init__()
+		
 	def startDocument(self):
 		# for each element name count the number of occurences
 		# and the amount of body text contained.
@@ -55,7 +62,8 @@ class FilterTagCounter(filter_interface.FilterSAX):
 		# report
 		print "\nsummary:"
 		for name,nos in sorted(self.count.items()):
-			print name, nos[0], nos[1]
+			if name in self.interesting or len(self.interesting) == 0:
+				print name, nos[0], nos[1]
 			
 		print "\nparsing:"
 		print "errors =", self.errors

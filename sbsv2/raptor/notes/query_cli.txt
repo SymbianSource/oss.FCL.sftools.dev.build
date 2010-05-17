@@ -1,0 +1,18 @@
+
+A new --query command-line option allows other tools to easily read raptor's
+configuration data without having to understand exactly how raptor config
+files work.
+
+For example, all the valid build aliases which can be used to build with
+the -c option can be obtained using:
+
+sbs --query=aliases
+
+All the known product variants can be obtained using:
+
+sbs --query=products
+
+And the details of a particular configuration can be found using:
+
+sbs --query=config[armv5_urel.n8]
+

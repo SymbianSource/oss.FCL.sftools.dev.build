@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<build xmlns="http://symbian.com/xml/build" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symbian.com/xml/build ../../schema/build/2_0.xsd">
+	<!-- Fake compiler variant for testing the  -->	
+	<var name="fake_compiler">
+		<set name='CC' value='python -u $(SBS_HOME)/test/smoke_suite/test_resources/scripts/delete_on_failed_compile.py'/>
+	</var>
+
+</build>

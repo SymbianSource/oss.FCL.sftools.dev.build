@@ -829,12 +829,13 @@ class Config(object):
 
 class Variant(Model, Config):
 
-	__slots__ = ('cache','name','host','extends','ops','variantRefs','allOperations')
+	__slots__ = ('cache','name','type','host','extends','ops','variantRefs','allOperations')
 
 	def __init__(self, name = ""):
 		Model.__init__(self)
 		Config.__init__(self)
 		self.name = name
+		self.type = ""
 
 		# Operations defined inside this variant.
 		self.ops = []
@@ -855,6 +856,8 @@ class Variant(Model, Config):
 				self.host = value
 		elif name == "extends":
 			self.extends = value
+		elif name == "type":
+			self.type = value
 		else:
 			raise InvalidPropertyError()
 
@@ -948,6 +951,7 @@ class Alias(Model, Config):
 		Config.__init__(self)
 		self.name = name
 		self.meaning = ""
+		self.type = ""
 		self.varRefs = []
 		self.variants = []
 
@@ -962,6 +966,8 @@ class Alias(Model, Config):
 
 			for u in val.split("."):
 				self.varRefs.append( VariantRef(ref = u) )
+		elif key == "type":
+			self.type = val
 		else:
 			raise InvalidPropertyError()
 

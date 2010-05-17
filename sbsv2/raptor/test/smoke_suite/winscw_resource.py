@@ -30,9 +30,7 @@ def run():
 		"$(EPOCROOT)/epoc32/release/winscw/udeb/z/resource/testresource/testresource.r01",
 		"$(EPOCROOT)/epoc32/release/winscw/urel/z/resource/testresource/testresource.r01",
 		"$(EPOCROOT)/epoc32/release/winscw/udeb/z/resource/testresource/testresource.rsc",
-		"$(EPOCROOT)/epoc32/release/winscw/urel/z/resource/testresource/testresource.rsc",
-		"$(EPOCROOT)/epoc32/localisation/group/testresource.info",
-		"$(EPOCROOT)/epoc32/localisation/testresource/rsc/testresource.rpp"
+		"$(EPOCROOT)/epoc32/release/winscw/urel/z/resource/testresource/testresource.rsc"
 		]
 	t.run()
 	return t

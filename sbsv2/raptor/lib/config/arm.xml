@@ -79,7 +79,6 @@
 		<set name="LINKER_ARCH_OPTION" value="$(LD.ARMV5)"/>
 		<set name="COMPILER_FPU_DEFAULT" value="$(CC.SOFTVFP_MAYBE_VFPV2)"/>
 		<set name="POSTLINKER_FPU_DEFAULT" value="$(PL.SOFTVFP_MAYBE_VFPV2)"/>
-		<set name="GENERATE_ABIV1_IMPLIBS" value="$(SUPPORTS_ABIV1_IMPLIBS)"/>
 	</var>
 	<var name="v6">
 		<set name="TRADITIONAL_PLATFORM" value="ARMV6"/>
@@ -92,6 +91,7 @@
 		<set name="STATIC_RUNTIME_DIR" value="$(EPOCROOT)/epoc32/release/armv5/$(VARIANTTYPE)"/>
 		<set name="COMPILER_FPU_DEFAULT" value="$(CC.SOFTVFP_MAYBE_VFPV2)"/>
 		<set name="POSTLINKER_FPU_DEFAULT" value="$(PL.SOFTVFP_MAYBE_VFPV2)"/>
+		<set name="SUPPORTS_ABIV1_IMPLIBS" value=""/>
 	</var>
 	<var name="v7">
 		<set name="TRADITIONAL_PLATFORM" value="ARMV7"/>
@@ -103,6 +103,7 @@
 		<set name="LINKER_ARCH_OPTION" value="$(LD.ARMV7)"/>
 		<set name="COMPILER_FPU_DEFAULT" value="$(CC.SOFTVFP_MAYBE_VFPV3)"/>
 		<set name="POSTLINKER_FPU_DEFAULT" value="$(PL.SOFTVFP_MAYBE_VFPV3)"/>
+		<set name="SUPPORTS_ABIV1_IMPLIBS" value=""/>
 	</var>
 	<var name="9e" extends="v5">
 		<set name="VARIANTPLATFORM" value="arm9e"/>

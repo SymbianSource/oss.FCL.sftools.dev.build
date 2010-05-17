@@ -153,6 +153,9 @@ class TestRaptorCli(unittest.TestCase):
 	def AddProject(self, project):
 		return True
 
+	def AddQuery(self, query):
+		return True
+	
 	def PrintVersion(self):
 		return True
 			 			 

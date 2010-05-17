@@ -13,6 +13,9 @@
 		<set name='TALON_TIMEOUT' value='600000'/>
 		<set name='TALON_DESCRAMBLE' value='1'/>
 		
+		<!-- Work around for RVCT compile failures -->
+		<set name='DELETE_ON_FAILED_COMPILE' value='1'/>
+		
 		<!-- Command-line for initialisation -->
 		<set name="initialise" value=""/>
 
@@ -52,7 +55,7 @@
 		<set name="copylogfromannofile" value="false"/>
 	</var>
 	
-	<alias name="make" meaning="make_engine"/>
+	<alias name="make" meaning="make_engine" type="engine"/>
 
 	<!-- use the talon shell -->
 	<var name="make_no_talon_engine" extends="make_engine">
@@ -60,7 +63,7 @@
 	        <set name='USE_TALON' value=''/>
 	</var>
 
-	<alias name="make_no_talon" meaning="make_no_talon_engine"/>
+	<alias name="make_no_talon" meaning="make_no_talon_engine" type="engine"/>
 
 	<!-- other derived versions of GNU make -->
 
@@ -70,12 +73,13 @@
 		<set name="build" value="$(EMAKE) HAVE_ORDERONLY= -r"/>
 		<set name="scrambled" value="false"/>
 		<set name='TALON_DESCRAMBLE' value=''/>
+		<set name='DELETE_ON_FAILED_COMPILE' value=''/>
 
 		<!-- workaround for damaged log output from emake -->
 		<set name="copylogfromannofile" value="true"/>
 	</var>
 
-	<alias name="emake" meaning="emake_engine"/>
+	<alias name="emake" meaning="emake_engine" type="engine"/>
 	
 	<!-- use the talon shell -->
 	<var name="emake_no_talon_engine" extends="emake_engine">
@@ -83,7 +87,7 @@
 	        <set name='USE_TALON' value=''/>
 	</var>
 
-	<alias name="emake_no_talon" meaning="emake_no_talon_engine"/>
+	<alias name="emake_no_talon" meaning="emake_no_talon_engine" type="engine"/>
 	
 	<!-- Raptor make engine for PVMgmake -->
 	<var name="pvmgmake_engine" extends="make_engine">
@@ -91,8 +95,9 @@
 		<set name="build" value="$(PVMGMAKE) HAVE_ORDERONLY=true  -r"/>
 		<set name="scrambled" value="false" />
 		<set name='TALON_DESCRAMBLE' value=''/>
+		<set name='DELETE_ON_FAILED_COMPILE' value=''/>
 	</var>
 
-	<alias name="pvmgmake" meaning="pvmgmake_engine"/>
+	<alias name="pvmgmake" meaning="pvmgmake_engine" type="engine"/>
 
 </build>

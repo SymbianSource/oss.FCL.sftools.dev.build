@@ -1,0 +1,24 @@
+Resources were copied using make rules.  This is sensible in local
+machine builds but non-optimal in cluster builds.  It is entirely IO
+bound so that instead of benefitting from running on the cluster it
+simply creates more IO as files need to be transferred over the network,
+possibly multiple times.
+
+This change introduces the <finalcopy> tag to the log which the frontend
+reads in a new "default" filter called FilterCopyFile.  Thus the python
+frontend does the copying rather than the cluster build engine.
+
+This happens at the end of each invocation of the build engine or "stage".
+Since resources are built in their own stage, the copying is completed
+before build tasks in the other stages require them.  The copied files
+are not needed in the resource stage itself.
+
+The filter uses <progress:end ...> tags to determine when a stage
+is finished and this requires that the timing feature be switched on
+permanently.
+
+The format of the tag is:
+<finalcopy source="sourcefilename">dest_filename1 dest_filename2 ...</finalcopy>
+
+Spaces may not be used in filenames. The sequence "%20" may be used
+instead.

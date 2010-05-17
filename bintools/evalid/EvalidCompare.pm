@@ -27,6 +27,29 @@ use File::Find;
 use File::Path;
 use File::Basename;
 use File::Copy;
+use Config;
+
+# Search for tools with Raptor...
+sub FindTool($)
+{
+  my $tool = shift;
+  my $location = $tool;
+  if ($Config{osname} =~ m/MSWin32/i && $ENV{SBS_HOME} && -e $ENV{SBS_HOME}."/win32/mingw/bin/".$tool.".exe")
+  {
+    $location = $ENV{SBS_HOME}."/win32/mingw/bin/".$tool.".exe"; 
+  }
+  elsif(-e $ENV{EPOCROOT}."epoc32/gcc_mingw/bin/".$tool.".exe")
+  {
+    $location = $ENV{EPOCROOT}."epoc32/gcc_mingw/bin/".$tool.".exe";
+  }
+  elsif(-e $FindBin::Bin."/".$tool.".exe")
+  {
+    $location = $FindBin::Bin."/".$tool.".exe"; 
+  }
+  return $location;
+}
+
+
 
 #
 # Constants.
@@ -71,11 +94,11 @@ my %typeLookup = (
 # they also enabled an order of expandor arguments where the filename is not last
 my %typeHandler = (
       e32 => {reader => 'elf2e32 --dump --e32input=', filter => \&Elf2E32Filter},
-      arm => {reader => 'nm --no-sort', filter => \&NmFilter, retry => 1, relative_paths => 1},
+      arm => {reader => FindTool("nm").' --no-sort', filter => \&NmFilter, retry => 1, relative_paths => 1},
       elf => {reader => 'elfdump -i', filter => \&ElfDumpFilter, rawretry => 1},
-      intel => {reader => '%EPOCROOT%epoc32\gcc_mingw\bin\nm --no-sort', filter => \&NmFilter, rawretry => 1, relative_paths => 1, skipstderr => 1},
+      intel => {reader => FindTool("nm").' --no-sort', filter => \&NmFilter, rawretry => 1, relative_paths => 1, skipstderr => 1},
       intel_pe => {reader => 'pe_dump', filter => \&FilterNone, rawretry => 1},
-	  zip => {reader => '"'.$FindBin::Bin.'/unzip" -l -v', filter => \&UnzipFilter, rawretry => 1},
+	  zip => {reader => FindTool("unzip").' -l -v', filter => \&UnzipFilter, rawretry => 1},
       map => {filter => \&MapFilter, skipblanks => 1},
       sgml => {filter => \&SgmlFilter},
       preprocessed_text => {filter => \&PreprocessedTextFilter},
@@ -231,7 +254,7 @@ sub IdentifyFileType {
     }
   }
 
-  if ($typeBuf =~ /^!<arch>\x0A(.{48}([0-9 ]{10})\x60\x0A(......))/s) {
+  if ($typeBuf =~ /^!<arch>\x0A(.{48}([0-9 ]{9}).\x60\x0A(......))/s) {
     # library - could be MARM or WINS
 
     $typeBuf = $1;
@@ -240,7 +263,7 @@ sub IdentifyFileType {
     open (FILE, $file) or die "Error: Couldn't open \"$file\" for reading: $!\n";
     binmode (FILE);
     
-    while ($typeBuf =~ /^.{48}([0-9 ]{10})\x60\x0A(......)/s) {
+    while ($typeBuf =~ /^.{48}([0-9 ]{9}).\x60\x0A(......)/s) {
       # $1 is the size of the archive member, $2 is first 6 bytes of the file
       # There may be several different sorts of file in the archive, and we
       # need to scan through until we find a type we recognize:

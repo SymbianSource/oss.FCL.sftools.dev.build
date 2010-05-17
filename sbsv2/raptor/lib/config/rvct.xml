@@ -87,8 +87,7 @@
 		<set name="SO_NAME_OPTION" value="--soname"/>
 		<set name="STATIC_LIBS_PATH" value="$(RVCTLIB)/armlib"/>
 		<set name="STDCPP_INCLUDE" value="$(EPOCINCLUDE)/stdapis"/>
-		<set name="STDLIB_OPTION" value="--no_scanlib"/>
-		<set name="SUPPORTS_ABIV1_IMPLIBS" value="1"/>	
+		<set name="STDLIB_OPTION" value="--no_scanlib"/>	
 		<set name="SYMBIAN_LD_MESSAGE_OPTION" value="$(LD_WARNINGS_CONTROL_OPTION) $(LD_ERRORS_CONTROL_OPTION)"/>
 		<set name="SYMVER_OPTION" value="--symver_soname"/>
 		<set name="TARGET_RELOCATION_OPTION" value=""/>
@@ -101,6 +100,7 @@
 		<set name="UNDEFINED_SYMBOL_REF_OPTION" value=""/>
 		<set name="UNIX_SLASH_FOR_CC_ABS_PATHS" value="0"/>
 		<set name="UNRESOLVED_SYMBOL_REF_OPTION" value=""/>
+		<set name="USE_RVCT22_DELETE_WORKAROUND" value=""/>
 		<set name="USERINCLUDE" value=""/>
 		<set name="USER_LIBS_PATH_OPTION" value="--userlibpath"/>
 		<set name="VFE_OPTION" value="--no_vfe"/>

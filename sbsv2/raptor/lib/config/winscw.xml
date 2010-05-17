@@ -127,7 +127,7 @@
 		<set name="PLATMACROS.LINUX" value="$(PLATMACROS.WINDOWS)"/>
 	</var>
 
-	<var name="winscw_udeb" extends="winscw_base">
+	<var name="winscw_debug">
 		<set name="FULLVARIANTPATH" value="winscw/udeb"/>
 		<set name="VARIANTTYPE" value="udeb"/>
 
@@ -135,17 +135,19 @@
 		<append name="CFLAGS" value="-g -O0 -inline off"/>
 		<append name="LFLAGS" value="-g"/>
 	</var>
-
-	<var name="winscw_urel" extends="winscw_base">
+	<alias name="winscw_udeb" meaning="winscw_base.winscw_debug"/>
+	
+	<var name="winscw_release">
 		<set name="FULLVARIANTPATH" value="winscw/urel"/>
 		<set name="VARIANTTYPE" value="urel"/>
 
 		<append name="CDEFS" value="NDEBUG"/>
 		<append name="CFLAGS" value="-O4,s"/>
 	</var>
-
+	<alias name="winscw_urel" meaning="winscw_base.winscw_release"/>
+	
 	<group name="winscw">
-		<varRef ref="winscw_urel"/>
-		<varRef ref="winscw_udeb"/>
+		<aliasRef ref="winscw_urel"/>
+		<aliasRef ref="winscw_udeb"/>
 	</group>
 </build>

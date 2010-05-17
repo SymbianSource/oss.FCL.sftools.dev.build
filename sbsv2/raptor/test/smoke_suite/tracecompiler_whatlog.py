@@ -62,14 +62,6 @@ def run():
 		]		
 	t.run("linux")
 	if t.result == CheckWhatSmokeTest.SKIP:
-		t.targets.extend([
-			'$(EPOCROOT)/epoc32/release/armv5/lib/testTC.lib',
-			'$(EPOCROOT)/epoc32/release/armv5/lib/testTC{000a0000}.lib'
-		])
-		t.stdout.extend([
-			'<build>$(EPOCROOT)/epoc32/release/armv5/lib/testTC.lib</build>',
-			'<build>$(EPOCROOT)/epoc32/release/armv5/lib/testTC{000a0000}.lib</build>'
-		])
 		t.run("windows")
 
 	t.id = "112"
