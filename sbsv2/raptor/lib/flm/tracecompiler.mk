@@ -71,10 +71,25 @@ TRACE_MARKER:=$(TRACE_MARKER_PATH)/tracecompile_$(TRACE_RELEASABLE_ID)_$(UID_TC)
 TRACE_HEADERS:=
 
 TRACE_SOURCE_LIST:=$(TRACE_MARKER_PATH)/tracecompile_$(TRACE_RELEASABLE_ID)_$(UID_TC).sourcelist
+TRACE_VARIANT_SOURCE_LIST:=$(OUTPUTPATH)/$(VARIANTPLATFORM)/$(VARIANTTYPE)/tracecompile_$(TRACE_RELEASABLE_ID)_$(UID_TC).sourcelist
 
-# 1. Append to or create the list of source files for trace compiler to process
-# 2. Check if the hash in trace marker remain unchanged. If not, remove marker so trace compiler will run again. 
-X:=$(shell set -x ; $(GNUMKDIR) -p $(TRACE_MARKER_PATH) ; $(GNUTOUCH) $(TRACE_SOURCE_LIST) ; echo -e "$(subst $(CHAR_SPACE),\\n,$(SOURCE))" | $(GNUSORT) -u $(TRACE_SOURCE_LIST) - > $(TRACE_SOURCE_LIST).tmp && $(GNUMV) $(TRACE_SOURCE_LIST).tmp $(TRACE_SOURCE_LIST) ; $(GNUMD5SUM) -c $(TRACE_MARKER) || $(GNURM) $(TRACE_MARKER))
+# Write the list of sources for this variant to a file
+# Make the combined sourcelist for this target depend on it
+define sourcelist_write
+$(TRACE_SOURCE_LIST): $(TRACE_VARIANT_SOURCE_LIST)
+
+.PHONY:: $(TRACE_VARIANT_SOURCE_LIST)
+
+$(TRACE_VARIANT_SOURCE_LIST): $(SOURCE) 
+	$(call startrule,sourcelist_write) \
+	echo -en '$$(subst $$(CHAR_SPACE),\n,$$(strip $$^))\n' > $$@  \ 
+	$(call endrule,sourcelist_write) 
+
+endef
+
+$(eval $(sourcelist_write))
+$(eval $(call GenerateStandardCleanTarget,$(TRACE_VARIANT_SOURCE_LIST),,))
+
 
 $(if $(FLMDEBUG),$(info <debug>Trace Compiler sourcelist generation output: $(X)</debug>))
 
@@ -116,14 +131,33 @@ TRACE_VER:=$(findstring new,$(foreach version,2 3 4 5 6 7 8 9,$(patsubst $(versi
 endif
 $(if $(FLMDEBUG),$(info <debug>TRACE_VSTR=$(TRACE_VSTR) TRACE_VER=$(TRACE_VER)</debug>))
 
+
+# 0. Generate a combined sourcelist from all variants. 
+# 0.1 Write the combined list to a temporary file
+# 0.2 Check if there are new files since the last build
+#      md5 stored in the trace marker.
+# 0.3 Rewrite the combined sourcelist if new sourcefiles have appeared
+#      since the last build
+# 1. Use pipe to send inputs to trace compiler to process
+# 2. Create a hash regarding to source names and put it in marker.
+# 3. Show source names that are processed by trace compiler
+
 ifeq ($(TRACE_VER),new)
 define trace_compile
-$(TRACE_MARKER) : $(PROJECT_META)
+
+$(TRACE_SOURCE_LIST):
+	$(call startrule,sourcelist_combine) \
+	$(GNUCAT) $$^ | $(GNUSORT) -u > $$@.new && \
+	$(GNUMD5SUM) -c $(TRACE_MARKER) 2>/dev/null ||  \
+	  $(GNUCP) $$@.new $$@ \
+	$(call endrule,sourcelist_combine)
+
+$(TRACE_MARKER) : $(PROJECT_META) $(TRACE_SOURCE_LIST)
 	$(call startrule,tracecompile) \
 	( $(GNUCAT) $(TRACE_SOURCE_LIST); \
 	  echo -en "*ENDOFSOURCEFILES*\n" ) | \
 	$(JAVA_COMMAND) $(TRACE_COMPILER_START) $(if $(FLMDEBUG),-d,) --uid=$(UID_TC) --project=$(TRACE_PRJNAME) --mmp=$(PROJECT_META) --traces=$(TRACE_PATH) &&  \
-	$(GNUMD5SUM) $(TRACE_SOURCE_LIST) > $(TRACE_MARKER) && \
+	$(GNUMD5SUM) $(TRACE_SOURCE_LIST).new > $(TRACE_MARKER) 2>/dev/null && \
 	{ $(GNUTOUCH) $(TRACE_DICTIONARY) $(AUTOGEN_HEADER); \
 	 $(GNUCAT) $(TRACE_SOURCE_LIST) ; true ; } \
 	$(call endrule,tracecompile)
@@ -131,17 +165,23 @@ endef
 
 else # Old inteface
 TRACE_COMPILER_START:=-classpath $(TRACE_COMPILER_PATH)/tracecompiler com.nokia.tracecompiler.TraceCompiler
-# 1. Use pipe to send inputs to trace compiler to process
-# 2. Create a hash regarding to source names and put it in marker.
-# 3. Show source names that are processed by trace compiler
+
 define trace_compile
-$(TRACE_MARKER) : $(PROJECT_META)
+
+$(TRACE_SOURCE_LIST):
+	$(call startrule,sourcelist_combine) \
+	$(GNUCAT) $$^ | $(GNUSORT) -u > $$@.new && \
+	$(GNUMD5SUM) -c $(TRACE_MARKER) ||  \
+	  $(GNUCP) $$@.new $$@ \
+	$(call endrule,sourcelist_combine)
+
+$(TRACE_MARKER) : $(PROJECT_META) $(TRACE_SOURCE_LIST)
 	$(call startrule,tracecompile) \
 	( echo -en "$(OLDTC_TRACE_PRJNAME)\n$(PROJECT_META)\n"; \
 	  $(GNUCAT) $(TRACE_SOURCE_LIST); \
 	  echo -en "*ENDOFSOURCEFILES*\n" ) | \
 	$(JAVA_COMMAND) $(TRACE_COMPILER_START) $(UID_TC) &&  \
-	$(GNUMD5SUM) $(TRACE_SOURCE_LIST) > $(TRACE_MARKER) && \
+	$(GNUMD5SUM) $(TRACE_SOURCE_LIST).new > $(TRACE_MARKER) && \
 	{ $(GNUTOUCH) $(TRACE_DICTIONARY) $(AUTOGEN_HEADER); \
 	 $(GNUCAT) $(TRACE_SOURCE_LIST) ; true ; } \
 	$(call endrule,tracecompile)
