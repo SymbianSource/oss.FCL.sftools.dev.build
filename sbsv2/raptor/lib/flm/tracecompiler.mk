@@ -148,7 +148,7 @@ define trace_compile
 $(TRACE_SOURCE_LIST):
 	$(call startrule,sourcelist_combine) \
 	$(GNUCAT) $$^ | $(GNUSORT) -u > $$@.new && \
-	$(GNUMD5SUM) -c $(TRACE_MARKER) ||  \
+	$(GNUMD5SUM) -c $(TRACE_MARKER) 2>/dev/null ||  \
 	  $(GNUCP) $$@.new $$@ \
 	$(call endrule,sourcelist_combine)
 
@@ -157,7 +157,7 @@ $(TRACE_MARKER) : $(PROJECT_META) $(TRACE_SOURCE_LIST)
 	( $(GNUCAT) $(TRACE_SOURCE_LIST); \
 	  echo -en "*ENDOFSOURCEFILES*\n" ) | \
 	$(JAVA_COMMAND) $(TRACE_COMPILER_START) $(if $(FLMDEBUG),-d,) --uid=$(UID_TC) --project=$(TRACE_PRJNAME) --mmp=$(PROJECT_META) --traces=$(TRACE_PATH) &&  \
-	$(GNUMD5SUM) $(TRACE_SOURCE_LIST).new > $(TRACE_MARKER) && \
+	$(GNUMD5SUM) $(TRACE_SOURCE_LIST).new > $(TRACE_MARKER) 2>/dev/null && \
 	{ $(GNUTOUCH) $(TRACE_DICTIONARY) $(AUTOGEN_HEADER); \
 	 $(GNUCAT) $(TRACE_SOURCE_LIST) ; true ; } \
 	$(call endrule,tracecompile)
