@@ -162,7 +162,7 @@ define trace_compile
 
 $(TRACE_SOURCE_LIST):
 	$(call startrule,sourcelist_combine) \
-	$(GNUCAT) $$^ | $(GNUSORT) -u > $$@.new && \
+	$(GNUCAT) $(TRACE_SOURCE_LIST) $$^ 2>/dev/null | $(GNUSORT) -u > $$@.new && \
 	$(GNUMD5SUM) -c $(TRACE_MARKER) 2>/dev/null ||  \
 	  $(GNUCP) $$@.new $$@ \
 	$(call endrule,sourcelist_combine)
@@ -185,7 +185,7 @@ define trace_compile
 
 $(TRACE_SOURCE_LIST):
 	$(call startrule,sourcelist_combine) \
-	$(GNUCAT) $$^ | $(GNUSORT) -u > $$@.new && \
+	$(GNUCAT) $(TRACE_SOURCE_LIST) $$^ 2>/dev/null | $(GNUSORT) -u > $$@.new && \
 	$(GNUMD5SUM) -c $(TRACE_MARKER) 2>/dev/null ||  \
 	  $(GNUCP) $$@.new $$@ \
 	$(call endrule,sourcelist_combine)
