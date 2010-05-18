@@ -79,7 +79,7 @@ TRACE_VARIANT_SOURCE_LIST:=$(OUTPUTPATH)/$(VARIANTPLATFORM)/$(VARIANTTYPE)/trace
 # $2 = ">" or ">>" i.e. for creating the file.
 define sourcelist_grouped_write
 	$(call startrule,sourcelist_write) \
-	$(if $1,echo -en '$(subst $(CHAR_SPACE),\n,$(strip $(wordlist 1,10,$1)))\n' $2 $$@,true;echo $1) \
+	$(if $1,echo -en '$(subst $(CHAR_SPACE),\n,$(strip $(wordlist 1,10,$1)))\n' $2 $$@,true) \
 	$(call endrule,sourcelist_write) 
 	$(if $1,$(call sourcelist_grouped_write,$(wordlist 11,$(words $1),$1),>>),)
 endef
@@ -186,7 +186,7 @@ define trace_compile
 $(TRACE_SOURCE_LIST):
 	$(call startrule,sourcelist_combine) \
 	$(GNUCAT) $$^ | $(GNUSORT) -u > $$@.new && \
-	$(GNUMD5SUM) -c $(TRACE_MARKER) ||  \
+	$(GNUMD5SUM) -c $(TRACE_MARKER) 2>/dev/null ||  \
 	  $(GNUCP) $$@.new $$@ \
 	$(call endrule,sourcelist_combine)
 
@@ -196,7 +196,7 @@ $(TRACE_MARKER) : $(PROJECT_META) $(TRACE_SOURCE_LIST)
 	  $(GNUCAT) $(TRACE_SOURCE_LIST); \
 	  echo -en "*ENDOFSOURCEFILES*\n" ) | \
 	$(JAVA_COMMAND) $(TRACE_COMPILER_START) $(UID_TC) &&  \
-	$(GNUMD5SUM) $(TRACE_SOURCE_LIST).new > $$@ && \
+	$(GNUMD5SUM) $(TRACE_SOURCE_LIST).new > $$@ 2>/dev/null && \
 	{ $(GNUTOUCH) $(TRACE_DICTIONARY) $(AUTOGEN_HEADER); \
 	 $(GNUCAT) $(TRACE_SOURCE_LIST) ; true ; } \
 	$(call endrule,tracecompile)
