@@ -1102,7 +1102,7 @@ ifneq ($(filter ROMFILE,$(call uppercase,$(MAKECMDGOALS))),)
         # Default values
         ROMFILETYPE:=file
         ROMFILE:=$(TARGET).$(REQUESTEDTARGETEXT)
-        ROMPATH:=sys/bin/
+        ROMPATH:=$(if $(TARGETPATH),$(TARGETPATH)/,/sys/bin/)
         ROMDECORATIONS:=
         ROMFILETYPE_RAM:=data
         ROMFILE_RAM:=$(TARGET).$(REQUESTEDTARGETEXT)
