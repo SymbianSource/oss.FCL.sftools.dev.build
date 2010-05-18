@@ -73,17 +73,32 @@ TRACE_HEADERS:=
 TRACE_SOURCE_LIST:=$(TRACE_MARKER_PATH)/tracecompile_$(TRACE_RELEASABLE_ID)_$(UID_TC).sourcelist
 TRACE_VARIANT_SOURCE_LIST:=$(OUTPUTPATH)/$(VARIANTPLATFORM)/$(VARIANTTYPE)/tracecompile_$(TRACE_RELEASABLE_ID)_$(UID_TC).sourcelist
 
+# The sourcelist_grouped_write macro allows us to construct a source list file, 10 objects at a time
+# to avoid limits on argument lengths and sizes on Windows.
+# $1 = list of source files
+# $2 = ">" or ">>" i.e. for creating the file.
+define sourcelist_grouped_write
+	$(call startrule,sourcelist_write) \
+	$(if $1,echo -en '$(subst $(CHAR_SPACE),\n,$(strip $(wordlist 1,10,$1)))\n' $2 $$@,true;echo $1) \
+	$(call endrule,sourcelist_write) 
+	$(if $1,$(call sourcelist_grouped_write,$(wordlist 11,$(words $1),$1),>>),)
+endef
+
 # Write the list of sources for this variant to a file
 # Make the combined sourcelist for this target depend on it
+# It's all to do with how make treats this file when it 
+# does exist. We are forcing it evaluate the target rule here 
+# even if the file is in place by making it PHONY. In other 
+# words, this is forcing the variant source list to always 
+# be written but later on we might not write to the combined 
+# source list if it isn't going to change.
 define sourcelist_write
 $(TRACE_SOURCE_LIST): $(TRACE_VARIANT_SOURCE_LIST)
 
 .PHONY:: $(TRACE_VARIANT_SOURCE_LIST)
 
 $(TRACE_VARIANT_SOURCE_LIST): $(SOURCE) 
-	$(call startrule,sourcelist_write) \
-	echo -en '$$(subst $$(CHAR_SPACE),\n,$$(strip $$^))\n' > $$@  \ 
-	$(call endrule,sourcelist_write) 
+	$(call sourcelist_grouped_write,$(SOURCE),>)
 
 endef
 
@@ -91,7 +106,7 @@ $(eval $(sourcelist_write))
 $(eval $(call GenerateStandardCleanTarget,$(TRACE_VARIANT_SOURCE_LIST),,))
 
 
-$(if $(FLMDEBUG),$(info <debug>Trace Compiler sourcelist generation output: $(X)</debug>))
+$(if $(FLMDEBUG),$(info <debug>Trace Compiler SOURCES: $(SOURCE)</debug>))
 
 $(TRACE_MARKER) : $(SOURCE)
 
@@ -157,7 +172,7 @@ $(TRACE_MARKER) : $(PROJECT_META) $(TRACE_SOURCE_LIST)
 	( $(GNUCAT) $(TRACE_SOURCE_LIST); \
 	  echo -en "*ENDOFSOURCEFILES*\n" ) | \
 	$(JAVA_COMMAND) $(TRACE_COMPILER_START) $(if $(FLMDEBUG),-d,) --uid=$(UID_TC) --project=$(TRACE_PRJNAME) --mmp=$(PROJECT_META) --traces=$(TRACE_PATH) &&  \
-	$(GNUMD5SUM) $(TRACE_SOURCE_LIST).new > $(TRACE_MARKER) 2>/dev/null && \
+	$(GNUMD5SUM) $(TRACE_SOURCE_LIST).new > $$@ 2>/dev/null && \
 	{ $(GNUTOUCH) $(TRACE_DICTIONARY) $(AUTOGEN_HEADER); \
 	 $(GNUCAT) $(TRACE_SOURCE_LIST) ; true ; } \
 	$(call endrule,tracecompile)
@@ -181,7 +196,7 @@ $(TRACE_MARKER) : $(PROJECT_META) $(TRACE_SOURCE_LIST)
 	  $(GNUCAT) $(TRACE_SOURCE_LIST); \
 	  echo -en "*ENDOFSOURCEFILES*\n" ) | \
 	$(JAVA_COMMAND) $(TRACE_COMPILER_START) $(UID_TC) &&  \
-	$(GNUMD5SUM) $(TRACE_SOURCE_LIST).new > $(TRACE_MARKER) && \
+	$(GNUMD5SUM) $(TRACE_SOURCE_LIST).new > $$@ && \
 	{ $(GNUTOUCH) $(TRACE_DICTIONARY) $(AUTOGEN_HEADER); \
 	 $(GNUCAT) $(TRACE_SOURCE_LIST) ; true ; } \
 	$(call endrule,tracecompile)
