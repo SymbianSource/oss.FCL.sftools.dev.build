@@ -13,6 +13,7 @@
 <li>Fix : tracecompiler.mk caused poor makefile parse performance due to use of $(shell)</li>
 <li><a href="http://developer.symbian.org/bugs/show_bug.cgi?id=2561"> SF Bug 2561 </a> - [Raptor] creates incorrect .iby files w.r.t target file versions &amp; ramtargets</li>
 <li><a href="http://developer.symbian.org/bugs/show_bug.cgi?id=2562"> SF Bug 2562 </a> - [Raptor] adds incorrect entries into .iby files w.r.t file paths</li>
+<li>Fix : since 2.14.0 intermediate rsc files are not named uniquely enough to guarantee that there won't be a clash</li>
 </ul>
 
 <h2>version 2.14.0</h2>
@@ -40,7 +41,6 @@
 <li><a href="notes/localresourcecopying.txt">Fix: (performance in cluster builds) do resource copying on local host.</a></li>
 <li>Fix: don't generate multiple copies of the same resource just because there are several target paths. Generate it once and copy that to the different target paths. Helps when winscw is built after an arm build.</li>
 <li>Fix: (performance) remove unnecessary copying of rpp files into epoc32\localisation as they are not used.</li>
-<li>Fix: (performance) remove -C option when preprocessing rpp files - causes comments to be stripped from the rpp resulting in smaller files that improves performance.</li>
 
 </ul>
 

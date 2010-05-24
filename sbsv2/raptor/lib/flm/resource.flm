@@ -94,14 +94,13 @@ CREATABLEPATHS:=$(CREATABLEPATHS) $(RSCCOPYDIRS)
 
 
 define preprocessresource
-# $(1) is the RPPFILE		(eg. /epoc32/build/xxx/b_sc.rpp)
-# $(2) is the related RESOURCEFILE if any (eg. /a/b.rsc)
-# $(3) is the LANGUAGE		(eg. sc or 01 or 02 ...)
-# $(4) is the "primary" language on which all the others depend
+# $1 is the RPPFILE		(eg. /epoc32/build/xxx/b_sc.rpp)
+# $2 is the LANGUAGE		(eg. sc or 01 or 02 ...)
+# $3 is the "primary" language on which all the others depend
 
   ifeq ($(TARGET_$(call sanitise,$1)),)
     TARGET_$(call sanitise,$1):=1
-    $(if $(FLMDEBUG),$$(info <debug>preprocessresource: $(1) for $(2) LANG:$(3) dep $(4)</debug>))
+    $(if $(FLMDEBUG),$$(info <debug>preprocessresource: $1 LANG:$2 dep $3</debug>))
 
 
     # Correct dependency information when a header file can't be found.
@@ -126,12 +125,12 @@ else
 endif
 
 
-    ifeq "$1" "$4"
+    ifeq "$1" "$3"
         RESOURCE_DEPS:: $1.d
 
         $1.d: $(SOURCE)
 	  $(call startrule,resourcedependencies,FORCESUCCESS) \
-	  $(GNUCPP) -DLANGUAGE_$(3) -DLANGUAGE_$(subst sc,SC,$3) $(call makemacrodef,-D,$(MMPDEFS))\
+	  $(GNUCPP) -DLANGUAGE_$2 -DLANGUAGE_$(subst sc,SC,$2) $(call makemacrodef,-D,$(MMPDEFS))\
 	  $(CPPOPT) $(SOURCE) -M -MG -MT"$1" | \
 	  $$(DEPENDENCY_CORRECTOR) >$$@ \
 	  $(call endrule,resourcedependencies)
@@ -139,12 +138,12 @@ endif
          $1 : $1.d
 
     else
-         $1 : $4
+         $1 : $3
     endif
 
     $1:
 	  $(call startrule,resourcepreprocess,FORCESUCCESS) \
-	  $(GNUCPP) -C -DLANGUAGE_$3 -DLANGUAGE_$(subst sc,SC,$(3)) $(call makemacrodef,-D,$(MMPDEFS))\
+	  $(GNUCPP) -C -DLANGUAGE_$2 -DLANGUAGE_$(subst sc,SC,$2) $(call makemacrodef,-D,$(MMPDEFS))\
 	  $(CPPOPT) $(SOURCE) -o $$@ \
 	  $(call endrule,resourcepreprocess)
     endif
@@ -152,7 +151,7 @@ endif
     CLEANTARGETS:= $$(CLEANTARGETS) $1
 
     ifeq "$(MAKEFILE_GROUP)" "RESOURCE"
-    ifeq "$1" "$4"
+    ifeq "$1" "$3"
       $(eval DEPENDFILENAME:=$1.d)
       $(eval DEPENDFILE:=$(wildcard $(DEPENDFILENAME)))
       
@@ -183,9 +182,10 @@ endef # copyresource #
 ###############################################################################
 define generateresource
 
-# $(1) is the resource filename e.g. /a/b/resource.rsc
+# $(1) is the intermediate resource filename with path e.g. /a/b/resource.rsc
 # $(2) is the preprocessed resource to make it from
 # $(3) is the language e.g. sc or 01 or 02
+# $(4) is the resource filename without path
 
 
         ifeq ($(TARGET_$(call sanitise,$1)),)
@@ -211,7 +211,7 @@ define generateresource
 #       targets for the sake of dependencies or, for example, if someone merely adds a new copy 
 #       when the resource is up-to-date
 
-        $(call copyresource,$1,$(sort $(patsubst %,%/$(notdir $1),$(RSCCOPYDIRS))))
+        $(call copyresource,$1,$(sort $(patsubst %,%/$4,$(RSCCOPYDIRS))))
 
 
         # individual source file compilation
@@ -265,10 +265,10 @@ PRIMARYRPPFILE:=$(INTERBASE_TMP)_$(HEADLANG).rpp
 ifeq ($(HEADERONLY),)
         # generate a resource file for each language
         # For sc we generate $(RESBASE).rsc and define LANGUAGE_SC and LANGUAGE_sc.
-        $(foreach L,$(LANGUAGES:SC=sc),$(eval $(call preprocessresource,$(INTERBASE_TMP)_$(L).rpp,$(INTERBASE).r$(L),$(L),$(PRIMARYRPPFILE))))
+        $(foreach L,$(LANGUAGES:SC=sc),$(eval $(call preprocessresource,$(INTERBASE_TMP)_$(L).rpp,$(L),$(PRIMARYRPPFILE))))
 
         ifeq "$(MAKEFILE_GROUP)" "RESOURCE"
-            $(foreach L,$(LANGUAGES:SC=sc),$(eval $(call generateresource,$(INTERBASE).r$(L),$(INTERBASE_TMP)_$(L).rpp,$(L))))
+            $(foreach L,$(LANGUAGES:SC=sc),$(eval $(call generateresource,$(INTERBASE_TMP).r$(L),$(INTERBASE_TMP)_$(L).rpp,$(L),$(notdir $(INTERBASE)).r$(L))))
         endif
 else
         # No resources are going to be made so unless we specifically ask for it, there will be no
