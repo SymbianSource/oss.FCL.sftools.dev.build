@@ -769,8 +769,8 @@ class ExtensionmakefileEntry(object):
 			biloc="." # Someone building with a relative raptor path
 
 		self.__StandardVariables = {}
-		# Relative step-down to the root. Amount to env variable SRCROOT 
-		# in case SBS_BUILD_DIR is on a different drive 		
+		# The source root directory is SRCROOT if set in the environment
+		# Set TO_ROOT to SRCROOT in case SBS_BUILD_DIR is on a different drive
 		if 'SRCROOT' in os.environ:
 			self.__StandardVariables['TO_ROOT'] = str(generic_path.Path(os.environ['SRCROOT']))
 		else:
@@ -843,8 +843,8 @@ class Extension(object):
 			eiloc="." # Someone building with a relative raptor path
 
 		self.__StandardVariables = {}
-		# Relative step-down to the root. Amount to env variable SRCROOT 
-		# in case SBS_BUILD_DIR is on a different drive 		
+		# The source root directory is SRCROOT if set in the environment	
+		# Set TO_ROOT to SRCROOT in case SBS_BUILD_DIR is on a different drive
 		if 'SRCROOT' in os.environ:
 			self.__StandardVariables['TO_ROOT'] = str(generic_path.Path(os.environ['SRCROOT']))
 		else:
