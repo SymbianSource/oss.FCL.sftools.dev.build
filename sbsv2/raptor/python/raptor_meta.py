@@ -35,6 +35,7 @@ from xml.sax.saxutils import escape
 from mmpparser import *
 
 import time
+import generic_path
 
 
 PiggyBackedBuildPlatforms = {'ARMV5':['GCCXML']}
@@ -768,9 +769,13 @@ class ExtensionmakefileEntry(object):
 			biloc="." # Someone building with a relative raptor path
 
 		self.__StandardVariables = {}
-		# Relative step-down to the root - let's try ignoring this for now, as it
-		# should amount to the same thing in a world where absolute paths are king
-		self.__StandardVariables['TO_ROOT'] = ""
+		# Relative step-down to the root. Amount to env variable SRCROOT 
+		# in case SBS_BUILD_DIR is on a different drive 		
+		if 'SRCROOT' in os.environ:
+			self.__StandardVariables['TO_ROOT'] = str(generic_path.Path(os.environ['SRCROOT']))
+		else:
+			self.__StandardVariables['TO_ROOT'] = ""
+		
 		# Top-level bld.inf location
 		self.__StandardVariables['TO_BLDINF'] = biloc
 		self.__StandardVariables['EXTENSION_ROOT'] = eiloc
@@ -838,9 +843,12 @@ class Extension(object):
 			eiloc="." # Someone building with a relative raptor path
 
 		self.__StandardVariables = {}
-		# Relative step-down to the root - let's try ignoring this for now, as it
-		# should amount to the same thing in a world where absolute paths are king
-		self.__StandardVariables['TO_ROOT'] = ""
+		# Relative step-down to the root. Amount to env variable SRCROOT 
+		# in case SBS_BUILD_DIR is on a different drive 		
+		if 'SRCROOT' in os.environ:
+			self.__StandardVariables['TO_ROOT'] = str(generic_path.Path(os.environ['SRCROOT']))
+		else:
+			self.__StandardVariables['TO_ROOT'] = ""
 		# Top-level bld.inf location
 		self.__StandardVariables['TO_BLDINF'] = biloc
 		# Location of bld.inf file containing the current EXTENSION block
@@ -3081,7 +3089,6 @@ class MetaReader(object):
 				self.__Raptor.Debug("Set %s=%s", option, options[option])
 				value = options[option].replace('$(EPOCROOT)', '$(EPOCROOT)/')
 				value = value.replace('$(', '$$$$(')
-				value = value.replace('$/', '/').replace('$;', ':')
 				value = value.replace('$/', '/').replace('$;', ':')
 
 				if customInterface:
