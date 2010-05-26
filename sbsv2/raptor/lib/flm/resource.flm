@@ -65,7 +65,6 @@ endif
 
 # we create intermediate .rpp and .d files
 INTERBASE_TMP:=$(OUTPUTPATH)/$(TARGET_lower)_$(notdir $(basename $(SOURCE)))
-INTERBASE:=$(OUTPUTPATH)/$(TARGET_lower)
 
 
 # common pre-processor options
@@ -268,7 +267,7 @@ ifeq ($(HEADERONLY),)
         $(foreach L,$(LANGUAGES:SC=sc),$(eval $(call preprocessresource,$(INTERBASE_TMP)_$(L).rpp,$(L),$(PRIMARYRPPFILE))))
 
         ifeq "$(MAKEFILE_GROUP)" "RESOURCE"
-            $(foreach L,$(LANGUAGES:SC=sc),$(eval $(call generateresource,$(INTERBASE_TMP).r$(L),$(INTERBASE_TMP)_$(L).rpp,$(L),$(notdir $(INTERBASE)).r$(L))))
+            $(foreach L,$(LANGUAGES:SC=sc),$(eval $(call generateresource,$(INTERBASE_TMP).r$(L),$(INTERBASE_TMP)_$(L).rpp,$(L),$(TARGET_lower).r$(L))))
         endif
 else
         # No resources are going to be made so unless we specifically ask for it, there will be no
