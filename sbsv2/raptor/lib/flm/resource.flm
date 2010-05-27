@@ -184,7 +184,7 @@ define generateresource
 # $(1) is the intermediate resource filename with path e.g. /a/b/resource.rsc
 # $(2) is the preprocessed resource to make it from
 # $(3) is the language e.g. sc or 01 or 02
-# $(4) is the resource filename without path
+# $(4) is the target resource filename without path
 
 
         ifeq ($(TARGET_$(call sanitise,$1)),)
