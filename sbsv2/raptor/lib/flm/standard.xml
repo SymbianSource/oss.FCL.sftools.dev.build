@@ -40,6 +40,7 @@
 		<param name='SOURCE' default=''/>
 		<param name='TARGET'/>
 		<param name='TARGET_lower'/>
+		<param name='TARGETPATH' default=''/>
 		<param name='LTCG' default=''/>
 		<param name='LTCG_OPTION' default='--ltcg'/>
 		<param name='TARGETTYPE'/>

@@ -62,22 +62,35 @@ def run():
 	buildLocation = ReplaceEnvs("$(EPOCROOT)/epoc32/build/") + BldInfFile.outputPathFragment('smoke_suite/test_resources/resource/group/bld.inf')
 	res_depfile= buildLocation+"/dependentresource_/dependentresource_dependentresource_sc.rpp.d"
 
+
 	t.targets = [
-		"$(EPOCROOT)/epoc32/include/testresource.rsg",
-		"$(EPOCROOT)/epoc32/include/testresource.hrh",
+		"$(EPOCROOT)/epoc32/data/z/resource/anotherresource/testresource.r01",
+		"$(EPOCROOT)/epoc32/data/z/resource/anotherresource/testresource.rsc",
+		"$(EPOCROOT)/epoc32/data/z/resource/dependentresource/dependentresource.rsc",
 		"$(EPOCROOT)/epoc32/data/z/resource/testresource/testresource.r01",
 		"$(EPOCROOT)/epoc32/data/z/resource/testresource/testresource.rsc",
+		"$(EPOCROOT)/epoc32/include/testresource.hrh",
+		"$(EPOCROOT)/epoc32/include/testresource.rsg",
 		"$(EPOCROOT)/epoc32/release/armv5/urel/testresource.exe",
+		"$(EPOCROOT)/epoc32/release/winscw/udeb/z/resource/anotherresource/testresource.r01",
+		"$(EPOCROOT)/epoc32/release/winscw/udeb/z/resource/anotherresource/testresource.rsc",
+		"$(EPOCROOT)/epoc32/release/winscw/udeb/z/resource/dependentresource/dependentresource.rsc",
+		"$(EPOCROOT)/epoc32/release/winscw/urel/z/resource/anotherresource/testresource.r01",
+		"$(EPOCROOT)/epoc32/release/winscw/urel/z/resource/anotherresource/testresource.rsc",
+		"$(EPOCROOT)/epoc32/release/winscw/urel/z/resource/dependentresource/dependentresource.rsc",
 		res_depfile
 		]
 
-	t.addbuildtargets('smoke_suite/test_resources/resource/group/bld.inf', [	
-		"testresource_/testresource_testresource_02.rpp",
+	t.addbuildtargets('smoke_suite/test_resources/resource/group/bld.inf', [
+		"dependentresource_/dependentresource_dependentresource.rsc",
+		"testresource_/testresource_dependentresource.r01",
+		"testresource_/testresource_dependentresource.rsc",
 		"testresource_/testresource_testresource_01.rpp",
 		"testresource_/testresource_testresource_01.rpp.d",
+		"testresource_/testresource_testresource_02.rpp",
 		"testresource_/testresource_testresource_sc.rpp"])
 
-	t.command = "sbs -b smoke_suite/test_resources/resource/group/bld.inf  -c armv5_urel reallyclean ; sbs --no-depend-generate -j 16 -b smoke_suite/test_resources/resource/group/bld.inf -c armv5_urel -f ${SBSLOGFILE} -m ${SBSMAKEFILE} && grep 'epoc32.include.testresource.rsg' %s && wc -l %s " % (res_depfile, res_depfile)
+	t.command = "sbs -b smoke_suite/test_resources/resource/group/bld.inf  -c armv5_urel -c winscw_urel reallyclean ; sbs --no-depend-generate -j 16 -b smoke_suite/test_resources/resource/group/bld.inf -c armv5_urel -c  winscw_urel -f ${SBSLOGFILE} -m ${SBSMAKEFILE} && grep 'epoc32.include.testresource.rsg' %s && { X=`md5sum $(EPOCROOT)/epoc32/release/winscw/urel/z/resource/anotherresource/testresource.rsc` && Y=`md5sum $(EPOCROOT)/epoc32/data/z/resource/testresource/testresource.rsc` && [ \"${X%% *}\" != \"${Y%% *}\" ] ; }  && wc -l %s " % (res_depfile, res_depfile)
 
 	t.mustnotmatch = []
 

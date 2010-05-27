@@ -58,10 +58,18 @@ TARGETPATH              resource/dependentresource
 LANG sc
 END
 
+// Looks like testresource but comes from another resource file
+START RESOURCE          dependentresource.rss
+TARGET 			testresource.rsc
+TARGETPATH              resource/anotherresource
+LANG SC 01
+END
+
 START BITMAP	testresource.mbm
 HEADER
-
 TARGETPATH		resource/apps
 SOURCEPATH		../aifsrccl
 SOURCE			c8,1 DEF24.BMP DEF2M.BMP
 END
+
+
