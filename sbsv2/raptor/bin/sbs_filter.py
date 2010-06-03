@@ -46,7 +46,7 @@ if not "HOSTPLATFORM_DIR" in os.environ:
 	sys.exit(1)
 
 # construct a Raptor object from our command-line (less the name of this script)
-the_raptor = raptor.Raptor.CreateCommandlineBuild(sys.argv[1:])
+the_raptor = raptor.Raptor.CreateCommandlineAnalysis(sys.argv[1:])
 
 # from Raptor.OpenLog()
 try:

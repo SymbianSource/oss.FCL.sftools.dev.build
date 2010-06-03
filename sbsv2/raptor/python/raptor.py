@@ -799,8 +799,10 @@ class Raptor(object):
 		self.args = args
 
 		# assuming self.CLI = "raptor_cli"
-		more_to_do = raptor_cli.GetArgs(self, args)
+		if not raptor_cli.GetArgs(self, args):
+			self.skipAll = True		# nothing else to do
 
+	def ParseCommandLineTargets(self):
 		# resolve inter-argument dependencies.
 		# --what or --check implies the WHAT target and FilterWhat Filter
 		if self.doWhat or self.doCheck:
@@ -840,8 +842,6 @@ class Raptor(object):
 				"""
 				self.filterList += ",filtercopyfile"
 
-		if not more_to_do:
-			self.skipAll = True		# nothing else to do
 
 	def ProcessConfig(self):
 		# this function will perform additional processing of config
@@ -1353,9 +1353,21 @@ class Raptor(object):
 		build.ConfigFile()
 		build.ProcessConfig()
 		build.CommandLine(argv)
+		build.ParseCommandLineTargets()
 
 		return build
+	
+	@classmethod
+	def CreateCommandlineAnalysis(cls, argv):
+		""" Perform an analysis run where a build is not performed. """
+		build = Raptor()
+		build.AssertBuildOK()
+		build.ConfigFile()
+		build.ProcessConfig()
+		build.CommandLine(argv)
+		# Don't parse command line targets - they don't make any sense if you're not doing a build
 
+		return build
 
 
 # Class for passing constricted parameters to filters
