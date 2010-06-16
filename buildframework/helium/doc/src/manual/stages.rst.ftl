@@ -108,3 +108,11 @@ After running this command generated file can be found from <temp.build.dir>/<bu
 .. include:: stage_ats.rst.inc
 
 .. include:: stage_matti.rst.inc
+
+Check EPL License header.
+=================================
+
+The target ``check-sf-source-header`` could be used to run to validate the source files for EPL license header.
+
+* Include the target ``check-sf-source-header`` in the target sequence.
+* This will validate source files present on the build area to contain EPL license. 

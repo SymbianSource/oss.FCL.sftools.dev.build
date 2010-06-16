@@ -20,12 +20,14 @@
 """ Test cases for ccm python toolkit.
 
 """
+# pylint: disable-msg=R0201
+
 import unittest
 import ccm
 import logging
 
 
-logger = logging.getLogger('test.ccm')
+_logger = logging.getLogger('test.ccm')
 
 
 class FourPartNameTest(unittest.TestCase):
@@ -95,7 +97,7 @@ class FourPartNameTest(unittest.TestCase):
         assert not fpn1.is_same_family(fpn2), "Should not be from the same family"
 
     def testConvert(self):
-        # Test task displayname tranformation
+        """ Test task displayname tranformation"""
         fpn = ccm.FourPartName("Task mydb#123")
         assert fpn.type == "task"
         # Test folder displayname tranformation
@@ -123,13 +125,13 @@ class FourPartNameTest(unittest.TestCase):
         try:
             fpn = ccm.FourPartName("task mydb#123")
             assert False, "Should raise InvalidFourPartNameException when parsing'task mydb#123'"
-        except ccm.InvalidFourPartNameException, e:
+        except ccm.InvalidFourPartNameException:
             pass
 
         try:
             fpn = ccm.FourPartName("folder mydb#123")
             assert False, "Should raise InvalidFourPartNameException when parsing'folder mydb#123'"
-        except ccm.InvalidFourPartNameException, e:
+        except ccm.InvalidFourPartNameException:
             pass
             
             

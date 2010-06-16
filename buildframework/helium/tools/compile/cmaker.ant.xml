@@ -100,14 +100,15 @@ Description:
     
     <!--  Installing CMaker. -->    
     <target name="cmaker-install">
-        <hlm:recordStartMacro name="${build.id}_install.cmaker.log" emacsmode="true"/>
+        <mkdir dir="${compile.log.dir}" />
+        <record name="${compile.log.dir}/${build.id}_install.cmaker.log" emacsmode="true" action="start" />
         <exec executable="${cmaker.component.dir}/bin/mingw_make.exe" osfamily="windows" dir="${cmaker.component.dir}" failonerror="true">
             <arg line="install"/>
         </exec>
         <exec executable="make" osfamily="unix" dir="${cmaker.component.dir}" failonerror="true">
             <arg line="install"/>
         </exec>
-        <hlm:recordStopMacro name="${build.id}_install.cmaker.log"/>
+        <record name="${compile.log.dir}/${build.id}_install.cmaker.log" action="stop" />
         <!-- Blocks packaging configuration generation. -->
         <if>
             <istrue value="${blocks.enabled}" />
@@ -119,7 +120,7 @@ Description:
                     <arg value="--epocroot=${build.drive}/" />
                     <arg value="--config=${blocks.config.dir}" />
                     <arg value="--datasource=cmaker" />
-                    <arg value="-Dwhatlog=${build.log.dir}/${build.id}_install.cmaker.log" />
+                    <arg value="-Dwhatlog=${compile.log.dir}/${build.id}_install.cmaker.log" />
                     <arg value="-Dconfigdir=${cmaker.component.dir}" />
                     <arg value="--updateData" />
                 </exec>
@@ -129,14 +130,15 @@ Description:
     
     <!-- CMaker export configuration. -->    
     <target name="cmaker-export" depends="cmaker-install" if="enable.cmaker">
-        <hlm:recordStartMacro name="${build.id}${cmaker.log.label}.export.cmaker.log" emacsmode="true"/>
+        <mkdir dir="${compile.log.dir}" />
+        <record name="${compile.log.dir}/${build.id}${cmaker.log.label}.export.cmaker.log" emacsmode="true" action="start" />
         <hlm:cmakerMacro ncp="${cmaker.pp.version}"
                       s60="${cmaker.s60.version}"
                       action="export"/>
-        <hlm:recordStopMacro name="${build.id}${cmaker.log.label}.export.cmaker.log"/>
+        <record name="${compile.log.dir}/${build.id}${cmaker.log.label}.export.cmaker.log" action="stop" />
         <hlm:metadatarecord database="${metadata.dbfile}">
             <hlm:abldmetadatainput>
-                <fileset casesensitive="false" file="${build.log.dir}/${build.id}${cmaker.log.label}.export.cmaker.log" />
+                <fileset casesensitive="false" file="${compile.log.dir}/${build.id}${cmaker.log.label}.export.cmaker.log" />
                 <metadatafilterset refid="filterset.compile" />
             </hlm:abldmetadatainput>
         </hlm:metadatarecord>
@@ -144,14 +146,15 @@ Description:
 
     <!-- CMaker cleanup exported configuration. -->
     <target name="cmaker-clean" depends="cmaker-install" if="enable.cmaker">
-        <hlm:recordStartMacro name="${build.id}${cmaker.log.label}.clean.cmaker.log" emacsmode="true"/>
+        <mkdir dir="${compile.log.dir}" />
+        <record name="${compile.log.dir}/${build.id}${cmaker.log.label}.clean.cmaker.log" emacsmode="true" action="start" />
         <hlm:cmakerMacro ncp="${cmaker.pp.version}"
                       s60="${cmaker.s60.version}"
                       action="clean"/>
-        <hlm:recordStopMacro name="${build.id}${cmaker.log.label}.clean.cmaker.log"/>
+        <record name="${compile.log.dir}/${build.id}${cmaker.log.label}.clean.cmaker.log" action="stop" />
         <hlm:metadatarecord database="${metadata.dbfile}">
             <hlm:abldmetadatainput>
-                <fileset casesensitive="false" file="${build.log.dir}/${build.id}${cmaker.log.label}.clean.cmaker.log" />
+                <fileset casesensitive="false" file="${compile.log.dir}/${build.id}${cmaker.log.label}.clean.cmaker.log" />
                 <metadatafilterset refid="filterset.compile" />
             </hlm:abldmetadatainput>
         </hlm:metadatarecord>
@@ -159,14 +162,15 @@ Description:
     
     <!-- CMaker list the final destination of what will be exported. -->
     <target name="cmaker-what" depends="cmaker-install" if="enable.cmaker">
-        <hlm:recordStartMacro name="${build.id}${cmaker.log.label}.what.cmaker.log" emacsmode="true"/>
+        <mkdir dir="${compile.log.dir}" />
+        <record name="${compile.log.dir}/${build.id}${cmaker.log.label}.what.cmaker.log" emacsmode="true" action="start" />
         <hlm:cmakerMacro ncp="${cmaker.pp.version}"
                       s60="${cmaker.s60.version}"
                       action="what"/>
-        <hlm:recordStopMacro name="${build.id}${cmaker.log.label}.what.cmaker.log"/>
+        <record name="${compile.log.dir}/${build.id}${cmaker.log.label}.what.cmaker.log" action="stop" />
         <hlm:metadatarecord database="${metadata.dbfile}">
             <hlm:abldmetadatainput>
-                <fileset casesensitive="false" file="${build.log.dir}/${build.id}${cmaker.log.label}.what.cmaker.log" />
+                <fileset casesensitive="false" file="${compile.log.dir}/${build.id}${cmaker.log.label}.what.cmaker.log" />
                 <metadatafilterset refid="filterset.compile" />
             </hlm:abldmetadatainput>
         </hlm:metadatarecord>
@@ -182,7 +186,7 @@ Description:
                     <arg value="--epocroot=${build.drive}/" />
                     <arg value="--config=${blocks.config.dir}" />
                     <arg value="--datasource=cmaker" />
-                    <arg value="-Dwhatlog=${build.log.dir}/${build.id}${cmaker.log.label}.what.cmaker.log" />
+                    <arg value="-Dwhatlog=${compile.log.dir}/${build.id}${cmaker.log.label}.what.cmaker.log" />
                     <arg value="-Dconfigdir=${cmaker.config.dir}" />
                     <!--arg value="-Dname=${cmaker.log.label}"-->
                     <arg value="--updateData" />
@@ -193,14 +197,15 @@ Description:
 
     <!-- CMaker list the source files what will be exported. -->
     <target name="cmaker-whatdeps" depends="cmaker-install" if="enable.cmaker">
-        <hlm:recordStartMacro name="${build.id}${cmaker.log.label}.whatdeps.cmaker.log" emacsmode="true"/>
+        <mkdir dir="${compile.log.dir}" />
+        <record name="${compile.log.dir}/${build.id}${cmaker.log.label}.whatdeps.cmaker.log" emacsmode="true" action="start" />
         <hlm:cmakerMacro ncp="${cmaker.pp.version}"
                       s60="${cmaker.s60.version}"
                       action="what_deps"/>
-        <hlm:recordStopMacro name="${build.id}${cmaker.log.label}.whatdeps.cmaker.log"/>
+        <record name="${compile.log.dir}/${build.id}${cmaker.log.label}.whatdeps.cmaker.log" action="stop" />
         <hlm:metadatarecord database="${metadata.dbfile}">
             <hlm:abldmetadatainput>
-                <fileset casesensitive="false" file="${build.log.dir}/${build.id}${cmaker.log.label}.whatdeps.cmaker.log" />
+                <fileset casesensitive="false" file="${compile.log.dir}/${build.id}${cmaker.log.label}.whatdeps.cmaker.log" />
                 <metadatafilterset refid="filterset.compile" />
             </hlm:abldmetadatainput>
         </hlm:metadatarecord>

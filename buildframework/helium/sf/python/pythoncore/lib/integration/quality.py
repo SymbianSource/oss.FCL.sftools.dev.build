@@ -110,14 +110,19 @@ class AbldWhatParser(symbian.log.Parser):
 
 
 class PolicyValidator(object):
-    """ Validate policy files on a hierarchy. """    
-    def __init__(self, policyfiles=None, csvfile=None, ignoreroot=False):
+    """ Validate policy files on a hierarchy. """
+    def __init__(self, policyfiles=None, csvfile=None, ignoreroot=False, excludes=None):
         """The constructor """
         if policyfiles is None:
             policyfiles = ['distribution.policy.s60']
         self._policyfiles = policyfiles
         self._ids = None
         self._ignoreroot = ignoreroot
+        
+        if not excludes:
+            self._excludes = []
+        else:
+            self._excludes = excludes
 
     def load_policy_ids(self, csvfile):
         """ Load the icds from the CSV file.
@@ -125,7 +130,7 @@ class PolicyValidator(object):
         """
         self._ids = {}
         reader = csv.reader(open(csvfile, "rU"))
-        for row in reader:            
+        for row in reader:
             if len(row)>=3 and re.match(r"^\s*\d+\s*$", row[0]): 
                 self._ids[row[0]] = row
                 if row[1].lower() != "yes" and row[1].lower() != "no" and row[1].lower() != "bin":
@@ -133,7 +138,7 @@ class PolicyValidator(object):
 
     def validate_content(self, filename):
         """  Validating the policy file content. If it cannot be decoded, 
-            it reports an 'invalidencoding'.            
+            it reports an 'invalidencoding'.
             Case 'notinidlist': value is not defined under the id list.
         """
         value = None
@@ -141,7 +146,7 @@ class PolicyValidator(object):
             value = fileutils.read_policy_content(filename)
         except Exception:
             yield ["invalidencoding", filename, None]
-        if value is not None:                        
+        if value is not None:
             if self._ids != None:
                 if value not in self._ids:
                     yield ["notinidlist", filename, value]
@@ -150,9 +155,9 @@ class PolicyValidator(object):
         """ find the policy file under path using filenames under the list. """
         for filename in self._policyfiles:
             if os.sep != '\\':
-                for f in os.listdir(path):
-                    if f.lower() == filename.lower():
-                        return os.path.join(path, f)
+                for f_file in os.listdir(path):
+                    if f_file.lower() == filename.lower():
+                        return os.path.join(path, f_file)
             if os.path.exists(os.path.join(path, filename)):
                 return os.path.join(path, filename)
         return None
@@ -184,7 +189,8 @@ class PolicyValidator(object):
                 # report an error is the directory has no DP file
                 # and any files underneith.
                 for item in os.listdir(dirpath):
-                    if os.path.isfile(os.path.join(dirpath, item)):
+                    if os.path.isfile(os.path.join(dirpath, item)) \
+                        and item not in self._excludes:
                         yield ['missing', dirpath, None]
                         break
 

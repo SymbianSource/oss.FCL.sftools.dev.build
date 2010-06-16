@@ -23,7 +23,6 @@ Description:
 <project name="test-ldap" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
     <description>Helium antlib core ldap tests.</description>
 
-    <typedef name="ldap" classname="com.nokia.helium.core.ant.taskdefs.LDAP"/>
     <taskdef resource="com/nokia/helium/core/ant/antlib.xml" uri="http://www.nokia.com/helium"/>
     
     

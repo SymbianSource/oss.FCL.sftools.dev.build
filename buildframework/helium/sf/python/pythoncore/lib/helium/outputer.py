@@ -17,13 +17,11 @@
 #Description:
 #===============================================================================
 
-##
-# Outputer module
-# Description : Port to python of the ISIS::Logger3::XML2HTML perl module
-#
-# 1.0.0 (13/12/2006)
-#  - First version of the module.
-##
+"""Port to python of the ISIS::Logger3::XML2HTML perl module
+
+1.0.0 (13/12/2006)
+ - First version of the module."""
+
 import codecs
 import xml.dom.minidom
 from helium.output.widgets import *
@@ -35,31 +33,36 @@ import dataurl
 class Configuration:
     """ Class  for isis Configuration """
     def __init__(self, url):
-        f = urllib2.urlopen(url)#
-        data = f.read()
-        f.close()
+        url_file = urllib2.urlopen(url)#
+        data = url_file.read()
+        url_file.close()
         self.__xml = amara.parse(data)
         
     def getClass(self, type, default = None):
+        """get Class"""
         return self._getValue(type, "class", default)
 
     def getImg(self, type, default = None):
+        """ get Image"""
         return self._getValue(type, "img", default)
     
     def getWidth(self, type, default = None):
+        """get Width"""
         return self._getValue(type, "width", default)
     
     def getHeight(self, type, default = None):
+        """get height"""
         return self._getValue(type, "height", default)
     
     def _getValue(self, type, attr, default = None):
-        r = self.__xml.xml_xpath("/htmloutput/icons/icon[@type='%s']" % type)
-        if len(r) == 0:
+        """get value"""
+        r_attr = self.__xml.xml_xpath("/htmloutput/icons/icon[@type='%s']" % type)
+        if len(r_attr) == 0:
             if default == None:
                 raise Exception("Not found")
             else:
                 return default
-        return r[0][attr]
+        return r_attr[0][attr]
     
 class XML2XHTML:
     """ This class is used to generate an html file from the given xml """
@@ -77,7 +80,7 @@ class XML2XHTML:
               "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd")
         self.__doc = dom.createDocument(None, "html", doctype)
         self.__xhtml = self.__doc.getElementsByTagName("html")[0]
-        self.__xhtml.setAttributeNS("", "xmlns", "http://www.w3.org/1999/xhtml")        
+        self.__xhtml.setAttributeNS("", "xmlns", "http://www.w3.org/1999/xhtml")
         self.__id = 0
         self.__xhtml_summary = None
         self.__tags = {}
@@ -92,47 +95,51 @@ class XML2XHTML:
                           '__event' : XML2XHTML.forname('helium.output.widgets.Event')}
     
     def _getId(self):
+        """get ID"""
         self.__id += 1
         return self.__id
 
     def addCSSLink(self, url):
+        """add CSS Link"""
         self.__css.append(url)
         
     def addJScriptLink(self, url):
+        """add Script Link"""
         self.__javascript.append(url)
         
     def _generateCSSLinks(self, container):
+        """generate CSS Links"""
         for link in self.__css:
-            l = self.__doc.createElementNS("", "link")
+            l_link = self.__doc.createElementNS("", "link")
             if self.__usedataurl:
-                l.setAttributeNS("", "href", dataurl.from_url(link))
+                l_link.setAttributeNS("", "href", dataurl.from_url(link))
             else:
-                l.setAttributeNS("", "href", link)
-            l.setAttributeNS("", "rel", "stylesheet")
-            l.setAttributeNS("", "type", "text/css")
-            container.appendChild(l)
-            
+                l_link.setAttributeNS("", "href", link)
+            l_link.setAttributeNS("", "rel", "stylesheet")
+            l_link.setAttributeNS("", "type", "text/css")
+            container.appendChild(l_link)
+
     def _generateJScriptLink(self, container):
+        """generate J Script Link"""
         for link in self.__javascript:
-            l = self.__doc.createElementNS("", "script")
+            l_link = self.__doc.createElementNS("", "script")
             if self.__usedataurl:
-                l.setAttributeNS("", "src", dataurl.from_url(link))
+                l_link.setAttributeNS("", "src", dataurl.from_url(link))
             else:
-                l.setAttributeNS("", "src", link)
-            l.setAttributeNS("", "type", "text/javascript")
-            l.appendChild(self.__doc.createTextNode(""))
-            container.appendChild(l)
-        
-        
+                l_link.setAttributeNS("", "src", link)
+            l_link.setAttributeNS("", "type", "text/javascript")
+            l_link.appendChild(self.__doc.createTextNode(""))
+            container.appendChild(l_link)
+
     def generate(self):
+        """generate"""
         root = self.__srcdoc.documentElement
         if root.tagName != "__log":
             raise Exception("Invalid document must be __log.")
 
-        for c in root.getElementsByTagName("__customoutputer"):
-            self.__factory[c.attributes['type'].value] = XML2XHTML.forname(c.attributes['module'].value)
+        for cust_out in root.getElementsByTagName("__customoutputer"):
+            self.__factory[cust_out.attributes['type'].value] = XML2XHTML.forname(cust_out.attributes['module'].value)
 
-        
         head = self.__doc.createElementNS("", "head")
         title = self.__doc.createElementNS("", "title")
         self.__title = self.__doc.createTextNode("")
@@ -145,72 +152,76 @@ class XML2XHTML:
         body = self.__doc.createElementNS("", "body") 
         self.__xhtml.appendChild(head)
         self.__xhtml.appendChild(body)
-        
-                    
-        for c in root.childNodes:            
-            if c.nodeType == xml.dom.Node.ELEMENT_NODE and c.tagName == "__header":
-                self._handleHeader(c, body)
-            elif c.nodeType == xml.dom.Node.ELEMENT_NODE and c.tagName == "__summary":
-                self._handleSummary(c, body)
-            elif c.nodeType == xml.dom.Node.ELEMENT_NODE and c.tagName == "__maincontent":
-                self._handleMainContent(c, body)
-            elif c.nodeType == xml.dom.Node.ELEMENT_NODE and c.tagName == "build":
-                self._handleBuild(c, body)
-            elif c.nodeType == xml.dom.Node.ELEMENT_NODE and c.tagName == "task" and c.attributes.has_key('type') and c.attributes['type'] == "maincontent":
-                self._handleMainContent(c, body)
+
+        for child in root.childNodes:
+            if child.nodeType == xml.dom.Node.ELEMENT_NODE and child.tagName == "__header":
+                self._handleHeader(child, body)
+            elif child.nodeType == xml.dom.Node.ELEMENT_NODE and child.tagName == "__summary":
+                self._handleSummary(child, body)
+            elif child.nodeType == xml.dom.Node.ELEMENT_NODE and child.tagName == "__maincontent":
+                self._handleMainContent(child, body)
+            elif child.nodeType == xml.dom.Node.ELEMENT_NODE and child.tagName == "build":
+                self._handleBuild(child, body)
+            elif child.nodeType == xml.dom.Node.ELEMENT_NODE and child.tagName == "task" and child.attributes.has_key('type') and child.attributes['type'] == "maincontent":
+                self._handleMainContent(child, body)
 
         try:
             footer = root.getElementsByTagName("__footer")[0]
-            f = self.__factory["__footer"](self.__doc, body)
+            f_foot = self.__factory["__footer"](self.__doc, body)
             if footer.attributes.has_key("title"):
-                f.setTitle(footer.attributes['title'].value)
+                f_foot.setTitle(footer.attributes['title'].value)
             if footer.attributes.has_key("subtitle"):
-                f.setSubTitle(footer.attributes['subtitle'].value)
-        except Exception:            
+                f_foot.setSubTitle(footer.attributes['subtitle'].value)
+        except Exception:
             pass
         # Generate summary
         self._createSummary()
 
     def _handleHeader(self, node, container):
-        h = self.__factory["__header"](self.__doc, container)
+        """handle Header"""
+        header = self.__factory["__header"](self.__doc, container)
         if node.attributes.has_key('title'):
             self.__title.data = node.attributes['title'].value
-            h.setTitle(node.attributes['title'].value)        
+            header.setTitle(node.attributes['title'].value)
         if node.attributes.has_key("subtitle"):
-            h.setSubTitle(node.attributes['subtitle'].value)
+            header.setSubTitle(node.attributes['subtitle'].value)
         
     def _handleSummary(self, node, container):
+        """handle Summary"""
         box = self.__factory["__summary"](self.__doc, container)
         if node.attributes.has_key('title'):
             box.setTitle(node.attributes["title"].value)
         
-        for c in node.getElementsByTagName("__elmt"):           
-            box.addElement(c.attributes['tag'].value, c.attributes['val'].value)
+        for c_tag in node.getElementsByTagName("__elmt"):
+            box.addElement(c_tag.attributes['tag'].value, c_tag.attributes['val'].value)
         self.__xhtml_summary = box
     
     def _handleBuild(self, node, container):
-        for c in node.childNodes:
-            if c.nodeType == xml.dom.Node.ELEMENT_NODE and c.tagName == "task" and c.attributes.has_key('type') and c.attributes['type'].value == 'maincontent':
-                self._handleMainContent(c, container)
+        """handle Build"""
+        for child in node.childNodes:
+            if child.nodeType == xml.dom.Node.ELEMENT_NODE and child.tagName == "task" and child.attributes.has_key('type') and child.attributes['type'].value == 'maincontent':
+                self._handleMainContent(child, container)
                 
 
     def _handleMainContent(self, node, container):
+        """handle Main Content"""
         box = self.__factory["__maincontent"](self.__doc, container)
         if node.attributes.has_key("title"):
             box.setTitle(node.attributes["title"].value)
         if node.attributes.has_key("name"):
             box.setTitle(node.attributes["name"].value)
-        for c in node.childNodes:
-            if c.nodeType == xml.dom.Node.ELEMENT_NODE and c.tagName == "__event":
-                self._handleEvent(c, box.getDOMContainer())
-            elif c.nodeType == xml.dom.Node.ELEMENT_NODE and c.tagName == "task" and c.attributes.has_key('type') and c.attributes['type'].value == 'event':
-                self._handleEvent(c, box.getDOMContainer())
-            elif c.nodeType == xml.dom.Node.ELEMENT_NODE and c.tagName == "message":
-                self._handleMessage(c, box.getDOMContainer())
-            elif c.nodeType == xml.dom.Node.ELEMENT_NODE:
-                self._handlePrint(c, box.getDOMContainer())
+        for child in node.childNodes:
+            if child.nodeType == xml.dom.Node.ELEMENT_NODE and child.tagName == "__event":
+                self._handleEvent(child, box.getDOMContainer())
+            elif child.nodeType == xml.dom.Node.ELEMENT_NODE and child.tagName == "task" and child.attributes.has_key('type') and child.attributes['type'].value == 'event':
+                self._handleEvent(child, box.getDOMContainer())
+            elif child.nodeType == xml.dom.Node.ELEMENT_NODE and child.tagName == "message":
+                self._handleMessage(child, box.getDOMContainer())
+            elif child.nodeType == xml.dom.Node.ELEMENT_NODE:
+                self._handlePrint(child, box.getDOMContainer())
 
     def _handleEvent(self, node, container):
+        """hnadle Event"""
         tags = self.__tags
         self.__tags = {}
         event = self.__factory["__event"](self.__doc, container, self._getId())
@@ -218,59 +229,62 @@ class XML2XHTML:
             event.setTitle(node.attributes['title'].value)
         elif node.attributes.has_key('name'):
             event.setTitle(node.attributes['name'].value)
-        for c in node.childNodes:            
-            if c.nodeType == xml.dom.Node.ELEMENT_NODE and c.tagName == "__event":
-                self._handleEvent(c, event.getDOMContainer())
-            elif c.nodeType == xml.dom.Node.ELEMENT_NODE and c.tagName == "task" and c.attributes.has_key('type') and c.attributes['type'].value == 'event':
-                self._handleEvent(c, event.getDOMContainer())
-            elif c.nodeType == xml.dom.Node.ELEMENT_NODE and c.tagName == "message":
-                self._handleMessage(c, event.getDOMContainer())
-            elif c.nodeType == xml.dom.Node.ELEMENT_NODE:
-                self._handlePrint(c, event.getDOMContainer())
+        for child in node.childNodes:            
+            if child.nodeType == xml.dom.Node.ELEMENT_NODE and child.tagName == "__event":
+                self._handleEvent(child, event.getDOMContainer())
+            elif child.nodeType == xml.dom.Node.ELEMENT_NODE and child.tagName == "task" and child.attributes.has_key('type') and child.attributes['type'].value == 'event':
+                self._handleEvent(child, event.getDOMContainer())
+            elif child.nodeType == xml.dom.Node.ELEMENT_NODE and child.tagName == "message":
+                self._handleMessage(child, event.getDOMContainer())
+            elif child.nodeType == xml.dom.Node.ELEMENT_NODE:
+                self._handlePrint(child, event.getDOMContainer())
                 
         keys = self.__tags.keys()
         keys.sort()
-        for name in keys:         
+        for name in keys:
             event.addStatistics(name.replace("__", ""), self.__tags[name])
         self.__tags = self._mergeStatistics(tags, self.__tags)
         
     def _handleMessage(self, node, container):
+        """ handle Message"""
         if node.attributes['priority'].value == "printraw":
-            t = self.__factory["__printraw"](self.__doc, container)
-            for n in node.childNodes:
-                if n.nodeType == xml.dom.Node.CDATA_SECTION_NODE:
-                    t.appendText(n.data)
+            t_print = self.__factory["__printraw"](self.__doc, container)
+            for n_node in node.childNodes:
+                if n_node.nodeType == xml.dom.Node.CDATA_SECTION_NODE:
+                    t_print.appendText(n_node.data)
         else:
-            t = self.__factory["__print"](self.__doc, container)
-            for n in node.childNodes:
-                if n.nodeType == xml.dom.Node.CDATA_SECTION_NODE:
-                    t.appendText(n.data)
+            t_print = self.__factory["__print"](self.__doc, container)
+            for n_node in node.childNodes:
+                if n_node.nodeType == xml.dom.Node.CDATA_SECTION_NODE:
+                    t_print.appendText(n_node.data)
             if node.attributes['priority'].value != "print":
-                t.setIcon(self.__config.getClass(node.attributes['priority'].value, "icn_dft"))
+                t_print.setIcon(self.__config.getClass(node.attributes['priority'].value, "icn_dft"))
                 if self.__tags.has_key(node.attributes['priority'].value):
                     self.__tags[node.attributes['priority'].value] += 1
                 else:
                     self.__tags[node.attributes['priority'].value] = 1
 
     def _handlePrint(self, node, container):
+        """handle print"""
         if node.tagName == "__printraw":
-            t = self.__factory["__printraw"](self.__doc, container)
-            for n in node.childNodes:
-                if n.nodeType == xml.dom.Node.CDATA_SECTION_NODE or n.nodeType == xml.dom.Node.TEXT_NODE:
-                    t.appendText(n.data)
+            t_print = self.__factory["__printraw"](self.__doc, container)
+            for n_node in node.childNodes:
+                if n_node.nodeType == xml.dom.Node.CDATA_SECTION_NODE or n_node.nodeType == xml.dom.Node.TEXT_NODE:
+                    t_print.appendText(n_node.data)
         else:
-            t = self.__factory["__print"](self.__doc, container)
-            for n in node.childNodes:
-                if n.nodeType == xml.dom.Node.CDATA_SECTION_NODE or n.nodeType == xml.dom.Node.TEXT_NODE:
-                    t.appendText(n.data)
+            t_print = self.__factory["__print"](self.__doc, container)
+            for n_node in node.childNodes:
+                if n_node.nodeType == xml.dom.Node.CDATA_SECTION_NODE or n_node.nodeType == xml.dom.Node.TEXT_NODE:
+                    t_print.appendText(n_node.data)
             if node.tagName != "__print":
-                t.setIcon(self.__config.getClass(node.tagName, "icn_dft"))
+                t_print.setIcon(self.__config.getClass(node.tagName, "icn_dft"))
                 if self.__tags.has_key(node.tagName):
                     self.__tags[node.tagName] += 1
                 else:
                     self.__tags[node.tagName] = 1
 
     def _createSummary(self):
+        """create Summary"""
         # pylint: disable-msg=E1101
         if self.__xhtml_summary == None:
             self.__xhtml_summary = Summary(self.__doc, self.__body)
@@ -279,29 +293,30 @@ class XML2XHTML:
         keys.sort()
         for name in keys:
             self.__xhtml_summary.addStatistics(name.replace("__", ""), self.__tags[name])
+        # pylint: enable-msg=E1101
 
-   
     def _mergeStatistics(self, tags, newTags):
+        """merge Statistics"""
         for name in newTags.keys():
             if tags.has_key(name):
                 tags[name] += newTags[name]
             else:
                 tags[name] = newTags[name]
         return tags
-        
-    def WriteToFile(self, filename):        
+
+    def WriteToFile(self, filename):
+        """write to file"""
         file_object = open(filename, "w")
         file_object.write(codecs.BOM_UTF8)
         file_object.write(self.__doc.toprettyxml(encoding="utf-8"))
         file_object.close()
-    
-    
+
+
     @staticmethod
     def forname(classname):
-        r = re.match("^(?P<modname>(?:\w+\.?)*)\.(?P<classname>(\w+?))$", classname)
-        if r != None:
-            return getattr(__import__(r.groupdict()['modname'], [], [], r.groupdict()['classname']), r.groupdict()['classname'])
+        """forname"""
+        result = re.match("^(?P<modname>(?:\w+\.?)*)\.(?P<classname>(\w+?))$", classname)
+        if result != None:
+            return getattr(__import__(result.groupdict()['modname'], [], [], result.groupdict()['classname']), result.groupdict()['classname'])
         else:
             raise Exception("Error retreiving module and classname for %s" % classname)
-        
-

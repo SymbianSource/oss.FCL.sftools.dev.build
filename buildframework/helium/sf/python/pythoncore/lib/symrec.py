@@ -30,6 +30,7 @@ LOGGER = logging.getLogger("symrec")
 logging.basicConfig(level=logging.INFO)
 
 def _cleanup_list(input):
+    """cleanup  list"""
     result = []
     for chars in input:
         if chars is not None and chars.strip() != "":
@@ -92,10 +93,12 @@ class ServicePack(object):
     
     @property
     def name(self):
+        """name"""
         return self.__xml.getAttribute('name')
     
     @property
     def files(self):
+        """files"""
         result = []
         for filen in self.__xml.getElementsByTagName('file'):
             result.append(filen.getAttribute('name'))
@@ -103,6 +106,7 @@ class ServicePack(object):
 
     @property
     def instructions(self):
+        """instructions"""
         result = []
         for instr in self.__xml.getElementsByTagName('instructions'):
             result.append(instr.getAttribute('name'))
@@ -147,7 +151,7 @@ class ReleaseMetadata(object):
             self._releaseDetails.appendChild(releaseID)
             
             #           service
-            serv = self._xml.createElement(u'service')            
+            serv = self._xml.createElement(u'service')
             xml_setattr(serv, 'name', unicode(service))
             releaseID.appendChild(serv)
             #           product
@@ -223,6 +227,7 @@ class ReleaseMetadata(object):
         
 
     def keys(self):
+        """keys"""
         keys = []
         for pkg in self._releaseFiles.getElementsByTagName('package'):
             keys.append(pkg.getAttribute('name'))
@@ -276,10 +281,11 @@ class ReleaseMetadata(object):
         return None
 
     def getVariantPackage(self, variant_name):
+        """get variant package"""
         for variant in self._xml.getElementsByTagName('variant'):
             if variant.getAttribute('name').lower() == variant_name.lower():
-                for x in variant.getElementsByTagName('file'):
-                    return x.getAttribute('name')        
+                for xxx in variant.getElementsByTagName('file'):
+                    return xxx.getAttribute('name')
 
     def xml(self):
         """ Returning the XML as a string. """
@@ -297,8 +303,8 @@ class ReleaseMetadata(object):
     def servicepacks(self):
         """ Getting the service pack names. """
         result = []
-        for sp in self._releaseInformation.getElementsByTagName('servicePack'):
-            result.append(ServicePack(sp))
+        for spack in self._releaseInformation.getElementsByTagName('servicePack'):
+            result.append(ServicePack(spack))
         return result
 
     filename = property(lambda self:self._filename)
@@ -324,6 +330,7 @@ class MD5Updater(ReleaseMetadata):
         for name in self.keys():
             fullname = os.path.join(self._filepath, name)                
             if os.path.exists(fullname):
+                LOGGER.info("Calculating the MD5 of " + fullname)
                 result = self[name]
                 result['md5checksum'] = unicode(fileutils.getmd5(fullname))
                 result['size'] = unicode(os.path.getsize(fullname))
@@ -343,9 +350,9 @@ class ValidateReleaseMetadata(ReleaseMetadata):
         status = os.path.join(os.path.dirname(self._filename), 'HYDRASTATUS.xml')
         if os.path.exists(status):
             hydraxml = xml.dom.minidom.parse(open(status, "r"))
-            for t in hydraxml.getElementsByTagName('state')[0].childNodes:
-                if t.nodeType == t.TEXT_NODE:
-                    if t.nodeValue != 'Ready':
+            for t_name in hydraxml.getElementsByTagName('state')[0].childNodes:
+                if t_name.nodeType == t_name.TEXT_NODE:
+                    if t_name.nodeValue != 'Ready':
                         LOGGER.error("HYDRASTATUS.xml is not ready")
                         return False
         if checkPath:
@@ -378,13 +385,13 @@ class ValidateReleaseMetadata(ReleaseMetadata):
                         LOGGER.error("%s md5checksum missmatch." % path)
                         return False
 
-        for sp in self.servicepacks:
-            for name in sp.files:
+        for spack in self.servicepacks:
+            for name in spack.files:
                 path = os.path.join(self.location, name)
                 if not os.path.exists(path):
                     LOGGER.error("%s doesn't exist." % path)
                     return False
-            for name in sp.instructions:
+            for name in spack.instructions:
                 path = os.path.join(self.location, name)
                 if not os.path.exists(path):
                     LOGGER.error("%s doesn't exist." % path)
@@ -431,6 +438,7 @@ class Metadata2TDD(ReleaseMetadata):
         self.excludes = excludes
 
     def archives_to_tdd(self, metadata):
+        """archives"""
         tdd = "\t[\n"
         for name in metadata.keys():
             path_ = os.path.join(os.path.dirname(metadata.filename), name)
@@ -495,36 +503,40 @@ class ValidateReleaseMetadataCached(ValidateReleaseMetadata):
         return result
 
     def in_cache(self, metadatas, key):
+        """in cache"""
         for metadata in metadatas:
             if metadata[0] == key:
                 return True 
         return False
     
     def value_from_cache(self, metadatas, key):
+        """value from cache"""
         for metadata in metadatas:
             if metadata[0] == key:
                 return metadata[1]
         return None
     
     def load_cache(self):
+        """load cache"""
         metadatas = []
         if self.__cachefile is not None and os.path.exists(self.__cachefile):
-            f = open(self.__cachefile, "rb")
-            for row in csv.reader(f):
+            f_file = open(self.__cachefile, "rb")
+            for row in csv.reader(f_file):
                 if len(row) == 2:
                     metadatas.append([os.path.normpath(row[0]), row[1].lower() == "true"])
                 elif len(row) == 1:
                     # backward compatibility with old cache.
                     metadatas.append([os.path.normpath(row[0]), True])
-            f.close()
+            f_file.close()
         return metadatas
 
     def update_cache(self, metadatas):
+        """update cache"""
         if self.__cachefile is not None and os.path.exists(os.path.dirname(self.__cachefile)):
-            f = open(self.__cachefile, "wb")
-            writer = csv.writer(f)
+            f_file = open(self.__cachefile, "wb")
+            writer = csv.writer(f_file)
             writer.writerows(metadatas)
-            f.close()
+            f_file.close()
 
 class ValidateTicklerReleaseMetadata(ValidateReleaseMetadataCached):
     """ This class validate if a metadata file is stored in the correct location and

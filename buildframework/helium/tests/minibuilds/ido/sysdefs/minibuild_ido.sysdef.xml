@@ -20,7 +20,7 @@ Description:
 
 ============================================================================
 -->
-<!DOCTYPE SystemDefinition SYSTEM "http://helium.nmp.nokia.com/trac/browser/helium/trunk/helium/tools/common/dtd/sysdef_1_4_0.dtd?format=raw">
+<!DOCTYPE SystemDefinition SYSTEM "sysdef_1_4_0.dtd">
 <SystemDefinition name="helium_minibuild_compile" schema="1.4.0">
 	<systemModel>
 		<layer name="mw_layer"/>

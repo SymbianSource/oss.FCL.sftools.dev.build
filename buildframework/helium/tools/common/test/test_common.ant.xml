@@ -28,7 +28,7 @@ Description:
     <property environment="env"/>
     
     <property name="helium.dir" location="../../.." />
-    <import file="../../../helium.ant.xml"/>
+    <import file="../../../build.xml"/>
         
     <target name="test-text-config">
         <hlm:configuration file="${helium.dir}/tests/data/ant_config_test.txt"/>
@@ -247,6 +247,7 @@ project.setProperty("xml.test.list", str(result))
             <param name="metadata.dbfile" value="${build.cache.dir}/helium/temp_drive/output/logs/${build.id}_metadata_db"/>
             <param name="build.log.dir" value="${build.cache.dir}/helium/temp_drive/output/logs"/>            
             <param name="post.log.dir" value="${build.cache.dir}/helium/temp_drive/output/logs/post"/>
+            <param name="build.log" value="${build.cache.dir}/helium/temp_drive/output/logs/${build.id}_main.ant.log"/>
         </antcall>
         <au:assertFileExists file="${build.cache.dir}/helium/temp_drive/output/temp_build_files/sis_build.ant.xml"/>
         <delete file="${sisfiles.tempconfig.file}"/>

@@ -16,6 +16,7 @@
 #
 #Description:
 #===============================================================================
+"""test ccm utilities"""
 
 import unittest
 import ccmutil
@@ -27,6 +28,8 @@ _logger = logging.getLogger('test.ccmutil')
 logging.basicConfig(level=logging.INFO)
 
 def open_session(username=None, password=None, engine=None, dbpath=None, database=None, reuse=True):
+    """open session"""
+    reuse = True        #just for pylint
     return MockSession(None, username, password, engine, dbpath, database)
 
 nokia.nokiaccm.open_session = open_session
@@ -40,12 +43,12 @@ class CcmUtilTest(unittest.TestCase):
         username = 'username'
         password = 'password'
         engine = "ccm.engine.host"
-        dbpath = "ccm.database.path"     
+        dbpath = "ccm.database.path"
         try:
             session = ccmutil.get_session(database, username, password, engine, dbpath)
-        except Exception, ex:
+        except Exception:
             print "Error creating session"
-        assert session is None        
+        assert session is None
             
     def test_get_session_without_database_set(self):
         """ Testing get_session method without database set"""
@@ -54,12 +57,12 @@ class CcmUtilTest(unittest.TestCase):
         username = 'username'
         password = 'password'
         engine = "ccm.engine.host"
-        dbpath = "ccm.database.path"     
+        dbpath = "ccm.database.path"
         try:
             session = ccmutil.get_session(database, username, password, engine, dbpath)
-        except Exception, ex:
-            print "Error creating session"            
-        assert session is None        
+        except Exception:
+            print "Error creating session"
+        assert session is None
 
     def test_get_session(self):
         """ Testing get_session method """
@@ -77,19 +80,19 @@ class MockSession(ccm.AbstractSession):
             self._session_addr = "LOCALHOST:127.0.0.1:1234"
         else:
             ccm.Session.start(username, password, engine, dbpath)
-                
+
     def database(self):
+        """database"""
         _logger.info("running database from MockResultSession")
         return self._database
     
     def execute(self, cmdline, result=None):
+        """execute"""
         if result == None:
-            result = ccm.Result(self)        
+            result = ccm.Result(self)
         if self._behave.has_key(cmdline):
             result.statuserrors = 0  
             result.output = self._behave[cmdline]
         else:
             result.status = -1  
         return result
-
-

@@ -95,29 +95,35 @@ except:
         <mkdir dir="${build.temp.dir}/temp" />
         <basename file="${binary.delivery.zip}" property="binary.delivery.basename" />
         <copy todir="${build.temp.dir}/temp" verbose="true">
-            <fileset dir="${publish.ci.dir}/${delivery.type}">
-                <include name="*/${binary.delivery.basename}" />
-                <scriptselector language="jython">
+            <first>
+                <sort>
+                    <reverse xmlns="antlib:org.apache.tools.ant.types.resources.comparators">
+                        <date />
+                    </reverse>
+                    <fileset dir="${publish.ci.dir}/${delivery.type}">
+                        <include name="*/${binary.delivery.basename}" />
+                        <scriptselector language="jython">
 <![CDATA[
 try:
     open(file.getParent() + "/tickler.txt").close()
-    myrev = int(file.getParentFile().getName())
-    selected = True
-    for f in file.getParentFile().getParentFile().listFiles():
-        try:
-            if myrev < int(f.getName()):
-                selected = False
-        except:
-            pass
-    self.setSelected(selected)
+    self.setSelected(True)
 except:
     print "No ticker file for %s" % file
     self.setSelected(False)
 ]]>
-                </scriptselector>
-            </fileset>
+                        </scriptselector>
+                    </fileset>
+                </sort>
+            </first>
             <flattenmapper/>
         </copy>
         <unzip src="${build.temp.dir}/temp/${binary.delivery.basename}" dest="${build.temp.dir}/temp" />
     </target>
+    
+    <target name="get-latest-sf-delivery">
+        <antcall target="get-latest-delivery">
+            <param name="delivery.type" value="sf"/>
+        </antcall>
+    </target>
+    
 </project>

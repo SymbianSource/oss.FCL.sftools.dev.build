@@ -100,22 +100,22 @@ public class XMLMerger {
     @SuppressWarnings("unchecked")
     protected void mergeNode(Element dest, Element src) {
         for (Iterator<Element> node = src.elements().iterator(); node.hasNext();) {
-            Element e = node.next();
+            Element element = node.next();
             
-            List<Element> ses = dest.elements(e.getName());
+            List<Element> ses = dest.elements(element.getName());
             boolean add = true;
             for (Element se : ses) {
-                if (areSame(se, e)) {
-                    log.debug("Element " + e.getName() + " already found in dest.");
+                if (areSame(se, element)) {
+                    log.debug("Element " + element.getName() + " already found in dest.");
                     add = false;
                 }
             }
             if (add) {
-                log.debug("Adding node " + e.getName() + " to " + dest.getName());
-                dest.add(e.detach());
+                log.debug("Adding node " + element.getName() + " to " + dest.getName());
+                dest.add(element.detach());
             } else if (ses.size() > 0) {
-                log.debug("Merging " + ses.get(0).getName() + " to " + e.getName());
-                mergeNode(ses.get(0), e);
+                log.debug("Merging " + ses.get(0).getName() + " to " + element.getName());
+                mergeNode(ses.get(0), element);
             }
         }
     }

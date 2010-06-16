@@ -22,7 +22,7 @@ Description:
 -->
 <project name="prep-ccm-get-input" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
     <description>Helium Antlib Logging unittests.</description>
-        
+    <import file="../../stages_config.ant.xml" />
     
     <property environment="env"/>
     

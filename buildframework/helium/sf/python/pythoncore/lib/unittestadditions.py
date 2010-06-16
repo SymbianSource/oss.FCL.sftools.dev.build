@@ -16,9 +16,13 @@
 #
 #Description:
 #===============================================================================
+""" unit test additions"""
+
 
 import logging
-logger = logging.getLogger('unittestadditions')
+_logger = logging.getLogger('unittestadditions')
+
+# pylint: disable-msg=C0103
 
 class skip(object):
     """ Skip decorator. The decorated function will only be called
@@ -35,11 +39,13 @@ class skip(object):
         self.shouldSkip = shouldSkip
         self.returns = returns
 
-    def __call__(self, f):
-        """ Returns the function f if  shouldSkip is False. Else a stub function is returned. """
+    def __call__(self, f_file):
+        """ Returns the function f_file if  shouldSkip is False. Else a stub function is returned. """
         def __skiptest(*args, **kargs):
-            logger.warning("Skipping test %s" % f.__name__)
+            """skip test"""
+            _logger.warning("Skipping test %s" % f_file.__name__)
             return self.returns
         if self.shouldSkip:
             return __skiptest
-        return f
+        return f_file
+# pylint: enable-msg=C0103

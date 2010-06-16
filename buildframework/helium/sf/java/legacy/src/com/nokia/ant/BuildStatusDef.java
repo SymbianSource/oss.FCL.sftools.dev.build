@@ -67,8 +67,8 @@ public class BuildStatusDef extends HlmPostDefImpl
         if (!output.isEmpty())
         {
             log("*** Configuration report ***", Project.MSG_INFO);
-            for (String x : output)
-                log(x, Project.MSG_INFO);
+            for (String outputStr : output)
+                log(outputStr, Project.MSG_INFO);
         }
     }
     
@@ -94,11 +94,11 @@ public class BuildStatusDef extends HlmPostDefImpl
         sorted = project.topoSort(targetNames[0], targets);
 
         // Find the desiredTarget Target object
-        for (Target t : sorted)
+        for (Target target : sorted)
         {
-            if (t.getName().equals(desiredTarget))
+            if (target.getName().equals(desiredTarget))
             {
-                return t;
+                return target;
             }
         }
         throw new BuildException("Could not find target matching " + desiredTarget + "\n");
@@ -114,49 +114,49 @@ public class BuildStatusDef extends HlmPostDefImpl
         String location = target.getLocation().getFileName();
         
         try {
-        String heliumpath = new File(project.getProperty("helium.dir")).getCanonicalPath();
-        String targetpath = new File(location).getCanonicalPath();
-        
-        if (!targetpath.contains(heliumpath))
-        {   
-            ArrayList<String> antcallTargets = new ArrayList<String>();
-            Visitor visitorTarget = new AntTargetVisitor(antcallTargets, project);
+            String heliumpath = new File(project.getProperty("helium.dir")).getCanonicalPath();
+            String targetpath = new File(location).getCanonicalPath();
             
-            Element element = findTargetElement(target, project);
-            if (element != null)
-                element.accept(visitorTarget);
-            for (String depTargetString : antcallTargets)
-            {
-                String[] array = { depTargetString };
-                try {
-                Target depTarget = findTarget(depTargetString, project, array);
-                targetCallsHeliumTarget(depTarget, project);
-                } catch (BuildException x) { 
-                    // We are Ignoring the errors as no need to fail the build.
-                    log("Exception occured while target defined outside helium are calling a private Helium target " + x.toString(), Project.MSG_DEBUG);
-                    x = null;
-                    }
+            if (!targetpath.contains(heliumpath))
+            {   
+                ArrayList<String> antcallTargets = new ArrayList<String>();
+                Visitor visitorTarget = new AntTargetVisitor(antcallTargets, project);
+                
+                Element element = findTargetElement(target, project);
+                if (element != null)
+                    element.accept(visitorTarget);
+                for (String depTargetString : antcallTargets)
+                {
+                    String[] array = { depTargetString };
+                    try {
+                    Target depTarget = findTarget(depTargetString, project, array);
+                    targetCallsHeliumTarget(depTarget, project);
+                    } catch (BuildException x) { 
+                        // We are Ignoring the errors as no need to fail the build.
+                        log("Exception occured while target defined outside helium are calling a private Helium target " + x.toString(), Project.MSG_DEBUG);
+                        x = null;
+                        }
+                }
+                
+              
+                for (Enumeration<String> depsEnum = target.getDependencies(); depsEnum.hasMoreElements();)
+                {
+                    String depTargetString = depsEnum.nextElement();
+                    String[] array = { depTargetString };
+                    try {
+                    Target depTarget = findTarget(depTargetString, project, array);
+                    targetCallsHeliumTarget(depTarget, project);
+                    } catch (BuildException x) {
+                        //We are Ignoring the errors as no need to fail the build.
+                        log("Exception occured while target defined outside helium are calling a private Helium target " + x.toString(), Project.MSG_DEBUG);
+                        x = null;
+                        }
+                }
             }
-            
-          
-            for (Enumeration<String> e = target.getDependencies(); e.hasMoreElements();)
+            else
             {
-                String depTargetString = e.nextElement();
-                String[] array = { depTargetString };
-                try {
-                Target depTarget = findTarget(depTargetString, project, array);
-                targetCallsHeliumTarget(depTarget, project);
-                } catch (BuildException x) {
-                    //We are Ignoring the errors as no need to fail the build.
-                    log("Exception occured while target defined outside helium are calling a private Helium target " + x.toString(), Project.MSG_DEBUG);
-                    x = null;
-                    }
+                checkIfTargetPrivate(target, project);
             }
-        }
-        else
-        {
-            checkIfTargetPrivate(target, project);
-        }
 
         } catch (IOException e) {
             //We are Ignoring the errors as no need to fail the build.
@@ -218,11 +218,11 @@ public class BuildStatusDef extends HlmPostDefImpl
         String projectName = antDoc.valueOf("/project/@name");
         for (Iterator<Element> iterator = antDoc.selectNodes("//target").iterator(); iterator.hasNext();)
         {
-            Element e = iterator.next();
+            Element element = iterator.next();
 
-            String targetName = e.attributeValue("name");
+            String targetName = element.attributeValue("name");
             if (targetName.equals(target.getName()) || (projectName + "." + targetName).equals(target.getName()))
-                return e;
+                return element;
         }
         return null;
     }
@@ -281,11 +281,11 @@ public class BuildStatusDef extends HlmPostDefImpl
             com.nokia.helium.ant.data.Database db = new com.nokia.helium.ant.data.Database(project, "private");
             ArrayList<String> customerProps = getCustomerProperties(project);
                             
-            for (PropertyMeta x : db.getProperties())
+            for (PropertyMeta propertyMeta : db.getProperties())
             {
-                if (x.getLocation().contains(heliumpath) && x.getScope().equals("private") && customerProps.contains(x.getName()))
+                if (propertyMeta.getLocation().contains(heliumpath) && propertyMeta.getScope().equals("private") && customerProps.contains(propertyMeta.getName()))
                 {
-                    output.add("Warning: " +  x.getName() + " property has been overridden");
+                    output.add("Warning: " +  propertyMeta.getName() + " property has been overridden");
                 }
             }
         } catch (IOException e) { e.printStackTrace(); }
@@ -299,9 +299,9 @@ public class BuildStatusDef extends HlmPostDefImpl
         try {
             String heliumpath = new File(project.getProperty("helium.dir")).getCanonicalPath();
 
-            for (Object o : db.getAntFiles(project))
+            for (Object object : db.getAntFiles(project))
             {
-                String antFile = (String)o;
+                String antFile = (String)object;
                 antFile = new File(antFile).getCanonicalPath();
 
                 if (!antFile.contains(heliumpath))

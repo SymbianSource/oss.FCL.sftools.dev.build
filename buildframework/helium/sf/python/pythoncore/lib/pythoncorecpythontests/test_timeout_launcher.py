@@ -39,14 +39,16 @@ if sys.platform == "win32":
 
 
 # pylint: disable-msg=C0103
+
 class os(object):   #has to be named this as it is mocking os method.
     """ dummy the os function call"""
-# pylint: enable-msg=C0103
+
     def kill(self, pid, value):
         """dummy OS class"""
         pid = value #just for pylint
         value = pid #just for pylint
         return 1
+# pylint: enable-msg=C0103
 
 class TimeoutLauncherTest(mocker.MockerTestCase):
     """class containing methods to test the timeout launcher"""

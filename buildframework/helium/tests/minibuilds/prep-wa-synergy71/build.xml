@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="minibuild.prep-wa-synergy71" default="help" xmlns:au="org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium" basedir="..\ido">
+    <property environment="env"/>
+	<!--property name="config.temp.build.dir" location="${ant.file.minibuild.ido-sbs}/../build"/ -->
+	
+	<!-- Configuring raptor build system -->
+	<property name="build.system" value="ebs"/>
+
+    <!-- Configuring get latest env. -->
+    <property name="s60.grace.service" value="s60_devices_sw" />
+    <property name="s60.grace.product" value="DFS7x.92" />
+    <property name="s60.grace.release" value="92_\d{6}_hw79" />
+    
+    
+    <!-- Synergy configuration -->
+	<property name="ccm.database" value="sa1bm1" />
+    <property name="ccm.project" value="MinibuildDomain-1_20100428" />
+	<property name="publish.ccm.folder" value="sa1bm1#36" />
+
+
+    <!-- Run the full sequence of target for the minibuild. ,mini-build-prep,compile-main,zip-ee,mini-build-check-->
+    <!--<target name="do-mini-build" depends="mini-build-cleanup,
+    										compile-main"/>-->
+
+	<property name="build.name" value="minibuild_ido_synergy71" />
+    <property name="build.family" value="test_minibuild_ido_synergy71" />
+
+    <!--ant code coverage for mini-builds-->
+	<target name="mini-build">
+	    <antcall target="database">
+            <param name="home.files.only" value="false"/>
+        </antcall>
+        <mkdir dir="${helium.build.dir}/temp" />
+		<property name="config.temp.build.dir" location="${config.dir}/build" />
+		<hlm:coveragerecord name="${helium.build.dir}/temp/test.minibuild-ido.xml" action="start" />
+            <runtarget target="do-mini-build" />
+		<hlm:coveragerecord name="${helium.build.dir}/temp/test.minibuild-ido.xml" action="stop" />
+		<fmpp sourcefile="${helium.dir}/tools/common/templates/coveragerecord.txt.ftl" outputfile="${helium.build.dir}/temp/test_minibuild.txt">
+			<data expandProperties="yes">
+                doc: xml(${helium.build.dir}/temp/test.minibuild-ido.xml)
+                database: xml(${database.file})
+            </data>
+		</fmpp>
+		<loadfile srcfile="${helium.build.dir}/temp/test_minibuild.txt" property="ant.coverage.summary" />
+		<echo>
+The summary of Ant code coverage:
+
+${ant.coverage.summary}</echo>
+		<fmpp sourcefile="${helium.dir}/tools/common/templates/coveragerecord.html.ftl" outputfile="${helium.build.dir}/temp/test_minibuild.html">
+			<data expandProperties="yes">
+            	doc: xml(${helium.build.dir}/temp/test.minibuild-ido.xml)
+                database: xml(${database.file})
+			</data>
+		</fmpp>
+		
+		<au:assertFileExists file="${build.log.dir}/prep/${build.id}_bom.log" />
+		<au:assertFileExists file="${build.log.dir}/prep/${build.id}_bom.txt" />
+		<au:assertFileExists file="${build.log.dir}/prep/${build.id}_ccm_get_input.log" />
+		
+	</target>
+	
+	<target name="do-mini-build" depends="prep,publish-tasks-to-folder" />
+	
+	<!-- Stubbing few targets for easy testing  ... -->
+	<target name="prep-drive" depends="build-number" />
+	<target name="dragonfly-prep-drive" />
+	
+	<import file="../ido/build.xml"/>
+    
+
+</project>
+
+    

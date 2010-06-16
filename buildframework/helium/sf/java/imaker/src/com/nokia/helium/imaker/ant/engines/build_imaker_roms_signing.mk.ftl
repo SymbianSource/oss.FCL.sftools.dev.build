@@ -54,11 +54,11 @@ configuration_${cid}-dir: $(ROMBUILD_TEMPDIR)/config_${iid} <#if (cid>0)>configu
     <#list cmds as cmd>
         <#assign cmdline="">
         <#list cmd.getArguments() as arg>
-            <#assign cmdline="${cmdline} ${arg}">
+            <#assign cmdline="${cmdline} \"${arg}\"">
         </#list>
         <#assign vars=cmd.getVariables()>
         <#list vars?keys as var>
-            <#assign cmdline="${cmdline} ${var}=${vars[var]}">
+            <#assign cmdline="${cmdline} \"${var}=${vars[var]}\"">
         </#list>
 	@echo $(call iif,$(USE_UNIX),,cmd /c) ${cmd.getCommand()} WORKDIR=$(ROMBUILD_TEMPDIR)/config_${iid} ${cmdline} ${cmd.getTarget()}-dir >> $(ROMBUILD_TEMPDIR)/command-dir-list-${cid}.txt 
 <#assign iid=iid+1>
@@ -70,11 +70,11 @@ configuration_${cid}-dir: $(ROMBUILD_TEMPDIR)/config_${iid} <#if (cid>0)>configu
     <#list cmds as cmd>
         <#assign cmdline="">
         <#list cmd.getArguments() as arg>
-            <#assign cmdline="${cmdline} ${arg}">
+            <#assign cmdline="${cmdline} \"${arg}\"">
         </#list>
         <#assign vars=cmd.getVariables()>
         <#list vars?keys as var>
-            <#assign cmdline="${cmdline} ${var}=${vars[var]}">
+            <#assign cmdline="${cmdline} \"${var}=${vars[var]}\"">
         </#list>
 #
 #  Building configuration ${iid}.
@@ -104,11 +104,11 @@ configuration_${cid}-e2flash: configuration_${cid}-image
     <#list cmds as cmd>
         <#assign cmdline="">
         <#list cmd.getArguments() as arg>
-            <#assign cmdline="${cmdline} ${arg}">
+            <#assign cmdline="${cmdline} \"${arg}\"">
         </#list>
         <#assign vars=cmd.getVariables()>
         <#list vars?keys as var>
-            <#assign cmdline="${cmdline} ${var}=${vars[var]}">
+            <#assign cmdline="${cmdline} \"${var}=${vars[var]}\"">
         </#list>
 	@echo $(call iif,$(USE_UNIX),,cmd /c) ${cmd.getCommand()} WORKDIR=$(ROMBUILD_TEMPDIR)/config_${iid} ${cmdline} ${cmd.getTarget()}-e2flash >> $(ROMBUILD_TEMPDIR)/command-e2flash-list-${cid}.txt 
 <#assign iid=iid+1>

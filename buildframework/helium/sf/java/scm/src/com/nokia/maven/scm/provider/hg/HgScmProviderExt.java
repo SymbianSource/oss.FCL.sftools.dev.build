@@ -76,7 +76,7 @@ public class HgScmProviderExt extends HgScmProvider implements ScmProviderExt {
     @Override
     public CheckOutScmResult checkout(ScmProviderRepository repository,
             ScmFileSet fileSet, CommandParameters parameters)
-            throws ScmException {
+        throws ScmException {
 
         HgCheckOutCommand command = new HgCheckOutCommand();
         command.setLogger(getLogger());
@@ -87,7 +87,7 @@ public class HgScmProviderExt extends HgScmProvider implements ScmProviderExt {
     @Override
     public ChangeLogScmResult changelog(ScmProviderRepository repository,
             ScmFileSet fileSet, CommandParameters parameters)
-            throws ScmException {
+        throws ScmException {
 
         HgChangeLogCommand command = new HgChangeLogCommand();
         command.setLogger(getLogger());
@@ -96,7 +96,7 @@ public class HgScmProviderExt extends HgScmProvider implements ScmProviderExt {
     }
 
     public PullScmResult pull(ScmRepository repository, File path)
-            throws ScmException {
+        throws ScmException {
         HgPullCommand command = new HgPullCommand();
         command.setLogger(getLogger());
         return (PullScmResult) command.executeCommand(repository
@@ -107,7 +107,7 @@ public class HgScmProviderExt extends HgScmProvider implements ScmProviderExt {
     @Override
     public UpdateScmResult update(ScmProviderRepository repository,
             ScmFileSet fileSet, CommandParameters parameters)
-            throws ScmException {
+        throws ScmException {
         HgUpdateCommand command = new HgUpdateCommand();
         command.setLogger(getLogger());
         return (UpdateScmResult) command.executeCommand(repository, fileSet,
@@ -133,7 +133,7 @@ public class HgScmProviderExt extends HgScmProvider implements ScmProviderExt {
     @Override
     public RemoveScmResult remove(ScmProviderRepository repository,
             ScmFileSet fileSet, CommandParameters parameters)
-            throws ScmException {
+        throws ScmException {
         HgRemoveCommand command = new HgRemoveCommand();
         command.setLogger(getLogger());
         return (RemoveScmResult) command.execute(repository, fileSet,
@@ -142,7 +142,7 @@ public class HgScmProviderExt extends HgScmProvider implements ScmProviderExt {
 
     protected BranchScmResult branch(ScmProviderRepository repository,
             ScmFileSet fileSet, CommandParameters parameters)
-            throws ScmException {
+        throws ScmException {
         HgBranchCommand command = new HgBranchCommand();
         command.setLogger(getLogger());
         return (BranchScmResult) command.execute(repository, fileSet,
@@ -151,7 +151,7 @@ public class HgScmProviderExt extends HgScmProvider implements ScmProviderExt {
 
     protected ExportScmResult export(ScmProviderRepository repository,
             ScmFileSet fileSet, CommandParameters parameters)
-            throws ScmException {
+        throws ScmException {
         HgExportCommand command = new HgExportCommand();
         command.setLogger(getLogger());
         return (ExportScmResult) command.execute(repository, fileSet,
@@ -161,7 +161,7 @@ public class HgScmProviderExt extends HgScmProvider implements ScmProviderExt {
     @Override
     public TagScmResult tag(ScmProviderRepository repository,
             ScmFileSet fileSet, CommandParameters parameters)
-            throws ScmException {
+        throws ScmException {
         HgTagCommand command = new HgTagCommand();
         command.setLogger(getLogger());
         return (TagScmResult) command.execute(repository, fileSet, parameters);

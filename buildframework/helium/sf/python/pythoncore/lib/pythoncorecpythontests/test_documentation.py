@@ -16,6 +16,7 @@
 #
 #Description:
 #===============================================================================
+""" test documentation """
 
 import tempfile
 import os
@@ -30,6 +31,7 @@ logging.basicConfig(level=logging.INFO)
 class DocumentationTest(unittest.TestCase):
     """ Unit tests for documentation module """
     def test_APIDeltaWriter(self):
+        """test API Delta writer"""
         (fileDes, tempFileName) = tempfile.mkstemp()
         old_db = os.path.join(os.environ['TEST_DATA'], 'data', 'docs', 'sample_old_db.xml') 
         new_db = os.path.join(os.environ['TEST_DATA'], 'data', 'docs', 'sample_new_db.xml') 

@@ -84,7 +84,7 @@ In the context of Helium, some specific elements and properties should be used. 
         <import file="${helium.dir}/helium.ant.xml"/>
     </project>
 
-Note that here the default target is ``product-build`` so this would be used for a product build configuration. In reality it would need many more properties to be complete.
+Note that here the default target is :hlm-t:`product-build` so this would be used for a product build configuration. In reality it would need many more properties to be complete.
 
 Refer to the `configuration reference`_ for a full list of all Helium Ant properties.
 
@@ -298,6 +298,26 @@ To include an XML element with a ``hlm:`` prefix the Helium namespace must be de
     <project name="myproject" xmlns:hlm="http://www.nokia.com/helium">
     ....
     </project>
+    
+If it is necessary to use the Helium tasks before importing ``helium.ant.xml``, first import ``helium_preinclude.ant.xml``, e.g::
+
+    <project name="helium-test" default="test" xmlns:hlm="http://www.nokia.com/helium"> 
+        <description>
+        Helium pre include test.
+        </description>
+        <property environment="env"/>
+        <import file="${helium.dir}\helium_preinclude.ant.xml"/>   
+            
+        <target name="test">
+           <hlm:logtoconsole action="stop"/>
+                <echo>Should not print anything.</echo>
+           <hlm:logtoconsole action="resume"/>
+           <echo>Should print something.</echo>       
+        </target>
+        
+        <import file="${helium.dir}\helium.ant.xml"/>           
+    </project> 
+
 
 .. index::
   single: System definition configuration files

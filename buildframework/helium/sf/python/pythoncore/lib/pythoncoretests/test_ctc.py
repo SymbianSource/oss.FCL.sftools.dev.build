@@ -16,6 +16,7 @@
 #
 #Description:
 #===============================================================================
+""" test ctc"""
 
 import unittest
 import ctc
@@ -27,7 +28,7 @@ import tempfile
 _logger = logging.getLogger('test.configuration')
 logging.basicConfig(level=logging.INFO)
 
-root_test_dir = tempfile.mkdtemp()
+_root_test_dir = tempfile.mkdtemp()
 _test_file_paths = [
                     "ctc/dir/component1/group/MON.SYM",
                     "ctc/dir/component2/group/",
@@ -36,7 +37,7 @@ _test_file_paths = [
 
 def _testpath(subpath):
     """ Normalised path for test paths. """
-    return os.path.normpath(os.path.join(root_test_dir, subpath))
+    return os.path.normpath(os.path.join(_root_test_dir, subpath))
 
 _test_file_content = {}
 
@@ -47,7 +48,7 @@ def setup_module():
     for testing various file selection and archiving operations.
     """
     for child_path in _test_file_paths:
-        path = os.path.join(root_test_dir, child_path)
+        path = os.path.join(_root_test_dir, child_path)
         path_dir = path
         path_dir = os.path.dirname(path)
         
@@ -65,27 +66,32 @@ def setup_module():
 
 def teardown_module():
     """ Teardown test config. """
-    if os.path.exists(root_test_dir):
-        fileutils.rmtree(root_test_dir)
+    if os.path.exists(_root_test_dir):
+        fileutils.rmtree(_root_test_dir)
     
 
 class MockUploader(ctc.MonSymFTPUploader):
     """ This class provides a mock MonSymFTPUploader """
     def _open(self):
+        """open"""
         pass
     
     def _close(self):
+        """close"""
         pass
 
     def _ftpmkdirs(self, dir):
+        """ftp make dirs"""
         pass    
     
     def _send(self, src, dst):
+        """send"""
         pass
 
 class NestedConfigurationBuilderTest(unittest.TestCase):
     """ Unit test for ctc uploader """    
     def test_uploader(self):
+        """test uploader"""
         paths = [   "ctc/dir/component1/group/MON.SYM",
                     "ctc/dir/component2/group/MON.SYM",
                     "ctc/dir/component3/group/MON.SYM",

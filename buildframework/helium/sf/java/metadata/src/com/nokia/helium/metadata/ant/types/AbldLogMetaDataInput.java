@@ -133,28 +133,28 @@ public class AbldLogMetaDataInput extends TextLogMetaDataInput {
             setCurrentReader(currentReader);
         } catch (FileNotFoundException ex) {
             log.debug("FileNotFoundException in AbldLogMetadata", ex);
-           try {
-               currentReader.close();
-           } catch ( IOException iex) {
-               // We are Ignoring the errors as no need to fail the build. 
-               log.debug("Exception in closing reader", iex);
-           }
-           currentReader = null;
-           setCurrentReader(null);
-           exceptions = exceptions + ex.getMessage() + "\n";
-           return false;
+            try {
+                currentReader.close();
+            } catch ( IOException iex) {
+                // We are Ignoring the errors as no need to fail the build. 
+                log.debug("Exception in closing reader", iex);
+            }
+            currentReader = null;
+            setCurrentReader(null);
+            exceptions = exceptions + ex.getMessage() + "\n";
+            return false;
         } catch (IOException ex) {
             log.debug("IOException in AbldLogMetadata", ex);
-           try {
-               currentReader.close();
-           } catch ( IOException iex) {
+            try {
+                currentReader.close();
+            } catch ( IOException iex) {
                // We are Ignoring the errors as no need to fail the build. 
                log.debug("IOException in closing reader", iex);
-           }
-           currentReader = null;
-           setCurrentReader(null);
-           exceptions = exceptions + ex.getMessage() + "\n";
-           return false;
+            }
+            currentReader = null;
+            setCurrentReader(null);
+            exceptions = exceptions + ex.getMessage() + "\n";
+            return false;
         }
         if (!exceptions.equals("")) {
             throw new BuildException(exceptions);

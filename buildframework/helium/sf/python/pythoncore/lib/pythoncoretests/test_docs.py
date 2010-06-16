@@ -16,6 +16,9 @@
 #
 #Description:
 #===============================================================================
+"""test docs """
+
+# pylint: disable-msg=R0201
 
 import unittest
 import docs

@@ -143,8 +143,7 @@ class CppParser(object):
         a dictionary (or nested dictionary) of paths and their dependencies.
         """
         bld_parser = BldFileParser()
-        pkg_parser = PkgFileParser()
-        mmp_parser = MmpFileParser()
+        pkg_parser = PkgFileParser(bldpath=path_to_bld)
         
         temp_path = os.getcwd()
         parent = os.getcwd()
@@ -186,6 +185,7 @@ class CppParser(object):
                             break
                         
         for t_case in test_cases:
+            mmp_parser = MmpFileParser(t_case[1])
             if t_case[0] == t_case[1] and (not bld_parser.get_test_mmp_files(t_case[1])):
                 del t_case
             elif t_case[0] in main_level:
@@ -376,9 +376,10 @@ class MmpFileParser(object):
     - libraries listed in the mmp
     """
 
-    def __init__(self):
+    def __init__(self, bldpath):
         self.mmp_files = []
         self.path_to_mmp = ""
+        self.bldpath = bldpath
 
     def get_target_filetype(self, path_to_mmp = None):
         """
@@ -464,10 +465,9 @@ class MmpFileParser(object):
                 self.path_to_mmp = path(self.path_to_mmp)
                 if not ".mmp" in str(self.path_to_mmp).lower():
                     bld_parser = BldFileParser()
-                    self.mmp_files = bld_parser.get_test_mmp_files(self.path_to_mmp, False)
-    
-                    for mpath in self.mmp_files:
-                        lst_mmp_paths.append(os.path.join(self.path_to_mmp, mpath))
+                    self.mmp_files = bld_parser.get_test_mmp_files(self.bldpath)
+                    if self.mmp_files:
+                        lst_mmp_paths = lst_mmp_paths + self.mmp_files
                 else:
                     lst_mmp_paths.append(self.path_to_mmp)
 
@@ -545,18 +545,19 @@ class PkgFileParser(object):
     for every file in the pkg file
     """
 
-    def __init__(self, platform = None, specific_pkg = None):
+    def __init__(self, bldpath, platform = None, specific_pkg = None, drive=''):
         self.platform = platform
         self.build_platform = None
         if self.platform is not None and "_" in self.platform:
             plat_tar = re.search(r"(.*)_(.*).pkg", self.platform)
             self.build_platform, self.build_target = plat_tar.groups() 
-        self.drive = ""
+        self.drive = drive
         self._files = []
         self.pkg_files = []
         self.pkg_file_path = None
         self.exclude = ""
         self.location = None
+        self.bldpath = bldpath
         self.specific_pkg = specific_pkg
         if specific_pkg:
             self.platform = specific_pkg + '.pkg'
@@ -636,11 +637,11 @@ class PkgFileParser(object):
                 for p_file in self.get_pkg_files(self.location, True):
                     self._files.append(p_file)
 
-        return self.__read_pkg_file(self._files)
+        return self.read_pkg_file(self._files)
 
     def __map_pkg_path(self, pkg_line, pkg_file_path, pkg_file):
         """Parse package file to get the src and dst paths" for installing files"""
-        mmp_parser = MmpFileParser()
+        mmp_parser = MmpFileParser(self.bldpath)
         ext = ""
         val1 = ""
         val2 = ""
@@ -669,7 +670,7 @@ class PkgFileParser(object):
                 val1 = val1.lower().replace("$(target)", self.build_target)
 
             if path.isabs(path(val1).normpath()):
-                map_src = str(path.joinpath(self.drive, val1).normpath())
+                map_src = os.path.normpath(os.path.join(self.drive, val1))
             elif re.search(r"\A\w", val1, 1):
                 map_src = str(path.joinpath(self.pkg_file_path + os.sep, os.path.normpath(val1)).normpath())
             else:
@@ -684,10 +685,10 @@ class PkgFileParser(object):
         map_dst = map_dst.replace("$:", "c:")
         map_dst = re.sub(r'^(\w)', r'\1', map_dst).strip()
         indx = map_dst.rsplit(".")
-        try:
+        if len(indx) > 1:
             ext = indx[1]
-        except IndexError:
-            _logger.warning("Index Error in map_pkg_path()")
+        else:
+            _logger.warning("File extension not found for " + map_dst)
 
         _test_type_ = ""
         _target_filename_ = ""
@@ -738,10 +739,12 @@ class PkgFileParser(object):
 
         if not map_src or map_src == "." or not map_dst or map_dst == ".":
             return None
-
+        if not os.path.exists(map_src):
+            _logger.error(map_src + ' not found')
+            return None
         return path(map_src).normpath(), path(map_dst).normpath(), file_type, pkg_file
 
-    def __read_pkg_file(self, pkg_files):
+    def read_pkg_file(self, pkg_files):
         """Reads contents of PKG file"""
         pkg_paths = []
         for pkg_file in pkg_files:
@@ -755,7 +758,7 @@ class PkgFileParser(object):
                 except UnicodeError:
                     file1 = open(pkg_file, 'r')
                     lines = file1.readlines()
-                pkg_file_path = path((pkg_file.rsplit(os.sep, 1))[0])
+                pkg_file_path = path(os.path.dirname(pkg_file))
                 for line in lines:
                     pkg_path = self.__map_pkg_path(line, pkg_file_path, os.path.basename(pkg_file))
                     if pkg_path is None:

@@ -58,7 +58,7 @@ public class ORMMetadataDB {
     }
 
     public void finalizeMetadata(String logPath) {
-        MetadataUtil.finalizeMetadata(logPath);
+        MetadataUtil.finalizeMetadata(dbPath, logPath);
     }
 
     public void finalizeDB() {

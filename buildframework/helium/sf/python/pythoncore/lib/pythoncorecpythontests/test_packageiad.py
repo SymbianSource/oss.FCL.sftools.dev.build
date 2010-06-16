@@ -25,7 +25,7 @@ import xml.dom.minidom
 import logging
 
 
-logger = logging.getLogger('test.packageiad')
+_logger = logging.getLogger('test.packageiad')
 logging.basicConfig(level=logging.INFO)
 
 
@@ -40,22 +40,22 @@ def teardown_module():
 
     
 #def test_package_main(self):
-    """ Test the package IAD class.
-    
-    iad = __import__('packageiad')
-    sysdef = os.path.join(os.environ['TEST_DATA'], 'data', 'packageiad', 'layers.sysdef.xml')
-    sysdefconfigs = "developer_mc_4032"
-    builddrive = os.path.join(os.environ['TEST_DATA'], 'data', 'packageiad')
-    result = iad.main(sysdef, sysdefconfigs, builddrive) """
+#    test the package IAD class.
+#    
+#    iad = __import__('packageiad')
+#    sysdef = os.path.join(os.environ['TEST_DATA'], 'data', 'packageiad', 'layers.sysdef.xml')
+#    sysdefconfigs = "developer_mc_4032"
+#    builddrive = os.path.join(os.environ['TEST_DATA'], 'data', 'packageiad')
+#    result = iad.main(sysdef, sysdefconfigs, builddrive)
 
 #def test_package_processSisDir(self):
-    """ Test the packageiad test_package_processSisDir method.
-    
-    iad = __import__('packageiad')
-    packager = iad.IADPackager()    #init the packager
-    builddrive = os.path.join(os.environ['TEST_DATA'], 'data', 'packageiad')
-    buildDirs = os.path.join(os.environ['TEST_DATA'], 'data', 'packageiad', 'sis\\')
-    packager.processSisDir(buildDirs, builddrive + "\\epoc32\\tools\\makesis.exe") """
+#    test the packageiad test_package_processSisDir method.
+#    
+#    iad = __import__('packageiad')
+#    packager = iad.IADPackager()    #init the packager
+#    builddrive = os.path.join(os.environ['TEST_DATA'], 'data', 'packageiad')
+#    buildDirs = os.path.join(os.environ['TEST_DATA'], 'data', 'packageiad', 'sis\\')
+#    packager.processSisDir(buildDirs, builddrive + "\\epoc32\\tools\\makesis.exe") 
     
 def test_createPackage():
     """ test the create package method """
@@ -68,7 +68,7 @@ def test_createPackage():
     currentDir = os.getcwd()
     packager.createPackage(topDir, packageName)
     if not os.path.exists('testPackage.zip') and not os.path.isfile('testPackage.zip'):
-        logger.info("testPackage.zip file not created")
+        _logger.info("testPackage.zip file not created")
         assert (os.path.exists('testPackage.zip') and os.path.isfile('testPackage.zip'))
     os.chdir(currentDir)
     

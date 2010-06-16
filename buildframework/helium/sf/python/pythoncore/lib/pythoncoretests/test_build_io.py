@@ -18,6 +18,8 @@
 #===============================================================================
 
 """ Test the build.io module. """
+# pylint: disable-msg=R0201
+#method could be a function warning removed
 
 import logging
 import unittest
@@ -25,7 +27,7 @@ import os
 import build.io
 
 
-logger = logging.getLogger('test.build.io')
+_logger = logging.getLogger('test.build.io')
 
 
 class AbldLogWhatReaderTest(unittest.TestCase):

@@ -35,7 +35,7 @@ import test_fileutils
 _logger = logging.getLogger('test.archive')
     
     
-root_test_dir = test_fileutils.root_test_dir
+_root_test_dir = test_fileutils._root_test_dir
 
 def setup_module():
     """ Creates some test data files for file-related testing. """
@@ -55,7 +55,7 @@ class ArchivePreBuilderTest(unittest.TestCase):
         builder = configuration.NestedConfigurationBuilder(os.environ['TEST_DATA'] + '/data/archive_test_input.cfg.xml')
         archiveConfigSet = builder.getConfiguration()
         archivePreBuilder = archive.ArchivePreBuilder(archiveConfigSet, "config", index=0)
-        buildFilePath = os.path.join(root_test_dir, r'archive_test.ant.xml')
+        buildFilePath = os.path.join(_root_test_dir, r'archive_test.ant.xml')
         archivePreBuilder.write(buildFilePath)
         build_file = open(buildFilePath)
         build_file_content = build_file.read()
@@ -80,9 +80,9 @@ class LogicalArchiveTest(unittest.TestCase):
 
     def test_manifest_files(self):
         """ A LogicalArchive can create a correct manifest. """
-        configDict = {'root.dir': root_test_dir,
-                  'temp.build.dir': os.path.join(root_test_dir, 'temp_build_files'),
-                  'archives.dir': root_test_dir,
+        configDict = {'root.dir': _root_test_dir,
+                  'temp.build.dir': os.path.join(_root_test_dir, 'temp_build_files'),
+                  'archives.dir': _root_test_dir,
                   'name': 'manifest_test',
                   'include': 'dir1/*.txt',
                   'archive.tool': '7za'
@@ -94,10 +94,10 @@ class LogicalArchiveTest(unittest.TestCase):
 
         expectedPaths = [os.path.normpath('dir1/file1.txt')]
 
-        includeFilePath = os.path.join(root_test_dir, 'temp_build_files/manifest_test_includefile.txt')
+        includeFilePath = os.path.join(_root_test_dir, 'temp_build_files/manifest_test_includefile.txt')
 
-        with open(includeFilePath) as f:
-            content = f.readlines()
+        with open(includeFilePath) as f_file:
+            content = f_file.readlines()
         print content
         print expectedPaths
         content = [s.strip().lower() for s in content]
@@ -105,9 +105,9 @@ class LogicalArchiveTest(unittest.TestCase):
     
     def test_empty_manifest_file(self):
         """ A LogicalArchive can handle empty manifest. """
-        configDict = {'root.dir': root_test_dir,
-                  'temp.build.dir': os.path.join(root_test_dir, 'temp_build_files'),
-                  'archives.dir': root_test_dir,
+        configDict = {'root.dir': _root_test_dir,
+                  'temp.build.dir': os.path.join(_root_test_dir, 'temp_build_files'),
+                  'archives.dir': _root_test_dir,
                   'name': 'manifest_test',
                   'include': 'nothing',
                   'archive.tool': '7za'
@@ -119,27 +119,27 @@ class LogicalArchiveTest(unittest.TestCase):
 
         expectedPaths = []
 
-        includeFilePath = os.path.join(root_test_dir, 'temp_build_files/manifest_test_includefile.txt')
+        includeFilePath = os.path.join(_root_test_dir, 'temp_build_files/manifest_test_includefile.txt')
 
-        with open(includeFilePath) as f:
-            content = f.readlines()
+        with open(includeFilePath) as f_file:
+            content = f_file.readlines()
         print content
         print expectedPaths
-        content = [s.strip().lower() for s in content]
+        content = [s_1.strip().lower() for s_1 in content]
         self.assert_(content == expectedPaths)
 
     def test_manifest_files_with_exclude_list(self):
         """ A LogicalArchive can create a correct manifest. """
-        excludelst = os.path.join(root_test_dir, 'exclude.lst')
+        excludelst = os.path.join(_root_test_dir, 'exclude.lst')
         flh = open(excludelst, 'w+')
         flh.write("/epoc32/tools/variant/variant.cfg\n")
         flh.write("\\epoc32\\tools\\abld.pl\n")
-        flh.write(os.path.join(root_test_dir, 'dir1', 'file1.txt') + "\n")
-        flh.write(os.path.join(root_test_dir, 'dir1/subdir1/subdir1_file.txt') + "\n")
+        flh.write(os.path.join(_root_test_dir, 'dir1', 'file1.txt') + "\n")
+        flh.write(os.path.join(_root_test_dir, 'dir1/subdir1/subdir1_file.txt') + "\n")
         flh.close()
-        configDict = {'root.dir': root_test_dir,
-                  'temp.build.dir': os.path.join(root_test_dir, 'temp_build_files'),
-                  'archives.dir': root_test_dir,
+        configDict = {'root.dir': _root_test_dir,
+                  'temp.build.dir': os.path.join(_root_test_dir, 'temp_build_files'),
+                  'archives.dir': _root_test_dir,
                   'name': 'manifest_test',
                   'include': 'dir1/**',
                   'exclude.lst': excludelst,
@@ -157,29 +157,29 @@ class LogicalArchiveTest(unittest.TestCase):
                          ]
         expectedPaths.sort()
         
-        includeFilePath = os.path.join(root_test_dir, 'temp_build_files/manifest_test_includefile.txt')
+        includeFilePath = os.path.join(_root_test_dir, 'temp_build_files/manifest_test_includefile.txt')
 
-        with open(includeFilePath) as f:
-            content = f.readlines()
+        with open(includeFilePath) as f_file:
+            content = f_file.readlines()
         print content
         print expectedPaths
-        content = [s.strip().lower() for s in content]
+        content = [s_1.strip().lower() for s_1 in content]
         content.sort()
         self.assert_(content == expectedPaths)
 
-    def test_manifest_files_with_exclude_list_abs_nodrive(self):
+    def test_manifestfiles_wth_xcld_lst_abs_ndrv(self):
         """ A LogicalArchive can create a correct manifest with external list and drive. """
-        rtd = os.path.splitdrive(os.path.abspath(root_test_dir))[1]
-        excludelst = os.path.join(root_test_dir, 'exclude.lst')
+        rtd = os.path.splitdrive(os.path.abspath(_root_test_dir))[1]
+        excludelst = os.path.join(_root_test_dir, 'exclude.lst')
         flh = open(excludelst, 'w+')
         flh.write("/epoc32/tools/variant/variant.cfg\n")
         flh.write("\\epoc32\\tools\\abld.pl\n")
         flh.write(os.path.join(rtd, 'dir1', 'file1.txt') + "\n")
         flh.write(os.path.join(rtd, 'dir1/subdir1/subdir1_file.txt') + "\n")
         flh.close()
-        configDict = {'root.dir': os.path.abspath(root_test_dir),
-                  'temp.build.dir': os.path.join(root_test_dir, 'temp_build_files'),
-                  'archives.dir': root_test_dir,
+        configDict = {'root.dir': os.path.abspath(_root_test_dir),
+                  'temp.build.dir': os.path.join(_root_test_dir, 'temp_build_files'),
+                  'archives.dir': _root_test_dir,
                   'name': 'manifest_test',
                   'include': 'dir1/**',
                   'exclude.lst': excludelst,
@@ -197,14 +197,14 @@ class LogicalArchiveTest(unittest.TestCase):
                          ]
         expectedPaths.sort()
         
-        includeFilePath = os.path.join(root_test_dir, 'temp_build_files/manifest_test_includefile.txt')
+        includeFilePath = os.path.join(_root_test_dir, 'temp_build_files/manifest_test_includefile.txt')
 
-        with open(includeFilePath) as f:
-            content = f.readlines()
+        with open(includeFilePath) as f_file:
+            content = f_file.readlines()
         if os.sep == '\\':
-            content = [s.strip().lower() for s in content]
+            content = [s_1.strip().lower() for s_1 in content]
         else:
-            content = [s.strip() for s in content]
+            content = [s_1.strip() for s_1 in content]
         content.sort()
         print content
         print expectedPaths
@@ -243,9 +243,9 @@ class LogicalArchiveTest(unittest.TestCase):
         
     def do_distribution_policy_config(self, expected_paths, policy):
         """ . """
-        configDict = {'root.dir': root_test_dir,
-                  'temp.build.dir': os.path.join(root_test_dir, 'temp_build_files'),
-                  'archives.dir': root_test_dir,
+        configDict = {'root.dir': _root_test_dir,
+                  'temp.build.dir': os.path.join(_root_test_dir, 'temp_build_files'),
+                  'archives.dir': _root_test_dir,
                   'name': 's60_policy_test',
                   'include': 's60/',
                   'distribution.policy.s60': policy,
@@ -256,10 +256,10 @@ class LogicalArchiveTest(unittest.TestCase):
 
         builder = archive.ArchivePreBuilder(configuration.ConfigurationSet([config]), "config", index=0)
         builder.build_manifest(config)
-        includeFilePath = os.path.join(root_test_dir, 'temp_build_files/s60_policy_test_includefile.txt')
+        includeFilePath = os.path.join(_root_test_dir, 'temp_build_files/s60_policy_test_includefile.txt')
         
-        with open(includeFilePath) as f:
-            content = f.readlines()
+        with open(includeFilePath) as f_file:
+            content = f_file.readlines()
         if os.sep == '\\':
             content = [s.strip().lower() for s in content]
         else:
@@ -277,9 +277,9 @@ class LogicalArchiveTest(unittest.TestCase):
         
     def test_split_manifest_file_unicode(self):
         """ A LogicalArchive can split a manifest correctly. """
-        configDict = {'root.dir': os.path.abspath(root_test_dir),
-                  'temp.build.dir': os.path.abspath(os.path.join(root_test_dir, 'temp_build_files')),
-                  'archives.dir': os.path.abspath(root_test_dir),
+        configDict = {'root.dir': os.path.abspath(_root_test_dir),
+                  'temp.build.dir': os.path.abspath(os.path.join(_root_test_dir, 'temp_build_files')),
+                  'archives.dir': os.path.abspath(_root_test_dir),
                   'name': 'manifest_test_unicode',
                   'max.files.per.archive': '1',
                   'include': 'test_unicode/',
@@ -288,22 +288,22 @@ class LogicalArchiveTest(unittest.TestCase):
         config = configuration.Configuration(configDict)
 
         builder = archive.ArchivePreBuilder(configuration.ConfigurationSet([config]), "config", index=0)
-        manifest_file_path = builder.build_manifest(config)        
+        manifest_file_path = builder.build_manifest(config)
         builder.manifest_to_commands(config, manifest_file_path)
         
-        includeFilePath = os.path.join(root_test_dir, 'temp_build_files/manifest_test_unicode_includefile.txt')
-        includeFilePath1 = os.path.join(root_test_dir, 'temp_build_files/manifest_test_unicode_part01.txt')
-        includeFilePath2 = os.path.join(root_test_dir, 'temp_build_files/manifest_test_unicode_part02.txt')
-        includeFilePath3 = os.path.join(root_test_dir, 'temp_build_files/manifest_test_unicode_part03.txt')
+        includeFilePath = os.path.join(_root_test_dir, 'temp_build_files/manifest_test_unicode_includefile.txt')
+        includeFilePath1 = os.path.join(_root_test_dir, 'temp_build_files/manifest_test_unicode_part01.txt')
+        includeFilePath2 = os.path.join(_root_test_dir, 'temp_build_files/manifest_test_unicode_part02.txt')
+        includeFilePath3 = os.path.join(_root_test_dir, 'temp_build_files/manifest_test_unicode_part03.txt')
 
-        with open(includeFilePath) as f:
-            content = f.readlines()
-        with open(includeFilePath1) as f:
-            content1 = f.readlines()
-        with open(includeFilePath2) as f:
-            content2 = f.readlines()
-        with open(includeFilePath3) as f:
-            content3 = f.readlines()
+        with open(includeFilePath) as f_file:
+            content = f_file.readlines()
+        with open(includeFilePath1) as f_file:
+            content1 = f_file.readlines()
+        with open(includeFilePath2) as f_file:
+            content2 = f_file.readlines()
+        with open(includeFilePath3) as f_file:
+            content3 = f_file.readlines()
         print "content: ", content
         print "content1: ", content1
         print "content2: ", content2
@@ -316,9 +316,9 @@ class LogicalArchiveTest(unittest.TestCase):
 
     def test_distribution_policy_mapper_config(self):
         """ Testing the policy mapper. """
-        configDict = {'root.dir': root_test_dir,
-                  'temp.build.dir': os.path.join(root_test_dir, 'temp_build_files'),
-                  'archives.dir': root_test_dir,
+        configDict = {'root.dir': _root_test_dir,
+                  'temp.build.dir': os.path.join(_root_test_dir, 'temp_build_files'),
+                  'archives.dir': _root_test_dir,
                   'name': 's60_policy_mapper_test',
                   'include': 's60/',
                   'archive.tool': '7za',
@@ -372,11 +372,11 @@ class LogicalArchiveTest(unittest.TestCase):
         if os.sep == '\\':
             for i in range(len(expected_paths9999)):
                 expected_paths9999[i] = expected_paths9999[i].lower()
-        includeFilePath = os.path.join(root_test_dir, 'temp_build_files/s60_policy_mapper_test_includefile.txt')
-        includeFilePath0 = os.path.join(root_test_dir, 'temp_build_files/s60_policy_mapper_test_0.txt')
-        includeFilePath1 = os.path.join(root_test_dir, 'temp_build_files/s60_policy_mapper_test_1.txt')
-        includeFilePath9999 = os.path.join(root_test_dir, 'temp_build_files/s60_policy_mapper_test_9999.txt')
-        includeFilePathInternal = os.path.join(root_test_dir, 'temp_build_files/s60_policy_mapper_test.internal.txt')
+        includeFilePath = os.path.join(_root_test_dir, 'temp_build_files/s60_policy_mapper_test_includefile.txt')
+        includeFilePath0 = os.path.join(_root_test_dir, 'temp_build_files/s60_policy_mapper_test_0.txt')
+        includeFilePath1 = os.path.join(_root_test_dir, 'temp_build_files/s60_policy_mapper_test_1.txt')
+        includeFilePath9999 = os.path.join(_root_test_dir, 'temp_build_files/s60_policy_mapper_test_9999.txt')
+        includeFilePathInternal = os.path.join(_root_test_dir, 'temp_build_files/s60_policy_mapper_test.internal.txt')
         
         content = self.__read_manifest(includeFilePath)
         expected_paths.sort()
@@ -408,12 +408,14 @@ class LogicalArchiveTest(unittest.TestCase):
         print "Commands : ", cmds
         assert len(cmds) == 3
 
+# pylint: disable-msg=C0103
 
     def test_distribution_policy_mapper_config_no_zip2zip(self):
         """ Testing the policy mapper. """
-        configDict = {'root.dir': root_test_dir,
-                  'temp.build.dir': os.path.join(root_test_dir, 'temp_build_files'),
-                  'archives.dir': root_test_dir,
+
+        configDict = {'root.dir': _root_test_dir,
+                  'temp.build.dir': os.path.join(_root_test_dir, 'temp_build_files'),
+                  'archives.dir': _root_test_dir,
                   'name': 's60_policy_mapper_test_noz2z',
                   'include': 's60/',
                   'archive.tool': '7za',
@@ -431,7 +433,7 @@ class LogicalArchiveTest(unittest.TestCase):
                            's60' + os.sep + 'component_private' + os.sep + 'Distribution.Policy.S60',
                            's60' + os.sep + 'component_public' + os.sep + 'component_public_file.txt',
                            's60' + os.sep + 'component_public' + os.sep + 'Distribution.Policy.S60',
-                           's60' + os.sep + 'Distribution.Policy.S60',                           
+                           's60' + os.sep + 'Distribution.Policy.S60',
                            's60' + os.sep + 'missing' + os.sep + 'subdir' + os.sep + 'another_subdir' + os.sep + 'to_be_removed_9999.txt',
                            's60' + os.sep + 'missing' + os.sep + 'subdir' + os.sep + 'Distribution.Policy.S60',
                            's60' + os.sep + 'missing' + os.sep + 'subdir' + os.sep + 'not_to_be_removed_0.txt',
@@ -468,11 +470,11 @@ class LogicalArchiveTest(unittest.TestCase):
                 expected_paths9999[i] = expected_paths9999[i].lower()
 
         expected_paths.sort()
-        includeFilePath = os.path.join(root_test_dir, 'temp_build_files/s60_policy_mapper_test_includefile.txt')
-        includeFilePath0 = os.path.join(root_test_dir, 'temp_build_files/s60_policy_mapper_test_0.txt')
-        includeFilePath1 = os.path.join(root_test_dir, 'temp_build_files/s60_policy_mapper_test_1.txt')
-        includeFilePath9999 = os.path.join(root_test_dir, 'temp_build_files/s60_policy_mapper_test_9999.txt')
-        includeFilePathInternal = os.path.join(root_test_dir, 'temp_build_files/s60_policy_mapper_test_noz2z.internal.txt')
+        includeFilePath = os.path.join(_root_test_dir, 'temp_build_files/s60_policy_mapper_test_includefile.txt')
+        includeFilePath0 = os.path.join(_root_test_dir, 'temp_build_files/s60_policy_mapper_test_0.txt')
+        includeFilePath1 = os.path.join(_root_test_dir, 'temp_build_files/s60_policy_mapper_test_1.txt')
+        includeFilePath9999 = os.path.join(_root_test_dir, 'temp_build_files/s60_policy_mapper_test_9999.txt')
+        includeFilePathInternal = os.path.join(_root_test_dir, 'temp_build_files/s60_policy_mapper_test_noz2z.internal.txt')
         
         content = self.__read_manifest(includeFilePath)
         expected_paths.sort()
@@ -501,16 +503,17 @@ class LogicalArchiveTest(unittest.TestCase):
         assert os.path.exists(includeFilePathInternal) == False
         print "Commands : ", cmds
         assert len(cmds) == 1
+# pylint: enable-msg=C0103
 
 
-    def test_distribution_policy_mapper_remover_config(self):
+    def test_dist_policy_mapper_remover_config(self):
         """ Testing the policy remover mapper. """
-        configDict = {'root.dir': root_test_dir,
-                  'temp.build.dir': os.path.join(root_test_dir, 'temp_build_files'),
-                  'archives.dir': root_test_dir,
+        configDict = {'root.dir': _root_test_dir,
+                  'temp.build.dir': os.path.join(_root_test_dir, 'temp_build_files'),
+                  'archives.dir': _root_test_dir,
                   'name': 's60_policy_mapper_test',
                   'include': 's60/',
-                  'policy.root.dir': os.path.join(root_test_dir, 's60'),
+                  'policy.root.dir': os.path.join(_root_test_dir, 's60'),
                   'archive.tool': '7za',
                   'mapper': 'policy.remover',
                   'policy.zip2zip': 'true',
@@ -556,9 +559,9 @@ class LogicalArchiveTest(unittest.TestCase):
             for i in range(len(expected_paths1)):
                 expected_paths1[i] = expected_paths1[i].lower()
         expected_paths1.sort()
-        includeFilePath = os.path.join(root_test_dir, 'temp_build_files/s60_policy_mapper_test_includefile.txt')
-        includeFilePath0 = os.path.join(root_test_dir, 'temp_build_files/s60_policy_mapper_test_0.txt')
-        includeFilePath1 = os.path.join(root_test_dir, 'temp_build_files/s60_policy_mapper_test_1.txt')
+        includeFilePath = os.path.join(_root_test_dir, 'temp_build_files/s60_policy_mapper_test_includefile.txt')
+        includeFilePath0 = os.path.join(_root_test_dir, 'temp_build_files/s60_policy_mapper_test_0.txt')
+        includeFilePath1 = os.path.join(_root_test_dir, 'temp_build_files/s60_policy_mapper_test_1.txt')
         
         content = self.__read_manifest(includeFilePath)
         expected_paths.sort()
@@ -582,14 +585,14 @@ class LogicalArchiveTest(unittest.TestCase):
         assert len(cmds[3]) == 7
 
 
-    def test_distribution_policy_mapper_sf_remover_config(self):
+    def test_dist_policy_mapper_sf_remvr_config(self):
         """ Testing the policy SFL remover mapper. """
-        configDict = {'root.dir': root_test_dir,
-                  'temp.build.dir': os.path.join(root_test_dir, 'temp_build_files'),
-                  'archives.dir': root_test_dir,
+        configDict = {'root.dir': _root_test_dir,
+                  'temp.build.dir': os.path.join(_root_test_dir, 'temp_build_files'),
+                  'archives.dir': _root_test_dir,
                   'name': 'sf_policy_sf_mapper_test',
                   'include': 'sf/',
-                  'policy.root.dir': os.path.join(root_test_dir, 'sf'),
+                  'policy.root.dir': os.path.join(_root_test_dir, 'sf'),
                   'archive.tool': '7za',
                   'mapper': 'sfl.policy.remover',
                   'policy.zip2zip': 'false',
@@ -656,12 +659,12 @@ class LogicalArchiveTest(unittest.TestCase):
             for i in range(len(expected_paths9)):
                 expected_paths9[i] = expected_paths9[i].lower()
  
-        includeFilePath = os.path.join(root_test_dir, 'temp_build_files/sf_policy_sf_mapper_test_includefile.txt')
-        includeFilePath0 = os.path.join(root_test_dir, 'temp_build_files/sf_policy_sf_mapper_test_0.txt')
-        includeFilePath1 = os.path.join(root_test_dir, 'temp_build_files/sf_policy_sf_mapper_test_1.txt')
-        includeFilePath3 = os.path.join(root_test_dir, 'temp_build_files/sf_policy_sf_mapper_test_3.txt')
-        includeFilePath7 = os.path.join(root_test_dir, 'temp_build_files/sf_policy_sf_mapper_test_7.txt')
-        includeFilePath9 = os.path.join(root_test_dir, 'temp_build_files/sf_policy_sf_mapper_test_9999.txt')
+        includeFilePath = os.path.join(_root_test_dir, 'temp_build_files/sf_policy_sf_mapper_test_includefile.txt')
+        includeFilePath0 = os.path.join(_root_test_dir, 'temp_build_files/sf_policy_sf_mapper_test_0.txt')
+        includeFilePath1 = os.path.join(_root_test_dir, 'temp_build_files/sf_policy_sf_mapper_test_1.txt')
+        includeFilePath3 = os.path.join(_root_test_dir, 'temp_build_files/sf_policy_sf_mapper_test_3.txt')
+        includeFilePath7 = os.path.join(_root_test_dir, 'temp_build_files/sf_policy_sf_mapper_test_7.txt')
+        includeFilePath9 = os.path.join(_root_test_dir, 'temp_build_files/sf_policy_sf_mapper_test_9999.txt')
         
         
         content = self.__read_manifest(includeFilePath)
@@ -708,14 +711,14 @@ class LogicalArchiveTest(unittest.TestCase):
             print cmd
         assert len(cmds[1]) == len(expected_paths)-len(expected_paths3), "Remore must be equal to len(expected_paths) - len(expected_paths3)"
 
-    def test_distribution_policy_mapper_epl_remover_config(self):
+    def test_dist_policy_mapper_epl_remvr_config(self):
         """ Testing the policy EPL remover mapper. """
-        configDict = {'root.dir': root_test_dir,
-                  'temp.build.dir': os.path.join(root_test_dir, 'temp_build_files'),
-                  'archives.dir': root_test_dir,
+        configDict = {'root.dir': _root_test_dir,
+                  'temp.build.dir': os.path.join(_root_test_dir, 'temp_build_files'),
+                  'archives.dir': _root_test_dir,
                   'name': 'sf_policy_epl_mapper_test',
                   'include': 'sf/',
-                  'policy.root.dir': os.path.join(root_test_dir, 'sf'),
+                  'policy.root.dir': os.path.join(_root_test_dir, 'sf'),
                   'archive.tool': '7za',
                   'mapper': 'epl.policy.remover',
                   'policy.zip2zip': 'false',
@@ -782,12 +785,12 @@ class LogicalArchiveTest(unittest.TestCase):
             for i in range(len(expected_paths9)):
                 expected_paths9[i] = expected_paths9[i].lower()
 
-        includeFilePath = os.path.join(root_test_dir, 'temp_build_files/sf_policy_epl_mapper_test_includefile.txt')
-        includeFilePath0 = os.path.join(root_test_dir, 'temp_build_files/sf_policy_epl_mapper_test_0.txt')
-        includeFilePath1 = os.path.join(root_test_dir, 'temp_build_files/sf_policy_epl_mapper_test_1.txt')
-        includeFilePath3 = os.path.join(root_test_dir, 'temp_build_files/sf_policy_epl_mapper_test_3.txt')
-        includeFilePath7 = os.path.join(root_test_dir, 'temp_build_files/sf_policy_epl_mapper_test_7.txt')
-        includeFilePath9 = os.path.join(root_test_dir, 'temp_build_files/sf_policy_epl_mapper_test_9999.txt')
+        includeFilePath = os.path.join(_root_test_dir, 'temp_build_files/sf_policy_epl_mapper_test_includefile.txt')
+        includeFilePath0 = os.path.join(_root_test_dir, 'temp_build_files/sf_policy_epl_mapper_test_0.txt')
+        includeFilePath1 = os.path.join(_root_test_dir, 'temp_build_files/sf_policy_epl_mapper_test_1.txt')
+        includeFilePath3 = os.path.join(_root_test_dir, 'temp_build_files/sf_policy_epl_mapper_test_3.txt')
+        includeFilePath7 = os.path.join(_root_test_dir, 'temp_build_files/sf_policy_epl_mapper_test_7.txt')
+        includeFilePath9 = os.path.join(_root_test_dir, 'temp_build_files/sf_policy_epl_mapper_test_9999.txt')
         
         
         content = self.__read_manifest(includeFilePath)
@@ -836,8 +839,8 @@ class LogicalArchiveTest(unittest.TestCase):
 
     def __read_manifest(self, manifest):
         """ read the file and sort"""
-        with open(manifest) as f:
-            content = f.readlines()
+        with open(manifest) as f_file:
+            content = f_file.readlines()
         if os.sep == '\\':
             content = [s.strip().lower() for s in content]
         else:
@@ -848,9 +851,9 @@ class LogicalArchiveTest(unittest.TestCase):
 
     def test_split_manifest_file(self):
         """ A LogicalArchive can split a manifest correctly. """
-        configDict = {'root.dir': os.path.abspath(root_test_dir),
-                  'temp.build.dir': os.path.abspath(os.path.join(root_test_dir, 'temp_build_files')),
-                  'archives.dir': os.path.abspath(root_test_dir),
+        configDict = {'root.dir': os.path.abspath(_root_test_dir),
+                  'temp.build.dir': os.path.abspath(os.path.join(_root_test_dir, 'temp_build_files')),
+                  'archives.dir': os.path.abspath(_root_test_dir),
                   'name': 'manifest_test',
                   'max.files.per.archive': '1',
                   'include': 'dir/',
@@ -867,16 +870,16 @@ class LogicalArchiveTest(unittest.TestCase):
         expectedPaths1 = ['dir' + os.sep + 'emptysubdir1\n']
         expectedPaths2 = ['dir' + os.sep + 'emptysubdir2\n']
         
-        includeFilePath = os.path.join(root_test_dir, 'temp_build_files/manifest_test_includefile.txt')
-        includeFilePath1 = os.path.join(root_test_dir, 'temp_build_files/manifest_test_part01.txt')
-        includeFilePath2 = os.path.join(root_test_dir, 'temp_build_files/manifest_test_part02.txt')
+        includeFilePath = os.path.join(_root_test_dir, 'temp_build_files/manifest_test_includefile.txt')
+        includeFilePath1 = os.path.join(_root_test_dir, 'temp_build_files/manifest_test_part01.txt')
+        includeFilePath2 = os.path.join(_root_test_dir, 'temp_build_files/manifest_test_part02.txt')
 
-        with open(includeFilePath) as f:
-            content = f.readlines()
-        with open(includeFilePath1) as f:
-            content1 = f.readlines()
-        with open(includeFilePath2) as f:
-            content2 = f.readlines()
+        with open(includeFilePath) as f_file:
+            content = f_file.readlines()
+        with open(includeFilePath1) as f_file:
+            content1 = f_file.readlines()
+        with open(includeFilePath2) as f_file:
+            content2 = f_file.readlines()
         print "content: ", content
         print "content1: ", content1
         print "content2: ", content2
@@ -892,16 +895,16 @@ class CheckRootDirValueTest(unittest.TestCase):
     """test root drive value"""
     def test_checkRootDirValue(self):
         """ Testing the root drive value. """
-        configDict = {'root.dir': root_test_dir,
-                'temp.build.dir': os.path.join(root_test_dir, 'temp_build_files'),
-                'archives.dir': root_test_dir,
+        configDict = {'root.dir': _root_test_dir,
+                'temp.build.dir': os.path.join(_root_test_dir, 'temp_build_files'),
+                'archives.dir': _root_test_dir,
                 'name': 'regular_path_test',
                 'include': 'dir1/*.txt',
                 'archive.tool': '7za'
                }
         configDictUnc = {'root.dir': "\\\\server\\share\\dir",
-                'temp.build.dir': os.path.join(root_test_dir, 'temp_build_files'),
-                'archives.dir': root_test_dir,
+                'temp.build.dir': os.path.join(_root_test_dir, 'temp_build_files'),
+                'archives.dir': _root_test_dir,
                 'name': 'unc_test',
                 'include': 'dir1/*.txt',
                 'archive.tool': '7za'
@@ -920,8 +923,8 @@ class CheckRootDirValueTest(unittest.TestCase):
                                                '\\\\server2\\share\\somedir'])
             self.assert_(len(roots) == 3)
             self.assert_('\\\\server\\share\\' in roots)
-            self.assert_('\\\\server\\share1\\' in roots)
-            self.assert_('\\\\server2\\share\\' in roots)
+            self.assert_('\\\\server\\share1\\dir\\' in roots)
+            self.assert_('\\\\server2\\share\\somedir\\' in roots)
 
 class MockedConfigBuilder:
     """."""
@@ -942,28 +945,29 @@ class MockedArchivePreBuilder(archive.ArchivePreBuilder):
     def unSubStituteDrives(self, drive):
         """ unsubstitute the drive"""
         pass
-    
+
     def rewriteXMLFile(self, xml_file, parse_xml_file):
         """re-write XML file"""
         doc = xml.dom.minidom.parse(xml_file)
         out = open(parse_xml_file, 'w')
         doc.writexml(out, indent='')
         out.close()
-            
-  
+
+
 class ZipArchiverTest(unittest.TestCase):
     """ Unit test case for seven zip archiver """
     def test_extension(self):
-        t = archive.tools.SevenZipArchiver()
-        self.assert_(t.extension() == ".zip")
+        """test extension"""
+        t_tools = archive.tools.SevenZipArchiver()
+        self.assert_(t_tools.extension() == ".zip")
     
 class SevenZipFormatArchiverTest(unittest.TestCase):
     """ Testing 7z archiver class """
     def test_archive(self):
         """ Testing whether the ant file for running 7z is created """
-        configDict = {'root.dir': os.path.abspath(root_test_dir),
-                  'temp.build.dir': os.path.abspath(os.path.join(root_test_dir, 'temp_build_files')),
-                  'archives.dir': os.path.abspath(root_test_dir),
+        configDict = {'root.dir': os.path.abspath(_root_test_dir),
+                  'temp.build.dir': os.path.abspath(os.path.join(_root_test_dir, 'temp_build_files')),
+                  'archives.dir': os.path.abspath(_root_test_dir),
                   'name': 'manifest_test',
                   'max.files.per.archive': '1',
                   'include': 'dir/',
@@ -974,7 +978,7 @@ class SevenZipFormatArchiverTest(unittest.TestCase):
         builder = archive.ArchivePreBuilder(configuration.ConfigurationSet([config]), "config", index=0)
         manifest_file_path = builder.build_manifest(config)
         builder.manifest_to_commands(config, manifest_file_path)
-        tmpfilename = os.path.join(os.path.abspath(root_test_dir),'test_archive_7z.xml')
+        tmpfilename = os.path.join(os.path.abspath(_root_test_dir),'test_archive_7z.xml')
         builder.write(tmpfilename)
         tmpfileh = open(tmpfilename,'r')
         content = tmpfileh.read()    

@@ -16,6 +16,7 @@
 #
 #Description:
 #===============================================================================
+""" SIS """
 
 import os
 import buildtools
@@ -78,7 +79,7 @@ class SisPreBuilder(buildtools.PreBuilder):
                 raise Exception("Invalid property %s if using new 'input' SIS configuration" % property_)
         
         input_ = config['input']
-        (input_path, input_name) = os.path.split(input_)
+        (input_path, _) = os.path.split(input_)
         (input_root, input_ext) = os.path.splitext(input_)
         valid_extensions = ['.pkg', '.sis', '.sisx']
         if input_ext not in valid_extensions:
@@ -105,7 +106,3 @@ class SisPreBuilder(buildtools.PreBuilder):
         # Copy content to SIS files directory
         copyCommand = buildtools.Copy(output, config['build.sisfiles.dir'])
         commandList.addCommand(copyCommand, newstage=True)
-        
-
-
-

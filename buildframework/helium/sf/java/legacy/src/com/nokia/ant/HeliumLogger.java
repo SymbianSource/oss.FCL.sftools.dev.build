@@ -131,9 +131,9 @@ public class HeliumLogger extends DefaultLogger {
     private void cleanup() {
         String loggingoutputfile = project.getProperty("logging.output.file");
         if (loggingoutputfile != null) {
-            File f = new File(loggingoutputfile);
-            if (f.exists()) {
-                f.delete();
+            File file = new File(loggingoutputfile);
+            if (file.exists()) {
+                file.delete();
             }
         }
 

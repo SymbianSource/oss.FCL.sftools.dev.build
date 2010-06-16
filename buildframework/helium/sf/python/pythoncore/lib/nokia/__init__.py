@@ -16,4 +16,4 @@
 #
 #Description:
 #===============================================================================
-
+"""python core library init file for nokia code"""

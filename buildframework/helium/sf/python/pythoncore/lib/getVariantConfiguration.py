@@ -1,5 +1,5 @@
 #============================================================================ 
-#Name        : getVariantConfiguration.py 
+#Name        : getvariantconfiguration.py 
 #Part of     : Helium 
 
 #Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
@@ -16,6 +16,7 @@
 #
 #Description:
 #===============================================================================
+"""get variant configuration"""
 
 import configuration
 import sys
@@ -66,9 +67,9 @@ def main():
                     alreadyDone[variant['PRODUCT_NAME']] = {}
                 if variant.type not in alreadyDone[variant['PRODUCT_NAME']] and variant['PRODUCT_NAME'] == product:
                     alreadyDone[variant['PRODUCT_NAME']][variant.type] = True
-                    v = VariantInfo(variant['ROFS2_DIR'])
-                    if len(str(v)) > 0:
-                        outfile.write(str(v)+"\n")
+                    v_info = VariantInfo(variant['ROFS2_DIR'])
+                    if len(str(v_info)) > 0:
+                        outfile.write(str(v_info)+"\n")
         outfile.close()
     except Exception, exc:
         print "ERROR: %s" % exc

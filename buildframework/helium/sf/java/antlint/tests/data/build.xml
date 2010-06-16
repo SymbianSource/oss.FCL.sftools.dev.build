@@ -22,4 +22,8 @@ Description:
 -->
 <project name="sample.build">
 
+	<target name="test">
+		<echo> Test target </echo>
+	</target>
+		
 </project>

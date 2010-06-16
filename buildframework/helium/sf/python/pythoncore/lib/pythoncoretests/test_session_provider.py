@@ -17,9 +17,10 @@
 #Description:
 #===============================================================================
 
-""" Test cases for ccm python toolkit.
+""" Test cases for ccm python toolkit."""
 
-"""
+# pylint: disable-msg=R0201
+
 import unittest
 import ccm
 import ccm.extra
@@ -81,7 +82,7 @@ class SessionProviderTest(unittest.TestCase):
         """ Test the opening of an invalid database. """
         prov = ccm.extra.SessionProvider(opener=MockOpener())
         try:
-            dbase = prov.get(database="invaliddb")
+            _ = prov.get(database="invaliddb")
             assert False, "Should raise Exception when giving unexisting dbase.'"
         except Exception, exc:
             _logger.info(exc)
@@ -114,7 +115,7 @@ class CachedSessionProviderTest(unittest.TestCase):
         """ Test the opening of an invalid database (cached). """
         prov = ccm.extra.CachedSessionProvider(opener=MockOpener())
         try:
-            dbase = prov.get(database="invaliddb")
+            _ = prov.get(database="invaliddb")
             assert False, "Should raise Exception when giving unexisting dbase.'"
         except Exception, exc:
             _logger.info(exc)

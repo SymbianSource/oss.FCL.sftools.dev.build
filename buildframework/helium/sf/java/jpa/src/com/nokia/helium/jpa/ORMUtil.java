@@ -38,6 +38,10 @@ public final class ORMUtil {
     private static HashMap<String, ORMEntityManager> emMap = 
         new HashMap<String, ORMEntityManager>();
 
+    private static HashMap<String, Integer> emMapCount = 
+        new HashMap<String, Integer>();
+
+    private static Object mutexObject = new Object();
     private ORMUtil() {
     }
     
@@ -50,13 +54,22 @@ public final class ORMUtil {
         log.debug("initializeORM: urlpath: " + urlPath);
         if (manager == null) {
             try {
+                log.debug("initializing for the first time");
                 manager = new ORMEntityManager(urlPath);
                 emMap.put(urlPath, manager);
+                Integer countObj = new Integer(1);
+                emMapCount.put(urlPath, countObj);
                 log.debug("initializeORM: manager: " + manager);
                 log.debug("initializeORM: manager: " + manager.getEntityManager());
             } catch ( IOException ex ) {
                 throw new BuildException("Entity Manager creation failure");
             }
+        } else {
+            Integer countObj = emMapCount.get(urlPath);
+            log.debug("object exists and incrementing the value");
+            countObj = new Integer(countObj.intValue() + 1);
+            log.debug("object exists count value: " + countObj.intValue());
+            emMapCount.put(urlPath, countObj);
         }
     }
 
@@ -64,7 +77,7 @@ public final class ORMUtil {
      * Helper Function to return the entity manager.
      * @return entity manager created during initialization.
      */
-    public static ORMEntityManager getEntityManager(String urlPath) {
+    public static synchronized ORMEntityManager getEntityManager(String urlPath) {
         log.debug("getEntityManager: urlpath: " + urlPath);
         ORMEntityManager manager = emMap.get(urlPath);
         if (manager != null) {
@@ -80,14 +93,30 @@ public final class ORMUtil {
     /**
      * Finalize the entity manager and release all the objects.
      */
-    public static void finalizeORM(String urlPath) {
+    public static synchronized void finalizeORM(String urlPath) {
         ORMEntityManager manager = emMap.get(urlPath);
         log.debug("finalizeORM: urlpath: " + urlPath);
         if (manager != null) {
-            manager.finalizeEntityManager();
-            manager = null;
-            log.debug("finalizeORM: manager" + manager);
-            emMap.remove(urlPath);
+            Integer countObj = emMapCount.get(urlPath);
+            if (countObj != null) {
+                int count = countObj.intValue();
+                count = count - 1;
+                if (count > 0) {
+                    countObj = new Integer(count);
+                    log.debug("countOBj value: " + countObj.intValue());
+                    emMapCount.put(urlPath, countObj);
+                } else {
+                    manager.finalizeEntityManager();
+                    manager = null;
+                    log.debug("finalizeORM: manager" + manager);
+                    emMap.remove(urlPath);
+                    emMapCount.remove(urlPath);
+                }
+            }
         }
+    }
+    
+    public static Object getMutexObject() {
+        return mutexObject;
     }
 }

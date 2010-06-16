@@ -24,8 +24,8 @@ Description:
     <!-- Task definition -->
     <taskdef name="sbstask" classname="com.nokia.helium.sbs.ant.taskdefs.SBSTask"/>
     <taskdef name="ctctask" classname="com.nokia.helium.sbs.ant.taskdefs.CTCTask"/>
-    <taskdef name="coveritybuild" classname="com.nokia.helium.sbs.ant.taskdefs.SBSCoverity"/>
-    <taskdef name="getsbsinputs" classname="com.nokia.helium.sbs.ant.taskdefs.GetSBSInputs"/>
+    <taskdef name="coveritybuild" classname="com.nokia.helium.sbs.ant.taskdefs.SBSCoverityTask"/>
+    <taskdef name="getsbsinputs" classname="com.nokia.helium.sbs.ant.taskdefs.GetSBSInputsTask"/>
     <!-- Type definition -->
     <typedef name="sbsbuild" classname="com.nokia.helium.sbs.ant.types.SBSBuild"/>
     <typedef name="sbsinput" classname="com.nokia.helium.sbs.ant.types.SBSInput"/>

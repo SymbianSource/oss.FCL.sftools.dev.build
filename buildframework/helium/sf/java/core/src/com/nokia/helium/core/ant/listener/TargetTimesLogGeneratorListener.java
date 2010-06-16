@@ -92,8 +92,8 @@ public class TargetTimesLogGeneratorListener implements BuildListener {
                             targetTimesLogCsv, true);
                     timesLogOut = new DataOutputStream(timesLogFileStream);
                     // Display (sorted) hashtable.
-                    for (String s : targetTimesTable)
-                        timesLogOut.writeBytes(s + "\n");
+                    for (String targetTime : targetTimesTable)
+                        timesLogOut.writeBytes(targetTime + "\n");
                     timesLogOut.close();
                 }
             } catch (java.io.FileNotFoundException ex) {

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<diamonds-build>
+    <schema>21</schema>
+    <cmt>
+        <files>3578</files>
+        <locphy>1449873</locphy>
+        <locbl>197449</locbl>
+        <locpro>883402</locpro>
+        <loccom>483</loccom>
+        <vg>79966</vg>
+        <mi_wo_comments>92</mi_wo_comments>
+        <mi_comment_weight>32</mi_comment_weight>
+        <mi>125</mi>
+    </cmt>
+</diamonds-build>

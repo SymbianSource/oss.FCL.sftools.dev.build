@@ -28,6 +28,8 @@ import time
 import ccm
 import ccm.extra
 import fileutils
+from xml.dom.minidom import getDOMImplementation
+
 
 # Uncomment this line to enable logging in this module, or configure logging elsewhere
 logging.basicConfig(level=logging.INFO)
@@ -80,10 +82,15 @@ class PreparationAction(object):
             It should implement the action to achieve.
         """
         pass
-        
+    
+    def extract_release_data(self):
+        """ This method is used to retrieve current project
+            environment data. (e.g. project name) 
+        """
+        return None
 
     def get_session(self):
-        """ Helper that retreive the session from the builder. Setting threads correctly. """
+        """ Helper that retrieve the session from the builder. Setting threads correctly. """
         if self._config.has_key('database'):
             return self._builder.session(self._config['database'], self.get_threads())
         if not self._config.has_key('host'):
@@ -240,13 +247,34 @@ class PreparationCheckout(PreparationAction):
             co_role = ccm.get_role_for_purpose(session, str(self._config['purpose']))
             session.role = co_role
             try:
-                delResult = result.delete(recurse=True)
+                delResult = result.delete(scope='project_and_subproject_hierarchy')
             finally:
                 session.role = role
             ccm.log_result(delResult, ccm.CHECKOUT_LOG_RULES, _logger)
-            
 
+    def extract_release_data(self):
+        """ Extracting data for a checked out project. """
+        data = None
+        session = self.get_session()
+        project = session.create(self._config.name)
         
+        session.home = self._config['dir']
+        
+        result = self.__find_project(project)
+        if (result != None) and (self._config.get_boolean('releasable', False)):
+            if  'baseline.release' in self._config:
+                data = {}
+                _logger.info("Releasing: '%s'" % result)
+                data['name'] = result.objectname
+                data['database'] = session.database()
+                data['role'] = ccm.get_role_for_purpose(session, str(self._config['purpose']))
+                data['dir'] = os.path.normpath(self._config['dir'])
+                data['pst'] = result.name
+                data['release'] = self._config['baseline.release']
+            else:
+                _logger.warning("Could not release " + result.objectname + " because the 'baseline.release' property is missing.")
+        return data
+    
     def execute(self):
         """ Creates a checkout of the project, or updates an existing checkout if one is found.
         
@@ -602,6 +630,28 @@ class PreparationUpdate(PreparationCheckout):
         
         session.role = role
 
+    def extract_release_data(self):
+        """ Extracting data for an updated project. """
+        data = None
+        session = self.get_session()
+        project = session.create(self._config.name)
+        
+        session.home = self._config['dir']
+        
+        if self._config.get_boolean('releasable', False):
+            if 'baseline.release' in self._config:
+                data = {}
+                _logger.info("Releasing: '%s'" % project)
+                data['name'] = project.objectname
+                data['database'] = session.database()
+                data['role'] = ccm.get_role_for_purpose(session, str(self._config['purpose']))
+                data['dir'] = os.path.normpath(self._config['dir'])
+                data['pst'] = project.name
+                data['release'] = self._config['baseline.release']
+            else:
+                _logger.warning("Could not release " + project + " because the 'baseline.release' property is missing.")
+        return data
+
 class PreparationBuilder(object):
     """ Creates an updated work area from a configuration. """
     def __init__(self, configs, username = None, password = None, cache=None):
@@ -635,6 +685,26 @@ class PreparationBuilder(object):
         for action in self._actions:
             action.execute()
 
+    def extract_release_data(self, filename):
+        """ Extract project information into an xml file. """
+
+        impl = getDOMImplementation()
+
+        doc = impl.createDocument(None, "release", None)
+        top_element = doc.documentElement
+        
+        for action in self._actions:
+            data = action.extract_release_data()
+            if data:
+                project_node = doc.createElement('project')
+                for attr in data:
+                    project_node.setAttribute(attr, data[attr])
+                top_element.appendChild(project_node)
+        
+        f_file = open(filename, 'w+')
+        f_file.write(doc.toprettyxml(indent="  "))
+        f_file.close()
+        
     def session(self, database, size=1, engine=None, dbpath=None):
         """ Handles pool rather that sessions. """
         assert size > 0, "The pool must contains at least one session!"

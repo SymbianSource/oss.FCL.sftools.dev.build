@@ -50,6 +50,8 @@ Description:
         <dependency org="com.nokia.helium" name="helium-legacy" rev="latest.integration" conf="default"/>
         <dependency org="com.nokia.helium" name="helium-sbs" rev="latest.integration" conf="default"/>
         <dependency org="com.nokia.helium" name="helium-checktools" rev="latest.integration" conf="default"/>
+        <dependency org="com.nokia.helium" name="helium-synergy" rev="latest.integration" conf="default"/>
+        <dependency org="com.nokia.helium" name="helium-ccmtask" rev="latest.integration" conf="default"/>
         <dependency org="com.nokia.helium" name="java-analyser-config" rev="latest.integration" conf="default"/>
         
         <!-- Helium Python deps -->

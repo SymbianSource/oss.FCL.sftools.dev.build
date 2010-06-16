@@ -21,6 +21,8 @@
 
 """
 
+# pylint: disable-msg=R0201
+
 import logging
 import unittest
 import os
@@ -35,6 +37,7 @@ class TestGSCM(unittest.TestCase):
     """ Test cases for gscm python wrapper. """
     
     def setUp(self):
+        """setUp automatically called before running the tests"""
         if os.environ.has_key('CCM_DATABASE'):
             self.ccmdatabase = os.environ['CCM_DATABASE']
         else:

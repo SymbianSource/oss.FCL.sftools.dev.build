@@ -16,6 +16,9 @@
 #
 #Description:
 #===============================================================================
+""" test log to XML """
+
+# pylint: disable-msg=R0201
 
 import unittest
 import logging
@@ -24,7 +27,7 @@ import log2xml
 from xml.dom import minidom
 import tempfile
 
-logger = logging.getLogger('test.log2xml')
+_logger = logging.getLogger('test.log2xml')
 
 
 class Log2XMLTest(unittest.TestCase):

@@ -1,6 +1,6 @@
 <#--
 ============================================================================ 
-Name        : 
+Name        : quick_start_guide.rst.ftl
 Part of     : Helium 
 
 Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
@@ -20,54 +20,37 @@ Description:
 ============================================================================
 -->
 ########################
-Helium Quick Start Guide 
+Helium Quick-Start Guide 
 ########################
 
 .. index::
-  module: Helium Quick Start Guide
+  module: Helium Quick-Start Guide
 
 .. contents::
 
 Introduction
 ============
 
-This document is a quick start guide for Ant based Helium build framework. More information can be found from `Helium manual`_.
+This document is a quick-start guide for the Ant-based Helium build framework. More information can be found from `Helium manual`_.
 
-.. _`Helium manual`: index.html#index-65
-
-This quick start guide is aimed at getting you helium on the build machine and showing you how to run helium in the very
-simplest of ways. Further reading and configuration is required to perform a complete build of a component or a product.
+.. _`Helium manual`: manual/index.html
 
 
 .. index::
   single: Helium configuration
-
-Helium configuration
---------------------
-
-- Helium is configured using a combination of Ant configuration elements (properties, filesets, etc) and other XML files for more complex
-  configuration of particular parts of the build. For initial tests run in this quick start guide you do not need to configure anything, but 
-  do please read the following references for more information:
-
-  - `Using Ant <http://ant.apache.org/manual/using.html>`_: specifically the Projects and Properties sections.
-  - `Configure Helium  <manual/configuring.html>`_: `common configuration format <manual/configuring.html#common-configuration-format>`_ and `Helium stages <manual/stages.html>`_.
-  - `Helium glossary <api/helium/properties-table.html>`_: lists the specific properties used in Helium.
-
 
 
 Installation
 =============
 
 <#if !ant?keys?seq_contains("sf")>
-The quickest way to get Helium is to check out from Subversion. Go to a directory and enter::
+Helium can be retrieved from the Hydra_ service:
 
-    svn co http://helium.nmp.nokia.com/svn/helium/tags/helium-8.0
-    
-Modify the path for the version of Helium you need.
+.. _Hydra: http://wikis.in.nokia.com/Hydra
 
-Read `Retrieving Helium`_ for additional ways to get Helium.
-
-.. _`Retrieving Helium`: manual/retrieving.html
+:URL: http://trhdr001.nmp.nokia.com/services/90?page=1 
+:Service: SoftwareBuildSolutions_Tools
+:Product: BuildEnvironment
 
 </#if>
 
@@ -77,6 +60,19 @@ Read `Retrieving Helium`_ for additional ways to get Helium.
 
 </#if>
 
+
+Configuration
+=============
+
+- Helium is configured using a combination of Ant configuration elements (properties, filesets, etc) and other XML files for more complex
+  configuration of particular parts of the build. For initial tests run in this quick-start guide you do not need to configure anything, but 
+  do please read the following references for more information:
+
+  - `Using Ant <http://ant.apache.org/manual/using.html>`_: specifically the Projects and Properties sections.
+  - `Configure Helium  <manual/configuring.html>`_: `common configuration format <manual/configuring.html#common-configuration-format>`_ and `Helium stages <manual/stages.html>`_.
+  - `Helium glossary <api/helium/properties-table.html>`_: lists the specific properties used in Helium.
+  
+  
 .. index::
   single: Running builds with Helium
 

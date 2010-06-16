@@ -16,4 +16,4 @@
 #
 #Description:
 #===============================================================================
-
+""" python core library sysdef initialisation"""

@@ -16,6 +16,7 @@
 #
 #Description:
 #===============================================================================
+""" test configuration model"""
 
 import logging
 import os
@@ -26,7 +27,7 @@ import configuration
 import configuration_model
 
 
-logger = logging.getLogger('test.configuration_model')
+_logger = logging.getLogger('test.configuration_model')
 #logging.basicConfig(level=logging.DEBUG)
 
 class GroupDefTest(unittest.TestCase):
@@ -58,7 +59,7 @@ class GroupDefTest(unittest.TestCase):
         assert len(items) == 2
         assert isinstance(items[0], configuration_model.MissingFromDataModelItem)
     
-    def test_required_property_in_group_not_defined(self):
+    def test_rqrd_property_in_group_not_defined(self):
         """ Required property in a group missing from config is identified. """
         config = configuration.Configuration({'test.property.1': '1', 'test.property.3': '3'})
         items = self.model.validate_config(config)
@@ -73,7 +74,7 @@ class MissingFromDataModelItemTest(unittest.TestCase):
         """ Basic validation item usage. """
         item = configuration_model.MissingFromDataModelItem('test.property')
         self.assert_(str(item) == 'Property not in data model: test.property')
-        item.log(logger)
+        item.log(_logger)
         
         
 class DataModelTest(unittest.TestCase):

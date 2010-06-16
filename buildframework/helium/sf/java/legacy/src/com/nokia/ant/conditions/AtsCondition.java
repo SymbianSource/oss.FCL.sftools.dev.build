@@ -73,16 +73,16 @@ public class AtsCondition extends ProjectComponent implements Condition
                 for (Iterator iterator = antDoc.selectNodes("//test/failed").iterator(); iterator.hasNext();)
                 {
                     testsfound = true;
-                    Element e = (Element) iterator.next();
-                    String failed = e.getText();
+                    Element element = (Element) iterator.next();
+                    String failed = element.getText();
                     if (!failed.equals("0"))
                     {
                         log.error("ATS tests failed");
                         
                         for (Iterator iterator2 = antDoc.selectNodes("//actual_result").iterator(); iterator2.hasNext();)
                         {
-                            Element e2 = (Element) iterator2.next();
-                            log.error(e2.getText());
+                            Element resultElement = (Element) iterator2.next();
+                            log.error(resultElement.getText());
                         }
                         return false;
                     }

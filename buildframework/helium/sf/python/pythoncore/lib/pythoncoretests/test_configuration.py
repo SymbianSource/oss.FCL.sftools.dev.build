@@ -16,6 +16,9 @@
 #
 #Description:
 #===============================================================================
+""" test configuration """
+
+# pylint: disable-msg=R0201
 
 import logging
 import StringIO
@@ -212,7 +215,7 @@ class NestedConfigurationBuilderTest(unittest.TestCase):
         builder = configuration.NestedConfigurationBuilder(StringIO.StringIO(config_text))
         configSet = builder.getConfiguration()
         configs = configSet.getConfigurations('test_spec_1')
-        (out, outputFile) = tempfile.mkstemp('.tmp', 'zip_test')
+        (_, outputFile) = tempfile.mkstemp('.tmp', 'zip_test')
         builder.writeToXML(outputFile, configs, 'test_spec_1')
         
         builder = configuration.NestedConfigurationBuilder(open(outputFile), 'r')
@@ -224,7 +227,7 @@ class NestedConfigurationBuilderTest(unittest.TestCase):
         builder = configuration.NestedConfigurationBuilder(StringIO.StringIO(config_text))
         configSet = builder.getConfiguration()
         configs = configSet.getConfigurations('test_spec')
-        (out, outputFile) = tempfile.mkstemp('.tmp', 'zip_test')
+        (_, outputFile) = tempfile.mkstemp('.tmp', 'zip_test')
         builder.writeToXML(outputFile, configs )
         
         builder = configuration.NestedConfigurationBuilder(open(outputFile), 'r')
@@ -235,7 +238,6 @@ class NestedConfigurationBuilderTest(unittest.TestCase):
         
         
 
-        
 class PropertiesConfigurationTest(unittest.TestCase):
     """ Test plain text configuration files. """
     def test_text_config(self):
@@ -250,9 +252,9 @@ class PropertiesConfigurationTest(unittest.TestCase):
         config = configuration.PropertiesConfiguration(open(os.path.join(os.environ['TEST_DATA'], 'data/ant_config_test.txt'), 'r'))
 
         config['foo'] = "bar"
-        (fd, filename) = tempfile.mkstemp()
-        f = os.fdopen(fd, 'w')
-        config.store(f)
+        (f_d, filename) = tempfile.mkstemp()
+        f_file = os.fdopen(f_d, 'w')
+        config.store(f_file)
         config = configuration.PropertiesConfiguration(open(filename))
         
         assert config['text.a'] == 'text.value.A'

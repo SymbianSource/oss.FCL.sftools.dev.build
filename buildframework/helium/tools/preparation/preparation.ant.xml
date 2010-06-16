@@ -357,20 +357,7 @@ if project.getProperty("build.area.count") > project.getProperty("build.area.lim
             <then>
                 <antcall target="dragonfly-prep-drive"/>
             </then>
-            <else>
-                <if>
-                    <and>
-                        <not>
-                            <isset property="build.drive.notdefined"/>
-                        </not>
-                        <os family="windows"/>
-                    </and>
-                    <then>
-                        <echo>Unsubsting any existing path substed to ${build.drive}.
-If this fails, it is because there was no substed drive.</echo>
-                        <hlm:unsubst drive="${build.drive}" failonerror="${failonerror}"/>
-                    </then>   
-                </if>    
+            <else> 
                 <tstamp>
                     <format property="old.prep.dir.timestamp" pattern="yyyyMMdd'_'HHmmss" />
                 </tstamp>
@@ -403,8 +390,8 @@ if prep_build_dir.exists():
                 fail build if prep.root.dir property is not set.-->
                 <fail unless="prep.root.dir" message="prep.root.dir value should be specified." />
                 <mkdir dir="${prep.build.dir}" />
-                
-                <exec osfamily="windows" executable="subst.exe" failonerror="false">
+                <hlm:unsubst drive="${build.drive}" failonerror="false"/>
+                <exec osfamily="windows" executable="subst" failonerror="false">
                     <arg value="${build.drive}" />
                     <arg value="${prep.build.dir}" />
                 </exec>
@@ -459,6 +446,12 @@ if prep_build_dir.exists():
           Diamonds. Also  build.property.cache.file will be there contains all the diamonds related properties 
     --> 
     <target name="diamonds">
+        <!--* @property skip.diamonds
+        Set to true to skip diamonds.
+        @type boolean
+        @editable required
+        @scope public
+        -->
         <mkdir dir="${diamonds.build.output.dir}" />
         <var name="diamonds.build.url"  value="http://${diamonds.host}:${diamonds.port}${diamonds.build.id}"/>
         <echoproperties destfile="${build.property.cache.file}">
@@ -578,12 +571,7 @@ if prep_build_dir.exists():
     
     <!-- Can be used to unsubst the drive . -->
     <target name="remove-drive">
-        <if>
-            <os family="windows"/>
-            <then>
-                <hlm:unsubst drive="${build.drive}"/>
-            </then>
-        </if>
+        <hlm:unsubst drive="${build.drive}"/>
     </target>
     
     <!--

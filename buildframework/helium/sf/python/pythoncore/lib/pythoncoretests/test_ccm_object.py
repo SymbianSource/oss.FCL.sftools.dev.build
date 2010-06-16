@@ -20,13 +20,16 @@
 """ Test cases for ccm python toolkit.
     unitesting CCMObject functionality
 """
+
+# pylint: disable-msg=R0201
+
 import unittest
 import ccm
 import logging
 
 # Uncomment this line to enable logging in this module, or configure logging elsewhere
 logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger('test.ccm_objects')
+_logger = logging.getLogger('test.ccm_objects')
 #
 #class CCMObjectTest(unittest.TestCase):
 #    """ Module related to CCMObject (and related) function testing. """
@@ -35,7 +38,7 @@ logger = logging.getLogger('test.ccm_objects')
 #        #vc1tltst
 #        self.session = ccm.open_session(database = 'to1tobet')
 #        if self.session is None:
-#            logger.error("Error creating connection.")
+#            _logger.error("Error creating connection.")
 #            raise Exception("Couldn't open a session.")
 #
 #    def tearDown(self):
@@ -56,10 +59,10 @@ logger = logging.getLogger('test.ccm_objects')
 #        project = self.session.create("mc-mc_4032_0728:project:vc1s60p1#1")
 #        release = self.session.create("mc/next")
 #        if not project.exists():
-#           logger.error("Project doesn't exists.")
+#           _logger.error("Project doesn't exists.")
 #           return       
 #        if not release.exists():           
-#           logger.error("Release doesn't exists.")
+#           _logger.error("Release doesn't exists.")
 #           return
 #           
 #        coproject = project.checkout(release).project
@@ -83,10 +86,12 @@ class MockResultSession(ccm.AbstractSession):
         self._database = database
     
     def database(self):
+        """database """
         return self._database
     
     def execute(self, cmdline, result=None):
-        logger.debug(cmdline)
+        """execute"""
+        _logger.debug(cmdline)
         if result == None:
             result = ccm.Result(self)
         if self._behave.has_key(cmdline):
@@ -99,6 +104,7 @@ class MockResultSession(ccm.AbstractSession):
 class CCMObjectTest(unittest.TestCase):
     """ Unit test case for CCMObject functionality """
     def test_get_baseline(self):
+        """test get baseline"""
         behave = {'up -show baseline_project "foo-1.0:project:db#1" -f "%displayname" -u': """foo-1.0:project:db#1 does not have a baseline project.
 """,
                   'up -show baseline_project "foo-2.0:project:db#1" -f "%displayname" -u': """foo-1.0:project:db#1
@@ -117,16 +123,33 @@ class CCMObjectTest(unittest.TestCase):
         project = session.create('project-1:project:db#1')
         result = project.delete()        
         assert "Deleting object 'project-1:project:db#1'" in result.output
-    
+
+    def test_delete_project_scope(self):
+        """ Check project deletion with custom scope """
+        behave = {'delete  -scope "project_and_subproject_hierarchy" -project "project-1:project:db#1"': "Deleting object 'project-1:project:db#1'"}
+        session = MockResultSession(behave)
+        project = session.create('project-1:project:db#1')
+        result = project.delete(scope='project_and_subproject_hierarchy')        
+        assert "Deleting object 'project-1:project:db#1'" in result.output
+
+    def test_delete_project_invalid_args(self):
+        """ Check project synergy is failing in case of bad synergy parameters for delete """
+        behave = {'delete  -project "project-1:project:db#1"': "Cannot use '-scope' option with '-r' option."}
+        session = MockResultSession(behave)
+        project = session.create('project-1:project:db#1')
+        try:
+            result = project.delete(recurse=True, scope='project_and_subproject_hierarchy')        
+            assert False, "The delete method must fail in case of synergy failure"
+        except:
+            pass
+
     def test_delete_object(self):
         """ Check object deletion """
         behave = {'delete   "object-1:object:db#1"': "Deleting object 'object-1:object:db#1'"}
         session = MockResultSession(behave)
-        o = session.create('object-1:object:db#1')
-        result = o.delete()        
+        obj = session.create('object-1:object:db#1')
+        result = obj.delete()
         assert "Deleting object 'object-1:object:db#1'" in result.output
 
 if __name__ == "__main__":
     unittest.main()
-
-

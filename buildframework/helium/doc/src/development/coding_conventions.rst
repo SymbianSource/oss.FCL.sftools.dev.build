@@ -340,7 +340,7 @@ Unit testing
 
 * Unit tests are written for each Python module.
 * They should follow the Nose_ testing framework conventions.
-* The test suite is run by calling ``hlm py-unittest``.
+* The test suite is run by calling :hlm-t:`py-unittest`.
 
 .. _Nose : http://somethingaboutorange.com/mrl/projects/nose/
 

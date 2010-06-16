@@ -159,7 +159,7 @@ public class SBSLogMetaDataInput extends XMLLogMetaDataInput implements CustomMe
      */
     @Deprecated
     public void setCleanLogFile(File logFile) {
-       log("The usage of the cleanLogFile is deprecated.");
+        log("The usage of the cleanLogFile is deprecated.");
     }
 
     /**
@@ -217,7 +217,7 @@ public class SBSLogMetaDataInput extends XMLLogMetaDataInput implements CustomMe
                         toProcess.put(text.trim(), streamReader.getLocation().getLineNumber() + i);
                     }
                     i++;
-               }
+                }
                 boolean entryCreated = false;
                 //Check for any general errors.
                 for (String textString : toProcess.keySet()) {
@@ -238,64 +238,64 @@ public class SBSLogMetaDataInput extends XMLLogMetaDataInput implements CustomMe
      * @return true if there are any element to be added to the database.
      */
     public boolean startElement (XMLStreamReader streamReader) {
-            String tagName = streamReader.getLocalName();
-            if (tagName.equalsIgnoreCase("buildlog")) {
-                logger.debug("starting with buildlog");
-                inMainDataSection  = true;
+        String tagName = streamReader.getLocalName();
+        if (tagName.equalsIgnoreCase("buildlog")) {
+            logger.debug("starting with buildlog");
+            inMainDataSection  = true;
+        }
+        if (tagName.equalsIgnoreCase("recipe") ) {
+            lineNumber = streamReader.getLocation().getLineNumber();
+            currentComponent = getComponent(streamReader);
+            recordText = true;
+            inMainDataSection = false;
+            recipeStatus = "ok";
+        } if (tagName.equalsIgnoreCase("status") ) {
+            String exit = streamReader.getAttributeValue(null, "exit");
+            recipeStatus = (exit != null) ? exit : "ok";
+        } else if (tagName.equalsIgnoreCase("error")
+                || tagName.equalsIgnoreCase("warning")) {
+            lineNumber = streamReader.getLocation().getLineNumber();
+            currentComponent = getComponent(streamReader);
+            recordText = true;
+            inMainDataSection = false;
+        } else if (tagName.equalsIgnoreCase("whatlog")) {
+            members.clear();
+            currentComponent = getComponent(streamReader);
+            inMainDataSection = false;
+            inWhatLogSection = true;
+        } else if (inWhatLogSection && tagName.equals("export")) {
+            String text = SBSLogMetaDataInput.getAttribute("destination", streamReader);
+            if (text != null && text.trim().length() > 0) {
+                String member = SBSLogMetaDataInput.removeDriveAndBldInf(text);
+                boolean exists = (new File(text)).exists();
+                Metadata.WhatLogMember entry = new Metadata.WhatLogMember(member, exists);
+                members.add(entry);
             }
-            if (tagName.equalsIgnoreCase("recipe") ) {
-                lineNumber = streamReader.getLocation().getLineNumber();
-                currentComponent = getComponent(streamReader);
-                recordText = true;
-                inMainDataSection = false;
-                recipeStatus = "ok";
-            } if (tagName.equalsIgnoreCase("status") ) {
-                String exit = streamReader.getAttributeValue(null, "exit");
-                recipeStatus = (exit != null) ? exit : "ok";
-            } else if (tagName.equalsIgnoreCase("error")
-                    || tagName.equalsIgnoreCase("warning")) {
-                lineNumber = streamReader.getLocation().getLineNumber();
-                currentComponent = getComponent(streamReader);
-                recordText = true;
-                inMainDataSection = false;
-            } else if (tagName.equalsIgnoreCase("whatlog")) {
-                members.clear();
-                currentComponent = getComponent(streamReader);
-                inMainDataSection = false;
-                inWhatLogSection = true;
-            } else if (inWhatLogSection && tagName.equals("export")) {
-                String text = SBSLogMetaDataInput.getAttribute("destination", streamReader);
-                if (text != null && text.trim().length() > 0) {
-                    String member = SBSLogMetaDataInput.removeDriveAndBldInf(text);
-                    boolean exists = (new File(text)).exists();
-                    Metadata.WhatLogMember entry = new Metadata.WhatLogMember(member, exists);
-                    members.add(entry);
+        } else if (inWhatLogSection && !tagName.equals("export")) {
+            logTextInfo = "";
+            recordText = true;                
+        } else if (tagName.equalsIgnoreCase("time")) {
+            inMainDataSection = false;
+            currentElapsedTime = Float.valueOf(getAttribute("elapsed", streamReader)).floatValue();
+            logger.debug("currentElapsedTime: " + currentElapsedTime);
+            if (currentComponent != null) {
+                TimeEntry timeObject = componentTimeMap.get(currentComponent);
+                logger.debug("currentComponent:" + currentComponent);
+                if (timeObject == null) {
+                    timeObject = new TimeEntry(currentElapsedTime, getCurrentFile().toString());
+                    componentTimeMap.put(currentComponent, timeObject);
+                    logger.debug("creating to new time object");
+                } else  {
+                    timeObject.addElapsedTime(currentElapsedTime);
+                    logger.debug("adding it to existing time object");
                 }
-            } else if (inWhatLogSection && !tagName.equals("export")) {
-                logTextInfo = "";
-                recordText = true;                
-            } else if (tagName.equalsIgnoreCase("time")) {
-                inMainDataSection = false;
-                currentElapsedTime = Float.valueOf(getAttribute("elapsed", streamReader)).floatValue();
-                logger.debug("currentElapsedTime: " + currentElapsedTime);
-                if (currentComponent != null) {
-                    TimeEntry timeObject = componentTimeMap.get(currentComponent);
-                    logger.debug("currentComponent:" + currentComponent);
-                    if (timeObject == null) {
-                        timeObject = new TimeEntry(currentElapsedTime, getCurrentFile().toString());
-                        componentTimeMap.put(currentComponent, timeObject);
-                        logger.debug("creating to new time object");
-                    } else  {
-                        timeObject.addElapsedTime(currentElapsedTime);
-                        logger.debug("adding it to existing time object");
-                    }
-                }
-            } else if (tagName.equalsIgnoreCase("clean")) {
-                inMainDataSection = false;
-            } else if (tagName.equalsIgnoreCase("info")) {
-                inMainDataSection = false;
-                recordText = true;
             }
+        } else if (tagName.equalsIgnoreCase("clean")) {
+            inMainDataSection = false;
+        } else if (tagName.equalsIgnoreCase("info")) {
+            inMainDataSection = false;
+            recordText = true;
+        }
         return false;
     }
 
@@ -306,40 +306,40 @@ public class SBSLogMetaDataInput extends XMLLogMetaDataInput implements CustomMe
      * @return true if there are any element to be added to the database.
      */
     public boolean isAdditionalEntry() {
-            if (!componentTimeMap.isEmpty()) {
-                Set<String> componentSet = componentTimeMap.keySet();
-                for (String component : componentSet) {
-                    
-                    TimeEntry entry = componentTimeMap.get(component);
-                    addEntry("default", component, entry.getFilePath(), -1, 
-                            null, entry.getElapsedTime(), null);
-                    componentTimeMap.remove(component);
-                    return true;
+        if (!componentTimeMap.isEmpty()) {
+            Set<String> componentSet = componentTimeMap.keySet();
+            for (String component : componentSet) {
+                
+                TimeEntry entry = componentTimeMap.get(component);
+                addEntry("default", component, entry.getFilePath(), -1, 
+                        null, entry.getElapsedTime(), null);
+                componentTimeMap.remove(component);
+                return true;
+            }
+        }
+        if (!categorizationCompleted) {
+            if (cleanLogFile != null) {
+                if (categorizationHandler == null ) {
+                    logger.debug("initializing categorization handler");
+                    categorizationHandler = 
+                        new CategorizationHandler(cleanLogFile, generalTextEntries);
                 }
             }
-            if (!categorizationCompleted) {
-                if (cleanLogFile != null) {
-                    if (categorizationHandler == null ) {
-                        logger.debug("initializing categorization handler");
-                        categorizationHandler = 
-                            new CategorizationHandler(cleanLogFile, generalTextEntries);
+            if (categorizationHandler != null && categorizationHandler.hasNext()) {
+                try {
+                    CategoryEntry entry = categorizationHandler.getNext();
+                    if (entry != null) {
+                        addEntry(entry.getSeverity(), entry.getCategory(), entry.getLogFile(), 
+                                entry.getLineNumber(), entry.getText());
+                        return true;
                     }
+                } catch (XMLStreamException ex) {
+                    logger.debug("Exception during categorization handler", ex);
+                    return false;
                 }
-                if (categorizationHandler != null && categorizationHandler.hasNext()) {
-                    try {
-                        CategoryEntry entry = categorizationHandler.getNext();
-                        if (entry != null) {
-                            addEntry(entry.getSeverity(), entry.getCategory(), entry.getLogFile(), 
-                                    entry.getLineNumber(), entry.getText());
-                            return true;
-                        }
-                    } catch (XMLStreamException ex) {
-                        logger.debug("Exception during categorization handler", ex);
-                        return false;
-                    }
-                }
-                categorizationCompleted = true;
             }
+            categorizationCompleted = true;
+        }
         return false;
     }
 
@@ -349,68 +349,68 @@ public class SBSLogMetaDataInput extends XMLLogMetaDataInput implements CustomMe
      * @return true if there are any element to be added to the database.
      */
     public boolean endElement(XMLStreamReader streamReader) {
-            String tagName = streamReader.getLocalName();
-            if (tagName.equalsIgnoreCase("recipe")) {
-                inMainDataSection = true;
-                recordText = false;
-                if (logTextInfo != null) {
-                    if (currentComponent == null) {
-                        currentComponent = "general";
-                    }
-                    Statistics stat = new Statistics();
-                    boolean entryCreated = findAndAddEntries(logTextInfo, currentComponent,
-                            getCurrentFile().toString(), lineNumber, stat);
-                    if (stat.getSeveriry("error") == 0 && recipeStatus.equals("failed")) {
-                        addEntry("error", currentComponent, getCurrentFile().toString(), 
-                                lineNumber, FAILED_STATUS_MESSAGE);
-                        entryCreated = true;
-                    }
-                    logTextInfo = "";
-                    recipeStatus = "ok";
-                    return entryCreated;
-                }
-            } else if (tagName.equalsIgnoreCase("error")
-                    || tagName.equalsIgnoreCase("warning")) {
-                inMainDataSection = true;
-                recordText = false;
+        String tagName = streamReader.getLocalName();
+        if (tagName.equalsIgnoreCase("recipe")) {
+            inMainDataSection = true;
+            recordText = false;
+            if (logTextInfo != null) {
                 if (currentComponent == null) {
                     currentComponent = "general";
                 }
-                addEntry(tagName, currentComponent, getCurrentFile().toString(), lineNumber, 
-                        logTextInfo);
-                logTextInfo = "";
-                return true;
-            } else if (tagName.equalsIgnoreCase("whatlog") ) {
-                inWhatLogSection = false;
-                inMainDataSection = true;
-                recordText = false;
-                logTextInfo = "";
-                addEntry("default", currentComponent, getCurrentFile().toString(), 
-                        streamReader.getLocation().getLineNumber(), "what log info", -1,  new Metadata.WhatEntry(currentComponent, members));
-                return true;
-            } else if (inWhatLogSection && !tagName.equalsIgnoreCase("export") && !tagName.equalsIgnoreCase("whatlog")) {
-                if (logTextInfo.trim().length() > 0) {
-                    String member = SBSLogMetaDataInput.removeDriveAndBldInf(logTextInfo.trim());
-                    boolean exists = (new File(logTextInfo.trim())).exists();
-                    Metadata.WhatLogMember entry = new Metadata.WhatLogMember(member, exists);
-                    members.add(entry);
+                Statistics stat = new Statistics();
+                boolean entryCreated = findAndAddEntries(logTextInfo, currentComponent,
+                        getCurrentFile().toString(), lineNumber, stat);
+                if (stat.getSeveriry("error") == 0 && recipeStatus.equals("failed")) {
+                    addEntry("error", currentComponent, getCurrentFile().toString(), 
+                            lineNumber, FAILED_STATUS_MESSAGE);
+                    entryCreated = true;
                 }
                 logTextInfo = "";
-                recordText = false;
-            } else if (tagName.equalsIgnoreCase("clean")) {
-                inMainDataSection = true;                
-            } else if (tagName.equalsIgnoreCase("info")) {
-                inMainDataSection = true;
-                recordText = false;
-                if (logTextInfo != null) {
-                    Matcher m = buildTimeMatcher.matcher(logTextInfo);
-                    if (m.matches()) {
-                        buildTime = Integer.parseInt(m.group(1));
-                        logger.info("Run time: " + buildTime);
-                    }
-                }
-                logTextInfo = "";
+                recipeStatus = "ok";
+                return entryCreated;
             }
+        } else if (tagName.equalsIgnoreCase("error")
+                || tagName.equalsIgnoreCase("warning")) {
+            inMainDataSection = true;
+            recordText = false;
+            if (currentComponent == null) {
+                currentComponent = "general";
+            }
+            addEntry(tagName, currentComponent, getCurrentFile().toString(), lineNumber, 
+                    logTextInfo);
+            logTextInfo = "";
+            return true;
+        } else if (tagName.equalsIgnoreCase("whatlog") ) {
+            inWhatLogSection = false;
+            inMainDataSection = true;
+            recordText = false;
+            logTextInfo = "";
+            addEntry("default", currentComponent, getCurrentFile().toString(), 
+                    streamReader.getLocation().getLineNumber(), "what log info", -1,  new Metadata.WhatEntry(currentComponent, members));
+            return true;
+        } else if (inWhatLogSection && !tagName.equalsIgnoreCase("export") && !tagName.equalsIgnoreCase("whatlog")) {
+            if (logTextInfo.trim().length() > 0) {
+                String member = SBSLogMetaDataInput.removeDriveAndBldInf(logTextInfo.trim());
+                boolean exists = (new File(logTextInfo.trim())).exists();
+                Metadata.WhatLogMember entry = new Metadata.WhatLogMember(member, exists);
+                members.add(entry);
+            }
+            logTextInfo = "";
+            recordText = false;
+        } else if (tagName.equalsIgnoreCase("clean")) {
+            inMainDataSection = true;                
+        } else if (tagName.equalsIgnoreCase("info")) {
+            inMainDataSection = true;
+            recordText = false;
+            if (logTextInfo != null) {
+                Matcher matcher = buildTimeMatcher.matcher(logTextInfo);
+                if (matcher.matches()) {
+                    buildTime = Integer.parseInt(matcher.group(1));
+                    logger.info("Run time: " + buildTime);
+                }
+            }
+            logTextInfo = "";
+        }
         return false;
     }
 
@@ -725,27 +725,27 @@ class CategoryEntry {
                 while (xmlStreamReader.hasNext()) {
                     int eventType = xmlStreamReader.next();
                     switch (eventType) {
-                    case XMLEvent.START_ELEMENT:
-                        startElement(xmlStreamReader);
-                        break;
-                    case XMLEvent.END_ELEMENT:
-                        endElement(xmlStreamReader);
-                        break;
-                    case XMLEvent.CHARACTERS:
-                        String path = characters(xmlStreamReader);
-                        if (path != null ) {
-                            currentList = getEntry(path);
-                            if (currentList != null && !currentList.isEmpty()) {
-                                if (currentComponent != null) {
-                                    updateCategoryEntries(currentList, currentComponent);
-                                    CategoryEntry entry = (CategoryEntry)currentList.remove(0);
-                                    return entry;
+                        case XMLEvent.START_ELEMENT:
+                            startElement(xmlStreamReader);
+                            break;
+                        case XMLEvent.END_ELEMENT:
+                            endElement(xmlStreamReader);
+                            break;
+                        case XMLEvent.CHARACTERS:
+                            String path = characters(xmlStreamReader);
+                            if (path != null ) {
+                                currentList = getEntry(path);
+                                if (currentList != null && !currentList.isEmpty()) {
+                                    if (currentComponent != null) {
+                                        updateCategoryEntries(currentList, currentComponent);
+                                        CategoryEntry entry = (CategoryEntry)currentList.remove(0);
+                                        return entry;
+                                    }
                                 }
                             }
-                        }
-                        break;
-                    default:
-                        break;
+                            break;
+                        default:
+                            break;
                     }
                 }
                 if (xmlStreamReader != null) {

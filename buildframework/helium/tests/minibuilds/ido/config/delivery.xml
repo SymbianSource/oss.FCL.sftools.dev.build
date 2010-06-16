@@ -29,14 +29,17 @@ Description:
 		<set name="show.conflicts" value="true" />
 		<set name="fix.missing.baselines" value="true" />
 		<set name="replace.subprojects" value="true" />
-		
+
 
 
         <set name="use.reconfigure.template" value="true" />
-        <set name="purpose" value="Insulated Development" />
+        <set name="purpose" value="Integration Testing" />
         <set name="release" value="MinibuildDomain/next" />
 
-        <config name="${ccm.project}" type="checkout"/>
+        <config name="${ccm.project}" type="checkout">
+            <set name="releasable" value="true" />      
+            <set name="baseline.release" value="MinibuildDomain/92_201019" />
+        </config>
         
     </config>
 </build>

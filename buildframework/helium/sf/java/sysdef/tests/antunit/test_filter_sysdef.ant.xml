@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : test_filter_sysdef.ant.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test-filter-sysdef" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>Helium antlib filter sysdef tests.</description>
+
+    <taskdef resource="com/nokia/helium/sysdef/ant/antlib.xml" uri="http://www.nokia.com/helium" />
+    <property name="epocroot" location="../../demo/data" />
+    <property name="epocroot.temp" location="${epocroot}/temp" />
+
+    <!-- is called prior to the test -->
+    <target name="setUp">
+        <delete dir="${epocroot.temp}/" failonerror="false" />
+        <mkdir dir="${epocroot.temp}" />
+    </target>
+
+    <!-- is called after the test, even if that caused an error -->
+    <target name="tearDown">
+        <delete dir="${epocroot.temp}" failonerror="false" />
+    </target>
+
+    <target name="test-noargs">
+        <au:expectfailure expectedMessage="'srcfile' attribute is not defined">
+            <hlm:filterSysdef />
+        </au:expectfailure>
+        <au:assertFileDoesntExist file="${epocroot.temp}/output.sysdef.xml" />
+    </target>
+
+    <target name="test-destfile-missing">
+        <au:expectfailure expectedMessage="'destfile' attribute is not defined">
+            <hlm:filterSysdef epocroot="${epocroot}" srcfile="../data/filter/canonical_system_definition.xml" />
+        </au:expectfailure>
+        <au:assertFileDoesntExist file="${epocroot.temp}/output.sysdef.xml" />
+    </target>
+
+    <target name="test-no-nested-filter">
+        <au:expectfailure expectedMessage="You must define at least one nested filterset element.">
+            <hlm:filterSysdef epocroot="${epocroot}" srcfile="../data/filter/canonical_system_definition.xml" 
+            destfile="${epocroot.temp}/filtered.xml" />
+        </au:expectfailure>
+        <au:assertFileDoesntExist file="${epocroot.temp}/filtered.xml" />
+    </target>
+
+    <target name="test-empty-nested-filterset">
+        <hlm:filterSysdef epocroot="${epocroot}" srcfile="../data/filter/canonical_system_definition.xml" 
+            destfile="${epocroot.temp}/filtered.xml">
+            <filterSet/>
+        </hlm:filterSysdef>
+        <au:assertFileExists file="${epocroot.temp}/filtered.xml" />
+    </target>
+
+    <target name="test-nested-filterset">
+        <hlm:filterSysdef epocroot="${epocroot}" srcfile="../data/filter/canonical_system_definition.xml" 
+            destfile="${epocroot.temp}/filtered.xml">
+            <filterSet>
+                <filter filter="test" type="has" />
+                <filter filter="test_unittest" type="has" />
+            </filterSet>
+        </hlm:filterSysdef>
+        <au:assertFileExists file="${epocroot.temp}/filtered.xml" />
+    </target>
+
+    <target name="test-nested-filterset-missing-filter-attribute">
+        <au:expectfailure expectedMessage="'filter' attribute is not defined.">
+        <hlm:filterSysdef epocroot="${epocroot}" srcfile="../data/filter/canonical_system_definition.xml" 
+            destfile="${epocroot.temp}/filtered.xml">
+            <filterSet>
+                <filter type="has" />
+            </filterSet>
+        </hlm:filterSysdef>
+        </au:expectfailure>
+        <au:assertFileDoesntExist file="${epocroot.temp}/filtered.xml" />
+    </target>
+
+    <target name="test-nested-filterset-refid">
+        <hlm:sysdefFilterSet id="filters.id">
+            <filter filter="test" type="has" />
+        </hlm:sysdefFilterSet>
+        <hlm:sysdefFilterSet id="filters2.id">
+            <filter filter="test_unittest" type="has" />
+        </hlm:sysdefFilterSet>
+        <hlm:filterSysdef epocroot="${epocroot}" srcfile="../data/filter/canonical_system_definition.xml" 
+            destfile="${epocroot.temp}/filtered.xml">
+            <filterSet refid="filters.id" />
+            <hlm:sysdefFilterSet refid="filters2.id"/>
+        </hlm:filterSysdef>
+        <au:assertFileExists file="${epocroot.temp}/filtered.xml" />
+    </target>
+
+</project>

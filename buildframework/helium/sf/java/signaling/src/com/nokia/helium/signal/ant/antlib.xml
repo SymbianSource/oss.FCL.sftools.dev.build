@@ -22,8 +22,8 @@ Description:
 -->
 <antlib>
     <!-- Task definition -->
-    <taskdef name="signal" classname="com.nokia.helium.signal.ant.taskdefs.Signal"/>
-    <taskdef name="clearDeferredFailures" classname="com.nokia.helium.signal.ant.taskdefs.ClearDeferredFailures"/>
+    <taskdef name="signal" classname="com.nokia.helium.signal.ant.taskdefs.SignalTask"/>
+    <taskdef name="clearDeferredFailures" classname="com.nokia.helium.signal.ant.taskdefs.ClearDeferredFailuresTask"/>
     
     <!-- Type definition -->
     <typedef name="hasDeferredFailure" classname="com.nokia.helium.signal.ant.conditions.DeferredFailureCondition"/>

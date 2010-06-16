@@ -16,6 +16,9 @@
 #
 #Description:
 #===============================================================================
+""" test free disk """
+
+# pylint: disable-msg=R0201
 
 import unittest
 import logging
@@ -31,7 +34,7 @@ class FreeDiskTest(unittest.TestCase):
 if sys.platform == "win32":
     from win32api import GetLogicalDriveStrings
     
-    logger = logging.getLogger('test_freedisk')
+    _logger = logging.getLogger('test_freedisk')
     
     ## MAKE SURE that the drive being tested MUST be there.
     class ToolTest(unittest.TestCase):

@@ -16,14 +16,16 @@
 #
 #Description:
 #===============================================================================
+""" helium logging file"""
 
 import os
 import logging
 import logging.config
-if os.environ.has_key("HELIUM_CACHE_DIR"):
-    logconf = os.path.join(os.environ['HELIUM_CACHE_DIR'], "logging." + os.environ['PID'] + ".conf")
-else:
-    logconf = os.path.join(os.getcwd(), "logging.conf")
 
-if os.path.exists(logconf):
-    logging.config.fileConfig(logconf)
+if os.environ.has_key("HELIUM_CACHE_DIR"):
+    _logconf = os.path.join(os.environ['HELIUM_CACHE_DIR'], "logging." + os.environ['PID'] + ".conf")
+else:
+    _logconf = os.path.join(os.getcwd(), "logging.conf")
+
+if os.path.exists(_logconf):
+    logging.config.fileConfig(_logconf)

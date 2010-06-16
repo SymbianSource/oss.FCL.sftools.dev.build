@@ -27,7 +27,7 @@ import traceback
 import ido
 
 logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("check_latest_release")
+_logger = logging.getLogger("check_latest_release")
 
 def validate(grace, service, product, release):
     """ Validate s60 grace server, s60 grace service, s60 grace product and 
@@ -50,7 +50,7 @@ def get_s60_env_details(grace, service, product, release, rev, cachefilename, s6
         revision = rev
 
     if cachefilename:
-        logger.info(str("Using cache file: %s" % cachefilename))
+        _logger.info(str("Using cache file: %s" % cachefilename))
     
     checkmd5 = False
     if s60gracecheckmd5 != None:
@@ -64,10 +64,10 @@ def get_s60_env_details(grace, service, product, release, rev, cachefilename, s6
     result = []
     for rel in os.listdir(branch):
         relpath = os.path.join(branch, rel)
-        logger.info("Checking: %s" % str(relpath))
+        _logger.info("Checking: %s" % str(relpath))
         res = re.match(r"%s%s$" % (release, revision), rel, re.I)
         if res != None:
-            logger.info("Found: %s" % str(relpath))
+            _logger.info("Found: %s" % str(relpath))
             result.append(relpath)
     result.sort(reverse=True)
     use_tickler = False
@@ -79,22 +79,22 @@ def get_s60_env_details(grace, service, product, release, rev, cachefilename, s6
         try:
             metadata_filename = symrec.find_latest_metadata(str(rel))
             if metadata_filename is not None and os.path.exists(metadata_filename):
-                logger.info(str("Validating: %s" % metadata_filename))
+                _logger.info(str("Validating: %s" % metadata_filename))
                 if (use_tickler):
                     validator = symrec.ValidateTicklerReleaseMetadata(metadata_filename, cachefilename)
                 else:
                     validator = symrec.ValidateReleaseMetadataCached(metadata_filename, cachefilename)
                 if validator.is_valid(checkmd5):
-                    logger.info(str("%s is valid." % rel))
+                    _logger.info(str("%s is valid." % rel))
                     validresults.append(rel)
                     break
                 else:
-                    logger.info(str("%s is not a valid release." % rel))
+                    _logger.info(str("%s is not a valid release." % rel))
             elif metadata_filename is None:
-                logger.info(str("Could not find the release metadata file under %s" % rel))
-        except Exception, e:
-            logger.warning(str("WARNING: %s: %s" % (rel , e)))
-            logger.warning(("%s is not a valid release." % rel))
+                _logger.info(str("Could not find the release metadata file under %s" % rel))
+        except Exception, exc:
+            _logger.warning(str("WARNING: %s: %s" % (rel , exc)))
+            _logger.warning(("%s is not a valid release." % rel))
             traceback.print_exc()
     
     result = validresults
@@ -108,13 +108,13 @@ def get_version(buiddrive, resultname):
     vfile = os.path.join(buiddrive + os.sep, 's60_version.txt')
     version = None
     if (os.path.exists(vfile)):
-        logger.info("Are we still up-to-date compare to %s" % str(vfile))
-        f = open(str(vfile), 'r')
-        version = f.readline()
-        logger.info(str("'%s' == '%s'" % (version, resultname)))
-        f.close()
+        _logger.info("Are we still up-to-date compare to %s" % str(vfile))
+        f_file = open(str(vfile), 'r')
+        version = f_file.readline()
+        _logger.info(str("'%s' == '%s'" % (version, resultname)))
+        f_file.close()
     else:
-        logger.info("Version file not found getting new environment...")
+        _logger.info("Version file not found getting new environment...")
     return version
         
 def create_ado_mapping(sysdefconfig, adomappingfile, adoqualitymappingfile, builddrive, adoqualitydirs):
@@ -122,7 +122,6 @@ def create_ado_mapping(sysdefconfig, adomappingfile, adoqualitymappingfile, buil
     input = open(sysdefconfig, 'r')
     output = open(adomappingfile, 'w')
     outputquality = open(adoqualitymappingfile, 'w')
-    components = {}
     for sysdef in input.readlines():
         sysdef = sysdef.strip()
         if len(sysdef) > 0:

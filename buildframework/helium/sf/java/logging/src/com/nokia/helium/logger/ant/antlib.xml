@@ -22,9 +22,9 @@ Description:
 -->
 <antlib>
     <!-- Task definition -->
-    <taskdef name="record" classname="com.nokia.helium.logger.ant.taskdefs.LogRecorder"/>
-    <taskdef name="logreplace" classname="com.nokia.helium.logger.ant.taskdefs.LogReplace"/>
-    <taskdef name="triggerlogger" classname="com.nokia.helium.logger.ant.taskdefs.TriggerLogger"/>
+    <taskdef name="record" classname="com.nokia.helium.logger.ant.taskdefs.LogRecorderTask"/>
+    <taskdef name="logreplace" classname="com.nokia.helium.logger.ant.taskdefs.LogReplaceTask"/>
+    <taskdef name="triggerlogger" classname="com.nokia.helium.logger.ant.taskdefs.TriggerLoggerTask"/>
     
     <!-- Type definition -->
     <typedef name="stagerecord" classname="com.nokia.helium.logger.ant.types.StageLogging"/>

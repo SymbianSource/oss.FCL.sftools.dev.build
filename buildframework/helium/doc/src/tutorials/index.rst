@@ -28,8 +28,6 @@
 
    qt_build.rst
    rom_image.rst
-   configuration/SimplestConfiguration.rst
-   configuration/UseHlmTasksInConfiguration.rst
    
    
    

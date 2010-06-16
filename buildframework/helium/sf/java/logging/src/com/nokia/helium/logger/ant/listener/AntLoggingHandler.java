@@ -44,15 +44,14 @@ import com.nokia.helium.logger.ant.types.Stage;
  */
 public class AntLoggingHandler implements Handler {
     private static Hashtable<File, RecorderEntry> recorderEntries = new Hashtable<File, RecorderEntry>();
+    private static HashMap<File, Boolean> fileCreatedMap = new HashMap<File, Boolean>();
+    private static boolean isDefaultStageStarted;
     private Map<String, Stage> stagesMapping;
     private Map<String, StageLogging> stageRecordMap;
     private HashMap<String, Vector<Target>> depStartTargetMap;
     private HashMap<String, Target> stageStartTargetMap;
-    private HashMap<File, Boolean> fileCreatedMap;
     private boolean isStageRecordingHappening;
     private boolean loggingStarted;
-    private boolean isStageInformationInited;
-    private boolean isDefaultStageStarted;
     private int loglevel = -1;
     private VerbosityLevelChoices antLogLevel;
     private Logger log = Logger.getLogger(AntLoggingHandler.class);
@@ -71,7 +70,7 @@ public class AntLoggingHandler implements Handler {
         stageRecordMap = new HashMap<String, StageLogging>();
         depStartTargetMap = new HashMap<String, Vector<Target>>();
         stageStartTargetMap = new HashMap<String, Target>();
-        fileCreatedMap = new HashMap<File, Boolean>();
+        initStagesInformation(project);
     }
 
     /**
@@ -93,7 +92,11 @@ public class AntLoggingHandler implements Handler {
             log.debug("Stopping stage logging for  [" + currentStageName
                     + "] for target [" + event.getTarget().getName() + "]");
             stopLog(currentStageName, "default");
-            startLog("default");
+            if (!isDefaultStageStarted)
+            {
+                startLog("default");
+                isDefaultStageStarted = true;
+            }
             currentStageName = null;
         }
     }
@@ -104,25 +107,23 @@ public class AntLoggingHandler implements Handler {
     public void handleTargetStarted(BuildEvent event) {
 
         // log.debug("Started target [" + event.getTarget().getName() + "]");
-        if (!this.isStageInformationInited) {
-            initStagesInformation(event.getProject());
-            this.isStageInformationInited = true;
-        }
 
-        if (this.isStageInformationInited && getLoggingStarted()
-                && !this.isDefaultStageStarted) {
+        if (getLoggingStarted() && !isDefaultStageStarted) {
             startLog("default");
-            this.isDefaultStageStarted = true;
+            isDefaultStageStarted = true;
         }
 
-        if (currentStageName == null && !getIsStageRecordingHappening()
-                && (getLoggingStarted())) {
-            String stageName = isStageValid(event.getTarget(), event
-                    .getProject());
+        if (currentStageName == null && !getIsStageRecordingHappening() && getLoggingStarted()) {
+            String stageName = isStageValid(event.getTarget(), event.getProject());
             if (stageName != null) {
                 log.debug("Started stage logging for  [" + stageName
                         + "] for target [" + event.getTarget().getName() + "]");
-                stopLog("default", stageName);
+
+                if (isDefaultStageStarted)
+                {
+                    stopLog("default", stageName);
+                    isDefaultStageStarted = false;
+                }
                 startLog(stageName);
                 currentStageName = stageName;
             }
@@ -147,7 +148,11 @@ public class AntLoggingHandler implements Handler {
          */
         if (getLoggingStarted() && getIsStageRecordingHappening()) {
             stopLog(currentStageName, "default");
-            startLog("default");
+            if (!isDefaultStageStarted)
+            {
+                startLog("default");
+                isDefaultStageStarted = true;
+            }
             currentStageName = null;
         }
 
@@ -155,8 +160,9 @@ public class AntLoggingHandler implements Handler {
          * If default stage logging happening stop logging into default ant log
          * file.
          */
-        if (this.isDefaultStageStarted && getLoggingStarted()) {
+        if (isDefaultStageStarted && getLoggingStarted()) {
             stopLog("default", null, event);
+            isDefaultStageStarted = false;
         }
         this.cleanup();
     }
@@ -202,6 +208,7 @@ public class AntLoggingHandler implements Handler {
     private void cleanup() {
         log.debug("Cleaning up recorder entries of stagerecord");
         recorderEntries.clear();
+        fileCreatedMap.clear();
 
     }
 
@@ -239,6 +246,8 @@ public class AntLoggingHandler implements Handler {
         String time = getDateTime();
         File fileName;
         if (stageName.equalsIgnoreCase("default")) {
+            if (stageRecordMap.get("default") == null)
+                throw new BuildException("stageRecordMap.get('default') is null");
             fileName = stageRecordMap.get("default").getDefaultOutput();
         } else {
             fileName = stageRecordMap.get(stageName).getOutput();
@@ -337,7 +346,6 @@ public class AntLoggingHandler implements Handler {
      * @param stageName
      */
     private void startLog(String stageName) {
-
         File fileName;
         String message;
         String time = getDateTime();
@@ -371,8 +379,7 @@ public class AntLoggingHandler implements Handler {
      * @param stageLogging
      * @return
      */
-    private boolean isFilePresent(RecorderEntry recorderEntry, File fileName,
-            StageLogging stageLogging) {
+    private boolean isFilePresent(RecorderEntry recorderEntry, File fileName, StageLogging stageLogging) {
         log.debug("isFilePresent? " + fileName);
         if (!fileCreatedMap.get(fileName)) {
             if (!fileName.getParentFile().exists()) {
@@ -381,12 +388,8 @@ public class AntLoggingHandler implements Handler {
             }
             if (fileName.exists()) {
                 long timestamp = System.currentTimeMillis();
-                StatusAndLogListener.getStatusAndLogListener().getProject()
-                        .log(
-                                "Backing up of " + fileName + " into "
-                                        + fileName + "." + timestamp);
-                fileName.renameTo(new File(fileName.getAbsoluteFile() + "."
-                        + timestamp));
+                getProject().log("Backing up of " + fileName + " into " + fileName + "." + timestamp);
+                fileName.renameTo(new File(fileName.getAbsoluteFile() + "." + timestamp));
             }
             recorderEntry.openFile(stageLogging.getAppend());
             fileCreatedMap.put(fileName, true);
@@ -416,7 +419,6 @@ public class AntLoggingHandler implements Handler {
      */
     private void stopLog(String stopStageName, String startStageName,
             BuildEvent event) {
-
         File fileName;
         String message;
         String time = getDateTime();
@@ -463,7 +465,8 @@ public class AntLoggingHandler implements Handler {
         recorderEntry.setMessageOutputLevel(loglevel);
         recorderEntry.setEmacsMode(false);
         recorderEntry.setRecordState(false);
-        fileCreatedMap.put(fileName, false);
+        if (fileCreatedMap.get(fileName) == null)
+            fileCreatedMap.put(fileName, false);
     }
 
     /**
@@ -474,14 +477,9 @@ public class AntLoggingHandler implements Handler {
      * @return
      */
     private String isStageValid(Target target, Project proj) {
-
-        if (!proj.getName().equals(
-                StatusAndLogListener.getStatusAndLogListener().getProject()
-                        .getName())
-                && (StatusAndLogListener.getStatusAndLogListener().getProject()
-                        .getName() != null)) {
+        //if (!proj.getName().equals(StatusAndLogListener.getStatusAndLogListener().getProject().getName()) && (StatusAndLogListener.getStatusAndLogListener().getProject().getName() != null)) {
             initSubProjectDependentTarget(proj);
-        }
+        //}
         for (Map.Entry<String, Stage> entry : stagesMapping.entrySet()) {
             Stage stage = entry.getValue();
             if (stage.getStartTarget().equals(target.getName())
@@ -672,8 +670,7 @@ public class AntLoggingHandler implements Handler {
                 }
             }
         }
-        throw new BuildException(
-                "There should be one default stagerecord datatype.");
+        throw new BuildException("There should be one default stagerecord datatype.");
     }
 
     /**

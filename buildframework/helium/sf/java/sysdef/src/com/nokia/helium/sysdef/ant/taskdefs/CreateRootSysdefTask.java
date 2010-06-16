@@ -65,6 +65,7 @@ public class CreateRootSysdefTask extends Task {
     private Map<String, List<String>> layers = new HashMap<String, List<String>>();
     private File epocroot;
     private boolean failOnError = true;
+    private boolean checkPackageExists;
     private File template;
 
     /**
@@ -86,30 +87,55 @@ public class CreateRootSysdefTask extends Task {
         for (ResourceCollection rc : resourceCollections) {
             Iterator<Resource> ri = (Iterator<Resource>)rc.iterator();
             while (ri.hasNext()) {
-                Resource r = ri.next();
-                File pkgDefFile = new File(r.toString());
-                log("pkgDefFile :" + pkgDefFile);
+                Resource resource = ri.next();
+                File pkgDefFile = new File(resource.toString());
+                log("Package definition file: " + pkgDefFile);
                 if (!pkgDefFile.exists() || 
                         !(pkgDefFile.getName().equalsIgnoreCase(
                                 CreatePackageMappingTask.PACKAGE_DEFINITION_FILENAME))) {
                     throw new BuildException("Missing Package Definition file");
                 }
-                File pkgDir = new File(r.toString()).getParentFile();
+                File pkgDir = pkgDefFile.getParentFile();
                 File pkgMapFile  = new File(pkgDir, CreatePackageMappingTask.PACKAGE_MAP_FILENAME);
                 try {
                     if (pkgMapFile.exists()) {
+                        log("Package map file: " + pkgMapFile);
+                        if (!checkPackageExists) {
                             addPackage(pkgMapFile, pkgDir.getName());
-                            log("Adding: " + pkgMapFile, Project.MSG_DEBUG);                        
+                        } else {
+                            PackageMap pkgMap = new PackageMap(pkgMapFile);
+                            File destPkg = new File(epocroot, pkgMap.getRoot() + File.separator +
+                                    pkgMap.getLayer() + File.separator + pkgDir.getName() + File.separator +
+                                    CreatePackageMappingTask.PACKAGE_DEFINITION_FILENAME);
+                            if (destPkg.exists()) {
+                                addPackage(pkgMapFile, pkgDir.getName());
+                            } else {
+                                log("Could not find " + destPkg.getAbsolutePath() +
+                                        " so entry is not added to the root system definition.", Project.MSG_ERR);
+                            }
+                        }
                     } else {
-                        pkgMapFile = new File(pkgDir, "/../../" + CreatePackageMappingTask.PACKAGE_MAP_FILENAME);
-                        log("pkgMapFile: " + pkgMapFile);
-                        File base1File = new File(r.toString()).getParentFile();
-                        String base1 = base1File.getName();
-                        log("base1: " + base1);
-                        String base2 = base1File.getParentFile().getName();
-                        log("base2: " + base2);
+                        pkgMapFile = new File(pkgDir.getParentFile().getParentFile(), CreatePackageMappingTask.PACKAGE_MAP_FILENAME);
+                        log("Package map file: " + pkgMapFile);
                         if (pkgMapFile.exists()) {
-                            addPackage(pkgMapFile, base2 + "/" + base1);
+                            if (!checkPackageExists) {
+                                addPackage(pkgMapFile, pkgDir.getName());
+                            } else {
+                                PackageMap pkgMap = new PackageMap(pkgMapFile);
+                                File destPkg = new File(epocroot, pkgMap.getRoot() + File.separator +
+                                        pkgMap.getLayer() + File.separator +
+                                        pkgMapFile.getParentFile().getName() + File.separator +
+                                        pkgDir.getParentFile().getName() + File.separator + pkgDir.getName() +
+                                        File.separator +
+                                        CreatePackageMappingTask.PACKAGE_DEFINITION_FILENAME);
+                                if (destPkg.exists()) {
+                                    addPackage(pkgMapFile, pkgDir.getParentFile().getName() +
+                                            File.separator + pkgDir.getName());
+                                } else {
+                                    log("Could not find " + destPkg.getAbsolutePath() +
+                                            " so entry is not added to the root system definition.", Project.MSG_ERR);
+                                }
+                            }
                         } else {
                             log("Could not find: " + pkgMapFile.toString(), Project.MSG_ERR);
                             if (shouldFailOnError()) {
@@ -133,6 +159,7 @@ public class CreateRootSysdefTask extends Task {
 
     private void addPackage(File pkgMapFile, String pkgPath) throws 
         PackageMapParsingException {
+        log("Adding: " + pkgMapFile, Project.MSG_DEBUG);
         // Adding the package in the structure.
         PackageMap pkgMap = new PackageMap(pkgMapFile);
         if (!roots.containsKey(pkgMap.getRoot())) {
@@ -195,6 +222,16 @@ public class CreateRootSysdefTask extends Task {
      */
     public boolean shouldFailOnError() {
         return failOnError;
+    }
+
+    /**
+     * Defines if the task should check the existence of the 
+     * target package_definition.xml under epocroot.
+     * @param checkPackageExists
+     * @ant.not-required Default false
+     */
+    public void setCheckPackageExists(boolean checkPackageExists) {
+        this.checkPackageExists = checkPackageExists;
     }
     
     /**
@@ -278,7 +315,7 @@ public class CreateRootSysdefTask extends Task {
         String rel = getEpocroot().toURI().relativize(getDestFile().getParentFile().toURI()).getPath();
         String[] relArray = rel.split("/"); // This is an URI not a File.
         rel = "";
-        for (String e : relArray) {
+        for (String string : relArray) {
             rel += ".." + File.separatorChar; 
         }
         return rel;

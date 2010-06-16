@@ -26,7 +26,15 @@ Description:
     </description>
     
     <taskdef resource="net/sf/antcontrib/antlib.xml"/>
-   
+    
+        
+    <macrodef name="pow" uri="http://www.nokia.com/helium">
+        <sequential>
+            <echo>pow</echo>
+        </sequential>
+    </macrodef>
+    
+    
     
     <property name="check-property-name" value="test"/>
     <property name="helium.build.dir" value="output"/>
@@ -34,6 +42,13 @@ Description:
     <presetdef name="check_PresetDef.Name" >
         <echo>check PresetDef Name </echo>
     </presetdef>
+    
+    <macrodef name="duplicateMacro" uri="http://www.nokia.com/helium">
+        <attribute name="parameter" default="default"/>
+        <sequential>
+            <echo>@{parameter}</echo>
+        </sequential>
+    </macrodef>
     
     <target name="hello">
         <echo>Hello Checking Tab Character</echo>
@@ -231,4 +246,6 @@ if int(r'@{error.limit}') > -1:
     <target name="check-indentation">
         <echo>checking indentation</echo>
      </target>
+     
+     
 </project>

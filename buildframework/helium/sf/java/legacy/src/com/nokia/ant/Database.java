@@ -105,12 +105,12 @@ public class Database
 
     public void setRefid(Reference r)
     {
-        Object o = r.getReferencedObject();
-        if (!(o instanceof ResourceCollection))
+        Object object = r.getReferencedObject();
+        if (!(object instanceof ResourceCollection))
         {
             throw new BuildException(r.getRefId() + " doesn\'t denote a ResourceCollection");
         }
-        rc = (ResourceCollection) o;
+        rc = (ResourceCollection) object;
     }
 
     public Document createDOM() throws DocumentException, IOException {
@@ -337,10 +337,10 @@ public class Database
                 Iterator extraFilesIter = rc.iterator();
                 while (extraFilesIter.hasNext())
                 {
-                    FileResource f = (FileResource) extraFilesIter.next();
-                    String extrafile = f.getFile().getCanonicalPath();
+                    FileResource fileResource = (FileResource) extraFilesIter.next();
+                    String extrafile = fileResource.getFile().getCanonicalPath();
 
-                    if (!antFiles.contains(f.toString()) && !f.getFile().getName().startsWith("test_"))
+                    if (!antFiles.contains(fileResource.toString()) && !fileResource.getFile().getName().startsWith("test_"))
                     {
                         if (homeOnly)
                         {
@@ -742,11 +742,11 @@ public class Database
      * @param allTaskdefs
      * @param criteria
      */
-    private HashMap < String, String > filterTasks ( Hashtable<String, Class<?> > allTaskdefs ) {
+    private HashMap < String, String > filterTasks( Hashtable<String, Class<?> > allTaskdefs ) {
         HashMap <String, String> tasks = new HashMap <String, String>();
 
         Enumeration <String> taskdefsenum = allTaskdefs.keys();
-        while ( taskdefsenum.hasMoreElements () ) {
+        while ( taskdefsenum.hasMoreElements() ) {
             String key = taskdefsenum.nextElement();
             Class<?> clazz = allTaskdefs.get(key);
             String className = clazz.getName();

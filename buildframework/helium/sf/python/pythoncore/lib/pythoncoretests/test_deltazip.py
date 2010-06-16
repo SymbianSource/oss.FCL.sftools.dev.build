@@ -16,6 +16,7 @@
 #
 #Description:
 #===============================================================================
+""" test delta zip"""
 
 from __future__ import with_statement
 import unittest
@@ -28,6 +29,7 @@ import tempfile
 class DeltaZipTest( unittest.TestCase ):
     """ Unit tests for the delta zip tool. """
     def setUp(self):
+        """setUp automatically called before running the tests"""
         self.cwd_backup = os.getcwd()
         self.logger = logging.getLogger('test.deltazip')
         self.root = os.environ['TEST_DATA']
@@ -37,9 +39,9 @@ class DeltaZipTest( unittest.TestCase ):
         logging.basicConfig(level=logging.INFO)
 
     def test_MD5SignatureBuilder(self):
-        
+        """test MD5 signature Builder"""
         output = os.path.join(self.output2, 'md5_list.txt')
-        md5output = os.path.join(self.output2, 'delta.md5')
+        _ = os.path.join(self.output2, 'delta.md5')
         
         if os.path.exists(output):
             os.remove(output)
@@ -49,7 +51,9 @@ class DeltaZipTest( unittest.TestCase ):
         if sys.platform == 'win32':
             assert os.path.splitdrive(self.root)[0] + os.sep not in open(output).read()
         assert os.path.exists(output)
+        
     def test_DeltaZipBuilder(self):
+        """test delta Zip Builder"""
         if not os.path.exists(self.output):
             os.mkdir(self.output)
       
@@ -101,18 +105,19 @@ Inclusion(s):
         delta.create_delta_zip(deltazipfile, deletefile, 1, deltaantfile)
 
     def test_changedFiles(self):
+        """test changed Files"""
         dir1 = tempfile.mkdtemp()
         dir2 = tempfile.mkdtemp()
         
-        with open(os.path.join(dir1, '1'), 'w') as f1:
-            f1.write('Directory:%s\n' % self.root)
-            f1.write('myfile1 TYPE=unknown format MD5=34dcda0d351c75e4942b55e1b2e2422g')
-        with open(os.path.join(dir2, '2'), 'w') as f2:
-            f2.write('Directory:%s\n' % self.root)
-            f2.write('myfile1 TYPE=unknown format MD5=34dcda0d351c75e4542b55e1b2e2422g')
+        with open(os.path.join(dir1, '1'), 'w') as f_1:
+            f_1.write('Directory:%s\n' % self.root)
+            f_1.write('myfile1 TYPE=unknown format MD5=34dcda0d351c75e4942b55e1b2e2422g')
+        with open(os.path.join(dir2, '2'), 'w') as f_2:
+            f_2.write('Directory:%s\n' % self.root)
+            f_2.write('myfile1 TYPE=unknown format MD5=34dcda0d351c75e4542b55e1b2e2422g')
         
         assert delta_zip.changedFiles(dir1, dir2) == [os.path.join(self.root, 'myfile1')]
 
     def tearDown(self):
-        """ Restore path """
+        """ Restore path automatically called when all test have been run"""
         os.chdir(self.cwd_backup)

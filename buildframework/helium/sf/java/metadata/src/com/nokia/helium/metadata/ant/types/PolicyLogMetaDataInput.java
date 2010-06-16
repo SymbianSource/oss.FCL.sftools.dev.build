@@ -77,7 +77,7 @@ public class PolicyLogMetaDataInput extends XMLLogMetaDataInput {
      * @param streamReader: the input stream reader which contains the xml data to be parsed for recording data.
      * @return true if there are any element to be added to the database.
      */
-    boolean startElement (XMLStreamReader streamReader) {
+    boolean startElement(XMLStreamReader streamReader) {
         String tagName = streamReader.getLocalName();
         if (tagName.equalsIgnoreCase("error")) {
             currentAttributeMap = getAttributes(streamReader);
@@ -92,33 +92,33 @@ public class PolicyLogMetaDataInput extends XMLLogMetaDataInput {
      */
     boolean endElement(XMLStreamReader streamReader) {
         boolean retValue = false;
-           String tagName = streamReader.getLocalName();
-            String priority = "ERROR";
-            log.debug("endElement: " + tagName);
-            if (tagName.equalsIgnoreCase("error")) {
-                log.debug("tagName matches error");
-                String errorType = currentAttributeMap.get("type");
-                log.debug("errorType:" + errorType);
-                if (errorType.equals("unknownstatus")) {
-                    addEntry(priority, "CSV validation", getCurrentFile().toString(), -1, currentAttributeMap.get("message") + 
-                            currentAttributeMap.get("value"));
-                    retValue = true;
-                } else if (errorType.equals("A") || errorType.equals("B") 
-                        || errorType.equals("C") || errorType.equals("D")) {
-                    int flags = Pattern.CASE_INSENSITIVE | Pattern.DOTALL ;
-                    Pattern pattern = Pattern.compile("([\\\\/][^\\\\/]+?)$", flags);
-                    addEntry(priority, "Issues", getCurrentFile().toString(), -1, 
-                            errorType + "Found incorrect value for" + 
-                            pattern.matcher(currentAttributeMap.get("message")).replaceAll(""));
-                    retValue = true;
-                } else if (errorType.equals("missing")) {
-                    addEntry(priority, "Missing", getCurrentFile().toString(), -1, currentAttributeMap.get("message"));
-                    retValue = true;
-                } else if (errorType.equals("invalidencoding")) {
-                    addEntry(priority, "Incorrect policy files", getCurrentFile().toString(), -1,  currentAttributeMap.get("message"));
-                    retValue = true;
-                }
+        String tagName = streamReader.getLocalName();
+        String priority = "ERROR";
+        log.debug("endElement: " + tagName);
+        if (tagName.equalsIgnoreCase("error")) {
+            log.debug("tagName matches error");
+            String errorType = currentAttributeMap.get("type");
+            log.debug("errorType:" + errorType);
+            if (errorType.equals("unknownstatus")) {
+                addEntry(priority, "CSV validation", getCurrentFile().toString(), -1, currentAttributeMap.get("message") + 
+                        currentAttributeMap.get("value"));
+                retValue = true;
+            } else if (errorType.equals("A") || errorType.equals("B") 
+                    || errorType.equals("C") || errorType.equals("D")) {
+                int flags = Pattern.CASE_INSENSITIVE | Pattern.DOTALL ;
+                Pattern pattern = Pattern.compile("([\\\\/][^\\\\/]+?)$", flags);
+                addEntry(priority, "Issues", getCurrentFile().toString(), -1, 
+                        errorType + "Found incorrect value for" + 
+                        pattern.matcher(currentAttributeMap.get("message")).replaceAll(""));
+                retValue = true;
+            } else if (errorType.equals("missing")) {
+                addEntry(priority, "Missing", getCurrentFile().toString(), -1, currentAttributeMap.get("message"));
+                retValue = true;
+            } else if (errorType.equals("invalidencoding")) {
+                addEntry(priority, "Incorrect policy files", getCurrentFile().toString(), -1,  currentAttributeMap.get("message"));
+                retValue = true;
             }
+        }
         return retValue;
     }
     
@@ -126,7 +126,7 @@ public class PolicyLogMetaDataInput extends XMLLogMetaDataInput {
      * @param streamReader: the input stream reader which contains the xml data to be parsed for recording data.
      * @return true if there are any element to be added to the database.
      */
-    boolean characters (XMLStreamReader streamReader) {
+    boolean characters(XMLStreamReader streamReader) {
         return false;
     }
 }

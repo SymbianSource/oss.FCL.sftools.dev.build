@@ -446,7 +446,6 @@ def main():
     if opts.verbose:
         _logger.setLevel(logging.DEBUG)
         logging.basicConfig(level=logging.DEBUG)
-    _ = tempfile.mkdtemp()
     config = Configuration(opts)
     create_drop(config)
 

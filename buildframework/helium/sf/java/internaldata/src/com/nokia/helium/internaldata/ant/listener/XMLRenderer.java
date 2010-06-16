@@ -191,8 +191,8 @@ public class XMLRenderer {
     protected void createProperties(Element statistics) {
         Element propertiesElt = statistics.addElement("properties");
         if (properties != null) {
-            for (Enumeration<String> e = properties.keys(); e.hasMoreElements() ; ) {
-                String key = e.nextElement();
+            for (Enumeration<String> propertyEnum = properties.keys(); propertyEnum.hasMoreElements() ; ) {
+                String key = propertyEnum.nextElement();
                 Element propertyElt = propertiesElt.addElement("property");
                 propertyElt.addAttribute("name", key);
                 propertyElt.addAttribute("value", properties.get(key));

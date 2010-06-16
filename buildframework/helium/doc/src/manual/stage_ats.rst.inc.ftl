@@ -30,7 +30,7 @@ Stage: ATS - STIF, TEF, RTEST, MTF and EUnit (also Qt)
 
 ATS testing is the automatic testing of the phone code once it has been compiled and linked to create a ROM image.
 
-Explanation of the process for getting ATS (`STIF`_ and `EUnit`_) tests compiled and executed by Helium, through the use of the ``ats-test`` target.
+Explanation of the process for getting ATS (`STIF`_ and `EUnit`_) tests compiled and executed by Helium, through the use of the :hlm-t:`ats-test` target.
 
 http://developer.symbian.org/wiki/index.php/Symbian_Test_Tools
 
@@ -115,23 +115,24 @@ Add the above line in the ``.netrc`` file and replace ``ats_user_name`` with you
    :header: "Property name", "Edit status", "Description"
    
     ":hlm-p:`ats.server`", "[must]", "For example: ``4fix012345`` or ``catstresrv001.cats.noklab.net:80``. Default server port is ``8080``, but it is not allowed between intra and Noklab. Because of this we need to define server port as 80. The host can be different depending on site and/or product."
-    ":hlm-p:`ats.drop.location`", "[must]", "Server location (UNC path) to save the ATSDrop file, before sending to the ATS Server. For example: ``\\\\trwsem00\\some_folder\\``. In case, :hlm-p:`ats.script.type` is set to ``import``, ATS doesn't need to have access to :hlm-p:`ats.drop.location`,  its value can be any local folder on build machine, for example ``c:/temp`` (no network share needed)."
+    ":hlm-p:`ats.drop.location`", "[allowed]", "Server location (UNC path) to save the ATSDrop file, before sending to the ATS Server. For example: ``\\\\trwsem00\\some_folder\\``. In case, :hlm-p:`ats.script.type` is set to ``import``, ATS doesn't need to have access to :hlm-p:`ats.drop.location`,  its value can be any local folder on build machine, for example ``c:/temp`` (no network share needed)."
     ":hlm-p:`ats.product.name`", "[must]", "Name of the product to be tested."
-    ":hlm-p:`eunit.test.package`", "[recommended]", "The EUnit package name to be unzipped on the environment, for executing EUnit tests."
-    ":hlm-p:`eunitexerunner.flags`", "[recommended]", "Flags for EUnit exerunner can be set by setting the value of this variable. The default flags are set to ``/E S60AppEnv /R Off``."
-    ":hlm-p:`ats.email.list`", "[recommended]", "The property is needed if you want to get an email from ATS server after the tests are executed. There can be one to many semicolon-separated email addresses."
+    ":hlm-p:`eunit.test.package`", "[allowed]", "The EUnit package name to be unzipped on the environment, for executing EUnit tests."
+    ":hlm-p:`eunitexerunner.flags`", "[allowed]", "Flags for EUnit exerunner can be set by setting the value of this variable. The default flags are set to ``/E S60AppEnv /R Off``."
+    ":hlm-p:`ats.email.list`", "[allowed]", "The property is needed if you want to get an email from ATS server after the tests are executed. There can be one to many semicolon-separated email addresses."
+    ":hlm-p:`ats.report.type`", "[allowed]", "Value of the ats email report"
     ":hlm-p:`ats.flashfiles.minlimit`", "[recommended]", "Limit of minimum number of flash files to execute :hlm-t:`ats-test` target, otherwise ``ATSDrop.zip`` will not be generated. Default value is 2 files."
-    ":hlm-p:`ats.plan.name`", "[recommended]", "Modify the plan name if you have understanding of ``test.xml`` file or leave it as it is. Default value is ``plan``."
-    ":hlm-p:`ats.product.hwid`", "[recommended]", "Product HardWare ID (HWID) attached to ATS. By default the value of HWID is not set."
-    ":hlm-p:`ats.script.type`", "[recommended]", "There are two types of ats script files to send drop to ATS server, ``runx`` and ``import``; only difference is that with ``import`` ATS doesn't have to have access rights to ``testdrop.zip`` file, as it is sent to the system over http and import doesn't need network shares. If that is not needed ``import`` should not be used. Default value is ``runx`` as ``import`` involves heavy processing on ATS server."
-    ":hlm-p:`ats.target.platform`", "[recommended]", "Sets target platform for compiling test components. Default value is ``armv5 urel``."
-    ":hlm-p:`ats.test.timeout`", "[recommended]", "To set test commands execution time limit on ATS server, in seconds. Default value is ``60``."
-    ":hlm-p:`ats.testrun.name`", "[recommended]", "Modify the test-run name if you have understanding of ``test.xml`` file or leave it as it is. Default value is a string consist of build id, product name, major and minor versions."
-    ":hlm-p:`ats.trace.enabled`", "[recommended]", "Should be ``True`` if tracing is needed during the tests running on ATS. Default value is ``False``, the values are case-sensitive. See http://s60wiki.nokia.com/S60Wiki/CATS/TraceTools."
-    ":hlm-p:`ats.ctc.enabled`", "[recommended]", "Should be ``True`` if coverage measurement and dynamic analysis (CTC) tool support is to be used by ATS. Default value is ``False``. The values are case-sensitive."
-    ":hlm-p:`ats.ctc.host`", "[recommended]", "CTC host, provided by CATS used to create coverage measurement reports. MON.sym files are copied to this location, for example ``10.0.0.1``. If not given, code coverage reports are not created"
-    ":hlm-p:`ats.obey.pkgfiles.rule`", "[recommended]", "If the property is set to ``True``, then the only test components which will have PKG files, will be included into the ``test.xml`` as a test-set. Which means, even if there's a test component (executable) but there's no PKG file, it should not be considered as a test component and hence not included into the test.xml as a separate test. By default the property value is ``False``."
-    "``reference.ats.flash.images``", "[recommended]", "Fileset for list of flash images (can be .fpsx, .C00, .V01 etc) It is recommended to set the fileset, default filset is given below which can be overwritten. set *dir=""* attribute of the filset to ``${r'$'}{build.output.dir}/variant_images`` if hlm-t:`variant-image-creation` target is being used."
+    ":hlm-p:`ats.plan.name`", "[allowed]", "Modify the plan name if you have understanding of ``test.xml`` file or leave it as it is. Default value is ``plan``."
+    ":hlm-p:`ats.product.hwid`", "[allowed]", "Product HardWare ID (HWID) attached to ATS. By default the value of HWID is not set."
+    ":hlm-p:`ats.script.type`", "[allowed]", "There are two types of ats script files to send drop to ATS server, ``runx`` and ``import``; only difference is that with ``import`` ATS doesn't have to have access rights to ``testdrop.zip`` file, as it is sent to the system over http and import doesn't need network shares. If that is not needed ``import`` should not be used. Default value is ``runx`` as ``import`` involves heavy processing on ATS server."
+    ":hlm-p:`ats.target.platform`", "[allowed]", "Sets target platform for compiling test components. Default value is ``armv5 urel``."
+    ":hlm-p:`ats.test.timeout`", "[allowed]", "To set test commands execution time limit on ATS server, in seconds. Default value is ``60``."
+    ":hlm-p:`ats.testrun.name`", "[allowed]", "Modify the test-run name if you have understanding of ``test.xml`` file or leave it as it is. Default value is a string consist of build id, product name, major and minor versions."
+    ":hlm-p:`ats.trace.enabled`", "[allowed]", "Should be ``True`` if tracing is needed during the tests running on ATS. Default value is ``False``, the values are case-sensitive. See http://s60wiki.nokia.com/S60Wiki/CATS/TraceTools."
+    ":hlm-p:`ats.ctc.enabled`", "[allowed]", "Should be ``True`` if coverage measurement and dynamic analysis (CTC) tool support is to be used by ATS. Default value is ``False``. The values are case-sensitive."
+    ":hlm-p:`ats.ctc.host`", "[allowed]", "CTC host, provided by CATS used to create coverage measurement reports. MON.sym files are copied to this location, for example ``10.0.0.1``. If not given, code coverage reports are not created"
+    ":hlm-p:`ats.obey.pkgfiles.rule`", "[allowed]", "If the property is set to ``True``, then the only test components which will have PKG files, will be included into the ``test.xml`` as a test-set. Which means, even if there's a test component (executable) but there's no PKG file, it should not be considered as a test component and hence not included into the test.xml as a separate test. By default the property value is ``False``."
+    "``reference.ats.flash.images``", "[allowed]", "Fileset for list of flash images (can be .fpsx, .C00, .V01 etc) It is recommended to set the fileset, default filset is given below which can be overwritten. set *dir=""* attribute of the filset to ``${r'$'}{build.output.dir}/variant_images`` if hlm-t:`variant-image-creation` target is being used."
     ":hlm-p:`tsrc.data.dir`", "[allowed]", "The default value is ``data`` and refers to the 'data' directory under 'tsrc' directory."
     ":hlm-p:`tsrc.path.list`", "[allowed]", "Contains list of the tsrc directories. Gets the list from system definition layer files. Assuming that the test components are defined already in te ``layers.sysdef.xml`` files to get compiled. Not recommended, but the property value can be set if there are no System Definition file(s), and tsrc directories paths to set manually."
     ":hlm-p:`ats.report.location`", "[allowed]", "Sets ATS reports store location. Default location is ``${r'$'}{publish.dir}/${r'$'}{publish.subdir}``."
@@ -141,6 +142,7 @@ Add the above line in the ``.netrc`` file and replace ``ats_user_name`` with you
     ":hlm-p:`ats4.enabled`", "[allowed]", "Should be ``true`` if ATS4 is to be used."
     ":hlm-p:`ats.emulator.enable`", "[allowed]", "Should be ``true`` if ``WINSCW`` emulator is to be used."
     ":hlm-p:`ats.specific.pkg`", "[allowed]", "Text in name of PKG files to use eg. 'sanity' would only use xxxsanity.pkg files from components."
+    ":hlm-p:`ats.create.singledrop.file`", "[recommended]", "If present and set to 'true', it will create one drop file, if set to any other value or not present it will create multiple drop files (defined by the sysdef file). This is to save traffic to the server."
 
 An example of setting up properties:
 
@@ -183,7 +185,7 @@ An example of setting up properties:
 
 To execute the target, a property should be set(``<property name="enabled.ats" value="true" />``).
 
-Then call ``ats-test``, which will create the ATSDrop.zip (test package).
+Then call :hlm-t:`ats-test`, which will create the ATSDrop.zip (test package).
 
 If property *ats.email.list* is set, an email (test report) will be sent when the tests are ready on ATS.
 
@@ -326,7 +328,7 @@ Example configuration:
 Stage: ATS - ASTE
 ===================
 
-Explanation of the process for getting ATS `ASTE`_ tests compiled and executed by Helium, through the use of the ``ats-aste`` target.
+Explanation of the process for getting ATS `ASTE`_ tests compiled and executed by Helium, through the use of the :hlm-t:`ats-aste` target.
 
 <#if !(ant?keys?seq_contains("sf"))>
 .. _`ASTE`: http://s60wiki.nokia.com/S60Wiki/ASTE
@@ -429,7 +431,7 @@ An example of setting up properties:
 
 To execute the target, a property should be set(``<property name="enabled.aste" value="true" />``).
 
-Then call ``ats-aste``, which will create the ATSDrop.zip (test package).
+Then call :hlm-t:`ats-aste`, which will create the ATSDrop.zip (test package).
 
 If property ``ats.aste.email.list`` is set, an email (test report) will be sent when the tests are ready on ATS/ASTE.
 
@@ -439,3 +441,13 @@ Skip Sending AtsDrop to ATS
 
 click :ref:`Skip-Sending-AtsDrop-label`:
 
+Stage: ATS - Custom Drop
+========================
+
+If you need to send a static drop to ATS then you can call the target :hlm-t:`ats-custom-drop` and set a property to your own template.
+
+A example template is in helium/tools/testing/ats/templates/ats4_naviengine_template.xml
+
+.. code-block:: xml
+
+    <property name="ats.custom.template" value="path/to/mytemplate.xml" />

@@ -268,6 +268,9 @@ public class EmailDataSender {
                 try {
                     InternetAddress fromAddress = getFromAddress(); 
                     message.setFrom(fromAddress);
+                } catch (HlmAntLibException e) {
+                    // We are Ignoring the errors as no need to fail the build.
+                    log.debug("Error retrieving current user email address: " + e.getMessage(), e);                    
                 } catch (javax.mail.internet.AddressException e) {
                     // We are Ignoring the errors as no need to fail the build.
                     log.debug("Error retrieving current user email address: " + e.getMessage(), e);
@@ -358,9 +361,11 @@ public class EmailDataSender {
             NamingEnumeration<SearchResult> en = ctx.search("", "uid=" + username, controls);
             if (en.hasMore()) {
                 SearchResult sr = en.next();
-                String email = (String) sr.getAttributes().get("mail").get();
-                log.debug("getUserEmail:" + email);
-                return email;
+                if (sr.getAttributes().get("mail") != null) {
+                    String email = (String) sr.getAttributes().get("mail").get();
+                    log.debug("getUserEmail:" + email);
+                    return email;
+                }
             }
         } catch (javax.naming.NameNotFoundException ex) {
             throw new HlmAntLibException("Error finding user email for " + username );

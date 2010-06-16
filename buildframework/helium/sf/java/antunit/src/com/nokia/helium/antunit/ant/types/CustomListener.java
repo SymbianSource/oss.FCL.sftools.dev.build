@@ -110,9 +110,9 @@ public class CustomListener extends DataType implements AntUnitListener {
     @Override
     public void startTest(String name) {
         listeners.clear();
-        for (Listener l : listenerDefinitions) {
-            BuildListener bl = l.instantiate();
-            l.setProject(currentProject);
+        for (Listener listener : listenerDefinitions) {
+            BuildListener bl = listener.instantiate();
+            listener.setProject(currentProject);
             if (bl != null) {
                 listeners.add(bl);
                 bl.buildStarted(new BuildEvent(currentProject));

@@ -24,6 +24,7 @@ import os
 
 
 def test_commonprefix():
+    """ tst common prefix"""
     paths = ['E:/Build_E/ido_wa/ido_lcdo_mcl_product_52_ec/LC_Domain/LC_Domain/localconnectivity',
              'E:/Build_E/ido_wa/ido_lcdo_mcl_product_52_ec/LC_Domain_osext/LC_Domain_osext/localconnectivityextensions',
              'E:/Build_E/ido_wa/ido_lcdo_mcl_product_52_ec/LC_Domain_osext/LC_Domain_osext/localconnectivityextensions/src',

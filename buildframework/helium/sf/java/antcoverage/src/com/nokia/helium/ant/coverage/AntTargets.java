@@ -119,15 +119,15 @@ public class AntTargets {
         public boolean equals(Object obj) {
             if (obj instanceof String) {
                 String str = (String)obj;
-                for (Target t : instances) {
-                    if (t.getName().equals(str)) {
+                for (Target target : instances) {
+                    if (target.getName().equals(str)) {
                         return true;
                     }
                 }
             } else if (obj instanceof Target) {
                 Target target = (Target) obj;
-                for (Target t : instances) {
-                    if (t.getLocation().equals(target.getLocation())) {
+                for (Target targetInstance : instances) {
+                    if (targetInstance.getLocation().equals(target.getLocation())) {
                         return true;
                     }
                 }

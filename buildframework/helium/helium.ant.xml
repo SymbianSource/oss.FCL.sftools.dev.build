@@ -25,6 +25,7 @@ Description:
     Main full build targets and properties
     </description>
     <property environment="env" />
+	
     
     <!-- Load the current Helium version. -->
     <!--* @property helium.version
@@ -98,6 +99,10 @@ Description:
                     <fail message="ERROR: Failed to assign build drive, please check you are not running out of drives." />    
                 </then>
             </if>
+            <exec osfamily="windows" executable="subst" failonerror="false">
+                <arg value="${build.drive}" />
+                <arg value="${env.TEMP}/helium/temp_drive" />
+            </exec>
             <echo> Using build drive ${build.drive} </echo>
         </then>
     </if>

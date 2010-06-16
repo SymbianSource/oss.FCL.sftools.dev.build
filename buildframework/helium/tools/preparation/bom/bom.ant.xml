@@ -137,9 +137,10 @@ except Exception, ex:
                 <!-- Transform bom data into the diamonds xml format: 
                      * BOM folders are flattened into tasks.
                      * Schema version is extracted from the appropriate FMPP template. -->
+                <mkdir dir="${temp.build.dir}" />
                 <fmpp sourcefile="${helium.dir}/tools/common/templates/diamonds/diamonds_header.ftl" 
-                      outputfile="${build.temp.dir}/diamonds_header.xml" quiet="true"/>
-                <loadfile srcfile="${build.temp.dir}/diamonds_header.xml" property="diamonds.schema.xml">
+                      outputfile="${temp.build.dir}/diamonds_header.xml" quiet="true"/>
+                <loadfile srcfile="${temp.build.dir}/diamonds_header.xml" property="diamonds.schema.xml">
                     <filterchain>
                         <linecontains>
                             <contains value="schema"/>
@@ -153,7 +154,7 @@ except Exception, ex:
                     <remove path="bom/build"/>
                     <rename path="bom" to="diamonds-build"/>
                 </xmltask>                
-                <delete file="${build.temp.dir}/diamonds_header.xml"/>
+                <delete file="${temp.build.dir}/diamonds_header.xml"/>
                 <replace file="${diamonds.build.output.dir}/create-bom.xml" token="&lt;folder&gt;" value="&lt;!-- &lt;folder&gt; --&gt;"/>
                 <replace file="${diamonds.build.output.dir}/create-bom.xml" token="&lt;/folder&gt;" value="&lt;!-- &lt;/folder&gt; --&gt;"/>
                 <xmltask source="${diamonds.build.output.dir}/create-bom.xml" dest="${diamonds.build.output.dir}/create-bom.xml"
@@ -215,9 +216,7 @@ except Exception, ex:
                                     <actions>
                                         <var name="task.owner" value="@{task.owner}"/>
                                         <if>
-                                            <and>
-                                                <isset property="task.owners"/>
-                                            </and>
+                                            <isset property="task.owners"/>
                                             <then>
                                                 <var name="task.owners" value="${task.owners},${task.owner}"/>
                                             </then>
@@ -242,9 +241,7 @@ except Exception, ex:
                                 <actions>
                                     <var name="task.owner" value="@{task.owner}"/>
                                     <if>
-                                        <and>
-                                            <isset property="task.owners"/>
-                                        </and>
+                                        <isset property="task.owners"/>
                                         <then>
                                             <var name="task.owners" value="${task.owners},${task.owner}"/>
                                         </then>
@@ -272,17 +269,20 @@ if taskOwnersDup:
         <for list="${task.owners.unique}" delimiter="," param="task.owner" >
             <sequential>
                 <var name="task.owner" value="@{task.owner}"/>
-                <hlm:ldap url="${email.ldap.server}" rootdn="${email.ldap.rootdn}" filter="uid=${task.owner}" outputproperty="task.owner.email" key="mail"/>
                 <if>
-                    <and>
-                        <isset property="task.owners.email"/>
-                    </and>
+                    <isset property="email.ldap.server"/>
                     <then>
-                        <var name="task.owners.email" value="${task.owners.email},${task.owner.email}"/>
-                    </then>
-                    <else>
-                        <var name="task.owners.email" value="${task.owner.email}"/>
-                    </else>
+                        <hlm:ldap url="${email.ldap.server}" rootdn="${email.ldap.rootdn}" filter="uid=${task.owner}" outputproperty="task.owner.email" key="mail"/>
+                        <if>
+                            <isset property="task.owners.email"/>
+                            <then>
+                                <var name="task.owners.email" value="${task.owners.email},${task.owner.email}"/>
+                            </then>
+                            <else>
+                                <var name="task.owners.email" value="${task.owner.email}"/>
+                            </else>
+                        </if>
+                    </then>   
                 </if>
             </sequential>
         </for>

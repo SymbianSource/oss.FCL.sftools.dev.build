@@ -204,9 +204,9 @@ public class HlmAntUnitListener extends BaseAntUnitListener {
     @SuppressWarnings("unchecked")
     private void addTargets(Project project) {
         Hashtable<String, Target> projectTargets = project.getTargets();
-        Enumeration<String> e = projectTargets.keys();
-        while (e.hasMoreElements()) {
-            String key = e.nextElement();
+        Enumeration<String> targetEnum = projectTargets.keys();
+        while (targetEnum.hasMoreElements()) {
+            String key = targetEnum.nextElement();
             System.out.println(key + ": " + projectTargets.get(key));
             if (!isAntUnitTestTarget(key) && key.length() > 0) {
                 antTargets.add((Target) projectTargets.get(key));
@@ -222,9 +222,9 @@ public class HlmAntUnitListener extends BaseAntUnitListener {
     @SuppressWarnings("unchecked")
     private void addMacros(Project project) {
         Hashtable<String, Class> projectMacros = project.getTaskDefinitions();
-        Enumeration<String> e = projectMacros.keys();
-        while (e.hasMoreElements()) {
-            String key = e.nextElement();
+        Enumeration<String> macrosEnum = projectMacros.keys();
+        while (macrosEnum.hasMoreElements()) {
+            String key = macrosEnum.nextElement();
             Class newTask = projectMacros.get(key);
             if (newTask.getName().equals(
                     "org.apache.tools.ant.taskdefs.MacroInstance")) {
@@ -245,9 +245,9 @@ public class HlmAntUnitListener extends BaseAntUnitListener {
     @SuppressWarnings("unchecked")
     private void addScriptDefs(Project project) {
         Hashtable<String, Class> projectMacros = project.getTaskDefinitions();
-        Enumeration<String> e = projectMacros.keys();
-        while (e.hasMoreElements()) {
-            String key = e.nextElement();
+        Enumeration<String> scriptDefsEnum = projectMacros.keys();
+        while (scriptDefsEnum.hasMoreElements()) {
+            String key = scriptDefsEnum.nextElement();
             Class newTask = projectMacros.get(key);
             if (newTask
                     .getName()

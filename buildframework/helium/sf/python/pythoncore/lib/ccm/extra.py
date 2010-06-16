@@ -133,7 +133,7 @@ def FastMaintainWorkArea(project, path, pst=None, threads=4, wat=False):
         _logger.error( "Exception occured in request #%s: %s\n%s" % (request.requestID, exc_info[1], traceback.format_exception(exc_info[0], exc_info[1], exc_info[2])))
         exceptions.append(exc_info[1])
     
-    def handle_result(result):
+    def handle_result(request, result):
         """append  the result"""
         results.append(result)
 

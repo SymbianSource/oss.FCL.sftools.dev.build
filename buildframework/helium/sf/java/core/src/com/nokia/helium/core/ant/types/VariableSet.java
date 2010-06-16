@@ -17,48 +17,27 @@
  
 package com.nokia.helium.core.ant.types;
 
-import java.util.Vector;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import com.nokia.helium.core.ant.VariableIFImpl;
-import java.util.Collection;
-import org.apache.tools.ant.types.Reference;
+
+import com.nokia.helium.core.ant.MappedVariable;
+import com.nokia.helium.core.ant.Variable;
+import com.nokia.helium.core.ant.VariableMap;
+
+
+import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.types.DataType;
 import java.util.ArrayList;
-import org.apache.log4j.Logger;
 
 /**
  * Helper class to store the variable set (list of variables
  * with name / value pair)
  * @ant.type name="argSet" category="Core"
  */
-public class VariableSet extends VariableIFImpl {
-
-    private static Logger log = Logger.getLogger(VariableSet.class);
+public class VariableSet extends DataType implements Variable, VariableMap {
     
-    private HashMap<String, Variable> variablesMap = new HashMap<String, Variable>();
-
-    private List<Variable> variables = new ArrayList<Variable> ();
-
-    private Vector<VariableSet> varSets = new Vector<VariableSet>();
-    
-    private VariableSet currentSet;
-
-    /**
-     * Constructor
-     */
-    public VariableSet() {
-    }    
-
-    /**
-     * Helper function to add the created varset
-     * @param filter to be added to the varset
-     */
-    public void add(VariableSet varSet) {
-        currentSet = null;
-        if (varSet != null) {
-            varSets.add(varSet);
-        }
-    }
+    private List<Variable> variables = new ArrayList<Variable>();
 
     /**
      * Creates an empty variable element and adds 
@@ -66,9 +45,9 @@ public class VariableSet extends VariableIFImpl {
      * @return empty Variable pair
      */
     public VariableSet createArgSet() {
-        VariableSet varSet =  new VariableSet();
-        add(varSet);
-        return varSet;
+        VariableSet variableSet =  new VariableSet();
+        variables.add(variableSet);
+        return variableSet;
     }
 
     /**
@@ -77,25 +56,17 @@ public class VariableSet extends VariableIFImpl {
      * @return empty Variable pair
      */
     public Variable createArg() {
-        Variable var =  new Variable();
-        add(var);
-        return var;
+        Variable variable =  new VariableImpl();
+        variables.add(variable);
+        return variable;
     }
-    
-    private void addVariable(Variable var) {
-        variables.add(var);
-    }
-    
+        
     /**
      * Add a given variable to the list 
      * @param var variable to add
      */
-    public void add(Variable var) {
-        if ( currentSet == null) {
-            currentSet = new VariableSet();
-            varSets.add(currentSet);
-        }
-        currentSet.addVariable(var);
+    public void add(Variable variable) {
+        variables.add(variable);
     }
 
     /**
@@ -106,49 +77,81 @@ public class VariableSet extends VariableIFImpl {
         return variables;
     }
     
-    public List<VariableSet> getVariableSets() {
-        return varSets;
-    }
-
-
     /**
-     * Helper function to return the list of variables and its references
-     * @return variable list for this set and its references.
+     * Get the list of nested VariableSet.
+     * @return the list of VariableSet.
      */
-    public Collection<Variable> getVariables() {
-        HashMap<String, Variable> varMap =   getVariablesMap();
-        //if (varMap.isEmpty()) {
-        //    throw new BuildException("Variable should not be empty and should contain one arg");
-        //}
-        return getVariablesMap().values();
+    public List<VariableSet> getVariableSets() {
+        List<VariableSet> variableSets = new ArrayList<VariableSet>();
+        for (Variable variable : variables) {
+            if (variable instanceof VariableSet) {
+                variableSets.add((VariableSet)variable);
+            }
+        }
+        return variableSets;
     }
+        
     /**
      * Returns the list of variables available in the VariableSet 
      * @return variable list
      */
-    public HashMap<String, Variable> getVariablesMap() {
-        HashMap<String, Variable> allVariables = new HashMap<String, Variable>();
-        // Then filters as reference in filterset
-        Reference refId = getRefid();
-        Object varSetObject = null;
-        if (refId != null) {
-            varSetObject = refId.getReferencedObject();
+    public HashMap<String, MappedVariable> getVariablesMap() {
+        if (this.isReference()) {
+            Object varSetObject = this.getRefid().getReferencedObject();
             if (varSetObject != null && varSetObject instanceof VariableSet) {
-                HashMap<String, Variable> varSetMap = ((VariableSet)varSetObject).getVariablesMap();
-                allVariables.putAll(varSetMap);
+                return ((VariableSet)varSetObject).getVariablesMap();
+            } else {
+                throw new BuildException("The '" + this.getRefid().getRefId() + "' reference is not referencing a VariableSet");
             }
-        }
-        if (varSets != null && (!varSets.isEmpty())) {
-            for (VariableSet varSet : varSets) {
-                HashMap<String, Variable> variablesMap = varSet.getVariablesMap();
-                allVariables.putAll(variablesMap);
+        } else {
+            HashMap<String, MappedVariable> allVariables = new HashMap<String, MappedVariable>();
+            for (Variable variable : variables) {
+                if (variable instanceof MappedVariable) {
+                    allVariables.put(((MappedVariable)variable).getName(), (MappedVariable)variable);
+                } else if (variable instanceof VariableSet)
+                    allVariables.putAll(((VariableSet)variable).getVariablesMap());
             }
+            return allVariables;
         }
-        if (variables != null && !variables.isEmpty()) {
-            for (Variable var : variables) {
-                allVariables.put(var.getName(), var);
-            }
-        }
-        return allVariables;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getParameter() {
+        return getParameter("=");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getParameter(String separator) {
+        if (this.isReference()) {
+            Object varSetObject = this.getRefid().getReferencedObject();
+            if (varSetObject != null && varSetObject instanceof VariableSet) {
+                return ((VariableSet)varSetObject).getParameter(separator);
+            } else {
+                throw new BuildException("The '" + this.getRefid().getRefId() + "' reference is not referencing a VariableSet");
+            }
+        } else {
+            String parameter = "";
+            for (Variable variable : variables) {
+                
+                parameter += " " + variable.getParameter(separator);
+            }
+            return parameter; 
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Collection<MappedVariable> getVariables() {
+        return this.getVariablesMap().values();
+    }
+    
+    
 }

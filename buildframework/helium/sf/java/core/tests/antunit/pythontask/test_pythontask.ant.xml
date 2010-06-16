@@ -23,7 +23,6 @@ Description:
 <project name="test-pythontask" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
     <description>Helium antlib core ldap tests.</description>
 
-    <typedef name="python" classname="com.nokia.helium.core.ant.taskdefs.PythonTask"/>
     <taskdef resource="com/nokia/helium/core/ant/antlib.xml" uri="http://www.nokia.com/helium"/>
     
     <target name="test-python-task-case-default">

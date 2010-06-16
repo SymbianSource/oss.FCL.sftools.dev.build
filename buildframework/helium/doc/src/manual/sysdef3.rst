@@ -8,7 +8,7 @@ Helium is now supporting System Definition v3 to achieve build. This document ex
 How to configure the feature?
 -----------------------------
 
-In order to enable the support you first need to define the **new.schema** property to true. Then define a resource ant element to either 
+In order to enable the support you first need to define the **schema.new** property to true. Then define a resource ant element to either 
 point to root definition file or package_definition.xml file.
 
 e.g:

@@ -101,8 +101,8 @@ public class MergeTask extends AbstractSydefTask {
                 for (ResourceCollection rc : resourceCollections) {
                     Iterator<Resource> ri =  (Iterator<Resource>)rc.iterator();
                     while (ri.hasNext()) {
-                        Resource r = ri.next();
-                        File rFile = new File(r.toString());
+                        Resource resource = ri.next();
+                        File rFile = new File(resource.toString());
                         if (first) {
                             log("Merging " + rFile);
                             tempFile.delete();

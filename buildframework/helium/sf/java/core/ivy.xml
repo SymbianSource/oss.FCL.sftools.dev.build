@@ -33,6 +33,7 @@ Description:
     <dependency org="org.codehaus.plexus" name="plexus-utils" rev="1.5.6"  />
     <dependency org="javax.mail" name="mail" rev="1.4.1"  />
     <dependency org="org.apache.commons" name="commons-io" rev="1.4"  />
+    <dependency org="org.apache.commons" name="commons-lang" rev="2.4"  />
     <dependency org="net.sourceforge.fmpp" name="fmpp" rev="0.9.13"  />
     <dependency org="dom4j" name="dom4j" rev="latest.integration"  />
   </dependencies>

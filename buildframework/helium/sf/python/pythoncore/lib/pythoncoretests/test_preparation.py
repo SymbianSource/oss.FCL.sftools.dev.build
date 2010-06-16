@@ -18,6 +18,8 @@
 #===============================================================================
 """ Testing preparation module """  
 
+# pylint: disable-msg=R0201
+
 import tempfile
 from shutil import rmtree
 import os
@@ -49,7 +51,7 @@ def _sessionPool(username, password, engine, dbpath, database, size, opener):
 
 def _fastSnapshot(project, target_dir, threads): 
     """ Emulate ccm.extra.FastSnapshot method for unit testing """
-    "Snapshot Created"
+    #Snapshot Created
 
 def _updateResultSimple(session): 
     """ Emulate ccm.UpdateResultSimple method for unit testing """
@@ -94,7 +96,7 @@ class PreparationTest(unittest.TestCase):
         ccm.extra.FastSnapshot = _fastSnapshot
         ccm.UpdateResultSimple = _updateResultSimple
         ccm.extra.FastMaintainWorkArea = _fastMaintainWorkArea
-        """Setup a temporary project directory for unit testing"""
+        #Setup a temporary project directory for unit testing
         self.dirname = os.path.join(tempfile.gettempdir(), 'pyUnitTestHeliumProject')
         self.filename = os.path.join(self.dirname, 'project.version')
         if os.path.exists(self.dirname): 

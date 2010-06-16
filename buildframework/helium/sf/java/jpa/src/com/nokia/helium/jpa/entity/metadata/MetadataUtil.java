@@ -69,9 +69,11 @@ public final class MetadataUtil {
      * Finalize the orm, calls ORMUtil finalize function to close
      * entity manager.
      */
-    public static void finalizeMetadata(String logPath) {
+    public static void finalizeMetadata(String urlPath, String logPath) {
         synchronized (mutexObject) {
-            log.debug("finalizing metadata");
+            ORMEntityManager manager = ORMUtil.getEntityManager(urlPath);
+            manager.commitToDB();
+            log.debug("finalizing metadata: " + logPath);
             metadataMap.remove(logPath);
         }
     }
@@ -106,7 +108,7 @@ public final class MetadataUtil {
         synchronized (mutexObject) {
             metadata = getMetadata(logPath, urlPath);
             metadata.removeEntries();
-            finalizeMetadata(logPath);
+            finalizeMetadata(urlPath, logPath);
         }
     }
 

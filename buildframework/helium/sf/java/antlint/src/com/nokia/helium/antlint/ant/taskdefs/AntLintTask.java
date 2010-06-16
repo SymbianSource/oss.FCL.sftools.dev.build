@@ -19,24 +19,17 @@ package com.nokia.helium.antlint.ant.taskdefs;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
-
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.types.FileSet;
-import org.dom4j.Document;
-import org.dom4j.Element;
-import org.dom4j.Visitor;
-import org.dom4j.io.SAXReader;
-import org.dom4j.DocumentException;
-
-import com.nokia.helium.antlint.AntFile;
-import com.nokia.helium.antlint.AntProjectVisitor;
-import com.nokia.helium.antlint.ant.types.Checker;
-import com.nokia.helium.antlint.checks.Check;
+import com.nokia.helium.antlint.ant.AntlintException;
+import com.nokia.helium.antlint.ant.Reporter;
+import com.nokia.helium.antlint.ant.Severity;
+import com.nokia.helium.antlint.ant.types.Check;
+import com.nokia.helium.antlint.ant.types.ConsoleReporter;
 
 /**
  * AntLint Task. This task checks for common coding conventions and errors in
@@ -56,8 +49,6 @@ import com.nokia.helium.antlint.checks.Check;
  * <li>CheckPresetDefMacroDefName : checks the naming convention of presetdef
  * and macrodef</li>
  * <li>CheckProjectName : checks the naming convention of project</li>
- * <li>CheckPropertiesInDataModel : checks whether the properties are defined in
- * data model</li>
  * <li>CheckPropertyName : checks the naming convention of properties</li>
  * </li>
  * <li>CheckPythonTasks : checks the coding convention of python tasks</li>
@@ -94,34 +85,23 @@ import com.nokia.helium.antlint.checks.Check;
  *               &lt;include name=&quot;*build.xml&quot;/&gt;
  *               &lt;include name=&quot;*.antlib.xml&quot;/&gt;
  *       &lt;/fileset&gt;
- *       &lt;checker name=&quot;CheckTabCharacter&quot; severity=&quot;error&quot; /&gt;
- *       .
- *       .
- *       &lt;checker name=&quot;CheckTargetName&quot; severity=&quot;warning&quot;&gt;([a-z0-9[\\d\\-]]*)&lt;/checker&gt;
+ *       &lt;CheckTabCharacter&quot; severity=&quot;error&quot; enabled=&quot;true&quot;/&gt;
+ *       &lt;CheckTargetName&quot; severity=&quot;warning&amp;quot enabled=&quot;true&quot; regexp=&quot;([a-z0-9[\\d\\-]]*)&quot;/&gt;
+ *       &lt;CheckScriptDef&quot; severity=&quot;error&quot; enabled=&quot;true&quot; outputDir=&quot;${antlint.test.dir}/output&quot;/&gt;
  *  &lt;/antlint&gt;
  * </pre>
  * 
  * @ant.task name="antlint" category="AntLint"
  * 
  */
-public class AntLintTask extends Task {
+public class AntLintTask extends Task implements Reporter {
 
-    private List<Checker> checkerList = new Vector<Checker>();
+    private List<Check> checkerList = new Vector<Check>();
     private List<FileSet> antFileSetList = new ArrayList<FileSet>();
-
-    private List<AntFile> antFilelist = new ArrayList<AntFile>();
-    private List<Check> checkList = new ArrayList<Check>();
-
-    /**
-     * Add the given {@link Checker} to the checklist.
-     * 
-     * @param checker
-     *            is the checker to be added.
-     * @ant.required
-     */
-    public void addChecker(Checker checker) {
-        checkerList.add(checker);
-    }
+    private List<Reporter> reporters = new ArrayList<Reporter>();
+    private int errorCount;
+    private boolean failOnError = true;
+    private ConsoleReporter consoleReporter = new ConsoleReporter();
 
     /**
      * Add a set of files to copy.
@@ -138,117 +118,50 @@ public class AntLintTask extends Task {
      * Execute the antlint task.
      */
     public final void execute() {
+        if (checkerList.size() == 0) {
+            throw new BuildException("No antlint checks are defined.");
+        }
         try {
-            initialize();
-            startAntLintCheck(); // trigger antlint checking
-        } catch (DocumentException e) {
+            // Adding console reported by default if no
+            // other reporter are mentioned.
+            if (reporters.size() == 0) {
+                reporters.add(consoleReporter);
+            }
+            setTask(this);
+            open();
+            doAntLintCheck();
+        } catch (AntlintException e) {
             throw new BuildException(
                     "Exception occured while running AntLint task "
                             + e.getMessage());
+        } finally {
+            // Closing all reporter session.
+            close();
         }
 
-        int errorCount = 0;
-        for (AntFile antFile : antFilelist) {
-            errorCount = errorCount + antFile.getErrorCount();
-            log(antFile.toString());
+        if (failOnError && (errorCount > 0)) {
+            throw new BuildException("Build failed because of AntLint errors.");
         }
-        if (errorCount > 0) {
-            throw new BuildException(errorCount + " errors found.");
-        }
-    }
 
-    /**
-     * Initialize the checklist setting the checkers against their corresponding
-     * Checks.
-     */
-    private void initialize() {
-        Check check = null;
-        for (Checker checker : checkerList) {
-            check = getCheckObject(checker.getName());
-            if (check != null) {
-                check.setChecker(checker);
-                checkList.add(check);
-            }
-        }
-    }
-
-    /**
-     * Instantiate the given {@link Check}.
-     * 
-     * @param checkerName
-     *            is the name of the Check object to be instantiated.
-     * @return an instance of requested {@link Check}.
-     */
-    @SuppressWarnings("unchecked")
-    private Check getCheckObject(String checkerName) {
-        Check check = null;
-        try {
-            Class clazz = Class.forName("com.nokia.helium.antlint.checks."
-                    + checkerName);
-            if (clazz != null) {
-                check = (Check) clazz.newInstance();
-            }
-        } catch (ClassNotFoundException th) {
-            throw new BuildException("Error in Antlint configuration-ClassNotFoundException:", th);
-        } catch (InstantiationException th) {
-            throw new BuildException("Error in Antlint configuration-InstantiationException:", th);
-        } catch (IllegalAccessException th) {
-            throw new BuildException("Error in Antlint configuration-IllegalAccessException:", th);
-        }
-        return check;
     }
 
     /**
      * Triggers the antlint checking.
      * 
+     * @throws AntlintException
+     * 
      * @throws Exception
      *             if the checking fails.
      */
-    private void startAntLintCheck() throws DocumentException {
-        runOneTimeCheck();
+    private void doAntLintCheck() throws AntlintException {
 
         for (FileSet fs : antFileSetList) {
             DirectoryScanner ds = fs.getDirectoryScanner(getProject());
             String[] srcFiles = ds.getIncludedFiles();
             String basedir = ds.getBasedir().getPath();
-
             for (int i = 0; i < srcFiles.length; i++) {
-                String antFileName = basedir + File.separator + srcFiles[i];
-                getProject().log("*************** Ant File: " + antFileName);
-
-                run(antFileName);
-
-                SAXReader saxReader = new SAXReader();
-                Document doc = saxReader.read(new File(antFileName));
-                treeWalk(doc);
-            }
-            Collections.sort(antFilelist);
-        }
-    }
-
-    /**
-     * Parse the given document.
-     * 
-     * @param document
-     *            is the document to be parsed.
-     */
-    private void treeWalk(final Document document) {
-        Element rootElement = document.getRootElement();
-        Visitor visitorRootElement = new AntProjectVisitor(checkList);
-        rootElement.accept(visitorRootElement);
-    }
-
-    /**
-     * Runs one time antlint checks.
-     * 
-     */
-    private void runOneTimeCheck() {
-        AntFile antFile = new AntFile("General");
-        antFilelist.add(antFile);
-        for (Check check : checkList) {
-            if (check.isEnabled()) {
-                check.setAntFile(antFile);
-                check.run();
+                String antFilename = basedir + File.separator + srcFiles[i];
+                runChecks(new File(antFilename));
             }
         }
     }
@@ -258,15 +171,89 @@ public class AntLintTask extends Task {
      * 
      * @param antFileName
      *            is the name of the ant file to be checked.
+     * @throws AntlintException
      */
-    private void run(String antFileName) {
-        AntFile antFile = new AntFile(antFileName);
-        antFilelist.add(antFile);
-        for (Check check : checkList) {
+    private void runChecks(File antFilename) throws AntlintException {
+        for (Check check : checkerList) {
             if (check.isEnabled()) {
-                check.setAntFile(antFile);
-                check.run(antFileName);
+                check.validateAttributes();
+                check.setReporter(this);
+                check.run(antFilename);
             }
         }
+
     }
+
+    /**
+     * To add Antlint checkers.
+     * 
+     * @param c
+     */
+    public void add(Check c) {
+        checkerList.add(c);
+    }
+
+    /**
+     * To add reporters.
+     * 
+     * @param reporter
+     */
+    public void add(Reporter reporter) {
+        reporter.setTask(this);
+        reporters.add(reporter);
+    }
+
+    /**
+     * @param failOnError
+     *            the failOnError to set
+     */
+    public void setFailOnError(boolean failOnError) {
+        this.failOnError = failOnError;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * com.nokia.helium.antlint.ant.Reporter#report(com.nokia.helium.antlint
+     * .ant.Severity, java.lang.String, java.io.File, int)
+     */
+    public void report(Severity severity, String message, File filename,
+            int lineNo) {
+        if (severity.getValue().toUpperCase().equals("ERROR")) {
+            errorCount++;
+        }
+
+        for (Reporter reporter : reporters) {
+            reporter.report(severity, message, filename, lineNo);
+        }
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * com.nokia.helium.antlint.ant.Reporter#setTask(org.apache.tools.ant.Task)
+     */
+    @Override
+    public void setTask(Task task) {
+        for (Reporter reporter : reporters) {
+            reporter.setTask(task);
+        }
+    }
+
+    @Override
+    public void close() {
+        for (Reporter reporter : reporters) {
+            reporter.close();
+        }
+    }
+
+    @Override
+    public void open() {
+        for (Reporter reporter : reporters) {
+            reporter.open();
+        }
+    }
+
 }

@@ -47,9 +47,9 @@ public class MacroMeta extends TaskContainerMeta {
             if (defaultval.equals("")) {
                 defaultval = "value";
             }
-            else {
-                defaultval = "<i>" + defaultval + "</i>";
-            }
+//            else {
+//                defaultval = "<i>" + defaultval + "</i>";
+//            }
             usage = usage + statement.valueOf("@name") + "=\"" + defaultval + "\"" + " ";
         }
 
@@ -57,14 +57,14 @@ public class MacroMeta extends TaskContainerMeta {
         statements = getNode().selectNodes(
                 "//scriptdef[@name='" + macroName + "']/element | //macrodef[@name='" + macroName + "']/element");
         for (Node statement : statements) {
-            macroElements = "&lt;" + statement.valueOf("@name") + "/&gt;\n" + macroElements;
+            macroElements = "        <" + statement.valueOf("@name") + "/>\n" + macroElements;
         }
 
         if (macroElements.equals("")) {
-            return "&lt;hlm:" + macroName + " " + usage + "/&gt;";
+            return "<hlm:" + macroName + " " + usage + "/>";
         }
         else {
-            return "&lt;hlm:" + macroName + " " + usage + "&gt;\n" + macroElements + "&lt;/hlm:" + macroName + "&gt;";
+            return "<hlm:" + macroName + " " + usage + ">\n" + macroElements + "    </hlm:" + macroName + ">";
         }
     }
 }

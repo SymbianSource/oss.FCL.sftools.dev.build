@@ -82,11 +82,11 @@ public class HgExportCommand extends AbstractExportCommand {
 
     protected List<String> getFiles(File dir) {
         List<String> files = new ArrayList<String>();
-        for (File f : dir.listFiles()) {
-            if (f.isFile()) {
-                files.add(f.getAbsolutePath());
-            } else if (f.isDirectory()) {
-                files.addAll(getFiles(f));
+        for (File file : dir.listFiles()) {
+            if (file.isFile()) {
+                files.add(file.getAbsolutePath());
+            } else if (file.isDirectory()) {
+                files.addAll(getFiles(file));
             }
         }
         return files;

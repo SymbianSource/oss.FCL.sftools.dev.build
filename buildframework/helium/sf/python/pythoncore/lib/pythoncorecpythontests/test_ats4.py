@@ -695,7 +695,7 @@ class TestComponentParser(mocker.MockerTestCase):
 
     def test_harness(self):
         """ Detect test harness."""
-        mmp_parser = parser.MmpFileParser()
+        mmp_parser = parser.MmpFileParser(None)
         group = TSRC.joinpath("group")
         for harness, mmp in [
             ("STIF", group / "stif.mmp"),

@@ -44,7 +44,7 @@ def get_first_day_of_cycle(now = datetime.datetime.now()):
     """ This function returns a datetime object representing the monday from closest
         odd week.
     """
-    isoyear, isoweek, isoday = now.isocalendar()
+    _, isoweek, isoday = now.isocalendar()
     week = isoweek - 1
     day = isoday - 1
     monday = now - datetime.timedelta(days=day + week.__mod__(2) * 7)

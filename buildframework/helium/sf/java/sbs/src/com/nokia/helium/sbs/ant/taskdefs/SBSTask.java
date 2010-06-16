@@ -32,7 +32,8 @@ import java.io.File;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
-import com.nokia.helium.core.ant.types.Variable;
+
+import com.nokia.helium.core.ant.MappedVariable;
 import com.nokia.helium.core.ant.types.VariableSet;
 import com.nokia.helium.sbs.ant.types.*;
 import org.apache.log4j.Logger;
@@ -339,14 +340,20 @@ public class SBSTask extends Task {
                 sbsCmd.addErrorLineHandler(sbsErrorConsumer);
             }
         } catch (java.io.FileNotFoundException ex) {
-            log.info("file path: " + errorFile + "Not valid" );
+            log("file path: " + errorFile + "Not valid" );
         }
         
         startTime = new Date();
         try {
-            log(getSbsCmd().getExecutable() + " commands: " + getSBSCmdLine());
+            String cmdLine = getSBSCmdLine();
+            if (cmdLine == null) {
+                // this happens in case there is nothing to be done, let's just run
+                // sbs anyway so the output log is generated
+                cmdLine = " --logfile " + getOutputLog().getAbsolutePath();
+            }
+            log(getSbsCmd().getExecutable() + " commands: " + cmdLine);
             if (executeCmd) {
-                sbsCmd.execute(getSBSCmdLine());
+                sbsCmd.execute(cmdLine);
             }
         } catch (SBSException sex) {
             log.debug("SBS exception occured during sbs execution", sex);
@@ -536,14 +543,14 @@ public class SBSTask extends Task {
         StringBuffer cmdOptions = new StringBuffer();
         VariableSet sbsOptions = sbsInput.getFullSBSOptions();
         cmdOptions.append(" -s " + sysDefFile);
-        Collection<Variable> variableList = sbsOptions.getVariables(); 
+        Collection<MappedVariable> variableList = sbsOptions.getVariables(); 
         if (sbsOptions != null ) {
            if (variableList.isEmpty()) {
                throw new BuildException("sbsoptions cannot be empty for input: " + sbsInputName);
            }
         }
         cmdOptions.append(" --logfile " + getOutputLog().getAbsolutePath());
-        for (Variable variable : variableList) {
+        for (MappedVariable variable : variableList) {
             if (variable.getParameter().startsWith("--logfile")) {
                 this.log("The following command line argument will be ignored: " + variable.getParameter(), Project.MSG_WARN);
             } else {
@@ -559,10 +566,7 @@ public class SBSTask extends Task {
                 cmdOptions.append(" -j " + ppThreads);
             }
             variableList = sbsMakeOptions.getVariables(); 
-            //if (variableList.isEmpty()) {
-            //    throw new BuildException("sbs make options cannot be empty for input: " + sbsInputName);
-            //}
-            for (Variable variable : variableList) {
+            for (MappedVariable variable : variableList) {
                 cmdOptions.append(" --mo=");
                 cmdOptions.append(variable.getParameter());
             }

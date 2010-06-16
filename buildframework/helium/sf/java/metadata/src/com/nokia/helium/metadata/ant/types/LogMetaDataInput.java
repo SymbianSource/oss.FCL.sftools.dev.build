@@ -147,29 +147,29 @@ public abstract class LogMetaDataInput extends DataType implements
      */
     
     boolean isEntryAvailable() {
-            int fileListSize = getFileList().size();
-            while (currentFileIndex < fileListSize) {
-                boolean entryCreated = false;
-                File currentFile = getCurrentFile();
-                entryCreated = isEntryCreated(currentFile);
-                if (entryCreated) {
-                    if (!entryAddedForLog) {
-                        entryAddedForLog = true;
-                    }
-                    return entryCreated;
-                }
+        int fileListSize = getFileList().size();
+        while (currentFileIndex < fileListSize) {
+            boolean entryCreated = false;
+            File currentFile = getCurrentFile();
+            entryCreated = isEntryCreated(currentFile);
+            if (entryCreated) {
                 if (!entryAddedForLog) {
-                    // If no entry, then logfile is added to the database.
-                    addEntry("default", "general",
-                            getCurrentFile().toString(), -1, "", -1, null);
                     entryAddedForLog = true;
-                    return true;
                 }
-                if (isAdditionalEntry()) {
-                    return true;
-                }
-                currentFileIndex ++;
+                return entryCreated;
             }
+            if (!entryAddedForLog) {
+                // If no entry, then logfile is added to the database.
+                addEntry("default", "general",
+                        getCurrentFile().toString(), -1, "", -1, null);
+                entryAddedForLog = true;
+                return true;
+            }
+            if (isAdditionalEntry()) {
+                return true;
+            }
+            currentFileIndex ++;
+        }
         return false;
     }
 

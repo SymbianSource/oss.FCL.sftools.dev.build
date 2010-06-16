@@ -17,7 +17,7 @@
 package com.nokia.helium.logger.ant.types;
 
 import java.io.File;
-
+import org.apache.tools.ant.Project;
 import org.apache.log4j.Logger;
 import org.apache.tools.ant.types.DataType;
 
@@ -43,7 +43,9 @@ public class StageSummary extends DataType {
     private File template;
     private Logger log = Logger.getLogger(getClass());
 
-    public StageSummary () {
+    public void setProject(Project project)
+    {
+        super.setProject(project);
         if ( !isStageSummaryHandlerRegistered && StatusAndLogListener.getStatusAndLogListener() != null) {
             log.debug("Registering stage summary to the StatusAndLogListener listener");
             StatusAndLogListener.getStatusAndLogListener().register( new StageSummaryHandler() );
@@ -56,7 +58,7 @@ public class StageSummary extends DataType {
      * 
      * @return the template to display build stage summary.
      */
-    public File getTemplate () {
+    public File getTemplate() {
         return template;
     }
 
@@ -67,7 +69,7 @@ public class StageSummary extends DataType {
      *            the template to set
      * @ant.required           
      */
-    public void setTemplate ( File template ) {
+    public void setTemplate( File template ) {
         this.template = template;
     }
 }

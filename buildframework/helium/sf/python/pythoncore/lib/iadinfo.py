@@ -16,6 +16,7 @@
 #
 #Description:
 #===============================================================================
+""" IAD info """
 
 import sys, os
 import struct
@@ -26,20 +27,22 @@ PyASN1Availabe = True
 try :
     from pyasn1.codec.der import decoder
     from pyasn1.type import base
-except :
+except ImportError:
     PyASN1Availabe = False
 
 def _findItem(item, itemParent, index, objectIdentifier) :
+    """find Item"""
     if isinstance(item, base.AbstractSimpleAsn1Item) :
         if item == objectIdentifier :
             return itemParent[index + 1]
     else:
-        for i in range(len(item)) :
-            found = _findItem(item[i], item, i, objectIdentifier)
+        for i_item in range(len(item)) :
+            found = _findItem(item[i_item], item, i_item, objectIdentifier)
             if found: 
                 return found
 
 def findItem(decodedCert, objectIdentifier) :
+    """find item"""
     return _findItem(decodedCert, None, 0, objectIdentifier)
 
 
@@ -49,6 +52,7 @@ class CertificateOrganization :
         pass
     
     def parse(self, decodedCert) :
+        """parse certificate Organisation"""
         self.commonName = findItem(decodedCert, (2, 5, 4, 3))
         self.countryCode = findItem(decodedCert, (2, 5, 4, 6))
         self.locality = findItem(decodedCert, (2, 5, 4, 7))
@@ -57,6 +61,7 @@ class CertificateOrganization :
         self.organization = findItem(decodedCert, (2, 5, 4, 10))
 
     def readableStr(self) :
+        """readable String"""
         buf = ""
         if self.commonName :
             buf += self.commonName.prettyPrint() + "\n"
@@ -78,6 +83,7 @@ class CertificateInfo :
         pass
         
     def parse(self, decodedCert) :
+        """parse"""
         self.issuer = CertificateOrganization()
         self.issuer.parse(decodedCert[0][3])
         
@@ -85,10 +91,11 @@ class CertificateInfo :
         self.signer.parse(decodedCert[0][5])
         
     def readableStr(self) :
+        """readable String"""
         buf = "Signer:\n      " + "\n      ".join(self.signer.readableStr().split('\n')) + "\n"
         buf += "Issuer:\n      " + "\n      ".join(self.issuer.readableStr().split('\n')) + "\n"
         return buf
-            
+
 
 class SISFileHeader :
     """ Class SIS File header """
@@ -106,6 +113,7 @@ class SISField :
         self.subFields = []
         
     def readFieldLength(self, fileReader) :
+        """read Field Length"""
         length = fileReader.readBytesAsUint(4)
         if length & 0x80000000 > 0 :
             length = length << 32
@@ -113,6 +121,7 @@ class SISField :
         return length
         
     def findField(self, fieldType, startIndex=0) :
+        """find Field"""
         result = None
         index = startIndex
         
@@ -124,9 +133,11 @@ class SISField :
         return (result, index)
         
     def readableStr(self) :
+        """readable String"""
         return ""
     
     def traverse(self, handler, depth=0) :
+        """ traverse"""
         handler.handleField(self, depth)
         for field in self.subFields :
             field.traverse(handler, depth + 1)
@@ -137,6 +148,7 @@ class SISUnsupportedField(SISField) :
         SISField.__init__(self)
         
     def initFromFile(self, fileReader) :
+        """initialisation From File"""
         self.length = self.readFieldLength(fileReader)
         fileReader.readPlainBytes(self.length)
 
@@ -147,6 +159,7 @@ class SISStringField(SISField) :
         self.data = None
         
     def initFromFile(self, fileReader) :
+        """initialise From File"""
         self.length = self.readFieldLength(fileReader)
         buf = fileReader.readPlainBytes(self.length)
         self.data = u""
@@ -156,6 +169,7 @@ class SISStringField(SISField) :
             self.data += unichr(ord(temp[0]) | ord(temp[1]) << 8)
         
     def readableStr(self) :
+        """readable String"""
         return self.data
         
 class SISArrayField(SISField) :
@@ -164,18 +178,19 @@ class SISArrayField(SISField) :
         SISField.__init__(self)
         
     def initFromFile(self, fileReader) :
+        """initialise From File"""
         self.length = self.readFieldLength(fileReader)
         type = fileReader.readBytesAsInt(4)
-        l = self.length - 4
-        while l > 0 :
+        l_len = self.length - 4
+        while l_len > 0 :
             field = SISFieldTypes[type]()
             field.type = type
             field.initFromFile(fileReader)
             self.subFields.append(field)
             
-            l -= field.length + 4 # field length + the length field
+            l_len -= field.length + 4 # field length + the length field
             padding = fileReader.skipPadding()
-            l -= padding
+            l_len -= padding
 
 class SISCompressedField(SISField) :
     """ Class SIS CompressedField """
@@ -186,6 +201,7 @@ class SISCompressedField(SISField) :
         self.data = None
         
     def initFromFile(self, fileReader) :
+        """initialise From File"""
         self.length = self.readFieldLength(fileReader)
         self.algorithm = fileReader.readBytesAsUint(4)
         self.uncompressedDataSize = fileReader.readBytesAsUint(8)
@@ -202,6 +218,7 @@ class SISVersionField(SISField) :
         self.version = (- 1, - 1, - 1)
         
     def initFromFile(self, fileReader) :
+        """initialise From File"""
         self.length = self.readFieldLength(fileReader)
         major = fileReader.readBytesAsInt(4)
         minor = fileReader.readBytesAsInt(4)
@@ -209,6 +226,7 @@ class SISVersionField(SISField) :
         self.version = (major, minor, build)
         
     def readableStr(self) :
+        """readable string"""
         return str(self.version)
     
 class SISVersionRangeField(SISField) :
@@ -219,6 +237,7 @@ class SISVersionRangeField(SISField) :
         self.toVersion = None
         
     def initFromFile(self, fileReader) :
+        """initialise From File"""
         self.length = self.readFieldLength(fileReader)
         fieldParser = SISFieldParser()
         self.fromVersion = fieldParser.parseField(fileReader)
@@ -234,12 +253,14 @@ class SISDateField(SISField) :
         self.day = None
         
     def initFromFile(self, fileReader) :
+        """initialise from File"""
         self.length = self.readFieldLength(fileReader)
         self.year = fileReader.readBytesAsUint(2)
         self.month = fileReader.readBytesAsUint(1)
         self.day = fileReader.readBytesAsUint(1)
     
     def readableStr(self) :
+        """readable string"""
         return str(self.year) + "." + str(self.month) + "." + str(self.day)
     
 class SISTimeField(SISField) :
@@ -251,12 +272,14 @@ class SISTimeField(SISField) :
         self.seconds = None
         
     def initFromFile(self, fileReader) :
+        """initialise from File"""
         self.length = self.readFieldLength(fileReader)
         self.hours = fileReader.readBytesAsUint(1)
         self.minutes = fileReader.readBytesAsUint(1)
         self.seconds = fileReader.readBytesAsUint(1)
     
     def readableStr(self) :
+        """readable String"""
         return str(self.hours) + ":" + str(self.minutes) + ":" + str(self.seconds)
     
 class SISDateTimeField(SISField) :
@@ -267,6 +290,7 @@ class SISDateTimeField(SISField) :
         self.time = None
         
     def initFromFile(self, fileReader) :
+        """initialise From File"""
         self.length = self.readFieldLength(fileReader)
         fieldParser = SISFieldParser()
         self.date = fieldParser.parseField(fileReader)
@@ -279,10 +303,12 @@ class SISUidField(SISField) :
         self.uid = None
         
     def initFromFile(self, fileReader) :
+        """initialise From File"""
         self.length = self.readFieldLength(fileReader)
         self.uid = fileReader.readBytesAsUint(4)
         
     def readableStr(self) :
+        """readable String"""
         return hex(self.uid)
     
 class SISLanguageField(SISField) :
@@ -292,10 +318,12 @@ class SISLanguageField(SISField) :
         self.language = None
         
     def initFromFile(self, fileReader) :
+        """initialise From File"""
         self.length = self.readFieldLength(fileReader)
         self.language = fileReader.readBytesAsUint(4)
         
     def readableStr(self) :
+        """readable String"""
         return str(self.language)
     
 class SISContentsField(SISField) :
@@ -304,6 +332,7 @@ class SISContentsField(SISField) :
         SISField.__init__(self)
         
     def initFromFile(self, fileReader) :
+        """initialise From File"""
         self.length = self.readFieldLength(fileReader)
         fieldParser = SISFieldParser()
         field = fieldParser.parseField(fileReader)
@@ -320,6 +349,7 @@ class SISControllerField(SISField) :
         SISField.__init__(self)
         
     def initFromFile(self, fileReader) :
+        """initialise From File"""
         self.length = self.readFieldLength(fileReader)
         fieldParser = SISFieldParser()
         bufferReader = SISBufferReader(fileReader.readPlainBytes(self.length))
@@ -336,6 +366,7 @@ class SISInfoField(SISField) :
         self.installFlags = None
         
     def initFromFile(self, fileReader) :
+        """initialise From File"""
         self.length = self.readFieldLength(fileReader)
         fieldParser = SISFieldParser()
         self.subFields.append(fieldParser.parseField(fileReader)) # UID
@@ -353,6 +384,7 @@ class SISSupportedLanguagesField(SISField) :
         SISField.__init__(self)
         
     def initFromFile(self, fileReader) :
+        """initialise From File"""
         self.length = self.readFieldLength(fileReader)
         fieldParser = SISFieldParser()
         self.subFields.append(fieldParser.parseField(fileReader)) # languages
@@ -363,6 +395,7 @@ class SISSupportedOptionsField(SISField) :
         SISField.__init__(self)
         
     def initFromFile(self, fileReader) :
+        """initialise From File"""
         self.length = self.readFieldLength(fileReader)
         fieldParser = SISFieldParser()
         self.subFields.append(fieldParser.parseField(fileReader)) # options
@@ -373,6 +406,7 @@ class SISPrerequisitiesField(SISField) :
         SISField.__init__(self)
         
     def initFromFile(self, fileReader) :
+        """initialise From File"""
         self.length = self.readFieldLength(fileReader)
         fieldParser = SISFieldParser()
         self.subFields.append(fieldParser.parseField(fileReader)) # target devices
@@ -385,6 +419,7 @@ class SISDependencyField(SISField) :
         SISField.__init__(self)
         
     def initFromFile(self, fileReader) :
+        """initialise From File"""
         self.length = self.readFieldLength(fileReader)
         fieldParser = SISFieldParser()
         self.subFields.append(fieldParser.parseField(fileReader)) # UID
@@ -402,6 +437,7 @@ class SISPropertiesField(SISField) :
         SISField.__init__(self)
         
     def initFromFile(self, fileReader) :
+        """initialise From File"""
         self.length = self.readFieldLength(fileReader)
         fieldParser = SISFieldParser()
         self.subFields.append(fieldParser.parseField(fileReader)) # properties
@@ -414,13 +450,13 @@ class SISPropertyField(SISField) :
         self.value = None
         
     def initFromFile(self, fileReader) :
+        """initialise From File"""
         self.length = self.readFieldLength(fileReader)
         self.key = fileReader.readBytesAsInt(4)
         self.value = fileReader.readBytesAsInt(4)
     
-# There is a type for this field, but there is no definition of the field contents
 class SISSignaturesField(SISUnsupportedField) :
-    """ Class SISSignaturesField """
+    """ Class SISSignaturesField There is a type for this field, but there is no definition of the field contents"""
     pass
     
 class SISCertificateChainField(SISField) :
@@ -429,6 +465,7 @@ class SISCertificateChainField(SISField) :
         SISField.__init__(self)
         
     def initFromFile(self, fileReader) :
+        """initialise From File"""
         self.length = self.readFieldLength(fileReader)
         fieldParser = SISFieldParser()
         self.subFields.append(fieldParser.parseField(fileReader)) # certificate data
@@ -439,6 +476,7 @@ class SISLogoField(SISField) :
         SISField.__init__(self)
 
     def initFromFile(self, fileReader) :
+        """initialise From File"""
         self.length = self.readFieldLength(fileReader)
         fieldParser = SISFieldParser()
         self.subFields.append(fieldParser.parseField(fileReader)) # logo file
@@ -454,6 +492,7 @@ class SISFileDescriptionField(SISField) :
         self.fileIndex = None
         
     def initFromFile(self, fileReader) :
+        """initialise From File"""
         self.length = self.readFieldLength(fileReader)
         fieldParser = SISFieldParser()
         
@@ -471,6 +510,7 @@ class SISFileDescriptionField(SISField) :
         self.fileIndex = fileReader.readBytesAsUint(4)
         
     def readableStr(self) :
+        """readable string"""
         return "index: " + str(self.fileIndex)
     
 class SISHashField(SISField) :
@@ -480,6 +520,7 @@ class SISHashField(SISField) :
         self.algorithm = None
 
     def initFromFile(self, fileReader) :
+        """initialise From File"""
         self.length = self.readFieldLength(fileReader)
         fieldParser = SISFieldParser()
         self.algorithm = fileReader.readBytesAsUint(4)
@@ -491,6 +532,7 @@ class SISIfField(SISField) :
         SISField.__init__(self)
 
     def initFromFile(self, fileReader) :
+        """initialise From File"""
         self.length = self.readFieldLength(fileReader)
         fieldParser = SISFieldParser()
         self.subFields.append(fieldParser.parseField(fileReader)) # expression
@@ -503,6 +545,7 @@ class SISElseIfField(SISField) :
         SISField.__init__(self)
 
     def initFromFile(self, fileReader) :
+        """initialise From File"""
         self.length = self.readFieldLength(fileReader)
         fieldParser = SISFieldParser()
         self.subFields.append(fieldParser.parseField(fileReader)) # expression
@@ -517,6 +560,7 @@ class SISInstallBlockField(SISField) :
         self.ifBlocks = None
         
     def initFromFile(self, fileReader) :
+        """initialise From File"""
         self.length = self.readFieldLength(fileReader)
         fieldParser = SISFieldParser()
         self.subFields.append(fieldParser.parseField(fileReader))
@@ -531,6 +575,7 @@ class SISExpressionField(SISField) :
         self.integerValue = None
         
     def initFromFile(self, fileReader) :
+        """initialise From File"""
         self.length = self.readFieldLength(fileReader)
         fieldParser = SISFieldParser()
         self.operator = fileReader.readBytesAsUint(4)
@@ -549,6 +594,7 @@ class SISDataField(SISField) :
         SISField.__init__(self)
         
     def initFromFile(self, fileReader) :
+        """initialise From File"""
         self.length = self.readFieldLength(fileReader)
         fieldParser = SISFieldParser()
         self.subFields.append(fieldParser.parseField(fileReader)) # data units
@@ -559,6 +605,7 @@ class SISDataUnitField(SISField) :
         SISField.__init__(self)
         
     def initFromFile(self, fileReader) :
+        """initialise From File"""
         self.length = self.readFieldLength(fileReader)
         fieldParser = SISFieldParser()
         self.subFields.append(fieldParser.parseField(fileReader)) # file data
@@ -569,6 +616,7 @@ class SISFileDataField(SISField) :
         SISField.__init__(self)
         
     def initFromFile(self, fileReader) :
+        """initialise From File"""
         self.length = self.readFieldLength(fileReader)
         fieldParser = SISFieldParser()
         self.subFields.append(fieldParser.parseField(fileReader)) # raw file data
@@ -579,6 +627,7 @@ class SISSupportedOptionField(SISField) :
         SISField.__init__(self)
         
     def initFromFile(self, fileReader) :
+        """initialise From File"""
         self.length = self.readFieldLength(fileReader)
         fieldParser = SISFieldParser()
         self.subFields.append(fieldParser.parseField(fileReader)) # names
@@ -590,6 +639,7 @@ class SISControllerChecksumField(SISField) :
         self.checksum = None
         
     def initFromFile(self, fileReader) :
+        """initialise From File"""
         self.length = self.readFieldLength(fileReader)
         self.checksum = fileReader.readBytesAsUint(2)
     
@@ -600,6 +650,7 @@ class SISDataChecksumField(SISField) :
         self.checksum = None
         
     def initFromFile(self, fileReader) :
+        """initialise From File"""
         self.length = self.readFieldLength(fileReader)
         self.checksum = fileReader.readBytesAsUint(2)
     
@@ -609,6 +660,7 @@ class SISSignatureField(SISField) :
         SISField.__init__(self)
         
     def initFromFile(self, fileReader) :
+        """initialise From File"""
         self.length = self.readFieldLength(fileReader)
         fieldParser = SISFieldParser()
         self.subFields.append(fieldParser.parseField(fileReader)) # signature algorithm
@@ -621,6 +673,7 @@ class SISBlobField(SISField) :
         self.data = None
         
     def initFromFile(self, fileReader) :
+        """initialise From File"""
         self.length = self.readFieldLength(fileReader)
         self.data = fileReader.readPlainBytes(self.length)
     
@@ -630,6 +683,7 @@ class SISSignatureAlgorithmField(SISField) :
         SISField.__init__(self)
         
     def initFromFile(self, fileReader) :
+        """initialise From File"""
         self.length = self.readFieldLength(fileReader)
         fieldParser = SISFieldParser()
         self.subFields.append(fieldParser.parseField(fileReader)) # algorithm identifier
@@ -640,6 +694,7 @@ class SISSignatureCertificateChainField(SISField) :
         SISField.__init__(self)
         
     def initFromFile(self, fileReader) :
+        """initialise From File"""
         self.length = self.readFieldLength(fileReader)
         fieldParser = SISFieldParser()
         self.subFields.append(fieldParser.parseField(fileReader)) # signatures
@@ -652,6 +707,7 @@ class SISDataIndexField(SISField) :
         self.dataIndex = None
         
     def initFromFile(self, fileReader) :
+        """initialise From File"""
         self.length = self.readFieldLength(fileReader)
         self.dataIndex = fileReader.readBytesAsUint(4)
 
@@ -663,6 +719,7 @@ class SISCapabilitiesField(SISField) :
         self.readableCaps = []
         
     def initFromFile(self, fileReader) :
+        """initialise From File"""
         self.length = self.readFieldLength(fileReader)
         self.capabilities = fileReader.readBytesAsUint(self.length)
         
@@ -671,6 +728,7 @@ class SISCapabilitiesField(SISField) :
                 self.readableCaps.append(CapabilityNames[i])
                 
     def readableStr(self) :
+        """readable string"""
         return " ".join(self.readableCaps)
     
 SISFieldTypes = { 
@@ -841,44 +899,49 @@ class SISReader :
         self.bytesRead = 0
         
     def readUnsignedBytes(self, numBytes) :
+        """read Unsigned bytes"""
         buf = self.readPlainBytes(numBytes)
         if len(buf) < numBytes :
             return []
             
         format = ""
-        for i in range(numBytes) :
+        for _ in range(numBytes) :
             format += "B"
         return struct.unpack(format, buf)
     
     def readSignedBytes(self, numBytes) :
+        """read signed bytes"""
         buf = self.readPlainBytes(numBytes)
         if len(buf) < numBytes :
             return []
             
         format = ""
-        for i in range(numBytes) :
+        for _ in range(numBytes) :
             format += "b"
         return struct.unpack(format, buf)
         
     def readBytesAsUint(self, numBytes) :
+        """read bytes as Unit"""
         result = 0
         bytes = self.readUnsignedBytes(numBytes)
         if len(bytes) == numBytes :
-            for i in range(numBytes) :
-                result |= bytes[i] << (i * 8)
+            for i_byte in range(numBytes) :
+                result |= bytes[i_byte] << (i_byte * 8)
         
         return result
         
     def readBytesAsInt(self, numBytes) :
+        """read bytes as Integer"""
         result = 0
         bytes = self.readSignedBytes(numBytes)
         if len(bytes) == numBytes :
-            for i in range(numBytes) :
-                result |= bytes[i] << (i * 8)
+            for i_byte in range(numBytes) :
+                result |= bytes[i_byte] << (i_byte * 8)
         
         return result
         
     def skipPadding(self) :
+        """skip padding"""
         result = 0
         if self.bytesRead % 4 != 0 :
             paddingLength = 4 - self.bytesRead % 4
@@ -888,6 +951,7 @@ class SISReader :
         return result
 
     def readPlainBytes(self, numBytes) :
+        """read plain bytes"""
         pass
 
 class SISFileReader(SISReader) : 
@@ -899,6 +963,7 @@ class SISFileReader(SISReader) :
         self.bytesRead = 0
 
     def readPlainBytes(self, numBytes) :
+        """read Plain byytes"""
         if self.eof :
             return ""
             
@@ -916,6 +981,7 @@ class SISFileReader(SISReader) :
         return buf
 
     def isEof(self) :
+        """is it End of File"""
         return self.eof
         
 class SISBufferReader(SISReader) :
@@ -925,6 +991,7 @@ class SISBufferReader(SISReader) :
         self.bytesRead = 0
         
     def readPlainBytes(self, numBytes) :
+        """read Plain bytes"""
         if self.isEof() :
             return ""
             
@@ -938,6 +1005,7 @@ class SISBufferReader(SISReader) :
         return result
             
     def isEof(self) :
+        """is it End of File"""
         return self.bytesRead >= len(self.buffer)
         
 class SISFieldParser :
@@ -967,18 +1035,21 @@ class SISInfo(SISField) :
         self.fileHeader = SISFileHeader()
         
     def parse(self, filename) :
+        """parse"""
         fin = open(filename, 'rb')
         fileReader = SISFileReader(fin)
         self.parseHeader(fileReader)
         self.parseSISFields(fileReader)
         
     def parseHeader(self, fileReader) :
+        """parse Holder"""
         self.fileHeader.uid1 = fileReader.readBytesAsUint(4)
         self.fileHeader.uid2 = fileReader.readBytesAsUint(4)
         self.fileHeader.uid3 = fileReader.readBytesAsUint(4)
         self.fileHeader.uidChecksum = fileReader.readBytesAsUint(4)
         
     def parseSISFields(self, fileReader) :
+        """parse SIS Fileds"""
         parser = SISFieldParser()
         while not fileReader.isEof() :
             self.subFields.append(parser.parseField(fileReader))
@@ -990,7 +1061,8 @@ class Handler :
         self.fileDatas = []
         self.signatureCertificateChains = []
         
-    def handleField(self, field, depth) :
+    def handleField(self, field, _) :
+        """handle Field"""
         if field.type == FileDescriptionField :
             self.files.append(field)
         elif field.type == FileDataField :
@@ -999,31 +1071,32 @@ class Handler :
             self.signatureCertificateChains.append(field)
 
     def execute(self, options) :
-        for f in self.files :
+        """execute"""
+        for f_file in self.files :
             if options.info :
-                buf = "   " + f.findField(StringField)[0].readableStr()
-                caps = f.findField(CapabilitiesField)[0]
+                buf = "   " + f_file.findField(StringField)[0].readableStr()
+                caps = f_file.findField(CapabilitiesField)[0]
                 if caps :
-                    buf += " [" + " ".join(f.findField(CapabilitiesField)[0].readableCaps) + "]"
+                    buf += " [" + " ".join(f_file.findField(CapabilitiesField)[0].readableCaps) + "]"
                 print buf
             if options.extract :
-                parts = f.findField(StringField)[0].readableStr().split("\\")
+                parts = f_file.findField(StringField)[0].readableStr().split("\\")
                 if len(parts[len(parts) - 1]) > 0 :
                     path = os.path.abspath(options.extract)
                     path += os.sep + os.sep.join(parts[1: - 1])
                     if not os.path.exists(path) :
                         os.makedirs(path)
                     newFile = file(path + os.sep + parts[len(parts) - 1], "wb")
-                    newFile.write(self.fileDatas[f.fileIndex].findField(CompressedField)[0].data)
+                    newFile.write(self.fileDatas[f_file.fileIndex].findField(CompressedField)[0].data)
                     newFile.close()
-        for s in self.signatureCertificateChains :
+        for sig in self.signatureCertificateChains :
             if options.certificate:
-                buf = s.findField(CertificateChainField)[0].subFields[0].data
+                buf = sig.findField(CertificateChainField)[0].subFields[0].data
                 print "Certificate chain:"
-                i = 1
+                i_num = 1
                 while len(buf) > 0 :
-                    print "   Certificate " + str(i) + ":"
-                    i += 1
+                    print "   Certificate " + str(i_num) + ":"
+                    i_num += 1
                     decoded = decoder.decode(buf)
                     cer = CertificateInfo()
                     cer.parse(decoded[0])
@@ -1032,13 +1105,14 @@ class Handler :
                     buf = decoded[1]
             
 class ContentPrinter :
-    """ A handler class which prints the field contents """        
+    """ A handler class which prints the field contents """
     def __init__(self) :
         pass
         
     def handleField(self, field, depth) :
+        """handle Field"""
         buf = ""
-        for i in range(depth) :
+        for _ in range(depth) :
             buf += "  "
         buf += FieldNames[field.type] + " "
         if len(field.readableStr()) > 0 :
@@ -1060,21 +1134,23 @@ class IADHandler :
         self.installFlags = 0
         
     def handleDependency(self, field) :
+        """handle dependancy"""
         dep = [0, - 1, - 1, - 1, - 1, - 1, - 1]
         dep[0] = field.subFields[0].uid
         if field.subFields[1] and field.subFields[1].type == VersionRangeField :
-            r = field.subFields[1]
-            if r.fromVersion != None :
-                dep[1] = r.fromVersion.version[0]
-                dep[2] = r.fromVersion.version[1]
-                dep[3] = r.fromVersion.version[2]
-            if r.toVersion != None :
-                dep[4] = r.toVersion.version[0]
-                dep[5] = r.toVersion.version[1]
-                dep[6] = r.toVersion.version[2]
+            res = field.subFields[1]
+            if res.fromVersion != None :
+                dep[1] = res.fromVersion.version[0]
+                dep[2] = res.fromVersion.version[1]
+                dep[3] = res.fromVersion.version[2]
+            if res.toVersion != None :
+                dep[4] = res.toVersion.version[0]
+                dep[5] = res.toVersion.version[1]
+                dep[6] = res.toVersion.version[2]
         return dep
         
-    def handleField(self, field, depth) :
+    def handleField(self, field, _) :
+        """handle Field"""
         if field.type == InfoField :
             self.packageVersion = field.subFields[4].version
             self.packageVersionField = field.subFields[4]
@@ -1089,14 +1165,15 @@ class IADHandler :
         elif field.type == LanguageField :
             self.languages.append(field.language)
         elif field.type == PrerequisitiesField :
-            for f in field.subFields[0].subFields :
-                dependency = self.handleDependency(f)
+            for f_field in field.subFields[0].subFields :
+                dependency = self.handleDependency(f_field)
                 self.platformDependencies.append(dependency)
-            for f in field.subFields[1].subFields :
-                dependency = self.handleDependency(f)
+            for f_field in field.subFields[1].subFields :
+                dependency = self.handleDependency(f_field)
                 self.packageDependencies.append(dependency)
         
     def getInfo (self, fileName) :
+        """get Info"""
         sisInfo = SISInfo()
         sisInfo.parse(fileName)
         handler = IADHandler()
@@ -1142,5 +1219,5 @@ class IADHandler :
         return info
 
 if __name__ == "__main__" :
-    handler = IADHandler()
-    print (handler.getInfo (sys.argv[1]))
+    _handler = IADHandler()
+    print (_handler.getInfo (sys.argv[1]))

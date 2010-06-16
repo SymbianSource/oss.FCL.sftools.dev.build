@@ -25,6 +25,8 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Recorder;
 
+import com.nokia.ant.listener.CoverageRecorderEntry;
+
 /**
  * Adds a listener, which inherits the Ant Record task, to the current build process that records the
  * output to a XML file.

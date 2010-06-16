@@ -26,8 +26,8 @@ Description:
             <scope>${macro.scope}</scope>
             <deprecated>${macro.deprecated}</deprecated>
             <location>${macro.location}</location>
-            <summary><![CDATA[${macro.summary}]]></summary>
-            <documentation><![CDATA[${wiki(macro.documentation)}]]></documentation>
+            <summary>${macro.summary}</summary>
+            <documentation>${wiki(macro.documentation)}</documentation>
             <usage><![CDATA[${macro.usage}]]></usage>
             
             <#list macro.signals as signal>
@@ -38,18 +38,17 @@ Description:
     ${macro.source}]]></source>
         </macro>
 </#macro>
-
-<antDatabase>
+<antDatabase xmlns:hlm="http://www.nokia.com/helium">
     <#list projects as project>
     <project>
         <name>${project.name}</name>
         <default>${project.default}</default>
-        <description><![CDATA[${wiki(project.description)}]]></description>
+        <description>${wiki(project.description)}</description>
         <scope>${project.scope}</scope>
         <deprecated>${project.deprecated}</deprecated>
         <location>${project.location}</location>
-        <summary><![CDATA[${project.summary}]]></summary>
-        <documentation><![CDATA[${wiki(project.documentation)}]]></documentation>
+        <summary>${project.summary}</summary>
+        <documentation>${wiki(project.documentation)}</documentation>
         
         <#list project.projectDependencies as dependency>
         <projectDependency>${dependency}</projectDependency>
@@ -66,12 +65,12 @@ Description:
             <name>${target.name}</name>
             <ifDependency>${target.if}</ifDependency>
             <unlessDependency>${target.unless}</unlessDependency>
-            <description><![CDATA[${target.description}]]></description>
+            <description>${target.description}</description>
             <scope>${target.scope}</scope>
             <deprecated>${target.deprecated}</deprecated>
             <location>${target.location}</location>
-            <summary><![CDATA[${target.summary}]]></summary>
-            <documentation><![CDATA[${wiki(target.documentation)}]]></documentation>
+            <summary>${target.summary}</summary>
+            <documentation>${wiki(target.documentation)}</documentation>
             
             <#list target.depends as dependency>
             <dependency type="direct">${dependency}</dependency>
@@ -111,8 +110,8 @@ Description:
             <scope>${property.scope}</scope>
             <deprecated>${property.deprecated}</deprecated>
             <location>${property.location}</location>
-            <summary><![CDATA[${property.summary}]]></summary>
-            <documentation><![CDATA[${wiki(property.documentation)}]]></documentation>
+            <summary>${property.summary}</summary>
+            <documentation>${wiki(property.documentation)}</documentation>
             <source><![CDATA[
     ${property.source}]]></source>
         </property>
@@ -127,8 +126,8 @@ Description:
             <scope>${property.scope}</scope>
             <deprecated>${property.deprecated}</deprecated>
             <location>${property.location}</location>
-            <summary><![CDATA[${property.summary}]]></summary>
-            <documentation><![CDATA[${wiki(property.documentation)}]]></documentation>
+            <summary>${property.summary}</summary>
+            <documentation>${wiki(property.documentation)}</documentation>
             <source><![CDATA[
     ${property.source}]]></source>
         </property>

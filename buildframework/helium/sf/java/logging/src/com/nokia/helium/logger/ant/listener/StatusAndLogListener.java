@@ -188,7 +188,7 @@ public class StatusAndLogListener implements BuildListener, SubBuildListener {
      * @param handler
      *            is the handler to register
      */
-    public synchronized void register ( Handler handler ) {
+    public synchronized void register( Handler handler ) {
         Vector<BuildEventHandler> tmpBuildHandlers = new Vector<BuildEventHandler>(buildHandlers);
         tmpBuildHandlers.add( handler );
         buildHandlers = tmpBuildHandlers;
@@ -203,7 +203,7 @@ public class StatusAndLogListener implements BuildListener, SubBuildListener {
      * @param handler
      *            is the handler to register
      */
-    public synchronized void remove ( Handler handler ) {
+    public synchronized void remove( Handler handler ) {
         Vector<BuildEventHandler> tmpBuildHandlers = new Vector<BuildEventHandler>(buildHandlers);
         tmpBuildHandlers.remove( handler );
         buildHandlers = tmpBuildHandlers;
@@ -218,7 +218,7 @@ public class StatusAndLogListener implements BuildListener, SubBuildListener {
      * @param handler
      *            is the handler to register
      */
-    public synchronized void register ( BuildEventHandler handler ) {
+    public synchronized void register( BuildEventHandler handler ) {
         Vector<BuildEventHandler> tmp = new Vector<BuildEventHandler>(buildHandlers);
         tmp.add( handler );
         buildHandlers = tmp;
@@ -230,7 +230,7 @@ public class StatusAndLogListener implements BuildListener, SubBuildListener {
      * @param handler
      *            is the handler to register
      */
-    public synchronized void remove ( BuildEventHandler handler ) {
+    public synchronized void remove( BuildEventHandler handler ) {
         Vector<BuildEventHandler> tmp = new Vector<BuildEventHandler>(buildHandlers);
         tmp.remove( handler );
         buildHandlers = tmp;
@@ -242,7 +242,7 @@ public class StatusAndLogListener implements BuildListener, SubBuildListener {
      * @param handler
      *            is the handler to register
      */
-    public synchronized void register ( TargetEventHandler handler ) {
+    public synchronized void register( TargetEventHandler handler ) {
         Vector<TargetEventHandler> tmp = new Vector<TargetEventHandler>(targetHandlers);
         tmp.add( handler );
         targetHandlers  = tmp;
@@ -254,7 +254,7 @@ public class StatusAndLogListener implements BuildListener, SubBuildListener {
      * @param handler
      *            is the handler to register
      */
-    public synchronized void remove ( TargetEventHandler handler ) {
+    public synchronized void remove( TargetEventHandler handler ) {
         Vector<TargetEventHandler> tmp = new Vector<TargetEventHandler>(targetHandlers);
         tmp.remove( handler );
         targetHandlers  = tmp;
@@ -267,7 +267,7 @@ public class StatusAndLogListener implements BuildListener, SubBuildListener {
      * @param handler
      *            is the handler to register
      */
-    public synchronized void register ( SubBuildEventHandler handler ) {
+    public synchronized void register( SubBuildEventHandler handler ) {
         Vector<SubBuildEventHandler> tmp = new Vector<SubBuildEventHandler>(subBuildHandlers);
         tmp.add( handler );
         subBuildHandlers  = tmp;
@@ -279,7 +279,7 @@ public class StatusAndLogListener implements BuildListener, SubBuildListener {
      * @param handler
      *            is the handler to register
      */
-    public synchronized void remove ( SubBuildEventHandler handler ) {
+    public synchronized void remove( SubBuildEventHandler handler ) {
         Vector<SubBuildEventHandler> tmp = new Vector<SubBuildEventHandler>(subBuildHandlers);
         tmp.remove( handler );
         subBuildHandlers  = tmp;
@@ -291,7 +291,7 @@ public class StatusAndLogListener implements BuildListener, SubBuildListener {
      * @param handler
      *            is the handler to register
      */
-    public synchronized void register ( MessageEventHandler handler ) {
+    public synchronized void register( MessageEventHandler handler ) {
         Vector<MessageEventHandler> tmp = new Vector<MessageEventHandler>(messageHandlers);
         tmp.add( handler );
         messageHandlers  = tmp;
@@ -303,7 +303,7 @@ public class StatusAndLogListener implements BuildListener, SubBuildListener {
      * @param handler
      *            is the handler to register
      */
-    public synchronized void remove ( MessageEventHandler handler ) {
+    public synchronized void remove( MessageEventHandler handler ) {
         Vector<MessageEventHandler> tmp = new Vector<MessageEventHandler>(messageHandlers);
         tmp.remove( handler );
         messageHandlers  = tmp;
@@ -315,7 +315,7 @@ public class StatusAndLogListener implements BuildListener, SubBuildListener {
      * @param handler
      *            is the handler to register
      */
-    public synchronized void register ( TaskEventHandler handler ) {
+    public synchronized void register( TaskEventHandler handler ) {
         Vector<TaskEventHandler> tmp = new Vector<TaskEventHandler>(taskHandlers);
         tmp.add( handler );
         taskHandlers  = tmp;
@@ -327,7 +327,7 @@ public class StatusAndLogListener implements BuildListener, SubBuildListener {
      * @param handler
      *            is the handler to register
      */
-    public synchronized void remove ( TaskEventHandler handler ) {
+    public synchronized void remove( TaskEventHandler handler ) {
         Vector<TaskEventHandler> tmp = new Vector<TaskEventHandler>(taskHandlers);
         tmp.remove( handler );
         taskHandlers  = tmp;
@@ -339,7 +339,7 @@ public class StatusAndLogListener implements BuildListener, SubBuildListener {
      * @return
      */
     public Project getProject() {
-      return project;   
+      return project;
     }
     
     /**

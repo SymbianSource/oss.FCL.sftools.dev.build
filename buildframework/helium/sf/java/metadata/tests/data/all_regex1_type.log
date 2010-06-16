@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<buildlog sbs_version="2.5.3 [2009-03-12 release]" xmlns="http://symbian.com/xml/build/log" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symbian.com/xml/build/log http://symbian.com/xml/build/log/1_0.xsd">
+<info>sbs: version 2.5.3 [2009-03-12 release]
+</info>
+<info>SBS_HOME E:/Build_E/ido-config-df/sbs</info>
+<info>Set-up E:/Build_E/ido-config-df/sbs/sbs_init.xml</info>
+<warning>E:/build_e/sbs_2.8.4/sbs/win32/mingw/bin/cpp.exe: </warning>
+<info>Command-line-arguments -s z:\output/build/canonical_system_definition_build.xml -k -c armv5 -j 4 -m z:\output\logs/ido_imm_mcl_devlon70_robot_5.1.005__armv5_multiple_thread_build_Makefile --filters=FilterHeliumLog -f z:\output\logs/ido_imm_mcl_devlon70_robot_5.1.005__armv5_multiple_thread_build_compile.log</info>
+<recipe name='resourcedependencies' target='z:/epoc32/build/camera/c_87f62b1af2e7d874/gscameraplugin_dll/gscameraplugin_resource_plugins_27.rpp.d' host='fawec012' layer='app_layer' component='' bldinf='z:/sf/app/camera/group/bld.inf' mmp='z:/sf/app/camera/camerauis/cameraapp/generic/GsCamcorderPlugin/group/gscameraplugin.mmp' config='armv5_udeb' platform='' phase='RESOURCE_DEPS' source=''>
+<![CDATA[
+mingw_make.exe: error
+test FATAL ERROR(S):abcd
+): Missing file:
+abcd FLEXlm error:
+ABLD ERROR: 1234
+BLDMAKE ERROR: 43543
+test FATAL ERROR 
+fatal error U1077 error occured
+test warning U4010
+Warning:
+WARNING:
+LINK : warning
+REMARK: 
+:10: warning: cannot find matching deallocation function
+INFO:
+make[10]: ***abcd
+make[10]: abcd not remade because of errors
+error: ((Internal fault)):
+ERROR,error: ((Internal fault):)$,
+ error given more than once in the same rule
+ERROR: build error
+ERROR EC95940: ec error
+Errors caused tool to abort. asdfasdf
+test no rule to make target
+ERROR,.*no rule to make.*,
+ERROR	testing
+100) : WARNING: TEST123
+MAKEDEF WARNING: TEST
+TEST 123 \\(10) : Warning: (400)
+BLDMAKE WARNING: bldm warning
+MAKEDEF WARNING: make warning
+atest(100) : warning C aasdfa
+testas 100: warning: test123
+usage Usage Warning: warn1
+abcd mwld.exe: abcd
+Command line warning abcd
+anything ERROR: bad relocation: test123
+10 warning in component1
+EventType: Error Source: SweepNTabcde
+WARNING,.EventType:\s+Error\s+Source:\s+SweepNT.*,
+WARN	test
+anything Command line warning D4025 : test
+REMARK: test remark anything
+EventType: Error Source: GNU Make.
+abcd :10: warning: cannot find matching deallocation function 100:note abcd
+INFO: any info match
+"abcd" 
+line 100+: Warning:', : warning 30:,
+"abcd , line 100: Error: 100abcd:. abcd
+line 10: Warning:\', r\': warning 10: abcd
+"abcd, line 100: Warning: 100 abcd: abcd",
+]]><time start='1238421421.153697000' elapsed='0.171' />
++ RV=0
++ set +x
+<status exit='ok' attempt='1' />
+</recipe>
+</buildlog>

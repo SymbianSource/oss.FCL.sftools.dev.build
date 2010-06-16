@@ -18,7 +18,7 @@
 package com.nokia.helium.internaldata.ant.listener;
 
 //import com.nokia.ant.taskdefs.HlmAssertMessage;
-import com.nokia.helium.internaldata.ant.taskdefs.HlmAssertMessage;
+import com.nokia.helium.internaldata.ant.taskdefs.HlmAssertMessageTask;
 /**
  * Object to set end time for a task.
  *
@@ -34,7 +34,7 @@ public class AssertNode extends DataNode {
     private int line = -1;
     private String assertName;
     
-     public AssertNode(DataNode parent, HlmAssertMessage task) {
+     public AssertNode(DataNode parent, HlmAssertMessageTask task) {
         super(parent, task);
         name = task.getTaskName();
         this.setFilename(task.getLocation().getFileName());

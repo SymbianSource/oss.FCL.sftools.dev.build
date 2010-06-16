@@ -129,7 +129,7 @@ public class ORMEntityManager {
      * @return entity manager
      */
     public EntityManager getEntityManager() {
-        log.debug("ORMEntityManager: getEntityManager: " + entityManager);
+        //log.debug("ORMEntityManager: getEntityManager: " + entityManager);
         return entityManager;
     }
 
@@ -178,11 +178,13 @@ public class ORMEntityManager {
                 entityManager = null;
             }
             if (factory != null) {
+                log.debug("closing the factory");
                 factory.close();
                 factory = null;
             }                    
             // Shutting down the derby database access, so files get unlocked. 
             try {
+                log.debug("shutting down the db");
                 DriverManager.getConnection("jdbc:derby:" + urlPath + ";shutdown=true");
             } catch (SQLException e) {
                 log.debug(e.getMessage());

@@ -111,17 +111,7 @@ $pathToReleaseFolder = undef;
 $defaultPathToServer = undef;
 $pathToUnzip = "7za";
 $getEnvVersion = "2.4.9";
-
-# first open/create log file
-#open( LOGFILE, ">> $logFile" ) or handleError( "cant create log file: $!", $warning );
-eval {
-  open( LOGFILE, ">> getcwd.'/output/logs/getenv.log'" );
-}; 
-  if ($@) #if exception
-  {
-     open( LOGFILE, ">> getcwd.'/getenv.log'" ) ; 
-  }
-  
+ 
 print "S60 RnD environment getter v.$getEnvVersion\n\n";
 printLog( "getenv.pl version $getEnvVersion" );
 
@@ -411,10 +401,20 @@ sub printLog {
             print $trace."\n";
         }
     
+        # first open/create log file
+        #open( LOGFILE, ">> $logFile" ) or handleError( "cant create log file: $!", $warning );
+        eval {
+            open( LOGFILE, ">> getcwd.'/output/logs/getenv.log'" );
+        }; 
+        if ($@) #if exception
+        {
+            open( LOGFILE, ">> getcwd.'/getenv.log'" ) or handleError( "cant create log file: $!", $warning );
+        }
         # we should print traces for log file
         my ($sec,$min,$hr) = localtime();
-      printf LOGFILE ( "%02d:%02d:%02d: ", $hr, $min, $sec );
+        printf LOGFILE ( "%02d:%02d:%02d: ", $hr, $min, $sec );
         print LOGFILE $trace."\n";
+		close (LOGFILE);
     }
 }
 

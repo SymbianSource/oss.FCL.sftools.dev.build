@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<!-- 
+============================================================================ 
+Name        : test_diamonds.ant.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test-diamonds-invalid-template-1" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>Helium Antlib diamonds unittests.</description>
+    <property environment="env" />
+    
+    <property name="diamonds.unitest.dir" location="${ant.file.test-diamonds-invalid-template}/../../../" />
+    <import file="../../../../../../nokia/companyproperties.ant.xml" optional="true"/>
+    <import file="../../../../../../../extensions/nokia/external/helium-nokia-antlib/companyproperties.ant.xml" optional="true"/>
+    <property name="diamonds.output.dir" location="${temp.dir}/output" />
+    <property name="diamonds.template.dir" location="${diamonds.unitest.dir}/data/templates" />
+    <property name="build.family" value="test_new_hlm"/>
+    <property name="id" value="123"/>
+    <property name="name" value="${build.family}_${id}"/>
+    <property name="build.system" value="ec-helium"/>
+    <property name="diamonds.listener.configuration.file" location="${diamonds.unitest.dir}/scenarii/invalid-templates-1/diamonds_config.xml.ftl" />
+    <property name="symsee.version" value="9.1.0" />
+
+    <target name="version">
+        <echo message="version" />
+    </target>
+
+    <target name="unittest" depends="unittest-diamonds" />
+    
+    <target name="unittest-diamonds" >
+            <delete dir="${diamonds.output.dir}" failonerror="false"/>
+            <mkdir dir="${diamonds.output.dir}"/>
+            <antcall target="test-all" />
+    </target>
+
+    <target name="diamonds" />
+    <target name="test-all" depends="diamonds" />
+</project>

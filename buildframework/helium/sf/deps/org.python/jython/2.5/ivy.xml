@@ -29,6 +29,6 @@ Description:
         revision="2.5" />
     <publications>
         <artifact type="jar" conf="default"/>
-        <!--artifact type="egg" conf="default"/-->
+        <artifact type="egg" conf="default"/>
     </publications>
 </ivy-module>

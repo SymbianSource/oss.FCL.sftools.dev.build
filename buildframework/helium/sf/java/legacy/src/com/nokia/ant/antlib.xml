@@ -23,19 +23,12 @@ Description:
 <antlib>
    
     <taskdef name="antdependency" classname="com.nokia.ant.taskdefs.AntDependencyTask"/>
-    <taskdef name="ccm" classname="com.nokia.ant.taskdefs.CcmTask" onerror="report"/>
     <taskdef name="configuration" classname="com.nokia.ant.taskdefs.AntConfigurationTask"/>
     <taskdef name="coveragerecord" classname="com.nokia.ant.taskdefs.CoverageRecorderTask"/>
-    <taskdef name="deconfigure" classname="com.nokia.ant.taskdefs.DeconfigureTask"/>
     <taskdef name="fastcopy" classname="com.nokia.ant.taskdefs.CopyParallelTask"/>
-    <taskdef name="logtoconsole" classname="com.nokia.ant.taskdefs.StopLogToConsole"/>
+    <taskdef name="logtoconsole" classname="com.nokia.ant.taskdefs.StopLogToConsoleTask"/>
     <taskdef name="parsemodel" classname="com.nokia.ant.taskdefs.ModelPropertiesTask"/>
     
-    <taskdef name="rebaseline" classname="com.nokia.ant.taskdefs.RebaselineTask"/>
-    <taskdef name="rebaseanddeconf" classname="com.nokia.ant.taskdefs.RBTTask"/>
-            
-    <typedef name="session" classname="com.nokia.ant.types.ccm.Session"/> 
-    <typedef name="sessionset" classname="com.nokia.ant.types.ccm.SessionSet"/> 
     <typedef name="typedef" classname="com.nokia.ant.TypedefURIFix"/>
     
     <typedef name="hasAtsPassed" classname="com.nokia.ant.conditions.AtsCondition"/>

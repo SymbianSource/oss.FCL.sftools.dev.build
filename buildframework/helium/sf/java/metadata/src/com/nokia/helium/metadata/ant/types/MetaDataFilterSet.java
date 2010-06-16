@@ -97,7 +97,7 @@ public class MetaDataFilterSet extends DataType
                 return allFilters;
             }
             log.debug("Filterset object is not instance of MetaDataFilterSet");
-            throw new BuildException ("Filterset object is not instance of MetaDataFilterSet");
+            throw new BuildException("Filterset object is not instance of MetaDataFilterSet");
         }
         // Add any nested filtersets
         for (MetaDataFilterSet filterSet : filterSets) {
@@ -188,22 +188,22 @@ public class MetaDataFilterSet extends DataType
             throw iex;
         }
         int size = 0;
-            log.debug("filter CSV record size: " + csvs.size());
-            size = csvs.size();
-            for (int i = 0; i < size; i++) {
-                TemplateSequenceModel model = (TemplateSequenceModel) csvs
-                .get(i);
-                int modelSize = model.size();
-                if (modelSize != 3 ) {
-                    log.debug("Metadata CSV file filter file format is invalid. It has row size " + size);
-                    throw new Exception("Metadata CSV file filter file format is invalid. It has row size " + size);
-                }
-                MetaDataFilter filter = new MetaDataFilter();
-                filter.setPriority(model.get(0).toString());
-                filter.setRegex(model.get(1).toString());
-                filter.setDescription(model.get(2).toString());
-                filters.add(filter);
+        log.debug("filter CSV record size: " + csvs.size());
+        size = csvs.size();
+        for (int i = 0; i < size; i++) {
+            TemplateSequenceModel model = (TemplateSequenceModel) csvs
+            .get(i);
+            int modelSize = model.size();
+            if (modelSize != 3 ) {
+                log.debug("Metadata CSV file filter file format is invalid. It has row size " + size);
+                throw new Exception("Metadata CSV file filter file format is invalid. It has row size " + size);
             }
+            MetaDataFilter filter = new MetaDataFilter();
+            filter.setPriority(model.get(0).toString());
+            filter.setRegex(model.get(1).toString());
+            filter.setDescription(model.get(2).toString());
+            filters.add(filter);
+        }
     }
 }
 

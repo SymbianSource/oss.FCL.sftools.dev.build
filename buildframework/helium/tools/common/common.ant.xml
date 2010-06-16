@@ -350,37 +350,42 @@ hlm -Dbuild.system=ec-helium   use electric cloud build system
         <delete dir="${helium.build.dir}/python"/>
         <delete dir="${helium.build.dir}/beanshell"/>
         <delete file="${helium.build.dir}/test_jython.xml"/>
+        <mkdir dir="${helium.build.dir}/report/antlint" />
         <hlm:antlint>
-            <fileset id="antlint.files" dir="${helium.dir}">
+            <fileset id="antlint.files" dir="${helium.dir}/tools">
                 <include name="**/*.ant.xml"/>
                 <include name="**/build.xml"/>
                 <include name="**/*.antlib.xml"/>
                 <exclude name="tests/**"/>
+                <exclude name="**/test/test_*.xml"/>
                 <exclude name="external/**"/>
                 <exclude name="**/tests/data/**"/>
                 <exclude name="build/**"/>
             </fileset>
-            <checker name="CheckTabCharacter" severity="error" />
-            <checker name="CheckPropertyName" severity="warning">([a-z0-9[\\d\\_\\.\\@\\{\\}\\$]]*)</checker>
-            <checker name="CheckTargetName" severity="warning">([a-z0-9[\\d\\-]]*)</checker>
-            <checker name="CheckIndentation" severity="error"/>
-            <checker name="CheckPresetDefMacroDefName" severity="warning">([a-z0-9][a-zA-Z0-9]*)</checker>       
-            <checker name="CheckProjectName" severity="warning">([a-z0-9[\\d\\.\\_\\-]]*)</checker>
-            <checker name="CheckDescription" severity="warning"/>
-            <checker name="CheckFileName" severity="warning" >^build.xml$|ant.xml$|antlib.xml$</checker>
-            <checker name="CheckRunTarget" severity="warning"/>
-            <checker name="CheckAntCall" severity="warning"/>
-            <checker name="CheckScriptSize" severity="warning"/>
-            <checker name="CheckUseOfIfInTargets" severity="warning"/>
-            <checker name="CheckJepJythonScript" severity="error" />
-            <checker name="CheckPropertiesInDataModel" severity="warning"/>
-            <checker name="CheckScriptCondition" severity="warning"/>
-            <checker name="CheckPythonTasks" severity="warning"/>
-            <checker name="CheckUseOfEqualsTask" severity="warning"/>
-            <checker name="CheckScriptDefNameAttributes" severity="error"/>
-            <checker name="CheckScriptDefStyle" severity="warning"/>
-            <checker name="CheckScriptDef" severity="error"/>
-            <checker name="CheckDuplicateNames" severity="warning"/>
+            <hlm:checkTabCharacter severity="error" enabled="true"/>
+            <hlm:checkPropertyName severity="warning" enabled="true" regexp="([a-z0-9[\\d\\_\\.\\@\\{\\}\\$]]*)" />
+            <hlm:checkTargetName severity="warning" enabled="true" regexp="([a-z0-9[\\d\\-]]*)" />
+            <hlm:checkIndentation severity="error" enabled="true"/>
+            <hlm:checkPresetDefMacroDefName severity="warning" enabled="true" regexp="([a-z0-9][a-zA-Z0-9]*)" />       
+            <hlm:checkProjectName severity="warning" enabled="true" regexp="([a-z0-9[\\d\\.\\_\\-]]*)" />
+            <hlm:checkDescription severity="warning" enabled="true"/>
+            <hlm:checkFileName severity="warning" enabled="true" regexp="^build.xml$|ant.xml$|antlib.xml$" />
+            <hlm:checkRunTarget severity="warning" enabled="true"/>
+            <hlm:checkAntCall severity="warning" enabled="true"/>
+            <hlm:checkScriptSize severity="warning" enabled="true"/>
+            <hlm:checkUseOfIfInTargets severity="warning" enabled="true"/>
+            <hlm:checkJythonScript severity="error" enabled="true" outputDir="${helium.build.dir}/jep"/>
+            <hlm:checkScriptCondition severity="warning" enabled="true" outputDir="${helium.build.dir}/scriptcondition"/>
+            <hlm:checkPythonTasks severity="warning" enabled="true" outputDir="${helium.build.dir}/python"/>
+            <hlm:checkUseOfEqualsTask severity="warning" enabled="true"/>
+            <hlm:checkScriptDefNameAttributes severity="error" enabled="true"/>
+            <hlm:checkScriptDefStyle severity="warning" enabled="true"/>
+            <hlm:checkScriptDef severity="error" enabled="true" outputDir="${helium.build.dir}/beanshell"/>
+            <hlm:checkDuplicateNames severity="warning" enabled="true"/>
+            
+            <!-- Reporters -->
+            <hlm:antlintCheckstyleReporter file="${helium.build.dir}/report/antlint/antlint_report.xml" />
+            <hlm:antlintConsoleReporter />            
         </hlm:antlint>
         <fileset id="jep.files" dir="${helium.build.dir}">
             <include name="jep/**/*.py"/>

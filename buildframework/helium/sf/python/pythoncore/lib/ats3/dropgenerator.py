@@ -818,6 +818,8 @@ def generate_target(test_plan, root):
     harness = test_plan["harness"]
     if harness == "MULTI_HARNESS":
         input_targets(test_plan, root, ["STIF", "EUNIT"])
+    elif harness == "MULTI_HARNESS_GENERIC_STIF":
+        input_targets(test_plan, root, ["STIF", "GENERIC"])
     elif harness == "STIF":
         input_targets(test_plan, root, ["STIF"])
     elif harness == "EUNIT":
@@ -983,7 +985,11 @@ class Ats3TemplateTestDropGenerator(Ats3TestDropGenerator):
         
         loader = jinja2.ChoiceLoader([jinja2.PackageLoader(__name__, 'templates')] + customdirs)
         env = jinja2.Environment(loader=loader)
-        template = env.from_string(pkg_resources.resource_string(__name__, 'ats4_template.xml'))# pylint: disable-msg=E1101
+        
+        if hasattr(test_plan, 'custom_template'):
+            template = env.from_string(open(test_plan.custom_template).read())
+        else:
+            template = env.from_string(pkg_resources.resource_string(__name__, 'ats4_template.xml'))# pylint: disable-msg=E1101
 
         xmltext = template.render(test_plan=test_plan, os=os, atspath=atspath, atsself=self).encode('ISO-8859-1')
         return et.ElementTree(et.XML(xmltext))

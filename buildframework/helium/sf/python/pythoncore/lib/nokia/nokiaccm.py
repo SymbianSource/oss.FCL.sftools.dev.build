@@ -80,7 +80,7 @@ def open_session(username=None, password=None, engine=None, dbpath=None, databas
                         _logger.info('Database engine set using .netrc (%s)' % n_engine)
                         engine = n_engine
         except IOError:
-            _logger.debug('Error accessing .netrc file')
+            _logger.warning('Warning: Cannot access .netrc file')
 
     # using environment username in case username is not defined.
     if username == None:
@@ -100,6 +100,7 @@ def open_session(username=None, password=None, engine=None, dbpath=None, databas
         for current_session in current_sessions:
             if current_session.dbpath == dbpath:
                 return current_session
+        raise ccm.CCMException('No existing session found')
     else:
         if ccm.CCM_BIN == None:
             raise ccm.CCMException("Could not find CM/Synergy executable in the path.")

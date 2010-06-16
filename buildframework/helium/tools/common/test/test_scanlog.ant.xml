@@ -28,7 +28,7 @@ Description:
     
     
     <property name="helium.dir" location="../../.." />
-    <import file="../../../helium.ant.xml"/>
+    <import file="../../../build.xml"/>
     <property name="scanlog.temp.dir" location="${helium.build.dir}/antunit/scanlog" />
     
     <target name="setUp">
@@ -104,10 +104,12 @@ Description:
                 <contains string="${scanlog}" substring="sf/app/HelloWorldCons/group" />
             </and>
         </au:assertTrue>
-        <au:assertTrue message="Check for 23 errors">
-            <contains string="${scanlog}" substring="&gt;23&lt;/td&gt;" />
+        <au:assertTrue message="Check for 7 errors">
+            <contains string="${scanlog}" substring="&gt;7&lt;/td&gt;" />
         </au:assertTrue>
-        
+        <au:assertTrue message="Check for 16 errors">
+            <contains string="${scanlog}" substring="&gt;16&lt;/td&gt;" />
+        </au:assertTrue>        
     </target>
     
     
@@ -190,11 +192,27 @@ Description:
             <os family="unix" />
         </condition>
         <property name="sbs.log.file" location="${helium.dir}/tests/data/test-scanlog_helium_minibuild_ido_input_compile.log" />
+        <copy file="${sbs.log.file}" tofile="${scanlog.temp.dir}/test-scanlog_helium_minibuild_ido_input_clean_compile.log" />
+        <copy file="${sbs.log.file}" tofile="${scanlog.temp.dir}/test-scanlog_helium_minibuild_ido_input2_compile.log" />
         <hlm:metadatarecord  database="${scanlog.temp.dir}/test-diamonds-faults_db">
             <hlm:sbsmetadatainput>
                 <fileset casesensitive="false" file="${sbs.log.file}"/>
+                <fileset casesensitive="false" file="${scanlog.temp.dir}/test-scanlog_helium_minibuild_ido_input_clean_compile.log" />
+                <fileset casesensitive="false" file="${scanlog.temp.dir}/test-scanlog_helium_minibuild_ido_input2_compile.log" />
                 <metadatafilterset refid="filterset.sbs" />
             </hlm:sbsmetadatainput>
+            <hlm:sbsmetadatainput>
+                <fileset casesensitive="false" file="${scanlog.temp.dir}/test-scanlog_helium_minibuild_ido_input_clean_compile.log" />
+                <metadatafilterset refid="filterset.sbs" />
+            </hlm:sbsmetadatainput>
+            <hlm:sbsmetadatainput>
+                <fileset casesensitive="false" file="${scanlog.temp.dir}/test-scanlog_helium_minibuild_ido_input2_compile.log" />
+                <metadatafilterset refid="filterset.sbs" />
+            </hlm:sbsmetadatainput>
+            <hlm:textmetadatainput>
+                <fileset casesensitive="false" file="${helium.dir}/tests/data/diamonds-faults_compile.text.log"/>
+                <metadatafilterset refid="filterset.sbs" />
+            </hlm:textmetadatainput>
         </hlm:metadatarecord>
 
         <fmpp sourceFile="${helium.dir}/tools/common/templates/diamonds/faults_metadata_orm.ftl"
@@ -205,20 +223,28 @@ Description:
             </data>
         </fmpp>
         <loadfile property="scanlog" srcFile="${scanlog.temp.dir}/compile-main.xml" />
+        <echo>${scanlog}</echo>
         <au:assertTrue message="Check for components">
             <and>
                 <contains string="${scanlog}" substring="&lt;name&gt;sf/mw/HelloWorldAPI/group&lt;/name&gt;" />
                 <contains string="${scanlog}" substring="&lt;name&gt;sf/app/HelloWorldCons/group&lt;/name&gt;" />
+                <contains string="${scanlog}" substring="&lt;generated_files&gt;46&lt;/generated_files&gt;" />
             </and>
         </au:assertTrue>
-        <au:assertTrue message="Check for 23 errors">
-            <contains string="${scanlog}" substring="&gt;23&lt;/total&gt;" />
+        
+        <au:assertTrue message="Check that diamonds-faults_compile.text.log is not pushed to diamonds">
+            <not>
+                <contains string="${scanlog}" substring="&lt;name&gt;diamonds-faults_compile.text.log&lt;/name&gt;" />
+            </not>
         </au:assertTrue>
-        <au:assertTrue message="Check for 16 errors">
-            <contains string="${scanlog}" substring="&gt;16&lt;/total&gt;" />
+        <au:assertTrue message="Check for 46 errors">
+            <contains string="${scanlog}" substring="&gt;46&lt;/total&gt;" />
         </au:assertTrue>
-        <au:assertTrue message="Check for 7 errors">
-            <contains string="${scanlog}" substring="&gt;7&lt;/total&gt;" />
+        <au:assertTrue message="Check for 32 errors">
+            <contains string="${scanlog}" substring="&gt;32&lt;/total&gt;" />
+        </au:assertTrue>
+        <au:assertTrue message="Check for 14 errors">
+            <contains string="${scanlog}" substring="&gt;14&lt;/total&gt;" />
         </au:assertTrue>
     </target>
 
@@ -255,11 +281,11 @@ Description:
         <au:assertTrue message="Check for build errors"> 
             <contains string="${cclog}" substring="test-scanlog_cc_summary_compile.log" /> 
         </au:assertTrue> 
-        <au:assertTrue message="Check for 24 build errors"> 
-            <contains string="${cclog}" substring="24" /> 
+        <au:assertTrue message="Check for 8 build errors"> 
+            <contains string="${cclog}" substring="8" /> 
         </au:assertTrue> 
-        <au:assertTrue message="Check for 23 build errors"> 
-            <contains string="${cclog}" substring="23" /> 
+        <au:assertTrue message="Check for 16 build errors"> 
+            <contains string="${cclog}" substring="16" /> 
         </au:assertTrue> 
         <au:assertTrue message="Check for validate policy errors"> 
             <and>

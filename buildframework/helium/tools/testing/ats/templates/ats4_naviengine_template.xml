@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<!-- 
+============================================================================ 
+Name        : ats_template.xml
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+Contains the template for the test.xml file output. The test.xml file contains
+information on the files used to create the drop file.
+============================================================================
+-->
+
+<testrun>
+    <metadata>
+        {% if test_plan['diamonds_build_url'] -%}
+        <meta name="diamonds-buildid">{{ test_plan['diamonds_build_url'] }}</meta> 
+        <meta name="diamonds-testtype">Smoke</meta>
+        {% endif %}
+        <meta name="name">{{ test_plan['testrun_name'] }}</meta> 
+    </metadata>
+    
+    <agents>
+        <agent alias="DEFAULT_{{ test_plan['harness'] }}">
+            <property name="hardware" value="{{ test_plan["device_type"] }}"/>
+        </agent>
+    </agents>
+    
+    <execution defaultAgent="DEFAULT_{{ test_plan['harness'] }}">
+        <task>
+            <type>ExecutableTestCaseTask</type>
+            <parameters>
+                <parameter value="{{ test_plan["test_timeout"] }}" name="timeout"/>
+                <parameter value="cmd.exe" name="file"/>
+                {% for setd in test_plan.sets -%}                
+                <parameter value="/C NaviTest.bat %DEFAULT_GENERIC->NaviPowerIP% %DEFAULT_GENERIC->NaviPowerPort% %DEFAULT_GENERIC->NaviSerialPort% %TEST_RUN_SANDBOX% ATS3Drop\images\{{ os.path.basename(atsself.get_sorted_images(setd)[0]) }} c:\temp\%DEFAULT_GENERIC->name%-console.log" name="parameters"/>
+                {% endfor -%}
+                <parameter value="c:\temp\%DEFAULT_GENERIC->name%-console.log" name="result-file"/>
+                <parameter value="true" name="local-execute"/>
+                <parameter value="true" name="local-result"/>
+                <parameter value="true" name="extract-html"/>
+                {% if test_plan['test_type'] == 'tef' -%}
+                <parameter name="parser" value="TEFResultParser" />
+                {% elif test_plan['test_type'] == 'mtf' -%}
+                <parameter name="parser" value="MTFResultParser" />
+                {% else %}
+                <parameter name="parser" value="RTestResultParser" />
+                {% endif %}
+            </parameters>
+        </task>
+        
+        <finalization>
+            <task>
+                <type>CleanupTask</type>
+                <parameters>
+                    <parameter value="true" name="upload-files"/>
+                </parameters>
+            </task>
+        </finalization>
+    </execution>
+    
+    <postActions>
+        {% for action_type, parameters in test_plan.post_actions -%}
+            {% if action_type == 'RunProcessAction' %}
+        <action>
+            <type>{{ action_type }}</type>
+            <parameters>
+                {% for name, value in parameters -%}
+                <parameter name="{{ name }}" value="{{ value }}"/>
+                {% endfor -%}
+            </parameters>
+        </action>
+            {% endif %}
+        {% endfor -%}
+        {% if test_plan['report_email'] -%}
+        <action>
+            <type>EmailAction</type>
+            <parameters>
+                <parameter value="Release testing" name="subject"/>
+                <parameter value="{{ test_plan['report_email'] }}" name="to"/>
+                <parameter value="simplelogger" name="format"/>
+            </parameters>
+        </action>
+        {% endif %}
+        {% if test_plan['diamonds_build_url'] -%}
+        <action>
+            <type>DiamondsAction</type>
+        </action>
+        {% endif %}
+    </postActions>
+    
+</testrun>

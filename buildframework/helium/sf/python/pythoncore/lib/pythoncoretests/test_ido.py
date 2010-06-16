@@ -16,6 +16,7 @@
 #
 #Description:
 #===============================================================================
+""" test IDO"""
 
 import unittest
 import ido
@@ -51,9 +52,9 @@ class IDOTest(unittest.TestCase):
 
     def test_ido_sysdef_invalid(self):
         """ Verifying get_sysdef_location method with invalid sysdef"""
-        (fd, filename) = mkstemp()
-        os.write(fd,'Test sysdef file')
-        os.close(fd)
+        (f_d, filename) = mkstemp()
+        os.write(f_d,'Test sysdef file')
+        os.close(f_d)
         location = ido.get_sysdef_location(filename); 
         os.unlink(filename)
         assert location == None

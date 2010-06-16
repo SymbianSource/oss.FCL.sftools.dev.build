@@ -30,7 +30,7 @@ import logging
 
 _logger = logging.getLogger('test.bom')
 
-database = "to1tobet"
+_database = "to1tobet"
 
 class BOMMockFolder:    
     """ This class provides a mock folder """
@@ -50,10 +50,12 @@ class BOMMockProject:
     
     @property
     def tasks(self):
+        """tasks"""
         return []
     
     @property
     def folders(self):
+        """folders"""
         return [BOMMockFolder('5856', 'tr1s60', "all completed tasks for release ABS_domain/abs.mcl for collaborative projects", [])] 
     
 class BOMMock:
@@ -63,10 +65,12 @@ class BOMMock:
         self.config['build.id'] = "mock"
     
     @property
-    def projects(self):    
+    def projects(self):
+        """projects"""
         return [BOMMockProject('ABS_domain-abs.mcl_200843:project:tr1s60#1')] 
 
     def all_baselines(self):
+        """all baselines"""
         return []
 
 # Refactor required: See http://delivery.nmp.nokia.com/trac/helium/ticket/1517
@@ -78,7 +82,7 @@ class BOMTest(unittest.TestCase):
 #    def test_bom_output(self):
 #        """ Test basic BOM execution. Only new spec format will be covered!"""
 #        try:
-#            session = ccm.open_session(database=database)
+#            session = ccm.open_session(_database=_database)
 #        except ccm.CCMException:
 #            print "Skipping BOMTest test cases."
 #            return
@@ -134,6 +138,7 @@ class BOMTest(unittest.TestCase):
         self.assertEqual(None, delta_bom_content_validity) 
 
     def test_BOMXMLWriter(self):
+        """test BOM XML writer"""
         config_data = {'delivery': os.environ['TEST_DATA'] + '/data/test_delivery.xml', 'prep.xml': os.environ['TEST_DATA'] + '/data/test_prep.xml', 'build.id': 'buildid', 'symbian_rel_week': r'${symbian.version.week}', 'symbian_rel_ver': r'${symbian.version}', 'symbian_rel_year': r'${symbian.version.year}', 's60_version': r'${s60.version}', 's60_release': r'${s60.release}', 'currentRelease.xml': os.environ['TEST_DATA'] + "tests/data/symrec/generated_release_metadata.xml"}
         bom = build.model.BOM(configuration.Configuration(config_data))
         xml_writer = build.model.BOMXMLWriter(bom)

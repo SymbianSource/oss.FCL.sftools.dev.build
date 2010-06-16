@@ -69,7 +69,7 @@ Description:
     <#list colors?keys as type>
         <#assign count =  table_info['jpasingle']['select count(m.id) from MetadataEntry m JOIN  m.priority as p JOIN m.component as c where (UPPER(p.priority)=\'${type?upper_case}\' and c.id=${component.id})'][0] >    
         <#if type=='error'>
-            <#assign count_missing = table_info['jpasingle']['select count(w.id) from WhatLogEntry w JOIN w.component c where c.logPathID=${logfile.id} and w.missing=\'true\''][0]> 
+            <#assign count_missing = table_info['jpasingle']['select count(w.id) from WhatLogEntry w JOIN w.component c where c.logPathID=${logfile.id} and c.id=${component.id} and w.missing=\'true\''][0]> 
             <#assign count = count?number + count_missing?number>
         </#if>
         <#if (count?number > 0)>

@@ -23,27 +23,36 @@ Description:
 <project name="test-cmt" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
     <description>Helium antlib Quality CMT related tests.</description>
 
-    <taskdef resource="com/nokia/helium/quality/ant/antlib.xml" uri="http://www.nokia.com/helium" />
-    <property name="cmt.output.dir" location="./../output"/>
-    <property name="test.data.src" value="./../data/helloworldcons"/>
-    <property name="build.id" value="testbuild"/>
-    <property name="ido.name" value="cmttest"/>
-    <property name="cmt.id" value="1"/>
+    <taskdef name="fmpp" classname="fmpp.tools.AntTask" onerror="report"/>
 
+    <taskdef resource="com/nokia/helium/quality/ant/antlib.xml" uri="http://www.nokia.com/helium" />
+    <property name="cmt.output.dir" location="${test.temp.dir}/output"/>
+    <property name="test.data.src" value="./../data/helloworldcons"/>
+    <property name="temp.diamonds.header.xml" location="${cmt.output.dir}/cmt/diamonds_header.xml" />
+    <property name="temp.diamonds.footer.xml" location="${cmt.output.dir}/cmt/diamonds_footer.xml" />
+    
     <basename property="componentbase" file="${test.data.src}"/>
+    <property name="diamonds.build.output.dir" location="${cmt.output.dir}/cmt" />
     
     <!-- is called prior to the test -->
     <target name="setUp">
-        <delete dir="${cmt.output.dir}" failonerror="false" />
-        <mkdir dir="${cmt.output.dir}/logs" />
+        <delete dir="${cmt.output.dir}/cmt" failonerror="false" />
+        <mkdir dir="${cmt.output.dir}/cmt" />
+        
+        <!--take the diamonds header and footer .ftl files and turn them into .xml files
+        for copying as the headera nd footer parts of the output files-->
+        <fmpp sourcefile="./../../../../../tools/common/templates/diamonds/diamonds_header.ftl" 
+              outputfile="${temp.diamonds.header.xml}" quiet="true"/>
+        <fmpp sourcefile="./../../../../../tools/common/templates/diamonds/diamonds_footer.ftl" 
+              outputfile="${temp.diamonds.footer.xml}" quiet="true"/>
     </target>
 
     <!-- is called after the test, even if that caused an error -->
     <target name="tearDown">
-        <delete dir="${cmt.output.dir}" failonerror="false" />
-        <delete file="${test.data.src}\files.lst" failonerror="false" />
+        <delete dir="${cmt.output.dir}/cmt" failonerror="false" />
+        <delete file="${temp.diamonds.header.xml}" failonerror="false" />
+        <delete file="${temp.diamonds.footer.xml}" failonerror="false" />
     </target>
-
     <condition property="do.cmt.test">
         <os family="windows" />
     </condition>
@@ -56,17 +65,27 @@ Description:
     -->
 
     <target name="test-cmt-with-all-reqd-params-set" if="do.cmt.test">
-        <hlm:cmt output="${cmt.output.dir}\logs\${build.id}_${ido.name}_${componentbase}_${cmt.id}.txt">
+        <hlm:cmt output="${cmt.output.dir}\logs\cmt_test.txt">
             <fileset id="input" dir="${test.data.src}">
                 <include name="**/*.h"/>
                 <include name="**/*.cpp"/>
             </fileset>
         </hlm:cmt>
-        
-        <au:assertLogContains text="CMT run successfully? true"/>
-        <au:assertFileExists file="${cmt.output.dir}\logs\testbuild_cmttest_helloworldcons_1.txt"/>
-        <au:assertLogContains text="CMT2HTML run successfully? true"/>
-        <au:assertFileExists file="${cmt.output.dir}\logs\testbuild_cmttest_helloworldcons_1_cmt\CMTHTML\index.html"/>
+        <au:assertLogContains text="run command: cmt"/>
+        <au:assertFileExists file="${cmt.output.dir}\logs\cmt_test.txt"/>
+    </target>
+    
+    <target name="test-cmt-with-html-output-dir" if="do.cmt.test">
+        <hlm:cmt output="${cmt.output.dir}\logs\cmt_test.txt" htmlOutputDir="${cmt.output.dir}\logs\cmthtmlFolder">
+            <fileset id="input" dir="${test.data.src}">
+                <include name="**/*.h"/>
+                <include name="**/*.cpp"/>
+            </fileset>
+        </hlm:cmt>
+        <au:assertLogContains text="run command: cmt"/>
+        <au:assertFileExists file="${cmt.output.dir}\logs\cmt_test.txt"/>
+        <au:assertLogContains text="run command: cmt2html.bat"/>
+        <au:assertFileExists file="${cmt.output.dir}\logs\cmthtmlFolder\CMTHTML\index.html"/>
     </target>
     
     <!--
@@ -102,9 +121,92 @@ Description:
      **************************************************************
     -->
     <target name="test-cmt-linux" unless="do.cmt.test">
-        <hlm:cmt/>
-        <au:assertLogContains text="CMT supported only for windows"/>
+        <au:expectfailure expectedMessage="CMT supported only on windows platforms">
+            <hlm:cmt/>
+        </au:expectfailure>
     </target>
 
-    
+    <!--
+     ** test CMT convert to diamonds (input file has all the wanted data on 2 lines only)
+    -->
+    <target name="test-cmt-cnvt-dia-valid-2lines" if="do.cmt.test">
+        <property name="cmt.id" value="1" />
+        <property name="cmt.test.data.src" location="${test.data.src}/index_${cmt.id}.html" />
+        <property name="output.file.name" location="${diamonds.build.output.dir}/cmt_summary_${cmt.id}.xml"/>
+
+        <hlm:cmtsummarytask diamondsHeaderFileName="${temp.diamonds.header.xml}" diamondsFooterFileName="${temp.diamonds.footer.xml}"
+            outputFile="${output.file.name}"
+            inputFile="${cmt.test.data.src}" />
+        <au:assertFileExists file="${output.file.name}" />
+        <au:assertFilesMatch expected="${output.file.name}" 
+                actual="${test.data.src}/../cmt_summary_${cmt.id}.xml" />
+
+    </target>
+
+    <!--
+     ** test CMT convert to diamonds (input file has all the wanted data on 4 lines)
+    -->
+    <target name="test-cmt-cnvt-dia-valid-split" if="do.cmt.test">
+        <property name="cmt.id" value="2" />
+        <property name="cmt.test.data.src" location="${test.data.src}/index_${cmt.id}.html" />
+        <property name="output.file.name" location="${diamonds.build.output.dir}/cmt_summary_${cmt.id}.xml"/>
+
+        <hlm:cmtsummarytask diamondsHeaderFileName="${temp.diamonds.header.xml}" diamondsFooterFileName="${temp.diamonds.footer.xml}"
+            outputFile="${output.file.name}"
+            inputFile="${cmt.test.data.src}" />
+        <au:assertFileExists file="${output.file.name}" />
+        <au:assertFilesMatch expected="${output.file.name}" 
+                actual="${test.data.src}/../cmt_summary_${cmt.id}.xml" />
+
+    </target>
+
+    <!--
+     ** test CMT convert to diamonds input file has no CMT summary data
+    -->
+    <target name="test-cmt-cnvt-dia-invalid-no-summary" if="do.cmt.test">
+        <property name="cmt.id" value="3" />
+        <property name="cmt.test.data.src" location="${test.data.src}/index_${cmt.id}.html" />
+        <property name="output.file.name" location="${diamonds.build.output.dir}/cmt_summary_${cmt.id}.xml"/>
+
+        <hlm:cmtsummarytask diamondsHeaderFileName="${temp.diamonds.header.xml}" diamondsFooterFileName="${temp.diamonds.footer.xml}"
+            outputFile="${output.file.name}"
+            inputFile="${cmt.test.data.src}" />
+        <au:assertFileExists file="${output.file.name}" />
+        <au:assertFilesMatch expected="${output.file.name}" 
+                actual="${test.data.src}/../cmt_summary_${cmt.id}.xml" />
+
+    </target>
+
+    <!--
+     ** test CMT convert to diamonds input file none existant
+    -->
+    <target name="test-cmt-cnvt-dia-invalid-no-file" if="do.cmt.test">
+        <property name="cmt.id" value="4" />
+        <property name="cmt.test.data.src" location="${test.data.src}/index_${cmt.id}.html" />
+        <property name="output.file.name" location="${diamonds.build.output.dir}/cmt_summary_${cmt.id}.xml"/>
+
+        <hlm:cmtsummarytask diamondsHeaderFileName="${temp.diamonds.header.xml}" diamondsFooterFileName="${temp.diamonds.footer.xml}"
+            outputFile="${output.file.name}"
+            inputFile="${cmt.test.data.src}" />
+        <au:assertFileDoesntExist file="${output.file.name}" />
+
+    </target>
+
+    <!--
+     ** test CMT convert to diamonds input file has spaces after number text in CMT summary data
+    -->
+    <target name="test-cmt-cnvt-dia-invalid-space-after-numtext-no-summary" if="do.cmt.test">
+        <property name="cmt.id" value="5" />
+        <property name="cmt.test.data.src" location="${test.data.src}/index_${cmt.id}.html" />
+        <property name="output.file.name" location="${diamonds.build.output.dir}/cmt_summary_${cmt.id}.xml"/>
+
+        <hlm:cmtsummarytask diamondsHeaderFileName="${temp.diamonds.header.xml}" diamondsFooterFileName="${temp.diamonds.footer.xml}"
+            outputFile="${output.file.name}"
+            inputFile="${cmt.test.data.src}" />
+        <au:assertFileExists file="${output.file.name}" />
+        <au:assertFilesMatch expected="${output.file.name}" 
+                actual="${test.data.src}/../cmt_summary_${cmt.id}.xml" />
+
+    </target>
+
 </project>

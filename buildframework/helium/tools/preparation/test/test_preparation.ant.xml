@@ -36,11 +36,11 @@ Description:
     <property name="prep.root.dir" value="../../../build/test/preproot" />
 
     <property name="helium.dir" location="../../.." />
-    <!--<import file="../../../helium.ant.xml"/>-->
+    <!--<import file="../../../build.xml"/>-->
 
-    <!-- in the normal run we should not have the same build.drive content in the second run -->
-    <property name="build.drive" value="Z:" />
-    <import file="../../../helium.ant.xml" />
+    <!-- in the normal run we should not have the same build.drive content in the second run 
+    <property name="build.drive" value="Z:" />-->
+    <import file="../../../build.xml" />
     <property name="preparation.temp.dir" location="${helium.build.dir}/antunit/preparation" />
 
     <target name="setUp">
@@ -124,13 +124,13 @@ session = ccm.open_session(database="fa1f5132")
                     <param name="build.drive.notdefined" value="true"/>
                 </antcall>
                 <au:assertFileExists file="${build.drive}"/>
-                <hlm:unsubst drive="${build.drive}"/>
+                <hlm:unsubst drive="${build.drive}" failonerror="false"/>
                 <delete dir="${prep.temp.build.dir}"/>
             </then>
         </if>
     </target>
 
-    <!--<import file="../../../helium.ant.xml"/>
+    <!--<import file="../../../build.xml"/>
     
      TODO: should these run on build.xml -->
     <!--<target name="test-build-int-not-set">    

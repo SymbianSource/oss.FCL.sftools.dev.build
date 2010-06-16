@@ -90,7 +90,7 @@ public class Stage extends DataType {
      * @param target
      * @return
      */
-    public boolean isStartTarget ( String target ) {
+    public boolean isStartTarget( String target ) {
         return this.startTarget.equals( target );
     }
     
@@ -99,7 +99,7 @@ public class Stage extends DataType {
      * @param target
      * @return
      */
-    public boolean isEndTarget ( String target ) {
+    public boolean isEndTarget( String target ) {
         return this.endTarget.equals( target );
     }
     

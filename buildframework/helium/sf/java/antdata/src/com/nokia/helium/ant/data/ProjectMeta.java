@@ -99,7 +99,7 @@ public class ProjectMeta extends RootAntObjectMeta {
     @SuppressWarnings("unchecked")
     public List<PropertyMeta> getProperties() throws IOException {
         List<PropertyMeta> properties = new ArrayList<PropertyMeta>();
-        List<Node> propertyNodes = getNode().selectNodes("//property");
+        List<Node> propertyNodes = getNode().selectNodes("//property[string-length(@name)>0]");
         for (Node propNode : propertyNodes) {
             PropertyMeta propertyMeta = new PropertyMeta(this, propNode);
             propertyMeta.setRuntimeProject(getRuntimeProject());

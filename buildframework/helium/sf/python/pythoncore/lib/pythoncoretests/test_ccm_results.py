@@ -25,8 +25,9 @@ import ccm
 import os
 import logging
 
+# pylint: disable-msg=R0201
 
-logger = logging.getLogger('test.ccm_results')
+_logger = logging.getLogger('test.ccm_results')
 logging.basicConfig(level=logging.INFO)
 
 class CounterHandler(logging.Handler):
@@ -54,11 +55,13 @@ class MockResultSession(ccm.AbstractSession):
         self._database = database
     
     def database(self):
+        """database"""
         return self._database
     
     def execute(self, cmdline, result=None):
+        """execute"""
         if result == None:
-            result = ccm.Result(self)        
+            result = ccm.Result(self)
         if self._behave.has_key(cmdline):
             result.statuserrors = 0  
             result.output = self._behave[cmdline]
@@ -97,6 +100,7 @@ class ResultTest(unittest.TestCase):
 
    
     def test_ObjectListResult(self):
+        """test object list result"""
         behave = { 'test_ObjectListResult': """mc-mc_0638:project:vc1s60p1#1
 mc-mc_4031_0642:project:vc1s60p1#1
 mc-mc_4031_0646:project:vc1s60p1#1
@@ -126,11 +130,12 @@ mc-mc_4032_0736:project:vc1s60p1#1
         session = MockResultSession(behave)
         result = session.execute('test_ObjectListResult', ccm.ObjectListResult(session))
         assert len(result.output) == 24, "output doesn't contains the right number of result project."
-        for o in result.output:
-            assert o.type == 'project'
-            assert o.name == 'mc'
+        for obj in result.output:
+            assert obj.type == 'project'
+            assert obj.name == 'mc'
 
     def test_WorkAreaInfoResult(self):
+        """ test work area info result"""
         behave = { 'test_WorkAreaInfoResult': """
 Project                                            Maintain Copies Relative Time Translate Modify Path
 -------------------------------------------------------------------
@@ -158,8 +163,8 @@ Ibusal_internal-fa1f5132#wbernard16:project:jk1imeng#1 working wbernard project 
         
 """}
         session = MockResultSession(behave)
-        object = session.create("Ibusal_internal-fa1f5132#wbernard16:project:jk1imeng#1")
-        result = session.execute('test_FinduseResult', ccm.FinduseResult(object))
+        obj = session.create("Ibusal_internal-fa1f5132#wbernard16:project:jk1imeng#1")
+        result = session.execute('test_FinduseResult', ccm.FinduseResult(obj))
         print result.output
         assert len(result.output) == 1
         assert result.output[0]['project'].objectname == "IBUSAL_RapidoYawe-fa1f5132#wbernard16:project:jk1imeng#1"
@@ -169,7 +174,7 @@ Ibusal_internal-fa1f5132#wbernard16:project:jk1imeng#1 working wbernard project 
     def test_read_ccmwaid_info(self):
         """ Testing read_ccmwaid_info, open a _ccmwaid.inf file and check the extracted data. """
         data = ccm.read_ccmwaid_info(os.path.join(os.environ['TEST_DATA'], 'data', 'test_ccmwaid.inf'))
-        logger.debug(data)
+        _logger.debug(data)
         assert data['database'] == "jk1f5132"
         assert data['objectname'] == "sa1spp#1/project/S60/jk1f5132#wbernard"
 
@@ -215,7 +220,7 @@ Update complete.
 """}
         session = MockResultSession(behave)
         result = session.execute('test_update', ccm.UpdateResult(session))
-        #logger.debug(result.output)
+        #_logger.debug(result.output)
         assert len(result.output['tasks']) == 4, "Number of tasks doesn't match."
         assert len(result.output['modifications']) == 4, "Number of modifications doesn't match."
         assert len(result.output['errors']) == 1, "Number of errors doesn't match."
@@ -246,12 +251,12 @@ Update failed.
 """}
         session = MockResultSession(behave)
         result = session.execute('test_update', ccm.UpdateResult(session))
-        #logger.debug(result.output)
-        #logger.debug(result.output.keys())
-        #logger.debug(len(result.output['tasks']))
-        #logger.debug(len(result.output['modifications']))
-        #logger.debug(len(result.output['errors']))
-        #logger.debug(len(result.output['warnings']))
+        #_logger.debug(result.output)
+        #_logger.debug(result.output.keys())
+        #_logger.debug(len(result.output['tasks']))
+        #_logger.debug(len(result.output['modifications']))
+        #_logger.debug(len(result.output['errors']))
+        #_logger.debug(len(result.output['warnings']))
         
         assert (len(result.output['tasks']) == 0), "Number of tasks doesn't match."
         assert (len(result.output['modifications']) == 0), "Number of modifications doesn't match."
@@ -259,8 +264,8 @@ Update failed.
         assert (len(result.output['warnings']) == 5), "Number of warnings doesn't match."
 
 
-    def test_UpdateTemplateInformation_result(self):        
-        """ Validating UpdateTemplateInformation."""                
+    def test_UpdateTemplateInformation_result(self):
+        """ Validating UpdateTemplateInformation."""
         behave = {'test_update' : """Baseline Selection Mode: Latest Baseline Projects
 Prep Allowed:            No
 Versions Matching:       *abs.50*
@@ -276,7 +281,7 @@ Folder Templates and Folders:
         """}
         session = MockResultSession(behave)
         result = session.execute('test_update', ccm.UpdateTemplateInformation(session))
-        #logger.debug(result.output)
+        #_logger.debug(result.output)
         assert result.output['baseline_selection_mode'] == "Latest Baseline Projects", "BSM doesn't match."
         assert result.output['prep_allowed'] == False, "Prep allowed doesn't match."
         assert result.output['version_matching'] == "*abs.50*", "Version matching doesn't match."
@@ -284,9 +289,9 @@ Folder Templates and Folders:
         assert result.output['modifiable_in_database'] == "tr1s60", "Modifiable in Database doesn't match."
         assert result.output['in_use_for_release'] == True, "In Use For Release doesn't match."
     
-    def test_ConflictsResult_result(self):        
-        """ Validating ConflictsResult."""                
-        behave = {'test_update' : """        
+    def test_ConflictsResult_result(self):
+        """ Validating ConflictsResult."""
+        behave = {'test_update' : """
 Project: Cartman-Release_v4
 
          No conflicts detected.
@@ -318,15 +323,15 @@ tr1test1#5226   Explicitly specified but not included
         """}
         session = MockResultSession(behave)
         result = session.execute('test_update', ccm.ConflictsResult(session))
-        #logger.debug(result.output)
+        #_logger.debug(result.output)
         # pylint: disable-msg=E1103
         assert len(result.output.keys()) == 7, "Should detect 7 projects."
         subproj = session.create("Cartman_sub_sub_sub02-Release_v4:project:%s#1" % session.database())
         assert len(result.output[subproj]) == 2, "%s should contain 2 conflicts" % subproj.objectname
 
 
-    def test_DataMapperListResult_result(self):        
-        """ Validating DataMapperListResult."""                        
+    def test_DataMapperListResult_result(self):
+        """ Validating DataMapperListResult."""
         behave = {'test_query' : """>>>objectname>>>task5204-1:task:tr1test1>>>task_synopsis>>>Create Cartman_sub03>>>
 >>>objectname>>>task5223-1:task:tr1test1>>>task_synopsis>>>cartman/next test1>>>
 >>>objectname>>>task5224-1:task:tr1test1>>>task_synopsis>>>test.txt>>>
@@ -336,11 +341,11 @@ tr1test1#5226   Explicitly specified but not included
 """}
         session = MockResultSession(behave)
         result = session.execute('test_query', ccm.DataMapperListResult(session, '>>>', ['objectname', 'task_synopsis'], ['ccmobject', 'string']))        
-        logger.debug(result.output)
+        _logger.debug(result.output)
         assert len(result.output) == 6
         
-    def test_UpdatePropertiesRefreshResult_result(self):        
-        """ Validating UpdatePropertiesRefreshResult."""                        
+    def test_UpdatePropertiesRefreshResult_result(self):
+        """ Validating UpdatePropertiesRefreshResult."""
         behave = {'test_refresh' : """Refreshing baseline and tasks for project grouping 'All cartman/next Integration Testing Projects from Database tr1test1'.
 Replacing tasks in folder tr1test1#2045
   Removed the following tasks from folder tr1test1#2045
@@ -357,7 +362,7 @@ Removed the following tasks from project grouping 'All cartman/next Integration 
 """}
         session = MockResultSession(behave)
         result = session.execute('test_refresh', ccm.UpdatePropertiesRefreshResult(session))        
-        logger.debug(result.output)
+        _logger.debug(result.output)
         assert result.output['added'] == [session.create("Task tr1test1#5223")]
         assert result.output['removed'] == [session.create("Task tr1test1#5225")]
 
@@ -388,11 +393,11 @@ Update Summary
 Serious: 
 Update failed.
 """
-        logger = logging.getLogger('count.logger')
-        logger.setLevel(logging.WARNING)
+        _logger = logging.getLogger('count.logger')
+        _logger.setLevel(logging.WARNING)
         handler = CounterHandler()
-        logger.addHandler(handler)
-        ccm.log_result(log, ccm.UPDATE_LOG_RULES, logger)
+        _logger.addHandler(handler)
+        ccm.log_result(log, ccm.UPDATE_LOG_RULES, _logger)
         print handler.warnings
         print handler.errors
         assert handler.warnings == 5
@@ -410,11 +415,11 @@ Warning: Object version 'fa1ssdo#MobileSearch_4_10_09w09_S60_3_3' too long, use 
 Copy Project complete with 1 errors.
 WARNING: There is no matching baseline project for 'ci-hitchcock_nga' in baseline 'tr1s60#ABS_domain_mcl92-abs.mcl.92_200907'.  This baseline might not be complete
 """
-        logger = logging.getLogger('count.logger')
-        logger.setLevel(logging.WARNING)
+        _logger = logging.getLogger('count.logger')
+        _logger.setLevel(logging.WARNING)
         handler = CounterHandler()
-        logger.addHandler(handler)
-        ccm.log_result(log, ccm.CHECKOUT_LOG_RULES, logger)
+        _logger.addHandler(handler)
+        ccm.log_result(log, ccm.CHECKOUT_LOG_RULES, _logger)
         print handler.warnings
         print handler.errors
         assert handler.warnings == 4
@@ -433,11 +438,11 @@ WARNING: There is no matching baseline project for 'ci-hitchcock_nga' in baselin
 You can use Reconcile to resolve work area conflicts
 Warning: Conflicts detected during synchronization. Check your logs.
 """
-        logger = logging.getLogger('count.logger')
-        logger.setLevel(logging.WARNING)
+        _logger = logging.getLogger('count.logger')
+        _logger.setLevel(logging.WARNING)
         handler = CounterHandler()
-        logger.addHandler(handler)
-        ccm.log_result(log, ccm.SYNC_LOG_RULES, logger)
+        _logger.addHandler(handler)
+        ccm.log_result(log, ccm.SYNC_LOG_RULES, _logger)
         print handler.warnings
         print handler.errors
         assert handler.warnings == 0

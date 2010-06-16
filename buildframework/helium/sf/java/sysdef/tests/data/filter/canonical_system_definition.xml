@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : canonical_system_definition.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<SystemDefinition schema="3.0.0" id-namespace="http://www.symbian.org/system-definition">
+<systemModel name="sf_">
+<layer id="app" name="app">
+<package id="helloworldcons" name="helloworldcons" levels="demo">
+<collection id="helloworldcons_apps" name="helloworldcons_apps" level="demo">
+<component id="helloworldcons_app" name="helloworldcons app" purpose="development">
+<unit bldFile="/sf/app/helloworldcons/group" mrp="/sf/app/helloworldcons/"/>
+</component>
+</collection>
+</package>
+</layer>
+<layer id="mw" name="mw">
+<package id="dummytest" name="dummytest" levels="demo">
+<collection id="test_nested" name="test_nested" level="demo">
+<component id="tc1" name="tc1" purpose="development" filter="test">
+<unit bldFile="/sf/mw/dummytest/test_nested/tc1/group" mrp="/sf/mw/dummytest/"/>
+</component>
+<component id="tc2" name="tc2" purpose="development" filter="test">
+<meta rel="testbuild">
+<group name="drop_tc2_and_tc3"/>
+</meta>
+<unit bldFile="/sf/mw/dummytest/test_nested/tc2/group" mrp="/sf/mw/dummytest/"/>
+</component>
+<component id="tc3" name="tc3" purpose="development" filter="test">
+<meta rel="testbuild">
+<group name="drop_tc2_and_tc3"/>
+</meta>
+<unit bldFile="/sf/mw/dummytest/test_nested/tc3/group" mrp="/sf/mw/dummytest/"/>
+</component>
+</collection>
+</package>
+<package id="helloworldapi" name="helloworldapi" levels="demo">
+<collection id="helloworld_apis" name="helloworlds APIs" level="demo">
+<component id="helloworld_api" name="Hello World API" purpose="development">
+<unit bldFile="/sf/mw/helloworldapi/group" mrp="/sf/mw/helloworldapi/"/>
+</component>
+</collection>
+</package>
+</layer>
+</systemModel>
+</SystemDefinition>

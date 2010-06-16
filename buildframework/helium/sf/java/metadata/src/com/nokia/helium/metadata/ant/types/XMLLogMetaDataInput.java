@@ -46,11 +46,11 @@ abstract class XMLLogMetaDataInput extends LogMetaDataInput {
      * Constructor
      */
     public XMLLogMetaDataInput() {
-            inParsing = true;
-            xmlInputFactory = XMLInputFactory.newInstance();
-            xmlInputFactory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES,Boolean.TRUE);
-            xmlInputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES,Boolean.FALSE);
-            xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING , Boolean.TRUE);
+        inParsing = true;
+        xmlInputFactory = XMLInputFactory.newInstance();
+        xmlInputFactory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES,Boolean.TRUE);
+        xmlInputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES,Boolean.FALSE);
+        xmlInputFactory.setProperty(XMLInputFactory.IS_COALESCING , Boolean.TRUE);
 
     }
     
@@ -88,17 +88,17 @@ abstract class XMLLogMetaDataInput extends LogMetaDataInput {
                 while (xmlStreamReader.hasNext()) {
                     eventType = xmlStreamReader.next();
                     switch (eventType) {
-                    case XMLEvent.START_ELEMENT:
-                        entryCreated = startElement(xmlStreamReader);
-                        break;
-                    case XMLEvent.END_ELEMENT:
-                        entryCreated = endElement(xmlStreamReader);
-                        break;
-                    case XMLEvent.CHARACTERS:
-                        entryCreated = characters(xmlStreamReader);
-                        break;
-                    default:
-                        break;
+                        case XMLEvent.START_ELEMENT:
+                            entryCreated = startElement(xmlStreamReader);
+                            break;
+                        case XMLEvent.END_ELEMENT:
+                            entryCreated = endElement(xmlStreamReader);
+                            break;
+                        case XMLEvent.CHARACTERS:
+                            entryCreated = characters(xmlStreamReader);
+                            break;
+                        default:
+                            break;
                     }
                     if ( entryCreated) {
                         return true; 
@@ -115,7 +115,7 @@ abstract class XMLLogMetaDataInput extends LogMetaDataInput {
             log.debug("FileNotFoundException in isEntryCreated" + ex);
         // CheckStyle:IllegalCatch OFF
         } catch (RuntimeException ex) { //have to catch this otherwise it crashes other parts of the code
-            throw new BuildException ("Failed during writing data to db:  ", ex);
+            throw new BuildException("Failed during writing data to db:  ", ex);
         }
         // CheckStyle:IllegalCatch ON
         return false;
@@ -127,7 +127,7 @@ abstract class XMLLogMetaDataInput extends LogMetaDataInput {
      * @param streamReader: the input stream reader which contains the xml data to be parsed for recording data.
      * @return true if there are any element to be added to the database.
      */
-    abstract boolean startElement (XMLStreamReader streamReader) ;
+    abstract boolean startElement(XMLStreamReader streamReader) ;
 
     /**
      * Function implemented by the subclasses to process the end event of xml stream callback.
@@ -141,5 +141,5 @@ abstract class XMLLogMetaDataInput extends LogMetaDataInput {
      * @param streamReader: the input stream reader which contains the xml data to be parsed for recording data.
      * @return true if there are any element to be added to the database.
      */
-    abstract boolean characters (XMLStreamReader streamReader);
+    abstract boolean characters(XMLStreamReader streamReader);
 }

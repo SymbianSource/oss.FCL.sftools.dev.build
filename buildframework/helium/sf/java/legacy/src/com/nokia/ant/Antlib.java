@@ -143,9 +143,9 @@ public class Antlib extends Task implements TaskContainer {
      * any tasks that derive from Definer.
      */
     public final void execute() {
-        for (Task t : tasks) {
-            if (t instanceof UnknownElement) {
-                UnknownElement ue = (UnknownElement)t;
+        for (Task task : tasks) {
+            if (task instanceof UnknownElement) {
+                UnknownElement ue = (UnknownElement)task;
                 setLocation(ue.getLocation());
                 ue.maybeConfigure();
                 Object configuredObject = ue.getRealThing();

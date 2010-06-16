@@ -16,6 +16,7 @@
 #
 #Description:
 #===============================================================================
+""" XML helper"""
 
 import re
 from xml.dom import Node
@@ -37,6 +38,6 @@ def recursive_node_scan(node, name):
         name is a regular expression.
     """
     results = node_scan(node, name)
-    for subnode in node.childNodes:        
+    for subnode in node.childNodes:
         results.extend(recursive_node_scan(subnode, name))
     return results

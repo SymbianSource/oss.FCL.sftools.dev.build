@@ -151,12 +151,12 @@ _test_file_content = {
     'sf/component_private/Distribution.Policy.S60': '1',
     }
     
-""" Used by test_archive. """
-root_test_dir = "build/_test_" + str(time.strftime("%H.%M.%S"))
-    
+# Used by test_archive.
+_root_test_dir = "build/_test_" + str(time.strftime("%H.%M.%S"))
+
 def _testpath(subpath):
     """ Normalised path for test paths. """
-    return os.path.normpath(os.path.join(root_test_dir, subpath))
+    return os.path.normpath(os.path.join(_root_test_dir, subpath))
     
 def setup_module():
     """ Setup files test config. 
@@ -167,7 +167,7 @@ def setup_module():
     #print 'setup_module()'
     #print _test_file_content.keys()
     for child_path in _test_file_paths:
-        path = os.path.join(root_test_dir, child_path)
+        path = os.path.join(_root_test_dir, child_path)
         path_dir = path
         path_dir = os.path.dirname(path)
         
@@ -185,8 +185,8 @@ def setup_module():
 
 def teardown_module():
     """ Teardown test config. """
-    if os.path.exists(root_test_dir):
-        fileutils.rmtree(root_test_dir)
+    if os.path.exists(_root_test_dir):
+        fileutils.rmtree(_root_test_dir)
     
 
 class FileScannerTest(unittest.TestCase):
@@ -342,7 +342,7 @@ class FileScannerTest(unittest.TestCase):
         testpaths = [_testpath('dir1/file1.txt'),
                      _testpath('dir1/file2.doc'),
                      _testpath('dir1/file3_no_extension'),
-                     _testpath('dir1/subdir3')]                   
+                     _testpath('dir1/subdir3')]
         result.sort()
         testpaths.sort()
         
@@ -359,7 +359,7 @@ class FileScannerTest(unittest.TestCase):
         result = []
         testpaths = [_testpath('dir1/file3_no_extension'),
                      _testpath('dir1/subdir2/subdir2_file_no_extension'),
-                     _testpath('dir1/subdir3')]                   
+                     _testpath('dir1/subdir3')]
         [result.append(path) for path in scanner.scan()]
         result.sort()
         testpaths.sort()
@@ -377,7 +377,7 @@ class FileScannerTest(unittest.TestCase):
                      _testpath('s60/UPPERCASE_MISSING/subdir/Distribution.Policy.S60'),
                      _testpath('s60/UPPERCASE_MISSING/subdir/not_to_be_removed_0.txt'),
                      _testpath('s60/UPPERCASE_MISSING/subdir/another_subdir/to_be_removed_9999.txt')
-                     ]                   
+                     ]
         [result.append(path) for path in scanner.scan()]
         
         testpaths.sort()
@@ -392,7 +392,7 @@ class FileScannerTest(unittest.TestCase):
         scanner = fileutils.FileScanner(_testpath(''))
         scanner.add_include('dir/emptysubdir1/')
         result = []
-        testpaths = [_testpath('dir/emptysubdir1')]                   
+        testpaths = [_testpath('dir/emptysubdir1')]
         [result.append(path) for path in scanner.scan()]
         
         result.sort()
@@ -409,7 +409,7 @@ class FileScannerTest(unittest.TestCase):
         scanner.add_exclude('emptydirerror/dir/subdir/')
         scanner.add_exclude('emptydirerror/dir/emptysubdir/')
         result = []
-        testpaths = []                   
+        testpaths = []
         [result.append(path) for path in scanner.scan()]
         
         result.sort()
@@ -426,7 +426,7 @@ class FileScannerTest(unittest.TestCase):
         scanner.add_exclude('dir/emptysubdir3/')
         result = []
         testpaths = [_testpath('dir/emptysubdir1'),
-                     _testpath('dir/emptysubdir2')]                   
+                     _testpath('dir/emptysubdir2')]
         [result.append(path) for path in scanner.scan()]
         
         print result
@@ -443,7 +443,7 @@ class FileScannerTest(unittest.TestCase):
         result = []
         [result.append(path) for path in scanner.scan()]
         testpaths = [_testpath('s60/component_public/component_public_file.txt'),
-                     _testpath('s60/component_public/distribution.policy.s60')]                   
+                     _testpath('s60/component_public/distribution.policy.s60')]
         
         result = [s.lower() for s in result]
         result.sort()
@@ -462,12 +462,13 @@ class FileScannerTest(unittest.TestCase):
         
         result = []
         [result.append(path) for path in scanner.scan()]
-        testpaths = []                   
+        testpaths = []
         
         assert result == testpaths
         
         
     def test_symbian_distribution_policy_cat_a(self):
+        """test symbian distribution policy category A"""
         scanner = fileutils.FileScanner(_testpath(''))
         scanner.add_include('s60src/src-a/')
         selector = archive.selectors.SymbianPolicySelector(['distribution.policy'], 'A')
@@ -479,7 +480,8 @@ class FileScannerTest(unittest.TestCase):
  
         assert result == testpaths
         
-    def test_symbian_distribution_policy_cat_b(self):        
+    def test_symbian_distribution_policy_cat_b(self):
+        """test symbian distribution policy category B"""
         scanner = fileutils.FileScanner(_testpath(''))
         scanner.add_include('s60src/src-b/')
         selector = archive.selectors.SymbianPolicySelector(['distribution.policy'], 'B')
@@ -489,9 +491,10 @@ class FileScannerTest(unittest.TestCase):
         [result.append(path) for path in scanner.scan()]
         testpaths = [_testpath('s60src/src-b/distribution.policy')] 
               
-        assert result == testpaths     
+        assert result == testpaths
         
-    def test_symbian_distribution_policy_cat_not_a_not_b(self):        
+    def test_symbian_dist_policy_cat_not_a_not_b(self):
+        """test symbian distribution policy category not A and not B"""
         scanner = fileutils.FileScanner(_testpath(''))
         scanner.add_include('s60src/src-c/')
         selector = archive.selectors.SymbianPolicySelector(['distribution.policy'], '!A,!B')
@@ -502,7 +505,7 @@ class FileScannerTest(unittest.TestCase):
                   
         testpaths = [_testpath('s60src/src-c/distribution.policy')] 
         
-        assert result == testpaths     
+        assert result == testpaths
     
         
     def test_find_subroots(self):
@@ -528,11 +531,12 @@ class FileScannerTest(unittest.TestCase):
         scanner.add_include('**/dir')
         scanner.add_include('foo/**/dir')
         result = scanner.find_subroots()
-        _logger.debug(result)              
+        _logger.debug(result)
         assert result == [_testpath('')]
 
 
     def test_load_policy_content(self):
+        """test load policy content"""
         try:
             fileutils.load_policy_content(_testpath('test_policies/1/Distribution.Policy.S60'))
             assert "Should fail while loading 'test_policies/1/Distribution.Policy.S60'."
@@ -545,8 +549,9 @@ class FileScannerTest(unittest.TestCase):
             assert "Should not fail while loading 's60/Distribution.Policy.S60'."
 
 
-    def assert_policy_file(self, filename, value=None, exception=False):
-        if exception:
+    def assert_policy_file(self, filename, value=None, excptn=False):
+        """assert policy file"""
+        if excptn:
             try:
                 fileutils.read_policy_content(filename)
                 assert "Should fail while loading '%s'." % filename
@@ -554,8 +559,10 @@ class FileScannerTest(unittest.TestCase):
                 pass
         else:
             assert fileutils.read_policy_content(filename) == value
-    def assert_symbian_policy_file(self, filename, value=None, exception=False):
-        if exception:
+
+    def assert_symbian_policy_file(self, filename, value=None, excptn=False):
+        """assert symbian policy file"""
+        if excptn:
             try:
                 fileutils.read_symbian_policy_content(filename)
                 assert "Should fail while loading '%s'." % filename
@@ -569,18 +576,18 @@ class FileScannerTest(unittest.TestCase):
 
         self.assert_policy_file(_testpath('s60/Distribution.Policy.S60'), value='0')
         self.assert_policy_file(_testpath('s60/component_private/Distribution.Policy.S60'), value='1')
-        self.assert_policy_file(_testpath('test_policies/1/Distribution.Policy.S60'), exception=True)
-        self.assert_policy_file(_testpath('test_policies/2/Distribution.Policy.S60'), exception=True)
-        self.assert_policy_file(_testpath('test_policies/3/Distribution.Policy.S60'), exception=True)
-        self.assert_policy_file(_testpath('test_policies/4/Distribution.Policy.S60'), exception=True)
-        self.assert_policy_file(_testpath('test_policies/5/Distribution.Policy.S60'), exception=True)
-        self.assert_policy_file(_testpath('test_policies/6/Distribution.Policy.S60'), exception=True)
+        self.assert_policy_file(_testpath('test_policies/1/Distribution.Policy.S60'), excptn=True)
+        self.assert_policy_file(_testpath('test_policies/2/Distribution.Policy.S60'), excptn=True)
+        self.assert_policy_file(_testpath('test_policies/3/Distribution.Policy.S60'), excptn=True)
+        self.assert_policy_file(_testpath('test_policies/4/Distribution.Policy.S60'), excptn=True)
+        self.assert_policy_file(_testpath('test_policies/5/Distribution.Policy.S60'), excptn=True)
+        self.assert_policy_file(_testpath('test_policies/6/Distribution.Policy.S60'), excptn=True)
 
     def test_read_policy_content_strict_focalid(self):
         """ Testing Focal ID support. """
         self.assert_policy_file(_testpath('test_policies/7/Distribution.Policy.S60'), value='08421A2')
-        self.assert_policy_file(_testpath('test_policies/8/Distribution.Policy.S60'), exception=True)
-        self.assert_policy_file(_testpath('test_policies/9/Distribution.Policy.S60'), exception=True)
+        self.assert_policy_file(_testpath('test_policies/8/Distribution.Policy.S60'), excptn=True)
+        self.assert_policy_file(_testpath('test_policies/9/Distribution.Policy.S60'), excptn=True)
 
     def test_read_symbian_policy_content_strict(self):
         """ Test symbian policy content using strict rules. """
@@ -589,15 +596,16 @@ class FileScannerTest(unittest.TestCase):
         self.assert_symbian_policy_file(_testpath('symbian/dir1/distribution.policy'), value='B')
         self.assert_symbian_policy_file(_testpath('symbian/dir2/distribution.policy'), value='C')
         self.assert_symbian_policy_file(_testpath('symbian/dir3/distribution.policy'), value='D')
-        self.assert_symbian_policy_file(_testpath('symbian/dir4/distribution.policy'), exception=True)
-        self.assert_symbian_policy_file(_testpath('symbian/dir5/distribution.policy'), exception=True)
+        self.assert_symbian_policy_file(_testpath('symbian/dir4/distribution.policy'), excptn=True)
+        self.assert_symbian_policy_file(_testpath('symbian/dir5/distribution.policy'), excptn=True)
 
 class TestLongPath(unittest.TestCase):
     """ Unit test case for testing long path strings """
-    long_path = os.path.join(root_test_dir, '01234567890123456789012345678901234567890123456789', 
+    long_path = os.path.join(_root_test_dir, '01234567890123456789012345678901234567890123456789', 
                      '01234567890123456789012345678901234567890123456789', '01234567890123456789012345678901234567890123456789',
                      '01234567890123456789012345678901234567890123456789', '01234567890123456789012345678901234567890123456789')
     def setUp(self):
+        """setup automatically called before running the tests"""
         self.mkdirs(os.path.join(self.long_path, r'dir1'))
         self.mkdirs(os.path.join(self.long_path, r'dir2'))
         if not '\\\\?\\' + os.path.abspath((os.path.join( self.long_path, r'foo.txt'))):
@@ -605,6 +613,7 @@ class TestLongPath(unittest.TestCase):
             win32file.CreateFileW('\\\\?\\' + os.path.abspath(os.path.join(self.long_path, r'foo.txt')), 0, 0, None, win32file.CREATE_NEW, 0, None)
 
     def mkdirs(self, path):
+        """create  folders"""
         if not os.path.isabs(path):
             path = os.path.join(os.path.abspath('.'), os.path.normpath(path))
         if not os.path.exists(os.path.dirname(path)):
@@ -612,10 +621,11 @@ class TestLongPath(unittest.TestCase):
         self.mkdir(path)
 
     def mkdir(self, path):
+        """create a folder"""
         if 'java' in sys.platform:
             import java.io
-            f = java.io.File(path)
-            if not f.exists():
+            f_file = java.io.File(path)
+            if not f_file.exists():
                 os.mkdir(path)
         elif not os.path.exists(path):
             if sys.platform == "win32":
@@ -628,15 +638,17 @@ class TestLongPath(unittest.TestCase):
                 os.mkdir(path)
 
     def test_rmtree_long_path(self):
-        fileutils.rmtree(root_test_dir)
+        """test remove tree with a long path name"""
+        fileutils.rmtree(_root_test_dir)
         assert not os.path.exists(self.long_path)
-        assert not os.path.exists(root_test_dir)
+        assert not os.path.exists(_root_test_dir)
 
     def test_rmtree_long_path_unc_format(self):
+        """test remove tree with long path name and UNC format"""
         if sys.platform == "win32":
-            fileutils.rmtree(u"\\\\?\\" + os.path.join(os.path.abspath('.'), root_test_dir))
+            fileutils.rmtree(u"\\\\?\\" + os.path.join(os.path.abspath('.'), _root_test_dir))
             assert not os.path.exists(self.long_path)
-            assert not os.path.exists(root_test_dir)
+            assert not os.path.exists(_root_test_dir)
         
 class DestInSrcTest(unittest.TestCase):
     """ Unit test case to test fileutils.destinsrc """
@@ -667,3 +679,19 @@ class DestInSrcTest(unittest.TestCase):
             src = r"Z:/a/b/CC"
             dst = r"Z:/a/b/c/d"
             assert fileutils.destinsrc(src, dst) is False
+
+
+class WhichTest(unittest.TestCase):
+    """ Testing the which implementation. """
+
+    def test_existing_file(self):
+        """ Test an existing executable is found (cmd on windows, bash on other os) """
+        if os.sep == '\\':
+            assert fileutils.which("cmd") != None
+        else:
+            assert fileutils.which("bash") != None
+
+    def test_non_existing_file(self):
+        """ Test a non existing executable is not found """
+        assert fileutils.which("foobar_app") == None
+

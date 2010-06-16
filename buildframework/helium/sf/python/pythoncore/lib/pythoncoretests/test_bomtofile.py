@@ -16,6 +16,9 @@
 #
 #Description:
 #===============================================================================
+""" test BOM to file"""
+
+# pylint: disable-msg=R0201
 
 import tempfile
 from shutil import rmtree
@@ -94,5 +97,6 @@ class _emulateSession():
     def __init__(self, baseline):
         self.baseline = baseline
 
-    def create(self, project):
+    def create(self, _):
+        """create"""
         return _emulateProject(self.baseline)

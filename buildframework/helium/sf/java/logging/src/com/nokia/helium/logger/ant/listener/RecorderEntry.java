@@ -333,14 +333,14 @@ public class RecorderEntry implements BuildEventHandler, TargetEventHandler, Tas
      * Registering ourselves to the StatusAndLogListener.
      */
     public void register() {
-        StatusAndLogListener l = StatusAndLogListener.getStatusAndLogListener();
-        if (l != null) {
+        StatusAndLogListener listener = StatusAndLogListener.getStatusAndLogListener();
+        if (listener != null) {
             this.log.debug("register");
-            synchronized (l) {
-                l.register((BuildEventHandler)this);
-                l.register((TargetEventHandler)this);
-                l.register((TaskEventHandler)this);
-                l.register((MessageEventHandler)this);
+            synchronized (listener) {
+                listener.register((BuildEventHandler)this);
+                listener.register((TargetEventHandler)this);
+                listener.register((TaskEventHandler)this);
+                listener.register((MessageEventHandler)this);
             }
         }
     }
@@ -349,14 +349,14 @@ public class RecorderEntry implements BuildEventHandler, TargetEventHandler, Tas
      * Unregistering ourselves from the StatusAndLogListener.
      */
     public void unregister() {
-        StatusAndLogListener l = StatusAndLogListener.getStatusAndLogListener();
-        if (l != null) {
+        StatusAndLogListener listener = StatusAndLogListener.getStatusAndLogListener();
+        if (listener != null) {
             this.log.debug("unregister");
-            synchronized (l) {
-                l.remove((MessageEventHandler)this);
-                l.remove((TaskEventHandler)this);
-                l.remove((TargetEventHandler)this);
-                l.remove((BuildEventHandler)this);
+            synchronized (listener) {
+                listener.remove((MessageEventHandler)this);
+                listener.remove((TaskEventHandler)this);
+                listener.remove((TargetEventHandler)this);
+                listener.remove((BuildEventHandler)this);
             }
         }
     }

@@ -93,19 +93,19 @@ public class MetaDataRegexTestCondition extends ProjectComponent implements Cond
      * @return true if the string is matched with any of the pattern in the given priority, false otherwise.
      */
     public boolean eval() {
-      if (this.severity == null || (this.severity != null && this.severity.trim().isEmpty()))
-          throw new BuildException("'severity' attribute is not defined");
-      if (this.string == null || (this.string != null && this.string.isEmpty()))
-          throw new BuildException("'string' attribute is not defined");
-      for (MetaDataFilterSet set : filterSets) {
-          for (MetaDataFilter filter : set.getAllFilters()) {
-              Pattern p = filter.getPattern();
-              Matcher m = p.matcher(this.string);
-              if (m.matches()) {
-                  return this.severity.equalsIgnoreCase(filter.getPriority());
-              }
-          }
-      }
-      return false;
+        if (this.severity == null || (this.severity != null && this.severity.trim().isEmpty()))
+            throw new BuildException("'severity' attribute is not defined");
+        if (this.string == null || (this.string != null && this.string.isEmpty()))
+            throw new BuildException("'string' attribute is not defined");
+        for (MetaDataFilterSet set : filterSets) {
+            for (MetaDataFilter filter : set.getAllFilters()) {
+                Pattern pattern = filter.getPattern();
+                Matcher matcher = pattern.matcher(this.string);
+                if (matcher.matches()) {
+                    return this.severity.equalsIgnoreCase(filter.getPriority());
+                }
+            }
+        }
+        return false;
     }
 }

@@ -1,16 +1,20 @@
+
+.. index::
+  module: Configuring Signaling
+  
 =====================
 Configuring Signaling
 =====================
 
 Helium signaling framework offers you a simplest way to control 
-failures on build flow, and provides you an easy way to get reporting on
+failures on build flow, and provides you with an easy way to get reporting on
 some crucial steps of your build.
 
 
 The configuration
 -----------------
 
-The signaling configuration is divided on three parts:
+The signaling configuration is divided into three parts:
 
    * the signalListenerConfig: defines the signal
    * the signalInput: defines what to do when a signal is raised
@@ -37,9 +41,9 @@ so the signaling framework knows how to behave when a signal is raised.
         </hlm:targetCondition>
     </hlm:signalListenerConfig>
  
-A signal will then be triggered each time the **target-name** completed. The signalInput will then defined how it should be handled.
+A signal will then be triggered each time the **target-name** completed. The signalInput will then define how it should be handled.
 
-Other way to trigger a signal is by using the signal task:
+Another way to trigger a signal is by using the signal task:
  
 .. code-block:: xml
 
@@ -71,13 +75,13 @@ Example of configurations
         <hlm:notifierListRef refid="customNotifier" />
     </hlm:signalInput>
   
-This will run all notifier from the customNotifier configuration then fail the build.
+This will run all notifiers from the customNotifier configuration then fail the build.
 
 .. code-block:: xml
 
     <hlm:signalInput id="customSignalInput" failbuild="defer"/>
 
-This will defer the failure at the end of the build, no notifier will be run.
+This will defer the failure to the end of the build, no notifier will be run.
 
 notifierList
 ............
@@ -111,7 +115,7 @@ In this example we will configure the compileSignal to behave this way:
    * send an email to additional users e.g: user@foo.com, user@bar.com
    * defer the build failure.
 
-You configuration should contains (e.g build.xml)
+Your configuration should contain (e.g build.xml)
 
 .. code-block:: xml
 
@@ -138,17 +142,17 @@ You configuration should contains (e.g build.xml)
 
    
 A custom notifierList has been created with **myCustomNotifierList** as reference ID. It defines
-a emailNotifier which uses the default email template under Helium (${helium.dir}/tools/common/templates/log/email_new.html.ftl).
-It also set the title of you email to be "[signal] My build goes wrong: ${signal.name}" (signal.name property will be replace by the signal name raised).
-**notifyWhen** attribute will make the notifier to send a notification only on build failure.
+an emailNotifier which uses the default email template under Helium (${helium.dir}/tools/common/templates/log/email_new.html.ftl).
+It also sets the title of your email to be "[signal] My build goes wrong: ${signal.name}" (signal.name property will be replaced by the signal name raised).
+**notifyWhen** attribute will make the notifier send a notification only on build failure.
 Finally the two additional email addresses will be set using the **additionalrecipients** attribute. 
 
-We then need to link the signal configuration and our custom the notifier list. The signalInput element is use to achieve that. 
-It must be defined using the same reference ID (see reference overriding howto) as the one in the Helium configuration, the naming convention for this is: **<signal_name>Input**.
+We then need to link the signal configuration and our custom  signal to the notifier list, the signalInput element is used to achieve this. 
+It must be defined using the same reference ID (see reference overriding how to) as the one in the Helium configuration, the naming convention for this is: **<signal_name>Input**.
 Its **failbuild** attribute is set to **defer** which will configure the build to keepgoing, and fail at the end of the build flow.
 Finally an embedded notifierListRef element will reference our custom notifier list: **myCustomNotifierList**.
 
-While failing the signaling framework will execute all notifier defined and then store internally the build failure so it can raise it again at the end of the execution.
+While failing the signaling framework will execute all notifiers defined and then store internally the build failure so it can raise it again at the end of the execution.
     
 
 Example: Report specific errors not included by default

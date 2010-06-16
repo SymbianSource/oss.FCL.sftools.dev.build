@@ -72,7 +72,11 @@ Description:
         <!-- See http://checkstyle.sf.net/config_naming.html -->
         <module name="ConstantName"/>
         <module name="LocalFinalVariableName"/>
-        <module name="LocalVariableName"/>
+        <module name="LocalVariableName">
+            <property name="format" value="^[ij]$|^[a-z][a-zA-Z0-9]+$"/>
+            <property name="tokens" value="VARIABLE_DEF"/>
+            <property name="severity" value="warning"/>
+        </module>
         <module name="MemberName"/>
         <module name="MethodName"/>
         <module name="PackageName"/>
@@ -189,6 +193,13 @@ Description:
         <module name="SuperFinalize"/>
         
         <module name="IllegalCatch"/>
+        
+        <module name="MethodParamPad">
+            <property name="severity" value="warning"/>
+        </module>
+        <module name="Indentation">
+            <property name="severity" value="warning"/>
+        </module>
     </module>
 
 </module>

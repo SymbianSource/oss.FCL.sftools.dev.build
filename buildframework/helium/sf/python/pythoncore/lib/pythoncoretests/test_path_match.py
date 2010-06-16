@@ -23,7 +23,7 @@ import pathaddition.match
 
 
 def test_path_match_ant_match():
-    # Matching stuff
+    """ Matching stuff"""
     assert pathaddition.match.ant_match(r"CVS/Repository", r"**/CVS/*") == True
     assert pathaddition.match.ant_match(r"org/apache/CVS/Entries", r"**/CVS/*") == True
     assert pathaddition.match.ant_match(r"org/apache/jakarta/tools/ant/CVS/Entries", r"**/CVS/*") == True

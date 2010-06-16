@@ -23,15 +23,14 @@ Description:
 <project name="helium-antlib-internaldata-hlmassertmessage-unittest" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
     <description>Helium Antlib internal unittests.</description>
     <taskdef resource="com/nokia/helium/internaldata/ant/antlib.xml" uri="http://www.nokia.com/helium"/>
-    <taskdef name="hlmassertmessage" classname="com.nokia.helium.internaldata.ant.taskdefs.HlmAssertMessage"/>
     <target name="test-hlmAssertMessage-case-no-args">
         <au:expectfailure expectedmessage="'assertName' attribute is not defined">
-            <hlmassertmessage/>
+            <hlm:hlmassertmessage/>
         </au:expectfailure>
     </target>
     <target name="test-hlmAssertMessage-case-assert-name-set">
         <au:expectfailure expectedmessage="'message' attribute is not defined">
-            <hlmassertmessage assertName="test"/>
+            <hlm:hlmassertmessage assertName="test"/>
         </au:expectfailure>
     </target>
 </project>

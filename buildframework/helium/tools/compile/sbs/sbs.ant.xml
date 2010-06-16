@@ -39,10 +39,26 @@ Description:
      @scope public
      -->
     
-    <!-- skip sbs layer filtering (true) for new schema and false for schema 1.4.0
-    @type boolean
+    <!--* @property schema.new
+     This property enables sbs compilation based on system definition schema 3.0.0. 
+     @type boolean
+     @scope public
+     -->
+    
+    <!-- This property enables sbs layer filtering of the canonical system definition file 
+         for system definition schema 1.4.0 using ${sysdef.configuration}. 
+     @type boolean
     -->
-    <property name="skip.sbs.layer.generation" value="false" />
+    <property name="sbs.layer.generation.enabled" value="true" />
+
+    <!-- Default CTC command line option, override it to customize it. -->
+    <hlm:argSet id="ctc.build.options" />
+
+    <!-- This property define what instrumentation CTC should create.
+    @type string
+    -->
+    <property name="ctc.instrument.type" value="m" />
+    
     
     <!-- This target filters the canonical system definition file compare to the "raptor_${sysdef.configuration}" filter. -->
     <macrodef name="generate-layers" uri="http://www.nokia.com/helium">
@@ -50,8 +66,18 @@ Description:
             <echo message="canno-file:${canonical.sysdef.file}" />
             <echo message="raptor-filters:raptor_${sysdef.configuration}" />
             <if>
-                <istrue value="${skip.sbs.layer.generation}" />
+                <isfalse value="${sbs.layer.generation.enabled}" />
                 <then>
+                    <if>
+                        <isreference refid="sysdef.layers.${sysdef.configuration}" />
+                        <then>
+                            <property name="sbs.patternset" value="sysdef.filters.${sysdef.configuration}" />
+                            <echo message="sbs.patternset: ${sbs.patternset}" />
+                        </then>
+                        <else>
+                            <echo message="The sysdef.layers.${sysdef.configuration} pattern set is not defined." />
+                        </else>
+                    </if>
                     <copy file="${canonical.sysdef.file}" tofile="${build.drive}/output/build/canonical_system_definition_${sysdef.configuration}_temp.xml"/>
                 </then>
                 <else>
@@ -100,15 +126,26 @@ Description:
                                 <echo message="sbs.patternset: ${sbs.patternset}" />
                             </then>
                             <else>
-                                <echo message="The sysdef.${sysdef.configuration} patternset is not defined." />
+                                <echo message="The sysdef.filters.${sysdef.configuration} patternset is not defined." />
                             </else>
                         </if>
                     </then>
                     <else>
-                        <hlm:generate-layers />
+                        <var name="sbs.patternset" unset="true"/>
+                        <if>
+                            <isreference refid="sysdef.layers.${sysdef.configuration}" />
+                            <then>
+                                <property name="sbs.patternset" value="sysdef.filters.${sysdef.configuration}" />
+                                <echo message="sbs.patternset: ${sbs.patternset}" />
+                                <copy file="${canonical.sysdef.file}" tofile="${build.drive}/output/build/canonical_system_definition_${sysdef.configuration}.xml" />
+                            </then>
+                            <else>
+                                <echo message="The sysdef.layers.${sysdef.configuration} patternset is not defined." />
+                                <hlm:generate-layers />
+                            </else>
+                        </if>
                     </else>
-                </if>
-                <var name="sbs.internal.inputs.list" value="" unset="true"/>
+                </if>              
                 <hlm:getsbsinputs config="sbs.${sysdef.configuration}" outputProperty="sbs.internal.inputs.list"/>
                 <for list="${sbs.internal.inputs.list}" delimiter="," param="sbs.input">
                     <sequential>
@@ -153,7 +190,10 @@ Description:
                                                     errorOutput="${sbs.log.file}.sbs_error.log" 
                                                     workingDir="${build.drive}/" 
                                                     failOnError="false" 
-                                                    outputLog="${sbs.log.file}" />                                
+                                                    outputLog="${sbs.log.file}"
+                                                    instrumentType="${ctc.instrument.type}">
+                                        <hlm:CTCOptions refid="ctc.build.options" />
+                                    </hlm:ctctask>
                                 </then>
                             </elseif>
                             <else>
@@ -191,7 +231,7 @@ Description:
             <hlm:metadatarecord database="${metadata.dbfile}">
                 <hlm:textmetadatainput>
                     <fileset casesensitive="false" file="@{sbs.error.output.file}"/>
-                    <metadatafilterset refid="filterset.sbs" />
+                    <metadatafilterset refid="filterset.sbs.cli" />
                 </hlm:textmetadatainput>
             </hlm:metadatarecord>
             <basename property="base.sbs.ant.output.log" file="@{sbs.ant.output.file}" />

@@ -32,7 +32,7 @@ if exist "%HELIUM_HOME%\runtime\runtime_env.bat" (
 call %HELIUM_HOME%\runtime\runtime_env.bat
 ) 
 
-if not exist "%HELIUM_HOME%\extensions\nokia\distribution.policy.S60" ( 
+if not exist "%HELIUM_HOME%\extensions\nokia\build.xml" ( 
 set HLM_SUBCON=1
 set HLM_DISABLE_INTERNAL_DATA=1
 )
@@ -52,7 +52,9 @@ perl "%HELIUM_HOME%\tools\common\bin\getppid.pl" > %TEMP%\%USERNAME%pid.txt
 set /p PID=< %TEMP%\%USERNAME%pid.txt
 
 REM Configure Apache Ant
-set TESTED_ANT=C:\APPS\ant_1.7
+if not defined TESTED_ANT (
+  set TESTED_ANT=C:\APPS\ant_1.7
+)
 if exist "%TESTED_ANT%" (set ANT_HOME=%TESTED_ANT%)
 if not exist "%ANT_HOME%" ( echo *** Ant cannot be found & goto :errorstop )
 if not defined ANT_OPTS (
@@ -117,12 +119,14 @@ call "C:\APPS\rvct%HLM_RVCT_VERSION%\rvctcmdprompt.bat" > nul
 TITLE Helium
 
 if not exist "%HELIUM_HOME%\external\antlibs2\helium-checktools-1.0.jar" (
-echo *** Error: Please build helium from builder dir run "bld && bld get-deps -Dconfig=sf or nokia"
+echo *** Error: Please build helium from nokia_builder or builder dir run "bld && bld get-deps"
 goto errorstop
 )
 
 call "%JAVA_HOME%\bin\java" -cp "%HELIUM_HOME%\external\antlibs2\helium-checktools-1.0.jar" com.nokia.helium.checktools.HeliumToolsCheckerMain -config "%HELIUM_HOME%\config\helium.basic.tools.config"
+if not defined HLM_DISABLE_TOOL_CHECK (
 if "%ERRORLEVEL%" neq "0" (goto errorstop)
+)
 
 REM Call the Helium generated batch file if it exists
 REM This must match with the cache.dir property in helium.ant.xml

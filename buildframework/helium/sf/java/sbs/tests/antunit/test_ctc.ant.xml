@@ -1,0 +1,83 @@
+<?xml version="1.0"?>
+<!-- 
+============================================================================ 
+Name        : test_ctc.ant.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+
+<project name="test-sbs-ctc" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>Helium Antlib ctc-sbs unittests.</description>
+
+    <taskdef resource="com/nokia/helium/core/ant/antlib.xml" uri="http://www.nokia.com/helium"/>
+    <taskdef resource="com/nokia/helium/sbs/ant/antlib.xml" uri="http://www.nokia.com/helium"/>
+    
+    <property name="build.system" value="sbs" />
+
+    <import file="sbs_default_config.ant.xml" />
+
+    <target name="test-ctc">
+        <property name="build.system" value="sbs" />
+        <hlm:getsbsinputs config="pf_7952" outputProperty="sbs-inputs"/>
+        <hlm:ctctask outputLog="tmp" sbsinput="${sbs-inputs}" sysdefFile="../data/test.sysdef.xml" 
+            layerPatternSetRef="includeNoNameLayerPatternSet" workingDir="${working.dir}"
+            execute="false"/>
+        <au:assertLogContains text="-i m sbs" />
+    </target>
+    
+    <target name="test-ctc-custom-config">
+        <property name="build.system" value="sbs" />
+        <hlm:getsbsinputs config="pf_7952" outputProperty="sbs-inputs"/>
+        <hlm:ctctask outputLog="tmp" sbsinput="${sbs-inputs}" sysdefFile="../data/test.sysdef.xml" 
+            layerPatternSetRef="includeNoNameLayerPatternSet" workingDir="${working.dir}"
+            execute="false">
+            <CTCOptions>
+                <arg line="-C OPT_ADD_COMPILE+-DCTC_NO_START_CTCMAN" />
+            </CTCOptions>
+        </hlm:ctctask>
+        <au:assertLogContains text="-i m  -C OPT_ADD_COMPILE+-DCTC_NO_START_CTCMAN sbs" />
+    </target>
+
+    <hlm:argSet id="ctc.extra.params">
+        <arg line="-C OPT_ADD_COMPILE+-DCTC_NO_START_CTCMAN" />
+    </hlm:argSet>
+
+    <target name="test-ctc-custom-ref-config">
+        <property name="build.system" value="sbs" />
+        <hlm:getsbsinputs config="pf_7952" outputProperty="sbs-inputs"/>
+        <hlm:ctctask outputLog="tmp" sbsinput="${sbs-inputs}" sysdefFile="../data/test.sysdef.xml" 
+            layerPatternSetRef="includeNoNameLayerPatternSet" workingDir="${working.dir}"
+            execute="false">
+            <CTCOptions refid="ctc.extra.params" />
+        </hlm:ctctask>
+        <au:assertLogContains text="-i m  -C OPT_ADD_COMPILE+-DCTC_NO_START_CTCMAN sbs" />
+    </target>
+
+
+    <target name="test-ctc-custom-ref-config-instrumentType">
+        <property name="build.system" value="sbs" />
+        <hlm:getsbsinputs config="pf_7952" outputProperty="sbs-inputs"/>
+        <hlm:ctctask outputLog="tmp" sbsinput="${sbs-inputs}" sysdefFile="../data/test.sysdef.xml" 
+            layerPatternSetRef="includeNoNameLayerPatternSet" workingDir="${working.dir}"
+            execute="false"
+            instrumentType="i">
+            <CTCOptions refid="ctc.extra.params" />
+        </hlm:ctctask>
+        <au:assertLogContains text="-i i  -C OPT_ADD_COMPILE+-DCTC_NO_START_CTCMAN sbs" />
+    </target>
+</project>

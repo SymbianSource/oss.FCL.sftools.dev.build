@@ -27,7 +27,7 @@ class CommentParserTest(unittest.TestCase):
     """ Test cases for Comments.py. """
     
     def setUp(self):
-        # Initialize the sample files into two Comment Parsers.
+        """ Initialize the sample files into two Comment Parsers."""
         self.parser1 = comments.CommentParser( [os.environ['TEST_DATA'] + '/data/comments_test.txt'], 'branchInfo' )
         self.parser2 = comments.CommentParser( [os.environ['TEST_DATA'] + '/data/comments_test.cpp', os.environ['TEST_DATA'] + '/data/comments_test.bat',
                                                 os.environ['TEST_DATA'] + '/data/comments_test.h', os.environ['TEST_DATA'] + '/data/comments_test.hrh',
@@ -40,9 +40,8 @@ class CommentParserTest(unittest.TestCase):
      
         
 
-    """ Unit test for method scan() in comments.py. It also tested scan_content by using scan()
-    """
     def test_scan(self):
+        """ Unit test for method scan() in comments.py. It also tested scan_content by using scan()"""
         #doc1 for only one txt file. 
         doc1 = amara.parse(self.parser1.scan().xml())
         #doc2 for all other 14 types of files. It also included two types of cmd files.

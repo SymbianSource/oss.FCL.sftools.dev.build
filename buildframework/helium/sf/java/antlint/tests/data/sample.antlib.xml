@@ -31,11 +31,7 @@ Description:
         </sequential>
     </macrodef>
     
-    <macrodef name="pow" uri="http://www.nokia.com/helium">
-        <sequential>
-            <echo>pow</echo>
-        </sequential>
-    </macrodef>
+    
     
     <scriptdef  name="check-prop-in-scriptdef" language="jython">
 result = None
@@ -44,6 +40,12 @@ if project.getProperty("test.scriptdef.property")is not None:
     </scriptdef>    
     
     <scriptdef name="check-scriptdef" language="jython">
+        <attribute name="attr0"/>
+        <attribute name="attr2"/>
+target = str(attributes.get('attr0'))    
+    </scriptdef>
+    
+    <scriptdef name="check-scriptdef-beanshell" language="beanshell">
         <attribute name="attr0"/>
         <attribute name="attr2"/>
 target = str(attributes.get('attr0'))    
@@ -65,6 +67,10 @@ if ${build.drive} is None:
     </scriptdef>
     
     <scriptdef name="check-scriptdef-attributes" language="jython">
+target = str(attributes.get('target'))    
+    </scriptdef>
+    
+    <scriptdef name="check-scriptdef-attributes" language="beanshell">
 target = str(attributes.get('target'))    
     </scriptdef>
 </antlib>

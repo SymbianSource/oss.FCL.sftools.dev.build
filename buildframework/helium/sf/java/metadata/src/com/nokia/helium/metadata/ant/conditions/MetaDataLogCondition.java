@@ -105,14 +105,17 @@ public class MetaDataLogCondition extends DataType implements Condition {
         // log file under the DB is always represented with / and not \.
         String logname = logFile.replace('\\', '/'); 
         String query = "select Count(m.id) from MetadataEntry m JOIN  m.logFile as l JOIN m.priority as p where l.path like '%" + logname + "' and UPPER(p.priority)='" + severity.toUpperCase() + "'";
-        Number number = (Number) (new ORMReader(fileName.getAbsolutePath())).executeSingleResult(query, null);
+        ORMReader reader = new ORMReader(fileName.getAbsolutePath());
+        Number number = (Number)reader.executeSingleResult(query, null);
+        int retValue = number.intValue();
         // Looking for missing file as error
         if (countMissing && prty == Metadata.PriorityEnum.ERROR) {
             String queryMissing = "select Count(m.id) from WhatLogEntry m JOIN m.component as c JOIN c.logFile as l where l.path like '%" + logname + "' and m.missing=1";
-            Number numberMissing = (Number) (new ORMReader(fileName.getAbsolutePath())).executeSingleResult(queryMissing, null);
-            return number.intValue() + numberMissing.intValue();
+            Number numberMissing = (Number) reader.executeSingleResult(queryMissing, null);
+            retValue = number.intValue() + numberMissing.intValue();
         }
-        return number.intValue();
+        reader.close();
+        return retValue;
     }
 
     /**

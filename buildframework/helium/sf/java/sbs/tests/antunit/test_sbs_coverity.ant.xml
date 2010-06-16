@@ -26,7 +26,7 @@ Description:
 
     <taskdef resource="com/nokia/helium/core/ant/antlib.xml" uri="http://www.nokia.com/helium"/>
     <taskdef resource="com/nokia/helium/sbs/ant/antlib.xml" uri="http://www.nokia.com/helium"/>
-    <taskdef name="getVariableValue" classname="com.nokia.helium.core.ant.taskdefs.GetValueFromVariableSet"/>
+    <taskdef name="getVariableValue" classname="com.nokia.helium.core.ant.taskdefs.GetValueFromVariableSetTask"/>
     <dirname property="test.sbs.dir" file="${ant.file.test-sbs-input}"/>
     <property name="working.dir" value="${test.sbs.dir}" />
     
@@ -50,7 +50,7 @@ Description:
             workingDir="${working.dir}" execute="false">
             <hlm:coverityoptions refid="coverity.build.options"/>
         </hlm:coveritybuild>
-        <au:assertLogContains text="--auto-diff  --record-only"/>
+        <au:assertLogContains text="--auto-diff  --preprocess-first  --record-only"/>
         <au:assertLogContains text="cov-build"/>
         <au:assertLogContains text="-c armv5"/>
     </target>
@@ -82,7 +82,7 @@ Description:
             workingDir="${working.dir}" execute="false">
             <hlm:coverityoptions refid="coverity.build.options"/>
         </hlm:coveritybuild>
-        <au:assertLogContains text="--auto-diff  --record-only"/>
+        <au:assertLogContains text="--auto-diff  --preprocess-first  --record-only"/>
         <au:assertLogContains text="cov-build"/>
         <au:assertLogContains text="-c armv5"/>
     </target>
@@ -96,11 +96,29 @@ Description:
         </hlm:coveritybuild>
         <au:assertLogContains text="cov-build"/>
         <au:assertLogContains text="-c armv5"/>
-        <au:assertLogContains text="--auto-diff  --record-only"/>
+        <au:assertLogContains text="--auto-diff  --preprocess-first  --record-only"/>
         <au:assertLogDoesntContain text="-e emake"/>
         <au:assertLogDoesntContain text="--mo=--emake-annodetail=basic,history,waiting"/>
          
     </target>
 
+    <target name="test-coverity-sbs-ec-several-disable">
+        <property name="build.system" value="sbs-ec" />
+        <hlm:getsbsinputs config="pf_7952" outputProperty="sbs-inputs"/>
+        <hlm:coveritybuild outputLog="tmp" sbsinput="${sbs-inputs}" sysdefFile="test.sysdef.xml" 
+            workingDir="${working.dir}" execute="false">
+            <hlm:coverityoptions refid="coverity.build.options"/>
+            <hlm:coverityoptions>
+                <arg name="--disable" value="foo" />
+                <arg name="--disable" value="bar" />
+            </hlm:coverityoptions>
+        </hlm:coveritybuild>
+        <au:assertLogContains text="cov-build"/>
+        <au:assertLogContains text="-c armv5"/>
+        <au:assertLogContains text="--auto-diff  --preprocess-first  --record-only"/>
+        <au:assertLogContains text="--disable foo --disable bar"/>
+        <au:assertLogDoesntContain text="-e emake"/>
+        <au:assertLogDoesntContain text="--mo=--emake-annodetail=basic,history,waiting"/>
+    </target>
 
 </project>

@@ -59,6 +59,11 @@ Description:
     @type string
     -->
     <property name="ido.codescanner.output.dir" location="${build.output.dir}/${build.id}_codescanner"/>
+
+    <!-- Defines the location of CMT++ output and the input for the diamonds creation target.
+    @type string
+    -->
+    <property name="ido.cmt.html.output.dir" location="${build.log.dir}/${build.id}_cmt"/>
     
     <!-- Internal target that generates the '''ado.mapping.file'''.
      It is a INI file that contains ADO location as a key and target location as value.
@@ -359,8 +364,34 @@ project.addReference('substed.ado.src.path', path)
             </data>
         </fmpp>
         <ant antfile="${temp.build.dir}/ido-cmt.ant.xml"/>
+        <runtarget target="cmt-generate-diamond-summary" />
     </target>
 
+        <!-- CMT Tool target. Once the CMT tool has been run this scans the results file and puts the
+        results into a .XML file in the diamonds folder ready for transmission to diamonds. 
+        The target uses the ido-cmt-summary-ant.xml.ftl file to create a file called ido-cmt-summary.ant.xml
+        which contains 1 new target for each of the input folders found under the build area. Then the 
+        ido-cmt-summary.ant.xml file is called as an ant file and the targets executed. Each target runs
+        the file scanner looking for CMT summary information which it extracts and writes to an 
+        XML file in the diamonds folder.
+        -->
+    <target name="cmt-generate-diamond-summary" if="enable.cmt">
+        <!--use the header.ftl template file to create the init part of the output file
+        that can be copied to the final output file by the java class-->
+        <property name="temp.diamonds.header.xml" location="${env.TEMP}/diamonds_header.xml" />
+        <fmpp sourcefile="${helium.dir}/tools/common/templates/diamonds/diamonds_header.ftl" 
+              outputfile="${temp.diamonds.header.xml}" quiet="true"/>
+        <property name="temp.diamonds.footer.xml" location="${env.TEMP}/diamonds_footer.xml" />
+        <fmpp sourcefile="${helium.dir}/tools/common/templates/diamonds/diamonds_footer.ftl" 
+              outputfile="${temp.diamonds.footer.xml}" quiet="true"/>
+        
+        <hlm:cmtsummarytask diamondsHeaderFileName="${temp.diamonds.header.xml}" diamondsFooterFileName="${temp.diamonds.footer.xml}"
+            outputFile="${diamonds.build.output.dir}/cmt_summary.xml"
+            inputFile="${ido.cmt.html.output.dir}/CMTHTML/index.html" />
+        <delete file="${temp.diamonds.header.xml}" failonerror="false" />
+        <delete file="${temp.diamonds.footer.xml}" failonerror="false" />
+        
+    </target>
 
     <!-- Internal target that generates a temporary file that allow the 
     either export of iby or either key*.xls. The generated Ant build file

@@ -68,20 +68,20 @@ Description:
         <echo message="invalid configuration4" />
     </target>
 
-    <target name="target-invalid-config5">
-        <echo message="invalid configuration5" />
+    <target name="target-empty-notifier-list-config5">
+        <echo message="Empty signal list is a valid configuration5" />
     </target>
 
-    <target name="target-invalid-config6">
-        <echo message="invalid configuration6" />
+    <target name="target-valid-config6">
+        <echo message="Empty signal list is a valid configuration6" />
     </target>
 
-    <target name="target-invalid-config7">
-        <echo message="invalid configuration7" />
+    <target name="target-valid-config7">
+        <echo message="Empty signal list is a valid configuration7" />
     </target>
 
-    <target name="target-invalid-config8">
-        <echo message="invalid configuration8" />
+    <target name="target-valid-config8">
+        <echo message="Empty signal list is a valid configuration8" />
     </target>
 
     <target name="target-invalid-config9">

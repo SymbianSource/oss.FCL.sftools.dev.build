@@ -39,5 +39,6 @@ Description:
       <dependency org="jinja" name="Jinja2" rev="latest.integration" conf="default" />
       <dependency org="threadpool" name="threadpool" rev="latest.integration" conf="default" />
       <dependency org="dom4j" name="dom4j" rev="latest.integration" conf="default" />
+      <dependency org="setuptools" name="setuptools" rev="0.6+" conf="default" />
   </dependencies>
 </ivy-module>

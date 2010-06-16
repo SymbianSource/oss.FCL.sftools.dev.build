@@ -21,5 +21,8 @@ Description:
 ============================================================================
 -->
 <project name="">
+    <description>
+        Testing for invalid file name
+    </description>
 
 </project>

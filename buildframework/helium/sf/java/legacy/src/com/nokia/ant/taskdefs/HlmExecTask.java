@@ -38,28 +38,28 @@ public class HlmExecTask extends ExecTask
       */
     public void execute()
     {
-        String p = getProject().getProperty("number.of.threads");
-        if (p != null)
+        String property = getProject().getProperty("number.of.threads");
+        if (property != null)
         {
-            ((ThreadPoolExecutor)threadPool).setCorePoolSize(Integer.parseInt(p));
-            ((ThreadPoolExecutor)threadPool).setMaximumPoolSize(Integer.parseInt(p));
+            ((ThreadPoolExecutor)threadPool).setCorePoolSize(Integer.parseInt(property));
+            ((ThreadPoolExecutor)threadPool).setMaximumPoolSize(Integer.parseInt(property));
         }
-        TaskRunnable tr = new TaskRunnable();
-        threadPool.submit(tr);
+        TaskRunnable taskRunnable = new TaskRunnable();
+        threadPool.submit(taskRunnable);
         try {
             synchronized (semaphore) {
-                while (!tr.isFinished())
+                while (!taskRunnable.isFinished())
                     semaphore.wait();
             }
         } catch (InterruptedException e) { e.printStackTrace(); }
           
-        Throwable t = tr.getException();
-        if (t != null)
+        Throwable exception = taskRunnable.getException();
+        if (exception != null)
         {
-            if (t instanceof BuildException)
-                throw (BuildException)t;
+            if (exception instanceof BuildException)
+                throw (BuildException)exception;
             else
-                t.printStackTrace();
+                exception.printStackTrace();
         }
     }
     

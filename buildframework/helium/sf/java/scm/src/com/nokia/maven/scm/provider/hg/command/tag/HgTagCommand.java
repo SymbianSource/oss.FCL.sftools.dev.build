@@ -125,8 +125,8 @@ public class HgTagCommand extends AbstractTagCommand implements Command {
         StringBuffer result = new StringBuffer();
         int i = 0;
         for (String cmd : cmds) {
-            String s = cmd;
-            result.append(s);
+            String cmdStr = cmd;
+            result.append(cmdStr);
             if (i < cmds.length - 1) {
                 result.append(" ");
             }

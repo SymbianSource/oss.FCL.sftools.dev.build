@@ -30,14 +30,15 @@ logging.basicConfig(level=logging.INFO)
 
 
 # Platform
-windows = False
+_windows = False
 if sys.platform == "win32":
     import win32process
     import win32con
     import win32api
-    windows = True
+    _windows = True
 
 def main():
+    """main method """
     cmdarg = False
     cmdline = []
     timeout = None
@@ -64,36 +65,36 @@ def main():
             finish = time.time() + timeout
             timedout = False
             shell = True
-            if windows:
+            if _windows:
                 shell = False
-            p = subprocess.Popen(' '.join(cmdline), stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=shell)
-            while (p.poll() == None):
+            p_file = subprocess.Popen(' '.join(cmdline), stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=shell)
+            while (p_file.poll() == None):
                 if time.time() > finish:
                     timedout = True
                     break
                 time.sleep(1)
             if timedout:
                 print "ERROR: Application has timed out (timeout=%s)." % timeout
-                if windows:
+                if _windows:
                     try:
                         print "ERROR: Trying to kill the process..."
-                        handle = win32api.OpenProcess(True, win32con.PROCESS_TERMINATE, p.pid)
+                        handle = win32api.OpenProcess(True, win32con.PROCESS_TERMINATE, p_file.pid)
                         win32process.TerminateProcess(handle, -1)
                         print "ERROR: Process killed..."
                     except Exception, exc:
                         print "ERROR: %s" % exc
                 else:
                     # pylint: disable-msg=E1101
-                    os.kill(p.pid, 9)
+                    os.kill(p_file.pid, 9)
                 print "ERROR: exiting..."
                 raise Exception("Timeout exception.")
             else:
-                print p.communicate()[0]
-                sys.exit(p.returncode)
+                print p_file.communicate()[0]
+                sys.exit(p_file.returncode)
         else:
-            p = subprocess.Popen(' '.join(cmdline), stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
-            print p.communicate()[0]
-            sys.exit(p.returncode)
+            p_file = subprocess.Popen(' '.join(cmdline), stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
+            print p_file.communicate()[0]
+            sys.exit(p_file.returncode)
 
 if __name__ == '__main__':
     main()

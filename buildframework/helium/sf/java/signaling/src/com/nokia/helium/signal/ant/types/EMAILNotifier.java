@@ -185,69 +185,69 @@ public class EMAILNotifier extends DataType implements Notifier {
             String additionalRecipientsUpdated = getProject().replaceProperties(additionalRecipients);
 
             log.debug("Sending data by e-mail.");
-                EmailDataSender emailSender;
-                if (rootdnUpdated != null)
+            EmailDataSender emailSender;
+            if (rootdnUpdated != null)
+            {
+                String[] to = null;
+                if (additionalRecipientsUpdated != null)
                 {
-                    String[] to = null;
-                    if (additionalRecipientsUpdated != null)
-                    {
-                        to = additionalRecipientsUpdated.split(",");
-                    }
-                    emailSender = new EmailDataSender(to, smtpUpdated, ldapUpdated, rootdnUpdated);
+                    to = additionalRecipientsUpdated.split(",");
                 }
-                else
-                {
-                    emailSender = new EmailDataSender(
-                        additionalRecipientsUpdated, smtpUpdated, ldapUpdated);
+                emailSender = new EmailDataSender(to, smtpUpdated, ldapUpdated, rootdnUpdated);
+            }
+            else
+            {
+                emailSender = new EmailDataSender(
+                    additionalRecipientsUpdated, smtpUpdated, ldapUpdated);
+            }
+            if (from != null)
+            {
+                emailSender.setFrom(from);
+            }
+            log.debug("EmailNotifier:arlist: " + additionalRecipientsUpdated);
+            Project subProject = getProject().createSubProject();
+            subProject.setProperty("signal.name", signalName);
+            subProject.setProperty("signal.status", "" + failStatus);
+            subProject.setProperty("signal.message", "" + message);
+            
+            emailSender.addCurrentUserToAddressList();
+            String filePath = "";
+            File fileToSend = null;
+            if (notifierInput != null) {
+                fileToSend = notifierInput.getFile(".*.html");
+                if (fileToSend != null) {
+                    filePath = fileToSend.toString();
                 }
-                if (from != null)
-                {
-                    emailSender.setFrom(from);
-                }
-                log.debug("EmailNotifier:arlist: " + additionalRecipientsUpdated);
-                Project subProject = getProject().createSubProject();
-                subProject.setProperty("signal.name", signalName);
-                subProject.setProperty("signal.status", "" + failStatus);
-                subProject.setProperty("signal.message", "" + message);
                 
-                emailSender.addCurrentUserToAddressList();
-                String filePath = "";
-                File fileToSend = null;
-                if (notifierInput != null) {
-                    fileToSend = notifierInput.getFile(".*.html");
-                    if (fileToSend != null) {
-                        filePath = fileToSend.toString();
-                    }
-                    
-                } 
-                if (fileToSend == null) {
-                    File emailOutputFile;
-                    try {
-                        emailOutputFile = File.createTempFile("helium_", "email.html");
-                        emailOutputFile.deleteOnExit();
-                        log.debug("sending data by e-mail:outputDir: "
-                                + emailOutputFile.getAbsolutePath());
+            } 
+            if (fileToSend == null) {
+                File emailOutputFile;
+                try {
+                    emailOutputFile = File.createTempFile("helium_", "email.html");
+                    emailOutputFile.deleteOnExit();
+                    log.debug("sending data by e-mail:outputDir: "
+                            + emailOutputFile.getAbsolutePath());
 
-                        List<TemplateInputSource> sourceList = new ArrayList<TemplateInputSource>();
-                        sourceList.add(new PropertiesSource("ant", getProject()
-                                .getProperties()));
-                        Hashtable<String, String> signalProperties = new Hashtable<String, String>();
-                        signalProperties.put("signal.name", signalName);
-                        signalProperties.put("signal.status", "" + failStatus);
-                        signalProperties.put("signal.message", "" + message);
-                        sourceList.add(new PropertiesSource("signaling",
-                                signalProperties));
+                    List<TemplateInputSource> sourceList = new ArrayList<TemplateInputSource>();
+                    sourceList.add(new PropertiesSource("ant", getProject()
+                            .getProperties()));
+                    Hashtable<String, String> signalProperties = new Hashtable<String, String>();
+                    signalProperties.put("signal.name", signalName);
+                    signalProperties.put("signal.status", "" + failStatus);
+                    signalProperties.put("signal.message", "" + message);
+                    sourceList.add(new PropertiesSource("signaling",
+                            signalProperties));
 
-                        templateProcessor.convertTemplate(defaultTemplate, emailOutputFile,
-                                sourceList);
-                        filePath = emailOutputFile.toString();
-                    } catch (IOException e) {
-                        log.debug("EmailNotifier: IOexception: ", e);
-                    }
+                    templateProcessor.convertTemplate(defaultTemplate, emailOutputFile,
+                            sourceList);
+                    filePath = emailOutputFile.toString();
+                } catch (IOException e) {
+                    log.debug("EmailNotifier: IOexception: ", e);
                 }
-                emailSender.sendData("signaling", filePath, 
-                        "application/html", subProject
-                        .replaceProperties(title), null);
+            }
+            emailSender.sendData("signaling", filePath, 
+                    "application/html", subProject
+                    .replaceProperties(title), null);
         }
     }
 

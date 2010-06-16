@@ -28,7 +28,7 @@ Description:
     <property environment="env"/>
     
     <property name="helium.dir" location="../../../.." />
-    <import file="${helium.dir}/helium.ant.xml"/>
+    <import file="${helium.dir}/build.xml"/>
     <property name="qt.temp.dir" location="${helium.build.dir}/antunit/qt" />
     
     <target name="setUp">

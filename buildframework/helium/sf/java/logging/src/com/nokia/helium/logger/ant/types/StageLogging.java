@@ -19,8 +19,6 @@ package com.nokia.helium.logger.ant.types;
 import java.io.File;
 
 import org.apache.tools.ant.types.DataType;
-import com.nokia.helium.logger.ant.listener.AntLoggingHandler;
-import com.nokia.helium.logger.ant.listener.StatusAndLogListener;
 import org.apache.log4j.Logger;
 
 /**
@@ -53,16 +51,6 @@ public class StageLogging extends DataType {
     private String stageRefId;
     private Logger log = Logger.getLogger(getClass());
     
-    /**
-     * Constructor which will register the logging handler
-     */
-    public StageLogging () {
-        if (!isAntLoggerRegistered && StatusAndLogListener.getStatusAndLogListener() != null) {
-            log.debug("Registering stage record to the StatusAndLogListener listener");
-            StatusAndLogListener.getStatusAndLogListener().register(new AntLoggingHandler(getProject()));
-            isAntLoggerRegistered = true;
-        }
-    }
     
     /**
      * Sets output log file name.

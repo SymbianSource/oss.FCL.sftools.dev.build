@@ -20,7 +20,8 @@ import org.xml.sax.Attributes;
 import org.xml.sax.Locator;
 import org.xml.sax.helpers.DefaultHandler;
 
-import com.nokia.helium.antlint.checks.Check;
+import com.nokia.helium.antlint.ant.types.AbstractCheck;
+import com.nokia.helium.antlint.ant.types.Check;
 
 /**
  * <code>AntLintHandler</code> is an SAX2 event handler class used to check for
@@ -46,7 +47,7 @@ public class AntLintHandler extends DefaultHandler {
      * @param check
      *            is the check to be performed.
      */
-    public AntLintHandler(Check check) {
+    public AntLintHandler(AbstractCheck check) {
         super();
         this.check = check;
     }
@@ -63,13 +64,6 @@ public class AntLintHandler extends DefaultHandler {
      */
     public void startDocument() {
         indentLevel -= 4;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public void endDocument() {
-
     }
 
     /**
@@ -125,7 +119,9 @@ public class AntLintHandler extends DefaultHandler {
     private void checkIndent() {
         if (indentationCheck) {
             if ((indentSpace != indentLevel) && !textElement) {
-                check.log(locator.getLineNumber() + ": Bad indentation!");
+                check.getReporter().report(check.getSeverity(),
+                        "Bad indentation", check.getAntFile(),
+                        locator.getLineNumber());
             }
         }
     }
@@ -147,24 +143,25 @@ public class AntLintHandler extends DefaultHandler {
         int numSpaces = 0;
         for (int i = 0; i < strBuff.length(); i++) {
             switch (strBuff.charAt(i)) {
-            case '\t':
-                numSpaces += 4;
-                if (tabCharacterCheck) {
-                    check.log(locator.getLineNumber()
-                            + ": Tabs should not be used!");
-                }
-                break;
-            case '\n':
-                numSpaces = 0;
-                break;
-            case '\r':
-                break;
-            case ' ':
-                numSpaces++;
-                break;
-            default:
-                textElement = true;
-                break;
+                case '\t':
+                    numSpaces += 4;
+                    if (tabCharacterCheck) {
+                        check.getReporter().report(check.getSeverity(),
+                                "Tabs should not be used!", check.getAntFile(),
+                                locator.getLineNumber());
+                    }
+                    break;
+                case '\n':
+                    numSpaces = 0;
+                    break;
+                case '\r':
+                    break;
+                case ' ':
+                    numSpaces++;
+                    break;
+                default:
+                    textElement = true;
+                    break;
             }
         }
         indentSpace = numSpaces;

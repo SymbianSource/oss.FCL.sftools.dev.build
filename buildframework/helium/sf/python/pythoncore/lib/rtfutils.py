@@ -16,6 +16,9 @@
 #
 #Description:
 #===============================================================================
+""" rtf utilis"""
+
+# pylint: disable-msg=R0201
 
 import csv
 import os
@@ -47,11 +50,12 @@ class RTFUtils(object):
         template.close()
         
     def _rtftable(self, errors, output, tagtoreplace, template):
-        PyRTF.Elements.StandardColours.append(PyRTF.PropertySets.Colour('NokiaBlue', 153, 204, 255))    
+        """rtf table"""
+        PyRTF.Elements.StandardColours.append(PyRTF.PropertySets.Colour('NokiaBlue', 153, 204, 255))
        
-        DR = PyRTF.Renderer()
+        d_r = PyRTF.Renderer()
         doc     = PyRTF.Document()
-        ss      = doc.StyleSheet
+        s_s      = doc.StyleSheet
         section = PyRTF.Section()
         doc.Sections.append( section )
     
@@ -66,21 +70,21 @@ class RTFUtils(object):
             assert len(row) == 3
             
             if style == None:
-                style = ss.ParagraphStyles.Heading2
+                style = s_s.ParagraphStyles.Heading2
             else:
-                style = ss.ParagraphStyles.Normal
+                style = s_s.ParagraphStyles.Normal
             
             # Handle each value from the row
             rowcell = []
             
-            for value in row:           
+            for value in row:
                 cell = PyRTF.Text( value )
                 rowcell.append(PyRTF.Cell( PyRTF.Paragraph(style, cell) ))
             table.AddRow( *rowcell )
     
         section.append( table )
         string = StringIO.StringIO()
-        DR.Write( doc, string )
+        d_r.Write( doc, string )
                 
         keep = ''
         for line in string.getvalue().splitlines():
@@ -106,20 +110,21 @@ class RTFUtils(object):
         template.close()
     
     def _rtfimage(self, image, output, tagtoreplace, template):
-        TEMP_FILE = 'image_temp.rtf'
+        """rtf image"""
+        temp_file = 'image_temp.rtf'
         
-        DR = PyRTF.Renderer()
+        d_r = PyRTF.Renderer()
         doc = PyRTF.Document()
-        ss = doc.StyleSheet
+        _ = doc.StyleSheet
         section = PyRTF.Section()
         doc.Sections.append( section )
     
-        section.append( PyRTF.Image( image ) )    
+        section.append( PyRTF.Image( image ) )
         
-        tempOutput = file( TEMP_FILE, 'w' )
-        DR.Write( doc, tempOutput )
+        tempOutput = file( temp_file, 'w' )
+        d_r.Write( doc, tempOutput )
         
-        tempOutput = file( TEMP_FILE, 'rb' )
+        tempOutput = file( temp_file, 'rb' )
         
         keep = ''
         for line in tempOutput:
@@ -137,7 +142,7 @@ class RTFUtils(object):
             line = line.replace(tagtoreplace, keep)
             output.write(line)
         
-        os.remove(TEMP_FILE)
+        os.remove(temp_file)
         
     def rtfconvert(self, inputfilename, outputfilename):
         """ Converts a property file to be RTF link syntax """
@@ -150,7 +155,8 @@ class RTFUtils(object):
         outputfile.close()
         
     def _rtfconvert(self, inputfile, outputfile):
-        p = re.compile(r'(.+=)((\\\\|http|\.\\|ftp)(.+))')
+        """rtf convert"""
+        ppp = re.compile(r'(.+=)((\\\\|http|\.\\|ftp)(.+))')
         for line in inputfile:
             newline = line
             
@@ -165,7 +171,7 @@ class RTFUtils(object):
                 newline = newline.replace('\\','\\\\\\\\\\\\\\\\')
                 
             
-            newline = p.sub('\g<1>{_backslash_field{_backslash_*_backslash_fldinst HYPERLINK \g<2>}}', newline)
+            newline = ppp.sub('\g<1>{_backslash_field{_backslash_*_backslash_fldinst HYPERLINK \g<2>}}', newline)
             
             newline = newline.replace('_backslash_', r'\\')
             

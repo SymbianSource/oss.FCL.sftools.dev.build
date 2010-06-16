@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : test_metadata.ant.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test-metadata" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>Helium antlib metadata tests.</description>
+
+    <taskdef resource="com/nokia/helium/metadata/ant/antlib.xml" uri="http://www.nokia.com/helium" />
+    <taskdef name="fmpp" classname="fmpp.tools.AntTask" onerror="report"/>
+
+    <target name="check-metadata">
+        <hlm:metadatarecord srcfile="${basedir}\data\gensis.txt" database="${basedir}\metadata_db">
+            <fileset dir="data" includes="gensis.txt"/>
+            <hlm:textlogparser>
+                <!-- Single set defined by csv file 
+                <hlm:metadatafilterset filterFile="${basedir}\data\common.csv"/>-->
+                <!-- Set defined by nested single filter and another nested set -->
+                <hlm:metadatafilterset>
+                    <hlm:metadatafilter priority="error" regex=".*Warning: Could not find file.*" description="Test pattern for missing file."/>
+                    <!--<hlm:metadatafilterset>
+                        <hlm:metadatafilter priority="warning" regex="File not found" description="Test pattern for missing file."/>
+                    </hlm:metadatafilterset>-->
+                </hlm:metadatafilterset>
+            </hlm:textlogparser>
+        </hlm:metadatarecord>
+        <!--<au:assertLogContains text="Successfully executed codescanner"/>
+        <au:assertLogContains text="Output format: xml,html"/>
+        <au:assertFileExists file="${codescanner.output.dir}/problemIndex.xml"/>-->
+    </target>
+    
+    
+    <target name="render-scanlog">
+        <property name="build.logs.dir" value="${bmd.test.project.dir}/test_bmd" />
+        <fmpp sourceFile="${basedir}/../src/templates/readdata.xml.ftl"
+                      outputFile="${basedir}/readdata.xml">
+            <freemarkerLinks expandProperties="yes">
+                macro: ${basedir}/../src/templates
+            </freemarkerLinks>
+            <data>
+                templatedir: "${basedir}/src/templates"
+                template: "components_status.xml.ftl"
+                dbPath: "tests/metadata_db"
+                countOnly: "true"
+                tableName: "out"
+                queryString: "where priority='WARNING' or priority='error'"
+                limit: "500"
+                ant: antProperties()
+            </data>
+        </fmpp>
+    </target>
+
+    <hlm:metadatafilterset id="metadata.regex.test">
+        <hlm:metadatafilter priority="ERROR" regex="^Error \d+: this is some serious error.*" description="Test pattern for testing metadataRegexTest condition."/>
+    </hlm:metadatafilterset>
+
+    <target name="test-scanlog-metadata-regex-pass">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="ERROR" string="Error 193: this is some serious error">
+                <hlm:metadatafilterset refid="metadata.regex.test"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+    <target name="test-scanlog-metadata-regex-fail-1">
+        <au:expectfailure>
+            <fail>
+                <condition>
+                    <hlm:metadataRegexTest severity="ERROR">
+                        <hlm:metadatafilterset refid="metadata.regex.test"/>
+                    </hlm:metadataRegexTest>
+                </condition>
+            </fail>
+        </au:expectfailure>
+    </target>
+    <target name="test-scanlog-metadata-regex-fail-2">
+        <au:expectfailure>
+            <fail>
+                <condition>
+                    <hlm:metadataRegexTest string="Error 193: this is some serious error">
+                        <hlm:metadatafilterset refid="metadata.regex.test"/>
+                    </hlm:metadataRegexTest>
+                </condition>
+            </fail>
+        </au:expectfailure>
+    </target>
+    
+    
+    <hlm:metadatafilterset id="filterset.imaker">
+        <metadatafilter priority="error" regex="^\s*Total duration:\s+\d+:\d+\s+Status:\s+FAILED" description="" />
+        <metadatafilter priority="error" regex="^.+- DOESN'T EXIST" description="" />
+    </hlm:metadatafilterset>
+    <hlm:metadatafilterset id="filterset.abld">
+        <metadatafilter priority="error" regex="^ERROR:" description="" />
+        <metadatafilter priority="warning" regex="^WARNING:.*" description="" />
+    </hlm:metadatafilterset>
+    
+    <target name="test-rombuild-metadata">
+        <hlm:metadatarecord database="${basedir}\metadata_db">
+            <hlm:imakermetadatainput>
+                <fileset casesensitive="false" file="${basedir}/../data/build_roms_sample.log" />
+                <fileset casesensitive="false" file="${basedir}/../data/sample_abld.log" />
+                <metadatafilterset refid="filterset.imaker" />
+            </hlm:imakermetadatainput>
+        </hlm:metadatarecord>
+        <hlm:metadatarecord database="${basedir}\metadata_db">
+            <hlm:imakermetadatainput>
+                <fileset casesensitive="false" file="${basedir}/../data/sample_abld.log" />
+                <metadatafilterset refid="filterset.abld" />
+            </hlm:imakermetadatainput>
+        </hlm:metadatarecord>
+        
+        <fmpp sourceFile="${basedir}/../../../../../tools/common/templates/diamonds/build_roms_diamonds.xml.ftl"
+                     outputfile="build_roms_diamonds.xml">
+            <data expandProperties="yes">
+                dbPath: ${basedir}\metadata_db
+                ant: antProperties()
+            </data>
+        </fmpp>
+        
+        <loadfile srcfile="build_roms_diamonds.xml" property="diamonds.output"/>
+        <au:assertMatches string="${diamonds.output}" pattern=".*?RM-XXX_010\.014_00\.01_79\.92_prd\.rofs3\.fpsx.*" singleline="true"/>
+        <delete file="build_roms_diamonds.xml"/>
+        <delete dir="${basedir}\metadata_db"/>
+    </target>
+    
+</project>
+
+
+

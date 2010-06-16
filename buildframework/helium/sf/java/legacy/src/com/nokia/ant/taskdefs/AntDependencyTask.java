@@ -202,7 +202,7 @@ public class AntDependencyTask extends Task
                 String mavenUrl = "http://repo2.maven.org/maven2/";
                 Enumeration jarfiles = jar.entries();
                 boolean found = false;
-                while (!found && jarfiles.hasMoreElements ()) {
+                while (!found && jarfiles.hasMoreElements()) {
                     ZipEntry file = (ZipEntry) jarfiles.nextElement();
                     if (file.isDirectory())
                     {   
@@ -301,7 +301,7 @@ public class AntDependencyTask extends Task
             HashSet<String> classlist = new HashSet<String>();
             
             Enumeration taskdefsenum = taskdefs.keys();
-            while (taskdefsenum.hasMoreElements ()) {
+            while (taskdefsenum.hasMoreElements()) {
                 String key = (String) taskdefsenum.nextElement();
                 Class value = (Class) taskdefs.get(key);
                 if (!key.contains("nokia") && !value.toString().contains("org.apache.tools.ant"))

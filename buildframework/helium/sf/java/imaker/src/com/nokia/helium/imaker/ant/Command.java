@@ -139,8 +139,8 @@ public class Command {
         for (String arg : getArguments()) {
             cmdLine += " " + arg;            
         }
-        for (Entry<String, String> e : getVariables().entrySet()) {
-            cmdLine += " " + e.getKey() + "=" + e.getValue();            
+        for (Entry<String, String> varEnum : getVariables().entrySet()) {
+            cmdLine += " " + varEnum.getKey() + "=" + varEnum.getValue();            
         }
         cmdLine += " " + getTarget();
         return cmdLine;

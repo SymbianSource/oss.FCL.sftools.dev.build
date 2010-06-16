@@ -71,10 +71,10 @@ public final class ParallelExecutor {
             for (int i = 0; st.hasMoreTokens(); i++) {
                 cmdArray[i] = st.nextToken();
             }
-            Process p;
+            Process process;
             try {
-                p = new ProcessBuilder(cmdArray).redirectErrorStream(true).start();
-                BufferedReader in = new BufferedReader(new InputStreamReader(p.getInputStream()));
+                process = new ProcessBuilder(cmdArray).redirectErrorStream(true).start();
+                BufferedReader in = new BufferedReader(new InputStreamReader(process.getInputStream()));
                 String line;
                 StringBuffer buffer = new StringBuffer();
                 SimpleDateFormat df = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy");

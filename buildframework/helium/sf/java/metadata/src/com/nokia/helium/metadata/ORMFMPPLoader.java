@@ -31,8 +31,6 @@ import freemarker.template.SimpleScalar;
 import freemarker.template.SimpleNumber;
 import freemarker.template.TemplateModelIterator;
 import com.nokia.helium.jpa.ORMReader;
-import com.nokia.helium.jpa.ORMUtil;
-
 import org.apache.log4j.Logger;
 import freemarker.ext.beans.BeanModel;
 import freemarker.ext.beans.BeansWrapper;
@@ -113,10 +111,10 @@ public class ORMFMPPLoader implements DataLoader {
         @Override
         public void notifyProgressEvent(Engine engine, int event, File src,
                 int pMode, Throwable error, Object param) throws Exception {
-            if (event == ProgressListener.EVENT_END_PROCESSING_SESSION) {
-                log.debug("notifyProgressEvent - finalizeORM");
-                ORMUtil.finalizeORM(dbPath);
-            }  
+            //if (event == ProgressListener.EVENT_END_PROCESSING_SESSION) {
+            //    log.debug("notifyProgressEvent - finalizeORM");
+            //    ORMUtil.finalizeORM(dbPath);
+            //}  
          }
     }
 
@@ -144,16 +142,21 @@ public class ORMFMPPLoader implements DataLoader {
             //log.debug("QueryTemplateModel: query" + query);
             if (queryMode.equals("jpasingle")) {
                 //log.debug("query executing with single result mode");
-                resultObject = getModel((new ORMReader(dbPath)).executeSingleResult(query, returnType));
+                resultObject = getModel(dbPath, query, returnType);
+                
             } else {
                 //log.debug("query executing with multiple result mode");
-                resultObject = new ORMQueryModel(new ORMReader(dbPath), query, queryMode, returnType); 
+                resultObject = new ORMQueryModel(dbPath, query, queryMode, returnType); 
             }
             return resultObject;
         }
         
-        private TemplateModel getModel(Object result) {
-            return new ORMSequenceModel(result);
+        private TemplateModel getModel(String dbPath, String query, 
+                String returnType) {
+            ORMReader reader = new ORMReader(dbPath);
+            ORMSequenceModel model = new ORMSequenceModel(reader.executeSingleResult(query, returnType));
+            reader.close();
+            return model;
         }
 
         public boolean isEmpty() {
@@ -199,8 +202,8 @@ public class ORMFMPPLoader implements DataLoader {
         private String query;
         private String returnType;
 
-        public ORMQueryModel (ORMReader reader, String queryString, String type, String retType) {
-            ormReader = reader;
+        public ORMQueryModel(String dbPath, String queryString, String type, String retType) {
+            ormReader = new ORMReader(dbPath);
             queryType = type;
             query = queryString;
             returnType = retType;
@@ -275,6 +278,7 @@ public class ORMFMPPLoader implements DataLoader {
                     }
                     if (rowList == null || rowList.size() == 0) {
                         finished = true;
+                        ormReader.close();
                     }
                 }
             }
@@ -286,6 +290,5 @@ public class ORMFMPPLoader implements DataLoader {
         public ORMObjectModel(Object obj) {
             super(obj, new BeansWrapper());
         }
-        
     }
 }

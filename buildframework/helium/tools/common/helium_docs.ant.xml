@@ -229,8 +229,16 @@ writer.write(r'${doc.build.dir}/api_changes.xml')
 
         <!-- Python API docs. -->
         <delete file="${docs.zip}"/>
+        <mkdir dir="${doc.build.dir}/javadoc" />
+        <mkdir dir="${doc.build.dir}/doclet" />
         <zip destfile="${docs.zip}">
-            <fileset dir="${doc.build.dir}" includes="**/*"/>
+            <fileset dir="${doc.build.dir}" >
+                <include name="**/*" />
+                <exclude name="doclet/*" />
+                <exclude name="javadoc/*" />
+            </fileset>
+            <zipfileset dir="${doc.build.dir}/javadoc" prefix="helium-antlib/api/javadoc"/>
+            <zipfileset dir="${doc.build.dir}/doclet" prefix="helium-antlib/api/doclet"/>
         </zip>
         <sshexec host="${documentation.host}"
                  username="${user.name}"

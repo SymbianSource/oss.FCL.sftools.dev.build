@@ -40,7 +40,7 @@ Description:
       <p class="biglink"><a class="biglink" href="{{ pathto("tutorials/index") }}">HowTos</a><br/>
          <span class="linkdescr">specific use cases</span></p>
       <p class="biglink"><a class="biglink" href="{{ pathto("api/helium/index") }}">Helium API</a><br/>
-         <span class="linkdescr">reference for Helium configuration</span></p>
+         <span class="linkdescr">or check <a href="{{ pathto("api/helium/targets_list") }}">Targets</a>, <a href="{{ pathto("api/helium/properties_list") }}">Properties</a>, <a href="{{ pathto("api/helium/macros_list") }}">Macros</a></span></p>
       <p class="biglink"><a class="biglink" href="{{ pathto("helium-antlib/index") }}">Ant libraries</a><br/>
          <span class="linkdescr">when you just have to customize</span></p>
       <p class="biglink"><a class="biglink" href="{{ pathto("development/index") }}">Development</a><br/>

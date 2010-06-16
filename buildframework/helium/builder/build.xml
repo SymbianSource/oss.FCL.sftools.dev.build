@@ -25,7 +25,7 @@ Description:
     <taskdef name="fmpp" classname="fmpp.tools.AntTask" />
     <import file="delivery.ant.xml" />
 
-    <!-- Ensuring that only Ant 1.7.0 is in use. -->
+    <!-- Ensuring that only Ant 1.7.0 is in use. 
     <ac:if>
         <not>
             <contains string="${ant.version}" substring="1.7.0" />
@@ -33,11 +33,12 @@ Description:
         <then>
             <fail message="Your current ant version is ${ant.version}, you must use 1.7.0" />
         </then>
-    </ac:if>            
+    </ac:if>            -->
 
     <condition property="platform" value="win32" else="unix">
         <os family="windows"/>
     </condition>
+    
     <dirname property="builder.dir" file="${ant.file.helium-builder}" />
     <property name="source.root.dir" location="${builder.dir}/.." />
     <property name="build.temp.dir" location="${source.root.dir}/build" />
@@ -63,9 +64,11 @@ Description:
         <exclude name="build/**" />
     </fileset>
   
+    
     <target name="cleanup" description="Cleanup (delete the temp build directory)">
         <delete dir="${build.temp.dir}" failonerror="false"/>
     </target>
+    
     
     <target name="get-build-list">
         <ivy:buildlist reference="ivy.buildlist.path">
@@ -73,12 +76,14 @@ Description:
         </ivy:buildlist>
     </target>
 
+    
     <target name="report" depends="get-build-list" description="Create Ivy report for each component">
         <subant target="report" buildpathref="ivy.buildlist.path">
             <property name="builder.dir" location="${builder.dir}" />
         </subant>
     </target>
   
+    
     <target name="compile" depends="get-build-list">
         <subant target="compile" buildpathref="ivy.buildlist.path">
             <property name="builder.dir" location="${builder.dir}" />
@@ -86,6 +91,7 @@ Description:
         </subant>
     </target>
 
+    
     <target name="build" depends="get-build-list" description="Build each component">
         <subant target="package" buildpathref="ivy.buildlist.path">
             <property name="builder.dir" location="${builder.dir}" />
@@ -94,6 +100,7 @@ Description:
         </subant>
     </target>
 
+    
     <target name="clean" depends="get-build-list" description="Run clean on each component">
         <subant target="clean" buildpathref="ivy.buildlist.path">
             <property name="builder.dir" location="${builder.dir}" />
@@ -101,6 +108,7 @@ Description:
         </subant>
     </target>
   
+    
     <target name="test" depends="get-build-list,build" description="Run test on each component">
         <ac:for param="file" keepgoing="true">
             <path refid="ivy.buildlist.path" />
@@ -108,6 +116,7 @@ Description:
                 <echo>Testing: @{file}</echo>
                 <ant antfile="@{file}" dir="@{file}/.." target="test" inheritAll="false">
                     <property name="builder.dir" location="${builder.dir}" />
+                    <property name="source.root.dir" location="${source.root.dir}" />
                 </ant>
             </sequential>
         </ac:for>
@@ -115,17 +124,22 @@ Description:
     <!-- TODO: remove after CI tools are cleaned up -->
     <target name="unittest" depends="test"/>
     
-    <target name="junit" depends="get-build-list" description="Run junit on each component">
+    
+    <target name="junit" depends="get-build-list" description="Run JUnit tests on each component">
         <subant target="junit" buildpathref="ivy.buildlist.path">
             <property name="builder.dir" location="${builder.dir}" />
+            <property name="source.root.dir" location="${source.root.dir}" />
         </subant>
     </target>
     
-    <target name="antunit" depends="get-build-list" description="Run antunit on each component">
+    
+    <target name="antunit" depends="get-build-list" description="Run AntUnit tests on each component">
         <subant target="antunit" buildpathref="ivy.buildlist.path">
             <property name="builder.dir" location="${builder.dir}" />
+            <property name="source.root.dir" location="${source.root.dir}" />
         </subant>
     </target>
+    
     
     <target name="quality" depends="get-build-list" description="Run quality checks on each component">
         <ac:for param="file" keepgoing="true">
@@ -141,6 +155,7 @@ Description:
         </ac:for>
     </target>
 
+    
     <target name="checkstyle" depends="get-build-list" description="Run checkstyle on each component">
         <ac:for param="file" keepgoing="true">
             <path refid="ivy.buildlist.path" />
@@ -154,6 +169,7 @@ Description:
         </ac:for>
     </target>
 
+    
     <target name="get-deps" description="Retrieving Helium dependencies">
         <ac:if>
             <not>
@@ -179,7 +195,7 @@ Description:
             module="helium-${config}-config" revision="1.0"
             inline="true" type="egg"
             pattern="${source.root.dir}/external/python/lib/auto/[artifact]-[revision].[ext]" />
-        <fileset id="egg.deps.fileset" dir="${source.root.dir}/external/python/lib/auto" includes="*.egg" />
+        <fileset id="egg.deps.fileset" dir="${source.root.dir}/external/python/lib/auto" includes="*.egg" excludes="jython*.egg" />
         <fmpp sourceFile="template/easy-install.pth.ftl" outputFile="${source.root.dir}/external/python/lib/auto/easy-install.pth">
             <data>
                 project: antProject()
@@ -254,6 +270,7 @@ Description:
         <echo message="Revision set to: ${helium.revision}" />
     </target>
     
+    
     <target name="update-version" depends="get-helium-revision">
         <ac:if>
             <available file="${source.root.dir}/config/version.txt.orig" />
@@ -268,9 +285,11 @@ Description:
         </propertyfile>
     </target>
 
+    
     <target name="restore-version">
         <move file="${source.root.dir}/config/version.txt.orig" tofile="${source.root.dir}/config/version.txt" />
     </target>
+    
     
     <target name="create-releasable" depends="get-deps,update-version,build-helium-docs,zip-releasable,restore-version" description="Create releasable binary package"/>
     
@@ -286,6 +305,7 @@ Description:
         </copy>
         <rstMacro version="1.0" src="${build.temp.dir}/doc/doctmp"/>
     </target>
+    
     
     <!-- Macro to generate html docs from rst. -->
     <macrodef name="rstMacro">
@@ -308,4 +328,7 @@ Description:
             </exec>
         </sequential>
     </macrodef>
+    
 </project>
+
+

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : build.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="helium-core-demo" xmlns:hlm="http://www.nokia.com/helium" xmlns:ac="antlib:net.sf.antcontrib">
+    <description>Helium java core demo.</description>
+
+    <taskdef resource="com/nokia/helium/core/ant/antlib.xml" uri="http://www.nokia.com/helium" />
+    
+    <property name="current.dir" value="."/>
+    <target name="getfreedrive-subst">
+        <ac:for list="A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z" param="drive.variable">
+            <sequential>
+                <antcall target="getfreedrive-subst-1"/>
+            </sequential>
+        </ac:for>
+    </target>
+
+    <target name="getfreedrive-subst-1">
+        <ac:trycatch property="subst.exception">
+            <ac:try>
+                <hlm:getfreedrive property="drive.variable"/>
+            </ac:try>
+            <ac:catch>
+                <echo message="Error: ${subst.exception}" />
+                <fail/>
+            </ac:catch>
+        </ac:trycatch>
+        <echo>${drive.variable} is substituted</echo>
+        <exec osfamily="windows" executable="subst.exe" failonerror="true">
+            <arg value="${drive.variable}"/>
+            <arg value="${current.dir}"/>
+        </exec>
+    </target>
+
+    <target name="getfreedrive-unsubst">
+        <ac:for list="A,B,C,D,E,F,G,H,I,J,K,L,M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z" param="drive.letter">
+            <sequential>
+                <echo>Letters @{drive.letter} is unsubstituted</echo>
+                <exec osfamily="windows" executable="subst.exe" failonerror="false">
+                    <arg value="@{drive.letter}:"/>
+                    <arg value="/D"/>
+                </exec>
+            </sequential>
+        </ac:for>
+    </target>
+
+    <target name="getfreedrive-unsubst-1">
+        <exec osfamily="windows" executable="subst.exe" failonerror="false">
+            <arg value="${drive.letter}:"/>
+            <arg value="/D"/>
+        </exec>
+    </target>
+
+</project>

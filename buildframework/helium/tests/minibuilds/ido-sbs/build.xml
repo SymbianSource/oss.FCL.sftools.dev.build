@@ -65,6 +65,12 @@ Description:
 
 	<import file="../ido/build.xml"/>
     <import file="build.sbsinput.ant.xml" />
+
+    <!-- We should defer the failure for raptor. -->
+    <hlm:signalInput id="raptorErrorSignalInput" failbuild="defer">
+        <hlm:notifierListRef refid="defaultFailNotifier" />
+    </hlm:signalInput>
+
 </project>
 
     

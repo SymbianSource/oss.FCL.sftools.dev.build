@@ -22,5 +22,5 @@ Description:
 -->
 <antlib>
     <!-- Task definition -->
-    <taskdef name="hlmassertmessage" classname="com.nokia.helium.internaldata.ant.taskdefs.HlmAssertMessage"/>
+    <taskdef name="hlmassertmessage" classname="com.nokia.helium.internaldata.ant.taskdefs.HlmAssertMessageTask"/>
 </antlib>

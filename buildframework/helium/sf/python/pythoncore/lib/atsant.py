@@ -31,11 +31,12 @@ _logger = logging.getLogger('atsant')
 
 class IConfigATS(object):
     """ Class used to read configuration file iconfig.xml """
-    def __init__(self, imagesdir):
+    def __init__(self, imagesdir, productname):
         self.imagesdir = imagesdir
+        self.productname = productname
         self.config = self.getconfig()
         
-    def getconfig(self, type=None):
+    def getconfig(self, type=None, productname=None):
         """get configuration"""
         noncust = None
         for root, _, files in os.walk(self.imagesdir, topdown=False):
@@ -45,8 +46,8 @@ class IConfigATS(object):
                     configBuilder = configuration.NestedConfigurationBuilder(open(filePath, 'r'))
                     configSet = configBuilder.getConfiguration()
                     for config in configSet.getConfigurations():
-                        if type:
-                            if type in config.type:
+                        if type and productname:
+                            if type in config.type and config['PRODUCT_NAME'] in productname:
                                 return config
                         else:
                             noncust = config
@@ -68,7 +69,7 @@ class IConfigATS(object):
         """find images"""
         output = ''
         for imagetype, imagetypename in [('core', 'CORE'), ('langpack', 'ROFS2'), ('cust', 'ROFS3'), ('udaerase', 'UDAERASE')]:
-            iconfigxml = self.getconfig(imagetype)
+            iconfigxml = self.getconfig(imagetype, self.productname)
             if iconfigxml == None:
                 iconfigxml = self.config
 
@@ -83,14 +84,25 @@ class IConfigATS(object):
                     raise Exception(image + ' not found')
             else:
                 if imagetype == 'core':
-                    raise Exception(imagetypename + '_FLASH not found in iconfig.xml')
+                    raise Exception(imagetypename + '_FLASH not found in iconfig.xml in ' + self.imagesdir)
                 print imagetypename + '_FLASH not found in iconfig.xml'
         return output
 
-def files_to_test(canonicalsysdeffile, excludetestlayers, idobuildfilter, builddrive):
+def get_boolean(string_val):
+    """if parameter passed in is not present in the project it will produce 'none'
+       as a result so this will be converted to boolean false as will all values
+        except true."""
+    retVal = False
+    if (string_val == 'true'):
+        retVal = True
+    return retVal
+
+
+def files_to_test(canonicalsysdeffile, excludetestlayers, idobuildfilter, builddrive, createmultipledropfiles):
     """list the files to test"""
     sdf = sysdef.api.SystemDefinition(canonicalsysdeffile)
-
+    
+    single_key = 'singledropfile'       #default single drop file name
     modules = {}
     for layr in sdf.layers:
         if re.match(r".*_test_layer$", layr):
@@ -104,8 +116,12 @@ def files_to_test(canonicalsysdeffile, excludetestlayers, idobuildfilter, buildd
 
             layer = sdf.layers[layr]
             for mod in layer.modules:
-                if mod.name not in modules:
+                if get_boolean(createmultipledropfiles):  #creating single drop file?
+                    if single_key not in modules:       #have we already added the key to the dictionary?
+                        modules[single_key] = []        #no so add it
+                elif mod.name not in modules:
                     modules[mod.name] = []
+                    single_key = mod.name               #change the key name to write to modules
                 for unit in mod.units:
                     include_unit = True
                     if idobuildfilter != None:
@@ -128,6 +144,6 @@ def files_to_test(canonicalsysdeffile, excludetestlayers, idobuildfilter, buildd
                                 if len(unit.filters) == 0:
                                     include_unit = True
                     if include_unit:
-                        modules[mod.name].append(os.path.join(builddrive + os.sep, unit.path))
-
+                        modules[single_key].append(os.path.join(builddrive + os.sep, unit.path))
     return modules
+

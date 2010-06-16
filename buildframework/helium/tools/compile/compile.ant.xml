@@ -58,6 +58,7 @@ Description:
     
     <!-- including common compilation macros -->
     <hlm:typedef file="${helium.dir}/tools/compile/compile.antlib.xml" uri="http://www.nokia.com/helium"/>
+    <import file="nokiacompile.ant.xml" />
     <import file="cmaker.ant.xml" />
     <import file="ec/ec.ant.xml" />
     <import file="ebs/ebs.ant.xml" />
@@ -77,12 +78,10 @@ Description:
     </target>
 
     <!-- Does all the necessary steps before starting the component build -->
-    <target name="precompile" depends="record-compile-start-time,create-canonical-sysdef-file,precompile-ec,run-coverity-configure"/>
+    <target name="precompile" depends="create-canonical-sysdef-file,precompile-ec,run-coverity-configure"/>
 
     <!-- post operation for EC builds, submits the compile time and lists all the built components-->
-    <target name="postcompile" depends="postcompile-ec,render-build-duplicates,post-coverity" unless="env.HLM_SUBCON">
-        <runtarget target="submit-compile-time"/>
-    </target>
+    <target name="postcompile" depends="postcompile-ec,render-build-duplicates,post-coverity" unless="env.HLM_SUBCON" />
     
     
     <!-- Pre-processes all System Definition input files.
@@ -151,7 +150,8 @@ self.addMappedName(path)
                     <fileset dir="${temp.build.dir}/join" />
                 </delete>
                 <!-- creating the root sysdef file for packages referenced directly -->
-                <hlm:createRootSysdef destFile="${temp.build.dir}/root/generated.root.xml" epocroot="${build.drive}">
+                <hlm:createRootSysdef destFile="${temp.build.dir}/root/generated.root.xml" epocroot="${build.drive}/"
+                    checkPackageExists="${compile.cmd.clean}">
                     <restrict>
                         <resources refid="system.definition.files" />
                         <rsel:name name="**${file.separator}package_definition.xml" />
@@ -284,12 +284,10 @@ for line in fileinput.input(["${genxml.output.file}"], inplace=True):
 
     This is used at the end of compilation to log the compile time to the GTI
     database.
+	@deprecated Implementation of the feature has changed, and the target is not needed anymore
     -->
     <target name="record-compile-start-time">
-        <preset.exec executable="perl" outputproperty="build.main.start.time">
-            <arg value="-e"/>
-            <arg value="print time"/>
-        </preset.exec>
+        <echo>Warning: this target is deprecated, please remove it from your configuration</echo>
     </target>
 
   <!-- Runs the Symbian scanlog and HTMLscanlog tools, as well as a Helium tool, for

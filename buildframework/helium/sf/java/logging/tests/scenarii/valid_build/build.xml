@@ -63,6 +63,7 @@ Description:
         </ant> 
         
         <antcall target="parallel-test"/>
+        <antcall target="parallel-test2"/>
     </target>
     
     <target name="compile" depends="creatbom,get-password"/>
@@ -254,6 +255,35 @@ Description:
     
     <target name="clean-up">
         <delete dir="${build.log.dir}"/>
+    </target>
+    
+    <target name="parallel-test2">
+        <parallel>
+            <antcall target="test2"/>
+            <antcall target="test3"/>
+        </parallel>
+    </target>
+    
+    <target name="test2">
+        <sleep seconds="2"/>
+        <hlm:record name="${build.log.dir}/${build.id}_error.log" action="start" loglevel="info"/>
+        <echo message="ERROR: Could not find:"/>
+        <hlm:record name="${build.log.dir}/${build.id}_error.log" append="true" action="stop" loglevel="info"/>
+        <loadfile property="error.log" srcFile="${build.log.dir}/${build.id}_error.log" />
+        <au:assertTrue>
+            <contains string="${error.log}" substring="ERROR:" />
+        </au:assertTrue>
+    </target>
+
+    <target name="test3">
+        <hlm:record name="${build.log.dir}/${build.id}_info.log" action="start" loglevel="info"/>
+        <echo message="INFO: Could not find:"/>
+        <sleep seconds="5"/>
+        <hlm:record name="${build.log.dir}/${build.id}_info.log" append="true" action="stop" loglevel="info"/>
+        <loadfile property="info.log" srcFile="${build.log.dir}/${build.id}_info.log" />
+        <au:assertFalse>
+            <contains string="${info.log}" substring="ERROR:" />
+        </au:assertFalse>
     </target>
 
 </project>

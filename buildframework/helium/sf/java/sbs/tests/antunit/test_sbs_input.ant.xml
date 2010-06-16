@@ -26,7 +26,6 @@ Description:
 
     <taskdef resource="com/nokia/helium/core/ant/antlib.xml" uri="http://www.nokia.com/helium"/>
     <taskdef resource="com/nokia/helium/sbs/ant/antlib.xml" uri="http://www.nokia.com/helium"/>
-    <taskdef name="getVariableValue" classname="com.nokia.helium.core.ant.taskdefs.GetValueFromVariableSet"/>
     <dirname property="test.sbs.dir" file="${ant.file.test-sbs-input}"/>
     <property name="working.dir" value="${test.sbs.dir}" />
     <patternset id="includeLayerPatternSet" >
@@ -64,6 +63,10 @@ Description:
 
     <patternset id="includeNoNameLayerPatternSet" >
         <include name="use_no_name_layer" />
+    </patternset>
+
+    <patternset id="doNotIncludeAnyExistingLayer" >
+        <include name="non_existing_layer" />
     </patternset>
 
     <dirname property="project.dir" file="${ant.file.test-sbs-input}" />
@@ -234,9 +237,9 @@ Description:
         <property name="build.system" value="sbs-ec" />
         <hlm:getsbsinputs config="inherit3" outputProperty="sbs-inputs"/>
         <echo message="sbs-inputs: ${sbs-inputs}" />
-        <getVariableValue name="-f" property="sbs.log.file">
+        <hlm:getVariableValue name="-f" property="sbs.log.file">
             <hlm:sbsinput refid="${sbs-inputs}" />
-        </getVariableValue>
+        </hlm:getVariableValue>
         <echo message="${sbs-inputs}" />
     </target>
 
@@ -258,13 +261,15 @@ Description:
         <au:assertLogContains text="-l use_no_name_layer" />
     </target>
 
-    <target name="test-ctc">
+    
+    <target name="test-include-no-layer">
         <property name="build.system" value="sbs" />
         <hlm:getsbsinputs config="pf_7952" outputProperty="sbs-inputs"/>
-        <hlm:ctctask outputLog="tmp" sbsinput="${sbs-inputs}" sysdefFile="../data/test.sysdef.xml" 
-            layerPatternSetRef="includeNoNameLayerPatternSet" workingDir="${working.dir}"
+        <hlm:sbstask outputLog="tmp" sbsinput="${sbs-inputs}" sysdefFile="../data/test.sysdef.xml" 
+            layerPatternSetRef="doNotIncludeAnyExistingLayer" workingDir="${working.dir}"
             execute="false"/>
-        <au:assertLogContains text="-i m sbs" />
+        <au:assertLogContains text="--logfile" />
+        <au:assertLogContains text="Warning: No matching layers to build from system definition file, skipped" />
     </target>
 
 </project>

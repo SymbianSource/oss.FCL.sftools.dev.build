@@ -24,12 +24,13 @@ import amara
 from xmlhelper import recursive_node_scan
 
 def test_amara():
-    x = amara.parse(r'<commentLog><branchInfo category="" error="kkk" file="tests/data/comments_test.txt" originator="sanummel" since="07-03-22">Add rofsfiles for usage in paged images</branchInfo></commentLog>')
-    assert str(x.commentLog.branchInfo) == 'Add rofsfiles for usage in paged images'
+    """test amara"""
+    xxx = amara.parse(r'<commentLog><branchInfo category="" error="kkk" file="tests/data/comments_test.txt" originator="sanummel" since="07-03-22">Add rofsfiles for usage in paged images</branchInfo></commentLog>')
+    assert str(xxx.commentLog.branchInfo) == 'Add rofsfiles for usage in paged images'
     
-    x = amara.parse(r'<commentLog><branchInfo>1</branchInfo><branchInfo>2</branchInfo></commentLog>')
-    for y in x.commentLog.branchInfo:
-        assert str(y) == '1'
+    xxx = amara.parse(r'<commentLog><branchInfo>1</branchInfo><branchInfo>2</branchInfo></commentLog>')
+    for yyy in xxx.commentLog.branchInfo:
+        assert str(yyy) == '1'
         break
           
     myxml = """<DpComponent DpType="File" name="dp.cfg.xml" fileType="Binary" fileSubType="1" fileIndex="1" owner="SwUpdate" extract="true" signed="true" optional="true" crc="true" useCases="Refurbish,BackupRestore" variantPackage="true" include="true" EnableCRCVerification="true" parameters="test"/>"""
@@ -72,8 +73,8 @@ def test_amara():
     
     xcf4 = amara.parse(r"<a><p name='1'/><p name='1'/></a>")
     found = False
-    for p in xcf4.xml_xpath("//p"):
-        assert str(p.name) == '1'
+    for p_path in xcf4.xml_xpath("//p"):
+        assert str(p_path.name) == '1'
         found = True
     assert found
     

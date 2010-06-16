@@ -361,17 +361,25 @@ def destinsrc(src, dst):
 def which(executable):
     """ Search for executable in the PATH."""
     pathlist = os.environ['PATH'].split(os.pathsep)
+    pathexts = ['']
+    if os.sep == '\\':
+        pathexts = os.environ['PATHEXT'].split(os.pathsep)
+
     for folder in pathlist:
-        filename = os.path.join(folder, executable)
-        try:
-            status = os.stat(filename)
-        except os.error:
-            continue
-        # Check if the path is a regular file
-        if stat.S_ISREG(status[stat.ST_MODE]):
-            mode = stat.S_IMODE(status[stat.ST_MODE])
-            if mode & 0111:
-                return os.path.normpath(filename)
+        for pathext in pathexts:
+            exename = executable
+            if os.sep == '\\' and not exename.lower().endswith(pathext.lower()):
+                exename = exename + pathext
+            filename = os.path.join(folder, exename)
+            try:
+                status = os.stat(filename)
+            except os.error:
+                continue
+            # Check if the path is a regular file
+            if stat.S_ISREG(status[stat.ST_MODE]):
+                mode = stat.S_IMODE(status[stat.ST_MODE])
+                if mode & 0111:
+                    return os.path.normpath(filename)
     return None
 
 
@@ -467,14 +475,18 @@ def guess_encoding(data):
         
 def getmd5(fullpath, chunk_size=2**16):
     """ returns the md5 value"""
-    file_handle = open(fullpath, "rb")
-    md5 = hashlib.md5()
-    while 1:
-        chunk = file_handle.read(chunk_size)
-        if not chunk:
-            break
-        md5.update(chunk)
-    file_handle.close()
+    for trial in range(3):
+        try:
+            file_handle = open(fullpath, "rb")
+            md5 = hashlib.md5()
+            while 1:
+                chunk = file_handle.read(chunk_size)
+                if not chunk:
+                    break
+                md5.update(chunk)
+            file_handle.close()
+        except Exception, exc:
+            LOGGER.warning("Error happened on %d trial: %s" % (trial, str(exc)))
     return md5.hexdigest()
 
 def read_symbian_policy_content(filename):

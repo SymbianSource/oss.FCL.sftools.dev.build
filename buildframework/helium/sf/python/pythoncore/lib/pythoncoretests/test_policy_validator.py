@@ -53,6 +53,9 @@ _test_file_paths = [
     's60/new_rules/',
     's60/new_rules/subdir1/invalid.txt',
     's60/new_rules/subdir2/',
+    's60/new_rules_excludes/.static_wa',
+    's60/new_rules_excludes/subdir1/invalid.txt',
+    's60/new_rules_excludes/subdir2/',
     ]
 
 _test_file_content = {
@@ -114,12 +117,12 @@ class PolicyValidatorTest(unittest.TestCase):
 
     def test_policy_validator(self):
         """ Testing the policy validator behaviour. """
-        validator = integration.quality.PolicyValidator()
+        validator = integration.quality.PolicyValidator(excludes=".static_wa")
         errors = [] 
         errors.extend(validator.validate(self._testpath('s60')))
         errors.sort()
         print errors
-        assert len(errors) == 5
+        assert len(errors) == 6
 
         
         # Invalid encoding: contains other stuff than policy id.
@@ -146,4 +149,9 @@ class PolicyValidatorTest(unittest.TestCase):
         assert errors[4][0] == "missing"
         assert errors[4][1].lower() == self._testpath('s60' + os.sep + 'new_rules' + os.sep + 'subdir1').lower()
         assert errors[4][2] == None
+
+        # Policy file is missing
+        assert errors[5][0] == "missing"
+        assert errors[5][1].lower() == self._testpath('s60' + os.sep + 'new_rules_excludes' + os.sep + 'subdir1').lower()
+        assert errors[5][2] == None
         

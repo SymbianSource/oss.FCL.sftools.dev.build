@@ -59,7 +59,7 @@ Description:
         
         <!-- IDO dependencies -->
         <dependency org="SWEPT" name="7zip" rev="4" conf="ido->default"/>
-        <dependency org="SWEPT" name="ccm" rev="6.5" conf="ido->default"/>
+        <dependency org="SWEPT" name="ccm" rev="exactlyAnyOne(6.5, 7.1)" conf="ido->default"/>
         <dependency org="SWEPT" name="codescanner" rev="[2.0,2.1]" conf="ido->default"/>
         <dependency org="SWEPT" name="java13" rev="1.3.1" conf="ido->default"/>
         <dependency org="SWEPT" name="sbs" rev="2.12" conf="ido->default"/>

@@ -16,6 +16,7 @@
 #
 #Description:
 #===============================================================================
+"""test dependancy graph"""
 
 import unittest
 import dependancygraph
@@ -28,22 +29,23 @@ _logger = logging.getLogger('test.dependancygraph')
 logging.basicConfig(level=logging.INFO)
 
 class DependancygraphTest(unittest.TestCase):
-    """ Acceptance tests for dependancygraph.py """        
+    """ Acceptance tests for dependancygraph.py """
     def test_dependancygraph(self):
-        (fd, filename) = tempfile.mkstemp()
-        f = os.fdopen(fd, 'w')
-        f.write('test')
-        f.close()
+        """test dependancy graph"""
+        (f_d, filename) = tempfile.mkstemp()
+        f_file = os.fdopen(f_d, 'w')
+        f_file.write('test')
+        f_file.close()
         path1 = None
         path2 = None
-        for p in sys.path:
-            for x in [p, os.path.join(p, '..')]:
-                if os.path.exists(x) and os.path.isdir(x):
-                    for egg in os.listdir(x):
+        for p_path in sys.path:
+            for xxx in [p_path, os.path.join(p_path, '..')]:
+                if os.path.exists(xxx) and os.path.isdir(xxx):
+                    for egg in os.listdir(xxx):
                         if egg.endswith('.egg'):
                             if path1 == None:
-                                path1 = x
-                            if path1 and path1 != x:
-                                path2 = x
+                                path1 = xxx
+                            if path1 and path1 != xxx:
+                                path2 = xxx
         if path1 and path2:
             dependancygraph.createGraph(os.path.join(os.environ['TEST_DATA'], 'data', 'ivy.xml'), filename, path1, path2, False)

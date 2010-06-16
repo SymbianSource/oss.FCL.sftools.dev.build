@@ -22,11 +22,11 @@ Description:
 -->
 <antlib>
     <!-- Task definition -->
-    <taskdef name="codescanner" classname="com.nokia.helium.quality.ant.taskdefs.CodeScanner" onerror="ignore"/>
-    <taskdef name="coverity" classname="com.nokia.helium.quality.ant.taskdefs.Coverity" onerror="ignore"/>
-    <taskdef name="cmt" classname="com.nokia.helium.quality.ant.taskdefs.CMTTool" onerror="ignore"/>
-    
+    <taskdef name="codescanner" classname="com.nokia.helium.quality.ant.taskdefs.CodeScannerTask" onerror="ignore"/>
+    <taskdef name="coverity" classname="com.nokia.helium.quality.ant.taskdefs.CoverityTask" onerror="ignore"/>
+    <taskdef name="cmt" classname="com.nokia.helium.quality.ant.taskdefs.CMTToolTask" onerror="ignore"/>
+    <taskdef name="cmtsummarytask" classname="com.nokia.helium.quality.ant.taskdefs.CMTSummaryTask" onerror="ignore"/>
+
     <!-- Type definition -->
     <typedef name="coverityoptions" classname="com.nokia.helium.core.ant.types.VariableSet"/>
-    <typedef name="arg" classname="com.nokia.helium.core.ant.types.Variable"/>
 </antlib>

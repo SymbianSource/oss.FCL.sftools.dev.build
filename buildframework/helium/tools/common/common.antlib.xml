@@ -50,15 +50,13 @@ Description:
         </sequential>
     </macrodef>
 
-    <!--
-        This macro generate a file that contains a list of path from a path structure:
-        <pre>
+    <!-- This macro generate a file that contains a list of path from a path structure.
+
         <hlm:pathToFileListMacro file="output.lst">
             <path>
                 <pathelement path="${helium.dir}"/>
             </path>
         </hlm:pathToFileListMacro> 
-        </pre>
     -->
     <scriptdef name="pathToFileListMacro" language="beanshell" uri="http://www.nokia.com/helium">
         <attribute name="file"/>
@@ -79,18 +77,16 @@ out.close();
 
     
    
-    <!-- This Macro is a wrapper to command line tool 
-        Currently supported command line tools are
-        configuration tool and
-        sbs tool
-        Usage: 
-            name - name of the tool:
-            toolvarset - reference id for variables to be passed to the tool
-        <pre>
+    <!-- This Macro is a wrapper to command line tool.
+    
+    Currently supported command line tools are the configuration tool and sbs tool.
+    Usage: 
+    * name - name of the tool
+    * toolvarset - reference id for variables to be passed to the tool.
+        
         <hlm:toolMacro name="configuration">
             <hlm:toolvarset refid="cnftool.conf.50"/>
         </hlm:toolMacro>
-        </pre>
     -->
     <scriptdef name="toolMacro" language="beanshell" uri="http://www.nokia.com/helium">
         <element name="toolvarset" classname="com.nokia.helium.core.ant.types.VariableSet"/>
@@ -179,6 +175,7 @@ try {
 ]]>
     </scriptdef>
 
+    
     <!-- This task allow to dump the content of a text file to the shell. -->
     <scriptdef name="echoFileMacro" language="beanshell" uri="http://www.nokia.com/helium">
         <attribute name="file"/>
@@ -196,6 +193,7 @@ try {
         ]]>
     </scriptdef>
     
+    
     <!-- This task create the herder information in the symbian log file -->
     <scriptdef name="symbianLogHeaderMacro" language="jython" uri="http://www.nokia.com/helium">
         <attribute name="config"/>
@@ -205,12 +203,12 @@ import log2xml
 log2xml.symbian_log_header(self, attributes.get('config'), attributes.get('command'), attributes.get('dir'))
     </scriptdef>
 
+    
     <!-- This task create the footer information in the symbian log file -->
     <scriptdef name="symbianLogFooterMacro" language="jython" uri="http://www.nokia.com/helium">
 import log2xml
 log2xml.symbian_log_footer(self)
     </scriptdef>
-
 
     
     <!-- A generic assert macro similar to AntUnit "assertTrue". -->
@@ -268,6 +266,7 @@ log2xml.symbian_log_footer(self)
         </sequential>
     </macrodef>
 
+    
     <!-- A generic assert macro similar to AntUnit "assertPropertySet". -->
     <macrodef name="assertPropertySet" uri="http://www.nokia.com/helium">
         <attribute name="property"/>
@@ -292,7 +291,6 @@ log2xml.symbian_log_footer(self)
             </if>
         </sequential>
     </macrodef>
-
 
     
     <!-- Script definition to collect target dependencies -->
@@ -363,6 +361,7 @@ while i.hasNext():
 output.close()
     ]]></scriptdef>
     
+    
     <!-- Reads password from .netrc file for a specific type of service. -->
     <scriptdef name="netrcPasswordMacro" language="jython" uri="http://www.nokia.com/helium">
         <attribute name="output-prop"/>
@@ -389,6 +388,7 @@ if attributes.get('result-prop') != None:
         ]]>
     </scriptdef>
 
+    
     <!-- Reads user name from .netrc file for a specific type of service. -->
     <scriptdef name="netrcUsernameMacro" language="jython" uri="http://www.nokia.com/helium">
         <attribute name="output-prop"/>
@@ -415,6 +415,7 @@ if attributes.get('result-prop') != None:
         ]]>
     </scriptdef>
      
+    
     <!-- Check availability of synergy. -->   
     <scriptdef  name="ccmAvailableMacro" language="jython" uri="http://www.nokia.com/helium">
         <attribute name="resultproperty"/>
@@ -462,8 +463,9 @@ except Exception, e:
 self.log("Result: %s" % attributes.get('resultproperty'))
 project.setProperty(str(attributes.get('resultproperty')), str(result))
         ]]>
-     </scriptdef>
+    </scriptdef>
 
+    
     <macrodef name="signalMacro" uri="http://www.nokia.com/helium">
         <attribute name="logfile"/>
         <attribute name="phase" default=""/>
@@ -519,6 +521,7 @@ project.setProperty(str(attributes.get('resultproperty')), str(result))
         </sequential>
     </macrodef>
 
+    
     <!-- A simple test macro -->
     <macrodef name="fooMacro" uri="http://www.nokia.com/helium">
         <sequential>
@@ -571,6 +574,7 @@ except Exception, e:
         ]]>
     </scriptdef>
     
+    
     <!-- unsubst task, will unsubst a given drive. -->
     <scriptdef name="unsubst" language="jython" uri="http://www.nokia.com/helium">
         <attribute name="drive"/>
@@ -587,17 +591,22 @@ if os.sep == '\\':
     else:
         failonerror = False
     if drive == None or len(str(drive)) != 2:
-        raise Exception("'drive' attribute is missing or invalid. " + str(drive))
-    drive = str(drive)
-    try:
-        self.log(str("Unsubsting %s..." % drive))
-        fileutils.unsubst(drive)
-    except Exception, e:
         if failonerror:
-            raise e
+            raise Exception("'drive' attribute is missing or invalid: " + str(drive))
         else:
-            self.log(str("Error: %s" % e))
+            self.log("Drive doesn't need unsubsting: " + str(drive))
+    else:
+        drive = str(drive)
+        try:
+            self.log(str("Unsubsting %s..." % drive))
+            fileutils.unsubst(drive)
+        except Exception, e:
+            if failonerror:
+                raise e
+            else:
+                self.log(str("Error: %s" % e))
     </scriptdef>
+    
     
     <!-- Touches the files in the paths given. -->
     <scriptdef name="touch" language="jython" uri="http://www.nokia.com/helium">

@@ -1,0 +1,80 @@
+<#--
+============================================================================ 
+Name        : 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+
+<#if ant?keys?seq_contains("tracurl")>
+    <#assign helium_browser_trunk=ant.tracurl>
+<#else>
+    <#assign helium_browser_trunk="">
+</#if>
+
+<#macro helium_api_location_path location>
+    <#assign target_line=""/>
+    <#assign res = location?matches(":(\\d+):$") />
+    <#list res as m>
+        <#assign target_line="#L${m?groups[1]}"/>
+    </#list>      
+    <#assign location_path=location/>
+    <#if location?index_of("helium\\") &gt; 0>
+        <#assign location_path=location?substring(location?last_index_of('helium\\'))/>
+    </#if>
+<#--       <#assign target_url=location_path?replace("\\", "/")?replace(":(\\d+):", "", 'ri') />
+    <tt class="docutils literal"><a href="${helium_browser_trunk}/${target_url}${target_line}">${location_path}</a></tt>-->
+    ``${location_path}``
+</#macro>
+
+<#macro helium_project_path location>
+    <#assign location_path=location/>
+    <#if location?index_of("helium\\") &gt; 0>
+        <#assign location_path=location?substring(location?last_index_of('helium\\'))/>
+    </#if>
+       <#assign target_url=location_path?replace("\\", "/")?replace(":(\\d+):", "", 'ri') />
+    <tt class="docutils literal"><a href="${helium_browser_trunk}/${target_url}">${target_url}</a></tt>  
+</#macro>
+
+<#-- Macros for recursively handling random HTML elements inside documentation elements. -->
+<#macro tt> <tt><#recurse></tt> </#macro>
+
+<#macro div><#recurse></#macro>
+
+<#macro p><#recurse>
+
+</#macro>
+
+<#macro ul>
+
+<#recurse>
+
+</#macro>
+
+<#macro li>    - <#recurse>
+</#macro>
+
+<#macro b>**<#recurse>**</#macro>
+
+<#macro pre>
+
+    <#recurse>
+    
+</#macro>
+
+<#macro @text>${.node?trim}</#macro>
+

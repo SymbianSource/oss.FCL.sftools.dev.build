@@ -16,6 +16,7 @@
 #
 #Description:
 #===============================================================================
+""" icf 2 text"""
 
 import sys
 import amara
@@ -33,6 +34,7 @@ def get_icfs(filename):
     return result
 
 def main():
+    """main method in the file"""
     if len(sys.argv) != 3:
         print "Usage: icf2txt.py bom.xml out.txt"
         sys.exit(1)

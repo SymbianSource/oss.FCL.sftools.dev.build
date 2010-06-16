@@ -123,6 +123,8 @@ Checkout: only need to define this when extra tasks are required on top of the l
         - ci.custom.query: Extend the synergy query for CC modificationset checking eg.(release='MinibuildDomain/next').
         - show.conflicts: boolean value to check for task conflicts.
         - show.conflicts.objects: boolean value to check for object conflicts.
+        - releasable: boolean value which defines if the project should be considered by the release-work-area target.
+        - baseline.release: defines what release should be used while releasing the project and creating the baseline.
 Snapshot: define type of the spec as snapshot and name as the baseline name.
     The following properties are required:
         - dir     : the location of your target snapshot.

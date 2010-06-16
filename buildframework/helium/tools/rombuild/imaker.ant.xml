@@ -178,7 +178,15 @@ writer.close();
                 </exec>
             </then>
         </if>
+        <fmpp sourceFile="${helium.dir}/tools/common/templates/diamonds/build_roms_diamonds.xml.ftl"
+                     outputfile="${diamonds.build.output.dir}/build-roms.xml">
+            <data expandProperties="yes">
+                dbPath: ${metadata.dbfile}
+                ant: antProperties()
+            </data>
+        </fmpp>
     </target>
+    
     
     <!-- iMaker engine configuration -->
     <hlm:defaultEngine id="imaker.engine.default" threads="${number.of.threads}" />

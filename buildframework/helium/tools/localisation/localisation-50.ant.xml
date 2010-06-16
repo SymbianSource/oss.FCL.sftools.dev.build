@@ -87,8 +87,10 @@ Description:
     
     
     <!-- The createDeltaZipMacro enables to create regional variant like china and japan.
+        
     e.g:
-         <pre><hlm:createDeltaZipMacro variant="china" type="armv5" ctool="true"/></pre>
+         
+        <hlm:createDeltaZipMacro variant="china" type="armv5" ctool="true"/>
     -->
     <macrodef name="createDeltaZipMacro" uri="http://www.nokia.com/helium">
         <attribute name="variant"/>
@@ -156,10 +158,12 @@ Description:
     </macrodef>
 
 
-    <!-- The createDeltaWesternZipMacro enables to create western regional variant
+    <!-- The createDeltaWesternZipMacro enables to create western regional variant.
+        
     e.g: build western variation using the results from S60_postbuild config
-         and enabling configuration tool support.
-         <pre><hlm:createDeltaWesternZipMacro configs="S60_postbuild" ctool="true"/></pre>
+    and enabling configuration tool support.
+    
+        <hlm:createDeltaWesternZipMacro configs="S60_postbuild" ctool="true"/>
     -->
     <macrodef name="createDeltaWesternZipMacro"  uri="http://www.nokia.com/helium">
         <attribute name="configs"/>

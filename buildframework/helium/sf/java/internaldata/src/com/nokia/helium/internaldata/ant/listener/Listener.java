@@ -19,7 +19,7 @@ package com.nokia.helium.internaldata.ant.listener;
 
 import java.util.Hashtable;
 import java.util.Date;
-import com.nokia.helium.internaldata.ant.taskdefs.HlmAssertMessage;
+import com.nokia.helium.internaldata.ant.taskdefs.HlmAssertMessageTask;
 import org.apache.tools.ant.BuildEvent;
 import org.apache.tools.ant.BuildListener;
 import org.apache.tools.ant.Project;
@@ -187,7 +187,7 @@ public class Listener implements BuildListener, SubBuildListener {
         // Ignoring task information
     }
 
-    public void addAssertTask(HlmAssertMessage assertTask) { 
+    public void addAssertTask(HlmAssertMessageTask assertTask) { 
         if (buildNode != null) {
             DataNode parentNode = buildNode.find(assertTask.getOwningTarget());
             if (parentNode != null) {

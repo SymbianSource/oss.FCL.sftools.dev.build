@@ -1201,7 +1201,7 @@ class CCMObject(FourPartName):
         result = self._session.execute("finduse \"%s\"" % self, FinduseResult(self))
         return result.output
     
-    def delete(self, recurse=False):
+    def delete(self, recurse=False, scope=None):
         """ Delete a synergy project. """
         args = ""
         if recurse:
@@ -1209,8 +1209,10 @@ class CCMObject(FourPartName):
         parg = ""
         if self.type == "project":
             parg = "-project"
+        if scope:
+            args = args + ' -scope "' + scope + '"'
         result = self._session.execute("delete %s %s \"%s\"" % (args, parg, self))
-        if result.status != 0 and result.status != None:
+        if (result.status != 0 and result.status != None) or (result.output.strip().startswith('Cannot use')):
             raise CCMException("An error occurred while deleting object %s (error status: %s)\n%s" % (self, result.status, result.output), result)
         return result
 
@@ -1440,6 +1442,46 @@ class Project(CCMObject):
             raise CCMException("Error checking out project %s,\n%s" % (self.objectname, result.output), result)
         return result
     
+    def create_release_tag(self, release, new_tag):
+        """ creates new release tag """
+        role = self._session.role
+        
+        if role is None:
+            self._session.role = "developer"
+            role = self._session.role
+
+        args = "release -create %s -from %s -bl %s -active -allow_parallel_check_out" % (new_tag, release, release)
+        self._session.role = "build_mgr"
+
+        result = self._session.execute(" %s" \
+                                  % (args), Result(self._session))
+        self._session.role = role
+
+        return result.output
+
+    def delete_release_tag(self, release, new_tag):
+        """ deletes new release tag """
+
+        role = self._session.role
+        if role is None:
+            self._session.role = "developer"
+            role = self._session.role
+        
+
+        self._session.role = "build_mgr"
+
+        result = self._session.execute("pg -l -r %s -u" \
+                                  % (new_tag), Result(self._session))
+        result = self._session.execute("pg -d \"%s\" -m" \
+                                  % (result.output), Result(self._session))
+        result = self._session.execute("release -d %s -force" \
+                                  % (new_tag), Result(self._session))
+
+        self._session.role = role
+
+        return result.output
+        
+        
     def work_area(self, maintain, recursive=None, relative=None, path=None, pst=None, wat=False):
         """ Configure the work area. This allow to enable it or disable it, set the path, recursion... """
         args = ""
@@ -1980,5 +2022,5 @@ def session_exists(sessionid, database=None):
 # The location of the ccm binary must be located to know where the _router.adr file is, to support
 # switching databases.
 CCM_BIN = fileutils.which("ccm")
-if os.sep == '\\':
-    CCM_BIN = fileutils.which("ccm.exe")
+if CCM_BIN:
+    CCM_BIN = os.path.normcase(CCM_BIN)

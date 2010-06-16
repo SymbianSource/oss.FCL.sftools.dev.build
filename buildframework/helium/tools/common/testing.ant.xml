@@ -125,6 +125,7 @@ for line in open(r'${helium.build.dir}/coverage/report/line_coverage.txt'):
         <au:antunit>
             <propertyset>
                 <propertyref name="cache.dir"/>
+                <propertyref name="synergy71.enabled"/>
             </propertyset>
             <fileset dir="${helium.dir}" includes="tools/**/test_*.ant.xml"/> 
             <fileset dir="${helium.dir}" includes="extensions/nokia/tools/**/test_*.ant.xml"/> 

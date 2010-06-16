@@ -65,6 +65,42 @@ Output::
 
 
 .. index::
+  single: Stage - Synergy Releasing
+
+Stage: Synergy releasing
+========================
+
+This stage consists in creating automatically a baseline using the prep-work-area configuration. You first need to add the 
+``releasable`` property set to true and what release to use using the ``baseline.release`` property.
+
+Here is an example of configuration:
+
+.. code-block:: xml
+   
+   <build>
+      <config name="myproject-config" abstract="true">
+         <set name="database" value="database" />
+         <set name="dir" value="C:\prep" />
+         <set name="sync" value="true" />
+         <set name="replace.subprojects" value="true" />
+         <set name="use.reconfigure.template" value="true" />
+         <set name="purpose" value="Integration Testing" />
+         <set name="release" value="MyProject/next" />
+
+         <config name="MyProject-92_201018" type="checkout">
+            <set name="to.version" value="next" />
+            <set name="releasable" value="true" />      
+            <set name="baseline.release" value="MyProject/92_201019" />
+         </config>
+        
+      </config>
+   </build> 
+
+
+You can then use the :hlm-t:`release-work-area` target (see Helium API) to at the end of your release cycle baseline and release your content automatically.
+
+
+.. index::
   single: Stage - Release Notes
 
 Stage: Release notes

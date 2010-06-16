@@ -20,11 +20,11 @@ Description:
 
 ============================================================================
 -->
-<project name="test-diamonds" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+<project name="test-diamonds-invalid-template" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
     <description>Helium Antlib diamonds unittests.</description>
     <property environment="env" />
     
-    <property name="diamonds.unitest.dir" location="${ant.file.test-diamonds}/../../../" />
+    <property name="diamonds.unitest.dir" location="${ant.file.test-diamonds-invalid-template}/../../../" />
     <import file="../../../../../../nokia/companyproperties.ant.xml" optional="true"/>
     <import file="../../../../../../../extensions/nokia/external/helium-nokia-antlib/companyproperties.ant.xml" optional="true"/>
     <property name="diamonds.output.dir" location="${temp.dir}/output" />
@@ -39,7 +39,6 @@ Description:
     <property name="policy.log.input" location="${diamonds.unitest.dir}/data/policy.log.xml" />
     <property name="invalid.target.input.file" location="${diamonds.unitest.dir}/data/invalid.target.input.log.xml" />
     <property name="symsee.version" value="9.1.0" />
-
 
     <target name="unittest" depends="unittest-diamonds" />
     

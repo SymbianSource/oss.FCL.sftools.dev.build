@@ -21,194 +21,200 @@ Description:
 ============================================================================
 -->
 <project name="minibuild.ido" default="help" xmlns:au="org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
-	<property environment="env" />
-	<import file="../site/${env.TEAM}.ant.xml" />
-	<dirname property="config.dir" file="${ant.file.minibuild.ido}" />
+    <property environment="env" />
+    <import file="../site/${env.TEAM}.ant.xml" />
+    <dirname property="config.dir" file="${ant.file.minibuild.ido}" />
 
-  <property name="data.drive.letter" value="E" />
-	<!-- Enable Helium internal assertion checking. -->
-	<property name="hlm.enable.asserts" value="1" />
+    <property name="data.drive.letter" value="E" />
+    <!-- Enable Helium internal assertion checking. -->
+    <property name="hlm.enable.asserts" value="1" />
 
-	<property name="build.name" value="minibuild_ido" />
-	<property name="build.family" value="test_minibuild_ido" />
-	<property name="major.version" value="0" />
-	<property name="minor.version" value="0" />
-	
-	<condition property="ccm.project.wa_path" value="${data.drive.letter}:\Build_${data.drive.letter}\${env.USERNAME}\ido_wa\${build.name}"  else="${build.name}\wa" > 
-	      <os family="windows"/>
-	</condition> 
-	<property name="ccm.enabled" value="true" />
-
-
-	<!-- build configuration -->
-	<property name="sysdef.configurations.list" value="helium_minibuild_ido" />
-	<path id="system.definition.files">
-		<fileset dir="${config.dir}" includes="sysdefs/*.sysdef.xml" />
-		<fileset dir="${ccm.project.wa_path}" includes="*/*/*/layers.sysdef.xml" />
-	</path>
-
-
-	<!-- Configuring the build system -->
-	<property name="build.system" value="ec-helium" />
-	<property name="rvct.version" value="22_686" />
-
-	<!-- Configuring get latest env. -->
-	<property name="s60.grace.service" value="S60RnD" />
-	<property name="s60.grace.product" value="pf_5250" />
-	<property name="s60.grace.release" value="pf_5250_\d{6}" />
+    <property name="build.name" value="minibuild_ido" />
+    <property name="build.family" value="test_minibuild_ido" />
+    <property name="major.version" value="0" />
+    <property name="minor.version" value="0" />
     
-	<!-- matching mcl_200948_hw79 -->
-	<condition property="prep.root.dir" value="${data.drive.letter}:\Build_${data.drive.letter}\${env.USERNAME}\ido_ba\${build.name}" else="${build.name}\ido_ba" >
+    <condition property="ccm.project.wa_path" value="${data.drive.letter}:\Build_${data.drive.letter}\${env.USERNAME}\ido_wa\${build.name}"  else="${build.name}\wa" > 
+          <os family="windows"/>
+    </condition> 
+    <property name="ccm.enabled" value="true" />
+    
+    <!-- CMT++ only runs on windows not linux machines -->
+    <condition property="enable.cmt" >
+        <os family="windows" />
+    </condition>
+    <!--property name="ido.name" value="test_cmt" /-->
+
+
+    <!-- build configuration -->
+    <property name="sysdef.configurations.list" value="helium_minibuild_ido" />
+    <path id="system.definition.files">
+        <fileset dir="${config.dir}" includes="sysdefs/*.sysdef.xml" />
+        <fileset dir="${ccm.project.wa_path}" includes="*/*/*/layers.sysdef.xml" />
+    </path>
+
+
+    <!-- Configuring the build system -->
+    <property name="build.system" value="ec-helium" />
+    <property name="rvct.version" value="22_686" />
+
+    <!-- Configuring get latest env. -->
+    <property name="s60.grace.service" value="S60RnD" />
+    <property name="s60.grace.product" value="pf_5250" />
+    <property name="s60.grace.release" value="pf_5250_\d{6}" />
+    
+    <!-- matching mcl_200948_hw79 -->
+    <condition property="prep.root.dir" value="${data.drive.letter}:\Build_${data.drive.letter}\${env.USERNAME}\ido_ba\${build.name}" else="${build.name}\ido_ba" >
         <os family="windows"/>
     </condition>
-	<!-- Synergy configuration -->
-	<property name="ccm.database" value="tr1ido" />
+    <!-- Synergy configuration -->
+    <property name="ccm.database" value="tr1ido" />
     <property name="ccm.project" value="MinibuildDomain-50_200832:project:tr1test1#1" />
-	<property name="prep.delivery.file" location="config/delivery.xml" />
-	<property name="publish.ccm.folder" value="tr1ido#2311" />
+    <property name="prep.delivery.file" location="config/delivery.xml" />
+    <property name="publish.ccm.folder" value="tr1ido#2311" />
 
 
-	<!-- Synergy is not configured -->
-	<property name="skip.password.validation" value="1" />
+    <!-- Synergy is not configured -->
+    <property name="skip.password.validation" value="1" />
 
-	<!-- IDO robot configuration -->
-	<property name="do.robot.release" value="MinibuildDomain" />
-	<tstamp>
-		<format property="ido.robot.tstamp" pattern="yyyyMMddhhmmss" />
-	</tstamp>
-	<property name="s60.build.robot.path" location="${build.drive}/shared_drive/s60robot/${build.name}/${ido.robot.tstamp}" />
+    <!-- IDO robot configuration -->
+    <property name="do.robot.release" value="MinibuildDomain" />
+    <tstamp>
+        <format property="ido.robot.tstamp" pattern="yyyyMMddhhmmss" />
+    </tstamp>
+    <property name="s60.build.robot.path" location="${build.drive}/shared_drive/s60robot/${build.name}/${ido.robot.tstamp}" />
 
-	<import file="hack-test.ant.xml" />
-	<import file="${helium.dir}/helium.ant.xml" />
+    <import file="hack-test.ant.xml" />
+    <import file="${helium.dir}/helium.ant.xml" />
     <import file="config/stages_config.ant.xml" />
 
-	<!-- Run the full sequence of target for the minibuild. ,mini-build-prep,compile-main,zip-ee,mini-build-check-->
-	<target name="do-mini-build" depends="ido-update-build-area,
+    <!-- Run the full sequence of target for the minibuild. ,mini-build-prep,compile-main,zip-ee,mini-build-check-->
+    <target name="do-mini-build" depends="ido-update-build-area,
                                             flag-ba-for-deletion,
-    										mini-build-cleanup,
-    										ido-build,
-                							check-diamonds,
-    	                                    mini-build-check,
-    										run-hack" />
+                                            mini-build-cleanup,
+                                            ido-build,
+                                            check-diamonds,
+                                            mini-build-check,
+                                            run-hack" />
 
 
-	<!--ant code coverage for mini-builds-->
-	<target name="mini-build">
+    <!--ant code coverage for mini-builds-->
+    <target name="mini-build">
     <antcall target="database">
         <param name="home.files.only" value="false"/>
     </antcall>
-		<mkdir dir="${helium.build.dir}/temp" />
-		<property name="config.temp.build.dir" location="${config.dir}/build" />
-		<hlm:coveragerecord name="${helium.build.dir}/temp/test.minibuild-ido.xml" action="start" />
-		<runtarget target="do-mini-build" />
-		<hlm:coveragerecord name="${helium.build.dir}/temp/test.minibuild-ido.xml" action="stop" />
-		<fmpp sourcefile="${helium.dir}/tools/common/templates/coveragerecord.txt.ftl" outputfile="${helium.build.dir}/temp/test_minibuild.txt">
-			<data expandProperties="yes">
+        <mkdir dir="${helium.build.dir}/temp" />
+        <property name="config.temp.build.dir" location="${config.dir}/build" />
+        <hlm:coveragerecord name="${helium.build.dir}/temp/test.minibuild-ido.xml" action="start" />
+        <runtarget target="do-mini-build" />
+        <hlm:coveragerecord name="${helium.build.dir}/temp/test.minibuild-ido.xml" action="stop" />
+        <fmpp sourcefile="${helium.dir}/tools/common/templates/coveragerecord.txt.ftl" outputfile="${helium.build.dir}/temp/test_minibuild.txt">
+            <data expandProperties="yes">
                 doc: xml(${helium.build.dir}/temp/test.minibuild-ido.xml)
                 database: xml(${database.file})
             </data>
-		</fmpp>
-		<loadfile srcfile="${helium.build.dir}/temp/test_minibuild.txt" property="ant.coverage.summary" />
-		<echo>
+        </fmpp>
+        <loadfile srcfile="${helium.build.dir}/temp/test_minibuild.txt" property="ant.coverage.summary" />
+        <echo>
 The summary of Ant code coverage:
 
 ${ant.coverage.summary}</echo>
-		<fmpp sourcefile="${helium.dir}/tools/common/templates/coveragerecord.html.ftl" outputfile="${helium.build.dir}/temp/test_minibuild.html">
-			<data expandProperties="yes">
-            	doc: xml(${helium.build.dir}/temp/test.minibuild-ido.xml)
+        <fmpp sourcefile="${helium.dir}/tools/common/templates/coveragerecord.html.ftl" outputfile="${helium.build.dir}/temp/test_minibuild.html">
+            <data expandProperties="yes">
+                doc: xml(${helium.build.dir}/temp/test.minibuild-ido.xml)
                 database: xml(${database.file})
-			</data>
-		</fmpp>
-	</target>
+            </data>
+        </fmpp>
+    </target>
 
 
-	<!-- Preparing the content on top of the env -->
-	<target name="ido-50-build" depends="ido-build-prep,compile-main,build-log-summary,render-internal-exports,update-policy-src-reference,render-validate-policy,localisation-50-build,ido-codescanner,ats-test,publish-tasks-to-folder,ido-sources-to-s60-build-robot" />
-	<target name="ido-build-prep" depends="ido-configure-prep,init,check-tool-dependencies,log-build-env,set-arm-version,check-free-space,diamonds,do-prep-work-area,ido-prep-clean,ido-prep-copy,create-bom" />
+    <!-- Preparing the content on top of the env -->
+    <target name="ido-50-build" depends="ido-build-prep,compile-main,build-log-summary,render-internal-exports,update-policy-src-reference,render-validate-policy,check-sf-source-header,localisation-50-build,ido-codescanner,ats-test,publish-tasks-to-folder,ido-sources-to-s60-build-robot" />
+    <target name="ido-build-prep" depends="ido-configure-prep,init,check-tool-dependencies,log-build-env,set-arm-version,check-free-space,diamonds,do-prep-work-area,ido-prep-clean,ido-prep-copy,create-bom" />
 
-	<!-- needed to defined skip.prep-drive -->
-	<target name="ido-configure-prep">
-		<property name="skip.prep-drive" value="true" />
-	</target>
+    <!-- needed to defined skip.prep-drive -->
+    <target name="ido-configure-prep">
+        <property name="skip.prep-drive" value="true" />
+    </target>
 
-	<!-- real IDO use this to switch branch target. -->
-	<target name="ido-build">
-		<runtarget target="ido-50-build" />
-	</target>
+    <!-- real IDO use this to switch branch target. -->
+    <target name="ido-build">
+        <runtarget target="ido-50-build" />
+    </target>
 
 
-	<target name="check-diamonds">
-		<!--loadfile srcfile="${build.log.dir}/diamonds-start.log.xml" property="diamonds.log.start" />
-		<echo>${diamonds.log.start}</echo-->
-		<!--loadresource property="diamonds.log.start.output">
-			<url url="${diamonds.build.url}?fmt=xml" />
-		</loadresource-->
-		<!--echo>${diamonds.log.start.output}</echo-->
+    <target name="check-diamonds">
+        <!--loadfile srcfile="${build.log.dir}/diamonds-start.log.xml" property="diamonds.log.start" />
+        <echo>${diamonds.log.start}</echo-->
+        <!--loadresource property="diamonds.log.start.output">
+            <url url="${diamonds.build.url}?fmt=xml" />
+        </loadresource-->
+        <!--echo>${diamonds.log.start.output}</echo-->
         <xmlvalidate lenient="yes">
-        	<fileset dir="${build.log.dir}">
+            <fileset dir="${build.log.dir}">
                 <include name="diamonds-finish.xml"/>
                 <include name="diamonds-full-results.xml"/>
                 <include name="diamonds-start.log.xml"/>
-        		<include name="check-tool-dependencies.xml"/>
-        		<include name="compile-main.xml"/>
-        		<include name="create-bom.xml"/>
-        		<include name="build-time.xml"/>
-        	</fileset>
+                <include name="check-tool-dependencies.xml"/>
+                <include name="compile-main.xml"/>
+                <include name="create-bom.xml"/>
+                <include name="build-time.xml"/>
+            </fileset>
         </xmlvalidate>
-	</target>
+    </target>
 
-	<target name="mini-build-cleanup">
-		<delete verbose="true" includeemptydirs="true" failonerror="false">
-			<fileset dir="${build.drive}/" casesensitive="false">
-				<include name="makefile" />
-				<include name="*.mk" />
-				<include name="ecloud_tmp_*/**" />
-				<include name="emake.*" />
-				<include name="epoc32/build/**" />
-				<include name="epoc32/rombuild/*/**" />
-				<include name="output/**" />
-				<include name="timestart.txt" />
-				<include name="timestop.txt" />
-			</fileset>
-		</delete>
-	</target>
-
-
-	<target name="mini-build-check">
-		<!-- Check if prep has set some prop correctly... -->
-		<!-- remember to update the selection by the environment variable in hlm.bat when switching to other compiler version -->
-		<echo>'${arm.compiler.version}'</echo>
-		<au:assertMatches string="${arm.compiler.version}" pattern="RVCT2\.2 \[Build 686\]" casesensitive="false" multiline="true" />
-
-		<!-- Check if compile-main step did what expected... -->
-		<au:assertFileExists file="${canonical.sysdef.file}" />
-		<if>
-			<or>
-				<isset property="build.system.ec-helium" />
-				<isset property="build.system.ec" />
-			</or>
-			<then>
-				<au:assertFileExists file="${build.drive}/helium_minibuild_ido.make" />
-				<au:assertFileExists file="${build.drive}/helium_minibuild_ido_clean.make" />
-				<au:assertFileExists file="${build.drive}/emake.data" />
-
-				<au:assertFileExists file="${temp.build.dir}/${build.id}.helium_minibuild_ido_run_emake.bat" />
-				<au:assertFileExists file="${temp.build.dir}/${build.id}.helium_minibuild_ido_clean_run_emake.bat" />
-			</then>
-		</if>
-		
-		<!-- Check if stagelogging step did what expected... -->
-		<au:assertFileExists file="${build.log.dir}/${build.id}_ido_prep.ant.log" />
-		<au:assertFileExists file="${build.log.dir}/${build.id}_compile.ant.log" />
-		<au:assertFileExists file="${build.log.dir}/${build.id}_test.ant.log" />
-		<au:assertFileExists file="${build.log.dir}/${build.id}_localisation.ant.log" />
-		
-	</target>
+    <target name="mini-build-cleanup">
+        <delete verbose="true" includeemptydirs="true" failonerror="false">
+            <fileset dir="${build.drive}/" casesensitive="false">
+                <include name="makefile" />
+                <include name="*.mk" />
+                <include name="ecloud_tmp_*/**" />
+                <include name="emake.*" />
+                <include name="epoc32/build/**" />
+                <include name="epoc32/rombuild/*/**" />
+                <include name="output/**" />
+                <include name="timestart.txt" />
+                <include name="timestop.txt" />
+            </fileset>
+        </delete>
+    </target>
 
 
-	<target name="update-policy-src-reference" depends="ido-create-ado-mapping">
-		<hlm:iniKeys2Path ini="${ado.mapping.file}" pathid="reference.policy.path.list"/>
-	</target>
+    <target name="mini-build-check">
+        <!-- Check if prep has set some prop correctly... -->
+        <!-- remember to update the selection by the environment variable in hlm.bat when switching to other compiler version -->
+        <echo>'${arm.compiler.version}'</echo>
+        <au:assertMatches string="${arm.compiler.version}" pattern="RVCT2\.2 \[Build 686\]" casesensitive="false" multiline="true" />
+
+        <!-- Check if compile-main step did what expected... -->
+        <au:assertFileExists file="${canonical.sysdef.file}" />
+        <if>
+            <or>
+                <isset property="build.system.ec-helium" />
+                <isset property="build.system.ec" />
+            </or>
+            <then>
+                <au:assertFileExists file="${build.drive}/helium_minibuild_ido.make" />
+                <au:assertFileExists file="${build.drive}/helium_minibuild_ido_clean.make" />
+                <au:assertFileExists file="${build.drive}/emake.data" />
+
+                <au:assertFileExists file="${temp.build.dir}/${build.id}.helium_minibuild_ido_run_emake.bat" />
+                <au:assertFileExists file="${temp.build.dir}/${build.id}.helium_minibuild_ido_clean_run_emake.bat" />
+            </then>
+        </if>
+        
+        <!-- Check if stagelogging step did what expected... -->
+        <au:assertFileExists file="${build.log.dir}/${build.id}_ido_prep.ant.log" />
+        <au:assertFileExists file="${build.log.dir}/${build.id}_compile.ant.log" />
+        <au:assertFileExists file="${build.log.dir}/${build.id}_test.ant.log" />
+        <au:assertFileExists file="${build.log.dir}/${build.id}_localisation.ant.log" />
+        
+    </target>
+
+
+    <target name="update-policy-src-reference" depends="ido-create-ado-mapping">
+        <hlm:iniKeys2Path ini="${ado.mapping.file}" pathid="reference.policy.path.list"/>
+    </target>
 
 </project>
 

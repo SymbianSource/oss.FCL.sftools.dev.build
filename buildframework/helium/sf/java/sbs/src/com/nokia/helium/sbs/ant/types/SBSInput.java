@@ -18,13 +18,14 @@
 package com.nokia.helium.sbs.ant.types;
 
 import com.nokia.helium.core.ant.types.VariableSet;
-import com.nokia.helium.core.ant.VariableIFImpl;
+import com.nokia.helium.core.ant.MappedVariable;
+import com.nokia.helium.core.ant.VariableMap;
 import java.util.Collection;
-import com.nokia.helium.core.ant.types.Variable;
 import org.apache.tools.ant.BuildException;
 import java.util.Vector;
+
+import org.apache.tools.ant.types.DataType;
 import org.apache.tools.ant.types.Reference;
-import org.apache.log4j.Logger;
 
 /**
  * Helper class to store the variable set (list of variables
@@ -37,19 +38,11 @@ import org.apache.log4j.Logger;
  * 
  * @ant.type name="sbsinput" category="SBS"
  */
-public class SBSInput extends VariableIFImpl {
-    
-    private static Logger log = Logger.getLogger(SBSInput.class);
+public class SBSInput extends DataType implements VariableMap {
     
     private Vector<VariableSet> sbsOptions = new Vector<VariableSet>();
     private Vector<SBSMakeOptions> sbsMakeOptions = new Vector<SBSMakeOptions>();
     private Vector<SBSInput> sbsInputList = new Vector<SBSInput>();
-    
-    /**
-     * Constructor
-     */
-    public SBSInput() {
-    }    
 
     /**
      * Creates an empty variable element and adds 
@@ -235,7 +228,7 @@ public class SBSInput extends VariableIFImpl {
         }
         if (fullList != null) {
             for (VariableSet varSet : fullList) {
-                for (Variable var : varSet.getVariables()) {
+                for (MappedVariable var : varSet.getVariables()) {
                     if (resultSet == null) {
                         resultSet = new VariableSet();
                     }
@@ -297,7 +290,7 @@ public class SBSInput extends VariableIFImpl {
                     ppThreads = currentThread;
                     resultSet.setPPThreads(ppThreads);
                 }
-                for (Variable var : varSet.getVariables()) {
+                for (MappedVariable var : varSet.getVariables()) {
                     resultSet.add(var);
                 }
             }
@@ -309,8 +302,8 @@ public class SBSInput extends VariableIFImpl {
      * Helper function to return the collection of variabes associated with this
      * @return collection of sbs options associatied with this sbsinput.
      */
-    public Collection<Variable> getVariables() {
-        Collection<Variable> varList = null;
+    public Collection<MappedVariable> getVariables() {
+        Collection<MappedVariable> varList = null;
         VariableSet  options = getFullSBSOptions();
         if (options != null) {
             varList = options.getVariables();

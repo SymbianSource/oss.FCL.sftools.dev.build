@@ -159,8 +159,8 @@ public class XmlLogger implements BuildLogger {
                     event.getException().toString());
             // print the stacktrace in the build file it is always useful...
             // better have too much info than not enough.
-            Throwable t = event.getException();
-            Text errText = doc.createCDATASection(StringUtils.getStackTrace(t));
+            Throwable exception = event.getException();
+            Text errText = doc.createCDATASection(StringUtils.getStackTrace(exception));
             Element stacktrace = doc.createElement(STACKTRACE_TAG);
             stacktrace.appendChild(errText);
             buildElement.element.appendChild(stacktrace);
@@ -279,8 +279,8 @@ public class XmlLogger implements BuildLogger {
             return element;
         }
 
-        for (Enumeration e = tasks.keys(); e.hasMoreElements();) {
-            Task key = (Task) e.nextElement();
+        for (Enumeration taskEnum = tasks.keys(); taskEnum.hasMoreElements();) {
+            Task key = (Task) taskEnum.nextElement();
             if (key instanceof UnknownElement) {
                 if (((UnknownElement) key).getTask() == task) {
                     return (TimedElement) tasks.get(key);

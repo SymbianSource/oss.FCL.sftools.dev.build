@@ -18,6 +18,7 @@
 #
 #Description:
 #===============================================================================
+""" test parsers"""
 
 import os
 import tempfile
@@ -353,7 +354,7 @@ class TestPkgFileParser(mocker.MockerTestCase):
         self.tcp = ats3.parsers.PkgFileParser("tc1.pkg")        
         
         self.data_files = [
-            (path(TSRC_DIR+r"" + os.sep + "tsrc" + os.sep + "tc1" + os.sep + "data" + os.sep + "file1.dll").normpath(), path(r"c:" + os.sep + "sys" + os.sep + "bin" + os.sep + "file1.dll").normpath(), "testmodule", 'tc1.pkg'),
+            (path(TSRC_DIR+r"" + os.sep + "tsrc" + os.sep + "tc1" + os.sep + "data" + os.sep + "file1.dll").normpath(), path(r"c:" + os.sep + "sys" + os.sep + "bin" + os.sep + "file1.dll").normpath(), "data:dependent", 'tc1.pkg'),
             (path(TSRC_DIR+r"" + os.sep + "tsrc" + os.sep + "tc1" + os.sep + "data" + os.sep + "file1.txt").normpath(), path(r"e:" + os.sep + "sys" + os.sep + "bin" + os.sep + "file1.txt").normpath(), "data", 'tc1.pkg'),
             (path(TSRC_DIR+r"" + os.sep + "tsrc" + os.sep + "tc1" + os.sep + "data" + os.sep + "file2.mp3").normpath(), path(r"e:" + os.sep + "sys" + os.sep + "bin" + os.sep + "file2.mp3").normpath(), "data", 'tc1.pkg'),
             (path(TSRC_DIR+r"" + os.sep + "tsrc" + os.sep + "tc1" + os.sep + "data" + os.sep + "TestFramework.ini").normpath(), path(r"c:" + os.sep + "sys" + os.sep + "bin" + os.sep + "TestFramework.ini").normpath(), "engine_ini", 'tc1.pkg'),
@@ -362,6 +363,8 @@ class TestPkgFileParser(mocker.MockerTestCase):
             (path(TSRC_DIR+r"" + os.sep + "tsrc" + os.sep + "tc1" + os.sep + "data" + os.sep + "tc1.sisx").normpath(), path(r"e:" + os.sep + "sys" + os.sep + "bin" + os.sep + "tc1.sisx").normpath(), "", 'tc1.pkg'),
             (path(TSRC_DIR+r"" + os.sep + "tsrc" + os.sep + "tc1" + os.sep + "data" + os.sep + "DUMP.xyz").normpath(), path(r"e:" + os.sep + "sys" + os.sep + "bin" + os.sep + "DUMP.xyz").normpath(), "data", 'tc1.pkg'),
             ]
+        for p, _, _, _ in self.data_files:
+            open(p, 'w').close()
 
     def test_get_pkg_files(self):
         """Test if pkg files are returned from a specified location"""
@@ -382,15 +385,13 @@ class TestPkgFileParser(mocker.MockerTestCase):
         self.data_files.pop()
         assert self.tcp.get_data_files(self.pkg_file_path1, "d:", "\.xyz") == self.data_files
 
-    def test_data_files_creation_without_drive_with_exclude(self):
+    def test_data_files_create_no_drive_wth_excl(self):
         """ Tests if PKG file parser creates data files list as expected without drive with exclude"""
-        
         self.data_files.pop()
         assert self.tcp.get_data_files(self.pkg_file_path1, "", "\.xyz") == self.data_files
 
-    def test_data_files_creation_without_drive_without_exclude(self):
+    def test_data_file_creation_no_drive_no_excl(self):
         """ Tests if PKG file parser creates data files list as expected without drive without exclude"""
-        
         assert self.tcp.get_data_files(self.pkg_file_path1, "") == self.data_files
             
 
@@ -400,6 +401,7 @@ class TestCppParser(mocker.MockerTestCase):
         mocker.MockerTestCase.__init__(self, methodName)
 
     def setUp(self):
+        """setUp called before running tests automatically"""
         self.bld_path = os.path.normpath(os.path.join(TSRC_DIR, "tsrc", "group"))
         self.bld_path_comp1 = os.path.normpath(os.path.join(TSRC_DIR, "tsrc", "tc1", "group"))
         self.tcp = ats3.parsers.CppParser()
@@ -586,8 +588,8 @@ class TestBldFileParser(mocker.MockerTestCase):
         """Tests if test mmp files are included"""
         self.lst_test_mmp = []
         
-        for p in self.path_list:
-            self.lst_test_mmp.append(self.tcp.get_test_mmp_files(os.path.normpath(os.path.join(p, "bld.inf")), False))
+        for p_list in self.path_list:
+            self.lst_test_mmp.append(self.tcp.get_test_mmp_files(os.path.normpath(os.path.join(p_list, "bld.inf")), False))
 
         assert self.lst_test_mmp == self.test_mmp_files
         
@@ -611,7 +613,7 @@ class TestBldFileParser(mocker.MockerTestCase):
     
     def test_empty_parameter(self):
         """Tests if 'None' is returned when bld file path is empty"""
-        upper_bld_path = os.path.dirname(self.bld_path)
+        _ = os.path.dirname(self.bld_path)
         assert self.tcp.get_test_mmp_files("") == None
 
     
@@ -621,9 +623,10 @@ class TestMmpFileParser(mocker.MockerTestCase):
         mocker.MockerTestCase.__init__(self, methodName)
         
     def setUp(self):
+        """setUp called before tests are runn (automatically)"""
         self.bld_path = os.path.normpath(os.path.join(TSRC_DIR, "tsrc", "group", "bld.inf"))
         upper_bld_path = os.path.dirname(self.bld_path)
-        self.tcp = ats3.parsers.MmpFileParser()
+        self.tcp = ats3.parsers.MmpFileParser(self.bld_path)
         self.tc1_type = "dll"
         self.tc1_name = "tc1.dll"
         self.tc1_dll_type = "executable"
@@ -684,4 +687,5 @@ class TestParsers(mocker.MockerTestCase):
         mocker.MockerTestCase.__init__(self, methodName)
         
     def setUp(self):
+        """setUp automatically called before the tests are run"""
         pass

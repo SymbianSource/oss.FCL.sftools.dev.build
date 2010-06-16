@@ -20,14 +20,14 @@ Description:
 
 ============================================================================
 -->
-<project name="test-signaling-config" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+<project name="test-signaling-config" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium" xmlns:cond="antlib:org.apache.tools.ant.types.conditions">
     <description>
         signalInput and notifierList test configuration
     </description>
     <dirname property="project.dir.signaling" file="${ant.file.test-signaling-config}" />
 
     <property name="build.summary.file" location="${project.dir.signaling}/../data/ido_tedo_mcl_devlon52_ec_MCL.52.105_summary.log.xml" />
-    <taskdef resource="org/apache/tools/ant/types/conditions/antlib.xml" />
+    
     <taskdef resource="com/nokia/helium/signal/ant/antlib.xml" uri="http://www.nokia.com/helium" />
 
     <hlm:notifierList id="defaultsignalnotifier">
@@ -62,9 +62,9 @@ Description:
             <signalInput refid="compilesignalinput" />
         </signalNotifierInput>
         <targetCondition >
-            <not>
+            <cond:not>
                 <equals arg1="0" arg2="${number.of.errors}" />
-            </not>
+            </cond:not>
         </targetCondition>
     </hlm:signalListenerConfig>
 
@@ -95,17 +95,17 @@ Description:
     </hlm:signallist-->
 
     <!--Invalid configurations -->
-    <hlm:notifierList id="invalid-notifier1" />
+    <hlm:notifierList id="empty-notifier1" />
 
-    <hlm:notifierList id="invalid-notifier2">
+    <hlm:notifierList id="empty-notifier2">
         <!--hlm:notifier type="test" senderlist="${env.username}" /-->
     </hlm:notifierList>
 
-    <hlm:notifierList id="invalid-notifier3">
+    <hlm:notifierList id="empty-notifier3">
         <!--hlm:notifier type="email" /-->
     </hlm:notifierList>
 
-    <hlm:notifierList id="invalid-notifier4">
+    <hlm:notifierList id="empty-notifier4">
         <!--hlm:notifier senderlist="${env.username}" /-->
     </hlm:notifierList>
 
@@ -115,19 +115,19 @@ Description:
     </hlm:signalInput>
 
     <hlm:signalInput id="invalid-input3" failbuild="never">
-        <hlm:notifierListRef refid="invalid-notifier1" />
+        <hlm:notifierListRef refid="empty-notifier1" />
     </hlm:signalInput>
 
-    <hlm:signalInput id="invalid-input4" failbuild="never">
-        <hlm:notifierListRef refid="invalid-notifier2" />
+    <hlm:signalInput id="valid-input4" failbuild="never">
+        <hlm:notifierListRef refid="empty-notifier2" />
     </hlm:signalInput>
 
-    <hlm:signalInput id="invalid-input5" failbuild="never">
-        <hlm:notifierListRef refid="invalid-notifier3" />
+    <hlm:signalInput id="valid-input5" failbuild="never">
+        <hlm:notifierListRef refid="empty-notifier3" />
     </hlm:signalInput>
 
-    <hlm:signalInput id="invalid-input6" failbuild="never">
-        <hlm:notifierListRef refid="invalid-notifier4" />
+    <hlm:signalInput id="valid-input6" failbuild="never">
+        <hlm:notifierListRef refid="empty-notifier4" />
     </hlm:signalInput>
 
     <hlm:signalListenerConfig id="noreferenceSignal" target="target-invalid-config1" message="Errors happened during compilation">
@@ -135,9 +135,9 @@ Description:
             <hlm:signalInput refid="noreference" />
         </signalNotifierInput>
         <targetCondition>
-            <not>
+            <cond:not>
                 <equals arg1="0" arg2="${number.of.errors}" />
-            </not>
+            </cond:not>
         </targetCondition>
     </hlm:signalListenerConfig>
 
@@ -148,54 +148,54 @@ Description:
     <hlm:signalListenerConfig id="invalidInputSignal" target="target-invalid-config4" message="Errors happened during compilation">
         <!-- <hlm:signalInput refid="invalid-input2" /> -->
         <targetCondition >
-            <not>
+            <cond:not>
                 <equals arg1="0" arg2="${number.of.errors}" />
-            </not>
+            </cond:not>
         </targetCondition>
     </hlm:signalListenerConfig>
 
-    <hlm:signalListenerConfig id="invalidInput3" target="target-invalid-config5" message="Errors happened during compilation">
+    <hlm:signalListenerConfig id="invalidInput3" target="target-empty-notifier-list-config5" message="Errors happened during compilation">
         <signalNotifierInput>
-            <signalInput refid="invalid-input3" />
+            <signalInput refid="empty-input3" />
         </signalNotifierInput>
-        <targetCondition >
-            <not>
+        <targetCondition>
+            <cond:not>
                 <equals arg1="0" arg2="${number.of.errors}" />
-            </not>
+            </cond:not>
         </targetCondition>
     </hlm:signalListenerConfig>
 
-    <hlm:signalListenerConfig id="invalidInput4" target="target-invalid-config6" message="Errors happened during compilation">
+    <hlm:signalListenerConfig id="invalidInput4" target="target-valid-config6" message="Errors happened during compilation">
         <signalNotifierInput>
-            <signalInput refid="invalid-input4" />
+            <signalInput refid="valid-input4" />
         </signalNotifierInput>
         <targetCondition >
-            <not>
+            <cond:not>
                 <equals arg1="0" arg2="${number.of.errors}" />
-            </not>
+            </cond:not>
         </targetCondition>
     </hlm:signalListenerConfig>
 
-    <hlm:signalListenerConfig id="invalidInput5" target="target-invalid-config7" message="Errors happened during compilation">
+    <hlm:signalListenerConfig id="validInput5" target="target-valid-config7" message="Errors happened during compilation">
         <signalNotifierInput>
-            <signalInput refid="invalid-input5" />
+            <signalInput refid="valid-input5" />
         </signalNotifierInput>
 
         <targetCondition >
-            <not>
+            <cond:not>
                 <equals arg1="0" arg2="${number.of.errors}" />
-            </not>
+            </cond:not>
         </targetCondition>
     </hlm:signalListenerConfig>
 
-    <hlm:signalListenerConfig id="invalidInput6" target="target-invalid-config8" message="Errors happened during compilation">
+    <hlm:signalListenerConfig id="validInput6" target="target-valid-config8" message="Errors happened during compilation">
         <signalNotifierInput>
-            <signalInput refid="invalid-input6" />
+            <signalInput refid="valid-input6" />
         </signalNotifierInput>
         <targetCondition >
-            <not>
+            <cond:not>
                 <equals arg1="0" arg2="${number.of.errors}" />
-            </not>
+            </cond:not>
         </targetCondition>
     </hlm:signalListenerConfig>
 
@@ -204,9 +204,9 @@ Description:
             <signalInput refid="invalid-input7" />
         </signalNotifierInput>
         <targetCondition >
-            <not>
+            <cond:not>
                 <equals arg1="0" arg2="${number.of.errors}" />
-            </not>
+            </cond:not>
         </targetCondition>
     </hlm:signalListenerConfig>
 
@@ -239,7 +239,7 @@ Description:
             <signalInput refid="validSignalInput" />
         </signalNotifierInput>
         <targetCondition >
-            <!-- <not><equals arg1="0" arg2="${number.of.error}"/></not> -->
+            <!-- <cond:not><equals arg1="0" arg2="${number.of.error}"/></cond:not> -->
         </targetCondition>
     </hlm:signalListenerConfig>
 
@@ -248,7 +248,7 @@ Description:
             <signalInput refid="validSignalInput" />
         </signalNotifierInput>
         <targetCondition >
-            <!--<not><equals arg1="0" arg2="0"/></not> -->
+            <!--<cond:not><equals arg1="0" arg2="0"/></cond:not> -->
         </targetCondition>
     </hlm:signalListenerConfig>
 
@@ -257,9 +257,9 @@ Description:
             <signalInput refid="input-fail-build-now" />
         </signalNotifierInput>
         <targetCondition>
-            <not>
+            <cond:not>
                 <equals arg1="0" arg2="0" />
-            </not>
+            </cond:not>
         </targetCondition>
     </hlm:signalListenerConfig>
 
@@ -268,9 +268,9 @@ Description:
             <signalInput refid="input-fail-build-now" />
         </signalNotifierInput>
         <targetCondition >
-            <not>
+            <cond:not>
                 <equals arg1="0" arg2="${number.of.errors}" />
-            </not>
+            </cond:not>
         </targetCondition>
     </hlm:signalListenerConfig>
 
@@ -286,9 +286,9 @@ Description:
             <signalInput refid="input-fail-build-defer" />
         </signalNotifierInput>
         <targetCondition >
-            <not>
+            <cond:not>
                 <equals arg1="0" arg2="0" />
-            </not>
+            </cond:not>
         </targetCondition>
     </hlm:signalListenerConfig>
 
@@ -297,9 +297,9 @@ Description:
             <signalInput refid="input-fail-build-defer" />
         </signalNotifierInput>
         <targetCondition>
-            <not>
+            <cond:not>
                 <equals arg1="0" arg2="${number.of.errors}" />
-            </not>
+            </cond:not>
         </targetCondition>
     </hlm:signalListenerConfig>
 
@@ -309,9 +309,9 @@ Description:
         </signalNotifierInput>
 
         <targetCondition>
-            <not>
+            <cond:not>
                 <equals arg1="0" arg2="0" />
-            </not>
+            </cond:not>
         </targetCondition>
     </hlm:signalListenerConfig>
 
@@ -321,9 +321,9 @@ Description:
         </signalNotifierInput>
 
         <targetCondition  >
-            <not>
+            <cond:not>
                 <equals arg1="0" arg2="${number.of.errors}" />
-            </not>
+            </cond:not>
         </targetCondition>
     </hlm:signalListenerConfig>
 

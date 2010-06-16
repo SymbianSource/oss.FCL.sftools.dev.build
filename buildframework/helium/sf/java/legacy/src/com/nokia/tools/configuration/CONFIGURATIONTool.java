@@ -17,8 +17,8 @@
 
 package com.nokia.tools.configuration;
 
+import com.nokia.helium.core.ant.MappedVariable;
 import com.nokia.helium.core.ant.types.VariableSet;
-import com.nokia.helium.core.ant.types.Variable;
 import com.nokia.tools.*;
 import org.apache.tools.ant.Project;
 
@@ -45,7 +45,7 @@ public class CONFIGURATIONTool implements Tool {
         String report = null;
         String varName;
         String value;
-        for (Variable variable : varSet.getVariables()) {
+        for (MappedVariable variable : varSet.getVariables()) {
             varName = variable.getName();
             value = variable.getValue();
             if (varName.equals("path")) {

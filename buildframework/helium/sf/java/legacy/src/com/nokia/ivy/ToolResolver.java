@@ -132,8 +132,8 @@ public class ToolResolver extends BasicResolver
                 continue;
             }
             if (versionMatcher.needModuleDescriptor(mrid, foundMrid)) {
-                ResolvedResource r = rmdparser.parse(rres.getResource(), rres.getRevision());
-                ModuleDescriptor md = ((MDResolvedResource)r).getResolvedModuleRevision().getDescriptor();
+                ResolvedResource resolvedResource = rmdparser.parse(rres.getResource(), rres.getRevision());
+                ModuleDescriptor md = ((MDResolvedResource)resolvedResource).getResolvedModuleRevision().getDescriptor();
                 if (md.isDefault()) {
                     Message.debug("\t" + name + ": default md rejected by version matcher requiring module descriptor: " + rres);
                     rejected.add(rres.getRevision() + " (MD)");
@@ -143,7 +143,7 @@ public class ToolResolver extends BasicResolver
                     rejected.add(rres.getRevision() + " (MD)");
                     continue;
                 } else {
-                    found = r;
+                    found = resolvedResource;
                 }
             } else {
                 found = rres;
@@ -242,13 +242,13 @@ public class ToolResolver extends BasicResolver
         Message.debug("\t\tm2compatible: " + isM2compatible());
         Message.debug("\t\tivy patterns:");
         for (ListIterator iter = getIvyPatterns().listIterator(); iter.hasNext();) {
-            String p = (String)iter.next();
-            Message.debug("\t\t\t" + p);
+            String pattern = (String)iter.next();
+            Message.debug("\t\t\t" + pattern);
         }
         Message.debug("\t\tartifact patterns:");
         for (ListIterator iter = getArtifactPatterns().listIterator(); iter.hasNext();) {
-            String p = (String)iter.next();
-            Message.debug("\t\t\t" + p);
+            String pattern = (String)iter.next();
+            Message.debug("\t\t\t" + pattern);
         }
     }
 

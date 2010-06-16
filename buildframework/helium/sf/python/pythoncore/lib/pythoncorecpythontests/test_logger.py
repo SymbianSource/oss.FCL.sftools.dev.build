@@ -16,6 +16,7 @@
 #
 #Description:
 #===============================================================================
+""" test logger"""
 
 import logging
 import os
@@ -27,7 +28,7 @@ import helium.outputer
 
 # Uncomment this line to enable logging in this module, or configure logging elsewhere
 #logging.basicConfig(level=logging.DEBUG)
-logger = logging.getLogger('test.helium.logger')
+_logger = logging.getLogger('test.helium.logger')
 
 
 class TestHeliumLogger(unittest.TestCase):
@@ -52,7 +53,7 @@ class TestHeliumLogger(unittest.TestCase):
         mclogger.CloseMainContent()
         mclogger.WriteToFile('log.xml')
         
-        logger.info(mclogger)
+        _logger.info(mclogger)
         
         os.unlink('log.xml')
         
@@ -71,7 +72,7 @@ class TestHeliumLogger(unittest.TestCase):
         mclogger.CloseMainContent()
         mclogger.WriteToFile('log.xml')
         
-        logger.info(mclogger)
+        _logger.info(mclogger)
         
         os.unlink('log.xml')
 
@@ -86,7 +87,7 @@ class TestHeliumLogger(unittest.TestCase):
         mclogger.CloseMainContent()
         mclogger.WriteToFile('log.xml')
         
-        logger.info(mclogger)
+        _logger.info(mclogger)
         
         out = helium.outputer.XML2XHTML('log.xml')
         out.generate()

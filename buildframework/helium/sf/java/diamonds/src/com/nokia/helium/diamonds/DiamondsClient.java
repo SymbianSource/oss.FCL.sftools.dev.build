@@ -197,6 +197,10 @@ public class DiamondsClient {
                 postMethod = getPostMethod(fileName, strURL);
                 result = processPostMethodResult(httpClient
                         .executeMethod(postMethod));
+            } catch (IllegalArgumentException e) {
+                // Catching this exception is needed because it is raised by httpclient
+                // library if the server is under update.
+                log.error("sendData:The final data via http not sent because errors:IllegalArgumentException ", e);
             } catch (DiamondsException e) {
                 log.error("sendData:The final data via http not sent because errors:DiamondsException ", e);
             } catch (IOException e) {

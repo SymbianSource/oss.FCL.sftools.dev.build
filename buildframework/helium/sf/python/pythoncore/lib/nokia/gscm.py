@@ -42,12 +42,12 @@ def _execute(command):
 
 def __get_gscm_info(method, dbname):
     """ Generic method that call function 'method' on GSCM wrapper script. """
-    (fd, filename) = tempfile.mkstemp()
-    f = os.fdopen(fd, 'w')
-    f.write(pkg_resources.resource_string(__name__, "get_gscm_info.pl"))# pylint: disable-msg=E1101
-    f.close()
+    (f_desc, filename) = tempfile.mkstemp()
+    f_file = os.fdopen(f_desc, 'w')
+    f_file.write(pkg_resources.resource_string(__name__, "get_gscm_info.pl"))# pylint: disable-msg=E1101
+    f_file.close()
     command = "perl " + filename
-    command += " %s %s" % (method, dbname)    
+    command += " %s %s" % (method, dbname)
     _logger.debug("Running command: %s" % command)
     (output, status) = _execute(command)
     _logger.debug("Status: %s" % status)

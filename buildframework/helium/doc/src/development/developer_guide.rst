@@ -73,20 +73,17 @@ The ``helium.ant.xml`` file in the project root should be imported by each build
 .. index::
   single: Custom Ant library
 
-Custom Ant library
-==================
+Custom Ant libraries
+====================
 
-All custom Ant tasks and loggers should be added as new component under the sf folder. If the component you are creating is Java based, then add
-it inside the java folder. Your component directory must contain a build.xml file that imports the ${builder.dir}/java/macros.ant.xml file. Also the name
-of the project must be the name of the future jar file e.g::
+All custom Ant tasks, types and loggers should be added as new components under the ``/sf`` folder. If the component being created is Java-based, then add it inside the ``/java`` folder. The component directory must contain a ``build.xml`` file that imports ``${builder.dir}/java/macros.ant.xml``. Also the name of the project must be the name of the future JAR file e.g::
 
    <?xml version="1.0"?>
    <project name="mycomponent">
        <import file="${builder.dir}/java/macros.ant.xml" />
    </project> 
 
-The component also need an Ivy file (ivy.xml) in order to be detected and built. The file must defined the correct list of 
-dependencies for the component so it get built in the correct order.
+The component also need an Ivy file (``ivy.xml``) in order to be detected and built. The file must define the correct list of dependencies for the component so it get built in the correct order.
 
 .. index::
   single: How to build the delivery?
@@ -94,8 +91,7 @@ dependencies for the component so it get built in the correct order.
 How to build the delivery?
 ==========================   
 
-From Helium 9.0 onward, the delivery will be released as source code, without any pre-built binaries. In order to build
-the release please follow the next instructions.
+From Helium 9.0 onward, the delivery will be released as source code, without any pre-built binaries. In order to build the release please follow the next instructions.
 
 Building the dependencies
 -------------------------
@@ -110,8 +106,7 @@ This will build all the components needed to create the Helium release: egg or j
 Retrieving Helium dependencies
 ------------------------------
 
-Building the dependency will not bring Helium in a workable stage. It is a preparation stage where components could be unit tested in isolation for example.
-Retrieving Helium dependencies based on the version of Helium you desire is then needed. The builder can achieve this operation by running the following command::
+Building the dependency will not bring Helium in a workable stage. It is a preparation stage where components could be unit tested in isolation for example. Retrieving Helium dependencies based on the version of Helium you desire is then needed. The builder can achieve this operation by running the following command::
 
    > cd builder
    > bld -Dconfig=sf get-deps
@@ -121,12 +116,37 @@ The previous command will retrieve Helium sf configuration dependencies.
 Packaging up the built version
 ------------------------------
 
-Deliverable zip pacakge of binary version of Helium can be created using the following command::
+A deliverable ZIP package of binary version of Helium can be created using the following commands::
 
-   > cd builder
-   > bld -Dconfig=sf create-releasable
+    > cd builder
+    > bld -Dconfig=sf create-releasable
 
-The archive can be found under: build/helium-bin.zip
+The archive can be found at ``build/helium-bin.zip``.
+
+.. index::
+  single: Testing
+  
+Testing
+=======
+
+Components
+-----------
+
+Component tests can be run using::
+
+    > cd builder
+    > bld unittest
+   
+A specific type of tests can be selected using::
+
+    > bld -Dcomponent.type=java unittest
+   
+A specific component can be selected using::
+
+    > bld -Dcomponent=sbs unittest
+
+Debug logs for component tests can be found at ``/build/components/<component>/xunit``.
+
 
 .. index::
   single: Assertions
@@ -175,3 +195,4 @@ Otherwise add to these files for non subcon libraries::
     helium/config/ivy/modules/jars-1.0.ivy.xml
     
 A new Ivy config file can be added for a non-jar or egg type file.
+

@@ -22,7 +22,8 @@ Description:
 -->
 <project name="test-recorder" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
     <description>Helium Antlib logger unittests.</description>
-    
+    <import file="../../stages_config.ant.xml" />
+
     <target name="test-recorder">
         <echo message="something to be not be recorded" />
         <hlm:record name="${temp.dir}/record.log" action="start" />

@@ -30,7 +30,8 @@ Description:
     </#if>
     <basename property="componentbase${cmtid}" file="${data[component]}"/>
     <target name="cmt-${cmtid}">
-        <hlm:cmt output="${ant['build.log.dir']}/${ant['build.id']}_${ant['ido.name']}_${r'$'}{componentbase${cmtid}}_${cmtid}.txt">
+        <hlm:cmt output="${ant['build.log.dir']}/${ant['build.id']}_cmt/${ant['build.id']}_${r'$'}{componentbase${cmtid}}_${cmtid}.txt" failonerror="${ant['failonerror']}" 
+                 htmlOutputDir="${ant['ido.cmt.html.output.dir']}">
             <fileset id="input" dir="${data[component]}">
                 <include name="**/*.h"/>
                 <include name="**/*.cpp"/>

@@ -26,6 +26,11 @@ Description:
 	
 	<!-- Configuring raptor build system -->
 	<property name="build.system" value="sbs"/>
+	
+	<!-- Configuring get latest env. -->
+    <property name="s60.grace.service" value="s60_devices_sw" />
+    <property name="s60.grace.product" value="DFS7x.92" />
+    <property name="s60.grace.release" value="92_\d{6}_hw79" />
     
     <!-- enable coverity -->
     <property name="enabled.coverity" value="true"/>

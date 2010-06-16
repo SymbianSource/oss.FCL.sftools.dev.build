@@ -18,6 +18,8 @@
 #===============================================================================
 """ Testing integration.ant module """  
 
+# pylint: disable-msg=R0201
+
 import tempfile
 import os
 import logging
@@ -53,19 +55,19 @@ class _emulateAttributes():
     """Emulate attributes"""
     def __init__(self, outputFilename):
         self.outputFilename = outputFilename
-    def get(self, attribute):
+    def get(self, _):
         """Emulate get method"""
         return self.outputFilename
 
 class _emulateElements():
     """Emulate elements"""
-    def get(self, fileset):
+    def get(self, _):
         """Emulate get method"""
         return _emulateFileset()
 
 class _emulateFileset():
     """Emulate fileset"""
-    def get(self, eid):
+    def get(self, _):
         """Emulate get method"""
         return _emulateDirScanner()
     def size(self):
@@ -83,7 +85,7 @@ class _emulateDirScanner():
             return ['test_build_compile.log']
         elif os.sep == '/':
             return ['test_build_compile_linux.log']
-    def getDirectoryScanner(self, project):
+    def getDirectoryScanner(self, _):
         """Emulate getDirectoryScanner method """
         return self
     def getBasedir(self):

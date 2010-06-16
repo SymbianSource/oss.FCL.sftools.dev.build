@@ -17,3 +17,4 @@
 #Description:
 #===============================================================================
 
+"""python core library path addition initialisation file"""

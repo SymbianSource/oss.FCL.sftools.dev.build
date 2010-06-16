@@ -47,20 +47,20 @@ public class PackageMap {
      * @throws PackageMapParsingException in case of error
      */
     public PackageMap(File file) throws PackageMapParsingException {
-         try {
-             DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-             Document doc = builder.parse(file);
-             if (!doc.getDocumentElement().getNodeName().equals("PackageMap")) {
-                 throw new PackageMapParsingException("Invalid XML format for " + file.getAbsolutePath() + " root element must be PackageMap");
-             }
-             if (!doc.getDocumentElement().hasAttribute("root")) {
-                 throw new PackageMapParsingException("root attribute under element " + doc.getDocumentElement().getTagName() + " is missing in file: " + file);
-             }
-             if (!doc.getDocumentElement().hasAttribute("layer")) {
-                 throw new PackageMapParsingException("layer attribute under element " + doc.getDocumentElement().getTagName() + " is missing in file: " + file);
-             }
-             setRoot(doc.getDocumentElement().getAttribute("root"));
-             setLayer(doc.getDocumentElement().getAttribute("layer"));
+        try {
+            DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            Document doc = builder.parse(file);
+            if (!doc.getDocumentElement().getNodeName().equals("PackageMap")) {
+               throw new PackageMapParsingException("Invalid XML format for " + file.getAbsolutePath() + " root element must be PackageMap");
+            }
+            if (!doc.getDocumentElement().hasAttribute("root")) {
+               throw new PackageMapParsingException("root attribute under element " + doc.getDocumentElement().getTagName() + " is missing in file: " + file);
+            }
+            if (!doc.getDocumentElement().hasAttribute("layer")) {
+               throw new PackageMapParsingException("layer attribute under element " + doc.getDocumentElement().getTagName() + " is missing in file: " + file);
+            }
+            setRoot(doc.getDocumentElement().getAttribute("root"));
+            setLayer(doc.getDocumentElement().getAttribute("layer"));
         } catch (ParserConfigurationException e) {
             throw new PackageMapParsingException("Error from the XML parser configuration: " + e.getMessage(), e);
         } catch (SAXException e) {

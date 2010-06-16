@@ -138,11 +138,11 @@ public class JavaEngine extends DataType implements Engine {
         File tempDir = imaker.createWorkDir();
         args.add("WORKDIR=" + tempDir.getAbsolutePath());
         // Pushing custom variables
-        for (Entry<String, String> e : cmd.getVariables().entrySet()) {
-            if (e.getKey().equals("WORKDIR")) {
+        for (Entry<String, String> cmdEnum : cmd.getVariables().entrySet()) {
+            if (cmdEnum.getKey().equals("WORKDIR")) {
                 task.log("WORKDIR cannot be defined by the user, the value will be ignored.", Project.MSG_WARN);
             } else {
-                args.add(e.getKey() + "=" + e.getValue());
+                args.add(cmdEnum.getKey() + "=" + cmdEnum.getValue());
             }
         }
         // Setting the target

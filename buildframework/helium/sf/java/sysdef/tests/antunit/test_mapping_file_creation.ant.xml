@@ -42,13 +42,15 @@ Description:
         <include name="**/valid*/"/>
     </dirset>
 
-    <target name="test-mapping-creation-invalid-dir">
-        <hlm:createPackageMapping epocroot="${epocroot}" filterDirSet="${ado.quality.dir}" destFile="${epocroot.temp}/quality.ini">
-            <fileset dir="../data/mapping">
-                <include name="**/valid_package/package_definition.xml" />
-            </fileset>
-        </hlm:createPackageMapping>
-        <au:assertLogContains text="filteredDirSet is not valid" level="warning"/>
+    <target name="test-mapping-creation-invalid-refid">
+        <au:expectfailure message="Id 'some.invalid.refid' doesn't reference a type.">
+            <hlm:createPackageMapping epocroot="${epocroot}" filterDirSet="some.invalid.refid" destFile="${epocroot.temp}/quality.ini">
+                <fileset dir="../data/mapping">
+                    <include name="**/valid_package/package_definition.xml" />
+                </fileset>
+            </hlm:createPackageMapping>
+        </au:expectfailure>
+        <au:assertFileDoesntExist file="${epocroot.temp}/quality.ini" />
     </target>
 
     <target name="test-mapping-creation-no-quality-dir">
@@ -58,11 +60,24 @@ Description:
             </fileset>
         </hlm:createPackageMapping>
         <au:assertFileExists file="${epocroot.temp}/quality.ini" />
-        <au:assertLogContains text="filterDirSet attribute is not set" level="warning"/>
+    </target>
+    
+    <target name="test-mapping-creation-filter-dir-no-selection">
+        <dirset id="filter.no.overlap" dir="../data/mapping">
+            <include name="nothing" />
+        </dirset>
+        <hlm:createPackageMapping epocroot="${epocroot}" destFile="${epocroot.temp}/quality.ini"
+            filterDirSet="filter.no.overlap">
+            <fileset dir="../data/mapping">
+                <include name="**/valid_package/package_definition.xml" />
+            </fileset>
+        </hlm:createPackageMapping>
+        <au:assertFileExists file="${epocroot.temp}/quality.ini" />
+        <au:assertLogContains text="Empty mapping after filtering" />
     </target>
 
-    <target name="test-mapping-creation-no-quality-map-file">
-        <au:expectfailure message="destFile is not defined">
+    <target name="test-mapping-creation-no-destfile">
+        <au:expectfailure message="The 'destFile' attribute is not defined">
             <hlm:createPackageMapping epocroot="${epocroot}">
                 <fileset dir="../data/mapping">
                     <include name="**/valid_package/package_definition.xml" />
@@ -89,13 +104,17 @@ Description:
                 <include name="**/valid_package/package_definition.xml" />
             </fileset>
         </hlm:createPackageMapping>
+        <dirset dir="../data/mapping" id="filter.dir">
+            <include name="valid_package" />
+        </dirset>
         <hlm:createPackageMapping epocroot="${epocroot}"
-            filterDirSet="${ado.quality.dir}" destFile="${epocroot.temp}/quality.ini">
+            filterDirSet="filter.dir" destFile="${epocroot.temp}/quality.ini">
             <fileset dir="../data/mapping">
                 <include name="**/valid_package/package_definition.xml" />
             </fileset>
         </hlm:createPackageMapping>
         <au:assertFileExists file="${epocroot.temp}/data.ini" />
+        <au:assertLogDoesntContain text="Empty mapping after filtering" />
         <loadfile property="pkg.mapping" srcfile="${epocroot.temp}/data.ini">
             <filterchain>
                 <replaceregex pattern="\\(:|\\)" replace="\1" flags="g" />

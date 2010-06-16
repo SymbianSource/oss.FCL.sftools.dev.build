@@ -74,9 +74,9 @@ public class VersionChangeSet extends ChangeSet
     {
         String result = "";
         for (ScmVersion versions : getScmVersion()) {
-           if (!versions.getName().equals("")) 
-           {
-               result += versions.getType().toLowerCase() + ":" + versions.getName() + "\n";
+            if (!versions.getName().equals("")) 
+            {
+                result += versions.getType().toLowerCase() + ":" + versions.getName() + "\n";
             }
         }
         if (getAuthor() != null)
@@ -123,13 +123,13 @@ public class VersionChangeSet extends ChangeSet
         }
 
         for (ScmVersion versions : getScmVersion()) {
-           if (!versions.getName().equals("")) 
-           {
-               buffer.append("\t\t<" + versions.getType().toLowerCase() + ">\n")
+            if (!versions.getName().equals("")) 
+            {
+                buffer.append("\t\t<" + versions.getType().toLowerCase() + ">\n")
                      .append("\t\t\t<name>")
                      .append(versions.getName())
                      .append("</name>\n");
-               buffer.append("\t\t</" + versions.getType().toLowerCase() + ">\n");
+                buffer.append("\t\t</" + versions.getType().toLowerCase() + ">\n");
             }
         }
 

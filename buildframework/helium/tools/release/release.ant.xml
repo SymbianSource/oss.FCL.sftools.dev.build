@@ -25,6 +25,15 @@ Description:
     <description>
         Release publising.
     </description>
+
+    <import file="scm_release.ant.xml" />
+    
+    <!-- This is where the release build logs are stored.
+    @type string
+    @scope private
+    -->
+    <property name="release.log.dir" location="${build.log.dir}/release"/>       
+    
     
     <!--* @property release.grace.service
     The Grace service used

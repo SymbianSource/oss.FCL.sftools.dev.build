@@ -126,10 +126,10 @@ public class DiamondsListenerImpl implements DiamondsListener {
                         + "diamonds-full-results.xml");
                 FileUtils.getFileUtils().copyFile(first, fullResultsFile);
                 XMLMerger merger = new XMLMerger(fullResultsFile);
-                HashSet<File> h = new HashSet<File>(finalLogList);
-                for (File f : h) {
+                HashSet<File> fileHash = new HashSet<File>(finalLogList);
+                for (File file : fileHash) {
                     try {
-                        merger.merge(f);
+                        merger.merge(file);
                     } catch (XMLMerger.XMLMergerException xe) {
                         log.debug("Error during the merge: ", xe);
                     }

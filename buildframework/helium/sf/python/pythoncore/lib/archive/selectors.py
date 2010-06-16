@@ -141,9 +141,9 @@ class SymbianPolicySelector:
                 return True
         return False
 
-SELECTORS = {'policy': lambda config: DistributionPolicySelector(config.get_list('policy.filenames', ['Distribution.Policy.S60']), config['policy.value']),
-               'symbian.policy': lambda config: SymbianPolicySelector(config.get_list('policy.filenames', ['distribution.policy']), config['policy.value']),
-             'distribution.policy.s60': lambda config: DistributionPolicySelector(['Distribution.Policy.S60'], config['distribution.policy.s60'], config['ignore.missing.policyfiles'] == 'true'),
+SELECTORS = {'policy': lambda config: DistributionPolicySelector(config.get_list('policy.filenames', ['Distribution.Policy.S60', 'distribution.policy', 'distribution.policy.pp']), config['policy.value']),
+             'symbian.policy': lambda config: SymbianPolicySelector(config.get_list('policy.filenames', ['distribution.policy']), config['policy.value']),
+             'distribution.policy.s60': lambda config: DistributionPolicySelector(['Distribution.Policy.S60', 'distribution.policy', 'distribution.policy.pp'], config['distribution.policy.s60'], config['ignore.missing.policyfiles'] == 'true'),
              }
 
 def get_selector(name, config):

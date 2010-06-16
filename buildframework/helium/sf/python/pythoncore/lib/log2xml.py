@@ -17,8 +17,8 @@
 #Description:
 #===============================================================================
 
-""" Symbian log converter.
-"""
+""" Symbian log converter."""
+
 import xml.dom.minidom
 import sys
 import os
@@ -82,6 +82,7 @@ DEFAULT_CONFIGURATION = {"FATAL": [r"mingw_make.exe"],
 
 
 def find_priority(line, config):
+    """find priority"""
     keys = config.keys()
     keys.reverse()    
     for category in keys:
@@ -98,14 +99,16 @@ class Stack:
         self.__stack = []
   
     def pop(self):
+        """pop off the stack"""
         result = None
         try:
             result = self.__stack.pop()
-        except IndexError, e:
+        except IndexError:
             result = self.__default
         return result
   
     def push(self, item):
+        """push on the stack"""
         self.__stack.append(item)
   
     def __len__(self):
@@ -116,16 +119,16 @@ def to_cdata(text):
         These are the only allowed characters: #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF].
     """
     result = ""
-    for c in list(text):
-        v = ord(c)        
-        if v == 0x9 or v == 0xa or v == 0xd:
-            result += c
-        elif v>=0x20 and v <= 0xd7ff:
-            result += c
-        elif v>=0xe000 and v <= 0xfffd:
-            result += c
-        elif v>=0x10000 and v <= 0x10ffff:
-            result += c
+    for char in list(text):
+        v_char = ord(char)
+        if v_char == 0x9 or v_char == 0xa or v_char == 0xd:
+            result += char
+        elif v_char>=0x20 and v_char <= 0xd7ff:
+            result += char
+        elif v_char>=0xe000 and v_char <= 0xfffd:
+            result += char
+        elif v_char>=0x10000 and v_char <= 0x10ffff:
+            result += char
         else:
             result += " " 
     return result
@@ -142,7 +145,7 @@ class LogWriter(object):
         self.__intask = 0
 
     def close(self):
-        # closing open tasks...
+        """ closing open tasks"""
         while self.__intask > 0:
             self.close_task()
         self.__stream.write("\t</build>\n")
@@ -150,23 +153,25 @@ class LogWriter(object):
         self.__stream.close()
 
     def open_task(self, name):
+        """open taks"""
         self.__indent += "\t"
         self.__intask += 1
         self.__stream.write("%s<task name=\"%s\">\n" % (self.__indent, name))
 
     def close_task(self):
+        """close task"""
         if self.__intask > 0:
             self.__intask -= 1
             self.__stream.write("%s</task>\n" % (self.__indent))
             self.__indent = self.__indent[:-1]
     
     def message(self, priority, msg):
+        """message"""
         try:
             acdata = to_cdata(msg.decode('utf-8', 'ignore'))
             self.__stream.write("%s<message priority=\"%s\"><![CDATA[%s]]></message>\n" % (self.__indent+"\t", priority, acdata))
-        except UnicodeDecodeError, e:
-            print e
-        
+        except UnicodeDecodeError, exc:
+            print exc
 
 
 def convert(inputfile, outputfile, fulllogging=True, configuration=DEFAULT_CONFIGURATION):
@@ -324,28 +329,31 @@ def convert_old(inputfile, outputfile, fulllogging=True, configuration=DEFAULT_C
 
 class ContentWriter(ContentHandler):
     """ SAX Content writer. Parse and write an XML file. """
-    def __init__(self, os, indent=""):
-        self.os = os
+    def __init__(self, op_sys, indent=""):
+        self.os = op_sys
         self.indent = indent
         self.__content = u""
     
     def startElement(self, name, attrs):
-        self.os.write(self.indent + "<" + name)        
+        """start Element"""
+        self.os.write(self.indent + "<" + name)
         if attrs.getLength() > 0:
-            self.os.write(" ")        
-        self.os.write(" ".join(map(lambda x: "%s=\"%s\"" % (x, attrs.getValue(x)), attrs.getNames())))            
+            self.os.write(" ")
+        self.os.write(" ".join(map(lambda x: "%s=\"%s\"" % (x, attrs.getValue(x)), attrs.getNames())))
         self.os.write(">\n")
         self.indent += "\t"
         self.__content = ""
     
     def endElement(self, name):
+        """end element"""
         if len(self.__content) > 0:
-            self.os.write(self.indent + self.__content + "\n")                
+            self.os.write(self.indent + self.__content + "\n")
         self.indent = self.indent[:-1]
         self.os.write("%s</%s>\n" % (self.indent, name))
         self.__content = ""
         
-    def characters(self, content):        
+    def characters(self, content):
+        """characters"""
         self.__content += unicode(escape(content.strip()))
 
 class AppendSummary(ContentWriter):
@@ -355,9 +363,11 @@ class AppendSummary(ContentWriter):
         self.xmllog = xmllog
 
     def startDocument(self):
+        """start document"""
         self.os.write('<?xml version="1.0" encoding="utf-8"?>\n')
     
     def startElement(self, name, attrs):
+        """start element"""
         ContentWriter.startElement(self, name, attrs)
         if name == "logSummary":
             parser = make_parser()
@@ -381,10 +391,11 @@ def append_summary(summary, xmllog, maxmb=80):
     outfile.close()
     # Updating the summary file.
     os.unlink(summary)
-    os.rename(summary + ".tmp", summary)    
+    os.rename(summary + ".tmp", summary)
     
 
 def symbian_log_header(output, config, command, dir):
+    """symbian log header"""
     output.log("===-------------------------------------------------")
     output.log("=== %s" % config)
     output.log("===-------------------------------------------------")
@@ -394,18 +405,20 @@ def symbian_log_header(output, config, command, dir):
     output.log("++ Started at %s" % datetime.datetime.now().ctime())
     output.log("+++ HiRes Start %f" % time.time())
     output.log("Chdir %s" % dir)
-    
+
 
 def symbian_log_footer(output):
+    """symbian log footer"""
     output.log("+++ HiRes End %f" % time.time())
     output.log("++ Finished at %s" % datetime.datetime.now().ctime())
-    
-    
+
+
 if __name__ == "__main__":
     convert(sys.argv[1], "%s.xml" % sys.argv[1], fulllogging=False)
-    """ An empty summary:
-        <?xml version=\"1.0\" encoding=\"UTF-8\"?><logSummary/>
-    """
+    # An empty summary:
+    #   <?xml version=\"1.0\" encoding=\"UTF-8\"?><logSummary/>
+    #
+    
     #s = open(r"z:\summary.xml", "w")
     #s.write("""<?xml version=\"1.0\" encoding=\"UTF-8\"?><logSummary/>""")
     #s.close()

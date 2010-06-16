@@ -76,7 +76,6 @@ public class CreatePackageMappingTask extends Task {
     private Map<File, File> pkgMapping = new HashMap<File, File>();
     private File epocroot;
     private File destFile;
-    private Map<File, File> pkgQualityMapping = new HashMap<File, File>();
     private String filteredDirSet;
 
     /**
@@ -84,75 +83,50 @@ public class CreatePackageMappingTask extends Task {
      * @param pkgMapFile a pointer to a package map file.
      * @throws PackageMapParsingException 
      */
-    protected void retrievePackageMapping(File pkgMapFile) throws PackageMapParsingException {
+    protected void retrievePackageMapping(File pkgMapFile, List<File> filterDirs) throws PackageMapParsingException {
         PackageMap parser = new PackageMap(pkgMapFile);
-        log("parent file: " + pkgMapFile.getParentFile());
+        log("parent file: " + pkgMapFile.getParentFile(), Project.MSG_DEBUG);
         log("parent file: " + getEpocroot() + parser.getRoot() + "/" + parser.getLayer() +
-                "/" + pkgMapFile.getParentFile().getName());
-        pkgMapping.put(pkgMapFile.getParentFile(), 
-                new File(getEpocroot(), parser.getRoot() + "/" + parser.getLayer() +
+                "/" + pkgMapFile.getParentFile().getName(), Project.MSG_DEBUG);
+        if (filterDirs == null) {
+            pkgMapping.put(pkgMapFile.getParentFile(), 
+                    new File(getEpocroot(), parser.getRoot() + "/" + parser.getLayer() +
                         "/" + pkgMapFile.getParentFile().getName()));
+        } else {
+            for (File dir : filterDirs) {
+                if (pkgMapFile.getParentFile().equals(dir)) {
+                    pkgMapping.put(pkgMapFile.getParentFile(), 
+                            new File(getEpocroot(), parser.getRoot() + "/" + parser.getLayer() +
+                                "/" + pkgMapFile.getParentFile().getName()));
+                    return;
+                }
+            }
+        }
     }
 
-    protected void createIniFile() throws IOException {
-        File baseQualityMappingFolder = destFile.getParentFile();
-        if (!baseQualityMappingFolder.exists()) {
-            throw new BuildException("Folder not exists: " 
-                    + baseQualityMappingFolder);
-        }
+    @SuppressWarnings("unchecked")
+    protected List<File> getFilterDir() throws IOException {
         if (filteredDirSet != null) {
-            Hashtable references = getProject().getReferences();
+            Hashtable<String, Object> references = getProject().getReferences();
             Object filteredDirSetObject = references.get(filteredDirSet);
-            log("filteredDirSetObject: " + filteredDirSetObject);
             if (filteredDirSetObject != null) {
-                if (! (filteredDirSetObject instanceof DirSet)) {
-                    throw new BuildException ("filteredDirSet is not of type "
-                            + "fileset");
+                if (!(filteredDirSetObject instanceof DirSet)) {
+                    throw new BuildException("filteredDirSet is not of type "
+                            + "dirset");
                 }
                 List<File> fileList = new ArrayList<File>();
                 DirSet dset = (DirSet)filteredDirSetObject;
                 DirectoryScanner ds = dset.getDirectoryScanner(getProject());
                 String[] includedFiles = ds.getIncludedDirectories();
-                log("includedFiles.size: " + includedFiles.length);
-                for ( String file : includedFiles ) {
+                for (String file : includedFiles) {
                     fileList.add(new File(ds.getBasedir(), file));
-                    log("includedfile: " + file);
                 }
-                Properties properties = new Properties();
-                for (File qualityDir : fileList) {
-                    log("qualityDir: " + qualityDir, 
-                            Project.MSG_DEBUG);
-                    for (File key : pkgMapping.keySet()) {
-                        log("pkgMapping:key: " + key, 
-                                Project.MSG_DEBUG);
-                        if ((qualityDir.getAbsolutePath()).equals(key.getAbsolutePath())) {
-                            String replacedKey = key.getAbsolutePath().replace('\\', '/');
-                            String replacedValue = 
-                                pkgMapping.get(key).getAbsolutePath().replace('\\', '/');
-                            properties.setProperty(replacedKey, 
-                                    replacedValue);
-                        }
-                    }
-                }
-                if (properties.isEmpty() ) {
-                    log("No mapping found for quality dir input: " +
-                            filteredDirSet, Project.MSG_WARN);
-                    return;
-                }
-                log("Creating " + destFile);
-                FileOutputStream fos = new FileOutputStream(destFile);
-                properties.store(fos, "DO NOT EDIT - File generated automatically");
-                fos.close();
-                return;
+                return fileList;
             } else {
-                log("filteredDirSet is not valid, using default mapping", 
-                        Project.MSG_WARN);
+                throw new BuildException("Id '" + filteredDirSet + "' doesn't reference a type.");                
             }
-        } else {
-            log("filterDirSet attribute is not set, using default mapping ",
-                    Project.MSG_WARN);
-            createDefaultIniFile(destFile);
         }
+        return null;
     }
     /**
      * Generates the ini file.
@@ -160,12 +134,13 @@ public class CreatePackageMappingTask extends Task {
      * @throws IOException in case of error while generating the file.
      */
     @SuppressWarnings("unchecked")
-    protected void createDefaultIniFile(File mappingFile) throws IOException {
+    protected void createIniFile(File mappingFile) throws IOException {
+        List<File> filterDirs = getFilterDir();
         for (ResourceCollection rc : resourceCollections) {
             Iterator<Resource> ri = (Iterator<Resource>)rc.iterator();
             while (ri.hasNext()) {
-                Resource r = ri.next();
-                File pkgFile = new File(r.toString()); // toString is representing the abs path
+                Resource resource = ri.next();
+                File pkgFile = new File(resource.toString()); // toString is representing the abs path
                 log("Checking " + pkgFile.getName(), Project.MSG_DEBUG);
                 if (pkgFile.getName().equalsIgnoreCase(PACKAGE_DEFINITION_FILENAME) 
                         && pkgFile.exists()) {
@@ -176,14 +151,15 @@ public class CreatePackageMappingTask extends Task {
                     if (pkgMapFile.exists()) {
                         log("Found package: " + pkgFile);
                         try {
-                            retrievePackageMapping(pkgMapFile);
+                            retrievePackageMapping(pkgMapFile, filterDirs);
                         } catch (PackageMapParsingException e) {
                             log(e.getMessage(), Project.MSG_ERR);
                             if (shouldFailOnError()) {
                                 throw new BuildException(e.getMessage(), e);
                             }
                         }
-                    } else {
+                    } else if (!(new File(pkgFile.getParentFile(),
+                            "../../" + PACKAGE_MAP_FILENAME).exists())) {
                         log("Could not find: " + pkgMapFile.getAbsolutePath(), 
                                 Project.MSG_ERR);
                         if (shouldFailOnError()) {
@@ -216,6 +192,10 @@ public class CreatePackageMappingTask extends Task {
             properties.setProperty(replacedKey, 
                     replacedValue);
         }
+        if (properties.isEmpty() && filteredDirSet != null) {
+            log("Empty mapping after filtering (filter: " +
+                    filteredDirSet + ")", Project.MSG_WARN);
+        }
         log("Creating " + mappingFile);
         FileOutputStream fos = new FileOutputStream(mappingFile);
         properties.store(fos, "DO NOT EDIT - File generated automatically");
@@ -230,14 +210,11 @@ public class CreatePackageMappingTask extends Task {
             throw new BuildException("The 'epocroot' attribute is not defined");
         }
         if (destFile == null) {
-            throw new BuildException("destFile is must");
+            throw new BuildException("The 'destFile' attribute is not defined");
         }
         
-        
         try {
-            if (destFile != null) {
-                createIniFile();
-            }
+            createIniFile(destFile);
         } catch (FileNotFoundException e) {
             throw new BuildException("Error generating the output file: " + e.getMessage(), e);
         } catch (IOException e) {

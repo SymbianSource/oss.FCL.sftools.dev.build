@@ -27,7 +27,7 @@ Description:
     <property environment="env" />
     
     <property name="helium.dir" location="../../.." />
-    <import file="../../../helium.ant.xml" />
+    <import file="../../../build.xml" />
 
     <property name="preparation.temp.dir" location="${helium.build.dir}/antunit/parallelcopy" />
 

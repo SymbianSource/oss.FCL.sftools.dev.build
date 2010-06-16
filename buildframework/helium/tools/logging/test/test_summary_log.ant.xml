@@ -29,7 +29,7 @@ Description:
     <property name="helium.dir" location="../../.." />
     <property name="test.temp.dir" location="${helium.dir}/build/antunit/summary" />
     <property name="build.drive" location="${test.temp.dir}" />
-    <import file="../../../helium.ant.xml"/>
+    <import file="../../../build.xml"/>
     
     <target name="setUp">
         <delete dir="${test.temp.dir}" failonerror="false" />

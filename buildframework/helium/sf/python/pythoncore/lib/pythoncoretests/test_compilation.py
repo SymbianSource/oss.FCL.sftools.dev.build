@@ -16,6 +16,9 @@
 #
 #Description:
 #===============================================================================
+"""test compilation """
+
+# pylint: disable-msg=R0201
 
 import unittest
 import compilation
@@ -30,7 +33,7 @@ logging.basicConfig(level=logging.INFO)
 
 class CompilationTest(unittest.TestCase):
     """ Unit test case for compilation.py """
-    def test_read_output_binaries_per_unit_with_empty_logs_list(self):
+    def test_read_op_bins_per_unt_empty_logs_lst(self):
         """ Testing read_output_binaries_per_unit method with empty log list """
         sysdefpath = os.path.join(os.environ['TEST_DATA'], 'data', 'compile', 'sysdefs', 'canonical_system_definition.xml')
         sysDef = sysdef.api.SystemDefinition(sysdefpath)
@@ -45,7 +48,7 @@ class CompilationTest(unittest.TestCase):
         loglist = os.path.join(os.environ['TEST_DATA'], 'data', 'compile', 'logs', 'test_build.log')
         bsl.read_output_binaries_per_unit(loglist.split(';'))
         
-    def test_read_binary_sizes_in_rom_output_logs_with_empty_logs_list(self):
+    def test_read_bin_sizes_rom_op_empty_logs_lst(self):
         """ Testing read_binary_sizes_in_rom_output_logs method with empty log list """
         sysdefpath = os.path.join(os.environ['TEST_DATA'], 'data', 'compile', 'sysdefs', 'canonical_system_definition.xml')
         sysDef = sysdef.api.SystemDefinition(sysdefpath)

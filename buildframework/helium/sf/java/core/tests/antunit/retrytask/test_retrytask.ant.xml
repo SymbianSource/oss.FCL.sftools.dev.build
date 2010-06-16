@@ -23,7 +23,6 @@ Description:
 <project name="test-retrytask" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
     <description>Helium antlib core ldap tests.</description>
 
-    <typedef name="retry" classname="com.nokia.helium.core.ant.taskdefs.RetryTask"/>
     <taskdef resource="com/nokia/helium/core/ant/antlib.xml" uri="http://www.nokia.com/helium"/>
     
     <target name="test-retry-task-case-retrycount-set">

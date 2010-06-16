@@ -62,10 +62,10 @@ public class CopyParallelTask extends Copy
      */
     public final void execute()
     {
-       super.execute(); 
-       //wait until all copy threads are dead
-       while (copyThreadCount > 0)
-       {
+        super.execute(); 
+        //wait until all copy threads are dead
+        while (copyThreadCount > 0)
+        {
             try {
                 Thread.sleep(500);
             } catch (InterruptedException e) {
@@ -74,7 +74,7 @@ public class CopyParallelTask extends Copy
                 }
                 log("Copy parallel task has been interrupted " + e.getMessage(), Project.MSG_ERR);
             }
-       }
+        }
        
     }
 
@@ -117,10 +117,10 @@ public class CopyParallelTask extends Copy
                 + " to " + destDir.getAbsolutePath() + " using " +  maxThreadCount 
                 + " threads in parallel.");
 
-            Enumeration e = fileCopyMap.keys();
-            while (e.hasMoreElements())
+            Enumeration fileEnum = fileCopyMap.keys();
+            while (fileEnum.hasMoreElements())
             {
-                String fromFile = (String) e.nextElement();
+                String fromFile = (String) fileEnum.nextElement();
                 String[] toFiles = (String[]) fileCopyMap.get(fromFile);
 
                 for (int i = 0; i < toFiles.length; i++) {
@@ -145,28 +145,28 @@ public class CopyParallelTask extends Copy
                     
                     while (true)
                     {
-                      if ( copyThreadCount < maxThreadCount)
-                      {
-                          CopyThread copyThread = new CopyThread(fromFile, toFile, executionFilters);
-                          copyThread.start();
-                          copyThreadCount++;
-                          break;
-                      }
+                        if ( copyThreadCount < maxThreadCount)
+                        {
+                            CopyThread copyThread = new CopyThread(fromFile, toFile, executionFilters);
+                            copyThread.start();
+                            copyThreadCount++;
+                            break;
+                        }
                     }
                 }
             }
         }
         if (includeEmpty) {
-            Enumeration e = dirCopyMap.elements();
+            Enumeration dirEnum = dirCopyMap.elements();
             int createCount = 0;
-            while (e.hasMoreElements()) {
-                String[] dirs = (String[]) e.nextElement();
+            while (dirEnum.hasMoreElements()) {
+                String[] dirs = (String[]) dirEnum.nextElement();
                 for (int i = 0; i < dirs.length; i++) {
-                    File d = new File(dirs[i]);
-                    if (!d.exists()) {
-                        if (!d.mkdirs()) {
+                    File file = new File(dirs[i]);
+                    if (!file.exists()) {
+                        if (!file.mkdirs()) {
                             log("Unable to create directory "
-                                + d.getAbsolutePath(), Project.MSG_ERR);
+                                + file.getAbsolutePath(), Project.MSG_ERR);
                         } else {
                             createCount++;
                         }
@@ -208,7 +208,7 @@ public class CopyParallelTask extends Copy
             message.append(LINE_SEPARATOR);
             message.append(
                 "This is normally due to the input file containing invalid");
-             message.append(LINE_SEPARATOR);
+            message.append(LINE_SEPARATOR);
             message.append("bytes for the character encoding used : ");
             message.append(
                 getEncoding() == null
@@ -244,7 +244,7 @@ public class CopyParallelTask extends Copy
         public void run() 
         {
             try {
-               fileUtils.copyFile(fromFile, toFile, executionFilters,
+                fileUtils.copyFile(fromFile, toFile, executionFilters,
                                  filterChains, forceOverwrite,
                                  preserveLastModified, inputEncoding,
                                  outputEncoding, getProject());

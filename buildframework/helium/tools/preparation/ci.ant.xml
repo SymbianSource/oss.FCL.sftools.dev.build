@@ -28,10 +28,7 @@ Description:
     
     <!-- Delete all the folders based on configurations file inside dir-path, optional attribute pool-size's default value is 4 -->
     <target name="delete-folders-from-list" if = "ci.cleanup.env.dir">
-        <exec osfamily="windows" executable="python" failonerror="true" outputproperty="delete.folders.drive">
-            <arg line="-m searchnextdrive"/>               
-        </exec>
-        <hlm:deleteFoldersFromDirMacro dir-path="${ci.cleanup.env.dir}" delete-folders-drive="${delete.folders.drive}"/>
+        <hlm:deleteFoldersFromDirMacro dir-path="${ci.cleanup.env.dir}" />
     </target>
 
     <!-- Delete all the folders based on configurations file inside dir-path, optional attribute pool-size's default value is 4 -->
@@ -48,6 +45,8 @@ from java.io import IOException
         
 dir_path = str(attributes.get('dir-path'))
 del_folder_drive = attributes.get('delete-folders-drive')
+if del_folder_drive:
+    self.log("Warning: the delete-folders-drive attribute is deprecated, please stop using it.")
 pool_size = attributes.get('pool-size')
 if pool_size != None:
     pool_size = str(pool_size)

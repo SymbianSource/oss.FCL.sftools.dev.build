@@ -29,6 +29,7 @@ Description:
     <property name="nose.result.dir" location="${module.temp.dir}/xunit/nose" />
 
     <target name="resolve">
+        <mkdir dir="${lib.dir}" />
         <ivy:settings file="${ivy.settings.dir}/ivysettings.xml" />
         
         <!-- the call to resolve is not mandatory, retrieve makes an implicit call if we don't -->

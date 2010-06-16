@@ -45,10 +45,7 @@ class Ats3ComponentParser(object):
     def __init__(self, config):
         
         self.target_platform = config.target_platform
-        self.pkg_parser = parser.PkgFileParser(self.target_platform.replace(" ", "_")+".pkg", config.specific_pkg)
-        
         self.bld_parser = parser.BldFileParser()
-        self.mmp_parser = parser.MmpFileParser()
         
         self.data_dirs = config.data_dir
         self.flash_images = [path(p) for p in config.flash_images]
@@ -61,6 +58,7 @@ class Ats3ComponentParser(object):
         self.trace_enabled = config.trace_enabled
         self.excludable_dlls = []
         self.custom_dir = None
+        self.specific_pkg = config.specific_pkg
 
     def insert_testset_stif(self, src_dst, pkg_paths):
         """Inserts test set data to test plan for stif"""
@@ -109,13 +107,14 @@ class Ats3ComponentParser(object):
             self.custom_dir = self.tsrc_dir.joinpath("custom")
             _logger.debug("using customized testing from %s" % self.custom_dir)
             if os.path.exists(self.tsrc_bld_dir.joinpath("group","bld.inf")):
-                mmp_files = self.bld_parser.get_test_mmp_files(self.tsrc_bld_dir.joinpath("group","bld.inf"))                
+                bldinf = self.tsrc_bld_dir.joinpath("group","bld.inf")
             else:
-                mmp_files = self.bld_parser.get_test_mmp_files(self.tsrc_bld_dir.joinpath("bld.inf"))
-                
-            test_harness = self.mmp_parser.get_harness(mmp_files)
-            
-            pkg_paths = self.pkg_parser.get_data_files(self.tsrc_pkg_files(_paths_dict_), self.build_drive)
+                bldinf = self.tsrc_bld_dir.joinpath("bld.inf")
+            mmp_files = self.bld_parser.get_test_mmp_files(bldinf)
+            mmp_parser = parser.MmpFileParser(bldinf)
+            test_harness = mmp_parser.get_harness(mmp_files)
+            pkg_parser = parser.PkgFileParser(bldinf, self.target_platform.replace(" ", "_")+".pkg", self.specific_pkg)
+            pkg_paths = pkg_parser.get_data_files(self.tsrc_pkg_files(_paths_dict_), self.build_drive)
             if self.trace_enabled == "True":
                 try:
                     pmd_files = self.tsrc_pmd_files()
@@ -135,7 +134,7 @@ class Ats3ComponentParser(object):
                         
             elif test_harness == "EUNIT":
                 try:
-                    src_dst  = self.pkg_parser.get_data_files(self.tsrc_pkg_files(_paths_dict_), self.build_drive)
+                    src_dst  = pkg_parser.get_data_files(self.tsrc_pkg_files(_paths_dict_), self.build_drive)
 
                 except OSError:
                     _logger.warning("No pkg file found in the directory ( %s )" % self.tsrc_pkg_dir)
@@ -148,7 +147,7 @@ class Ats3ComponentParser(object):
 
                 for dll_file in testmodule_files:
                     if not self.check_dll_duplication(dll_file.name, src_dst):
-                        _dll_type_ = self.mmp_parser.get_dll_type(self.tsrc_bld_dir)
+                        _dll_type_ = mmp_parser.get_dll_type(self.tsrc_bld_dir)
 
                         if dll_file.name in self.excludable_dlls:
                             src_dst.append((dll_file, path(r"c:\sys\bin").joinpath(dll_file.name), "data:%s" % _dll_type_))

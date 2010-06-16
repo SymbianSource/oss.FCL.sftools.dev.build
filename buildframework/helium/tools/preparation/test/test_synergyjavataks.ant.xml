@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : test_ci.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test_synergyjavataks" xmlns:au="org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>
+         Testing targets related to Synergy java tasks
+    </description>
+    <property environment="env" />
+    <property name="publish.root.dir" value="${helium.dir}/tests/data/output/" />
+    <property name="helium.dir" location="../../.." />
+    <property name="synergy71.project.wa" location="${helium.dir}/build/synergy71_ccm_wa" />
+    <property name="synergy71.snapshot.wa" location="${helium.dir}/build/synergy71_ccm_snapshot" />
+    <import file="../../../build.xml" />
+    
+    <condition property="run.ccm.71">
+        <istrue value="${synergy71.enabled}" />
+    </condition>
+    
+    <target name="suiteSetUp" if="run.ccm.71">
+        <mkdir dir="${synergy71.project.wa}"/>
+        <mkdir dir="${synergy71.snapshot.wa}"/>
+    </target>
+    
+    <target name="suiteTearDown" if="run.ccm.71">
+        <delete dir="${synergy71.project.wa}"/>
+        <delete dir="${synergy71.snapshot.wa}"/>
+    </target>
+    
+    <target name="test-synergyjavataks" if="run.ccm.71">
+        <hlm:createSessionMacro database="sa1bm1" reference="test.session" />
+        <au:assertLogContains text="Database engine set using the GSCM database"/>
+        <!-- To synchronize the project -->
+        <hlm:ccm >
+            <hlm:sessionset refid="test.session" />
+            <hlm:synchronize project="MinibuildDomain-hlm_71_test" recursive="true" />
+        </hlm:ccm>
+        <au:assertLogContains text="Session list:"/>        
+        <au:assertLogContains text="Synchronizing project: MinibuildDomain-hlm_71_test"/>
+        <au:assertFileExists file="${synergy71.project.wa}/MinibuildDomain/MinibuildDomain/_ccmwaid.inf"/>
+        
+        <!-- To update the synergy project -->
+        <hlm:ccm >
+            <hlm:sessionset refid="test.session" />
+            <hlm:update project="MinibuildDomain-hlm_71_test" />
+        </hlm:ccm>
+        <au:assertLogContains text="Running command 'update'"/>
+        <au:assertLogContains text="Updating project: MinibuildDomain-hlm_71_test"/>
+        <au:assertLogContains text="Updating project 'MinibuildDomain-hlm_71_test:project:sa1bm1#1'"/>
+        <au:assertLogContains text="Update for 'MinibuildDomain-hlm_71_test:project:sa1bm1#1' complete"/>
+        <au:assertLogContains text="Update complete"/>
+        
+        <!-- To get the snapshot of the project -->
+        <hlm:ccm >
+            <hlm:sessionset refid="test.session" />
+            <hlm:snapshot project="MinibuildDomain-hlm_71_test" dir="${synergy71.snapshot.wa}" fast="true" recursive="true" />
+        </hlm:ccm>
+        <au:assertLogContains text="Snapshotting MinibuildDomain-hlm_71_test"/>
+        
+        <!-- To reconcile the project -->
+        <hlm:ccm >
+            <hlm:sessionset refid="test.session" />
+            <hlm:reconcile project="MinibuildDomain-hlm_71_test"/>
+        </hlm:ccm>
+        <au:assertLogContains text="Reconciling project: MinibuildDomain-hlm_71_test"/>        
+        
+        <!-- To maintain the project workarea -->
+        <delete dir="${synergy71.project.wa}"/>
+        <hlm:ccm >
+            <hlm:sessionset refid="test.session" />
+            <hlm:workarea project="MinibuildDomain-hlm_71_test" maintain="true" recursive="true" path="${synergy71.project.wa}"/>
+        </hlm:ccm>
+        <au:assertLogContains text="Modifying work area for the project : MinibuildDomain-hlm_71_test"/>
+        
+        <!-- To add the tasks into folders -->
+        <hlm:ccm >
+            <hlm:sessionset refid="test.session" />
+            <hlm:addtask folder="sa1bm1#33">
+                <task name="sa1bm1#126" />
+            </hlm:addtask>
+        </hlm:ccm>
+        <au:assertLogContains text="Changing role to build_mgr"/>
+        
+        <!-- To close ccm session -->
+        <hlm:ccm >
+            <hlm:sessionset refid="test.session" />
+            <hlm:close />
+        </hlm:ccm>        
+             
+    </target>
+    
+</project>

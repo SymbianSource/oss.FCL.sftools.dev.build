@@ -18,7 +18,6 @@
 package com.nokia.helium.sbs.ant.types;
 
 import com.nokia.helium.core.ant.types.VariableSet;
-import org.apache.log4j.Logger;
 import org.apache.tools.ant.types.Reference;
 import org.apache.tools.ant.BuildException;
 import java.util.List;
@@ -44,19 +43,11 @@ import java.util.List;
  */
 public class  SBSMakeOptions extends VariableSet {
 
-    private static Logger log = Logger.getLogger(SBSMakeOptions.class);
-
     private String engine;
 
     private String ppThreads;
 
-    
     private boolean initialized;
-    /**
-     * Constructor
-     */
-    public SBSMakeOptions() {
-    }    
 
     /**
      * Helper function called by ant to create the new sbs make options
@@ -129,7 +120,6 @@ public class  SBSMakeOptions extends VariableSet {
      * input. 
      */
     private void initializeAll() {
-        Object sbsInputObject = null;
         List<VariableSet> varSets = getVariableSets();
         initialize(this);
         for (VariableSet varSet : varSets) {

@@ -554,7 +554,7 @@ class SystemDefinition(object):
         #TODO - handle duplicate names of different types
         if not self._cache.has_key(element.get_id()):
             self._cache[element.get_id()] = element
-            _logger.info('Adding SysDef element to cache: %s' % str(element))
+            #_logger.info('Adding SysDef element to cache: %s' % str(element))
         else:
             _logger.warning("Element already exists: %s" % element.name)
         

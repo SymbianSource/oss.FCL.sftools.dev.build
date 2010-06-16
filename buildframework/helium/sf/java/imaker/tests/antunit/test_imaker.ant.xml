@@ -278,4 +278,28 @@ Description:
         <au:assertLogContains text="Nothing to build." />
     </target>
 
+    <target name="test-imaker-imakerconfiguration-variableset-invalid-engine">
+        <au:expectfailure message="Could not find engine reference: 'invalid.engine.ref'.">
+            <hlm:imaker epocroot="${epocroot}" output="${epocroot.temp}/output.log" engineRefid="invalid.engine.ref">
+                <hlm:imakerconfiguration>
+                    <makefileset>
+                        <include name="**/product/*ui.mk" />
+                    </makefileset>
+                    <targetset>
+                        <include name="core" />
+                        <include name="langpack_\d+" />
+                    </targetset>
+                    <variablegroup>
+                        <variable name="TYPE" value="rnd" />
+                    </variablegroup>
+                    <variablegroup>
+                        <variable name="TYPE" value="prd" />
+                    </variablegroup>
+                </hlm:imakerconfiguration>
+            </hlm:imaker>
+        </au:expectfailure>
+        <au:assertLogContains text="Using engine: invalid.engine.ref" />
+        <au:assertFileDoesntExist file="${epocroot.temp}/output.log" />
+   </target>
+    
 </project>

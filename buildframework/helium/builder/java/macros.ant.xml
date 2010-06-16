@@ -29,13 +29,16 @@ Description:
             <include name="**/*.jar" />
         </fileset>
     </path>
+    
     <taskdef resource="net/sf/antcontrib/antlib.xml" classpathref="emma.classpath"/>
     <taskdef classpathref="emma.classpath" resource="emma_ant.properties" />
+    
     
     <target name="clean">
         <delete dir="${module.temp.dir}" />
     </target>
 
+    
     <target name="resolve">
         <mkdir dir="${lib.dir}"/> <!-- not usually necessary, ivy creates the directory IF there are dependencies -->
         <ivy:settings file="${ivy.settings.dir}/ivysettings.xml" />
@@ -45,11 +48,14 @@ Description:
         <ivy:retrieve pattern="${lib.dir}/[artifact].[ext]" log="download-only"/>
     </target>
 
+    
     <target name="report" depends="resolve" description="--> generates a report of dependencies">
         <ivy:report todir="${build.dir}"/>
     </target>
 
+    
     <target name="quality" depends="checkstyle" />
+    
     
     <target name="checkstyle" depends="resolve">
         <mkdir dir="${module.temp.dir}"/>
@@ -66,6 +72,7 @@ Description:
         </cs:checkstyle>
     </target>
     
+    
     <target name="compile" depends="resolve" description="--> compile the project">
         <mkdir dir="${classes.dir}" />
         <javac srcdir="${src.dir}" destdir="${classes.dir}" classpathref="lib.path.id" debug="true" source="1.6" target="1.6" listfiles="true"> 
@@ -75,6 +82,7 @@ Description:
         </javac>
     </target>
 
+    
     <target name="ivy-new-version"  unless="ivy.new.revision">
         <!-- default module version prefix value 
         <property name="module.version.prefix" value="${module.version.target}-dev-b" />
@@ -86,12 +94,14 @@ Description:
             revision="${module.version.prefix}" defaultBuildNumber="1" revSep=""/> -->
     </target>
 
+    
     <target name="local-version">
         <!--<tstamp>
             <format property="now" pattern="yyyyMMddHHmmss"/>
         </tstamp>
         <property name="ivy.new.revision" value="${module.version.target}-local-${now}"/>-->
     </target>
+    
     
     <target name="version" depends="ivy-new-version">
         <!-- create version file in classpath for later inclusion in jar 
@@ -101,6 +111,7 @@ Description:
         <!-- load generated version properties file 
         <property file="${classes.dir}/${ant.project.name}.properties" />-->
     </target>
+    
     
     <target name="package" depends="local-version,version,compile" description="--> make a jar file for this project">
         <delete dir="${module.bin.dir}"/>
@@ -140,7 +151,8 @@ Description:
 
     <target name="test" depends="junit,antunit"/>
 
-    <target name="junit">
+    
+    <target name="junit" depends="resolve">
         <mkdir dir="${build.temp.dir}" />
         <if>
             <available type="dir" file="${basedir}/tests/src"/>
@@ -236,6 +248,7 @@ Description:
         </if>
     </target>
     
+    
     <target name="antunit">
         <mkdir dir="${build.temp.dir}" />
         <if>
@@ -259,13 +272,23 @@ Description:
                                 </instrpath>
                             </instr>
                         </emma>
+                        <pathconvert pathsep="${path.separator}" property="python.path">
+                            <fileset dir="${lib.dir}" includes="**/*.egg"/>
+                            <dirset dir="${lib.dir}"/>
+                        </pathconvert>
                         <exec osfamily="windows" executable="cmd" dir="${basedir}/tests" failonerror="true">
-                            <env key="ANT_ARGS" value="-lib ${lib.dir} -lib ${module.temp.dir}/backup/${ant.project.name}.jar -lib ${builder.dir}/antlibs" />
-                            <arg line="/c build.bat unittest -Dbuilder.dir=${builder.dir}" />
+                            <env key="ANT_ARGS" value="-lib ${lib.dir} -lib ${module.temp.dir}/backup/${ant.project.name}.jar -lib ${builder.dir}/antlibs -Dpython.path=${python.path}" />
+                            <env key="PYTHONPATH" value="${python.path}" />
+                            <env key="JYTHONPATH" value="${python.path}" />
+                            <arg line="/c build.bat unittest " />
+                            <arg value="-Dbuilder.dir=${builder.dir}" />
                         </exec>
                         <exec osfamily="unix" executable="./bld.sh" dir="${basedir}/tests" failonerror="true">
-                            <env key="ANT_ARGS" value="-lib ${lib.dir} -lib ${module.temp.dir}/backup/${ant.project.name}.jar -lib ${builder.dir}/antlibs" />
-                            <arg line="unittest -Dbuilder.dir=${builder.dir}" />
+                            <env key="ANT_ARGS" value="-lib ${lib.dir} -lib ${module.temp.dir}/backup/${ant.project.name}.jar -lib ${builder.dir}/antlibs -Dpython.path=${python.path}" />
+                            <env key="PYTHONPATH" value="${python.path}" />
+                            <env key="JYTHONPATH" value="${python.path}" />
+                            <arg line="unittest" />
+                            <arg value="-Dbuilder.dir=${builder.dir}" />
                         </exec>
                         <move todir="${module.temp.dir}">
                             <fileset dir="${basedir}/tests" includes="**/coverage.ec" />
@@ -320,6 +343,10 @@ Description:
             </then>
         </if>
     </target>
+    
+    
     <target name="unittest" depends="antunit"/>
     
 </project>
+
+

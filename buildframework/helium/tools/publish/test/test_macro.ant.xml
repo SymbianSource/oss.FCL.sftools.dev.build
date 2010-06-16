@@ -26,7 +26,7 @@ Description:
     </description>
     <property environment="env" />
     <property name="helium.dir" location="../../.." />
-    <import file="../../../helium.ant.xml" />
+    <import file="../../../build.xml" />
     
     <target name="test-update-metadata">
         <mkdir dir="${helium.build.dir}/GRACE"/>
