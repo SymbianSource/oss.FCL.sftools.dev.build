@@ -218,7 +218,7 @@ information on the files used to create the drop file.
             <task>
                 <type>FileDownloadTask</type>
                 <parameters>
-                    <parameter value="{{ atsself.getlogdir(setd) }}\*" name="dir"/>
+                    <parameter value="{{ atsself.getlogdir(setd) }}\*" name="src"/>
                 </parameters>
             </task>
         {% include 'poststep_custom.xml' ignore missing %}

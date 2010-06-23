@@ -668,7 +668,10 @@ class TestComponentParser(mocker.MockerTestCase):
         process.communicate()
         self.mocker.result(["lib1.dll\npath/to/another/library.dll\nsome/other/file.txt\nlib2.dll\nlib3.dll\n"])
         obj = self.mocker.replace("subprocess.Popen")
-        obj("abld -w test build target platform", shell=True, stdout=subprocess.PIPE)
+        if os.environ.has_key("SBS_HOME"):
+            obj("sbs --what -c target_platform.test", shell=True, stdout=subprocess.PIPE)
+        else:
+            obj("abld -w test build target platform", shell=True, stdout=subprocess.PIPE)
         self.mocker.result(process)
         
         exists = self.mocker.replace("os.path.exists")

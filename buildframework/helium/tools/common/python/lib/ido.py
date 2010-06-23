@@ -42,10 +42,11 @@ def get_sysdef_location(sysdef):
 
 def get_first_day_of_cycle(now = datetime.datetime.now()):
     """ This function returns a datetime object representing the monday from closest
-        even week.
+        odd week.
     """
-    week = int(now.strftime("%W"))
-    day = int(now.strftime("%w")) - 1
+    isoyear, isoweek, isoday = now.isocalendar()
+    week = isoweek - 1
+    day = isoday - 1
     monday = now - datetime.timedelta(days=day + week.__mod__(2) * 7)
     monday = monday.replace(hour = 0, minute = 0, second = 0, microsecond = 0)
     return monday

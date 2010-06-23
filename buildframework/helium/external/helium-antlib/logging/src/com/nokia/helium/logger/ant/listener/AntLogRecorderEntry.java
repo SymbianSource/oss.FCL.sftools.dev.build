@@ -95,6 +95,14 @@ public class AntLogRecorderEntry implements BuildLogger, SubBuildListener {
             record = state.booleanValue();
         }
     }
+
+    /**
+     * Get the current state of the recorder
+     * @param state
+     */
+    public boolean getRecordState() {
+        return record;
+    }
     
     /**
      * To set the regexp to filter the logging.
@@ -338,6 +346,14 @@ public class AntLogRecorderEntry implements BuildLogger, SubBuildListener {
             project.addBuildListener(this);
         }
     }
+    
+    /**
+     * To return the project name associated with recorder.
+     * @return
+     */
+    public Project getProject() {
+        return this.project;
+    }
 
     /**
      * @since 1.6.2
@@ -404,5 +420,6 @@ public class AntLogRecorderEntry implements BuildLogger, SubBuildListener {
         
     }
     
-
+    
+    
 }

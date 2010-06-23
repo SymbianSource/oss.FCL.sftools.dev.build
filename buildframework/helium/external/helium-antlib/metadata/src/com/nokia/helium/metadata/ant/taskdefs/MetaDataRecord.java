@@ -128,6 +128,10 @@ public class MetaDataRecord extends Task {
             log("time after recording to db" + new Date());
             log.debug("Successfully writen to DB");
         } catch (BuildException ex1) {
+            String message = ex1.getMessage();
+            if ( message != null) {
+                log("Exception: " + message);
+            }
             if (failOnError) {
                 throw ex1;
             }

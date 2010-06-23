@@ -142,7 +142,7 @@ public class SBSInput extends VariableIFImpl {
                throw new BuildException("Reference id (" + refId.getRefId() + ") of sbsinput list is not valid");
             }
             if (sbsInputObject != null && sbsInputObject instanceof SBSInput) {
-                SBSMakeOptions options = ((SBSInput)sbsInputObject).getFullSBSMakeOptions(); 
+                SBSMakeOptions options = ((SBSInput)sbsInputObject).getFullSBSMakeOptions();
                 if (options != null ) {
                     if (sbsMakeOptionsList == null) {
                         sbsMakeOptionsList = new Vector<SBSMakeOptions>();
@@ -197,6 +197,7 @@ public class SBSInput extends VariableIFImpl {
         Vector<SBSMakeOptions> sbsMakeOptionsList = null;
         SBSMakeOptions resultSet = null;
         Vector<SBSMakeOptions> currentOptions = getSBSMakeOptions(this);
+
         if (currentOptions != null && !currentOptions.isEmpty()) {
             if (sbsMakeOptionsList == null ) {
                 sbsMakeOptionsList = new Vector<SBSMakeOptions>();
@@ -214,8 +215,10 @@ public class SBSInput extends VariableIFImpl {
         }
         if (sbsMakeOptionsList != null ) {
             String engine = null;
+            String ppThreads = null;
             for (SBSMakeOptions varSet : sbsMakeOptionsList) {
                 String currentEngine = varSet.getEngine();
+                String currentThread = varSet.getPPThreads();
                 if (currentEngine != null) {
                     if (engine == null) {
                         engine = currentEngine;
@@ -231,6 +234,10 @@ public class SBSInput extends VariableIFImpl {
                 }
                 if (resultSet == null ) {
                     resultSet = new SBSMakeOptions();
+                }
+                if (ppThreads == null && currentThread != null) {
+                    ppThreads = currentThread;
+                    resultSet.setPPThreads(ppThreads);
                 }
                 for (Variable var : varSet.getVariables()) {
                     resultSet.add(var);

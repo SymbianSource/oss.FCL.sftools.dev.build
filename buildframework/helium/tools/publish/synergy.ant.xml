@@ -28,7 +28,7 @@ Description:
     <!-- Validate all the inputs for the publish-tasks-to-folder target. -->
     <target name="publish-tasks-to-folder-check" if="publish.ccm.folder">
         <condition property="do.publish-tasks-to-folder" value="true">
-            <available file="${temp.build.dir}/${build.id}_bom.xml" />
+            <available file="${build.log.dir}/${build.id}_bom.xml" />
         </condition>
     </target>
 
@@ -40,7 +40,7 @@ Description:
                 macro: ${helium.dir}/tools/common/templates/macro
             </freemarkerLinks>
             <data expandProperties="yes">
-                bom: xml(${temp.build.dir}/${build.id}_bom.xml)
+                bom: xml(${build.log.dir}/${build.id}_bom.xml)
                 ant: antProperties()
             </data>
         </fmpp>

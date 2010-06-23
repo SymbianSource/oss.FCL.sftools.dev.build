@@ -263,12 +263,14 @@ ${xml.test.content}</echo>
     
     
     <target name="test-tempRecordMacro">
-        <delete file="${build.cache.log.dir}/test.log" failonerror="false"/>
-        <delete file="${build.cache.log.dir}/test.log.xml" failonerror="false"/>
-        <delete file="${build.cache.log.dir}/test.sqlite" failonerror="false"/>
-        <delete file="${metadata.dbfile}" failonerror="false"/>
-        <var name="build.log.dir" value="${build.cache.dir}/helium/temp_drive/output/logs" unset="true"/>
-        <var name="test.log.dir" value="${build.cache.dir}/helium/temp_drive/output/logs/test" unset="true"/>        
+        <au:plainlistener logLevel="verbose"/>
+        <delete file="${build.cache.log.dir}/test.log" failonerror="true"/>
+        <delete file="${build.cache.log.dir}/test.log.xml" failonerror="true"/>
+        <delete file="${build.cache.log.dir}/test.sqlite" failonerror="true"/>
+        <delete file="${build.cache.log.dir}/signals/test.log.status.xml" failonerror="true"/>
+        <delete file="${metadata.dbfile}" failonerror="true"/>
+        <var name="build.log.dir" value="${build.cache.dir}/helium/temp_drive/output/logs"/>
+        <var name="test.log.dir" value="${build.cache.dir}/helium/temp_drive/output/logs/test" />        
         <hlm:tempRecordStartMacro name="test.log" />
         <echo>ERROR: an error</echo>
         <echo>WARNING: a warning</echo>

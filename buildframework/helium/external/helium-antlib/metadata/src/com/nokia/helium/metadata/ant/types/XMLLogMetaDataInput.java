@@ -144,5 +144,5 @@ abstract class XMLLogMetaDataInput extends LogMetaDataInput {
      * @param streamReader: the input stream reader which contains the xml data to be parsed for recording data.
      * @return true if there are any element to be added to the database.
      */
-    abstract boolean characters (XMLStreamReader streamReader);
+    abstract boolean characters (XMLStreamReader streamReader) throws Exception;
 }

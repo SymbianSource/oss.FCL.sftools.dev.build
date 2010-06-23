@@ -654,7 +654,7 @@ class BOMXMLWriter(object):
                 s60_year = u'0'
                 s60_week = u'0'
                 if s60_version == None:
-                    res = re.match(r'.*\.(.*)_(\d{4})(\d{2})_(.*)', release)
+                    res = re.match(r'(.*)_(\d{4})(\d{2})_(.*)', release)
                     if res != None:
                         s60_release = res.group(1) + '_' + res.group(4)
                         s60_year = res.group(2)

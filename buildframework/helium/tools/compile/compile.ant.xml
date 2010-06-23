@@ -94,8 +94,15 @@ Description:
                         <scriptmapper language="jython">
 <![CDATA[
 import os
+counter = project.getProperty(".unique.counter");
+if not counter:
+    counter = 0
+else:
+    counter = int(counter)
+counter = counter + 1
+project.setProperty(".unique.counter", str(counter));
 (drive, _) = os.path.splitdrive(r'@{file}')
-path = r'@{file}'.replace(drive + os.sep, "", 1)
+path = r'@{file}'.replace(drive + os.sep, "%08d%s" % ((counter-1), os.sep), 1)
 self.addMappedName(path)
 ]]>
                         </scriptmapper>

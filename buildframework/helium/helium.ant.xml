@@ -201,7 +201,6 @@ ${build.int.db.file.comments}
     <property name="ccm.base.dir" location="${ccm.home.dir}\${minor.version}"/>
     <property name="prep.build.dir" location="${prep.root.dir}/${build.id}"/>
     <property name="build.output.dir" location="${build.drive}/output"/>
-    <property name="diamonds.build.output.dir" location="${build.output.dir}/diamonds"/>
     <property name="build.sisfiles.dir" location="${build.output.dir}/sisfiles"/>
     <property name="zips.build.dir" location="${build.output.dir}/build_area/engineering_english"/>
     <property name="zips.loc.dir" location="${build.output.dir}/build_area/localised"/>
@@ -210,6 +209,7 @@ ${build.int.db.file.comments}
     <property name="build.log.dir" location="${build.output.dir}/logs"/>
     <property name="prep.log.dir" location="${build.log.dir}/prep"/>
     <property name="compile.log.dir" location="${build.log.dir}/compile"/>
+    <property name="diamonds.build.output.dir" location="${build.log.dir}/diamonds"/>
     <property name="test.log.dir" location="${build.log.dir}/test"/>
     <property name="archive.log.dir" location="${build.log.dir}/archive"/>
     <property name="roms.log.dir" location="${build.log.dir}/roms"/>       

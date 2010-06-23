@@ -42,7 +42,7 @@ import com.nokia.helium.sbs.SBSCommandBase;
 import com.nokia.helium.sbs.SBSException;
 import java.util.ArrayList;
 import java.util.Hashtable;
-import com.nokia.helium.core.plexus.FileStreamConsumer;
+import com.nokia.helium.sbs.plexus.SBSErrorStreamConsumer;
 import java.util.Collection;
 
 public class SBSTask extends Task {
@@ -112,6 +112,7 @@ public class SBSTask extends Task {
      * @throws BuildException
      */
     public void execute() {
+        SBSErrorStreamConsumer sbsErrorConsumer = null;
         if (sbsInputName == null) {
             throw new BuildException("sbsInputName is not defined");
         }
@@ -121,7 +122,6 @@ public class SBSTask extends Task {
         if (workingDir == null) {
             throw new BuildException("workingDir must be set");
         }
-        
         List <String> filteredLayers = getFilteredLayers();
         SBSCommandBase sbsCmd = new SBSCommandBase();
         sbsCmd.setWorkingDir(workingDir);
@@ -135,8 +135,9 @@ public class SBSTask extends Task {
                 log.debug("redirecting error to Antstream");
                 sbsCmd.addErrorLineHandler(new AntStreamConsumer(this));
             } else {
+                sbsErrorConsumer = new SBSErrorStreamConsumer(errorFile);
                 log.debug("redirecting error to file stream");
-                sbsCmd.addErrorLineHandler(new FileStreamConsumer(errorFile));
+                sbsCmd.addErrorLineHandler(sbsErrorConsumer);
             }
         } catch (java.io.FileNotFoundException ex) {
             log.info("file path: " + errorFile + "Not valid" );
@@ -195,18 +196,26 @@ public class SBSTask extends Task {
                 sbsCmd.execute(cmdOptions.toString());
             }
         } catch (SBSException sex) {
-            log.info("SBS exception occured during sbs execution");
+            log.debug("SBS exception occured during sbs execution", sex);
             if (failOnError) {
                 throw new BuildException("exception during SBS execution", sex);
             }
         } catch (Exception ex) {
-            log.info("Exception occured during sbs execution");
+            log.debug("Exception occured during sbs execution", ex);
             if (failOnError) {
                 throw new BuildException("exception during SBS execution", ex);
             }
+        } finally {
+            //Called to update the error stream, better would be the commandbase
+            //handling the closing of streams in case of exceptions.
+            if (sbsErrorConsumer != null) {
+                sbsErrorConsumer.close();
+            }
         }
         endTime = new Date();
-        updateSBSLogStatistics(statsLog, outputLogName);
+        if (statsLog != null) {
+            updateSBSLogStatistics(statsLog, outputLogName);
+        }
     }
 
     private List<String> getFilteredLayers() {

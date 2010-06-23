@@ -304,9 +304,13 @@ class Ats3ComponentParser(object):
         orig_dir = os.getcwd()
         try:
             os.chdir(self.tsrc_bld_dir)
-            os.system("bldmake bldfiles")
             #os.system("abld test build %s" % self.target_platform)
-            process = subprocess.Popen("abld -w test build %s" % self.target_platform, shell=True, stdout=subprocess.PIPE)
+            
+            if os.environ.has_key("SBS_HOME"):
+                process = subprocess.Popen("sbs --what -c %s.test" % self.target_platform.replace(' ', '_'), shell=True, stdout=subprocess.PIPE)
+            else:
+                os.system("bldmake bldfiles")
+                process = subprocess.Popen("abld -w test build %s" % self.target_platform, shell=True, stdout=subprocess.PIPE)
             pipe = process.communicate()[0]
             for line in pipe.split('\n'):
                 _logger.debug(line.strip())

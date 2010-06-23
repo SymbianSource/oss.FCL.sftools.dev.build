@@ -252,9 +252,7 @@ public class DiamondsListenerImpl implements DiamondsListener {
                     diamondsProperties.setDiamondsBuildID(buildID);
                     project.setProperty(diamondsProperties.getProperty("buildid-property"),
                             diamondsProperties.getDiamondsBuildID());
-                    log.info("Got build id from diamonds"
-                            + diamondsClient.getBuildId(outputFile
-                                    .getAbsolutePath()));
+                    log.info("Got build id from diamonds: " + buildID);
                 } else {
                     diamondsProperties.setDiamondsBuildID(buildID);
                     project.setProperty(diamondsProperties.getProperty("buildid-property"),

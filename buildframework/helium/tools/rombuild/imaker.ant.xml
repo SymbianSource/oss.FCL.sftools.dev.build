@@ -108,6 +108,14 @@ writer.close();
                         output="${roms.log.dir}/${build.id}${imaker.rom.name}.roms.log" verbose="true">
             <hlm:imakerconfigurationset refid="imaker.rom.config" />
         </hlm:imaker>
+        <hlm:metadatarecord database="${metadata.dbfile}">
+            <hlm:textmetadatainput>
+                <fileset casesensitive="false" file="${roms.log.dir}/${build.id}${imaker.rom.name}.roms.log" />
+                <metadatafilterset refid="filterset.imaker" />
+            </hlm:textmetadatainput>
+        </hlm:metadatarecord>
+        <hlm:signalMacro logfile="${roms.log.dir}/${build.id}${imaker.rom.name}.roms.log" 
+                         signal.input="rombuildSignalInput" />
         <if>
             <istrue value="${blocks.enabled}" />
             <then>
@@ -131,6 +139,7 @@ writer.close();
     <hlm:defaultEngine id="imaker.engine.default" threads="${number.of.threads}" />
 
     <hlm:emakeEngine id="imaker.engine.ec">
+        <arg value="--emake-emulation=symbian" />
         <arg value="--emake-annofile=${roms.log.dir}/${build.id}${imaker.rom.name}.anno.xml"/>
         <arg value="--emake-root=${env.EMAKE_ROOT}${path.separator}${helium.dir}"/>
         <arg value="--emake-annodetail=basic,history,file,waiting"/>

@@ -1,4 +1,4 @@
 #Helium version - DO NOT EDIT
-#Fri Dec 18 15:07:03 EET 2009
+#Wed Dec 23 16:22:42 EET 2009
 last.major.helium.version=6.0
 helium.version=7.0

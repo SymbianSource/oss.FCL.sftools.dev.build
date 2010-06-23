@@ -34,6 +34,8 @@ Description:
                             <arg value="/C"/>
                             <arg value="qmake"/>
                             <arg value="-listgen"/>
+                            <#if "${ant['build.system']?lower_case}" = 'sbs'> 
+                            <arg line = "-spec symbian-sbsv2" /></#if>
                             <#if unit.@qmakeArgs[0]??>
                             <arg line="${unit.@qmakeArgs?xml}"/>
                             <#else>

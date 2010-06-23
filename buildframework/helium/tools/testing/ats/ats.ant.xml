@@ -149,9 +149,13 @@ if '1.6.0' in version:
                 <condition property="ats.import.arg" value="-import" else="">
                     <equals arg1="${ats.script.type}" arg2="import" />
                 </condition>
-                <java classname="com.nokia.ats.util.server.CommandLineClient" fork="true">
+                <condition property="ats4.libs" value="${helium.dir}/extensions/nokia/external/ats4" else="${helium.dir}/external/antlibs">
+                    <available type="dir" file="${helium.dir}/extensions/nokia/external/ats4"/>
+                </condition>
+                <java classname="com.nokia.ats.util.server.CommandLineClient" fork="true" maxmemory="512m">
                     <classpath>
                         <pathelement path="${java.class.path}"/>
+                        <fileset dir="${ats4.libs}" includes="*.jar"/>
                     </classpath>
                     <arg line="-url http://${ats.server}/ServerService -path ${ats.drop.location.file} ${ats.import.arg}"/>
                 </java>

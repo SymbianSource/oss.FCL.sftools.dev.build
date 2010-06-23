@@ -376,10 +376,10 @@ output.close()
                 <hlm:createDeltaZipMacro variant="@{variant}" />
                 <!-- getting all languages to localise -->
                 <var name="localisation.languages" unset="true"/>
-                <exec executable="python" outputproperty="localisation.languages" dir="${build.drive}/" failonerror="${failonerror}">
+                <exec executable="python" outputproperty="localisation.languages.output" dir="${build.drive}/" failonerror="${failonerror}">
                     <arg line="${helium.dir}/tools/localisation/getalllanguages.py ${localisation.language.file} @{variant}"/> 
                 </exec>
-                
+                <propertyregex property="localisation.languages" input="${localisation.languages.output}" override="true" regexp="((?: ?\d+)+)$" select="\1"/>
                 <echo>Localising ${localisation.languages}</echo>
                 <propertyregex property="localisation.log" input="${build.log.dir}/localisation_${localisation.languages}.html" regexp="\s+" replace="_" override="true"/>
                 <echo>Localising using ${localisation.tool}.</echo>

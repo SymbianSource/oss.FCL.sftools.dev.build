@@ -255,9 +255,17 @@ except Exception, ex:
                 </if>
             </else>
         </if>
-        <sortlist property="task.owners" override="true" value="${task.owners}"/>
-        <propertyregex property="task.owners" override="true" input="${task.owners}" regexp="([^,]+),.*\1" replace="\1" global='true'/>
-        <for list="${task.owners}" delimiter="," param="task.owner" >
+        <script language="jython" setbeans="false">
+import re
+taskOwnersDup = project.getProperty("task.owners")
+if taskOwnersDup:
+    taskOwnersDup = re.sub(r'\s', '', taskOwnersDup)
+    taskOwners = taskOwnersDup.split(',')
+    if taskOwners:
+        taskOwners = list(set(taskOwners))
+        project.setProperty("task.owners.unique", ",".join(taskOwners))
+        </script>
+        <for list="${task.owners.unique}" delimiter="," param="task.owner" >
             <sequential>
                 <var name="task.owner" value="@{task.owner}"/>
                 <hlm:ldap url="${email.ldap.server}" rootdn="${email.ldap.rootdn}" filter="uid=${task.owner}" outputproperty="task.owner.email" key="mail"/>

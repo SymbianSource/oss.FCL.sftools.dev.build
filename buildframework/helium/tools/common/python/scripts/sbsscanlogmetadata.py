@@ -68,6 +68,9 @@ class SBSScanlogMetadata(object):
             self.compiled_stream_object[stream] = []
             self.streams[stream] = open(self.stream_path[stream], "w")
             self.streamStatus[stream] = False
+            self.streams[stream].write(\
+"""<?xml version="1.0" encoding="ISO-8859-1" ?>
+<buildlog sbs_version="" xmlns="http://symbian.com/xml/build/log" xmlns:progress="http://symbian.com/xml/build/log/progress" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symbian.com/xml/build/log http://symbian.com/xml/build/log/1_0.xsd">""")
             for  searchString in STREAM_REGEX[stream]:
                 self.compiled_stream_object[stream].append(re.compile(searchString))
         return True
@@ -85,8 +88,6 @@ class SBSScanlogMetadata(object):
             if textLine.startswith("<?xml ") or textLine.startswith("<buildlog ") \
                 or textLine.startswith("</buildlog"):
                 self.loggerout.write(textLine)
-                for stream in stream_list:
-                    self.streams[stream].write(textLine)
                 continue
             if(self.ignoreTextCompileObject.search(textLine)):
                 continue
@@ -99,6 +100,9 @@ class SBSScanlogMetadata(object):
                     break
     
                 if(self.streamStatus[stream]):
+                    if textLine.startswith("<?xml ") or textLine.startswith("<buildlog ") \
+                        or textLine.startswith("</buildlog"):
+                        continue
                     self.streams[stream].write(textLine)
                     break
 
@@ -116,6 +120,7 @@ class SBSScanlogMetadata(object):
         try:
             self.loggerout.close()
             for stream in self.streams.keys():
+                self.streams[stream].write('</buildlog>')
                 self.streams[stream].close()
             return True
         except:

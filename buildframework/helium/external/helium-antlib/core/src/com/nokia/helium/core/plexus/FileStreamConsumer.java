@@ -21,7 +21,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.io.Writer;
+import java.io.BufferedWriter;
 
 import org.apache.log4j.Logger;
 import org.codehaus.plexus.util.cli.StreamConsumer;
@@ -32,7 +32,7 @@ import org.codehaus.plexus.util.cli.StreamConsumer;
  */
 public class FileStreamConsumer implements StreamConsumer {
     private Logger log = Logger.getLogger(getClass());
-    private Writer writer;
+    private BufferedWriter writer;
     
     /**
      * Create a FileStreamConsumer which will record content to 
@@ -41,7 +41,7 @@ public class FileStreamConsumer implements StreamConsumer {
      * @throws FileNotFoundException if an error occur while opening the file.
      */
     public FileStreamConsumer(File output) throws FileNotFoundException {
-        writer = new OutputStreamWriter(new FileOutputStream(output));
+        writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(output)));
     }
     
     /**
@@ -50,7 +50,8 @@ public class FileStreamConsumer implements StreamConsumer {
     @Override
     public synchronized void consumeLine(String line) {
         try {
-            writer.append(line + "\n");
+            writer.write(line);
+            writer.newLine();
         } catch (IOException e) {
             log.error("Error while writing to file: " + e.getMessage(), e);
         }
@@ -66,5 +67,14 @@ public class FileStreamConsumer implements StreamConsumer {
         } catch (IOException e) {
             log.error("Error while writing to file: " + e.getMessage(), e);
         }
+    }
+
+    /**
+     * Helper function to return the writer instance for sub classes
+     * to write if any additional information.
+     * @return writer of the stream consumer. 
+     */
+    public BufferedWriter getWriter() {
+        return writer;
     }
 }

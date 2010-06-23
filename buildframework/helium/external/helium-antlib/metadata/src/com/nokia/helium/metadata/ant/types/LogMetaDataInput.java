@@ -26,6 +26,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Hashtable;
 import java.util.regex.Pattern;
 import org.apache.tools.ant.types.FileSet;
 import org.apache.tools.ant.DirectoryScanner;
@@ -170,7 +172,7 @@ public abstract class LogMetaDataInput extends DataType implements
                 currentFileIndex ++;
             }
         } catch (Exception ex1 ) {
-            log.info("Exception processing stream: " + ex1.getMessage());
+            //log.info("Exception processing stream: " + ex1.getMessage());
             log.debug("exception while parsing the stream", ex1);
             throw ex1;
         }
@@ -252,13 +254,30 @@ public abstract class LogMetaDataInput extends DataType implements
      * @param lineNumber of the text message
      */
     protected boolean findAndAddEntries(String logTextInfo, String currentComponent, 
-            String logPath, int lineNumber)throws Exception {
+            String logPath, int lineNumber) throws Exception {
+        return findAndAddEntries(logTextInfo, currentComponent, logPath, lineNumber, null);
+    }
+
+    /**
+     * Looks for the text which matches the filter regular expression and adds the entries to the database.
+     * @param logTextInfo text message to be searched with filter regular expressions
+     * @param priority for the entry
+     * @param currentComponent of the logtextInfo
+     * @param logpath fo;e fpr wjocj tje text info has to be looked for with filter expression
+     * @param lineNumber of the text message
+     * @param stat object to capture statistics about the parsing.
+     */
+    protected boolean findAndAddEntries(String logTextInfo, String currentComponent, 
+            String logPath, int lineNumber, Statistics stat) throws Exception {
         boolean entryAdded = false; 
         String[] logText = logTextInfo.split("\n");
         String severity = null;
         for (int i = 0; i < logText.length; i++) {
             severity = getSeverity(logText[i]);
-            if ( severity != null) {
+            if (severity != null) {
+                if (stat != null) {
+                    stat.incrementSeverity(severity);
+                }
                 addEntry(severity, currentComponent, logPath, 
                         i + lineNumber, logText[i]);
                 if (!entryAdded) {
@@ -296,7 +315,12 @@ public abstract class LogMetaDataInput extends DataType implements
             try {
                 retValue = isEntryAvailable();
             } catch ( Exception ex) {
-                throw new BuildException("Exception while analysing errors from the log:", ex);
+                
+                String message = ex.getMessage();
+                if (message == null ) {
+                    message = "";
+                }
+                throw new BuildException("Exception while analysing errors from the log:\n " + message, ex);
             }
             return retValue;
         }
@@ -320,6 +344,39 @@ public abstract class LogMetaDataInput extends DataType implements
                 log.debug("Exception while getting entry: ", ex);
             }
             return entry;
+        }
+    }
+    
+    /**
+     * This class capture statistics about the number of severity counted when 
+     * parsing, the log.
+     */
+    public class Statistics {
+        private Map<String, Integer> statistics = new Hashtable<String, Integer>();
+        
+        /**
+         * Increment the severity counter by 1.
+         */
+        public void incrementSeverity(String severity) {
+            severity = severity.toLowerCase();
+            if (statistics.get(severity) == null) {
+                statistics.put(severity, new Integer(1));
+            } else {
+                statistics.put(severity, new Integer(statistics.get(severity).intValue() + 1));
+            }
+        }
+        
+        /**
+         * Get the severity counter.
+         * @return the number of message with the mentioned severity.
+         */
+        public int getSeveriry(String severity) {
+            severity = severity.toLowerCase();
+            if (statistics.get(severity) == null) {
+                return 0;
+            } else {
+                return statistics.get(severity).intValue();
+            }
         }
     }
 }

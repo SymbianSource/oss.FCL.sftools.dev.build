@@ -65,6 +65,8 @@ Description:
         <attribute name="error.limit"/>
         <attribute name="phase" default="compile"/>
         <sequential>
+            <var name="build.errors.total" unset="true" />
+            <var name="compile.result" unset="true" />
             <hlm:metadataCountSeverity severity="ERROR" log="@{compile.summary.file}" 
                 db="${metadata.dbfile}" 
                 property="build.errors.total"/>
@@ -151,6 +153,8 @@ if int(r'@{error.limit}') > -1:
         <attribute name="output"/>
         <attribute name="logfile"/>
         <sequential>
+            <basename property="base.merge.log" file="@{logfile}"/>
+            <hlm:tempRecordStartMacro name="${base.merge.log}"/>
             <echo message="input:@{input}" />
             <echo message="output:@{output}" />
             <mkdir dir="${compile.log.dir}"/>
@@ -158,7 +162,7 @@ if int(r'@{error.limit}') > -1:
             <copy todir="${build.drive}/" verbose="true">
                 <fileset dir="${helium.dir}/tools/common/dtd" includes="*.dtd"/>
             </copy>
-            <preset.exec executable="perl" dir="${build.drive}/" failonerror="${failonerror}" output="@{logfile}">
+            <preset.exec executable="perl" dir="${build.drive}/" failonerror="${failonerror}">
                 <arg value="${epocroot}epoc32/tools/build/genxml.pl"/>
                 <arg value="-s"/>
                 <arg value="${epocroot}"/>
@@ -166,35 +170,11 @@ if int(r'@{error.limit}') > -1:
                 <arg value="@{output}"/>              
                 <arg line="@{input}"/>
             </preset.exec>
-            <if>
-                <not>
-                    <available file="@{output}"/>
-                </not>
-                <then>
-                    <echo file="@{logfile}" message="ERROR: Check @{input}" append="true"/>
-                    <!-- Todo: metadata: Make sure that logfilter is added to the filterset -->
-                    <hlm:metadatarecord database="${metadata.dbfile}">
-                        <hlm:textmetadatainput>
-                            <fileset casesensitive="false" file="@{logfile}" />
-                            <metadatafilterset refid="filterset.genxml.merge" />
-                        </hlm:textmetadatainput>
-                    </hlm:metadatarecord>
-                    <hlm:generateBuildStatus file="${build.id}.sysdef_GenxmlMerge.log" />
-                    <hlm:signal name="canonicalSysDefFailSignal" result="1" >
-                        <signalNotifierInput>
-                            <signalInput refid="canonicalSysDefFailSignalInput" >
-                                <notifierInput>
-                                    <fileset dir="${build.log.dir}" >
-                                        <include name="**/${build.id}.sysdef_GenxmlMerge.log*" />
-                                    </fileset>
-                                </notifierInput>
-                            </signalInput>
-                        </signalNotifierInput>
-                    </hlm:signal>
-                </then>
-            </if>
-
-            <hlm:assertFileExists file="@{output}"/>
+            <hlm:tempRecordStopMacro name="${base.merge.log}" phase="compile" filterref="filterset.genxml.merge"/>
+            <hlm:signalMacro
+                logfile="${build.cache.log.dir}/${base.merge.log}"
+                phase="compile" 
+                signal.input="canonicalSysDefFailSignalInput" />
         </sequential>
     </macrodef>
 

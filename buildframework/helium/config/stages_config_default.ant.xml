@@ -41,7 +41,7 @@ Description:
     
     
     <!-- Stage record configuration -->
-    <hlm:stagerecord id="stage.default" defaultoutput="${build.log}" loglevel="${ant.loglevel}" append="false"/>
+    <hlm:stagerecord id="stage.default" defaultoutput="${build.log}" loglevel="${ant.loglevel}" append="true"/>
        
     <hlm:stagerecord id="stage.preparation" stagerefid="preparation" output="${build.log.dir}/${build.id}_prep.ant.log" loglevel="info" append="true"/>
     

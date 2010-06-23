@@ -724,7 +724,7 @@ class Session(AbstractSession):
             raise Exception("Error creating a session: result:\n%s" % result)
         session_addr = result.strip()
         _logger.debug(session_addr)
-        if not re.match(r'\w+:\d+:\d+.\d+.\d+.\d+(:\d+.\d+.\d+.\d+)?', session_addr):
+        if not re.match(r'[a-zA-Z0-9_-]+:\d+:\d+\.\d+\.\d+\.\d+(:\d+\.\d+\.\d+\.\d+)?', session_addr):
             raise Exception("Error creating a session: result:\n%s" % result)
         return Session(username, engine, dbpath, session_addr)        
             

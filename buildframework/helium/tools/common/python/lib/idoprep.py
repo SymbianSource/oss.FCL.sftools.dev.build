@@ -141,7 +141,7 @@ def create_ado_mapping(sysdefconfig, adomappingfile, adoqualitymappingfile, buil
                     outputquality.write("%s=%s\n" % (sysdef, component))
                 else:
                     for dir in adoqualitydirs.split(','):
-                        if os.path.normpath(dir) == os.path.normpath(os.path.join(builddrive), os.environ['EPOCROOT'], location):
+                        if os.path.normpath(dir) == os.path.normpath(os.path.join(builddrive, os.environ['EPOCROOT'], location)):
                             outputquality.write("%s=%s\n" % (sysdef, component))
     outputquality.close()
     output.close()

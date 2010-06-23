@@ -58,7 +58,8 @@ builder = None
 try:
     configBuilder = configuration.NestedConfigurationBuilder(open(ant.get_property(r'${prep.delivery.conf.parsed}'), 'r'))
     configSet = configBuilder.getConfiguration()
-    builder = preparation.PreparationBuilder(configSet.getConfigurations(), ant.get_property(r'${ccm.user.login}'), ant.get_property(r'${ccm.user.password}'), cache=ant.get_property(r'${ccm.cache.xml}'))
+    password = ant.get_property(r'${ccm.user.password}')
+    builder = preparation.PreparationBuilder(configSet.getConfigurations(), ant.get_property(r'${ccm.user.login}'), password, cache=ant.get_property(r'${ccm.cache.xml}'))
     builder.check()
     builder.get_content()
     builder.close()

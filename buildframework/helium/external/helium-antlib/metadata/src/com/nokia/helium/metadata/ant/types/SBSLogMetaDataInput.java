@@ -46,7 +46,6 @@ import javax.xml.stream.events.XMLEvent;
  */
 public class SBSLogMetaDataInput extends XMLLogMetaDataInput {
 
-    private static final String SPECIAL_CASE_REG_EX = "(make.exe|make): \\*\\*\\*.*(/.*)(_exe|_dll|_pdd|_ldd|_kext|_lib)/.*";
 
     private static final String DRIVE_LETTER_REGEX = "(([a-z]|[A-Z]):(\\\\|/))(.*)(/bld\\.inf)";
 
@@ -58,11 +57,17 @@ public class SBSLogMetaDataInput extends XMLLogMetaDataInput {
     
     private String logTextInfo = "";
     
+    private String recipeStatus = "ok";
+    
     private HashMap<String, List <CategoryEntry>> generalTextEntries = new HashMap<String, List <CategoryEntry>>();
     
     private CategorizationHandler categorizationHandler;
     
+    private List<SpecialRegex> specialRegexPatternList = new ArrayList<SpecialRegex>();
+
     private int lineNumber;
+    
+    private boolean inMainDataSection;
 
     private boolean recordText;
     
@@ -78,7 +83,8 @@ public class SBSLogMetaDataInput extends XMLLogMetaDataInput {
      * Constructor
      */
     public SBSLogMetaDataInput() {
-        specialCasePattern = Pattern.compile(SPECIAL_CASE_REG_EX);
+        specialRegexPatternList.add(new SpecialRegex("(make.exe|make): \\*\\*\\* No rule to make target.*needed by `(.*)'.*", 2));
+        specialRegexPatternList.add(new SpecialRegex("(make.exe|make): \\*\\*\\* \\[(.*)\\].*", 2));
     }
     
     
@@ -140,52 +146,51 @@ public class SBSLogMetaDataInput extends XMLLogMetaDataInput {
      * @param streamReader: the input stream reader which contains the xml data to be parsed for recording data.
      * @return true if there are any element to be added to the database.
      */
-    public boolean characters (XMLStreamReader streamReader) {
+    public boolean characters (XMLStreamReader streamReader) throws Exception {
+        HashMap<String, Integer> toProcess = new HashMap<String, Integer>(); 
         if (recordText) {
             logTextInfo += streamReader.getText();
         } else {
-            if (!additionalEntry) {
-                additionalEntry = true;
-            }
-            String cdataText = streamReader.getText().trim();
-            String [] textList = cdataText.split("\n");
-            for (String text : textList) {
-                Matcher specialCaseMatcher = specialCasePattern.matcher(text);
-                List <CategoryEntry> entryList  = null;
-                if (specialCaseMatcher.matches()) {
-                    String componentName = specialCaseMatcher.group(2);
-                    String extension = specialCaseMatcher.group(3); 
-                    String componentWithTarget =  (componentName.substring(1) + "." 
-                        + extension.substring(1)).toLowerCase();
-                    CategoryEntry newEntry = new CategoryEntry(text, componentWithTarget ,
-                            "error", streamReader.getLocation().getLineNumber(), getCurrentFile().toString());
-                    entryList = generalTextEntries.get(componentWithTarget); 
-                    if ( entryList == null) {
-                        entryList = new ArrayList<CategoryEntry>();
-                        generalTextEntries.put(componentWithTarget, entryList);
+            if (inMainDataSection) {
+                String cdataText = streamReader.getText().trim();
+                String [] textList = cdataText.split("\n");
+                int i = 0;
+                for (String text : textList) {
+                    boolean added = false;
+                    if (text.trim().equals("")) {
+                        continue;
                     }
-                    entryList.add(newEntry);
-                } else {
-                    String componentWithTarget = null;
-                    int indexMakeString = text.indexOf( "make: ***" );
-                    int indexSlash = text.lastIndexOf( "/" );
-                    if (indexMakeString != -1 && indexSlash != -1) {
-                        int indexExt = ( indexSlash  + 1) + text.substring(indexSlash).indexOf( "." );
-                        if ( indexExt != -1 ) {
-                            componentWithTarget = (text.substring(indexSlash,indexExt + 3)).toLowerCase();
+                    for (SpecialRegex specialRegex : specialRegexPatternList) {
+                        Matcher matcher = specialRegex.getRegexPattern().matcher(text); 
+                        int groupPosition = specialRegex.getGroupPosition();
+                        List <CategoryEntry> entryList  = null;
+                        if (matcher.matches()) {
+                            String componentName = matcher.group(groupPosition).toLowerCase();
+                            CategoryEntry newEntry = new CategoryEntry(text, componentName ,
+                                    "error", streamReader.getLocation().getLineNumber(), getCurrentFile().toString());
+                            entryList = generalTextEntries.get(componentName); 
+                            if ( entryList == null) {
+                                entryList = new ArrayList<CategoryEntry>();
+                                generalTextEntries.put(componentName, entryList);
+                            }
+                            entryList.add(newEntry);
+                            added = true;
+                            break;
                         }
                     }
-                    if (componentWithTarget != null) {
-                        CategoryEntry newEntry = new CategoryEntry(text, componentWithTarget ,
-                                "error", streamReader.getLocation().getLineNumber(), getCurrentFile().toString());                    
-                        entryList = generalTextEntries.get(componentWithTarget);
-                        if (entryList == null) {
-                            entryList = new ArrayList<CategoryEntry>();
-                            generalTextEntries.put(componentWithTarget, entryList);
-                        }
-                        entryList.add(newEntry);
+                    if (!added) {
+                        toProcess.put(text.trim(), streamReader.getLocation().getLineNumber() + i);
                     }
-                    
+                    i++;
+               }
+                boolean entryCreated = false;
+                //Check for any general errors.
+                for (String textString : toProcess.keySet()) {
+                    boolean created = findAndAddEntries(textString, "general",
+                        getCurrentFile().toString(), toProcess.get(textString));
+                    if (created && !entryCreated ) {
+                        entryCreated = true;
+                    }
                 }
             }
         }
@@ -202,19 +207,28 @@ public class SBSLogMetaDataInput extends XMLLogMetaDataInput {
             String tagName = streamReader.getLocalName();
             if (tagName.equalsIgnoreCase("buildlog")) {
                 log.debug("starting with buildlog");
+                inMainDataSection  = true;
             }
             if (tagName.equalsIgnoreCase("recipe") ) {
                 lineNumber = streamReader.getLocation().getLineNumber();
                 currentComponent = getComponent(streamReader);
                 recordText = true;
+                inMainDataSection = false;
+                recipeStatus = "ok";
+            } if (tagName.equalsIgnoreCase("status") ) {
+                String exit = streamReader.getAttributeValue(null, "exit");
+                recipeStatus = (exit != null) ? exit : "ok";
             } else if (tagName.equalsIgnoreCase("error")
                     || tagName.equalsIgnoreCase("warning")) {
                 lineNumber = streamReader.getLocation().getLineNumber();
                 currentComponent = getComponent(streamReader);
                 recordText = true;
+                inMainDataSection = false;
             } else if (tagName.equalsIgnoreCase("whatlog") ) {
                 currentComponent = getComponent(streamReader);
+                inMainDataSection = false;
             } else if (tagName.equalsIgnoreCase("time")) {
+                inMainDataSection = false;
                 currentElapsedTime = Float.valueOf(getAttribute("elapsed", streamReader)).floatValue();
                 if (currentComponent != null) {
                     TimeEntry timeObject = componentTimeMap.get(currentComponent);
@@ -225,6 +239,10 @@ public class SBSLogMetaDataInput extends XMLLogMetaDataInput {
                         timeObject.addElapsedTime(currentElapsedTime);
                     }
                 }
+            } else if (tagName.equalsIgnoreCase("clean")) {
+                inMainDataSection = false;
+            } else if (tagName.equalsIgnoreCase("info")) {
+                inMainDataSection = false;
             }
         } catch (Exception ex) {
             log.debug("exception in startelement",ex);
@@ -287,20 +305,27 @@ public class SBSLogMetaDataInput extends XMLLogMetaDataInput {
         try {
             String tagName = streamReader.getLocalName();
             if (tagName.equalsIgnoreCase("recipe")) {
+                inMainDataSection = true;
                 recordText = false;
                 if (logTextInfo != null) {
                     if (currentComponent == null) {
                         currentComponent = "general";
                     }
+                    Statistics stat = new Statistics();
                     boolean entryCreated = findAndAddEntries(logTextInfo, currentComponent,
-                            getCurrentFile().toString(), lineNumber);
-                    logTextInfo = "";
-                    if ( entryCreated) {
-                        return true;
+                            getCurrentFile().toString(), lineNumber, stat);
+                    if (stat.getSeveriry("error") == 0 && recipeStatus.equals("failed")) {
+                        addEntry("error", currentComponent, getCurrentFile().toString(), 
+                                lineNumber, "ERROR: recipe exit status is failed.");
+                        entryCreated = true;
                     }
+                    logTextInfo = "";
+                    recipeStatus = "ok";
+                    return entryCreated;
                 }
             } else if (tagName.equalsIgnoreCase("error")
                     || tagName.equalsIgnoreCase("warning")) {
+                inMainDataSection = true;
                 recordText = false;
                 if (currentComponent == null) {
                     currentComponent = "general";
@@ -310,9 +335,14 @@ public class SBSLogMetaDataInput extends XMLLogMetaDataInput {
                 logTextInfo = "";
                 return true;
             } else if (tagName.equalsIgnoreCase("whatlog") ) {
+                inMainDataSection = true;
                 addEntry("default", currentComponent, getCurrentFile().toString(), -1, 
                         "");
                 return true;
+            } else if (tagName.equalsIgnoreCase("clean")) {
+                inMainDataSection = true;                
+            } else if (tagName.equalsIgnoreCase("info")) {
+                inMainDataSection = true;
             }
         } catch (Exception ex) {
             log.debug("Exception while processing for sbs metadata input", ex);
@@ -321,6 +351,25 @@ public class SBSLogMetaDataInput extends XMLLogMetaDataInput {
         return false;
     }
 }
+
+class SpecialRegex {
+    private Pattern regexPattern;
+    private int groupPosition;
+
+    public SpecialRegex(String exp, int pos) {
+        regexPattern = Pattern.compile(exp);
+        groupPosition = pos;
+    }
+    
+    public Pattern getRegexPattern() {
+        return regexPattern;
+    }
+    
+    public int getGroupPosition() {
+        return groupPosition;
+    }
+}
+
 
 /* This class stores the temporary Time entry which is being recorded for each data
  * at the end of the build and during isAdditionalEntry function, the time for the component
@@ -336,8 +385,8 @@ class TimeEntry {
      * @param elapsedTime: time duration of the component.
      * @path of the component.
      */
-    public TimeEntry(float elapsedTime, String path) {
-        elapsedTime = elapsedTime;
+    public TimeEntry(float time, String path) {
+        elapsedTime = time;
         filePath = path;
     }
     
@@ -569,7 +618,8 @@ class CategoryEntry {
         int index = 0;
         Set<String> categorySet = categoryList.keySet();
         for (String key : categorySet) {
-            if (path.indexOf(key) != -1) {
+        if (path.toLowerCase().equals(key)) {
+
                 List<CategoryEntry> entry = categoryList.get(key);
                 categoryList.remove(key);
                 return entry;
@@ -630,6 +680,15 @@ class CategoryEntry {
                 }
                 if (xmlStreamReader != null) {
                     close();
+                }
+            }
+            Set<String> categorySet = categoryList.keySet();
+            for (String key : categorySet) {
+                currentList = categoryList.remove(key);
+                if (currentList != null && !currentList.isEmpty()) {
+                    updateCategoryEntries(currentList, "general");
+                    CategoryEntry entry = (CategoryEntry)currentList.remove(0);
+                    return entry;
                 }
             }
         } catch ( Exception ex) {

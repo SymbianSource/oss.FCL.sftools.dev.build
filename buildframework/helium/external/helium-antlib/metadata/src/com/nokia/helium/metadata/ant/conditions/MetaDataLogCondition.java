@@ -100,7 +100,7 @@ public class MetaDataLogCondition extends ConditionType {
         
         MetaDataDb db = new MetaDataDb(fileName.getAbsolutePath());
         
-        String sql = "select count(data) as COUNT from metadata INNER JOIN logfiles ON logfiles.id=metadata.logpath_id where path like '%" + logFile + "%' and priority_id = " + prty.getValue();
+        String sql = "select count(data) as COUNT from metadata INNER JOIN logfiles ON logfiles.id=metadata.logpath_id where path like '%" + logFile + "' and priority_id = " + prty.getValue();
         
         //System.out.println(sql);
         List<Map<String, Object>> records = db.getRecords(sql);

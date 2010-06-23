@@ -78,9 +78,11 @@ public class  SBSMakeOptions extends VariableSet {
     }
     
     public String getPPThreads() {
-        if (!initialized) {
-            initializeAll();
-            initialized = true;
+        if (ppThreads == null) {
+            if (!initialized) {
+                initializeAll();
+                initialized = true;
+            }
         }
         return ppThreads;
     }
@@ -90,12 +92,14 @@ public class  SBSMakeOptions extends VariableSet {
      * @return type of make engine
      */
     public String getEngine() {
-        if (!initialized) {
-            initializeAll();
-            initialized = true;
-        }
         if (engine == null) {
-            throw new BuildException("engine should not be null");
+            if (!initialized) {
+                initializeAll();
+                initialized = true;
+            }
+            if (engine == null) {
+                throw new BuildException("engine should not be null");
+            }
         }
         return engine;
     }
@@ -121,7 +125,7 @@ public class  SBSMakeOptions extends VariableSet {
                         throw new BuildException(" Config's engine type " + engine + " not matching with reference : " 
                                 + refId.getRefId() + ": engine: " + refEngine);
                     }
-                    if (ppThreads == null) {
+                    if (ppThreads == null && threads != null) {
                         ppThreads = threads;
                     }
                     if (engine == null) {

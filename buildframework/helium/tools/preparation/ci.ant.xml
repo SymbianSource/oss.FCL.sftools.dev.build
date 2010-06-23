@@ -43,7 +43,8 @@ import fileutils
 import threadpool
 import subprocess
 import sys
-
+from java.io import IOException
+        
 dir_path = str(attributes.get('dir-path'))
 del_folder_drive = attributes.get('delete-folders-drive')
 pool_size = attributes.get('pool-size')
@@ -70,24 +71,12 @@ for path_ in os.listdir(dir_path):
 # Delete all dirs based on config
 for dir_ in delete_dirs:
     try:
-        if os.sep == '\\':
-            fileutils.subst(del_folder_drive, dir_)
-            self.log(str("substed for deleting folders"))
-            self.log(str("Removing %s\\" % del_folder_drive))
-            fileutils.rmtree("%s\\" % del_folder_drive)
-            fileutils.unsubst(del_folder_drive)
-            self.log(str("unsubsted substed for deleting folders"))
-        else:
-            self.log(str("Removing %s" % dir_))
-            fileutils.rmtree(dir_)
-    except Exception, e:
-        if os.sep == '\\':
-            try:
-                fileutils.unsubst(del_folder_drive)
-                self.log(str("unsubsted for deleling folders"))
-            except Exception, e2:
-                self.log(str("failed when unsubsting for failed deleting folders... process will continue anyway"))
-        self.log(str("ERROR: %s" % e))
+        self.log(str("Removing %s" % dir_))
+        fileutils.rmtree(dir_)
+    except Exception, exc:
+        self.log(str("ERROR: %s" % exc))
+    except IOException, ioExc:
+        self.log(str("ERROR: %s" % ioExc))
 
 # Delete all config files
 for path_ in found_inputs:

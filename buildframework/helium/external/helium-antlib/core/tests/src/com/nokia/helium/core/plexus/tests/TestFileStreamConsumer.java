@@ -35,7 +35,7 @@ public class TestFileStreamConsumer {
         consumer.consumeLine("Hello World!");
         consumer.consumeLine("Bonjour monde!");
         consumer.close();
-        assertTrue(temp.length() == 28);
+        assertTrue(temp.length() == 26 + System.getProperty("line.separator").length()*2);
     }
 
 }

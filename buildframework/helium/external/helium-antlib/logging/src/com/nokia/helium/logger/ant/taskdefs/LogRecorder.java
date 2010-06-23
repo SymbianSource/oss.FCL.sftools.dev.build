@@ -101,6 +101,9 @@ public class LogRecorder extends Task implements Handler {
                         antLoggingHandler.doLoggingAction("default", false, "Stopping", this);
                     }
                 }
+                if (!recorder.getRecordState() && recorder.getProject() != getProject()) {
+                    recorder.setProject(getProject());
+                }
                 recorder.reopenFile();
                 recorder.setRecordState(start);
             } else {

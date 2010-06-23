@@ -81,7 +81,7 @@ project.setProperty('rom.product.path', imaker.get_product_dir(r'@{product}'))
                 <then>
                     <echo message="target to run @{target}-dryrun" />
                     <exec executable="${imaker.command}" dir="${build.drive}/" output="${build.drive}/dryrun_out.txt" append="true" failonerror="${failonerror}">
-                        <arg line="-p@{product} -f /epoc32/rom/${rom.product.path}/${rombuild.makefile.name}" />
+                        <arg line="-p@{product} -f ${rom.product.path}/${rombuild.makefile.name}" />
                         <arg value="@{target}-dryrun" />
                     </exec>
                 </then>
@@ -90,13 +90,13 @@ project.setProperty('rom.product.path', imaker.get_product_dir(r'@{product}'))
                         <istrue value="${rombuild.using.var}" />
                         <then>
                             <exec executable="${imaker.command}" dir="${build.drive}/" failonerror="${failonerror}">
-                                <arg line="-p@{product} -f /epoc32/rom/${rom.product.path}/${rombuild.makefile.name}" />
+                                <arg line="-p@{product} -f ${rom.product.path}/${rombuild.makefile.name}" />
                                 <arg value="@{target}" />
                             </exec>
                         </then>
                         <else>
                             <exec executable="${imaker.command}" dir="${build.drive}/" failonerror="${failonerror}">
-                                <arg line="-p@{product} -c${rom.product.platform} -f /epoc32/rom/${rom.product.path}/${rombuild.makefile.name}" />
+                                <arg line="-p@{product} -c${rom.product.platform} -f ${rom.product.path}/${rombuild.makefile.name}" />
                                 <arg value="@{target}" />
                             </exec>
                         </else>

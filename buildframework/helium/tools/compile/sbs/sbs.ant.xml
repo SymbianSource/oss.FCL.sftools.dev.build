@@ -116,11 +116,23 @@ Description:
                         <hlm:sbstask sbsinput="@{sbs.input}" sysdefFile="${build.drive}/output/build/canonical_system_definition_${sysdef.configuration}.xml" 
                             layerPatternSetRef="${sbs.patternset}" errorOutput="${sbs.log.file}.sbs_error.log" 
                             workingDir="${build.drive}/" failOnError="false" outputLog="${sbs.log.file}" cleanLog = "${sbs.clean.log}"
-                             statsLog="${compile.log.dir}/${build.id}_${sysdef.configuration}.info.xml" />
-                        <!-- run arm license checking / setting arm version only for arm config --> 
+                             statsLog="${sbs.log.file}.info.xml" />
+
+                        <!-- Check build for missing files -->
+                        <exec osfamily="windows" executable="cmd" dir="${build.drive}/" input="${sbs.log.file}" output="${sbs.log.file}.check.log" failonerror="false">
+                            <arg value="/c" />
+                            <arg value="sbs_filter.bat" />
+                            <arg value="--filters=FilterCheckComp" />
+                        </exec>
+                        <exec osfamily="unix" executable="sbs_filter" dir="${build.drive}/" input="${sbs.log.file}" output="${sbs.log.file}.check.log" failonerror="false">
+                            <arg value="--filters=FilterCheckComp" />
+                        </exec>
+                        <hlm:assertFileExists file="${sbs.log.file}.check.log" />
+                        
+                        <!-- Push info to the database and generate scanlog. --> 
                         <echo message="sbs.log.file: ${sbs.log.file}" />
                         <hlm:sbsProcessOutputMacro sbs.log.file="${sbs.log.file}"
-                            sbs.clean.log.file="${sbs.clean.log}"  sbs.stats.file="${compile.log.dir}/${build.id}_${sysdef.configuration}.info.xml"
+                            sbs.clean.log.file="${sbs.clean.log}"  sbs.stats.file="${sbs.log.file}.info.xml"
                             sbs.ant.output.file="${sbs.log.file}" sbs.error.output.file="${sbs.log.file}.sbs_error.log"/>
                     </sequential>
                 </for>
@@ -131,7 +143,8 @@ Description:
             </then>
         </if>
     </target>
-
+    
+    
     <macrodef name="sbsProcessOutputMacro" uri="http://www.nokia.com/helium">
         <attribute name="sbs.clean.log.file" />
         <attribute name="sbs.log.file" />
@@ -140,7 +153,29 @@ Description:
         <attribute name="sbs.ant.output.file" />
         <sequential>
             <var name="sbs.scan2.template" value="scan2.html.ftl" />
+            <var name="base.sbs.log" value="" unset="true"/>
             <basename property="base.sbs.log" file="@{sbs.log.file}" suffix=".log"/>
+            <echo message="base.sbs.log: ${base.sbs.log}" />
+            
+            <!-- Push check log into the database -->
+            <hlm:metadatarecord database="${metadata.dbfile}">
+                <hlm:textmetadatainput>
+                    <fileset casesensitive="false" file="@{sbs.log.file}.check.log"/>
+                    <metadatafilterset refid="filterset.sbs" />
+                </hlm:textmetadatainput>
+            </hlm:metadatarecord>
+            <delete file="${build.log.dir}/${base.sbs.log}.check.scan2.html" failonerror="false" />
+            <exec executable="perl" dir="${build.drive}/" failonerror="false">
+                <arg value="${build.drive}/epoc32/tools/htmlscanlog.pl" />
+                <arg value="-v" />
+                <arg value="-v" />
+                <arg value="-l" />
+                <arg file="@{sbs.log.file}.check.log" />
+                <arg value="-o" />
+                <arg file="${build.log.dir}/${base.sbs.log}.check.scan2.html" />
+            </exec>
+            <hlm:assertFileExists file="${build.log.dir}/${base.sbs.log}.check.scan2.html" />
+            
             <hlm:metadatarecord database="${metadata.dbfile}">
                 <hlm:textmetadatainput>
                     <fileset casesensitive="false" file="@{sbs.error.output.file}"/>
@@ -168,12 +203,13 @@ Description:
                         <istrue value="${skip.sbs.parser.exception}" />
                         <then>
                             <var name="sbs.scan2.template" value="scan2_text.html.ftl" />
-                            <hlm:metadatadelete database="${metadata-read-db}">
+                            <hlm:metadatadelete database="${metadata.dbfile}">
                                 <fileset casesensitive="false" file="@{sbs.log.file}"/>
                             </hlm:metadatadelete>
-                            <hlm:metadatarecord database="${metadata-read-db}" >
+                            <hlm:metadatarecord database="${metadata.dbfile}" >
                                 <hlm:textmetadatainput>
                                     <fileset casesensitive="false" file="@{sbs.log.file}"/>
+                                    <metadatafilterset refid="filterset.sbs" />
                                 </hlm:textmetadatainput>
                             </hlm:metadatarecord>
                         </then>
@@ -184,7 +220,7 @@ Description:
                 </catch>
             </trycatch>
             <fmpp sourceFile="${helium.dir}/tools/common/templates/log/${sbs.scan2.template}"
-                         outputfile="@{sbs.log.file}.scan2.html">
+                         outputfile="${build.log.dir}/${base.sbs.log}.scan2.html">
                 <freemarkerLinks expandProperties="yes">
                     macro: ${helium.dir}/tools/common/templates/macro
                 </freemarkerLinks>
@@ -195,9 +231,13 @@ Description:
                 </data>
             </fmpp>
             <echo message="generating signal" />
-            <hlm:assertFileExists file="@{sbs.log.file}.scan2.html"/>
+            <hlm:assertFileExists file="${build.log.dir}/${base.sbs.log}.scan2.html"/>
             <hlm:calculateErrorsFromLog logfile="@{sbs.log.file}" />
-            <hlm:compileLogSignalMacro compile.summary.file="${base.sbs.log}" 
+            <echo message="sbs.log.file: @{sbs.log.file}"/>
+            <hlm:compileLogSignalMacro compile.summary.file="@{sbs.log.file}" 
+                error.limit="${build.errors.limit}" phase="compile"/>
+            <echo message="sbs.error.output.file: @{sbs.error.output.file}"/>
+            <hlm:compileLogSignalMacro compile.summary.file="@{sbs.error.output.file}" 
                 error.limit="${build.errors.limit}" phase="compile"/>
             <!-- Blocks packaging configuration generation. -->
             <if>

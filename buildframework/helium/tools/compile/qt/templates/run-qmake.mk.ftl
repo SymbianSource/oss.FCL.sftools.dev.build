@@ -28,8 +28,8 @@ Description:
 <#list data["//unit/@proFile/.."] as unit>
 ##########################################################################
 /${unit.@bldFile}/bld.inf: /${unit.@bldFile}/${unit.@proFile}
-	@echo cd /${unit.@bldFile} ^&^& qmake -listgen <#if unit.@qmakeArgs[0]??>${unit.@qmakeArgs}<#else>${ant['qt.qmake.default.args']}</#if> ${unit.@proFile}
-	cd /${unit.@bldFile} && qmake -listgen <#if unit.@qmakeArgs[0]??>${unit.@qmakeArgs}<#else>${ant['qt.qmake.default.args']}</#if> ${unit.@proFile}
+	@echo cd /${unit.@bldFile} ^&^& qmake -listgen <#if unit.@qmakeArgs[0]??>${unit.@qmakeArgs}<#else>${ant['qt.qmake.default.args']}</#if> <#if "${ant['build.system']?lower_case}" = 'sbs-ec'> -spec symbian-sbsv2 </#if> ${unit.@proFile}
+	-@cd /${unit.@bldFile} && qmake -listgen <#if unit.@qmakeArgs[0]??>${unit.@qmakeArgs}<#else>${ant['qt.qmake.default.args']}</#if> <#if "${ant['build.system']?lower_case}" = 'sbs-ec'> -spec symbian-sbsv2 </#if> ${unit.@proFile}
 
 all:: /${unit.@bldFile}/bld.inf
 
