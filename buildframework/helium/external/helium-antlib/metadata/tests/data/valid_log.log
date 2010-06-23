@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<buildlog sbs_version="2.12.2 [2010-02-17 symbian build system 1e23e973ab85]" xmlns="http://symbian.com/xml/build/log" xmlns:progress="http://symbian.com/xml/build/log/progress" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symbian.com/xml/build/log http://symbian.com/xml/build/log/1_0.xsd">
+<info>sbs: version 2.12.2 [2010-02-17 symbian build system 1e23e973ab85]
+</info>
+<info>SBS_HOME C:/apps/Raptor_2.12.2_rc2</info>
+<info>Set-up C:/apps/Raptor_2.12.2_rc2/sbs_init.xml</info>
+<info>Command-line-arguments -s y:\output\build\canonical_system_definition.xml -c tools_rel -c tools2_rel --filters=FilterMetadataLog -k --logfile=y:\output\logs\compile/valid_log.log --noexport --makefile=y:\output\logs/makefile/92_7952_RAPTOR_201007_3Wed_dfs_build_ncp_tools -e emake --mo=--emake-emulation=gmake --mo=--emake-annofile=#MAKEFILE#.emake.anno --mo=--emake-class=DFS_7952-64 --mo=--emake-annodetail=basic,history,file,waiting --mo=--case-sensitive=0 --mo=--emake-root=y:/;\;C:\apps;E:\Build_E\helium-7.0.x\helium;C:\apps\Raptor_2.12.2_rc2</info>
+<info>Current working directory y:\</info>
+<info>Environment _USE_CLASSPATH=no</info>
+<info>Environment __CYGWIN__=C:\apps\Raptor_2.12.2_rc2\win32\cygwin</info>
+<info>Environment __MINGW__=C:\apps\Raptor_2.12.2_rc2\win32\mingw</info>
+<info>Environment __PYTHON__=C:\apps\Raptor_2.12.2_rc2\win32\python264\python.exe</info>
+<info>Duplicate alias 'make' (the one from 'y:/epoc32/sbs_config\s60_sbs_config.xml' will override the one in 'C:/apps/Raptor_2.12.2_rc2/lib/config\make.xml')</info>
+<info>Duplicate alias 'emake' (the one from 'y:/epoc32/sbs_config\s60_sbs_config.xml' will override the one in 'C:/apps/Raptor_2.12.2_rc2/lib/config\make.xml')</info>
+<info>Buildable configuration 'tools_rel'</info>
+<info>Buildable configuration 'tools2_rel'</info>
+<info>System Definition file y:/output/build/canonical_system_definition_dfs_build_ncp.xml</info>
+<info>Found 119 bld.inf references in y:/output/build/canonical_system_definition_dfs_build_ncp.xml within 3 layers:</info>
+<info>	ncp_layer, os_layer, unit_test_layer</info>
+<info>Found 94 bld.inf references in layer "ncp_layer"</info>
+<info>Found 25 bld.inf references in layer "os_layer"</info>
+<info>Found 0 bld.inf references in layer "unit_test_layer"</info>
+<info>Toolcheck cache y:/epoc32/build/toolcheck_cache_.tmp ignored - environment changed
+</info>
+<info>OS version "vtb92sf" determined from file "y:/epoc32/data/buildinfo.txt"</info>
+<info>applying the OS variant to the configuration "tools_rel".</info>
+<info>'tools_rel' uses variant hrh file 'y:/epoc32/include/feature_settings.hrh'</info>
+<info>OS version "vtb92sf" determined from file "y:/epoc32/data/buildinfo.txt"</info>
+<info>applying the OS variant to the configuration "tools2_rel".</info>
+<info>'tools2_rel' uses variant hrh file 'y:/epoc32/include/feature_settings.hrh'</info>
+<info>Processing y:/ncp_sw/corecom/dgsw_s60display/tv_out/group/bld.inf</info>
+<info>Processing y:/ext/os/netdo_config/group/bld.inf</info>
+<info>Processing y:/config/ncp_config/ncpmocked_config/ncpmocked_configconfig/variation/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/dgsw_s60display/display/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/dgsw_s60display/display_updater/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/dgsw_s60display/DDC_access/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/aasw/radioadaptation/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/base_components/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/aasw/eap/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/usb_adaptation/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/security_components/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/dcc/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/MknCodec/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/dgsw_s60display/memory_copy/group/bld.inf</info>
+<info>Processing y:/ncp_sw/core7.0/ive3adaptation/group/bld.inf</info>
+<info>Processing y:/sf/os/mm/audio/ARM_CMMF_codecs/AacEncoderPlugin/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/aasw/mmrc/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/dgsw_s60display/display_tools/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/dgsw_s60display/display_chipset_api/os_wrapper/symbian/group/bld.inf</info>
+<info>Processing y:/sf/os/lbs/group/bld.inf</info>
+<info>Processing y:/ncp_sw/core7.0/IVE3_Engine/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/dgsw_s60display/boot_figure/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/CameraAPI/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/aasw/aswcommonlibs/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/dgsw_s60display/compositor/group/bld.inf</info>
+<info>Processing y:/config/ncp_config/ncpmocked_config/ncpmocked_configconfig/variation/group/bld.inf</info>
+<info>Processing y:/ncp_sw/testcom/ptsw/config/group/carbon/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/aasw/ads/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/dgsw_s60display/CEC_access/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/dgsw_s60display/tv_out_behaviour/group/bld.inf</info>
+<info>Processing y:/config/ncp_config/ncpmocked_config/ncp_mocker_config/variation/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/dgsw_s60display/display_chipset_api/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/aasw/tuning_parameter_service/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/bt_adaptation/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/nloader/mocker/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/cameradrivers/rcam/group/bld.inf</info>
+<info>Processing y:/config/ncp_config/ncpmocked_config/mocker_config/variation/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/dgsw_s60display/surface_manager/group/bld.inf</info>
+<info>Processing y:/sf/os/devicesrv/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/aasw/sostonegenerator/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/aasw/btaudioadaptation/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/aasw/audiohwdrivers/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/dgsw_s60display/radio_frequencies/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/dgsw_s60display/tv_out_chipset_api/implementation/symbian/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/dgsw_s60display/display_modules/group/bld.inf</info>
+<info>Processing y:/ncp_sw/core7.0/base_mocker/assp/mocker/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/aasw/coreaudioplatform/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/aasw/eap_algorithms/s60/components/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/dgsw_s60display/tv_out_chipset_api/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/CryptoHW/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/VideoEncPluginARMOpt/Build/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/aasw/saaudioserver/group/bld.inf</info>
+<info>Processing y:/ncp_sw/core7.0/delta_update_installer/tools/susd_dll/bld.inf</info>
+<info>Processing y:/sf/os/mm/audio/ARM_CMMF_codecs/EAacPlusCodecPlugin/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/aasw/hwdevices/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/locationadaptation/group/ncp/bld.inf</info>
+<info>Processing y:/sf/os/graphics/group/bld.inf</info>
+<info>Processing y:/sf/os/deviceplatformrelease/S60Extras/group/bld.inf</info>
+<info>Processing y:/sf/os/osrndtools/group/bld.inf</info>
+<info>Processing y:/config/ncp_config/ncpmocked_config/ncpmocked_configconfig_config/variation/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/dgsw_s60display/display_hw_test/group/bld.inf</info>
+<info>Processing y:/sf/os/mm/audio/ARM_CMMF_codecs/EAacPlusUtil/group/bld.inf</info>
+<info>Processing y:/sf/os/mm/audio/ARM_CMMF_codecs/AmrWbCodecPlugin/group/bld.inf</info>
+<info>Processing y:/sf/os/wlan/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/aasw/mmcodecs_hwd/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/aasw/remoteaudiotestingservice/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/dgsw_s60display/group/bld.inf</info>
+<info>Processing y:/ncp_sw/core7.0/delta_update_installer/group/bld.inf</info>
+<info>Processing y:/sf/os/devicesrv/devicesrv_plat/fps_api/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/accel2d/accel2d/group/bld.inf</info>
+<info>Processing y:/sf/os/mm/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/dgsw_s60display/text_shell_updater/group/bld.inf</info>
+<info>Processing y:/ncp_sw/core7.0/base_mocker/mocker/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/wlan_adapt_common/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/SecEnvInit2/group/bld.inf</info>
+<info>Processing y:/sf/os/mm/audio/ARM_CMMF_codecs/WMADecoderPlugin/group/bld.inf</info>
+<info>Processing y:/sf/os/wlan/wlan_bearer/wlanengine/wlan_symbian/wlanengine_symbian_3.1/group/wpx/bld.inf</info>
+<info>Processing y:/config/ncp_config/ncpmocked_config/ncpmocked_configconfig_config/variation/group/bld.inf</info>
+<info>Processing y:/tools/flash_tools/bld.inf</info>
+<info>Processing y:/sf/os/deviceplatformrelease/Version/group/bld.inf</info>
+<info>Processing y:/ncp_sw/core7.0/mTVadaptation/DVBH/Group_CTS70/bld.inf</info>
+<info>Processing y:/ext/tools/swconfigapps/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/dgsw_s60display/display_chipset_api/dummy/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/aasw/lac/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/JpegOptIclCodec/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/visual_codecs_interface_iby/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/npe_core/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/h264armvideoencoder/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/dgsw_s60display/lossi/rap/group/bld.inf</info>
+<info>Processing y:/ncp_sw/testcom/cameratestserver/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/aasw/audioprocessingengine/group/bld.inf</info>
+<info>Processing y:/sf/os/usb/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/dgsw_s60display/tv_out_config/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/dgsw_s60display/display_chipset_api/backend/group/bld.inf</info>
+<info>Processing y:/sf/os/bt/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/CameraAPITesting/StifCameraApi/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/dgsw_s60display/power_save_display_mode/group/bld.inf</info>
+<info>Processing y:/config/ncp_config/ncpmocked_config/ncpmocked_configconfig_config/variation/group/bld.inf</info>
+<info>Processing y:/sf/os/mm/video/ARM_MDF_Decoders/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/dgsw_s60display/r_display/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/nfc_adaptation/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/aasw/mdaif/group/bld.inf</info>
+<info>Processing y:/sf/os/cellularsrv/telephonyserverplugins/common_tsy/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/dgsw_s60display/gcebe/group/bld.inf</info>
+<info>Processing y:/sf/os/mm/audio/ARM_CMMF_codecs/AmrNbCodecPlugin/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/modemadaptation_ext/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/dgsw_s60display/tv_out_chipset_api/implementation_dummy/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/SWATI_Symbian_Tools/group/bld.inf</info>
+<info>Processing y:/sf/os/devicesrv/sensorservices/fpsclient/group/bld.inf</info>
+<info>Processing y:/sf/os/mm/audio/ARM_CMMF_codecs/MP3CodecPlugin/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/dgsw_s60display/scdv/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/aasw/systemtoneservice/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/SecEnv2/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/dgsw_s60display/panic_screen/group/bld.inf</info>
+<info>Processing y:/sf/os/imagingext/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/bbc_components/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/aasw/aamm/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/cameradrivers/group/bld.inf</info>
+<info>Processing y:/ncp_sw/corecom/dgsw_s60display/display_chipset_api/interface_storage/group/bld.inf</info>
+<info>Not Processing Exports (--noexport enabled)</info>
+<info>Running C:/apps/Raptor_2.12.2_rc2/win32/bin/talonctl.exe start</info>
+<info>Making y:/output/logs/makefile/92_7952_RAPTOR_201007_3Wed_dfs_build_ncp_tools_all.export</info>
+<info>Executing 'emake HAVE_ORDERONLY= -r -f  "y:/output/logs/makefile/92_7952_RAPTOR_201007_3Wed_dfs_build_ncp_tools_all.export"  -k -j 4   --emake-emulation=gmake  --emake-annofile=y:/output/logs/makefile/92_7952_RAPTOR_201007_3Wed_dfs_build_ncp_tools_all.export.emake.anno  --emake-class=DFS_7952-64  --emake-annodetail=basic,history,file,waiting  --case-sensitive=0  '--emake-root=y:/;\;C:\apps;E:\Build_E\helium-7.0.x\helium;C:\apps\Raptor_2.12.2_rc2' TALON_DESCRAMBLE=0  2&gt;'y:/output/logs/makefile/92_7952_RAPTOR_201007_3Wed_dfs_build_ncp_tools_all.export.stderr' '</info>
+Starting build: 453525
+make: Nothing mocker for `EXPORT'.
+Finished build: 453525   Duration: 0:01 (m:s)   Cluster availability: 100%
+WARNING EC1003: Ignoring redundant EMAKE_ROOT value - C:/apps/Raptor_2.12.2_rc2 (It is already included by EMAKE_ROOT value - C:/apps)
+WARNING EC1003: Ignoring redundant EMAKE_ROOT value - y:/ (It is already included by EMAKE_ROOT value - y:/)
+<info>Making y:/output/logs/makefile/92_7952_RAPTOR_201007_3Wed_dfs_build_ncp_tools_all.bitmap</info>
+<info>Executing 'emake HAVE_ORDERONLY= -r -f  "y:/output/logs/makefile/92_7952_RAPTOR_201007_3Wed_dfs_build_ncp_tools_all.bitmap"  -k -j 4   --emake-emulation=gmake  --emake-annofile=y:/output/logs/makefile/92_7952_RAPTOR_201007_3Wed_dfs_build_ncp_tools_all.bitmap.emake.anno  --emake-class=DFS_7952-64  --emake-annodetail=basic,history,file,waiting  --case-sensitive=0  '--emake-root=y:/;\;C:\apps;E:\Build_E\helium-7.0.x\helium;C:\apps\Raptor_2.12.2_rc2' TALON_DESCRAMBLE=0  2&gt;'y:/output/logs/makefile/92_7952_RAPTOR_201007_3Wed_dfs_build_ncp_tools_all.bitmap.stderr' '</info>
+Starting build: 453526
+make: Nothing mocker for `BITMAP'.
+Finished build: 453526   Duration: 0:01 (m:s)   Cluster availability: 100%
+WARNING EC1003: Ignoring redundant EMAKE_ROOT value - C:/apps/Raptor_2.12.2_rc2 (It is already included by EMAKE_ROOT value - C:/apps)
+WARNING EC1003: Ignoring redundant EMAKE_ROOT value - y:/ (It is already included by EMAKE_ROOT value - y:/)
+<info>Making y:/output/logs/makefile/92_7952_RAPTOR_201007_3Wed_dfs_build_ncp_tools_all.resource_deps</info>
+<info>Executing 'emake HAVE_ORDERONLY= -r -f  "y:/output/logs/makefile/92_7952_RAPTOR_201007_3Wed_dfs_build_ncp_tools_all.resource_deps"  -k -j 4   --emake-emulation=gmake  --emake-annofile=y:/output/logs/makefile/92_7952_RAPTOR_201007_3Wed_dfs_build_ncp_tools_all.resource_deps.emake.anno  --emake-class=DFS_7952-64  --emake-annodetail=basic,history,file,waiting  --case-sensitive=0  '--emake-root=y:/;\;C:\apps;E:\Build_E\helium-7.0.x\helium;C:\apps\Raptor_2.12.2_rc2' TALON_DESCRAMBLE=0  2&gt;'y:/output/logs/makefile/92_7952_RAPTOR_201007_3Wed_dfs_build_ncp_tools_all.resource_deps.stderr' '</info>
+Starting build: 453527
+make: Nothing mocker for `RESOURCE_DEPS'.
+Finished build: 453527   Duration: 0:00 (m:s)   Cluster availability: 100%
+WARNING EC1003: Ignoring redundant EMAKE_ROOT value - C:/apps/Raptor_2.12.2_rc2 (It is already included by EMAKE_ROOT value - C:/apps)
+WARNING EC1003: Ignoring redundant EMAKE_ROOT value - y:/ (It is already included by EMAKE_ROOT value - y:/)
+<info>Making y:/output/logs/makefile/92_7952_RAPTOR_201007_3Wed_dfs_build_ncp_tools_all.resource</info>
+<info>Executing 'emake HAVE_ORDERONLY= -r -f  "y:/output/logs/makefile/92_7952_RAPTOR_201007_3Wed_dfs_build_ncp_tools_all.resource"  -k -j 4   --emake-emulation=gmake  --emake-annofile=y:/output/logs/makefile/92_7952_RAPTOR_201007_3Wed_dfs_build_ncp_tools_all.resource.emake.anno  --emake-class=DFS_7952-64  --emake-annodetail=basic,history,file,waiting  --case-sensitive=0  '--emake-root=y:/;\;C:\apps;E:\Build_E\helium-7.0.x\helium;C:\apps\Raptor_2.12.2_rc2' TALON_DESCRAMBLE=0  2&gt;'y:/output/logs/makefile/92_7952_RAPTOR_201007_3Wed_dfs_build_ncp_tools_all.resource.stderr' '</info>
+Starting build: 453528
+make: Nothing mocker for `RESOURCE'.
+Finished build: 453528   Duration: 0:00 (m:s)   Cluster availability: 100%
+WARNING EC1003: Ignoring redundant EMAKE_ROOT value - C:/apps/Raptor_2.12.2_rc2 (It is already included by EMAKE_ROOT value - C:/apps)
+WARNING EC1003: Ignoring redundant EMAKE_ROOT value - y:/ (It is already included by EMAKE_ROOT value - y:/)
+<info>Making y:/output/logs/makefile/92_7952_RAPTOR_201007_3Wed_dfs_build_ncp_tools_all.default</info>
+<info>Executing 'emake HAVE_ORDERONLY= -r -f  "y:/output/logs/makefile/92_7952_RAPTOR_201007_3Wed_dfs_build_ncp_tools_all.default"  -k -j 4   --emake-emulation=gmake  --emake-annofile=y:/output/logs/makefile/92_7952_RAPTOR_201007_3Wed_dfs_build_ncp_tools_all.default.emake.anno  --emake-class=DFS_7952-64  --emake-annodetail=basic,history,file,waiting  --case-sensitive=0  '--emake-root=y:/;\;C:\apps;E:\Build_E\helium-7.0.x\helium;C:\apps\Raptor_2.12.2_rc2' TALON_DESCRAMBLE=0  2&gt;'y:/output/logs/makefile/92_7952_RAPTOR_201007_3Wed_dfs_build_ncp_tools_all.default.stderr' '</info>
+Starting build: 453529
+make: Nothing mocker for `ALL'.
+Finished build: 453529   Duration: 0:01 (m:s)   Cluster availability: 100%
+WARNING EC1003: Ignoring redundant EMAKE_ROOT value - C:/apps/Raptor_2.12.2_rc2 (It is already included by EMAKE_ROOT value - C:/apps)
+WARNING EC1003: Ignoring redundant EMAKE_ROOT value - y:/ (It is already included by EMAKE_ROOT value - y:/)
+<info>Running C:/apps/Raptor_2.12.2_rc2/win32/bin/talonctl.exe stop</info>
+<info>The make-engine exited successfully.</info>
+<info>Run time 29 seconds</info>
+<info>Created/Updated toolcheck cache: y:/epoc32/build/toolcheck_cache_.tmp
+</info>
+</buildlog>
