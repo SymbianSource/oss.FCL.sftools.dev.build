@@ -1177,6 +1177,10 @@ void E32ImageFile::SetFPU()
 
 	if (iUseCase->GetFPU() == 1)
 		iHdr->iFlags |= KImageHWFloat_VFPv2;
+	else if (iUseCase->GetFPU() == 2)
+		iHdr->iFlags |= KImageHWFloat_VFPv3;
+	else if (iUseCase->GetFPU() == 3)
+		iHdr->iFlags |= KImageHWFloat_VFPv3D16; 
 }
 
 /**

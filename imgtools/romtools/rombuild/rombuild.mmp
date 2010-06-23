@@ -24,11 +24,11 @@ sourcepath	.
 source			 r_dir.cpp r_header.cpp r_obey.cpp r_srec.cpp
 source			 r_rom.cpp rombuild.cpp r_build.cpp r_collapse.cpp
 source			 r_global.cpp r_areaset.cpp
-source			 r_coreimage.cpp r_coreimagereader.cpp
+source			 r_coreimage.cpp r_coreimagereader.cpp symbolgenerator.cpp
 sourcepath	../../imglib/e32uid
 source			e32uid.cpp
 sourcepath	../../imglib/host
-source			h_file.cpp h_mem.cpp h_utl.cpp
+source			h_file.cpp h_mem.cpp h_utl.cpp utf16string.cpp
 sourcepath	../../imglib/e32image
 source			e32image.cpp
 sourcepath	../../imglib/e32image/deflate
@@ -45,15 +45,11 @@ userinclude	../../imglib/boostlibrary/
 
 OS_LAYER_SYSTEMINCLUDE_SYMBIAN
 
-staticlibrary	patchdataprocessor
-staticlibrary   parameterfileprocessor
-staticlibrary 	memmap
+staticlibrary	patchdataprocessor parameterfileprocessor memmap boost_thread-1.39
 
 #ifdef TOOLS2_LINUX
-STATICLIBRARY   boost_thread-mgw34-mt-1_39_linux
 OPTION    GCC -O2 -Wno-uninitialized -pthread
 #else
-STATICLIBRARY   boost_thread-mgw34-mt-1_39_win32
 OPTION    GCC -O2 -Wno-uninitialized -mthreads
 #endif
 

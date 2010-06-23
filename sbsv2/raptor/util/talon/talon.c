@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of the License "Eclipse Public License v1.0"
@@ -16,6 +16,11 @@
 */
 
 
+#ifdef HAS_WINSOCK2
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#define WIN32_LEAN_AND_MEAN
+#endif
 
 
 #include <stdlib.h>
@@ -33,16 +38,22 @@
 #include "buffer.h"
 #include "../config.h"
 
+#ifdef HAS_GETCOMMANDLINE
+#include "chomp.h"
+#endif
+
 /* The output semaphore. */
 sbs_semaphore talon_sem;
 
 #define TALON_ATTEMPT_STRMAX 32
 #define RECIPETAG_STRMAX 2048
-#define STATUS_STRMAX 100
+#define STATUS_STRMAX 120
 
 #define TALONDELIMITER '|'
 #define VARNAMEMAX 100
 #define VARVALMAX 1024
+
+#define HOSTNAME_MAX 100
 
 
 #include "log.h"
@@ -51,6 +62,7 @@ sbs_semaphore talon_sem;
 /* Make all output handling binary */
 unsigned int _CRT_fmode = _O_BINARY;
 #endif
+
 
 double getseconds(void)
 {
@@ -125,7 +137,7 @@ void prependattributes(buffer *b, char *attributes)
 				att++;
 			} while ( e < (VARNAMEMAX-1) && (isalnum(*att) || *att == '_'));
 			envvarname[e] = '\0';
-/* DEBUG(("envvarname: %s\n", envvarname)); */
+			/* DEBUG(("envvarname: %s\n", envvarname));*/ 
 			v = talon_getenv(envvarname);
 			if (v)
 			{
@@ -229,9 +241,20 @@ int main(int argc, char *argv[])
 	char *recipe = NULL;
 	int talon_returncode = 0;
 
+#ifdef HAS_WINSOCK2
+	WSADATA wsaData;
+
+	WSAStartup(MAKEWORD(2,2), &wsaData);
+
+	/* We ignore the result as we are only doing this to use gethostname
+	   and if that fails then leaving the host attribute blank is perfectly
+	   acceptable.
+	*/
+
+#endif
+
 #ifdef HAS_GETCOMMANDLINE
 	char *commandline= GetCommandLine();
-	DEBUG(("talon: commandline: %s\n", commandline));
 	/*
 	 * The command line should be either,
 	 * talon -c "some shell commands"
@@ -240,21 +263,13 @@ int main(int argc, char *argv[])
 	 *
 	 * talon could be an absolute path and may have a .exe extension.
 	 */
-	recipe = strstr(commandline, "-c");
+
+	
+	recipe = chompCommand(commandline);
 	if (recipe)
 	{
 		/* there was a -c so extract the quoted commands */
 
-		while (*recipe != '"' && *recipe != '\0')
-			recipe++;
-
-		if (*recipe != '"')    /* we found -c but no following quote */
-		{
-			error("talon: error: unquoted recipe in shell call '%s'\n", commandline);
-			return 1;
-		}
-		recipe++;
-		
 		int recipelen = strlen(recipe);
 		if (recipelen > 0 && recipe[recipelen - 1] == '"')
 			recipe[recipelen - 1] = '\0'; /* remove trailing quote */
@@ -336,6 +351,20 @@ int main(int argc, char *argv[])
 	}
 
 	DEBUG(("talon: recipe: %s\n", recipe));
+
+	/* Make sure that the agent's hostname can be put into the host attribute */
+	char hostname[HOSTNAME_MAX];
+	int hostresult=0;
+	
+	hostresult = gethostname(hostname, HOSTNAME_MAX-1);
+	if (0 != hostresult)
+	{
+		DEBUG(("talon: failed to get hostname: %d\n", hostresult));
+		hostname[0] = '\0';
+	}
+
+	talon_setenv("HOSTNAME", hostname);
+	DEBUG(("talon: setenv: hostname: %s\n", hostname));
 
 	
 	char varname[VARNAMEMAX];
@@ -549,14 +578,18 @@ int main(int argc, char *argv[])
 
 			if (dotagging) 
 			{
-				char *forcesuccessstr = force_success == 0 ? "" : " forcesuccess='FORCESUCCESS'";
+				char *flagsstr = force_success == 0 ? "" : " flags='FORCESUCCESS'";
+				char *reasonstr = "" ;
+
+				if (p->causeofdeath == PROC_TIMEOUTDEATH)
+					reasonstr = " reason='timeout'";
 
 				if (p->returncode != 0)
 				{
-					char *exitstr = retries > 0 ? "retry" : "failed";
-					snprintf(status, STATUS_STRMAX - 1, "\n<status exit='%s' code='%d' attempt='%d'%s />", exitstr, p->returncode, attempt, forcesuccessstr );
+					char *exitstr = (force_success || retries <= 0) ? "failed" : "retry";
+					snprintf(status, STATUS_STRMAX - 1, "\n<status exit='%s' code='%d' attempt='%d'%s%s />", exitstr, p->returncode, attempt, flagsstr, reasonstr );
 				} else {
-					snprintf(status, STATUS_STRMAX - 1, "\n<status exit='ok' attempt='%d'%s />", attempt, forcesuccessstr );
+					snprintf(status, STATUS_STRMAX - 1, "\n<status exit='ok' attempt='%d'%s%s />", attempt, flagsstr, reasonstr );
 				}
 				status[STATUS_STRMAX-1] = '\0';
 	

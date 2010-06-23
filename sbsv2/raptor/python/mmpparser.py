@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -71,6 +71,7 @@ class MMPParser(object):
 		self.assignment = \
 			( \
 			Line(CaselessKeyword('ARMFPU') + String()) ^ \
+			Line(CaselessKeyword('APPLY') + String()) ^ \
 			Line(CaselessKeyword('ASSPLIBRARY') + StringList()) ^ \
 			Line(CaselessKeyword('CAPABILITY') + StringList()) ^ \
 			Line(CaselessKeyword('DOCUMENT') + StringList()) ^ \
@@ -142,6 +143,7 @@ class MMPParser(object):
 			CaselessKeyword('EPOCALLOWDLLDATA') ^ \
 			CaselessKeyword('EPOCCALLDLLENTRYPOINTS') ^ \
 			CaselessKeyword('EPOCFIXEDPROCESS') ^ \
+			CaselessKeyword('EPOCNESTEDEXCEPTIONS') ^ \
 			CaselessKeyword('EXPORTUNFROZEN') ^ \
 			CaselessKeyword('FEATUREVARIANT') ^ \
 			CaselessKeyword('BYTEPAIRCOMPRESSTARGET') ^ \

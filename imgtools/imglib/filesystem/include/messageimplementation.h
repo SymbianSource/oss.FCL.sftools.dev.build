@@ -23,20 +23,14 @@
 #ifndef MESSAGEIMPLEMENTATION_H
 #define MESSAGEIMPLEMENTATION_H
 
-#ifdef _MSC_VER 
-	#pragma warning(disable: 4514) // unreferenced inline function has been removed
-	#pragma warning(disable: 4702) // unreachable code
-	#pragma warning(disable: 4710) // function not inlined
-	#pragma warning(disable: 4786) // identifier was truncated to '255' characters in the debug information
-	#pragma warning(disable: 4103) // used #pragma pack to change alignment
-#endif
+ 
 
 #include <map>
 #include <string>
 #include <stdarg.h>
-
-typedef std::map<int,char*> Map;
-typedef std::string String;
+using namespace std;
+typedef map<int,char*> Map;
+ 
 
 enum 
 { 

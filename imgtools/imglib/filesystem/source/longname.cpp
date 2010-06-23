@@ -98,7 +98,7 @@ To write the sub name's in a formatted WriteSubName() function invoked
 
 @param aLongEntry - the long entry
 */
-void ClongName::WriteLongEntry(CLongEntry* aLongEntry,String& longEntryString)
+void ClongName::WriteLongEntry(CLongEntry* aLongEntry,string& longEntryString)
 {
 	longEntryString.append(KWriteOnce, aLongEntry->GetDirOrder());
 	WriteSubName(aLongEntry->GetSubName1(),(ESubName1Length*2),longEntryString);
@@ -124,7 +124,7 @@ Function responsible to
 @param aSubNameLength - No of characters to be filled
 @param alongEntryString - formatted sub name appended to this string
 */
-void ClongName::WriteSubName(String& aSubName,unsigned short aSubNameLength,String& alongEntryString)
+void ClongName::WriteSubName(string& aSubName,unsigned short aSubNameLength,string& alongEntryString)
 {
 	unsigned int subNameCurrLength = aSubName.length();
 	if(subNameCurrLength == 0)
@@ -154,6 +154,7 @@ void ClongName::WriteSubName(String& aSubName,unsigned short aSubNameLength,Stri
 		if(subNameCurrLength < aSubNameLength)
 		{
 			aSubName.insert(subNameCurrLength, KPaddingCharCnt, 0); 
+			iSubNameProperEnd = false;
 		}
 	}
 	subNameCurrLength = aSubName.length();
@@ -184,7 +185,7 @@ strings data
 @param aSecondName - Second sub name
 @param aThirdName - third sub name
 */
-void ClongName::PushAndErase(String& aFirstName,String& aSecondName,String& aThirdName)
+void ClongName::PushAndErase(string& aFirstName,string& aSecondName,string& aThirdName)
 {
 	iSubNamesList.push_back(aFirstName);
 	aFirstName.erase();
@@ -206,11 +207,11 @@ Function responsible split single sub name from the long name
 @param aSubNameLength - Length of the Sub Name of required length
 @param aSubName - splitted Sub Name assigned using this string
 */
-void ClongName::GetSubName(String& aLongName,
+void ClongName::GetSubName(string& aLongName,
 						   int& aStartIndex,
 						   int& aStringLength,
 						   int aSubNameLength,
-						   String& aSubName)
+						   string& aSubName)
 {
 	if((aStartIndex + aSubNameLength) <= aStringLength)
 	{
@@ -230,13 +231,13 @@ iNameList container.
 @internalComponent
 @released
 */
-void ClongName::FormatLongFileName(String& aLongName)
+void ClongName::FormatLongFileName(string& aLongName)
 {
 	int stringLength = aLongName.length();
 	int startIndex = 0;
-	String iSubName1;
-	String iSubName2;
-	String iSubName3;
+	string iSubName1;
+	string iSubName2;
+	string iSubName3;
 
 	while(startIndex < stringLength)
 	{
@@ -258,12 +259,12 @@ eg. Input:UNITTE~1TXT returns:UNITTE~2TXT
 
 @return - returns the short name
 */
-void ClongName::CheckAndUpdateShortName(String& aShortName)
+void ClongName::CheckAndUpdateShortName(string& aShortName)
 {
 	char trailingChar;
 	StringList::iterator beginIter = GShortEntryList.begin();
 	StringList::iterator endIter = GShortEntryList.end();
-	String tempString;
+	string tempString;
 	while(beginIter != endIter)
 	{
 		tempString = (*beginIter);
@@ -275,6 +276,9 @@ void ClongName::CheckAndUpdateShortName(String& aShortName)
 		}
 		++beginIter;
 	}
+        int gap = ENameLengthWithExtension - aShortName.length();
+        if(gap >0 )
+            aShortName.append(gap,KSpace);
 }
 
 /**
@@ -287,18 +291,18 @@ e.g. Long File Name.pl to LONGFI~1PL
 @return - returns the short name
 */
 
-String ClongName::GetShortEntryName()
+string ClongName::GetShortEntryName()
 {
-	String shortName;
+	string shortName;
 	unsigned int extensionIndex = iLongName.find_last_of(KDot);
 
 	unsigned int dotIndex = extensionIndex;
 	//Erase all the dots from the string, but keep the extension index 
-	while(dotIndex != String::npos)
+	while(dotIndex != string::npos)
 	{
 		iLongName.erase(dotIndex,1); //Erase the dot
 		dotIndex = iLongName.find_first_of(KDot);
-		if(dotIndex != String::npos)
+		if(dotIndex != string::npos)
 		{
 			//Decrement only if more than one dot exists
 			--extensionIndex;
@@ -332,7 +336,7 @@ String ClongName::GetShortEntryName()
 		{
 			shortName.append((ENameLength - shortName.length()),KSpace);
 		}
-		String shortNameString = iLongName.substr(extensionIndex,EExtensionLength);
+		string shortNameString = iLongName.substr(extensionIndex,EExtensionLength);
 		shortName.append(ToUpper(shortNameString));
 		CheckAndUpdateShortName(shortName);
 		return shortName;
@@ -377,7 +381,7 @@ Short entry is also an sub entry along with Long entries
 */
 CDirectory* ClongName::CreateShortEntry(CDirectory* aEntry)
 {
-	CDirectory* shortEntry = new CDirectory((char*)iShortName.c_str());
+	CDirectory* shortEntry = new CDirectory(iShortName.c_str(),NULL);
 	shortEntry->SetEntryAttribute(aEntry->GetEntryAttribute()); 
 	if(aEntry->IsFile())
 	{	 
@@ -418,9 +422,9 @@ Function responsible to
 
 @return - returns the formatted long name string
 */
-String ClongName::CreateLongEntries()
+string ClongName::CreateLongEntries()
 {
-	String longEntryString;
+	string longEntryString;
 	CLongEntry* longEntryObject;
 	unsigned char chckSum = CalculateCheckSum();
 	unsigned char dirOrderNumber = 0x00;

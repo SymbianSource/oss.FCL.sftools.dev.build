@@ -15,7 +15,7 @@
 #
 
 # This package processes the Image Content XML, and creates an OBY file to create a Rom image.
-package ImageContentHandler;
+package imagecontenthandler;
 
 
 require Exporter;
@@ -37,7 +37,8 @@ require Exporter;
 use strict;
 use genericparser;
 use cdfparser;
-use Dep_Lister;
+use dep_lister;
+use romutl;
 
 #Error list
 my @errors;
@@ -594,7 +595,7 @@ sub SetBldRomOpts
 		$DefaultDirs{ABI_DIR} = 'ARMV5';
 		$DefaultDirs{BUILD_DIR}='urel';
 
-		$DefaultDirs{DEST_DIR}= "\\sys\\bin";
+		$DefaultDirs{DEST_DIR}= "\/sys\/bin";
 
 	}
 	else
@@ -656,8 +657,8 @@ sub GenObyFile
 	my $line;
 	my $index;
 	my $new_src_path;
-	my $exec_src_path = $ENV{EPOCROOT};#This is the Executable source path
-	$exec_src_path .= "epoc32\\release\\";
+	my $exec_src_path = &get_epocroot;#This is the Executable source path
+	$exec_src_path .= "epoc32\/release\/";
 	my $abidir = $DefaultDirs{ABI_DIR};
 	my $blddir = $DefaultDirs{BUILD_DIR};
 
@@ -781,7 +782,7 @@ sub GenObyFile
 						if (exists $binRef->{plugin_name})
 						{
 							$isEcomPlugin=1;
-							$line = "__$binRef->{plugin_name}_PLUGIN(ABI_DIR\\BUILD_DIR,ECOM_BIN_DIR,DATAZ_,ECOM_RSC_DIR,$binRef->{id},$binRef->{id})\n";
+							$line = "__$binRef->{plugin_name}_PLUGIN(ABI_DIR\/BUILD_DIR,ECOM_BIN_DIR,DATAZ_,ECOM_RSC_DIR,$binRef->{id},$binRef->{id})\n";
 						}
 					}
 					else
@@ -901,7 +902,7 @@ sub GenObyFile
 				my $imagecontentbin = 0;
 				foreach my $bin (@ImageContentBinaries) {
 					my $source;
-					if( $bin->{source} =~ /.*\\(\S+)/)
+					if( $bin->{source} =~ /.*[\\\/](\S+)/)
 					{
 						$source = $1;
 					}
@@ -917,8 +918,8 @@ sub GenObyFile
 				my $obyInfo = &ImageContentHandler::GetObyBinaryInfo($binary);
 				if(!defined $obyInfo)
 				{
-					$line = "file=" . $exec_src_path. $DefaultDirs{ABI_DIR}. "\\" . $DefaultDirs{BUILD_DIR}. "\\". $binary. " ";
-					$line .= $DefaultDirs{DEST_DIR}. "\\". $binary;
+					$line = "file=" . $exec_src_path. $DefaultDirs{ABI_DIR}. "\/" . $DefaultDirs{BUILD_DIR}. "\/". $binary. " ";
+					$line .= $DefaultDirs{DEST_DIR}. "\/". $binary;
 					$line .= "\n";
 					print OBYFH $line;
 				}
@@ -937,7 +938,7 @@ sub fallback{
 	my $foundFile=0;
 	foreach my $BpabiPlat (@BPABIPlats)
 	{
-		if ($$abiFileRef =~ /^(.*)\\$BpabiPlat\\(.*)$/)
+		if ($$abiFileRef =~ /^(.*)[\/\\]$BpabiPlat[\/\\](.*)$/)
 		{
 			$$abiFileRef =~ s/$abidir/ARMV5/i;
 			if(-f $$abiFileRef)
@@ -1431,11 +1432,11 @@ sub ProcessStaticDep
 	my $aAbsFile;
 #	Include the static dependencies.
 
-	my $dir = "$ENV{EPOCROOT}epoc32\\release\\";
+	my $dir = &get_epocroot()."epoc32\/release\/";
 	my $abidir = &ImageContentHandler::GetBldRomOpts("ABI_DIR");
 	my $blddir = &ImageContentHandler::GetBldRomOpts("BUILD_DIR"); 
 
-	if($aBinary =~ /(.*)\\.*/)
+	if($aBinary =~ /(.*)[\\\/].*/)
 	{
 		$aBinary =~ s/ABI_DIR/$abidir/i;
 		$aBinary =~ s/BUILD_DIR/$blddir/i;
@@ -1443,8 +1444,8 @@ sub ProcessStaticDep
 	}
 	else
 	{
-		$dir .= $abidir . "\\";
-		$dir .= $blddir. "\\";
+		$dir .= $abidir . "\/";
+		$dir .= $blddir. "\/";
 	}
 	$aAbsFile = $dir. $aBinary;
 
@@ -1484,7 +1485,7 @@ sub ProcessStaticDep
 #	This is the key into the BinaryInfo map maintained by cdfparser.
 	my $filename;
 
-	if( $aBinary =~ /.*\\(\S+)/)
+	if( $aBinary =~ /.*[\\\/](\S+)/)
 	{
 		$filename = $1;
 	}

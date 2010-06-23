@@ -27,8 +27,8 @@
 
 #define ToString(dataInteger) reinterpret_cast<char*>(&dataInteger),sizeof(dataInteger)
 
-typedef std::stack<CLongEntry*> LongEntryStack;
-typedef std::list<String> StringList;
+typedef stack<CLongEntry*> LongEntryStack;
+typedef list<string> StringList;
 
 //Long entry sub name lengths
 enum TLongSubNameLength
@@ -64,9 +64,9 @@ private:
 	LongEntryStack iLongEntryStack;	//Holds all the long name directory entry node's
 	unsigned int iClusterNumber;	//Current cluster number, where the current long entry needs to be written
 	CCluster* iClusterPtr;
-	String iLongName;
+	string iLongName;
 	char iLongEntryAttribute;
-	String iShortName;
+	string iShortName;
 	unsigned int iLongNameLength;
 	unsigned int iTildeNumberPosition;
 	/**If the received sub name entry size is equal to its expected length, then
@@ -76,19 +76,19 @@ private:
 	bool iFirstNullName;// Is first name ending with NULL character?
 
 private:
-	String GetShortEntryName();
+	string GetShortEntryName();
 	unsigned char CalculateCheckSum();
-	void WriteLongEntry(CLongEntry* aLongEntry,String& longEntryString);
-	void WriteSubName(String& aSubName,unsigned short aSubNameLength,
-					  String& alongEntryString);
-	void FormatLongFileName(String& aLongName);
-	void CheckAndUpdateShortName(String& aShortName);
-	void PushAndErase(String& aFirstName,String& aSecondName,String& aThirdName);
-	void GetSubName(String& aLongName,
+	void WriteLongEntry(CLongEntry* aLongEntry,string& longEntryString);
+	void WriteSubName(string& aSubName,unsigned short aSubNameLength,
+					  string& alongEntryString);
+	void FormatLongFileName(string& aLongName);
+	void CheckAndUpdateShortName(string& aShortName);
+	void PushAndErase(string& aFirstName,string& aSecondName,string& aThirdName);
+	void GetSubName(string& aLongName,
 				   int& aStartIndex,
 				   int& aStringLength,
 				   int aSubNameLength,
-				   String& aSubName);
+				   string& aSubName);
 	void PopAndErase();
 	void CalculateExtentionLength();
 
@@ -96,7 +96,7 @@ public:
 	ClongName(CCluster* aClusterPtr, CDirectory* aEntry);
 	~ClongName();
 	CDirectory* CreateShortEntry(CDirectory* aEntry);
-	String CreateLongEntries();
+	string CreateLongEntries();
 	static void DestroyShortEntryList();
 };
 

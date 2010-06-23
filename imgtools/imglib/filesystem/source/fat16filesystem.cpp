@@ -188,7 +188,7 @@ void CFat16FileSystem::CreateFatTable(ofstream& aOutPutStream)
 		++clusterCounter;
 	}
 	// Each FAT16 entries occupies 2 bytes, hence multiply by 2
-	std::string aFatString(reinterpret_cast<char*>(FatTable),clusterCounter*2);
+	string aFatString(reinterpret_cast<char*>(FatTable),clusterCounter*2);
 	delete[] FatTable;
 	if(clusterCounter < totalFatEntries)
 	{

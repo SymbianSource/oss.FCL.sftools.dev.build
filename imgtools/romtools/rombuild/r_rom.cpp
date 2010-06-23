@@ -22,12 +22,7 @@
 #include "h_utl.h"
 #include <string.h>
 #include <stdlib.h>
-
-#if defined(__MSVCDOTNET__) || defined(__TOOLS2__)
-#include <iomanip>
-#else //!__MSVCDOTNET__
-#include <iomanip.h>
-#endif //__MSVCDOTNET__
+#include <iomanip> 
 
 #include "r_global.h"
 #include "r_obey.h"
@@ -36,10 +31,11 @@
 #include "patchdataprocessor.h"
 #include "memmap.h"
 #include "byte_pair.h"
+#include "symbolgenerator.h"
 
 const TInt KSpareExports=16;
 extern TInt gThreadNum;
-extern char* gDepInfoFile;
+extern string gDepInfoFile;
 extern TBool gGenDepGraph;
 
 TUint32 DeflateCompressCheck(char *bytes,TInt size,ostream &os);
@@ -66,6 +62,9 @@ void LoadImageWorker::operator()()
 			m_queue->pop();
 			m_mutex.unlock();
 			TInt err = current->OpenImageFile();
+			m_mutex.lock();
+			err = current->GetImageFileInfo(err);
+			m_mutex.unlock();
 			if(err)
 				{
 				m_mutex.lock();
@@ -133,7 +132,7 @@ CompressPageWorker::CompressPageWorker(E32Rom* aRom, TInt aPageSize, TInt aTotal
 void CompressPageWorker::operator()()
 	{
 	SRomPageInfo* pPageBase = (SRomPageInfo*)((TInt)m_rom->iHeader + m_rom->iHeader->iRomPageIndex);
-	CBytePair bpe(gFastCompress);
+	CBytePair bpe;
 	while(1)
 		{
 		m_mutex.lock();
@@ -256,7 +255,8 @@ COrderedFileList::COrderedFileList(TInt aMaxFiles)
 COrderedFileList::~COrderedFileList()
 	{
 	iCount=0;
-	delete[] iOrderedFiles;
+	if(iOrderedFiles)
+		delete[] iOrderedFiles;
 	}
 
 COrderedFileList* COrderedFileList::New(TInt aMaxFiles)
@@ -311,22 +311,12 @@ void GetFileNameAndUid(char *aDllName, TUid &aDllUid, char *aExportName)
 		// Importing from DLL with Uid
 		char uidStr[0x100];
 		strcpy(uidStr, "0x");
-		strncat(uidStr, aExportName+start+1, end-start-1);
-		#ifdef __TOOLS2__
-		istringstream val(uidStr);
-		#else
-		istrstream val(uidStr,strlen(uidStr));
-		#endif
+		strncat(uidStr, aExportName+start+1, end-start-1); 
 
-#if defined(__MSVCDOTNET__) || defined(__TOOLS2__)
-		val >> setbase(0);
-#endif //__MSVCDOTNET__
-
-		TUint32 u;
-		val >> u;
-		val.peek();
-		if (val.eof())
-			{
+				 
+		if (IsValidNumber(uidStr)){
+			TUint32 u = 0;
+			Val(u,uidStr);
 			aDllUid=TUid::Uid(u);
 			char *dot=aExportName+strlen(aExportName)-1;
 			while (dot>=aExportName)
@@ -346,16 +336,12 @@ void GetFileNameAndUid(char *aDllName, TUid &aDllUid, char *aExportName)
 		}
 	}
 
-E32Rom::E32Rom(CObeyFile *aObey)
-//
-// Constructor
-//
-	{
+E32Rom::E32Rom(CObeyFile *aObey) {
 
 	iSize=sizeof(TRomLoaderHeader)+aObey->iRomSize;
 	iObey=aObey;
 	iPeFiles=NULL;
-
+	iSymGen = NULL ;
 	if(gLowMem)
 	{
 		iImageMap = new Memmap();
@@ -411,12 +397,11 @@ E32Rom::E32Rom(CObeyFile *aObey)
 	iOverhead=0;
 	}
 
-E32Rom::~E32Rom()
-//
-// Destructor
-//
-	{
-
+E32Rom::~E32Rom() {
+	if(iSymGen){		
+		delete iSymGen;
+		iSymGen = NULL ;
+	}
 	if(gLowMem)
 	{
 		iImageMap->CloseMemoryMap(ETrue);
@@ -474,9 +459,8 @@ TInt E32Rom::LoadContents(char*& anAddr, TRomHeader* aHeader)
 	TRomExceptionSearchTable* exceptionSearchTable = 0;
 
 	if(gPagedRom)
-		{
-		gDepInfoFile = (char* )malloc(strlen((char *)iObey->iRomFileName) + 1);
-		strcpy(gDepInfoFile, (char *)iObey->iRomFileName);
+		{ 
+		gDepInfoFile = iObey->iRomFileName; 
 		iObey->SetArea().DefaultArea()->SortFilesForPagedRom();
 		// exception search table needs to go at start of ROM to make it not demand paged...
 		addr = ReserveRomExceptionSearchTable(addr,exceptionSearchTable);
@@ -711,6 +695,8 @@ TInt E32Rom::CreateExtension(MRomImage* aKernelRom)
 	if (r!=KErrNone)
 		{
 		Print(EError, "LoadContents failed - return code %d\n", r);
+		if(iSymGen)
+			iSymGen->WaitThreads();
 		return r;
 		}
 	iExtensionRomHeader->iRomRootDirectoryList = dummy.iRomRootDirectoryList;
@@ -718,7 +704,8 @@ TInt E32Rom::CreateExtension(MRomImage* aKernelRom)
 	iLoaderHeader->SetUp(iObey);
 	FinaliseExtensionHeader(aKernelRom);
 	DisplayExtensionHeader();
-
+	if(iSymGen)
+		iSymGen->WaitThreads();
 	return KErrNone;
 	}
 	
@@ -749,6 +736,8 @@ TInt E32Rom::Create()
 	if (r!=KErrNone)
 		{
 		Print(EError, "LoadContents failed - return code %d\n", r);
+		if(iSymGen)
+			iSymGen->WaitThreads();
 		return r;
 		}
 
@@ -756,12 +745,16 @@ TInt E32Rom::Create()
 	if(r!=KErrNone)
 		{
 		Print(EError, "Setup pages information failed - return code %d\n", r);
+		if(iSymGen)
+			iSymGen->WaitThreads();
 		return r;
 		}
 	
 	r = CheckUnpagedMemSize(); // check for unpaged memory overflow
 	if(r!=KErrNone)
 	{
+		if(iSymGen)
+			iSymGen->WaitThreads();
 		return r;
 	}
 	
@@ -769,6 +762,8 @@ TInt E32Rom::Create()
 	if(r!=KErrNone)
 		{
 		Print(EError, "CompressPages failed - return code %d\n", r);
+		if(iSymGen)
+			iSymGen->WaitThreads();
 		return r;
 		}
 
@@ -795,9 +790,12 @@ TInt E32Rom::Create()
 
 	TUint testCheckSum = HMem::CheckSum((TUint *)iHeader, iHeader->iRomSize);
 	Print(ELog, "Rom 32bit words sum to   %08x\n", testCheckSum);
-	if (testCheckSum != iObey->iCheckSum)
+	if (testCheckSum != iObey->iCheckSum){
+		if(iSymGen)
+			iSymGen->WaitThreads();
 		return Print(EError, "Rom checksum is incorrect: %08x should be %08x\n",
 					testCheckSum, iObey->iCheckSum);
+	}
 
 	// 8bit checksum = sum of bytes
 	// odd/even checksum = checksum of the odd and even halfwords of the image
@@ -834,7 +832,8 @@ TInt E32Rom::Create()
 					}
 			}
 		}
-
+	if(iSymGen)
+			iSymGen->WaitThreads();
 	return KErrNone;
 	}
 
@@ -946,7 +945,7 @@ TInt E32Rom::RequiredSize()
 	while (current)
 		{
 		if (current->iResource || current->HCRDataFile())
-			sum+=Align(HFile::GetLength((TText*)current->iFileName));
+			sum+=Align(HFile::GetLength(current->iFileName));
 		else
  			sum+=Align(current->SizeInRom());
 		current=iObey->NextFile();
@@ -994,11 +993,11 @@ TInt E32Rom::TranslateFiles()
 	return total_errors ? KErrGeneral : KErrNone;
 	}
 
-const TText FileTypeFile[]=		"File     ";
-const TText FileTypePrimary[]=	"Primary  ";
-const TText FileTypeVariant[]=	"Variant  ";
-const TText FileTypeExtension[]="Extension";
-const TText FileTypeDevice[]=	"Device   ";
+const char FileTypeFile[]=		"File     ";
+const char FileTypePrimary[]=	"Primary  ";
+const char FileTypeVariant[]=	"Variant  ";
+const char FileTypeExtension[]="Extension";
+const char FileTypeDevice[]=	"Device   ";
 
 void E32Rom::EnumerateVariants()
 	{
@@ -1063,7 +1062,7 @@ void E32Rom::EnumerateVariants()
 				Print(EError,"Conflicting DataBss addresses\n");
 			pF->iDataBssOffset=dataOffset;
 			TInt dataSize=AlignData(pH->iDataSize+pH->iBssSize);
-			const TText* pT=FileTypeFile;
+			const char* pT=FileTypeFile;
 			if (pF->Primary())
 				pT=FileTypePrimary;
 			if (pF->Variant())
@@ -1095,7 +1094,7 @@ TInt E32Rom::LoadDataToRom(TRomBuilderEntry *aFile, TAddressRange& aAddress, CBy
 		tn = (aFile->iCompression) ? "compressed executable" : "uncompressed executable";
 	Print(ELog,"Reading %s %s to rom linear address %08x\n", tn, aFile->iFileName, aAddress.iImageAddr);
 
-	TUint32 size=HFile::GetLength((TText*)aFile->iFileName);
+	TUint32 size=HFile::GetLength(aFile->iFileName);
 	if (size==0)
 		{
 		Print(EWarning, "File %s does not exist or is 0 bytes in length.\n",aFile->iFileName);
@@ -1104,12 +1103,8 @@ TInt E32Rom::LoadDataToRom(TRomBuilderEntry *aFile, TAddressRange& aAddress, CBy
 
 	aFile->iHeaderRange=aAddress;
 	char* addr = (char*)aFile->iHeaderRange.iImagePtr;
-	const char* src = NULL;
-	#ifdef __TOOLS2__
-	ostringstream os;
-	#else
-	ostrstream os;
-	#endif
+	const char* src = NULL; 
+	ostringstream os; 
 	if (aFile->iNonXIP)
 		{
 		E32ImageFile f(aBPE);
@@ -1138,14 +1133,9 @@ TInt E32Rom::LoadDataToRom(TRomBuilderEntry *aFile, TAddressRange& aAddress, CBy
 				f.UpdateHeaderCrc();
 				}
 			Print(ELog, "Compression Method:0x%08x/0x%08x \n", f.iHdr->CompressionType(), aFile->iCompression);
-			os << f;
-			#ifdef __TOOLS2__
+			os << f; 
 			size = (os.str()).length(); 
-			src = (os.str()).c_str();
-			#else
-			size = os.pcount();
-			src = os.str();
-			#endif
+			src = (os.str()).c_str(); 
 			}
 		}
 	if (addr+size>iData+iSize)
@@ -1157,7 +1147,7 @@ TInt E32Rom::LoadDataToRom(TRomBuilderEntry *aFile, TAddressRange& aAddress, CBy
 	if (src)
 		memcpy(addr, src, size);
 	else
-		size = HFile::Read((TText*)aFile->iFileName, (TAny *)addr);
+		size = HFile::Read(aFile->iFileName, (TAny *)addr);
 	Print(ELog,"Size:                    %08x\n", size);
 
 	aFile->iHeaderRange.iSize=size;
@@ -1329,12 +1319,18 @@ char *E32Rom::LayoutRom(char *romaddr)
 		}
 
 	TInt fileCount=0;
-
+	if(gGenSymbols && !iSymGen) {
+		string filename(iObey->GetFileName());
+		filename.erase(filename.length() - 3,3);
+		filename.append("symbol");
+		iSymGen = new SymbolGenerator(filename.c_str(),gThreadNum - 1);		
+	}
+		
 	//
 	// Process files in non default areas
 	//
 
-        CBytePair bpe(gFastCompress);
+        CBytePair bpe;
 	for (NonDefaultAreasIterator areaIt(iObey->SetArea());
 		 ! areaIt.IsDone();
 		 areaIt.GoToNext())
@@ -1398,7 +1394,11 @@ char *E32Rom::LayoutRom(char *romaddr)
 	offset = Align(offset)-offset;
 	mainptr->Extend(offset);
 	iOverhead +=offset;
-
+	if(iSymGen){
+		SymGenContext context ;
+		memset(&context,0,sizeof(SymGenContext));
+		iSymGen->AddEntry(context);
+	}
 	return (char*)mainptr->iImagePtr;
  	}
 
@@ -1442,13 +1442,20 @@ void E32Rom::LayoutFile(TRomBuilderEntry* current, TAddressRange& aMain, TAddres
 
 	if (current->iPatched)
 		Print(ELog, "[Patched file]\n");
-
+	TLinAddr savedAddr = aMain.iImageAddr;
 	if (current->iResource)
-		{
+		{		
 		TInt size=LoadDataToRom(current, aMain, aBPE);
 		if (aSecond != 0 && aMain.iImageAddr > iObey->iSectionStart)
 			return;		// first section has overflowed
 		current->FixupRomEntries(size);
+		if(iSymGen) {
+			SymGenContext context ;
+			memset(&context,0,sizeof(SymGenContext));
+			context.iFileName = current->iFileName ;
+			context.iDataAddress = savedAddr ;
+			iSymGen->AddEntry(context); 
+		}
 		return;
 		}
 	if(current->HCRDataFile()){	
@@ -1457,7 +1464,14 @@ void E32Rom::LayoutFile(TRomBuilderEntry* current, TAddressRange& aMain, TAddres
 			return;		// first section has overflowed
 		current->FixupRomEntries(size);
 		iHeader->iHcrFileAddress =  current->iHeaderRange.iImageAddr ;
-		TRACE(TAREA, Print(ELog, "iHeader->iHcrFileAddress = %08x\n", iHeader->iHcrFileAddress));		 
+		TRACE(TAREA, Print(ELog, "iHeader->iHcrFileAddress = %08x\n", iHeader->iHcrFileAddress));	
+		if(iSymGen) {
+			SymGenContext context ;
+			memset(&context,0,sizeof(SymGenContext));
+			context.iFileName = current->iFileName ;
+			context.iDataAddress = savedAddr ;
+			iSymGen->AddEntry(context); 
+		}		
 		return ;
 	}
 	Print(ELog,"Processing file %s\n",current->iFileName);
@@ -1515,7 +1529,22 @@ void E32Rom::LayoutFile(TRomBuilderEntry* current, TAddressRange& aMain, TAddres
 		return;		// first section has overflowed
 
 	LoadFileToRom(current);
-	Display(current->iRomImageHeader);
+	TRomImageHeader *header = current->iRomImageHeader;
+	if(iSymGen){
+		SymGenContext context  ;
+		context.iFileName = current->iFileName ;		
+		context.iTotalSize = section1size;
+		context.iCodeAddress = header->iCodeAddress; 
+		context.iDataAddress = header->iDataAddress; 
+		context.iDataBssLinearBase = header->iDataBssLinearBase;	 
+		context.iTextSize = header->iTextSize; 
+		context.iDataSize = header->iDataSize; 
+		context.iBssSize = header->iBssSize;   	
+		context.iTotalDataSize = header->iTotalDataSize;
+		context.iExecutable = ETrue ;
+		iSymGen->AddEntry(context);		
+	}
+	Display(header);
 	Print(ELog,     "Dll ref table size:      %08x\n", current->iDllRefTableRange.iSize);
 	Print(ELog,     "Compression:             %08x\n", current->iCompression);
 	Print(ELog,     "\n");
@@ -2060,7 +2089,7 @@ TInt E32Rom::WriteImages(TInt aHeaderType)
 	{
 	if (aHeaderType < 0)
 		aHeaderType = 1;
-	ofstream romFile((const char *)iObey->iRomFileName,ios::binary);
+	ofstream romFile((const char *)iObey->iRomFileName,ios_base::binary);
 	if (!romFile)
 		return Print(EError,"Cannot open ROM file %s for output\n",iObey->iRomFileName);
 	Write(romFile, aHeaderType);
@@ -2077,7 +2106,7 @@ TInt E32Rom::WriteImages(TInt aHeaderType)
 			// use romname with ".odd" appended.
 			sprintf(sname,"%s.odd",(const char *)iObey->iRomFileName);
 			}
-		ofstream oFile(sname,ios::binary);
+		ofstream oFile(sname,ios_base::binary);
 		if (!oFile)
 			return Print(EError,"Cannot open file %s for output\n",sname);
 		Print(EAlways, "Writing odd half words to file %s\n",sname);
@@ -2092,7 +2121,7 @@ TInt E32Rom::WriteImages(TInt aHeaderType)
 			// use romname with ".even" appended.
 			sprintf(sname,"%s.even",(const char *)iObey->iRomFileName);
 			}
-		ofstream oFile(sname,ios::binary);
+		ofstream oFile(sname,ios_base::binary);
 		if (!oFile)
 			return Print(EError,"Cannot open file %s for output\n",sname);
 		Print(EAlways, "Writing even half words to file %s\n",sname);
@@ -2110,7 +2139,7 @@ TInt E32Rom::WriteImages(TInt aHeaderType)
 			// use romname with ".srec" appended.
 			sprintf(sname,"%s.srec",(const char *)iObey->iRomFileName);
 			}
-		ofstream sFile(sname,ios::binary);
+		ofstream sFile(sname,ios_base::binary);
 		if (!romFile)
 			return Print(EError,"Cannot open file %s for output\n",sname);
 		Print(EAlways, "Writing S record format to file %s\n",sname);
@@ -2314,7 +2343,7 @@ void E32Rom::Write(ofstream &os, TInt aHeaderType)
 		#ifdef __TOOLS2__
 		os.seekp(headerpos); 
 		#else
-		os.seekp(headerpos,ios::beg);
+		os.seekp(headerpos,ios_base::beg);
 		#endif
 		
 		// Rewrite uncompressed un-paged part (bootstrap + Page Index Table)
@@ -2386,7 +2415,7 @@ void E32Rom::Write(ofstream &os, TInt aHeaderType)
 	#ifdef __TOOLS2__
 	os.seekp(headerpos); 
 	#else
-	os.seekp(headerpos,ios::beg);
+	os.seekp(headerpos,ios_base::beg);
 	#endif
 	os.write(reinterpret_cast<char*>(iHeader), headersize);	// write header again with (compressed) size info
 	
@@ -2394,14 +2423,14 @@ void E32Rom::Write(ofstream &os, TInt aHeaderType)
 		Print(ELog, "\tiSizeUsed:%d, iUncompressedSize:%d, headersize:%d, srcsize:%d, rawimagelen:%d \n",iSizeUsed, iUncompressedSize, headersize, srcsize, rawimagelen);
 	}
 
-TInt E32Rom::Compare(char *anImage, TInt aHeaderType)
+TInt E32Rom::Compare(const char *aImage, TInt aHeaderType)
 	{
 	if (aHeaderType < 0)
 		aHeaderType = 1;
-	ifstream file(anImage, ios::binary);
+	ifstream file(aImage, ios_base::binary);
 	if (!file)
-		return Print(EError, "Cannot open Rom image '%s' for verification\n", anImage);
-	Print(ELog, "\nVerifying ROM against image in %s\n", anImage);
+		return Print(EError, "Cannot open Rom image '%s' for verification\n", aImage);
+	Print(ELog, "\nVerifying ROM against image in %s\n", aImage);
 	switch (aHeaderType)
 		{
 	case 0:
@@ -2660,49 +2689,31 @@ TInt E32Rom::CheckUnpagedMemSize()
 		}
 		
 	return KErrNone;
-	}
-
-TRomNode* E32Rom::RootDirectory() 
-{ 
+}
+TRomNode* E32Rom::RootDirectory() const {
 	return iObey->iRootDirectory; 
 }
-
-TText* E32Rom::RomFileName()
-{ 
+const char* E32Rom::RomFileName() const {
 	return iObey->iRomFileName; 
 }
-
-TUint32 E32Rom::RomBase()
-{
-	return iHeader->iRomBase;
+TUint32 E32Rom::RomBase() const {
+	return iHeader->iRomBase; 
 }
-
-TUint32 E32Rom::RomSize()
-{
+TUint32 E32Rom::RomSize() const {
 	return iHeader->iRomSize;
 }
-
-TVersion E32Rom::Version()
-{
+TVersion E32Rom::Version() const {
 	return iHeader->iVersion;
 }
-
-TInt64 E32Rom::Time()
-{
+TInt64 E32Rom::Time() const {
 	return iHeader->iTime;
 }
-
-TUint32 E32Rom::CheckSum()
-{
+TUint32 E32Rom::CheckSum() const {
 	return iHeader->iCheckSum;
 }
-
-TUint32 E32Rom::DataRunAddress()
-{
+TUint32 E32Rom::DataRunAddress() const {
 	return iObey->iDataRunAddress;
 }
-
-TUint32 E32Rom::RomAlign()
-{
+TUint32 E32Rom::RomAlign() const {
 	return iObey->iRomAlign;
 }

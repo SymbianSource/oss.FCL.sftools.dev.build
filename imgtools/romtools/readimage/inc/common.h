@@ -27,8 +27,7 @@
 #ifdef __MSVCDOTNET__ 
 #include <ctype.h>
 #endif
-
-using namespace std ;
+ 
 
 #include <e32std.h>
 #include <e32std_private.h>
@@ -58,8 +57,15 @@ typedef enum EImageType
     //EBAREROM_IMAGE is introduced for handling bare ROM image (an image without loader header)
     EBAREROM_IMAGE
 };
-
-#define DIR_SEPARATOR  "/"
+#ifdef __LINUX__
+const char SLASH_CHAR1 = '/' ;
+const char SLASH_CHAR2 = '\\' ;
+#define MKDIR(a)		mkdir(a,0777)
+#else
+const char SLASH_CHAR1 = '\\' ;
+const char SLASH_CHAR2 = '/' ;
+#define MKDIR(a)		mkdir(a)
+#endif
 #define DUMP_HDR_FLAG			0x1
 #define DUMP_VERBOSE_FLAG		0x2
 #define DUMP_DIR_ENTRIES_FLAG	0x4
@@ -72,7 +78,7 @@ typedef enum EImageType
 #define EXTRACT_FILE_SET_FLAG	0x100
 
 // maximum buffer size.
-#define _MAX_BUFFER_SIZE_		128 
+#define _MAX_BUFFER_SIZE_		256 
 
 class ReaderUtil
 {

@@ -16,7 +16,7 @@
 #ifndef ELF_SYMBOL_H
 #define ELF_SYMBOL_H
 
-#include "elftools/inc/elfdefs.h"
+#include <elfdefs.h>
 #include <stdint.h>
 
 

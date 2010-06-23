@@ -32,8 +32,8 @@ Global pointers declaration.
 @internalComponent
 @released
 */
-CmdLineHandler* cmdInput = KNull;
-ImgCheckManager* imgCheckerPtr = KNull;
+CmdLineHandler* cmdInput = 0;
+ImgCheckManager* imgCheckerPtr = 0;
 
 /**
 Function to delete the created instances
@@ -42,10 +42,15 @@ Function to delete the created instances
 @released
 */
 
-void DeleteInstances()
-{
-	DELETE(imgCheckerPtr);
-	DELETE(cmdInput);
+void DeleteInstances() {
+	if(imgCheckerPtr){
+		delete imgCheckerPtr;
+		imgCheckerPtr = 0 ;
+	}
+	if(cmdInput){
+		delete cmdInput;
+		cmdInput = 0 ;
+	}
 }
 
 /**
@@ -60,34 +65,29 @@ to carry out the validation and to generate report.
 
 @return - returns Exit status success or failure
 */
-int main(int argc,char* argv[])
-{
-	try
-	{
-		cmdInput = new CmdLineHandler();
-		if(cmdInput == KNull)
-		{
+int main(int argc,char* argv[]) {
+	try {
+		cmdInput = new CmdLineHandler(); 
+		if(cmdInput == 0) {
 			throw ExceptionReporter(NOMEMORY, __FILE__, __LINE__);
 		}
 		ReturnType val = cmdInput->ProcessCommandLine(argc,argv);
 
 		int ret = 0;
-		switch(val)
-		{
+		switch(val) {
 			case EQuit:
 				ret = EXIT_SUCCESS;
 				break;
 	
 			case ESuccess:
 				imgCheckerPtr = new ImgCheckManager(cmdInput);
-				if(imgCheckerPtr == KNull)
-				{
+				if(imgCheckerPtr == 0) {
 					throw ExceptionReporter(NOMEMORY, __FILE__, __LINE__);
-				}
-				imgCheckerPtr->CreateObjects();
-				imgCheckerPtr->Execute();
-				imgCheckerPtr->FillReporterData();
-				imgCheckerPtr->GenerateReport();
+				} 
+				imgCheckerPtr->CreateObjects();  
+				imgCheckerPtr->Execute();  
+				imgCheckerPtr->FillReporterData();  
+				imgCheckerPtr->GenerateReport();  
 				break;
 			
 			case EFail:
@@ -98,8 +98,7 @@ int main(int argc,char* argv[])
 		ExceptionImplementation::DeleteInstance();
 		return ret;
 	}
-    catch(ExceptionReporter& aExceptionReport)
-	{
+    catch(ExceptionReporter& aExceptionReport) {
 		aExceptionReport.Report();
 		ExceptionImplementation::DeleteInstance();
 		DeleteInstances();

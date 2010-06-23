@@ -17,9 +17,9 @@
 
 
 /**
- @file
- @internalComponent
- @released
+@file
+@internalComponent
+@released
 */
 #include "romimageheader.h"
 /** 
@@ -31,18 +31,15 @@ Constructor intializes the Rom image header.
 @param aHdr - ROM laoder header
 @param aImgType - Image type
 */
-RomImageHeader::RomImageHeader(char* aHdr, EImageType aImgType , bool aNoRomLoaderHeader)
-{
+RomImageHeader::RomImageHeader(char* aHdr, EImageType aImgType , bool aNoRomLoaderHeader) {
 	switch(aImgType)
 	{
 	case ERomImage:
-		if(!aNoRomLoaderHeader)
-		{
-		iLoaderHdr = (TRomLoaderHeader*)aHdr;
-		iRomHdr = (TRomHeader*)(aHdr + sizeof(TRomLoaderHeader));
+		if(!aNoRomLoaderHeader) {
+			iLoaderHdr = (TRomLoaderHeader*)aHdr;
+			iRomHdr = (TRomHeader*)(aHdr + sizeof(TRomLoaderHeader));
 		}
-		else
-		{
+		else {
 			iRomHdr = (TRomHeader*)(aHdr);
 		}
 		iExtRomHdr = 0;
@@ -54,9 +51,9 @@ RomImageHeader::RomImageHeader(char* aHdr, EImageType aImgType , bool aNoRomLoad
 		iLoaderHdr = 0;
 		break;
 	default:
-	 iLoaderHdr = 0 ;
-	 iRomHdr = 0;
-	 iExtRomHdr = 0 ; 
+		iLoaderHdr = 0 ;
+		iRomHdr = 0;
+		iExtRomHdr = 0 ; 
 		break ;
 	}
 }

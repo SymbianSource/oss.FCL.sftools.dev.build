@@ -17,20 +17,22 @@
 
 
 /**
- @file
- @internalComponent
- @released
+@file
+@internalComponent
+@released
 */
-
 #include "dirreader.h"
 #include "e32reader.h"
 
-#ifdef __LINUX__
-#include <dirent.h>
-#include <sys/stat.h>
-#else
+#ifdef WIN32
 #include <io.h>
 #include <direct.h>
+#else//__LINUX__
+#include <dirent.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#define stricmp strcasecmp
+#define strinicmp strncasecmp
 #endif
 
 #define MAXPATHLEN 255
@@ -41,9 +43,8 @@ Constructor.
 @internalComponent
 @released
 */
-DirReader::DirReader(char* aDirName)
-:ImageReader(aDirName)
-{
+DirReader::DirReader(const char* aDirName)
+:ImageReader(aDirName) {
 }
 
 /** 
@@ -52,15 +53,13 @@ Destructor.
 @internalComponent
 @released
 */
-DirReader::~DirReader(void)
-{
+DirReader::~DirReader(void) {
 	ExeVsE32ImageMap::iterator begin = iExeVsE32ImageMap.begin();
 	ExeVsE32ImageMap::iterator end = iExeVsE32ImageMap.end();
-	while(begin != end)
-	{
+	while(begin != end) {
 		DELETE(begin->second);
 		++begin;
-	}
+	}  
 	iExeVsE32ImageMap.clear();
 }
 
@@ -72,24 +71,20 @@ Function to check whether the node is an executable or not.
 
 @param aName - Executable name
 */
-bool DirReader::IsExecutable(String aName)
-{
+bool DirReader::IsExecutable(const string& aName) {
 	unsigned int strPos = aName.find_last_of('.');
-	if(strPos != String::npos)
-	{
-		aName = aName.substr(strPos);
-		if(aName.length() <= 4)
-		{
-			ReaderUtil::ToLower(aName);
-			if (aName.find(".exe") != String::npos || aName.find(".dll") != String::npos ||
-				aName.find(".prt") != String::npos || aName.find(".nif") != String::npos ||
-				aName.find(".pdl") != String::npos || aName.find(".csy") != String::npos || 
-				aName.find(".agt") != String::npos || aName.find(".ani") != String::npos || 
-				aName.find(".loc") != String::npos || aName.find(".drv") != String::npos || 
-				aName.find(".pdd") != String::npos || aName.find(".ldd") != String::npos ||
-				aName.find(".tsy") != String::npos || aName.find(".fsy") != String::npos ||
-				aName.find(".fxt") != String::npos)
-			{
+	if(strPos != string::npos) {
+		string ext = aName.substr(strPos);
+		if(ext.length() <= 4) {
+			ReaderUtil::ToLower(ext);
+			if (ext.find(".exe") != string::npos || ext.find(".dll") != string::npos ||
+				ext.find(".prt") != string::npos || ext.find(".nif") != string::npos ||
+				ext.find(".pdl") != string::npos || ext.find(".csy") != string::npos || 
+				ext.find(".agt") != string::npos || ext.find(".ani") != string::npos || 
+				ext.find(".loc") != string::npos || ext.find(".drv") != string::npos || 
+				ext.find(".pdd") != string::npos || ext.find(".ldd") != string::npos ||
+				ext.find(".tsy") != string::npos || ext.find(".fsy") != string::npos ||
+				ext.find(".fxt") != string::npos) {
 				return true;
 			}
 		}
@@ -103,8 +98,7 @@ Dummy function to be compatible with other Readers.
 @internalComponent
 @released
 */
-void DirReader::ReadImage(void)
-{
+void DirReader::ReadImage(void) {
 }
 
 /** 
@@ -116,12 +110,11 @@ Function to
 @internalComponent
 @released
 */
-void DirReader::ProcessImage()
-{
-	char* cwd = new char[MAXPATHLEN];
+void DirReader::ProcessImage() {
+	char* cwd = new char[MAXPATHLEN]; 
 	getcwd(cwd,MAXPATHLEN);
-	ReadDir(iImgFileName);
-	chdir(cwd);
+	ReadDir(iImgFileName); 
+	chdir(cwd); 
 	if(cwd != NULL)
 		delete [] cwd;
 	cwd = 0;
@@ -137,56 +130,106 @@ Function to
 
 @param aPath - Directory name.
 */
-void DirReader::ReadDir(String aPath)
-{
-	int handle;
-	int retVal = 0; 
+void DirReader::ReadDir(const string& aPath) {
+
+
 	E32Image* e32Image = KNull;
 
-#ifdef __LINUX__
+#ifdef WIN32
+	int handle ; 
+	int retVal = chdir(aPath.c_str());
+	struct _finddata_t  finder;
+	handle = _findfirst("*.*", &finder);
+	while (retVal == 0) {
+		if ((strcmp(finder.name, KChildDir.c_str()) == 0) || 
+			(strcmp(finder.name, KParentDir.c_str()) == 0) ) {// current dir || parent dir   
+			retVal = _findnext(handle, &finder);
+			continue;
+		}
+
+		if (finder.attrib & _A_SUBDIR) {
+			ReadDir(finder.name);  
+			chdir(KParentDir.c_str()); 
+		}
+		else {
+			if ((finder.size > 0) && IsExecutable(string(finder.name)) && E32Image::IsE32ImageFile(finder.name)) {
+				e32Image = new E32Image();
+				ifstream inputStream(finder.name, ios_base::binary | ios_base::in);
+				iExeAvailable = true;
+				e32Image->iFileSize=finder.size;
+				e32Image->Adjust(finder.size);
+				inputStream >> *e32Image;				
+				ExeVsE32ImageMap::iterator it  ;
+				for(it = iExeVsE32ImageMap.begin() ;it != iExeVsE32ImageMap.end(); it++){
+					if(it->first == finder.name){ 
+						break ;
+					}
+				}				
+				if(it != iExeVsE32ImageMap.end()) {
+					cout << "Warning: "<< "Duplicate entry '" << finder.name << " '"<< endl;					
+					retVal = _findnext(handle, &finder);
+					continue;
+				}
+				size_t len = strlen(finder.name) + 1;
+				e32Image->iFileName = new char[len ];
+				memcpy(e32Image->iFileName,finder.name,len); 
+				put_item_to_map_2(iExeVsE32ImageMap,e32Image->iFileName, e32Image);
+				
+				iExecutableList.push_back(e32Image->iFileName); 
+			}
+			else {
+				cout << "Warning: "<< finder.name << " is not a valid E32 executable" << endl;
+			}
+		}
+		retVal = _findnext(handle,&finder);
+	}
+#else //__LINUX__
 	DIR* dirEntry = opendir( aPath.c_str());
 	static struct dirent* dirPtr;
-	while ((dirPtr= readdir(dirEntry)) != NULL)
-	{
+	while ((dirPtr= readdir(dirEntry)) != NULL) {
 		if ((strcmp(dirPtr->d_name, KChildDir.c_str()) == 0) || 
 			(strcmp(dirPtr->d_name, KParentDir.c_str()) == 0)) 
 			continue; // current dir || parent dir
 
-		String fullName( aPath + "/" + dirPtr->d_name );
-		
-		struct stat fileEntrybuf;
-		int retVal = stat((char*)fullName.c_str(), &fileEntrybuf);
-		if(retVal >= 0)
-		{
-			if(S_ISDIR(fileEntrybuf.st_mode)) //Is Directory?
-			{
+		string fullName( aPath + "/" + dirPtr->d_name );
+
+		struct stat fileEntrybuf; 
+		int retVal = stat((char*)fullName.c_str(), &fileEntrybuf); 
+		if(retVal >= 0) {
+			if(S_ISDIR(fileEntrybuf.st_mode)) { //Is Directory?
 				ReadDir(fullName);
 			}
-			else if(S_ISREG(fileEntrybuf.st_mode)) //Is regular file?
-			{
-				if ((fileEntrybuf.st_blksize > 0) && IsExecutable(String(dirPtr->d_name)) && E32Image::IsE32ImageFile((char*)fullName.c_str()))
-				{
+			else if(S_ISREG(fileEntrybuf.st_mode)){ //Is regular file? 
+				if ((fileEntrybuf.st_blksize > 0) && IsExecutable(string(dirPtr->d_name)) && E32Image::IsE32ImageFile(fullName.c_str())) {
 					iExeAvailable = true;
 					e32Image = new E32Image();
-					Ifstream inputStream((char*)fullName.c_str(), Ios::binary | Ios::in);
-					inputStream.seekg(0, Ios::end);
+					ifstream inputStream(fullName.c_str(), ios_base::binary | ios_base::in);
+					inputStream.seekg(0, ios_base::end);
 					TUint32 aSz = inputStream.tellg();
-					inputStream.seekg(0, Ios::beg);
+					inputStream.seekg(0, ios_base::beg);
 					e32Image->iFileSize=aSz;
 					e32Image->Adjust(aSz);
 					inputStream >> *e32Image;
-					String exeName(dirPtr->d_name);
-					ReaderUtil::ToLower(exeName);
-					if(iExeVsE32ImageMap.find(exeName) != iExeVsE32ImageMap.end())
-					{
+					//string exeName(dirPtr->d_name);
+					//ReaderUtil::ToLower(exeName);
+					ExeVsE32ImageMap::iterator it  ;
+					for(it = iExeVsE32ImageMap.begin() ;it != iExeVsE32ImageMap.end(); it++){
+						if(!stricmp(dirPtr->d_name,it->first.c_str())){ 
+							break ;
+						}
+					}	
+					if(it != iExeVsE32ImageMap.end()) {
 						cout << "Warning: "<< "Duplicate entry '" << dirPtr->d_name << " '"<< endl;
 						continue;
 					}
-					iExeVsE32ImageMap.insert(std::make_pair(exeName, e32Image));
-					iExecutableList.push_back(exeName);
+					size_t len = strlen(dirPtr->d_name) + 1;
+					if(e32Image->iFileName) delete []e32Image->iFileName;
+					e32Image->iFileName = new char[len ];
+					memcpy(e32Image->iFileName,dirPtr->d_name,len); 					
+					put_item_to_map_2(iExeVsE32ImageMap,e32Image->iFileName, e32Image);					
+					iExecutableList.push_back(e32Image->iFileName); 
 				}
-				else
-				{
+				else {
 					cout << "Warning: "<< dirPtr->d_name << " is not a valid E32 executable" << endl;
 				}
 			}
@@ -194,52 +237,8 @@ void DirReader::ReadDir(String aPath)
 	}
 	closedir(dirEntry);
 
-#else
-	retVal = chdir(aPath.c_str());
-	struct _finddata_t  finder;
-	handle = _findfirst("*.*", &finder);
-	while (retVal == 0)
-	{
-		if ((strcmp(finder.name, KChildDir.c_str()) == 0) || 
-			(strcmp(finder.name, KParentDir.c_str()) == 0) ) // current dir || parent dir  
-		{
-			retVal = _findnext(handle, &finder);
-			continue;
-		}
 
-		if (finder.attrib & _A_SUBDIR)
-		{
-			ReadDir(finder.name);
-			chdir(KParentDir.c_str());
-		}
-		else
-		{
-			if ((finder.size > 0) && IsExecutable(String(finder.name)) && E32Image::IsE32ImageFile(finder.name))
-			{
-				e32Image = new E32Image();
-				Ifstream inputStream(finder.name, Ios::binary | Ios::in);
-				iExeAvailable = true;
-				e32Image->iFileSize=finder.size;
-				e32Image->Adjust(finder.size);
-				inputStream >> *e32Image;
-				String exeName(finder.name);
-				ReaderUtil::ToLower(exeName);
-				if(iExeVsE32ImageMap.find(exeName) != iExeVsE32ImageMap.end())
-				{
-					cout << "Warning: "<< "Duplicate entry '" << finder.name << " '"<< endl;
-					retVal = _findnext(handle, &finder);
-					continue;
-				}
-				iExeVsE32ImageMap.insert(std::make_pair(exeName, e32Image));
-				iExecutableList.push_back(exeName);
-			}
-			else
-			{
-				cout << "Warning: "<< finder.name << " is not a valid E32 executable" << endl;
-			}
-		}
-		retVal = _findnext(handle,&finder);
-	}
+
 #endif
 }
 
@@ -249,35 +248,24 @@ Function to traverse through ExeVsE32ImageMap and prepare ExeVsIdData map.
 @internalComponent
 @released
 */
-void DirReader::PrepareExeVsIdMap(void)
-{
-	ExeVsE32ImageMap::iterator begin = iExeVsE32ImageMap.begin();
-	ExeVsE32ImageMap::iterator end = iExeVsE32ImageMap.end();
-	String exeName;
-	E32Image* e32Image = KNull;
-	IdData* id = KNull;
-	if(iExeVsIdData.size() == 0) //Is not already prepared
-	{
-		while(begin != end)
-		{
-			exeName = begin->first;
-			e32Image = begin->second;
-			id = new IdData;
+void DirReader::PrepareExeVsIdMap(void) {  
+	if(iExeVsIdData.size() == 0)  {//Is not already prepared
+		for(ExeVsE32ImageMap::iterator it = iExeVsE32ImageMap.begin();
+		it != iExeVsE32ImageMap.end(); it++) { 
+			E32Image* e32Image = it->second;
+			IdData* id = new IdData;
 			id->iUid = e32Image->iOrigHdr->iUid1;
 			id->iDbgFlag = (e32Image->iOrigHdr->iFlags & KImageDebuggable)? true : false;
 			TUint aHeaderFmt = E32ImageHeader::HdrFmtFromFlags(e32Image->iOrigHdr->iFlags);
-			if (aHeaderFmt >= KImageHdrFmt_V)
-			{
+			if (aHeaderFmt >= KImageHdrFmt_V) {
 				E32ImageHeaderV* v = e32Image->iHdr;
 				id->iSid = v->iS.iSecureId;
 				id->iVid = v->iS.iVendorId;
 				id->iFileOffset = 0;//Entry read from directory input, has no offset.
 			}
-			iExeVsIdData[exeName] = id;
-			++begin;
+			put_item_to_map_2(iExeVsIdData,it->first,id); 
 		}
-	}
-	id = KNull;
+	} 
 }
 
 /** 
@@ -288,8 +276,7 @@ Function to return ExeVsIdData map.
 
 @return returns iExeVsIdData.
 */
-const ExeVsIdDataMap& DirReader::GetExeVsIdMap() const
-{
+const ExeVsIdDataMap& DirReader::GetExeVsIdMap() const {
 	return iExeVsIdData;
 }
 
@@ -301,18 +288,13 @@ Function responsible to gather dependencies for all the executables using the co
 
 @return iImageVsDepList - returns all executable's dependencies
 */
-ExeNamesVsDepListMap& DirReader::GatherDependencies()
-{
-	ExeVsE32ImageMap::iterator begin = iExeVsE32ImageMap.begin();
-	ExeVsE32ImageMap::iterator end = iExeVsE32ImageMap.end();
-
-	StringList executableList;
-	while(begin != end)
-	{
-		PrepareExeDependencyList((*begin).second, executableList);
-		iImageVsDepList.insert(std::make_pair((*begin).first, executableList));
-		executableList.clear();
-		++begin;
+ExeNamesVsDepListMap& DirReader::GatherDependencies() {  
+	StringList executables;
+	for(ExeVsE32ImageMap::iterator it =  iExeVsE32ImageMap.begin();
+	it != iExeVsE32ImageMap.end(); it++) {
+		PrepareExeDependencyList(it->second, executables);
+		put_item_to_map(iImageVsDepList,it->first, executables);
+		executables.clear(); 
 	}
 	return iImageVsDepList;
 }
@@ -324,20 +306,17 @@ Function responsible to prepare the dependency list.
 @released
 
 @param - aE32Image, Using this, can get all the information about the executable
-@param - aExecutableList, Excutables placed into this list
+@param - aExecutables, Excutables placed into this list
 */
-void DirReader::PrepareExeDependencyList(E32Image* aE32Image, StringList& aExecutableList)
-{
+void DirReader::PrepareExeDependencyList(E32Image* aE32Image, StringList& aExecutables) {
 	int count = 0;
-	char** nameList = aE32Image->GetImportExecutableNames(count);
-	int i = 0;
-	String dependency;
-	for(; i < count; ++i)
-	{
-		dependency.assign(nameList[i]);
-		aExecutableList.push_back(ReaderUtil::ToLower(dependency));
+	char** names = aE32Image->GetImportExecutableNames(count); 
+	for(int i = 0; i < count; ++i) { 
+		aExecutables.push_back(names[i]);
 	}
-	DELETE(nameList);
+	if(names){
+		delete [](reinterpret_cast<long*>(names));
+	}
 }
 
 /** 
@@ -349,39 +328,35 @@ Function to identify the given path as file or directory
 @param - aStr, path name
 @return - retuns the either Directory, file or Unknown.
 */
-EImageType DirReader::EntryType(char* aStr)
-{
-	int strLength = strlen(aStr);
-	if(aStr[strLength - 1] == '\\' || aStr[strLength - 1] == '/')
-	{
-		aStr[strLength - 1] = KNull;
-	}
-	int retVal = 0;
-	#ifdef __LINUX__
-		struct stat fileEntrybuf;
-		retVal = stat(aStr, &fileEntrybuf);
-		if(retVal >= 0)
-		{
-			if(S_ISDIR(fileEntrybuf.st_mode))
-			{
-	#else
-		struct _finddata_t  finder;
-		retVal = _findfirst(aStr, &finder);
-		if(retVal > 0) //No error
-		{
-			if(finder.attrib & _A_SUBDIR)
-			{
-	#endif
-				return EE32Directoy;
-			}
-			else
-			{
-				if(E32Reader::IsE32Image(aStr) == true)
-				{
-					return EE32File;
-				}
+EImageType DirReader::EntryType(string& aStr) {	
+	int pos = aStr.length() - 1;
+	if(pos < 0)
+		return EUnknownImage;
+	char ch = aStr.at(pos);
+	if(ch == SLASH_CHAR1 || ch == SLASH_CHAR2) {
+		aStr.erase(pos,1);
+	} 
+#ifdef WIN32 
+	struct _finddata_t  finder;
+	int retVal = _findfirst(aStr.c_str(), &finder);
+	if(retVal > 0) {//No error 
+		if(finder.attrib & _A_SUBDIR) {
+#else//__LINUX__
+	struct stat fileEntrybuf;
+	int retVal = stat(aStr.c_str(), &fileEntrybuf);
+	if(retVal >= 0) {
+		if(S_ISDIR(fileEntrybuf.st_mode)) {
+
+
+#endif
+			return EE32Directoy;
+		}
+		else {
+			if(E32Reader::IsE32Image(aStr.c_str()) == true) {
+				return EE32File;
 			}
 		}
+	}
 
 	return EE32InputNotExist;
 }

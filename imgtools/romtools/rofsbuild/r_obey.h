@@ -23,37 +23,23 @@
 
 #define __REFERENCE_CAPABILITY_NAMES__
 
-#ifdef _MSC_VER
-#pragma warning(disable:4503)
-#endif
-
-#if defined(__MSVCDOTNET__) || defined(__TOOLS2__)
-#include <fstream>
-#else
-#include <fstream.h>
-#endif
-
 #include <stdio.h>
 #include <e32capability.h>
-
-#ifdef _L
-#undef _L
-#endif
+#include <kernel/kernboot.h>
 
 #include <vector>
 #include <map>
-#include <kernel/kernboot.h>
+#include <fstream>
 
+using namespace std;
 //
 const TUint32 KNumWords=16;
 //
 const TInt KDefaultRomSize=0x400000;
 const TInt KDefaultRomAlign=0x10;
 //
-
-typedef std::string String;
-typedef std::vector<String> StringVector;
-typedef std::map<String, StringVector> KeywordMap;
+typedef vector<string> StringVector ;
+typedef map<string, StringVector> KeywordMap;
 
 enum EKeyword
 {
@@ -122,7 +108,7 @@ enum EFileAttribute {
 #include "r_rofs.h"
 
 class MRofsImage;
-
+ 
 struct ObeyFileKeyword
 	{
 	const char* iKeyword;
@@ -146,7 +132,7 @@ struct FileAttributeKeyword
 class ObeyFileReader
 	{
 public:
-	ObeyFileReader(TText *aFileName);
+	ObeyFileReader(const char *aFileName);
 	~ObeyFileReader();
 
 	static void KeywordHelp();
@@ -157,42 +143,38 @@ public:
 	void Rewind();
 
 	TInt NextLine(TInt aPass, enum EKeyword& aKeyword);
-	TInt NextAttribute(TInt& aIndex, TInt aHasFile, enum EFileAttribute& aKeyword, TText*& aArg);
+	TInt NextAttribute(TInt& aIndex, TInt aHasFile, enum EFileAttribute& aKeyword, char*& aArg);
 
-	void CopyWord(TInt aIndex, TText*& aString);				// allocate copy of nth word
-	TInt Count() { return iNumWords;}				// number of words on current line
-	char* Word(TInt aIndex) { return (char*)iWord[aIndex]; }	// return nth word as char*
-	TText* Text(TInt aIndex) { return iWord[aIndex]; }			// return nth word as TText*
-	char* Suffix() { return (char*)iSuffix; }			// return unmatched suffix of word[0]
-	TInt CurrentLine() { return iCurrentLine;}				// number of words on current line
-	TText* GetCurrentObeyStatement() const;						// return current obey statement
+	char* DupWord(TInt aIndex) const;				// allocate copy of nth word
+	TInt Count() const { return iNumWords;}				// number of words on current line
+	const char* Word(TInt aIndex) const { return iWord[aIndex]; }	// return nth word as char* 
+	const char* Suffix() const { return iSuffix; } 			// return unmatched suffix of word[0]
+	TInt CurrentLine() const { return iCurrentLine;}				// number of words on current line
+	const char* GetCurrentObeyStatement() const {return iCurrentObeyStatement;}						// return current obey statement
 
 	void ProcessTime(TInt64& aTime);
-
 	static void TimeNow(TInt64& aTime);
 private:
-	TInt ReadAndParseLine();
-	TInt SetLineLengthBuffer();
+	TInt ReadAndParseLine(); 
 	TInt Parse();
-	inline TBool IsGap(char ch);
+	inline static TBool IsGap(char ch) {
+		return (ch==' ' || ch=='=' || ch=='\t');
+	}
 
 	static const ObeyFileKeyword iKeywords[];
 	static const FileAttributeKeyword iAttributeKeywords[];
 	static TInt64 iTimeNow;
 
 private:
-	FILE* iObeyFile;
-	long iMark;
-	TInt iMarkLine;
-	long iCurrentMark;
-	TInt iCurrentLine;
-	TInt imaxLength;
-	TText* iFileName;
-	TInt iNumWords;
-	TText* iWord[KNumWords];
-	TText* iSuffix;
-	TText* iLine;
-	TText* iCurrentObeyStatement;
+	TInt iCurrentLine; 
+	StringVector iLines ;
+	string iFileName;
+	TInt iNumWords;	
+	char* iLine;
+	TInt iMarkLine ;
+	char* iCurrentObeyStatement;
+	char iSuffix[80];
+	char* iWord[KNumWords];
 	};
 
 class CPatchDataProcessor;
@@ -201,9 +183,9 @@ struct ConfigurableFatAttributes;
 class CObeyFile
 	{
 public:
-	TText *iRomFileName;
-	TText *iExtensionRofsName;
-	TText *iKernelRofsName;
+	char* iRomFileName;
+	char* iExtensionRofsName;
+	char* iKernelRofsName;
 	TInt iRomSize;
 	TVersion iVersion;
 	TUint32 iCheckSum;
@@ -212,9 +194,9 @@ public:
 	TRomNode* iRootDirectory;
 	TInt iNumberOfDataFiles;
 	// Added to support Data Drive Images.
-	TText* iDriveFileName;
+	char* iDriveFileName;
 	TInt64 iDataSize;
-	TText* iDriveFileFormat;
+	char* iDriveFileFormat;
 	ConfigurableFatAttributes* iConfigurableFatAttributes;
 
 private:
@@ -236,12 +218,13 @@ public:
 	TInt ProcessDataDrive();		//	Process the data drive obey file.
 	TRomBuilderEntry *FirstFile();
 	TRomBuilderEntry *NextFile();
-	TText* ProcessCoreImage();
+	char* ProcessCoreImage() const;
 	void SkipToExtension();
-	TBool AutoSize();
-	TUint32 AutoPageSize();
+	TBool AutoSize() const {return iAutoSize ;}
+	TUint32 AutoPageSize() const {return iAutoPageSize;} 
 	TBool Process();
-	StringVector getValues(const String& aKey);
+ 
+	StringVector getValues(const string& aKey);
 
 private:
 	TBool ProcessFile(TInt aAlign, enum EKeyword aKeyword);
@@ -256,25 +239,25 @@ private:
 	TBool GotKeyVariables();
 	TBool GotKeyDriveVariables();			// To check the data drive mandatory variables. 
 	TBool GotExtensionVariables(MRofsImage* aRom);
-	TBool GetNextBitOfFileName(TText **epocEndPtr);
-	TText *IsValidFilePath(TText *aPath);
 	void AddFile(TRomBuilderEntry* aFile);
 
-	TInt SetStackSize(TRomNode* aNode, TText *aStr);
-	TInt SetHeapSizeMin(TRomNode* aNode, TText *aStr);
-	TInt SetHeapSizeMax(TRomNode* aNode, TText *aStr);
-	TInt SetCapability(TRomNode* aNode, TText *aStr);
-	TInt SetUid1(TRomNode* aNode, TText *aStr);
-	TInt SetUid2(TRomNode* aNode, TText *aStr);
-	TInt SetUid3(TRomNode* aNode, TText *aStr);
-	TInt SetPriority(TRomNode* aNode, TText *aStr);
+	TInt SetStackSize(TRomNode* aNode, const char *aStr);
+	TInt SetHeapSizeMin(TRomNode* aNode, const char *aStr);
+	TInt SetHeapSizeMax(TRomNode* aNode, const char *aStr);
+	TInt SetCapability(TRomNode* aNode, const char *aStr);
+	TInt SetUid1(TRomNode* aNode, const char *aStr);
+	TInt SetUid2(TRomNode* aNode, const char *aStr);
+	TInt SetUid3(TRomNode* aNode, const char *aStr);
+	TInt SetPriority(TRomNode* aNode, const char *aStr);
+	
+	static TBool GetNextBitOfFileName(char*& epocEndPtr);
+	static const char *IsValidFilePath(const char *aPath);
 
 	TBool iAutoSize;
 	TUint32 iAutoPageSize;
 	TBool iPagingOverrideParsed;
 	TBool iCodePagingOverrideParsed;
 	TBool iDataPagingOverrideParsed;
-
 public:
 	CPatchDataProcessor* iPatchData;	
 	void SplitPatchDataStatement(StringVector& aPatchDataTokens);	

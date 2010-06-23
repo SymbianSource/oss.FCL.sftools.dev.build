@@ -127,7 +127,7 @@ void TFATBaseBootSector::SetBytesPerSector(unsigned int aDriveSectorSize)
 		}
 		else
 		{
-			std::cout<<"Warning: Invalid Sector Size value. Default value is considered.\n";
+			cout<<"Warning: Invalid Sector Size value. Default value is considered.\n";
 		}
 	}
 	iBytesPerSector=KDefaultBytesPerSector;	
@@ -162,7 +162,7 @@ void TFATBaseBootSector::SetNumberOfFats(unsigned int aDriveNoOfFATs)
 		// If invalid value for No of FATs is provided, generate a warning and take the default value. 
 		if ((aDriveNoOfFATs>255) || (aDriveNoOfFATs<1))
 		{
-			std::cout<<"Warning: No of FATs should be between 0 and 256. Default value is considered.\n";
+			cout<<"Warning: No of FATs should be between 0 and 256. Default value is considered.\n";
 			iNumberOfFats= KDefaultNumFats;
 			return;
 		}
@@ -407,7 +407,7 @@ Set the volume's label
 
 @param aVolumeLable Data Drive Volume Label
 */
-void TFATBaseBootSector::SetVolumeLab(String aVolumeLable)
+void TFATBaseBootSector::SetVolumeLab(string aVolumeLable)
 {
 	// Set the default value of VolumeLable(i.e. "NO NAME    ") if not provided
 	// by the user.
@@ -423,7 +423,7 @@ void TFATBaseBootSector::SetVolumeLab(String aVolumeLable)
 		int volumeLabelSize= aVolumeLable.size();
 		if (volumeLabelSize > volumeMaxLangth)
 		{
-			std::cout<<"Warning: Size overflow for Data Drive Volume Label. Truncating to 11-bytes.\n";	
+			cout<<"Warning: Size overflow for Data Drive Volume Label. Truncating to 11-bytes.\n";	
 			aVolumeLable.resize(volumeMaxLangth);
 			strcpy(reinterpret_cast<char*>(iVolumeLabel),aVolumeLable.c_str());
 			return;

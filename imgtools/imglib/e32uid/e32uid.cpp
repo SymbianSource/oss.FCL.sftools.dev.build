@@ -15,10 +15,12 @@
 *
 */
 
+
 #if defined(__MSVCDOTNET__) || defined(__TOOLS2__)
 	#include <iostream>
 	using namespace std;
 #endif
+
 typedef unsigned char  BYTE;	// TUint8
 typedef unsigned short WORD;	// TUint16
 typedef unsigned int   UINT;	// TUint

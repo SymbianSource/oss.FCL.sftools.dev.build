@@ -81,11 +81,10 @@ ARMV7BUILD:=
 # to be target specific to the unique targets
 # that we have created.
 
-UNIQ:=$(TEMPLATE_EXTENSION_MAKEFILE)$(PLATFORM)$(TO_ROOT)$(TO_BLDINF)$(EPOCBLD)$(EXTENSION_ROOT)$(TEMCOUNT)
+UNIQ:=$(TEMPLATE_EXTENSION_MAKEFILE)$(VARIANTPLATFORM)$(TO_ROOT)$(TO_BLDINF)$(EPOCBLD)$(EXTENSION_ROOT)$(TEMCOUNT)
 UNIQ:=$(word 1,$(shell echo $(UNIQ) | $(GNUMD5SUM)))
 
 # Work out the other FINAL target if we're building both udeb and urel
-ifneq ($($(UNIQ)),)
 
 ifeq ($(CFG),urel)
 OTHER_CFG:=udeb
@@ -100,6 +99,7 @@ ifeq ($(CFG),deb)
 OTHER_CFG:=rel
 endif
 
+ifneq ($($(UNIQ)_$(OTHER_CFG)),)
 OTHER_MAKMAKE:=$(UNIQ)_$(OTHER_CFG)_MAKMAKE
 OTHER_BLD:=$(UNIQ)_$(OTHER_CFG)_BLD
 OTHER_FREEZE:=$(UNIQ)_$(OTHER_CFG)_FREEZE
@@ -111,7 +111,7 @@ OTHER_FINAL:=$(UNIQ)_$(OTHER_CFG)_FINAL
 endif # ifneq ($($(UNIQ)),)
 
 # Set $($(UNIQ)) so it can be detected if we're run again
-$(UNIQ):=1
+$(UNIQ)_$(CFG):=1
 
 tem_$(notdir $(TEMPLATE_EXTENSION_MAKEFILE))_$(PLATFORM)_$(CFG):=$(tem_$(notdir $(TEMPLATE_EXTENSION_MAKEFILE))_$(PLATFORM)_$(CFG)) $(UNIQ)_$(CFG)
 
@@ -121,7 +121,7 @@ TEPARAMETERS:= \
 	RMDIR RM ERASE MKDIR CP                 \
 	PLATFORM_PATH CFG_PATH                  \
 	TEMPLATE_EXTENSION_MAKEFILE             \
-	TARGET SOURCE DEPENDENCIES TOOL PRODUCT_INCLUDE \
+	PRODUCT_INCLUDE \
 	RVCTBIN RVCTINC RVCTLIB
 
 

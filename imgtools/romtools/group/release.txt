@@ -1,3 +1,149 @@
+Version 1.1.1 (fixupsym.pl)
+===============
+Released by Lorence Wang, 12/05/2010
+	1) DPDEF145440 fixupsym cannot startup
+
+Version 2.17.3 (rombuild)
+Version 2.10.4 (rofsbuild)
+===============
+Released by Lorence Wang, 12/05/2010
+	1) DPDEF145436 ROMBUILD and ROFSBUILD cannot take OBY filename from command line
+
+Version 2.17.2 (rombuild)
+===============
+Released by Lorence Wang, 05/05/2010
+	1) DPDEF145420 rombuild fails on TB10.1 vasco_ui core image creation 
+
+Version 2.10.3 (rofsbuild)
+===============
+Released by Lorence Wang, 29/04/2010
+	1) DPDEF145380 Small letters are changing to capital letters in folder and file names 
+	2) DPDEF145381 Voide guidance file names are corrupted with following way
+
+Version 2.10.2 (rofsbuild)
+===============
+Released by Lorence Wang, 20/04/2010
+	1) DPDEF145346 rofsbuild crashs if ROFS partition is too small   
+
+Version 2.10.1 (rofsbuild)
+Version 2.17.1 (rombuild)
+===============
+Released by Ross Qin, 12/04/2010
+	1) DPDEF145300 Rombuild hangs in S60 2010wk13 vasco_ui rom building  
+	
+Version 2.10.0 (rofsbuild)
+Version 2.17.0 (rombuild)
+===============
+Released by Ross Qin, 09/04/2010
+	1) DPDEF145281 Paged meaning change 
+  
+Version 2.9.5 (rofsbuild)
+Version 2.16.1 (rombuild)
+===============
+Released by Ross Qin, 29/03/2010
+	1) RDPDEF145196	rombuild/rofsbuild has extension rom/rofs recognition issues 
+  
+Version 2.16.0 (rombuild)
+===============
+Released by Ross Qin, 26/03/2010
+	1) RM-RIM406-1232: BU: MAKSYMROFS Integration
+  
+Version 2.9.4  (rofsbuild)
+===============
+Released by Lorence Wang, 25/03/2010
+	1) DPDEF145165 S60 build break caused by latest Buildrom.
+
+Version 2.15.3 (rombuild)
+Version 2.9.3  (rofsbuild)
+===============
+Released by Zheng Shen, 16/03/2010
+	1) DPDEF144882  buildrom, rombuild,rofsbuil -keepgoing option
+
+Version 2.15.2 (rombuild)
+Version 2.9.2  (rofsbuild)
+Version 2.2 build(2) (readimage)
+===============
+Released by Zheng Shen, 10/03/2010
+	1) DPDEF144887  [System build] : NE1 smoketest not booting up for TB92SF_1069 vtb92sf build
+
+
+Version 2.15.1 (rombuild)
+Version 2.9.1  (rofsbuild)
+Version 2.2 build(1) (readimage)
+===============
+Released by Zheng Shen, 05/03/2010
+	1) DPDEF144535  remove -fastcompress option for rombuild/rofsbuild
+
+Version 2.15.0 (rombuild)
+Version 2.9.0  (rofsbuild)
+Version 2.2 build(0) (readimage)
+Version 1.1.0 (maksym)
+Version 1.1.0 (maksymrofs)
+Version 1.1.0 (hpsym)
+Version 1.1.0 (fixupsym)
+===============
+Released by Zheng Shen, 22/02/2010
+	1) DPDEF144562	Build Tools cannot be built in Linux
+
+Version 2.14.3 (rombuild)
+================
+(Made by Zheng Shen, 08/02/2010)
+  1. DPDEF143270 -compress=paged is not supported by buildrom/rombuild
+
+Version 2.14.3 (rombuild)
+================
+(Made by Marvin Shi, 25/01/2010)
+  1. DPDEF143859  Bitwise compatible bytepair algorithm update
+  
+Version 2.8.4 (rofsbuild)
+================
+(Made by Marvin Shi, 19/01/2009)
+  1. DPDEF143713 TSW error CSTI-7X4GHW: Buildtool creates invalid long names in FAT images 
+  2. DPDEF143834  Creating multiple rofs images encounters a problem and rofsbuild failed 
+  3. DPDEF143859  Bitwise compatible bytepair algorithm update 
+  
+Version 2.8.3 (rofsbuild)
+================
+(Made by Zheng Shen, 06/01/2009)
+  1. DEF143442 rofsbuild hangs occasionally with -symbols 
+
+Version 2.8.2 (rofsbuild)
+================
+(Made by Zheng Shen, 09/12/2009)
+  1. DPDEF143314 rofsbuild cannot generate FAT16 files 
+
+Version 1.0.1  (fixupsym)
+================
+(Made by Marvin Shi, 23/11/2009)
+ 1. DPDEF142869 Fixupsym failed for romutl.pm cannot be found 
+ 
+Version 2.14.2 (rombuild)
+================
+(Made by Marvin Shi, 18/11/2009)
+  1. DEF142972 buildrom produces garbled logs 
+  
+Version 2.8.1 (rofsbuild)
+================
+(Made by Marvin Shi, 17/11/2009)
+  1. DPDEF142921 TSW error CSTI-7X4GHW: Buildtool creates invalid long names in FAT images 
+  
+
+Version 2.8.0 (rofsbuild)
+================
+(Made by Marvin Shi, 13/11/2009)
+  1. RM-RIM406-1233: BU: MAKSYMROFS Integration
+Version 2.7.0 (rofsbuild)
+===============
+Made by Zhi Dou 03/11/2009
+
+1. RM-RIM406-1228: BU: ROFSBUILD Cache
+
+Version 2.14.1 (rombuild)
+===============
+Made by Zhi Dou 02/11/2009
+
+1. DEF142739 - rombuild.exe displays bogus error messages when trailing REM statement present
+
 Version 2.14.0 (rombuild)
 ===============
 Made by Zhi Dou 26/10/2009

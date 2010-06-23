@@ -1,3 +1,4 @@
+#!/usr/bin/perl
 #
 # Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
@@ -22,9 +23,9 @@ BEGIN {
 # check user has a version of perl that will cope
 	require 5.005_03;
 # establish the path to the Perl libraries
-    $PerlLibPath = $FindBin::Bin;	# X:/epoc32/tools
-    $PerlLibPath =~ s/\//\\/g;	# X:\epoc32\tools
-    $PerlLibPath .= "\\";
+    $PerlLibPath = $FindBin::Bin;
+    $PerlLibPath =~ s/\\/\//g;
+    $PerlLibPath .= "\/";
 }
 
 use  lib $PerlLibPath;

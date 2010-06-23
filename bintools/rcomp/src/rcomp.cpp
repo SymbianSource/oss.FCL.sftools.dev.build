@@ -90,8 +90,8 @@ using std::endl;
 #pragma warning( disable : 4244 ) // C4244: '=' : conversion from 'int' to 'short', possible loss of data
 #endif //__VC32__
 
-#include "resource.h"
-#include "parser.h"
+#include "RESOURCE.H"
+#include "Parser.h"
 
 int yylex();
 void yyerror(const char* string, ...);
@@ -100,14 +100,14 @@ int yywrap();
 extern int yylineno;
 
 #include "rcomp.hpp"
-#include "datatype.h"
-#include "mem.h"
-#include "rcbinstr.h"
-#include "rcscan.h"
-#include "errorhan.h"
-#include "fileacc.h"
-#include "version.h"
-#include "ctable.h"
+#include "DATATYPE.H"
+#include "MEM.H"
+#include "RCBINSTR.H"
+#include "RCSCAN.H"
+#include "ERRORHAN.H"
+#include "FILEACC.H"
+#include "VERSION.H"
+#include "CTABLE.H"
 #include "localise.h"
 #include "main.h"
 
@@ -2549,7 +2549,7 @@ yyreduce:
 
 	    if (pG->EnumValues.IsStored((yyvsp[(1) - (1)].Value)))
 			{
-			sprintf((yyval.Value), "%d", pG->EnumValues.FindId((yyvsp[(1) - (1)].Value)));
+			sprintf((yyval.Value), "%d", (int)(pG->EnumValues.FindId((yyvsp[(1) - (1)].Value))));
 			}
 		else if (pG->RlsNameIndex.count((yyvsp[(1) - (1)].Value))) // if rls item has already been defined
 			{

@@ -46,7 +46,7 @@ public:
 	void InsertWriter(ReportWriter* aWriter);
 
 private:
-	void HandleImage(const String& aImgName, EImageType aImageType = EUnknownImage);
+	void HandleImage(const char* aImgName, EImageType aImageType = EUnknownImage);
     
 protected:
 	CmdLineHandler* iCmdLine;

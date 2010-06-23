@@ -1,3 +1,4 @@
+#!/usr/bin/perl
 #
 # Copyright (c) 2004-2009 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.

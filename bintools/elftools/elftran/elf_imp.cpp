@@ -19,7 +19,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <e32std.h>
-#include <h_utl.h>
+#include "h_utl.h"
 #include "e32ldfmt.h"
 #include "elftran.h"
 #include "elffile.h"

@@ -19,6 +19,7 @@ package spitool;
 use strict;
 use Exporter;
 use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
+use romutl;
 
 $VERSION     = 1.00;
 @ISA         = qw(Exporter);
@@ -171,7 +172,7 @@ sub createSpi
 	my @existingUid = (-1,-1,-1,-1);
 	my $uidNumber;
 	my $defaultSpiFileName = "ecom-0-0.spi";
-	my $defaultTargetDirectory = "$ENV{EPOCROOT}epoc32\\tools\\";
+	my $defaultTargetDirectory = &get_epocroot."epoc32\/tools\/";
 	my @defaultUid = (-1,-1,-1,-1);
 	
 ##########################################################################################
@@ -225,7 +226,7 @@ sub createSpi
 			next;
 			}
 		if (-d $arg) {
-			if(($arg =~ m-^.:-) && ($arg =~ m-\\$-)) {
+			if(($arg =~ m-^.:-) && ($arg =~ m-[\\\/]$-)) {
 				unless(opendir(DIRECTORY, $arg)) { print "Exiting: $arg"; exit; }
 				while (my $file=readdir(DIRECTORY)) {
 					my $newfile = $arg.$file;
@@ -317,8 +318,8 @@ sub createSpi
 	}
 	
 	for(my $i=0;$i<scalar @resourceFiles;$i++) {
-		if($resourceFiles[$i]=~m|\\|) {
-			if($resourceFiles[$i]=~m|(.*)\\([^\\]*)$|) {
+		if($resourceFiles[$i]=~m|\/|) {
+			if($resourceFiles[$i]=~m|(.*)\/([^\/]*)$|) {
 				$resourceFilePaths[$i]=$1;
 				$resourceFileNames[$i]=$2;
 			}
@@ -334,7 +335,6 @@ sub createSpi
 			}
 		}
 	}
-	
 	my %uid2values; #hash to hold UID2 values for each type of SPI file
 	$uid2values{"ecom"} = 270556204;
 

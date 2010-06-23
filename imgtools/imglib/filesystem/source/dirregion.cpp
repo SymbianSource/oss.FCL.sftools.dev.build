@@ -22,7 +22,7 @@
 
 
 #include "dirregion.h"
-
+#include "directory.h"
 /**
 Constructor:
 1.Get the instance of class CCluster
@@ -108,7 +108,7 @@ void CDirRegion::WriteClustersIntoFile(OfStream& aOutPutStream)
 	StringMap::iterator mapBeginIter = iClusterMap.begin();
 	StringMap::iterator mapEndIter= iClusterMap.end();
 	//MAPs are sorted associative containers, so no need to sort
-	String tempString;
+	string tempString;
 	while(mapBeginIter != mapEndIter)
 	{
 		tempString = (*mapBeginIter++).second;
@@ -120,184 +120,6 @@ void CDirRegion::WriteClustersIntoFile(OfStream& aOutPutStream)
 		throw ErrorHandler(FILEWRITEERROR, __FILE__, __LINE__);
 	}
 }
-
-
-/**
-Function takes the full entry name and formats it as per FAT spec requirement
-Requirement:
-1. All the names should be of 11 characters length.
-2. Name occupies 8 characters and the extension occupies 3 characters.
-3. If the name length is less than 8 characters, padd remaining characters with '0x20' 
-4. If the extension length is less than 3 characters, padd remaining characters with '0x20' 
-5. If the Name or extension exceeds from its actual length then it is treated as long name.
-
-@internalComponent
-@released
-
-@param aString - the String needs to be formatted
-@param aAttrValue - the entry attribute
-*/
-void CDirRegion::FormatName(String& aString, char aAttrValue)
-{
-	if(!aString.empty())
-	{
-		if((*aString.begin()) != KDot)
-		{
-			//Get the file extension start index
-			int extensionStartIndex = aString.find_last_of (KDot);
-			if(aAttrValue != EAttrDirectory && extensionStartIndex != -1)
-			{
-				//Erase the dot, because it is not required to be written in the FAT image
-				aString.erase(extensionStartIndex,1);
-				//Apply Space padding for the Name
-				aString.insert (extensionStartIndex,(ENameLength - extensionStartIndex), KSpace);
-				int totalStringLength = aString.length();
-				//Apply Space padding for the  Extension
-				if(totalStringLength < ENameLengthWithExtension)
-				{
-					aString.insert(totalStringLength,(ENameLengthWithExtension - totalStringLength), KSpace);
-					return;
-				}
-			}
-			else
-			{
-				int nameEndIndex = aString.length();
-				//Apply Space padding for the directory Name
-				aString.insert(nameEndIndex,(ENameLengthWithExtension - nameEndIndex),KSpace);
-				return;
-			}
-		}
-		else
-		{	//Apply Space padding for either '.' or ".."
-			aString.append((ENameLengthWithExtension - aString.length()),KSpace);
-			return;
-		}
-	}
-	else
-	{
-		throw ErrorHandler(EMPTYFILENAME, __FILE__, __LINE__);
-	}
-}
-
-/**
-Function responsible to classify the entry name as long name or regular name.
-
-@internalComponent
-@released
-
-@param aEntry - the directory entry
-@return - returns true if it is long name else false.
-*/
-bool CDirRegion::IsLongEntry(CDirectory* aEntry) const
-{
-	String entryName = aEntry->GetEntryName();
-	unsigned int receivedNameLength = entryName.length();
-	unsigned int firstDotLocation = entryName.find_first_of(KDot);
-	unsigned int lastDotLocation = entryName.find_last_of(KDot);
-
-	if(firstDotLocation == lastDotLocation)
-	{
-		if(aEntry->GetEntryAttribute() == EAttrDirectory)
-		{
-			// If the directory name length is more than 8 characters, then it is a long name
-			if(receivedNameLength > ENameLength)
-			{
-				return true;
-			}
-		}
-		else
-		{
-			int extensionIndex = lastDotLocation;
-			unsigned int fileExtensionLength = receivedNameLength - extensionIndex - 1;
-			/*Either the full name length is greater than 11 or the extension 
-			 *length is greater than 3, then it is considered as long name.
-			 */
-			if((receivedNameLength > ENameLengthWithExtension) 
-			   || (fileExtensionLength > EExtensionLength))
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-	else
-	{
-		//If the name contains multiple dots, then it is a long name.
-		return true;	
-	}
-}
-
-/**
-Function responsible to 
-1. Invoke long name class
-2. Invoke the methods to create long and short entries
-3. Receive the string filled with long entries
-
-@internalComponent
-@released
-
-@param aEntry - the entry
-@param aDirString - long name entry appended to this string
-*/
-
-void CDirRegion::CreateLongEntries(CDirectory* aEntry,String& aDirString)
-{
-	ClongName aLongNameObject(iClusterPtr,aEntry);
-	String tempString = aLongNameObject.CreateLongEntries();
-	if(tempString.length() == 0)
-	{
-		tempString.erase();
-		throw ErrorHandler(EMPTYFILENAME, __FILE__, __LINE__);
-	}
-	else
-	{
-		aDirString.append(tempString.c_str(),tempString.length());
-		tempString.erase();
-		WriteEntryToString(aLongNameObject.CreateShortEntry(aEntry),aDirString);
-	}
-}
-
-/**
-Function takes a single entry and writes its attributes into tempString.
-Later this string is appended with the string received in the argument
-
-@internalComponent
-@released
-
-@param aEntry - the entry which attributes are needs to be written into aString
-@param aString - entry attributes appended into this string
-*/
-void CDirRegion::WriteEntryToString(CDirectory* aEntry,String& aString)
-{
-	String tempString;
-	String entryName = aEntry->GetEntryName();
-	tempString.append(ToUpper(entryName));
-	//appends the attributes only once
-	tempString.append(KWriteOnce, aEntry->GetEntryAttribute());
-	tempString.append(KWriteOnce, aEntry->GetNtReservedByte());
-	tempString.append(KWriteOnce, aEntry->GetCreationTimeMsecs());
-	unsigned short int createdTime = aEntry->GetCreatedTime();
-	tempString.append(ToString(createdTime));
-	unsigned short int creationDate = aEntry->GetCreationDate();
-	tempString.append(ToString(creationDate));
-	unsigned short int lastAccessDate = aEntry->GetLastAccessDate();
-	tempString.append(ToString(lastAccessDate));
-	unsigned short int clusterNumberHi = aEntry->GetClusterNumberHi();
-	tempString.append(ToString(clusterNumberHi));
-	unsigned short int lastWriteTime = aEntry->GetLastWriteTime();
-	tempString.append(ToString(lastWriteTime));
-	unsigned short int lastWriteDate = aEntry->GetLastWriteDate();
-	tempString.append(ToString(lastWriteDate));
-	unsigned short int clusterNumberLow = aEntry->GetClusterNumberLow();
-	tempString.append(ToString(clusterNumberLow));
-	unsigned int fileSize = aEntry->GetFileSize();
-	tempString.append(ToString(fileSize));
-
-	aString.append(tempString.c_str(),KDirectoryEntrySize);
-	tempString.erase();
-}
-
- 
 
 /**
 Function responsible to 
@@ -311,16 +133,16 @@ Function responsible to
 */
 void CDirRegion::WriteFileDataInToCluster(CDirectory* aEntry)
 {
-	iInputStream.open(aEntry->GetFilePath().c_str(),Ios::binary);
+	iInputStream.open(aEntry->GetFilePath().c_str(),ios_base::binary);
 	if(iInputStream.fail() == true )
 	{
 		throw ErrorHandler(FILEOPENERROR,(char*)aEntry->GetFilePath().c_str(),__FILE__,__LINE__);
 	}
 	else
 	{
-		iInputStream.seekg (0,Ios::end);
+		iInputStream.seekg (0,ios_base::end);
 		Long64 fileSize = iInputStream.tellg(); 
-		iInputStream.seekg(0,Ios::beg);
+		iInputStream.seekg(0,ios_base::beg);
 		char* dataBuffer = (char*)malloc((unsigned int)fileSize);
 		if(dataBuffer == 0)
 		{
@@ -334,7 +156,7 @@ void CDirRegion::WriteFileDataInToCluster(CDirectory* aEntry)
 		{
 			throw ErrorHandler(FILEREADERROR,(char*)aEntry->GetFilePath().c_str(), __FILE__, __LINE__);
 		}
-		String clusterData(dataBuffer,(unsigned int)bytesRead);
+		string clusterData(dataBuffer,(unsigned int)bytesRead);
 		PushStringIntoClusterMap(iClusterPtr->GetCurrentClusterNumber(),clusterData,iClusterSize,aEntry->GetEntryAttribute());
 	}
 	iInputStream.close();
@@ -366,21 +188,17 @@ and appends all the attributes into the string (aString).
 @param aParDirClusterNumber - parent directory cluster number
 @param aString - parent directory entry attributes appended to this string
 */
-void CDirRegion::CreateAndWriteParentDirEntry(unsigned int aParDirClusterNumber,String& aString)
+void CDirRegion::CreateAndWriteParentDirEntry(unsigned int aParDirClusterNumber,string& aString)
 {
-	const char* parentDirName = ".."; //Indicates parent directory entry name
-	CDirectory* parentDirectory = new CDirectory((char*)parentDirName);
+	CDirectory* parentDirectory = new CDirectory("..",NULL);
 
 	parentDirectory->SetEntryAttribute(EAttrDirectory);
 	parentDirectory->SetClusterNumberLow((unsigned short) (aParDirClusterNumber & KHighWordMask));
 	parentDirectory->SetClusterNumberHi((unsigned short) (aParDirClusterNumber >> KBitShift16));
 
-	String tempString(parentDirectory->GetEntryName());
-	FormatName(tempString,EAttrDirectory);
-	parentDirectory->SetEntryName(tempString);
-	tempString.erase();
-	
-	WriteEntryToString(parentDirectory,aString);
+	TShortDirEntry entry ;
+	parentDirectory->GetShortEntry(entry);
+	aString.append((const char*)(&entry),sizeof(entry));
 	iParentDirEntry = true;
 	delete parentDirectory;
 	parentDirectory = NULL;
@@ -397,22 +215,18 @@ Function responsible to
 @param aCurDirClusterNumber - Current directory Cluster number
 @param aString - the entry attributes should be appended to this string
 */
-void CDirRegion::CreateAndWriteCurrentDirEntry(unsigned int aCurClusterNumber,String& aString)
+void CDirRegion::CreateAndWriteCurrentDirEntry(unsigned int aCurClusterNumber,string& aString)
 {
-	const char* currentDirName = "."; //Indicates Current Directory entry name
 	iCurEntryClusterNumber = aCurClusterNumber;
-	CDirectory* currentDirectory = new CDirectory((char*)currentDirName);
+	CDirectory* currentDirectory = new CDirectory(".",NULL);
 
 	currentDirectory->SetEntryAttribute(EAttrDirectory);
 	currentDirectory->SetClusterNumberLow((unsigned short) (iCurEntryClusterNumber & KHighWordMask));
 	currentDirectory->SetClusterNumberHi((unsigned short) (iCurEntryClusterNumber >> KBitShift16));
 
-	String tempString(currentDirectory->GetEntryName());
-	FormatName(tempString,EAttrDirectory);
-	currentDirectory->SetEntryName(tempString);
-	tempString.erase();
-
-	WriteEntryToString(currentDirectory,aString);
+	TShortDirEntry entry ;
+    currentDirectory->GetShortEntry(entry);
+    aString.append((const char*)(&entry),sizeof(entry));
 	iCurrentDirEntry = true;
 	delete currentDirectory;
 	currentDirectory = NULL;
@@ -430,14 +244,14 @@ directory entry string size is greater than the cluster size.
 @param aClustersRequired - No of clusters required to hold this string
 */
 
-void CDirRegion::PushDirectoryEntryString(unsigned int aNumber,String& aString,int aClustersRequired)
+void CDirRegion::PushDirectoryEntryString(unsigned int aNumber,string& aString,int aClustersRequired)
 {
 	int clusterCount = 0;
 	int clusterKey = aNumber;
 	iClusterPtr->CreateMap(aNumber,clusterKey);
 	iClusterMap[clusterKey] =	aString.substr(clusterCount*iClusterSize,iClusterSize);
 	++clusterCount;
-	String clusterSizeString;
+	string clusterSizeString;
 	for(; clusterCount < aClustersRequired; ++clusterCount)
 	{
 		clusterKey = iClusterPtr->GetCurrentClusterNumber();
@@ -461,7 +275,7 @@ void CDirRegion::PushDirectoryEntryString(unsigned int aNumber,String& aString,i
 @param aClusterSize - used to split the string
 @param aAttribute - current entry attribute
 */
-void CDirRegion::PushStringIntoClusterMap(unsigned int aNumber, String& aString, unsigned long int aClusterSize,char aAttribute)
+void CDirRegion::PushStringIntoClusterMap(unsigned int aNumber, string& aString, unsigned long int aClusterSize,char aAttribute)
 {
 	int receivedStringLength = aString.length();
 	/* Precaution, once the map is initialized with specific cluster number don't over write
@@ -485,7 +299,7 @@ void CDirRegion::PushStringIntoClusterMap(unsigned int aNumber, String& aString,
 			return;
 		}
 		int updatedClusterNumber = aNumber;
-		String clusterSizeString;
+		string clusterSizeString;
 		for(short int clusterCount = 0; clusterCount < clustersRequired; ++clusterCount)
 		{
 			/* In case of the contents occupying more than one cluster, break the contents into
@@ -500,7 +314,7 @@ void CDirRegion::PushStringIntoClusterMap(unsigned int aNumber, String& aString,
 				 */
 				clusterSizeString.append((aClusterSize - clusterSizeString.length()),0);
 			}
-			// Insert the String into ClusterMap	
+			// Insert the string into ClusterMap	
 			iClusterMap[updatedClusterNumber] = clusterSizeString;
 		
 			iClusterPtr->UpdateNextAvailableClusterNumber();
@@ -592,9 +406,10 @@ void CDirRegion::CreateDirEntry(CDirectory* aEntry,unsigned int aParentDirCluste
 	
 	unsigned int dirEntryCount = aEntry->GetEntryList()->size();
 
-	String dirString;
-	String nameString;
+	string dirString;
+	string nameString;
 	CDirectory* tempDirEntry = (*printIterator);
+	list<TLongDirEntry> longNames ; 
 	//Writes all the Directory entries available in one Directory entry
 	while(dirEntryCount > 0)
 	{
@@ -615,19 +430,18 @@ void CDirRegion::CreateDirEntry(CDirectory* aEntry,unsigned int aParentDirCluste
 		}
 		MessageHandler::ReportMessage(INFORMATION,
 									  ENTRYCREATEMSG,
-									  (char*)tempDirEntry->GetEntryName().c_str());
-		if(!IsLongEntry(tempDirEntry))
-		{
-			nameString.assign(tempDirEntry->GetEntryName());
-			FormatName(nameString,tempDirEntry->GetEntryAttribute());
-			tempDirEntry->SetEntryName(nameString);
-			nameString.erase();
-			WriteEntryToString(tempDirEntry,dirString);
+									  (char*)tempDirEntry->GetEntryName().c_str()); 
+									  
+		if(tempDirEntry->GetLongEntries(longNames)){ 
+			list<TLongDirEntry>::const_iterator i = longNames.begin();
+			while(i != longNames.end()) {
+				dirString.append((char*)(&(*i)),sizeof(TLongDirEntry)); 
+				i++ ;
+			} 
 		}
-		else
-		{
-			CreateLongEntries(tempDirEntry,dirString);
-		}
+		TShortDirEntry shortEntry ;
+		tempDirEntry->GetShortEntry(shortEntry);	 
+		dirString.append((char*)(&shortEntry),sizeof(TShortDirEntry));		 
 		if(tempDirEntry->IsFile())
 		{
 			WriteFileDataInToCluster(tempDirEntry);
@@ -635,6 +449,7 @@ void CDirRegion::CreateDirEntry(CDirectory* aEntry,unsigned int aParentDirCluste
 		else
 		{
 			iClusterPtr->UpdateNextAvailableClusterNumber ();
+			//tempDirEntry->SetEntryAttribute(tempDirEntry->GetEntryAttribute() | EAttrDirectory);
 		}
 		++printIterator;
 		--dirEntryCount;

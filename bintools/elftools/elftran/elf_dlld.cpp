@@ -20,59 +20,25 @@
 #include <string.h>
 #include <stdlib.h>
 #include <e32std.h>
-#include <elfdefs.h>
+#include "elfdefs.h"
 #include "elfdll.h"
 #include "elffile.h"
-#include <h_utl.h>
+#include "h_utl.h"
 #include <e32ldr.h>
 
-ELFFile::ELFDllData::ELFDllData(ELFFile * f)
-    :
-        iElfFile(f),
-
-        iDynStrTab(0),
-        iDynStrTabSize(0),
-        iDynSymTab(0),
-
-        iSymSize(0),
-        iRela(0),
-        iRelaSz(0),
-        iRelaEnt(0),
-
-        iRel(0),
-        iRelSz(0),
-        iRelEnt(0),
-
-        iHashTable(0),
-
-        iNamedExportSymbolHead(0),
-        iNamedExportCount(0),
-
-        iSymStringTableSize(0),
-        iStringNameOffset(0),
-
-        iDepRecords(0),
-        iDepRecordsTail(0),
-
-        iNeededDllNames(0),
-        iNeededDllNamesTail(0),
-
-        iOrdZeroRec(0),
-
-        iNamedLookupEnabled(0),
-
-        iDllHead(0),
-        iDllTail(0),
-
-        iNumberOfImports(0),
-        iNumberOfExports(0),
-        iNumberOfImportDlls(0),
-
-        iStringTableSize(0),
-
-        iNumberOfRelocs(0),
-        iNumberOfCodeRelocs(0),
-        iNumberOfDataRelocs(0)
+ELFFile::ELFDllData::ELFDllData(ELFFile * f) :
+         iElfFile(f), iDynStrTab(0), iDynStrTabSize(0), iDynSymTab(0),
+ 		iSymSize(0), iRela(0), iRelaSz(0), iRelaEnt(0), 
+ 		iRel(0), iRelSz(0), iRelEnt(0),
+ 		iHashTable(0), iNamedExportSymbolHead(0),  iNamedExportCount(0),
+		iSymStringTableSize(0),iStringNameOffset(0), 
+		iDepRecords(0), iDepRecordsTail(0),iNeededDllNames(0),iNeededDllNamesTail(0),
+		iOrdZeroRec(0), iNamedLookupEnabled(0), 
+		iDllHead(0), iDllTail(0), 
+ 		iNumberOfImports(0),  iNumberOfExports(0), iNumberOfImportDlls(0),
+ 		iStringTableSize(0), iNumberOfRelocs(0), iNumberOfCodeRelocs(0),
+ 		iNumberOfDataRelocs(0)
+ 		  		
 		{
 		}
 
@@ -134,10 +100,9 @@ TBool ELFFile::ELFDllData::Init()
 			}
 	// Set up export info
 	if (InitExportInfo())
-	       {
-	       TText * sym = (TText *)"_E32Startup";
+	       { 
 	       // If _E32Startup is defined then this is not a DLL
-	       iImageIsDll = !iElfFile->SymbolPresent(sym);
+	       iImageIsDll = !iElfFile->SymbolPresent("_E32Startup");
 	       }
 	if (errors > 0) return EFalse;
 	return ETrue;
@@ -247,7 +212,7 @@ void ELFFile::ELFDllData::DllRec::AddSymbol(ELFFile::ELFDllData::DllSymbol * s)
     iTail = s;
     }
 
-static unsigned long elf_hash(const unsigned char *name)
+static unsigned long elf_hash(const unsigned char* name)
     {
     unsigned long h, g;
     for (h = 0; *name != 0; ++name)
@@ -260,9 +225,9 @@ static unsigned long elf_hash(const unsigned char *name)
 	return h;
     }
 
-Elf32_Word ELFFile::ELFDllData::FindSymbolIndex(TText * s)
+Elf32_Word ELFFile::ELFDllData::FindSymbolIndex(const char* s)
     {
-	TUint h = elf_hash(s);
+	TUint h = elf_hash((const unsigned char*)s);
 	TUint nb = iHashTable[0].nBuckets;
 	TUint probe = h%nb;
 	Elf32_Sword * bucket = ELFADDR(Elf32_Sword, iHashTable, sizeof(Elf32_HashTable));
@@ -271,7 +236,7 @@ Elf32_Word ELFFile::ELFDllData::FindSymbolIndex(TText * s)
 
 	do 	
 			{
-			if (!strcmp(ELFADDR(char, iDynStrTab, iDynSymTab[idx].st_name), (char *)s)) return idx;
+			if (!strcmp(ELFADDR(char, iDynStrTab, iDynSymTab[idx].st_name), s)) return idx;
 			idx = chain[idx];
 			} while (idx > 0);
 	if (idx == 0) idx = -1;
@@ -280,12 +245,10 @@ Elf32_Word ELFFile::ELFDllData::FindSymbolIndex(TText * s)
 
 TBool ELFFile::ELFDllData::InitExportInfo()
 	{
-	memset(&iSymInfoHdr, 0, sizeof(iSymInfoHdr));
-	TText * exp = (TText *)EXPORTTABLENAME;
-	if ( int(iExportTableSymIdx = FindSymbolIndex(exp)) != -1 )
-			{
-			TText * exps = (TText *)EXPORTTABLESIZENAME;
-			iExportTableSizeSymIdx = FindSymbolIndex(exps);
+	memset(&iSymInfoHdr, 0, sizeof(iSymInfoHdr)); 
+	if ((iExportTableSymIdx = FindSymbolIndex(EXPORTTABLENAME)) != (Elf32_Word)-1)
+			{ 
+			iExportTableSizeSymIdx = FindSymbolIndex(EXPORTTABLESIZENAME);
 			//TUint offset = iDynSymTab[iExportTableSizeSymIdx].st_value - (TUint)code;
 			Elf32_Word * pNumberOfExports = iElfFile->CodePtrFromAddr(iDynSymTab[iExportTableSizeSymIdx].st_value);
 			iNumberOfExports = * pNumberOfExports;
@@ -380,6 +343,9 @@ char * ELFFile::ELFDllData::CreateImportSection(TInt &aSize)
 					if (!iElfFile->CodeSegmentP(segment))
 							{
 							Print(EPeError, "Import relocation does not refer to code segment.\n");
+							Print(EPeError, "Dll: %s\n", sym->iDll);
+							Print(EPeError, "Ordinal: %d\n", sym->iOrd);
+							Print(EPeError, "DLL name: %s\n", dll->iName);
 							aSize = 0;
 							return 0;
 							}
@@ -396,11 +362,18 @@ char * ELFFile::ELFDllData::CreateImportSection(TInt &aSize)
 					// but we won't.
 					TUint relocVal = *relocAddr;
 					TUint importOrdinal = sym->iOrd;
-					if (relocVal > 0xFFFF)
+					if (relocVal > 0xFFFF) {
 							Print(EPeError, "ELF relocation exceeds E32Image limit of 64K.\n");
-					if (importOrdinal > 0xFFFF)
+							Print(EPeError, "Dll: %s\n", sym->iDll);
+							Print(EPeError, "Ordinal: %d\n", sym->iOrd);
+							Print(EPeError, "DLL name: %s\n", dll->iName);
+					}
+					if (importOrdinal > 0xFFFF) {
 							Print(EPeError, "Import ordinal exceeds E32Image limit of 64K.\n");
-   
+							Print(EPeError, "Dll: %s\n", sym->iDll);
+							Print(EPeError, "Ordinal: %d\n", sym->iOrd);
+							Print(EPeError, "DLL name: %s\n", dll->iName);
+					}   
    					*rp = segOffset;
    			
    					// eek !! surgery on the code segment....
@@ -438,11 +411,12 @@ TBool ELFFile::ELFDllData::GetRelocs(Elf32_Rel **aCodeRelocs, Elf32_Rel **aDataR
 	TInt nrelocs = iRelSz/iRelEnt;
 
 	TInt SrcSegIdx = -1;
-
+	
+	TInt idx = 0;
 	TInt cidx = 0;
 	TInt didx = 0;
 
-	for (TInt idx = 0; idx < nrelocs; idx++)
+	for (idx = 0, cidx = 0, didx = 0; idx < nrelocs; idx++)
 	        {
 			Elf32_Rel * rel = &iRel[idx];
 
@@ -531,7 +505,7 @@ TBool ELFFile::ELFDllData::SetupSymbolValues()
 {
 	NamedExportSymbol *aSym, *aPrevSym;
 
-	if( int(iExportTableSymIdx) == -1 || int(iExportTableSizeSymIdx) == -1)
+	if( iExportTableSymIdx == (Elf32_Word)-1 || iExportTableSizeSymIdx == (Elf32_Word)-1)
 		return FALSE;
 
 	// Fetch the 'export table' symbol from the dynamic symbol table.

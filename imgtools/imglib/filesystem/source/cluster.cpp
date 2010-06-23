@@ -173,7 +173,7 @@ the sub sequent cluster numbers (where the data extends).
 */
 void CCluster::CreateMap(unsigned int aStartingClusterNumber,unsigned int aPairClusterNumber)
 {
-	iClustersPerEntry.insert(std::make_pair(aStartingClusterNumber,aPairClusterNumber));
+	iClustersPerEntry.insert(make_pair(aStartingClusterNumber,aPairClusterNumber));
 }
 
 /**

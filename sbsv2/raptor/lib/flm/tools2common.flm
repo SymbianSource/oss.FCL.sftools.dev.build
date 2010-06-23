@@ -1,4 +1,4 @@
-# Copyright (c) 2006-2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2006-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -18,17 +18,28 @@
 
 ## Input parameters
 
-OUTPUTPATH:=$(OUTPUTPATH)/$(TARGET)_$(TARGETTYPE)/tools2/$(VARIANTTYPE)$(TOOLPLATFORMDIR)
-
-ifeq ($(OSTYPE),cygwin)
+ifeq ($(filter win,$(HOSTPLATFORM)),win)
 CDEFS.TOOLS2:=$(CDEFS.WIN32) $(CDEFS)
 CFLAGS:=$(CFLAGS.WIN32) $(CFLAGS) $(OPTION_GCC)
 COMPILER_PATH:=$(COMPILER_PATH.WIN32)
+OUTPUTPATH:=$(OUTPUTPATH)/$(TARGET)_$(TARGETTYPE)/tools2/$(VARIANTTYPE)$(TOOLPLATFORMDIR)
 else
+ifneq ($(TOOLS2WIN32),)
+# Build win32 tools in Linux
+CDEFS.TOOLS2:=$(CDEFS.WIN32) $(CDEFS)
+CFLAGS:=$(CFLAGS.WIN32) $(CFLAGS) $(OPTION_GCC)
+COMPILER_PATH:=$(COMPILER_PATH.WIN32)
+OUTPUTPATH:=$(OUTPUTPATH)/$(TARGET)_$(TARGETTYPE)/tools2/$(VARIANTTYPE)
+else
+# Build linux tools in Linux
 CDEFS.TOOLS2:=$(CDEFS.LINUX) $(CDEFS)
 CFLAGS:=$(CFLAGS) $(OPTION_GCC)
 COMPILER_PATH=$(COMPILER_PATH.LINUX)
+OUTPUTPATH:=$(OUTPUTPATH)/$(TARGET)_$(TARGETTYPE)/tools2/$(VARIANTTYPE)$(TOOLPLATFORMDIR)
 endif
+endif
+
+
 CDEFS.TOOLS2:=$(call makemacrodef,$(OPT.D),$(CDEFS.TOOLS2))
 
 ## Locally used variables
@@ -75,16 +86,21 @@ $(eval DEPENDFILE:=$(wildcard $(DEPENDFILENAME)))
 $(compile2object_TARGET): $(1) $(if (DEPENDFILE),,EXPORT)
 	$(call startrule,compile2object,,$(1)) \
 	$(if $(COMPILER_PATH),COMPILER_PATH="$(COMPILER_PATH)",) \
-	$(COMPILER) $(CFLAGS) $(CDEFS.TOOLS2) -MD -MT"$$@" -MF"$(DEPENDFILENAME)" $(INCLUDES) $(OPT.O)"$$@" "$(1)" \
+	$(COMPILER) $(CFLAGS) $(CDEFS.TOOLS2) \
+	$(if $(NO_DEPEND_GENERATE),,-MD -MT"$$@" -MF"$(DEPENDFILENAME)") \
+	$(INCLUDES) $(OPT.O)"$$@" "$(1)" \
 	$(call endrule,compile2object)
 
-CLEANTARGETS:=$$(CLEANTARGETS) $(DEPENDFILENAME)
-ifneq "$(DEPENDFILE)" ""
-ifeq ($(NO_DEPEND_INCLUDE),)
-  ifeq "$(filter %CLEAN,$(call uppercase,$(MAKECMDGOALS)))" ""
-    -include $(DEPENDFILE)
-  endif
+ifeq ($(NO_DEPEND_GENERATE),)
+  CLEANTARGETS:=$$(CLEANTARGETS) $(DEPENDFILENAME)
 endif
+
+ifneq ($(DEPENDFILE),)
+  ifeq ($(NO_DEPEND_INCLUDE),)
+    ifeq ($(filter %CLEAN,$(call uppercase,$(MAKECMDGOALS))),)
+      -include $(DEPENDFILE)
+    endif
+  endif
 endif
 
 endef
@@ -99,9 +115,9 @@ $(foreach SRC,$(cFILES),$(eval $(call compile2object,$(SRC),c)))
 # make the output directories while reading makefile - some build engines prefer this
 $(call makepath,$(CREATABLEPATHS))
 
-## Clean up (using eval to avoid target specific variables)
-$(eval $(call GenerateStandardCleanTarget,$(TARGETS) $(OBJECTFILES),$(CREATABLEPATHS),))
-## WHAT target
-$(eval $(call whatmacro,$(RELEASEABLES),WHATTOOLS2))
+## Clean up
+$(call raptor_clean,$(CLEANTARGETS) $(OBJECTFILES))
+## for the --what option and the log file
+$(call raptor_release,$(RELEASABLES))
 
 ## The End

@@ -168,7 +168,7 @@ void CBytePairCompressedImage::AddPage(TUint16 aPageNum, TUint8 * aPageData, TUi
         if(aBPE != NULL)
             compressedSize = (TUint16) aBPE->Compress(iOutBuffer,aPageData,aPageSize);
         else {
-            CBytePair bpe(EFalse);
+            CBytePair bpe;
             compressedSize = (TUint16) bpe.Compress(iOutBuffer,aPageData,aPageSize);
         }
 	iPages[aPageNum].iSizeOfCompressedPageData = compressedSize;
@@ -267,7 +267,7 @@ int  CBytePairCompressedImage::GetPage(TUint16 aPageNum, TUint8 * aPageData, CBy
                 iPages[aPageNum].iSizeOfCompressedPageData, 
                 pakEnd );
         else {
-            CBytePair bpe(EFalse);
+            CBytePair bpe;
             uncompressedSize = (TUint16) bpe.Decompress( aPageData, 
                 MaxBlockSize, 
                 iPages[aPageNum].iCompressedPageData, 

@@ -19,10 +19,10 @@
 
 #define __REFERENCE_CAPABILITY_NAMES__
 
-#include <e32image.h>
-#include <h_utl.h>
+#include "e32image.h"
+#include "h_utl.h"
 #include <string.h>
-
+#include <e32def_private.h>
 void PriorityToStr(TProcessPriority aPri, char *aStr)
 	{
 
@@ -73,7 +73,7 @@ void nl()
 	Print(EAlways, "\n");
 	}
 
-void E32ImageFile::Dump(TText *aFileName,TInt aDumpFlags)
+void E32ImageFile::Dump(const char* aFileName,TInt aDumpFlags)
 	{
 	if (IsValid())
 		{
@@ -83,7 +83,7 @@ void E32ImageFile::Dump(TText *aFileName,TInt aDumpFlags)
 		}
 	else
 		Print(EAlways, "This is not an E32 image file (error %d).\n", iError);
-	}
+}
 
 void E32ImageFile::DumpHeader(TInt aDumpFlags)
 	{
@@ -383,7 +383,7 @@ void dump(TUint *aData, TInt aLength)
 			ccount++;
 			for (j=0; j<4; j++)
 				{
-				char c=*cp++;
+				unsigned char c=*cp++;
 				if (c<32 || c>127)
 					{
 					c = '.';

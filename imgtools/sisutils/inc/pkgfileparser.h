@@ -20,6 +20,9 @@
 #define __PKGFILEPARSER_H__
 
 #ifdef WIN32
+#ifdef _STLP_INTERNAL_WINDOWS_H
+#define __INTERLOCKED_DECLARED
+#endif
 #include <windows.h>
 #endif
 
@@ -61,8 +64,8 @@ typedef class PkgParser PKGPARSER, *PPKGPARSER;
 
 typedef union _tag_VARIANTVAL
 {
-	long dwNumber;					// numeric value, e.g. 100
-	wchar_t pszString[MAX_STRING];	// string value, e.g. "crystal"
+	TInt32 iNumber;					// numeric value, e.g. 100
+	char iString[MAX_STRING];	// string value, e.g. "crystal"
 }VARIANTVAL;
 
 //Data structures to store the pkg file contents
@@ -76,9 +79,9 @@ Structure to store the language details
 */
 typedef struct _tag_LangList
 {
-	String langName;  // Language Name
-	unsigned long langCode; // Language code
-	unsigned long dialectCode; // Dialect code
+	string iLangName;  // Language Name
+	TUint32 iLangCode; // Language code
+	TUint32 iDialectCode; // Dialect code
 }LANG_LIST, *PLANG_LIST;
 
 /**
@@ -86,12 +89,12 @@ Structure to store the package file header details
 */
 typedef struct _tag_Pkgheader
 {
-	std::list<String> pkgNameList;
-	unsigned long pkgUid;
-	int vMajor;
-	int vMinor;
-	int vBuild;
-	String pkgType;
+	list<string> iPkgNames;
+	TUint32 iPkgUID;
+	TInt iMajorVersion;
+	TInt iMinorVersion;
+	TInt iBuildVersion;
+	string iPkgType;
 }PKG_HEADER, *PPKG_HEADER;
 
 /**
@@ -99,10 +102,10 @@ Structure to store the installable file list
 */
 typedef struct _tag_InstallFileList
 {
-	int langDepFlg;
-	int pkgFlg;
-	std::list<String> srcFiles;
-	String destFile;
+	TInt iLangDepFlag;
+	TInt iPkgFlag;
+	list<string> iSourceFiles;
+	string iDestFile;
 }INSTALLFILE_LIST, *PINSTALLFILE_LIST;
 
 /**
@@ -110,14 +113,14 @@ Structure to store the package body details
 */
 typedef struct _tag_CmdBlock
 {
-	CMD_TYPE cmdType; // Command type
-	String cmdExpression; // Expression
+	CMD_TYPE iCmdType; // Command type
+	string iCmdExpr; // Expression
 	PINSTALLFILE_LIST iInstallFileList; // Installable file details
 }CMD_BLOCK, *PCMD_BLOCK;
 
-typedef std::list<PLANG_LIST> LANGUAGE_LIST;
-typedef std::list<String> SISFILE_LIST, FILE_LIST;
-typedef std::list<PCMD_BLOCK> CMDBLOCK_LIST;
+typedef list<PLANG_LIST> LANGUAGE_LIST;
+typedef list<string> SISFILE_LIST, FILE_LIST;
+typedef list<PCMD_BLOCK> CMDBLOCK_LIST;
 
 /** 
 class PkgParser
@@ -129,7 +132,7 @@ class PkgParser
 class PkgParser
 {
 public:
-	PkgParser(String aFile);
+	PkgParser(const string& aFile);
 	~PkgParser();
 
 	void ParsePkgFile();
@@ -138,16 +141,17 @@ public:
 	void GetLanguageList(LANGUAGE_LIST& langList);
 	void GetHeader(PKG_HEADER& pkgHeader);
 	void GetCommandList(CMDBLOCK_LIST& cmdList);
-	String GetPkgFileName()
-	{
-		return iPkgFile;
+	const char* GetPkgFileName(){
+		return iPkgFileName.c_str();
 	}
 
 private:
-	int OpenFile();
-	void DeleteAll();
-
-	HANDLE iPkgHandle;
+	bool OpenFile();
+	void DeleteAll(); 
+	
+	const char* iPkgFileContent ;
+	TUint iContentPos ;
+	string iContentStr  ;
 
 	LANGUAGE_LIST iLangList;
 	PKG_HEADER iPkgHeader;
@@ -155,29 +159,36 @@ private:
 	FILE_LIST iInstallOptions;
 	CMDBLOCK_LIST iPkgBlock;
 
-	String iPkgFile;
+	string iPkgFileName;
 
 	//Parser Methods
-	void AddLanguage(String aLang, unsigned long aCode, unsigned long aDialect);
-	void GetNextChar();
+	void AddLanguage(const string& aLang, TUint32 aCode, TUint32 aDialect);
+	 
+	void GetNextChar() ;
+	inline char GetCurChar() const {
+		return iPkgFileContent[iContentPos] ;
+	}
 	void GetNextToken();
 	bool GetStringToken();
-	WORD ParseEscapeChars();
+	TUint16 ParseEscapeChars();
 	void GetAlphaNumericToken();
 	bool IsNumericToken();
 	void GetNumericToken();
 	void ParseEmbeddedBlockL ();
 	void ParseCommentL();
-	void ExpectToken(int aToken);
+	inline void ExpectToken(TInt aToken) { 
+		if (iToken!=aToken) 
+			ParserError("Unexpected Token"); 
+	}
 	void ParseHeaderL();
 	void ParseLanguagesL();
 	void ParseFileL();
 	void ParsePackageL();
 	void ParseIfBlockL();
-	void ParseLogicalOp(String& aExpression);
-	void ParseRelation(String& aExpression);
-	void ParseUnary(String& aExpression);
-	void ParseFactor(String& aExpression);
+	void ParseLogicalOp(string& aExpression);
+	void ParseRelation(string& aExpression);
+	void ParseUnary(string& aExpression);
+	void ParseFactor(string& aExpression);
 	void ParseOptionsBlockL();
 	void ParsePropertyL();
 	void ParseVendorNameL();
@@ -187,18 +198,13 @@ private:
 	void ParseVendorUniqueNameL();
 	void ParseTargetDeviceL();
 
-	//Parser Attributes
-	wchar_t m_pkgChar;
-	int m_token;
-	VARIANTVAL m_tokenValue;
-	int m_nLineNo;
+	//Parser Attributes 
+	TInt iToken;
+	VARIANTVAL iTokenVal;
+	TInt iLineNumber;
 
-	void ParserError(char* msg);
-
-	friend String wstring2string (const std::wstring& aWide);
-	friend std::wstring string2wstring (const String& aNarrow);
-	friend int CompareTwoString(wchar_t* string ,wchar_t* option);
-	friend int CompareNString(wchar_t* string ,wchar_t* option, int len);
+	void ParserError(const char* aMsg);
+ 
 };
-
+ 
 #endif //__PKGFILEPARSER_H__

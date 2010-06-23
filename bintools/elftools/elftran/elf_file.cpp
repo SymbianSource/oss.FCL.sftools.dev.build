@@ -20,58 +20,48 @@
 #include <e32def.h>
 #include <e32std.h>
 #include "elftran.h"
-#include <elfdefs.h>
+#include "elfdefs.h"
 #include "elffile.h"
 #include "elfdll.h"
-#include <h_utl.h>
+#include "h_utl.h"
 #include <string.h>
 #include <stdlib.h>
 
 TBool hadText, hadReloc = EFalse;
 
 ELFFile::ELFFile() 
-    :
-    iHeapCommittedSize(0x1000),
-    iHeapReservedSize(0x100000),
-    iStackCommittedSize(0),
-
-    iFileName(0),
-    iFileHandle(-1),
-    iElfFile(0),
-
-    iDynamicSegmentHdr(0),
-    iDynamicSegmentIdx(0),
-
-    iCodeSegmentHdr(0),
-    iCodeSegmentIdx(0),
-
-    iDataSegmentHdr(0),
-    iDataSegmentIdx(0),
-
-    iDllData(0),
-    iCpu(ECpuUnknown)
-    {}
-
-
-
+    :	iHeapCommittedSize(0x1000), iHeapReservedSize(0x100000), iStackCommittedSize(0),
+		iFileName(0), iFileHandle(-1) , iElfFile(0), 
+  	iDynamicSegmentHdr(0), iDynamicSegmentIdx(0),
+		iCodeSegmentHdr(0), iCodeSegmentIdx(0), 
+		iDataSegmentHdr(0), iDataSegmentIdx(0),
+  	iDllData(0), iCpu(ECpuUnknown)
+  	{}
 
 ELFFile::~ELFFile()
+  //
+  // Destructor
+  //
 	{
-	delete [] iFileName;
+	if(iFileName)
+		delete [] iFileName;
 	delete iElfFile;
 	delete iDllData;
 	}
 
 
-TBool ELFFile::Init(const TText * const aFileName)
+TBool ELFFile::Init(const char* aFileName)
 //
 // Read the ELF file into memory
 //
  	{
-
- 	delete [] iFileName;	
-	iFileName = new TText[strlen((const char *)aFileName)+1];
-	strcpy ((char *)iFileName, (const char *)aFileName);
+	if(iFileName){
+		delete [] iFileName;	
+		iFileName = 0;
+	}
+	size_t length = strlen(aFileName) + 1 ;
+	iFileName = new char[length];
+	memcpy (iFileName, aFileName,length);
 
 	TInt error = HFile::Open(iFileName, &iFileHandle);
 	if (error!=0)
@@ -457,7 +447,7 @@ TBool ELFFile::IsValidFileHeader(Elf32_Ehdr * iElfFile)
 
 // The following static functions are passed an array of PE files to operate on
 
-Elf32_Sym * ELFFile::FindSymbol(const TText *aName)
+Elf32_Sym * ELFFile::FindSymbol(const char* aName)
     {
 	Elf32_Shdr * s = ELFADDR(Elf32_Shdr, iElfFile, iElfFile->e_shoff);	
 	TInt symIdx = iSymIdx;
@@ -472,21 +462,18 @@ Elf32_Sym * ELFFile::FindSymbol(const TText *aName)
 	return (Elf32_Sym *)0;
     }
 
-TBool ELFFile::SymbolPresent(TText *aName)
+TBool ELFFile::SymbolPresent(const char* aName)
     {
 	return (FindSymbol(aName) != 0);
     }
 
 TBool ELFFile::GetExceptionIndexInfo(TUint32 &aOffset)
     {
-    const TText * aBase = (TText *)".ARM.exidx$$Base";
-    const TText * aLimit = (TText *)".ARM.exidx$$Limit";
-	Elf32_Sym * exidxBase = FindSymbol(aBase);
-	Elf32_Sym * exidxLimit = FindSymbol(aLimit);
+	Elf32_Sym * exidxBase = FindSymbol(".ARM.exidx$$Base");
+	Elf32_Sym * exidxLimit = FindSymbol(".ARM.exidx$$Limit");
 	if (exidxBase && exidxLimit && (exidxLimit->st_value - exidxBase->st_value)) 
 	    {
-		const TText * aExceptionDescriptor = (TText *)"Symbian$$CPP$$Exception$$Descriptor";
-		Elf32_Sym * aED = FindSymbol(aExceptionDescriptor);
+		Elf32_Sym * aED = FindSymbol("Symbian$$CPP$$Exception$$Descriptor");
 		if (aED) 
 			{
 			// Set bottom bit so 0 in header slot means an old binary.

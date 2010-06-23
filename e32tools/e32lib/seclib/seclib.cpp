@@ -18,7 +18,7 @@
 
 #include <e32cmn.h>
 #include <e32ldr.h>
-#include <seclib.h>
+#include "seclib.h"
 
 #include "e32image.h"
 #include "h_utl.h"

@@ -21,5 +21,8 @@ targettype		lib
 sourcepath	../filesystem/source
 source			cluster.cpp directory.cpp dirregion.cpp errorhandler.cpp fat16bootsector.cpp fat16filesystem.cpp fat32bootsector.cpp fat32filesystem.cpp fatbasebootsector.cpp filesysteminterface.cpp longentry.cpp longname.cpp messagehandler.cpp messageimplementation.cpp filesystemclass.cpp
 userinclude	../filesystem/include
+userinclude	../inc
+
+OS_LAYER_SYSTEMINCLUDE_SYMBIAN
 
 option GCC -O2 -Wno-uninitialized

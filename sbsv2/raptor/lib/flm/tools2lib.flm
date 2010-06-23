@@ -19,7 +19,7 @@
 LIBTARGET:=$(RELEASEPATH)/$(TARGET).a
 
 ## Target groups
-RELEASEABLES:=$(LIBTARGET)
+RELEASABLES:=$(LIBTARGET)
 TARGETS:=$(LIBTARGET)
 
 ## Common build steps (compiling)

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2008-2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2008-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -105,7 +105,7 @@ class FilterTerminal(filter_interface.Filter):
 
 	attribute_re = re.compile("([a-z][a-z0-9]*)='([^']*)'",re.I)
 	maxdots = 40 # if one prints dots then don't print masses
-	recipelinelimit = 200 # don't scan ultra-long recipes in case we run out of memory
+	recipelinelimit = 1024 # don't scan ultra-long recipes in case we run out of memory
 
 	# recipes that we think most users are interested in
 	# and the mapping that we will use to output them as
@@ -113,6 +113,7 @@ class FilterTerminal(filter_interface.Filter):
 		"asmcompile" : "asmcompile" ,
 		"compile" : "compile" ,
 		"postlink" : "target",
+		"linkandpostlink" : "target",
 		"resourcecompile" : "resource",
 		"genstringtable" : "strtable",
 		"tem" : "tem",
@@ -160,7 +161,7 @@ class FilterTerminal(filter_interface.Filter):
 
 		# list of strings to catch recipe warnings (must be lowercase)
 		self.recipe_warning_expr = ["warning:"]
-
+		
 	def isMakeWarning(self, text):
                 """A simple test for warnings.
                 Can be extended do to more comprehensive checking."""
@@ -200,6 +201,9 @@ class FilterTerminal(filter_interface.Filter):
 		if self.raptor.quiet:
 			self.quiet = True
 		
+		# the build configurations which were reported
+		self.built_configs = []
+		
 		# keep count of errors and warnings
 		self.err_count = 0
 		self.warn_count = 0
@@ -229,6 +233,8 @@ class FilterTerminal(filter_interface.Filter):
 			# detect the status report from a recipe
 			if text.find('failed') != -1:
 				self.failed = True
+				if text.find("reason='timeout'") != -1:
+					self.timedout = True
 			else:
 				self.failed = False
 			return
@@ -281,7 +287,9 @@ class FilterTerminal(filter_interface.Filter):
 
 			# This variable holds all recipe information
 			self.failed = False # Recipe status
+			self.timedout = False # Did it Timeout?
 			self.recipeBody = []
+			self.recipelineExceeded = 0
 			return		
 		elif text.startswith("</recipe>"):
 			# detect the end of a recipe
@@ -296,22 +304,36 @@ class FilterTerminal(filter_interface.Filter):
 				
 				if self.failed == True:
 					if not self.analyseonly:
-						sys.stderr.write("\n FAILED %s for %s: %s\n" % \
+						reason=""
+						if self.timedout:
+							reason="(timeout)"
+
+						sys.stderr.write("\n FAILED %s %s for %s: %s\n" % \
 								(self.recipe_dict['name'],
+								reason,
 								self.recipe_dict['config'],
 								self.recipe_dict['name_to_user']))
 	
 						mmppath = generic_path.Path(self.recipe_dict['mmp']).From(generic_path.CurrentDir()).GetShellPath()
-						sys.stderr.write("  mmp: %s\n" % mmppath)
-						for L in self.recipeBody:
-							if not L.startswith('+'):
-								sys.stdout.write("   %s\n" % L.rstrip())
+						if mmppath is not "":
+							sys.stderr.write("  mmp: %s\n" % mmppath)
+						if self.timedout:
+							sys.stderr.write( \
+"""    Timeouts may be due to network related issues (e.g. license servers),
+    tool bugs or abnormally large components. TALON_TIMEOUT can be adjusted 
+    in the make engine configuration if required.  Make engines may have 
+    their own timeouts that Raptor cannot influence
+""")
+						else:
+							for L in self.recipeBody:
+								if not L.startswith('+'):
+									sys.stdout.write("   %s\n" % L.rstrip())
 					self.err_count += 1
 				else:
 					r = Recipe.factory(self.recipe_dict['name'], "".join(self.recipeBody))
 					warnings = r.warnings()
 					info = r.info()
-					if len(warnings) > 0:
+					if len(warnings) or len(info):
 						if not self.analyseonly:
 							for L in self.recipeBody:
 								if not L.startswith('+'):
@@ -336,6 +358,11 @@ class FilterTerminal(filter_interface.Filter):
 		elif text.startswith("]]>"):
 			if self.inRecipe:
 				self.inBody = False
+				if self.recipelineExceeded > 0:
+					self.recipeBody.append("[filter_terminal: OUTPUT TRUNCATED: " + \
+						"Recipe output limit exceeded; see logfile for full output " + \
+						"(%s lines shown out of %s)]" % (FilterTerminal.recipelinelimit, \
+						FilterTerminal.recipelinelimit + self.recipelineExceeded))
 		elif text.startswith("<info>Copied"):
 			if not self.analyseonly and not self.quiet:
 				start = text.find(" to ") + 4
@@ -365,8 +392,13 @@ class FilterTerminal(filter_interface.Filter):
 			# we have to keep the output until we find out
 			# if the recipe failed. But not all of it if it turns
 			# out to be very long
-			if len(self.recipeBody) < FilterTerminal.recipelinelimit:
+			if len(self.recipeBody) <= FilterTerminal.recipelinelimit:
 				self.recipeBody.append(text)
+			else:
+				self.recipelineExceeded += 1
+		elif text.startswith("<info>Buildable configuration '"):
+			# <info>Buildable configuration 'name'</info>
+			self.built_configs.append(text[30:-8])
 
 	def logit(self):
 		""" log a message """
@@ -405,11 +437,14 @@ class FilterTerminal(filter_interface.Filter):
 		if self.warn_count > 0 or self.err_count > 0:
 			sys.stdout.write("\n%s : warnings: %s\n" % (raptor.name,
 					self.warn_count))
-			sys.stdout.write("%s : errors: %s\n" % (raptor.name,
+			sys.stdout.write("%s : errors: %s\n\n" % (raptor.name,
 					self.err_count))
 		else:
-			sys.stdout.write("\nno warnings or errors\n")
+			sys.stdout.write("\nno warnings or errors\n\n")
 
+		for bc in self.built_configs:
+			sys.stdout.write("built " + bc + "\n")
+			
 		sys.stdout.write("\nRun time %d seconds\n" % self.raptor.runtime);
 		sys.stdout.write("\n")
 		return True

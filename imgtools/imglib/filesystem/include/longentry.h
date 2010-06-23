@@ -39,12 +39,12 @@ class CLongEntry
 public:
 	char GetDirOrder() const;
 	void SetDirOrder(char aDirOrder);
-	String& GetSubName1();
-	void SetSubName1(String aSubName1);
-	String& GetSubName2();
-	void SetSubName2(String aSubName2);
-	String& GetSubName3();
-	void SetSubName3(String aSubName3);
+	string& GetSubName1();
+	void SetSubName1(string aSubName1);
+	string& GetSubName2();
+	void SetSubName2(string aSubName2);
+	string& GetSubName3();
+	void SetSubName3(string aSubName3);
 	char GetAttribute() const;
 	char GetCheckSum() const;
 	char GetDirType() const;
@@ -52,16 +52,16 @@ public:
 
 private:
 	char iDirOrder;		//Order of this entry in the sequence of long directory entries
-	String iSubName1;	//character 1-5 of long name sub component
+	string iSubName1;	//character 1-5 of long name sub component
 	char iAttribute;	//LONG_FILE_NAME attribute
 	char iDirType;		//zero to mention subcomponent of directory entry
 	char iCheckSum;		//Check sum of Short directory entry name
-	String iSubName2;	//character 6-11 of long name sub component
+	string iSubName2;	//character 6-11 of long name sub component
 	/* Low of cluster number, must be zero for existing disk utility compatible 
 	 * reason
 	 */
 	unsigned short int iFirstClusterNumberLow;
-	String iSubName3;	//character 12-13 of long name sub component
+	string iSubName3;	//character 12-13 of long name sub component
 
 public:
 	CLongEntry(char aChckSum);

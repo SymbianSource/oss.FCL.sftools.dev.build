@@ -446,7 +446,7 @@ sub getdeps
 	{
 		if (is_oby_statement($line))
 		{
-			if ($line =~ /\\$hw_base_name/i)
+			if ($line =~ /[\/\\]$hw_base_name/i)
 			{
 				$line =~ /\s*=\s*(\S+)\s*/;
 				$comp = $1;

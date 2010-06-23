@@ -41,10 +41,10 @@ class ErrorHandler
 		virtual ~ErrorHandler();
 		void Report();
 
-		String iMessage;
+		string iMessage;
 		int iMessageIndex;
-		String iSubMessage;
-        String iFileName;
+		string iSubMessage;
+        string iFileName;
         int iLineNumber;
 };
 

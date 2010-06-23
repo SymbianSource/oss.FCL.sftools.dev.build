@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -28,18 +28,21 @@ DOPOSTLINK:=1
 # Determine what kind of entrypoint option to set
 LINKER_STUB_LIBRARY:=
 LINKER_ENTRYPOINT_LIBDEP:=$(STATIC_RUNTIME_DIR)/eexe.lib
-LINKER_ENTRYPOINT_SETTING:=$(LINKER_ENTRY_OPTION) _E32Startup $(LINKER_ENTRYPOINT_DECORATION) $(call dblquote,$(STATIC_RUNTIME_DIR)/eexe.lib$(LINKER_ENTRYPOINT_ADORNMENT))
+LINKER_ENTRYPOINT_SETTING:=$(LINKER_ENTRY_OPTION)=_E32Startup $(LINKER_ENTRYPOINT_DECORATION)$(LINKER_SEPARATOR)$(call dblquote,$(STATIC_RUNTIME_DIR)/eexe.lib$(LINKER_ENTRYPOINT_ADORNMENT))
 DEFAULT_NEWLIB:=$(DEFAULT_STDCPP_NEWLIB)
 
 ifeq ("$(NEED_ENTRYPOINT_LIBRARY)","True")
 LINKER_ENTRYPOINT_SETTING:=$(LINKER_ENTRYPOINT_SETTING) $(LINKER_ENTRYPOINT_LIBDEP)
 endif
 
-STATIC_RUNTIME_LIB:=$(USER_STATIC_RUNTIME_LIB)
+ifeq ($(EPOCNESTEDEXCEPTIONS),)
+  STATIC_RUNTIME_LIB:=$(USER_STATIC_RUNTIME_LIB)
+else
+  STATIC_RUNTIME_LIB:=$(USER_STATIC_RUNTIME_LIB_NESTED_EXCEPTIONS)
+endif
+
 NAMEDSYMLKUP:=1
 LIBRARY:=$(LIBRARY) euser.dso
-
-MAKEDEFFILE:=
 
 $(call vsave,CDEFS SYSTEMINCLUDE STATICLIBRARY)
 

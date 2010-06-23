@@ -20,22 +20,17 @@
 #define __R_OBEY_H__
 
 #define __REFERENCE_CAPABILITY_NAMES__
-
-#if defined(__MSVCDOTNET__) || defined(__TOOLS2__)
+ 
+#include <e32capability.h>
+#include <vector>
+#include <map>
 #include <fstream>
-#else //!__MSVCDOTNET__
-#include <fstream.h>
-#endif //__MSVCDOTNET__
+using namespace std;
 
 #include "r_rom.h"
 #include "r_areaset.h"
-#include <e32capability.h>
-
-#ifdef _L
-#undef _L
-#endif
-
-#include <vector>
+ 
+ 
 
 const TUint32 KNumWords=16;
 //
@@ -44,9 +39,8 @@ const TInt KDefaultRomLinearBase=0x50000000;
 const TInt KDefaultRomAlign=0x1000;
 const TUint32 KDefaultDataRunAddress = 0x400000;
 //
-
-typedef std::string String;
-typedef std::vector<String> StringVector;
+typedef vector<string> StringVector ;
+ 
 
 enum EFileAttribute
 	{
@@ -183,11 +177,11 @@ struct FileAttributeKeyword
 	enum EFileAttribute iAttributeEnum;
 	const char* iHelpText;
 	};
-
+class CObeyFile;
 class ObeyFileReader
 	{
 public:
-	ObeyFileReader(TText *aFileName);
+	ObeyFileReader(const char* aFileName);
 	~ObeyFileReader();
 
 	static void KeywordHelp();
@@ -198,14 +192,13 @@ public:
 	void Rewind();
 
 	TInt NextLine(TInt aPass, enum EKeyword& aKeyword);
-	TInt NextAttribute(TInt& aIndex, TInt aHasFile, enum EFileAttribute& aKeyword, TText*& aArg);
+	TInt NextAttribute(TInt& aIndex, TInt aHasFile, enum EFileAttribute& aKeyword, char*& aArg);
 
-	void CopyWord(TInt aIndex, TText*& aString);				// allocate copy of nth word
-	TInt Count() { return iNumWords;}				// number of words on current line
-	char* Word(TInt aIndex) { return (char*)iWord[aIndex]; }	// return nth word as char*
-	TText* Text(TInt aIndex) { return iWord[aIndex]; }			// return nth word as TText*
-	char* Suffix() { return (char*)iSuffix; }			// return unmatched suffix of word[0]
-	TInt CurrentLine() { return iCurrentLine;}				// number of words on current line
+	char* DupWord(TInt aIndex) const ;				// allocate copy of nth word
+	TInt Count() const { return iNumWords;}				// number of words on current line
+	const char* Word(TInt aIndex) const  { return iWord[aIndex]; }	// return nth word as char* 
+	const char* Suffix() const { return iSuffix; }			// return unmatched suffix of word[0]
+	TInt CurrentLine() const { return iCurrentLine;}				// number of words on current line
 
 	TInt ProcessAlign(TInt& aAlign);
 	void ProcessLanguages(TInt64& aLanguageMask);
@@ -213,27 +206,27 @@ public:
 
 	static void TimeNow(TInt64& aTime);
 private:
-	TInt ReadAndParseLine();
-	TInt SetLineLengthBuffer();
+	TInt ReadAndParseLine(); 
 	TInt Parse();
-	inline TBool IsGap(char ch); 
+	inline static TBool IsGap(char ch) {
+		return (ch==' ' || ch=='=' || ch=='\t');
+	}
 
 	static const ObeyFileKeyword iKeywords[];
 	static const FileAttributeKeyword iAttributeKeywords[];
 	static TInt64 iTimeNow;
-
+protected:
+	string iFileName;	
 private:
-	FILE* iObeyFile;
-	long iMark;
-	TInt iMarkLine;
-	long iCurrentMark;
-	TInt iCurrentLine;
-	TInt imaxLength;
-	TText* iFileName;
-	TInt iNumWords;
-	TText* iWord[KNumWords];
-	TText* iSuffix;
-	TText* iLine;
+	TInt iCurrentLine; 
+	StringVector iLines ;
+	TInt iNumWords;	
+	char* iLine;
+	TInt iMarkLine ;
+	 
+	char iSuffix[80];
+	char* iWord[KNumWords];
+friend class CObeyFile;
 	};
 
 class CPatchDataProcessor;
@@ -242,12 +235,12 @@ class DllDataEntry;
 class CObeyFile
 	{
 public:
-	TText *iRomFileName;
-	TText *iRomOddFileName;
-	TText *iRomEvenFileName;
-	TText *iSRecordFileName;
-	TText *iBootFileName;
-	TText *iKernelRomName;
+	char* iRomFileName;
+	char* iRomOddFileName;
+	char* iRomEvenFileName;
+	char* iSRecordFileName;
+	char* iBootFileName;
+	char* iKernelRomName;
 	TInt iRomSize;
 	TUint32 iRomLinearBase;
 	TUint32 iRomAlign;
@@ -328,7 +321,8 @@ public:
 	void SetFirstDllDataEntry(DllDataEntry* aDllDataEntry);
 
 	int SkipToExtension();
-	TText* ProcessCoreImage();
+	char* ProcessCoreImage();
+	const char* GetFileName() const ;
 
 private:
 	TBool CheckHardwareVariants();
@@ -342,14 +336,14 @@ private:
 	TUint32 ParseVariant();
 	TBool GotKeyVariables();
 	TBool GotExtensionVariables(MRomImage*& aRom);
-	TBool GetNextBitOfFileName(TText **epocEndPtr);
-	TText *IsValidFilePath(TText *aPath);
+	TBool GetNextBitOfFileName(char*& epocEndPtr);
+	const char* IsValidFilePath(const char* aPath);
 	void AddFile(TRomBuilderEntry* aFile);
 
 	// Area-related methods
 	TBool CreateDefaultArea();
 	TBool ParseAreaKeyword();
-	TBool ParseAreaAttribute(const TText* aArg, TInt aLineNumber, const Area*& aArea);
+	TBool ParseAreaAttribute(const char* aArg, TInt aLineNumber, const Area*& aArea);
 	TBool AddAreaAndHandleError(const char* aName, TLinAddr aDestBaseAddr, TUint aLength, TInt aLineNumber = -1);
 
 public:
@@ -358,9 +352,10 @@ public:
 	};
 
 
-inline const AreaSet& CObeyFile::SetArea() const
-	{
+inline const AreaSet& CObeyFile::SetArea() const {
 	return iAreaSet;
-	}
-
+}
+inline const char* CObeyFile::GetFileName() const {
+	return iReader.iFileName.c_str();
+}
 #endif

@@ -22,11 +22,8 @@
 #include "e32image.h"
 #include <e32rom.h>
 
-#if defined(__MSVCDOTNET__) || defined(__TOOLS2__)
-#include <fstream>
-#else //!__MSVCDOTNET__
-#include <fstream.h>
-#endif //__MSVCDOTNET__
+ 
+#include <fstream> 
 #include <boost/thread/thread.hpp>
 #include <boost/thread/mutex.hpp>
 #include <queue>
@@ -128,9 +125,9 @@ private:
 class TRomLoad
 	{
 public:
-	TText name[KRomNameSize];
-	TText versionStr[4];
-	TText buildNumStr[4];
+	char name[KRomNameSize];
+	char versionStr[4];
+	char buildNumStr[4];
 	TUint romSize;
 	TUint wrapSize;
 	};
@@ -296,23 +293,23 @@ class RomFileStructure;
 class TRomNode
 	{
 public:
-	TRomNode(const TText* aName, TRomBuilderEntry* aEntry=0);
-	TRomNode(const TText* aName, TRomNode* aNode);
+	TRomNode(const char* aName, TRomBuilderEntry* aEntry=0);
+	TRomNode(const char* aName, TRomNode* aNode);
 private:
 	TRomNode(const TRomNode& aNode);
 public:
 	~TRomNode();
 	void Destroy();
 
-	TInt SetAtt(TText *anAttWord);
-	TInt NameCpy(char* aDest); // returns the length of aDest (in UTF-16 characters for Unicode, not bytes)
+	TInt SetAtt(const char* anAttWord);
+	//TInt NameCpy(const char* aDest); // returns the length of aDest (in UTF-16 characters for Unicode, not bytes)
 	TInt SetBareName();
 
-	TRomNode* NewSubDir(const TText* aName);
+	TRomNode* NewSubDir(const char* aName);
 	void AddFile(TRomNode *aChild);
-	TInt Rename(TRomNode *aOldParent, TRomNode* aNewParent, TText* aNewName);
-	TRomNode* FindInDirectory(const TText* aName);
-	TRomNode* FindInDirectory(const TText* aName, THardwareVariant aVariant , TBool aPatchDataFlag=FALSE);
+	TInt Rename(TRomNode *aOldParent, TRomNode* aNewParent, const char* aNewName);
+	TRomNode* FindInDirectory(const char* aName);
+	TRomNode* FindInDirectory(const char* aName, THardwareVariant aVariant , TBool aPatchDataFlag=FALSE);
 
 	TRomEntry* RomEntry() const {return iRomFile->RomEntry();}
 	void Finalise(TInt aSize);
@@ -327,7 +324,7 @@ public:
 	TRomNode* CopyDirectory(TRomNode*& aLastExecutable, TRomNode* aParent);
 	TInt Alias(TRomNode* aNode, TRomNode*& aLastExecutable);
 public:
-	char* BareName() const;
+	const char* BareName() const;
 	TUint32 Uid3() const;
 	TUint32 ModuleVersion() const;
 	THardwareVariant HardwareVariant() const;
@@ -351,7 +348,7 @@ protected:
 
 public:
 	TRomFile* iRomFile;
-	TText* iName;
+	char* iName;
 	char* iBareName;		// name including extension but without UID or version
 	TUint8 iAtt;
 	TBool iHidden;
@@ -362,23 +359,24 @@ class Area;
 class TRomBuilderEntry : public E32ImageFile
 	{
 public:
-	TRomBuilderEntry(const char *aFileName, TText *aName);
+	TRomBuilderEntry(const char *aFileName, const char* aName);
 	~TRomBuilderEntry();
-	TInt SetCodeAlignment(TText *aStr);
-	TInt SetDataAlignment(TText *aStr);
-	TInt SetRelocationAddress(TText *aStr);
-	TInt SetStackReserve(TText *aStr);
-	TInt SetStackSize(TText *aStr);
-	TInt SetHeapSizeMin(TText *aStr);
-	TInt SetHeapSizeMax(TText *aStr);
-	TInt SetCapability(TText *aStr);
-	TInt SetUid1(TText *aStr);
-	TInt SetUid2(TText *aStr);
-	TInt SetUid3(TText *aStr);
+	TInt SetCodeAlignment(const char* aStr);
+	TInt SetDataAlignment(const char* aStr);
+	TInt SetRelocationAddress(const char* aStr);
+	TInt SetStackReserve(const char* aStr);
+	TInt SetStackSize(const char* aStr);
+	TInt SetHeapSizeMin(const char* aStr);
+	TInt SetHeapSizeMax(const char* aStr);
+	TInt SetCapability(const char* aStr);
+	TInt SetUid1(const char* aStr);
+	TInt SetUid2(const char* aStr);
+	TInt SetUid3(const char* aStr);
 	TInt SetCallEntryPoint(TBool aState);
-	TInt SetPriority(TText *aStr);
-	TInt SetAttachProcess(TText *aStr);
+	TInt SetPriority(const char* aStr);
+	TInt SetAttachProcess(const char* aStr);
 	TInt OpenImageFile();
+	TInt GetImageFileInfo(TInt aResult);
 	TInt SizeInRom();
 	void SizeInSections(TInt& aSize1, TInt& aSize2);
 	void LoadToRom();
@@ -410,7 +408,7 @@ private:
 	const TRomBuilderEntry& operator=(const TRomBuilderEntry &);
 	void Relocate();
 public:
-	TText *iName;
+	char *iName;
 	TBool iResource;
 	TBool iNonXIP;
 	TBool iPreferred;
@@ -455,7 +453,7 @@ public:
 	TRomBuilderEntry* iNextInArea;
 
 	TUint32 iRomImageFlags;
-	TText* iProcessName;
+	char* iProcessName;
 
 	// Used by the collapse routines
 	TInt iImportCount;
@@ -491,17 +489,18 @@ private:
 class CObeyFile;
 class Area;
 class Memmap;
+class SymbolGenerator;
 class E32Rom : public MRomImage
 	{
 public:
 	E32Rom(CObeyFile *aObey);
-	~E32Rom();
+	virtual ~E32Rom();
 	TInt Create();
 	TInt CreateExtension(MRomImage* aKernelRom);
 	TInt Align(TInt aVal);
 	void DisplaySizes(TPrintType aWhere);
 	TInt WriteImages(TInt aHeaderType);
-	TInt Compare(char* anImage, TInt aHeaderType);
+	TInt Compare(const char* aImage, TInt aHeaderType);
 	//
 	//
 	char *RomToActualAddress(TUint aPtr);
@@ -510,16 +509,16 @@ public:
 	TRomNode* FindImageFileByName(const TDllFindInfo& aInfo, TBool aPrintDiag, TBool& aFallBack);
 	TInt CheckForVersionConflicts(const TRomBuilderEntry* a);
 	TRomNode* CopyDirectory(TRomNode*& aLastExecutable);
-
-	TRomNode* RootDirectory();
-	TText* RomFileName();
-	TUint32 RomBase();
-	TUint32 RomSize();
-	TVersion Version();
-	TInt64 Time();
-	TUint32 CheckSum();
-	TUint32 DataRunAddress();
-	TUint32 RomAlign();
+	
+	TRomNode* RootDirectory() const ;
+	const char* RomFileName() const ;
+	TUint32 RomBase() const ;
+	TUint32 RomSize() const ;
+	TVersion Version() const ;
+	TInt64 Time() const ;
+	TUint32 CheckSum() const ;
+	TUint32 DataRunAddress() const ;
+	TUint32 RomAlign() const ;
 
 private:
 	void CalculateDataAddresses();
@@ -588,6 +587,7 @@ private:
 	TInt SetupPages();
 
 	Memmap *iImageMap;
+	SymbolGenerator* iSymGen;
 public:
 	char* iData;
 	TInt iSize;

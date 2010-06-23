@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -31,6 +31,7 @@ import raptor_xml
 import generic_path
 import subprocess
 import zipfile
+from xml.sax.saxutils import escape
 from mmpparser import *
 
 import time
@@ -232,6 +233,19 @@ def getPreProcessorCommentDetail (aPreProcessorComment):
 	return commentDetail
 
 
+def getSpecName(aFileRoot, fullPath=False):
+	"""Returns a build spec name: this is the file root (full path
+	or simple file name) made safe for use as a file name."""
+
+	if fullPath:
+		specName = str(aFileRoot).replace("/","_")
+		specName = specName.replace(":","")
+	else:
+		specName = aFileRoot.File()
+
+	return specName.lower()
+
+
 # Classes
 
 class MetaDataError(Exception):
@@ -284,9 +298,8 @@ class PreProcessor(raptor_utilities.ExternalTool):
 	def call(self, aArgs, sourcefilename):
 		""" Override call so that we can do our own error handling."""
 		tool = self._ExternalTool__Tool
+		commandline = tool + " " + aArgs + " " + str(sourcefilename)
 		try:
-			commandline = tool + " " + aArgs + " " + str(sourcefilename)
-
 			# the actual call differs between Windows and Unix
 			if raptor_utilities.getOSFileSystem() == "unix":
 				p = subprocess.Popen(commandline, \
@@ -332,7 +345,7 @@ class PreProcessor(raptor_utilities.ExternalTool):
 				raise MetaDataError("Errors in %s" % str(sourcefilename))
 
 		except Exception,e:
-			raise MetaDataError("Preprocessor exception: %s" % str(e))
+			raise MetaDataError("Preprocessor exception: '%s' : in command : '%s'" % (str(e), commandline))
 
 		return 0	# all OK
 
@@ -398,11 +411,13 @@ class MetaDataFile(object):
 	on the selected build platform.  This class provides a generic means of wrapping
 	up the preprocessing of such files."""
 
-	def __init__(self, aFilename, gnucpp, aRootLocation=None, log=None):
+	def __init__(self, aFilename, gnucpp, depfiles, aRootLocation=None, log=None):
 		"""
 		@param aFilename	An MMP, bld.inf or other preprocessable build spec file
 		@param aDefaultPlatform  Default preprocessed version of this file
 		@param aCPP 		location of GNU CPP
+		@param depfiles     	list to add dependency file tuples to
+		@param aRootLocation    where the file is 
 		@param log 		A class with Debug(<string>), Info(<string>) and Error(<string>) methods
 		"""
 		self.filename = aFilename
@@ -410,6 +425,7 @@ class MetaDataFile(object):
 		# Dictionary with key of build platform and a text string of processed output as values
 		self.__PreProcessedContent = {}
 		self.log = log
+		self.depfiles = depfiles
 
 		self.__gnucpp = gnucpp
 		if gnucpp is None:
@@ -436,7 +452,7 @@ class MetaDataFile(object):
 			else:
 				metatarget = "'$(PARSETARGET)'"
 			generateDepsOptions = "-MD -MF%s -MT%s" % (adepfilename, metatarget)
-			aBuildPlatform['METADEPS'].append((adepfilename, metatarget))
+			self.depfiles.append((adepfilename, metatarget))
 			try:
 				os.makedirs(os.path.dirname(adepfilename))
 			except Exception, e:
@@ -515,15 +531,17 @@ class MMPFile(MetaDataFile):
 	on the selected build platform.  This class provides a generic means of wrapping
 	up the preprocessing of such files."""
 
-	def __init__(self, aFilename, gnucpp, bldinf, log=None):
+	def __init__(self, aFilename, gnucpp, bldinf, depfiles, log=None):
 		"""
 		@param aFilename	An MMP, bld.inf or other preprocessable build spec file
 		@param gnucpp 		location of GNU CPP
-		@param bldinf   	the bldinf file that this mmp comes from
-		@param log 			A class with Debug(<string>), Info(<string>) and Error(<string>) methods
+		@param bldinf		the bld.inf file this mmp was specified in
+		@param depfiles         list to fill with mmp dependency files
+		@param log 		A class with Debug(<string>), Info(<string>) and Error(<string>) methods
 		"""
-		super(MMPFile, self).__init__(aFilename, gnucpp, str(bldinf.filename.Dir()), log)
+		super(MMPFile, self).__init__(aFilename, gnucpp, depfiles, str(bldinf.filename.Dir()),  log)
 		self.__bldinf = bldinf
+		self.depfiles = depfiles
 
 		self.__gnucpp = gnucpp
 		if gnucpp is None:
@@ -878,8 +896,8 @@ class MMPFileEntry(object):
 class BldInfFile(MetaDataFile):
 	"""Representation of a Symbian bld.inf file"""
 
-	def __init__(self, aFilename, gnucpp, log=None):
-		MetaDataFile.__init__(self, aFilename, gnucpp, None, log)
+	def __init__(self, aFilename, gnucpp, depfiles, log=None):
+		MetaDataFile.__init__(self, aFilename, gnucpp, depfiles, None, log)
 		self.__Raptor = log
 		self.testManual = 0
 		self.testAuto = 0
@@ -1053,9 +1071,12 @@ class BldInfFile(MetaDataFile):
 			if (re.search(r'^\s*START ',extensionLine, re.I)):
 				start = extensionLine
 			elif re.search(r'^\s*END\s*$',extensionLine, re.I):
-				extensionObjects.append(Extension(self.filename, start, options, aBuildPlatform, self.__Raptor))
-				start = ""
-				options = []
+				if start == "":
+					self.log.Error("unmatched END statement in %s section", aType, bldinf=str(self.filename))
+				else:
+					extensionObjects.append(Extension(self.filename, start, options, aBuildPlatform, self.__Raptor))
+					start = ""
+					options = []
 			elif re.search(r'^\s*$',extensionLine, re.I):
 				continue
 			elif start:
@@ -1194,7 +1215,9 @@ class MMPRaptorBackend(MMPBackend):
 		super(MMPRaptorBackend,self).__init__()
 		self.platformblock = None
 		self.__Raptor = aRaptor
-		self.BuildVariant = raptor_data.Variant()
+		self.__debug("-----+++++ %s " % aMmpfilename)
+		self.BuildVariant = raptor_data.Variant(name = "mmp")
+		self.ApplyVariants = []
 		self.ResourceVariants = []
 		self.BitmapVariants = []
 		self.StringTableVariants = []
@@ -1208,11 +1231,12 @@ class MMPRaptorBackend(MMPBackend):
 		self.__systeminclude = ""
 		self.__bitmapSourcepath = self.__sourcepath
 		self.__current_resource = ""
-		self.__capabilities = []
 		self.__resourceFiles = []
 		self.__pageConflict = []
 		self.__debuggable = ""
+		self.__compressionKeyword = ""
 		self.sources = []
+		self.capabilities = []
 
 		self.__TARGET = ""
 		self.__TARGETEXT = ""
@@ -1283,16 +1307,15 @@ class MMPRaptorBackend(MMPBackend):
 		elif varname == 'PAGED':
 			self.BuildVariant.AddOperation(raptor_data.Set(varname, "1"))
 			self.__debug( "Set switch PAGE ON")
+			# PAGED is equivalent to PAGEDCODE
 			self.BuildVariant.AddOperation(raptor_data.Set("PAGEDCODE_OPTION", "paged"))
 			self.__debug( "Set switch PAGEDCODE ON")
-			self.BuildVariant.AddOperation(raptor_data.Set("PAGEDDATA_OPTION", "paged"))
-			self.__debug( "Set data PAGEDDATA ON")
 			self.__pageConflict.append("PAGEDCODE")
-			self.__pageConflict.append("PAGEDDATA")
 
 		elif varname == 'UNPAGED':
 			self.BuildVariant.AddOperation(raptor_data.Set("PAGED", "0"))
 			self.__debug( "Set switch PAGED OFF")
+			# UNPAGED is equivalent to UNPAGEDCODE *and* UNPAGEDDATA
 			self.BuildVariant.AddOperation(raptor_data.Set("PAGEDCODE_OPTION", "unpaged"))
 			self.__debug( "Set switch PAGEDCODE OFF")
 			self.BuildVariant.AddOperation(raptor_data.Set("PAGEDDATA_OPTION", "unpaged"))
@@ -1314,6 +1337,7 @@ class MMPRaptorBackend(MMPBackend):
 			self.BuildVariant.AddOperation(raptor_data.Set("PAGEDCODE_OPTION", "unpaged"))
 			self.__debug( "Set switch " + varname + " ON")
 			self.__pageConflict.append(varname)
+			
 		elif varname == 'UNPAGEDDATA':
 			self.BuildVariant.AddOperation(raptor_data.Set("PAGEDDATA_OPTION", "unpaged"))
 			self.__debug( "Set switch " + varname + " ON")
@@ -1322,6 +1346,7 @@ class MMPRaptorBackend(MMPBackend):
 		elif varname == 'NOLINKTIMECODEGENERATION':
 			self.BuildVariant.AddOperation(raptor_data.Set("LTCG",""))
 			self.__debug( "Set switch " + varname + " OFF")
+			
 		elif varname == 'NOMULTIFILECOMPILATION':
 			self.BuildVariant.AddOperation(raptor_data.Set("MULTIFILE_ENABLED",""))
 			self.__debug( "Set switch " + varname + " OFF")
@@ -1331,13 +1356,19 @@ class MMPRaptorBackend(MMPBackend):
 				self.__debuggable = "udeb urel"
 			else:
 				self.__Raptor.Warn("DEBUGGABLE keyword ignored as DEBUGGABLE_UDEBONLY is already specified")
+		
 		elif varname == 'DEBUGGABLE_UDEBONLY':
 			if self.__debuggable != "":
 				self.__Raptor.Warn("DEBUGGABLE keyword has no effect as DEBUGGABLE or DEBUGGABLE_UDEBONLY is already set")
 			self.__debuggable = "udeb"
+		
 		elif varname == 'FEATUREVARIANT':
 			self.BuildVariant.AddOperation(raptor_data.Set(varname,"1"))
 			self.featureVariant = True
+		
+		elif varname in ['COMPRESSTARGET', 'NOCOMPRESSTARGET', 'INFLATECOMPRESSTARGET', 'BYTEPAIRCOMPRESSTARGET']:
+			self.resolveCompressionKeyword(varname)
+		
 		else:
 			self.__debug( "Set switch "+toks[0]+" ON")
 			self.BuildVariant.AddOperation(raptor_data.Set(prefix+varname, "1"))
@@ -1423,9 +1454,12 @@ class MMPRaptorBackend(MMPBackend):
 
 		elif varname=='CAPABILITY':
 			for cap in toks[1]:
-				self.BuildVariant.AddOperation(raptor_data.Append(varname,cap," "))
+				cap = cap.lower()
 				self.__debug("Setting  "+toks[0]+": " + cap)
-				self.__capabilities.append(cap.lower())
+				if not cap.startswith("-"):
+					if not cap.startswith("+"):
+						cap = "+" + cap	
+				self.capabilities.append(cap)
 		elif varname=='DEFFILE':
 			self.__defFileRoot = self.__currentMmpFile
 			self.deffile = toks[1]
@@ -1450,8 +1484,10 @@ class MMPRaptorBackend(MMPBackend):
 
 				# add in the minor number
 				minor = 0
-				if len(version) >  1:
+				if version[1] is not None:
 					minor = int(version[2],10)
+				else:
+					self.__Raptor.Warn("VERSION (%s) missing '.minor' in %s, using '.0'" % (toks[1],self.__currentMmpFile))
 
 				self.__versionhex = "%04x%04x" % (major, minor)
 				self.BuildVariant.AddOperation(raptor_data.Set(varname, "%d.%d" %(major, minor)))
@@ -1517,7 +1553,8 @@ class MMPRaptorBackend(MMPBackend):
 					toks1 = re.sub("[,'\[\]]", "", toks1).replace("//","/")
 				self.__debug("Set "+toks[0]+" to " + toks1)
 				self.BuildVariant.AddOperation(raptor_data.Set(varname,toks1))
-
+		elif varname=='APPLY':
+			self.ApplyVariants.append(toks[1])
 		else:
 			self.__debug("Set "+toks[0]+" to " + str(toks[1]))
 			self.BuildVariant.AddOperation(raptor_data.Set(varname,"".join(toks[1])))
@@ -1687,7 +1724,7 @@ class MMPRaptorBackend(MMPBackend):
 	def getDefaultResourceTargetPath(self, targettype):
 		# the different default TARGETPATH values should come from the
 		# configuration rather than being hard-coded here.
-		if targettype == "plugin":
+		if targettype in ["plugin", "plugin3"]:
 			return "resource/plugins"
 		if targettype == "pdl":
 			return "resource/printers"
@@ -1765,7 +1802,7 @@ class MMPRaptorBackend(MMPBackend):
 					replace = ""
 					if len(matches):
 						replace = matches.pop()
-					
+
 					searchReplacePairs.append('%s<->%s' % (search, replace))
 
 			# Replace spaces to maintain word-based grouping in downstream makefile lists
@@ -1884,7 +1921,7 @@ class MMPRaptorBackend(MMPBackend):
 		self.__currentLineNumber += 1
 		self.__debug("Start BITMAP "+toks[1])
 
-		self.__currentBitmapVariant = raptor_data.Variant(toks[1].replace('.','_'))
+		self.__currentBitmapVariant = raptor_data.Variant(name = toks[1].replace('.','_'))
 		# Use BMTARGET and BMTARGET_lower because that prevents
 		# confusion with the TARGET and TARGET_lower of our parent MMP
 		# when setting the OUTPUTPATH.  This in turn allows us to
@@ -1974,7 +2011,7 @@ class MMPRaptorBackend(MMPBackend):
 		self.__debug("stringtable: " + toks[1])
 		self.__debug("adjusted stringtable source=" + source)
 
-		self.__currentStringTableVariant = raptor_data.Variant(uniqname)
+		self.__currentStringTableVariant = raptor_data.Variant(name = uniqname)
 		self.__currentStringTableVariant.AddOperation(raptor_data.Set("SOURCE", source))
 		self.__currentStringTableVariant.AddOperation(raptor_data.Set("EXPORTPATH", ""))
 		self.__stringtableExported = False
@@ -2142,6 +2179,9 @@ class MMPRaptorBackend(MMPBackend):
 		self.BuildVariant.AddOperation(raptor_data.Set("DEFFILEKEYWORD", deffile_keyword))
 		self.__debug("Set DEFFILEKEYWORD to '%s'",deffile_keyword)
 
+		# If target type is "implib" it must have a def file
+		self.checkImplibDefFile(resolvedDefFile)
+
 		# if this target type has a default TARGETPATH other than "" for
 		# resources then we need to add that default to all resources which
 		# do not explicitly set the TARGETPATH themselves.
@@ -2167,16 +2207,20 @@ class MMPRaptorBackend(MMPBackend):
 			self.ResourceVariants[i].AddOperation(raptor_data.Set("MAIN_TARGET_lower", self.__TARGET.lower()))
 			self.ResourceVariants[i].AddOperation(raptor_data.Set("MAIN_REQUESTEDTARGETEXT", self.__TARGETEXT.lower()))
 
+		# Create Capability variable in one SET operation (more efficient than multiple appends)
+		
+		self.BuildVariant.AddOperation(raptor_data.Set("CAPABILITY","".join(self.capabilities)))
+
 		# Resolve combined capabilities as hex flags, for configurations that require them
 		capabilityFlag1 = 0
 		capabilityFlag2 = 0			# Always 0
 
-		for capability in self.__capabilities:
+		for capability in self.capabilities:
 			invert = 0
 
 			if capability.startswith('-'):
 				invert = 0xffffffff
-				capability = capability.lstrip('-')
+			capability = capability[1:]
 
 			if MMPRaptorBackend.supportedCapabilities.has_key(capability):
 				capabilityFlag1 = capabilityFlag1 ^ invert
@@ -2205,12 +2249,21 @@ class MMPRaptorBackend(MMPBackend):
 			for x in self.__pageConflict:
 				if x == "PAGEDCODE" or x == "UNPAGEDCODE":
 					self.__Raptor.Warn("Both PAGEDCODE and UNPAGEDCODE are specified. The last one %s will take effect" % x)
+					if x == "PAGEDCODE":
+						self.resolveCompressionKeyword("BYTEPAIRCOMPRESSTARGET")
 					break
+		elif "PAGEDCODE" in self.__pageConflict:
+			self.resolveCompressionKeyword("BYTEPAIRCOMPRESSTARGET")
+				
 		if "PAGEDDATA" in self.__pageConflict and "UNPAGEDDATA" in self.__pageConflict:
 			for x in self.__pageConflict:
 				if x == "PAGEDDATA" or x == "UNPAGEDDATA":
 					self.__Raptor.Warn("Both PAGEDDATA and UNPAGEDDATA are specified. The last one %s will take effect" % x)
+					if x == "PAGEDDATA":
+						self.resolveCompressionKeyword("BYTEPAIRCOMPRESSTARGET")
 					break
+		elif "PAGEDDATA" in self.__pageConflict:
+			self.resolveCompressionKeyword("BYTEPAIRCOMPRESSTARGET")
 
 		# Set Debuggable
 		self.BuildVariant.AddOperation(raptor_data.Set("DEBUGGABLE", self.__debuggable))
@@ -2228,6 +2281,27 @@ class MMPRaptorBackend(MMPBackend):
 	def getTargetType(self):
 		"""Target type in lower case - the standard format"""
 		return self.__targettype.lower()
+
+	def resolveCompressionKeyword(self, aCompressionKeyword):
+		"""If a compression keyword is set more than once either explicitly
+		or implicitly a warning is given and the last one takes effect 
+		"""
+		if self.__compressionKeyword and self.__compressionKeyword != aCompressionKeyword:
+			self.__Raptor.Warn("%s keyword in %s overrides earlier use of %s" % \
+						(aCompressionKeyword, self.__currentMmpFile, self.__compressionKeyword))
+			self.BuildVariant.AddOperation(raptor_data.Set(self.__compressionKeyword, ""))
+			self.__debug( "Set switch " + self.__compressionKeyword + " OFF")
+		self.BuildVariant.AddOperation(raptor_data.Set(aCompressionKeyword,"1"))
+		self.__debug( "Set switch " + aCompressionKeyword + " ON")
+		self.__compressionKeyword = aCompressionKeyword
+
+	def checkImplibDefFile(self, defFile):
+		"""Project with target type implib must have DEFFILE defined 
+		explicitly or implicitly, otherwise it is an error
+		""" 
+		if self.getTargetType() == 'implib' and defFile == '':
+			self.__Raptor.Error("No DEF File for IMPLIB target type in " + \
+							self.__currentMmpFile, bldinf=self.__bldInfFilename)
 
 	def resolveDefFile(self, aTARGET, aBuildPlatform):
 		"""Returns a fully resolved DEFFILE entry depending on .mmp file location and TARGET, DEFFILE and NOSTRICTDEF
@@ -2283,6 +2357,32 @@ class MMPRaptorBackend(MMPBackend):
 		return resolvedDefFile
 
 
+def CheckedGet(self, key, default = None):
+	"""extract a value from an self and raise an exception if None.
+
+	An optional default can be set to replace a None value.
+
+	This function belongs in the Evaluator class logically. But
+	Evaluator doesn't know how to raise a Metadata error. Since
+	being able to raise a metadata error is the whole point of
+	the method, it makes sense to adapt the Evaluator class from
+	raptor_meta for the use of everything inside raptor_meta.
+
+	... so it will be added to the Evaluator class.
+	"""
+
+	value = self.Get(key)
+	if value == None:
+		if default == None:
+			raise MetaDataError("configuration " + self.buildUnit.name +
+							    " has no variable " + key)
+		else:
+			return default
+	return value
+
+raptor_data.Evaluator.CheckedGet = CheckedGet 
+
+
 class MetaReader(object):
 	"""Entry point class for Symbian metadata processing.
 
@@ -2299,10 +2399,10 @@ class MetaReader(object):
 		# Get the version of CPP that we are using
 		metadata = self.__Raptor.cache.FindNamedVariant("meta")
 		evaluator = self.__Raptor.GetEvaluator(None, raptor_data.BuildUnit(metadata.name, [metadata]) )
-		self.__gnucpp = self.CheckValue(evaluator, "GNUCPP")
-		self.__defaultplatforms = self.CheckValue(evaluator, "DEFAULT_PLATFORMS")
-		self.__basedefaultplatforms = self.CheckValue(evaluator, "BASE_DEFAULT_PLATFORMS")
-		self.__baseuserdefaultplatforms = self.CheckValue(evaluator, "BASE_USER_DEFAULT_PLATFORMS")
+		self.__gnucpp = evaluator.CheckedGet("GNUCPP")
+		self.__defaultplatforms = evaluator.CheckedGet("DEFAULT_PLATFORMS")
+		self.__basedefaultplatforms = evaluator.CheckedGet("BASE_DEFAULT_PLATFORMS")
+		self.__baseuserdefaultplatforms = evaluator.CheckedGet("BASE_USER_DEFAULT_PLATFORMS")
 
 		# Only read each variant.cfg once
 		variantCfgs = {}
@@ -2320,25 +2420,36 @@ class MetaReader(object):
 		# "export platform" but several "build platforms" can be associated
 		# with the same "export platform".
 		exports = {}
+		
+		# We sort configurations by name here.  This is solely to deal with situations
+		# where macros linked to builds end up being used in preprocessor conditionals
+		# within bld.inf files that then wrap exports under PRJ_EXPORTS statements.
+		# Having exports that are conditional on these macros isn't supported, but
+		# as there are areas of the source base that make this assumption, and
+		# fail if emulator macros are used instead of arm ones, we ensure that arm
+		# configurations come first when multiple configurations are active, and so are
+		# used first for determining exports.
+		sortedConfigsToBuild = sorted(configsToBuild,key=lambda config: config.name)
 
-		for buildConfig in configsToBuild:
+		self.__Raptor.Debug("MetaReader: sortedConfigsToBuild:  %s", [b.name for b in sortedConfigsToBuild])
+		for buildConfig in sortedConfigsToBuild:
 			# get everything we need to know about the configuration
 			evaluator = self.__Raptor.GetEvaluator(None, buildConfig)
 
 			detail = {}
-			detail['PLATFORM'] = self.CheckValue(evaluator, "TRADITIONAL_PLATFORM")
-			epocroot = self.CheckValue(evaluator, "EPOCROOT")
+			detail['PLATFORM'] = evaluator.CheckedGet("TRADITIONAL_PLATFORM")
+			epocroot = evaluator.CheckedGet("EPOCROOT")
 			detail['EPOCROOT'] = generic_path.Path(epocroot)
 
-			sbs_build_dir = self.CheckValue(evaluator, "SBS_BUILD_DIR")
+			sbs_build_dir = evaluator.CheckedGet("SBS_BUILD_DIR")
 			detail['SBS_BUILD_DIR'] = generic_path.Path(sbs_build_dir)
-			flm_export_dir = self.CheckValue(evaluator, "FLM_EXPORT_DIR")
+			flm_export_dir = evaluator.CheckedGet("FLM_EXPORT_DIR")
 			detail['FLM_EXPORT_DIR'] = generic_path.Path(flm_export_dir)
 			detail['CACHEID'] = flm_export_dir
 			if raptor_utilities.getOSPlatform().startswith("win"):
-				detail['PLATMACROS'] = self.CheckValue(evaluator,"PLATMACROS.WINDOWS")
+				detail['PLATMACROS'] = evaluator.CheckedGet("PLATMACROS.WINDOWS")
 			else:
-				detail['PLATMACROS'] = self.CheckValue(evaluator,"PLATMACROS.LINUX")
+				detail['PLATMACROS'] = evaluator.CheckedGet("PLATMACROS.LINUX")
 
 			# Apply OS variant provided we are not ignoring this
 			if not self.__Raptor.ignoreOsDetection:
@@ -2350,11 +2461,11 @@ class MetaReader(object):
 			# is this a feature variant config or an ordinary variant
 			fv = evaluator.Get("FEATUREVARIANTNAME")
 			if fv:
-				variantHdr = self.CheckValue(evaluator, "VARIANT_HRH")
+				variantHdr = evaluator.CheckedGet("VARIANT_HRH")
 				variantHRH = generic_path.Path(variantHdr)
 				detail['ISFEATUREVARIANT'] = True
 			else:
-				variantCfg = self.CheckValue(evaluator, "VARIANT_CFG")
+				variantCfg = evaluator.CheckedGet("VARIANT_CFG")
 				variantCfg = generic_path.Path(variantCfg)
 				if not variantCfg in variantCfgs:
 					# get VARIANT_HRH from the variant.cfg file
@@ -2369,19 +2480,18 @@ class MetaReader(object):
 
 			detail['VARIANT_HRH'] = variantHRH
 			self.__Raptor.Info("'%s' uses variant hrh file '%s'", buildConfig.name, variantHRH)
-			detail['SYSTEMINCLUDE'] = self.CheckValue(evaluator, "SYSTEMINCLUDE")
+			detail['SYSTEMINCLUDE'] = evaluator.CheckedGet("SYSTEMINCLUDE")
 
-			detail['METADEPS'] = [] # Dependency targets for all metadata files in this platform
 
 			# find all the interface names we need
-			ifaceTypes = self.CheckValue(evaluator, "INTERFACE_TYPES")
+			ifaceTypes = evaluator.CheckedGet("INTERFACE_TYPES")
 			interfaces = ifaceTypes.split()
 
 			for iface in interfaces:
-				detail[iface] = self.CheckValue(evaluator, "INTERFACE." + iface)
+				detail[iface] = evaluator.CheckedGet("INTERFACE." + iface)
 
 			# not test code unless positively specified
-			detail['TESTCODE'] = self.CheckValue(evaluator, "TESTCODE", "")
+			detail['TESTCODE'] = evaluator.CheckedGet("TESTCODE", "")
 
 			# make a key that identifies this platform uniquely
 			# - used to tell us whether we have done the pre-processing
@@ -2390,7 +2500,8 @@ class MetaReader(object):
 			key = str(detail['VARIANT_HRH']) \
 			 	+ str(detail['EPOCROOT']) \
 		    	+ detail['SYSTEMINCLUDE'] \
-		    	+ detail['PLATFORM']
+		    	+ detail['PLATFORM'] \
+		    	+ detail['PLATMACROS']
 
 		    # Keep a short version of the key for use in filenames.
 			uniq = hashlib.md5()
@@ -2426,11 +2537,7 @@ class MetaReader(object):
 			# Is this an unseen build platform?
 			# concatenate all the values we care about in a fixed order
 			# and use that as a signature for the platform.
-			items = ['PLATFORM', 'EPOCROOT', 'VARIANT_HRH', 'SYSTEMINCLUDE', 'TESTCODE']
-			if raptor_utilities.getOSPlatform().startswith("win"):
-				items.append('PLATMACROS.WINDOWS')
-			else:
-				items.append('PLATMACROS.LINUX')
+			items = ['PLATFORM', 'PLATMACROS', 'EPOCROOT', 'VARIANT_HRH', 'SYSTEMINCLUDE', 'TESTCODE']
 
 			items.extend(interfaces)
 			platform = ""
@@ -2452,20 +2559,8 @@ class MetaReader(object):
 		# that are supposedly platform independent (e.g. PRJ_PLATFORMS)
 		self.defaultPlatform = self.ExportPlatforms[0]
 
-	def CheckValue(self, evaluator, key, default = None):
-		"""extract a value from an evaluator and raise an exception if None.
 
-		An optional default can be set to replace a None value."""
-		value = evaluator.Get(key)
-		if value == None:
-			if default == None:
-				raise MetaDataError("configuration " + evaluator.config.name +
-								    " has no variable " + key)
-			else:
-				return default
-		return value
-
-	def ReadBldInfFiles(self, aFileList, doExportOnly):
+	def ReadBldInfFiles(self, aComponentList, doexport, dobuild = True):
 		"""Take a list of bld.inf files and return a list of build specs.
 
 		The returned specification nodes will be suitable for all the build
@@ -2475,7 +2570,7 @@ class MetaReader(object):
 		# we need a Filter node per export platform
 		exportNodes = []
 		for i,ep in enumerate(self.ExportPlatforms):
-			filter = raptor_data.Filter("export_" + str(i))
+			filter = raptor_data.Filter(name = "export_" + str(i))
 
 			# what configurations is this node active for?
 			for config in ep['configs']:
@@ -2486,7 +2581,7 @@ class MetaReader(object):
 		# we need a Filter node per build platform
 		platformNodes = []
 		for i,bp in enumerate(self.BuildPlatforms):
-			filter = raptor_data.Filter("build_" + str(i))
+			filter = raptor_data.Filter(name = "build_" + str(i))
 
 			# what configurations is this node active for?
 			for config in bp['configs']:
@@ -2502,18 +2597,18 @@ class MetaReader(object):
 
 		# check that each bld.inf exists and add a Specification node for it
 		# to the nodes of the export and build platforms that it supports.
-		for bif in aFileList:
-			if bif.isFile():
-				self.__Raptor.Info("Processing %s", str(bif))
+		for c in aComponentList:
+			if c.bldinf_filename.isFile():
+				self.__Raptor.Info("Processing %s", str(c.bldinf_filename))
 				try:
-					self.AddComponentNodes(bif, exportNodes, platformNodes)
+					self.AddComponentNodes(c, exportNodes, platformNodes)
 
 				except MetaDataError, e:
-					self.__Raptor.Error(e.Text, bldinf=str(bif))
+					self.__Raptor.Error(e.Text, bldinf=str(c.bldinf_filename))
 					if not self.__Raptor.keepGoing:
 						return []
 			else:
-				self.__Raptor.Error("build info file does not exist", bldinf=str(bif))
+				self.__Raptor.Error("build info file does not exist", bldinf=str(c.bldinf_filename))
 				if not self.__Raptor.keepGoing:
 					return []
 
@@ -2545,20 +2640,23 @@ class MetaReader(object):
 		# before we can do anything else (because raptor itself must do
 		# some exports before the MMP files that include them can be
 		# processed).
-		for i,p in enumerate(exportNodes):
-			exportPlatform = self.ExportPlatforms[i]
-			for s in p.GetChildSpecs():
-				try:
-					self.ProcessExports(s, exportPlatform)
+		if doexport:
+			for i,p in enumerate(exportNodes):
+				exportPlatform = self.ExportPlatforms[i]
+				for s in p.GetChildSpecs():
+					try:
+						self.ProcessExports(s, exportPlatform)
 
-				except MetaDataError, e:
-					self.__Raptor.Error("%s",e.Text)
-					if not self.__Raptor.keepGoing:
-						return []
+					except MetaDataError, e:
+						self.__Raptor.Error("%s",e.Text)
+						if not self.__Raptor.keepGoing:
+							return []
+		else:
+			self.__Raptor.Info("Not Processing Exports (--noexport enabled)")
 
 		# this is a switch to return the function at this point if export
 		# only option is specified in the run
-		if (self.__Raptor.doExportOnly):
+		if dobuild is not True:
 			self.__Raptor.Info("Processing Exports only")
 			return[]
 
@@ -2601,8 +2699,8 @@ class MetaReader(object):
 
 		def LeftPortionOf(pth,sep):
 			""" Internal function to return portion of str that is to the left of sep. 
-			The partition is case-insentive."""
-			length = len((pth.lower().partition(sep.lower()))[0])
+			The split is case-insensitive."""
+			length = len((pth.lower().split(sep.lower()))[0])
 			return pth[0:length]
 			
 		modulePath = LeftPortionOf(LeftPortionOf(os.path.dirname(aBldInfPath), "group"), "ongoing")
@@ -2615,74 +2713,69 @@ class MetaReader(object):
 		return moduleName
 
 
-	def AddComponentNodes(self, buildFile, exportNodes, platformNodes):
+	def AddComponentNodes(self, component, exportNodes, platformNodes):	
 		"""Add Specification nodes for a bld.inf to the appropriate platforms."""
-		bldInfFile = BldInfFile(buildFile, self.__gnucpp, self.__Raptor)
+		bldInfFile = BldInfFile(component.bldinf_filename, self.__gnucpp, component.depfiles, self.__Raptor)
+		component.bldinf = bldInfFile 
 
-		specName = self.getSpecName(buildFile, fullPath=True)
-
-		if isinstance(buildFile, raptor_xml.SystemModelComponent):
-			# this component came from a system_definition.xml
-			layer = buildFile.GetContainerName("layer")
-			component = buildFile.GetContainerName("component")
-		else:
-			# this is a plain old bld.inf file from the command-line
-			layer = ""
-			component = ""
+		specName = getSpecName(component.bldinf_filename, fullPath=True)
 
 		# exports are independent of build platform
 		for i,ep in enumerate(self.ExportPlatforms):
-			specNode = raptor_data.Specification(specName)
+			specNode = raptor_data.Specification(name = specName)
 
 			# keep the BldInfFile object for later
-			specNode.bldinf = bldInfFile
+			specNode.component = component
 
 			# add some basic data in a component-wide variant
-			var = raptor_data.Variant()
-			var.AddOperation(raptor_data.Set("COMPONENT_META", str(buildFile)))
-			var.AddOperation(raptor_data.Set("COMPONENT_NAME", component))
-			var.AddOperation(raptor_data.Set("COMPONENT_LAYER", layer))
+			var = raptor_data.Variant(name='component-wide')
+			var.AddOperation(raptor_data.Set("COMPONENT_META", str(component.bldinf_filename)))
+			var.AddOperation(raptor_data.Set("COMPONENT_NAME", component.componentname))
+			var.AddOperation(raptor_data.Set("COMPONENT_LAYER", component.layername))
 			specNode.AddVariant(var)
 
 			# add this bld.inf Specification to the export platform
 			exportNodes[i].AddChild(specNode)
+			component.exportspecs.append(specNode)
 
 		# get the relevant build platforms
 		listedPlatforms = bldInfFile.getBuildPlatforms(self.defaultPlatform)
 		platforms = getBuildableBldInfBuildPlatforms(listedPlatforms,
-													self.__defaultplatforms,
-													self.__basedefaultplatforms,
-													self.__baseuserdefaultplatforms)
+								self.__defaultplatforms,
+								self.__basedefaultplatforms,
+								self.__baseuserdefaultplatforms)
 
 
-
-		outputDir = BldInfFile.outputPathFragment(buildFile)
+		outputDir = BldInfFile.outputPathFragment(component.bldinf_filename)
 
 		# Calculate "module name"
-		modulename = self.ModuleName(str(buildFile))
+		modulename = self.ModuleName(str(component.bldinf_filename))
 
 		for i,bp in enumerate(self.BuildPlatforms):
+			plat = bp['PLATFORM']
 			if bp['PLATFORM'] in platforms:
-				specNode = raptor_data.Specification(specName)
+				specNode = raptor_data.Specification(name = specName)
 
-				# keep the BldInfFile object for later
-				specNode.bldinf = bldInfFile
+				# remember what component this spec node comes from for later
+				specNode.component = component
 
 				# add some basic data in a component-wide variant
-				var = raptor_data.Variant()
-				var.AddOperation(raptor_data.Set("COMPONENT_META",str(buildFile)))
-				var.AddOperation(raptor_data.Set("COMPONENT_NAME", component))
-				var.AddOperation(raptor_data.Set("COMPONENT_LAYER", layer))
+				var = raptor_data.Variant(name='component-wide-settings-' + plat)
+				var.AddOperation(raptor_data.Set("COMPONENT_META",str(component.bldinf_filename)))
+				var.AddOperation(raptor_data.Set("COMPONENT_NAME", component.componentname))
+				var.AddOperation(raptor_data.Set("COMPONENT_LAYER", component.layername))
 				var.AddOperation(raptor_data.Set("MODULE", modulename))
 				var.AddOperation(raptor_data.Append("OUTPUTPATHOFFSET", outputDir, '/'))
 				var.AddOperation(raptor_data.Append("OUTPUTPATH", outputDir, '/'))
 				var.AddOperation(raptor_data.Append("BLDINF_OUTPUTPATH",outputDir, '/'))
 
-				var.AddOperation(raptor_data.Set("TEST_OPTION", specNode.bldinf.getRomTestType(bp)))
+				var.AddOperation(raptor_data.Set("TEST_OPTION", component.bldinf.getRomTestType(bp)))
 				specNode.AddVariant(var)
 
 				# add this bld.inf Specification to the build platform
 				platformNodes[i].AddChild(specNode)
+				# also attach it into the component
+				component.specs.append(specNode)
 
 	def ProcessExports(self, componentNode, exportPlatform):
 		"""Do the exports for a given platform and skeleton bld.inf node.
@@ -2694,18 +2787,18 @@ class MetaReader(object):
 		[some MMP files #include exported .mmh files]
 		"""
 		if exportPlatform["TESTCODE"]:
-			exports = componentNode.bldinf.getTestExports(exportPlatform)
+			exports = componentNode.component.bldinf.getTestExports(exportPlatform)
 		else:
-			exports = componentNode.bldinf.getExports(exportPlatform)
+			exports = componentNode.component.bldinf.getExports(exportPlatform)
 
 		self.__Raptor.Debug("%i exports for %s",
-							len(exports), str(componentNode.bldinf.filename))
+							len(exports), str(componentNode.component.bldinf.filename))
 		if exports:
 
 			# each export is either a 'copy' or 'unzip'
 			# maybe we should trap multiple exports to the same location here?
 			epocroot = str(exportPlatform["EPOCROOT"])
-			bldinf_filename = str(componentNode.bldinf.filename)
+			bldinf_filename = str(componentNode.component.bldinf.filename)
 			exportwhatlog="<whatlog bldinf='%s' mmp='' config=''>\n" % bldinf_filename
 			for export in exports:
 				expSrc = export.getSource()
@@ -2728,11 +2821,11 @@ class MetaReader(object):
 							# export the file
 							exportwhatlog += self.CopyExport(fromFile, toFile, bldinf_filename)
 						else:
-							# unzip the zip
-							exportwhatlog += ("<archive zipfile='" + str(fromFile) + "'>\n")
 							members = self.UnzipExport(fromFile, toFile,
 									str(exportPlatform['SBS_BUILD_DIR']),
 									bldinf_filename)
+							
+							exportwhatlog += ("<archive zipfile='" + str(fromFile) + "'>\n")
 							if members != None:
 								exportwhatlog += members
 							exportwhatlog += "</archive>\n"
@@ -2767,8 +2860,10 @@ class MetaReader(object):
 
 			sourceMTime = 0
 			destMTime = 0
+			sourceStat = 0
 			try:
-				sourceMTime = os.stat(source_str)[stat.ST_MTIME]
+				sourceStat = os.stat(source_str)
+				sourceMTime = sourceStat[stat.ST_MTIME]
 				destMTime = os.stat(dest_str)[stat.ST_MTIME]
 			except OSError, e:
 				if sourceMTime == 0:
@@ -2782,6 +2877,9 @@ class MetaReader(object):
 				if os.path.exists(dest_str):
 					os.chmod(dest_str,stat.S_IREAD | stat.S_IWRITE)
 				shutil.copyfile(source_str, dest_str)
+
+				# Ensure that the destination file remains executable if the source was also:
+				os.chmod(dest_str,sourceStat[stat.ST_MODE] | stat.S_IREAD | stat.S_IWRITE | stat.S_IWGRP ) 
 				self.__Raptor.Info("Copied %s to %s", source_str, dest_str)
 			else:
 				self.__Raptor.Info("Up-to-date: %s", dest_str)
@@ -2845,7 +2943,7 @@ class MetaReader(object):
 				for file in files:
 					if not file.endswith('/'):
 						expfilename = str(generic_path.Join(destination, file))
-						exportwhatlog += "<member>" + expfilename + "</member>\n"
+						exportwhatlog += "<member>" + escape(expfilename) + "</member>\n"
 
 				self.__Raptor.PrintXML("<clean bldinf='" + bldinf_filename + "' mmp='' config=''>\n")
 				self.__Raptor.PrintXML("<zipmarker>" + markerfilename + "</zipmarker>\n")
@@ -2876,6 +2974,11 @@ class MetaReader(object):
 						expfile = open(expfilename, 'wb')
 						expfile.write(exportzip.read(file))
 						expfile.close()
+						
+						# Resurrect any file execution permissions present in the archived version
+						if (exportzip.getinfo(file).external_attr >> 16L) & 0100:
+							os.chmod(expfilename, stat.S_IMODE(os.stat(expfilename).st_mode) | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)						
+						
 						# Each file keeps its modified time the same as what it was before unzipping
 						accesstime = time.time()
 						datetime = exportzip.getinfo(file).date_time
@@ -2885,7 +2988,7 @@ class MetaReader(object):
 						os.utime(expfilename,(accesstime, modifiedtime))
 
 						filecount += 1
-						exportwhatlog+="<member>" + expfilename + "</member>\n"
+						exportwhatlog+="<member>" + escape(expfilename) + "</member>\n"
 					except IOError, e:
 						message = "Could not unzip %s to %s: file %s: %s" %(source, destination, expfilename, str(e))
 						if not self.__Raptor.keepGoing:
@@ -2899,7 +3002,7 @@ class MetaReader(object):
 			self.__Raptor.PrintXML("<zipmarker>" + markerfilename +	"</zipmarker>\n")
 			self.__Raptor.PrintXML("</clean>\n")
 
-		except IOError:
+		except IOError, e:
 			self.__Raptor.Warn("Problem while unzipping export %s to %s: %s",source,destination,str(e))
 
 		self.__Raptor.Info("Unzipped %d files from %s to %s", filecount, source, destination)
@@ -2915,12 +3018,12 @@ class MetaReader(object):
 			return	# feature variation does not run extensions at all
 		
 		if buildPlatform["TESTCODE"]:
-			extensions = componentNode.bldinf.getTestExtensions(buildPlatform)
+			extensions = componentNode.component.bldinf.getTestExtensions(buildPlatform)
 		else:
-			extensions = componentNode.bldinf.getExtensions(buildPlatform)
+			extensions = componentNode.component.bldinf.getExtensions(buildPlatform)
 
 		self.__Raptor.Debug("%i template extension makefiles for %s",
-							len(extensions), str(componentNode.bldinf.filename))
+							len(extensions), str(componentNode.component.bldinf.filename))
 
 		for i,extension in enumerate(extensions):
 			if self.__Raptor.projects:
@@ -2999,14 +3102,20 @@ class MetaReader(object):
 		gnuList = []
 		makefileList = []
 
-		if buildPlatform["TESTCODE"]:
-			MMPList = componentNode.bldinf.getTestMMPList(buildPlatform)
-		else:
-			MMPList = componentNode.bldinf.getMMPList(buildPlatform)
 
-		bldInfFile = componentNode.bldinf.filename
+		component = componentNode.component
+
+
+		if buildPlatform["TESTCODE"]:
+			MMPList = component.bldinf.getTestMMPList(buildPlatform)
+		else:
+			MMPList = component.bldinf.getMMPList(buildPlatform)
+
+		bldInfFile = component.bldinf.filename
 
 		for mmpFileEntry in MMPList['mmpFileList']:
+			component.AddMMP(mmpFileEntry.filename) # Tell the component another mmp is specified (for this platform)
+
 			projectname = mmpFileEntry.filename.File().lower()
 
 			if self.__Raptor.projects:
@@ -3024,7 +3133,8 @@ class MetaReader(object):
 
 			mmpFile = MMPFile(foundmmpfile,
 								   self.__gnucpp,
-								   bldinf = componentNode.bldinf,
+								   component.bldinf,
+								   component.depfiles,
 								   log = self.__Raptor)
 
 			mmpFilename = mmpFile.filename
@@ -3058,7 +3168,7 @@ class MetaReader(object):
 				continue
 			
 			# now build the specification tree
-			mmpSpec = raptor_data.Specification(self.getSpecName(mmpFilename))
+			mmpSpec = raptor_data.Specification(generic_path.Path(getSpecName(mmpFilename)))
 			var = backend.BuildVariant
 
 			var.AddOperation(raptor_data.Set("PROJECT_META", str(mmpFilename)))
@@ -3094,7 +3204,7 @@ class MetaReader(object):
 
 			# Although not part of the MMP, some MMP-based build specs additionally require knowledge of their
 			# container bld.inf exported headers
-			for export in componentNode.bldinf.getExports(buildPlatform):
+			for export in componentNode.component.bldinf.getExports(buildPlatform):
 				destination = export.getDestination()
 				if isinstance(destination, list):
 					exportfile = str(destination[0])
@@ -3107,6 +3217,16 @@ class MetaReader(object):
 			# now we have something worth adding to the component
 			mmpSpec.AddVariant(var)
 			componentNode.AddChild(mmpSpec)
+			
+			# if there are APPLY variants then add them to the mmpSpec too
+			for applyVar in backend.ApplyVariants:
+				try:
+					mmpSpec.AddVariant(self.__Raptor.cache.FindNamedVariant(applyVar))
+				except KeyError:
+					self.__Raptor.Error("APPLY unknown variant '%s' in %s",
+								        applyVar,
+								        str(mmpFileEntry.filename),
+								        bldinf=str(bldInfFile))
 
 			# resources, stringtables and bitmaps are sub-nodes of this project
 			# (do not add these for feature variant builds)
@@ -3150,7 +3270,7 @@ class MetaReader(object):
 					self.projectList.remove(projectname)
 
 			self.__Raptor.Debug("%i gnumakefile extension makefiles for %s",
-						len(gnuList), str(componentNode.bldinf.filename))
+						len(gnuList), str(componentNode.component.bldinf.filename))
 			var = raptor_data.Variant()
 			gnuSpec = raptor_data.Specification("gnumakefile " + str(g.getMakefileName()))
 			interface = buildPlatform["ext_makefile"]
@@ -3179,10 +3299,10 @@ class MetaReader(object):
 					self.__Raptor.Debug("Skipping %s", str(m.getMakefileName()))
 					continue
 				elif projectname in self.projectList:
-					projectList.remove(projectname)
+					self.projectList.remove(projectname)
 
 			self.__Raptor.Debug("%i makefile extension makefiles for %s",
-						len(makefileList), str(componentNode.bldinf.filename))
+						len(makefileList), str(componentNode.component.bldinf.filename))
 			var = raptor_data.Variant()
 			gnuSpec = raptor_data.Specification("makefile " + str(m.getMakefileName()))
 			interface = buildPlatform["ext_makefile"]
@@ -3203,17 +3323,6 @@ class MetaReader(object):
 			gnuSpec.AddVariant(var)
 			componentNode.AddChild(gnuSpec)
 
-	def getSpecName(self, aFileRoot, fullPath=False):
-		"""Returns a build spec name: this is the file root (full path
-		or simple file name) made safe for use as a file name."""
-
-		if fullPath:
-			specName = str(aFileRoot).replace("/","_")
-			specName = specName.replace(":","")
-		else:
-			specName = aFileRoot.File()
-
-		return specName.lower()
 
 	def ApplyOSVariant(self, aBuildUnit, aEpocroot):
 		# Form path to kif.xml and path to buildinfo.txt

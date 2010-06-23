@@ -1,108 +1,128 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <build xmlns="http://symbian.com/xml/build" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symbian.com/xml/build ../../schema/build/2_0.xsd">
-	<!-- GCCE build variant for ARM compilers -->
-	<!-- This is called gcce_base in case someone wants to use "gcce" as a configuration name -->
+	<!-- build variant for GCCE ARM toolchains -->
 	<var name="gcce_base">
 		<set name="TOOLCHAIN" value="GCCE"/>
+		<set name="PLATMACROS.TOOLCHAIN" value="GCCE"/>
+
+		<!-- toolchain tools -->
+		<set name="GCCEAR" value="$(GCCEBIN)/arm-none-symbianelf-ar$(DOTEXE)"/>
+		<set name="GCCEASM" value="$(GCCEBIN)/arm-none-symbianelf-as$(DOTEXE)"/>
+		<set name="GCCECC" value="$(GCCEBIN)/arm-none-symbianelf-g++$(DOTEXE)"/>
+		<set name="GCCELD" value="$(GCCEBIN)/arm-none-symbianelf-g++$(DOTEXE)"/>
+		<set name="FROMELF" value="$(GCCEBIN)/arm-none-symbianelf-readelf$(DOTEXE)"/>
+
 		<set name="CC" value="$(GCCECC)"/>
 		<set name="LD" value="$(GCCELD)"/>
 		<set name="ASM" value="$(GCCEASM)"/>
-		<set name="AR" value="$(GCCEAR)"/>		
-		<set name="GCCECC" value="$(GCCEBIN)/arm-none-symbianelf-g++$(DOTEXE)"/>
-		<set name="GCCELD" value="$(GCCEBIN)/arm-none-symbianelf-ld$(DOTEXE)"/>
-		<set name="GCCEASM" value="$(GCCEBIN)/arm-none-symbianelf-as$(DOTEXE)"/>
-		<set name="GCCEAR" value="$(GCCEBIN)/arm-none-symbianelf-ar$(DOTEXE)"/>
-		<set name="FROMELF" value="$(GCCEBIN)/arm-none-symbianelf-readelf$(DOTEXE)"/>
+		<set name="AR" value="$(GCCEAR)"/>
+		
 		<set name="AAPCS_OPTION" value="-mapcs -mthumb-interwork"/>
 		<set name="ARCHIVER_CREATE_OPTION" value="cr"/>
 		<set name="ARM_INSTRUCTION_SET" value="-marm"/>
+		<set name="ARMLIBS" value=""/>
 		<set name="ASM_OUTPUT_OPTION" value="-o"/>
 		<set name="ASSEMBLER_LISTING_OPTION" value="-S"/>
 		<set name="BPABI_OPTION" value=""/>
-		<set name="CC_ERRORS_CONTROL_OPTION" value=""/>
-		<set name="CC_WARNINGS_CONTROL_OPTION" value="-Wall -Wno-unknown-pragmas"/>
 		<set name="C_LANG_OPTION" value="-x c"/>
-		<set name="COMMANDFILE_OPTION" value="@"/>
-		<set name="COMPILE_ONLY_OPTION" value="-c"/>
-		<set name="CPP_LANG_OPTION" value="-x c++ -Wno-ctor-dtor-privacy"/>
-		<set name="DEBUG_OPTIMISATION" value="-O0"/>
-		<set name="DEPEND_OPTION" value="-MD -MF"/>
-		<set name="ENUM_OPTION" value=""/>
-		<set name="EXPORT_VTBL_OPTION" value=""/>
-		<set name="EXTRA_LD_OPTION" value=""/>
-		<set name="FPMODE_OPTION" value=""/>
-		<set name="LD_ERRORS_CONTROL_OPTION" value=""/>
-		<set name="LD_WARNINGS_CONTROL_OPTION" value="--no-undefined"/>
-		<set name="LISTING_OPTION" value="-S"/>
-		<set name="EXCEPTIONS" value="-fexceptions"/>
-		<set name="NO_EXCEPTIONS" value="-fno-exceptions"/>
-		<set name="PREINCLUDE_OPTION" value="-include"/>
-		<set name="PREPROCESSOR_OPTION" value="-E"/>
-		<set name="REL_OPTIMISATION" value="-O2"/>
-		<set name="STDLIB_OPTION" value="-nostdlib"/>
-		<set name="RUNTIME_SYMBOL_VISIBILITY_OPTION" value=""/>
-		<set name="RW_BASE_OPTION" value="-Tdata"/>
-		<set name="CODE_SEGMENT_START" value="-Ttext"/>
-		<set name="PREINCLUDE" value="$(EPOCINCLUDE)/gcce/gcce.h"/>
+		<set name="CC.ARMV5" value="-march=armv5t"/>
+		<set name="CC.ARMV6" value="-march=armv6t2"/>
+		<set name="CC.ARMV7" value="-march=armv7"/>
 		<!-- From the GCC manual: "With this option, GCC uses features of DWARF version 3 when they are useful; ..." -->
 		<!-- There is no -gdwarf-3 option; hence CC.DWARF2 and CC.DWARF3 have the same value. -->
 		<set name="CC.DWARF2" value="-gdwarf-2"/>
 		<set name="CC.DWARF3" value="-gdwarf-2"/>
-		<set name="LD.ARMV5" value=""/>
-		<set name="LD.ARMV6" value=""/>
-		<set name="LD.ARMV7" value=""/>
-		<set name="ARMMACROS.VAR" value=""/>
+		<set name="CC.NO_UNALIGNED_ACCESS" value=""/>
+		<set name="CC.SOFTVFP_MAYBE_VFPV2" value="soft"/>
+		<set name="CC.SOFTVFP_MAYBE_VFPV3" value="soft"/>
+		<set name="CC_ERRORS_CONTROL_OPTION" value=""/>
+		<set name="CC_WARNINGS_CONTROL_OPTION" value="-Wall -Wno-unknown-pragmas"/>
 		<set name="CFLAGS" value=""/>
 		<set name="CIADEFS" value="__CIA__"/>
-		<append name="CDEFS" value='__SUPPORT_CPP_EXCEPTIONS__ _UNICODE __SYMBIAN32__ __GCCE__ __EPOC32__ __MARM__ __EABI__ __PRODUCT_INCLUDE__="$(PRODUCT_INCLUDE)" $(MMPDEFS) $(ARMMACROS)'/>
-		<!-- Note that the intention of ABLD for CIA compilation seems to be "-S -Wa,-adln", although this doesn't work -->
+		<set name="CODE_SEGMENT_START" value="-Ttext"/>
+		<set name="COMMANDFILE_OPTION" value="@"/>
+		<set name="COMPILE_ONLY_OPTION" value="-c"/>
 		<set name="COMPILER_CIA_FLAGS" value="-marm"/>
-		<set name="COMPILER_DEFINES" value="-D__GCCE__"/>
-		<set name="COMPILER_FPU_FLAGS" value="$(CC.OPT.SOFTVFP_MAYBE_VFPV2)$(CC.VAL.SOFTVFP_MAYBE_VFPV2)"/>		
+		<set name="COMPILER_DEFINES" value="-D__GCCE__"/>		
+		<set name="COMPILER_FPU_OPTION" value="-mfloat-abi="/>		
 		<set name="COMPILER_INTERWORK_DEFINES" value="__MARM_INTERWORK__"/>
 		<set name="COMPILER_SYSTEM_INCLUDE_OPTION" value="-I"/>
 		<set name="COMPILER_THUMB_DEFINES" value="__MARM_THUMB__"/>
+		<set name="CPP_LANG_OPTION" value="-x c++ -Wno-ctor-dtor-privacy"/>
 		<set name="DATA_SEGMENT_START" value="$(SPLIT_OPTION) $(RW_BASE_OPTION)"/>
+		<set name="DEBUG_OPTIMISATION" value="-O0"/>
+		<set name="DEPEND_OPTION" value="-MD -MF"/>
+		<set name="ENUM_OPTION" value=""/>
+		<set name="EXCEPTIONS" value="-fexceptions"/>
+		<set name="EXPORT_VTBL_OPTION" value=""/>
 		<set name="EXTRA_CC_OPTION" value=""/>
+		<set name="EXTRA_LD_OPTION" value=""/>
+		<set name="FPMODE_OPTION" value=""/>
 		<set name="HEADER_FILES_CONTROL_OPTION" value=""/>
+		<set name="INSTRUCTION_SET" value=""/>
+		<set name="KERNEL_STATIC_RUNTIME_LIB" value="ksrt3_1.lib"/>
+		<set name="LD.ARMV5" value=""/>
+		<set name="LD.ARMV6" value=""/>
+		<set name="LD.ARMV7" value=""/>
+		<set name="LD_ERRORS_CONTROL_OPTION" value=""/>
+		<set name="LD_WARNINGS_CONTROL_OPTION" value="-Wl,--no-undefined"/>
 		<set name="LIBPATH" value=""/>
 		<set name="LIBRARY" value=""/>
 		<set name="LICENSERETRY_OPTION" value=""/>
 		<set name="LINKER_ADD_STATIC_RUNTIME" value="1"/>
 		<set name="LINKER_DEBUG_OPTION" value=""/>
-		<!-- Clearly the linker libs stuff following isn't right - need to use ARMLIBS (or reinvent this a bit) -->
+		<set name="LINKER_DEFAULT_LIB_PATHS" value=""/>
 		<set name="LINKER_DEFAULT_LIBS" value="-lsupc++ -lgcc"/>
-		<set name="LINKER_DEFAULT_LIB_PATHS" value="-L $(GCCEBIN)/../lib/gcc/arm-none-symbianelf/$(TOOLCHAINVERSION) -L $(GCCEBIN)/../lib/gcc/arm-none-symbianelf/$(TOOLCHAINVERSION)/../../../../arm-none-symbianelf/lib"/>
-		<set name="LINKER_ENTRY_OPTION" value="--entry"/>
-		<set name="LINKER_GROUP_START_OPTION" value="--start-group"/>
+		<set name="LINKER_ENTRY_OPTION" value="-Wl,--entry"/>
 		<set name="LINKER_GROUP_END_OPTION" value="--end-group"/>
-		<set name="LINKER_MISC_FLAGS" value="$(CODE_SEGMENT_START) 0x8000"/>
-		<set name="LINKER_NODEBUG_OPTION" value = "--strip-debug"/>
+		<set name="LINKER_GROUP_START_OPTION" value="--start-group"/>
+		<set name="LINKER_MISC_FLAGS" value="-Wl,$(CODE_SEGMENT_START),0x8000"/>
+		<set name="LINKER_NODEBUG_OPTION" value = "-Wl,--strip-debug"/>
 		<set name="LINKER_SCRIPT_FILE_OPTION" value="-T"/>
-		<set name="LINKER_SYMBOLS_OPTION" value="-Map"/>
-		<set name="LINKER_SYMBOLS_FILE_OPTION" value=""/>
-		<set name="SHARED_OBJECT_OPTION" value="-shared"/>
+		<set name="LINKER_SYMBOLS_FILE_OPTION" value="-Wl,-Map"/>
+		<set name="LINKER_SYMBOLS_OPTION" value=""/>
+		<set name="LISTING_OPTION" value="-S"/>
+		<set name="NEED_ENTRYPOINT_LIBRARY" value="" />
+		<set name="NEED_ENTRYPOINT_LIBRARY" value=""/>
+		<set name="NO_EXCEPTIONS" value="-fno-exceptions"/>
+		<set name="NO_UNALIGNED_ACCESS" value="$(CC.NO_UNALIGNED_ACCESS)"/>
+		<set name="OWN_LIBRARY_OPTION" value=""/>
+		<set name="PL.SOFTVFP_MAYBE_VFPV2" value="softvfp"/>
+		<set name="PL.SOFTVFP_MAYBE_VFPV3" value="softvfp"/>
+		<set name="PREINCLUDE" value="$(EPOCINCLUDE)/gcce/gcce.h"/>
+		<set name="PREINCLUDE_OPTION" value="-include"/>
+		<set name="PREPROCESSOR_OPTION" value="-E"/>
+		<set name="REL_OPTIMISATION" value="-O2"/>
+		<set name="RELOCATABLE_IMAGE_OPTION" value=""/>
+		<set name="RUNTIME_SYMBOL_VISIBILITY_OPTION" value=""/>
+		<set name="RVCTBIN" value="" />
+		<set name="RVCTINC" value="" />
+		<set name="RVCTLIB" value=""/>
+		<set name="RW_BASE" value="$(RW_BASE_OPTION)0x400000"/>
+		<set name="RW_BASE_OPTION" value="-Wl,-Tdata,"/>
+		<set name="SHARED_OBJECT_OPTION" value="-Wl,-shared"/>
 		<set name="SID" value=""/>
-		<set name="SO_NAME_OPTION" value="-soname"/>
+		<set name="SO_NAME_OPTION" value="-Wl,-soname"/>
+		<set name="SPLIT_OPTION" value=""/>
+		<set name="STATIC_LIBS_LIST" value=""/>
 		<set name="STATIC_LIBS_PATH" value="" />
 		<set name="STDCPP_INCLUDE" value="$(EPOCINCLUDE)/stdapis"/>
+		<set name="STDLIB_OPTION" value="-nodefaultlibs"/>
 		<set name="SUPPORTS_ABIV1_IMPLIBS" value=""/>	
 		<set name="SYMBIAN_LD_MESSAGE_OPTION" value="$(LD_WARNINGS_CONTROL_OPTION) $(LD_ERRORS_CONTROL_OPTION)"/>
+		<set name="SYMVER_OPTION" value="-Wl,--default-symver"/>
 		<set name="TARGET_RELOCATION_OPTION" value="--target1-rel" />
-		<set name="SYMVER_OPTION" value="--default-symver"/>
 		<set name="TEMP_FILES_OPTION" value="-pipe"/>
 		<set name="THUMB_INSTRUCTION_SET" value="-mthumb"/>
 		<set name="TRANSFORM_CIA" value=""/>		
-		<set name="INSTRUCTION_SET" value=""/>
 		<set name="UNDEFINED_SYMBOL_REF_OPTION" value="-u"/>
 		<set name="UNRESOLVED_SYMBOL_REF_OPTION" value=""/>
-		<set name="USERINCLUDE" value=""/>
 		<set name="USER_LIBS_PATH_OPTION" value="--userlibpath"/>
+		<set name="USER_STATIC_RUNTIME_LIB" value="usrt3_1.lib"/>
+		<set name="USER_STATIC_RUNTIME_LIB_NESTED_EXCEPTIONS" value="usrt_nx_3_1.lib"/>
+		<set name="USERINCLUDE" value=""/>
 		<set name="VFE_OPTION" value=""/>
-		<set name="PLATMACROS.WINDOWS" value="GCCE EPOC32 MARM EABI GENERIC_MARM MARM_ARMV5 $(PLATMACROS.CONFIG) $(PLATMACROS.VAR)"/>
-		<set name="PLATMACROS.LINUX" value="$(PLATMACROS.WINDOWS)"/>
-		<set name="PLATMACROS.CONFIG" value=""/>
-		<set name="PLATMACROS.VAR" value=""/>
-		<set name="NO_UNALIGNED_ACCESS" value="$(CC.NO_UNALIGNED_ACCESS)"/>
+
+		<append name="CDEFS" value="__GCCE__"/>
 	</var>
 </build>

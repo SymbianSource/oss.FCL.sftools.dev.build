@@ -19,9 +19,9 @@
 
 
 /**
- @file
- @internalComponent
- @released
+@file
+@internalComponent
+@released
 */
 
 #include "exceptionimplementation.h"
@@ -35,8 +35,7 @@ message required by imgcheck tool.
 @internalComponent
 @released
 */
-struct Messages MessageArray[MAX]=
-{
+struct Messages MessageArray[MAX]= {
 	{UNKNOWNIMAGETYPE, "Error: Image Type Unknown: '%s'"},
 	{UNKNOWNPREFIX,"Error: Option has Un-Known Prefix: '%s'"},
 	{VALUEEXPECTED,"Error: Value expected for option: '%s'"},
@@ -105,10 +104,8 @@ standard output upon receiving verbose mode flag.
 
 @return - returns the instance
 */
-ExceptionImplementation* ExceptionImplementation::Instance(unsigned int aCmdFlag)
-{
-	if(iInstance == KNull)
-	{
+ExceptionImplementation* ExceptionImplementation::Instance(unsigned int aCmdFlag) {
+	if(iInstance == KNull) {
 		iCmdFlag = aCmdFlag;
 		iInstance = new ExceptionImplementation();
 	}
@@ -121,8 +118,7 @@ Static function to delete the instance.
 @internalComponent
 @released
 */
-void ExceptionImplementation::DeleteInstance()
-{
+void ExceptionImplementation::DeleteInstance() {
 	DELETE(iInstance);
 }
 
@@ -134,13 +130,11 @@ initialize iMessage map. This map is used later to log the messages.
 @released
 */
 ExceptionImplementation::ExceptionImplementation()
-:iMsgIndex(0)
-{
-	iLogStream.open(gLogFileName.c_str(),Ios::out);
+:iMsgIndex(0) {
+	iLogStream.open(gLogFileName.c_str(),ios_base::out);
 	int i;
-	for(i = 0; i < MAX; i++)
-	{
-		iMessage.insert(std::make_pair(MessageArray[i].iIndex,MessageArray[i].iMessage));
+	for(i = 0; i < MAX; i++) {
+		iMessage.insert(make_pair(MessageArray[i].iIndex,MessageArray[i].iMessage));
 	}
 }
 
@@ -150,8 +144,7 @@ Destructor closes the output stream opened during construction.
 @internalComponent
 @released
 */
-ExceptionImplementation::~ExceptionImplementation()
-{
+ExceptionImplementation::~ExceptionImplementation() {
 	iLogStream.close();
 }
 
@@ -163,8 +156,7 @@ Function returns the message equivalent to the recived enum value.
 
 @param aMsgIndex - enum value
 */
-String& ExceptionImplementation::Message(const int aMsgIndex)
-{
+string& ExceptionImplementation::Message(const int aMsgIndex) {
 	iMsgIndex = aMsgIndex;
 	return iMessage[aMsgIndex];
 }
@@ -181,12 +173,10 @@ the verbose mode is selected by the user.
 
 @param aMsgIndex - enum value
 */
-void ExceptionImplementation::Log(const String aMsg)
-{
+void ExceptionImplementation::Log(const string aMsg) {
 	iLogStream <<  aMsg.c_str() << "\n";
-    
-	if(iCmdFlag & KVerbose)
-	{
+
+	if(iCmdFlag & KVerbose) {
 		cout << aMsg.c_str() << endl;
 	}
 }
@@ -202,15 +192,12 @@ prompt always.
 
 @param aMsgIndex - enum value
 */
-void ExceptionImplementation::Report(const String aMsg)
-{
+void ExceptionImplementation::Report(const string aMsg) {
 	iLogStream <<  aMsg.c_str() << "\n";
-	if(aMsg.find("Success") != String::npos)
-	{
+	if(aMsg.find("Success") != string::npos) {
 		cout << aMsg.c_str() << endl;
 	}
-	else
-	{
+	else {
 		cerr << aMsg.c_str() << endl;
 	}
 }

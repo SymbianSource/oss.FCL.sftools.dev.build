@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -40,13 +40,17 @@ DEFAULT_NEWLIB:=$(DEFAULT_SYMBIAN_NEWLIB)
 # Reset these variables as they change for every single target type
 # LINKER_ENTRYPOINT_ADORNMENT will be blank for GCCE; for RVCT it will look like "(uc_exe_.o)"
 # LINKER_ENTRYPOINT_DECORATION will be blank for RVCT; for GCCE it will look like "-u _E32Startup"
+# LINKER_SEPARATOR is a comma for GCCE as g++ is used for linking; for RVCT is should be a space, but
+# as make strips trailing spaces, we use the CHAR_SPACE variable.
 
 LINKER_ENTRYPOINT_ADORNMENT:=
 LINKER_ENTRYPOINT_DECORATION:=
+LINKER_SEPARATOR:=
 
 # For GCCE
 ifeq ($(TOOLCHAIN),GCCE)
-LINKER_ENTRYPOINT_DECORATION:=$(if $(call isoneof,$(TARGETTYPE),exexp exe),-u _E32Startup,-u _E32Dll)
+LINKER_ENTRYPOINT_DECORATION:=$(if $(call isoneof,$(TARGETTYPE),exexp exe),-Wl$(CHAR_COMMA)-u$(CHAR_COMMA)_E32Startup,-Wl$(CHAR_COMMA)-u$(CHAR_COMMA)_E32Dll)
+LINKER_SEPARATOR:=$(CHAR_COMMA)
 endif
 
 # For RVCT
@@ -55,7 +59,7 @@ ifeq ($(TOOLCHAIN),RVCT)
 	LINKER_ENTRYPOINT_ADORNMENT:=(uc_exe_.o)
   endif
 
-  ifeq ($(call isoneof,$(TARGETTYPE),ani textnotifier2 stddll plugin fsy pdl dll),1)
+  ifeq ($(call isoneof,$(TARGETTYPE),ani textnotifier2 stddll plugin plugin3 fsy pdl dll pdll),1)
 	LINKER_ENTRYPOINT_ADORNMENT:=(uc_dll_.o)
   endif
 
@@ -74,6 +78,7 @@ ifeq ($(TOOLCHAIN),RVCT)
   ifeq ($(TARGETTYPE),kdll)
 	LINKER_ENTRYPOINT_ADORNMENT:=(L_ENTRY_.o)
   endif
+LINKER_SEPARATOR:=$(CHAR_SPACE)
 endif
 
 # "OPTION" metadata from the front-end can potentially be supplied simultaneously for both GCCE and RVCT,
@@ -88,4 +93,10 @@ ifeq ($(TOOLCHAIN),RVCT)
   LINKEROPTION:=$(LINKEROPTION_ARMCC)
   OPTION_COMPILER:=$(OPTION_ARMCC)
   OPTION_REPLACE_COMPILER:=$(OPTION_REPLACE_ARMCC)
+endif
+
+# "ARMFPU" overrides for 'fpu-ness' in compiler and postlinker calls in .mmp files are currently only
+# supported for RVCT-based builds, GCCE builds always make use of the interface defined defaults.
+ifeq ($(TOOLCHAIN),GCCE)
+  ARMFPU:=
 endif

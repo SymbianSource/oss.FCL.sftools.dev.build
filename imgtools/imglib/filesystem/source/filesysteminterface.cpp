@@ -59,7 +59,7 @@ FILESYSTEM_API int CFileSystemInterFace::CreateFilesystem(EntryList* aNodeList ,
 	try
 	{
 		MessageHandler::StartLogging (aLogFileName);
-		iOutputStream.open(aImageFileName,ios::out|ios::binary);
+		iOutputStream.open(aImageFileName,ios_base::out|ios_base::binary);
 		if(iOutputStream.fail() == true )
 		{
 			throw ErrorHandler(FILEOPENERROR,aImageFileName,__FILE__, __LINE__);

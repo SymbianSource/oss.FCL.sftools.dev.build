@@ -93,7 +93,7 @@ void ErrorHandler::Report()
 	errMessage=MessageHandler::GetInstance()->GetMessageString(iMessageIndex);
 	if(errMessage)
 	{
-		tempMssg = new char[strlen(errMessage) + strlen(iFileName.c_str()) + sizeof(int) + strlen(iSubMessage.c_str())];
+		tempMssg = new char[strlen(errMessage) + iFileName.length() + sizeof(int) + iSubMessage.length()];
 		sprintf(tempMssg, errMessage, iFileName.c_str(), iLineNumber, iSubMessage.c_str());
 		iMessage += tempMssg;
 		MessageHandler::GetInstance()->Output(iMessage.c_str());

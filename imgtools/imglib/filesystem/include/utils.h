@@ -35,7 +35,7 @@
 	typedef long long int Long64;
 #endif
 
-typedef std::string String;
+using namespace std;
 
 /**
 Function responsible to convert given string into upper case.
@@ -47,7 +47,7 @@ Note: In FAT iamge regular entry names are need to be mentioned in Upper case.
 @param aString - input string 
 @return returns the string, were string alphabets are changed to uppercase
 */
-inline String& ToUpper(String& aString)
+inline string& ToUpper(string& aString)
 {
 	unsigned int stringLength = aString.length();
 	for(unsigned int stringIndex = 0; stringIndex < stringLength; stringIndex++)

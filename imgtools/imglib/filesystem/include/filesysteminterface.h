@@ -25,7 +25,7 @@
 #include "directory.h"
 #include <fstream>
 
-typedef std::ofstream Ofstream;
+typedef ofstream Ofstream;
 
 //default image size in Bytes
 const int KDefaultImageSize=50*1024*1024;
@@ -52,7 +52,7 @@ enum TErrorCodes
 // Configurable FAT attributes
 struct ConfigurableFatAttributes
 {
-	String iDriveVolumeLabel;
+	string iDriveVolumeLabel;
 	unsigned int iDriveSectorSize;
 	unsigned int iDriveNoOfFATs;
 	

@@ -32,10 +32,10 @@
 
 class CFileSystem;
 
-typedef std::ofstream OfStream;
-typedef std::ifstream IfStream;
-typedef std::ios Ios;
-typedef std::map<unsigned int,std::string> StringMap;
+typedef ofstream OfStream;
+typedef ifstream IfStream;
+typedef ios Ios;
+typedef map<unsigned int,string> StringMap;
 
 /**
 This class describes the member functions and data members required to create directory/data
@@ -47,22 +47,18 @@ region of FAT image.
 
 class CDirRegion
 	{
-	private:
-		void FormatName(String& aString,char aAttrValue);
+	private: 
 		unsigned int Get32BitClusterNumber(unsigned int aHighWord, unsigned int aLowWord);
 		void CheckEntry(EntryList aNodeList);
 		void CreateDirEntry(CDirectory* aEntry,unsigned int aParentDirClusterNumber);
-		void CreateAndWriteCurrentDirEntry(unsigned int aCurClusterNumber,String& aString);
-		void CreateAndWriteParentDirEntry(unsigned int aParDirClusterNumber,String& aString);
-		void WriteEntryToString(CDirectory* aEntry,String& aString);
-		bool IsLongEntry(CDirectory* aEntry) const;
-		void CreateLongEntries(CDirectory* aEntry,String& aDirString);
+		void CreateAndWriteCurrentDirEntry(unsigned int aCurClusterNumber,string& aString);
+		void CreateAndWriteParentDirEntry(unsigned int aParDirClusterNumber,string& aString); 
 		void WriteFileDataInToCluster(CDirectory* aEntry); 
 		void PushStringIntoClusterMap(unsigned int aNumber, 
-									  String& aDirString,
+									  string& aDirString,
 									  unsigned long int aClusterSize,
 									  char aAttribute);
-		void PushDirectoryEntryString(unsigned int aNumber,String& aString,int aClustersRequired);
+		void PushDirectoryEntryString(unsigned int aNumber,string& aString,int aClustersRequired);
 
 	public:
 		CDirRegion(	EntryList iNodeList,

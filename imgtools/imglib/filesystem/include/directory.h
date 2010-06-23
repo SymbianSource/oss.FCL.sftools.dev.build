@@ -48,7 +48,7 @@
 class CDirectory;
 class CLongEntry;
 
-typedef std::list<CDirectory*> EntryList;
+typedef list<CDirectory*> EntryList;
 
 //Directory, file and volume Attributes
 enum KAttributes
@@ -95,6 +95,31 @@ union TTimeInteger
 	unsigned short int iImageTime;
 };
 
+struct TShortDirEntry {
+    unsigned char DIR_Name [11];
+    unsigned char DIR_Attr ;
+    unsigned char DIR_NTRes ;
+    unsigned char DIR_CrtTimeTenth ;
+    unsigned char DIR_CrtTime[2] ;
+    unsigned char DIR_CrtDate[2] ;
+    unsigned char DIR_LstAccDate[2] ;
+    unsigned char DIR_FstClusHI[2] ;
+    unsigned char DIR_WrtTime[2] ;
+    unsigned char DIR_WrtDate[2];
+    unsigned char DIR_FstClusLO[2];
+    unsigned char DIR_FileSize[4] ;    
+};
+
+struct TLongDirEntry {
+    unsigned char LDIR_Ord ;
+    unsigned char LDIR_Name1[10] ;
+    unsigned char LDIR_Attr ;
+    unsigned char LDIR_Type ;
+    unsigned char LDIR_Chksum ;
+    unsigned char LDIR_Name2[12] ;
+    unsigned char LDIR_FstClusLO[2] ; 
+    unsigned char LDIR_Name3[4] ;
+};
 /* This class describes the attributes of a single directory/file/volume entry.
  *
  * @internalComponent
@@ -104,14 +129,14 @@ class CDirectory
 {
 
 public:
-	FILESYSTEM_API CDirectory(char* aEntryName);
+	FILESYSTEM_API CDirectory(const char* aEntryName,CDirectory* aParent);
 	FILESYSTEM_API ~CDirectory();
 	FILESYSTEM_API EntryList* GetEntryList();
 	FILESYSTEM_API void InsertIntoEntryList(CDirectory* aEntry);
 	FILESYSTEM_API void SetFilePath(char* aFilePath);
-	FILESYSTEM_API String GetFilePath() const;
-	FILESYSTEM_API void SetEntryName(String aEntryName);
-	FILESYSTEM_API String GetEntryName() const;
+	FILESYSTEM_API string GetFilePath() const;
+	FILESYSTEM_API void SetEntryName(string aEntryName);
+	FILESYSTEM_API string GetEntryName() const;
 	FILESYSTEM_API void SetEntryAttribute(char aAttribute);
 	FILESYSTEM_API char GetEntryAttribute() const;
 	char GetNtReservedByte() const;
@@ -127,13 +152,18 @@ public:
 	unsigned short int GetLastWriteTime() const;
 	FILESYSTEM_API void SetFileSize(unsigned int aFileSize);
 	FILESYSTEM_API unsigned int GetFileSize() const;
-	bool IsFile() const ;
-
+	bool IsFile() const ; 
+	FILESYSTEM_API CDirectory* GetParent()const {
+	    return iParent ;
+	}
+	FILESYSTEM_API bool GetShortEntry(TShortDirEntry& rEntry) ;
+	FILESYSTEM_API bool GetLongEntries(list<TLongDirEntry>& rEntries) ;
 private:
 	void InitializeTime();
-
+	void MakeUniqueShortName(unsigned char* rShortName,size_t aWavPos) const ;
 private:
-	String iEntryName;					//Directory or file name
+	string iEntryName;					//Directory or file name
+    unsigned char iShortName[12] ; 
 	char iAttribute;					//To mention file or directory or Volume
 	char iNtReserved;					//Reserved for use by windows NT, this value always zero
 	char iCreationTimeMsecs;			/**Millisecond stamp at file creation time, Since this is not 
@@ -148,11 +178,12 @@ private:
 	unsigned int iFileSize;				//file size
 	EntryList iDirectoryList;			//List Template used to hold subdirectories
 	
-	String iFilePath; //Holds file path only if the entry is of type "file"
+	string iFilePath; //Holds file path only if the entry is of type "file"
 
 	struct tm* iDateAndTime;
 	union TTimeInteger iTime;
-	union TDateInteger iDate;
+	union TDateInteger iDate; 
+	CDirectory* iParent ;
 };
 
 #endif //DIRECTORY_H

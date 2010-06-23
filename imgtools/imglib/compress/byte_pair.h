@@ -18,6 +18,7 @@
 #ifndef BYTE_PAIR_H
 #define BYTE_PAIR_H
 
+ 
 #ifdef __VC32__
  #ifdef __MSVCDOTNET__
   #include <strstream>
@@ -74,8 +75,8 @@ const TUint8 ByteTail = 'T';
 const TUint8 ByteNew = 'N';
 class CBytePair {
     private:
-        TBool   iFastCompress;
         TInt    marker;
+        TInt    markerCount;
         TUint8  Mask[MaxBlockSize];
         TUint16 ByteCount[0x100];
         TUint16 ByteIndex[0x100];
@@ -89,22 +90,12 @@ class CBytePair {
         TInt    PairListHigh;
 
         void CountBytes(TUint8* data, TInt size) {
-            TUint32 *p;
-            p = (TUint32*)ByteCount;
-            while (p < (TUint32*)ByteCount + sizeof(ByteCount)/4) {
-                *p++ = 0;
-            }
-            p = (TUint32*)ByteIndex;
-            while (p < (TUint32*)ByteIndex + sizeof(ByteIndex)/4) {
-                *p++ = 0xffffffff;
-            }
-            p = (TUint32*)BytePos;
-            while (p< (TUint32*)BytePos + sizeof(BytePos)/4) {
-                *p++ = 0xffffffff;
-            }
-            TUint8* dataEnd = data+size;
+	    memset(reinterpret_cast<char*>(ByteCount),0,sizeof(ByteCount));
+            memset(reinterpret_cast<char*>(ByteIndex),0xff,sizeof(ByteIndex));
+            memset(reinterpret_cast<char*>(BytePos),0xff, sizeof(BytePos));
+            TUint8* dataEnd = data + size;
             int pos = 0;
-            while(data<dataEnd) {
+            while(data < dataEnd) {
                 BytePos[pos] = ByteIndex[*data];
                 ByteIndex[*data] = (TUint16)pos;
                 pos ++;
@@ -117,9 +108,12 @@ class CBytePair {
         int TieBreak(int b1,int b2) {
             return -ByteCount[b1]-ByteCount[b2];
         }
+        void SortN(TUint16 *a, TInt n);
+        void InsertN(TUint16 *a, TInt n, TUint16 v);
+        TInt PosN(TUint16 index, TInt minFrequency);
 
         void Initialize(TUint8* data, TInt size);
-        TInt MostCommonPair(TInt& pair);
+        TInt MostCommonPair(TInt& pair, TInt minFrequency);
         TInt LeastCommonByte(TInt& byte);
         inline void InsertPair(const TUint16 pair, const TUint16 pos) {
             //ClockInsert1 = clock();
@@ -344,9 +338,6 @@ class CBytePair {
         }
 #endif
 	public:
-        CBytePair(TBool fastCompress) {
-            iFastCompress = fastCompress; 
-        }
         TInt Compress(TUint8* dst, TUint8* src, TInt size);
         TInt Decompress(TUint8* dst, TInt dstSize, TUint8* src, TInt srcSize, TUint8*& srcNext);
 };

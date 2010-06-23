@@ -36,7 +36,6 @@ TBool gPlatSecDiagnostics=0;
 TBool gPlatSecEnforceSysBin=0;
 TBool gSortedRomFs=ETrue;
 TBool gEnableCompress=EFalse;		// Default to uncompressed ROM image
-TBool gFastCompress = EFalse;   // Default to compress most
 TUint gCompressionMethod=0; // Default compression method
 
 TBool gCompressUnpaged=EFalse; // Default to not compress un-paged part of ROM Image
@@ -56,7 +55,8 @@ TBool gEnableStdPathWarning=EFalse; // To generate warning if the destination pa
 
 TBool gLowMem = EFalse;
 TBool gUseCoreImage = EFalse;
-TText* gImageFilename = 0;
+string gImageFilename = "";
 
 TInt gBootstrapSize=0;			// To calculate uncompressed un-paged size CR1258
 TInt gPageIndexTableSize=0;		// To calculate uncompressed un-paged size CR1258
+TBool gKeepGoing = EFalse;

@@ -101,7 +101,7 @@ public:
 	void SetReservedByte();
 	void SetBootSignature();
 	void SetVolumeId();
-	void SetVolumeLab(String aVolumeLable);
+	void SetVolumeLab(string aVolumeLable);
 	//virtual methods
 	virtual void SetRootDirEntries()=0;
 	virtual void SetFileSysType()=0;

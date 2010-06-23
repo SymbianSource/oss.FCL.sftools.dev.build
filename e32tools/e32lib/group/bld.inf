@@ -14,8 +14,12 @@
 //
 
 PRJ_PLATFORMS
-TOOLS2
+TOOLS TOOLS2
+
+PRJ_EXPORTS
+../seclib/seclib.h				SYMBIAN_OS_LAYER_PLATFORM_EXPORT_PATH(seclib.h)
 
 PRJ_MMPFILES
-seclib
+seclib.mmp
+
 

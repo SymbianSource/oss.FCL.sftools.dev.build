@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -17,7 +17,7 @@
 #
 
 # If SBS_HOME is not set in the environment then work it out
-# from the path to this batch file
+# from the path to this script
 if [ -z "$SBS_HOME" ] ; then
 	temp=$0
 	SBS_HOME=$(cd ${temp%/*} && echo $PWD)
@@ -62,31 +62,47 @@ EOERROR
 fi
 
 if [ "$OSTYPE" == "cygwin" ]; then
-
-	SBS_HOME=${SBS_HOME//\\//}
-
 	__MINGW__=${SBS_MINGW:-$SBS_HOME/$HOSTPLATFORM_DIR/mingw}
 	__CYGWIN__=${SBS_CYGWIN:-$SBS_HOME/$HOSTPLATFORM_DIR/cygwin}
-	__PYTHON__=${SBS_PYTHON:-$SBS_HOME/$HOSTPLATFORM_DIR/python252/python.exe}
 
-    # Command for unifying path strings. For example, "c:\some\path" and
-    # "/cygdrive/c/some/path" will both be converted into "c:/some/path".
+	# Command for unifying path strings. For example, "c:\some\path" and
+	# "/cygdrive/c/some/path" will both be converted into "c:/some/path".
 	u="$__CYGWIN__/bin/cygpath.exe -m"
-
+	
+	SBS_HOME=${SBS_HOME//\\//}
+	export SBS_HOME=$($u "$SBS_HOME")
+	
 	__MINGW__=$($u "$__MINGW__")
 	__CYGWIN__=$($u "$__MINGW__")
-	__PYTHON__=$($u "$__PYTHON__")
-
-	export SBS_HOME=$($u "$SBS_HOME")
-	export EPOCROOT=$($u "$EPOCROOT")
-
 	export PATH=${__MINGW__}/bin:${__CYGWIN__}/bin:$SBS_HOME/$HOSTPLATFORM_DIR/bin:$PATH
 
 	# Tell Cygwin not to map unix security attributes to windows to
 	# prevent raptor from potentially creating read-only files:
 	export CYGWIN='nontsec nosmbntsec'
 
+	# The python and PYTHONPATH used by Raptor are determined by, in order of precedence:
+	#  1. the SBS_PYTHON and SBS_PYTHONPATH environment variables (if set)
+	#  2. the python shipped locally with Raptor (if present)
+	#  3. the python on the system PATH and the PYTHONPATH set in the system environment
+
+	__LOCAL_PYTHON__=$SBS_HOME/win32/python264/python.exe
+
+	if [ -n "$SBS_PYTHON" ]; then
+		__PYTHON__=$SBS_PYTHON
+	elif [ -f "$__LOCAL_PYTHON__" ]; then
+		__PYTHON__=$__LOCAL_PYTHON__
+		export SBS_PYTHON=$__PYTHON__
+		export PYTHONPATH=
+	else
+		__PYTHON__=python.exe
+	fi
+	__PYTHON__=$($u "$__PYTHON__")		
+
+	if [ -n "$SBS_PYTHONPATH" ]; then
+		export PYTHONPATH=$($u "$SBS_PYTHONPATH")
+	fi
 else
+	export PYTHONPATH=${SBS_PYTHONPATH:-$SBS_HOME/$HOSTPLATFORM_DIR/python262/lib}
 	PATH=$SBS_HOME/$HOSTPLATFORM_DIR/python262/bin:$SBS_HOME/$HOSTPLATFORM_DIR/bin:$PATH
 	LD_LIBRARY_PATH=$SBS_HOME/$HOSTPLATFORM_DIR/python262/lib:$SBS_HOME/$HOSTPLATFORM_DIR/bv/lib:$LD_LIBRARY_PATH
 

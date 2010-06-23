@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -50,6 +50,7 @@ LINKER_FIRSTSTATLIB:=
 MAINLINKAS:=
 NEWLIBFILE:=
 RELEASABLES:=
+TC_RELEASABLES:=
 STATLIBDIR:=
 STDCPP_BUILD:=
 STDCPPTAGFILE:=
@@ -111,13 +112,20 @@ ifeq ($(SUPPORTS_STDCPP_NEWLIB),1)
     endif
   endif
 
+  # Operator new linking depends on both the use of the NEWLIB keyword and whether a component supports a standard
+  # CPP build.
   ifneq ($(NEWLIB),)
+    # If specified, always use the NEWLIB keyword value for operator new library linking
     NEWLIBFILE:=$(STATLIBDIR)/$(NEWLIB)
   else
-    ifeq ($(SYSTEM_TARGET),1)
-      NEWLIBFILE:=$(STATLIBDIR)/$(DEFAULT_SYSTEM_NEWLIB)
-    else
-      NEWLIBFILE:=$(STATLIBDIR)/$(DEFAULT_NORMAL_NEWLIB)
+    # If not performing a standard CPP build, link to an appropriate default Symbian new library.
+    # Standard CPP components defer to the toolchain supplied libraries.
+    ifneq ($(STDCPP_BUILD),1)
+      ifeq ($(SYSTEM_TARGET),1)
+        NEWLIBFILE:=$(STATLIBDIR)/$(DEFAULT_SYSTEM_NEWLIB)
+      else
+        NEWLIBFILE:=$(STATLIBDIR)/$(DEFAULT_NORMAL_NEWLIB)
+      endif
     endif
   endif
 endif
@@ -142,7 +150,7 @@ else
 endif
 
 # get the compiler to generate dependencies for us?
-ifeq ($(DEPEND_SKIP),)
+ifeq ($(NO_DEPEND_GENERATE),)
   CFLAGS:=$(CFLAGS) $(OPT.DEPEND)
 endif
 
@@ -191,13 +199,14 @@ else
 endif
 
 
-BINTARGET:=$(BINDIR)/$(TARGET).$(if $(REQUESTEDTARGETEXT),$(REQUESTEDTARGETEXT),$(TARGETTYPE))
+TARGETEXT:=$(if $(REQUESTEDTARGETEXT),$(REQUESTEDTARGETEXT),$(TARGETTYPE))
+BINTARGET:=$(BINDIR)/$(TARGET).$(TARGETEXT)
 
 
 # Run trace compiler #####################################
 TRACE_MARKER_PATH:=$(OUTPUTPATH)
 
-ifeq ($(UID3),)
+ifeq ($(subst 0,,$(UID3)),)
   ifeq ($(UID2),)
     USE_TRACE_COMPILER:=
   else
@@ -209,8 +218,10 @@ endif
 
 # USE_TRACE_COMPILER defaults to blank in Raptor config.
 # Users can turn TC on by setting it to 1 in user config.
-ifneq ($(USE_TRACE_COMPILER),) 
+ifneq ($(USE_TRACE_COMPILER),)
+  # TARGETEXT must be set before here
   include $(FLMHOME)/tracecompiler.mk
+  TC_RELEASABLES:=$(TRACE_DICTIONARY) $(AUTOGEN_HEADER)
 endif
 
 
@@ -218,7 +229,7 @@ endif
 ## IMPORT LIBRARY ##
 ####################
 
-IMPORTLIBLINKAS:=$(TARGET).$(if $(REQUESTEDTARGETEXT),$(REQUESTEDTARGETEXT),$(TARGETTYPE))
+IMPORTLIBLINKAS:=$(TARGET).$(TARGETEXT)
 # LINKAS, if supplied, only applies to IMPLIB TARGETTYPEs
 ifeq ($(BASE_TYPE),importlib)
   ifneq ($(LINKAS),)
@@ -243,7 +254,6 @@ endif
 ifeq ($(SUPPORTS_IMPORT_LIBRARY),1)
   ifneq ($(NOEXPORTLIBRARY),1)
     ifneq ($(TARGET_$(call sanitise,$(IMPORTLIBTARGET))),1)
-      CLEANTARGETS:=$(CLEANTARGETS) $(if $(or $(EXPORTUNFROZEN),$(DEFFILE)),$(IMPORTLIBTARGET))
       RELEASABLES:=$(RELEASABLES) $(if $(or $(EXPORTUNFROZEN),$(DEFFILE)),$(IMPORTLIBTARGET))
 
       # import libraries are generated to the UDEB release directory
@@ -287,10 +297,9 @@ ifneq ($(BASE_TYPE),importlib)
   #############
 
   ifeq ($(COPY_FOR_STATIC_LINKAGE),1)
-    BINTARGETSTATICLINK:=$(BINDIRSTATICLINK)/$(TARGET).$(if $(REQUESTEDTARGETEXT),$(REQUESTEDTARGETEXT),$(TARGETTYPE))
+    BINTARGETSTATICLINK:=$(BINDIRSTATICLINK)/$(TARGET).$(TARGETEXT)
   endif
 
-  CLEANTARGETS:=$(CLEANTARGETS) $(BINTARGET) $(BINTARGETSTATICLINK)
   RELEASABLES:=$(RELEASABLES) $(BINTARGET) $(BINTARGETSTATICLINK)
 
   # work on a local source files list
@@ -368,23 +377,24 @@ ifneq ($(BASE_TYPE),importlib)
     $(eval DEPENDFILENAME:=$(call mapwin32file,$(1),.o.d))
     $(eval DEPENDFILE:=$(wildcard $(DEPENDFILENAME)))
 
-    $(call mapwin32file,$(1),.o): $(1) $(PROJECT_META) $(if $(DEPENDFILE),,RESOURCE BITMAP EXPORT) $(if $(USE_TRACE_COMPILER),$(TRACE_MARKER))
+    $(call mapwin32file,$(1),.o): $(1) $(PROJECT_META) $(if $(DEPENDFILE),,RESOURCE BITMAP EXPORT) | $(if $(USE_TRACE_COMPILER),$(TRACE_MARKER))
 	  $(call startrule,win32compile2object,,$(1)) \
 	  $(CC) $$(if $$(filter %.C,$(1)),-lang c) $(CFLAGS) $(OPTION_CW) \
 	  $(if $(STDCPP_BUILD),$$(if $$(filter %.c %.C,$(1)),,$$(call makemacrodef,$(OPT.DEFINE),$(STDCPP_WCHAR_DEF))),) \
-	  $(DEFINES) $(INCLUDES) $(OPT.OUT)"$$@" "$(1)" && \
-	  $(GNUSED) 's#\\\\\(.\)#/\1#g;s#/ #\\\ #g;s#\([A-Za-z]:\)\\\\#\1/#g;1,1s#.*: .* \(.\)\?$$$$#$(call mapwin32file,$(1),.o): $1 \1#' $(call mapwin32file,$(1),.dep) > $(call mapwin32file,$(1),.o.d) \
+	  $(DEFINES) $(INCLUDES) $(OPT.OUT)"$$@" "$(1)" \
+	  $(if $(NO_DEPEND_GENERATE),,&& $(GNUSED) 's#\\\\\(.\)#/\1#g;s#/ #\\\ #g;s#\([A-Za-z]:\)\\\\#\1/#g;1,1s#.*: .* \(.\)\?$$$$#$(call mapwin32file,$(1),.o): $1 \1#' $(call mapwin32file,$(1),.dep) > $(call mapwin32file,$(1),.o.d)) \
 	  $(call endrule,win32compile2object)
 
-    CLEANTARGETS:=$$(CLEANTARGETS) $(call mapwin32file,$(1),.dep)
-
-    CLEANTARGETS:=$$(CLEANTARGETS) $(DEPENDFILENAME)
-    ifneq "$(DEPENDFILE)" ""
-    ifeq ($(NO_DEPEND_INCLUDE),)
-      ifeq "$(filter %CLEAN,$(call uppercase,$(MAKECMDGOALS)))" ""
-        -include $(DEPENDFILE)
-      endif
+    ifeq ($(NO_DEPEND_GENERATE),)
+      CLEANTARGETS:=$$(CLEANTARGETS) $(call mapwin32file,$(1),.dep) $(DEPENDFILENAME)
     endif
+    
+    ifneq ($(DEPENDFILE),)
+      ifeq ($(NO_DEPEND_INCLUDE),)
+        ifeq ($(filter %CLEAN,$(call uppercase,$(MAKECMDGOALS))),)
+          -include $(DEPENDFILE)
+        endif
+      endif
     endif
 
     # individual source file compilation
@@ -412,27 +422,31 @@ ifneq ($(BASE_TYPE),importlib)
   STDMWCINCLUDEPATHS:=$(if $(MWCSym2Includes),$(MWCSym2Includes),$(MWCSYM2INCLUDES))
 
   define win32resourcecompile
-    # Note that two calls are made to the resource compiler here.  There seems to be no means to override the
-    # default behaviour of dumping dependency files into the CWD when using -MD.  So - we compile once for real,
-    # and then pipe dependency output through SED afterwards to create the dependency file where we want it
+    # Note that, if dependency files are required, two calls are made to the resource compiler here.
+    # There seems to be no means to override the default behaviour of dumping dependency files into the CWD when using -MD.
+    # So - we compile once for real, and then pipe dependency output through SED afterwards to create the dependency file where we want it
 
     $(eval DEPENDFILENAME:=$(call mapwin32file,$(1),.res.d))
     $(eval DEPENDFILE:=$(wildcard $(DEPENDFILENAME)))
 
     $(call mapwin32file,$(1),.res): $(1) $(PROJECT_META) $(if $(DEPENDFILE),,RESOURCE BITMAP EXPORT)
 	  $(call startrule,win32resourcecompile,,$(1)) \
-	  MWCIncludes='$(STDMWCINCLUDEPATHS)' $(RC) $(OPT.OUT)"$$@" "$(1)" && \
-	  MWCIncludes='$(STDMWCINCLUDEPATHS)' $(RC) -make $(OPT.OUT)"$$@" "$(1)" | \
-	  $(GNUSED) 's#\\\\\(.\)#/\1#g;s#/ #\\\ #g;s#\([A-Za-z]:\)\\\\#\1/#g;1,1s#.*: .* \(.\)\?$$$$#$(call mapwin32file,$(1),.res): $1 \1#' > $(call mapwin32file,$(1),.res.d) \
+	  MWCIncludes='$(STDMWCINCLUDEPATHS)' $(RC) $(OPT.OUT)"$$@" "$(1)" \
+	  $(if $(NO_DEPEND_GENERATE),,&& \
+	    MWCIncludes='$(STDMWCINCLUDEPATHS)' $(RC) -make $(OPT.OUT)"$$@" "$(1)" | \
+	    $(GNUSED) 's#\\\\\(.\)#/\1#g;s#/ #\\\ #g;s#\([A-Za-z]:\)\\\\#\1/#g;1,1s#.*: .* \(.\)\?$$$$#$(call mapwin32file,$(1),.res): $1 \1#' > $(call mapwin32file,$(1),.res.d)) \
 	  $(call endrule,win32resourcecompile)
 
-    CLEANTARGETS:=$$(CLEANTARGETS) $(DEPENDFILENAME)
-    ifneq "$(DEPENDFILE)" ""
-    ifeq ($(NO_DEPEND_INCLUDE),)
-      ifeq "$(filter %CLEAN,$(call uppercase,$(MAKECMDGOALS)))" ""
-        -include $(DEPENDFILE)
-      endif
+    ifeq ($(NO_DEPEND_GENERATE),)
+      CLEANTARGETS:=$$(CLEANTARGETS) $(DEPENDFILENAME)
     endif
+    
+    ifneq ($(DEPENDFILE),)
+      ifeq ($(NO_DEPEND_INCLUDE),)
+        ifeq ($(filter %CLEAN,$(call uppercase,$(MAKECMDGOALS))),)
+          -include $(DEPENDFILE)
+        endif
+      endif
     endif
 
   endef
@@ -463,7 +477,6 @@ ifneq ($(BASE_TYPE),importlib)
       # link map file (urel only)
       ifeq ($(VARIANTTYPE),urel)
         MAP:=$(OPT.MAP)$(BINTARGET).map
-        CLEANTARGETS:=$(CLEANTARGETS) $(BINTARGET).map
         RELEASABLES:=$(RELEASABLES) $(BINTARGET).map
       endif
     endif
@@ -524,7 +537,7 @@ ifneq ($(BASE_TYPE),importlib)
     TMP_IMPLIB:=$(BLDDIR)/$(TARGET).lib
     TMP_INFFILE:=$(BLDDIR)/$(TARGET).inf
     TMP_SYMFILE:=$(if $(OPEN_ENVIRONMENT),$(BLDDIR)/$(TARGET).sym,)
-    TMP_TARGET:=$(BLDDIR)/$(TARGET).$(if $(REQUESTEDTARGETEXT),$(REQUESTEDTARGETEXT),$(TARGETTYPE))
+    TMP_TARGET:=$(BLDDIR)/$(TARGET).$(TARGETEXT)
     TMP_DEFFILE:=$(BLDDIR)/$(TARGET).def
 
     CLEANTARGETS:=$(CLEANTARGETS) $(TMP_IMPLIB) $(TMP_INFFILE) $(TMP_TARGET) $(TMP_DEFFILE) $(TMP_SYMFILE)
@@ -565,7 +578,7 @@ ifneq ($(BASE_TYPE),importlib)
 		$(call groupin10,$(notdir $(OBJECTFILES))) ;
 	    $(call startrule,win32stageonelink) \
 	    $(if $(SUPPORTS_STDCPP_NEWLIB),$(if $(STATICLIBFILES),$(CHECKLIB) $(CHECKLIB_TYPE) $(OPT.CHECKLIB.WIN32) $(STATICLIBFILES) &&,),) \
-	    MWSym2LibraryFiles="$(MWSym2LibraryFiles)" $(LD) $(LFLAGS) $(OPT.MENTRYPOINT)$(ENTRYSYMBOL) $(OPT.EXPORT)$(EXPORT_TYPE) $(OPT.NOCOMPACTIMPORTLIB) $(OPT.ADDCOMMAND) "out:$(TARGET).$(if $(REQUESTEDTARGETEXT),$(REQUESTEDTARGETEXT),$(TARGETTYPE))" $(OPT.WARNINGS) off $(OPT.IMPLIB)"$(TMP_IMPLIB)" $(OPT.OUT)"$(TMP_TARGET)" $(LINKER_FIRSTSTATLIBFILE) $(NEWLIBFILE) $(WIN32_LIBRARIES) $(STATICLIBFILES) $(LINKLIBFILES) $(OPT.LIBPATH)$(BLDDIR) $(OPT.SEARCH) @$(OBJECTFILES_LRF) \
+	    MWSym2LibraryFiles="$(MWSym2LibraryFiles)" $(LD) $(LFLAGS) $(OPT.MENTRYPOINT)$(ENTRYSYMBOL) $(OPT.EXPORT)$(EXPORT_TYPE) $(OPT.NOCOMPACTIMPORTLIB) $(OPT.ADDCOMMAND) "out:$(TARGET).$(TARGETEXT)" $(OPT.WARNINGS) off $(OPT.IMPLIB)"$(TMP_IMPLIB)" $(OPT.OUT)"$(TMP_TARGET)" $(LINKER_FIRSTSTATLIBFILE) $(NEWLIBFILE) $(WIN32_LIBRARIES) $(STATICLIBFILES) $(LINKLIBFILES) $(OPT.LIBPATH)$(BLDDIR) $(OPT.SEARCH) @$(OBJECTFILES_LRF) \
 	    $(call endrule,win32stageonelink)
     endef
     $(eval $(win32stageonelink))
@@ -677,12 +690,11 @@ ifneq ($(TESTPATH),)
   BATCHFILE_CREATED_$(BATCHDIR)$(MODULE)/$(VARIANTPLATFORM).$(TESTPATH):=1
   TARGET_CREATED_$(EPOCROOT)/epoc32/release/$(VARIANTPLATFORM)/$(VARIANTTYPE)/z/test/$(MODULE)/$(VARIANTPLATFORM).$(TESTPATH)_$(TARGET):=1
   RELEASABLES:=$(RELEASABLES) $(EPOCROOT)/epoc32/release/$(VARIANTPLATFORM)/$(VARIANTTYPE)/z/test/$(MODULE)/$(VARIANTPLATFORM).$(TESTPATH)
-  CLEANTARGETS:=$(CLEANTARGETS) $(EPOCROOT)/epoc32/release/$(VARIANTPLATFORM)/$(VARIANTTYPE)/z/test/$(MODULE)/$(VARIANTPLATFORM).$(TESTPATH)
 endif
 
 # clean up
-$(eval $(call GenerateStandardCleanTarget,$(CLEANTARGETS),$(CREATABLEPATHS),))
+$(call raptor_clean,$(CLEANTARGETS))
 # make the output directories while reading makefile - some build engines prefer this
 $(call makepath,$(CREATABLEPATHS))
-# for the abld -what target
-$(eval $(call whatmacro,$(RELEASABLES),WHATWINSCW))
+# for the --what option and the log file
+$(call raptor_release,$(RELEASABLES) $(TC_RELEASABLES))

@@ -21,18 +21,26 @@
 #include <stdlib.h>
 #include <string>
 
-#ifndef __LINUX__
+#ifdef __LINUX__
+	
+	#include <dirent.h>
+	#ifndef MKDIR
+		#define MKDIR(a)	mkdir(a,0777)
+	#endif
+#else
+	#ifdef _STLP_INTERNAL_WINDOWS_H
+	#define __INTERLOCKED_DECLARED
+	#endif
 	#include <windows.h>
 	#include <direct.h>
-#else
-	#include <dirent.h>
+	#ifndef MKDIR
+		#define MKDIR		mkdir
+	#endif
 #endif
+#include <sys/stat.h>
+#include <sys/types.h>
+using namespace std;
 
-#ifdef __TOOLS2__
-	#include <sys/stat.h>
-	#include <sys/types.h>
-	using namespace std;
-#endif
 
 #include <f32file.h>
 #include "h_utl.h"
@@ -41,7 +49,6 @@
 #include "r_rofs.h"
 #include "r_driveimage.h"
 
-extern TBool gFastCompress;
 
 // File format supported by Rofsbuild
 DriveFileFormatSupported CDriveImage::iFormatType[] =
@@ -58,12 +65,12 @@ File format conversion from char* to coresponding enum value.
 @param aUserFileFormat - pointer to user entered file format.
 @param aDriveFileFormat - Reference to actual variable.
 */
-TBool CDriveImage::FormatTranslation(TText* aUserFileFormat,enum TFileSystem& aDriveFileFormat)
+TBool CDriveImage::FormatTranslation(const char* aUserFileFormat,enum TFileSystem& aDriveFileFormat)
 	{
 	struct DriveFileFormatSupported* strPointer = iFormatType;
 	for( ; (strPointer->iDriveFileFormat) != '\0' ; ++strPointer )
 		{
-		if(!strcmp((char*)aUserFileFormat,strPointer->iDriveFileFormat))
+		if(!strcmp(aUserFileFormat,strPointer->iDriveFileFormat))
 			{
 			aDriveFileFormat = strPointer->iFileSystem;
 			return ETrue;
@@ -79,7 +86,7 @@ Constructor: CDriveImage class
 @param aObey - pointer to Drive obey file.
 */
 CDriveImage::CDriveImage(CObeyFile *aObey)
-	: iObey( aObey ),iParentInnerList(0),iListReference(0),iTempDirName(NULL), iData(0)
+	: iObey( aObey ),iParentDirEntry(0),iListReference(0),iTempDirName(NULL), iData(0)
 	{
 	}
 
@@ -126,12 +133,8 @@ TInt CDriveImage::CreateList()
 	// Check for folder exist, if exist it loops until dir created or loop exit.
 	while(dirCheck)
 		{
-		sprintf(iTempDirName,"%s%05d","temp",dirCheck);
-#ifdef __LINUX__
-		retStatus = mkdir((char*)iTempDirName,0777);
-#else
-		retStatus = mkdir((char*)iTempDirName);
-#endif
+		sprintf(iTempDirName,"%s%05d","temp",dirCheck); 
+		retStatus = MKDIR(iTempDirName); 
 		if(!retStatus)
 			break;	
 
@@ -176,7 +179,7 @@ Calls the file system modules with required parameters.
 @return Status(r) - returns the status of file system module.
                    'KErrGeneral' - Unable to done the above operations properly.
 */
-TInt CDriveImage::CreateImage(TText* alogfile)
+TInt CDriveImage::CreateImage(const char* alogfile)
 	{
 
 	TInt retStatus = 0;
@@ -188,7 +191,7 @@ TInt CDriveImage::CreateImage(TText* alogfile)
 	if(retStatus != KErrNone)
 		{
 		Print(EError,"Insufficent Memory/Not able to generate the Structure\n");
-		if(DeleteTempFolder((char*)iTempDirName) != KErrNone )
+		if(DeleteTempFolder(iTempDirName) != KErrNone )
 			{
 			Print(EWarning,"Not able to delete the temp folder : %s",iTempDirName);
 			}
@@ -216,7 +219,7 @@ TInt CDriveImage::CreateImage(TText* alogfile)
 														iObey->iConfigurableFatAttributes);														; 
 
 	//delete the temp folder.
-	if(DeleteTempFolder((char*)iTempDirName) != KErrNone )
+	if(DeleteTempFolder(iTempDirName) != KErrNone )
 		{
 		cout << "Warning: Not able to delete the temp folder : " << iTempDirName << "\n" ;
 		}
@@ -234,12 +237,12 @@ Delete the temp directory.
                    'KErrGeneral' - Unable to done the above operations properly.
 				   'KErrNone' - successfully deleted the folder.
 */
-TInt CDriveImage::DeleteTempFolder(char* aTempDirName)
+TInt CDriveImage::DeleteTempFolder(const char* aTempDirName)
 	{
 
 	TInt fileDeleted = 1;
-	std::string dirPath(aTempDirName); 
-	std::string fileName(aTempDirName); 
+	string dirPath(aTempDirName); 
+	string fileName(aTempDirName); 
 
 #ifdef __LINUX__
 
@@ -254,7 +257,7 @@ TInt CDriveImage::DeleteTempFolder(char* aTempDirName)
 	fileName.append("/");
 
 	// Go through each entry
-	while(dirEntry = readdir(dirHandler))
+	while((dirEntry = readdir(dirHandler)))
 		{
 		if(dirEntry->d_type != DT_DIR) 
 			{
@@ -363,7 +366,13 @@ Hidden file node is not placed in list.
 TInt CDriveImage::CreateDirOrFileEntry(TRomNode* atempnode,enum KNodeType aType)    
 	{
 
-	CDirectory* iDirectory = new CDirectory((char*)atempnode->iName);
+	CDirectory* parentDirectory = NULL ;
+	if(KNodeTypeChild == aType)
+		parentDirectory = iParentDirEntry;
+	else if(KNodeTypeSibling == aType)
+		parentDirectory = (CDirectory*)(iNodeAddStore[iListReference-1]);
+	
+	CDirectory* iDirectory = new CDirectory(atempnode->iName,parentDirectory);
 	if(!iDirectory)									
 		return KErrNoMemory;
 		
@@ -389,7 +398,7 @@ TInt CDriveImage::CreateDirOrFileEntry(TRomNode* atempnode,enum KNodeType aType)
 			}
 		else
 			{
-			iNodeAddStore.push_back((void*)iParentInnerList);
+			iNodeAddStore.push_back((void*)iParentDirEntry);
 			++iListReference;
 			return KErrNone;  
 			}	
@@ -403,20 +412,19 @@ TInt CDriveImage::CreateDirOrFileEntry(TRomNode* atempnode,enum KNodeType aType)
 		case KNodeTypeRoot:
 			iDirectory->SetEntryAttribute(EAttrVolumeId);
 			iNodeList.push_back(iDirectory);	
-			iParentInnerList = iDirectory->GetEntryList(); 
+			iParentDirEntry = iDirectory; 
 			break;
 					
 		case KNodeTypeChild:
-			iNodeAddStore.push_back((void*)iParentInnerList);
+			iNodeAddStore.push_back((void*)iParentDirEntry);
 			++iListReference;
-			iParentInnerList->push_back(iDirectory);
-			iParentInnerList = iDirectory->GetEntryList(); 
+			parentDirectory->InsertIntoEntryList(iDirectory); 
+			iParentDirEntry = iDirectory ;
 			break;
 
-		case KNodeTypeSibling:									
-			iParentInnerList =(std::list<CDirectory*> *)(iNodeAddStore[iListReference-1]);
-			iParentInnerList->push_back(iDirectory);
-			iParentInnerList = iDirectory->GetEntryList();
+		case KNodeTypeSibling:
+			parentDirectory->InsertIntoEntryList(iDirectory); 
+			iParentDirEntry = iDirectory ;
 			break;
 
 		default: 
@@ -435,12 +443,11 @@ Hidden file node is not placed in temp folder.
 @return r - returns 'KErrNoMemory/KErrGeneral' if fails to update the options or memory
             not allocated or else 'KErrNone' for Succesfully operation.
 */
-TInt CDriveImage::ConstructOptions() 
-	{
+TInt CDriveImage::ConstructOptions()  {
 
 	TInt32 len = 0;
 	TRomNode* node = TRomNode::FirstNode();
-        CBytePair bpe(gFastCompress);
+        CBytePair bpe;
 	
 	while(node)
 		{
@@ -448,7 +455,7 @@ TInt CDriveImage::ConstructOptions()
 		if(node->IsFile() && (!node->iHidden))
 			{
 		
-			TInt32 size=HFile::GetLength((TText*)node->iEntry->iFileName);    
+			TInt32 size=HFile::GetLength(node->iEntry->iFileName);    
 			if(size <= 0)
 				{
 				Print(EWarning,"File %s does not exist or is 0 bytes in length.\n",node->iEntry->iFileName);
@@ -459,13 +466,14 @@ TInt CDriveImage::ConstructOptions()
 				
 				if((node->iFileUpdate) || (node->iOverride))
 					{
-					iData = new char[(size * 2)];
+					size_t allocSize = size << 1 ;
+					iData = new char[allocSize];
 					if(!iData)
 						return KErrNoMemory;
 					
-					HMem::Set(iData, 0xff, (size * 2));
-                                        TUint8* aData = (TUint8*)iData;
-					len = node->PlaceFile(aData,0,(size * 2),&bpe);
+					HMem::Set(iData, 0xff, allocSize);
+                    TUint8* aData = (TUint8*)iData;
+					len = node->PlaceFile(aData,0,allocSize,&bpe);
 					if(len < KErrNone)
 						{	
 						delete[] iData;
@@ -506,8 +514,8 @@ TInt CDriveImage::PlaceFileTemporary(const TInt afileSize,TRomNode* acurrentNode
 
 	TInt randomValue = 0;
 	char randomString[KMaxGenBuffer] = "\0";
-	unsigned char* fileSourcePath = acurrentNode->iEntry->iName;
-	std::string newFileName;
+	char* fileSourcePath = acurrentNode->iEntry->iName;
+	string newFileName;
 
 	do
 		{
@@ -516,24 +524,20 @@ TInt CDriveImage::PlaceFileTemporary(const TInt afileSize,TRomNode* acurrentNode
 
 		if(!randomValue)	
 			{
-			newFileName.append((char*)fileSourcePath);
+			newFileName.append(fileSourcePath);
 			}
 		else
 			{  
 			newFileName.append(randomString);
-			newFileName.append((char*)fileSourcePath);
+			newFileName.append(fileSourcePath);
 			}
 
-#if defined(__MSVCDOTNET__) || defined(__TOOLS2__)
+ 
 		ifstream test(newFileName.c_str());
-#else //!__MSVCDOTNET__
-		ifstream test(newFileName.c_str(), ios::nocreate);
-#endif //__MSVCDOTNET__
-
 		if (!test)
 			{
 			test.close();
-			ofstream driveFile((char *)newFileName.c_str(),ios::binary);
+			ofstream driveFile(newFileName.c_str(),ios_base::binary);
 			if (!driveFile)
 				{
 				Print(EError,"Cannot open file %s for output\n",newFileName.c_str());
@@ -545,11 +549,12 @@ TInt CDriveImage::PlaceFileTemporary(const TInt afileSize,TRomNode* acurrentNode
 
 			// Update the new source path.
 			delete[] acurrentNode->iEntry->iFileName;
-			acurrentNode->iEntry->iFileName = new char[ strlen(newFileName.c_str()) + 1 ];
+			acurrentNode->iEntry->iFileName = new char[ newFileName.length() + 1 ];
 			if(!acurrentNode->iEntry->iFileName)
 				return KErrNoMemory;
 				
-			strcpy(acurrentNode->iEntry->iFileName,newFileName.c_str());
+			memcpy(acurrentNode->iEntry->iFileName,newFileName.c_str(),newFileName.length());
+			acurrentNode->iEntry->iFileName[newFileName.length()] = 0;
 			break;
 			}
 

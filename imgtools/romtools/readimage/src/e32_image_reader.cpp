@@ -20,11 +20,11 @@
 
 #include "e32_image_reader.h"
 
-E32ImageReader::E32ImageReader(char *aFile):ImageReader(aFile)
+E32ImageReader::E32ImageReader(const char* aFile):ImageReader(aFile)
 {
 }
 
-E32ImageReader::E32ImageReader():ImageReader(NULL)
+E32ImageReader::E32ImageReader():ImageReader("")
 {
 }
 
@@ -36,7 +36,7 @@ E32ImageReader::~E32ImageReader()
 
 void E32ImageReader::ReadImage()
 {
-	ifstream aIf(iImgFileName.c_str(), ios::binary | ios::in);
+	ifstream aIf(iImgFileName.c_str(), ios_base::binary | ios_base::in);
 	if( !aIf.is_open() )
 	{
 		throw ImageReaderException(iImgFileName.c_str(), "Cannot open file ");
@@ -46,13 +46,13 @@ void E32ImageReader::ReadImage()
 
 	TUint32			aSz;
 
-	aIf.seekg(0,ios::end);
+	aIf.seekg(0,ios_base::end);
 	aSz = aIf.tellg();
 
 	iE32Image->Adjust(aSz);
 	iE32Image->iFileSize = aSz;
 
-	aIf.seekg(0,ios::beg);
+	aIf.seekg(0,ios_base::beg);
 	aIf >> *iE32Image;
 }
 

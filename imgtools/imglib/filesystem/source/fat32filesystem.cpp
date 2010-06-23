@@ -221,7 +221,7 @@ void CFat32FileSystem::CreateFatTable(ofstream& aOutPutStream)
 		++clusterCounter;
 	}
 	// Each FAT32 entries occupies 4 bytes, hence multiply by 4
-	std::string aFatString(reinterpret_cast<char*>(FatTable),clusterCounter*4);
+	string aFatString(reinterpret_cast<char*>(FatTable),clusterCounter*4);
 	delete[] FatTable;
 	if(clusterCounter < totalFatEntries)
 	{

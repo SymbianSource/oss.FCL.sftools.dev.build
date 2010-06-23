@@ -21,17 +21,12 @@
 #ifndef __R_DRIVEIMAGE_H__
 #define __R_DRIVEIMAGE_H__
 
-#if defined(__MSVCDOTNET__) || defined(__TOOLS2__)
-	#include <fstream>
-#else //!__MSVCDOTNET__
-	#include <fstream.h>
-#endif 
-
+#include <fstream>
 #include "filesysteminterface.h" 
 #include <vector>
 
-typedef std::vector<void*> EntryReferenceVector;
-typedef	std::list<CDirectory*> EntryList; 
+typedef vector<void*> EntryReferenceVector;
+typedef	list<CDirectory*> EntryList; 
 
 const TInt KMaxGenBuffer=0x14;  
 
@@ -57,8 +52,8 @@ class CDriveImage
 public:
 	CDriveImage(CObeyFile *aObey);
 	~CDriveImage();
-	TInt CreateImage(TText* alogfile);
-	static TBool FormatTranslation(TText* aUserFileFormat,enum TFileSystem& aDriveFileFormat);
+	TInt CreateImage(const char* alogfile);
+	static TBool FormatTranslation(const char* aUserFileFormat,enum TFileSystem& aDriveFileFormat);
 
 private:
 
@@ -67,7 +62,7 @@ private:
 	TInt CreateDirOrFileEntry(TRomNode* atempnode,enum KNodeType aType);   
 	TInt ConstructOptions();
 	TInt PlaceFileTemporary(const TInt afileSize,TRomNode* acurrentNode); 
-	TInt DeleteTempFolder(char* aTempDirName);
+	TInt DeleteTempFolder(const char* aTempDirName);
 
 private:
 
@@ -76,7 +71,7 @@ private:
 	// Container required for file sysem module.
 	EntryList iNodeList;
 	// Pointer for nested Container.
-	EntryList *iParentInnerList;
+	CDirectory* iParentDirEntry ;
 
 	// For temp storge of Container address.
 	EntryReferenceVector iNodeAddStore;

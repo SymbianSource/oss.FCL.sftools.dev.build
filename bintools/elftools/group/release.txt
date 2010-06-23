@@ -3,3 +3,13 @@ Nokia Corporation
 
 NOTESRC_RELEASE_REASON
 ELFtools Release
+
+Version V02.02 (Build 002)
+===============
+Released by Zheng Shen, 10/03/2010
+    1) DPDEF144887  [System build] : NE1 smoketest not booting up for TB92SF_1069 vtb92sf build
+
+Version V02.02 (Build 001)
+===============
+Released by Zheng Shen, 05/03/2010
+    1) DPDEF144558  ELFTRAN'd give info in the illegal import of data message to allow debugging

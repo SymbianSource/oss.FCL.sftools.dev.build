@@ -170,16 +170,16 @@ int FileDump::DumpE32Image(const char* afileName)
 		return 1;
 	else if (result == KErrCorrupt || result == KErrNotSupported)
 	{
-		throw InvalidE32ImageError(INVALIDE32IMAGEERROR, (char *)afileName);
+		throw InvalidE32ImageError(INVALIDE32IMAGEERROR, (char*)afileName);
 	}
 	else if (result != 0)
 	{
-		throw FileError(FILEREADERROR, (char *)afileName);
+		throw FileError(FILEREADERROR, (char*)afileName);
 	}
 
 	int dumpOptions=iParameterListInterface->DumpOptions();
 	
-	aE32Imagefile->Dump((TText*)afileName, dumpOptions);
+	aE32Imagefile->Dump(afileName, dumpOptions);
 	delete aE32Imagefile;
 	return KErrNone;
 }

@@ -25,7 +25,7 @@
 #include "errorhandler.h"
 #include "directory.h"
 
-typedef std::multimap <unsigned int,unsigned int> TClustersPerEntryMap;
+typedef multimap <unsigned int,unsigned int> TClustersPerEntryMap;
 
 /*
  * This class is used by classes CDirRegion and CLongName. This class describes 

@@ -21,15 +21,9 @@
 
 #include <e32std.h>
 #include <e32std_private.h>
-
-#if defined(__MSVCDOTNET__) || defined(__TOOLS2__)
+ 
 #include <iostream>
-#include <fstream>
-#else //!__MSVCDOTNET__
-#include <iostream.h>
-#include <fstream.h>
-#endif //__MSVCDOTNET__
-
+#include <fstream> 
 #include <string.h>
 
 const TInt KSRecBytesPerLine=32;		// max line = 1+1+2+8 + (32*2) + 2 = 78

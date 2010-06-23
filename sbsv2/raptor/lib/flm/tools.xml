@@ -27,6 +27,7 @@
 		<param name='SYSTEMINCLUDE' default=''/>
 		<param name='TARGET'/>
 		<param name='TOOLSPATH'/>
+		<param name='TOOLS2WIN32' default=''/>
 		<param name='USERINCLUDE' default=''/>
 		<param name='PRODUCT_INCLUDE' default=''/>
 		<param name='PLATMACROS.WINDOWS'/>
@@ -35,6 +36,7 @@
 	</interface>
 
 	<interface name="Tools.exe" extends="Tools.common" flm="tools2exe.flm">
+		<param name='DOTEXE'/>
 		<param name='LINKER'/>
 		<param name='LFLAGS'/>
 		<param name='LIBS.WIN32' default=''/>
@@ -43,6 +45,7 @@
 		<param name='OPT.l'/>
 		<param name='STATICLIBRARY'/>
 		<param name='TARGETTYPE' default="EXE"/>
+		<param name='LINKER_OPTIONS' default=''/>	
 	</interface>
 
 	<interface name="Tools.lib" extends="Tools.common" flm="tools2lib.flm">

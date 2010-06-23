@@ -54,7 +54,7 @@ public:
 class RofsImageReader : public ImageReader
 {
 public:
-	RofsImageReader(char* aFile);
+	RofsImageReader(const char* aFile);
 	~RofsImageReader();
 
 	void ReadImage();
@@ -65,11 +65,11 @@ public:
 	void DumpDirStructure();
 	void DumpFileAttributes();
 	void MarkNodes();
-	void SetSeek(streampos aOff, ios::seek_dir aStartPos=ios::beg);
+	void SetSeek(streampos aOff, ios_base::seek_dir aStartPos=ios_base::beg);
 	void ExtractImageContents();
-	void CheckFileExtension(char* aFileName,TRomBuilderEntry* aEntry,TRomNode* aNode,ofstream& aLogFile );
-	void GetCompleteNodePath(TRomNode* aNode,string& aName,char* aAppStr);
-	void WriteEntryToFile(char* aFileName,TRomNode* aNode,ofstream& aLogFile);
+	void CheckFileExtension(const char* aFileName,TRomBuilderEntry* aEntry,TRomNode* aNode,ofstream& aLogFile );
+	void GetCompleteNodePath(TRomNode* aNode,string& aName);
+	void WriteEntryToFile(const char* aFileName,TRomNode* aNode,ofstream& aLogFile);
 
 	void GetFileInfo(FILEINFOMAP &aFileMap);
 	TUint32 GetImageSize();
@@ -80,7 +80,7 @@ private:
 	
 	TRomNode			*iRootDirEntry;
 
-	ifstream			*iInputFile;
+	std::ifstream			*iInputFile;
 };
 
 #endif //__ROFS_IMAGE_READER__

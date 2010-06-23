@@ -24,9 +24,6 @@
 #include "messageimplementation.h"
 #include "errorhandler.h"
 
-using std::endl;
-using std::cout;
-typedef std::string String;
 
 char *errorMssgPrefix="FileSystem : Error:";
 char *warnMssgPrefix="FileSystem : Warning:";
@@ -159,7 +156,7 @@ Function to Get Message stored in map and to display the Message
 */
 void MessageImplementation::ReportMessage(int aMessageType, int aMsgIndex,...)
 {
-	String reportMessage;
+	string reportMessage;
 	char* ptr;
 
 	va_list ap;
@@ -239,6 +236,6 @@ void MessageImplementation::InitializeMessages()
 	{
 		errStr = new char[strlen(MessageArray[i].message) + 1];
 		strcpy(errStr, MessageArray[i].message);
-		iMessage.insert(std::pair<int,char*>(MessageArray[i].index,errStr));
+		iMessage.insert(pair<int,char*>(MessageArray[i].index,errStr));
 	}
 }

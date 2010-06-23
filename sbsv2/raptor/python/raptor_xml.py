@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -11,7 +11,7 @@
 #
 # Contributors:
 #
-# Description: 
+# Description:
 # raptor_xml module
 #
 
@@ -67,15 +67,15 @@ def Read(Raptor, filename):
 	objects = []
 
 	fileVersion = build.getAttribute("xsi:schemaLocation")
-	
+
 	# ignore the file it matches the "invalid" schema
 	if fileVersion.endswith(xsdIgnore):
 		return objects
-		
+
 	# check that the file matches the expected schema
 	if not fileVersion.endswith(xsdVersion):
 		Raptor.Warn("file '%s' uses schema '%s' which does not end with the expected version '%s'", filename, fileVersion, xsdVersion)
-		
+
 	# create a Data Model object from each sub-element
 	for child in build.childNodes:
 		if child.namespaceURI == namespace \
@@ -144,9 +144,10 @@ class SystemModelComponent(generic_path.Path):
 	"""Path sub-class that wraps up a component bld.inf file with
 	system_definition.xml context information."""
 
-	def __init__(self, aBldInfFile, aContainerNames, aSystemDefinitionFile, aSystemDefinitionBase, aSystemDefinitionVersion):
+	def __init__(self, aBldInfFile, aLayerName, aContainerNames, aSystemDefinitionFile, aSystemDefinitionBase, aSystemDefinitionVersion):
 		generic_path.Path.__init__(self, aBldInfFile.Absolute().path)
 		self.__ContainerNames = aContainerNames
+		self.__LayerName = aLayerName
 		self.__SystemDefinitionFile = aSystemDefinitionFile
 		self.__SystemDefinitionBase = aSystemDefinitionBase
 		self.__SystemDefinitionVersion = aSystemDefinitionVersion
@@ -157,12 +158,15 @@ class SystemModelComponent(generic_path.Path):
 	def GetSystemDefinitionBase(self):
 		return self.__SystemDefinitionBase
 
-	def GetSystemDefinitionFile(self):
+	def GetSystemDefinitionVersion(self):
 		return self.__SystemDefinitionVersion
+
+	def GetLayerName(self):
+		return self.__LayerName
 
 	def GetContainerName(self, aContainerType):
 		if self.__ContainerNames.has_key(aContainerType):
-		  return self.__ContainerNames[aContainerType]
+			return self.__ContainerNames[aContainerType]
 		return ""
 
 
@@ -174,10 +178,12 @@ class SystemModel(object):
 		self.__SystemDefinitionFile = aSystemDefinitionFile.GetLocalString()
 		self.__SystemDefinitionBase = aSystemDefinitionBase.GetLocalString()
 		self.__Version = {'MAJOR':0,'MID':0,'MINOR':0}
+		self.__IdAttribute = "name"
 		self.__ComponentRoot = ""
 		self.__TotalComponents = 0
 		self.__LayerList = []
 		self.__LayerDetails = {}
+		self.__MissingBldInfs = {}
 
 		self.__DOM = None
 		self.__SystemDefinitionElement = None
@@ -203,9 +209,15 @@ class SystemModel(object):
 		return self.__LayerDetails[aLayer]
 
 	def IsLayerBuildable(self, aLayer):
+		if aLayer in self.__MissingBldInfs:
+			for missingbldinf in self.__MissingBldInfs[aLayer]:
+				self.__Logger.Error("System Definition layer \"%s\" from system definition file \"%s\" " + \
+								    "refers to non existent bld.inf file %s", aLayer, self.__SystemDefinitionFile, missingbldinf)
+
 		if len(self.GetLayerComponents(aLayer)):
 			return True
 		return False
+
 
 	def GetAllComponents(self):
 		components = []
@@ -222,6 +234,10 @@ class SystemModel(object):
 	def DumpInfo(self):
 		self.__Logger.Info("Found %d bld.inf references in %s within %d layers:", len(self.GetAllComponents()), self.__SystemDefinitionFile, len(self.GetLayerNames()))
 		self.__Logger.Info("\t%s", ", ".join(self.GetLayerNames()))
+		self.__Logger.InfoDiscovery(object_type = "layers",
+				count = len(self.GetLayerNames()))
+		self.__Logger.InfoDiscovery(object_type = "bld.inf references",
+				count = len(self.GetAllComponents()))
 
 	def __Read(self):
 		if not os.path.exists(self.__SystemDefinitionFile):
@@ -259,42 +275,62 @@ class SystemModel(object):
 
 		if self.__Version['MAJOR'] == 1 and self.__Version['MID'] > 2:
 			self.__ComponentRoot = self.__SystemDefinitionBase
-		elif self.__Version['MAJOR'] == 2:
-			# 2.0.0 format supports SOURCEROOT as an environment specified base - we respect this, unless
+		elif self.__Version['MAJOR'] == 2 or self.__Version['MAJOR'] == 3:
+			# 2.0.x and 3.0.0 formats support SOURCEROOT or SRCROOT as an environment specified base - we respect this, unless
 			# explicitly overridden on the command line
-			if os.environ.has_key('SOURCEROOT'):
+			if os.environ.has_key('SRCROOT'):
+				self.__ComponentRoot = generic_path.Path(os.environ['SRCROOT'])
+			elif os.environ.has_key('SOURCEROOT'):
 				self.__ComponentRoot = generic_path.Path(os.environ['SOURCEROOT'])
+
 			if self.__SystemDefinitionBase and self.__SystemDefinitionBase != ".":
 				self.__ComponentRoot = self.__SystemDefinitionBase
-				if os.environ.has_key('SOURCEROOT'):
+				if os.environ.has_key('SRCROOT'):
+					self.__Logger.Info("Command line specified System Definition file base \'%s\' overriding environment SRCROOT \'%s\'", self.__SystemDefinitionBase, os.environ['SRCROOT'])
+				elif os.environ.has_key('SOURCEROOT'):
 					self.__Logger.Info("Command line specified System Definition file base \'%s\' overriding environment SOURCEROOT \'%s\'", self.__SystemDefinitionBase, os.environ['SOURCEROOT'])
 		else:
 			self.__Logger.Error("Cannot process schema version %s of file %s", version.string, self.__SystemDefinitionFile)
 			return False
 
+		if self.__Version['MAJOR'] >= 3:
+			# id is the unique identifier for 3.0 and later schema
+			self.__IdAttribute = "id"
+
 		return True
 
 	def __Parse(self):
-		# find the <systemModel> element (there can be 0 or 1) and search any <layer> elements for <unit> elements with "bldFile" attributes
+		# For 2.0 and earlier: find the <systemModel> element (there can be 0 or 1) and search any <layer> elements for <unit> elements with "bldFile" attributes
 		# the <layer> context of captured "bldFile" attributes is recorded as we go
+		# For 3.0 and later, process any architectural topmost element, use the topmost element with an id as the "layer"
 		for child in self.__SystemDefinitionElement.childNodes:
-			if child.localName == "systemModel":
+			if child.localName in ["systemModel", "layer", "package", "collection", "component"]:
 				self.__ProcessSystemModelElement(child)
 
 	def __CreateComponent(self, aBldInfFile, aUnitElement):
 		# take a resolved bld.inf file and associated <unit/> element and returns a populated Component object
 		containers = {}
 		self.__GetElementContainers(aUnitElement, containers)
-		component = SystemModelComponent(aBldInfFile, containers, self.__SystemDefinitionFile, self.__SystemDefinitionBase, self.__Version)
+		layer = self.__GetEffectiveLayer(aUnitElement)
+		component = SystemModelComponent(aBldInfFile, layer, containers, self.__SystemDefinitionFile, self.__SystemDefinitionBase, self.__Version)
 
 		return component
+
+	def __GetEffectiveLayer(self, aElement):
+		#' return the ID of the topmost item which has an ID. For 1.x and 2.x, this will always be layer, for 3.x, it will be the topmost ID'd element in the file
+		# never call this on the root element
+		if aElement.parentNode.hasAttribute(self.__IdAttribute):
+			return self.__GetEffectiveLayer(aElement.parentNode)
+		elif aElement.hasAttribute(self.__IdAttribute):
+			return aElement.getAttribute(self.__IdAttribute)
+		return ""
 
 	def __GetElementContainers(self, aElement, aContainers):
 		# take a <unit/> element and creates a type->name dictionary of all of its parent containers
 		# We're only interested in parent nodes if they're not the top-most node
 		if aElement.parentNode.parentNode:
 			parent = aElement.parentNode
-			name = parent.getAttribute("name")
+			name = parent.getAttribute(self.__IdAttribute)
 
 			if name:
 				aContainers[parent.tagName] = name
@@ -305,8 +341,9 @@ class SystemModel(object):
 		"""Search for XML <unit/> elements with 'bldFile' attributes and resolve concrete bld.inf locations
 		with an appreciation of different schema versions."""
 
-		if aElement.tagName == "layer":
-			currentLayer = aElement.getAttribute("name")
+		# The effective "layer" is the item whose parent does not have an id (or name in 2.x and earlier)
+		if not aElement.parentNode.hasAttribute(self.__IdAttribute) :
+			currentLayer = aElement.getAttribute(self.__IdAttribute)
 
 			if not self.__LayerDetails.has_key(currentLayer):
 				self.__LayerDetails[currentLayer] = []
@@ -320,10 +357,10 @@ class SystemModel(object):
 			if bldFileValue:
 				bldInfRoot = self.__ComponentRoot
 
-				if self.__Version['MAJOR'] == 1 and self.__Version['MID'] == 4:
-					# version 1.4.x schema paths can use DOS slashes
+				if self.__Version['MAJOR'] == 1:
+					# version 1.x schema paths can use DOS slashes
 					bldFileValue = raptor_utilities.convertToUnixSlash(bldFileValue)
-				elif self.__Version['MAJOR'] == 2:
+				elif self.__Version['MAJOR'] >= 2:
 					# version 2.x.x schema paths are subject to a "root" attribute off-set, if it exists
 					rootValue = aElement.getAttribute("root")
 
@@ -338,16 +375,29 @@ class SystemModel(object):
 
 				group = generic_path.Path(bldFileValue)
 
-				if not group.isAbsolute() and bldInfRoot:
-					group = generic_path.Join(bldInfRoot, group)
+				if self.__Version['MAJOR'] < 3:
+					# absolute paths are not changed by root var in 1.x and 2.x
+					if not group.isAbsolute() and bldInfRoot:
+						group = generic_path.Join(bldInfRoot, group)
+				else:
+					# only absolute paths are changed by root var in 3.x
+					if group.isAbsolute() and bldInfRoot:
+						group = generic_path.Join(bldInfRoot, group)
 
 				bldinf = generic_path.Join(group, "bld.inf").FindCaseless()
 
 				if bldinf == None:
-					self.__Logger.Error("No bld.inf found at %s in %s", group.GetLocalString(), self.__SystemDefinitionFile)
+					# recording layers containing non existent bld.infs
+					bldinfname = group.GetLocalString()
+					bldinfname = bldinfname + 'bld.inf'
+					layer = self.__GetEffectiveLayer(aElement)
+					if not layer in self.__MissingBldInfs:
+						self.__MissingBldInfs[layer]=[]
+					self.__MissingBldInfs[layer].append(bldinfname)
+
 				else:
 					component = self.__CreateComponent(bldinf, aElement)
-					layer = component.GetContainerName("layer")
+					layer = component.GetLayerName()
 					if layer:
 						self.__LayerDetails[layer].append(component)
 						self.__TotalComponents += 1

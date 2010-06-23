@@ -22,27 +22,19 @@
 #ifndef PATCHDATAPROCESSOR_H
 #define PATCHDATAPROCESSOR_H
 
-#ifdef _MSC_VER
-	#pragma warning(disable: 4786) // identifier was truncated to '255' characters in the debug information
-#endif
-
 #include <e32def.h>
-
-#ifdef _L
-#undef _L
-#endif
-
+#include <string> 
 #include <iostream>
 #include <vector>
 #include <map>
 #include <sstream>
 
-typedef std::string String;
-typedef std::vector<String> StringVector;
-typedef std::vector<StringVector> VectorOfStringVector;
-typedef std::map<String,String> MapOfString;
-typedef std::map<String,String>::iterator MapOfStringIterator;
-typedef std::ostringstream OutputStringStream; 
+
+using namespace std;
+typedef vector<string> StringVector;
+typedef vector<StringVector> VectorOfStringVector;
+typedef map<string,string> MapOfString;
+typedef map<string,string>::iterator MapOfStringIterator; 
 
 /**
 Class for patching exported data.
@@ -57,7 +49,7 @@ class CPatchDataProcessor
 
 public:	
 	void AddPatchDataStatement(StringVector aPatchDataStatement);
-	void AddToRenamedFileMap(String aCurrentName, String aNewName);
+	void AddToRenamedFileMap(string aCurrentName, string aNewName);
 	VectorOfStringVector GetPatchDataStatements() const;
 	MapOfString GetRenamedFileMap() const;		
 };

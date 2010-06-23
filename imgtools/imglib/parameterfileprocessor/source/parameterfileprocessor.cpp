@@ -31,7 +31,7 @@ Constructor of CParameterFileProcessor class
 @internalComponent
 @released
 */
-CParameterFileProcessor::CParameterFileProcessor(String aParamFileName):
+CParameterFileProcessor::CParameterFileProcessor(const string& aParamFileName):
 												 iParamFileName(aParamFileName),iNoOfArguments(0),
 												 iParamFileArgs(NULL)
 {
@@ -49,12 +49,12 @@ Function to open parameter-file
 bool CParameterFileProcessor::OpenFile()
 {
 	
-	iParamFile.open(iParamFileName.data(),std::ios::binary);
+	iParamFile.open(iParamFileName.data(),ios_base::binary);
 	if (iParamFile.is_open())
 		return true;
 	else
 	{		
-		std::cout<<"Error: Couldn't open parameter-file for reading:"<<iParamFileName.c_str()<<"\n";
+		cout<<"Error: Couldn't open parameter-file for reading:"<<iParamFileName.c_str()<<"\n";
 		return false;
 	}
 }
@@ -75,12 +75,12 @@ bool CParameterFileProcessor::ParameterFileProcessor()
 		while(!iParamFile.eof())
 		{
 			// Read the parameter-file line by line.
-			String line;
-			std::getline(iParamFile,line);
+			string line;
+			getline(iParamFile,line);
 
 			// Read the line till the occurence of character ';' or EOL.
 			unsigned int pos = line.find_first_of(";\r\n");
-			if (pos != std::string::npos)
+			if (pos != string::npos)
 				line = line.substr(0,pos);
 			
 			// Split the line if multiple parameters are provided
@@ -116,29 +116,29 @@ Function to split line of paramfile-file
 
 @return True/False depending on the status of spliting.
 */
-bool CParameterFileProcessor::SplitLine(String& aLine)
+bool CParameterFileProcessor::SplitLine(string& aLine)
 {
 	unsigned int startPos=0;
 	unsigned int endPos=0; 	
 
 	// Segregate parameters based on white-space or tabs.
 	startPos= aLine.find_first_not_of(" \t",endPos);
-	while(startPos != std::string::npos)
+	while(startPos != string::npos)
 	{		
 		endPos= aLine.find_first_of(" \t",startPos);
-		String paramStr= aLine.substr(startPos,endPos-startPos);
+		string paramStr= aLine.substr(startPos,endPos-startPos);
 
 		unsigned int position= aLine.find_first_of("\"",startPos);
 
 		// If the parameter contains double quotes('"') then also include the spaces(if provided)
 		// within the quotes.		
-		if((position!=std::string::npos) && position<=endPos)
+		if((position!=string::npos) && position<=endPos)
 		{
 			endPos= aLine.find_first_of("\"",position+1);
-			if(endPos!= std::string::npos)
+			if(endPos!= string::npos)
 			{				
 				endPos= aLine.find_first_of(" \t",endPos+1);
-				if(endPos != std::string::npos)
+				if(endPos != string::npos)
 				{
 					paramStr= aLine.substr(startPos,endPos-startPos);
 				}
@@ -155,7 +155,7 @@ bool CParameterFileProcessor::SplitLine(String& aLine)
 			// Generate error message if enclosing quotes are not found.
 			else
 			{
-				std::cout<<"Error while parsing parameter-file"<<iParamFileName.c_str()<<". Closing \"\"\" not found\n";
+				cout<<"Error while parsing parameter-file"<<iParamFileName.c_str()<<". Closing \"\"\" not found\n";
 				return false;				
 			}
 		}
@@ -179,7 +179,7 @@ bool CParameterFileProcessor::SetNoOfArguments()
 	unsigned int noOfArguements = iParameters.size();	
 	if (!noOfArguements)
 	{
-		std::cout<<"Warning: No parameters specified in paramer-file:"<<iParamFileName.data()<<"\n";
+		cout<<"Warning: No parameters specified in paramer-file:"<<iParamFileName.data()<<"\n";
 		return false;
 	}
 	iNoOfArguments = noOfArguements+1;
@@ -202,7 +202,7 @@ void CParameterFileProcessor::SetParameters()
 	
 	for (unsigned int count=1; count<=paramSize; count++)
 	{
-		String param = iParameters.at(count-1);
+		string param = iParameters.at(count-1);
 		*(iParamFileArgs+count) = new char[param.size()+1];
 		strcpy(*(iParamFileArgs+count),param.c_str());
 	}

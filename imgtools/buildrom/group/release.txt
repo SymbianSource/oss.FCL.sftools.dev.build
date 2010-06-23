@@ -1,7 +1,117 @@
+Version 3.24.0 (buildrom)
+===============
+Released by Lorence Wang, 20/05/2010
+	1) DPDEF145452 work path config -workdir feature
+
+Version 3.23.1 (buildrom)
+===============
+Released by Lorence Wang, 04/05/2010
+	1) DPDEF145374 Symbian Foundation License found in package build
+
+Version 3.23.0 (buildrom)
+===============
+Released by Lorence Wang, 21/04/2010
+	1) DPDEF145365 check path submit  
+
+Version 3.22.2 (buildrom)
+===============
+Released by Ross Qin, 14/04/2010
+	1) DPDEF145300 Rombuild hangs in S60 2010wk13 vasco_ui rom building 
+
+Version 1.2.1 (configpaging)
+===============
+Released by Zheng Shen, 09/04/2010
+	1) DPDEF145281 Paged meaning change
+
+Version 3.22.1 (buildrom)
+===============
+Released by Zheng Shen, 07/04/2010
+	1) DPDEF145287 ROmbuild.exe will hang with -symbols on TB92
+
+Version 3.22.0 (buildrom)
+===============
+Released by Ross Qin, 26/03/2010
+  1. RM-RIM406-1232: BU: MAKSYMROFS Integration
+Version 3.21.4 (buildrom)
+===============
+Released by Lorence Wang, 25/03/2010
+	1) DPDEF145165: S60 build break caused by latest Buildrom.
+
+Version 3.21.3 (buildrom)
+Version 1.1.1 (configpaging)
+===============
+Released by Zheng Shen, 16/03/2010
+	1) DPDEF145030  configpaging will hang as some time.
+        2) DPDEF144882  buildrom, rombuild,rofsbuil -keepgoing option
+
+Version 3.20.2 (buildrom)
+===============
+Released by Zheng Shen, 08/03/2010
+	1) DPDEF144795  ROM Tools cannot handle mixed binary variation scenario.
+    2) DPDEF144862  Correct handling of variant configuration file in a platform independent way
+
+Version 3.20.1 (buildrom)
+===============
+Released by Zheng Shen, 05/03/2010
+	1) DPDEF144535  remove -fastcompress option for rombuild/rofsbuild
+
+version 3.20.0 (buildrom)
+version 0.3 (features)
+Version 1.1.0 (configpaging)
+===============
+Released by Zheng Shen, 22/02/2010
+	1) DPDEF144562	Build Tools cannot be built in Linux
+
+Version 3.19.4 (buildrom)
+================
+(Made by Marvin Shi, 27/01/2010)
+  1. DPDEF143872 the warning from features.pl needs to be updated
+
+Version 3.19.3 (buildrom)
+Version 1.0.0 (configpaging)
+================
+(Made by Zheng Shen, 15/12/2009)
+  1. DPDEF143392 Change Configpaging.pm to Configpaging.exe
+
+Version 3.19.2
+================
+(Made by Marvin Shi, 23/11/2009)
+  1. DPDEF143057 BUILDROM reports "Invalid Switch" if one or more options contains "/" 
+  2. DPDEF143123 Feature variant failed in wk47 SOS. 
+  
+Version 3.19.1
+================
+(Made by Marvin Shi, 17/11/2009)
+  1. DPDEF142921 TSW error CSTI-7X4GHW: Buildtool creates invalid long names in FAT images 
+  2. DEF142972  buildrom produces garbled logs 
+
+Version 3.19.0
+================
+(Made by Marvin Shi, 13/11/2009)
+  1. RM-RIM406-1233: BU: MAKSYMROFS Integration
+Version 3.18.1
+================
+(Made by Marvin Shi, 13/11/2009)
+  1. DPDEF142937  S60 image creation is failed at feature variant phase 
+Version 3.18.0
+================
+(Made by Zhi Dou, 03/11/2009)
+  1. RM-RIM406-1228: BU: ROFSBUILD Cache
+  
+Version 3.17.1
+================
+(Made by Zhi Dou, 28/10/2009)
+  1. DPDEF142726 - ROM tools needs to be running stand alone according to the requirement of SymSEE  
+
 Version 3.17.0
 ================
 (Made by Zhi Dou, 26/10/2009)
   1. RM-RIM406-1263: BU: Visual ROM Layout
+
+Version 3.16.1
+================
+(Made by Zhi Dou, 26/10/2009)
+  1. DEF142435 Configpaging is case sensitive when trying to match binary names
 
 Version 3.16.0
 ================

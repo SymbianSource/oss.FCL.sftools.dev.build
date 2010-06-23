@@ -86,7 +86,7 @@ Function responsible to return SubName1
 
 @return iSubName1 - returns sub name 1 of a long entry
 */
-String& CLongEntry::GetSubName1()
+string& CLongEntry::GetSubName1()
 {
 	return iSubName1;
 }
@@ -99,7 +99,7 @@ Function responsible to set SubName3
 
 @param aSubName1 - a long entry sub name 1
 */
-void CLongEntry::SetSubName1(String aSubName1)
+void CLongEntry::SetSubName1(string aSubName1)
 {
 	iSubName1 = aSubName1;
 }
@@ -112,7 +112,7 @@ Function responsible to return SubName2
 
 @return iSubName2 - returns sub name 2 of a long entry
 */
-String& CLongEntry::GetSubName2()
+string& CLongEntry::GetSubName2()
 {
 	return iSubName2;
 }
@@ -125,7 +125,7 @@ Function responsible to set SubName2
 
 @param aSubName2 - a long entry sub name 2
 */
-void CLongEntry::SetSubName2(String aSubName2)
+void CLongEntry::SetSubName2(string aSubName2)
 {
 	iSubName2 = aSubName2;
 }
@@ -138,7 +138,7 @@ Function responsible to return SubName3
 
 @return iSubName3 - returns sub name 3 of a long entry
 */
-String& CLongEntry::GetSubName3()
+string& CLongEntry::GetSubName3()
 {
 	return iSubName3;
 }
@@ -151,7 +151,7 @@ Function responsible to set SubName3
 
 @param aSubName3 - a long entry sub name 3
 */
-void CLongEntry::SetSubName3(String aSubName3)
+void CLongEntry::SetSubName3(string aSubName3)
 {
 	iSubName3 = aSubName3;
 }

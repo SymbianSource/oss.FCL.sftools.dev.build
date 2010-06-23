@@ -14,11 +14,8 @@
 * Description: 
 *
 */
-
-#if defined(__MSVCDOTNET__) || defined(__TOOLS2__)
-	#include <iostream>
-	using namespace std;
-#endif
+#include <iostream>
+using namespace std;
  
 #include <stdio.h>
 #include <stdlib.h>

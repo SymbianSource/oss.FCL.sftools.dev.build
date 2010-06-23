@@ -27,6 +27,22 @@
 			<config name="armv9e_urel"/>
 			<config name="armv9e_udeb"/>
 		</config>
+		<config name="armv5_gcce" abstract="true">
+			<config name="armv5_urel_gcce"/>
+			<config name="armv5_udeb_gcce"/>
+		</config>
+		<config name="armv6_gcce" abstract="true">
+			<config name="armv6_urel_gcce"/>
+			<config name="armv6_udeb_gcce"/>
+		</config>
+		<config name="armv7_gcce" abstract="true">
+			<config name="armv7_urel_gcce"/>
+			<config name="armv7_udeb_gcce"/>
+		</config>
+		<config name="armv9e_gcce" abstract="true">
+			<config name="armv9e_urel_gcce"/>
+			<config name="armv9e_udeb_gcce"/>
+		</config>
 	</config>
 
 	<config name="winscw" abstract="true">

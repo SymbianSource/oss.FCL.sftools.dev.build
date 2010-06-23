@@ -1,3 +1,4 @@
+#!/usr/bin/perl
 #
 # Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
@@ -15,15 +16,16 @@
 #
 
 # features tool version
-use constant TOOL_VERSION=>"0.2";
+use constant TOOL_VERSION=>"0.3";
 
 # global variables
 my $PerlLibPath;    # fully qualified pathname of the directory containing our Perl modules
+my $PerlEPOCPath;   # fully qualified pathname of the directory containing epoc tools
 my $ibyPath; # destination path for the iby files
 my $hdrPath; # destination path for the header files
 my $datPath; # destination path for the features.DAT file
 my $convPath; # destination path for the feature registry database convertion
-my $epocroot = $ENV{EPOCROOT}; # epcoroot directory
+my $epocroot = &get_epocroot; # epcoroot directory
 
 #
 # xml database file name(s)
@@ -48,15 +50,25 @@ BEGIN {
 # check user has a version of perl that will cope
 	require 5.005_03;
 # establish the path to the Perl libraries
-    $PerlLibPath = $FindBin::Bin;	# X:/epoc32/tools
-    $PerlLibPath .= "/";
+    $PerlLibPath = $FindBin::Bin;
+    $PerlLibPath =~ s/\\/\//g;
+    $PerlLibPath .= "\/" unless $PerlLibPath =~ /\/$/;
+    
+    $PerlEPOCPath = $ENV{EPOCROOT};
+    $PerlEPOCPath =~ s/\\/\//g;
+    $PerlEPOCPath .= "\/" unless $PerlEPOCPath =~ /\/$/;
+    $PerlEPOCPath .= "epoc32\/tools\/";
 }
-use  lib $PerlLibPath;
+
 # Includes the validation perl modules for XML validation against the given DTD.
-use lib "$PerlLibPath/build/lib";
+use lib "${PerlEPOCPath}build/lib";
+use lib $PerlEPOCPath;
+use lib $PerlLibPath;
+
 # Include routines to create the feature header and iby files.
 use features;
 
+use romutl;
 #
 # main - Tool entry function
 #
@@ -293,11 +305,11 @@ Options:
 Ex: option combination \"-ri\" generates header and IBY files
    
 Default destination paths:
-   <header file>         - $EPOCROOT\\epoc32\\include\\
-   <iby file>            - $EPOCROOT\\epoc32\\rom\\include\\
+   <header file>         - ${epocroot}epoc32\/include\/
+   <iby file>            - ${epocroot}epoc32\/rom\/include\/
    <features.dat file>   - generates in current directory
    
 Note: The conversion(--convert) of feature registry database requires the 
-feature registry dtd file(featureuids.dtd) in $EPOCROOT\\epoc32\\tools\\
+feature registry dtd file(featureuids.dtd) in ${epocroot}epoc32\/tools\/
 USAGE_EOF
 }
