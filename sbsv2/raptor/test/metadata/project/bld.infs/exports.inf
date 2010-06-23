@@ -1,0 +1,46 @@
+/*
+* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description: 
+*
+*/
+PRJ_EXPORTS
+export1.h															// %EPOCROOT%epoc32\include\export1.h
+export2.h				export_test/export2.h						// %EPOCROOT%epoc32\include\export_test\export2.h 
+export3.h				../export_test/export3.h					// %EPOCROOT%epoc32\export_test\export3.h
+export4.h				/export_test_abs/export4.h					// \export_test_abs\export4.h
+export5.h				/epoc32/export_test_abs/export5.h			// %EPOCROOT%epoc32\export_test_abs\export5.h
+export6.h				|../export_test_rel/\export6.h				// ..\export_test_rel\export6.h
+export7.h				|/export_test_rel/export7.h					// .\export_test_rel\export7.h
+export8.h				|export_test_rel/export8.h					// .\export_test_rel\export8.h
+:zip export9.zip													// %EPOCROOT% 
+:zip export10.zip		export_test									// %EPOCROOT%export_test
+:zip export11.zip		/export_test								// \export_test
+:zip export12.zip		/epoc32/export_test							// %EPOCROOT%epoc32\export_test
+export13.rsc			z:/resource/app/export13.rsc				// %EPOCROOT%epoc32\data\z\resource\app\export13.rsc
+
+PRJ_TESTEXPORTS
+testexport1.h														// .\testexport1.h (as exports over itself!)
+testexport2.h			export_test_rel/testexport2.h				// .\export_test_rel\testexport2.h 
+testexport3.h			../export_test_rel/testexport3.h			// ..\export_test_rel\testexport3.h
+testexport4.h			/export_test_abs/testexport4.h				// \export_test_abs\testexport4.h
+testexport5.h			/epoc32/export_test_abs/testexport5.h		// %EPOCROOT%epoc32\export_test_abs\testexport5.h
+testexport6.h			|../export_test_rel/testexport6.h			// ..\export_test_rel\testexport6.h
+testexport7.h			|/export_test_rel/testexport7.h				// .\export_test_rel\testexport7.h
+testexport8.h			|export_test_rel/testexport8.h				// .\export_test_rel\testexport8.h
+:zip testexport9.zip												// %EPOCROOT%
+:zip testexport10.zip	export_test									// %EPOCROOT%export_test
+:zip testexport11.zip	/export_test								// \export_test
+:zip testexport12.zip	/epoc32/export_test							// %EPOCROOT%epoc32\export_test
+testexport13.rsc		z:/resource/app/testexport13.rsc			// %EPOCROOT%epoc32\data\z\resource\app\testexport13.rsc
+

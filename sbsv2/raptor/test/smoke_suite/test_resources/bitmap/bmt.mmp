@@ -1,0 +1,30 @@
+/*
+* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description: 
+*
+*/
+
+target			testbitmap.dll
+targettype      DLL
+source			fake.cpp
+
+START BITMAP	testbitmap.mBm
+HEADER
+
+// Test backslash conversion to / here:
+TARGETPATH		\resource\apps
+SOURCEPATH		aifsrccl
+SOURCE			c8,1 DEF24.BMP DEF2M.BMP DEF32.BMP DEF3M.BMP DEF48.BMP DEF4M.BMP
+END
+

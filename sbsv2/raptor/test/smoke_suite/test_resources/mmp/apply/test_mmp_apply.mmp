@@ -1,0 +1,16 @@
+
+TARGET			test_mmp_apply
+TARGETTYPE		EXE
+
+APPLY no_such_var
+
+LIBRARY			euser.lib
+
+SYSTEMINCLUDE		/epoc32/include
+
+APPLY apply_test_append_cdefs
+
+SOURCE			test_mmp_apply.cpp
+
+APPLY apply_test_exported_var
+

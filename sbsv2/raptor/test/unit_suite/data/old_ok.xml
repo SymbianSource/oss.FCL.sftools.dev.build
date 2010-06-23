@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<build xmlns="http://symbian.com/xml/build"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://symbian.com/xml/build build/1_0.xsd">
+
+	<!-- old 1.0 schema interface files should still be readable by
+	     the new 2.0 schema parser -->
+	
+    <!-- a base interface -->
+
+	<interface name="base.1_0" abstract="true">
+		<param name='A'/>
+		<param name='B' default=''/>
+		<param name='C'/>
+    </interface>
+    
+    <!-- extends the base interface -->
+
+	<interface name="interface.1_0" extends="base.1_0" flm="flm.flm">
+		<param name='D'/>
+		<param name='C'/>
+    </interface>
+    
+</build>

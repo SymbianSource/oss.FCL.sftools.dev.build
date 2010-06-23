@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+
+<SystemDefinition name="MCL" schema="1.4.0">
+  
+  <systemModel>
+    <layer name="common">
+      <module name="allexports">
+        <component name="envelope">
+          <unit unitID="001" name="emime" bldFile="common/generic/app-framework/emime/group"/>
+          <unit unitID="001" name="featreg" bldFile="common/generic/syslibs/ezlib/group"/>
+          <unit unitID="001" name="caf" bldFile="common/generic/syslibs/caf2/group"/>
+          <unit unitID="001" name="charconv" bldFile="common/generic/syslibs/charconv/ongoing/group/"/>
+          <unit unitID="001" name="featreg" bldFile="common/generic/syslibs/featreg/group"/>
+          <unit unitID="001" name="store" bldFile="common/generic/syslibs/store/group"/>
+        </component>
+      </module>
+    </layer>
+  </systemModel>
+  
+  <build>
+  </build>
+
+</SystemDefinition>

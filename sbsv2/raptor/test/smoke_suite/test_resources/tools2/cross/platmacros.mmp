@@ -1,0 +1,32 @@
+/*
+* Copyright (c) 2010 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description: 
+*
+*/
+
+
+TARGET			test_platmacros
+TARGETTYPE		EXE
+SOURCEPATH		./src
+SOURCE			platmacros.cpp
+
+// TOOLS2_WINDOWS activated for cross compilation on Linux
+#ifdef TOOLS2_LINUX
+#warning TOOLS2_LINUX
+#endif
+
+#ifdef TOOLS2_WINDOWS
+#warning TOOLS2_WINDOWS
+#endif
+

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<build xmlns="http://symbian.com/xml/build"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://symbian.com/xml/build build/666.xsd">
+
+	<!-- the 666 schema indicates that the file should be ignored -->
+
+	<var name="should_be_ignored"/>
+    
+</build>

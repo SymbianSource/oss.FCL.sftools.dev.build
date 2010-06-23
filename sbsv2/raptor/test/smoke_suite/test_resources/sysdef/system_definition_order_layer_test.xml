@@ -1,0 +1,19 @@
+<SystemDefinition name="MCL" schema="2.0.0" > 
+	<systemModel>
+	    <layer name="Component with Layer Dependencies">
+			<component name="dependent">
+				<unit bldFile="test/smoke_suite/test_resources/sysdef/dependent" root="SBS_HOME" mrp="test/sysdef/dependent/test.mrp"/>
+			</component>
+		</layer>
+	    <layer name="Build Generated Source">
+			<component name="build generated source">
+				<unit bldFile="test/smoke_suite/test_resources/sysdef/build_gen_source" root="SBS_HOME" mrp="test/sysdef/build_gen_source/test.mrp"/>
+			</component>
+		</layer>
+	    <layer name="Metadata Export">
+			<component name="metadata export">
+				<unit bldFile="test/smoke_suite/test_resources/sysdef/metadata_export" root="SBS_HOME" mrp="test/sysdef/metadata_export/test.mrp"/>
+			</component>
+		</layer>
+	</systemModel>
+</SystemDefinition>

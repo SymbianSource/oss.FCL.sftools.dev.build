@@ -1,0 +1,2 @@
+
+$(call raptor_phony_recipe,name,ALL,,echo "building variant platform $(VP)")

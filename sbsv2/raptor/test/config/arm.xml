@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<build xmlns="http://symbian.com/xml/build"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://symbian.com/xml/build build/2_0.xsd">
+
+  <!-- build configurations for ARM compilers -->
+
+  <var name="ARMV5_BASE">
+    <env name='SBS_HOME' default='' type='path'/>
+    <env name='EPOCROOT'/>
+
+    <set name='FLMHOME' value='$(SBS_HOME)/lib/flm'/>
+    <set name='TRADITIONAL_PLATFORM' value='ARMV5'/>
+    <set name='VARIANT_CFG' value='$(EPOCROOT)/variant/variant.cfg'/>
+  </var>
+
+  <var name="ARMV5_UDEB" extends="ARMV5_BASE">
+    <append name='ABC' value='abc' />
+    <append name='VARIANT_CFG' value='2' separator='' />
+  </var>
+
+  <var name="ARMV5_UREL" extends="ARMV5_BASE">
+    <prepend name='ABC' value='abc' />
+    <prepend name='VARIANT_CFG' value='' separator='' />
+  </var>
+
+  <var name="MOD1">
+    <set name="X" value="X1"/>
+  </var>
+
+  <var name="MOD2">
+    <set name="X" value="X2"/>
+    <set name="Y" value="Y2"/>
+  </var>
+
+  <group name="ARMV5">
+    <varRef ref="ARMV5_UREL"/>
+    <varRef ref="ARMV5_UDEB"/>
+  </group>
+
+  <alias name="ALIAS_1" meaning="ARMV5_UREL.MOD1"/>
+  <alias name="ALIAS_2" meaning="ARMV5_UDEB.MOD1.MOD2"/>
+
+  <group name="G1">
+    <varRef ref="MOD1"/>
+    <varRef ref="MOD2"/>
+  </group>
+
+  <group name="G2">
+    <varRef ref="ARMV5_UREL" mod="MOD1"/>
+    <varRef ref="ARMV5_UDEB" mod="MOD1.MOD2"/>
+    <aliasRef ref="ALIAS_1"/>
+    <aliasRef ref="ALIAS_2" mod="MOD1.MOD2.MOD1"/>
+    <groupRef ref="ARMV5" mod="MOD2"/>
+    <groupRef ref="G1"/>
+  </group>
+
+  <!-- these are deliberately redefined in user.xml -->
+  
+  <alias name="alias_redef" meaning="MOD1"/>
+  <group name="group_redef"><varRef ref="MOD1"/></group>
+  <interface name="interface_redef" abstract="true"/>
+  <var name="var_redef"></var>
+  
+</build>

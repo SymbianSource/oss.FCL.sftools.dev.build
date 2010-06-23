@@ -1,0 +1,42 @@
+New Trace Compiler
+-------------------
+
+Raptor supports an updated version of the Trace Compiler which has
+an improved command-line interface that allows Raptor to specify the
+directory in which trace data should be written.  This allows MMPs to
+implement a new convention for where trace files are stored.
+
+The new convention prevents clashes where building the same
+source file for different MMPs would previously have resulted in two
+build tasks trying to create the same trace file (header/dictionary).
+This caused build slowdowns and also made the trace data inaccurate.
+
+The standard for this directory is that the last two elements of the
+path should be
+
+   traces/traces_<targetname>_<ext>
+
+e.g.
+
+   traces/traces_euser_dll
+
+The new trace compiler also creates "autogen" headers in a new location
+under epoc32/include/platform rather than epoc32/include/internal.
+
+Trace Headers Directory can now also be in SYSTEMINCLUDEs
+----------------------------------------------------------
+
+Some teams were having trouble getting qmake to generate MMPs with
+USERINCLUDEs set.  So they were specifying the trace header directory in
+their SYTEMINCLUDEs.  This change causes Raptor to look for the traces
+directory in bot SYSTEMINCLUDES and USERINCLUDES.
+
+
+Create Trace Directories During Makefile Parse
+-----------------------------------------------
+
+Some build engines consider it a "clash" when two jobs attempt to make the
+same directory.  This change causes some important trace output directories
+to be created during makefile parsing which removes the (small) possibility
+that they would clash during the build part.
+

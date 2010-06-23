@@ -1,0 +1,34 @@
+/*
+* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description: 
+*
+*/
+PRJ_PLATFORMS
+ARMV5 WINSCW
+
+PRJ_MMPFILES
+simple.mmp
+
+PRJ_EXPORTS
+simple_exp1.h exported_1.h
+simple_exp2.h exported_2.h
+simple_exp3.h exported_3.h
+"file with a space.doc" "exportedfilewithspacesremoved.doc"
+"file with a space.doc" "exported file with a space.doc"
+executable_file	executable_file
+
+simple_exp1.h /tmp/$$(USER)/  //
+simple_exp2.h \tmp\$$(USER)/  //
+simple_exp3.h /tmp/$$(USER)/simple_exp3.h 
+simple_exp4.h //

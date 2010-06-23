@@ -1,0 +1,21 @@
+#include <var.hrh>
+
+TARGET			variant_source
+TARGETTYPE		EXE
+
+UID			0x100039ce 0x10000003
+LIBRARY			euser.lib
+SYSTEMINCLUDE		/epoc32/include
+SYSTEMINCLUDE		/epoc32/include/platform
+
+SOURCEPATH		../src
+SOURCE			var_source1.cpp
+#if defined(MACRO_X)
+SOURCE			var_source2.cpp
+#endif
+#if defined(MACRO_Y)
+SOURCE			var_source3.cpp
+#endif
+
+USERINCLUDE		../traces
+

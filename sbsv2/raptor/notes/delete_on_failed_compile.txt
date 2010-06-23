@@ -1,0 +1,7 @@
+In certain circumstances, such as failure to obtain licenses, RVCT 2.2's armcc 
+program still produces object files whose contents is junk. This causes build 
+problems later as from Make's point of view those object files are "up to 
+date" so the build tries to link them. Of course, these attempts at linking 
+fail and the build is broken.
+
+This is a work around for that RVCT 2.2 problem.

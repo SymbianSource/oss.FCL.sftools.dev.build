@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+
+<SystemDefinition name="MCL" schema="1.4.0">
+  
+  <systemModel>
+    <layer name="RaptorEnvelope">
+      <module name="Tests">
+        <component name="envelope">
+          <unit unitID="001" name="featreg" bldFile="common/generic/syslibs/featreg/group"/>
+          <unit unitID="001" name="store" bldFile="common/generic/syslibs/store/group"/>
+        </component>
+      </module>
+    </layer>
+  </systemModel>
+  
+  <build>
+  </build>
+
+</SystemDefinition>
