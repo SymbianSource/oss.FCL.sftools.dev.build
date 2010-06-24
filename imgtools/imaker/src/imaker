@@ -1,0 +1,43 @@
+#!/bin/bash
+#
+# Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+#
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+#
+# Contributors:
+#
+# Description: iMaker wrapper for Linux (Bash)
+#
+
+
+export IMAKER_CMDARG=
+for arg in "$@"; do
+    if [ -z "$IMAKER_CMDARG" ]; then IMAKER_CMDARG="'$arg'"
+    else IMAKER_CMDARG="$IMAKER_CMDARG '$arg'"; fi
+done
+if [ -z "$IMAKER_DIR" ]; then
+    export IMAKER_DIR="`dirname "$0"`/rom/imaker"
+    if [ -e "`dirname "$0"`/imaker.pl" ]; then IMAKER_DIR="`dirname "$0"`"; fi
+fi
+export IMAKER_TOOL="$0"
+
+if [ -z "$PERL" ]; then export PERL="perl"; fi
+$PERL -x "$IMAKER_DIR/imaker.pl"
+IMAKER_ERROR=$?
+
+if [ $IMAKER_ERROR -ne 0 ]; then
+    $PERL -v >/dev/null 2>&1
+    if [ $? -ne 0 ]; then
+        echo "Perl is not properly installed! Environment variable PERL can be used to set the Perl exe."
+    fi
+fi
+
+exit $IMAKER_ERROR
+
+# END OF IMAKER

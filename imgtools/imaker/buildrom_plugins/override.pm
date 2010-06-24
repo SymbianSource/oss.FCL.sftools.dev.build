@@ -53,6 +53,7 @@ package override;
 
 use strict;
 use warnings;
+use File::Basename;
 use plugincommon;
 
                                  # OVERRIDE TARGET FOUND  OVERRIDE TARGET NOT FOUND
@@ -70,31 +71,30 @@ BEGIN
     @EXPORT  = qw(&override_info &override_init &override_process);
 }
 
-my $conf = "";
+my $conf;
 
 sub override_info
 {
     return({
         name       => "override",
-        invocation => "InvocationPoint2",
+        invocation => "InvocationPoint2",  # tmp6.oby
         initialize => "override::override_init",
         single     => "override::override_process"});
 }
 
 sub override_init
 {
-    plugin_init("override.pm", $conf = shift());
+    plugin_init(&override_info, $conf = shift(), 0);
 }
 
 sub override_process
 {
-    plugin_start("override.pm", $conf);
+    plugin_start(&override_info, $conf);
 
     my $obydata    = shift();
     my %targets    = ();
     my @overrides  = ();
     my @oconfstack = (REPLACE_WARN);
-    my @romelemcnt = (0, 0, 0, 0, 0, 0, 0, 0);
 
     # Go through all the tmp6.oby (InvocationPoint2) lines and store
     # normal targets' data to %targets and override targets' data to @overrides
@@ -103,34 +103,35 @@ sub override_process
 
     foreach (@{$obydata})
     {
-        my $parse = parse_obyline($_);
+        next if !(my $parse = parse_obyline($_));
 
-        if ($parse == 2) {
-            # REM ROM_IMAGE[id]
-            dprint(2, "#$gLnum: `$gLine'");
-        }
-        elsif (/^\s*OVERRIDE_(?:(END)|(REPLACE\/ADD)|(REPLACE\/SKIP)|(REPLACE\/WARN)|SKIP\/ADD)\s*$/i) {
-            # Override configuration keyword
-            if (defined($1)) {
-                # OVERRIDE_END
-                pop(@oconfstack);
-            } else {
-                # OVERRIDE_REPLACE/ADD|REPLACE/SKIP|REPLACE/WARN|SKIP/ADD
-                push(@oconfstack, defined($2) ? REPLACE_ADD : (defined($3) ? REPLACE_SKIP : (defined($4) ? REPLACE_WARN : SKIP_ADD)));
-            }
-            dprint(2, "#$gLnum: `$gLine'");
-            $_ = "$gHandlestr $gLine";
-        }
-        elsif ($parse == 1 && $gKeyword =~ /-override/i) {
+        if (($parse == 2) && ($gKeyword =~ /-?override$/i)) {
             # Override entry
+            $_ = "$gHandlestr $_", next if ($gImgid != $gRomidCmp);
             dprint(2, "#$gLnum: `$gLine'");
-            push(@overrides, [$gLnum - 1, $gRomid, $oconfstack[$#oconfstack]]);
+            push(@overrides, [$gLnum - 1, $oconfstack[$#oconfstack]]);
+            next;
         }
-        elsif ($parse == 1 && $gKeyword =~ FILESPECKEYWORD) {
+        if (($parse == 2) && ($gKeyword =~ FILEBITMAPSPECKEYWORD)) {
             # Normal file specification entry
-            $targets{lc("$gTarget/$gRomid")} = $gLnum - 1;
-            $romelemcnt[$gRomid]++;
+            $targets{$gTgtCmp} = $targets{File::Basename::basename($gTgtCmp)} = $gLnum - 1
+                if ($gImgid == $gRomidCmp);
+            next;
         }
+
+        next if !/^\s*OVERRIDE_(?:(END)|(REPLACE\/ADD)|(REPLACE\/SKIP)|(REPLACE\/WARN)|SKIP\/ADD)\s*$/i;
+
+        # Override configuration keyword
+        $_ = "$gHandlestr $_";
+        next if $gRomid && ($gImgid != $gRomidCmp);
+        if (defined($1)) {
+            # OVERRIDE_END
+            pop(@oconfstack);
+        } else {
+            # OVERRIDE_REPLACE/ADD|REPLACE/SKIP|REPLACE/WARN|SKIP/ADD
+            push(@oconfstack, defined($2) ? REPLACE_ADD : (defined($3) ? REPLACE_SKIP : (defined($4) ? REPLACE_WARN : SKIP_ADD)));
+        }
+        dprint(2, "#$gLnum: `$gLine'");
     }
 
     # Loop through all overrides and handle them
@@ -138,64 +139,50 @@ sub override_process
 
     foreach (@overrides)
     {
-        my ($lnum, $romid, $type) = @{$_};
-        parse_keyline(${$obydata}[$lnum], 1);
-        dprint(2, "Handling    : `$gLine' ($romid, " . ("REPLACE/ADD", "REPLACE/SKIP", "REPLACE/WARN", "SKIP/ADD")[$type] . ")");
-        ${$obydata}[$lnum] = "$gHandlestr $gLine";
-        (my $target = $gTarget) =~ s/^"(.*)"$/$1/;
+        my ($tlnum, $olnum, $type) = (0, @$_);
+        parse_keyline(${$obydata}[$olnum]);
+        dprint(2, "Handling    : `$gLine' (" . ("REPLACE/ADD", "REPLACE/SKIP", "REPLACE/WARN", "SKIP/ADD")[$type] . ")");
+        ${$obydata}[$olnum] = "$gHandlestr ${$obydata}[$olnum]";
 
-        if (exists($targets{lc("$target/$romid")})) {
+        if (defined($tlnum = $targets{$gTgtCmp}) || defined($tlnum = $targets{File::Basename::basename($gTgtCmp)})) {
             # Override target found
-
             my ($line, $keyword, $source, $attrib) = ($gLine, $gKeyword, $gSource, $gAttrib);
-            parse_keyline(${$obydata}[$lnum = $targets{lc("$target/$romid")}], 1);
-            dprint(2, "Target      : `$gLine' ($romid, #" . ($lnum + 1) . ")");
+            parse_keyline(${$obydata}[$tlnum]);
+            dprint(2, "Target      : `$gLine' (#" . ($tlnum + 1) . ")");
 
             if ($type == SKIP_ADD) {
                 dprint(2, "Do nothing  : Target found and override type SKIP");
             }
-            elsif ($source =~ /^"?empty"?$/i) {
+            elsif ($source =~ /^empty$/i) {
                 # Empty keyword -> comment line out
-                ${$obydata}[$lnum] = "$gHandlestr $gLine";
-                dprint(1, "Remove ROM_IMAGE[$romid] `$gLine' due to `$line'");
-                dprint(2, "Replace with: `${$obydata}[$lnum]' (Override source EMPTY)");
+                ${$obydata}[$tlnum] = "$gHandlestr ${$obydata}[$tlnum]";
+                dprint(1, "Remove `$gLine' due to `$line'");
+                dprint(2, "Replace with: `${$obydata}[$tlnum]' (Override source EMPTY)");
             }
             else {
                 # Replace existing line with new line
-                $keyword =~ s/-override//i;
+                $keyword =~ s/-?override$//i;
                 $attrib = ($attrib eq "" ? $gAttrib : ($attrib =~ /^\s*empty$/i ? "" : $attrib));
-                $line = ${$obydata}[$lnum] = "$keyword=$source  $gTarget$attrib\n";
-                dprint(1, "Replace ROM_IMAGE[$romid] `$gLine' with `$line'");
+                $line = ${$obydata}[$tlnum] = ($keyword ne "" ? $keyword : $gKeyword) .
+                    ($source  =~ /\s/ ? "=\"$source\"" : "=$source") . "  " .
+                    ($gTarget =~ /\s/ ? "\"$gTarget\"" : $gTarget) . "$attrib\n";
+                dprint(1, "Replace `$gLine' with `$line'");
                 dprint(2, "Replace with: `$line'");
             }
         }
-        else {
-            # Override target not found
-
-            if (!$romelemcnt[$romid] && $type != REPLACE_ADD && $type != SKIP_ADD) {
-                # Ignore override non-XXX/ADD targets on empty ROM_IMAGE sections
-                dprint(2, "Do nothing  : Target not found, override target's ROM_IMAGE[$romid] section is empty");
-                next;
-            }
-            # Check if override target exists in different ROM section
-            my $warn = "";
-            foreach my $tromid (0 .. 7) {
-                $warn = "Override target `$target' found from ROM_IMAGE[$tromid] while override is for ROM_IMAGE[$romid]", last
-                    if exists($targets{lc("$target/$tromid")});
-            }
+        else { # Override target not found
             if ($type == REPLACE_SKIP) {
-                dprint(2, "Do nothing  : Target not found " . ($warn ? "from ROM_IMAGE[$romid] " : "") . "and override type SKIP");
+                dprint(2, "Do nothing  : Target not found and override type SKIP");
             }
             elsif ($type == REPLACE_WARN) {
-                dprint(-3, $warn ? "$warn, ignoring `$target'" : "Ignoring override target `$target', target not found");
+                dprint(-3, "Ignoring override target `$gTarget', target not found");
                 dprint(2, "Do nothing  : Target not found and override type WARN");
             }
             else {
                 # OVERRIDE_XXX/ADD
-                (my $line = $gLine) =~ s/^(\S+?)-override/$1/i;
-                ${$obydata}[$lnum] = $line;
-                dprint(-3, $warn) if $warn;
-                dprint(1, "Add ROM_IMAGE[$romid] `$line' from `$gLine'");
+                (my $line = $gLine) =~ s/^(\S*?)-?override/$1/i;
+                $line = ${$obydata}[$olnum] = ($1 ne "" ? "" : "data") . $line;
+                dprint(1, "Add `$line' from `$gLine'");
                 dprint(2, "Add new     : `$line' (Target not found, override type ADD)");
             }
         }

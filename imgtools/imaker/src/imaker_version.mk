@@ -14,4 +14,4 @@
 # Description: iMaker version string
 #
 
-IMAKER_VERSION = iMaker 09.06.01, 05-Feb-2009.
+IMAKER_VERSION = iMaker 10.24.01, 14-Jun-2010.
