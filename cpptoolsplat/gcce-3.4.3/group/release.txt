@@ -1,0 +1,6 @@
+NOTESRC_RELEASER
+Nokia Corporation
+
+NOTESRC_RELEASE_REASON
+gcce-3.4.3 Release
+

@@ -1,0 +1,10 @@
+component	    dev_build_cpptoolsplat_gcce-3.4.3
+
+source          /src/tools/build/cpptoolsplat/gcce-3.4.3
+exports         /src/tools/build/cpptoolsplat/gcce-3.4.3/group
+
+notes_source    ./release.txt   
+
+ipr T
+ipr O           /src/tools/build/cpptoolsplat/gcce-3.4.3
+

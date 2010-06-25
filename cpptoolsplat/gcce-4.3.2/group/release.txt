@@ -1,0 +1,7 @@
+NOTESRC_RELEASER
+Symbian Software Ltd. (kits.notify@symbian.com)
+
+NOTESRC_RELEASE_REASON
+gcce-4.3.2 Release
+
+
