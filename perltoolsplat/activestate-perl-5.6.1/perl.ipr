@@ -1,0 +1,15 @@
+[purpose]
+
+ActivePerl
+
+[categories]
+generic
+
+[files]
+tools\distrib\APi518e.exe	# full distribution of ActivePerl 518
+
+[owner]
+Runtime & Tools
+
+[IPR]
+Copyright (c) 1999 ActiveState Tool Corp. All rights reserved.

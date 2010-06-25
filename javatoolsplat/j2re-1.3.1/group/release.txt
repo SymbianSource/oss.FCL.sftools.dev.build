@@ -1,0 +1,5 @@
+NOTESRC_RELEASER
+Symbian Software Ltd.
+
+NOTESRC_RELEASE_REASON
+j2re 1.3.1.
