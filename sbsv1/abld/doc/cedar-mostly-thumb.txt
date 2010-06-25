@@ -1,0 +1,61 @@
+Intro.
+
+A new GCC98r2 platform/build target has been added to Cedar. This
+platform is called ARM4T and implements the 'mostly thumb' build
+policy. Under this policy user-side code is built in THUMB (ARMv4)
+mode by default and kernel side code is built in ARM (ARMv4) mode with
+no interworking support. These defaults can be overridden by various
+means (see below). When the default is overridden both user and
+kernel-side code is built in ARM (ARMv4) mode with interworking
+support.
+
+Overriding the default.
+
+The default can be overridden at project (MMP)and compontent (BLD.INF)
+level and also interactively via a commandline argument to MAKMAKE.
+
+i) MMP 
+
+A new keyword ALWAYS_BUILD_AS_ARM is introduced to the supported MMP
+file syntax. This keyword takes no arguments. It applies only to
+platforms that implement the 'mostly thumb' policy. In other words it
+is ignored by other platforms (e.g. ARM4). 
+
+ii. BLD.INF
+
+A new qualifier, BUILD_AS_ARM, is introduced for MMP file statements
+in the BLD.INF syntax. The syntax for such statements thus becomes:
+
+PRJ_MMPFILES
+[<mmp path>\<mmp file>] {<qualifiers>}
+{MAKEFILE|NMAKEFILE} [<path>\<makefile>] {build_as_arm}
+// <qualifiers> are tidy, ignore, build_as_arm
+
+iii. MAKMAKE
+
+MAKMAKE has been extended to accept the option -ARM. Supplying this
+option has the same effect as if ALWAYS_BUILD_AS_ARM is supplied in
+the MMP file.
+
+Build/Release Directory Structure.
+
+Build artefacts are placed in either UREL or UDEB beneath ARM4T in
+both build and release trees whatever ISA is targeted. The exception
+is import libraries. Because ARM4T only supports version 4 of the ARM
+architecture different import stubs implementations are required for
+each of the possible modes that clients can be compiled in (e.g. ARM
+without-interworking vs ARM with-interworking vs THUMB). Therefore
+import libraries are placed in the UREL sub-directory of ARM4, ARMI or
+THUMB respectively within the release tree.
+
+Static Libraries.  
+
+Static libraries are always built in ARM mode with interworking. A
+consequence of this is that the linker (LD) will introduce veneers
+into executables built in THUMB mode. The veneers are responsible for
+switching mode (as appropriate). However the introduction of a veneer
+has a small impact on code size. These two factors (i.e. static libs
+being ARM and veneers) mean that an ARM4T THUMB executable will always
+be slightly larger than if it had been built using the old THUMB build
+target.
+

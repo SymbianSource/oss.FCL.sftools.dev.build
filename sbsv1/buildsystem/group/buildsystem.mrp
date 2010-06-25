@@ -1,0 +1,10 @@
+component	dev_build_sbsv1_buildsystem
+
+source	\src\tools\build\sbsv1\buildsystem
+binary	\src\tools\build\sbsv1\buildsystem\group	all
+exports	\src\tools\build\sbsv1\buildsystem\group
+
+notes_source \component_defs\release.src
+
+ipr T
+

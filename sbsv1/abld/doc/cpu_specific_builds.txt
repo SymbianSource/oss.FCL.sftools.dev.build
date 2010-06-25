@@ -1,0 +1,83 @@
+
+Intro.
+The ARMV5 build supports the notion of customization. This allows a
+programmer to define a new build target that is derived from the ARMV5
+build. A new build target is defined via a .BSF file. The build system
+becomes aware of a customized build by the presence of its .BSF file
+in $(EPOCROOT)\epoc32\tools. Such customizations are referred to by
+the name of their .BSF file e.g. the file XScale.bsf defines the build
+target XScale. This name can be used in exactly the same way as
+built-in names such as ARMV5.
+
+BSF Syntax It is intended that the syntax of a .BSF file be toolchain
+specific with the exception of the obligatory header:
+
+#<BSF>#					: token to identify this as a BSF file must appear at start of first line.
+CUSTOMIZES 	build			: identitifies which build is customized by this spec  e.g. ARMV5.
+
+Currently only ARMV5 can be customized which is the only supported
+RVCT toolchain build. ARMV5 implements the 'mostly thumb' policy. The
+ARMV5 specific .BSF syntax is as follows:
+
+
+THUMB_OPTIONS	opt1 opt2 ...	: compiler options used by default for user side code (expected to be THUMB mode)
+ARM_OPTIONS	opt1 opt2 ...	: compiler options used when BUILD_AS_ARM etc are specified (expected to be ARM mode)
+KERNEL_OPTIONS	opt1 opt2 ...	: compiler options used to compile kernel side code
+COMMON_OPTIONS	opt1 opt2 ...	: compiler options that are added to all the above
+
+The above four keywords specify compiler options that can be overriden
+in an MMP file via OPTION: e.g.
+
+OPTION ARMCC -Ospace.
+
+A final keyword specifies the system-wide options that cannot be
+overridden in an MMP file via OPTION. Typically these specify options
+within the EABI e.g. the SOFTVFP calling convention. They are called
+invariant since code compiled with different settings will not be
+binary compatible.
+
+INVARIANT_OPTIONS	opt opt2 ...	: these options are appended to all compiler command lines
+
+The following is the contents of the example file
+armv5_cpu_spec_example.bsf which is exported to
+$(EPOCROOT)\epoc32\tools from e32toolp\platform. It is intended that
+users can use this a the basis for their own customizations.
+
+--------------------------------EXAMPLE-----------------------------------
+
+#<bsf>#
+
+# Example build specialization file 
+# 
+# NB currently specialization only applies to ARMV5 build using RVCT.
+
+# This file customizes the default ARMV5. It specifies a build that
+# always uses optimization level O1 rather than the default O2.
+customizes ARMV5
+
+# The following options that can be overridden by MMP files
+
+# Use these options when compiling user-side THUMB code
+thumb_options	-thumb -O1 
+
+# Use these options when compiling user-side ARM code
+arm_options	-arm -O1 
+
+# Use these options when compiling Kernel code
+kernel_options	-arm -O1 
+
+# This just factors out common (contingent) options from the above.
+# These options can also be overridden by MMP files.
+common_options	--diag_suppress 1,161,654,1135,1152,1300 --diag_error 1267
+
+# Fixed options for this build. These options should only be changed with great care since
+# they have the potential to introduce incompatible ABI (or machine) level effects.
+# -cpu 5T - this build just targets a generic 5T
+# -Ono_known_library - we use our own library so tell the compiler not to make assumptions about its implementation
+# -fpu softvfp - some system code explicitly assumes this variant of the EABI (softvfp+vfp could be used on say XScale)
+# --dll_vtbl - this switches on class exporting and is needed to support Symbian OS DLL model
+# -apcs /inter - redundant on 5T, but worth saying anyway
+invariant_options	-cpu 5T -fy -Ono_known_library -fpu softvfp --dll_vtbl -apcs /inter
+
+------------------------------------------END EXAMPLE-----------------------------------------
+

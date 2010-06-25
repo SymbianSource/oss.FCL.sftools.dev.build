@@ -1,0 +1,79 @@
+GENSHIMSRC
+15/08/03
+
+Here is the user documentation that GENSHIMSRC.BAT itself produces:
+
+genshimsrc
+
+	Generate source for a shim DLL and its associated deffile from a supplied deffile
+
+Usage:
+	genshimsrc [options] deffile
+
+Where:
+	[deffile]     The source deffile
+
+Options:
+	--srcpath         the path for the output source file (defaults to CWD)
+	--defpath         the path for the output DEF file (defaults to srcpath)
+	--name            the name to use for the output files (defaults to shim)
+	--version         the version to use for the output DEF file (defaults to 0.0)
+	--alignstack      use shims which align the stack to an 8 byte boundary
+
+The following invocation
+
+    genshimsrc.bat --name=xuser-7_0 xuseru.def
+
+would produce two files: xuser-7_0.cia and xuser-7_0{00000000}.def (in CWD). 
+
+The version encoded in the DEF file name can be changed by supplying
+the --version option. e.g.
+
+    genshimsrc.bat --name=xuser-7_0 --version=1.0 xuseru.def
+
+would produce two files: xuser-7_0.cia and xuser-7_0{00010000}.def (in CWD). 
+
+The primary purpose of GENSHIMSRC is to allow 'DLL ordinal skew' to be
+repaired. It achieves this by generating 'trampoline' functions at the
+old ordinal which get linked against import stubs which will be
+resolved by the loader at the new ordinal. However the generated files
+make it easy for the programmer to inject code into the trampoline if
+the need arises by identifying each trampoline with the function it is
+derived from. The generated .DEF file also permits a usable IMPORT lib
+to be produced for the shim DLL if it is necessary.
+
+As alluded to above, for each entry in the supplied .DEF file
+GENSHIMSRC generates an exported (trampoline) function in the .CIA
+file and a corresponding entry in the associated .DEF file. Assume the
+following entry appears in the supplied .DEF file
+
+AddL__9CObjectIxP7CObject @ 11 NONAME ; CObjectIx::AddL(CObject *)xxxxx
+
+This results in the following source code being generated in the .CIA file
+
+EXPORT_C __NAKED__ int export_at_ordinal_11()
+//
+// CObjectIx::AddL(CObject *)
+//
+	{
+	asm("B AddL__9CObjectIxP7CObject");
+	}
+
+and the following entry being generated in the generated .DEF file
+
+AddL__9CObjectIxP7CObject=export_at_ordinal_11__Fv @ 11 NONAME ; CObjectIx::AddL(CObject *)
+
+These can be incorporated into a buildable project by providing a MMP file which contains:
+
+
+version			0.0		explicit
+target			xuser.dll
+targettype		dll
+sourcepath		.
+source			xuser-7_0.cia
+library			xuser{1.0}.lib
+systeminclude	..\..\include
+deffile			..\..\~\xuser-7_0.def
+
+
+N.B. There is nothing special about the MMP file.

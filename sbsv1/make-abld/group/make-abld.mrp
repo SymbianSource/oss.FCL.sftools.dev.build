@@ -1,0 +1,10 @@
+component	dev_build_sbsv1_make-abld
+
+source	\src\tools\build\sbsv1\make-abld
+binary	\src\tools\build\sbsv1\make-abld\group	all
+exports	\src\tools\build\sbsv1\make-abld\group
+
+notes_source \component_defs\release.src
+
+ipr T
+
