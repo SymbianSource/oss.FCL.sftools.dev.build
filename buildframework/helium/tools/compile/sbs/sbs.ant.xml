@@ -89,9 +89,19 @@ Description:
                 <copy file="${helium.dir}/tools/common/python/scripts/sbsscanlogmetadata.py" todir="${env.SBS_HOME}/python/plugins/" failonerror="true" />
                 <echo message="sbs.patternset: ${sbs.patternset}" />
                 <hlm:generate-layers />
-                <var name="sbs.inputs.list" value="" unset="true"/>
-                <hlm:getsbsinputs config="sbs.${sysdef.configuration}" outputProperty="sbs.inputs.list"/>
-                <for list="${sbs.inputs.list}" delimiter="," param="sbs.input">
+                <var name="sbs.internal.inputs.list" value="" unset="true"/>
+                <if>
+                    <istrue value="${schema.new}" />
+                    <then>
+                        <var name="sbs.internal.inputs.list" value="${sbs.inputs.list}"/>
+                    </then>
+                    <else>
+                        <var name="sbs.internal.inputs.list" value="" unset="true"/>
+                        <hlm:getsbsinputs config="sbs.${sysdef.configuration}" outputProperty="sbs.internal.inputs.list"/>  
+                        <echo message="Inputs: ${sbs.internal.inputs.list}"/>
+                    </else>
+                </if>
+                 <for list="${sbs.internal.inputs.list}" delimiter="," param="sbs.input">
                     <sequential>
                         <echo message="building raptor input: @{sbs.input}" />
                         <hlm:getVariableValue name="--logfile" property="sbs.log.file">
