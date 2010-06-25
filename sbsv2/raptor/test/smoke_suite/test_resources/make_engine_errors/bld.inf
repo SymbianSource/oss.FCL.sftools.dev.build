@@ -1,0 +1,9 @@
+
+PRJ_EXPORTS
+with_make_errors.flm /epoc32/tools/makefile_templates/tools/with_make_errors.flm
+with_make_errors.xml /epoc32/tools/makefile_templates/tools/with_make_errors.xml
+
+PRJ_EXTENSIONS
+start extension tools/with_make_errors
+end
+

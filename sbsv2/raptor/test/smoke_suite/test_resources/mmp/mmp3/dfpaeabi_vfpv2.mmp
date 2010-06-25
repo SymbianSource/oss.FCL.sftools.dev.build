@@ -1,0 +1,34 @@
+/*
+* Copyright (c) 2005-2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description: 
+*
+*/
+
+
+#include "dfpaeabi_common.mmh"
+
+TARGET 			dfpaeabi_vfpv2.dll
+LINKAS			dfpaeabi.dll
+NOEXPORTLIBRARY
+START ARMCC
+ARMRT
+// we want the vfpv2 supporting versions
+#ifdef MARM_ARMV5
+ARMLIBS			f_tvp.l
+#else
+ARMLIBS			f_avp.l
+#endif
+END
+
+unpagedcode

@@ -1,0 +1,14 @@
+TARGET			child3
+TARGETTYPE		EXE
+
+UID			0x100039ce 0x11100002
+LIBRARY			euser.lib
+SYSTEMINCLUDE		/epoc32/include
+SYSTEMINCLUDE		/epoc32/include/platform
+
+SOURCEPATH		../src
+SOURCE			child3.cpp
+SOURCE			common.cpp
+
+USERINCLUDE		../traces/traces_child3_exe
+

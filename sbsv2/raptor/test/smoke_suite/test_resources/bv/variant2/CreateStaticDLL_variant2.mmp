@@ -1,0 +1,53 @@
+/*
+* Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description: 
+* CreateStaticDLL.mmp
+*
+*/
+
+
+TARGET        createstaticdll_variant2.dll
+TARGETTYPE    dll
+
+UID             0xE800004C
+CAPABILITY   All -TCB
+
+
+VENDORID 0x70000001
+
+SOURCEPATH    .
+SOURCE        CreateStaticDLL_variant2.cpp
+
+USERINCLUDE   .
+SYSTEMINCLUDE /epoc32/include
+SYSTEMINCLUDE /epoc32/include/techview
+
+LIBRARY       euser.lib
+
+// Dummy resource entry to exercise the resource build in a BV context
+START RESOURCE	dummy.rss
+TARGET			dummy_var2.rsc
+HEADER
+TARGETPATH		/resource/apps
+END
+
+FEATUREVARIANT
+
+#if defined(WINS)
+    deffile ../CREATESTATICDLLWINS.def
+#else
+    deffile ../CREATESTATICDLLARM.def
+#endif
+nostrictdef
+

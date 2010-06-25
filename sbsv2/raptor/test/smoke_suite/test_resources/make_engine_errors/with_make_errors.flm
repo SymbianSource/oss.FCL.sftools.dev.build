@@ -1,0 +1,10 @@
+
+ALL:: a b c
+
+a: b
+b: a
+
+c: non_existent_&_needs_escaping.txt
+
+$(call raptor_phony_recipe,name,ALL,,echo "this FLM is rubbish")
+

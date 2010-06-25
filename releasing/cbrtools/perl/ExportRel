@@ -1,0 +1,267 @@
+#!perl
+# Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+# 
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+# 
+# Contributors:
+# 
+# Description:
+# 
+#
+
+use strict;
+use FindBin;
+use lib "$FindBin::Bin";
+use Getopt::Long;
+use File::Path;
+use IniData;
+use RelTransfer::Export;
+use RelData;
+use CommandController;
+
+
+#
+# Globals.
+#
+
+my $verbose = 0;
+my $dummy = 0;
+my $force = 0;
+my $ftpResume = 0;
+my $iniData;
+my $commandController;
+my $excludeSource = 0;
+my %releases; # Data structure changed to a double hash (from a single hash).
+              # Top level keys are (case lowered) component names with has reference values.
+              # Second level hash keys are versions, with a dummy value.
+              # This arrangement makes it possible for a single component to have more than one
+              # version, and to easily delete versions that have already been imported.
+my %failedExports;
+my %goodExports;
+my %alreadyExported;
+  
+#
+# Main.
+#
+
+ProcessCommandLine();
+ExportRelease();
+PrintReport();
+
+#
+# Subs.
+#
+
+sub ProcessCommandLine {
+  Getopt::Long::Configure ("bundling");
+  my $help;
+  GetOptions("h" => \$help, "v+" => \$verbose, "f" => \$force, "r" => \$ftpResume, "d" => \$dummy, "e" => \$excludeSource);
+
+  if ($help) {
+    Usage(0);
+  }
+
+  if (scalar(@ARGV) == 1) {
+    if (-f $ARGV[0]) {
+      open IN, $ARGV[0] or die "Error: Couldn't open $ARGV[0] for reading: $!\n";
+      while (my $line = <IN>) {
+	chomp $line;
+	$line =~ s/^\s*$//;
+	$line =~ s/#.*//;
+	if ($line eq '') {
+	  next; #Nothing left
+	}
+	my ($comp, $ver) = split(" ", $line);
+	if (defined $comp and defined $ver) {
+	  $releases{lc($comp)}->{$ver} = 1;
+	}
+	else {
+	  print "Error: Invalid file format in $ARGV[0]\n";
+	  Usage(1);
+	}
+      }
+      close IN;
+    }
+    else {
+      print "Error: $ARGV[0] is not a file\n";
+      Usage(1);
+    }      
+  }	
+  elsif (scalar(@ARGV) == 2) {
+    $releases{lc($ARGV[0])}->{$ARGV[1]} = 1;
+  }
+  else {
+    print "Error: Invalid arguments\n";
+    Usage(1);
+  }
+  $iniData = IniData->New(undef,1);
+  $commandController = CommandController->New($iniData, 'ExportRel');
+  #if ftp resume option is used override value in reltools.ini
+  if ($ftpResume) {
+    $iniData->FtpServerSupportsResume(1);
+  }
+}
+
+sub Usage {
+  my $exitCode = shift;
+
+  Utils::PrintDeathMessage($exitCode, "\nUsage: exportrel [options] (<component> <version>) | (<component_ver_list_file>)
+
+options:
+
+-h  help
+-f  force export overwriting if necessary
+-r  use FTP reconnect and resume transfer mode
+-d  dummy run (don't do anything) - assumes -v
+-e  exclude source
+-v  verbose output (-vv very verbose)\n");
+}
+
+sub ExportRelease {
+  my $exporter = RelTransfer::Export->New(ini_data => $iniData,
+					  force => $force,
+					  dummy => $dummy,
+					  excludeSource => $excludeSource,
+					  verbose => $verbose);
+  #do the export checking for errors
+  foreach my $comp (sort keys %releases) {
+    foreach my $ver (keys %{$releases{$comp}}) {
+      my $exported;
+      eval {
+        GetCorrectVersionNumber($comp, \$ver);
+        $exported = $exporter->TransferRelease($comp, $ver);
+      };
+      if ($@) {
+        print $@;
+        if ($@ =~ /cannot\s+connect/i) {
+          print "\nConnection to remote site dropped aborting export\n";
+          last;
+        }
+        my $error = $@;
+        chomp $error;
+        $error =~ s/^error: ("?$comp $ver"? )?//i;
+        $failedExports{$comp}->{$ver} = $error;
+      } else {
+        if ($exported) {
+          push @{$goodExports{$comp}}, $ver;
+        } else {
+          push @{$alreadyExported{$comp}}, $ver;
+        }
+      }
+    }
+  }
+}
+
+sub GetCorrectVersionNumber {
+  #This function changes the version number string of each component to that 
+  #stored in its reldata file. This is required because version numbers are case dependent
+  my $comp = shift;
+  my $verRef = shift;
+
+  my $relData = RelData->Open($iniData, $comp, $$verRef, $verbose);
+  my $env = $relData->Environment();
+  $$verRef = $env->{$comp};
+}
+
+sub PrintReport {
+  print "\n=========EXPORT SUMMARY==========\n";
+
+  my $tableData = [["Component", "Version", "status"]];
+
+  foreach my $comp (sort keys %goodExports) {
+    foreach my $ver (@{$goodExports{$comp}}) {
+      push (@$tableData, [$comp, $ver, 'successfully exported']);
+    }
+  }
+  
+  foreach my $comp (sort keys %alreadyExported) {
+    foreach my $ver (@{$alreadyExported{$comp}}) {
+      push (@$tableData, [$comp, $ver, 'has already been exported']);
+    }
+  }
+  
+  if (scalar @{$tableData} > 1) {
+    $iniData->TableFormatter->PrintTable($tableData, 1);
+  }
+  
+  #handle failed exports
+  if (keys %failedExports) {
+    print "\n=========FAILED EXPORTS==========\n";
+    my $failureTableData = [["Component", "Version", "Failure reason"]];
+    foreach my $comp (sort keys %failedExports) {
+      foreach my $ver (sort keys %{$failedExports{$comp}}) {
+        push (@$failureTableData, [$comp, $ver, $failedExports{$comp}->{$ver}]);
+      }
+    }
+    $iniData->TableFormatter->PrintTable($failureTableData, 1);
+    print "\nError: Unable to export component release successfully\n";
+  }
+  else
+  {
+    if (keys %goodExports) {
+      print "\nAll releases exported successfully\n";
+    } else {
+      print "\nNothing to do!\n";
+    }
+  }
+}
+
+__END__
+
+=head1 NAME
+
+ExportRel - Exports a component release to a remote site.
+
+=head1 SYNOPSIS
+
+  exportrel [options] (<component> <version>) | (<component_ver_list_file>)
+
+options:
+
+  -h  help
+  -f  force export overwriting if necessary
+  -r  use FTP reconnect and resume transfer mode
+  -d  dummy run (don't do anything) - assumes -v
+  -e  exclude source
+  -v  verbose output (-vv very verbose)
+
+=head1 DESCRIPTION
+
+Takes a C<component> and C<version> number as arguments. Encrypts the release and sends it to the projects shared archive stored on a remote site.
+
+The name of file containing a list of components and versions maybe passed as an argument to the tool instead of a single component to export multiple releases.
+
+Using the C<-f> option will force releases to be exported even if they already exist on the remote site (this only applies to components existing in the users export table)
+
+If the C<-r> option is used and the FTP connection is dropped during the upload of a release, the tools will automatically reconnect to the FTP site and resume the upload. This feature may not be supported by some FTP servers.
+
+Using C<-e> option will create a component release without source.
+
+=head1 KNOWN BUGS
+
+None
+
+=head1 COPYRIGHT
+
+ Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+ All rights reserved.
+ This component and the accompanying materials are made available
+ under the terms of the License "Eclipse Public License v1.0"
+ which accompanies this distribution, and is available
+ at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ 
+ Initial Contributors:
+ Nokia Corporation - initial contribution.
+ 
+ Contributors:
+ 
+ Description:
+ 
+
+=cut

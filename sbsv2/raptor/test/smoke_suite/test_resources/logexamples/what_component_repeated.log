@@ -1,0 +1,15 @@
+<whatlog bldinf='y:/ext/app/emailwizard/bld.inf' mmp='' config='armv5_urel.generic'>
+<build>/epoc32/data/something</build>
+</whatlog>
+
+
+
+<whatlog bldinf='y:/sf/mw/gsprofilesrv/ftuwizardmodel/bld.inf' mmp='y:/sf/mw/gsprofilesrv/ftuwizardmodel/ftuwizardmodel_0x20027009.mmp' config='armv5_urel.generic'>
+<build>/epoc32/release/armv5/something</build>
+</whatlog>
+
+
+
+<whatlog bldinf='y:/ext/app/emailwizard/bld.inf' mmp='' config='armv5_urel.generic'>
+<build>/epoc32/data/something_else</build>
+</whatlog>

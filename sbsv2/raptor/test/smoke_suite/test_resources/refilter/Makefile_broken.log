@@ -1,0 +1,646 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!-- This is a Test Logfile used in test_terminal_filter.py to test the terminal filter's handling of invalid 'recipe' tags (Could be extended to include more test cases) -->
+<buildlog sbs_version="2.9.2-alpha [2009-09-02 sf release]" xmlns="http://symbian.com/xml/build/log" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symbian.com/xml/build/log http://symbian.com/xml/build/log/1_0.xsd">
+<info>sbs: version 2.9.2-alpha [2009-09-02 sf release]
+</info>
+<info>SBS_HOME G:/tcl-personal/iainw/fix2/raptor</info>
+<info>Set-up G:/tcl-personal/iainw/fix2/raptor/sbs_init.xml</info>
+<info>Command-line-arguments </info>
+<info>Current working directory G:\tcl-personal\iainw\fix2\raptor\test\smoke_suite\test_resources\simple</info>
+<info>Environment TMP=C:\DOCUME~1\IAINW\LOCALS~1\Temp</info>
+<info>Environment COMPUTERNAME=D063576</info>
+<info>Environment MWSYM2LIBRARYFILES=MSL_ALL_Static_MSE_Symbian_D.lib;gdi32.lib;user32.lib;kernel32.lib;MSL_All_MSE_Symbian_D.lib;gdi32.lib;user32.lib;kernel32.lib;</info>
+<info>Environment LIB=C:\apps\MSVC6\VC98\mfc\lib;C:\apps\MSVC6\VC98\lib</info>
+<info>Environment USERDOMAIN=SYMBIAN</info>
+<info>Environment __PYTHON__=G:\tcl-personal\iainw\fix2\raptor\\win32\python252\python.exe</info>
+<info>Environment COMMONPROGRAMFILES=C:\Program Files\Common Files</info>
+<info>Environment PROCESSOR_IDENTIFIER=x86 Family 15 Model 6 Stepping 5, GenuineIntel</info>
+<info>Environment CYGWIN=nontsec nosmbntsec</info>
+<info>Environment PROCESSOR_REVISION=0605</info>
+<info>Environment PATH=G:\tcl-personal\iainw\fix2\raptor\\win32\mingw\bin;G:\tcl-personal\iainw\fix2\raptor\\win32\cygwin\bin;G:\tcl-personal\iainw\fix2\raptor\\win32\bin;g:\tcl-personal\iainw\fix2\raptor\bin;G:\tcl-personal\iainw\fix2\raptor\win32\mingw\bin;D:\apps\Python\2.6.2.2\;d:\apps\ECloud\i686_win32\bin;C:\Program Files\Common Files\Symbian\Tools;d:\apps\SITK\stuff;d:\apps\SITK\stuff\stat\bin;d:\apps\SITK\stuff\edgd\bin\;d:\apps\SITK\stuff\cbr;d:\apps\SITK\stuff\ucc\bin;d:\apps\SITK\stuff\testdriver;;d:\apps\2.83.1013;d:\apps\python\2.4;C:\Program Files\PC Connectivity Solution\;D:\APPS\Perl\bin\;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\i386;c:\Program Files\Novell\ZENworks\;C:\Program Files\Symantec\pcAnywhere\;d:\apps\Perforce;C:\apps\MSVC6\VC98\bin;C:\apps\MSVC6\Common\Tools;C:\apps\MSVC6\Common\Tools\WinNT;C:\apps\MSVC6\Common\MSDev98\Bin;C:\Apps\Metrowerks\OEM3.1\Symbian_Tools\Command_Line_Tools;C:\Apps\Metrowerks\OEM3.1\Bin\;C:\Apps\Metrowerks\OEM3.1\Symbian_Support\Runtime\Runtime_x86\Runtime_Win32\Libs\MSL_All-Dlls;d:\apps\WinSCP\;C:\APPS\Nokia\Carbide.c++ v1.3\x86Build\Symbian_Tools\Command_Line_Tools;d:\apps\TortoiseHg</info>
+<info>Environment SYSTEMROOT=C:\WINDOWS</info>
+<info>Environment USERPROFILE=C:\Documents and Settings\IAINW</info>
+<info>Environment OLD_PATH=D:\apps\Python\2.6.2.2\;d:\apps\ECloud\i686_win32\bin;C:\Program Files\Common Files\Symbian\Tools;d:\apps\SITK\stuff;d:\apps\SITK\stuff\stat\bin;d:\apps\SITK\stuff\edgd\bin\;d:\apps\SITK\stuff\cbr;d:\apps\SITK\stuff\ucc\bin;d:\apps\SITK\stuff\testdriver;;d:\apps\2.83.1013;d:\apps\python\2.4;C:\Program Files\PC Connectivity Solution\;D:\APPS\Perl\bin\;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\i386;c:\Program Files\Novell\ZENworks\;C:\Program Files\Symantec\pcAnywhere\;d:\apps\Perforce;C:\apps\MSVC6\VC98\bin;C:\apps\MSVC6\Common\Tools;C:\apps\MSVC6\Common\Tools\WinNT;C:\apps\MSVC6\Common\MSDev98\Bin;C:\Apps\Metrowerks\OEM3.1\Symbian_Tools\Command_Line_Tools;C:\Apps\Metrowerks\OEM3.1\Bin\;C:\Apps\Metrowerks\OEM3.1\Symbian_Support\Runtime\Runtime_x86\Runtime_Win32\Libs\MSL_All-Dlls;d:\apps\WinSCP\;C:\APPS\Nokia\Carbide.c++ v1.3\x86Build\Symbian_Tools\Command_Line_Tools;d:\apps\TortoiseHg</info>
+<info>Environment RVCT22LIB=C:\Apps\ARM\RVCT\Data\2.2\349\lib</info>
+<info>Environment INCLUDE=C:\apps\MSVC6\VC98\atl\include;C:\apps\MSVC6\VC98\mfc\include;C:\apps\MSVC6\VC98\include</info>
+<info>Environment PROCESSOR_ARCHITECTURE=x86</info>
+<info>Environment ARMROOT=C:\Program Files\ARM</info>
+<info>Environment SBS_HOME=G:\tcl-personal\iainw\fix2\raptor\</info>
+<info>Environment ALLUSERSPROFILE=C:\Documents and Settings\All Users</info>
+<info>Environment __MINGW__=G:\tcl-personal\iainw\fix2\raptor\\win32\mingw</info>
+<info>Environment SESSIONNAME=Console</info>
+<info>Environment HOMEPATH=\</info>
+<info>Environment MWSYM2LIBRARIES=C:\Apps\Metrowerks\OEM3.1\Symbian_Support\Win32-x86 Support\Libraries\Win32 SDK;C:\Apps\Metrowerks\OEM3.1\Symbian_Support\Runtime\Runtime_x86\Runtime_Win32\Libs;C:\APPS\Nokia\Carbide.c++ v1.3\x86Build\Symbian_Support\Win32-x86 Support\Libraries\Win32 SDK;C:\APPS\Nokia\Carbide.c++ v1.3\x86Build\Symbian_Support\Runtime\Runtime_x86\Runtime_Win32\Libs</info>
+<info>Environment USERDNSDOMAIN=PROD.AD.SYMBIAN.INTRA</info>
+<info>Environment __CYGWIN__=G:\tcl-personal\iainw\fix2\raptor\\win32\cygwin</info>
+<info>Environment MSDEVDIR=C:\apps\MSVC6\Common\msdev98</info>
+<info>Environment HOSTPLATFORM=win 32</info>
+<info>Environment USERNAME=iainwilliamson</info>
+<info>Environment OS=Windows_NT</info>
+<info>Environment FLEXLM_TIMEOUT=5000000</info>
+<info>Environment LOGONSERVER=\\UKLONDCS03</info>
+<info>Environment PROMPT=$P$G</info>
+<info>Environment COMSPEC=C:\WINDOWS\system32\cmd.exe</info>
+<info>Environment CLASSPATH=D:\apps\Symbian\SITK\aura\log4j-1.2.8.jar;</info>
+<info>Environment DTEXT_PATH=C:\Apps\ARM\Documentation\DynaText\4.1.1\release\win_32-pentium\bin</info>
+<info>Environment RVCT22INC=C:\Apps\ARM\RVCT\Data\2.2\349\include\windows</info>
+<info>Environment PATHEXT=.COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.py;.pyw</info>
+<info>Environment FOO=bar</info>
+<info>Environment FP_NO_HOST_CHECK=NO</info>
+<info>Environment WINDIR=C:\WINDOWS</info>
+<info>Environment HOSTPLATFORM_DIR=win32</info>
+<info>Environment TEMP=C:\DOCUME~1\IAINW\LOCALS~1\Temp</info>
+<info>Environment HOMEDRIVE=U:</info>
+<info>Environment ARMLMD_LICENSE_FILE=27001@lon-flexlm02;27001@lon-flexlm01;27001@cam-flexlm02;27001@cam-flexlm01</info>
+<info>Environment SYSTEMDRIVE=C:</info>
+<info>Environment MWCSYM2INCLUDES=C:\Apps\Metrowerks\OEM3.1\Symbian_Support\MSL\MSL_C\MSL_Common\Include\;C:\Apps\Metrowerks\OEM3.1\Symbian_Support\MSL\MSL_C\MSL_Win32\Include\;C:\Apps\Metrowerks\OEM3.1\Symbian_Support\MSL\MSL_C\MSL_X86\;C:\Apps\Metrowerks\OEM3.1\Symbian_Support\MSL\MSL_C++\MSL_Common\Include\;C:\Apps\Metrowerks\OEM3.1\Symbian_Support\MSL\MSL_Extras\MSL_Common\Include\;C:\Apps\Metrowerks\OEM3.1\Symbian_Support\MSL\MSL_Extras\MSL_Win32\Include\;C:\Apps\Metrowerks\OEM3.1\Symbian_Support\Win32-x86 Support\Headers\Win32 SDK\;C:\APPS\Nokia\Carbide.c++ v1.3\x86Build\Symbian_Support\MSL\MSL_C\MSL_Common\Include;C:\APPS\Nokia\Carbide.c++ v1.3\x86Build\Symbian_Support\MSL\MSL_C\MSL_Win32\Include;C:\APPS\Nokia\Carbide.c++ v1.3\x86Build\Symbian_Support\MSL\MSL_C\MSL_X86;C:\APPS\Nokia\Carbide.c++ v1.3\x86Build\Symbian_Support\MSL\MSL_C++\MSL_Common\Include;+C:\APPS\Nokia\Carbide.c++ v1.3\x86Build\Symbian_Support\MSL\MSL_Extras\MSL_Common\Include;C:\APPS\Nokia\Carbide.c++ v1.3\x86Build\Symbian_Support\MSL\MSL_Extras\MSL_Win32\Include;C:\APPS\Nokia\Carbide.c++ v1.3\x86Build\Symbian_Support\Win32-x86 Support\Headers\Win32 SDK</info>
+<info>Environment NUMBER_OF_PROCESSORS=2</info>
+<info>Environment APPDATA=C:\Documents and Settings\IAINW\Application Data</info>
+<info>Environment HOMESHARE=\\lonfiler01\uiainwilliamson</info>
+<info>Environment PROCESSOR_LEVEL=15</info>
+<info>Environment NOKIA_LICENSE_FILE=1700@lon-flexlm02;1700@cam-flexlm01; 1700@ban-flexlm01</info>
+<info>Environment EPOCROOT=G:\tcl-personal\iainw\fix2\raptor\test\epocroot\</info>
+<info>Environment RVCT22BIN=C:\Apps\ARM\RVCT\Programs\2.2\349\win_32-pentium</info>
+<info>Environment SITK_PATHS=d:\apps\SITK\stuff;d:\apps\SITK\stuff\stat\bin;d:\apps\SITK\stuff\edgd\bin\;d:\apps\SITK\stuff\cbr;d:\apps\SITK\stuff\ucc\bin;d:\apps\SITK\stuff\testdriver;</info>
+<info>Environment PROGRAMFILES=C:\Program Files</info>
+<info>Duplicate variant 'v95' (the one from 'G:/tcl-personal/iainw/fix2/raptor/lib/config\variants.xml' was replaced by the one in 'G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/sbs_config\overrides.xml')</info>
+<info>Duplicate variant 'root.changes' (the one from 'G:/tcl-personal/iainw/fix2/raptor/lib/config\root.xml' was replaced by the one in 'G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/sbs_config\overrides.xml')</info>
+<info>Buildable configuration 'armv5_urel'</info>
+<info>Buildable configuration 'armv5_udeb'</info>
+<info>Buildable configuration 'winscw_udeb'</info>
+<info>Buildable configuration 'winscw_urel'</info>
+<info>Loaded toolcheck cache: G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/toolcheck_cache_.tmp
+</info>
+<info>Buildable specification group 'CONFIG_WIDE'</info>
+<info>Buildable specification 'config_wide'</info>
+<info>OS version "v95" determined from file "G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/data/buildinfo.txt"</info>
+<info>applying the OS variant to the configuration "armv5_urel".</info>
+<info>'armv5_urel' uses variant hrh file 'G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/variant/Symbian_OS.hrh'</info>
+<info>OS version "v95" determined from file "G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/data/buildinfo.txt"</info>
+<info>applying the OS variant to the configuration "armv5_udeb".</info>
+<info>'armv5_udeb' uses variant hrh file 'G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/variant/Symbian_OS.hrh'</info>
+<info>OS version "v95" determined from file "G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/data/buildinfo.txt"</info>
+<info>applying the OS variant to the configuration "winscw_udeb".</info>
+<info>'winscw_udeb' uses variant hrh file 'G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/variant/Symbian_OS.hrh'</info>
+<info>OS version "v95" determined from file "G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/data/buildinfo.txt"</info>
+<info>applying the OS variant to the configuration "winscw_urel".</info>
+<info>'winscw_urel' uses variant hrh file 'G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/variant/Symbian_OS.hrh'</info>
+<info>Processing G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/bld.inf</info>
+<info>Processing G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/simple.mmp for platform armv5_urel + armv5_udeb</info>
+<info>Processing G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/simple.mmp for platform winscw_udeb + winscw_urel</info>
+<info>Buildable specification group 'ALL'</info>
+<info>Buildable specification 'export_0'</info>
+<info>Buildable specification 'build_0'</info>
+<info>Buildable specification 'build_1'</info>
+<info>Running G:/tcl-personal/iainw/fix2/raptor/win32/bin/talonctl.exe start</info>
+<info>Making G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/Makefile.export</info>
+<info>Executing 'G:/tcl-personal/iainw/fix2/raptor/win32/mingw/bin/make.exe HAVE_ORDERONLY=1 -r -f "G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/Makefile.export" -j 4  TALON_DESCRAMBLE=1 '</info>
+make.exe: Nothing to be done for `EXPORT'.
+<info>Making G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/Makefile.bitmap</info>
+<info>Executing 'G:/tcl-personal/iainw/fix2/raptor/win32/mingw/bin/make.exe HAVE_ORDERONLY=1 -r -f "G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/Makefile.bitmap" -j 4  TALON_DESCRAMBLE=1 '</info>
+make.exe: Nothing to be done for `BITMAP'.
+<info>Making G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/Makefile.resource_deps</info>
+<info>Executing 'G:/tcl-personal/iainw/fix2/raptor/win32/mingw/bin/make.exe HAVE_ORDERONLY=1 -r -f "G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/Makefile.resource_deps" -j 4  TALON_DESCRAMBLE=1 '</info>
+make.exe: Nothing to be done for `RESOURCE_DEPS'.
+<info>Making G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/Makefile.resource</info>
+<info>Executing 'G:/tcl-personal/iainw/fix2/raptor/win32/mingw/bin/make.exe HAVE_ORDERONLY=1 -r -f "G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/Makefile.resource" -j 4  TALON_DESCRAMBLE=1 '</info>
+make.exe: Nothing to be done for `RESOURCE'.
+<info>Making G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/Makefile.default</info>
+<info>Executing 'G:/tcl-personal/iainw/fix2/raptor/win32/mingw/bin/make.exe HAVE_ORDERONLY=1 -r -f "G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/Makefile.default" -j 4  TALON_DESCRAMBLE=1 '</info>
+<clean bldinf='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/bld.inf' mmp='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/simple.mmp' config='armv5_urel'>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/armv5/urel/test.exe</file>
+<file>"G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/urel/test{000a0000}.def"</file>
+<file>"G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/urel/test{000a0000}.dso"</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/armv5/urel/test.exe.sym</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/urel/test_urel_objects.via</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/armv5/urel/test.exe.map</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/urel/test.o.d</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/urel/test3.o.d</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/urel/test4.o.d</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/urel/test5.o.d</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/urel/test1.o.d</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/urel/test6.o.d</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/urel/test2.o.d</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/urel/test.o</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/urel/test3.o</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/urel/test4.o</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/urel/test5.o</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/urel/test1.o</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/urel/test6.o</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/urel/test2.o</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/urel/test.o</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/urel/test3.o</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/urel/test4.o</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/urel/test5.o</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/urel/test1.o</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/urel/test6.o</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/urel/test2.o</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/urel/test_.o</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/urel/test_.cpp</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/urel/test_.pre</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/urel/test_.pre.d</file>
+<dir>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_</dir>
+<dir>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5</dir>
+<dir>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/urel</dir>
+<dir>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/armv5/urel</dir>
+<dir>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/armv5/lib</dir>
+<dir>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/armv5/lib</dir>
+</clean>
+<whatlog bldinf='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/bld.inf' mmp='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/simple.mmp' config='armv5_urel'>
+<build>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/armv5/urel/test.exe</build>
+<build>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/armv5/urel/test.exe.map</build>
+<build>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/armv5/urel/test.exe.map</build>
+</whatlog>
+<clean bldinf='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/bld.inf' mmp='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/simple.mmp' config='armv5_udeb'>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/armv5/udeb/test.exe</file>
+<file>"G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/udeb/test{000a0000}.def"</file>
+<file>"G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/udeb/test{000a0000}.dso"</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/armv5/udeb/test.exe.sym</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/udeb/test_udeb_objects.via</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/armv5/udeb/test.exe.map</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/udeb/test.o.d</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/udeb/test3.o.d</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/udeb/test4.o.d</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/udeb/test5.o.d</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/udeb/test1.o.d</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/udeb/test6.o.d</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/udeb/test2.o.d</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/udeb/test.o</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/udeb/test3.o</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/udeb/test4.o</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/udeb/test5.o</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/udeb/test1.o</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/udeb/test6.o</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/udeb/test2.o</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/udeb/test.o</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/udeb/test3.o</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/udeb/test4.o</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/udeb/test5.o</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/udeb/test1.o</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/udeb/test6.o</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/udeb/test2.o</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/udeb/test_.o</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/udeb/test_.cpp</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/udeb/test_.pre</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/udeb/test_.pre.d</file>
+<dir>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_</dir>
+<dir>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5</dir>
+<dir>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/udeb</dir>
+<dir>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/armv5/udeb</dir>
+<dir>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/armv5/lib</dir>
+<dir>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/armv5/lib</dir>
+</clean>
+<whatlog bldinf='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/bld.inf' mmp='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/simple.mmp' config='armv5_udeb'>
+<build>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/armv5/udeb/test.exe</build>
+<build>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/armv5/udeb/test.exe.map</build>
+<build>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/armv5/udeb/test.exe.map</build>
+</whatlog>
+<clean bldinf='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/bld.inf' mmp='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/simple.mmp' config='winscw_udeb'>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/winscw/udeb/test.exe</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test.UID.CPP</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test.o</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test_.o</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test1.o</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test2.o</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test3.o</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test4.o</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test5.o</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test6.o</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test_UID_.o</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test.dep</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test.o.d</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test_.dep</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test_.o.d</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test1.dep</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test1.o.d</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test2.dep</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test2.o.d</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test3.dep</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test3.o.d</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test4.dep</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test4.o.d</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test5.dep</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test5.o.d</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test6.dep</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test6.o.d</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test_UID_.dep</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test_UID_.o.d</file>
+<dir>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb</dir>
+<dir>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/winscw/udeb</dir>
+</clean>
+<whatlog bldinf='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/bld.inf' mmp='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/simple.mmp' config='winscw_udeb'>
+<build>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/winscw/udeb/test.exe</build>
+</whatlog>
+<clean bldinf='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/bld.inf' mmp='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/simple.mmp' config='winscw_urel'>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/winscw/urel/test.exe</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test.UID.CPP</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test.o</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test_.o</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test1.o</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test2.o</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test3.o</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test4.o</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test5.o</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test6.o</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test_UID_.o</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test.dep</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test.o.d</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test_.dep</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test_.o.d</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test1.dep</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test1.o.d</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test2.dep</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test2.o.d</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test3.dep</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test3.o.d</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test4.dep</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test4.o.d</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test5.dep</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test5.o.d</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test6.dep</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test6.o.d</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test_UID_.dep</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test_UID_.o.d</file>
+<file>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/winscw/urel/test.exe.map</file>
+<dir>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel</dir>
+<dir>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/winscw/urel</dir>
+</clean>
+<whatlog bldinf='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/bld.inf' mmp='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/simple.mmp' config='winscw_urel'>
+<build>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/winscw/urel/test.exe</build>
+<build>G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/winscw/urel/test.exe.map</build>
+</whatlog>
+<recipe name='compile' target='G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/urel/test2.o' host='' layer='' component='' bldinf='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/bld.inf' mmp='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/simple.mmp' config='armv5_urel' platform='armv5' phase='ALL' source='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test2.cxx'>
+<![CDATA[
++ C:/Apps/ARM/RVCT/Programs/2.2/349/win_32-pentium/armcc.exe -O2 --dwarf2 --dllimport_runtime --exceptions --exceptions_unwind --diag_suppress 161,611,654,997,1152,1300,1464,1488,2523,6318,6331 --diag_error 1267 --cpu 5T --enum_is_int -Ono_known_library --fpmode ieee_no_fenv --export_all_vtbl --memaccess -UL41 --no_vfe --apcs /inter -c --thumb -D__MARM_THUMB__ --fpu softvfp --cpp -D__MARM_INTERWORK__ -D__SUPPORT_CPP_EXCEPTIONS__ -D_UNICODE -D__SYMBIAN32__ -D__ARMCC__ -D__EPOC32__ -D__MARM__ -D__EABI__ '-D__PRODUCT_INCLUDE__="G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/variant/Symbian_OS.hrh"' -DTEST_MACRO_THAT_DOES_NOTHING -D__MARM_ARMV5__ -D__ARMCC_2__ -D__ARMCC_2_2__ -DNDEBUG -DOSVARIANT95WASAPPLIED -D__EXE__ --preinclude G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/rvct/rvct.h -JG:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple -JG:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include -JG:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/variant --depend_format=unix --depend G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/urel/test2.o.d -o G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/urel/test2.o G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test2.cxx
+
+]]><time start='1253890703.95062' elapsed='1.391' />
+<status exit='ok' attempt='1' />
+</recipe>
+<recipe name='compile' target='G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/urel/test1.o' host='' layer='' component='' bldinf='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/bld.inf' mmp='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/simple.mmp' config='armv5_urel' platform='armv5' phase='ALL' source='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test1.c++'>
+<![CDATA[
++ C:/Apps/ARM/RVCT/Programs/2.2/349/win_32-pentium/armcc.exe -O2 --dwarf2 --dllimport_runtime --exceptions --exceptions_unwind --diag_suppress 161,611,654,997,1152,1300,1464,1488,2523,6318,6331 --diag_error 1267 --cpu 5T --enum_is_int -Ono_known_library --fpmode ieee_no_fenv --export_all_vtbl --memaccess -UL41 --no_vfe --apcs /inter -c --thumb -D__MARM_THUMB__ --fpu softvfp --cpp -D__MARM_INTERWORK__ -D__SUPPORT_CPP_EXCEPTIONS__ -D_UNICODE -D__SYMBIAN32__ -D__ARMCC__ -D__EPOC32__ -D__MARM__ -D__EABI__ '-D__PRODUCT_INCLUDE__="G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/variant/Symbian_OS.hrh"' -DTEST_MACRO_THAT_DOES_NOTHING -D__MARM_ARMV5__ -D__ARMCC_2__ -D__ARMCC_2_2__ -DNDEBUG -DOSVARIANT95WASAPPLIED -D__EXE__ --preinclude G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/rvct/rvct.h -JG:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple -JG:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include -JG:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/variant --depend_format=unix --depend G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/urel/test1.o.d -o G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/urel/test1.o G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test1.c++
+
+]]><time start='1253890703.95062' elapsed='1.406' />
+<status exit='ok' attempt='1' />
+</recipe>
+<recipe name='compile' target='G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/urel/test.o' host='' layer='' component='' bldinf='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/bld.inf' mmp='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/simple.mmp' config='armv5_urel' platform='armv5' phase='ALL' source='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test.cpp'>
+<![CDATA[
++ C:/Apps/ARM/RVCT/Programs/2.2/349/win_32-pentium/armcc.exe -O2 --dwarf2 --dllimport_runtime --exceptions --exceptions_unwind --diag_suppress 161,611,654,997,1152,1300,1464,1488,2523,6318,6331 --diag_error 1267 --cpu 5T --enum_is_int -Ono_known_library --fpmode ieee_no_fenv --export_all_vtbl --memaccess -UL41 --no_vfe --apcs /inter -c --thumb -D__MARM_THUMB__ --fpu softvfp --cpp -D__MARM_INTERWORK__ -D__SUPPORT_CPP_EXCEPTIONS__ -D_UNICODE -D__SYMBIAN32__ -D__ARMCC__ -D__EPOC32__ -D__MARM__ -D__EABI__ '-D__PRODUCT_INCLUDE__="G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/variant/Symbian_OS.hrh"' -DTEST_MACRO_THAT_DOES_NOTHING -D__MARM_ARMV5__ -D__ARMCC_2__ -D__ARMCC_2_2__ -DNDEBUG -DOSVARIANT95WASAPPLIED -D__EXE__ --preinclude G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/rvct/rvct.h -JG:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple -JG:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include -JG:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/variant --depend_format=unix --depend G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/urel/test.o.d -o G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/urel/test.o G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test.cpp
+
+]]><time start='1253890703.95062' elapsed='1.422' />
+<status exit='ok' attempt='1' />
+</recipe>
+<recipe name='compile' target='G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/urel/test5.o' host='' layer='' component='' bldinf='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/bld.inf' mmp='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/simple.mmp' config='armv5_urel' platform='armv5' phase='ALL' source='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test5.CC'>
+<![CDATA[
++ C:/Apps/ARM/RVCT/Programs/2.2/349/win_32-pentium/armcc.exe -O2 --dwarf2 --dllimport_runtime --exceptions --exceptions_unwind --diag_suppress 161,611,654,997,1152,1300,1464,1488,2523,6318,6331 --diag_error 1267 --cpu 5T --enum_is_int -Ono_known_library --fpmode ieee_no_fenv --export_all_vtbl --memaccess -UL41 --no_vfe --apcs /inter -c --thumb -D__MARM_THUMB__ --fpu softvfp --cpp -D__MARM_INTERWORK__ -D__SUPPORT_CPP_EXCEPTIONS__ -D_UNICODE -D__SYMBIAN32__ -D__ARMCC__ -D__EPOC32__ -D__MARM__ -D__EABI__ '-D__PRODUCT_INCLUDE__="G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/variant/Symbian_OS.hrh"' -DTEST_MACRO_THAT_DOES_NOTHING -D__MARM_ARMV5__ -D__ARMCC_2__ -D__ARMCC_2_2__ -DNDEBUG -DOSVARIANT95WASAPPLIED -D__EXE__ --preinclude G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/rvct/rvct.h -JG:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple -JG:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include -JG:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/variant --depend_format=unix --depend G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/urel/test5.o.d -o G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/urel/test5.o G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test5.CC
+<recipe name='compile' target='G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/urel/test5.o.fake' host='' layer='' component='' bldinf='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/bld.inf' mmp='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/simple.mmp' config='armv5_urel' platform='armv5' phase='ALL' source='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test5.CC'> <!-- Fake recipe, nested in ther CDATA of a real one -->
+<status exit='ok' attempt='1' />
+</recipe>
+]><time start='1253890705.41936' elapsed='0.500' />
+<status exit='ok' attempt='1' />
+</recipe>
+<recipe name='cia2cpp' target='G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/urel/test_.pre' host='' layer='' component='' bldinf='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/bld.inf' mmp='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/simple.mmp' config='armv5_urel' platform='armv5' phase='ALL' source='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test.cia'>
+<![CDATA[
++ C:/Apps/ARM/RVCT/Programs/2.2/349/win_32-pentium/armcc.exe -E -O2 -D__MARM_INTERWORK__ -D__SUPPORT_CPP_EXCEPTIONS__ -D_UNICODE -D__SYMBIAN32__ -D__ARMCC__ -D__EPOC32__ -D__MARM__ -D__EABI__ '-D__PRODUCT_INCLUDE__="G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/variant/Symbian_OS.hrh"' -DTEST_MACRO_THAT_DOES_NOTHING -D__MARM_ARMV5__ -D__ARMCC_2__ -D__ARMCC_2_2__ -DNDEBUG -DOSVARIANT95WASAPPLIED -D__EXE__ -D__CIA__ --cpp --preinclude G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/rvct/rvct.h -JG:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include -JG:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/variant -o G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/urel/test_.pre G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test.cia
++ C:/Apps/ARM/RVCT/Programs/2.2/349/win_32-pentium/armcc.exe -M -E -O2 -D__MARM_INTERWORK__ -D__SUPPORT_CPP_EXCEPTIONS__ -D_UNICODE -D__SYMBIAN32__ -D__ARMCC__ -D__EPOC32__ -D__MARM__ -D__EABI__ '-D__PRODUCT_INCLUDE__="G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/variant/Symbian_OS.hrh"' -DTEST_MACRO_THAT_DOES_NOTHING -D__MARM_ARMV5__ -D__ARMCC_2__ -D__ARMCC_2_2__ -DNDEBUG -DOSVARIANT95WASAPPLIED -D__EXE__ -D__CIA__ --cpp --preinclude G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/rvct/rvct.h -JG:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include -JG:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/variant --depend_format=unix -o G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/urel/test_.pre G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test.cia
+
+]]><time start='1253890703.95062' elapsed='2.016' />
+<status exit='ok' attempt='1' />
+</recipe>
+<recipe name='compile' target='G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/urel/test3.o' host='' layer='' component='' bldinf='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/bld.inf' mmp='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/simple.mmp' config='armv5_urel' platform='armv5' phase='ALL' source='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test3.Cpp'>
+<![CDATA[
++ C:/Apps/ARM/RVCT/Programs/2.2/349/win_32-pentium/armcc.exe -O2 --dwarf2 --dllimport_runtime --exceptions --exceptions_unwind --diag_suppress 161,611,654,997,1152,1300,1464,1488,2523,6318,6331 --diag_error 1267 --cpu 5T --enum_is_int -Ono_known_library --fpmode ieee_no_fenv --export_all_vtbl --memaccess -UL41 --no_vfe --apcs /inter -c --thumb -D__MARM_THUMB__ --fpu softvfp --cpp -D__MARM_INTERWORK__ -D__SUPPORT_CPP_EXCEPTIONS__ -D_UNICODE -D__SYMBIAN32__ -D__ARMCC__ -D__EPOC32__ -D__MARM__ -D__EABI__ '-D__PRODUCT_INCLUDE__="G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/variant/Symbian_OS.hrh"' -DTEST_MACRO_THAT_DOES_NOTHING -D__MARM_ARMV5__ -D__ARMCC_2__ -D__ARMCC_2_2__ -DNDEBUG -DOSVARIANT95WASAPPLIED -D__EXE__ --preinclude G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/rvct/rvct.h -JG:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple -JG:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include -JG:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/variant --depend_format=unix --depend G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/urel/test3.o.d -o G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/urel/test3.o G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test3.Cpp
+
+]]><time start='1253890705.38811' elapsed='0.641' />
+<status exit='ok' attempt='1' />
+</recipe>
+<recipe name='compile' target='G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/urel/test4.o' host='' layer='' component='' bldinf='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/bld.inf' mmp='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/simple.mmp' config='armv5_urel' platform='armv5' phase='ALL' source='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test4.cc'>
+<![CDATA[
++ C:/Apps/ARM/RVCT/Programs/2.2/349/win_32-pentium/armcc.exe -O2 --dwarf2 --dllimport_runtime --exceptions --exceptions_unwind --diag_suppress 161,611,654,997,1152,1300,1464,1488,2523,6318,6331 --diag_error 1267 --cpu 5T --enum_is_int -Ono_known_library --fpmode ieee_no_fenv --export_all_vtbl --memaccess -UL41 --no_vfe --apcs /inter -c --thumb -D__MARM_THUMB__ --fpu softvfp --cpp -D__MARM_INTERWORK__ -D__SUPPORT_CPP_EXCEPTIONS__ -D_UNICODE -D__SYMBIAN32__ -D__ARMCC__ -D__EPOC32__ -D__MARM__ -D__EABI__ '-D__PRODUCT_INCLUDE__="G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/variant/Symbian_OS.hrh"' -DTEST_MACRO_THAT_DOES_NOTHING -D__MARM_ARMV5__ -D__ARMCC_2__ -D__ARMCC_2_2__ -DNDEBUG -DOSVARIANT95WASAPPLIED -D__EXE__ --preinclude G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/rvct/rvct.h -JG:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple -JG:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include -JG:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/variant --depend_format=unix --depend G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/urel/test4.o.d -o G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/urel/test4.o G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test4.cc
+
+]]><time start='1253890705.38811' elapsed='0.750' />
+<status exit='ok' attempt='1' />
+</recipe>
+<recipe name='compile' target='G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/urel/test6.o' host='' layer='' component='' bldinf='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/bld.inf' mmp='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/simple.mmp' config='armv5_urel' platform='armv5' phase='ALL' source='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test6.C++'>
+<![CDATA[
++ C:/Apps/ARM/RVCT/Programs/2.2/349/win_32-pentium/armcc.exe -O2 --dwarf2 --dllimport_runtime --exceptions --exceptions_unwind --diag_suppress 161,611,654,997,1152,1300,1464,1488,2523,6318,6331 --diag_error 1267 --cpu 5T --enum_is_int -Ono_known_library --fpmode ieee_no_fenv --export_all_vtbl --memaccess -UL41 --no_vfe --apcs /inter -c --thumb -D__MARM_THUMB__ --fpu softvfp --cpp -D__MARM_INTERWORK__ -D__SUPPORT_CPP_EXCEPTIONS__ -D_UNICODE -D__SYMBIAN32__ -D__ARMCC__ -D__EPOC32__ -D__MARM__ -D__EABI__ '-D__PRODUCT_INCLUDE__="G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/variant/Symbian_OS.hrh"' -DTEST_MACRO_THAT_DOES_NOTHING -D__MARM_ARMV5__ -D__ARMCC_2__ -D__ARMCC_2_2__ -DNDEBUG -DOSVARIANT95WASAPPLIED -D__EXE__ --preinclude G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/rvct/rvct.h -JG:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple -JG:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include -JG:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/variant --depend_format=unix --depend G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/urel/test6.o.d -o G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/urel/test6.o G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test6.C++
+
+]]><time start='1253890705.96623' elapsed='0.656' />
+<status exit='ok' attempt='1' />
+</recipe>
+<recipe name='compile' target='G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/udeb/test1.o' host='' layer='' component='' bldinf='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/bld.inf' mmp='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/simple.mmp' config='armv5_udeb' platform='armv5' phase='ALL' source='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test1.c++'>
+<![CDATA[
++ C:/Apps/ARM/RVCT/Programs/2.2/349/win_32-pentium/armcc.exe -O0 -g --dwarf2 --dllimport_runtime --exceptions --exceptions_unwind --diag_suppress 161,611,654,997,1152,1300,1464,1488,2523,6318,6331 --diag_error 1267 --cpu 5T --enum_is_int -Ono_known_library --fpmode ieee_no_fenv --export_all_vtbl --memaccess -UL41 --no_vfe --apcs /inter -c --thumb -D__MARM_THUMB__ --fpu softvfp --cpp -D__MARM_INTERWORK__ -D__SUPPORT_CPP_EXCEPTIONS__ -D_UNICODE -D__SYMBIAN32__ -D__ARMCC__ -D__EPOC32__ -D__MARM__ -D__EABI__ '-D__PRODUCT_INCLUDE__="G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/variant/Symbian_OS.hrh"' -DTEST_MACRO_THAT_DOES_NOTHING -D__MARM_ARMV5__ -D__ARMCC_2__ -D__ARMCC_2_2__ -D_DEBUG -DOSVARIANT95WASAPPLIED -D__EXE__ --preinclude G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/rvct/rvct.h -JG:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple -JG:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include -JG:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/variant --depend_format=unix --depend G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/udeb/test1.o.d -o G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/udeb/test1.o G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test1.c++
+
+]]><time start='1253890706.18498' elapsed='0.562' />
+<status exit='ok' attempt='1' />
+</recipe>
+<recipe name='compile' target='G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/udeb/test.o' host='' layer='' component='' bldinf='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/bld.inf' mmp='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/simple.mmp' config='armv5_udeb' platform='armv5' phase='ALL' source='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test.cpp'>
+<![CDATA[
++ C:/Apps/ARM/RVCT/Programs/2.2/349/win_32-pentium/armcc.exe -O0 -g --dwarf2 --dllimport_runtime --exceptions --exceptions_unwind --diag_suppress 161,611,654,997,1152,1300,1464,1488,2523,6318,6331 --diag_error 1267 --cpu 5T --enum_is_int -Ono_known_library --fpmode ieee_no_fenv --export_all_vtbl --memaccess -UL41 --no_vfe --apcs /inter -c --thumb -D__MARM_THUMB__ --fpu softvfp --cpp -D__MARM_INTERWORK__ -D__SUPPORT_CPP_EXCEPTIONS__ -D_UNICODE -D__SYMBIAN32__ -D__ARMCC__ -D__EPOC32__ -D__MARM__ -D__EABI__ '-D__PRODUCT_INCLUDE__="G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/variant/Symbian_OS.hrh"' -DTEST_MACRO_THAT_DOES_NOTHING -D__MARM_ARMV5__ -D__ARMCC_2__ -D__ARMCC_2_2__ -D_DEBUG -DOSVARIANT95WASAPPLIED -D__EXE__ --preinclude G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/rvct/rvct.h -JG:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple -JG:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include -JG:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/variant --depend_format=unix --depend G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/udeb/test.o.d -o G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/udeb/test.o G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test.cpp
+
+]]><time start='1253890706.04435' elapsed='0.719' />
+<status exit='ok' attempt='1' />
+</recipe>
+<recipe name='compile' target='G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/udeb/test2.o' host='' layer='' component='' bldinf='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/bld.inf' mmp='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/simple.mmp' config='armv5_udeb' platform='armv5' phase='ALL' source='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test2.cxx'>
+<![CDATA[
++ C:/Apps/ARM/RVCT/Programs/2.2/349/win_32-pentium/armcc.exe -O0 -g --dwarf2 --dllimport_runtime --exceptions --exceptions_unwind --diag_suppress 161,611,654,997,1152,1300,1464,1488,2523,6318,6331 --diag_error 1267 --cpu 5T --enum_is_int -Ono_known_library --fpmode ieee_no_fenv --export_all_vtbl --memaccess -UL41 --no_vfe --apcs /inter -c --thumb -D__MARM_THUMB__ --fpu softvfp --cpp -D__MARM_INTERWORK__ -D__SUPPORT_CPP_EXCEPTIONS__ -D_UNICODE -D__SYMBIAN32__ -D__ARMCC__ -D__EPOC32__ -D__MARM__ -D__EABI__ '-D__PRODUCT_INCLUDE__="G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/variant/Symbian_OS.hrh"' -DTEST_MACRO_THAT_DOES_NOTHING -D__MARM_ARMV5__ -D__ARMCC_2__ -D__ARMCC_2_2__ -D_DEBUG -DOSVARIANT95WASAPPLIED -D__EXE__ --preinclude G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/rvct/rvct.h -JG:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple -JG:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include -JG:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/variant --depend_format=unix --depend G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/udeb/test2.o.d -o G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/udeb/test2.o G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test2.cxx
+
+]]><time start='1253890706.66935' elapsed='0.672' />
+<status exit='ok' attempt='1' />
+</recipe>
+<recipe name='cia2cpp' target='G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/udeb/test_.pre' host='' layer='' component='' bldinf='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/bld.inf' mmp='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/simple.mmp' config='armv5_udeb' platform='armv5' phase='ALL' source='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test.cia'>
+<![CDATA[
++ C:/Apps/ARM/RVCT/Programs/2.2/349/win_32-pentium/armcc.exe -E -O0 -D__MARM_INTERWORK__ -D__SUPPORT_CPP_EXCEPTIONS__ -D_UNICODE -D__SYMBIAN32__ -D__ARMCC__ -D__EPOC32__ -D__MARM__ -D__EABI__ '-D__PRODUCT_INCLUDE__="G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/variant/Symbian_OS.hrh"' -DTEST_MACRO_THAT_DOES_NOTHING -D__MARM_ARMV5__ -D__ARMCC_2__ -D__ARMCC_2_2__ -D_DEBUG -DOSVARIANT95WASAPPLIED -D__EXE__ -D__CIA__ --cpp --preinclude G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/rvct/rvct.h -JG:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include -JG:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/variant -o G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/udeb/test_.pre G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test.cia
++ C:/Apps/ARM/RVCT/Programs/2.2/349/win_32-pentium/armcc.exe -M -E -O0 -D__MARM_INTERWORK__ -D__SUPPORT_CPP_EXCEPTIONS__ -D_UNICODE -D__SYMBIAN32__ -D__ARMCC__ -D__EPOC32__ -D__MARM__ -D__EABI__ '-D__PRODUCT_INCLUDE__="G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/variant/Symbian_OS.hrh"' -DTEST_MACRO_THAT_DOES_NOTHING -D__MARM_ARMV5__ -D__ARMCC_2__ -D__ARMCC_2_2__ -D_DEBUG -DOSVARIANT95WASAPPLIED -D__EXE__ -D__CIA__ --cpp --preinclude G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/rvct/rvct.h -JG:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include -JG:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/variant --depend_format=unix -o G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/udeb/test_.pre G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test.cia
+
+]]><time start='1253890706.05998' elapsed='1.281' />
+<status exit='ok' attempt='1' />
+</recipe>
+<recipe name='compile' target='G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/udeb/test3.o' host='' layer='' component='' bldinf='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/bld.inf' mmp='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/simple.mmp' config='armv5_udeb' platform='armv5' phase='ALL' source='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test3.Cpp'>
+<![CDATA[
++ C:/Apps/ARM/RVCT/Programs/2.2/349/win_32-pentium/armcc.exe -O0 -g --dwarf2 --dllimport_runtime --exceptions --exceptions_unwind --diag_suppress 161,611,654,997,1152,1300,1464,1488,2523,6318,6331 --diag_error 1267 --cpu 5T --enum_is_int -Ono_known_library --fpmode ieee_no_fenv --export_all_vtbl --memaccess -UL41 --no_vfe --apcs /inter -c --thumb -D__MARM_THUMB__ --fpu softvfp --cpp -D__MARM_INTERWORK__ -D__SUPPORT_CPP_EXCEPTIONS__ -D_UNICODE -D__SYMBIAN32__ -D__ARMCC__ -D__EPOC32__ -D__MARM__ -D__EABI__ '-D__PRODUCT_INCLUDE__="G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/variant/Symbian_OS.hrh"' -DTEST_MACRO_THAT_DOES_NOTHING -D__MARM_ARMV5__ -D__ARMCC_2__ -D__ARMCC_2_2__ -D_DEBUG -DOSVARIANT95WASAPPLIED -D__EXE__ --preinclude G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/rvct/rvct.h -JG:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple -JG:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include -JG:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/variant --depend_format=unix --depend G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/udeb/test3.o.d -o G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/udeb/test3.o G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test3.Cpp
+
+]]><time start='1253890706.77872' elapsed='0.656' />
+<status exit='ok' attempt='1' />
+</recipe>
+<recipe name='compile' target='G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/udeb/test4.o' host='' layer='' component='' bldinf='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/bld.inf' mmp='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/simple.mmp' config='armv5_udeb' platform='armv5' phase='ALL' source='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test4.cc'>
+<![CDATA[
++ C:/Apps/ARM/RVCT/Programs/2.2/349/win_32-pentium/armcc.exe -O0 -g --dwarf2 --dllimport_runtime --exceptions --exceptions_unwind --diag_suppress 161,611,654,997,1152,1300,1464,1488,2523,6318,6331 --diag_error 1267 --cpu 5T --enum_is_int -Ono_known_library --fpmode ieee_no_fenv --export_all_vtbl --memaccess -UL41 --no_vfe --apcs /inter -c --thumb -D__MARM_THUMB__ --fpu softvfp --cpp -D__MARM_INTERWORK__ -D__SUPPORT_CPP_EXCEPTIONS__ -D_UNICODE -D__SYMBIAN32__ -D__ARMCC__ -D__EPOC32__ -D__MARM__ -D__EABI__ '-D__PRODUCT_INCLUDE__="G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/variant/Symbian_OS.hrh"' -DTEST_MACRO_THAT_DOES_NOTHING -D__MARM_ARMV5__ -D__ARMCC_2__ -D__ARMCC_2_2__ -D_DEBUG -DOSVARIANT95WASAPPLIED -D__EXE__ --preinclude G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/rvct/rvct.h -JG:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple -JG:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include -JG:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/variant --depend_format=unix --depend G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/udeb/test4.o.d -o G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/udeb/test4.o G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test4.cc
+
+]]><time start='1253890706.84122' elapsed='0.703' />
+<status exit='ok' attempt='1' />
+</recipe>
+<recipe name='compile' target='G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/udeb/test5.o' host='' layer='' component='' bldinf='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/bld.inf' mmp='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/simple.mmp' config='armv5_udeb' platform='armv5' phase='ALL' source='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test5.CC'>
+<![CDATA[
++ C:/Apps/ARM/RVCT/Programs/2.2/349/win_32-pentium/armcc.exe -O0 -g --dwarf2 --dllimport_runtime --exceptions --exceptions_unwind --diag_suppress 161,611,654,997,1152,1300,1464,1488,2523,6318,6331 --diag_error 1267 --cpu 5T --enum_is_int -Ono_known_library --fpmode ieee_no_fenv --export_all_vtbl --memaccess -UL41 --no_vfe --apcs /inter -c --thumb -D__MARM_THUMB__ --fpu softvfp --cpp -D__MARM_INTERWORK__ -D__SUPPORT_CPP_EXCEPTIONS__ -D_UNICODE -D__SYMBIAN32__ -D__ARMCC__ -D__EPOC32__ -D__MARM__ -D__EABI__ '-D__PRODUCT_INCLUDE__="G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/variant/Symbian_OS.hrh"' -DTEST_MACRO_THAT_DOES_NOTHING -D__MARM_ARMV5__ -D__ARMCC_2__ -D__ARMCC_2_2__ -D_DEBUG -DOSVARIANT95WASAPPLIED -D__EXE__ --preinclude G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/rvct/rvct.h -JG:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple -JG:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include -JG:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/variant --depend_format=unix --depend G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/udeb/test5.o.d -o G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/udeb/test5.o G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test5.CC
+
+]]><time start='1253890707.41935' elapsed='0.625' />
+<status exit='ok' attempt='1' />
+</recipe>
+<recipe name='compile' target='G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/udeb/test6.o' host='' layer='' component='' bldinf='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/bld.inf' mmp='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/simple.mmp' config='armv5_udeb' platform='armv5' phase='ALL' source='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test6.C++'>
+<![CDATA[
++ C:/Apps/ARM/RVCT/Programs/2.2/349/win_32-pentium/armcc.exe -O0 -g --dwarf2 --dllimport_runtime --exceptions --exceptions_unwind --diag_suppress 161,611,654,997,1152,1300,1464,1488,2523,6318,6331 --diag_error 1267 --cpu 5T --enum_is_int -Ono_known_library --fpmode ieee_no_fenv --export_all_vtbl --memaccess -UL41 --no_vfe --apcs /inter -c --thumb -D__MARM_THUMB__ --fpu softvfp --cpp -D__MARM_INTERWORK__ -D__SUPPORT_CPP_EXCEPTIONS__ -D_UNICODE -D__SYMBIAN32__ -D__ARMCC__ -D__EPOC32__ -D__MARM__ -D__EABI__ '-D__PRODUCT_INCLUDE__="G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/variant/Symbian_OS.hrh"' -DTEST_MACRO_THAT_DOES_NOTHING -D__MARM_ARMV5__ -D__ARMCC_2__ -D__ARMCC_2_2__ -D_DEBUG -DOSVARIANT95WASAPPLIED -D__EXE__ --preinclude G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/rvct/rvct.h -JG:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple -JG:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include -JG:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/variant --depend_format=unix --depend G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/udeb/test6.o.d -o G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/udeb/test6.o G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test6.C++
+
+]]><time start='1253890707.37247' elapsed='0.672' />
+<status exit='ok' attempt='1' />
+</recipe>
+<recipe name='win32compile2object' target='G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test_.o' host='' layer='' component='' bldinf='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/bld.inf' mmp='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/simple.mmp' config='winscw_udeb' platform='winscw' phase='ALL' source='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test.cia'>
+<![CDATA[
++ mwccsym2.exe -c -align 4 -warnings on -w nohidevirtual,nounusedexpr -msgstyle gcc -enum int -str pool -exc ms -trigraphs on -cwd source -g -O0 -inline off -runtime staticmulti -wchar_t off -nostdinc -gccdepends -MD -d __SYMBIAN32__ -d __CW32__ -d __WINS__ -d __WINSCW__ -d __SUPPORT_CPP_EXCEPTIONS__ -d _UNICODE -d TEST_MACRO_THAT_DOES_NOTHING -d _DEBUG -d OSVARIANT95WASAPPLIED -d __EXE__ -i- -i G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include -i G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/variant -include Symbian_OS.hrh -o G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test_.o G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test.cia
+mwccsym2.exe: warning: No file mapping matches 'test.cia' (unrecognized file contents or filename extension); treating as source text
+test.cia:3: warning: variable / argument 'i' is not used in function
++ G:/tcl-personal/iainw/fix2/raptor/win32/cygwin/bin/sed.exe 's#\\\(.\)#/\1#g;s#/ #\\ #g;s#\([A-Za-z]:\)\\#\1/#g;1,1s#.*: .* \(.\)\?$#    G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test_.o: G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test.cia \1#' G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test_.dep
+
+]]><time start='1253890707.55997' elapsed='4.016' />
+<status exit='ok' attempt='1' />
+</recipe>
+<recipe name='win32compile2object' target='G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test2.o' host='' layer='' component='' bldinf='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/bld.inf' mmp='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/simple.mmp' config='winscw_udeb' platform='winscw' phase='ALL' source='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test2.cxx'>
+<![CDATA[
++ mwccsym2.exe -c -align 4 -warnings on -w nohidevirtual,nounusedexpr -msgstyle gcc -enum int -str pool -exc ms -trigraphs on -cwd source -g -O0 -inline off -runtime staticmulti -wchar_t off -nostdinc -gccdepends -MD -d __SYMBIAN32__ -d __CW32__ -d __WINS__ -d __WINSCW__ -d __SUPPORT_CPP_EXCEPTIONS__ -d _UNICODE -d TEST_MACRO_THAT_DOES_NOTHING -d _DEBUG -d OSVARIANT95WASAPPLIED -d __EXE__ -i- -i G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include -i G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/variant -include Symbian_OS.hrh -o G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test2.o G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test2.cxx
++ G:/tcl-personal/iainw/fix2/raptor/win32/cygwin/bin/sed.exe 's#\\\(.\)#/\1#g;s#/ #\\ #g;s#\([A-Za-z]:\)\\#\1/#g;1,1s#.*: .* \(.\)\?$#    G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test2.o: G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test2.cxx \1#' G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test2.dep
+
+]]><time start='1253890708.05997' elapsed='3.547' />
+<status exit='ok' attempt='1' />
+</recipe>
+<recipe name='win32compile2object' target='G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test1.o' host='' layer='' component='' bldinf='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/bld.inf' mmp='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/simple.mmp' config='winscw_udeb' platform='winscw' phase='ALL' source='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test1.c++'>
+<![CDATA[
++ mwccsym2.exe -c -align 4 -warnings on -w nohidevirtual,nounusedexpr -msgstyle gcc -enum int -str pool -exc ms -trigraphs on -cwd source -g -O0 -inline off -runtime staticmulti -wchar_t off -nostdinc -gccdepends -MD -d __SYMBIAN32__ -d __CW32__ -d __WINS__ -d __WINSCW__ -d __SUPPORT_CPP_EXCEPTIONS__ -d _UNICODE -d TEST_MACRO_THAT_DOES_NOTHING -d _DEBUG -d OSVARIANT95WASAPPLIED -d __EXE__ -i- -i G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include -i G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/variant -include Symbian_OS.hrh -o G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test1.o G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test1.c++
++ G:/tcl-personal/iainw/fix2/raptor/win32/cygwin/bin/sed.exe 's#\\\(.\)#/\1#g;s#/ #\\ #g;s#\([A-Za-z]:\)\\#\1/#g;1,1s#.*: .* \(.\)\?$#    G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test1.o: G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test1.c++ \1#' G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test1.dep
+
+]]><time start='1253890708.05997' elapsed='3.609' />
+<status exit='ok' attempt='1' />
+</recipe>
+<recipe name='win32compile2object' target='G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test.o' host='' layer='' component='' bldinf='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/bld.inf' mmp='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/simple.mmp' config='winscw_udeb' platform='winscw' phase='ALL' source='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test.cpp'>
+<![CDATA[
++ mwccsym2.exe -c -align 4 -warnings on -w nohidevirtual,nounusedexpr -msgstyle gcc -enum int -str pool -exc ms -trigraphs on -cwd source -g -O0 -inline off -runtime staticmulti -wchar_t off -nostdinc -gccdepends -MD -d __SYMBIAN32__ -d __CW32__ -d __WINS__ -d __WINSCW__ -d __SUPPORT_CPP_EXCEPTIONS__ -d _UNICODE -d TEST_MACRO_THAT_DOES_NOTHING -d _DEBUG -d OSVARIANT95WASAPPLIED -d __EXE__ -i- -i G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include -i G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/variant -include Symbian_OS.hrh -o G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test.o G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test.cpp
++ G:/tcl-personal/iainw/fix2/raptor/win32/cygwin/bin/sed.exe 's#\\\(.\)#/\1#g;s#/ #\\ #g;s#\([A-Za-z]:\)\\#\1/#g;1,1s#.*: .* \(.\)\?$#    G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test.o: G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test.cpp \1#' G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test.dep
+
+]]><time start='1253890707.48185' elapsed='4.328' />
+<status exit='ok' attempt='1' />
+</recipe>
+<recipe name='win32compile2object' target='G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test5.o' host='' layer='' component='' bldinf='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/bld.inf' mmp='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/simple.mmp' config='winscw_udeb' platform='winscw' phase='ALL' source='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test5.CC'>
+<![CDATA[
++ mwccsym2.exe -c -align 4 -warnings on -w nohidevirtual,nounusedexpr -msgstyle gcc -enum int -str pool -exc ms -trigraphs on -cwd source -g -O0 -inline off -runtime staticmulti -wchar_t off -nostdinc -gccdepends -MD -d __SYMBIAN32__ -d __CW32__ -d __WINS__ -d __WINSCW__ -d __SUPPORT_CPP_EXCEPTIONS__ -d _UNICODE -d TEST_MACRO_THAT_DOES_NOTHING -d _DEBUG -d OSVARIANT95WASAPPLIED -d __EXE__ -i- -i G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include -i G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/variant -include Symbian_OS.hrh -o G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test5.o G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test5.CC
++ G:/tcl-personal/iainw/fix2/raptor/win32/cygwin/bin/sed.exe 's#\\\(.\)#/\1#g;s#/ #\\ #g;s#\([A-Za-z]:\)\\#\1/#g;1,1s#.*: .* \(.\)\?$#    G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test5.o: G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test5.CC \1#' G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test5.dep
+
+]]><time start='1253890711.71619' elapsed='0.516' />
+<status exit='ok' attempt='1' />
+</recipe>
+<recipe name='win32compile2object' target='G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test3.o' host='' layer='' component='' bldinf='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/bld.inf' mmp='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/simple.mmp' config='winscw_udeb' platform='winscw' phase='ALL' source='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test3.Cpp'>
+<![CDATA[
++ mwccsym2.exe -c -align 4 -warnings on -w nohidevirtual,nounusedexpr -msgstyle gcc -enum int -str pool -exc ms -trigraphs on -cwd source -g -O0 -inline off -runtime staticmulti -wchar_t off -nostdinc -gccdepends -MD -d __SYMBIAN32__ -d __CW32__ -d __WINS__ -d __WINSCW__ -d __SUPPORT_CPP_EXCEPTIONS__ -d _UNICODE -d TEST_MACRO_THAT_DOES_NOTHING -d _DEBUG -d OSVARIANT95WASAPPLIED -d __EXE__ -i- -i G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include -i G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/variant -include Symbian_OS.hrh -o G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test3.o G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test3.Cpp
++ G:/tcl-personal/iainw/fix2/raptor/win32/cygwin/bin/sed.exe 's#\\\(.\)#/\1#g;s#/ #\\ #g;s#\([A-Za-z]:\)\\#\1/#g;1,1s#.*: .* \(.\)\?$#    G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test3.o: G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test3.Cpp \1#' G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test3.dep
+
+]]><time start='1253890711.62244' elapsed='0.625' />
+<status exit='ok' attempt='1' />
+</recipe>
+<recipe name='win32compile2object' target='G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test4.o' host='' layer='' component='' bldinf='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/bld.inf' mmp='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/simple.mmp' config='winscw_udeb' platform='winscw' phase='ALL' source='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test4.cc'>
+<![CDATA[
++ mwccsym2.exe -c -align 4 -warnings on -w nohidevirtual,nounusedexpr -msgstyle gcc -enum int -str pool -exc ms -trigraphs on -cwd source -g -O0 -inline off -runtime staticmulti -wchar_t off -nostdinc -gccdepends -MD -d __SYMBIAN32__ -d __CW32__ -d __WINS__ -d __WINSCW__ -d __SUPPORT_CPP_EXCEPTIONS__ -d _UNICODE -d TEST_MACRO_THAT_DOES_NOTHING -d _DEBUG -d OSVARIANT95WASAPPLIED -d __EXE__ -i- -i G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include -i G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/variant -include Symbian_OS.hrh -o G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test4.o G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test4.cc
++ G:/tcl-personal/iainw/fix2/raptor/win32/cygwin/bin/sed.exe 's#\\\(.\)#/\1#g;s#/ #\\ #g;s#\([A-Za-z]:\)\\#\1/#g;1,1s#.*: .* \(.\)\?$#    G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test4.o: G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test4.cc \1#' G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test4.dep
+
+]]><time start='1253890711.70057' elapsed='0.578' />
+<status exit='ok' attempt='1' />
+</recipe>
+<recipe name='win32compile2object' target='G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test6.o' host='' layer='' component='' bldinf='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/bld.inf' mmp='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/simple.mmp' config='winscw_udeb' platform='winscw' phase='ALL' source='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test6.C++'>
+<![CDATA[
++ mwccsym2.exe -c -align 4 -warnings on -w nohidevirtual,nounusedexpr -msgstyle gcc -enum int -str pool -exc ms -trigraphs on -cwd source -g -O0 -inline off -runtime staticmulti -wchar_t off -nostdinc -gccdepends -MD -d __SYMBIAN32__ -d __CW32__ -d __WINS__ -d __WINSCW__ -d __SUPPORT_CPP_EXCEPTIONS__ -d _UNICODE -d TEST_MACRO_THAT_DOES_NOTHING -d _DEBUG -d OSVARIANT95WASAPPLIED -d __EXE__ -i- -i G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include -i G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/variant -include Symbian_OS.hrh -o G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test6.o G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test6.C++
++ G:/tcl-personal/iainw/fix2/raptor/win32/cygwin/bin/sed.exe 's#\\\(.\)#/\1#g;s#/ #\\ #g;s#\([A-Za-z]:\)\\#\1/#g;1,1s#.*: .* \(.\)\?$#    G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test6.o: G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test6.C++ \1#' G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test6.dep
+
+]]><time start='1253890711.84119' elapsed='0.484' />
+<status exit='ok' attempt='1' />
+</recipe>
+<recipe name='win32generateUIDcpp' target='G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test.UID.CPP' host='' layer='' component='' bldinf='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/bld.inf' mmp='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/simple.mmp' config='winscw_udeb' platform='winscw' phase='ALL' source=''>
+<![CDATA[
++ echo '// SBS-generated uid source file'
++ echo '#include <e32cmn.h>'
++ echo '#pragma data_seg(".SYMBIAN")'
++ echo '__EMULATOR_IMAGE_HEADER2(0x1000007a,0x100039ce,0x00000001,EPriorityLow,0x00000b07u,0x00000000u,0x10003a5c,0x00000000,0x00010000,0)'
++ echo '#pragma data_seg()'
+
+]]><time start='1253890712.27869' elapsed='0.281' />
+<status exit='ok' attempt='1' />
+</recipe>
+<recipe name='win32compile2object' target='G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test_.o' host='' layer='' component='' bldinf='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/bld.inf' mmp='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/simple.mmp' config='winscw_urel' platform='winscw' phase='ALL' source='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test.cia'>
+<![CDATA[
++ mwccsym2.exe -c -align 4 -warnings on -w nohidevirtual,nounusedexpr -msgstyle gcc -enum int -str pool -exc ms -trigraphs on -cwd source -O4,s -runtime staticmulti -wchar_t off -nostdinc -gccdepends -MD -d __SYMBIAN32__ -d __CW32__ -d __WINS__ -d __WINSCW__ -d __SUPPORT_CPP_EXCEPTIONS__ -d _UNICODE -d TEST_MACRO_THAT_DOES_NOTHING -d NDEBUG -d OSVARIANT95WASAPPLIED -d __EXE__ -i- -i G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include -i G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/variant -include Symbian_OS.hrh -o G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test_.o G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test.cia
+mwccsym2.exe: warning: No file mapping matches 'test.cia' (unrecognized file contents or filename extension); treating as source text
+test.cia:3: warning: variable / argument 'i' is not used in function
++ G:/tcl-personal/iainw/fix2/raptor/win32/cygwin/bin/sed.exe 's#\\\(.\)#/\1#g;s#/ #\\ #g;s#\([A-Za-z]:\)\\#\1/#g;1,1s#.*: .* \(.\)\?$#    G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test_.o: G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test.cia \1#' G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test_.dep
+
+]]><time start='1253890712.32557' elapsed='0.422' />
+<status exit='ok' attempt='1' />
+</recipe>
+<recipe name='win32compile2object' target='G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test.o' host='' layer='' component='' bldinf='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/bld.inf' mmp='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/simple.mmp' config='winscw_urel' platform='winscw' phase='ALL' source='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test.cpp'>
+<![CDATA[
++ mwccsym2.exe -c -align 4 -warnings on -w nohidevirtual,nounusedexpr -msgstyle gcc -enum int -str pool -exc ms -trigraphs on -cwd source -O4,s -runtime staticmulti -wchar_t off -nostdinc -gccdepends -MD -d __SYMBIAN32__ -d __CW32__ -d __WINS__ -d __WINSCW__ -d __SUPPORT_CPP_EXCEPTIONS__ -d _UNICODE -d TEST_MACRO_THAT_DOES_NOTHING -d NDEBUG -d OSVARIANT95WASAPPLIED -d __EXE__ -i- -i G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include -i G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/variant -include Symbian_OS.hrh -o G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test.o G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test.cpp
++ G:/tcl-personal/iainw/fix2/raptor/win32/cygwin/bin/sed.exe 's#\\\(.\)#/\1#g;s#/ #\\ #g;s#\([A-Za-z]:\)\\#\1/#g;1,1s#.*: .* \(.\)\?$#    G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test.o: G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test.cpp \1#' G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test.dep
+
+]]><time start='1253890712.27869' elapsed='0.516' />
+<status exit='ok' attempt='1' />
+</recipe>
+<recipe name='win32compile2object' target='G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test1.o' host='' layer='' component='' bldinf='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/bld.inf' mmp='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/simple.mmp' config='winscw_urel' platform='winscw' phase='ALL' source='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test1.c++'>
+<![CDATA[
++ mwccsym2.exe -c -align 4 -warnings on -w nohidevirtual,nounusedexpr -msgstyle gcc -enum int -str pool -exc ms -trigraphs on -cwd source -O4,s -runtime staticmulti -wchar_t off -nostdinc -gccdepends -MD -d __SYMBIAN32__ -d __CW32__ -d __WINS__ -d __WINSCW__ -d __SUPPORT_CPP_EXCEPTIONS__ -d _UNICODE -d TEST_MACRO_THAT_DOES_NOTHING -d NDEBUG -d OSVARIANT95WASAPPLIED -d __EXE__ -i- -i G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include -i G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/variant -include Symbian_OS.hrh -o G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test1.o G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test1.c++
++ G:/tcl-personal/iainw/fix2/raptor/win32/cygwin/bin/sed.exe 's#\\\(.\)#/\1#g;s#/ #\\ #g;s#\([A-Za-z]:\)\\#\1/#g;1,1s#.*: .* \(.\)\?$#    G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test1.o: G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test1.c++ \1#' G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test1.dep
+
+]]><time start='1253890712.38807' elapsed='0.422' />
+<status exit='ok' attempt='1' />
+</recipe>
+<recipe name='win32compile2object' target='G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test2.o' host='' layer='' component='' bldinf='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/bld.inf' mmp='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/simple.mmp' config='winscw_urel' platform='winscw' phase='ALL' source='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test2.cxx'>
+<![CDATA[
++ mwccsym2.exe -c -align 4 -warnings on -w nohidevirtual,nounusedexpr -msgstyle gcc -enum int -str pool -exc ms -trigraphs on -cwd source -O4,s -runtime staticmulti -wchar_t off -nostdinc -gccdepends -MD -d __SYMBIAN32__ -d __CW32__ -d __WINS__ -d __WINSCW__ -d __SUPPORT_CPP_EXCEPTIONS__ -d _UNICODE -d TEST_MACRO_THAT_DOES_NOTHING -d NDEBUG -d OSVARIANT95WASAPPLIED -d __EXE__ -i- -i G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include -i G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/variant -include Symbian_OS.hrh -o G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test2.o G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test2.cxx
++ G:/tcl-personal/iainw/fix2/raptor/win32/cygwin/bin/sed.exe 's#\\\(.\)#/\1#g;s#/ #\\ #g;s#\([A-Za-z]:\)\\#\1/#g;1,1s#.*: .* \(.\)\?$#    G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test2.o: G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test2.cxx \1#' G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test2.dep
+
+]]><time start='1253890712.57556' elapsed='0.453' />
+<status exit='ok' attempt='1' />
+</recipe>
+<recipe name='win32compile2object' target='G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test3.o' host='' layer='' component='' bldinf='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/bld.inf' mmp='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/simple.mmp' config='winscw_urel' platform='winscw' phase='ALL' source='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test3.Cpp'>
+<![CDATA[
++ mwccsym2.exe -c -align 4 -warnings on -w nohidevirtual,nounusedexpr -msgstyle gcc -enum int -str pool -exc ms -trigraphs on -cwd source -O4,s -runtime staticmulti -wchar_t off -nostdinc -gccdepends -MD -d __SYMBIAN32__ -d __CW32__ -d __WINS__ -d __WINSCW__ -d __SUPPORT_CPP_EXCEPTIONS__ -d _UNICODE -d TEST_MACRO_THAT_DOES_NOTHING -d NDEBUG -d OSVARIANT95WASAPPLIED -d __EXE__ -i- -i G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include -i G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/variant -include Symbian_OS.hrh -o G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test3.o G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test3.Cpp
++ G:/tcl-personal/iainw/fix2/raptor/win32/cygwin/bin/sed.exe 's#\\\(.\)#/\1#g;s#/ #\\ #g;s#\([A-Za-z]:\)\\#\1/#g;1,1s#.*: .* \(.\)\?$#    G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test3.o: G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test3.Cpp \1#' G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test3.dep
+
+]]><time start='1253890712.77869' elapsed='0.422' />
+<status exit='ok' attempt='1' />
+</recipe>
+<recipe name='win32compile2object' target='G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test5.o' host='' layer='' component='' bldinf='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/bld.inf' mmp='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/simple.mmp' config='winscw_urel' platform='winscw' phase='ALL' source='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test5.CC'>
+<![CDATA[
++ mwccsym2.exe -c -align 4 -warnings on -w nohidevirtual,nounusedexpr -msgstyle gcc -enum int -str pool -exc ms -trigraphs on -cwd source -O4,s -runtime staticmulti -wchar_t off -nostdinc -gccdepends -MD -d __SYMBIAN32__ -d __CW32__ -d __WINS__ -d __WINSCW__ -d __SUPPORT_CPP_EXCEPTIONS__ -d _UNICODE -d TEST_MACRO_THAT_DOES_NOTHING -d NDEBUG -d OSVARIANT95WASAPPLIED -d __EXE__ -i- -i G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include -i G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/variant -include Symbian_OS.hrh -o G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test5.o G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test5.CC
++ G:/tcl-personal/iainw/fix2/raptor/win32/cygwin/bin/sed.exe 's#\\\(.\)#/\1#g;s#/ #\\ #g;s#\([A-Za-z]:\)\\#\1/#g;1,1s#.*: .* \(.\)\?$#    G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test5.o: G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test5.CC \1#' G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test5.dep
+
+]]><time start='1253890712.84119' elapsed='0.391' />
+<status exit='ok' attempt='1' />
+</recipe>
+<recipe name='win32compile2object' target='G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test4.o' host='' layer='' component='' bldinf='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/bld.inf' mmp='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/simple.mmp' config='winscw_urel' platform='winscw' phase='ALL' source='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test4.cc'>
+<![CDATA[
++ mwccsym2.exe -c -align 4 -warnings on -w nohidevirtual,nounusedexpr -msgstyle gcc -enum int -str pool -exc ms -trigraphs on -cwd source -O4,s -runtime staticmulti -wchar_t off -nostdinc -gccdepends -MD -d __SYMBIAN32__ -d __CW32__ -d __WINS__ -d __WINSCW__ -d __SUPPORT_CPP_EXCEPTIONS__ -d _UNICODE -d TEST_MACRO_THAT_DOES_NOTHING -d NDEBUG -d OSVARIANT95WASAPPLIED -d __EXE__ -i- -i G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include -i G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/variant -include Symbian_OS.hrh -o G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test4.o G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test4.cc
++ G:/tcl-personal/iainw/fix2/raptor/win32/cygwin/bin/sed.exe 's#\\\(.\)#/\1#g;s#/ #\\ #g;s#\([A-Za-z]:\)\\#\1/#g;1,1s#.*: .* \(.\)\?$#    G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test4.o: G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test4.cc \1#' G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test4.dep
+
+]]><time start='1253890712.82556' elapsed='0.484' />
+<status exit='ok' attempt='1' />
+</recipe>
+<recipe name='win32generateUIDcpp' target='G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test.UID.CPP' host='' layer='' component='' bldinf='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/bld.inf' mmp='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/simple.mmp' config='winscw_urel' platform='winscw' phase='ALL' source=''>
+<![CDATA[
++ echo '// SBS-generated uid source file'
++ echo '#include <e32cmn.h>'
++ echo '#pragma data_seg(".SYMBIAN")'
++ echo '__EMULATOR_IMAGE_HEADER2(0x1000007a,0x100039ce,0x00000001,EPriorityLow,0x00000b07u,0x00000000u,0x10003a5c,0x00000000,0x00010000,0)'
++ echo '#pragma data_seg()'
+
+]]><time start='1253890713.23181' elapsed='0.203' />
+<status exit='ok' attempt='1' />
+</recipe>
+<recipe name='win32compile2object' target='G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test6.o' host='' layer='' component='' bldinf='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/bld.inf' mmp='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/simple.mmp' config='winscw_urel' platform='winscw' phase='ALL' source='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test6.C++'>
+<![CDATA[
++ mwccsym2.exe -c -align 4 -warnings on -w nohidevirtual,nounusedexpr -msgstyle gcc -enum int -str pool -exc ms -trigraphs on -cwd source -O4,s -runtime staticmulti -wchar_t off -nostdinc -gccdepends -MD -d __SYMBIAN32__ -d __CW32__ -d __WINS__ -d __WINSCW__ -d __SUPPORT_CPP_EXCEPTIONS__ -d _UNICODE -d TEST_MACRO_THAT_DOES_NOTHING -d NDEBUG -d OSVARIANT95WASAPPLIED -d __EXE__ -i- -i G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include -i G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/variant -include Symbian_OS.hrh -o G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test6.o G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test6.C++
++ G:/tcl-personal/iainw/fix2/raptor/win32/cygwin/bin/sed.exe 's#\\\(.\)#/\1#g;s#/ #\\ #g;s#\([A-Za-z]:\)\\#\1/#g;1,1s#.*: .* \(.\)\?$#    G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test6.o: G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/test6.C++ \1#' G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test6.dep
+
+]]><time start='1253890713.10681' elapsed='0.391' />
+<status exit='ok' attempt='1' />
+</recipe>
+<recipe name='win32compile2object' target='G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test_UID_.o' host='' layer='' component='' bldinf='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/bld.inf' mmp='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/simple.mmp' config='winscw_urel' platform='winscw' phase='ALL' source='G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test.UID.CPP'>
+<![CDATA[
++ mwccsym2.exe -c -align 4 -warnings on -w nohidevirtual,nounusedexpr -msgstyle gcc -enum int -str pool -exc ms -trigraphs on -cwd source -O4,s -runtime staticmulti -wchar_t off -nostdinc -gccdepends -MD -d __SYMBIAN32__ -d __CW32__ -d __WINS__ -d __WINSCW__ -d __SUPPORT_CPP_EXCEPTIONS__ -d _UNICODE -d TEST_MACRO_THAT_DOES_NOTHING -d NDEBUG -d OSVARIANT95WASAPPLIED -d __EXE__ -i- -i G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include -i G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/variant -include Symbian_OS.hrh -o G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test_UID_.o G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test.UID.CPP
++ G:/tcl-personal/iainw/fix2/raptor/win32/cygwin/bin/sed.exe 's#\\\(.\)#/\1#g;s#/ #\\ #g;s#\([A-Za-z]:\)\\#\1/#g;1,1s#.*: .* \(.\)\?$#    G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test_UID_.o: G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test.UID.CPP \1#' G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test_UID_.dep
+
+]]><time start='1253890713.52868' elapsed='0.875' />
+<status exit='ok' attempt='1' />
+</recipe>
+<recipe name='win32compile2object' target='G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test_UID_.o' host='' layer='' component='' bldinf='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/bld.inf' mmp='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/simple.mmp' config='winscw_udeb' platform='winscw' phase='ALL' source='G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test.UID.CPP'>
+<![CDATA[
++ mwccsym2.exe -c -align 4 -warnings on -w nohidevirtual,nounusedexpr -msgstyle gcc -enum int -str pool -exc ms -trigraphs on -cwd source -g -O0 -inline off -runtime staticmulti -wchar_t off -nostdinc -gccdepends -MD -d __SYMBIAN32__ -d __CW32__ -d __WINS__ -d __WINSCW__ -d __SUPPORT_CPP_EXCEPTIONS__ -d _UNICODE -d TEST_MACRO_THAT_DOES_NOTHING -d _DEBUG -d OSVARIANT95WASAPPLIED -d __EXE__ -i- -i G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include -i G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/variant -include Symbian_OS.hrh -o G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test_UID_.o G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test.UID.CPP
++ G:/tcl-personal/iainw/fix2/raptor/win32/cygwin/bin/sed.exe 's#\\\(.\)#/\1#g;s#/ #\\ #g;s#\([A-Za-z]:\)\\#\1/#g;1,1s#.*: .* \(.\)\?$#    G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test_UID_.o: G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test.UID.CPP \1#' G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test_UID_.dep
+
+]]><time start='1253890713.45056' elapsed='0.953' />
+<status exit='ok' attempt='1' />
+</recipe>
+<recipe name='tranasm' target='G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/urel/test_.cpp' host='' layer='' component='' bldinf='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/bld.inf' mmp='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/simple.mmp' config='armv5_urel' platform='armv5' phase='ALL' source=''>
+<![CDATA[
++ CPPFILT=G:/tcl-personal/iainw/fix2/raptor/win32/mingw/bin/c++filt.exe
++ perl.exe G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/tools/tranasm.pl --suppress-check --output=G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/urel/test_.cpp G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/urel/test_.pre
+
+]]><time start='1253890713.26306' elapsed='2.062' />
+<status exit='ok' attempt='1' />
+</recipe>
+<recipe name='tranasm' target='G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/udeb/test_.cpp' host='' layer='' component='' bldinf='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/bld.inf' mmp='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/simple.mmp' config='armv5_udeb' platform='armv5' phase='ALL' source=''>
+<![CDATA[
++ CPPFILT=G:/tcl-personal/iainw/fix2/raptor/win32/mingw/bin/c++filt.exe
++ perl.exe G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/tools/tranasm.pl --suppress-check --output=G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/udeb/test_.cpp G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/udeb/test_.pre
+
+]]><time start='1253890713.32556' elapsed='2.000' />
+<status exit='ok' attempt='1' />
+</recipe>
+<recipe name='cia2cpp2o' target='G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/udeb/test_.o' host='' layer='' component='' bldinf='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/bld.inf' mmp='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/simple.mmp' config='armv5_udeb' platform='armv5' phase='ALL' source='G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/udeb/test_.cpp'>
+<![CDATA[
++ C:/Apps/ARM/RVCT/Programs/2.2/349/win_32-pentium/armcc.exe -O0 -g --dwarf2 --dllimport_runtime --exceptions --exceptions_unwind --diag_suppress 161,611,654,997,1152,1300,1464,1488,2523,6318,6331 --diag_error 1267 --cpu 5T --enum_is_int -Ono_known_library --fpmode ieee_no_fenv --export_all_vtbl --memaccess -UL41 --no_vfe --apcs /inter -c --thumb -D__MARM_THUMB__ --fpu softvfp -D__MARM_INTERWORK__ -D__SUPPORT_CPP_EXCEPTIONS__ -D_UNICODE -D__SYMBIAN32__ -D__ARMCC__ -D__EPOC32__ -D__MARM__ -D__EABI__ '-D__PRODUCT_INCLUDE__="G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/variant/Symbian_OS.hrh"' -DTEST_MACRO_THAT_DOES_NOTHING -D__MARM_ARMV5__ -D__ARMCC_2__ -D__ARMCC_2_2__ -D_DEBUG -DOSVARIANT95WASAPPLIED -D__EXE__ -D__CIA__ --cpp -JG:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include -JG:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/variant G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/udeb/test_.cpp -o G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/udeb/test_.o
+
+]]><time start='1253890715.34117' elapsed='0.437' />
+<status exit='ok' attempt='1' />
+</recipe>
+<recipe name='win32simplelink' target='G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/winscw/udeb/test.exe' host='' layer='' component='' bldinf='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/bld.inf' mmp='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/simple.mmp' config='winscw_udeb' platform='winscw' phase='ALL' source=''>
+<![CDATA[
++ MWSym2LibraryFiles='msl_all_static_mse_symbian_d.lib;gdi32.lib;user32.lib;kernel32.lib'
++ mwldsym2.exe -msgstyle gcc -stdlib -subsystem windows -g -heapreserve=64 -heapcommit=20 -m '?_E32Bootstrap@@YGXXZ' G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/winscw/udeb/eexe.lib G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/winscw/udeb/scppnwdl.lib G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/winscw/udeb/euser.lib -o G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/winscw/udeb/test.exe -noimplib -l G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb -search @G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/udeb/test_udeb_objects.lrf
+mwldsym2.exe: warning: Multiply defined symbol: ___get_MSL_init_count in
+mwldsym2.exe: warning: files uc_cwhelp.obj (eexe.lib), startup.win32.c.obj (msl_all_static_mse_symbian_d.lib),
+mwldsym2.exe: warning: keeping definition in startup.win32.c.obj
+
+]]><time start='1253890714.71618' elapsed='1.156' />
+<status exit='ok' attempt='1' />
+</recipe>
+<status exit='failed' attempt='1' />
+</recipe> <!-- Repeated closure - what status do we get? -->
+<recipe name='win32simplelink' target='G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/winscw/urel/test.exe' host='' layer='' component='' bldinf='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/bld.inf' mmp='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/simple.mmp' config='winscw_urel' platform='winscw' phase='ALL' source=''>
+<![CDATA[
++ MWSym2LibraryFiles='msl_all_static_mse_symbian_d.lib;gdi32.lib;user32.lib;kernel32.lib'
++ mwldsym2.exe -msgstyle gcc -stdlib -subsystem windows -heapreserve=64 -heapcommit=20 -m '?_E32Bootstrap@@YGXXZ' -map G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/winscw/urel/test.exe.map G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/winscw/urel/eexe.lib G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/winscw/urel/scppnwdl.lib G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/winscw/udeb/euser.lib -o G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/winscw/urel/test.exe -noimplib -l G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel -search @G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/winscw/urel/test_urel_objects.lrf
+mwldsym2.exe: warning: Multiply defined symbol: ___get_MSL_init_count in
+mwldsym2.exe: warning: files uc_cwhelp.obj (eexe.lib), startup.win32.c.obj (msl_all_static_mse_symbian_d.lib),
+mwldsym2.exe: warning: keeping definition in startup.win32.c.obj
+
+]]><time start='1253890714.68493' elapsed='1.203' />
+<status exit='ok' attempt='1' />
+<recipe name='win32simplelink' target='G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/winscw/urel/test.exe' host='' layer='' component='' bldinf='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/bld.inf' mmp='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/simple.mmp' config='winscw_urel' platform='winscw' phase='ALL' source=''> <!-- Repeated opening - will this hide the warnings above? -->
+</recipe>
+<recipe name='cia2cpp2o' target='G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/urel/test_.o' host='' layer='' component='' bldinf='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/bld.inf' mmp='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/simple.mmp' config='armv5_urel' platform='armv5' phase='ALL' source='G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/urel/test_.cpp'>
+<![CDATA[
++ C:/Apps/ARM/RVCT/Programs/2.2/349/win_32-pentium/armcc.exe -O2 --dwarf2 --dllimport_runtime --exceptions --exceptions_unwind --diag_suppress 161,611,654,997,1152,1300,1464,1488,2523,6318,6331 --diag_error 1267 --cpu 5T --enum_is_int -Ono_known_library --fpmode ieee_no_fenv --export_all_vtbl --memaccess -UL41 --no_vfe --apcs /inter -c --thumb -D__MARM_THUMB__ --fpu softvfp -D__MARM_INTERWORK__ -D__SUPPORT_CPP_EXCEPTIONS__ -D_UNICODE -D__SYMBIAN32__ -D__ARMCC__ -D__EPOC32__ -D__MARM__ -D__EABI__ '-D__PRODUCT_INCLUDE__="G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/variant/Symbian_OS.hrh"' -DTEST_MACRO_THAT_DOES_NOTHING -D__MARM_ARMV5__ -D__ARMCC_2__ -D__ARMCC_2_2__ -DNDEBUG -DOSVARIANT95WASAPPLIED -D__EXE__ -D__CIA__ --cpp -JG:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include -JG:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/include/variant G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/urel/test_.cpp -o G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/urel/test_.o
+
+]]><time start='1253890715.34117' elapsed='0.547' />
+<status exit='ok' attempt='1' />
+</recipe>
+<recipe name='link' target='G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/armv5/urel/test.exe.sym' host='' layer='' component='' bldinf='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/bld.inf' mmp='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/simple.mmp' config='armv5_urel' platform='armv5' phase='ALL' source=''>
+<![CDATA[
++ C:/Apps/ARM/RVCT/Programs/2.2/349/win_32-pentium/armlink.exe --diag_suppress 6331 --bpabi --reloc --no_scanlib --datacompressor=off --dll --split --rw-base 0x400000 --symver_soname --soname 'test{000a0000}[00000001].exe' --entry _E32Startup 'G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/armv5/urel/eexe.lib(uc_exe_.o)' -o G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/armv5/urel/test.exe.sym --symbols --list G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/armv5/urel/test.exe.map --via G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/urel/test_urel_objects.via G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/armv5/urel/usrt2_2.lib G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/armv5/lib/euser.dso G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/armv5/lib/scppnwdl.dso G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/armv5/lib/drtaeabi.dso G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/armv5/lib/dfpaeabi.dso G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/armv5/lib/dfprvct2_2.dso G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/armv5/lib/drtrvct2_2.dso 'C:/Apps/ARM/RVCT/Data/2.2/349/lib/armlib/h_t__uf.l(switch8.o)'
+
+]]><time start='1253890716.15367' elapsed='0.891' />
+<status exit='ok' attempt='1' />
+</recipe>
+<recipe name='link' target='G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/armv5/udeb/test.exe.sym' host='' layer='' component='' bldinf='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/bld.inf' mmp='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/simple.mmp' config='armv5_udeb' platform='armv5' phase='ALL' source=''>
+<![CDATA[
++ C:/Apps/ARM/RVCT/Programs/2.2/349/win_32-pentium/armlink.exe --diag_suppress 6331 --bpabi --reloc --no_scanlib --datacompressor=off --debug --dll --split --rw-base 0x400000 --symver_soname --soname 'test{000a0000}[00000001].exe' --entry _E32Startup 'G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/armv5/udeb/eexe.lib(uc_exe_.o)' -o G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/armv5/udeb/test.exe.sym --symbols --list G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/armv5/udeb/test.exe.map --via G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/simple/c_bad5e30874f7a6c6/test_/armv5/udeb/test_udeb_objects.via G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/armv5/udeb/usrt2_2.lib G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/armv5/lib/euser.dso G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/armv5/lib/scppnwdl.dso G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/armv5/lib/drtaeabi.dso G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/armv5/lib/dfpaeabi.dso G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/armv5/lib/dfprvct2_2.dso G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/armv5/lib/drtrvct2_2.dso 'C:/Apps/ARM/RVCT/Data/2.2/349/lib/armlib/h_t__uf.l(switch8.o)'
+
+]]><time start='1253890716.15367' elapsed='1.219' />
+<status exit='ok' attempt='1' />
+</recipe>
+<recipe name='postlink' target='G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/armv5/urel/test.exe' host='' layer='' component='' bldinf='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/bld.inf' mmp='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/simple.mmp' config='armv5_urel' platform='armv5' phase='ALL' source=''>
+<![CDATA[
++ G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/tools/elf2e32.exe --sid=0x10003a5c --version=10.0 --uid1=0x1000007a --uid2=0x100039ce --uid3=0x00000001 --capability=TCB+ProtServ+DiskAdmin+AllFiles+PowerMgmt+CommDD --fpu=softvfp --codepaging=paged --datapaging=paged --targettype=EXE --output=G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/armv5/urel/test.exe --elfinput=G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/armv5/urel/test.exe.sym '--linkas=test{000a0000}[00000001].exe' --priority=Low --stack=0x2000 --heap=0x5000,0xffff --debuggable '--libpath=G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/armv5/lib/;C:/Apps/ARM/RVCT/Data/2.2/349/lib/armlib'
+
+]]><time start='1253890717.05991' elapsed='0.641' />
+<status exit='ok' attempt='1' />
+</recipe>
+<recipe name='postlink' target='G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/armv5/udeb/test.exe' host='' layer='' component='' bldinf='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/bld.inf' mmp='G:/tcl-personal/iainw/fix2/raptor/test/smoke_suite/test_resources/simple/simple.mmp' config='armv5_udeb' platform='armv5' phase='ALL' source=''>
+<![CDATA[
++ G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/tools/elf2e32.exe --sid=0x10003a5c --version=10.0 --uid1=0x1000007a --uid2=0x100039ce --uid3=0x00000001 --capability=TCB+ProtServ+DiskAdmin+AllFiles+PowerMgmt+CommDD --fpu=softvfp --codepaging=paged --datapaging=paged --targettype=EXE --output=G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/armv5/udeb/test.exe --elfinput=G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/armv5/udeb/test.exe.sym '--linkas=test{000a0000}[00000001].exe' --priority=Low --stack=0x2000 --heap=0x5000,0xffff --debuggable '--libpath=G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/release/armv5/lib/;C:/Apps/ARM/RVCT/Data/2.2/349/lib/armlib'
+
+]]><time start='1253890717.38803' elapsed='0.312' />
+<status exit='ok' attempt='1' />
+</recipe>
+<info>Running G:/tcl-personal/iainw/fix2/raptor/win32/bin/talonctl.exe stop</info>
+<info>The make-engine exited successfully.</info>
+<info>Run time 16 seconds</info>
+<info>Created/Updated toolcheck cache: G:/tcl-personal/iainw/fix2/raptor/test/epocroot/epoc32/build/toolcheck_cache_.tmp
+</info>
+</buildlog>

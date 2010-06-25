@@ -1,0 +1,24 @@
+/*
+============================================================================
+ Name		: HelloWorld.mmp
+ Author	  : 
+ Copyright   : Your copyright notice
+ Description : This is the project specification file for HelloWorld.
+============================================================================
+*/
+
+TARGET		HelloWorld.exe
+TARGETTYPE	exe
+UID		0 0xE78A5AA3
+
+USERINCLUDE	..\inc  
+USERINCLUDE	..\traces
+SYSTEMINCLUDE	\epoc32\include
+SYSTEMINCLUDE	\epoc32\include\platform
+
+SOURCEPATH	..\src
+SOURCE		HelloWorld.cpp
+
+LIBRARY		euser.lib
+
+featurevariant

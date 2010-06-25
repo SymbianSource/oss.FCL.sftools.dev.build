@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+
+<SystemDefinition name="MCL" schema="1.4.0">
+  <systemModel>
+    <layer name="common">
+      <module name="allexports">
+        <component name="envelope">
+	<unit unitID='APPARC' name='app-framework_apparc' bldFile='common/generic/APP-FRAMEWORK/APPARC/GROUP' />
+	<unit unitID='SYSSTART' name='app-framework_sysstart' bldFile='common/generic/app-framework/sysstart/group' />
+        </component>
+      </module>
+    </layer>
+  </systemModel>
+  
+  <build>
+  </build>
+
+</SystemDefinition>

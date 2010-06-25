@@ -1,0 +1,8 @@
+
+System Definition version 3 Support
+
+This is only prototype support for testing the reading of single 
+"package" files. The implementation was submitted by Bob Rosenberg
+and has been regression tested by the Raptor team. Testing on real
+sysdef files is being carried out by the Symbian Foundation.
+

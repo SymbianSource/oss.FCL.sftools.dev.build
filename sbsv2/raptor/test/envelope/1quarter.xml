@@ -1,0 +1,90 @@
+<?xml version="1.0"?>
+
+<SystemDefinition name="MCL" schema="1.4.0">
+  <systemModel>
+    <layer name="common">
+      <module name="allexports">
+        <component name="envelope">
+	<unit unitID='BUILDSYSTEMTOOLS' name='tools_build' bldFile='common/generic/tools/build/group' />
+	<unit unitID='CBRTOOLS' name='tools_cbr_tools' bldFile='common/generic/tools/cbr/tools/Group' />
+	<unit unitID='CBRPRF' name='tools_cbr_prf' bldFile='common/generic/tools/cbr/prf/group' />
+	<unit unitID='DEPCHECK' name='tools_depcheck' bldFile='common/generic/tools/depcheck' />
+	<unit unitID='DEPMODEL' name='tools_depmodel' bldFile='common/generic/tools/depmodel/group' />
+	<unit unitID='E32TOOLS_EKA2' name='tools_e32tools' bldFile='cedar/generic/TOOLS/E32Tools/GROUP' />
+	<unit unitID='EVALID' name='tools_evalid' bldFile='common/generic/tools/host_utilities/evalid' />
+	<unit unitID='RCOMP' name='tools_rcomp' bldFile='common/generic/TOOLS/RCOMP/GROUP' />
+	<unit unitID='REDISTRIBUTION' name='tools_redistribution_common' bldFile='common/generic/TOOLS/REDISTRIBUTION' />
+	<unit unitID='ROMKIT_EKA2' name='tools_romkit' bldFile='cedar/generic/TOOLS/ROMKIT/GROUP' />
+	<!-- not including <unit unitID='s60headercompat' name='tools_s60_header_compat' bldFile='common/generic/tools/s60_header_compat/group' /> -->
+	<unit unitID='BLUETOOTH_LOGGER' name='bluetooth_logger' bldFile='common/generic/bluetooth/latest/bluetooth/logger/group' />
+	<unit unitID='CINIDATA' name='tools_cinidata' bldFile='common/generic/TOOLS/CINIDATA' />
+	<unit unitID='AUTOTEST' name='tools_autotest' bldFile='common/generic/TOOLS/AUTOTEST/GROUP' />
+	<unit unitID='TESTCONFIGFILEPARSER' name='tools_testconfigfileparser' bldFile='common/generic/TOOLS/testconfigfileparser/GROUP' />
+	<unit unitID='KITSETUPAPP' name='tools_devkits_kitsetupapp' bldFile='common/generic/TOOLS/DevKits/KitSetupApp/group' />
+	<unit unitID='PRODUCTINSTALLER' name='tools_custkits_productinstaller' bldFile='common/generic/TOOLS/Custkits/ProductInstaller/group' />
+	<unit unitID='REDISTRIBUTION_WINC_EKA2' name='tools_redistribution_cedar' bldFile='cedar/generic/tools/redistribution' />
+	<unit unitID='MAKEKEYS' name='security_makekeys' bldFile='common/generic/SECURITY/MakeKeys/GROUP' />
+	<unit unitID='PACKETLOOPBACKCSY' name='PacketLoopbackCSY' bldFile='common/generic/networking/test/PacketLoopbackCSY/group' />
+	<unit unitID='STLPORT' name='tools_stlport' bldFile='common/generic/tools/stlport/group' />
+	<unit unitID='RUNPERL' name='tools_sdk_eng_runperl' bldFile='common/generic/TOOLS/SDK_ENG/RUNPERL/GROUP' />
+	<unit unitID='BUILD-TOOLS' name='tools_sdk_eng_build-tools' bldFile='common/generic/TOOLS/SDK_ENG/BUILD-TOOLS/GROUP' />
+	<unit unitID='JAVALIBRARY' name='tools_sdk_eng_javalibrary' bldFile='common/generic/TOOLS/SDK_ENG/JAVALIBRARY/GROUP' />
+	<unit unitID='ASSERTION' name='tools_sdk_eng_assertion' bldFile='common/generic/TOOLS/SDK_ENG/ASSERTION/GROUP' />
+	<unit unitID='ENUM' name='tools_sdk_eng_enum' bldFile='common/generic/TOOLS/SDK_ENG/ENUM/GROUP' />
+	<unit unitID='LOGGER' name='tools_sdk_eng_logger' bldFile='common/generic/TOOLS/SDK_ENG/LOGGER/GROUP' />
+	<unit unitID='FILESYS' name='tools_sdk_eng_filesys' bldFile='common/generic/TOOLS/SDK_ENG/FILESYS/GROUP' />
+	<unit unitID='ENVVAR' name='tools_sdk_eng_envvar' bldFile='common/generic/TOOLS/SDK_ENG/ENVVAR/GROUP' />
+	<unit unitID='INSTALLUTILS' name='tools_sdk_eng_installutils' bldFile='common/generic/TOOLS/SDK_ENG/INSTALLUTILS/GROUP' />
+	<unit unitID='MNEMONICFIX' name='tools_sdk_eng_mnemonicfix' bldFile='common/generic/TOOLS/SDK_ENG/MNEMONICFIX/GROUP' />
+	<unit unitID='PATHBROWSER' name='tools_sdk_eng_pathbrowser' bldFile='common/generic/TOOLS/SDK_ENG/PATHBROWSER/GROUP' />
+	<unit unitID='SHELLEXEC' name='tools_sdk_eng_shellexec' bldFile='common/generic/TOOLS/SDK_ENG/SHELLEXEC/GROUP' />
+	<unit unitID='SWINGWORKER' name='tools_sdk_eng_swingworker' bldFile='common/generic/TOOLS/SDK_ENG/SWINGWORKER/GROUP' />
+	<unit unitID='TESTCASERUNNER' name='tools_sdk_eng_testcaserunner' bldFile='common/generic/TOOLS/SDK_ENG/TESTCASERUNNER/GROUP' />
+	<unit unitID='TOOLBARPANEL' name='tools_sdk_eng_toolbarpanel' bldFile='common/generic/TOOLS/SDK_ENG/TOOLBARPANEL/GROUP' />
+	<unit unitID='JAVAHELP' name='tools_sdk_eng_javahelp' bldFile='common/generic/TOOLS/SDK_ENG/JAVAHELP/GROUP' />
+	<unit unitID='LANGCONFIG' name='tools_sdk_eng_langconfig' bldFile='common/generic/TOOLS/SDK_ENG/LANGCONFIG/GROUP' />
+	<unit unitID='MBMCODEC' name='tools_sdk_eng_mbmcodec' bldFile='common/generic/TOOLS/SDK_ENG/MBMCODEC/GROUP' />
+	<unit unitID='SDKINFO' name='tools_sdk_eng_sdkinfo' bldFile='common/generic/TOOLS/SDK_ENG/SDKINFO/GROUP' />
+	<unit unitID='JADE' name='tools_sdk_eng_jade' bldFile='common/generic/TOOLS/SDK_ENG/JADE/GROUP' />
+	<unit unitID='CSHLPCMP_GUI' name='tools_sdk_eng_cshlpcmp_gui' bldFile='common/generic/TOOLS/SDK_ENG/CSHLPCMP_GUI/GROUP' />
+	<unit unitID='SISAR' name='tools_sdk_eng_sisar' bldFile='common/generic/TOOLS/SDK_ENG/SISAR/GROUP' />
+	<unit unitID='SDKPKG-MANAGER' name='tools_sdk_eng_sdkpkg-manager' bldFile='common/generic/TOOLS/SDK_ENG/SDKPKG-MANAGER/GROUP' />
+	<unit unitID='SDKPKG-TOOLS' name='tools_sdk_eng_sdkpkg-tools' bldFile='common/generic/TOOLS/SDK_ENG/SDKPKG-TOOLS/GROUP' />
+	<unit unitID='EMULATOR_LAUNCHER' name='tools_sdk_eng_emulator_launcher' bldFile='common/generic/TOOLS/SDK_ENG/EMULATOR_LAUNCHER/GROUP' />
+	<unit unitID='PKGMGRGUI' name='tools_sdk_eng_pkgmgrgui' bldFile='common/generic/TOOLS/SDK_ENG/PKGMGRGUI/GROUP' />
+	<unit unitID='LAUNCH' name='tools_sdk_eng_launch' bldFile='common/generic/TOOLS/SDK_ENG/LAUNCH/GROUP' />
+	<unit unitID='TOOLS_STUBS' name='tools_sdk_eng_tools_stubs' bldFile='common/generic/TOOLS/SDK_ENG/TOOLS_STUBS/GROUP' />
+	<unit unitID='CWPLUGINS' name='tools_sdk_eng_cwplugins' bldFile='common/generic/TOOLS/SDK_ENG/CWPLUGINS/GROUP' />
+	<unit unitID='BSPBUILDER' name='tools_bspbuilder' bldFile='common/generic/TOOLS/BSPBUILDER/GROUP' />
+	<unit unitID='ALP2CSH' name='tools_sdk_eng_alp2csh' bldFile='common/generic/TOOLS/SDK_ENG/ALP2CSH/GROUP' />
+	<unit unitID='CJPEG' name='tools_sdk_eng_cjpeg' bldFile='common/generic/TOOLS/SDK_ENG/CJPEG/GROUP' />
+	<unit unitID='CSHLPCMP_FRONTEND' name='tools_sdk_eng_cshlpcmp_frontend' bldFile='common/generic/TOOLS/SDK_ENG/CSHLPCMP_FRONTEND/GROUP' />
+	<unit unitID='PERLLIBRARY' name='tools_sdk_eng_perllibrary' bldFile='common/generic/TOOLS/SDK_ENG/PERLLIBRARY/GROUP' />
+	<unit unitID='PERLSHARED' name='tools_sdk_eng_perl_shared' bldFile='common/generic/tools/sdk_eng/perl_shared/group' />
+	<unit unitID='RTF2PTML' name='tools_sdk_eng_rtf2ptml' bldFile='common/generic/TOOLS/SDK_ENG/RTF2PTML/GROUP' />
+	<unit unitID='SPLASH' name='tools_sdk_eng_splash' bldFile='common/generic/TOOLS/SDK_ENG/SPLASH/GROUP' />
+	<unit unitID='SDK_BUILDER' name='tools_sdk_eng_sdk_builder' bldFile='common/generic/TOOLS/sdk_eng/sdk_builder/GROUP' />
+<!--	<unit unitID='WINS_VARIANT_EKA2' name='base_wins' bldFile='cedar/generic/base/wins' /> -->
+	<unit unitID='LUBBOCK_EKA2' name='base_lubbock' bldFile='cedar/generic/BASE/LUBBOCK' />
+	<unit unitID='OMAP_H2' name='base_omaph2' bldFile='cedar/generic/base/omap/h2' />
+	<unit unitID='BASE_H2_UNISTORE2' name='base_h2_unistore2' bldFile='cedar/generic/base/omap/h2_restricted/unistore2' />
+	<unit unitID='BASE_H2_SDIO' name='base_h2_sdio' bldFile='cedar/generic/base/omap/h2_restricted/sdio' />
+	<unit unitID='OMAPH4HRP' name='base_omaph4hrp' bldFile='cedar/generic/base/omap_hrp/h4' />
+	<unit unitID='H4BOOTLOADER' name='base_omaph4hrp_bootldr' bldFile='cedar/generic/base/omap_hrp/h4_bootloader' />
+	<unit unitID='H4MEBOOTLOADER' name='base_omaph4hrp_mebootldr' bldFile='cedar/generic/base/omap_hrp/h4_mebootloader' />
+	<unit unitID='OMAPH4HRP_UNISTORE2' name='base_omaph4hrp_unistore2' bldFile='cedar/generic/base/omap_hrp/h4_restricted/unistore2' />
+	<unit unitID='OMAPH4HRP_SDIO' name='base_omaph4hrp_sdio' bldFile='cedar/generic/base/omap_hrp/h4_restricted/sdio' />
+	<unit unitID='LMNAND2_LOGIC' name='base_integrator_logic_lmnand2' bldFile='cedar/generic/base/integrator/logic/lmnand2' />
+	<unit unitID='UNISTORE2_DRIVERS' name='base_drivers_unistore2' bldFile='cedar/generic/base/e32/drivers/unistore2' />
+	<unit unitID='UNISTORE2_CRASHFLASH' name='base_crashflash_unistore2' bldFile='cedar/generic/base/e32/drivers/crashflash/unistore2' />
+	<unit unitID='APPARC' name='app-framework_apparc' bldFile='common/generic/APP-FRAMEWORK/APPARC/GROUP' />
+	<unit unitID='SYSSTART' name='app-framework_sysstart' bldFile='common/generic/app-framework/sysstart/group' />
+        </component>
+      </module>
+    </layer>
+  </systemModel>
+  
+  <build>
+  </build>
+
+</SystemDefinition>

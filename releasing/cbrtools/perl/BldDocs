@@ -1,0 +1,347 @@
+#!perl
+# Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+# 
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+# 
+# Contributors:
+# 
+# Description:
+# 
+#
+
+use strict;
+use CGI qw(:standard);
+use FindBin;
+use lib "$FindBin::Bin";
+use Utils;
+use Cwd;
+use File::Basename;
+use Pod::Html;
+use Getopt::Long;
+
+$|++;
+
+#
+# Constants.
+#
+
+my $KDocDir = "..\\doc";
+my @intro = ({fileName => "HistoricPerspective",
+	      caption => "Historic Perspective",
+	      comment => ""},
+#	     {fileName => "Environment",
+#	      caption => "Licensee Product Environment",
+#	      comment => ""},
+	     {fileName => "QuickStart",
+	      caption => "Quick Start",
+	      comment => ""},
+	     {fileName => "MakingReleases",
+	      caption => "Making Releases",
+	      comment => ""},
+	     {fileName => "Installation",
+	      caption => "Installation Guide",
+	      comment => ""},
+	     {fileName => "ExportingReleases",
+	      caption => "Exporting and Importing Releases",
+	      comment => ""},
+	     {fileName => "FurtherInformation",
+	      caption => "Further Information",
+	      comment => ""},
+	     {fileName => "Optimisation",
+	      caption => "Optimisation",
+	      comment => ""},
+	     {fileName => "FAQ",
+	      caption => "Frequently Asked Questions",
+	      comment => ""});
+my @commands = ({fileName => "BinInfo"},
+		{fileName => "BuildRel"},
+		{fileName => "CleanEnv"},
+		{fileName => "CleanLocalArch"},
+		{fileName => "CleanRemote"},
+		{fileName => "CopyRel"},
+		{fileName => "DeltaEnv"},
+		{fileName => "DiffEnv"},
+		{fileName => "DiffRel"},
+		{fileName => "EnvInfo"},
+		{fileName => "ExportEnv"},
+		{fileName => "ExportRel"},
+		{fileName => "EnvMembership"},
+		{fileName => "EnvSize"},
+		{fileName => "GetEnv"},
+		{fileName => "GetRel"},
+		{fileName => "GetSource"},
+		{fileName => "ImportEnv"},
+		{fileName => "ImportRel"},
+		{fileName => "InstallSnapShot"},
+		{fileName => "LatestVer"},
+		{fileName => "ListComponents"},
+		{fileName => "MakeEnv"},
+		{fileName => "MakeRel"},
+		{fileName => "MakeSnapShot"},
+		{fileName => "ModNotes"},
+		{fileName => "MrpComplexity"},
+		{fileName => "RemoveRel"},
+		{fileName => "RemoveSource"},
+		{fileName => "SourceInfo"},
+		{fileName => "PrepEnv"},
+		{fileName => "PrepRel"},
+		{fileName => "PullEnv"},
+		{fileName => "PushEnv"},
+		{fileName => "PullRel"},
+		{fileName => "PushRel"},
+		{fileName => "ValidateEnv"},
+		{fileName => "ValidateRel"},
+		{fileName => "ViewNotes"});
+
+my @utils =({fileName => "BldDocs"},
+	    {fileName => "CheckBc"},
+	    {fileName => "CheckRls"},
+	    {fileName => "InstCol2"},
+	    {fileName => "MBld"},
+	    {fileName => "MergeEnvironments"});
+
+my @modules =({fileName => "CatData.pm"},
+	      {fileName => "CheckBc.pm"},
+	      {fileName => "CleanEnv.pm"},
+	      {fileName => "Cleaner.pm"},
+	      {fileName => "CommandController.pm"},
+	      {fileName => "CopyRel.pm"},
+	      {fileName => "Crypt.pm"},
+	      {fileName => "Crypt/GPG.pm"},
+	      {fileName => "Crypt/PGP.pm"},
+	      {fileName => "EnvDb.pm"},
+	      {fileName => "EnvDifferencer.pm"},
+	      {fileName => "ExportData.pm"},
+	      {fileName => "GetEnv.pm"},
+	      {fileName => "IniData.pm"},
+	      {fileName => "MakeRel.pm"},
+	      {fileName => "MrpData.pm"},
+	      {fileName => "NotesCompiler.pm"},
+	      {fileName => "PathData.pm"},
+	      {fileName => "PathData/ComponentBased.pm"},
+	      {fileName => "PathData/ProjectBased.pm"},
+	      {fileName => "PrepRel.pm"},
+	      {fileName => "RelData.pm"},
+	      {fileName => "RelTransfer.pm"},
+	      {fileName => "RelTransfer/Export.pm"},
+	      {fileName => "RelTransfer/Import.pm"},
+	      {fileName => "RemoteSite.pm"},
+	      {fileName => "RemoteSite/FTP.pm"},
+	      {fileName => "RemoteSite/FTP/Proxy.pm"},
+	      {fileName => "RemoteSite/NetDrive.pm"},
+	      {fileName => "RemoteSite/NetDrive/MultiVolumeExport.pm"},
+	      {fileName => "RemoteSite/NetDrive/MultiVolumeImport.pm"},
+	      {fileName => "Symbian/CBR/ApplyDelta.pm"},
+	      {fileName => "Symbian/CBR/CreateDelta.pm"},
+	      {fileName => "TableFormatter.pm"},
+	      {fileName => "TableFormatter/Text.pm"},
+	      {fileName => "TableFormatter/Excel.pm"},
+	      {fileName => "TableFormatter/Csv.pm"},
+	      {fileName => "TableFormatter/Html.pm"},
+	      {fileName => "TableFormatter/Auto.pm"},
+	      {fileName => "Utils.pm"}
+	     );
+
+
+
+#
+# Globals.
+#
+
+my $docDir;
+my $devDocs = 0;
+my $verbose = 0;
+
+#
+# Main.
+#
+
+ProcessCommandLine();
+my $cwd = cwd;
+my $toolsdir = $FindBin::Bin;
+chdir $toolsdir or die "Error: Couldn't chdir to \"$toolsdir\": $!\n";
+ReadCaptions(\@commands);
+ReadCaptions(\@utils);
+ReadCaptions(\@modules);
+chdir $cwd or die "Error: Couldn't chdir to \"cwd\": $!\n";;
+Utils::MakeDir($docDir);
+chdir $docDir or die "Error: Couldn't chdir to \"$docDir\": $!\n";;
+BldIndex();
+BldDocs();
+chdir $cwd or die "Error: Couldn't chdir to \"cwd\": $!\n";;
+
+
+#
+# Subs.
+#
+
+sub ProcessCommandLine {
+  Getopt::Long::Configure ("bundling");
+  my $help;
+  GetOptions('h' => \$help, 'd' => \$devDocs, 'v+' => \$verbose);
+
+  $docDir = shift @ARGV || $KDocDir;
+
+  unless (scalar(@ARGV) == 0) {
+    print "Error: Invalid arguments\n";
+    Usage(1);
+  }
+
+  if ($help) {
+    Usage(0);
+  }
+}
+
+sub Usage {
+  my $exitCode = shift;
+
+  Utils::PrintDeathMessage($exitCode, "\nUsage: blddocs [<documentation_directory>]
+
+options:
+
+-h  help
+-d  generate additional documentation relevent to development of the tools
+-v  verbose output (-vv very verbose)\n");
+}
+
+sub BldIndex {
+  print "Generating index.html...\n";
+
+  open INDEX, ">index.html" or die "Couldn't open index.html for writing: $!\n";
+  $CGI::NO_DEBUG = 1;
+  $CGI::NO_DEBUG = 1;
+  my $cgi = new CGI;
+  print INDEX $cgi->start_html("LPD Release Tools Documentation");
+  print INDEX $cgi->h1("LPD Release Tools Documentation");
+  my $version = Utils::ToolsVersion();
+  print INDEX $cgi->h3("Version $version\n");
+
+  AddSection("Introduction", \@intro, *INDEX, $cgi);
+  AddSection("Command reference", \@commands, *INDEX, $cgi);
+  AddSection("Utilities", \@utils, *INDEX, $cgi);
+  AddSection("Implementation notes", \@modules, *INDEX, $cgi) if ($devDocs);
+
+  print INDEX $cgi->hr;
+  print INDEX $cgi->end_html();
+  close INDEX;
+}
+
+sub ReadCaptions {
+  my $list = shift;
+  foreach my $module (@$list) {
+    open (FILE, $module->{fileName}) or die "Error: Couldn't open $module->{fileName} for reading: $!\n";
+
+    # Search through file for name section.
+    while (<FILE>) {
+      if (/^=head1 NAME/) {
+	last;
+      }
+    }
+
+    # Read name section.
+    while (<FILE>) {
+      unless (/^\s*$/) {
+	(my $caption, my $comment) = split (/ - /, $_, 2);
+	die unless defined $caption and defined $comment;
+	$module->{caption} = $caption;
+	$module->{comment} = " - $comment";
+	last;
+      }
+    }
+
+    unless (exists $module->{caption}) {
+      $module->{caption} = "";
+      $module->{comment} = "";
+    }
+
+    close (FILE);
+  }
+}
+
+sub AddSection {
+  my $heading = shift;
+  my $list = shift;
+  local *INDEX = shift;
+  my $cgi = shift;
+
+  print INDEX $cgi->hr;
+  print INDEX $cgi->h2($heading);
+  foreach my $module (@$list) {
+    print INDEX $cgi->a({ -href => "$module->{fileName}.html" }, $module->{caption}), $module->{comment};
+    print INDEX $cgi->p("");
+  }
+}
+
+sub BldDocs {
+  BldList(\@intro);
+  BldList(\@commands);
+  BldList(\@utils);
+  BldList(\@modules) if ($devDocs);
+}
+
+sub BldList {
+  my $listRef = shift;
+
+  foreach my $item (@$listRef) {
+    my $itemMTime = Utils::FileModifiedTime("$toolsdir\\$item->{fileName}");
+    if ($itemMTime == 0 or not -e "$item->{fileName}.html" or $itemMTime > Utils::FileModifiedTime("$item->{fileName}.html")) {
+      my $dirName = dirname($item->{fileName});
+      unless (-e $dirName) {
+        eval {Utils::MakeDir($dirName)};
+        if ($@) {
+          die "Error: Couldn't make directory $docDir/$dirName : $@\n";
+        }
+      }
+      print "Generating $item->{fileName}.html...\n";
+      pod2html("--infile=$toolsdir\\$item->{fileName}", "--outfile=$item->{fileName}.html", "--title=$item->{fileName}");
+    }
+  }
+}
+
+
+=head1 NAME
+
+BldDocs - Builds this HTML documentation set from the POD in the Perl sources.
+
+=head1 SYNOPSIS
+
+  blddocs [<documentation_directory>]
+
+options:
+
+  -h  help
+  -d  generate additional documentation relevent to development of the tools
+  -v  verbose output (-vv very verbose)
+
+=head1 DESCRIPTION
+
+Invokes C<pod2html> on each source file, and puts all the generated documentation files into a F<doc> directory. On subsequent calls only generates new html for source files that have been modified. Also generates the file F<doc\index.html> which contains a set of links to the other documentation files.
+
+=head1 KNOWN BUGS
+
+None.
+
+=head1 COPYRIGHT
+
+ Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+ All rights reserved.
+ This component and the accompanying materials are made available
+ under the terms of the License "Eclipse Public License v1.0"
+ which accompanies this distribution, and is available
+ at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ 
+ Initial Contributors:
+ Nokia Corporation - initial contribution.
+ 
+ Contributors:
+ 
+ Description:
+ 
+
+=cut

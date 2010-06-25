@@ -1,0 +1,12 @@
+
+TARGET			test_mmp_version
+TARGETTYPE		EXE
+
+LIBRARY			euser.lib
+
+SYSTEMINCLUDE		/epoc32/include
+
+SOURCE			test_mmp_version.cpp
+
+VERSION			6
+

@@ -1,0 +1,79 @@
+/*
+* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description: 
+*
+*/
+
+target		deftest
+targettype		dll
+
+source	test.cpp 
+source	test01.cpp 
+source	test02.cpp 
+source	test03.cpp 
+source	test04.cpp 
+source	test05.cpp 
+source	test06.cpp 
+source	test07.cpp 
+source	test08.cpp 
+source	test09.cpp 
+source	test10.cpp 
+source	test11.cpp 
+source	test12.cpp 
+source	test13.cpp 
+source	test14.cpp 
+source	test15.cpp 
+source	test16.cpp 
+source	test17.cpp 
+source	test18.cpp 
+source	test19.cpp 
+source	test20.cpp 
+source	test21.cpp 
+source	test22.cpp 
+source	test23.cpp 
+source	test24.cpp 
+source	test25.cpp 
+source	test26.cpp 
+source	test27.cpp 
+source	test28.cpp 
+source	test29.cpp 
+source	test30.cpp 
+source	test31.cpp 
+source	test32.cpp 
+source	test33.cpp 
+source	test34.cpp 
+source	test35.cpp 
+source	test36.cpp 
+source	test37.cpp 
+source	test38.cpp 
+source	test39.cpp 
+source	test40.cpp 
+source	test41.cpp 
+source	test42.cpp 
+source	test43.cpp 
+source	test44.cpp 
+source	test45.cpp 
+source	test46.cpp 
+source	test47.cpp 
+source	test48.cpp 
+source	test49.cpp 
+unpaged
+macro __TESTNAME__="deftest"
+
+deffile  deftest.def
+uid 0x1000008d 0x100039e5
+VENDORID 0x70000001
+capability		all
+unpaged
+epocallowdlldata

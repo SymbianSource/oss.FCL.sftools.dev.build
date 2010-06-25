@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- user.xml - user configuration file for raptor_data_unit.py test "testUserXmlCfg" -->
+<build xmlns="http://symbian.com/xml/build"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://symbian.com/xml/build build/2_0.xsd">
+
+  <!-- these are deliberately redefined in arm.xml -->
+  
+  <alias name="alias_redef" meaning="MOD2"/>
+  <group name="group_redef"><varRef ref="MOD2"/></group>
+  <interface name="interface_redef" abstract="true"/>
+  <var name="var_redef"></var>
+</build>

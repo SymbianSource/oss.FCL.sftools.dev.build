@@ -1,0 +1,91 @@
+#!/bin/bash
+# Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+#
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+#
+# Contributors:
+#
+# Description:
+# raptor script
+# add mingw to the PATH if we are running Cygwin on Windows
+#
+
+# If SBS_HOME is not set in the environment then work it out
+# from the path to this batch file
+if [ -z "$SBS_HOME" ] ; then
+	temp=$0
+	SBS_HOME=$(cd ${temp%/*} && echo $PWD)
+	export SBS_HOME=${SBS_HOME%/bin}
+fi
+
+# Ensure that the host type is set for Raptor:
+eval $($SBS_HOME/bin/gethost.sh -e)
+
+if [ -z "$HOSTPLATFORM" ]; then
+	echo "Error: HOSTPLATFORM could not be determined." 1>&2
+	exit 1
+fi
+
+if [ ! -d "$SBS_HOME/$HOSTPLATFORM_DIR" ]; then
+cat 1>&2 <<EOERROR
+Error: sbs has not been installed with support for your platform: "${HOSTPLATFORM}".
+EOERROR
+	exit 1
+fi
+
+if [ "$OSTYPE" == "cygwin" ]; then
+
+	SBS_HOME=${SBS_HOME//\\//}
+
+	__MINGW__=${SBS_MINGW:-$SBS_HOME/$HOSTPLATFORM_DIR/mingw}
+	__CYGWIN__=${SBS_CYGWIN:-$SBS_HOME/$HOSTPLATFORM_DIR/cygwin}
+	__PYTHON__=${SBS_PYTHON:-$SBS_HOME/$HOSTPLATFORM_DIR/python264/python.exe}
+	export PYTHONPATH=${SBS_PYTHONPATH:-$SBS_HOME/$HOSTPLATFORM_DIR/python264}
+
+    # Command for unifying path strings. For example, "c:\some\path" and
+    # "/cygdrive/c/some/path" will both be converted into "c:/some/path".
+	u="$__CYGWIN__/bin/cygpath.exe -m"
+
+	__MINGW__=$($u "$__MINGW__")
+	__CYGWIN__=$($u "$__MINGW__")
+	__PYTHON__=$($u "$__PYTHON__")
+
+	export SBS_HOME=$($u "$SBS_HOME")
+
+	export PATH=${__MINGW__}/bin:${__CYGWIN__}/bin:$SBS_HOME/$HOSTPLATFORM_DIR/bin:$PATH
+
+	# Tell Cygwin not to map unix security attributes to windows to
+	# prevent raptor from potentially creating read-only files:
+	export CYGWIN='nontsec nosmbntsec'
+
+else
+	export PYTHONPATH=${SBS_PYTHONPATH:-$SBS_HOME/$HOSTPLATFORM_DIR/python262/lib}
+	PATH=$SBS_HOME/$HOSTPLATFORM_DIR/python262/bin:$SBS_HOME/$HOSTPLATFORM_DIR/bin:$PATH
+	LD_LIBRARY_PATH=$SBS_HOME/$HOSTPLATFORM_DIR/python262/lib:$SBS_HOME/$HOSTPLATFORM_DIR/bv/lib:$LD_LIBRARY_PATH
+
+	export PATH LD_LIBRARY_PATH
+	__PYTHON__=python
+fi
+
+
+# call sbs_filter.py with the arguments
+
+FILTER_START="$SBS_HOME/bin/sbs_filter.py"
+
+if [ -e "$FILTER_START" ]; then
+	# run the source version
+	${__PYTHON__} "$FILTER_START" "$@"
+elif [ -e "$FILTER_START"c ]; then
+	# run the compiled version
+	${__PYTHON__} "$FILTER_START"c "$@"
+else
+	echo "Cannot start sbs_filter - $FILTER_START not found." 1>&2
+	echo "Check your SBS_HOME environment variable." 1>&2
+fi
+

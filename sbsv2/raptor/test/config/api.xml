@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<build xmlns="http://symbian.com/xml/build"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://symbian.com/xml/build build/2_0.xsd">
+
+	<!-- test data for raptor_api_unit -->
+
+	<alias meaning="a" name="alias_A"/>
+	<alias meaning="a.b" name="alias_B"/>
+	<alias meaning="a.b.c" name="alias_C" type="O"/>
+	<alias meaning="a.b.c.d" name="alias_D" type="X"/>
+ 
+ 	<var name="product_A" type="product"/>
+ 	<var name="product_B"/>
+ 	<var name="product_C" type="product"/>
+ 	<var name="product_D"/>
+ 	
+ 	<var name="buildme">
+ 		<set name="RELEASEPATH" value="/home/raptor" host="lin.*"/>
+ 		<set name="RELEASEPATH" value="C:/home/raptor" host="win.*"/>
+ 		<set name="VARIANTPLATFORM" value="foo"/>
+ 		<set name="VARIANTTYPE" value="bar"/>
+ 	</var>
+ 	
+ 	<var name="foo"/>
+ 	<var name="bar"/>
+ 	
+ 	<alias name="s1" meaning="buildme.foo"/>
+ 	<alias name="s2" meaning="buildme.foo.bar"/>
+ 	
+</build>

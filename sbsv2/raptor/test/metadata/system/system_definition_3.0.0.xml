@@ -1,0 +1,13 @@
+<SystemDefinition name="MCL" schema="3.0.0" >  
+	<systemModel>
+	    <layer name="test">
+			<component name="Test Component 1">          
+				<unit unitID="TCOMP1" name="test_component_1" bldFile="simple" mrp="simple\simple.mrp"/>
+			</component>
+			<component name="Test Component 2">
+				<unit unitID="TCOMP2" name="test_component_2" bldFile="basics\helloworld" mrp="basics\helloworld.mrp"/>
+			</component>
+		</layer>
+	</systemModel>
+</SystemDefinition>
+

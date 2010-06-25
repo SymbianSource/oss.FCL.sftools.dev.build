@@ -1,0 +1,212 @@
+#!perl
+# Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+# 
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+# 
+# Contributors:
+# 
+# Description:
+# 
+#
+
+use strict;
+use FindBin;
+use lib "$FindBin::Bin";
+use Getopt::Long;
+use IniData;
+use RelData;
+use EnvDb;
+use CommandController;
+use GetEnv;
+
+
+#
+# Globals.
+#
+
+my $verbose = 0;
+my $overwriteSource = 0;
+my $sourceInstallPath = undef;
+my $iniData = IniData->New();
+my $commandController = CommandController->New($iniData, 'GetEnv');
+my $comp;
+my $ver;
+my $installSource = 0;
+my $removeSource =0;
+my $excludeComponents = undef;
+my $forceExclusion = 0;
+my $sourceOnly;
+
+
+#
+# Main.
+#
+
+ProcessCommandLine();
+
+if ($sourceOnly) {
+  GetEnvSource();
+}
+else {
+  GetEnv::GetEnvFromRelData($iniData, $comp, $ver, $installSource, $sourceInstallPath, $overwriteSource, $removeSource, $verbose, $excludeComponents, $forceExclusion);
+  print "Checking environment...\n";
+  my $envDb = EnvDb->Open($iniData, $verbose);
+  (my $status) = $envDb->CheckEnv();
+  print "Status: ", EnvDb::StatusString($status), "\n";
+}
+
+#
+# Subs.
+#
+
+sub ProcessCommandLine {
+  Getopt::Long::Configure ("bundling");
+  my $help;
+  GetOptions('h' => \$help, 's' => \$installSource, 'o' => \$overwriteSource, 'r' => \$removeSource, 'v+' => \$verbose,  'i=s' => \$sourceInstallPath, 'x=s' => \$excludeComponents, 'f' => \$forceExclusion, 'source-only' => \$sourceOnly);
+
+  if ($help) {
+    Usage(0);
+  }
+
+  $comp = shift @ARGV;
+  $ver = shift @ARGV;
+
+  unless (defined $comp and defined $ver and $#ARGV = -1) {
+    print "Error: Invalid arguments\n";
+    Usage(1);
+  }
+
+  if ($sourceInstallPath and not ($installSource || $sourceOnly )) {
+    print "Error: Invalid options - cannot specify install path (using -i) without installing source (using -s or --source-only)\n";
+    Usage(1);
+  }
+  
+  Utils::CheckDirectoryName($sourceInstallPath) if defined $sourceInstallPath;
+}
+
+sub Usage {
+  my $exitCode = shift;
+
+  Utils::PrintDeathMessage($exitCode, "\nUsage: getenv [options] <component> <external_version>
+
+options:
+
+-h  help
+-s  install source also
+-r  remove source which belongs to components deleted during upgrade
+-i  <source_install_directory>
+-o  overwrite any existing source and binaries (including pending release components)
+-v  verbose output (-vv very verbose)
+-x  <component_name> to exclude from installation or <file> with list of components to exclude (sets -r)
+-f  overrides the user prompt when removing components specified with the -x flag. Does nothing if -x not defined
+--source-only Installs the source code for any environment, irrespective of whether it is the current environment or not\n");
+}
+
+sub GetEnvSource {   
+    my $reldata = RelData->Open($iniData, $comp, $ver, $verbose);
+    my $components = $reldata->Environment();    
+    my $envDb = EnvDb->Open($iniData, $verbose);
+    
+    if (defined $excludeComponents) {
+      $components = GetEnv::FilterCompsToExclude($components, $excludeComponents, $verbose, $forceExclusion);
+    }
+    
+    foreach my $thisComp (sort keys %{$components}) {
+        eval {
+            print "Getting source for $thisComp $components->{$thisComp}...\n";
+            $envDb->UnpackSource($thisComp, $components->{$thisComp}, $sourceInstallPath || "\\", $overwriteSource, $verbose);     
+        };
+    }
+}
+
+__END__
+
+=head1 NAME
+
+GetEnv - Installs the environment from which a component release was made.
+
+=head1 SYNOPSIS
+
+  getenv [options] <component> <version>
+
+options:
+
+  -h  help
+  -s  install source also
+  -r  removes source which belongs to components deleted during upgrade
+  -i  <source_install_directory>
+  -o  overwrite any existing source and binaries (including components pending release)
+  -v  verbose output (-vv very verbose)
+  -x  <component_name> to exclude from installation or <file> with list of components to exclude (sets -r)
+  -f  overrides the user prompt when removing components specified with the -x flag. Does nothing if -x not defined.
+  --source-only Installs the source code for any environment, irrespective of whether it is the current environment or not
+
+=head1 DESCRIPTION
+
+When a release is made, a description of the environment it was made from is stored with it. C<GetEnv> reads this and installs the necessary components into the current environment in order to make it identical to the environment from which the release was made. Note, the term I<environment> is used to mean the F<\epoc32> tree. C<GetEnv> will optionally install source code into the root of the current drive, but it makes no attempt to verify the cleanliness of these directories.
+
+Components that were present in the release environment, but which are not present in the current environment are simply installed. Components of a different version in the current environment to that of the release environment are upgraded. The upgrade process involves removing the currently installed binaries, and then unpacking the new binaries. The binaries of components that have the same version in the current environment to that of the release environment are checked against the time stamp information that was stored when they were installed. If the check fails, the component is upgraded. If it succeeds, the component left untouched.
+
+As well as overwriting existing source code, C<-o> will overwrite any binaries which are left on the drive. There will only be leftover binaries in exceptional circumstances; normally C<getenv> will remove old versions of components before trying to install new ones. C<-o> will also force 'pending release' components to be removed if necessary.
+
+Unrequired components, (e.g. documentation), can be optionally excluded from being installed using the -x flag and specifying the component name or a file which contains a list of component names (Wildcards are supported). If the unrequired component exists in the current environment the binaries and source will be removed from the current environment, if it does not currently exist the component will simply not be installed if it is in the new environment. This option should be used cautiously especially if making releases from your local work area.
+
+Examples of -x flag:
+
+	getenv -vos gt_techview_baseline <some_version> -x tools_e32toolp
+	
+	This will exclude the component tools_e32toolp from the new installation if it exists in the archive
+	
+	
+	
+	getenv -vos gt_techview_baseline <some_version> -x tools*
+	
+	This will exclude any components which begin with the string "tools" in their name from the new installation
+	
+	
+	
+	getenv -vos gt_techview_baseline <some_version> -x d:\exclude.txt
+	
+	This will exclude any components that are mentioned in the file from the new installation if they exist in the archive
+	(File can be named anything)
+	
+	
+	Format of the file:
+	
+	component_one
+	component_two
+	component_three
+	component*
+	
+	(All components are to be on seperate lines, empty lines are permitted).
+	
+	When using the * wildcard this must be at the end of the line.
+	
+=head1 KNOWN BUGS
+
+None.
+
+=head1 COPYRIGHT
+
+ Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+ All rights reserved.
+ This component and the accompanying materials are made available
+ under the terms of the License "Eclipse Public License v1.0"
+ which accompanies this distribution, and is available
+ at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ 
+ Initial Contributors:
+ Nokia Corporation - initial contribution.
+ 
+ Contributors:
+ 
+ Description:
+ 
+
+=cut

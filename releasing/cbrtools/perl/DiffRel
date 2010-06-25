@@ -1,0 +1,303 @@
+#!perl
+# Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+# 
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+# 
+# Contributors:
+# 
+# Description:
+# 
+#
+
+use strict;
+use FindBin;
+use lib "$FindBin::Bin";
+use Getopt::Long;
+use IniData;
+use EnvDb;
+use Utils;
+use CommandController;
+
+
+#
+# Globals.
+#
+
+my $verbose = 0;
+my $iniData = IniData->New();
+my $commandController = CommandController->New($iniData, 'DiffRel');
+my $comp;
+my $ver1;
+my $ver2;
+my $specifiedLocalDir;
+my $specifiedReleaseDir;
+my $specifiedDiffTool;
+
+
+#
+# Main.
+#
+
+ProcessCommandLine();
+DoDiff();
+
+
+#
+# Subs.
+#
+
+sub ProcessCommandLine {
+  Getopt::Long::Configure ("bundling");
+  my $help;
+  GetOptions('h' => \$help, 'l=s' => \$specifiedLocalDir, 'r=s' => \$specifiedReleaseDir, 'v+' => \$verbose, 't=s' => \$specifiedDiffTool);
+
+  if ($help) {
+    Usage(0);
+  }
+
+  $comp = shift @ARGV;
+  $ver1 = shift @ARGV;
+  $ver2 = shift @ARGV;
+
+  unless ($comp and $#ARGV = -1) {
+    print "Error: Invalid arguments\n";
+    Usage(1);
+  }
+
+  if ($ver2 and $specifiedLocalDir) {
+    print "Warning: The '-l' switch has no effect when specifying a pair of versions to difference\n";
+  }
+
+  if ($ver2 and $specifiedReleaseDir) {
+    print "Warning: The '-r' switch has no effect when specifying a pair of versions to difference\n";
+  }
+
+  if ($specifiedReleaseDir and $specifiedReleaseDir !~ /^\\/) {
+    die "Error: Release directories must be absolute (i.e. start with '\\')\n";
+  }
+
+  if ($specifiedLocalDir) {
+    Utils::AbsoluteFileName(\$specifiedLocalDir);
+  }
+}
+
+sub Usage {
+  my $exitCode = shift;
+
+  Utils::PrintDeathMessage($exitCode, "\nUsage: diffrel [options] <component> [<version_1>] [<version_2>]
+
+options:
+
+-h                help
+-l <local_dir>    specify a specific local directory to difference against
+-r <release_dir>  specify a specific directory within the release zip file to difference against
+-t <tool>         specify a particular diffing tool to use (instead of that specified in reltools.ini)
+-v                verbose output (-vv very verbose)\n");
+}
+
+sub DoDiff {
+  my $diffTool = $specifiedDiffTool || $iniData->DiffTool();
+  unless (defined $diffTool) {
+    die "Error: No differencing tool specified - use diff_tool keyword in reltools.ini\n";
+  }
+
+  my $envDb = EnvDb->Open($iniData, $verbose);
+  unless ($ver1) {
+    $ver1 = $envDb->Version($comp);
+    unless ($ver1) {
+      die "Error: $comp not currently installed\n";
+    }
+  }
+
+  Utils::InitialiseTempDir($iniData);
+  eval {
+    if ($ver2) {
+      DiffPair($envDb, $diffTool);
+    }
+    else {
+      DiffAgainstLocalDir($envDb, $diffTool);
+    }
+  };
+  Utils::RemoveTempDir();
+  if ($@) {
+    die $@;
+  }
+}
+
+sub DiffAgainstLocalDir {
+  my $envDb = shift;
+  my $diffTool = shift;
+  my $tempDir = Utils::TempDir();
+  $envDb->UnpackSource($comp, $ver1, $tempDir, 0, 0, 1); # 0 = overwrite, 0 = do not show progress, 1 = validate
+  my $significantDir = Utils::SignificantDir($tempDir);
+
+  my $localDir;
+  if ($specifiedLocalDir) {
+    $localDir = $specifiedLocalDir;
+  }
+  else {
+    $localDir = $significantDir;
+    $localDir =~ s/\Q$tempDir\E//;
+    unless ($localDir) {
+      $localDir = '\\';
+    }
+    $localDir = Utils::PrependSourceRoot($localDir);
+  }
+  # UnpackSource does not return a success status so we check the dir manually
+  if (!-d $localDir) {
+    warn "Nothing to do".($verbose ? '' : ' (run with -v for more info)').".\n";
+    return;
+  }
+
+  my $releaseDir;
+  if ($specifiedReleaseDir) {
+    $releaseDir = "$tempDir$specifiedReleaseDir";
+  }
+  else {
+    $releaseDir = $significantDir;
+  }
+  # UnpackSource does not return a success status so we check the dir manually
+  if (!-d $releaseDir) {
+    warn "Nothing to do".($verbose ? '' : ' (run with -v for more info)').".\n";
+    return;
+  }
+
+  if ($localDir eq '\\') {
+    print "Warning: About to diff \"$releaseDir\" against the root of your development environment.
+         You could alternatively use the -l and -r options to specify which directories to diff.
+         Are you sure you want to continue? [y/n] ";
+    my $response = <STDIN>;
+    chomp $response;
+    unless ($response eq 'y') {
+      warn "Aborting...\n";
+      return;
+    }
+  }
+
+  $localDir =~ s/^[\\\/]// unless ($localDir =~ m/^[\\\/][\\\/]/);
+  if ($verbose) { print "Envoking \"call $diffTool \"$releaseDir\" \"$localDir\"\"\n"; }
+  system "call \"$diffTool\" \"$releaseDir\" \"$localDir\"";
+}
+
+sub DiffPair {
+  my $envDb = shift;
+  my $diffTool = shift;
+  my $tempDir = Utils::TempDir();
+  my $ver1Dir = "$tempDir\\1";
+  my $ver2Dir = "$tempDir\\2";
+
+  $envDb->UnpackSource($comp, $ver1, $ver1Dir, 0, 0, 1); # 0 = overwrite, 0 = do not show progress, 1 = validate
+  $envDb->UnpackSource($comp, $ver2, $ver2Dir, 0, 0, 1); # 0 = overwrite, 0 = do not show progress, 1 = validate
+
+  if (!-d $ver1Dir or !-d $ver2Dir) {
+    warn "Nothing to do".($verbose ? '' : ' (run with -v for more info)').".\n";
+    return;
+  }
+
+  if ($verbose) { print "Envoking \"call $diffTool $ver1Dir $ver2Dir\"\n"; }
+  system "call \"$diffTool\" \"$ver1Dir\" \"$ver2Dir\"";
+}
+
+
+=head1 NAME
+
+DiffRel - Displays the source differences between two component releases.
+
+=head1 SYNOPSIS
+
+  diffrel [options] <component> [<version_1>] [<version_2>]
+
+options:
+
+  -h                help
+  -l <local_dir>    specify a specific local directory to difference against
+  -r <release_dir>  specify a specific directory within the release zip file to difference against
+  -t <diff_tool>    specify a particular diffing tool to use (instead of that in reltools.ini)
+  -v                verbose output (-vv very verbose)
+
+=head1 DESCRIPTION
+
+C<DiffRel> allows you to lauch a differencing tool of your choice to anyalise the source differences between either a pair of releases or a single release and the source in your development drive. The differencing tool to be used must be specified in C<reltools.ini> using the keyword C<diff_tool> and it must support differencing a pair of directories specified as command line arguments.
+
+There are three main ways of envoking C<DiffRel>:
+
+=over 4
+
+=item * Specifying a component and a pair of versions
+
+C<DiffRel> will difference the source of a pair of component releases. It will unpack the source from the specified versions into two temporary directories. The differencing tool will then be launched with the names of the temporary directories passed as command line arguments.
+
+=item * Specifying a component and a single version
+
+C<DiffRel> will difference the source of the specified version against that present in your development drive. It will unpack the source from the specified version into a temporary directory. It will then attempt to find a suitable pair of directories to difference (this process described in detail later) and then launch the differencing tool, passing the directory names as command line arguments.
+
+=item * Specifying just a component name
+
+As above, except the source of the currently installed version of the component will be differenced against that in your development drive.
+
+=back
+
+As mentioned previously, when C<DiffRel> is asked to perform a diff against the source code in your development drive, it attempts find a suitable pair of directories to pass to your differencing tool. The source code belonging to a particular component often lives in a deeply nested directory structure containing the source for other components also. C<DiffRel> therefore attempts to find the deepest sub-directory that captures all the source belonging to a particular component. It does this as follows:
+
+=over 4
+
+=item 1
+
+C<DiffRel> unpacks the source belonging to the component to be differenced against into a temporary directory.
+
+=item 2
+
+C<DiffRel> then examines the sub-directories of the temporary directory, looking for the deepest sub-directory that captures all files.
+
+=item 3
+
+By default the full path to this sub-directory is used as the first argument to the differencing tool. Optionally, this argument can be manually specified using the C<-r> option. In this case, C<DiffRel> with add the name of the temporary directory to the start of the path you specify.
+
+=item 4
+
+By default, the sub-directory found in (2), minus the leading temporary directory name is used as the second argument to your differencing tool. Optionally, this argument can be manually specified using the C<-l> option. In this case, C<DiffRel> will use the path you specify unaltered.
+
+=back
+
+Normally C<DiffRel>'s default behaviour will do the right thing. Situations where you may want to use the C<-r> and / or the C<-l> option include:
+
+=over 4
+
+=item 1
+
+If the source of the component you need to difference is in a different location in your development environment compared to that of the released version.
+
+=item 2
+
+If the source of the component you need to difference is contained in two or more root level directories. In this case C<DiffRel> will warn that it is about to difference against the root of your development drive (which is unlikely to be a good idea since there are likely to be source directories of other components at this level).
+
+=back
+
+=head1 KNOWN BUGS
+
+None.
+
+=head1 COPYRIGHT
+
+ Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+ All rights reserved.
+ This component and the accompanying materials are made available
+ under the terms of the License "Eclipse Public License v1.0"
+ which accompanies this distribution, and is available
+ at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ 
+ Initial Contributors:
+ Nokia Corporation - initial contribution.
+ 
+ Contributors:
+ 
+ Description:
+ 
+
+=cut

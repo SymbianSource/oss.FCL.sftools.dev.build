@@ -1,0 +1,7 @@
+
+To build tools for Windows and Linux, on Linux, use
+
+sbs -c tools2.win32 -c tools2
+
+You will also need the mingw32 package, for the cross-compiler.
+

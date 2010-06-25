@@ -1,0 +1,10 @@
+
+Qt needs to be able to have more than one active exception object, even when
+OOM (out-of-memory).
+
+A detailed overview of the solution can be found at 
+http://wikis.in.nokia.com/Toolchain/QtExceptionHandling
+
+In short, we add a new MMP flag keyword - EPOCNESTEDEXCEPTIONS. When this
+keyword is specified, a different static run-time library is used.
+

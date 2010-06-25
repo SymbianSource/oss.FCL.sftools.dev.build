@@ -1,0 +1,30 @@
+/*
+* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description: 
+*
+*/
+
+PRJ_PLATFORMS
+armv5
+
+PRJ_EXPORTS
+flm_export.flm /epoc32/tools/makefile_templates/tools/flm_export.flm
+flm_export.xml /epoc32/tools/makefile_templates/tools/flm_export.xml
+
+PRJ_EXTENSIONS
+
+start extension tools/flm_test
+option FLM_EXPORT_1 1
+option FLM_EXPORT_2 2
+end

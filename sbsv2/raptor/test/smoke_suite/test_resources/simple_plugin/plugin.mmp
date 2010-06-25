@@ -1,0 +1,34 @@
+/*
+* Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description: 
+* Example data recognizer plugin
+*
+*/
+
+
+
+TARGET			plugin.dll
+TARGETTYPE		plugin
+CAPABILITY		Protserv
+UID				0x10009d8d 0xE8000002
+VENDORID		0x70000001
+SOURCEPATH		.
+SOURCE			plugin.cpp
+SYSTEMINCLUDE 	/epoc32/include
+SYSTEMINCLUDE 	/epoc32/include/ecom
+SYSTEMINCLUDE	/epoc32/include/techview
+LIBRARY			euser.lib apmime.lib efsrv.lib
+
+START RESOURCE	plugin.rss
+END

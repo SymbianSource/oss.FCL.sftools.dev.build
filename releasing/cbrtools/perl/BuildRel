@@ -1,0 +1,219 @@
+#!perl
+# Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+# 
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+# 
+# Contributors:
+# 
+# Description:
+# 
+#
+
+use strict;
+use FindBin;
+use lib "$FindBin::Bin";
+use Getopt::Long;
+use IniData;
+use EnvDb;
+use MrpData;
+use CommandController;
+use Cwd;
+
+
+#
+# Globals.
+#
+
+my $verbose = 0;
+my $comp;
+my $iniData = IniData->New();
+my $commandController = CommandController->New($iniData, 'BuildRel');
+my $envDb;
+my $buildall;
+my $noclean;
+my $dummyrun;
+
+
+#
+# Main.
+#
+
+ProcessCommandLine();
+BuildRel();
+
+
+#
+# Subs.
+#
+
+sub ProcessCommandLine {
+  Getopt::Long::Configure ("bundling");
+  my $help;
+  my $ignore;
+  my $stdin;
+  GetOptions("h" => \$help, "v+" => \$verbose, "a" => \$buildall, "q" => \$noclean, "d" => \$dummyrun, "f" => \$ignore);
+
+  if ($help) {
+    Usage(0);
+  }
+
+  $comp = shift @ARGV;
+
+  if (@ARGV) {
+    print "Error: too many arguments\n";
+    Usage(1);
+  } elsif ($buildall && $comp) {
+    print "Error: can't use -a with a component name\n";
+    Usage(1);
+  } elsif (!$buildall && !$comp) {
+    print "Error: Must specify -a or a component name\n";
+    Usage(1);
+  }
+
+  $envDb = EnvDb->Open($iniData, $verbose);
+}
+
+sub Usage {
+  my $exitCode = shift;
+
+  Utils::PrintDeathMessage($exitCode, "\nUsage: buildrel [options] -a | <component>
+
+options:
+
+-a                    build all pending release components
+-h                    help
+-f                    (deprecated)
+-v                    verbose output (-vv very verbose)
+-q                    quick (don't do \"abld reallyclean\")
+-d                    dummy run: just show what would happen\n");
+}
+
+sub BuildRel {
+  if ($buildall) {
+    BuildEnvironment();
+  } else {
+    BuildComp($comp);
+  }
+}
+
+# Implementation
+
+sub BuildComp {
+  my $comp = shift; # could accept a component name or an entry
+
+  print "Building \"$comp\"\n" if ($verbose);
+
+  print "Gathering data from MRP file...\n" if ($verbose>1);
+  my $mrpData = $envDb->GetMrpData($comp);
+  print "Working out build commands...\n" if ($verbose>1);
+  my $cwd = cwd();
+  my $nul = ($verbose > 2)?"":" > NUL";
+  my %commands_by_path;
+
+  foreach my $binset (@{$mrpData->BinSets()}) {
+    my $path = Utils::PrependSourceRoot($binset->{path});
+    unless ($commands_by_path{$path}) {
+      $commands_by_path{$path} = [ "bldmake bldfiles" ];
+      push @{$commands_by_path{$path}}, "abld reallyclean" unless $noclean;
+    }
+    push @{$commands_by_path{$path}}, "abld $binset->{test} build $binset->{plat} $binset->{var} $binset->{mmp}";
+  }
+
+  print "Running build commands...\n" if ($verbose>1);
+  foreach my $path (sort keys %commands_by_path) {
+    chdir($path);
+    my $cmds = $commands_by_path{$path};
+    foreach my $cmd (@$cmds) {
+      print "Build command: $cmd\n" if ($dummyrun || $verbose > 1);
+      next if $dummyrun;
+      open(CMD, "$cmd|") or die "Couldn't start command \"$_\" because $!";
+      my $output = "";
+      my $failure = 0;
+      while (<CMD>) {
+        print $_ if $verbose > 2;
+        $failure = 1 if m/fatal error/i;
+        $output .= $_;
+      }
+      close CMD;
+      die "Error: build failed. Command \"$cmd\" in directory \"$path\" failed with error code $? and output:\n$output\n\n" if ($? || $failure);
+      # ABLD currently doesn't pass through error codes. I have requested
+      # that it be modified to do so.
+    }
+  }
+  chdir $cwd;
+}
+
+sub BuildEnvironment {
+  foreach my $comp (keys %{$envDb->{db}}) {
+    next unless $envDb->Status($comp) == EnvDb::STATUS_PENDING_RELEASE;
+    BuildComp($comp);
+  }
+}
+
+
+__END__
+
+=head1 NAME
+
+BuildRel - Attempt to build a component.
+
+=head1 SYNOPSIS
+
+  buildrel [options] -a | <component>
+
+options:
+
+  -a                    build all components pending release
+  -h                    help
+  -v                    verbose output (-vv  very verbose)
+  -q                    quick (don't do abld reallyclean)
+  -d                    dummy run: just show what would happen
+
+=head1 DESCRIPTION
+
+Attempts to build a component, using all the platforms listed in the
+MRP file. Using -a will build all the components that are pending
+release.
+
+The -d option doesn't do any building. However, in the process of
+reading the details from the MRP it may be forced to run commands
+such as C<bldmake bldfiles> and C<abld makefile>.
+
+The commands this script runs are:
+
+  bldmake bldfiles
+  abld reallyclean (unless you're using -q)
+  abld build XXX XXX (or abld test build XXX XXX)
+
+=head1 STATUS
+
+Supported. If you find a problem, please report it to us.
+
+=head1 KNOWN BUGS
+
+None.
+
+=head1 COPYRIGHT
+
+ Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+ All rights reserved.
+ This component and the accompanying materials are made available
+ under the terms of the License "Eclipse Public License v1.0"
+ which accompanies this distribution, and is available
+ at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ 
+ Initial Contributors:
+ Nokia Corporation - initial contribution.
+ 
+ Contributors:
+ 
+ Description:
+ 
+
+=cut

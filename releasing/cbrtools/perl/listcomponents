@@ -1,0 +1,132 @@
+#!perl
+# Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+# 
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+# 
+# Contributors:
+# 
+# Description:
+# 
+#
+
+use strict;
+use FindBin;
+use lib "$FindBin::Bin";
+use Getopt::Long;
+use IniData;
+
+
+#
+# Globals.
+#
+
+my $iniData = IniData->New();
+
+
+#
+# Main.
+#
+
+ProcessCommandLine();
+PrintListComponents();
+
+#
+# Subs.
+#
+
+sub ProcessCommandLine {
+  Getopt::Long::Configure ("bundling");
+  my $help;
+  GetOptions('h' => \$help);
+
+  if ($help) {
+    Usage(0);
+  }
+
+  unless ($#ARGV == -1) {
+    print "Error: Invalid arguments\n";
+    Usage(1);
+  }
+}
+
+sub Usage {
+  my $exitCode = shift;
+
+  Utils::PrintDeathMessage($exitCode, "\nUsage: listcomponents [options] 
+
+options:
+
+-h  help\n");
+}
+
+sub PrintListComponents {
+  my @Components = ();
+  
+  foreach my $component (sort @{$iniData->PathData->ListComponents()}){
+    my $found = 0;
+    
+    $component = lc($component);
+
+    foreach(@Components){
+      if($component eq $_){
+        $found = 1;
+	last;
+      }
+    }
+    
+    unless($found){
+      push(@Components, $component);
+    }
+  }
+
+  foreach(@Components){
+    print "$_\n";
+  }
+}
+
+__END__
+
+=head1 NAME
+
+ListComponents - Prints a list of the components on the local archive.
+
+=head1 SYNOPSIS
+
+  listcomponents [options] 
+
+options:
+
+  -h  help
+
+=head1 DESCRIPTION
+
+Lists all the components on the local archive.
+
+=head1 KNOWN BUGS
+
+None.
+
+=head1 COPYRIGHT
+
+ Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+ All rights reserved.
+ This component and the accompanying materials are made available
+ under the terms of the License "Eclipse Public License v1.0"
+ which accompanies this distribution, and is available
+ at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ 
+ Initial Contributors:
+ Nokia Corporation - initial contribution.
+ 
+ Contributors:
+ 
+ Description:
+ 
+
+=cut

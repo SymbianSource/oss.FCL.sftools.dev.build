@@ -1,0 +1,380 @@
+#!perl
+# Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+# 
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+# 
+# Contributors:
+# 
+# Description:
+# 
+#
+
+=head1 User Installation
+
+The configuration management team for the project you are working on will provide you with:
+
+=over 4
+
+=item 1
+
+A release tools distribution F<zip> file.
+
+=item 2
+
+A project specific configuration file (named F<reltools.ini>).
+
+=back
+
+To install the tools, do the following:
+
+=over 4
+
+=item 1
+
+Unpack a release tools distribution F<zip> file into a directory that is present in your path environment variable (or to a new directory and add this to your path).
+
+=item 2
+
+Set up a blank development area. Usually, this would be a substituted drive, but the EPOCROOT and SRCROOT environment variables are supported if you wish to use another mechanism. At this time, the @sdk syntax is not supported - you must explicitly set your EPOCROOT variable. The SRCROOT is assumed to be \ if it is not specified.
+
+=item 3
+
+Copy the F<reltools.ini> file into F<\epoc32\relinfo> in the drive you plan to do development for this project in. This drive should (prior to this) be completely empty. Note, if you are working on more than one project, each development drive must have its own configuration file.
+
+=item 4
+
+If you plan to use the C<DiffRel> command, you will need to add  a line to F<reltools.ini> that specifies the name of the differencing tool to use, e.g.:
+
+  diff_tool  windiff
+
+Note, the tool specifed must be capable of differencing the contents of a pair of directories given their names as command line arguments.
+
+=back
+
+=head1 Perl Versions
+
+The tools should work with Perl 5.005 or higher.
+
+Some tools, notably C<CheckBc>, require Perl version 5.6.1 or higher. This is avaialble from www.activestate.com. Any tools requiring this version of Perl will simply refuse to run: you need not worry about incorrect operation.
+
+At this time, Perl 5.8.0 has bugs and is not recommended.
+
+=head1 Full Configuration
+
+This section describes how to perform a full configuration of the release tools for a particular project. This task is generally undertaken by the project's configuration management team at the start of the project. However as the project evolves, its release structure is likely to evolve also, and so this section also provides the information necessary to maintain existing configuration files.
+
+=head2 reltools.ini
+
+The file F<reltools.ini> must be distributed in the same directory as the rest of the tools. In may contain the following configuration keyword / value pairs (note, the keywords are case sensitive).
+
+Text after # is assumed to be a comment, unless the comment is preceded by \ in which case the # is literal.
+
+=over 4
+
+=item * archive_path_file <file_name>
+
+=item * archive_path <project_name> <local_path> <remote_path>
+
+These keywords are used to inform the tools where to keep releases on the local and remote archives. See the section I<Archive Path> for full details. The first syntax (C<archive_path_file>) is the older style, and specifies where to find a file listing the exact location of each component. This may be a UNC style path to a file on a network share. The newer style lists several areas that the release tools should search to find a particular release.
+
+You must either have a single C<archive_path_file> line, or at least one C<archive_path> line. You cannot use both.
+
+=item * source_map <archive_source_directory> <local_source_directory>
+
+Defines source mappings which are to be applied to a release when using the release tools. A source mapping enables source directories to be extracted, from an archive, to specified locations on the working drive. Enables working on a release which has mapped source. Enables the user to make releases from a mapped location on the working drive to be stored with a specified directory structure in the archive.
+
+=item * export_data_file <file_name>
+
+Specifies the name of the project's export data file (see the section I<Export Data File>) path to a file on a network share. Use of this keyword is mandatory.
+
+=item * require_internal_versions
+
+Normally C<MakeRel> and C<MakeEnv> allow internal versions of releases to be optionally specified. If this keyword is present, they will insist that an internal version is specified.
+
+=item * ignore_source_filter_errors
+
+C<MakeRel> and C<MakeEnv> filter a releases source into C<zip> files corresponding to different categories. The tools can then be configured to restrict access to certain categories of source for each licensee/third party involved in the project. Currently the method for filtering source is to use C<iprtool>. By default, errors occuring during filtering will be stored in the releases C<reldata> file (and shown in the release notes). If this keyword is present, source filter errors will not be stored or shown.
+
+=item * disallow_unclassified_source
+
+By default, unclassified source (i.e. source directories that don't contain a F<distribution.policy> file detailing the source category) is classified as category 'X'. If this keyword is present, then unclassified source will generate an error when an attempt to release it is made (using either C<MakeRel> and C<MakeEnv>).
+
+=item * no_ini_location_warning
+
+By default the tools expect to find the F<reltools.ini> file in F<\epoc32\relinfo>. This is so a single installation of the tools can be used with multiple projects. However, if the file is not found there, it is looked for in the directory the tools are running from. If found, it will be used, but by default a warning is displayed to alert the user that they may be not using the configuration they had intended to use. To disable this warning, specify this keyword in the F<ini> file.
+
+=item * disable_win32_extensions
+
+By default the tools make use of various Win32 Perl modules. These have been found to be faulty on certain Perl releases and so this keyword can be used to disable functionality that depends on them. For the most part, disabling the functionality that uses Win32 will not result in reduced overall functionality, but certain operations may take longer to process. However, when they are disabled the tools will not be able to protect themselves against the user running commands concurrently in an unsafe way. It is therefore advisable to leave Win32 extensions enabled unless there is a good reason not to do so.
+
+=item * categorise_binaries
+
+By default component releases contain a single F<zip> file that holds all the released binaries. If this keyword is specified, the tools will categorise the binaries by build variant (e.g. C<wins udeb>, C<test thumb urel>, etc.). Having done this, the C<required_binaries> keyword can be used to choose a sub-set of the available binaries for a particular project. Note, this keyword can also be spelt C<categorize_binaries>. Note also, this keyword has only existed since release 2.50 of the tools. Any releases generated using categorised binaries must be installed using a version of the tools >= 2.50.
+
+=item * categorise_exports
+
+By default component exports (header files etc.) are included in the main binaries F<zip> file of each component release. This means that they are available to all parties that have access to the corresponding releases. If this keyword is specified, the tools will categorise exports according to the same rules as source code. This allows access to exports to be restricted in the same way as for source code (see the section F<Export Data File> below). Note, this keyword can also be spelt C<categorize_exports>. Note also, this keyword has only existed since release 2.59 of the tools. Any releases generated using categorised exports must be installed using a version of the tools >= 2.59.
+
+=item * required_binaries <component> <build_description>
+
+By default all available categories of binaries will be installed (when using C<GetRel> and C<GetEnv>) and exported (when using C<ExportRel> and C<ExportEnv>). This keyword can be used to choose a sub-set of the available binary categories (assuming that C<categorise_binaries> was used when the corresponding releases were made, if it wasn't then it will have no effect and you'll get everything). The C<component> argument may be either a valid component name or C<default> which applies to all components. This allows the general policy to be defined using C<default> and exceptions to be defined using specific component names. The C<build_description> argument must be a string made up from valid build commands, separated by underscore ('C<_>') characters. For example, to specify C<thumb> (both C<udeb> and C<urel>) and C<wins udeb> for all components, do:
+
+  required_binaries  default   thumb
+  required_binaries  default   wins_udeb
+
+To override the defaults for the component C<wserve> to C<armi urel> also, add:
+
+  required_binaries  wserv     thumb
+  required_binaries  wserv     wins_udeb
+  required_binaries  wserv     armi_urel
+
+To override the defaults for the component C<e32test> to just C<arm4> test code (both C<udeb> and C<urel>), add:
+
+  required_binaries  e32tools  test_arm4
+
+=item * html_notes
+
+Specifies the behaviour of the tools when displaying the release notes of components made with versions of the tools prior to v2.83.1014, whether to treat text as HTML (thereby allowing tags) or to render notes as plain text (in v2.nn.nn support for the <html> tags to specify whether text is HTML or not was added).
+
+=item * remote_site_type <server_type>
+
+Specifies the type of server hosting the projects remote archive used to share releases between different sites. Must be C<FTP> for an FTP server, C<proxy> for an FTP proxy server, C<NetDrive> for a network drive, C<MultiVolumeExport> to export multiple fixed size volumes, C<MultiVolumeImport> to import multiple volumes.
+
+=item * remote_host <host_name>
+
+Specifies host name of the remote site where the remote archive is stored. This will be a DNS or IP address if the remote site is an FTP site or a UNC path (ie \\server\share) if the remote site is a network drive.
+
+=item * remote_username <username>
+
+Specifies the username required to access the remote site. Not required if the remote site is a network drive.
+Also, not mandatory - if it is not specified in C<reltools.ini> then it will be prompted for when it is needed.
+
+=item * remote_password <password>
+
+Specifies the password required to access the remote site. Not required if the remote site is a network drive.
+Also, not mandatory - if it is not specified in C<reltools.ini> then it will be prompted for when it is needed.
+
+=item * remote_logs_dir <directory>
+
+An optional keyword which specifies a directory on the remote host in which to write a log of releases that have been successfully exported. The log is an empty file with a name composed of the component name and version.
+
+=item * pasv_transfer_mode
+
+If this keyword is specified and the remote site is an FTP server (or proxy) then the tools will connect to the server in passive mode. Passive mode is required to access some FTP sites (behind firewalls for example). If the export/import tools freeze after connecting then try using this keyword.
+
+=item * ftp_server_supports_resume
+
+If this keyword is specified and the remote site is an FTP server (or proxy) then the tools will attempt to reconnect and resume an export or import if the FTP connection is dropped during a file transfer. Some FTP servers may not support this feature so the default behaviour is to fail the export/import if the connection is dropped.
+
+=item * ftp_timeout
+
+Specifies the timeout (in seconds) for a connection to an FTP server. This should be set to higher values for poor connections. If not set a default value is chosen.
+
+=item * ftp_reconnect_attempts
+
+Specifies the number of attempts made to reconnect to an FTP server after the connection is dropped. This should be set to higher values for poor connections. If not set a default value is chosen.
+
+=item * proxy <host_name>
+
+Specifies the IP address or DNS name of an FTP proxy server used to access the FTP site containing the remote archive.
+
+=item * proxy_username <username>
+
+Specifies the username required to access the proxy server.
+Not mandatory - if it is not specified in C<reltools.ini> then it will be prompted for when it is needed.
+
+=item * proxy_password <password>
+
+Specifies the password required to access the proxy server.
+Not mandatory - if it is not specified in C<reltools.ini> then it will be prompted for when it is needed.
+
+=item * max_export_volume_size <size_in_bytes>
+
+This keyword relates to remote sites of type C<MultiVolumeExport>. It can be used to specify the maximum size an export volume may reach before then next one is started. By default a value of 670040064 (639 MB) is used, appropriate for volumes that will be transferred to CD.
+
+=item * pgp_tool <tool_name>
+
+The name of the command line PGP tool used to encrypt releases for export and decrypt imported releases. This must be set to either C<PGP> for Network Associates command line PGP (version 6 and 7) or C<GPG> for GNU Privacy Guard PGP tool (version 1.06).
+
+=item * pgp_encryption_key <keyid>
+
+Specifies the ID (an 8 digit hexadecimal number preceeded by C<0x> e.g C<0x8AF34E21>) of a PGP key which will be used to encrypt all release files before exporting to the remote site. This keyword may be used many times with each value being added to a list of key ids. Typically the value of this keyword will be set to the local teams project key id so that they may decrypt their own exported releases.
+
+=item * pgp_config_path <dir_name>
+
+Specifies the directory where the users PGP configuration and keyring files are stored. If not set the default value for the PGP tool will be used.
+
+=item * ignore_binary <wild_file_name>
+
+Specifies files in the F<\epoc32> tree that should be disregarded from the point of view of unknown origin status when an environment scan is performed (scans are done by C<EnvInfo>, C<MakeEnv> and C<CleanEnv>). As standard, the following are ignored (this keyword can be used to add to this list):
+
+ \epoc32\relinfo\*
+ \epoc32\build\*
+ \epoc32\wins\c\*
+ \epoc32\release\*.ilk
+ \epoc32\release\*.bsc
+ \epoc32\data\emulator\*.sys.ini
+
+Note, the only wild character supported is C<*>, and this is 'greedy'. For example, F<\epoc32\build\*> ignores everything in F<\epoc32\build> and all it's sub-directories. F<\epoc32\release\*.ilk> ignores any file ending in F<.ilk> in F<\epoc32\release> and all it's sub-directories.
+
+=item * diff_tool
+
+The tool that C<diffrel> should use to compare two releases.
+
+=item * table_format
+
+The format of the tables produced by the Release Tools. If omitted, text format is used. Tables are produced by many commands, such as C<envinfo>, C<bininfo>, C<latestver> and C<sourceinfo>. These can be difficult to view if the tables are too wide to fit in your terminal. Using this keyword selects an alternative table format. Use one of these options: text, CSV, HTML, Excel or Auto. "Auto" takes an extra argument, for example:
+
+  table_format auto excel
+
+It prompts the tools to show small tables as text, but to use Excel if they are too wide to fit, or have more than a certain number of rows. For normal usage, we recommend "auto excel" or "auto html" because they both auto-fit the column widths and produce easily legible tables.
+
+=back
+
+Here's an example F<reltools.ini> file:
+
+ require_internal_versions
+ disallow_unclassified_source
+ categorise_binaries
+ categorise_exports
+ diff_tool 			windiff
+ table_format                   auto excel
+ archive_path                   pixiework  \\pixieshare\config_man\archive\pixiestuff  /share/archive/pixiestuff
+ archive_path                   ourwork    \\pixieshare\config_man\archive\ourstuff  /share/archive/ourstuff
+ archive_path                   hurricane  \\pixieshare\config_man\archive\hurricane /share/archive/hurricane
+ export_data_file       	 \\pixieshare\config_man\reltools\export_data.csv
+ pgp_tool                       PGP
+ pgp_encryption_key             0x12345678
+ pgp_config_path                \\pixieshare\config_man\reltools\
+ remote_site_type               FTP
+ remote_host		 	ftp.pixie.com
+ remote_username		myusername
+ remote_password		mypassword
+ remote_logs_dir		/release_logs
+ proxy                          myproxyhost
+ proxy_username                 myproxyusername
+ proxy_password                 myproxypassword
+ pasv_transfer_mode
+ ftp_server_supports_resume
+ ftp_timeout                    60
+ ftp_reconnect_attempts         5
+ required_binaries              default wins_udeb
+ required_binaries              default thumb_urel
+
+=head2 Archive Path
+
+The release tools must know where to find (and put) a release, both on the local and remote archives. This information is used primarily whenever a release is made, exported or installed. There are two alternative mechanisms for supplying this information to the release tools. You should choose one or the other.
+
+=over 4
+
+=item Old-style Archive Path File
+
+Some licensees want a single file that lists the exact location of each component. The problem with this arrangement is that the file must be altered if a component moves from one place in the archive to another - which typically happens whenever a Symbian component is branched for the first time, or if responsibility for a component moves from one organisation to another.
+
+If you use a single archive path file, its location should be specified with the C<archive_path_file> keyword in the F<reltools.ini> file. It is recommended that a single copy of this file be placed on a network share, and referred to by the F<reltools.ini> file in the project's release tools distribution F<zip>. This will allow the file to be maintained without having to roll out a new distribution of the release tools. It is also advisable to restrict write access to the file to ensure it doesn't get changed in error.
+
+The archive path file exists to allow sites flexibility in the way their releases are archived. It also allows the maintainer of a remote host to allocate each site that will be delivering software their own directory with appropriate permissions.
+
+The file must contain lines in the following format:
+
+ <component_name> <local_archive_path> <remote_archive_path>
+
+It is also possible to specify a default path, to be used if the paths for a component have not been specified with the above syntax:
+
+ default <local_archive_path> <remote_archive_path>
+
+Here's an example archive path file:
+
+ # Miscellaneous components.
+ default \\pixieshare\release_archive\misc	/mycompany/pixie/misc
+
+ # Components delivered by our company.
+ comp1	\\pixieshare\release_archive\mycompany	/mycompany/pixie
+ comp2	\\pixieshare\release_archive\mycompany	/mycompany/pixie
+
+ # Components delivered by other companies.
+ comp3	\\pixieshare\release_archive\company_x	/company_x/pixie
+ comp4	\\pixieshare\release_archive\company_y	/company_y/pixie
+
+=item New-style Archive Paths
+
+The new mechanism fulfils the same purpose, but with additional flexibility. The release tools will search several areas for a particular release of a component. This allows components to be branched, or experimentally modified by several organisations, without the need to constantly adjust an F<archive_path.txt> file.
+
+With this mechanism, there is no F<archive_path.txt> file. Instead, statements in the F<reltools.ini> provide all the necessary information. These should appear as:
+
+ archive_path <project_name> <local_path> <remote_path>
+
+You would normally have several such lines, listing different areas to search. Each one should belong to one organisation, though an individual may even have their own repository. The project name is just a label, and is reported by various commands such as C<envinfo -f> depending on where the release is stored.
+
+ archive_path pixiework \\pixieshare\config_man\archive\pixiestuff /share/archive/pixiestuff
+ archive_path ourwork   \\pixieshare\config_man\archive\ourstuff   /share/archive/ourstuff
+ archive_path hurricane \\pixieshare\config_man\archive\hurricane  /share/archive/hurricane
+
+The directories are searched in the order they are listed; so if a gnome 002 exists in several places, the first one will be used. All releases are made into the first listed directory by default, though you can choose to place them into another project with the C<-w> switch to C<makerel> and C<makeenv>. When exporting, the release tools will put a release in the remote directory that corresponds to the relevant local directory. The same applies when importing.
+
+Ideally, all the local and remote paths will be different. However, if you're constained by an existing archive structure, you might want different projects to have different local archive paths, and the same remote archive path (or vice versa). In this case, when importing (for example) the release tools may have several possible local directories that they can put a release in. They always choose the one listed first in the F<reltools.ini>.
+
+=back
+
+=head2 Export Data File
+
+In order to use the commands C<ExportEnv> and C<ImportEnv> an export data file must be written and indicated in F<reltools.ini> with the C<export_data_file> keyword. A project's export data file contains a table detailing the source categories each site can have access to for each component. The raw data format of the file must be CSV (comma separated variables), but it is recommended that a spreadsheet such as Excel is used to prepare this to make sure data is in the correct columns. It is also recommended that a single copy of this file be placed on a network share, and referred to by the F<reltools.ini> file in the project's release tools distribution F<zip>. This will allow the file to be maintained without having to roll out a new distribution of the release tools. It is also advisable to restrict write access to the file to ensure it doesn't get changed in error.
+
+Here's an example layout:
+
+             | pgpkeyid_1 (recipient) | pgpkeyid_2 (recipient) | pgpkeyid_3 (recipient) |
+ ------------+------------------------+------------------------+------------------------+--
+ component_1 |          DE            |            E           |          CDE           |
+ ------------+------------------------+------------------------+------------------------+--
+ component_2 |          CDE           |                        |           DE           |
+ ------------+------------------------+------------------------+------------------------+--
+ component_3 |           DE           |            E           |        exclude         |
+ ------------+------------------------+------------------------+------------------------+--
+ component_4 |  exclude_bin DEFG      |       DEFG             |       DEFG             |
+
+
+
+The column headers must contain the recipients PGP key ID - an eight digit hexadecimal number preceeded by C<0x> (e.g C<0xD9A2CE15>). This public PGP key will be used to encrypt all files sent to the recipient. The name of the recipient may also be included in the column header although this is not mandatory.
+
+A cell contains a list of source categories available to the recipient of the component.
+ Each category must be a single letter or digit. Empty cells imply that the recipient
+ does not have access to any source for the corresponding component but can still receive
+binaries.
+
+To prevent a recipient from receiving both source and binaries for the corresponding component, use the keyword C<exclude>. This can be useful when certain recipients may receive releases of some but not all components.
+
+To prevent a recipient from receiving binaries for the corresponding component, use the keyword C<exclude_bin>. Unlike C<exclude>, this does not break any environment.
+
+Components which are not listed in the table but exist on the local site will not be exported to any recipients. However, a warning will be issued to alert the exporter of this situation.
+
+If a licensee or third party does not use C<DISTRIBUTION.POLICY> files to categorize source then all source will have the category X. In this case, putting X in a cell implies that all source for that component will be sent to the recipient, otherwise none will be sent.
+
+Lines starting with a C<#> are treated as comments and ignored.
+
+[NOTE: It is recommended that this file is created and maintained using a spreadsheet
+application (saving as a CSV file) rather than editing it directly.]
+
+=head1 COPYRIGHT
+
+ Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+ All rights reserved.
+ This component and the accompanying materials are made available
+ under the terms of the License "Eclipse Public License v1.0"
+ which accompanies this distribution, and is available
+ at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ 
+ Initial Contributors:
+ Nokia Corporation - initial contribution.
+ 
+ Contributors:
+ 
+ Description:
+ 
+
+=cut

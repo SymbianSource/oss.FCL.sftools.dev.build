@@ -1,0 +1,54 @@
+#!perl
+# Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+# 
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+# 
+# Contributors:
+# 
+# Description:
+# 
+#
+# Description:
+# MakingReleases
+#
+
+=head1 Overview
+
+
+
+=head1 Fundamental Concepts
+
+Consider a project that is being developed by three geographically separated sites (A, B and C). Each site is contributes various pieces of software. Site A is responsible for coordinating the software deliveries between all sites. It is critical that all sites develop against a common environment.
+
+The release tools provide an efficient means for the different sites to share environments with one another. Each site defines its deliverables as components (a single site may have a single component, or several smaller ones). B<Arrrgggg, this section needs more thought!!>
+
+=head1 Considerations Before Making a Release
+
+Component releases are fundamentally mechanism for distributing binary files. Source files may also be distributed, but the binary files are the key focus. The release tools are not intended to be a replacement for conventional source control systems. However they do allow sites to store in their source control system only the files that they actually own, and rely on the binaries distributed by the release tools to complete their environment. Source for these binaries may be available for debugging purposes according to licensing agreements.
+
+So the release tools are generally used in conjunction with a source control system during development. Individual developers will use the command C<GetEnv> to install a particual environment onto their workstation. They would then check out of the source control system the components they plan to work on, make changes and perform builds to test those changes.
+
+=head1 COPYRIGHT
+
+ Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+ All rights reserved.
+ This component and the accompanying materials are made available
+ under the terms of the License "Eclipse Public License v1.0"
+ which accompanies this distribution, and is available
+ at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ 
+ Initial Contributors:
+ Nokia Corporation - initial contribution.
+ 
+ Contributors:
+ 
+ Description:
+ 
+
+=cut

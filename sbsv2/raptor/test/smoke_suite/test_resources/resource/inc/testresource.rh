@@ -1,0 +1,82 @@
+/*
+* Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description: 
+*
+*/
+
+#define ELogEnable 1
+#define ELogDisable 0
+#define ELogUnique 1
+#define ELogUndefined -1
+
+STRUCT CONFIG
+	{
+	WORD size;
+	BYTE recent;
+	LONG age;
+	}
+
+
+STRUCT CAPABILITY
+	{
+	LONG cap;
+	}
+	
+STRUCT SECURITY
+	{
+	LONG uid;
+	STRUCT read_caps[];
+	STRUCT write_caps[];
+	}	
+
+STRUCT ETYPE
+	{
+	LONG uid;
+	LTEXT description;
+	BYTE enabled = ELogEnable;
+	}
+	
+ENUM {EAsc,EDesc};
+
+STRUCT KEY
+	{
+	LTEXT col;
+	WORD order = EAsc;
+	WORD len = ELogUndefined;
+	}
+
+ENUM { EDbCompareNormal, EDbCompareFolded, EDbCompareCollated };
+
+STRUCT INDEX
+	{
+	LTEXT name;
+	LTEXT table;
+	STRUCT keys[];
+	BYTE unique = 0;
+	BYTE compare = EDbCompareNormal;
+	}
+
+STRUCT RECENT
+	{
+	BYTE id;
+	WORD duplicate = 0;
+	STRUCT conditions[];
+	}
+
+STRUCT MATCH
+	{
+	WORD field;
+	LTEXT string = "";
+	LONG value = 0;
+	}

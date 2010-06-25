@@ -1,0 +1,36 @@
+/*
+* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description: 
+*
+*/
+TARGET			test
+TARGETTYPE		EXE
+
+// Test backslash to / here:
+TARGETPATH		\sys\bin
+
+UID			0x100039ce 0x00000001
+LIBRARY			euser.lib
+SECUREID		0x10003a5c
+SYSTEMINCLUDE	/epoc32/include
+SOURCE			test.cpp test.cia test1.c++ test2.cxx test3.Cpp test4.cc test5.CC test6.C++
+MACRO			TEST_MACRO_THAT_DOES_NOTHING
+OPTION GCCE -O2
+PAGED
+DEBUGGABLE
+EPOCCALLDLLENTRYPOINTS
+EPOCSTACKSIZE 8192
+EPOCHEAPSIZE 0x5000 65535
+EPOCPROCESSPRIORITY low
+capability TCB ProtServ DiskAdmin AllFiles PowerMgmt CommDD

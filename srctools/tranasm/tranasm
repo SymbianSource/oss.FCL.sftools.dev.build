@@ -1,0 +1,4 @@
+#!/bin/sh
+PATH=.:$PATH
+perl -S tranasm.pl $@
+

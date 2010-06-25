@@ -1,0 +1,193 @@
+/*
+* Copyright (c) 1997-2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description: 
+*
+*/
+
+
+/**
+ @file
+ @internalTechnology 
+*/
+
+#ifndef ICL_UIDS_HRH
+#define ICL_UIDS_HRH
+
+
+#define KICLCodecDllUidValue	0x101F45AC
+
+#define KDecoderInterfaceUidValue	0x101F45AD
+#define KEncoderInterfaceUidValue	0x101F45B4
+
+#define KBMPCodecDllUidValue		0x101F45AE
+#define KBMPImageDataUidValue		0x101F45BF
+#define KBMPCompressionUidValue		0x101F45E3
+#define KBMPDecoderImplementationUidValue	0x101F45AF
+#define KBMPEncoderImplementationUidValue	0x101F45BE
+
+#define KJPGCodecDllUidValue		0x101F45D6
+#define KJPGImageDataUidValue		0x101F45DA
+#define KJPGQTableUidValue			0x101F45E1
+#define KJPGCommentUidValue			0x101F45E2
+#define KJPGDecoderImplementationUidValue	0x101F45D7
+#define KJPGEncoderImplementationUidValue	0x101F45D9
+
+#define KGIFCodecDllUidValue		0x101F45B1
+#define KGIFBackgroundColorUidValue 0x101F45DE
+#define KGIFImageDescriptorUidValue 0x101F45E4
+#define KGIFLZWInfoUidValue			0x101F45E5
+#define KGIFImageControlUidValue	0x101F45E6
+#define KGIFCommentUidValue			0x101F45E7
+#define KGIFDecoderImplementationUidValue	0x101F45B2
+#define KGIFEncoderImplementationUidValue	0x101F45DD
+
+#define KMBMCodecDllUidValue		0x101F45CA
+#define KMBMDecodeDataUidValue		0x101F45E0
+#define KMBMEncodeDataUidValue		0x101F45E9
+#define KMBMDecoderImplementationUidValue	0x101F45CB
+#define KMBMEncoderImplementationUidValue	0x101F45DF
+
+#define KTIFFCodecDllUidValue		0x101F45C0
+#define KTIFFImageDataUidValue		0x101F45E8
+#define KTIFFDecoderImplementationUidValue	0x101F45C1
+#define KTIFFDecoderLittleEndianImplementationUidValue	0x101F45C2
+#define KTIFFDecoderBigEndianImplementationUidValue	0x101F45C3
+
+#define KWMFCodecDllUidValue		0x101F45B5
+#define KWMFDecoderImplementationUidValue	0x101F45B6
+#define KWMFDecoderStdImplementationUidValue	0x101F45B7
+#define KWMFDecoderApmImplementationUidValue	0x101F45B8
+#define KWMFDecoderClpImplementationUidValue	0x101F45B9
+
+#define KPNGCodecDllUidValue		0x101F45C7
+#define KPNGDecoderImplementationUidValue	0x101F45C8
+#define KPNGEncoderImplementationUidValue	0x101F45FE
+
+#define KWBMPCodecDllUidValue		0x101F45CD
+#define KWBMPDecoderImplementationUidValue	0x101F45CE
+
+#define KOTACodecDllUidValue		0x101F45D0
+#define KOTADecoderImplementationUidValue	0x101F45D1
+
+#define KICOCodecDllUidValue		0x101F45D3
+#define KICODecoderImplementationUidValue	0x101F45D4
+
+#define KMngMimeTypeUidValue 0x101F7C53
+#define KMngImageDisplayPluginUidValue 0x101F7C52
+#define KMngDllUidValue 0x101F7C51
+
+/**
+@publishedAll
+@released
+Class UID for a set of decoders which support the Exchangeable Image File Format. 
+
+When loading plugins by class UID, the first valid plugin from the list 
+of available plugins with the specified class UID will be loaded. Loading 
+the plugin in this way always allow a cast to the derived decoder or 
+encoder class to be made. 
+@see CJPEGExifDecoder
+*/
+#define KUidICLJpegEXIFInterface 	0x101F7C4F
+
+#define KUidTransformJpegPluginUidValue		0x101F7C2F
+#define KUidTransformJpegExtension	0x101F7C30
+
+/**
+@publishedAll
+@released
+Image Transform Plugin Extension UID for Squeeze Transaformations
+*/
+#define KUidSqueezeTransformExtension	0x10285BD6
+
+/**
+@publishedAll
+@released
+Image Transform Plugin Extension UID for Orientation Transaformations
+*/
+#define KUidOrientationTransformExtension	0x10285C33 
+
+/**
+@publishedAll
+@released
+Image Transform Plugin Extension UID for Overlay Transaformations
+*/
+#define KUidOverlayTransformExtension	0x10285C34
+
+/**
+@publishedAll
+@released
+Class UID for the set of decoders which support operations through the CImageFrame. 
+
+When loading plugins by class UID, the first valid plugin from the list 
+of available plugins with the specified class UID will be loaded. Loading 
+the plugin in this way always allow a cast to the derived decoder or 
+encoder class to be made. 
+@see CJPEGImageFrameDecoder
+*/
+#define KUidICLJpegImageFrameInterface 	0x101F7C60
+
+#define KJPGDecoderImplementation2UidValue	0x101F7C61
+#define KJPGEncoderImplementation2UidValue	0x101F7C62
+
+#define KJPEGImageFramePluginDllUidValue	0x1027376E
+
+/**
+@publishedAll
+@released
+
+Extension interface uid for TImageConvOperation
+*/
+#define KUidImageConvExtOperationValue	0x102833DF
+
+/**
+@publishedAll
+@released
+
+Extension interface uid for TImageConvScaler
+*/
+#define KUidImageConvExtScalerValue		0x102833E0 	
+
+/**
+@publishedAll
+@released
+
+Extension interface uid for TImageConvStreamedDecode
+*/
+#define KUidImageConvExtStreamedDecodeValue	0x102833E1 	
+
+/**
+@publishedPartner
+@released
+
+Extension interface uid for TImageConvStreamedEncode
+*/
+#define KUidImageConvExtStreamedEncodeValue	0x102833E2 
+
+/**
+@publishedAll
+@released
+
+Extension interface uid for TImageConvPrepare
+*/
+#define KUidImageConvExtPrepareValue 0x1028346D 
+
+/**
+@publishedAll
+@released
+
+Uid that identifies encoders that maintain the alpha channel of the EColor16MA source CFbsBitmap.
+*/
+#define KUidAlphaChannelEncodeSupported 0x10285D1B
+
+#endif // ICL_UIDS_HRH

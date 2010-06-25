@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<build xmlns="http://symbian.com/xml/build"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://symbian.com/xml/build build/2_0.xsd">
+
+  <!-- This variant is used so that we can tell if the APPLY keyword
+       can find variants exported into the epoc32 tree -->
+
+  <var name="apply_tools2_linker_options">
+	<append name="LINKER_OPTIONS" value="-lwsock32" />
+  </var>
+
+
+</build>

@@ -1,0 +1,38 @@
+/*
+* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description: 
+*
+*/
+TARGET        stringtabletest
+TARGETTYPE    exe
+//UID           0x1000008d 0x101F5D46
+
+SOURCE       simple_stringtable.cpp
+
+SOURCEPATH    strings
+
+START STRINGTABLE strconsts.st
+	  EXPORTPATH /epoc32/include
+END
+
+SYSTEMINCLUDE \epoc32\include
+
+LIBRARY       euser.lib
+LIBRARY       bafl.lib
+LIBRARY       estor.lib
+LIBRARY       charconv.lib
+
+VENDORID 0x101FB657
+
+CAPABILITY All -Tcb

@@ -1,0 +1,147 @@
+#!perl
+# Copyright (c) 2004-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+# 
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+# 
+# Contributors:
+# 
+# Description:
+# 
+#
+
+use strict;
+use FindBin;
+use lib "$FindBin::Bin";
+use Getopt::Long;
+use IniData;
+use CommandController;
+use CopyRel;
+
+#
+# Globals.
+#
+
+my $verbose = 0;
+my $force = 0;
+my $iniData = IniData->New();
+my $commandController = CommandController->New($iniData, 'CopyRel');
+my $component;
+my $versionToCopy;
+my $version;
+my $internalVersion;
+my $project;
+
+
+#
+# Main.
+#
+
+ProcessCommandLine();
+PrintHeinousWarning();
+CopyRel();
+
+sub ProcessCommandLine {
+  Getopt::Long::Configure ("bundling");
+  my $help;
+  GetOptions("h" => \$help, "f" => \$force, "v+" => \$verbose, "w=s" => \$project);
+
+  if ($help) {
+    Usage(0);
+  }
+
+  $component = shift @ARGV;
+  $versionToCopy = shift @ARGV;
+  $version = shift @ARGV;
+  $internalVersion = shift @ARGV;
+
+  unless (defined $component and defined $versionToCopy and defined $version and defined $internalVersion and $#ARGV == -1) {
+    print "Error: Invalid arguments\n";
+    Usage(1);
+  }
+}
+
+sub Usage {
+  my $exitCode = shift;
+
+  Utils::PrintDeathMessage($exitCode, "\nUsage: copyrel [options] <component> <external_version_to_copy> <new_external_version> <new_internal_version>
+
+options:
+
+-h                    help
+-f                    if check fails, overwrite external copy
+-v                    verbose output (-vv very verbose)
+-w <project>          copy the release in given \"project\"
+\n");
+}
+
+sub PrintHeinousWarning {
+  Utils::QueryUnsupportedTool(<<GUILTY, 0);  # Set $reallyrun as 0
+Warning: This operation may pollute the archive if used incorrectly. 
+Also note that if the copy fails because of an interruption, disk 
+full or a network error, you must re-run copyrel with -f. 
+
+Do you want to continue? (y/n)
+GUILTY
+}
+
+sub CopyRel {
+  my $cr = new CopyRel($iniData, $force, $verbose, $project);
+  
+  $cr->CopyRelease($component, $versionToCopy, $version, $internalVersion);
+  $cr->SummariseErrors(1);
+}
+
+
+__END__
+
+=head1 NAME
+
+CopyRel - Modifies an archive so that an additional release version is created which is a copy of a release version input.
+
+=head1 SYNOPSIS
+
+  copyrel [options] <component> <external_version_to_copy> <new_external_version> <new_internal_version>
+
+options:
+
+  -h                    help
+  -f                    if check fails, overwrite external copy
+  -v                    verbose output (-vv very verbose)
+  -w <project>          copy the release in given \"project\"
+
+=head1 DESCRIPTION
+
+The command CopyRel is used to create a new release which is based upon another release. The contents of the new release version is identical to the release input, except the external and internal version is updated as specified.
+
+By using CopyRel a new baseline release can be created, which will inherit the environment of the original baseline release version that was copied. This is useful renumbering a baseline.
+
+By default the new release is created in the same archive as the release which is copied. The option -w <project> changes the default behavior so that the archive to create the new release can be set as <project>.
+
+=head1 KNOWN BUGS
+
+None.
+
+=head1 COPYRIGHT
+
+ Copyright (c) 2004-2009 Nokia Corporation and/or its subsidiary(-ies).
+ All rights reserved.
+ This component and the accompanying materials are made available
+ under the terms of the License "Eclipse Public License v1.0"
+ which accompanies this distribution, and is available
+ at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ 
+ Initial Contributors:
+ Nokia Corporation - initial contribution.
+ 
+ Contributors:
+ 
+ Description:
+ 
+
+=cut

@@ -1,0 +1,218 @@
+#!perl
+# Copyright (c) 2003-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+# 
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+# 
+# Contributors:
+# 
+# Description:
+# 
+#
+
+use strict;
+use FindBin;
+use lib "$FindBin::Bin";
+use Getopt::Long;
+use IniData;
+use EnvDb;
+use Utils;
+
+
+#
+# Globals.
+#
+
+my $verbose = 0;
+my $iniData = IniData->New();
+my $force;
+
+
+#
+# Main.
+#
+
+ProcessCommandLine();
+Utils::QueryUnsupportedTool(undef, $force);
+my $ratings = ScanMrps();
+PrintReport($ratings);
+
+
+#
+# Subs.
+#
+
+sub ProcessCommandLine {
+  Getopt::Long::Configure ('bundling');
+  my $help;
+  GetOptions('h' => \$help, 'v+' => \$verbose, 'f' => \$force);
+
+  if ($help) {
+    Usage(0);
+  }
+}
+
+sub ScanMrps {
+  my $envDb = EnvDb->Open($iniData, $verbose);
+  my @comps = keys %{$envDb->{db}}; # This should go through an EnvDb interface - needs adding.
+  my %ratings;
+  foreach my $thisComp (@comps) {
+    my $dbEntry = $envDb->{db}->{$thisComp};
+    if (-e $dbEntry->{mrpName}) {
+      $ratings{$thisComp} = RateMrpFile($dbEntry->{mrpName});
+    }
+    elsif ($verbose) {
+      print "Warning: $thisComp\'s mrp file (\"$dbEntry->{mrpName}\") does not exit\n";
+    }
+  }
+  return \%ratings;
+}
+
+sub PrintReport {
+  my $ratings = shift;
+  my $tableData = [["Component", "Complexity Rating"]];
+
+  foreach my $thisComp (sort { $ratings->{$b} <=> $ratings->{$a} } keys %$ratings) {
+    if ($ratings->{$thisComp} > 0) {
+      push (@$tableData, [$thisComp, $ratings->{$thisComp}]);
+    }
+  }
+
+  print "\n";
+  Utils::PrintTable($tableData, 1);
+}
+
+sub RateMrpFile {
+  my $file = shift;
+  my $rating = 0;
+  print "Rating \"$file\"...\n" if ($verbose);
+  open (MRP, $file) or die "Error: Couldn't open \"$file\": $!\n";
+  while (my $line = <MRP>) {
+    chomp $line;
+    $line =~ s/^\s*$//;
+    $line =~ s/\s*#.*//;
+    unless ($line) {
+      # Nothing left.
+      next;
+    }
+
+    my $keyWord;
+    my $operand;
+    if ($line =~ /(\S+)\s+(.*)/) {
+      $keyWord = $1;
+      $operand = $2;
+    }
+    else {
+      die "Error: Invalid mrp file \"$file\"";
+    }
+
+    if ($keyWord eq 'binary') {
+      if (-f $operand) {
+	print "binary <file> statement found in \"$file\"\n" if ($verbose);
+	++$rating;
+      }
+    }
+    elsif ($keyWord eq '-binary') {
+      print "-binary statement found in \"$file\"\n" if ($verbose);
+      ++$rating;
+    }
+    elsif ($keyWord eq 'source') {
+      if (-f $operand) {
+	print "source <file> statement found in \"$file\"\n" if ($verbose);
+	++$rating;
+      }
+    }
+    elsif ($keyWord eq 'export_file') {
+      print "export_file statement found in \"$file\"\n" if ($verbose);
+      ++$rating;
+    }
+    elsif ($keyWord eq '-export_file') {
+      print "-export_file statement found in \"$file\"\n" if ($verbose);
+      ++$rating;
+    }
+    elsif ($keyWord eq 'testbinary') {
+      print "testbinary statement found in \"$file\"\n" if ($verbose);
+      ++$rating;
+    }
+  }
+  close (MRP);
+  return $rating;
+}
+
+sub Usage {
+  my $exitCode = shift;
+
+  Utils::PrintDeathMessage($exitCode, "\nUsage: mrpcomplexity [options] <file_name>
+
+options:
+
+-h  help
+-v  verbose output (-vv very verbose)
+-f  force, skip warnings about unsupported-ness\n");
+}
+
+
+__END__
+
+=head1 NAME
+
+MrpComplexity - Reports information on undesirable mrp constructs.
+
+=head1 SYNOPSIS
+
+  MrpComplexity [options]
+
+options:
+
+  -h  help
+  -v  verbose output (-vv very verbose)
+  -f  force, skip warnings about unsupported-ness
+
+=head1 DESCRIPTION
+
+Under normal circumstances F<mrp> files should contain very little information regarding where to find binary files. This information is best placed within the build configuration files (F<bld.inf>s and F<.mmp>s), as doing so allows F<mrp> files to be relatively self-maintaining.
+
+However, F<mrp> files support a rich syntax. This was designed to make it possible to release a component even if is it not possible to change the build configuration files (perhaps due to ownership restraints). Under these conditions, F<mrp> files can often become complex and as a result time consuming to maintain.
+
+This command provides a report that can be used to identify overly complex F<mrp> files, so that the root cause of this complexity can be found and eliminated. For each component in the environment, if its F<mrp> file is available, it is parsed and rated. The rating each is assigned is determined from the number of the following constructs that are found:
+
+ binary <file_name>
+ -binary
+ source <file_name>
+ export_file
+ -export_file
+ testbinary
+
+The report is presented showing the components with the highest complexity rating first. Those with a rating of zero are not shown.
+
+=head1 STATUS
+
+Unsupported/experimental. If you find a problem, please send us a patch.
+
+=head1 KNOWN BUGS
+
+None.
+
+=head1 COPYRIGHT
+
+ Copyright (c) 2003-2009 Nokia Corporation and/or its subsidiary(-ies).
+ All rights reserved.
+ This component and the accompanying materials are made available
+ under the terms of the License "Eclipse Public License v1.0"
+ which accompanies this distribution, and is available
+ at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ 
+ Initial Contributors:
+ Nokia Corporation - initial contribution.
+ 
+ Contributors:
+ 
+ Description:
+ 
+
+=cut

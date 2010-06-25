@@ -1,0 +1,61 @@
+# Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+#
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+#
+# Contributors:
+#
+# Description:
+# ARMv5 PDLL ABIv2 Function Like Makefile (FLM)
+# Build an e32 PDLL (Patchable constants DLL)
+# 
+#
+
+ifeq ($(TARGETTYPE),pdll)
+include $(FLMHOME)/e32abiv2defaults.mk
+
+# What we need to build a DLL
+ifeq ($(NOEXPORTLIBRARY),)
+IMPORTLIBRARYREQUIRED:=1
+endif
+POSTLINKDEFFILE:=$(DEFFILE)
+SUPPORT_FREEZE:=1
+
+# Default Linker settings for this target type
+LINKER_ENTRYPOINT_LIBDEP:=$(STATIC_RUNTIME_DIR)/edll.lib
+LINKER_ENTRYPOINT_SETTING:=$(LINKER_ENTRY_OPTION)=_E32Dll $(LINKER_ENTRYPOINT_DECORATION)$(LINKER_SEPARATOR)$(call dblquote,$(STATIC_RUNTIME_DIR)/edll.lib$(LINKER_ENTRYPOINT_ADORNMENT))
+
+ifeq ("$(NEED_ENTRYPOINT_LIBRARY)","True")
+LINKER_ENTRYPOINT_SETTING:=$(LINKER_ENTRYPOINT_SETTING) $(LINKER_ENTRYPOINT_LIBDEP)
+endif
+
+LINKER_STUB_LIBRARY:=$(STATIC_RUNTIME_DIR)/edllstub.lib
+STATIC_RUNTIME_LIB:=$(USER_STATIC_RUNTIME_LIB)
+
+
+# Default Postlinker settings
+CANHAVEEXPORTS:=1
+POSTLINKTARGETTYPE:=DLL
+POSTLINKFILETYPE:=dll
+DOPOSTLINK:=1
+CANIGNORENONCALLABLE:=1
+
+# Use the general EABI FLM 
+# We are appending to CDEFS but we don't want this to affect
+# other invocations so we are going to save it on a stack
+# and restore it afterwards
+$(call vsave,CDEFS)
+CDEFS:=$(CDEFS) __DLL__
+include $(FLMHOME)/e32abiv2.flm
+$(call vrestore)
+
+else
+$(error e32abiv2pdll.flm called with wrong TARGETTYPE (should be 'pdll' but is '$(TARGETTYPE)'))
+endif
+
+

@@ -1,0 +1,7 @@
+
+-b smoke_suite/test_resources/simple/bld.inf
+
+-c
+
+armv7_urel
+

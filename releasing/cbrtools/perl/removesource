@@ -1,0 +1,146 @@
+#!perl
+# Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+# 
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+# 
+# Contributors:
+# 
+# Description:
+# 
+#
+
+use strict;
+use FindBin;
+use lib "$FindBin::Bin";
+use Getopt::Long;
+use IniData;
+use EnvDb;
+use CommandController;
+use File::Path;
+
+
+#
+# Globals.
+#
+
+my $verbose = 0;
+my $dryrun = 0;
+my $iniData = IniData->New();
+my $commandController = CommandController->New($iniData, 'RemoveSource');
+my $envDb;
+my $comp;
+my $force;
+
+
+#
+# Main.
+#
+
+ProcessCommandLine();
+RemoveSource();
+
+
+#
+# Subs.
+#
+
+sub ProcessCommandLine {
+  Getopt::Long::Configure ("bundling");
+  my $help;
+  GetOptions('h' => \$help, 'v+' => \$verbose, 'd' => \$dryrun, 'f' => \$force);
+
+  if ($help) {
+    Usage(0);
+  }
+
+  $comp = shift @ARGV;
+
+  unless ($#ARGV == -1) {
+    print "Error: Invalid number of arguments\n";
+    Usage(1);
+  }
+
+  $envDb = EnvDb->Open($iniData, $verbose);
+}
+
+sub Usage {
+  my $exitCode = shift;
+
+  Utils::PrintDeathMessage($exitCode, "\nUsage: removesource [options] <component> 
+
+options:
+
+-h  help
+-d  dry run - don't do anything, just state what would happen
+-v  verbose output (-vv very verbose)
+-f  force - even delete write-protected stuff\n");
+}
+
+sub RemoveSource {
+  if (defined $comp) {	  
+    $envDb->DeleteSource($comp, $dryrun, $force);
+  }
+  else {
+    print "About to remove the source for the entire environment. Continue? [y/n] ";
+    my $response = <STDIN>;
+    if ($response =~ /^y$/i) {
+      my $versionInfo = $envDb->VersionInfo();
+      foreach my $thisComp (sort keys %{$versionInfo}) {
+        eval {
+          $envDb->DeleteSource($thisComp, $dryrun, $force);
+        };
+        print "Problem removing source for \"$thisComp\" - continuing with others: $@\n" if $@;
+      }
+    }
+  } 
+}
+
+__END__
+
+=head1 NAME
+
+RemoveSource - Removes the source code for one component or all
+
+=head1 SYNOPSIS
+
+  removesource [options] [<component>]
+
+options:
+
+  -h  help
+  -d  dry run - only states what would happen, doesn't actually do it
+  -f  force - even deletes write protected stuff
+  -v  verbose output (-vv very verbose)
+
+=head1 DESCRIPTION
+
+Deletes the source code for a particular component. If no component is specifies, deletes all known source code in your environment.
+
+=head1 KNOWN BUGS
+
+None.
+
+=head1 COPYRIGHT
+
+ Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+ All rights reserved.
+ This component and the accompanying materials are made available
+ under the terms of the License "Eclipse Public License v1.0"
+ which accompanies this distribution, and is available
+ at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ 
+ Initial Contributors:
+ Nokia Corporation - initial contribution.
+ 
+ Contributors:
+ 
+ Description:
+ 
+
+=cut
