@@ -1,0 +1,9 @@
+component       dev_build_deprecated_rommask
+
+source          /src/tools/build/deprecated/rommask
+exports         /src/tools/build/deprecated/rommask/group
+binary          /src/tools/build/deprecated/rommask/group all
+
+notes_source	\component_defs\release.src
+
+ipr T

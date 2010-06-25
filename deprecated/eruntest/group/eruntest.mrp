@@ -1,0 +1,9 @@
+component       dev_build_deprecated_eruntest
+
+source          /src/tools/build/deprecated/eruntest
+exports         /src/tools/build/deprecated/eruntest/group
+binary          /src/tools/build/deprecated/eruntest/group all
+
+notes_source	\component_defs\release.src
+
+ipr T

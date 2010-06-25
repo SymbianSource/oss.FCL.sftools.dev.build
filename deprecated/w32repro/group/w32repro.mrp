@@ -1,0 +1,9 @@
+component       dev_build_deprecated_w32repro
+
+source          /src/tools/build/deprecated/w32repro
+exports         /src/tools/build/deprecated/w32repro/group
+binary          /src/tools/build/deprecated/w32repro/group all
+
+notes_source	\component_defs\release.src
+
+ipr T

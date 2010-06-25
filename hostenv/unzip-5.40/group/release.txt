@@ -1,0 +1,5 @@
+NOTESRC_RELEASER
+Symbian Software Ltd.
+
+NOTESRC_RELEASE_REASON
+Unzip tools.

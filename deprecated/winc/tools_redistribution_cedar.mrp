@@ -1,0 +1,15 @@
+component	tools_redistribution_cedar
+
+source	\sf\os\buildtools\dist_os\redistributionwinceka2\winc
+
+source	\sf\os\buildtools\dist_os\redistributionwinceka2\bld.inf
+source	\sf\os\buildtools\dist_os\redistributionwinceka2\tools_redistribution_cedar.mrp
+
+binary	\sf\os\buildtools\dist_os\redistributionwinceka2 all
+#binary	\sf\os\buildtools\dist_os\redistributionwinceka2 cwtools
+#exports	\sf\os\buildtools\dist_os\redistributionwinceka2
+
+notes_source	\component_defs\release.src
+
+ipr T 
+
