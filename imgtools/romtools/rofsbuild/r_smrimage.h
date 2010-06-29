@@ -32,14 +32,12 @@ public:
 	TBool SetPayloadUID(const StringVector& aValues);
 	TBool SetPayloadFlags(const StringVector& aValues);
 	TInt Initialise();
-	String GetImageName(){ return iImageName; };
+	string GetImageName() const { return iImageName; };
 private:
 	CObeyFile* iObeyFile;
 	SSmrRomHeader iSmrRomHeader;
-	String iImageName;
-	String iHcrData;
-private:
-	TUint32 StrToInt(const char* aStr);
+	string iImageName;
+	string iHcrData; 
 
 };
 

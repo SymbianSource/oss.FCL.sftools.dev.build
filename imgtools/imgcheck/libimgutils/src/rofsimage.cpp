@@ -17,9 +17,9 @@
 
 
 /**
- @file
- @internalComponent
- @released
+@file
+@internalComponent
+@released
 */
 
 #include "typedefs.h"
@@ -36,8 +36,7 @@ Constructor.
 RofsImage::RofsImage(RCoreImageReader *aReader)
 : CCoreImage(aReader) ,
 iRofsHeader(0), iRofsExtnHeader(0),iAdjustment(0), 
-iImageType((RCoreImageReader::TImageType)0)
-{
+iImageType((RCoreImageReader::TImageType)0) {
 }
 
 /** 
@@ -48,8 +47,7 @@ Destructor deletes iRofsHeader and iRofsExtnHeader.
 
 @param aReader - image reader pointer
 */
-RofsImage::~RofsImage()
-{
+RofsImage::~RofsImage() {
 	DELETE(iRofsHeader);
 	DELETE(iRofsExtnHeader);
 }
@@ -63,26 +61,24 @@ elements available in Directory section.
 
 @return - returns the error code
 */
-TInt RofsImage::ProcessImage()
-{
+TInt RofsImage::ProcessImage() {
 	int result = CreateRootDir();
-	if (result == KErrNone)
-	{
-		if (iReader->Open())
-		{
+	if (result == KErrNone) {
+		if (iReader->Open()) {
 			iImageType = iReader->ReadImageType();
-			if (iImageType == RCoreImageReader::E_ROFS)
-			{
+			if (iImageType == RCoreImageReader::E_ROFS) {
 				iRofsHeader = new TRofsHeader;
 				result = iReader->ReadCoreHeader(*iRofsHeader);
-				if (result != KErrNone)
+				if (result != KErrNone){
+					cerr << "error is :"<< result << endl;
 					return result;
-				
+				}
+
+
 				SaveDirInfo(*iRofsHeader);
 				result = ProcessDirectory(0);
 			}
-			else if (iImageType == RCoreImageReader::E_ROFX)
-			{
+			else if (iImageType == RCoreImageReader::E_ROFX) {
 				iRofsExtnHeader = new TExtensionRofsHeader ;
 				result = iReader->ReadExtensionHeader(*iRofsExtnHeader);
 				if(result != KErrNone)
@@ -94,13 +90,11 @@ TInt RofsImage::ProcessImage()
 				SaveDirInfo(*iRofsExtnHeader);
 				result = ProcessDirectory(iAdjustment);
 			}
-			else
-			{
+			else {
 				result = KErrNotSupported;
 			}
 		}
-		else
-		{
+		else {
 			result = KErrGeneral;
 		}
 	}

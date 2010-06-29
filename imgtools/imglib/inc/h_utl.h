@@ -67,12 +67,14 @@ using namespace std;
 
 // to fix the linux problem: memcpy does not work with overlapped areas.
 #define memcpy memmove
-
+#define SLASH_CHAR	'/'
 // hand-rolled strupr function for converting a string to all uppercase
 char* strupr(char *a);
 
 // return the length of a file
 off_t filelength (int filedes);
+#else
+#define SLASH_CHAR	'\\'
 #endif
 
 
@@ -96,14 +98,14 @@ const TInt KMaxStringLength=0x400;
 class HFile
 	{
 public:
-	static TBool Open(const TText * const aFileName, TInt32 * const aFileHandle);
+	static TBool Open(const char* aFileName, TInt32 * const aFileHandle);
 	static TBool Read(const TInt32 aFileHandle, TAny * const aBuffer, const TUint32 aCount);
 	static TBool Seek(const TInt32 aFileHandle, const TUint32 aOffset);
 	static TUint32 GetPos(const TInt32 aFileHandle);
 	static TAny Close(const TInt32 aFileHandle);
 	static TUint32 GetLength(const TInt32 aFileHandle);
-	static TUint32 GetLength(TText *aName);
-	static TUint32 Read(TText *aName, TAny *someMem);
+	static TUint32 GetLength(const char* aName);
+	static TUint32 Read(const char* aName, TAny *someMem);
 	};
 //
 //inline TAny* operator new(TUint /*aSize*/, TAny* aBase)
@@ -133,11 +135,11 @@ class HPrint
 	{
 public:
 	~HPrint();
-	void SetLogFile(TText *aFileName);
+	void SetLogFile(const char* aFileName);
 	void CloseLogFile();						//	Added to close intermediate log files.
 	TInt PrintString(TPrintType aType,const char *aFmt,...);
 public:
-	TText iText[KMaxStringLength];
+	char iText[KMaxStringLength];
 	TBool iVerbose;
 private:
 	ofstream iLogFile;
@@ -163,19 +165,18 @@ void ByteSwap(TUint *aPtr, TInt aSize);
 
 extern TBool gLittleEndian;
 
-
 /**
  Convert string to number.
 */
 template <class T>
-TInt Val(T& aVal, char* aStr)
+TInt Val(T& aVal, const char* aStr)
 	{
 
 	T x;
 	#ifdef __TOOLS2__
 	istringstream val(aStr);
 	#else
-	istrstream val(aStr,strlen(aStr));
+	istrstream val((char*)aStr,strlen(aStr));
 	#endif
 	#if defined(__MSVCDOTNET__) || defined (__TOOLS2__) 
 		val >> setbase(0);
@@ -186,7 +187,7 @@ TInt Val(T& aVal, char* aStr)
 	aVal=x;
 	return KErrNone;
 	}
-
+ 
 // Filename decompose routines
 enum TDecomposeFlag
 	{
@@ -198,7 +199,6 @@ class TFileNameInfo
 	{
 public:
 	TFileNameInfo(const char* aFileName, TBool aLookForUid);
-public:
 	const char* iFileName;
 	TInt iTotalLength;
 	TInt iBaseLength;
@@ -212,7 +212,8 @@ extern char* NormaliseFileName(const char* aName);
 extern char* SplitFileName(const char* aName, TUint32& aUid, TUint32& aModuleVersion, TUint32& aFlags);
 extern char* SplitFileName(const char* aName, TUint32& aModuleVersion, TUint32& aFlags);
 extern TInt ParseCapabilitiesArg(SCapabilitySet& aCapabilities, const char *aText);
-extern TInt ParseBoolArg(TBool& aValue, const char *aText);
+extern TInt ParseBoolArg(TBool& aValue, const char *aText); 
+extern TBool IsValidNumber(const char* aStr);
 
 #endif
 

@@ -21,18 +21,17 @@
 
 #ifndef HASH_H
 #define HASH_H
-
-#pragma warning(disable: 4786) // identifier was truncated to '255' characters in the debug information
+ 
 
 #include<iostream>
 #include<list>
 #include<map>
 #include<string>
+using namespace std;
 
-typedef std::list<std::string> StringList;
-typedef std::map<unsigned int,StringList> Table;
-typedef std::string String;
 
+typedef multimap<unsigned int,string > Table;
+ 
 /** 
 class Hash Table
 
@@ -44,11 +43,11 @@ class HashTable
 public:
 	HashTable(int aSize);
 	~HashTable(void);
-	int Hash(String aString);
-	bool IsAvailable(String aString);
-	void Insert(String aString);
-	void InsertStringList(StringList& aList);
-	void Delete(String aString);
+	int Hash(const string& aString);
+	bool IsAvailable(const string& aString);
+	void Insert(const string& aString);
+	void InsertStringList(const StringList& aList);
+	void Delete(const string& aString);
 
 private:
 	int iSize;       /* the size of the table */

@@ -21,10 +21,10 @@
 #include <string.h>
 #include "elftran.h"
 #include <e32std.h>
-#include <elfdefs.h>
+#include "elfdefs.h"
 #include "elffile.h"
-#include <h_ver.h>
-#include <h_utl.h>
+#include "h_ver.h"
+#include "h_utl.h"
 
 extern TUid gUid1, gUid2, gUid3;
 extern int gSetUid1, gSetUid2, gSetUid3;
@@ -112,7 +112,7 @@ TInt E32ImageFile_ELF::Translate(const char* aFileName, TUint aDataBase, TBool a
 {
 	iSource = EElfFile;
 	ELFFile elffile;
-	if (!elffile.Init((const TText * const)aFileName)) return KErrGeneral;
+	if (!elffile.Init(aFileName)) return KErrGeneral;
 		
 	iFileName = strdup(aFileName);
 

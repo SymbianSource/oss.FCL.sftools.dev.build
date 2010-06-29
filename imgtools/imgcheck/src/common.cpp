@@ -18,9 +18,9 @@
 
 
 /**
- @file
- @internalComponent
- @released
+@file
+@internalComponent
+@released
 */
 
 #include "common.h"
@@ -36,11 +36,10 @@ Function to convert Integer to string
 
 @return - return the converted string
 */
-String Common::IntToString(unsigned int aValue)
-{
-    OStringStream outStrStream;
-    outStrStream << aValue;
-    return outStrStream.str();
+string Common::IntToString(unsigned int aValue) {
+	ostringstream outStrStream;
+	outStrStream << aValue;
+	return outStrStream.str();
 }
 
 /** 
@@ -53,10 +52,9 @@ Function to convert string to integer
 
 @return - return the converted value
 */
-unsigned int Common::StringToInt(String& aStringVal)
-{
-    std::istringstream iss(aStringVal);
-    unsigned int intVal;
-    iss >> std::dec >> intVal;
-    return intVal;
+unsigned int Common::StringToInt(string& aStringVal) {
+	istringstream iss(aStringVal);
+	unsigned int intVal;
+	iss >> dec >> intVal;
+	return intVal;
 }

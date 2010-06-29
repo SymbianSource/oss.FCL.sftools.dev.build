@@ -33,6 +33,11 @@ BEGIN {
 	}	
 }
 
+# Version
+my $MajorVersion = 1;
+my $MinorVersion = 1;
+my $PatchVersion = 0;
+
 use lib $PerlLibPath;
 use Defutl;
 
@@ -66,6 +71,14 @@ my $interworkingp = $opts{"inter"};
 my $interworking = "${oP}apcs /nointer";
 $interworking = "${oP}apcs /inter" if ($interworkingp);
 
+my $gDelim;
+if ($^O eq "MSWin32") {
+	$gDelim = '\\';
+}
+else {
+	$gDelim = '/';
+}
+
 my @objectFiles;
 
 &main;
@@ -91,7 +104,7 @@ sub main ()
 sub usage( )
 {
         print "\n";
-        print "DEF2DLL -Creates binary objects used to implement the Symbian OS DLL model\n";
+        print "DEF2DLL -Creates binary objects used to implement the Symbian OS DLL model v$MajorVersion.$MinorVersion.$PatchVersion\n";
         print "\n";
         print "Usage: def2dll --deffile=<file> [--path=<dir>] [--bldpath=<dir>] [--import=<file>]  [--linkas=<file>] [--inter] [--export=<file>] [--sym_name_lkup]\n";
 
@@ -103,7 +116,7 @@ sub usage( )
         print "\t--linkas=<file>     		: linkas to file name specified\n";
         print "\t--inter                 	: enables interworking on ARM and THUMB\n";
         print "\t--export=<file>			: export to filename\n";
-        print "\t--sym_name_lkup         	: symbol name ordinal number lookupç\n";
+        print "\t--sym_name_lkup         	: symbol name ordinal number lookup\n";
         print "\n";
         exit 1;
 }
@@ -148,8 +161,8 @@ sub genExpFile ($$$)
     my $numkeys = keys %symbolIndexMap;
     my $failed = 0;
 
-    open EXPFILE, ">$path\\$expFile.s" or
-		die "Error: can't create $path\\$expFile.s\n";
+    open EXPFILE, ">$path$gDelim$expFile.s" or
+		die "Error: can't create $path$gDelim$expFile.s\n";
 
     print EXPFILE "\tEXPORT __DLL_Export_Table__\n\n";
     print EXPFILE "\tEXPORT |DLL\#\#ExportTable|\n\n";
@@ -204,9 +217,9 @@ sub genExpFile ($$$)
     print EXPFILE "\tEND";
     close EXPFILE;
 
-    $failed = system "armasm $floatingpointmodel $interworking -o $path\\$expFile.exp $path\\$expFile.s";
-    unlink ("$path\\$expFile.s") unless $failed;
-    die "Error: cant create $path\\$expFile.exp\n" if $failed;
+    $failed = system "armasm $floatingpointmodel $interworking -o $path$gDelim$expFile.exp $path$gDelim$expFile.s";
+    unlink ("$path$gDelim$expFile.s") unless $failed;
+    die "Error: cant create $path$gDelim$expFile.exp\n" if $failed;
 }
 
 my %DataSymbols = ();
@@ -216,8 +229,8 @@ sub genVtblExportFile($$)
     my ($bldpath, $dllName) = @_;
     my $FileName = "VtblExports";
 
-    open VTBLFILE, ">$bldpath\\$FileName.s" or
-		die "Error: can't create $bldpath\\$FileName.s\n";
+    open VTBLFILE, ">$bldpath$gDelim$FileName.s" or
+		die "Error: can't create $bldpath$gDelim$FileName.s\n";
 
     print VTBLFILE "\tAREA |.directive|, NOALLOC, READONLY, ALIGN=2\n";
     printf VTBLFILE "\tDCB \"\#\<SYMEDIT\>\#\\n\"\n";
@@ -233,23 +246,23 @@ sub genVtblExportFile($$)
     print VTBLFILE "\tEND";
     close VTBLFILE;
 
-    my $failed = system "armasm $floatingpointmodel $interworking -o $bldpath\\$FileName.o $bldpath\\$FileName.s";
-    unlink ("$bldpath\\$FileName.s");
-    die "Error: cant create $bldpath\\$FileName.o\n" if $failed;
-    push @objectFiles, "$bldpath\\$FileName.o";
+    my $failed = system "armasm $floatingpointmodel $interworking -o $bldpath$gDelim$FileName.o $bldpath$gDelim$FileName.s";
+    unlink ("$bldpath$gDelim$FileName.s");
+    die "Error: cant create $bldpath$gDelim$FileName.o\n" if $failed;
+    push @objectFiles, "$bldpath$gDelim$FileName.o";
 }
 
 sub genLibFile ($$$$)
 {
     my ($path, $bldpath, $libFile, $dllName) = @_;
-    my $tempFileName = "$bldpath\\$compName";
-    my $viaFileName = sprintf("$bldpath\\_t%x_via_.txt", time);
+    my $tempFileName = "$bldpath$gDelim$compName";
+    my $viaFileName = sprintf("$bldpath${gDelim}_t%x_via_.txt", time);
     my $keyz = keys %symbolIndexMap;
     my $failed = 0;
     my $key;
 
     if ($keyz > 0) {
-		open STUBGEN, "|$ENV{'EPOCROOT'}/epoc32/tools/genstubs" if $exports;
+		open STUBGEN, "|genstubs" if $exports;
 		foreach $key (sort keys %symbolIndexMap) {
 			my $symbol = $symbolIndexMap{$key};
 			my $stubFileName = "$tempFileName-$key";
@@ -263,7 +276,7 @@ sub genLibFile ($$$$)
 		genVtblExportFile($bldpath, $dllName);
     } else {
 		# create dummy stub so armar creates a .lib for us
-		open STUBGEN, "|$ENV{'EPOCROOT'}/epoc32/tools/genstubs";
+		open STUBGEN, "|genstubs";
 		print STUBGEN "$tempFileName-stub.o $tempFileName##stub $dllName##dummy\n";
 		push @objectFiles, "$tempFileName-stub.o";
     }
@@ -272,7 +285,7 @@ sub genLibFile ($$$$)
     open VIAFILE, ">$viaFileName" or
 		die "Error: can't create VIA fie $viaFileName\n";
 
-    print VIAFILE "${oP}create \"$path\\$libFile\"\n";
+    print VIAFILE "${oP}create \"$path$gDelim$libFile\"\n";
     my $objectFile;
     foreach $objectFile (@objectFiles) {
 		print VIAFILE "\"$objectFile\"\n";
@@ -282,7 +295,7 @@ sub genLibFile ($$$$)
     $failed = system( "armar ${oP}via $viaFileName");
     push @objectFiles, $viaFileName;
     unlink @objectFiles;
-    die "Error: can't create $path\\$libFile\n" if $failed;
+    die "Error: can't create $path$gDelim$libFile\n" if $failed;
 }
 
 __END__

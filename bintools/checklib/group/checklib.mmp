@@ -20,6 +20,7 @@ targettype      exe
 userinclude     ..
 userinclude     ../object/coff
 userinclude 	../..
+systeminclude   ../../elftools/inc
 
 sourcepath      ..
 

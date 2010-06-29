@@ -39,7 +39,7 @@ BEGIN {
 # Version
 my $MajorVersion = 1;
 my $MinorVersion = 1;
-my $PatchVersion = 0;
+my $PatchVersion = 1;
 
 use lib $PerlLibPath;
 use Defutl;

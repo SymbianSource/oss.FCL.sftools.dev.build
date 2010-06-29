@@ -1,3 +1,4 @@
+#!/usr/bin/perl
 # e32toolp\e32util\omapsig.pl
 #
 # Copyright (c) 2008 Nokia Corporation and/or its subsidiary(-ies).
@@ -24,8 +25,13 @@ use warnings;
 use IO::Handle;
 use File::Copy;
 
+# Version
+my $MajorVersion = 1;
+my $MinorVersion = 1;
+my $PatchVersion = 0;
+
 if (scalar(@ARGV)!=3) {
-	die "perl omapsig.pl <load address in hex> <input miniboot> <output minboot with sig>\n";
+	die "OMAPSIG signature tool V$MajorVersion.$MinorVersion.$PatchVersion\nperl omapsig.pl <load address in hex> <input miniboot> <output minboot with sig>\n";
 }
 
 my ($load_address, $infile, $outfile) = @ARGV;

@@ -173,10 +173,10 @@ public:
 
 	void UpdateHeaderCrc();
 
-	bool WriteImage(const char * aName);
+	bool WriteImage(const char* aName);
 
 public:
-	const char * iFileName;
+	const char* iFileName;
 
 	char * iE32Image;
 	uint8 * iExportBitMap;
@@ -226,7 +226,7 @@ public:
 	TUint32 Capability();
 	TUint32 Format();
 
-	void Dump(TText *aFileName,TInt aDumpFlags);
+	void Dump(const char* aFileName,TInt aDumpFlags);
 	void DumpHeader(TInt aDumpFlags);
 	void DumpData(TInt aDumpFlags);
 	void DumpSymbolInfo(E32EpocExpSymInfoHdr *aSymInfoHdr);

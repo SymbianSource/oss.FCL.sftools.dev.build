@@ -20,7 +20,7 @@
 #define __ELFFILE_H__
 #include <e32rom.h>
 #include "e32ldfmt.h"
-#include <elfdefs.h>
+#include "elfdefs.h"
 
 #define ELFADDR(rtype, p, o) (rtype *)(((char *)p) + o)
 
@@ -32,7 +32,7 @@ class ELFFile
 public:
 	ELFFile();
 	~ELFFile();
-	TBool Init(const TText * const aFileName);
+	TBool Init(const char* aFileName);
 	void Close(void);
 
 	char *CreateImportSection(TInt &aSize);
@@ -84,8 +84,8 @@ public:
 	TUint GetExportTableOffset(void);
 	TUint GetEntryPointOffset(void) { return iElfFile->e_entry - iCodeSegmentHdr->p_vaddr; }
 
-	TBool SymbolPresent(TText *s);
-	Elf32_Sym * FindSymbol(const TText *);
+	TBool SymbolPresent(const char* s);
+	Elf32_Sym * FindSymbol(const char* s);
 
 	TBool GetExceptionIndexInfo(TUint32 &aOffset);
 	TBool SetUpLookupTable();
@@ -122,7 +122,7 @@ private:
 	friend class E32ImageFile;
 	friend class E32ImageFile_ELF;
 
-	TText * iFileName;
+	char* iFileName;
 	TInt32 iFileHandle;
 	Elf32_Ehdr * iElfFile;
 	Elf32_Phdr * iPhdr;

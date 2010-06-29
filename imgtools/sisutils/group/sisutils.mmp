@@ -22,7 +22,11 @@ targettype		lib
 sourcepath	../src
 source		sisutils.cpp sis2iby.cpp pkglanguage.cpp pkgfileparser.cpp
 
+sourcepath	../../imglib/host
+source		utf16string.cpp
+
 userinclude	../inc
+userinclude	../../imglib/inc
 
 OS_LAYER_SYSTEMINCLUDE_SYMBIAN
 

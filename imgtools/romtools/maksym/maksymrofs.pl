@@ -20,19 +20,10 @@ no strict 'vars';
 use English;
 use FindBin;		# for FindBin::Bin
 
-my $PerlLibPath;    # fully qualified pathname of the directory containing our Perl modules
-
-BEGIN {
-    # check user has a version of perl that will cope require 5.005_03;
-    # establish the path to the Perl libraries: currently the same directory as this script
-    $PerlLibPath = $FindBin::Bin; # X:/epoc32/tools
-    $PerlLibPath =~ s/\//\\/g;	# X:\epoc32\tools
-    $PerlLibPath .= "\\";
-}
-
-use lib $PerlLibPath;
-use Modload;
-Load_SetModulePath($PerlLibPath);
+# Version
+my $MajorVersion = 1;
+my $MinorVersion = 1;
+my $PatchVersion = 0;
 
 # Globals
 my $maksym = "";
@@ -194,29 +185,16 @@ sub ProcessArmv5File
 				# particular address, this is because aliases are included.
 				# The following code checks that the correct function (i.e. the one with
 				# non-zero size) is being included in the symbol file.
-				if(exists $syms{$addr})
-				{ # an entry at this address exists, replace if it is an alias
-					if( ($size != 0) && ($addr > 0) )
-					{
-						if( ! defined $baseOffset )
-						{
-							$baseOffset = $addr;
-						}
-						$syms{$addr - $baseOffset} = "$size    $sym $section";
-					}
-				}
-				else
-				{ # no entry at this address so create one regardless of whether size is zero
-					if( $addr > 0 )
-					{
-						if( ! defined $baseOffset )
-						{
-							$baseOffset = $addr;
-						}	
-						$syms{$addr - $baseOffset} = "$size    $sym $section";
-					}
-				}
-
+                                if($addr > 0) {
+                                    if( ! defined $baseOffset ) {
+                                        $baseOffset = $addr;
+                                    }
+                                    # no entry at this address so create one regardless of whether size is zero
+                                    # an entry at this address exists, replace if it is an alias
+                                    if( (! exists $syms{$addr-$baseOffset}) || !($size eq "0000")) {
+                                        $syms{$addr - $baseOffset} = "$size    $sym $section";
+                                    }
+                                }
 			}
 		}
 
@@ -316,7 +294,7 @@ sub args
 	{
 		$arg = shift @ARGV;
 
-		if ($arg=~/^[\-\/](\S*)$/) 
+		if ($arg=~/^[\-](\S*)$/) 
 		{
 			$flag=$1;
 
@@ -361,9 +339,7 @@ sub help ()
 {
 	my $build;
 
-	&Load_ModuleL('E32TPVER');
-	print "\nmaksymrofs - Produce symbolic information given a ROFS image (Build ",
-	&E32tpver, ")\n";
+	print "\nmaksymrofs - Produce symbolic information given a ROFS image V${MajorVersion}.${MinorVersion}.${PatchVersion}\n";
 	&usage;
 	exit 0;
 }

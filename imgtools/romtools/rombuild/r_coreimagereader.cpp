@@ -27,7 +27,8 @@
 
 #include "r_coreimage.h"
 #include "r_global.h"
-
+#include "utf16string.h"
+ 
 
 #define ROM_PTR(base_ptr) ((TInt8*)iRomHdr + (base_ptr - iRomHdr->iRomBase))
 
@@ -39,7 +40,7 @@ const TUint KEntryAttHidden=0x0002;
 
 // CoreRomImageReader
 // 
-CoreRomImageReader::CoreRomImageReader(String aFileName, TBool aUseMemMap) : iImgFileName(aFileName), 
+CoreRomImageReader::CoreRomImageReader(const char* aFileName, TBool aUseMemMap) : iImgFileName(aFileName), 
 iData(0), iLoaderHdr(0), iRomHdr(0), iRootDirList(0), iRootDirectory(0), iUseMemMap(aUseMemMap), iImageMap(0)
 {
 }
@@ -113,14 +114,14 @@ TBool CoreRomImageReader::OpenImage()
 {
 	TUint aLen = 0;
 
-	Ifstream aIf(iImgFileName.data(), std::ios::binary | std::ios::in);
+	ifstream aIf(iImgFileName.c_str(), ios_base::binary | ios_base::in);
 	if( !aIf.is_open() )
 	{
-		Print(EError, "Cannot open file %s", (char*)iImgFileName.data());
+		Print(EError, "Cannot open file %s", iImgFileName.c_str());
 		return EFalse;
 	}
 
-	aIf.seekg(0, std::ios::end);
+	aIf.seekg(0, ios_base::end);
 	aLen = aIf.tellg();
 
 	if(iUseMemMap)
@@ -143,12 +144,12 @@ TBool CoreRomImageReader::OpenImage()
 		}
 		memset(iData, 0, aLen);
 	}
-	aIf.seekg(0, std::ios::beg);
+	aIf.seekg(0, ios_base::beg);
 	aIf.read((char*)iData, aLen);
 
 	if(!IsCoreROM() || !StoreImageHeader())
 	{
-		Print(EError, "Invalid Core ROM image %s", (char*)iImgFileName.data());
+		Print(EError, "Invalid Core ROM image %s", iImgFileName.c_str());
 		aIf.close();
 		return EFalse;
 	}
@@ -171,7 +172,7 @@ TBool CoreRomImageReader::StoreImageHeader()
 
 TInt CoreRomImageReader::CreateRootDirectory()
 {
-	iRootDirectory = new TRomNode((TText*)"", (TRomBuilderEntry*)0);
+	iRootDirectory = new TRomNode("", (TRomBuilderEntry*)0);
 	if (iRootDirectory == 0 )
 		return KErrNoMemory;
 	return KErrNone;
@@ -245,7 +246,7 @@ TBool CoreRomImageReader::ProcessImage()
 		TUint8* dest = (aData + sizeof(TRomLoaderHeader) + pRomHdr->iPageableRomStart);
 		SRomPageInfo* pi = (SRomPageInfo*)((TUint8*)pRomHdr + pRomHdr->iRomPageIndex);
 		
-                CBytePair bpe(gFastCompress);
+                CBytePair bpe;
 		for(TInt i=0; i<numPages; i++,pi++)
 		{
 			if (pi->iPagingAttributes != SRomPageInfo::EPageable) // skip uncompressed part at the beginning of ROM image
@@ -275,7 +276,7 @@ TBool CoreRomImageReader::ProcessImage()
 						{
 							delete [] aData;
 						}
-						Print(EError, "Corrupted BytePair compressed ROM image %s", (char*)iImgFileName.data());
+						Print(EError, "Corrupted BytePair compressed ROM image %s", iImgFileName.c_str());
 						return EFalse;
 					}
 					
@@ -294,7 +295,7 @@ TBool CoreRomImageReader::ProcessImage()
 					{
 						delete [] aData;
 					}
-					Print(EError, "Undefined compression type in %s", (char*)iImgFileName.data());
+					Print(EError, "Undefined compression type in %s", iImgFileName.c_str());
 					return EFalse;
 				}
 			}
@@ -390,8 +391,8 @@ TInt CoreRomImageReader::BuildDir(TInt16 *aOffsetTbl, TInt16 aOffsetTblCount,
 	TRomEntry		*aRomEntry;
 	TUint32			aOffsetFromBase;
 
-	String	aName;
-	char	*aPtr;
+	string		aName;
+	//char	*aPtr;
 
 	while( aOffsetTblCount )
 	{
@@ -400,14 +401,14 @@ TInt CoreRomImageReader::BuildDir(TInt16 *aOffsetTbl, TInt16 aOffsetTblCount,
 		aOffsetFromBase <<= 2;
 
 		aRomEntry = (TRomEntry*)((char*)aPaRomDir + sizeof(int) + aOffsetFromBase);
-
-		aPtr = (char*)aRomEntry->iName;
-		Name(aName, aPtr, aRomEntry->iNameLength);
+		UTF16String unistr(reinterpret_cast<const TUint16*>(aRomEntry->iName),aRomEntry->iNameLength);
+		if(!unistr.ToUTF8(aName))
+			aName.assign(reinterpret_cast<const char*>(aRomEntry->iName),aRomEntry->iNameLength);
 
 		if( aRomEntry->iAtt & KEntryAttDir )
 		{
 			// add directory
-			aNewFSEntry = aPaFSEntry->NewSubDir((unsigned char*)aName.data());
+			aNewFSEntry = aPaFSEntry->NewSubDir(aName.c_str());
 			if(aRomEntry->iAtt & KEntryAttHidden)
 				aNewFSEntry->iHidden = ETrue;
 			else
@@ -422,7 +423,7 @@ TInt CoreRomImageReader::BuildDir(TInt16 *aOffsetTbl, TInt16 aOffsetTblCount,
 		else
 		{
 			// add file
-			if(AddFile(aPaFSEntry, (char*)aName.data(), aRomEntry) != KErrNone)
+			if(AddFile(aPaFSEntry, aName.c_str(), aRomEntry) != KErrNone)
 			{
 				return KErrNoMemory;
 			}
@@ -435,7 +436,7 @@ TInt CoreRomImageReader::BuildDir(TInt16 *aOffsetTbl, TInt16 aOffsetTblCount,
 	return KErrNone;
 }
 
-TInt CoreRomImageReader::AddFile(TRomNode *aPa, char *entryName, TRomEntry* aRomEntry)
+TInt CoreRomImageReader::AddFile(TRomNode *aPa, const char* entryName, TRomEntry* aRomEntry)
 {
 	TRomImageHeader*	aImgHdr = 0;
 	TRomBuilderEntry*	aFile = 0;
@@ -445,14 +446,15 @@ TInt CoreRomImageReader::AddFile(TRomNode *aPa, char *entryName, TRomEntry* aRom
 
 	aImgHdr = (TRomImageHeader*)ROM_PTR(aRomEntry->iAddressLin);
 
-	aFile = new TRomBuilderEntry(0, (TUint8*)entryName);
+	aFile = new TRomBuilderEntry(0, entryName);
 
 	if(!aFile)
 	{
 		return KErrNoMemory;
 	}
-
-	aFile->iBareName = strdup((char*)aFile->iName);
+	size_t len = strlen(aFile->iName) + 1;	
+	aFile->iBareName = new char[len];
+	memcpy(aFile->iBareName,aFile->iName,len);
 	aFile->iUid1 = aImgHdr->iUid1;
 	aFile->iUid2 = aImgHdr->iUid2;
 	aFile->iUid3 = aImgHdr->iUid3;
@@ -463,7 +465,7 @@ TInt CoreRomImageReader::AddFile(TRomNode *aPa, char *entryName, TRomEntry* aRom
 
 	aFile->iResource = !IsExecutable(aUid1);
 
-	aNewFSEntry = new TRomNode((TUint8*)entryName, aFile);
+	aNewFSEntry = new TRomNode(entryName, aFile);
 	if(!aNewFSEntry)
 	{
 		return KErrNoMemory;
@@ -524,18 +526,7 @@ TInt CoreRomImageReader::AddFile(TRomNode *aPa, char *entryName, TRomEntry* aRom
 	return KErrNone;
 }
 
-void CoreRomImageReader::Name(String& aName, char * aUnicodeName, int aLen)
-{
-	int aPos = 0;
-	int uncodeLen = aLen << 1;
-	aName=("");
-	while( aPos < uncodeLen)
-	{
-		if( aUnicodeName[aPos] )
-			aName += aUnicodeName[aPos];
-		aPos++;
-	}
-}
+ 
 
 TBool CoreRomImageReader::IsExecutable(TUint8* Uids1)
 {

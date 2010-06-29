@@ -55,7 +55,7 @@ Add a new entry to renamed file map.
 @internalComponent
 @released
 */
-void CPatchDataProcessor::AddToRenamedFileMap(String aCurrentName, String aNewName)
+void CPatchDataProcessor::AddToRenamedFileMap(string aCurrentName, string aNewName)
 {
 	iRenamedFileMap[aCurrentName]=aNewName;
 }

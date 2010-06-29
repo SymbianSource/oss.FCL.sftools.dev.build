@@ -37,8 +37,7 @@ Constructor intializes the iVidValList member.
 @param aImageReaderList - List of ImageReader insatance pointers
 */
 VidChecker::VidChecker(CmdLineHandler* aCmdPtr, ImageReaderPtrList& aImageReaderList)
-:Checker(aCmdPtr, aImageReaderList)
-{
+:Checker(aCmdPtr, aImageReaderList) {
 	iVidValList = iCmdLine->VidValueList();
 	iVidValList.push_back(KDefaultVid);
 }
@@ -49,8 +48,7 @@ Destructor
 @internalComponent
 @released
 */
-VidChecker::~VidChecker()
-{
+VidChecker::~VidChecker() {
 	iVidValList.clear();
 }
 
@@ -62,36 +60,37 @@ Fucntion responsible to Prepare the ROM and ROFS image VID data
 
 @param ImgVsExeStatus - Global integrated container which contains image, exes and attribute value status.
 */
-void VidChecker::Check(ImgVsExeStatus& aImgVsExeStatus)
-{
-	ImageReaderPtrList::iterator begin = iImageReaderList.begin();
-	ImageReaderPtrList::iterator end = iImageReaderList.end();
-
-	ExeVsIdDataMap::iterator exeBegin;
-	ExeVsIdDataMap::iterator exeEnd;
-
-	String imageName;
-
-	while(begin != end)
-	{
-		ImageReader* imageReader = *begin;
-		imageName = imageReader->ImageName();
-		ExceptionReporter(GATHERINGIDDATA, (char*)KVid.c_str(),(char*)imageName.c_str()).Log();
+void VidChecker::Check(ImgVsExeStatus& aImgVsExeStatus) {  	
+	int readerCount = iImageReaderList.size();
+	for(int i = 0 ; i < readerCount ; i++ ) {
+		ImageReader* imageReader = iImageReaderList.at(i);
+		const char* imageName = imageReader->ImageName();
+		ExceptionReporter(GATHERINGIDDATA, KVid ,imageName).Log();
 		imageReader->PrepareExeVsIdMap();
-		ExeVsIdDataMap& exeVsIdDataMa = (ExeVsIdDataMap&)imageReader->GetExeVsIdMap();
-		exeBegin = exeVsIdDataMa.begin();
-		exeEnd = exeVsIdDataMa.end();
-		if((aImgVsExeStatus[imageName].size() == 0) 
-			|| (aImgVsExeStatus[imageName][exeBegin->first].iIdData == KNull))
-		{
-			while(exeBegin != exeEnd)
-			{
-				aImgVsExeStatus[imageName][exeBegin->first].iIdData = exeBegin->second;
-				aImgVsExeStatus[imageName][exeBegin->first].iExeName = exeBegin->first;
-				++exeBegin;
-			}
+		ExeVsIdDataMap& exeVsIdDataMap = const_cast<ExeVsIdDataMap&>(imageReader->GetExeVsIdMap());
+		ImgVsExeStatus::iterator pos = aImgVsExeStatus.find(imageName);
+		ExeVsMetaData* p = 0;
+		if(pos == aImgVsExeStatus.end()){
+			p = new ExeVsMetaData();
+			put_item_to_map(aImgVsExeStatus,imageName,p);
 		}
-		++begin;
+		else
+			p = pos->second ;
+		for(ExeVsIdDataMap::iterator it = exeVsIdDataMap.begin(); 
+		it != exeVsIdDataMap.end(); it++) {
+			ExeVsMetaData::iterator i = p->find(it->first);
+			if(i == p->end()){
+				ExeContainer container;
+				container.iExeName = it->first;
+				container.iIdData = it->second ;
+				put_item_to_map(*p,it->first,container);
+			}
+			else if(i->second.iIdData == KNull){				
+				i->second.iExeName = it->first;
+				i->second.iIdData = it->second ;
+			}  
+		}
+		 
 	}
 }
 
@@ -103,32 +102,27 @@ Function responsible to Validate and write the VID data into Reporter.
 
 @param aExeContainer - Global integrated container which contains all the attribute, values and the status.
 */
-void VidChecker::PrepareAndWriteData(ExeContainer* aExeContainer)
-{
+void VidChecker::PrepareAndWriteData(ExeContainer& aExeContainer) {
 	ExeAttribute* exeAtt = KNull;
 	
 	IdData* idData = KNull;
 
-	idData = aExeContainer->iIdData;
+	idData = aExeContainer.iIdData;
 	exeAtt = new ExeAttribute;
-	if(!exeAtt)
-	{
+	if(!exeAtt) {
 		throw ExceptionReporter(NOMEMORY, __FILE__, __LINE__);
 	}
 	exeAtt->iAttName = KVid;
 	exeAtt->iAttValue = Common::IntToString(idData->iVid);
-	if(!iNoCheck)
-	{
+	if(!iNoCheck) {
 		FillExeVidStatus(idData);
 		exeAtt->iAttStatus = idData->iVidStatus;
 	}
-	else
-	{
+	else {
 		exeAtt->iAttStatus = KNull;
 	}
-	if(iAllExecutables || (exeAtt->iAttStatus == KInValid) || iNoCheck)
-	{
-		aExeContainer->iExeAttList.push_back(exeAtt);
+	if(iAllExecutables || (exeAtt->iAttStatus == KInValid) || iNoCheck) {
+		aExeContainer.iExeAttList.push_back(exeAtt);
 	}
 }
 
@@ -143,19 +137,13 @@ comparison is success then the VID status is Valid.
 
 @param aIdData - Executable's IdData data instance.
 */
-void VidChecker::FillExeVidStatus(IdData* aIdData)
-{
-	aIdData->iVidStatus.assign(KInValid);
-	UnIntList::iterator vidValBegin = iVidValList.begin();
-	UnIntList::iterator vidValEnd = iVidValList.end();
-
-	while(vidValBegin != vidValEnd)
-	{
-		if((*vidValBegin) == aIdData->iVid)
-		{
-			aIdData->iVidStatus = KValid;
+void VidChecker::FillExeVidStatus(IdData* aIdData) {
+	aIdData->iVidStatus.assign(KInValid); 
+	for(UnIntList::iterator it = iVidValList.begin(); 
+		it != iVidValList.end(); it++) {
+		if(*it == aIdData->iVid) {
+			aIdData->iVidStatus.assign(KValid);
 			break;
-		}
-		++vidValBegin;
+		} 
 	}
 }

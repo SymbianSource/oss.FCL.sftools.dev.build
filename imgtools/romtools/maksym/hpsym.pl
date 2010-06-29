@@ -32,20 +32,15 @@ my $skip;
 # Standard e32toolp path scanning
 use FindBin;		# for FindBin::Bin
 
-my $PerlLibPath;    # fully qualified pathname of the directory containing our Perl modules
-
 BEGIN {
 # check user has a version of perl that will cope
 	require 5.005_03;
-# establish the path to the Perl libraries: currently the same directory as this script
-	$PerlLibPath = $FindBin::Bin;	# X:/epoc32/tools
-	$PerlLibPath =~ s/\//\\/g;	# X:\epoc32\tools
-	$PerlLibPath .= "\\";
 }
 
-use lib $PerlLibPath;
-use Modload;
-Load_SetModulePath($PerlLibPath);
+# Version
+my $MajorVersion = 1;
+my $MinorVersion = 1;
+my $PatchVersion = 0;
 
 if (@ARGV)
   {
@@ -166,10 +161,8 @@ sub help ()
   {
 	my $build;
 
-	&Load_ModuleL('E32TPVER');
 	print "\nhpsym - Produce symbolic info in \"HP GPA Symbol File Format\"" .
-	  " suitable for use\n        with a HP logic analyser (Build ",
-	  &E32tpver, ")\n";
+	  " suitable for use\n        with a HP logic analyser V${MajorVersion}.${MinorVersion}.${PatchVersion}\n";
 	&usage;
 	exit 0;
   }

@@ -31,9 +31,9 @@ For any change in the input or output format or enhancements or feature support 
 For any patch or maintenance(defect fixes) changes the maintenance version should be incremented.
 The maintenance version should be reset to 0 if the minor version is incremented.
 */
-const String gMajorVersion("V1");
-const String gMinorVersion(".3");
-const String gMaintenanceVersion(".5 \n");
+const string gMajorVersion("V1");
+const string gMinorVersion(".4");
+const string gMaintenanceVersion(".0 \n");
 
 /** 
 Copyright to be displayed
@@ -41,7 +41,7 @@ Copyright to be displayed
 @internalComponent
 @released
 */
-const String gCopyright("Copyright (c) 2007-2009 Nokia Corporation.\n");
+const string gCopyright("Copyright (c) 2007-2010 Nokia Corporation.\n");
 
 /** 
 Tool description
@@ -49,6 +49,6 @@ Tool description
 @internalComponent
 @released
 */
-const String gToolDesc("\nIMGCHECK - Tool for ROM/ROFS partition check ");
+const string gToolDesc("\nIMGCHECK - Tool for ROM/ROFS partition check ");
 
 #endif //VERSION_H

@@ -25,16 +25,43 @@ PRJ_PLATFORMS
 TOOLS2
 
 PRJ_EXPORTS
-../boostlibrary/binary/linux/libboost_thread-mgw34-mt-1_39.a	/epoc32/release/tools2/rel/libboost_thread-mgw34-mt-1_39_linux.a
-../boostlibrary/binary/linux/libboost_thread-mgw34-mt-1_39.a	/epoc32/release/tools2/deb/libboost_thread-mgw34-mt-1_39_linux.a
-../boostlibrary/binary/windows/libboost_thread-mgw34-mt-1_39.a	/epoc32/release/tools2/rel/libboost_thread-mgw34-mt-1_39_win32.a
-../boostlibrary/binary/windows/libboost_thread-mgw34-mt-1_39.a	/epoc32/release/tools2/deb/libboost_thread-mgw34-mt-1_39_win32.a
-../boostlibrary/binary/windows/mingwm10.dll	/epoc32/tools/mingwm10.dll
+#ifdef TOOLS2_LINUX
+../boostlibrary/binary/linux/libboost_filesystem-1.39.a /epoc32/release/tools2/linux-i386-libc2_5/rel/libboost_filesystem-1.39.a
+../boostlibrary/binary/linux/libboost_thread-1.39.a /epoc32/release/tools2/linux-i386-libc2_5/rel/libboost_thread-1.39.a
+../boostlibrary/binary/linux/libboost_regex-1.39.a /epoc32/release/tools2/linux-i386-libc2_5/rel/libboost_regex-1.39.a
+../boostlibrary/binary/linux/libboost_system-1.39.a /epoc32/release/tools2/linux-i386-libc2_5/rel/libboost_system-1.39.a
 
+../boostlibrary/binary/linux/libboost_filesystem-1.39.a /epoc32/release/tools2/linux-i386-libc2_5/deb/libboost_filesystem-1.39.a
+../boostlibrary/binary/linux/libboost_thread-1.39.a /epoc32/release/tools2/linux-i386-libc2_5/deb/libboost_thread-1.39.a
+../boostlibrary/binary/linux/libboost_regex-1.39.a /epoc32/release/tools2/linux-i386-libc2_5/deb/libboost_regex-1.39.a
+../boostlibrary/binary/linux/libboost_system-1.39.a /epoc32/release/tools2/linux-i386-libc2_5/deb/libboost_system-1.39.a
+
+../boostlibrary/binary/linux/libboost_filesystem-1.39.a /epoc32/release/tools2/linux-x86_64-libc2_5/rel/libboost_filesystem-1.39.a
+../boostlibrary/binary/linux/libboost_thread-1.39.a /epoc32/release/tools2/linux-x86_64-libc2_5/rel/libboost_thread-1.39.a
+../boostlibrary/binary/linux/libboost_regex-1.39.a /epoc32/release/tools2/linux-x86_64-libc2_5/rel/libboost_regex-1.39.a
+../boostlibrary/binary/linux/libboost_system-1.39.a /epoc32/release/tools2/linux-x86_64-libc2_5/rel/libboost_system-1.39.a
+
+../boostlibrary/binary/linux/libboost_filesystem-1.39.a /epoc32/release/tools2/linux-x86_64-libc2_5/deb/libboost_filesystem-1.39.a
+../boostlibrary/binary/linux/libboost_thread-1.39.a /epoc32/release/tools2/linux-x86_64-libc2_5/deb/libboost_thread-1.39.a
+../boostlibrary/binary/linux/libboost_regex-1.39.a /epoc32/release/tools2/linux-x86_64-libc2_5/deb/libboost_regex-1.39.a
+../boostlibrary/binary/linux/libboost_system-1.39.a /epoc32/release/tools2/linux-x86_64-libc2_5/deb/libboost_system-1.39.a
+
+#else
+../boostlibrary/binary/windows/libboost_thread-1.39.a	/epoc32/release/tools2/rel/libboost_thread-1.39.a
+../boostlibrary/binary/windows/libboost_regex-1.39.a	/epoc32/release/tools2/rel/libboost_regex-1.39.a
+../boostlibrary/binary/windows/libboost_filesystem-1.39.a /epoc32/release/tools2/rel/libboost_filesystem-1.39.a 
+../boostlibrary/binary/windows/libboost_system-1.39.a /epoc32/release/tools2/rel/libboost_system-1.39.a 
+
+../boostlibrary/binary/windows/libboost_thread-1.39.a	/epoc32/release/tools2/deb/libboost_thread-1.39.a
+../boostlibrary/binary/windows/libboost_regex-1.39.a	/epoc32/release/tools2/deb/libboost_regex-1.39.a
+../boostlibrary/binary/windows/libboost_filesystem-1.39.a /epoc32/release/tools2/deb/libboost_filesystem-1.39.a 
+../boostlibrary/binary/windows/libboost_system-1.39.a /epoc32/release/tools2/deb/libboost_system-1.39.a 
+
+../boostlibrary/binary/windows/mingwm10.dll	/epoc32/tools/mingwm10.dll
+#endif
 
 PRJ_MMPFILES
 patchdataprocessor
 parameterfileprocessor
 memmap
-filesystem
 uidcrc

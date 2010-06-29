@@ -40,7 +40,7 @@ use Defutl;
 # Version
 my $MajorVersion = 1;
 my $MinorVersion = 1;
-my $PatchVersion = 0;
+my $PatchVersion = 1;
 
 # THE MAIN PROGRAM SECTION
 ##########################

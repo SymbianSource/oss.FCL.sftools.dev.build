@@ -41,6 +41,7 @@ UTF16String::UTF16String(const string& aUtf8Str){
 UTF16String::UTF16String(const TUint16* aUtf16Str,TInt aLength /* = -1*/){
 	
 	if(aLength < 0){
+		aLength = 0 ;
 		const TUint16* p = aUtf16Str ;
 		while(*p){
 			p++ ;

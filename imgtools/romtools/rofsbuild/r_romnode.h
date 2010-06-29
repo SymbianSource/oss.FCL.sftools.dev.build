@@ -19,12 +19,7 @@
 #ifndef __R_ROMNODE_H__
 #define __R_ROMNODE_H__
 
-#if defined(__MSVCDOTNET__) || defined(__TOOLS2__)
 #include <fstream>
-#else //!__MSVCDOTNET__
-#include <fstream.h>
-#endif //__MSVCDOTNET__
-
 #include <e32std.h>
 #include "rofs.h"
 #include "e32image.h"
@@ -65,7 +60,7 @@ class RomFileStructure;
 class TRomNode
 	{
 public:
-	TRomNode(TText* aName, TRomBuilderEntry* aEntry=0);
+	TRomNode(const char* aName, TRomBuilderEntry* aEntry = 0);
 	~TRomNode();
 	void Destroy();
 
@@ -76,11 +71,11 @@ public:
 	inline TRomNode* Currentsibling() const { return iSibling; };
 
 	void DisplayStructure(ostream* aOut);
-	TRomNode* FindInDirectory(TText *aName);
+	TRomNode* FindInDirectory(const char *aName) const;
 	void AddFile(TRomNode *aChild);
-	TRomNode* NewSubDir(TText *aName);
-	TInt SetAtt(TText *anAttWord);
-	TInt SetAttExtra(TText *anAttWord, TRomBuilderEntry* aFile, enum EKeyword aKeyword);
+	TRomNode* NewSubDir(const char *aName);
+	TInt SetAtt(char *anAttWord);
+	TInt SetAttExtra(char *anAttWord, TRomBuilderEntry* aFile, enum EKeyword aKeyword);
 	inline void SetStackSize(TInt aValue);
 	inline void SetHeapSizeMin(TInt aValue);
 	inline void SetHeapSizeMax(TInt aValue);
@@ -93,7 +88,7 @@ public:
 	inline void SetDllData();
 
 
-	TBool IsDirectory() const { return 0==iEntry; };
+	TBool IsDirectory() const { return 0 == iEntry; };
 	TBool IsFile() const { return 0!=iEntry; };
 
 	TInt CalculateDirectoryEntrySize( TInt& aDirectoryBlockSize,
@@ -102,12 +97,12 @@ public:
 	TInt CountFileAndDir(TInt& aFileCount, TInt& aDirCount);
 
 	TInt PlaceFile( TUint8* &aDest, TUint aOffset, TUint aMaxSize, CBytePair *aBPE );
-	TInt Place( TUint8* aDestBase );
-
+	TInt Place( TUint8* aDestBase ); 
+	
 	TInt NameCpy(char* aDest, TUint8& aUnicodeLength );
 	TInt NameLengthUnicode() const;
 
-	void Rename(TRomNode *aOldParent, TRomNode* aNewParent, TText* aNewName);
+	void Rename(TRomNode *aOldParent, TRomNode* aNewParent, const char* aNewName);
 
 	TRofsEntry* RofsEntry() const { return iRofsEntry; };
 	void SetRofsEntry(TRofsEntry* aEntry);
@@ -164,7 +159,7 @@ protected:
 	friend class FileEntry;
 
 public:
-	TText* iName;
+	char* iName;
 	TUint8 iAtt;
 	TUint8 iAttExtra;
 	TBool iHidden;
@@ -195,7 +190,7 @@ class DllDataEntry;
 class TRomBuilderEntry
 	{
 public:
-	TRomBuilderEntry(const char *aFileName, TText *aName);
+	TRomBuilderEntry(const char *aFileName, const char *aName);
 	~TRomBuilderEntry();
 	void SetRomNode(TRomNode* aNode);
 	TRofsEntry* RofsEntry() const {return iRomNode->RofsEntry(); };
@@ -212,7 +207,7 @@ private:
 	DllDataEntry* iFirstDllDataEntry;
 
 public:
-	TText *iName;
+	char *iName;
 	char *iFileName;
 
 	TRomBuilderEntry* iNext;

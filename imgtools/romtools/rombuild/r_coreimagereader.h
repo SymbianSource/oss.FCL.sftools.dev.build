@@ -33,7 +33,7 @@ class CoreRomImageReader
 {
 private:
 
-	String iImgFileName;
+	string iImgFileName;
 
 	TUint8* iData;
 
@@ -51,18 +51,16 @@ private:
 	TInt BuildDir(TRomDir* aDir, TRomNode* aPaFSEntry);
 	TInt BuildDir(TInt16 *aOffsetTbl, TInt16 aOffsetTblCount, TRomDir *aPaRomDir, TRomNode* aPaFSEntry);
 	TInt CreateRootDirectory();
-	TInt AddFile(TRomNode *aPa, char *entryName, TRomEntry* aRomEntry);
-	void Name(String& aName, char * aUnicodeName, int aLen);
+	TInt AddFile(TRomNode *aPa, const char* entryName, TRomEntry* aRomEntry); 
 	TBool IsExecutable(TUint8* Uids1);
 	TUint GetHdrSize();
-
 	TBool iUseMemMap;
 	Memmap* iImageMap;
 
 	TBool AllocateImageMap(Memmap*& aImageMap, TUint8*& aData, TUint aLen);
 public:
 
-	CoreRomImageReader(String aFileName, TBool aUseMemMap = EFalse);
+	CoreRomImageReader(const char* aFileName, TBool aUseMemMap = EFalse);
 	~CoreRomImageReader();
 
 	TBool OpenImage();

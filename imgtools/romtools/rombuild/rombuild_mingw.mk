@@ -34,6 +34,7 @@ SOURCE = r_areaset.cpp \
          r_collapse.cpp \
          r_coreimage.cpp \
          r_coreimagereader.cpp \
+         symbolgenerator.cpp \
 		 r_dir.cpp \
 		 r_global.cpp \
          r_header.cpp \

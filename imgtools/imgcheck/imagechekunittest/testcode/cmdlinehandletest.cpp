@@ -178,8 +178,8 @@ void CTestCmdHandler::TestWithGetXmlReportName()
 		char* argvect[] = { "imgchecker","--all", "-o=test.xml", "--xml","--dep","--vid", "S:/GT0415/cppunit/imgcheck_unittest/imgs/rom.img" };
 		cmdInput = new CmdLineHandler();
 		ReturnType val = cmdInput->ProcessCommandLine(7,argvect);
-		String xmlName = cmdInput->XmlReportName();  
-		if(xmlName == String("test.xml"))
+		string xmlName = cmdInput->XmlReportName();  
+		if(xmlName == string("test.xml"))
 		{
 			status = 1;
 		}

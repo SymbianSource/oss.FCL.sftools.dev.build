@@ -22,12 +22,17 @@
 #define __IMAGE_READER__
 
 #if defined(__VC32__) && (_MSC_VER < 1300)
-#pragma warning(disable:4786) // std::map etc overflow debug symbol length :(
+#pragma warning(disable:4786) // map etc overflow debug symbol length :(
 #endif
 
 
 #include "common.h"
+#ifdef WIN32
 #include <direct.h>
+#else
+#include <unistd.h>
+#include <sys/stat.h>
+#endif
 #include <map>
 
 typedef struct tag_FILEINFO
@@ -36,7 +41,7 @@ typedef struct tag_FILEINFO
 	TUint32 iSize;
 }FILEINFO, *PFILEINFO;
 
-typedef std::map<std::string, PFILEINFO> FILEINFOMAP;
+typedef map<string, PFILEINFO> FILEINFOMAP;
 
 class ImageReader
 {
@@ -55,15 +60,15 @@ public:
 	void SetDisplayOptions(TUint32);
 	bool DisplayOptions(TUint32);
 
-	void ExtractFile(TUint aOffset, TInt aSize, const char* aFileName, const char* aPath, char* aFilePath,char* aData = NULL);
+	void ExtractFile(TUint aOffset, TInt aSize, const char* aFileName,const char* aPath,const char* aFilePath,const char* aData = NULL);
 	void FindAndInsertString(string& aSrcStr,string& aDelimiter,string& aAppStr);
 	void FindAndReplaceString(string& aSrcStr, string& aDelimiter, string& aReplStr);
-	void CreateSpecifiedDir(char* aSrcPath,const char* aDelimiter);
-	TBool IsDrive(char* aStr);
+ 
+	void CreateSpecifiedDir(const string& aSrcPath);  
 
 	virtual void GetFileInfo(FILEINFOMAP& /*fileInfoMap */){}
-	void ExtractFileSet(char* aData);
-	int FileNameMatch(string aPattern, string aFileName, int aRecursiveFlag);
+	void ExtractFileSet(const char* aData);
+	int FileNameMatch(const string& aPattern, const string& aFileName, int aRecursiveFlag);
 
 	TUint32	iDisplayOptions;
 	string	iImgFileName;

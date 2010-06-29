@@ -15,10 +15,14 @@
 #
 
 use File::Basename;
+# Version
+my $MajorVersion = 1;
+my $MinorVersion = 1;
+my $PatchVersion = 0;
 
 if (@ARGV <2)
 	{
-	print (STDERR "\ncreaterfifile.pl\n");
+	print (STDERR "\nCREATERFIFILE resource files combine tool V$MajorVersion.$MinorVersion.$PatchVersion\n");
 	print STDERR << 'END_OF_HELP';
 
 Usage: createrfifile.pl rss_cpp_deps_file.d output_file.rfi [exclude path]

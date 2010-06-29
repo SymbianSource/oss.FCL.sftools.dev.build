@@ -25,7 +25,7 @@
 #define SISEXTRACT_TOOL_DEFOPT	" -x"      // Default options to the tool
 #define SISEXTRACT_TOOL_EXTOPT	" -d "     // Extract path option
 
-typedef std::map<String,PPKGPARSER> PKGFILE_MAP;
+typedef map<string,PPKGPARSER> PKGFILE_MAP;
 
 /** 
 class Sis2Iby
@@ -38,36 +38,36 @@ class Sis2Iby
 class Sis2Iby : public SisUtils
 {
 public:
-	Sis2Iby(char* aFile);
+	Sis2Iby(const char* aFile);
 	~Sis2Iby();
 
 	void ProcessSisFile();
 	void GenerateOutput();
 
 private:
-	void GenerateIby(String aPkgFile, PPKGPARSER aParser);
-	TUint32 InvokeExtractTool(String sisFile);
-	void UpdatePkgFileMap(String aPath, String aFile);
-	void GetFileName(String aName, String& aFile);
-	void AppendFileName(String& aPath, String aFile);
-	void NormaliseSourceFile(String& aFile, String aPkgFile);
-	void NormaliseDestFile(String& aFile);
-	void MakeFullPath(String& aFile);
+	void GenerateIby(string aPkgFile, PPKGPARSER aParser);
+	TUint32 InvokeExtractTool(const string& aSisFile);
+	void UpdatePkgFileMap(const string& aPath, const string& aFile);
+	void GetFileName(const string& aName, string& aFile);
+	void AppendFileName(string& aPath,string aFile);
+	void NormaliseSourceFile(string& aFile, const string& aPkgFile);
+	void NormaliseDestFile(string& aFile);
+	void MakeFullPath(string& aFile);
 
 	void WriteLanguages(PPKGPARSER aParser);
-	void WriteFileInclusion(String aSrcFile, String aDestFile, String aPkgName, int pad);
+	void WriteFileInclusion(string aSrcFile, string aDestFile, string aPkgName, TInt aPadding);
 	void WritePackageHeader(PPKGPARSER aParser);
 	void WriteInstallOptions(PPKGPARSER aParser);
 	void WritePackageBody(PPKGPARSER aParser);
-	void WriteInstallFileList(PINSTALLFILE_LIST aFileList, PPKGPARSER aParser, int pad);
-	void InsertTabs(int num);
+	void WriteInstallFileList(PINSTALLFILE_LIST aFileList, PPKGPARSER aParser, TInt aPadding);
+	void InsertTabs(TInt num);
 
 	PkgParser *pkgParser;
 	PKGFILE_MAP iPkgFileMap;
 
-	std::ofstream ibyHandle;
+	ofstream ibyHandle;
 
-	TBool IsValidE32Image(String aFile);
+	TBool IsValidE32Image(string aFile);
 };
 
 #endif //__SIS2IBY_H__

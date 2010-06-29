@@ -217,7 +217,7 @@ GetMapFileName: Generates a temporary file name
 
 @param aFile - Returns the name of the temporary file
 */
-void MemmapUtils::GetMapFileName(String& aFile)
+void MemmapUtils::GetMapFileName(string& aFile)
 {
 	char *fileName = 0;
 

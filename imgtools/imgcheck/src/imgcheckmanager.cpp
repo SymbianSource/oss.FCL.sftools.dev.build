@@ -43,8 +43,7 @@ Which can be used by any tool which is derived from this class.
 @param aCmdPtr - command line handler pointer
 */
 ImgCheckManager::ImgCheckManager(CmdLineHandler* aCmdPtr)
-:iCmdLine(aCmdPtr)
-{
+:iCmdLine(aCmdPtr) {
 	iReporter = Reporter::Instance(iCmdLine->ReportFlag());
 	iNoRomImage = true; 
 }
@@ -55,23 +54,26 @@ Destructor traverses through the imagereader list and delets the same
 @internalComponent
 @released
 */
-ImgCheckManager::~ImgCheckManager()
-{
-	while(iImageReaderList.size() > 0)
-	{
-		DELETE(iImageReaderList.back());
-		iImageReaderList.pop_back();
+ImgCheckManager::~ImgCheckManager() {
+	int i ;	 
+	for(i = iImageReaderList.size() - 1 ; i >= 0 ; i--) {		
+		ImageReader* reader = iImageReaderList.at(i); 
+		if(NULL != reader)
+			delete reader ;
 	}
-	while(iCheckerList.size() > 0)
-	{
-		DELETE(iCheckerList.back());
-		iCheckerList.pop_back();
+	iImageReaderList.clear(); 
+	for(i = iCheckerList.size() - 1 ; i >= 0 ; i--) { 
+		Checker* checker = iCheckerList.at(i); 
+		if(NULL != checker)
+			delete checker ;
 	}
-	while(iWriterList.size() > 0)
-	{
-		DELETE(iWriterList.back())
-		iWriterList.pop_back();
+	iCheckerList.clear(); 
+	for(i = iWriterList.size() - 1 ; i >= 0 ; i--) { 
+		ReportWriter* writer = iWriterList.at(i); 
+		if(NULL != writer)
+			delete writer ;
 	}
+	iWriterList.clear();  
 	Reporter::DeleteInstance();
 	iCmdLine = 0;
 }
@@ -85,13 +87,11 @@ Function responsible to read the header and directory section.
 @param aImageName - image name
 @param aImageType - image type
 */
-void ImgCheckManager::Process(ImageReader* aImageReader)
-{
-	ExceptionReporter(READINGIMAGE,(char*)aImageReader->ImageName().c_str()).Log();
+void ImgCheckManager::Process(ImageReader* aImageReader) {
+	ExceptionReporter(READINGIMAGE,aImageReader->ImageName()).Log();
 	aImageReader->ReadImage();
 	aImageReader->ProcessImage();
-	if(!aImageReader->ExecutableAvailable())
-	{
+	if(!aImageReader->ExecutableAvailable()) {
 		throw ExceptionReporter(NOEXEPRESENT);
 	}
 }
@@ -106,27 +106,20 @@ Function responsible to
 @internalComponent
 @released
 */
-void ImgCheckManager::CreateObjects(void)
-{
-	unsigned int imgCnt = iCmdLine->NoOfImages();
-	String imgName;
-	
-	while(imgCnt > 0)
-	{	
-		imgName = iCmdLine->NextImageName();
-		--imgCnt;
+void ImgCheckManager::CreateObjects(void) { 
+
+	const char* imgName = iCmdLine->NextImageName();	
+	while(imgName) {		 
 		HandleImage(imgName);
+		imgName = iCmdLine->NextImageName();
 	}
 
 	Checker* checkerPtr = KNull;
 	unsigned int checks = iCmdLine->EnabledValidations();
 	unsigned short int bitPos = 1;
-	while(bitPos)
-	{
-		if(bitPos & checks)
-		{
-			switch(bitPos)
-			{
+	while(bitPos) {
+		if(bitPos & checks) {
+			switch(bitPos) {
 			case EDep:
 				checkerPtr = new DepChecker(iCmdLine, iImageReaderList,iNoRomImage);
 				break;
@@ -140,8 +133,7 @@ void ImgCheckManager::CreateObjects(void)
 				checkerPtr = new DbgFlagChecker(iCmdLine, iImageReaderList);
 				break;
 			}
-			if(checkerPtr == KNull)
-			{
+			if(checkerPtr == KNull) {
 				throw ExceptionReporter(NOMEMORY, __FILE__, __LINE__);
 			}
 			iCheckerList.push_back(checkerPtr);
@@ -151,15 +143,18 @@ void ImgCheckManager::CreateObjects(void)
 
 	unsigned int rptFlag = iCmdLine->ReportFlag();
 	ReportWriter* rptWriter = KNull;
-	if(!( rptFlag & QuietMode))
-	{
+	if(!( rptFlag & QuietMode)) {
 		rptWriter = new CmdLineWriter(rptFlag);
 		InsertWriter(rptWriter);
 	}
-	if(iCmdLine->ReportFlag() & KXmlReport)
-	{
+	
+	if(iCmdLine->ReportFlag() & KXmlReport) { 
 		rptWriter = new XmlWriter(iCmdLine->XmlReportName(), iCmdLine->Command());
-		InsertWriter(rptWriter);
+		if(!rptWriter){
+			cerr << "Failed at file :"<< iCmdLine->XmlReportName() <<" With args "<< iCmdLine->Command()<< endl;
+			throw ExceptionReporter(FILEOPENFAIL, __FILE__, __LINE__);
+		}
+		InsertWriter(rptWriter);		
 	}
 }
 
@@ -169,10 +164,8 @@ Function responsible to insert the ReprtWriter into iWriterList
 @internalComponent
 @released
 */
-void ImgCheckManager::InsertWriter(ReportWriter* aWriter)
-{
-	if(aWriter == KNull)
-	{
+void ImgCheckManager::InsertWriter(ReportWriter* aWriter) {
+	if(aWriter == KNull) {
 		throw ExceptionReporter(NOMEMORY, __FILE__, __LINE__);
 	}
 	iWriterList.push_back(aWriter);
@@ -184,12 +177,10 @@ Function responsible to initiate the enabled validations
 @internalComponent
 @released
 */
-void ImgCheckManager::Execute(void)
-{
-	unsigned int cnt = 0;
+void ImgCheckManager::Execute(void) {	
 	ImgVsExeStatus& imgVsExeStatus = iReporter->GetContainerReference();
-	while(cnt < iCheckerList.size())
-	{
+	unsigned int cnt = 0;
+	while(cnt < iCheckerList.size()) {		
 		iCheckerList[cnt++]->Check(imgVsExeStatus);
 	}
 }
@@ -200,34 +191,18 @@ Function responsible to write the validated data into Reporter.
 @internalComponent
 @released
 */
-void ImgCheckManager::FillReporterData(void)
-{
-	
-	ImgVsExeStatus& imgVsExeStatus = iReporter->GetContainerReference();
-	ImgVsExeStatus::iterator imgBegin = imgVsExeStatus.begin();
-	ImgVsExeStatus::iterator imgEnd = imgVsExeStatus.end();
-	
-	ExeVsMetaData::iterator exeBegin;
-	ExeVsMetaData::iterator exeEnd;
-
-
-	while(imgBegin != imgEnd)
-	{
-		ExeVsMetaData& exeVsMetaData = imgBegin->second;
-		exeBegin = exeVsMetaData.begin();
-		exeEnd = exeVsMetaData.end();
-		while(exeBegin != exeEnd)
-		{
-			ExeContainer& exeContainer = (*exeBegin).second;
-
-			unsigned int cnt = 0;
-			while(cnt < iCheckerList.size())
-			{
-				iCheckerList[cnt++]->PrepareAndWriteData(&exeContainer);
-			}
-			++exeBegin;
-		}
-		++imgBegin;
+void ImgCheckManager::FillReporterData(void) {	
+	ImgVsExeStatus& imgVsExeStatus = iReporter->GetContainerReference(); 	
+	for(ImgVsExeStatus::iterator it = imgVsExeStatus.begin();
+		it != imgVsExeStatus.end(); it++) {
+		ExeVsMetaData* exeVsMetaData = it->second;
+		
+		for(ExeVsMetaData::iterator i = exeVsMetaData->begin();
+			i != exeVsMetaData->end() ; i++ ) {  
+			for(unsigned int cnt = 0 ; cnt < iCheckerList.size() ; cnt++) {
+				iCheckerList[cnt]->PrepareAndWriteData(i->second);
+			} 
+		} 
 	}
 }
 
@@ -240,9 +215,8 @@ CreateReport function by passing iWriterList as argument.
 
 @return - returns the return value of Reporter::CreateReport function.
 */
-void ImgCheckManager::GenerateReport(void)
-{
-	iReporter->CreateReport(iWriterList);
+void ImgCheckManager::GenerateReport(void) {
+	iReporter->CreateReport(iWriterList); 
 }
 
 /** 
@@ -254,50 +228,46 @@ Function to identify the image type and read the header and file and/or director
 @param aImageName - image name received as part of command line
 @param EImageType - type of the input image
 */
-void ImgCheckManager::HandleImage(const String& aImageName, EImageType aImageType)
-{
+void ImgCheckManager::HandleImage(const char* aImageName, EImageType aImageType) {
 	unsigned int rptFlag = iCmdLine->ReportFlag();
-	if(rptFlag & KE32Input)
-	{
-		aImageType = DirReader::EntryType((char*)aImageName.c_str());
+	string name(aImageName);
+	if(rptFlag & KE32Input) {
+		aImageType = DirReader::EntryType(name);
 	}
-	else if(aImageType == EUnknownImage)
-	{
-		aImageType = ImageReader::ReadImageType(aImageName);
+	else if(aImageType == EUnknownImage) {
+		aImageType = ImageReader::ReadImageType(name);
 	}
 	ImageReader* imgReader = KNull;
-
-	switch(aImageType)
-	{
+	
+	switch(aImageType) {
 	case ERomImage:
 		iNoRomImage = false;
 	case ERomExImage:
-		imgReader = new RomReader((char*)aImageName.c_str(), aImageType);
+		imgReader = new RomReader(aImageName, aImageType);
 		break;
 
 	case ERofsImage:
 	case ERofsExImage:
-		imgReader = new RofsReader((char*)aImageName.c_str(), aImageType);
+		imgReader = new RofsReader(aImageName, aImageType);
 		break;
 
 	case EE32Directoy:
-		imgReader = new DirReader((char*)aImageName.c_str());
+		imgReader = new DirReader(aImageName);
 		break;
 	
 	case EE32File:
-		imgReader = new E32Reader((char*)aImageName.c_str());
+		imgReader = new E32Reader(aImageName);
 		break;
 
 	case EUnknownImage:
-		throw ExceptionReporter(UNKNOWNIMAGETYPE, (char*)aImageName.c_str());
+		throw ExceptionReporter(UNKNOWNIMAGETYPE, aImageName);
 		break;
 
 	case EE32InputNotExist:
-		throw ExceptionReporter(E32INPUTNOTEXIST, (char*)aImageName.c_str());
+		throw ExceptionReporter(E32INPUTNOTEXIST, aImageName);
 		break;
 	}
-	if(imgReader == KNull)
-	{
+	if(imgReader == KNull) {
 		throw ExceptionReporter(NOMEMORY, __FILE__, __LINE__);
 	}
 	Process(imgReader);

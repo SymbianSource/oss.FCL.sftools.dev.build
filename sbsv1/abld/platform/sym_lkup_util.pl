@@ -41,6 +41,12 @@ my $nImports = 0;
 my %Symbols = ();
 my @Imports = ();
 
+# Version
+my $MajorVersion = 1;
+my $MinorVersion = 1;
+my $PatchVersion = 0;
+
+
 {
 	unless (GetOptions(\%Options, 'sym=s', 'o=s', 'map=s', 'ignore_export_dir')) {
 		exit 1;
@@ -49,6 +55,21 @@ my @Imports = ();
 	$CppFile = $Options{o};
 	$mapFile = $Options{map};
 	$IgnoreExportDir = $Options{ignore_export_dir};
+
+	unless($ImportSymFile)
+	{
+		print(
+			 "\n",
+			 "SYM_LKUP_UTIL symbol process tool V$MajorVersion.$MinorVersion.$PatchVersion\n",
+			 "\n",
+			 "options:\n",
+			 " -sym symbol file\n",
+			 " -o   output file\n",
+			 " -map  map file\n",
+			 "\n"
+		);
+		exit 1;
+	}
 
 	ReadSymFile() if $ImportSymFile;
 	ReadMapFile() if $mapFile;

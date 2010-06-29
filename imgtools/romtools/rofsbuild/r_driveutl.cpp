@@ -36,7 +36,7 @@ Checks the validity of driveobey file name before creating the log file name.
   
 @return - returns 'ErrorNone' if log file created, otherwise returns Error.
 */ 
-TInt Getlogfile(TText *aDriveObeyFileName,TText* &aPadLogFile)
+TInt Getlogfile(char *aDriveObeyFileName,char* &aPadLogFile)
 	{
 
 	if(!(*aDriveObeyFileName))
@@ -68,7 +68,7 @@ TInt Getlogfile(TText *aDriveObeyFileName,TText* &aPadLogFile)
 		return KErrGeneral;
 
 	// Allocates the memory for log file name.
-	aPadLogFile = new TText[(len)+5]; 
+	aPadLogFile = new char[(len)+5]; 
 	if(!aPadLogFile)
 		return KErrNoMemory;
 

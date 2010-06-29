@@ -26,7 +26,7 @@
 #include "reporter.h"
 #include "imagereader.h"
 
-typedef std::map<std::string, ExeVsIdDataMap> ImgVsExeIdData;
+typedef map<string, ExeVsIdDataMap> ImgVsExeIdData;
 
 /** 
 Different status of a dependency
@@ -34,10 +34,10 @@ Different status of a dependency
 @internalComponent
 @released
 */
-const String KStatusYes("Available");
-const String KStatusNo("Missing");
-const String KStatusHidden("Hidden");
-const String KDependency("Dependency");
+const char KStatusYes[] = "Available";
+const char KStatusNo[] = "Missing";
+const char KStatusHidden[] = "Hidden";
+const char KDependency[] = "Dependency";
 
 /** 
 All SID validation status constants
@@ -45,10 +45,10 @@ All SID validation status constants
 @internalComponent
 @released
 */
-const String KUniqueAlias("Unique(alias)");
-const String KUnique("Unique");
-const String KDuplicate("Duplicate");
-const String KSid("SID");
+const char KUniqueAlias[] = "Unique(alias)";
+const char KUnique[] = "Unique";
+const char KDuplicate[] = "Duplicate";
+const char KSid[] = "SID";
 
 /** 
 VID and Debuggable flag validation status constants
@@ -56,12 +56,12 @@ VID and Debuggable flag validation status constants
 @internalComponent
 @released
 */
-const String KValid("Valid");
-const String KInValid("Invalid");
-const String KDbgMatching("Matching");
-const String KDbgNotMatching("Not Matching");
-const String KDbgFlag("DBG");
-const String KVid("VID");
+const char KValid[] = "Valid";
+const char KInValid[] = "Invalid";
+const char KDbgMatching[] = "Matching";
+const char KDbgNotMatching[] = "Not Matching";
+const char KDbgFlag[] = "DBG";
+const char KVid[] = "VID";
 
 /**
 This class is a virtual base. If any new checks or validation needs to be 
@@ -85,6 +85,6 @@ public:
 	Checker(CmdLineHandler* aCmdPtr,ImageReaderPtrList& aImageReaderList);
 	virtual ~Checker();
 	virtual void Check(ImgVsExeStatus& imgVsExeStatus)=0;
-	virtual void PrepareAndWriteData(ExeContainer* aExeContainer)=0;
+	virtual void PrepareAndWriteData(ExeContainer& aExeContainer)=0;
 };
 #endif//CHECKER_H

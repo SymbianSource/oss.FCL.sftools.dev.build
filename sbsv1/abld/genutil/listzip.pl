@@ -1,3 +1,4 @@
+#!/usr/bin/perl
 # Copyright (c) 2008-2009 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
@@ -20,6 +21,11 @@
 # 
 #
 
+# Version
+my $MajorVersion = 1;
+my $MinorVersion = 1;
+my $PatchVersion = 0;
+
 sub _print_usage_and_die();
 sub _print_err_and_die(@);
 
@@ -36,12 +42,12 @@ sub main(@)
 
     for (@raw_data)
     {
-        if ($_ =~ /^\s*\d+\s+\d\d[-|\/]\d\d[-|\/]\d\d\s+\d\d:\d\d\s+(.*)/)
+        if ($_ =~ /^\s*\d+\s+\d\d[-|\/|\.]\d\d[-|\/|\.]\d\d\s+\d\d:\d\d\s+(.*)/)
         {
             my $line = "${prefix}/$1";
-            $line =~ s/\//\\/g;
+            $line =~ s/\//\\/g if($^O =~ /^MSWin32$/i);
 	    # don't print directories under the <build> tags
-	    if (!($line =~ /\\$/)) {
+	    if (!($line =~ /[\\|\/]$/)) {
 		    print "$line\n";
 		    }
         }
@@ -50,7 +56,7 @@ sub main(@)
 
 sub _print_usage_and_die()
 {
-    print "usage: listzip.pl <prefix> <zipfile>\n";
+    print "LISTZIP zip files process tool V$MajorVersion.$MinorVersion.$PatchVersion\nusage: listzip.pl <prefix> <zipfile>\n";
     exit 2;
 }
 

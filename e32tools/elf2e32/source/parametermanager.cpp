@@ -18,13 +18,14 @@
 //
 
 // This must go before ParameterManager.h
-#define __INCLUDE_CAPABILITY_NAMES__
+#define __REFERENCE_CAPABILITY_NAMES__
 #include <e32capability.h>
 
 #include "pl_common.h"
 #include "parametermanager.h"
 #include "errorhandler.h"
 #include <iostream>
+#include <ctype.h>
 
 #include "h_utl.h"
 #include "h_ver.h"
@@ -375,7 +376,7 @@ const ParameterManager::OptionDesc ParameterManager::iOptions[] =
 	{
 		"fpu",
 		(void *)ParameterManager::ParseFPU,
-		"FPU type [softvfp|vfpv2]",
+		"FPU type [softvfp|vfpv2|vfpv3|vfpv3D16]",
 	},
 	{
         "codepaging",
@@ -2241,21 +2242,33 @@ DEFINE_PARAM_PARSER(ParameterManager::ParseSysDefs)
 		int q = 0;
 		unsigned int ordinalnum = 0;
 		char *symbol = 0;
+		int nq = aSysDefValues.find_first_not_of(" 	");
+		if (nq && (nq != string::npos))
+		{
+			sysdeflength -= nq;
+			aSysDefValues.erase(0, nq);
+		}		
 
-		int nq = aSysDefValues.find_first_of(",", q,sizeof(*p));
+		nq = aSysDefValues.find_first_of(",", q,sizeof(*p));
 		if (nq && (nq != string::npos))
 		{
 			int len = nq;
+			while (*(p+len-1) == ' ' || *(p+len-1) == '	')
+				len --;
 			symbol = new char[len+1];
 			memcpy(symbol, p, len);
 			symbol[len] = 0;
 			q = nq+1;
+      while (*(p+q) == ' ' || *(p+q) == '	')
+      	q ++;
 
 			char val = *(p+q);
 			if (!val || !isdigit(val))
 				throw ParameterParserError(SYSDEFERROR, "--sysdef");
 			ordinalnum = *(p+q) - '0';
 			aPM->SetSysDefs(ordinalnum, symbol, sysdefcount);
+      while (*(p+q+1) == ' ' || *(p+q+1) == '	')
+      	q ++;
 
 			unsigned int separator = aSysDefValues.find(";", 0);
 
@@ -2565,8 +2578,12 @@ DEFINE_PARAM_PARSER(ParameterManager::ParseFPU)
 
 	if (strnicmp(aValue, "softvfp", 7)==0)
 		aPM->SetFPU(0);
-	else if (strnicmp(aValue, "vfpv2", 5)==0)
+	else if ((strnicmp(aValue, "vfpv2", 5)==0) || (strnicmp(aValue, "softvfp+vfpv2",13 )==0))
 		aPM->SetFPU(1);
+	else if (strnicmp(aValue,"vfpv3", 5)==0)
+		aPM->SetFPU(2);
+	else if (strnicmp(aValue,"vfpv3D16", 8)==0)
+		aPM->SetFPU(3);
 	else
 		throw InvalidArgumentError(INVALIDARGUMENTERROR, aValue, aOption);
 }

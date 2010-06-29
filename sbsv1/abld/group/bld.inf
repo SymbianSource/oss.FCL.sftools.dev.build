@@ -49,6 +49,11 @@ PRJ_EXPORTS
 ../platform/extractvars.make		/epoc32/tools/compilation_config/extractvars.make
 ../platform/GCCE.mk			/epoc32/tools/compilation_config/GCCE.mk
 ../genutil/listzip.pl			/epoc32/tools/listzip.pl
+../genutil/conv_khronos_openvg_hdr_to_cpp.pl        /epoc32/tools/conv_khronos_openvg_hdr_to_cpp.pl 
+../genutil/ecopyfile.pl        /epoc32/tools/ecopyfile.pl
+../genutil/conv_khronos_hdr_to_cpp.pl        /epoc32/tools/conv_khronos_hdr_to_cpp.pl  
+../e32util/armasm2as.pl        /epoc32/tools/armasm2as.pl
+../e32util/copyfeaturevariants.pl        /epoc32/tools/copyfeaturevariants.pl 
 
 // BSF files
 ../platform/armv6.bsf        /epoc32/tools/armv6.bsf 
@@ -77,7 +82,6 @@ PRJ_EXPORTS
 ../e32util/epocmbm.pl        /epoc32/tools/epocmbm.pl 
 ../platform/cl_edg.pm        /epoc32/tools/cl_edg.pm 
 ../platform/cl_tools.pm        /epoc32/tools/cl_tools.pm 
-../genutil/conv_khronos_openvg_hdr_to_cpp.pl        /epoc32/tools/conv_khronos_openvg_hdr_to_cpp.pl 
 ../e32util/fixsource.bat        /epoc32/tools/fixsource.bat 
 ../platform/cl_generic.pm        /epoc32/tools/cl_generic.pm 
 ../platform/e32variant.pm        /epoc32/tools/e32variant.pm 
@@ -111,8 +115,7 @@ PRJ_EXPORTS
 ../platform/findimp.pl        /epoc32/tools/findimp.pl 
 ../e32util/checksource.pm        /epoc32/tools/checksource.pm 
 ../e32util/genshimsrc.bat        /epoc32/tools/genshimsrc.bat 
-../toolinfo/rvct_ver2set.pm        /epoc32/tools/rvct_ver2set.pm 
-../e32util/armasm2as.pl        /epoc32/tools/armasm2as.pl  
+../toolinfo/rvct_ver2set.pm        /epoc32/tools/rvct_ver2set.pm   
 ../e32util/selectbootmak.pl        /epoc32/tools/selectbootmak.pl 
 ../makmake/makhelp.pm        /epoc32/tools/makhelp.pm 
 ../platform/cl_codewarrior.pm        /epoc32/tools/cl_codewarrior.pm 
@@ -123,7 +126,6 @@ PRJ_EXPORTS
 ../bldmake/bldmake.bat        /epoc32/tools/bldmake.bat 
 ../e32util/listfeaturevariants.pl        /epoc32/tools/listfeaturevariants.pl 
 ../memtrace/memtrace.pl        /epoc32/tools/memtrace.pl 
-../genutil/ecopyfile.pl        /epoc32/tools/ecopyfile.pl 
 ../genutil/ermdir.pl        /epoc32/tools/ermdir.pl 
 ../platform/armutl.pm        /epoc32/tools/armutl.pm 
 ../platform/cl_arm.pm        /epoc32/tools/cl_arm.pm 
@@ -135,10 +137,8 @@ PRJ_EXPORTS
 ../genutil/output.pm        /epoc32/tools/output.pm 
 ../e32util/efreeze.bat        /epoc32/tools/efreeze.bat 
 ../platform/cw_project_template_v4.xml        /epoc32/tools/cw_project_template_v4.xml 
-../e32util/copyfeaturevariants.pl        /epoc32/tools/copyfeaturevariants.pl 
 ../platform/fcloggerutl.pm        /epoc32/tools/fcloggerutl.pm 
 ../platform/cl_win.pm        /epoc32/tools/cl_win.pm 
-../genutil/conv_khronos_hdr_to_cpp.pl        /epoc32/tools/conv_khronos_hdr_to_cpp.pl 
 ../e32util/featurevariantmap.pm        /epoc32/tools/featurevariantmap.pm 
 ../e32util/preprocessor.pm        /epoc32/tools/preprocessor.pm 
 ../platform/winutl.pm        /epoc32/tools/winutl.pm 

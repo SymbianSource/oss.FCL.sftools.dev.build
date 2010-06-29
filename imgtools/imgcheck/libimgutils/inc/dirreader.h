@@ -24,8 +24,8 @@
 
 #include "imagereader.h"
 
-const String KParentDir("..");
-const String KChildDir(".");
+const string KParentDir("..");
+const string KChildDir(".");
 
 /**
 Class Directory reader
@@ -34,24 +34,22 @@ Class Directory reader
 @released
 */
 class DirReader : public ImageReader
-{
-private:
-	ExeVsE32ImageMap iExeVsE32ImageMap;
-
+{ 
 public:
-	DirReader(char* aDirName);
+	DirReader(const char* aDirName);
 	~DirReader(void);
 	void ReadImage(void);
 	void ProcessImage(void);
 	void PrepareExeVsIdMap(void);
 	const ExeVsIdDataMap& GetExeVsIdMap() const;
 	ExeNamesVsDepListMap& GatherDependencies(void);
-	void PrepareExeDependencyList(E32Image* aE32Image, StringList& aExecutableList);
-	static EImageType EntryType(char* aStr);
+	void PrepareExeDependencyList(E32Image* aE32Image, StringList& aExecutables);
+	static EImageType EntryType(string& aStr);
 
 private:	
-	void ReadDir(String aPath);
-	bool IsExecutable(String aName);
+	void ReadDir(const string& aPath);
+	bool IsExecutable(const string& aName); 
+	ExeVsE32ImageMap iExeVsE32ImageMap;
 };
  
 #endif //DIRREADER_H

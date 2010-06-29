@@ -45,7 +45,7 @@ use File::Copy;
 # Version
 my $MajorVersion = 1;
 my $MinorVersion = 1;
-my $PatchVersion = 0;
+my $PatchVersion = 1;
 
 my %Options;	# command line option information
 

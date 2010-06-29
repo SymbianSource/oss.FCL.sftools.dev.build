@@ -21,8 +21,10 @@ TOOLS2
 
 // These libraries needs to be exported
 PRJ_EXPORTS
+#ifndef TOOLS2_LINUX
 ../libxml/lib/libxml2.a			/epoc32/release/tools2/rel/libxml2.a
 ../libxml/lib/libxml2.a			/epoc32/release/tools2/deb/libxml2.a
+#endif
 ../src/imgcheck.xsl			/epoc32/tools/imgcheck.xsl
 ./imgcheck.pl				/epoc32/tools/imgcheck.pl
 ./imgcheck.cmd				/epoc32/tools/imgcheck.cmd

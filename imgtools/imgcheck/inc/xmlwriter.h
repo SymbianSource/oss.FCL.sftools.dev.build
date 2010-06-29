@@ -31,10 +31,10 @@
 Constants for XML report generation.
 xml tags (headers,elements and attribute names).
 */
-const String KXmlEncoding("ISO-8859-1");
-const String KXslFileName("imgcheck.xsl");
-const String KXmlVersion("1.0");
-const String KDtdXslInfo("<!DOCTYPE imgcheck_report [ \
+const char KXmlEncoding[] = "ISO-8859-1";
+const char KXslFileName[] = "imgcheck.xsl";
+const char KXmlVersion[] = "1.0";
+const char KDtdXslInfo[] = "<!DOCTYPE imgcheck_report [ \
 							<!ELEMENT comment (imgcheck_report+) > \
 							<!ELEMENT imgcheck_report (Image*)> \
 							<!ELEMENT Image (Exe_Name*)> \
@@ -58,26 +58,26 @@ const String KDtdXslInfo("<!DOCTYPE imgcheck_report [ \
 							val CDATA #IMPLIED \
 							status CDATA #IMPLIED> \
 							]> \
-							<?xml-stylesheet type=\"text/xsl\" href=\"imgcheck.xsl\"?>");
+							<?xml-stylesheet type=\"text/xsl\" href=\"imgcheck.xsl\"?>";
 
-const String KXmlRootElement("imgcheck_report");
-const String KXmlcomment("comment");
-const String KXmlinputcmd("Inputcmd");
+const char KXmlRootElement[] = "imgcheck_report";
+const char KXmlcomment[] = "comment";
+const char KXmlinputcmd[] = "Inputcmd";
 
-const String KXmlImageName("Image");
-const String KXmlImageAtt1("name");
+const char KXmlImageName[] = "Image";
+const char KXmlImageAtt1[] = "name";
 
-const String KXmlExeName("Executable");
-const String KXmlExeAtt1("SNo");
-const String KXmlExeAtt2("name");
+const char KXmlExeName[] = "Executable";
+const char KXmlExeAtt1[] = "SNo";
+const char KXmlExeAtt2[] = "name";
 
-const String KDepName("Dependency");
-const String KDepAtt1("name");
-const String KAtt1("status");
-const String KAtt2("val");
-const String KDepAvaStatus("Available");
-const String KXml("XML");
-const String KXMLDbgFlag("DBG");
+const char KDepName[] = "Dependency";
+const char KDepAtt1[] = "name";
+const char KAtt1[] = "status";
+const char KAtt2[] = "val";
+const char KDepAvaStatus[] = "Available";
+const char KXml[] = "XML";
+const char KXMLDbgFlag[] = "DBG";
 const unsigned int KXmlGenBuffer=1024;
 
 /** 
@@ -90,34 +90,34 @@ class XmlWriter: public ReportWriter
 {
 public:
 
-	XmlWriter(const String& aXmlFileName, const String& aInputCommand);
+	XmlWriter(const string& aXmlFileName, const string& aInputCommand);
 	~XmlWriter(void);
 
 	int CreateXslFile(void);
-	bool GetXslSourcePath(String& aExePath);
+	bool GetXslSourcePath(string& aExePath);
 	void StartReport(void);
 	void EndReport(void);
-	void StartImage(const String& aImageName);
+	void StartImage(const string& aImageName);
     void EndImage(void);
 	void WriteExeAttribute(ExeAttribute& aOneSetExeAtt);
-	void StartExecutable(const unsigned int aSerNo, const String& aExeName);
+	void StartExecutable(const unsigned int aSerNo, const string& aExeName);
 	void EndExecutable(void);
 	void WriteNote(void);
-	const String& ReportType(void);
+	const string& ReportType(void);
 
 private:
 	// File stream for xml output.
 	ofstream iXmlFile;
 	// Xml file name for output.
-	const String iXmlFileName;
+	string iXmlFileName;
 	// Xml Buffer pointer.
 	xmlBufferPtr iXmlBufPtr;
 	// Xml write pointer to buffer.
 	xmlTextWriterPtr iXmlTextWriter;
 	//Hold the input command string
-	String iInputCommnd;
+	string iInputCommnd;
 	//Hold the report type
-	String iRptType;
+	string iRptType;
 };
 
 #endif // XMLWRITER_H

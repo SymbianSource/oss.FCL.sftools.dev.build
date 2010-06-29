@@ -86,11 +86,26 @@ private:
 
 inline HDeflateHash::HDeflateHash()
 	{TInt* p=iHash+256;do *--p=-KDeflateMaxDistance-1; while (p>iHash);}
-
+    
 inline HDeflateHash* HDeflateHash::NewLC(TInt aLinks)
 	{
-	return new(HMem::Alloc(0,_FOFF(HDeflateHash,iOffset[Min(aLinks,KDeflateMaxDistance)]))) HDeflateHash;
-	}
+#if __GNUC__ >= 4
+ 	unsigned n = sizeof(TInt) * 256 + sizeof(TOffset) * Min(aLinks, KDeflateMaxDistance);
+ 
+ 	while (n & 0x1f)
+ 	{
+ 		n++;	
+ 	}
+ 
+ 	void* p = ::operator new(n);
+ 
+ 	return new(p) HDeflateHash;
+#else
+   	HDeflateHash *dummy = reinterpret_cast<HDeflateHash *>(0) ;
+	TUint offset = reinterpret_cast<TUint>(&(dummy->iOffset[Min(KDeflateMaxDistance , aLinks)])) ;
+	return new (HMem::Alloc(0,offset)) HDeflateHash;
+#endif
+}
 
 inline TInt HDeflateHash::Hash(const TUint8* aPtr)
 	{

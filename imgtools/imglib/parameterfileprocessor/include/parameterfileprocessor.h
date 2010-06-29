@@ -27,9 +27,8 @@
 #include<vector>
 #include<fstream>
 
-typedef std::string String;
-typedef std::vector<String> VectorOfStrings;
-typedef std::ifstream FileInputStream;
+using namespace std ;
+typedef vector<string> VectorOfStrings; 
 
 /**
 Class CParameterFileProcessor for processing parameter-file
@@ -40,15 +39,15 @@ Class CParameterFileProcessor for processing parameter-file
 
 class CParameterFileProcessor
 {
-	FileInputStream iParamFile;	 	
-	String iParamFileName;		 // Parameter-file name
+	ifstream iParamFile;	 	
+	string iParamFileName;		 // Parameter-file name
 	VectorOfStrings iParameters; // Parameters read from parameter-file
 	unsigned int iNoOfArguments; // Number of parameters present in the parameter-file.
 	char **iParamFileArgs; // Pointer to 2D character array containing the parameters 
 						   // read from parameter-file.	 
 							   
 public:			
-	CParameterFileProcessor(String aParamFileName);	
+	CParameterFileProcessor(const string& aParamFileName);	
 	bool ParameterFileProcessor();	
 	unsigned int GetNoOfArguments() const;
 	char** GetParameters() const;
@@ -56,7 +55,7 @@ public:
 
 private:
 	bool OpenFile();
-	bool SplitLine(String& aLine);
+	bool SplitLine(string& aLine);
 	bool SetNoOfArguments();
 	void SetParameters();
 	void CloseFile();

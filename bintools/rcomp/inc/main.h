@@ -90,6 +90,9 @@ struct GlobalData
     StringArray                AllIdentifiers;
     QualifiedStringArray       UsedIdentifiers;
     MessageArray               Messages;
+	char*					   StdInBuffer ;
+	unsigned long			   StdInBufLength ;
+	unsigned long			   StdInfBufPos ;
 };
 
 extern GlobalData *pG;

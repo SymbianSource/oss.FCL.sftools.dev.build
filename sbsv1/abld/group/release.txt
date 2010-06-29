@@ -1,3 +1,29 @@
+
+<unchange>
+================
+(Made by Zheng Shen 12/06/2010)
+1) minor: enable the following scripts on Linux
+conv_khronos_openvg_hdr_to_cpp.pl
+conv_khronos_hdr_to_cpp.pl
+copyfeaturevariants.pl
+ecopyfile.pl
+armasm2as.pl 
+
+===============
+sym_lkup_util 	version 1.1.0
+listzip 	version 1.1.0
+prepdef 	version 1.1.1
+omapsig 	version 1.1.0
+makedef 	version 1.1.1
+h2inc 		version 1.1.0
+gendef 		version 1.1.0
+createrfifile 	version 1.1.0
+efreeze 	version 1.1.1
+================
+(Made by Marvin Shi 02/06/2010)
+1) change for linux porting
+
+=======
 Version 1.1.0 (efreeze.pl)
 Version 1.1.0 (prepdef.pl)
 Version 1.1.0 (makedef.pl)

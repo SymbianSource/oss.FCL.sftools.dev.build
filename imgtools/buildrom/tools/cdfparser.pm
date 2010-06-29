@@ -97,7 +97,7 @@ sub CreateCDFFileBinaryMap
 	my $path;
 	if( defined $aCdfDir)
 	{
-		$path = "$aCdfDir\\$cdffilename";
+		$path = "$aCdfDir\/$cdffilename";
 	}
 	else
 	{
@@ -200,7 +200,7 @@ sub setBinaryInfo
   	if (defined $aBinaryInfoRef->{"plugin_name"})
   	{
   		$aBinaryInfoRef->{"IsFoundInCDF"} = 1;
-  		$aBinaryInfoRef->{"source"} = "ABI_DIR\\BUILD_DIR\\$aBinaryInfoRef->{id}";
+  		$aBinaryInfoRef->{"source"} = "ABI_DIR\/BUILD_DIR\/$aBinaryInfoRef->{id}";
   		$aBinaryInfoRef->{"plugin_name"} =~ s/$aBinaryInfoRef->{plugin_name}/ECOM/;
   	}
   

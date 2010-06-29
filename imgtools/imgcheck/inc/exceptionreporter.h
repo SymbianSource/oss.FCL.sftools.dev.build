@@ -40,7 +40,7 @@ public:
 	void Report(void) const;
 
 private:
-	String iMessage;
+	string iMessage;
 	ExceptionImplementation* iExcepImplPtr;
 };
 

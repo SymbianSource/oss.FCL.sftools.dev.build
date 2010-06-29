@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2006-2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2006-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -58,11 +58,16 @@ require Exporter;
 	create_smrimage
 );
 
+my $useinterpretsis = 1;
+if ($^O !~ /^MSWin32$/i){
+	$useinterpretsis = 0;
+}
 my $enforceFeatureManager = 0; # Flag to make Feature Manager mandatory if SYMBIAN_FEATURE_MANAGER macro is defined. 
 
 my $BuildromMajorVersion = 3 ;
-my $BuildromMinorVersion = 17;
+my $BuildromMinorVersion = 26;
 my $BuildromPatchVersion = 0;
+
 
 sub print_usage
 {
@@ -94,7 +99,7 @@ The final specification is in the subset of the specification language
 which is understood directly by ROMBUILD.
 
 Each obyfile parameter specifies a file via a search path: if the
-filename is not matched then buildrom will look in \\epoc32\\rom\\include.
+filename is not matched then buildrom will look in \/epoc32\/rom\/include.
 
 Buildrom invokes ROMBUILD to generate the ROM image, and produces a
 number of related files such as the ROM symbol file. The name of the
@@ -122,8 +127,10 @@ The available options are
    -gendep                          -- generate dependence graph for rom image
    -nosymbols                       -- disable creation of symbol file
    -noimage                         -- disable creation of ROM/ROFS/DataDrive Image
-   -fastcompress                    -- compress files with faster bytepair and tradeoff of compress ratio
    -j<digit>                        -- do the main job with <digit> threads
+   -cache                           -- allow the ROFSBUILD to reuse/generate cached executable files
+   -nocache                         -- force the ROFSBUILD not to reuse/generate cached executable files
+   -cleancache                      -- permanently remove all cached executable files
    -loglevel<level>                 -- Level of information logging where loglevel is 0,1,2
                                        0 default level of information
                                        1 host/ROM filenames, file size and the hidden attribute along with level0 log
@@ -131,7 +138,8 @@ The available options are
    -z=xxx or -zdrivepath=xxx        -- specify a location to create Z drive directory. 
    -d=xxx or -datadrivepath=xxx     -- specify a location to create data drive directory.
    -k or -keepgoing                 -- enable keepgoing,continue to create the data drive image even
-                                    if the non-sis, sis or zdrive image file(s) are missing or corrupt.
+                                    if the non-sis, sis or zdrive image file(s) are missing or corrupt; create rom/rofs
+									image even some oby files missing and/or duplicated definitions in oby files .
    -r or -retainfolder              -- enable retainfolder,would retain pre-existence of z & data drive folder. 
    -zdriveimage=xxx                 -- specify Z drive image (ROM, CORE, ROFS or Ext-ROFS image).
    -pfile=xxx                       -- specify a parameter file for interpretsis to take additional parameters.
@@ -142,6 +150,9 @@ The available options are
    -I<directory>                    -- Use <directory> for the referenced IBY/OBY files
    -argfile=xxx                     -- specify argument-file name containing list of command-line arguments to buildrom   
    -lowmem                          -- use memory-mapped file for image build to reduce physical memory consumption   
+   -checkcase                       -- check character case of path/name in oby/iby files, 
+                                    the result will be checkcase.log, this option is only valid on windows.
+   -workdir=xxx                     -- specify a directory to contain generated files.   
 
 Popular -D defines to use include
 
@@ -149,8 +160,8 @@ Popular -D defines to use include
    -D_FULL_DEBUG    -- select debug versions of all files
    -D_ARM4          -- specify the target platform
 
-   -D_EABI=xxxx     -- specify target for all files (e.g. ARMV5)
-   -D_KABI=xxxx     -- specify the target platform for the Kernel (e.g. ARMV5)
+   -D_EABI=xxxx     -- specify target for all files (e.g. armv5)
+   -D_KABI=xxxx     -- specify the target platform for the Kernel (e.g. armv5)
 
 Other defines may be useful for particular OBY files.
 
@@ -158,45 +169,29 @@ USAGE_EOF
 }
 
 use strict;
-my $PerlLibPath;    # fully qualified pathname of the directory containing our Perl modules
-# establish the path to the Perl libraries
-$PerlLibPath = $FindBin::Bin;	# X:/epoc32/tools
-$PerlLibPath =~ s/\//\\/g;	# X:\epoc32\tools
-$PerlLibPath .= "\\";
-sub ExportDirs ($);
+use romutl;
+use romosvariant;
 
-use BPABIutl; # for BPABIutl::BPABIutl_Plat_List
+my $PerlEPOCPath = &get_epocroot()."epoc32\/tools\/";   # fully qualified pathname of the directory containing EPOC Perl modules
+
+sub ExportDirs ($);
 
 my $xmlrequired = 0; # assume xml required is false. Used to determine if xml
                      # modules should be loaded.
 
-use Modload;	     # To load modules dynamically
+use flexmodload;	     # To load modules dynamically
 
 # Work out the relative path to the epoc32 directory
 use spitool qw(&createSpi);
 use Cwd;
-use Pathutl;
-use E32Variant;
-use E32Plat;
-use Genutl;
-use BPABIutl;		# for BPABIutl::BPABIutl_Plat_List
 use externaltools; 	#To invoke External Tools
+use File::Basename;
 
 my @tempfiles;  	
 my $preserve = 0; 	#flag to indicate if temporary files should be preserved
 my $uppath="x";	    	# will be initialised when first needed
 
-my $epocroot = $ENV{EPOCROOT};
-die "ERROR: Must set the EPOCROOT environment variable\n" if (!defined($epocroot));
-$epocroot =~ s-/-\\-go;	# for those working with UNIX shells
-die "ERROR: EPOCROOT must not include a drive letter\n" if ($epocroot =~ /^.:/);
-die "ERROR: EPOCROOT must be an absolute path without a drive letter\n" if ($epocroot !~ /^\\/);
-die "ERROR: EPOCROOT must not be a UNC path\n" if ($epocroot =~ /^\\\\/);
-die "ERROR: EPOCROOT must end with a backslash\n" if ($epocroot !~ /\\$/);
-die "ERROR: EPOCROOT must specify an existing directory\n" if (!-d $epocroot);
-
-my $epoc32 = relative_path("${epocroot}epoc32");
-$epoc32 =~ s-\\-/-go;
+my $epocroot = &get_epocroot;
 
 my @obyfiles;
 my $cppargs = "-nostdinc -undef";
@@ -223,14 +218,22 @@ use constant PAGEDSECTION   => 2;        # Indicates only paged section will be 
 use constant UNPAGEDSECTION => 3;        # Indicates only unpaged section will be compressed.
 my $opt_compression_type = UNCOMPRESSED; # Leave the ROM image uncompressed by default.
 
-my $thisdir=cwd;
-$thisdir=~s-/-\\-go;		    # separator from Perl 5.005_02+ is forward slash
-$thisdir=~s-^(.*[^\\])$-$1\\-o;	    # ensure path ends with a backslash
-$thisdir=~s-^.:\\--o;		    # remove drive letter and leading backslash
+#Variables to store cache command line options
+my $opt_cache      = 0;
+my $opt_nocache    = 0;
+my $opt_cleancache = 0;
 
-my $rominclude = "$epoc32/rom/include";
+my $thisdir=cwd;
+$thisdir=~s-\\-\/-go;		    # separator from Perl 5.005_02+ is forward slash
+$thisdir.= "\/" unless $thisdir =~ /\/$/;
+$thisdir =~ s-\/-\\-g if (&is_windows);
+
+my $rominclude = $epocroot."epoc32\/rom\/include\/";
+$rominclude = &get_epocdrive().$rominclude unless $rominclude =~ /^.:/;
+$rominclude =~s-\\-\/-g;
+
 my %plugintypes; #hash of plugin types and their SPI files' destinations in ROM
-$plugintypes{"ECOM"} = "\\private\\10009d8f\\"; #ECOM SPI files' destination in ROM image
+$plugintypes{"ECOM"} = "\/private\/10009d8f\/"; #ECOM SPI files' destination in ROM image
 
 my @obydata;
 my @newobydata;
@@ -239,7 +242,7 @@ my @substitutionOrder;
 my %languageCodes;
 my $defaultLanguageCode;
 my %multiLinguifyAlias;  # to by-pass the 'mustbesysbin' option for multilinguify 'alias'es. 
-my $abiDowngrade;
+my $abiDowngrade = "";
 my @binarySelectionOrder;
 my $fromDIR;
 my %rombuildOptions = ("-type-safe-link" => 1 );
@@ -252,7 +255,7 @@ my $rombasename;
 
 my $sourcefile;
 my $sourceline;
-my ($line);
+#my $line;
 my %romfiles;
 
 # To handle BINARY_SELECTION_ORDER macro.
@@ -276,7 +279,6 @@ my $gendep = "";
 my $nosymbols = "";
 my $noimage = "";
 my $customizedPlat = undef;
-my $opt_fastcompress = "";
 my $opt_jobs= "";
 
 #Summary of files(both executables and data files) currently includes 
@@ -291,8 +293,6 @@ my $logLevel="";
 my $lowMem="";
 
 # Feature Variation modules and data
-use featurevariantparser;
-use featurevariantmap;
 my %featureVariant;
 
 # global variables specific to data drive image generation. 
@@ -338,6 +338,10 @@ my %smrNameInfo;
 my @obeyFileList;
 my $smrNoImageName = 0;
 my $onlysmrimage = 1;
+my $checkcase = 0;
+my $checkcase_platform = "";
+my $checkcase_test = 0;
+my $opt_workdir = 0;
 
 sub match_obyfile
 {
@@ -359,6 +363,7 @@ sub match_obyfile
 	}
 	foreach my $dir (@otherDirs)
 	{
+		print "$dir/$obyfile\n" if ($opt_v);
 		if (-f "$dir/$obyfile")
 		{
 		    push @obyfiles, "$dir/$obyfile";
@@ -432,7 +437,7 @@ sub create_datadriveImage
 			&datadriveimage::reportError("* Warning could not delete $ZDirloc",$opt_k);
 		}
 		# delete data drive directory if and only if preserve(-p) option is disabled.
-		my $retVal = &deleteDirectory($DataDriveDirloc,$opt_v)if(!($preserve));
+		$retVal = &deleteDirectory($DataDriveDirloc,$opt_v)if(!($preserve));
 		if($retVal)
 		{
 			&datadriveimage::reportError("* Warning could not delete $DataDriveDirloc",$opt_k);
@@ -453,6 +458,7 @@ sub tidy_exit
 	{
 	    foreach my $tempfiles (@tempfiles)
 	    {
+	    print "remove $tempfiles\n" if ($opt_v);
 			unlink "$tempfiles";
 	    }
 	}
@@ -498,7 +504,7 @@ sub processData
 			exit(1) if(!$opt_k);
 		}
 		# delete pre-existence of data drive folder, if and only if -r option is not enabled.
-		my $retVal = &datadriveimage::deleteDirectory($DataDriveDirloc,$opt_v) if(!$opt_r);
+		$retVal = &datadriveimage::deleteDirectory($DataDriveDirloc,$opt_v) if(!$opt_r);
 		if($retVal)
 		{
 			exit(1) if(!$opt_k);
@@ -506,7 +512,7 @@ sub processData
 		if($opt_logFile)
 		{
 			# clean any pre-existance of log file.
-			unlink($ZDirloc."\\".$imageEntryLogFile);
+			unlink($ZDirloc."\/".$imageEntryLogFile);
 		}
 		
 		for (my $datadriveidx=0; $datadriveidx < $dataImageCount; $datadriveidx++)
@@ -531,7 +537,7 @@ sub processData
 					{
 						# if yes, then set the location of prototype data drive folder as 
 						# DataDriveDirloc + datadrivename
-						$proDataDriveDirloc = $DataDriveDirloc."\\".$datadrivename;
+						$proDataDriveDirloc = $DataDriveDirloc."\/".$datadrivename;
 					}
 					else
 					{
@@ -556,7 +562,7 @@ sub processData
 							my $arraysize = scalar(@zDriveImageList);
 							for( my $i=0; $i < $arraysize; $i++ )
 							{
-								$zDriveSisFileLoc =  $ZDirloc."\\".$datadrivename;
+								$zDriveSisFileLoc =  $ZDirloc."\/".$datadrivename;
 								&datadriveimage::invokeReadImage(pop(@zDriveImageList),$zDriveSisFileLoc,$opt_v,$imageEntryLogFile,$opt_k);
 							}
 						}
@@ -592,7 +598,13 @@ sub processData
 							}
 						}
 						# invoke INTERPRETSIS tool with z drive folder location.
-						&datadriveimage::invokeInterpretsis( \@sisfilelist,$proDataDriveDirloc,$opt_v,$zDriveSisFileLoc,$paraFile,$opt_k,\@interpretsisOptList)if($sisfilepresent);
+						if ($useinterpretsis)
+						{
+							&datadriveimage::invokeInterpretsis( \@sisfilelist,$proDataDriveDirloc,$opt_v,$zDriveSisFileLoc,$paraFile,$opt_k,\@interpretsisOptList)if($sisfilepresent);
+						}else
+						{
+							print "Warning: interpretsis is not ready on linux.\n";
+						}	
 					}
 
 					# create an oby file by traversing through upated prototype data drive directory.
@@ -729,7 +741,7 @@ sub process_cmdline_arguments
 	if (!defined $paramFileFlag) 
 	{
 		# Enforce Feature Manager if macro SYMBIAN_FEATURE_MANAGER is defined in the HRH file.
-		my @hrhMacros = &Variant_GetMacroList;	
+		my @hrhMacros = &get_variantmacrolist;	
 		if (grep /^SYMBIAN_FEATURE_MANAGER\s*$/, @hrhMacros)
 		{
 			$enforceFeatureManager = 1;
@@ -744,7 +756,14 @@ sub process_cmdline_arguments
 			}
 		}
 	}
-
+	# first searching argList for keepgoing option
+	foreach my $arg (@argList) {
+		if ( $arg =~ /^-k$/i || $arg =~ /^-keepgoing$/i )
+	  {
+			$opt_k = 1;		
+  		last;	
+		}
+	}
 	foreach my $arg (@argList)
 	{
 	    if ($arg =~ /^-argfile=(.*)/) 
@@ -773,11 +792,11 @@ sub process_cmdline_arguments
 			if ($varname =~ /^\.(.*)$/)
 			{
 				# for testing, locate the VAR file in the current directory
-				%featureVariant = featurevariantparser->GetVariant($1, ".");
+				%featureVariant = get_variant($1, ".");
 			}
 			else
 			{
-				%featureVariant = featurevariantparser->GetVariant($varname);
+				%featureVariant = get_variant($varname);
 			}
 			if (!$featureVariant{'VALID'})
 			{
@@ -797,11 +816,6 @@ sub process_cmdline_arguments
 	    {
 		$opt_o = $1;
 		next;
-	    }
-	    if ($arg =~ /^-fastcompress$/i)
-	    {
-		    $opt_fastcompress = "-fastcompress";
-		    next;
 	    }
 	    if ($arg =~ /^-j(\d+)$/i)
 	    {
@@ -871,6 +885,23 @@ sub process_cmdline_arguments
 			}			
 			next;
 	    }
+		#Process Cache command line options.
+		if($arg =~ /^-cache/)
+		{
+			$opt_cache = 1;
+			next;
+		}
+		if($arg =~ /^-nocache/)
+		{
+			$opt_nocache = 1;
+			next;
+		}
+		if($arg =~ /^-cleancache/)
+		{
+			$opt_cleancache = 1;
+			next;
+		}
+
 	    #Process ROM image compression type if it's specified through command line option.
 	    if($arg =~ /^-compress(.*)/)
 	    {
@@ -958,6 +989,36 @@ sub process_cmdline_arguments
 			$gendep=1;
 			next;
 		}
+		if ($arg =~ /^-checkcase$/)
+		{
+			$checkcase=1;
+			next;	
+		}
+		if ($arg =~ /^-checkcase_test$/)
+		{
+			$checkcase_test=1;
+			next;	
+		}
+		if ($arg =~ /^-workdir=(.*)/)
+		{
+			my $workdir = $1;
+			if (!-d $workdir)
+			{
+				die "directory $workdir does not exist\n";
+			}
+			my $currentdir = cwd;
+			chdir "$workdir" or die "cannot change to directory $workdir\n";
+			$thisdir=cwd;
+			$thisdir=~s-\\-\/-go;		    # separator from Perl 5.005_02+ is forward slash
+			$thisdir.= "\/" unless $thisdir =~ /\/$/;
+			if(&is_windows)
+			{
+				$thisdir =~ s-\/-\\-g;
+			}
+			$opt_workdir = 1;
+			chdir "$currentdir";
+			next;	
+		}
         if($arg =~/^-c(.*)/)
         {
           if($1 eq 'none' )
@@ -998,9 +1059,10 @@ sub process_cmdline_arguments
 			else
 			{
 				$ZDirloc  = $1;
-				if( $ZDirloc !~ m/\\(\Z)/)
+				$ZDirloc =~ s-\\-\/-g;
+				if( $ZDirloc !~ m/\/(\Z)/)
 				{ 
-					$ZDirloc .= "\\"; 
+					$ZDirloc .= "\/"; 
 				}
 				if( $ZDirloc !~ m/:/)
 				{
@@ -1027,9 +1089,10 @@ sub process_cmdline_arguments
 			else
 			{
 				$DataDriveDirloc = $1;
-				if( $DataDriveDirloc !~ m/\\(\Z)/)
+				$DataDriveDirloc =~ s-\\-\/-g;
+				if( $DataDriveDirloc !~ m/\/(\Z)/)
 				{ 
-					$DataDriveDirloc .= "\\"; 
+					$DataDriveDirloc .= "\/"; 
 				}
 				if( $DataDriveDirloc !~ m/:/)
 				{
@@ -1088,7 +1151,7 @@ sub process_cmdline_arguments
 	    }
 		if ( $arg =~ /^-l=(.*)/i || $arg =~ /^-logimageentry=(.*)/i )
 	    {
-			if( $1 =~/\\/ || $1 =~ m/:/)
+			if( $1 =~/[\/\\]/ || $1 =~ m/:/)
 			{
 				print "* Warning: Invalid log file extension try filename.txt\n";
 				next;
@@ -1116,7 +1179,7 @@ sub process_cmdline_arguments
 	    next if (match_obyfile("$arg.oby"));
 
 	    print "Cannot find oby file: $arg\n";
-	    $errors++;
+	    $errors++ if(!$opt_k);
 	}
 
 	if (defined $paramFileFlag) 
@@ -1127,7 +1190,7 @@ sub process_cmdline_arguments
 	if (@obyfiles<1)
 	{
 	    print "Missing obyfile argument\n";
-	    $errors++;
+	    $errors++ if(!$opt_k);
 	}
 
 	if ($errors)
@@ -1146,18 +1209,16 @@ sub process_cmdline_arguments
 	# (only required if no Feature Variant is used)
 	if (!$featureVariant{'VALID'})
 	{
-	    my $variantMacroHRHFile = Variant_GetMacroHRHFile();
+	    my $variantMacroHRHFile = get_variantmacroHRHfile();
 	    if($variantMacroHRHFile){
-
-	        my $variantFilePath = Path_Split('Path',$variantMacroHRHFile);
-	        $cppargs .= " -I \"" . &Path_RltToWork($variantFilePath) . "\" -include \"" . &Path_RltToWork($variantMacroHRHFile) . "\""; 
+	        my $variantFilePath = split_path('Path',$variantMacroHRHFile);
+	        $cppargs .= " -I " . &append_driveandquote($variantFilePath) . " -include " . &append_driveandquote($variantMacroHRHFile); 
+	        print "in cmd process $cppargs\n" if ($opt_v);
 	    }
 	}
 	# load the required modules if xml is required
 	if ($xmlrequired == 1)
 	{
-	    my $epocToolsPath = $ENV{EPOCROOT}."epoc32\\tools\\";
-	    Load_SetModulePath($epocToolsPath);
 	    if (defined ($featureXml))
 	    {
 			load_featuresutil();
@@ -1165,10 +1226,10 @@ sub process_cmdline_arguments
 	
 	    if ($image_content)
 	    {
-	    	&Load_ModuleL("ImageContentHandler");
+	    	&FlexLoad_ModuleL("ImageContentHandler");
 	    	# some variables for ImageContentHandler may have been setup
 	    	my ($key, $value);
-	    	&ImageContentHandler::SetBldRomOpts; # Defaults to ARMV5 platform
+	    	&ImageContentHandler::SetBldRomOpts; # Defaults to armv5 platform
 	    	while (($key,$value) = each %tmpBldRomOpts)
 	    	{
 			&ImageContentHandler::SetBldRomOpts($key, $value);
@@ -1186,7 +1247,8 @@ sub process_cmdline_arguments
 
 sub preprocessing_phase
 {
-	unlink "tmp1.oby";
+	my $temp1OBYFile = $thisdir."tmp1.oby";
+	unlink "$temp1OBYFile";
 
 #	Macro "ROM_FEATURE_MANAGEMENT" is defined when "-f|fr" or "-fm" is used
 	if (defined ($featureXml))
@@ -1215,30 +1277,37 @@ sub preprocessing_phase
 	else
 	{
 		# no feature variant so use the standard includes
-		$cppargs .= " -I. -I$rominclude";
+		$cppargs .= " -I. -I \"$rominclude\"";
 	}
 
-	print "* cpp -o tmp1.oby $cppargs\n" if ($opt_v);
+	print "* cpp -Wno-endif-labels -o $temp1OBYFile $cppargs\n" if ($opt_v);
 	
+	is_existinpath("cpp", romutl::DIE_NOT_FOUND);
 	$errors = 0;
-	open CPP, "| cpp -o tmp1.oby $cppargs" or die "* Can't execute cpp";
+	open CPP, "| cpp -Wno-endif-labels -o $temp1OBYFile $cppargs" or die "* Can't execute cpp";
 	foreach my $arg (@obyfiles)
 	{
 		print CPP "\n#line 1 \"$arg\"\n";
 	
-		open OBY, $arg or die "* Can't open $arg";
-		print "* reading $arg\n" if ($opt_v);
-		while ($line=<OBY>)
-		{
-			print CPP $line;
+		if(open(OBY, $arg)) {
+			print "* reading $arg\n" if ($opt_v);
+			while ($line=<OBY>) {
+				print CPP $line;
+			}
+			close OBY;
 		}
-		close OBY;
+		else {
+			print STDERR "* Can't open $arg\n";
+			if(!$opt_k){			
+				close CPP;
+				exit(1);
+			}
+		}
 	}
 	close CPP;
 	my $cpp_status = $?;
-	die "* cpp failed\n" if ($cpp_status != 0 || !-f "tmp1.oby");
+	die "* cpp failed\n" if ($cpp_status != 0 || !-f "$temp1OBYFile");
 
-	my $temp1OBYFile = "tmp1.oby";
 	if( defined ($image_content))
 	{
 		#Read the OBY file that was generated by the pre-processor
@@ -1275,10 +1344,10 @@ sub ReadPreprocessedFile
 			$srcFilePath = $2;
 			$dstFilePath = $3;
 
-			if ($srcFilePath=~/.*\\(\S+)/) {
+			if ($srcFilePath=~/.*[\/\\](\S+)/) {
 				$srcFileName = $1;
 			}
-			if ($dstFilePath=~/.*\\(\S+)/) {
+			if ($dstFilePath=~/.*[\/\\](\S+)/) {
 				$dstFileName = $1;
 			}
 			my $binaryInfoRef = &cdfparser::GetBinaryInfo($dstFileName);
@@ -1324,11 +1393,11 @@ sub substitution_phase
 		@substitutionOrder = ("TODAY", "RIGHT_NOW", "EPOCROOT");
 	}
 
+	my $temp1OBYFile = $thisdir."tmp1.oby";
 	
-	open TMP1, "tmp1.oby" or die("* Can't open tmp1.oby\n");
+	open TMP1, "$temp1OBYFile" or die("* Can't open $temp1OBYFile\n");
 	while ($line=<TMP1>)
 	{
-
 		if(($line =~ /^\s*romsize\s*=/i) || ( $line=~ /^\s*rom_image/i) || ($line =~ /^\s*data_image/i))
 		{
 			$onlysmrimage = 0;
@@ -1339,7 +1408,7 @@ sub substitution_phase
 	if ($enforceFeatureManager && (!$featuremanager) && (!$noFeatureManager) )
 	{
 		my $defaultFeatureDbFlag = 0;
-		open TMP1, "tmp1.oby" or die("* Can't open tmp1.oby\n");
+		open TMP1, "$temp1OBYFile" or die("* Can't open $temp1OBYFile\n");
 		while ($line=<TMP1>)
 		{
 			if ($line=~/^\s*defaultfeaturedb\s*=?\s*(\S+)/i)
@@ -1347,6 +1416,7 @@ sub substitution_phase
 				# Get the default value for featuredatabasefile
                 
 				$featureXml = "$epocroot$1";
+				$featureXml =~ s-\\-\/-g;
 				$featuremanager = 1;				
 				$defaultFeatureDbFlag = 1;
 				load_featuresutil();				
@@ -1362,10 +1432,20 @@ sub substitution_phase
 		}
 	}
 
-	open TMP1, "tmp1.oby" or die("* Can't open tmp1.oby\n");
+	open TMP1, "$temp1OBYFile" or die("* Can't open $temp1OBYFile\n");
 	while ($line=<TMP1>)
 	{
 		track_source($line);
+		$line =~ s-\\-\/-g;
+
+		my $tempstring = $epocroot."epoc32";
+		if(($line !~ /^\s*\#/) && ($line =~ /\/epoc32/i) 
+		 && ($line !~ /EPOCROOT##\/?epoc32/i) && ($line !~ /$tempstring/i))
+		{
+			print "add EPOCROOT for line: $line\n" if ($opt_v);
+	  	$line =~ s-\/epoc32-EPOCROOT##epoc32-ig;
+		}
+
 		#
 		# Recognise keywords in lines that we process before substitution
 		#
@@ -1692,7 +1772,6 @@ sub substitution_phase
 
 	close TMP1;
 	exit(1) if ($errors);
-	
 	dump_obydata("tmp2.oby", "result of substitution phase") if ($opt_v);
 }
 
@@ -1725,6 +1804,7 @@ sub check_romimage
 sub dump_obydata
 {
 	my ($dumpfile, $comment) = @_;
+	$dumpfile = $thisdir.$dumpfile;
 	unlink($dumpfile);
 	open DUMPFILE, ">$dumpfile" or die("* Can't create $dumpfile\n");
 	print "* Writing $dumpfile - $comment\n";
@@ -1743,8 +1823,8 @@ sub track_source
 	{
 		$sourceline=$1-1;
 		$sourcefile=$2;
-		$sourcefile=~ s/\//\\/g;
 		$sourcefile=~ s/\\\\/\\/g;
+		$sourcefile=~ s/\\/\//g;
 		return;
 	}
 	$sourceline++;
@@ -2067,7 +2147,7 @@ sub reorganize_phase
 			}
 			# a partition is specified
 			# push this line into the currently selected partition
-			my $partition=@currentpartition[-1];
+			my $partition=$currentpartition[-1];
 			push @$partition, $modifiedLine;
 			$line="REM handled $line";
 		}
@@ -2218,30 +2298,30 @@ sub plugin_match ()
 
 		    if ($spidatahide)
 		    {
-			push @newobydata, "hide=$fileRomDir\\$pluginFileName\n";
+			push @newobydata, "hide=$fileRomDir\/$pluginFileName\n";
 		    }
 		    else
 		    {
-		    	push @newobydata, "file=$emulatorDir\\$pluginFileName $fileRomDir\\$pluginFileName $paged_data\n";
+		    	push @newobydata, "file=$emulatorDir\/$pluginFileName $fileRomDir\/$pluginFileName $paged_data\n";
 		    }
 
 		    if($createspi) {
 		    	    if ($spidatahide)
 			    {
-			    	push @newobydata, "spidatahide=MULTI_LINGUIFY(RSC $dataz_\\$resourceDir\\$pluginResourceName $resourceDir\\$pluginResourceName) " . lc($plugintype) . "\.spi " . $plugintypes{$plugintype} . "\n";      
+			    	push @newobydata, "spidatahide=MULTI_LINGUIFY(RSC $dataz_\/$resourceDir\/$pluginResourceName $resourceDir\/$pluginResourceName) " . lc($plugintype) . "\.spi " . $plugintypes{$plugintype} . "\n";      
 			    }
 			    else
 			    {
-			    	push @newobydata, "spidata=MULTI_LINGUIFY(RSC $dataz_\\$resourceDir\\$pluginResourceName $resourceDir\\$pluginResourceName) " . lc($plugintype) . "\.spi " . $plugintypes{$plugintype} . "\n";      
+			    	push @newobydata, "spidata=MULTI_LINGUIFY(RSC $dataz_\/$resourceDir\/$pluginResourceName $resourceDir\/$pluginResourceName) " . lc($plugintype) . "\.spi " . $plugintypes{$plugintype} . "\n";      
 			    }
 		  	} else {
 		    	    if ($spidatahide)
 			    {
-			    	push @newobydata, "hide=MULTI_LINGUIFY(RSC $dataz_\\$resourceDir\\$pluginResourceName $resourceDir\\$pluginResourceName)\n";
+			    	push @newobydata, "hide=MULTI_LINGUIFY(RSC $dataz_\/$resourceDir\/$pluginResourceName $resourceDir\/$pluginResourceName)\n";
 			    }
 			    else
 			    {
-			    	push @newobydata, "data=MULTI_LINGUIFY(RSC $dataz_\\$resourceDir\\$pluginResourceName $resourceDir\\$pluginResourceName)\n";
+			    	push @newobydata, "data=MULTI_LINGUIFY(RSC $dataz_\/$resourceDir\/$pluginResourceName $resourceDir\/$pluginResourceName)\n";
 			    }
 			}
 				return 1; #successful match
@@ -2275,8 +2355,11 @@ sub multlinguify_phase
 		elsif ($line=~/^(.*?)\bMULTI_LINGUIFY\s*\(\s*(\S+)\s+(\S+)\s+(\S+)\s*\)(.*)$/i)
 		{
 			my $initialStuff=$1;
+			$initialStuff = lc ($initialStuff);# if ($enableLowercaseTransfer);
 			my $defaultFileNameExtension=$2;
+			$defaultFileNameExtension = lc ($defaultFileNameExtension);# if ($enableLowercaseTransfer);
 			my $sourceFileNameWithoutExtension=$3;
+			$sourceFileNameWithoutExtension = ($sourceFileNameWithoutExtension);# if ($enableLowercaseTransfer);
 			my $targetFileNameWithoutExtension=$4;
 			my $finalStuff=$5;
 			my $spidataflag = 0;
@@ -2311,7 +2394,7 @@ sub multlinguify_phase
 			{
 				my $sourceFileNameExtension = $defaultFileNameExtension;
 				my $targetFileNameExtension = $defaultFileNameExtension;
-				if (-e "$sourceFileNameWithoutExtension.$sourceFileNameExtension")
+				if (-e ("$sourceFileNameWithoutExtension.$sourceFileNameExtension"))
 				{
 					if ($spidatahide)
 					{
@@ -2327,7 +2410,7 @@ sub multlinguify_phase
 			foreach my $languageCode (keys %languageCodes) {
 				my $sourceFileNameExtension=$defaultFileNameExtension;
 				$sourceFileNameExtension=~s/^(.*).{2}$/$1$languageCode/;
-				if (! -e "$sourceFileNameWithoutExtension.$sourceFileNameExtension")
+				if (! -e ("$sourceFileNameWithoutExtension.$sourceFileNameExtension"))
 				{
 					if (!$spidataflag)
 					{
@@ -2377,6 +2460,7 @@ sub multlinguify_phase
 					if(!($sourceFileNameExtension eq $targetFileNameExtension))
 					{
 						push @newobydata, "alias $targetFileNameWithoutExtension.$sourceFileNameExtension $targetFileNameWithoutExtension.$targetFileNameExtension $modifiedfinalStuff\n";
+						$targetFileNameWithoutExtension =~ s-\\-\/-g;
 						$multiLinguifyAlias{"$targetFileNameWithoutExtension.$sourceFileNameExtension"} = 1;
 					}
 				}
@@ -2455,7 +2539,7 @@ sub create
 			}
 		}
 		my @spiargs; #arguments passed to createSpi
-		push @spiargs, ("-t$targetspi", "-d\\$thisdir", "-hide@hidedatainspi");
+		push @spiargs, ("-t$targetspi", "-d$thisdir", "-hide@hidedatainspi");
 		if($existingspi ne "") { push @spiargs, $existingspi; }
 		&spitool::createSpi(@spiargs, @dataforspi); # external call to 
 	}
@@ -2621,7 +2705,7 @@ sub spi_creation_phase
                                         while(defined $spiarray[$imageIdx][$spiIdx]) {
                                                 if($spiarray[$imageIdx][$spiIdx]{spifile} =~ /(.+)\.(.*)$/) {
                                                         my $targetspi="$1-$imageIdx-$spiIdx\.$2";
-                                                        push @newobydata, "data=" . "\\$thisdir" . $targetspi . " \"" . $spiarray[$imageIdx][$spiIdx]{spi} . "\"\n";
+                                                        push @newobydata, "data=" . "$thisdir" . $targetspi . " \"" . $spiarray[$imageIdx][$spiIdx]{spi} . "\"\n";
                                                 }
                                                 $spiIdx++;
                                         }
@@ -2648,7 +2732,7 @@ sub spi_creation_phase
 					while(defined $spiarray[0][$k]) {
 						if($spiarray[0][$k]{spifile} =~ /(.+)\.(.*)$/) {
 							my $targetspi="$1-0-$k\.$2";
-							push @newobydata, "data=" . "\\$thisdir" . $targetspi . " \"" . $spiarray[0][$k]{spidir} . $targetspi .  "\"\n";
+							push @newobydata, "data=" . "$thisdir" . $targetspi . " \"" . $spiarray[0][$k]{spidir} . $targetspi .  "\"\n";
 						}
 						$k++;
 					}
@@ -2658,7 +2742,7 @@ sub spi_creation_phase
 				while(defined $spiarray[$romimage][$j]) { #put in SPI files for current ROM_IMAGE
 					if($spiarray[$romimage][$j]{spifile} =~ /(.+)\.(.*)$/) {
 						my $targetspi="$1-$romimage-$j\.$2";
-						push @newobydata, "data=" . "\\$thisdir" . $targetspi . " \"" . $spiarray[$romimage][$j]{spidir} . $targetspi .  "\"\n";
+						push @newobydata, "data=" . "$thisdir" . $targetspi . " \"" . $spiarray[$romimage][$j]{spidir} . $targetspi .  "\"\n";
 					}
 					$j++;
 				}
@@ -2668,7 +2752,7 @@ sub spi_creation_phase
 					while(defined $spiarray[0][$k]) {
 						if($spiarray[0][$k]{spifile} =~ /(.+)\.(.*)$/) {
 							my $targetspi="$1-0-$k\.$2";
-							push @newobydata, "data=" . "\\$thisdir" . $targetspi . " \"" . $spiarray[0][$k]{spidir} . $targetspi . "\"\n";
+							push @newobydata, "data=" . "$thisdir" . $targetspi . " \"" . $spiarray[0][$k]{spidir} . $targetspi . "\"\n";
 						}
 						$k++;
 					}
@@ -2685,7 +2769,7 @@ sub spi_creation_phase
 			while(defined $spiarray[0][$k]) {
 				if($spiarray[0][$k]{spifile} =~ /(.+)\.(.*)$/) {
 					my $targetspi="$1-0-$k\.$2";
-					push @newobydata, "data=" . "\\$thisdir" . $targetspi . " \"" . $spiarray[0][$k]{spidir} . $targetspi . "\"\n";
+					push @newobydata, "data=" . "$thisdir" . $targetspi . " \"" . $spiarray[0][$k]{spidir} . $targetspi . "\"\n";
 				}
 				$k++;
 			}
@@ -2697,7 +2781,7 @@ sub spi_creation_phase
 
 sub load_featuresutil
 {
-	&Load_ModuleL("featuresutil");
+	&FlexLoad_ModuleL("featuresutil");
 			
 	# Parse the feature database XML file
 	if(!&featuresutil::parseXMLDatabase($featureXml, $featuremanager, $strict))
@@ -2723,13 +2807,13 @@ sub featurefile_creation_phase
 	if ($enforceFeatureManager) 
 	{
 		# features data file location
-		$dir = "private\\10205054\\";
+		$dir = "private\/10205054\/";
 		$featurefilename = "features.dat";
 	}
 	else
 	{
 		# feature registry configuration file location
-		$dir = "private\\102744CA\\"; 
+		$dir = "private\/102744CA\/"; 
 		$featurefilename = "featreg.cfg";
 	}		
 	if (defined ($featureXml)) 
@@ -2859,7 +2943,7 @@ sub featurefile_creation_phase
 			my $j=0;
 			while(defined $featurefilearray[$i][$j])
 			{
-				my $targetfeaturefile = $featurefilearray[$i][$j]{cfgfile};
+				my $targetfeaturefile = $thisdir.$featurefilearray[$i][$j]{cfgfile};
 				if (!(&featuresutil::createFeatureFile($i,$j,$targetfeaturefile,\@featureslist,$featuremanager))) 
 				{
 					$featurefilearray[$i][$j]{cfgfile}= undef;
@@ -2890,7 +2974,7 @@ sub featurefile_creation_phase
 						my $targetfeaturefile=$featurefilearray[0][$k]{cfgfile};
 						if (defined $targetfeaturefile) 
 						{
-							push @newobydata, "data=" . "\\$thisdir" . $targetfeaturefile . " \"" . $featurefilearray[0][$k]{cfgdir} . $targetfeaturefile .  "\"\n";							
+							push @newobydata, "data=" . "$thisdir" . $targetfeaturefile . " \"" . $featurefilearray[0][$k]{cfgdir} . $targetfeaturefile .  "\"\n";							
 						}
 						$k++;
 					}
@@ -2913,7 +2997,7 @@ sub featurefile_creation_phase
 
 					if (defined $targetfeaturefile)
 					{
-						push @newobydata, "data=" . "\\$thisdir" . $targetfeaturefile . " \"" . $featurefilearray[$romimage][$j]{cfgdir} . $destinationfeaturefile .  "\"\t\t" . $exattribute . "\n";
+						push @newobydata, "data=" . "$thisdir" . $targetfeaturefile . " \"" . $featurefilearray[$romimage][$j]{cfgdir} . $destinationfeaturefile .  "\"\t\t" . $exattribute . "\n";
 					}
 					$j++;
 				}
@@ -2934,7 +3018,7 @@ sub featurefile_creation_phase
 				my $targetfeaturefile = $featurefilearray[0][$k]{cfgfile};
 				if (defined $targetfeaturefile)
 				{
-					push @newobydata, "data=" . "\\$thisdir" . $targetfeaturefile . " \"" . $featurefilearray[0][$k]{cfgdir} . $targetfeaturefile . "\"\n";
+					push @newobydata, "data=" . "$thisdir" . $targetfeaturefile . " \"" . $featurefilearray[0][$k]{cfgdir} . $targetfeaturefile . "\"\n";
 				}
 				$k++;
 			}
@@ -2976,6 +3060,8 @@ sub featurefile_creation_phase
 	    print "Error: no feature data file or pre-built feature data file is provided!";
 	    exit(1);
 	}
+	
+	checkcase() if ($checkcase);
 }
 my ($fromABI,$toABI) = split / /,$abiDowngrade;
 
@@ -2991,7 +3077,8 @@ my ($fromABI,$toABI) = split / /,$abiDowngrade;
 sub suppress_phase
 {
 	undef @newobydata;
-	Plat_Init($PerlLibPath);
+
+	init_plat($PerlEPOCPath);
 
 	# use the "default" feature variant by default.
 	my $varname = $featureVariant{'VALID'} ? $featureVariant{'NAME'} : "default";
@@ -2999,14 +3086,14 @@ sub suppress_phase
 	foreach $line (@obydata)
 	{
 		track_source($line);
-		if ($line =~ /^\s*REM/i)
+		if ($line =~ /^\s*REM/i || $line =~ /^\s*TIME\s*=\s*/i)
 		{
 			# ignore REM statements, to avoid processing "REM data=xxx yyy"
 		}
 		# 
 		# thing=some\file 
 		#
-		elsif ($line =~ /(\S+)\s*=\s*"?(\S+\\\S+)"?/)
+		elsif ($line =~ /(\S+)\s*=\s*"?(\S+[\/\\]\S+)"?/)
 		{
 			my $what = $1;
 			my $filename = $2;
@@ -3014,7 +3101,7 @@ sub suppress_phase
 			{
 				$filename = $2;
 			}
-			my $normedFilename = &Genutl_NormaliseVersionedName($filename);
+			my $normedFilename = &get_versionedname($filename);
 
 			# find all the alternative file locations
 			my @alternatives = fallback($normedFilename);
@@ -3027,36 +3114,35 @@ sub suppress_phase
 			{
 			    my $tmpPath;
 			    my $tmpFile;
-				if($altFile =~ /"?(.*\\arm\w+_?\w+)\\([^"]+)/i)
+				if($altFile =~ /"?(.*[\/\\]arm\w+_?\w+)[\/\\]([^"]+)/i)
 				{
 					$tmpPath = $1;
 					$tmpFile = $2;
 				}
 				$tmpPath .= "\.$varname";
-				if (-d $tmpPath){
-				  if (-e $tmpPath ."\\$tmpFile"){
-				   $fileExists = $tmpPath . "\\$tmpFile";
-				  }
-				  elsif (-e $altFile){
-				   $fileExists = $altFile;
-				  }
+				
+				if (-e $tmpPath ."\/$tmpFile"){
+                  # SBSv2 variant binary exists
+				  $fileExists = $tmpPath . "\/$tmpFile";
 				}
 				else {
-				  $fileExists = featurevariantmap->Find($altFile, $varname);
+                  # SBSv1 variant binary or invariant binary
+				  $fileExists = get_BVbinname($altFile, $varname);
 				}
 				last if $fileExists;
 			}
-
+			
 			# edit the OBY line to use the actual file name which we found.
 			# (maybe) warn if an alternative to the original was selected.
 			if ($fileExists)
 			{
 				my $from = $filename;
-				$from =~ s/\\/\\\\/g;		# need to escape backslashes
+				$from =~ s/\\/\\\\/g;	
+				$from =~ s/\//\\\//g;		# need to escape backslashes
 				$from =~ s/(\[|\])/\\$1/g;	# need to escape square brackets for file names like "featreg.cfg[x-y]",etc.
 				my $into = $fileExists;
 
- 				$line =~ s/$from/$into/;
+ 				$line =~ s/$from/$into/i;
 
  				if ($warnSelection && ($fileExists ne $normedFilename))
 				{
@@ -3069,7 +3155,7 @@ sub suppress_phase
 				# it is a manatory ROMBUILD keyword, in which case it is better
 				# to let ROMBUILD report the missing file rather than report the
 				# missing keyword.
-   				if ($what !~ /^bootbinary|variant|primary|secondary|hide/i)
+   				if ($what !~ /^bootbinary|variant|primary|secondary|hide|dir/i)
 				{
    					$line = "REM MISSING " . $line;
    					print_source_error("Missing file: '$filename' in statement '$what='");
@@ -3093,8 +3179,8 @@ sub suppress_phase
 				$aSrcfile = $1;
 				}
 
-				$aSrcfile = &Genutl_NormaliseVersionedName($aSrcfile);
-				if($dstFile =~ /"?(.*)\\([^"]+)/)
+				$aSrcfile = &get_versionedname($aSrcfile);
+				if($dstFile =~ /"?(.*)[\/\\]([^"]+)/)
 				{
 					$dstPath = $1;
 					$dstFile = $2;
@@ -3110,6 +3196,7 @@ sub suppress_phase
 		}
 		push @newobydata, $line;
 	}
+	
 	@obydata = @newobydata;
 	dump_obydata("tmp7.oby", "result of problem-suppression phase") if ($opt_v);
 	die "ERROR: $errors missing file(s) detected\n" if ($strict && $errors );
@@ -3136,72 +3223,72 @@ sub fallback
  	if ($binarySelectionOrderFlag)
    	{
  		# Search in the specified binary order 
- 		if(!defined(@Global_PlatList))
+ 		if(scalar(@Global_PlatList) == 0)
 		{
-			@Global_PlatList = Plat_List();
+			@Global_PlatList = get_platlist();
 		}
  		my $b;
  		my $e;
  		foreach my $plat (@Global_PlatList) 
   		{
-  			if ($file =~ /^(.*)\\$plat\\(.*)$/i) 
+  			if ($file =~ /^(.*)[\/\\]$plat[\/\\](.*)$/i) 
   			{
   				$b = $1;
   				$e = $2;
  				last;
  			}
  		}
- 		push(@alternatives, "$b\\$firstDIR\\$e");
+ 		push(@alternatives, "$b\/$firstDIR\/$e");
  			
  		foreach my $toDIR (@binarySelectionOrder)
    		{
- 			push(@alternatives, "$b\\$toDIR\\$e");
+ 			push(@alternatives, "$b\/$toDIR\/$e");
    		}
    	}
   	
- 	# If the file is not found in the specified ABIV2 platform, then select from ARMV5 directory.
- 	# This is necessary as some of the runtime DLLs will be present only in ARMV5 directory. 
+ 	# If the file is not found in the specified ABIV2 platform, then select from armv5 directory.
+ 	# This is necessary as some of the runtime DLLs will be present only in armv5 directory. 
 	# Add the BPABI Platforms to be added
-	if(!defined(@Global_BPABIPlats))
+	if(scalar(@Global_BPABIPlats) == 0)
 	{
-		@Global_BPABIPlats = &BPABIutl_Plat_List;
+		@Global_BPABIPlats = &get_bpabiplatlist;
 	}
 
  	foreach my $BpabiPlat (@Global_BPABIPlats)
  	{
- 		if ($fromABI eq "" && $file =~ /^(.*)\\$BpabiPlat\\(.*)$/)
+ 		if ($fromABI eq "" && $file =~ /^(.*)[\/\\]$BpabiPlat[\/\\](.*)$/i)
    		{
- 			push(@alternatives, "$1\\armv5\\$2");
+ 			push(@alternatives, "$1\/armv5\/$2");
    		}
    	}
 
-	if ($customizedPlat && $fromABI eq "" && $file =~ /^(.*)\\$customizedPlat\\(.*)$/)
+	if ($customizedPlat && $fromABI eq "" && $file =~ /^(.*)[\/\\]$customizedPlat[\/\\](.*)$/i)
 	{
 		my $b = $1;
 		my $e = $2;
 		# if platform customization 
-		my $rootPlat = Plat_Root($customizedPlat);		
+		my $rootPlat = get_platroot($customizedPlat);		
         
    		#Check in ARMV7 folder for binaries in case GCCEV7 is used [DEF128457 ]
    		if($customizedPlat == "GCCEV7")
    		{
-   			push(@alternatives,"$b\\armv7\\$e");
+   			push(@alternatives,"$b\/armv7\/$e");
    		}
 
 		if( grep /$rootPlat/, @Global_BPABIPlats)
 		{
- 			push(@alternatives, "$b\\armv5\\$e");
+ 			push(@alternatives, "$b\/armv5\/$e");
 		}
 	}
 
-	if ($fromABI eq "" && $file =~ /^(.*)\\ARMV5_ABIV1\\(.*)$/i)
+	if ($fromABI eq "" && $file =~ /^(.*)[\/\\]armv5_abiv1[\/\\](.*)$/i)
    	{
- 		push(@alternatives, "$1\\armv5\\$2");
+ 		push(@alternatives, "$1\/armv5\/$2");
    	}
   		
-   	if ($fromABI ne "" && $file =~ /^(.*)\\$fromABI\\(.*)$/)
+   	if ($fromABI ne "" && $file =~ /^(.*)[\/\\]$fromABI[\/\\](.*)$/)
 	{
- 		push(@alternatives, "$1\\$toABI\\$2");
+ 		push(@alternatives, "$1\/$toABI\/$2");
 	}
    
    	return @alternatives;
@@ -3215,17 +3302,17 @@ sub CheckCustomization
  	my @alternatives;
 	$customizedPlat = undef;	# global (used in feedback)
 
- 	if(!defined(@Global_PlatList))
+ 	if(scalar(@Global_PlatList) == 0)
 	{
-		@Global_PlatList = Plat_List();
+		@Global_PlatList = get_platlist();
 	}
  	foreach my $plat (@Global_PlatList) 
 	{
- 		if ($file =~ /^(.*)\\$plat\\(.*)$/i) 
+ 		if ($file =~ /^(.*)[\/\\]$plat[\/\\](.*)$/i) 
 		{
  			my $b = $1;
  			my $e = $2;
- 			my $root = Plat_Customizes($plat);
+ 			my $root = get_platcustomizes($plat);
  			if ($root) 
 			{
 				# Preserve the plat that is customized
@@ -3236,15 +3323,15 @@ sub CheckCustomization
 				# child BSF platform and working back to the root BSF platform
 				while ($root)
 				{
-					push(@alternatives, "$b\\$root\\$e");
+					push(@alternatives, "$b\/$root\/$e");
 
-					# Temporary special case for ARMV5_ABIV1 and ARMV5_ABIV2
+					# Temporary special case for armv5_abiv1 and armv5_abiv2
 					if ($root =~ /^armv5_abiv[12]$/i)
 					{
-						push(@alternatives, "$b\\armv5\\$e");
+						push(@alternatives, "$b\/armv5\/$e");
  					}
 
-					$root = Plat_Customizes($root);
+					$root = get_platcustomizes($root);
 				}
  			}
 			return @alternatives;
@@ -3311,7 +3398,7 @@ sub bitmap_aif_converison_phase
 		if ($line =~ /^\s*bitmap=\s*"?(\S+)"?\s+"?(\S+)"?/i)
 		{
 			my $mbm = $1;
-			my $dest = $2;
+			my $dest = $2;            
 			my $rom_mbm = "$1_rom";
 			if ($is_xip eq 0)
 			{
@@ -3322,8 +3409,17 @@ sub bitmap_aif_converison_phase
 			{	
 		        if (! -e $rom_mbm || -M $rom_mbm >= -M $mbm)
 			    {
-				    system "bmconv /q /r $rom_mbm /m$mbm";
-				    my $bmconv_status = $?;
+					is_existinpath("bmconv", romutl::DIE_NOT_FOUND);
+                    
+                    my $rom_mbm_tmp = $rom_mbm;
+                    my $mbm_tmp = $mbm;
+                    if ($^O =~ /^MSWIN32$/i){
+                        $mbm_tmp =~ s-\/-\\-g;
+                        $rom_mbm_tmp =~ s-\/-\\-g;
+                    }
+                    
+				    system "bmconv -q -r $rom_mbm_tmp -m$mbm_tmp";
+	  		    my $bmconv_status = $?;
 				    die "* bmconv failed\n" if ($bmconv_status != 0 || !-f $rom_mbm);
 			    }
 				$line = "data=\"$rom_mbm\"\t\"$dest\"\n";
@@ -3337,7 +3433,7 @@ sub bitmap_aif_converison_phase
 		elsif ($line =~ /^\s*compressed-bitmap=\s*"?(\S+)"?\s+"?(\S+)"?/i)
 		{
 			my $mbm = $1;
-			my $dest = $2;
+			my $dest = $2;            
 			my $cmprssd_rom_mbm = "$1_rom";
 			if ($is_xip eq 0)
 			{
@@ -3348,7 +3444,16 @@ sub bitmap_aif_converison_phase
 			{
 				if (! -e $cmprssd_rom_mbm || -M $cmprssd_rom_mbm >= -M $mbm)
 			    {
-				    system "bmconv /q /s $cmprssd_rom_mbm /m$mbm";
+					is_existinpath("bmconv", romutl::DIE_NOT_FOUND);
+                    
+                    my $cmprssd_rom_mbm_tmp = $cmprssd_rom_mbm;
+                    my $mbm_tmp = $mbm;
+                    if ($^O =~ /^MSWIN32$/i){
+                        $mbm_tmp =~ s-\/-\\-g;
+                        $cmprssd_rom_mbm_tmp =~ s-\/-\\-g;
+                    }
+                    
+				    system "bmconv -q -s $cmprssd_rom_mbm_tmp -m$mbm_tmp";
 				    my $bmconv_status = $?;
 				    die "* bmconv failed\n" if ($bmconv_status != 0 || !-f $cmprssd_rom_mbm);
 				}
@@ -3379,6 +3484,7 @@ sub reformat_line($)
 	# file=\epoc32\release\marm\urel\eikcore.dll 			System\Libs\Eikcore.dll
 	# alias \System\Bin\DRTRVCT2_2.dll 			\System\Bin\DRTRVCT2_1.dll
 	#
+	$line =~ s-\\-\/-g;
 	if ($line =~ /^\s*TIME\s*=\s*/i)
 	{
 		return $line;
@@ -3391,7 +3497,14 @@ sub reformat_line($)
 	{
 		return $line;
 	}
-	if ($line =~ /^\s*(\S+)\s*=\s*(\S+)\s+"\\?(.*)"(.*)$/)
+	elsif($line =~ /^\s*dir\s*=.*/i)
+	{
+		return $line;
+	}
+	elsif($line =~ /^\s*bootbinary\s*=(.*)/i)
+	{
+	}
+	if ($line =~ /^\s*(\S+)\s*=\s*(\S+)\s+"\/?(.*)"(.*)$/)
 	{
 		$type = $1;
 		$variant = "";
@@ -3399,7 +3512,7 @@ sub reformat_line($)
 		$romfile = $3;
 		$tail = $4;
 	}
-	elsif ($line =~ /^\s*(\S+)(\[\S+\])\s*=\s*(\S+)\s+\\?(\S+)(.*)$/)
+	elsif ($line =~ /^\s*(\S+)(\[\S+\])\s*=\s*(\S+)\s+\/?(\S+)(.*)$/)
 	{
 		$type = $1;
 		$variant = $2;
@@ -3407,7 +3520,8 @@ sub reformat_line($)
 		$romfile = $4;
 		$tail = $5;
 	}
-	elsif ($line =~ /(\S+)\s*=\s*"([^"]+)"\s+"\\?(.*)"(.*)$/)
+	elsif ($line =~ /(\S+)\s*=\s*"([^"]+)"\s+"\/?(.*)"(.*)$/ 
+			|| $line =~ /(\S+)\s*=\s*"([^"]+)"\s+\/?(\S+)(.*)$/)
 	{
 		if ($line !~ /^REM MISSING/i)
 		{
@@ -3421,7 +3535,7 @@ sub reformat_line($)
 			return $line;
 		}
 	}
-	elsif ($line =~ /^\s*(\S+)\s*=\s*(\S+)\s+\\?(\S+)(.*)$/)
+	elsif ($line =~ /^\s*(\S+)\s*=\s*(\S+)\s+\/?(\S+)(.*)$/)
 	{
 		$type = $1;
 		$variant = "";
@@ -3451,11 +3565,11 @@ sub reformat_line($)
 			if ($DllDataMap{$patchdlldatamap_key}->{dstpath} !~ /^sys\\bin/i 
 			 && $DllDataMap{$patchdlldatamap_key}->{dstpath} !~ /^sys\/bin/i)
 			{
-				$DllDataMap{$patchdlldatamap_key}->{dstpath} = "sys\\bin";
+				$DllDataMap{$patchdlldatamap_key}->{dstpath} = "sys\/bin";
 			}
 		}
 		
-		my $dllfile = $DllDataMap{$patchdlldatamap_key}->{dstpath} . "\\". $romfilename;
+		my $dllfile = $DllDataMap{$patchdlldatamap_key}->{dstpath} . "\/". $romfilename;
 		
 		$line = "$1  ";
 		$line .= "$dllfile ";
@@ -3556,7 +3670,7 @@ sub reformat_line($)
 
 		return $line;
 	}
-	elsif ($line =~ /^\s*(\S+)\s*(\S+)\s+\\?(\S+)(.*)$/)
+	elsif ($line =~ /^\s*(\S+)\s*(\S+)\s+\/?(\S+)(.*)$/)
 	{
 		$type = $1;
 		$variant = "";
@@ -3588,7 +3702,7 @@ sub reformat_line($)
  	my $warnFlag = 1;
 	my $mustBeSysBin = $enforceSysBin;
 	if ($type =~ /^(data|compress|nocompress)$/i
-		&& $romfile !~ /^system\\(bin|libs|programs)\\/i)
+		&& $romfile !~ /^system\/(bin|libs|programs)\//i)
 	{
 		$mustBeSysBin = 0;
  		$warnFlag = 0;
@@ -3605,16 +3719,16 @@ sub reformat_line($)
 				return $line;  
 			}
 
-			my $filename = "\\$romfile";	# in case no path is specified
-			$filename = substr $filename, rindex($filename, "\\");
-			$romfile = "sys\\bin".$filename;
+			my $filename = "\/$romfile";	# in case no path is specified
+			$filename = substr $filename, rindex($filename, "\/");
+			$romfile = "sys\/bin".$filename;
 
 			if ($pcfile !~ /^sys\\bin\\/i
 			    && $pcfile !~ /^sys\/bin/i)
 			{
-				my $pcfilename = "\\$pcfile";	# in case no path is specified
-				$pcfilename = substr $pcfilename, rindex($pcfilename, "\\");
-				$pcfile = "sys\\bin".$pcfilename;
+				my $pcfilename = "\/$pcfile";	# in case no path is specified
+				$pcfilename = substr $pcfilename, rindex($pcfilename, "\/");
+				$pcfile = "sys\/bin".$pcfilename;
 			}
 			return "$type$variant $pcfile \t$romfile$tail\n";
 		}
@@ -3622,9 +3736,9 @@ sub reformat_line($)
 		if ($romfile !~ /^sys\\bin\\/i
 		    && $romfile !~ /^sys\/bin/i)
 		{
-			my $filename = "\\$romfile";	# in case no path is specified
-			$filename = substr $filename, rindex($filename, "\\");
-			$romfile = "sys\\bin".$filename;
+			my $filename = "\/$romfile";	# in case no path is specified
+			$filename = substr $filename, rindex($filename, "\/");
+			$romfile = "sys\/bin".$filename;
 		}
 	}
 	else
@@ -3696,8 +3810,8 @@ sub cleaning_phase
 	
     if($opt_v)
     {
-	  my $logWin = "logwin.oby";
-	  my $logLinux = "loglinux.oby";
+	  my $logWin = $thisdir."logwin.oby";
+	  my $logLinux = $thisdir."loglinux.oby";
 	  unlink($logWin);
 	  unlink($logLinux);
 	  open LOGWIN, ">$logWin" or die("* Can't create $logWin\n");
@@ -3733,7 +3847,7 @@ sub cleaning_phase
 		#
 		# Track ROMNAME, allowing overrides
 		#
-		if ($line=~/romname\s*=\s*"?(\S+)\.(\S+)"?\s*/i)
+		if ($line=~/romname\s*[=\s]\s*"?(\S+)\.(\S+)"?\s*/i)
 		{
 			if ($romname ne "" && $opt_o eq "")
 			{
@@ -3741,6 +3855,11 @@ sub cleaning_phase
 			}
 			$rombasename = $1;
 			$romname = "$1.$2";
+			if ($opt_workdir)
+			{
+				$rombasename = $thisdir.$rombasename;
+				$romname = $thisdir.$romname;
+			}
 			next;
 		}
 		#
@@ -3752,7 +3871,7 @@ sub cleaning_phase
 	      &&($newline !~ /^\s*kerneltrace\s*=.*/i))
 	    {
 	        my $tmpline = $newline;
-	        if($^O =~ /^MSWin32$/i)
+	        if(&is_windows)
 	        {
 	          $newline =~ s-\/-\\-go;
 	          if($opt_v)
@@ -3782,10 +3901,20 @@ sub cleaning_phase
 	}
 	
 	exit(1) if($errors && $strict);
-
 	# Handle ROMNAME and possible -o override
 	if ($opt_o ne "")
 	{
+		if ($opt_workdir && $opt_o !~ /^[\\\/]/ && $opt_o !~ /^.:/)
+		{
+			$opt_o = $thisdir.$opt_o;
+		}
+		if (&is_windows)
+		{
+			$opt_o =~ s-\/-\\-g;
+		}else
+		{
+			$opt_o =~ s-\\-\/-g;
+		}
 		$romname=$opt_o;
 		if ($opt_o=~/(\S+)\.(\S+)/)
 		{
@@ -4008,7 +4137,7 @@ sub create_dirlisting
 		my $prevdir = "";
 		foreach $file (sort {uc($a) cmp uc($b)} keys %romfiles)
 		{
-			my $dir = substr $file,0,rindex($file, "\\");
+			my $dir = substr $file,0,rindex($file, "\/");
 			if (uc $dir ne uc $prevdir)
 			{
 				$prevdir = $dir;
@@ -4099,26 +4228,42 @@ sub invoke_rombuild
 	{
 		$rom_compression_type = "";
 	}
+
+	#Compose command line options for Cache.
+	my $cache_options;
+	if($opt_cache == 1)
+	{
+		$cache_options = "-cache ";
+	}
+	if($opt_nocache == 1)
+	{
+		$cache_options .= "-nocache ";
+	}
+	if($opt_cleancache == 1)
+	{
+		$cache_options .= "-cleancache";
+	}
 	
 	my $rombuild;
 	if(!$geninc)
 	{
-		$rombuild = "rombuild -slog $rom_compression_type $logLevel $lowMem $opt_fastcompress $opt_jobs";
+		$rombuild = "rombuild -slog $rom_compression_type $logLevel $lowMem $opt_jobs";
 	}
 	else
 	{
-		$rombuild = "rombuild -slog $rom_compression_type -geninc $logLevel $lowMem $opt_fastcompress $opt_jobs";
+		$rombuild = "rombuild -slog $rom_compression_type -geninc $logLevel $lowMem $opt_jobs";
 	}
 	if($gendep)
 	{
 		$rombuild .= " -gendep";
 	}
-	my $rofsbuild = "rofsbuild -slog $logLevel $lowMem $opt_fastcompress $opt_jobs";
+	$rombuild .= " -k" if($opt_k);
+	my $rofsbuild = "rofsbuild -slog $logLevel $lowMem $opt_jobs $cache_options";
 	foreach my $arg (keys %rombuildOptions)
 	{
 		$rombuild .= " $arg";
 	}
-	        
+	$rofsbuild .= " -k" if($opt_k);        
 	for (my $romidx=0; $romidx<8; $romidx++)
 	{
 		my $obeyfile=$romimage[$romidx]{obeyfile};
@@ -4150,41 +4295,36 @@ sub invoke_rombuild
 			}                        
 			if ($xip)
 			{
+				is_existinpath("rombuild", romutl::DIE_NOT_FOUND);
+				$rombuild .= " -symbols" unless($nosymbols) ;
 				run_rombuilder($rombuild.$compress, $obeyfile, "ROMBUILD.LOG");
-				if(!$nosymbols){
-				print "* Writing $obeyfile.symbol - ROM symbol file\n";
-				print "* Executing maksym $obeyfile.log $obeyfile.symbol\n" if ($opt_v);
-				system("maksym $obeyfile.log $obeyfile.symbol >maksym.out");
-				exit(1) if (!-e "$obeyfile.symbol");
-				}
 			}
 			else
 			{
 				# efficient_rom_paging.pm can move everything to core rom.
 				# If that is the case, don't run rofsbuild at all to avoid errors.
-				use constant TRUE => 1;
-				use constant FALSE => 0;
-				my $run_rofs_build = FALSE;
+			#	use constant TRUE => 1;
+			#	use constant FALSE => 0;
+				my $run_rofs_build = 0;
 				
 				open OBYFILE, "$obeyfile.oby";
 				for (<OBYFILE>)
 				{
 					if (is_oby_statement($_))
 					{
-						$run_rofs_build = TRUE;
+						$run_rofs_build = 1;
 						last;
 					}
 				}
 				close OBYFILE;
 				if ($run_rofs_build)
 				{
-					run_rombuilder($rofsbuild.$compress, $obeyfile, "ROFSBUILD.LOG");
-					if(!$nosymbols){
-					print "* Writing $obeyfile.symbol - ROFS symbol file\n";
-					print "* Executing maksymrofs $obeyfile.log $obeyfile.symbol\n" if ($opt_v);
-					system("maksymrofs $obeyfile.log $obeyfile.symbol >maksym.out");
-					exit(1) if (!-e "$obeyfile.symbol" );
+					is_existinpath("rofsbuild", romutl::DIE_NOT_FOUND);
+					if(!$nosymbols)
+					{
+						$rofsbuild .= " -symbols";
 					}			
+					run_rombuilder($rofsbuild.$compress, $obeyfile, "ROFSBUILD.LOG");
 				}
 			}
 			unlink "rombuild.log";
@@ -4214,16 +4354,16 @@ sub is_oby_statement
 sub relative_path
 {
     my ($arg) = @_;
-    return $arg if ($arg !~ /^\\/);	# not an absolute path
+    return $arg if ($arg !~ /^\//);	# not an absolute path
     if ($uppath eq "x")
 	{
 		$uppath=cwd;
-		$uppath=~s-/-\\-go;		    # separator from Perl 5.005_02+ is forward slash
-		$uppath=~s-^(.*[^\\])$-$1\\-o;	    # ensure path ends with a backslash
-		$uppath=~s-\\([^\\]+)-\\..-og;	    # convert directories into ..
-		$uppath=~s-^.:\\--o;		    # remove drive letter and leading backslash
+		$uppath=~s-\\-\/-go;		    # separator from Perl 5.005_02+ is forward slash
+		$uppath=~s-^(.*[^\/])$-$1\/-o;	    # ensure path ends with a backslash
+		$uppath=~s-\/([^\/]+)-\/..-og;	    # convert directories into ..
+		$uppath=~s-^.:\/--o;		    # remove drive letter and leading backslash
 	}
-    $arg=~s-^\\--o;	# remove leading backslash from original path
+    $arg=~s-^\/--o;	# remove leading backslash from original path
     return "$uppath$arg";
 }
 
@@ -4453,28 +4593,28 @@ sub process_dlldata
 
 		my $DllSymMapRef;
 
-		my @BPABIPlats = &BPABIutl_Plat_List;
+		my @BPABIPlats = &get_bpabiplatlist;
 		my $matchedSymbols = 0;
 		my $globalSyms = 0;
-		my @platlist = &Plat_List();
+		my @platlist = &get_platlist;
 		my $platName;
 		my $rootPlatName;
-		my $plat = "ARMV5";				
-		$plat = &Variant_GetMacro() ? $plat."_ABIV1" : $plat."_ABIV2";		
+		my $plat = "armv5";				
+		$plat = &get_abiv2mode() ? $plat."_abiv1" : $plat."_abiv2";		
 
 		foreach my $plat(@platlist) 
 		{
-			if(($aDllFile =~ /\\($plat)\\/i) or ($aDllFile =~ /\\($plat\.\w+)\\/i ))
+			if(($aDllFile =~ /[\/\\]($plat)[\/\\]/i) or ($aDllFile =~ /[\/\\]($plat\.\w+)[\/\\]/i ))
 			{
 				$platName = $1;
 				last;
 			}
 		}		
-		$rootPlatName =	&Plat_Customizes($platName) ? &Plat_Root($platName) : $platName;
+		$rootPlatName =	&get_platcustomizes($platName) ? &get_platroot($platName) : $platName;
 		
 		# Map files will be referred for all ARM platforms, 
 		# and for BSF platforms which cutomizes ARM platforms.
-		if($rootPlatName =~ /^ARMV5|$plat$/i){
+		if($rootPlatName =~ /^armv5|$plat$/i){
 			my $mapfile = "${aDllFile}.map";
 			
 			open MAPFILE, "$mapfile" or die "Can't open $mapfile\n";
@@ -4518,6 +4658,7 @@ sub process_dlldata
 					$DllSymMapRef->{dataAddr} = $symbolValue;
 					$DllSymMapRef->{size} = $symbolSz;
 
+
 					$matchedSymbols++;
 					if( $matchedSymbols >= $SymbolCount){
 						last;
@@ -4544,7 +4685,7 @@ sub process_dlldata
 			}
 			if( $aDllFile =~ /(.*)\.[^.]+$/ ){
 				my $proxydsofile = "$1.dso";
-				$proxydsofile =~ s/$abiDir\\(.*)\\/ARMV5\\LIB\\/ig;
+				$proxydsofile =~ s-$abiDir\/(.*)\/-armv5\/lib\/-ig;
 				open PIPE, "getexports -d $proxydsofile|" or die "Can't open file $proxydsofile\n";
 				while (<PIPE>){
 					my $line = $_;
@@ -4587,7 +4728,7 @@ sub addDrivesToFeatureVariantPaths
 {
 	return unless $featureVariant{'VALID'};
 
-	my $current = cwd();
+	my $current = &get_epocdrive;
 	my $drive = $1 if ($current =~ /^(.:)/);
 
 	# pre-include file
@@ -4611,6 +4752,7 @@ sub create_smrimage
 	{
 		foreach my $oby (@obeyFileList)
 		{
+			is_existinpath("rofsbuild", romutl::ERROR_NOT_FOUND);
 			my $command = "rofsbuild -slog -smr=$oby.oby";
 			print "* Executing $command\n" if($opt_v);
 			system($command);
@@ -4649,6 +4791,387 @@ sub create_smrimage
 	{
 		print "\n SMR image creating error for empty image name!\n";
 	}
+}
+
+sub checkcase()
+{
+	if (&is_windows)
+	{
+		my @checkcase_obydatatemp = @obydata;
+
+		# call the phase without external tools.
+		plugin_phase();
+		multlinguify_phase();
+		#spi_creation_phase(); #spi creation phase will delete some lines, so do not call this phase
+		suppress_phase();
+		process_dlldata();
+		bitmap_aif_converison_phase();
+
+		my $checkcase_log = "checkcase.log";
+		unlink $checkcase_log;
+		
+		open CHECKCASELOG, ">$checkcase_log" or die("* Can't create $checkcase_log\n");
+		my @checkcase_lines = @obydata;
+		my %checkcase_macro;
+		my @checkcase_macrodir;
+		my $checkcase_line;
+		print CHECKCASELOG "======================Macro check part:======================\n";
+		foreach $checkcase_line (@checkcase_lines)
+		{
+			track_source($checkcase_line);
+			$checkcase_line =~ s-\/-\\-g;
+			$checkcase_line =~ s-\\\\-\\-g;
+			if ($checkcase_line =~ /^\s*REM\s*(re)?defined\s*(\w*)\s*as\s*(\S+)/)
+			{
+				my $checkcase_macrocontent = $3;
+				my $checkcase_macroname = $2;
+				if ($checkcase_macrocontent =~ /[a-zA-Z]/)
+				{
+					$checkcase_macro{$checkcase_macroname} = $checkcase_macrocontent;
+					checkcase_macro(\@checkcase_macrodir, $checkcase_macroname, $checkcase_macrocontent);
+				}
+			}
+		}
+		print CHECKCASELOG "======================Macro check part end======================\n\n";
+		print CHECKCASELOG "======================File check part:======================\n";
+		foreach $checkcase_line (@checkcase_lines)
+		{
+			if ($checkcase_line =~ /^\s*REM\s*.*/)
+			{
+				next;
+			}
+			if ($checkcase_line =~ /^\s*#\s*\d+\s*\"(\S+)\"\s*\d*\s*$/) #oby filename
+			{
+				my $checkcase_whichfile = $1;
+				checkcase_obyfilename($checkcase_whichfile);
+				track_source($checkcase_line);
+			}elsif ($checkcase_line =~ /^\s*\S+\s*=\s*"([^"]+)"\s+\S*\s*/ 
+					 || $checkcase_line =~ /^\s*\S+\s*=\s*(\S+)\s+\S*\s*/) #oby content file name
+			{
+				my $checkcase_pcsidefile = $1;
+				checkcase_pcsidefilename(\@checkcase_macrodir, $checkcase_pcsidefile);
+			}
+		}
+		print CHECKCASELOG "======================File check part end======================\n";
+		close CHECKCASELOG;
+		
+		@obydata = @checkcase_obydatatemp;
+	}else
+	{
+		print "WARNING: checkcase option is only valid on windows.\n";
+	}
+}
+
+sub checkcase_macro()
+{
+	my $macrodir = shift;
+	my $name = shift;
+	my $content = shift;
+	
+	if ($content =~ /epoc32/i && (-d $content))
+	{
+		my $realdir = `directory.bat $content`;
+		$realdir =~ s/\s+$//g;
+		$realdir =~ s/^\s*\w://g if ($content !~ /^\w:/);
+		$realdir =~ s/\\$//g if ($content !~ /\\$/);
+		$realdir .= "\\" if ($content =~ /\\$/ && $realdir !~ /\\$/);
+		$sourcefile =~ s/\//\\/g;
+		$sourcefile =~ s/\\\\/\\/g;
+		if ($realdir ne $content)
+		{
+			print CHECKCASELOG "check case: macro name is $name\n";
+			print CHECKCASELOG "WARNING: macro case is not equal to real.\n";
+			print CHECKCASELOG "file name is $sourcefile\n";
+			print CHECKCASELOG "current is $content\n";
+			print CHECKCASELOG "expect  is $realdir\n\n";
+			checkcase_convert($sourcefile, $content, $realdir);
+		}
+		$content =~ s-\\-\\\\-g;
+		push @$macrodir, $content;
+	}else
+	{
+		if($name eq "PLATFORM_NAME")
+		{
+			$content =~ s-\\-\\\\-g;
+			$content =~ s-\.-\\\.-g;
+			$checkcase_platform = $content;
+		}
+	}
+}
+
+sub checkcase_obyfilename()
+{
+	my $checkfile = shift;
+	if (-e $checkfile)
+	{
+		while ($checkfile=~s-[\\](?!\.{2}\\)[^\\]*\\\.{2}(?=\\)--go){};
+		$sourcefile =~ s/\//\\/g;
+		if ($checkfile eq $sourcefile)
+		{
+			return;		
+		}
+		my($filename, $dir, $suffix) = fileparse($checkfile);
+		
+		my $realdir = `directory.bat $dir`;
+		$realdir =~ s/\s+$//g;
+		$realdir .= "\\" if ($realdir !~ /\\$/);
+		if ($realdir ne $dir)
+		{
+			print CHECKCASELOG "check case: oby file name is $checkfile\n";
+			print CHECKCASELOG "WARNING: dir case is not equal to real.\n";
+			my $tempsrcfile = $sourcefile;
+			$tempsrcfile =~ s/\\\\/\\/g;
+			print CHECKCASELOG "file name is $tempsrcfile\n";
+			print CHECKCASELOG "current is $dir\n";
+			print CHECKCASELOG "expect  is $realdir\n\n";
+			checkcase_convert($sourcefile, $dir, $realdir);
+		}
+		
+		my $currentdir = cwd;
+		chdir "$dir";
+		my @realfile = `dir "$filename" 2>&1`;
+		my $line;
+		foreach $line (@realfile)
+		{
+			if ($line =~ /^\s*(\S+)\s+(\d{2}:\d{2})\s+(PM|AM)?\s+([\d\,])+\s+([\S]+)\s*/)
+			{
+				my $realfilename = $5;
+				my $filetemp = lc $filename;
+				my $realtemp = lc $realfilename;
+				if ($filetemp eq $realtemp && $realfilename ne $filename)
+				{
+					print CHECKCASELOG "check case: oby file name is $checkfile\n";
+					print CHECKCASELOG "WARNING: filename case is not equal to real.\n";
+					my $tempsrcfile = $sourcefile;
+					$tempsrcfile =~ s/\\\\/\\/g;
+					print CHECKCASELOG "file name is $tempsrcfile\n";
+					print CHECKCASELOG "current is $filename\n";
+					print CHECKCASELOG "expect  is $realfilename\n\n";
+					checkcase_convert($sourcefile, $filename, $realfilename);
+				}
+			}
+		}
+		chdir "$currentdir";
+	}
+}
+
+sub checkcase_pcsidefilename()
+{
+	my $macrodirs = shift;
+	my $checkfile = shift;
+	$checkfile =~ s/^\"//g;
+	$checkfile =~ s/\"$//g;
+	if (-e $checkfile)
+	{
+		while ($checkfile=~s-[\\](?!\.{2}\\)[^\\]*\\\.{2}(?=\\)--go){};
+		$sourcefile =~ s/\//\\/g;
+		my($filename, $dir, $suffix) = fileparse($checkfile);
+		if ($dir eq "\.\\")
+		{
+			$dir = cwd;
+			$dir =~ s/\//\\/g;
+			$dir .= "\\" if ($dir !~ /\\$/);
+		}
+		
+		my $realdir = `directory.bat $dir`;
+		$realdir =~ s/\s+$//g;
+		$realdir =~ s/^\s*\w://g if ($dir !~ /^\w:/);
+		$realdir .= "\\" if ($realdir !~ /\\$/);
+		my $dirtemp = $dir;
+		if ($checkcase_test)
+		{
+			my $macrodirtemp = "";
+			foreach my $macrodir (@$macrodirs)
+			{
+				if ($dirtemp =~ /^$macrodir(.*)$/)
+				{
+					$macrodirtemp = $macrodir if (length($macrodirtemp) < length($macrodir));
+				}
+			}
+			if ($macrodirtemp ne "")
+			{
+				$dirtemp =~ s/^$macrodirtemp//g;
+				$realdir =~ s/^$macrodirtemp//ig;
+			}
+		}
+		if ($realdir ne $dirtemp)
+		{
+			print CHECKCASELOG "check case: pc side file name is $checkfile\n";
+			print CHECKCASELOG "WARNING: dir case is not equal to real.\n";
+			my $tempsrcfile = $sourcefile;
+			$tempsrcfile =~ s/\\\\/\\/g;
+			print CHECKCASELOG "file name is $tempsrcfile\n";
+			print CHECKCASELOG "current is $dirtemp\n";
+			print CHECKCASELOG "expect  is $realdir\n\n";
+			checkcase_convert($sourcefile, $dirtemp, $realdir);
+		}
+		
+		my $currentdir = cwd;
+		chdir "$dir";
+		my @realfile = `dir "$filename" 2>&1`;
+		my $line;
+		foreach $line (@realfile)
+		{
+			if ($line =~ /^\s*(\S+)\s+(\d{2}:\d{2})\s+(PM|AM)?\s+([\d\,])+\s+(.+)\s*/)
+			{
+				my $realfilename = $5;
+				my $filetemp = lc $filename;
+				my $realtemp = lc $realfilename;
+				if ($filetemp eq $realtemp && $realfilename ne $filename)
+				{
+					print CHECKCASELOG "check case: pc side file name is $checkfile\n";
+					print CHECKCASELOG "WARNING: filename case is not equal to real.\n";
+					my $tempsrcfile = $sourcefile;
+					$tempsrcfile =~ s/\\\\/\\/g;
+					print CHECKCASELOG "file name is $tempsrcfile\n";
+					print CHECKCASELOG "current is $filename\n";
+					print CHECKCASELOG "expect  is $realfilename\n\n";
+					checkcase_convert($sourcefile, $filename, $realfilename);
+				}
+			}
+		}
+		chdir "$currentdir";
+	}
+}
+
+sub checkcase_convert()
+{
+	return if (!$checkcase_test);
+	
+	my $file = shift;
+	my $origin = shift;
+	my $real = shift;
+	
+	my @realfile = `dir "$file"  2>&1`;
+	my $line;
+	foreach $line (@realfile)
+	{
+		if ($line =~ /^\s*(\S+)\s+(\d{2}:\d{2})\s+(PM|AM)?\s+([\d\,])+\s+([\S]+)\s*/)
+		{
+			my $realfilename = $5;
+			$realfilename =~ s-\.-\\\.-g;
+			$file =~ s-$realfilename$--ig;
+			$realfilename =~ s-\\\.-\.-g;
+			$file .= $realfilename;
+		}
+	}
+
+	my $tempfile = $file.".temp";
+	my $usemultimacro = 0;
+	my $uses60macro_aifrsc = 0;
+	my $uses60macro_exe = 0;
+	my $uses60macro_aificon = 0;
+	my $uses60macro_resource = 0;
+	my $originwithoutext = $origin;
+	my $realwithoutext = $real;
+	if ($origin =~ /epoc32/i)
+	{
+		my $tempepocroot = $ENV{EPOCROOT};
+		$tempepocroot =~ s-\\-\\\\-g;
+		$origin =~ s/^$tempepocroot//g;
+		$real =~ s/^$tempepocroot//g;
+	}elsif ($checkcase_platform ne "" && $origin =~ /^_$checkcase_platform\_(.*)/)
+	{
+		$origin =~ s/^_$checkcase_platform\_/_PLATFORM_NAME_/g;
+		$real =~ s/^_$checkcase_platform\_/_PLATFORM_NAME_/g;
+	}elsif ($origin =~ /\S+\_reg\.rsc$/)
+	{
+		$originwithoutext =~ s/\_reg\.rsc$//g;
+		$realwithoutext =~ s/\_reg\.rsc$//ig;
+		$uses60macro_aifrsc = 1;
+	}elsif ($origin =~ /\S+\.rsc$/)
+	{
+		$originwithoutext =~ s/\.rsc$//g;
+		$realwithoutext =~ s/\.rsc$//ig;
+		$usemultimacro = 1;
+		$uses60macro_resource = 1;
+	}elsif ($origin =~ /\S+\.r01$/)
+	{
+		$originwithoutext =~ s/\.r01$//g;
+		$realwithoutext =~ s/\.r01$//ig;
+		$usemultimacro = 1;
+	}elsif ($origin =~ /\S+\.exe$/)
+	{
+		$originwithoutext =~ s/\.exe$//g;
+		$realwithoutext =~ s/\.exe$//ig;
+		$uses60macro_exe = 1;
+	}elsif ($origin =~ /\S+\_aif\.mif$/)
+	{
+		$originwithoutext =~ s/\_aif\.mif$//g;
+		$realwithoutext =~ s/\_aif\.mif$//ig;
+		$uses60macro_aificon = 1;
+	}elsif ($origin =~ /\S+\.mif$/)
+	{
+		$originwithoutext =~ s/\.mif$//g;
+		$realwithoutext =~ s/\.mif$//ig;
+		$uses60macro_aificon = 1;
+	}
+	$origin =~ s-\\-\\\\-g;
+	$origin =~ s-\.-\\\.-g;
+	
+	open (SRC, "<$file");
+	open (DST, ">$tempfile");
+	my $line;
+	while($line = <SRC>)
+	{
+		my $flag = 0;
+
+		if ($line =~ /$origin/)
+		{
+			$originwithoutext = $origin;
+			$realwithoutext = $real;
+			$flag = 1;
+		}elsif ($usemultimacro)
+		{
+			if ($line =~ /^.*=\s*MULTI_LINGUIFY\s*\(.*$originwithoutext/)
+			{
+				$flag = 1;
+			}elsif ($line =~ /^\s*S60_APP_RESOURCE\s*\(\s*$originwithoutext\s*\)/ && $uses60macro_resource)
+			{
+				$flag = 1;
+			}
+		}elsif ($uses60macro_exe)
+		{
+			if ($line =~ /^\s*S60_APP_EXE\s*\(\s*$originwithoutext\s*\)/)
+			{
+				$flag = 1;
+			}
+		}elsif ($uses60macro_aificon)
+		{
+			if ($line =~ /^\s*S60_APP_AIF_ICONS\s*\(\s*$originwithoutext\s*\)/)
+			{
+				$flag = 1;
+			}elsif ($line =~ /^\s*SCALABLE_IMAGE\s*\(.*$originwithoutext\s*\)/)
+			{
+				$flag = 1;
+			}elsif ($line =~ /^\s*S60_APP_BITMAP\s*\(\s*$originwithoutext\s*\)/)
+			{
+				$flag = 1;
+			}
+		}elsif ($uses60macro_aifrsc)
+		{
+			if ($line =~ /^\s*S60_APP_AIF_RSC\s*\(\s*$originwithoutext\s*\)/)
+			{
+				$flag = 1;
+			}elsif ($line =~ /^\s*S60_UPGRADABLE_APP_REG_RSC\s*\(\s*$originwithoutext\s*\)/)
+			{
+				$flag = 1;
+			}
+		}
+		if ($flag)
+		{
+			print CHECKCASELOG "it has been converted automatically\n";
+			print CHECKCASELOG "original  line is $line";
+			$line =~ s-$originwithoutext-$realwithoutext-;
+			print CHECKCASELOG "converted line is $line\n";
+		}
+		print DST $line;
+	}
+	close SRC;
+	close DST;
+	
+  unlink "$file";
+  rename ("$file.temp", "$file");
 }
 
 1;

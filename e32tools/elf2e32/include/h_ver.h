@@ -17,8 +17,8 @@
 #define __H_VER_H__
 
 const TInt MajorVersion=2;
-const TInt MinorVersion=1;
-const TInt Build=14;
+const TInt MinorVersion=2;
+const TInt Build=4;
 
 #endif
 

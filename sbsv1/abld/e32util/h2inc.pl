@@ -1,3 +1,4 @@
+#!/usr/bin/perl
 # Copyright (c) 2002-2009 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
@@ -19,6 +20,11 @@
 # 
 #
 
+# Version
+my $MajorVersion = 1;
+my $MinorVersion = 1;
+my $PatchVersion = 0;
+
 %basictypes = (
 	TInt8		=>	1,
 	TUint8		=>	1,
@@ -38,7 +44,7 @@
 );
 
 if (scalar(@ARGV)!=3) {
-	die "perl h2inc.pl <input.h> <output.inc> <format>\n";
+	die "H2INC format management tools V$MajorVersion.$MinorVersion.$PatchVersion\nperl h2inc.pl <input.h> <output.inc> <format>\n";
 }
 my ($infile, $outfile, $format) = @ARGV;
 open IN, $infile or die "Can't open $infile for input\n";

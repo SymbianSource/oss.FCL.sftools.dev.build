@@ -30,29 +30,18 @@
 
 #define USE_IAT_FOR_IMPORTS (iOverrideFlags&KOverrideKeepIAT || (iHdr->iCpuIdentifier & 0x1000))
 
-#if defined(__MSVCDOTNET__) || defined(__TOOLS2__)
-#include <iomanip>
-#else //!__MSVCDOTNET__
-#include <iomanip.h>
-#endif
-
-#if defined(__MSVCDOTNET__) || defined(__TOOLS2__)
-#include <iomanip>
-#else //!__MSVCDOTNET__
-#include <iomanip.h>
-#endif
-
+#include <iomanip> 
 #include "r_obey.h"
 #include "r_global.h"
 #include "r_dir.h"
 
 TInt NumRootDirs;
 
-inline TLinAddr ActualToRomAddress(TAny* anAddr)
-	{ return TLinAddr(anAddr)-TheRomMem+TheRomLinearAddress; }
+inline TLinAddr ActualToRomAddress(TAny* anAddr) { 
+	return TLinAddr(anAddr)-TheRomMem+TheRomLinearAddress; 
+}
 
-TBool THardwareVariant::MutuallyExclusive(THardwareVariant a) const
-	{
+TBool THardwareVariant::MutuallyExclusive(THardwareVariant a) const {
 	if (Layer()<=3 || a.Layer()<=3)
 		return EFalse;
 	if (Parent()==3 && a.Parent()==3)
@@ -64,24 +53,21 @@ TBool THardwareVariant::MutuallyExclusive(THardwareVariant a) const
 	if (Layer()!=a.Layer())
 		return ETrue;
 	return((VMask()&a.VMask())==0);
-	}
+}
 
-TBool THardwareVariant::IsVariant() const
-	{
+TBool THardwareVariant::IsVariant() const {
 	if (Layer()<=3 || Parent()==3)
 		return EFalse;
 	TUint v=VMask();
 	TInt i;
-	for (i=0; i<16; i++)
-		{
+	for (i=0; i<16; i++) {
 		if (v==TUint(1<<i))
 			return ETrue;
-		}
-	return EFalse;
 	}
+	return EFalse;
+}
 
-TInt THardwareVariant::Compare(THardwareVariant a) const
-	{
+TInt THardwareVariant::Compare(THardwareVariant a) const {
 	TUint l1=Layer();
 	TUint p1=Parent();
 	TUint v1=VMask();
@@ -89,34 +75,29 @@ TInt THardwareVariant::Compare(THardwareVariant a) const
 	TUint p2=a.Parent();
 	TUint v2=a.VMask();
 
-	if (l1<=3)
-		{
-		if (l2<=3)
-			{
+	if (l1<=3) {
+		if (l2<=3) {
 			return EEqual;
-			}
-		return EGreater;
 		}
+		return EGreater;
+	}
 	if (l2<=3)
 		return ELess;
-	if (p1==3)
-		{
-		if (p2==3)
-			{
+	if (p1==3) {
+		if (p2==3) {
 			if (l1==l2)
 				return EEqual;
 			return EUnordered;
-			}
+		}
 		if (p2==l1)
 			return EGreater;
 		return EUnordered;
-		}
-	if (p2==3)
-		{
+	}
+	if (p2==3) {
 		if (p1==l2)
 			return ELess;
 		return EUnordered;
-		}
+	}
 	if (l1!=l2)
 		return EUnordered;
 	if ((v1&v2)==v1)
@@ -124,350 +105,312 @@ TInt THardwareVariant::Compare(THardwareVariant a) const
 	if ((v1&v2)==v2)
 		return EGreater;
 	return EUnordered;
-	}
+}
 //
 TInt TRomNode::Count=0;
-TRomNode::TRomNode(const TText* aName, TRomBuilderEntry* aEntry)
+
 //
 // Constructor from TRomBuilderEntry, i.e. for new file or directory
 //
-	{
+TRomNode::TRomNode(const char* aName, TRomBuilderEntry* aEntry) {
 	memset(this, 0, sizeof(TRomNode));
 	iAtt = (TUint8)KEntryAttReadOnly;
-	iName = (TText*)NormaliseFileName((const char*)aName);
+	iName = NormaliseFileName(aName);
 	iIdentifier=TRomNode::Count++;
 	iRomFile = new TRomFile;
-	if (aEntry)
-		{
+
+	if (aEntry) {
 		iRomFile->iRbEntry = aEntry;
 		aEntry->SetRomNode(this);
-		iBareName = strdup(aEntry->iBareName);
+		size_t len = strlen(aEntry->iBareName) + 1;
+		iBareName = new char[len];
+		memcpy(iBareName,aEntry->iBareName,len);
 		iRomFile->iHwvd = aEntry->iHardwareVariant;
-		}
-	else
-		{
+	}
+	else {
 		iRomFile->iDir = ETrue;
 		iAtt |= (TUint8)KEntryAttDir;
-		iBareName = strdup((const char*)iName);
+		size_t len = strlen(iName) + 1;
+		iBareName = new char[len];
+		memcpy(iBareName,iName,len);
 		iRomFile->iHwvd = KVariantIndependent;
-		}
-	TRACE(TROMNODE,Print(ELog, "TRomNode %d name %s bare %s att %02x romfile %08x\n", iIdentifier,
-			iName, iBareName, iAtt, iRomFile));
 	}
+	TRACE(TROMNODE,Print(ELog, "TRomNode %d name %s bare %s att %02x romfile %08x\n", iIdentifier,
+		iName, iBareName, iAtt, iRomFile));
+}
 
-TRomNode::TRomNode(const TText* aName, TRomNode* aNode)
 //
 // Constructor from TRomNode, i.e. for aliased file
-//
-	{
+//	
+TRomNode::TRomNode(const char* aName, TRomNode* aNode){
 	memset(this, 0, sizeof(TRomNode));
 	iAtt = aNode->iAtt;
 	iIdentifier=TRomNode::Count++;
-	iName = (TText*)NormaliseFileName((const char*)aName);
+	iName = NormaliseFileName(aName);
 	iHidden = aNode->iHidden;
 	iRomFile = aNode->iRomFile;
-	if (iRomFile)
-		{
+	if (iRomFile) {
 		iRomFile->Open();
-		}
-	TRACE(TROMNODE,Print(ELog, "TRomNode %d DUP name %s romfile %08x\n", iIdentifier, iName, iRomFile));
 	}
-
-TRomNode::TRomNode(const TRomNode& aNode)
+	TRACE(TROMNODE,Print(ELog, "TRomNode %d DUP name %s romfile %08x\n", iIdentifier, iName, iRomFile));
+}
 //
 // Copy constructor - only used in deep copy function
 //
-	{
+TRomNode::TRomNode(const TRomNode& aNode) {
 	memset(this, 0, sizeof(TRomNode));
 	iAtt = aNode.iAtt;
 	iIdentifier=TRomNode::Count++;
-	iName = (TText*)strdup((const char*)aNode.iName);
-	iBareName = strdup(aNode.iBareName);
+	size_t len = strlen(aNode.iName) + 1;
+	iName = new char[len];
+	memcpy(iName,aNode.iName,len);
+	len = strlen(aNode.iBareName) + 1;
+	iBareName = new char[len];
+	memcpy(iBareName,aNode.iBareName,len);
 	iHidden = aNode.iHidden;
 	iRomFile = aNode.iRomFile;
-	if (iRomFile)
-		{
+	if (iRomFile) {
 		iRomFile->Open();
-		}
-	TRACE(TROMNODE,Print(ELog, "TRomNode %d COPY name %s bare %s att %02x romfile %08x\n", iIdentifier,
-			iName, iBareName, iAtt, iRomFile));
 	}
+	TRACE(TROMNODE,Print(ELog, "TRomNode %d COPY name %s bare %s att %02x romfile %08x\n", iIdentifier,
+		iName, iBareName, iAtt, iRomFile));
+}
 
-TRomNode::~TRomNode()
-	{
-	free(iName);
-	free(iBareName);
+TRomNode::~TRomNode() {
+	if(iName) {
+		delete []iName;
+		iName = 0 ;
+	}
+	if(iBareName){
+		delete []iBareName;
+		iBareName = 0 ;
+	}
 	if (iRomFile)
 		iRomFile->Close();
-	}
-
-TRomNode* TRomNode::FindInDirectory(const TText* aName)
+}
 //
 // Check if the TRomNode for aName exists in aDir, and if so, return it.
 //
-	{
+TRomNode* TRomNode::FindInDirectory(const char* aName) {
 
 	TRomNode *entry=iChild; // first subdirectory or file
-	while (entry)
-		{
-		if (!entry->iHidden && (stricmp((const char *)aName, (const char *)entry->iName))==0) 
+	while (entry){
+		if (!entry->iHidden && (stricmp(aName, entry->iName))==0) 
 			return entry;
 		else
 			entry=entry->iSibling;
-		}
-	return 0;
 	}
-
-TRomNode* TRomNode::FindInDirectory(const TText* aName, THardwareVariant aVariant, TBool aPatchDataFlag)
+	return 0;
+}
 //
 // Check for a file with same name and a compatible hardware variant
 //
-	{
-
+TRomNode* TRomNode::FindInDirectory(const char* aName, THardwareVariant aVariant, TBool aPatchDataFlag) {
 	TRomNode *entry=iChild; // first subdirectory or file
-	while (entry)
-		{
-		if (((!entry->iHidden)||aPatchDataFlag) && entry->iRomFile && (stricmp((const char *)aName, (const char *)entry->iName))==0) 
-			{
-			if (!aVariant.MutuallyExclusive(entry->HardwareVariant()))
-				return entry;
-			}
-		entry=entry->iSibling;
+	while (entry) {
+		if (((!entry->iHidden)||aPatchDataFlag) && entry->iRomFile && 
+			(stricmp(aName, entry->iName))==0) 	{
+				if (!aVariant.MutuallyExclusive(entry->HardwareVariant()))
+					return entry;
 		}
-	return 0;
+		entry=entry->iSibling;
 	}
+	return 0;
+}
 
-void TRomNode::AddFile(TRomNode* aChild)
-	{
-	if (!(iAtt & KEntryAttDir))
-		{
+void TRomNode::AddFile(TRomNode* aChild) {
+	if (!(iAtt & KEntryAttDir)) {
 		Print(EError, "Adding subdirectory to a file!!!\n");
 		return;
-		}
-	Add(aChild);
 	}
+	Add(aChild);
+}
 
-TRomNode* TRomNode::NewSubDir(const TText* aName)
-	{
-	if (!(iAtt & KEntryAttDir))
-		{
+TRomNode* TRomNode::NewSubDir(const char* aName) {
+	if (!(iAtt & KEntryAttDir)) {
 		Print(EError, "Adding subdirectory to a file!!!\n");
 		return 0;
-		}
-
-	TRomNode* node = new TRomNode(aName);
-	if (node==0)
-		{
-		Print(EError, "TRomNode::NewNode: Out of memory\n");
-		return 0;
-		}
-	Add(node);
-	return node;
 	}
 
-void TRomNode::Add(TRomNode* aChild)
-	{
-	if (iChild) // this node is a non-empty directory
-		{
+	TRomNode* node = new TRomNode(aName);
+	if (node==0) {
+		Print(EError, "TRomNode::NewNode: Out of memory\n");
+		return 0;
+	}
+	Add(node);
+	return node;
+}
+
+void TRomNode::Add(TRomNode* aChild) {
+	if (iChild) {// this node is a non-empty directory 
 		TRomNode* dir = iChild; // find where to link in the new node
-		while (dir->iSibling)
+		while (dir->iSibling) 
 			dir = dir->iSibling;
 		dir->iSibling = aChild;
-		}
+	}
 	else
 		iChild = aChild; // else just set it up as the child of the dir
 	aChild->iSibling = 0;
 	aChild->iParent = this;
-	}
+}
 
-void TRomNode::Remove(TRomNode* aChild)
-	{
-	if (iChild==0)
-		{
+void TRomNode::Remove(TRomNode* aChild) {
+	if (iChild==0) {
 		Print(EError, "Removing file from a file!!!\n");
 		return;
-		}
-	if (iChild==aChild) // first child in this directory
-		{
+	}
+	if (iChild==aChild) { // first child in this directory 
 		iChild = aChild->iSibling;
 		aChild->iSibling = 0;
 		aChild->iParent = 0;
 		return;
-		}
+	}
 	TRomNode* prev = iChild;
 	while (prev->iSibling && prev->iSibling != aChild)
 		prev = prev->iSibling;
-	if (prev==0)
-		{
+	if (prev==0) {
 		Print(EError, "Attempting to remove file not in this directory!!!\n");
 		return;
-		}
+	}
 	prev->iSibling = aChild->iSibling;
 	aChild->iSibling = 0;
 	aChild->iParent = 0;
-	}
+}
 
-void TRomNode::CountDirectory(TInt& aFileCount, TInt& aDirCount)
-	{
+void TRomNode::CountDirectory(TInt& aFileCount, TInt& aDirCount) {
 	TRomNode *current=iChild;
-	while(current)
-		{
+	while(current) {
 		if (current->iChild)
 			aDirCount++;
 		else if (!current->iHidden)
 			aFileCount++;
 		current=current->iSibling;
-		}
 	}
+}
 
 /**
- * Walk the contents of the directory, accumulating the
- * files as FileEntry objects in the specified RomFileStructure
- * and recursively handling the sub-directories
- *
- * TRomNode::ProcessDirectory is a pair with
- * RomFileStructure::ProcessDirectory
- */
-int TRomNode::ProcessDirectory(RomFileStructure* aRFS)
-	{
+* Walk the contents of the directory, accumulating the
+* files as FileEntry objects in the specified RomFileStructure
+* and recursively handling the sub-directories
+*
+* TRomNode::ProcessDirectory is a pair with
+* RomFileStructure::ProcessDirectory
+*/
+int TRomNode::ProcessDirectory(RomFileStructure* aRFS) {
 	TInt r=KErrNone;
 	TRomNode *current=iChild;
-	while(current)
-		{
-		if (current->iAtt & (TUint8)KEntryAttDir)
-			{
+	while(current) {
+		if (current->iAtt & (TUint8)KEntryAttDir) {
 			r=aRFS->ProcessDirectory(current);
 			if (r!=KErrNone)
 				return r;
-			}
-		else if (!current->iHidden)
-			{
+		}
+		else if (!current->iHidden) {
 			FileEntry *pE=FileEntry::New(current);
 			if (!pE)
 				return KErrNoMemory;
 			r=aRFS->Add(*pE);
 			if (r==KErrOverflow)
 				return r;
-			}
-		current=current->iSibling;
 		}
-	return r;
+		current=current->iSibling;
 	}
+	return r;
+}
 
-void TRomNode::AddExecutableFile(TRomNode*& aLast, TRomNode* aNode)
-	{
+void TRomNode::AddExecutableFile(TRomNode*& aLast, TRomNode* aNode) {
 	aLast->iNextExecutable = aNode;
 	aLast = aNode;
 	aNode->iAtt |= KEntryAttXIP;
-	}
+}
 
-char* TRomNode::BareName() const
-	{
-	return iBareName;
-	}
+const char* TRomNode::BareName() const {
+	return iBareName  ;
+}
 
-TUint32 TRomNode::Uid3() const
-	{
+TUint32 TRomNode::Uid3() const {
 	return iRomFile->Uid3();
-	}
+}
 
-TUint32 TRomNode::ModuleVersion() const
-	{
+TUint32 TRomNode::ModuleVersion() const {
 	return iRomFile->ModuleVersion();
-	}
+}
 
-THardwareVariant TRomNode::HardwareVariant() const
-	{
+THardwareVariant TRomNode::HardwareVariant() const {
 	return iRomFile->HardwareVariant();
-	}
+}
 
-TUint32 TRomNode::ABI() const
-	{
+TUint32 TRomNode::ABI() const {
 	return iRomFile->ABI();
-	}
+}
 
-TUint32 TRomFile::Uid3() const
-	{
+TUint32 TRomFile::Uid3() const {
 	assert(!iDir);
-	if (iRbEntry)
-	{
+	if (iRbEntry) {
 		if(iRbEntry->iHdr)
 			return iRbEntry->iHdr->iUid3;
 	}
 	return RomImgHdr()->iUid3;
-	}
+}
 
-TUint32 TRomFile::ModuleVersion() const
-	{
+TUint32 TRomFile::ModuleVersion() const {
 	assert(!iDir);
-	if (iRbEntry)
-	{
+	if (iRbEntry) {
 		if(iRbEntry->iHdr)
 			return iRbEntry->iHdr->ModuleVersion();
 	}
 	return RomImgHdr()->iModuleVersion;
-	}
+}
 
-THardwareVariant TRomFile::HardwareVariant() const
-	{
+THardwareVariant TRomFile::HardwareVariant() const {
 	return iHwvd;
-	}
+}
 
-TUint32 TRomFile::ABI() const
-	{
+TUint32 TRomFile::ABI() const {
 	assert(!iDir);
-	if (iRbEntry)
-	{
+	if (iRbEntry) {
 		if(iRbEntry->iHdr)
 			return iRbEntry->iHdr->ABI();
 	}
 	return RomImgHdr()->iFlags & KRomImageABIMask;
-	}
+}
 
-TInt TRomFile::ExportDirCount() const
-	{
+TInt TRomFile::ExportDirCount() const {
 	assert(!iDir);
-	if (iRbEntry)
-	{
+	if (iRbEntry) {
 		if(iRbEntry->iHdr)
 			return iRbEntry->iHdr->iExportDirCount;
 	}
 	return RomImgHdr()->iExportDirCount;
-	}
+}
 
-TUint32 TRomFile::RomImageFlags() const
-	{
+TUint32 TRomFile::RomImageFlags() const {
 	assert(!iDir);
-	if (iRbEntry)
-		{
-		if(iRbEntry->iHdr)
-		{
-		const TUint KRomFlagMask = KImageDll | KImageNoCallEntryPoint | KImageFixedAddressExe | KImageNmdExpData;
-		TUint romflags = iRbEntry->iHdr->iFlags & KRomFlagMask;
-		return iRbEntry->iRomImageFlags | romflags;
+	if (iRbEntry) {
+		if(iRbEntry->iHdr) {
+			const TUint KRomFlagMask = KImageDll | KImageNoCallEntryPoint | KImageFixedAddressExe | KImageNmdExpData;
+			TUint romflags = iRbEntry->iHdr->iFlags & KRomFlagMask;
+			return iRbEntry->iRomImageFlags | romflags;
 		}
-		}
-	return RomImgHdr()->iFlags;
 	}
+	return RomImgHdr()->iFlags;
+}
 
-TLinAddr TRomFile::DataBssLinearBase() const
-	{
+TLinAddr TRomFile::DataBssLinearBase() const {
 	assert(!iDir);
 	if (iRbEntry)
 		return iRbEntry->iDataBssLinearBase;
 	return RomImgHdr()->iDataBssLinearBase;
-	}
+}
 
-const SSecurityInfo& TRomFile::SecurityInfo() const
-	{
+const SSecurityInfo& TRomFile::SecurityInfo() const {
 	assert(!iDir);
 	if (iRbEntry)
 		return iRbEntry->iS;
 	return RomImgHdr()->iS;
-	}
+}
 
-TInt TRomNode::FullNameLength(TBool aIgnoreHiddenAttrib) const
-	{
+TInt TRomNode::FullNameLength(TBool aIgnoreHiddenAttrib) const {
 	TInt l = 0;
 	// aIgnoreHiddenAttrib is used to find the complete file name length as
 	// in ROM of a hidden file.
@@ -475,30 +418,30 @@ TInt TRomNode::FullNameLength(TBool aIgnoreHiddenAttrib) const
 		l = iParent->FullNameLength() + 1;
 	l += strlen((const char*)iName);
 	return l;
-	}
+}
 
-TInt TRomNode::GetFullName(char* aBuf, TBool aIgnoreHiddenAttrib) const
-	{
+TInt TRomNode::GetFullName(char* aBuf, TBool aIgnoreHiddenAttrib) const {
 	TInt l = 0;
-	TInt nl = strlen((const char*)iName);
+	TInt nl = strlen(iName);
 	// aIgnoreHiddenAttrib is used to find the complete file name as in ROM of a hidden file.
 	if (iParent && ( !iHidden || aIgnoreHiddenAttrib))
 		l = iParent->GetFullName(aBuf);
 	char* b = aBuf + l;
-	if (l)
-		*b++ = '\\', ++l;
+	if (l){
+		*b++ = SLASH_CHAR; 
+		++l;
+	}
 	memcpy(b, iName, nl);
 	b += nl;
 	*b = 0;
 	l += nl;
 	return l;
-	}
+}
 
-TInt CompareCapabilities(const SCapabilitySet& aSubCaps, const SCapabilitySet& aSuperCaps, const char* aSubName, const char* aSuperName)
 //
 //	Check that a aSubCaps are a subset of aSuperCaps
 //
-	{
+TInt CompareCapabilities(const SCapabilitySet& aSubCaps, const SCapabilitySet& aSuperCaps, const char* aSubName, const char* aSuperName) {
 	if ((!gPlatSecEnforcement)&&(!gPlatSecDiagnostics))
 		return KErrNone;
 	TInt i;
@@ -506,189 +449,165 @@ TInt CompareCapabilities(const SCapabilitySet& aSubCaps, const SCapabilitySet& a
 	for (i=0; i<SCapabilitySet::ENCapW; ++i)
 		c |= (aSubCaps[i] &~ aSuperCaps[i]);
 	TInt r = c ? KErrPermissionDenied : KErrNone;
-	if (r && aSubName && aSuperName)
-		{
+	if (r && aSubName && aSuperName) {
 		TPrintType printType;
 		if(gPlatSecEnforcement)
 			printType = EError;
-		else
-			{
+		else {
 			printType = EWarning;
 			r = KErrNone;
-			}
+		}
 		char* buf = (char*)malloc(2);
 		if(!buf)
 			return KErrNoMemory;
 		TInt len = 0;
-		for(i=0; i<ECapability_Limit; i++)
-			{
-			if( (aSubCaps[i>>5] &~ aSuperCaps[i>>5]) & (1<<(i&31)) )
-				{
+		for(i=0; i<ECapability_Limit; i++) {
+			if( (aSubCaps[i>>5] &~ aSuperCaps[i>>5]) & (1<<(i&31)) ) {
 				// append capability name to buf
 				const char* name = CapabilityNames[i];
 				if(!name)
 					continue;
-				if(len)
-					{
+				if(len) {
 					buf[len++] = ' ';
-					}
+				}
 				int nameLen=strlen(name);
 				buf = (char*)realloc(buf,len+nameLen+2);
 				if(!buf)
 					return KErrNoMemory;
 				memcpy(buf+len,CapabilityNames[i],nameLen);
 				len += nameLen;
-				}
 			}
+		}
 		buf[len]=0;
 		Print(printType, "*PlatSec* %s - Capability check failed. Can't load %s because it links to %s which has the following capabilities missing: %s\n",gPlatSecEnforcement?"ERROR":"WARNING",aSubName, aSuperName, buf);
 		free(buf);
-		}
-	return r;
 	}
+	return r;
+}
 
-TDllFindInfo::TDllFindInfo(const char* aImportName, const TRomBuilderEntry* aEntry)
-	{
+TDllFindInfo::TDllFindInfo(const char* aImportName, const TRomBuilderEntry* aEntry) {
 	TUint32 flags;
 	iBareName = SplitFileName(aImportName, iUid3, iModuleVersion, flags);
 	assert(iBareName != 0);
 	iHwVariant = aEntry->iHardwareVariant.ReturnVariant(); 
-	}
+}
 
-TDllFindInfo::~TDllFindInfo()
-	{
-	free((void*)iBareName);
-	}
+TDllFindInfo::~TDllFindInfo() {
+	delete []iBareName;
+}
 
 // Generate name as follows:
 // PC filename (UID3:xxxxxxxx HWVD:xxxxxxxx VER:M.m)
-TModuleName::TModuleName(const TRomBuilderEntry* a)
-	{
+TModuleName::TModuleName(const TRomBuilderEntry* a) {
 	TInt l = strlen(a->iFileName) + strlen(" (UID3:xxxxxxxx HWVD:xxxxxxxx VER:MMMMM.mmmmm)");
-	iName = (char*)malloc(l + 1);
+	iName = new char[l + 1];
 	assert(iName != 0);
 	sprintf(iName, "%s (UID3:%08lx HWVD:%08lx VER:%ld.%ld)", a->iFileName, a->iHdr->iUid3,
 		a->iHardwareVariant.ReturnVariant(), a->iHdr->ModuleVersion()>>16, a->iHdr->ModuleVersion()&0x0000ffffu);
-	}
+}
 
 // Generate name as follows:
 // Bare name (UID3:xxxxxxxx HWVD:xxxxxxxx VER:M.m)
-TModuleName::TModuleName(const TDllFindInfo& a)
-	{
+TModuleName::TModuleName(const TDllFindInfo& a) {
 	TInt l = strlen(a.iBareName) + strlen(" (UID3:xxxxxxxx HWVD:xxxxxxxx VER:MMMMM.mmmmm)");
-	iName = (char*)malloc(l + 1);
+	iName = new char [l + 1];
 	assert(iName != 0);
 	sprintf(iName, "%s (UID3:%08lx HWVD:%08lx VER:%ld.%ld)", a.iBareName, a.iUid3,
 		a.iHwVariant, a.iModuleVersion>>16, a.iModuleVersion&0x0000ffffu);
-	}
+}
 
 // Generate name as follows:
 // Name (UID3:xxxxxxxx HWVD:xxxxxxxx VER:M.m)
-TModuleName::TModuleName(const TRomNode& a)
-	{
+TModuleName::TModuleName(const TRomNode& a) {
 	TBool xip = (a.iAtt & KEntryAttXIP);
 	TUint32 uid3 = xip ? a.Uid3() : 0;
 	TUint32 hwvd = (TUint)a.HardwareVariant();
 	TUint32 ver = xip ? a.ModuleVersion() : 0;
 	TInt l = a.FullNameLength() + strlen(" (UID3:xxxxxxxx HWVD:xxxxxxxx VER:MMMMM.mmmmm)");
-	iName = (char*)malloc(l + 1);
+	iName = new char[l + 1];
 	assert(iName != 0);
 	char* b = iName + a.GetFullName(iName);
 	sprintf(b, " (UID3:%08lx HWVD:%08lx VER:%ld.%ld)", uid3, hwvd, ver>>16, ver&0x0000ffffu);
-	}
+}
 
-TModuleName::TModuleName(const TRomFile& a, const TRomNode* aRootDir)
-	{
+TModuleName::TModuleName(const TRomFile& a, const TRomNode* aRootDir) {
 	iName = 0;
-	if (a.iRbEntry)
-		{
+	if (a.iRbEntry) {
 		new (this) TModuleName(a.iRbEntry);
 		return;
-		}
+	}
 	TRomNode* x = aRootDir->iNextExecutable;
-	for(; x; x=x->iNextExecutable)
-		{
-		if (x->iRomFile == &a)
-			{
+	for(; x; x=x->iNextExecutable) {
+		if (x->iRomFile == &a) {
 			new (this) TModuleName(*x);
 			return;
-			}
 		}
 	}
+}
 
-TModuleName::~TModuleName()
-	{
-	free(iName);
-	}
+TModuleName::~TModuleName() {
+	if(iName)
+		delete []iName;
+}
 
 
 /**
- * TRomNode::FindImageFileByName is always called on the root TRomNode, so
- * it doesn't consider the current TRomNode, just the linked items in the
- * iNextExecutable list.
- */
-TRomNode* TRomNode::FindImageFileByName(const TDllFindInfo& aInfo, TBool aPrintDiag, TBool& aFallBack)
-	{
+* TRomNode::FindImageFileByName is always called on the root TRomNode, so
+* it doesn't consider the current TRomNode, just the linked items in the
+* iNextExecutable list.
+*/
+TRomNode* TRomNode::FindImageFileByName(const TDllFindInfo& aInfo, TBool aPrintDiag, TBool& aFallBack) {
 	TUint r_major = aInfo.iModuleVersion >> 16;
 	TUint r_minor = aInfo.iModuleVersion & 0x0000ffffu;
 	TRomNode* fallback = NULL;
 	aFallBack = EFalse;
-	for (TRomNode* x=iNextExecutable; x!=0; x=x->iNextExecutable)
-		{
+	for (TRomNode* x=iNextExecutable; x!=0; x=x->iNextExecutable) {
 		if (stricmp(x->BareName(), aInfo.iBareName))
 			continue;	// name doesn't match
 		if (aPrintDiag)
 			Print(ELog, "Candidate: %s ", (const char*)TModuleName(*x) );
-		if ( !(THardwareVariant(aInfo.iHwVariant) <= x->HardwareVariant()) )
-			{
+		if ( !(THardwareVariant(aInfo.iHwVariant) <= x->HardwareVariant()) ) {
 			if (aPrintDiag)
 				Print(ELog, "HWVD mismatch - requested %08x\n", aInfo.iHwVariant);
 			continue;
-			}
-		if (aInfo.iUid3 && (aInfo.iUid3 != x->Uid3()))
-			{
+		}
+		if (aInfo.iUid3 && (aInfo.iUid3 != x->Uid3())) {
 			if (aPrintDiag)
 				Print(ELog, "UID3 mismatch - requested %08x\n", aInfo.iUid3);
 			continue;
-			}
+		}
 		TUint x_major = x->ModuleVersion() >> 16;
 		TUint x_minor = x->ModuleVersion() & 0x0000ffffu;
-		if ( x->ModuleVersion() == 0x00010000 && aInfo.iModuleVersion == 0 )
-			{
+		if ( x->ModuleVersion() == 0x00010000 && aInfo.iModuleVersion == 0 ) {
 			// allow requested version 0.0 to link to 1.0 with a warning
 			fallback = x;
-			}
-		if ( x_major != r_major )
-			{
+		}
+		if ( x_major != r_major ) {
 			if (aPrintDiag)
 				Print(ELog, "Major version mismatch - requested %d\n", r_major);
 			continue;
-			}
-		if ( x_minor < r_minor )
-			{
+		}
+		if ( x_minor < r_minor ) {
 			if (aPrintDiag)
 				Print(ELog, "??? Minor version mismatch - requested %d\n", r_minor);
 			continue;
-			}
+		}
 		if (aPrintDiag)
 			Print(ELog, "OK\n");
 		return x;
-		}
-	if (fallback)
-		{
+	}
+	if (fallback) {
 		aFallBack = ETrue;
 		return fallback;
-		}
-	return 0;
 	}
+	return 0;
+}
 
-TInt TRomNode::CheckForVersionConflicts(const TRomBuilderEntry* a)
-	{
+TInt TRomNode::CheckForVersionConflicts(const TRomBuilderEntry* a) {
 	TUint r_major = a->iHdr->ModuleVersion() >> 16;
 	TUint r_minor = a->iHdr->ModuleVersion() & 0x0000ffffu;
 	TInt errors = 0;
-	for (TRomNode* x=iNextExecutable; x!=0; x=x->iNextExecutable)
-		{
+	for (TRomNode* x=iNextExecutable; x!=0; x=x->iNextExecutable) {
 		if (x->iRomFile->iRbEntry == a)
 			continue;	// don't compare a with itself
 		if (stricmp(x->BareName(), a->iBareName))
@@ -699,20 +618,18 @@ TInt TRomNode::CheckForVersionConflicts(const TRomBuilderEntry* a)
 			continue;	// UID3's don't match
 		TUint x_major = x->ModuleVersion() >> 16;
 		TUint x_minor = x->ModuleVersion() & 0x0000ffffu;
-		if (x_major == r_major && x_minor != r_minor)	// allow two copies of same file
-			{
+		if (x_major == r_major && x_minor != r_minor)  {	// allow two copies of same file
 			Print(EError, "Version Conflict %s with %s\n", (const char*)TModuleName(a), (const char*)TModuleName(*x) );
 			++errors;
-			}
 		}
-	return errors;
 	}
+	return errors;
+}
 
-TInt E32Rom::WriteHeadersToRom(char *anAddr)
 //
 // Follow the TRomBuilderEntry tree, writing TRomEntry headers to the rom.
 //
-	{
+TInt E32Rom::WriteHeadersToRom(char *anAddr) {
 	TRACE(TTIMING,Print(EAlways,"0\n"));
 	TRACE(TDIR,Print(EAlways,"WriteHeadersToRom()\n"));
 	char* start=anAddr;
@@ -732,49 +649,42 @@ TInt E32Rom::WriteHeadersToRom(char *anAddr)
 	TInt i;
 	TRACE(TDIR,Print(EAlways,"Count=%d\n",c));
 	TRACE(TDIR,pS->DebugPrint());
-	for(i=0; i<c; i++)
-		{
+	for(i=0; i<c; i++) {
 		DirEntry* pD=(DirEntry*)&(*pS)[i];
 		TRomDir* pR=pD->CreateRomEntries(anAddr);
 		dirPointers->iRootDir[i].iHardwareVariant=TUint(pD->Variants().Lookup());
 		dirPointers->iRootDir[i].iAddressLin=ActualToRomAddress(pR);
-		}
+	}
 	TRACE(TDIR,Print(EAlways,"Beginning final cleanup\n"));
 	delete pS;
 	TRACE(TTIMING,Print(EAlways,"1\n"));
 	return anAddr-start;
-	}
+}
 
- void TRomNode::Destroy()
 //
 // Follow the TRomNode tree, destroying it
 //
-	{
+void TRomNode::Destroy() {
 
- 	TRomNode *current = this; // root has no siblings
-	while (current)
-		{
+	TRomNode *current = this; // root has no siblings
+	while (current) {
 		if (current->iChild)
 			current->iChild->Destroy();
 		TRomNode* prev=current;
 		current=current->iSibling;
 		delete prev;
-		}
- 	}
+	}
+}
 
-
-TInt TRomNode::SetAtt(TText *anAttWord)
 //
 // Set the file attribute byte from the letters passed
 //
-	{
+TInt TRomNode::SetAtt(const char* anAttWord) {
 	iAtt=0;
 	if (anAttWord==0 || anAttWord[0]=='\0')
 		return Print(EError, "Missing argument for keyword 'attrib'.\n");
-	for (TText *letter=anAttWord;*letter!=0;letter++)
-		{
-		switch (*letter)
-			{
+	for (const char* letter = anAttWord; *letter != 0; letter ++) {
+		switch (*letter) {
 		case 'R':
 		case 'w':
 			iAtt |= KEntryAttReadOnly;
@@ -798,276 +708,250 @@ TInt TRomNode::SetAtt(TText *anAttWord)
 		default:
 			return Print(EError, "Unrecognised attrib - '%c'.\n", *letter);
 			break;
-			}
 		}
-	return KErrNone;
 	}
-
-TRomBuilderEntry::TRomBuilderEntry(const char *aFileName,TText *aName)
+	return KErrNone;
+}
 //
 // Constructor
 //
-	:
-	E32ImageFile(),
-	iName(0),
-	iResource(EFalse), iNonXIP(EFalse), iPreferred(EFalse), iCompression(0), iPatched(EFalse),iArea(0),
-	iOverrideFlags(0),iCodeAlignment(0),iDataAlignment(0),iUid1(0), iUid2(0), iUid3(0),iBareName(0), 
-	iHardwareVariant(KVariantIndependent),iDataBssOffset(0xffffffff), 
-	iStackReserve(0),iIATRefs(0), iNext(0), iNextInArea(0), 
-	iRomImageFlags(0),iProcessName(0), iRomNode(NULL)
-	{
-	if (aFileName)
-   		iFileName = NormaliseFileName((const char*)aFileName);
-	if (aName)
-		iName = (TText*)NormaliseFileName((const char*)aName);
+TRomBuilderEntry::TRomBuilderEntry(const char *aFileName,const char* aName) :
+E32ImageFile(),
+iName(0),
+iResource(EFalse), iNonXIP(EFalse), iPreferred(EFalse), iCompression(0), iPatched(EFalse),iArea(0),
+iOverrideFlags(0),iCodeAlignment(0),iDataAlignment(0),iUid1(0), iUid2(0), iUid3(0),iBareName(0), 
+iHardwareVariant(KVariantIndependent),iDataBssOffset(0xffffffff), 
+iStackReserve(0),iIATRefs(0), iNext(0), iNextInArea(0), 
+iRomImageFlags(0),iProcessName(0), iRomNode(NULL) {
+	if (aFileName){
+		if(iFileName)
+			delete []iFileName;
+		iFileName = NormaliseFileName(aFileName);	 
 	}
-
-TRomBuilderEntry::~TRomBuilderEntry()
+	if (aName)
+		iName = NormaliseFileName(aName);
+}
 //
 // Destructor
 //
-	{
-
-	free(iFileName);
-	iFileName = 0;
-	free(iName);
-	iName = 0;
-	delete[] iProcessName;
-	free(iBareName);
-	iBareName = 0;
-	delete[] iIATRefs;
+TRomBuilderEntry::~TRomBuilderEntry() {
+	 
+	if(iName){
+		delete []iName; 
+		iName = 0 ;
+	}
+	if(iProcessName){	
+		delete []iProcessName;
+		iProcessName = 0 ;
+	}
+	if(iBareName) {
+		delete []iBareName;
+		iBareName = 0 ;
 	}
 
-TInt isNumber(TText *aString)
-	{
-	if (aString==NULL)
-		return 0;
-	if (strlen((char *)aString)==0)
-		return 0;
-	return isdigit(aString[0]);
+	if(iIATRefs){
+		char* tmp = reinterpret_cast<char*>(iIATRefs);
+		delete []tmp;
+		iIATRefs = 0 ;
 	}
+}
 
-TInt getNumber(TText *aStr)
-	{
-	TUint a;
-	#ifdef __TOOLS2__
-	istringstream val((char *)aStr);
-	#else
-	istrstream val((char *)aStr,strlen((char *)aStr));
-	#endif
+TInt TRomBuilderEntry::SetCodeAlignment(const char* aStr) {
+	if (!IsValidNumber(aStr))
+		return Print(EError, "Number required as argument for keyword 'code-align'.\n"); 
+	TInt err = Val(iCodeAlignment,aStr);	 
+	return err;
+}
 
-#if defined(__MSVCDOTNET__) || defined(__TOOLS2__)
-	val >> setbase(0);
-#endif //__MSVCDOTNET__
-
-	val >> a;
-	return a;
-	}
-
-TInt TRomBuilderEntry::SetCodeAlignment(TText* aStr)
-	{
-    if (!aStr || (aStr && isNumber(aStr)==0))
-		return Print(EError, "Number required as argument for keyword 'code-align'.\n");
-    iCodeAlignment=getNumber(aStr);
-    return KErrNone;
-	}
-
-TInt TRomBuilderEntry::SetDataAlignment(TText* aStr)
-	{
-    if (!isNumber(aStr))
-		return Print(EError, "Number required as argument for keyword 'data-align'.\n");
-    TInt align=getNumber(aStr);
-	if (align<0 || (align&0x0F) != 0)
+TInt TRomBuilderEntry::SetDataAlignment(const char* aStr) {
+	if (!IsValidNumber(aStr))
+		return Print(EError, "Number required as argument for keyword 'data-align'.\n"); 
+	TInt align = 0;
+	Val(align,aStr);
+	if (align < 0 || (align & 0x0F) != 0) 
 		return Print(EError, "Positive multiple of 16 required for 'data-align'.\n");
-	iDataAlignment=align;
-    return KErrNone;
-	}
+	iDataAlignment = align;
+	return KErrNone;
+}
 
-TInt TRomBuilderEntry::SetRelocationAddress(TText *aStr)
-	{
-	if (aStr && isNumber(aStr)==0)
+TInt TRomBuilderEntry::SetRelocationAddress(const char* aStr) {
+	if (aStr && !IsValidNumber(aStr))
 		return Print(EError, "Number required as argument for keyword 'reloc'.\n");
 	iOverrideFlags |= KOverrideAddress;
-	iRelocationAddress=aStr ? getNumber(aStr) : 0xFFFFFFFF;
-	return KErrNone;
+	iRelocationAddress =  0xFFFFFFFF; 
+	if(aStr){
+		Val(iRelocationAddress,aStr);
 	}
-
-TInt TRomBuilderEntry::SetStackReserve(TText *aStr)
-	{
-	if (isNumber(aStr)==0)
-		return Print(EError, "Number required as argument for keyword 'stackreserve'.\n");
-	iOverrideFlags |= KOverrideStackReserve;
-	iStackReserve=getNumber(aStr);
 	return KErrNone;
-	}
+}
 
-TInt TRomBuilderEntry::SetStackSize(TText *aStr)
-	{
-	if (isNumber(aStr)==0)
-		return Print(EError, "Number required as argument for keyword 'stack'.\n");
-	iOverrideFlags |= KOverrideStack;
-	iStackSize=getNumber(aStr);
+TInt TRomBuilderEntry::SetStackReserve(const char* aStr) {
+	if (!IsValidNumber(aStr))
+		return Print(EError, "Number required as argument for keyword 'stackreserve'.\n");	
+	TInt err = Val(iStackReserve,aStr);
+	if(err == KErrNone)
+		iOverrideFlags |= KOverrideStackReserve;
+	return err;
+}
+
+TInt TRomBuilderEntry::SetStackSize(const char* aStr) {
+	if (!IsValidNumber(aStr))
+		return Print(EError, "Number required as argument for keyword 'stack'.\n");	
+	TInt err = Val(iStackSize,aStr);
+	if(err == KErrNone)
+		iOverrideFlags |= KOverrideStack;
+	return err;
+}
+
+TInt TRomBuilderEntry::SetHeapSizeMin(const char* aStr) {
+	if (!IsValidNumber(aStr))
+		return Print(EError, "Number required as argument for keyword 'heapmin'.\n");	
+	TInt err = Val(iHeapSizeMin,aStr); 
+	if(err == KErrNone)
+		iOverrideFlags |= KOverrideHeapMin;
 	return KErrNone;
-	}
+}
 
-TInt TRomBuilderEntry::SetHeapSizeMin(TText *aStr)
-	{
-	if (isNumber(aStr)==0)
-		return Print(EError, "Number required as argument for keyword 'heapmin'.\n");
-	iOverrideFlags |= KOverrideHeapMin;
-	iHeapSizeMin=getNumber(aStr);
-	return KErrNone;
-	}
-
-TInt TRomBuilderEntry::SetHeapSizeMax(TText *aStr)
-	{
-	if (isNumber(aStr)==0)
+TInt TRomBuilderEntry::SetHeapSizeMax(const char* aStr) {
+	if (!IsValidNumber(aStr))
 		return Print(EError, "Number required as argument for keyword 'heapmax'.\n");
-	iOverrideFlags |= KOverrideHeapMax;
-	iHeapSizeMax=getNumber(aStr);
-	return KErrNone;
-	}
+	TInt err = Val(iHeapSizeMax,aStr); 
+	if(err == KErrNone)
+		iOverrideFlags |= KOverrideHeapMax;
+	return err;
+}
 
-TInt TRomBuilderEntry::SetCapability(TText *aStr)
-	{
+TInt TRomBuilderEntry::SetCapability(const char* aStr) {
 	iOverrideFlags |= KOverrideCapability;
-	if (isNumber(aStr))
-		{
+	if (IsValidNumber(aStr)) {
 		Print(EDiagnostic,"Old style numeric CAPABILTY specification ignored.\n");
 		return KErrNone;
-		}
-	return ParseCapabilitiesArg(iS.iCaps, (char*)aStr);
 	}
+	return ParseCapabilitiesArg(iS.iCaps, aStr);
+}
 
-TInt TRomBuilderEntry::SetPriority(TText *aStr)
-	{
-	if (isNumber(aStr))
-		iPriority=(TProcessPriority)getNumber(aStr);
-	else
-		{
-		char *str=(char *)aStr;
-		if (stricmp(str, "low")==0)
+TInt TRomBuilderEntry::SetPriority(const char* aStr) {
+	if (IsValidNumber(aStr)){
+		TUint32 temp = 0 ;
+		Val(temp,aStr);
+		iPriority=(TProcessPriority)temp;
+	}
+	else {		 
+		if (stricmp(aStr, "low")==0)
 			iPriority=EPriorityLow;
-		else if (strnicmp(str, "background", 4)==0)
+		else if (strnicmp(aStr, "background", 4)==0)
 			iPriority=EPriorityBackground;
-		else if (strnicmp(str, "foreground", 4)==0)
+		else if (strnicmp(aStr, "foreground", 4)==0)
 			iPriority=EPriorityForeground;
-		else if (stricmp(str, "high")==0)
+		else if (stricmp(aStr, "high")==0)
 			iPriority=EPriorityHigh;
-		else if (strnicmp(str, "windowserver",3)==0)
+		else if (strnicmp(aStr, "windowserver",3)==0)
 			iPriority=EPriorityWindowServer;
-		else if (strnicmp(str, "fileserver",4)==0)
+		else if (strnicmp(aStr, "fileserver",4)==0)
 			iPriority=EPriorityFileServer;
-		else if (strnicmp(str, "realtimeserver",4)==0)
+		else if (strnicmp(aStr, "realtimeserver",4)==0)
 			iPriority=EPriorityRealTimeServer;
-		else if (strnicmp(str, "supervisor",3)==0)
+		else if (strnicmp(aStr, "supervisor",3)==0)
 			iPriority=EPrioritySupervisor;
 		else
 			return Print(EError, "Unrecognised priority keyword.\n");
-		}
+	}
 	if (iPriority<EPriorityLow || iPriority>EPrioritySupervisor)
 		return Print(EError, "Priority out of range.\n");
 	iOverrideFlags |= KOverridePriority;
 	return KErrNone;
-	}
+}
 
-TInt TRomBuilderEntry::SetUid1(TText *aStr)
-	{
-	if (isNumber(aStr)==0)
+TInt TRomBuilderEntry::SetUid1(const char* aStr) {
+	if (!IsValidNumber(aStr))
 		return Print(EError, "Number required as argument for keyword 'uid1'.\n");
 	iOverrideFlags |= KOverrideUid1;
-	iUid1=getNumber(aStr);
+	Val(iUid1,aStr);
 	return KErrNone;
-	}
-TInt TRomBuilderEntry::SetUid2(TText *aStr)
-	{
-	if (isNumber(aStr)==0)
+}
+TInt TRomBuilderEntry::SetUid2(const char* aStr) {
+	if (!IsValidNumber(aStr))
 		return Print(EError, "Number required as argument for keyword 'uid2'.\n");
 	iOverrideFlags |= KOverrideUid2;
-	iUid2=getNumber(aStr);
+	Val(iUid2,aStr);
 	return KErrNone;
-	}
-TInt TRomBuilderEntry::SetUid3(TText *aStr)
-	{
-	if (isNumber(aStr)==0)
+}
+TInt TRomBuilderEntry::SetUid3(const char* aStr) {
+	if (!IsValidNumber(aStr))
 		return Print(EError, "Number required as argument for keyword 'uid3'.\n");
 	iOverrideFlags |= KOverrideUid3;
-	iUid3=getNumber(aStr);
+	Val(iUid3,aStr);
 	return KErrNone;
-	}
-TInt TRomBuilderEntry::SetCallEntryPoint(TBool aState)
-	{
+}
+TInt TRomBuilderEntry::SetCallEntryPoint(TBool aState) {
 	if (aState)
 		iOverrideFlags|=KOverrideCallEntryPoint;
 	else
 		iOverrideFlags|=KOverrideNoCallEntryPoint;
 	return KErrNone;
-	}
+}
 
-TInt TRomBuilderEntry::SetAttachProcess(TText *aStr)
-	{
-	const char* s=(const char*)aStr;
+TInt TRomBuilderEntry::SetAttachProcess(const char* aStr) {
+
 	TInt nd=0;
-	if (*s=='\\')
-		{
-		++s;
+	if (*aStr==SLASH_CHAR) {
+		++aStr;
 		++nd;
-		}
-	TInt l=strlen(s);
-	if (l==0)
+	}
+	size_t l = strlen(aStr);
+	if (l == 0)
 		return KErrGeneral;
-	const char* ss=s;
-	while(*ss!=0 && *ss!='.') ++ss;
-	int ext=*ss;	// 0 if no extension
-	iProcessName=new TText[l+2+(ext?0:4)];
+	const char* ss=aStr;
+	while(*ss != 0 && *ss!='.') ++ss;
+	int ext = *ss;	// 0 if no extension
+	iProcessName=new char[l+2+(ext?0:4)];
 	char* d=(char *)iProcessName;
-	strcpy(d+1, s);
-	if (!ext)
-		{
+	strcpy(d+1, aStr);
+	if (!ext) {
 		char* t=d+1+l;
 		*t++='.';
 		*t++='e';
 		*t++='x';
 		*t++='e';
 		*t++=0;
-		}
+	}
 	char* dd=d;
 	int ind=nd;
-	while(*dd)
-		{
-		while(*dd && *dd!='\\') ++dd;
-		if (*dd=='\\')
-			{
+	while(*dd) {
+		while(*dd && *dd!=SLASH_CHAR) ++dd;
+		if (*dd==SLASH_CHAR) {
 			*dd++=0;	// change \ to NUL
 			++nd;		// count path elements
-			}
 		}
+	}
 	if (!ind && nd)
 		++nd;			// add initial \ if not present
 	*d=(char)nd;
 	return 0;
-	}
+}
 
 TInt TRomBuilderEntry::OpenImageFile()
 	{
-	Print(ELog,"Loading E32Image file %s \n", iFileName);
 	TInt err = Open(iFileName);
-	if (err != KErrNone)
-		{
+	return err;
+	}
+TInt TRomBuilderEntry::GetImageFileInfo(TInt aResult)
+{
+	TInt err = aResult;
+	Print(ELog,"Loading E32Image file %s \n", iFileName);
+	if (err != KErrNone) {
 		Print(EError,"File %s is not a valid E32Image file (error %d)\n", iFileName, err);
 		return err;
-		}
+	}
 	TUint hdrfmt = iHdr->HeaderFormat();
-	if (hdrfmt != KImageHdrFmt_V)
-		{
+	if (hdrfmt != KImageHdrFmt_V) {
 		Print(EError,"%s: Can't load old format binary\n", iFileName);
 		return KErrNotSupported;
-		}
+	}
 	E32ImageHeaderV* h = iHdr;
-	
+
 	// Overide any settings in the image file with those in the obey file
-	if (iOverrideFlags & (KOverrideUid1|KOverrideUid2|KOverrideUid3))
-		{
+	if (iOverrideFlags & (KOverrideUid1|KOverrideUid2|KOverrideUid3)) {
 		TUint uid1 = h->iUid1;
 		TUint uid2 = h->iUid2;
 		TUint uid3 = h->iUid3;
@@ -1078,7 +962,7 @@ TInt TRomBuilderEntry::OpenImageFile()
 		if (iOverrideFlags & KOverrideUid3)
 			uid3 = iUid3;
 		SetUids(TUid::Uid(uid1), TUid::Uid(uid2), TUid::Uid(uid3));
-		}
+	}
 	if (iOverrideFlags & KOverrideStack)
 		h->iStackSize = iStackSize;
 	if (iOverrideFlags & KOverrideHeapMax)
@@ -1089,39 +973,32 @@ TInt TRomBuilderEntry::OpenImageFile()
 		h->iProcessPriority = (TUint16)iPriority;
 	if (iOverrideFlags & KOverrideCapability)
 		h->iS.iCaps = iS.iCaps;
-	for (TInt i=0; i<SCapabilitySet::ENCapW; ++i)
-		{
+	for (TInt i=0; i<SCapabilitySet::ENCapW; ++i) {
 		h->iS.iCaps[i] |= gPlatSecDisabledCaps[i];
 		h->iS.iCaps[i] &= gPlatSecAllCaps[i];
-		}
+	}
 
-	if (iOverrideFlags & KOverrideCodePaged)
-		{
+	if (iOverrideFlags & KOverrideCodePaged) {
 		h->iFlags &= ~KImageCodeUnpaged;
 		h->iFlags |= KImageCodePaged;
-		}
-	if (iOverrideFlags & KOverrideCodeUnpaged)
-		{
+	}
+	if (iOverrideFlags & KOverrideCodeUnpaged) {
 		h->iFlags |= KImageCodeUnpaged;
 		h->iFlags &= ~KImageCodePaged;
-		}
+	}
 
-	if ((TInt)h->iUid1 == KExecutableImageUidValue)
-		{
-		if (iOverrideFlags & KOverrideDataPaged)
-			{
+	if ((TInt)h->iUid1 == KExecutableImageUidValue) {
+		if (iOverrideFlags & KOverrideDataPaged) {
 			h->iFlags &= ~KImageDataUnpaged;
 			h->iFlags |= KImageDataPaged;
-			}
-		if (iOverrideFlags & KOverrideDataUnpaged)
-			{
+		}
+		if (iOverrideFlags & KOverrideDataUnpaged) {
 			h->iFlags |= KImageDataUnpaged;
 			h->iFlags &= ~KImageDataPaged;
-			}
 		}
+	}
 
-	switch(gCodePagingOverride)
-		{
+	switch(gCodePagingOverride) {
 	case EKernelConfigPagingPolicyNoPaging:
 		h->iFlags |= KImageCodeUnpaged;
 		h->iFlags &= ~KImageCodePaged;
@@ -1138,9 +1015,8 @@ TInt TRomBuilderEntry::OpenImageFile()
 		if(!(h->iFlags&(KImageCodeUnpaged|KImageCodePaged)))
 			h->iFlags |= KImageCodePaged;
 		break;
-		}
-	switch(gDataPagingOverride)
-		{
+	}
+	switch(gDataPagingOverride) {
 	case EKernelConfigPagingPolicyNoPaging:
 		h->iFlags |= KImageDataUnpaged;
 		h->iFlags &= ~KImageDataPaged;
@@ -1157,10 +1033,10 @@ TInt TRomBuilderEntry::OpenImageFile()
 		if(!(h->iFlags&(KImageDataUnpaged|KImageDataPaged)))
 			h->iFlags |= KImageDataPaged;
 		break;
-		}
-	
+	}
+
 	h->iCompressionType=KUidCompressionDeflate; // XIP images are always uncompressed
-	
+
 	Print(ELog,"\t\tcompression format:0x%08x \n", h->iCompressionType);
 	if (gLogLevel & LOG_LEVEL_COMPRESSION_INFO)
 		Print(ELog,"\t\tgCompress:%d, gCompressionMethod: 0x%08x \n", gEnableCompress , gCompressionMethod);
@@ -1180,22 +1056,19 @@ TInt TRomBuilderEntry::OpenImageFile()
 
 	TUint impfmt = h->ImportFormat();
 
-	if (impfmt==KImageImpFmt_PE || impfmt==KImageImpFmt_PE2)
-		{
+	if (impfmt==KImageImpFmt_PE || impfmt==KImageImpFmt_PE2) {
 		TInt nimports = NumberOfImports();
-		if (nimports)
-			{
-			iImportAddressTableSection.iSize    = (nimports+1)*4;
+		if (nimports) {
+			iImportAddressTableSection.iSize    = (nimports+1)* sizeof(TLinAddr*);
 			iImportAddressTableSection.iFilePtr = iData + iOrigHdr->iCodeOffset + iOrigHdr->iTextSize;
-			iIATRefs = new TLinAddr*[nimports+1];
-			memcpy(iIATRefs, iImportAddressTableSection.iFilePtr, (nimports+1)*sizeof(TLinAddr*));
-			}
+			iIATRefs = reinterpret_cast<TLinAddr **>(new char[iImportAddressTableSection.iSize ]);
+			memcpy(iIATRefs, iImportAddressTableSection.iFilePtr, iImportAddressTableSection.iSize);
+		}
 
-		if (h->iExportDirCount)
-			{
+		if (h->iExportDirCount) {
 			iExportDirSection.iSize    = h->iExportDirCount*4;
 			iExportDirSection.iFilePtr = iData + iOrigHdr->iExportDirOffset;
-			}
+		}
 
 		// assertion - there's no rdata between IAT and Export Directory
 		TInt rdatasize = h->iCodeSize;		// overall "readonly" size
@@ -1203,144 +1076,51 @@ TInt TRomBuilderEntry::OpenImageFile()
 		rdatasize -= iImportAddressTableSection.iSize;	// IAT plus trailing 0
 		rdatasize -= iExportDirSection.iSize;			// export data
 
-		if (rdatasize != 0)
-			{
+		if (rdatasize != 0) {
 			Print(EWarning, "Unexpected code in %s: %d bytes unexplained\n", iFileName, rdatasize);
 			// expand the code to cover text+IAT+rdata
 			iCodeSection.iSize = h->iCodeSize - iExportDirSection.iSize;
-			}
-		else
-			{
+		}
+		else {
 			if (USE_IAT_FOR_IMPORTS)
 				iCodeSection.iSize += iImportAddressTableSection.iSize;	// include IAT
-			}
 		}
-	else
-		{
+	}
+	else {
 		// ELF-derived images have no IAT and the export directory is included in the code section
 		iImportAddressTableSection.iSize    = 0;
 		iImportAddressTableSection.iFilePtr = NULL;
 		iExportDirSection.iSize    = 0;
 		iExportDirSection.iFilePtr = NULL;
-		}
+	}
 
-	if (h->iDataSize)
-		{
+	if (h->iDataSize) {
 		iDataSection.iSize    = h->iDataSize;
 		iDataSection.iFilePtr = iData + iOrigHdr->iDataOffset;
-		}
+	}
 
 	iRomNode->iRomFile->iTotalDataBss = h->iDataSize + h->iBssSize;
 	iS = h->iS;
-	if (iVersionPresentInName && iVersionInName != h->ModuleVersion())
-		{
+	if (iVersionPresentInName && iVersionInName != h->ModuleVersion()) {
 		Print(EError,"%s: Version in name (%d.%d) does not match version in header (%d.%d)\n", iFileName,
 			iVersionInName>>16, iVersionInName&0x0000ffffu, h->ModuleVersion()>>16, h->ModuleVersion()&0x0000ffffu);
 		return KErrGeneral;
-		}
+	}
 	return KErrNone;
-	}
+}
 
-TInt TRomNode::NameCpy(char* aDest)
-//
-// Safely copy a file name in the rom entry
-//
-	{
-
-	if ((aDest==NULL) || (iName==NULL))
-		return 0;
-	if (Unicode)
-		{
-		const unsigned char* pSourceByte=iName;
-		unsigned char* pTargetByte=(unsigned char*)aDest;
-		for (;;)
-			{
-			const TUint sourceByte=*pSourceByte;
-			if (sourceByte==0)
-				{
-				*pTargetByte=0;
-				*(pTargetByte+1)=0;
-				break;
-				}
-			if ((sourceByte&0x80)==0)
-				{
-				*pTargetByte=(unsigned char)sourceByte;
-				++pTargetByte;
-				*pTargetByte=0;
-				++pTargetByte;
-				++pSourceByte;
-				}
-			else if ((sourceByte&0xe0)==0xc0)
-				{
-				++pSourceByte;
-				const TUint secondSourceByte=*pSourceByte;
-				if ((secondSourceByte&0xc0)!=0x80)
-					{
-					Print(EError, "Bad UTF-8 '%s'", iName);
-					exit(671);
-					}
-				*pTargetByte=(unsigned char)((secondSourceByte&0x3f)|((sourceByte&0x03)<<6));
-				++pTargetByte;
-				*pTargetByte=(unsigned char)((sourceByte>>2)&0x07);
-				++pTargetByte;
-				++pSourceByte;
-				}
-			else if ((sourceByte&0xf0)==0xe0)
-				{
-				++pSourceByte;
-				const TUint secondSourceByte=*pSourceByte;
-				if ((secondSourceByte&0xc0)!=0x80)
-					{
-					Print(EError, "Bad UTF-8 '%s'", iName);
-					exit(672);
-					}
-				++pSourceByte;
-				const TUint thirdSourceByte=*pSourceByte;
-				if ((thirdSourceByte&0xc0)!=0x80)
-					{
-					Print(EError, "Bad UTF-8 '%s'", iName);
-					exit(673);
-					}
-				*pTargetByte=(unsigned char)((thirdSourceByte&0x3f)|((secondSourceByte&0x03)<<6));
-				++pTargetByte;
-				*pTargetByte=(unsigned char)(((secondSourceByte>>2)&0x0f)|((sourceByte&0x0f)<<4));
-				++pTargetByte;
-				++pSourceByte;
-				}
-			else
-				{
-				Print(EError, "Bad UTF-8 '%s'", iName);
-				exit(674);
-				}
-			}
-		const TInt numberOfBytesInTarget=(pTargetByte-(unsigned char*)aDest); // this number excludes the trailing null-terminator
-		if (numberOfBytesInTarget%2!=0)
-			{
-			Print(EError, "Internal error");
-			exit(675);
-			}
-		return numberOfBytesInTarget/2; // returns the length of aDest (in UTF-16 characters for Unicode, not bytes)
-		}
-	strcpy(aDest,(const char*)iName);
-	return strlen((const char*)iName);
-	}
-
-TInt TRomBuilderEntry::SizeInRom()
 //
 // Approximate the required size of the file when rommed
 //
-	{
-
+TInt TRomBuilderEntry::SizeInRom() {
 	TInt size1, size2;
 	SizeInSections(size1,size2);
 	return size1+size2;
-	}
-
-void TRomBuilderEntry::LoadToRom()
+}
 //
 //
 //
-	{
+void TRomBuilderEntry::LoadToRom() {
 	// Copy fixed stuff into iRomImageHeader
 	E32ImageHeaderV* h = iHdr;
 	const TUint KRomFlagMask = KImageDll | KImageNoCallEntryPoint | KImageFixedAddressExe | KImageNmdExpData | KImageDataPagingMask;
@@ -1370,8 +1150,8 @@ void TRomBuilderEntry::LoadToRom()
 	iRomImageHeader->iDllRefTable       = (TDllRefTable*)(iDllRefTableRange.iImageAddr);
 	iRomImageHeader->iExportDirCount    = h->iExportDirCount;
 	iRomImageHeader->iExportDir         = (impfmt==KImageImpFmt_ELF) ?
-											iCodeSection.iRunAddr + (h->iExportDirOffset - h->iCodeOffset)
-											: iExportDirSection.iRunAddr;
+		iCodeSection.iRunAddr + (h->iExportDirOffset - h->iCodeOffset)
+		: iExportDirSection.iRunAddr;
 	iRomImageHeader->iS					= h->iS;
 	iRomImageHeader->iToolsVersion		= h->iToolsVersion;
 	iRomImageHeader->iModuleVersion		= h->ModuleVersion();
@@ -1385,11 +1165,10 @@ void TRomBuilderEntry::LoadToRom()
 	if ((xd & 1) && (xd != 0xffffffffu))
 		iRomImageHeader->iExceptionDescriptor = (xd & ~1) + iRomImageHeader->iCodeAddress;
 
-	if (iPreferred)
-		{
+	if (iPreferred) {
 		iRomImageHeader->iModuleVersion	&= ~0xffffu;
 		iRomImageHeader->iModuleVersion	|= 0x8000u;
-		}
+	}
 
 	// Relocate the file to reflect the new addresses
 	Relocate();
@@ -1398,13 +1177,11 @@ void TRomBuilderEntry::LoadToRom()
 	iCodeSection.Load();
 	iExportDirSection.Load();
 	iDataSection.Load();
-	}
-
-void TRomBuilderEntry::Relocate()
+}
 //
 // Relocates the iData to new Code and Data addresses
-//	
-	{
+//
+void TRomBuilderEntry::Relocate() {
 	TUint codeDelta=iRomImageHeader->iCodeAddress       - iHdr->iCodeBase;
 	TUint dataDelta=iRomImageHeader->iDataBssLinearBase - iHdr->iDataBase;
 
@@ -1412,69 +1189,63 @@ void TRomBuilderEntry::Relocate()
 
 	if (iOrigHdr->iCodeRelocOffset)
 		RelocateSection(iData + iOrigHdr->iCodeOffset, iData + iOrigHdr->iCodeRelocOffset,
-			codeDelta, dataDelta, (char*)iCodeSection.iImagePtr, iIATRefs);
+		codeDelta, dataDelta, (char*)iCodeSection.iImagePtr, iIATRefs);
 
 	// data section 
 
 	if (iOrigHdr->iDataRelocOffset)
 		RelocateSection(iData + iOrigHdr->iDataOffset, iData + iOrigHdr->iDataRelocOffset, 
-			codeDelta, dataDelta, (char*)iDataSection.iImagePtr, iIATRefs);
+		codeDelta, dataDelta, (char*)iDataSection.iImagePtr, iIATRefs);
 
 	// export directory (only for PE-derived files)
-	if (iExportDirSection.iSize)
-		{
+	if (iExportDirSection.iSize) {
 		TLinAddr* ptr=(TLinAddr*)(iData + iOrigHdr->iExportDirOffset);
 
 		TLinAddr textStart = iHdr->iCodeBase;
 		TLinAddr textFinish = textStart + iHdr->iTextSize;
 		TLinAddr dataStart = textStart + iHdr->iCodeSize;
 		TLinAddr dataFinish = dataStart + iHdr->iDataSize + iHdr->iBssSize;
-	 
+
 		TInt i;
-		for (i=0; i<iHdr->iExportDirCount; i++, ptr++)
-			{
+		for (i=0; i<iHdr->iExportDirCount; i++, ptr++) {
 			TLinAddr data=*ptr+textStart;
 			if ((data>=textStart) && (data<textFinish))
 				*ptr=data+codeDelta; // export something from the text/rdata section
 			else if ((data>=dataStart) && (data<dataFinish))
 				*ptr=data+dataDelta; // export some data or bss item
-			else
-				{
+			else {
 				Print(EWarning, "Export directory in %s: item %d -> %08x, which is not text or data!\n", iFileName, i, data);
 				*ptr=0x13;	// unlucky for some
-				}
 			}
 		}
+	}
 
 	// Replace absent exports with 0
 	TLinAddr* ptr = (TLinAddr*)(iData + iOrigHdr->iExportDirOffset);
 	TInt i;
-	for (i=0; i<iHdr->iExportDirCount; i++, ptr++)
-		{
+	for (i=0; i<iHdr->iExportDirCount; i++, ptr++) {
 		if ( !( iExportBitMap[i>>3] & (1u << (i&7)) ) )
 			*ptr = 0;
-		}
+	}
 
 	// Update E32ImageHeader, in case we want to do this process again later
 
 	iHdr->iCodeBase += codeDelta;
 	iHdr->iDataBase += dataDelta;
-	}
+}
 
 
-
-
-TInt TRomBuilderEntry::FixupImports(E32Rom& aRom)
 //
 // Modify the import stubs to point directly into the export directory of the corresponding DLLs
 // using the back pointers captured by detecting relocations referring to the Import Address Table
 // The old-style Import Address Table behaviour can be retained by specifying the "keepIAT" attribute.
 //
-	{
+
+TInt TRomBuilderEntry::FixupImports(E32Rom& aRom) {
 	if (iHdr->iImportOffset == 0)
 		return KErrNone;	// nothing to do
 
-	
+
 
 	TUint impfmt = iHdr->ImportFormat();
 	TUint my_abi = iHdr->ABI();
@@ -1483,96 +1254,85 @@ TInt TRomBuilderEntry::FixupImports(E32Rom& aRom)
 	TLinAddr **iatRef=iIATRefs;
 	TAddressRange iatRange = iCodeSection;
 	iatRange.Move(iHdr->iTextSize);
-	if (USE_IAT_FOR_IMPORTS)
-		{
+	if (USE_IAT_FOR_IMPORTS) {
 		if (impfmt == KImageImpFmt_ELF)
 			return Print(EError, "Can't retain IAT for %s since it never existed\n", iFileName);
 		if (iRomSectionNumber==0 && aRom.iObey->iSectionPosition!=-1)
 			return Print(EError, "Can't retain IAT for %s in first section - not yet implemented\n", iFileName);
 		Print(ELog, "%s has IAT at %08x\n", iFileName, iatRange.iRunAddr);
-		}
+	}
 	const E32ImportBlock* b = (const E32ImportBlock*)(importsection + 1);
 	TInt i = iHdr->iDllRefTableCount;
 	TInt numberOfImports=0;
 	TUint *impOrdinalP = (TUint*)iImportAddressTableSection.iFilePtr;	// points to original IAT in file
-	while (i-->0)
-		{
+	while (i-->0) {
 		char* dllname = (char*)importsection + b->iOffsetOfDllName;
 		TDllFindInfo find_info(dllname, this);
 		TBool fallback;
 		TRomNode* romnode = aRom.FindImageFileByName(find_info, EFalse, fallback);
-		if (!romnode)
-			{
+		if (!romnode) {
 			Print(EError, "Can't fixup imports for\n\t%s\nbecause\n\t%s\nis not in rom.\n",
-						 (const char*)TModuleName(this), (const char*)TModuleName(find_info));
+				(const char*)TModuleName(this), (const char*)TModuleName(find_info));
 			aRom.FindImageFileByName(find_info, ETrue, fallback);
 			return KErrGeneral;
-			}
+		}
 		TRomFile* dll=romnode->iRomFile;
 		TRACE(TIMPORT,Print(ELog,"%s importing from %s\n", (const char*)TModuleName(this), (const char*)TModuleName(find_info)));
-		if (romnode->ABI() != my_abi)
-			{
+		if (romnode->ABI() != my_abi) {
 			Print(EWarning, "File %s links to %s with different ABI\n", (const char*)TModuleName(this), (const char*)TModuleName(find_info));
-			}
+		}
 		TInt j;
 		numberOfImports += b->iNumberOfImports;
 		if (impfmt==KImageImpFmt_ELF)
 			impOrdinalP = (TUint*)(b->Imports());	// for ELF must look in import block
 		char* codeBase = (char*)iCodeSection.iImagePtr;
-		for (j=0; j<b->iNumberOfImports; j++)
-			{
+		for (j=0; j<b->iNumberOfImports; j++) {
 			TLinAddr exportAddr = 0xdeadbeef;
 			TLinAddr exporter = 0xdeadbeef;
 			TUint impOrdinal = *impOrdinalP;
 			TUint impOffset = 0;
-			if (impfmt==KImageImpFmt_ELF)
-				{
+			if (impfmt==KImageImpFmt_ELF) {
 				TUint impd = *(TUint*)(codeBase + impOrdinal);
 				impOrdinal = impd & 0xffff;
 				impOffset = impd >> 16;
-				}
+			}
 			TRACE(TIMPORT,Print(ELog,"Ordinal %d\n", impOrdinal));
 			TInt ret=dll->AddressFromOrdinal(exporter, exportAddr, impOrdinal);
 			TRACE(TIMPORT,Print(ELog,"export %08x exporter %08x\n",exportAddr,exporter));
-			if (ret!=KErrNone)
-				{
+			if (ret!=KErrNone) {
 				Print(EError, "%s wants ordinal %d from %s which only exports %d functions\n",
 					iFileName, impOrdinal, 	(const char*)TModuleName(find_info), dll->ExportDirCount());
 				exporter=0x13;	// unlucky for some...
 				exportAddr=0x13;
-				}
-			else if (exportAddr == 0 && impOrdinal != 0)
-				{
+			}
+			else if (exportAddr == 0 && impOrdinal != 0) {
 				Print(EError, "%s wants ordinal %d from %s which is absent\n",
 					iFileName, impOrdinal, 	(const char*)TModuleName(find_info));
 				exporter=0x13;	// unlucky for some...
 				exportAddr=0x13;
-				}
-			if (USE_IAT_FOR_IMPORTS)
-				{
+			}
+			if (USE_IAT_FOR_IMPORTS) {
 				// must be PE-derived
 				*iatRef=(unsigned long*)exportAddr; //iatRange.iRunAddr;					// point into IAT ...
 				*(TLinAddr*)(iatRange.iImagePtr)=exportAddr;	// ... which has a copy of the export
 				iatRange.Move(sizeof(TLinAddr));
 				iatRef++;
-				}
-			else if (impfmt==KImageImpFmt_PE || impfmt==KImageImpFmt_PE2)
-				{
+			}
+			else if (impfmt==KImageImpFmt_PE || impfmt==KImageImpFmt_PE2) {
 				**iatRef=exporter;	// point directly into export directory
 				iatRef++;
-				}
-			else
-				{
+			}
+			else {
 				// ELF-derived
 				*(TUint*)(codeBase + *impOrdinalP) = exportAddr + impOffset;
-				}
-			impOrdinalP++;
 			}
-		b = b->NextBlock(impfmt);
+			impOrdinalP++;
 		}
+		b = b->NextBlock(impfmt);
+	}
 	iImportCount=numberOfImports;
 	return KErrNone;
-	}
+}
 
 const char* KF32ProcessName="efile.exe";
 const char* KWservProcessName="ewsrv.exe";
@@ -1580,7 +1340,6 @@ const char* KFbservProcessName="fbserv.exe";
 const char* KMdaSvrProcessName="mediaserverstub.exe";
 const char* KC32ProcessName="c32exe.exe";
 
-const char* TRomBuilderEntry::GetDefaultAttachProcess()
 //
 // Work out the attach process from the file extension
 //
@@ -1591,7 +1350,7 @@ const char* TRomBuilderEntry::GetDefaultAttachProcess()
 // MDASVR:	MDA
 // C32:		CSY, PRT, TSY, AGT, AGX
 //
-	{
+const char* TRomBuilderEntry::GetDefaultAttachProcess() {
 	const char* s=(const char*)iName;
 	TInt l=strlen(s);
 	if (l<4 || s[l-4]!='.')
@@ -1616,10 +1375,9 @@ const char* TRomBuilderEntry::GetDefaultAttachProcess()
 	if (stricmp(s,"agx")==0)
 		return KC32ProcessName;
 	return NULL;
-	}
+}
 
-TInt TRomBuilderEntry::FindAttachProcess(E32Rom& aRom)
-	{
+TInt TRomBuilderEntry::FindAttachProcess(E32Rom& aRom) {
 	if (iRomImageFlags & (KRomImageFlagVariant|KRomImageFlagExtension|KRomImageFlagDevice))
 		return KErrNone;
 	const char* attp_name=(const char*)iProcessName;
@@ -1633,130 +1391,109 @@ TInt TRomBuilderEntry::FindAttachProcess(E32Rom& aRom)
 	TInt i;
 	TUint my_abi = iHdr->ABI();
 	TUint abi = 0;
-	if (nd)
-		{
+	if (nd) {
 		// path search
 		TRomNode* rn=aRom.iObey->iRootDirectory;
-		for (; nd; --nd)
-			{
-			rn=rn->FindInDirectory((TText*)attp_name);
-			if (!rn)
-				{
+		for (; nd; --nd) {
+			rn=rn->FindInDirectory(attp_name);
+			if (!rn) {
 				Print(EError, "Invalid attach process name element %s\n", attp_name);
 				return KErrGeneral;
-				}
-			attp_name+=(strlen(attp_name)+1);
 			}
+			attp_name+=(strlen(attp_name)+1);
+		}
 		iRomNode->iRomFile->iAttachProcess=rn->iRomFile;
 		abi = iRomNode->iRomFile->iAttachProcess->ABI();
-		}
-	else
-		{
+	}
+	else {
 		// filename only search
-		for (i=0; i<aRom.iObey->iNumberOfPeFiles; i++)
-			{
+		for (i=0; i<aRom.iObey->iNumberOfPeFiles; i++) {
 			TRomBuilderEntry* e=aRom.iPeFiles[i];
 			abi = e->iHdr->ABI();
-			if (stricmp((const char*)e->iName, attp_name)==0)
-				{
-				if (iRomNode->iRomFile->iAttachProcess)
-					{
+			if (stricmp((const char*)e->iName, attp_name)==0) {
+				if (iRomNode->iRomFile->iAttachProcess) {
 					Print(EError, "Ambiguous attach process name %s\n", attp_name);
 					return KErrGeneral;
-					}
-				iRomNode->iRomFile->iAttachProcess=e->iRomNode->iRomFile;
 				}
+				iRomNode->iRomFile->iAttachProcess=e->iRomNode->iRomFile;
 			}
 		}
-	if (abi != my_abi)
-		{
-		Print(EWarning, "File %s: Attach process has different ABI\n", (const char*)TModuleName(this));
-		}
-	return KErrNone;
 	}
-
-TInt TRomBuilderEntry::BuildDependenceGraph(E32Rom& aRom)
+	if (abi != my_abi) {
+		Print(EWarning, "File %s: Attach process has different ABI\n", (const char*)TModuleName(this));
+	}
+	return KErrNone;
+}
 //
 // Fill in the iDeps
 //
-	{
+TInt TRomBuilderEntry::BuildDependenceGraph(E32Rom& aRom) {
 	TBool is_kernel = ((iRomImageFlags & KRomImageFlagsKernelMask) != 0);
 	TRomNode* rn = iRomNode;
 	TRomFile* rf = rn->iRomFile;
 	TUint my_abi = iHdr->ABI();
 	TUint impfmt = iHdr->ImportFormat();
 	rf->iNumDeps = iHdr->iDllRefTableCount;
-	if (IsDll() && aRom.iObey->iMemModel!=E_MM_Flexible && aRom.iObey->iMemModel!=E_MM_Multiple && (iHdr->iDataSize!=0 || iHdr->iBssSize!=0))
-		{
+	if (IsDll() && aRom.iObey->iMemModel!=E_MM_Flexible && aRom.iObey->iMemModel!=E_MM_Multiple && (iHdr->iDataSize!=0 || iHdr->iBssSize!=0)) {
 		TInt r=FindAttachProcess(aRom);
 		if (r!=KErrNone)
 			return r;
-		if (aRom.iObey->iMemModel==E_MM_Moving)
-			{
+		if (aRom.iObey->iMemModel==E_MM_Moving) {
 			if (rf->iAttachProcess && !(rf->iAttachProcess->RomImageFlags() & KRomImageFlagFixedAddressExe))
 				rf->iAttachProcess=NULL;	// ignore attach process if not fixed
-			}
 		}
+	}
 	TRomFile* attp=rf->iAttachProcess;
 	if (attp)
 		++rf->iNumDeps;		// extra implicit dependence on process
-	if (rf->iNumDeps)
-		{
+	if (rf->iNumDeps) {
 		rf->iDeps=new TRomFile* [rf->iNumDeps];
 		memset(rf->iDeps, 0, rf->iNumDeps*sizeof(TRomFile*));
-		}
+	}
 
 	TInt err = KErrNone;
 	const E32ImportSection* importSection = (const E32ImportSection*)(iData + iOrigHdr->iImportOffset);
 	const E32ImportBlock* block = (const E32ImportBlock*)(importSection + 1);
 	TInt i;
-	for (i=0; i<iHdr->iDllRefTableCount; i++, block = block->NextBlock(impfmt), TRACE(TIMPORT,Print(ELog,"DllRef/dll done\n")) )
-		{
+	for (i=0; i<iHdr->iDllRefTableCount; i++, block = block->NextBlock(impfmt), TRACE(TIMPORT,Print(ELog,"DllRef/dll done\n")) ) {
 		char* dllname = (char*)importSection + block->iOffsetOfDllName;
 		TDllFindInfo find_info(dllname, this);
 		TBool fallback;
 		TRomNode* romnode = aRom.FindImageFileByName(find_info, EFalse, fallback);
-		if (!romnode)
-			{
+		if (!romnode) {
 			Print(EError, "Can't build dependence graph for\n\t%s\nbecause\n\t%s\nis not in rom.\n",
-						 (const char*)TModuleName(this), (const char*)TModuleName(find_info));
+				(const char*)TModuleName(this), (const char*)TModuleName(find_info));
 			aRom.FindImageFileByName(find_info, ETrue, fallback);
 			err = KErrNotFound;
 			continue;
-			}
-		if (fallback)
-			{
+		}
+		if (fallback) {
 			Print(EWarning, "File %s links to %s\n\twhich is not in ROM. Version 1.0 of latter used instead.\n",
-					 (const char*)TModuleName(this), (const char*)TModuleName(find_info));
-			}
+				(const char*)TModuleName(this), (const char*)TModuleName(find_info));
+		}
 		TRACE(TIMPORT,Print(ELog,"%s links to %s\n", (const char*)TModuleName(this), (const char*)TModuleName(find_info)));
 		TRACE(TIMPORT,Print(ELog,"Resolves to %s\n", (const char*)TModuleName(*romnode)));
 		TBool dep_is_kernel = ((romnode->iRomFile->RomImageFlags() & KRomImageFlagsKernelMask) != 0);
-		if (dep_is_kernel != is_kernel)
-			{
-			if (is_kernel)
-				{
+		if (dep_is_kernel != is_kernel) {
+			if (is_kernel) {
 				Print(EError, "Kernel side executable\n\t%s\nlinks to user side executable\n\t%s\n",
-									 (const char*)TModuleName(this), (const char*)TModuleName(find_info));
-				}
-			else
-				{
+					(const char*)TModuleName(this), (const char*)TModuleName(find_info));
+			}
+			else {
 				Print(EError, "User side executable\n\t%s\nlinks to kernel side executable\n\t%s\n",
-									 (const char*)TModuleName(this), (const char*)TModuleName(find_info));
-				}
+					(const char*)TModuleName(this), (const char*)TModuleName(find_info));
+			}
 			err = KErrGeneral;
 			continue;
-			}
+		}
 		// prevent the situiation which importer is primary, variant or extension, exporter is device
-		if (is_kernel && !Device() && romnode->iRomFile->iRbEntry->Device())	
-			{
+		if (is_kernel && !Device() && romnode->iRomFile->iRbEntry->Device())	 {
 			Print(EWarning, "Kernel/variant/extension\n\t%s\nlinks to non-extension LDD/PDD\n\t%s\n",
-							(const char*)TModuleName(this), (const char*)TModuleName(find_info));
-			}
-		if (romnode->ABI() != my_abi)
-			{
+				(const char*)TModuleName(this), (const char*)TModuleName(find_info));
+		}
+		if (romnode->ABI() != my_abi) {
 			Print(EWarning, "File %s links to %s with different ABI\n", (const char*)TModuleName(this), (const char*)TModuleName(find_info));
-			}
+		}
 
 		rf->iDeps[i]=romnode->iRomFile;
 		const SSecurityInfo& s1 = iHdr->iS;
@@ -1766,19 +1503,17 @@ TInt TRomBuilderEntry::BuildDependenceGraph(E32Rom& aRom)
 			err = r;
 		if (romnode->iRomFile==attp)
 			attp=NULL;
-		}
+	}
 
 	if (attp)
 		rf->iDeps[rf->iNumDeps-1]=attp;
 	TRACE(TIMPORT,Print(ELog,"BuildDep done all\n"));
 	return err;
-	}
-
-TInt TRomBuilderEntry::ResolveDllRefTable(E32Rom& aRom)
+}
 //
 // Fill in the DLLRefTable
 //
-	{
+TInt TRomBuilderEntry::ResolveDllRefTable(E32Rom& aRom) {
 	TRomNode* rn = iRomNode;
 	TRomFile* rf = rn->iRomFile;
 	(void)aRom;
@@ -1794,20 +1529,17 @@ TInt TRomBuilderEntry::ResolveDllRefTable(E32Rom& aRom)
 
 	TInt err = KErrNone;
 	TInt i;
-	for (i=0; i<rf->iNumPDeps; i++)
-		{
+	for (i=0; i<rf->iNumPDeps; i++) {
 		dllRefTable->iEntry[i]=(TRomImageHeader*)rf->iPDeps[i]->iAddresses.iRunAddr;
-		}
+	}
 	TRACE(TIMPORT,Print(ELog,"DllRef done all\n"));
 	return err;
-	}
+}
 
-void TRomBuilderEntry::DisplaySize(TPrintType aWhere)
-	{
+void TRomBuilderEntry::DisplaySize(TPrintType aWhere) {
 	if(gLogLevel > DEFAULT_LOG_LEVEL){
 
-		if(gLogLevel & LOG_LEVEL_FILE_DETAILS)
-		{
+		if(gLogLevel & LOG_LEVEL_FILE_DETAILS) {
 			// More detailed information about file name in .
 			TBool aIgnoreHiddenAttrib = ETrue;
 			TInt aLen = iRomNode->FullNameLength(aIgnoreHiddenAttrib);
@@ -1826,124 +1558,112 @@ void TRomBuilderEntry::DisplaySize(TPrintType aWhere)
 		else
 			Print(aWhere, "%s\t%d\n", iFileName, SizeInRom());
 	}
-	}
+}
 
 /**
- * TRomFile iRomEntry is a linked list through the various
- * distinct TRomEntry objects which may exist for the associated file
- * due to variant processing / aliasing
- */
+* TRomFile iRomEntry is a linked list through the various
+* distinct TRomEntry objects which may exist for the associated file
+* due to variant processing / aliasing
+*/
 
-void TRomFile::SetRomEntry(TRomEntry* aEntry)
-	{
+void TRomFile::SetRomEntry(TRomEntry* aEntry) {
 	// Need to add to the tail of the list, for backwards compatibility
 	// Adding to the front of the list changes the iPrimary and iSecondary
 	// values in the TRomHeader when multiple variants are present
 
 	if (iFinal)
 		return;			// address already established so no fixup required
-	if (iRomEntry==0)
-		{
+	if (iRomEntry==0) {
 		iRomEntry = aEntry;
 		return;
-		}
+	}
 	TRomEntry* entry = iRomEntry;
 	while (entry->iAddressLin != 0)
 		entry = (TRomEntry*)entry->iAddressLin;
 	entry->iAddressLin = (TLinAddr)aEntry;
-	}
+}
 
-void TRomBuilderEntry::FixupRomEntries(TInt aSize)
-	{
+void TRomBuilderEntry::FixupRomEntries(TInt aSize) {
 	if (iPatched)
 		return;		// patched files don't appear in the ROM file system
 
 	iRomNode->Finalise(aSize);
-	}
+}
 
 /**
- * TRomNode::Finalise updates the associated TRomEntry objects with the final size and
- * linear address information supplied by the TRomBuilderEntry. It also stores the
- * summary information for resolving static linkages to this executable (if appropriate)
- * and adjusts the TRomNodes so that they are identical to the ones which would be 
- * obtained by walking the directory structure in an existing ROM.
- */
-void TRomNode::Finalise(TInt aSize)
-	{
+* TRomNode::Finalise updates the associated TRomEntry objects with the final size and
+* linear address information supplied by the TRomBuilderEntry. It also stores the
+* summary information for resolving static linkages to this executable (if appropriate)
+* and adjusts the TRomNodes so that they are identical to the ones which would be 
+* obtained by walking the directory structure in an existing ROM.
+*/
+void TRomNode::Finalise(TInt aSize) {
 	TRACE(TIMPORT,Print(ELog,"TRomNode %s Finalise %08x %d\n", (const char*)TModuleName(*this), iRomFile->iFinal));
 	iRomFile->Finalise(aSize);
-	}
+}
 
 /**
- * TRomFile::Finalise updates the associated TRomEntry objects with the final size and
- * linear address information supplied by the TRomBuilderEntry. It also stores the
- * summary information for resolving static linkages to this executable (if appropriate)
- * and adjusts the TRomFiles so that they are identical to the ones which would be 
- * obtained by walking the directory structure in an existing ROM.
- */
-void TRomFile::Finalise(TInt aSize)
-	{
+* TRomFile::Finalise updates the associated TRomEntry objects with the final size and
+* linear address information supplied by the TRomBuilderEntry. It also stores the
+* summary information for resolving static linkages to this executable (if appropriate)
+* and adjusts the TRomFiles so that they are identical to the ones which would be 
+* obtained by walking the directory structure in an existing ROM.
+*/
+void TRomFile::Finalise(TInt aSize) {
 	if (iFinal)
 		return;
 	TLinAddr ra = iRbEntry->iHeaderRange.iImageAddr;
 	TRomEntry* entry = iRomEntry;
-	while (entry)
-		{
+	while (entry) {
 		TRomEntry* next = (TRomEntry*)entry->iAddressLin;
 		entry->iSize = aSize;
 		entry->iAddressLin = ra;
 		entry = next;
-		}
+	}
 	iAddresses = iRbEntry->iHeaderRange;
 	iAddresses.iSize = aSize;
-	if ((!iRbEntry->iResource) && (!iRbEntry->HCRDataFile()))
-		{
+	if ((!iRbEntry->iResource) && (!iRbEntry->HCRDataFile())) {
 		iExportDir = iAddresses;
 		iExportDir.iSize = iRbEntry->iHdr->iExportDirCount * sizeof(TLinAddr);
 		iExportDir.Move(RomImgHdr()->iExportDir - iAddresses.iRunAddr);
-		}
+	}
 	iRbEntry = 0;
 	iFinal = ETrue;
-	}
+}
 
-void TRomBuilderEntry::SetRomNode(TRomNode* aNode)
-	{
+void TRomBuilderEntry::SetRomNode(TRomNode* aNode) {
 	iRomNode = aNode;
-	}
+}
 
 
 void TImageSection::Load() const
-	{ 
+{ 
 	if (iSize && iImagePtr && iFilePtr) 
 		memcpy(iImagePtr,iFilePtr,iSize); 
-	}
+}
 
 /**
- * TDllExportInfo is the information about a DLL which is necessary to
- * resolve a static link to that DLL. It all comes from the TRomImageHeader,
- * as it would with a static linkage resolved at runtime.
- */
-TRomFile::TRomFile()
-	{
+* TDllExportInfo is the information about a DLL which is necessary to
+* resolve a static link to that DLL. It all comes from the TRomImageHeader,
+* as it would with a static linkage resolved at runtime.
+*/
+TRomFile::TRomFile() {
 	memset(this, 0, sizeof(TRomFile));
 	iRefCount = 1;
 	iHwvd = KVariantIndependent;
 	iDataBssOffsetInExe = -1;
-	}
+}
 
-TRomFile::~TRomFile()
-	{
-	delete[] iDeps;
-	delete[] iPDeps;
-	}
-
-TInt TRomFile::AddressFromOrdinal(TLinAddr& aEDataAddr, TLinAddr& aExport, TUint aOrdinal)
+TRomFile::~TRomFile() {
+	if(iDeps) delete[] iDeps;
+	if(iPDeps) delete[] iPDeps;
+}
 //
 // Get the export address of symbol aOrdinal
 //
-	{
-	if(aOrdinal == 0)
-	{
+
+TInt TRomFile::AddressFromOrdinal(TLinAddr& aEDataAddr, TLinAddr& aExport, TUint aOrdinal) {
+	if(aOrdinal == 0) {
 		aEDataAddr = iExportDir.iRunAddr -1 ;
 		aExport = *(TLinAddr*)((TLinAddr*)iExportDir.iImagePtr - 1);
 		if((TInt)aExport == ExportDirCount()) {
@@ -1952,18 +1672,17 @@ TInt TRomFile::AddressFromOrdinal(TLinAddr& aEDataAddr, TLinAddr& aExport, TUint
 		}
 		return KErrNone;
 	}
-	
+
 	TUint index = aOrdinal - KOrdinalBase;
 	if (index >= (TUint)ExportDirCount())
 		return KErrNotFound;
 	aEDataAddr = iExportDir.iRunAddr + index * sizeof(TLinAddr);
 	aExport = ((TLinAddr*)iExportDir.iImagePtr)[index];
 	return KErrNone;
-	}
+}
 
 
-bool TRomFile::ComputeSmpSafe(const TRomBuilderEntry* aRbEntry)
-	{
+bool TRomFile::ComputeSmpSafe(const TRomBuilderEntry* aRbEntry) {
 	// A component is SMP safe if:
 	//
 	// 1. It's E32 image file is marked as SMP safe (MMP keyword SMPSAFE).
@@ -1971,11 +1690,10 @@ bool TRomFile::ComputeSmpSafe(const TRomBuilderEntry* aRbEntry)
 	//
 	// This implies a recursive dependency structure.
 
-	if (iSmpInfo.isInit)
-		{
+	if (iSmpInfo.isInit) {
 		// We have already visited this node.
 		return iSmpInfo.isSafe;
-		}
+	}
 
 	// Mark this node as "active," meaning that we are currently evaluating it. We
 	// use this to detect cycles in the dependency graph.
@@ -1986,67 +1704,57 @@ bool TRomFile::ComputeSmpSafe(const TRomBuilderEntry* aRbEntry)
 	// Have we found any cycle in the graph?
 	bool is_cycle = 0;
 
-	if ( aRbEntry->iOrigHdr->iFlags & KImageSMPSafe )
-		{
+	if ( aRbEntry->iOrigHdr->iFlags & KImageSMPSafe ) {
 		// OK, the E32 file for this node is marked as SMPSAFE. Now we need to check
 		// that all nodes we depend on are SMP safe.
 
-		for (int i = 0; i < iNumDeps; i++)
-			{
+		for (int i = 0; i < iNumDeps; i++) {
 			TRomFile* e = iDeps[i];
 
 			assert(this != e);
 
-			if (e->iSmpInfo.isActive)
-				{
+			if (e->iSmpInfo.isActive) {
 				is_cycle = 1;
-				}
-			else if ( ! e->ComputeSmpSafe(e->iRbEntry) )
-				{
-				if (gLogLevel & LOG_LEVEL_SMP_INFO)
-					{
+			}
+			else if ( ! e->ComputeSmpSafe(e->iRbEntry) ) {
+				if (gLogLevel & LOG_LEVEL_SMP_INFO) {
 					Print(ELog,"SMP-unsafe: %s: links to unsafe component %s.\n",
-							aRbEntry->iBareName , e->iRbEntry->iBareName);
-					}
+						aRbEntry->iBareName , e->iRbEntry->iBareName);
+				}
 
 				iSmpInfo.isSafe = 0;
 				break;
-				}
 			}
 		}
-	else
-		{
-		if (gLogLevel & LOG_LEVEL_SMP_INFO)
-			{
+	}
+	else {
+		if (gLogLevel & LOG_LEVEL_SMP_INFO) {
 			Print(ELog,"SMP-unsafe: %s: MMP keyword SMPSAFE not used.\n", aRbEntry->iBareName);
-			}
+		}
 
 		iSmpInfo.isSafe = 0;
-		}
+	}
 
 	iSmpInfo.isActive = 0;
 
-	if (!iSmpInfo.isSafe || !is_cycle)
-		{
+	if (!iSmpInfo.isSafe || !is_cycle) {
 		iSmpInfo.isInit = 1;
-		}
-
-	return iSmpInfo.isSafe;
 	}
 
+	return iSmpInfo.isSafe;
+}
+
 /**
- * TRomNode::CopyDirectory performs a deep copy of the TRomNode structure
- */
-TRomNode* TRomNode::CopyDirectory(TRomNode*& aLastExecutable, TRomNode* aParent)
-	{
-	if (iHidden && iChild==0)
-		{
+* TRomNode::CopyDirectory performs a deep copy of the TRomNode structure
+*/
+TRomNode* TRomNode::CopyDirectory(TRomNode*& aLastExecutable, TRomNode* aParent) {
+	if (iHidden && iChild==0) {
 		// Hidden file - do not copy (as it wouldn't be visible in the ROM filestructure)
 		if (iSibling)
 			return iSibling->CopyDirectory(aLastExecutable, aParent);
 		else
 			return 0;
-		}
+	}
 
 	TRomNode* copy = new TRomNode(*this);
 	copy->iParent = aParent;
@@ -2062,40 +1770,40 @@ TRomNode* TRomNode::CopyDirectory(TRomNode*& aLastExecutable, TRomNode* aParent)
 	if (copy->iAtt & KEntryAttXIP)
 		AddExecutableFile(aLastExecutable,copy);
 	return copy;
-	}
+}
 
-TInt TRomNode::Alias(TRomNode* aNode, TRomNode*& aLastExecutable)
-	{
+TInt TRomNode::Alias(TRomNode* aNode, TRomNode*& aLastExecutable) {
 	if (aNode->iAtt & KEntryAttXIP)
 		AddExecutableFile(aLastExecutable,this);
 	return SetBareName();
-	}
+}
 
-TInt TRomNode::Rename(TRomNode *aOldParent, TRomNode* aNewParent, TText* aNewName)
-	{
+TInt TRomNode::Rename(TRomNode *aOldParent, TRomNode* aNewParent, const char* aNewName) {
 	aOldParent->Remove(this);
 	aNewParent->Add(this);
-	free(iName);
-	iName = (TText*)NormaliseFileName((const char*)aNewName);
+	if(iName)
+		delete []iName;
+	iName = NormaliseFileName(aNewName);
 	return SetBareName();
-	}
+}
 
-TInt TRomNode::SetBareName()
-	{
-	free(iBareName);
+TInt TRomNode::SetBareName() {
+	if(iBareName) {
+		delete []iBareName;
+		iBareName = 0 ;
+	}
 	TUint32 uid;
 	TUint32 vin;
 	TUint32 flg;
-	iBareName = SplitFileName((const char*)iName, uid, vin, flg);
+	iBareName = SplitFileName(iName, uid, vin, flg);
 	if (uid || (flg & EUidPresent))
 		return KErrBadName;
 	if (strchr(iBareName, '{') || strchr(iBareName, '}'))
 		return KErrBadName;
-	if ((iAtt & KEntryAttXIP) && (flg & EVerPresent))
-		{
+	if ((iAtt & KEntryAttXIP) && (flg & EVerPresent)) {
 		TUint32 ver = iRomFile->ModuleVersion();
 		if (ver != vin)
 			return KErrArgument;
-		}
-	return KErrNone;
 	}
+	return KErrNone;
+}
