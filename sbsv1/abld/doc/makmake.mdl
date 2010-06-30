@@ -1,0 +1,2075 @@
+
+(object Petal
+    version    	37)
+
+(object Design "<Top Level>"
+    is_unit    	TRUE
+    is_loaded  	TRUE
+    defaults   	(object defaults
+	rightMargin 	0.250000
+	leftMargin 	0.250000
+	topMargin  	0.250000
+	bottomMargin 	0.500000
+	pageOverlap 	0.250000
+	clipIconLabels 	TRUE
+	autoResize 	FALSE
+	snapToGrid 	TRUE
+	gridX      	0
+	gridY      	0
+	defaultFont 	(object Font
+	    size       	12
+	    face       	"Arial"
+	    bold       	FALSE
+	    italics    	FALSE
+	    underline  	FALSE
+	    strike     	FALSE
+	    color      	0
+	    default_color 	TRUE)
+	showMessageNum 	3
+	showClassOfObject 	TRUE
+	notation   	"Booch")
+    root_category 	(object Class_Category "<Top Level>"
+	exportControl 	"Public"
+	global     	TRUE
+	subsystem  	"<Top Level>"
+	logical_models 	(list unit_reference_list
+	    (object Class "MAKMAKE"
+		statemachine 	(object State_Machine
+		    states     	(list States
+			(object State "$UNNAMED$0"
+			    type       	"EndState")
+			(object State "$UNNAMED$1"
+			    transitions 	(list transition_list
+				(object State_Transition
+				    supplier   	"Load PERL Platform Module"
+				    Event      	(object Event "Buil")
+				    sendEvent  	(object sendEvent)))
+			    type       	"StartState")
+			(object State "Call PMGetBldList"
+			    documentation 	"Returns array of build types"
+			    transitions 	(list transition_list
+				(object State_Transition
+				    supplier   	"Call PMStartMakefile"
+				    sendEvent  	(object sendEvent))
+				(object State_Transition
+				    supplier   	"Call PMStartMakefile"
+				    sendEvent  	(object sendEvent)))
+			    type       	"Normal")
+			(object State "Call PMBld"
+			    transitions 	(list transition_list
+				(object State_Transition
+				    supplier   	"Call PMStartBldSPrjDoc"
+				    sendEvent  	(object sendEvent))
+				(object State_Transition
+				    supplier   	"if not defined PMStartBldSPrjSrc"
+				    sendEvent  	(object sendEvent))
+				(object State_Transition
+				    supplier   	"if not defined PMStartBldSPrjSrc"
+				    sendEvent  	(object sendEvent))
+				(object State_Transition
+				    supplier   	"if defined PMStartBldSPrjSrc"
+				    sendEvent  	(object sendEvent)))
+			    type       	"Normal")
+			(object State "Call PMStartBld"
+			    transitions 	(list transition_list
+				(object State_Transition
+				    supplier   	"Call PMBld"
+				    sendEvent  	(object sendEvent))
+				(object State_Transition
+				    supplier   	"Setup the next build"
+				    sendEvent  	(object sendEvent)))
+			    type       	"Normal")
+			(object State "Call PMStartBldSPrjDoc"
+			    transitions 	(list transition_list
+				(object State_Transition
+				    supplier   	"Call PMBld"
+				    sendEvent  	(object sendEvent))
+				(object State_Transition
+				    supplier   	"Call PMBldSPrjDoc"
+				    sendEvent  	(object sendEvent)))
+			    type       	"Normal")
+			(object State "Read MMP file"
+			    transitions 	(list transition_list
+				(object State_Transition
+				    supplier   	"Open Makefile"
+				    sendEvent  	(object sendEvent))
+				(object State_Transition
+				    supplier   	"Setup Globals"
+				    sendEvent  	(object sendEvent)))
+			    type       	"Normal")
+			(object State "Setup Globals"
+			    transitions 	(list transition_list
+				(object State_Transition
+				    supplier   	"Call PMStartMakefile"
+				    sendEvent  	(object sendEvent))
+				(object State_Transition
+				    supplier   	"Call PMGetBldList"
+				    sendEvent  	(object sendEvent)))
+			    type       	"Normal")
+			(object State "Call PMStartBldSPrjSrcList"
+			    transitions 	(list transition_list
+				(object State_Transition
+				    supplier   	"Call PMStartBldSPrjSrc"
+				    sendEvent  	(object sendEvent)))
+			    type       	"Normal")
+			(object State "Call PMSource"
+			    type       	"Normal")
+			(object State "Call PMBldSPrjDoc"
+			    transitions 	(list transition_list
+				(object State_Transition
+				    supplier   	"Call PMEndBldSPrjDoc"
+				    sendEvent  	(object sendEvent)))
+			    type       	"Normal")
+			(object State "Call PMStartMakefile"
+			    transitions 	(list transition_list
+				(object State_Transition
+				    supplier   	"CallPMStartBldList"
+				    sendEvent  	(object sendEvent))
+				(object State_Transition
+				    supplier   	"Call PMGetBldList"
+				    sendEvent  	(object sendEvent)))
+			    type       	"Normal")
+			(object State "Call PMStartBldSPrjList"
+			    transitions 	(list transition_list
+				(object State_Transition
+				    supplier   	"Call PMStartBldSPrj"
+				    sendEvent  	(object sendEvent)))
+			    type       	"Normal")
+			(object State "Call PMBldSPrj"
+			    transitions 	(list transition_list
+				(object State_Transition
+				    supplier   	"Call PMStartBldSPrjSrcList"
+				    sendEvent  	(object sendEvent)))
+			    type       	"Normal")
+			(object State "Call PMEndBldSPrjSrc"
+			    transitions 	(list transition_list
+				(object State_Transition
+				    supplier   	"Call PMStartBldSPrjSrc"
+				    sendEvent  	(object sendEvent))
+				(object State_Transition
+				    supplier   	"Call PMEndBldSPrjSrcList"
+				    sendEvent  	(object sendEvent)))
+			    type       	"Normal")
+			(object State "Call PMEndBldSPrjDoc"
+			    transitions 	(list transition_list
+				(object State_Transition
+				    supplier   	"Call PMStartBldSPrjDoc"
+				    sendEvent  	(object sendEvent))
+				(object State_Transition
+				    supplier   	"Call PMEndBldSPrjDocList"
+				    sendEvent  	(object sendEvent)))
+			    type       	"Normal")
+			(object State "Call PMEndBldSPrj"
+			    transitions 	(list transition_list
+				(object State_Transition
+				    supplier   	"Call PMStartBldSPrj"
+				    sendEvent  	(object sendEvent))
+				(object State_Transition
+				    supplier   	"Call PMEndBldSPrjList"
+				    sendEvent  	(object sendEvent)))
+			    type       	"Normal")
+			(object State "Call PMEndBld"
+			    transitions 	(list transition_list
+				(object State_Transition
+				    supplier   	"Call PMStartBld"
+				    sendEvent  	(object sendEvent))
+				(object State_Transition
+				    supplier   	"Call PMEndBldList"
+				    sendEvent  	(object sendEvent)))
+			    type       	"Normal")
+			(object State "Load PERL Platform Module"
+			    transitions 	(list transition_list
+				(object State_Transition
+				    supplier   	"Call PMStartPlatform"
+				    sendEvent  	(object sendEvent)))
+			    type       	"Normal")
+			(object State "Call PMStartPlatform"
+			    transitions 	(list transition_list
+				(object State_Transition
+				    supplier   	"Read MMP file"
+				    sendEvent  	(object sendEvent)))
+			    type       	"Normal")
+			(object State "Open Makefile"
+			    transitions 	(list transition_list
+				(object State_Transition
+				    supplier   	"Setup Globals"
+				    sendEvent  	(object sendEvent))
+				(object State_Transition
+				    supplier   	"Write text to makefile"
+				    sendEvent  	(object sendEvent)))
+			    type       	"Normal")
+			(object State "CallPMStartBldList"
+			    transitions 	(list transition_list
+				(object State_Transition
+				    supplier   	"Call PMStartBld"
+				    sendEvent  	(object sendEvent)))
+			    type       	"Normal")
+			(object State "if not defined PMStartBldSPrjSrc"
+			    transitions 	(list transition_list
+				(object State_Transition
+				    supplier   	"Call PMStartBldSPrjList"
+				    sendEvent  	(object sendEvent))
+				(object State_Transition
+				    supplier   	"Call PMEndBld"
+				    sendEvent  	(object sendEvent)))
+			    type       	"Normal")
+			(object State "if defined PMStartBldSPrjSrc"
+			    transitions 	(list transition_list
+				(object State_Transition
+				    supplier   	"Call PMStartBldSPrjList"
+				    sendEvent  	(object sendEvent)))
+			    type       	"Normal")
+			(object State "Call PMStartBldSPrj"
+			    transitions 	(list transition_list
+				(object State_Transition
+				    supplier   	"Call PMBldSPrj"
+				    sendEvent  	(object sendEvent)))
+			    type       	"Normal")
+			(object State "Call PMStartBldSPrjSrc"
+			    transitions 	(list transition_list
+				(object State_Transition
+				    supplier   	"Call PMBldSPrjSrc"
+				    sendEvent  	(object sendEvent)))
+			    type       	"Normal")
+			(object State "Call PMBldSPrjSrc"
+			    transitions 	(list transition_list
+				(object State_Transition
+				    supplier   	"Call PMEndBldSPrjSrc"
+				    sendEvent  	(object sendEvent)))
+			    type       	"Normal")
+			(object State "Call PMEndBldSPrjSrcList"
+			    transitions 	(list transition_list
+				(object State_Transition
+				    supplier   	"Call PMStartBldSPrjDocList"
+				    sendEvent  	(object sendEvent)))
+			    type       	"Normal")
+			(object State "Call PMEndBldSPrjDocList"
+			    transitions 	(list transition_list
+				(object State_Transition
+				    supplier   	"Call PMEndBldSPrj"
+				    sendEvent  	(object sendEvent)))
+			    type       	"Normal")
+			(object State "Call PMStartBldSPrjDocList"
+			    transitions 	(list transition_list
+				(object State_Transition
+				    supplier   	"Call PMStartBldSPrjDoc"
+				    sendEvent  	(object sendEvent)))
+			    type       	"Normal")
+			(object State "Call PMEndBldSPrjList"
+			    transitions 	(list transition_list
+				(object State_Transition
+				    supplier   	"Call PMEndBld"
+				    sendEvent  	(object sendEvent)))
+			    type       	"Normal")
+			(object State "Call PMEndBldList"
+			    transitions 	(list transition_list
+				(object State_Transition
+				    supplier   	"if not defined PMSPrjSrc"
+				    sendEvent  	(object sendEvent))
+				(object State_Transition
+				    supplier   	"if not defined PMSPrjSrc"
+				    sendEvent  	(object sendEvent))
+				(object State_Transition
+				    supplier   	"if defined PMSPrjSrc"
+				    sendEvent  	(object sendEvent)))
+			    type       	"Normal")
+			(object State "if not defined PMSPrjSrc"
+			    transitions 	(list transition_list
+				(object State_Transition
+				    supplier   	"Call PMEndMakefile"
+				    sendEvent  	(object sendEvent)))
+			    type       	"Normal")
+			(object State "if defined PMSPrjSrc"
+			    transitions 	(list transition_list
+				(object State_Transition
+				    supplier   	"Call PMStartSPrjList"
+				    sendEvent  	(object sendEvent)))
+			    type       	"Normal")
+			(object State "Call PMStartSPrjList"
+			    transitions 	(list transition_list
+				(object State_Transition
+				    supplier   	"Call PMStartSPrj"
+				    sendEvent  	(object sendEvent)))
+			    type       	"Normal")
+			(object State "Call PMStartSPrjSrcList"
+			    transitions 	(list transition_list
+				(object State_Transition
+				    supplier   	"Call PMSPrjSrcList"
+				    sendEvent  	(object sendEvent))
+				(object State_Transition
+				    supplier   	"Call PMStartSPrjSrc"
+				    sendEvent  	(object sendEvent)))
+			    type       	"Normal")
+			(object State "Call PMStartSPrjDoc"
+			    transitions 	(list transition_list
+				(object State_Transition
+				    supplier   	"Call PMStartSPrjSrcList"
+				    sendEvent  	(object sendEvent))
+				(object State_Transition
+				    supplier   	"Call PMSPrjDoc"
+				    sendEvent  	(object sendEvent)))
+			    type       	"Normal")
+			(object State "Call PMSPrjSrcList"
+			    type       	"Normal")
+			(object State "Call PMStartSPrjSrcBldList"
+			    transitions 	(list transition_list
+				(object State_Transition
+				    supplier   	"Call PMStartSPrjSrcBld"
+				    sendEvent  	(object sendEvent)))
+			    type       	"Normal")
+			(object State "Call PMSPrjSrc"
+			    transitions 	(list transition_list
+				(object State_Transition
+				    supplier   	"Call PMStartSPrjSrcBldList"
+				    sendEvent  	(object sendEvent)))
+			    type       	"Normal")
+			(object State "Call PMStartSPrjSrc"
+			    transitions 	(list transition_list
+				(object State_Transition
+				    supplier   	"Call PMSPrjSrc"
+				    sendEvent  	(object sendEvent)))
+			    type       	"Normal")
+			(object State "Call PMSPrjSrcBldList"
+			    transitions 	(list transition_list
+				(object State_Transition
+				    supplier   	"Call PMStartSPrjSrcBld"
+				    sendEvent  	(object sendEvent)))
+			    type       	"Normal")
+			(object State "Call PMStartSPrjSrcBld"
+			    transitions 	(list transition_list
+				(object State_Transition
+				    supplier   	"Call PMSPrjSrcBld"
+				    sendEvent  	(object sendEvent)))
+			    type       	"Normal")
+			(object State "Call PMSPrjSrcBld"
+			    transitions 	(list transition_list
+				(object State_Transition
+				    supplier   	"Call PMEndSPrjSrcBld"
+				    sendEvent  	(object sendEvent)))
+			    type       	"Normal")
+			(object State "Call PMEndSPrjSrcBld"
+			    transitions 	(list transition_list
+				(object State_Transition
+				    supplier   	"Call PMEndSPrjSrcBldList"
+				    sendEvent  	(object sendEvent))
+				(object State_Transition
+				    supplier   	"Call PMStartSPrjSrcBld"
+				    sendEvent  	(object sendEvent)))
+			    type       	"Normal")
+			(object State "Call PMEndSPrjSrcBldList"
+			    transitions 	(list transition_list
+				(object State_Transition
+				    supplier   	"CallPMEndSPrjSrc"
+				    sendEvent  	(object sendEvent)))
+			    type       	"Normal")
+			(object State "CallPMEndSPrjSrc"
+			    transitions 	(list transition_list
+				(object State_Transition
+				    supplier   	"CallPMEndSPrjSrcList"
+				    sendEvent  	(object sendEvent))
+				(object State_Transition
+				    supplier   	"Call PMStartSPrjSrc"
+				    sendEvent  	(object sendEvent)))
+			    type       	"Normal")
+			(object State "CallPMEndSPrjSrcList"
+			    transitions 	(list transition_list
+				(object State_Transition
+				    supplier   	"Call PMStartSPrjDocList"
+				    sendEvent  	(object sendEvent)))
+			    type       	"Normal")
+			(object State "Call PMStartSPrjDocList"
+			    transitions 	(list transition_list
+				(object State_Transition
+				    supplier   	"Call PMStartSPrjDoc"
+				    sendEvent  	(object sendEvent)))
+			    type       	"Normal")
+			(object State "Call PMStartSPrjDocBldList"
+			    transitions 	(list transition_list
+				(object State_Transition
+				    supplier   	"Call PMStartSPrjDocBld"
+				    sendEvent  	(object sendEvent)))
+			    type       	"Normal")
+			(object State "Call PMStartSPrjDocBld"
+			    transitions 	(list transition_list
+				(object State_Transition
+				    supplier   	"Call PMSPrjDocBld"
+				    sendEvent  	(object sendEvent)))
+			    type       	"Normal")
+			(object State "Call PMSPrjDocBld"
+			    transitions 	(list transition_list
+				(object State_Transition
+				    supplier   	"Call PMEndSPrjDocBld"
+				    sendEvent  	(object sendEvent)))
+			    type       	"Normal")
+			(object State "Call PMEndSPrjDocBldList"
+			    transitions 	(list transition_list
+				(object State_Transition
+				    supplier   	"Call PMEndSPrjDoc"
+				    sendEvent  	(object sendEvent)))
+			    type       	"Normal")
+			(object State "Call PMEndSPrjDoc"
+			    transitions 	(list transition_list
+				(object State_Transition
+				    supplier   	"Call PMEndSPrjDocList"
+				    sendEvent  	(object sendEvent))
+				(object State_Transition
+				    supplier   	"Call PMStartSPrjDoc"
+				    sendEvent  	(object sendEvent)))
+			    type       	"Normal")
+			(object State "Call PMEndSPrjDocList"
+			    transitions 	(list transition_list
+				(object State_Transition
+				    supplier   	"Call PMEndSPrj"
+				    sendEvent  	(object sendEvent)))
+			    type       	"Normal")
+			(object State "Call PMEndSPrj"
+			    transitions 	(list transition_list
+				(object State_Transition
+				    supplier   	"Call PMEndSPrjList"
+				    sendEvent  	(object sendEvent))
+				(object State_Transition
+				    supplier   	"Call PMStartSPrj"
+				    sendEvent  	(object sendEvent)))
+			    type       	"Normal")
+			(object State "Call PMEndSPrjList"
+			    transitions 	(list transition_list
+				(object State_Transition
+				    supplier   	"Call PMEndMakefile"
+				    sendEvent  	(object sendEvent)))
+			    type       	"Normal")
+			(object State "Call PMEndMakefile"
+			    transitions 	(list transition_list
+				(object State_Transition
+				    supplier   	"Call PMEndPlatform"
+				    sendEvent  	(object sendEvent)))
+			    type       	"Normal")
+			(object State "Call PMEndPlatform"
+			    transitions 	(list transition_list
+				(object State_Transition
+				    supplier   	"Open Makefile"
+				    sendEvent  	(object sendEvent)))
+			    type       	"Normal")
+			(object State "Call PMStartSPrj"
+			    transitions 	(list transition_list
+				(object State_Transition
+				    supplier   	"Call PMStartSPrjDoc"
+				    sendEvent  	(object sendEvent))
+				(object State_Transition
+				    supplier   	"Call PMSPrj"
+				    sendEvent  	(object sendEvent)))
+			    type       	"Normal")
+			(object State "Call PMSPrjDoc"
+			    transitions 	(list transition_list
+				(object State_Transition
+				    supplier   	"Call PMStartSPrjDocBldList"
+				    sendEvent  	(object sendEvent)))
+			    type       	"Normal")
+			(object State "Call PMSPrj"
+			    transitions 	(list transition_list
+				(object State_Transition
+				    supplier   	"Call PMStartSPrjSrcList"
+				    sendEvent  	(object sendEvent)))
+			    type       	"Normal")
+			(object State "Call PMEndSPrjDocBld"
+			    transitions 	(list transition_list
+				(object State_Transition
+				    supplier   	"Call PMEndSPrjDocBldList"
+				    sendEvent  	(object sendEvent))
+				(object State_Transition
+				    supplier   	"Call PMStartSPrjDocBld"
+				    sendEvent  	(object sendEvent)))
+			    type       	"Normal")
+			(object State "Write text to makefile"
+			    transitions 	(list transition_list
+				(object State_Transition
+				    supplier   	"Close Makefile"
+				    sendEvent  	(object sendEvent)))
+			    type       	"Normal")
+			(object State "Close Makefile"
+			    transitions 	(list transition_list
+				(object State_Transition
+				    supplier   	"$UNNAMED$0"
+				    sendEvent  	(object sendEvent)))
+			    type       	"Normal")))
+		statediagram 	(object State_Diagram ""
+		    title      	""
+		    zoom       	60
+		    max_height 	28350
+		    max_width  	21600
+		    origin_x   	0
+		    origin_y   	0
+		    items      	(list diagram_item_list
+			(object StateView "EndState" "$UNNAMED$0" @1
+			    location   	(322, 11086))
+			(object StateView "StartState" "$UNNAMED$1" @2
+			    location   	(112, 78))
+			(object StateView "Normal" "Call PMGetBldList" @3
+			    location   	(330, 1319)
+			    label      	(object ItemLabel
+				Parent_View 	@3
+				location   	(330, 1293)
+				anchor_loc 	1
+				nlines     	1
+				max_width  	534
+				justify    	0
+				label      	"Call PMGetBldList")
+			    width      	546
+			    height     	142)
+			(object StateView "Normal" "Call PMBld" @4
+			    location   	(827, 2557)
+			    label      	(object ItemLabel
+				Parent_View 	@4
+				location   	(827, 2536)
+				anchor_loc 	1
+				nlines     	1
+				max_width  	380
+				justify    	0
+				label      	"Call PMBld")
+			    width      	392
+			    height     	133)
+			(object StateView "Normal" "Call PMStartBld" @5
+			    location   	(328, 2281)
+			    label      	(object ItemLabel
+				Parent_View 	@5
+				location   	(328, 2239)
+				anchor_loc 	1
+				nlines     	1
+				max_width  	496
+				justify    	0
+				label      	"Call PMStartBld")
+			    width      	508
+			    height     	175)
+			(object TransView "" @6
+			    client     	@5
+			    supplier   	@4
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object StateView "Normal" "Call PMStartBldSPrjDoc" @7
+			    location   	(3957, 4721)
+			    label      	(object ItemLabel
+				Parent_View 	@7
+				location   	(3957, 4699)
+				anchor_loc 	1
+				nlines     	1
+				max_width  	710
+				justify    	0
+				label      	"Call PMStartBldSPrjDoc")
+			    width      	722
+			    height     	134)
+			(object NoteView @8
+			    location   	(1187, 1929)
+			    label      	(object ItemLabel
+				Parent_View 	@8
+				location   	(759, 1818)
+				nlines     	3
+				max_width  	881
+				label      	
+|main::TargetDir $(path)\<build>
+|main::BuildDir $(path)\<build>
+|main::Build build
+				)
+			    width      	941
+			    height     	234)
+			(object StateView "Normal" "Read MMP file" @9
+			    location   	(346, 780)
+			    label      	(object ItemLabel
+				Parent_View 	@9
+				location   	(346, 757)
+				anchor_loc 	1
+				nlines     	1
+				max_width  	507
+				justify    	0
+				label      	"Read MMP file")
+			    width      	519
+			    height     	137)
+			(object StateView "Normal" "Setup Globals" @10
+			    location   	(330, 1023)
+			    label      	(object ItemLabel
+				Parent_View 	@10
+				location   	(330, 1003)
+				anchor_loc 	1
+				nlines     	1
+				max_width  	600
+				justify    	0
+				label      	"Setup Globals")
+			    width      	612
+			    height     	131)
+			(object NoteView @11
+			    location   	(2463, 908)
+			    label      	(object ItemLabel
+				Parent_View 	@11
+				location   	(1793, 56)
+				nlines     	27
+				max_width  	1365
+				label      	
+|main::Path_MakeToRoot	path from makefile to top directory
+|main::Project	project
+|main::PlainTarget	plaintarget . def-> mmp file - no ext.
+|main::TargetType	targettype. def-> "EXE"
+|main::Target	target. def-> plaintarget.targettype
+|main::UserIncludeList	user include list
+|main::SystemIncludeList	system include list
+|main::LibraryList	list of libraries
+|main::PlatformText  platform text block from mmp file
+|main::SubProject	null
+|main::Source	null
+|main::PlainSource	null
+|main::SourceDir	null
+|main::SourceList	list of all source files
+|main::PlainSourceList    list of all source files - no exts.
+|main::DependencyList    null
+|main::DocumentList	     list of all document files
+|main::Document	null
+|main::BuildList	null
+|main::Build	null
+|main::TargetDir	\epoc32\release\<platform>
+|main::BuildDir	\epoc32\build\project(?D)\<platform>
+|main::MacroList	current macrolist
+|main::AddMacro	list of added macros
+|main::RemoveMacro list of removed macros if successful
+|main::Output	1 if successful else die
+				)
+			    width      	1425
+			    height     	1716)
+			(object StateView "Normal" "Call PMStartBldSPrjSrcList" @12
+			    location   	(3004, 3681)
+			    label      	(object ItemLabel
+				Parent_View 	@12
+				location   	(3004, 3658)
+				anchor_loc 	1
+				nlines     	1
+				max_width  	796
+				justify    	0
+				label      	"Call PMStartBldSPrjSrcList")
+			    width      	808
+			    height     	136)
+			(object StateView "Normal" "Call PMBldSPrjDoc" @13
+			    location   	(4572, 4914)
+			    label      	(object ItemLabel
+				Parent_View 	@13
+				location   	(4572, 4897)
+				anchor_loc 	1
+				nlines     	1
+				max_width  	566
+				justify    	0
+				label      	"Call PMBldSPrjDoc")
+			    width      	578
+			    height     	124)
+			(object NoteView @14
+			    location   	(3268, 821)
+			    label      	(object ItemLabel
+				Parent_View 	@14
+				location   	(2906, 690)
+				nlines     	4
+				max_width  	748
+				label      	"All Main:: functions return default text or the null string If called prematurely.")
+			    width      	808
+			    height     	275)
+			(object AttachView "" @15
+			    client     	@11
+			    supplier   	@10
+			    line_style 	0)
+			(object AttachView "" @16
+			    client     	@8
+			    supplier   	@5
+			    line_style 	0)
+			(object NoteView @17
+			    location   	(1057, 1426)
+			    label      	(object ItemLabel
+				Parent_View 	@17
+				location   	(792, 1370)
+				nlines     	2
+				max_width  	555
+				label      	"main::BuildList buildlist")
+			    width      	615
+			    height     	125)
+			(object NoteView @18
+			    location   	(3749, 3450)
+			    label      	(object ItemLabel
+				Parent_View 	@18
+				location   	(3397, 3374)
+				nlines     	2
+				max_width  	729
+				label      	
+|main::Source	source
+|main::PlainSource	plainsource
+				)
+			    width      	789
+			    height     	164)
+			(object NoteView @19
+			    location   	(3787, 4544)
+			    label      	(object ItemLabel
+				Parent_View 	@19
+				location   	(3459, 4488)
+				nlines     	1
+				max_width  	680
+				label      	
+|main::Document	Document
+				)
+			    width      	740
+			    height     	124)
+			(object StateView "Normal" "Call PMStartBldSPrjList" @20
+			    location   	(1806, 3112)
+			    label      	(object ItemLabel
+				Parent_View 	@20
+				location   	(1806, 3091)
+				anchor_loc 	1
+				nlines     	1
+				max_width  	696
+				justify    	0
+				label      	"Call PMStartBldSPrjList")
+			    width      	708
+			    height     	132)
+			(object StateView "Normal" "Call PMBldSPrj" @21
+			    location   	(3007, 3345)
+			    label      	(object ItemLabel
+				Parent_View 	@21
+				location   	(3007, 3315)
+				anchor_loc 	1
+				nlines     	1
+				max_width  	463
+				justify    	0
+				label      	"Call PMBldSPrj")
+			    width      	475
+			    height     	150)
+			(object NoteView @22
+			    location   	(1669, 3467)
+			    label      	(object ItemLabel
+				Parent_View 	@22
+				location   	(1118, 3312)
+				nlines     	5
+				max_width  	1127
+				label      	
+|main::SubProject	 subproject
+|main::SourceDir	source directory
+|main::SourceList	subproj relative src list
+|main::PlainSourceList  subproj relative plain src list
+|main::DocumentList  subproj relative document list
+				)
+			    width      	1187
+			    height     	323)
+			(object TransView "" @23
+			    client     	@21
+			    supplier   	@12
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object StateView "Normal" "Call PMEndBldSPrjSrc" @24
+			    location   	(3928, 4034)
+			    label      	(object ItemLabel
+				Parent_View 	@24
+				location   	(3928, 4011)
+				anchor_loc 	1
+				nlines     	1
+				max_width  	668
+				justify    	0
+				label      	"Call PMEndBldSPrjSrc")
+			    width      	680
+			    height     	136)
+			(object StateView "Normal" "Call PMEndBldSPrjDoc" @25
+			    location   	(3957, 5117)
+			    label      	(object ItemLabel
+				Parent_View 	@25
+				location   	(3957, 5087)
+				anchor_loc 	1
+				nlines     	1
+				max_width  	686
+				justify    	0
+				label      	"Call PMEndBldSPrjDoc")
+			    width      	698
+			    height     	150)
+			(object TransView "" @26
+			    client     	@13
+			    supplier   	@25
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object StateView "Normal" "Call PMEndBldSPrj" @27
+			    location   	(2554, 5371)
+			    label      	(object ItemLabel
+				Parent_View 	@27
+				location   	(2554, 5349)
+				anchor_loc 	1
+				nlines     	1
+				max_width  	566
+				justify    	0
+				label      	"Call PMEndBldSPrj")
+			    width      	578
+			    height     	134)
+			(object StateView "Normal" "Call PMEndBld" @28
+			    location   	(328, 5369)
+			    label      	(object ItemLabel
+				Parent_View 	@28
+				location   	(328, 5339)
+				anchor_loc 	1
+				nlines     	1
+				max_width  	480
+				justify    	0
+				label      	"Call PMEndBld")
+			    width      	492
+			    height     	150)
+			(object StateView "Normal" "Load PERL Platform Module" @29
+			    location   	(338, 307)
+			    label      	(object ItemLabel
+				Parent_View 	@29
+				location   	(338, 264)
+				anchor_loc 	1
+				nlines     	1
+				max_width  	665
+				justify    	0
+				label      	"Load PERL Platform Module")
+			    width      	677
+			    height     	177)
+			(object TransView "" @30
+			    client     	@2
+			    supplier   	@29
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object NoteView @31
+			    location   	(1192, 343)
+			    label      	(object ItemLabel
+				Parent_View 	@31
+				location   	(807, 271)
+				nlines     	2
+				max_width  	794
+				label      	
+|main::Platform	platform
+|main::ResetPlatform   newplatform
+				)
+			    width      	854
+			    height     	156)
+			(object StateView "Normal" "Call PMStartPlatform" @32
+			    location   	(341, 549)
+			    label      	(object ItemLabel
+				Parent_View 	@32
+				location   	(341, 527)
+				anchor_loc 	1
+				nlines     	1
+				max_width  	618
+				justify    	0
+				label      	"Call PMStartPlatform")
+			    width      	630
+			    height     	134)
+			(object TransView "" @33
+			    client     	@29
+			    supplier   	@32
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object TransView "" @34
+			    client     	@32
+			    supplier   	@9
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object StateView "Normal" "Call PMStartMakefile" @35
+			    location   	(328, 1631)
+			    label      	(object ItemLabel
+				Parent_View 	@35
+				location   	(328, 1597)
+				anchor_loc 	1
+				nlines     	1
+				max_width  	616
+				justify    	0
+				label      	"Call PMStartMakefile")
+			    width      	628
+			    height     	158)
+			(object TransView "" @36
+			    client     	@3
+			    supplier   	@35
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object TransView "" @37
+			    client     	@10
+			    supplier   	@3
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object StateView "Normal" "CallPMStartBldList" @38
+			    location   	(330, 2007)
+			    label      	(object ItemLabel
+				Parent_View 	@38
+				location   	(330, 1985)
+				anchor_loc 	1
+				nlines     	1
+				max_width  	550
+				justify    	0
+				label      	"CallPMStartBldList")
+			    width      	562
+			    height     	134)
+			(object TransView "" @39
+			    client     	@35
+			    supplier   	@38
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object TransView "" @40
+			    client     	@38
+			    supplier   	@5
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object StateView "Normal" "if not defined PMStartBldSPrjSrc" @41
+			    location   	(781, 2839)
+			    label      	(object ItemLabel
+				Parent_View 	@41
+				location   	(781, 2817)
+				anchor_loc 	1
+				nlines     	1
+				max_width  	758
+				justify    	0
+				label      	"if not defined PMStartBldSPrjSrc")
+			    width      	770)
+			(object StateView "Normal" "if defined PMStartBldSPrjSrc" @42
+			    location   	(1815, 2845)
+			    label      	(object ItemLabel
+				Parent_View 	@42
+				location   	(1815, 2823)
+				anchor_loc 	1
+				nlines     	1
+				max_width  	850
+				justify    	0
+				label      	"if defined PMStartBldSPrjSrc")
+			    width      	862
+			    height     	134)
+			(object TransView "" @43
+			    client     	@42
+			    supplier   	@20
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object StateView "Normal" "Call PMStartBldSPrj" @44
+			    location   	(2557, 3110)
+			    label      	(object ItemLabel
+				Parent_View 	@44
+				location   	(2557, 3088)
+				anchor_loc 	1
+				nlines     	1
+				max_width  	590
+				justify    	0
+				label      	"Call PMStartBldSPrj")
+			    width      	602
+			    height     	134)
+			(object TransView "" @45
+			    client     	@20
+			    supplier   	@44
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object TransView "" @46
+			    client     	@44
+			    supplier   	@21
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object StateView "Normal" "Call PMStartBldSPrjSrc" @47
+			    location   	(3928, 3680)
+			    label      	(object ItemLabel
+				Parent_View 	@47
+				location   	(3928, 3652)
+				anchor_loc 	1
+				nlines     	1
+				max_width  	692
+				justify    	0
+				label      	"Call PMStartBldSPrjSrc")
+			    width      	704
+			    height     	146)
+			(object TransView "" @48
+			    client     	@12
+			    supplier   	@47
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object AttachView "" @49
+			    client     	@18
+			    supplier   	@47
+			    line_style 	0)
+			(object NoteView @50
+			    location   	(5064, 3611)
+			    label      	(object ItemLabel
+				Parent_View 	@50
+				location   	(4622, 3544)
+				nlines     	2
+				max_width  	909
+				label      	"main::DependencyList dependency list")
+			    width      	969
+			    height     	146)
+			(object AttachView "" @51
+			    client     	@31
+			    supplier   	@32
+			    line_style 	0)
+			(object AttachView "" @52
+			    client     	@22
+			    supplier   	@44
+			    line_style 	0)
+			(object StateView "Normal" "Call PMBldSPrjSrc" @53
+			    location   	(4654, 3843)
+			    label      	(object ItemLabel
+				Parent_View 	@53
+				location   	(4654, 3821)
+				anchor_loc 	1
+				nlines     	1
+				max_width  	722
+				justify    	0
+				label      	"Call PMBldSPrjSrc")
+			    width      	734
+			    height     	134)
+			(object TransView "" @54
+			    client     	@47
+			    supplier   	@53
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object TransView "" @55
+			    client     	@53
+			    supplier   	@24
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object AttachView "" @56
+			    client     	@50
+			    supplier   	@53
+			    line_style 	0)
+			(object StateView "Normal" "Call PMEndBldSPrjSrcList" @57
+			    location   	(3020, 4027)
+			    label      	(object ItemLabel
+				Parent_View 	@57
+				location   	(3020, 4005)
+				anchor_loc 	1
+				nlines     	1
+				max_width  	772
+				justify    	0
+				label      	"Call PMEndBldSPrjSrcList")
+			    width      	784
+			    height     	134)
+			(object StateView "Normal" "Call PMEndBldSPrjDocList" @58
+			    location   	(3043, 5113)
+			    label      	(object ItemLabel
+				Parent_View 	@58
+				location   	(3043, 5092)
+				anchor_loc 	1
+				nlines     	1
+				max_width  	790
+				justify    	0
+				label      	"Call PMEndBldSPrjDocList")
+			    width      	802
+			    height     	132)
+			(object StateView "Normal" "Call PMStartBldSPrjDocList" @59
+			    location   	(3019, 4719)
+			    label      	(object ItemLabel
+				Parent_View 	@59
+				location   	(3019, 4698)
+				anchor_loc 	1
+				nlines     	1
+				max_width  	814
+				justify    	0
+				label      	"Call PMStartBldSPrjDocList")
+			    width      	826
+			    height     	132)
+			(object TransView "" @60
+			    client     	@57
+			    supplier   	@59
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object TransView "" @61
+			    client     	@59
+			    supplier   	@7
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object TransView "" @62
+			    client     	@7
+			    supplier   	@13
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object StateView "Normal" "Call PMEndBldSPrjList" @63
+			    location   	(1733, 5368)
+			    label      	(object ItemLabel
+				Parent_View 	@63
+				location   	(1733, 5346)
+				anchor_loc 	1
+				nlines     	1
+				max_width  	672
+				justify    	0
+				label      	"Call PMEndBldSPrjList")
+			    width      	684
+			    height     	134)
+			(object TransView "" @64
+			    client     	@63
+			    supplier   	@28
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object TransView "" @65
+			    client     	@41
+			    supplier   	@28
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object AttachView "" @66
+			    client     	@19
+			    supplier   	@7
+			    line_style 	0)
+			(object TransView "" @67
+			    client     	@4
+			    supplier   	@41
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object TransView "" @68
+			    client     	@4
+			    supplier   	@42
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object AttachView "" @69
+			    client     	@17
+			    supplier   	@35
+			    line_style 	0)
+			(object NoteView @70
+			    location   	(3775, 4284)
+			    label      	(object ItemLabel
+				Parent_View 	@70
+				location   	(3494, 4217)
+				nlines     	2
+				max_width  	586
+				label      	
+|main::Source	null
+|main::PlainSource	null
+				)
+			    width      	646
+			    height     	146)
+			(object AttachView "" @71
+			    client     	@57
+			    supplier   	@70
+			    line_style 	0)
+			(object NoteView @72
+			    location   	(3790, 5334)
+			    label      	(object ItemLabel
+				Parent_View 	@72
+				location   	(3556, 5278)
+				nlines     	1
+				max_width  	492
+				label      	"main::Document null")
+			    width      	552
+			    height     	125)
+			(object NoteView @73
+			    location   	(1651, 4969)
+			    label      	(object ItemLabel
+				Parent_View 	@73
+				location   	(1220, 4819)
+				nlines     	4
+				max_width  	887
+				label      	
+|main::SubProject	null
+|main::SourceDir	null
+|main::SourceList	all sources
+|main::PlainSourceList  all plain sources
+|main::DocumentList all documents
+				)
+			    width      	947
+			    height     	312)
+			(object AttachView "" @74
+			    client     	@73
+			    supplier   	@63
+			    line_style 	0)
+			(object StateView "Normal" "Call PMEndBldList" @75
+			    location   	(328, 5679)
+			    label      	(object ItemLabel
+				Parent_View 	@75
+				location   	(328, 5657)
+				anchor_loc 	1
+				nlines     	1
+				max_width  	540
+				justify    	0
+				label      	"Call PMEndBldList")
+			    width      	552)
+			(object NoteView @76
+			    location   	(4883, 4113)
+			    label      	(object ItemLabel
+				Parent_View 	@76
+				location   	(4582, 4057)
+				nlines     	1
+				max_width  	627
+				label      	"main::DependencyList  null")
+			    width      	687
+			    height     	125)
+			(object AttachView "" @77
+			    client     	@24
+			    supplier   	@76
+			    line_style 	0)
+			(object NoteView @78
+			    location   	(1390, 5594)
+			    label      	(object ItemLabel
+				Parent_View 	@78
+				location   	(740, 5491)
+				nlines     	3
+				max_width  	1325
+				label      	
+|main::TargetDir	\EPOC32\RELEASE\<platform>
+|main::BuildDir	\EPOC32\BUILD\PROJECT\<platform>
+|main::Build	null
+				)
+			    width      	1385
+			    height     	219)
+			(object AttachView "" @79
+			    client     	@75
+			    supplier   	@78
+			    line_style 	0)
+			(object StateView "Normal" "if not defined PMSPrjSrc" @80
+			    location   	(328, 6002)
+			    label      	(object ItemLabel
+				Parent_View 	@80
+				location   	(328, 5974)
+				anchor_loc 	1
+				nlines     	1
+				max_width  	571
+				justify    	0
+				label      	"if not defined PMSPrjSrc")
+			    width      	583
+			    height     	146)
+			(object TransView "" @81
+			    client     	@75
+			    supplier   	@80
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object StateView "Normal" "if defined PMSPrjSrc" @82
+			    location   	(1107, 6001)
+			    label      	(object ItemLabel
+				Parent_View 	@82
+				location   	(1107, 5978)
+				anchor_loc 	1
+				nlines     	1
+				max_width  	610
+				justify    	0
+				label      	"if defined PMSPrjSrc")
+			    width      	622
+			    height     	136)
+			(object TransView "" @83
+			    client     	@75
+			    supplier   	@82
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object StateView "Normal" "Call PMStartSPrjList" @84
+			    location   	(1091, 6235)
+			    label      	(object ItemLabel
+				Parent_View 	@84
+				location   	(1091, 6212)
+				anchor_loc 	1
+				nlines     	1
+				max_width  	598
+				justify    	0
+				label      	"Call PMStartSPrjList")
+			    width      	610
+			    height     	136)
+			(object TransView "" @85
+			    client     	@82
+			    supplier   	@84
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object StateView "Normal" "Call PMStartSPrjSrcList" @86
+			    location   	(2416, 6646)
+			    label      	(object ItemLabel
+				Parent_View 	@86
+				location   	(2416, 6624)
+				anchor_loc 	1
+				nlines     	1
+				max_width  	700
+				justify    	0
+				label      	"Call PMStartSPrjSrcList")
+			    width      	712
+			    height     	134)
+			(object StateView "Normal" "Call PMStartSPrjSrcBldList" @87
+			    location   	(3700, 7174)
+			    label      	(object ItemLabel
+				Parent_View 	@87
+				location   	(3700, 7151)
+				anchor_loc 	1
+				nlines     	1
+				max_width  	796
+				justify    	0
+				label      	"Call PMStartSPrjSrcBldList")
+			    width      	808
+			    height     	136)
+			(object StateView "Normal" "Call PMSPrjSrc" @88
+			    location   	(3703, 6898)
+			    label      	(object ItemLabel
+				Parent_View 	@88
+				location   	(3703, 6875)
+				anchor_loc 	1
+				nlines     	1
+				max_width  	478
+				justify    	0
+				label      	"Call PMSPrjSrc")
+			    width      	490
+			    height     	136)
+			(object StateView "Normal" "Call PMStartSPrjSrc" @89
+			    location   	(3248, 6642)
+			    label      	(object ItemLabel
+				Parent_View 	@89
+				location   	(3248, 6614)
+				anchor_loc 	1
+				nlines     	1
+				max_width  	596
+				justify    	0
+				label      	"Call PMStartSPrjSrc")
+			    width      	608
+			    height     	146)
+			(object TransView "" @90
+			    client     	@89
+			    supplier   	@88
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object TransView "" @91
+			    client     	@88
+			    supplier   	@87
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object StateView "Normal" "Call PMStartSPrjSrcBld" @92
+			    location   	(4636, 7193)
+			    label      	(object ItemLabel
+				Parent_View 	@92
+				location   	(4636, 7171)
+				anchor_loc 	1
+				nlines     	1
+				max_width  	692
+				justify    	0
+				label      	"Call PMStartSPrjSrcBld")
+			    width      	704
+			    height     	134)
+			(object StateView "Normal" "Call PMSPrjSrcBld" @93
+			    location   	(5183, 7399)
+			    label      	(object ItemLabel
+				Parent_View 	@93
+				location   	(5183, 7376)
+				anchor_loc 	1
+				nlines     	1
+				max_width  	550
+				justify    	0
+				label      	"Call PMSPrjSrcBld")
+			    width      	562
+			    height     	136)
+			(object StateView "Normal" "Call PMEndSPrjSrcBld" @94
+			    location   	(4636, 7605)
+			    label      	(object ItemLabel
+				Parent_View 	@94
+				location   	(4636, 7583)
+				anchor_loc 	1
+				nlines     	1
+				max_width  	668
+				justify    	0
+				label      	"Call PMEndSPrjSrcBld")
+			    width      	680
+			    height     	134)
+			(object StateView "Normal" "Call PMEndSPrjSrcBldList" @95
+			    location   	(3775, 7598)
+			    label      	(object ItemLabel
+				Parent_View 	@95
+				location   	(3775, 7575)
+				anchor_loc 	1
+				nlines     	1
+				max_width  	772
+				justify    	0
+				label      	"Call PMEndSPrjSrcBldList")
+			    width      	784
+			    height     	136)
+			(object StateView "Normal" "CallPMEndSPrjSrc" @96
+			    location   	(3248, 7855)
+			    label      	(object ItemLabel
+				Parent_View 	@96
+				location   	(3248, 7827)
+				anchor_loc 	1
+				nlines     	1
+				max_width  	552
+				justify    	0
+				label      	"CallPMEndSPrjSrc")
+			    width      	564
+			    height     	146)
+			(object StateView "Normal" "CallPMEndSPrjSrcList" @97
+			    location   	(2445, 7848)
+			    label      	(object ItemLabel
+				Parent_View 	@97
+				location   	(2445, 7826)
+				anchor_loc 	1
+				nlines     	1
+				max_width  	656
+				justify    	0
+				label      	"CallPMEndSPrjSrcList")
+			    width      	668
+			    height     	134)
+			(object TransView "" @98
+			    client     	@92
+			    supplier   	@93
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object TransView "" @99
+			    client     	@93
+			    supplier   	@94
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object TransView "" @100
+			    client     	@94
+			    supplier   	@95
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object TransView "" @101
+			    client     	@95
+			    supplier   	@96
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object TransView "" @102
+			    client     	@96
+			    supplier   	@97
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object StateView "Normal" "Call PMStartSPrjDocList" @103
+			    location   	(2445, 8167)
+			    label      	(object ItemLabel
+				Parent_View 	@103
+				location   	(2445, 8144)
+				anchor_loc 	1
+				nlines     	1
+				max_width  	718
+				justify    	0
+				label      	"Call PMStartSPrjDocList")
+			    width      	730
+			    height     	136)
+			(object TransView "" @104
+			    client     	@97
+			    supplier   	@103
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object StateView "Normal" "Call PMStartSPrjDoc" @105
+			    location   	(3269, 8136)
+			    label      	(object ItemLabel
+				Parent_View 	@105
+				location   	(3269, 8114)
+				anchor_loc 	1
+				nlines     	1
+				max_width  	614
+				justify    	0
+				label      	"Call PMStartSPrjDoc")
+			    width      	626
+			    height     	134)
+			(object TransView "" @106
+			    client     	@86
+			    supplier   	@89
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object TransView "" @107
+			    client     	@87
+			    supplier   	@92
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object TransView "" @108
+			    client     	@103
+			    supplier   	@105
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object StateView "Normal" "Call PMStartSPrjDocBldList" @109
+			    location   	(3785, 8653)
+			    label      	(object ItemLabel
+				Parent_View 	@109
+				location   	(3785, 8631)
+				anchor_loc 	1
+				nlines     	1
+				max_width  	814
+				justify    	0
+				label      	"Call PMStartSPrjDocBldList")
+			    width      	826
+			    height     	134)
+			(object StateView "Normal" "Call PMStartSPrjDocBld" @110
+			    location   	(4708, 8682)
+			    label      	(object ItemLabel
+				Parent_View 	@110
+				location   	(4708, 8659)
+				anchor_loc 	1
+				nlines     	1
+				max_width  	710
+				justify    	0
+				label      	"Call PMStartSPrjDocBld")
+			    width      	722
+			    height     	136)
+			(object TransView "" @111
+			    client     	@109
+			    supplier   	@110
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object StateView "Normal" "Call PMSPrjDocBld" @112
+			    location   	(5234, 8906)
+			    label      	(object ItemLabel
+				Parent_View 	@112
+				location   	(5234, 8884)
+				anchor_loc 	1
+				nlines     	1
+				max_width  	566
+				justify    	0
+				label      	"Call PMSPrjDocBld")
+			    width      	578
+			    height     	134)
+			(object TransView "" @113
+			    client     	@110
+			    supplier   	@112
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object StateView "Normal" "Call PMEndSPrjDocBldList" @114
+			    location   	(3816, 9060)
+			    label      	(object ItemLabel
+				Parent_View 	@114
+				location   	(3816, 9038)
+				anchor_loc 	1
+				nlines     	1
+				max_width  	790
+				justify    	0
+				label      	"Call PMEndSPrjDocBldList")
+			    width      	802
+			    height     	134)
+			(object StateView "Normal" "Call PMEndSPrjDoc" @115
+			    location   	(3269, 9318)
+			    label      	(object ItemLabel
+				Parent_View 	@115
+				location   	(3269, 9295)
+				anchor_loc 	1
+				nlines     	1
+				max_width  	590
+				justify    	0
+				label      	"Call PMEndSPrjDoc")
+			    width      	602
+			    height     	136)
+			(object TransView "" @116
+			    client     	@114
+			    supplier   	@115
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object StateView "Normal" "Call PMEndSPrjDocList" @117
+			    location   	(2474, 9317)
+			    label      	(object ItemLabel
+				Parent_View 	@117
+				location   	(2474, 9294)
+				anchor_loc 	1
+				nlines     	1
+				max_width  	694
+				justify    	0
+				label      	"Call PMEndSPrjDocList")
+			    width      	706
+			    height     	136)
+			(object TransView "" @118
+			    client     	@115
+			    supplier   	@117
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object StateView "Normal" "Call PMEndSPrj" @119
+			    location   	(1778, 9305)
+			    label      	(object ItemLabel
+				Parent_View 	@119
+				location   	(1778, 9283)
+				anchor_loc 	1
+				nlines     	1
+				max_width  	470
+				justify    	0
+				label      	"Call PMEndSPrj")
+			    width      	482
+			    height     	134)
+			(object TransView "" @120
+			    client     	@117
+			    supplier   	@119
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object StateView "Normal" "Call PMEndSPrjList" @121
+			    location   	(1002, 9303)
+			    label      	(object ItemLabel
+				Parent_View 	@121
+				location   	(1002, 9286)
+				anchor_loc 	1
+				nlines     	1
+				max_width  	574
+				justify    	0
+				label      	"Call PMEndSPrjList")
+			    width      	586
+			    height     	124)
+			(object TransView "" @122
+			    client     	@119
+			    supplier   	@121
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object StateView "Normal" "Call PMEndMakefile" @123
+			    location   	(328, 9657)
+			    label      	(object ItemLabel
+				Parent_View 	@123
+				location   	(328, 9635)
+				anchor_loc 	1
+				nlines     	1
+				max_width  	592
+				justify    	0
+				label      	"Call PMEndMakefile")
+			    width      	604
+			    height     	134)
+			(object StateView "Normal" "Call PMEndPlatform" @124
+			    location   	(328, 9933)
+			    label      	(object ItemLabel
+				Parent_View 	@124
+				location   	(328, 9911)
+				anchor_loc 	1
+				nlines     	1
+				max_width  	594
+				justify    	0
+				label      	"Call PMEndPlatform")
+			    width      	606
+			    height     	134)
+			(object TransView "" @125
+			    client     	@121
+			    supplier   	@123
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object TransView "" @126
+			    client     	@123
+			    supplier   	@124
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object TransView "" @127
+			    client     	@58
+			    supplier   	@27
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object TransView "" @128
+			    client     	@25
+			    supplier   	@7
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object TransView "" @129
+			    client     	@25
+			    supplier   	@58
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object TransView "" @130
+			    client     	@24
+			    supplier   	@47
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object TransView "" @131
+			    client     	@24
+			    supplier   	@57
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object StateView "Normal" "Call PMStartSPrj" @132
+			    location   	(1778, 6229)
+			    label      	(object ItemLabel
+				Parent_View 	@132
+				location   	(1778, 6207)
+				anchor_loc 	1
+				nlines     	1
+				max_width  	494
+				justify    	0
+				label      	"Call PMStartSPrj")
+			    width      	506
+			    height     	134)
+			(object TransView "" @133
+			    client     	@84
+			    supplier   	@132
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object StateView "Normal" "Call PMSPrjDoc" @134
+			    location   	(3786, 8418)
+			    label      	(object ItemLabel
+				Parent_View 	@134
+				location   	(3786, 8395)
+				anchor_loc 	1
+				nlines     	1
+				max_width  	470
+				justify    	0
+				label      	"Call PMSPrjDoc")
+			    width      	482
+			    height     	136)
+			(object TransView "" @135
+			    client     	@105
+			    supplier   	@134
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object TransView "" @136
+			    client     	@134
+			    supplier   	@109
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object TransView "" @137
+			    client     	@119
+			    supplier   	@132
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object StateView "Normal" "Call PMSPrj" @138
+			    location   	(2411, 6234)
+			    label      	(object ItemLabel
+				Parent_View 	@138
+				location   	(2411, 6212)
+				anchor_loc 	1
+				nlines     	1
+				max_width  	352
+				justify    	0
+				label      	"Call PMSPrj")
+			    width      	364
+			    height     	134)
+			(object TransView "" @139
+			    client     	@132
+			    supplier   	@138
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object TransView "" @140
+			    client     	@138
+			    supplier   	@86
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object TransView "" @141
+			    client     	@94
+			    supplier   	@92
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object TransView "" @142
+			    client     	@96
+			    supplier   	@89
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object StateView "Normal" "Call PMEndSPrjDocBld" @143
+			    location   	(4708, 9093)
+			    label      	(object ItemLabel
+				Parent_View 	@143
+				location   	(4708, 9071)
+				anchor_loc 	1
+				nlines     	1
+				max_width  	686
+				justify    	0
+				label      	"Call PMEndSPrjDocBld")
+			    width      	698
+			    height     	134)
+			(object TransView "" @144
+			    client     	@112
+			    supplier   	@143
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object TransView "" @145
+			    client     	@143
+			    supplier   	@114
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object TransView "" @146
+			    client     	@143
+			    supplier   	@110
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object TransView "" @147
+			    client     	@115
+			    supplier   	@105
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object TransView "" @148
+			    client     	@80
+			    supplier   	@123
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object TransView "" @149
+			    client     	@28
+			    supplier   	@5
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object TransView "" @150
+			    client     	@28
+			    supplier   	@75
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object NoteView @151
+			    location   	(2214, 5928)
+			    label      	(object ItemLabel
+				Parent_View 	@151
+				location   	(1663, 5773)
+				nlines     	5
+				max_width  	1127
+				label      	
+|main::SubProject	 subproject
+|main::SourceDir	source directory
+|main::SourceList	subproj relative src list
+|main::PlainSourceList  subproj relative plain src list
+|main::DocumentList  subproj relative document list
+				)
+			    width      	1187
+			    height     	323)
+			(object AttachView "" @152
+			    client     	@151
+			    supplier   	@132
+			    line_style 	0)
+			(object NoteView @153
+			    location   	(2790, 6885)
+			    label      	(object ItemLabel
+				Parent_View 	@153
+				location   	(2438, 6809)
+				nlines     	2
+				max_width  	729
+				label      	
+|main::Source	source
+|main::PlainSource	plainsource
+				)
+			    width      	789
+			    height     	164)
+			(object AttachView "" @154
+			    client     	@153
+			    supplier   	@89
+			    line_style 	0)
+			(object NoteView @155
+			    location   	(4281, 6696)
+			    label      	(object ItemLabel
+				Parent_View 	@155
+				location   	(3839, 6629)
+				nlines     	2
+				max_width  	909
+				label      	"main::DependencyList dependency list")
+			    width      	969
+			    height     	146)
+			(object AttachView "" @156
+			    client     	@155
+			    supplier   	@88
+			    line_style 	0)
+			(object NoteView @157
+			    location   	(5162, 6966)
+			    label      	(object ItemLabel
+				Parent_View 	@157
+				location   	(4734, 6855)
+				nlines     	3
+				max_width  	881
+				label      	
+|main::TargetDir $(path)\<build>
+|main::BuildDir $(path)\<build>
+|main::Build build
+				)
+			    width      	941
+			    height     	234)
+			(object AttachView "" @158
+			    client     	@157
+			    supplier   	@92
+			    line_style 	0)
+			(object NoteView @159
+			    location   	(5188, 8376)
+			    label      	(object ItemLabel
+				Parent_View 	@159
+				location   	(4760, 8265)
+				nlines     	3
+				max_width  	881
+				label      	
+|main::TargetDir $(path)\<build>
+|main::BuildDir $(path)\<build>
+|main::Build build
+				)
+			    width      	941
+			    height     	234)
+			(object AttachView "" @160
+			    client     	@159
+			    supplier   	@110
+			    line_style 	0)
+			(object NoteView @161
+			    location   	(4198, 8110)
+			    label      	(object ItemLabel
+				Parent_View 	@161
+				location   	(3897, 8054)
+				nlines     	1
+				max_width  	627
+				label      	"main::DependencyList  null")
+			    width      	687
+			    height     	125)
+			(object AttachView "" @162
+			    client     	@96
+			    supplier   	@161
+			    line_style 	0)
+			(object NoteView @163
+			    location   	(2826, 7562)
+			    label      	(object ItemLabel
+				Parent_View 	@163
+				location   	(2545, 7495)
+				nlines     	2
+				max_width  	586
+				label      	
+|main::Source	null
+|main::PlainSource	null
+				)
+			    width      	646
+			    height     	146)
+			(object AttachView "" @164
+			    client     	@163
+			    supplier   	@97
+			    line_style 	0)
+			(object NoteView @165
+			    location   	(2832, 9009)
+			    label      	(object ItemLabel
+				Parent_View 	@165
+				location   	(2598, 8953)
+				nlines     	1
+				max_width  	492
+				label      	"main::Document null")
+			    width      	552
+			    height     	125)
+			(object NoteView @166
+			    location   	(5157, 7883)
+			    label      	(object ItemLabel
+				Parent_View 	@166
+				location   	(4506, 7785)
+				nlines     	3
+				max_width  	1326
+				label      	
+|main::TargetDir	\EPOC32\RELEASE\<platform>
+|main::BuildDir	\EPOC32\BUILD\PROJECT\<platform>
+|main::Build	null
+				)
+			    width      	1386
+			    height     	208)
+			(object AttachView "" @167
+			    client     	@95
+			    supplier   	@166
+			    line_style 	0)
+			(object NoteView @168
+			    location   	(5125, 9414)
+			    label      	(object ItemLabel
+				Parent_View 	@168
+				location   	(4474, 9316)
+				nlines     	3
+				max_width  	1326
+				label      	
+|main::TargetDir	\EPOC32\RELEASE\<platform>
+|main::BuildDir	\EPOC32\BUILD\PROJECT\<platform>
+|main::Build	null
+				)
+			    width      	1386
+			    height     	208)
+			(object AttachView "" @169
+			    client     	@114
+			    supplier   	@168
+			    line_style 	0)
+			(object AttachView "" @170
+			    client     	@117
+			    supplier   	@165
+			    line_style 	0)
+			(object NoteView @171
+			    location   	(1907, 9751)
+			    label      	(object ItemLabel
+				Parent_View 	@171
+				location   	(1476, 9601)
+				nlines     	4
+				max_width  	887
+				label      	
+|main::SubProject	null
+|main::SourceDir	null
+|main::SourceList	all sources
+|main::PlainSourceList  all plain sources
+|main::DocumentList all documents
+				)
+			    width      	947
+			    height     	312)
+			(object AttachView "" @172
+			    client     	@121
+			    supplier   	@171
+			    line_style 	0)
+			(object NoteView @173
+			    location   	(2800, 8421)
+			    label      	(object ItemLabel
+				Parent_View 	@173
+				location   	(2472, 8365)
+				nlines     	1
+				max_width  	680
+				label      	
+|main::Document	Document
+				)
+			    width      	740
+			    height     	124)
+			(object AttachView "" @174
+			    client     	@105
+			    supplier   	@173
+			    line_style 	0)
+			(object AttachView "" @175
+			    client     	@58
+			    supplier   	@72
+			    line_style 	0)
+			(object TransView "" @176
+			    client     	@27
+			    supplier   	@44
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object TransView "" @177
+			    client     	@27
+			    supplier   	@63
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object TransView "" @178
+			    client     	@9
+			    supplier   	@10
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object StateView "Normal" "Open Makefile" @179
+			    location   	(333, 10240)
+			    label      	(object ItemLabel
+				Parent_View 	@179
+				location   	(333, 10218)
+				anchor_loc 	1
+				nlines     	1
+				max_width  	519
+				justify    	0
+				label      	"Open Makefile")
+			    width      	531)
+			(object TransView "" @180
+			    client     	@124
+			    supplier   	@179
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object StateView "Normal" "Write text to makefile" @181
+			    location   	(333, 10545)
+			    label      	(object ItemLabel
+				Parent_View 	@181
+				location   	(333, 10518)
+				anchor_loc 	1
+				nlines     	1
+				max_width  	519
+				justify    	0
+				label      	"Write text to makefile")
+			    width      	531
+			    height     	145)
+			(object StateView "Normal" "Close Makefile" @182
+			    location   	(323, 10816)
+			    label      	(object ItemLabel
+				Parent_View 	@182
+				location   	(323, 10794)
+				anchor_loc 	1
+				nlines     	1
+				max_width  	405
+				justify    	0
+				label      	"Close Makefile")
+			    width      	417)
+			(object TransView "" @183
+			    client     	@179
+			    supplier   	@181
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object TransView "" @184
+			    client     	@181
+			    supplier   	@182
+			    line_style 	0
+			    x_offset   	FALSE)
+			(object TransView "" @185
+			    client     	@182
+			    supplier   	@1
+			    line_style 	0
+			    x_offset   	FALSE)))))
+	logical_presentations 	(list unit_reference_list
+	    (object ClassDiagram "Main"
+		title      	"Main"
+		zoom       	100
+		max_height 	28350
+		max_width  	21600
+		origin_x   	0
+		origin_y   	0
+		items      	(list diagram_item_list
+		    (object ClassView "Class" "MAKMAKE" @186
+			location   	(1569, 909)
+			label      	(object ItemLabel
+			    Parent_View 	@186
+			    location   	(1465, 825)
+			    nlines     	2
+			    max_width  	240
+			    justify    	0
+			    label      	"MAKMAKE"))))))
+    root_subsystem 	(object SubSystem "<Top Level>"
+	physical_models 	(list unit_reference_list)
+	physical_presentations 	(list unit_reference_list
+	    (object Module_Diagram "Main"
+		title      	"Main"
+		zoom       	100
+		max_height 	28350
+		max_width  	21600
+		origin_x   	0
+		origin_y   	0
+		items      	(list diagram_item_list))))
+    process_structure 	(object Processes
+	ProcsNDevs 	(list
+	    (object Process_Diagram ""
+		title      	""
+		zoom       	100
+		max_height 	28350
+		max_width  	21600
+		origin_x   	0
+		origin_y   	0
+		items      	(list diagram_item_list))))
+    properties 	(object Properties))

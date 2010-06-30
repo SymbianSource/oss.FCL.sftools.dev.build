@@ -1,0 +1,351 @@
+#!perl
+# Copyright (c) 2002-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+# 
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+# 
+# Contributors:
+# 
+# Description:
+# 
+#
+
+use strict;
+use FindBin;
+use lib "$FindBin::Bin";
+use Cwd;
+use Getopt::Long;
+use Utils;
+
+$|++;
+
+#
+# Globals
+#
+
+my @bldData;
+my $descriptionFile;
+my $keepGoing = '';
+my $saveSpace = '';
+my $verbose = 0;
+my $clean = 0;
+my $outFile = "stdout.log";
+my $errorFile = "stderr.log";
+my $startTime;
+my $cwd;
+
+
+#
+# Main.
+#
+
+ProcessCommandLine();
+ParseDescriptionFile();
+Init();
+DoBuild();
+End();
+
+
+#
+# Subs
+#
+
+sub ProcessCommandLine {
+  Getopt::Long::Configure ("bundling");
+  my $help;
+  GetOptions('c+' => \$clean, 'h' => \$help, 'k' => \$keepGoing, 's' => \$saveSpace, 'v+' => \$verbose);
+
+  if ($help) {
+    Usage(0);
+  }
+
+  $descriptionFile = shift @ARGV;
+
+  unless ($descriptionFile and $#ARGV == -1) {
+    print "Error: Invalid arguments\n";
+    Usage(1);
+  }
+}
+
+sub Usage {
+  my $exitCode = shift;
+
+  Utils::PrintDeathMessage($exitCode, "\nUsage: mbld [options] <build_description_file>
+
+options:
+
+-h  help
+-c  clean (-cc reallyclean)
+-k  keep going
+-s  save space
+-v  verbose output (-vv very verbose)\n");
+}
+
+sub Init {
+  $startTime = time;
+  unlink $outFile;
+  unlink $errorFile;
+  $cwd = cwd();
+  $outFile = "$cwd\\$outFile";
+  $errorFile = "$cwd\\$errorFile";
+}
+
+
+sub ParseDescriptionFile {
+  open(FILE, $descriptionFile) or die "Error: Unable to open \"$descriptionFile\" for reading: $!\n";
+
+  my $line = -1;
+  while (<FILE>) {
+    ++$line;
+    # Remove line feed, white space and comments.
+    chomp;
+    s/^\s*$//;
+    s/#.*//;
+    if ($_ eq '') {
+      # Nothing left.
+      next;
+    }
+
+    (my @words) = split /\s+/;
+
+    if ($#words < 2) {
+      print "Warning: Not enough arguments on line $line\n";
+      next;
+    }
+
+    my $bldEntry;
+    $bldEntry->{name} = shift @words;
+    $bldEntry->{bldInf} = shift @words;
+    if ($words[0] eq 'test') {
+      $bldEntry->{test} = 1;
+      shift @words;
+      if ($#words == -1) {
+	print "Warning: Not enough arguments on line $line\n";
+	next;
+      }
+    }
+    $bldEntry->{plat} = shift @words;
+    if ($#words >= 0) {
+      if ($words[0] =~ /(udeb)|(urel)/) {
+	$bldEntry->{var} = shift @words;
+      }
+    }
+    if ($#words >= 0) {
+      $bldEntry->{mmp} = shift @words;
+    }
+
+    push (@bldData, $bldEntry);
+  }
+    
+  close FILE;
+}
+
+sub DoBuild {
+  if ($clean == 1) {
+    DoPlatformVariantCommand('clean:       ', 'abld', 'clean');
+  }
+  elsif ($clean == 2) {
+    DoPlatformVariantCommand('reallyclean: ', 'abld', 'reallyclean');
+  }
+  DoBldMake();
+  DoExport();
+  DoPlatformCommand('makefile:    ', 'abld', 'makefile');
+  DoPlatformCommand('library:     ', 'abld', 'library');
+  DoPlatformVariantCommand('resource:    ', 'abld', 'resource');
+  my $target = 'target';
+  if ($keepGoing) {
+    $target .= " $keepGoing";
+  }
+  if ($saveSpace) {
+    $target .= " $saveSpace";
+  }
+  DoPlatformVariantCommand('target:      ', 'abld', $target);
+  DoPlatformVariantCommand('final:       ', 'abld', 'final');
+  DoPlatformVariantCommand('check:       ', 'abld -check', 'build');
+}
+
+sub DoBldMake {
+  my %built;
+  foreach my $bldEntry (@bldData) {
+    unless (exists $built{lc($bldEntry->{bldInf})}) {
+      DoPrint("bldfiles:     $bldEntry->{name} [bldmake bldfiles]");
+      chdir $bldEntry->{bldInf} or die "Error: Couldn't change working directory to \"$bldEntry->{bldInf}\": $!\n";
+      system "bldmake bldfiles >>$outFile 2>>$errorFile";
+      chdir $cwd or die "Error: Couldn't change working directory to \"$cwd\": $!\n";
+      $built{lc($bldEntry->{bldInf})} = 1;
+    }
+  }
+}
+
+sub DoExport {
+  my %built;
+  my %builtTest;
+  foreach my $bldEntry (@bldData) {
+    if (exists $bldEntry->{test}) {
+      unless (exists $builtTest{lc($bldEntry->{bldInf})}) {
+	DoPrint("export:       $bldEntry->{name} [abld test export]");
+	chdir $bldEntry->{bldInf} or die "Error: Couldn't change working directory to \"$bldEntry->{bldInf}\": $!\n";
+	system "abld test export >>$outFile 2>>$errorFile";
+	chdir $cwd or die "Error: Couldn't change working directory to \"$cwd\": $!\n";
+	$builtTest{lc($bldEntry->{bldInf})} = 1;
+      }
+    }
+    else {
+      unless (exists $built{lc($bldEntry->{bldInf})}) {
+	DoPrint("export:       $bldEntry->{name} [abld export]");
+	chdir $bldEntry->{bldInf} or die "Error: Couldn't change working directory to \"$bldEntry->{bldInf}\": $!\n";
+	system "abld export >>$outFile 2>>$errorFile";
+	chdir $cwd or die "Error: Couldn't change working directory to \"$cwd\": $!\n";
+	$built{lc($bldEntry->{bldInf})} = 1;
+      }
+    }
+  }
+}
+
+sub DoPlatformCommand {
+  my $prompt = shift;
+  my $command1 = shift;
+  my $command2 = shift;
+
+  foreach my $bldEntry (@bldData) {
+    my $command = $command1;
+    if (exists $bldEntry->{test}) {
+      $command .= ' test';
+    }
+    $command .= " $command2 $bldEntry->{plat}";
+    if (exists $bldEntry->{mmp}) {
+      $command .= " $bldEntry->{mmp}";
+    }
+    DoPrint("$prompt $bldEntry->{name} [$command]");
+    chdir $bldEntry->{bldInf} or die "Error: Couldn't change working directory to \"$bldEntry->{bldInf}\": $!\n";
+    system "$command >>$outFile 2>>$errorFile";
+    chdir $cwd or die "Error: Couldn't change working directory to \"$cwd\": $!\n";
+  }
+}
+
+sub DoPlatformVariantCommand {
+  my $prompt = shift;
+  my $command1 = shift;
+  my $command2 = shift;
+
+  foreach my $bldEntry (@bldData) {
+    my $command = $command1;
+    if (exists $bldEntry->{test}) {
+      $command .= ' test';
+    }
+    $command .= " $command2 $bldEntry->{plat}";
+    if (exists $bldEntry->{var}) {
+      $command .= " $bldEntry->{var}";
+    }
+    if (exists $bldEntry->{mmp}) {
+      $command .= " $bldEntry->{mmp}";
+    }
+    DoPrint("$prompt $bldEntry->{name} [$command]");
+    chdir $bldEntry->{bldInf} or die "Error: Couldn't change working directory to \"$bldEntry->{bldInf}\": $!\n";
+    system "$command >>$outFile 2>>$errorFile";
+    chdir $cwd or die "Error: Couldn't change working directory to \"$cwd\": $!\n";
+  }
+}
+
+sub DoPrint {
+  my $prompt = $_[0];
+
+  print "$prompt\n";
+  system "echo === $prompt >> $outFile";
+  system "echo === $prompt >> $errorFile";
+}
+
+sub End {
+  my $finishTime = time;
+  my $total = $finishTime - $startTime;
+  my $seconds =  $total % 60;$total = ($total - $seconds) / 60;
+  my $minutes =  $total % 60;$total = ($total - $minutes) / 60;
+  my $hours =  $total % 24;$total = ($total - $hours)   / 24;
+
+  print "\nTotal build time: $hours:$minutes:$seconds\n";
+  chdir $cwd;
+}
+
+
+__END__
+
+=head1 NAME
+
+MBld - Builds multiple components in one pass.
+
+=head1 SYNOPSIS
+
+  mbld [options] <build_description_file>
+
+options:
+
+  -h  help
+  -c  clean (-cc reallyclean)
+  -k  keep going
+  -s  save space
+  -v  verbose output (-vv very verbose)
+
+=head1 DESCRIPTION
+
+The build description file must be plain text with lines of the following format (one for each item that you want to be built):
+
+ component_name  bld_inf_path  [test] platform [variant] [mmp_file]
+
+=over 4
+
+=item component_name
+
+A string that can be used to identify the component being built - can be anything you like provided it's a single word.
+
+=item bld_inf_path
+
+An absolute or relative path to where the componen't F<bld.inf> file can be found.
+
+=item test
+
+An optional argument to allow test code to be built.
+
+=item platform
+
+The build plaform required (e.g. C<WINS>, C<WINCW>, C<THUMB>, C<ARM4>, C<ARMI>, C<MISA> etc).
+
+=item variant
+
+The build variant (either C<udeb> or C<urel>). If ommitted, both variants will be built.
+
+=item mmp_file
+
+A optional argument that allows specific projects (defined by an F<mmp> file) to be built. If ommitted all F<mmp> files will be used.
+
+=back
+
+The build output is captured to a pair of log files; F<stdout.log> for C<STDOUT> and F<stderr.log> for C<STDERR>.
+
+
+=head1 KNOWN BUGS
+
+None.
+
+=head1 COPYRIGHT
+
+ Copyright (c) 2002-2009 Nokia Corporation and/or its subsidiary(-ies).
+ All rights reserved.
+ This component and the accompanying materials are made available
+ under the terms of the License "Eclipse Public License v1.0"
+ which accompanies this distribution, and is available
+ at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ 
+ Initial Contributors:
+ Nokia Corporation - initial contribution.
+ 
+ Contributors:
+ 
+ Description:
+ 
+
+=cut

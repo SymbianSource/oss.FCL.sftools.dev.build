@@ -1,0 +1,383 @@
+#!perl
+# Copyright (c) 2003-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+# 
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+# 
+# Contributors:
+# 
+# Description:
+# 
+#
+
+use strict;
+use FindBin;
+use lib "$FindBin::Bin";
+use File::Find;
+use File::Copy;
+use Getopt::Long;
+use IniData;
+use EnvDb;
+use Utils;
+
+
+#
+# Globals.
+#
+
+my $verbose = 0;
+my $dummyRun = 0;
+my $interactive = 0;
+my $force = 0;
+my $wins = 1;
+my $wincw = 1;
+my $udeb = 1;
+my $urel = 1;
+my $comp;
+my %affectedExtentions;
+
+
+#
+# Constants.
+#
+
+my %searchPath = (
+		   wins => {
+			    udeb => '\\epoc32\\release\\wins\\udeb\\z',
+			    urel => '\\epoc32\\release\\wins\\urel\\z'
+			    },
+		   wincw => {
+			    udeb => '\\epoc32\\release\\wincw\\udeb\\z',
+			    urel => '\\epoc32\\release\\wincw\\urel\\z'
+			    }
+		 );
+my $KBinCompareChunkSize = 16 * 1024;
+
+
+#
+# Main.
+#
+
+ProcessCommandLine();
+my $files = FindFiles();
+CopyFiles($files);
+
+
+#
+# Subs.
+#
+
+sub ProcessCommandLine {
+  Getopt::Long::Configure ('bundling');
+  my $help;
+  my $extention;
+  my $winsOnly = 0;
+  my $wincwOnly = 0;
+  my $udebOnly = 0;
+  my $urelOnly = 0;
+  GetOptions('h' => \$help, 'f' => \$force, 'n' => \$dummyRun, 'i' => \$interactive, 'w' => \$winsOnly, 'c' => \$wincwOnly, 'd' => \$udebOnly, 'r' => \$urelOnly, 'v+' => \$verbose);
+
+  if ($help) {
+    Usage(0);
+  }
+
+  $extention = lc(shift @ARGV);
+  $comp = shift @ARGV;
+
+  unless ($extention and ($extention eq 'cl' or $extention eq 'bw')) {
+    print "Error: Invalid colour discription\n";
+    Usage(1);
+  }
+  unless (scalar (@ARGV) == 0) {
+    print "Error: Invalid number of arguments\n";
+    Usage(1);
+  }
+  if ($winsOnly and $wincwOnly) {
+    print "Error: -w and -c options are mutually exclusive\n";
+    Usage(1);
+  }
+  if ($udebOnly and $urelOnly) {
+    print "Error: -d and -r options are mutually exclusive\n";
+    Usage(1);
+  }
+
+  if ($winsOnly) {
+    $wincw = 0;
+  }
+  if ($wincwOnly) {
+    $wins = 0;
+  }
+  if ($udebOnly) {
+    $urel = 0;
+  }
+  if ($urelOnly) {
+    $udeb = 0;
+  }
+
+  %affectedExtentions = (
+			  ".a$extention" => '.aif',
+			  ".i$extention" => '.ini',
+			  ".m$extention" => '.mbm'
+			 );
+}
+
+sub Usage {
+  my $exitCode = shift;
+
+  Utils::PrintDeathMessage($exitCode, "\nUsage: instcol2 [options] cl | bw [<component>]
+
+options:
+
+-h  help
+-f  force a copy of everything (i.e. instcol behaviour)
+-n  dummy run (list what would be done, but doesn't do anything)
+-i  interactive mode (ask before copying each file)
+-w  WINS emulator only
+-c  WINCW emulator only
+-d  UDEB builds only
+-r  UREL builds only
+-v  verbose output (-vv very verbose)\n");
+}
+
+sub FindFiles {
+  my @files;
+  if ($comp) {
+    FindCompFiles($comp, \@files);
+  }
+  else {
+    if ($wins) {
+      if ($udeb) {
+	DoFindFiles($searchPath{wins}->{udeb}, \@files);
+      }
+      if ($urel) {
+	DoFindFiles($searchPath{wins}->{urel}, \@files);
+      }
+    }
+    if ($wincw) {
+      if ($udeb) {
+	DoFindFiles($searchPath{wincw}->{udeb}, \@files);
+      }
+      if ($urel) {
+	DoFindFiles($searchPath{wincw}->{urel}, \@files);
+      }
+    }
+  }
+  return \@files;
+}
+
+sub FindCompFiles {
+  my $comp = shift;
+  my $files = shift;
+  my $iniData = IniData->New();
+  my $envDb = EnvDb->Open($iniData, $verbose);
+  unless ($envDb->Version($comp)) {
+    print "Error: \"$comp\" is not currently installed\n";
+    Usage(1);
+  }
+  my $info = $envDb->ListBins($comp);
+  shift @$info; # Get rid of title.
+  foreach my $line (@$info) {
+    unless ($line->[0] =~ /^\\epoc32\\data/i) {
+      my $extention = lc (Extention($line->[0]));
+      if ($extention and ($line->[1] ne EnvDb::STATUS_STRING_MISSING) and exists $affectedExtentions{$extention}) {
+	push (@$files, lc($line->[0]));
+      }
+    }
+  }
+}
+
+sub DoFindFiles {
+  my $path = shift;
+  my $files = shift;
+  my $processFileSub = sub {
+    if (-f $File::Find::name) {
+      my $thisFile = lc($File::Find::name);
+      my $extention = Extention($thisFile);
+      if ($extention) {
+	if (exists $affectedExtentions{$extention}) {
+	  Utils::TidyFileName(\$thisFile);
+	  push (@$files, $thisFile);
+	}
+      }
+    }
+  };
+  if (-e $path) {
+    find($processFileSub, $path);
+  }
+}
+
+sub CopyFiles {
+  my $files = shift;
+  foreach my $thisFile (@$files) {
+    (my $path, my $name, my $ext) = Utils::SplitFileName($thisFile);
+    my $newExt = $affectedExtentions{$ext};
+    my $newName = Utils::ConcatenateDirNames($path, "$name$newExt");
+    CopyFile($thisFile, $newName);
+  }
+}
+
+sub CopyFile {
+  my $from = shift;
+  my $to = shift;
+
+  unless ($force) {
+    if (-e $to) {
+      (my $fromMtime, my $fromSize) = Utils::FileModifiedTimeAndSize($from);
+      (my $toMtime, my $toSize) = Utils::FileModifiedTimeAndSize($to);
+      if ($fromMtime == $toMtime) {
+	print "Last modified times of \"$from\" and \"$to\" are identical\n" if ($verbose > 2);
+	return;
+      }
+      if ($fromSize == $toSize) {
+	if (BinaryCompare($from, $to, $fromSize)) {
+	  print "Binary content of \"$from\" and \"$to\" are identical\n" if ($verbose > 2);
+	  return;
+	}
+	else {
+	  print "Binary content of \"$from\" and \"$to\" are different\n" if ($verbose > 1);
+	}
+      }
+      else {
+	print "Sizes of \"$from\" and \"$to\" are different\n" if ($verbose > 1);
+      }
+    }
+    else {
+      print "\"$to\" does not exist\n" if ($verbose > 1);
+    }
+  }
+
+  if ($interactive) {
+    print "Copy \"$from\" to \"$to\"? [y] ";
+    my $response = <STDIN>;
+    chomp $response;
+    unless ($response =~ /^y$/i or not $response) {
+      return;
+    }
+  }
+
+  if ($verbose) {
+    print "Copying \"$from\" to \"$to\"\n";
+  }
+  unless ($dummyRun) {
+    copy ($from, $to) or die "Error: Couldn't copy \"$from\" to \"$to\": $!\n";
+  }
+}
+
+sub BinaryCompare {
+  my $file1 = shift;
+  my $file2 = shift;
+  my $size = shift;
+  my $identical = 1;
+  open (FILE1, $file1) or die "Error: Couldn't open \"$file1\": $!\n";
+  open (FILE2, $file2) or die "Error: Couldn't open \"$file2\": $!\n";
+  binmode (FILE1);
+  binmode (FILE2);
+  my $bytesCompared = 0;
+  while ($bytesCompared < $size) {
+    my $buf1;
+    my $buf2;
+    my $bytesRead1 = read (FILE1, $buf1, $KBinCompareChunkSize);
+    my $bytesRead2 = read (FILE2, $buf2, $KBinCompareChunkSize);
+    unless ($bytesRead1 eq $bytesRead2) {
+      die "Error: Problem binary comparing \"$file1\" with \"$file2\": $!\n";
+    }
+    $bytesCompared += $bytesRead1;
+    if ($buf1 ne $buf2) {
+      $identical = 0;
+      last;
+    }
+  }
+  close (FILE1);
+  close (FILE2);
+  return $identical;
+}
+
+sub Extention {
+  my $fileName = shift;
+  (my $ext) = $fileName =~ /(\.[^\.]*)$/;
+  return $ext;
+}
+
+__END__
+
+=head1 NAME
+
+InstCol2 - A more controlled instcol.
+
+=head1 SYNOPSIS
+
+  instcol2 [options] cl | bw [<component>]
+
+options:
+
+  -h  help
+  -f  force a copy of everything (i.e. instcol behaviour)
+  -n  dummy run (list what would be done, but doesn't do anything)
+  -i  interactive mode (ask before copying each file)
+  -w  WINS emulator only
+  -c  WINCW emulator only
+  -d  UDEB builds only
+  -r  UREL builds only
+  -v  verbose output (-vv very verbose)
+
+=head1 DESCRIPTION
+
+Symbian tools C<instcol> may be used to configure the emulator to be either colour or monochrome. Files with the extentions F<.aif>, F<.ini>, F<.mbm> are often provided in both colour and monochrome variants. The last two characters of the extention are replaced with F<cl> for colour, or F<bw> for monochrome. To install a particular variant, C<instcol> simply copies files with the required colour variant extention to files with the emulator required extention. For example, F<eikon.mcl> would be copied to a file named F<eikon.mbm> if the emulator were to be configured for colour.
+
+This emulator configuration technique has the unfortunate side effect of making development environments dirty from the point of view of the release tools. It is hoped that this problem will eventually disappear, if support for multiple colour variants of the emulator is dropped. In the meantime, C<InstCol2> was written to provide a higher degree of control over changes made to development environments than that offered by C<instcol>.
+
+C<InstCol2> only copies files if it really has to. A copy will only occur if:
+
+=over 4
+
+=item *
+
+The emulator required extention (F<.aif>, F<.ini> or F<.mbm>) copy of a particular file does not exist.
+
+=item *
+
+The emulator required extention copy for a particular file has a last modified time of less than the required colour variant of the file.
+
+=item *
+
+The emulator required exetention copy for a particular file contains different binary data to the required colour varaint of the file.
+
+=back
+
+=head1 EXAMPLES
+
+ instcol2 -wd cl
+
+Installs the colour variants for the WINS UDEB emulator.
+
+ instcol2 -cr bw alaunch
+
+Installs the monochrome variants for the WINCW UREL emulator for the component C<alaunch>.
+
+=head1 KNOWN BUGS
+
+None.
+
+=head1 COPYRIGHT
+
+ Copyright (c) 2003-2009 Nokia Corporation and/or its subsidiary(-ies).
+ All rights reserved.
+ This component and the accompanying materials are made available
+ under the terms of the License "Eclipse Public License v1.0"
+ which accompanies this distribution, and is available
+ at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ 
+ Initial Contributors:
+ Nokia Corporation - initial contribution.
+ 
+ Contributors:
+ 
+ Description:
+ 
+
+=cut

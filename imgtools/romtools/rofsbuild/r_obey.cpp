@@ -37,7 +37,7 @@
 #include "r_obey.h"
 #include "r_coreimage.h"
 #include "patchdataprocessor.h"
-#include "filesysteminterface.h" 
+#include "fatimagegenerator.h" 
 #include "r_driveimage.h"
 
 extern TInt gCodePagingOverride;
@@ -54,6 +54,7 @@ const ObeyFileKeyword ObeyFileReader::iKeywords[] =
 {
 	{_K("file"),		2,-2, EKeywordFile, "File to be copied into ROFS"},
 	{_K("data"),		2,-2, EKeywordData, "same as file"},
+	{_K("dir"),         2,1, EKeywordDir, "Directory to be created into FAT image"},
 
 	{_K("rofsname"),	1, 1, EKeywordRofsName, "output file for ROFS image"},
 	{_K("romsize"),		1, 1, EKeywordRomSize, "size of ROM image"}, 
@@ -412,8 +413,7 @@ void ObeyFileReader::TimeNow(TInt64& aTime) {
 const FileAttributeKeyword ObeyFileReader::iAttributeKeywords[] =
 {
 	{"attrib",3			,0,1,EAttributeAtt, "File attributes in ROM file system"},
-	{"exattrib",3		,0,1,EAttributeAttExtra, "File extra attributes in ROM file system"},
-	//	{_K("compress")		,1,1,EAttributeCompress, "Compress file"},
+	{"exattrib",3		,0,1,EAttributeAttExtra, "File extra attributes in ROM file system"}, 
 	{"stack",3			,1,1,EAttributeStack, "?"},
 	{"fixed",3			,1,0,EAttributeFixed, "Relocate to a fixed address space"},
 	{"priority",3		,1,1,EAttributePriority, "Override process priority"},
@@ -497,10 +497,8 @@ iNumberOfFiles(0),
 iTime(0),
 iRootDirectory(0),
 iNumberOfDataFiles(0),
-iDriveFileName(0),
-iDataSize(0),
-iDriveFileFormat(0),
-iConfigurableFatAttributes(new ConfigurableFatAttributes),
+iDriveFileName(0), 
+iDriveFileFormat(0), 
 iReader(aReader), 
 iMissingFiles(0), 
 iLastExecutable(0),
@@ -539,9 +537,7 @@ CObeyFile::~CObeyFile() {
 		iRomFileName = 0 ;
 	}
 	if (iRootDirectory)
-		iRootDirectory->Destroy();
-	if(iConfigurableFatAttributes)
-		delete iConfigurableFatAttributes;
+		iRootDirectory->Destroy(); 
 	if(iPatchData)
 		delete iPatchData;
 }
@@ -739,6 +735,7 @@ TInt CObeyFile::ProcessDataDrive() {
 
 		case EKeywordHide:						
 		case EKeywordFile:
+		case EKeywordDir:
 		case EKeywordData:
 		case EKeywordFileCompress:
 		case EKeywordFileUncompress:
@@ -789,16 +786,8 @@ TBool CObeyFile::ProcessDriveKeyword(enum EKeyword aKeyword) {
 				Print(EWarning,"Not a valid Image Size. Default size is considered\n");		
 				break;
 			}
-#ifdef __LINUX__
-			errno = 0;
-			iDataSize = strtoll(bigString,NULL,10);
-			if((iDataSize == LONG_MAX) || (iDataSize == LONG_MIN) ||(errno == ERANGE))
-			{
-				Print(EWarning,"Invalid Range. Default size is considered\n");		
-			}
-#else
-			iDataSize = _atoi64(bigString);
-#endif
+ 
+			Val(iConfigurableFatAttributes.iImageSize,bigString); 
 		}
 		break;
 	case EKeywordDataImageVolume:
@@ -823,8 +812,13 @@ TBool CObeyFile::ProcessDriveKeyword(enum EKeyword aKeyword) {
 				position = volumeLabel.find_first_of("\r\n");
 				if (position != string::npos)
 					volumeLabel = volumeLabel.substr(0,position);
-
-				iConfigurableFatAttributes->iDriveVolumeLabel = volumeLabel.data() ;
+				size_t length = volumeLabel.length() ;
+				if(length > 11) 
+						length = 11 ;
+				memcpy(iConfigurableFatAttributes.iDriveVolumeLabel,volumeLabel.c_str(),length) ;
+				while(length != 11)
+					iConfigurableFatAttributes.iDriveVolumeLabel[length++] = ' ';
+				iConfigurableFatAttributes.iDriveVolumeLabel[length] = 0;
 			}
 			else {
 				Print(EWarning,"Value for Volume Label is not provided. Default value is considered.\n");
@@ -839,7 +833,7 @@ TBool CObeyFile::ProcessDriveKeyword(enum EKeyword aKeyword) {
 				Print(EWarning,"Invalid Sector Size value. Default value is considered.\n");
 			}
 			else {
-				iConfigurableFatAttributes->iDriveSectorSize = atoi(bigString);
+				iConfigurableFatAttributes.iDriveSectorSize = atoi(bigString);
 			}
 		}			
 		break;
@@ -850,7 +844,7 @@ TBool CObeyFile::ProcessDriveKeyword(enum EKeyword aKeyword) {
 			if (noOfFats <=0)
 				Print(EWarning,"Invalid No of FATs specified. Default value is considered.\n");
 			else
-				iConfigurableFatAttributes->iDriveNoOfFATs = atoi(bigString);			
+				iConfigurableFatAttributes.iDriveNoOfFATs = atoi(bigString);			
 		}			
 		break;			
 	default:
@@ -879,7 +873,7 @@ TBool CObeyFile::GotKeyDriveVariables() {
 		retVal = EFalse;
 	}
 	// Check for '-'ve entered value.
-	if(iDataSize <= 0){
+	if(iConfigurableFatAttributes.iImageSize <= 0){
 		Print(EWarning,"Image Size should be positive. Default size is Considered.\n");
 	}
 
@@ -891,10 +885,8 @@ TBool CObeyFile::GotKeyDriveVariables() {
 	}
 
 	// Checking the validity of file system format.
-	if(iDriveFileFormat){
-		strupr((char *)iDriveFileFormat);
-		enum TFileSystem check = (TFileSystem)0;
-		if(!(CDriveImage::FormatTranslation(iDriveFileFormat,check))) {
+	if(iDriveFileFormat){		 
+		if(stricmp(iDriveFileFormat,"FAT16") && stricmp(iDriveFileFormat,"FAT32")) {
 			Print(EError,"The name of the file system not supported : %s\n",iDriveFileFormat);
 			retVal = EFalse;
 		}
@@ -931,6 +923,7 @@ TBool CObeyFile::ProcessDriveFile(enum EKeyword aKeyword) {
 	switch (aKeyword)
 	{
 	case EKeywordData:
+	case EKeywordDir:
 	case EKeywordHide:
 		isPeFile = EFalse;
 		break;
@@ -950,7 +943,7 @@ TBool CObeyFile::ProcessDriveFile(enum EKeyword aKeyword) {
 		return EFalse;
 	}
 
-	if (aKeyword!=EKeywordHide) {
+	if (aKeyword!=EKeywordHide && aKeyword!=EKeywordDir) {
 		// check the PC file exists
 		char* nname = NormaliseFileName(iReader.Word(1));		  
 		ifstream test(nname);
@@ -965,10 +958,15 @@ TBool CObeyFile::ProcessDriveFile(enum EKeyword aKeyword) {
 	else
 		epocPathStart=1;   
 
-	iNumberOfFiles++;
+	if(aKeyword != EKeywordDir)
+		iNumberOfFiles++;
 
 	TBool endOfName=EFalse;
-	const char *epocStartPtr= IsValidFilePath(iReader.Word(epocPathStart));
+	const char *epocStartPtr;
+	if(aKeyword != EKeywordDir)
+		epocStartPtr = IsValidFilePath(iReader.Word(epocPathStart));
+	else
+		epocStartPtr = IsValidDirPath(iReader.Word(epocPathStart));
 	char *epocEndPtr = const_cast<char*>(epocStartPtr);
 
 	if (epocStartPtr == NULL) {
@@ -982,7 +980,7 @@ TBool CObeyFile::ProcessDriveFile(enum EKeyword aKeyword) {
 
 	while (!endOfName) {
 		endOfName = GetNextBitOfFileName(epocEndPtr);      
-		if (endOfName) { // file		
+		if (endOfName && (aKeyword!=EKeywordDir)) { // file
 			TRomNode* alreadyExists=dir->FindInDirectory(epocStartPtr);
 			if ((aKeyword != EKeywordHide) && alreadyExists) { // duplicate file		
 				if (gKeepGoing) {
@@ -1034,6 +1032,10 @@ TBool CObeyFile::ProcessDriveFile(enum EKeyword aKeyword) {
 		}		 
 		else {
 			// directory
+			//for directory creation, given /sys/bin/, it's possible to reach 0 at the end, just ignore that...
+			if(!*epocStartPtr)
+				break;
+
 			subDir = dir->FindInDirectory(epocStartPtr);      
 			if (!subDir){ // sub directory does not exist			
 				if(aKeyword==EKeywordHide) {
@@ -1683,11 +1685,32 @@ const char* CObeyFile::IsValidFilePath(const char* aPath) {
 			if (len == 0)
 				return NULL;
 			len=0;
+			p++;
+			continue;
+
 		}
 		len++;
 		p++;
 	}
 	return (len ? aPath : NULL);
+}
+
+const char* CObeyFile::IsValidDirPath(const char* aPath)
+{
+	const char* walker = aPath;
+
+	//validate path...
+	while(*walker)
+	{
+		if(((*walker=='/') || (*walker=='\\')) && ((*(walker+1)=='/') || (*(walker+1)=='\\')))
+			return (const char*)0;
+		walker++;
+	}
+
+	if((*aPath=='/') || (*aPath=='\\'))
+		aPath++;
+
+	return aPath;
 }
 
 //

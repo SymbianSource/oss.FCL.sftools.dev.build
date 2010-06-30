@@ -229,7 +229,7 @@ sub copyFilesToFolders
 	else
 	{
 		print "$source copied to $destfile\n" if($verboseOpt);
-		return $destfile;
+		return "\"".$destfile."\"";
 	}
 }
 
@@ -288,21 +288,23 @@ sub copyNonSisFiles
 	open (OBEY ,$obyfile) or die($obyfile."\n");
 	while(my $line =<OBEY>) 
 	{
-		if( $line =~ /^(file|data)\s*=\s*(\S+)\s+(\S+)/i )
+		if( $line =~ /^(file|data)\s*=\s*(\"[^"]+\")\s+(\"[^"]+\")/i || 
+				$line =~ /^(file|data)\s*=\s*(\"[^"]+\")\s+(\S+)/i || 
+				$line =~ /^(file|data)\s*=\s*(\S+)\s+(\"[^"]+\")/i || 
+				$line =~ /^(file|data)\s*=\s*(\S+)\s+(\S+)/i )
 		{
 			my $keyWord=$1;
 			my $source=$2;
 			my $dest=$3;
 
-			if( $source !~ /(\S+):(\S+)/ )
+			if( $source !~ /(\S+):([^"]+)/ )
 			{ 
 				$source = get_drive().$2;
 			}
 			my $var = &copyFilesToFolders( $source,$dest,$dir,$verboseOpt);
 			if($var)
 			{
-				$var = $keyWord."=".$var;
-				$line =~ s/^(\S+)=(\S+)/$var/;
+				$line = $keyWord."=".$var."\t".$dest."\n";
 				push(@$nonsisFileArray,$line);
 			}
 			else

@@ -4,6 +4,11 @@ Nokia Corporation
 NOTESRC_RELEASE_REASON
 ELFtools Release
 
+Version v1.1.0 - def2dll.pl
+===============
+Released by Zheng Shen, 12/06/2010
+    Minor: port def2dll.pl to Linux
+
 Version V02.02 (Build 002)
 ===============
 Released by Zheng Shen, 10/03/2010

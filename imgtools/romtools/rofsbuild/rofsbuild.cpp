@@ -46,8 +46,8 @@
 #endif
 
 static const TInt RofsbuildMajorVersion=2;
-static const TInt RofsbuildMinorVersion=10;
-static const TInt RofsbuildPatchVersion=4;
+static const TInt RofsbuildMinorVersion=12;
+static const TInt RofsbuildPatchVersion=0;
 static TBool SizeSummary=EFalse;
 static TPrintType SizeWhere=EAlways;
 
@@ -313,13 +313,13 @@ void processCommandLine(int argc, char *argv[], TBool paramFileFlag = EFalse) {
 				gLowMem = ETrue;
 			else {
 #ifdef WIN32
-				cout << "Unrecognised option " << argv[i] << "\n";
+				Print (EWarning, "Unrecognised option %s\n",argv[i]);
 #else
 				if(0 == access(argv[i],R_OK)){
 					filename.assign(argv[i]);
 				}
 				else {
-					cout << "Unrecognised option " << argv[i] << "\n";
+					Print (EWarning, "Unrecognised option %s\n",argv[i]);
 				}
 #endif				
 
@@ -335,14 +335,13 @@ void processCommandLine(int argc, char *argv[], TBool paramFileFlag = EFalse) {
 
 	if((gDriveImage == EFalse) && (gSmrImage ==  EFalse) && 
 		(filename.empty() || (gUseCoreImage && gImageFilename.length() == 0))){
-			PrintVersion();
-			cout << HelpText;
+			Print (EAlways, HelpText);
 			if (reallyHelp) {
 				ObeyFileReader::KeywordHelp();
-				cout << ReallyHelpText;
+				Print (EAlways, ReallyHelpText);
 			}
 			else if (filename.empty()){
-				Print(EError, "Obey filename is missing\n");
+				Print(EAlways, "Obey filename is missing\n");
 			}
 	}	
 }
@@ -399,10 +398,10 @@ TInt ProcessDataDriveMain(char* aobeyFileName,char* alogfile) {
 			// Drive image creation.
 			retstatus = userImage->CreateImage(alogfile);
 			if(retstatus == KErrNone) {
-				cout << "\nSuccessfully generated the Drive image : " << mainObeyFile->iDriveFileName << "\n";
+				Print (EAlways, "\nSuccessfully generated the Drive image : %s \n",mainObeyFile->iDriveFileName);
 			}
 			else {
-				cout << "\nFailed to generate the Image : " << mainObeyFile->iDriveFileName << "\n";
+				Print (EError, "Failed to generate the Image : %s\n",mainObeyFile->iDriveFileName);
 			}
 			delete userImage; 
 		}
@@ -437,10 +436,10 @@ TInt ProcessSmrImageMain(char* aObeyFileName, char* /* alogfile */) {
 				retstatus = smrImage->CreateImage();
 			}
 			if(retstatus == KErrNone) {
-				cout << "\nSuccessfully generated the SMR image : " << smrImage->GetImageName().c_str() << "\n";
+				Print (EAlways,  "\nSuccessfully generated the SMR image : %s\n" ,smrImage->GetImageName().c_str());
 			}
 			else {
-				cout << "\nFailed to generate the Image : " << smrImage->GetImageName().c_str() << "\n";
+				Print (EError, "\nFailed to generate the Image : %s\n" ,smrImage->GetImageName().c_str());
 			}
 			delete smrImage;
 		}
@@ -472,15 +471,16 @@ TInt main(int argc, char *argv[]){
 #endif		
 	if(gCPUNum > MAXIMUM_THREADS)
 		gCPUNum = MAXIMUM_THREADS;
+	PrintVersion();
 	processCommandLine(argc, argv);
 	//if the user wants to clean up the cache, do it only.
 	if(gCleanCache){
 		try {
 			CacheManager::GetInstance()->CleanCache();
-			printf("Cache has been deleted successfully.\r\n");
+			Print (EAlways, "Cache has been deleted successfully.\n");
 		}
 		catch(CacheException& ce){
-			printf("%s\r\n", ce.GetErrorMessage());
+			Print (EError, "%s\n", ce.GetErrorMessage());
 			return (TInt)1;
 		}
 		return r;
@@ -491,7 +491,7 @@ TInt main(int argc, char *argv[]){
 			CacheManager::GetInstance();
 		}
 		catch(CacheException ce){
-			printf("%s\r\n", ce.GetErrorMessage());
+			Print (EError, "%s\n", ce.GetErrorMessage());
 			return (TInt)1;
 		}
 	}
@@ -503,11 +503,11 @@ TInt main(int argc, char *argv[]){
 	}
 	if(gThreadNum == 0) {
 		if(gCPUNum > 0) {
-			printf("The number of processors (%d) is used as the number of concurrent jobs.\n", gCPUNum);
+			Print (EWarning, "The number of processors (%d) is used as the number of concurrent jobs.\n", gCPUNum);
 			gThreadNum = gCPUNum;
 		}
 		else {
-			printf("WARNING: Can't automatically get the valid number of concurrent jobs and %d is used.\n", DEFAULT_THREADS);
+			Print (EWarning, "Can't automatically get the valid number of concurrent jobs and %d is used.\n", DEFAULT_THREADS);
 			gThreadNum = DEFAULT_THREADS;
 		}
 	}
@@ -525,7 +525,6 @@ TInt main(int argc, char *argv[]){
 				char* logfile = 0;
 				if(Getlogfile(driveobeyFileName,logfile) == KErrNone) {
 					H.SetLogFile(logfile);
-					PrintVersion();
 					GetLocalTime();
 					r = ProcessDataDriveMain(driveobeyFileName,logfile);   
 					H.CloseLogFile();
@@ -534,7 +533,7 @@ TInt main(int argc, char *argv[]){
 						return KErrNoMemory;
 				}
 				else {
-					cout << "Error : Invalid obey file name : " << driveobeyFileName << "\n" ;   
+					Print(EError,"Invalid obey file name : %s\n", driveobeyFileName);   
 				}
 			}
 			driveobeyFileName = ptr;
@@ -554,7 +553,6 @@ TInt main(int argc, char *argv[]){
 				char * logfile = 0;
 				if(Getlogfile(smrImageObeyFileName,logfile) == KErrNone){
 					H.SetLogFile(logfile);
-					PrintVersion();
 					GetLocalTime();
 					r = ProcessSmrImageMain(smrImageObeyFileName, logfile);
 					H.CloseLogFile();
@@ -563,7 +561,7 @@ TInt main(int argc, char *argv[]){
 						return KErrNoMemory;
 				}
 				else {
-					cout << "Error: Invalid obey file name: " << smrImageObeyFileName << "\n";
+					Print(EError,"Invalid obey file name: %s", smrImageObeyFileName);
 				}
 			}
 			smrImageObeyFileName = ptr;
@@ -572,8 +570,7 @@ TInt main(int argc, char *argv[]){
 	}
 	// Process Rofs Obey files.
 	if(obeyFileName) {
-		H.SetLogFile("ROFSBUILD.LOG");
-		PrintVersion();
+		H.SetLogFile("ROFSBUILD.LOG");		
 		ObeyFileReader *reader = new ObeyFileReader(obeyFileName); 
 		if (!reader->Open())
 			return KErrGeneral;
@@ -661,9 +658,7 @@ TInt main(int argc, char *argv[]){
 			r = extensionRofs->WriteImage(0);	
 
 			delete extensionRofs;
-			delete extensionObeyFile;			
 			extensionRofs = 0;
-			extensionObeyFile = 0;
 		} while (r == KErrNone);
 		if(RofsImage) {
 			delete RofsImage;									

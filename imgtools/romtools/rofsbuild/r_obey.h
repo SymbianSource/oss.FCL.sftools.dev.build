@@ -26,6 +26,7 @@
 #include <stdio.h>
 #include <e32capability.h>
 #include <kernel/kernboot.h>
+#include "fatdefines.h"
 
 #include <vector>
 #include <map>
@@ -46,6 +47,7 @@ enum EKeyword
 	EKeywordNone=0,	// backwards compatibility, but now ignored
 	EKeywordFile,
 	EKeywordData,
+	EKeywordDir,
 	EKeywordRofsName,
 	EKeywordExtensionRofs, 
 	EKeywordCoreRofsName,
@@ -178,7 +180,8 @@ private:
 	};
 
 class CPatchDataProcessor;
-struct ConfigurableFatAttributes;
+// Configurable FAT attributes
+
 
 class CObeyFile
 	{
@@ -194,10 +197,9 @@ public:
 	TRomNode* iRootDirectory;
 	TInt iNumberOfDataFiles;
 	// Added to support Data Drive Images.
-	char* iDriveFileName;
-	TInt64 iDataSize;
+	char* iDriveFileName; 
 	char* iDriveFileFormat;
-	ConfigurableFatAttributes* iConfigurableFatAttributes;
+	ConfigurableFatAttributes iConfigurableFatAttributes;
 
 private:
 	ObeyFileReader& iReader;
@@ -252,6 +254,7 @@ private:
 	
 	static TBool GetNextBitOfFileName(char*& epocEndPtr);
 	static const char *IsValidFilePath(const char *aPath);
+	static const char* IsValidDirPath(const char* aPath);
 
 	TBool iAutoSize;
 	TUint32 iAutoPageSize;

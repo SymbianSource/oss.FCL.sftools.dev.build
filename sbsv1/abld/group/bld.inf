@@ -1,0 +1,146 @@
+// Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
+// All rights reserved.
+// This component and the accompanying materials are made available
+// under the terms of "Eclipse Public License v1.0"
+// which accompanies this distribution, and is available
+// at the URL "http://www.eclipse.org/legal/epl-v10.html".
+//
+// Initial Contributors:
+// Nokia Corporation - initial contribution.
+//
+// Contributors:
+//
+// Description:
+// 
+//      ******* IMPORTANT CHANGE TO THE CONTENTS OF THIS FILE (2010/02/11) *******
+//
+//      Some of the content of this file has been moved to another bld.inf.
+// 	    (this is in response to http://developer.symbian.org/bugs/show_bug.cgi?id=151)
+//
+//      If you were planning to edit the "buildsystem" exports, e.g.
+//                  TEMPLATE EXTENSION MAKEFILES FOR ABLD
+//      ...then you now need to go to the following bld.inf to make the change.
+//      ../../buildsystem/group/bld.inf
+// 
+//      **** END OF IMPORTANT CHANGE TO THE CONTENTS OF THIS FILE (2010/02/11) ****
+//
+
+
+// ORIGINAL bld.inf contents (e32toolp component) follow
+PRJ_PLATFORMS
+TOOLS2
+
+PRJ_EXPORTS
+
+// Symbian Build System common files
+../e32util/defutl.pm 			/epoc32/tools/Defutl.pm
+../e32util/e32tpver.pm 			/epoc32/tools/E32tpver.pm
+../e32util/efreeze.pl 			/epoc32/tools/efreeze.pl
+../e32util/h2inc.pl 			/epoc32/tools/h2inc.pl
+../e32util/makedef.pl 			/epoc32/tools/makedef.pl
+../e32util/prepdef.pl 			/epoc32/tools/prepdef.pl
+../genutil/pathutl.pm 			/epoc32/tools/Pathutl.pm
+../e32util/createrfifile.pl		/epoc32/tools/createrfifile.pl
+../e32util/gendef.pl 			/epoc32/tools/gendef.pl
+../e32util/set-rvct.bat 		/epoc32/tools/set-rvct.bat
+../e32util/omapsig.pl			/epoc32/tools/omapsig.pl
+../platform/sym_lkup_util.pl		/epoc32/tools/sym_lkup_util.pl
+../platform/ARMV5.mk			/epoc32/tools/compilation_config/ARMV5.mk
+../platform/extractvars.make		/epoc32/tools/compilation_config/extractvars.make
+../platform/GCCE.mk			/epoc32/tools/compilation_config/GCCE.mk
+../genutil/listzip.pl			/epoc32/tools/listzip.pl
+../genutil/conv_khronos_openvg_hdr_to_cpp.pl        /epoc32/tools/conv_khronos_openvg_hdr_to_cpp.pl 
+../genutil/ecopyfile.pl        /epoc32/tools/ecopyfile.pl
+../genutil/conv_khronos_hdr_to_cpp.pl        /epoc32/tools/conv_khronos_hdr_to_cpp.pl  
+../e32util/armasm2as.pl        /epoc32/tools/armasm2as.pl
+../e32util/copyfeaturevariants.pl        /epoc32/tools/copyfeaturevariants.pl 
+
+// BSF files
+../platform/armv6.bsf        /epoc32/tools/armv6.bsf 
+../platform/armv6t2.bsf        /epoc32/tools/armv6t2.bsf 
+../platform/gccev7.bsf        /epoc32/tools/gccev7.bsf 
+../platform/armv5smp.bsf        /epoc32/tools/armv5smp.bsf 
+../platform/armv6smp.bsf        /epoc32/tools/armv6smp.bsf 
+../platform/gccev6t2.bsf        /epoc32/tools/gccev6t2.bsf
+../platform/gccev6.bsf        /epoc32/tools/gccev6.bsf 
+../platform/armv6_abiv1.bsf        /epoc32/tools/armv6_abiv1.bsf 
+../platform/armv7.bsf        /epoc32/tools/armv7.bsf  
+
+#ifdef SBSV2
+#ifndef TOOLS2_LINUX
+// export Symbian Build System v1 in case of no confliction.
+
+../genutil/modload.pm        /epoc32/tools/modload.pm  
+../bldmake/linkdeps.pl        /epoc32/tools/linkdeps.pl  
+../platform/cl_gccxml.pm        /epoc32/tools/cl_gccxml.pm 
+../platform/ide_cw.pm        /epoc32/tools/ide_cw.pm 
+../platform/cl_gcc.pm        /epoc32/tools/cl_gcc.pm 
+../toolinfo/gcce_plat2set.pm        /epoc32/tools/gcce_plat2set.pm 
+../platform/cl_x86gcc.pm        /epoc32/tools/cl_x86gcc.pm 
+../platform/filenamepolicyexclusions.txt        /epoc32/tools/filenamepolicyexclusions.txt 
+../makmake/makdeps.pm        /epoc32/tools/makdeps.pm 
+../e32util/epocmbm.pl        /epoc32/tools/epocmbm.pl 
+../platform/cl_edg.pm        /epoc32/tools/cl_edg.pm 
+../platform/cl_tools.pm        /epoc32/tools/cl_tools.pm 
+../e32util/fixsource.bat        /epoc32/tools/fixsource.bat 
+../platform/cl_generic.pm        /epoc32/tools/cl_generic.pm 
+../platform/e32variant.pm        /epoc32/tools/e32variant.pm 
+../platform/bpabiutl.pm        /epoc32/tools/bpabiutl.pm 
+../genutil/prepfile.pm        /epoc32/tools/prepfile.pm 
+../platform/ide_vc6.pm        /epoc32/tools/ide_vc6.pm 
+../bldmake/bldmake.pl        /epoc32/tools/bldmake.pl 
+../e32util/checkgcc.pm        /epoc32/tools/checkgcc.pm 
+../e32util/epocrc.pl        /epoc32/tools/epocrc.pl 
+../memtrace/memtrace.bat        /epoc32/tools/memtrace.bat 
+../platform/cw_project_template_v3.xml        /epoc32/tools/cw_project_template_v3.xml 
+../bldmake/abld.pl        /epoc32/tools/abld.pl 
+../platform/default_plats.txt        /epoc32/tools/default_plats.txt 
+../platform/e32plat.pm        /epoc32/tools/e32plat.pm 
+../e32util/_secure_e32env.pm        /epoc32/tools/e32env.pm 
+../e32util/deletefeaturevariants.pl        /epoc32/tools/deletefeaturevariants.pl 
+../platform/cw_link_descriptor_template_v2.cwlink        /epoc32/tools/cw_link_descriptor_template_v2.cwlink 
+../makmake/mmp.pm        /epoc32/tools/mmp.pm 
+../genutil/err_formatter.pl        /epoc32/tools/err_formatter.pl 
+../platform/cl_bpabi.pm        /epoc32/tools/cl_bpabi.pm 
+../bldmake/metabld.bat        /epoc32/tools/metabld.bat 
+../e32util/epocrc.bat        /epoc32/tools/epocrc.bat 
+../platform/lockit_info.pm        /epoc32/tools/lockit_info.pm 
+../toolinfo/rvct_plat2set.pm        /epoc32/tools/rvct_plat2set.pm 
+../platform/default_plats_v2.txt        /epoc32/tools/default_plats_v2.txt 
+../platform/cl_x86.pm        /epoc32/tools/cl_x86.pm 
+../platform/cl_mingw.pm        /epoc32/tools/cl_mingw.pm 
+../bldmake/metabld.pl        /epoc32/tools/metabld.pl 
+../e32util/checksource.pl        /epoc32/tools/checksource.pl 
+../makmake/makmake.pl        /epoc32/tools/makmake.pl 
+../platform/findimp.pl        /epoc32/tools/findimp.pl 
+../e32util/checksource.pm        /epoc32/tools/checksource.pm 
+../e32util/genshimsrc.bat        /epoc32/tools/genshimsrc.bat 
+../toolinfo/rvct_ver2set.pm        /epoc32/tools/rvct_ver2set.pm   
+../e32util/selectbootmak.pl        /epoc32/tools/selectbootmak.pl 
+../makmake/makhelp.pm        /epoc32/tools/makhelp.pm 
+../platform/cl_codewarrior.pm        /epoc32/tools/cl_codewarrior.pm 
+../bldmake/wrappermakefile.pm        /epoc32/tools/wrappermakefile.pm 
+../genutil/genutl.pm        /epoc32/tools/genutl.pm 
+../platform/cl_vscw.pm        /epoc32/tools/cl_vscw.pm 
+../e32util/epocaif.pl        /epoc32/tools/epocaif.pl 
+../bldmake/bldmake.bat        /epoc32/tools/bldmake.bat 
+../e32util/listfeaturevariants.pl        /epoc32/tools/listfeaturevariants.pl 
+../memtrace/memtrace.pl        /epoc32/tools/memtrace.pl 
+../genutil/ermdir.pl        /epoc32/tools/ermdir.pl 
+../platform/armutl.pm        /epoc32/tools/armutl.pm 
+../platform/cl_arm.pm        /epoc32/tools/cl_arm.pm 
+../makmake/makmake.bat        /epoc32/tools/makmake.bat 
+../e32util/featurevariantparser.pm        /epoc32/tools/featurevariantparser.pm 
+../makmake/_secure_trgtype.pm        /epoc32/tools/trgtype.pm 
+../genutil/emkdir.pl        /epoc32/tools/emkdir.pl 
+../platform/cw_link_descriptor_template.cwlink        /epoc32/tools/cw_link_descriptor_template.cwlink  
+../genutil/output.pm        /epoc32/tools/output.pm 
+../e32util/efreeze.bat        /epoc32/tools/efreeze.bat 
+../platform/cw_project_template_v4.xml        /epoc32/tools/cw_project_template_v4.xml 
+../platform/fcloggerutl.pm        /epoc32/tools/fcloggerutl.pm 
+../platform/cl_win.pm        /epoc32/tools/cl_win.pm 
+../e32util/featurevariantmap.pm        /epoc32/tools/featurevariantmap.pm 
+../e32util/preprocessor.pm        /epoc32/tools/preprocessor.pm 
+../platform/winutl.pm        /epoc32/tools/winutl.pm 
+#endif
+#endif

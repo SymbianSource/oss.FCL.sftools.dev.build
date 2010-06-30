@@ -1,0 +1,258 @@
+#!perl
+# Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+# 
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+# 
+# Contributors:
+# 
+# Description:
+# 
+#
+
+use strict;
+use FindBin;
+use lib "$FindBin::Bin";
+use Getopt::Long;
+use File::Path;
+use IniData;
+use RelData;
+use RelTransfer::Import;
+use CommandController;
+
+
+#
+# Globals.
+#
+
+my $verbose = 0;
+my $ftpResume = 0;
+my $iniData;
+my $commandController;
+my $envcomp;
+my $envver;
+my $passphraseFile;
+my $force;
+my $noPassphraseRetry;
+my %goodImports;
+my %failedImports;
+my %alreadyImported;
+
+#
+# Main.
+#
+
+ProcessCommandLine();
+ImportEnvironment();
+PrintReport();
+
+#
+# Subs.
+#
+
+sub ProcessCommandLine {
+  Getopt::Long::Configure ("bundling");
+  my $help;
+  GetOptions("h" => \$help, "v+" => \$verbose, "r" => \$ftpResume, "p=s" => \$passphraseFile, "f" => \$force, "noPassphraseRetry" => \$noPassphraseRetry);
+
+  if ($help) {
+    Usage(0);
+  }
+
+  $envcomp = lc($ARGV[0]);
+  $envver = $ARGV[1];
+
+  unless (defined $envcomp and defined $envver and $#ARGV = -1) {
+    print "Error: Invalid arguments\n";
+    Usage(1);
+  }
+  $iniData = IniData->New(undef,1);
+  $commandController = CommandController->New($iniData, 'ImportEnv');
+  #if ftp resume option is used override value in reltools.ini
+  if ($ftpResume) {
+    $iniData->FtpServerSupportsResume(1);
+  }
+}
+
+sub Usage {
+  my $exitCode = shift;
+
+  Utils::PrintDeathMessage($exitCode, "\nUsage: importenv [options] <component> <external_version>
+
+options:
+
+-h  help
+-r  use FTP reconnect and resume transfer mode
+-v  verbose output (-vv very verbose)
+-p <file>  file containing passphrase
+-f  force the re-import of component releases
+--noPassphraseRetry  Will cause ImportEnv to terminate if an incorrect passphrase is specified
+
+N.B. You will be prompted for your passphrase unless the -p option is specified.
+Use of the -p option is NOT recommended though, as storing your passphrase in a file is considered a security risk.\n");
+}
+
+sub ReadPassphraseFile {
+  return undef unless $passphraseFile;
+  open(PP, $passphraseFile) or die "Couldn't open passphrase file \"$passphraseFile\" because $!\n";
+  my $passphrase = join ("\n", <PP>);
+  close PP;
+  return $passphrase;
+}
+
+sub ImportEnvironment {
+  my $importer = RelTransfer::Import->New(ini_data => $iniData, force => $force,
+					  verbose => $verbose, passphrase => ReadPassphraseFile);
+
+  #import the release to get the environment information
+  eval {
+    $importer->TransferRelease($envcomp, $envver, $noPassphraseRetry);
+  };
+  if ($@) {
+    print $@;
+    die "Aborting import of $envcomp $envver environment\n";
+  }
+
+  #read the environment information and transfer releases
+  print "Reading $envcomp $envver environment...\n" if ($verbose);
+  my $relData = RelData->Open($iniData, $envcomp, $envver, $verbose);
+  my %env = %{$relData->Environment()};
+
+  delete $env{$envcomp};
+
+  #do the import checking for errors
+
+  foreach my $comp (sort keys %env) {
+    my $imported;
+    my $ver = $env{$comp};
+    eval {
+      $imported = $importer->TransferRelease($comp, $ver, $noPassphraseRetry);
+    };
+    if ($@) {
+      print $@;
+      if ($@ =~ /cannot\s+connect/i) {
+        print "\nAborting import of $envcomp $envver environment\n";
+        last;
+      }
+      my $error = $@;
+      chomp $error;
+      $error =~ s/^error: ("?$comp $ver"? )?//i;
+      $failedImports{$comp}->{$ver} = $error;
+
+      print "Aborting import of $envcomp $envver environment\n";
+      last;
+    }
+    else {
+      if ($imported) {
+        push (@{$goodImports{$comp}}, $ver);
+      } else {
+        push (@{$alreadyImported{$comp}}, $ver);
+      }
+    }
+  }
+}
+
+sub PrintReport {
+  print "\n=========IMPORT SUMMARY==========\n";
+
+  my $tableData = [["Component", "Version", "status"]];
+
+  foreach my $comp (sort keys %goodImports) {
+    foreach my $ver (@{$goodImports{$comp}}) {
+      push (@$tableData, [$comp, $ver, 'successfully imported']);
+    }
+  }
+    
+  foreach my $comp (sort keys %alreadyImported) {
+    foreach my $ver (@{$alreadyImported{$comp}}) {
+      push (@$tableData, [$comp, $ver, 'has already been imported']);
+    }
+  }
+  
+  $iniData->TableFormatter->PrintTable($tableData, 1);
+
+  if (scalar (keys %alreadyImported) > 0) {
+    print "\nYou can specify the -f option to force the re-import of component releases\n";
+  }
+ 
+  if (keys %failedImports) {
+    print "\n=========FAILED IMPORTS==========\n";
+    print "\nImport Failure Summary\n\n";
+    my $failureTableData = [["Component", "Version", "Failure reason"]];
+    foreach my $comp (sort keys %failedImports) {
+      foreach my $ver (sort keys %{$failedImports{$comp}}) {
+        push (@$failureTableData, [$comp, $ver, $failedImports{$comp}->{$ver}]);
+      }
+    }
+    $iniData->TableFormatter->PrintTable($failureTableData, 1);
+    print "\nError: Unable to import environment successfully. Environment might be corrupted.\n";
+  }
+  else
+  {
+    if (keys %goodImports) {
+      print "\nEnvironment $envcomp $envver successfully imported\n";
+    } else {
+      print "\nNothing to do!\n";
+    }
+  }
+}
+
+__END__
+
+=head1 NAME
+
+ImportEnv - Imports the environment from which a component release was made.
+
+=head1 SYNOPSIS
+
+  importenv [options] <component> <version>
+
+options:
+
+  -h  help
+  -r  use FTP reconnect and resume transfer mode
+  -v  verbose output (-vv very verbose)
+  -p <file>  file containing passphrase
+  -f  force the re-import of component releases
+  --noPassphraseRetry  Will cause ImportEnv to terminate if an incorrect passphrase is specified
+
+=head1 DESCRIPTION
+
+When a release is made, a description of the environment it was made from is stored with it.
+C<ImportEnv> takes a component name and version, reads the environment data for this
+component and imports the necessary releases from a remote site if they do not already
+exist on the local archive. If the environment data is not available from the local archive
+an attempt is made to import this component first.
+
+If the C<-r> option is used and the FTP connection is dropped during the download of a release, the tools will automatically reconnect to the FTP site and resume the download. This feature may not be supported by some FTP servers.
+
+It is recommended NOT to use the -p option; you will be prompted for your
+passphrase. Having a file containing your passphrase is be a security risk.
+
+=head1 KNOWN BUGS
+
+None
+
+=head1 COPYRIGHT
+
+ Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+ All rights reserved.
+ This component and the accompanying materials are made available
+ under the terms of the License "Eclipse Public License v1.0"
+ which accompanies this distribution, and is available
+ at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ 
+ Initial Contributors:
+ Nokia Corporation - initial contribution.
+ 
+ Contributors:
+ 
+ Description:
+ 
+
+=cut

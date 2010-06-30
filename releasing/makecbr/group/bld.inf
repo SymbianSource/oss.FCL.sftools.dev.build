@@ -1,0 +1,50 @@
+// Copyright (c) 2005-2009 Nokia Corporation and/or its subsidiary(-ies).
+// All rights reserved.
+// This component and the accompanying materials are made available
+// under the terms of the License "Eclipse Public License v1.0"
+// which accompanies this distribution, and is available
+// at the URL "http://www.eclipse.org/legal/epl-v10.html".
+// 
+// Initial Contributors:
+// Nokia Corporation - initial contribution.
+// 
+// Contributors:
+// 
+// Description:
+// 
+//
+
+PRJ_PLATFORMS
+
+PRJ_EXPORTS
+
+../CBROutputFile.xml							/tools/makecbr/CBROutputFile.xml
+../CConfig.pm											/tools/makecbr/CConfig.pm
+../COutputHandler.pm							/tools/makecbr/COutputHandler.pm
+../CProcessStage.pm								/tools/makecbr/CProcessStage.pm
+../CStageRunner.pm								/tools/makecbr/CStageRunner.pm
+../MakeCBR.pl											/tools/makecbr/MakeCBR.pl
+../Win32/Pipe.pm									/tools/makecbr/Win32/Pipe.pm
+../test/CExampleStage.pm					/tools/makecbr/test/CExampleStage.pm
+../test/CTestScore.pm							/tools/makecbr/test/CTestScore.pm
+../test/runtests.pl								/tools/makecbr/test/runtests.pl
+../test/unit_CConfig.pm						/tools/makecbr/test/unit_CConfig.pm
+../test/unit_CProcessStage.pm			/tools/makecbr/test/unit_CProcessStage.pm
+../test/unit_CStageRunner.pm			/tools/makecbr/test/unit_CStageRunner.pm
+../test/unit_stage_CDelta.pm			/tools/makecbr/test/unit_stage_CDelta.pm
+../stages/CCheckEnv.pm						/tools/makecbr/stages/CCheckEnv.pm
+../stages/CCheckMrpUpdates.pm			/tools/makecbr/stages/CCheckMrpUpdates.pm
+../stages/CCleanUp.pm							/tools/makecbr/stages/CCleanUp.pm
+../stages/CConfigureRepair.pm			/tools/makecbr/stages/CConfigureRepair.pm
+../stages/CCreateDrive.pm					/tools/makecbr/stages/CCreateDrive.pm
+../stages/CDelta.pm								/tools/makecbr/stages/CDelta.pm
+../stages/CGetPrevRel.pm					/tools/makecbr/stages/CGetPrevRel.pm
+../stages/CInstallGTConflicts.pm	/tools/makecbr/stages/CInstallGTConflicts.pm
+../stages/CPrepGTRelease.pm				/tools/makecbr/stages/CPrepGTRelease.pm
+../stages/CReleaseEnv.pm					/tools/makecbr/stages/CReleaseEnv.pm
+../stages/CRemoveNonGT.pm					/tools/makecbr/stages/CRemoveNonGT.pm
+../stages/CStoreMrpState.pm				/tools/makecbr/stages/CStoreMrpState.pm
+../stages/CBRRepair/cbrfix.pm			/tools/makecbr/stages/CBRRepair/cbrfix.pm
+../stages/CBRRepair/CBRPatch.pm		/tools/makecbr/stages/CBRRepair/CBRPatch.pm
+../stages/CBRRepair/cbrproblem.pm	/tools/makecbr/CBRRepair/cbrproblem.pm
+../Parallel/ForkManager.pm				/tools/makecbr/Parallel/ForkManager.pm

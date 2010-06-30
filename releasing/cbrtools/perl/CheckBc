@@ -1,0 +1,307 @@
+#!perl
+# Copyright (c) 2002-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+# 
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+# 
+# Contributors:
+# 
+# Description:
+# 
+#
+
+require 5.006_001;
+use strict;
+use FindBin;
+use Pod::Usage;
+use lib "$FindBin::Bin";
+use Getopt::Long;
+use CheckBc;
+
+$|++;
+
+#
+# Main.
+#
+
+ProcessCommandLine();
+
+
+#
+# Subs.
+#
+
+sub ProcessCommandLine {
+  Getopt::Long::Configure ("bundling");
+  my $help;
+  my $verbose;
+  my @additionalHeaders;
+  my @additionalIncludePaths;
+  my @ignoreClasses;
+  my $ignoreR3Unused = 0;
+  my $whichChecks = { noClassSize => 0, noDef => 0, noVtable => 0 };
+  GetOptions('h' => \$help, 'v+' => \$verbose, 'c' => \$whichChecks->{noClassSize}, 'd' => \$whichChecks->{noDef}, 't' => \$whichChecks->{noVtable}, 'header=s' => \@additionalHeaders, 'include=s' => \@additionalIncludePaths, 'ignore=s' => \@ignoreClasses, 'ignoreR3UNUSED+' => \$ignoreR3Unused);
+
+  if ($help) {
+    Usage($verbose);
+  }
+
+  my $allNo = 1;
+  foreach my $thisCheck (keys %{$whichChecks}) {
+    unless ($whichChecks->{$thisCheck}) {
+      $allNo = 0;
+      last;
+    }
+  }
+  if ($allNo) {
+    print "\nError: Specified options have disabled all the checks\n\n";
+    Usage();
+  }
+
+  if (scalar(@ARGV) == 1) {
+    my $descriptionFile = shift @ARGV;
+    HandleDescriptionFile($descriptionFile, $ignoreR3Unused, $whichChecks, $verbose);
+  }
+  elsif (scalar(@ARGV) == 2) {
+    my $bldInfDir1 = shift @ARGV;
+    my $bldInfDir2 = shift @ARGV;
+    HandleBldInfPair($bldInfDir1, $bldInfDir2, \@additionalHeaders, \@additionalIncludePaths, \@ignoreClasses, $ignoreR3Unused, $whichChecks, $verbose);
+  }
+  else {
+    print "Error: Invalid arguments\n";
+    Usage();
+  }
+}
+
+sub Usage {
+  my $verbose = shift;
+  if ($verbose) {
+    system("perldoc $0");
+  }
+  else {
+    pod2usage(-verbose => 1);
+  }
+  die ("\n");
+}
+
+sub HandleBldInfPair {
+  my $bldInfDir1 = shift;
+  my $bldInfDir2 = shift;
+  my $additionalHeaders = shift;
+  my $additionalIncludePaths = shift;
+  my $ignoreClasses = shift;
+  my $ignoreR3Unused = shift;
+  my $whichChecks = shift;
+  my $verbose = shift;
+  my $checkBc = CheckBc->New($bldInfDir1, $bldInfDir2, $verbose, undef, $additionalHeaders, $additionalIncludePaths, $ignoreClasses, $ignoreR3Unused);
+  if (DoCheck($checkBc, $whichChecks)) {
+    print "Check passed\n";
+  }
+  else {
+    print "Check failed\n";
+  }
+}
+
+sub HandleDescriptionFile {
+  my $descriptionFile = shift;
+  my $ignoreR3Unused = shift;
+  my $whichChecks = shift;
+  my $verbose = shift;
+  open (DESC, $descriptionFile) or die "Error: Couldn't open \"$descriptionFile\": $!\n";
+  my $lineNum = 0;
+  while (my $thisLine = <DESC>) {
+    ++$lineNum;
+    chomp $thisLine;
+    $thisLine =~ s/^\s*$//;
+    $thisLine =~ s/#.*//;
+    next if ($thisLine eq '');
+    $thisLine =~ s/^\s+//;
+    @ARGV = split (/\s+/, $thisLine);
+    my @additionalHeaders;
+    my @additionalIncludePaths;
+    my @ignoreClasses;
+    GetOptions('header=s' => \@additionalHeaders, 'include=s' => \@additionalIncludePaths, 'ignore=s' => \@ignoreClasses);
+    my $component = shift @ARGV;
+    my $bldInfDir1 = shift @ARGV;
+    my $bldInfDir2 = shift @ARGV;
+    unless ($component and $bldInfDir1 and $bldInfDir2) {
+      die "Error: Invalid line in $descriptionFile($lineNum)\n";
+    }
+    print "=== $component\n";
+    eval {
+      my $checkBc = CheckBc->New($bldInfDir1, $bldInfDir2, $verbose, $component, \@additionalHeaders, \@additionalIncludePaths, \@ignoreClasses, $ignoreR3Unused);
+      if (DoCheck($checkBc, $whichChecks)) {
+	print "=== $component passed ===\n";
+      }
+      else {
+	print "=== $component failed ===\n";
+      }
+    };
+    if ($@) {
+      print $@;
+      print "===\n";
+    }
+  }
+  close (DESC);
+}
+
+sub DoCheck {
+  my $checkBc = shift;
+  my $whichChecks = shift;
+  my $passed = 1;
+  unless ($whichChecks->{noDef}) {
+    unless ($checkBc->CheckDefFiles() and $passed) {
+      $passed = 0;
+    }
+  }
+  unless ($whichChecks->{noClassSize}) {
+    unless ($checkBc->CheckClassSizes() and $passed) {
+      $passed = 0;
+    }
+  }
+  unless ($whichChecks->{noVtable}) {
+    unless ($checkBc->CheckVTables() and $passed) {
+      $passed = 0;
+    }
+  }
+  return $passed;
+}
+
+__END__
+
+=head1 NAME
+
+CheckBc - Runs some simple tests to see if one component source tree is backwards compatible another.
+
+=head1 SYNOPSIS
+
+  checkbc [options] (<bld_inf_dir_1> <bld_inf_dir_2>) | <description_file>
+
+Options:
+
+  -h  help
+  -c  don't check class sizes
+  -d  don't check def files
+  -t  don't check vtables
+  -v  verbose output (-vv very verbose)
+
+Additional options for use on a per component basis:
+
+  --ignoreR3UNUSED
+  --ignore  <class_to_ignore>
+  --header  <additional_header_file>
+  --include <additional_include_path>
+
+=head1 DESCRIPTION
+
+C<CheckBc> is a tool that attempts to discover if one release of a component has broken backwards compatibility with another. It is currently able to perform the following checks:
+
+=over 4
+
+=item 1
+
+Compares the ARM F<.def> files to ensure that only new lines have been added to the end of the file.
+
+=item 2
+
+Compares the sizes of any classes that have an exported C++ constructor. This is done by compiling some generated C++ code that uses the C<sizeof> operator to print the relevant class sizes to C<STDOUT>.
+
+=item 3
+
+Compares the v-table layouts of any classes that have an exported C++ constructor. This is done by compiling each source code set to ARM4 assembler listings, comparing the v-table sections.
+
+=back
+
+There are two ways of envoking C<CheckBc>:
+
+=over 4
+
+=item 1 By specifying a pair of F<bld.inf> directories
+
+Given the location of two F<bld.inf> files (say, C<bld_inf_1> and C<bld_inf_2>), C<CheckBc> attempts to discover if the source code referred by by C<bld_inf_2> is backwards compatible with C<bld_inf_1>.
+
+=item 2 By specifying a list of F<bld.inf> directory pairs in a text file
+
+The text file must have the following line format:
+
+  <component_name>  <bld_inf_dir_1>  <bld_inf_dir_2> [options]
+
+Any text following a 'C<#>' character will be ignored.
+
+=back
+
+Using either invokation method, the following options can be specified as many times as required:
+
+=over 4
+
+=item * --ignoreR3UNUSED
+
+Indicates that differences between F<.def> files relating to the R3UNUSED export stub optimisation should be ignored.
+
+=item * --header <additional_header>
+
+Specifies an additional #include statement to be included in the generated C++. This option can be used to get headers that don't include all the headers they need to compile. Common headers are automatically included (e32std.h, e32def.h and e32base.h), but occasionally others are also required.
+
+=item * --include <additional_include_path>
+
+Specifies an additional path that the pre-processor should use to find header files.
+
+=item * --ignore <class_to_ignore>
+
+Specifies the name of a class that should be ignored from a class size point of view. This option can be useful if components release librarys that are intended for debugging purposes only and so are not required to maintain backwards compatibility.
+
+=back
+
+=head1 LIMITATIONS
+
+=over 4
+
+=item 1
+
+The component's headers must compile using Microsoft's Visual C++ compiler.
+
+=item 2
+
+The component's exported headers must compile when they are all #include'd into a single F<.cpp> file. If this isn't the case, then the C<--header> option can be used to add additional headers.
+
+=item 3
+
+Declarations of the component's exported C++ constructors must be found in one of the exported headers.
+
+=item 4
+
+F<.def> file lines are expected to be identical. This can lead to checks failing falsely because, for example, the name of a function may be changed without breaking BC provided the F<.def> file is carefully edited.
+
+=item 5
+
+The components must compile as ARM4. This is likely to mean that each set of source code needs to be accompanied with a suitable F<\epoc32> tree that allows it to be built. The simplest way to acheive this is to prepare a pair of subst'd drives.
+
+=back
+
+=head1 KNOWN BUGS
+
+F<bld.inf>, F<.mmp> and F<.def> file parsing is probably not as industrial strength as it should be.
+
+=head1 COPYRIGHT
+
+ Copyright (c) 2002-2009 Nokia Corporation and/or its subsidiary(-ies).
+ All rights reserved.
+ This component and the accompanying materials are made available
+ under the terms of the License "Eclipse Public License v1.0"
+ which accompanies this distribution, and is available
+ at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ 
+ Initial Contributors:
+ Nokia Corporation - initial contribution.
+ 
+ Contributors:
+ 
+ Description:
+ 
+
+=cut

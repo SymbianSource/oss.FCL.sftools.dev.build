@@ -1,0 +1,250 @@
+#!perl
+# Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+# 
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+# 
+# Contributors:
+# 
+# Description:
+# 
+#
+
+use strict;
+use FindBin;
+use lib "$FindBin::Bin";
+use Getopt::Long;
+use IniData;
+use RelData;
+use EnvDb;
+use NotesCompiler;
+use CommandController;
+
+
+#
+# Globals.
+#
+
+my $verbose = 0;
+my $iniData = IniData->New();
+my $commandController = CommandController->New($iniData, 'ViewNotes');
+my $comp1;
+my $ver1;
+my $comp2;
+my $ver2;
+my $compSummary;
+my $envSummary;
+my $diffEnvSummary;
+my $projectFilter;
+my $numberFilter;
+my $outputLocation;
+my $outputSTDOUTonly;
+my $htmlNotes="";
+#
+# Main.
+#
+
+ProcessCommandLine();
+
+if ($htmlNotes eq "") {
+  # User didn't specify --html or --nohtml
+  $htmlNotes = $iniData->HtmlNotes();
+}
+my $notesCompiler = NotesCompiler->New($iniData, $comp1, $ver1, $verbose, $outputLocation, $outputSTDOUTonly, $htmlNotes);
+$notesCompiler->SetProjectFilter($projectFilter);
+$notesCompiler->SetVersionNumberFilter($numberFilter);
+if ($compSummary) {
+  if ($outputSTDOUTonly) {
+    die "Error: Cannot use -s with -t\n";
+    Usage(1);
+  }
+  $notesCompiler->DoCompSummary();
+}
+elsif ($envSummary or (not $comp1 and not $ver1)) {
+  if ($outputSTDOUTonly && $envSummary) {
+    die "Error: Cannot use -e with -t\n";
+    Usage(1);
+  }
+  elsif ($outputSTDOUTonly and (not $comp1 and not $ver1)){
+    die "Error: When using the -t flag, either <component> or <version> (or both) must be specified\n";
+    Usage(1);
+  }
+  
+  $notesCompiler->DoEnvSummary();
+}
+elsif ($diffEnvSummary) {
+  $notesCompiler->DoDiffEnvSummary($comp2, $ver2);
+}
+else {
+  $notesCompiler->DoStandardNotes();
+}
+if ($outputLocation) {
+  print "LAUNCH LOCATION: ".$notesCompiler->HtmlMainFile();
+}
+elsif (!$outputSTDOUTonly){
+  system "start ".$notesCompiler->HtmlFileName();
+}
+
+
+#
+# Subs.
+#
+
+sub ProcessCommandLine {
+  Getopt::Long::Configure ("bundling");
+  my $help;
+  GetOptions('h' => \$help, 'e' => \$envSummary, 's' => \$compSummary, 'v+' => \$verbose, 'd' => \$diffEnvSummary, 'p=s' => \$projectFilter, 'n=s' => \$numberFilter, 'o=s' => \$outputLocation, 't' => \$outputSTDOUTonly, 'html!' => \$htmlNotes);
+
+  if ($help) {
+    Usage(0);
+  }
+
+  $comp1 = shift @ARGV;
+  $ver1 = shift @ARGV;
+  $comp2 = shift @ARGV;
+  $ver2 = shift @ARGV;
+
+  if (@ARGV) {
+    print "Error: Invalid arguments\n";
+    Usage(1);
+  }
+
+  if (defined ($compSummary) + defined ($envSummary) + defined ($diffEnvSummary) > 1) {
+    print "Error: Incompatible options\n";
+    Usage(1);
+  }
+
+  if ($projectFilter || $numberFilter) {
+    unless ($compSummary || $diffEnvSummary || $envSummary) {
+      print "Error: the -p and -n filters don't make sense if you're just viewing the notes for one release\n";
+      Usage(1);
+    }
+  }
+
+  if ($compSummary) {
+    unless ($comp1) {
+      print "Error: A component must be specified when using the -s option\n";
+      Usage(1);
+    }
+    if ($ver1) {
+      print "Error: Too many arguments\n";
+      Usage(1);
+    }
+  }
+  elsif ($diffEnvSummary) {
+    if ($comp2 && !$ver2) {
+      print "Error: You must specify a version number for each component\n";
+      Usage(1);
+    }
+    unless ($comp1 && $ver1) {
+      print "Error: You must specify a component and version to difference against\n";
+      Usage(1);
+    }
+  }
+  elsif ($comp1 and not $ver1) {
+    SetVersionToCurrent();
+  }
+}
+
+sub Usage {
+  my $exitCode = shift;
+
+  Utils::PrintDeathMessage($exitCode, "
+Usage: viewnotes [options] [[-t] <component> [<version>]]
+       viewnotes [options] -s <component>
+       viewnotes [options] -e [<component> [<version>]]
+       viewnotes [options] -d [-t] <component> <version> [<component> <version>]
+
+options:
+
+-h  help
+-s  display a summary all releases made to date for a specified component
+-e  display a summary of all the releases in the specified environment
+-d  display a report of all the changes between two environments
+-v  verbose output (-vv very verbose)
+-t  output HTML directly to STDOUT, without generating a file
+-p <project> only display notes for releases in this project
+-n <version Number> only display notes for releases whose number matches this
+--html   Display notes made using tools v2.83.1013 and earlier as html
+--nohtml Display notes made using tools v2.83.1013 and earlier as plain text
+
+The --html and --nohtml options override the html_notes setting in reltools.ini\n");
+}
+
+sub SetVersionToCurrent {
+  my $envDb = EnvDb->Open($iniData);
+  $ver1 = $envDb->Version($comp1);
+  unless (defined $ver1) {
+    die "Error: $comp1 not installed in current environment\n";
+  }
+}
+
+
+
+=head1 NAME
+
+ViewNotes - View the release notes of a component release.
+
+=head1 SYNOPSIS
+
+       viewnotes [options] [[-t] <component> [<version>]]
+       viewnotes [options] -s <component>
+       viewnotes [options] -e [<component> [<version>]]
+       viewnotes [options] -d [-t] <component> <version> [<component> <version>]
+       
+options:
+
+  -h  help
+  -s  display a summary all releases made to date for a specified component
+  -e  display a summary of all the releases in the specified environment
+  -d  display a report of all the changes between two environments
+  -v  verbose output (-vv very verbose)
+  -t  output HTML directly to STDOUT, without generating a file
+  -p <project> only display notes for releases in this project
+  -n <version Number> only display notes for releases whose number matches this
+  --html   Display notes made using tools v2.83.1013 and earlier as html
+  --nohtml Display notes made using tools v2.83.1013 and earlier as plain text
+
+=head1 DESCRIPTION
+
+Launches a web browser to view the HTML release notes of the requested component release. Without C<-s>, C<-e> or C<-d>, it displays the notes for a single component version. If the version is specified, the notes for that component version are displayed. If the version is not specified, the notes for the currently installed component version are displayed. If the version is not specified and the component is currently C<pending release>, the notes for the component are displayed for previewing. 
+
+The C<-s> switch may be used to display a summary of all releases made to date (most recent first). The C<-e> switch displays notes for all the components in the specified environment (or your current environment, if you don't specify one).
+
+The C<-d> switch produces a single page which shows the release notes for all components which have changed between two environments. This page contains the release notes for each changed release, including any intervening releases which may exist on your release archive.
+
+The C<-s>, C<-e> and C<-d> switches all produce information for several releases. In all cases, but especially with C<-d>, you may not want information produced for every release. You can therefore use C<-p> and C<-n> to filter the releases for which you want to see the notes. The C<-n> switch can take a regular expression, so that you can (for example) show only releases starting with a certain phrase.
+
+The C<-t> switch will not create a file, but instead, will output the HTML to STDOUT. The output to STDOUT is useful for viewnotes to be built into other scripts and provides more flexibility in viewing release notes.
+
+The C<--html> and C<--nohtml> switches override the setting of the html_notes keyword in your reltools.ini file.  This setting controls how the text in release notes made using tools version 2.83.1013 and earlier is displayed in a web browser - either as html (allowing tags to be used) or as plain text.  Note that release notes used with newer versions of tools use the <html/> element to specify whether the text is html or not at time of writing, so this setting is ignored with those releases.
+
+(Note: there is also a C<--dummy> switch, which prompts the page to be generated but not displayed in a web browser. This is intended for the use of test scripts).
+
+=head1 KNOWN BUGS
+
+None.
+
+=head1 COPYRIGHT
+
+ Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+ All rights reserved.
+ This component and the accompanying materials are made available
+ under the terms of the License "Eclipse Public License v1.0"
+ which accompanies this distribution, and is available
+ at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ 
+ Initial Contributors:
+ Nokia Corporation - initial contribution.
+ 
+ Contributors:
+ 
+ Description:
+ 
+
+=cut

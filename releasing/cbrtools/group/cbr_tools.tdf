@@ -1,0 +1,15 @@
+<tool name="CBR Tools" description="Component Based Release tools for integration and transferring releases" version="2.84.3">
+	<properties>
+		<property type="toolLogic" name="Path" value="$INSTDIR\cbr"/>
+	</properties>
+	<templates>
+		<template type="nsis" operation="preconfigure" name="src/tools/product/tools/cbr/group/cbr.preconfigure.nsh" />
+		<template type="xsl" operation="install" name="cbr_installer.xsl"/>
+	</templates>
+	<files>
+		<zip source="\tools\cbr\cbrtools*.zip" target="$INSTDIR/cbr"/>
+	</files>
+	<dependencies>
+		<dependency name="CBR Documentation"/>
+	</dependencies>
+</tool>

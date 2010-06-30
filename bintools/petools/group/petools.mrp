@@ -1,0 +1,9 @@
+component       dev_build_bintools_petools
+
+source          /src/tools/build/bintools/petools
+exports         /src/tools/build/bintools/petools/group
+binary          /src/tools/build/bintools/petools/group all
+
+notes_source	\component_defs\release.src
+
+ipr T 

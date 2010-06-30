@@ -33,87 +33,92 @@ BEGIN
     @EXPORT  = qw(&obyparse_info &obyparse_init &obyparse_process);
 }
 
-my $conf = "";
+my $conf;
 
 sub obyparse_info()
 {
     return({
         name       => "obyparse",
-        invocation => "InvocationPoint2",
+        invocation => "InvocationPoint2",  # tmp6.oby
         initialize => "obyparse::obyparse_init",
         single     => "obyparse::obyparse_process"});
 }
 
 sub obyparse_init($)
 {
-    plugin_init("obyparse.pm", $conf = shift());
+    plugin_init(&obyparse_info, $conf = shift(), 0);
 }
 
 sub obyparse_readconffile($$$$$);
-
+sub obyparse_findincfiles();
+sub obyparse_findspifiles();
 
 sub obyparse_process($)
 {
-    plugin_start("obyparse.pm", $conf);
+    plugin_start(&obyparse_info, $conf);
 
-    my $obydata = shift();
-    my %targets = ();
-    my %patchdata = ();
-    my ($romfiles, $rofs1files, $udebfiles, $urelfiles) = (undef, undef, "", "");
-    my $fname = "";
+    my ($obydata, $romfiles, $rofs1files, $udebfiles, $urelfiles, $fname) = (shift(), undef, undef, "", "", "");
+    my %targets = my %patchdata = ();
+
+    obyparse_findincfiles();
+    obyparse_findspifiles();
+    plugin_reset();
 
     foreach (@$obydata)
     {
-        next if (my $parse = parse_obyline($_)) < 0;
+        next if !(my $parse = parse_obyline($_));
 
-        if (($parse == 1) && ($gKeyword =~ FILEBITMAPSPECKEYWORD)) {
-            ($fname = lc($gTarget)) =~ /^(?:.*\\)?(.+?)$/;
-            my $tname = $1;
-            $targets{$fname} = $targets{$tname} = [$gLnum - 1, !$gRomid && ($gKeyword =~ ROFSBITMAPFILESPECKEYWORD)];
+        if (($parse == 2) && ($gKeyword =~ FILEBITMAPSPECKEYWORD)) {
+            $targets{$gTgtCmp} = $targets{File::Basename::basename($gTgtCmp)} = [$gLnum - 1,
+                !$gRomid && ($gKeyword =~ ROFSBITMAPFILESPECKEYWORD) && ($gAttrib !~ /paging_unmovable/i)]
+                    if ($gImgid == $gRomidCmp);
+            dprint(2, "Removed attribute paging_unmovable: `$_'")
+                if ($gAttrib =~ /paging_unmovable/i) && (s/\s+paging_unmovable\s*(?=\s|^)//i);
             next;
         }
 
         next if !/^\s*OBYPARSE_(ROM|ROFS1|UDEB|UREL)\s+(.+?)\s*$/i;
 
         (my $rule, $fname) = (uc($1), $2);
+        $_ = "$gHandlestr $_";
+        next if $gRomid && ($gImgid != $gRomidCmp);
+
+        dprint(2, "#$gLnum: `$gLine'");
         my $files = ($rule eq "ROM" ? \$romfiles : ($rule eq "ROFS1" ? \$rofs1files :
             ($rule eq "UDEB" ? \$udebfiles : \$urelfiles)));
         $$files = "" if !defined($$files);
-        dprint(2, "#$gLnum: `$gLine'");
 
         if ($fname ne "*") {
             my $basedir = "";
             ($basedir, $fname) = ($1, $2) if $fname =~ /^(.*[\/\\])(.+?)$/;
             dprint(3, "Found " . obyparse_readconffile($basedir, $fname, $rule, $files, 0) . " entries");
-        }
-        else {
-            $$files = ".*";
+        } else {
             dprint(3, "Move/change all possible components to $rule");
+            $$files = ".*";
         }
-        $_ = "$gHandlestr $_";
     }
 
     $romfiles   = qr/^($romfiles)$/i   if defined($romfiles);
     $rofs1files = qr/^($rofs1files)$/i if defined($rofs1files);
     ($udebfiles, $urelfiles) = (qr/^($udebfiles)$/i, qr/^($urelfiles)$/i);
 
-    ($gLnum, $gRomid) = (0, 0);
-    my ($rofs1cnt, $udebcnt, $urelcnt, $offset, @torofs1) = (0, 0, 0, 0, ());
+    my ($rofs1ofs, $udebcnt, $urelcnt, @torofs1) = (0, 0, 0, ());
+    plugin_reset();
 
     foreach (@$obydata)
     {
         my $parse = parse_obyline($_);
-        $offset++ if $gRomid < 2;
-        next if $parse != 1;
+        $rofs1ofs++ if ($gRomid < 2);
+        next if ($parse != 2) || ($gImgid != $gRomidCmp);
 
         if ($gKeyword =~ /^patchdata$/i) {
-            $gSource =~ /^(.+?)(?:@.+)?$/;
-            $fname = lc($1);
+            $gSrcCmp =~ /^(.+?)(?:@.+)?$/;
+            next if !exists($targets{$fname = $1});
             $patchdata{$fname} = $targets{$fname}[0] if !exists($patchdata{$fname});
+            next if !$targets{$fname}[1];
         }
-        else {
-            $gTarget =~ /^(?:.*\\)?(.+?)$/;
-            $fname = $1;
+        elsif ($gKeyword =~ FILEBITMAPSPECKEYWORD) {
+            $fname = File::Basename::basename($gTgtCmp);
             if ($fname =~ $urelfiles && s/(?<=[\/\\])udeb(?=[\/\\])/urel/i) {
                 $urelcnt++;
                 dprint(2, "Changed to UREL: `$_'");
@@ -122,67 +127,105 @@ sub obyparse_process($)
                 $udebcnt++;
                 dprint(2, "Changed to UDEB: `$_'");
             }
+            next if !$targets{$gTgtCmp}[1];
         }
+        elsif ($gKeyword =~ DIRECTORYKEYWORD) {
+            $fname = File::Basename::basename($gTgtCmp);
+            next if !(exists($targets{$gTgtCmp}) && $targets{$gTgtCmp}[1]) &&
+                !(exists($targets{$fname}) && $targets{$fname}[1]);
+        }
+        else { next }
 
-        next if $gRomid || !defined($romfiles) && !defined($rofs1files);
-
-        if (($gKeyword =~ ROFSBITMAPFILESPECKEYWORD) ||
-            ($gKeyword =~ /^patchdata$/i) && exists($targets{$fname}) && $targets{$fname}[1]) {
-        }
-        elsif ($gKeyword =~ /^(?:alias|rename)/i && exists($targets{lc($gSource)}) && $targets{lc($gSource)}[1]) {
-            $gSource =~ /^(?:.*\\)?(.+?)$/;
-            $fname = $1;
-        }
-        else {
-            next;
-        }
-        if (defined($rofs1files) && ($fname =~ $rofs1files) || defined($romfiles) && ($fname !~ $romfiles)) {
-            $rofs1cnt++;
+        if (!$gRomid && (defined($rofs1files) && ($fname =~ $rofs1files) || defined($romfiles) && ($fname !~ $romfiles))) {
             push(@torofs1, $_);
-            $_ = "$gHandlestr =>ROFS1 $_";
+            $_ = "$gHandlestr $_";
         }
     }
 
-    dprint(3, "Moved $rofs1cnt entries to ROFS1")    if $rofs1cnt;
+    dprint(3, "Moved " . scalar(@torofs1) . " entries to ROFS1") if @torofs1;
     dprint(3, "Changed $udebcnt components to UDEB") if $udebcnt;
     dprint(3, "Changed $urelcnt components to UREL") if $urelcnt;
 
-    dprint(2, "Found " . keys(%patchdata) . " ROM-patched components:") if %patchdata;
+    dprint(3, "Finding ROM-patched components");
     foreach (sort({$a <=> $b} values(%patchdata))) {
-        ${$obydata}[$_] =~ /^(?:$gHandlestr =>ROFS1 )?(.+)$/;
+        ${$obydata}[$_] =~ /^(?:$gHandlestr )?(.+)$/;
         parse_keyline($1);
         dprint(2, "`$gSource'");
     }
+    dprint(3, "Found " . keys(%patchdata) . " ROM-patched components");
 
-    splice(@$obydata, $offset, 0, @torofs1) if @torofs1;
+    splice(@$obydata, $rofs1ofs, 0, @torofs1) if @torofs1;
 
     plugin_end();
 }
 
+sub obyparse_findincfiles()
+{
+    my ($drive, $indent, $prev, $tmpoby, %files) =
+        (Cwd::cwd() =~ /^([a-z]:)/i ? $1 : "", -2, "", "$gWorkdir/tmp1.oby", ());
+
+    dprint(3, "Finding include hierarchy from `$tmpoby'");
+    open(FILE, $tmpoby) or dprint(-3, "$gPluginname can't open `$tmpoby'"), return;
+
+    while (my $line = <FILE>) {
+        next if ($line !~ /^#\s+\d+\s+"(.+?)"(?:\s+(\d))?$/);
+        my ($file, $flag) = ($1, defined($2) ? $2 : 0);
+        next if ($file =~ /^<.*>$/);
+        $indent -= 2, $prev = $file, next if ($flag == 2);
+        next if (!$flag && $file eq $prev || $flag > 1);
+        $indent += 2 if $flag;
+        ($prev = $file) =~ /^(.*[\/\\])?(.+?)$/;
+        (my $dir, $file) = ("", $2);
+        $dir = abspath(defined($1) ? $1 : ".");
+        dprint(2, ("." x $indent) . "`$prev' !!!"), next if ($dir eq "");
+        $dir =~ s/^$drive|\/$//gi;
+        $files{lc($file = "$dir/$file")} = 1;
+        dprint(2, ("." x $indent) . "`$file'");
+    }
+    close(FILE);
+    dprint(3, "Found " . keys(%files) . " different include files");
+}
+
+sub obyparse_findspifiles()
+{
+    my ($spicnt, $tmpoby) = (0, "$gWorkdir/tmp5.oby");
+
+    dprint(3, "Finding SPI input files from `$tmpoby'");
+    open(FILE, $tmpoby) or dprint(-3, "$gPluginname can't open `$tmpoby'"), return;
+
+    while (my $line = <FILE>) {
+        next if (parse_obyline($line) != 2) || ($gKeyword !~ /^spidata/i);
+        $spicnt++;
+        dprint(2, "`$gSource'" . ($gKeyword =~ /^spidata$/i ? "" : " ($gKeyword)"));
+    }
+    close(FILE);
+    dprint(3, "Found $spicnt SPI input files");
+}
 
 sub obyparse_readconffile($$$$$)
 {
     my ($basedir, $file, $type, $files, $indent) = @_;
-    $file = $basedir . $file;
+    $file = "$basedir$file";
     my $filecnt = 0;
 
-    dprint(3, "Reading $type files") if $type;
-    dprint(3, ("." x $indent) . "`$file'");
+    dprint(3, "Reading $type files from $file") if $type;
+    dprint(2, ("." x $indent) . "`$file'");
 
-    open(FILE, $file) or die("ERROR: Can't open `$file'\n");
+    open(FILE, $file) or dprint(3, "Error: $gPluginname can't open $file", 1), die("\n");
+    my @files = <FILE>;
+    close(FILE);
 
-    foreach my $line (<FILE>) {
-        if ($line =~ /^\s*#include\s+(.+?)\s*$/i) {
+    foreach (@files) {
+        if (/^\s*#include\s+(.+?)\s*$/i) {
             $filecnt += obyparse_readconffile($basedir, $1, "", $files, $indent + 2);
             next;
         }
-        next if ($line =~ /^\s*$/) || ($line =~ /^\s*(?:#|\/\/|REM\s)/i);
+        next if (/^\s*$/) || (/^\s*(?:#|\/\/|REM\s)/i);
         $filecnt++;
-        (my $fname = $line) =~ s/^\s+|\s+$//g;
-        $fname =~ s/(.)/{'*' => '.*', '?' => '.', '[' => '[', ']' => ']'}->{$1} || "\Q$1\E"/ge;
+        (my $fname = $_) =~ s/^\s+|\s+$//g;
+        $fname =~ s/(.)/{"*" => ".*", "?" => "."}->{$1} || "\Q$1\E"/eg;
         $$files .= ($$files eq "" ? "" : "|") . $fname;
     }
-    close(FILE);
     return($filecnt);
 }
 

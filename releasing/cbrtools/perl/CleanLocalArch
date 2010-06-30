@@ -1,0 +1,486 @@
+#!perl
+# Copyright (c) 2001-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+# 
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+# 
+# Contributors:
+# 
+# Description:
+# 
+#
+
+use strict;
+use FindBin;
+use lib "$FindBin::Bin";
+use Getopt::Long;
+use IniData;
+use RelData;
+use File::Copy;
+use File::Path;
+use File::Spec;
+use File::Basename;
+use Cleaner;
+use Utils;
+use Cwd;
+
+#
+# Globals.
+#
+
+my $verbose = 0;
+my $overwrite = 0;
+my $dummyRun = 0;
+my $descriptionFile;
+my $iniData = IniData->New();
+my $cleaner; # object that does most of it
+my $cleanTo;
+my $expunge = 0; # don't leave reldatas lying around
+my $reallyClean;
+
+#
+# Main.
+#
+
+ProcessCommandLine();
+$cleaner = Cleaner->New($iniData, 0, $verbose, $reallyClean); # 0 = local not remote
+ParseDescriptionFile($descriptionFile);
+$cleaner->SetCleaningSubroutine(\&CleaningSubroutine);
+if (!$expunge) {
+  $cleaner->SetRevertingSubroutine(\&RevertingSubroutine);
+}
+$cleaner->Clean();
+
+
+#
+# Subs.
+#
+
+sub ProcessCommandLine {
+  Getopt::Long::Configure ("bundling");
+  my $help;
+  GetOptions('h' => \$help, 'd' => \$dummyRun, 'v+' => \$verbose, 'o' => \$overwrite, 'r' => \$reallyClean);
+
+  if ($help) {
+    Usage(0);
+  }
+
+  $descriptionFile = shift @ARGV;
+
+  unless ($descriptionFile) {
+    print "Error: Archive cleaning description file not specified\n";
+    Usage(1);
+  }
+
+  unless ($#ARGV == -1) {
+    print "Error: Invalid number of arguments\n";
+    Usage(1);
+  }
+
+  if ($dummyRun and not $verbose) {
+    $verbose = 1;
+  }
+}
+
+sub Usage {
+  my $exitCode = shift;
+
+  Utils::PrintDeathMessage($exitCode, "\nUsage: cleanlocalarch [options] description-file
+
+options:
+
+-h  help
+-d  dummy run (don't do anything) - assumes -v
+-r  really clean (removes corrupt and partially released components)
+-v  verbose output (-vv very verbose)
+-o  overwrite destination (delete destination then normal copy)
+
+Please note, if you are in the process of publishing components to the archive
+and specify the -r option you may lose partially released components.\n");
+
+}
+
+sub ParseDescriptionFile {
+  if ($dummyRun) { print "Running in dummy mode...\n"; }
+  if ($verbose) { print "Parsing \"$descriptionFile\"...\n"; }
+  open (DES, $descriptionFile) or die "Unable to open \"$descriptionFile\" for reading: $!\n";
+
+  while (my $line = <DES>) {
+    # Remove line feed, white space and comments.
+    chomp($line);
+    $line =~ s/^\s*$//;
+    $line =~ s/#.*//;
+    if ($line eq '') {
+      # Nothing left.
+      next;
+    }
+
+    my $keyWord;
+    my @operand;
+    if ($line =~ /^(\w+)\s+(.*)/) {
+      $keyWord = $1;
+      @operand = ();
+      if ($2) {
+        @operand = split /\s+/, $2;
+      }
+    } else {
+      $keyWord = $line;
+    }
+
+    unless (defined $keyWord) {
+      die "Error: Invalid line in \"$descriptionFile\":\n$line\n";
+      next;
+    }
+
+    if ($cleaner->ProcessDescriptionLine($descriptionFile, $keyWord, @operand)) {
+      # We're happy because Cleaner.pm knows what to do with this line
+    } elsif ($keyWord =~ /^clean_to$/) {
+      unless ($#operand == 0) {
+        die "Error: Incorrect number of arguments to \'$keyWord\' keyword in \"$descriptionFile\"\nSyntax: clean_to <path>\n";
+      }
+      if ($cleanTo) {
+        die "Error: \'$keyWord\' keyword specifed more than once in \"$descriptionFile\"\n";
+      }
+      $cleanTo = $operand[0];
+    } elsif ($keyWord =~ /^delete$/) {
+      if (@operand) {
+        die "Error: Incorrect number of arguments to \'$keyWord\' keyword in \"$descriptionFile\"\nSyntax: delete\n";
+      }
+    } elsif ($keyWord =~ /^expunge$/) {
+      $expunge = 1;
+      $cleaner->{expunge_already_cleaned} = 1;
+    } elsif ($keyWord =~ /^no_prompt$/) {
+      print "Warning: currently, CleanLocalArch does not prompt. 'no_prompt' keyword is redundant.\n";
+    } else {
+      die "Error: Unknown keyword \'$keyWord\' in \"$descriptionFile\"\n";
+    }
+  }
+
+  close (DES);
+
+  unless ($cleanTo || $expunge) {
+    die "Error: \"Clean to\" path not specified in \"$descriptionFile\"\n";
+  }
+  if ($cleanTo && $expunge) {
+    die "Error: can't specify both \"clean_to\" and \"expunge\" in \"$descriptionFile\"\n";
+  }
+
+  if ($verbose > 1) {
+    $cleaner->PrintEnvsToKeep();
+  }
+}
+
+sub CleaningSubroutine {
+  # This actually gets run by Cleaner.pm (it's a callback)
+  my $thisComp = shift;
+  my $thisVer = shift;
+  my $relDir = shift;
+  if ($expunge) {
+    print "Expunging $thisComp $thisVer from $relDir...\n" if ($verbose);
+    return DeleteComp($relDir);
+  }
+  print "Archiving $thisComp $thisVer from $relDir to $cleanTo...\n" if ($verbose);
+  my $cleanDir = "$cleanTo\\$thisComp\\$thisVer";
+  
+  if (CopyComp($relDir, $cleanDir)) {
+    print "Wiping $thisComp $thisVer from $relDir...\n" if ($verbose);
+    if (DeleteComp("$relDir")) {
+      # Check if the remaining dir is empty
+      my ($parent, $file, $ext) = Utils::SplitFileName($relDir);
+      return DeleteCompIfEmpty($parent);
+    }
+    else {
+      # Call the reverting subroutine here because cleaner.pm will only revert clean components
+      RevertingSubroutine($thisComp, $thisVer, $relDir);
+    }
+  }
+  
+  return 0;
+}
+
+sub RevertingSubroutine {
+  # Again, this gets run by Cleaner.pm
+  my $thisComp = shift;
+  my $thisVer = shift;
+  my $relDir = shift;
+  
+  print "Restoring $thisComp $thisVer to $relDir...\n" if ($verbose);
+  
+  # create the reldir if required
+  if(!-d $relDir) {
+    Utils::MakeDir($relDir);
+  }
+  
+  my $fullCleanToPath = File::Spec->catdir($cleanTo, $thisComp, $thisVer);
+  
+  my $dirContents = Utils::ReadDir($fullCleanToPath);
+  foreach my $thisFile (@$dirContents) {
+     copy(File::Spec->catdir($fullCleanToPath, $thisFile), $relDir);
+  }  
+
+  print "Removing copy of $thisComp $thisVer from $cleanTo...\n" if ($verbose);
+  if (DeleteComp("$cleanTo\\$thisComp\\$thisVer")) {
+    # Check if the remaining dir is empty
+    return DeleteCompIfEmpty("$cleanTo\\$thisComp");
+  }
+  else {
+    # Failed to even delete component
+    return 0;
+  }
+}
+
+sub CopyComp {
+  my $dir = shift;
+  my $destDir = shift;
+
+  if (-e $destDir) {
+    if ($overwrite) {
+      if ($verbose > 0) { print "Overwriting by deleting \"$destDir\"\n"; }
+      DeleteComp("$destDir");
+    }
+    else {
+      print "Error: Can't copy \"$dir\" to \"$destDir\" because directory \"$destDir\" already exists\n";
+      return 0;
+    }
+  }
+
+  my $failed = 0;
+  my @copied;
+  eval {
+    Utils::MakeDir($destDir) unless $dummyRun;
+  };
+  if ($@) {
+    print "$@";
+    $failed = 1;
+  }
+
+  if($failed==0) {
+    my $dirContents = Utils::ReadDir($dir);
+    foreach my $thisFile (@$dirContents) {
+      if ($verbose > 1) { print "\tCopying \"$dir\\$thisFile\" to \"$destDir\"...\n"; }
+      if ($dummyRun) {
+        return 1;
+      }
+      else {
+        if (copy($dir."\\".$thisFile, $destDir)) {
+          push @copied, $thisFile;
+        }
+        else {
+          print "Error: Couldn't copy \"$dir\\$thisFile\" to \"$destDir\": $!\n";
+          $failed = 1;
+          if (-f $destDir."\\".$thisFile) {
+            # Must've part-copied this file
+            push @copied, $thisFile;
+          }
+          last;
+        }
+      }
+    }
+  }
+
+  if ($failed) {
+    # Revert copied files
+    foreach my $thisFile (@copied) {
+      unlink $destDir."\\".$thisFile or print "Error: Couldn't delete $destDir\\$thisFile when cleaning up\n";
+    }
+    DeleteCompIfEmpty($destDir) or print "Error: Couldn't clean up empty directory $destDir\n";
+  }
+
+  return ($failed == 0);
+}
+
+sub DeleteComp {
+  my $dir = shift;
+
+  if (!$dummyRun) {
+    local $SIG{__WARN__} = sub {my $line = shift;
+                                $line =~ s/ at .*$//;
+                                print "Error: $line\n";};
+    
+    my $reldataFile = File::Spec->catdir($dir, 'reldata');
+
+    my $origDir = cwd();
+    chdir(dirname($dir));
+    
+    if (-e $reldataFile) {
+      # Delete the reldata file first, if something goes wrong other tools will identify the archived component
+      # as corrupt by the absence of reldata
+      if (!unlink $reldataFile) {
+        print "Error: Couldn't delete \"$reldataFile\"\n";
+        return 0;
+      }
+    }
+    
+    if (!rmtree($dir, 0, 0) or -d $dir) {
+      print "Error: Couldn't delete \"$dir\"\n";
+      return 0;
+    }
+    else {
+      chdir($origDir);
+      return 1;
+    }
+  }
+  else {
+    return 1;
+  }
+}
+
+sub DeleteCompIfEmpty {
+  my $dir = shift;
+
+  if (!$dummyRun) {
+    if (opendir(DIR, $dir)) {
+      my @files = grep( !/\.\.?$/, readdir DIR);
+      if (!closedir(DIR)) {
+        die "Error: Couldn't close '$dir' after reading. Aborting\n";
+      }
+      if (scalar(@files) == 0) {
+        print "Tidying $dir...\n" if ($verbose);
+        return DeleteComp("$dir");
+
+      }
+      else {
+        return 1; # Nothing to do
+      }
+    }
+    else {
+      print "Warning: Couldn't open '$dir' directory for reading. An empty directory may have been left behind.\n";
+      return 1; # Warning only
+    }
+  }
+  else {
+    return 1; # Dummy run
+  }
+}
+
+__END__
+
+=head1 NAME
+
+CleanLocalArch - Cleans unwanted releases from the local release archive.
+
+=head1 SYNOPSIS
+
+  cleanlocalarch [options] <description_file>
+
+options:
+
+  -h  help
+  -d  dummy run (don't do anything) - assumes -v
+  -r  really clean (removes corrupt and partially released components)
+  -v  verbose output (-vv very verbose)
+  -o  overwrite destination (delete destination then normal copy)
+
+Please note, if you are in the process of publishing components to the archive and specify the -r option you may lose partially released components.
+
+=head1 DESCRIPTION
+
+C<CleanLocalArch> allows releases to be cleaned out of a local archive. This may be useful if a local archive is consuming a large amount of disk space and there are old releases present that are no longer required. Note that releases to be cleaned are normally backed up to a user defined directory before being deleted. This allows the cleaned releases to be permanently archived (to say a writable CDROM) before they are deleted.
+
+If C<CleanLocalArch> encounters an error while backing up releases to be cleaned, it will attempt to back out of the change by deleting the backups of any releases already done. If C<CleanLocalArch> encounters errors while backing out of a clean, it has the potential to leave releases in the backup directory. Similarly, if after backing up all releases to delete, it encounters errors while actually deleting them, it may leave releases in the local archive. However the clean can be repeated to a fresh backup directory once the problem has been isolated to get rid of these releases.
+
+Before using C<CleanLocalArchive> you must write a plain text file that describes which releases you want to keep etc. The following keywords are supported:
+
+=over 4
+
+=item keep_env <component> <version>
+
+Instructs C<CleanLocalArchive> to keep all the component versions in the environment from which the specified component was released. This keyword may be used multiple times.
+
+=item keep_rel <component> <version>
+
+Instructs C<CleanLocalArchive> to keep a specific component release. This keyword may be used multiple times.
+
+=item keep_recent_env <component> <num_days>
+
+Instructs C<CleanLocalArchive> to keep all named component releases, including their environments, where the component release has been made within the specified number of days (since the current time). This keyword may be used multiple times provided it is used for different components each time.
+
+=item keep_recent_rel [component] <num_days>
+
+Instructs C<CleanLocalArchive> to keep any component releases made within the specified number of days (since the current time). If a component name is specified, C<CleanLocalArchive> will only keep component releases which match that name (and are sufficiently recent). This keyword may be used multiple times if the command is used for different components.
+
+=item keep_recent <num_days>
+
+B<Depricated:> Equivalent to keep_recent_rel without a component name entered.
+
+=item clean_to
+
+Specifies where to move release to be cleaned. Use of this keyword is mandatory and may only be used once. There is an alternative, 'expunge', which will actually delete the releases - but this is only intended for test scripts and use on real, important archives is strongly discouraged.
+
+=item force
+
+This keyword, which takes no operands, specifies that cleanlocalarch should be non-interactive.
+
+=back
+
+For example:
+
+ keep_env     pixie alpha
+ keep_env     pixie beta
+ keep_rel     comp1 rel1
+ keep_recent  10
+ clean_to     \\backup\pixie_cleaned_releases
+
+C<CleanLocalArch> will work out which component releases need to be kept in order to satisfy the specified keep criteria. All other component releases found in the archive will be moved to the C<clean_to> directory. B<It is therefore extremely important that the list of environments to keep is complete>. It is recommended that this file be controlled using a configuration management tool. It is also recommended that each project has only one description file, and that all users of C<CleanLocalArch> know where to find it.
+
+Recommended procedure for using C<CleanLocalArch>:
+
+=over 4
+
+=item 1
+
+Inform all users of the archive that a clean is about to be performed, and that the archive will be unavailable whilst this is happening.
+
+=item 2
+
+Take the archive off-line or alter directory permissions such that you are the only person that can access it.
+
+=item 3
+
+Backup the archive.
+
+=item 4
+
+Run C<CleanLocalArchive> and carefully check the list of components that are about to be cleaned. If you are happy, type 'yes' to continue, otherwise type 'no', modify your description file and re-run C<CleanLocalArchive>.
+
+=item 5
+
+Backup the C<clean_to> directory.
+
+=item 6
+
+Bring the archive back on-line.
+
+=item 7
+
+Inform all users of the archive that it is available for use once more.
+
+=back
+
+=head1 STATUS
+
+Supported. If you find a problem, please report it to us.
+
+=head1 COPYRIGHT
+
+ Copyright (c) 2001-2009 Nokia Corporation and/or its subsidiary(-ies).
+ All rights reserved.
+ This component and the accompanying materials are made available
+ under the terms of the License "Eclipse Public License v1.0"
+ which accompanies this distribution, and is available
+ at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ 
+ Initial Contributors:
+ Nokia Corporation - initial contribution.
+ 
+ Contributors:
+ 
+ Description:
+ 
+
+=cut

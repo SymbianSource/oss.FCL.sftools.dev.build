@@ -1,0 +1,366 @@
+#!perl
+# Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+# 
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+# 
+# Contributors:
+# 
+# Description:
+# 
+#
+
+use strict;
+use FindBin;
+use lib "$FindBin::Bin";
+use Getopt::Long;
+use IniData;
+use EnvDb;
+use Utils;
+use PrepRel;
+use CommandController;
+
+
+#
+# Constants.
+#
+
+use constant UPDATED => 0;
+use constant UNCHANGED => 1;
+
+
+#
+# Globals.
+#
+
+my $verbose = 0;
+my $newMrpName;
+my $inputFile;
+my $comp;
+my $ver;
+my $intVer;
+my $iniData = IniData->New();
+my $commandController = CommandController->New($iniData, 'PrepEnv');
+my $envDb;
+my $mode;
+my $samemrps;
+my $fixedIntVer;
+my $printlatestversion;
+my $skipPendingRelease;
+
+
+#
+# Main.
+#
+
+ProcessCommandLine();
+PrepEnv();
+
+
+#
+# Subs.
+#
+
+sub ProcessCommandLine {
+  Getopt::Long::Configure ("bundling");
+  my $help;
+  GetOptions("h" => \$help, "v+" => \$verbose, "m" => \$samemrps, "i=s" => \$fixedIntVer, "l" => \$printlatestversion, "p" => \$skipPendingRelease);
+
+  if ($help) {
+    Usage(0);
+  }
+
+  $inputFile = shift @ARGV;
+
+  unless ($#ARGV == -1) {
+    print "Error: Invalid number of arguments\n";
+    Usage(1);
+  }
+  if ($printlatestversion && $inputFile) {
+    print "Error: can't use -l with an input file\n";
+    Usage(1);
+  }
+  if ($skipPendingRelease && $inputFile) {
+    print "Error: can't use -p with an input file\n";
+    Usage(1);
+  }
+
+  $envDb = EnvDb->Open($iniData, $verbose);
+}
+
+sub Usage {
+  my $exitCode = shift;
+
+  Utils::PrintDeathMessage($exitCode, "\nUsage: prepenv [options] [<input_file_name>]
+
+options:
+
+-h  help
+-v  verbose output (-vv very verbose)
+-m          don't query for MRP location (assume same as previously)
+-i <number> use this internal version number for each component
+
+Options only valid in interactive mode:
+-l          print latest version number
+-p          skip those components that are pending release
+
+Note: if prepenv is failing to recognise some components are dirty,
+run 'envinfo -f' then run 'prepenv' again.\n");
+}
+
+sub PrepEnv {
+  if (defined $inputFile) {
+    HandleInputFile();
+  }
+  else {
+    HandleInteractive();
+  }
+}
+
+sub HandleInputFile {
+  open (IN, $inputFile) or die "Error: Couldn't open $inputFile: $!\n";
+  my $numEntriesUpdated = 0;
+  my $numEntriesAdded = 0;
+  my $numErrors = 0;
+  my $lineNum = 0;
+  while (my $line = <IN>) {
+    ++$lineNum;
+    # Remove line feed, white space and comments.
+    chomp $line;
+    $line =~ s/^\s*$//;
+    $line =~ s/#.*//;
+    if ($line eq '') {
+      # Nothing left.
+      next;
+    }
+
+    local @ARGV;
+    @ARGV = split (/\s+/, $line);
+    my $mrpName;
+    GetOptions("m=s" => \$mrpName);
+    (my $comp, my $ver, my $intVer) = @ARGV;
+    unless (defined $comp and defined $ver and $#ARGV <= 2) {
+      die "Error: Line $lineNum contains invalid arguments in \"$inputFile\"\n";
+    }
+    $intVer ||= undef;
+    $mrpName ||= undef;
+    if (!defined $mrpName && $samemrps) {
+      eval {
+        $mrpName = $envDb->MrpName($comp);
+      };
+      if ($@) {
+        die "Error: Could not get MRP location for \"$comp\", because $@\n";
+      }
+    }
+    if (!defined $intVer && $fixedIntVer) {
+      $intVer = $fixedIntVer;
+    }
+    my $updating = $envDb->Version($comp);
+    if ($verbose) {
+      if (defined $updating) {
+	print "Updating $comp $ver...\n";
+      }
+      else {
+	print "Adding $comp $ver...\n";
+      }
+    }
+    eval {
+      PrepRel::PrepRel($iniData, $envDb, $comp, $ver, $intVer, $mrpName);
+    };
+    if ($@) {
+      print $@;
+      ++$numErrors;
+    }
+    elsif (defined $updating) {
+      ++$numEntriesUpdated;
+    }
+    else {
+      ++$numEntriesAdded;
+    }
+  }
+  close (IN);
+  print "$numEntriesAdded component(s) added, $numEntriesUpdated component(s) updated, $numErrors error(s)\n";
+}
+
+sub HandleInteractive {
+  my $verInfo = $envDb->VersionInfo();
+  my $numUpdatedEntries = 0;
+  my $numUnchangedEntries = 0;
+  foreach my $thisComp (sort keys %{$verInfo}) {
+    my $thisStatus = $envDb->Status($thisComp);
+    if ($thisStatus == EnvDb::STATUS_DIRTY or $thisStatus == EnvDb::STATUS_DIRTY_SOURCE or ($thisStatus == EnvDb::STATUS_PENDING_RELEASE && !$skipPendingRelease)) {
+      my $action = DoInteraction($thisComp, $verInfo->{$thisComp});
+      if ($action == UPDATED) {
+        ++$numUpdatedEntries;
+      }
+      else {
+        ++$numUnchangedEntries;
+      }
+    }
+  }
+  print "$numUpdatedEntries component(s) updated, $numUnchangedEntries component(s) unchanged\n";
+  if ($numUpdatedEntries + $numUnchangedEntries == 0) {
+    my $pendingReleaseString = $skipPendingRelease?"":" or pending release";
+    print <<ENDGIBBER;
+No components appeared dirty$pendingReleaseString. If you were expecting to see more dirty 
+components, run 'envinfo -f' then run prepenv again.
+ENDGIBBER
+  }
+}
+
+sub DoInteraction {
+  my $comp = shift;
+  my $ver = shift;
+  my $modified = 0;
+
+  ShowLatestVer($comp) if $printlatestversion;
+
+  print "$comp version [$ver] ";
+
+  my $newVer = <STDIN>;
+  chomp $newVer;
+  if ($newVer) {
+    $modified = 1;
+  }
+  else {
+    undef $newVer;
+  }
+
+  my $newIntVer;
+  if ($fixedIntVer) {
+    $newIntVer = $fixedIntVer;
+  } else {
+    my $intVer = $envDb->InternalVersion($comp);
+    print "$comp internal version ";
+    if (defined $intVer and !defined $newVer) {
+      print "[$intVer] ";
+    }
+    $newIntVer = <STDIN>;
+    chomp $newIntVer;
+    if ($newIntVer) {
+      $modified = 1;
+    }
+    else {
+      undef $newIntVer;
+    }
+  }
+
+  my $mrpName = $envDb->MrpName($comp);
+  my $newMrpName;
+  if ($samemrps) {
+    $newMrpName = $mrpName;
+  } else {
+    print "$comp mrp name [$mrpName] ";
+    $newMrpName = <STDIN>;
+    chomp $newMrpName;
+    if ($newMrpName) {
+      $modified = 1;
+    }
+    else {
+      undef $newMrpName;
+    }
+  }
+
+  my $return = UNCHANGED;
+  if ($modified) {
+    eval {
+      PrepRel::PrepRel($iniData, $envDb, $comp, $newVer, $newIntVer, $newMrpName);
+    };
+    if ($@) {
+      print $@;
+    }
+    else {
+      $return = UPDATED;
+    }
+  }
+
+  print "\n";
+  return $return;
+}
+
+sub ShowLatestVer {
+  my $comp = shift;
+  my $reldata = RelData->OpenSet($iniData, $comp, $verbose);
+  if ($reldata) {
+    my $reldatum = $reldata->[0];
+    if ($reldatum) {
+      print "$comp: Latest version: ".$reldatum->Version . " (internal version ".$reldatum->InternalVersion.")\n";
+      return;
+    }
+  }
+  print "No previous versions.\n";
+}
+
+__END__
+
+=head1 NAME
+
+PrepEnv - Prepares an environment for release.
+
+=head1 SYNOPSIS
+
+  prepenv [options] [<input_file_name>]
+
+options:
+
+  -h  help
+  -v  verbose output (-vv very verbose)
+  -i  <internal> use this internal version number instead of prompting
+  -m  don't prompt for MRP location
+
+Options valid only in interactive mode:
+
+  -l  show latest version number
+  -p  skip those components that are pending release
+
+=head1 DESCRIPTION
+
+Before an environment can be released, the status of each component that needs to be released must be set to I<pending release> and the new versions and F<mrp> names must be specified. C<PrepEnv> provides two ways of manipulating this information in the environment database:
+
+=over 4
+
+=item 1 Interactively
+
+If no arguments are given to C<PrepEnv>, it will enter an interactive mode asking for version, internal version and mrp name for each component in the database with a status of I<dirty> or I<binaries clean, source dirty> (or I<pending release> unless -p is specified). It won't ask for internal version or MRP name if you have used the -i or -m respectively. The current value of each will be presented in square brackets. Hitting I<return> will preserve the current value. If all the current values are selected for a particular component, it's environment database entry will not be changed, otherwise the values will be updated and its status will be set to I<pending release>.
+
+=item 3 Via an input file
+
+The name of an input file may be specified as an argument. The structure of each line in the file must be as follows:
+
+ <component_name> <version> [<internal_version>] [-m <mrp_name>]
+
+Note, you can optionally specify internal version (assuming the F<reltools.ini> keyword C<require_internal_versions> has not been specified) and F<mrp> name. You can also optionally specify a new F<mrp> name, but to distinguish this from an internal version you much precede it with '-m'.
+
+=back
+
+Note, C<PrepEnv> (and its counterpart C<PrepRel>) do nothing more than update your the environment database. You can execute these commands as many times as you like before running C<MakeEnv> to actually release the environment.
+
+C<PrepEnv> does not always identify dirty components correctly. If you've just made a component dirty, then run C<prepenv> immediately afterwards, it will not notice that dirty component. To solve this you should run C<EnvInfo -f> before running C<PrepEnv>. C<PrepEnv> will then ask you about components correctly. This is a deliberate design decision: otherwise, C<PrepEnv> would have to do a slow environment scan before prompting you. Normally, you'll have run C<envinfo -f> first, so the environment scan is redundant.
+
+=head1 KNOWN BUGS
+
+None.
+
+=head1 COPYRIGHT
+
+ Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+ All rights reserved.
+ This component and the accompanying materials are made available
+ under the terms of the License "Eclipse Public License v1.0"
+ which accompanies this distribution, and is available
+ at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ 
+ Initial Contributors:
+ Nokia Corporation - initial contribution.
+ 
+ Contributors:
+ 
+ Description:
+ 
+
+=cut

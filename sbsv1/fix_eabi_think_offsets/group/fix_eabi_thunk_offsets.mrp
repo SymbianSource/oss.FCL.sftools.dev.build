@@ -1,0 +1,10 @@
+component	dev_build_sbsv1_fix_eabi_thunk_offsets
+
+source	\src\tools\build\sbsv1\fix_eabi_thunk_offsets
+binary	\src\tools\build\sbsv1\fix_eabi_thunk_offsets\group	all
+exports	\src\tools\build\sbsv1\fix_eabi_thunk_offsets\group
+
+notes_source \component_defs\release.src
+
+ipr T
+

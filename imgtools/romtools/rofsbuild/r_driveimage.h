@@ -21,12 +21,8 @@
 #ifndef __R_DRIVEIMAGE_H__
 #define __R_DRIVEIMAGE_H__
 
-#include <fstream>
-#include "filesysteminterface.h" 
+#include <fstream> 
 #include <vector>
-
-typedef vector<void*> EntryReferenceVector;
-typedef	list<CDirectory*> EntryList; 
 
 const TInt KMaxGenBuffer=0x14;  
 
@@ -40,12 +36,8 @@ enum KNodeType
 	};
 
 // File Format Supported.
-struct DriveFileFormatSupported
-	{
-	const char* iDriveFileFormat;
-	enum TFileSystem iFileSystem;
-	};
 
+class TFSNode ;
 // Image creation class.
 class CDriveImage
 	{
@@ -53,37 +45,14 @@ public:
 	CDriveImage(CObeyFile *aObey);
 	~CDriveImage();
 	TInt CreateImage(const char* alogfile);
-	static TBool FormatTranslation(const char* aUserFileFormat,enum TFileSystem& aDriveFileFormat);
-
+	
 private:
-
-	TInt CreateList();
-	TInt GenTreeTraverse(TRomNode* anode,enum KNodeType anodeType);    
-	TInt CreateDirOrFileEntry(TRomNode* atempnode,enum KNodeType aType);   
-	TInt ConstructOptions();
-	TInt PlaceFileTemporary(const TInt afileSize,TRomNode* acurrentNode); 
-	TInt DeleteTempFolder(const char* aTempDirName);
-
-private:
-
+ 
+	TFSNode* PrepareFileSystem(TRomNode* aRomNode); 	
 	// Holds the address of CObeyFile object. used to get the object information.
-	CObeyFile *iObey;
-	// Container required for file sysem module.
-	EntryList iNodeList;
-	// Pointer for nested Container.
-	CDirectory* iParentDirEntry ;
-
-	// For temp storge of Container address.
-	EntryReferenceVector iNodeAddStore;
-
-	// For file format support.
-	static DriveFileFormatSupported iFormatType[];
-	// Reference variable used for converting tree to list.
-	TInt iListReference;
-	// Holds temp folder name. 
-	char *iTempDirName;
-	// Pointer to buffer, which will be used for compression/un-compression purpose.
-	char *iData;
+	CObeyFile *iObey;	  
+	 
+	 
 	};
 
 #endif

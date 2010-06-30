@@ -1,3 +1,18 @@
+Version 2.12.0 (ROFSBUILD)
+===============
+Released by Jason Cui, 13/06/2010
+	1)Large FAT image support in Rofsbuild
+
+Version 2.11.5 (ROFSBUILD)
+===============
+Released by Jason Cui, 10/06/2010
+	1)Empty Directory Support in FAT Image
+
+Version 2.10.5 (rofsbuild)
+===============
+Released by Lorence Wang, 01/06/2010
+	1) DPDEF145488 ROFSBUILD crash on extension image creation
+
 Version 1.1.1 (fixupsym.pl)
 ===============
 Released by Lorence Wang, 12/05/2010

@@ -1,0 +1,215 @@
+#!perl
+# Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+# 
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+# 
+# Contributors:
+# 
+# Description:
+# 
+#
+
+use strict;
+use FindBin;
+use lib "$FindBin::Bin";
+use Getopt::Long;
+use IniData;
+use EnvDb;
+use CommandController;
+use Utils;
+
+#
+# Constants.
+#
+
+my $KMissingFileName = Utils::PrependEpocRoot("\\__missing.txt");
+my $KCompsFileName = Utils::PrependEpocRoot("\\__comps.txt");
+
+
+#
+# Globals.
+#
+
+my $verbose = 0;
+my $noIgnores = 0;
+my $fileName;
+my $iniData = IniData->New();
+my $commandController = CommandController->New($iniData, 'MakeSnapShot');
+my $force;
+
+#
+# Main.
+#
+
+ProcessCommandLine();
+MakeSnapShot();
+
+
+#
+# Subs.
+#
+
+sub ProcessCommandLine {
+  Getopt::Long::Configure ('bundling');
+  my $help;
+  GetOptions('h' => \$help, 'i' => \$noIgnores, 'v+' => \$verbose, 'f' => \$force);
+
+  if ($help) {
+    Usage(0);
+  }
+
+  $fileName = shift @ARGV;
+
+  unless ($fileName and scalar(@ARGV) == 0) {
+    print "Error: Invalid number of arguments\n";
+    Usage(1);
+  }
+
+  unless ($fileName =~ /\.zip$/i) {
+    $fileName .= '.zip';
+  }
+  Utils::AbsoluteFileName(\$fileName);
+}
+
+sub Usage {
+  my $exitCode = shift;
+
+  Utils::PrintDeathMessage($exitCode, "\nUsage: makesnapshot [options] <snap_shot_file_name>
+
+options:
+
+  -h  help
+  -i  include files that are normally ignored (e.g. \\epoc32\\build\\...)
+  -f  (deprecated)
+  -v  verbose output (-vv very verbose)\n");
+}
+
+sub MakeSnapShot {
+  if (-e $fileName) {
+    die "Error: \"$fileName\" already exists\n";
+  }
+  my $envDb = EnvDb->Open($iniData, $verbose);
+  my $compsPendingRelease = $envDb->ComponentsPendingRelease();
+  if (scalar (keys %$compsPendingRelease) > 0) {
+    die "Error: Can't make a snap shot of an environment contains components that are pending release\n";
+  }
+  (my $overallStatus, undef, my $dirtyComps, my $unaccountedFiles, my $duplicates) = $envDb->CheckEnv(1, $noIgnores);
+  if ($overallStatus == EnvDb::STATUS_CLEAN) {
+    print "Environment clean, aborting snap shot creation\n";
+    return;
+  }
+  if (scalar (@$duplicates) > 0) {
+    die "Error: Unexpected duplicates\n";
+  }
+  my @dirtyFiles;
+  foreach my $thisUnaccountedFile (@$unaccountedFiles) {
+    push (@dirtyFiles, Utils::RemoveEpocRoot($thisUnaccountedFile));
+  }
+  my @missingFiles;
+  foreach my $thisComp (@$dirtyComps) {
+    my $binaryList = $envDb->ListBins($thisComp->{comp});
+    shift @$binaryList; # Throw away list header;
+    foreach my $thisFile (@$binaryList) {
+      if ($thisFile->[1] eq EnvDb::STATUS_STRING_FAILED) {
+	push (@dirtyFiles, Utils::RemoveEpocRoot($thisFile->[0]));
+      }
+      elsif ($thisFile->[1] eq EnvDb::STATUS_STRING_MISSING) {
+	push (@missingFiles, Utils::RemoveEpocRoot($thisFile->[0]));
+      }
+    }
+  }
+
+  open (MISSING, ">$KMissingFileName") or die "Error: Couldn't open \"$KMissingFileName\" for writing\n";
+  foreach my $thisFile (@missingFiles) {
+    print MISSING "$thisFile\n";
+  }
+  close (MISSING);
+  push (@dirtyFiles, Utils::RemoveEpocRoot($KMissingFileName));
+
+  my $versionInfo = $envDb->VersionInfo();
+  open (COMPS, ">$KCompsFileName") or die "Error: Couldn't open \"$KCompsFileName\" for writing\n";
+  foreach my $thisComp (sort keys %$versionInfo) {
+    print COMPS "$thisComp $versionInfo->{$thisComp}\n";
+  }
+  close (COMPS);
+  push (@dirtyFiles, Utils::RemoveEpocRoot($KCompsFileName));
+
+  Utils::ZipList($fileName, \@dirtyFiles, $verbose, 0, Utils::EpocRoot());
+  Utils::SetFileReadOnly($fileName);
+
+  unlink ($KMissingFileName) or die "Error: Couldn't delete \"$KMissingFileName\": $!\n";
+  unlink ($KCompsFileName) or die "Error: Couldn't delete \"$KMissingFileName\": $!\n";
+  
+  print "Snapshot \"$fileName\" successfully made\n";
+}
+
+__END__
+
+=head1 NAME
+
+MakeSnapShot - Captures all dirty files in an environment into a user specified zip file that can be used to reproduce the environment.
+
+=head1 SYNOPSIS
+
+  makesnapshot [options] <snap_shot_file_name>
+
+options:
+
+  -h  help
+  -i  include files that are normally ignored (e.g. \epoc32\build\...)
+  -v  verbose output (-vv very verbose)
+
+=head1 DESCRIPTION
+
+The release tools exist to make it relatively straight forward to share binary files in a controlled way. In order to acheive a suitable level of control, a fair amount of rigor is imposed on users when they are making releases. There are times when this is inappropriate. For example, if a user wants to temporarily capture the current state of their environment. The commands C<MakeSnapShot> and C<InstallSnapShot> exist to make it easy to accurately capture the current state of an environment, and subsequently revert to it, without the overhead of doing a full environment release. Snap shots should only be used in preference to full environment releases when there is a B<temporary> need to capture an environment, because:
+
+=over 4
+
+=item 1
+
+No mechansims are provided for exporting or importing snap shots.
+
+=item 2
+
+No release notes are provided with snap shots.
+
+=item 3
+
+The contents of snap shots are inherently dirty - they consist of all the files that could not be accounted for with proper releases. Reliance on snap shots as a means of distributing software would therefore eventually become a self defeating activity since the snap shot files would get larger and larger over time.
+
+=back
+
+C<MakeSnapShot> generates a zip file that contains all the dirty files currently present in the environment. It makes no attempt to understand which component own which files. It also stores some metadata in the zip file; a list of the component versions currently installed, and a list of files that are currently missing from the environment. This can subsequently be used by C<InstallSnapShot> to revert to the snap shot state.
+
+=head1 STATUS
+
+Supported. If you find a problem, please report it to us.
+
+=head1 KNOWN BUGS
+
+None.
+
+=head1 COPYRIGHT
+
+ Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+ All rights reserved.
+ This component and the accompanying materials are made available
+ under the terms of the License "Eclipse Public License v1.0"
+ which accompanies this distribution, and is available
+ at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ 
+ Initial Contributors:
+ Nokia Corporation - initial contribution.
+ 
+ Contributors:
+ 
+ Description:
+ 
+
+=cut

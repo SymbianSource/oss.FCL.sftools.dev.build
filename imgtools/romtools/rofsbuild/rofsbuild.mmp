@@ -24,6 +24,7 @@ TARGETTYPE		exe
 SOURCEPATH	../rofsbuild
 SOURCE			 r_obey.cpp r_build.cpp r_rofs.cpp r_driveimage.cpp r_driveutl.cpp
 SOURCE			 rofsbuild.cpp r_coreimage.cpp r_smrimage.cpp symbolgenerator.cpp
+SOURCE			 fatcluster.cpp fsnode.cpp fatimagegenerator.cpp
 SOURCEPATH	../../imglib/host
 SOURCE			h_utl.cpp h_file.cpp h_mem.cpp utf16string.cpp
 SOURCEPATH ../rofsbuild/src/cache
@@ -42,14 +43,14 @@ source					byte_pair.cpp pagedcompress.cpp
 
 OS_LAYER_SYSTEMINCLUDE_SYMBIAN
 
-USERINCLUDE   ../../imglib/inc ../../imglib/compress ../../imglib/filesystem/include 
+USERINCLUDE   ../../imglib/inc ../../imglib/compress
 USERINCLUDE   ../../imglib/patchdataprocessor/include ../../imglib/parameterfileprocessor/include
 USERINCLUDE	  ../../imglib/memmap/include
 USERINCLUDE   ../rofsbuild/inc
 USERINCLUDE   ../../imglib/boostlibrary/
 USERINCLUDE   ../../imglib/boostlibrary/boost
 
-STATICLIBRARY 	filesystem patchdataprocessor parameterfileprocessor memmap
+STATICLIBRARY 	patchdataprocessor parameterfileprocessor memmap
 STATICLIBRARY   boost_thread-1.39 boost_filesystem-1.39 boost_regex-1.39 boost_system-1.39
 #ifdef TOOLS2_LINUX
 OPTION    GCC -pthread -O2 -Wno-uninitialized

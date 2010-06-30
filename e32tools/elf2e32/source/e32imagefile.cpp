@@ -33,6 +33,7 @@
 #include "h_ver.h"
 #include "checksum.h"
 #include "errorhandler.h"
+#include "byte_pair.h"
 
 #include <string>
 #include <vector>
@@ -56,25 +57,6 @@ template <class T> inline T Align(T v, size_t s)
 	unsigned int res = (val+inc) & mask;
 	return (T)res;
 }
-
-// Need a default constructor for TVersion, but don't want all the other stuff in h_utl.cpp
-/**
-Default constructor for TVersion class.
-@internalComponent
-@released
-*/
-TVersion::TVersion(){}
-
-/**
-Constructor for TVersion class.
-@internalComponent
-@released
-*/
-TVersion::TVersion(TInt aMajor, TInt aMinor, TInt aBuild): 
-	iMajor((TInt8)aMajor), iMinor((TInt8)aMinor), iBuild((TInt16)aBuild)
-{
-}
-
 
 /**
 Constructor for E32ImageChunkDesc class.
@@ -1406,7 +1388,7 @@ This function Paged Pack the compressed data.
 @internalComponent
 @released
 */
-void CompressPages(TUint8 * bytes, TInt size, ofstream& os);
+void CompressPages(TUint8 * bytes, TInt size, ostream& os, CBytePair *aBPE);
 
 
 /**
@@ -1436,15 +1418,16 @@ bool E32ImageFile::WriteImage(const char * aName)
 			os->write(iE32Image, aHeaderSize);
 			
 			// Compress and write out code part
+			CBytePair bpe;
 			int srcStart = GetExtendedE32ImageHeaderSize();
-			CompressPages( (TUint8*)iE32Image + srcStart, iHdr->iCodeSize, *os);
+			CompressPages( (TUint8*)iE32Image + srcStart, iHdr->iCodeSize, *os, &bpe);
 			
 			
 			// Compress and write out data part
 			srcStart += iHdr->iCodeSize;
 			int srcLen = GetE32ImageSize() - srcStart;
 			
-			CompressPages((TUint8*)iE32Image + srcStart, srcLen, *os);		
+			CompressPages((TUint8*)iE32Image + srcStart, srcLen, *os, &bpe);		
 
 		}
 		else if (compression == 0)
@@ -1702,7 +1685,7 @@ TInt E32ImageFile::CheckExportDescription()
 }
 
 
-int  DecompressPages(TUint8 * bytes, ifstream& is);
+int DecompressPages(TUint8 * bytes, istream& is, CBytePair *aBPE);
 
 
 /**
@@ -1773,13 +1756,13 @@ ifstream& operator>>(ifstream& is, E32ImageFile& aImage)
 		oh = aImage.iOrigHdr;
 
 		// Read and decompress code part of the image
-
-		unsigned int uncompressedCodeSize = DecompressPages((TUint8 *) (aImage.iData + orighdrsz), is);
+		CBytePair bpe;
+		unsigned int uncompressedCodeSize = DecompressPages((TUint8 *) (aImage.iData + orighdrsz), is, &bpe);
 
 		
 		// Read and decompress data part of the image
 
-		unsigned int uncompressedDataSize = DecompressPages((TUint8 *) (aImage.iData + orighdrsz + uncompressedCodeSize), is);
+		unsigned int uncompressedDataSize = DecompressPages((TUint8 *) (aImage.iData + orighdrsz + uncompressedCodeSize), is, &bpe);
 
 		if (uncompressedCodeSize + uncompressedDataSize != uncompsize)
 			MessageHandler::GetInstance()->ReportMessage(WARNING, BYTEPAIRINCONSISTENTSIZEERROR);

@@ -1,0 +1,4 @@
+component	whole
+source	\\prefix//source\whole
+binary	/prefix/source\whole	all
+notes_source dummy

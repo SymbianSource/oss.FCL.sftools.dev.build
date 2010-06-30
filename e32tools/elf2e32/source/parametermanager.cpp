@@ -18,7 +18,7 @@
 //
 
 // This must go before ParameterManager.h
-#define __INCLUDE_CAPABILITY_NAMES__
+#define __REFERENCE_CAPABILITY_NAMES__
 #include <e32capability.h>
 
 #include "pl_common.h"

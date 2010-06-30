@@ -1,0 +1,251 @@
+#!perl
+# Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+# 
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+# 
+# Contributors:
+# 
+# Description:
+# 
+#
+
+use strict;
+use FindBin;
+use lib "$FindBin::Bin";
+use Getopt::Long;
+use IniData;
+use EnvDb;
+use MrpData;
+use MakeRel;
+use CommandController;
+
+
+#
+# Globals.
+#
+
+my $verbose = 0;
+my $fixLibs = 0;
+my $iniData = IniData->New();
+my $commandController = CommandController->New($iniData, 'MakeRel');
+my $envDb;
+my $makeRel;
+my $notesSrc;
+my $project;
+my $reallyrun;
+my @mrpData;
+
+
+#
+# Main.
+#
+
+ProcessCommandLine();
+PrintHeinousWarning();
+MakeRel::MakeReleases($iniData, $envDb, \@mrpData, $notesSrc, 'MakeRel', $verbose, $project);
+
+
+#
+# Subs.
+#
+
+sub ProcessCommandLine {
+  Getopt::Long::Configure ("bundling");
+  my $help;
+  my $stdin;
+  GetOptions("h" => \$help, "v+" => \$verbose, "n=s" => \$notesSrc, "p" => \$stdin, "l" => \$fixLibs, "w=s" => \$project, "f" => \$reallyrun);
+
+  if ($help) {
+    Usage(0);
+  }
+
+  # Create the MrpData objects. These will not write any files to disk, and so if any of
+  # them die, there is no need to perform any file system cleanup.
+  if ($#ARGV == -1 and $stdin) {
+    # Read input from STDIN.
+    MakeMrpData(\@mrpData, *STDIN);
+  }
+  elsif ($#ARGV == 0) {
+    # Read input from a file.
+    if (-f $ARGV[0]) {
+      open (IN, $ARGV[0]) or die "Error: Couldn't open $ARGV[0] for reading: $!\n";
+      MakeMrpData(\@mrpData, *IN);
+      close (IN);
+    }
+    else {
+      print "Error: $ARGV[0] is not a file\n";
+      Usage(1);
+    }
+  }
+  elsif ($#ARGV == 1) {
+    # Read input from a single set of command line arguments.
+    if ($iniData->RequireInternalVersions()) {
+      die "Error: Internal version number not specified\n";
+    }
+    else {
+      push (@mrpData, MrpData->New(shift @ARGV, shift @ARGV, '', $iniData, $verbose, $fixLibs));
+    }
+  }
+  elsif ($#ARGV == 2) {
+    # Read input from a single set of command line arguments.
+    push (@mrpData, MrpData->New(shift @ARGV, shift @ARGV, shift @ARGV, $iniData, $verbose, $fixLibs));
+  }
+  else {
+    print "Error: invalid number of arguments\n";
+    Usage(1);
+  }
+
+  $envDb = EnvDb->Open($iniData, $verbose);
+}
+
+sub Usage {
+  my $exitCode = shift;
+
+  Utils::PrintDeathMessage($exitCode, "\nUsage: makerel [options] [[<mrp_file> <version> [<internal_version>]] | [mrp_list_file]]
+
+options:
+
+-h                    help
+-v                    verbose output (-vv very verbose)
+-n <notes_src_file>   compile all release notes using a single source file
+-p                    read a piped mrp list from STDIN
+-l                    copy missing ARMI lib files from THUMB is possible
+-f                    force (no prompting)
+-w <project name>     make the release in this \"project\"
+
+Unsupported tool.\n");
+}
+
+sub PrintHeinousWarning {
+  Utils::QueryUnsupportedTool(<<GUILTY, $reallyrun);
+############################ WARNING ################################
+# Do not use MakeRel  under normal circumstances.   If you  wish to #
+# make a component release,   use the PrepRel and MakeEnv commands. #
+# ( PrepRel to specify the version numbers,  etc.,  then MakeEnv to #
+# actually make the release(s). )                                   #
+#####################################################################
+
+The problem with MakeRel is that it doesn't ensure your environment
+is clean before making the releases. Hence, component releases made
+using MakeRel are not subject to the normal guarantees, that ensure
+users of your release can precisely reproduce what you have on your
+development drive.
+
+Usually, releases made using MakeRel are unacceptable to licensee
+integration teams. Use with caution.
+
+GUILTY
+}
+
+sub MakeMrpData {
+  my $mrpData = shift;
+  local *IN = shift;
+  print "Gathering release info...\n";
+  my @failedReleases;
+  my @lines;
+  while (my $line = <IN>) {
+    # Remove line feed, white space and comments.
+    chomp $line;
+    $line =~ s/^\s*$//;
+    $line =~ s/#.*//;
+    if ($line eq '') {
+      # Nothing left.
+      next;
+    }
+    push @lines, $line;
+  }
+
+  # Reading in a separate loop due to Perl 5.8.0 defect # 21217, due to be fixed in 5.8.1.
+
+  my $lineNum = -1;
+  foreach my $line (@lines) {
+    $lineNum++;
+    eval {
+      (my $mrpName, my $extVer, my $intVer) = split (/\s+/, $line, 4);
+      unless (defined $mrpName and defined $extVer) {
+        die "Error: Invalid arguments at line $lineNum\n";
+      }
+      if (not defined $intVer) {
+        if ($iniData->RequireInternalVersions()) {
+          die "Error: Internal version number not specified\n";
+        }
+        else {
+          $intVer = '';
+        }
+      }
+      my $thisMrpData = MrpData->New($mrpName, $extVer, $intVer, $iniData, $verbose, $fixLibs);
+      push (@$mrpData, $thisMrpData);
+    };
+    if ($@) {
+      print $@;
+      push (@failedReleases, "$line - $@");
+    }
+  }
+
+  if ($#failedReleases >= 0) {
+    print "\nThere was an error making the following release(s):\n\n";
+    foreach my $rel (@failedReleases) {
+      print "$rel";
+    }
+    die "\n";
+  }
+}
+
+__END__
+
+=head1 NAME
+
+MakeRel - Make a single, or set of component releases.
+
+=head1 SYNOPSIS
+
+  makerel [options] [[<mrp_file> <version> [<internal_version>]] | [mrp_list_file]]
+
+options:
+
+  -h                    help
+  -v                    verbose output (-vv  very verbose)
+  -n <notes_src_file>   compile all release notes using a single source file
+  -p                    read a piped mrp list from STDIN
+  -l                    copy missing ARMI lib files from THUMB is possible
+  -f                    force (no prompting)
+  -w <project>          make the releases in this "project"
+
+=head1 DESCRIPTION
+
+C<MakeRel> is a tool that can generate one or more component releases. Where ever possible the tool C<MakeEnv> should be used instead of C<MakeRel> because this guarantees the ability to reproduce the entire environment from which a release was made, rather than just packaging up a particular set of source and binaries.
+
+See the document I<Making Releases> for more complete coverage of the process of making releases in general.
+
+=head1 STATUS
+
+Unsupported/experimental. If you find a problem, please send us a patch.
+
+=head1 KNOWN BUGS
+
+None.
+
+=head1 COPYRIGHT
+
+ Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+ All rights reserved.
+ This component and the accompanying materials are made available
+ under the terms of the License "Eclipse Public License v1.0"
+ which accompanies this distribution, and is available
+ at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ 
+ Initial Contributors:
+ Nokia Corporation - initial contribution.
+ 
+ Contributors:
+ 
+ Description:
+ 
+
+=cut

@@ -1,0 +1,6 @@
+component	missing
+source	\preFIX\source\missing\file
+source	DISTRIBUTION.POLICY
+source	/prefix\source\missing\missing.mrp
+source	\prefix\source\shared\missing
+notes_source	dummy

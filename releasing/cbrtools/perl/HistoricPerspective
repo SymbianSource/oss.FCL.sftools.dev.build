@@ -1,0 +1,172 @@
+#!perl
+# Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+# 
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+# 
+# Contributors:
+# 
+# Description:
+# 
+#
+# Description:
+# Overview
+#
+
+=head1 Introduction
+
+The processes for distributing source and binaries between engineers has a large impact on the efficiency of both the development and integration phases of a project. The efficiency of these processes is even more significant when a project is being development between multiple sites that are geographically separated. The LPD release tools were written to make the human tasks necessary to distribute software as simple as possible. This document provides an historic perspective of the way things have been done in the past. It then goes on to present the main features of the release tools.
+
+=head1 History
+
+There have been two different distribution strategies for source and binaries:
+
+=over 4
+
+=item * Component Releases
+
+The component release strategy involves modularising the project into a set of named components. These generally map onto the source level modularisation. Component owners are identified and are responsible for compiling a set of binaries for use by the rest of the developers at regular intervals. An integration team is responsible for identifying a set of versioned releases that work together.
+
+Advantages
+
+=over 8
+
+=item *
+
+B<Pluggable.> Provided a new release is binary compatible with the previous release, it may be installed onto a development environment and run immediately (i.e. without having to re-compile and other components). If a problem is found with the release, the component can be quickly reverted to the previous version.
+
+=item *
+
+B<Easy to patch.> Because the integrated product is assembled from a set of versioned components, it is easy to re-release a single component that is found to be problematic, without having to touch the rest of the system. 
+
+=item *
+
+B<Minimises data transfer between sites.> Only newly released component need be distributed between sites.
+
+=item *
+
+B<Flexible for developers.> Developers can create their own configuration of component versions suitable for the task in hand. Also, developers can share their software with one another in a very efficient way. This is useful for authors of components that are highly dependent on one another, because they can form an 'integration cluster', and solve many problems before their components are released to the project at large.
+
+=item *
+
+B<Easy to reference.> Component version numbers encourage a common vocabulary between engineers ("I've found problem I<x> in verion I<y> of component I<z>", "I've fixed that in version I<y+1>").
+
+=back
+
+Disadvantages
+
+=over 8
+
+=item *
+
+B<Hard to maintain.> The original tools for automating the procedures for generating and unpacking releases were written using DOS-style batch files. These were notoriously cryptic and hard to maintain. As a result, releases were often missing files. Also, component scripts for populating a development drive were often broken.
+
+=item *
+
+B<Time consuming to prepare a new development drive.> Even when the scripts for populating a development drive were working correctly, they invariably took a long time to run. This generally led to developers either using a vastly cut down environment (that would not be suitable for reproducing certain types of problem) or updating their environments very seldomly (which often compounded integration problems).
+
+=item *
+
+B<Reliance on binary compatibility.> As already stated, the benefits of pluggable releases only come when releases are binary compatible with one another. If a component release is made than breaks binary compatibility, all the components that depend on it must be re-released also. This so called batton passing procedure can introduce significant delays and risks to integration.
+
+ 
+
+=back
+
+=item * Monolithic F<.zip> files
+
+Centralised builds were introduced when the EPOC build tools were over-halled. The new build technology allowed all of the components that make up EPOC to be built on the same machine using a uniform procedure (this was a massive step forward from the days when each component has a hand crafted build script). A build team is employed to run builds of the latest source on a regular basis. The output of these builds is then packaged into a small set of large F<.zip> files for distribution.
+
+Advantages
+
+=over 8
+
+=item *
+
+B<Eliminatates binary incompatibilities.> The inherent fragility of component releases as regards binary compatibility is eliminated - if all the project's components have been sucessfully built in the same environment there is no risk of incompatibility.
+
+=item *
+
+B<Simple distribution mechanism.> The set of large F<.zip> files are simple to install and provide a high degree of confidence that the environment generated on the build machine will be faithfully reproduced on other machines.
+
+=back
+
+Disadvantages
+
+=over 8
+
+=item *
+
+B<Slow transfer between sites.> Because the F<.zip> files contain everything, they are inherently large. A large binary transfer must therefore take place in order to distribute changes to even a very small number of components. This can be a huge problem for sites with low bandwidth connections, particularly if the file transfer mechanism is not reliable (as is often the case when using FTP without resume functionality). Transfer of a complete development environment can in the worst cases take several days.
+
+=item *
+
+B<Time consuming to prepare a new development drive.> Again due to the size of the F<.zip> files, even when available on a local network, they can be time consuming to install. As with component releases, this can result in developers not upgrading their development enviroments as often as they would like.
+
+=item *
+
+B<Hard to patch cleanly.> Patches are generally provided in the form of additional F<.zip> files. This introduces another level of complexity (and room for error) due to their ad-hock nature. Subtly different development environments may be produced by unpacking patches in the wrong order, for example.
+
+=item *
+
+B<Build team becomes a bottle neck.> During the integration phase of a project it is desirable for developers to receive environment updates as frequently as possible. However, the build cycle rate dictates the rate at which developers receive new development environments. A delayed build has the nasty side effect that it is likely to cause the next build to be delayed also, since a higher than normal volume of un-integrated code will be submitted. This can result in a very unpredictable build cycle rate, and overall project integration is likely to suffer as a result.
+
+=item *
+
+B<Hard to reference.> Build numbers are extremely coarse for referencing purposes. It is often difficult to get information on the state of an individual component from only a build number. This can make information exchanges between licensees (who only have a build number) and development engineers (who may not have a current installation of the relevant build) error prone and time consuming.
+
+=back
+
+=back
+
+=head1 A combined approach
+
+The previous section described a number of significant problems associated with each of the software distribution strategies that have been used in the past. The LPD release tools have been designed to build on the positive points mentioned above and to minimise the negative points. Fundamentally they opperate in a similar way to the 'component releases' strategy and so gain all the advantages of this approach. However, they also allow the use of a 'centralised build' strategy, thereby most of those advantages also. The main features are as follows:
+
+=over 4
+
+=item *
+
+B<Easy to maintain.> The tools are by and large maintenance free once configured. This is largely due to their reliance on the EPOC build tools to provide information about which binary files to include in a particular release. Also, when any release (or set of releases) is made, the tools store details of the exact environment from which this was done. This information can then be used by others to reproduce the release environment.
+
+=item *
+
+B<Upgradable development environments.> Development environments need not be prepared from scratch (i.e. on an empty drive) to ensure their cleanliness. The tools keep track of what has been installed in a particlar environment, and allow this to be upgraded. They also provide a means for verifying that the cleanliness of an environment (listing files that are known to not have originated from releases). Because development environments can be upgraded incrementally, the time taken to perform this opperation is vastly reduced.
+
+=item *
+
+B<Automatic release generation.> The tools can compare the output of a build (either full, or partial) and re-release only the components whose binaries have changed. This is significant because it allow a centralised build strategy to be married with the component release strategy, thereby eliminating problems concerning binary compatibility. It also means that a new build can be distributed by only transferring the components that have actually changed.
+
+=item *
+
+B<Automated delivery via FTP.> The tools are capable of automatically retrieving component releases made by remote sites from a central FTP server. They also provide a simple means of exporting releases to the FTP server. It is recommended that each project has a single FTP server to facilitate the transfer of releases between sites.
+
+=item *
+
+B<Automatic handling of IPR sensitive source.> When a release is made, the source code is categorized according to the F<distribution.policy> files present using C<IPRTOOL>. Before exporting releases to a central FTP server, these separately categorized source F<.zip> files are encrypted using PGP according to the data present in a project specific export configuration table. This table contains a complete list of each site concerned with the project, and their PGP key ids. It also contains a per-component list of which site is allowed to view which categories of source code. The correct set (according the the export table) of PGP keys are then used to encrypt each source F<.zip> file, thereby significantly reducing the risk of human error.
+
+=back
+
+=head1 COPYRIGHT
+
+ Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+ All rights reserved.
+ This component and the accompanying materials are made available
+ under the terms of the License "Eclipse Public License v1.0"
+ which accompanies this distribution, and is available
+ at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ 
+ Initial Contributors:
+ Nokia Corporation - initial contribution.
+ 
+ Contributors:
+ 
+ Description:
+ 
+
+=cut

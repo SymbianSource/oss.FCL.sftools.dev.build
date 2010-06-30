@@ -1,0 +1,10 @@
+component	dev_build_bintools_bin2coff
+
+source	\src\tools\build\bintools\bin2coff
+binary	\src\tools\build\bintools\bin2coff\group	all
+exports	\src\tools\build\bintools\bin2coff\group
+
+notes_source \component_defs\release.src
+
+ipr T
+

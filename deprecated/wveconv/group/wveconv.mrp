@@ -1,0 +1,9 @@
+component       dev_build_deprecated_wveconv
+
+source          /src/tools/build/deprecated/wveconv
+exports         /src/tools/build/deprecated/wveconv/group
+binary          /src/tools/build/deprecated/wveconv/group all
+
+notes_source	\component_defs\release.src
+
+ipr T

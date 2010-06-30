@@ -1,0 +1,171 @@
+#!perl
+# Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+# 
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+# 
+# Contributors:
+# 
+# Description:
+# 
+#
+
+use strict;
+use FindBin;
+use lib "$FindBin::Bin";
+use Getopt::Long;
+use IniData;
+use EnvDb;
+use CommandController;
+
+
+#
+# Globals.
+#
+
+my $verbose = 0;
+my $overwrite = 0;
+my $iniData = IniData->New();
+my $commandController = CommandController->New($iniData, 'GetSource');
+my $envDb;
+my $comp;
+my $ver;
+my $installDir = "\\";
+
+
+#
+# Main.
+#
+
+ProcessCommandLine();
+GetSource();
+
+
+#
+# Subs.
+#
+
+sub ProcessCommandLine {
+  Getopt::Long::Configure ("bundling");
+  my $help;
+  GetOptions('h' => \$help, 'i=s' => \$installDir, 'o' => \$overwrite, 'v+' => \$verbose);
+
+  if ($help) {
+    Usage(0);
+  }
+
+  $comp = shift @ARGV;
+  $ver = shift @ARGV;
+
+  unless ($#ARGV == -1) {
+    print "Error: Invalid number of arguments\n";
+    Usage(1);
+  }
+
+  Utils::CheckDirectoryName($installDir);
+
+  $envDb = EnvDb->Open($iniData, $verbose);
+  
+  if (defined $comp and not defined $ver) {
+    $ver = $envDb->Version($comp);
+    unless (defined $ver) {
+      die "Error: $comp not installed\n";
+    }
+  }
+}
+
+sub Usage {
+  my $exitCode = shift;
+
+  Utils::PrintDeathMessage($exitCode, "\nUsage: getsource [options] [<component> [<version>]]
+
+options:
+
+-h  help
+-i  <install_directory>
+-o  overwrite any existing source
+-v  verbose output (-vv very verbose)\n");
+}
+
+sub GetSource {
+  if (defined $comp) {
+    UnpackSource($comp, $ver, $installDir);
+  }
+  else {
+    print "About to unpack the source for the entire environment. Continue? [y/n] ";
+    my $response = <STDIN>;
+    if ($response =~ /^y$/i) {
+      my $versionInfo = $envDb->VersionInfo();
+      foreach my $thisComp (sort keys %{$versionInfo}) {
+        eval {
+          UnpackSource($thisComp, $versionInfo->{$thisComp}, $installDir);
+        };
+ 
+        if ($@) {
+          print $@;
+        }
+      }
+    }
+  }
+}
+
+sub UnpackSource {
+  my $comp = shift;
+  my $ver = shift;
+  my $dir = shift;
+
+  print "Getting source for $comp $ver...\n";
+  $envDb->UnpackSource($comp, $ver, $dir, $overwrite, 1);
+}
+
+
+__END__
+
+=head1 NAME
+
+GetSource - Installs the source code from a component release into the current environment.
+
+=head1 SYNOPSIS
+
+  getsource [options] [<component> [<version>]]
+
+options:
+
+  -h  help
+  -i  <install_directory>
+  -o  overwrite any existing source
+  -v  verbose output (-vv very verbose)
+
+=head1 DESCRIPTION
+
+Releases are generally made containing both source and binaries. By default, tools like C<GetEnv> and C<GetRel> only unpack the binaries. C<GetSource> provides a means of installing the source when it is required (e.g. for debugging purposes).
+
+If only a component name is specified, the source for the currently installed version of the component is unpacked into the root of the current drive. If the source code for a version of a component that is not currently installed is required, then specify both the version and a directory in which the source should be unpacked (this will be created if it does not already exist). If no arguments are specified, the source to all the installed components is unpacked into the root of the current drive.
+
+=head1 KNOWN BUGS
+
+None.
+
+=head1 COPYRIGHT
+
+ Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+ All rights reserved.
+ This component and the accompanying materials are made available
+ under the terms of the License "Eclipse Public License v1.0"
+ which accompanies this distribution, and is available
+ at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ 
+ Initial Contributors:
+ Nokia Corporation - initial contribution.
+ 
+ Contributors:
+ 
+ Description:
+ 
+
+=cut

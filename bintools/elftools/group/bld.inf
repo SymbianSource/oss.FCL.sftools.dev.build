@@ -25,19 +25,20 @@ PRJ_EXPORTS
 #ifndef TOOLS2_LINUX
 ../elf2inf.pl		/epoc32/tools/elf2inf.pl
 ../def2dll.bat		/epoc32/tools/def2dll.bat
-../def2dll.pl		/epoc32/tools/def2dll.pl
+A
 ../deputil.pl		/epoc32/tools/deputil.pl
 ../deputil.pm		/epoc32/tools/deputil.pm
 #endif
+../def2dll.pl		/epoc32/tools/def2dll.pl
 ../inc/elfdefs.h	SYMBIAN_OS_LAYER_PLATFORM_EXPORT_PATH(tools/elfdefs.h)
 
 
 PRJ_MMPFILES
 #ifndef TOOLS2_LINUX
-genstubs
 getexports
-elftran
 #endif
+elftran
+genstubs
 elfdump
 
 

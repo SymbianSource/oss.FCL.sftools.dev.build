@@ -1,0 +1,140 @@
+#!perl
+# Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+# 
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+# 
+# Contributors:
+# 
+# Description:
+# 
+#
+# Description:
+# Licensee Product Environment
+#
+
+=head1 Licensee Project Environment
+
+The processes for distributing source code and binaries between engineers has a large impact on the efficiency of both the development and integration phases of a project. The efficiency of these processes is even more significant when a project is being developed between multiple sites that are geographically separated. The LPD release tools address the key elements of this process, making the human tasks required to distribute software as simple as possible. The following points characterise the projects LPD are generally involved with:
+
+=over 4
+
+=item *
+
+Integration is centrally owned and performed by a dedicated integration team. The integration team are responsible for collecting all software modules delivered by multiple external and internal parties, and assembling them into a self-consistent sofware platform.
+
+=item *
+
+Many 3rd parties are involved in delivering software modules into the integration team. It is important, therefore, to have a standard means of delivering software irrespective of the package's origin.
+
+=item *
+
+There are dependancies between the software 3rd parties. 
+
+...delivery of software packets into the integration team is not a one-way process. Unofficial baselines are typically maintained in different sites amongst integration-clusters. All software packets may be delivered to all development groups.
+
+=item *
+
+different 3rd parties have different SLDA's and therefore are entitled to differing source IPR categories
+
+...there is no single customer and so provision must be made for protecting source code IPR and confidentiality.
+
+=item *
+
+contributing software teams may have close dependancies, and form natural integration clusters
+
+...telephony, for example, consists of a number of contributing components and may choose to release a sub-system of components before submitting to the rest of the porject.
+
+=item *
+
+software author's development environments should never become too old, and hence require updating frequently
+
+...developing against an old environment always leads to unecessary integration problems. This most frequently occurs when the cost of upgrading a development environment is large; in terms of time, network bandwidth, and local storage.
+
+=item *
+
+an effective integration team must be capable of fast baseline turnaround
+
+...delays in baseline deliveries result in a larget than normal volume of unintegrated code getting submitted to the next build. It is therefore more likely to be late again.
+
+=back
+
+=head1 Software Distribution
+
+There are two main strategies for distributing source and binaries:
+
+=over 4
+
+=item *
+
+component releases
+
+=item *
+
+monolithic environments
+
+=back
+
+=head2 Component Releases
+
+The component release strategy involves modularising the project into a set of named components. These generally map onto the source level modularisation. Component owners are identified and are responsible for compiling a set of binaries for use by the rest of the developers at regular intervals. An integration team is responsible for identifying a set of versioned releases that work together.
+
+=head2 Monolithic environments
+
+These are the direct ouputs of a centralised build process, where all software components are built from source on a single machine, using a uniform procedure. A build team is employed to perform these builds at regular intervals on the latest source. The results of the build are packaged into a small number of large F<.zip> files for distribution.
+
+Each of these approaches is best suited to particular applications and address some of the same problems. They both have a number of advantages and disadvantages.
+
+In addressing the key aspects of the Licensee project environment described at the start, the LPD Release Tools combine the strengths of both distribution methods:
+
+=over 4
+
+=item *
+
+reduce the data transfer between sites
+
+=item *
+
+reliable environment sharing between sites
+
+=item *
+
+ability to verify the I<current> state of a development drive
+
+=item *
+
+incorporation of I<mainline builds> with I<component releases> (ie, validateenv)
+
+=item *
+
+facilitate I<integration clusters>
+
+=item *
+
+fast baseline turn-around
+
+=back
+
+=head1 COPYRIGHT
+
+ Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+ All rights reserved.
+ This component and the accompanying materials are made available
+ under the terms of the License "Eclipse Public License v1.0"
+ which accompanies this distribution, and is available
+ at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ 
+ Initial Contributors:
+ Nokia Corporation - initial contribution.
+ 
+ Contributors:
+ 
+ Description:
+ 
+
+=cut

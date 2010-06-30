@@ -1,0 +1,162 @@
+#!perl
+# Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+# 
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+# 
+# Contributors:
+# 
+# Description:
+# 
+#
+
+=head1 Overview
+
+This document is intended to familiarise the reader with basic release tool commands. It covers topics such as installing and upgrading a development environment, and viewing details about particular releases within that environment. It does not cover the process of preparing new environments or making releases (see the document I<Making Releases> for material on that topic).
+
+=head1 Glossary
+
+=over 4
+
+=item *
+
+B<Component> - A deliverable piece of software.
+
+=item *
+
+B<Release> - A delivery of a component (may contain source or binaries or both).
+
+=item *
+
+B<Version> - The name of a specific component release (must be unique).
+
+=item *
+
+B<Baseline> - A set of component releases (referred to by their version) that are known to work together.
+
+=item *
+
+B<Environment> - A development drive that contains an F<\epoc32> tree generated from the binaries in a set of component releases.
+
+=back
+
+=head1 Getting an Environment
+
+When ever a component release is made, the release tools make note of the entire environment from which it was made. To install the environment from which the component C<mycomp> version C<059> was made, use the command C<GetEnv>:
+
+  getenv mycomp 059
+
+This will install into the root of the current drive all the binaries that were present when C<mycomp 059> was released. It is possible therefore to reproduce the environment from which any component release has been made. Normally, however, each project will have official environments that are prepared by a build / integration team. They will release a dummy component (normally the name of the project) that can be used to reproduce these official environments. The dummy component will probably not contain any binaries, but should contain a set of release notes (see the section I<Viewing a Component's Release Notes>).
+
+=head1 Upgrading a Single Component
+
+Single components can be installed into an environment using the command C<GetRel>, for example:
+
+  getrel mycomp 060
+
+If a version of C<mycomp> is already installed in the current environment, it's binaries will be removed before those from C<060> are installed.
+
+=head1 Upgrading to a New Environment
+
+The command C<GetEnv> can be used to upgrade an existing environment, for example:
+
+  getenv myproject 030
+
+As with C<GetRel>, old component versions are removed before the new are installed. If environment already contains something similar to C<myproject 030>, the process of upgrading it should be fairly quick.
+
+=head1 Viewing the State of an Environment
+
+The component versions that are currently installed in an environment can be listed with the following command:
+
+  envinfo
+
+Which will display something like:
+
+ Component   Version
+
+ mycomp1     032
+ mycomp2     036
+
+=head1 Getting the Source Code for a Component
+
+By default, the commands C<GetEnv> and C<GetRel> do not install the source code contained within component releases. If you want to get the source for a single component, use the command C<GetSource>:
+
+  getsource mycomp
+
+This will unpack the source for the currently installed version of C<mycomp> into the root of the current drive. Note, the commands C<GetEnv> and C<GetRel> both have a C<-s> switch that instructs them to unpack source code as well as binaries. Note also that the release tools make no attempt to keep track of source files that have been unpacked into a drive (unlike binary files, which they do keep track of). This means that any existing files of the same name will be over written.
+
+There's also a C<RemoveSource> command.
+
+=head1 Viewing a Component's Release Notes
+
+The release notes for a component can be compiled on the fly using the command C<ViewNotes>. This will compile the release notes into a temporary file and then launch your default web browser to view. For example:
+
+  viewnotes mycomp 032
+
+If the version is ommitted, then the notes for the version that is currently installed will be displayed. Note, C<ViewNotes> assumes that a web browser is already installed, and than there is an association between it and the file extension F<.html>.
+
+C<ViewNotes> can also be used to display a summary of all releases that have been made to date using the C<-s> switch. For example:
+
+  viewnotes -s mycomp 032
+
+This can be useful if you want to look back through old release notes.
+
+=head1 Other information commands
+
+C<BinInfo> lists all the binary files belonging to a component, or to which component a given binary file belongs. C<SourceInfo> does exactly the same with source code directories.
+
+C<EnvMembership> and C<DiffEnv> show you information about the contents of different environments. C<ListComponents>, C<LatestVer> and C<EnvSize> report the contents of the local archive.
+
+=head1 Recovering your Environment to a Known State
+
+If you have forgotten what's on your development drive, and you want to get it back to a clean baseline, you could use C<EnvInfo -f> to examine it, then reinstall all the dirty components and delete any loose files. But C<CleanEnv> does this automatically.
+
+=head1 Viewing the Source Differences between Two Component Releases
+
+The command C<DiffRel> can be used to compare the source of two releases using a differencing tool of your choice (this must be specified in the release tools configuration file C<reltools.ini> - see the installation guide for details). For example...
+
+  diffrel mycomp 031 032
+
+...will diff C<mycomp> version C<031> against version C<032>. Alternatively...
+
+  diffrel mycomp 031 \mycomp
+
+...will diff C<mycomp 031> against the source in the directory F<\mycomp>.
+
+=head1 Making Releases
+
+See the separate Making Releases document.
+
+=head1 Importing and Exporting Releases
+
+This is the process of transferring a release from one site to another. It involves encryption, and typically FTP sites. See the separate Exporting and Importing Releases document.
+
+=head1 "Validation"
+
+If you have two releases that you believe to be the same, you can use the commands C<ValidateRel> and C<ValidateEnv> to compare them. The comparison is intelligent and ignores differences in the timestamps in DLL headers (it uses the standard Symbian utility 'evalid').
+
+In particular, if you have constructed a baseline of many individual component releases, we recommend that you occasionally do a 'full build' of all the source code. You can then use 'validateenv' to ensure that the full build has produced the same results as all the individual components.
+
+=head1 COPYRIGHT
+
+ Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+ All rights reserved.
+ This component and the accompanying materials are made available
+ under the terms of the License "Eclipse Public License v1.0"
+ which accompanies this distribution, and is available
+ at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ 
+ Initial Contributors:
+ Nokia Corporation - initial contribution.
+ 
+ Contributors:
+ 
+ Description:
+ 
+
+=cut

@@ -18,26 +18,29 @@
 
 PRJ_EXPORTS
 
+../src/imaker                                           +/tools/ //
 ../src/imaker.cmd                                       +/tools/ //
 ../src/imaker.mk                                        +/tools/rom/imaker/ //
 ../src/imaker.pl                                        +/tools/rom/imaker/ //
-../src/imaker.pm                                        +/tools/rom/imaker/ //
-../src/imaker_public.mk                                 +/tools/rom/imaker/ //
-../src/imaker_version.mk                                +/tools/rom/imaker/ //
-
 ../src/imaker_core.mk                                   +/tools/rom/imaker/ //
+../src/imaker_emmc.mk                                   +/tools/rom/imaker/ //
+../src/imaker_fat.mk                                    +/tools/rom/imaker/ //
 ../src/imaker_help.mk                                   +/tools/rom/imaker/ //
 ../src/imaker_image.mk                                  +/tools/rom/imaker/ //
+../src/imaker_memcard.mk                                +/tools/rom/imaker/ //
 ../src/imaker_minienv.mk                                +/tools/rom/imaker/ //
 ../src/imaker_odp.mk                                    +/tools/rom/imaker/ //
+../src/imaker_rofs.mk                                   +/tools/rom/imaker/ //
 ../src/imaker_rofs2.mk                                  +/tools/rom/imaker/ //
 ../src/imaker_rofs3.mk                                  +/tools/rom/imaker/ //
 ../src/imaker_rofs4.mk                                  +/tools/rom/imaker/ //
+../src/imaker_smr.mk                                    +/tools/rom/imaker/ //
 ../src/imaker_tools.mk                                  +/tools/rom/imaker/ //
 ../src/imaker_uda.mk                                    +/tools/rom/imaker/ //
 ../src/imaker_variant.mk                                +/tools/rom/imaker/ //
+../src/imaker_version.mk                                +/tools/rom/imaker/ //
 
-// GNU make port to mingw32 (http://www.mingw.org/)
+// GNU make port to mingw32 (http://sourceforge.net/projects/mingw/files/ -> GNU Make)
 ../bin/mingw_make.exe                                   +/tools/rom/imaker/ //
 
 // Buildrom plugins

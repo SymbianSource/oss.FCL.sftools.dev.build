@@ -1,0 +1,70 @@
+#!perl
+# Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+# 
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+# 
+# Contributors:
+# 
+# Description:
+# 
+#
+
+=head1 Overview
+
+This document is intended to provide an overview of how to update and distribute environments.
+
+=head1 Receiving Releases
+
+
+
+
+ in one of three ways:
+
+=over 4
+
+=item *
+
+Via the local archive.
+
+=item *
+
+Via a remote archive.
+
+=item *
+
+Via a central FTP site.
+
+=item *
+
+
+
+=head1 Versioning
+
+=head1 Integration Clusters
+
+=head1 Branched Development
+
+=head1 COPYRIGHT
+
+ Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+ All rights reserved.
+ This component and the accompanying materials are made available
+ under the terms of the License "Eclipse Public License v1.0"
+ which accompanies this distribution, and is available
+ at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ 
+ Initial Contributors:
+ Nokia Corporation - initial contribution.
+ 
+ Contributors:
+ 
+ Description:
+ 
+
+=cut
