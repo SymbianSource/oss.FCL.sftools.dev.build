@@ -1,76 +1,335 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<SystemDefinition schema="3.0.0">
-    <package id="build" levels="lowlevel-libs middleware framework ui" name="Build">
-        <collection id="bintools" level="framework" name="Binary Tools">
-            <component filter="build_SFPhase3" id="evalid" name="Evalid" >
-                <unit bldFile="bintools/evalid" mrp="bintools/evalid/evalid.mrp"/>
-            </component>
-            <component filter="build_SFPhase1" id="rcomp" name="Resource Compiler" >
-                <unit bldFile="bintools/rcomp/group" mrp="bintools/rcomp/group/rcomp.mrp"/>
-            </component>
-            <component filter="build_SFPhase1" id="checklib" name="checklib" >
-                <unit bldFile="bintools/checklib/group" mrp="bintools/checklib/group/checklib.mrp"/>
-            </component>
-            <component filter="build_SFPhase1" id="elftools" name="elftools" >
-                <unit bldFile="bintools/elftools/group" mrp="bintools/elftools/group/elftools.mrp"/>
-            </component>
-        </collection>
-        <collection id="srctools" level="middleware" name="Source Tools">
-            <component filter="build_SFPhase1" id="tranasm" name="tranasm" >
-                <unit bldFile="srctools/tranasm/group" mrp="srctools/tranasm/group/tranasm.mrp"/>
-            </component>
-        </collection>
-        <collection id="e32tools" level="middleware" name="E32 Tools">
-            <component filter="build_SFPhase1" id="elf2e32" name="elf2e32 (Postlinker)" >
-                <unit bldFile="e32tools/elf2e32/group" mrp="e32tools/elf2e32/group/elf2e32.mrp"/>
-            </component>
-            <component filter="build_SFPhase1" id="e32lib" name="E32 Image Library" >
-                <unit bldFile="e32tools/e32lib/group" mrp="e32tools/e32lib/group/e32lib.mrp"/>
-            </component>
-        </collection>
-        <collection id="buildtoolguides" level="ui" name="Build Tool Guides">
-            <component filter="build_SFPhase3" id="emulconfiguratorguide" name="Emulator Configurator Guide" >
-                <unit bldFile="buildtoolguides/emulconfiguratorguide/group" mrp="buildtoolguides/emulconfiguratorguide/group/emulbuilderguide.mrp"/>
-            </component>
-            <component filter="build_SFPhase3" id="romtoolsguide" name="ROM Tools Guide" >
-                <unit bldFile="buildtoolguides/romtoolsguide/group" mrp="buildtoolguides/romtoolsguide/group/romtoolsguide.mrp"/>
-            </component>
-            <component filter="build_SFPhase3" id="sbsv2guide" name="SBSv2 Guide" >
-                <unit bldFile="buildtoolguides/sbsv2guide/group" mrp="buildtoolguides/sbsv2guide/group/sbsv2guide.mrp"/>
-            </component>
-        </collection>
-        <collection id="sbsv2" level="middleware" name="Symbian Build System v2">
-            <component filter="build_SFPhase3" id="cpp-raptor" name="CPP (Raptor)" >
-                <unit bldFile="sbsv2/cpp-raptor/group" mrp="sbsv2/cpp-raptor/group/cpp-raptor.mrp"/>
-            </component>
-            <component filter="build_SFPhase3" id="pvmgmake" name="PVM Gmake" >
-                <unit bldFile="sbsv2/pvmgmake/group" mrp="sbsv2/pvmgmake/group/pvmgmake.mrp"/>
-            </component>
-            <component filter="build_SFPhase3" id="raptor" name="SBSv2 (Raptor)" >
-                <unit bldFile="sbsv2/raptor/group" mrp="sbsv2/raptor/group/raptor.mrp"/>
-            </component>
-        </collection>
-        <collection id="imgtools" level="framework" name="Image Tools">
-            <component filter="build_SFPhase3" id="romtools" name="ROM Tools" >
-                <unit bldFile="imgtools/romtools/group" mrp="imgtools/romtools/group/romtools.mrp"/>
-            </component>
-            <component filter="build_SFPhase3" id="buildrom" name="Build ROM" >
-                <unit bldFile="imgtools/buildrom/group" mrp="imgtools/buildrom/group/buildrom.mrp"/>
-            </component>
-            <component filter="build_SFPhase1" id="imglib" name="ROM/ROFS Image Library" >
-                <unit bldFile="imgtools/imglib/group" mrp="imgtools/imglib/group/imglib.mrp"/>
-            </component>
-            <component filter="build_SFPhase3" id="sisutils" name="SIS Utility Library" >
-                <unit bldFile="imgtools/sisutils/group" mrp="imgtools/sisutils/group/sisutils.mrp"/>
-            </component>
-            <component filter="build_SFPhase2" id="imgcheck" name="Image Checker" >
-                <unit bldFile="imgtools/imgcheck/group" mrp="imgtools/imgcheck/group/imgcheck.mrp"/>
-            </component>
-        </collection>
-        <collection id="build_info" name="Build Info" level="ui">
-          <component id="build_metadata" name="Build Metadata" filter="build_SFPhase3">
-            <unit mrp="build_info/build_metadata/build_metadata.mrp"/>
-          </component>
-        </collection>
-    </package>
-</SystemDefinition>
+<!DOCTYPE SystemDefinition [
+<!ELEMENT SystemDefinition ( systemModel?, SystemBuild? )>
+ <!ATTLIST SystemDefinition
+  name CDATA #REQUIRED
+  schema CDATA #REQUIRED>
+ <!ELEMENT systemModel (layer+)>
+ <!ELEMENT layer (block* | collection*)*>
+ <!ATTLIST layer
+  name CDATA #REQUIRED
+  long-name CDATA #IMPLIED
+  levels NMTOKENS #IMPLIED
+  span CDATA #IMPLIED>
+ <!ELEMENT block (subblock* | collection*)*>
+ <!ATTLIST block
+  levels NMTOKENS #IMPLIED
+  span CDATA #IMPLIED
+  level NMTOKEN #IMPLIED
+  name CDATA #REQUIRED
+  long-name CDATA #IMPLIED>
+ <!ELEMENT subblock (collection)*>
+ <!ATTLIST subblock
+  name CDATA #REQUIRED
+  long-name CDATA #IMPLIED>
+ <!ELEMENT collection (component)*>
+ <!ATTLIST collection
+  name CDATA #REQUIRED
+  long-name CDATA #IMPLIED
+  level NMTOKEN #IMPLIED>
+ <!ELEMENT component (unit)*>
+ <!ATTLIST component
+  name CDATA #REQUIRED
+  long-name CDATA #IMPLIED
+  deprecated CDATA #IMPLIED
+  introduced CDATA #IMPLIED
+  contract CDATA #IMPLIED
+  plugin (Y|N) "N"
+  filter CDATA #IMPLIED
+  class NMTOKENS #IMPLIED
+  supports CDATA #IMPLIED
+  purpose ( optional | mandatory | development ) "optional">
+ <!ELEMENT unit EMPTY>
+ <!ATTLIST unit
+  mrp CDATA #IMPLIED
+  filter CDATA #IMPLIED
+  bldFile CDATA #IMPLIED
+  root CDATA #IMPLIED
+  version NMTOKEN #IMPLIED
+  prebuilt NMTOKEN #IMPLIED
+  late (Y|N) #IMPLIED
+  priority CDATA #IMPLIED>
+ <!ELEMENT SystemBuild (option* | target+ | targetList+ | list+ | configuration+)*>
+ <!ATTLIST SystemBuild
+  name CDATA #REQUIRED
+  schema CDATA #REQUIRED>
+ <!ELEMENT list (ref+)>
+ <!ATTLIST list
+  name ID #REQUIRED
+  description CDATA #REQUIRED>
+ <!ELEMENT ref EMPTY>
+ <!ATTLIST ref item CDATA #REQUIRED>
+ <!ELEMENT targetList EMPTY>
+ <!ATTLIST targetList
+  name ID #REQUIRED
+  description CDATA #REQUIRED
+  target IDREFS #REQUIRED>
+ <!ELEMENT target EMPTY>
+ <!ATTLIST target
+  name ID #REQUIRED
+  abldTarget CDATA #REQUIRED
+  description CDATA #REQUIRED>
+ <!ELEMENT option EMPTY>
+ <!ATTLIST option
+  name ID #REQUIRED
+  abldOption CDATA #REQUIRED
+  description CDATA #REQUIRED
+  enable (Y | N | y | n) #REQUIRED>
+ <!ELEMENT configuration (listRef+ | ref+ | task+)*>
+ <!ATTLIST configuration
+  name ID #REQUIRED
+  description CDATA #REQUIRED
+  filter CDATA #REQUIRED>
+ <!ELEMENT task (listRef* , (buildLayer | specialInstructions))>
+ <!ELEMENT listRef EMPTY>
+ <!ATTLIST listRef list CDATA #REQUIRED>
+ <!ELEMENT buildLayer EMPTY>
+ <!ATTLIST buildLayer
+  command CDATA #REQUIRED
+  targetList IDREFS #IMPLIED
+  unitParallel (Y | N | y | n) #REQUIRED
+  targetParallel (Y | N | y | n) #IMPLIED>
+ <!ELEMENT specialInstructions EMPTY>
+ <!ATTLIST specialInstructions
+  name CDATA #REQUIRED
+  cwd CDATA #REQUIRED
+  root CDATA #IMPLIED
+  command CDATA #REQUIRED>
+]>
+<SystemDefinition schema="2.0.1" name="Symbian">
+    <systemModel>
+        <layer name="dev" levels="device middleware eclipse" long-name="Development">
+            <!-- Developer Product -->
+            
+            <!-- OS Product-->
+
+            <block name="buildtools" level="framework" levels="lowlevel-libs middleware framework ui" long-name="Build Tools">
+                <collection name="imgtools_os" level="framework" long-name="Image Tools Metadata">
+                    <component filter="build_SFPhase1" name="romkiteka2">
+                        <unit bldFile="trunk\buildtools\imgtools_os\romkiteka2\group" mrp="trunk\buildtools\imgtools_os\romkiteka2\group\tools_romkit.mrp"/>
+                    </component>
+                </collection>
+                <!-- 
+                <collection name="perltoolsplat_os" level="framework" long-name="Redistribution Tools">
+                    <component filter="build_SFPhase1" name="redistribution">
+                        <unit bldFile="trunk\buildtools\perltoolsplat_os\redistribution" mrp="trunk\buildtools\perltoolsplat_os\redistribution\tools_redistribution_common.mrp"/>
+                    </component>
+                </collection>
+                <collection name="sbsv1_os" level="framework" long-name="Symbian Build System v1">
+                    <component filter="build_SFPhase1" name="e32toolp">
+                        <unit bldFile="trunk\buildtools\sbsv1_os\e32toolp\group" mrp="trunk\buildtools\sbsv1_os\e32toolp\group\tools_e32toolp.mrp"/>
+                    </component>
+                </collection>
+                <collection name="toolsandutils" level="framework" long-name="Other Tools">
+                    <component filter="build_SFPhase1" name="e32tools">
+                        <unit bldFile="trunk\buildtools\toolsandutils\e32tools\group" mrp="trunk\buildtools\toolsandutils\e32tools\group\tools_e32tools.mrp"/>
+                    </component>
+                    <component filter="build_SFPhase1" name="stlport">
+                        <unit bldFile="trunk\buildtools\toolsandutils\stlport\group" mrp="trunk\buildtools\toolsandutils\stlport\group\tools_stlport.mrp"/>
+                    </component>
+                </collection>
+                <collection name="miscomponents" level="framework" long-name="Mis Components">
+                    <component filter="build_SFPhase1" name="emulatorlauncher">
+                        <unit bldFile="trunk\buildtools\misccomponents\emulatorlauncher\group" mrp="trunk\buildtools\misccomponents\emulatorlauncher\group\tools_sdk_eng_emulator_launcher.mrp"/>
+                    </component>
+                </collection>
+                <collection name="dist_os" level="framework" long-name="Redistribution Tools">
+                    <component filter="build_SFPhase1" name="redistributionwinceka2">
+                        <unit bldFile="trunk\buildtools\dist_os\redistributionwinceka2" mrp="trunk\buildtools\dist_os\redistributionwinceka2\tools_redistribution_winc.mrp"/>
+                    </component>
+                </collection>
+                -->
+            </block>
+
+
+            <block name="build" level="framework" levels="lowlevel-libs middleware framework ui" long-name="Build">
+                <collection name="bintools" level="framework" long-name="Binary Tools">
+                    <component filter="build_SFPhase1" name="rcomp" long-name="Resource Compiler">
+                        <unit bldFile="trunk\build\bintools\rcomp\group" mrp="trunk\build\bintools\rcomp\group\rcomp.mrp"/>
+                    </component>
+                    <component filter="build_SFPhase1" name="bin2coff">
+                        <unit bldFile="trunk\build\bintools\bin2coff\group" mrp="trunk\build\bintools\bin2coff\group\bin2coff.mrp"/>
+                    </component>
+                    <component filter="build_SFPhase1" name="petools">
+                        <unit bldFile="trunk\build\bintools\petools\group" mrp="trunk\build\bintools\petools\group\petools.mrp"/>
+                    </component>
+                    <component filter="build_SFPhase1" name="elftools">
+                        <unit bldFile="trunk\build\bintools\elftools\group" mrp="trunk\build\bintools\elftools\group\elftools.mrp"/>
+                    </component>
+                    <component filter="build_SFPhase1" name="checklib">
+                        <unit bldFile="trunk\build\bintools\checklib\group" mrp="trunk\build\bintools\checklib\group\checklib.mrp"/>
+                    </component>
+                    <component filter="build_SFPhase1" name="evalid">
+                        <unit bldFile="trunk\build\bintools\evalid" mrp="trunk\build\bintools\evalid\dev_build_bintools_evalid.mrp"/>
+                    </component>
+                </collection>
+                
+                <collection name="releasing" level="framework" long-name="Binary Tools">
+                    <component filter="build_SFPhase1" name="cbrtools">
+                        <unit bldFile="trunk\build\releasing\cbrtools\group" mrp="trunk\build\releasing\cbrtools\group\cbrtools.mrp"/>
+                    </component>
+                    <component filter="build_SFPhase1" name="makecbr">
+                        <unit bldFile="trunk\build\releasing\makecbr\group" mrp="trunk\build\releasing\makecbr\group\makecbr.mrp"/>
+                    </component>
+                    <component filter="build_SFPhase1" name="zdelta-2.1">
+                        <unit bldFile="trunk\build\releasing\zdelta-2.1\group" mrp="trunk\build\releasing\zdelta-2.1\group\zdelta-2.1.mrp"/>
+                    </component>
+                </collection>
+                
+                <collection name="e32tools" level="framework" long-name="E32 Tools">
+                    <component filter="build_SFPhase1" name="e32lib">
+                        <unit bldFile="trunk\build\e32tools\e32lib\group" mrp="trunk\build\e32tools\e32lib\group\e32lib.mrp"/>
+                    </component>
+                    <component filter="build_SFPhase1" name="elf2e32" long-name="Post Linker">
+                        <unit bldFile="trunk\build\e32tools\elf2e32\group" mrp="trunk\build\e32tools\elf2e32\group\elf2e32.mrp"/>
+                    </component>
+                </collection>
+                
+                <collection name="deprecated" level="framework" long-name="Deprecated Tools">
+                    <component filter="build_SFPhase1" name="eruntest">
+                        <unit bldFile="trunk\build\deprecated\eruntest\group" mrp="trunk\build\deprecated\eruntest\group\eruntest.mrp"/>
+                    </component>
+                    <component filter="build_SFPhase1" name="etouch">
+                        <unit bldFile="trunk\build\deprecated\etouch\group" mrp="trunk\build\deprecated\etouch\group\etouch.mrp"/>
+                    </component>
+                    <component filter="build_SFPhase1" name="rommask">
+                        <unit bldFile="trunk\build\deprecated\rommask\group" mrp="trunk\build\deprecated\rommask\group\rommask.mrp"/>
+                    </component>
+                    <component filter="build_SFPhase1" name="w32repro">
+                        <unit bldFile="trunk\build\deprecated\w32repro\group" mrp="trunk\build\deprecated\w32repro\group\w32repro.mrp"/>
+                    </component>
+                    <component filter="build_SFPhase1" name="wveconv">
+                        <unit bldFile="trunk\build\deprecated\wveconv\group" mrp="trunk\build\deprecated\wveconv\group\wveconv.mrp"/>
+                    </component>
+                </collection>
+                
+                <collection name="sbsv1" level="framework" long-name="Symbian Build System v1">
+                    <component filter="build_SFPhase1" name="abld">
+                        <unit bldFile="trunk\build\sbsv1\abld\group" mrp="trunk\build\sbsv1\abld\group\abld.mrp"/>
+                    </component>
+                    <component filter="build_SFPhase1" name="buildsystem">
+                        <unit bldFile="trunk\build\sbsv1\buildsystem\group" mrp="trunk\build\sbsv1\buildsystem\group\buildsystem.mrp"/>
+                    </component>
+                    <component filter="build_SFPhase1" name="make-abld">
+                        <unit bldFile="trunk\build\sbsv1\make-abld\group" mrp="trunk\build\sbsv1\make-abld\group\make-abld.mrp"/>
+                    </component>
+                    <component filter="build_SFPhase1" name="scpp-abld">
+                        <unit bldFile="trunk\build\sbsv1\scpp-abld\group" mrp="trunk\build\sbsv1\scpp-abld\group\scpp-abld.mrp"/>
+                    </component>
+                </collection>
+
+                <collection name="imgtools" level="framework" long-name="Image Tools">
+                    <component filter="build_SFPhase2" name="imgcheck" long-name="Image Checker">
+                        <unit bldFile="trunk\build\imgtools\imgcheck\group" mrp="trunk\build\imgtools\imgcheck\group\imgcheck.mrp"/>
+                    </component>
+                    <component filter="build_SFPhase1" name="imglib" long-name="ROM/ROFS Image Library">
+                        <unit bldFile="trunk\build\imgtools\imglib\group" mrp="trunk\build\imgtools\imglib\group\imglib.mrp"/>
+                    </component>
+                    <component filter="build_SFPhase3" name="romtools" long-name="ROM Tools">
+                        <unit bldFile="trunk\build\imgtools\romtools\group" mrp="trunk\build\imgtools\romtools\group\romtools.mrp"/>
+                    </component>
+                    <component filter="build_SFPhase3" name="buildrom" long-name="Build ROM">
+                        <unit bldFile="trunk\build\imgtools\buildrom\group" mrp="trunk\build\imgtools\buildrom\group\buildrom.mrp"/>
+                    </component>
+                    <component filter="build_SFPhase3" name="sisutils" long-name="SIS Utility Library">
+                        <unit bldFile="trunk\build\imgtools\sisutils\group" mrp="trunk\build\imgtools\sisutils\group\sisutils.mrp"/>
+                    </component>
+                </collection>
+                
+                <collection name="srctools" level="framework" long-name="Source Tools">
+                    <component filter="build_SFPhase1" name="tranasm">
+                        <unit bldFile="trunk\build\srctools\tranasm\group" mrp="trunk\build\srctools\tranasm\group\tranasm.mrp"/>
+                    </component>
+                    <component filter="build_SFPhase1" name="readtype">
+                        <unit bldFile="trunk\build\srctools\readtype\group" mrp="trunk\build\srctools\readtype\group\readtype.mrp"/>
+                    </component>
+                </collection>
+
+								<collection name="cpptoolsplat" level="framework" long-name="C++ Tools Platform">
+                    <component filter="build_SFPhase1" name="stlport" long-name="STLport">
+                        <unit bldFile="trunk\build\cpptoolsplat\stlport\group" mrp="trunk\build\cpptoolsplat\stlport\group\stlport.mrp"/>
+                    </component>
+                    <component filter="build_SFPhase1" name="cpp-2.9-psion-98r2">
+                        <unit bldFile="trunk\build\cpptoolsplat\cpp-2.9-psion-98r2\group" mrp="trunk\build\cpptoolsplat\cpp-2.9-psion-98r2\group\cpp-2.9-psion-98r2.mrp"/>
+                    </component>
+                    <component filter="build_SFPhase1" name="mingw-gcc-3.4.5">
+                        <unit bldFile="trunk\build\cpptoolsplat\mingw-gcc-3.4.5\group" mrp="trunk\build\cpptoolsplat\mingw-gcc-3.4.5\group\mingw-gcc-3.4.5.mrp"/>
+                    </component>
+                    <component filter="build_SFPhase1" name="gcce-4.3.2">
+                        <unit bldFile="trunk\build\cpptoolsplat\gcce-4.3.2\group" mrp="trunk\build\cpptoolsplat\gcce-4.3.2\group\gcce-4.3.2.mrp"/>
+                    </component>
+                    <component filter="build_SFPhase1" name="gcce-3.4.3">
+                        <unit bldFile="trunk\build\cpptoolsplat\gcce-3.4.3\group" mrp="trunk\build\cpptoolsplat\gcce-3.4.3\group\gcce-3.4.3.mrp"/>
+                    </component>
+                </collection>
+		
+                <collection name="perltoolsplat" level="framework" long-name="Perl Tools Platform">
+                    <component filter="build_SFPhase1" name="activestate-perl-5.6.1">
+                        <unit bldFile="trunk\build\perltoolsplat\activestate-perl-5.6.1\group" mrp="trunk\build\perltoolsplat\activestate-perl-5.6.1\group\activestate-perl-5.6.1.mrp"/>
+                    </component>
+                </collection>
+	
+                <collection name="javatoolsplat" level="framework" long-name="Java Tools Platform">
+                    <component filter="build_SFPhase1" name="j2re-1.3.1">
+                        <unit bldFile="trunk\build\javatoolsplat\j2re-1.3.1\group" mrp="trunk\build\javatoolsplat\j2re-1.3.1\group\j2re-1.3.1.mrp"/>
+                    </component>
+                </collection>
+				
+                <collection name="hostenv" level="framework" long-name="Host Environment">
+                    <component filter="build_SFPhase1" name="zip-2.2">
+                        <unit bldFile="trunk\build\hostenv\zip-2.2\group" mrp="trunk\build\hostenv\zip-2.2\group\zip-2.2.mrp"/>
+                    </component>
+                    <component filter="build_SFPhase1" name="unzip-5.40">
+                        <unit bldFile="trunk\build\hostenv\unzip-5.40\group" mrp="trunk\build\hostenv\unzip-5.40\group\unzip-5.40.mrp"/>
+                    </component>
+                </collection>
+            </block>
+        </layer>
+    </systemModel>
+    <SystemBuild name="TCL" schema="2.0.0">
+        <option name="KEEPGOING" abldOption="-keepgoing" description="Causes make to keepgoing on errors" enable="Y"/>
+        <option name="SAVESPACE" abldOption="-savespace" description="Causes the removal of intermediate files" enable="Y"/>
+        <target name="WINS" abldTarget="wins" description="MSVC Compiler"/>
+        <target name="WINS_REL" abldTarget="wins urel" description="MSVC Compiler"/>
+        <target name="WINS_DEB" abldTarget="wins udeb" description="MSVC Compiler"/>
+        <target name="WINSCW" abldTarget="winscw" description="CodeWarrior Compiler"/>
+        <target name="WINSCW_REL" abldTarget="winscw urel" description="CodeWarrior Compiler"/>
+        <target name="WINSCW_DEB" abldTarget="winscw udeb" description="CodeWarrior Compiler"/>
+        <target name="TOOLS" abldTarget="tools" description="MSVC Compiler for Tools"/>
+        <target name="TOOLS_REL" abldTarget="tools rel" description="MSVC Compiler for Tools Release mode only"/>
+        <target name="TOOLS2" abldTarget="tools2" description="MinGW GCC Compiler for Tools"/>
+        <target name="TOOLS2_REL" abldTarget="tools2 rel" description="MinGW GCC Compiler for Tools Release mode only"/>
+        <target name="ARMV5" abldTarget="armv5" description="RVCT Compiler"/>
+        <target name="ARMV5_REL" abldTarget="armv5 urel" description="RVCT Compiler"/>
+        <target name="ARMV5_DEB" abldTarget="armv5 udeb" description="RVCT Compiler"/>
+        <target name="ARMV5SMP" abldTarget="armv5smp" description="RVCT Compiler for SMP"/>
+        <target name="ARMV5SMP_REL" abldTarget="armv5smp urel" description="RVCT Compiler for SMP"/>
+        <target name="ARMV5SMP_DEB" abldTarget="armv5smp udeb" description="RVCT Compiler for SMP"/>
+        <!-- <target name="GCCE" abldTarget="gcce" description="GCCCE Compiler"/> -->
+        <!-- <target name="GCCE_DEB" abldTarget="gcce udeb" description="GCCCE Compiler"/> -->
+        <!-- <target name="GCCE_REL" abldTarget="gcce urel" description="GCCCE Compiler"/> -->
+        <!-- Aditional Targets -->
+        <target name="CWTOOLS" abldTarget="cwtools" description="CodeWarrior Compiler for Tools"/><!-- Not supported -->
+        <target name="CWTOOLS_REL" abldTarget="cwtools rel" description="CodeWarrior Compiler for Tools Release mode only"/><!-- Not supported -->
+        <target name="GCCXML" abldTarget="gccxml" description="GCCXML for Code comparision tools"/>
+        <target name="GCCXML_REL" abldTarget="gccxml urel" description="GCCXML for Code comparision tools release mode only"/>
+        <targetList name="default_9.0" description="Main Targets for 9.0" target="WINSCW ARMV5 ARMV5SMP"/>
+        <targetList name="default_9.0_rel" description="Main Targets for 9.0_rel" target="WINSCW_REL ARMV5_REL ARMV5SMP_REL"/>
+        <targetList name="default_9.0_deb" description="Main Targets for 9.0_deb" target="WINSCW_DEB ARMV5_DEB ARMV5SMP_DEB"/>
+        <targetList name="tools" description="tools Targets" target="TOOLS"/>
+        <targetList name="tools_rel" description="tools Release Targets" target="TOOLS_REL"/>
+        <targetList name="tools2" description="tools Targets" target="TOOLS2"/>
+        <targetList name="tools2_rel" description="tools Release Targets" target="TOOLS2_REL"/>
+        <targetList name="gccxml" description="tools Targets" target="GCCXML"/>
+        <targetList name="gccxml_rel" description="tools Release Targets" target="GCCXML_REL"/>
+        <targetList name="armv5smp" description="Separate ARMV5 SMP target" target="ARMV5SMP"/>
+        <targetList name="armv5smp_rel" description="Separate ARMV5 SMP release target" target="ARMV5SMP_REL"/>
+        <targetList name="armv5smp_deb" description="Separate ARMV5 SMP debug target" target="ARMV5SMP_DEB"/>
+        <!-- Default configuration -->
+        <configuration name="TCL_SF_PHASE3" description="Symbian Foundation Build Phase3" filter="tcl,build_SFPhase3">
+            <ref item="ana"/>
+            <ref item="depl"/>
+            <ref item="dev"/>
+            <ref item="unclassifiedlayer"/>
+        </configuration>
+</SystemBuild></SystemDefinition>

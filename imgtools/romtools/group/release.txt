@@ -1,3 +1,13 @@
+Version 2.12.2 (ROFSBUILD)
+===============
+Released by Marvin Shi, 30/06/2010
+	1)DEF145479 Rofsbuild fails to build SMR image with non-HCR content. 
+
+Version 2.12.1 (ROFSBUILD)
+===============
+Released by Lorence Wang, 30/06/2010
+	1)Rofsbuild cache test case failed defect.
+
 Version 2.12.0 (ROFSBUILD)
 ===============
 Released by Jason Cui, 13/06/2010

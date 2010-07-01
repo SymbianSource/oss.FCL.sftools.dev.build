@@ -60,18 +60,19 @@ CacheEntry* CacheValidator::Validate(const char* OriginalFilename, int CurrentCo
 	{
 		return (CacheEntry*)0;
 	}
+
+	boost::filesystem::path originalfile(OriginalFilename);
+	time_t originalcreationtime = last_write_time(originalfile);
+	string creationtime(ctime(&originalcreationtime));
+	size_t newlinepos = creationtime.find("\n");
+	while(newlinepos != string::npos)
+	{
+		creationtime.erase(newlinepos, 1);
+		newlinepos = creationtime.find(("\n"));
+	}
 	while(entryref)
 	{
-		boost::filesystem::path originalfile(OriginalFilename);
-		time_t originalcreationtime = last_write_time(originalfile);
-		string creationtime(ctime(&originalcreationtime));
-		size_t newlinepos = creationtime.find("\n");
-		while(newlinepos != string::npos)
-		{
-			creationtime.erase(newlinepos, 1);
-			newlinepos = creationtime.find(("\n"));
-		}
-		if((creationtime.compare(entryref->GetOriginalFileCreateTime())== 0) || (atoi(entryref->GetCachedFileCompressionID())==CurrentCompressionID))
+		if((creationtime.compare(entryref->GetOriginalFileCreateTime())== 0) && (atoi(entryref->GetCachedFileCompressionID())==CurrentCompressionID))
 		{
 			boost::filesystem::path cachedfile(entryref->GetCachedFilename());
 			string filename = cachedfile.file_string(); 

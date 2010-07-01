@@ -152,7 +152,8 @@ The available options are
    -lowmem                          -- use memory-mapped file for image build to reduce physical memory consumption   
    -checkcase                       -- check character case of path/name in oby/iby files, 
                                     the result will be checkcase.log, this option is only valid on windows.
-   -workdir=xxx                     -- specify a directory to contain generated files.   
+   -workdir=xxx                     -- specify a directory to contain generated files. 
+   -prependepocroot                 -- if there is no EPOCROOT## before /epoc32/, prepend EPOCROOT## to epoc32.
 
 Popular -D defines to use include
 
@@ -342,6 +343,7 @@ my $checkcase = 0;
 my $checkcase_platform = "";
 my $checkcase_test = 0;
 my $opt_workdir = 0;
+my $prependepocroot = 0;
 
 sub match_obyfile
 {
@@ -1019,7 +1021,12 @@ sub process_cmdline_arguments
 			chdir "$currentdir";
 			next;	
 		}
-        if($arg =~/^-c(.*)/)
+		if ($arg =~ /^-prependepocroot$/)
+		{
+			$prependepocroot = 1;
+			next;
+		}
+		    if($arg =~/^-c(.*)/)
         {
           if($1 eq 'none' )
           {
@@ -1438,14 +1445,16 @@ sub substitution_phase
 		track_source($line);
 		$line =~ s-\\-\/-g;
 
-		my $tempstring = $epocroot."epoc32";
-		if(($line !~ /^\s*\#/) && ($line =~ /\/epoc32/i) 
-		 && ($line !~ /EPOCROOT##\/?epoc32/i) && ($line !~ /$tempstring/i))
+		if ($prependepocroot)
 		{
-			print "add EPOCROOT for line: $line\n" if ($opt_v);
-	  	$line =~ s-\/epoc32-EPOCROOT##epoc32-ig;
+			my $tempstring = $epocroot."epoc32\/";
+			if(($line !~ /^\s*\#/) && ($line =~ /\/epoc32\//i) 
+			 && ($line !~ /EPOCROOT##\/?epoc32\//i) && ($line !~ /$tempstring/i))
+			{
+				print "add EPOCROOT for line: $line\n" if ($opt_v);
+		  	$line =~ s-\/epoc32-EPOCROOT##epoc32-ig;
+			}
 		}
-
 		#
 		# Recognise keywords in lines that we process before substitution
 		#

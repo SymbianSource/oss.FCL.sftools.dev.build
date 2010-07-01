@@ -70,31 +70,25 @@ TBool CSmrImage::SetFormatVersion(const StringVector& aValues)
 	Val(iSmrRomHeader.iImageVersion,aValues.at(0).c_str()); 
 	return ETrue;
 }
-TBool CSmrImage::SetHcrData(const StringVector& aValues)
+TBool CSmrImage::SetSmrData(const StringVector& aValues)
 {
 	
 	if(aValues.size() == 0)
 	{
-		Print(EError, "keyword hcrdata has not been set!");
+		Print(EError, "keyword smrdata has not been set!");
 		return EFalse;
 	}
 	if(aValues.size() > 1)
 	{
-		Print(EError, "Keyword hcrdata has been set more than one time!");
+		Print(EError, "Keyword smrdata has been set more than one time!");
 		return EFalse;
 	}
-	iHcrData = aValues.at(0);
+	iSmrData = aValues.at(0);
 
-	ifstream is(iHcrData.c_str(), ios_base::binary );
+	ifstream is(iSmrData.c_str(), ios_base::binary );
 	if(!is)
 	{
-		Print(EError, "HCR data file: %s dose not exist!", iHcrData.c_str());
-		return EFalse;
-	}
-	TUint32 magicWord = 0;
-	is.read(reinterpret_cast<char*>(&magicWord),sizeof(TUint32));
-	if(0x66524348 != magicWord){
-		Print(EError, "HCR data file: %s is an invalid HCR data file!", iHcrData.c_str());
+		Print(EError, "SMR data file: %s dose not exist!", iSmrData.c_str());
 		return EFalse;
 	}
 	is.close();
@@ -140,7 +134,7 @@ TInt CSmrImage::Initialise()
 		return result;
 	if(! SetFormatVersion(iObeyFile->getValues("formatversion")))
 		return result;
-	if(! SetHcrData(iObeyFile->getValues("hcrdata")))
+	if(! SetSmrData(iObeyFile->getValues("smrdata")))
 		return result;
 	if(! SetPayloadUID(iObeyFile->getValues("payloaduid")))
 		return result;
@@ -153,10 +147,10 @@ TInt CSmrImage::CreateImage()
 {
 	TInt imageSize = 0;
 	ifstream is;
-	is.open(iHcrData.c_str(), ios_base::binary);
+	is.open(iSmrData.c_str(), ios_base::binary);
 	if(!is)
 	{
-		Print(EError, "Open HCR data file: %s error!\n", iHcrData.c_str());
+		Print(EError, "Open SMR data file: %s error!\n", iSmrData.c_str());
 		return KErrGeneral;
 	}
 	is.seekg(0, ios_base::end);

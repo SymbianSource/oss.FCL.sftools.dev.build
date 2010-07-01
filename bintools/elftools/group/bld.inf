@@ -25,7 +25,6 @@ PRJ_EXPORTS
 #ifndef TOOLS2_LINUX
 ../elf2inf.pl		/epoc32/tools/elf2inf.pl
 ../def2dll.bat		/epoc32/tools/def2dll.bat
-A
 ../deputil.pl		/epoc32/tools/deputil.pl
 ../deputil.pm		/epoc32/tools/deputil.pm
 #endif

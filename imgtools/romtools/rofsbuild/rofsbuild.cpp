@@ -47,7 +47,7 @@
 
 static const TInt RofsbuildMajorVersion=2;
 static const TInt RofsbuildMinorVersion=12;
-static const TInt RofsbuildPatchVersion=0;
+static const TInt RofsbuildPatchVersion=2;
 static TBool SizeSummary=EFalse;
 static TPrintType SizeWhere=EAlways;
 
