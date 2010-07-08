@@ -99,10 +99,6 @@
 <SystemDefinition schema="2.0.1" name="Symbian">
     <systemModel>
         <layer name="dev" levels="device middleware eclipse" long-name="Development">
-            <!-- Developer Product -->
-            
-            <!-- OS Product-->
-
             <block name="buildtools" level="framework" levels="lowlevel-libs middleware framework ui" long-name="Build Tools">
                 <collection name="imgtools_os" level="framework" long-name="Image Tools Metadata">
                     <component filter="build_SFPhase1" name="romkiteka2">
