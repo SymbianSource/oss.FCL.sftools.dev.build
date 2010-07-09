@@ -110,6 +110,7 @@
 		<param name='DEBUG_INFO'/>
 		<param name='DEPEND_OPTION'/>
 		<param name='ELF2E32'/>
+		<param name='ELF2E32_EXPGEN_OPT' default=''/>
 		<param name='EFREEZE'/>
 		<param name='EFREEZE_REMOVE_OPTION' default=''/>
 		<param name='ENUM_OPTION'/>

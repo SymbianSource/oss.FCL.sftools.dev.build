@@ -449,7 +449,7 @@ $(EXPTARGET): $(DEFFILE) $(ELF2E32)
 	$(call startrule,expgen) \
 	$(ELF2E32) \
 	   --definput=$$(call dblquote,$(DEFFILE)) \
-	   --dump=a \
+	   --dump=a $(ELF2E32_EXPGEN_OPT) \
 	   --output=$(call dblquote,$(EXPTARGETASMFILE)) && \
 	$(ASM) $(TARGET_ARCH_OPTION) $(AAPCS_OPTION) $(ASM_OUTPUT_OPTION) $$(call dblquote, $$@) $(EXPTARGETASMFILE) \
 	$(call endrule,expgen)
