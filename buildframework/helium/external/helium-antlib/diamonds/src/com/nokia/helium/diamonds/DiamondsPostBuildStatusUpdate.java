@@ -83,8 +83,12 @@ public class DiamondsPostBuildStatusUpdate extends HlmPostDefImpl {
             sourceList.add(new PropertiesSource("ant", getProject().getProperties()));
             sourceList.add(new PropertiesSource("diamonds", tempProperties));
             outputFile = DiamondsConfig.getOutputDir() + File.separator + "diamonds-status.xml";
-            templateFile = "diamonds_status.xml.ftl";
-            templateProcessor.convertTemplate(DiamondsConfig.getTemplateDir(), templateFile, outputFile, sourceList);
+			
+            // Enhancement SF Bug 3222
+            if (!(new File(outputFile)).exists()) {
+              templateFile = "diamonds_status.xml.ftl";
+              templateProcessor.convertTemplate(DiamondsConfig.getTemplateDir(), templateFile, outputFile, sourceList);
+            }
 
             /* send the generated XML file for diamonds client to update the build status into Diamonds */
             log.debug("[DiamondsPostBuildStatusUpdate] => sending data to diamonds ..." + outputFile);
