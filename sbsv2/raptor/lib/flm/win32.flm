@@ -204,8 +204,15 @@ BINTARGET:=$(BINDIR)/$(TARGET).$(TARGETEXT)
 
 
 # Run trace compiler #####################################
+# The following variable defines a prereq that source code will 
+# depend on so that tracing happens before compilation.  Must be 
+# blank by default so that if tracing is off then there will be
+# no dependency.  The tracecompiler code will set it if this
+# project actually does depend on trace-generated headers:
+TRACE_THISCOMPONENT_ALLRULE:=
 TRACE_MARKER_PATH:=$(OUTPUTPATH)
 
+# Tracing requires a UID to make uniquely numbered trace points
 ifeq ($(subst 0,,$(UID3)),)
   ifeq ($(UID2),)
     USE_TRACE_COMPILER:=
@@ -377,7 +384,7 @@ ifneq ($(BASE_TYPE),importlib)
     $(eval DEPENDFILENAME:=$(call mapwin32file,$(1),.o.d))
     $(eval DEPENDFILE:=$(wildcard $(DEPENDFILENAME)))
 
-    $(call mapwin32file,$(1),.o): $(1) $(PROJECT_META) $(if $(DEPENDFILE),,RESOURCE BITMAP EXPORT) | $(if $(USE_TRACE_COMPILER),$(TRACE_MARKER))
+    $(call mapwin32file,$(1),.o): $(1) $(PROJECT_META) $(if $(DEPENDFILE),,RESOURCE BITMAP EXPORT) | $(TRACE_THISCOMPONENT_ALLRULE) 
 	  $(call startrule,win32compile2object,,$(1)) \
 	  $(CC) $$(if $$(filter %.C,$(1)),-lang c) $(CFLAGS) $(OPTION_CW) \
 	  $(if $(STDCPP_BUILD),$$(if $$(filter %.c %.C,$(1)),,$$(call makemacrodef,$(OPT.DEFINE),$(STDCPP_WCHAR_DEF))),) \

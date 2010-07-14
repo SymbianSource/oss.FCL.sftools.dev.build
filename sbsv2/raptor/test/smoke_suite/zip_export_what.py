@@ -15,11 +15,13 @@
 #
 
 from raptor_tests import CheckWhatSmokeTest, ReplaceEnvs
+from raptor_meta import MetaReader
+from raptor_utilities import sanitise
 import re
 
 def run():
-	markerfile = re.sub("(\\\\|\/|:|;| )", "_",
-			ReplaceEnvs("$(SBS_HOME)_test_smoke_suite_test_resources_simple_zip_export_archive.zip$(EPOCROOT)_epoc32_testunzip.unzipped"))
+	premarkerfile = sanitise(ReplaceEnvs("$(SBS_HOME)_test_smoke_suite_test_resources_simple_zip_export_archive.zip$(EPOCROOT)_epoc32_testunzip"))
+	markerfile = MetaReader.unzippedPathFragment(premarkerfile) + ".unzipped"
 	
 	t = CheckWhatSmokeTest()
 	t.id = "25"

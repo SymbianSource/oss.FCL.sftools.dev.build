@@ -23,6 +23,7 @@ def run():
 	t.command = "sbs -b smoke_suite/test_resources/resource/group/bld.inf -c " \
 			+ "winscw RESOURCE"
 	t.targets = [
+		"$(EPOCROOT)/epoc32/include/onelang.rsg",
 		"$(EPOCROOT)/epoc32/include/testresource.rsg",
 		"$(EPOCROOT)/epoc32/include/testresource.hrh",
 		"$(EPOCROOT)/epoc32/data/z/resource/testresource/testresource.r01",

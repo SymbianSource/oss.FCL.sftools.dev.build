@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2002-2006 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2002-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of the License "Eclipse Public License v1.0"
@@ -40,6 +40,15 @@ const TUint32 KNvMemValueOffset32 = 3;
 typedef TUint nvsUpdateList;
 #define UPDATE_MAC_ADDR 		0x0080
 #define UPDATE_ALL 				  0xFFFF
+
+// Custom trace extraction content required for this component
+typedef TUint8  TGroupId;
+#define GROUPIDMASK             0x00ff0000
+#define GROUPIDSHIFT            16
+#define TRACEIDMASK             0x0000ffff
+#define TRACEIDSHIFT            0
+#define EXTRACT_GROUP_ID(aTraceName) static_cast<TGroupId>((aTraceName & GROUPIDMASK) >> GROUPIDSHIFT)
+
 
 /**
 * The class for parsing the tuning data stored in PERM server.

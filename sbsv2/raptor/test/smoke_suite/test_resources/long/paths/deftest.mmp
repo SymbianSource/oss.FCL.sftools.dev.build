@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of the License "Eclipse Public License v1.0"
@@ -67,7 +67,10 @@ source	test45.cpp
 source	test46.cpp 
 source	test47.cpp 
 source	test48.cpp 
-source	test49.cpp 
+source	test49.cpp
+
+APP_LAYER_SYSTEMINCLUDE_SYMBIAN
+
 unpaged
 macro __TESTNAME__="deftest"
 

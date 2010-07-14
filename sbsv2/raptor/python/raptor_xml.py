@@ -317,8 +317,8 @@ class SystemModel(object):
 		return component
 
 	def __GetEffectiveLayer(self, aElement):
-		#' return the ID of the topmost item which has an ID. For 1.x and 2.x, this will always be layer, for 3.x, it will be the topmost ID'd element in the file
-		# never call this on the root element
+		# return the ID of the topmost item which has an ID. For 1.x and 2.x, this will always be layer,
+		# for 3.x, it will be the topmost ID'd element in the file never call this on the root element
 		if aElement.parentNode.hasAttribute(self.__IdAttribute):
 			return self.__GetEffectiveLayer(aElement.parentNode)
 		elif aElement.hasAttribute(self.__IdAttribute):
@@ -336,15 +336,24 @@ class SystemModel(object):
 				aContainers[parent.tagName] = name
 
 			self.__GetElementContainers(parent, aContainers)
+	
+	def __ProcessSystemModelMetaElement(self, aElement):
+		# stub method - may deal with metadata elements at some point in the future
+		return	
 
 	def __ProcessSystemModelElement(self, aElement):
 		"""Search for XML <unit/> elements with 'bldFile' attributes and resolve concrete bld.inf locations
 		with an appreciation of different schema versions."""
 
+		# Metadata elements are processed separately - there are no further child nodes
+		# to process in this context
+		if aElement.tagName == "meta" :
+			return self.__ProcessSystemModelMetaElement(aElement)
+
 		# The effective "layer" is the item whose parent does not have an id (or name in 2.x and earlier)
 		if not aElement.parentNode.hasAttribute(self.__IdAttribute) :
 			currentLayer = aElement.getAttribute(self.__IdAttribute)
-
+			
 			if not self.__LayerDetails.has_key(currentLayer):
 				self.__LayerDetails[currentLayer] = []
 
@@ -380,8 +389,8 @@ class SystemModel(object):
 					if not group.isAbsolute() and bldInfRoot:
 						group = generic_path.Join(bldInfRoot, group)
 				else:
-					# only absolute paths are changed by root var in 3.x
-					if group.isAbsolute() and bldInfRoot:
+					# all paths are changed by root var in 3.x
+					if bldInfRoot:
 						group = generic_path.Join(bldInfRoot, group)
 
 				bldinf = generic_path.Join(group, "bld.inf").FindCaseless()
@@ -389,7 +398,7 @@ class SystemModel(object):
 				if bldinf == None:
 					# recording layers containing non existent bld.infs
 					bldinfname = group.GetLocalString()
-					bldinfname = bldinfname + 'bld.inf'
+					bldinfname = bldinfname+'/'+'bld.inf'
 					layer = self.__GetEffectiveLayer(aElement)
 					if not layer in self.__MissingBldInfs:
 						self.__MissingBldInfs[layer]=[]

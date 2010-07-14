@@ -25,9 +25,8 @@ UID				0x10009d8d 0xE8000002
 VENDORID		0x70000001
 SOURCEPATH		.
 SOURCE			plugin.cpp
-SYSTEMINCLUDE 	/epoc32/include
+APP_LAYER_SYSTEMINCLUDE
 SYSTEMINCLUDE 	/epoc32/include/ecom
-SYSTEMINCLUDE	/epoc32/include/techview
 LIBRARY			euser.lib apmime.lib efsrv.lib
 
 START RESOURCE	plugin.rss

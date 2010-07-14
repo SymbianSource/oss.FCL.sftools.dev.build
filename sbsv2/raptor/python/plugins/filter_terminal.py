@@ -154,7 +154,8 @@ class FilterTerminal(filter_interface.Filter):
 				"error:",
 				": ***",
 				"make: interrupt/exception caught (code =",
-				"make.exe: interrupt/exception caught (code ="
+				"make.exe: interrupt/exception caught (code =",
+				"command returned code"
 				])
 		# list of strings to catch make warnings (must be lowercase)
 		self.make_warning_expr = ["warning:"]

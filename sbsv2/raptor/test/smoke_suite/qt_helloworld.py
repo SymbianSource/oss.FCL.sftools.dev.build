@@ -15,6 +15,7 @@
 # This test case requires install of Qt. 
 
 from raptor_tests import SmokeTest
+import os
 
 def run():
 	t = SmokeTest()
@@ -23,7 +24,10 @@ def run():
 
 	t.id = "0110"
 	t.name = "qt_helloworld"
-	t.command = "cd smoke_suite/test_resources/qt && qmake -spec symbian-sbsv2 && sbs"
+	# Internal QT deliveries use a QMAKE launcher that expects EPOCROOT to end in a slash
+	# We ensure it does (doesn't matter if there are multiple slashes)
+	t.environ["EPOCROOT"] = os.environ["EPOCROOT"] + os.sep
+	t.command = "cd smoke_suite/test_resources/qt && $(EPOCROOT)/epoc32/tools/qmake -spec symbian-sbsv2 && sbs"
 	t.targets = [
 			"$(SBS_HOME)/test/smoke_suite/test_resources/qt/bld.inf",
 			"$(SBS_HOME)/test/smoke_suite/test_resources/qt/helloworldqt.loc",

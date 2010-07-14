@@ -16,7 +16,7 @@
 		<set name="LD" value="$(GCCELD)"/>
 		<set name="ASM" value="$(GCCEASM)"/>
 		<set name="AR" value="$(GCCEAR)"/>
-		
+
 		<set name="AAPCS_OPTION" value="-mapcs -mthumb-interwork"/>
 		<set name="ARCHIVER_CREATE_OPTION" value="cr"/>
 		<set name="ARM_INSTRUCTION_SET" value="-marm"/>
@@ -43,9 +43,10 @@
 		<set name="COMMANDFILE_OPTION" value="@"/>
 		<set name="COMPILE_ONLY_OPTION" value="-c"/>
 		<set name="COMPILER_CIA_FLAGS" value="-marm"/>
-		<set name="COMPILER_DEFINES" value="-D__GCCE__"/>		
-		<set name="COMPILER_FPU_OPTION" value="-mfloat-abi="/>		
+		<set name="COMPILER_DEFINES" value="-D__GCCE__"/>
+		<set name="COMPILER_FPU_OPTION" value="-mfloat-abi="/>
 		<set name="COMPILER_INTERWORK_DEFINES" value="__MARM_INTERWORK__"/>
+        <set name="COMPILER_NO_HIDE_ALL_OPTION" value="-fvisibility=default"/>
 		<set name="COMPILER_SYSTEM_INCLUDE_OPTION" value="-I"/>
 		<set name="COMPILER_THUMB_DEFINES" value="__MARM_THUMB__"/>
 		<set name="CPP_LANG_OPTION" value="-x c++ -Wno-ctor-dtor-privacy"/>
@@ -108,13 +109,13 @@
 		<set name="STATIC_LIBS_PATH" value="" />
 		<set name="STDCPP_INCLUDE" value="$(EPOCINCLUDE)/stdapis"/>
 		<set name="STDLIB_OPTION" value="-nodefaultlibs"/>
-		<set name="SUPPORTS_ABIV1_IMPLIBS" value=""/>	
+		<set name="SUPPORTS_ABIV1_IMPLIBS" value=""/>
 		<set name="SYMBIAN_LD_MESSAGE_OPTION" value="$(LD_WARNINGS_CONTROL_OPTION) $(LD_ERRORS_CONTROL_OPTION)"/>
 		<set name="SYMVER_OPTION" value="-Wl,--default-symver"/>
 		<set name="TARGET_RELOCATION_OPTION" value="--target1-rel" />
 		<set name="TEMP_FILES_OPTION" value="-pipe"/>
 		<set name="THUMB_INSTRUCTION_SET" value="-mthumb"/>
-		<set name="TRANSFORM_CIA" value=""/>		
+		<set name="TRANSFORM_CIA" value=""/>
 		<set name="UNDEFINED_SYMBOL_REF_OPTION" value="-u"/>
 		<set name="UNRESOLVED_SYMBOL_REF_OPTION" value=""/>
 		<set name="USER_LIBS_PATH_OPTION" value="--userlibpath"/>

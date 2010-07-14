@@ -25,7 +25,7 @@ SOURCE			main.cpp
 SOURCE			dependency.cpp
 
 #ifndef TOOLS2
-SYSTEMINCLUDE	/epoc32/include/techview
+APP_LAYER_SYSTEMINCLUDE
 
 START RESOURCE	main.rss
 HEADER

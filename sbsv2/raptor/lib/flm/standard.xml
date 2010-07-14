@@ -40,6 +40,7 @@
 		<param name='SOURCE' default=''/>
 		<param name='TARGET'/>
 		<param name='TARGET_lower'/>
+		<param name='TARGETPATH' default=''/>
 		<param name='LTCG' default=''/>
 		<param name='LTCG_OPTION' default='--ltcg'/>
 		<param name='TARGETTYPE'/>
@@ -96,6 +97,7 @@
 		<param name='COMPILE_ONLY_OPTION'/>
 		<param name='COMPILER_FPU_DEFAULT'/>
 		<param name='COMPILER_FPU_OPTION'/>
+		<param name='COMPILER_NO_HIDE_ALL_OPTION'/>
 		<param name='COMPILER_CIA_FLAGS'/>
 		<param name='COMPILER_INTERWORK_DEFINES'/>
 		<param name='COMPILER_SYSTEM_INCLUDE_OPTION'/>
@@ -149,6 +151,7 @@
 		<param name='PERTURBMSECS' default='500'/>
 		<param name='POSTLINKER_COMPRESSION_DEFAULT'/>
 		<param name='POSTLINKER_FPU_DEFAULT'/>
+		<param name='POSTLINKER_FPU_MAPPING'/>
 		<param name='PREPDEF'/>
 		<param name='PREINCLUDE'/>
 		<param name='PREINCLUDE_OPTION'/>

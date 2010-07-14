@@ -1,0 +1,8 @@
+TARGETTYPE none
+
+START BITMAP	notargetkeyword.mbm
+HEADER
+TARGETPATH		resource/apps
+SOURCEPATH		../aifsrccl
+SOURCE			c8,1 DEF24.BMP DEF2M.BMP
+END

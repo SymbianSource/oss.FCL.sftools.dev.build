@@ -1,13 +1,29 @@
-<SystemDefinition name="MCL" schema="3.0.0" >  
-	<systemModel>
-	    <layer name="test">
-			<component name="Test Component 1">          
-				<unit unitID="TCOMP1" name="test_component_1" bldFile="simple" mrp="simple\simple.mrp"/>
-			</component>
-			<component name="Test Component 2">
-				<unit unitID="TCOMP2" name="test_component_2" bldFile="basics\helloworld" mrp="basics\helloworld.mrp"/>
-			</component>
-		</layer>
-	</systemModel>
-</SystemDefinition>
-
+<?xml version="1.0" encoding="UTF-8" ?> 
+	<SystemDefinition schema="3.0.0">
+	    <layer id = "testlayer" name="Test Layer">
+			<package id="testpackage" name="Test Package" levels="test">
+				<collection id="testcollection" name="Test Collection" level="test">
+					<component id="testcomponent1" name="Test Component 1" introduced="symbian^3" purpose="optional">
+						<meta rel="Api" type="auto">
+							<api dataversion="1.0" id="11111111111111111111111111111111">
+								<name>testcomponentapi1</name>
+			  					<description>Test Component 1 API description.</description>
+			  					<type>c++</type>
+							</api>
+						</meta>
+						<unit bldFile="../../smoke_suite/test_resources/simple" /> 
+					</component>
+					<component id="testcomponent2" name="Test Component 2" introduced="symbian^3" purpose="optional">
+						<meta rel="Api" type="auto">
+							<api dataversion="1.0" id="22222222222222222222222222222222">
+								<name>testcomponentapi2</name>
+			  					<description>Test Component 2 API description.</description>
+			  					<type>c++</type>
+							</api>
+						</meta>
+						<unit bldFile="../../smoke_suite/test_resources/basics/helloworld" /> 
+					</component>
+	  			</collection>
+	  		</package>
+	  	</layer>
+	</SystemDefinition>

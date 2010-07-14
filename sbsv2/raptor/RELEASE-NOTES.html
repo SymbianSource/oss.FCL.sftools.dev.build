@@ -6,6 +6,40 @@
 
 <h1>Release Notes for Symbian Build System v2</h1>
 
+<h2>version 2.14.2</h2>
+
+<h3>Defect Fixes</h3>
+<ul>
+<li>Fix: minor change: tracecompiler trace folder rename</li>
+<li><a href="http://developer.symbian.org/bugs/show_bug.cgi?id=2886">SF Bug 2886</a> - [Raptor] STDEXE targets cannot be built with GCC-E</li>
+<li><a href="http://developer.symbian.org/bugs/show_bug.cgi?id=2713">SF Bug 2713</a> - [Raptor] Terminal filter needs to allow more make errors through</li>
+<li>Fix: smoketests fail for emake and rvct 4</li>
+<li>Fix permissions for exported files with group ownership on Linux</li>
+<li><a href="http://developer.symbian.org/bugs/show_bug.cgi?id=2697">SF Bug 2697</a> - [Raptor] Macro __SYMBIAN_STDCPP_SUPPORT__ not automatically defined for STD targets</li>
+<li><a href="http://developer.symbian.org/bugs/show_bug.cgi?id=2712">SF Bug 2712</a> - [Raptor] STDEXE and STDDLL targets: euser.lib not automatically included for UDEB builds</li>
+<li><a href="http://developer.symbian.org/bugs/show_bug.cgi?id=2735">SF Bug 2735</a> - [Raptor] Relative unit paths in pkgdefs are not handled correctly</li>
+<li>Fix: resources with headeronly can fail because of an invalid dependency</li>
+<li>Fix: ARMFPU softvfp+vfpv2 for postlinker and RVCT only</li>
+<li><a href="http://developer.symbian.org/bugs/show_bug.cgi?id=2276">SF Bug 2276</a> - [Raptor] ZIP exports from deep directory hierarchies fail</li>
+<li><a href="notes/emulatorstacksize.txt"> Reduction of emulator stack size to 512KB </a>; see also the enhancement <a href="http://developer.symbian.org/bugs/show_bug.cgi?id=2605"> SF Bug 2606 </a> - [Raptor] Can we use a smaller stack size for the emulator </li>
+<li><a href="http://developer.symbian.org/bugs/show_bug.cgi?id=3091">SF Bug 3091</a> - [Raptor] When reporting missing bld.inf's from a Sys def a / can be missing</li>
+<li><a href="http://developer.symbian.org/bugs/show_bug.cgi?id=2825">SF Bug 2825</a> - [Raptor] Meta elements should be ignored when processing a sysdef</li>
+<li><a href="notes/tcom_allbefore.txt">Trace all source files in a component before compiling any file</a>. Helps prevent build breaks in some situations where an asset change is really needed.</li>
+</ul>
+
+<h2>version 2.14.1</h2>
+
+<h3>Defect Fixes</h3>
+<ul>
+
+<li><a href="http://developer.symbian.org/bugs/show_bug.cgi?id=2203"> SF Bug 2203 </a> - [Raptor] Building extension makefile with SBS_BUILD_DIR set to another drive</li>
+<li>Fix : tracecompiler.mk caused poor makefile parse performance due to use of $(shell)</li>
+<li><a href="http://developer.symbian.org/bugs/show_bug.cgi?id=2561">SF Bug 2561</a> - [Raptor] creates incorrect .iby files w.r.t target file versions &amp; ramtargets</li>
+<li><a href="http://developer.symbian.org/bugs/show_bug.cgi?id=2562">SF Bug 2562</a> - [Raptor] adds incorrect entries into .iby files w.r.t file paths</li>
+<li><a href="http://developer.symbian.org/bugs/show_bug.cgi?id=2809">SF Bug 2809</a> - [Raptor] Intermediate Resource Filenames not unique (2.14.0 only), rom fails to boot</li>
+<li><a href="http://developer.symbian.org/bugs/show_bug.cgi?id=1859">SF Bug 1859</a> - [Raptor] Traceback when TARGET missing from MMP file</li>
+</ul>
+
 <h2>version 2.14.0</h2>
 
 <h3>New Features</h3>
@@ -31,7 +65,6 @@
 <li><a href="notes/localresourcecopying.txt">Fix: (performance in cluster builds) do resource copying on local host.</a></li>
 <li>Fix: don't generate multiple copies of the same resource just because there are several target paths. Generate it once and copy that to the different target paths. Helps when winscw is built after an arm build.</li>
 <li>Fix: (performance) remove unnecessary copying of rpp files into epoc32\localisation as they are not used.</li>
-<li>Fix: (performance) remove -C option when preprocessing rpp files - causes comments to be stripped from the rpp resulting in smaller files that improves performance.</li>
 
 </ul>
 
@@ -74,10 +107,10 @@ version 2.12.5
 
 Defect Fixes:
 - Fix: Workaround for emake engine log corruption when clockskew errors occur (annofile2log).
-  Allow Raptor to obtain log from emake annotation file where it is uncorrupted.  A new 
+  Allow Raptor to obtain log from emake annotation file where it is uncorrupted.  A new
   Make engine option "copylogfromannofile" enables/disables this mode for emake. If this option is disabled
   or if no annotation file is specified for the build then Raptor reads logs directly as normal.
-- SF Bug 2125 - [Raptor] - tracecompiler what output incorrect if mmp basename contains '.' e.g. fred.prd.mmp 
+- SF Bug 2125 - [Raptor] - tracecompiler what output incorrect if mmp basename contains '.' e.g. fred.prd.mmp
 - SF Bug 2191 - [Raptor] - When forcesuccess is enabled, exit status for a failed recipe is "retry" but should be "failed"
 - Fix: extend tracecompiler tests to Linux
 - Fix: Amendment to SF Bug 1511 fix - removal of blanked DEFFILE keyword from e32abiv2ani.flm
@@ -115,7 +148,7 @@ version 2.12.2
 Defect Fixes:
 - SF Bug 1569 - excessive recompilation in incremental tracecompiler builds
 - Better error messages for make-engine selection.
-  e.g. "sbs -e arm" will now produce a useful error message rather than 
+  e.g. "sbs -e arm" will now produce a useful error message rather than
   a traceback. "arm" is a real variant but it's not a make engine.  In
   the past sbs would have tried to use it and would have failed with a
   complicated traceback. Also doesn't traceback for non-existent make engines.
@@ -139,11 +172,11 @@ New Features:
 - New 'Patchable Constants' target type: TARGETTYPE pdll
 - Combine Linking and Postlinking into a single step - performance improvement.
 - Support exit codes from next version of the trace compiler which will issue them
-- New sbs_filter script and batchfile to ease the use of sbs_filter.py.  
+- New sbs_filter script and batchfile to ease the use of sbs_filter.py.
   Allows filters to be executed over a log after a build has been done.
     e.g.
 
-  	sbs_filter --filters=FilterWhat < logfile.log 
+  	sbs_filter --filters=FilterWhat < logfile.log
 
     (This runs a "--what" without regenerating any makefiles or reparsing
     the matadata.)
@@ -152,40 +185,40 @@ New Features:
   uses the incoming epocroot value.  i.e. if epocroot is relative then so is
   the what output.  e.g. if EPOCROOT=\ then the output will be of the form:
 
-	"\epoc32\release\armv5\...."  
+	"\epoc32\release\armv5\...."
 
   If it's "..\myepocroot" then the output will be:
 
-	"..\myepocroot\epoc32\release\armv5".  
+	"..\myepocroot\epoc32\release\armv5".
 
   If it's absolute then the what output will also be absolute.
-- New FilterCheck filter.  This can be used with sbs_filter to perform the 
+- New FilterCheck filter.  This can be used with sbs_filter to perform the
   equivalent of --check using the log output from a build.  It is more
   efficient than --check because the metadata is not parsed and no makefiles
   are generated. e.g.
 
-	sbs_filter --filters=FilterCheck < logfile.log 
+	sbs_filter --filters=FilterCheck < logfile.log
 
-- New (beta) graphical build visualisation tool (bin/timelines.py). 
+- New (beta) graphical build visualisation tool (bin/timelines.py).
   Requires pygame and PyOpenGL. e.g.
 
 	python timelines.py < filename.log
 
-- New (beta) log analyser (recipestats.py) for recording the total time spent 
+- New (beta) log analyser (recipestats.py) for recording the total time spent
   in each type of recipe in the build. e.g.
 
 	python recipestats.py < filename.log > stats.csv
 
-  The output is in CSV format.  
+  The output is in CSV format.
 
 Defect Fixes:
 - fix for ARM9E + ARMV5 pre-processing confusion
 - SF bug 1606: template_ext.flm wrongly creates dependencies to OTHER_CFG targets
-- SF bug 1570: Adding then removing a capability can produce incorrect 
+- SF bug 1570: Adding then removing a capability can produce incorrect
   result: e.g. ALL TCB -TCB becomes ALL -TCB but it should be just ALL
 
 Other Changes:
-- Default to using Python 2.6.4 on windows (no change in compatibility with 
+- Default to using Python 2.6.4 on windows (no change in compatibility with
   older versions of Python).
 
 
@@ -270,7 +303,7 @@ DPDEF141354 EXPORTUNFROZEN fails in target builds if .savespace is applied
 DPDEF141533 Inconsistent log output
 DPDEF141604 file winscw.auto.bat is released two times
 DPDEF141787 Raptor treats EFREEZE info message as warnings
-	
+
 Other Changes:
 talon can read commands from a temporary file as well as with -c
 
@@ -295,7 +328,7 @@ version 2.9.1
 Defect Fixes:
 DPDEF141503 RMTPClient::StartTransport Panic when using emulated test tranport plugin
 DPDEF141688 ARMV6 builds with SBSv2 have problems with missing DEF files
-	
+
 
 version 2.9.0
 
@@ -311,7 +344,7 @@ Defect Fixes:
 DPDEF141523 Raptor links kernel-side components to scppnwdl.dso
 DPDEF141418 Raptor turns echo on
 DPDEF141495 Raptor doesn't deal correctly with SOURECEPATH beginning with '/'
-DPDEF141388 raptor inserts epoc32\include at start of systeminclude path	
+DPDEF141388 raptor inserts epoc32\include at start of systeminclude path
 
 
 version 2.8.6
@@ -468,7 +501,7 @@ version 2.6.3
 
 Defect Fixes:
 DPDEF133508 Number of errors is counted wrong
-DPDEF138098 UID issue in Trace Compiler for Raptor 
+DPDEF138098 UID issue in Trace Compiler for Raptor
 DPDEF138296 SBSV2 disables all TOOLS2 compiler warnings
 
 
@@ -477,7 +510,7 @@ version 2.6.2
 Defect Fixes:
 DPDEF135330 Raptor Rollout: bangalore messaging winscw udeb test code
 DPDEF137726 Missing mscvr_readme.txt from the SBSv2 drop
-DPDEF137739 SBSv2: rollout - .cia object files can conflict with .cpp object files 
+DPDEF137739 SBSv2: rollout - .cia object files can conflict with .cpp object files
 
 
 version 2.6.1
@@ -507,7 +540,7 @@ Defect Fixes:
 DPDEF136719 Raptor: sbsv2cache.py cache file generation fails with very large log files
 DPDEF136715 On Linux the shipped python 2.5.2 is not found
 DPDEF132996 SBSv2 doesn't generate AUTO.BAT file
-DPDEF136382 SBSv2: explicit dll versioning not supported on arm platforms 	
+DPDEF136382 SBSv2: explicit dll versioning not supported on arm platforms
 DPDEF135843 [Raptor Rollout] Raptor does not support OPTION_REPLACE ARMASM/OPTION ARMASM
 DPDEF136693 makesis fails when multiple instances are run concurrently with the same target
 
@@ -545,7 +578,7 @@ DS.1568 User defined configuration file location(s)
 version 2.4.3
 
 Defect Fixes:
-DPDEF134322 SBSV2 uses the wrong library when building STDCPP targets 	
+DPDEF134322 SBSV2 uses the wrong library when building STDCPP targets
 DPDEF132923 SBSv2 freeze don't add Vtable and RTTI information into def file for arm dll
 DPDEF133775 SBSv2: ARMFPU is not passed to compiler
 DPDEF134023 case inconsistency with libOpenVG.lib
@@ -576,7 +609,7 @@ version 2.4.0
 
 New Features:
 DS.1475 Pluggable Log Summariser
-DS.1476 Use FLMs from the source tree  
+DS.1476 Use FLMs from the source tree
 
 Defect Fixes:
 DPDEF133417 SBSv2: tmp mounting errors on startup
@@ -611,7 +644,7 @@ DPDEF129634 ALWAYS_BUILD_AS_ARM does not suppress __MARM_THUMB__ with SBSv2
 version 2.3.0
 
 New Features:
-DS.1424 Support for ARMV5SMP platform  
+DS.1424 Support for ARMV5SMP platform
 
 Defect Fixes:
 DPDEF129804 SBSv2 crashes when there are double \\ in prj_mmpfiles in bld.inf
@@ -713,7 +746,7 @@ MINOR_CHANGE Added monty test data to the test folder
 version 2.2.0
 
 New Features:
-DS.1347 SBSv2 Compiler Selection  
+DS.1347 SBSv2 Compiler Selection
 DS.1348 SBSv2 allow mixed slashes
 
 Defect Fixes:
@@ -799,7 +832,7 @@ Change Requests:
 CR1413 Support for different toolchains to be called by SBSv1 and SBSv2
 
 
-version 2.1.1	
+version 2.1.1
 
 Defect Fixes:
 DEF124748 GCCXML errors in Raptor related to missing arm lib files

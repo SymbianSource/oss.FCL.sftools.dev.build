@@ -11,5 +11,5 @@ SOURCEPATH		../src
 SOURCE			child2.cpp
 SOURCE			common.cpp
 
-USERINCLUDE		../traces/traces_child2_exe
+USERINCLUDE		../traces/child2_exe
 

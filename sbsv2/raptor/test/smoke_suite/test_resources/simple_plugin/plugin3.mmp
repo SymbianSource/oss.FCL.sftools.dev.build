@@ -24,9 +24,8 @@ CAPABILITY		Protserv
 VENDORID		0x70000001
 SOURCEPATH		.
 SOURCE			plugin.cpp
-SYSTEMINCLUDE	/epoc32/include
-SYSTEMINCLUDE	/epoc32/include/ecom
-SYSTEMINCLUDE	/epoc32/include/techview
+APP_LAYER_SYSTEMINCLUDE
+SYSTEMINCLUDE 	/epoc32/include/ecom
 LIBRARY			euser.lib apmime.lib efsrv.lib
 
 START RESOURCE	plugin3.rss

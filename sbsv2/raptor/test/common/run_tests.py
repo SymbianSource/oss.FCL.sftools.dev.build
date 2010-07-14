@@ -44,7 +44,7 @@ parser.add_option("-t", "--tests", action = "store", type = "string",
 parser.add_option("-d", "--debug", action = "store_true", dest = "debug_mode",
 		default = False, help = "Turns on debug-mode")
 parser.add_option("--test-home", action = "store", type = "string",
-		dest = "test_home",
+		dest = "test_home", default="default",
 		help = "Location of custom .sbs_init.xml (name of directory in " +
 		"'custom_options'): test/custom_options/<test_home>/.sbs_init.xml")
 parser.add_option("--what-failed", action = "store_true", dest = "what_failed",

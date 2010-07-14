@@ -3,9 +3,9 @@
 # Copyright (c) 2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
-# under the terms of the License "Eclipse Public License v1.0"
+# under the terms of the License "Symbian Foundation License v1.0"
 # which accompanies this distribution, and is available
-# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+# at the URL "http://www.symbianfoundation.org/legal/sfl-v10.html".
 #
 # Initial Contributors:
 # Nokia Corporation - initial contribution.
@@ -46,7 +46,7 @@ if not "HOSTPLATFORM_DIR" in os.environ:
 	sys.exit(1)
 
 # construct a Raptor object from our command-line (less the name of this script)
-the_raptor = raptor.Raptor.CreateCommandlineBuild(sys.argv[1:])
+the_raptor = raptor.Raptor.CreateCommandlineAnalysis(sys.argv[1:])
 
 # from Raptor.OpenLog()
 try:

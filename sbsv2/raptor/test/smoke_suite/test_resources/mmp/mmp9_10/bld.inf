@@ -22,5 +22,5 @@ ARMV5
 PRJ_MMPFILES
 armfpu_soft.mmp
 armfpu_vfpv2.mmp
-
+armfpu_soft+vfpv2.mmp
 

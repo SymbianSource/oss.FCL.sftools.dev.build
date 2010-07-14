@@ -1,0 +1,5 @@
+Each thread or virtual "process" that is launched on the emulator gets a 1 MB 
+stack. 1MB is much too large and 512 KB is more than sufficient. This 
+reduction in stack size will help the emulator to fit into Windows virtual 
+address space and improve its performance.
+

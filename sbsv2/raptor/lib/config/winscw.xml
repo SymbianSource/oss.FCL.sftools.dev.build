@@ -63,7 +63,7 @@
 		<set name="DEFAULT_SYSTEM_NEWLIB" value="scppnwdl_kern.lib"/>
 		<set name="EPOCSTACKSIZE" value=""/>
 		<set name="EXPORT_TYPE" value="dllexport"/>
-		<set name="LFLAGS" value="-msgstyle gcc -stdlib -subsystem windows"/>
+		<set name="LFLAGS" value="-msgstyle gcc -stdlib -subsystem windows -stackreserve 512"/>
 		<set name="LFLAGS_INFGEN" value="-S -show only,names,unmangled,verbose "/>
 		<set name="LFLAGS_SYMGEN" value="-S -show only,names,verbose "/>
 		<set name="LINKPATH" value="winscw/udeb"/>

@@ -207,7 +207,8 @@ def copyfile(_source, _destination):
 		destDir = destination.Dir()
 		if not destDir.isDir():
 			os.makedirs(str(destDir))
-			shutil.copyfile(source_str, dest_str)
+			# preserve permissions
+			shutil.copy(source_str, dest_str)
 			return 
 		# Destination file exists so we have to think about updating it
 		sourceMTime = 0
@@ -225,13 +226,13 @@ def copyfile(_source, _destination):
 			pass # destination doesn't have to exist
 
 		if destMTime == 0 or destMTime < sourceMTime:
+			# remove old version
+			#	- not having ownership prevents chmod
+			#	- avoid clobbering the original if it is a hard link
 			if os.path.exists(dest_str):
-				os.chmod(dest_str,stat.S_IREAD | stat.S_IWRITE)
-			shutil.copyfile(source_str, dest_str)
-
-			# Ensure that the destination file remains executable if the source was also:
-			os.chmod(dest_str,sourceStat[stat.ST_MODE] | stat.S_IREAD | stat.S_IWRITE | stat.S_IWGRP ) 
-
+				os.unlink(dest_str)
+			# preserve permissions
+			shutil.copy(source_str, dest_str)
 
 	except Exception,e:
 		message = "Could not update " + dest_str + " from " + source_str + " : " + str(e)

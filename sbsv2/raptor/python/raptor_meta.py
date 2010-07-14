@@ -35,6 +35,7 @@ from xml.sax.saxutils import escape
 from mmpparser import *
 
 import time
+import generic_path
 
 
 PiggyBackedBuildPlatforms = {'ARMV5':['GCCXML']}
@@ -768,9 +769,13 @@ class ExtensionmakefileEntry(object):
 			biloc="." # Someone building with a relative raptor path
 
 		self.__StandardVariables = {}
-		# Relative step-down to the root - let's try ignoring this for now, as it
-		# should amount to the same thing in a world where absolute paths are king
-		self.__StandardVariables['TO_ROOT'] = ""
+		# The source root directory is SRCROOT if set in the environment
+		# Set TO_ROOT to SRCROOT in case SBS_BUILD_DIR is on a different drive
+		if 'SRCROOT' in os.environ:
+			self.__StandardVariables['TO_ROOT'] = str(generic_path.Path(os.environ['SRCROOT']))
+		else:
+			self.__StandardVariables['TO_ROOT'] = ""
+		
 		# Top-level bld.inf location
 		self.__StandardVariables['TO_BLDINF'] = biloc
 		self.__StandardVariables['EXTENSION_ROOT'] = eiloc
@@ -838,9 +843,12 @@ class Extension(object):
 			eiloc="." # Someone building with a relative raptor path
 
 		self.__StandardVariables = {}
-		# Relative step-down to the root - let's try ignoring this for now, as it
-		# should amount to the same thing in a world where absolute paths are king
-		self.__StandardVariables['TO_ROOT'] = ""
+		# The source root directory is SRCROOT if set in the environment	
+		# Set TO_ROOT to SRCROOT in case SBS_BUILD_DIR is on a different drive
+		if 'SRCROOT' in os.environ:
+			self.__StandardVariables['TO_ROOT'] = str(generic_path.Path(os.environ['SRCROOT']))
+		else:
+			self.__StandardVariables['TO_ROOT'] = ""
 		# Top-level bld.inf location
 		self.__StandardVariables['TO_BLDINF'] = biloc
 		# Location of bld.inf file containing the current EXTENSION block
@@ -1207,6 +1215,13 @@ class MMPRaptorBackend(MMPBackend):
 		'phonenetwork':0,
 		'localnetwork':0
 	  	}
+	
+	# Valid ARMFPU options
+	armfpu_options = [
+		'softvfp',
+		'vfpv2',
+		'softvfp+vfpv2'
+		]
 
 	library_re = re.compile(r"^(?P<name>[^{]+?)(?P<version>{(?P<major>[0-9]+)\.(?P<minor>[0-9]+)})?(\.(lib|dso))?$",re.I)
 
@@ -1491,9 +1506,9 @@ class MMPRaptorBackend(MMPBackend):
 
 				self.__versionhex = "%04x%04x" % (major, minor)
 				self.BuildVariant.AddOperation(raptor_data.Set(varname, "%d.%d" %(major, minor)))
-				self.BuildVariant.AddOperation(raptor_data.Set(varname+"HEX", self.__versionhex))
+				self.BuildVariant.AddOperation(raptor_data.Set("VERSIONHEX", self.__versionhex))
 				self.__debug("Set "+toks[0]+"  OPTION to " + toks[1])
-				self.__debug("Set "+toks[0]+"HEX OPTION to " + "%04x%04x" % (major,minor))
+				self.__debug("Set VERSIONHEX OPTION to " + self.__versionhex)
 
 			else:
 				self.__Raptor.Warn("Invalid version supplied to VERSION (%s), using default value" % toks[1])
@@ -1555,6 +1570,12 @@ class MMPRaptorBackend(MMPBackend):
 				self.BuildVariant.AddOperation(raptor_data.Set(varname,toks1))
 		elif varname=='APPLY':
 			self.ApplyVariants.append(toks[1])
+		elif varname=='ARMFPU':
+			if not str(toks[1]).lower() in self.armfpu_options:
+				self.__Raptor.Error("ARMFPU option '"+str(toks[1])+"' not recognised - should be one of "+", ".join(self.armfpu_options))
+			else:
+				self.__debug("Set "+toks[0]+" to " + str(toks[1]))
+				self.BuildVariant.AddOperation(raptor_data.Set(varname,str(toks[1])))
 		else:
 			self.__debug("Set "+toks[0]+" to " + str(toks[1]))
 			self.BuildVariant.AddOperation(raptor_data.Set(varname,"".join(toks[1])))
@@ -2278,6 +2299,26 @@ class MMPRaptorBackend(MMPBackend):
 		self.BuildVariant.AddOperation(raptor_data.Set("SOURCE",
 						   " ".join(self.sources)))
 
+	def validate(self):
+		"""Test that the parsed MMP file is correct.
+		
+		By "correct" we mean that all the required keywords were present
+		with acceptable and mutually consistent values.
+		
+		There should be no attempt to build anything if this method returns False."""
+		
+		# do all the checks so that we can see all the errors at once...
+		valid = True
+		
+		# for "TARGETTYPE none", it is permitted to omit the "TARGET" keyword
+		if not self.__TARGET and not self.getTargetType() == "none":
+			self.__Raptor.Error("required keyword TARGET is missing in " + self.__currentMmpFile, bldinf=self.__bldInfFilename)
+			valid = False
+		
+		# what else could be wrong?
+			
+		return valid
+	
 	def getTargetType(self):
 		"""Target type in lower case - the standard format"""
 		return self.__targettype.lower()
@@ -2855,7 +2896,8 @@ class MetaReader(object):
 			destDir = destination.Dir()
 			if not destDir.isDir():
 				os.makedirs(str(destDir))
-				shutil.copyfile(source_str, dest_str)
+				# preserve permissions
+				shutil.copy(source_str, dest_str)
 				return exportwhatlog
 
 			sourceMTime = 0
@@ -2874,12 +2916,14 @@ class MetaReader(object):
 						self.__Raptor.Error(message, bldinf=bldInfFile)
 
 			if destMTime == 0 or destMTime < sourceMTime:
+				# remove old version
+				#	- not having ownership prevents chmod
+				#	- avoid clobbering the original if it is a hard link
 				if os.path.exists(dest_str):
-					os.chmod(dest_str,stat.S_IREAD | stat.S_IWRITE)
-				shutil.copyfile(source_str, dest_str)
+					os.unlink(dest_str)
+				# preserve permissions
+				shutil.copy(source_str, dest_str)
 
-				# Ensure that the destination file remains executable if the source was also:
-				os.chmod(dest_str,sourceStat[stat.ST_MODE] | stat.S_IREAD | stat.S_IWRITE | stat.S_IWGRP ) 
 				self.__Raptor.Info("Copied %s to %s", source_str, dest_str)
 			else:
 				self.__Raptor.Info("Up-to-date: %s", dest_str)
@@ -2923,7 +2967,9 @@ class MetaReader(object):
 				os.makedirs(str(markerfiledir))
 
 			# Form the marker file name and convert to Python string
-			markerfilename = str(generic_path.Join(markerfiledir, sanitisedSource + sanitisedDestination + ".unzipped"))
+			combinedPath = sanitisedSource + sanitisedDestination
+			sanitisedPath = self.unzippedPathFragment(combinedPath)
+			markerfilename = str(generic_path.Join(markerfiledir, sanitisedPath + ".unzipped"))
 
 			# Don't unzip if the marker file is already there or more uptodate
 			sourceMTime = 0
@@ -3082,7 +3128,6 @@ class MetaReader(object):
 				value = options[option].replace('$(EPOCROOT)', '$(EPOCROOT)/')
 				value = value.replace('$(', '$$$$(')
 				value = value.replace('$/', '/').replace('$;', ':')
-				value = value.replace('$/', '/').replace('$;', ':')
 
 				if customInterface:
 					var.AddOperation(raptor_data.Set(option, value))
@@ -3163,6 +3208,11 @@ class MetaReader(object):
 			else:
 				backend.finalise(buildPlatform)
 
+			# if the parsed MMP file is fundamentally broken then report
+			# the errors and stop processing this MMP node
+			if not backend.validate():
+				continue
+			
 			# feature variation only processes FEATUREVARIANT binaries
 			if buildPlatform["ISFEATUREVARIANT"] and not backend.featureVariant:
 				continue
@@ -3351,4 +3401,10 @@ class MetaReader(object):
 			aBuildUnit.variants.append(self.__Raptor.cache.variants[osVersion])
 		else:
 			self.__Raptor.Info("no OS variant for the configuration \"%s\"." % aBuildUnit.name)
+			
+	@classmethod		
+	def unzippedPathFragment(self, sanitisedPath):
+		fragment = hashlib.md5(sanitisedPath).hexdigest()[:16]
+		return fragment
+
 

@@ -494,15 +494,21 @@ class TestRaptorMeta(unittest.TestCase):
 				self.assertTrue(testOptions.has_key(testParameter))
 				self.assertEquals(testOptions.get(testParameter), aTestParameters.get(testParameter))
 
+
 	def testBldInfExtensions(self):
 		bldInfTestRoot = self.__testRoot.Append('metadata/project/bld.infs')
 		bldInfMakefilePathTestRoot = str(self.__makefilePathTestRoot)+'/metadata/project/bld.infs'			
+		if 'SRCROOT' in os.environ:
+			srcroot = os.environ['SRCROOT']
+		else:
+			srcroot = os.environ['SRCROOT'] = "x:/somesrcroot"
+		
 		depfiles = []
 		bldInfObject = raptor_meta.BldInfFile(bldInfTestRoot.Append('extensions.inf'),
 											  self.__gnucpp, depfiles=depfiles, log=self.raptor)
 		
 		extensions = bldInfObject.getExtensions(self.ARMV5)
-		
+				
 		self.__testExtension(extensions[0],
 							'test/dummyextension1.mk',
 							{'TARGET':'dummyoutput1.exe',
@@ -511,7 +517,7 @@ class TestRaptorMeta(unittest.TestCase):
 							'TOOL':'dummytool1.exe',
 							'OPTION11':'option11value',
 							'OPTION12':'$(MAKE_VAR)',
-							'STDVAR_TO_ROOT':"",
+							'STDVAR_TO_ROOT':srcroot,
 							'STDVAR_TO_BLDINF':bldInfMakefilePathTestRoot,
 							'STDVAR_EXTENSION_ROOT':bldInfMakefilePathTestRoot}		
 							)
@@ -524,7 +530,7 @@ class TestRaptorMeta(unittest.TestCase):
 							'TOOL':'dummytool2.exe',
 							'OPTION21':'option21value',
 							'OPTION22':'$(MAKE_VAR)',
-							'STDVAR_TO_ROOT':"",
+							'STDVAR_TO_ROOT':srcroot,
 							'STDVAR_TO_BLDINF':bldInfMakefilePathTestRoot,
 							'STDVAR_EXTENSION_ROOT':bldInfMakefilePathTestRoot}
 							)
@@ -537,7 +543,7 @@ class TestRaptorMeta(unittest.TestCase):
 							'TOOL':'dummytool3.exe',
 							'OPTION31':'option31value',
 							'OPTION32':'$(MAKE_VAR)',
-							'STDVAR_TO_ROOT':"",
+							'STDVAR_TO_ROOT':srcroot,
 							'STDVAR_TO_BLDINF':bldInfMakefilePathTestRoot,
 							'STDVAR_EXTENSION_ROOT':bldInfMakefilePathTestRoot}
 							)
@@ -552,7 +558,7 @@ class TestRaptorMeta(unittest.TestCase):
 							'TOOL':'dummytesttool1.exe',
 							'OPTIONTEST11':'optiontest11value',
 							'OPTIONTEST12':'$(MAKE_VAR)',
-							'STDVAR_TO_ROOT':"",
+							'STDVAR_TO_ROOT':srcroot,
 							'STDVAR_TO_BLDINF':bldInfMakefilePathTestRoot,
 							'STDVAR_EXTENSION_ROOT':bldInfMakefilePathTestRoot}		
 							)
@@ -565,7 +571,7 @@ class TestRaptorMeta(unittest.TestCase):
 							'TOOL':'dummytesttool2.exe',
 							'OPTIONTEST21':'optiontest21value',
 							'OPTIONTEST22':'$(MAKE_VAR)',
-							'STDVAR_TO_ROOT':"",
+							'STDVAR_TO_ROOT':srcroot,
 							'STDVAR_TO_BLDINF':bldInfMakefilePathTestRoot,
 							'STDVAR_EXTENSION_ROOT':bldInfMakefilePathTestRoot}		
 							)

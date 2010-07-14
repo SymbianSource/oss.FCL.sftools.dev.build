@@ -514,7 +514,7 @@ endef
 # Determine what object files will be linked by using the source files.
 CPPFILES_LINKOBJECTS:=$(call mapcpp2object,$(CPPFILES))
 CFILES_LINKOBJECTS:=$(call mapc2object,$(CFILES))
-ifeq ($(TRANSFORM_CIA),1) 
+ifeq ($(TRANSFORM_CIA),1)
   CIAFILES_LINKOBJECTS:=$(patsubst %_.cpp,%_.o,$(CIA_CPPFILES))
 else
   CIAFILES_LINKOBJECTS:=$(call mapcia2object,$(CIAFILES))
@@ -551,6 +551,12 @@ define groupin10
 	$(if $1,@echo -e $(foreach L,$(wordlist 1,10,$1),"$(L)\\n") >>$(VIAFILE),)
 	$(if $1,$(call groupin10,$(wordlist 11,$(words $1),$1)),@true)
 endef
+
+################################################
+## ARMFPU postlinker option
+#
+POSTLINKER_FPU:=$(patsubst $(ARMFPU)>%,%,$(filter $(ARMFPU)>%,$(POSTLINKER_FPU_MAPPING)))
+POSTLINKER_FPU:=$(if $(POSTLINKER_FPU),$(POSTLINKER_FPU),$(POSTLINKER_FPU_DEFAULT))
 
 ################################################
 
@@ -654,7 +660,7 @@ $(E32TARGET): $(POSTLINKDEFFILE) $(ELF2E32) $(if $(MULTIFILE_ENABLED),$(MULTIFIL
 	  --version=$(VERSION) \
 	  --capability=$(FINAL_CAPABILITIES) \
 	  --linkas=$(call dblquote,$(LINKASVERSIONED)) \
-	  --fpu=$(if $(ARMFPU),$(ARMFPU),$(POSTLINKER_FPU_DEFAULT)) \
+	  --fpu=$(POSTLINKER_FPU) \
 	  --targettype=$(POSTLINKTARGETTYPE) \
 	  --output=$$(call dblquote,$$@) \
 	  --elfinput=$(call dblquote,$(LINK_TARGET)) \
@@ -704,6 +710,14 @@ endif # if TARGETTYPE lib
 
 
 ## Run trace compiler ##############################################
+# The following variable defines a prereq that source code will 
+# depend on so that tracing happens before compilation.  Must be 
+# blank by default so that if tracing is off then there will be
+# no dependency.  The tracecompiler code will set it if this
+# project actually does depend on trace-generated headers:
+TRACE_THISCOMPONENT_ALLRULE:=
+
+# Tracing requires a UID to make uniquely numbered trace points
 ifeq ($(UID3),)
  ifeq ($(UID2),)
   USE_TRACE_COMPILER:=
@@ -779,7 +793,7 @@ $(eval DEPENDFILENAME:=$(1).d)
 $(eval DEPENDFILE:=$(wildcard $(DEPENDFILENAME)))
 
 # $4 is for language specific options (e.g. C++ vs C)
-$(1): $(2) $(PROJECT_META) $(if $(MULTIFILE_ENABLED),,$(if $(DEPENDFILE),,RESOURCE BITMAP EXPORT)) $(if $(LINKERFEEDBACK_STAGE2),$(FEEDBACKFILE),) | $(if $(USE_TRACE_COMPILER),$(TRACE_MARKER),)  
+$(1): $(2) $(PROJECT_META) $(if $(MULTIFILE_ENABLED),,$(if $(DEPENDFILE),,RESOURCE BITMAP EXPORT)) $(if $(LINKERFEEDBACK_STAGE2),$(FEEDBACKFILE),) | $(TRACE_THISCOMPONENT_ALLRULE) 
 	$(call startrule,compile,,$(2))		\
 		$(if $(PERTURBSTARTTIME), $(RANSLEEP) $(PERTURBMSECS) ;,) \
 		$(if $(MULTIFILE_ENABLED), echo $(2) $(3) > $(MULTIFILE_VIAFILE) ;,) \
@@ -794,7 +808,7 @@ $(1): $(2) $(PROJECT_META) $(if $(MULTIFILE_ENABLED),,$(if $(DEPENDFILE),,RESOUR
 			$(COMPILER_SYSTEM_INCLUDE_OPTION)$$(call dblquote,$$(<D))                                                      \
 			$(if $(USERINCLUDE),$(COMPILER_SYSTEM_INCLUDE_OPTION),)$(call concat, $(COMPILER_SYSTEM_INCLUDE_OPTION),$(call dblquote,$(USERINCLUDE)))      \
 			$(if $(SYSTEMINCLUDE),$(COMPILER_SYSTEM_INCLUDE_OPTION),)$(call concat, $(COMPILER_SYSTEM_INCLUDE_OPTION),$(call dblquote,$(SYSTEMINCLUDE)))  \
-			$(if $(NOHIDEALL),--no_hide_all,) \
+			$(if $(NOHIDEALL),$(COMPILER_NO_HIDE_ALL_OPTION),) \
 			$(if $(NO_DEPEND_GENERATE),,$(DEPEND_OPTION) $(call dblquote,$(1).d)) \
 			$(if $(LINKERFEEDBACK_STAGE2),$(FEEDBACK_OPTION)$(call dblquote,$(FEEDBACKFILE))) \
 			$(if $(MULTIFILE_ENABLED),--multifile $(OUTPUT_OPTION) $(MULTIFILEOBJECT) \
@@ -856,7 +870,7 @@ $(CPPONLYTARGET): $(1) $(PROJECT_META)  $(if $(DEPENDFILE),,RESOURCE BITMAP EXPO
 			$(COMPILER_SYSTEM_INCLUDE_OPTION)$$(call dblquote,$$(<D))                                                   \
 			$(if $(USERINCLUDE),$(COMPILER_SYSTEM_INCLUDE_OPTION),)$(call concat, $(COMPILER_SYSTEM_INCLUDE_OPTION),$(call dblquote,$(USERINCLUDE)))      \
 			$(if $(SYSTEMINCLUDE),$(COMPILER_SYSTEM_INCLUDE_OPTION),)$(call concat, $(COMPILER_SYSTEM_INCLUDE_OPTION),$(call dblquote,$(SYSTEMINCLUDE)))  \
-			$(if $(NOHIDEALL),--no_hide_all,) \
+			$(if $(NOHIDEALL),$(COMPILER_NO_HIDE_ALL_OPTION),) \
 			$$(call dblquote, $$<) $(OUTPUT_OPTION) $$(@) $(if $(USE_RVCT22_DELETE_WORKAROUND),$(RVCT22_DELETE_WORKAROUND)) \
 	$(call endrule,e32cpponly)
 
@@ -890,7 +904,7 @@ $(LISTINGTARGET): $(1) $(PROJECT_META)  $(if $(DEPENDFILE),,RESOURCE BITMAP EXPO
 			$(COMPILER_SYSTEM_INCLUDE_OPTION)$$(call dblquote,$$(<D))                                                   \
 			$(if $(USERINCLUDE),$(COMPILER_SYSTEM_INCLUDE_OPTION),)$(call concat, $(COMPILER_SYSTEM_INCLUDE_OPTION),$(call dblquote,$(USERINCLUDE)))      \
 			$(if $(SYSTEMINCLUDE),$(COMPILER_SYSTEM_INCLUDE_OPTION),)$(call concat, $(COMPILER_SYSTEM_INCLUDE_OPTION),$(call dblquote,$(SYSTEMINCLUDE)))  \
-			$(if $(NOHIDEALL),--no_hide_all,) \
+			$(if $(NOHIDEALL),$(COMPILER_NO_HIDE_ALL_OPTION),) \
 			$(if $(NO_DEPEND_GENERATE),,$(DEPEND_OPTION) $(call dblquote,$(DEPENDFILENAME))) \
 			$$(call dblquote, $$<) $(OUTPUT_OPTION) $$(@) $(if $(USE_RVCT22_DELETE_WORKAROUND),$(RVCT22_DELETE_WORKAROUND)) \
 	$(call endrule,e32listing)
@@ -1102,7 +1116,7 @@ ifneq ($(filter ROMFILE,$(call uppercase,$(MAKECMDGOALS))),)
         # Default values
         ROMFILETYPE:=file
         ROMFILE:=$(TARGET).$(REQUESTEDTARGETEXT)
-        ROMPATH:=sys/bin/
+        ROMPATH:=$(if $(TARGETPATH),$(TARGETPATH)/,sys/bin/)
         ROMDECORATIONS:=
         ROMFILETYPE_RAM:=data
         ROMFILE_RAM:=$(TARGET).$(REQUESTEDTARGETEXT)
@@ -1179,8 +1193,8 @@ ifneq ($(filter ROMFILE,$(call uppercase,$(MAKECMDGOALS))),)
 	        $(call startrule,rombuild)	\
 	        $(GNUMKDIR) -p $(ROMDIR) \
             $(if $(ROMFILE_CREATED_$(TOBLDINF)),,&& echo -e "// $(subst $(EPOC_ROOT)/,,$(ROMFILENAME))\n//\n$(DATATEXT)" > $(ROMFILENAME)) \
-            $(if $(BUILDROMTARGET),&& echo "$(ROMFILETYPE)=/epoc32/release/##$(ABIDIR)##/##BUILD##/$(TARGET).$(REQUESTEDTARGETEXT)   $(1)$(ROMDECORATIONS)" >> $(ROMFILENAME))	\
-	        $(if $(RAMTARGET),&& echo "$(ROMFILETYPE_RAM)=/epoc32/release/##$(ABIDIR)##/##BUILD##/$(TARGET).$(REQUESTEDTARGETEXT)   $(ROMPATH_RAM)$(ROMFILE_RAM)$(ROMDECORATIONS_RAM)" >> $(ROMFILENAME))	\
+            $(if $(BUILDROMTARGET),&& echo "$(ROMFILETYPE)=/epoc32/release/##$(ABIDIR)##/##BUILD##/$(TARGET)$(if $(EXPLICITVERSION),{$(VERSIONHEX)},).$(REQUESTEDTARGETEXT)   $(1)$(ROMDECORATIONS)" >> $(ROMFILENAME))	\
+	        $(if $(RAMTARGET),&& echo "$(ROMFILETYPE_RAM)=/epoc32/release/##$(ABIDIR)##/##BUILD##/$(TARGET)$(if $(EXPLICITVERSION),{$(VERSIONHEX)},).$(REQUESTEDTARGETEXT)   $(ROMPATH_RAM)$(ROMFILE_RAM)$(ROMDECORATIONS_RAM)" >> $(ROMFILENAME))	\
 	        $(call endrule,buildromfiletarget)
     endef
 

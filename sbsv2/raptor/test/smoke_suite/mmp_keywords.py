@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2009 - 2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -226,7 +226,7 @@ def run():
 	t.command = "sbs -b $(SBS_HOME)/test/smoke_suite/test_resources/mmp/mmp9_10/bld.inf -p armfpu_soft.mmp -c armv5_urel -f-"			
 	t.targets = []
 	t.mustmatch = ["--fpu softvfp", "--fpu=softvfp"]
-	t.mustnotmatch = ["--fpu vfpv2", "--fpu=vfpv2"]
+	t.mustnotmatch = ["--fpu vfpv2", "--fpu softvfp\+", "--fpu=vfpv2", "--fpu=softvfp\+"]
 	t.warnings = 0
 	t.run()
 		
@@ -239,16 +239,25 @@ def run():
 	t.mustnotmatch = ["--fpu softvfp", "--fpu=softvfp"]	
 	t.run()
 	
+	t.id = "75ja"
+	t.name = "mmp_9c"
+	t.command = "sbs -b $(SBS_HOME)/test/smoke_suite/test_resources/mmp/mmp9_10/bld.inf -c armv5_urel REALLYCLEAN &&" \
+			+ " sbs -b $(SBS_HOME)/test/smoke_suite/test_resources/mmp/mmp9_10/bld.inf -p \"armfpu_soft+vfpv2.mmp\" -c armv5_urel -f-"
+
+	t.mustmatch = ["--fpu softvfp\+vfpv2", "--fpu=vfpv2"]
+	t.mustnotmatch = ["--fpu vfpv2", "--fpu softvfp ", "--fpu=softvfp"]
+	t.run()
+
 	t.id = "75k"
 	t.name = "mmp_10"
 	t.command = "sbs -b $(SBS_HOME)/test/smoke_suite/test_resources/mmp/mmp9_10/bld.inf  -c armv5_urel_gcce4_3_2 REALLYCLEAN &&" \
 			+ " sbs -b $(SBS_HOME)/test/smoke_suite/test_resources/mmp/mmp9_10/bld.inf -c armv5_urel_gcce4_3_2 -f-"
 	t.countmatch = [
-		["-mfloat-abi=soft", 2],
-		["--fpu=softvfp", 2]
+		["-mfloat-abi=soft", 3],
+		["--fpu=softvfp", 3] # gcce doesn't vary according to ARMFPU currently
 	]
 	t.mustmatch = []
-	t.mustnotmatch = ["--fpu=vfpv2"]
+	t.mustnotmatch = ["--fpu=vfpv2", "--fpu=softvfp\+"]
 	t.run()
 	
 	# Test keywords: compresstarget, nocompresstarget, bytepaircompresstarget, inflatecompresstarget
@@ -291,7 +300,7 @@ def run():
 	# Test keyword: EPOCNESTEDEXCEPTIONS
 	t.id = "75n"
 	t.name = "epocnestedexceptions"
-	t.command = "sbs -b smoke_suite/test_resources/mmp/epocnestedexceptions/bld.inf -c armv5 -f-"
+	t.command = "sbs -b smoke_suite/test_resources/mmp/epocnestedexceptions/bld.inf -c armv5_udeb -f-"
 
 	# When EPOCNESTEDEXCEPTIONS is specified in the MMP file, a different static
 	# run-time library should be used.
@@ -302,7 +311,7 @@ def run():
 
 	# The new static run-time libraries don't yet exist.
 	t.errors = 1
-	t.warnings = 2
+	t.warnings = 1
 	t.targets = []
 
 	t.run()
