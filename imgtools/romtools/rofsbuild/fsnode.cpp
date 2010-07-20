@@ -41,6 +41,12 @@
 using namespace std;
 
 const TUint KBytesPerEntry = 13 ;
+
+static inline bool is_a_long_file_name_char(unsigned char ch){
+	return ( ch >= ' ' && ch != '"' && ch != '*' && ch != ':' && ch != '<' \
+		&& ch != '>' && ch != '?' && ch != '|' && ch != 127) ; 
+	
+}
 //
 TFSNode::TFSNode(TFSNode* aParent, const char* aFileName, TUint8 aAttrs, const char* aPCSideName)  :
 iParent(aParent),iFirstChild(0),iSibling(0),iAttrs(aAttrs), iPCSideName(0), iWideName(0){
@@ -49,7 +55,18 @@ iParent(aParent),iFirstChild(0),iSibling(0),iAttrs(aAttrs), iPCSideName(0), iWid
 	memset(iShortName,0x20,11);  
 	iShortName[11] = 0 ; 
 	if(aFileName) {
-		iFileName = strdup(aFileName);
+		const unsigned char* ptr = reinterpret_cast<const unsigned char*>(aFileName);
+		bool allSpaces = true ;
+		while(*ptr){
+			if( !is_a_long_file_name_char(*ptr))
+				throw "Illegal filename or dir name! \n";		
+			if(*ptr != ' ')
+				allSpaces = false ;		
+			ptr++ ;
+		}
+		if(allSpaces)
+			throw "Illegal filename or dir name(all spaces)!\n";
+		iFileName = strdup(aFileName); 
 		GenerateBasicName() ;	
 	} 
 	if(aPCSideName) {
@@ -84,9 +101,12 @@ TFSNode::~TFSNode(){
 		free(iFileName) ;
 	if(iWideName)
 		delete iWideName;
+	if(iPCSideName)
+		free(iPCSideName);
 }
+ 
 TFSNode* TFSNode::CreateFromFolder(const char* aPath,TFSNode* aParent) { 
-	static char fileName[2048];
+	 
 	int len = strlen(aPath);  
 #ifdef __LINUX__
 	DIR* dir = opendir(aPath);
@@ -95,45 +115,49 @@ TFSNode* TFSNode::CreateFromFolder(const char* aPath,TFSNode* aParent) {
 			return aParent;
 	}
 	if(!aParent)
-		aParent = new TFSNode(NULL,"/",ATTR_VOLUME_ID);
+		aParent = new TFSNode(NULL,"/",ATTR_DIRECTORY);
 	dirent*  entry; 
 	struct stat statbuf ;
+	char* fileName = new(nothrow) char[len + 200];
+	if(!fileName) return NULL ;
+	memcpy(fileName,aPath,len); 
+	fileName[len] = SPLIT_CHAR;
 	while ((entry = readdir(dir)) != NULL)  {
-		if(entry->d_name[0] == '.') continue ; 
-			memcpy(fileName,aPath,len); 
-			fileName[len] = SPLIT_CHAR;
-			strcpy(&fileName[len+1],entry->d_name);             
-			stat(fileName , &statbuf);         
-			TFSNode* pNewItem = new TFSNode(aParent,fileName,S_ISDIR(statbuf.st_mode) ? ATTR_DIRECTORY : 0);
-			pNewItem->Init(statbuf.st_ctime,statbuf.st_atime,statbuf.st_mtime,statbuf.st_size);         
-			if(S_ISDIR(statbuf.st_mode)){ 
-				CreateFromFolder(fileName,pNewItem);
-			}  
-	}
+		if(strcmp(entry->d_name,".") == 0 || strcmp(entry->d_name,"..") == 0)
+			continue ; 
+		strcpy(&fileName[len+1],entry->d_name);             
+		stat(fileName , &statbuf);         
+		TFSNode* pNewItem = new TFSNode(aParent,fileName,S_ISDIR(statbuf.st_mode) ? ATTR_DIRECTORY : 0);
+		pNewItem->Init(statbuf.st_ctime,statbuf.st_atime,statbuf.st_mtime,statbuf.st_size);         
+		if(S_ISDIR(statbuf.st_mode)){ 
+			CreateFromFolder(fileName,pNewItem);
+		} 
+	}	
+	delete []fileName ;
 	closedir(dir);
 #else
 	struct _finddata_t data ;
 	memset(&data, 0, sizeof(data)); 	
-	char* pattern = new char[len + 4] ;
-	memcpy(pattern,aPath,len);
-	pattern[len] = SPLIT_CHAR;
-	pattern[len+1] = '*';
-	pattern[len+2] = 0;
-
-	intptr_t hFind =  _findfirst(pattern,&data);
-	delete []pattern ;
+	char* fileName = new(nothrow) char[len + 200];
+	if(!fileName) return NULL ;
+	memcpy(fileName,aPath,len); 
+    fileName[len] = SPLIT_CHAR;
+	fileName[len+1] = '*';
+	fileName[len+2] = 0;
+	intptr_t hFind =  _findfirst(fileName,&data); 
  
 	if(hFind == (intptr_t)-1 ) {
 		cout << aPath << " does not contain any subfolder/file.\n";		
+		delete []fileName;
 		return aParent;
-	}
+	}	
 	if(!aParent)
-	    aParent = new TFSNode(NULL,"/",ATTR_VOLUME_ID);
+	    aParent = new TFSNode(NULL,"/",ATTR_DIRECTORY);	
+	
 	do {        
-        if(data.name[0] == '.') 
+        if(strcmp(data.name,".") == 0 || strcmp(data.name,"..") == 0)
             continue ; 
-        memcpy(fileName,aPath,len); 
-        fileName[len] = SPLIT_CHAR;
+        
         strcpy(&fileName[len+1],data.name); 
         TUint8 attr = 0;
         if(data.attrib & _A_SUBDIR)  
@@ -146,31 +170,20 @@ TFSNode* TFSNode::CreateFromFolder(const char* aPath,TFSNode* aParent) {
             attr |= ATTR_SYSTEM ;
         if(data.attrib & _A_ARCH)
             attr |= ATTR_ARCHIVE;      
-        TFSNode* pNewItem = new TFSNode(aParent,fileName,attr);        
+        TFSNode* pNewItem = new TFSNode(aParent,data.name,attr,fileName);        
         pNewItem->Init(data.time_create,data.time_access,data.time_write,data.size);            
         if(data.attrib & _A_SUBDIR){ 
             CreateFromFolder(fileName,pNewItem);
         }  
  
     } while(-1 != _findnext(hFind, &data));
+	delete []fileName ;
     _findclose(hFind);
 #endif
  
 	return aParent;
 }
- 	
-
-
-static const char* lbasename(const char* aFullName) {
-	const char* retval = aFullName ;
-	while(*aFullName) {
-		if('\\' == *aFullName || '/' == *aFullName )
-			retval = ++aFullName ;
-		else
-			aFullName ++ ;
-	}
-	return retval ;
-}
+ 
 /** GenerateBasicName : Generate the short name according to long name 
 	* 
 	* algorithm :
@@ -205,7 +218,7 @@ static const char* lbasename(const char* aFullName) {
   *
   */
 void TFSNode::GenerateBasicName() { 
-	const char* filename = lbasename(iFileName);	 
+	const char* filename =  iFileName ;	 
 	TUint length = strlen(filename);
 	if(0 == length)
 	    return ;
@@ -217,10 +230,7 @@ void TFSNode::GenerateBasicName() {
         iShortName[0] = '.' ;
         iShortName[1] = '.' ;
         return ;
-	}	
-#ifdef _DEBUG
-		cout << "GenericBasicName: \"" << filename ;
-#endif	
+	} 
 	iWideName = new UTF16String(filename,length); // The unicode string
 	char base[10];
 	const char* ext = filename + length;
@@ -286,10 +296,7 @@ void TFSNode::GenerateBasicName() {
 	}
  
 	if(iParent) 
-		iParent->MakeUniqueShortName(iShortName,bl);
-#ifdef _DEBUG
-		cout << "\" => \"" << iShortName << "\"\n";
-#endif	
+		iParent->MakeUniqueShortName(iShortName,bl); 
 }
 
 #ifdef _DEBUG
@@ -304,7 +311,7 @@ void TFSNode::PrintTree(int nTab) {
 }
 #endif
 bool TFSNode::IsDirectory() const {
-	return 0 != (iAttrs & ATTR_DIRECTORY);
+	return (0 != (iAttrs & ATTR_DIRECTORY) || ATTR_VOLUME_ID == iAttrs) ;
 }
 int TFSNode::GetWideNameLength() const {
 	if(!iWideName)
@@ -313,7 +320,7 @@ int TFSNode::GetWideNameLength() const {
 }
 TUint TFSNode::GetSize() const {
 	
-	if(  0 == (iAttrs & ATTR_DIRECTORY))
+	if( !IsDirectory())
 		return iFileSize ;
 	TUint retVal = sizeof(TShortDirEntry) ; // the tailed entry 
 	if(iParent)
@@ -368,7 +375,7 @@ void TFSNode::WriteDirEntries(TUint aStartIndex,TUint8* aClusterData){
 		*((TUint16*)iFATEntry->DIR_FstClusLO) = (aStartIndex & 0xFFFF) ;
 	}
 	 
-	if(iAttrs & ATTR_DIRECTORY) { // Directory , write dir entries ; 
+	if(IsDirectory()) { // Directory , write dir entries ; 
 		TShortDirEntry* entry = reinterpret_cast<TShortDirEntry*>(aClusterData);
 		if(iParent != NULL) {
 			//Make 

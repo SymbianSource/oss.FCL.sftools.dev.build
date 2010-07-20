@@ -460,14 +460,16 @@ TInt E32Rom::LoadContents(char*& anAddr, TRomHeader* aHeader)
 
 	if(gPagedRom)
 		{ 
-		gDepInfoFile = iObey->iRomFileName; 
 		iObey->SetArea().DefaultArea()->SortFilesForPagedRom();
 		// exception search table needs to go at start of ROM to make it not demand paged...
 		addr = ReserveRomExceptionSearchTable(addr,exceptionSearchTable);
 		}
-	else if(gGenDepGraph)
+
+	if(gGenDepGraph)
 		{
-			Print(EWarning, "Not dependence information in an unpaged ROM.");
+			Print(ELog, "Generate dependence information in ROM.");
+			gDepInfoFile = iObey->iRomFileName; 
+			iObey->SetArea().DefaultArea()->WriteDependenceGraph();
 		}
 
 	addr=WriteDirectory(addr, aHeader);

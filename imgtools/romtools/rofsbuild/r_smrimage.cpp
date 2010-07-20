@@ -39,13 +39,13 @@ TBool CSmrImage::SetImageName(const StringVector& aValues)
 {
 	if(aValues.size() == 0)
 	{
-		Print(EError, "Keyword Imageanme has not been set!");
+		Print(EError, "Keyword Imageanme has not been set!\n");
 		return EFalse;
 
 	}
 	if(aValues.size() > 1)
 	{
-		Print(EError, "Keyword Imagename has been set more than one time!");
+		Print(EError, "Keyword Imagename has been set more than one time!\n");
 		return EFalse;
 	}
 	iImageName = aValues.at(0);
@@ -59,28 +59,62 @@ TBool CSmrImage::SetFormatVersion(const StringVector& aValues)
 {
 	if(aValues.size() == 0)
 	{
-		Print(EError, "keyword formatversion has not been set!");
+		Print(EError, "keyword formatversion has not been set!\n");
 		return EFalse;
 	}
 	if(aValues.size() > 1)
 	{
-		Print(EError, "Keyword Formatversion has been set more than one time!");
+		Print(EError, "Keyword Formatversion has been set more than one time!\n");
 		return EFalse;
 	}
 	Val(iSmrRomHeader.iImageVersion,aValues.at(0).c_str()); 
 	return ETrue;
 }
-TBool CSmrImage::SetSmrData(const StringVector& aValues)
+TBool CSmrImage::SetHcrData(const StringVector& aValues)
 {
 	
 	if(aValues.size() == 0)
 	{
-		Print(EError, "keyword smrdata has not been set!");
-		return EFalse;
+		return ETrue;
 	}
 	if(aValues.size() > 1)
 	{
-		Print(EError, "Keyword smrdata has been set more than one time!");
+		Print(EError, "Keyword hcrdata has been set more than one time!\n");
+		return EFalse;
+	}
+	iHcrData = aValues.at(0);
+
+	ifstream is(iHcrData.c_str(), ios_base::binary );
+	if(!is)
+	{
+		Print(EError, "HCR data file: %s dose not exist!\n", iHcrData.c_str());
+		return EFalse;
+	}
+	TUint32 magicWord = 0;
+	is.read(reinterpret_cast<char*>(&magicWord),sizeof(TUint32));
+	if(0x66524348 != magicWord){
+		Print(EError, "HCR data file: %s is an invalid HCR data file!\n", iHcrData.c_str());
+		return EFalse;
+	}
+	is.close();
+	return ETrue;
+}
+TBool CSmrImage::SetSmrData(const StringVector& aValues)
+{
+	
+	if((aValues.size() == 0) && iHcrData.empty())
+	{
+		Print(EError, "Keyword smrdata has not been set!\n");
+		return EFalse;
+	}
+	if(! iHcrData.empty())
+	{
+		Print(EWarning, "Keyword hcrdata has been used, the value for smrdata will be ignored!\n");
+		return ETrue;
+	}
+	if(aValues.size() > 1)
+	{
+		Print(EError, "Keyword smrdata has been set more than one time!\n");
 		return EFalse;
 	}
 	iSmrData = aValues.at(0);
@@ -88,7 +122,7 @@ TBool CSmrImage::SetSmrData(const StringVector& aValues)
 	ifstream is(iSmrData.c_str(), ios_base::binary );
 	if(!is)
 	{
-		Print(EError, "SMR data file: %s dose not exist!", iSmrData.c_str());
+		Print(EError, "SMR data file: %s dose not exist!\n", iSmrData.c_str());
 		return EFalse;
 	}
 	is.close();
@@ -99,12 +133,12 @@ TBool CSmrImage::SetPayloadUID(const StringVector& aValues)
 
 	if(aValues.size() == 0)
 	{
-		Print(EError, "keyword PayloadUID has not been set!");
+		Print(EError, "keyword PayloadUID has not been set!\n");
 		return EFalse;
 	}
 	if(aValues.size() > 1)
 	{
-		Print(EError, "Keyword PayloadUID has been set more than one time!");
+		Print(EError, "Keyword PayloadUID has been set more than one time!\n");
 		return EFalse;
 	}
 	Val(iSmrRomHeader.iPayloadUID,aValues.at(0).c_str()); 
@@ -115,12 +149,12 @@ TBool CSmrImage::SetPayloadFlags(const StringVector& aValues)
 
 	if(aValues.size() == 0)
 	{
-		Print(EError, "keyword Payloadflags has not been set!");
+		Print(EError, "keyword Payloadflags has not been set!\n");
 		return EFalse;
 	}
 	if(aValues.size() > 1)
 	{
-		Print(EError, "Keyword Payloadfalgs has been set more than one time!");
+		Print(EError, "Keyword Payloadfalgs has been set more than one time!\n");
 		return EFalse;
 	}
 	Val(iSmrRomHeader.iPayloadFlags , aValues.at(0).c_str());
@@ -133,6 +167,8 @@ TInt CSmrImage::Initialise()
 	if(! SetImageName(iObeyFile->getValues("imagename")))
 		return result;
 	if(! SetFormatVersion(iObeyFile->getValues("formatversion")))
+		return result;
+	if(! SetHcrData(iObeyFile->getValues("hcrdata"))) 
 		return result;
 	if(! SetSmrData(iObeyFile->getValues("smrdata")))
 		return result;
@@ -147,10 +183,18 @@ TInt CSmrImage::CreateImage()
 {
 	TInt imageSize = 0;
 	ifstream is;
-	is.open(iSmrData.c_str(), ios_base::binary);
+	string datafile;
+	if(! iHcrData.empty())
+	{
+		datafile = iHcrData;
+	}else if(! iSmrData.empty())
+	{
+		datafile = iSmrData;
+	}
+	is.open(datafile.c_str(), ios_base::binary);
 	if(!is)
 	{
-		Print(EError, "Open SMR data file: %s error!\n", iSmrData.c_str());
+		Print(EError, "Open SMR data file: %s error!\n", datafile.c_str());
 		return KErrGeneral;
 	}
 	is.seekg(0, ios_base::end);

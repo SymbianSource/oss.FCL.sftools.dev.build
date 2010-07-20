@@ -89,11 +89,18 @@ TFSNode* CDriveImage::PrepareFileSystem(TRomNode* aRomNode){
 			attrib |= ATTR_HIDDEN ;
 		if(romNode->iAtt & KEntryAttSystem)
 			attrib |= ATTR_SYSTEM ;  
-		if(romNode->IsDirectory()) {		  
-			curFS = new(std::nothrow)  TFSNode(parentFS,romNode->iName,attrib | ATTR_DIRECTORY);
-			if(!curFS){
-					err = true ;
-					break ;
+		if(romNode->IsDirectory()) {
+			try {
+				curFS = new TFSNode(parentFS,romNode->iName,attrib | ATTR_DIRECTORY);
+			}
+			catch(const char* errInfo){
+				Print(EError,errInfo);
+				err = true ;
+				break ;
+			}
+			catch(...) {
+				err = true ;
+				break ;
 			} 
 			if(!root) root = curFS ;  
 			time_t now = time(NULL); 
@@ -108,17 +115,24 @@ TFSNode* CDriveImage::PrepareFileSystem(TRomNode* aRomNode){
 				continue ;
 			}			
 		}
-		else { // file             
-				curFS = new(std::nothrow) TFSNode(parentFS,romNode->iEntry->iName,attrib,romNode->iEntry->iFileName);
-				if(!curFS){
+		else { // file   
+			try {         
+				curFS = new TFSNode(parentFS,romNode->iEntry->iName,attrib,romNode->iEntry->iFileName);
+			}
+			catch(const char* errInfo){
+				Print(EError,errInfo);
+				err = true ;
+				break ;
+			}
+			catch(...) { 
 					err = true ;
 					break ;
-				} 
+			} 
 					
-				if(!root) root = curFS ;  
-				struct stat statbuf ;
-				stat(romNode->iEntry->iFileName, &statbuf);             
-				curFS->Init(statbuf.st_ctime,statbuf.st_atime,statbuf.st_mtime,statbuf.st_size);   
+			if(!root) root = curFS ;  
+			struct stat statbuf ;
+			stat(romNode->iEntry->iFileName, &statbuf);             
+			curFS->Init(statbuf.st_ctime,statbuf.st_atime,statbuf.st_mtime,statbuf.st_size);   
 		 
 		}
 		

@@ -87,7 +87,8 @@ const ObeyFileKeyword ObeyFileReader::iKeywords[] =
 	{_K("fileuncompress"),2, -2,EKeywordFileUncompress,"Non-XIP Executable to be loaded into the ROM uncompressed" },
 	{_K("patchdata"),2, 5,EKeywordPatchDllData, "Patch exported data"},
 	{_K("imagename"), 1, 1, EKeywordSmrImageName, "output file for SMR image"},
-	{_K("smrdata"), 1, 1, EKeywordSmrFileData, "file data for SMR image"},
+	{_K("hcrdata"), 1, 1, EKeywordSmrFileData, "file data for HCR SMR image"},
+	{_K("smrdata"), 1, 1, EKeywordSmrFileData, "file data for general SMR image"},
 	{_K("formatversion"), 1, 1, EKeywordSmrFormatVersion, "format version for HCR SMR image"},
 	{_K("payloadflags"), 1, 1, EKeywordSmrFlags, "payload flags for the HCR SMR image"},
 	{_K("payloaduid"), 1, 1, EKeywordSmrUID, "payload UID for the HCR SMR image"},
@@ -755,7 +756,7 @@ TInt CObeyFile::ProcessDataDrive() {
 		return KErrGeneral;
 	}
 	if (!iNumberOfFiles)
-		Print(EWarning,"No files specified.\n");
+		Print(EAlways,"No files specified.\n");
 
 	return KErrNone;
 }

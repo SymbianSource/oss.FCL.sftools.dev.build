@@ -2576,14 +2576,14 @@ DEFINE_PARAM_PARSER(ParameterManager::ParseFPU)
 {
 	INITIALISE_PARAM_PARSER;
 
-	if (strnicmp(aValue, "softvfp", 7)==0)
-		aPM->SetFPU(0);
-	else if ((strnicmp(aValue, "vfpv2", 5)==0) || (strnicmp(aValue, "softvfp+vfpv2",13 )==0))
-		aPM->SetFPU(1);
+	if (strnicmp(aValue,"vfpv3D16", 8)==0)
+		aPM->SetFPU(3);
 	else if (strnicmp(aValue,"vfpv3", 5)==0)
 		aPM->SetFPU(2);
-	else if (strnicmp(aValue,"vfpv3D16", 8)==0)
-		aPM->SetFPU(3);
+	else if ((strnicmp(aValue, "vfpv2", 5)==0) || (strnicmp(aValue, "softvfp+vfpv2",13 )==0))
+		aPM->SetFPU(1);
+	else if (strnicmp(aValue, "softvfp", 7)==0)
+		aPM->SetFPU(0);
 	else
 		throw InvalidArgumentError(INVALIDARGUMENTERROR, aValue, aOption);
 }

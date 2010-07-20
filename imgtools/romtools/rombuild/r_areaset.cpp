@@ -303,8 +303,6 @@ TInt Area::SortFilesForPagedRom() {
 
 	iFirstPagedCode = normal[0];
 	Print(ELog,"\n");
-	if(gGenDepGraph)
-		WriteDependenceGraph();
 	return KErrNone;
 }
 
@@ -313,7 +311,7 @@ void Area::WriteDependenceGraph() {
 	TDepInfoList::iterator infoIt;
 	TStringList::iterator strIt;
 	TDepInfoList myDepInfoList;
-	TRomBuilderEntry* e = iFirstPagedCode;
+	TRomBuilderEntry* e = iFiles;
 	char buffer[255];
 	TInt count = 0;
 	TStringList nameList;
@@ -332,7 +330,7 @@ void Area::WriteDependenceGraph() {
 		e = e->iNextInArea;
 		count++;
 	}
-	e = iFirstPagedCode;
+	e = iFiles;
 	count = 0;
 	while(e) {
 		TRomNode* rn = e->iRomNode;

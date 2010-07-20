@@ -97,11 +97,11 @@ public:
 	void AddFile(TRomBuilderEntry* aFile);
 
 	TInt SortFilesForPagedRom();
+	void WriteDependenceGraph();
 private:
 	// only AreaSet can create areas
 	Area(const char* aName, TLinAddr aDestBaseAddr, TUint aMaxSize, Area* aNext=0);
 	void ReleaseAllFiles();
-	void WriteDependenceGraph();
 public:
 	TRomBuilderEntry* iFirstPagedCode; // For PagedRom only
 private:

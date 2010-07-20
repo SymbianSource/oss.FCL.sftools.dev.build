@@ -1,7 +1,17 @@
+Version 2.12.3 (ROFSBUILD)
+===============
+Released by Marvin Shi, 09/07/2010
+	1) ou1cimx1#471304 Rofsbuild fails to build SMR image with non-HCR content 
+
 Version 2.12.2 (ROFSBUILD)
 ===============
-Released by Marvin Shi, 30/06/2010
-	1)DEF145479 Rofsbuild fails to build SMR image with non-HCR content. 
+Released by Lorence Wang, 09/07/2010
+	1)Rofsbuild build empty FAT image.
+
+Version 2.17.4 (rombuild)
+===============
+Released by Lorence Wang, 06/07/2010
+	1)Rombuild generates ROM dependency including Paged and Unpaged section.
 
 Version 2.12.1 (ROFSBUILD)
 ===============
