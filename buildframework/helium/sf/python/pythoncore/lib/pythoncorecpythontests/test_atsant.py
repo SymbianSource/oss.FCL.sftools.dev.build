@@ -31,13 +31,14 @@ def test_atsant():
     """test atsant and check 3 files in the file"""
     files = atsant.files_to_test(os.path.join(os.environ['TEST_DATA'], 'data/packageiad/layers.sysdef.xml'), None, None, 'z:')
     assert len(files) == 3
-    
+
 def test_IConfigATS():
+    """test I config ATS"""
     tmpdir = tempfile.mkdtemp()
     shutil.copy(os.path.join(os.environ['TEST_DATA'], 'data', 'example_corernd.iconfig.xml'), os.path.join(tmpdir, 'example_corernd.iconfig.xml'))
     open(os.path.join(tmpdir, 'RX-60_00_rnd.core.fpsx'), 'w').close()
     open(os.path.join(tmpdir, 'RX-60_00.01_rnd.rofs2.fpsx'), 'w').close()
     open(os.path.join(tmpdir, 'RX-60_00_rnd.rofs3.fpsx'), 'w').close()
     open(os.path.join(tmpdir, 'RX-60_00_rnd.udaerase.fpsx'), 'w').close()
-    ic = atsant.IConfigATS(tmpdir)
-    ic.findimages()
+    i_c = atsant.IConfigATS(tmpdir, '')
+    i_c.findimages()

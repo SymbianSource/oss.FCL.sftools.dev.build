@@ -33,6 +33,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import org.apache.tools.ant.BuildException;
 import java.io.IOException;
+import javax.persistence.FlushModeType;
 
 /**
  * This class handles the generic ORM entity management.
@@ -117,6 +118,7 @@ public class ORMEntityManager {
                 name,
                 persistProperties);
         entityManager = factory.createEntityManager();
+        entityManager.setFlushMode(FlushModeType.COMMIT);
         entityManager.getTransaction().begin();
         entityManager.persist(new Version());
         entityManager.getTransaction().commit();

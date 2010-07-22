@@ -88,7 +88,7 @@ public class ExecuteTaskNotifier extends DataType implements Notifier,
             prj.setProperty("signal.message", message );
             // Converting the list of inputs into a string.
             String inputs = "";
-            if (notifierInput != null) {
+            if (notifierInput != null && notifierInput.getFile() != null) {
                 inputs += notifierInput.getFile().toString();
             }
             prj.setProperty("signal.notifier.inputs", inputs);

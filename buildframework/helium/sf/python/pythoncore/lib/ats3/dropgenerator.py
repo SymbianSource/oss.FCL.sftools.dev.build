@@ -818,6 +818,8 @@ def generate_target(test_plan, root):
     harness = test_plan["harness"]
     if harness == "MULTI_HARNESS":
         input_targets(test_plan, root, ["STIF", "EUNIT"])
+    elif harness == "MULTI_HARNESS_GENERIC_STIF":
+        input_targets(test_plan, root, ["STIF", "GENERIC"])
     elif harness == "STIF":
         input_targets(test_plan, root, ["STIF"])
     elif harness == "EUNIT":
@@ -915,6 +917,7 @@ class Ats3TemplateTestDropGenerator(Ats3TestDropGenerator):
     #QT_LOG_DIR = r"c:\private\Qt\logs"
     QT_LOG_DIR = r"c:\shared\EUnit\logs"
     CTC_LOG_DIR = r"c:\data\ctc"
+    AtsInterface_LOG_DIR = r"c:\spd_logs\xml"
 
     def stif_init_file(self, src_dst):
         """init the STIF format file"""
@@ -953,11 +956,22 @@ class Ats3TemplateTestDropGenerator(Ats3TestDropGenerator):
             drop_id = temp_drop_id
 
         return atspath.join(ats_network, "ctc_helium" , diamonds_id, drop_id, setd["name"], "ctcdata")
+    
+    def stifmodulename(self, ini_file):
+        modname = None
+        ini = open(ini_file)
+        for l in ini:
+            if l.startswith('ModuleName'):
+                modname = l.split('=')[1].strip()
+        ini.close()
+        return modname
 
-    def getlogdir(self, setd):
+    def getlogdir(self, test_plan, setd):
         """ find the logger directory"""
         if setd["test_harness"] == "STIF":
-            return self.STIF_LOG_DIR
+            if test_plan['hti'] == 'True':
+                return self.STIF_LOG_DIR
+            return self.AtsInterface_LOG_DIR
         elif setd["test_harness"] == "STIFUNIT":
             return self.STIFUNIT_LOG_DIR
         elif setd["test_harness"] == "GENERIC":
@@ -983,7 +997,11 @@ class Ats3TemplateTestDropGenerator(Ats3TestDropGenerator):
         
         loader = jinja2.ChoiceLoader([jinja2.PackageLoader(__name__, 'templates')] + customdirs)
         env = jinja2.Environment(loader=loader)
-        template = env.from_string(pkg_resources.resource_string(__name__, 'ats4_template.xml'))# pylint: disable-msg=E1101
+        
+        if hasattr(test_plan, 'custom_template'):
+            template = env.from_string(open(test_plan.custom_template).read())
+        else:
+            template = env.from_string(pkg_resources.resource_string(__name__, 'ats4_template.xml'))# pylint: disable-msg=E1101
 
         xmltext = template.render(test_plan=test_plan, os=os, atspath=atspath, atsself=self).encode('ISO-8859-1')
         return et.ElementTree(et.XML(xmltext))

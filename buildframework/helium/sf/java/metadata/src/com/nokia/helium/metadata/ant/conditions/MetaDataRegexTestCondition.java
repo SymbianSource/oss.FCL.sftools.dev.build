@@ -99,9 +99,9 @@ public class MetaDataRegexTestCondition extends ProjectComponent implements Cond
           throw new BuildException("'string' attribute is not defined");
       for (MetaDataFilterSet set : filterSets) {
           for (MetaDataFilter filter : set.getAllFilters()) {
-              Pattern p = filter.getPattern();
-              Matcher m = p.matcher(this.string);
-              if (m.matches()) {
+              Pattern pattern = filter.getPattern();
+              Matcher matcher = pattern.matcher(this.string);
+              if (matcher.matches()) {
                   return this.severity.equalsIgnoreCase(filter.getPriority());
               }
           }

@@ -32,7 +32,7 @@ if exist "%HELIUM_HOME%\runtime\runtime_env.bat" (
 call %HELIUM_HOME%\runtime\runtime_env.bat
 ) 
 
-if not exist "%HELIUM_HOME%\extensions\nokia\distribution.policy.S60" ( 
+if not exist "%HELIUM_HOME%\extensions\nokia\build.xml" ( 
 set HLM_SUBCON=1
 set HLM_DISABLE_INTERNAL_DATA=1
 )

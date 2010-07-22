@@ -1201,7 +1201,7 @@ class CCMObject(FourPartName):
         result = self._session.execute("finduse \"%s\"" % self, FinduseResult(self))
         return result.output
     
-    def delete(self, recurse=False):
+    def delete(self, recurse=False, scope=None):
         """ Delete a synergy project. """
         args = ""
         if recurse:
@@ -1209,8 +1209,10 @@ class CCMObject(FourPartName):
         parg = ""
         if self.type == "project":
             parg = "-project"
+        if scope:
+            args = args + ' -scope "' + scope + '"'
         result = self._session.execute("delete %s %s \"%s\"" % (args, parg, self))
-        if result.status != 0 and result.status != None:
+        if (result.status != 0 and result.status != None) or (result.output.strip().startswith('Cannot use')):
             raise CCMException("An error occurred while deleting object %s (error status: %s)\n%s" % (self, result.status, result.output), result)
         return result
 

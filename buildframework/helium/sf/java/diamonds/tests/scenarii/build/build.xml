@@ -40,7 +40,6 @@ Description:
     <property name="invalid.target.input.file" location="${diamonds.unitest.dir}/data/invalid.target.input.log.xml" />
     <property name="symsee.version" value="9.1.0" />
 
-
     <target name="unittest" depends="unittest-diamonds" />
     
     <target name="unittest-diamonds" >
@@ -155,8 +154,63 @@ Description:
         </au:assertFalse>
     </target>
 
+    <target name="test-echo-operation">
+        <echo message="echo operation: test" />
+    </target>
+
+    <target name="test-echo-operation1">
+        <echo message="echo operation1: test" />
+    </target>
+
+    <target name="test-echo-operation2">
+        <echo message="echo operation2: test" />
+    </target>
+
+    <target name="test-echo-operation3">
+        <echo message="echo operation3: test" />
+    </target>
+
+    <target name="test-echo-operation4">
+        <echo message="echo operation4: test" />
+    </target>
+
+    <target name="test-echo-operation5">
+        <echo message="echo operation5: test" />
+    </target>
+
+    <target name="test-depend-target" depends="test-echo-operation">
+        <echo message="test-ant-call" />
+        <antcall target="test-echo-operation" />
+        <au:assertFileExists file="${diamonds.output.dir}/test-echo-operation-time.xml" />
+    </target>
+
+    <target name="test-ant-call">
+        <echo message="test-ant-call" />
+        <antcall target="test-echo-operation1" />
+        <au:assertFileExists file="${diamonds.output.dir}/test-echo-operation1-time.xml" />
+    </target>
+
+    <target name="test-ant-call-multiple">
+        <echo message="test-ant-call" />
+        <antcall target="test-echo-operation2" />
+        <au:assertFileExists file="${diamonds.output.dir}/test-echo-operation2-time.xml" />
+        <antcall target="test-echo-operation3" />
+        <au:assertFileExists file="${diamonds.output.dir}/test-echo-operation3-time.xml" />
+    </target>
+
+    <target name="test-ant-call-multiple-parallel">
+        <echo message="test-ant-call" />
+        <parallel>
+            <antcall target="test-echo-operation4" />
+            <antcall target="test-echo-operation5" />
+        </parallel>
+        <au:assertFileExists file="${diamonds.output.dir}/test-echo-operation4-time.xml" />
+        <au:assertFileExists file="${diamonds.output.dir}/test-echo-operation5-time.xml" />
+    </target>
+
     <target name="test-all" depends="test-buildid-notset, diamonds, test-buildid-set, test-defer-type, test-version,
         test-create-bom-log,test-codescanner,test-compile-target,test-invalid-diamonds-server-properties,
         test-non-existing-ant-properties,test-invalid-ant-properties-input,test-invalid-template-file,
-        test-invalid-target-input-file,test-invalid-stage-input-file " />
+        test-invalid-target-input-file,test-invalid-stage-input-file, test-depend-target,
+        test-ant-call, test-ant-call-multiple, test-ant-call-multiple-parallel" />
 </project>

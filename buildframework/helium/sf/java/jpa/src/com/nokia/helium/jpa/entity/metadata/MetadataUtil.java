@@ -69,10 +69,15 @@ public final class MetadataUtil {
      * Finalize the orm, calls ORMUtil finalize function to close
      * entity manager.
      */
-    public static void finalizeMetadata(String logPath) {
+    public static void finalizeMetadata(String urlPath, String logPath) {
         synchronized (mutexObject) {
-            log.debug("finalizing metadata");
-            metadataMap.remove(logPath);
+            Object readMutexObject = ORMUtil.getMutexObject();
+            synchronized (readMutexObject) {
+                ORMEntityManager manager = ORMUtil.getEntityManager(urlPath);
+                manager.commitToDB();
+                log.debug("finalizing metadata: " + logPath);
+                metadataMap.remove(logPath);
+            }
         }
     }
 
@@ -82,8 +87,11 @@ public final class MetadataUtil {
      */
     public static void addEntry(String urlPath, Metadata.LogEntry entry) {
         synchronized (mutexObject) {
-            metadata = getMetadata(entry.getLogPath(), urlPath);
-            metadata.addEntry(entry);
+            Object readMutexObject = ORMUtil.getMutexObject();
+            synchronized (readMutexObject) {
+                metadata = getMetadata(entry.getLogPath(), urlPath);
+                metadata.addEntry(entry);
+            }
         }
     }
 
@@ -92,8 +100,12 @@ public final class MetadataUtil {
      */
     public static void addEntry(String urlPath, String logPath, int time) {
         synchronized (mutexObject) {
-            metadata = getMetadata(logPath, urlPath);
-            metadata.addExecutionTime(time);
+            Object readMutexObject = ORMUtil.getMutexObject();
+            synchronized (readMutexObject) {
+                
+                metadata = getMetadata(logPath, urlPath);
+                metadata.addExecutionTime(time);
+            }
         }
     }
     
@@ -104,9 +116,12 @@ public final class MetadataUtil {
      */
     public static void removeEntries(String urlPath, String logPath) {
         synchronized (mutexObject) {
-            metadata = getMetadata(logPath, urlPath);
-            metadata.removeEntries();
-            finalizeMetadata(logPath);
+            Object readMutexObject = ORMUtil.getMutexObject();
+            synchronized (readMutexObject) {
+                metadata = getMetadata(logPath, urlPath);
+                metadata.removeEntries();
+                finalizeMetadata(urlPath, logPath);
+            }
         }
     }
 

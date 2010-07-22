@@ -43,6 +43,15 @@ Description:
     @type boolean
     -->
     <property name="skip.sbs.layer.generation" value="false" />
+
+    <!-- Default CTC command line option, override it to customize it. -->
+    <hlm:argSet id="ctc.build.options" />
+
+    <!-- This property define what instrumentation CTC should create.
+    @type string
+    -->
+    <property name="ctc.instrument.type" value="m" />
+    
     
     <!-- This target filters the canonical system definition file compare to the "raptor_${sysdef.configuration}" filter. -->
     <macrodef name="generate-layers" uri="http://www.nokia.com/helium">
@@ -153,7 +162,10 @@ Description:
                                                     errorOutput="${sbs.log.file}.sbs_error.log" 
                                                     workingDir="${build.drive}/" 
                                                     failOnError="false" 
-                                                    outputLog="${sbs.log.file}" />                                
+                                                    outputLog="${sbs.log.file}"
+                                                    instrumentType="${ctc.instrument.type}">
+                                        <hlm:CTCOptions refid="ctc.build.options" />
+                                    </hlm:ctctask>
                                 </then>
                             </elseif>
                             <else>

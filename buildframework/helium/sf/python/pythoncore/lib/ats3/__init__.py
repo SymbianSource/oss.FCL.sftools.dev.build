@@ -53,24 +53,32 @@ class Configuration(object):
         pkg_parser = parser.PkgFileParser()
         
         # Customize some attributes from how optparse leaves them.
-        self.build_drive = path(self._opts.build_drive)
+        if hasattr(self._opts, 'build_drive'):
+            self.build_drive = path(self._opts.build_drive)
         self.file_store = path(self._opts.file_store)
         self.flash_images = split_paths(self._opts.flash_images)
-        self.sis_files = split_paths(self._opts.sis_files)
-        self.config_file = self._opts.config
-        self.obey_pkgfiles = to_bool(self._opts.obey_pkgfiles)
-        self.hti = to_bool(self._opts.hti)
-        self.specific_pkg = self._opts.specific_pkg
-        if self.specific_pkg == '':
-            self.specific_pkg = None
+        if hasattr(self._opts, 'sis_files'):
+            self.sis_files = split_paths(self._opts.sis_files)
+        if hasattr(self._opts, 'config'):
+            self.config_file = self._opts.config
+        if hasattr(self._opts, 'obey_pkgfiles'):
+            self.obey_pkgfiles = to_bool(self._opts.obey_pkgfiles)
+        if hasattr(self._opts, 'hti'):
+            self.hti = to_bool(self._opts.hti)
+        if hasattr(self._opts, 'test_type'):
+            self.test_type = self._opts.test_type
+        if hasattr(self._opts, 'specific_pkg'):
+            self.specific_pkg = self._opts.specific_pkg
+            if self.specific_pkg == '':
+                self.specific_pkg = None
         self.tsrc_paths_dict = {}
-
-        ats_nd = self._opts.ctc_run_process_params.strip()
-        if ats_nd != "":
-            ats_nd = ats_nd.split("#")[0].strip()
-            if ats_nd == "":
-                self._opts.ctc_run_process_params = ""
-                _logger.warning("Property \'ats.ctc.host\' is not set. Code coverage measurement report(s) will not be created.")
+        if hasattr(self._opts, 'ctc_run_process_params'):
+            ats_nd = self._opts.ctc_run_process_params.strip()
+            if ats_nd != "":
+                ats_nd = ats_nd.split("#")[0].strip()
+                if ats_nd == "":
+                    self._opts.ctc_run_process_params = ""
+                    _logger.warning("Property \'ats.ctc.host\' is not set. Code coverage measurement report(s) will not be created.")
                 
         main_comps = []
                 
@@ -126,27 +134,45 @@ class Ats3TestPlan(object):
 
     def __init__(self, config):
         self.diamonds_build_url = config.diamonds_build_url
-        self.ctc_run_process_params = config.ctc_run_process_params
+        if hasattr(config, 'ctc_run_process_params'):
+            self.ctc_run_process_params = config.ctc_run_process_params
         self.testrun_name = config.testrun_name
-        self.harness = config.harness
+        if hasattr(config, 'harness'):
+            self.harness = config.harness
         self.device_type = config.device_type
-        self.device_hwid = config.device_hwid
-        self.plan_name = config.plan_name
+        if hasattr(config, 'device_hwid'):
+            self.device_hwid = config.device_hwid
+        if hasattr(config, 'plan_name'):
+            self.plan_name = config.plan_name
         self.report_email = config.report_email
         self.file_store = config.file_store
         self.test_timeout = config.test_timeout
-        self.eunitexerunner_flags = config.eunitexerunner_flags
+        if hasattr(config, 'eunitexerunner_flags'):
+            self.eunitexerunner_flags = config.eunitexerunner_flags
         self.sets = []
         self.src_dst = []
         self.pmd_files = []
         self.trace_activation_files = []
-        self.trace_enabled = to_bool(config.trace_enabled)
-        self.ctc_enabled = to_bool(config.ctc_enabled)
-        self.multiset_enabled = to_bool(config.multiset_enabled)
-        self.monsym_files = config.monsym_files
-        self.hti = config.hti
+        self.trace_enabled = 'False'
+        if hasattr(config, 'trace_enabled'):
+            self.trace_enabled = to_bool(config.trace_enabled)
+        self.ctc_enabled = 'False'
+        if hasattr(config, 'ctc_enabled'):
+            self.ctc_enabled = to_bool(config.ctc_enabled)
+        if hasattr(config, 'multiset_enabled'):
+            self.multiset_enabled = to_bool(config.multiset_enabled)
+        if hasattr(config, 'monsym_files'):
+            self.monsym_files = config.monsym_files
+        if hasattr(config, 'hti'):
+            self.hti = config.hti
+        if hasattr(config, 'custom_template'):
+            self.custom_template = config.custom_template
         self.component_path = ""
         self.custom_dir = None
+        if hasattr(config, 'flash_images'):
+            self.flash_images = config.flash_images
+        if hasattr(config, 'test_type'):
+            self.test_type = config.test_type
     
     def insert_set(self, data_files=None, config_files=None, 
                    engine_ini_file=None,  image_files=None, sis_files=None,
@@ -206,6 +232,7 @@ class Ats3TestPlan(object):
         eunit = False
         stif = False
         stifunit = False
+        generic = False
         for setd in self.sets:
             if setd["test_harness"] == "STIF":
                 stif = True
@@ -213,8 +240,12 @@ class Ats3TestPlan(object):
                 eunit = True
             elif setd["test_harness"] == "STIFUNIT":
                 stifunit = True
+            else:
+                generic = True
                 
-        if eunit and stif:
+        if stif and generic:
+            self.harness = "MULTI_HARNESS_GENERIC_STIF"
+        elif eunit and stif:
             self.harness = "MULTI_HARNESS"
         elif eunit:
             self.harness = "EUNIT"

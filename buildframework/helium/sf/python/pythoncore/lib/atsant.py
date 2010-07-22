@@ -31,11 +31,12 @@ _logger = logging.getLogger('atsant')
 
 class IConfigATS(object):
     """ Class used to read configuration file iconfig.xml """
-    def __init__(self, imagesdir):
+    def __init__(self, imagesdir, productname):
         self.imagesdir = imagesdir
+        self.productname = productname
         self.config = self.getconfig()
         
-    def getconfig(self, type=None):
+    def getconfig(self, type=None, productname=None):
         """get configuration"""
         noncust = None
         for root, _, files in os.walk(self.imagesdir, topdown=False):
@@ -45,8 +46,8 @@ class IConfigATS(object):
                     configBuilder = configuration.NestedConfigurationBuilder(open(filePath, 'r'))
                     configSet = configBuilder.getConfiguration()
                     for config in configSet.getConfigurations():
-                        if type:
-                            if type in config.type:
+                        if type and productname:
+                            if type in config.type and config['PRODUCT_NAME'] in productname:
                                 return config
                         else:
                             noncust = config
@@ -68,7 +69,7 @@ class IConfigATS(object):
         """find images"""
         output = ''
         for imagetype, imagetypename in [('core', 'CORE'), ('langpack', 'ROFS2'), ('cust', 'ROFS3'), ('udaerase', 'UDAERASE')]:
-            iconfigxml = self.getconfig(imagetype)
+            iconfigxml = self.getconfig(imagetype, self.productname)
             if iconfigxml == None:
                 iconfigxml = self.config
 
@@ -83,7 +84,7 @@ class IConfigATS(object):
                     raise Exception(image + ' not found')
             else:
                 if imagetype == 'core':
-                    raise Exception(imagetypename + '_FLASH not found in iconfig.xml')
+                    raise Exception(imagetypename + '_FLASH not found in iconfig.xml in ' + self.imagesdir)
                 print imagetypename + '_FLASH not found in iconfig.xml'
         return output
 

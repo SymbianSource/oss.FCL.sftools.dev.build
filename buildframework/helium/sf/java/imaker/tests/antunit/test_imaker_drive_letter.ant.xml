@@ -41,13 +41,15 @@ Description:
         <delete dir="${epocroot}/epoc32" failonerror="false" />
         <echo>-------------------------------------------------------------------------------</echo>
     </target>
-
+    
+    <!-- once imaker is in SymSEE this does not fail 
     <target name="test-imaker-noargs-noconfig">
         <echo>Will fail because it can't find imaker.</echo>
         <au:expectfailure>
             <hlm:imaker />
         </au:expectfailure>
     </target>
+    -->
 
     <target name="test-imaker-epocroot">
         <echo>Usin custom epocroot.</echo>

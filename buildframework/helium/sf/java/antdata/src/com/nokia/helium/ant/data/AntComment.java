@@ -96,7 +96,9 @@ public class AntComment {
                 while (tokenizer.hasMoreElements()) {
                     String tagText = (String) tokenizer.nextElement();
                     String[] tagParts = tagText.split("\\s", 2);
-                    tags.put(tagParts[0], tagParts[1].trim());
+                    if (tagParts.length > 1) {
+                        tags.put(tagParts[0], tagParts[1].trim());
+                    }
                 }
             }
         }

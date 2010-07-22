@@ -240,7 +240,7 @@ class PreparationCheckout(PreparationAction):
             co_role = ccm.get_role_for_purpose(session, str(self._config['purpose']))
             session.role = co_role
             try:
-                delResult = result.delete(recurse=True)
+                delResult = result.delete(scope='project_and_subproject_hierarchy')
             finally:
                 session.role = role
             ccm.log_result(delResult, ccm.CHECKOUT_LOG_RULES, _logger)

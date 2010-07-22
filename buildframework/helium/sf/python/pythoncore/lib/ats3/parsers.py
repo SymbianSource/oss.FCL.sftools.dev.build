@@ -545,13 +545,13 @@ class PkgFileParser(object):
     for every file in the pkg file
     """
 
-    def __init__(self, platform = None, specific_pkg = None):
+    def __init__(self, platform = None, specific_pkg = None, drive=''):
         self.platform = platform
         self.build_platform = None
         if self.platform is not None and "_" in self.platform:
             plat_tar = re.search(r"(.*)_(.*).pkg", self.platform)
             self.build_platform, self.build_target = plat_tar.groups() 
-        self.drive = ""
+        self.drive = drive
         self._files = []
         self.pkg_files = []
         self.pkg_file_path = None
@@ -636,7 +636,7 @@ class PkgFileParser(object):
                 for p_file in self.get_pkg_files(self.location, True):
                     self._files.append(p_file)
 
-        return self.__read_pkg_file(self._files)
+        return self.read_pkg_file(self._files)
 
     def __map_pkg_path(self, pkg_line, pkg_file_path, pkg_file):
         """Parse package file to get the src and dst paths" for installing files"""
@@ -669,7 +669,7 @@ class PkgFileParser(object):
                 val1 = val1.lower().replace("$(target)", self.build_target)
 
             if path.isabs(path(val1).normpath()):
-                map_src = str(path.joinpath(self.drive, val1).normpath())
+                map_src = os.path.normpath(os.path.join(self.drive, val1))
             elif re.search(r"\A\w", val1, 1):
                 map_src = str(path.joinpath(self.pkg_file_path + os.sep, os.path.normpath(val1)).normpath())
             else:
@@ -738,10 +738,12 @@ class PkgFileParser(object):
 
         if not map_src or map_src == "." or not map_dst or map_dst == ".":
             return None
-
+        if not os.path.exists(map_src):
+            _logger.error(map_src + ' not found')
+            return None
         return path(map_src).normpath(), path(map_dst).normpath(), file_type, pkg_file
 
-    def __read_pkg_file(self, pkg_files):
+    def read_pkg_file(self, pkg_files):
         """Reads contents of PKG file"""
         pkg_paths = []
         for pkg_file in pkg_files:
@@ -755,7 +757,7 @@ class PkgFileParser(object):
                 except UnicodeError:
                     file1 = open(pkg_file, 'r')
                     lines = file1.readlines()
-                pkg_file_path = path((pkg_file.rsplit(os.sep, 1))[0])
+                pkg_file_path = path(os.path.dirname(pkg_file))
                 for line in lines:
                     pkg_path = self.__map_pkg_path(line, pkg_file_path, os.path.basename(pkg_file))
                     if pkg_path is None:

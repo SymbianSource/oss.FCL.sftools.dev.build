@@ -115,6 +115,10 @@ public class IMakerTask extends Task {
             engine.setTask(this);
             return engine;
         } else {
+            log("Using engine: " + engineRefId);
+            if (this.getProject().getReference(engineRefId) == null) {
+                throw new BuildException("Could not find engine reference: '" + engineRefId + "'.");
+            }
             try {
                 Engine engine = (Engine)this.getProject().getReference(engineRefId);
                 engine.setTask(this);

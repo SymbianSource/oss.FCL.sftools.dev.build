@@ -43,7 +43,18 @@ Description:
     <stages>
             <!-- verifying basic stage input -->
             <stage name="pre-build" start="version" end="version" />
-            
+            <stage name="test-echo-operation" 
+                start="test-echo-operation" end="test-echo-operation" />
+            <stage name="test-echo-operation1" 
+                start="test-echo-operation1" end="test-echo-operation1" />
+            <stage name="test-echo-operation2" 
+                start="test-echo-operation2" end="test-echo-operation2" />
+            <stage name="test-echo-operation3" 
+                start="test-echo-operation3" end="test-echo-operation3" />
+            <stage name="test-echo-operation4" 
+                start="test-echo-operation4" end="test-echo-operation4" />
+            <stage name="test-echo-operation5" 
+                start="test-echo-operation5" end="test-echo-operation5" />
             <!-- verifying basic stage input with input xml file-->
             <stage name="build" start="compile-target" end="compile-target"
                 logfile="${ant['compile.log.input']}"/>

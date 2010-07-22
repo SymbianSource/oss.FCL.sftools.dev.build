@@ -35,6 +35,7 @@ import java.util.Hashtable;
 import javax.persistence.Query;
 import javax.persistence.CascadeType;
 import com.nokia.helium.jpa.ORMCommitCount;
+import com.nokia.helium.jpa.ORMUtil;
 import com.nokia.helium.jpa.ORMEntityManager;
 
 /**
@@ -236,9 +237,10 @@ public class Metadata {
     private void loadFromDB(String path) {
         LogFile logFile = null;
         logFiles = new Hashtable<String, LogFile>();
+        Query query = manager.getEntityManager().createQuery("SELECT l FROM LogFile l");
+        query.setFlushMode(FlushModeType.COMMIT);
         List<LogFile> logFilesList =
-            (List<LogFile>) manager.getEntityManager().createQuery(
-                "SELECT l FROM LogFile l").getResultList();
+            (List<LogFile>) query.getResultList();
         for (LogFile file : logFilesList) {
             log.debug("getting logfile from db: " + file.getPath());
             logFiles.put(file.getPath(), file);
@@ -260,18 +262,20 @@ public class Metadata {
      * @param obj - object to be stored in the data.
      */
     private void persist(Object obj) {
-        synchronized (manager) {
-            EntityManager em = manager.getEntityManager();
-            ORMCommitCount countObject = manager.getCommitCountObject();
-            //log.debug("object: " + obj);
-            //log.debug("object: " + em);
-            em.persist(obj);
-            countObject.decreaseCount();
-            if (countObject.isCommitRequired()) {
-                countObject.reset();
-                em.getTransaction().commit();
-                em.clear();
-                em.getTransaction().begin();
+        Object mutexObject = ORMUtil.getMutexObject();
+        synchronized (mutexObject) {
+            synchronized (manager) {
+                EntityManager em = manager.getEntityManager();
+                ORMCommitCount countObject = manager.getCommitCountObject();
+                //log.debug("object: " + em);
+                em.persist(obj);
+                countObject.decreaseCount();
+                if (countObject.isCommitRequired()) {
+                    countObject.reset();
+                    em.getTransaction().commit();
+                    em.clear();
+                    em.getTransaction().begin();
+                }
             }
         }
     }
@@ -315,11 +319,13 @@ public class Metadata {
      * Internal function to cache the logpath for performance.
      */
     private void initializeLogPath() {
-        EntityManager em = manager.getEntityManager();
-        Query q = em.createQuery("select m from LogFile m");
+        EntityManager entityManager = manager.getEntityManager();
+        Query query = entityManager.createQuery("select m from LogFile m");
+        query.setFlushMode(FlushModeType.COMMIT);
+        
         name = "metadata";
-        if (q.getResultList().size() == 0) {
-            log.debug("query result: size" + q.getResultList().size());
+        if (query.getResultList().size() == 0) {
+            log.debug("query result: size" + query.getResultList().size());
             populatePriorities();
             populateDB(logPath);
         } else {
@@ -489,7 +495,6 @@ public class Metadata {
      * priority.
      */
     public final void removeEntries() {
-        EntityManager em = manager.getEntityManager();
         LogFile file = (LogFile)executeSingleQuery("select l from LogFile l where l.path like '%" + logPath + "'");
         if ( file != null ) {
             log.debug("removing entries for : " + file.getPath());
@@ -510,19 +515,22 @@ public class Metadata {
      * @return object - record from the executed query.
      */
     private Object executeSingleQuery (String queryString) {
-        EntityManager em = manager.getEntityManager();
-        Query query = em.createQuery(queryString);
-        query.setHint("eclipselink.persistence-context.reference-mode", "WEAK");
-        query.setHint("eclipselink.maintain-cache", "false");
-        query.setHint("eclipselink.read-only", "true");
-        query.setFlushMode(FlushModeType.COMMIT);
+        Object mutexObject = ORMUtil.getMutexObject();
         Object obj = null;
-        try {
-            obj = query.getSingleResult();
-        } catch (javax.persistence.NoResultException nex) {
-            log.debug("no results for query: " + queryString, nex);
-        } catch (javax.persistence.NonUniqueResultException nux) {
-            log.debug("more than one result returned by query: " + queryString, nux);
+        synchronized (mutexObject) {
+            EntityManager em = manager.getEntityManager();
+            Query query = em.createQuery(queryString);
+            query.setHint("eclipselink.persistence-context.reference-mode", "WEAK");
+            query.setHint("eclipselink.maintain-cache", "false");
+            query.setHint("eclipselink.read-only", "true");
+            query.setFlushMode(FlushModeType.COMMIT);
+            try {
+                obj = query.getSingleResult();
+            } catch (javax.persistence.NoResultException nex) {
+                log.debug("no results for query: " + queryString, nex);
+            } catch (javax.persistence.NonUniqueResultException nux) {
+                log.debug("more than one result returned by query: " + queryString, nux);
+            }
         }
         return obj;
     }
@@ -532,19 +540,22 @@ public class Metadata {
      * @param queryString - query string for whcih the result to be obtained.
      */
     private void removeEntries(String queryString) {
-        EntityManager em = manager.getEntityManager();
-        Query query = em.createNativeQuery(queryString);
-        query.setHint("eclipselink.persistence-context.reference-mode", "WEAK");
-        query.setHint("eclipselink.maintain-cache", "false");
-        query.setFlushMode(FlushModeType.COMMIT);
-        try {
-            int deletedRecords = query.executeUpdate();
-            log.debug("total records deleted " + deletedRecords 
-                    + "for query:" + queryString);
-        } catch (javax.persistence.NoResultException nex) {
-            log.debug("no results:", nex);
-        } catch (javax.persistence.NonUniqueResultException nux) {
-            log.debug("more than one result returned:", nux);
+        Object mutexObject = ORMUtil.getMutexObject();
+        synchronized (mutexObject) {
+            EntityManager em = manager.getEntityManager();
+            Query query = em.createNativeQuery(queryString);
+            query.setHint("eclipselink.persistence-context.reference-mode", "WEAK");
+            query.setHint("eclipselink.maintain-cache", "false");
+            query.setFlushMode(FlushModeType.COMMIT);
+            try {
+                int deletedRecords = query.executeUpdate();
+                log.debug("total records deleted " + deletedRecords 
+                        + "for query:" + queryString);
+            } catch (javax.persistence.NoResultException nex) {
+                log.debug("no results:", nex);
+            } catch (javax.persistence.NonUniqueResultException nux) {
+                log.debug("more than one result returned:", nux);
+            }
         }
     }
 

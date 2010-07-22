@@ -121,24 +121,31 @@ public class MetaDataRecord extends Task {
             for (MetaDataInput metadataInput : metadataList) {
                 boolean removed = false;
                 String logPath = null;
+                String currentLogPath = null;
                 Iterator<Metadata.LogEntry> inputIterator = metadataInput.iterator();
                 while (inputIterator.hasNext()) {
+                    //Todo: better way of log handling, with metadatainput
+                    // metadata initialization for each logfile within 
+                    //metadatainput itself would be better. this is temporary.
                     Metadata.LogEntry logEntry = inputIterator.next();
-                    if (!removed) {
-                        logPath = logEntry.getLogPath();
+                    logPath = logEntry.getLogPath();
+                    if (currentLogPath == null) {
+                        currentLogPath = logPath;
+                        removed = false;
+                    } else if (!currentLogPath.equals(logPath)) {
+                        finalizeForLogPath(currentLogPath, metadataInput, ormDB);
+                        currentLogPath = logPath;
+                        removed = false;
+                    }
+                    if (!removed ) {
+                        log.debug("processing for log: " + logPath);
                         ormDB.removeEntries(logPath);
                         removed = true;
                     }
                     //initializes the metadata if none exists
                     ormDB.addLogEntry(logEntry);
                 }
-                if (logPath != null && metadataInput instanceof CustomMetaDataProvider) {
-                    CustomMetaDataProvider provider = (CustomMetaDataProvider)metadataInput;
-                    provider.provide(ormDB, logPath);
-                }
-                if (logPath != null) {
-                    ormDB.finalizeMetadata(logPath);
-                }
+                finalizeForLogPath(currentLogPath, metadataInput, ormDB);
             }
             Date after = new Date();
             log("Time after recording to db: " + after);
@@ -153,6 +160,18 @@ public class MetaDataRecord extends Task {
             if (ormDB != null) {
                 ormDB.finalizeDB();
             }
+        }
+    }
+    
+    private void finalizeForLogPath(String currentLogPath, 
+            MetaDataInput metadataInput, ORMMetadataDB ormDB) {
+        if (currentLogPath != null) {
+            if (metadataInput instanceof CustomMetaDataProvider) {
+                CustomMetaDataProvider provider = 
+                    (CustomMetaDataProvider)metadataInput;
+                provider.provide(ormDB, currentLogPath);
+            }
+            ormDB.finalizeMetadata(currentLogPath);
         }
     }
 }

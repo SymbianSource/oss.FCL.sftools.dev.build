@@ -73,7 +73,7 @@ information on the files used to create the drop file.
             <task>
                 <type>CreateDirTask</type>
                 <parameters>                
-                    <parameter value="{{ atsself.getlogdir(setd) }}" name="dir"/>
+                    <parameter value="{{ atsself.getlogdir(test_plan, setd) }}" name="dir"/>
                 </parameters>
             </task>
                       
@@ -84,6 +84,8 @@ information on the files used to create the drop file.
                 <parameters>
                     <parameter name="src" value="ATS3Drop\{{ setd.name }}\sis\{{ os.path.basename(sis_file) }}"/>
                     <parameter name="dst" value="c:\testframework\{{ os.path.basename(sis_file) }}"/>
+                    <parameter name="reboot-retry-count" value="2"/>
+                    <parameter name="retry-count" value="2"/>
                 </parameters>
             </task>
               {% endfor -%}
@@ -95,6 +97,8 @@ information on the files used to create the drop file.
                 <parameters>
                     <parameter value="ATS3Drop\{{ setd.name }}\{{ file[1].replace(":", "") }}" name="src"/>
                     <parameter value="{{ file[1] }}" name="dst"/>
+                    <parameter name="reboot-retry-count" value="2"/>
+                    <parameter name="retry-count" value="2"/>
                 </parameters>
             </task>
                 {% endfor -%}
@@ -105,6 +109,8 @@ information on the files used to create the drop file.
                 <parameters>
                     <parameter name="src" value="ATS3Drop\{{ setd.name }}\data\{{ os.path.basename(data_file) }}"/>
                     <parameter name="dst" value="e:\testing\data\{{ os.path.basename(data_file) }}"/>
+                    <parameter name="reboot-retry-count" value="2"/>
+                    <parameter name="retry-count" value="2"/>
                 </parameters>
             </task>
                   {% endfor -%}
@@ -114,6 +120,8 @@ information on the files used to create the drop file.
                 <parameters>
                     <parameter name="src" value="ATS3Drop\{{ setd.name }}\conf\{{ os.path.basename(data_file) }}"/>
                     <parameter name="dst" value="e:\testing\conf\{{ os.path.basename(data_file) }}"/>
+                    <parameter name="reboot-retry-count" value="2"/>
+                    <parameter name="retry-count" value="2"/>
                 </parameters>
             </task>
                   {% endfor -%}
@@ -123,6 +131,8 @@ information on the files used to create the drop file.
                 <parameters>
                     <parameter name="src" value="ATS3Drop\{{ setd.name }}\testmodules\{{ os.path.basename(data_file) }}"/>
                     <parameter name="dst" value="c:\sys\bin\{{ os.path.basename(data_file) }}"/>
+                    <parameter name="reboot-retry-count" value="2"/>
+                    <parameter name="retry-count" value="2"/>
                 </parameters>
             </task>
                   {% endfor -%}
@@ -136,6 +146,8 @@ information on the files used to create the drop file.
                 <parameters>
                     <parameter name="src" value="ATS3Drop\{{ setd.name }}\init\{{ os.path.basename(setd["engine_ini_file"]) }}"/>
                     <parameter name="dst" value="c:\testframework\{{ os.path.basename(setd["engine_ini_file"]) }}"/>
+                    <parameter name="reboot-retry-count" value="2"/>
+                    <parameter name="retry-count" value="2"/>
                 </parameters>
             </task>
               {% endif %}
@@ -238,7 +250,7 @@ information on the files used to create the drop file.
             <task>
                 <type>FileDownloadTask</type>
                 <parameters>
-                    <parameter value="{{ atsself.getlogdir(setd) }}\*" name="src"/>
+                    <parameter value="{{ atsself.getlogdir(test_plan, setd) }}\*" name="src"/>
                     <parameter name="recursive" value="true"/>
                 </parameters>
             </task>

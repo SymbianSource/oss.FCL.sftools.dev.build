@@ -95,8 +95,8 @@
 <info>Environment __CYGWIN__=C:\apps\sbs\win32\cygwin</info>
 <info>Environment __MINGW__=C:\apps\sbs\win32\mingw</info>
 <info>Environment __PYTHON__=C:\APPS\actpython\python.exe</info>
-<info>Duplicate alias 'make' (the one from 'G:/epoc32/sbs_config\s60_sbs_config.xml' will override the one in 'C:/apps/sbs/lib/config\make.xml')</info>
-<info>Duplicate alias 'emake' (the one from 'G:/epoc32/sbs_config\s60_sbs_config.xml' will override the one in 'C:/apps/sbs/lib/config\make.xml')</info>
+<info>Duplicate alias 'make' (the one from 'G:/invalid_sdk/epoc32/sbs_config\s60_sbs_config.xml' will override the one in 'C:/apps/sbs/lib/config\make.xml')</info>
+<info>Duplicate alias 'emake' (the one from 'G:/invalid_sdk/epoc32/sbs_config\s60_sbs_config.xml' will override the one in 'C:/apps/sbs/lib/config\make.xml')</info>
 <info>Buildable configuration 'armv5_urel'</info>
 <info>Buildable configuration 'armv5_udeb'</info>
 <info>Buildable configuration 'winscw_udeb'</info>
@@ -114,42 +114,42 @@
 <info>Found 30 bld.inf references in layer "addon_layer"</info>
 <info>Found 0 bld.inf references in layer "unit_test_layer"</info>
 <info>Found 6 bld.inf references in layer "complementary_layer"</info>
-<info>Toolcheck cache G:/epoc32/build/toolcheck_cache_.tmp ignored - environment changed
+<info>Toolcheck cache G:/invalid_sdk/epoc32/build/toolcheck_cache_.tmp ignored - environment changed
 </info>
-<info>OS version "vtb92sf" determined from file "G:/epoc32/data/buildinfo.txt"</info>
+<info>OS version "vtb92sf" determined from file "G:/invalid_sdk/epoc32/data/buildinfo.txt"</info>
 <info>applying the OS variant to the configuration "armv5_urel".</info>
-<info>'armv5_urel' uses variant hrh file 'G:/epoc32/include/feature_settings.hrh'</info>
-<info>OS version "vtb92sf" determined from file "G:/epoc32/data/buildinfo.txt"</info>
+<info>'armv5_urel' uses variant hrh file 'G:/invalid_sdk/epoc32/include/feature_settings.hrh'</info>
+<info>OS version "vtb92sf" determined from file "G:/invalid_sdk/epoc32/data/buildinfo.txt"</info>
 <info>applying the OS variant to the configuration "armv5_udeb".</info>
-<info>'armv5_udeb' uses variant hrh file 'G:/epoc32/include/feature_settings.hrh'</info>
-<info>OS version "vtb92sf" determined from file "G:/epoc32/data/buildinfo.txt"</info>
+<info>'armv5_udeb' uses variant hrh file 'G:/invalid_sdk/epoc32/include/feature_settings.hrh'</info>
+<info>OS version "vtb92sf" determined from file "G:/invalid_sdk/epoc32/data/buildinfo.txt"</info>
 <info>applying the OS variant to the configuration "winscw_udeb".</info>
-<info>'winscw_udeb' uses variant hrh file 'G:/epoc32/include/feature_settings.hrh'</info>
-<info>OS version "vtb92sf" determined from file "G:/epoc32/data/buildinfo.txt"</info>
+<info>'winscw_udeb' uses variant hrh file 'G:/invalid_sdk/epoc32/include/feature_settings.hrh'</info>
+<info>OS version "vtb92sf" determined from file "G:/invalid_sdk/epoc32/data/buildinfo.txt"</info>
 <info>applying the OS variant to the configuration "winscw_urel".</info>
-<info>'winscw_urel' uses variant hrh file 'G:/epoc32/include/feature_settings.hrh'</info>
+<info>'winscw_urel' uses variant hrh file 'G:/invalid_sdk/epoc32/include/feature_settings.hrh'</info>
 <info>Processing G:/sf/mw/svgt/group/bld.inf</info>
-<info>Copied G:/sf/mw/svgt/svgt_plat/svgt_api/inc/SVGImageLoadingObserver.h to G:/epoc32/include/platform/mw/SVGImageLoadingObserver.h</info>
-<info>Copied G:/sf/mw/svgt/svgt_plat/svgt_api/inc/SVGEngineInterfaceImpl.h to G:/epoc32/include/platform/mw/SVGEngineInterfaceImpl.h</info>
-<info>Copied G:/sf/mw/svgt/svgt_plat/svgt_api/inc/SvgListener.h to G:/epoc32/include/platform/mw/SVGListener.h</info>
-<info>Copied G:/sf/mw/svgt/svgt_plat/svgt_api/inc/SVGErrorImpl.h to G:/epoc32/include/platform/mw/SVGErrorImpl.h</info>
-<info>Copied G:/sf/mw/svgt/svgt_plat/svgt_api/inc/SvgJavaInterfaceImpl.h to G:/epoc32/include/platform/mw/SvgJavaInterfaceImpl.h</info>
-<info>Copied G:/sf/mw/svgt/svgt_plat/svgt_api/inc/SVGHyperlinkListener.h to G:/epoc32/include/platform/mw/SVGHyperlinkListener.h</info>
-<info>Copied G:/sf/mw/svgt/svgt_plat/svgt_api/inc/SVGAnimationListener.h to G:/epoc32/include/platform/mw/SVGAnimationListener.h</info>
-<info>Copied G:/sf/mw/svgt/svgt_plat/svgt_api/inc/SVGRequestObserver.h to G:/epoc32/include/platform/mw/SVGRequestObserver.h</info>
-<info>Copied G:/sf/mw/svgt/svgt_plat/svgt_api/inc/SVGRendererId.h to G:/epoc32/include/platform/mw/SVGRendererId.h</info>
-<info>Copied G:/sf/mw/svgt/svgt_plat/nvg_api/inc/nvg.h to G:/epoc32/include/platform/mw/nvg.h</info>
-<info>Copied G:/sf/mw/svgt/svgt_plat/nvg_api/inc/MVGImageBinder.h to G:/epoc32/include/platform/mw/MVGImageBinder.h</info>
-<info>Copied G:/sf/mw/svgt/svgt_plat/nvg_api/inc/NVGIcon.h to G:/epoc32/include/platform/mw/NVGIcon.h</info>
-<info>Copied G:/sf/mw/svgt/svgtopt/rom/SVGEngine.iby to G:/epoc32/rom/include/core/mw/SVGEngine.iby</info>
-<info>Copied G:/sf/mw/svgt/svgtopt/rom/SvgtPluginEcom.iby to G:/epoc32/rom/include/core/mw/SvgtPluginEcom.iby</info>
-<info>Copied G:/sf/mw/svgt/svgtopt/rom/nvgdecoder.iby to G:/epoc32/rom/include/core/mw/NVGDecoder.iby</info>
-<info>Copied G:/sf/mw/svgt/svgtopt/rom/NVGDecoder_SW.iby to G:/epoc32/rom/include/core/mw/NVGDecoder_SW.iby</info>
-<info>Copied G:/sf/mw/svgt/svgtopt/rom/VGRenderer.iby to G:/epoc32/rom/include/core/mw/VGRenderer.iby</info>
+<info>Copied G:/sf/mw/svgt/svgt_plat/svgt_api/inc/SVGImageLoadingObserver.h to G:/invalid_sdk/epoc32/include/platform/mw/SVGImageLoadingObserver.h</info>
+<info>Copied G:/sf/mw/svgt/svgt_plat/svgt_api/inc/SVGEngineInterfaceImpl.h to G:/invalid_sdk/epoc32/include/platform/mw/SVGEngineInterfaceImpl.h</info>
+<info>Copied G:/sf/mw/svgt/svgt_plat/svgt_api/inc/SvgListener.h to G:/invalid_sdk/epoc32/include/platform/mw/SVGListener.h</info>
+<info>Copied G:/sf/mw/svgt/svgt_plat/svgt_api/inc/SVGErrorImpl.h to G:/invalid_sdk/epoc32/include/platform/mw/SVGErrorImpl.h</info>
+<info>Copied G:/sf/mw/svgt/svgt_plat/svgt_api/inc/SvgJavaInterfaceImpl.h to G:/invalid_sdk/epoc32/include/platform/mw/SvgJavaInterfaceImpl.h</info>
+<info>Copied G:/sf/mw/svgt/svgt_plat/svgt_api/inc/SVGHyperlinkListener.h to G:/invalid_sdk/epoc32/include/platform/mw/SVGHyperlinkListener.h</info>
+<info>Copied G:/sf/mw/svgt/svgt_plat/svgt_api/inc/SVGAnimationListener.h to G:/invalid_sdk/epoc32/include/platform/mw/SVGAnimationListener.h</info>
+<info>Copied G:/sf/mw/svgt/svgt_plat/svgt_api/inc/SVGRequestObserver.h to G:/invalid_sdk/epoc32/include/platform/mw/SVGRequestObserver.h</info>
+<info>Copied G:/sf/mw/svgt/svgt_plat/svgt_api/inc/SVGRendererId.h to G:/invalid_sdk/epoc32/include/platform/mw/SVGRendererId.h</info>
+<info>Copied G:/sf/mw/svgt/svgt_plat/nvg_api/inc/nvg.h to G:/invalid_sdk/epoc32/include/platform/mw/nvg.h</info>
+<info>Copied G:/sf/mw/svgt/svgt_plat/nvg_api/inc/MVGImageBinder.h to G:/invalid_sdk/epoc32/include/platform/mw/MVGImageBinder.h</info>
+<info>Copied G:/sf/mw/svgt/svgt_plat/nvg_api/inc/NVGIcon.h to G:/invalid_sdk/epoc32/include/platform/mw/NVGIcon.h</info>
+<info>Copied G:/sf/mw/svgt/svgtopt/rom/SVGEngine.iby to G:/invalid_sdk/epoc32/rom/include/core/mw/SVGEngine.iby</info>
+<info>Copied G:/sf/mw/svgt/svgtopt/rom/SvgtPluginEcom.iby to G:/invalid_sdk/epoc32/rom/include/core/mw/SvgtPluginEcom.iby</info>
+<info>Copied G:/sf/mw/svgt/svgtopt/rom/nvgdecoder.iby to G:/invalid_sdk/epoc32/rom/include/core/mw/NVGDecoder.iby</info>
+<info>Copied G:/sf/mw/svgt/svgtopt/rom/NVGDecoder_SW.iby to G:/invalid_sdk/epoc32/rom/include/core/mw/NVGDecoder_SW.iby</info>
+<info>Copied G:/sf/mw/svgt/svgtopt/rom/VGRenderer.iby to G:/invalid_sdk/epoc32/rom/include/core/mw/VGRenderer.iby</info>
 <whatlog bldinf='G:/sf/mw/svgt/group/bld.inf' mmp='' config=''>
-<export destination='G:/epoc32/include/platform/mw/SVGImageLoadingObserver.h' source='G:/sf/mw/svgt/svgt_plat/svgt_api/inc/SVGImageLoadingObserver.h'/>
-<resource>G:/epoc32/include/hrv_gain_mappings.rsg</resource>
-<build>G:/epoc32/release/armv5/urel/ekeyb.dll</build>
+<export destination='G:/invalid_sdk/epoc32/include/platform/mw/SVGImageLoadingObserver.h' source='G:/sf/mw/svgt/svgt_plat/svgt_api/inc/SVGImageLoadingObserver.h'/>
+<resource>G:/invalid_sdk/epoc32/include/hrv_gain_mappings.rsg</resource>
+<build>G:/invalid_sdk/epoc32/release/armv5/urel/ekeyb.dll</build>
 </whatlog>
 <recipe name='compile' target='X:/epoc32/build/organizer/c_aff6bae36b1df6c4/srchuiresviewplugin_dll/armv5/urel/srchuiresultview.o' host='' layer='app_layer' component='' bldinf='X:/sf/app/organizer/group/bld.inf' mmp='X:/sf/app/organizer/searchui/searchapp/plugins/resultviewerplugin/group/srchuiresviewplugin.mmp' config='armv5_urel.product' platform='armv5' phase='ALL' source='X:/sf/app/organizer/searchui/searchapp/plugins/resultviewerplugin/src/srchuiresultview2.cpp'>
 <![CDATA[
@@ -157,16 +157,16 @@
 <status exit='failed' code='1' attempt='3' />
 </recipe>
 <clean bldinf='G:/sf/os/deviceplatformrelease/locfiles/group/set14/bld.inf' mmp='' config=''>
-<zipmarker>G:/epoc32/build/G__sf_os_deviceplatformrelease_locfiles_data_65.zipG__epoc32_include_platform_loc.unzipped</zipmarker>
+<zipmarker>G:/invalid_sdk/epoc32/build/G__sf_os_deviceplatformrelease_locfiles_data_65.zipG__epoc32_include_platform_loc.unzipped</zipmarker>
 </clean>
 <whatlog bldinf='G:/sf/os/deviceplatformrelease/locfiles/group/set14/bld.inf' mmp='' config=''>
 <archive zipfile='G:/sf/os/deviceplatformrelease/locfiles/data/65.zip'>
-<member>G:/epoc32/include/platform/loc/65/101f6dd6_65.loc</member>
-<member>G:/epoc32/include/platform/loc/65/101f6dd7_65.loc</member>
+<member>G:/invalid_sdk/epoc32/include/platform/loc/65/101f6dd6_65.loc</member>
+<member>G:/invalid_sdk/epoc32/include/platform/loc/65/101f6dd7_65.loc</member>
 </archive>
 </whatlog>
 <info>The make-engine exited successfully.</info>
 <info>Run time 999 seconds</info>
-<info>Created/Updated toolcheck cache: G:/epoc32/build/toolcheck_cache_.tmp
+<info>Created/Updated toolcheck cache: G:/invalid_sdk/epoc32/build/toolcheck_cache_.tmp
 </info>
 </buildlog>

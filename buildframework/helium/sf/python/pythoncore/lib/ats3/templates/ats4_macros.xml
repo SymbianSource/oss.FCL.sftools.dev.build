@@ -87,8 +87,8 @@ Description:
             <parameters>
               	<parameter name="timeout" value="{{ test_plan["test_timeout"] }}"/>
               	<parameter name="file" value="atsinterface.exe" />
-              	<parameter name="parameters" value="-engineini {{ ini_file[1] }}" />
-              	<parameter name="result-file" value="{{ atsself.STIF_LOG_DIR }}\{{ os.path.basename(ini_file[1]).replace('.' + ini_file[1].rsplit(".")[1], '.xml') }}" />
+                <parameter name="parameters" value="-testmodule {{ atsself.stifmodulename(ini_file[0]) }} -engineini {{ ini_file[1] }}" />
+                <parameter name="result-file" value="{{ atsself.AtsInterface_LOG_DIR }}\{{ atsself.stifmodulename(ini_file[0]) + '.xml' }}" />
             </parameters>
         </task>
         {% endif %}
@@ -113,7 +113,7 @@ Description:
               	<parameter name="timeout" value="{{ test_plan["test_timeout"] }}"/>
               	<parameter name="file" value="atsinterface.exe" />
               	<parameter name="parameters" value="-testmodule TESTSCRIPTER" />
-              	<parameter name="result-file" value="{{ atsself.STIF_LOG_DIR }}\TESTSCRIPTER.xml" />
+                <parameter name="result-file" value="{{ atsself.AtsInterface_LOG_DIR }}\TESTSCRIPTER.xml" />
             </parameters>
         </task>
         {% endif %}
@@ -135,7 +135,7 @@ Description:
               	<parameter name="timeout" value="{{ test_plan["test_timeout"] }}"/>
               	<parameter name="file" value="atsinterface.exe" />
               	<parameter name="parameters" value="-testmodule {{ os.path.basename(file[1]) }}" />
-              	<parameter name="result-file" value="{{ atsself.STIF_LOG_DIR }}\{{ os.path.basename(file[1]).replace('.' + file[1].rsplit(".")[1], '.xml') }}" />
+                <parameter name="result-file" value="{{ atsself.AtsInterface_LOG_DIR }}\{{ os.path.basename(file[1]).replace('.' + file[1].rsplit(".")[1], '.xml') }}" />
             </parameters>
         </task>
         {% endif %}
@@ -164,7 +164,7 @@ Description:
               	<parameter name="timeout" value="{{ test_plan["test_timeout"] }}"/>
               	<parameter name="file" value="atsinterface.exe" />
               	<parameter name="parameters" value="-engineini c:\testframework\{{ os.path.basename(setd["engine_ini_file"]) }}" />
-              	<parameter name="result-file" value="{{ atsself.STIF_LOG_DIR }}\{{ os.path.basename(setd["engine_ini_file"]).replace('.' + setd["engine_ini_file"].rsplit(".")[1], '.xml') }}" />
+                <parameter name="result-file" value="{{ atsself.AtsInterface_LOG_DIR }}\{{ os.path.basename(setd["engine_ini_file"]).replace('.' + setd["engine_ini_file"].rsplit(".")[1], '.xml') }}" />
             </parameters>
         </task>
         {% endif %}
@@ -187,7 +187,7 @@ Description:
               	<parameter name="timeout" value="{{ test_plan["test_timeout"] }}"/>
               	<parameter name="file" value="atsinterface.exe" />
               	<parameter name="parameters" value="-config e:\testing\conf\{{ os.path.basename(config_file) }}" />
-              	<parameter name="result-file" value="{{ atsself.STIF_LOG_DIR }}\{{ os.path.basename(config_file).replace('.' + config_file.rsplit(".")[1], '.xml') }}" />
+                <parameter name="result-file" value="{{ atsself.AtsInterface_LOG_DIR }}\{{ os.path.basename(config_file).replace('.' + config_file.rsplit(".")[1], '.xml') }}" />
             </parameters>
         </task>
         {% endif %}
@@ -209,8 +209,8 @@ Description:
             <parameters>
               	<parameter name="timeout" value="{{ test_plan["test_timeout"] }}"/>
               	<parameter name="file" value="atsinterface.exe" />
-              	<parameter name="parameters" value="-module {{ os.path.basename(testmodule_file) }}" />
-              	<parameter name="result-file" value="{{ atsself.STIF_LOG_DIR }}\{{ os.path.basename(testmodule_file).replace('.' + testmodule_file.rsplit(".")[1], '.xml') }}" />
+                <parameter name="parameters" value="-testmodule {{ os.path.basename(testmodule_file) }}" />
+                <parameter name="result-file" value="{{ atsself.AtsInterface_LOG_DIR }}\{{ os.path.basename(testmodule_file).replace('.' + testmodule_file.rsplit(".")[1], '.xml') }}" />
             </parameters>
         </task>
         {% endif %}

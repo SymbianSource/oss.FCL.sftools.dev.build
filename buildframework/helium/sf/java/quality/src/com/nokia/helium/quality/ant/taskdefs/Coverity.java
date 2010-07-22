@@ -18,8 +18,6 @@ package com.nokia.helium.quality.ant.taskdefs;
 
 import java.io.File;
 import java.util.Vector;
-import java.util.Map.Entry;
-
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.taskdefs.ExecTask;
@@ -85,10 +83,16 @@ public class Coverity extends Task {
         task.setDir(new File(this.dir));
         
         for (VariableSet coverityArg : coverityOptions) {
-            for (Entry<String, Variable> entry : coverityArg.getVariablesMap().entrySet() ) {
-                task.createArg().setValue(entry.getKey());
-                task.createArg().setValue(entry.getValue().getValue());
-                commandString = commandString + " " + entry.getKey() + " " + entry.getValue().getValue();
+            for (Variable var : coverityArg.getVariables()) {
+                if (var.getValue().startsWith(var.getName())) {
+                    task.createArg().setLine(var.getValue());
+                    commandString = commandString + " " + var.getValue() ;
+                } else {
+                    task.createArg().setValue(var.getName());
+                    task.createArg().setValue(var.getValue());
+                    commandString = commandString + " " + var.getName() + " "
+                            + var.getValue();
+                }
             }
         }
         

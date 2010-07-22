@@ -22,7 +22,7 @@ package com.nokia.helium.jpa;
 import org.apache.log4j.Logger;
 import java.util.List;
 import javax.persistence.Query;
-
+import javax.persistence.FlushModeType;
 /**
  * This class provides an interface to read data from the 
  * database using JPA.
@@ -36,11 +36,14 @@ public class ORMReader {
     private ORMEntityManager manager;
     
     private int startPos;
+    
+    private String dbPath;
 
     /**Constructor:
      * @param dbPath - path of the database to connect to.
      */
-    public ORMReader(String dbPath) {
+    public ORMReader(String path) {
+        dbPath = path;
         ORMUtil.initializeORM(dbPath);
         manager = ORMUtil.getEntityManager(dbPath);
     }
@@ -54,28 +57,32 @@ public class ORMReader {
      */
     public List executeNativeQuery(String queryString, String type) {
         int maxResults = READ_CACHE_LIMIT;
-        String queryWithSubSet = queryString + " OFFSET " + startPos +
-                " ROWS FETCH FIRST " + maxResults + " ROW ONLY";
-        Query query = null;
-        if (type != null) {
-            try {
-                query = manager.getEntityManager().createNativeQuery(queryWithSubSet,
-                        Class.forName(type));
-            } catch (ClassNotFoundException ex) {
-                log.debug("Exception during native query", ex);
+        Object mutexObject = ORMUtil.getMutexObject();
+        synchronized (mutexObject) {
+            String queryWithSubSet = queryString + " OFFSET " + startPos +
+                    " ROWS FETCH FIRST " + maxResults + " ROW ONLY";
+            Query query = null;
+            if (type != null) {
+                try {
+                    query = manager.getEntityManager().createNativeQuery(queryWithSubSet,
+                            Class.forName(type));
+                } catch (ClassNotFoundException ex) {
+                    log.debug("Exception during native query", ex);
+                }
+            } else {
+                query = manager.getEntityManager().createNativeQuery(queryWithSubSet);
             }
-        } else {
-            query = manager.getEntityManager().createNativeQuery(queryWithSubSet);
+            query.setHint("eclipselink.maintain-cache", "false");
+            query.setFlushMode(FlushModeType.COMMIT);
+            List results = query.getResultList();
+            int resultsSize = results.size();
+            if (resultsSize == 0 || resultsSize < READ_CACHE_LIMIT) {
+                startPos += resultsSize;
+            } else {
+                startPos += maxResults;
+            }
+            return results;
         }
-        query.setHint("eclipselink.maintain-cache", "false");
-        List results = query.getResultList();
-        int resultsSize = results.size();
-        if (resultsSize == 0 || resultsSize < READ_CACHE_LIMIT) {
-            startPos += resultsSize;
-        } else {
-            startPos += maxResults;
-        }
-        return results;
     }
 
     /**
@@ -85,20 +92,23 @@ public class ORMReader {
      * @return an Object of return type.
      */
     public Object  executeSingleResult(String queryString, String type) {
-        log.debug("executeSingleResult: " + queryString);
-        Query query = manager.getEntityManager().createQuery(queryString);
-        query.setHint("eclipselink.persistence-context.reference-mode", "WEAK");
-        query.setHint("eclipselink.maintain-cache", "false");
-        query.setHint("eclipselink.read-only", "true");
-        Object obj = null;
-        try {
-            obj = query.getSingleResult();
-        } catch (javax.persistence.NoResultException nex) {
-            log.debug("no results:", nex);
-        } catch (javax.persistence.NonUniqueResultException nux) {
-            log.debug("more than one result returned:", nux);
+        Object mutexObject = ORMUtil.getMutexObject();
+        synchronized (mutexObject) {
+            Query query = manager.getEntityManager().createQuery(queryString);
+            query.setHint("eclipselink.persistence-context.reference-mode", "WEAK");
+            query.setHint("eclipselink.maintain-cache", "false");
+            query.setHint("eclipselink.read-only", "true");
+            query.setFlushMode(FlushModeType.COMMIT);
+            Object obj = null;
+            try {
+                obj = query.getSingleResult();
+            } catch (javax.persistence.NoResultException nex) {
+                log.debug("no results:", nex);
+            } catch (javax.persistence.NonUniqueResultException nux) {
+                log.debug("more than one result returned:", nux);
+            }
+            return obj;
         }
-        return obj;
     }
 
     /**
@@ -107,21 +117,34 @@ public class ORMReader {
      * @return List of objects read from database.
      */
     public List executeQuery (String queryString) {
-        int maxResults = READ_CACHE_LIMIT;
-        Query query = manager.getEntityManager().createQuery(queryString);
-        query.setHint("eclipselink.persistence-context.reference-mode", "WEAK");
-        query.setHint("eclipselink.maintain-cache", "false");
-        query.setHint("eclipselink.read-only", "true");
-        query.setFirstResult(startPos);
-        query.setMaxResults(maxResults);
-        List results = (List) query.getResultList();
-        int resultsSize = results.size();
-        log.debug("result size: " + resultsSize);
-        if (results.size() == 0 || resultsSize < READ_CACHE_LIMIT) {
-            startPos += resultsSize;
-        } else {
-            startPos += maxResults;
+        Object mutexObject = ORMUtil.getMutexObject();
+        synchronized (mutexObject) {
+            int maxResults = READ_CACHE_LIMIT;
+            log.debug("executeSingleResult: " + queryString);
+            Query query = manager.getEntityManager().createQuery(queryString);
+            query.setHint("eclipselink.persistence-context.reference-mode", "WEAK");
+            query.setHint("eclipselink.maintain-cache", "false");
+            query.setHint("eclipselink.read-only", "true");
+            query.setFirstResult(startPos);
+            query.setMaxResults(maxResults);
+            query.setFlushMode(FlushModeType.COMMIT);
+            List results = (List) query.getResultList();
+            int resultsSize = results.size();
+            log.debug("result size: " + resultsSize);
+            if (results.size() == 0 || resultsSize < READ_CACHE_LIMIT) {
+                startPos += resultsSize;
+            } else {
+                startPos += maxResults;
+            }
+            return results;
         }
-        return results;
+    }
+    
+    
+    public void close() {
+        Object mutexObject = ORMUtil.getMutexObject();
+        synchronized (mutexObject) {
+            ORMUtil.finalizeORM(dbPath);
+        }
     }
 }

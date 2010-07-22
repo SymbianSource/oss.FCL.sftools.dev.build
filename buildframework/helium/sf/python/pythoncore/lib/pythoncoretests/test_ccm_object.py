@@ -117,7 +117,26 @@ class CCMObjectTest(unittest.TestCase):
         project = session.create('project-1:project:db#1')
         result = project.delete()        
         assert "Deleting object 'project-1:project:db#1'" in result.output
-    
+
+    def test_delete_project_scope(self):
+        """ Check project deletion with custom scope """
+        behave = {'delete  -scope "project_and_subproject_hierarchy" -project "project-1:project:db#1"': "Deleting object 'project-1:project:db#1'"}
+        session = MockResultSession(behave)
+        project = session.create('project-1:project:db#1')
+        result = project.delete(scope='project_and_subproject_hierarchy')        
+        assert "Deleting object 'project-1:project:db#1'" in result.output
+
+    def test_delete_project_invalid_args(self):
+        """ Check project synergy is failing in case of bad synergy parameters for delete """
+        behave = {'delete  -project "project-1:project:db#1"': "Cannot use '-scope' option with '-r' option."}
+        session = MockResultSession(behave)
+        project = session.create('project-1:project:db#1')
+        try:
+            result = project.delete(recurse=True, scope='project_and_subproject_hierarchy')        
+            assert False, "The delete method must fail in case of synergy failure"
+        except:
+            pass
+
     def test_delete_object(self):
         """ Check object deletion """
         behave = {'delete   "object-1:object:db#1"': "Deleting object 'object-1:object:db#1'"}

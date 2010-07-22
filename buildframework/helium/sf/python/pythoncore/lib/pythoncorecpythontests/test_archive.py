@@ -920,8 +920,8 @@ class CheckRootDirValueTest(unittest.TestCase):
                                                '\\\\server2\\share\\somedir'])
             self.assert_(len(roots) == 3)
             self.assert_('\\\\server\\share\\' in roots)
-            self.assert_('\\\\server\\share1\\' in roots)
-            self.assert_('\\\\server2\\share\\' in roots)
+            self.assert_('\\\\server\\share1\\dir\\' in roots)
+            self.assert_('\\\\server2\\share\\somedir\\' in roots)
 
 class MockedConfigBuilder:
     """."""

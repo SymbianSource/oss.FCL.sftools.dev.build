@@ -362,6 +362,8 @@ class TestPkgFileParser(mocker.MockerTestCase):
             (path(TSRC_DIR+r"" + os.sep + "tsrc" + os.sep + "tc1" + os.sep + "data" + os.sep + "tc1.sisx").normpath(), path(r"e:" + os.sep + "sys" + os.sep + "bin" + os.sep + "tc1.sisx").normpath(), "", 'tc1.pkg'),
             (path(TSRC_DIR+r"" + os.sep + "tsrc" + os.sep + "tc1" + os.sep + "data" + os.sep + "DUMP.xyz").normpath(), path(r"e:" + os.sep + "sys" + os.sep + "bin" + os.sep + "DUMP.xyz").normpath(), "data", 'tc1.pkg'),
             ]
+        for p, _, _, _ in self.data_files:
+            open(p, 'w').close()
 
     def test_get_pkg_files(self):
         """Test if pkg files are returned from a specified location"""

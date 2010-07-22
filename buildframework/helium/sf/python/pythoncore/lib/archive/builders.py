@@ -115,10 +115,23 @@ class ArchivePreBuilder(buildtools.PreBuilder):
         writer.close()
 
     def getCommonUncRoots(self, uncPaths):
-        """get common UNC roots"""
+        """ Get common UNC roots.
+            The following [r'\\server1\foo\bar', r'\\server2\foo', r'\\server1\foo'] input
+            will return [r'\\server1\foo\', r'\\server2\foo'].
+        """
         commonRoots = {}
+        uncPaths = [os.path.normpath(p_path) for p_path in uncPaths]
+        # sorting the input by alphabetical order, so smaller roots 
+        # are coming first.
+        uncPaths.sort()
         for p_path in uncPaths:
-            commonRoots["\\\\" + os.sep.join(p_path[2:].split(os.sep)[0:2]) + os.sep] = 1
+            common_path = "\\\\"
+            for p_comp in p_path[2:].split(os.sep):
+                common_path = common_path + p_comp + os.sep
+                if common_path in commonRoots:
+                    break
+            else:
+                commonRoots[common_path] = 1
         return commonRoots.keys()
 
     def getPrefix(self, dir, commonUncRoots):
@@ -138,7 +151,7 @@ class ArchivePreBuilder(buildtools.PreBuilder):
         # Of course this is only on windows platform
         if os.sep == '\\':
             for config in self.configs:
-                (drive, root_dir) = os.path.splitdrive(os.path.normpath(config['root.dir']))
+                (drive, root_dir) = os.path.splitdrive(os.path.abspath(os.path.normpath(config['root.dir'])))
                 _logger.debug("drive=%s, root_dir=%s" % (drive, root_dir))
                 if drive == "":
                     self.listToFindPrefix.append(root_dir)
@@ -153,14 +166,16 @@ class ArchivePreBuilder(buildtools.PreBuilder):
                 substDrives.append(driveMapping[root] + os.sep)
 
             for config in self.configs:
-                (drive, root_dir) = os.path.splitdrive(os.path.normpath(config['root.dir']) + os.sep) 
+                (drive, root_dir) = os.path.splitdrive(os.path.abspath(os.path.normpath(config['root.dir'])) + os.sep) 
                 if drive == "":
                     for root in driveMapping:
                         if root_dir.startswith(root):
                             config['root.dir'] = os.path.normpath(driveMapping[root] + os.sep + root_dir[len(root):len(root_dir)])
                             _logger.info("Updated %s in %s" % (root_dir, config['root.dir']))
                             config['unsubst.dir'] = driveMapping[root]
-                            break                
+                            break
+                    else:
+                        _logger.error("Could not find root for %s." % root_dir)
                 elif drive != build_drive:
                     if config['root.dir'] not in substDrives:
                         substDrives.append(config['root.dir'])

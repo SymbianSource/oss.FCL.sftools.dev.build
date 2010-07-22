@@ -78,21 +78,62 @@ Description:
     </target>
     <!-- Test parser error
     -->
-    <target name="test-parser-error">
-        <delete dir="${test.temp.dir}/parser_error_db" failonerror="false" />
-        <au:expectfailure>
-            <hlm:metadatarecord database="${test.temp.dir}/parser_error_db">
-                <hlm:sbsmetadatainput>
-                    <fileset dir="${project.dir}/../data/">
-                        <include  name="parser_error.log"/>
-                    </fileset>
-                    <metadatafilterset refid="all-regex-filterfile" />
-                </hlm:sbsmetadatainput>
-            </hlm:metadatarecord>
-        </au:expectfailure>
-    </target>
     <!-- Test parser error
     -->
+    <target name="parser-error">
+        <property name="metadata-read-db" value="${test.temp.dir}/log_all_filterfile_db"/>
+        <delete dir="${metadata-read-db}" failonerror="false"/>
+        <echo message="all regular expression validation" />
+        <echo message="database:${metadata-read-db}" />
+        <!-- do some checks that files are present and raise asserts if not present-->
+        <au:assertFileExists file="${metadata-filterfile}" message="${metadata-filterfile} filter file does not exist"/>
+        <mkdir dir="${test.temp.dir}"/>
+        
+        <hlm:metadatarecord database="${metadata-read-db}">
+            <hlm:sbsmetadatainput>
+                <fileset dir="${project.dir}/../data/">
+                    <include  name="all_regex_type.log"/>
+                </fileset>
+                <metadatafilterset refid="all-regex-filterfile" />
+            </hlm:sbsmetadatainput>
+        </hlm:metadatarecord>
+        <!-- check we have created the DB file-->
+        <au:assertTrue>
+            <available type="dir" file="${metadata-read-db}" />
+        </au:assertTrue>
+    </target>
+
+    <target name="parser-error1">
+        <property name="metadata-read-db" value="${test.temp.dir}/log_all_filterfile_db"/>
+        <delete dir="${metadata-read-db}" failonerror="false"/>
+        <echo message="all regular expression validation" />
+        <echo message="database:${metadata-read-db}" />
+        <!-- do some checks that files are present and raise asserts if not present-->
+        <au:assertFileExists file="${metadata-filterfile}" message="${metadata-filterfile} filter file does not exist"/>
+        <mkdir dir="${test.temp.dir}"/>
+        
+        <hlm:metadatarecord database="${metadata-read-db}">
+            <hlm:sbsmetadatainput>
+                <fileset dir="${project.dir}/../data/">
+                    <include  name="all_regex1_type.log"/>
+                </fileset>
+                <metadatafilterset refid="all-regex-filterfile" />
+            </hlm:sbsmetadatainput>
+        </hlm:metadatarecord>
+        <!-- check we have created the DB file-->
+        <au:assertTrue>
+            <available type="dir" file="${metadata-read-db}" />
+        </au:assertTrue>
+    </target>
+
+    <target name="test-parser-error-ant-call">
+        <parallel>
+            <antcall target="parser-error" />
+            <antcall target="parser-error1" />
+        </parallel>
+    </target>
+
+    <!-- Test parser error-->
     <target name="test-parser-error-keepgoing">
         <delete dir="${test.temp.dir}/parser_error_db" failonerror="false" />
         <hlm:metadatarecord database="${test.temp.dir}/parser_error_db" failonerror="false">
@@ -164,6 +205,7 @@ Description:
             </hlm:sbsmetadatainput>
         </hlm:metadatarecord>
         <hlm:metadataCountSeverity severity="error" log="categorization_failed_empty_recipe.log" db="${test.temp.dir}/log-entry-failed-empty-recipe_db" property="empty_nocleanlog_errors"/>
+        <echo message="no.of empty_nocleanlog_errors: ${empty_nocleanlog_errors}" />
         <au:assertTrue>
             <equals arg1="${empty_nocleanlog_errors}" arg2="2"/>
         </au:assertTrue>
@@ -181,6 +223,7 @@ Description:
             </hlm:sbsmetadatainput>
         </hlm:metadatarecord>
         <hlm:metadataCountSeverity severity="error" log="categorization_failed_error_in_recipe.log" db="${test.temp.dir}/log-entry-failed-error-in-recipe_db" property="empty_nocleanlog_errors"/>
+        <echo message="no.of empty_nocleanlog_errors: ${empty_nocleanlog_errors}" />
         <au:assertTrue>
             <equals arg1="${empty_nocleanlog_errors}" arg2="2"/>
         </au:assertTrue>
@@ -558,7 +601,7 @@ Description:
         </hlm:metadatarecord>
 
         <hlm:metadataCountSeverity severity="error" log="_fixslashes_raptor.log" db="${test.temp.dir}/dp_db" property="errors"/>
-        <echo message="${errors}" />
+        <echo message="errors:${errors}" />
         <au:assertTrue>
             <equals arg1="${errors}" arg2="24"/>
         </au:assertTrue>
@@ -585,6 +628,7 @@ Description:
             </hlm:sbsmetadatainput>
         </hlm:metadatarecord>
         <hlm:metadataCountSeverity severity="error" log="data\metadatacount_missing_files.log" db="${test.temp.dir}/metadatacount_with_missing_files_db" property="errors"/>
+        <echo message="errors: ${errors}" />
         <au:assertTrue message="We must have 5 missing files counted as error.">
             <equals arg1="${errors}" arg2="5"/>
         </au:assertTrue>
@@ -711,6 +755,7 @@ Description:
             </hlm:sbsmetadatainput>
         </hlm:metadatarecord>
         <hlm:metadataCountSeverity severity="error" log="metadatacount_missing_files.log" db="${test.temp.dir}/metadatacount_with_missing_files_db" property="errors"/>
+        <echo message="errors: ${errors}" />
         <au:assertTrue message="We must have 5 missing files counted as error.">
             <equals arg1="${errors}" arg2="5"/>
         </au:assertTrue>
@@ -730,6 +775,7 @@ Description:
             </hlm:sbsmetadatainput>
         </hlm:metadatarecord>
         <hlm:metadataCountSeverity severity="error" log="metadatacount_error_and_missing_files.log" db="${test.temp.dir}/metadatacount_with_missing_files_db" property="errors"/>
+        <echo message="errors: ${errors}" />
         <au:assertTrue message="We must have 6 missing files counted as error.">
             <equals arg1="${errors}" arg2="6"/>
         </au:assertTrue>
@@ -751,9 +797,9 @@ Description:
         <hlm:metadataCountSeverity severity="error" log="metadatacount_error_and_missing_files.log"
             db="${test.temp.dir}/metadatacount_with_missing_files_db" property="errors"
             countMissing="false"/>
+        <echo message="errors: ${errors}" />
         <au:assertTrue message="We must have 1 missing files counted as error.">
             <equals arg1="${errors}" arg2="1"/>
         </au:assertTrue>
     </target>
-
 </project>

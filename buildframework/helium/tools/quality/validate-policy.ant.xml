@@ -194,8 +194,10 @@ if output is not None:
     
     <!-- Policy validation target for IDO. Only detected ADO will get scanned. -->    
     <target name="ido-validate-policy" depends="ido-create-ado-mapping,ido-validate-policy-skip" unless="do.skip.policy-validation">
+        <record name="${temp.build.dir}/${build.id}_validate-policy.ant.log" action="start" />
         <hlm:iniKeys2Path ini="${ado.quality.mapping.file}" pathid="reference.policy.path.list"/>
         <runtarget target="render-validate-policy" />
+        <record name="${temp.build.dir}/${build.id}_validate-policy.ant.log" action="stop" />
     </target>
 
 </project>

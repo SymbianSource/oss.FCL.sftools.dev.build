@@ -149,7 +149,7 @@ Description:
     <#list roots?keys as root>
         <#if roots[root]?keys?seq_contains(layer)>
             <#list roots[root][layer] as pkg>
-        <package id="${pkg}" href="${dest_dir_to_epocroot?replace('\\', '/')}${root}/${layer}/${pkg}/package_definition.xml"/>
+        <package id="${pkg?replace('/', '_')}" href="${dest_dir_to_epocroot?replace('\\', '/')}${root}/${layer}/${pkg}/package_definition.xml"/>
             </#list>
         </#if>
     </#list>

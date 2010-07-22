@@ -403,9 +403,9 @@ public class SBSLogMetaDataInput extends XMLLogMetaDataInput implements CustomMe
                 inMainDataSection = true;
                 recordText = false;
                 if (logTextInfo != null) {
-                    Matcher m = buildTimeMatcher.matcher(logTextInfo);
-                    if (m.matches()) {
-                        buildTime = Integer.parseInt(m.group(1));
+                    Matcher matcher = buildTimeMatcher.matcher(logTextInfo);
+                    if (matcher.matches()) {
+                        buildTime = Integer.parseInt(matcher.group(1));
                         logger.info("Run time: " + buildTime);
                     }
                 }
