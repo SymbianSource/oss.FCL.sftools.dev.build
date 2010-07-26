@@ -20,7 +20,7 @@
 #define __INCLUDE_CAPABILITY_NAMES__
 
 #if defined(_MSVCDOTNET__) || defined(__TOOLS2__)
-#include <string>
+
 #else //!__MSVCDOTNET__
 #include <string.h>
 #endif //__MSVCDOTNET__
@@ -71,9 +71,9 @@ HPrint::~HPrint()
 	iLogFile.close();
 	}
 
-void HPrint::SetLogFile(TText *aFileName)
+void HPrint::SetLogFile(const char* aFileName)
 	{
-	iLogFile.open((const char *)aFileName);
+	iLogFile.open(aFileName);
 	}
 
 
@@ -486,17 +486,22 @@ char* SplitFileName(const char* aName, TUint32& aModuleVersion, TUint32& aFlags)
 
 
 // Parse a filename and convert decimal version number to hex
-char* NormaliseFileName(const char* aName)
-{
+char* NormaliseFileName(const char* aName) {
 	//convert forward slashes into back slashes.
-	char* filename = strdup(aName);  //prevent violated access from stack.
+	char* filename = strdup(aName);  //prevent violated access from stack.	
+#ifdef WIN32
+#define SPLIT_CHAR1	'/'
+#define SPLIT_CHAR2	'\\'
+#else
+#define SPLIT_CHAR1	'\\'
+#define SPLIT_CHAR2	'/'
+#endif
 	char* fwdslashfinder = filename;
-	fwdslashfinder=strstr(fwdslashfinder, "/");
-	while(fwdslashfinder)
-	  {
-		*fwdslashfinder++ = '\\';
-		fwdslashfinder=strstr(fwdslashfinder, "/");
-	  }
+	fwdslashfinder=strchr(fwdslashfinder, SPLIT_CHAR1);
+	while(fwdslashfinder){
+		*fwdslashfinder++ = SPLIT_CHAR2;
+		fwdslashfinder=strchr(fwdslashfinder, SPLIT_CHAR1);
+	}
 
 	//normalize filename.
 	TFileNameInfo f(filename, EFalse);
@@ -505,18 +510,16 @@ char* NormaliseFileName(const char* aName)
 	TInt tl = nl + el;
 	if (f.iFlags & EVerPresent)
 		tl += 10;
-	char* t = (char*)malloc(tl + 1);
-	if (t)
-		{
+	char* t = new char[tl + 1];
+	if (t) {
 		memcpy(t, filename, nl);
 		if (f.iFlags & EVerPresent)
 			sprintf(t + nl, "{%08lx}%s", f.iModuleVersion, filename + f.iExtPos);
 		else if (el)
-			memcpy(t + nl, filename + f.iExtPos, el);
+			memcpy(t + nl,  filename + f.iExtPos, el);
 		t[tl] = 0;
-		}
+	} 
 	free(filename);
-
 	return t;
 }
 
@@ -681,4 +684,31 @@ TInt ParseBoolArg(TBool& aValue, const char *aText)
 		}
 	Print(EError, "Expected a boolean on/off value but found %s\n",aText);
 	return KErrArgument;
+}
+ 
+TBool IsValidNumber(const char* aStr){
+	if(0 == aStr || 0 == *aStr) 
+		return EFalse ;
+	if(*aStr == '+' || *aStr == '-') 
+			aStr ++ ; 
+	if(aStr[0] == '0' && (aStr[1] | 0x20) == 'x'){
+		aStr += 2 ;
+		while(*aStr){
+			if((*aStr >= '0' && *aStr <= '9') ||
+				(*aStr >= 'a' && *aStr <= 'f') ||
+				(*aStr >= 'A' && *aStr <= 'F'))
+				aStr++ ;
+			else
+				return EFalse ;
+		}
 	}
+	else {		
+		while(*aStr){
+			if(*aStr >= '0' && *aStr <= '9')
+				aStr++ ;
+			else
+				return EFalse ;
+		}
+	}
+	return ETrue ;
+}

@@ -26,6 +26,7 @@
 #include "exceptionreporter.h"
 #include "version.h"
 #include "hash.h"
+ 
 #include <map>
 #include <vector>
 
@@ -36,10 +37,9 @@ Tydefs used in this class.
 @released
 */
 
-typedef std::map<String,unsigned int> OptionsMap;
-typedef std::map<String,unsigned int> SuppressionsMap;
-typedef std::vector<char*> ArgumentList;
-
+typedef map<string,unsigned int> OptionsMap;
+typedef map<string,unsigned int> SuppressionsMap; 
+typedef vector<const char*> cstrings ;
 
 /** 
 Long options will be intialized into an MAP, this data is used later to
@@ -48,16 +48,16 @@ validate the received command line arguments.
 @internalComponent
 @released
 */
-const String KLongHelpOption("--help");
-const String KLongXmlOption("--xml");
-const String KLongQuietOption("--quiet");
-const String KLongAllOption("--all");
-const String KLongOutputOption("--output");
-const String KLongVerboseOption("--verbose");
-const String KLongSuppressOption("--suppress");
-const String KLongVidValOption("--vidlist");
-const String KLongSidAllOption("--sidall");
-const String KLongE32InputOption("--e32input");
+const string KLongHelpOption("--help");
+const string KLongXmlOption("--xml");
+const string KLongQuietOption("--quiet");
+const string KLongAllOption("--all");
+const string KLongOutputOption("--output");
+const string KLongVerboseOption("--verbose");
+const string KLongSuppressOption("--suppress");
+const string KLongVidValOption("--vidlist");
+const string KLongSidAllOption("--sidall");
+const string KLongE32InputOption("--e32input");
 
 /** 
 Short options will be intialized into an MAP, this data is used later to
@@ -66,14 +66,14 @@ validate the received command line arguments.
 @internalComponent
 @released
 */
-const String KShortHelpOption("-h");
-const String KShortXmlOption("-x");
-const String KShortQuietOption("-q");
-const String KShortAllOption("-a");
-const String KShortOutputOption("-o");
-const String KShortVerboseOption("-v");
-const String KShortSuppressOption("-s");
-const String KShortNoCheck("-n");
+const string KShortHelpOption("-h");
+const string KShortXmlOption("-x");
+const string KShortQuietOption("-q");
+const string KShortAllOption("-a");
+const string KShortOutputOption("-o");
+const string KShortVerboseOption("-v");
+const string KShortSuppressOption("-s");
+const string KShortNoCheck("-n");
 
 /**
 options to enable required Validation
@@ -81,11 +81,11 @@ options to enable required Validation
 @internalComponent
 @released
 */
-const String KLongEnableDepCheck("--dep");
-const String KLongEnableSidCheck("--sid");
-const String KLongEnableVidCheck("--vid");
-const String KLongEnableDbgFlagCheck("--dbg");
-const String KLongNoCheck("--nocheck");
+const string KLongEnableDepCheck("--dep");
+const string KLongEnableSidCheck("--sid");
+const string KLongEnableVidCheck("--vid");
+const string KLongEnableDbgFlagCheck("--dbg");
+const string KLongNoCheck("--nocheck");
 
 /**
 option values to disable specific Validation.
@@ -93,9 +93,9 @@ option values to disable specific Validation.
 @internalComponent
 @released
 */
-const String KSuppressDependency("dep");
-const String KSuppressSid("sid");
-const String KSuppressVid("vid");
+const string KSuppressDependency("dep");
+const string KSuppressSid("sid");
+const string KSuppressVid("vid");
 
 /**
 To mark whether validaition is enabled or not
@@ -160,7 +160,7 @@ this string is appended.
 @internalComponent
 @released
 */
-const String KXmlExtension(".xml");
+const char KXmlExtension[] = ".xml";
 
 /** 
 Default XML report name, used if the output report name is not passed through 
@@ -169,7 +169,7 @@ command line.
 @internalComponent
 @released
 */
-const String GXmlFileName("imgcheckreport.xml");
+const char GXmlFileName[] = "imgcheckreport.xml";
 
 /** 
 Tool name
@@ -177,7 +177,7 @@ Tool name
 @internalComponent
 @released
 */
-const String KToolName("imgcheck");
+const char KToolName[] = "imgcheck";
 
 /**
 Constants used validate the input Decimal or Hexadecimal values
@@ -185,9 +185,8 @@ Constants used validate the input Decimal or Hexadecimal values
 @internalComponent
 @released
 */
-const String KHexNumber("0123456789abcdef");
-const String KDecNumber("0123456789");
-
+const char KHexNumber[] = "0123456789abcdef";
+const char KDecNumber[] = "0123456789"; 
 /** 
 class command line handler
 
@@ -201,44 +200,44 @@ public:
 	~CmdLineHandler(void);
 	void Usage(void);
 	void Version(void);
-	const String& PrintUsage(void) const;
-	const String& PrintVersion(void) const;
-	String NextImageName(void);
+	const string& PrintUsage(void) const;
+	const string& PrintVersion(void) const;
+	const char* NextImageName(void);
 	unsigned int NoOfImages(void) const;
 	const unsigned int ReportFlag(void) const;
-	const String& XmlReportName(void) const;
+	const string& XmlReportName(void) const;
 	ReturnType ProcessCommandLine(unsigned int aArgc, char* aArgv[]);
 	void ValidateArguments(void) const;
 	const unsigned int EnabledValidations(void) const;
 	UnIntList& VidValueList(void);
-	const String& Command(void) const;
+	const string& Command(void) const;
 	bool DebuggableFlagVal(void);
 	void ValidateImageNameList(void);
 	void ValidateE32NoCheckArguments(void);
 
 private:
-	bool IsOption(const String& aName, int& aLongOptionFlag);
-	bool Validate(const String& aName, bool aOptionValue, unsigned int aNoOfVal);
+	bool IsOption(const char* aName, int& aLongOptionFlag);
+	bool Validate(const string& aName, bool aOptionValue, unsigned int aNoOfVal);
 	void NormaliseName(void);
-	void ParseOption(const String& aFullName, String& aOptionName, StringList& aOptionValues, bool& aOptionValue);
-	void HandleImage(const String& aImageName);
-	void StringListToUnIntList(StringList& aStrList, UnIntList& aUnIntList);
-	bool AlreadyReceived(String& aName);
+	void ParseOption(char* aFullName, cstrings& aOptionValues, bool& aOptionValue);
+	void HandleImage(const char* aImageName);
+	void StringListToUnIntList(cstrings& aStrList, UnIntList& aUnIntList);
+	bool AlreadyReceived(const char* aName);
 
 private:
-	StringList iImageNameList;
+	cstrings iImageNameList;
 	OptionsMap iOptionMap;
 	SuppressionsMap iSuppressVal;
 	UnIntList iVidValList;
 	bool iDebuggableFlagVal;
-	String iInputCommand;
-	String iXmlFileName;
+	string iInputCommand;
+	string iXmlFileName;
 	bool iNoImage;
 	unsigned int iCommmandFlag;
 	unsigned int iValidations;
 	unsigned int iSuppressions;
-	String iVersion;
-	String iUsage;
+	string iVersion;
+	string iUsage;
 };
 
 #endif //CMDLINEHANDLER_H

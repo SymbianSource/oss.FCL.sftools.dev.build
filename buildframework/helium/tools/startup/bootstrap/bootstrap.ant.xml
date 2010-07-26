@@ -51,12 +51,12 @@ Description:
     @type string
     @scope private
     -->
-    <property name="ivy.file" value="${helium.dir}/external/antlibs/${ivy.filename}" />
+    <property name="ivy.file" value="${helium.dir}/external/antlibs2/${ivy.filename}" />
     <available file="${ivy.file}" property="ivy.file.present" />
 
     <!-- Download ivy jar -->
     <target name="get-ivy" unless="ivy.file.present" depends="proxy">
-        <mkdir dir="${helium.dir}/external/antlibs" />
+        <mkdir dir="${helium.dir}/external/antlibs2" />
         <get src="http://mirrors.ibiblio.org/pub/mirrors/maven2/org/apache/ivy/ivy/2.0.0-beta2/${ivy.filename}" dest="${ivy.file}" />
     </target>
 
@@ -88,7 +88,7 @@ Description:
     <!-- Set libs for bootstrap -->
     <target name="set-libs">
         <path id="lib.path">
-            <fileset dir="${helium.dir}/external/antlibs" includes="**/*.jar" />
+            <fileset dir="${helium.dir}/external/antlibs2" includes="**/*.jar" />
         </path>
 
         <!-- External tasks. -->
@@ -103,7 +103,7 @@ Description:
 
     <!-- unzip jars. @scope private-->
     <target name="unzip-jar">
-        <unzip src="${artifact.file}" dest="${helium.dir}/external/antlibs" />
+        <unzip src="${artifact.file}" dest="${helium.dir}/external/antlibs2" />
     </target>
     <!-- unzip eggs. @scope private -->
     <target name="unzip-egg">
@@ -125,13 +125,13 @@ Description:
         <ivy:configure file="${tools.ivy.config.file}" />
         <ivy:resolve file="${helium.dir}/config/ivy/ivy.xml" conf="${build.type}" haltonfailure="false" />
 
-        <ivy:retrieve pattern="${helium.dir}/external/antlibs/[artifact]-[revision].[ext]" type="jar" />
+        <ivy:retrieve pattern="${helium.dir}/external/antlibs2/[artifact]-[revision].[ext]" type="jar" />
         <ivy:retrieve pattern="${helium.dir}/external/python/lib/2.5/[artifact]-[revision].[ext]" type="egg" />
         <ivy:retrieve pattern="${helium.dir}/external/sources/[artifact]-[revision].[ext]" type="zip" />
 
         <delete>
-            <fileset dir="${helium.dir}/external/antlibs" includes="ant-optional*.jar" />
-            <fileset dir="${helium.dir}/external/antlibs" includes="ant-1.5.jar" />
+            <fileset dir="${helium.dir}/external/antlibs2" includes="ant-optional*.jar" />
+            <fileset dir="${helium.dir}/external/antlibs2" includes="ant-1.5.jar" />
         </delete>
 
         <taskdef resource="net/sf/antcontrib/antlib.xml" classpathref="lib.path" />

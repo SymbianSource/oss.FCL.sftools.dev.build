@@ -1,0 +1,422 @@
+<cbrmessages>
+	<Error>Line .* in .* has circular reference in .*</Error>
+		<!--> IniData.pm: ReadTargetAliasFile<-->
+	<Error>.* is pending release and contains a path which is .*</Error>
+		<!--> MrpData.pm: CheckPathLength<-->
+	<Error>Failed to extract .*</Error>
+		<!--> Utils.pm: ExtractFile<-->
+	<Error>SRCROOT must not be a UNC path</Error>
+		<!--> Utils.pm: SourceRoot<-->
+	<Error>Couldn&apos;t open directory &quot;.*&quot;: .*</Error>
+		<!--> EnvDb.pm: ExecuteAllSignatures<-->
+	<Error>Problem generating makefile for .* .* in .*</Error>
+		<!--> MrpData.pm: CallMakMake<-->
+	<Error>No path environment variable</Error>
+		<!--> Utils.pm: FindInPath<-->
+	<Error>SRCROOT must specify an existing directory</Error>
+		<!--> Utils.pm: SourceRoot<-->
+	<Error>Unzip reported error code .*</Error>
+		<!--> Utils.pm: CheckUnzipError<-->
+	<Error>Unable to overwrite the hidden file .*: .*</Error>
+		<!--> Utils.pm: ExtractFile<-->
+	<Error>No path data found in reldata.ini. Cannot provide remote archive path for existing component.</Error>
+		<!--> pathdata.pm: RemoteArchivePathForExistingComponent<-->
+	<Error>Component .* version .* didn&apos;t exist</Error>
+		<!--> EnvDb.pm: AddUpEnvSize<-->
+	<Error>Couldn&apos;t remove .* from .*</Error>
+		<!--> Utils.pm: RemoveSourceRoot<-->
+	<Error>Couldn&apos;t open .* for writing: .*</Error>
+		<!--> RelData.pm: WriteToFile CatData.pm: WriteToFile<-->
+	<Error>Zipping failed with error code .*</Error>
+		<!--> Utils.pm: ZipList<-->
+	<Error>EPOCROOT must not be a UNC path</Error>
+		<!--> Utils.pm: EpocRoot<-->
+	<Error>No category was provided</Error>
+		<!--> MrpData.pm: HandleBinFile<-->
+	<Error>Couldn&apos;t open database DB_NAME: .*</Error>
+		<!--> EnvDb.pm: Open<-->
+	<Error>.* is not a valid version number</Error>
+		<!--> Utils.pm: ValidateOldFormatVersion PrepRel.pm: PrepRel<-->
+	<Error>.* is not within SRCROOT</Error>
+		<!--> Utils.pm: CheckWithinSourceRoot<-->
+	<Error>Couldn&apos;t delete .*: .*</Error>
+		<!--> EnvDb.pm: DeleteFilesInSignature CleanEnv.pm: CleanEnv, RemoveDirIfEmpty<-->
+	<Error>No path data found in reldata.ini. Cannot provide local archive path for new component.</Error>
+		<!--> pathdata.pm: LocalArchivePathForNewComponent<-->
+	<Error>EPOCROOT must not include a drive letter</Error>
+		<!--> Utils.pm: EpocRoot<-->
+	<Error>Unable to create component release successfully, archive might be corrupted.</Error>
+		<!--> MakeRel.pm: MakeReleases<-->
+	<Error>abld .* returned an error code .*</Error>
+		<!--> MrpData.pm: GatherAbldOutput<-->
+	<Error>No versions were found.</Error>
+		<!--> LatestVer: PrintLatestVersions<-->
+	<Error>.* .* does not exist</Error>
+		<!--> RelData.pm: ReadFromFile, ReadFromSpecificFile CatData.pm: ReadFromFile, ReadFromFile<-->
+	<Error>Could not create the table formatter .* for format .*</Error>
+		<!--> TableFormatter.pm: CreateFormatter<-->
+	<Error>No path data found in reldata.ini. Cannot return a list of versions.</Error>
+		<!--> pathdata.pm: ListVersions<-->
+	<Error>.* would be overwritten by unpacking .*</Error>
+		<!--> Utils.pm: CheckZipFileContentsNotPresent<-->
+	<Error>Invalid date specification: .*</Error>
+		<!--> Utils.pm: TextDateToEpochSeconds<-->
+	<Error>EPOCROOT must specify an existing directory</Error>
+		<!--> Utils.pm: EpocRoot<-->
+	<Error>.* not found in path</Error>
+		<!--> Utils.pm: FindInPath<-->
+	<Error>.* contains unclassified source code</Error>
+		<!--> Utils.pm: ClassifySourceFile<-->
+	<Error>Couldn&apos;t open abld cache data file &apos;.*&apos;</Error>
+		<!--> MrpData.pm: HandleBinSet<-->
+	<Error>Can&apos;t validate against an external environment, because the current environment database is not empty</Error>
+		<!--> EnvDb.pm: ValidateEnv<-->
+	<Error>Problem stating .*</Error>
+		<!--> EnvDb.pm: ListBinsStandard<-->
+	<Error>&lt;NOTESRC_RELEASE_REASON&gt; not specified in .*</Error>
+		<!--> RelData.pm: ValidateSource<-->
+	<Error>Invalid number of arguments to &apos;testbinary&apos; keyword in .*</Error>
+		<!--> MrpData.pm: DoReadMrp<-->
+	<Error>.* not installed; could not work out what version to use. Please specify a version number.</Error>
+		<!--> PrepRel.pm: PrepRel<-->
+	<Error>.* does not exist</Error>
+		<!--> MrpData.pm: DoReadMrp Utils.pm: CheckExists Manifest.pm: new<-->
+	<Error>Invalid line in signature file .*</Error>
+		<!--> EnvDb.pm: ExecuteSignature<-->
+	<Error>Unzip reported disk full (though this might mean it&apos;s trying to overwrite files in use)</Error>
+		<!--> Utils.pm: CheckUnzipError<-->
+	<Error>Project path .* does not correspond to a real directory</Error>
+		<!--> PathData/ProjectBased.pm: ListComponents<-->
+	<Error>.* is not a file</Error>
+		<!--> Utils.pm: CheckIsFile<-->
+	<Error>.* is not a valid version number; patch number must be given</Error>
+		<!--> Utils.pm: ValidateNewFormatVersion<-->
+	<Error>.* .* was not a valid release (can&apos;t find .*\\reldata)</Error>
+		<!--> RelData.pm: ReadFromFile<-->
+	<Error>&apos;notes_src&apos; keyword used more than once in .*</Error>
+		<!--> MrpData.pm: DoReadMrp<-->
+	<Error>Can&apos;t find IPR category for export .* in .*</Error>
+		<!--> MrpData.pm: AddExport<-->
+	<Error>Couldn&apos;t cope with archive path arguments .*: possibly the wrong number of arguments?</Error>
+		<!--> PathData/ProjectBased.pm: ProcessLine<-->
+	<Error>Release environment is dirty</Error>
+		<!--> MakeEnv: CheckEnvironment<-->
+	<Error>No &apos;component&apos; keyword specified in .*</Error>
+		<!--> MrpData.pm: Validate<-->
+	<Error>No components are pending release</Error>
+		<!--> MakeEnv: CheckEnvironment<-->
+	<Error>.* already exists</Error>
+		<!--> MakeRel.pm: CheckDirs<-->
+	<Error>Problem creating temporary directory .*: .*</Error>
+		<!--> Utils.pm: InitialiseTempDir<-->
+	<Error>Incorrect syntax to &apos;export_file&apos; keyword in .*</Error>
+		<!--> MrpData.pm: DoReadMrp<-->
+	<Error>Can&apos;t find .*\\exports.* .* .* is an incompatible release</Error>
+		<!--> CatData.pm: ReadFromFile<-->
+	<Error>Invalid component name .*</Error>
+		<!--> EnvDb.pm: GetMrpData<-->
+	<Error>Invalid line in .* (Line .*) - .*</Error>
+		<!--> MrpData.pm: DoReadMrp<-->
+	<Error>Could not load the table formatter .* for format .* because .*</Error>
+		<!--> TableFormatter.pm: CreateFormatter<-->
+	<Error>No path data found in reltools.ini. Cannot return list of projects.</Error>
+		<!--> pathdata.pm: ListProjects<-->
+	<Error>Unknown keyword .* for project-based path data</Error>
+		<!--> PathData/ProjectBased.pm: ProcessLine<-->
+	<Error>.* is pending release and cannot be refreshed; use &apos;preprel&apos; to remove it from your environment</Error>
+		<!--> EnvDb.pm: RefreshComponent<-->
+	<Error>Couldn&apos;t decode signature name .*</Error>
+		<!--> EnvDb.pm: DecodeSignatureName<-->
+	<Error>Couldn&apos;t open directory .*: .*</Error>
+		<!--> Utils.pm: ReadDir, CrossCheckDirsOneWay<-->
+	<Error>SRCROOT must end with a backslash</Error>
+		<!--> Utils.pm: SourceRoot<-->
+	<Error>Could not return the list of source statements used in the MRP file.</Error>
+		<!--> RelData.pm: SourceItems<-->
+	<Error>Component .* .* didn&apos;t exist</Error>
+		<!--> EnvDb.pm: AddUpReleaseSize<-->
+	<Error>Cannot run .* because another command is already running</Error>
+		<!--> CommandController.pm: New<-->
+	<Error>Unable to overwrite the read-only file .*: .*</Error>
+		<!--> Utils.pm: ExtractFile<-->
+	<Error>Couldn&apos;t parse abld cache data in &apos;.*&apos;: .*</Error>
+		<!--> MrpData.pm: HandleBinSet<-->
+	<Error>&apos;component&apos; keyword used more than once in .*</Error>
+		<!--> MrpData.pm: DoReadMrp<-->
+	<Error>Unable to create directory.</Error>
+		<!--> Utils.pm: ZipSourceList<-->
+	<Error>Problem emptying temporary directory .*: .*</Error>
+		<!--> Utils.pm: RemoveTempDir<-->
+	<Error>Couldn&apos;t run bldmake bldfiles -v | in abldPath: .*</Error>
+		<!--> MrpData.pm: ExportMakeFile<-->
+	<Error>Couldn&apos;t run EValid: .*</Error>
+		<!--> EnvDb.pm: EvalidateDirectories<-->
+	<Error>Version number .* has an invalid patch number</Error>
+		<!--> Utils.pm: ValidateNewFormatVersion, ValidateNewFormatVersion<-->
+	<Error>Couldn&apos;t parse reldata in .*</Error>
+		<!--> RelData.pm: ReadFromSpecificFile CatData.pm: ReadFromFile<-->
+	<Error>&lt;NOTESRC_RELEASER&gt; not specified in .*</Error>
+		<!--> RelData.pm: ValidateSource<-->
+	<Error>Path does not contain EPOCROOT - EPOCROOT:.* - Path:.*</Error>
+		<!--> Utils.pm: RemoveEpocRoot<-->
+	<Error>No path data found in reldata.ini. Cannot provide local archive path for importing component.</Error>
+		<!--> pathdata.pm: LocalArchivePathForImportingComponent<-->
+	<Error>SRCROOT already present in .*</Error>
+		<!--> Utils.pm: PrependSourceRoot<-->
+	<Error>couldn&apos;t create a formatter without a type</Error>
+		<!--> TableFormatter.pm: CreateFormatter<-->
+	<Error>Problem extracting export IPR categories for .*</Error>
+		<!--> MrpData.pm: ClassifyAutomaticExports<-->
+	<Error>problem reading .*</Error>
+		<!--> Utils.pm: ListZip, SignificantZipDir<-->
+	<Error>.* .* already exists</Error>
+		<!--> MrpData.pm: EnsureDoesNotExist PrepRel.pm: PrepRel<-->
+	<Error>.* does not exist, so can not add to .*</Error>
+		<!--> Utils.pm: ZipSourceList<-->
+	<Error>No path data found in reldata.ini. Cannot return list of components.</Error>
+		<!--> pathdata.pm: ListComponents<-->
+	<Error>Unknown archive_path related keyword: </Error>
+		<!--> pathdata.pm: SubclassifyMyselfByKeyword<-->
+	<Error>Local archive path .* is not a directory</Error>
+		<!--> PathData/ProjectBased.pm: CreateLocalDirectory<-->
+	<Error>Cannot add file &apos;.*&apos; to new zip.</Error>
+		<!--> Utils.pm: ZipSourceList<-->
+	<Error>Component name in MRP file is .* whilst the name of this component in the environment database is .*</Error>
+		<!--> EnvDb.pm: GetMrpData<-->
+	<Error>.* is not within EPOCROOT</Error>
+		<!--> Utils.pm: CheckWithinEpocRoot<-->
+	<Error>Unknown tag .* in .*</Error>
+		<!--> RelData.pm: AddLine<-->
+	<Error>Couldn&apos;t open .* for reading: .*</Error>
+		<!--> ValidateRel: ProcessCommandLine EnvDb.pm: ExecuteSignature RelData.pm: ReadFromSpecificFile CatData.pm: ReadFromFile<-->
+	<Error>Couldn&apos;t make path .*: .*</Error>
+		<!--> Utils.pm: MakeDir<-->
+	<Error>Couldn&apos;t make directory .*: .*</Error>
+		<!--> Utils.pm: MakeDir EnvDb.pm: Open<-->
+	<Error>Failed to write ZIP file &apos;.*&apos;</Error>
+		<!--> Utils.pm: ZipSourceList<-->
+	<Error>Invalid line in .*:.*</Error>
+		<!--> IniData.pm: ReadIni, ReadIni, ReadTargetAliasFile<-->
+	<Error>Unable to find EXPORT.MAKE or EXPORTTEST.MAKE for .*</Error>
+		<!--> MrpData.pm: ExportMakeFile<-->
+	<Error>Invalid line in .*:.* does not exist or is an invalid directory name</Error>
+		<!--> IniData.pm: ReadIni<-->
+	<Error>.* .* is dirty</Error>
+		<!--> MakeEnv: CheckEnvironment<-->
+	<Error>Couldn&apos;t change working directory back to .*: .*</Error>
+		<!--> MrpData.pm: ReadMrp Utils.pm: ZipList<-->
+	<Error>.* not found in environment database</Error>
+		<!--> EnvDb.pm: SetInternalVersion, Status, SetStatus, MrpName, SetMrpName<-->
+	<Error>Line .* in .* has forward reference to .*</Error>
+		<!--> IniData.pm: ReadTargetAliasFile<-->
+	<Error>SRCROOT must not include a drive letter</Error>
+		<!--> Utils.pm: SourceRoot<-->
+	<Error>&quot;.*&quot; does not exist</Error>
+		<!--> Utils.pm: ZipList<-->
+	<Error>Reldata in .* is blank</Error>
+		<!--> RelData.pm: ReadFromSpecificFile CatData.pm: ReadFromFile<-->
+	<Error>.* not currently installed; aborting refreshing of binaries</Error>
+		<!--> EnvDb.pm: RefreshComponent<-->
+	<Error>Unknown keyword .* in .*</Error>
+		<!--> MrpData.pm: DoReadMrp IniData.pm: ReadIni<-->
+	<Error>Couldn&apos;t open .*: .*</Error>
+		<!--> MrpData.pm: ProcessExportMakeFile Utils.pm: ToolsVersion EnvDb.pm: GenerateSignature, GenerateFakeSignature, GenerateEmptySignature Symbian/DistributionPolicy/Reader.pm: readfile<-->
+	<Error>Problem reading stats of .*</Error>
+		<!--> EnvDb.pm: GenerateSignature<-->
+	<Error>bldmake bldfiles failed in .* (exit status .*)</Error>
+		<!--> MrpData.pm: CallBldMake<-->
+	<Error>No path data found in reldata.ini. Cannot provide remote archive path for exporting component.</Error>
+		<!--> pathdata.pm: RemoteArchivePathForExportingComponent<-->
+	<Error>No targets detected for .*</Error>
+		<!--> IniData.pm: ReadTargetAliasFile<-->
+	<Error>You cannot have multiple archive_path lines with the same project name (&quot;..*&quot;)</Error>
+		<!--> PathData/ProjectBased.pm: ProcessLine<-->
+	<Error>Problem unpacking .* from .*</Error>
+		<!--> Utils.pm: UnzipSingleFile<-->
+	<Error>Multiple targets in list declared &lt;EMPTY&gt; for alias .*</Error>
+		<!--> IniData.pm: ReadTargetAliasFile<-->
+	<Error>.* contains unclassified source code</Error>
+		<!--> MrpData.pm: HandleSourceDir<-->
+	<Error>.* not currently installed, aborting removal of binaries</Error>
+		<!--> EnvDb.pm: RemoveComponent<-->
+	<Error>Could not remove directory .*: .*</Error>
+		<!--> EnvDb.pm: DeleteFilesInSignature, DeleteFilesInSignature<-->
+	<Error>Unable to decode string .*</Error>
+		<!--> Utils.pm: SplitQuotedString<-->
+	<Error>Couldn&apos;t run .*\\abld</Error>
+		<!--> MrpData.pm: GetPlatforms<-->
+	<Error>SRCROOT must be an absolute path without a drive letter</Error>
+		<!--> Utils.pm: SourceRoot<-->
+	<Error>Couldn&apos;t parse filename .*</Error>
+		<!--> Utils.pm: SplitFileName<-->
+	<Error>The path .* contains too many characters and can not be extracted</Error>
+		<!--> Utils.pm: ExtractFile, Unzip<-->
+	<Error>Fatal parser error.</Error>
+		<!--> IniData.pm: ReadTargetAliasFile<-->
+	<Error>Must set the EPOCROOT environment variable</Error>
+		<!--> Utils.pm: EpocRoot<-->
+	<Error>creating local archive path &quot;..*&quot;</Error>
+		<!--> PathData/ProjectBased.pm: CreateLocalDirectory<-->
+	<Error>Unable to open .* for reading: .*</Error>
+		<!--> MrpData.pm: DoReadMrp IniData.pm: ReadIni, ReadTargetAliasFile RelData.pm: ParseNotesSource<-->
+	<Error>.* .* not found</Error>
+		<!--> pathdata.pm: CheckReleaseExists<-->
+	<Error>Couldn&apos;t open directory .* because .*</Error>
+		<!--> EnvDb.pm: AddUpReleaseSize<-->
+	<Error>.* is not a file or directory in .*</Error>
+		<!--> MrpData.pm: ClassifySource<-->
+	<Error>Component name not found in mrp</Error>
+		<!--> MrpData.pm: Component<-->
+	<Error>Platform .* not supported</Error>
+		<!--> MrpData.pm: GatherAbldOutput<-->
+	<Error>Couldn&apos;t make .* writable: .*</Error>
+		<!--> Utils.pm: SetFileWritable<-->
+	<Error>EPOCROOT already present in .*</Error>
+		<!--> Utils.pm: PrependEpocRoot<-->
+	<Error>No path data found in reldata.ini. Cannot provide local archive path for existing component.</Error>
+		<!--> pathdata.pm: LocalArchivePathForExistingComponent<-->
+	<Error>Internal version number not specified for .* .*</Error>
+		<!--> PrepRel.pm: PrepRel<-->
+	<Error>didn&apos;t find any platforms</Error>
+		<!--> MrpData.pm: GetPlatforms<-->
+	<Error>Problem generating makefile for .* in .*</Error>
+		<!--> MrpData.pm: CallMakMake<-->
+	<Error>No path data found in reldata.ini. Cannot return which project a component belongs to.</Error>
+		<!--> pathdata.pm: ComponentProjects<-->
+	<Error>Unable to create environment successfully, archive might be corrupted.</Error>
+		<!--> MakeRel.pm: MakeReleases<-->
+	<Error>Couldn&apos;t make .* read only: .*</Error>
+		<!--> Utils.pm: SetFileReadOnly<-->
+	<Error>Problem calling bldmake in .*</Error>
+		<!--> MrpData.pm: CallBldMake<-->
+	<Error>Couldn&apos;t change working directory to .*: .*</Error>
+		<!--> MrpData.pm: ExportMakeFile, ExportMakeFile, ReadMrp, CallBldMake Utils.pm: ZipList<-->
+	<Error>Failed to read ipr category for directory .*: .*</Error>
+		<!--> Utils.pm: ClassifyDir<-->
+	<Error>Unzip reported an out-of-memory error</Error>
+		<!--> Utils.pm: CheckUnzipError<-->
+	<Error>Mrp name not specified for .*</Error>
+		<!--> PrepRel.pm: PrepRel, EnvDb.pm: CheckComp<-->
+	<Error>.* has unknown origin</Error>
+		<!--> MakeEnv: CheckEnvironment<-->
+	<Error>Invalid arguments</Error>
+		<!--> MakeEnv: ProcessCommandLine LatestVer: ProcessCommandLine BinInfo: ProcessCommandLine<-->
+	<Error>EPOCROOT must end with a backslash</Error>
+		<!--> Utils.pm: EpocRoot<-->
+	<Error>Network share .* does not exist</Error>
+		<!--> Utils.pm: MakeDir<-->
+	<Error>EPOCROOT must be an absolute path without a drive letter</Error>
+		<!--> Utils.pm: EpocRoot<-->
+	<Error>Unzip reported a problem with the zip file</Error>
+		<!--> Utils.pm: CheckUnzipError<-->
+	<Error>Notes source not found in mrp for .*</Error>
+		<!--> MrpData.pm: NotesSource<-->
+	<Error>New version not specified</Error>
+		<!--> PrepRel.pm: PrepRel<-->
+	<Error>Couldn&apos;t execute _zip.exe - .*</Error>
+		<!--> Utils.pm: ZipList<-->
+	<Error>Invalid number of arguments</Error>
+		<!--> RemoveRel: ProcessCommandLine ValidateRel: ProcessCommandLine ValidateEnv: ProcessCommandLine<-->
+	<Error>Unable to create new zip.</Error>
+		<!--> Utils.pm: ZipSourceList<-->
+	<Error>Line .* in .* has duplicate key .*</Error>
+		<!--> IniData.pm: ReadTargetAliasFile<-->
+	<Error>.* is not a valid internal version number</Error>
+		<!--> PrepRel.pm: PrepRel<-->
+	<Error>MD5 info incomplete</Error>
+		<!--> Manifest.pm: Compare<-->
+	<Error>File is neither an MRP file nor a manifest file.</Error>
+		<!--> Manifest.pm: new<-->
+	<Error>Directory path does not exist : .*</Error>
+		<!--> Manifest.pm: Save<-->	 
+	<Error>Can&apos;t write manifest file:.*</Error>
+		<!--> Manifest.pm: Save<-->
+	<Error>Component names does not match between manifest versions</Error>
+		<!--> Manifest.pm: Compare<-->	 				 
+	<Error>Can&apos;t read manifest file &apos;.*&apos;:.*</Error>
+		<!--> Manifest.pm: LoadManifestFile<-->
+	<Error>Component name undefined.*</Error>
+		<!--> PathData::ProjectBased.pm: multiple<-->
+	<Error>Version number undefined.*</Error>
+		<!--> PathData::ProjectBased.pm: multiple<-->
+	<Error>Unexpected entry in .* could be corrupt or tampered with</Error>
+		<!--> EnvDb.pm: GenerateSignature<-->
+	<Error>No project paths are defined</Error>
+		<!--> PathData/ProjectBased.pm: BasicChecks<-->	
+	<Error>Project .* unknown</Error>
+		<!--> PathData/ProjectBased.pm: CheckProject<-->		
+	<Error>.* failed check</Error>
+		<!--> CBR Patch<-->
+	<Error>IPR category .* is invalid</Error>
+		<!--> Symbian/IPR.pm: SetIPR<-->
+	<Error>Notes source .* does not exist</Error>
+		<!--> Symbian/CBR/MRP.pm: SetNotesSource<-->
+	<Error>Source .* does not exist</Error>
+		<!--> Symbian/CBR/MRP.pm: SetSource<-->
+	<Error>&apos;exports&apos; entry for .* defined more than once in .*</Error>
+		<!--> Symbian/CBR/MRP.pm: SetExports<-->
+	<Error>Exports path .* does not exist</Error>
+		<!--> Symbian/CBR/MRP.pm: SetExports<-->
+	<Error>Incorrect syntax to &apos;export_file&apos; keyword in .*</Error>
+		<!--> Symbian/CBR/MRP.pm: SetExportFile<-->
+	<Error>Export file .* does not exist</Error>
+		<!--> Symbian/CBR/MRP.pm: SetExportFile<-->
+	<Error>&apos;component&apos; keyword used more than once in .*</Error>
+		<!--> Symbian/CBR/MRP/Reader: ReadFile<-->
+	<Error>Invalid number of arguments to .* keyword in .*</Error>
+		<!--> Symbian/CBR/MRP/Reader: ReadFile<-->
+	<Error>&apos;notes_source&apos; keyword used more than once in .*</Error>
+		<!--> Symbian/CBR/MRP/Reader: ReadFile<-->
+	<Error>&apos;source&apos; entry for .* defined more than once in .*</Error>
+		<!--> Symbian/CBR/MRP/Reader: ReadFile<-->
+	<Error>IPR information for .* specified more than once in .*</Error>
+		<!--> Symbian/CBR/MRP/Reader: ReadFile<-->
+	<Warning>Exported file .* is not within EPOCROOT</Warning>
+		<!--> MrpData.pm: HandleExports<-->
+	<Warning>(.*) -export_file: could not remove .*, as it hadn&apos;t been added. Perhaps the lines in your MRP are in the wrong order, or you meant -binary\?</Warning>
+		<!--> MrpData.pm: HandleExportFile<-->
+	<Warning>Using .* version found in .*</Warning>
+		<!--> IniData.pm: ReadIni<-->
+	<Warning>could not examine .* .* because .*</Warning>
+		<!--> RelData.pm: OpenSet<-->
+	<Warning>.* not found in .*, using version found in .*</Warning>
+		<!--> IniData.pm: ReadIni<-->
+	<Warning>Installed component does not match existing signature; updating signature</Warning>
+		<!--> EnvDb.pm: RefreshComponent<-->
+	<Warning>(.*) The MRP line .* does not .* any files. Therefore is this line necessary?</Warning>
+		<!--> MrpData.pm: WarnRedundantMRPLine<-->
+	<Warning>Not checking for new binaries; .*</Warning>
+		<!--> EnvDb.pm: ValidateCompOld<-->
+	<Warning>skipping the check for added files, for the component .* All other source code validation checks passed. The reason is: .*</Warning>
+		<!--> EnvDb.pm: ValidateCompOld<-->
+	<Warning>Line .* in .* has duplicate value entry .* in key .*</Warning>
+		<!--> IniData.pm: ReadTargetAliasFile<-->
+	<Warning>could not convert path .* to an absolute path because: .*</Warning>
+		<!--> MrpData.pm: GatherAbldOutput<-->
+	<Warning>Couldn&apos;t delete .*: .*</Warning>
+		<!--> EnvDb.pm: DeleteSignature<-->
+	<Warning>.* requires Release Tools version .* or later. You have .*</Warning>
+		<!--> RelData.pm: WarnIfReleaseTooNew<-->
+	<Warning>Not checking for new binaries; MRP file not present</Warning>
+		<!--> EnvDb.pm: ValidateCompOld, ValidateComp<-->
+	<Warning>.* not found.</Warning>
+		<!--> IniData.pm: CheckAliasWarning<-->
+	<Warning>Couldn&apos;t run abld .*</Warning>
+		<!--> MrpData.pm: GatherAbldOutput<-->
+	<Warning>IPR information for .* defined more than once in MRP files and differs and so will be ignored</Warning>
+		<!--> Symbian/CBR/IPR/MRP.pm: AddToTree<-->
+	<Warning>.* contains an export .* which is not included as source for this component, and does not contain dependencies on another component</Warning>
+		<!--> MrpData.pm: ProcessExports<-->
+	<Warning>IPR information for .* could not be obtained from either MRP files or distribution policy files</Warning>
+		<!--> Symbian/IPR.pm: GetRequestedInformation<-->
+	<Warning>The default IPR entry does not apply to any source statements in .*</Warning>
+		<!--> Symbian/CBR/MRP.pm: ValidateParsing, MrpData.pm: validateparsing<-->
+	<Warning>The IPR entry for .* does not apply to any source statements in .*</Warning>
+		<!--> Symbian/CBR/MRP.pm: ValidateParsing, MrpData.pm: validateparsing<-->
+	<Remark>Evalid is not available (.*)</Remark>
+		<!--> Symbian/CBR/Component/Manifest.pm: PopulateDataFromMRP, RefreshMetaData<-->
+	<Remark>Evalid is not available (.*)</Remark>
+		<!--> Symbian/CBR/Component/Manifest.pm: PopulateDataFromMRP, RefreshMetaData<-->											     
+	<Remark>Incompatible evalid versions</Remark>
+		<!--> Symbian/CBR/Component/Manifest.pm: Compare<-->	 					 
+</cbrmessages>

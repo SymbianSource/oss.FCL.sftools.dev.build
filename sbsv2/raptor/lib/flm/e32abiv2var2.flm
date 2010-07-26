@@ -1,4 +1,4 @@
-# Copyright (c) 2008-2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2008-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -19,17 +19,9 @@
 ifeq ($(TARGETTYPE),var2)
 include $(FLMHOME)/e32abiv2defaults.mk
 
-# What we need to build a DLL
-# May need a dso e.g. ecust.dll
-ifeq ($(NOEXPORTLIBRARY),)
-IMPORTLIBRARYREQUIRED:=1
-endif
-POSTLINKDEFFILE:=$(DEFFILE)
-SUPPORT_FREEZE:=1
-
 # Determine what kind of entrypoint option to set
 LINKER_ENTRYPOINT_LIBDEP:=$(STATIC_RUNTIME_DIR)/evar.lib
-LINKER_ENTRYPOINT_SETTING:=$(LINKER_ENTRY_OPTION) _E32Dll $(LINKER_ENTRYPOINT_DECORATION) $(call dblquote,$(STATIC_RUNTIME_DIR)/evar.lib$(LINKER_ENTRYPOINT_ADORNMENT))
+LINKER_ENTRYPOINT_SETTING:=$(LINKER_ENTRY_OPTION)=_E32Dll $(LINKER_ENTRYPOINT_DECORATION)$(LINKER_SEPARATOR)$(call dblquote,$(STATIC_RUNTIME_DIR)/evar.lib$(LINKER_ENTRYPOINT_ADORNMENT))
 
 ifeq ("$(NEED_ENTRYPOINT_LIBRARY)","True")
 LINKER_ENTRYPOINT_SETTING:=$(LINKER_ENTRYPOINT_SETTING) $(LINKER_ENTRYPOINT_LIBDEP)
@@ -55,7 +47,14 @@ AUTOEXPORTS:=VariantInitialise,1;
 # No exception support for kernel code?
 EXCEPTIONS:=$(NO_EXCEPTIONS)
 
-
+# Fixed export TARGETTYPEs should only reference a .def file if an explicit DEFFILE statement is present in the .mmp file
+ifneq ($(DEFFILEKEYWORD),)
+POSTLINKDEFFILE:=$(DEFFILE)
+SUPPORT_FREEZE:=1
+ifeq ($(NOEXPORTLIBRARY),)
+IMPORTLIBRARYREQUIRED:=1
+endif
+endif
 
 # We are appending to CDEFS but we don't want this to affect
 # other invocations so we are going to save it on a stack

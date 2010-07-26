@@ -1,0 +1,97 @@
+#!perl
+# Copyright (c) 2004-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+# 
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+# 
+# Contributors:
+# 
+# Description:
+# 
+#
+
+=head1 Overview
+
+This document is intended to make suggestions about how the tools can be made to operate quicker.
+
+=head1 Getting releases and baselines
+
+=over 4
+
+=item *
+
+Use the C<required_binaries> directive in your F<reltools.ini> to limit the selection of binaries that are installed.
+
+=item *
+
+Don't use the -s switch on C<GetEnv> to install source code. Use C<GetSource> subsequently to fetch source code for the components you want.
+
+=item *
+
+If you are working over a slow network link, create a local archive on your own PC using the C<PullEnv> commands. List this local cache first in your F<reltools.ini> and the tools will automatically search that archive first, to find any releases you need. This is also useful if you need to work offline.
+
+=back
+
+=head1 Making baselines
+
+=over 4
+
+=item *
+
+If you are making several baselines (for example, one with strong cryptography and one without) or you make a succession of baselines over a period (for example, fortnightly baselines) try to keep releases common to both. For example, if I<viewsrv> has not changed over the course of a fortnight then the new baseline should contain the same component release of viewsrv. Use the C<ValidateEnv> command to check which components you need to release afresh.
+
+=item *
+
+Try to make components as small as possible. Then, on average, fewer parts of the system will need to be transferred/installed for each new baseline. Having said that, small components gives no advantage if they are so interlinked that they always need to be released together.
+
+=back
+
+=head1 Transferring Releases
+
+=over 4
+
+=item *
+
+Again, use C<required_binaries> to restrict which binary platforms are transferred.
+
+=item *
+
+In the export table (F<exportdata.csv>) don't deliver more source code than you have to.
+
+=item *
+
+If you are delivering the same thing to several parties, don't do multiple C<ExportEnv>s. Instead use a single F<exportdata.csv> with everyone's PGP key listed along the top. Then do a single C<ExportEnv>; the files will be encrypted to each PGP key.
+
+=item *
+
+If you have to deliver something to several FTP sites, use the above method and export to a local drive (or a network share). Then, transfer things to each of the FTP sites. This saves on the encryption time and ensures you deliver the same stuff to each party.
+
+=item *
+
+If you have a secure network connection to a third party, then use C<PushEnv> instead of C<ExportEnv>. This eliminates the encryption/decryption stage. But be aware that it does not do source code filtering, so the recipient will be able to see all the source code.
+
+=back
+
+=head1 COPYRIGHT
+
+ Copyright (c) 2004-2009 Nokia Corporation and/or its subsidiary(-ies).
+ All rights reserved.
+ This component and the accompanying materials are made available
+ under the terms of the License "Eclipse Public License v1.0"
+ which accompanies this distribution, and is available
+ at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ 
+ Initial Contributors:
+ Nokia Corporation - initial contribution.
+ 
+ Contributors:
+ 
+ Description:
+ 
+
+=cut

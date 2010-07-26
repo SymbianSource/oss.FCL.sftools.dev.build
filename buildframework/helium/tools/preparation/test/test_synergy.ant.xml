@@ -27,7 +27,7 @@ Description:
     <property environment="env" />
     <property name="publish.root.dir" value="${helium.dir}/tests/data/output/" />
     <property name="helium.dir" location="../../.." />
-    <import file="../../../helium.ant.xml" />
+    <import file="../../../build.xml" />
 
     <target name="test-ccm-preparation-log-extraction">
         <delete file="${helium.dir}/tests/data/output/temp.log" failonerror="false"/>

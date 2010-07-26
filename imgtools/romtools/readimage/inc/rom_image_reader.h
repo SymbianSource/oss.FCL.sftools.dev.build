@@ -23,14 +23,13 @@
 
 #include "image_reader.h"
 
-class TRomLoaderHeader;
-#include <wchar.h>
+class TRomLoaderHeader; 
 class RomImageFSEntry 
 {
 public:
 	RomImageFSEntry (const char* aName) ;
 	virtual ~RomImageFSEntry() ;
-	virtual bool IsDirectory() = 0;
+	virtual bool IsDirectory() const = 0;
 	const char *Name() { return iName.c_str();}
 
 	string iName;
@@ -46,7 +45,7 @@ public:
 	{
 	}
 
-	bool IsDirectory() {
+	bool IsDirectory() const {
 		return false;
 	}
 	
@@ -68,8 +67,7 @@ public:
 	{
 	}
 
-	bool IsDirectory()
-	{
+	bool IsDirectory() const {
 		return true;
 	}
 
@@ -98,8 +96,7 @@ public:
 	void ProcessImage();
 	void BuildDir(TRomDir *aDir, RomImageFSEntry* aPaFSEntry); 
 
-	void AddChild(RomImageFSEntry *aParent, RomImageFSEntry *aChild, TRomEntry* aRomEntry);
-	void Name(string& aName, const wchar_t* aUnicodeName, TUint aLen);
+	void AddChild(RomImageFSEntry *aParent, RomImageFSEntry *aChild, TRomEntry* aRomEntry); 
 	void Validate();
 	void Dump();
 	void DumpTree();

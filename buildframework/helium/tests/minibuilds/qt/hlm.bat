@@ -18,5 +18,5 @@ rem
 
 setlocal
 set HLM_RVCT_VERSION=22_616
-..\..\..\..\helium\hlm.bat %*
+..\..\..\hlm.bat %*
 endlocal

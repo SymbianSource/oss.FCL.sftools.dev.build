@@ -1,0 +1,138 @@
+#!perl
+# Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+# 
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+# 
+# Contributors:
+# 
+# Description:
+# 
+#
+
+use strict;
+use FindBin;
+use lib "$FindBin::Bin";
+use Getopt::Long;
+use IniData;
+use EnvDb;
+use CommandController;
+use CleanEnv;
+
+
+#
+# Globals.
+#
+
+my $verbose = 0;
+my $iniData = IniData->New();
+my $commandController = CommandController->New($iniData, 'CleanEnv');
+my $reallyClean = 0;
+my $force = 0;
+
+
+#
+# Main.
+#
+
+ProcessCommandLine();
+CleanEnv::CleanEnv($iniData, $reallyClean, $force, $verbose);
+print "Environment cleaned.\n" if ($force);
+
+
+#
+# Subs.
+#
+
+sub ProcessCommandLine {
+  Getopt::Long::Configure ("bundling");
+  my $help;
+  GetOptions('h' => \$help, 'r' => \$reallyClean, 'f' => \$force, 'v+' => \$verbose);
+
+  if ($help) {
+    Usage(0);
+  }
+
+  unless ($#ARGV == -1) {
+    print "Error: Invalid number of arguments\n";
+    Usage(1);
+  }
+}
+
+sub Usage {
+  my $exitCode = shift;
+
+  Utils::PrintDeathMessage($exitCode, "\nUsage: cleanenv [options]
+
+options:
+
+-h  help
+-r  really clean
+-f  force (don't prompt)
+-v  verbose output (-vv very verbose)\n");
+}
+
+__END__
+
+=head1 NAME
+
+CleanEnv - Restores an environment to a clean state.
+
+=head1 SYNOPSIS
+
+  cleanenv [options]
+
+options:
+
+  -h  help
+  -r  really clean
+  -f  force (don't prompt)
+  -v  verbose output (-vv very verbose)
+
+=head1 DESCRIPTION
+
+Provides the user with the option of:
+
+=over 4
+
+=item *
+
+Re-installing dirty components.
+
+=item *
+
+Removing files of unknown origin.
+
+=back
+
+Normally when scanning an environment certain directories and files are ignored from the point of view of C<unknown origin> status (see the document I<Installation Guide> for more details), for example intermediate build files. The C<-r> switch causes C<CleanEnv> to not ignore any files when performing it's scan, and hence do a more comprehensive clean.
+
+Normally it will ask you if you want to delete files, and/or reinstall components. The -f flag supresses these questions, and should be used with care.
+
+=head1 KNOWN BUGS
+
+None.
+
+=head1 COPYRIGHT
+
+ Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+ All rights reserved.
+ This component and the accompanying materials are made available
+ under the terms of the License "Eclipse Public License v1.0"
+ which accompanies this distribution, and is available
+ at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ 
+ Initial Contributors:
+ Nokia Corporation - initial contribution.
+ 
+ Contributors:
+ 
+ Description:
+ 
+
+=cut

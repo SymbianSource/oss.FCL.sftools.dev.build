@@ -17,9 +17,9 @@
 
 
 /**
- @file
- @internalComponent
- @released
+@file
+@internalComponent
+@released
 */
 
 #include "e32reader.h"
@@ -32,8 +32,7 @@ Constructor.
 @released
 */
 E32Image::E32Image()
-:E32ImageFile()
-{
+:E32ImageFile() {
 }
 
 /** 
@@ -42,8 +41,7 @@ Destructor.
 @internalComponent
 @released
 */
-E32Image::~E32Image()
-{
+E32Image::~E32Image() {
 }
 
 /** 
@@ -56,28 +54,26 @@ Function responsible to read the import section of an e32 image and return the d
 
 @return - returns the two dimensional 
 */
-char** E32Image::GetImportExecutableNames(int& aCount)
-{
+char** E32Image::GetImportExecutableNames(int& aCount) {
 	const E32ImportSection* isection = (const E32ImportSection*)(iData + iOrigHdr->iImportOffset);
 	const E32ImportBlock* impBlock = (const E32ImportBlock*)(isection + 1);
 
-	char** nameList = (char**)malloc(iOrigHdr->iDllRefTableCount * sizeof(char*));
+	char** nameList = reinterpret_cast<char**>(new long[iOrigHdr->iDllRefTableCount]);
 
 	aCount = iOrigHdr->iDllRefTableCount;
 
-	for (int d = 0; d < iOrigHdr->iDllRefTableCount; ++d)
-		{
-			char* dllname = iData + iOrigHdr->iImportOffset + impBlock->iOffsetOfDllName;
-			char* curlyStart = strchr(dllname, '{');
-			char* dotStart = strrchr(dllname, '.');
-			
-			dllname[curlyStart - dllname] = '\0';
-			strcat(dllname,dotStart);
-			
-			nameList[d] = dllname;
-			TUint impfmt = iOrigHdr->ImportFormat();
-			impBlock = impBlock->NextBlock(impfmt); //Get next import block
-		}
+	for (int d = 0; d < iOrigHdr->iDllRefTableCount; ++d) {
+		char* dllname = iData + iOrigHdr->iImportOffset + impBlock->iOffsetOfDllName;
+		char* curlyStart = strchr(dllname, '{');
+		char* dotStart = strrchr(dllname, '.');
+
+		dllname[curlyStart - dllname] = '\0';
+		strcat(dllname,dotStart);
+
+		nameList[d] = dllname;
+		TUint impfmt = iOrigHdr->ImportFormat();
+		impBlock = impBlock->NextBlock(impfmt); //Get next import block
+	}
 	return nameList;	
 }
 
@@ -89,10 +85,9 @@ Constructor intializes the class pointer members.
 
 @param aImageName - image file name
 */
-E32Reader::E32Reader(char* aImageName)
-:ImageReader(aImageName)
-{
-	iInputStream.open(iImgFileName.c_str(), Ios::binary | Ios::in);
+E32Reader::E32Reader(const char* aImageName)
+:ImageReader(aImageName) {
+	iInputStream.open(iImgFileName.c_str(), ios_base::binary | ios_base::in);
 	int fwdSlashOff = iImgFileName.find_last_of('/');
 	int bwdSlashOff = iImgFileName.find_last_of('\\');
 	int exeNameOff = (fwdSlashOff > bwdSlashOff) ? fwdSlashOff : bwdSlashOff;
@@ -105,8 +100,8 @@ Destructor deletes the class pointer members.
 @internalComponent
 @released
 */
-E32Reader::~E32Reader()
-{
+E32Reader::~E32Reader() {
+	
 	iInputStream.close();
 	DELETE(iE32Image);
 }
@@ -119,8 +114,7 @@ Function responsible to say whether it is an e32 image or not.
 
 @param aImage - e32 image
 */
-bool E32Reader::IsE32Image(char* aFile)
-{
+bool E32Reader::IsE32Image(const char* aFile) {
 	if(E32Image::IsE32ImageFile(aFile))
 		return true;
 	return false;
@@ -132,17 +126,15 @@ Funtion to read the whole e32 image file and write the contents into iData memeb
 @internalComponent
 @released
 */
-void E32Reader::ReadImage()
-{
-	if( !iInputStream.is_open() )
-	{
+void E32Reader::ReadImage() {
+	if( !iInputStream.is_open() ) {
 		cerr << "Error: " << "Can not open file" << iImgFileName.c_str() << endl;
 		exit(EXIT_FAILURE);
 	}
 	iE32Image = new E32Image();
-	iInputStream.seekg(0, Ios::end);
+	iInputStream.seekg(0, ios_base::end);
 	TUint32 aSz = iInputStream.tellg();
-	iInputStream.seekg(0, Ios::beg);
+	iInputStream.seekg(0, ios_base::beg);
 	iE32Image->Adjust(aSz);
 	iE32Image->iFileSize = aSz;
 }
@@ -154,8 +146,7 @@ It is achieved using the operator >> overloaded function.
 @internalComponent
 @released
 */
-void E32Reader::ProcessImage()
-{
+void E32Reader::ProcessImage() {
 	iInputStream >> *iE32Image;
 	iExeAvailable = true;
 }
@@ -168,16 +159,17 @@ Function responsible to gather dependencies for one e32 image.
 
 @return iExeNamesVsDepListMap - returns all executable's dependencies
 */
-ExeNamesVsDepListMap& E32Reader::GatherDependencies()
-{
-	int count=0;
-	char** nameList = iE32Image->GetImportExecutableNames(count);
-	int i = 0;
-	for(; i < count; ++i)
-	{
-		iDependencyList.push_back(String(nameList[i]));
+ExeNamesVsDepListMap& E32Reader::GatherDependencies() {
+	int count=0; 
+	iDependencyList.clear();
+	char** names = iE32Image->GetImportExecutableNames(count); 
+	for(int i = 0 ; i < count; ++i) {
+		iDependencyList.push_back(names[i]);
 	}
-	iImageVsDepList.insert(std::make_pair(iExeName, iDependencyList));
+	put_item_to_map(iImageVsDepList,iExeName.c_str(), iDependencyList);
+	if(names){
+		delete [](reinterpret_cast<long*>(names));
+	}
 	return iImageVsDepList;
 }
 
@@ -189,8 +181,7 @@ Function responsible to return the dependency list of an e32 image.
 
 @return iDependencyList - returns all executable's dependencies
 */
-const StringList& E32Reader::GetDependencyList()
-{
+const StringList& E32Reader::GetDependencyList() const {
 	return iDependencyList;
 }
 
@@ -200,25 +191,20 @@ Function responsible prepare the ExeVsId map.
 @internalComponent
 @released
 */
-void E32Reader::PrepareExeVsIdMap()
-{
-	IdData* id;
-	if(iExeVsIdData.size() == 0) //Is not already prepared
-	{
-		id = new IdData;
+void E32Reader::PrepareExeVsIdMap() { 
+	if(iExeVsIdData.size() == 0) { //Is not already prepared 
+		IdData* id = new IdData;
 		id->iUid = iE32Image->iOrigHdr->iUid1;
 		id->iDbgFlag = (iE32Image->iOrigHdr->iFlags & KImageDebuggable)? true : false;
 		TUint aHeaderFmt = E32ImageHeader::HdrFmtFromFlags(iE32Image->iOrigHdr->iFlags);
-		if (aHeaderFmt >= KImageHdrFmt_V)
-		{
+		if (aHeaderFmt >= KImageHdrFmt_V) {
 			E32ImageHeaderV* v = iE32Image->iHdr;
 			id->iSid = v->iS.iSecureId;
 			id->iVid = v->iS.iVendorId;
 		}
 		id->iFileOffset = 0;
-		iExeVsIdData[iExeName] = id;
-	}
-	id = KNull;
+		put_item_to_map_2(iExeVsIdData,iExeName.c_str(),id); 
+	} 
 }
 
 /** 
@@ -229,7 +215,6 @@ Function responsible to return the Executable versus IdData container.
 
 @return - returns iExeVsIdData
 */
-const ExeVsIdDataMap& E32Reader::GetExeVsIdMap() const
-{
+const ExeVsIdDataMap& E32Reader::GetExeVsIdMap() const {
 	return iExeVsIdData;
 }

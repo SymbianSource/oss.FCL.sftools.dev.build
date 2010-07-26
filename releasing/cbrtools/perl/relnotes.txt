@@ -1,0 +1,2835 @@
+Version 2.84.3
+
+Made by Build Tools China, 08/09/2009
+
+Defect fixes:
+        DPDEF141526 - raptor errors when validating tools_redistribution_common in MakeCBR
+New Features:
+*   REQ12751 - CBR Tools use Raptor.
+        
+-----------------------------------------------------------------------------------
+
+Version 2.84.2
+
+Made by Build Tools China, 02/09/2009
+
+Defect fixes:
+        DPDEF141709 - DeltaEnv create delta_manifest_baseline.xml format error
+        
+-----------------------------------------------------------------------------------
+
+Version 2.84.1
+
+Made by Build Tools China, 20/07/2009
+
+Defect fixes:
+        DPDEF140962 - Miss manifest.xml when apply delta between 141 & 142 tb91sf 
+        DPDEF141079 - deltaenv keep the file which has been moved to another one in old zip file 
+        
+-----------------------------------------------------------------------------------
+
+Version 2.84.0
+
+Made by Release & Integration Tools China, 30/06/2009
+
+New Features:
+*   REQ9701  - Faster, Optimised Packaging process.
+*   REQ11393 - SBSv2 support in CBR tools.
+
+Compatibility notes:
+*   There is a new reldata format introduced in this REQ. 
+    Then if an enviornment is got by any prior CBR version, there will be reldata mismatch 
+    when using any CBR tool in this version. So please keep the CBR tools version consistent.
+    
+-----------------------------------------------------------------------------------
+
+Version 2.83.1031
+
+Made by Release & Integration Tools China, 17/06/2009
+
+Defect fixes:
+        DPDEF140280 - CBR Tools 2.83.1030 fail to compile
+        
+-----------------------------------------------------------------------------------
+
+Version 2.83.1030
+
+Made by Release & Integration Tools China, 18/05/2009
+
+Defect fixes:
+        DEF139216 - DeltaEnv: keep going with error during create and apply delta
+        
+-----------------------------------------------------------------------------------
+
+Version 2.83.1029
+
+Made by Release & Integration Tools China, 01/04/2009
+
+Defect fixes:
+        DPDEF137305 - CBR will report "Error: didn't find any platforms"
+        
+-----------------------------------------------------------------------------------
+
+Version 2.83.1028
+
+Made by Release & Integration Tools China, 26/03/2009
+
+Defect fixes:
+        DEF130995 - Deltaenv errors in creating delta package for 9.5 - M04693
+
+-----------------------------------------------------------------------------------
+
+Version 2.83.1027
+
+Made by Release & Integration Tools China, 16/03/2009
+
+Defect fixes:
+        DPDEF136548 - CBR tools don't work with raptor-generated abldcache file
+
+-----------------------------------------------------------------------------------
+
+Version 2.83.1026
+
+Made by Release & Integration Tools China, 04/03/2009
+
+Defect fixes:
+        DPDEF135800 - The CBR Tools do not classify IPR for source statements using relative paths
+        DPDEF135797 - CBR Tools do not support relative paths in MRP files
+
+-----------------------------------------------------------------------------------
+
+Version 2.83.1025
+
+Made by Release & Integration Tools UK, 19/02/2009
+
+Defect fixes:
+        DPDEF135168: - CBR Tools do not automatically include DP files 
+    
+-----------------------------------------------------------------------------------
+
+Version 2.83.1024
+
+Made by Release & Integration Tools China, 22/01/2009
+
+Defect fixes:
+        DPDEF128617 - MakeEnv does not work with SRCROOT set to anything other than \
+    
+-----------------------------------------------------------------------------------
+
+Version 2.83.1023
+
+Made by Release & Integration Tools China, 12/01/2009
+
+Defect fixes:
+        DPDEF128818 - Envinfo fails testing a mrp with a source statement pointing to a directory
+        DPDEF132654 - Project Loki - 23 - Archive-Tar 
+    
+-----------------------------------------------------------------------------------
+        
+Version 2.83.1022
+
+Made by Release & Integration Tools China, 08/01/2009
+
+Defect fixes:
+        DEF130274   - Intermittent failures in CBR import of releases to Beijing site
+        DPDEF132728 - Project Loki - 175 - net-ftp-common
+
+-----------------------------------------------------------------------------------
+
+Version 2.83.1021
+
+Made by Release & Integration Tools China, 23/12/2008
+
+Defect fixes:        
+        DPDEF132236 - unzip version is too old in the CBR packages
+        PDEF131197  - Deltaenv re-construction fails - transferring vFuture M04717 -> M04719	
+
+-----------------------------------------------------------------------------------
+Version 2.83.1020
+
+Made by Release & Integration Tools China, 17/12/2008
+
+Defect fixes:
+        DEF131119   - deltaEnv can't create delta data of gt_techview_baseline component 
+        DEF131116   - Permission deny issue when doing zip and delete command by using deltaenv
+        DPDEF130547 - CBR tools should report error to the log when import file failed
+	
+-----------------------------------------------------------------------------------
+
+Version 2.83.1019
+
+Made by Release & Integration Tools China, 05/11/2008
+
+Defect fixes:
+	DPDEF129430 - Improve the warning message for envinfo with -c,-d or -p
+	DPDEF129931 - DeltaEnv apply need to handle one error senario 
+	
+-----------------------------------------------------------------------------------
+
+Version 2.83.1018
+
+Made by Release & Integration Tools UK, 23/10/2008
+
+Defect fixes:
+	DPDEF128531 - problems creating delta package using manifest file in 9.1
+	DPINC128056 - Missing argument handling in CleanEnv.pm
+	DPDEF126632 - Deprecate support for Component-Based Archives in the CBR Tools
+	
+Compatability notes:
+*	Component-based archives (using the 'archive_path_file' keyword) are now deprecated, and produce a warning - however, no functionality has been disabled.  It's recommended that users migrate to using project-based archives with the 'archive_path' keyword.
+
+-----------------------------------------------------------------------------------
+
+Version 2.83.1017
+
+Made by Integration & Variant Tools, 03/10/2008
+
+Defect fixes:
+	DPDEF125527 - CBR tools source mappings break binary platform statements
+	DPINC128057 - Issue with reltools and [...] deep recursion
+	DPDEF127628 - Deltaenv produces errors on pathnames > 255
+
+-----------------------------------------------------------------------------------
+
+Version 2.83.1016
+
+Made by Integration & Variant Tools, 12/09/2008
+
+Defect fixes:
+	DPDEF126625 - Problem with ViewNotes [viewnotes doesn't always return immediately with some browsers]
+	DPDEF124626 - deltaenv -c -ra doesn't work
+
+-----------------------------------------------------------------------------------
+
+Version 2.83.1015
+
+Made by Product Creation Tools, 17/07/2008
+
+Defect fixes:
+	DEF114845 - Latestver doesn't spot if the archive path doesn't exist 
+	DEF122011 - GT0410 CBR tools: open archive file when cleaning, cleanlocalarch warns 
+
+-----------------------------------------------------------------------------------
+
+Version 2.83.1014
+
+Made by Product Creation Tools, 11/07/2008
+
+Defect fixes:
+	DEF124892 - wrong command name in the synopsis of RemoveSource.html
+	DEF124119 - Use of uninitialized value in split at c:/apps/SITK/cbr/Utils.pm line 1467.
+	INC123162 - viewnotes behaves differently between old CBR and SITK's
+	DEF122117 - GT0410 CBR tools: perl crash for invalid paths: deltaenv -r and deltaenv -c --dp
+	DEF122116 - GT0410 CBR tools: perl crash if source file held open while running removesource
+
+Compatability notes:
+*   When writing release notes for use with these tools, this version of the
+    tools permits HTML tags to be used.  To tell the tools not to treat your
+    comment as plain text, wrap the comment in <html> </html> tags
+
+-----------------------------------------------------------------------------------
+
+Version 2.83.1013
+
+Made by Product Creation Tools, 20/05/2008
+
+Defect fixes:
+	DEF114845 - Latestver doesn't spot if the archive path doesn't exist
+	DEF118532 - Warnings from cleanremote if remote archive paths not specified
+	DEF121046 - CBR tool Cleanlocalarch fails using Perl 5.8.8
+	DEF121945 - GT0410 CBR tools: file held open while removing component
+                    crashes envdb line1639
+	DEF121958 - GT0410 CBR tools: no archive path crashes latestver, exportenv
+                    and exportrel
+	DEF121964 - GT0410 CBR tools: wrong number of args for archive path crashes
+                    pathdata
+	DEF121972 - GT0410 CBR tools: perl warnings 'exiting subroutines via next
+                    at cleaner.pm'
+	DEF122005 - GT0410 CBR tools: keep_recent_env and rel give warnings on non
+                    numeric arguments
+	DEF122012 - GT0410 CBR tools: incorrect configuration gives perl warnings
+	DEF122018 - GT0410 CBR tools: invalid source dir specified to getrel -I,
+                    getsource -i crash
+	DEF122110 - GT0410 CBR tools: invalid archive path in remote reltools.ini
+                    (pullenv, pullrel)
+	DEF122114 - GT0410 CBR tools: pullrel -h gives the wrong help
+	DEF122115 - GT0410 CBR tools: perl crash when removing source for a non
+                    installed component
+	DEF122119 - GT0410 CBR tools: use of uninitialised value when calling
+                    deltaenv -r (no args)
+	DEF122122 - GT0410 CBR tools: perl crash if bad values given to --maxdelta
+	DEF122142 - ImportEnv command line help is missing an option
+
+-----------------------------------------------------------------------------------
+
+Version 2.83.1012
+
+Made by Product Creation Tools, 09/04/2008
+
+Defect fixes:
+	PDEF120528 DeltaEnv -a : error in constructing base_documentation component
+	DEF119931 DeltaEnv -c tool unable to read a generated release manifest file
+
+-----------------------------------------------------------------------------------
+
+Version 2.83.1011
+
+Made by Product Creation Tools, 26/03/2008
+
+Defect fixes:
+	DEF115306 Errors when running EnvInfo
+
+-----------------------------------------------------------------------------------
+
+Version 2.83.1010
+
+Made by Product Creation Tools, 22/02/2008
+
+Defect fixes:
+	PDEF111988 Adding archives to reltools.ini slows down getenv
+	DEF118518 "experimentalproxy" remote site type doesn't work
+	DEF118517 CleanRemote doesn't work: undefined values
+
+-----------------------------------------------------------------------------------
+
+Version 2.83.1009
+
+Made by Product Creation Tools, 26/11/2007
+
+Defect fixes:
+        DEF114351 DeltaEnv is very slow processing developer library components
+        DEF113317 zdc.exe crashes in deltaenv
+        DEF110665 CBR Tools GPG documentation is out of date
+        DEF113042 CBR tools return a '0' value even with invalid arguments
+        DEF114436 GT0366: DeltaEnv: ApplyDelta.pm has incorrect English messages
+
+-----------------------------------------------------------------------------------
+
+Version 2.83.1008
+
+Made by Product Creation Tools, 15/11/2007
+
+Defect fixes:
+
+    INC113318 - RELTOOLS: deltaenv can not co-op with multiple local archive
+    INC105515 - RELTOOLS: viewnotes and angled-brackets
+    DEF113091 - Inconsistent behaviour of CBR tools
+    DEF114173 - DeltaEnv Fails with Perl Error
+
+-----------------------------------------------------------------------------------
+
+Version 2.83.1007
+
+Made by Product Creation Tools, 30/10/2007
+
+Defect fixes:
+
+    DEF112925 - DeltaEnv does not remove deleted exports
+    DEF113007 - DeltaEnv can create invalid delta manifests
+    DEF112186 - DeltaEnv fails to apply delta due to long path lengths
+    DEF113394 - Releasing an already existing version of a CBR comp deletes the 
+                original from the archive
+    INC113252 - RELTOOLS: blddoc exit with an error
+
+-----------------------------------------------------------------------------------
+
+Version 2.83.1006
+
+Made by Product Creation Tools, 22/10/2007
+
+Defect fixes:
+
+    PDEF113136 - CBR: Bad reference when remote path missing from reltools.ini  
+    PDEF107504 - ImportEnv and ImportRel do not provide a summary
+    DEF113056 - DeltaEnv produces Perl warnings
+    DEF112883 - PullEnv/PushEnv have ceased to work
+    DEF112532 - DeltaEnv cannot create a delta     
+    DEF112367 - CBR errors and warnings in M04358 v9.6
+
+Compatibility notes:
+*   The output of ImportRel/ExportRel/ImportEnv and ExportEnv has been changed.
+    All the tools now produce a table of successful transfers, and then a table
+    of failed transfers (if any).  The table also includes a column to display
+    the status or failure reason.
+    
+-----------------------------------------------------------------------------------
+
+Version 2.83.1005
+
+Made by Product Creation Tools, 09/10/2007
+
+Defect fixes:
+
+    DEF112571 - CBR creation more fragile in recent System Builds
+
+-----------------------------------------------------------------------------------
+
+Version 2.83.1004
+
+Made by Product Creation Tools, 27/09/2007
+
+Defect fixes:
+
+    INC111277 - RELTOOLS: slow exporting / exportdata parsing
+
+-----------------------------------------------------------------------------------
+
+Version 2.83.1003
+
+Made by Product Creation Tools, 26/09/2007
+
+Defect fixes:
+
+    DEF112113 - DeltaEnv fails to overwrite even if the overwrite flag is set
+    DEF112116 - DeltaEnv won't apply a delta
+
+-----------------------------------------------------------------------------------
+
+Version 2.83.1002
+
+Made by Product Creation Tools, 20/09/2007
+
+Defect fixes:
+
+    DEF111270 - Mysterious warning in latestver
+    DEF105111 - Symbian::DistributionPolicy perldoc incorrect since CL653690
+    DEF110092 - CBR tools do not indicate whether or not abld cache is being used
+    DEF108677 - BldDocs does not build the docs for DeltaEnv 
+    DEF109761 - DeltaEnv obliges the user to provide a PGP key 
+    DEF111453 - DeltaEnv causes problems for archive cleaning tool
+    DEF111817 - DeltaEnv fails to handle changes to export rules 
+
+-----------------------------------------------------------------------------------
+
+Version 2.83.1001
+
+Made by Product Creation Tools, 31/08/2007
+
+Defect fixes:
+
+    DEF108536 - autoCBR releases components unnecessarily 
+
+Compatibility notes:
+*   Archived components which contain abld.bat in the manifest.xml or the zip
+    files may be reported as dirty.  Components created with this release of the
+    CBR Tools will not contain abld.bat files.
+
+-----------------------------------------------------------------------------------
+
+Version 2.83.1000
+
+Made by Product Creation Tools, 30/08/2007
+
+New Features:
+*   PREQ775 - Alignment of CBR and System Model components
+
+Compatibility notes:
+*   There is a new keyword supported for specifying IPR information in MRP files.
+    Information on the syntax and usage of the 'ipr' keyword can be found in the
+    CBR Tools CHM help file->CBR Tools User Guide->Creating a typical MRP file->
+    Adding IPR information.
+
+    IPR information will be obtained from MRP files by default, unless the MRP files
+    do not contain IPR information in which case it will fall back to
+    using distribution.policy files.
+    
+    You can specify that distribution.policy files are to be used by default by
+    adding the 'use_distribution_policy_files_first' directive to your reltools.ini.
+    
+    If you are using distribution.policy files as default and the required
+    distribution.policy file is missing then the CBR Tools will attempt to get the
+    information from MRP files.    
+    
+-----------------------------------------------------------------------------------
+
+Version 2.82.1004
+
+Made by Product Creation Tools, 17/08/2007
+
+Defect fixes:
+
+    INC105524 - Cleanremote command does not work...
+    DEF110377 - GetSource does not print warning with missing archives
+
+-----------------------------------------------------------------------------------
+
+Version 2.82.1003
+
+Made by Product Creation Tools, 10/07/2007
+
+Defect fixes:
+
+    DEF103662 - Add support to envsize command to only count 'new' components
+    DEF107988 - Source mapping breaks manifest
+    DEF108734 - DeltaEnv fails to run from SITK
+
+-----------------------------------------------------------------------------------
+
+Version 2.82.1002
+
+Made by Product Creation Tools, 06/07/2007
+
+Defect fixes:
+
+    INC108949 - RELTOOLS: Cannot run GetEnv because another command is already running
+    DEF100309 - CBR Tools do not work with GNU Diff 
+
+-----------------------------------------------------------------------------------
+
+Version 2.82.1001
+
+Made by Product Creation Tools, 29/06/2007
+
+Defect fixes:
+
+    DEF102405 - reltools don't seem to cope with importing releases with sourceX
+                but no key
+    DEF105028 - Cleanlocalarch did not keep a recent component when it was specified to
+    DEF107829 - Autoflush turned on for reltool scripts
+    DEF107832 - Import.pm should have setting so that "Incorrect PGP passphrase"
+                doesn't hang YG
+
+Compatibility notes:
+*   Previously Cleanlocalarch would remove components which were corrupt or which
+    were being released into the archive at the same time Cleanlocalarch was
+    running.  Now Cleanlocalarch will not remove these components by default.
+    If you wish for Cleanlocalarch to remove such components you will need to
+    specify the -r (really clean) flag when running Cleanlocalarch.
+
+-----------------------------------------------------------------------------------
+
+Version 2.82.1000
+
+Made by Product Creation Tools, 26/06/2007
+
+New Features:
+*   GT0366/PREQ1703 Traceability PREQ for changes to legacy functionality which
+    have been delivered as part of Nutmeg
+    REQ7325 CBR intelligent bitwise-delta releases
+
+Compatibility notes:
+*   This change provides the new DeltaEnv command - there is no change to the
+    existing release/import/export commands or their functionality
+
+-----------------------------------------------------------------------------------
+
+Version 2.81.1018
+
+Made by Product Creation Tools, 19/06/2007
+
+Defect Fixes:
+
+    DEF107823 - CBR Tools compatibility fix for export sources owned by another component
+
+Compatiblity notes:
+*   If you specify the wrong number of arguments for the 'export_file' keyword in
+    an MRP file then an error will be produced.  The new error is 'Error: Invalid
+    number of arguments to 'export_file' keyword in "MRP name"'.
+
+-----------------------------------------------------------------------------------
+
+
+Version 2.81.1017
+
+Made by Engineering Tools, 08/06/2007
+
+Defect Fixes:
+
+    DEF107823 - CBR Tools compatibility fix for export sources owned by another component
+
+-----------------------------------------------------------------------------------
+
+Version 2.81.1016
+
+Made by Engineering Tools, 30/05/2007
+
+Defect Fixes:
+
+    INC104253 - ExportRel exits silently if release exists on FTP site
+
+Compatiblity notes:
+*   Additional messages in the ExportRel command:
+    - a note of anything that didn't need exporting because it already exists
+    - a report at the end of all successful exports
+    - a messsage at the end if the overall effect of the tool was to do nothing
+
+-----------------------------------------------------------------------------------
+
+Version 2.81.1015
+
+Made by Engineering Tools, 25/05/2007
+
+Defect Fixes:
+
+    INC105513 - Using validaterel results in releases with corrupt manifest files
+    INC105514 - Cannot find mrp file when using validaterel
+    INC105518 - Out-commented line in mrp file picked up anyway...
+    INC105677 - CBR Tools behave badly with special characters in passwords
+    INC105539 - Viewnotes produce not so good html...
+    INC105535 - Greek and Russian characters are not supported by reltools
+    INC105548 - Reltools allowing to build on drives lower than F:
+
+-----------------------------------------------------------------------------------
+
+Version 2.81.1014
+
+Made by Engineering Tools, 30/04/2007
+
+Defect Fixes:
+
+    DEF101018 - CBR getenv gets stopped
+    DEF101032 - Unnecessary confirmation dialog in installer during upgrade
+    DEF104279 - The exclude keyword in the CBR export table breaks the exported archive
+    DEF104280 - CBR Documentation of export tables is incomplete
+
+Minor Changes:
+    Amended the error messages produces when UnZip fails to include the return code
+
+-----------------------------------------------------------------------------------
+
+Version 2.81.1013
+                             
+Made by Engineering Tools, 01/03/2007
+
+Defect Fixes:
+    DEF099673 - OS limits on path length are not enforced by CBR tools
+    DEF102329 - Importenv runs slowly
+
+Compatibility Notes:
+*   Amended CleanEnv so that warning messages are produced instead of error
+    messages in relation to files and the OS path length.
+
+-----------------------------------------------------------------------------------
+    
+Version 2.81.1012
+                             
+Made by Engineering Tools, 20/02/2007
+
+Defect Fixes:
+    INC101483 - dumpbin /symbols /exports failed
+
+Compatibility Notes:
+*   The tools will now continue on from errors originating from an evalid
+    dependency (e.g. dumpbin, and also others such as elfdump).  The errors are
+    suppressed if they originate from dumpbin, and appear as warnings if
+    originating from other tools.
+*   When validating the message 'No checksum found for files(s)...' will appear
+    in all these cases, or when validating against a release which experienced
+    one of the above evalid dependency failures when it was made.
+
+-----------------------------------------------------------------------------------
+
+Version 2.81.1011
+                             
+Made by Engineering Tools, 22/01/2007
+
+Defect Fixes:
+    DEF098727 - Add support for forcing an import of an environment
+    DEF092967 - [CBR Tools] Re-enable newly disabled functionality in fix for DEF092883
+    DEF099673 - OS limits on path length are not enforced by CBR tools
+    DEF100138 - LatestVer filtering is case sensitive
+    DEF097215 - CBR/Evalid generates incorrect manifest checksum when dumpbin not present
+
+Compatibility Notes:
+*   Path lengths are now enforced by the CBR tools.  It is now not possible to
+    release a file with a path of containing more than 245 characters.
+*   A new informational message has been added.  When validating against a
+    component which was built on a machine with no 'dumpbin' program, and which
+    contains files that require dumpbin in order to be validated, the code will
+    now revert to the validation process which predated version 2.81 of the
+    tools.
+    The new message is 'No checksum found for files(s) <files> - reverting to
+    old evalid process.'
+
+-----------------------------------------------------------------------------------
+
+Version 2.81.1010
+Made by Engineering Tools, 03/01/2007
+
+Defect Fixes:
+    DEF091267 - CBR tools 2.80 produce warning when used with Perl 5.8.7
+    DEF095504 - Support for 'ipr' keyword tolerance
+    DEF099019 - Export does not give FTP information without extra options
+
+Compatibility Notes:
+*   The 'ipr' keyword is not to be used in MRP files as the CBR Tools will
+    ignore it.  This functionality has been added to support PREQ775.
+
+-----------------------------------------------------------------------------------
+
+Version 2.81.1009
+Made by Engineering Tools, 12/12/2006
+
+Defect Fixes:
+    DEF097247 - CBR command diffrel is broken unless you provide version information
+    INC096841 - ImportEnv can lead to corrupt environments in low-disc space situations
+
+-----------------------------------------------------------------------------------
+
+Version 2.81.1008
+Made by Engineering Tools, 24/11/2006
+
+Defect Fixes:
+    DEF097671: CBR assumption makes binaries from a new tools platform orphans 
+
+-----------------------------------------------------------------------------------
+
+Version 2.81.1007
+Made by Engineering Tools, 2/11/2006
+
+New Features:
+*   Implemented CR0751 - Remove GPG binary from CBR Tools distribution
+
+Compatibility Notes:
+*   Users will need to have installed a version of GPGv1.x or PGP Command Line
+    version 6 or later to use the import/export functionality.  The tools no
+    longer come with a default tool.
+
+-----------------------------------------------------------------------------------
+
+Version 2.81.1006
+Made by Engineering Tools, 21/09/2006
+
+Defect Fixes:
+    DEF091264	LatestVer should filter results by a pattern
+    DEF092244	Use of uninitialised value in Manifest.pm line 128
+    DEF092722	exclude.txt parsing dislikes hyphens in wildcard specifications
+    DEF092972	ViewNotes creates blank documents when attempting to view notes
+                for a component which has not been released
+    DEF093204	CBR Tools Quick Reference typo
+    DEF093609	validaterel assumptions about path case can lead to CBR errors
+    DEF094460	[System Build] - Can't locate EvalidCompare.pm
+
+-----------------------------------------------------------------------------------
+
+Version 2.81.1005
+Made by Engineering Tools, 17/08/2006
+
+Defect Fixes:
+    DEF092883  [System Build] - CBR Tools identifying folders as orphans
+
+-----------------------------------------------------------------------------------
+
+Version 2.81.1004
+Made by Engineering Tools, 08/08/2006
+
+Defect Fixes:
+    DEF087684  [CBR Tools] Diffrel can't cope with paths longer than as little as 115 chars
+    DEF090893  [CBR Tools] The reltools.ini 'experimentalproxy' keyword is treated as 'proxy'
+    DEF088308  [CBR Tools] Run-time error when EPOCROOT is invalid
+    DEF088479  [CBR Tools] Tools never warn about missing cbrtargetalias.cfg
+    DEF089530  "cleanenv -rf" doesn't remove rogue dirs
+    DEF085602  [CBR Tools] Get source for any environment
+    INC089568  reltools.ini.ex out of date
+
+Compatibility Notes:
+*   GetEnv functionality has been extended to allow the source code for any
+    environment to be downloaded, irrespective of whether it is the current
+    environment or not.  This is achieved by using the --source-only switch.
+*   When using cleanenv it will now remove any empty directories it finds within
+    the EPOC tree.  The list of directories to be removed will be displayed
+    with the list of files to be removed.
+*   If the 'remote_site_type experimentalproxy' option was specified in the
+    reltools.ini file, it would actually have been interpreted as 'proxy' and
+    not 'experimentalproxy'.  Users using the 'experimentalproxy' keyword will
+    find that the tools now respect that keyword.  To get the old behaviour,
+    the remote_site_type value should be 'proxy'.
+*   The CBR tools now create temporary directories under the system temp dir.
+    If your system temp dir is deeply nested, it may be better to override this
+    with a shorter path, since there are limitations on internal path lengths
+    for certain cbr commands.  This can be done my specifying the 'temp_dir'
+    keyword in reltools.ini, e.g. 'temp_dir c:\temp'
+*   The CBR tools should produce a warning message if the cbrtargetalias.cfg
+    file is missing.  This functionality was not working properly and has now
+    been fixed.  This warning message can be suppressed by specifying the
+    'no_target_alias_warning' in your reltools.ini.
+
+-----------------------------------------------------------------------------------
+
+Version 2.81.1003
+Made by Engineering Tools, 06/06/2006
+
+Defect Fixes:
+    DEF065262  [CBR Tools] cleanremote fails to clean old releases (documentation issue)
+    DEF084397  Upgrading releases using getenv doesn't remove empty include directories
+    DEF085780  ValidateRel fails when no MRP file exists (e.g. due to having no source)
+    DEF087482  cleanremote broken in 2.80.1002
+
+Compatibility Notes:
+*   If using cleanlocalarch and the copy of the component in the local archive is
+    corrupt then cleanlocalarch will give the following error message and continue:
+    "Warning: Unable to identify the environment for 'Component Version'. This may
+    result in additional component releases being cleaned from the archive.
+    (Corrupt release; missing reldata file)".  This replaces the error message:
+    "No Reldata file exists for $thisComp $thisVer as it would appear to be corrupt.
+    A fresh version shall need to be installed".
+
+
+-----------------------------------------------------------------------------------
+
+Version 2.81.1002
+Made by Engineering Tools, 26/04/2006
+
+Defect Fixes:
+    DEF084619: [CBR Tools] Cat X is pre-2.80.1000 Compatible
+
+-----------------------------------------------------------------------------------
+
+Version 2.81.1001
+Made by Engineering Tools, 19/04/2006
+
+Defect Fixes:
+    DEF068972: [CBR Tools] A CBR component being installed can't be interrupted
+
+-----------------------------------------------------------------------------------
+
+Version 2.81.1000
+Made by Engineering Tools, 12/04/2006
+
+New Features:
+* GT0278/TREQ0017 Significantly Reduce CBR Build Time
+    REQ0035  Add component manifest
+     An XML manifest is created during component release - contains Evalid MD5
+     checksums of component content.
+    REQ0036  ValidateEnv/Rel using Evalid MD5
+     Validation uses the manifest checksums rather than installing a temporary
+     local copy and generating evalid data every time.
+
+N.B.: The text above is a summary of the requirements.
+
+Defect Fixes:
+    DEF058539: [CBR Tools] Timestamp of source clobbered by reapplication of MSDOS attributes
+    DEF077956: [CBR Tools 2.80.1001] Unhelpful Warnings
+
+Compatibility Notes:
+*   A manifest.xml file is added to each new component published. This can be
+    found at the same level as the component reldata file within the archive.
+
+-----------------------------------------------------------------------------------
+
+Version 2.80.1003
+Made by Engineering Tools, 04/04/2006
+
+Defect Fixes:
+    DEF083821: CBR tools 2.81beta3 breaks the PATH environment setting
+
+-----------------------------------------------------------------------------------
+
+Version 2.80.1002
+Made by Engineering Tools, 03/04/2006
+
+Defect Fixes:
+    DEF083670: cleanlocalarch stops cleaning
+    DEF083808: CBR tools have incorrect "earliest compatible version" in reldata
+    DEF077676: CBR tools create perl warnings and unhelpful output given a bad .mrp file
+    DEF082745: CBR tools envinfo releasable error should be clearer
+    DEF083234: CBR Tools MrpData->Source() method returns some directories
+
+Compatibility Notes:
+
+*   The error message for a bad line in an MRP file has been changed.  The line
+    number of the bad line is now printed inbetween the MRP file name and the
+    bad line offending line is always printed too e.g. Warning: Invalid line in
+    "helloworld\group\helloworld.mrp" (Line 3) - "source\helloworld"
+    instead of:
+    Warning: Invalid line in "helloworld\group\helloworld.mrp" - .
+*   When the EPOCROOT could not be removed from the path the following error
+    message was displayed: "Error: Couldn't remove "\" from "afolder".
+    This has now been changed to:
+    Error: Path does not contain EPOCROOT - EPOCROOT:"\" - Path:"afolder".
+
+-----------------------------------------------------------------------------------
+
+Version 2.80.1001
+Made by Engineering Tools, 12/01/2006
+
+Defect Fixes:
+    DEF077665: [CBR Tools] does not add any files warning should be a remark
+
+-----------------------------------------------------------------------------------
+
+Version 2.80.1000
+Made by Engineering Tools, 06/01/2006
+
+New Features:
+* GT0278/TREQ0018 CBR Tools ISC Support
+    REQ0018  Comply with new version numbering
+     The CBR Tools must adhere to the Engineering Tools versioning standard.
+    REQ0037  Update tools documentation
+     The CBR Tools documentation must be updated to include new features.
+    REQ0045  Arbitrary IRP categorisation (A-Z)
+     The CBR Tools must allow arbitrary IPR categorisation of source and
+     exports to permit additions within the CKL.
+    REQ0076  Enhance existing export filtering
+     The CBR Tools export functionality must be able to differentiate between
+     source and exports when encryptying based on IPR category.
+
+N.B.: The text above is a summary of the requirements.
+
+Defects Fixed:
+    DEF044949  [Reltools] Missing in-source documentation
+    DEF052380  [RelTools] Misleading warning message from 2.76.3
+    DEF053523  [Reltool] bininfo after preprel does not work
+    DEF054781  [Reltools] InstallSnapshot falls over if given no options.
+    DEF054800  [Reltools] CBR Release Tools message in 'importenv' is gibberish.
+    DEF054806  [reltools] Release tools command 'BuildRel' compatibility break
+    DEF055785  [Reltools] DiffRel upset if no source
+    DEF058539  [Reltools] Timestamp of source clobbered by reapplication of MSDOS attributes
+    DEF058760  [Reltools] GPG decrypt less verbose than GPG encrypt
+    DEF060192  cleanlocalarch does not report failure to delete files / directories
+    DEF061247  CBR tools Installation document still refers to source_filter keyword
+    DEF061580  [RelTools] PASV mode suggested when PASV mode enabled
+    DEF061684  GPG Encrypt/Decrypt does not show command executed in very verbose mode
+    DEF062294  [RelTools] Validateenv produces warnings
+    DEF064016  [RelTools] Validateenv fails if source is not present
+    DEF064912  validaterel does not report filename of reclassified export
+    DEF065010  CBR Tools treat "-exports" as "exports"
+
+Compatibility Notes:
+*   The CBR Tools were incorrectly interpreting the (illegal) MRP syntax "-exports"
+    to mean "exports". Version 2.80 of the CBR Tools corrects this defective action
+    and will now stop with the fatal error, 'Error: Unknown keyword "-exports" in
+    [file.mrp]' should this be encountered (where [mrp.file] is replaced by the
+    path to the actual MRP file containing the incorrect syntax). Actions to
+    resolve: 1. Ensure no MRP files contain the illegal syntax. 2. Use the
+    -export_file syntax instead (if required). 3. Be aware that any files thought
+    to have been excluded from export were actually being exported.
+*   CBR Tools release 2.76.4 inadvertently 'touch'ed the files as a result of
+    reapplying the MSDOS file attributes after unzipping (e.g. during a getenv
+    operation). This overwrote the original Modified timestamps with the current
+    system time. CBR Tools release 2.80 will preserve the timestamps as all releases
+    prior to 2.76.4 used-to. If any dependency has been introduced based on this
+    unintentional change then the actions to resolve will depend on the actual
+    implementation of the dependency. We do not believe it is likely that any issue
+    will exist due to the obscurity and relative short life of this defective
+    action.
+*   Additional -v (verbose output) has been added to the tools during GPG
+    decryption. This will permit the output from the encryption utility to be seen.
+    This brings the decryption action into line with the encryption action which
+    already displays the utility output. During a CBR import and when in verbose
+    mode, this additional output will be included in the command output. The
+    additional output will follow the form of the encryption output display in that
+    each line will be indented with a tab character. These lines may be safely
+    ignored as verbose output.
+*   IPR categorisation of source files was until recently restricted to A-G or X
+    (for undefined). Any letter: A-Z, is now permitted (with X retaining its special
+    property of representing "IPR not specified"). The behaviour in previous
+    versions of the tools was undefined should a previously-invalid categorisation
+    have been encountered. In the unlikely event that any dependencies were created
+    on this undefined behaviour then each will need to be looked at to determine
+    sensible resolutions.
+*   Export table syntax has been updated to allow for separate treatment of source
+    and exports. The old syntax is still supported but more rigorous error checking
+    will ensure that any invalid content will cause a fatal error to be thrown. Only
+    the keywords "exclude", "exclude_bin", IPR categories consisting single letters
+    "A"-"Z" and whitespace will be allowed. Any other punctuation will not be
+    permitted, e.g. hyphens, brackets, braces etc. These were not explicitly
+    disallowed in the previous versions but must now be, to allow the additional new
+    syntax to be checked properly. Actions to resolve any issue: 1. restrict export
+    table content to only the above permitted keywords and the new syntax (details
+    of which will are available in the documentation).
+
+-----------------------------------------------------------------------------------
+
+Version 2.76.4
+Made by Nic Percival, 15/02/2005
+
+From Nic Percival:
+* Fixes for:
+    DEF054892 - Missing option "exclude_bin" from the documentation in module "Installation"
+
+From Hocine Adjerid:
+* Fixes for:
+    DEF053737 - [Reltools] CBR Tools Fail to work with "testexports" keyword
+    DEF051278 - [Reltools] zip does not accept filenames with '['
+    DEF050304 - [Reltools] Commands within the RelTools indicate they are not supported
+    DEF050374 - [Reltools] importrel should not rely on EPOCROOT being set
+    DEF051241 - [Reltools] CBR tools provided GnuPG does not support IDEA encryption algorithm
+    DEF049473 - [Reltools] CBR tools users must not 'send us a patch'
+    DEF052150 - [Reltools] importrel/importenv are case sentive in 2.76.3 unlike earlier version
+    DEF051424 - [Reltools] RemoteSite::NetDrive unhelpful
+* Implemented CR:
+    CR-EKOS-653GJ9 :  add the possiblity to exclude binaries from a component when exporting.
+
+From George Sin:
+* Fixes for:
+    DEF043802 - [Reltools] CleanLocalArch is not atomic in it's move operations
+    DEF049619 - [Reltools] viewnotes -d between gt_techview and gt_only_baseline crashes
+    DEF049823 - [Reltools] Cleanlocalarch in release tools 2.76.2 documentation needs updating
+    DEF047825 - [Reltools] CBR tools inefficient at searching for releases
+    DEF043820 - [Reltools] lastestver documentation is unclear
+* Implemented CR:
+    ABEK-63REXV: Option to overwrite destination when using cleanlocalarch of the CBR tools.
+    CLEN-65CEUW: RemoveSource functionality needed for redundant components found during a Getenv\Getrel command
+    JROE-62DHSZ: Add support to CBR viewnotes to output HTML on stdout rather than creating a file.
+    EMAE-68LJZF: Minimising CBR delta sizes when transferring CBR builds between parties with shared source access
+
+From Larry Knibb
+* Fix for:
+    DEF053799 - [Reltools] CBR tools do not preserve file attributes
+
+
+From Conor Lennon:
+* Fix for:
+    DEF051830 - [Reltools] reltools 2.76.3 causing IO errors
+* Implemented CR:
+    CLEN-65CF94 Baseline component for DevLib and Documentation components so as to install documention as an option
+    CLEN-65CEUW  Remove Source functionality needed for redundant components found during a Getenv\Getrel command
+
+-----------------------------------------------------------------------------------
+
+Version 2.76.3
+Made by Iain Williamson, 04/11/2004
+
+From Conor Lennon:
+*Fix for:
+    DEF050197  [System Build] CBR Warnings in 03387 (8.1a) introduced by new RelTools
+
+-----------------------------------------------------------------------------------
+
+Version 2.76.2
+Made by Nic Percival, 08/10/2004
+
+From Hocine Adjerid:
+* Fixes for:
+    DEF045203  CBR Tools do not support all FTP server s/w
+    DEF048538  CBR: Archive::Zip module truncates some files during unzip
+    DEF049213  zip.exe does not accept name with '['
+    DEF049351  CBR tools do not find cbrtargetalias unless EPOCROOT is set to /
+
+From George Sin:
+* Fixes for:
+   DEF045331  RelTools v2.74 fail on removesource if full component not present
+   DEF046291  Latestver of the reltools does not like archives that don't exist
+   DEF047874  Cleanlocalarch determine from the output if it's was a dummy run
+   DEF047458  Release tools: ftp_timeout field not used
+   DEF047935  Reltools docs error
+
+* Also includes implementation for CR WROS-5ZLKHS Provide a tool which can create a new version
+  of a CBR component by copying and manipulating the archive metadata of an existing version
+
+From Iain Williamson:
+* Implemented CR ABEK-5z5GXE Usable CBR archive cleaning - new keep_recent_rel
+  and keep_recent_env keywords
+
+From George Sin:
+
+* Fixes for:
+   DEF047062 [Reltools] CBR Tools fail to identify the need to upversion a component.
+   DEF048513 [Reltools] validateenv does not check for additional binaries.
+
+From Uma Ahamed:
+* Added fix for DEF045288 - latestver and viewnotes don't work in 2.75.2 with gt_only_baseline
+
+-----------------------------------------------------------------------------------
+
+Version 2.76.1
+Made by Iain Williamson, 11/08/2004
+
+From Uma Ahamed:
+
+* Added fix for DEF043802 "CleanLocalArch is not atomic in it's move operations"
+
+* Added fix for DEF046030 "cleanenv removes component without re-installing it"
+
+From George Sin:
+
+* Fixes for:
+   DEF043820  lastestver documentation is unclear
+   DEF044978  Error in how source is unpacked in the Release tools...
+   DEF045715  Incorrect warning about -binary in comms-infras_commdb_cedar
+   DEF046148  Release Tools do not allow spaces in their installation directory
+   DEF046325  RelTools don't report correct error messages in local arch disc
+     full conditions
+   DEF046711  Release tools 2.76 cannot install files that already exist and is
+     read only...
+
+From Hocine Adjerid:
+
+* Fix for DEF046532  RelTools v2.76 won't configure to work with an internal
+    proxy for FTP traffic
+
+-----------------------------------------------------------------------------------
+
+Version 2.76
+Made by Iain Williamson, 07/06/04
+
+From George Sin:
+
+* Have added all build from anywhere functionality as part of PR0097.
+
+* The keyword source_map is now accepted in the reltools.ini file.
+
+* In source documentation updated to refect the change.
+
+From Nic Percival:
+
+* Added fix for DEF045096, retry gpg if it fails with return code 2.
+
+From Iain Williamson:
+
+* Fixes for DEF043798, 043802, 044943 and 044944 (various cleanlocal/remote
+  archive defects)
+
+From Paul Ross:
+
+* Added fixes for DEF045417, DEF045416, DEF045414, DEF044950, DEF044948
+  DEF044947, DEF044946, DEF044781, DEF044778, DEF044777, DEF044775, DEF044773
+  DEF044771 (code review defects)
+
+-----------------------------------------------------------------------------------
+
+Version 2.75.2
+Made by Iain Williamson, 10/05/04
+
+From Paul Ross:
+
+* Suppressed warning of missing alias file if not using 'all' functionality
+  (DEF044726)
+* Suppressed directory listing during FTP (DEF044724)
+
+From Iain Williamson:
+
+* Fixed 'argument "n.nn.n" isn't numeric...' warning (DEF044699)
+
+From George Sin:
+
+* Fixed broken link when building 'MakingReleases' doc (DEF044976)
+
+-----------------------------------------------------------------------------------
+
+Version 2.75.1
+Made by Iain Williamson, 23/04/04
+
+From Paul Ross:
+
+* Fixed bug where tools failed to obtain the correct IPR category for export
+  restricted files (DEF044565)
+
+-----------------------------------------------------------------------------------
+
+Version 2.75
+Made by Iain Williamson, 21/04/04
+
+From Paul Ross:
+
+* Added support for the aliasing system in MRP files, for example using
+  a target 'ALL' in an MRP file.
+
+* The data needed to resolve aliases is in \epoc32\tools\variant\cbrtargetalias.cfg,
+  if this is absent a warning is issued only when required and then only once.
+  The warning can be suppressed by the presense of a flag 'no_target_alias_warning'
+  in the reltools.ini file.
+
+* In IniData.pm added APIs ReadTargetAlias(), ReadTargetAliasFile() to read the
+  alias file. Added APIs HasTargetPlatforms() and TargetPlatforms() to resolve
+  MRP aliases. Added API CheckAliasWarning() to handle the absence of alias
+  file warning.
+
+* In MrpData.pm added implementation code in HandleBinSet() to provide resolution of
+  aliases if appropriate.
+
+From Adrian Taylor:
+
+* Removed obsolete GenMrp and UpdateMrp commands.
+
+* Marked several obscure tools as 'unsupported'
+
+* Added warnings if -binary or -export_file are not doing anything.
+
+* Added two new types of remote archive: 'experimentalftp' and
+  'experimentalproxy'. These are exactly the same as 'ftp' and 'proxy',
+  but use a different algorithm for listing the contents of the FTP site.
+  You may find that these new remote site types work successfully with
+  CleanRemote, whilst the standard 'ftp' and 'proxy' types almost
+  certainly will not.
+
+* Rejigged the test suite to use a real FTP site for testing.
+
+-----------------------------------------------------------------------------------
+
+Version 2.74
+Made by Adrian Taylor, 12/02/04
+
+This version is identical to 2.73-Testing-Only.
+
+-----------------------------------------------------------------------------------
+
+Version 2.73  *** TESTING ONLY ***
+Made by Adrian Taylor, 30/01/04
+
+From Adrian Taylor:
+
+* Added -i flag to GetRel
+
+* Ensured little dots march across screen even with the dodgy IO layer
+  of Perl 5.8.x
+
+* Fixed bug where tools didn't complain if EPOCROOT wasn't set (DEF041251)
+
+* 'component' argument to EnvInfo -f <component> was case-sensitive. INC040759.
+  Fixed.
+
+* Added Optimisation document.
+
+* Added new field to reldata: 'first compatible version'. This shows the first
+  version of the tools that a given release should work with. It's set based on
+  the CategoriseXXX features in the reltools.ini. GetRel and GetEnv issue a
+  warning if they're trying to install a release that's too recent.
+
+* Added optional version number filter to LatestVer, so it only shows versions
+  with a certain phrase in their version number.
+
+* Tests for GetSource -i, GetRel -s and GetRel -si added to test suite.
+
+* Fix for serious bug, introduced in 2.71, where duplicate ownership files were
+  sometimes not reported.
+
+* Increased diagnostics for problems listing directories on FTP sites, to try
+  to work out what's up with the Symbian FTP site.
+
+* Increased robustness of RemoteSite::FTP::DirList now I've seen the symptoms
+  that the Symbian FTP site has.
+
+* Improved efficiency of ExportEnv - it no longer does so many redundant checks
+  to find out if a release has already been exported.
+
+* Upgraded Net::FTP to libnet-1.17
+
+* Reverted 2.72 change where FTP connections used 'dir' instead of 'ls'. This
+  will reveal problems with CleanRemote, which I have tried to work around.
+
+From Matt Davies (merged by Ade):
+
+* Fix for INC040720 - CBR Tools: Categorised Exports cannot have spaces in the source path
+
+-----------------------------------------------------------------------------------
+
+Version 2.72
+Made by Adrian Taylor, 4/12/03
+
+From Adrian Taylor:
+
+* Added 'testexports' MRP directive
+
+* Re-enabled limited SourceInfo functionality
+
+* Fixed many bugs in CleanRemote.
+
+* Ensure 'PGP passphrase' prompt is never invisible even on Perl 5.8.x
+
+* Added \epoc32\release\tools\* to the list of standard ignores, as the
+  files in there are intermediate files. (They get copied to \epoc32\tools,
+  which is the final resting place). See DEF039764 for the reasoning.
+
+* Prevented the use of Win32::Semaphore module when disable_win32_extensions
+  is turned on
+
+From Joe Branton:
+
+* Added checks to ensure that all exported files referred to by an MRP file physically
+  exist. Also added a defensive check to Utils::ZipList to throw an error if any
+  of the files being zipped are not present (previously such situations were being
+  ignored).
+
+-----------------------------------------------------------------------------------
+
+Version 2.71
+Made by Joe Branton, 08/10/2003
+
+Know Problems:
+
+* The command 'SourceInfo' is broken in this release.
+
+From Adrian Taylor:
+
+* Removing -d option from LatestVer documentation
+
+* Removed annoying FTP site prompting with LatestVer -vv when no FTP site
+  defined.
+
+* Prevented the version number '0' which confused the tools
+
+* Fixed bug which prevented BinInfo <file> working if the component was
+  pending release.
+
+From Joe Branton:
+
+* Added support for EPOCROOT with a value other that '\'. When installing binaries
+  they will be installed into %EPOCROOT%\epoc32. When making releases, EPOCROOT is
+  not stored in the zip files, thereby allowing a release to be installed into an
+  environment configured with a different EPOCROOT.
+
+* Added support for a new environment variable - SRCROOT. This is similar to EPOCROOT
+  except that it defines where the release tools install source (by default - the -i
+  option can still be used to override this). SRCROOT information is not stored in
+  release zip files.
+
+* Added support for relative paths in MRP files. You can now do things like:
+
+    binary . all
+    exports ..\somepath
+
+  Such paths are read as being relative to the directory inwhich the MRP file is stored.
+  If absolute paths are specified, the following rules apply to each keyword:
+
+    'notes_source <file>'                    - SRCROOT is prepended to <file>.
+    'source <file|dir>'                      - SRCROOT is prepended to <file> or <dir>.
+    '[-][test]binary <abld_path>'            - SRCROOT is prepended to <abld_path>.
+    '[-][test]binary <file|dir>'             - EPOCROOT is prepended to <file> or <dir>.
+    'exports <abld_path>'                    - SRCROOT is prepended to <abld_path>.
+    '[-]export_file <src_file> <dest_file>'  - SRCROOT is prepended to <src_file>.
+                                             - EPOCROOT is prepended to <dest_file>.
+
+  Note, it is assumed that all components are EPOCROOT compliant (i.e. only generate files
+  within %EPOCROOT%). Currently at least one component (Java) is known to not comply. This
+  has the consequence that it is not currently possible to release Java using an EPOCROOT
+  of anything other than '\'. It also means that when installing an environment containing
+  Java, its 'erj' directoy will be put in %EPOCROOT%\erj rather than \erj.
+
+  Tools developers note, within MrpData all paths are stored in absolute form, but
+  without EPOCROOT or SRCROOT at the beginning. This is because parts of MrpData get
+  written into RelData objects, and these need to be independent of EPOC/SRCROOT. The
+  consequence of this is that care must be taken both within MrpData and by users of
+  MrpData to prepend EPOCROOT or SRCROOT as appropriate before using the paths.
+
+* Added support for :zip statements in the PRJ_EXPORTS section of bld.inf files. Note,
+  at the time of writing bldmake.pl contained bugs in it's implemention of this
+  functionality. Tested against a hacked version of bldmake.pl that contained fixes to:
+    a) "abld -w export" listing "\" as an export (bug in GetArchiveExportList()).
+    b) "abld -w export" not listing exports relative to EPOCROOT.
+
+-----------------------------------------------------------------------------------
+
+Version 2.70
+Made by Adrian Taylor, 07/08/2003
+
+From Adrian Taylor:
+
+* Better error checking of 'unzip' return code, detecting invalid releases.
+  Similarly with GPG.
+
+* Fix to allow 'perldoc CleanEnv' to produce the command manual page,
+  rather than the manual page for the internal module.
+
+* Fixed problem with -f option on Push/Pull/Rel/Env
+
+* Worked around bug in Perl 5.8.0 itself, which prevented GetRel -p and
+  MakeRel -p from working (Perl bug #21217)
+
+* Fixing minor bug in test suite t_snapshot and Perl 5.005
+
+-----------------------------------------------------------------------------------
+
+Version 2.69
+Made by Adrian Taylor, 30/7/2003
+
+From Adrian Taylor:
+
+* Fixing bug in ValidateEnv which resulted in complaints about "uninitialised
+  value at line 644".
+
+-----------------------------------------------------------------------------------
+
+Version 2.68
+Made by Adrian Taylor 23/7/2003
+
+From Adrian Taylor:
+
+* Fixing bug in ValidateRel. If there was a component with binary files,
+  none of which were within \epoc32, and no source code files, its status
+  would always be reported as clean by validation.
+
+-----------------------------------------------------------------------------------
+
+Version 2.67
+Made by Joe Branton 9/07/2003
+
+From Adrian Taylor:
+
+* Fixing bug in ValidateRel. If you had a pending release component, then
+  you validated against a component that didn't match what you had, the tools
+  got temporarily confused and you had to PrepRel the component to get things
+  back to normal.
+
+From Joe Branton:
+
+* Added '-d' option to CleanLocalArch to allow dummy runs to be performed.
+
+* Changed behaviour of CleanLocalArch so that it cleans entire releases - previously
+  it left reldata files behind in an attempt to preserve release note history. However
+  with this file in place the tools will not warn the user if they attempt to install
+  the corresponding release even though there is nothing to install. This issue
+  needs to be addressed in a more fundamental way. For the time being cleaned releases
+  are removed without trace.
+
+* Removed output to STDERR from the majority of the tools. Note, this has not been done
+  for the Net (FTP etc) modules and IPRTOOL since sources are not technically part of
+  the release tools and we don't want to branch them.
+
+-----------------------------------------------------------------------------------
+
+Version 2.66
+Made by Adrian Taylor 24/06/2003
+
+From Adrian Taylor:
+
+* Reinstating CleanLocalArch command
+
+-----------------------------------------------------------------------------------
+
+Version 2.65
+Made by Joe Branton 16/06/2003
+
+From Adrian Taylor:
+
+* Fixing bug in MakeSnapShot - no error message was printed if the filename
+  was not specified
+
+* Fixing bug which prevented 'viewnotes -s <comp>' when <comp> not installed
+
+From Joe Branton:
+
+* Fixed defect that caused .lib file binaries (and potentially other duplicate files
+  to be incorrectly categorised. Duplicate files should now be put into the 'unclassified'
+  category so that they are available regardless of the user's 'required_binary'
+  configuration.
+
+-----------------------------------------------------------------------------------
+
+Version 2.64
+Made by Joe Branton 8/5/2003
+
+From John Roe (merged by Joe Branton):
+
+* Fixed bug in mrp parser that caused an error to be thrown when parsing mrp files
+  with multiple "exports" statements with export classification enabled.
+
+-----------------------------------------------------------------------------------
+
+Version 2.63
+Made by Andy Salter 14/04/2003
+
+From Andy Salter:
+
+* Added EnvUserName to reldata.pm and viewnotes.
+
+-----------------------------------------------------------------------------------
+
+Version 2.62
+Made by Joe Branton 07/04/2003
+
+From Adrian Taylor:
+
+* Fixed bug that prevented reltools.ini keyword 'pasv_transfer_mode' from working.
+
+* Added helpful error message if Utils::SplitFileName dies due to a known bug in Perl 5.6.0 (fixed in 5.6.1)
+
+* Added more files to blddocs
+
+* Ignore whitespace at start and end of lines with getrel -p
+
+From Andy Salter:
+
+* Added -o option to ViewNotes, to allow writing output to a file or directory.
+
+From Joe Branton:
+
+* Added utility InstCol2. See documentation for details.
+
+* Fixed minor interface bug in BinInfo - died nastily if given no arguments.
+
+* Fixed defect in ini file parser that caused spurious "Unknown keyword" errors to be
+  displayed when running the test t_exportimport. It's unlikely that this defect would
+  ever be seen in 'the wild' because it would have been necessary for the Perl variable
+  $1 have been set before parsing the ini file. Since the tools always parse the ini file
+  pretty much before doing anything else, this is unlikely to happen. (Also in 2.60.01)
+
+* Fixed identical problem to that described above in MrpData. (Also in 2.60.01)
+
+* Integrated latest version of IPRTOOL (provided by Uma Ahamed) which fixes problem
+  relating to '.' characters in directory names. Removed corresponding assertions from
+  MrpData.
+
+From Iain Williamson (merged by Joe):
+
+* Fixed defect in the way the required_binaries reltools.ini keyword is handled. Now,
+  for example, specifying 'wincw' will not result in 'wins' also being installed.
+  (Also in 2.60.01)
+
+* Added -i <source install directory> option to GetEnv (mirrors GetSource -i option).
+  Note, the supplied patch was slightly modified - the logic for checking that -i is
+  always accompanied with -s was wrong. (Also in 2.60.01)
+
+-----------------------------------------------------------------------------------
+
+Version 2.61
+Made by Joe Branton 13/03/2003
+
+From Joe Branton:
+
+* Extended the behaviour of Im/ExportRel regarding the handling of a list of component
+  versions specified in a text file. The commands now support im/exporting multiple
+  versions of the same component.
+
+* Fixed minor interface bugs in ViewNotes. Now correctly reports when a component
+  does not exist, rather than displaying an empty web page.
+
+* Added 'dummy run' option (-d) to CleanRemote.
+
+* Overhalled configuration of the automated tests. There is now a 'developer_specific.txt'
+  configuration file in the 'configs' directory which should be all developers need to
+  change in order to set up the test harness. The various configurations are generated
+  using a new module ConfigMaker. This provides some C pre-processor like functionality
+  to allow the amount of duplication between configurations to be minimised. See the test
+  documentation for details.
+
+* Fixed defect in ini file parser that caused spurious "Unknown keyword" errors to be
+  displayed when running the test t_exportimport. It's unlikely that this defect would
+  ever be seen in 'the wild' because it would have been necessary for the Perl variable
+  $1 have been set before parsing the ini file. Since the tools always parse the ini file
+  pretty much before doing anything else, this is unlikely to happen.
+
+* Fixed identical problem to that described above in MrpData.
+
+* Added MrpComplexity command. See documentation for details.
+
+* Fixed defect in PrepEnv interactive mode that caused it to prematurely abort if an
+  internal version was not specified when internal versions are required. It now reports
+  an error and carries on.
+
+* Added new commands MakeSnapShot and InstallSnapShot. See documentation for details.
+
+From Adrian Taylor:
+
+* Tidied error message in PathData/ProjectBased
+
+* Fixed regression in 2.59 where diffenv -v no longer overrode -d
+
+* Clarified documentation of -a in latestver
+
+* Added further documentation for -n in viewnotes
+
+* Clarified messages printed by validate[env|rel] -vs
+
+* Spaces at the end of 'source XXX' lines in MRP files are now ignored
+
+Note this release did NOT contain the changes made in 2.60.01 below. These fixes
+have been merged in 2.62.
+
+-----------------------------------------------------------------------------------
+
+Version 2.60.01
+Made by Joe Branton 31/03/2003
+
+From Iain Williamson (merged by Joe):
+
+* Fixed defect in the way the required_binaries reltools.ini keyword is handled. Now,
+  for example, specifying 'wincw' will not result in 'wins' also being installed.
+
+* Added -i <source install directory> option to GetEnv (mirrors GetSource -i option).
+  Note, the supplied patch was slightly modified - the logic for checking that -i is
+  always accompanied with -s was wrong.
+
+From Joe Branton (bug fixes taken from latest branch to get tests to pass):
+
+* Fixed defect in ini file parser that caused spurious "Unknown keyword" errors to be
+  displayed when running the test t_exportimport. It's unlikely that this defect would
+  ever be seen in 'the wild' because it would have been necessary for the Perl variable
+  $1 have been set before parsing the ini file. Since the tools always parse the ini file
+  pretty much before doing anything else, this is unlikely to happen.
+
+* Fixed identical problem to that described above in MrpData.
+
+----------------------------------------------------------------------------------
+Version 2.60
+Made by Joe Branton 26/02/2003
+
+From Joe Branton:
+
+* Fixed defect in new export categorisation functionality that caused a
+  "Can't use string as an ARRAY" Perl error for components whose mrp file contained
+  an 'exports' statement, but which did not actually export anything.
+
+* Changed the way that exported files are IPR classified. Previously the classifications
+  were read from the corresponding source file classifications. However, this meant
+  that unless exported files are released as source, the tools would fail to find
+  the classification and throw an error. Now IPRTOOL is invoked to explicitly classify
+  the source of every  exported file, which lifts this limitation.
+
+-----------------------------------------------------------------------------------
+
+Version 2.59
+Made by ---, --/--/--
+
+From Adrian Taylor:
+
+* 'envinfo' and other read-only commands will no longer try to create all the
+  archives listed in your reltools.ini.
+
+* Fixed documentation error in latestver
+
+* Added check that 'source' directories do not contain '.', because iprtool
+  fails and therefore no source gets packaged up.
+
+* Improved realism of 'fake abld' in test suite.
+
+* Added check that archive_path lines in reltools.ini have a remote path
+  specified, when it's needed.
+
+* Added -d flag to 'ViewNotes' which produces a single HTML page concatenating
+  the release notes between one environment and another.
+
+* Changed DiffEnv to use a new class, EnvDifferencer.pm, which is also used
+  by ViewNotes.
+
+* Added warning to CheckBc that it requires Perl 5.6.1
+
+* Added information to "Installation" about where to get Perl 5.6.1
+
+* Added tests for 'viewnotes'. Added minimal tests to ensure that CheckBc
+  and CheckRls do at least run
+
+* getenv -o now overwrites binaries as well as source (including pending
+  release components)
+
+* Added new "Further Information" document and added information to
+  "Quick Start".
+
+* Fixed bug making releases of 'tools rel' or 'tools deb' components
+
+From Joe Branton
+
+* EnvSize now checks that the user has provided a component name before attempting
+  to calculate its sizes.
+
+* Added 'categorise_exports' keyword and corresponding functionality. See the
+  'Installation' section in the documentation for details.
+
+* Added '[-]export_file' mrp keyword and corresponding functionality. See the
+  'Making Releases' section in the doucmentation for details.
+
+* Added '-d' option to blddocs. By default 'Implementation Notes' are no longer
+  generated. This option can be used to override the default.
+
+* Added 'exclude' keyword and corresponding functionality to the export table parser
+  ExportData. See the 'Installation' section in the documentation for details.
+
+* Changed the failure report summaries of ImportEnv and ExportEnv to print a formatted
+  table.
+
+* Added multi-volume export / import functionality to allow exports to be done
+  do writable CD drives and the like.
+
+-----------------------------------------------------------------------------------
+Version 2.58
+Made by Adrian Taylor, 15/01/03
+
+From Adrian Taylor:
+
+* Fixed bug introduced in 2.56 where an environment scan would continue
+  to run if a binary file didn't exist. This reported very confusing
+  error messages from envinfo and makeenv, and if you agreed to the
+  prompts, cleanenv would delete extra files.
+
+* Added extra documentation and warning messages to prepenv, to note
+  that it doesn't always notice dirty components.
+
+* Fixed prepenv bugs. Firstly, it ignored new MRP locations. Secondly,
+  it misleadingly implied you didn't have to specify a new internal
+  version number for updated components.
+
+* Table formatter always now displays using text format if the output
+  is not a TTY.
+
+* Added -d flag to exportrel and exportenv, which means 'dummy run'.
+  It reports what would happen, without actually doing anything.
+  In particular it reports what PGP keys will be used to encrypt each
+  file.
+
+-----------------------------------------------------------------------------------
+
+Version 2.57
+Made by Adrian Taylor, 09/01/03
+
+From Joe Branton:
+
+* Fixed bug relating to unpacking zip files (say from a getsource) into a directory
+  that doesn't exist. It seems that zip can cope with a single directory not exisiting,
+  but not more than one.
+
+* Added vtable checking functionality to CheckBc.
+
+* Added options to CheckBc to allow individual tests to be disabled.
+
+* Added utility CheckRls.
+
+* Added check to ensure the EPOCROOT environment variable is set to '\'.
+
+* Fixed bug in PrepRel/Env that allowed a new mrp file to be specified without specifying a new version.
+
+From Adrian Taylor:
+
+* Added envsize command
+
+* Added reporting of release size into viewnotes
+
+* Added extra check to exporting, to ensure that the size of the resulting
+  file on the FTP site matches the expected size.
+
+* Added flag -x to exportenv, to just check the size of the exported files
+  instead of doing any exporting. This can provide a report of what exported
+  components are corrupted, if there's a dodgy FTP site.
+
+* Fixed bug in MrpData where directories reported by 'abld -what' would
+  get included in the zip file, instead of their contents.
+
+* Optimised sourceinfo <component>
+
+* Added extra check that the component name in the MRP file matches the component
+  name in the environment database. ("The Fitzgerald Case").
+
+* Changed test suite so t_run requires a drive letter as a command-line
+  argument. (Because I managed to run it on C: and delete most of c:\apps
+  before I realised what was happening...)
+
+* Importenv/exportenv problem summary now displays what went wrong.
+
+* Added -t flag to validaterel, which stops deletion of the temporary
+  directory. This allows further investigation with evalid and other tools.
+
+* Fixed MRP parsing bug where there were comments on the ends of lines
+
+* Made third (remote path) argument to 'archive_path' in reltools.ini optional
+
+* Fixed typo in listcomponents help
+
+* Fixed bug in Excel table formatter where 001 was coming out as 1
+
+* Added -a [number] option to latestver, to show the last 'n' releases.
+  Also allowed -vvv to work even if there is no remote site properly
+  defined.
+
+-----------------------------------------------------------------------------------
+
+Version 2.56
+Made by Adrian Taylor, 21/11/02
+
+From Adrian Taylor:
+
+* Added SourceInfo tool. This shows what source files belong to
+  a component, and vice-versa.
+
+* Added BuildRel tool, which will try to build all the platforms
+  listed in the MRP file of that component.
+
+* Stopped envinfo -f from classifying all the source code. We now do
+  it only when you actually require the classified source code. This
+  makes environment scans about five times as fast when you have lots of
+  components pending release.
+
+* Added table_format keyword to reltools.ini, allowing you to see the
+  output of envinfo, latestver and similar commands in Excel, HTML or
+  CSV format if you like. (Reason: the reports that sourceinfo outputs
+  are far too long to be readable in a console).
+
+* Added 'all' option for binary MRP syntax. e.g.
+   binary \rabbit\hole\group all
+  (Reason: a licensee wanted all possible binaries delivered).
+
+* Changed exportenv to warn if components aren't in the export table,
+  before it starts tranferring data.
+
+* Added a little more readily available information to viewnotes output.
+
+* Fixed bug in viewnotes -s <comp> where <comp> didn't exist - the error
+  message was illogical.
+
+* Fixed bug in MergeEnvironments where -i would stop it all from working
+
+* Fixed bug where extension makefiles using the TO_ROOT variable would
+  cause envinfo to report unknown origins.
+
+* Fixed typo in spelling of disable_win32_extensions. The old spelling
+  still works.
+
+* Tidied up the options that were added to prepenv in 2.55.
+
+* envinfo now states component names in error messages during its
+  scanning phase.
+
+* Checking for error-free completion of bldmake bldfiles.
+
+* Fixed bug where duplicate item checking for MRP binaries was
+  sometimes case-sensitive with categorise_binaries
+
+* Notice more errors from abld build -w and build makefile to fix
+  them.
+
+* Fixed bug where "exports xxx" line in MRP wouldn't trigger bldmake. Normally
+  this was OK because there would be a 'binary' line first which would call
+  bldmake.
+
+-----------------------------------------------------------------------------------
+
+Version 2.55
+Made by Adrian Taylor, 07/11/2002
+
+From Joe Branton:
+
+* Changed CleanEnv so that it removes empty directories associated with the clean.
+
+* Added -d option to DiffEnv. This causes the command to ignore components that are
+  younger in the first environment compared to the second. Useful when younger
+  releases are known to be backwards compatible with older ones.
+
+* Added 'globbing' functionality to BinInfo. You can now do things like:
+	bininfo \epoc32\release\wins\udeb\*.dl?
+
+From Adrian Taylor:
+
+* Fixed bug where project-style archive structures would not successfully create
+  directories on network shares.
+
+* Added -t option to diffrel, to allow you to specify a particular diffing tool
+  on the command line. This is useful with -t "diff -bBru" to produce diff
+  files, that can later be used with the 'patch' command to patch another version.
+
+* Removing troublesome debug print from RelData when using -v and a new-style
+  archive path.
+
+* Added lots of options to prepenv. -l: shows latest version of each component
+  available. -i <num>: always use this internal version number. -m: don't
+  prompt for MRP location. -p: skip components that are pending release.
+  These options work, but aren't very polished yet.
+
+* Added minimal test scripts for prepenv, getsource, removesource.
+
+* Added pushrel and pullrel (at last). In the process, I abstracted out
+  a lot of PushEnv, PullEnv, PushRel and PullRel into a new module,
+  called PushPullRel.
+
+* Added removesource.
+
+* Make cleanenv -f less confusing with another message.
+
+* bininfo <component> now works for components that are pending release.
+
+* bininfo <file> now reports if a file is part of an ignore_binary line
+
+* getrel -o now overwrites binaries as well as source.
+
+-----------------------------------------------------------------------------------
+
+Version 2.54
+Made by Adrian Taylor, 20/09/2002
+
+From Joe Branton:
+
+* Generally improved CheckBc. It now has been run over a pair of Hurricane source
+  trees. Only e32 and f32 are still causing problems.
+
+* Changed viewnotes so that it compiles HTML files into \epoc32\relinfo\notes and
+  reuses them if they're already present.
+
+* Fixed bug that caused auto-generation of abld.bat to fail if 'cleanenv -r' had
+  previously been run on the environment.
+
+* Modified interface to GetSource - an install directory can now be optionally be
+  specified using the switch '-i'. Previously it was specified by the last parameter
+  which made it useless if you wanted to the source for all components.
+
+* GetSource when used to get the source for all components now doesn't abort at the
+  first error.
+
+* Commands that remove comonents now throw an error if their not able to remove a
+  particular file (previously they just warned). This is to prevent the tools getting
+  into the situation where subsequently the zip utility prompts the user about
+  overwriting files.
+
+* Added some additional robustness to the signature generation code. Previously it
+  didn't ensure that all entries in the zip file were files. It turns out that some
+  zip utilities put directories as entries. If these kind of zip files are
+  encountered now, the signature is generated correctly and a warning is displayed.
+
+From Adrian Taylor:
+
+* Added new error check to project-based path data module. It now gives you
+  a sensible error message if you enter a non-existent project name.
+
+* Fixed "uninitialized value" warning from bininfo after a validateenv against
+  an external environment where you validated against a component whose binaries
+  didn't exist on the local site.
+
+* Finally fixed source validation. Previously, there were occasional false-
+  positive results (i.e. wrongly reported dirty) where a component had
+  several source code directories listed in its MRP. The sorry tale begins
+  with the need to check for added files. To do this, it has to deduce
+  what the root source code directory is for the component, then check
+  whether any extra files have been added inside that directory. If there
+  are several root directories, the algorithm goes wrong and selects too
+  'wide' a directory, where it probably will find other files inside.
+
+  The only way to solve this was to remember the "source" lines stored
+  in the MRP. From this release on, we remember that information and
+  store it in the release packet. We later use that information in source
+  validation.
+
+  This means that source validation won't fully work against releases made with
+  earlier versions of the release tools. But don't worry: you'll get a nice
+  error message explaining the situation. The only part of source validation
+  which fails is the check for added files - the check for removed files
+  and changed files still works fine.
+
+* Expanded test suite to test a variety of 'source' MRP statements.
+
+-----------------------------------------------------------------------------------
+
+Version 2.53
+Made by Adrian Taylor, 21/08/2002
+
+From Adrian Taylor:
+
+* Fixed bug where remote archive locations were getting made lowercase if you
+  use the new archive-path arrangement.
+
+* Made blddocs runnable from anywhere. Documents whichever tools version is
+  in your $PATH.
+
+* Added some extra commands/modules into BldDocs.
+
+* Fixed bug where some validateenv would set some components to dirty instead
+  of "binaries clean, source dirty". Validaterel did not have this bug.
+
+* Fixed an untidy error message in latestver
+
+* Added new tool, "MergeEnvironments". This is a specialised tool for taking
+  a subset of the components from one environment, and a subset from another,
+  and making a third environment (as a new release but without any binaries
+  or source). The intention is that you would then validate against that
+  merged environment. Currently the tool only supports the subset selection
+  using the prefix of the version number.
+
+* Made error checking in RelData.pm and MrpData.pm stricter
+
+-----------------------------------------------------------------------------------
+
+Version 2.52
+Made by Joe Branton 01/08/2002
+
+From Joe Branton:
+
+* Fixed bug in mrp parsing code that caused an assertion to fail is the component
+  concerned didn't have any binaries.
+
+* Fixed bug in mrp parsing code associated with the classification of 'tools' binaries.
+  Previously everything was expected to support the build variants 'udeb' and 'urel'.
+  'tools' has now been made a special case, and are always unclassified.
+
+* Fixed bug in mrp parsing code the prevented '-binary' from working properly when use
+  the 'categorise_binaries' reltools.ini keyword. Previously '-binary <file>' only excluded
+  binaries from the 'unclassified' category. They are not excluded from all categories.
+
+-----------------------------------------------------------------------------------
+
+Version 2.51
+Made by Adrian Taylor 26/07/2002
+
+From Adrian Taylor:
+
+* Fixed bug where envinfo -f didn't work for pending release components when
+  using a project-based archive path
+
+* Fixed a bug where validation would die if it had to make a fake signature
+
+* Fixed cosmetic error message if a release didn't exist
+
+From Joe Branton:
+
+* Fixed a bug where envinfo would complain of uninitialized values when
+  MRPs contained some strange targets
+
+-----------------------------------------------------------------------------------
+
+Version 2.50
+Made by Adrian Taylor 24/07/2002
+
+From Adrian Taylor:
+
+* Restructured the archive path arrangement. A new "archive_path" keyword
+  is now possible instead of the old "archive_path_file" keyword. See
+  the Installation document for details. This is optional; the old
+  arrangement will still work.
+
+* Fixed bug in binary categorisation where components with no binaries could
+  not be exported or envinfo'd.
+
+* Added 'listcomponents' command
+
+* Extended latestver with -aa switch, -vv and -vvv switches, and the ability
+  to show output about all installed components.
+
+* Fixed error in "usage" message of envmembership
+
+* Added additional test cases: t_bininfo, t_pushpullenv, t_latestver,
+  t_envmembership, t_envinfo, t_exportimport
+
+* Added -f ("force") flag to CleanEnv, to allow easier use in test scripts
+
+* Fixed bug in source validation where the "binaries clean, source dirty" status
+  appeared as "dirty" if the component had been dirty immediately beforehand
+
+* Fixed error message in ValidateRel if a non-existent component was specified
+
+* Components can now be validated against an external version even if they're
+  pending release.
+
+From Joe Branton:
+
+* Fixed bug in ViewNotes that prevented versions containing upper case characters from
+  being previewed.
+
+* Added CheckBc utility - does some simple tests for backwards compatibility breaks.
+
+* Added two new reltools.ini keywords - 'categorise_binaries' and 'required_binaries'.
+  The first instructs the tools to categorise binaries according to their build
+  variants. The second allows a particular individual (or project) to select which
+  build variants they require. See the documentation 'Installation Guide' for more
+  details.
+
+------------------------------------------------------------------------------------
+
+Version 2.30
+Made by Adrian Taylor 23/7/2002
+
+From Adrian Taylor:
+
+* Fixed regression caused by CommandController changes where validaterel would
+  no longer print second and subsequent validation failures.
+
+-----------------------------------------------------------------------------------
+
+Version 2.29
+Made by Adrian Taylor 22/7/2002
+
+From Adrian Taylor:
+
+* Fixed bug where source directories with "authorised <licenseename>" IPR data
+  did not get zipped up.
+
+-----------------------------------------------------------------------------------
+
+Version 2.28
+Made by Adrian Taylor 1/7/2002
+
+From Adrian Taylor:
+
+* Fixed bug introduced by source validation, where previously dirty components
+  refused to go clean again.
+
+* Used updated version of iprtool from Richard Harrison, which reports even
+  directories containing just "distribution.policy". Removed the workaround
+  added in 2.26.
+
+-------------------------------------------------------------------------
+
+Version 2.27
+Made by Adrian Taylor 28/6/2002
+
+From Adrian Taylor;
+
+* Fixed bug in CommandController stuff that stopped imports and exports working
+
+------------------------------------------------------------------------------------
+
+Version 2.26
+Made by Adrian Taylor 27/6/2002
+
+From Adrian Taylor:
+
+* Changed behaviour of ValidateRel <comp> <ver> so that it will change the version
+  number in the environment database if the validation succeeds.
+
+* Fixed bug in MrpData.pm where directories with spaces in their name were not
+  getting included in source zips.
+
+* Fixed bug in MrpData.pm where . and .. were accidentally getting put into all
+  release zips. (So far as we know, this had no effect.)
+
+* Changed (binary) validation to work properly for components which release
+  binary files outside \epoc32
+
+* Changed validation to overwrite files in the temporary directory,
+  so it should keep going under more circumstances
+
+* Fixed bug where source validation would try to validate source for components
+  without any source code.
+
+* Worked around a bug in iprtool where directories containing just "distribution.policy"
+  were not put into zip files. This upset validaterel later on.
+
+* Fixed bug in ValidateRel where it didn't keep going after first error.
+
+* Added "\epoc32\winscw\c\*" to the list of standard ignores
+
+From Joe Branton:
+
+* Added -r option to DiffRel, and fixed bugs associated with the -l option. This means
+  that now you can specify exactly which directories you'd like to diff (both the local
+  directory and/or the directory within the release zip file) if you want to.
+
+* Added a new class (CommandController) that allows certain types of commands to run
+  concurrently, and prevents others from running concurrently. Also gave temporary
+  directories a unique name to allow for this concurrency.
+
+* Added new keyword to IniData - disable_win32_extentions - this currently only disables
+  the above CommandController functionality, but I intend to use it more widely in the
+  future.
+
+------------------------------------------------------------------------------------
+
+Version 2.25
+Made by Adrian Taylor 18/6/2002
+
+From Adrian Taylor;
+
+* Fixed bug in source validation which incorrectly classified some components as
+  'binaries clean, source dirty' when they were in reality completely clean.
+
+-----------------------------------------------------------------------------
+
+Version 2.24
+Made by Adrian Taylor 17/6/2002
+
+From Adrian Taylor:
+
+* Fixed RelData.pm so that latestver works correctly even when there are
+  corrupt (blank) reldata files in the archive.
+
+* Added -s flag to ValidateRel and ValidateEnv, to permit the validation of
+  source code. The purpose of this is to detect changes to source code that
+  don't cause changes in the binaries. (For example, changes to distribution
+  policy). There are some associated changes in EnvDb; in particular
+  the addition of an extra status "binaries clean, source dirty" which
+  is only ever set by these two commands.
+
+* Updated test example output for the above change and various other recent
+  changes.
+
+------------------------------------------------------------------------------------
+
+Version 2.23
+Made by Joe Branton 10/6/2002
+
+From Joe Branton:
+
+* Fixed bug in Utils::CommonDir that caused a GetSource to get stuck in a
+  'Use of uninitialized value' infinite loop.
+
+From Lee Luchford:
+
+* Updated iprtool to latest version from GT. Fixed defect in previous version
+  which outputted all directory names in upper case
+
+-----------------------------------------------------------------------------------
+
+Version 2.22
+Made by Joe Branton 10/6/2002
+
+From Adrian Taylor:
+
+* Added facility to prefix # with \ in reltools.ini, to escape literal #
+  (in this case the need was for an FTP site password)
+
+From Joe Branton:
+
+* Fixed bug in mbld that caused '-h' to fail.
+* Changed behaviour of environment scans to improve performance when there are a lot
+  of files that will be ignored. Previously the \epoc32 tree was scanned fully and
+  at the end files to be ignored were removed from the data structure. Now the ignore
+  list is checked during the scan to allow entire directory branches to be ingored
+  without scanning them.
+* Added functionality to ViewNotes to allow it to display a summary of all the
+  release notes in a specific (or the current) environment.
+* Added 'disallow_unclassified_source' keyword to IniData and changed MrpData to
+  make use of the new flag. This is intended to allow sites to ensure that all
+  source code is given a category.
+* Fixed bug in GenMrp that was causing binary statements to be added for aif and mbm
+  files that live in \epoc32\data\z.
+* Changed GenMrp to ignore the platform 'cw_ide' (for the time being).
+* Changed GetSource so that it displays the name of the significant directory the
+  source is being unpacked into.
+* Changed GetSource so that it doesn't allow you to overwrite files that are already
+  present in your development drive.
+* Added '-o' option to GetSource, GetRel and GetEnv to allow existing source code
+  to be overwritten.
+
+-----------------------------------------------------------------------------------
+
+Version 2.21
+
+Made by Lee Luchford 29/05/2002
+
+From Lee Luchford:
+
+* Added 'cleanremote' tool to delete unwanted releases from remote archive and made
+  necessary modifications to RemoteSite modules to support this tool
+
+* Removed changes to all tools related to introduction of CleanLocalArch tool
+  (e.g checks to see if releases have been cleaned) It has been decided to remove
+  this tool in future
+
+* Fix for component name case dependency bug in getrel
+
+From James Gibbons:
+
+* Modified ValidateRel so that the binaries of a component on the current drive can be validated against
+  a version of the component other than the version held in the environment database.
+
+* Fixed usage text for EnvMembership so the name of the command is correct.
+
+From Joe Branton:
+
+* Fixed a bug in diffrel where it didn't cope with diffing components where the top level directory
+  for a component contained files (rather than just directories).
+------------------------------------------------------------------------------------
+
+Version 2.20
+
+Made by Lee Luchford 03/05/2002
+
+From Lee Luchford:
+
+* Added ftp_timeout keyword to reltools.ini. This overrides the default timeout value which
+  may not be long enough for poor FTP connections
+
+* Added ftp_reconnect_attempts to reltools.ini. This overrides the default number of reconnect
+  attempts made when the connection to the FTP site is dropped. This should be set to higher
+  value for poor FTP connections
+
+* Fixed a bug in EnvDb.pm related to the getsource command. The regular expression used
+  to grep for source files just looked for the word 'source' in the file name. Since the
+  file name includes the path if the release directory contains the string 'source'
+  all zips in the release dir are unzipped, including binaries.
+
+* Fixed getrel to handle case dependency of version numbers
+
+-----------------------------------------------------------------------------------
+
+Version 2.19
+Made by Joe Branton  15/04/2002
+
+From Lee Luchford:
+
+* Modified NotesCompiler.pm to interpret new lines as line breaks in HTML
+
+* ImportRel now checks to see if releases exist locally before connecting to the remote
+  and asking for passwords etc...
+
+* ValidateRel now takes the name of a file containing a list of
+  component names as an argument. All of the components listed in the
+  file are validated
+
+* Fixed case dependency of version numbers bug in DiffEnv
+
+* Fixed warnings in BldDocs
+
+* Fixed POD errors in FAQ document
+
+From Joe Branton:
+
+* Fixed bug that caused 'viewnotes -s' to miss out releases if there are more than one
+  release directory with exactly the same modified time. Added a record of 'the right
+  thing to do' to todo.txt (read the release dates out of RelData).
+
+* Fixed bug in bininfo that caused it to report incorrectly that there is no information
+  available when the owning component is pending release (file name case problem).
+
+* Fixed bug in makefile auto-generation code that caused components with multiple 'binary'
+  statements in the mrp file to only have their first set of makefiles generated.
+
+* BinInfo if given a component name, now displays a list of all files owned by that
+  component and their current status.
+
+* Archive path files are now checked to ensure they don't contain more than one entry
+  for the same component.
+
+* The archive path and export data files now don't need to exist until they are actually
+  required. This should allow use of tools like envinfo when not connected to the network.
+
+* Added license file for zip and unzip. Also removed the leading underscore from the
+  executable file names so as to conform to the license.
+
+* Added CleanLocalArch command which can be used to clear out old releases from a release archive.
+  See documentation for details.
+
+* Changed viewnotes -s so that the summary is ordered according the release time and date
+  stored in the release's reldata file (previously it used the timestamp of the corresponding
+  release archive directory).
+
+* Added new command - 'latestver'. See documentation for details.
+
+* Added new utility command - 'mbld'. See documentation for details.
+
+* Upgraded to the latest version of IPRTOOL (//EPOC/main/sysint/tools/iprtool.pl@140492).
+
+* ViewNotes is now tolerent to directories within a component's release archive not being releases.
+  A warning is now issued rather than bailing out altogether.
+
+* Added 'relToolsVer' tag to reldata.
+
+* Changed '\\epoc32\\data\\emulator\\epoc.sys.ini' to '\\epoc32\\data\\emulator\\*.sys.ini'.
+
+* Changed the interface to DiffRel - it'll now attempt to work out how to difference against
+  the source in a development environment (rather than having to be giving the name of a
+  directory against which to difference).
+
+* Added 'reallyclean' flag to CleanEnv. Causes it to clean out files that are normally ignored
+  from the point of view of unknown origin status (intermediate build files etc).
+
+From James Gibbons:
+
+* Added new command EnvMembership. To allow querying of baselines to see if a particular component
+  component release is present.
+
+-----------------------------------------------------------------------------------
+
+Version 2.18
+Made by Lee Luchford  28/01/2002
+
+From Lee Luchford:
+
+* Fix IO bug affecting Perl 5005 during FTP transfers. The FTP.pm module now
+  quits the FTP connection whenever an error occurs instead of just aborting the
+  failed command but keeping the connection open.
+
+* Increase TIMEOUT value in Proxy.pm module
+
+* Add -r option to export and import tools. The user can now force the use of FTP
+  resume mode from the command line overriding the ftp_server_supports_resume
+  value in the reltools.ini file
+
+* Implemented an FTP get command with resume in FTP.pm
+
+* Fix for PGP.pm. Check to see if error code defined before using in numerical
+  comparisons
+
+-----------------------------------------------------------------------------------
+
+Version 2.17
+Made by Lee Luchford 21/01/2002
+
+From Lee Luchford:
+
+* Added a fix for PGP version 7 in PGP.pm. Error codes have changed between 6 and 7
+  so errors were not being handled correctly
+
+* Changes to ExportRel, ExportEnv, ImportRel, ImportEnv and FTP.pm to handle case
+  dependency of file names on the FTP server.
+  Now when exporting, component names are all converted to lower case and the actual
+  version number (ie with the correct case) is read from the releases reldata file
+  The FTP module ignores case when checking to see if a file exists and selects the
+  correct filename to download.
+
+* Changed naming of the temporary files used during uploads to FTP sites.
+  Now of the form lpdrt*****.tmp. Should make it more obvious that we can delete
+  these files if they are left lying around on the server
+
+------------------------------------------------------------------------------------
+
+Version 2.16
+Made by Joe Branton 10/01/2002
+
+From Lee Luchford:
+
+* Added support for FTP servers with firewalls (ie passive transfers) and servers that do not
+  support reconnect and resume. Use the new keywords "pasv_transfer_mode" and
+  "ftp_server_supports_resume" in the reltools.ini to activate these features
+
+* RelTransfer::Export module modified. A failed log file send no longer reports that the actual
+  release failed to export
+
+* Removed FTP download with resume code. Not reliable at the moment.
+
+From Joe Branton:
+
+* PrepEnv and PrepRel now throw an error if a version already exists.
+
+* BinInfo now handles file name arguments of any case.
+
+* Fixed bug in EnvDb that caused duplicates to not be reported accurately when making
+  a release (or scanning an environment using EnvInfo).
+
+* Fixed bug in Utils::TidyFileName that cause UNC paths to get converted into absolute
+  paths. This caused a "Path not found" error message when making a release to an archive
+  specified using UNC paths. This is not a fatal error, but the release files do not get
+  their read only attribute set.
+
+* Testing importing/exporting against the Symbian FTP site showed that the file / directory
+  existance checking routes weren't working for this server (though they worked fine
+  against others). Changed the implementation, and tested again our normal test Linux box,
+  the Symbian server and the Bayou server.
+
+----------------------------------------------------------------------------------------
+
+Version 2.15
+Made by Joe Branton 20/12/2001
+
+From Joe Branton:
+
+* The reltools.ini keywords 'remote_username' and 'remote_password' are no longer mandatory
+  for FTP access - if not provided, they are prompted for at runtime. This also applies to
+  the keywords 'proxy_username' and 'proxy_password' for use with proxy FTP servers.
+
+* Implemented 'hidden text' password entry ('*' characters are displayed rather than the
+  actual text). This is used when the user is asked to enter encryption passphrases or
+  FTP passwords.
+
+* Fixed a bug in the NETDRIVE exporting code that caused exported files to appear in the root
+  of the current drive rather than the network drive.
+
+* Added minimal progress information to imports and exports when the verbosity level is zero.
+
+* Imported files are now set to read only in the archive (corresponding to MakeEnv and MakeRel's
+  behaviour).
+
+----------------------------------------------------------------------------------------
+
+Version 2.14
+Made by Joe Branton 19/12/2001
+
+From Lee Luchford:
+
+* In FTP.pm comment out file size comparison check for successful uploads. Appears to
+  cause problems on the Symbian FTP server
+
+* FTP move command cannot overwrite existing files. RemoteSite::FTP.pm now deletes the remote file
+  before a move is attempted
+
+* Win32::File module function calls replaced with system "attrib ..." in Utils.pm since Win32::File
+  fails in some situations
+
+* glob replaced with readdir + small fix for filtering individual source files in
+  MrpData.pm
+
+From Joe Branton:
+
+* Fixed Win2K only problem associated with finding 'evalid.bat' in the user's path. This
+  cause ValidateRel/Env to fail on Win2K machines.
+
+* DiffEnv now displays "Environments identical" rather than an empty table if there are
+  no differences.
+
+* Fixed another suspicious forward slash in file name when using GetSource.
+
+* Fixed bug in ViewNotes that caused the summary feature (available via -s) to produce
+  a summary page with broken links on IE 5.0 and Opera 6.0 (and possibly other browsers).
+  The problem was that these browsers expect any files they are asked to render to have
+  the extention .html. This is now the case.
+
+* Fixed regression in mrp parser that allowed the binary.zip file to contain multiple files
+  whose name only differs with regard to case.
+
+----------------------------------------------------------------------------------------
+
+Version 2.13
+Made by Joe Branton 27/11/2001
+
+From Joe Branton:
+
+* Fixed a regression introduced by changing the behaviour of the tools to not lower
+  the case of file names. Bug caused the tools to wrongly report files as having
+  unkown origin.
+
+----------------------------------------------------------------------------------------
+
+Version 2.12
+Made by Joe Branton 27/11/2001
+
+From Lee Luchford:
+
+* Added support for proxy FTP servers by adding RemoteSite::FTP::Proxy module
+  If remote_site_type keyword in reltools.ini has value 'PROXY' then FTP access is
+  via the proxy server and the keywords proxy, proxy_username and proxy_password must
+  be defined in reltools.ini
+
+* fix to handle FTP sites that have problems with back slashes in paths
+
+* Some changes to FTP module code for improved reconnect and resume handling
+
+* Added passive mode support to FTP module. Include pasv_transfer_mode keyword in reltools.ini.
+  If keyword specified then connects to FTP site in passive mode.
+
+* Ask for PGP passphrase in Import module constructor ie before any files are downloaded
+
+From Joe Branton:
+
+* Removed the file name case lowering behaviour of the tools. This behaviour broke certain
+  regression tests that depended upon file and directory names being in upper case (as they are
+  when the build tools create them).
+
+* DiffEnv now displays the components in alphabetical order.
+
+----------------------------------------------------------------------------------------
+
+Version 2.11
+Made by Joe Branton 19/11/2001
+
+From Lee Luchford:
+
+* ExportRel and ImportRel added support for exporting and importing multiple releases by passing
+  a file containing a list of component names and version numbers
+
+* ExportEnv and ImportEnv now check to see if all components in the environment are defined
+  in the archive path file before attempting to export/import
+
+* Various fixes for potential problems with FTP uploading/downloading in RemoteSite::FTP.pm
+
+From Joe Branton:
+
+* Added a new switch to EnvInfo (-ff). -f now displays a table of component name, version, and status.
+  -ff displays a table of component name, version, internal version status and mrp name.
+
+* Tidied up new line handling in EnvInfo when displaying progress dots and an error occurs.
+
+* PrepRel now warns before removing an entry from the environment database.
+
+* Fixed bug in PrepRel that caused entries to be removed if only the mrp name is specified.
+  Now updates the mrp name instead.
+
+* Changed PrepEnv interactive mode so that any change in an entries data is written to the database.
+  Previously the version needed to be changed to prevoke a write.
+
+* The check for binaries being released by more than one component is now done in EnvInfo
+  as well as MakeEnv.
+
+* Tidied up the output of EnvInfo, MakeEnv and CleanEnv.
+
+* ViewNotes now supports previewing the release notes for components that are currently pending
+  release.
+
+* Put the "Release environment" section of the release notes into a table.
+
+* Added a new command - ModNotes. This allows the release notes of an release that has already
+  been made to be modified.
+
+* Added a new command - BinInfo. This displays the name of the component that owns a particular
+  binary file, the currently installed version and the file's current status.
+
+* Added support for releasing test code. Mrp files now support a new keyword - 'testbinary' (and also
+  -testbinary). The syntax for this is very similar to the original 'binary' keyword.
+
+* Added support for displaying a summary of all releases to date of a particular component
+  in ViewNotes.
+
+* The ini file can now be in either \epoc32\relinfo for the directory the tools are installed
+  in. \epoc32\relinfo is checked first. If not found there, but found in the tools dir then
+  a warning is issued. To disable this warning use the new "no_ini_location_warning" keyword.
+
+* check_ignore.txt is no more. The standard ignores that used to ship in this file have been moved
+  into the body of the Perl scripts (IniData.pm to be precise). Project specific customisations
+  can be added to reltools.ini using the "ignore_binary" keyword. See the Installation Guide for
+  details.
+
+----------------------------------------------------------------------------------------
+
+Version 2.10
+Made by Lee Luchford 02/11/2001
+
+From Lee Luchford:
+
+* Rewrite of Crypt modules. Broken up into a base module Crypt.pm and 2 modules Crypt::PGP.pm and
+  Crypt::GPG.pm both of which implement an abstract interface defined in Crypt.pm
+
+* Fixed decryption bug in Crypt::GPG.pm. Open2 was not killing off child processes, now uses open
+  instead but dumps the output to a file which is then parsed for errors.
+
+* Rewrite of RemoteSite modules. Broken up into a base module RemoteSite.pm and 2 modules RemoteSite::FTP.pm and
+  RemoteSite::NetDrive.pm both of which implement an abstract interface defined in RemoteSite.pm
+
+* RemoteSite::FTP now has support for reconnect and resume for downloads and uploads
+
+* RemoteSite::FTP and RemoteSite::NetDrive both use temporary files during uploads and then rename the
+  temporary file to the final release name. Therefore .log files are no longer needed to confirm that
+  an upload was successful
+
+* RelExporter and RelImporter replaced by a base module RelTransfer.pm and 2 modules RelTransfer::Export
+  and RelTransfer::Import which inherit from the base module.
+
+* pgp passphrase errors handled better in RelTransfer::Import. Keep asking for passphrase until
+  correct
+
+* ExportRel, ExportEnv and ImportRel now have a -f option which forces the export and import of
+  releases even if they already exist
+
+* reltools.ini and check_ignore.txt now assumed to be stored in \epoc32\relinfo instead of the
+  release tools directory
+
+* Changed pgp_path keyword in reltools.ini to pgp_config_path
+
+* Changed pgp_users_keyid keyword to pgp_encrpytion_key in reltools.ini. Also this keyword can
+  be used more than once to build up a list of default keys used for encryption
+
+* Remote site type no longer determined by remote_host value in reltools.ini. Added remote_site_type
+  keyword which should have the value FTP or NETDRIVE
+
+* Added zero compression option to Utils::ZipList function
+
+* Replace globs with readdir in RelTransfer modules and EnvDb.pm
+
+From Joe Branton:
+
+* Partially fixed bug to do with the way file modified times are stored in the environment
+  database. The WIN32 Perl implementation returns file modified times taking into account
+  daylight saving. Previously they were stored in this form in the environment database,
+  which meant that when daylight saving changed, environments were reported as dirty. The
+  fix attempts to undo the daylight saving accounting, and store the times in GMT.
+
+  It is a partial fix, because testing has revealed that certain time zones (e.g. Cairo, GMT +2)
+  cause unexpected hour shifts in some files. The reason for this is currently unknown (although
+  some test code was written in C using the Windows stdlib, and this showed the same behaviour).
+
+  NOTE, ANY EXISTING ENVIRONMENT DATABASES WILL HAVE THEIR TIMES IN THE WRONG FORMAT. This
+  will manifest itself as the environment appearing completely dirty. To fix this, either run
+  ValidateEnv, or re-run GetEnv. In most cases, this problem should not return. Because of the
+  issue described above, users in some time zones may experience a recurrence of this problem
+  when daylight saving changes. Also, users that change their time zone to one of the affected
+  ones, may see this problem recur.
+
+* Release notes source files are now checked for existance as well as whether they are
+  actually a file (results in a more meaningful error message if the file does not exist).
+
+* DiffRel now removes the drive letter if specified for the source path.
+
+* PrepRel/Env now removes the drive letter if specified for the mrp file name.
+
+----------------------------------------------------------------------------------------
+
+Version 2.09
+Made by Lee Luchford 17/10/2001
+
+From Lee Luchford:
+
+* Fixed critical bug in MrpData.pm. Iprtool parsing failed in some cases causing some source
+  files to be missing from release
+
+-----------------------------------------------------------------------------------------
+
+Version 2.08
+Made by Joe Branton 12/10/2001
+
+From Lee Luchford:
+
+* Fixed bug in RemoteSite::FTP. Sometimes a release was getting exported
+  even though it already existed on the remote site. This problem occurs if the connection is
+  dropped during the check for existence of a release on the remote site. Now attempts to reconnect
+  several times if the connection is dropped, if this does not work then dies marking the export
+  as failed
+
+* Improved error handling for components mistakenly ommitted from the export table. Now throws an
+  error if the component does not exist in the export table and the release does not exist on the
+  remote site.
+
+From Joe Branton:
+
+* Added more status checking to GetEnv - now checks the status of components that will be removed
+  and warns if their status is pending release (providing an oportunity to abort the GetEnv).
+
+* Fixed a bug in PrepRel. If called with no version argument, the specified component is removed
+  from the environment database. Previously, if a component name that did not exist was specified
+  PrepRel would still report successful removal from the database. It now reports an error. It
+  also removes that component's signature file as well as the database entry (i.e. fully cleans up).
+
+* Tweaked the code in MrpData that interacts with the build tools to cope with the version shipped
+  with Hurricane. The build tools now use GNU Make for most task (rather than Microsoft's NMake),
+  and this reports errors in a different way. The old build tools should still be supported.
+
+* Automatic calling of bldmake and generation of makefiles now only does one attempt of each (rather
+  than getting stuck in an infinite loop if there is a problem).
+
+* Add protection against makefiles that list files for release with double back slashes (e.g.
+  "\epoc32\release\wins\udeb\\test.dll") since these cause problems for the zip. Double slash
+  is replaced with a single slash.
+
+* Added a check in GenMrp to ensure that the bld.inf file exists - dies cleanly if not.
+
+* Fixed a bug in DiffEnv that caused components present in "environment 2" but not in "environment 1"
+  to be wrongly assigned to "environment 1".
+
+* Added "keep going" style error handling to PullEnv.
+
+* Added "-l" switch to GenMrp to allow the source directory nesting level to be specified. This allows
+  the tool to be used effectively with GT's new sub-system directory structure.
+
+* Fixed bug that meant whitespace in the release tools installation directory name caused the
+  tools to fail badly.
+
+* Fixed "uninitialised variable" warning in the exporting commands that occurs when there is no
+  pgp_path keyword in the reltools.ini.
+
+----------------------------------------------------------------------------------------
+
+Version 2.07
+Made by Lee Luchford 19/9/2001
+
+From Lee Luchford:
+
+* Replaced CryptTool with Crypt::PGP and Crypt::GNUPG grouping
+  together all modules with a common interface for encrypting and
+  decrypting files into one directory
+  Crypt::PGP uses NA command line PGP client (executable name pgp.exe)
+  Crypt::GNUPG uses GNU Privacy guard PGP client (executable name gpg.exe)
+
+* Changed FtpSite to RemoteSite::FTP and NetworkDrive to RemoteSite::LANShare
+  grouping together all modules with a common interface for accessing
+  a remote site into one directory
+
+* Updated modules which are affected by above changes
+
+* ExportRel replaced by RelExporter and ImportRel replaced by RelImporter
+
+* All Export and Import related modules now use named argument lists in constructors
+
+* Fix to Net::Config module to remove 'uninitialized value' warning when exporting/importing
+
+* Fixed handling of PGP passphrases with blank spaces
+
+* Added the ImportRel tool for importing single releases
+
+* MrpData.pm now handles single source files listed in the mrp file.
+  Runs IPRTool on the directory where the file is stored to get the
+  category of the file.
+
+* ExportData.pm now allows comment lines starting with #
+
+* ExportData.pm now allows spaces in recipient names in column headers
+
+* ExportData.pm returns empty anonymous array references instead
+  of undef. Fixes potential dererencing a non array reference bugs
+
+* RelExporter now checks to see if PGP keys listed in export data file exist on keyring
+  before attempting to encrypt releases
+
+* Crypt::PGP and Crypt::GNUPG include fixes for handling directory names with spaces
+
+From Joe Branton:
+
+* Fixed bug in GenMrp that caused an extra invalid binary statement to be printed.
+
+* Fixed bug in EnvDb::InstallComponent that caused an invalid database entry to be
+  written if the components reldata file fails to open.
+
+* Changed EnvDb::CheckEnv so that warnings about "unknown origin" files are not displayed
+  if there were any errors parsing mrp files. This was done because errors in mrp files
+  are likely to cause many "unknown origin" as a knock on effect.
+
+* Fixed bug in MakeRel.pm that causes releases to fail if they didn't contain any source
+  or binaries (release directory not made correctly).
+
+* Fixed bug in MakeRel.pm that caused an "Uninitialised value" warning to be displayed
+  when no internal version was specified.
+
+* Fixed bug in ViewNotes that cause the page displayed by the web browser to be invalid.
+  The temporary file was getting deleted before the browser had had a chance to read it.
+  ViewNotes now pauses until the user hits a key before deleting.
+
+* Added FAQ section to documentation.
+
+* Changed EnvDb::ValidateComp to pick up evalid from anywhere in the user's path, rather
+  than only \epoc32\tools (mainly to make running the test code easier).
+
+* Added an automated test suite for testing core (non-interactive) commands.
+
+* Added 'keep going' error handling functionality to PrepEnv - total number of errors is
+  listed at the end.
+
+* Added check to PrepRel.pm to ensure that a valid mrp file name is specified.
+
+* Fixed bugs in PushEnv/PullEnv that caused UNC paths to fail.
+
+* Added better parameter checking to PushEnv and PullEnv.
+
+* Fixed bug in EnvDb::CheckComp that caused an invalid db entry to be written if a check
+  was attempted on a component that did not exists. This manifested itself in EnvInfo if
+  you give the name of a non-existent component as a parameter.
+
+------------------------------------------------------------------------------------------
+
+Version 2.06
+Made by Joe Branton 30/8/2001
+
+From Joe Branton:
+
+* Fixed (another) bug in GetEnv that cause getting an environment on a clean drive
+  to fail (doh!).
+
+------------------------------------------------------------------------------------------
+
+Version 2.05
+Made by Joe Branton 24/8/2001
+
+From Lee Luchford:
+
+* Added some additional information about setting up PGP to the Installation Guide.
+
+From Joe Branton:
+
+* Fixed a bug in GetEnv that caused environment upgrading to fail.
+
+* Fixed a bug in CleanEnv that caused re-installation of dirty components to fail.
+
+* Fixed some cosmetic problems relating to the 'dot' progress information when
+  performing an environment scan.
+
+* Added additional status output to ValidateEnv.
+
+* Added additional feedback to PrepEnv and PrepRel.
+
+* Added implementation of interactive mode to PrepEnv.
+
+------------------------------------------------------------------------------------------
+
+Version 2.04
+Made by Joe Branton 20/8/2001
+
+From Lee Luchford:
+
+* Updated CPan Net module to latest release.
+
+* Change to CryptTool to display less warnings.
+
+* EnvDb.pm, ExportRel.pm and ImportRel.pm now use File::DosGlob as a workaround to glob
+  bug in latest Perl release.
+
+* Added a new ExportRel tool to export individual releases.
+
+* Source filtering (with IPR tool) is now used by default. Therefore the source_filter
+  keyword in reltools.ini is deprecated. A new keyword, ignore_source_filter_errors, maybe
+  used to switch off displaying of source filter errors in release notes.
+
+
+From Joe Branton:
+
+* Added new tools CleanEnv, PullEnv and PushEnv (see documentation for details).
+
+* Added progress dots to environment scanning code (when used with a verbosity of 0).
+
+* Added 'keep going' type error handling to mrp file parsing during an environment scan.
+
+* Added makefile generation functionality to GenMrp.
+
+* Changed behaviour of GetEnv to work in phases. Phase 1 checks that each component in the
+  requested environment is physically available. Phase 2 removes all old binaries. Phase 3
+  installs all new binaries. This makes the process robust when binary files have moved from
+  one component into another.
+
+* Added -l option to MakeRel which causes lib files to be copied from the thumb release
+  directory if they are not found in the armi release directory.
+
+* Added progress info (via verbosity level 1) and exit info to PrepEnv.
+
+* Fixed uninitialised variable bug in GetSource when an install path is not specified.
+
+* Added extra progress info to GetSource and PrepEnv.
+
+* Changed PrepEnv to have the same syntax as PrepRel - now uses '-m' to denote an mrp file name.

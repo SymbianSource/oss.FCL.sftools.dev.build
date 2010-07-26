@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : test_parallelcopy.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test_parallelcopy" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>
+         Preparation Testing targets
+    </description>
+    <property environment="env" />
+    
+    <property name="helium.dir" location="../../.." />
+    <import file="../../../build.xml" />
+
+    <property name="preparation.temp.dir" location="${helium.build.dir}/antunit/parallelcopy" />
+
+    <target name="setUp">
+        <delete dir="${preparation.temp.dir}" failonerror="false" />
+        <mkdir dir="${preparation.temp.dir}" />
+    </target>
+
+    <target name="tearDown">
+        <delete dir="${preparation.temp.dir}" failonerror="false" />
+    </target>
+
+    <target name="prepare-test">
+        <mkdir dir="${preparation.temp.dir}/src/dir1" />
+        <mkdir dir="${preparation.temp.dir}/src/dir2" />
+        <mkdir dir="${preparation.temp.dir}/dest" />
+        <echo file="${preparation.temp.dir}/src/dir1/test.txt">Some content</echo>
+        <echo file="${preparation.temp.dir}/src/dir2/test.txt">Some content</echo>
+    </target>
+    
+    <target name="test-parallelcopy" depends="prepare-test">
+        <hlm:parallelCopy todir="${preparation.temp.dir}/dest">
+            <hlm:resourceSet>
+                <fileset dir="${preparation.temp.dir}/src" includes="dir1/**" />
+                <fileset dir="${preparation.temp.dir}/src" includes="dir2/**" />
+            </hlm:resourceSet>
+        </hlm:parallelCopy>
+        <au:assertLogContains text="1 file" />
+        <au:assertFileExists file="${preparation.temp.dir}/dest/dir1/test.txt" />
+        <au:assertFileExists file="${preparation.temp.dir}/dest/dir2/test.txt" />
+    </target>
+
+    <target name="test-parallelcopy-overwrite" depends="prepare-test">
+        <hlm:parallelCopy todir="${preparation.temp.dir}/dest" overwrite="true">
+            <hlm:resourceSet>
+                <fileset dir="${preparation.temp.dir}/src" includes="dir1/**" />
+                <fileset dir="${preparation.temp.dir}/src" includes="dir2/**" />
+            </hlm:resourceSet>
+        </hlm:parallelCopy>
+        <au:assertLogContains text="1 file" />
+        <au:assertFileExists file="${preparation.temp.dir}/dest/dir1/test.txt" />
+        <au:assertFileExists file="${preparation.temp.dir}/dest/dir2/test.txt" />
+    </target>
+    
+    <target name="test-parallelcopy-no-fileset" depends="prepare-test">
+        <hlm:parallelCopy todir="${preparation.temp.dir}/dest" />
+    </target>
+
+    <target name="test-parallelcopy-missing-todir" depends="prepare-test">
+        <au:expectfailure expectedMessage="'todir' attribute is not defined.">
+            <hlm:parallelCopy />
+        </au:expectfailure>
+    </target>
+    
+    <target name="test-parallelcopy-invalid-threads-number" depends="prepare-test">
+        <au:expectfailure expectedMessage="Invalid thread number: -1">
+            <hlm:parallelCopy todir="${preparation.temp.dir}/dest" threads="-1"/>
+        </au:expectfailure>
+    </target>
+
+    <target name="test-parallelcopy-verbose" depends="prepare-test">
+        <hlm:parallelCopy todir="${preparation.temp.dir}/dest" verbose="true">
+            <hlm:resourceSet>
+                <fileset dir="${preparation.temp.dir}/src" includes="dir1/**" />
+                <fileset dir="${preparation.temp.dir}/src" includes="dir2/**" />
+            </hlm:resourceSet>
+        </hlm:parallelCopy>
+        <au:assertLogContains text="dir1${file.separator}test.txt" />
+        <au:assertLogContains text="dir1${file.separator}test.txt" />
+        <au:assertFileExists file="${preparation.temp.dir}/dest/dir1/test.txt" />
+        <au:assertFileExists file="${preparation.temp.dir}/dest/dir2/test.txt" />
+    </target>
+</project>

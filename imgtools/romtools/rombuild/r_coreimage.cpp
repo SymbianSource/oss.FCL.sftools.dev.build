@@ -27,7 +27,7 @@
 
 // CoreRomImage
 //
-CoreRomImage::CoreRomImage(char* aFileName) : 
+CoreRomImage::CoreRomImage(const char* aFileName) : 
 iReader(0),
 iFileName(aFileName),
 iRomHdr(0),
@@ -54,7 +54,7 @@ TBool CoreRomImage::ProcessImage(const TBool aUseMemMap)
 	TRomRootDirectoryList *rootDirInfo = 0;
 	TInt dirCount = 0;
 
-	iReader = new CoreRomImageReader(iFileName, aUseMemMap);
+	iReader = new CoreRomImageReader(iFileName.c_str(), aUseMemMap);
 
 	if(!iReader)
 	{
@@ -106,73 +106,59 @@ TBool CoreRomImage::ProcessImage(const TBool aUseMemMap)
 	return Status;
 }
 
-TRomNode* CoreRomImage::CopyDirectory(TRomNode*& aSourceDirectory)
-{
+TRomNode* CoreRomImage::CopyDirectory(TRomNode*& aSourceDirectory) {
 	return iRootDirectory->CopyDirectory(aSourceDirectory,0); 
 }
 
-TUint32 CoreRomImage::RomBase()
-{
+TUint32 CoreRomImage::RomBase() const {
 	return (iRomHdr->iRomBase);
 }
 
-TUint32 CoreRomImage::RomSize()
-{
+TUint32 CoreRomImage::RomSize() const {
 	return (iRomHdr->iRomSize);
 }
 
-TVersion CoreRomImage::Version()
-{
+TVersion CoreRomImage::Version() const {
 	return (iRomHdr->iVersion);
 }
 
-TInt64 CoreRomImage::Time()
-{
+TInt64 CoreRomImage::Time() const {
 	return (iRomHdr->iTime);
 }
 
-TUint32 CoreRomImage::CheckSum()
-{
+TUint32 CoreRomImage::CheckSum() const {
 	return (iRomHdr->iCheckSum);
 }
 
-TUint32 CoreRomImage::CompressionType()
-{
+TUint32 CoreRomImage::CompressionType() const {
 	return (iRomHdr->iCompressionType);
 }
 
-TRomNode* CoreRomImage::RootDirectory()
-{ 
+TRomNode* CoreRomImage::RootDirectory() const {
 	return iRootDirectory; 
 }
 
-TText* CoreRomImage::RomFileName()
-{ 
-	return (TText*)iFileName.data();
+const char* CoreRomImage::RomFileName() const {
+	return iFileName.data();
 }
 
-TUint32 CoreRomImage::RomAlign()
-{
+TUint32 CoreRomImage::RomAlign() const {
 	return iRomAlign;
 }
 
-TUint32 CoreRomImage::DataRunAddress()
-{
+TUint32 CoreRomImage::DataRunAddress() const {
 	return iDataRunAddress;
 }
 
-TInt32 CoreRomImage::VariantCount()
-{ 
+TInt32 CoreRomImage::VariantCount() const {
 	return iNumVariants; 
 }
 
-THardwareVariant* CoreRomImage::VariantList()
-{ 
+THardwareVariant* CoreRomImage::VariantList() const {
 	return iVariants;
 }
 
-void CoreRomImage::SetRomAlign(const TUint32 aAlign)
-{
+void CoreRomImage::SetRomAlign(const TUint32 aAlign)  {
 	iRomAlign = aAlign;
 }
 

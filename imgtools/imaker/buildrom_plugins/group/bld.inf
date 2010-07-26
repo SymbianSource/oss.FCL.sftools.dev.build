@@ -18,11 +18,12 @@
 
 PRJ_EXPORTS
 
-../plugincommon.pm                              +/tools/ //
-../hide.pm                                      +/tools/ //
-../localise.pm                                  +/tools/ //
-../localise_all_resources.pm                    +/tools/ //
-../obyparse.pm                                  +/tools/ //
-../override.pm                                  +/tools/ //
+../plugincommon.pm                      +/tools/rom/imaker/ //
+../hide.pm                              +/tools/rom/imaker/ //
+../localise.pm                          +/tools/rom/imaker/ //
+../localise_all_resources.pm            +/tools/rom/imaker/ //
+../obyparse.pm                          +/tools/rom/imaker/ //
+../override.pm                          +/tools/rom/imaker/ //
+../stubsischeck.pm                      +/tools/rom/imaker/ //
 
 // END OF BLD.INF

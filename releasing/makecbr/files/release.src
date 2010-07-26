@@ -1,0 +1,21 @@
+NOTESRC_RELEASER
+Productisation (kits.notify@symbian.com)
+
+NOTESRC_RELEASE_REASON
+New release based on build %build identifier%
+
+NOTESRC_GENERAL_COMMENTS
+Built automatically from an release build, not via an OCK or CustKit.
+See Appendix_to_Release_Notes.rtf for details on prohibited export or use.
+
+NOTESRC_KNOWN_DEVIATIONS
+See General Comments above.
+
+NOTESRC_BUGS_FIXED
+See General Comments above.
+
+NOTESRC_BUGS_REMAINING
+See General Comments above.
+
+NOTESRC_OTHER_CHANGES
+

@@ -49,6 +49,8 @@ Description:
             logfile="${ant['temp.build.dir']}/build/doc/ivy/tool-dependencies-${ant['build.type']}.xml" ant-properties="true"/>        
 
         <target name="compile-main" />
+        
+        <target name="build-roms" />
             
         <target name="ido-codescanner" template-file="codescanner.xml.ftl"
             logfile="${ant['ido.codescanner.output.dir']}/problemIndex.xml"/>
@@ -76,6 +78,9 @@ Description:
         <target name="check-tool-dependencies" template-file="tool.xml.ftl" 
             logfile="${ant['temp.build.dir']}/build/doc/ivy/tool-dependencies-${ant['build.type']}.xml" ant-properties="true"
             defer="true"/>
+            
+        <target name="cmt-generate-diamond-summary"/>
+        
     </targets>
 </logger>
 </configuration>

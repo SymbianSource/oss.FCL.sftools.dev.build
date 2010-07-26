@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : test_getFreeDrive.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<!--* @package Core -->
+<project name="test_getFreeDrive" xmlns:hlm="http://www.nokia.com/helium" xmlns:au="antlib:org.apache.ant.antunit">
+    <description>
+        Testing getFreeDrive targets
+    </description>
+
+    <property name="current.dir" value="."/>
+    
+    <condition property="is.windows">
+        <os family="windows"/>
+    </condition>
+    
+    <target name="test-getfreedrive" if="is.windows">
+        <hlm:getfreedrive property="build.drive"/>
+         <au:assertTrue>
+            <isset property="build.drive"/>
+        </au:assertTrue>   
+    </target>
+
+    <target name="test-getfreedrive-missed-param" if="is.windows">
+        <au:expectfailure expectedMessage="'property' attribute is not defined">
+            <hlm:getfreedrive/>
+        </au:expectfailure>
+    </target>
+
+    <target name="test-getfreedrive-validation" if="is.windows">
+        <hlm:getfreedrive property="build.drive"/>
+        <exec osfamily="windows" executable="subst.exe" failonerror="false">
+            <arg value="${build.drive}"/>
+            <arg value="${current.dir}"/>
+        </exec>
+        <au:assertTrue>
+           <hasfreespace partition="${build.drive}" needed="1M"/>
+        </au:assertTrue>
+        <exec osfamily="windows" executable="subst.exe" failonerror="false">
+            <arg value="${build.drive}"/>
+            <arg value="/D"/>
+        </exec>
+    </target>
+
+</project>
+

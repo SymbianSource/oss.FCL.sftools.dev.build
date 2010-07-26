@@ -1,0 +1,8 @@
+component	dev_build_cpptoolsplat_stlport
+
+source		\src\tools\build\cpptoolsplat\stlport
+binary		\src\tools\build\cpptoolsplat\stlport\group all
+exports		\src\tools\build\cpptoolsplat\stlport\group
+notes_source	\component_defs\release.src
+
+ipr T

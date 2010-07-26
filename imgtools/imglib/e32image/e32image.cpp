@@ -19,20 +19,22 @@
 *
 */
 
-
+#include "h_utl.h"
 #include <time.h>
 #include <malloc.h>
 #include <string.h>
 #include <stdlib.h>
-#include "h_utl.h"
 
 
-#if defined (__MSVCDOTNET__) || defined(__TOOLS2__)
+
+
+#if defined(__TOOLS2__) || defined(__MSVCDOTNET__) 
+#define IOS_BASE ios_base
 #include <fstream>
-#else //!__MSVCDOTNET__
+#else
+#define IOS_BASE ios
 #include <fstream.h>
-#endif //__MSVCDOTNET__
-
+#endif 
 #include <assert.h>
 #ifndef __LINUX__
   #include <io.h>
@@ -66,19 +68,32 @@ E32ImageFile::E32ImageFile(CBytePair *aBPE)
 #endif
 , iError(0), iSource(EE32Image), iOrigHdrOffsetAdj(0), iExportBitMap(0), iBPE(aBPE)
 	{
-        }
+}
 
-E32ImageFile::~E32ImageFile()
-	{
-	free(iData);
-	delete [] iFileName;
-#ifndef __LINUX__
-	delete [] iWideFileName;
-#endif
-	if (iHdr && iHdr != iOrigHdr)
-		delete iHdr;
-	free(iExportBitMap);
+E32ImageFile::~E32ImageFile(){
+	if(iData){
+		free(iData);
+		iData = 0 ;
 	}
+	if (iHdr && iHdr != iOrigHdr){
+		delete iHdr;
+		iHdr = 0 ;
+	}
+	if(iExportBitMap){
+		delete []iExportBitMap;
+		iExportBitMap = 0 ;
+	}
+	if(iFileName){
+		delete []iFileName ;
+		iFileName = 0;
+	}
+#ifndef __LINUX__
+    if(iWideFileName){
+		delete []iWideFileName ;
+		iWideFileName = 0;
+	}
+#endif
+}
 
 // dummy implementation
 TBool E32ImageFile::Translate(const char*, TUint, TBool, TBool)
@@ -430,7 +445,7 @@ void E32ImageFile::CreateExportBitMap()
 	{
 	TInt nexp = iOrigHdr->iExportDirCount;
 	TInt memsz = (nexp + 7) >> 3;
-	iExportBitMap = (TUint8*)malloc(memsz);
+	iExportBitMap = new TUint8[memsz];
 	memset(iExportBitMap, 0xff, memsz);
 	TUint* exports = (TUint*)(iData + iOrigHdr->iExportDirOffset);
 	TUint absoluteEntryPoint = iOrigHdr->iEntryPoint + iOrigHdr->iCodeBase;
@@ -697,77 +712,43 @@ ifstream& operator>>(ifstream& is, E32ImageFile& aImage)
 	return is;
 	}
 
-TInt E32ImageFile::IsE32ImageFile(char *aFileName)
-	{
-
-#ifdef __LINUX__
-	E32ImageFile f;
-	struct stat buf;
-	if (stat(aFileName, &buf) < 0) 
-		{
-		return FALSE;
-		}
-	f.iFileSize = buf.st_size;
-#else
-	_finddata_t fileinfo;
-	int ret=_findfirst((char *)aFileName,&fileinfo);
-	if (ret==-1) 
-		return FALSE;
-	E32ImageFile f;
-	f.iFileSize = fileinfo.size;
-#endif
-	ifstream ifile(aFileName, ios::in | ios::binary);
+TInt E32ImageFile::IsE32ImageFile(const char *aFileName) {
+ 
+	ifstream ifile(aFileName, IOS_BASE::in | IOS_BASE::binary);
 	if(!ifile.is_open())
 		return FALSE;
+	E32ImageFile f;
+	ifile.seekg(0,IOS_BASE::end);
+	f.iFileSize = ifile.tellg();
+	ifile.seekg(0,IOS_BASE::beg);
 	TInt r = f.ReadHeader(ifile);
 	ifile.close();
 	return (r == KErrNone);
-	}
+}
 
-TInt E32ImageFile::IsValid()
-	{
-	return (iError == KErrNone);
-	}
-
-TInt E32ImageFile::Open(const char* aFileName)
+ 
 //
 // Open an E32 Image file
 //
-	{
-#ifdef __LINUX__
-	struct stat buf;
-	if (stat(aFileName, &buf) < 0) 
-		{
+TInt E32ImageFile::Open(const char* aFileName) {	
+	ifstream ifile(aFileName, IOS_BASE::in | IOS_BASE::binary);
+	if(!ifile.is_open()) {
 		Print(EError,"Cannot open %s for input.\n",aFileName);
 		return 1;
 		}
-	iFileSize = buf.st_size;
-#else
-	_finddata_t fileinfo;
-	int ret=_findfirst((char *)aFileName,&fileinfo);
-	if (ret==-1) 
-		{
-		Print(EError,"Cannot open %s for input.\n",aFileName);
-		return 1;
-		}
-	iFileSize = fileinfo.size;
-#endif
+	ifile.seekg(0,IOS_BASE::end);
+	iFileSize = ifile.tellg();
+	ifile.seekg(0,IOS_BASE::beg);
 	Adjust(iFileSize);
-	ifstream ifile((char *)aFileName, ios::in | ios::binary);
-	if(!ifile.is_open())
-		{
-		Print(EError,"Cannot open %s for input.\n",aFileName);
-		return 1;
-		}
 	ifile >> *this;
 	ifile.close();
 	if (iError != KErrNone)
 		return iError;
-	iFileName=strdup((char *)aFileName);
-	if (iFileName==NULL)
-		return KErrNoMemory;
+	size_t len = strlen(aFileName) + 1;
+	iFileName =  new char[len] ;
+	memcpy(iFileName ,aFileName,len);
 	return KErrNone;
-	}
+} 
 
 #ifndef __LINUX__
 TInt E32ImageFile::Open(const wchar_t* aFileName)
@@ -776,7 +757,7 @@ TInt E32ImageFile::Open(const wchar_t* aFileName)
 //
 	{
 	_wfinddata_t fileinfo;
-	int ret=_wfindfirst(aFileName,&fileinfo);
+	int ret=_wfindfirst((wchar_t*)aFileName,&fileinfo);
 	if (ret==-1) 
 		{
 		Print(EError,"Cannot open %ls for input.\n",aFileName);
@@ -819,12 +800,12 @@ TInt E32ImageFile::Open(const wchar_t* aFileName)
 	}
 #endif
 
-TUint E32ImageFile::VaOfOrdinal(TUint aOrdinal)
+TUint E32ImageFile::VaOfOrdinal(TUint aOrdinal){
 // return the offset of the exported symbol
-	{
+	
 	TUint* exportdir = (TUint*)(iData + iOrigHdr->iExportDirOffset);
 	return exportdir[aOrdinal-KOrdinalBase];
-	}
+}
 
 // Determine the type of entry point in this module and set the flags
 // in the E32Image header accordingly.

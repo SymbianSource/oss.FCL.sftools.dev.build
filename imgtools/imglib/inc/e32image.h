@@ -19,6 +19,7 @@
 #ifndef __E32IMAGE_H__
 #define __E32IMAGE_H__
 
+ 
 #if defined(__MSVCDOTNET__) || defined(__TOOLS2__)
 #include <fstream>
 using namespace std;
@@ -61,7 +62,7 @@ public:
 	TUint32 Format();
 	TInt NumberOfImports();
 
-	TInt IsValid();
+	TInt IsValid() const {return (iError == KErrNone);}
 	TInt IsDll();
 	enum TDumpFlags
 		{
@@ -73,7 +74,7 @@ public:
 		EDumpImports = 1<<5,
 		EDumpDefaults = EDumpHeader|EDumpCode|EDumpData|EDumpExports|EDumpImports
 		};
-	void Dump(TText *aFileName,TInt aDumpFlags);
+	void Dump(const char* aFileName,TInt aDumpFlags);
 	void DumpHeader(TInt aDumpFlags);
 	void DumpData(TInt aDumpFlags);
 	void SetStackSize(TInt aSize);
@@ -87,7 +88,7 @@ public:
 	void SetPriority(TProcessPriority aPri);
 	void SetCapability(SCapabilitySet& aCapabilities);
 	void SetFPU(unsigned int aFPU);
-	static TInt IsE32ImageFile(char *aFileName);
+	static TInt IsE32ImageFile(const char *aFileName);
 	TInt DetermineEntryPointType();
 	void UpdateHeaderCrc();
 	void SetDefaultHeader();
@@ -122,11 +123,7 @@ public:
 	CBytePair *iBPE;
 	};
 
-#ifdef __VC32__
-ostream &operator<<(ostream &os, const E32ImageFile &aImage);
-#else
-ostream &operator<<(ostream &os, const E32ImageFile &aImage);
-#endif
-ifstream &operator>>(ifstream &is, E32ImageFile &aImage);
+ostream& operator<<(ostream &os, const E32ImageFile &aImage); 
+ifstream& operator>>(ifstream &is, E32ImageFile &aImage);
 
 #endif

@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<!-- 
+============================================================================ 
+Name        : ats_template.xml
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+Contains the template for the test.xml file output. The test.xml file contains
+information on the files used to create the drop file.
+============================================================================
+-->
+
+<testrun>
+    <metadata>
+        {% if test_plan['diamonds_build_url'] -%}
+        <meta name="diamonds-buildid">{{ test_plan['diamonds_build_url'] }}</meta> 
+        <meta name="diamonds-testtype">Smoke</meta>
+        {% endif %}
+        <meta name="name">{{ test_plan['testrun_name'] }}</meta> 
+    </metadata>
+    
+    <agents>
+        <agent alias="master">
+            <property name="TYPE" value="EmuMaster"/>
+        </agent>
+        <agent alias="slave">
+            <property name="TYPE" value="EmuSlave"/>
+        </agent>
+    </agents>
+    {% for setd in test_plan.sets -%}
+    <execution>
+        <initialization>
+            <task agents="master">
+                <type>FlashTask</type>
+                <parameters>
+                    <parameter name="image-1" value="{{ atsself.get_sorted_images(setd)[0] }}" />
+                </parameters>
+            </task>
+            <task agents="slave">
+                <type>FlashTask</type>
+                <parameters>
+                    <parameter name="image-2" value="{{ atsself.get_sorted_images(setd)[1] }}" />
+                </parameters>
+            </task>
+        </initialization>
+        <task agents="slave">
+            <metadata/>
+            <type>NonTestExecuteTask</type>
+            <parameters>
+                <parameter value="tpantestbtbaseband.exe" name="file"/>
+                <parameter value="B S 7" name="parameters"/>
+                <parameter value="true" name="async"/>
+            </parameters>
+        </task>
+        <task agents="master">
+            <metadata/>
+            <type>NonTestExecuteTask</type>
+            <parameters>
+                <parameter value="tpantestbtbaseband.exe" name="file"/>
+                <parameter value="A M 6 X" name="parameters"/>
+                <parameter value="false" name="async"/>
+            </parameters>
+        </task>
+        <finalization>
+            <task agents="master">
+                <type>CleanupTask</type>
+                <parameters>
+                    <parameter value="true" name="upload-files"/>
+                </parameters>
+            </task>
+            <task agents="slave">
+                <type>CleanupTask</type>
+                <parameters>
+                    <parameter value="true" name="upload-files"/>
+                </parameters>
+            </task>
+        </finalization>
+    </execution>
+    {% endfor -%}
+    
+    <postActions>
+        {% for action_type, parameters in test_plan.post_actions -%}
+            {% if action_type == 'RunProcessAction' %}
+        <action>
+            <type>{{ action_type }}</type>
+            <parameters>
+                {% for name, value in parameters -%}
+                <parameter name="{{ name }}" value="{{ value }}"/>
+                {% endfor -%}
+            </parameters>
+        </action>
+            {% endif %}
+        {% endfor -%}
+        {% if test_plan['report_email'] -%}
+        <action>
+            <type>EmailAction</type>
+            <parameters>
+                <parameter value="Release testing" name="subject"/>
+                <parameter value="{{ test_plan['report_email'] }}" name="to"/>
+                <parameter value="simplelogger" name="format"/>
+            </parameters>
+        </action>
+        {% endif %}
+        {% if test_plan['diamonds_build_url'] -%}
+        <action>
+            <type>DiamondsAction</type>
+        </action>
+        {% endif %}
+    </postActions>
+    
+</testrun>

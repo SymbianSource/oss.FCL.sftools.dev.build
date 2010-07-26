@@ -1,0 +1,334 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : build.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="helium-builder" default="build" xmlns:au="antlib:org.apache.ant.antunit" xmlns:ivy="antlib:org.apache.ivy.ant" xmlns:ac="antlib:net.sf.antcontrib">
+    <property environment="env" />
+    <taskdef name="fmpp" classname="fmpp.tools.AntTask" />
+    <import file="delivery.ant.xml" />
+
+    <!-- Ensuring that only Ant 1.7.0 is in use. 
+    <ac:if>
+        <not>
+            <contains string="${ant.version}" substring="1.7.0" />
+        </not>
+        <then>
+            <fail message="Your current ant version is ${ant.version}, you must use 1.7.0" />
+        </then>
+    </ac:if>            -->
+
+    <condition property="platform" value="win32" else="unix">
+        <os family="windows"/>
+    </condition>
+    
+    <dirname property="builder.dir" file="${ant.file.helium-builder}" />
+    <property name="source.root.dir" location="${builder.dir}/.." />
+    <property name="build.temp.dir" location="${source.root.dir}/build" />
+    <property name="components.temp.dir" location="${build.temp.dir}/components" />
+    <property name="component" value="*" />
+    <property name="component.type" value="*" />
+    <property name="component.root" value="*" />
+    <property name="config" value="sf" />
+    <property name="sf.delivery.zip" location="${build.temp.dir}/helium-sf-src.zip" />
+    <property name="binary.delivery.zip" location="${build.temp.dir}/helium-bin.zip" />
+    
+    <fileset id="ant.build.files" dir="${source.root.dir}">
+        <include name="${component.root}/${component.type}/${component}/build.xml" />
+        <exclude name="*builder/**" />
+        <exclude name="*/*builder/**" />
+        <exclude name="tools/**" />
+        <exclude name="config/**" />
+        <exclude name="doc/**" />
+        <exclude name="external/**" />
+        <exclude name="extensions/**" />
+        <exclude name="licences/**" />
+        <exclude name="tests/**" />
+        <exclude name="build/**" />
+    </fileset>
+  
+    
+    <target name="cleanup" description="Cleanup (delete the temp build directory)">
+        <delete dir="${build.temp.dir}" failonerror="false"/>
+    </target>
+    
+    
+    <target name="get-build-list">
+        <ivy:buildlist reference="ivy.buildlist.path">
+            <fileset refid="ant.build.files"/>
+        </ivy:buildlist>
+    </target>
+
+    
+    <target name="report" depends="get-build-list" description="Create Ivy report for each component">
+        <subant target="report" buildpathref="ivy.buildlist.path">
+            <property name="builder.dir" location="${builder.dir}" />
+        </subant>
+    </target>
+  
+    
+    <target name="compile" depends="get-build-list">
+        <subant target="compile" buildpathref="ivy.buildlist.path">
+            <property name="builder.dir" location="${builder.dir}" />
+            <property name="source.root.dir" value="${source.root.dir}"/>
+        </subant>
+    </target>
+
+    
+    <target name="build" depends="get-build-list" description="Build each component">
+        <subant target="package" buildpathref="ivy.buildlist.path">
+            <property name="builder.dir" location="${builder.dir}" />
+            <property name="source.root.dir" value="${source.root.dir}"/>
+            <property name="platform" value="${platform}"/>
+        </subant>
+    </target>
+
+    
+    <target name="clean" depends="get-build-list" description="Run clean on each component">
+        <subant target="clean" buildpathref="ivy.buildlist.path">
+            <property name="builder.dir" location="${builder.dir}" />
+            <property name="source.root.dir" value="${source.root.dir}"/>
+        </subant>
+    </target>
+  
+    
+    <target name="test" depends="get-build-list,build" description="Run test on each component">
+        <ac:for param="file" keepgoing="true">
+            <path refid="ivy.buildlist.path" />
+            <sequential>
+                <echo>Testing: @{file}</echo>
+                <ant antfile="@{file}" dir="@{file}/.." target="test" inheritAll="false">
+                    <property name="builder.dir" location="${builder.dir}" />
+                    <property name="source.root.dir" location="${source.root.dir}" />
+                </ant>
+            </sequential>
+        </ac:for>
+    </target>
+    <!-- TODO: remove after CI tools are cleaned up -->
+    <target name="unittest" depends="test"/>
+    
+    
+    <target name="junit" depends="get-build-list" description="Run JUnit tests on each component">
+        <subant target="junit" buildpathref="ivy.buildlist.path">
+            <property name="builder.dir" location="${builder.dir}" />
+            <property name="source.root.dir" location="${source.root.dir}" />
+        </subant>
+    </target>
+    
+    
+    <target name="antunit" depends="get-build-list" description="Run AntUnit tests on each component">
+        <subant target="antunit" buildpathref="ivy.buildlist.path">
+            <property name="builder.dir" location="${builder.dir}" />
+            <property name="source.root.dir" location="${source.root.dir}" />
+        </subant>
+    </target>
+    
+    
+    <target name="quality" depends="get-build-list" description="Run quality checks on each component">
+        <ac:for param="file" keepgoing="true">
+            <path refid="ivy.buildlist.path" />
+            <sequential>
+                <echo>Checking @{file}</echo>
+                <ant antfile="@{file}" dir="@{file}/.." target="quality" inheritAll="false">
+                    <property name="builder.dir" location="${builder.dir}" />
+                    <property name="source.root.dir" value="${source.root.dir}"/>
+                    <property name="platform" value="${platform}"/>
+                </ant>
+            </sequential>
+        </ac:for>
+    </target>
+
+    
+    <target name="checkstyle" depends="get-build-list" description="Run checkstyle on each component">
+        <ac:for param="file" keepgoing="true">
+            <path refid="ivy.buildlist.path" />
+            <sequential>
+                <ant antfile="@{file}" dir="@{file}/.." target="checkstyle" inheritAll="false">
+                    <property name="builder.dir" location="${builder.dir}" />
+                    <property name="source.root.dir" value="${source.root.dir}"/>
+                    <property name="platform" value="${platform}"/>
+                </ant>
+            </sequential>
+        </ac:for>
+    </target>
+
+    
+    <target name="get-deps" description="Retrieving Helium dependencies">
+        <ac:if>
+            <not>
+                <isset property="config" />
+            </not>
+            <then>
+                <fail message="config is not defined." />
+            </then>
+        </ac:if>
+        <echo>Using ${config} configuration.</echo>
+        <delete>
+            <fileset dir="${build.temp.dir}" includes="ivy/com.nokia.helium.config/**" />
+        </delete>
+        <ivy:settings file="${source.root.dir}/${config}/settings/ivysettings.xml" />
+        
+        <!-- the call to resolve is not mandatory, retrieve makes an implicit call if we don't -->
+        <ivy:resolve organisation="com.nokia.helium.config" module="helium-${config}-config" revision="1.0" inline="true" />
+        <ivy:retrieve sync="true" conf="default" organisation="com.nokia.helium.config"
+            module="helium-${config}-config" revision="1.0"
+            inline="true" type="jar"
+            pattern="${source.root.dir}/external/antlibs2/[artifact]-[revision].[ext]" />        
+        <ivy:retrieve sync="true" conf="default" organisation="com.nokia.helium.config"
+            module="helium-${config}-config" revision="1.0"
+            inline="true" type="egg"
+            pattern="${source.root.dir}/external/python/lib/auto/[artifact]-[revision].[ext]" />
+        <fileset id="egg.deps.fileset" dir="${source.root.dir}/external/python/lib/auto" includes="*.egg" excludes="jython*.egg" />
+        <fmpp sourceFile="template/easy-install.pth.ftl" outputFile="${source.root.dir}/external/python/lib/auto/easy-install.pth">
+            <data>
+                project: antProject()
+            </data>
+        </fmpp>
+        
+        <fileset id="egg.hlm.deps.fileset" dir="${source.root.dir}">
+            <include name="external/python/**/*.egg" />
+            <exclude name="**/2.5/**" />
+        </fileset>
+        <fmpp sourceFile="template/configure_jython.bat.ftl" outputFile="${source.root.dir}/external/python/configure_jython.bat">
+            <data>
+                project: antProject()
+            </data>
+        </fmpp>
+
+        <fmpp sourceFile="template/configure_jython.sh.ftl" outputFile="${source.root.dir}/external/python/configure_jython.sh">
+            <data>
+                project: antProject()
+            </data>
+        </fmpp>
+    </target>
+    
+    
+    <target name="build-helium-docs" unless="skip.docs">
+        <exec osfamily="windows" executable="${source.root.dir}/hlm.bat" dir="${source.root.dir}">
+            <arg value="docs"/>
+        </exec>
+        <exec osfamily="unix" executable="${source.root.dir}/hlm" dir="${source.root.dir}">
+            <arg value="docs"/>
+        </exec>
+    </target>
+    
+    
+    <target name="zip-releasable">
+        <delete file="${binary.delivery.zip}" failonerror="false" />
+        <zip destfile="${binary.delivery.zip}">
+            <zipfileset id="zip.content" dir="${source.root.dir}" prefix="helium">
+                <include name="hlm.bat" />
+                <include name="helium*.ant.xml" />
+                <include name="build.xml" />
+                <include name="tools/**" />
+                <include name="config/**" />
+                <include name="extensions/**" />
+                <include name="external/**" />
+                <include name="licenses/**" />
+                <include name="tests/minibuilds/**" />
+                <exclude name="config/version.txt.orig" />
+                <exclude name="**/distribution.policy.S60" />
+            </zipfileset>
+            <zipfileset id="zip.doc" dir="${source.root.dir}/build" prefix="helium">
+                <include name="doc/**" />
+                <exclude name="**/distribution.policy.S60" />
+            </zipfileset>
+            <zipfileset id="zip.executable" dir="${source.root.dir}" prefix="helium" filemode="755">
+                <include name="hlm" />
+            </zipfileset>
+        </zip>
+    </target>
+    
+    
+    <target name="get-helium-revision">
+        <exec executable="hg" outputproperty="hg.helium.revision">
+            <arg value="id" />
+            <arg value="--id" />
+        </exec>
+        <ac:propertyregex property="helium.revision"
+                    input="${hg.helium.revision}"
+                    regexp="([a-f0-9]+).*"
+                    replace="\1"
+                    casesensitive="false" />
+        <echo message="Revision set to: ${helium.revision}" />
+    </target>
+    
+    
+    <target name="update-version" depends="get-helium-revision">
+        <ac:if>
+            <available file="${source.root.dir}/config/version.txt.orig" />
+            <then>
+                <move file="${source.root.dir}/config/version.txt.orig" tofile="${source.root.dir}/config/version.txt" />
+            </then>
+        </ac:if>
+        <copy file="${source.root.dir}/config/version.txt" tofile="${source.root.dir}/config/version.txt.orig" />
+        <property file="${source.root.dir}/config/version.txt" />
+        <propertyfile file="${source.root.dir}/config/version.txt" comment="Helium version - DO NOT EDIT">
+            <entry key="helium.version" value="${helium.version}-r${helium.revision}"/>
+        </propertyfile>
+    </target>
+
+    
+    <target name="restore-version">
+        <move file="${source.root.dir}/config/version.txt.orig" tofile="${source.root.dir}/config/version.txt" />
+    </target>
+    
+    
+    <target name="create-releasable" depends="get-deps,update-version,build-helium-docs,zip-releasable,restore-version" description="Create releasable binary package"/>
+    
+    
+    <target name="textdoc">
+        <delete dir="${build.temp.dir}/doc/doctmp" failonerror="false"/>
+        <copy todir="${build.temp.dir}/doc/doctmp" overwrite="true">
+            <fileset dir="${source.root.dir}/sf/doc/src"/>
+        </copy>
+        <copy todir="${build.temp.dir}/doc/doctmp" overwrite="true" flatten="true">
+            <fileset dir="${source.root.dir}" includes="*/java/*/**/*.rst"/>
+            <fileset dir="${source.root.dir}" includes="*/python/*/**/*.rst"/>
+        </copy>
+        <rstMacro version="1.0" src="${build.temp.dir}/doc/doctmp"/>
+    </target>
+    
+    
+    <!-- Macro to generate html docs from rst. -->
+    <macrodef name="rstMacro">
+        <attribute name="version"/>
+        <attribute name="src" default="${source.root.dir}/sf/doc/src"/>
+        <attribute name="output" default="${build.temp.dir}/doc/text"/>
+        <sequential>
+            <property name="sphinx.lib.dir" location="${builder.dir}/tools/sphinx/Sphinx-0.5.1-py2.5.egg/sphinx" />
+            <exec executable="python" failonerror="${failonerror}">
+                <env key="PYTHONPATH" path="${builder.dir}/tools/sphinx" />
+                <arg file="${builder.dir}/tools/sphinx/sphinx-build.py"/>
+                <arg value="-b" />
+                <arg value="html" />            
+                <arg value="-D" />
+                <arg value="version=@{version}" />
+                <arg value="-D" />
+                <arg value="release=@{version}" />
+                <arg file="@{src}" />
+                <arg file="@{output}" />
+            </exec>
+        </sequential>
+    </macrodef>
+    
+</project>
+
+

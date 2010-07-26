@@ -1,0 +1,293 @@
+#!perl -w
+# Copyright (c) 2002-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+# 
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+# 
+# Contributors:
+# 
+# Description:
+# 
+#
+
+use strict;
+use FindBin;
+use lib "$FindBin::Bin";
+use Getopt::Long;
+use IniData;
+use EnvDb;
+use CommandController;
+
+
+#
+# Globals.
+#
+
+my $verbose = 0;
+my $iniData = IniData->New();
+my $commandController = CommandController->New($iniData, 'LatestVer');
+my $envDb; # this is only created when needed, by the EnvDb() function
+my $listAll;
+my $userComp;
+my $everyComponent;
+my $versionFilter;
+
+
+#
+# Main.
+#
+
+ProcessCommandLine();
+PrintLatestVersions();
+
+#
+# Subs.
+#
+
+sub ProcessCommandLine {
+  Getopt::Long::Configure ("bundling");
+  my $help;
+  GetOptions('h' => \$help, 'a:i' => \$listAll, 'v+' => \$verbose, 'f=s' => \$versionFilter);
+
+  if ($help) {
+    Usage(0);
+  }
+
+  $userComp = shift @ARGV || undef;
+
+  unless ($#ARGV == -1) {
+    print "Error: Invalid arguments\n";
+    Usage(1);
+  }
+}
+
+sub Usage {
+  my $exitCode = shift;
+
+  Utils::PrintDeathMessage($exitCode, "\nUsage: latestver [options] [component] 
+
+options:
+
+-h   help
+-a   lists all versions in descending date order
+-a 6 list the most recent six versions
+-v   verbose output (-vv very verbose, -vvv very very verbose)
+-f <version wildcard> only show versions whose version numbers match that text\n");
+}
+
+sub PrintLatestVersions {
+  # Convert the version number filter from glob-style to perl-style RE
+  if (defined $versionFilter) {
+		require Text::Glob;
+		# Surprisingly complicated to convert a glob-style to a perl-style RE
+		# Hence we use a module. Not entirely convinced that Text::Glob
+		# does a particularly good job (e.g. the pattern t_make*[0] doesn't work)
+		# but it's better than my attempts, and should suffice for most cases.
+		$versionFilter = Text::Glob::glob_to_regex($versionFilter);
+	}
+
+  # First work out what components we need to process
+  my @compsToProcess;
+  if ($userComp) {
+    @compsToProcess = ($userComp);
+  } else {
+    # Call listcomponents with remote flag set as 0 and continue flag set as 1
+    @compsToProcess = sort @{$iniData->PathData->ListComponents(0,1)};
+  }
+
+  # Second work out what versions we need to process
+  my @compVersions; # contains lots of [ comp_name, reldata ]
+  foreach my $compName (@compsToProcess) {
+    foreach (@{GetRelevantRelDataObjects($compName, $versionFilter)}) {
+      push @compVersions, [ $compName, $_ ];
+    }
+  }
+
+  die "No versions were found.\n" unless (@compVersions);
+
+  # Third work out how verbose to make the output, and do it!
+  if ($verbose) {
+    my @tableData;
+    InsertTableHeadings(\@tableData);
+    AddTableEntry($$_[0], \@tableData, $$_[1]) foreach (@compVersions);
+    print "\n";
+    $iniData->TableFormatter->PrintTable(\@tableData, 1);
+  } else {
+    PrintMinimalVerbosity($$_[0], $$_[1]) foreach (@compVersions);
+  }
+}
+
+sub PrintMinimalVerbosity {
+  my $comp = shift;
+  my $reldata = shift;
+
+  my $ver = $reldata->Version();
+  if ($userComp) {
+    print "$ver\n";
+  } else {
+    print "$comp: $ver\n";
+  }
+}
+
+sub GetRelevantRelDataObjects {
+  my $comp = shift;
+  my $ver = shift;
+
+  my $shownum = $listAll;
+  $shownum = 1 unless defined $listAll;
+
+  my $relDataObjects = RelData->OpenSet($iniData, $comp, $verbose, $ver);
+  $relDataObjects ||= [];
+  splice(@$relDataObjects, $shownum) unless (scalar @$relDataObjects == 0) || ($shownum==0) || ($shownum > @$relDataObjects); # if showNum==0, we got just -a so show all
+  
+  return $relDataObjects;
+}
+
+sub InsertTableHeadings {
+  my $tableData = shift;
+
+  my @headings;
+  @headings = ('Version', 'Internal version', 'Project', 'Releaser', 'Date');
+  if ($verbose > 1) {
+    @headings = ('', @headings);
+  }
+  if ($verbose > 2) {
+    @headings = (@headings, 'Local path', 'Remote path');
+  }
+  if (!$userComp) {
+    @headings = ('Component', @headings);
+  }
+  push @$tableData, \@headings;
+}
+
+sub AddTableEntry {
+  my $comp = shift;
+  my $tableData = shift;
+  my $relData = shift;
+
+  my @fields;
+
+  my $ver = $relData->Version();
+  my $releaser = $relData->NotesSource()->{releaser};
+  chomp $releaser;
+  my $project = $iniData->PathData->ComponentProject($comp, $ver);
+  @fields = ($ver, $relData->InternalVersion(), $project, $releaser, $relData->NotesSource()->{date});
+
+  # We're being very verbose, so add a 'status' field
+  if ($verbose > 1) {
+    my $status = "";
+    # "Installed" flag
+    #
+    my $installedversion = EnvDb()->Version($comp);
+    $status .= "I" if ($installedversion && $installedversion eq $ver);
+
+    # "Exported" flag
+    my $remotePath||="";
+    eval {
+      my $remoteSite = $iniData->RemoteSite(0); # 0 = not verbose
+      if ($remoteSite) {
+        $remotePath = $iniData->PathData->RemoteArchivePathForExistingComponent
+          ($comp, $ver, $remoteSite);
+        $status .= "E" if ($remotePath && $remoteSite->FileExists("$remotePath/$comp$ver.zip") );
+      }
+    };
+
+    unshift @fields, $status;
+
+    if ($verbose > 2) {
+      # We're being extravagently verbose, so add two 'location' fields which will 
+      # wrap off the end of the line - sigh.
+      my $localPath = '"'. $iniData->PathData->LocalArchivePathForExistingComponent
+        ($comp, $ver) .'"';
+      $remotePath = '"'.$remotePath.'"' if ($remotePath);
+      $remotePath ||= '';
+      $localPath ||= '';
+      @fields = (@fields, $localPath, $remotePath);
+    }
+  }
+
+  # If we're listing several components, stick a field on the front
+  # saying which component we're talking about in this case
+  if (!$userComp) {
+    unshift @fields, $comp;
+  }
+  push @$tableData, \@fields;
+}
+
+sub EnvDb {
+  $envDb ||= EnvDb->Open($iniData, $verbose);
+}
+
+__END__
+
+=head1 NAME
+
+LatestVer - Prints the latest version of a particular component.
+
+=head1 SYNOPSIS
+
+  latestver [options] [component]
+
+options:
+
+  -h   help
+  -a   lists all versions in descending date order
+  -a <n>  lists the most recent 'n' versions in descending date order
+  -v   verbose output (-vv very verbose, -vvv very very verbose)
+  -f <wildcard> filter the versions displayed
+
+=head1 DESCRIPTION
+
+Prints the latest version of a particular component, or all known components if the component name is omitted. Optionally prints all versions in descending date order.
+
+If verbose output is requested, the internal version number, storage area ("project"), releaser's name and release time is also displayed.
+
+If very verbose output is requested, and the remote site is set in the reltools.ini file, a "flags" column will be shown with two possible letters:
+
+=over 4
+
+=item I
+
+This version is installed on your machine.
+
+=item E
+
+This version is exported.
+
+=back
+
+Using the -vv option may significantly increase the time this tool takes to run.
+
+If very very verbose is requested the local path is also output to screen.
+
+If you specify a -f version string then only versions whose version numbers contain that wildcard will be shown. The wildcard should be a glob-style regular expression (for example "*chinese*"). It is case-insensitive.
+
+If very very verbose output is requested, two more fields will show the location of the release on the local and remote archives.
+
+=head1 KNOWN BUGS
+
+None.
+
+=head1 COPYRIGHT
+
+ Copyright (c) 2002-2009 Nokia Corporation and/or its subsidiary(-ies).
+ All rights reserved.
+ This component and the accompanying materials are made available
+ under the terms of the License "Eclipse Public License v1.0"
+ which accompanies this distribution, and is available
+ at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ 
+ Initial Contributors:
+ Nokia Corporation - initial contribution.
+ 
+ Contributors:
+ 
+ Description:
+ 
+
+=cut

@@ -34,12 +34,11 @@ Constructor intializes the class pointer members.
 @param aFile - image file name
 @param aImageType - image type
 */
-RofsReader::RofsReader(char* aFile, EImageType aImageType)
-:ImageReader(aFile), iImageType(aImageType)
-{
+RofsReader::RofsReader(const char* aFile, EImageType aImageType)
+:ImageReader(aFile), iImageType(aImageType) {
 	iImageReader = new RCoreImageReader(aFile);
 	iImage = new RofsImage(iImageReader);
-	iInputStream.open(aFile, Ios::binary | Ios::in);
+	iInputStream.open(aFile, ios_base::binary | ios_base::in);
 }
 
 /** 
@@ -48,18 +47,28 @@ Destructor deletes the class pointer members.
 @internalComponent
 @released
 */
-RofsReader::~RofsReader()
-{
-	ExeVsE32ImageMap::iterator e32ImageBegin = iExeVsE32ImageMap.begin();
-    ExeVsE32ImageMap::iterator e32ImageEnd  = iExeVsE32ImageMap.end();
-	while(e32ImageBegin != e32ImageEnd)
-	{
-		DELETE(e32ImageBegin->second);
-		++e32ImageBegin;
-	}
-	iRootDirEntry->Destroy();
+RofsReader::~RofsReader() {
+	 
+	 for(ExeVsE32ImageMap::iterator it = iExeVsE32ImageMap.begin();
+		it != iExeVsE32ImageMap.end(); it++) {
+		if(it->second){
+			delete it->second ;
+			it->second = 0 ;
+		}
+		
+	} 
+	 
+	iRootDirEntry = 0 ;
+	 
 	iExeVsOffsetMap.clear();
-	DELETE(iImageReader);
+	if(iImageReader){
+		delete iImageReader;
+		iImageReader = 0 ;
+	}
+	if(iImage){
+		delete iImage;
+		iImage = 0 ;
+	}
 	iInputStream.close();
 	iExeVsE32ImageMap.clear();
 }
@@ -70,8 +79,7 @@ Dummy function for compatibility
 @internalComponent
 @released
 */
-void RofsReader::ReadImage()
-{
+void RofsReader::ReadImage() {
 }
 
 /** 
@@ -83,11 +91,9 @@ Function responsible to
 @internalComponent
 @released
 */
-void RofsReader::ProcessImage()
-{
+void RofsReader::ProcessImage() {
 	int retVal = iImage->ProcessImage();
-	if(retVal != KErrNone)
-	{
+	if(retVal != KErrNone) {
 		exit(retVal);
 	}
 	iRootDirEntry = iImage->RootDirectory();
@@ -102,23 +108,19 @@ Function to check whether the node is an executable or not.
 
 @param aName - Executable name
 */
-bool RofsReader::IsExecutable(String aName)
-{
+bool RofsReader::IsExecutable(const string& aName) {
 	unsigned int extOffset = aName.find_last_of('.');
-	if(extOffset != String::npos)
-	{
-		aName = aName.substr(extOffset);
-		if(aName.length() <= 4)
-		{
-			ReaderUtil::ToLower(aName);
-			if (aName.find(".exe") != String::npos || aName.find(".dll") != String::npos || 
-				aName.find(".prt") != String::npos || aName.find(".nif") != String::npos || 
-				aName.find(".tsy") != String::npos || aName.find(".pdl") != String::npos || 
-				aName.find(".csy") != String::npos || aName.find(".agt") != String::npos || 
-				aName.find(".ani") != String::npos || aName.find(".loc") != String::npos || 
-				aName.find(".pdd") != String::npos || aName.find(".ldd") != String::npos ||
-				aName.find(".drv") != String::npos) 
-			{
+	if(extOffset != string::npos) {
+		string ext = aName.substr(extOffset);
+		if(ext.length() <= 4) {
+			ReaderUtil::ToLower(ext);
+			if (ext.find(".exe") != string::npos || ext.find(".dll") != string::npos || 
+				ext.find(".prt") != string::npos || ext.find(".nif") != string::npos || 
+				ext.find(".tsy") != string::npos || ext.find(".pdl") != string::npos || 
+				ext.find(".csy") != string::npos || ext.find(".agt") != string::npos || 
+				ext.find(".ani") != string::npos || ext.find(".loc") != string::npos || 
+				ext.find(".pdd") != string::npos || ext.find(".ldd") != string::npos ||
+				ext.find(".drv") != string::npos)  {
 				return true;
 			}
 		}
@@ -140,38 +142,31 @@ Function responsible to prepare iExeVsE32ImageMap by traversing the tree recursi
 @param aExeVsOffsetMap - Container to be filled
 @param aHiddenExeList - Hidden executables filled here.
 */
-void RofsReader::PrepareExeVsE32ImageMap(TRomNode* aEntry, CCoreImage *aImage, EImageType aImageType, Ifstream& aInputStream, ExeVsE32ImageMap& aExeVsE32ImageMap, ExeVsOffsetMap& aExeVsOffsetMap, StringList& aHiddenExeList)
-{
-    String name((char*)aEntry->iName);
+void RofsReader::PrepareExeVsE32ImageMap(TRomNode* aEntry, CCoreImage *aImage, EImageType aImageType, ifstream& aInputStream, ExeVsE32ImageMap& aExeVsE32ImageMap, ExeVsOffsetMap& aExeVsOffsetMap, StringList& aHiddenExes) {
+    string name(aEntry->iName);
 	bool insideRofs = false;
     E32Image* e32Image;
-    if(IsExecutable(name))
-    {
+    if(IsExecutable(name)) {
 		iExeAvailable = true;
 		//V9.1 images has hidden file offset as 0x0
 		//V9.2 to V9.6 has hidden file offset as 0xFFFFFFFFF
-        if(aEntry->iEntry->iFileOffset != KFileHidden && aEntry->iEntry->iFileOffset != KFileHidden_9_1)
-        {
+        if(aEntry->iEntry->iFileOffset != KFileHidden && aEntry->iEntry->iFileOffset != KFileHidden_9_1) {
             long fileOffset = 0;
-            if(aImageType == ERofsExImage)
-            {
-				if(aEntry->iEntry->iFileOffset > (long)((RofsImage*)aImage)->iAdjustment)
-				{
+            if(aImageType == ERofsExImage) {
+				if(aEntry->iEntry->iFileOffset > (long)((RofsImage*)aImage)->iAdjustment) {
 	            // File exists in Rofs extension 
 		            fileOffset = aEntry->iEntry->iFileOffset - ((RofsImage*)aImage)->iAdjustment;
 				}
-				else
-				{
+				else {
 					insideRofs = true;
 				}
             }
-            else
-            {
+            else {
 	            // For rofs files
 	            fileOffset = aEntry->iEntry->iFileOffset;
             }
 	            
-            aInputStream.seekg(fileOffset, Ios::beg);
+            aInputStream.seekg(fileOffset, ios_base::beg);
             /*
             Due to the complexities involved in sending the physical file size to E32Reader class, 
             here we avoided using it for gathering dependencies. Hence class E32ImageFile is used
@@ -181,25 +176,22 @@ void RofsReader::PrepareExeVsE32ImageMap(TRomNode* aEntry, CCoreImage *aImage, E
             e32Image->iFileSize = aEntry->iSize;
             e32Image->Adjust(aEntry->iSize); //Initialise the data pointer to the file size
             aInputStream >> *e32Image; //Input the E32 file to E32ImageFile class
-            aExeVsOffsetMap[ReaderUtil::ToLower(name)] = fileOffset;
-			if(!insideRofs)
-			{
-				aExeVsE32ImageMap.insert(std::make_pair(ReaderUtil::ToLower(name), e32Image));
+            put_item_to_map(aExeVsOffsetMap,aEntry->iName,fileOffset);
+			if(!insideRofs) {
+				put_item_to_map_2(aExeVsE32ImageMap,aEntry->iName, e32Image);
+				
 			}
         }
-        else
-        {
-            aHiddenExeList.push_back(ReaderUtil::ToLower(name));
+        else { 
+            aHiddenExes.push_back(aEntry->iName);
         }
     }
 
-    if(aEntry->Currentchild())
-    {
-        PrepareExeVsE32ImageMap(aEntry->Currentchild(), aImage, aImageType, aInputStream, aExeVsE32ImageMap, aExeVsOffsetMap, aHiddenExeList);
+    if(aEntry->Currentchild()) {
+        PrepareExeVsE32ImageMap(aEntry->Currentchild(), aImage, aImageType, aInputStream, aExeVsE32ImageMap, aExeVsOffsetMap, aHiddenExes);
     }
-    if(aEntry->Currentsibling())
-    {
-        PrepareExeVsE32ImageMap(aEntry->Currentsibling(), aImage, aImageType, aInputStream, aExeVsE32ImageMap, aExeVsOffsetMap, aHiddenExeList);
+    if(aEntry->Currentsibling()) {
+        PrepareExeVsE32ImageMap(aEntry->Currentsibling(), aImage, aImageType, aInputStream, aExeVsE32ImageMap, aExeVsOffsetMap, aHiddenExes);
     }
 }
 
@@ -209,18 +201,11 @@ Function responsible to the executable lists using the container iExeVsE32ImageM
 @internalComponent
 @released
 */
-void RofsReader::PrepareExecutableList()
-{
-    ExeVsE32ImageMap::iterator e32ImageBegin = iExeVsE32ImageMap.begin();
-    ExeVsE32ImageMap::iterator e32ImageEnd  = iExeVsE32ImageMap.end();
-    E32Image* entry;
-    String name;
-    while(e32ImageBegin != e32ImageEnd)
-    {
-        entry = e32ImageBegin->second;
-        name = e32ImageBegin->first;
-        iExecutableList.push_back(name);
-        ++e32ImageBegin;
+void RofsReader::PrepareExecutableList() { 
+	iExecutableList.clear();
+    for(ExeVsE32ImageMap::iterator it = iExeVsE32ImageMap.begin();
+		it != iExeVsE32ImageMap.end() ; it ++) { 
+        iExecutableList.push_back(it->first); 
     }
 	DeleteHiddenExecutableVsE32ImageEntry();
 }
@@ -232,21 +217,16 @@ avoid the dependency data collection for the same.
 @internalComponent
 @released
 */
-void RofsReader::DeleteHiddenExecutableVsE32ImageEntry()
-{
-	StringList::iterator hExeBegin = iHiddenExeList.begin();
-	StringList::iterator hExeEnd = iHiddenExeList.end();
-	ExeVsE32ImageMap::iterator loc;
-
-	while(hExeBegin != hExeEnd)
-	{
+void RofsReader::DeleteHiddenExecutableVsE32ImageEntry() { 
+	for(StringList::iterator it = iHiddenExeList.begin();
+		it != iHiddenExeList.end(); it++){ 
 		//Remove the hidden executable entry from executables vs RomNode Map
-		loc = iExeVsE32ImageMap.find(*hExeBegin);
-		if(loc != iExeVsE32ImageMap.end())
-		{
-			iExeVsE32ImageMap.erase(loc);
-		}
-		++hExeBegin;
+		ExeVsE32ImageMap::iterator pos = iExeVsE32ImageMap.find(*it);
+		if(pos != iExeVsE32ImageMap.end()) { 
+			if(pos->second)
+				delete pos->second ;
+			iExeVsE32ImageMap.erase(pos);
+		} 
 	}
 }
 
@@ -258,18 +238,14 @@ Function responsible to gather dependencies for all the executables using the co
 
 @return iImageVsDepList - returns all executable's dependencies
 */
-ExeNamesVsDepListMap& RofsReader::GatherDependencies()
-{
-	ExeVsE32ImageMap::iterator begin = iExeVsE32ImageMap.begin();
-	ExeVsE32ImageMap::iterator end = iExeVsE32ImageMap.end();
+ExeNamesVsDepListMap& RofsReader::GatherDependencies() { 
 
-	StringList executableList;
-	while(begin != end)
-	{
-		PrepareExeDependencyList((*begin).second, executableList);
-		iImageVsDepList.insert(std::make_pair((*begin).first, executableList));
-		executableList.clear();
-		++begin;
+	StringList executables;
+	for(ExeVsE32ImageMap::iterator it = iExeVsE32ImageMap.begin() ; 
+		it != iExeVsE32ImageMap.end() ; it++) {
+		PrepareExeDependencyList(it->second, executables);
+		put_item_to_map(iImageVsDepList,it->first, executables);
+		executables.clear(); 
 	}
 	return iImageVsDepList;
 }
@@ -282,20 +258,17 @@ This function can handle ROFS and ROFS extension images.
 @released
 
 @param - aE32Image, Using this, can get all the information about the executable
-@param - aExecutableList, Excutables placed into this list
+@param - aExecutables, Excutables placed into this list
 */
-void RofsReader::PrepareExeDependencyList(E32Image* aE32Image, StringList& aExecutableList)
-{
+void RofsReader::PrepareExeDependencyList(E32Image* aE32Image, StringList& aExecutables) {
 	int count = 0;
-	char** nameList = aE32Image->GetImportExecutableNames(count);
-	int i = 0;
-	String dependency;
-	for(; i < count; ++i)
-	{
-		dependency.assign(nameList[i]);
-		aExecutableList.push_back(ReaderUtil::ToLower(dependency));
+	char** names = aE32Image->GetImportExecutableNames(count); 
+	for(int i = 0 ; i < count; ++i) { 
+		aExecutables.push_back(names[i]);
 	}
-	DELETE(nameList);
+	if(names){
+		delete [](reinterpret_cast<long*>(names));
+	}
 }
 
 /** 
@@ -306,13 +279,9 @@ Function responsible to say whether it is an ROFS image or not.
 
 @param - aWord which has the identifier string
 */
-bool RofsReader::IsRofsImage(String& aWord)
-{
-	if(aWord.find(KRofsImageIdentifier) == 0) //Identifier should start at the beginning
-	{
-		return true;
-	}
-	return false;
+bool RofsReader::IsRofsImage(const string& aWord) {
+	return (aWord.find(KRofsImageIdentifier) == 0);//Identifier should start at the beginning
+ 
 }
 
 /** 
@@ -323,13 +292,8 @@ Function responsible to say whether it is an ROFS extension image or not.
 
 @param - aWord which has the identifier string
 */
-bool RofsReader::IsRofsExtImage(String& aWord)
-{
-	if(aWord.find(KRofsExtImageIdentifier) == 0) //Identifier should start at the beginning
-	{
-		return true;
-	}
-	return false;
+bool RofsReader::IsRofsExtImage(const string& aWord) {
+	return (aWord.find(KRofsExtImageIdentifier) == 0) ;//Identifier should start at the beginning
 }
 
 /** 
@@ -339,35 +303,25 @@ iExeVsIdData.
 @internalComponent
 @released
 */
-void RofsReader::PrepareExeVsIdMap()
-{
-    ExeVsE32ImageMap::iterator begin = iExeVsE32ImageMap.begin();
-    ExeVsE32ImageMap::iterator end = iExeVsE32ImageMap.end();
-    String exeName;
-    E32Image* e32Image;
-    IdData* id;
-    if(iExeVsIdData.size() == 0) //Is not already prepared
-    {
-        while(begin != end)
-        {
-            exeName = begin->first;
-            e32Image = begin->second;
-			id = new IdData;
+void RofsReader::PrepareExeVsIdMap() { 
+    if(iExeVsIdData.size() == 0) {//Is not already prepared 
+        for(ExeVsE32ImageMap::iterator it = iExeVsE32ImageMap.begin();
+			it != iExeVsE32ImageMap.end() ; it++) {
+            string exeName(it->first);
+            E32Image* e32Image = it->second;
+			IdData* id = new IdData;
 			id->iUid = e32Image->iOrigHdr->iUid1;
 			id->iDbgFlag = (e32Image->iOrigHdr->iFlags & KImageDebuggable)? true : false;
             TUint aHeaderFmt = E32ImageHeader::HdrFmtFromFlags(e32Image->iOrigHdr->iFlags);
-	        if (aHeaderFmt >= KImageHdrFmt_V)
-	        {
+	        if (aHeaderFmt >= KImageHdrFmt_V) {
                 E32ImageHeaderV* v = e32Image->iHdr;
                 id->iSid = v->iS.iSecureId;
                 id->iVid = v->iS.iVendorId;
 	        }
-			id->iFileOffset = iExeVsOffsetMap[exeName];
-			iExeVsIdData[exeName] = id;
-            ++begin;
+			id->iFileOffset = iExeVsOffsetMap[exeName]; 
+			put_item_to_map_2(iExeVsIdData,exeName,id); 
         }
-    }
-	id = KNull;
+    } 
 }
 
 /** 
@@ -378,7 +332,6 @@ Function responsible to return the Executable versus IdData container.
 
 @return - returns iExeVsIdData
 */
-const ExeVsIdDataMap& RofsReader::GetExeVsIdMap() const
-{
+const ExeVsIdDataMap& RofsReader::GetExeVsIdMap() const {
     return iExeVsIdData;
 }

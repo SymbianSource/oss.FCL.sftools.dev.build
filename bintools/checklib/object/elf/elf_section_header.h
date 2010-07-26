@@ -16,7 +16,7 @@
 #ifndef ELF_SECTION_HEADER_H
 #define ELF_SECTION_HEADER_H
 
-#include "elftools/inc/elfdefs.h"
+#include <elfdefs.h>
 #include <stdint.h>
 
 namespace elf

@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : test_antcoverage.ant.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<!--* @package test-package -->
+<project name="helium-antlib-antcoverage-unittest" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>Helium Antlib antcoverage. unittests.</description>
+    
+    <typedef resource="com/nokia/helium/ant/coverage/antlib.xml" uri="http://www.nokia.com/helium"/>
+    <dirname property="antcoverage.test.dir" file="${ant.file.helium-antlib-antcoverage-unittest}" />
+    <fileset id="coverage.filetset" dir="../data/testfiles" includes="**/*.ant.xml" />
+    
+    <target name="setUp">
+        <mkdir dir="${test.temp.dir}" />
+    </target>
+    
+    <target name="tearDown">
+        <delete dir="${antcoverage.test.dir}/results" />
+    </target>
+    
+
+    <target name="test-antcoverage-targets">
+        <au:antunit>
+            <fileset dir="../data/testfiles" includes="**/test_targets.ant.xml" />
+            <au:plainlistener logLevel="info"/>
+            <au:xmllistener toDir="${test.temp.dir}" logLevel="debug"/>
+            <hlm:antcoveragelistener />
+        </au:antunit>
+        <au:assertLogContains text="Coverage Report"/>
+        <au:assertLogContains text="50% [1/2]"/>
+    </target>
+    
+    <target name="test-antcoverage-macros">
+        <au:antunit>
+            <fileset dir="../data/testfiles" includes="**/test_macros.ant.xml" />
+            <au:plainlistener logLevel="info"/>
+            <au:xmllistener toDir="${test.temp.dir}" logLevel="debug"/>
+            <hlm:antcoveragelistener />
+        </au:antunit>
+        <au:assertLogContains text="Coverage Report"/>
+        <au:assertLogContains text="50% [1/2]"/>
+    </target>
+    
+    <target name="test-antcoverage-scriptdefs">
+        <au:antunit>
+            <fileset dir="../data/testfiles" includes="**/test_scriptdefs.ant.xml" />
+            <au:plainlistener logLevel="info"/>
+            <au:xmllistener toDir="${test.temp.dir}" logLevel="debug"/>
+            <hlm:antcoveragelistener />
+        </au:antunit>
+        <au:assertLogContains text="Coverage Report"/>
+        <au:assertLogContains text="50% [1/2]"/>
+    </target>
+    
+    <target name="test-antcoverage-targets-withfile">
+        <au:antunit>
+            <fileset dir="../data/testfiles" includes="**/test_targets.ant.xml" />
+            <au:plainlistener logLevel="info"/>
+            <au:xmllistener toDir="${test.temp.dir}" logLevel="debug"/>
+            <hlm:antcoveragelistener outputfile="${antcoverage.test.dir}/results/coverage.txt"/>
+        </au:antunit>
+        <au:assertFileExists file="${antcoverage.test.dir}/results/coverage.txt"/>
+        <au:assertFileExists file="${antcoverage.test.dir}/results/target.plot.property"/>
+        <loadfile srcfile="${antcoverage.test.dir}/results/coverage.txt" property="coverage.txt" />
+        <au:assertTrue>
+            <contains string="${coverage.txt}" substring="Coverage Report" />
+        </au:assertTrue>
+        <au:assertTrue>
+            <contains string="${coverage.txt}" substring="50% [1/2]" />
+        </au:assertTrue>
+        <au:assertTrue>
+            <contains string="${coverage.txt}" substring="100% [0/0]" />
+        </au:assertTrue>
+        <loadfile srcfile="${antcoverage.test.dir}/results/target.plot.property" property="target.plot" />
+        <au:assertTrue>
+            <contains string="${target.plot}" substring="YVALUE=50" />
+        </au:assertTrue>
+    </target>
+    
+    <target name="test-antcoverage-macros-withfile">
+        <au:antunit>
+            <fileset dir="../data/testfiles" includes="**/test_macros.ant.xml" />
+            <au:plainlistener logLevel="info"/>
+            <au:xmllistener toDir="${test.temp.dir}" logLevel="debug"/>
+            <hlm:antcoveragelistener outputfile="${antcoverage.test.dir}/results/coverage.txt"/>
+        </au:antunit>
+        <au:assertFileExists file="${antcoverage.test.dir}/results/coverage.txt"/>
+        <au:assertFileExists file="${antcoverage.test.dir}/results/macro.plot.property"/>
+        <loadfile srcfile="${antcoverage.test.dir}/results/coverage.txt" property="coverage.txt" />
+        <au:assertTrue>
+            <contains string="${coverage.txt}" substring="Coverage Report" />
+        </au:assertTrue>
+        <au:assertTrue>
+            <contains string="${coverage.txt}" substring="50% [1/2]" />
+        </au:assertTrue>
+        <au:assertTrue>
+            <contains string="${coverage.txt}" substring="100% [0/0]" />
+        </au:assertTrue>
+        <loadfile srcfile="${antcoverage.test.dir}/results/macro.plot.property" property="macro.plot" />
+        <au:assertTrue>
+            <contains string="${macro.plot}" substring="YVALUE=50" />
+        </au:assertTrue>
+    </target>
+    
+    <target name="test-antcoverage-scriptdefs-withfile">
+        <au:antunit>
+            <fileset dir="../data/testfiles" includes="**/test_scriptdefs.ant.xml" />
+            <au:plainlistener logLevel="info"/>
+            <au:xmllistener toDir="${test.temp.dir}" logLevel="debug"/>
+            <hlm:antcoveragelistener outputfile="${antcoverage.test.dir}/results/coverage.txt"/>
+        </au:antunit>
+        <au:assertFileExists file="${antcoverage.test.dir}/results/coverage.txt"/>
+        <au:assertFileExists file="${antcoverage.test.dir}/results/scriptdef.plot.property"/>
+        <loadfile srcfile="${antcoverage.test.dir}/results/coverage.txt" property="coverage.txt" />
+        <au:assertTrue>
+            <contains string="${coverage.txt}" substring="Coverage Report" />
+        </au:assertTrue>
+        <au:assertTrue>
+            <contains string="${coverage.txt}" substring="50% [1/2]" />
+        </au:assertTrue>
+        <au:assertTrue>
+            <contains string="${coverage.txt}" substring="100% [0/0]" />
+        </au:assertTrue>
+        <loadfile srcfile="${antcoverage.test.dir}/results/scriptdef.plot.property" property="scriptdef.plot" />
+        <au:assertTrue>
+            <contains string="${scriptdef.plot}" substring="YVALUE=50" />
+        </au:assertTrue>
+    </target>
+
+</project>
+
+
+

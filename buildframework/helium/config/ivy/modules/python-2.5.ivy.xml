@@ -23,7 +23,7 @@ Description:
 <ivy-module version="1.3">
     <info organisation="SWEPT"
           module="python"
-          revision="2.x"/>
+          revision="2.5"/>
     <publications>
         <artifact name="python" type="exe" versionArgs="--version" versionExp=".*2\.[56].*"/> 
     </publications>

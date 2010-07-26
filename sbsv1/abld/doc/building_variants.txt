@@ -1,0 +1,43 @@
+Product Build Variants
+======================
+
+In order to create a build variant two files are required. A "Product Variant" HRH file
+containing the variant-specific macros.  And a configuration file (variant.cfg) that points
+to it.
+
+
+1. The Product Variant (.HRH) File
+==================================
+
+This file contains the macros to be defined for this product variant as #define statements.
+eg,
+	#define EKA2
+	#define NEW_CRYPTO
+	#undef DONT_USE_ME
+
+This file is a C++ header file, so comments are allowed.
+
+The product variant can go anywhere on the same drive as the epoc32 directory.
+Suggested location is somewhere under %EPOCROOT%\epoc32.
+e.g.:
+	\epoc32\include\variant\buildvariant.hrh
+	\epoc32\include\variant\cedar.hrh
+
+
+
+2. The Configuration File (variant.cfg)
+=======================
+
+The variant.cfg file must be called
+
+	%EPOCROOT%\epoc32\tools\variant\variant.cfg
+
+The variant folder doesn't exist by default and has to be created manually.
+This file should contain the name and path of the product variant (.HRH) file.
+The file can be specified as
+	a) a path relative to %EPOCROOT%
+	b) an absolute path
+A path starting with "\EPOC32" will be adjusted for EPOCROOT.
+
+Perl-type comments (#) are allowed.
+

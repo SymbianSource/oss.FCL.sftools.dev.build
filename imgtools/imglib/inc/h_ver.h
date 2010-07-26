@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 1996-2009 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 1996-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of the License "Eclipse Public License v1.0"
@@ -19,8 +19,8 @@
 #ifndef __H_VER_H__
 #define __H_VER_H__
 const TInt MajorVersion=2;
-const TInt MinorVersion=1;
-const TInt Build=603;
-const char Copyright[]="Copyright (c) 1996-2009 Nokia Corporation.\n\n";
+const TInt MinorVersion=2;
+const TInt Build=2;
+const char Copyright[]="Copyright (c) 1996-2010 Nokia Corporation.\n\n";
 #endif
 

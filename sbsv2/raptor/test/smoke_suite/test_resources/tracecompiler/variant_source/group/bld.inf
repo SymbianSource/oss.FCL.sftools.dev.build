@@ -1,0 +1,6 @@
+PRJ_PLATFORMS
+ARMV5 WINSCW 
+
+PRJ_MMPFILES
+invariant_source.mmp
+variant_source.mmp

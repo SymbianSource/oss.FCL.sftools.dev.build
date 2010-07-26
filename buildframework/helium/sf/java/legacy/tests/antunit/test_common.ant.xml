@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : test_common.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test_common" xmlns:au="antlib:org.apache.ant.antunit"
+    xmlns:ivy="antlib:org.apache.ivy.ant"
+    xmlns:hlm="http://www.nokia.com/helium">
+    <description>
+        Testing targets
+    </description>
+    <property environment="env"/>
+    <taskdef resource="com/nokia/ant/antlib.xml" uri="http://www.nokia.com/helium" />
+    
+    <target name="setUp">
+        <delete file="../test_helium_data_model.xml_parsed" failonerror="false"/>
+    </target>
+
+    <target name="tearDown">
+        <delete file="../test_helium_data_model.xml_parsed" failonerror="false"/>
+    </target>
+    
+    <!-- Test parsemodel -->
+    <target name="test-parsemodel-description">
+        <hlm:parsemodel output="../test_helium_data_model.xml_parsed" input="../data/datamodel/data_model_validation_test.xml"/>            
+        <!-- Check if parsed file exist -->
+        <au:assertFileExists file="../test_helium_data_model.xml_parsed" />
+    </target>
+    
+
+    <target name="test-exec">
+        <au:expectfailure>
+            <hlm:exec executable="123"/>
+        </au:expectfailure>
+        <hlm:exec executable="perl" outputproperty="testexec">
+            <arg value="-e"/>
+            <arg value="print 'hi'"/>
+        </hlm:exec>
+        <au:assertPropertyEquals name="testexec" value="hi"/>
+    </target>
+    
+    <target name="test-ivy-tools">
+        <property name="data.dir" location="../data" />
+        <ivy:configure file="../data/ivy/tools_ivy_settings.xml" override="true" />
+        <ivy:resolve file="../data/ivy/ivy.xml" conf="core" haltonfailure="true" />
+    </target>
+
+    <target name="test-ivy-tools-invalid">
+        <property name="data.dir" location="../data" />
+        <ivy:configure file="../data/ivy/tools_ivy_settings.xml" override="true" />
+        <au:expectfailure message="impossible to resolve dependencies:">
+            <ivy:resolve file="../data/ivy/ivy.xml" conf="core-invalid" haltonfailure="true" />
+        </au:expectfailure>
+    </target>
+</project>
+

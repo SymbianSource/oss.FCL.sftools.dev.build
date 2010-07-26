@@ -1,3 +1,23 @@
+..  ============================================================================ 
+    Name        : rom_image.rst
+    Part of     : Helium 
+    
+    Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+    All rights reserved.
+    This component and the accompanying materials are made available
+    under the terms of the License "Eclipse Public License v1.0"
+    which accompanies this distribution, and is available
+    at the URL "http://www.eclipse.org/legal/epl-v10.html".
+    
+    Initial Contributors:
+    Nokia Corporation - initial contribution.
+    
+    Contributors:
+    
+    Description:
+    
+    ============================================================================
+
 .. index::
   module: How to create a ROM Image
 
@@ -13,7 +33,7 @@ This tutorial explains how to create a ROM image and all the configurations requ
 Introduction
 =============
 
-The ROM image is the end product which is flashed (downloaded) in to the phone and makes the phone behave the way it is supposed to behave (or not if there are problems present). ROM images are created within Helium using the S60 tool iMaker. iMaker is a ROM-image creation tool which provides a simple, standardized and configurable ROM-image creation framework. iMaker is based on the standardized GNU Make system and is therefore platform-independent. iMaker is a tool that creates a flash image from a set of Symbian binary and data files. iMaker mainly functions on top of the Symbian buildrom utility. 
+The ROM image is the end product which is flashed (downloaded) in to the phone and makes the phone behave the way it is supposed to behave (or not if there are problems present). ROM images are created within Helium using the iMaker tool. iMaker is a ROM-image creation tool which provides a simple, standardized and configurable ROM-image creation framework. iMaker is based on the standardized GNU Make system and is therefore platform-independent. iMaker is a tool that creates a flash image from a set of Symbian binary and data files. iMaker mainly functions on top of the Symbian buildrom utility. 
 
 The iMaker tool itself runs the Make tool and consists of thin layer of Perl. 
 iMaker offers a standardized framework for defining configuration parameters for the ROM-image 
@@ -25,7 +45,7 @@ This section is targeting build managers and IDOs who need to configure Helium t
  
 
 In order to use Helium for ROM-image creation your ROMs need to be configured to
-be created using Helium. The creation is supported by the iMaker task which supports the  '''imakerconfigurationset'''
+be created using Helium. The creation is supported by the iMaker task which supports the ``imakerconfigurationset``
 element to configure what needs to be built (please check the Helium Antlib documentation).
  
 

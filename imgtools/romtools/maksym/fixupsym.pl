@@ -22,20 +22,22 @@ use English;
 use Cwd;
 use FindBin;		# for FindBin::Bin
 
-my $PerlLibPath;    # fully qualified pathname of the directory containing our Perl modules
+my $PerlLibPath;
 
 BEGIN {
 # check user has a version of perl that will cope
 	require 5.005_03;
-# establish the path to the Perl libraries: currently the same directory as this script
-	$PerlLibPath = $FindBin::Bin;	# X:/epoc32/tools
-	$PerlLibPath =~ s/\//\\/g;	# X:\epoc32\tools
-	$PerlLibPath .= "\\";
+	$PerlLibPath = $FindBin::Bin;	
 }
 
 use lib $PerlLibPath;
-use Modload;
-Load_SetModulePath($PerlLibPath);
+
+use romutl;
+
+# Version
+my $MajorVersion = 1;
+my $MinorVersion = 1;
+my $PatchVersion = 1;
 
 # Globals
 my $debug = 0;
@@ -46,7 +48,7 @@ cwd =~ /^(.:)/o;
 my $drive = $1;
 
 # get EPOCROOT for searching directories
-my $epocroot = lc $ENV{EPOCROOT};
+my $epocroot = lc &get_epocroot;
 
 &args;
 &main;
@@ -332,7 +334,7 @@ sub args
 	  {
 		$arg = shift @ARGV;
 		
-		if ($arg=~/^[\-\/](\S*)$/)
+		if ($arg=~/^[\-](\S*)$/)
 		  {
 			$flag=$1;
 			
@@ -424,10 +426,8 @@ sub help ()
   {
 	my $build;
 	
-	&Load_ModuleL('E32TPVER');
 	print "\nfixupsym - " .
-	  "Fix up executables with locations taken from a ROM image (Build ",
-	  &E32tpver, ")\n";
+	  "Fix up executables with locations taken from a ROM image V${MajorVersion}.${MinorVersion}.${PatchVersion}\n";
 	&usage;
 	exit 0;
   }

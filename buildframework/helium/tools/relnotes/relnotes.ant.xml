@@ -308,7 +308,7 @@ bomfile.close()
     <target name="release-notes-icfs" depends="create-bom">
         <exec executable="python" failonerror="${failonerror}">
             <arg line="-m icf2txt"/>
-            <arg value="${temp.build.dir}/${build.id}_BOM.xml"/>            
+            <arg value="${build.log.dir}/${build.id}_bom.xml"/>            
             <arg value="${releasenotes.output.dir}/icdicf.txt"/>
         </exec>
     </target>

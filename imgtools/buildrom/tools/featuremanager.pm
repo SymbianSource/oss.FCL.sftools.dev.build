@@ -211,7 +211,7 @@ my $fillFeatureAttributes = sub
 			
 			#Read the attribute infeaturesetiby
 			$attval = &featureparser::getattrValue($nodeMac,"infeaturesetiby");
-			if(($attval eq undef) or (lc($attval) eq "yes")) {
+			if(!defined($attval) or (lc($attval) eq "yes")) {
 				$featureHash{infeaturesetiby} = 1;
 			}
 			elsif(lc($attval) eq "no") {
@@ -317,7 +317,7 @@ my $fillAliasAttributes = sub
 			$featureHash{excludemacro} = &featureparser::getattrValue($nodeMac, "exclude", STRICTCASE);
 			#read the attribute infeaturesetiby
 			$attval = &featureparser::getattrValue($nodeMac, "infeaturesetiby");
-			if(($attval eq undef) or (lc($attval) eq "yes"))
+			if(!defined($attval) or (lc($attval) eq "yes"))
 			{
 				$featureHash{infeaturesetiby} = 1;
 			}
@@ -453,7 +453,7 @@ sub getFeatureUID
 	my $featuresetList = $object->$featuresetList;
 	
 	$feature = lc($feature);
-	if($namespace eq undef)	{
+	if(!defined ($namespace))	{
 		if(exists $$featuresetList[0]->{feature_list}{$feature}) {
 			return $$featuresetList[0]->{feature_list}{$feature};
 		}
@@ -491,7 +491,7 @@ sub getFeatureInfo
 	my $namespace = shift;
 	my $featuresetList = $object->$featuresetList;
 
-	if($namespace eq undef)	{
+	if(!defined($namespace))	{
 		foreach my $node (@$featuresetList) {
 			return $node->{alias_feature}{$uid} if(exists $node->{alias_feature}{$uid});
 		}
@@ -529,7 +529,7 @@ sub getFeaturesetInfo
 	my $namespace = shift;
 	
 	my $featuresetList = $object->$featuresetList;
-	if($namespace eq undef)	{
+	if(!defined ($namespace))	{
 		if(exists $$featuresetList[0]) {
 			return $$featuresetList[0];
 		}
@@ -706,7 +706,7 @@ sub addFeatureSet
 		}
 		if(!$featHash)
 		{
-			&featureparser::ERROR("original feature definition does not exist.");
+			&featureparser::ERROR("Original feature definition does not exist for feature ".sprintf("0x%08x", $uid));
 			return 0;
 		}
 
@@ -714,54 +714,52 @@ sub addFeatureSet
 
 		if(($aliasfeatHash->{includemacro}) || ($aliasfeatHash->{excludemacro}))
 		{
-			if(($featHash->{includemacro}) || ($featHash->{excludemacro}))
+			if (($featHash->{includemacro} || $featHash->{excludemacro}) && (!(($featHash->{includemacro} && ($featHash->{includemacro} eq $aliasfeatHash->{includemacro})) || ($featHash->{excludemacro} && ($featHash->{excludemacro} eq $aliasfeatHash->{excludemacro})))))
 			{
-				&featureparser::WARN("the value of attribute hrhmacro has been overrided in ogrinal feature ".sprintf("0x%08x", $uid));
-				undef $featHash->{includemacro};
-				undef $featHash->{excludemacro};
+				&featureparser::WARN("the value of attribute hrhmacro has been overridden in original feature ".sprintf("0x%08x", $uid));
 			}
+			undef $featHash->{includemacro};
+			undef $featHash->{excludemacro};
 		}
 		elsif($featHash->{includemacro} || $featHash->{excludemacro})
 		{
-			&featureparser::WARN("the original value of attribute hrhmacro will be used for featureoverride ".sprintf("0x%08x", $uid));
 			$aliasfeatHash->{includemacro} = $featHash->{includemacro};
 			$aliasfeatHash->{excludemacro} = $featHash->{excludemacro};
+			undef $featHash->{includemacro};
+			undef $featHash->{excludemacro};
 		}
 		if($aliasfeatHash->{statusflags})
 		{
 			if(($featHash->{statusflags}) && !($aliasfeatHash->{statusflags} eq $featHash->{statusflags}))
 			{
-				&featureparser::WARN("the value of attribute statusflags has been overrided in ogrinal feature ".sprintf("0x%08x", $uid));
+				&featureparser::WARN("the value of attribute statusflags has been overridden in original feature ".sprintf("0x%08x", $uid));
 			}
 		}
 		elsif($featHash->{statusflags})
 		{
 			$aliasfeatHash->{statusflags} = $featHash->{statusflags};
-			&featureparser::WARN("the original value of attribute statusflags will be used for featureoverride ".sprintf("0x%08x", $uid));
 		}
 		if($aliasfeatHash->{userdata})
 		{
 			if(($featHash->{userdata}) && !($aliasfeatHash->{userdata} eq $featHash->{userdata}))
 			{
-				&featureparser::WARN("the value of attribute userdata has been overrided in ogrinal feature ".sprintf("0x%08x", $uid));
+				&featureparser::WARN("the value of attribute userdata has been overridden in original feature ".sprintf("0x%08x", $uid));
 			}
 		}
 		elsif($featHash->{userdata})
 		{
 			$aliasfeatHash->{userdata} = $featHash->{userdata};
-			&featureparser::WARN("the original value of attribute userdata will be used for featureoverride ".sprintf("0x%08x", $uid));
 		}
 		if($aliasfeatHash->{infeaturesetiby})
 		{
 			if(($featHash->{infeaturesetiby}) && ($aliasfeatHash->{infeaturesetiby} != $featHash->{infeaturesetiby}))
 			{
-				&featureparser::WARN("the value of attribute infeautresetiby has been overrided in ogrinal feature ".sprintf("0x%08x", $uid));
+				&featureparser::WARN("the value of attribute infeautresetiby has been overridden in original feature ".sprintf("0x%08x", $uid));
 			}
 		}
 		elsif(defined($featHash->{infeaturesetiby}))
 		{
 			$aliasfeatHash->{infeaturesetiby} = $featHash->{infeaturesetiby};
-			&featureparser::WARN("the original value of attribute infewaturesetiby will be used for featureoverride ".sprintf("0x%08x", $uid));
 		}
 	}
 	# Add the unique featureset into the list

@@ -41,11 +41,11 @@ public:
 	SidChecker(CmdLineHandler* aCmdPtr, ImageReaderPtrList& aImageReaderList);
 	~SidChecker(void);
 	void Check(ImgVsExeStatus& aImgVsExeStatus);
-	void PrepareAndWriteData(ExeContainer* aExeContainer);
+	void PrepareAndWriteData(ExeContainer& aExeContainer);
 
 private:
-	void FillExeSidStatus(ExeContainer* aExeContainer);
-	const unsigned int GetExecutableOffset(const String& aExeName);
-	void FillExeAttribute(ExeContainer* aExeContainer);
+	void FillExeSidStatus(ExeContainer& aExeContainer);
+	const unsigned int GetExecutableOffset(const char* aExeName);
+	void FillExeAttribute(ExeContainer& aExeContainer);
 };
 #endif//SIDCHECKER_H

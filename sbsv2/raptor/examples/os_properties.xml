@@ -18,6 +18,7 @@
 		<set name='POSTLINKER_SUPPORTS_WDP' value=''/>
 		<set name='SUPPORTS_STDCPP_NEWLIB' value=''/>
 		<set name='RVCT_PRE_INCLUDE' value='$(EPOCINCLUDE)/rvct2_2/rvct2_2.h'/>
+		<set name="SUPPORTS_ABIV1_IMPLIBS" value='1'/>
 	</var>
 	
 </build>

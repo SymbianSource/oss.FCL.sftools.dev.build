@@ -23,18 +23,15 @@
 #include "e32_image_reader.h"
 
 RofsImage::RofsImage(RCoreImageReader *aReader) : CCoreImage(aReader) ,
-iRofsHeader(0), iRofsExtnHeader(0),iAdjustment(0),  iImageType(RCoreImageReader::E_UNKNOWN)
-{
+iRofsHeader(0), iRofsExtnHeader(0),iAdjustment(0),  iImageType(RCoreImageReader::E_UNKNOWN) {
 }
 
-RofsImageReader::RofsImageReader(char* aFile) : ImageReader(aFile), iInputFile(0)
-{
+RofsImageReader::RofsImageReader(const char* aFile) : ImageReader(aFile), iInputFile(0) {
 	iImageReader = new RCoreImageReader(aFile);
 	iImage = new RofsImage(iImageReader);
 }
 
-RofsImageReader::~RofsImageReader()
-{
+RofsImageReader::~RofsImageReader() {
 	if(iInputFile)
 		iInputFile->close();
 	delete iInputFile;
@@ -42,36 +39,28 @@ RofsImageReader::~RofsImageReader()
 	delete iImageReader;
 }
 
-void RofsImageReader::SetSeek(streampos aOff, ios::seek_dir aStartPos)
-{
+void RofsImageReader::SetSeek(streampos aOff, ios_base::seek_dir aStartPos) {
 	if(!iInputFile)
 		return;
 
 	iInputFile->seekg(aOff, aStartPos);
 }
 
-void RofsImageReader::ReadImage()
-{
-	if(!iImageReader->Open())
-	{
-		throw ImageReaderException((char*)(iImageReader->Filename()), "Failed to open Image File");
+void RofsImageReader::ReadImage() {
+	if(!iImageReader->Open()) {
+		throw ImageReaderException((iImageReader->Filename()), "Failed to open Image File");
 	}
 }
 
-void RofsImageReader::Validate()
-{
+void RofsImageReader::Validate() {
 }
 
-TInt RofsImage::ProcessImage()
-{
+TInt RofsImage::ProcessImage() {
 	int result = CreateRootDir();
-	if (result == KErrNone)
-	{
-		if (iReader->Open())
-		{
+	if (result == KErrNone) {
+		if (iReader->Open()) {
 			iImageType = iReader->ReadImageType();
-			if (iImageType == RCoreImageReader::E_ROFS)
-			{
+			if (iImageType == RCoreImageReader::E_ROFS) {
 				iRofsHeader = new TRofsHeader;
 				result = iReader->ReadCoreHeader(*iRofsHeader);
 				if (result != KErrNone)
@@ -80,12 +69,8 @@ TInt RofsImage::ProcessImage()
 				SaveDirInfo(*iRofsHeader);
 				result = ProcessDirectory(0);
 			}
-#if defined(__TOOLS2__) || defined(__MSVCDOTNET__)
-			else if (iImageType == RCoreImageReader::E_ROFX)
-#else
-			else if (iImageType == RCoreImageReader::TImageType::E_ROFX)
-#endif
-			{
+
+			else if (iImageType == RCoreImageReader::E_ROFX) {
 				iRofsExtnHeader = new TExtensionRofsHeader ;
 				result = iReader->ReadExtensionHeader(*iRofsExtnHeader);
 				if(result != KErrNone)
@@ -97,13 +82,11 @@ TInt RofsImage::ProcessImage()
 				SaveDirInfo(*iRofsExtnHeader);
 				result = ProcessDirectory(iAdjustment);
 			}
-			else
-			{
+			else {
 				result = KErrNotSupported;
 			}
 		}
-		else
-		{
+		else {
 			result = KErrGeneral;
 		}
 	}
@@ -111,45 +94,37 @@ TInt RofsImage::ProcessImage()
 	return result;
 }
 
-void RofsImageReader::ProcessImage()
-{
+void RofsImageReader::ProcessImage() {
 	iImage->ProcessImage();
 	iRootDirEntry = iImage->RootDirectory();
 }
 
-void RofsImageReader::Dump()
-{
+void RofsImageReader::Dump() {
 	if( !((iDisplayOptions & EXTRACT_FILES_FLAG) || (iDisplayOptions & LOG_IMAGE_CONTENTS_FLAG) ||
-		(iDisplayOptions & EXTRACT_FILE_SET_FLAG)) )
-	{
+		(iDisplayOptions & EXTRACT_FILE_SET_FLAG)) ) {
 		
 		MarkNodes();
-		if(iDisplayOptions & DUMP_HDR_FLAG)
-		{
+		if(iDisplayOptions & DUMP_HDR_FLAG) {
 			DumpHeader();
 		}
 		if( (iDisplayOptions & DUMP_DIR_ENTRIES_FLAG) ||
-			(iDisplayOptions & DUMP_VERBOSE_FLAG) )
-		{
+			(iDisplayOptions & DUMP_VERBOSE_FLAG) ) {
 			DumpDirStructure();
 			DumpFileAttributes();
 		}
 	}
 }
 
-void RofsImageReader::DumpHeader()
-{
+void RofsImageReader::DumpHeader() {
 	*out << "Image Name................." << iImgFileName.c_str() << endl;
 
 	int aPos = 0;
 
-	if( ((RofsImage*)iImage)->iImageType == RCoreImageReader::E_ROFS)
-	{
+	if( ((RofsImage*)iImage)->iImageType == RCoreImageReader::E_ROFS) {
 		*out << "ROFS Image" << endl;
 
 		*out << "Image Signature..........." ;
-		while(aPos < K_ID_SIZE)
-		{
+		while(aPos < K_ID_SIZE) {
 			*out << ((RofsImage*)iImage)->iRofsHeader->iIdentifier[aPos++];
 		}
 		*out << endl << endl;
@@ -163,12 +138,10 @@ void RofsImageReader::DumpHeader()
 		*out << "Total directory size: 0x" << hex << ( aTotalDirSz ) << endl;
 		*out << "Total image size:     0x" << hex << ((RofsImage*)iImage)->iRofsHeader->iImageSize << endl;
 	}
-	else if(((RofsImage*)iImage)->iImageType == RCoreImageReader::E_ROFX)
-	{
+	else if(((RofsImage*)iImage)->iImageType == RCoreImageReader::E_ROFX) {
 		*out << "Extension ROFS Image" << endl;
 		*out << "Image Signature..........." ;
-		while(aPos < K_ID_SIZE)
-		{
+		while(aPos < K_ID_SIZE) {
 			*out << ((RofsImage*)iImage)->iRofsExtnHeader->iIdentifier[aPos++];
 		}
 		*out << endl << endl;
@@ -184,8 +157,7 @@ void RofsImageReader::DumpHeader()
 	}
 }
 
-void RofsImageReader::DumpDirStructure()
-{
+void RofsImageReader::DumpDirStructure() {
 	 
 	*out << "Directory Listing" << endl;
 	*out << "=================" << endl; 
@@ -193,20 +165,15 @@ void RofsImageReader::DumpDirStructure()
 
 }
 
-void RofsImageReader::MarkNodes()
-{
+void RofsImageReader::MarkNodes() {
 	TRomNode *aNode = iRootDirEntry->NextNode();
 
-	while( aNode )
-	{
-		if(aNode->iEntry)
-		{
-			if( ReaderUtil::IsExecutable(aNode->iEntry->iUids) )
-			{
+	while( aNode ) {
+		if(aNode->iEntry) {
+			if( ReaderUtil::IsExecutable(aNode->iEntry->iUids) ) {
 				aNode->iEntry->iExecutable = true;
 			}
-			else
-			{
+			else {
 				aNode->iEntry->iExecutable = false;
 			}
 		}
@@ -214,88 +181,72 @@ void RofsImageReader::MarkNodes()
 	}
 }
 
-void RofsImageReader::DumpFileAttributes()
-{
+void RofsImageReader::DumpFileAttributes() {
 	TRomNode *aNode = iRootDirEntry->NextNode();
 	E32ImageFile	aE32Img;
-	streampos		aFileOffset;
-	string			iPath;
+	size_t		aFileOffset;
+	std::string			iPath;
 	
-	while( aNode )
-	{
-		if( aNode->IsFile() )
-		{
-			if( !iInputFile )
-			{
+	while( aNode ) {
+		if( aNode->IsFile() ) {
+			if( !iInputFile ) {
 				// Open the image file once and to access the E32 images within,#
 				// seek to the file offsets...
-				iInputFile = new ifstream( (char*)(iImageReader->Filename()), ios::binary|ios::in);
+				iInputFile = new ifstream( (iImageReader->Filename()), ios_base::binary|ios_base::in);
 				
-				if(!iInputFile->is_open())
-				{
-					throw ImageReaderException((char*)iImageReader->Filename(), "Failed to open file");
+				if(!iInputFile->is_open()) {
+					throw ImageReaderException(iImageReader->Filename(), "Failed to open file");
 				}
 			}
 
-			try 
-			{
-				if( aNode->iEntry->iExecutable)
-				{
+			try  {
+				if( aNode->iEntry->iExecutable) {
 					aFileOffset = 0;
-					if( ((RofsImage*)iImage)->iImageType == RCoreImageReader::E_ROFX)
-					{
-						if((TUint)aNode->iEntry->iFileOffset > ((RofsImage*)iImage)->iRofsExtnHeader->iDirTreeOffset)
-						{
+					if( ((RofsImage*)iImage)->iImageType == RCoreImageReader::E_ROFX) {
+						if((TUint)aNode->iEntry->iFileOffset > ((RofsImage*)iImage)->iRofsExtnHeader->iDirTreeOffset) {
 							//This is set only for files within this extended ROFS
 							aFileOffset = aNode->iEntry->iFileOffset - ((RofsImage*)iImage)->iAdjustment;
 						}
 					}
-					else
-					{
+					else {
 						//This is set only for files within ROFS
 						aFileOffset = aNode->iEntry->iFileOffset;
 					}
 
-					if( aFileOffset )
-					{
-						SetSeek(aFileOffset , ios::beg);
+					if( aFileOffset ) {
+						SetSeek(aFileOffset , ios_base::beg);
 						memset(&aE32Img, 0, sizeof(aE32Img));
 						aE32Img.Adjust(aNode->iSize);
 						aE32Img.iFileSize = aNode->iSize;
-						if( iInputFile->fail())
-						{
+						if( iInputFile->fail()) {
 							// Check why is the fail bit set causing all subsequent
 							// istream operations to fail.
 							// For now, clear the fail bit...
 							iInputFile->clear();
 						}
 						*iInputFile >> aE32Img;
-						if(aE32Img.iError != KErrNone)
-						{
+						if(aE32Img.iError != KErrNone) {
 							throw int (0);
 						}
 					}
 				}
 			}
-			catch(...)
-			{
+			catch(...) {
 				// Just in case this was't a valid E32 image and the E32 reader didn't 
 				// catch it...
 				
 				string aStr("Failed to read contents of ");
-				aStr.append((char*)aNode->iName);
+				aStr.append(aNode->iName);
 
-				throw ImageReaderException((char*)iImageReader->Filename(), (char*)aStr.c_str());
+				throw ImageReaderException(iImageReader->Filename(), aStr.c_str());
 			}
 
 			*out << "********************************************************************" << endl;
-			iPath.assign((char*)aNode->iName);	
-			GetCompleteNodePath(aNode,iPath,"/");
+			//iPath.assign(aNode->iName);	
+			GetCompleteNodePath(aNode,iPath);
 			*out << "File........................" << iPath.c_str() << endl;
-			if( aNode->iEntry->iExecutable )
-			{
-				if(aFileOffset)
-				{
+			if( aNode->iEntry->iExecutable ) {
+				if(aFileOffset) {
 					// When its an E32 Image...
 					E32ImageReader::DumpE32Attributes(aE32Img);
 					if( iDisplayOptions & DUMP_E32_IMG_FLAG){
@@ -314,8 +265,7 @@ void RofsImageReader::DumpFileAttributes()
 						}
 					}
 				}
-				else
-				{
+				else {
 					*out << "Image "<< aNode->iName << " not in the extended ROFS " << iImgFileName.c_str() << endl;
 				}
 			}
@@ -333,15 +283,12 @@ then it makes a call to GetFileExtension to check for the extension.
 @internalComponent
 @released
 */
-void RofsImageReader::ExtractImageContents()
-{
-	if( (iDisplayOptions & EXTRACT_FILE_SET_FLAG) )
-	{
+void RofsImageReader::ExtractImageContents() {
+	if( (iDisplayOptions & EXTRACT_FILE_SET_FLAG) ) {
 		ImageReader::ExtractFileSet(NULL);
 	}
 
-	if( iDisplayOptions & EXTRACT_FILES_FLAG || iDisplayOptions & LOG_IMAGE_CONTENTS_FLAG  )
-	{
+	if( iDisplayOptions & EXTRACT_FILES_FLAG || iDisplayOptions & LOG_IMAGE_CONTENTS_FLAG  ) {
 		// get the next Node 
 		TRomNode *nextNode = iRootDirEntry->NextNode();
 		// current Node.
@@ -353,28 +300,31 @@ void RofsImageReader::ExtractImageContents()
 
 		if( iDisplayOptions & LOG_IMAGE_CONTENTS_FLAG ){		 
 			if( ImageReader::iZdrivePath.compare("")){
-				// create a string to hold path information.
-				string filePath;
-				string delimiter;
-				delimiter.assign("\\");
-				filePath.assign( ImageReader::iZdrivePath );
-				// replace backslash with double backslash. 
-				FindAndInsertString(filePath,delimiter,delimiter);
-				logFile.assign(filePath);
 				// create specified directory.
-				CreateSpecifiedDir(&filePath[0],"\\\\");
-				logFile.append("\\\\");
-				logFile.append(ImageReader::iLogFileName);
+				CreateSpecifiedDir(ImageReader::iZdrivePath); 
+				int len = ImageReader::iZdrivePath.length() ;
+				const char* z = ImageReader::iZdrivePath.c_str();
+				logFile = "";
+				for(int i = 0 ; i < len ; i++){
+					if(z[i] == SLASH_CHAR2)
+						logFile += SLASH_CHAR1;
+					else
+						logFile += z[i];
+				}
+				len -- ;
+				if(z[len] != SLASH_CHAR1)
+					logFile += SLASH_CHAR1;
+				logFile += ImageReader::iLogFileName ;
 			}
 			else {				
 				logFile.assign(ImageReader::iLogFileName);
 			}
 
 			// open the specified file in append mode.
-			oFile.open(logFile.c_str(),ios::out|ios::app);
+			oFile.open(logFile.c_str(),ios_base::out|ios_base::app);
 
 			if(!oFile.is_open()) {
-				throw ImageReaderException((char*)ImageReader::iLogFileName.c_str(), "Failed to open the log file");
+				throw ImageReaderException(ImageReader::iLogFileName.c_str(), "Failed to open the log file");
 			}
 		}
 
@@ -385,7 +335,7 @@ void RofsImageReader::ExtractImageContents()
 			}
 			else {
 				// get file extension
-				CheckFileExtension((char*) nextNode->iName,nextNode->iEntry,currNode,oFile);
+				CheckFileExtension( nextNode->iName,nextNode->iEntry,currNode,oFile);
 			}
 			nextNode = nextNode->NextNode();
 		}
@@ -408,33 +358,24 @@ then call ExtractFile function to extract the file from the image.
 @param aNode	- current node.
 @param aLogFile	- output stream.
 */
-void RofsImageReader::CheckFileExtension(char* aFileName,TRomBuilderEntry* aEntry,TRomNode* aNode,ofstream& aLogFile)
-{
+void RofsImageReader::CheckFileExtension(const char* aFileName,TRomBuilderEntry* aEntry,TRomNode* aNode,ofstream& aLogFile) {
 	//create a string to hold path information.
 	string path;
 	// check whether the node has parent 
-	if(aNode->GetParent())
-	{
-		// get the complete path 
-		path.assign( (char*)aNode->iName );
-		GetCompleteNodePath( aNode, path, "\\\\" );
+	if(aNode->GetParent()) {
+		// get the complete path  
+		GetCompleteNodePath( aNode, path );
 	}
-	else
-	{
+	else {
 		// else path is the current path
 		path.assign("");
 	}
-	if( iDisplayOptions & LOG_IMAGE_CONTENTS_FLAG && iDisplayOptions & EXTRACT_FILES_FLAG )
-	{
+	if( iDisplayOptions & LOG_IMAGE_CONTENTS_FLAG && iDisplayOptions & EXTRACT_FILES_FLAG ) {
 	 
-		size_t pos = string(aFileName).find_last_of(".");
-
-		const char* extName = "";
-		if(pos != string::npos)
-			extName = aFileName + pos + 1;	 
-		if ( 0 == stricmp(extName,"SIS") || 0 == stricmp(extName,"DAT")) {
+		const char* extName = strrchr(aFileName ,'.');	  
+		if ( extName && (0 == stricmp(extName,".SIS") || 0 == stricmp(extName,".DAT"))) {
 			// if the two strings are same then extract the corresponding file.
-			ImageReader::ExtractFile(aEntry->iFileOffset,aEntry->RealFileSize(),aFileName,path.c_str(),&ImageReader::iZdrivePath[0]);
+			ImageReader::ExtractFile(aEntry->iFileOffset,aEntry->RealFileSize(),aFileName,path.c_str(),ImageReader::iZdrivePath.c_str());
 		}
 		else {
 			// log the entry path information on to the specified file.
@@ -447,7 +388,7 @@ void RofsImageReader::CheckFileExtension(char* aFileName,TRomBuilderEntry* aEntr
 	}
 	else {
 		// if the two strings are same then extract the corresponding file.
-		ImageReader::ExtractFile(aEntry->iFileOffset,aEntry->RealFileSize(),aFileName,path.c_str(),&ImageReader::iZdrivePath[0]);
+		ImageReader::ExtractFile(aEntry->iFileOffset,aEntry->RealFileSize(),aFileName,path.c_str(),ImageReader::iZdrivePath.c_str());
 	}
 }
 
@@ -462,17 +403,15 @@ Function to get the complete path information of a file from an image.
 @param aAppStr	- string to append.
 @return - returns full path of the given file.
 */
-void RofsImageReader::GetCompleteNodePath(TRomNode* aNode,string& aName,char* aAppStr)
-{
+void RofsImageReader::GetCompleteNodePath(TRomNode* aNode,string& aName) {
 	// check if the entry has a parent.
-	TRomNode* NodeParent = aNode->GetParent();
-	if(NodeParent)
-	{
-		string str( (char*)NodeParent->iName );
-		str.append( aAppStr );
-		str.append( aName );
-		aName = str;
-		GetCompleteNodePath(NodeParent,aName,aAppStr);
+	 
+	aName = "";
+	while(aNode) {
+		aName.insert(0,aNode->iName);		
+		aNode = aNode->GetParent();
+		if(aNode)
+			aName.insert((size_t)0,(size_t)1,SLASH_CHAR1);
 	}
 }
 
@@ -487,27 +426,23 @@ Function to write the rom entry to an output stream.
 @param aFileName	- name of the current entry in the image.
 @param aLogFile		- output stream.
 */
-void RofsImageReader::WriteEntryToFile(char* aFileName,TRomNode* aNode,ofstream& aLogFile)
-{
+void RofsImageReader::WriteEntryToFile(const char* aFileName,TRomNode* aNode,ofstream& aLogFile) {
 	//create a string to hold path information.
-	string path;
+	string path("");
 	
-	if(aNode->GetParent())
-	{
+	if(aNode->GetParent()) {
 		// get the complete path 
-		path.assign( (char*)aNode->iName );
-		GetCompleteNodePath( aNode, path, "\\" );
+		GetCompleteNodePath( aNode, path);
+		
 	}
-	else
-	{
+	else {
 		// else path is the current path
 		path.assign("");
 	}
 	
-	if(aLogFile.is_open())
-	{
-		aLogFile.seekp(0,ios::end);
-		aLogFile<<path.c_str()<<"\\"<<aFileName<<"\n";
+	if(aLogFile.is_open()) {
+		aLogFile.seekp(0,ios_base::end);
+		aLogFile<<path.c_str()<<SLASH_CHAR1<<aFileName<< endl;
 	}
 }
 
@@ -519,8 +454,7 @@ Function to get the directory structure information.
 
 @param aFileMap		- map of filename with its size and offset values.
 */
-void RofsImageReader::GetFileInfo(FILEINFOMAP &aFileMap)
-{
+void RofsImageReader::GetFileInfo(FILEINFOMAP &aFileMap) {
 	// get the next Node 
 	TRomNode *nextNode = iRootDirEntry->NextNode();
 	// current Node.
@@ -528,60 +462,52 @@ void RofsImageReader::GetFileInfo(FILEINFOMAP &aFileMap)
 	// image size
 	TUint32 imgSize = GetImageSize();
 
-	while(nextNode)
-	{
-		if(nextNode->IsDirectory())
-		{
+	while(nextNode) {
+		if(nextNode->IsDirectory()) {
 			// if next node is a directory set current node as next node.
 			currNode = nextNode;
 		}
-		else
-		{
+		else {
 			PFILEINFO fileInfo = new FILEINFO;
 			//create a string to hold path information.
 			string fileName;
 			TUint32 aFileOffset = 0;
 
 			// check whether the node has parent 
-			if(currNode->GetParent())
-			{
-				if( !((currNode->GetParent() == currNode->FirstNode()) && !(currNode->IsDirectory())) )
-				{
+			if(currNode->GetParent()) {
+				if( !((currNode->GetParent() == currNode->FirstNode()) && !(currNode->IsDirectory())) ) {
 					// get the complete path 
-					fileName.assign( (char*)currNode->iName );
-					GetCompleteNodePath( currNode, fileName, (char*)DIR_SEPARATOR );
+					 
+					GetCompleteNodePath( currNode, fileName );
+					fileName += SLASH_CHAR1;
+					fileName.append(nextNode->iName);
 				}
 			}
-			else
-			{
+			else {
 				// else path is the current path
-				fileName.assign("");
+				fileName.assign(nextNode->iName);
 			}
-			fileName.append(DIR_SEPARATOR);
-			fileName.append((char*)nextNode->iName);
+			
+			
 
 			// get the size of the entity.
 			fileInfo->iSize = nextNode->iEntry->RealFileSize();
 
 			// get the offset of the entity.
-			if( ((RofsImage*)iImage)->iImageType == RCoreImageReader::E_ROFX)
-			{
-				if((TUint)nextNode->iEntry->iFileOffset > ((RofsImage*)iImage)->iRofsExtnHeader->iDirTreeOffset)
-				{
+			if( ((RofsImage*)iImage)->iImageType == RCoreImageReader::E_ROFX) {
+				if((TUint)nextNode->iEntry->iFileOffset > ((RofsImage*)iImage)->iRofsExtnHeader->iDirTreeOffset) {
 					//This is set only for files within this extended ROFS
 					aFileOffset = nextNode->iEntry->iFileOffset - ((RofsImage*)iImage)->iAdjustment;
 				}
 			}
-			else
-			{
+			else {
 				//This is set only for files within ROFS
 				aFileOffset = nextNode->iEntry->iFileOffset;
 			}
 
 			fileInfo->iOffset = aFileOffset;
 
-			if((!fileInfo->iOffset) || ((fileInfo->iOffset + fileInfo->iSize) > imgSize))
-			{
+			if((!fileInfo->iOffset) || ((fileInfo->iOffset + fileInfo->iSize) > imgSize)) {
 				fileInfo->iOffset = 0;
 				fileInfo->iSize = 0;
 			}
@@ -599,16 +525,13 @@ Function to get the ROFS image size.
 @internalComponent
 @released
 */
-TUint32 RofsImageReader::GetImageSize()
-{
+TUint32 RofsImageReader::GetImageSize() {
 	TUint32 result = 0;
 
-	if( ((RofsImage*)iImage)->iImageType == RCoreImageReader::E_ROFS)
-	{
+	if( ((RofsImage*)iImage)->iImageType == RCoreImageReader::E_ROFS) {
 		result = ((RofsImage*)iImage)->iRofsHeader->iImageSize;
 	}
-	else if(((RofsImage*)iImage)->iImageType == RCoreImageReader::E_ROFX)
-	{
+	else if(((RofsImage*)iImage)->iImageType == RCoreImageReader::E_ROFX) {
 		result = ((RofsImage*)iImage)->iRofsExtnHeader->iImageSize;
 	}
 

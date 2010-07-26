@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : test_ccmtask.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test_ccmtask" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>
+         Testing the ccm task
+    </description>
+    
+    <taskdef resource="com/nokia/helium/ccmtask/ant/antlib.xml" uri="http://www.nokia.com/helium"/>
+    
+    <target name="setUp">
+        <mkdir dir="${test.temp.dir}" />
+    </target>
+    
+    <target name="tearDown">
+        <delete dir="${test.temp.dir}" />
+    </target>
+
+    <hlm:sessionset id="ccm.session">
+        <session addr="FAKESESSION:9999:192.168.0.1" />
+    </hlm:sessionset>
+
+    <!-- Verify that task don't fail if there is nothing to be achieved. -->
+    <target name="test-ccm-no-commands">
+        <hlm:ccm verbose="false">
+            <hlm:sessionset refid="ccm.session" />
+        </hlm:ccm>
+    </target>
+
+    <!-- Simple test of role switching. -->
+    <target name="test-ccm-role">
+        <hlm:ccm verbose="false">
+            <hlm:sessionset refid="ccm.session" />
+            <role role="developer" />
+        </hlm:ccm>
+        <au:assertLogContains text="Running command 'role'" />
+        <au:assertLogContains text="Updating role: developer" />
+    </target>
+
+    <!-- Simple test of role switching. -->
+    <target name="test-ccm-close">
+        <hlm:ccm verbose="false">
+            <hlm:sessionset refid="ccm.session" />
+            <close />
+        </hlm:ccm>
+        <au:assertLogContains text="Running command 'close'" />
+        <au:assertLogContains text="Closing session FAKESESSION:9999:192.168.0.1" />
+    </target>
+
+    <!-- Simple test of role switching without role, the task must fail. -->
+    <target name="test-ccm-role-no-param">
+        <au:expectfailure message="The 'role' attribute has not been defined.">
+            <hlm:ccm verbose="false">
+                <hlm:sessionset refid="ccm.session" />
+                <role />
+            </hlm:ccm>
+        </au:expectfailure>
+    </target>
+
+    <!-- Verify that workarea fails if project is missing. -->
+    <target name="test-ccm-workarea-no-attribs">
+        <au:expectfailure message="The 'project' attribute has not been defined.">
+            <hlm:ccm verbose="false">
+                <hlm:sessionset refid="ccm.session" />
+                <workarea />
+            </hlm:ccm>
+        </au:expectfailure>
+    </target>
+
+    <!-- Verify that snapshot fails if project is missing. -->
+    <target name="test-ccm-snapshot-no-attribs">
+        <au:expectfailure message="The 'project' attribute has not been defined.">
+            <hlm:ccm verbose="false">
+                <hlm:sessionset refid="ccm.session" />
+                <snapshot />
+            </hlm:ccm>
+        </au:expectfailure>
+    </target>
+
+    <!-- Verify that checkout fails if project is missing. -->
+    <target name="test-ccm-checkout-no-attribs">
+        <au:expectfailure message="The 'project' attribute has not been defined.">
+            <hlm:ccm verbose="false">
+                <hlm:sessionset refid="ccm.session" />
+                <checkout />
+            </hlm:ccm>
+        </au:expectfailure>
+    </target>
+
+    <!-- Verify that reconcile fails if project is missing. -->
+    <target name="test-ccm-reconcile-no-attribs">
+        <au:expectfailure message="The 'project' attribute has not been defined.">
+            <hlm:ccm verbose="false">
+                <hlm:sessionset refid="ccm.session" />
+                <reconcile />
+            </hlm:ccm>
+        </au:expectfailure>
+        <au:assertLogContains text="Running command 'reconcile'" />
+    </target>
+
+    <!-- Verify that synchronize fails if project is missing. -->
+    <target name="test-ccm-synchronize-no-attribs">
+        <au:expectfailure message="The 'project' attribute has not been defined.">
+            <hlm:ccm verbose="false">
+                <hlm:sessionset refid="ccm.session" />
+                <synchronize />
+            </hlm:ccm>
+        </au:expectfailure>
+        <au:assertLogContains text="Running command 'synchronize'" />
+    </target>
+
+
+    <!-- Verify that simple project synchronize do not fail. -->
+    <target name="test-ccm-synchronize">
+        <hlm:ccm verbose="false">
+            <hlm:sessionset refid="ccm.session" />
+            <synchronize project="projectname-version:project:instance#1" />
+        </hlm:ccm>
+        <au:assertLogContains text="Running command 'synchronize'" />
+    </target>
+
+    <!-- Verify that simple project update do not fail. -->
+    <target name="test-ccm-update">
+        <hlm:ccm verbose="false">
+            <hlm:sessionset refid="ccm.session" />
+            <update project="projectname-version:project:instance#1" />
+        </hlm:ccm>
+        <au:assertLogContains text="Running command 'update'" />
+    </target>
+
+    <!-- Verify that simple project snapshot do not fail. -->
+    <target name="test-ccm-snapshot">
+        <au:expectfailure message="The 'dir' attribute has not been defined.">
+            <hlm:ccm verbose="false">
+                <hlm:sessionset refid="ccm.session" />
+                <snapshot project="projectname-version:project:instance#1" />
+            </hlm:ccm>
+        </au:expectfailure>
+        <au:assertLogContains text="Running command 'snapshot'" />
+    </target>
+
+
+    <!-- Verify that addtask does not fail the build if no parameter are given. -->
+    <target name="test-ccm-addtask">
+        <hlm:ccm verbose="false">
+            <hlm:sessionset refid="ccm.session" />
+            <addtask />
+        </hlm:ccm>
+        <au:assertLogContains text="Running command 'addtask'" />
+    </target>
+
+    <!-- Verify that addtask does not fail the build if only folder is given. -->
+    <target name="test-ccm-addtask-folder">
+        <hlm:ccm verbose="false">
+            <hlm:sessionset refid="ccm.session" />
+            <addtask folder="database#1234" />
+        </hlm:ccm>
+        <au:assertLogContains text="Running command 'addtask'" />
+        <au:assertLogContains text="Adding task to folder 1234-1:folder:database" />
+    </target>
+
+    <!-- Verify that addtask does not fail the build if only folder is given. -->
+    <target name="test-ccm-addtask-folder-tasks">
+        <hlm:ccm verbose="false">
+            <hlm:sessionset refid="ccm.session" />
+            <addtask folder="database#1234">
+                <task name="database#1" />
+                <task name="database#2" />
+            </addtask>
+        </hlm:ccm>
+        <au:assertLogContains text="Running command 'addtask'" />
+        <au:assertLogContains text="Adding task to folder 1234-1:folder:database" />
+    </target>
+
+</project>

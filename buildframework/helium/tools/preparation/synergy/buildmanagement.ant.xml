@@ -71,7 +71,7 @@ if database == None:
 
 import nokia.nokiaccm
 import ccm.extra
-from com.nokia.ant.types.ccm import SessionSet
+from com.nokia.helium.ccmtask.ant.types import SessionSet
 import traceback
         
 session = None
@@ -89,50 +89,5 @@ asession.setAddr(str(session.addr()))
 project.addReference(str(reference), sessionset)
     </scriptdef>
 
-    <!-- Target to test ccm-task. -->
-    <target name="try-ccm-task" if="run.ccm">
-        <hlm:ccm>
-            <hlm:update project="mc_4032_component_branches-mc_4031_0650" />
-        </hlm:ccm>
-    </target>
-
-    <!-- Target to test ccm-task. -->
-    <target name="try-ccm-task2" if="run.ccm">
-        <hlm:createSessionMacro database="to1tobet" reference="test.session" />
-        <hlm:ccm verbose="false">
-            <!-- Defining some session to use. -->
-            <hlm:sessionset refid="test.session" />
-
-
-            <!-- Do something ...-->
-            <hlm:addtask folder="tr1test1#2079">
-                <task name="tr1test1#5310" />
-            </hlm:addtask>
-            <!--<hlm:update project="mc_4032_component_branches-mc_4031_0650"/>-->
-            <hlm:snapshot project="helium-to1tobet#helium_3.0:project:vc1s60p1#1" dir="c:\test" fast="true" recursive="true" />
-            <hlm:close />
-        </hlm:ccm>
-    </target>
-    <!-- Target to test ccm-checkout. -->
-    <target name="try-ccm-task3" if="run.ccm">
-        <hlm:createSessionMacro database="tr1test1" reference="test.session" />
-        <hlm:ccm verbose="false">
-            <!-- Defining some session to use. -->
-            <hlm:sessionset refid="test.session" />
-            <hlm:checkout project="Hello_World-8.2:project:tr1test1#1" release="Hello_World/next" />
-            <hlm:close />
-        </hlm:ccm>
-    </target>
-
-    <!-- Target to test ccm-work_area. -->
-    <target name="try-ccm-task4" if="run.ccm">
-        <hlm:createSessionMacro database="tr1test1" reference="test.session" />
-        <hlm:ccm verbose="false">
-            <!-- Defining some session to use. -->
-            <hlm:sessionset refid="test.session" />
-            <hlm:workarea project="Hello_World-8.3:project:tr1test1#1" maintain="True" />
-            <hlm:close />
-        </hlm:ccm>
-    </target>
 
 </project>

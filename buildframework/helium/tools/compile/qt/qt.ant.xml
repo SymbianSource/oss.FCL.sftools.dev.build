@@ -43,68 +43,83 @@ Description:
     -->
     <property name="qt.qmake.default.args" value="-r"/>
 
+    <!--* @property qmake.enabled
+    Enables the run of qMake over a build configuration so bld.inf and mmps are generated for the build.
+    @type boolean
+    @scope public
+    -->
+    
     <!--
         Executing qmake on all Qt components defined under the system definition file.
         It must use schema v1.5.0+, and Qt unit must define a proFile attibute.   
      -->
-    <target name="run-qmake" if="qmake.enabled">
-        <!-- Generating the build steps from the sysdef information -->
-        <hlm:generate-layers />
+    <target name="run-qmake">
         <if>
-            <or>
-                <equals arg1="${build.system}" arg2="ec-helium" />
-                <equals arg1="${build.system}" arg2="sbs-ec" />
-            </or>
+            <istrue value="${qmake.enabled}" />
             <then>
-                <fmpp sourceFile="${qt.qmake.makefile.template}"
-                    outputFile="${temp.build.dir}/run-qmake-${sysdef.configuration}.mk">
-                    <data expandProperties="yes">
-                        data: xml(${build.drive}/output/build/canonical_system_definition_${sysdef.configuration}.xml)
-                        ant: antProperties()
-                    </data>
-                </fmpp>
-                <hlm:assertFileExists file="${temp.build.dir}/run-qmake-${sysdef.configuration}.mk" />
+                <!-- Generating the build steps from the sysdef information -->
+                <hlm:generate-layers />
+                <if>
+                    <or>
+                        <equals arg1="${build.system}" arg2="ec-helium" />
+                        <equals arg1="${build.system}" arg2="sbs-ec" />
+                    </or>
+                    <then>
+                        <fmpp sourceFile="${qt.qmake.makefile.template}"
+                            outputFile="${temp.build.dir}/run-qmake-${sysdef.configuration}.mk">
+                            <data expandProperties="yes">
+                                data: xml(${build.drive}/output/build/canonical_system_definition_${sysdef.configuration}.xml)
+                                ant: antProperties()
+                            </data>
+                        </fmpp>
+                        <hlm:assertFileExists file="${temp.build.dir}/run-qmake-${sysdef.configuration}.mk" />
     
-                <!-- Running the qmake steps -->
-                <hlm:emakeMacro name="run-qmake-${sysdef.configuration}" makefile="${temp.build.dir}/run-qmake-${sysdef.configuration}.mk"
-                    target="all" dir="${build.drive}/" log="${compile.log.dir}/${build.id}_${sysdef.configuration}.qmake.log"
-                    annodetail="basic,history,file,waiting"
-                    failonerror="false" 
-                    phase="compile"/>
-                <hlm:assertFileExists file="${compile.log.dir}/${build.id}_${sysdef.configuration}.qmake.log" />
+                        <!-- Running the qmake steps -->
+                        <hlm:emakeMacro name="run-qmake-${sysdef.configuration}" makefile="${temp.build.dir}/run-qmake-${sysdef.configuration}.mk"
+                                target="all" dir="${build.drive}/" log="${compile.log.dir}/${build.id}_${sysdef.configuration}.qmake.log"
+                                annodetail="basic,history,file,waiting"
+                                failonerror="false" 
+                                phase="compile"/>
+                        <hlm:assertFileExists file="${compile.log.dir}/${build.id}_${sysdef.configuration}.qmake.log" />
+                    </then>
+                    <else>
+                        <fmpp sourceFile="${qt.qmake.ant.template}"
+                            outputFile="${temp.build.dir}/run-qmake-${sysdef.configuration}.ant.xml">
+                            <data expandProperties="yes">
+                                data: xml(${build.drive}/output/build/canonical_system_definition_${sysdef.configuration}.xml)
+                                ant: antProperties()
+                            </data>
+                        </fmpp>
+                        <hlm:assertFileExists file="${temp.build.dir}/run-qmake-${sysdef.configuration}.ant.xml" />
+    
+                        <!-- Running the qmake steps -->
+                        <ant antfile="${temp.build.dir}/run-qmake-${sysdef.configuration}.ant.xml" dir="${build.drive}/"
+                            output="${compile.log.dir}/${build.id}_${sysdef.configuration}.qmake.log"/>
+                        <hlm:assertFileExists file="${compile.log.dir}/${build.id}_${sysdef.configuration}.qmake.log" />
+                    </else>
+                </if>
+                <copy file="${compile.log.dir}/${build.id}_${sysdef.configuration}.qmake.log" tofile="${compile.log.dir}/${build.id}_${sysdef.configuration}.qmake.generated.txt">
+                    <filterchain>
+                        <linecontainsregexp>
+                            <regexp pattern="Generating"/>
+                        </linecontainsregexp>
+                    </filterchain>
+                </copy>
+                <replaceregexp file="${compile.log.dir}/${build.id}_${sysdef.configuration}.qmake.generated.txt" match="^\s*(?:\[exec\])?\s*Generating[^/\\]*." replace="" byline="true"/>
+                <hlm:assertFileExists file="${compile.log.dir}/${build.id}_${sysdef.configuration}.qmake.generated.txt"/>
+                <hlm:metadatarecord database="${metadata.dbfile}">
+                    <hlm:textmetadatainput>
+                        <fileset casesensitive="false" file="${compile.log.dir}/${build.id}_${sysdef.configuration}.qmake.log" />
+                        <metadatafilterset refid="filterset.qmake" />
+                    </hlm:textmetadatainput>
+                </hlm:metadatarecord>
+                <hlm:signalMacro logfile="${build.id}_${sysdef.configuration}.qmake.log" 
+                    signal.input="signalRunQMakeInput" phase="compile"/>
             </then>
             <else>
-                <fmpp sourceFile="${qt.qmake.ant.template}"
-                    outputFile="${temp.build.dir}/run-qmake-${sysdef.configuration}.ant.xml">
-                    <data expandProperties="yes">
-                        data: xml(${build.drive}/output/build/canonical_system_definition_${sysdef.configuration}.xml)
-                        ant: antProperties()
-                    </data>
-                </fmpp>
-                <hlm:assertFileExists file="${temp.build.dir}/run-qmake-${sysdef.configuration}.ant.xml" />
-    
-                <!-- Running the qmake steps -->
-                <ant antfile="${temp.build.dir}/run-qmake-${sysdef.configuration}.ant.xml" dir="${build.drive}/"
-                    output="${compile.log.dir}/${build.id}_${sysdef.configuration}.qmake.log"/>
-                <hlm:assertFileExists file="${compile.log.dir}/${build.id}_${sysdef.configuration}.qmake.log" />
+                <echo>Skipping qmake step, because qmake.enabled is not set to true.</echo>
             </else>
         </if>
-        <copy file="${compile.log.dir}/${build.id}_${sysdef.configuration}.qmake.log" tofile="${compile.log.dir}/${build.id}_${sysdef.configuration}.qmake.generated.txt">
-            <filterchain>
-                <linecontainsregexp>
-                    <regexp pattern="Generating"/>
-                </linecontainsregexp>
-            </filterchain>
-        </copy>
-        <replaceregexp file="${compile.log.dir}/${build.id}_${sysdef.configuration}.qmake.generated.txt" match="^\s*(?:\[exec\])?\s*Generating[^/\\]*." replace="" byline="true"/>
-        <hlm:assertFileExists file="${compile.log.dir}/${build.id}_${sysdef.configuration}.qmake.generated.txt"/>
-        <hlm:metadatarecord database="${metadata.dbfile}">
-            <hlm:textmetadatainput>
-                <fileset casesensitive="false" file="${compile.log.dir}/${build.id}_${sysdef.configuration}.qmake.log" />
-                <metadatafilterset refid="filterset.qmake" />
-            </hlm:textmetadatainput>
-        </hlm:metadatarecord>
-        <hlm:signalMacro logfile="${build.id}_${sysdef.configuration}.qmake.log" 
-            signal.input="signalRunQMakeInput" phase="compile"/>
     </target>
+
 </project>

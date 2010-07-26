@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : test_create_root_sysdef.ant.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test-create-root-sysdef" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>Helium antlib merge sysdef tests.</description>
+
+    <taskdef resource="com/nokia/helium/sysdef/ant/antlib.xml" uri="http://www.nokia.com/helium" />
+    <property name="epocroot" location="../data/rootsysdef" />
+    <property name="epocroot.temp" location="${epocroot}/temp" />
+
+    <!-- is called prior to the test -->
+    <target name="setUp">
+        <delete dir="${epocroot.temp}/" failonerror="false" />
+        <mkdir dir="${epocroot.temp}" />
+    </target>
+
+    <!-- is called after the test, even if that caused an error -->
+    <target name="tearDown">
+        <delete dir="${epocroot.temp}" failonerror="false" />
+    </target>
+
+    <target name="test-missing-epocroot">
+        <au:expectfailure message="Must fail if epocroot is missing">
+            <hlm:createRootSysdef />
+        </au:expectfailure>
+    </target>
+
+    <target name="test-missing-destFile">
+        <au:expectfailure message="Must fail if epocroot is missing">
+            <hlm:createRootSysdef epocroot="${epocroot}"/>
+        </au:expectfailure>
+    </target>
+
+    <target name="test-destFile-out-of-epocroot">
+        <au:expectfailure message="Must fail if destfile is not under epocroot">
+            <hlm:createRootSysdef epocroot="${epocroot}" destFile="${java.io.tmpdir}/root.sysdef.xml"/>
+        </au:expectfailure>
+    </target>
+
+            <!--
+      This test checks how the task is behaving while a dir is given in place of a 
+      output file. Failure is of course expected, and clear error message shown.
+     -->
+    <target name="test-create-root-invalid-dest-file">
+        <au:expectfailure message="Must fail in case of invalid destFile">
+            <hlm:createRootSysdef destFile="${epocroot.temp}/" epocroot="${epocroot}">
+                <fileset dir="${epocroot}">
+                    <include name="valid_package/package_definition.xml" />
+                </fileset>
+            </hlm:createRootSysdef>
+        </au:expectfailure>
+        <au:assertFileDoesntExist file="${epocroot.temp}/sysdef_model.xml" />
+        <au:assertLogContains text="Error while creating output file:" />
+    </target>
+
+    <target name="test-create-root-invalid-dest-file-failonerror">
+        <hlm:createRootSysdef destFile="${epocroot.temp}/" epocroot="${epocroot}" failonerror="false">
+            <fileset dir="${epocroot}">
+                <include name="**/valid_package/package_definition.xml" />
+            </fileset>
+        </hlm:createRootSysdef>
+        <au:assertFileDoesntExist file="${epocroot.temp}/sysdef_model.xml" />
+    </target>
+    
+    <target name="test-create-root-sysdef-single-root">
+        <hlm:createRootSysdef destFile="${epocroot.temp}/sysdef_model.xml" epocroot="${epocroot}">
+            <fileset dir="${epocroot}">
+                <include name="valid_package/package_definition.xml" />
+            </fileset>
+        </hlm:createRootSysdef>
+        <au:assertFileExists file="${epocroot.temp}/sysdef_model.xml" />
+        <loadfile property="pkg.root" srcfile="${epocroot.temp}/sysdef_model.xml" />
+        <au:assertTrue>
+            <contains string="${pkg.root}" substring="valid_package" />
+        </au:assertTrue>
+    </target>
+
+    <!--
+      Check the generation of a root sysdef file.
+        * contains the correct package under the correct layer
+        * url starts correctly
+     -->
+    <target name="test-create-root-sysdef-dual-root">
+        <hlm:createRootSysdef destFile="${epocroot.temp}/sysdef_model.xml" epocroot="${epocroot}">
+            <fileset dir="${epocroot}">
+                <include name="valid_package/package_definition.xml" />
+                <include name="valid_package_root2/package_definition.xml" />
+            </fileset>
+        </hlm:createRootSysdef>
+        <au:assertLogContains text="Creating ${epocroot.temp}${file.separator}sysdef_model.xml" />
+        <au:assertFileExists file="${epocroot.temp}/sysdef_model.xml" />
+        <loadfile property="pkg.root" srcfile="${epocroot.temp}/sysdef_model.xml"/>
+        <echo>${pkg.root}</echo>
+        <au:assertTrue>
+            <contains string="${pkg.root}" substring="&quot;../root/layer/valid_package" />
+        </au:assertTrue>
+        <au:assertTrue>
+            <contains string="${pkg.root}" substring="&quot;../root2/layer/valid_package_root2" />
+        </au:assertTrue>
+    </target>
+
+    <target name="test-create-root-sysdef-dual-root-invalid-pkg-data-file-failure">
+        <au:expectfailure message="Must fail if an pkgdata file is invalid.">
+            <hlm:createRootSysdef destFile="${epocroot.temp}/sysdef_model.xml" epocroot="${epocroot}">
+                <fileset dir="${epocroot}">
+                    <include name="valid_package/package_definition.xml" />
+                    <include name="invalid_pkg_data/package_definition.xml" />
+                </fileset>
+            </hlm:createRootSysdef>
+        </au:expectfailure>
+        <au:assertFileDoesntExist file="${epocroot.temp}/sysdef_model.xml" />
+    </target>
+            
+    <target name="test-create-root-sysdef-dual-root-missing-pkg-data">
+        <au:expectfailure message="Must fail if an pkgdata file is missing.">
+            <hlm:createRootSysdef destFile="${epocroot.temp}/sysdef_model.xml" epocroot="${epocroot}">
+                <fileset dir="${epocroot}">
+                    <include name="/valid_package/package_definition.xml" />
+                    <include name="missing_data_file_pkg/package_definition.xml" />
+                </fileset>
+            </hlm:createRootSysdef>
+        </au:expectfailure>
+        <au:assertFileDoesntExist file="${epocroot.temp}/sysdef_model.xml" />
+    </target>
+    
+    <target name="test-create-root-sysdef-dual-root-missing-pkg-data-failonerror">
+        <hlm:createRootSysdef destFile="${epocroot.temp}/sysdef_model.xml" epocroot="${epocroot}" failonerror="false">
+            <fileset dir="${epocroot}">
+                <include name="**/valid_package/package_definition.xml" />
+                <include name="**/missing_data_file_pkg/package_definition.xml" />
+            </fileset>
+        </hlm:createRootSysdef>
+        <au:assertFileExists file="${epocroot.temp}/sysdef_model.xml" />
+        <loadfile property="pkg.root" srcfile="${epocroot.temp}/sysdef_model.xml" />
+        <au:assertTrue>
+            <contains string="${pkg.root}" substring="valid_package" />
+        </au:assertTrue>
+    </target>
+    
+    <target name="test-create-root-sysdef-dual-root-missing-pkg-data-custom-template">
+        <hlm:createRootSysdef destFile="${epocroot.temp}/sysdef_model.txt" 
+            epocroot="${epocroot}"
+            template="${epocroot}/template.txt.ftl">
+            <fileset dir="${epocroot}">
+                <include name="valid_package/package_definition.xml" />
+            </fileset>
+        </hlm:createRootSysdef>
+        <au:assertFileExists file="${epocroot.temp}/sysdef_model.txt" />
+        <loadfile property="pkg.root" srcfile="${epocroot.temp}/sysdef_model.txt" />
+        <au:assertTrue>
+            <contains string="${pkg.root}" substring="root/layer/valid_package" />
+        </au:assertTrue>
+        <au:assertLogContains text="Creating ${epocroot.temp}${file.separator}sysdef_model.txt" />
+    </target>
+
+    <target name="test-create-root-sysdef-dual-root-missing-pkg-data-failonerror-custom-template">
+        <hlm:createRootSysdef destFile="${epocroot.temp}/sysdef_model.txt" 
+            epocroot="${epocroot}" failonerror="false"
+            template="${epocroot}/faulty_template.txt.ftl">
+            <fileset dir="${epocroot}">
+                <include name="valid_package/package_definition.xml" />
+            </fileset>
+        </hlm:createRootSysdef>
+        <au:assertFileDoesntExist file="${epocroot.temp}/sysdef_model.txt" />
+        <au:assertLogContains text="Error while creating output file: Unexpected end of file reached." />
+    </target>
+    
+    <target name="test-create-root-sysdef-single-root-test-target-package">
+        <copy todir="${epocroot.temp}">
+            <fileset dir="${epocroot}/epocroot_valid" />
+        </copy>
+        <hlm:createRootSysdef destFile="${epocroot.temp}/sysdef_model.xml" epocroot="${epocroot.temp}"
+            checkPackageExists="true">
+            <fileset dir="${epocroot}">
+                <include name="valid_package/package_definition.xml" />
+                <include name="vendor_package/**/package_definition.xml" />
+            </fileset>
+        </hlm:createRootSysdef>
+        <au:assertFileExists file="${epocroot.temp}/sysdef_model.xml" />
+        <loadfile property="pkg.root" srcfile="${epocroot.temp}/sysdef_model.xml" />
+        <au:assertTrue>
+            <and>
+                <contains string="${pkg.root}" substring="valid_package" />
+                <contains string="${pkg.root}" substring="vendor_package" />
+                <contains string="${pkg.root}" substring="nokia_vendor_package" />
+            </and>
+        </au:assertTrue>
+    </target>
+
+    <target name="test-create-root-sysdef-single-root-test-target-package-missing">
+        <hlm:createRootSysdef destFile="${epocroot.temp}/sysdef_model.xml" epocroot="${epocroot.temp}"
+            checkPackageExists="true">
+            <fileset dir="${epocroot}">
+                <include name="valid_package/package_definition.xml" />
+                <include name="vendor_package/**/package_definition.xml" />
+            </fileset>
+        </hlm:createRootSysdef>
+        <au:assertFileExists file="${epocroot.temp}/sysdef_model.xml" />
+        <loadfile property="pkg.root" srcfile="${epocroot.temp}/sysdef_model.xml" />
+        <au:assertTrue>
+            <not>
+                <and>
+                    <contains string="${pkg.root}" substring="valid_package" />
+                    <contains string="${pkg.root}" substring="vendor_package" />
+                    <contains string="${pkg.root}" substring="nokia_vendor_package" />
+                </and>
+            </not>
+        </au:assertTrue>
+    </target>
+
+    <target name="test-create-root-sysdef-single-root-test-vendor-package">
+        <hlm:createRootSysdef destFile="${epocroot.temp}/sysdef_model.xml" epocroot="${epocroot.temp}">
+            <fileset dir="${epocroot}">
+                <include name="vendor_package/**/package_definition.xml" />
+            </fileset>
+        </hlm:createRootSysdef>
+        <au:assertFileExists file="${epocroot.temp}/sysdef_model.xml" />
+        <loadfile property="pkg.root" srcfile="${epocroot.temp}/sysdef_model.xml" />
+        <au:assertTrue>
+            <and>
+                <contains string="${pkg.root}" substring="vendor_package" />
+                <contains string="${pkg.root}" substring="nokia_vendor_package" />
+            </and>
+        </au:assertTrue>
+    </target>
+      
+</project>

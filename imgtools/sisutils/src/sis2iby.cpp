@@ -28,8 +28,7 @@ Initilize the parameters to data members.
 
 @param aFile	- SIS file name
 */
-Sis2Iby::Sis2Iby(char* aFile) : SisUtils(aFile)
-{
+Sis2Iby::Sis2Iby(const char* aFile) : SisUtils(aFile) {
 }
 
 /**
@@ -39,12 +38,10 @@ Deallocates the memory for data members
 @internalComponent
 @released
 */
-Sis2Iby::~Sis2Iby()
-{
+Sis2Iby::~Sis2Iby() {
 	PKGFILE_MAP::iterator begin = iPkgFileMap.begin();
 	PKGFILE_MAP::iterator end = iPkgFileMap.end();
-	while(begin != end)
-	{
+	while(begin != end) {
 		PPKGPARSER ptemp = 0;
 		ptemp = (*begin).second;
 
@@ -63,35 +60,28 @@ ProcessSisFile: Processes the input sis file
 @internalComponent
 @released
 */
-void Sis2Iby::ProcessSisFile()
-{
+void Sis2Iby::ProcessSisFile() {
 	TUint32 retStatus = STAT_SUCCESS;
-	String sisFile = SisFileName();
+	string sisFile = SisFileName();
 
-	if(IsVerboseMode())
-	{
-		std::cout << "Processing " << (char*)sisFile.data() << std::endl;
+	if(IsVerboseMode()) {
+		cout << "Processing " << sisFile.c_str() << endl;
 	}
 
-	if(IsFileExist(sisFile))
-	{
+	if(IsFileExist(sisFile)) {
 		retStatus = InvokeExtractTool(sisFile);
 
-		switch(retStatus)
-		{
-		case STAT_SUCCESS:
-			{
-				UpdatePkgFileMap(iExtractPath, sisFile);
-			}
+		switch(retStatus) {
+		case STAT_SUCCESS: 
+			UpdatePkgFileMap(iExtractPath, sisFile); 
 			break;
 		case STAT_FAILURE:
-			{
-				throw SisUtilsException((char*)sisFile.data(), "Failed to extract SIS file");
-			}
+			throw SisUtilsException(sisFile.c_str(), "Failed to extract SIS file");
+			break ;
 		}
 	}
 	else
-		throw SisUtilsException((char*)sisFile.data(), "File not found");
+		throw SisUtilsException(sisFile.c_str(), "File not found");
 }
 
 /**
@@ -100,12 +90,10 @@ GenerateOutput: Generates IBY for each of the package file
 @internalComponent
 @released
 */
-void Sis2Iby::GenerateOutput()
-{
+void Sis2Iby::GenerateOutput() {
 	PKGFILE_MAP::iterator begin = iPkgFileMap.begin();
 	PKGFILE_MAP::iterator end = iPkgFileMap.end();
-	while(begin != end)
-	{
+	while(begin != end) {
 		GenerateIby((*begin).first, (*begin).second);
 		++begin;
 	}
@@ -120,26 +108,23 @@ GenerateOutput: Generates IBY file for the given package file
 @param aPkgFile - package file name
 @param aParser - corresponding package file reader object
 */
-void Sis2Iby::GenerateIby(String aPkgFile, PPKGPARSER aParser)
-{
-	String ibyFile = iOutputPath;
+void Sis2Iby::GenerateIby(string aPkgFile, PPKGPARSER aParser) {
+	string ibyFile = iOutputPath;
 	
 	AppendFileName(ibyFile, aPkgFile);
 	ibyFile.append(".iby");
 
 	if( !MakeDirectory(iOutputPath) )
-		throw SisUtilsException((char*)iOutputPath.data(), "Failed to create path");
+		throw SisUtilsException(iOutputPath.c_str(), "Failed to create path");
 
-	if(IsVerboseMode())
-	{
-		std::cout << "Generating IBY file " << (char*)ibyFile.data() << std::endl;
+	if(IsVerboseMode())	{
+		cout << "Generating IBY file " << ibyFile.c_str() << endl;
 	}
 
-	ibyHandle.open((char*)ibyFile.data(),(std::ios::out));
+	ibyHandle.open(ibyFile.c_str(),ios_base::out);
 
-	if(!ibyHandle.good())
-	{
-		throw SisUtilsException((char*)ibyFile.data(), "Failed to create IBY file");
+	if(!ibyHandle.good()) 	{
+		throw SisUtilsException(ibyFile.c_str() , "Failed to create IBY file");
 	}
 
 	// Generating Header
@@ -170,24 +155,22 @@ InvokeExtractTool: Invokes the SIS file extraction tool and returns the status
 
 @param sisFile - SIS file name
 */
-TUint32 Sis2Iby::InvokeExtractTool(String sisFile)
-{
-	String cmdLine;
+TUint32 Sis2Iby::InvokeExtractTool(const string& aSisFile) {
+	string cmdLine;
 
 	cmdLine.append(SISEXTRACT_TOOL_NAME SISEXTRACT_TOOL_DEFOPT);
 
-	AppendFileName(iExtractPath, sisFile);
+	AppendFileName(iExtractPath, aSisFile);
 
 	cmdLine.append(SISEXTRACT_TOOL_EXTOPT);
 	cmdLine.append("\"" + iExtractPath + "\" ");
-	cmdLine.append(sisFile);
+	cmdLine.append(aSisFile);
 
-	if(IsVerboseMode())
-	{
-		std::cout << "Executing " << (char*)cmdLine.data() << std::endl;
+	if(IsVerboseMode()) {
+		cout << "Executing " << cmdLine.c_str() << endl;
 	}
 
-	return RunCommand(cmdLine);
+	return RunCommand(cmdLine.c_str());
 }
 
 /**
@@ -199,10 +182,9 @@ UpdatePkgFileMap: Update the package file map by getting the embedded sis file l
 @param aPath - Extract path
 @param aFile - SIS file name
 */
-void Sis2Iby::UpdatePkgFileMap(String aPath, String aFile)
-{
-	String pkgFileName;
-	std::list<String> sisList;
+void Sis2Iby::UpdatePkgFileMap(const string& aPath, const string& aFile) {
+	string pkgFileName;
+	list<string> sisList;
 
 	// main pkg file
 	pkgFileName = aPath;
@@ -213,12 +195,10 @@ void Sis2Iby::UpdatePkgFileMap(String aPath, String aFile)
 	// get the embedded sis file list
 	// add each as pkg file into the list
 	pkgParser = 0;
-	if( IsFileExist(pkgFileName) )
-	{
+	if( IsFileExist(pkgFileName) ) {
 		pkgParser = new PkgParser(pkgFileName);
 
-		if(pkgParser)
-		{
+		if(pkgParser) {
 			pkgParser->ParsePkgFile();
 
 			iPkgFileMap[pkgFileName] = pkgParser;
@@ -227,9 +207,8 @@ void Sis2Iby::UpdatePkgFileMap(String aPath, String aFile)
 			SISFILE_LIST::iterator begin = sisList.begin();
 			SISFILE_LIST::iterator end = sisList.end();
 
-			while(begin != end)
-			{
-				String currPath = aPath;
+			while(begin != end) {
+				string currPath = aPath;
 
 				currPath.append(PATHSEPARATOR);
 				GetFileName((*begin), currPath);
@@ -239,10 +218,10 @@ void Sis2Iby::UpdatePkgFileMap(String aPath, String aFile)
 			}
 		}
 		else
-			throw SisUtilsException((char*)pkgFileName.data(), "Could not create parser object");
+			throw SisUtilsException(pkgFileName.c_str(), "Could not create parser object");
 	}
 	else
-		throw SisUtilsException((char*)pkgFileName.data(), "File not found");
+		throw SisUtilsException(pkgFileName.c_str(), "File not found");
 }
 
 /**
@@ -253,10 +232,9 @@ WriteLanguages: Writes language section in the IBY file
 
 @param aParser - Package file parser object
 */
-void Sis2Iby::WriteLanguages(PPKGPARSER aParser)
-{
+void Sis2Iby::WriteLanguages(PPKGPARSER aParser) {
 	LANGUAGE_LIST lanMap;
-	PLANG_LIST langCode;
+	PLANG_LIST iLangCode;
 
 	aParser->GetLanguageList(lanMap);
 	ibyHandle << "\n// Languages: ";
@@ -264,16 +242,14 @@ void Sis2Iby::WriteLanguages(PPKGPARSER aParser)
 	LANGUAGE_LIST::iterator begin = lanMap.begin();
 	LANGUAGE_LIST::iterator end = lanMap.end();
 
-	while(begin != end)
-	{
-		langCode = (*begin);
+	while(begin != end) {
+		iLangCode = (*begin);
 
-		ibyHandle << " " << langCode->langName;
-		ibyHandle << "(" << langCode->langCode;
+		ibyHandle << " " << iLangCode->iLangName;
+		ibyHandle << "(" << iLangCode->iLangCode;
 
-		if(langCode->dialectCode)
-		{
-			ibyHandle << "-" << langCode->dialectCode;
+		if(iLangCode->iDialectCode) {
+			ibyHandle << "-" << iLangCode->iDialectCode;
 		}
 		ibyHandle << ")";
 
@@ -289,24 +265,23 @@ WritePackageHeader: Writes package header section in the IBY file
 
 @param aParser - Package file parser object
 */
-void Sis2Iby::WritePackageHeader(PPKGPARSER aParser)
-{
+void Sis2Iby::WritePackageHeader(PPKGPARSER aParser) {
 	PKG_HEADER pkgHeader;
-	std::list<String> pkgList;
-	std::ostringstream str;
+	list<string> pkgList;
+	ostringstream str;
 
 	aParser->GetHeader(pkgHeader);
 
 	ibyHandle << "\n// Header: ";
 
-	pkgList = pkgHeader.pkgNameList;
+	pkgList = pkgHeader.iPkgNames;
 	while(pkgList.size())
 	{
 		ibyHandle << "\"" << pkgList.front() << "\" ";
 		pkgList.pop_front();
 	}
 
-	str << "(0x" << std::setbase(16) << pkgHeader.pkgUid << ")";
+	str << "(0x" << setbase(16) << pkgHeader.iPkgUID << ")";
 
 	ibyHandle << str.str();
 }
@@ -319,22 +294,19 @@ WriteInstallOptions: Writes install option section in the IBY file
 
 @param aParser - Package file parser object
 */
-void Sis2Iby::WriteInstallOptions(PPKGPARSER aParser)
-{
-	std::list<String> optList;
-	String ibyName;
+void Sis2Iby::WriteInstallOptions(PPKGPARSER aParser) {
+	list<string> optList;
+	string ibyName;
 
 	aParser->GetInstallOptions(optList);
 	SISFILE_LIST::iterator begin = optList.begin();
 	SISFILE_LIST::iterator end = optList.end();
 
-	if(begin != end)
-	{
+	if(begin != end) {
 		ibyHandle << "\n// Install Options: ";
 	}
 
-	while(begin != end)
-	{
+	while(begin != end) {
 		ibyHandle << " \"" << (*begin) << "\"";
 		++begin;
 	}
@@ -348,11 +320,9 @@ InsertTabs: Inserts spaces for indentation in the output IBY file
 
 @param num - num of spaces to be inserted
 */
-void Sis2Iby::InsertTabs(int num)
-{
+void Sis2Iby::InsertTabs(TInt num) {
 	ibyHandle << "\n";
-	while(num--)
-	{
+	while(num--) {
 		ibyHandle << "  ";
 	}
 }
@@ -365,11 +335,10 @@ WritePackageBody: Writes package body details in the IBY file
 
 @param aParser - Package file parser object
 */
-void Sis2Iby::WritePackageBody(PPKGPARSER aParser)
-{
+void Sis2Iby::WritePackageBody(PPKGPARSER aParser) {
 	CMDBLOCK_LIST cmdList;
 	PCMD_BLOCK cmd;
-	int pad = 0;
+	TInt pad = 0;
 
 	ibyHandle << "\n\n";
 	aParser->GetCommandList(cmdList);
@@ -377,48 +346,36 @@ void Sis2Iby::WritePackageBody(PPKGPARSER aParser)
 	CMDBLOCK_LIST::iterator begin = cmdList.begin();
 	CMDBLOCK_LIST::iterator end = cmdList.end();
 
-	while(begin != end)
-	{
+	while(begin != end) {
 		cmd = (*begin);
 
-		switch(cmd->cmdType)
+		switch(cmd->iCmdType)
 		{
-		case IF:
-			{
-				InsertTabs(pad);
-				ibyHandle << "#if " << cmd->cmdExpression;
-				pad++;
-			}
+		case IF:			 
+			InsertTabs(pad);
+			ibyHandle << "#if " << cmd->iCmdExpr;
+			pad++;
+			 
 			break;
-		case ELSEIF:
-			{
-				InsertTabs(pad-1);
-				ibyHandle << "#elif " << cmd->cmdExpression;
-			}
+		case ELSEIF:			
+			InsertTabs(pad-1);
+			ibyHandle << "#elif " << cmd->iCmdExpr;			
 			break;
-		case ELSE:
-			{
-				InsertTabs(pad-1);
-				ibyHandle << "#else";
-			}
+		case ELSE:		
+			InsertTabs(pad-1);
+			ibyHandle << "#else";			
 			break;
-		case ENDIF:
-			{
-				--pad;
-				InsertTabs(pad);
-				ibyHandle << "#endif";
-			}
+		case ENDIF:			
+			--pad;
+			InsertTabs(pad);
+			ibyHandle << "#endif";			
 			break;
-		case INSTALLFILE:
-			{
-				WriteInstallFileList(cmd->iInstallFileList, aParser, pad);
-			}
+		case INSTALLFILE:			
+			WriteInstallFileList(cmd->iInstallFileList, aParser, pad);			
 			break;
-		case PACKAGE:
-			{
-				InsertTabs(pad);
-				ibyHandle << "#include " << "\"" << cmd->cmdExpression << "\"";
-			}
+		case PACKAGE:			
+			InsertTabs(pad);
+			ibyHandle << "#include " << "\"" << cmd->iCmdExpr << "\"";			
 			break;
 		}
 
@@ -436,17 +393,14 @@ WriteFileInclusion: Writes installable file details in the IBY file
 @param aDestFile - Name of the destination file
 @param aPkgName - Name of the package file
 */
-void Sis2Iby::WriteFileInclusion(String aSrcFile, String aDestFile, String aPkgName, int pad)
-{
+void Sis2Iby::WriteFileInclusion(string aSrcFile, string aDestFile, string aPkgName, TInt aPadding) {
 	NormaliseSourceFile(aSrcFile, aPkgName);
 
-	InsertTabs(pad);
-	if(IsValidE32Image(aSrcFile))
-	{
+	InsertTabs(aPadding);
+	if(IsValidE32Image(aSrcFile)){
 		ibyHandle << "file = ";
 	}
-	else
-	{
+	else {
 		ibyHandle << "data = ";
 	}
 
@@ -465,9 +419,8 @@ WriteInstallFileList: Writes installable file details in the IBY file
 @param aParser - Package file parser object
 @param pad - Number of spaces for indentation purpose
 */
-void Sis2Iby::WriteInstallFileList(PINSTALLFILE_LIST aFileList, PPKGPARSER aParser, int pad)
-{
-	WriteFileInclusion(aFileList->srcFiles.front(), aFileList->destFile, aParser->GetPkgFileName(), pad);
+void Sis2Iby::WriteInstallFileList(PINSTALLFILE_LIST aFileList, PPKGPARSER aParser, TInt aPadding) {
+	WriteFileInclusion(aFileList->iSourceFiles.front(), aFileList->iDestFile, aParser->GetPkgFileName(), aPadding);
 }
 
 /**
@@ -479,21 +432,18 @@ AppendFileName: Appends file name to the given path
 @param aPath - Source path
 @param aFile - File name
 */
-void Sis2Iby::AppendFileName(String& aPath, String aFile)
-{
+void Sis2Iby::AppendFileName(string& aPath, string aFile) {
 	TUint pos = 0;
 
 	TrimQuotes(aPath);
 	TrimQuotes(aFile);
 
 	pos = aPath.rfind(PATHSEPARATOR);
-	if(pos == String::npos)
-	{
+	if(pos == string::npos) {
 		aPath.append(PATHSEPARATOR);
 	}
 
-	if(pos < (aPath.length()-1))
-	{
+	if(pos < (aPath.length() - 1)) {
 		aPath.append(PATHSEPARATOR);
 	}
 
@@ -510,23 +460,19 @@ GetFileName: Returns the base file name
 @param aName - Input file name
 @param aFile - Output parameter to hold the return value
 */
-void Sis2Iby::GetFileName(String aName, String& aFile)
-{
+void Sis2Iby::GetFileName(const string& aName, string& aFile) {
 	TUint spos = 0, epos = 0;
 
 	spos = aName.rfind(PATHSEPARATOR);
-	if(spos != String::npos)
-	{
+	if(spos != string::npos) {
 		spos += 1;
 	}
-	else
-	{
+	else {
 		spos = 0;
 	}
 
 	epos = aName.rfind(".");
-	if(epos == String::npos)
-	{
+	if(epos == string::npos) {
 		epos = aName.size();
 	}
 
@@ -541,19 +487,16 @@ MakeFullPath: Returns the absolute path of the given file
 
 @param aFile - Input file name
 */
-void Sis2Iby::MakeFullPath(String& aFile)
-{
-#ifdef WIN32
-	char fPath[_MAX_PATH];
-
-	if( _fullpath(fPath, (char*)aFile.data(), _MAX_PATH) != NULL )
-	{
-		aFile.assign(fPath);
-	}
-#else
-#error "TODO: Implement this function under other OS than Windows"
+#ifndef _MAX_PATH
+#define _MAX_PATH 1024
 #endif
-	return;
+void Sis2Iby::MakeFullPath(string& aFile) {
+ 
+	char path[_MAX_PATH];
+	if( _fullpath(path, aFile.c_str(), _MAX_PATH) != NULL ) {
+		aFile.assign(path);
+	}
+
 }
 
 /**
@@ -565,18 +508,15 @@ NormaliseSourceFile: Normalise the source file with its absolute path
 @param aFile - Input file name
 @param aPkgFile - Package file path
 */
-void Sis2Iby::NormaliseSourceFile(String& aFile, String aPkgFile)
-{
-	String result;
+void Sis2Iby::NormaliseSourceFile(string& aFile, const string& aPkgFile) {
+	string result;
 	TUint pos = 0;
 
 	pos = aPkgFile.rfind(PATHSEPARATOR);
-	if(pos != String::npos)
-	{
+	if(pos != string::npos) {
 		result = aPkgFile.substr(0,pos);
 	}
-	else
-	{
+	else {
 		result = ".";
 	}
 
@@ -596,37 +536,16 @@ NormaliseDestFile: Normalise the destination file
 
 @param aFile - Input file name
 */
-void Sis2Iby::NormaliseDestFile(String& aFile)
-{
-	TUint pos = 0;
-
-	/** Comment by KunXu to fix DEF122540 on 18 Jun 2008
-	pos = aFile.find("$:");
-	if(pos != String::npos)
-	{
-		aFile.replace(pos, 2, "");
-	}
-
-	pos = aFile.find("!:");
-	if(pos != String::npos)
-	{
-		aFile.replace(pos, 2, "");
-	}
-	**/
-
-	/** Add by KunXu to fix DEF122540 on 18 Jun 2008 **/
-	/** Ignore any drive indication in the filename to generate an iby file **/
-	/** Begin **/
+void Sis2Iby::NormaliseDestFile(string& aFile) {
+	TUint pos = 0; 
 	pos = aFile.find(":");
-	if (1 == pos)
-	{
+	if (1 == pos) {
 		char chFirst = aFile[0];
-		if ('$' == chFirst || '!' == chFirst || (chFirst >='a' && chFirst <='z') || (chFirst >='A' && chFirst <='Z'))
-		{
+		if ('$' == chFirst || '!' == chFirst || (chFirst >='a' && chFirst <='z') || (chFirst >='A' && chFirst <='Z')) {
 			aFile.replace(0, 2, "");
 		}
 	}
-	/** End **/
+ 
 
 	aFile = "\"" + aFile + "\"";
 }
@@ -639,37 +558,32 @@ IsValidE32Image: Checks whether the given file is E32 image
 
 @param aFile - Input file name
 */
-TBool Sis2Iby::IsValidE32Image(String aFile)
-{
-	std::ifstream aIfs;
-	TInt8 aSig[5];
+TBool Sis2Iby::IsValidE32Image(string aFile) {
+	ifstream file;
+	char sig[5];
 	TUint32 e32SigOffset = 0x10, fileSize = 0;
 	TBool validE32 = EFalse;
 
 	TrimQuotes(aFile);
 
-	aIfs.open(aFile.c_str(), std::ios::in | std::ios::binary);
+	file.open(aFile.c_str(), ios_base::in | ios_base::binary);
 
-	if( !aIfs.is_open() )
-	{
-		throw SisUtilsException((char*)aFile.data(), "Cannot open file");
+	if( !file.is_open() ) {
+		throw SisUtilsException(aFile.c_str(), "Cannot open file");
 	}
 
-	aIfs.seekg(0,std::ios::end);
-	fileSize = aIfs.tellg();
-	if(fileSize > 20)
-	{
-		aIfs.seekg(e32SigOffset,std::ios::beg);
-		aIfs.read((char*)aSig, 4);
-		aSig[4] = '\0';
+	file.seekg(0,ios_base::end);
+	fileSize = file.tellg();
+	if(fileSize > 20) {
+		file.seekg(e32SigOffset,ios_base::beg);
+		file.read(sig, 4);
+		sig[4] = '\0';
 
-		if(!strcmp((char*)aSig, "EPOC"))
-		{
+		if(!strcmp(sig, "EPOC")) {
 			validE32 = ETrue;
 		}
 	}
 
-	aIfs.close();
-
+	file.close();
 	return validE32;
 }

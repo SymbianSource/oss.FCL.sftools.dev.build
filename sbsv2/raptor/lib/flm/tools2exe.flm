@@ -1,4 +1,4 @@
-# Copyright (c) 2006-2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2006-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -16,20 +16,28 @@
 #
 
 ## Outputs - externally relevant targets that this FLM generates
-ifeq ($(OSTYPE),cygwin)
+ifeq ($(filter win,$(HOSTPLATFORM)),win)
 SYSTEMLIBS:=$(LIBS.WIN32)
 else
+ifneq ($(TOOLS2WIN32),)
+# Build win32 tools in Linux 
+SYSTEMLIBS:=$(LIBS.WIN32)
+else
+# Build linux tools in Linux
 SYSTEMLIBS:=$(LIBS.LINUX)
 endif
+endif
+
 
 EXETARGET:=$(RELEASEPATH)/$(TARGET)$(DOTEXE)
 
+INSTALLED:=
 ifneq ($(TOOLSPATH),)
 INSTALLED:=$(TOOLSPATH)/$(TARGET)$(DOTEXE)
 endif
 
 ## Target groups
-RELEASEABLES:=$(INSTALLED)
+RELEASABLES:=$(INSTALLED)
 TARGETS:=$(EXETARGET) $(INSTALLED)
 
 ## Common build steps (compiling and cleaning)
@@ -51,7 +59,7 @@ endif
 define tools2linkexe
 $(EXETARGET): $(OBJECTFILES) $(STATICLIBS)
 	$(call startrule,tools2linkexe) \
-	$(LINKER) $(CFLAGS) $(LFLAGS) $(OPT.O)"$(EXETARGET)" $(call dblquote,$(OBJECTFILES)) $(LLIBS) \
+	$(LINKER) $(CFLAGS) $(LFLAGS) $(OPT.O)"$(EXETARGET)" $(call dblquote,$(OBJECTFILES)) $(LLIBS) $(LINKER_OPTIONS) \
 	$(if $(SAVESPACE),; $(GNURM) -rf $(OUTPUTPATH); true,) \
 	$(call endrule,tools2linkexe)
 

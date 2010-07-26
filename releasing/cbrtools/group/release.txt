@@ -1,0 +1,5 @@
+NOTESRC_RELEASER
+Symbian.
+
+NOTESRC_RELEASE_REASON
+CBR tools release.

@@ -16,7 +16,7 @@
 #ifndef ELF_FILE_HEADER_H
 #define ELF_FILE_HEADER_H
 
-#include "elftools/inc/elfdefs.h"
+#include <elfdefs.h>
 #include <stdint.h>
 
 

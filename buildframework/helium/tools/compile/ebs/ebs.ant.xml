@@ -49,8 +49,9 @@ mySocket.close()
     </target>
 
     
-    <!-- Executes compilation of a System Definition configuration using
-    Symbian EBS tools, driven directly from Ant. -->
+    <!-- Executes compilation of a System Definition configuration.
+        
+    Uses Symbian EBS tools, driven directly from Ant. -->
     <target name="compile-ebs-ant" if="build.system.ebs-ant" depends="set-arm-version,find-freeport">        
         <script language="jython" setbeans="false">
 threads = project.getProperty("number.of.threads")

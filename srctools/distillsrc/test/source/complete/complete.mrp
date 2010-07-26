@@ -1,0 +1,8 @@
+component	complete
+source	\prefix\source\complete
+binary	\prefix/source\complete all
+exports	/prefix\source\complete
+export_file	\epoc32\include\complete	\prefix/source\complete\complete
+source	\prefix\source\shared\complete
+source	\PREFIX\source\shared\DISTRIBUTION.POLICY
+notes_source	dummy

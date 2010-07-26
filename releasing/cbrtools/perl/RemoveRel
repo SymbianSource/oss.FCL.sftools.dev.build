@@ -1,0 +1,142 @@
+#!perl
+# Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+# 
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+# 
+# Contributors:
+# 
+# Description:
+# 
+#
+
+use strict;
+use FindBin;
+use lib "$FindBin::Bin";
+use Getopt::Long;
+use IniData;
+use EnvDb;
+use CommandController;
+
+
+#
+# Globals.
+#
+
+my $verbose = 0;
+my $iniData = IniData->New();
+my $commandController = CommandController->New($iniData, 'RemoveRel');
+my $comp;
+my $source;
+my $force;
+
+#
+# Main.
+#
+
+ProcessCommandLine();
+RemoveRel();
+
+
+#
+# Subs.
+#
+
+sub ProcessCommandLine {
+  Getopt::Long::Configure ("bundling");
+  my $help;
+  
+  GetOptions("h" => \$help, "v+" => \$verbose, "s" => \$source, "f" => \$force);
+
+  if ($help) {
+    Usage(0);
+  }
+
+  $comp = shift @ARGV;
+
+  unless (defined $comp and $#ARGV == -1) {
+    print "Error: Invalid number of arguments\n";
+    Usage(1);
+  }
+}
+
+sub Usage {
+  my $exitCode = shift;
+
+  Utils::PrintDeathMessage($exitCode, "\nUsage: removerel [options] <component>
+
+options:
+
+-h  help
+-s  remove source also
+-f  (deprecated)
+-v  verbose output (-vv very verbose)\n");
+}
+
+sub RemoveRel {
+  my $envDb = EnvDb->Open($iniData, $verbose);
+  
+  if (!$envDb->ComponentExistsInDatabase($comp)) {
+    die "Error: $comp not currently installed\n";
+  }
+  
+  eval {
+    if($source) {
+      $envDb->DeleteSource($comp, undef, 1);
+    }
+  };
+  if ($@) {
+    print "$@";
+  }
+  
+  $envDb->RemoveComponent($comp);
+}
+
+
+__END__
+
+=head1 NAME
+
+RemoveRel - Removes the binaries of a component release from the current environment.
+
+=head1 SYNOPSIS
+
+  removerel [options] <component>
+
+options:
+
+  -h  help
+  -f  (deprecated)
+  -v  verbose output (-vv very verbose)
+
+=head1 DESCRIPTION
+
+When the binaries from a component release are installed into an environment using either C<GetRel> or C<GetEnv>, a file is stored in F<\epoc32\relinfo> containing details of the files that were unpacked. This information is used by C<RemoveRel> to remove the installed binaries. C<RemoveRel> also updates the environment database to reflect this change. Note, C<RemoveRel> makes no attempt to the remove the release's source code.
+
+=head1 KNOWN BUGS
+
+None.
+
+=head1 COPYRIGHT
+
+ Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+ All rights reserved.
+ This component and the accompanying materials are made available
+ under the terms of the License "Eclipse Public License v1.0"
+ which accompanies this distribution, and is available
+ at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ 
+ Initial Contributors:
+ Nokia Corporation - initial contribution.
+ 
+ Contributors:
+ 
+ Description:
+ 
+
+=cut

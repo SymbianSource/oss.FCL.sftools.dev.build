@@ -30,7 +30,7 @@
 		<env name='SBS_GNUTOUCH' default='/bin/touch' type='tool'/>
 		<env name='SBS_GNUFIND' default='/usr/bin/find' type='tool'/>
 		<env name='SBS_GNUGREP' default='/bin/grep' type='tool'/>
-		<env name='SBS_GNUSORT' default='/bin/sort' type='tool'/>
+		<env name='SBS_GNUSORT' default='sort' type='tool'/>
 		<env name='SBS_SHELL' default="$(SBS_HOME)/$(HOSTPLATFORM_DIR)/bin/sh" type='tool'/>
 		<env name='SBS_ZIP' default="$(SBS_HOME)/$(HOSTPLATFORM_DIR)/bin/zip" type='tool'/>
 		<env name='SBS_UNZIP' default="$(SBS_HOME)/$(HOSTPLATFORM_DIR)/bin/unzip" type='tool'/>
@@ -72,11 +72,12 @@
 		<env name='SBS_UNZIP' default="$(COREUTILSBINDIR)/unzip.exe" type='tool'/>
 		<env name='SBS_BVCPP' default="$(SBS_HOME)/$(HOSTPLATFORM_DIR)/bv/bin/cpp.exe" type='tool'/>
 		<env name='SBS_PERL' default='perl.exe' type='tool'/>
-		<env name='SBS_PYTHON' default='$(SBS_HOME)/$(HOSTPLATFORM_DIR)/python252/python.exe' type='tool'/>
+		<env name='SBS_PYTHON' default='python.exe' type='tool'/>
 	</var>
 
 	<var name="default.locations" extends="hostplatform.locations">
 		<env name='EPOCROOT' default='' type='path'/>
+		<env name='SBS_HOME' default='' type='path'/>
 		<!-- Place where intermediate files are built -->
 		<env name='SBS_BUILD_DIR' default='$(EPOCROOT)/epoc32/build' type='path'/>
 
@@ -101,13 +102,14 @@
 		<set name='UNZIP' value="$(SBS_UNZIP)" type='tool'/>
 		<set name='PERL' value='$(SBS_PERL)' type='tool'/>
 		<set name='PYTHON' value='$(SBS_PYTHON)' type='tool' versionCommand='$(PYTHON) -V' versionResult='Python 2\.[456].*'/>
-
+		
 		<set name='DEFAULT_PLATFORMS' value='ARMV5 ARMV7 WINSCW'/>
 		<set name='BASE_DEFAULT_PLATFORMS' value='ARMV5 ARMV7 WINSCW ARMV5SMP'/>
 		<set name='BASE_USER_DEFAULT_PLATFORMS' value='ARMV5 ARMV7 WINSCW'/>
 
 		<set name='BUILD_INCLUDE' value=''/>
-		<set name='CREATEVMAP' value='$(PYTHON) $(SBS_HOME)/bin/createvmap.py' type='tool'/>
+		<set name='CREATEVMAP' value='$(PYTHON) $(SBS_HOME)/bin/createvmap.py' type='script'/>
+		<set name='DEPCRUNCH' value='$(PYTHON) $(SBS_HOME)/bin/depcrunch.py' type='script'/>
 		<set name='CREATEVMAPCPP' value='$(SBS_BVCPP)' type='tool'/>
 		<set name='FEATURELISTFILES' value=''/>
 		<set name='FEATUREVARIANTNAME' value=''/>

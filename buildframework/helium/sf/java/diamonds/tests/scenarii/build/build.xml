@@ -1,0 +1,228 @@
+<?xml version="1.0"?>
+<!-- 
+============================================================================ 
+Name        : test_diamonds.ant.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test-diamonds" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>Helium Antlib diamonds unittests.</description>
+    <property environment="env" />
+    
+    <property name="diamonds.unitest.dir" location="${ant.file.test-diamonds}/../../../" />
+    <import file="../../../../../../nokia/companyproperties.ant.xml" optional="true"/>
+    <import file="../../../../../../../extensions/nokia/external/helium-nokia-antlib/companyproperties.ant.xml" optional="true"/>
+    <property name="diamonds.output.dir" location="${temp.dir}/output" />
+    <property name="diamonds.template.dir" location="${diamonds.unitest.dir}/data/templates" />
+    <property name="build.family" value="test_new_hlm"/>
+    <property name="id" value="123"/>
+    <property name="name" value="${build.family}_${id}"/>
+    <property name="build.system" value="ec-helium"/>
+    <property name="diamonds.listener.configuration.file" location="${diamonds.unitest.dir}/config/diamonds_config.xml.ftl" />
+    <property name="compile.log.input" location="${diamonds.unitest.dir}/data/compile.log.xml" />
+    <property name="codescanner.log.input" location="${diamonds.unitest.dir}/data/problemIndex.xml" />
+    <property name="policy.log.input" location="${diamonds.unitest.dir}/data/policy.log.xml" />
+    <property name="invalid.target.input.file" location="${diamonds.unitest.dir}/data/invalid.target.input.log.xml" />
+    <property name="symsee.version" value="9.1.0" />
+
+    <property name="diamonds.host" value="diamonds.nmp.nokia.com" />
+
+    <target name="unittest" depends="unittest-diamonds" />
+    
+    <target name="unittest-diamonds" >
+        <delete dir="${diamonds.output.dir}" failonerror="false"/>
+        <mkdir dir="${diamonds.output.dir}"/>
+        <antcall target="test-all" />
+    </target>
+    
+    <dirname property="project.dir" file="${ant.file.test-diamonds}" />
+    <target name="version">
+        <echo message="version target for diamonds to verify sending data to diamonds" />
+    </target>
+
+    <target name="diamonds" />
+
+    <target name="compile-target">
+        <echo message="verify the build stage with input source xml file" />
+    </target>
+
+    <target name="codescanner">
+        <echo message="target verification with input source xml file" />
+    </target>
+
+    <target name="create-bom-log">
+        <echo message="target without input file and just to send the data" />
+    </target>
+
+    <target name="invalid-target-input-file">
+        <echo message="target with invalid input source xml file" />
+    </target>
+
+    <target name="invalid-stage-input-file">
+        <echo message="stage with invalid input source xml file" />
+    </target>
+
+    <target name="invalid-template-file">
+        <echo message="target with invalid template-file" />
+    </target>
+
+    <target name="invalid-ant-properties-input">
+        <echo message="target with invalid ant properties input" />
+    </target>
+
+    <target name="non-existing-ant-properties">
+        <echo message="target with non-existing-ant-properties" />
+    </target>
+
+    <target name="invalid-diamonds-server-properties">
+        <echo message="target with invalid-diamonds-server-properties" />
+    </target>
+
+    <target name="defer-type">
+        <echo message="version target for diamonds to verify sending data to diamonds" />
+    </target>
+
+    <target name="test-defer-type">
+        <antcall target="defer-type" />
+    </target>
+
+    <target name="test-create-bom-log">
+        <antcall target="create-bom-log" />
+    </target>
+
+    <target name="test-codescanner">
+        <antcall target="codescanner" />
+    </target>
+
+    <target name="test-invalid-target-input-file">
+        <antcall target="invalid-target-input-file" />
+    </target>
+
+    <target name="test-invalid-stage-input-file">
+        <antcall target="invalid-target-input-file" />
+        <echo message="stage with invalid input source xml file" />
+    </target>
+
+    <target name="test-invalid-template-file">
+        <antcall target="invalid-template-file" />
+    </target>
+
+    <target name="test-invalid-ant-properties-input">
+        <antcall target="invalid-ant-properties-input" />
+    </target>
+
+    <target name="test-non-existing-ant-properties">
+        <antcall target="non-existing-ant-properties" />
+    </target>
+
+    <target name="test-invalid-diamonds-server-properties">
+        <antcall target="invalid-diamonds-server-properties" />
+        <echo message="target with invalid-diamonds-server-properties" />
+    </target>
+
+    <target name="test-compile-target">
+        <antcall target="compile-target" />
+    </target>
+
+    <target name="test-version">
+        <antcall target="version" />
+    </target>
+
+    <target name="test-buildid-set">
+        <echo>${diamonds.build.id}</echo>
+        <au:assertTrue>
+            <isset property="diamonds.build.id"/>
+        </au:assertTrue>
+    </target>
+
+    <target name="test-buildid-notset">
+        <au:assertFalse>
+            <isset property="diamonds.build.id"/>
+        </au:assertFalse>
+    </target>
+
+    <target name="test-echo-operation">
+        <echo message="echo operation: test" />
+    </target>
+
+    <target name="test-echo-operation1">
+        <echo message="echo operation1: test" />
+    </target>
+
+    <target name="test-echo-operation2">
+        <echo message="echo operation2: test" />
+    </target>
+
+    <target name="test-echo-operation3">
+        <echo message="echo operation3: test" />
+    </target>
+
+    <target name="test-echo-operation4">
+        <echo message="echo operation4: test" />
+    </target>
+
+    <target name="test-echo-operation5">
+        <echo message="echo operation5: test" />
+    </target>
+
+    <target name="test-depend-target" depends="test-echo-operation">
+        <echo message="test-ant-call" />
+        <antcall target="test-echo-operation" />
+        <au:assertFileExists file="${diamonds.output.dir}/test-echo-operation-time.xml" />
+    </target>
+
+    <target name="test-ant-call">
+        <echo message="test-ant-call" />
+        <antcall target="test-echo-operation1" />
+        <au:assertFileExists file="${diamonds.output.dir}/test-echo-operation1-time.xml" />
+    </target>
+
+    <target name="test-ant-call-multiple">
+        <echo message="test-ant-call" />
+        <antcall target="test-echo-operation2" />
+        <au:assertFileExists file="${diamonds.output.dir}/test-echo-operation2-time.xml" />
+        <antcall target="test-echo-operation3" />
+        <au:assertFileExists file="${diamonds.output.dir}/test-echo-operation3-time.xml" />
+    </target>
+
+    <target name="test-ant-call-multiple-parallel">
+        <echo message="test-ant-call" />
+        <parallel>
+            <antcall target="test-echo-operation4" />
+            <antcall target="test-echo-operation5" />
+        </parallel>
+        <au:assertFileExists file="${diamonds.output.dir}/test-echo-operation4-time.xml" />
+        <au:assertFileExists file="${diamonds.output.dir}/test-echo-operation5-time.xml" />
+    </target>
+
+    <target name="sequence-config-test-target-1">
+        <au:assertFileExists file="${diamonds.output.dir}/stage-sequence-1-time.xml" />
+    </target>
+
+    <target name="sequence-config-test-target-2">
+        <au:assertFileExists file="${diamonds.output.dir}/stage-sequence-2-time.xml" />
+    </target>
+
+
+    <target name="test-all" depends="test-buildid-notset, diamonds, test-buildid-set, test-defer-type, test-version,
+        test-create-bom-log,test-codescanner,test-compile-target,test-invalid-diamonds-server-properties,
+        test-non-existing-ant-properties,test-invalid-ant-properties-input,test-invalid-template-file,
+        test-invalid-target-input-file,test-invalid-stage-input-file, test-depend-target,
+        test-ant-call, test-ant-call-multiple, test-ant-call-multiple-parallel, 
+        sequence-config-test-target-1,sequence-config-test-target-2 " />
+</project>

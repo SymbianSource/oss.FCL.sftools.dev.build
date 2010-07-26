@@ -51,7 +51,6 @@ Description:
     <!-- tools common sbs options -->
     <hlm:sbsoptions id="commonSBS">
         <arg line="-k" />
-        <arg name="--filters" value="FilterMetadataLog"/>
     </hlm:sbsoptions>
 
     <!-- tools common sbs options -->

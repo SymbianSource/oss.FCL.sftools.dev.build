@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : test_parallelunzip.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test_parallelunzip" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>
+         Preparation Testing targets
+    </description>
+    <property environment="env" />
+    
+    <property name="helium.dir" location="../../.." />
+    <import file="../../../build.xml" />
+
+    <property name="preparation.temp.dir" location="${helium.build.dir}/antunit/parallelunzip" />
+
+    <target name="setUp">
+        <delete dir="${preparation.temp.dir}" failonerror="false" />
+        <mkdir dir="${preparation.temp.dir}" />
+    </target>
+
+    <target name="tearDown">
+        <delete dir="${preparation.temp.dir}" failonerror="false" />
+    </target>
+
+    <target name="prepare-test">
+        <mkdir dir="${preparation.temp.dir}/src/dir1" />
+        <mkdir dir="${preparation.temp.dir}/src/dir2" />
+        <echo file="${preparation.temp.dir}/src/dir1/test.txt">Some content</echo>
+        <echo file="${preparation.temp.dir}/src/dir2/test.txt">Some content</echo>
+        <zip destfile="${preparation.temp.dir}/dir1.zip">
+            <fileset dir="${preparation.temp.dir}/src" includes="dir1/**" />
+        </zip>
+        <zip destfile="${preparation.temp.dir}/dir2.zip">
+            <fileset dir="${preparation.temp.dir}/src" includes="dir2/**" />
+        </zip>
+    </target>
+    
+    <target name="test-parallelunzip" depends="prepare-test">
+        <hlm:parallelUnzip todir="${preparation.temp.dir}/dest">
+            <hlm:resourceSet>
+                <path>
+                    <pathelement path="${preparation.temp.dir}/dir1.zip" />
+                </path>
+                <path>
+                    <pathelement path="${preparation.temp.dir}/dir2.zip" />
+                </path>
+            </hlm:resourceSet>
+        </hlm:parallelUnzip>
+        <au:assertLogContains text="7zip" />
+        <au:assertFileExists file="${preparation.temp.dir}/dest/dir1/test.txt" />
+        <au:assertFileExists file="${preparation.temp.dir}/dest/dir2/test.txt" />
+    </target>
+    
+    <target name="test-parallelcopy-no-fileset" depends="prepare-test">
+        <hlm:parallelUnzip todir="${preparation.temp.dir}/dest" />
+    </target>
+
+    <target name="test-parallelcopy-missing-todir" depends="prepare-test">
+        <au:expectfailure expectedMessage="'todir' attribute is not defined.">
+            <hlm:parallelUnzip />
+        </au:expectfailure>
+    </target>
+    
+    <target name="test-parallelcopy-invalid-threads-number" depends="prepare-test">
+        <au:expectfailure expectedMessage="Invalid thread number: -1">
+            <hlm:parallelUnzip todir="${preparation.temp.dir}/dest" threads="-1"/>
+        </au:expectfailure>
+    </target>
+
+    <target name="test-parallelunzip-invalid-file" depends="prepare-test">
+        <au:expectfailure>
+            <hlm:parallelUnzip todir="${preparation.temp.dir}/dest">
+                <hlm:resourceSet>
+                    <path>
+                        <pathelement path="${preparation.temp.dir}/dir1.zip" />
+                        <pathelement path="${preparation.temp.dir}/dir2.zip" />
+                    </path>
+                    <path>
+                        <pathelement path="${preparation.temp.dir}/dir3.zip" />
+                    </path>
+                </hlm:resourceSet>
+            </hlm:parallelUnzip>
+        </au:expectfailure>            
+        <au:assertLogContains text="7zip" />
+    </target>
+
+    <target name="test-parallelunzip-invalid-file-failonerror-false" depends="prepare-test">
+        <hlm:parallelUnzip todir="${preparation.temp.dir}/dest" failonerror="false">
+            <hlm:resourceSet>
+                <path>
+                    <pathelement path="${preparation.temp.dir}/dir1.zip" />
+                    <pathelement path="${preparation.temp.dir}/dir2.zip" />
+                </path>
+                <path>
+                    <pathelement path="${preparation.temp.dir}/dir3.zip" />
+                </path>
+            </hlm:resourceSet>
+        </hlm:parallelUnzip>
+        <au:assertLogContains text="7zip" />
+        <au:assertLogContains text="Result: 2" />
+    </target>
+
+    <target name="test-parallelunzip-logdir" depends="prepare-test">
+        <hlm:parallelUnzip todir="${preparation.temp.dir}/dest" logdir="${preparation.temp.dir}/logdir">
+            <hlm:resourceSet>
+                <path>
+                    <pathelement path="${preparation.temp.dir}/dir1.zip" />
+                </path>
+                <path>
+                    <pathelement path="${preparation.temp.dir}/dir2.zip" />
+                </path>
+            </hlm:resourceSet>
+        </hlm:parallelUnzip>
+        <au:assertLogDoesntContain text="7-Zip" />
+        <au:assertFileExists file="${preparation.temp.dir}/dest/dir1/test.txt" />
+        <au:assertFileExists file="${preparation.temp.dir}/dest/dir2/test.txt" />
+        <au:assertFileExists file="${preparation.temp.dir}/logdir/dir1.zip.log" />
+        <au:assertFileExists file="${preparation.temp.dir}/logdir/dir1.zip.log" />
+    </target>
+
+</project>

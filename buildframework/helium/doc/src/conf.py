@@ -41,8 +41,8 @@ import sys, os
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-#extensions = []
-
+extensions = ['sphinx_ext']
+#api_doc_base_url = 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['.templates']
 
@@ -128,7 +128,9 @@ html_sidebars = {
 
 # Additional templates that should be rendered to pages, maps page names to
 # template names.
-#html_additional_pages = {}
+html_additional_pages = {
+    'index': 'indexcontent.html',
+}
 
 # If false, no module index is generated.
 html_use_modindex = False

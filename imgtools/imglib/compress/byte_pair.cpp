@@ -37,36 +37,79 @@ void myassert(int c) {
 }
 #endif
 
+void CBytePair::SortN(TUint16 *a, TInt n)
+{
+    //bubble sort
+    TInt i,j;
+    TUint16 tmp;
+    for (i=0;i<n-1;i++){
+        for (j=i+1;j<=n-1;j++){
+            if (a[j]<a[i]) {
+                tmp = a[j];
+                a[j]=a[i];
+                a[i]=tmp;
+            }
+        }
+    }
+}
+void CBytePair::InsertN(TUint16 *a, TInt n, TUint16 v)
+{
+    TInt i;
+    for (i=n-1;i>=0;i--){
+        if (a[i] > v)
+            a[i+1]=a[i];
+        else{
+            break;
+        }
+    }
+    a[i+1] = v;
+}
+
+
+TInt CBytePair::PosN(TUint16 index, TInt n){
+    myassert(n<=PairCount[PairBuffer[index].Pair].Count);
+    TUint16 FirstN[1+3+0x1000/256+1];
+    TInt i = 0;
+    TUint16 posindex;
+    posindex = PairBuffer[index].Pos;
+
+    while (i<n) {
+        FirstN[i] = PairPos[posindex].Pos;
+        posindex = PairPos[posindex].Next;
+        i++;
+    }
+    SortN(FirstN, n);
+    while (posindex!=PosEnd){
+        InsertN(FirstN, n, PairPos[posindex].Pos);
+        posindex=PairPos[posindex].Next;
+    }
+    return FirstN[n-1];
+}
+
 void CBytePair::Initialize(TUint8* data, TInt size)
 {
-    TUint32 *p;
-    p = (TUint32*)PairCount;
-    while(p < (TUint32*)PairCount+0x10000) {
-        *p = 0xffff0000;
-        p ++;
+#if defined(WIN32)
+    TUint32 *p = reinterpret_cast<TUint32*>(PairCount);
+    TUint32 *end = p + 0x10000;
+    while(p < end) {
+        *p++ = 0xffff0000;
     }
-    p = (TUint32*)PairBuffer;
-    while (p < (TUint32*)PairBuffer + sizeof(PairBuffer) / 4) {
-        *p = 0xffffffff;
-        p++;
-    }
+#else
+    for(int i = 0 ; i < 0x10000 ; i ++){
+	PairCount[i].Count = 0 ;
+	PairCount[i].Index = 0xffff;
+    }	
+#endif
+    memset(reinterpret_cast<char*>(PairBuffer),0xff, sizeof(PairBuffer)); 
     PairBufferNext = 0;
-    p = (TUint32*)PairPos;
-    while (p < (TUint32*)PairPos + sizeof(PairPos) /4 ) {
-        *p = 0xffffffff;
-        p ++;
-    }
+    memset(reinterpret_cast<char*>(PairPos),0xff, sizeof(PairPos)); 
     PairPosNext = 0;
-    p = (TUint32*)PairLists;
-    while (p < (TUint32*)PairLists + sizeof(PairLists) / 4) {
-        *p = 0xffffffff;
-        p ++;
-    }
+    memset(reinterpret_cast<char*>(PairLists),0xff, sizeof(PairLists)); 
     PairListHigh = 0;
     
     CountBytes(data,size);
     marker = -1;
-    LeastCommonByte(marker);
+    markerCount = LeastCommonByte(marker);
     ByteUsed(marker);
 
     TUint8 *pData, *pMask;
@@ -105,7 +148,7 @@ void CBytePair::Initialize(TUint8* data, TInt size)
         *pMask = ByteTail;
 }
 
-TInt CBytePair::MostCommonPair(TInt& pair)
+TInt CBytePair::MostCommonPair(TInt& pair, TInt minFrequency)
 {
     TUint16 index = PairLists[PairListHigh];
     TUint16 tmpindex = index; 
@@ -120,6 +163,13 @@ TInt CBytePair::MostCommonPair(TInt& pair)
             {
                 index = tmpindex;
                 bestTieBreak = tieBreak;
+            }
+            else if(tieBreak==bestTieBreak){
+                if (minFrequency > PairListHigh)
+                    break;
+                if (PosN(tmpindex, minFrequency) > PosN(index,minFrequency)){
+                    index = tmpindex;
+                }
             }
     }
     pair = PairBuffer[index].Pair;
@@ -150,29 +200,24 @@ TInt CBytePair::Compress(TUint8* dst, TUint8* src, TInt size)
     clock_t ClockStart = clock();
     TUint8 tokens[0x100*3];
     TInt tokenCount = 0;
-    TInt overhead;
 
     TUint8 * dst2 = dst + size*2;
     memcpy (dst2, src, size);
     Initialize (dst2, size);
-    //DumpList(dst2, size);
+    TInt overhead = 1+3+markerCount;
     for(TInt r=256; r>0; --r)
     {   
         TInt byte;
         TInt byteCount = LeastCommonByte(byte);
-        if (iFastCompress && byteCount) break;
-        //if(byteCount) break;
         TInt pair;
-        TInt pairCount = MostCommonPair(pair);
+        TInt pairCount = MostCommonPair(pair, overhead+1);
         TInt saving = pairCount-byteCount;
+        if(saving<=overhead)
+            break;
 
-        //cout << "byte: <" << hex << setw(2) << setfill('0') <<  byte << ">"  << byteCount << endl;
-        //cout << "pair: <" << hex << setw(4) << setfill('0') <<  pair << ">" << pairCount << endl;
         overhead = 3;
         if(tokenCount>=32)
             overhead = 2;
-        if(saving<=overhead)
-            break;
 
         TUint8* d=tokens+3*tokenCount;
         ++tokenCount;
@@ -182,13 +227,11 @@ TInt CBytePair::Compress(TUint8* dst, TUint8* src, TInt size)
         ByteUsed(pair&0xff);
         *d++ = (TUint8)(pair>>8);
         ByteUsed(pair>>8);
-        //++GlobalPairs[pair];
 
-            //clock_t ClockReplace1 ,ClockReplace2;
             TUint16 index = PairCount[pair].Index;
             TUint16 count = PairCount[pair].Count;
             TUint16 posindex = PairBuffer[index].Pos;
-            TUint16 headpos, tailpos, tmppos, bytepos;
+            TUint16 headpos, tailpos, tmppos, tmpposprev, bytepos;
             TUint16 tmppair;
             // Remove pairs
             while (posindex != PosEnd) {
@@ -276,6 +319,35 @@ TInt CBytePair::Compress(TUint8* dst, TUint8* src, TInt size)
                     if (tmppos != PosEnd) {
                         Mask[lastpos] = ByteHead;
                         InsertPair(tmppair, tmppos);
+                        // Potential new pair after the new one
+                        tmppos = (TUint16)(lastpos+1);
+                        while(Mask[tmppos]==ByteRemoved) 
+                            tmppos ++;
+                        if (Mask[tmppos]==ByteTail){
+                            tmpposprev = tmppos;
+                            tmppos ++;
+                            while (tmppos<size){
+                                if (Mask[tmppos]==ByteRemoved){
+                                    tmppos++;
+                                    continue;
+                                }
+                                if (Mask[tmppos]==ByteMarked)
+                                    break;
+                                if (dst2[tmppos]!=dst2[tmpposprev])
+                                    break;
+                                if (Mask[tmpposprev]==ByteTail){
+                                    //myassert(Mask[tmppos]==ByteHead);
+                                    InsertPair((TUint16)(dst2[tmppos]|dst2[tmppos]<<8), tmpposprev);
+                                    Mask[tmpposprev]=ByteHead;
+                                }else{
+                                    myassert(Mask[tmpposprev]==ByteHead);
+                                    RemovePair((TUint16)(dst2[tmppos]|dst2[tmppos]<<8), tmpposprev);
+                                    Mask[tmpposprev]=ByteTail;
+                                }
+                                tmpposprev = tmppos;
+                                tmppos ++;
+                            }
+                        }
                     }else {
                         Mask[lastpos] = ByteTail;
                     }
@@ -328,11 +400,6 @@ TInt CBytePair::Compress(TUint8* dst, TUint8* src, TInt size)
             PairCount[pair].Count = 0;
             PairCount[pair].Index = PosEnd;
 
-        //cout << "Pair: <" << pair << "> completed" << endl;
-        //DumpList(dst2,size);
-        //for (int i=0;i<100;i++)
-          //  cout << " ";
-        //cout << endl;
     }
 
     // sort tokens with a bubble sort...
@@ -475,7 +542,7 @@ TInt CBytePair::Decompress(TUint8* dst, TInt dstSize, TUint8* src, TInt srcSize,
                         goto error;
                     TInt p2 = *src++;
                     LUT0[b] = (TUint8)p1;
-                    LUT1[b] = (TUint8)p2;		
+                    LUT1[b] = (TUint8)p2;
                     --numTokens;
                 }
                 ++b;

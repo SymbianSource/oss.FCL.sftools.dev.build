@@ -27,7 +27,7 @@ Description:
     <property environment="env" />
     <property name="publish.root.dir" value="${env.TEMP}" />
     <property name="helium.dir" location="../../.." />
-    <import file="../../../helium.ant.xml" />
+    <import file="../../../build.xml" />
     <import file="../ci.ant.xml" />
     <!-- Test for delete folders: Creates configuration and Folder structure then delete folders, config files and test existance of the folders -->
     <target name="test-delete-folders-from-list">

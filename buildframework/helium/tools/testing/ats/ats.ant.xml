@@ -75,6 +75,12 @@ Description:
     @scope public
     -->
     
+    <!--* @property ats.create.singledrop.file
+    defined as true if single drop file is required. Define as false or not present for multiple drop files.
+    @type boolean
+    @editable required
+    @scope public
+    -->
     
     <!-- -->
     <fileset id="reference.ats.flash.images" dir="${release.images.dir}">
@@ -83,11 +89,14 @@ Description:
         <include name="**/*rnd.V01" />
     </fileset>
     
-    <!-- Limit of minimum number of flash files to execute ats-test target, otherwise ATSDrop.zip will not be generated. Default value is "2" files.
+    <!--* @property ats.flashfiles.minlimit
+    Limit of minimum number of flash files to execute ats-test target, otherwise ATSDrop.zip will not be generated. Default value is "2" files.
     @type string
     @scope public
     -->
-    <property name="ats.flashfiles.minlimit" value="2" />
+    <condition property="ats.flashfiles.minlimit" value="0" else="2">
+        <istrue value="${ats.emulator.enable}" />
+    </condition>
 
     <fileset id="reference.ats.sis.images" dir="${ats.sis.images.dir}">
         <include name="**/*.sis" />
@@ -100,19 +109,21 @@ Description:
     
     <var name="drop.file.counter" value="0" />
 
-    <!-- The target creates ATSDrop.zip file which also includes test.xml file; and sends the drop to ATS.
+    <condition property="internal.enabled.ats">
+        <istrue value="${enabled.ats}" />
+    </condition>
 
+    <!-- The target creates ATSDrop.zip file which also includes test.xml file; and sends the drop to ATS.
+        
     The layer definition, in system definition file, for tsrc directory should look like:
-    
-    <pre>
-    <layer name="name_test_layer">
-        <module name="module_name">
-            <unit id="unit_id" name="unti_name" bldFile="path_of_tsrc_folder_to_be_built" filter=""/>
-        </module>
-    </layer>
-    </pre>
+
+        <layer name="name_test_layer">
+            <module name="module_name">
+                <unit id="unit_id" name="unti_name" bldFile="path_of_tsrc_folder_to_be_built" filter=""/>
+            </module>
+        </layer>
     -->
-    <target name="ats-test" if="enabled.ats">
+    <target name="ats-test" if="internal.enabled.ats">
         <mkdir dir="${test.log.dir}"/>
         <hlm:filterRecordStartMacro pattern="${ats.password}" category="ats"/>
         <trycatch property="exception" reference="exception">
@@ -194,53 +205,92 @@ Description:
             </else>
         </if>
 
-        <!-- Notify ATS about the drop. -->
-        <if>
-            <istrue value="${ats4.enabled}" />
-            <then>
-                <hlm:python failonerror="true">
+        <trycatch property="exception">
+            <try>
+                <!-- Notify ATS about the drop. -->
+                <if>
+                    <istrue value="${ats4.enabled}" />
+                    <then>
+                        <hlm:python failonerror="true">
 version = r'${java.version}'
 if '1.6.0' in version:
     assert int(version.split('_')[1]) > 6, 'Java 6 u7 required'
-                </hlm:python>
-                <condition property="ats.import.arg" value="-import" else="">
-                    <equals arg1="${ats.script.type}" arg2="import" />
-                </condition>
-                <condition property="ats4.libs" value="${helium.dir}/extensions/nokia/external/ats4" else="${helium.dir}/external/antlibs">
-                    <available type="dir" file="${helium.dir}/extensions/nokia/external/ats4"/>
-                </condition>
-                <java classname="com.nokia.ats.util.server.CommandLineClient" fork="true" maxmemory="512m">
-                    <classpath>
-                        <pathelement path="${java.class.path}"/>
-                        <fileset dir="${ats4.libs}" includes="*.jar"/>
-                    </classpath>
-                    <arg line="-url http://${ats.server}/ServerService -path ${ats.drop.location.file} ${ats.import.arg}"/>
-                </java>
-            </then>
-            <else>
-                <condition property="ats.wsh.testrun.file" value="wshTestRunImport.vbs" else="wshTestRunX.vbs">
-                    <equals arg1="${ats.script.type}" arg2="import" />
-                </condition>
-                <exec executable="cscript" dir="${build.drive}/" failonerror="false">
-                    <env key="ats3.username" value="${ats.username}" />
-                    <env key="ats3.password" value="${ats.password}" />
-                    <env key="ats3.host" value="${ats.server}" />
-                    <env key="ats3.pathToDrop" value="${ats.drop.location.file}"/>
-                    <arg value="${helium.dir}/tools/testing/ats/${ats.wsh.testrun.file}" />
-                </exec>
-            </else>
-        </if>
+                        </hlm:python>
+                        <condition property="ats.import.arg" value="-import" else="">
+                            <equals arg1="${ats.script.type}" arg2="import" />
+                        </condition>
+                        <condition property="ats4.libs" value="${helium.dir}/extensions/nokia/external/ats4" else="${helium.dir}/external/antlibs">
+                            <available type="dir" file="${helium.dir}/extensions/nokia/external/ats4"/>
+                        </condition>
+                        <java classname="com.nokia.ats.util.server.CommandLineClient" fork="true" maxmemory="1024m" failonerror="true">
+                            <classpath>
+                                <pathelement path="${java.class.path}"/>
+                                <fileset dir="${ats4.libs}" includes="*.jar"/>
+                            </classpath>
+                            <arg line="-url http://${ats.server}/ServerService -path ${ats.drop.location.file} ${ats.import.arg}"/>
+                        </java>
+                    </then>
+                    <else>
+                        <if>
+                            <and>
+                                <equals arg1="${ats.script.type}" arg2="import" />
+                                <available classname="com.nokia.taitei.util.TestDropImporter"/>
+                                <not>
+                                    <istrue value="${ats.disable.java.importer}" />
+                                </not>
+                            </and>
+                            <then>
+                                <java classname="com.nokia.taitei.util.TestDropImporter" fork="true" maxmemory="1024m" failonerror="true">
+                                    <classpath>
+                                        <pathelement path="${java.class.path}"/>
+                                    </classpath>
+                                    <arg line="${ats.server} ${ats.drop.location.file} ${ats.username} ${ats.password}"/>
+                                </java>
+                            </then>
+                            <else>
+                                <condition property="ats.wsh.testrun.file" value="wshTestRunImport.vbs" else="wshTestRunX.vbs">
+                                    <equals arg1="${ats.script.type}" arg2="import" />
+                                </condition>
+                                <exec executable="cscript" dir="${build.drive}/" failonerror="true">
+                                    <env key="ats3.username" value="${ats.username}" />
+                                    <env key="ats3.password" value="${ats.password}" />
+                                    <env key="ats3.host" value="${ats.server}" />
+                                    <env key="ats3.pathToDrop" value="${ats.drop.location.file}"/>
+                                    <arg value="${helium.dir}/tools/testing/ats/${ats.wsh.testrun.file}" />
+                                </exec>
+                            </else>
+                        </if>             
+                    </else>
+                </if>
+            </try>
+            <catch>
+                <echo message="Error: ${exception}"/>
+            </catch>
+        </trycatch>
     </target>
 
     <!-- The target is dependent on "ats-test", should not be called independently. The target fetches flash files location -->
-    <target name="ats-set-flash-image-path">
+    <target name="ats-set-flash-image-path" unless="ats.emulator.enable">
         <pathconvert pathsep="," property="ats.flash.images">
             <fileset refid="reference.ats.flash.images"/>
         </pathconvert>
+        <script language="jython" setbeans="false">
+if project.getProperty('ats.disable.iconfig') == None:
+    import atsant
+    ic = None
+    try:
+        ic = atsant.IConfigATS(project.getProperty('release.images.dir'), project.getProperty('ats.product.name'))
+    except Exception, ex:
+        print ex
+    if ic:
+        project.setProperty('ats.flash.images', ic.findimages())
+        </script>
         <hlm:python failonerror="true">
 <![CDATA[
 flashfilescount = len(r'${ats.flash.images}'.split(','))
 mincount = int(r'${ats.flashfiles.minlimit}')
+if mincount > 0:
+    assert r'${ats.flash.images}' != '', 'No images found in ' + r'${release.images.dir}'
 if flashfilescount < mincount:
     raise Exception('Not enough flash files, check reference.ats.flash.images and build.id, found: ' + r'${ats.flash.images}' + ', looking in: ' + r'${release.images.dir}')
 ]]>
@@ -287,6 +337,11 @@ if flashfilescount < mincount:
         @scope public
         -->
         <property name="ats.email.list" value="${email.from}" />
+        <!-- Value of the ats email report
+        @type string
+        @scope public
+        -->
+        <property name="ats.report.type" value="ATS3_REPORT" />
         <!-- The default value is "data" and refers to the 'data' directory under 'tsrc' directory.
         @type string
         @scope public
@@ -312,11 +367,14 @@ if flashfilescount < mincount:
         </condition>
         <var name="ats.drop.file" value="ATS${ats.version}Drop${drop.file.counter}.zip" />
         
-        <!-- Sets target platform for compiling test components. Default value is "armv5 urel".
+        <!--* @property ats.target.platform
+        Sets target platform for compiling test components. Default value is "armv5 urel".
         @type string
         @scope public
         -->
-        <property name="ats.target.platform" value="armv5 urel" />
+        <condition property="ats.target.platform" value="winscw urel" else="armv5 urel">
+            <istrue value="${ats.emulator.enable}" />
+        </condition>
         <!-- Should be "True" if tracing is needed during the tests running on ATS3. Default value is "False", the values are case-sensitive.
         @type string
         @scope public
@@ -338,6 +396,10 @@ if flashfilescount < mincount:
         @scope public
         -->
         <property name="ats.obey.pkgfiles.rule" value="False" />
+        <fail unless="ats.product.name" message="ats.product.name property not defined" />
+        <condition property="ats.hti" value="false" else="true">
+            <istrue value="${ats.emulator.enable}" />
+        </condition>
     </target>
 
     <!-- Sets default values for the ASTE, this is a dependent target and shouldn't be used as an individual target -->
@@ -365,14 +427,15 @@ if flashfilescount < mincount:
         <property name="ats.aste.email.list" value="" />
     </target>
 
-    <!-- This macro fetches the tsrc paths from system definition file (layers.sysdef.xml), layer defintion should look like
-    <pre>
-    <layer name="name_test_layer">
-        <module name="module_name">
-            <unit id="unit_id" name="unti_name" bldFile="path_of_tsrc_folder_to_be_built" filter="" />
-        </module>
-    </layer>
-    </pre>
+    <!-- This macro fetches the tsrc paths from system definition file (layers.sysdef.xml).
+        
+    The layer defintion should look like:
+
+        <layer name="name_test_layer">
+            <module name="module_name">
+                <unit id="unit_id" name="unti_name" bldFile="path_of_tsrc_folder_to_be_built" filter="" />
+            </module>
+        </layer>
     -->
     <scriptdef name="getModuleTsrcMacro" language="jython" uri="http://www.nokia.com/helium">
         <attribute name="property" />
@@ -383,7 +446,8 @@ import atsant
 from com.nokia.ant.util import Helper
 
 canonicalsysdeffile = Helper.getProperty(project, 'canonical.sysdef.file')
-modules = atsant.files_to_test(canonicalsysdeffile, project.getProperty('exclude.test.layers'), project.getProperty('ido.build.filter'), project.getProperty('build.drive'))
+createsingledropfile = project.getProperty('ats.create.singledrop.file')
+modules = atsant.files_to_test(canonicalsysdeffile, project.getProperty('exclude.test.layers'), project.getProperty('ido.build.filter'), project.getProperty('build.drive'), createsingledropfile)
 
 for name in modules.keys():    
     if modules[name] == []:
@@ -396,7 +460,7 @@ project.setProperty('ats.drops.count', str(len(modules)))
     </scriptdef>
 
     <!-- The target is dependent on "ats-test", should not be called individually. The target creates the ATSdrop.zip file including test:xml file -->
-    <target name="ats-create-drop" depends="ats-set-flash-image-path">
+    <target name="ats-create-drop" depends="ats-set-flash-image-path,ats-emulator-zip">
         <mkdir dir="${build.output.dir}/ats" />
         <hlm:getModuleTsrcMacro property="module.list" prefix="module.tsrc" />
         <if>
@@ -431,6 +495,7 @@ project.setProperty('ats.drops.count', str(len(modules)))
                             <arg value="${internal.ats.diamonds.arg}" />
                             <arg value="--drop-file=${build.output.dir}/ats/${ats.drop.file}" />
                             <arg value="--report-email=${ats.email.list}" />
+                            <arg value="--report-type=${ats.report.type}" />
                             <arg value="--plan-name=${ats.plan.name}" />
                             <arg value="--testrun-name=${ats.testrun.name}_@{module}" />
                             <arg value="--flash-images=${ats.flash.images}" />
@@ -450,10 +515,11 @@ project.setProperty('ats.drops.count', str(len(modules)))
                             <arg value="--obey-pkgfiles=${ats.obey.pkgfiles.rule}" />
                             <arg value="--ats4-enabled=${ats4.enabled}" />
                             <arg value="--specific-pkg=${ats.specific.pkg}" />
+                            <arg value="--hti=${ats.hti}" />
                             <arg value="--verbose" />
                             <arg line="${module.tsrc.@{module}}" />
                         </exec>
-                        <runtarget target="do-ats-test" />
+                        <antcall target="do-ats-test" />
                         <math result="drop.file.counter" operand1="1" operation="+" operand2="${drop.file.counter}" datatype="int" />
                     </sequential>
                 </for>
@@ -660,4 +726,43 @@ project.addReference('ats.system.definition.files', atspath)
     
     <!-- Common target to run ats, aste and matti -->
     <target name="run-test" depends="ats-test,ats-aste,matti-test"/>
+    
+    <!-- Zip build area for emulator -->
+    <target name="ats-emulator-zip" if="ats.emulator.enable">
+        <property name="zips.emulator_zip.spec.name" value="emulator_zip"/>
+        <hlm:zipContentMacro type="emulator_zip" file="${helium.dir}/tools/testing/ats/emulator_zip.cfg.xml" />
+
+        <if>
+            <isset property="ats.drop.location" />
+            <then>
+                <property name="ats.flash.images" value="${ats.drop.location}\${build.id}_emulator_urel.zip"/>
+                <copy file="${build.output.dir}/ats/${build.id}_emulator_urel.zip" tofile="${ats.flash.images}" />
+            </then>
+            <else>
+                <property name="ats.flash.images" value="${build.output.dir}/ats/${build.id}_emulator_urel.zip"/>
+            </else>
+        </if>        
+    </target>
+    
+    <!-- Generate and upload drop using custom template -->
+    <target name="ats-custom-drop">
+        <mkdir dir="${build.output.dir}/ats" />
+        <runtarget target="ats-set-flash-image-path" />
+        <runtarget target="ats-set-defaults-stifeunit" />
+        <property name="ats.custom.template" value="${helium.dir}/tools/testing/ats/templates/ats4_naviengine_template.xml"/>
+        <exec executable="python">
+            <arg line="-Wignore -m ats3.custom" />
+            <arg value="--custom-template=${ats.custom.template}" />
+            <arg value="--device-type=${ats.product.name}" />
+            <arg value="${internal.ats.diamonds.arg}" />
+            <arg value="--drop-file=${build.output.dir}/ats/${ats.drop.file}" />
+            <arg value="--report-email=${ats.email.list}" />
+            <arg value="--testrun-name=${ats.testrun.name}" />
+            <arg value="--flash-images=${ats.flash.images}" />
+            <arg value="--test-timeout=${ats.test.timeout}" />
+            <arg value="--test-type=${ats.custom.test.type}" />
+        </exec>
+        <runtarget target="do-ats-test" />
+    </target>
+
 </project>

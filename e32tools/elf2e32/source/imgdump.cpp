@@ -46,7 +46,7 @@ Formatted string.
 */
 void PrintString(const char *aFmt,...)
 {
-	TText imageText[KMaxStringLength];
+	char imageText[KMaxStringLength];
 	va_list list;
 	va_start(list,aFmt);
 	VSNPRINTF((char *)imageText,KMaxStringLength,aFmt,list);
@@ -122,7 +122,7 @@ Name of the E32image to be dumped.
 @param aDumpFlags
 sub options passed to the 'dump' option
 */
-void E32ImageFile::Dump(TText *aFileName,TInt aDumpFlags)
+void E32ImageFile::Dump(const char* aFileName,TInt aDumpFlags)
 {
 	PrintString("E32ImageFile '%s'\n", aFileName);
 	DumpHeader(aDumpFlags);

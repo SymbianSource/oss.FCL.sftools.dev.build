@@ -1,0 +1,189 @@
+#!perl
+# Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+# 
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+# 
+# Contributors:
+# 
+# Description:
+# 
+#
+
+use strict;
+use FindBin;
+use lib "$FindBin::Bin";
+use Getopt::Long;
+use File::Path;
+use IniData;
+use EnvDb;
+use MrpData;
+use NotesCompiler;
+use MakeRel;
+use CommandController;
+
+
+#
+# Globals.
+#
+
+my $verbose = 0;
+my $notesSrc;
+my $mrpData;
+my $iniData = IniData->New();
+my $commandController = CommandController->New($iniData, 'MakeEnv');
+my $envDb;
+my $project;
+my $useCachedManifest;
+
+
+#
+# Main.
+#
+
+ProcessCommandLine();
+if (!CheckArchive()) {
+  exit 1;
+}
+CheckEnvironment();
+MakeRel::MakeReleases($iniData, $envDb, $mrpData, $notesSrc, 'MakeEnv', $verbose, $project, $useCachedManifest);
+
+
+#
+# Subs.
+#
+
+sub ProcessCommandLine {
+  Getopt::Long::Configure ("bundling");
+  my $help;
+  GetOptions("h" => \$help, "v+" => \$verbose, "n=s" => \$notesSrc, "w=s" => \$project, "useCachedManifest" =>\$useCachedManifest);
+
+  if ($help) {
+    Usage(0);
+  }
+
+  unless ($#ARGV == -1) {
+    print "Error: Invalid arguments\n";
+    Usage(1);
+  }
+
+  $envDb = EnvDb->Open($iniData, $verbose);
+}
+
+sub Usage {
+  my $exitCode = shift;
+
+  Utils::PrintDeathMessage($exitCode, "\nUsage: makeenv [options]
+
+options:
+
+-h                    help
+-n <notes_src_file>   compile all release notes using a single source file
+-v                    verbose output (-vv very verbose)
+-w <project>          make the release in given \"project\"\n");
+}
+
+sub CheckArchive {
+  my $self = shift;
+
+  my $env = $envDb->VersionInfo();
+  my @components = map([$_, $env->{$_}], keys(%$env));
+  my @pendingComps = grep($envDb->Status($_->[0]) == EnvDb::STATUS_PENDING_RELEASE, @components);
+
+  my $good = 1;
+  foreach my $comp (@pendingComps) {
+    my $relDir = $iniData->PathData->LocalArchivePathForExistingOrNewComponent($comp->[0],$comp->[1],$project);
+    if (-e $relDir) {
+      print STDERR "Error: $relDir already exists\n";
+      $good = 0;
+    }
+  }
+
+  return $good;
+}
+
+sub CheckEnvironment {
+  my $self = shift;
+
+  (my $status, $mrpData, my $dirtyComps, my $unaccountedFiles, my $duplicates) = $envDb->CheckEnv(1);
+  if (scalar (@$dirtyComps) > 0) {
+    foreach my $comp (@$dirtyComps) {
+      print "Error: $comp->{comp} $comp->{ver} is dirty\n"; 
+    }
+  }
+  if (scalar (@$unaccountedFiles) > 0) {
+    foreach my $line (@$unaccountedFiles) {
+      print "Error: $line has unknown origin\n"; 
+    }
+  }
+  if (scalar (@$duplicates) > 0) {
+    foreach my $args (@$duplicates) {
+      print "Error: $args->[1] attempting to release $args->[0] which has already been released by $args->[2]\n"; 
+    }
+  }
+  if ($status == EnvDb::STATUS_CLEAN) {
+    die "No components are pending release\n";
+  }
+  elsif ($status == EnvDb::STATUS_DIRTY) {
+    die "Error: Release environment is dirty\n";
+  }
+}
+
+
+__END__
+
+=head1 NAME
+
+MakeEnv - Make a release of an entire environment.
+
+=head1 SYNOPSIS
+
+  makeenv [options]
+
+options:
+
+  -h                    help
+  -n <notes_src_file>   compile all release notes using a single source file
+  -v                    verbose output (-vv  very verbose)
+  -w <project>          make the release in given "project"
+  --useCachedManifest   for internal use only *
+
+=head1 DESCRIPTION
+
+C<MakeEnv> is a tool that can generate one or more releases in such a way that the entire environment from which they were released can reliably be reproduced when doing a corresponding C<GetEnv> (not this is B<not> a guarantee that C<MakeRel> can make). The reliability of environment reproduction is achieved by scanning the F<\epoc32> tree before making a release to ensure that each file present has a known origin. This may be either within an existing release, or within releases that are about to be made. Releases that are about to be made must have their environment database status set to C<pending release> using either C<PrepRel> or C<PrepEnv>. C<MakeEnv> will not proceed until the overall status of the release environment is C<pending release>. The current overall status of an environment can be found using C<EnvInfo> with the C<-f> switch.
+
+Once the release environment is C<pending release>, C<MakeEnv> can be executed. If no arguments are provided, it will make releases of each component with C<pending release> status using the version information and F<mrp> file name store in the environment database. It is possible to override the release notes source file to be used for all releases via the C<-n> switch. This may be useful, for example, if the source in the components being released hasn't changed, but an underlying break in binary compatibility is being absorbed, as they can all be assigned the same release note.
+
+The C<-w> switch specifies the location to make the releases. If you use this argument, you should specify the name of an archive as specified in your F<reltools.ini> file. If you don't use this argument, the releases will go into the first archive listed in your F<reltools.ini>.
+
+See the document I<Making Releases> for more complete coverage of the process of making releases in general. See also the documentation on C<ValidateEnv> which can identify components that have not changed since the last time they were released, and so do not need to be released again.
+
+* When using the C<--useCachedManifest> switch C<MakeEnv> will check too see if a cached manifest file already exists for each component.  Cached manifest files are created by  C<ValidateRel>.  If a cached manifest file is found it will used for the component release.  If no manifest file is found, or the C<--useChachedManifest> switch has not been specified then a new manifest file will be generated from the component's MRP file.  This functionality is useful for automated build systems, as it avoids the process of duplicating manifest files.  Note that evalid checksums are not recalculated for cached manifest files.
+
+=head1 KNOWN BUGS
+
+None.
+
+=head1 COPYRIGHT
+
+ Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+ All rights reserved.
+ This component and the accompanying materials are made available
+ under the terms of the License "Eclipse Public License v1.0"
+ which accompanies this distribution, and is available
+ at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ 
+ Initial Contributors:
+ Nokia Corporation - initial contribution.
+ 
+ Contributors:
+ 
+ Description:
+ 
+
+=cut

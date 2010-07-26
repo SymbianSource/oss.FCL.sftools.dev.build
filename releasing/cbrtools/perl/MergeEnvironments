@@ -1,0 +1,219 @@
+#!perl -w
+# Copyright (c) 2002-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+# 
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+# 
+# Contributors:
+# 
+# Description:
+# MergeTwoEnvironments
+#
+
+use strict;
+use FindBin;
+use lib "$FindBin::Bin";
+use RelData;
+use IniData;
+use MrpData;
+use EnvDb;
+use Getopt::Long;
+use Data::Dumper;
+use Utils;
+
+# Process command-line options
+Getopt::Long::Configure ("bundling");
+my ($help, $verbose, $project, $releasenotes, $dummyrun, $internalver, $force);
+GetOptions("h" => \$help, "v+" => \$verbose, "w=s" => \$project, "r=s" => \$releasenotes, "d" => \$dummyrun, "i=s" => \$internalver, 'f' => \$force);
+$verbose ||= 0;
+$internalver ||= "-";
+
+
+# Get the name and version of the new environment
+my ($newcomp, $newver, @argsleft) = @ARGV;
+print "Using \"$newcomp\" \"$newver\"\n" if ($verbose);
+
+# Eat up the environments to merge
+my @envstomerge;
+while (scalar @argsleft) {
+  my ($oldcomp, $oldver, $prefix);
+  ($oldcomp, $oldver, $prefix, @argsleft) = @argsleft;
+  print "Adding \"$oldcomp\" \"$oldver\" prefix \"$prefix\"\n" if ($verbose);
+  push @envstomerge, {
+    comp => $oldcomp,
+    ver => $oldver,
+    prefix => $prefix
+  };
+  die "You must provide a component, version and environment for each environment you want to merge" unless $oldcomp && $oldver && defined $prefix;
+    # In fact, a blank (but defined) prefix might be worth having so we'll let them get away with that
+}
+
+print <<ENDHELP and exit if $help;
+Merges several environments into a new release.
+Usage:
+MergeEnvironments <options> newcomp newver {oldcomp oldver prefix} ...
+
+The {oldcomp oldver prefix} section must be repeated at least twice
+
+Options:
+
+-r <release.src> the release.src file to use (mandatory)
+-h               show this help
+-w <project>     make the reldata in this project
+-v               verbose
+-f               (deprecated)
+-d               dummy run (just report the environment to be produced)
+-i <ver>         internal version number of the release we're creating
+ENDHELP
+
+die "You must specify a release notes file" unless $releasenotes;
+die "Release notes file \"$releasenotes\" doesn't exist" unless -e $releasenotes;
+
+##############################################################################
+
+# Create objects that the Release Tools need
+my $iniData = New IniData;
+my $envDb = Open EnvDb($iniData);
+
+# The final environment we're going to use
+my %newenv;
+
+foreach my $mergeenv (@envstomerge) {
+  my $env = ReadEnvironmentFromRelData($mergeenv->{comp}, $mergeenv->{ver});
+  my %copy = %$env;
+
+  # Delete things according to the prefix
+  foreach (keys %copy) {
+    my $prefix = $mergeenv->{prefix};
+    delete $copy{$_} if ($copy{$_} !~ m/^$prefix/i);
+  }
+
+  %newenv = (%copy, %newenv);
+}
+
+# Finally make sure our new component itself is in the environment
+$newenv{$newcomp} = $newver;
+
+if ($verbose || $dummyrun) {
+  print "Have combined the two environments. Results are:\n";
+  print Dumper(\%newenv);
+}
+
+CreateNewRelease($newcomp, $newver, \%newenv, $project) unless $dummyrun;
+
+exit;
+
+##############################################################################
+sub ReadEnvironmentFromRelData {
+  my $comp = shift;
+  my $ver = shift;
+  print "Reading environment from \"$comp\", \"$ver\"...\n" if ($verbose);
+  my $rd = Open RelData($iniData, $comp, $ver, 2) or die "Couldn't open reldata for \"$comp\" \"$ver\"";
+  return $rd->Environment;
+}
+
+sub CreateNewRelease {
+  my $comp = shift;
+  my $ver = shift;
+  my $env = shift;
+  my $project = shift;
+
+  my $fakeMrpName = Utils::PrependEpocRoot("\\__reltools_tmp_mrp");
+  WriteFakeMrp($fakeMrpName, $comp, $releasenotes);
+
+  my $mrpData = New MrpData($fakeMrpName,
+                          $ver, 
+                          $internalver, 
+                          $iniData, 
+                          $verbose,  # verbosity
+                          0); # fixLibs
+
+  unlink($fakeMrpName);
+
+  my $dir = $iniData->PathData->LocalArchivePathForNewComponent($comp, $ver, $project);
+  print "Making directory \"$dir\"\n" if ($verbose);
+  Utils::MakeDir($dir);
+  print "Writing out reldata\n";
+  my $relData = New RelData($iniData,
+                   $mrpData, 
+                   $releasenotes,
+                   $env, 
+                   "MergeTwoEnvironments", 
+                   $verbose, # verbosity
+                   undef, # dontPersist
+                   $project);
+  print "$comp $ver created.\n";
+}
+
+sub WriteFakeMrp {
+  my $name = shift;
+  my $comp = shift;
+  my $relnotes = shift;
+  open(FILE, ">$name") or die "Couldn't write to \"$name\" because $!";
+  print FILE "component $comp\nnotes_source $relnotes\n";
+  close FILE;
+}
+
+__END__
+
+=head1 NAME
+
+MergeEnvironments - Merge the environments of several existing releases into a new release
+
+=head1 SYNOPSIS
+
+MergeEnvironments <options> newcomp newver {oldcomp oldver prefix} ...
+
+The {oldcomp oldver prefix} section must be repeated at least twice.
+
+Options:
+
+  -r <release.src> the release.src file to use (mandatory)
+  -h               help
+  -w <project>     make the new release in this project (only applicable for new-style archive-path arrangements)
+  -v               verbose (-vv = very verbose)
+  -f		   (deprecated)
+  -d               dummy run (just report the environment to be produced)
+  -i <ver>         internal version number of the release we're creating
+
+=head1 DESCRIPTION
+
+This tool will merge several environments to produce a new one. It reads the environment from two existing components, and produces another one. This new component just contains an environment; it has no binaries nor source.
+
+It is expected that you will then use C<validateenv> to validate against that environment.
+
+=head1 KNOWN BUGS
+
+Not really a defect, but it's limiting that you can only merge the environments based on the prefix of the version number. It would be nice to have more flexible criteria.
+
+The command line syntax is not intuitive. This may be fixed one day.
+
+But much more likely, the whole issue will go away with Release Tools 3, when validation will be substantially changed.
+
+=head1 STATUS
+
+Supported. If you find a problem, please report it to us.
+
+=head1 COPYRIGHT
+
+ Copyright (c) 2002-2009 Nokia Corporation and/or its subsidiary(-ies).
+ All rights reserved.
+ This component and the accompanying materials are made available
+ under the terms of the License "Eclipse Public License v1.0"
+ which accompanies this distribution, and is available
+ at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ 
+ Initial Contributors:
+ Nokia Corporation - initial contribution.
+ 
+ Contributors:
+ 
+ Description:
+ 
+
+=cut

@@ -1,0 +1,137 @@
+#!perl
+# Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+# 
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+# 
+# Contributors:
+# 
+# Description:
+# 
+#
+
+use strict;
+use FindBin;
+use lib "$FindBin::Bin";
+use Getopt::Long;
+use IniData;
+use EnvDb;
+use RelData;
+use CommandController;
+
+
+#
+# Globals.
+#
+
+my $verbose = 0;
+my $iniData = IniData->New();
+my $commandController = CommandController->New($iniData, 'ModNotes');
+my $comp;
+my $notesSrc;
+my $ver;
+
+
+#
+# Main.
+#
+
+ProcessCommandLine();
+ModNotes();
+
+
+#
+# Subs.
+#
+
+sub ProcessCommandLine {
+  Getopt::Long::Configure ("bundling");
+  my $help;
+  GetOptions('h' => \$help, 'v+' => \$verbose);
+
+  if ($help) {
+    Usage(0);
+  }
+
+  $comp = shift @ARGV;
+  $notesSrc = shift @ARGV;
+  $ver = shift @ARGV;
+
+  unless (defined $comp and defined $notesSrc and $#ARGV == -1) {
+    print "Error: Invalid arguments\n";
+    Usage(1);
+  }
+
+  unless (defined $ver) {
+    my $envDb = EnvDb->Open($iniData, $verbose);
+    $ver = $envDb->Version($comp);
+    unless (defined $ver) {
+      die "Error: Version not specified and $comp not currently installed\n";
+    }
+  }
+}
+
+sub Usage {
+  my $exitCode = shift;
+
+  Utils::PrintDeathMessage($exitCode, "\nUsage: modnotes [options] <component> <notes_source_file> [<version>]
+
+options:
+
+-h  help
+-v  verbose output (-vv very verbose)\n");
+}
+
+sub ModNotes {
+  my $relData = RelData->Open($iniData, $comp, $ver, $verbose);
+  $relData->UpdateNotes($notesSrc);
+  print "Release notes for $comp $ver updated\n";
+}
+
+
+__END__
+
+=head1 NAME
+
+ModNotes - Modifies the release notes of a release that has already been made.
+
+=head1 SYNOPSIS
+
+  modnotes [options] <component> <notes_source_file> [<version>]
+
+options:
+
+  -h  help
+  -v  verbose output (-vv very verbose)
+
+=head1 DESCRIPTION
+
+Occasionally release are made using the wrong release notes source. Also, sometimes mistakes in the source are spotted after the release has been made. C<ModNotes> may be used to rectify these problems after a release has been made. Unless a version is explicitly specified, the release notes of the currently installed version will be modified.
+
+=head1 KNOWN BUGS
+
+None.
+
+=head1 COPYRIGHT
+
+ Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+ All rights reserved.
+ This component and the accompanying materials are made available
+ under the terms of the License "Eclipse Public License v1.0"
+ which accompanies this distribution, and is available
+ at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ 
+ Initial Contributors:
+ Nokia Corporation - initial contribution.
+ 
+ Contributors:
+ 
+ Description:
+ 
+
+=cut

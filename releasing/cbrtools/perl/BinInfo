@@ -1,0 +1,177 @@
+#!perl
+# Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+# 
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+# 
+# Contributors:
+# 
+# Description:
+# 
+#
+
+use strict;
+use FindBin;
+use lib "$FindBin::Bin";
+use Getopt::Long;
+use IniData;
+use EnvDb;
+use CommandController;
+
+
+#
+# Globals.
+#
+
+my $verbose = 0;
+my $iniData = IniData->New();
+my $commandController = CommandController->New($iniData, 'BinInfo');
+my $envDb;
+
+
+#
+# Main.
+#
+
+ProcessCommandLine();
+
+
+#
+# Subs.
+#
+
+sub ProcessCommandLine {
+  Getopt::Long::Configure ("bundling");
+  my $help;
+  GetOptions('h' => \$help, 'v+' => \$verbose);
+
+  if ($help) {
+    Usage(0);
+  }
+
+  unless (scalar (@ARGV) == 1) {
+    print "Error: Invalid arguments\n";
+    Usage(1);
+  }
+
+  $envDb = EnvDb->Open($iniData, $verbose);
+
+  if ($ARGV[0] =~ /[\*\?]/) {
+    my $glob = shift @ARGV;
+    foreach my $entry (@{Utils::ReadGlob($glob)}) {
+      Utils::AbsoluteFileName(\$entry);
+      print "\nFile:        $entry\n";
+      BinInfo($entry);
+    }
+  }
+  elsif (-f $ARGV[0]) {
+    my $binary = shift @ARGV;
+    Utils::AbsoluteFileName(\$binary);
+    BinInfo($binary);
+  }
+  else {
+    my $comp = shift @ARGV;
+    ListBins($comp);
+  }
+}
+
+sub Usage {
+  my $exitCode = shift;
+  
+  Utils::PrintDeathMessage($exitCode, "\nUsage: bininfo [options] <binary_file> | <component>
+
+options:
+
+-h  help
+-v  verbose output (-vv very verbose)\n");
+}
+
+sub BinInfo {
+  my $binary = shift;
+  my $info = $envDb->BinaryInfo($binary);
+  $iniData->TableFormatter->PrintTable($info);
+}
+
+sub ListBins {
+  my $comp = shift;
+  unless ($envDb->Version($comp)) {
+    print "Error: \"$comp\" is not a file and is not a component that is currently installed\n";
+    Usage(1);
+  }
+  my $info = $envDb->ListBins($comp);
+  $iniData->TableFormatter->PrintTable($info, 1);
+}
+
+
+
+__END__
+
+=head1 NAME
+
+BinInfo - Displays information about a currently installed binary file.
+
+=head1 SYNOPSIS
+
+  bininfo [options] <binary_file> | <component>
+
+options:
+
+  -h  help
+  -v  verbose output (-vv very verbose)
+
+=head1 DESCRIPTION
+
+If given a file name, prints the name of the component that owns the binary, the currently installed version and its status. For example:
+
+ D:\>bininfo \epoc32\release\wins\udeb\brdcst.dll
+ Component:   brdcst
+ Version:     001
+ Status:      pending release
+
+If given a component name, displays a list of all the binary files owned by that component and their status. For example:
+
+ D:\>bininfo brdcst
+ File                                                     Status
+
+ \EPOC32\INCLUDE\brdcst.h                                 clean
+ \EPOC32\RELEASE\THUMB\UREL\BRDCST.DLL                    clean
+ \EPOC32\RELEASE\THUMB\UREL\BRDCST.DLL.MAP                clean
+ \EPOC32\RELEASE\THUMB\UREL\BRDCST.LIB                    clean
+ \EPOC32\RELEASE\THUMB\UREL\BRDSRV.EXE                    clean
+ \EPOC32\RELEASE\THUMB\UREL\BRDSRV.EXE.MAP                clean
+ \EPOC32\RELEASE\THUMB\UREL\BRDSRV.LIB                    clean
+ \EPOC32\RELEASE\WINS\UDEB\BRDCST.DLL                     clean
+ \EPOC32\RELEASE\WINS\UDEB\BRDCST.LIB                     clean
+ \EPOC32\RELEASE\WINS\UDEB\BRDCST.PDB                     clean
+ \EPOC32\RELEASE\WINS\UDEB\BRDSRV.LIB                     clean
+ \EPOC32\RELEASE\WINS\UDEB\Z\SYSTEM\PROGRAMS\BRDSRV.DLL   clean
+ \EPOC32\RELEASE\WINS\UDEB\Z\SYSTEM\PROGRAMS\BRDSRV.PDB   clean
+ \EPOC32\rom\include\brdcst.iby                           clean
+
+=head1 KNOWN BUGS
+
+None.
+
+=head1 COPYRIGHT
+
+ Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+ All rights reserved.
+ This component and the accompanying materials are made available
+ under the terms of the License "Eclipse Public License v1.0"
+ which accompanies this distribution, and is available
+ at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ 
+ Initial Contributors:
+ Nokia Corporation - initial contribution.
+ 
+ Contributors:
+ 
+ Description:
+ 
+
+=cut

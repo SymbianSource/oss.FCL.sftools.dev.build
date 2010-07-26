@@ -1,0 +1,42 @@
+<buildlog>
+
+<error bldinf="y:/src/email/bld.inf">email error #1</error>
+<error bldinf="y:/src/email/bld.inf">email error #2</error>
+
+<warning bldinf="y:/src/txt/bld.inf">txt warning #1</warning>
+<warning bldinf="y:/src/txt/bld.inf">txt warning #2</warning>
+
+<warning bldinf="y:/src/email/bld.inf">email warning #1</warning>
+<warning bldinf="y:/src/email/bld.inf">email warning #2</warning>
+
+<whatlog bldinf='y:/src/email/bld.inf' mmp='y:/src/email/a.mmp' config='armv5_urel'>
+<build>/epoc32/data/email_1</build>
+<build>/epoc32/data/email_2</build>
+</whatlog>
+
+<clean bldinf='y:/src/txt/bld.inf' mmp='y:/src/txt/b.mmp' config='armv5_udeb'>
+<file>/epoc32/data/txt_1</file>
+<file>/epoc32/data/txt_2</file>
+</clean>
+
+<recipe name='dummy' bldinf='y:/src/txt/bld.inf'>
++ make_txt
+txt was made fine
+<status exit='ok'/>
+</recipe>
+
+<recipe name='dummy' bldinf='y:/src/email/bld.inf'>
++ make_email
+email was made fine
+<status exit='ok'/>
+</recipe>
+
+<fake bldinf='y:src/email/bld.inf'>
+  <foo>
+    <bar>
+      <fb>fb email</fb>
+    </bar>
+  </foo>
+</fake>
+
+</buildlog>

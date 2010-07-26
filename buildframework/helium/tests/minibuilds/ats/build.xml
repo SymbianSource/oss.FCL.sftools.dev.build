@@ -34,31 +34,25 @@ Description:
     <property name="build.drive" value="z:" />
     <property name="build.id" value="${build.name}_${build.version}"/>
     <property name="diamonds.host" value="diamonds.nmp.nokia.com"/>
-    <property name="diamonds.port" value="8080"/>
+    <property name="diamonds.port" value="80"/>
     <property name="diamonds.path" value="/diamonds/builds/"/>
     
-    <property name="enabled.ats" value="1" />
-
-	<property name="skip.ats.sending" value="1"/>
-		<property name="ats.image.type" value="variant" />
-		<property name="ats.product.name" value="" />
-		<property name="ats.email.list" value="" />
-		<property name="ats.plan.name" value="" />
-		<property name="ats.flashfiles.minlimit" value="2" />
-		<property name="ats.target.platform" value="armv5 urel" />
-		<property name="ats.script.type" value="import" />
-		<property name="ats.product.hwid" value="" />
-		<property name="ats.testrun.name" value="${build.id}_${ats.product.name}_${core.build.version}" />
-		<property name="ats.test.timeout" value="60" />
-		<property name="tsrc.data.dir" value="data_rom" />
-		<property name="ats.ctc.enabled" value="True" />
-		<property name="ats.ctc.host" value="10.11.3.2" />
-		<property name="ats.flashfiles.minlimit" value="2" />
-		
-		<property name="ta.flag.list" value="TA_M, TA_MU, TA_MMAPPFW,TA_MM"/>
+    <property name="enabled.ats" value="true" />
+    <property name="skip.ats.sending" value="true"/>
+    <property name="ats.image.type" value="variant" />
+    <property name="ats.product.name" value="" />
+    
+    <property name="ats.script.type" value="import" />
+    <property name="ats.product.hwid" value="" />
+    
+    <property name="tsrc.data.dir" value="data_rom" />
+    <property name="ats.ctc.enabled" value="True" />
+    <property name="ats.ctc.host" value="10.11.3.2" />
+    
+    <property name="ta.flag.list" value="TA_M, TA_MU, TA_MMAPPFW,TA_MM"/>
     <property name="ido.build.filter" value="${ta.flag.list},dfs_build"/>
-    <property name="release.images.dir" value="Z:\output\variant_images" />
-		
+    <!--<property name="release.images.dir" value="Z:\output\variant_images" />-->
+    
     <!-- build configuration -->
     <property name="sysdef.configurations.list" value="helium_minibuild_ats_compile" />
     <path id="system.definition.files">
@@ -68,10 +62,10 @@ Description:
 <!--    
     <property name="build.system" value="ec-helium" />
 -->	
-	<property name="rvct.version" value="22_616"/>
-	<!-- Archiving configuration-->
-	<property name="zip.config.file" location="archive.cfg.xml"/>
-	<property name="zips.ee.spec.name" value="minibuild_archive"/>
+    <property name="rvct.version" value="22_616"/>
+    <!-- Archiving configuration-->
+    <property name="zip.config.file" location="archive.cfg.xml"/>
+    <property name="zips.ee.spec.name" value="minibuild_archive"/>
 	
     <!-- Synergy is not configured -->
     <property name="skip.password.validation" value="1"/>
@@ -121,15 +115,14 @@ DIAMONDS ATS TEST PAGE: http://${diamonds.host}${diamonds.build.id}#tab=4
         <au:assertMatches string="${arm.compiler.version}" pattern="RVCT2\.2 \[Build 616\]" casesensitive="false" multiline="true"/>
 
         <!-- Check if compile-main step did what expected... -->
-    	<au:assertFileExists file="${canonical.sysdef.file}"/>
+        <au:assertFileExists file="${canonical.sysdef.file}"/>
         <au:assertFileExists file="${build.drive}/Makefile"/>
         <au:assertFileExists file="${build.drive}/emake.data"/>
         <au:assertFileExists file="${build.log.dir}/${build.id}.helium_minibuild_compile_run_emake.bat"/>
-    	
-    	
-    	<!-- Checking the zip generation -->
-    	<au:assertFileExists file="${zips.build.dir}/s60_app_organizer_clock_binary.zip"/>
-    	<au:assertFileExists file="${zips.build.dir}/s60_app_organizer_clock.zip"/>    	
+        
+        <!-- Checking the zip generation -->
+        <au:assertFileExists file="${zips.build.dir}/s60_app_organizer_clock_binary.zip"/>
+        <au:assertFileExists file="${zips.build.dir}/s60_app_organizer_clock.zip"/>    	
     </target>
 
 

@@ -31,7 +31,7 @@ Typedefs locally used
 @internalComponent
 @released
 */
-typedef std::map<unsigned int, String> AddressVsExeName;
+typedef map<unsigned int, string> AddressVsExeName;
 
 /**
 If multiple images are specified as the input, then this value must be 
@@ -62,11 +62,11 @@ public:
 	DepChecker(CmdLineHandler* aCmdPtr, ImageReaderPtrList& aImageReaderList, bool aNoRomImage);
 	~DepChecker(void);
 	void Check(ImgVsExeStatus& aImgVsExeStatus);
-	void PrepareAndWriteData(ExeContainer* aExeContainer);
+	void PrepareAndWriteData(ExeContainer& aExeContainer);
 	
 private:
-	void DeleteHiddenExeFromExecutableList(ImageReader* aImageReader, StringList& aHiddenExeList);
-	void CollectDependencyStatus(String& aString, String& aStatus) const;
+	void DeleteHiddenExeFromExecutableList(ImageReader* aImageReader, const StringList& aHiddenExeList);
+	void CollectDependencyStatus(const char* aString, string& aStatus) const;
 	void PrepareImageExeList(ImageReader* aImageReader);
 	void RomImagePassed(void) const;
 	

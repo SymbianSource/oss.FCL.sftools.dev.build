@@ -1,0 +1,9 @@
+component	dev_build_cpptoolsplat_cpp-2.9-psion-98r2
+
+source		\src\tools\build\cpptoolsplat\cpp-2.9-psion-98r2
+exports		\src\tools\build\cpptoolsplat\cpp-2.9-psion-98r2\group
+notes_source	\component_defs\release.src
+
+ipr T
+ipr O  \src\tools\build\cpptoolsplat\cpp-2.9-psion-98r2
+

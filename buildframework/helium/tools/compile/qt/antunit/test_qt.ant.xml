@@ -1,0 +1,155 @@
+<?xml version="1.0"?>
+<!--
+============================================================================
+Name        : test_qt.ant.xml
+Part of     : Helium
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<!--* @package compile -->
+<project name="test-qt" xmlns:au="org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>
+        Testing Qt targets.
+    </description>
+    <property environment="env"/>
+    
+    <property name="helium.dir" location="../../../.." />
+    <import file="${helium.dir}/build.xml"/>
+    <property name="qt.temp.dir" location="${helium.build.dir}/antunit/qt" />
+    
+    <target name="setUp">
+        <mkdir dir="${qt.temp.dir}" />
+        <!--delete dir="${qt.temp.dir}" />
+        <mkdir dir="${qt.temp.dir}" /-->
+    </target>
+
+    <!--target name="tearDown">
+        <delete dir="${qt.temp.dir}" />
+    </target-->
+
+    <target name="test-sysdef3-namespaced-qt-ant">
+        <property name="sysdef.configuration" value="demo" />
+        <fmpp sourceFile="${helium.dir}/tools/compile/qt/templates/run-qmake.ant.xml.ftl"
+           outputFile="${qt.temp.dir}/run-qmake3.ant.xml">
+            <data expandProperties="yes">
+                data: xml(${helium.dir}/tests/data/test-qt-sysdef3.xml)
+                ant: antProperties()
+            </data>
+        </fmpp>
+        <au:assertFileExists file="${qt.temp.dir}/run-qmake3.ant.xml" />
+        <loadfile property="run.qmake.out" srcfile="${qt.temp.dir}/run-qmake3.ant.xml" />
+        <au:assertTrue message="The output file must contain the -nomoc argument.">
+            <contains string="${run.qmake.out}" substring="-nomoc" />
+        </au:assertTrue>
+        <au:assertTrue message="The output file must contain helloworld.pro">
+            <contains string="${run.qmake.out}" substring="helloworld.pro" />
+        </au:assertTrue>
+        <au:assertTrue message="The output file must contain helloworldapi.pro">
+            <contains string="${run.qmake.out}" substring="helloworldapi.pro" />
+        </au:assertTrue>
+        <au:assertTrue message="The output file must contain $${build.drive}/sf/app/helloworldcons/group">
+            <contains string="${run.qmake.out}" substring="$${build.drive}/sf/app/helloworldcons/group" />
+        </au:assertTrue>
+        <au:assertTrue message="The output file must contain $${build.drive}/sf/mw/helloworldapi/group">
+            <contains string="${run.qmake.out}" substring="$${build.drive}/sf/mw/helloworldapi/group" />
+        </au:assertTrue>
+    </target>
+    
+    <target name="test-sysdef151-namespaced-qt-ant">
+        <property name="sysdef.configuration" value="demo" />
+        <fmpp sourceFile="${helium.dir}/tools/compile/qt/templates/run-qmake.ant.xml.ftl"
+           outputFile="${qt.temp.dir}/run-qmake151.ant.xml">
+            <data expandProperties="yes">
+                data: xml(${helium.dir}/tests/data/test-qt-sysdef151.xml)
+                ant: antProperties()
+            </data>
+        </fmpp>
+        <au:assertFileExists file="${qt.temp.dir}/run-qmake151.ant.xml" />
+        <loadfile property="run.qmake.out" srcfile="${qt.temp.dir}/run-qmake151.ant.xml" />
+        <au:assertTrue message="The output file must contain the -nomoc argument.">
+            <contains string="${run.qmake.out}" substring="-nomoc" />
+        </au:assertTrue>
+        <au:assertTrue message="The output file must contain helloworld.pro">
+            <contains string="${run.qmake.out}" substring="helloworld.pro" />
+        </au:assertTrue>
+        <au:assertTrue message="The output file must contain helloworldapi.pro">
+            <contains string="${run.qmake.out}" substring="helloworldapi.pro" />
+        </au:assertTrue>
+        <au:assertTrue message="The output file must contain $${build.drive}/\sf\app\HelloWorldCons\group">
+            <contains string="${run.qmake.out}" substring="$${build.drive}/\sf\app\HelloWorldCons\group" />
+        </au:assertTrue>
+        <au:assertTrue message="The output file must contain $${build.drive}/\sf\mw\HelloWorldAPI\group">
+            <contains string="${run.qmake.out}" substring="$${build.drive}/\sf\mw\HelloWorldAPI\group" />
+        </au:assertTrue>
+    </target>
+    
+    <target name="test-sysdef151-namespaced-qt-mk">
+        <property name="sysdef.configuration" value="demo" />
+        <fmpp sourceFile="${helium.dir}/tools/compile/qt/templates/run-qmake.mk.ftl"
+           outputFile="${qt.temp.dir}/run-qmake151.mk">
+            <data expandProperties="yes">
+                data: xml(${helium.dir}/tests/data/test-qt-sysdef151.xml)
+                ant: antProperties()
+            </data>
+        </fmpp>
+        <au:assertFileExists file="${qt.temp.dir}/run-qmake151.mk" />
+        <loadfile property="run.qmake.out" srcfile="${qt.temp.dir}/run-qmake151.mk" />
+        <au:assertTrue message="The output file must contain the -nomoc argument.">
+            <contains string="${run.qmake.out}" substring="-nomoc" />
+        </au:assertTrue>
+        <au:assertTrue message="The output file must contain helloworld.pro">
+            <contains string="${run.qmake.out}" substring="helloworld.pro" />
+        </au:assertTrue>
+        <au:assertTrue message="The output file must contain helloworldapi.pro">
+            <contains string="${run.qmake.out}" substring="helloworldapi.pro" />
+        </au:assertTrue>
+        <au:assertTrue message="The output file must contain -@cd /\sf\mw\HelloWorldAPI\group &amp;&amp; qmake -listgen -nomoc helloworldapi.pro">
+            <contains string="${run.qmake.out}" substring="-@cd /\sf\mw\HelloWorldAPI\group &amp;&amp; qmake -listgen -nomoc helloworldapi.pro" />
+        </au:assertTrue>
+        <au:assertTrue message="The output file must contain -@cd /\sf\app\HelloWorldCons\group &amp;&amp; qmake -listgen -r helloworld.pro">
+            <contains string="${run.qmake.out}" substring="-@cd /\sf\app\HelloWorldCons\group &amp;&amp; qmake -listgen -r helloworld.pro" />
+        </au:assertTrue>
+    </target>
+
+    <target name="test-sysdef3-namespaced-qt-mk">
+        <property name="sysdef.configuration" value="demo" />
+        <fmpp sourceFile="${helium.dir}/tools/compile/qt/templates/run-qmake.mk.ftl"
+           outputFile="${qt.temp.dir}/run-qmake3.mk">
+            <data expandProperties="yes">
+                data: xml(${helium.dir}/tests/data/test-qt-sysdef3.xml)
+                ant: antProperties()
+            </data>
+        </fmpp>
+        <au:assertFileExists file="${qt.temp.dir}/run-qmake3.mk" />
+        <loadfile property="run.qmake.out" srcfile="${qt.temp.dir}/run-qmake151.mk" />
+        <au:assertTrue message="The output file must contain the -nomoc argument.">
+            <contains string="${run.qmake.out}" substring="-nomoc" />
+        </au:assertTrue>
+        <au:assertTrue message="The output file must contain helloworld.pro">
+            <contains string="${run.qmake.out}" substring="helloworld.pro" />
+        </au:assertTrue>
+        <au:assertTrue message="The output file must contain helloworldapi.pro">
+            <contains string="${run.qmake.out}" substring="helloworldapi.pro" />
+        </au:assertTrue>
+        <au:assertTrue message="The output file must contain -@cd /\sf\mw\HelloWorldAPI\group &amp;&amp; qmake -listgen -nomoc helloworldapi.pro">
+            <contains string="${run.qmake.out}" substring="-@cd /\sf\mw\HelloWorldAPI\group &amp;&amp; qmake -listgen -nomoc helloworldapi.pro" />
+        </au:assertTrue>
+        <au:assertTrue message="The output file must contain -@cd /\sf\app\HelloWorldCons\group &amp;&amp; qmake -listgen -r helloworld.pro">
+            <contains string="${run.qmake.out}" substring="-@cd /\sf\app\HelloWorldCons\group &amp;&amp; qmake -listgen -r helloworld.pro" />
+        </au:assertTrue>
+    </target>
+</project>

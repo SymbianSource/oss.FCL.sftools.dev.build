@@ -21,10 +21,18 @@ TOOLS2
 
 PRJ_EXPORTS
 
+#ifdef TOOLS2_LINUX
+../maksym/fixupsym              /epoc32/tools/fixupsym
+../maksym/hpsym                 /epoc32/tools/hpsym
+../maksym/maksym                /epoc32/tools/maksym
+../maksym/maksymrofs            /epoc32/tools/maksymrofs
+#else
 ../maksym/fixupsym.bat              /epoc32/tools/fixupsym.bat
 ../maksym/hpsym.bat                 /epoc32/tools/hpsym.bat
 ../maksym/maksym.bat                /epoc32/tools/maksym.bat
 ../maksym/maksymrofs.bat            /epoc32/tools/maksymrofs.bat
+#endif
+
 ../maksym/fixupsym.pl               /epoc32/tools/fixupsym.pl
 ../maksym/hpsym.pl                  /epoc32/tools/hpsym.pl
 ../maksym/maksym.pl                 /epoc32/tools/maksym.pl
@@ -40,3 +48,4 @@ readimage
 
 PRJ_TESTMMPFILES
 ../rombuild/r_t_areaset
+ 

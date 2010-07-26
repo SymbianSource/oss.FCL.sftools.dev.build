@@ -32,15 +32,16 @@
 
 #include <e32std.h>
 #include <e32rom.h>				// TLinAddr
+using namespace std;
 
-typedef std::vector<std::string> TStringList;
+typedef vector<string> TStringList;
 struct DepInfo
 {
 public:
 	TBool dependOthers;
 	TBool beenDepended;
 	int index;
-	std::string portName;
+	string portName;
 	TStringList depFilesList;
 	DepInfo()
 	{
@@ -49,7 +50,7 @@ public:
 		index = -1;
 	}
 };
-typedef std::map<std::string, DepInfo> TDepInfoList;
+typedef map<string, DepInfo> TDepInfoList;
 
 class TRomBuilderEntry;
 
@@ -96,15 +97,15 @@ public:
 	void AddFile(TRomBuilderEntry* aFile);
 
 	TInt SortFilesForPagedRom();
+	void WriteDependenceGraph();
 private:
 	// only AreaSet can create areas
 	Area(const char* aName, TLinAddr aDestBaseAddr, TUint aMaxSize, Area* aNext=0);
 	void ReleaseAllFiles();
-	void WriteDependenceGraph();
 public:
 	TRomBuilderEntry* iFirstPagedCode; // For PagedRom only
 private:
-	const char* iName;
+	char* iName;
 	TLinAddr iDestBaseAddr;
 	TLinAddr iSrcBaseAddr;
 	TLinAddr iSrcLimitAddr;

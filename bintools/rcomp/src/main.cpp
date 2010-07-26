@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2000-2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of the License "Eclipse Public License v1.0"
@@ -20,10 +20,12 @@
 #include <stdio.h>
 #include <string.h>
 
+
 #include "unistd.h"
 
 #if defined( __MSVCDOTNET__) || defined(__TOOLS2__)
 #include <iostream>
+#include <fstream>
 using std::cout;
 using std::endl;
 using std::cerr;
@@ -208,7 +210,7 @@ void Tokenize(String aString)
 
 void OutputHelp()
 	{
-	cerr << "Resource compiler version " << version << " (Build " << build << ") (C) 1997-2009 Nokia Corporation." << endl;
+	cerr << "Resource compiler version " << version << " (Build " << build << ") (C) 1997-2010 Nokia Corporation." << endl;
 	cerr << "Usage: rcomp [-vpul] [-force] [-oRSCFile] [-{uid2,uid3}] [-hHeaderFile] [-sSourceFile] [-iBaseInputFileName]" << endl;
 	cerr << "\tv" << "\tverbose" << endl;
 	cerr << "\tp" << "\tParser debugging" << endl;
@@ -359,35 +361,75 @@ int main(int argc, char * argv[])
 		}
 	if(SourceFileName.Length() == 0)
 		{
-		pSourceFile = stdin;
+		pSourceFile = NULL ; //stdin;
 		}
-	else 
-		{
+	else  
+	{
 		if((pSourceFile = fopen(SourceFileName.GetAssertedNonEmptyBuffer(), "r") ) == NULL)
-			{
+		{
 			cerr << "Failed to open " << SourceFileName << endl;
 			exit(-2);
-			}
 		}
-	//Searchig for BOM signature which if found will be ignored
-
-	unsigned char buffer[3];
-	fread( buffer, sizeof( char ), 3, pSourceFile);
-	
-	if((buffer[0]!=239) && (buffer[1]!=187) && (buffer[2]!=191))
+		//Searchig for BOM signature which if found will be ignored
+		unsigned char buffer[3];
+		fread( buffer, sizeof( char ), 3, pSourceFile);	
+		if((buffer[0]!=239) && (buffer[1]!=187) && (buffer[2]!=191))
 		{
-		// BOM not found. Set the file-position indicator to 0
-		filePositionIndicator = fpos_t();
-		if(fsetpos(pSourceFile, &filePositionIndicator) !=0)
+			// BOM not found. Set the file-position indicator to 0
+			filePositionIndicator = fpos_t();
+			if(fsetpos(pSourceFile, &filePositionIndicator) !=0)
 			{
-			perror("fsetpos error");
+				perror("fsetpos error");
+				exit(-2);
 			} 
-		}	
+		}		
+	}
+		
 	verbose = vParam;
-
 	pG = new GlobalData;
 	if (pG==NULL)
 		exit(-4);
+		
+	if(NULL == pSourceFile){ // Cache the standard input		
+		pG->StdInBufLength = 0; 
+		unsigned long allocSize = 0x100000 ; // 1M bytes
+		pG->StdInfBufPos = 0 ;
+		pG->StdInBuffer = (char*)malloc(allocSize);
+		if(NULL == pG->StdInBuffer){
+			delete pG ;
+			exit(-4);
+		}
+		int result = 1;
+		char* buffer = pG->StdInBuffer;
+		FILE *file = stdin ;
+		const int KIOBytes = 0x20000 ;
+		while(1) {		 
+			result = fread(buffer, 1, KIOBytes, file);  
+			if(result == 0){
+				*buffer = 0;
+				break ;
+			}
+			buffer += result ;
+			pG->StdInBufLength += result ;
+			if((pG->StdInBufLength + KIOBytes) > allocSize) {
+				allocSize += KIOBytes ;
+				pG->StdInBuffer = (char*)realloc(pG->StdInBuffer,allocSize);
+				if(NULL == pG->StdInBuffer){
+					delete pG ;
+					exit(-4);
+				}
+				buffer = pG->StdInBuffer + pG->StdInBufLength;
+			}
+			
+		}
+		const unsigned char BOM[] = {0xef , 0xbb, 0xbf, 0x0 };
+		if(0 == memcmp(pG->StdInBuffer,BOM,3))
+			pG->StdInfBufPos = 3 ; 
+	}
+	else {
+		pG->StdInBuffer = 0 ;
+		pG->StdInBufLength = 0; 
+	}
 	
 	Tokenize(MessageSuppressionList);
 
@@ -403,7 +445,10 @@ int main(int argc, char * argv[])
 	#endif
 	
 	int ret=ParseSourceFile(pSourceFile, pParam);
-	fclose(pSourceFile);
+	if(pSourceFile != NULL)
+		fclose(pSourceFile);
+	if(pG->StdInBuffer != NULL)
+		free(pG->StdInBuffer);
 	
 	pGL->StoreFinalComment(); // final comment not stored during running of lex and yacc
 	if(lParam && (pGL->LocalisationCommentsExist() || lForce))
@@ -439,14 +484,42 @@ int main(int argc, char * argv[])
 		const char* uidTool = "uidcrc";
 
 #else
+
 		std::string totalpath(s.substr( 0, s.rfind("\\")+1 ));
 		const char* uidTool = "uidcrc.exe";
-
+    
+		// in case unix style of seperator is used in windows.
+		if(!totalpath.length()){
+			totalpath = s.substr( 0, s.rfind("/")+1 );
+		}
+		
 #endif
-
-		// Calls the uidcrc tool with the full path to where RCOMP resides in
+		
 		std::string uidpath(uidTool);
-		totalpath += uidpath;
+		
+		// try to call the uidcrc tool with the full path to where RCOMP resides in
+		// if does not exists, search uidcrc in PATH 
+		if(totalpath.length()){
+		
+			std::string trypath(totalpath);
+			trypath += uidpath;
+			
+			std::fstream _file;
+			_file.open(trypath.c_str(), std::ios::in);
+			if(!_file){
+				// try to search from PATH
+				totalpath = uidpath;
+			}
+			else{
+				_file.close();
+				// invoke from the path RCOMP resides in
+				totalpath += uidpath;
+			}
+		}
+		else{
+			// search from PATH
+			totalpath = uidpath;
+		}
 		
 		// Find and replace all occurences of \ with /
 		std::string searchString( "\\" ); 
@@ -503,17 +576,7 @@ int main(int argc, char * argv[])
 			MOFF; cout << uidcrcTool << " " << uidcrcUIDs[0] << " " << uidcrcUIDs[1] << " " << uidcrcUIDs[2] << " " << DataOutputFileName.GetAssertedNonEmptyBuffer(); cout << endl; MON;
 			}
 
-#ifndef __LINUX__
-		const int error = _spawnlp (_P_WAIT,
-									uidcrcTool,
-									uidcrcTool,
-									uidcrcUIDs[0],
-									uidcrcUIDs[1],
-									uidcrcUIDs[2],
-									DataOutputFileName.GetAssertedNonEmptyBuffer(),
-									NULL);
-#else
-		char uidcrc_params[256];
+		char uidcrc_params[512];
 		const int ret = snprintf(uidcrc_params,
 					 sizeof(uidcrc_params),
 					 "%s %s %s %s %s",
@@ -527,7 +590,6 @@ int main(int argc, char * argv[])
 			exit(ret);
 		}
 		const int error = system(uidcrc_params);
-#endif //__LINUX__
 
 		if(error != 0)
 			{

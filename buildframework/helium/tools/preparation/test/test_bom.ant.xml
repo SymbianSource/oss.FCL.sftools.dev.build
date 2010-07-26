@@ -29,14 +29,14 @@ Description:
     <property name="build.drive" location="${env.TEMP}/helium/${env.USERNAME}/testbom"/>
     <property name="publish.dir" value="${build.drive}/output" />
     <property name="build.number" value="1" />
-    <import file="../../../helium.ant.xml" />
+    <import file="../../../build.xml" />
     
     <target name="test-create-bom">
         <delete dir="${build.drive}"/>
         <mkdir dir="${build.log.dir}"/>    
         
-        <unzip src="${helium.dir}/external/helium-antlib/java/scm/demo/hg_test2.zip" dest="${build.drive}" />
-        <unzip src="${helium.dir}/external/helium-antlib/java/scm/demo/hg_test3.zip" dest="${build.drive}" />
+        <unzip src="${helium.dir}/tests/data/bom/hg_test2.zip" dest="${build.drive}" />
+        <unzip src="${helium.dir}/tests/data/bom/hg_test3.zip" dest="${build.drive}" />
         <hlm:scm scmurl="scm:hg:${build.drive}/test2">
             <hlm:checkout baseDir="${build.drive}/test2a"/>
             <hlm:changelog baseDir="${build.drive}/test2a" xmlbom="${build.log.dir}/${build.id}_bom.xml" />

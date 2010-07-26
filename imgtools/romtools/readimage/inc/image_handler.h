@@ -36,19 +36,19 @@ public:
 	ImageHandler();
 	~ImageHandler();
 
-	void		ProcessArgs(int argc, char**argv);
+	void		ProcessArgs(int argc, char*argv[]);
 
 	void		HandleInputFiles();
 	EImageType	ReadMagicWord();
     EImageType  ReadBareImage(ifstream& aIfs);
 	void		PrintUsage();
 	void		PrintVersion();
-	void		SetInputFile(char* aFile) { iInputFileName = aFile;}
+	void		SetInputFile(const string& aFile) { iInputFileName = aFile;}
 
 private:
 	ImageReader *iReader;
-	string		iInputFileName;
-	string		iOutFile;
+	string	iInputFileName;
+	string	iOutFile;
 	TUint		iOptions;
 
 	SisUtils	*iSisUtils;

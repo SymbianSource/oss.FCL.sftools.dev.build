@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : preparation.antlib.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<!--* @package preparation -->
+<antlib xmlns:hlm="http://www.nokia.com/helium">
+
+    <!--
+       This task will copy the content of the its nested fileset in parallel. The todir attribute defines
+       the output directory. 'threads' defines how many copy you would like in parallel, and verbose
+       defines if you want the copying to be logged.
+     -->
+    <scriptdef language="beanshell" name="parallelCopy" uri="http://www.nokia.com/helium">
+        <attribute name="todir" />
+        <attribute name="threads" />
+        <attribute name="verbose" />
+        <attribute name="overwrite" />
+        <element name="resourceset" type="http://www.nokia.com/helium:resourceSet"/>
+        <![CDATA[
+import org.apache.tools.ant.taskdefs.Parallel;
+import org.apache.tools.ant.taskdefs.Copy;
+import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.taskdefs.Mkdir;
+import java.io.File;
+        
+int threads = 4;
+String verbose = "false";
+String overwrite = "false";
+
+if (attributes.get("todir") == null) {
+    throw new BuildException("'todir' attribute is not defined.");
+}
+
+if (attributes.get("threads") != null) {
+    threads = Integer.parseInt(attributes.get("threads"));
+    if (threads < 0) {
+        throw new BuildException("Invalid thread number: " + threads);
+    }
+}
+if (attributes.get("verbose") != null) {
+        verbose = attributes.get("verbose");
+}
+if (attributes.get("overwrite") != null) {
+        overwrite = attributes.get("overwrite");
+}
+// Creating the output dir
+Mkdir mkdir = new Mkdir();
+mkdir.setProject(project);
+mkdir.setTaskName(self.getTaskName());
+mkdir.setDir(new File(attributes.get("todir")));
+mkdir.execute();
+
+Parallel pt = new Parallel();
+pt.setProject(project);
+pt.setTaskName(self.getTaskName());
+pt.setThreadCount(threads);
+if (elements.get("resourceset") != null) {
+    resourceSets = elements.get("resourceset");
+    for (int rsi = 0 ; rsi < resourceSets.size() ; rsi++) {
+        resourceCollections  = resourceSets.get(rsi).getData();
+        for (int i = 0 ; i < resourceCollections.size() ; i++) {
+            self.log("Creating copy task...");
+            Copy copy = new Copy();
+            copy.setProject(project);
+            copy.setTaskName(self.getTaskName());
+            copy.setTodir(new File(attributes.get("todir")));
+            copy.add(resourceCollections.get(i));
+            copy.setVerbose(new Boolean(verbose).booleanValue());
+            copy.setOverwrite(new Boolean(overwrite).booleanValue());
+            pt.addTask(copy);
+    }
+    }
+}
+self.log("Starting parallel copying...");
+pt.execute();
+self.log("Copying completed.");
+]]>
+    </scriptdef>
+
+    <!--
+        This task will unzip each group (represented as path element) in parallel. But the content of each
+        group will be unzipped sequentially.
+     -->
+    <scriptdef language="beanshell" name="parallelUnzip" uri="http://www.nokia.com/helium">
+        <attribute name="todir" />
+        <attribute name="threads" />
+        <attribute name="failonerror" />
+        <attribute name="logdir" />
+        <element name="resourceset" type="http://www.nokia.com/helium:resourceSet"/>
+        <![CDATA[
+import org.apache.tools.ant.taskdefs.Sequential;
+import org.apache.tools.ant.taskdefs.Parallel;
+import org.apache.tools.ant.taskdefs.ExecTask;
+import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.taskdefs.Mkdir;
+import java.io.File;
+
+int threads = 4;
+String failonerror = "true";
+String logDir = attributes.get("logdir");
+
+if (attributes.get("todir") == null) {
+    throw new BuildException("'todir' attribute is not defined.");
+}
+
+if (attributes.get("threads") != null) {
+    threads = Integer.parseInt(attributes.get("threads"));
+    if (threads < 0) {
+        throw new BuildException("Invalid thread number: " + threads);
+    }
+}
+if (attributes.get("failonerror") != null) {
+    failonerror = attributes.get("failonerror");
+}
+
+// Creating the output dir
+Mkdir mkdir = new Mkdir();
+mkdir.setProject(project);
+mkdir.setTaskName(self.getTaskName());
+mkdir.setDir(new File(attributes.get("todir")));
+mkdir.execute();
+
+if (logDir != null) {
+    Mkdir mkdir = new Mkdir();
+    mkdir.setProject(project);
+    mkdir.setTaskName(self.getTaskName());
+    mkdir.setDir(new File(logDir));
+    mkdir.execute();
+}
+
+// parallel
+Parallel pt = new Parallel();
+pt.setProject(project);
+pt.setTaskName(self.getTaskName());
+pt.setThreadCount(threads);
+
+if (elements.get("resourceset") != null) {
+    resourceSets = elements.get("resourceset");
+    for (int rsi = 0 ; rsi < resourceSets.size() ; rsi++) {
+        resourceCollections  = resourceSets.get(rsi).getData();
+        for (int i = 0 ; i < resourceCollections.size() ; i++) {
+            Sequential seq = new Sequential();
+            seq.setProject(project);
+            seq.setTaskName(self.getTaskName());
+            iterator = resourceCollections.get(i).iterator();
+            while (iterator.hasNext()) {
+                resource = iterator.next();
+                self.log("Creating 7zip task...");
+                ExecTask exec = new ExecTask();
+                exec.setProject(project);
+                exec.setTaskName(self.getTaskName());
+                exec.setExecutable("7za");
+                if (logDir != null) {
+                    exec.setOutput(new File(logDir, new File(resource.toString()).getName() + ".log"));
+                }
+                exec.setDir(new File(attributes.get("todir")));
+                exec.setFailonerror(new Boolean(failonerror).booleanValue());
+                exec.createArg().setValue("x");
+                exec.createArg().setFile(new File(resource.toString()));
+                exec.createArg().setValue("-y");
+                seq.addTask(exec);
+            }
+            pt.addTask(seq);
+        }
+    }
+}
+self.log("Starting parallel unzipping...");
+pt.execute();
+self.log("Unzipping completed.");
+]]>
+    </scriptdef>
+
+</antlib>

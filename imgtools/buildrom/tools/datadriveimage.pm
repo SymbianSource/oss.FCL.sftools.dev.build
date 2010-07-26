@@ -44,8 +44,10 @@ use strict;
 use File::Path;		# Module to provide functions to remove or create directories in a convenient way.
 use File::Copy;		# Module to provide functions to copy file(s) from source to destination.
 
-use Pathutl;
 use Cwd;			# Module to provide functions for determining the pathname of the current working directory.
+
+use romutl;
+use romosvariant;
 
 # This fuction is used primiarly to check for whitespace in the location for "zdrive" / "datadrive" folder creation,
 # specified by the user, if yes then it returns one, else zero
@@ -170,15 +172,15 @@ sub setPath
 	# get the working directory.
 	my $curWorkingDir = getcwd;
 	# substitute slash with double backward slash.
-	$curWorkingDir =~ s/\//\\/g;
+	$curWorkingDir =~ s/\\/\//g;
  	#if $curWorkingDir already has trailing '\', don't include it again 
- 	if( $curWorkingDir =~ /\\$/)
+ 	if( $curWorkingDir =~ /\/$/)
  	{
  		return $curWorkingDir.$dirName;
  	}
  	else
  	{
- 		return $curWorkingDir."\\".$dirName;
+ 		return $curWorkingDir."\/".$dirName;
  	}
 }
 
@@ -193,7 +195,7 @@ sub copyFilesToFolders
 	$dest =~ s/\"//g;	# remove double quotes from the string. 
 	my $destDirectory = $dest;
 	# strip the last substring to get destination file 
-	if ($dest=~/.*\\(\S+)/) 
+	if ($dest=~/.*[\/\\](\S+)/) 
 	{
 		$destFileName = $1;
 	}
@@ -214,8 +216,8 @@ sub copyFilesToFolders
 	{	
 		$destDirectory =~ s/$destFileName//;
 	}
-	my $destfile = $dir."\\".$dest;
-	my $createdir = $dir."\\".$destDirectory ;
+	my $destfile = $dir."\/".$dest;
+	my $createdir = $dir."\/".$destDirectory ;
 
 	# create the specified directory.
 	&createDirectory($createdir);
@@ -227,7 +229,7 @@ sub copyFilesToFolders
 	else
 	{
 		print "$source copied to $destfile\n" if($verboseOpt);
-		return $destfile;
+		return "\"".$destfile."\"";
 	}
 }
 
@@ -286,21 +288,23 @@ sub copyNonSisFiles
 	open (OBEY ,$obyfile) or die($obyfile."\n");
 	while(my $line =<OBEY>) 
 	{
-		if( $line =~ /^(file|data)\s*=\s*(\S+)\s+(\S+)/i )
+		if( $line =~ /^(file|data)\s*=\s*(\"[^"]+\")\s+(\"[^"]+\")/i || 
+				$line =~ /^(file|data)\s*=\s*(\"[^"]+\")\s+(\S+)/i || 
+				$line =~ /^(file|data)\s*=\s*(\S+)\s+(\"[^"]+\")/i || 
+				$line =~ /^(file|data)\s*=\s*(\S+)\s+(\S+)/i )
 		{
 			my $keyWord=$1;
 			my $source=$2;
 			my $dest=$3;
 
-			if( $source !~ /(\S+):(\S+)/ )
+			if( $source !~ /(\S+):([^"]+)/ )
 			{ 
-				$source = Path_Drive().$2;
+				$source = get_drive().$2;
 			}
 			my $var = &copyFilesToFolders( $source,$dest,$dir,$verboseOpt);
 			if($var)
 			{
-				$var = $keyWord."=".$var;
-				$line =~ s/^(\S+)=(\S+)/$var/;
+				$line = $keyWord."=".$var."\t".$dest."\n";
 				push(@$nonsisFileArray,$line);
 			}
 			else
@@ -366,6 +370,8 @@ sub invokeInterpretsis
 	my $basicOption = "-d C: ";	# default system drive letter
 	my $command = "interpretsis ";
 	my $vOption = "-w info" if ($verboseOpt);
+	
+	is_existinpath("interpretsis", romutl::DIE_NOT_FOUND);
 
 	# do a check if the path has a white space.
 	if( $dataDrivePath =~ m/ /)
@@ -430,7 +436,7 @@ sub invokeInterpretsis
 			$command .= $$interpretsisOptList[$i]." ";
 		}
 	}
-
+	
 	print "* Executing $command\n" if ( $verboseOpt );
 	system ( $command );
 
@@ -445,6 +451,9 @@ sub invokeReadImage
 {
 	my($imageName,$loc,$verboseOpt,$logFile,$keepgoingOpt) = @_;
 	my $command = "readimage ";
+	
+	is_existinpath("readimage", romutl::DIE_NOT_FOUND);
+	
 	# check if log file has been supplied.
 	if(defined($logFile))
 	{
@@ -492,15 +501,15 @@ sub compareArrays
 	# get source file.
 
 	# strip first occurrence of back slash
-	$linesource =~ s/\\//; 
+	$linesource =~ s/[\/\\]//; 
 
 	# get source file.
-	if ($linesource =~ /.*\\(\S+)/ ) 
+	if ($linesource =~ /.*[\/\\](\S+)/ ) 
 	{
 		$linesourceFile = $1;
 	}
 	# get destination file.
-	if ($linedest =~ /.*\\(\S+)/ )
+	if ($linedest =~ /.*[\/\\](\S+)/ )
 	{
 		$linedestFile = $1;
 	}
@@ -525,7 +534,7 @@ sub compareArrays
 						# remove double quotes.
 						$nonsisEntryDest =~ s/\"//g;
 						my $nonsisEntryDestFile;
-						if ($nonsisEntryDest =~ /.*\\(\S+)/ ) 
+						if ($nonsisEntryDest =~ /.*[\/\\](\S+)/ ) 
 						{ 
 							$nonsisEntryDestFile = $1;
 						}
@@ -593,7 +602,7 @@ sub dumpDatadriveObydata
 							my $newLinesource = $2;
 							my $newLinedest = $3;
 							$newLinedest =~ s/\"//g;
-							$newLinedest = "\\".$newLinedest;
+							$newLinedest = "\/".$newLinedest;
 							if( $newLinedest eq $lineToSearch )
 							{
 								# remove the specified element from the array.
@@ -666,7 +675,7 @@ sub  TraverseDir
 		#check if it is a file 
 		if( -f $entry )
 		{
-			my $sourcedir = $rootdir."\\".$folderList.$entry;
+			my $sourcedir = $rootdir."\/".$folderList.$entry;
 			my $destdir	= "$folderList".$entry;
 			my $sisSource;
 			my $sisdestination;
@@ -706,7 +715,7 @@ sub  TraverseDir
 		#else it's a directory
 		else
 		{
-			&TraverseDir($entry,$folderList.$entry."\\",$sisFileContent,$rootdir);
+			&TraverseDir($entry,$folderList.$entry."\/",$sisFileContent,$rootdir);
 		}
 	}
 	closedir(DIR);
@@ -722,6 +731,12 @@ sub writeDataToFile
 	for(my $i=0; $i<$arraySize ; $i++ )
 	{
 		#pop out the element to the respective obey file.
-		 print NEWDATA pop(@$array)."\n";
+		my $line=pop(@$array);
+		if (&is_windows){
+			$line =~ s-\/-\\-g;
+		}else{
+			$line =~ s-\\-\/-g;
+		}
+		print NEWDATA $line."\n";
 	}
 }

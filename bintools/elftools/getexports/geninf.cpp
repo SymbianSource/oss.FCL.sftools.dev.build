@@ -159,8 +159,8 @@ void InitSymbolsLists(Elf32_Ehdr * eh,Elf32_Shdr * shdr,int shnum)
 	Elf32_Sym * symtab = 0;
 	int nSyms = 0;
 	char * strtab = 0;
-	int i=0;
-
+	int i = 0;
+	
 	for (i = 0; (i < shnum); i++) {
 		if (shdr[i].sh_type == SHT_SYMTAB) {
 			symtab = ELFADDR(Elf32_Sym, eh, shdr[i].sh_offset);
@@ -283,7 +283,6 @@ void PrintABIv2ExportSymbols(Elf32_Ehdr *eh)
 	int shoff = eh->e_shoff;                      // offset of section header table
 	if (shoff) {
 	Elf32_Shdr * shdr = ELFADDR(Elf32_Shdr, eh, shoff);
-	int i=0;
 
 	int shnum = eh->e_shnum;                    // number of section headers
 
@@ -307,7 +306,8 @@ void PrintABIv2ExportSymbols(Elf32_Ehdr *eh)
 	Elf32_Sym * symtab = 0;
 	int nSyms = 0;
 	char * strtab = 0;
-
+	int i = 0;
+	
 	for (i = 0; (i < shnum); i++) {
 		if (shdr[i].sh_type == SHT_DYNSYM) {
 			symtab = ELFADDR(Elf32_Sym, eh, shdr[i].sh_offset);
@@ -350,7 +350,7 @@ void PrintSONAME(Elf32_Ehdr *eh)
 
 		int shstrndx = eh->e_shstrndx;
 		char *aSHdrStrTab = ELFADDR(char, eh, shdr[shstrndx].sh_offset);
-		int i=0;
+		int i;
 		Elf32_Verdef *aVerDef = 0;
 		char *aStringTab = 0;
 		for(i = 0; i < shnum; i++) {

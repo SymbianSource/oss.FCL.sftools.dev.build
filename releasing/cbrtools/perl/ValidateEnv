@@ -1,0 +1,143 @@
+#!perl
+# Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+# 
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+# 
+# Contributors:
+# 
+# Description:
+# 
+#
+
+use strict;
+use FindBin;
+use lib "$FindBin::Bin";
+use Getopt::Long;
+use IniData;
+use EnvDb;
+use CommandController;
+
+
+#
+# Globals.
+#
+
+my $iniData = IniData->New();
+my $commandController = CommandController->New($iniData, 'ValidateEnv');
+my $verbose = 0;
+my $validatesource = 0;
+my $fullbincheck = 0;
+my $comp;
+my $ver;
+
+
+#
+# Main.
+#
+
+ProcessCommandLine();
+ValidateEnv();
+
+
+#
+# Subs.
+#
+
+sub ProcessCommandLine {
+  Getopt::Long::Configure ("bundling");  my $help;
+  GetOptions("h" => \$help, "v+" => \$verbose, "s" => \$validatesource, "f" => \$fullbincheck);
+
+  if ($help) {
+    Usage(0);
+  }
+
+  $comp = shift @ARGV;
+  $ver = shift @ARGV;
+
+  unless ($#ARGV == -1) {
+    print "Error: Invalid number of arguments\n";
+    Usage(1);
+  }
+}
+
+sub Usage {
+  my $exitCode = shift;
+
+  Utils::PrintDeathMessage($exitCode, "\nUsage: validateenv [options] [<component> <version>]
+
+options:
+
+-h  help
+-v  verbose output (-vv very verbose)
+-s  validate source code too
+-f  fully check for added binaries (can be very slow)\n");
+}
+
+sub ValidateEnv {
+  my $iniData = IniData->New();
+  my $envDb = EnvDb->Open($iniData, $verbose);
+  my $failedMrps = $envDb->ValidateEnv($comp, $ver, $validatesource, $fullbincheck);
+  my $numFailedMrps = scalar(@$failedMrps);
+  unless ($numFailedMrps == 0) {
+    print "\nThe following component(s) failed their validation:\n\n";
+    foreach my $mrp (@$failedMrps) {
+      print "$mrp\n";
+    }
+    print "\n";
+  }
+}
+
+__END__
+
+=head1 NAME
+
+ValidateEnv - Validates the integrity of all the binaries in the current environment.
+
+=head1 SYNOPSIS
+
+  validateenv [options] [<component> <version>]
+
+options:
+
+  -h  help
+  -v  verbose output (-vv very verbose)
+  -s  also validate source code
+  -f  fully check for added binaries
+
+=head1 DESCRIPTION
+
+C<ValidateEnv> is intended to be used on a drive that contains the output of a clean build. It is assumed that the drive has been populated using C<GetRel> or C<GetEnv>. This is important since C<ValidateEnv> needs to know the version of each component installed on the drive - it gets this information from the drive's environment Database. Its role is to establish the status of each component by comparing the released binary files against those present in the current environment. The comparison is done using the tool C<EValid> which ignores irrelevant differences (such as those in header blocks). Components with a status of I<pending release> will be ignored. Components that pass their validation will have their status set to I<clean> and a new signature file written. Components that fail their validation will have their status set to I<dirty>.
+
+You may also give a -s flag to indicate that you want to validate the source code. This is useful because in some cases the source code may change, without the binary files changing. (For example, a change of distrubution.policy). If this validation fails, but the binary validation succeeds, the status will be set to I<binaries clean, source dirty>. Only source code in the release packet will be validated - source files missing from the release packets will not be detected.
+
+By default C<ValidateEnv> validates against the component version installed in current environment, however instead you can specify a different environment by referring to the component and version of it. This can only be done if the current environment database is empty. This facility was designed to allow builds delivered without using the release tools to be analysed and subsequently delivered using the release tools. It effectively allows you to construct an environment database by comparing the binaries on the current drive with another environment. Components that pass the validation will have their status set to clean and a signature file written. Components that fail their validation will have their status set to dirty and a dummy signature file written. This will contain the name of each binary previously released, with zero time stamp and size. This signature will never match the files on the drive and so will cause C<EnvInfo> to correctly find the component as dirty.
+
+
+=head1 KNOWN BUGS
+
+None.
+
+=head1 COPYRIGHT
+
+ Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+ All rights reserved.
+ This component and the accompanying materials are made available
+ under the terms of the License "Eclipse Public License v1.0"
+ which accompanies this distribution, and is available
+ at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ 
+ Initial Contributors:
+ Nokia Corporation - initial contribution.
+ 
+ Contributors:
+ 
+ Description:
+ 
+
+=cut

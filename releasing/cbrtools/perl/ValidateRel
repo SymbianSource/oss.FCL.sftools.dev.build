@@ -1,0 +1,187 @@
+#!perl
+# Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+# 
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+# 
+# Contributors:
+# 
+# Description:
+# 
+#
+
+use strict;
+use FindBin;
+use lib "$FindBin::Bin";
+use Getopt::Long;
+use IniData;
+use EnvDb;
+use CommandController;
+
+
+#
+# Globals.
+#
+
+my $iniData = IniData->New();
+my $commandController = CommandController->New($iniData, 'ValidateRel');
+my $verbose = 0;
+my $validatesource = 0;
+my $fullbincheck = 0;
+my $keeptemp;
+my @comps;
+
+
+#
+# Main.
+#
+
+ProcessCommandLine();
+ValidateRel();
+
+
+#
+# Subs.
+#
+
+sub ProcessCommandLine {
+  Getopt::Long::Configure ("bundling");
+  my $help;
+  GetOptions("h" => \$help, "v+" => \$verbose, "s" => \$validatesource, "t" => \$keeptemp, "f" => \$fullbincheck);
+
+  if ($help) {
+    Usage(0);
+  }
+
+  if ($#ARGV == 0) {
+    if (-f $ARGV[0]) {
+      open IN, $ARGV[0] or die "Error: Couldn't open $ARGV[0] for reading: $!\n";
+      while (my $line = <IN>) {
+        chomp $line;
+        $line =~ s/^\s*$//; #remove lines entirely filled with white space
+        $line =~ s/#.*//; #remove comments from lines
+		$line =~ s/^\s*//; #remove whitespace from the start of lines
+        if ($line eq '') {
+          next; #Nothing left
+        }
+		my @cmdLine = split(/\s+/,$line);
+		my $cmdLineCount = @cmdLine;
+		my %relStruct;
+		if($cmdLineCount > 0) {
+			$relStruct{name} = $cmdLine[0];
+			if($cmdLineCount > 1) {
+				$relStruct{ver} = $cmdLine[1];
+			}
+			push @comps, \%relStruct;
+		}
+      }
+    close IN;
+    }
+    else {
+      push @comps, {name => $ARGV[0]};
+    }
+  }
+  elsif ($#ARGV == 1) {
+    # Both component and version are specified
+    push @comps, {name => $ARGV[0],
+                  ver  => $ARGV[1]};    
+  }
+  else {
+    print "Error: Invalid number of arguments\n";
+    Usage(1);
+  }
+}
+
+sub Usage {
+  my $exitCode = shift;
+
+  Utils::PrintDeathMessage($exitCode, "\nUsage: validaterel [options] (<component> [<version>]) | <component_list_file>
+
+options:
+
+-h  help
+-v  verbose output (-vv very verbose)
+-s  validate source code too
+-f  fully check for added binaries (can be very slow)
+-t  don't delete the temporary directory
+");
+}
+
+sub ValidateRel {
+  my $iniData = IniData->New();
+  my $envDb = EnvDb->Open($iniData, $verbose);
+ 
+  foreach my $comp (@comps) {
+	my $version;	
+	if(exists($comp->{ver})) {
+		$version = $comp->{ver};
+	}
+	else {
+		$version = $envDb->Version($comp->{name});
+	}
+
+	if(defined $version) {
+		$envDb->ValidateComp($comp->{name}, $version, undef, $validatesource, $keeptemp, $fullbincheck);
+	}
+    else {
+      print $comp->{name}." not installed\n";
+    }
+  }
+}
+
+__END__
+
+=head1 NAME
+
+ValidateRel - Validates the integrity of the installed binaries of a given component.
+
+=head1 SYNOPSIS
+
+  validaterel [options] (<component> [<version>]) | <component_list_file>
+
+options:
+
+  -h  help
+  -v  verbose output (-vv very verbose)
+  -s  validate source code too
+  -f  fully check for added binaries
+  -t  keep temporary directory
+
+=head1 DESCRIPTION
+
+Unpacks the binaries of the specified version of the component to a temporary directory (if a version is not specified, the version of the component that was originally installed in the environment is retrieved from the environment database). It then compares them with the binaries in the current drive's F<\epoc32> tree using the standard EPOC tool C<EValid>. Reports the status of the component as a result of the validation. This will be I<clean> if the validation passed, I<dirty> if the validation failed, or I<pending release> if the component was already pending release. If the component passes its validation and the version is the same as the one present in the environment database, its signature file in F<\epoc32\relinfo> will be updated.
+
+You may also give a -s flag to indicate that you want to validate the source code. This is useful because in some cases the source code may change, without the binary files changing. (For example, a change of distrubution.policy). If this validation fails, but the binary validation succeeds, the status will be set to I<binaries clean, source dirty>. Only source code in the release packet will be validated - source files missing from the release packets will not be detected.
+
+A list of component names stored in a text file may be passed to validaterel to validate multiple components.
+
+With the -t flag, you will be told where the temporary directory was. You
+can then use that to investigate validation failures with evalid.
+
+=head1 KNOWN BUGS
+
+None.
+
+=head1 COPYRIGHT
+
+ Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+ All rights reserved.
+ This component and the accompanying materials are made available
+ under the terms of the License "Eclipse Public License v1.0"
+ which accompanies this distribution, and is available
+ at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ 
+ Initial Contributors:
+ Nokia Corporation - initial contribution.
+ 
+ Contributors:
+ 
+ Description:
+ 
+
+=cut

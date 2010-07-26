@@ -1,0 +1,36 @@
+ResourceRef
+	Source =>	full path to source file
+	Lang =>		language code to use when compiling this resource
+	Uids =>		uids for this resource file (if any)
+	Hdr =>		anything, indicating that a resource header file is required
+	BaseTrg =>	base of target name
+	TrgPath =>	target path in the emulated filesystem
+	
+	Trg =>		target name for this resource, in the form name.Rxx to match LANG
+
+Notes;
+TrgPath is filled in at the end for any resource which lacks one
+If Lang is not specified, copies of this ResourceRef are made for each of the 
+languages specified in the LANG statement.
+Trg is constructed from the TrgPath, BaseTrg and Lang information.
+
+
+BitmapRef
+	Source =>	list of bitmap source references, each of the form
+		Src =>		full path of BMP file
+		ClDepth =>	colour depth as specified in MMP file
+	TrgPath =>	target path in the emulated filesystem
+	Trg =>		target name for this bitmap as specified in the MMP file
+	Hdr =>		anything, indicating that a bitmap header should be generated
+
+AifRef
+	Trg =>		target name as specified in the MMP file. Defect: may include directory
+	Dir =>		source path
+	Resrc =>	resource file name relative to source path
+	ClDepth =>	colour depth to apply to bitmap files (design defect!)
+	BitMaps =>	list of bitmap files
+
+SourceRef
+	SrcPath => full path to source file
+	CurFile => full source file name
+	BaseTrg => base of source file name

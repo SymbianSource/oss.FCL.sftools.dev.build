@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SystemDefinition schema="3.0.0" id-namespace="http://www.symbian.org/system-definition" xmlns:qt="http://www.nokia.com/qt">
+<systemModel name="sf_">
+<layer id="app" name="app">
+<package id="helloworldcons" name="helloworldcons" levels="demo">
+<collection id="helloworldcons_apps" name="helloworldcons_apps" level="demo">
+<component id="helloworldcons_app" name="helloworldcons app" purpose="development">
+<unit bldFile="sf/app/helloworldcons/group" mrp="sf/app/helloworldcons/" qt:proFile="helloworld.pro" />
+</component>
+</collection>
+</package>
+</layer>
+<layer id="mw" name="mw">
+<package id="helloworldapi" name="helloworldapi" levels="demo">
+<collection id="helloworld_apis" name="helloworlds APIs" level="demo">
+<component id="helloworld_api" name="Hello World API" purpose="development">
+<unit bldFile="sf/mw/helloworldapi/group" mrp="sf/mw/helloworldapi/" qt:proFile="helloworldapi.pro" qt:qmakeArgs="-nomoc" />
+</component>
+</collection>
+</package>
+</layer>
+</systemModel>
+</SystemDefinition>

@@ -17,11 +17,24 @@
 
 
 #ifdef WIN32
+#ifdef _STLP_INTERNAL_WINDOWS_H
+#define __INTERLOCKED_DECLARED
+#endif
 #include <windows.h>
 #include <direct.h>
+#define MKDIR mkdir
+#else
+#include <unistd.h>
+#include <sys/wait.h>
+
+#include <sys/stat.h>
+#include <sys/types.h>
+#define MKDIR(a) mkdir(a,0777)
 #endif
 
 #include "sisutils.h"
+#include <errno.h>
+
 
 /**
 Constructor: SisUtilsException class
@@ -33,7 +46,7 @@ Initilize the parameters to data members.
 @param aFile	- Name of the file
 @param aErrMessage - Error message
 */
-SisUtilsException::SisUtilsException(char* aFile, char* aErrMessage) : \
+SisUtilsException::SisUtilsException(const char* aFile, const char* aErrMessage) : \
 	iSisFileName(aFile), iErrMessage(aErrMessage)
 {
 }
@@ -57,10 +70,7 @@ Report: Reports error message on the console
 */
 void SisUtilsException::Report()
 {
-	std::cout << "Error : ";
-	std::cout << iSisFileName.c_str() << " : ";
-	std::cout << iErrMessage.c_str();
-	std::cout << std::endl;
+	cout << "Error : " << iSisFileName.c_str() << " : " << iErrMessage.c_str() << endl;
 }
 
 /**
@@ -72,7 +82,7 @@ Initilize the parameters to data members.
 
 @param aFile	- Name of the SIS file
 */
-SisUtils::SisUtils(char* aFile) :  iVerboseMode(EFalse),iSisFile(aFile)
+SisUtils::SisUtils(const char* aFile) :  iVerboseMode(EFalse),iSisFile(aFile)
 {
 }
 
@@ -104,9 +114,9 @@ SisFileName: Returns the SIS file name
 @internalComponent
 @released
 */
-String SisUtils::SisFileName()
+const char* SisUtils::SisFileName()
 {
-	return iSisFile;
+	return iSisFile.c_str();
 }
 
 /**
@@ -128,23 +138,17 @@ IsFileExist: Tests whether the give file exists or not
 
 @param aFile - Name of the file
 */
-TBool SisUtils::IsFileExist(String aFile)
+TBool SisUtils::IsFileExist(string aFile)
 {
-	std::ifstream aIfs;
-
+	ifstream file;
 	TrimQuotes(aFile);
-
-	aIfs.open((char*)aFile.data(), std::ios::in);
-
-	if( aIfs.fail() )
-	{
-		aIfs.close();
-		return EFalse;
+	file.open(aFile.c_str(), ios_base::in);
+	TBool retVal = EFalse ;
+	if(file.is_open()){
+		file.close();
+		retVal = ETrue ;
 	}
-
-	aIfs.close();
-
-	return ETrue;
+	return retVal;
 }
 
 /**
@@ -155,21 +159,18 @@ RunCommand: Runs the given command
 
 @param cmd - Command line as string
 */
-TUint32 SisUtils::RunCommand(String cmd)
-{
+TUint32 SisUtils::RunCommand(const char* aCmd) {
 	TUint32 iExitCode = STAT_SUCCESS;
 
 #ifdef WIN32
-    STARTUPINFO si;
-    PROCESS_INFORMATION pi;
-	DWORD dwWaitResult;
-
-    memset(&si, 0, sizeof(si));
-    si.cb = sizeof(si);
-    memset(&pi, 0, sizeof(pi));
+	STARTUPINFO si ; 
+	PROCESS_INFORMATION pi ; 
+	memset(&si,0,sizeof(STARTUPINFO));
+	si.cb = sizeof(STARTUPINFO);
+	memset(&pi,0,sizeof(PROCESS_INFORMATION));
 
     if( !::CreateProcess( NULL,   // No module name (use command line)
-        (char*)cmd.data(),        // Command line
+        const_cast<char*>(aCmd),        // Command line
         NULL,           // Process handle not inheritable
         NULL,           // Thread handle not inheritable
         FALSE,          // Set handle inheritance to FALSE
@@ -177,31 +178,39 @@ TUint32 SisUtils::RunCommand(String cmd)
         NULL,           // Use parent's environment block
         NULL,           // Use parent's starting directory 
         &si,            // Pointer to STARTUPINFO structure
-        &pi )           // Pointer to PROCESS_INFORMATION structure
-    ) 
-    {
+        &pi ))           // Pointer to PROCESS_INFORMATION structure     
 		return static_cast<TUint32>(STAT_FAILURE);
-    }
+    
 
-	dwWaitResult = ::WaitForSingleObject( pi.hProcess, INFINITE );
-
-	if(dwWaitResult == WAIT_OBJECT_0)
-	{
+	TUint32 dwWaitResult = ::WaitForSingleObject( pi.hProcess, INFINITE );
+	if(dwWaitResult == WAIT_OBJECT_0) {
 		::GetExitCodeProcess(pi.hProcess, &iExitCode);
-		if(iExitCode != STAT_SUCCESS)
-		{
+		if(iExitCode != STAT_SUCCESS){
 			iExitCode = static_cast<TUint32>(STAT_FAILURE);
 		}
 	}
-	else
-	{
+	else {
 		iExitCode = static_cast<TUint32>(STAT_FAILURE);
 	}
 
 	::CloseHandle( pi.hProcess );
 	::CloseHandle( pi.hThread );
 #else
-#error "TODO: Implement this function under other OS than Windows"
+
+	TInt child_pid  = fork();
+	if( -1 == child_pid)
+		return (TUint32)STAT_FAILURE;
+	if(0 == child_pid){
+		if(-1 == execl(aCmd,"",NULL))
+			return (TUint32)STAT_FAILURE;
+	}
+	else{
+		TInt status = 0 ;
+		iExitCode = (TUint32)STAT_FAILURE;
+        while(wait(&status) != child_pid);
+        iExitCode  = WEXITSTATUS(status)  ;
+	}
+	
 #endif
 
 	return iExitCode;
@@ -215,27 +224,22 @@ TrimQuotes: Remove the quotes in the given file name
 
 @param aStr - File name
 */
-void SisUtils::TrimQuotes(String& aStr)
-{
-	TUint spos = 0, epos = 0;
+void SisUtils::TrimQuotes(string& aStr) {
 
-	spos = aStr.find("\"");
-	if(spos == String::npos)
+	TUint spos  = aStr.find("\"");
+	if(spos == string::npos)
 		return;
 
-	epos = aStr.rfind("\"");
+	TUint epos = aStr.rfind("\"");
 
-	if(spos == epos)
-	{
+	if(spos == epos) {
 		epos = aStr.size();
 		aStr = aStr.substr(spos+1,epos);
 	}
-	else
-	{
+	else {
 		aStr = aStr.substr(spos+1,epos-1);
-
 		spos = aStr.find("\"");
-		while( spos != String::npos )
+		while( spos != string::npos )
 		{
 			aStr.erase(spos,1);
 			spos = aStr.find("\"");
@@ -253,39 +257,133 @@ MakeDirectory: Creates directory if it is not exist
 
 @param aPath - Directory name to be created
 */
-TBool SisUtils::MakeDirectory(String aPath)
-{
+TBool SisUtils::MakeDirectory(const string& aPath) {
 	TBool status = ETrue;
 	TUint currpos = 0;
-	String dir;
+	string dir;
 
-	do
-	{
+	do 	{
 		currpos = aPath.find_first_of(PATHSEPARATOR, currpos);
-		if(currpos == String::npos)
-		{
+		if(currpos == string::npos) {
 			dir = aPath.substr(0, aPath.length());
-		}
-		else
-		{
+		} else {
 			dir = aPath.substr(0, currpos);
 			currpos++;
 		}
-
-#ifdef WIN32
-		if(mkdir((char*)dir.data()) != 0)
-		{
-			if(errno != EEXIST)
-			{
+ 
+		if(MKDIR(dir.c_str()) != 0){
+			if(errno != EEXIST)	{
 				status = EFalse;
 			}
-		}
-#else
-#error "TODO: Implement this function under other OS than Windows"
-#endif
+		} 
 		if(status == EFalse)
 			break;
-	} while(currpos != String::npos);
+	} while(currpos != string::npos);
 
 	return status;
 }
+#ifndef WIN32
+/*static inline wchar_t to_lowerW(wchar_t aChar){
+	return (aChar >= L'A' && aChar <= L'Z') ? (aChar | 0x20) : aChar ; 
+}
+int wcsnicmp(const wchar_t* str1,const wchar_t* str2,size_t n){
+	wchar_t a , b ;
+	size_t i = 0 ;
+	while(*str1 && *str2){
+		a = to_lowerW(*str1) ;
+		b = to_lowerW(*str2) ; 
+		if(a > b )
+			return 1 ;
+		else if(a < b)
+			return -1 ;
+		if(++i >= n) break ;
+		str1++ ;
+		str2++ ;		
+	}
+	return 0;
+}
+int wcsicmp(const wchar_t* str1,const wchar_t* str2){
+	wchar_t a , b ;
+	while(*str1 && *str2){
+		a = to_lowerW(*str1) ;
+		b = to_lowerW(*str2) ; 
+		if(a > b )
+			return 1 ;
+		else if(a < b)
+			return -1 ;
+		str1++ ;
+		str2++ ;
+	}
+	if(0 == *str1 && 0 == *str2){
+		return 0 ;
+	}
+	else if(*str1)
+		return 1;
+	else
+		return -1;
+}
+int iswdigit(wchar_t ch){
+	if(ch >= L'0' && ch <= L'9') return 1 ;
+	return 0;
+}*/
+char *_fullpath(char* absPath, const char*relPath, size_t maxLength){
+	if(*relPath == '/'){
+		return strncpy(absPath,relPath,maxLength);
+	}
+	*absPath = 0 ;
+	getcwd(absPath,maxLength);
+	size_t len = strlen(absPath);
+	//absPath[len++] = '/';
+	int upward = 0 ;
+	int status = 0 ;
+	const char* savedPath = relPath ;
+	while(*relPath){
+		if(*relPath == '.'){
+			status ++ ;
+		}
+		else if(*relPath == '/'){
+			if(status == 2){
+				upward ++ ;
+			}
+			else if(status != 1)
+				break ;
+			status = 0 ;
+			savedPath = relPath + 1;
+		}
+		else {
+			break ;
+		}
+		relPath ++ ;
+			
+	}
+	if(0 == *relPath){ // like ".." or "." 
+		if(2 == status) 
+			upward ++ ;			 
+	}
+	else {
+		relPath = savedPath ;
+	}
+	char* pathEnd = &absPath[len];	
+	while(upward > 0){ // we have "../" in the beginning of relPath
+		pathEnd -- ;
+		if(pathEnd <= absPath)	return NULL ;
+		while(pathEnd > absPath){
+			pathEnd -- ;
+			if(*pathEnd == '/')
+				break ;
+		}
+		upward -- ;
+	}
+	if(0 != *relPath){
+		*pathEnd = '/' ;
+		char* conjBegin = pathEnd + 1;
+		size_t bufLen = maxLength - (conjBegin - absPath);	
+		strncpy(conjBegin,relPath,bufLen);
+	}else {
+		*pathEnd = 0 ;
+	}
+		
+	return absPath ;
+	 
+}
+#endif

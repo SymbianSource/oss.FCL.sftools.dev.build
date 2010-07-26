@@ -21,11 +21,7 @@
 
 #include <e32rom.h>
 
-#if defined(__MSVCDOTNET__) || defined(__TOOLS2__)
 #include <fstream>
-#else //!__MSVCDOTNET__
-#include <fstream.h>
-#endif //__MSVCDOTNET__
 
 #include "h_utl.h"
 #include "r_coreimage.h"
@@ -41,19 +37,20 @@
 class CObeyFile;
 class MRofsImage;
 class Memmap;
+class SymbolGenerator;
 
 struct TPlacingSection {
-    TUint8* buf;
-    TInt len;
-    TRomNode* node;
-    TPlacingSection(TRomNode* anode){
-        node = anode;
-        buf = NULL;
-        len = 0;
-    }
+	TUint8* buf;
+	TInt len;
+	TRomNode* node;
+	TPlacingSection(TRomNode* anode){
+		node = anode;
+		buf = NULL;
+		len = 0;
+	}
 };
 class E32Rofs : public MRofsImage
-	{
+{
 public:
 	E32Rofs(CObeyFile *aObey);
 	virtual ~E32Rofs();
@@ -65,15 +62,15 @@ public:
 	TRomNode* CopyDirectory(TRomNode*& aLastExecutable);
 	TRomNode* RootDirectory();
 	void SetRootDirectory(TRomNode* aDir);
-	TText* RomFileName();
-	TInt Size();
+	const char* RomFileName() const ;
+	TInt Size() const;
 	void MakeAutomaticSize(TUint32 aSize);
 
-        //Get a node to handle, if there is no more, NULL returns.
-        //For alias node, it will be deferred to later phase to handle.
+	//Get a node to handle, if there is no more, NULL returns.
+	//For alias node, it will be deferred to later phase to handle.
 	TPlacingSection* GetFileNode(bool &aDeferred);
-        TPlacingSection* GetDeferredJob();
-        void ArriveDeferPoint();
+	TPlacingSection* GetDeferredJob();
+	void ArriveDeferPoint();
 	void DisplaySizes(TPrintType aWhere);
 private:
 	TInt PlaceFiles( TRomNode* aRootDir, TUint8* aDestBase, TUint aBaseOffset, TInt aCoreSize = 0 );
@@ -102,24 +99,25 @@ public:
 	TInt iTotalDirectoryBlockSize;
 	TInt iTotalFileBlockSize;
 	//
+        SymbolGenerator* iSymGen;
 
 private:
 	TRomNode *iLastNode;
-        int iWorkerArrived;
-        boost::mutex iMuxTree;
-        std::vector<TPlacingSection*> iVPS;
-        std::queue<TPlacingSection*> iQueueAliasNode;
+	int iWorkerArrived;
+	boost::mutex iMuxTree;
+	vector<TPlacingSection*> iVPS;
+	queue<TPlacingSection*> iQueueAliasNode;
 };
 
 
 class TRofsDirStructure
-	{
-	public:
-		TRofsDirStructure( TRomEntry* aRootDirectory );
+{
+public:
+	TRofsDirStructure( TRomEntry* aRootDirectory );
 
-		TInt CalculateDirectorySize();
+	TInt CalculateDirectorySize();
 
-	private:
-		TRomEntry* iRootDirectory;
-	};
+private:
+	TRomEntry* iRootDirectory;
+};
 #endif

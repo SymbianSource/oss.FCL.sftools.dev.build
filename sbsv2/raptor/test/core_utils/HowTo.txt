@@ -1,0 +1,96 @@
+HowTo.txt - Copyright 2008 Symbian Software Ltd.
+
+This document describes how to use this test suite for stress-testing Linux-emulation type systems on Windows.
+
+Structure of tests
+==================
+
+The Linux emulation layer tests are structured as follows:
+
+LinuxEmulationLayerStressTests\HowTo.txt (this file)
+LinuxEmulationLayerStressTests\makemakefile.py (described below)
+LinuxEmulationLayerStressTests\mingw.tar.bz2
+LinuxEmulationLayerStressTests\msys.tar.bz2
+LinuxEmulationLayerStressTests\GeneratedMakefiles\TestRun01\makefiles_testrun01.zip
+LinuxEmulationLayerStressTests\GeneratedMakefiles\TestRun01\testrig01.bat
+LinuxEmulationLayerStressTests\GeneratedMakefiles\TestRun02\makefiles_testrun02.zip
+LinuxEmulationLayerStressTests\GeneratedMakefiles\TestRun02\testrig02.bat
+LinuxEmulationLayerStressTests\GeneratedMakefiles\TestRun03\makefiles_testrun03.zip
+LinuxEmulationLayerStressTests\GeneratedMakefiles\TestRun03\testrig03.bat
+LinuxEmulationLayerStressTests\GeneratedMakefiles\TestRun04\makefiles_testrun04.zip
+LinuxEmulationLayerStressTests\GeneratedMakefiles\TestRun04\testrig04.bat
+LinuxEmulationLayerStressTests\GeneratedMakefiles\TestRun05\makefiles_testrun05.zip
+LinuxEmulationLayerStressTests\GeneratedMakefiles\TestRun05\testrig05.bat
+LinuxEmulationLayerStressTests\GeneratedMakefiles\TestRun06\makefiles_testrun06.zip
+LinuxEmulationLayerStressTests\GeneratedMakefiles\TestRun06\testrig06.bat
+LinuxEmulationLayerStressTests\GeneratedMakefiles\TestRun07\makefiles_testrun07.zip
+LinuxEmulationLayerStressTests\GeneratedMakefiles\TestRun07\testrig07.bat
+LinuxEmulationLayerStressTests\GeneratedMakefiles\TestRun08\makefiles_testrun08.zip
+LinuxEmulationLayerStressTests\GeneratedMakefiles\TestRun08\testrig08.bat
+LinuxEmulationLayerStressTests\src\msys-sed-4.1.5-src.tar.gz
+
+Each test run has its makefiles preserved in the corresponding zip file (e.g. makefiles_testrun01.zip). 
+
+The testrigNN.bat are very basic batch scripts that do not take any parameters. They are simply there as a 
+bootstrap to 
+
+1) Set the PATH to contain either MSYS's or Cygwin's bin folder (but not both!) 
+2) Set the PATH to contain MinGW's bin folder (for MinGW's make)
+3) Generate the makefiles in a number of for-loops (optional)
+4) Run the make over the makefiles in a number of for-loops
+
+In future, if any of these batch files are re-used, it will be necessary to adjust them so that 
+they set the PATH environment variable correctly to contain the place where MSYS or Cygwin 
+was unzipped. Then decide if you wish to generate further makefiles using the Python script,
+or if it's just enough to run the existing makefiles.
+
+For convenience, both MSYS and Cygwin are provided in the files
+
+LinuxEmulationLayerStressTests\mingw.tar.bz2
+LinuxEmulationLayerStressTests\msys.tar.bz2
+
+These are the versions that were tested and were shipped with SBSv2. Simply untar to a convenient
+location and update the batch files bootstraps to add these to your PATH.
+
+makemakefile.py
+===============
+
+This script, as its name suggests, makes a range of makefiles. Use the command
+
+python makemakefile.py -h
+
+to see a list of available options. At time of writing, the usage help is as follows:
+
+Usage: makemakefile.py [options]
+
+Options:
+  -h, --help            show this help message and exit
+  -t TARGETS, --targets=TARGETS
+                        Number of main (or "level1") targets to generate -
+                        these are the targets that actually perform some
+                        simulated actions.
+  -d DIVISIONS, --divisions=DIVISIONS
+                        The number of "level2" targets. Each level2 target
+                        will depend on t/d level1 targets. This makes makefile
+                        generation more logical.
+  -m MAKEFILE, --makefile=MAKEFILE
+                        Name of makefile to generate. If blank, makefile is
+                        printed to STDOUT.
+  -c CASE, --case=CASE  Type of commands to use in each rule. Default is
+                        "all"; other options are "env", "echo", "cp" and "sed"
+
+
+
+The -t option specifies total the number of makefile targets. This should be a positive integer. 
+
+The -d option specifies total the number of subdivisions of the makefile targets into level1/level2 targets. 
+This should be a positive integer. 
+
+The makefiles are structured in such as way, so that the dependency tree has three levels. The aim is to 
+introduce some complexity into the makefile's dependency tree rather than just having a "flat" dependency tree. 
+The top level in the dependency tree contains only one target called "main"; below this are the level2 targets
+which are all prerequisites of main; lastly are the level1 targets which split into groups and each group is 
+the set of prerequisites for a level2 target.
+
+The size of these groups of level1 targets is <= DIVISIONS depending if DIVISIONS divides into TARGETS exactly or not. 
+

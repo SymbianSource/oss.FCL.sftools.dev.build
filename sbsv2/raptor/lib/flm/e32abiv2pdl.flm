@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -28,7 +28,7 @@ AUTOEXPORTS:=_Z17NewPrinterDeviceLv,1;
 
 # Determine what kind of entrypoint option to set
 LINKER_ENTRYPOINT_LIBDEP:=$(STATIC_RUNTIME_DIR)/edll.lib
-LINKER_ENTRYPOINT_SETTING:=$(LINKER_ENTRY_OPTION) _E32Dll $(LINKER_ENTRYPOINT_DECORATION) $(call dblquote,$(STATIC_RUNTIME_DIR)/edll.lib$(LINKER_ENTRYPOINT_ADORNMENT))
+LINKER_ENTRYPOINT_SETTING:=$(LINKER_ENTRY_OPTION)=_E32Dll $(LINKER_ENTRYPOINT_DECORATION)$(LINKER_SEPARATOR)$(call dblquote,$(STATIC_RUNTIME_DIR)/edll.lib$(LINKER_ENTRYPOINT_ADORNMENT))
 
 ifeq ("$(NEED_ENTRYPOINT_LIBRARY)","True")
 LINKER_ENTRYPOINT_SETTING:=$(LINKER_ENTRYPOINT_SETTING) $(LINKER_ENTRYPOINT_LIBDEP)
@@ -37,6 +37,15 @@ endif
 LINKER_STUB_LIBRARY:=$(STATIC_RUNTIME_DIR)/edllstub.lib
 STATIC_RUNTIME_LIB:=$(USER_STATIC_RUNTIME_LIB)
 CANIGNORENONCALLABLE:=1
+
+# Fixed export TARGETTYPEs should only reference a .def file if an explicit DEFFILE statement is present in the .mmp file
+ifneq ($(DEFFILEKEYWORD),)
+POSTLINKDEFFILE:=$(DEFFILE)
+SUPPORT_FREEZE:=1
+ifeq ($(NOEXPORTLIBRARY),)
+IMPORTLIBRARYREQUIRED:=1
+endif
+endif
 
 BASELIBS:=
 UID2:=10003b1c

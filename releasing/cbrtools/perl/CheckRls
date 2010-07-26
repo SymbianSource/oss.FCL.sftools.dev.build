@@ -1,0 +1,181 @@
+#!perl
+# Copyright (c) 2002-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+# 
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+# 
+# Contributors:
+# 
+# Description:
+# 
+#
+
+use strict;
+use File::Find;
+use File::Basename;
+use Cwd 'abs_path';
+
+$|++;
+
+my $dir1 = shift @ARGV;
+my $dir2 = shift @ARGV;
+
+unless ($dir1 and -d $dir1 and $dir2 and -d $dir2) {
+  die "Error: Invalid arguments\n";
+}
+
+$dir1 = AbsoluteFileName($dir1);
+$dir2 = AbsoluteFileName($dir2);
+
+my $rlsFiles = FindRlsFiles($dir1, $dir2);
+DiffRlsFiles($dir1, $dir2, $rlsFiles);
+
+
+sub FindRlsFiles {
+  my $dir1 = shift;
+  my $dir2 = shift;
+  my %rlsFiles;
+  my $whichDir = $dir1;
+  my $processFileSub = sub {
+    if (/\.rls$/i) {
+      print '.';
+      my $thisFile = $File::Find::name;
+      $thisFile =~ s/^\Q$whichDir\E//;
+      $thisFile =~ s/^\///;
+      $thisFile =~ s/\//\\/g;
+      $rlsFiles{$thisFile} = 1;
+    }
+  };
+  print 'Scanning for rls files';
+  find($processFileSub, $dir1);
+  $whichDir = $dir2;
+  find($processFileSub, $dir2);
+  print "\n";
+  return \%rlsFiles;
+}
+
+sub DiffRlsFiles {
+  my $dir1 = shift;
+  my $dir2 = shift;
+  my $rlsFiles = shift;
+  foreach my $thisFile (sort keys %$rlsFiles) {
+    my $file1 = ConcatenatePaths($dir1, $thisFile);
+    my $file2 = ConcatenatePaths($dir2, $thisFile);
+    if (-e $file1 and -e $file2) {
+      CompareFiles($file1, $file2);
+    }
+    elsif (-e $file1) {
+      print "Warning: $file2 does not exist\n";
+    }
+    else {
+      print "Warning: $file1 does not exist\n";
+    }
+  }
+}
+
+sub CompareFiles {
+  my $file1 = shift;
+  my $file2 = shift;
+  open(IN1, "cpp $file1 2>NUL|") or die "Error: Unable to open \"$file1\": $!";
+  open(IN2, "cpp $file2 2>NUL|") or die "Error: Unable to open \"$file2\": $!";
+  my $result = 'identical';
+  while (my $file1Line = <IN1>) {
+    my $file2Line = <IN2>;
+    unless ($file2Line) {
+      # file2 has been fully read, so file1 must be longer.
+      $result = 'different';
+      last;
+    }
+    if ($file1Line =~ /^\#/ and $file2Line =~ /^\#/) {
+      # Ignore stuff put in by cpp.
+      next;
+    }
+
+    # Remove whitespace from the ends of lines.
+    chomp $file1Line;
+    chomp $file2Line;
+    $file1Line =~ s/\s*$//;
+    $file2Line =~ s/\s*$//;
+
+    # Do the comparison.
+    if ($file1Line ne $file2Line) {
+      $result = 'different';
+      last;
+    }
+  }
+  if (<IN2>) {
+    # We've compared all lines in file1. Need to check to see if file2 has been fully read.
+    $result = 'different';
+  }
+  close(IN1);
+  close(IN2);
+
+  if ($result eq 'identical') {
+  }
+  else {
+    print "Different: $file1 $file2\n";
+  }
+}
+
+
+sub AbsoluteFileName {
+  my $fileName = shift;
+  (my $base, my $path) = fileparse($fileName);
+  my $absPath = abs_path($path);
+  unless ($absPath =~ /[\\\/]$/) {
+    $absPath .= "\\";
+  }
+  $fileName = $absPath . $base;
+  $fileName =~ s/\//\\/g;
+  return $fileName;
+}
+
+sub ConcatenatePaths {
+  my $path1 = shift;
+  my $path2 = shift;
+  $path1 =~ s/([^\\]$)/$1\\/;
+  $path2 =~ s/^\\//;
+  return $path1.$path2;
+}
+
+=head1 NAME
+
+CheckRls - Compares all rls files found in a pair of directory trees
+
+=head1 SYNOPSIS
+
+  checkrls <dir1> <dir2>
+
+=head1 DESCRIPTION
+
+rls files contain the content of resource files that needs to be translated into different languages. Changes made to a particular language variant therefore potentially need to be applied to all other language variants. It is therefore important that changes to rls files are made in a highly controlled way. This tool provides a means of comparing the rls found in a pair of directory trees, and reporting which ones have changed.
+
+The rls files are run through the C preprocessor before being compared. This means that changes to comments will be ignored. Also, differences in white space (space and tab characters) at the end of a line are ignored. Each file pair that contains any other kind of difference is reported to C<STDOUT>. Use a conventional differencing tool to get a detailed picture of what the differences are.
+
+=head1 KNOWN BUGS
+
+None.
+
+=head1 COPYRIGHT
+
+ Copyright (c) 2002-2009 Nokia Corporation and/or its subsidiary(-ies).
+ All rights reserved.
+ This component and the accompanying materials are made available
+ under the terms of the License "Eclipse Public License v1.0"
+ which accompanies this distribution, and is available
+ at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ 
+ Initial Contributors:
+ Nokia Corporation - initial contribution.
+ 
+ Contributors:
+ 
+ Description:
+ 
+
+=cut

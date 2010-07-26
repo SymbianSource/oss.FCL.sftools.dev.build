@@ -44,10 +44,16 @@ Description:
     @type boolean
     -->
     <property name="validate.policy.ignoreroot" value="false" />
-    <!-- Comma separated list of pattern for policy validation. Defualt value is, distribution.policy.s60,distribution.policy
+    <!-- Comma separated list of pattern for policy validation.
+    Default value is, distribution.policy.s60,distribution.policy,distribution.policy.pp
     @type string
     -->
-    <property name="validate.policy.pattern" value="distribution.policy.s60,distribution.policy" />
+    <property name="validate.policy.pattern" value="distribution.policy.s60,distribution.policy,distribution.policy.pp" />
+    <!-- Comma separated list of filename to exclude while scanning for missing policy files.
+    Default value is .static_wa,_ccmwaid.inf
+    @type string
+    -->
+    <property name="validate.policy.exclude.pattern" value=".static_wa,_ccmwaid.inf" />
 
     <!-- Default path settings for policy validation. -->
     <path id="reference.policy.path.list">
@@ -73,14 +79,20 @@ Description:
         <attribute name="ignoreroot" />
         <attribute name="ids" />
         <attribute name="pattern" />
+        <attribute name="excludes" />
         <element name="path" type="path" />
         <![CDATA[
 import integration.quality
 import os
 ignoreroot = False
+excludes = []
 if (attributes.get('ignoreroot') != None) and (str(attributes.get('ignoreroot')).lower() == "true"):
     self.log("Ignoring root path.")
     ignoreroot = True
+
+if (attributes.get('excludes') != None):
+    self.log("Adding excludes patterns.")
+    excludes = [pattern.strip() for pattern in str(attributes.get('excludes')).split(',')]
 
 output = None
 if attributes.get('output') is not None:
@@ -93,7 +105,7 @@ pattern = ['distribution.policy.s60']
 if attributes.get('pattern') != None:
     pattern = str(attributes.get('pattern')).split(',')
 
-validator = integration.quality.PolicyValidator(pattern, ignoreroot=ignoreroot)
+validator = integration.quality.PolicyValidator(pattern, ignoreroot=ignoreroot, excludes=excludes)
 
 if attributes.get('ids') is not None:
     self.log("Loading policy ids from: %s" % str(attributes.get('ids')))
@@ -129,7 +141,9 @@ if output is not None:
         <mkdir dir="${build.log.dir}"/>
         <mkdir dir="${post.log.dir}"/>
         <mkdir dir="${temp.build.dir}"/>
-        <hlm:validatePolicyMacro output="${validate.policy.log}" ids="${validate.policy.csv}" ignoreroot="${validate.policy.ignoreroot}" pattern="${validate.policy.pattern}">
+        <hlm:validatePolicyMacro output="${validate.policy.log}" ids="${validate.policy.csv}" 
+            ignoreroot="${validate.policy.ignoreroot}" pattern="${validate.policy.pattern}"
+            excludes="${validate.policy.exclude.pattern}">
             <path refid="reference.policy.path.list" />
         </hlm:validatePolicyMacro>
         <hlm:metadatarecord database="${metadata.dbfile}">
@@ -194,8 +208,10 @@ if output is not None:
     
     <!-- Policy validation target for IDO. Only detected ADO will get scanned. -->    
     <target name="ido-validate-policy" depends="ido-create-ado-mapping,ido-validate-policy-skip" unless="do.skip.policy-validation">
+        <record name="${temp.build.dir}/${build.id}_validate-policy.ant.log" action="start" />
         <hlm:iniKeys2Path ini="${ado.quality.mapping.file}" pathid="reference.policy.path.list"/>
         <runtarget target="render-validate-policy" />
+        <record name="${temp.build.dir}/${build.id}_validate-policy.ant.log" action="stop" />
     </target>
 
 </project>

@@ -1,0 +1,1 @@
+The module FileCompare.pm needs an MD5 module. If present it will use Digest::MD5, because this is implemented in C and so is faster than this pure Perl version. However, Perl version 5.005_03 (the version currently shipped with the Symbian platform SDK) doesn't contain Digest::MD5. This module is therefore provided as a fall back.

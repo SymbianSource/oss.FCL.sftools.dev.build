@@ -51,17 +51,23 @@ class FilterClean(filter_interface.Filter):
 		
 			if self.removeTargets:
 				if line.startswith("<file>"):
-					self.doFile(line)
-				elif line.startswith("<dir>"):
-					self.doDirectory(line)
+					self.doFile(line, "file")
+				elif line.startswith("<build>"):
+					self.doFile(line, "build")
+				elif line.startswith("<resource>"):
+					self.doFile(line, "resource")
+				elif line.startswith("<bitmap>"):
+					self.doFile(line, "bitmap")
+				elif line.startswith("<stringtable>"):
+					self.doFile(line, "stringtable")
 						
 			if self.removeExports:
 				if line.startswith("<export "):
 					self.doExport(line)
 				elif line.startswith("<member>"):
-					self.doMember(line)
+					self.doFile(line, "member")
 				elif line.startswith("<zipmarker>"):
-					self.doZipMarker(line)
+					self.doFile(line, "zipmarker")
 				
 		return self.ok
 	
@@ -81,13 +87,14 @@ class FilterClean(filter_interface.Filter):
 				
 				if os.path.isfile(path):
 					self.removeFile(path)
-					
-				elif os.path.isdir(path):
-					dirs.add(path)
+				
+				directory = os.path.dirname(path)
+				if os.path.isdir(directory):
+					dirs.add(directory)
 					
 			self.tmp.close()	# this also deletes the temporary file
-		except:
-			sys.stderr.write("sbs: could not access temporary file for FilterClean\n")
+		except Exception,e:
+			sys.stderr.write("sbs: problem reading temporary file for FilterClean: %s\n" % str(e))
 			self.ok = False
 		
 		# finally remove (empty) directories
@@ -123,47 +130,20 @@ class FilterClean(filter_interface.Filter):
 			self.ok = False
 	
 			
-	def doFile(self, line):
-		"remove filenames in <file> tags immediately (not .d or .dep)."
-		filename = line[6:-7]                # line is "<file>filename</file>
+	def doFile(self, line, tagname):
+		"deal with <tagname>X</tagname>"
+		
+		first = len(tagname) + 2	# line is "<tagname>filename</tagname>
+		last = -(first + 1)
+		filename = line[first:last]                
 		filename = filename.strip("\"\'")    # some names are quoted
-		
-		# dependency files must be deleted at the end,
-		# everything else can be deleted straight away.
-		if filename.endswith(".d") or filename.endswith(".dep"):
-			self.saveItem(filename)
-		else:
-			if os.path.isfile(filename):
-				self.removeFile(filename)
+		self.saveItem(filename)
+				
 
-
-	def doDirectory(self, line):
-		"save directories in <dir> tags for the end."
-		# assuming <dir>X</dir>
-		dirname = line[5:-6]
-		self.saveItem(dirname.strip("\"\'"))
-		
-		
 	def doExport(self, line):
-		"save exported files in <export> tags for the end."
-		# assuming <export destination='X' source='Y' />
+		"deal with <export destination='X' source='Y'/>"
 		filename = line[21:line.find("'", 21)]
 		self.saveItem(filename)
-		
-		
-	def doMember(self, line):
-		"save zip exports in <member> tags for the end."
-		# assuming <member>X</member>
-		filename = line[8:-9]
-		self.saveItem(filename)
-		
-		
-	def doZipMarker(self, line):
-		"Remove file in <zipmarker> tags"
-		# assuming <zipmarker>X</zipmarker>
-		filename = line[11:-12]
-		if os.path.isfile(filename):
-			self.removeFile(filename)
 
 
 # the end				

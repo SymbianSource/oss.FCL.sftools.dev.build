@@ -30,5 +30,5 @@ UID2_DEFAULT:=
 include $(FLMHOME)/win32.flm
 
 else
-$(error $win32dll.flm called with wrong TARGETTYPE (should be 'dll' but is '$(TARGETTYPE)'))
+$(error win32dll.flm called with wrong TARGETTYPE (should be 'dll' but is '$(TARGETTYPE)'))
 endif

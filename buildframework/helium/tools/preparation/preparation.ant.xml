@@ -37,6 +37,7 @@ Description:
     -->
     <property name="ccmgetinput" value="ccmgetinput" />
 
+    <typedef file="${ant.file.preparation}/../preparation.antlib.xml" uri="http://www.nokia.com/helium"/>
     <import file="bom/bom.ant.xml" />
     <import file="password.ant.xml" />
     <import file="ido-prep.ant.xml" />
@@ -70,7 +71,6 @@ Description:
                         <exec executable="perl" dir="${build.drive}/" failonerror="true">
                             <arg value="${getenv.tool.location}"/>
                             <arg value="-start"/>
-                            <arg value="-nosoap"/>            
                             <arg value="-path"/>
                             <arg value="${base_release.path}"/>
                             <arg line="${base_release.getenv_options}"/>
@@ -308,7 +308,7 @@ if project.getProperty("build.area.count") > project.getProperty("build.area.lim
         <propertyref name="release.notes.password" />
         <propertyref name="nwiki.password" />
         <propertyref name="noe.password" />
-        <propertyref name="ats3.password" />
+        <propertyref name="ats.password" />
         <propertyref name="hydra.password" />
     </propertyset>
     
@@ -357,17 +357,7 @@ if project.getProperty("build.area.count") > project.getProperty("build.area.lim
             <then>
                 <antcall target="dragonfly-prep-drive"/>
             </then>
-            <else>
-                <if>
-                    <not>
-                        <isset property="build.drive.notdefined"/>
-                    </not>
-                    <then>
-                        <echo>Unsubsting any existing path substed to ${build.drive}.
-If this fails, it is because there was no substed drive.</echo>
-                        <hlm:unsubst drive="${build.drive}" failonerror="${failonerror}"/>
-                    </then>   
-                </if>    
+            <else> 
                 <tstamp>
                     <format property="old.prep.dir.timestamp" pattern="yyyyMMdd'_'HHmmss" />
                 </tstamp>
@@ -396,9 +386,12 @@ if prep_build_dir.exists():
                         </script>
                     </then>
                 </if>
-                <!-- Create a new directory for the build and subst it to a drive. -->
+                <!-- Create a new directory for the build and subst it to a drive. 
+                fail build if prep.root.dir property is not set.-->
+                <fail unless="prep.root.dir" message="prep.root.dir value should be specified." />
                 <mkdir dir="${prep.build.dir}" />
-                <exec osfamily="windows" executable="subst.exe" failonerror="false">
+                <hlm:unsubst drive="${build.drive}" failonerror="false"/>
+                <exec osfamily="windows" executable="subst" failonerror="false">
                     <arg value="${build.drive}" />
                     <arg value="${prep.build.dir}" />
                 </exec>
@@ -453,6 +446,12 @@ if prep_build_dir.exists():
           Diamonds. Also  build.property.cache.file will be there contains all the diamonds related properties 
     --> 
     <target name="diamonds">
+        <!--* @property skip.diamonds
+        Set to true to skip diamonds.
+        @type boolean
+        @editable required
+        @scope public
+        -->
         <mkdir dir="${diamonds.build.output.dir}" />
         <var name="diamonds.build.url"  value="http://${diamonds.host}:${diamonds.port}${diamonds.build.id}"/>
         <echoproperties destfile="${build.property.cache.file}">
@@ -468,6 +467,12 @@ if prep_build_dir.exists():
     <!-- Used to prep the build area, now only a placeholder target for the customer -->
     <target name="prep-copy" />
 
+    <!--* @property ccm.enabled
+    Defines that property if you want the ccm-get-input step to be run during the build area preparation.
+    @type boolean
+    @editable required
+    @scope public
+    -->
     
     <condition property="run.ccm">
         <and>
@@ -566,13 +571,27 @@ if prep_build_dir.exists():
     
     <!-- Can be used to unsubst the drive . -->
     <target name="remove-drive">
-        <if>
-            <os family="windows"/>
-            <then>
-                <hlm:unsubst drive="${build.drive}"/>
-            </then>
-        </if>
+        <hlm:unsubst drive="${build.drive}"/>
     </target>
     
+    <!--
+      Simple target to create a set of directory based on a path reference.
+     -->
+    <target name="create-directory-structure">
+        <if>
+            <isreference refid="directory.structure.config" />
+            <then>
+                <for param="dir">
+                    <path refid="directory.structure.config" />
+                    <sequential>
+                        <mkdir dir="@{dir}" />
+                    </sequential>
+                </for>
+            </then>
+            <else>
+                <echo>'directory.structure.config' reference not found, so not any directory structure will be created.</echo>
+            </else>
+        </if>
+    </target>
     
 </project>

@@ -21,15 +21,9 @@
 #ifndef TYPEDEFS_H
 #define TYPEDEFS_H
 
-#ifdef _MSC_VER
-	#pragma warning(disable: 4786) // identifier was truncated to '255' characters in the debug information
-	#pragma warning(disable: 4503) // decorated name length exceeded, name was truncated
-#endif
-
-#undef _L
-
-#include <fstream.h>
-#include <iostream.h>
+ 
+#include <iostream>
+#include <fstream>
 #include <list>
 #include <vector>
 #include <map>
@@ -53,20 +47,16 @@ Typedefs used all over the tool.
 @internalComponent
 @released
 */
-typedef ios Ios;
-typedef std::string String;
-typedef ofstream Ofstream;
-typedef ifstream Ifstream;
-typedef std::list<String> StringList;
-typedef std::map<unsigned int, String> UintVsString;
-typedef std::map<unsigned int, UintVsString> RomAddrVsExeName;
-typedef std::vector<unsigned int> VectorList;
-typedef std::multimap<String, StringList> ExeNamesVsDepListMap;
-typedef std::multimap<String, E32Image*> ExeVsE32ImageMap;
-typedef std::map<String, unsigned int> ExeVsOffsetMap;
-typedef std::map<String, RomImageFSEntry*> ExeVsRomFsEntryMap;
-typedef std::istringstream IStringStream;
-typedef std::ostringstream OStringStream;
+
+typedef list<string> StringList; 
+typedef map<unsigned int, string> UintVsString; 
+typedef map<unsigned int, UintVsString*> RomAddrVsExeName;
+typedef vector<unsigned int> VectorList;
+typedef map<string, StringList > ExeNamesVsDepListMap;
+typedef map<string, E32Image*> ExeVsE32ImageMap;
+typedef map<string, unsigned int> ExeVsOffsetMap;
+typedef map<string, RomImageFSEntry*> ExeVsRomFsEntryMap; 
+ 
 
 /**
 Class used to preserve each attribute of a E32 exectuble.
@@ -78,16 +68,16 @@ typedef struct IdData
 {
 	unsigned long int iUid;
 	unsigned long int iSid;
-	String iSidStatus;
+	string iSidStatus;
 	unsigned long int iVid;
-	String iVidStatus;
+	string iVidStatus;
 	bool iDbgFlag;
-	String iDbgFlagStatus;
+	string iDbgFlagStatus;
     unsigned long int iFileOffset;
 }IdData;
 
-typedef std::map<String,IdData*> ExeVsIdDataMap;
-typedef std::multimap<unsigned long int, String> SidVsExeMap;
+typedef map<string,IdData*> ExeVsIdDataMap;
+typedef multimap<unsigned long, string> SidVsExeMap;
 
 /**
 Enums to represent input image type.
@@ -108,10 +98,38 @@ typedef enum EImageType
 	//more here...
 };
 
-const String KUnknownDependency("unknown");
-typedef const char* c_str ;
-const c_str KDirSeperaor = "/";
+const char KUnknownDependency[] = "unknown"; 
+const char KDirSeperaor = '/';
 const char KNull = '\0';
 const long KFileHidden_9_1 = 0x0;
+
+template<typename m, typename l,typename r>
+static typename m::iterator put_item_to_map(m& o, l a,r& b){	
+	typedef typename m::iterator iterator;
+	pair<iterator, bool> ret = o.insert(pair<l,r>(a,b));
+	if(false == ret.second){
+		ret.first->second = b ;
+	}
+	return ret.first ;
+}
+
+template<typename m, typename l,typename r>
+static typename m::iterator put_item_to_map_2(m& o, l a,r& b){	
+	typedef typename m::iterator iterator;
+	pair<iterator,bool> ret = o.insert(pair<l,r>(a,b));
+	if(false == ret.second){
+		if(ret.first->second)
+			delete ret.first->second;
+		ret.first->second = b ;
+	}
+	return ret.first ;
+}
+#ifdef __LINUX__
+const char SLASH_CHAR1 = '/' ;
+const char SLASH_CHAR2 = '\\' ;
+#else
+const char SLASH_CHAR1 = '\\' ;
+const char SLASH_CHAR2 = '/'  ;
+#endif
 
 #endif// TYPEDEFS_H

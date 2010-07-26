@@ -1,0 +1,221 @@
+#!perl
+# Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+# 
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+# 
+# Contributors:
+# 
+# Description:
+# 
+#
+
+=head1 Overview
+
+This document discusses the various techniques that can be used to make component releases. It describes the files that specify what comprises a component release (F<mrp> files), and then how these can be used to produce release packets. 
+
+=head1 Location
+
+Before you start, you should know where you want to store your release. The release tools support two structures of local archive - "component-based" and "project-based". If you're using the old-style, component-based structure, then skip this section since you have no choice where your release will be stored. (You can find out by seeing if you have an C<archive_path_file> line in your F<reltools.ini>.)
+
+If you are using the new-style, project-based, archive structure, then there may be several places you could store your release in the archive. These are called "projects", and may be something like "GT" or "LPD", or perhaps a licensee name. Any development you do should be stored in your own project, even if you've modified somebody else's component.
+
+For both C<makerel> and C<makeenv> commands, described later, you can optionally specify a project location with the C<-w> switch. If you don't, the release will be made to your default project which is the first one listed in your F<reltools.ini> file.
+
+=head1 Mrp Files
+
+Each component to be released must have a corresponding F<mrp> file. Normally this would be archived in the source code of the component. F<mrp> files can be automatically generated using the tool C<GenMrp>, but normally a certain amount of hand tuning will be required (to select the exact binary targets required, for example). The F<mrp> parser understands the following statements:
+
+=over 4
+
+=item * component <component_name>
+
+The name that will be used to refer to this component when using the release tools. Can be used only once per F<mrp>.
+
+=item * source (<source_file> | <source_directory>)
+
+Used to describe which source files should be put into a release. May be used more than once in a single F<.mrp> file (or not at all). If a directory is specified, all files in that directory and it's sub-directories will be included in the release.
+
+The specified paths may be absolute or relative. If they're relative, then they're relative to the location of the MRP. If they're absolute (start with a backslash) then they are assumed to be relative to the SRCROOT environment variable. If there's no SRCROOT environment variable, then a source root of \ is assumed.
+
+=item * [-]binary (<abld_path> <platform> [<variant> [<program>]]) | <binary_file> | <binary_directory>
+
+Used to describe which binary files should be put into a release. May be used more than once in a single F<.mrp> file (or not at all). The first argument structure (<abld_path> <platform> [<variant> <program>]) directs the Release Tools to enquire from the EPOC build tools which binaries should be included in the release. The <abld_path> argument should provide the full path to the directory where the component's <abld.bat> file lives. This will be the same directory as the component's <bld.inf> file. <platform> and <build_cmnd_1> ... <build_cmnd_n> must be valid for the corresponding <bld.inf> file (common choices would be C<wins udeb> and C<thumb urel>). You can also use the keyword all, which will read all the platforms supported by the <bld.inf> and include all of them (for both udeb and urel). Note, you can also specify the name of an individual F<mmp> file (or program), for example C<thumb urel mymmp>. 
+
+The second and third argument structures allow individual binary files and directories of binary files to be specified (as with the C<source> keyword, directories are recursively scanned). These forms of C<binary> statement should only be used if the first cannot be. However, with the EPOC build tool's support for custom make files, it is highly unlikely that this would ever be the case. If using a custom make file, be sure to provide a C<RELEASABLES> target, because this is how the release tools get the information they need.
+
+The C<binary> keyword can be preceded with a minus sign (C<->). This instructs the release tools to exclude the associated binaries from the release. You may therefore first use a C<binary> statement to specify more than you actually want to release, and and then a C<-binary> statement to refine the list. For example:
+
+ binary   \mycomp wins udeb
+ -binary  \mycomp wins udeb mymmp_to_exclude
+ -binary  \myfile_to_exclude
+
+Paths referring to <bld.inf> files are relative to SRCROOT, using the same rules as described in L<source>. Paths referring to binary files must be absolute, and are assumed to be within EPOCROOT.
+
+=item * [-]testbinary <abld_path> <platform> [<variant> [<program>]]
+
+Used to describe which test binary files should be put into a release. Identical to the first argument structure of the C<binary> keyword, except for use with test code. Also supports a preceeding minus sign (C<->) to allow the exclusion of certain programs.
+
+=item * exports <abld_path>
+
+Used to describe which exports (header files etc.) should be included. Note, by default exports are treated as though they are binary files unless the C<categorise_exports> keyword is specified in the F<reltools.ini>. This means that they are made available to all sites that are able to receive the binaries. If exports are categorised, they are given the same IPR category as the corresponding source file. See the F<Installation> section for details.
+
+This keyword can be used more than once. If the component's F<bld.inf> file lists more exports than are required, specific files may be removed from the export list using the C<-export_file> keyword. See below. Note, prior to release 2.59 of the tools, it was recommended that the keyword C<-binary> be used for this purpose. This is semantically identical when the C<categorise_exports> F<reltools.ini> keyword is B<not> used, however it has no effect when it is.
+
+=item * [-]export_file <source_export_file> <destination_export_file>
+
+Used to manually specify exported files. Note, both source and destination export file names must be specified. The source export file name is needed to assign the export's IPR category to that of the corresponding source file. The source file must therefore be present within the source tree specified using C<source> keywords. If this is not the case, an error will be thrown when the F<mrp> file is parsed.
+
+Note that the source and destination locations' arguments' relativity is the same as for the <source> keyword and the <binary file> keyword respectively. This is as you would expect.
+
+=item * notes_source <release_notes_source_path>
+
+Information regarding the content of a release should be provided in the form of a release notes source file. This will be stored with the release in a format that can be compiled in to HTML using the tool C<ViewNotes>. The C<notes_source> keywork is used to specify where this source file can be found. The location is assumed to be within the source code, and follows the same rules for relative and absolute paths as described above in L<source>. The following keywords are supported (the text beneath each keyword will be compiled into the release notes):
+
+=over 8
+
+=item * notesrc_releaser
+
+The name of the person making the release.
+
+=item * notesrc_release_reason
+
+A description of why the release was made (e.g. "Defect fix to alpha candidate").
+
+=item * notesrc_general_comments
+
+A summary of the release conent, including any information that it is particularly important others should read (e.g. "Interface X has been depricated in this release, please use Y instead. The reason for this was...").
+
+=item * notesrc_known_deviations
+
+A list of areas where this component is known to not conform to spec. (e.g. "Feature X is currently not working because defect Y needs to be fixed in component Z").
+
+=item * notesrc_bugs_fixed
+
+A list of defects fixed in this release (ideally including the defect reference code and description).
+
+=item * notesrc_bugs_remaining
+
+A list of known defects outstanding in this release (again, ideally including the defect reference code and description).
+
+=item * notesrc_other_changes
+
+A list of other changes made to the component (e.g. new features).
+
+=back
+
+=back
+
+Here's an example F<.mrp> file:
+
+  component      mycomp
+  source	 \mycomp
+  binary	 \mycomp\group wins udeb
+  binary	 \mycomp\group thumb urel
+  exports        \mycomp\group
+  notes_source	 \mycomp\group\release.src
+
+=head1 Making a Single Component Release
+
+The command C<MakeRel> can be used to create a single component release. It is assumed that the binaries to be released have already been built and tested. The following command...
+
+  makerel mycomp 001
+
+...instructs C<MakeRel> to read the F<mrp> file F<mycomp.mrp> (note, specifying the F<mrp> extension is optional) and generate a release packet with the version 001. If C<mycomp> version C<001> already exists, an error will be generated. Also, if any of the binaries referred to by the F<mrp> file do not exist, an error will be generated. The release will be put into the component's archive (specified in the project's archive path file, see the document I<Installation Guide> for details). Once a release has been made, the command C<GetRel> can be used to retrieve it.
+
+=head1 Making Multiple Component Releases
+
+C<MakeRel> can also be used to create more than one component release in one pass. The various F<mrp> file names and versions must be specified in a text file with lines in the following format:
+
+ <mrp_name> <version> [<internal_version>]
+
+C<MakeRel> can then be envoked as follows:
+
+ makerel mycomps.txt
+
+This technique can be useful when preparing the first set of releases for a project. However, where ever possible the command C<MakeEnv> should be used rather than C<MakeRel> because this performs a rigorous check of the environment to ensure it can be reliably reproduced in it's entirety.
+
+=head1 Making an Environment Release
+
+Releasing an environment involves releasing one or more components in a way that ensures the entire F<\epoc32> in which they currently reside can be reproduced. The command C<MakeEnv> is used to do this, which makes heavy use of the drive's environment database (this is a binary file stored on the current drive in F<\epoc32\relinfo>). Whenever a component is installed, upgraded or removed from an environment, the drive's environment database is updated. At any point in time, the environment database should contain an up to date list of versions of each component installed. The command C<EnvInfo> displays this information on the screen in a table. Using C<EnvInfo>'s C<-ff> switch, a fuller table can be displayed, for example:
+
+ Component   Version   Internal version                       Status   Mrp
+
+ mycomp1     026       //myproject/latest/mycomp1/...@10106   dirty    \mycomp1\mycomp1.mrp
+ mycomp2     057       //myproject/latest/mycomp1/...@10157   clean    \mycomp2\mycomp2.mrp
+
+ Overall status: dirty
+
+The status column shows the current status of each component currently installed. A status of C<clean> means that the component's binaries can be reproduced (this is determined by comparing the current time stamps of the files against as set that was stored when the component was installed (the component's I<signature>)). A status of C<dirty> means that the binaries cannot be reproduced. If any components have a status of C<dirty>, then the overall status of the environment will be C<dirty>. It is not possible to use C<MakeEnv> to release components whilst the environment is in a dirty state. In order to release the environment, all dirty components must have their status changed to C<pending release>. This may be done for a single component using the command C<PrepRel>:
+
+ preprel mycomp1 version [internal_version]
+
+Note, an internal version can be optionally specified. This will appear in the component's release notes, and may be of use for referrencing a configuration within a source control repository, for example. The command C<PrepEnv> can be used to prepare more than one component for release in one step.
+
+Even if all the components installed have a status of either C<clean> or C<pending release>, the overall status will be C<dirty> if there are files in the F<\epoc32> tree that are of unknown origin to the release tools, i.e. files that have not already been released by the C<clean> components, and will not be released by the C<pending release> components. In this situation one or more F<mrp> files will need to be changed to capture these files, or they will need to be removed from the environment before it can be released. Once C<EnvInfo> reports that the environment has an overall status of C<pending release>, the command C<MakeEnv> can be used to generate the releases. This command need not take any parameters, but using the C<-v> switch instructs it to be verbose about its activities.
+
+Once C<MakeEnv> has been run, other people in the same site may access the environment using C<GetEnv>. To provide remote sites access, the releases must first be encrypted and put on the project's FTP site. This is done using the command C<ExportEnv>. Other sites can then use the command C<ImportEnv> to bring the new releases into their local archive (see the document I<Installation Guide> for details of how to configure the release tools to do exporting and importing).
+
+=head1 Releasing the Output of a Build
+
+An individual site may have a build team whose role is to build and distribute the software being developed at that site. However, each time a build is performed, certain components may not have changed since the last time they were built. The command C<ValidateEnv> can be used to determine which components have changed and therefore need to be released. This is likely to significantly reduce the amount of data that must be transferred between sites (and ultimately down onto developer's workstations) compared to simply releasing everything each time. The following procedure is most commonly used:
+
+=over 4
+
+=item 1
+
+Install a reference environment using C<GetEnv> (this will be the environment against which C<ValidateEnv> will do its comparisons).
+
+=item 2
+
+Install the source to be built (normally from a source control system).
+
+=item 3
+
+Perform a clean build of the source, over writing the previously released binaries.
+
+=item 4
+
+Test the resultant binaries, repeating step 3 until all problems have been resolved.
+
+=item 5
+
+Run C<ValidateEnv> with no arguments. This will cause the binaries of each component currently installed to be unpacked into a temporary directory and compared with those in the current environment. The comparison is done by a tool that is able to ignore irrelevant differences between executables (such as data in headers). Any components that pass this comparison will have their signatures regenerated and their status set to C<clean>. Any component that fail this comparison will remain with a C<dirty> status. A list of components that failed will also be displayed at the end.
+
+=item 6
+
+Use C<PrepEnv> or C<PrepRel> to set the status of all C<dirty> components to C<pending release>, assigning a new version to each.
+
+=item 7
+
+Use C<MakeEnv> to release the environment.
+
+=back
+
+=head1 Trivia
+
+The file extension F<mrp> originates from the first version of the LPD release tools. It stood for B<M>C<ake>B<R>C<el> B<P>C<roject>, in keeping with the C<MakMake> file extension F<mmp>. Back then, the command C<MakeEnv> did not exist - C<MakeRel> was the only mechanism for making releases. The extension is retained now purely for historic reasons.
+
+=head1 COPYRIGHT
+
+ Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+ All rights reserved.
+ This component and the accompanying materials are made available
+ under the terms of the License "Eclipse Public License v1.0"
+ which accompanies this distribution, and is available
+ at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ 
+ Initial Contributors:
+ Nokia Corporation - initial contribution.
+ 
+ Contributors:
+ 
+ Description:
+ 
+
+=cut

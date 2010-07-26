@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : build.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="delivery" default="build" xmlns:au="antlib:org.apache.ant.antunit" xmlns:ivy="antlib:org.apache.ivy.ant" xmlns:ac="antlib:net.sf.antcontrib">
+
+    <property name="delivery.type" value="nokia" />
+    <target name="publish-releasable" if="publish.ci.dir" description="Publish the releasble package on a shared drived (must be built from a Mercurial clone)">
+        <ac:runtarget target="get-helium-revision" />
+        <mkdir dir="${publish.ci.dir}/${delivery.type}/${helium.revision}/" />
+        <copy file="${binary.delivery.zip}" todir="${publish.ci.dir}/${delivery.type}/${helium.revision}/" />
+        <echo file="${publish.ci.dir}/${delivery.type}/${helium.revision}/tickler.txt" message="done" />
+    </target>
+  
+    <target name="cleanup-publish-dir" if="publish.ci.dir">
+        <tstamp>
+            <format property="before.date" pattern="MM/dd/yyyy hh:mm aa" offset="-1" unit="day"/>
+        </tstamp>
+        <echo>Deleting files before: ${before.date}</echo>
+        <delete>
+            <fileset dir="${publish.ci.dir}">
+                <date datetime="${before.date}" when="before" />
+            </fileset>
+        </delete>
+    </target>
+    
+    <target name="create-sf-source-delivery" description="Create the SF source delivery">
+        <mkdir dir="${build.temp.dir}" />
+        <delete file="${sf.delivery.zip}" failonerror="false" />
+        <zip destfile="${sf.delivery.zip}">
+            <zipfileset dir="${source.root.dir}" prefix="helium">
+                <include name="**/*" />
+                <exclude name="build/**" />
+                <exclude name="**/distribution.policy.S60" />
+                <exclude name="builder/antlibs/cachedir/**" />
+                <exclude name="external/antlibs/**" />
+                <exclude name="external/antlibs2/**" />
+                <exclude name="external/python/configure_jython.*" />
+                <exclude name="external/python/lib/auto/**" />
+                <scriptselector language="jython">
+try:
+    if file.isDirectory():
+        value = open(file.toString() + "/distribution.policy.S60").read().strip().strip('\n')
+    else:
+        value = open(file.getParent() + "/distribution.policy.S60").read().strip().strip('\n')
+    if value == '7':
+        #self.log("Selecting %s" % file)
+        self.setSelected(True)
+    else:
+        self.setSelected(False)
+except:
+    print "distribution.policy.S60 is missing for %s" % file
+    self.setSelected(False)
+                </scriptselector>
+            </zipfileset>
+        </zip>
+    </target>
+
+    <target name="create-sf-delivery" depends="create-sf-source-delivery">
+        <delete dir="${build.temp.dir}/sf_helium" failonerror="false" />
+        <mkdir dir="${build.temp.dir}/sf_helium" />
+        <unzip src="${sf.delivery.zip}" dest="${build.temp.dir}/sf_helium" />
+        <exec osfamily="windows" executable="cmd" dir="${build.temp.dir}/sf_helium/helium/builder">
+            <arg value="/C" />
+            <arg value="bld.bat" />
+            <arg value="build" />
+        </exec>
+        <exec osfamily="windows" executable="cmd" dir="${build.temp.dir}/sf_helium/helium/builder">
+            <arg value="/C" />
+            <arg value="bld.bat" />
+            <arg value="-Dconfig=sf" />
+            <arg value="create-releasable" />
+        </exec>
+    </target>
+
+    <target name="get-latest-delivery">
+        <mkdir dir="${build.temp.dir}/temp" />
+        <basename file="${binary.delivery.zip}" property="binary.delivery.basename" />
+        <copy todir="${build.temp.dir}/temp" verbose="true">
+            <first>
+                <sort>
+                    <reverse xmlns="antlib:org.apache.tools.ant.types.resources.comparators">
+                        <date />
+                    </reverse>
+                    <fileset dir="${publish.ci.dir}/${delivery.type}">
+                        <include name="*/${binary.delivery.basename}" />
+                        <scriptselector language="jython">
+<![CDATA[
+try:
+    open(file.getParent() + "/tickler.txt").close()
+    self.setSelected(True)
+except:
+    print "No ticker file for %s" % file
+    self.setSelected(False)
+]]>
+                        </scriptselector>
+                    </fileset>
+                </sort>
+            </first>
+            <flattenmapper/>
+        </copy>
+        <unzip src="${build.temp.dir}/temp/${binary.delivery.basename}" dest="${build.temp.dir}/temp" />
+    </target>
+    
+    <target name="get-latest-sf-delivery">
+        <antcall target="get-latest-delivery">
+            <param name="delivery.type" value="sf"/>
+        </antcall>
+    </target>
+    
+</project>

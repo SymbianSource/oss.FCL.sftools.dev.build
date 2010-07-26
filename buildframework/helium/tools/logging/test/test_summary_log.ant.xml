@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : test_summary_log.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test_summary_log" xmlns:au="org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>
+        Logging testing targets
+    </description>
+    <property environment="env"/>
+    
+    <property name="helium.dir" location="../../.." />
+    <property name="test.temp.dir" location="${helium.dir}/build/antunit/summary" />
+    <property name="build.drive" location="${test.temp.dir}" />
+    <import file="../../../build.xml"/>
+    
+    <target name="setUp">
+        <delete dir="${test.temp.dir}" failonerror="false" />
+        <mkdir dir="${test.temp.dir}" />
+    </target>
+
+    <target name="tearDown">
+        <!-- delete dir="${test.temp.dir}" failonerror="false" / -->
+    </target>
+                
+    <target name="test-render-log-summary">
+        <condition property="sbs.log" value="${helium.dir}/tests/data/summary_log/sbs_linux_compile.log" else="${helium.dir}/tests/data/summary_log/sbs_compile.log">
+            <os family="unix" />
+        </condition>
+        <hlm:metadatarecord database="${metadata.dbfile}">
+            <hlm:sbsmetadatainput>
+                <fileset casesensitive="false" file="${sbs.log}"/>
+                <metadatafilterset refid="filterset.sbs" />
+            </hlm:sbsmetadatainput>
+            <hlm:antmetadatainput>
+                <fileset casesensitive="false" file="${helium.dir}/tests/data/summary_log/prep_work_area.log"/>
+                <metadatafilterset refid="filterset.common" />
+            </hlm:antmetadatainput>
+        </hlm:metadatarecord>
+        <copy file="${helium.dir}/tests/data/summary_log/build_info.log.xml" tofile="${build.log.dir}/${build.id}_info.log.xml" />
+        <echo>${build.log.dir}/${build.id}_summary.html</echo>
+        
+        <runtarget target="render-log-summary" />
+        
+        <au:assertFileExists file="${build.log.dir}/${build.id}_summary.html" />
+        <loadfile property="summarylog" srcFile="${build.log.dir}/${build.id}_summary.html" /> 
+        <au:assertTrue message="Check &quot;ERROR: Some fake error&quot;"> 
+            <contains string="${summarylog}" substring="ERROR: Some fake error" />
+        </au:assertTrue> 
+        <au:assertTrue message="Check for 24 errors"> 
+            <contains string="${summarylog}" substring="&gt;24 errors&lt;" />
+        </au:assertTrue> 
+        <au:assertTrue message="Check for 8 errors"> 
+            <contains string="${summarylog}" substring="&gt;8 errors&lt;" />
+        </au:assertTrue> 
+        <au:assertTrue message="Check for 16 errors"> 
+            <contains string="${summarylog}" substring="&gt;16 errors&lt;" />
+        </au:assertTrue> 
+        <au:assertTrue message="Check for 15 errors"> 
+            <contains string="${summarylog}" substring="&gt;15 errors&lt;" />
+        </au:assertTrue> 
+    </target>
+</project>
+

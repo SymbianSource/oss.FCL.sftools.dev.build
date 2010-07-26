@@ -1,3 +1,4 @@
+<#ftl ns_prefixes={"qt":"http://www.nokia.com/qt"}>  
 <#--
 ============================================================================ 
 Name        : run-qmake.mk.ftl 
@@ -25,11 +26,15 @@ Description:
 #
 ##########################################################################
 
-<#list data["//unit/@proFile/.."] as unit>
+<#list data["//unit/@proFile/.."] + data["//unit/@qt:proFile/.."] as unit>
+    <#assign prefix="qt:" />
+    <#if unit.@proFile[0]??>
+        <#assign prefix="" />
+    </#if>
 ##########################################################################
-/${unit.@bldFile}/bld.inf: /${unit.@bldFile}/${unit.@proFile}
-	@echo cd /${unit.@bldFile} ^&^& qmake -listgen <#if unit.@qmakeArgs[0]??>${unit.@qmakeArgs}<#else>${ant['qt.qmake.default.args']}</#if><#if "${ant['build.system']?lower_case}" = 'sbs-ec'> -spec symbian-sbsv2</#if> ${unit.@proFile}
-	-@cd /${unit.@bldFile} && qmake -listgen <#if unit.@qmakeArgs[0]??>${unit.@qmakeArgs}<#else>${ant['qt.qmake.default.args']}</#if> ${unit.@proFile}
+/${unit.@bldFile}/bld.inf: /${unit.@bldFile}/${unit['@${prefix}proFile'][0]}
+	@echo cd /${unit.@bldFile} ^&^& qmake -listgen <#if unit['@${prefix}qmakeArgs'][0]??>${unit['@${prefix}qmakeArgs'][0]}<#else>${ant['qt.qmake.default.args']}</#if><#if "${ant['build.system']?lower_case}" = 'sbs-ec'> -spec symbian-sbsv2</#if> ${unit['@${prefix}proFile'][0]}
+	-@cd /${unit.@bldFile} && qmake -listgen <#if unit['@${prefix}qmakeArgs'][0]??>${unit['@${prefix}qmakeArgs'][0]}<#else>${ant['qt.qmake.default.args']}</#if> ${unit['@${prefix}proFile'][0]}
 
 all:: /${unit.@bldFile}/bld.inf
 

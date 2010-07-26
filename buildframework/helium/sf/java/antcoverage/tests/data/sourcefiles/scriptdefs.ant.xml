@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : scriptdefs.ant.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<!--* @package test-package -->
+<project name="helium-macros" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>Helium Antlib antcoverage. unittests.</description>
+
+    <scriptdef name="pathToFileListMacro" language="beanshell" uri="http://www.nokia.com/helium">
+        <![CDATA[
+        System.out.println ("Inside pathToFileListMacro scriptdef");
+    
+]]>   
+    </scriptdef>
+    
+    <scriptdef name="helloscript" language="beanshell" uri="http://www.nokia.com/helium">
+        <![CDATA[
+        System.out.println ("Inside helloscript scriptdef");
+    
+]]>   
+    </scriptdef>
+
+</project>
+
+
+

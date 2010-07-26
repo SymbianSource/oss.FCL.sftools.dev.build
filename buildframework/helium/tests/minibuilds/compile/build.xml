@@ -225,36 +225,36 @@ ${diamonds.log.start.edited}</echo>-->
 
 	<!-- This target will copy a part of the tree structure to test policy.remover mapper. -->
 	<target name="prepare-archiving">
-		<delete dir="${build.drive}/test_policy" failonerror="false" />
-		<mkdir dir="${build.drive}/test_policy/os" />
-		<!-- Creating a policy file under the new s60 test root. -->
-		<echo file="${build.drive}/test_policy/distribution.policy.s60">0</echo>
-		<echo file="${build.drive}/test_policy/os/distribution.policy.s60">0</echo>
-		<!-- Getting some Content -->
-		<copy todir="${build.drive}/test_policy">
-			<fileset dir="${build.drive}/sf">
-				<include name="os/graphics/" />
-			</fileset>
-		</copy>
-	</target>
+        <delete dir="${build.drive}/test_policy" failonerror="false" />
+        <mkdir dir="${build.drive}/test_policy/os" />
+        <!-- Creating a policy file under the new s60 test root. -->
+        <echo file="${build.drive}/test_policy/distribution.policy.s60">0</echo>
+        <echo file="${build.drive}/test_policy/os/distribution.policy.s60">0</echo>
+        <!-- Getting some Content -->
+        <copy todir="${build.drive}/test_policy">
+            <fileset dir="${build.drive}/sf">
+                <include name="os/graphics/" />
+            </fileset>
+        </copy>
+    </target>
 
-	<target name="mini-build-archive-ec-full">
-		<antcall target="do-mini-build-archive">
-			<param name="build.system" value="ec-helium" />
-			<param name="archive.using.ec" value="true" />
-			<param name="zipping.type" value="ec" />
-			<!-- Uses to set the target location -->
-		</antcall>
-	</target>
+    <target name="mini-build-archive-ec-full">
+        <antcall target="do-mini-build-archive">
+            <param name="build.system" value="ec-helium" />
+            <param name="archive.using.ec" value="true" />
+            <param name="zipping.type" value="ec" />
+            <!-- Uses to set the target location -->
+        </antcall>
+    </target>
 
-	<target name="mini-build-archive-ant">
-		<antcall target="do-mini-build-archive">
-			<param name="build.system" value="ebs" />
-			<param name="archive.using.ec" value="false" />
-			<param name="zipping.type" value="ant" />
-			<!-- Uses to set the target location -->
-		</antcall>
-	    
+    <target name="mini-build-archive-ant">
+        <antcall target="do-mini-build-archive">
+            <param name="build.system" value="ebs" />
+            <param name="archive.using.ec" value="false" />
+            <param name="zipping.type" value="ant" />
+            <!-- Uses to set the target location -->
+        </antcall>
+        
     </target>
  
     <target name="mini-build-archive-ant-empty-config">
@@ -262,53 +262,57 @@ ${diamonds.log.start.edited}</echo>-->
         <au:expectfailure>
             <hlm:zipContentMacro type="ee-empty" ec="false" file="${zip.config.file}" failonemptyconfig="true" />
         </au:expectfailure>
-	</target>
+    </target>
 
-	<target name="do-mini-build-archive">
-		<runtarget target="prepare-archiving" />
-		<runtarget target="zip-ee" />
-		<!-- Checking the zip generation Ant -->
-		<au:assertFileExists file="${zips.build.dir}/${zipping.type}/release_metadata.xml" />
-		<au:assertFileExists file="${zips.build.dir}/${zipping.type}/sf_app_organizer_clock_binary.zip" />
-		<au:assertFileExists file="${zips.build.dir}/${zipping.type}/sf_app_organizer_clock.zip" />
+    <target name="do-mini-build-archive">
+        <runtarget target="prepare-archiving" />
+        <runtarget target="zip-ee" />
+        <!-- Checking the zip generation Ant -->
+        <au:assertFileExists file="${zips.build.dir}/${zipping.type}/release_metadata.xml" />
+        <!--au:assertFileExists file="${zips.build.dir}/${zipping.type}/sf_app_organizer_clock_binary.zip" /-->
+        <au:assertFileExists file="${zips.build.dir}/${zipping.type}/sf_app_organizer_clock.zip" />
         <au:assertFileExists file="${zips.build.dir}/${zipping.type}/sf_mw_classicui_and_app_radio_0.zip" />
         <au:assertFileExists file="${zips.build.dir}/${zipping.type}/sf_mw_classicui_and_app_radio_1.zip" />
         <au:assertFileExists file="${zips.build.dir}/${zipping.type}/sf_mw_classicui_and_app_radio_3.zip" />
-		<au:assertFileExists file="${zips.build.dir}/${zipping.type}/sf_mw_classicui_and_app_radio_950.zip" />
+        <au:assertFileExists file="${zips.build.dir}/${zipping.type}/sf_mw_classicui_and_app_radio_7.zip" />
+        <au:assertFileExists file="${zips.build.dir}/${zipping.type}/sf_mw_classicui_and_app_radio_1401.zip" />
         <au:assertFileExists file="${zips.build.dir}/${zipping.type}/sf_os_0.zip" />
         <au:assertFileExists file="${zips.build.dir}/${zipping.type}/sf_os_1.zip" />
         <au:assertFileExists file="${zips.build.dir}/${zipping.type}/sf_os_2.zip" />
         <au:assertFileExists file="${zips.build.dir}/${zipping.type}/sf_os_3.zip" />
         <au:assertFileExists file="${zips.build.dir}/${zipping.type}/sf_os_7.zip" />
         <au:assertFileExists file="${zips.build.dir}/${zipping.type}/sf_os_1308.zip" />
-	</target>
+        <au:assertFileExists file="${zips.build.dir}/${zipping.type}/sf_os_1422.zip" />
+        <au:assertFileExists file="${zips.build.dir}/${zipping.type}/sf_os_1435.zip" />
+        <au:assertFileExists file="${zips.build.dir}/${zipping.type}/sf_os_1436.zip" />
+    </target>
 
 
-	<target name="mini-build-cleanup">
-		<delete verbose="true" includeemptydirs="true" failonerror="false">		 
-			<fileset dir="${build.drive}/" casesensitive="false">
-				<include name="makefile" />
-				<include name="*.mk" />
-				<include name="*.make" />
-				<include name="ecloud_tmp_*/**" />
-				<include name="emake.*" />
-				<include name="epoc32/build/**" />
+    <target name="mini-build-cleanup">
+        <delete verbose="true" includeemptydirs="true" failonerror="false">         
+            <fileset dir="${build.drive}/" casesensitive="false">
+                <include name="makefile" />
+                <include name="*.mk" />
+                <include name="*.make" />
+                <include name="ecloud_tmp_*/**" />
+                <include name="emake.*" />
+                <include name="epoc32/build/**" />
                 <include name="epoc32/rombuild/imaker_temp/**" />
                 <include name="epoc32/rombuild/${product.name}/**" />
-				<include name="epoc32/rom/config/*/**/foti*.*" />
-				<include name="output/**" />
-				<include name="timestart.txt" />
-				<include name="timestop.txt" />
-				<exclude name="output/build_area/localised/**" />
-			</fileset>
-		</delete>
-	</target>
+                <include name="epoc32/rom/config/*/**/foti*.*" />
+                <include name="output/**" />
+                <include name="timestart.txt" />
+                <include name="timestop.txt" />
+                <exclude name="output/build_area/localised/**" />
+            </fileset>
+        </delete>
+    </target>
 
-	<target name="mini-build-install-new-imaker">
-		<!-- Export custom image configuration file. -->
-		<copy file="config/image_conf_naming.mk" tofile="${build.drive}/epoc32/rom/config/image_conf_naming.mk" />
-		<property name="imaker.dir" value="${helium.dir}/../external/imaker" />
-		<!--
+    <target name="mini-build-install-new-imaker">
+        <!-- Export custom image configuration file. -->
+        <copy file="config/image_conf_naming.mk" tofile="${build.drive}/epoc32/rom/config/image_conf_naming.mk" />
+        <property name="imaker.dir" value="${helium.dir}/../external/imaker" />
+        <!--
         <delete dir="${build.drive}/imaker_rnd"/>
         <copy todir="${build.drive}/imaker_rnd">
             <fileset dir="${imaker.dir}"/>
@@ -318,16 +322,16 @@ ${diamonds.log.start.edited}</echo>-->
         <hlm:abldMacro dir="${build.drive}/imaker_rnd/group" command="cleanexport" platform=""/>
         <hlm:abldMacro dir="${build.drive}/imaker_rnd/group" command="export" platform=""/>
         -->
-	</target>
+    </target>
 
-	<target name="mini-build-check">
-		<!-- Check if prep has set some prop correctly... -->
-		<echo>'${arm.compiler.version}'</echo>
-		<au:assertMatches string="${arm.compiler.version}" pattern="RVCT2\.2 \[Build 616\]" casesensitive="false" multiline="true" />
+    <target name="mini-build-check">
+        <!-- Check if prep has set some prop correctly... -->
+        <echo>'${arm.compiler.version}'</echo>
+        <au:assertMatches string="${arm.compiler.version}" pattern="RVCT2\.2 \[Build 616\]" casesensitive="false" multiline="true" />
 
-		<!-- Check if compile-main step did what expected... -->
-		<au:assertFileExists file="${canonical.sysdef.file}" />
-		<!--<au:assertFileExists file="${build.drive}/Makefile"/>-->
+        <!-- Check if compile-main step did what expected... -->
+        <au:assertFileExists file="${canonical.sysdef.file}" />
+        <!--<au:assertFileExists file="${build.drive}/Makefile"/>-->
         <if>
             <istrue value="${blocks.enabled}" />
             <then>
@@ -335,55 +339,69 @@ ${diamonds.log.start.edited}</echo>-->
             </then>
         </if>
 
-		<if>
-			<isset property="build.system.ec-helium" />
-			<then>
-				<au:assertFileExists file="${build.drive}/emake.data" />
-				<au:assertFileExists file="${temp.build.dir}/${build.id}.helium_minibuild_compile_run_emake.bat" />
-			</then>
-		</if>
+        <if>
+            <isset property="build.system.ec-helium" />
+            <then>
+                <au:assertFileExists file="${build.drive}/emake.data" />
+                <au:assertFileExists file="${temp.build.dir}/${build.id}.helium_minibuild_compile_run_emake.bat" />
+            </then>
+        </if>
 
-		<resourcecount property="fpsx.count">
-			<fileset dir="${build.output.dir}">
-				<include name="**/*.core.fpsx" />
-				<include name="**/*.rofs2.fpsx" />
-			</fileset>
-		</resourcecount>
-		<echo>Number of images generated: ${fpsx.count}.</echo>
-	</target>
+        <resourcecount property="fpsx.count">
+            <fileset dir="${build.output.dir}">
+                <include name="**/*.core.fpsx" />
+                <include name="**/*.rofs2.fpsx" />
+            </fileset>
+        </resourcecount>
+        <echo>Number of images generated: ${fpsx.count}.</echo>
+
+        <!-- Taking abld build failure because of deprecation into account. -->
+        <if>
+            <or>
+                <contains string="${build.system}" substring="ebs" />
+                <contains string="${build.system}" substring="ec-helium" />
+            </or>
+            <then>
+                <au:assertTrue message="Build should have a pending failure because abld is not supported anymore.">
+                    <hlm:hasDeferredFailure name="compileSignalInput" />
+                </au:assertTrue>
+                <hlm:clearDeferredFailures/>
+            </then>
+        </if>        
+    </target>
 
 
-	<!-- Custom iMaker configuration - preparing for future dev. -->
-	<property name="imaker.fmpp.makefile" location="${helium.dir}/tools/common/templates/imaker/build_imaker_roms_signing.mk.ftl" />
-	<hlm:imakerconfigurationset id="imaker.rom.config">
-		<imakerconfiguration>
-			<makefileset>
+    <!-- Custom iMaker configuration - preparing for future dev. -->
+    <property name="imaker.fmpp.makefile" location="${helium.dir}/tools/common/templates/imaker/build_imaker_roms_signing.mk.ftl" />
+    <hlm:imakerconfigurationset id="imaker.rom.config">
+        <imakerconfiguration>
+            <makefileset>
                 <include name="**/image_conf_${product.name}.mk" />
-			</makefileset>
-			<targetset>
-				<include name="fota" />
-			</targetset>
-		</imakerconfiguration>
-		<imakerconfiguration>
-			<makefileset>
-			    <include name="**/${product.name}/*ui.mk"/>
-			</makefileset>
-			<targetset>
-				<include name="core(?:-prd|-rnd|-subcon)?$" />
-				<include name="^langpack_01$" />
-				<exclude name=".*-image$" />
-			</targetset>
-			<variableset>
-				<variable name="USE_FOTI" value="1" />
-				<variable name="USE_FOTA" value="1" />
-				<variable name="TYPE" value="rnd" />
-			</variableset>
-		</imakerconfiguration>
-	</hlm:imakerconfigurationset>
+            </makefileset>
+            <targetset>
+                <include name="fota" />
+            </targetset>
+        </imakerconfiguration>
+        <imakerconfiguration>
+            <makefileset>
+                <include name="**/${product.name}/*ui.mk"/>
+            </makefileset>
+            <targetset>
+                <include name="core(?:-prd|-rnd|-subcon)?$" />
+                <include name="^langpack_01$" />
+                <exclude name=".*-image$" />
+            </targetset>
+            <variableset>
+                <variable name="USE_FOTI" value="1" />
+                <variable name="USE_FOTA" value="1" />
+                <variable name="TYPE" value="rnd" />
+            </variableset>
+        </imakerconfiguration>
+    </hlm:imakerconfigurationset>
 
-	<fileset dir="${build.drive}/" id="mmp.to.target.config">
-		<include name="s60/app/**/*.mmp" />
-	</fileset>
+    <fileset dir="${build.drive}/" id="mmp.to.target.config">
+        <include name="s60/app/**/*.mmp" />
+    </fileset>
 
     <import file="build.sbsinput.ant.xml" />
 </project>

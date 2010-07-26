@@ -29,18 +29,18 @@
 #include "xmlwriter.h"
 #include <vector>
 
-typedef std::list<ExeAttribute*> ExeAttList;
+typedef list<ExeAttribute*> ExeAttList;
 
 struct ExeContainer
 {
-	String iExeName;
+	string iExeName;
 	IdData* iIdData;
 	StringList iDepList;
 	ExeAttList iExeAttList;
 };
 
-typedef std::map<std::string, ExeContainer> ExeVsMetaData;
-typedef std::map<std::string, ExeVsMetaData> ImgVsExeStatus;
+typedef map<string, ExeContainer> ExeVsMetaData; 
+typedef map<string, ExeVsMetaData* > ImgVsExeStatus;
 
 /** 
 Base class for all type of report generation.

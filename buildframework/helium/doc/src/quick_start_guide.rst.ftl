@@ -1,6 +1,6 @@
 <#--
 ============================================================================ 
-Name        : 
+Name        : quick_start_guide.rst.ftl
 Part of     : Helium 
 
 Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
@@ -20,51 +20,59 @@ Description:
 ============================================================================
 -->
 ########################
-Helium Quick Start Guide 
+Helium Quick-Start Guide 
 ########################
 
 .. index::
-  module: Helium Quick Start Guide
+  module: Helium Quick-Start Guide
 
 .. contents::
 
 Introduction
 ============
 
-This document is a quick start guide for Ant based Helium build framework. More information can be found from `Helium manual`_.
+This document is a quick-start guide for the Ant-based Helium build framework. More information can be found from `Helium manual`_.
 
-.. _`Helium manual`: index.html#index-65
-
-This quick start guide is aimed at getting you helium on the build machine and showing you how to run helium in the very
-simplest of ways. Further reading and configuration is required to perform a complete build of a component or a product.
-
-<#if !ant?keys?seq_contains("sf")>
-To set up your environment please follow the `Helium Environment Setup`_ also make sure you have correct SymSEE version mentioned in this link. 
-
-.. _`Helium Environment Setup`: nokia/nokia.html
-</#if>
-
-<#if ant?keys?seq_contains("sf")>
-To set up your environment please follow the steps of `Helium Environment Setup`_.
-
-.. _`Helium Environment Setup`: sf.html
-</#if>
+.. _`Helium manual`: manual/index.html
 
 
 .. index::
   single: Helium configuration
 
-Helium configuration
---------------------
+
+Installation
+=============
+
+<#if !ant?keys?seq_contains("sf")>
+Helium can be retrieved from the Hydra_ service:
+
+.. _Hydra: http://wikis.in.nokia.com/Hydra
+
+:URL: http://trhdr001.nmp.nokia.com/services/90?page=1 
+:Service: SoftwareBuildSolutions_Tools
+:Product: BuildEnvironment
+
+</#if>
+
+<#if ant?keys?seq_contains("sf")>
+
+.. include:: sf.html
+
+</#if>
+
+
+Configuration
+=============
 
 - Helium is configured using a combination of Ant configuration elements (properties, filesets, etc) and other XML files for more complex
-  configuration of particular parts of the build. For initial tests run in this quick start guide you do not need to configure anything, but 
+  configuration of particular parts of the build. For initial tests run in this quick-start guide you do not need to configure anything, but 
   do please read the following references for more information:
 
   - `Using Ant <http://ant.apache.org/manual/using.html>`_: specifically the Projects and Properties sections.
   - `Configure Helium  <manual/configuring.html>`_: `common configuration format <manual/configuring.html#common-configuration-format>`_ and `Helium stages <manual/stages.html>`_.
   - `Helium glossary <api/helium/properties-table.html>`_: lists the specific properties used in Helium.
-
+  
+  
 .. index::
   single: Running builds with Helium
 
@@ -76,7 +84,7 @@ Running builds with Helium
 After configuring the framework, running builds with Helium is simple. The command-line interface is the same as for Apache Ant. 
 Please read `Running Ant <http://ant.apache.org/manual/running.html>`_ for more information.
 
-You start the build with ``hlm`` command. Navigate into 'helium' directory (should contain the file hlm.bat) and type::
+You start the build with ``hlm`` command. Navigate into 'helium' directory (should contain the file ``hlm.bat``) and type::
 
     hlm [target] [-D<property>=<value>] [-f <ant_build_file>] [-h] [-p -v]
     
@@ -107,17 +115,37 @@ The code is shown below::
     <!-- A simple test target that prints a simple message -->  This is a comment line <!--  --> 
                                                                 indicates comment text
     <target name="hello">                                       This is the target name 'hello'
-        <echo message="Hello!"/>                                what the task does echo the word 'hello'
+        <echo message="Hello!"/>                                what the task does echo the 
+                                                                word 'hello'
         <if>                                                    Conditional branch
-            <isset property="build.number"/>                    If the property build.number is present 
+            <isset property="build.number"/>                    If the property build.number is
+                                                                present 
             <then>                                              then 
-                <echo message="Ant libs found OK"/>             echo additional text 'Ant libs found OK'
+                <echo message="Ant libs found OK"/>             echo additional text 'Ant libs 
+                                                                found OK'
             </then>                                             end of 'then' action
         </if>                                                   end of 'if' action
     </target>                                                   end of target/task
     
     
-    <target name="hi" depends="hello"/>                         this is the called target which depends
-                                                                upon the target 'hello' being run before
+    <target name="hi" depends="hello"/>                         this is the called target which
+                                                                depends upon the target 'hello' 
+                                                                being run before
                                                                 this target is run.
     
+Users' Flow Diagram
+==========================
+
+The diagram below illustrates some pathways and key documents to review for different proficiency levels.
+
+.. raw:: html
+
+   <img src="user_graph.dot.png" alt="Flow Diagram" usemap="#flowdiagram" style="border-style: none"/>
+   <map name="flowdiagram" id="flowdiagram">
+
+.. raw:: html
+   :file: user_graph.dot.cmap
+
+.. raw:: html
+
+   </map>

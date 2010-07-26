@@ -44,17 +44,17 @@ class E32Reader : public ImageReader
 private:
 	StringList iDependencyList;
 	E32Image *iE32Image;
-	String iExeName;
+	string iExeName;
 
 public:
 	void ReadImage(void);
 	void ProcessImage(void);
-	E32Reader(char* aImageName);
+	E32Reader(const char* aImageName);
 	~E32Reader(void);
 
-	const StringList& GetDependencyList(void);
+	const StringList& GetDependencyList(void) const ;
 	ExeNamesVsDepListMap& GatherDependencies(void);
-	static bool IsE32Image(char* aImageName);
+	static bool IsE32Image(const char* aImageName);
 	void PrepareExeVsIdMap(void);
 	const ExeVsIdDataMap& GetExeVsIdMap() const;
 };

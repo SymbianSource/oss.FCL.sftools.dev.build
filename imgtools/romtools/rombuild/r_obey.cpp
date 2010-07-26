@@ -18,46 +18,33 @@
 
 #include <string.h>
 
-#ifdef __VC32__
- #ifdef __MSVCDOTNET__
-  #include <strstream>
-  #include <iomanip>
- #else //!__MSVCDOTNET__
-  #include <strstrea.h>
-  #include <iomanip.h>
- #endif //__MSVCDOTNET__
-#else //!__VC32__
-#ifdef __TOOLS2__
- #include <sstream>
-  #include <iomanip>
-#else
- #include <strstream.h>
- #include <iomanip.h>
-#endif 
-#endif //__VC32__
+#include <strstream>
+#include <iomanip>
+
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
 #include <assert.h>
+#include <errno.h>
 
-#include "e32std.h"
-#include "e32std_private.h"
-#include "e32rom.h"
-#include "u32std.h"
+#include <e32std.h>
+#include <e32std_private.h>
+#include <e32rom.h>
+#include <u32std.h>
+#include <f32file.h>
 
 #include "r_rom.h"
 #include "r_obey.h"
 #include "r_global.h"
 #include "h_utl.h"
 #include "patchdataprocessor.h"
-#include "r_coreimage.h"
+#include "r_coreimage.h" 
 
 #define _P(word)	word, sizeof(word)-1	// match prefix, optionally followed by [HWVD]
 #define _K(word)	word, 0					// match whole word
-
-const ObeyFileKeyword ObeyFileReader::iKeywords[] =
-{
+static char* const NullString = "" ;
+const ObeyFileKeyword ObeyFileReader::iKeywords[] = {
 	{_P("file"),		2,-2, EKeywordFile, "Executable file to be loaded into the ROM"},
 	{_P("data"),		2,-2, EKeywordData, "Data file to be copied into the ROM"},
 	{_P("primary"),		1+2,-2, EKeywordPrimary, "An EPOC Kernel"},
@@ -139,16 +126,15 @@ const ObeyFileKeyword ObeyFileReader::iKeywords[] =
 	{_K("maxunpagedsize"),	1, 1, EKeywordMaxUnpagedMemSize, "Maxinum unpaged size in ROM image. Default is no limited."},
 	{_K("hcrdata") , 2, 2,EKeywordHardwareConfigRepositoryData,"HCR image data"},
 	{0,0,0,0,EKeywordNone,""} 
-	
+
 };
 
-void ObeyFileReader::KeywordHelp() // static
-	{
+void ObeyFileReader::KeywordHelp() { // static
+
 	cout << "Obey file keywords:\n";
 
 	const ObeyFileKeyword* k=0;
-	for (k=iKeywords; k->iKeyword!=0; k++)
-		{
+	for (k=iKeywords; k->iKeyword!=0; k++) {
 		if (k->iHelpText==0)
 			continue;
 		if (k->iHelpText[0]=='(' && !H.iVerbose)
@@ -161,14 +147,13 @@ void ObeyFileReader::KeywordHelp() // static
 		if (H.iVerbose)
 			sprintf(buf+20,"%2d",k->iNumArgs);
 		cout << "    " << buf << " " << k->iHelpText << endl;
-		}
+	}
 	cout << endl;
 
 	cout << "File attributes:\n";
 
 	const FileAttributeKeyword* f=0;
-	for (f=iAttributeKeywords; f->iKeyword!=0; f++)
-		{
+	for (f=iAttributeKeywords; f->iKeyword!=0; f++) {
 		if (f->iHelpText==0)
 			continue;
 		if (f->iHelpText[0]=='(' && !H.iVerbose)
@@ -179,133 +164,134 @@ void ObeyFileReader::KeywordHelp() // static
 		if (H.iVerbose)
 			sprintf(buf+20,"%2d",k->iNumArgs);
 		cout << "    " << buf << " " << f->iHelpText << endl;
-		}
-	cout << endl;
 	}
+	cout << endl;
+}
 
 TInt NumberOfVariants=0;
-
-ObeyFileReader::ObeyFileReader(TText* aFileName):
 //
 // Constructor
 //
-	iMark(0), iMarkLine(0), iCurrentMark(0), iCurrentLine(0), imaxLength(0),iSuffix(0),iLine(0)
-	{
+ObeyFileReader::ObeyFileReader(const char* aFileName):iFileName(aFileName),iCurrentLine(0), iNumWords(0),iLine(0),iMarkLine(0)  {
+	for(TUint i = 0 ; i < KNumWords ; i++)
+		iWord[i] = NullString ;	 
+	*iSuffix = 0 ; 
 
-	iFileName = new TText[strlen((const char *)aFileName)+1];
-	strcpy((char *)iFileName,(const char *)aFileName);
-	}
+}
 
-ObeyFileReader::~ObeyFileReader()
-	{
-	if (iObeyFile)
-		fclose(iObeyFile);
-	iObeyFile=0;
-	delete [] iFileName;
-	delete [] iLine;
-	}
-
-TBool ObeyFileReader::Open()
+ObeyFileReader::~ObeyFileReader() {
+	if(iLine)
+		delete [] iLine;
+}
 //
 // Open the file & return a status
 //
-	{
-
- 	iObeyFile = fopen((const char *)iFileName,"r");
-	if (!iObeyFile)
-		{
-		Print(EError,"Cannot open obey file %s\n",iFileName);
+TBool ObeyFileReader::Open() {
+	ifstream ifs(iFileName.c_str(),ios_base::in + ios_base::binary);
+	if (!ifs.is_open()) {
+		Print(EError,"Cannot open obey file %s\n",iFileName.c_str());
 		return EFalse;
+	}
+	iLines.clear();
+	if(iLine){
+		delete []iLine;
+		iLine = 0 ;
+	}		
+	ifs.seekg(0,ios_base::end);
+	size_t length = ifs.tellg();
+	char* buffer = new char[length + 2];
+	if (0 == buffer) {
+		Print(EError,"Insufficient Memory to Continue.");
+		return EFalse;
+	}
+	ifs.seekg(0,ios_base::beg);
+	ifs.read(buffer,length); 
+	size_t readcout = ifs.gcount() ;
+	if(readcout != length){ 	
+		Print(EError,"Cannot Read All of File.");	
+		delete []buffer ;
+		ifs.close();
+		return EFalse;
+	}
+	buffer[length] = '\n';
+	buffer[length + 1] = 0 ; 
+	ifs.close();
+	char* lineStart = buffer ;
+	char* end = buffer + length ;
+	string line ;
+	size_t maxLengthOfLine = 0 ; 
+	while(lineStart <= end){
+		while(*lineStart == ' ' || *lineStart == '\t') //trimleft 
+			lineStart ++ ;		
+		char* lineEnd = lineStart ;	 
+		while(*lineEnd != '\r' && *lineEnd != '\n')
+			lineEnd ++ ;
+		if(strnicmp(lineStart,"REM",3) == 0){
+			line = "" ; // REMOVE "REM ... "
 		}
-	if (SetLineLengthBuffer() != KErrNone)
-	 	{
-		Print(EError,"Insufficent Memory to Continue.");	
-	 	return EFalse;
+		else {
+			TInt lastIndex = lineEnd - lineStart - 1;
+			while(lastIndex >= 0 &&  // trimright
+				(lineStart[lastIndex] == ' ' || lineStart[lastIndex] == '\t'))
+				lastIndex -- ;
+			if(lastIndex >= 0)
+				line.assign(lineStart,lastIndex + 1);
+			else
+				line = "";
 		}
+	 
+
+		if(line.length() > maxLengthOfLine)
+			maxLengthOfLine = line.length();
+		iLines.push_back(line);
+		if(*lineEnd == '\r') {
+			if(lineEnd[1] == '\n')
+				lineStart = lineEnd + 2 ;
+			else
+				lineStart = lineEnd + 1 ;
+		}
+		else // '\n'
+			lineStart = lineEnd + 1 ; 
+	}	
+	delete []buffer ;
+	iLine = new char[maxLengthOfLine + 1]; 
+	iCurrentLine = 0 ;
+	iMarkLine = 0 ;
 	return ETrue;
-	}
+}
+ 
 
-TInt ObeyFileReader::SetLineLengthBuffer()
-// Get the Max Line length for the given obey file and allocate the buffer.
-	{
-	char ch = '\0';
-	TInt length = 0;
-		
-	Rewind();
-	while ((ch = (char)fgetc(iObeyFile)) != EOF)
-		{
-		length++;
-		if (ch == '\n')
-			{
-			if (length > imaxLength)
-				imaxLength = length;
-			length = 0;				
-			}
-		}
-	
-	if (length > imaxLength)
-		imaxLength = length;
-		
-	if (0 == imaxLength)
-		{
-		Print(EError,"Empty obey file passed as input.");
-		exit(-1);
-		}			
-	else if (imaxLength < 2)
-		{
-		Print(EError,"Invalid obey file passed as input.");
-		exit(-1);
-		}
-		
-	Rewind();
-	iLine = new TText[imaxLength+1];
-	
-	if(!iLine)
-		return KErrNoMemory;
+void ObeyFileReader::Mark()	{ 
+	iMarkLine = iCurrentLine - 1;
+}
 
-	return KErrNone;
-	}
-
-void ObeyFileReader::Mark()
-	{
-
-	iMark = iCurrentMark;
-	iMarkLine = iCurrentLine-1;
-	}
-
-void ObeyFileReader::MarkNext()
-	{
-
-	iMark = ftell(iObeyFile);
+void ObeyFileReader::MarkNext() { 
 	iMarkLine = iCurrentLine;
-	}
+}
 
-void ObeyFileReader::Rewind()
-	{
-	
-	fseek(iObeyFile,iMark,SEEK_SET);
-	iCurrentMark = iMark;
+void ObeyFileReader::Rewind() {
 	iCurrentLine = iMarkLine;
-	}
+}
 
-void ObeyFileReader::CopyWord(TInt aIndex, TText*& aString)
-	{
-	aString = new TText[strlen((const char *)iWord[aIndex])+1];
-	strcpy((char *)aString, (const char *)iWord[aIndex]);
-	}
+char* ObeyFileReader::DupWord(TInt aIndex) const {
+	char* retVal = 0 ;
+	if(aIndex >= 0 && aIndex < (TInt)KNumWords){
+		size_t len = strlen(iWord[aIndex]) + 1;
+		retVal = new char[len];
+		if(retVal)
+			memcpy(retVal,iWord[aIndex],len);
+	} 
+	return retVal ;
+}
 
-TInt ObeyFileReader::ReadAndParseLine()
-	{
-	if (feof(iObeyFile))
+
+TInt ObeyFileReader::ReadAndParseLine() {
+	if (iCurrentLine >= (TInt)iLines.size())
 		return KErrEof;
-	iCurrentLine++;
-	iCurrentMark = ftell(iObeyFile);
-	iLine[0]='\0';
-	fgets((char*)iLine,imaxLength+1,iObeyFile);
+	iCurrentLine++; 
 	iNumWords = Parse();
 	return KErrNone;
-	}
-
+}
 TInt ObeyFileReader::NextLine(TInt aPass, enum EKeyword& aKeyword)
 	{
 
@@ -313,40 +299,34 @@ NextLine:
 	TInt err = ReadAndParseLine();
 	if (err == KErrEof)
 		return KErrEof;
-	if (iNumWords == 0 || stricmp((const char*)iWord[0], "rem")==0)
+	if (iNumWords == 0 )
 		goto NextLine;
 	if (stricmp((const char*)iWord[0], "stop")==0)
 		return KErrEof;
 
 	const ObeyFileKeyword* k=0;
-	for (k=iKeywords; k->iKeyword!=0; k++)
-		{
-		if (k->iKeywordLength == 0)
-			{
+	for (k=iKeywords; k->iKeyword!=0; k++) {
+		if (k->iKeywordLength == 0) {
 			// Exact case-insensitive match on keyword
 			if (stricmp((const char*)iWord[0], k->iKeyword) != 0)
 				continue;
-			iSuffix = 0;
-			}
-		else
-			{
+			*iSuffix = 0;
+		}
+		else {
 			// Prefix match
 			if (strnicmp((const char*)iWord[0], k->iKeyword, k->iKeywordLength) != 0)
 				continue;
 			// Suffix must be empty, or a variant number in []
-			iSuffix = iWord[0]+k->iKeywordLength;
+			strncpy(iSuffix,iWord[0]+k->iKeywordLength,80);
 			if (*iSuffix != '\0' && *iSuffix != '[')
 				continue;
-			}
+		}
 		// found a match
-		if ((k->iPass & aPass) == 0)
+		if ((k->iPass & aPass) == 0) 
 			goto NextLine;
-		if (k->iNumArgs>=0 && (1+k->iNumArgs != iNumWords))
-			{
-			 
+		if (k->iNumArgs>=0 && (1+k->iNumArgs != iNumWords))	{			 
 			if(EKeywordHardwareConfigRepositoryData == k->iKeywordEnum){ // preq2131 specific 
-				Print(EWarning, "Incorrect number of arguments for keyword '%s' on line %d. Extra argument(s) are ignored.\n",
-				iWord[0],iCurrentLine);
+				Print(EWarning, "Incorrect number of arguments for keyword '%s' on line %d. Extra argument(s) are ignored.\n",	iWord[0],iCurrentLine);
 				aKeyword = k->iKeywordEnum;
 				return KErrNone;
 			}else{
@@ -354,103 +334,81 @@ NextLine:
 					iWord[0], iCurrentLine);
 			}
 			goto NextLine;
-			}
-		if (k->iNumArgs<0 && (1-k->iNumArgs > iNumWords))
-			{
+		}
+		if (k->iNumArgs<0 && (1-k->iNumArgs > iNumWords)){
 			Print(EError, "Too few arguments for keyword %s on line %d.\n",
 				iWord[0], iCurrentLine);
 			goto NextLine;
-			}
+		}
 		
 		aKeyword = k->iKeywordEnum;
 		return KErrNone;
-		}
+	}
 	if (aPass == 1)
 		Print(EWarning, "Unknown keyword '%s'.  Line %d ignored\n", iWord[0], iCurrentLine);
 	goto NextLine;
-	}
+}
 
-inline TBool ObeyFileReader::IsGap(char ch)
-	{
-	return (ch==' ' || ch=='=' || ch=='\t');
-	}
-
-TInt ObeyFileReader::Parse()
+ 
 //
 // splits a line into words, and returns the number of words found
-//
+// 
+TInt ObeyFileReader::Parse() {
 
-	{
-
-	TUint i; 
-	TText *letter=iLine;
-	TText *end=iLine+strlen((char *)iLine);
-	for (i=0; i<KNumWords; i++)
-		iWord[i]=end;
+	for (TUint i = 0; i < KNumWords; i++)
+		iWord[i] = NullString;
 
 	enum TState {EInWord, EInQuotedWord, EInGap};
-	TState state=EInGap;
+	TState state = EInGap;	 
+	TUint i = 0;
+	const string& line = iLines[iCurrentLine -1];  
 
-	i=0;
-	while (i<KNumWords && letter<end)
-		{
-		char ch=*letter;
-		if (ch==0)
-			break;
-		if (ch=='\n')
-			{
-			*letter='\0';	// remove trailing newline left by fgets
-			break;
-			}
-		switch (state)
-			{
+	memcpy(iLine,line.c_str(),line.length());
+	iLine[line.length()] = 0 ; 
+	char* linestr = iLine;
+	while (i < KNumWords && *linestr != 0) {
+		switch (state) {
 		case EInGap:
-			if (ch=='\"')
-				{
-				if (letter[1]!=0 && letter[1]!='\"')
-					iWord[i++]=letter+1;
-				state=EInQuotedWord;
-				}
-			else if (!IsGap(ch))
-				{
-				iWord[i++]=letter;
+			if (*linestr =='\"') {
+				if (linestr[1] != 0 && linestr[1]!='\"')
+					iWord[i++] = linestr + 1;
+				state = EInQuotedWord;
+			}
+			else if (!IsGap(*linestr)) {
+				iWord[i++] = linestr;
 				state=EInWord;
-				}
+			}
 			else
-				*letter=0;
+				*linestr=0;
 			break;
 		case EInWord:
-			if (ch=='\"')
-				{
-				*letter=0;
-				if (letter[1]!=0 && letter[1]!='\"')
-					iWord[i++]=letter+1;
+			if (*linestr == '\"') {
+				*linestr = 0;
+				if (linestr[1] != 0 && linestr[1] != '\"')
+					iWord[i++] = linestr+1;
 				state=EInQuotedWord;
-				}
-			else if (IsGap(ch))
-				{
-				*letter=0;
+			}
+			else if (IsGap(*linestr)) {
+				*linestr=0;
 				state=EInGap;
-				}
+			}
 			break;
 		case EInQuotedWord:
-			if (ch=='\"')
-				{
-				*letter=0;
-				state=EInGap;
-				}
-			break;
+			if (*linestr == '\"'){
+				*linestr = 0;
+				state = EInGap;
 			}
-		letter++;
+			break;
 		}
-	return i;
+		linestr++;
 	}
+	return i;
+}
 
-void ObeyFileReader::ProcessLanguages(TInt64& aLanguageMask)
-	{
+
+void ObeyFileReader::ProcessLanguages(TInt64& aLanguageMask) {
 	TInt i=1;
-	while (i<iNumWords)
-		{
+	while (i<iNumWords) {
 		char *aStr=(char *)iWord[i];
 		TLanguage l=ELangTest;
 		if (stricmp(aStr, "test")==0)
@@ -497,75 +455,65 @@ void ObeyFileReader::ProcessLanguages(TInt64& aLanguageMask)
 			l=ELangAustralian;
 		else if (stricmp(aStr, "BelgianFrench")==0)
 			l=ELangBelgianFrench;
-		else
-			{
+		else {
 			Print(EError, "Unknown language '%s' on line %d", iWord[i], iCurrentLine);
 			exit(666);
-			}
+		}
 		aLanguageMask = aLanguageMask+(1<<(TInt)l);
 		i++;
-		}
 	}
+}
 
-void ObeyFileReader::ProcessTime(TInt64& aTime)
 //
 // Process the timestamp
 //
-	{
+void ObeyFileReader::ProcessTime(TInt64& aTime) {
 	char timebuf[256];
 	if (iNumWords>2)
 		sprintf(timebuf, "%s_%s", iWord[1], iWord[2]);
 	else
-		strcpy(timebuf, (char*)iWord[1]);
+		strncpy(timebuf, iWord[1],256);
 
-	TInt r=StringToTime(aTime, timebuf);
-	if (r==KErrGeneral)
-		{
+	TInt r = StringToTime(aTime, timebuf);
+	if (r==KErrGeneral) {
 		Print(EError, "incorrect format for time keyword on line %d\n", iCurrentLine);
 		exit(0x670);
-		}
-	if (r==KErrArgument)
-		{
+	}
+	if (r==KErrArgument) {
 		Print(EError, "Time out of range on line %d\n", iCurrentLine);
 		exit(0x670);
-		}
 	}
+}
 
 TInt64 ObeyFileReader::iTimeNow=0;
-void ObeyFileReader::TimeNow(TInt64& aTime)
-	{
-	if (iTimeNow==0)
-		{
+void ObeyFileReader::TimeNow(TInt64& aTime) {
+	if (iTimeNow==0) {
 		TInt sysTime=time(0);					// seconds since midnight Jan 1st, 1970
 		sysTime-=(30*365*24*60*60+7*24*60*60);	// seconds since midnight Jan 1st, 2000
 		TInt64 daysTo2000AD=730497;
 		TInt64 t=daysTo2000AD*24*3600+sysTime;	// seconds since 0000
 		t=t+3600;								// BST (?)
 		iTimeNow=t*1000000;						// milliseconds
-		}
-	aTime=iTimeNow;
 	}
-
-TInt ObeyFileReader::ProcessAlign(TInt &aAlign)
+	aTime=iTimeNow;
+}
 //
 // Process the align keyword
 //
-	{
-
-	TInt align;
-	if (Val(align, Word(1)))
-		return Print(EError, "Number required for 'align' keyword on line %d\n", iCurrentLine);
-	aAlign=align;
+TInt ObeyFileReader::ProcessAlign(TInt &aAlign) {
+		
+	TInt err = Val(aAlign,Word(1));
+	if(err != KErrNone) 
+		return Print(EError, "Number required for 'align' keyword on line %d\n", iCurrentLine); 
 	TInt i;
 	for (i=4; i!=0x40000000; i<<=1)
 		if (i==aAlign)
 			return KErrNone;
 	return Print(EError, "Alignment must be a power of 2 and bigger than 4.  Line %d\n", iCurrentLine);
-	}
+}
 
 
-const FileAttributeKeyword ObeyFileReader::iAttributeKeywords[] =
-{
+const FileAttributeKeyword ObeyFileReader::iAttributeKeywords[] = {
 	{"stackreserve",6	,1,1,EAttributeStackReserve, "?"},
 	{"stack",3			,1,1,EAttributeStack, "?"},
 	{"reloc",3			,1,1,EAttributeReloc, "?"},
@@ -595,79 +543,71 @@ const FileAttributeKeyword ObeyFileReader::iAttributeKeywords[] =
 	{0,0,0,0,EAttributeStackReserve,0}
 };
 
-TInt ObeyFileReader::NextAttribute(TInt& aIndex, TInt aHasFile, enum EFileAttribute& aKeyword, TText*& aArg)
-	{
+TInt ObeyFileReader::NextAttribute(TInt& aIndex, TInt aHasFile, enum EFileAttribute& aKeyword, char*& aArg) {
 NextAttribute:
 	if (aIndex >= iNumWords)
 		return KErrEof;
-	TText* word=iWord[aIndex++];
+	char* word=iWord[aIndex++];
 	const FileAttributeKeyword* k;
-	for (k=iAttributeKeywords; k->iKeyword!=0; k++)
-		{
-		if (k->iKeywordLength == 0)
-			{
+	for (k=iAttributeKeywords; k->iKeyword!=0; k++) {
+		if (k->iKeywordLength == 0) {
 			// Exact match on keyword
-			if (stricmp((const char*)word, k->iKeyword) != 0)
+			if (stricmp(word, k->iKeyword) != 0)
 				continue;
-			}
-		else
-			{
+		}
+		else {
 			// Prefix match
-			if (strnicmp((const char*)word, k->iKeyword, k->iKeywordLength) != 0)
+			if (strnicmp(word, k->iKeyword, k->iKeywordLength) != 0)
 				continue;
-			}
+		}
 		// found a match
-		if (k->iNumArgs>0)
-			{
+		if (k->iNumArgs>0) {
 			TInt argIndex = aIndex;
 			aIndex += k->iNumArgs;		// interface only really supports 1 argument
-			if (aIndex>iNumWords)
-				{
+			if (aIndex>iNumWords) {
 				Print(EError, "Missing argument for attribute %s on line %d\n", word, iCurrentLine);
 				return KErrArgument;
-				}
-			aArg=iWord[argIndex];
 			}
-		if (k->iIsFileAttribute && !aHasFile)
-			{
+			aArg=iWord[argIndex];
+		}
+		if (k->iIsFileAttribute && !aHasFile) {
 			Print(EError, "File attribute %s applied to non-file on line %d\n", word, iCurrentLine);
 			return KErrNotSupported;
-			}
+		}
 		aKeyword=k->iAttributeEnum;
 		return KErrNone;
-		}
+	}
 	Print(EWarning, "Unknown attribute '%s' skipped on line %d\n", word, iCurrentLine);
 	goto NextAttribute;
-	}
+}
 
 
 
 
 CObeyFile::CObeyFile(ObeyFileReader& aReader):
-	iRomFileName(0),iRomOddFileName(0),iRomEvenFileName(0),
-	iSRecordFileName(0),iBootFileName(0),iKernelRomName(0),
-	iRomSize(0),iRomLinearBase(0xffffffff),iRomAlign(0),
-	iKernDataRunAddress(0),iDataRunAddress(0),iKernelLimit(0xffffffff),
-	iKernHeapMin(0),iKernHeapMax(0),iSectionStart(0),iSectionPosition(-1),
-	iVersion(0,0,0),iCheckSum(0),iNumberOfPeFiles(0),iNumberOfDataFiles(0),
-	iNumberOfPrimaries(0),iNumberOfExtensions(0),iNumberOfVariants(0),
-	iNumberOfDevices(0),iNumberOfHCRDataFiles (0),
-	//iAllVariantsMask[256],
-	iPrimaries(0),iVariants(0),iExtensions(0),iDevices(0),
-	iLanguage(0),iHardware(0),iTime(0),iMemModel(E_MM_Moving),iPageSize(0x1000),
-	iChunkSize(0x100000),iVirtualAllocSize(0x1000),iKernelModel(ESingleKernel),
-	iCollapseMode(ECollapseNone),iSRecordBase(0),iCurrentSectionNumber(0),
-	iDefaultStackReserve(0),//iTraceMask[KNumTraceMaskWords];iInitialBTraceFilter[8];
-	iInitialBTraceBuffer(0),iInitialBTraceMode(0),iDebugPort(0),
-	iDebugPortParsed(EFalse),iRootDirectory(0),iDllDataTop(0x40000000),
-	iKernelConfigFlags(0),iPagingPolicyParsed(EFalse),iCodePagingPolicyParsed(EFalse),
-	iDataPagingPolicyParsed(EFalse),iPagingOverrideParsed(EFalse),
-	iCodePagingOverrideParsed(EFalse),iDataPagingOverrideParsed(EFalse),
-	/*iPlatSecDisabledCaps(), */iPlatSecDisabledCapsParsed(EFalse),iMaxUnpagedMemSize(0),
-	iReader(aReader),iMissingFiles(0),iLastExecutable(0),iAreaSet(),iFirstFile(0),
-	iCurrentFile(0),iLastVariantFile(0),iFirstDllDataEntry(0),
-	iUpdatedMaxUnpagedMemSize(EFalse),iPatchData(new CPatchDataProcessor)
-	{
+iRomFileName(0),iRomOddFileName(0),iRomEvenFileName(0),
+iSRecordFileName(0),iBootFileName(0),iKernelRomName(0),
+iRomSize(0),iRomLinearBase(0xffffffff),iRomAlign(0),
+iKernDataRunAddress(0),iDataRunAddress(0),iKernelLimit(0xffffffff),
+iKernHeapMin(0),iKernHeapMax(0),iSectionStart(0),iSectionPosition(-1),
+iVersion(0,0,0),iCheckSum(0),iNumberOfPeFiles(0),iNumberOfDataFiles(0),
+iNumberOfPrimaries(0),iNumberOfExtensions(0),iNumberOfVariants(0),
+iNumberOfDevices(0),iNumberOfHCRDataFiles (0),
+//iAllVariantsMask[256],
+iPrimaries(0),iVariants(0),iExtensions(0),iDevices(0),
+iLanguage(0),iHardware(0),iTime(0),iMemModel(E_MM_Moving),iPageSize(0x1000),
+iChunkSize(0x100000),iVirtualAllocSize(0x1000),iKernelModel(ESingleKernel),
+iCollapseMode(ECollapseNone),iSRecordBase(0),iCurrentSectionNumber(0),
+iDefaultStackReserve(0),//iTraceMask[KNumTraceMaskWords];iInitialBTraceFilter[8];
+iInitialBTraceBuffer(0),iInitialBTraceMode(0),iDebugPort(0),
+iDebugPortParsed(EFalse),iRootDirectory(0),iDllDataTop(0x40000000),
+iKernelConfigFlags(0),iPagingPolicyParsed(EFalse),iCodePagingPolicyParsed(EFalse),
+iDataPagingPolicyParsed(EFalse),iPagingOverrideParsed(EFalse),
+iCodePagingOverrideParsed(EFalse),iDataPagingOverrideParsed(EFalse),
+/*iPlatSecDisabledCaps(), */iPlatSecDisabledCapsParsed(EFalse),iMaxUnpagedMemSize(0),
+iReader(aReader),iMissingFiles(0),iLastExecutable(0),iAreaSet(),iFirstFile(0),
+iCurrentFile(0),iLastVariantFile(0),iFirstDllDataEntry(0),
+iUpdatedMaxUnpagedMemSize(EFalse),iPatchData(new CPatchDataProcessor) {
 
 	TUint i; 
 	for (i=0; i<256; i++)
@@ -678,33 +618,36 @@ CObeyFile::CObeyFile(ObeyFileReader& aReader):
 		iInitialBTraceFilter[i]=0;	
 	memset(&iPlatSecDisabledCaps,0,sizeof(SCapabilitySet));
 	iNextFilePtrPtr = &iFirstFile;
-	}
+}
 
-CObeyFile::~CObeyFile()
 //
 // Destructor
-//
-	{
+// 
+CObeyFile::~CObeyFile(){
 
 	Release();
-	delete [] iRomFileName;
+	if(iRomFileName){
+		delete [] iRomFileName;
+		iRomFileName = 0 ;
+	}
 	if (iRootDirectory)
 		iRootDirectory->Destroy();
-	delete iPatchData;
+	if(iPatchData) {
+		delete iPatchData;
+		iPatchData = 0 ;
 	}
-
-void CObeyFile::Release()
+}
 //
 // Free resources not needed after building a ROM
-//
-	{
+// 
+void CObeyFile::Release() {
 	iAreaSet.ReleaseAllAreas();
-
-	delete [] iBootFileName;
-	delete [] iPrimaries;
-	delete [] iVariants;
-	delete [] iExtensions;
-	delete [] iDevices;
+	
+	if(iBootFileName) delete [] iBootFileName;
+	if(iPrimaries) delete [] iPrimaries;
+	if(iVariants) delete [] iVariants;
+	if(iExtensions) delete [] iExtensions;
+	if(iDevices) delete [] iDevices;
 
 	iBootFileName = 0;
 	iPrimaries = 0;
@@ -713,59 +656,51 @@ void CObeyFile::Release()
 	iDevices = 0;
 	iFirstFile = 0;
 	iNextFilePtrPtr = &iFirstFile;
-	}
+}
 
-TRomBuilderEntry *CObeyFile::FirstFile()
-	{
+TRomBuilderEntry *CObeyFile::FirstFile() {
 	iCurrentFile = iFirstFile;
 	return iCurrentFile;
-	}
+}
 
-TRomBuilderEntry *CObeyFile::NextFile()
-	{
+TRomBuilderEntry *CObeyFile::NextFile() {
 	iCurrentFile = iCurrentFile ? iCurrentFile->iNext : 0;
 	return iCurrentFile;
-	}
+}
 
 /*
 *Set first link in patchdata linked list
 **/
-void CObeyFile::SetFirstDllDataEntry(DllDataEntry* aDllDataEntry)
-{
-  	iFirstDllDataEntry = aDllDataEntry;
+void CObeyFile::SetFirstDllDataEntry(DllDataEntry* aDllDataEntry) {
+	iFirstDllDataEntry = aDllDataEntry;
 }
 
 /*
 *Get first link in patchdata linked list
 **/
-DllDataEntry* CObeyFile::GetFirstDllDataEntry() const
-{
+DllDataEntry* CObeyFile::GetFirstDllDataEntry() const {
 	return iFirstDllDataEntry;
 }
 
-TInt CObeyFile::ProcessKernelRom()
-	{
+TInt CObeyFile::ProcessKernelRom() {
 	//
 	// First pass through the obey file to set up key variables
 	//
-
 	iReader.Rewind();
 
 	TInt count=0;
 	enum EKeyword keyword;
-	while (iReader.NextLine(1,keyword) != KErrEof)
-		{
-		if (keyword == EKeywordExtensionRom)
-			{
+	while (iReader.NextLine(1,keyword) != KErrEof) {
+		if (keyword == EKeywordExtensionRom) {
 			if (count==0)
 				return KErrNotFound;		// no kernel ROM, just extension ROMs.
 			break;
-			}
+		}
 
 		count++;
 		if (! ProcessKeyword(keyword))
 			return KErrGeneral;
-		}
+	}
 
 	if (!GotKeyVariables())
 		return KErrGeneral;
@@ -779,17 +714,15 @@ TInt CObeyFile::ProcessKernelRom()
 	//
 	iReader.Rewind();
 
-	iRootDirectory = new TRomNode((TText*)"");
+	iRootDirectory = new TRomNode("");
 	iLastExecutable = iRootDirectory;
 
 	TInt align=0;
-	while (iReader.NextLine(2,keyword)!=KErrEof)
-		{
+	while (iReader.NextLine(2,keyword)!=KErrEof) {
 		if (keyword == EKeywordExtensionRom)
 			break;
 
-		switch (keyword)
-			{
+		switch (keyword) {
 		case EKeywordSection:
 			if (ParseSection()!=KErrNone)
 				return KErrGeneral;
@@ -804,23 +737,22 @@ TInt CObeyFile::ProcessKernelRom()
 			if (!ProcessRenaming(keyword))
 				return KErrGeneral;
 			break;
-		case EKeywordPatchDllData:
-		{
-			// Collect patchdata statements to process at the end
-			StringVector patchDataTokens;
-			SplitPatchDataStatement(patchDataTokens); 
-			iPatchData->AddPatchDataStatement(patchDataTokens);									
-			break;
-		}
+		case EKeywordPatchDllData: {
+				// Collect patchdata statements to process at the end
+				StringVector patchDataTokens;
+				SplitPatchDataStatement(patchDataTokens); 
+				iPatchData->AddPatchDataStatement(patchDataTokens);									
+				break;
+			}
 
 		default:
 			if (!ProcessFile(align, keyword))
-				return KErrGeneral;
+				return KErrGeneral;				
 			align=0;
 			break;
-			}
 		}
-
+	}
+	
 	if( !ParsePatchDllData())
 		return KErrGeneral;
 
@@ -828,57 +760,54 @@ TInt CObeyFile::ProcessKernelRom()
 
 	if (iMissingFiles!=0)
 		return KErrGeneral;
-	if (iNumberOfDataFiles+iNumberOfPeFiles==0)
-		{
+	if (iNumberOfDataFiles+iNumberOfPeFiles==0) {
 		Print(EError, "No files specified.\n");
 		return KErrGeneral;
-		}
+	}
 	if (!CheckHardwareVariants())
 		return KErrGeneral;
 
 	return KErrNone;
-	}
+}
 
-
-TInt CObeyFile::ParseSection()
 //
 // Process the section keyword
-//
-	{
+// 
+TInt CObeyFile::ParseSection(){
 	TInt currentLine = iReader.CurrentLine();
 	if (iSectionPosition!=-1)
 		return Print(EError, "Rom already sectioned.  Line %d\n", currentLine);
-	TInt offset;
-	if (Val(offset, iReader.Word(1)))
+	 
+	if (!IsValidNumber(iReader.Word(1)))
 		return Print(EError, "Number required for 'section' keyword on line %d\n", currentLine);
-	iSectionStart=offset+iRomLinearBase;
-	if (offset>=iRomSize)
+	TUint32 offset = 0 ;
+	Val(offset,iReader.Word(1)) ; 
+	iSectionStart = offset + iRomLinearBase;
+	if (offset>=(TUint32)iRomSize)
 		return Print(EError, "Sectioned beyond end of Rom.  Line %d\n", currentLine);
 	if (offset&0x0fff)
 		return Print(EError, "Section must be on a 4K boundry.  Line %d\n", currentLine);
-	iSectionPosition=iNumberOfDataFiles+iNumberOfPeFiles;
+	iSectionPosition=iNumberOfDataFiles + iNumberOfPeFiles;
 	iCurrentSectionNumber++;	
 	return KErrNone;
-	}
+}
 
-TInt CObeyFile::ParseFileAttributes(TRomNode *aNode, TRomBuilderEntry* aFile)
+
 //
 // Process any inline keywords
-//
-	{
+// 
+TInt CObeyFile::ParseFileAttributes(TRomNode *aNode, TRomBuilderEntry* aFile) {
 	TInt currentLine = iReader.CurrentLine();
 	enum EFileAttribute attribute;
 	TInt r=KErrNone;
 	TInt index=3;
-	TText* arg=0;
+	char* arg=0;
 
-	while(r==KErrNone)
-		{
+	while(r==KErrNone) {
 		r=iReader.NextAttribute(index,(aFile!=0),attribute,arg);
 		if (r!=KErrNone)
 			break;
-		switch(attribute)
-			{
+		switch(attribute) {
 		case EAttributeStackReserve:
 			r=aFile->SetStackReserve(arg);
 			break;
@@ -928,23 +857,21 @@ TInt CObeyFile::ParseFileAttributes(TRomNode *aNode, TRomBuilderEntry* aFile)
 			break;
 		case EAttributeHidden:
 			if (aFile->Extension())
- 				return Print(EError, "Cannot hide Extension. Line %d.\n", currentLine);
+				return Print(EError, "Cannot hide Extension. Line %d.\n", currentLine);
 			aNode->iHidden=ETrue;
 			break;
-		case EAttributeArea:
-			{
-			TRACE(TAREA, Print(EScreen, "Area Attribute: %s\n", arg));
-			const Area* area = aFile->iArea;
-			if (! ParseAreaAttribute(arg, currentLine, area))
-				return KErrGeneral;
+		case EAttributeArea: {
+				TRACE(TAREA, Print(EScreen, "Area Attribute: %s\n", arg));
+				const Area* area = aFile->iArea;
+				if (! ParseAreaAttribute(arg, currentLine, area))
+					return KErrGeneral;
 			}
 			break;
 		case EAttributeProcessSpecific:
-			if (!IsValidFilePath(arg))
-				{
+			if (!IsValidFilePath(arg)) {
 				Print(EError, "Invalid file path for process attribute on line %d\n", currentLine);
 				return KErrGeneral;
-				}
+			}
 			r=aFile->SetAttachProcess(arg);
 			break;
 		case EAttributeCapability:
@@ -958,8 +885,8 @@ TInt CObeyFile::ParseFileAttributes(TRomNode *aNode, TRomBuilderEntry* aFile)
 			aFile->iOverrideFlags &= ~(KOverrideCodePaged | KOverrideDataPaged);
 			break;
 		case EAttributePaged:
-			aFile->iOverrideFlags |= KOverrideCodePaged | KOverrideDataPaged;
-			aFile->iOverrideFlags &= ~(KOverrideCodeUnpaged | KOverrideDataUnpaged);
+			aFile->iOverrideFlags |= KOverrideCodePaged;
+			aFile->iOverrideFlags &= ~(KOverrideCodeUnpaged);
 			break;
 		case EAttributeUnpagedCode:
 			aFile->iOverrideFlags |= KOverrideCodeUnpaged;
@@ -980,60 +907,48 @@ TInt CObeyFile::ParseFileAttributes(TRomNode *aNode, TRomBuilderEntry* aFile)
 
 		default:
 			return Print(EError, "Unrecognised keyword in file attributes on line %d.\n",currentLine);
-			}
 		}
+	}
 
 	// aFile may be null if processing an extension ROM
-	if (aFile && aFile->iPatched && ! aFile->iArea->IsDefault())
-		{
+	if (aFile && aFile->iPatched && ! aFile->iArea->IsDefault()) {
 		return Print(EError, "Relocation to area at line %d forbidden because file is patched\n", currentLine);
-		}
+	}
 
 	if (r==KErrEof)
 		return KErrNone;
 	return r;
-	}
+}
 
-TUint32 CObeyFile::ParseVariant()
-	{
-	char* left=iReader.Suffix();
+TUint32 CObeyFile::ParseVariant() {
+	if (iReader.Count() == 0 || stricmp(iReader.Word(0), "rem")==0)
+		return KVariantIndependent;
+	const char* left=iReader.Suffix();
 	if (left == 0 || *left=='\0')
 		return KVariantIndependent;
 	const char* right=left+strlen(left)-1;
-	if (*left=='[' && *right==']')
-		{
-		TUint variant;
-		#ifdef __TOOLS2__
+	if (*left=='[' && *right==']') { 
 		string s(left+1);
 		string s2=s.substr(0,right-(left+1));
-		istringstream val(s2,ios::in);
-		#else
-		istrstream val(left+1, right-(left+1));
-		#endif
-		
-
-#if defined(__MSVCDOTNET__) || defined(__TOOLS2__)
-		val >> setbase(0);
-#endif //__MSVCDOTNET__
-
-		val >> variant;
-		if (val.eof() && !val.fail())
-			return variant;
+		if(IsValidNumber(s2.c_str())){
+			TUint32 temp = 0 ;
+			Val(temp,s2.c_str());
+			return temp;
 		}
-//#endif
+	}
+	//#endif
 	Print(EError,"Syntax error in variant, %s keyword on line %d\n", iReader.Word(0), iReader.CurrentLine());
 	return KVariantIndependent;
-	}
+}
 
-TBool CObeyFile::ProcessFile(TInt aAlign, enum EKeyword aKeyword)
 //
 // Process a parsed line to set up one or more new TRomBuilder entry objects.
 // iWord[0] = the keyword (file, primary or secondary)
 // iWord[1] = the PC pathname
 // iWord[2] = the EPOC pathname
 // iWord[3] = start of the file attributes
-//
-	{
+// 
+TBool CObeyFile::ProcessFile(TInt aAlign, enum EKeyword aKeyword){
 
 	TUint imageFlags = 0;
 	TUint overrides = 0;
@@ -1045,29 +960,27 @@ TBool CObeyFile::ProcessFile(TInt aAlign, enum EKeyword aKeyword)
 	TUint hardwareVariant=KVariantIndependent;
 	TBool mustBeInSysBin = EFalse;
 	TBool tryForSysBin = EFalse;
- 	TBool warnFlag = EFalse;
+	TBool warnFlag = EFalse;
 
 	// do some validation of the keyword
 	TInt currentLine = iReader.CurrentLine();
 
-	switch (aKeyword)
-		{
+	switch (aKeyword) {
 	case EKeywordPrimary:
 		imageFlags |= KRomImageFlagPrimary;
 		overrides |= KOverrideCodeUnpaged | KOverrideDataUnpaged;
 		mustBeInSysBin = gPlatSecEnforceSysBin;
- 		warnFlag = gEnableStdPathWarning;		
+		warnFlag = gEnableStdPathWarning;		
 		hardwareVariant=ParseVariant();
-		if (iKernelModel==ESingleKernel && !THardwareVariant(hardwareVariant).IsIndependent())
-			{
+		if (iKernelModel==ESingleKernel && !THardwareVariant(hardwareVariant).IsIndependent()) {
 			Print(EError,"Kernel must be independent in single kernel ROMs\n");
-			}
+		}
 		break;
 
 	case EKeywordSecondary:
 		imageFlags |= KRomImageFlagSecondary;
 		mustBeInSysBin = gPlatSecEnforceSysBin;
- 		warnFlag = gEnableStdPathWarning;
+		warnFlag = gEnableStdPathWarning;
 		hardwareVariant=ParseVariant();
 		break;
 
@@ -1075,7 +988,7 @@ TBool CObeyFile::ProcessFile(TInt aAlign, enum EKeyword aKeyword)
 		imageFlags |= KRomImageFlagVariant;
 		overrides |= KOverrideCodeUnpaged | KOverrideDataUnpaged;
 		mustBeInSysBin = gPlatSecEnforceSysBin;
- 		warnFlag = gEnableStdPathWarning;		
+		warnFlag = gEnableStdPathWarning;		
 		hardwareVariant=ParseVariant();
 		break;
 
@@ -1083,7 +996,7 @@ TBool CObeyFile::ProcessFile(TInt aAlign, enum EKeyword aKeyword)
 		imageFlags |= KRomImageFlagExtension;
 		overrides |= KOverrideCodeUnpaged | KOverrideDataUnpaged;
 		mustBeInSysBin = gPlatSecEnforceSysBin;
- 		warnFlag = gEnableStdPathWarning;
+		warnFlag = gEnableStdPathWarning;
 		hardwareVariant=ParseVariant();
 		break;
 
@@ -1091,13 +1004,13 @@ TBool CObeyFile::ProcessFile(TInt aAlign, enum EKeyword aKeyword)
 		imageFlags |= KRomImageFlagDevice;
 		overrides |= KOverrideCodeUnpaged | KOverrideDataUnpaged;
 		mustBeInSysBin = gPlatSecEnforceSysBin;
- 		warnFlag = gEnableStdPathWarning;		
+		warnFlag = gEnableStdPathWarning;		
 		hardwareVariant=ParseVariant();
 		break;
 
 	case EKeywordExecutableCompressionMethodBytePair:
 		compression=KUidCompressionBytePair;
-		
+
 	case EKeywordExecutableCompressionMethodInflate:
 	case EKeywordFileCompress:
 		compression = compression ? compression : KUidCompressionDeflate;
@@ -1128,141 +1041,159 @@ TBool CObeyFile::ProcessFile(TInt aAlign, enum EKeyword aKeyword)
 	case EKeywordDll:
 		callEntryPoint = ETrue;
 		// and fall through to handling for "file"
-	
-	case EKeywordFile:
-		{
-			
-		char* nname = NormaliseFileName(iReader.Word(1));
+
+	case EKeywordFile: {
+
+		char* nname = NormaliseFileName(iReader.Word(1)); 
 		strupr(nname);
-		
-		if( gCompressionMethod == 0 || NULL != strstr(nname, ".DLL") || callEntryPoint )
-		{
+		if( gCompressionMethod == 0 || NULL != strstr(nname, ".DLL") || callEntryPoint ) {
 			mustBeInSysBin = gPlatSecEnforceSysBin;
- 			warnFlag = gEnableStdPathWarning;			
+			warnFlag = gEnableStdPathWarning;			
 			hardwareVariant=ParseVariant();
 		}
-		else 
-		{
+		else  {
 			compression = gCompressionMethod;
 			hardwareVariant=ParseVariant();
 			tryForSysBin = gPlatSecEnforceSysBin;
 		}
-		}
-		break;
+		delete []nname ;
+	}
+	break;
 
 	default:
 		Print(EError,"Unexpected keyword '%s' on line %d.\n",iReader.Word(0),currentLine);
 		return EFalse;
-		}
+	}
 
 	if (isPeFile)
 		iNumberOfPeFiles++;
 
 	// check the PC file exists
-	char* nname = NormaliseFileName(iReader.Word(1));
+	char* nname = NormaliseFileName(iReader.Word(1)); 
+	ifstream test(nname,ios_base::binary | ios_base::in); 
 
-#if defined(__MSVCDOTNET__) || defined(__TOOLS2__)
-	ifstream test(nname,ios_base::binary );
-#else //!__MSVCDOTNET__
-	ifstream test(nname,ios::nocreate | ios::binary); 
-#endif //__MSVCDOTNET__
-
-	if (!test.is_open())
-		{
+	if (!test.is_open()) {
 		Print(EError,"Cannot open file %s for input.\n",iReader.Word(1));
-		if(EKeywordHardwareConfigRepositoryData == aKeyword)
-			{
-			free(nname);
+		if(EKeywordHardwareConfigRepositoryData == aKeyword) {
+			delete []nname;
 			return EFalse ;
-			}
-		iMissingFiles++;
 		}
-		
-	if(EKeywordHardwareConfigRepositoryData == aKeyword)
-		{ // check hcr file 
+		iMissingFiles++;
+	}
+	if(EKeywordHardwareConfigRepositoryData == aKeyword) { // check hcr file 
 
 		TUint32 magicWord = 0;
 		test.read(reinterpret_cast<char*>(&magicWord),sizeof(TUint32));
-		if(0x66524348 != magicWord)
-			{
+		if(0x66524348 != magicWord) {
 			Print(EError,"Invalid hardware configuration repository data file %s .\n",iReader.Word(1));
 			test.close();
-			free(nname);
+			delete []nname;
 			return EFalse;
-			}
-
 		}
-	test.close();
-	free(nname);
- 	
 
- 	TBool endOfName=EFalse;
-	TText *epocStartPtr=IsValidFilePath(iReader.Text(2));
-	if (epocStartPtr==NULL)
-		{
+	}
+	test.close();
+	delete []nname;
+
+
+	TBool endOfName=EFalse; 
+	if (IsValidFilePath(iReader.Word(2)) == NULL) {
 		Print(EError, "Invalid destination path on line %d\n",currentLine);
 		return EFalse;
-		}
-	epocStartPtr = (TText*)NormaliseFileName((const char*)epocStartPtr);
+	}
+	char* epocStartPtr = NormaliseFileName(iReader.Word(2));
+	char* savedPtr = epocStartPtr;
+	if(*epocStartPtr == '/' ||*epocStartPtr == '\\')
+				epocStartPtr++ ;
+#ifdef __LINUX__
+	if(tryForSysBin) {
+		if(strnicmp(epocStartPtr, "system/bin/", 11)==0)
+			mustBeInSysBin = 1;
+		if(strnicmp(epocStartPtr, "system/libs/", 12)==0)
+			mustBeInSysBin = 1;
+		if(strnicmp(epocStartPtr, "system/programs/", 16)==0)
+			mustBeInSysBin = 1;
+	}
 
-	if(tryForSysBin)
-		{
-		if(strnicmp((const char*)epocStartPtr, "system\\bin\\", 11)==0)
+	static const char sysBin[] = "sys/bin/";
+#else
+	if(tryForSysBin) {
+		if(strnicmp(epocStartPtr, "system\\bin\\", 11)==0)
 			mustBeInSysBin = 1;
-		if(strnicmp((const char*)epocStartPtr, "system\\libs\\", 12)==0)
+		if(strnicmp(epocStartPtr, "system\\libs\\", 12)==0)
 			mustBeInSysBin = 1;
-		if(strnicmp((const char*)epocStartPtr, "system\\programs\\", 16)==0)
+		if(strnicmp(epocStartPtr, "system\\programs\\", 16)==0)
 			mustBeInSysBin = 1;
-		}
+	}
 
 	static const char sysBin[] = "sys\\bin\\";
+#endif
 	static const int sysBinLength = sizeof(sysBin)-1;
 
- 	if (strnicmp((const char*)epocStartPtr, sysBin, sysBinLength)!=0)
- 	{		
- 		if(mustBeInSysBin)
-		{
- 			TInt len = strlen((char*)epocStartPtr);
- 			TInt i = len;
- 			while(--i>=0) if(epocStartPtr[i]=='\\') break;
- 			++i;
- 			char* old = (char*)epocStartPtr;
- 			epocStartPtr = (TText*)malloc(sysBinLength+(len-i)+1);
- 			strcpy((char*)epocStartPtr,sysBin);
- 			strcat((char*)epocStartPtr,old+i);
-
- 			Print(EDiagnostic, "%s moved to %s\n", old, epocStartPtr);
- 			delete old;
+	if (strnicmp(epocStartPtr, sysBin, sysBinLength)!=0) {
+		if(mustBeInSysBin) {
+			TInt len = strlen((char*)epocStartPtr);
+			TInt i = len;
+			while(--i>=0) if(epocStartPtr[i] == SLASH_CHAR) break;
+			++i;
+			char* old = (char*)epocStartPtr;
+			epocStartPtr = new char[sysBinLength+(len-i)+1];
+			strcpy((char*)epocStartPtr,sysBin);
+			strcat((char*)epocStartPtr,old+i);
+			delete []old;
+			savedPtr = epocStartPtr;
+			Print(EDiagnostic, "%s moved to %s\n", old, epocStartPtr); 
 		}
- 		else if (warnFlag)
- 		{
- 			Print(EWarning, "Outside standard path at %s\n", epocStartPtr);
- 		}		
- 	}	
+		else if (warnFlag) {
+			Print(EWarning, "Outside standard path at %s\n", epocStartPtr);
+		}		
+	}	
 
-	TText *epocEndPtr=epocStartPtr;
-	AUTO_FREE(epocStartPtr);	
-		
+	char *epocEndPtr=epocStartPtr; 
+
 	TRomNode* dir=iRootDirectory;
 	TRomNode* subDir=0;
 	TRomBuilderEntry *file=0;
-	while (!endOfName)
-		{
-		endOfName = GetNextBitOfFileName(&epocEndPtr);
-		if (endOfName) // file
-			{
+	while (!endOfName) {
+		endOfName = GetNextBitOfFileName(epocEndPtr);
+		if (endOfName){ // file 
 			TRomNode* alreadyExists=dir->FindInDirectory(epocStartPtr,hardwareVariant);
-			if (alreadyExists) // duplicate file
-				{
-				Print(EError, "Duplicate file for %s on line %d\n",iReader.Word(1),iReader.CurrentLine());
-				return EFalse;
+			if (alreadyExists) { // duplicate file 
+				if (gKeepGoing) {
+					Print(EWarning, "Duplicate file for %s on line %d, will be ignored\n",iReader.Word(1),iReader.CurrentLine());
+					delete []savedPtr;
+					switch (aKeyword) {
+						case EKeywordExecutableCompressionMethodBytePair:
+						case EKeywordExecutableCompressionMethodInflate:
+						case EKeywordFileCompress:
+						case EKeywordExecutableCompressionMethodNone:	
+						case EKeywordFileUncompress:
+						case EKeywordData:
+							iNumberOfDataFiles--;
+							break;
+						case EKeywordHardwareConfigRepositoryData:
+							iNumberOfHCRDataFiles -- ;
+							break;	
+						default:	
+							break;
+					}		
+					if (isPeFile)
+						iNumberOfPeFiles--;
+					return ETrue;
+				
 				}
+				else {
+					Print(EError, "Duplicate file for %s on line %d\n",iReader.Word(1),iReader.CurrentLine());
+					delete []savedPtr;
+					return EFalse;
+				}
+			}
 			file = new TRomBuilderEntry(iReader.Word(1),epocStartPtr);
 			file->iRomImageFlags = imageFlags;
 			file->iResource = isResource;
 			file->iNonXIP = isNonXIP;
 			file->iCompression = compression;
-			
+
 			file->iArea = iAreaSet.FindByName(AreaSet::KDefaultAreaName);
 			file->iRomSectionNumber = iCurrentSectionNumber;
 			file->iHardwareVariant = hardwareVariant;
@@ -1271,185 +1202,180 @@ TBool CObeyFile::ProcessFile(TInt aAlign, enum EKeyword aKeyword)
 				file->SetCallEntryPoint(callEntryPoint);
 			file->iAlignment=aAlign;
 			TUint32 uid;
-			file->iBareName = SplitFileName((const char*)file->iName, uid, file->iVersionInName, file->iVersionPresentInName);
+			file->iBareName = SplitFileName(file->iName, uid, file->iVersionInName, file->iVersionPresentInName);
 			assert(uid==0 && !(file->iVersionPresentInName & EUidPresent));
-			if (strchr(file->iBareName, '{') || strchr(file->iBareName, '}'))
-				{
+			if (strchr(file->iBareName, '{') || strchr(file->iBareName, '}')) {
 				Print(EError, "Illegal character in name %s on line %d\n", file->iName, iReader.CurrentLine());
 				delete file;
+				delete []savedPtr;
 				return EFalse;
-				}
+			}
 			TRomNode* node=new TRomNode(epocStartPtr, file);
 			if (node==0){
 				delete file;
+				delete []savedPtr;
 				return EFalse;
 			}
-				
+
 			TInt r=ParseFileAttributes(node, file);
 			if (r!=KErrNone){
 				delete file;
 				delete node;
+				delete []savedPtr;
 				return EFalse;
 			}
 
 			TRACE(TAREA, Print(EScreen, "File %s area '%s'\n", iReader.Word(1), file->iArea->Name()));
 
 			// Apply some specific overrides to the primary
-			if (imageFlags & KRomImageFlagPrimary)
-				{
+			if (imageFlags & KRomImageFlagPrimary) {
 				if (file->iCodeAlignment < iPageSize)
 					file->iCodeAlignment = iPageSize;	// Kernel code is at least page aligned
 				file->iHeapSizeMin = iKernHeapMin;
 				file->iHeapSizeMax = iKernHeapMax;
 				file->iOverrideFlags |= KOverrideHeapMin+KOverrideHeapMax;
-				}
+			}
 
 			if (!file->iPatched)
 				dir->AddFile(node);	// to ROM directory structure, though possibly hidden
 			if (isPeFile)
 				TRomNode::AddExecutableFile(iLastExecutable, node);
-			
+
 			AddFile(file);
-			}		 
-		else // directory
-			{
+		}		 
+		else // directory {
 			subDir = dir->FindInDirectory(epocStartPtr);
-			if (!subDir) // sub directory does not exist
-				{
-				subDir = dir->NewSubDir(epocStartPtr);
-				if (!subDir)
-					return EFalse;
-				}
-			dir=subDir;
-			epocStartPtr = epocEndPtr;
+		if (!subDir) { // sub directory does not exist 
+			subDir = dir->NewSubDir(epocStartPtr);
+			if (!subDir){
+				delete []savedPtr;
+				return EFalse;
 			}
 		}
-	return ETrue;
+		dir=subDir;
+		epocStartPtr = epocEndPtr;
 	}
+ 
+	delete []savedPtr;
+	return ETrue;	
+}
 
 
-void CObeyFile::AddFile(TRomBuilderEntry* aFile)
-	{
+void CObeyFile::AddFile(TRomBuilderEntry* aFile) {
 	aFile->iArea->AddFile(aFile);
 
 	*iNextFilePtrPtr = aFile;
 	iNextFilePtrPtr = &(aFile->iNext);
-	}
+}
 
 
-TBool CObeyFile::ProcessRenaming(enum EKeyword aKeyword)
-	{
+TBool CObeyFile::ProcessRenaming(enum EKeyword aKeyword) {
 	TUint hardwareVariant=ParseVariant();
 
 	// find existing file
 	TBool endOfName=EFalse;
 
 	// Store the current name and new name to maintain renamed file map
-	String currentName=iReader.Word(1);
-	String newName=iReader.Word(2);
+	string currentName=iReader.Word(1);
+	string newName=iReader.Word(2);
 
-	TText *epocStartPtr=IsValidFilePath(iReader.Text(1));
-	if (epocStartPtr==NULL)
-		{
+	 
+	if (IsValidFilePath(iReader.Word(1)) == NULL) {
 		Print(EError, "Invalid source path on line %d\n",iReader.CurrentLine());
 		return EFalse;
-		}
-	epocStartPtr = (TText*)NormaliseFileName((const char*)epocStartPtr);
-	TText *epocEndPtr=epocStartPtr;
-	AUTO_FREE(epocStartPtr);
-
+	}
+	char* epocStartPtr = NormaliseFileName(iReader.Word(1));
+	char* savedPtr = epocStartPtr;	
+	if(*epocStartPtr == '/' ||*epocStartPtr == '\\')
+		epocStartPtr++ ;
+	char* epocEndPtr = epocStartPtr; 
 	char saved_srcname[257];
 	strcpy(saved_srcname, iReader.Word(1));
 
 	TRomNode* dir=iRootDirectory;
 	TRomNode* existingFile=0;
-	while (!endOfName)
-		{
-		endOfName = GetNextBitOfFileName(&epocEndPtr);
-		if (endOfName) // file
-			{
+	while (!endOfName) {
+		endOfName = GetNextBitOfFileName(epocEndPtr);
+		if (endOfName) { // file 
 			existingFile=dir->FindInDirectory(epocStartPtr,hardwareVariant);
-			if (existingFile)
-				{
+			if (existingFile) {
 				TInt fileCount=0;
 				TInt dirCount=0;
 				existingFile->CountDirectory(fileCount, dirCount);
-				if (dirCount != 0 || fileCount != 0)
-					{
-					Print(EError, "Keyword %s not applicable to directories - line %d\n",iReader.Word(0),iReader.CurrentLine());
+				if (dirCount != 0 || fileCount != 0) {					
+					Print(EError, "Keyword %s not applicable to directories - line %d\n",
+						iReader.Word(0),iReader.CurrentLine());
+					delete []savedPtr;
 					return EFalse;
-					}
+					
 				}
 			}
-		else // directory
-			{
+		}
+		else {// directory 
 			TRomNode* subDir = dir->FindInDirectory(epocStartPtr);
 			if (!subDir) // sub directory does not exist
 				break;
 			dir=subDir;
 			epocStartPtr = epocEndPtr;
-			}
 		}
-	if (aKeyword == EKeywordHide)
-		{
-		if (!existingFile)
-			{
+	}
+	if (aKeyword == EKeywordHide) {
+		if (!existingFile) {
 			Print(EWarning, "Hiding non-existent file %s on line %d\n", 
 				saved_srcname, iReader.CurrentLine());
 			// Just a warning, as we've achieved the right overall effect.
-			}
-		else
-			{
-			existingFile->iHidden = ETrue;
-			}
-		return ETrue;
 		}
+		else {
+			existingFile->iHidden = ETrue;
+		}
+		delete []savedPtr;
+		return ETrue;
+	}
 
-	if (!existingFile)
-		{
+	if (!existingFile) {
 		Print(EError, "Can't %s non-existent source file %s on line %d\n",
 			iReader.Word(0), saved_srcname, iReader.CurrentLine());
+		delete []savedPtr;
 		return EFalse;
-		}
-
-	epocStartPtr=IsValidFilePath(iReader.Text(2));
+	}
+	delete []savedPtr;
+	epocStartPtr=(char*)IsValidFilePath(iReader.Word(2));
 	epocEndPtr=epocStartPtr;
 	endOfName=EFalse;
-	if (epocStartPtr==NULL)
-		{
+	if (epocStartPtr==NULL) {
 		Print(EError, "Invalid destination path on line %d\n",iReader.CurrentLine());
 		return EFalse;
-		}
+	}
 
 	TRomNode* newdir=iRootDirectory;
-	while (!endOfName)
-		{
-		endOfName = GetNextBitOfFileName(&epocEndPtr);
-		if (endOfName) // file
-			{
+	while (!endOfName) {
+		endOfName = GetNextBitOfFileName(epocEndPtr);
+		if (endOfName){ // file 
 			TRomNode* alreadyExists=newdir->FindInDirectory(epocStartPtr,existingFile->HardwareVariant());
-			if (alreadyExists) // duplicate file
-				{
-				Print(EError, "Duplicate file for %s on line %d\n",saved_srcname,iReader.CurrentLine());
-				return EFalse;
+			if (alreadyExists) { // duplicate file 
+				if (gKeepGoing) {
+					Print(EWarning, "Duplicate file for %s on line %d, renaming will be skipped\n",saved_srcname,iReader.CurrentLine());
+					return ETrue;			
+				}
+				else {
+					Print(EError, "Duplicate file for %s on line %d\n",saved_srcname,iReader.CurrentLine());
+					return EFalse;
 				}
 			}
-		else // directory
-			{
+		}
+		else { // directory 
 			TRomNode* subDir = newdir->FindInDirectory(epocStartPtr);
-			if (!subDir) // sub directory does not exist
-				{
+			if (!subDir) { // sub directory does not exist 
 				subDir = newdir->NewSubDir(epocStartPtr);
 				if (!subDir)
 					return EFalse;
-				}
+			}
 			newdir=subDir;
 			epocStartPtr = epocEndPtr;
-			}
 		}
+	}
 
-	if (aKeyword == EKeywordRename)
-		{
+	if (aKeyword == EKeywordRename) {
 		// rename => remove existingFile and insert into tree at new place
 		// has no effect on the iNextExecutable or iNextNodeForSameFile links
 
@@ -1457,41 +1383,36 @@ TBool CObeyFile::ProcessRenaming(enum EKeyword aKeyword)
 		if (r!=KErrNone)
 			return EFalse;
 		r = existingFile->Rename(dir, newdir, epocStartPtr);
-		if (r==KErrBadName)
-			{
+		if (r==KErrBadName) {
 			Print(EError, "Bad name %s at line %d\n", epocStartPtr, iReader.CurrentLine());
 			return EFalse;
-			}
-		else if (r==KErrArgument)
-			{
+		}
+		else if (r==KErrArgument) {
 			Print(EError, "Version in name %s does not match version in file header at line %d\n", epocStartPtr, iReader.CurrentLine());
 			return EFalse;
-			}
+		}
 		// Store the current and new name of file in the renamed file map.
 		iPatchData->AddToRenamedFileMap(currentName, newName);
 		return ETrue;
-		}
-	
+	}
+
 	// alias => create new TRomNode entry and insert into tree
 
 	TRomNode* node = new TRomNode(epocStartPtr, existingFile);
-	if (node == 0)
-		{
+	if (node == 0) {
 		Print(EError, "Out of memory\n");
 		return EFalse;
-		}
+	}
 
 	TInt r = node->Alias(existingFile, iLastExecutable);
-	if (r==KErrBadName)
-		{
+	if (r==KErrBadName) {
 		Print(EError, "Bad name %s at line %d\n", epocStartPtr, iReader.CurrentLine());
 		return EFalse;
-		}
-	else if (r==KErrArgument)
-		{
+	}
+	else if (r==KErrArgument) {
 		Print(EError, "Version in name %s does not match version in file header at line %d\n", epocStartPtr, iReader.CurrentLine());
 		return EFalse;
-		}
+	}
 	r=ParseFileAttributes(node, 0);
 	if (r!=KErrNone)
 		return EFalse;
@@ -1499,11 +1420,10 @@ TBool CObeyFile::ProcessRenaming(enum EKeyword aKeyword)
 	newdir->AddFile(node);	// to ROM directory structure, though possibly hidden
 
 	return ETrue;
-	}
+}
 
 
-TInt ParsePagingPolicy(const char* policy)
-	{
+TInt ParsePagingPolicy(const char* policy) {
 	if(stricmp(policy,"NOPAGING")==0)
 		return EKernelConfigPagingPolicyNoPaging;
 	else if (stricmp(policy,"ALWAYSPAGE")==0)
@@ -1513,27 +1433,13 @@ TInt ParsePagingPolicy(const char* policy)
 	else if(stricmp(policy,"DEFAULTPAGED")==0)
 		return EKernelConfigPagingPolicyDefaultPaged;
 	return KErrArgument;
-	}
+}
 
 
-TBool CObeyFile::ProcessKeyword(enum EKeyword aKeyword)
-	{
-	TUint hardwareVariant=KVariantIndependent;
-
-	#ifdef __TOOLS2__
-	istringstream val(iReader.Word(1));
-	#else
-	istrstream val(iReader.Word(1),strlen(iReader.Word(1)));
-	#endif
-
-#if defined(__MSVCDOTNET__) || defined (__TOOLS2__)
-	val >> setbase(0);
-#endif //__MSVCDOTNET__
-
+TBool CObeyFile::ProcessKeyword(enum EKeyword aKeyword) {
+	TUint hardwareVariant=KVariantIndependent; 
 	TBool success = ETrue;
-
-	switch (aKeyword)
-		{
+	switch (aKeyword) {
 	case EKeywordUnicode:
 		Unicode=ETrue;
 		break;
@@ -1549,56 +1455,59 @@ TBool CObeyFile::ProcessKeyword(enum EKeyword aKeyword)
 		break;
 
 	case EKeywordBootBinary:
-		iReader.CopyWord(1, iBootFileName);
+		iBootFileName = iReader.DupWord(1);
 		break;
 	case EKeywordRomName:
-		iReader.CopyWord(1, iRomFileName);
+		iRomFileName = iReader.DupWord(1);
 		break;
 	case EKeywordRomNameOdd:
-		iReader.CopyWord(1, iRomOddFileName);
+		iRomOddFileName = iReader.DupWord(1);
 		break;
 	case EKeywordRomNameEven:
-		iReader.CopyWord(1, iRomEvenFileName);
+		iRomEvenFileName = iReader.DupWord(1);
 		break;
 	case EKeywordSRecordFileName:
-		iReader.CopyWord(1, iSRecordFileName);
+		iSRecordFileName = iReader.DupWord(1);
 		break;
 
 	case EKeywordRomLinearBase:
-		val >> iRomLinearBase;
+		Val(iRomLinearBase,iReader.Word(1));
 		break;
 	case EKeywordRomSize:
-		val >> iRomSize;
+		Val(iRomSize,iReader.Word(1));
 		break;
 	case EKeywordRomAlign:
-		val >> iRomAlign;
+		Val(iRomAlign,iReader.Word(1));
 		break;
 	case EKeywordKernelDataAddress:
-		val >> iKernDataRunAddress;
+		Val(iKernDataRunAddress,iReader.Word(1));
 		break;
 	case EKeywordKernelHeapMin:
-		val >> iKernHeapMin;
+		Val(iKernHeapMin,iReader.Word(1));
 		break;
 	case EKeywordKernelHeapMax:
-		val >> iKernHeapMax;
+		Val(iKernHeapMax,iReader.Word(1));
 		break;
 	case EKeywordDataAddress:
-		val >> iDataRunAddress;
+		Val(iDataRunAddress,iReader.Word(1));
 		break;
 	case EKeywordDefaultStackReserve:
-		val >> iDefaultStackReserve;
+		Val(iDefaultStackReserve,iReader.Word(1));
 		break;
 	case EKeywordVersion:
-		val >> iVersion;
+		{
+			istringstream val(iReader.Word(1));
+			val >> iVersion ;
+		}
 		break;
 	case EKeywordSRecordBase:
-		val >> iSRecordBase;
+		Val(iSRecordBase,iReader.Word(1));
 		break;
 	case EKeywordRomChecksum:
-		val >> iCheckSum;
+		Val(iCheckSum,iReader.Word(1));
 		break;
 	case EKeywordHardware:
-		val >> iHardware;
+		Val(iHardware,iReader.Word(1));
 		break;
 	case EKeywordLanguages:
 		iReader.ProcessLanguages(iLanguage);
@@ -1607,76 +1516,41 @@ TBool CObeyFile::ProcessKeyword(enum EKeyword aKeyword)
 		iReader.ProcessTime(iTime);
 		break;
 	case EKeywordDllDataTop:
-		val >> iDllDataTop;
+		Val(iDllDataTop,iReader.Word(1));
 		break;
 
-	case EKeywordMemModel:
-		{
-		char* arg1=iReader.Word(1);
-		char* arg2=iReader.Word(2);
-		char* arg3=iReader.Word(3);
-		char* arg4=iReader.Word(4);
-		if (strnicmp(arg1, "moving", 6)==0)
-			iMemModel=E_MM_Moving;
-		else if (strnicmp(arg1, "direct", 6)==0)
-			iMemModel=E_MM_Direct;
-		else if (strnicmp(arg1, "multiple", 8)==0)
-			iMemModel=E_MM_Multiple;
-		else if (strnicmp(arg1, "flexible", 8)==0)
-			iMemModel=E_MM_Flexible;
-		else
-			{
-			Print(EError, "Unknown memory model specified\n");
-			success = EFalse;
+	case EKeywordMemModel: {
+			const char* arg1=iReader.Word(1);
+			const char* arg2=iReader.Word(2);
+			const char* arg3=iReader.Word(3);
+			const char* arg4=iReader.Word(4);
+			if (strnicmp(arg1, "moving", 6)==0)
+				iMemModel=E_MM_Moving;
+			else if (strnicmp(arg1, "direct", 6)==0)
+				iMemModel=E_MM_Direct;
+			else if (strnicmp(arg1, "multiple", 8)==0)
+				iMemModel=E_MM_Multiple;
+			else if (strnicmp(arg1, "flexible", 8)==0)
+				iMemModel=E_MM_Flexible;
+			else {
+				Print(EError, "Unknown memory model specified\n");
+				success = EFalse;
 			}
-		if (strlen(arg2))
-			{
-			#ifdef __TOOLS2__
-			istringstream arg2s(arg2);
-			#else
-			istrstream arg2s(arg2,strlen(arg2));
-			#endif
-
-#if defined(__MSVCDOTNET__) || defined(__TOOLS2__)
-			arg2s >> setbase(0);
-#endif //__MSVCDOTNET__
-
-			arg2s >> iChunkSize;
+			if (IsValidNumber(arg2)) { 
+				Val(iChunkSize,arg2); 
 			}
-		if (iMemModel!=E_MM_Direct && strlen(arg3))
-			{
-				#ifdef __TOOLS2__
-			istringstream arg3s(arg3);
-			#else
-			istrstream arg3s(arg3,strlen(arg3));
-			#endif
-
-#if defined(__MSVCDOTNET__) || defined(__TOOLS2__)
-			arg3s >> setbase(0);
-#endif //__MSVCDOTNET__
-
-			arg3s >> iPageSize;
+			if (iMemModel!=E_MM_Direct && IsValidNumber(arg3)) { 
+				 Val(iPageSize,arg3); 
 			}
-		else if (iMemModel==E_MM_Direct)
-			iPageSize=iChunkSize;
-		if (iMemModel!=E_MM_Direct && strlen(arg4))
-			{
-			#ifdef __TOOLS2__
-			istringstream arg4s(arg4);
-			#else
-			istrstream arg4s(arg4,strlen(arg4));
-			#endif
-
-#if defined(__MSVCDOTNET__) || defined(__TOOLS2__)
-			arg4s >> setbase(0);
-#endif //__MSVCDOTNET__
-
-			arg4s >> iVirtualAllocSize;
+			else if (iMemModel==E_MM_Direct)
+				iPageSize=iChunkSize;
+			if (iMemModel!=E_MM_Direct && IsValidNumber(arg4)) { 
+				Val(iVirtualAllocSize,arg4); 
 			}
-		else
-			iVirtualAllocSize = iPageSize;
-		
-		break;
+			else
+				iVirtualAllocSize = iPageSize;
+
+			break;
 		}
 	case EKeywordNoWrapper:
 		if (gHeaderType<0)
@@ -1705,194 +1579,160 @@ TBool CObeyFile::ProcessKeyword(enum EKeyword aKeyword)
 		else
 			iKernelConfigFlags &= ~EKernelConfigPlatSecDiagnostics;
 		break;
-	case EKeywordPlatSecProcessIsolation:
-		{
-		TInt processIsolation;
-		ParseBoolArg(processIsolation,iReader.Word(1));
-		if(processIsolation)
-			iKernelConfigFlags |= EKernelConfigPlatSecProcessIsolation;
-		else
-			iKernelConfigFlags &= ~EKernelConfigPlatSecProcessIsolation;
-		break;
+	case EKeywordPlatSecProcessIsolation: {
+			TInt processIsolation;
+			ParseBoolArg(processIsolation,iReader.Word(1));
+			if(processIsolation)
+				iKernelConfigFlags |= EKernelConfigPlatSecProcessIsolation;
+			else
+				iKernelConfigFlags &= ~EKernelConfigPlatSecProcessIsolation;
+			break;
 		}
-	case EKeywordPlatSecEnforceSysBin:
-		{
-		ParseBoolArg(gPlatSecEnforceSysBin,iReader.Word(1));
-		if(gPlatSecEnforceSysBin)
-			iKernelConfigFlags |= EKernelConfigPlatSecEnforceSysBin;
-		else
-			iKernelConfigFlags &= ~EKernelConfigPlatSecEnforceSysBin;
-		break;
+	case EKeywordPlatSecEnforceSysBin: {
+			ParseBoolArg(gPlatSecEnforceSysBin,iReader.Word(1));
+			if(gPlatSecEnforceSysBin)
+				iKernelConfigFlags |= EKernelConfigPlatSecEnforceSysBin;
+			else
+				iKernelConfigFlags &= ~EKernelConfigPlatSecEnforceSysBin;
+			break;
 		}
 	case EKeywordPlatSecDisabledCaps:
 		if(iPlatSecDisabledCapsParsed)
-			Print(EWarning, "PlatSecDisabledCaps redefined - previous values lost\n");
-		{
-		ParseCapabilitiesArg(iPlatSecDisabledCaps, iReader.Word(1));
-		gPlatSecDisabledCaps = iPlatSecDisabledCaps;
-		iPlatSecDisabledCapsParsed=ETrue;
+			Print(EWarning, "PlatSecDisabledCaps redefined - previous values lost\n"); {
+			ParseCapabilitiesArg(iPlatSecDisabledCaps, iReader.Word(1));
+			gPlatSecDisabledCaps = iPlatSecDisabledCaps;
+			iPlatSecDisabledCapsParsed=ETrue;
 		}
 		break;
-	case EKeywordPagingPolicy:
-		{
-		if(iPagingPolicyParsed)
-			Print(EWarning, "PagingPolicy redefined - previous PagingPolicy values lost\n");
-		if(iDataPagingPolicyParsed)
-			Print(EWarning, "PagingPolicy defined - previous DataPagingPolicy values lost\n");
-		if(iCodePagingPolicyParsed)
-			Print(EWarning, "PagingPolicy defined - previous DataPagingPolicy values lost\n");
-		iPagingPolicyParsed = true;
-		iKernelConfigFlags &= ~(EKernelConfigCodePagingPolicyMask|EKernelConfigDataPagingPolicyMask);
-		TInt policy = ParsePagingPolicy(iReader.Word(1));
-		if(policy<0)
-			{
-			Print(EError,"Unrecognised option for PAGINGPOLICY keyword\n");
-			success = false;
+	case EKeywordPagingPolicy: {
+			if(iPagingPolicyParsed)
+				Print(EWarning, "PagingPolicy redefined - previous PagingPolicy values lost\n");
+			if(iCodePagingPolicyParsed)
+				Print(EWarning, "PagingPolicy defined - previous CodePagingPolicy values lost\n");
+			iPagingPolicyParsed = true;
+			iKernelConfigFlags &= ~(EKernelConfigCodePagingPolicyMask);
+			TInt policy = ParsePagingPolicy(iReader.Word(1));
+			if(policy<0) {
+				Print(EError,"Unrecognized option for PAGINGPOLICY keyword\n");
+				success = false;
 			}
-		else 	{
+			else 	{
 #ifndef SYMBIAN_WRITABLE_DATA_PAGING
-			if ((policy != EKernelConfigPagingPolicyNoPaging) && (iMemModel == E_MM_Flexible))
-				Print(EWarning, "SYMBIAN_WRITABLE_DATA_PAPING is not defined. Writable data paging is not warranted on this version of Symbian.");
+				if ((policy != EKernelConfigPagingPolicyNoPaging) && (iMemModel == E_MM_Flexible))
+					Print(EWarning, "SYMBIAN_WRITABLE_DATA_PAPING is not defined. Writable data paging is not warranted on this version of Symbian.");
 #endif
-			iKernelConfigFlags |= policy << EKernelConfigCodePagingPolicyShift;
-			iKernelConfigFlags |= policy << EKernelConfigDataPagingPolicyShift;
+				iKernelConfigFlags |= policy << EKernelConfigCodePagingPolicyShift;
+				if((policy==EKernelConfigPagingPolicyNoPaging) || (policy==EKernelConfigPagingPolicyDefaultUnpaged))
+					iKernelConfigFlags |= policy << EKernelConfigDataPagingPolicyShift;
 			}
 		}
 		break;
-	case EKeywordCodePagingPolicy:
-		{
-		if(iCodePagingPolicyParsed)
-			Print(EWarning, "CodePagingPolicy redefined - previous CodePagingPolicy values lost\n");
-		if(iPagingPolicyParsed)
-			Print(EWarning, "CodePagingPolicy defined - previous PagingPolicy values lost\n");
-		iCodePagingPolicyParsed = true;
-		iKernelConfigFlags &= ~EKernelConfigCodePagingPolicyMask;
-		TInt policy = ParsePagingPolicy(iReader.Word(1));
-		if(policy<0)
-			{
-			Print(EError,"Unrecognised option for CODEPAGINGPOLICY keyword\n");
-			success = false;
+	case EKeywordCodePagingPolicy: {
+			if(iCodePagingPolicyParsed)
+				Print(EWarning, "CodePagingPolicy redefined - previous CodePagingPolicy values lost\n");
+			if(iPagingPolicyParsed)
+				Print(EWarning, "CodePagingPolicy defined - previous PagingPolicy values lost\n");
+			iCodePagingPolicyParsed = true;
+			iKernelConfigFlags &= ~EKernelConfigCodePagingPolicyMask;
+			TInt policy = ParsePagingPolicy(iReader.Word(1));
+			if(policy<0) {
+				Print(EError,"Unrecognised option for CODEPAGINGPOLICY keyword\n");
+				success = false;
 			}
-		else
-			iKernelConfigFlags |= policy << EKernelConfigCodePagingPolicyShift;
+			else
+				iKernelConfigFlags |= policy << EKernelConfigCodePagingPolicyShift;
 		}
 		break;
-	case EKeywordDataPagingPolicy:
-		{
-		if(iDataPagingPolicyParsed)
-			Print(EWarning, "DataPagingPolicy redefined - previous DataPagingPolicy values lost\n");
-		if(iPagingPolicyParsed)
-			Print(EWarning, "DataPagingPolicy defined - previous PagingPolicy values lost\n");
-		iDataPagingPolicyParsed = true;
-		iKernelConfigFlags &= ~EKernelConfigDataPagingPolicyMask;
-		TInt policy = ParsePagingPolicy(iReader.Word(1));
-		if(policy<0)
-			{
-			Print(EError,"Unrecognised option for DATAPAGINGPOLICY keyword\n");
-			success = false;
+	case EKeywordDataPagingPolicy: {
+			if(iDataPagingPolicyParsed)
+				Print(EWarning, "DataPagingPolicy redefined - previous DataPagingPolicy values lost\n");
+			if(iPagingPolicyParsed)
+				Print(EWarning, "DataPagingPolicy defined - previous PagingPolicy values lost\n");
+			iDataPagingPolicyParsed = true;
+			iKernelConfigFlags &= ~EKernelConfigDataPagingPolicyMask;
+			TInt policy = ParsePagingPolicy(iReader.Word(1));
+			if(policy<0) {
+				Print(EError,"Unrecognized option for DATAPAGINGPOLICY keyword\n");
+				success = false;
 			}
-		else
+			else
 #ifndef SYMBIAN_WRITABLE_DATA_PAGING
-			if ((policy != EKernelConfigPagingPolicyNoPaging) && (iMemModel == E_MM_Flexible))
-				Print(EWarning, "SYMBIAN_WRITABLE_DATA_PAPING is not defined. Writable data paging is not warranted on this version of Symbian.");
+				if ((policy != EKernelConfigPagingPolicyNoPaging) && (iMemModel == E_MM_Flexible))
+					Print(EWarning, "SYMBIAN_WRITABLE_DATA_PAPING is not defined. Writable data paging is not warranted on this version of Symbian.");
 #endif
 			iKernelConfigFlags |= policy << EKernelConfigDataPagingPolicyShift;
 		}
 		break;
-	case EKeywordPagingOverride:
-		{
-		if(iPagingOverrideParsed)
-			Print(EWarning, "PagingOverride redefined - previous PagingOverride values lost\n");
-		if(iCodePagingOverrideParsed)
-			Print(EWarning, "PagingOverride defined - previous CodePagingOverride valus lost\n");
-		if(iDataPagingOverrideParsed)
-			Print(EWarning, "PagingOverride defined - previous DataPagingOverride values lostn");
-		iPagingOverrideParsed = true;
-		TInt policy = ParsePagingPolicy(iReader.Word(1));
-		if(policy<0)
-			{
-			Print(EError,"Unrecognised option for PAGINGOVERRIDE keyword\n");
-			success = false;
+	case EKeywordPagingOverride: {
+			if(iPagingOverrideParsed)
+				Print(EWarning, "PagingOverride redefined - previous PagingOverride values lost\n");
+			if(iCodePagingOverrideParsed)
+				Print(EWarning, "PagingOverride defined - previous CodePagingOverride values lost\n");
+			iPagingOverrideParsed = true;
+			TInt policy = ParsePagingPolicy(iReader.Word(1));
+			if(policy<0) {
+				Print(EError,"Unrecognized option for PAGINGOVERRIDE keyword\n");
+				success = false;
 			}
-		else
-			{
-			gCodePagingOverride = policy;
-			gDataPagingOverride = policy;
+			else {
+				gCodePagingOverride = policy;
+				if((policy==EKernelConfigPagingPolicyNoPaging) || (policy==EKernelConfigPagingPolicyDefaultUnpaged))
+					gDataPagingOverride = policy;
 			}
 		}
 		break;
-	case EKeywordCodePagingOverride:
-		{
-		if(iCodePagingOverrideParsed)
-			Print(EWarning, "CodePagingOverride redefined - previous CodePagingOverride values lost\n");
-		if(iPagingOverrideParsed)
-			Print(EWarning, "CodePagingOverride defined - previous PagingOverride values lost\n");
-		iCodePagingOverrideParsed = true;
-		TInt policy = ParsePagingPolicy(iReader.Word(1));
-		if(policy<0)
-			{
-			Print(EError,"Unrecognised option for CODEPAGINGOVERRIDE keyword\n");
-			success = false;
+	case EKeywordCodePagingOverride: {
+			if(iCodePagingOverrideParsed)
+				Print(EWarning, "CodePagingOverride redefined - previous CodePagingOverride values lost\n");
+			if(iPagingOverrideParsed)
+				Print(EWarning, "CodePagingOverride defined - previous PagingOverride values lost\n");
+			iCodePagingOverrideParsed = true;
+			TInt policy = ParsePagingPolicy(iReader.Word(1));
+			if(policy<0) {
+				Print(EError,"Unrecognised option for CODEPAGINGOVERRIDE keyword\n");
+				success = false;
 			}
-		else
-			gCodePagingOverride = policy;
+			else
+				gCodePagingOverride = policy;
 		}
 		break;
-	case EKeywordDataPagingOverride:
+	case EKeywordDataPagingOverride: 
 		{
-		if(iDataPagingOverrideParsed)
-			Print(EWarning, "DataPagingOverride redefined - previous DataPagingOverride values lost\n");
-		if(iPagingOverrideParsed)
-			Print(EWarning, "DataPagingOverride defined - previous PagingOverride values lost\n");
-		iDataPagingOverrideParsed = true;
-		TInt policy = ParsePagingPolicy(iReader.Word(1));
-		if(policy<0)
-			{
-			Print(EError,"Unrecognised option for DATAPAGINGOVERRIDE keyword\n");
-			success = false;
+			if(iDataPagingOverrideParsed)
+				Print(EWarning, "DataPagingOverride redefined - previous DataPagingOverride values lost\n");
+			if(iPagingOverrideParsed)
+				Print(EWarning, "DataPagingOverride defined - previous PagingOverride values lost\n");
+			iDataPagingOverrideParsed = true;
+			TInt policy = ParsePagingPolicy(iReader.Word(1));
+			if(policy<0) {
+				Print(EError,"Unrecognised option for DATAPAGINGOVERRIDE keyword\n");
+				success = false;
 			}
-		else
-			gDataPagingOverride = policy;
+			else
+				gDataPagingOverride = policy;
 		}
 		break;
-	case EKeywordDemandPagingConfig:
+	case EKeywordDemandPagingConfig: 
 		{
-		memset(&gDemandPagingConfig,0,sizeof(gDemandPagingConfig));
-		val >> gDemandPagingConfig.iMinPages;
-		if(strlen(iReader.Word(2)))
-			{
-			#ifdef __TOOLS2__
-			istringstream val(iReader.Word(2));
-			#else
-			istrstream val(iReader.Word(2),strlen(iReader.Word(2)));
-		    #endif
-			val >> gDemandPagingConfig.iMaxPages;
-			if(strlen(iReader.Word(3)))
-				{
-				#ifdef __TOOLS2__
-				istringstream val(iReader.Word(3));
-				#else
-				istrstream val(iReader.Word(3),strlen(iReader.Word(3)));
-				#endif
-				val >> gDemandPagingConfig.iYoungOldRatio;
-				for(int i=0; i<=2; i++)
-					{
-					if(!strlen(iReader.Word(4+i)))
-						break;
-					#ifdef __TOOLS2__
-					istringstream val(iReader.Word(4+i));
-					#else
-					istrstream val(iReader.Word(4+i),strlen(iReader.Word(4+i)));
-					#endif
-					val >> gDemandPagingConfig.iSpare[i];
+			memset(&gDemandPagingConfig,0,sizeof(gDemandPagingConfig));
+			Val(gDemandPagingConfig.iMinPages,iReader.Word(1));
+			const char* tmp = iReader.Word(2);
+			if(*tmp) {
+				Val(gDemandPagingConfig.iMaxPages,tmp);
+				tmp = iReader.Word(3);
+				if(*tmp){
+					Val(gDemandPagingConfig.iYoungOldRatio,tmp);
+					for(int i = 1 ; i <= 2 ; i++){
+						tmp = iReader.Word(4 + i);
+						if(0 == *tmp) break ;
+							Val(gDemandPagingConfig.iSpare[i],tmp);
 					}
 				}
-			}
-		if(gDemandPagingConfig.iMaxPages && gDemandPagingConfig.iMaxPages<gDemandPagingConfig.iMinPages)
-			{
-			Print(EError,"DemandPagingConfig maxPages must be >= minPages\n");
-			success = EFalse;
-			break;
+			} 
+			if(gDemandPagingConfig.iMaxPages && gDemandPagingConfig.iMaxPages<gDemandPagingConfig.iMinPages) {
+				Print(EError,"DemandPagingConfig maxPages must be >= minPages\n");
+				success = EFalse;
+				break;
 			}
 		}
 		break;
@@ -1901,63 +1741,39 @@ TBool CObeyFile::ProcessKeyword(enum EKeyword aKeyword)
 		break;
 
 	case EKeywordTrace:
-		val >> TraceMask;
+		Val(TraceMask,iReader.Word(1));
 		break;
 
-	case EKeywordKernelTrace:
-		{
-		TInt i;
-		val >> iTraceMask[0];
-		i=1;
-		while(strlen(iReader.Word(i+1)) && i<KNumTraceMaskWords)
-			{
-			#ifdef __TOOLS2__
-			istringstream val(iReader.Word(i+1));
-			#else
-			istrstream val(iReader.Word(i+1),strlen(iReader.Word(i+1)));
-			#endif
-			#if defined(__MSVCDOTNET__) || defined (__TOOLS2__)
- 				val >> setbase(0);
-			#endif
-			val >> iTraceMask[i];
-			++i;
-			}
-		}
+	case EKeywordKernelTrace: 	
+		iTraceMask[0] = 0;
+		for(int i = 0 ; i < KNumTraceMaskWords ; i++) {
+			const char* tmp = iReader.Word(i+1);
+			if(0 == *tmp) break ;
+			Val(iTraceMask[i],tmp);
+		}	 
 		break;
 
-	case EKeywordBTrace:
-		{
-		TUint i; 
-		val >> iInitialBTraceFilter[0];
-		i=1;
-		while(strlen(iReader.Word(i+1)) && i<sizeof(iInitialBTraceFilter)/sizeof(TUint32))
-			{
-			#ifdef __TOOLS2__
-			istringstream val(iReader.Word(i+1));
-			#else
-			istrstream val(iReader.Word(i+1),strlen(iReader.Word(i+1)));
-			#endif
-			#if defined(__MSVCDOTNET__) || defined (__TOOLS2__)
- 				val >> setbase(0);
-			#endif
-			val >> iInitialBTraceFilter[i];
-			++i;
-			}
+	case EKeywordBTrace: 
+		iInitialBTraceFilter[0] = 0 ;
+		for(TUint i = 0 ; i < sizeof(iInitialBTraceFilter) / sizeof(iInitialBTraceFilter[0]); i++) {
+			const char* tmp = iReader.Word(i+1);
+			if(0 == *tmp) break ;
+			Val(iInitialBTraceFilter[i],tmp);
 		}
 		break;
 
 	case EKeywordBTraceMode:
-		val >> iInitialBTraceMode;
+		Val(iInitialBTraceMode,iReader.Word(1));
 		break;
 
 	case EKeywordBTraceBuffer:
-		val >> iInitialBTraceBuffer;
+		Val(iInitialBTraceBuffer,iReader.Word(1));
 		break;
 
 	case EKeywordDebugPort:
 		if (iDebugPortParsed)
 			Print(EWarning, "DEBUGPORT redefined - previous value lost\n");
-		val >> iDebugPort;
+		Val(iDebugPort,iReader.Word(1));
 		iDebugPortParsed = ETrue;
 		break;
 
@@ -1966,31 +1782,19 @@ TBool CObeyFile::ProcessKeyword(enum EKeyword aKeyword)
 		break;
 
 	case EKeywordCollapse:
-		if (strnicmp(iReader.Word(1), "arm", 3)!=0 || strnicmp(iReader.Word(2), "gcc", 3)!=0)
-			{
+		if (strnicmp(iReader.Word(1), "arm", 3)!=0 || strnicmp(iReader.Word(2), "gcc", 3)!=0) {
 			Print(EWarning, "COLLAPSE only supported for ARM and GCC - keyword ignored\n");
-			}
-		else
-			{
-			TInt cm;
-			#ifdef __TOOLS2__
-			istringstream cmval(iReader.Word(3));
-			#else
-			istrstream cmval(iReader.Word(3),strlen(iReader.Word(3)));
-			#endif
+		}
+		else {
 
-#if defined(__MSVCDOTNET__) || defined(__TOOLS2__)
-			cmval >> setbase(0);
-#endif //__MSVCDOTNET__
-
-			cmval>>cm;
-			if (cm<0 || cm>ECollapseAllChainBranches)
-				{
+			TUint32 cm = 0;
+			Val(cm,iReader.Word(3)); 
+			if ((cm & 0x80000000L) != 0 || cm > ECollapseAllChainBranches) {
 				Print(EWarning, "COLLAPSE mode unrecognised - keyword ignored\n");
-				}
+			}
 			else
 				iCollapseMode=cm;
-			}
+		}
 		break;
 
 	case EKeywordPrimary:
@@ -1998,18 +1802,16 @@ TBool CObeyFile::ProcessKeyword(enum EKeyword aKeyword)
 		break;
 	case EKeywordVariant:
 		hardwareVariant=ParseVariant();
-		if (THardwareVariant(hardwareVariant).IsVariant())
-			{
+		if (THardwareVariant(hardwareVariant).IsVariant()) {
 			iNumberOfVariants++;
 			TUint layer=THardwareVariant(hardwareVariant).Layer();
 			TUint vmask=THardwareVariant(hardwareVariant).VMask();
 			iAllVariantsMask[layer] |= vmask;
-			}
-		else
-			{
+		}
+		else {
 			Print(EError,"Variant DLLs must belong to variant layer - line %d\n", iReader.CurrentLine());
 			break;
-			}
+		}
 
 		break;
 	case EKeywordExtension:
@@ -2031,378 +1833,327 @@ TBool CObeyFile::ProcessKeyword(enum EKeyword aKeyword)
 	case EKeywordExecutableCompressionMethodNone:
 		gCompressionMethod = 0;
 		break;
-		
+
 	case EKeywordExecutableCompressionMethodInflate:
 		gCompressionMethod = KUidCompressionDeflate;
 		break;
-		
+
 	case EKeywordExecutableCompressionMethodBytePair:
 		gCompressionMethod = KUidCompressionBytePair;
 		break;
-		
-	case EKeywordKernelConfig:
+
+	case EKeywordKernelConfig: 
 		{
-		TInt bit, setTo;
-		val >> bit;
-		if(bit<0 || bit>31)
-			{
-			Print(EError,"KernelConfig bit must be between 0 and 31\n");
-			success = EFalse;
-			break;
+			TUint32 bit = (TUint32)-1 ;
+			Val(bit,iReader.Word(1)) ; 
+			TInt setTo = 0;
+			 
+			if(bit > 31) {
+				Print(EError,"KernelConfig bit must be between 0 and 31\n");
+				success = EFalse;
+				break;
 			}
-		if(ParseBoolArg(setTo,iReader.Word(2))!=KErrNone)
-			{
-			success = EFalse;
-			break;
+			if(ParseBoolArg(setTo,iReader.Word(2))!=KErrNone) {
+				success = EFalse;
+				break;
 			}
-		if(setTo)
-			iKernelConfigFlags |= 1<<bit;
-		else
-			iKernelConfigFlags &= ~(1<<bit);
-		break;
+			if(setTo)
+				iKernelConfigFlags |= 1<<bit;
+			else
+				iKernelConfigFlags &= ~(1<<bit);
+			break;
 		}
-		
-	case EKeywordMaxUnpagedMemSize:
-		{
-		TInt unpagedSize = -1;
-		val >> unpagedSize;
-			
-		if (!val || unpagedSize < 0)
-			{
+
+	case EKeywordMaxUnpagedMemSize: 
+	{	
+		TUint32 unpagedSize = (TUint32)-1;
+		Val(unpagedSize,iReader.Word(1)); 
+		if (unpagedSize > 0x7FFFFFFF) {
 			Print(EWarning, "Invalid value of MaxUnpagedSize (0 to 0x7FFFFFFF) - value ignored\n");
 			break;
-			}
-			
-		iMaxUnpagedMemSize = unpagedSize;
-		
-		if(iUpdatedMaxUnpagedMemSize)
-			{
-			Print(EWarning, "MaxUnpagedSize redefined - previous values lost\n");
-			}
-		else
-			{
-			iUpdatedMaxUnpagedMemSize = ETrue;
-			}
-		
-		break;
 		}
+
+		iMaxUnpagedMemSize = unpagedSize;
+
+		if(iUpdatedMaxUnpagedMemSize) {
+			Print(EWarning, "MaxUnpagedSize redefined - previous values lost\n");
+		}
+		else {
+			iUpdatedMaxUnpagedMemSize = ETrue;
+		}
+
+		break;
+	}
 
 	default:
 		// unexpected keyword iReader.Word(0)
 		break;
-		}
-
-	return success;
 	}
 
-TBool CObeyFile::GotKeyVariables()
+	return success;
+}
+
 //
 // Checks that the obeyfile has supplied enough variables to continue
-//
-   	{
+// 
+TBool CObeyFile::GotKeyVariables() {
 
 	TBool retVal=ETrue;
 
 	// Mandatory keywords
 
-	if (iRomFileName==0)
-		{
+	if (iRomFileName==0) {
 		Print(EAlways,"The name of the ROM has not been supplied.\n");
 		Print(EAlways,"Use the keyword \"romname\".\n");
 		retVal = EFalse;
-		}
-	if (iBootFileName==0)
-		{
+	}
+	if (iBootFileName==0) {
 		Print(EAlways,"The name of the bootstrap binary has not been supplied.\n");
 		Print(EAlways,"Use the keyword \"bootbinary\".\n");
 		retVal = EFalse;
-		}
-	if (iRomLinearBase==0xFFFFFFFF)
-		{
+	}
+	if (iRomLinearBase==0xFFFFFFFF) {
 		Print(EAlways,"The base linear address of the ROM has not been supplied.\n");
 		Print(EAlways,"Use the keyword \"romlinearbase\".\n");
 		retVal = EFalse;
-		}
-	if (iRomSize==0)
-		{
+	}
+	if (iRomSize==0) {
 		Print(EAlways,"The size of the ROM has not been supplied.\n");
 		Print(EAlways,"Use the keyword \"romsize\".\n");
 		retVal = EFalse;
-		}
-	if (iKernDataRunAddress==0)
-		{
+	}
+	if (iKernDataRunAddress==0) {
 		Print(EAlways,"The address for the kernel's data section has not been supplied.\n");
 		Print(EAlways,"Use the keyword \"kerneldataaddress\".\n");
 		retVal = EFalse;
-		}
+	}
 
 	// Validation
-	if (iNumberOfPrimaries>1 && iKernelModel==ESingleKernel)
-		{
+	if (iNumberOfPrimaries>1 && iKernelModel==ESingleKernel) {
 		Print(EError,"More than one primary in single-kernel ROM\n");
 		retVal = EFalse;
-		}
-	if (iNumberOfPrimaries==0)
-		{
+	}
+	if (iNumberOfPrimaries==0) {
 		Print(EError,"No primary file specified\n");
 		retVal = EFalse;
-		}
-	if (iNumberOfVariants==0)
-		{
+	}
+	if (iNumberOfVariants==0) {
 		Print(EError,"No variants specified\n");
 		retVal = EFalse;
-		}
-	if(iNumberOfHCRDataFiles > 1)
-		{
+	}
+	if(iNumberOfHCRDataFiles > 1) {
 		Print(EError,"More than one hcr data files in ROM.\n");
 		retVal = EFalse ;
-		}
+	}
 	// Warn about enabling data paging on OS versions where's it's not officially supported
 #ifndef SYMBIAN_WRITABLE_DATA_PAGING
 	if (iMemModel == E_MM_Flexible &&
-		(iKernelConfigFlags & EKernelConfigDataPagingPolicyMask) != EKernelConfigDataPagingPolicyNoPaging)
-		{
+		(iKernelConfigFlags & EKernelConfigDataPagingPolicyMask) != EKernelConfigDataPagingPolicyNoPaging) {
 		Print(EWarning, "Writable data paging is not warranted on this version of Symbian OS.");
-		}
+	}
 #endif
-	
+
 	// Apply defaults as necessary
 	TheRomLinearAddress=iRomLinearBase;
 
-	if (iDataRunAddress==0)
-		{
+	if (iDataRunAddress==0) {
 		iDataRunAddress=0x400000;
 		Print(EWarning,"The address for a running ROM app's data section (keyword \"dataaddress\") has not been supplied.\n");
 		Print(EWarning,"Will use the default value of 0x%0x.\n", iDataRunAddress);
 		retVal = EFalse;
-		}
-	if (iRomAlign==0)
-		{
+	}
+	if (iRomAlign==0) {
 		iRomAlign=0x1000;
 		Print(EWarning,"The ROM section alignment (keyword \"romalign\") has not been supplied.\n");
 		Print(EWarning,"Will use the default value of 0x%0x.\n", iRomAlign);
-		}
-	if (iRomAlign&0x3)
-		{
+	}
+	if (iRomAlign&0x3) {
 		Print(EWarning, "Rounding rom alignment to multiple of 4.\n");
 		iRomAlign=(iRomAlign+0x3)&0xfffffffc;
-		}
-	if (iKernHeapMin==0)
-	 	{
-	 	iKernHeapMin=0x10000;
+	}
+	if (iKernHeapMin==0) {
+		iKernHeapMin=0x10000;
 		Print(EWarning,"The kernel heap min size (keyword \"kernelheapmin\") has not been supplied.\n");
 		Print(EWarning,"Will use the default value of 0x%0x.\n", iKernHeapMin);
-		}
-	if (iKernHeapMax==0)
-	 	{
-	 	iKernHeapMax=0x100000;
+	}
+	if (iKernHeapMax==0) {
+		iKernHeapMax=0x100000;
 		Print(EWarning,"The kernel heap max size (keyword \"kernelheapmax\") has not been supplied.\n");
 		Print(EWarning,"Will use the default value of 0x%0x.\n", iKernHeapMax);
-		}
+	}
 
-	if (iTime==0)
-		{
+	if (iTime==0) {
 		Print(ELog, "No timestamp specified. Using current time...\n");
 		ObeyFileReader::TimeNow(iTime);
-		}
+	}
 
 	Print(ELog, "\nCreating Rom image %s\n", iRomFileName);
 	Print(ELog, "MemModel: %1d\nChunkSize: %08x\nPageSize: %08x\n", iMemModel, iChunkSize, iPageSize);
 	return retVal;
-	}
+}
 
 
-TText *CObeyFile::IsValidFilePath(TText *aPath)
 //
 // Check the path is valid
-//
-	{
+// 
+const char* CObeyFile::IsValidFilePath(const char* aPath) {
 	// skip leading "\"
-	if (*aPath=='\\')
+	if (*aPath == '/' || *aPath == '\\')
 		aPath++;
-	if (*aPath==0)
+	if (*aPath == 0)
 		return NULL; // file ends in a backslash
 
-	TText *p=aPath;
+	const char *p = aPath;
 	TInt len=0;
-	FOREVER
-		{
-		if (*p==0)
-			return (len ? aPath : NULL);
-		if (*p=='\\')
-			{
-			if (len==0)
+	while(*p) {			
+		if (*p == '/' || *p == '\\') {
+			if (len == 0)
 				return NULL;
 			len=0;
-			}
+		}
 		len++;
 		p++;
-		}
 	}
+	return (len ? aPath : NULL);
+}
 
-TBool CObeyFile::GetNextBitOfFileName(TText **epocEndPtr)
 //
 // Move the end pointer past the next directory separator, replacing it with 0
 //
-	{
-	while (**epocEndPtr != '\\') // until reach the directory separator
-		{
-		if (**epocEndPtr==0) // if reach end of string, return TRUE, it's the filename
+TBool CObeyFile::GetNextBitOfFileName(char*& epocEndPtr) {
+	while (*epocEndPtr != '/' && *epocEndPtr != '\\'){ // until reach the directory separator		
+		if (*epocEndPtr == 0) // if reach end of string, return TRUE, it's the filename
 			return ETrue;
-		(*epocEndPtr)++;
-		}
-	**epocEndPtr=0; // overwrite the directory separator with a 0
-	(*epocEndPtr)++; // point past the 0 ready for the next one
-	return EFalse;
+		epocEndPtr++;
 	}
+	*epocEndPtr = 0; // overwrite the directory separator with a 0
+	epocEndPtr++; // point past the 0 ready for the next one
+	return EFalse;
+}
 
 
-TBool CObeyFile::CheckHardwareVariants()
-	{
+TBool CObeyFile::CheckHardwareVariants() {
 	iPrimaries=new TRomBuilderEntry*[iNumberOfPrimaries];
 	iVariants=new TRomBuilderEntry*[iNumberOfVariants];
 	THardwareVariant* primaryHwVariants=new THardwareVariant[iNumberOfPrimaries];
 	TInt nVar=0;
 	TRomBuilderEntry* current=FirstFile();
 	THardwareVariant* variantHwVariants=new THardwareVariant[iNumberOfVariants];
-	while(current)
-		{
-		if (current->Variant())
-			{
+	while(current) {
+		if (current->Variant()) {
 			TInt i;
-			for(i=0; i<nVar; i++)
-				{
-				if (!current->iHardwareVariant.MutuallyExclusive(variantHwVariants[i]))
-					{
+			for(i=0; i<nVar; i++) {
+				if (!current->iHardwareVariant.MutuallyExclusive(variantHwVariants[i])) {
 					delete[] variantHwVariants;
 					delete[] primaryHwVariants;
 					Print(EError,"Variants not mutually exclusive\n");
 					return EFalse;
-					}
 				}
+			}
 			iVariants[nVar]=current;
 			variantHwVariants[nVar++]=current->iHardwareVariant;
-			}
-		current=NextFile();
 		}
+		current=NextFile();
+	}
 	delete[] variantHwVariants;
 	nVar=0;
 	current=FirstFile();
-	while(current)
-		{
+	while(current) {
 		TInt i;
-		for (i=0; i<iNumberOfVariants; i++)
-			{
+		for (i=0; i<iNumberOfVariants; i++) {
 			if (iVariants[i]->iHardwareVariant<=current->iHardwareVariant)
 				break;
-			}
-		if (i==iNumberOfVariants)
-			{
+		}
+		if (i==iNumberOfVariants) {
 			Print(EError,"File %s[%08x] does not correspond to any variant\n",
-									current->iName,TUint(current->iHardwareVariant));
+				current->iName,TUint(current->iHardwareVariant));
 			delete[] primaryHwVariants;
 			return EFalse;
-			}
-		if (current->Primary())
-			{
-			for(i=0; i<nVar; i++)
-				{
-				if (!current->iHardwareVariant.MutuallyExclusive(primaryHwVariants[i]))
-					{
+		}
+		if (current->Primary()) {
+			for(i=0; i<nVar; i++) {
+				if (!current->iHardwareVariant.MutuallyExclusive(primaryHwVariants[i])) {
 					delete[] primaryHwVariants;
 					Print(EError,"Primaries not mutually exclusive\n");
 					return EFalse;
-					}
 				}
+			}
 			iPrimaries[nVar]=current;
 			primaryHwVariants[nVar++]=current->iHardwareVariant;
-			}
-		current=NextFile();
 		}
+		current=NextFile();
+	}
 	delete[] primaryHwVariants;
-	if (iNumberOfExtensions)
-		{
+	if (iNumberOfExtensions) {
 		nVar=0;
 		iExtensions=new TRomBuilderEntry*[iNumberOfExtensions];
 		TRomBuilderEntry* current=FirstFile();
-		while(current)
-			{
-			if (current->Extension())
-				{
-				if (current->iHardwareVariant.IsVariant())
-					{
+		while(current) {
+			if (current->Extension()) {
+				if (current->iHardwareVariant.IsVariant()) {
 					TUint layer=current->iHardwareVariant.Layer();
 					TUint vmask=current->iHardwareVariant.VMask();
-					if ((iAllVariantsMask[layer]&vmask)==0)
-						{
+					if ((iAllVariantsMask[layer]&vmask)==0) {
 						Print(EError,"Variant-layer extension %s has no corresponding variant DLL\n",current->iName);
 						return EFalse;
-						}
 					}
-				iExtensions[nVar++]=current;
 				}
-			current=NextFile();
+				iExtensions[nVar++]=current;
 			}
+			current=NextFile();
 		}
-	if (iNumberOfDevices)
-		{
+	}
+	if (iNumberOfDevices) {
 		nVar=0;
 		iDevices=new TRomBuilderEntry*[iNumberOfDevices];
 		TRomBuilderEntry* current=FirstFile();
-		while(current)
-			{
-			if (current->Device())
-				{
-				if (current->iHardwareVariant.IsVariant())
-					{
+		while(current) {
+			if (current->Device()) {
+				if (current->iHardwareVariant.IsVariant()) {
 					TUint layer=current->iHardwareVariant.Layer();
 					TUint vmask=current->iHardwareVariant.VMask();
-					if ((iAllVariantsMask[layer]&vmask)==0)
-						{
+					if ((iAllVariantsMask[layer]&vmask)==0) {
 						Print(EError,"Variant-layer device %s has no corresponding variant DLL\n",current->iName);
 						return EFalse;
-						}
 					}
-				iDevices[nVar++]=current;
 				}
-			current=NextFile();
+				iDevices[nVar++]=current;
 			}
+			current=NextFile();
 		}
+	}
 	NumberOfVariants=iNumberOfVariants;
 	return ETrue;
-	}
+}
 
 
-TInt CObeyFile::ProcessExtensionRom(MRomImage*& aKernelRom)
-	{
+TInt CObeyFile::ProcessExtensionRom(MRomImage*& aKernelRom) {
 	//
 	// First pass through the obey file to set up key variables
 	//
-
 	iReader.Rewind();
 
 	enum EKeyword keyword;
 
 	// Deal with the "extensionrom" keyword, which should be first
-	
-	if (iReader.NextLine(1,keyword) != KErrNone)
-		return KErrEof;
-	if (keyword != EKeywordExtensionRom)
-		return Print(EError, "Unexpected keyword '%s' at start of extension rom - line %d\n",
-			iReader.Word(0), iReader.CurrentLine());
-	
-	iReader.CopyWord(1, iRomFileName);
+	// however, you may've found "time" before it.
+	while(iReader.NextLine(1,keyword) != KErrEof) {
+		if(EKeywordExtensionRom == keyword)
+			break ;		
+	}
+	if(EKeywordExtensionRom != keyword) return KErrEof;
+
+	iRomFileName = iReader.DupWord(1);
 	Print(ELog, "\n========================================================\n");
 	Print(ELog, "Extension ROM %s starting at line %d\n\n", iRomFileName, iReader.CurrentLine());
 
 	iReader.MarkNext();		// so that we rewind to the line after the extensionrom keyword
 
-	while (iReader.NextLine(1,keyword) != KErrEof)
-		{
+	while (iReader.NextLine(1,keyword) != KErrEof) {
 		if (keyword == EKeywordExtensionRom)
 			break;
 		ProcessExtensionKeyword(keyword);
-		}
+	}
 
 	if (!GotExtensionVariables(aKernelRom))
 		return KErrGeneral;
@@ -2423,13 +2174,11 @@ TInt CObeyFile::ProcessExtensionRom(MRomImage*& aKernelRom)
 
 
 	TInt align=0;
-	while (iReader.NextLine(2,keyword)!=KErrEof)
-		{
+	while (iReader.NextLine(2,keyword)!=KErrEof) {
 		if (keyword == EKeywordExtensionRom)
 			break;
 
-		switch (keyword)
-			{
+		switch (keyword) {
 		case EKeywordSection:
 		case EKeywordArea:
 		case EKeywordPrimary:
@@ -2453,23 +2202,22 @@ TInt CObeyFile::ProcessExtensionRom(MRomImage*& aKernelRom)
 			if (!ProcessRenaming(keyword))
 				return KErrGeneral;
 			break;
-		case EKeywordPatchDllData:
-		{
-			// Collect patchdata statements to process at the end
-			StringVector patchDataTokens;
-			SplitPatchDataStatement(patchDataTokens); 
-			iPatchData->AddPatchDataStatement(patchDataTokens);										
-			break;
-		}
+		case EKeywordPatchDllData: {
+				// Collect patchdata statements to process at the end
+				StringVector patchDataTokens;
+				SplitPatchDataStatement(patchDataTokens); 
+				iPatchData->AddPatchDataStatement(patchDataTokens);										
+				break;
+			}
 
 		default:
 			if (!ProcessFile(align, keyword))
-				return KErrGeneral;
+					return KErrGeneral;			
 			align=0;
 			break;
-			}
 		}
-
+	}
+	
 	if( !ParsePatchDllData())
 		return KErrGeneral;
 
@@ -2477,103 +2225,78 @@ TInt CObeyFile::ProcessExtensionRom(MRomImage*& aKernelRom)
 
 	if (iMissingFiles!=0)
 		return KErrGeneral;
-	if (iNumberOfDataFiles+iNumberOfPeFiles==0)
-		{
+	if (iNumberOfDataFiles+iNumberOfPeFiles==0) {
 		Print(EError, "No files specified.\n");
 		return KErrGeneral;
-		}
-	return KErrNone;
 	}
+	return KErrNone;
+}
 
-void CObeyFile::ProcessExtensionKeyword(enum EKeyword aKeyword)
-	{
-	#ifdef __TOOLS2__
-	istringstream val(iReader.Word(1));
-	#else
-	istrstream val(iReader.Word(1),strlen(iReader.Word(1)));
-	#endif
+void CObeyFile::ProcessExtensionKeyword(enum EKeyword aKeyword) {
 	
-
-#if defined(__MSVCDOTNET__) || defined(__TOOLS2__)
-	val >> setbase(0);
-#endif //__MSVCDOTNET__
-
-	switch (aKeyword)
-		{
+	switch (aKeyword) {
 	case EKeywordKernelRomName:
-		iReader.CopyWord(1, iKernelRomName);
+		iKernelRomName = iReader.DupWord(1);
 		return;
 	case EKeywordRomNameOdd:
-		iReader.CopyWord(1, iRomOddFileName);
+		iRomOddFileName = iReader.DupWord(1);
 		return;
 	case EKeywordRomNameEven:
-		iReader.CopyWord(1, iRomEvenFileName);
+		iRomEvenFileName = iReader.DupWord(1);
 		return;
 	case EKeywordSRecordFileName:
-		iReader.CopyWord(1, iSRecordFileName);
+		iSRecordFileName = iReader.DupWord(1);
 		return;
 
 	case EKeywordRomLinearBase:
-		val >> iRomLinearBase;
+		Val(iRomLinearBase,iReader.Word(1));
 		return;
 	case EKeywordRomSize:
-		val >> iRomSize;
+		Val(iRomSize,iReader.Word(1));
 		return;
 	case EKeywordRomAlign:
-		val >> iRomAlign;
+		Val(iRomAlign,iReader.Word(1));
 		return;
-
 	case EKeywordDataAddress:
-		val >> iDataRunAddress;
+		Val(iDataRunAddress ,iReader.Word(1));
 		return;
 	case EKeywordDefaultStackReserve:
-		val >> iDefaultStackReserve;
+		Val(iDefaultStackReserve,iReader.Word(1));
 		return;
 	case EKeywordVersion:
-		val >> iVersion;
+		{
+			istringstream val(iReader.Word(1));
+			val >> iVersion;
+		}
 		return;
 	case EKeywordSRecordBase:
-		val >> iSRecordBase;
+		Val(iSRecordBase,iReader.Word(1));
 		return;
 	case EKeywordRomChecksum:
-		val >> iCheckSum;
+		Val(iCheckSum,iReader.Word(1)); 
 		return;
 	case EKeywordTime:
 		iReader.ProcessTime(iTime);
 		return;
 
 	case EKeywordTrace:
-		val >> TraceMask;
+		Val(TraceMask,iReader.Word(1));
 		return;
 
 	case EKeywordCollapse:
-		if (strnicmp(iReader.Word(1), "arm", 3)!=0 || strnicmp(iReader.Word(2), "gcc", 3)!=0)
-			{
+		if (strnicmp(iReader.Word(1), "arm", 3)!=0 || strnicmp(iReader.Word(2), "gcc", 3)!=0) {
 			Print(EWarning, "COLLAPSE only supported for ARM and GCC - keyword ignored\n");
-			}
-		else
-			{
-			TInt cm;
-			#ifdef __TOOLS2__
-			istringstream cmval(iReader.Word(3));
-			#else
-			istrstream cmval(iReader.Word(3),strlen(iReader.Word(3)));
-			#endif
-
-#if defined(__MSVCDOTNET__) || defined(__TOOLS2__)
-			cmval >> setbase(0);
-#endif //__MSVCDOTNET__
-
-			cmval>>cm;
-			if (cm<0 || cm>ECollapseAllChainBranches)
-				{
+		}
+		else {
+			TUint32 cm = 0;
+			Val(cm,iReader.Word(3)); 
+			if ( cm > ECollapseAllChainBranches) {
 				Print(EWarning, "COLLAPSE mode unrecognised - keyword ignored\n");
-				}
-			else
-				{
-				Print(EWarning, "COLLAPSE not currently supported for extension roms\n");
-				}
 			}
+			else {
+				Print(EWarning, "COLLAPSE not currently supported for extension roms\n");
+			}
+		}
 		return;
 
 	case EKeywordCoreImage:
@@ -2583,113 +2306,101 @@ void CObeyFile::ProcessExtensionKeyword(enum EKeyword aKeyword)
 	default:
 		Print(EError,"Keyword '%s' not valid in extension ROMs - line %d\n", iReader.Word(0), iReader.CurrentLine());
 		break;
-		}
-	return;
 	}
+	return;
+}
 
-TBool CObeyFile::GotExtensionVariables(MRomImage*& aRom)
 //
 // Checks that the obeyfile has supplied enough variables to continue
-//
-   	{
+// 
+TBool CObeyFile::GotExtensionVariables(MRomImage*& aRom){
 
 	TBool retVal=ETrue;
-	TText* kernelRomName = iKernelRomName;
+	const char* kernelRomName = iKernelRomName ;
 
 	// Mandatory keywords
 
-	if (iRomSize==0)
-		{
+	if (iRomSize==0) {
 		Print(EAlways,"The size of the extension ROM has not been supplied.\n");
 		Print(EAlways,"Use the keyword \"romsize\".\n");
 		retVal = EFalse;
-		}
+	}
 
 	// keywords we need if we don't already have a ROM image to work from
 
-	if (aRom==0)
-		{
-		if (iKernelRomName==0)
-			{
+	if (aRom==0) {
+		if (iKernelRomName==0) {
 			Print(EAlways,"The name of the kernel ROM has not been supplied.\n");
 			Print(EAlways,"Use the keyword \"kernelromname\".\n");
 			retVal = EFalse;
-			}
-		if (iRomLinearBase==0xFFFFFFFF)
-			{
+		}
+		if (iRomLinearBase==0xFFFFFFFF) {
 			Print(EAlways,"The base linear address of the ROM has not been supplied.\n");
 			Print(EAlways,"Use the keyword \"romlinearbase\".\n");
 			retVal = EFalse;
-			}
 		}
-	else
-		{
-		if (iKernelRomName != 0)
-			{
+	}
+	else {
+		if (iKernelRomName != 0) {
 			Print(EWarning,"Keyword \"kernelromname\") ignored.\n");
-			}
-		kernelRomName = aRom->RomFileName();
 		}
+		kernelRomName = aRom->RomFileName();
+	}
 
 	// validation
 
 	// Apply defaults as necessary
 
-	if (iRomLinearBase==0xFFFFFFFF && aRom!=0)
-		{
+	if (iRomLinearBase==0xFFFFFFFF && aRom!=0) {
 		iRomLinearBase = aRom->RomBase() + aRom->RomSize();
 		Print(ELog,"Assuming extension ROM is contiguous with kernel ROM\n");
 		Print(ELog,"Setting romlinearbase to 0x%08x\n", iRomLinearBase);
-		}
+	}
 	TheRomLinearAddress=iRomLinearBase;
 
-	if (iDataRunAddress==0)
-		{
+	if (iDataRunAddress==0) {
 		iDataRunAddress= aRom->DataRunAddress();
 		Print(EWarning,"The address for a running ROM app's data section (keyword \"dataaddress\") has not been supplied.\n");
 		Print(EWarning,"Will use the default value of 0x%0x.\n", iDataRunAddress);
-		}
-	if (iRomAlign==0)
-		{
+	}
+	if (iRomAlign==0) {
 		iRomAlign = aRom->RomAlign();
 		Print(EWarning,"The ROM section alignment (keyword \"romalign\") has not been supplied.\n");
 		Print(EWarning,"Will use the default value of 0x%0x.\n", iRomAlign);
-		}
-	if (iRomAlign&0x3)
-		{
+	}
+	if (iRomAlign&0x3) {
 		Print(EWarning, "Rounding rom alignment to multiple of 4.\n");
 		iRomAlign=(iRomAlign+0x3)&0xfffffffc;
-		}
-	if (iTime==0)
-		{
+	}
+	if (iTime==0) {
 		Print(ELog, "No timestamp specified. Using current time...\n");
 		ObeyFileReader::TimeNow(iTime);
-		}
+	}
 
 	// fix up "*" in romname
-	TText newname[256];
-	TText* p=newname;
-	TText* q=iRomFileName;
-	TText c;
+	char newname[256];
+	char* p=newname;
+	char* q=iRomFileName;
+	char c;
 
-	while ((c=*q++)!='\0')
-		{
-		if (c!='*')
-			{
+	while ((c=*q++)!='\0') {
+		if (c!='*') {
 			*p++=c;
 			continue;
-			}
-		TText *r=kernelRomName;
+		}
+		const char *r = kernelRomName ? kernelRomName : "";
 		while ((c=*r++)!='\0')
 			*p++=c;
-		}
-	*p = '\0';
-	free(iRomFileName);
-	iRomFileName = (TText*)strdup((char*)newname);
+	}
+	*p++ = '\0';
+	delete []iRomFileName;
+	size_t len = p - newname ;
+	iRomFileName = new char[len];
+	memcpy(iRomFileName,newname,len);
 
 	Print(ELog, "\nCreating Rom image %s\n", iRomFileName);
 	return retVal;
-	}
+}
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -2697,61 +2408,56 @@ TBool CObeyFile::GotExtensionVariables(MRomImage*& aRom)
 ////////////////////////////////////////////////////////////////////////
 
 /**
- Process an area declaration.
- */
+Process an area declaration.
+*/
 
-TBool CObeyFile::ParseAreaKeyword()
-	{
-	const char* name = iReader.Word(1);
-	TLinAddr start;
-	TUint length;
-	if(Val(start, iReader.Word(2)) != KErrNone || Val(length, iReader.Word(3)) != KErrNone)
-		{
+TBool CObeyFile::ParseAreaKeyword() {
+		 
+	if(!IsValidNumber(iReader.Word(2)) || !IsValidNumber(iReader.Word(3))) {
 		Print(EError, "Line %d: Wrong area specification: Should be <name> <start address> <length>\n",
-			  iReader.CurrentLine());
+			iReader.CurrentLine());
 		return EFalse;
-		}
-
+	}
+	const char* name = iReader.Word(1);
+	TLinAddr start = 0;
+	Val(start,iReader.Word(2)); 
+	TUint length = 0;
+	Val(length,iReader.Word(3));
 	if (! AddAreaAndHandleError(name, start, length, iReader.CurrentLine()))
 		return EFalse;
 
 	return ETrue;
-	}
+}
 
 
 /**
- Process an "area=xxx" file attribute.
- */
+Process an "area=xxx" file attribute.
+*/
 
-TBool CObeyFile::ParseAreaAttribute(const TText* aArg, TInt aLineNumber, const Area*& aArea)
-	{
-	if (iSectionPosition != -1)
-		{
+TBool CObeyFile::ParseAreaAttribute(const char* aArg, TInt aLineNumber, const Area*& aArea) {
+	if (iSectionPosition != -1) {
 		Print(EError, "Line %d: Relocation to area forbidden in second section\n", aLineNumber);
 		return EFalse;
-		}
+	}
 
 	aArea = iAreaSet.FindByName(reinterpret_cast<const char*>(aArg));
-	if (aArea == 0)
-		{
+	if (aArea == 0) {
 		Print(EError, "Line %d: Attempt to use an unknown area named '%s'\n", aLineNumber, aArg);
 		return EFalse;
-		}
+	}
 
 	return ETrue;
-	}
+}
 
 
-TBool CObeyFile::CreateDefaultArea()
-	{
+TBool CObeyFile::CreateDefaultArea() {
 	return AddAreaAndHandleError(AreaSet::KDefaultAreaName, iRomLinearBase, iRomSize);
-	}
+}
 
 
-TBool CObeyFile::AddAreaAndHandleError(const char* aName, TLinAddr aDestBaseAddr, TUint aLength, TInt aLineNumber)
-	{
+TBool CObeyFile::AddAreaAndHandleError(const char* aName, TLinAddr aDestBaseAddr, TUint aLength, TInt aLineNumber) {
 	TBool added = EFalse;
-	
+
 	const char lineInfoFmt[] = "Line %d:";
 	char lineInfo[sizeof(lineInfoFmt)+10];
 	if (aLineNumber > 0)
@@ -2760,8 +2466,7 @@ TBool CObeyFile::AddAreaAndHandleError(const char* aName, TLinAddr aDestBaseAddr
 		lineInfo[0] = '\0';
 
 	const char* overlappingArea;
-	switch (iAreaSet.AddArea(aName, aDestBaseAddr, aLength, overlappingArea))
-		{
+	switch (iAreaSet.AddArea(aName, aDestBaseAddr, aLength, overlappingArea)) {
 	case AreaSet::EAdded:
 		TRACE(TAREA, Print(EScreen, "Area '%s' added to AreaSet\n", aName));
 		added = ETrue;
@@ -2777,85 +2482,76 @@ TBool CObeyFile::AddAreaAndHandleError(const char* aName, TLinAddr aDestBaseAddr
 		break;
 	default:
 		assert(0);				// can't happen
-		}
-
-	return added;
 	}
 
-TInt getNumber(TText*);
-
+	return added;
+}
 
 // Fuction to split patchdata statement 
-void CObeyFile::SplitPatchDataStatement(StringVector& aPatchDataTokens)
-{
+void CObeyFile::SplitPatchDataStatement(StringVector& aPatchDataTokens) {
 	// Get the value of symbol size, address/ordinal and new value 
 	// to be patched from the patchdata statement.
 	// Syntax of patchdata statements is as follows:
 	// 1)	patchdata dll_name  ordinal OrdinalNumber size_in_bytes   new_value 
 	// 2)   patchdata dll_name  addr    Address       size_in_bytes   new_value
-	for(TInt count=1; count<=5; count++)	
-	{
+	for(TInt count=1; count<=5; count++)	 {
 		aPatchDataTokens.push_back(iReader.Word(count));
 	}
 
 	// Store the the value of current line which will be used
 	// when displaying error messages.
-	OutputStringStream outStrStream;
+	ostringstream outStrStream;
 	outStrStream << iReader.CurrentLine();
-    aPatchDataTokens.push_back(outStrStream.str());	
+	aPatchDataTokens.push_back(outStrStream.str());	
 }
 
-TBool CObeyFile::ParsePatchDllData()
-{
+TBool CObeyFile::ParsePatchDllData() {
 	// Get the list of patchdata statements
 	VectorOfStringVector patchDataStatements=iPatchData->GetPatchDataStatements();
 	// Get the list of renamed file map
 	MapOfString RenamedFileMap=iPatchData->GetRenamedFileMap();
 	DllDataEntry *aDllDataEntry=NULL;
 
-	for(TUint count=0; count<patchDataStatements.size(); count++)
-	{
+	for(TUint count=0; count<patchDataStatements.size(); count++) {
 		StringVector strVector = patchDataStatements.at(count);
-		String filename=strVector.at(0);
-		String lineNoStr = strVector.at(5);
-		TUint lineNo=getNumber(((TText*)lineNoStr.c_str()));
+		string filename=strVector.at(0);
+		string lineNoStr = strVector.at(5);
+		TUint lineNo = 1 ;
+		Val(lineNo,lineNoStr.c_str()); 
 		TRomNode* existingFile = NULL;
-			
-		do
-		{			
+
+		do {
 			TUint hardwareVariant=ParseVariant();
 			TRomNode* dir=iRootDirectory;		
 			TBool endOfName=EFalse;
 
-			TText *epocStartPtr=IsValidFilePath((TText*)filename.c_str());
-			if (epocStartPtr==NULL)
-			{
+		 
+			if (IsValidFilePath(filename.c_str()) == NULL) {
 				Print(EError, "Invalid source path on line %d\n",lineNo);
 				return EFalse;
 			}
-			epocStartPtr = (TText*)NormaliseFileName((const char*)epocStartPtr);
-			TText *epocEndPtr=epocStartPtr;
+			char* epocStartPtr = NormaliseFileName(filename.c_str());
+			char* savedPtr = epocStartPtr;
+			if(*epocStartPtr == '/' ||*epocStartPtr == '\\')
+				epocStartPtr++ ;
+			char* epocEndPtr=epocStartPtr;
 
-			while (!endOfName)
-			{
-				endOfName = GetNextBitOfFileName(&epocEndPtr);
-				if (endOfName) // file
-				{
+			while (!endOfName) {
+				endOfName = GetNextBitOfFileName(epocEndPtr);
+				if (endOfName) { // file 
 					existingFile=dir->FindInDirectory(epocStartPtr,hardwareVariant,TRUE);
-					if (existingFile)
-					{
+					if (existingFile) {
 						TInt fileCount=0;
 						TInt dirCount=0;
 						existingFile->CountDirectory(fileCount, dirCount);
-						if (dirCount != 0 || fileCount != 0)
-						{
+						if (dirCount != 0 || fileCount != 0) {
 							Print(EError, "Keyword %s not applicable to directories - line %d\n","patchdata",lineNo);
+							delete []savedPtr;
 							return EFalse;
 						}
 					}
 				}
-				else // directory
-				{
+				else {// directory 
 					TRomNode* subDir = dir->FindInDirectory(epocStartPtr);
 					if (!subDir) // sub directory does not exist
 						break;
@@ -2863,17 +2559,15 @@ TBool CObeyFile::ParsePatchDllData()
 					epocStartPtr = epocEndPtr;
 				}
 			}
-
-			if( !existingFile )
-			{
+			delete []savedPtr;
+			if( !existingFile ) {
 				MapOfStringIterator RenamedFileMapIterator;
 
 				// If the E32Image file to be patched is not included then check if the
 				// file was renamed.
 				if ((RenamedFileMapIterator=RenamedFileMap.find(filename)) != RenamedFileMap.end())
 					filename = (*RenamedFileMapIterator).second; 
-				else
-				{
+				else {
 					Print(EError, "File %s not found - line %d\n", filename.c_str(), lineNo);
 					return EFalse;
 				}
@@ -2887,46 +2581,42 @@ TBool CObeyFile::ParsePatchDllData()
 		aDataAddr = (TUint32)-1;
 		aOffset = 0;
 
-		String symbolSize = strVector.at(3);
-		aSize = getNumber((TText*)symbolSize.c_str());
-		String aValue = strVector.at(4);
-		aNewValue = getNumber( (TText*)aValue.c_str());
+		string symbolSize = strVector.at(3);
+		Val(aSize,symbolSize.c_str());
+		string aValue = strVector.at(4);
+		Val(aNewValue,aValue.c_str());
 
 		DllDataEntry *dataEntry = new DllDataEntry(aSize, aNewValue);
 
 		// Set the address of the data or the ordinal number specified in OBY statement.
-		String keyword = strVector.at(1);
-		String keywordValue = strVector.at(2);
+		string keyword = strVector.at(1);
+		string keywordValue = strVector.at(2);
 
 		/* Check for +OFFSET at the end of the ordinal number or address */
 		TUint plus = keywordValue.find("+",0);
-		if (plus != std::string::npos)
-		{
+		if (plus != string::npos) {
 			/* Get the offset that we found after the + sign */
-			String offset = keywordValue.substr(plus+1);
-			aOffset = getNumber((TText*)offset.c_str());
-
+			string offset = keywordValue.substr(plus+1);
+			Val(aOffset,offset.c_str());
 			keywordValue.resize(plus);		
 		}
-		if(stricmp ((char*)keyword.c_str(), "addr") == 0)
-			aDataAddr = getNumber((TText*)keywordValue.c_str());
-		
+		if(stricmp (keyword.c_str(), "addr") == 0)
+			Val(aDataAddr,keywordValue.c_str());
+
 		else 
-			 aOrdinal = getNumber((TText*)keywordValue.c_str());
-		
+			Val(aOrdinal,keywordValue.c_str());
+
 		dataEntry->iDataAddress = aDataAddr;
 		dataEntry->iOrdinal = aOrdinal;
 		dataEntry->iOffset = aOffset;
 		dataEntry->iRomNode = existingFile;
 
-		if (aDllDataEntry==NULL)
-		{
+		if (aDllDataEntry==NULL) {
 			// Set the first node of the patchdata linked list
 			aDllDataEntry = dataEntry;
 			SetFirstDllDataEntry(aDllDataEntry);
 		}
-		else
-		{
+		else {
 			// Add the new node at the end of linked list
 			aDllDataEntry->AddDllDataEntry(dataEntry);
 			aDllDataEntry = aDllDataEntry->NextDllDataEntry();
@@ -2935,81 +2625,54 @@ TBool CObeyFile::ParsePatchDllData()
 	return ETrue;
 }
 
-int CObeyFile::SkipToExtension()
-{
+int CObeyFile::SkipToExtension() {
 	int found = 0;
 
 	iReader.Rewind();
 	enum EKeyword keyword;
-	while (iReader.NextLine(1,keyword) != KErrEof)
-	{
-		if (keyword == EKeywordExtensionRom)
-		{
+	while (iReader.NextLine(1,keyword) != KErrEof) {
+		if (keyword == EKeywordExtensionRom) {
 			found = 1;
 			iReader.Mark(); // ready for processing extension
 			break;
 		}
 	}
 
-	if(!found)
-	{
+	if(!found) {
 		Print(EError, "Coreimage option requires valid \"extensionrom\" keyword\n");
 	}
 
 	return found;
 }
 
-TText* CObeyFile::ProcessCoreImage()
-{
+char* CObeyFile::ProcessCoreImage() {
 	// check for coreimage keyword and return filename
 	iReader.Rewind();
 	enum EKeyword keyword;
-	TText* coreImageFileName = 0;
+	char* coreImageFileName = 0;
 
 	iRomAlign = KDefaultRomAlign;
 	iDataRunAddress = KDefaultDataRunAddress;
 
-	while (iReader.NextLine(1,keyword) != KErrEof)
-	{
-		if (keyword == EKeywordCoreImage)
-		{
-#if defined(__TOOLS2__) && defined (_STLP_THREADS)
-			istringstream val(iReader.Word(1),(ios_base::in+ios_base::out));	  
-#elif __TOOLS2__
-			istringstream val(iReader.Word(1),(std::_Ios_Openmode)(ios_base::in+ios_base::out));
-#else
-			istrstream val(iReader.Word(1),strlen(iReader.Word(1)));
-#endif
-			iReader.CopyWord(1, coreImageFileName);
+	while (iReader.NextLine(1,keyword) != KErrEof) {
+		if (keyword == EKeywordCoreImage) {
+			coreImageFileName = iReader.DupWord(1);
 			break;
 		}
-		else if ((keyword == EKeywordRomAlign) || (keyword == EKeywordDataAddress))
-		{
-#ifdef __TOOLS2__
-			istringstream val(iReader.Word(1));
-#else
-			istrstream val(iReader.Word(1),strlen(iReader.Word(1)));
-#endif
-#if defined(__MSVCDOTNET__) || defined(__TOOLS2__)
-	val >> setbase(0);
-#endif //__MSVCDOTNET__
-			if(keyword == EKeywordRomAlign)
-			{
-				val >> iRomAlign;
+		else if ((keyword == EKeywordRomAlign) || (keyword == EKeywordDataAddress)) {
+			if(keyword == EKeywordRomAlign) {
+				Val(iRomAlign,iReader.Word(1));
 			}
-			else
-			{
-				val >> iDataRunAddress;
+			else {
+				Val(iDataRunAddress,iReader.Word(1));
 			}
 		}
 	}
 
-	if (iRomAlign&0x3)
-	{
+	if (iRomAlign&0x3) {
 		//Rounding rom alignment to multiple of 4
 		iRomAlign=(iRomAlign+0x3)&0xfffffffc;
 	}
 
 	return coreImageFileName;
 }
-

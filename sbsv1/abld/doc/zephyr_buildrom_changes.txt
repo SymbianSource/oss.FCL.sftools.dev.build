@@ -1,0 +1,33 @@
+Zephyr/Cedar BUILDROM
+2003/09/03
+
+BUILDROM has been extended to support the building of 'mostly-thumb' ROMs and mixed ROMs.
+
+1. Mostly Thumb ROMs.
+
+In Cedar for Zephyr BUILDROM supports the following macros for
+specifying which build to construct the ROM from:
+	   _ARM4 - The ARM4 build (eventually this will be removed)
+	   _ARM4T - The 'mostly-thumb' ARM4T.
+
+2. Mixed ROMs
+
+Mixed ROMs have a kernel built for a different ABI than that targeted
+by user-side code. In practice this means an EABI kernel and GCC98r2
+user-side code. By default BUILDROM use the same ABI for the kernel as
+specified for user-side code (i.e. one of ARM4 or ARM4T). The default
+kernel ABI can be overriden by supplying the appropriate value for
+_KABI in BUILDROM's commandline e.g. -D_KABI=ARMV5.
+
+The following example builds a 'mostly thumb' techview ROM with an
+EABI kernel compiled specifically for XScale:
+
+     buildrom lubbock -D_ARM4T -D_KABI=XSCALE -o\epoc32\techview.arm4t.xscale.img \epoc32\rom\include\techview
+
+The above example shows that the EABI kernel does not have to be the
+default ARMV5 build. BUILDROM supports customizations of the default
+ARMV5 build. It is also worth noting that the XScale build does not
+have to be complete. If BUILDROM cannot find an XScale file it will
+look for the equivalent file from the build that has been
+customized. Currently this will always be ARMV5, since this is the
+only build that supports customization at this time.

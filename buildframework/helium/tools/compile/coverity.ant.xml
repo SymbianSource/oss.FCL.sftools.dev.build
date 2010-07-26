@@ -26,6 +26,17 @@ Description:
     </description>
     
     <!-- Coverity property declaration and types defination-->
+    <!--* @property enabled.coverity
+    Value must be set to execute coverity targets.
+    @type boolean
+    @editable required
+    @scope public
+    -->
+    <!--* @property run.coverity
+    Value will be set to if enabled.coverity set tot true.
+    @type string
+    @scope private
+    -->
     <!-- coverity output directory location
     @type string
     @scope private

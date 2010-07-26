@@ -18,8 +18,11 @@
 
 #if !defined(__MEMMAPUTILS_H__)
 #define __MEMMAPUTILS_H__
-
+#include "h_utl.h"
 #ifdef WIN32
+#ifdef _STLP_INTERNAL_WINDOWS_H
+#define __INTERLOCKED_DECLARED
+#endif
 #include <windows.h>
 #include <io.h>
 #endif
@@ -28,13 +31,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <stdio.h>
-#include <string>
-#include <fstream>
-
-#include "h_utl.h"
-
-typedef std::string String;
-typedef std::ofstream Ofstream;
+ 
 
 const int KStatTrue = 1;
 const int KStatFalse = 0;
@@ -56,14 +53,14 @@ private:
 	HANDLE iHMMFile;
 #endif
 	// Map file name
-	String iMapFileName;
+	string iMapFileName;
 
 public:
 	MemmapUtils();
 	~MemmapUtils();
 
 	// Generate temporary file name
-	void GetMapFileName(String& aFile);
+	void GetMapFileName(string& aFile);
 
 	// Create the memory map
 	void* OpenMemMapPointer(unsigned long aOffset, unsigned long aSize);

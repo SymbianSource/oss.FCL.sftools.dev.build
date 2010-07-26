@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<build xmlns="http://symbian.com/xml/build"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://symbian.com/xml/build http://symbian.com/xml/build/1_0.xsd">
+
+    <!-- test build specification -->
+
+    <spec name="simple">
+        <interfaceRef ref="Symbian.EXE"/>
+	<var>
+	    <set name="SIMPLE" value="$(SBS_HOME)/test/simple"/>
+
+	    <set name="SOURCEFILES" value="$(SIMPLE)/test.cpp"/>
+	    <set name="EXENAME" value="test"/>
+	    <set name="TARGETTYPE" value="EXE"/>
+	    <set name="UID1" value="0x1000007a"/>
+	    <set name="UID2" value="0x100039ce"/>
+	    <set name="UID3" value="0x00000001"/>
+	    <set name="SID" value="0x10003a5c"/>
+	</var>
+    </spec>
+</build>

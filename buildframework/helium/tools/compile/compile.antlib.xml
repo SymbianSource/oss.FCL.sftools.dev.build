@@ -22,6 +22,7 @@ Description:
 -->
 <!--* @package compile -->
 <antlib xmlns:hlm="http://www.nokia.com/helium">
+    
     <!-- This task transfer the log file into html format -->
     <macrodef name="compileHtmlscanlogMacro" uri="http://www.nokia.com/helium">
         <attribute name="input"/>
@@ -40,8 +41,9 @@ Description:
         </sequential>
     </macrodef>
 
+    
+    <!-- Generates compilation report for diamonds. -->
     <macrodef name="calculateErrorsFromLog" uri="http://www.nokia.com/helium">
-        <attribute name="logfile"/>
         <sequential>
             <if>
                 <not>
@@ -52,7 +54,6 @@ Description:
                                  outputfile="${diamonds.build.output.dir}/compile-main.xml">
                         <data expandProperties="yes">
                             dbPath: ${metadata.dbfile}
-                            logpath: @{logfile} 
                             ant: antProperties()
                         </data>
                     </fmpp>
@@ -61,15 +62,29 @@ Description:
         </sequential>
     </macrodef>
 
+    
     <macrodef name="compileLogSignalMacro" uri="http://www.nokia.com/helium">
         <attribute name="compile.summary.file"/>
         <attribute name="error.limit"/>
         <attribute name="phase" default="compile"/>
         <sequential>
-            <hlm:calculateErrorsFromLog logfile="@{compile.summary.file}" />
-            <hlm:metadataCountSeverity severity="ERROR" log="@{compile.summary.file}" 
-                db="${metadata.dbfile}" 
-                property="build.errors.total"/>
+            <hlm:calculateErrorsFromLog />
+            <var name="build.errors.total" unset="true" />
+            <var name="compile.result" unset="true" />
+            <if>
+                <equals arg1="${compile.signal.input}" arg2="compileCleanSignalInput" />
+                <then>
+                    <hlm:metadataCountSeverity severity="ERROR" log="@{compile.summary.file}"
+                        db="${metadata.dbfile}"
+                        countMissing="false"
+                        property="build.errors.total"/>
+                </then>
+                <else>
+                    <hlm:metadataCountSeverity severity="ERROR" log="@{compile.summary.file}"
+                        db="${metadata.dbfile}"
+                        property="build.errors.total"/>
+                </else>
+            </if>
                 
             <echo>Errors after compile-main: ${build.errors.total}</echo>
             <echo message="${build.errors.limit}" />
@@ -96,7 +111,10 @@ if int(r'@{error.limit}') > -1:
         </sequential>
     </macrodef>
     
-    <!-- Macro to start the build using EBS. Parameters are generated xml file for EBS builds
+    
+    <!-- Macro to start the build using EBS. 
+        
+    Parameters are generated xml file for EBS builds
     the log output of the build and the number of threads for the build. -->
     <macrodef name="compileEbsMacro" uri="http://www.nokia.com/helium">
         <attribute name="input"/>
@@ -117,7 +135,10 @@ if int(r'@{error.limit}') > -1:
         </sequential>
     </macrodef>
 
-    <!-- Macro to generate the xml file for EBS builds. Inputs are Merged xml file for the process,
+    
+    <!-- Macro to generate the xml file for EBS builds.
+        
+    Inputs are Merged xml file for the process,
     configuration for which the EBS xml file is generated and the output xml file for the EBS builds and
     the log output of the build. -->
     <macrodef name="compileGenxmlMacro" uri="http://www.nokia.com/helium">
@@ -127,7 +148,7 @@ if int(r'@{error.limit}') > -1:
         <attribute name="log"/>
         <sequential>
             <preset.exec executable="perl" dir="${build.drive}/" failonerror="${failonerror}">
-                <arg value="${epocroot}epoc32/tools/build/genxml.pl"/>
+                <arg value="${build.drive}/epoc32/tools/build/genxml.pl"/>
                 <arg value="-o"/>
                 <arg value="@{output}"/>
                 <arg value="-l"/>
@@ -143,10 +164,10 @@ if int(r'@{error.limit}') > -1:
         </sequential>
     </macrodef>
 
-    <!--
-        Merges all preprocessed System Definition files into one combined file
-        This macro also handles the copying of the sysdef DTDs on the root of
-        the build environment.
+    
+    <!-- Merges all preprocessed System Definition files into one combined file
+    
+    This macro also handles the copying of the sysdef DTDs on the root of the build environment.
     -->
     <macrodef name="compileGenxmlMergeMacro" uri="http://www.nokia.com/helium">
         <attribute name="input"/>
@@ -163,7 +184,7 @@ if int(r'@{error.limit}') > -1:
                 <fileset dir="${helium.dir}/tools/common/dtd" includes="*.dtd"/>
             </copy>
             <preset.exec executable="perl" dir="${build.drive}/" failonerror="${failonerror}">
-                <arg value="${epocroot}epoc32/tools/build/genxml.pl"/>
+                <arg value="${build.drive}/epoc32/tools/build/genxml.pl"/>
                 <arg value="-s"/>
                 <arg value="${epocroot}"/>
                 <arg value="-m"/>
@@ -178,16 +199,15 @@ if int(r'@{error.limit}') > -1:
         </sequential>
     </macrodef>
 
-    <!--
-      This macro uses genxml to filter a sysdef file.
-      -->
+    
+    <!-- This macro uses genxml to filter a sysdef file. -->
     <macrodef name="compileGenxmlFilterMacro" uri="http://www.nokia.com/helium">
         <attribute name="input"/>
         <attribute name="output"/>
         <attribute name="filter"/>
         <sequential>
             <preset.exec executable="perl" dir="${build.drive}/" failonerror="${failonerror}">
-                <arg value="${epocroot}epoc32/tools/build/genxml.pl"/>
+                <arg value="${build.drive}/epoc32/tools/build/genxml.pl"/>
                 <arg value="-s"/>
                 <arg value="${epocroot}"/>
                 <arg value="-m"/>
@@ -204,14 +224,14 @@ if int(r'@{error.limit}') > -1:
     </macrodef>
 
 
-  <!--
-    Electric Cloud emake support.
+    <!-- Electric Cloud emake support.
+
     e.g:
-    <pre>
-    <hlm:emakeMacro name="zip-ee" makefile="/foo.mk" log="${build.log.dir}/zip-ee.log" target="zip-all"/>
-    </pre>
+
+        <hlm:emakeMacro name="zip-ee" makefile="/foo.mk" log="${build.log.dir}/zip-ee.log" target="zip-all"/>
+
     Optionally to generate emake annotation file use/add attribute annodetail="basic,history,file,waiting".
-  -->
+    -->
     <scriptdef name="emakeMacro" language="beanshell" uri="http://www.nokia.com/helium">
         <attribute name="name"/>
         <attribute name="log"/>
@@ -294,7 +314,8 @@ if int(r'@{error.limit}') > -1:
           task.execute();
     </scriptdef>
 
-  <!-- Macro to build using Raptor.-->
+    
+    <!-- Macro to build using Raptor.-->
     <scriptdef name="sbsMacro" language="beanshell" uri="http://www.nokia.com/helium">
         <attribute name="config"/>
         <attribute name="layers"/>
@@ -311,6 +332,7 @@ sbsTool.execute(attributes,project);
 ]]>
     </scriptdef>
 
+    
     <scriptdef name="getSBSConfigMacro" language="beanshell" uri="http://www.nokia.com/helium">
         <attribute name="sbs.sysdef.file"/>
 <![CDATA[
@@ -319,4 +341,5 @@ SAXConfigParser configParser = new SAXConfigParser(attributes.get("sbs.sysdef.fi
 project.setProperty("sbs.configs",configParser.getConfigs());
 ]]>
     </scriptdef>
+    
 </antlib>

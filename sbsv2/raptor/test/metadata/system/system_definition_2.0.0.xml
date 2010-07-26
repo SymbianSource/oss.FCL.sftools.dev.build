@@ -1,0 +1,19 @@
+<SystemDefinition name="MCL" schema="2.0.0" > 
+	<systemModel>
+	    <layer name="test">
+			<component name="Test Component 1">
+				<unit bldFile="simple" mrp="simple/simple.mrp"/>
+			</component>
+			<component name="Test Component 2">
+				<unit bldFile="test/smoke_suite/test_resources/basics/helloworld" root="SBS_HOME" mrp="test/smoke_suite/test_resources/basics/helloworld.mrp"/>
+			</component>
+			<component name="Incorrect root attribute">
+				<unit bldFile="basics/helloworld" root="NON_EXISTENT_ENVVAR" mrp="basics/helloworld.mrp"/>
+			</component>
+			<component name="Missing Component">
+				<unit unitID="MCOMP" name="missing_component" bldFile="basics\missing" mrp="basics\missing\missing.mrp"/>
+			</component>
+		</layer>
+	</systemModel>
+</SystemDefinition>
+

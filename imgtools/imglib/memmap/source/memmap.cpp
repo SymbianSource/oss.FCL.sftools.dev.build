@@ -28,9 +28,8 @@ Initilize the parameters to data members.
 @param aFillFlg	- Flag to enable the initialisation of memory map
 @param aOutputFile - Name of the output file
 */
-Memmap::Memmap( int aFillFlg, String aOutputFile )
-: iOutFileName(aOutputFile), iData(0), iMaxMapSize(0), iStartOffset(0), iFillFlg(aFillFlg)
-{
+Memmap::Memmap( int aFillFlg, const string& aOutputFile )
+: iOutFileName(aOutputFile), iData(0), iMaxMapSize(0), iStartOffset(0), iFillFlg(aFillFlg) {
 	iUtils = new MemmapUtils();
 }
 
@@ -44,8 +43,7 @@ Initilize the parameters to data members.
 @param aFillFlg	- Flag to enable the initialisation of memory map
 */
 Memmap::Memmap( int aFillFlg )
-: iData(0), iMaxMapSize(0), iStartOffset(0), iFillFlg(aFillFlg)
-{
+: iData(0), iMaxMapSize(0), iStartOffset(0), iFillFlg(aFillFlg) {
 	iUtils = new MemmapUtils();
 }
 
@@ -57,15 +55,12 @@ Deallocates the memory for data members
 @internalComponent
 @released
 */
-Memmap::~Memmap( )
-{
-	if(iData)
-	{
+Memmap::~Memmap( ) {
+	if(iData) {
 		CloseMemoryMap();
 	}
 
-	if(iUtils)
-	{
+	if(iUtils) {
 		delete iUtils;
 	}
 }
@@ -78,8 +73,7 @@ SetOutputFile: To set the output image file
 
 @param aOutputFile  - Name of the output image file
 */
-void Memmap::SetOutputFile( String aOutputFile )
-{
+void Memmap::SetOutputFile(const string& aOutputFile ) {
 	iOutFileName = aOutputFile;
 }
 
@@ -122,10 +116,10 @@ char& Memmap::operator[]( unsigned long aIndex )
 
 /**
 CreateMemoryMap: 
- Opens the memory map file
- Initialises the map size member
- Create the memory map pointer
- Fill the memory map with the specified value
+Opens the memory map file
+Initialises the map size member
+Create the memory map pointer
+Fill the memory map with the specified value
 
 @internalComponent
 @released
@@ -133,41 +127,33 @@ CreateMemoryMap:
 @param aStartOffset - Start offset of the memory map location
 @param aFillVal - Value to be filled in the memory map
 */
-int Memmap::CreateMemoryMap( unsigned long aStartOffset, unsigned char aFillVal )
-{
-	if((!iMaxMapSize) || (aStartOffset > iMaxMapSize))
-	{
+int Memmap::CreateMemoryMap( unsigned long aStartOffset, unsigned char aFillVal ) {
+	if((!iMaxMapSize) || (aStartOffset > iMaxMapSize)) {
 		return KStatFalse;
 	}
-	else if(iUtils->IsMapFileOpen() && iData)
-	{
+	else if(iUtils->IsMapFileOpen() && iData) {
 		iStartOffset = aStartOffset;
 		return KStatTrue;
 	}
 
-	if(iUtils->IsMapFileOpen() == KStatFalse)
-	{
-		if(iUtils->OpenMapFile() == KStatFalse)
-		{
+	if(iUtils->IsMapFileOpen() == KStatFalse) {
+		if(iUtils->OpenMapFile() == KStatFalse) {
 			return KStatFalse;
 		}
 	}
 
-	if(iUtils->CreateFileMapObject(iMaxMapSize) == KStatFalse)
-	{
+	if(iUtils->CreateFileMapObject(iMaxMapSize) == KStatFalse) {
 		return KStatFalse;
 	}
 
 	iData = (char*)(iUtils->OpenMemMapPointer(0,iMaxMapSize));
-	if( !iData )
-	{
+	if( !iData ) {
 		return KStatFalse;
 	}
 
 	iStartOffset = aStartOffset;
-	
-	if(iFillFlg)
-	{
+
+	if(iFillFlg) {
 		return FillMemMap( aFillVal );
 	}
 
@@ -182,11 +168,9 @@ CloseMemoryMap: Close the memory map and the associated objects
 
 @param aCloseFile - Flag to close the memory map file
 */
-void Memmap::CloseMemoryMap( int aCloseFile )
-{
+void Memmap::CloseMemoryMap( int aCloseFile ) {
 	// Close map view pointer
-	if(!iUtils->CloseMemMapPointer((void*)iData, iMaxMapSize))
-	{
+	if(!iUtils->CloseMemMapPointer((void*)iData, iMaxMapSize)) {
 		Print(ELog, "Failed to unmap the memory map object");
 	}
 	iData = 0;
@@ -194,8 +178,7 @@ void Memmap::CloseMemoryMap( int aCloseFile )
 	iUtils->CloseFileMapObject();
 
 	// Close map file
-	if(aCloseFile)
-	{
+	if(aCloseFile) {
 		iUtils->CloseMapFile();
 	}
 }
@@ -206,8 +189,7 @@ GetMemoryMapPointer: Get the stating address of the memory map
 @internalComponent
 @released
 */
-char *Memmap::GetMemoryMapPointer( )
-{
+char *Memmap::GetMemoryMapPointer( ) {
 	if(iData)
 		return (iData + iStartOffset);
 
@@ -220,24 +202,20 @@ WriteToOutputFile: Writes the memory map contents to the output file
 @internalComponent
 @released
 */
-void Memmap::WriteToOutputFile( )
-{
-	Ofstream ofs;
+void Memmap::WriteToOutputFile( ) {
+ 
 
-	if(!iData)
-	{
+	if(!iData) {
 		Print(EAlways, "Memory map has not been created");
 	}
 
-	if(iOutFileName.empty())
-	{
+	if(iOutFileName.empty()) {
 		Print(EAlways, "Output file has not been set");
 		return;
 	}
 
-	ofs.open(((const char*)iOutFileName.data()), std::ios::binary);
-	if(!ofs.is_open())
-	{
+	ofstream ofs(iOutFileName.c_str(), ios_base::out + ios_base::binary );
+	if(!ofs.is_open()) {
 		Print(EAlways, "Cannot open output file %s", (char*)iOutFileName.data());
 		return;
 	}
@@ -257,23 +235,19 @@ FillMemMap: Fills the memory map with the specified value
 
 @param aFillVal - Value to be filled
 */
-int Memmap::FillMemMap( unsigned char aFillVal )
-{
-	if(iData)
-	{
+int Memmap::FillMemMap( unsigned char aFillVal ) {
+	if(iData) {
 		// Fill the value
 		memset(iData, aFillVal, iMaxMapSize);
 
 		// Unmap the file
-		if(iUtils->CloseMemMapPointer((void*)iData, iMaxMapSize) == KStatFalse)
-		{
+		if(iUtils->CloseMemMapPointer((void*)iData, iMaxMapSize) == KStatFalse) {
 			return KStatFalse;
 		}
 
 		// Map it again
 		iData = (char*)(iUtils->OpenMemMapPointer(0,iMaxMapSize));
-		if(!iData)
-		{
+		if(!iData) {
 			return KStatFalse;
 		}
 	}

@@ -33,8 +33,8 @@ Contains the configuration variables for the minibuild testing of MATTI.
     <property name="build.drive" value="z:" />
     
     <!-- MATTI testing parameters-->
-    <property name="enabled.matti" value="1" />
-    <property name="enabled.ats" value="1" />
+    <property name="enabled.matti" value="true" />
+    <property name="enabled.ats" value="true" />
 	<property name="matti.scripts" value="${helium.dir}\testconfig\ats3\matti\script" />
 	<property name="template.file" value="${helium.dir}\tools\common\python\lib\ats3\matti\template\matti_demo.xml" />
 	<property name="ats.sis.images.dir" location="${helium.dir}\testconfig\ats3\matti\sis" />

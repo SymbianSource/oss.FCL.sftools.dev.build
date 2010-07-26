@@ -1,0 +1,152 @@
+#!perl
+# Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+# 
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+# 
+# Contributors:
+# 
+# Description:
+# 
+#
+
+=head1 Frequently Asked Questions
+
+=head3 How do I remove an environment database entry?
+
+Use C<preprel comp_name> - no parameters indicates that you want to remove the entry. This may be useful if you edit the environment database (via either C<PrepRel> or C<PrepEnv>) incorrectly and want to rectify your mistake.
+
+=head3 When making a release, the tools complain about missing files that I don't want to release. How do I avoid this?
+
+F<mrp> statements like...
+
+ binary  \mycomp\mybldinfdir wins
+
+...cause the release tools to get the identity of file that need to be release from the build tools (using their C<-what> switch). It is possible that the build files (F<bld.inf>, F<mmp>s, custom make files, etc.) could list more releasables than you want to actually release. One solution is to modify the build files, but this may not be convenient if you are releasing code that you don't actually own. An alternative is to explicitly exclude certain binary files using the C<-binary> keyword in your F<mrp> file. This supports the same syntax as the C<binary> keyword, but tells the release tools to not release the files specified. It can be used to exclude exported files also. For example, to exclude the file F<\epoc32\release\wins\udeb\mycomp.pdb>:
+
+ -binary \epoc32\release\wins\udeb\mycomp.pdb
+
+To exclude all the files associated with the F<mmp> file F<mymmp>:
+
+ -binary \mycomp\mybldinfdir wins mymmp
+
+See the document I<Making Releases> for more details.
+
+=head3 How can I exclude exported files?
+
+The F<mrp> keyword C<exports> can be used to instruct the release tools to release a component's exports. Note, since version 2.59 of the release tools, it has been possible to categorise exports according to the IPR classifications applied to source code. See the C<categorise_exports> keyword in the section F<Installation> for more details.
+
+=head3 When making a release, the tools complain about files of unknown origin even though I know they were created by building the component. What could the problem be?
+
+The tools use the C<binary> statements in the components F<mrp> file to create a list of binary files associated with the release. 
+If the output of the build generates extra files to those contained in this list then they will be reported as files of unknown origin.
+
+The list of binaries the tools expect to be in the release can be viewed manually by reading the F<mrp> file. The files and directories explicitly defined after C<binary> keywords are included in this list. If a C<binary> keyword is followed by the location of a F<bld.inf> and a target then running C<abld -what build target> will display the binaries contributed to the list by these C<binary> statements.
+
+If the list of binaries created from the F<mrp> file is different to the output of the build then it is likely that the build configuration files (in particular the custom makefiles) have been written in a non-standard way. The ideal solution would be for the user to fix the build configuration files; if this is not possible then an alternative would be to explicitly list the extra files in the F<mrp> file and then make the release.     
+
+=head3 EnvInfo appears to hang after I set some components to pending release. What's going on?
+
+When you set a component's status to C<pending release> and run C<EnvInfo>, instead of checking the component's binaries against the stored signature (which contains the binary file names and their last modified times), the release tools attempt to determine the identity of binaries are are about to be released. This involves parsing the component's F<mrp> file, which in turn may involve generating a set of makefiles. This can take a considerable amount of time for large components.
+
+=head3 Where can I get help in setting up GnuPG?
+
+You can find all the GnuPG documentation you need at C<www.gnupg.org>
+
+=head3 Why is it possible to set PGP key ids in both F<reltools.ini> and the export data table?
+
+The configuration file F<reltools.ini> supports the keyword C<pgp_encryption_keys> which can be used to specify keys which should be used to encrypt B<ALL> exported files. This should be used to specify the outbound public key(s) of the site that is doing the exporting. This allows the site that generated each release to decrypt it if need be. It should not be used to specify the public keys any other sites. These should be specified in the export data table (contains in the file specified using the C<export_data_file> keyword in F<reltools.ini>). This table allows each site's export policy to be carefully defined and controlled. See the F<Installation Guide> for details.
+
+=head3 I get the error "Unable to decrypt any part of <component> <version>" when using C<ImportRel> or C<ImportEnv>. What does this mean?
+
+The exporter of a release may apply different access restrictions to the release files. Source files and exported files (headers etc.) may be given an IPR category. This allows the exporter to control which recipients are allowed to receive which categories. In addition to this a component's binaries may also have restricted access. Binaries aren't categorised - each recipient is either allowed to receive all binaries for a particular component or none. See the section F<Installation> for more details on how to control exports.
+
+Provided a recipient has access to the binary files of a component release, they will be allowed to install that component release into an environment. The above error is generated to alert recipients of the situation where they have attempted to import a release that they don't have access to, and as a result with not be able to install it into an environment.
+
+It's possible that this situation has occurred due to an error on the part of the exporter. If this is suspected, then the exporter should be contacted and asked to check their export table. If the recipient should have been able to access the release, then the exporter will need to update their export table and re-export using the C<-f> option to force an overwrite.
+
+=head3 How large (or small) should I make my components?
+
+Here are some points to bear in mind when deciding upon component granularity:
+
+=over 4
+
+=item 1
+
+A package description (or F<mrp>) file must be written and maintained for each component.
+
+=item 2
+
+The simpler these files are, the easier they are to maintain.
+
+=item 3
+
+Componentising at a granularity of a F<bld.inf> generally results in the simplest F<mrp> files. Such F<mrp> files hardly ever need to be changed once they have been created.
+
+=item 4
+
+Componentising at a granularity less than a F<bld.inf> in terms of F<mmp> files, is possible, however it does introduced some increased complexity in the F<mrp> files. It also may require changes to the source code structure the ensure that the source can be correctly distributed between the fine granularity components. This is almost never required when componentising at the F<bld.inf> granularity.
+
+=item 5
+
+Componentising at a granularity less than an F<mmp> file is again possible, but highly unadvisable since building one component would cause files belonging to another component to get overwritten. It would also significantly increase the complexity of the F<mrp> files. The reason for this is that it would no longer be possible to rely on the build tools to provide the identity of the binary files. They would need to be listed manually (to some extent). Doing so would make maintenance of the F<mrp> files very burdensome. Also, it would not be possible to separate the source in a mutually exclusive way. This would mean that certain source files would need to be distributed with more than one component. This is bad news, because it makes ownership unclear.
+
+=item 6
+
+Minimising component sizes minimises the amount of data that must be transferred between sites and to workstations. This is because if one file has changed within a component, the whole component must be re-released. Keeping components small increases the likely hood that entire components have not changed between builds, and hence do not need to be re-released or distributed.
+
+=item 7
+
+Minimising component sizes maximises customisation flexibility. This is because customisers can branch just the bits they need to, and continue to use the original components for everything else.
+
+=item 8
+
+Minimising component sizes inevitably means that there will be a large number of components. Each component needs to have a new version assigned each time it is released. Large numbers of components therefore increases the workload of the release engineer each time a release is made (thought points 7 and 8 may well out weigh this cost).
+
+=back
+
+=head3 My exporting seems unreliable. How can I improve that?
+
+If you are behind any sort of firewall, you should use passive FTP connections. See the F<Installation> document for details of how.
+
+=head3 How can I run a sequence of Release Tools commands?
+
+Windows supports this syntax: C<command1 && command2>. This will first run C<command1>, then run C<command2> - but only if the first command succeeds. The release tools provide the proper information to Windows to allow it to make these decisions, so you can for example do:
+
+  getenv baseline 001 && getsource component
+
+or
+
+  getenv baseline 001 && cleanenv -rf
+
+or even
+
+  getenv baseline 001 && getsource component && cd \component && bldmake bldfiles && abld build thumb urel
+
+whilst making a cup of tea.
+
+But one caveat: currently, C<abld> doesn't correctly tell Windows whether it succeeded or failed. Any commands after C<abld> will always get run, irrespective of whether the build succeeded or failed.
+
+=head1 COPYRIGHT
+
+ Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+ All rights reserved.
+ This component and the accompanying materials are made available
+ under the terms of the License "Eclipse Public License v1.0"
+ which accompanies this distribution, and is available
+ at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ 
+ Initial Contributors:
+ Nokia Corporation - initial contribution.
+ 
+ Contributors:
+ 
+ Description:
+ 
+
+=cut

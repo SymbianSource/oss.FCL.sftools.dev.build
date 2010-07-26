@@ -28,7 +28,7 @@ Description:
     
     <property name="helium.dir" location="../../.." />
     <property name="build.drive" location="${env.TEMP}/helium/temp_drive"/>
-    <import file="../../../helium.ant.xml"/>
+    <import file="../../../build.xml"/>
     
                 
     <!--target name="test-tempRecordMacro">

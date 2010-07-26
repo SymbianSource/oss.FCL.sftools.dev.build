@@ -17,55 +17,59 @@
 #Description: Cleaned version.
 #============================================================================
 
-use strict;                 # strict naming rules
-use Cwd;                        # figuring out directories
-use Data::Dumper;       # debugging purposes
-use XML::Simple;        # for using xml parser
-use File::Copy;         # for copying files
-use SOAP::Lite;         # SOAP interface for s60build server
-use Getopt::Long;       # parameter handling
+use strict;         # strict naming rules
+use Cwd;            # figuring out directories
+use Data::Dumper;   # debugging purposes
+use XML::Simple;    # for using xml parser
+use File::Copy;     # for copying files
+use Getopt::Long;   # parameter handling
 Getopt::Long::Configure( "bundling_override","ignore_case_always" );
-# uncomment to get SOAP debug traces
-# use SOAP::Lite +trace => 'debug';
+use File::Temp qw/ tempdir /; # for creating unique temp directories
+
+# uncomment to get temp dir debug traces
+$File::Temp::DEBUG = 1;
 
 # variables for commandline params
-my( $param_help,                    # print help
-        $param_server,              # manually select server
-        $param_release_path,    # where are the releases located in the server
-        $param_debug,                   # parameter for controlling extra debug prints
-        $param_latest,              # just grab the latest build (requires product name)
-        $param_keepgoing,           # continue even if dependency is missing
-        $param_print_only,      # do nothing but print system calls
-        $param_skipITD,             # do not extract internal, testsources and documentation
-        $param_emuenv,              # extract only emulator environment
-        $param_start_directly,# starts extracting directly without waiting user acceptance
-        $param_product,             # manually insert product name
-        $param_skip_deps,           # do not extract dependencies
-        $param_grace,                   # do not check for grace access
-        $param_no_soap,             # dont use soap connection
-        @param_exclude,             # exclude list
-        @param_include );           # include list
+my( $param_help,          # print help
+    $param_server,        # manually select server
+    $param_release_path,  # where are the releases located in the server
+    $param_debug,         # parameter for controlling extra debug prints
+    $param_latest,        # just grab the latest build (requires product name)
+    $param_keepgoing,     # continue even if dependency is missing
+    $param_print_only,    # do nothing but print system calls
+    $param_skipITD,       # do not extract internal, testsources and documentation
+    $param_emuenv,        # extract only emulator environment
+    $param_start_directly,# starts extracting directly without waiting user acceptance
+    $param_product,       # manually insert product name
+    $param_skip_deps,     # do not extract dependencies
+    $param_grace,         # do not check for grace access
+    @param_exclude,       # exclude list
+    @param_include,       # include list
+    @force_include,       # force include list
+    $param_all );         # extract all zips
 
 # read commandline parameters
-my $result = GetOptions('help'          => \$param_help,                        # print help
-                                                'h'                 => \$param_help,                        # print help
-                                                'latest'        => \$param_latest,                  # just grab the latest build (requires product name)
-                                                'server=s'  => \$param_server,                  # manually select server
-                                                'path=s'        => \$param_release_path,        # extract this release directly
-                                                'verbose'       => \$param_debug,                       # verbose debug print
-                                                'k'                 => \$param_keepgoing,               # continue even if there is any problems
-                                                'p'                 => \$param_print_only,          # do nothing but print system calls
-                                                'skipitd'       => \$param_skipITD,                 # Deprecated: do not extract internal, testsources and documentation
-                                                'emu'               => \$param_emuenv,                  # Deprecated: extract only emulator environment
-                                                'start'         => \$param_start_directly,  # starts extracting directly without waiting user acceptance
-                                                'product=s' => \$param_product,                 # manually insert product name
-                                                'x=s'               => \@param_exclude,                 # filer list for excluding zips
-                                                'exclude=s' => \@param_exclude,                 # filer list for excluding zips
-                                                'i=s'               => \@param_include,                 # filer list for including zips
-                                                'include=s' => \@param_include,                 # filer list for including zips
-                                                'nodeps'        => \$param_skip_deps,               # do not extract dependencies
-                                                'grace'         => \$param_grace,                       # try to DL from GRACE
-                                                'nosoap'        => \$param_no_soap );               # dont try using SOAP for s60builds server
+my $result = GetOptions('help'      => \$param_help,            # print help
+                        'h'         => \$param_help,            # print help
+                        'latest'    => \$param_latest,          # just grab the latest build (requires product name)
+                        'server=s'  => \$param_server,          # manually select server
+                        'path=s'    => \$param_release_path,    # extract this release directly
+                        'verbose'   => \$param_debug,           # verbose debug print
+                        'k'         => \$param_keepgoing,       # continue even if there is any problems
+                        'p'         => \$param_print_only,      # do nothing but print system calls
+                        'skipitd'   => \$param_skipITD,         # Deprecated: do not extract internal, testsources and documentation
+                        'emu'       => \$param_emuenv,          # Deprecated: extract only emulator environment
+                        'start'     => \$param_start_directly,  # starts extracting directly without waiting user acceptance
+                        'product=s' => \$param_product,         # manually insert product name
+                        'x=s'       => \@param_exclude,         # filer list for excluding zips
+                        'exclude=s' => \@param_exclude,         # filer list for excluding zips
+                        'i=s'       => \@param_include,         # filer list for including zips
+                        'include=s' => \@param_include,         # filer list for including zips
+                        'f=s'       => \@force_include,         # filer list for including zips if default tag is false
+                        'force=s'   => \@force_include,         # filer list for including zips if default tag is false
+                        'all'       => \$param_all,             # extract all zip whether default tag is true or false
+                        'nodeps'    => \$param_skip_deps,       # do not extract dependencies
+                        'grace'     => \$param_grace);          # try to DL from GRACE
 
 # enums for error situations
 my $warning = 1;
@@ -74,28 +78,25 @@ my $dependencyMissing = 3;
 my $cannotContinue = 4;
 
 # common global variables
-my $metaDataXml;                    # path to metadata file
+my $metaDataXml;            # path to metadata file
 my $currentReleaseXml;      # path to currentRelease.xml if exists
 my $pathToReleaseFolder;    # path to server that has releases
 my $defaultServiceName;     # default name for service (s60rnd)
-my $pathToUnzip;                    # path to unzip tool
-my $tmpDlDir;                           # path to temp dir where we'll DL packages to
-my $tmpDir;                             # path to temp dir where we extract packages from
-my $returnValue;                    # holds the error codes coming from 7-zip
-my $graceServer;                    # path to local grace server if accessible
-my $logFile;                            # log file for troubleshooting
-my %packageHash;                    # hash containing zips to extract
-my @finalZipList;                   # contains final list of files to unzip
-my $getEnvVersion;              # version of this getenv script
-my $soapConnection;             # holding boolean value wheter we have connection s60builds server
-my $soapSessionID;              # holds the session ID received from SOAP server
+my $pathToUnzip;            # path to unzip tool
+my $tmpDlDir;               # path to temp dir where we'll DL packages to
+my $tmpDir;                 # path to temp dir where we extract packages from
+my $returnValue;            # holds the error codes coming from 7-zip
+my $graceServer;            # path to local grace server if accessible
+my $logFile;                # log file for troubleshooting
+my %packageHash;            # hash containing zips to extract
+my @finalZipList;           # contains final list of files to unzip
+my $getEnvVersion;          # version of this getenv script
 my $defaultPathToServer;    # default value for the server
-my $soapServiceURL = undef;
 
 # list of GRACE samba shares - must match to @graceNameList
-my @graceList = ();
+my @hydraList = ();
 # must match to @graceList
-my @graceNameList = ();
+my @hydraNameList = ();
 
 #these 2 lists need to match                    
 my @serviceList = ();
@@ -109,18 +110,8 @@ $defaultServiceName = undef;
 $pathToReleaseFolder = undef;
 $defaultPathToServer = undef;
 $pathToUnzip = "7za";
-$getEnvVersion = "2.4.0";
-
-# first open/create log file
-#open( LOGFILE, ">> $logFile" ) or handleError( "cant create log file: $!", $warning );
-eval {
-  open( LOGFILE, ">> getcwd.'/output/logs/getenv.log'" );
-}; 
-  if ($@) #if exception
-  {
-     open( LOGFILE, ">> getcwd.'/getenv.log'" ) ; 
-  }
-  
+$getEnvVersion = "2.4.9";
+ 
 print "S60 RnD environment getter v.$getEnvVersion\n\n";
 printLog( "getenv.pl version $getEnvVersion" );
 
@@ -136,273 +127,253 @@ ValidateInputs( );
 printLog( "Following release we will extract: $metaDataXml" );
 PrintFinalWarning( );
 DownloadRelease( );
-# if we have SOAP connection we should end it
-if( $soapConnection ) {
-    my $sessionInfo = EndSoapConnection( );
-    print "\n\n".$sessionInfo->{'Info'}."\n\n" if( $sessionInfo->{'Info'} );
-}
 
 exit 0;
 
 
 sub ValidateInputs {
-    print_help( ) if ( $param_help );
+  print_help( ) if ( $param_help );
+
+  if( @param_exclude and @param_include ) {
+    HandleError( "you cant specify include and exclude lists at the same time!", $cannotContinue );
+  }
+
+  # checking wheter we are in root of the substituted drive (if -start param is not specified)
+  if( ! $param_start_directly and
+      ! getcwd =~ /[a-zA-Z]:\// and
+        $param_keepgoing ) {
+    HandleError( "You should run getenv only in root of the substituted drive\nYou can use -k as keep going parameter if you think it is ok to proceed", $cannotContinue );
+  }
+
+  # ok we are in root. Is the drive empty?
+  my $xmlFile = 0;
+  my $driveEmpty = 1;
+  
+  opendir( ROOT, "/" ) or HandleError( "cant read root dir: $!", $warning );
+  my @filesFound = readdir( ROOT );
+  closedir( ROOT );
+  foreach my $file( @filesFound ) {
+      next if $file =~ /^\.[\.]?$/;
+      next if $file =~ /getenv/;
+      $xmlFile = 1 if $file =~ /.*metadata.*\.xml/;
+      $xmlFile = 1 if $file =~ /currentRelease\.xml/;
+      $driveEmpty = 0;
+  }
+  
+  printLog( "xml files: $xmlFile" );
+  printLog( "drive empty: $driveEmpty" );
+
+  # if drive is not empty and no xmls found ==> print warning (if -start param not specified)
+  if( ! $param_start_directly and ! $xmlFile and ! $driveEmpty ) {
+      HandleError( "The drive you are about to extract environment is not empty!\nHit CTRL-C to break now or <enter> to continue", $promptUser );
+  }
+
+  # if there is valid metadata.xml in root, params like path or latest doesn't make any sense
+  if( $xmlFile ) {
+      foreach my $file( @filesFound ) {
+          if( $file =~ /.*metadata(_(\d*))?.xml$/i ) {
+              print "metadata file found!\n";
+              if( ValidateXmlFile( getcwd.$file ) ) {
+                  $metaDataXml = getcwd.$file;
+                  last;
+              }
+          }
+      }
+  }
+
+  if( $metaDataXml ) {
+    if( $param_latest or $param_release_path ) {
+          print "It doesnt make sense to use 'path' or 'latest' parameter while having metadata.xml in root!\n\n";
+          print_help( );
+          exit 0;
+    }
+
+  # we should ask correct grace share if xmlfile !server !start       
+    if( !$param_server and ! $param_start_directly ) {
+      print "For your convenience it is recommended to use HYDRA samba share close to you.\n";
+      # prompt user wheter he wants to use GRACE
+      my $networkAccessVerified = 0;
+      while( $networkAccessVerified eq 0 ) {
+        my $wantedServer = FixPaths( $hydraList[ ReturnMenuIndex( "Please select share closest to you", @hydraNameList ) ] );
     
-    # try to get version info from s60builds SOAP server
-    my $versionInfoFromServer = GetSoapVersion( ) if( !$param_no_soap );
-    if( $versionInfoFromServer ) {
-        # we have access to SOAP server
-        printLog( "SOAP: access OK" );
-        $soapConnection = 1;
-        
-        # lets not start soap if prompt only is defined
-        $soapConnection = 0 if $param_print_only;
-        
-        printLog( "SOAP: latest OK version: ".$versionInfoFromServer->{'LatestOK'}->{'Version'} );
-        printLog( "SOAP: latest OK date: ".$versionInfoFromServer->{'LatestOK'}->{'Date'} );
-        printLog( "SOAP: latest version: ".$versionInfoFromServer->{'Latest'}->{'Version'} );
-        printLog( "SOAP: latest date: ".$versionInfoFromServer->{'Latest'}->{'Date'} );
-        
-        # compare version nmbrs and prompt user if outdated getenv
-        if( $getEnvVersion < $versionInfoFromServer->{'LatestOK'}->{'Version'} ) {
-            HandleError( "Your getenv is outdated and can not be usedanymore\nPlease get newer from the server.", $cannotContinue );
-        }       
-    }
-    else {
-        printLog( "SOAP: we dont have SOAP access" );
-        $soapConnection = 0;
-    }
-
-    if( @param_exclude and @param_include ) {
-        HandleError( "you cant specify include and exclude lists at the same time!", $cannotContinue );
-    }
-
-    # checking wheter we are in root of the substituted drive (if -start param is not specified)
-    if( ! $param_start_directly and
-            !   getcwd =~ /[a-zA-Z]:\// and
-                $param_keepgoing ) {
-        HandleError( "You should run getenv only in root of the substituted drive\nYou can use -k as keep going parameter if you think it is ok to proceed", $cannotContinue );
-    }
-
-    # ok we are in root. Is the drive empty?
-    my $xmlFile = 0;
-    my $driveEmpty = 1;
-    
-    opendir( ROOT, "/" ) or HandleError( "cant read root dir: $!", $warning );
-    my @filesFound = readdir( ROOT );
-    closedir( ROOT );
-    foreach my $file( @filesFound ) {
-        next if $file =~ /^\.[\.]?$/;
-        next if $file =~ /getenv/;
-        $xmlFile = 1 if $file =~ /.*metadata.*\.xml/;
-        $xmlFile = 1 if $file =~ /currentRelease\.xml/;
-        $driveEmpty = 0;
-    }
-    
-    printLog( "xml files: $xmlFile" );
-    printLog( "drive empty: $driveEmpty" );
-
-    # if drive is not empty and no xmls found ==> print warning (if -start param not specified)
-    if( ! $param_start_directly and ! $xmlFile and ! $driveEmpty ) {
-        HandleError( "The drive you are about to extract environment is not empty!\nHit CTRL-C to break now or <enter> to continue", $promptUser );
-    }
-
-    # if there is valid metadata.xml in root, params like path or latest doesn't make any sense
-    if( $xmlFile ) {
-        foreach my $file( @filesFound ) {
-            if( $file =~ /.*metadata(_(\d*))?.xml$/i ) {
-                print "metadata file found!\n";
-                if( ValidateXmlFile( getcwd.$file ) ) {
-                    $metaDataXml = getcwd.$file;
-                    last;
-                }
-            }
+        if( $wantedServer eq FixPaths( $hydraList[0] ) ) {
+              HandleError( "Please notice that access to $hydraList[0] will be removed from wk50 onwards. Now would be perfect time to get yourself a GRACE access.", $promptUser );
         }
-    }
-
-    if( $metaDataXml ) {
-        if( $param_latest or $param_release_path ) {
-            print "It doesnt make sense to use 'path' or 'latest' parameter while having metadata.xml in root!\n\n";
-            print_help( );
-            exit 0;
-        }
-
-        # we should ask correct grace share if xmlfile !server !start       
-        if( !$param_server and ! $param_start_directly ) {
-            print "For your convenience it is recommended to use GRACE samba share close to you.\n";
-            # prompt user wheter he wants to use GRACE
-            my $networkAccessVerified = 0;
-            while( $networkAccessVerified eq 0 ) {
-                my $wantedServer = FixPaths( $graceList[ ReturnMenuIndex( "Please select share closest to you", @graceNameList ) ] );
-        
-                if( $wantedServer eq FixPaths( $graceList[0] ) ) {
-                    HandleError( "Please notice that access to $graceList[0] will be removed from wk50 onwards. Now would be perfect time to get yourself a GRACE access.", $promptUser );
-                }
-            
-                printLog( "selected: $wantedServer - accessing.." );
-                if( opendir( GRACETEST, $wantedServer ) ) {
-                    printLog( "connection tested OK" );
-                    $networkAccessVerified = 1;
-                    $pathToReleaseFolder = $wantedServer;
-                }
-                else {
-                    print "Unable to access $wantedServer\nPlease select another network share.\n";
-                }
-            }
-        }
-        
-        # in case we have metadata in \ and -start defined, look grace automatically
-        elsif( !$param_server and $param_start_directly ) {
-            $pathToReleaseFolder = FindGraceServer( );
-        }
-    }
-    
-    # ToDo: if there is not metadata.xml in root check if we have already env. Possibly update?
-    
-    # is 'path' parameter is used, find out (wheter there exists) valid metadata.xml
-    if( $param_release_path ) {
-        if( $param_latest or $param_product ) {
-            print "It doesnt make sense to use 'path' or 'latest' parameter while having metadata.xml in root!\n\n";
-            print_help( );
-            exit 0;
-        }
-        $metaDataXml = FixPaths( $param_release_path );
-        $metaDataXml .= SearchValidXml( $metaDataXml );
-        printLog( "setting metadata: $metaDataXml" );
-    }
-    
-    # handle server parameter
-    # simply just verify accessablility and fix path
-    if( $param_server ) {
-        $pathToReleaseFolder = FixPaths( $param_server );
-        opendir( OPENTEST, $pathToReleaseFolder ) or HandleError( "Unable to access given server path: $pathToReleaseFolder\n$!", $cannotContinue );
-        closedir( OPENTEST );
-    }
-    
-    # param_latest is used to just get latest release - requires product
-    if( $param_latest ) {
-        if( $param_product ) {
-            $param_product = FixPaths( $param_product );
-            
-            # once the network share is unavailable then tries to find grace share
-            $pathToReleaseFolder = FindGraceServer( );
-            
-            opendir( RELDIR, $pathToReleaseFolder.$defaultServiceName.$param_product ) or die "unable to open $pathToReleaseFolder$defaultServiceName$param_product\n$!";
-            # scan all xml files to @files_found
-# salmarko starts
-            my @files_found = grep { /^pf_|^S60_|^dfs_/i } readdir RELDIR;
-# salmarko ends
-            close RELDIR;
-
-            if( @files_found ) {
-                foreach( reverse sort ( @files_found ) ) {
-                    # we only want to get the last dir name..
-                    s/.*\///i;
-                    my $productToDl = $pathToReleaseFolder.$defaultServiceName.$param_product;
-                    $productToDl .= FixPaths( $_ );
-                    print "Searching metadata.xml files from $productToDl\n" if $param_debug;
-
-                    $metaDataXml = SearchValidXml( $productToDl ) ;
-                    if( $metaDataXml ) {
-                        $metaDataXml = $productToDl.$metaDataXml;
-                        printLog( "selected xml: $metaDataXml" );
-                        last;
-                    }
-                }
-            }
-            else {
-                HandleError( "cannot find releases from $pathToReleaseFolder$defaultServiceName$param_product", $cannotContinue );
-            }
+      
+        printLog( "selected: $wantedServer - accessing.." );
+        if( opendir( GRACETEST, $wantedServer ) ) {
+          printLog( "connection tested OK" );
+          $networkAccessVerified = 1;
+          $pathToReleaseFolder = $wantedServer;
         }
         else {
-            die "If you specify -latest parameter you have to define -product also!\n";
+              print "Unable to access $wantedServer\nPlease select another network share.\n";
         }
+      }
     }
-    
-    # use wizard to find out what to DL
-    if( ! $metaDataXml ) {
-        printLog( "Not enought valid inputs provided - running wizard..." );
-        RunWizard( );
+          
+          # in case we have metadata in \ and -start defined, look grace automatically
+    elsif( !$param_server and $param_start_directly ) {
+              $pathToReleaseFolder = FindGraceServer( );
     }
+  }
     
-    # check wheter metadata and currentRelease adds up
-    if( -e FixPaths( getcwd )."currentRelease.xml") {
-        printLog( "CurrenRelease.xml exists. Checking wheter update is possible" );
-        
-        # compare service, product and release with xml files
-        my $CurrentRelXmlParser = new XML::Simple( );
-        my $currentReleaseData = $CurrentRelXmlParser->XMLin( FixPaths( getcwd )."currentRelease.xml" );
-        
-        my $xmlParser = new XML::Simple( );
-        my $xmlData = $xmlParser->XMLin( $metaDataXml );
+  # ToDo: if there is not metadata.xml in root check if we have already env. Possibly update?
+  
+  # is 'path' parameter is used, find out (wheter there exists) valid metadata.xml
+  if( $param_release_path ) {
+    if( $param_latest or $param_product ) {
+      print "It doesnt make sense to use 'path' or 'latest' parameter while having metadata.xml in root!\n\n";
+      print_help( );
+      exit 0;
+    }
+    $metaDataXml = FixPaths( $param_release_path );
+    $metaDataXml .= SearchValidXml( $metaDataXml );
+    printLog( "setting metadata: $metaDataXml" );
+  }
+  
+  # handle server parameter
+  # simply just verify accessablility and fix path
+  if( $param_server ) {
+      $pathToReleaseFolder = FixPaths( $param_server );
+      opendir( OPENTEST, $pathToReleaseFolder ) or HandleError( "Unable to access given server path: $pathToReleaseFolder\n$!", $cannotContinue );
+      closedir( OPENTEST );
+  }
+  
+  # param_latest is used to just get latest release - requires product
+  if( $param_latest ) {
+    if( $param_product ) {
+      $param_product = FixPaths( $param_product );
+      
+      # once the network share is unavailable then tries to find grace share
+      $pathToReleaseFolder = FindGraceServer( );
+      
+      opendir( RELDIR, $pathToReleaseFolder.$defaultServiceName.$param_product ) or die "unable to open $pathToReleaseFolder$defaultServiceName$param_product\n$!";
+      # scan all xml files to @files_found
+# salmarko starts
+      my @files_found = grep { /^pf_|^S60_|^dfs_/i } readdir RELDIR;
+# salmarko ends
+      close RELDIR;
+
+      if( @files_found ) {
+          foreach( reverse sort ( @files_found ) ) {
+              # we only want to get the last dir name..
+              s/.*\///i;
+              my $productToDl = $pathToReleaseFolder.$defaultServiceName.$param_product;
+              $productToDl .= FixPaths( $_ );
+              print "Searching metadata.xml files from $productToDl\n" if $param_debug;
+
+              $metaDataXml = SearchValidXml( $productToDl ) ;
+              if( $metaDataXml ) {
+                  $metaDataXml = $productToDl.$metaDataXml;
+                  printLog( "selected xml: $metaDataXml" );
+                  last;
+              }
+          }
+      }
+      else {
+          HandleError( "cannot find releases from $pathToReleaseFolder$defaultServiceName$param_product", $cannotContinue );
+      }
+    }
+    else {
+        die "If you specify -latest parameter you have to define -product also!\n";
+    }
+  }
+  
+  # use wizard to find out what to DL
+  if( ! $metaDataXml ) {
+      printLog( "Not enought valid inputs provided - running wizard..." );
+      RunWizard( );
+  }
+  
+  # check wheter metadata and currentRelease adds up
+  if( -e FixPaths( getcwd )."currentRelease.xml") {
+      printLog( "CurrenRelease.xml exists. Checking wheter update is possible" );
+      
+      # compare service, product and release with xml files
+      my $CurrentRelXmlParser = new XML::Simple( );
+      my $currentReleaseData = $CurrentRelXmlParser->XMLin( FixPaths( getcwd )."currentRelease.xml" );
+      
+      my $xmlParser = new XML::Simple( );
+      my $xmlData = $xmlParser->XMLin( $metaDataXml );
 
 # salmarko starts
-        my $currentRelease = '';
-        my $newRelease = '';
+      my $currentRelease = '';
+      my $newRelease = '';
 
-        if ( !defined $xmlData->{releaseDetails}->{dependsOf}->{service}->{name} ) { # no dependencies, lets compare current to new
-            # compare services
-            if( $currentReleaseData->{releaseDetails}->{releaseID}->{service}->{name} ne
-                    $xmlData->{releaseDetails}->{releaseID}->{service}->{name} ) {
-                HandleError( "Can not extract ".$xmlData->{releaseDetails}->{releaseID}->{service}->{name} .
-                " release on top of ".$currentReleaseData->{releaseDetails}->{releaseID}->{service}->{name}, $cannotContinue );
-            }
-            # compare products
-            if( $currentReleaseData->{releaseDetails}->{releaseID}->{product}->{name} ne
-                    $xmlData->{releaseDetails}->{releaseID}->{product}->{name} ) {
-                HandleError( "Can not extract ".$xmlData->{releaseDetails}->{releaseID}->{product}->{name} .
-                " release on top of ".$currentReleaseData->{releaseDetails}->{releaseID}->{product}->{name}, $cannotContinue );
-            }
-            printLog( "service and product matches.. checking release" );
+      if ( !defined $xmlData->{releaseDetails}->{dependsOf}->{service}->{name} ) { # no dependencies, lets compare current to new
+          # compare services
+          if( $currentReleaseData->{releaseDetails}->{releaseID}->{service}->{name} ne
+                  $xmlData->{releaseDetails}->{releaseID}->{service}->{name} ) {
+              HandleError( "Can not extract ".$xmlData->{releaseDetails}->{releaseID}->{service}->{name} .
+              " release on top of ".$currentReleaseData->{releaseDetails}->{releaseID}->{service}->{name}, $cannotContinue );
+          }
+          # compare products
+          if( $currentReleaseData->{releaseDetails}->{releaseID}->{product}->{name} ne
+                  $xmlData->{releaseDetails}->{releaseID}->{product}->{name} ) {
+              HandleError( "Can not extract ".$xmlData->{releaseDetails}->{releaseID}->{product}->{name} .
+              " release on top of ".$currentReleaseData->{releaseDetails}->{releaseID}->{product}->{name}, $cannotContinue );
+          }
+          printLog( "service and product matches.. checking release" );
 
-            $currentRelease = $currentReleaseData->{releaseDetails}->{releaseID}->{release}->{name};
-            $newRelease = $xmlData->{releaseDetails}->{releaseID}->{release}->{name};
-        }
-        else{
-            # compare services
-            if( $currentReleaseData->{releaseDetails}->{releaseID}->{service}->{name} ne
-                    $xmlData->{releaseDetails}->{dependsOf}->{service}->{name} ) {
-                HandleError( "Can not extract ".$xmlData->{releaseDetails}->{dependsOf}->{service}->{name} .
-                " release on top of ".$currentReleaseData->{releaseDetails}->{releaseID}->{service}->{name}, $cannotContinue );
-            }
-            # compare products
-            if( $currentReleaseData->{releaseDetails}->{releaseID}->{product}->{name} ne
-                    $xmlData->{releaseDetails}->{dependsOf}->{product}->{name} ) {
-                HandleError( "Can not extract ".$xmlData->{releaseDetails}->{dependsOf}->{product}->{name} .
-                " release on top of ".$currentReleaseData->{releaseDetails}->{releaseID}->{product}->{name}, $cannotContinue );
-            }
-            printLog( "service and product matches.. checking release" );
-            
-            # compare releases
-            $currentRelease = $currentReleaseData->{releaseDetails}->{releaseID}->{release}->{name};
-            $newRelease = $xmlData->{releaseDetails}->{dependsOf}->{release}->{name};
+          $currentRelease = $currentReleaseData->{releaseDetails}->{releaseID}->{release}->{name};
+          $newRelease = $xmlData->{releaseDetails}->{releaseID}->{release}->{name};
+      }
+      else{
+          # compare services
+          if( $currentReleaseData->{releaseDetails}->{releaseID}->{service}->{name} ne
+                  $xmlData->{releaseDetails}->{dependsOf}->{service}->{name} ) {
+              HandleError( "Can not extract ".$xmlData->{releaseDetails}->{dependsOf}->{service}->{name} .
+              " release on top of ".$currentReleaseData->{releaseDetails}->{releaseID}->{service}->{name}, $cannotContinue );
+          }
+          # compare products
+          if( $currentReleaseData->{releaseDetails}->{releaseID}->{product}->{name} ne
+                  $xmlData->{releaseDetails}->{dependsOf}->{product}->{name} ) {
+              HandleError( "Can not extract ".$xmlData->{releaseDetails}->{dependsOf}->{product}->{name} .
+              " release on top of ".$currentReleaseData->{releaseDetails}->{releaseID}->{product}->{name}, $cannotContinue );
+          }
+          printLog( "service and product matches.. checking release" );
+          
+          # compare releases
+          $currentRelease = $currentReleaseData->{releaseDetails}->{releaseID}->{release}->{name};
+          $newRelease = $xmlData->{releaseDetails}->{dependsOf}->{release}->{name};
 
-            if ( $currentRelease =~ m/^(S60_\d_\d+_\d{6})/i or $currentRelease =~ m/^(pf_\d{4}_\d{6})/ ) {
-                $currentRelease = $1;
-            }
-            else {
-                HandleError( "Current release info unknown or missing: $currentRelease", $cannotContinue );
-            }
+          if ( $currentRelease =~ m/^(S60_\d_\d+_\d{6})/i or $currentRelease =~ m/^(pf_\d{4}_\d{6})/ ) {
+              $currentRelease = $1;
+          }
+          else {
+              HandleError( "Current release info unknown or missing: $currentRelease", $cannotContinue );
+          }
 
-            if ( $newRelease =~ m/^(S60_\d_\d+_\d{6})/i or $newRelease =~ m/^(pf_\d{4}_\d{6})/ ) {
-                $newRelease = $1;
-            }
-            else {
-                HandleError( "New release info unknown or missing: $newRelease", $cannotContinue );
-            }
-        }
+          if ( $newRelease =~ m/^(S60_\d_\d+_\d{6})/i or $newRelease =~ m/^(pf_\d{4}_\d{6})/ ) {
+              $newRelease = $1;
+          }
+          else {
+              HandleError( "New release info unknown or missing: $newRelease", $cannotContinue );
+          }
+      }
 
-        printLog( "current release: $currentRelease" );
-        printLog( "release to extract: $newRelease" );
-# salmarko ends
+      printLog( "current release: $currentRelease" );
+      printLog( "release to extract: $newRelease" );
+#salmarko ends
 
-        if( $currentRelease ne $newRelease ) {
-            HandleError( "Can not extract $newRelease release on top of $currentRelease", $cannotContinue );
-        }
-        printLog( "release matches - update possible" );
-        
-        $currentRelease = FixPaths( getcwd )."currentRelease.xml";
-    }
+      if( $currentRelease ne $newRelease ) {
+          HandleError( "Can not extract $newRelease release on top of $currentRelease", $cannotContinue );
+      }
+      printLog( "release matches - update possible" );
+      
+      $currentRelease = FixPaths( getcwd )."currentRelease.xml";
+  }
+  # check wheter we can use c-disc as temp
+  my $df = getFreeDisk(  $ENV{'TEMP'}  );
+  
+  if( $df > 2147483648 && $df < 2147483648000 ) {
+    printLog( "amount of free space seems sane: $df" );
+    $tmpDir = FixPaths( tempdir( CLEANUP => 0 ) );
+    printLog( "setting tmpDir: $tmpDir" );
+    $tmpDlDir = FixPaths( tempdir( CLEANUP => 0 ) );
+    printLog( "setting tmpDlDir: $tmpDlDir" );
+  }
 }
 
 
@@ -430,10 +401,20 @@ sub printLog {
             print $trace."\n";
         }
     
+        # first open/create log file
+        #open( LOGFILE, ">> $logFile" ) or handleError( "cant create log file: $!", $warning );
+        eval {
+            open( LOGFILE, ">> getcwd.'/output/logs/getenv.log'" );
+        }; 
+        if ($@) #if exception
+        {
+            open( LOGFILE, ">> getcwd.'/getenv.log'" ) or handleError( "cant create log file: $!", $warning );
+        }
         # we should print traces for log file
         my ($sec,$min,$hr) = localtime();
-      printf LOGFILE ( "%02d:%02d:%02d: ", $hr, $min, $sec );
+        printf LOGFILE ( "%02d:%02d:%02d: ", $hr, $min, $sec );
         print LOGFILE $trace."\n";
+		close (LOGFILE);
     }
 }
 
@@ -502,11 +483,12 @@ getenv.pl [params]
   getenv.pl -emu        DEPRECATED - prefer filtering: get only emulator environment
   getenv.pl -start      starts extracting without user confirmation (nice for scripts)
   getenv.pl -nodeps     do not download dependencies for the release
-  getenv.pl -nosoap     dont try to use SOAP connection for s60builds server
   getenv.pl -skipitd    DEPRECATED - prefer filtering: skips useless doc, internal, tsrc zips
   getenv.pl -verbose    print debug traces
   getenv.pl -Include    include only some types of packages (emu, src, tsrc)
   getenv.pl -eXclude    exclude some types of packages (emu, src, tsrc)
+  getenv.pl -all        extract all zips
+  getenv.pl -Force      forces to extract some filtered packages ( tsrc ) including default zips
 
 examples
 ========
@@ -580,10 +562,10 @@ sub RunWizard {
         my $wantedServer;
         my $networkAccessVerified = 0;
         while( $networkAccessVerified eq 0 ) {
-            $wantedServer = FixPaths( $graceList[ ReturnMenuIndex( "Please select share closest to you", @graceNameList ) ] );
+            $wantedServer = FixPaths( $hydraList[ ReturnMenuIndex( "Please select share closest to you", @hydraNameList ) ] );
             
-            if( $wantedServer eq FixPaths( $graceList[0] ) ) {
-                HandleError( "Please notice that access to $graceList[0] will be removed from wk50 onwards. Now would be perfect time to get yourself GRACE access.", $promptUser );
+            if( $wantedServer eq FixPaths( $hydraList[0] ) ) {
+                HandleError( "Please notice that access to $hydraList[0] will be removed from wk50 onwards. Now would be perfect time to get yourself GRACE access.", $promptUser );
             }
         
             printLog( "selected: $wantedServer - accessing.." );
@@ -593,7 +575,7 @@ sub RunWizard {
                 $pathToReleaseFolder = $wantedServer;
             }
             else {
-                print "Unable to access $wantedServer\nPlease select another network share.\n";
+        die "Unable to access $wantedServer\nPlease select another network share.\n";
             }
         }
         my $wantedService = $serviceList[ ReturnMenuIndex( "Please select GRACE Service.", @serviceNameList)];
@@ -604,7 +586,7 @@ sub RunWizard {
             $defaultServiceName = $wantedService
             }
             else {
-            print "Unable to access $wantedServer.$wantedService\nPlease select another network share or service.\n";
+            die "Unable to access $wantedServer.$wantedService\nPlease select another network share or service.\n";
             }
     }
 
@@ -636,11 +618,7 @@ sub RunWizard {
 sub FindAvailableProducts {
     opendir( DIR, $pathToReleaseFolder.$defaultServiceName )
         or HandleError( "Can't open directory: $pathToReleaseFolder$defaultServiceName\n$!", $cannotContinue );
-#change to match only for directories
-#   my @productFiles = grep { /s(eries_)?60_\d_\d/i } readdir (DIR);
-# salmarko starts
-    my @productFiles = grep /^pf_|^S60_|^DFS/i, readdir (DIR);
-# salmarko ends
+  my @productFiles = grep /^pf_|^S60|^DFS|^50_|^pf./i, readdir (DIR);
     printLog( @productFiles );
     closedir( DIR );
     
@@ -750,7 +728,10 @@ sub FindAvailableReleases {
     opendir( DIR, $pathToReleaseFolder.$defaultServiceName .$selectedProduct ) or die "Can't open dir: $!\n";
 #   my @releaseFiles = grep { /S60_\d_\d.*/ } readdir (DIR);
 # salmarko starts
-    my @releaseFiles = grep /^pf_|^S60/i, readdir (DIR);
+  #my @releaseFiles = grep /^pf_|^S60|^DFS|^50_|^pf./i, readdir (DIR);
+  # s3laine: Better way to exclude "." and ".." entries. The previous will fail
+  # if the release name includes dots. 
+  my @releaseFiles = grep { $_ ne '.' and $_ ne '..' } readdir (DIR); 
 # salmarko ends
 #   print Dumper( @releaseFiles );
     closedir (DIR);
@@ -813,17 +794,6 @@ sub DownloadRelease {
         RemoveThisXmlFromFinalList( FixPaths( getcwd )."currentRelease.xml", 1 );
     }
     if( VerifyFinalZipList( ) or $param_keepgoing ) {
-        # start SOAP session
-        if( $soapConnection ) {
-            my $soapSessionInfo = StartSoapSession( );
-            printLog( "SOAP: note ".$soapSessionInfo->{'HelloNote'} );
-            printLog( "SOAP: sessionid ".$soapSessionInfo->{'SessionID'} );
-            
-            print "\n".$soapSessionInfo->{'HelloNote'}."\n\n" if( $soapSessionInfo->{'HelloNote'} );
-            $soapSessionID = $soapSessionInfo->{'SessionID'};
-            printLog( "SOAP: soapSessionID set: $soapSessionID" );
-        }
-        
         # extract the environment
         GetEnv( );
     }
@@ -893,8 +863,10 @@ sub GeneratePackageHash {
         ${packageHash}{$key}{state} = $xmlDataHandle->{releaseFiles}->{package}->{$key}->{'state'};
         ${packageHash}{$key}{extract} = $xmlDataHandle->{releaseFiles}->{package}->{$key}->{'extract'};
         ${packageHash}{$key}{default} = $xmlDataHandle->{releaseFiles}->{package}->{$key}->{'default'};
-        
-        # added 31.7.2007 : check filters -attribute
+    # added 5th of September 2008 by salmarko, include all zips
+    if ( $param_all ) {
+      ${packageHash}{$key}{default} = "true";
+    }
         if ($xmlDataHandle->{releaseFiles}->{package}->{$key}->{'filters'}){
             ${packageHash}{$key}{s60filter} = $xmlDataHandle->{releaseFiles}->{package}->{$key}->{'filters'};
         }
@@ -902,6 +874,23 @@ sub GeneratePackageHash {
             ${packageHash}{$key}{s60filter} = $xmlDataHandle->{releaseFiles}->{package}->{$key}->{'s60filter'};
         }   
 
+    # added 5th of September 2008 by salmarko, include zips marked as false if -f parameter equals
+    if ( ${packageHash}{$key}{default} eq "false" ) {
+      if ( @force_include ) {
+        foreach my $include( @force_include ) {
+          if ( FindFromList( $include,${packageHash}{$key}{s60filter} ) ) {
+            ${packageHash}{$key}{default} = "true";
+          }
+        }
+      }
+      if ( @param_include ){
+        foreach my $include( @param_include ) {
+          if ( FindFromList( $include,${packageHash}{$key}{s60filter} ) ) {
+            ${packageHash}{$key}{default} = "true";
+          }
+        }
+      }
+    }
         # find out what is the latest state
         if( $finalState < $xmlDataHandle->{releaseFiles}->{package}->{$key}->{'state'} ) {
             $finalState = $xmlDataHandle->{releaseFiles}->{package}->{$key}->{'state'};
@@ -932,7 +921,6 @@ sub GeneratePackageHash {
             printLog( "read special instructions" );
         }
     }
-    # this is needed due to SymSEE's obsolete xml library
     # in case there is > 1 SP's in one XML file
     else {
         foreach( keys(%{$xmlDataHandle->{servicePacks}->{servicePack} } ) ) {
@@ -1129,7 +1117,7 @@ sub ReductFilesFromFinalLists {
 #               if( $finalZip->{filename} eq $zips and
 #                       $finalZip->{path} eq %packageHash->{$zips}->{'path'} ) {
                 if( $finalZip->{filename} eq $zips ) {
-                            printLog( "removing $finalZip->{path}/$finalZip->{filename} from dl list" );
+              printLog( "removing $finalZip->{path} $finalZip->{filename} from dl list" );
                             $finalZip->{default} = "false";
                 }
             }
@@ -1167,19 +1155,23 @@ sub VerifyFinalZipList {
 
 
 sub GetEnv {
-    # first thing is to copy 7zip
-    if( ! $param_print_only ) {
-        `7za --help`;
-        HandleError( "couldnt copy 7zip! make sure you have it in your system path!", $warning ) if ($? != 0);
-        mkdir $tmpDir;
-        mkdir $tmpDlDir;
-    }
+  my $fileCounter = 0;
+  # first thing is to copy 7zip
+  if( ! $param_print_only ) {
+    `7za --help`;
+    HandleError( "couldnt copy 7zip! make sure you have it in your system path!", $warning ) if ($? != 0);
+    mkdir $tmpDir;
+    mkdir $tmpDlDir;
+  }
+  
+  my $nmbrOfFiles = returnNmbrOfFiles( );
 
     printLog( "final zip list:" );
     printLog( Dumper( @finalZipList ) );
 
     # symsee 3.3.0 contains obsolete archive::zip, so we'll have to use system calls
     foreach my $file( @finalZipList ) {
+    $fileCounter ++;
         $returnValue = 0;
 
         # skip not mandatory files
@@ -1218,18 +1210,22 @@ sub GetEnv {
         # exclude files that has s60filter matching with exclude array
         if( @param_exclude ) {
             foreach my $exclude( @param_exclude ) {
-                if( $exclude eq $file->{s60filter} ) {
-                    $skipByFilter = 1;
-                    last;
-                }
+#       if( $exclude eq $file->{s60filter} ) {
+        if( FindFromList( $exclude, $file->{s60filter} ) ) {
+          printLog( "excluding $file->{filename} because $exclude matches $file->{s60filter}" );
+          $skipByFilter = 1;
+          last;
+        }
             }
         }
         # include only files that has s60filter matching with include array
         elsif( @param_include ) {
             $skipByFilter = 1;
             foreach my $include( @param_include ) {
-                if( $include eq $file->{s60filter} ) {
-                    $skipByFilter = 0;
+#       if( $include eq $file->{s60filter} ) {
+        if( FindFromList( $include, $file->{s60filter} ) ) {
+          printLog( "including $file->{filename} because $include matches $file->{s60filter}" );
+          $skipByFilter = 0;
                     last;
                 }
             }
@@ -1245,15 +1241,22 @@ sub GetEnv {
             # parent process copies/unzips packages to tmpDlDir
             printLog( "parent: extract packages to $tmpDlDir" );
             printLog( "parent: Processing: $file->{filename}... " );
-            print "Processing: $file->{filename}... ";
+      print "Downloading[$fileCounter\/$nmbrOfFiles] $file->{filename}... ";
             
             if( $file->{extract} eq 'single' ) {
                 # copy single zipped packages to $tmpDlDir
                 printLog( "parent: single zipped - copy to $tmpDlDir" );
-                if( ! $param_print_only ) {
-                    copy( $file->{path} . $file->{filename}, $tmpDlDir ) or
-                        HandleError( "cant copy file $file->{path}$file->{filename} to $tmpDlDir", $cannotContinue);
-                }
+        if( ! $param_print_only ) {
+          # Let's try 3 times to copy the file in case the server is busy, note this is a hack,
+          # the correct way would be either to remove the file from release list so that the next run would get the file
+          # or to check the for the error value before trying again. Although the error code seems to be '2' ie.
+          # 'File not found' so it is a little bit hard to distinguish between removed file and the server being busy.
+          # With more testing it some times returns also error code '9' ie. 'Bad file descriptor'.
+          copy( $file->{path} . $file->{filename}, $tmpDlDir ) or
+          copy( $file->{path} . $file->{filename}, $tmpDlDir ) or
+          copy( $file->{path} . $file->{filename}, $tmpDlDir ) or
+            HandleError( "cant copy file $file->{path}$file->{filename} to $tmpDlDir", $warning );
+        }
             }
             elsif( $file->{extract} eq 'double' ) {
                 # unzip double zipped zips to $tmpDlDir
@@ -1307,12 +1310,14 @@ sub GetEnv {
         
         # this is after forking
         # move files from tmpDlDir => tmpDir
+    printLog( "check is there file to move in tmpdldir" );
         my $somethingToCopy = 0;
         opendir( DLTEMP, $tmpDlDir ) or HandleError( "cant read $tmpDlDir dir: $!", $warning );
         my @filesFound = readdir( DLTEMP );
         closedir( DLTEMP );
         foreach my $file( @filesFound ) {
             next if $file =~ /^\.[\.]?$/;
+      printLog( "in tmpdldir: $file" );
             $somethingToCopy = 1;
         }
 
@@ -1436,15 +1441,12 @@ sub HandleZipError {
 
 # return path to accessible GRACE samba share
 sub FindGraceServer {
-# added 27.2.2007 : skip seeking if server has given from commandline
-# salmarko starts
     if (defined $param_server) {return FixPaths( $param_server );}
-# salmarko ends
 
-    print "\nseeking possible grace accesses. This might take a while.. ";
+    print "\nseeking possible hydra accesses. This might take a while.. ";
 
         my @graceAccessArray;
-        foreach my $address( @graceList ) {
+        foreach my $address( @hydraList ) {
             printLog( "accessing $address..." );
             if( opendir( GRACETEST, $address ) ) {
                 push @graceAccessArray, $address;
@@ -1457,23 +1459,23 @@ sub FindGraceServer {
         }
 
     if( @graceAccessArray ) {
-        print "done\nSelected GRACE server: ", $graceAccessArray[0];
+        print "done\nSelected HYDRA server: ", $graceAccessArray[0];
         if( scalar( @graceAccessArray ) > 1 ) {
             
             # if start is defined && >1 grace shares available, we'll have to just guess correct share
             if( $param_start_directly ) {
-                print( "More than one grace shares accessible\n" );
+                print( "More than one HYDRA shares accessible\n" );
                 print Dumper( @graceAccessArray );
                 print "\nBecause -start parameter is provided we cant prompt user to select correct, lets pick first one from the list\n";
                 print "You should use -server parameter to define the server\n";
-                printLog( "-start defined and >1 grace shares accessible" );
+                printLog( "-start defined and >1 hydra shares accessible" );
                 printLog( @graceAccessArray );
                 printLog( "selecting first one: $graceAccessArray[0]" );
                 return FixPaths( $graceAccessArray[0] );
             }
             else {
 # salmarko starts
-                return FixPaths( PrintSelectMenu( "Select reasonable GRACE share", @graceAccessArray ) );
+                return FixPaths( PrintSelectMenu( "Select reasonable HYDRA share", @graceAccessArray ) );
 # salmarko ends
             }
         }
@@ -1509,65 +1511,6 @@ sub ReturnProductName {
     return $tempXmlHandle->{releaseDetails}->{releaseID}->{product}->{name};
 }
 
-sub GetSoapVersion {
-    printLog( "Trying to access SOAP server" );
-    
-    my $soapVersion = eval { SOAP::Lite
-                                                        ->uri('GetEnv')
-                                                        ->on_action(sub{ sprintf('%s/%s', @_ )})
-                                                        ->proxy($soapServiceURL)
-                                                        ->GetVersionInfo( )
-                                                        ->result } ;
-    
-    print Dumper( $soapVersion ) if( $param_debug );
-    
-    return $soapVersion;
-}
-
-sub StartSoapSession {
-    printLog( "fetching session start info from SOAP" );
-    my $netPath = FixPaths( $pathToReleaseFolder );
-    $netPath .= FixPaths( $defaultServiceName );
-    $netPath .= FixPaths( ReturnProductName( $metaDataXml ) );
-    $netPath .= FixPaths( ReturnReleaseName( $metaDataXml ) );
-#   $netPath .= $metaDataXml;
-    printLog( "about to fetch: $netPath" );
-    
-    return SOAP::Lite
-        ->uri('GetEnv')
-        ->on_action(sub{ sprintf('%s/%s', @_ )})
-        ->proxy($soapServiceURL)
-        ->StartGetEnv( SOAP::Data->name( BuildName=> ReturnReleaseName( $metaDataXml ) )
-                                            ->type('string')
-                                            ->uri('GetEnv'),
-                                        SOAP::Data->name( NetworkPath=> $netPath )
-                                            ->type('string')
-                                            ->uri('GetEnv'),
-                                        SOAP::Data->name( UserName=> $ENV{'USERNAME'} )
-                                            ->type('string')
-                                            ->uri('GetEnv'),
-                                        SOAP::Data->name( MachineName=> $ENV{'COMPUTERNAME'} )
-                                            ->type('string')
-                                            ->uri('GetEnv') )
-        ->result;
-}
-
-sub EndSoapConnection {
-    printLog( "SOAP: Finishing SOAP session: $soapSessionID" );
-    printLog( "SOAP: release downloaded: $metaDataXml" );
-
-    return SOAP::Lite
-        ->uri('GetEnv')
-        ->on_action(sub{ sprintf('%s/%s', @_ )})
-        ->proxy($soapServiceURL)
-        ->DoneGetEnv( SOAP::Data->name( ID=> $soapSessionID )
-                                        ->type('string')
-                                        ->uri('GetEnv'))
-        ->result;
-
-}
-
-
 sub FindTempDir {
     # it'll speed up extraction if we put temp dir to separate disk
     
@@ -1594,4 +1537,48 @@ sub myFork()
         }
     return $pid;
     }
+# try to grep amount of free disk space
+sub getFreeDisk {
+  printLog( "getFreeDisk: $_[0]" );
+  my $bytesfree;
+  my $d = $_[0];
+  chomp($d);
+
+  my $cmd = "call dir $d";
+  my @dir = `$cmd 2>&1`;
+  return -1 if ($? != 0);
+  my $dir = $dir[scalar(@dir) - 1]; # the last line
+  chop($dir);
+  
+  printLog( "dir: $dir" );
+
+  # clean up whitespaces
+  $dir =~ s/^\s+//g;
+  $dir =~ s/\s+$//g;
+  $dir =~ s/\s{1,}/ /g;
+
+  # get rid of `X Dir(s)'
+  @dir = split(/\s/, $dir);
+  $dir = join("", @dir[2 .. scalar(@dir)]);
+  # get digits only
+  $dir =~ s/[^0-9]//g;
+  
+  # free space in gigabytes
+# $bytesfree = $dir/1073741824;
+  $bytesfree = $dir;
+  
+  printLog( "returning: $bytesfree" );
+  return $bytesfree;
+}
+
+# returns amount of files set for extract from finalZipList
+sub returnNmbrOfFiles {
+  my $count = 0;
+  
+  foreach( @finalZipList ) {
+    $count++ if $_->{default};
+  }
+  
+  return $count;
+}
 

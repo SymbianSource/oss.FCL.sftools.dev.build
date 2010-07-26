@@ -27,7 +27,7 @@ require Exporter;
 
 use strict;
 use XML::Handler::XMLWriter;
-use IO;
+#use IO;
 
 use featureparser;
 use featuremanager;
@@ -377,7 +377,7 @@ sub generateXML
 # @param singleDATfile           - Flag to generate single features.dat file.
 sub createFeatureFile
 {
-	if($xmlDBHandle == undef) 
+	if(!defined ($xmlDBHandle)) 
 	{
 		ERROR("No XML Database opened");
 		return 0;

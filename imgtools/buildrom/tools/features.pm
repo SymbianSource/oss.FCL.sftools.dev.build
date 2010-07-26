@@ -331,7 +331,7 @@ sub generate_Obeyfile
 			writeFile($ibyfilehandle, $defblock);
 		}
 		
-		writeFile($ibyfilehandle, "\n\n#endif //__",$ibyfile,"__");
+		writeFile($ibyfilehandle, "\n\n#endif //__",$ibyfile,"__\n");
 		closeFile($ibyfilehandle);
 	}
 }

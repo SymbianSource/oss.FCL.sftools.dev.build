@@ -22,12 +22,13 @@ Description:
 -->
 <project name="test_common" xmlns:au="org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
     <description>
-        Testing targets
+    Testing targets.
     </description>
+    
     <property environment="env"/>
     
     <property name="helium.dir" location="../../.." />
-    <import file="../../../helium.ant.xml"/>
+    <import file="../../../build.xml"/>
         
     <target name="test-text-config">
         <hlm:configuration file="${helium.dir}/tests/data/ant_config_test.txt"/>
@@ -204,29 +205,13 @@ project.setProperty("xml.test.list", str(result))
             </path>
         </hlm:touch>
     </target>
-    
-    <!-- Test parsemodel -->
-    <target name="test-parsemodel-description">
-        <hlm:parsemodel output="${helium.build.dir}/test_helium_data_model.xml_parsed" input="${helium.dir}/tests/data/data_model_validation_test.xml"/>            
-        <!-- Check if parsed file exist -->
-        <au:assertFileExists file="${helium.build.dir}/test_helium_data_model.xml_parsed" />
-        <xpathtest xmlfile="${helium.build.dir}/test_helium_data_model.xml_parsed">  
-            <namespace uri="" prefix=""/>
-            <!-- Check property description has been rendered as Media Wiki Syntax -->
-            <xpath expression="/heliumDataModel/property[description = '&lt;p&gt;Test property one.&lt;/p&gt;']"/>
-            <!-- Check group description has been rendered as Media Wiki Syntax -->
-            <xpath expression="/heliumDataModel/group[description = '&lt;p&gt;Group description test.&lt;/p&gt;']"/>
-            <!-- Check ** has been removed from property description -->
-            <xpath expression="/heliumDataModel/property[description = '&lt;p&gt;Test property Three.&lt;/p&gt;']"/>
-        </xpathtest>
-    </target>
+
     
     <!-- Test user flow graph creation -->
     <target name="test-helium-user-graph">
         <runtarget target="helium-user-graph"/>
-        <!--<au:assertFileExists file="${helium.build.dir}/doc/user-graph.html"/>-->
-        <au:assertFileExists file="${docs.build.dir}/images/user-graph.dot.png"/>
-        <delete dir="${docs.build.dir}"/>
+        <au:assertFileExists file="${basedir}/build/doc/user_graph.dot.png"/>
+        <delete dir="${basedir}/build/doc"/>
     </target>
 
 
@@ -262,6 +247,7 @@ project.setProperty("xml.test.list", str(result))
             <param name="metadata.dbfile" value="${build.cache.dir}/helium/temp_drive/output/logs/${build.id}_metadata_db"/>
             <param name="build.log.dir" value="${build.cache.dir}/helium/temp_drive/output/logs"/>            
             <param name="post.log.dir" value="${build.cache.dir}/helium/temp_drive/output/logs/post"/>
+            <param name="build.log" value="${build.cache.dir}/helium/temp_drive/output/logs/${build.id}_main.ant.log"/>
         </antcall>
         <au:assertFileExists file="${build.cache.dir}/helium/temp_drive/output/temp_build_files/sis_build.ant.xml"/>
         <delete file="${sisfiles.tempconfig.file}"/>

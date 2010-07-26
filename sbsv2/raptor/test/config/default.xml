@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<build xmlns="http://symbian.com/xml/build"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://symbian.com/xml/build build/2_0.xsd">
+
+    <!-- The build configurations built by default -->
+
+	<var name="default">
+		<set name="OVER" value="default"/>
+		<varRef ref="A"/>
+		<varRef ref="B"/>
+	</var>
+
+	<var name="baseA">
+		<set name="BASE" value="baseA"/>
+		<set name="OVER" value="baseA"/>
+	</var>
+
+	<var name="A" extends="baseA">
+		<set name="OVER" value="A"/>
+		<varRef ref="A2"/>
+		<varRef ref="A3"/>
+	</var>
+
+	<var name="baseB">
+		<set name="BASE" value="baseB"/>
+		<set name="OVER" value="baseB"/>
+	</var>
+
+	<var name="B" extends="baseB">
+		<set name="OVER" value="B"/>
+		<varRef ref="B2"/>
+		<varRef ref="B3"/>
+	</var>
+
+	<var name="A2">
+		<set name="OVER" value="A2"/>
+	</var>
+
+	<var name="A3">
+		<set name="OVER" value="A3"/>
+	</var>
+
+	<var name="B2">
+		<set name="OVER" value="B2"/>
+	</var>
+
+	<var name="B3">
+		<set name="OVER" value="B3"/>
+	</var>
+
+</build>

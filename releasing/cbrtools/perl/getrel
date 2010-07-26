@@ -1,0 +1,241 @@
+#!perl
+# Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+# 
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+# 
+# Contributors:
+# 
+# Description:
+# 
+#
+
+use strict;
+use FindBin;
+use lib "$FindBin::Bin";
+use Getopt::Long;
+use IniData;
+use EnvDb;
+use CommandController;
+
+
+#
+# Globals.
+#
+
+my $verbose = 0;
+my $overwriteSource = 0;
+my $iniData = IniData->New();
+my $commandController = CommandController->New($iniData, 'GetRel');
+my $envDb;
+my $installSource;
+my $sourceInstallPath = undef;
+
+
+#
+# Main.
+#
+
+ProcessCommandLine();
+
+
+#
+# Subs.
+#
+
+sub ProcessCommandLine {
+  Getopt::Long::Configure ("bundling");
+  my $help;
+  my $stdin;
+  GetOptions('h' => \$help, 's' => \$installSource, 'o' => \$overwriteSource, 'v+' => \$verbose, 'p' => \$stdin, 'i=s' => \$sourceInstallPath);
+
+  if ($help) {
+    Usage(0);
+  }
+
+  if ($sourceInstallPath and not $installSource) {
+    print "Error: Invalid options - cannot specify install path (using -i) without installing source (using -s)\n";
+    Usage(1);
+  }
+
+  $envDb = EnvDb->Open($iniData, $verbose);
+ 
+  if ($#ARGV == -1 and $stdin) {
+    my @failedGets;
+    my @lines;
+    my $line;
+    while (defined ($line = <STDIN>)) {
+      # Remove line feed, white space and comments.
+      chomp $line;
+      $line =~ s/^\s*//;
+      $line =~ s/\s$//;
+      $line =~ s/#.*//;
+      if ($line eq '') {
+        # Nothing left.
+        next;
+      }
+      push @lines, $line;
+    }
+
+    # We do this as a separate loop to work around a weird defect in Perl 5.8.0
+    # where <STDIN> only reads the first line if a system() call happens
+    # in between (which would be done by InstallComponent)
+    # This defect is #21717 and is due to be fixed in 5.8.1
+    my $lineNum = 0;
+    foreach $line (@lines) {
+      $lineNum++;
+      eval {
+        my @words = split (/\s+/, $line);
+        unless ($#words == 1) {
+          die "Error: Invalid number of arguments at line $lineNum from STDIN\n";
+        }
+        InstallComponent(@words);
+      };
+      if ($@) {
+        print $@;
+        push (@failedGets, $line);
+      }
+    }
+
+    if ($#failedGets >= 0) {
+      print "\nThere was an error getting the following release(s):\n\n";
+      foreach (@failedGets) {
+        print;
+      }
+    }
+  }
+  elsif ($#ARGV == 0) {
+    my $comp = shift @ARGV;
+    my $ver = $envDb->Version($comp);
+    unless (defined $ver) {
+      die "Error: Couldn't find version of $comp - not currently installed\n";
+    }
+    InstallComponent($comp, $ver);
+  }
+  elsif ($#ARGV == 1) {
+    InstallComponent(@ARGV);
+  }
+  else {
+    print "Error: Invalid number of arguments\n";
+    Usage(1);
+  }
+}
+
+sub Usage {
+  my $exitCode = shift;
+
+  Utils::PrintDeathMessage($exitCode, "\nUsage: getrel [options] <component> [<version>]
+
+options:
+
+-h  help
+-s  install source code also
+-o  overwrite any existing source
+-v  verbose output (-vv very verbose)
+-p  read a piped list of components from STDIN\n");
+}
+
+sub InstallComponent {
+  my $comp = shift;
+  my $ver = shift;
+
+  $comp = lc($comp);
+
+  $iniData->PathData()->CheckReleaseExists($comp, $ver);
+
+  my $relData = RelData->Open($iniData, $comp, $ver, $verbose);
+
+  #change the version string to that stored in the reldata file (version nums are case dependent)
+  my $env = $relData->Environment();
+  $ver = $env->{$comp};
+
+  my $noinstall = 0;
+  my $installedVer = $envDb->Version($comp);
+  if (defined $installedVer and lc($installedVer) eq lc($ver)) {
+    (my $status) = $envDb->CheckComp($comp, 0);
+    if ($status == EnvDb::STATUS_CLEAN) {
+      print "$comp $ver already installed and clean\n";
+      $noinstall = 1;
+    }
+  }
+
+  unless ($noinstall) {
+    # Remove old binaries if present.
+    if (defined $installedVer and $envDb->Status($comp) != EnvDb::STATUS_PENDING_RELEASE) {
+      if (lc($installedVer) eq lc($ver)) {
+        print "Re-installing $comp $ver...\n";
+      }
+      else {
+        print "Switching $comp from $installedVer to $ver...\n";
+      }
+      $envDb->RemoveComponent($comp);
+    }
+    else {
+      print "Installing $comp $ver...\n";
+    }
+    $envDb->InstallComponent($comp, $ver, $overwriteSource);
+  }
+
+  if ($installSource) {
+    my $installPath = $sourceInstallPath;
+    if (!defined ($installPath)) {
+      $installPath="\\";
+    }
+    $envDb->UnpackSource($comp, $ver, $installPath, $overwriteSource, 1);
+  }
+}
+
+
+__END__
+
+=head1 NAME
+
+GetRel - Installs the binaries of a component release into the current environment.
+
+=head1 SYNOPSIS
+
+  getrel [options] <component> [<version>]
+
+options:
+
+  -h  help
+  -s  install source code also
+  -o  overwrite any existing source
+  -v  verbose output (-vv very verbose)
+  -p  read a piped list of components from STDIN
+
+=head1 DESCRIPTION
+
+Before installing new binaries, any existing binaries are removed. If no version is specifed, the current version will be re-installed (if it is dirty). Multiple releases may be installed by specifying the C<-p> switch and piping in text via C<STDIN> that contains lines in a <component> <version> format. Releases that fail to install are listed at the end.
+
+Source code may optionally be installed also. If specified, this will be installed into the root of the current drive. Any existing files will be overwritten with -o.
+
+As well as overwriting existing source code, C<-o> will overwrite any binaries which are left on the drive. There will only be leftover binaries in exceptional circumstances; normally C<getrel> will remove old versions of components before trying to install new ones.
+
+=head1 KNOWN BUGS
+
+None.
+
+=head1 COPYRIGHT
+
+ Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+ All rights reserved.
+ This component and the accompanying materials are made available
+ under the terms of the License "Eclipse Public License v1.0"
+ which accompanies this distribution, and is available
+ at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ 
+ Initial Contributors:
+ Nokia Corporation - initial contribution.
+ 
+ Contributors:
+ 
+ Description:
+ 
+
+=cut

@@ -85,7 +85,11 @@ build summary</title>
     <#-- -->
     <@helium_logger_node_head nodeid="${helium_node_id}" title="${logentry.path}">
         <#list table_info['jpa']['select p from Priority p where p.priority not like \'%DEFAULT%\''] as priority>
-        <#assign count = table_info['jpasingle']['select Count(m.id) from MetadataEntry m where m.priorityId = ${priority.id} and m.logPathId=${logentry.id}'][0]>
+        <#assign missing_count=0/>
+        <#if priority.priority == "ERROR">
+            <#assign missing_count=table_info['jpasingle']['select Count(w.id) from WhatLogEntry w JOIN w.component as c JOIN c.logFile as l where l.id=${logentry.id} and l.path not like \'%_clean_%compile.log\' and w.missing=1'][0]/>
+        </#if>        
+        <#assign count = missing_count + table_info['jpasingle']['select Count(m.id) from MetadataEntry m where m.priorityId = ${priority.id} and m.logPathId=${logentry.id}'][0]>
             <@logfile_severity "${logentry.path}", "${priority.priority?lower_case}", 
                 "${count}", 
                 "${helium_node_id}" />
@@ -96,8 +100,12 @@ build summary</title>
             <#assign helium_node_id = helium_node_id + 1>
             <@helium_logger_node_head nodeid="${helium_node_id}" title="${component.component}">
                 <#list table_info['jpa']['select p from Priority p where p.priority not like \'%DEFAULT%\''] as priority>
-                    <@logfile_severity "${component.id}", "${priority.priority}", 
-                            table_info['jpasingle']['select Count(m.id) from MetadataEntry m where m.priorityId=${priority.id} and m.componentId = ${component.id}'][0], 
+                    <#assign missing_count=0/>
+                    <#if priority.priority == "ERROR">
+                        <#assign missing_count=table_info['jpasingle']['select Count(w.id) from WhatLogEntry w JOIN w.component as c JOIN c.logFile as l where c.id=${component.id} and l.path not like \'%_clean_%compile.log\' and w.missing=1'][0]/>
+                    </#if>
+                    <@logfile_severity "${component.id}", "${priority.priority?lower_case}", 
+                            table_info['jpasingle']['select Count(m.id) from MetadataEntry m where m.priorityId=${priority.id} and m.componentId = ${component.id}'][0] + missing_count, 
                             "${helium_node_id}" />
                 </#list>
             </@helium_logger_node_head>
@@ -112,6 +120,9 @@ build summary</title>
                         <@antlognode sublog/>
                     </#if> -->
                 </#list>
+            </#list>
+            <#list table_info['jpa']['select distinct w FROM WhatLogEntry w join  w.component as c JOIN c.logFile as l where c.id=${component.id} and l.path not like \'%_clean_%compile.log\' AND w.missing=1'] as entry>
+                <@logfile_entry_detail "MISSING: ${entry.member}", "ERROR", "${helium_node_id}" />
             </#list>
             </@helium_logger_node_content>
         </#list>

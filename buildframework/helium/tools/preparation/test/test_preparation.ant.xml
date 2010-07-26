@@ -36,11 +36,21 @@ Description:
     <property name="prep.root.dir" value="../../../build/test/preproot" />
 
     <property name="helium.dir" location="../../.." />
-    <!--<import file="../../../helium.ant.xml"/>-->
+    <!--<import file="../../../build.xml"/>-->
 
-    <!-- in the normal run we should not have the same build.drive content in the second run -->
-    <property name="build.drive" value="Z:" />
-    <import file="../../../helium.ant.xml" />
+    <!-- in the normal run we should not have the same build.drive content in the second run 
+    <property name="build.drive" value="Z:" />-->
+    <import file="../../../build.xml" />
+    <property name="preparation.temp.dir" location="${helium.build.dir}/antunit/preparation" />
+
+    <target name="setUp">
+        <delete dir="${preparation.temp.dir}" failonerror="false" />
+        <mkdir dir="${preparation.temp.dir}" />
+    </target>
+
+    <target name="tearDown">
+        <delete dir="${preparation.temp.dir}" failonerror="false" />
+    </target>
 
     <!-- Simple Synergy testing. -->
     <target name="-test-ccm">
@@ -114,13 +124,13 @@ session = ccm.open_session(database="fa1f5132")
                     <param name="build.drive.notdefined" value="true"/>
                 </antcall>
                 <au:assertFileExists file="${build.drive}"/>
-                <hlm:unsubst drive="${build.drive}"/>
+                <hlm:unsubst drive="${build.drive}" failonerror="false"/>
                 <delete dir="${prep.temp.build.dir}"/>
             </then>
         </if>
     </target>
 
-    <!--<import file="../../../helium.ant.xml"/>
+    <!--<import file="../../../build.xml"/>
     
      TODO: should these run on build.xml -->
     <!--<target name="test-build-int-not-set">    
@@ -205,4 +215,27 @@ project.setProperty("r.tag", str(strExists))
     </target>
 
 
+    <path id="test.directory.structure.config">
+        <pathelement path="${preparation.temp.dir}/dir1" />
+        <pathelement path="${preparation.temp.dir}/dir2" />
+    </path>
+
+    <target name="test-create-directory-structure-no-reference">
+        <antcall target="create-directory-structure" />
+        <au:assertLogContains text="'directory.structure.config' reference not found, so not any directory structure will be created." />
+    </target>
+    
+    <target name="test-create-directory-structure">
+        <antcall target="create-directory-structure">
+            <reference refid="test.directory.structure.config" torefid="directory.structure.config" />
+        </antcall>
+        <au:assertLogContains text="dir1" />
+        <au:assertLogContains text="dir2" />
+        <au:assertTrue>
+            <available file="${preparation.temp.dir}/dir1" type="dir" />
+        </au:assertTrue>
+        <au:assertTrue>
+            <available file="${preparation.temp.dir}/dir2" type="dir" />
+        </au:assertTrue>
+    </target>
 </project>

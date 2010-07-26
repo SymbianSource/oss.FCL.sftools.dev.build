@@ -57,8 +57,19 @@ Description:
         <metadatafilterset refid="filterset.common" />
     </hlm:metadatafilterset>
 
+    <hlm:metadatafilterset id="filterset.sbs.cli">
+        <metadatafilter priority="error" regex="^sbs:\s+error:.*" description="sbs cli error" />
+        <metadatafilter priority="warning" regex="^sbs:\s+warning:.*" description="sbs cli warning" />
+    </hlm:metadatafilterset>
+
     <hlm:metadatafilterset id="filterset.compile">
         <metadatafilterset refid="filterset.common" />
+        <hlm:metadatafilterset refid="filterset.compile.abld.deprecated" />
+    </hlm:metadatafilterset>
+    
+    <hlm:metadatafilterset id="filterset.compile.abld.deprecated">
+        <metadatafilter priority="error" regex="^\s*ABLD is not supported with this build.*" description="" />
+        <metadatafilter priority="error" regex="^\s*bldmake script can not be used in this env.*" description="" />
     </hlm:metadatafilterset>
 
     <hlm:metadatafilterset id="filterset.genxml.merge">

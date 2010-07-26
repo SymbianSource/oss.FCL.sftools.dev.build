@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -16,22 +16,12 @@
 # 
 #
 
-ifeq ($(TARGETTYPE),plugin)
+ifneq ($(filter plugin plugin3,$(TARGETTYPE)),)
 include $(FLMHOME)/e32abiv2defaults.mk
-
-# This is basically a DLL with some tweaks
-# If DEFFILE keyword is specified in the MMP, set the POSTLINKDEFFILE
-# and guarantee the generation of import library; if not specified import library
-# won't be generated for plugin (default)
-ifneq ($(DEFFILEKEYWORD),)
-POSTLINKDEFFILE:=$(DEFFILE)
-SUPPORT_FREEZE:=1
-IMPORTLIBRARYREQUIRED:=1
-endif
 
 # Default Linker settings for this target type
 LINKER_ENTRYPOINT_LIBDEP:=$(STATIC_RUNTIME_DIR)/edll.lib
-LINKER_ENTRYPOINT_SETTING:=$(LINKER_ENTRY_OPTION) _E32Dll $(LINKER_ENTRYPOINT_DECORATION) $(call dblquote,$(STATIC_RUNTIME_DIR)/edll.lib$(LINKER_ENTRYPOINT_ADORNMENT))
+LINKER_ENTRYPOINT_SETTING:=$(LINKER_ENTRY_OPTION)=_E32Dll $(LINKER_ENTRYPOINT_DECORATION)$(LINKER_SEPARATOR)$(call dblquote,$(STATIC_RUNTIME_DIR)/edll.lib$(LINKER_ENTRYPOINT_ADORNMENT))
 
 ifeq ("$(NEED_ENTRYPOINT_LIBRARY)","True")
 LINKER_ENTRYPOINT_SETTING:=$(LINKER_ENTRYPOINT_SETTING) $(LINKER_ENTRYPOINT_LIBDEP)
@@ -48,9 +38,22 @@ DOPOSTLINK:=1
 AUTOEXPORTS:=_Z24ImplementationGroupProxyRi,1;
 CANIGNORENONCALLABLE:=1
 
+# Fixed export TARGETTYPEs should only reference a .def file if an explicit DEFFILE statement is present in the .mmp file
+ifneq ($(DEFFILEKEYWORD),)
+POSTLINKDEFFILE:=$(DEFFILE)
+SUPPORT_FREEZE:=1
+ifeq ($(NOEXPORTLIBRARY),)
+IMPORTLIBRARYREQUIRED:=1
+endif
+endif
+
 # We could check the UID rather than forcing it
 # but there seems to be no point in that.
 UID2:=10009D8D
+ifeq ($(TARGETTYPE),plugin3)
+UID2:=10009D93
+POSTLINKTARGETTYPE:=PLUGIN3
+endif
 
 
 RESOURCEPATH:=Resource/Plugins
@@ -65,5 +68,5 @@ include $(FLMHOME)/e32abiv2.flm
 $(call vrestore)
 
 else
-$(error $e32abiv2plugin.flm called with wrong TARGETTYPE (should be 'plugin' but is '$(TARGETTYPE)'))
+$(error $e32abiv2plugin.flm called with wrong TARGETTYPE (should be 'plugin' or 'plugin3' but is '$(TARGETTYPE)'))
 endif

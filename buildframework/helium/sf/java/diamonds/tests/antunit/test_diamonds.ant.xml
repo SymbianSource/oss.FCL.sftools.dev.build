@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<!-- 
+============================================================================ 
+Name        : test_diamonds.ant.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test-diamonds" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>Helium Antlib diamonds unittests.</description>
+
+    
+    <import file="run-scenario.ant.xml" />
+
+    <target name="test-build">
+        <runScenario scenario="build" target="unittest-diamonds" />
+        <au:assertFileExists file="${temp.dir}/output/diamonds-start.log.xml" />
+        <au:assertFileExists file="${temp.dir}/output/diamonds-finish.xml" />
+    </target>
+
+    <target name="test-build-with-invalid-address">
+        <runScenario scenario="invalid-address" target="unittest-diamonds" />
+        <au:assertFileExists file="${temp.dir}/output/diamonds-start.log.xml" />
+        <au:assertFileExists file="${temp.dir}/output/diamonds-finish.xml" />
+    </target>
+    
+    <target name="test-build-with-invalid-templates">
+        <runScenario scenario="invalid-templates" target="unittest-diamonds" />
+        <au:assertFileExists file="${temp.dir}/output/diamonds-start.log.xml" />
+        <au:assertFileExists file="${temp.dir}/output/diamonds-finish.xml" />
+    </target>
+
+    <target name="test-build-with-invalid-templates-1">
+        <runScenario scenario="invalid-templates-1" failonerror="false" target="unittest-diamonds" />
+        <au:assertLogContains text="Not supported: two stages withsame ending target"/>
+    </target>
+    
+</project>

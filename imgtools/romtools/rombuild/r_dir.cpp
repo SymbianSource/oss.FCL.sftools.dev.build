@@ -23,6 +23,7 @@
 #include "r_obey.h"
 #include "r_rom.h"
 #include "r_global.h"
+#include "utf16string.h"
 
 // Generalised set handling
 
@@ -89,7 +90,8 @@ FiniteSet::~FiniteSet()
 	TInt i;
 	for (i=0; i<iCount; i++)
 		iMembers[i]->Close();
-	delete[] iMembers;
+	if(iMembers)
+		delete[] iMembers;
 	}
 
 TInt FiniteSet::Find(const SetMember& aMember, TInt& anIndex) const
@@ -388,16 +390,25 @@ TRomEntry* Entry::CreateRomEntry(char*& anAddr) const
 		iRomNode->iRomFile->SetRomEntry(pE);
 	pE->iName[0]=0;
 	pE->iName[1]=0;
-	TInt nl=iRomNode->NameCpy((char*)pE->iName);
-	pE->iNameLength=(TUint8)nl;
-	if (Unicode)
-		nl<<=1;
-	anAddr+=Align4(KRomEntrySize+nl);
+	int nameLen = strlen(iRomNode->iName);
+	if(Unicode){
+		UTF16String unistr(iRomNode->iName,nameLen);
+		pE->iNameLength = unistr.length();
+		memcpy(pE->iName,unistr.c_str(),unistr.bytes());
+		anAddr+=Align4(KRomEntrySize + unistr.bytes());
+	}
+	else{
+		memcpy(pE->iName,iRomNode->iName,nameLen);
+		anAddr+=Align4(KRomEntrySize + nameLen);
+		pE->iNameLength = nameLen ;
+	}
+ 
+	
 	TRACE(TDIR,DumpRomEntry(*pE));
 	return pE;
 	}
 
-const TText* Entry::Name() const
+const char* Entry::Name() const
 	{
 	return iRomNode->iName;
 	}

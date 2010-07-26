@@ -89,7 +89,6 @@
 		<param name='OPT.DEFINE'/>
 		<param name='OPT.DEFFILE'/>
 		<param name='OPT.DEPEND'/>
-		<param name='DEPEND_SKIP' default=''/>
 		<param name='OPT.EXPORT'/>
 		<param name='OPT.IMPORTLIB'/>
 		<param name='OPT.LISTING'/>
@@ -135,6 +134,23 @@
 	</interface>
 
 	<interface name="Emulator.dll" extends="Emulator.win32" flm="win32dll.flm">
+		<param name='CHECKLIB' default=''/>
+		<param name='LD'/>
+		<param name='LFLAGS_INFGEN'/>
+		<param name='OPT.CHECKLIB.STDCPP'/>
+		<param name='OPT.CHECKLIB.SYMCPP'/>
+		<param name='OPT.CHECKLIB.WIN32'/>
+		<param name='OPT.HEAPCOMMIT'/>
+		<param name='OPT.HEAPRESERVE'/>
+		<param name='OPT.IMAGEBASE'/>
+		<param name='OPT.IMPLIB'/>
+		<param name='OPT.LIBFILE'/>
+		<param name='OPT.LIBPATH'/>
+		<param name='OPT.NOIMPLIB'/>
+		<param name='MAKEDEF'/>
+	</interface>
+
+	<interface name="Emulator.pdll" extends="Emulator.win32" flm="win32pdll.flm">
 		<param name='CHECKLIB' default=''/>
 		<param name='LD'/>
 		<param name='LFLAGS_INFGEN'/>
@@ -213,6 +229,9 @@
 	</interface>
 
 	<interface name="Emulator.plugin" extends="Emulator.dll" flm="win32plugin.flm">
+	</interface>
+
+	<interface name="Emulator.plugin3" extends="Emulator.dll" flm="win32plugin.flm">
 	</interface>
 
 	<interface name="Emulator.textnotifier2" extends="Emulator.dll" flm="win32textnotifier2.flm">

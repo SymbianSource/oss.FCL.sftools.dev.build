@@ -1,0 +1,207 @@
+#!perl
+# Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+# 
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+# 
+# Contributors:
+# 
+# Description:
+# 
+#
+
+
+use strict;
+use FindBin;
+use lib "$FindBin::Bin";
+use Getopt::Long;
+use IniData;
+use EnvDb;
+use CommandController;
+
+my ($remove, $mrpName, $verbose, $comp, $forceRemove);
+
+my $iniData = IniData->New();
+my $commandController = CommandController->New($iniData, 'EnvData');
+
+ProcessCommandLine();
+
+my $envDb = EnvDb->Open($iniData, $verbose);
+
+if ($remove) {
+    RemoveEntryFromDB();
+}
+elsif (!$mrpName) {
+    DisplayInformation();
+}
+else {
+    AddEntryToDB();
+}
+
+sub ProcessCommandLine {
+    Getopt::Long::Configure ("bundling");
+    
+    my $help;
+    GetOptions("h" => \$help, "r" => \$remove, "m=s" => \$mrpName, "v+" => \$verbose, "f" => \$forceRemove);
+    
+    if ($help) {
+        Usage(0);
+    }
+
+    $comp = lc(shift @ARGV);
+
+    if (scalar @ARGV) {
+            print "Error: Invalid number of arguments\n";
+            Usage(1);
+        }    
+    elsif ($remove && $mrpName) {
+        print "Error: Can not specify -m and -r options together\n";
+        Usage(1);
+    }
+    elsif (($remove || $mrpName) && !$comp) {
+        print "Error: You must specify a component name\n";
+        Usage(1);       
+    }
+}
+
+sub Usage {
+  my $exitCode = shift;
+
+  Utils::PrintDeathMessage($exitCode, "\nUsage: envdata [options] <component>
+EnvData is used for adding components to the evironment database...
+  
+options:
+
+-h             help
+-m <mrp_name>  specify a new mrp file name
+-v             verbose output (-vv very verbose)\n");
+}
+
+sub AddEntryToDB {
+    Utils::CheckExists($mrpName);
+    Utils::AbsoluteFileName(\$mrpName);
+    
+    if($iniData->HasMappings()) {
+      $mrpName = $iniData->PerformReverseMapOnFileName($mrpName);
+    }
+    
+    $mrpName = Utils::RemoveSourceRoot($mrpName);
+    
+    if ($envDb->ComponentExistsInDatabase($comp) && $envDb->Status($comp) != EnvDb::STATUS_INFORMATION_ONLY) {
+        die "EnvData can only be used to update non-installed components\n";
+    }
+
+    $envDb->SetVersion($comp, '__info__');
+    $envDb->SetStatus($comp, EnvDb::STATUS_INFORMATION_ONLY);
+    $envDb->GenerateEmptySignature($comp, '__info__');
+
+    $envDb->SetMrpName($comp, $mrpName);
+    
+    print "Entry for $comp added to the environment database\n";
+}
+
+sub RemoveEntryFromDB {
+    if ($envDb->ComponentExistsInDatabase($comp) && $envDb->Status($comp) != EnvDb::STATUS_INFORMATION_ONLY) {
+        die "EnvData can only be used to update non-installed components\n";
+    }
+
+    my $ver = $envDb->Version($comp, 1);
+    
+    if (defined $ver) {
+        if ($forceRemove) {
+            $envDb->SetVersion($comp, undef);
+        }
+        else {
+            print "Remove environment database entry for $comp? [y/n] ";
+            my $response = <STDIN>;
+            chomp $response;
+            if ($response =~ /^y$/i) {
+                $envDb->SetVersion($comp, undef);
+            }
+            else {
+                die "Remove aborted\n";
+            }
+        }
+    }
+    else {
+        die "Error: No information for $comp exists in the environment database\n";
+    }
+}
+
+sub DisplayInformation {
+    my $versionInfo = $envDb->VersionInfo(1);
+    
+    my $tableData = [["Component", "Status", "MRP"]];
+    
+    if ($comp) {
+        if (exists $versionInfo->{$comp}) {
+            push @{$tableData}, [$comp, EnvDb::StatusString($envDb->Status($comp)), $envDb->MrpName($comp)];
+        }
+    }
+    else {
+        foreach my $entry (sort keys %{$versionInfo}) {
+                push @{$tableData}, [$entry, EnvDb::StatusString($envDb->Status($entry)), $envDb->MrpName($entry)];
+        }
+    }
+
+    if (scalar(@{$tableData}) > 1) {
+        print "\n";
+        $iniData->TableFormatter->PrintTable($tableData, 1);
+    }
+    else {
+        print "No information exists in the environment database". ($comp ? " for $comp" : '') ."\n";        
+    }
+}
+
+
+=head1 NAME
+
+EnvData
+
+=head1 SYNOPSIS
+
+  envdata [options] [<component>]
+
+options:
+  -h             help
+  -m <mrp_name>  specify a new mrp file name
+  -v             verbose output (-vv very verbose)
+  -r             remove entry from database
+  -f             force removal from database (no confirmation prompt)\n");
+
+=head1 DESCRIPTION
+
+Displays the information contained within the environment database.  Can also add
+and delete information about components which are not installed.  This is particularly
+useful for when IPR information needs to be obtained from MRP files, but the MRP file
+locations are not known to the CBR Tools as the components are not already part of
+the environment, for example during the overnight build process.
+
+
+=head1 KNOWN BUGS
+
+None.
+
+=head1 COPYRIGHT
+
+ Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+ All rights reserved.
+ This component and the accompanying materials are made available
+ under the terms of the License "Eclipse Public License v1.0"
+ which accompanies this distribution, and is available
+ at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ 
+ Initial Contributors:
+ Nokia Corporation - initial contribution.
+ 
+ Contributors:
+ 
+ Description:
+ 
+
+=cut

@@ -1,3 +1,4 @@
+#!/usr/bin/perl 
 #
 # Copyright (c) 2005-2009 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
@@ -17,27 +18,38 @@
 
 use FindBin;		# for FindBin::Bin
 my $PerlLibPath;    # fully qualified pathname of the directory containing our Perl modules
+my $PerlEPOCPath;
 
 BEGIN {
 # check user has a version of perl that will cope
 	require 5.005_03;
 # establish the path to the Perl libraries
-    $PerlLibPath = $FindBin::Bin;	# X:/epoc32/tools
-    $PerlLibPath =~ s/\//\\/g;	# X:\epoc32\tools
+    $PerlLibPath = $FindBin::Bin;	
+#    $PerlLibPath =~ s/\//\\/g;
     $PerlLibPath .= "\\";
+    $PerlLibPath =~ s/\\/\//g;
+    
+    $PerlEPOCPath = $ENV{EPOCROOT};
+    $PerlEPOCPath =~ s/\\/\//g;
+    $PerlEPOCPath .= "\/" unless $PerlEPOCPath =~ /\/$/;
+    $PerlEPOCPath .= "epoc32\/tools\/";
 }
-
-
-use  lib $PerlLibPath;
-#Includes the validation perl modules for XML validation against the given DTD.
-use lib "$PerlLibPath/build/lib";
+use lib $PerlEPOCPath."build/lib/";
+use lib $PerlEPOCPath;
+use lib $PerlLibPath;
 
 use buildrom;	# for buildrom module
 use externaltools; #To support External tool invocation
+use romutl;
+use romosvariant;
 
+# add current path and SDK tool path to the begining of environment path
+my $epocroot=&get_epocroot;
+my $delimiter=&env_delimiter;
+$ENV{PATH}="${PerlLibPath}$delimiter${epocroot}epoc32\/tools$delimiter${epocroot}epoc32\/gcc\/bin$delimiter${epocroot}epoc32\/gcc_mingw\/bin$delimiter".$ENV{PATH};
 
 # Main block for buildrom module invocation
-{
+{    
 	# Processes the buildrom command line parameters.
 	&process_cmdline_arguments;
 	

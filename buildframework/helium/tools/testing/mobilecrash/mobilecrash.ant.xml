@@ -41,6 +41,11 @@ Description:
         <mkdir dir="${build.drive}${ee.rom.output.dir}" />
         <zip basedir="${build.drive}\\epoc32\release\armv5\urel" includes="*.map" destfile="${build.drive}${ee.rom.output.dir}/Mapfiles.zip" />
         <propertyregex input="${publish.dir}" property="proj.dir" regexp="\\" replace="\\\\\\\\\\\\\\\\" global="true" />
+        <!--* @property ee.rom.output.dir
+        @type string
+        @editable required
+        @scope public
+        -->
         <propertyregex input="${ee.rom.output.dir}" property="rom.network.dir" regexp="\\output" replace="" global="true" />
         <propertyregex input="${rom.network.dir}" property="rom.dir" regexp="\\" replace="\\\\\\\\\\\\\\\\" global="true" />
         <for param="file">
@@ -85,6 +90,11 @@ Description:
     -->
     <target name="mobilecrash-prep-loc">
         <mkdir dir="${build.output.dir}/build" />
+        <!--* @property core.rom.output.dir
+        @type string
+        @editable required
+        @scope public
+        -->
         <mkdir dir="${build.drive}${core.rom.output.dir}" />
         <zip basedir="${build.drive}\\epoc32\release\armv5\urel" includes="*.map" destfile="${build.drive}${core.rom.output.dir}/Mapfiles.zip" />
         <propertyregex input="${publish.dir}" property="proj.dir" regexp="\\" replace="\\\\\\\\\\\\\\\\" global="true" />

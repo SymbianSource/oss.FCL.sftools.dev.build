@@ -39,6 +39,6 @@ public:
 	DbgFlagChecker(CmdLineHandler* aCmdPtr, ImageReaderPtrList& aImageReaderList);
 	~DbgFlagChecker(void);
 	void Check(ImgVsExeStatus& aImgVsExeStatus);
-	void PrepareAndWriteData(ExeContainer* aExeContainer);
+	void PrepareAndWriteData(ExeContainer& aExeContainer);
 };
 #endif//DBGFLAGCHECKER_H

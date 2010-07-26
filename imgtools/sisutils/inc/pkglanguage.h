@@ -24,10 +24,9 @@
 	#pragma warning(disable: 4503) // decorated name length exceeded, name was truncated
 #endif
 
-typedef struct
-{
-	wchar_t*		iName;
-	unsigned long	iId;
+typedef struct {
+	char* iName;
+	TUint32	iId;
 } SKeyword;
 
 /** 
@@ -248,8 +247,8 @@ public:
 		ELangNone = 0xFFFF
 	}TLanguage;
 
-	static unsigned long GetLanguageCode(std::wstring aLang);
-	static std::wstring GetLanguageName(unsigned long aCode);
-};
 
+};
+TUint32 GetLanguageCode(const char* aLang);
+const char* GetLanguageName(TUint32 aCode);
 #endif //__PKGLANGUAGE_H__

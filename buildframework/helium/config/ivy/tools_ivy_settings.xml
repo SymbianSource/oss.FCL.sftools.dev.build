@@ -24,6 +24,8 @@ Description:
 <ivysettings>
     
     <typedef name="tool" classname="com.nokia.ivy.ToolResolver"/>
+    <typedef name="version-range" classname="org.apache.ivy.plugins.version.VersionRangeMatcher"/>
+    
     <caches useOrigin="true"/>
     <settings validate="false" defaultResolver="external"/>
     
@@ -41,7 +43,7 @@ Description:
         <url name="helium-svn">
             <ivy pattern="http://helium.nmp.nokia.com/svn/[module]/branches/[revision]/bin/ivy.xml" />
         </url>
-
+        
         <dual name="tool-resolver">
             <filesystem name="ivy-tool-resolver">
                 <ivy pattern="${helium.dir}/config/ivy/modules/[module]-[revision].ivy.xml" />
@@ -53,21 +55,20 @@ Description:
         </dual>
     </resolvers>
 
-    
     <triggers>
         <ant-build  antfile="${helium.dir}/config/ivy/install/build-[artifact].ant.xml"
-                    target="install"
-                       event="post-download-artifact"
-                       prefix="artifact"/>
+                target="install"
+                event="post-download-artifact"
+                prefix="artifact"/>
                        
-      <ant-call target="unzip-egg" prefix="artifact"
-          event="post-download-artifact" filter="ext=zip AND type=egg"/>
-      <ant-call target="unzip-jar" prefix="artifact"
-          event="post-download-artifact" filter="ext=zip AND type=jar"/>
-      <ant-call target="gunzip-egg" prefix="artifact"
-          event="post-download-artifact" filter="ext=tar.gz AND type=egg"/>
-      <ant-call target="bunzip-egg" prefix="artifact"
-          event="post-download-artifact" filter="ext=tar.bz2 AND type=egg"/>
+        <ant-call target="unzip-egg" prefix="artifact"
+                event="post-download-artifact" filter="ext=zip AND type=egg"/>
+        <ant-call target="unzip-jar" prefix="artifact"
+                event="post-download-artifact" filter="ext=zip AND type=jar"/>
+        <ant-call target="gunzip-egg" prefix="artifact"
+                event="post-download-artifact" filter="ext=tar.gz AND type=egg"/>
+        <ant-call target="bunzip-egg" prefix="artifact"
+                event="post-download-artifact" filter="ext=tar.bz2 AND type=egg"/>
     </triggers>
 
     
@@ -78,4 +79,11 @@ Description:
         <module organisation="helium-external" name=".*" resolver="helium-svn" />
     </modules>
     
+    <version-matchers>
+        <pattern-vm>
+            <match revision="exactlyAnyOne" pattern="${minor}_${major}" args="minor, major" matcher="regexp" />     
+        </pattern-vm>    
+        <version-range/>
+    </version-matchers>
+
 </ivysettings>

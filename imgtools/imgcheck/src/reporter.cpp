@@ -41,8 +41,7 @@ Initilize the parameters to data members.
 @released
 */
 Reporter::Reporter(unsigned int aCmdOptions)
-:iInputOptions(aCmdOptions)
-{
+:iInputOptions(aCmdOptions) {
 }
 
 
@@ -53,8 +52,9 @@ Release the objects.
 @internalComponent
 @released
 */
-Reporter::~Reporter()
-{
+Reporter::~Reporter() {
+	for(ImgVsExeStatus::iterator it = iImgVsExeStatus.begin() ; it != iImgVsExeStatus.end(); it++)
+		delete it->second; 
 	iImgVsExeStatus.clear();
 }
 
@@ -66,8 +66,7 @@ Function responsible to return the reference of iImgVsExeStatus
 
 @return - returns the reference of iImgVsExeStatus
 */
-ImgVsExeStatus& Reporter::GetContainerReference()
-{
+ImgVsExeStatus& Reporter::GetContainerReference() {
 	return iImgVsExeStatus;
 }
 
@@ -83,13 +82,10 @@ Function responsible to create the report instances.
 
 @return - return the new report instance created
 */
-Reporter* Reporter::Instance(unsigned int aCmdOptions)
-{
-	if(iInstance == KNull)
-	{
+Reporter* Reporter::Instance(unsigned int aCmdOptions) {
+	if(iInstance == KNull) {
 		iInstance = new Reporter(aCmdOptions);
-		if(!iInstance)
-		{
+		if(!iInstance) {
 			throw ExceptionReporter(NOMEMORY, __FILE__, __LINE__);
 		}
 	}
@@ -102,9 +98,11 @@ Function to delete the instance.
 @internalComponent
 @released
 */
-void Reporter::DeleteInstance()
-{
-	DELETE(iInstance);
+void Reporter::DeleteInstance() {
+	if(NULL != iInstance) {
+	  delete iInstance;
+	  iInstance = 0 ;
+	}
 }
 
 
@@ -116,87 +114,63 @@ Function responsible to create the report which is common for both the XML and c
 
 @param aWriterList - Container which stores the report objects
 */
-void Reporter::CreateReport(const WriterPtrList& aWriterList)
-{
-	int wtrPtrLstCnt = aWriterList.size();
-	int attrCnt=0;
-	int serNo = 0;
-	ReportWriter* rptWriter = KNull;
-
-	// fetches the begin and end of the image and the related data from the integrated container
-	ImgVsExeStatus::iterator imgBegin;
-	ImgVsExeStatus::iterator imgEnd;
-
-	ExeVsMetaData::iterator exeBegin;
-	ExeVsMetaData::iterator exeEnd;
-	
-	if(IsAttributeAvailable())
-	{
-		while(wtrPtrLstCnt)
-		{
-			imgBegin = iImgVsExeStatus.begin();
-			imgEnd = iImgVsExeStatus.end();
-
-			rptWriter = aWriterList[wtrPtrLstCnt-1];
-			ExceptionReporter(GENERATINGREPORT, (char*)rptWriter->ReportType().c_str()).Log();
-			// starts the report
-			rptWriter->StartReport();
-			
-			while(imgBegin != imgEnd)
-			{
+void Reporter::CreateReport(const WriterPtrList& aWriterList) {
+	int maxIndex = aWriterList.size() - 1;  
+	int serNo = 0; 
+	// fetches the begin and end of the image and the related data from the integrated container 
+	if(IsAttributeAvailable()) {
+		for(int i = 0 ; i <= maxIndex ; i++) { 
+			ReportWriter* writer = aWriterList.at(i) ;
+			ExceptionReporter(GENERATINGREPORT, writer->ReportType().c_str()).Log(); 
+			// starts the report			
+			writer->StartReport();			
+			for(ImgVsExeStatus::iterator j = iImgVsExeStatus.begin();
+			j != iImgVsExeStatus.end(); j++) {
 				// starts the image
-				rptWriter->StartImage(imgBegin->first);
+				writer->StartImage(j->first);
 
 				// fetches the begin and end of the executable container
-				ExeVsMetaData& exeAttStatus = imgBegin->second;
-				exeBegin = exeAttStatus.begin();
-				exeEnd = exeAttStatus.end();
+				ExeVsMetaData* exeAttStatus = j->second; 
 				serNo = 1;
-				while(exeBegin != exeEnd)
-				{
-					ExeAttList exeAttList = exeBegin->second.iExeAttList;
-					attrCnt = exeAttList.size();
-					if(attrCnt)
-					{
+				for(ExeVsMetaData::iterator k = exeAttStatus->begin(); 
+				k != exeAttStatus->end(); k++ ) {
+					ExeAttList exeAttList = k->second.iExeAttList;
+					int attrCnt = exeAttList.size();
+					for(int ii = 0 ; ii < attrCnt ; ii++) {
 						// starts the executable	
-						rptWriter->StartExecutable(serNo, exeBegin->first);
-					
-						while(attrCnt)
-						{
-							// writes the attributes
-							rptWriter->WriteExeAttribute(*exeAttList.front());
-							if(wtrPtrLstCnt == 1)
-							{
-								DELETE(exeAttList.front()); //If no more reports to be generated, delete it
-							}
-							exeAttList.pop_front();
-							--attrCnt;
+						if(ii == 0)
+							writer->StartExecutable(serNo, k->first);					
+						 
+						// writes the attributes
+						ExeAttribute* attr = exeAttList.front();											
+						if(attr) { 
+							writer->WriteExeAttribute(*attr);
+							//If no more reports to be generated, delete it
+							if(maxIndex == i ) delete attr; 
+							
 						}
+						exeAttList.pop_front(); 
+						if(ii == attrCnt - 1){
 						// ends the executable
-						rptWriter->EndExecutable();	
-						++serNo;
-					}
-					++exeBegin;
-				}
-				++imgBegin;
+							writer->EndExecutable();	
+							++serNo;
+						}
+					} 
+				} 
 				// ends the image
-				rptWriter->EndImage();
+				writer->EndImage();
 			}
-			rptWriter->WriteNote();
+			writer->WriteNote();
 			// ends the report
-			rptWriter->EndReport();
-			--wtrPtrLstCnt;
+			writer->EndReport();  
 		}
 		ExceptionReporter(REPORTGENERATION,"Success").Log();
 	}
-	else
-	{
-		if(iInputOptions & KE32Input)
-		{
+	else {
+		if(iInputOptions & KE32Input) {
 			ExceptionReporter(VALIDE32INPUT).Report();
 		}
-		else
-		{
+		else {
 			ExceptionReporter(VALIDIMAGE).Report();
 		}
 	}
@@ -209,34 +183,14 @@ Function checks if the attributes are valid and are not blank.
 @released
 
 */
-bool Reporter::IsAttributeAvailable()
-{
-	ImgVsExeStatus::iterator imgBegin = iImgVsExeStatus.begin();
-	ImgVsExeStatus::iterator imgEnd = iImgVsExeStatus.end();
-
-	ExeVsMetaData::iterator exeBegin;
-	ExeVsMetaData::iterator exeEnd;
-
-	while(imgBegin != imgEnd)
-	{
-		ExeVsMetaData& exeVsMetaData = imgBegin->second;
-
-		exeBegin = exeVsMetaData.begin();
-		exeEnd = exeVsMetaData.end();
-		while(exeBegin != exeEnd)
-		{
-			if((exeBegin->second).iExeAttList.size() == 0)
-			{
-				++exeBegin;
-				continue;
-			}
-			else
-			{
-				return true;
-			}
-			++exeBegin;
+bool Reporter::IsAttributeAvailable() { 
+	for(ImgVsExeStatus::iterator i = iImgVsExeStatus.begin(); 
+		i != iImgVsExeStatus.end(); i++) {
+		ExeVsMetaData* d = i->second; 
+		for(ExeVsMetaData::iterator j = d->begin() ; j != d->end() ; j++) {
+			if(j->second.iExeAttList.size() > 0)
+				return true ;
 		}
-		++imgBegin;
 	}
 	return false;
 }

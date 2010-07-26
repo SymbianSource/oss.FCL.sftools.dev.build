@@ -1,4 +1,4 @@
-# Copyright (c) 2008-2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2008-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -28,8 +28,7 @@ RELEASETARGET:=$(RELEASEPATH)/$(TARGET).$(if $(REQUESTEDTARGETEXT),$(REQUESTEDTA
 $(call makepath,$(RELEASEPATH))
 $(call makepath,$(BUILDPATH))
 
-CLEANTARGETS:=$(CLEANTARGETS) $(RELEASETARGET)
-RELEASEABLES:=$(RELEASEABLES) $(RELEASETARGET)
+RELEASABLES:=$(RELEASABLES) $(RELEASETARGET)
 
 GENDEBUGINFO:=$(if $(findstring deb,$(VARIANTTYPE)),1,)
 
@@ -59,10 +58,6 @@ INCLUDES:=$(PINCLUDE) $(UINCLUDE) $(SINCLUDE)
 # macros
 DEFINES:=$(call makemacrodef,$(OPT.DEFINE),$(CDEFS) $(BASE_MACRO) $(CFLAGS.ADD))
 
-# other
-PDBFILE:=$(if $(GENDEBUGINFO),$(RELEASEPATH)/$(TARGET).pdb,)
-CLEANTARGETS:=$(CLEANTARGETS) $(PDBFILE)
-
 #compile
 define msvctoolscompile
   $(BUILDPATH)/$(basename $(notdir $(1))).obj: $(1) $(PROJECT_META) $(if $(HAVE_ORDERONLY),|,)  EXPORT
@@ -71,7 +66,6 @@ define msvctoolscompile
 	$(if $(findstring staticlib,$(BASE_TYPE)),,$(CFLAGS.LIB)) \
 	$(CFLAGS) $$(subst /,-,$(OPTION_MSVC)) \
 	$(if $(findstring /W,$(OPTION_MSVC)),,$(CFLAGS.DEFAULT.WARNLEVEL)) \
-	$(if $(PDBFILE),$$(call msvcformatarg,$(OPT.PDBFILE),$(PDBFILE)),) \
 	$(DEFINES) $(INCLUDES) \
 	$$(call msvcformatarg,$(OPT.BROWSEFILE),$(BUILDPATH)/$(basename $(notdir $(1))).sbr) \
 	$$(call msvcformatarg,$(OPT.OBJECTFILE),$$@) $(1) \
@@ -157,8 +151,7 @@ endif
 
 ifneq ($(INSTALLPATH),)
   INSTALLTARGET:=$(INSTALLPATH)/$(TARGET).$(if $(REQUESTEDTARGETEXT),$(REQUESTEDTARGETEXT),$(TARGETTYPE))
-  CLEANTARGETS:=$(CLEANTARGETS) $(INSTALLTARGET)
-  RELEASEABLES:=$(RELEASEABLES) $(INSTALLTARGET)
+  RELEASABLES:=$(RELEASABLES) $(INSTALLTARGET)
 
   define msvctoolsinstall
     $(INSTALLTARGET): $(RELEASETARGET)
@@ -180,8 +173,8 @@ endif
 ifneq ($(GENDEBUGINFO),)
   BSCFILE:=$(RELEASEPATH)/$(TARGET).bsc
   BSCRESPONSEFILE:=$(BUILDPATH)/$(TARGET).brf
-  CLEANTARGETS:=$(CLEANTARGETS) $(BSCFILE) $(BSCRESPONSEFILE)
-  RELEASEABLES:=$(RELEASEABLES) $(BSCFILE)
+  CLEANTARGETS:=$(CLEANTARGETS) $(BSCRESPONSEFILE)
+  RELEASABLES:=$(RELEASABLES) $(BSCFILE)
 
   define msvctoolsgenbrowse  
     $(BSCFILE): $(OBJFILES)
@@ -199,14 +192,14 @@ endif
 
 # Global targets
 .PHONY:: $(ALLTARGET)
-$(ALLTARGET):: $(RELEASEABLES)
-TARGET:: $(RELEASEABLES)
+$(ALLTARGET):: $(RELEASABLES)
+TARGET:: $(RELEASABLES)
 
 ifeq ($(BASE_TYPE),staticlib)
   LIBRARY:: $(RELEASETARGET) $(INSTALLTARGET)
 endif
 
 # clean up
-$(eval $(call GenerateStandardCleanTarget,$(CLEANTARGETS),,))
-# for the abld -what target
-$(eval $(call whatmacro,$(INSTALLTARGET),WHATTOOLS))
+$(call raptor_clean,$(CLEANTARGETS))
+# for the --what option and the log file
+$(call raptor_release,$(INSTALLTARGET))

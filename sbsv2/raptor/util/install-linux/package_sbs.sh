@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Copyright (c) 2006-2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2006-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -61,7 +61,7 @@ BINARIES=""
 fi
 
 
-   echo init.xml LICENSE.txt RELEASE-NOTES.txt; cd $SBS_HOME && find bin lib $BINARIES python test schema util |
+   cd $SBS_HOME && find license.txt RELEASE-NOTES.html bin lib notes $BINARIES python test schema util |
 	grep -v "$TMPSBS"'/python/\.py$' |
 	grep -v 'flm/test'  |
 	grep -v 'util/build'  | 
