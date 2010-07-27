@@ -231,7 +231,7 @@ sub IdentifyFileType {
     }
   }
 
-  if ($typeBuf =~ /^!<arch>\x0A(.{48}([0-9 ]{10})\x60\x0A(......))/s) {
+  if ($typeBuf =~ /^!<arch>\x0A(.{48}([0-9 ]{9})\x60\x0A(......))/s) {
     # library - could be MARM or WINS
 
     $typeBuf = $1;
@@ -240,7 +240,7 @@ sub IdentifyFileType {
     open (FILE, $file) or die "Error: Couldn't open \"$file\" for reading: $!\n";
     binmode (FILE);
     
-    while ($typeBuf =~ /^.{48}([0-9 ]{10})\x60\x0A(......)/s) {
+    while ($typeBuf =~ /^.{48}([0-9 ]{9})\x60\x0A(......)/s) {
       # $1 is the size of the archive member, $2 is first 6 bytes of the file
       # There may be several different sorts of file in the archive, and we
       # need to scan through until we find a type we recognize:
