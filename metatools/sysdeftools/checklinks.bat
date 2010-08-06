@@ -13,5 +13,5 @@
 @rem Description: 
 @rem
 @setlocal
-@perl %~dpn0.pl %*
+@perl "%~dpn0.pl" %*
 

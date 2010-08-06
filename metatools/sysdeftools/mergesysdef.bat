@@ -14,8 +14,8 @@
 @rem
 @setlocal
 @if .%1==. goto use
-@ java -jar %~dp0xalanj\xalan.jar -xsl %~dpn0.xsl %*  -XSLTC
+@ java -jar "%~dp0xalanj\xalan.jar" -xsl "%~dpn0.xsl" %*  -XSLTC
 @goto end
 :use
-@ java -jar %~dp0xalanj\xalan.jar -in %~dpn0.xsl -xsl %~dp0lib\usage.xsl -param usage "%~n0"
+@ java -jar "%~dp0xalanj\xalan.jar" -in "%~dpn0.xsl" -xsl "%~dp0lib\usage.xsl" -param usage "%~n0"
 :end

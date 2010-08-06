@@ -1,42 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ProductsDefinition schema="3.0.0">
 	<product name="BuildEnvironment" long-name="Build Environment">
-		<tool name="sysdeftools" long-name="System Definition Tools" default-src="sftools/build/metatools/sysdeftools" default-dst="/" version="1.0.0.0">
+		<tool name="sysdeftools" long-name="System Definition Tools" default-src="metatools/sysdeftools" default-dst="/" version="1.0.0.0">
 
 			<!-- core functionality -->
 			<file filename="*.pl"/> 
 			<file filename="*.xsl"/> 
 
 				<!-- reusable modules and internal utilities -->
-		  <file filename="*.xsl" src="sftools/build/metatools/sysdeftools/lib/" dst="lib/"/> 
+		  <file filename="*.xsl" src="metatools/sysdeftools/lib/" dst="lib/"/> 
 
 				<!-- Xalan jar files -->
-		  <file filename="*" src="sftools/build/metatools/sysdeftools/xalanj/" dst="xalanj/"/> 
+		  <file filename="*" src="metatools/sysdeftools/xalanj/" dst="xalanj/"/> 
 
 			<windows>
-			  <file filename="perl.bat" src="sftools/build/metatools/sysdeftools/group/" dstFile="/checklinks.bat"/> 
-			  <file filename="perl.bat" src="sftools/build/metatools/sysdeftools/group/" dstFile="/joinsysdef.bat"/> 
-			  <file filename="perl.bat" src="sftools/build/metatools/sysdeftools/group/" dstFile="/rootsysdef.bat"/> 
+			  <file filename="perl.bat" src="metatools/sysdeftools/group/" dstFile="/checklinks.bat"/> 
+			  <file filename="perl.bat" src="metatools/sysdeftools/group/" dstFile="/joinsysdef.bat"/> 
+			  <file filename="perl.bat" src="metatools/sysdeftools/group/" dstFile="/rootsysdef.bat"/> 
 
 				<!-- Xalan-calling .bat files -->
-			  <file filename="unixxslcmd.bat" src="sftools/build/metatools/sysdeftools/group/" dstFile="/joinandparesysdef.bat"/> 
-			  <file filename="unixxslcmd.bat" src="sftools/build/metatools/sysdeftools/group/" dstFile="/filtering.bat"/> 
-			  <file filename="unixxslcmd.bat" src="sftools/build/metatools/sysdeftools/group/" dstFile="/validate-sysdef.bat"/> 
+			  <file filename="unixxslcmd.bat" src="metatools/sysdeftools/group/" dstFile="/joinandparesysdef.bat"/> 
+			  <file filename="unixxslcmd.bat" src="metatools/sysdeftools/group/" dstFile="/filtering.bat"/> 
+			  <file filename="unixxslcmd.bat" src="metatools/sysdeftools/group/" dstFile="/validate-sysdef.bat"/> 
 
 				<!-- Xalan-calling .bat files that use XSLTC -->
-			  <file filename="unixxsltccmd.bat" src="sftools/build/metatools/sysdeftools/group/" dstFile="/mergesysdef.bat"/> 
-			  <file filename="unixxsltccmd.bat" src="sftools/build/metatools/sysdeftools/group/" dstFile="/sysdefdowngrade.bat"/> 
+			  <file filename="unixxsltccmd.bat" src="metatools/sysdeftools/group/" dstFile="/mergesysdef.bat"/> 
+			  <file filename="unixxsltccmd.bat" src="metatools/sysdeftools/group/" dstFile="/sysdefdowngrade.bat"/> 
 			</windows>
 		
 			<linux>
 				<!-- Xalan-calling unix files -->
-			  <file filename="unixxslcmd" src="sftools/build/metatools/sysdeftools/group/" dstFile="/joinandparesysdef"/> 
-			  <file filename="unixxslcmd" src="sftools/build/metatools/sysdeftools/group/" dstFile="/filtering"/> 
-			  <file filename="unixxslcmd" src="sftools/build/metatools/sysdeftools/group/" dstFile="/validate-sysdef"/> 
+			  <file filename="unixxslcmd" src="metatools/sysdeftools/group/" dstFile="/joinandparesysdef"/> 
+			  <file filename="unixxslcmd" src="metatools/sysdeftools/group/" dstFile="/filtering"/> 
+			  <file filename="unixxslcmd" src="metatools/sysdeftools/group/" dstFile="/validate-sysdef"/> 
 
 				<!-- Xalan-calling unix files that use XSLTC -->
-			  <file filename="unixxsltccmd" src="sftools/build/metatools/sysdeftools/group/" dstFile="/mergesysdef"/> 
-			  <file filename="unixxsltccmd" src="sftools/build/metatools/sysdeftools/group/" dstFile="/sysdefdowngrade"/> 
+			  <file filename="unixxsltccmd" src="metatools/sysdeftools/group/" dstFile="/mergesysdef"/> 
+			  <file filename="unixxsltccmd" src="metatools/sysdeftools/group/" dstFile="/sysdefdowngrade"/> 
 			</linux>
 		</tool>
 	</product>
