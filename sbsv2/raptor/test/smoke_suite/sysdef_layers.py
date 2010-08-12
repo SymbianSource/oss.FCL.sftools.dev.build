@@ -48,7 +48,7 @@ def run():
 		"$(EPOCROOT)/epoc32/release/winscw/urel/z/resource/apps/helloworld.rsc",
 		]
 	t.addbuildtargets('smoke_suite/test_resources/sysdef/build_gen_source/bld.inf', [
-		"helloworld_/helloworld_HelloWorld_sc.rpp"
+		"helloworld_/helloworld_HelloWorld.rsc.rpp"
 		])
 	t.addbuildtargets('smoke_suite/test_resources/sysdef/dependent/bld.inf', [
 		"helloworld_exe/armv5/udeb/HelloWorld_Application.o",
@@ -75,11 +75,11 @@ def run():
 		"helloworld_exe/winscw/urel/HelloWorld_Main.o",
 		"helloworld_exe/winscw/urel/helloworld.UID.CPP",
 		"helloworld_exe/winscw/urel/helloworld_UID_.o",
-		"helloworld_reg_exe/helloworld_reg_HelloWorld_reg_sc.rpp"
+		"helloworld_reg_exe/helloworld_reg_HelloWorld_reg.rsc.rpp"
 		])
 	t.countmatch = [
-		["<recipe .*layer='Component with Layer Dependencies' component='dependent'.*>", 34],
-		["<recipe .*layer='Build Generated Source' component='build generated source'.*>", 4]		
+		["<recipe .*layer='Component with Layer Dependencies' component='dependent'.*>", 33],
+		["<recipe .*layer='Build Generated Source' component='build generated source'.*>", 3]		
 		]
 	t.run()
 	return t

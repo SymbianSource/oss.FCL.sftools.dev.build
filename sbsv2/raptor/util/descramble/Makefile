@@ -15,15 +15,8 @@
 #
 #
 
-TARGET:=sbs_descramble
-SOURCES:=$(SBS_HOME:\=/)/util/descramble/descramble.cpp 
 
-ifeq ($(filter win,$(HOSTPLATFORM)),win)
-CFLAGS:=-DWIN32
-LDFLAGS:=
-else
-CFLAGS:=
-LDFLAGS:=-lpthread
-endif
+.PHONY: all
 
-$(eval $(cppprogram))
+all:
+	cd .. && make descramble

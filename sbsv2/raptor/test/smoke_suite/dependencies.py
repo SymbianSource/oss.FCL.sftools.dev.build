@@ -86,7 +86,7 @@ def run():
 		[".*recipe name='compile'", 2],
 		[".*recipe name='win32compile2object'", 2],
 		[".*recipe name='compile2object'", 1],
-		[".*recipe name='resourcecompile'", 1]
+		[".*recipe name='resourcecompile", 2]
 	]
 
 	
@@ -127,20 +127,24 @@ def run():
 	t.name ="invalid_dependency_files"
 	t.description = "Invalidate dependency files, then make sure we can clean and re-build successfully"
 	buildLocation = "$(EPOCROOT)/epoc32/build/" + BldInfFile.outputPathFragment('smoke_suite/test_resources/dependencies/bld.inf') + "/dependency_"
-	t.command = """
-		sleep 1
-		touch smoke_suite/test_resources/dependencies/dependency.cpp
-		echo INVALIDATE_ARMV5_DEPENDENCY_FILE >> """+buildLocation+"""/armv5/urel/dependency.o.d
-		echo INVALIDATE_WINSCW_DEPENDENCY_FILE >> """+buildLocation+"""/winscw/urel/dependency.o.d
-		echo INVALIDATE_TOOLS2_DEPENDENCY_FILE >> """+buildLocation+"""/dependency_exe/tools2/rel/"""+hostPlatformOffset+"""dependency.o.d
-		echo INVALIDATE_RESOURCE_DEPENDENCY_FILE >> """+buildLocation+"""/dependency__resource_apps_sc.rpp.d
-		sbs -b smoke_suite/test_resources/dependencies/bld.inf -c default -c tools2_rel
-		sbs -b smoke_suite/test_resources/dependencies/bld.inf -c default -c tools2_rel clean
-		sbs -b smoke_suite/test_resources/dependencies/bld.inf -c default -c tools2_rel"""
-	t.mustmatch = []
+        # use one long bash command so that we can capture 
+	# the output in a way that isn't messed up with all the ordering confused.
+	t.command = " mkdir -p $(EPOCROOT)/epoc32/build/smoketestlogs ; { sleep 1 ; set -x ; \
+touch smoke_suite/test_resources/dependencies/dependency.cpp; \
+echo INVALIDATE_ARMV5_DEPENDENCY_FILE >> %s/armv5/urel/dependency.o.d ; \
+echo INVALIDATE_WINSCW_DEPENDENCY_FILE >> %s/winscw/urel/dependency.o.d ;\
+echo INVALIDATE_TOOLS2_DEPENDENCY_FILE >> %s/dependency_exe/tools2/rel/%s/dependency.o.d ;\
+echo INVALIDATE_RESOURCE_DEPENDENCY_FILE >> %s/dependency__resource_apps.rsc.d ;\
+sbs -b smoke_suite/test_resources/dependencies/bld.inf -c default -c tools2_rel ;\
+sbs -b smoke_suite/test_resources/dependencies/bld.inf -c default -c tools2_rel clean ;\
+sbs -b smoke_suite/test_resources/dependencies/bld.inf -c default -c tools2_rel ; } > ${SBSLOGFILE} 2>&1; grep 'missing separator' ${SBSLOGFILE} " %(buildLocation, buildLocation, buildLocation, hostPlatformOffset, buildLocation)
+	# We expect an error from the first build due to the deliberate dependency file corruption
+	t.mustmatch = [
+		".*dependency.o.d:[0-9]+: \*\*\* missing separator"
+		]
 	t.countmatch = []
 	t.warnings = 0
-	t.errors = 1 # We expect an error from the first build due to the deliberate dependency file corruption
+	t.errors = 0 
 	t.targets = hostPlatformTargets
 	t.run(hostPlatform)
 
@@ -156,6 +160,7 @@ def run():
 		echo INVALIDATE_WINSCW_DEPENDENCY_FILE >> """+buildLocation+"""/winscw/urel/dependency.o.d
 		echo INVALIDATE_TOOLS2_DEPENDENCY_FILE >> """+buildLocation+"""/dependency_exe/tools2/rel/"""+hostPlatformOffset+"""dependency.o.d
 		sbs --no-depend-include -b smoke_suite/test_resources/dependencies/bld.inf -c default -c tools2_rel"""
+	t.mustmatch = []
 	t.errors = 0		
 	t.targets = hostPlatformTargets
 	t.run(hostPlatform)

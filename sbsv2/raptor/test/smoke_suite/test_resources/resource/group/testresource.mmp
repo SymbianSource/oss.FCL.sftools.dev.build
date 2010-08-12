@@ -42,9 +42,12 @@ LANG SC 01
 END
 
 START RESOURCE          testresource.rss
-TARGETPATH              resource/testresource2
+// The header produced here would clash with that of the previous block
+// if the target name were the same
+TARGET                  testheader
 HEADERONLY
-LANG 01 sc
+// having multiple lang values doesn't make sense with a headeronly.
+LANG sc
 END
 
 START RESOURCE          testresource.rss

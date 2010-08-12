@@ -315,7 +315,26 @@ def run():
 	t.targets = []
 
 	t.run()
-
+	
+	# Test keyword: DOCUMENT
+	t.id = "75o"
+	t.name = "mmp_keyword_document"
+	# Note: in t.command, the makefile is cat'd through sed to remove the .DEFAULT double-colon rule's <warning> tag to ensure that t.run succeeds.
+	t.command = "sbs -b smoke_suite/test_resources/mmp/mmp1/group/bld.inf -c armv5 reallyclean; " + \
+				"sbs -b smoke_suite/test_resources/mmp/mmp1/group/bld.inf --no-depend-generate -c armv5_urel -m ${SBSMAKEFILE}; " + \
+				"cat ${SBSMAKEFILE}_all.default"
+	
+	t.mustmatch_singleline = ["DOCUMENT:=.*test/smoke_suite/test_resources/mmp/mmp1/src/file01\.txt\\s+.*test/smoke_suite/test_resources/mmp/mmp1/src/file02\.txt"]
+	t.mustnotmatch = []
+	t.countmatch = []
+	
+	t.errors = 0
+	t.warnings = 0
+	t.returncode = 0
+	t.targets = []
+	
+	t.run()
+	
 	t.id = "75"
 	t.name = "mmp_keywords"
 	t.print_result()

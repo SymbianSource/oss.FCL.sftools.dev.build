@@ -27,15 +27,13 @@
 		<set name="CC.DWARF3" value="--dwarf3"/>
 		<set name="CC_ERRORS_CONTROL_OPTION" value="--diag_error 1267"/>
 		<set name="CC_WARNINGS_CONTROL_OPTION" value="--diag_suppress 161,611,654,997,1152,1300,1464,1488,2523,6318,6331"/>
-		<set name="CFLAGS" value=""/>
 		<set name="CIADEFS" value="__CIA__"/>
 		<set name="CODE_SEGMENT_START" value=""/>
 		<set name="COMMANDFILE_OPTION" value="--via "/>
 		<set name="COMPILER_CIA_FLAGS" value=""/>
-		<set name="COMPILER_DEFINES" value=""/>
 		<set name="COMPILER_FPU_OPTION" value="--fpu "/>
 		<set name="COMPILER_INTERWORK_DEFINES" value="__MARM_INTERWORK__"/>
-        <set name="COMPILER_NO_HIDE_ALL_OPTION" value="--no_hide_all"/>
+		<set name="COMPILER_NO_HIDE_ALL_OPTION" value="--no_hide_all"/>
 		<set name="COMPILER_SYSTEM_INCLUDE_OPTION" value="-J"/>
 		<set name="COMPILER_THUMB_DEFINES" value="__MARM_THUMB__"/>
 		<set name="COMPILE_ONLY_OPTION" value="-c"/>
@@ -43,6 +41,7 @@
 		<set name="C_LANG_OPTION" value=""/>
 		<set name="DATA_SEGMENT_START" value="$(SPLIT_OPTION) $(RW_BASE_OPTION)"/>
 		<set name="DEBUG_OPTIMISATION" value="-O0"/>
+		<set name="DEBUGINFO_OPTIMISATION" value="--no_debug_macros --remove_unneeded_entities"/>
 		<set name="DEPEND_OPTION" value="--depend_format=unix --depend"/>
 		<set name="ENUM_OPTION" value="--enum_is_int"/>
 		<set name="EXCEPTIONS" value="--exceptions --exceptions_unwind"/>
@@ -76,6 +75,7 @@
 		<set name="LISTING_OPTION" value="-S"/>
 		<set name="NO_EXCEPTIONS" value="--no_exceptions --no_exceptions_unwind"/>
 		<set name="NO_UNALIGNED_ACCESS" value="$(CC.NO_UNALIGNED_ACCESS)"/>
+		<set name='POSTLINKER_ASM_OPTION' value="--asm=armas"/>
 		<set name="PREINCLUDE" value="$(RVCT_PRE_INCLUDE)"/>
 		<set name="PREINCLUDE_OPTION" value="--preinclude"/>
 		<set name="PREPROCESSOR_OPTION" value="-E"/>
@@ -99,7 +99,6 @@
 		<set name="TRANASM_OUTPUT_OPTION" value="-o="/>
 		<set name="TRANSFORM_CIA" value="1"/>
 		<set name="UNDEFINED_SYMBOL_REF_OPTION" value=""/>
-		<set name="UNIX_SLASH_FOR_CC_ABS_PATHS" value="0"/>
 		<set name="UNRESOLVED_SYMBOL_REF_OPTION" value=""/>
 		<set name="USE_RVCT22_DELETE_WORKAROUND" value=""/>
 		<set name="USERINCLUDE" value=""/>

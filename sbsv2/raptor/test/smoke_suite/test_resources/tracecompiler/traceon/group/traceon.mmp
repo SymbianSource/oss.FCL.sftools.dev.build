@@ -1,0 +1,16 @@
+
+TARGET			traceon.exe
+TARGETTYPE		EXE
+
+UID			0x10003901 0x11100010
+LIBRARY			euser.lib
+SYSTEMINCLUDE		/epoc32/include
+SYSTEMINCLUDE		/epoc32/include/platform
+
+SOURCEPATH		../src
+SOURCE			traceon.cpp
+
+TRACES
+// the above equals below:
+// USERINCLUDE		../traces/traceon_exe
+//

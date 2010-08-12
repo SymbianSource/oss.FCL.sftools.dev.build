@@ -19,12 +19,15 @@
 		<!-- link to bld.inf and mmp platform names -->
 		<set name='TRADITIONAL_PLATFORM' value='GCCXML'/>
 
+		<!-- targettypes -->
+		<set name="TARGET_TYPES" value="ani dll exe exexp implib fsy kdll kext klib ldd lib pdd pdl plugin stddll stdexe stdlib textnotifier2 var var2 none"/>
 		<!-- interfaces -->
+		<append name="INTERFACE_TYPES" value="$(TARGET_TYPES)"/>
+
 		<set name="INTERFACE.ani" value="analysis.ani"/>
 		<set name="INTERFACE.dll" value="analysis.dll"/>
 		<set name="INTERFACE.exe" value="analysis.exe"/>
 		<set name="INTERFACE.exexp" value="analysis.exexp"/>
-		<set name="INTERFACE.extension" value="analysis.extension"/>
 		<set name="INTERFACE.implib" value="analysis.implib"/>
 		<set name="INTERFACE.fsy" value="analysis.fsy"/>
 		<set name="INTERFACE.kdll" value="analysis.kdll"/>
@@ -35,7 +38,6 @@
 		<set name="INTERFACE.pdd" value="analysis.pdd"/>
 		<set name="INTERFACE.pdl" value="analysis.pdl"/>
 		<set name="INTERFACE.plugin" value="analysis.plugin"/>
-		<set name="INTERFACE.resource" value="analysis.resource"/>
 		<set name="INTERFACE.stddll" value="analysis.stddll"/>
 		<set name="INTERFACE.stdexe" value="analysis.stdexe"/>
 		<set name="INTERFACE.stdlib" value="analysis.stdlib"/>
@@ -44,6 +46,10 @@
 		<set name="INTERFACE.var2" value="analysis.var2"/>
 		<!-- the following should really be done via the default "Symbian.*" interfaces from standard.xml - but they're currently tied to non-defaulted ARM build specifics -->
 		<set name="INTERFACE.none" value="analysis.none"/>
+
+		<!-- START block interfaces -->
+		<set name="INTERFACE.extension" value="analysis.extension"/>
+		<set name="INTERFACE.resource" value="analysis.resource"/>
 
 		<!-- Java used by Trace Compiler -->
 		<env name='JAVA_HOME' default='' type='path'/>

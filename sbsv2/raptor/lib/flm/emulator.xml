@@ -27,6 +27,7 @@
 		<param name='COPY_FOR_STATIC_LINKAGE' default='0'/>
 		<param name='DEBUGLIBRARY' default=''/>
 		<param name='DEFFILE' default=''/>
+		<param name='DOCUMENT' default=''/>
 		<param name='EFREEZE' default=''/>
 		<param name='EFREEZE_REMOVE_OPTION' default=''/>
 		<param name='EPOCALLOWDLLDATA' default='0'/>

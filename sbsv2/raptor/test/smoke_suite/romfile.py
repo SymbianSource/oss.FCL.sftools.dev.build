@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -20,12 +20,12 @@ import os
 
 def run():
 	t = SmokeTest()
-	t.id = "55"
-	t.name = "romfile"
 	t.description = """
 		Tests the creation and content of an .iby romfile for the armv5.test
 		configuration. Also tests for creation of relevant test batch files.
 		"""
+	t.id = "55a"
+	t.name = "romfile_general"
 	t.usebash = True
 	t.command = "sbs -b $(EPOCROOT)/src/ongoing/group/romfile/other_name.inf " \
 			+ "-c armv5.test ROMFILE -f - " \
@@ -89,4 +89,33 @@ def run():
 		t.warnings = 2
 		t.run("linux")
 
+
+	t.id = "55b"
+	t.name = "romfile_mmp_include_twice"
+	t.command = "sbs -b $(EPOCROOT)/src/e32test/group/bld.inf " \
+	        + "-b $(EPOCROOT)/src/falcon/test/bld.inf " \
+			+ "-c armv5.test ROMFILE -m ${SBSMAKEFILE} -f ${SBSLOGFILE} " \
+			+ "&& cat $(EPOCROOT)/epoc32/rom/src/e32test/group/armv5test.iby"
+	
+	t.targets = [
+		"$(EPOCROOT)/epoc32/rom/src/e32test/group/armv5test.iby"
+		]
+
+	# Check the content of the generated .iby file
+	t.mustmatch = [
+		r".*\ndevice\[MAGIC\]=/epoc32/release/##KMAIN##/##BUILD##/d_nanowait\.ldd\s+sys/bin/d_nanowait\.ldd\n.*",
+		r".*\ndevice\[MAGIC\]=/epoc32/release/##KMAIN##/##BUILD##/d_pagingexample_2_post.ldd\s+sys/bin/d_pagingexample_2_post.ldd\n.*",
+		]
+	t.mustnotmatch = [
+		# These two files are from two mmp files that included in both bld.inf
+		# They shouldn't be in the ROM
+		r".*/d_medch.ldd\s.*"
+		r".*/d_dma.ldd\s.*"
+		]
+	t.warnings = 0
+	t.run()
+
+	t.id = "55"
+	t.name = "romfile"
+	t.print_result()
 	return t

@@ -61,7 +61,7 @@ BINARIES=""
 fi
 
 
-   cd $SBS_HOME && find license.txt RELEASE-NOTES.html bin lib notes $BINARIES python test schema util |
+   cd $SBS_HOME && find license.txt RELEASE-NOTES.html bin examples lib notes $BINARIES python schema style util |
 	grep -v "$TMPSBS"'/python/\.py$' |
 	grep -v 'flm/test'  |
 	grep -v 'util/build'  | 
@@ -74,7 +74,7 @@ echo "FULLVERSION=\"$FULLVERSION\"" > $TMPSBS/.version
 echo "VERSION=\"$VERSION\"" >> $TMPSBS/.version
 
 if [[ "$packtype" == "binary" ]]; then
-chmod a+x $TMPSBS/bin/* $TMPSBS/util/$HOSTPLATFORM_DIR/bin/* $TMPSBS/util/$HOSTPLATFORM_DIR/python262/bin/* 
+chmod a+x $TMPSBS/bin/* $TMPSBS/util/$HOSTPLATFORM_DIR/bin/* $TMPSBS/util/$HOSTPLATFORM_DIR/python265/bin/* 
 chmod a+x $TMPSBS/util/pvm3/bin/LINUX/*
 chmod a+x $TMPSBS/util/$HOSTPLATFORM_DIR/cw_build470msl19/release/Symbian_Tools/Command_Line_Tools/*
 fi

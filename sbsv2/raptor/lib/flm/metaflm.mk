@@ -155,43 +155,6 @@ define makepathfinalise
 $(strip $(if $(makepathLIST),$(shell $(GNUMKDIR) -p $(makepathLIST))$(eval makepathLIST:=),))
 endef
 
-## ROMFILE macro #####################################
-define DoRomSet
-
-ifeq ($(call uppercase,$(TARGETTYPE)),LIB)
-BUILDROMTARGET:=
-endif
-
-ifeq ($(call uppercase,$(TARGETTYPE)),KEXT)
-ROMFILETYPE:=extension[MAGIC]
-ABIDIR:=KMAIN
-endif
-ifeq ($(call uppercase,$(TARGETTYPE)),LDD)
-ROMFILETYPE:=device[MAGIC]
-ABIDIR:=KMAIN
-endif
-ifeq ($(call uppercase,$(TARGETTYPE)),PDD)
-ROMFILETYPE:=device[MAGIC]
-ABIDIR:=KMAIN
-endif
-ifeq ($(call uppercase,$(TARGETTYPE)),VAR)
-ROMFILETYPE:=variant[MAGIC]
-ABIDIR:=KMAIN
-endif
-ifeq ($(call uppercase,$(TARGETTYPE)),KDLL)
-ABIDIR:=KMAIN
-endif
-
-ifneq ($(CALLDLLENTRYPOINTS),)
-ROMFILETYPE:=dll
-endif
-ifeq ($(ROMFILETYPE),primary)
-ABIDIR:=KMAIN
-endif
-
-endef
-
-## End of ROMFILE macro ##############################
 
 ## Macros for writing FLMs without needing to know eval
 

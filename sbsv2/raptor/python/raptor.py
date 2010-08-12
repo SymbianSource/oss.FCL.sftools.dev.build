@@ -1377,6 +1377,8 @@ class BuildStats(object):
 		self.incoming_epocroot = incoming_epocroot
 		self.epocroot = epocroot
 		self.logFileName = raptor_instance.logFileName
+		self.configPath = raptor_instance.configPath
+		self.home = raptor_instance.home
 		self.quiet = raptor_instance.quiet
 		self.doCheck = raptor_instance.doCheck
 		self.doWhat = raptor_instance.doWhat

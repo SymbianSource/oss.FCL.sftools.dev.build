@@ -27,14 +27,15 @@
 		<!-- link to bld.inf and mmp platform names -->
 		<set name="TRADITIONAL_PLATFORM" value="WINSCW"/>
 
+		<!-- targettypes -->
+		<set name="TARGET_TYPES" value="ani dll exe exexp fsy implib kdll kext klib ldd lib pdd pdl pdll plugin plugin3 stddll stdexe stdlib textnotifier2 var none"/>
+
 		<!-- interfaces -->
+		<append name="INTERFACE_TYPES" value="$(TARGET_TYPES)"/>
+
 		<set name="INTERFACE.ani" value="Emulator.ani"/>
-		<set name="INTERFACE.bitmap" value="Emulator.bitmap"/>
-		<set name="INTERFACE.exe" value="Emulator.exe"/>
-		<set name="INTERFACE.stdexe" value="Emulator.stdexe"/>
 		<set name="INTERFACE.dll" value="Emulator.dll"/>
-		<set name="INTERFACE.pdll" value="Emulator.pdll"/>
-		<set name="INTERFACE.stddll" value="Emulator.stddll"/>
+		<set name="INTERFACE.exe" value="Emulator.exe"/>
 		<set name="INTERFACE.exexp" value="Emulator.exexp"/>
 		<set name="INTERFACE.fsy" value="Emulator.fsy"/>
 		<set name="INTERFACE.implib" value="Emulator.implib"/>
@@ -43,15 +44,21 @@
 		<set name="INTERFACE.klib" value="Emulator.klib"/>
 		<set name="INTERFACE.ldd" value="Emulator.ldd"/>
 		<set name="INTERFACE.lib" value="Emulator.lib"/>
-		<set name="INTERFACE.stdlib" value="Emulator.stdlib"/>
-		<set name="INTERFACE.none" value="Emulator.none"/>
 		<set name="INTERFACE.pdd" value="Emulator.pdd"/>
 		<set name="INTERFACE.pdl" value="Emulator.pdl"/>
+		<set name="INTERFACE.pdll" value="Emulator.pdll"/>
 		<set name="INTERFACE.plugin" value="Emulator.plugin"/>
 		<set name="INTERFACE.plugin3" value="Emulator.plugin3"/>
-		<set name="INTERFACE.resource" value="Emulator.resource"/>
+		<set name="INTERFACE.stddll" value="Emulator.stddll"/>
+		<set name="INTERFACE.stdexe" value="Emulator.stdexe"/>
+		<set name="INTERFACE.stdlib" value="Emulator.stdlib"/>
 		<set name="INTERFACE.textnotifier2" value="Emulator.textnotifier2"/>
 		<set name="INTERFACE.var" value="Emulator.var"/>
+		<set name="INTERFACE.none" value="Emulator.none"/>
+
+		<!-- START block interfaces -->
+		<set name="INTERFACE.bitmap" value="Emulator.bitmap"/>
+		<set name="INTERFACE.resource" value="Emulator.resource"/>
 		
 		<set name="BLDINF_OUTPUTPATH" value="$(SBS_BUILD_DIR)"/>
 		<set name="CDEFS" value="__SYMBIAN32__ __CW32__ __WINS__ __WINSCW__ __SUPPORT_CPP_EXCEPTIONS__ _UNICODE $(MMPDEFS)"/>

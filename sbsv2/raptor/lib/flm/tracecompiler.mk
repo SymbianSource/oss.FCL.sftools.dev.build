@@ -16,6 +16,12 @@
 # Expected inputs:
 # TARGETEXT
 
+# Set macro for TRACES keyword
+ifneq ($(TRACES),)
+CDEFS:=$(CDEFS) OST_TRACE_COMPILER_IN_USE
+$(if $(FLMDEBUG),$(info <debug>CDEFS=$(CDEFS)</debug>))
+endif
+
 # Set project name as <mmp_name>
 TRACE_PRJNAME:=$(basename $(notdir $(PROJECT_META)))
 OLDTC_TRACE_PRJNAME:=$(TRACE_PRJNAME)

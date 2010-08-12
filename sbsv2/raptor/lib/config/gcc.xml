@@ -16,7 +16,12 @@
 		<!-- tools and scripts -->
 		<env name='JAVATC' default='$(JAVA_HOME)/bin/java' type='tool'/> <!-- Java used by Trace Compiler -->
 
+		<!-- targettypes -->
+		<set name="TARGET_TYPES" value="exe lib"/>
+
 		<!-- interfaces -->
+		<append name="INTERFACE_TYPES" value="$(TARGET_TYPES)"/>
+
 		<set name="INTERFACE.exe" value="Tools.exe"/>
 		<set name="INTERFACE.lib" value="Tools.lib"/>
 
@@ -43,7 +48,7 @@
 		<set name='CDEFS.WIN32' value='$(CDEFS.DEFAULT) _WIN32 WIN32 _WINDOWS __TOOLS2_WINDOWS__'/>
 		<set name='CDEFS.LINUX' value='$(CDEFS.DEFAULT) __LINUX__ __TOOLS2_LINUX__'/>
 
-		<set name='INC.COMPILER' value='$(EPOCINCLUDE)/gcc_mingw/gcc_mingw_3_4_2.h'/>
+		<set name='PREINCLUDE' value='$(EPOCINCLUDE)/gcc_mingw/gcc_mingw_3_4_2.h'/>
 
 		<set name='OPT.D' value='-D'/>
 		<set name='OPT.L' value='-L'/>

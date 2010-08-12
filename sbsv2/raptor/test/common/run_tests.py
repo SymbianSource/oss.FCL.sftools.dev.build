@@ -535,3 +535,6 @@ run_tests = SuiteRun(suitepattern = options.suite, testpattern = options.tests,
 		upload_location = options.upload)
 run_tests.run_tests()
 
+if run_tests.suites_failed:
+	sys.exit(1)
+	

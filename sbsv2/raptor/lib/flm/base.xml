@@ -15,7 +15,6 @@
 		<param name='COMPONENT_LAYER' default=''/> <!-- Multimedia -->
 		<param name='PROJECT_META' default=''/>     <!-- my.mmp  -->
 		<param name='DATE' default=''/>
-		<param name='DUMPBCINFO' default=''/>
 		<param name='FLMDEBUG'  default=''/>
 		<param name='PLATFORM' default=''/>
 		<param name='PYTHON' default=''/> <!-- allow python scripts to be used in general flms -->

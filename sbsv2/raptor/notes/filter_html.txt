@@ -1,0 +1,41 @@
+There is a new log filter to generate HTML output. For example,
+
+sbs --filters=html -f logdir
+
+will produce an output file "logdir/index.html" and other supporting files
+in the directory "logdir". This can be used alongside the Bz2 filter to
+generate both a human readable summary and a compressed log for further
+detailed machine analysis if required: for example,
+
+sbs --filters=html,bz2log -f name
+
+will produce a folder "name" and a file "name.bz2".
+
+
+If a build is done in several parts, for example,
+
+sbs -s sys1.xml --filters=html,bz2log -f build/part1
+sbs -s sys2.xml --filters=html,bz2log -f build/part2
+sbs -s sys3.xml --filters=html,bz2log -f build/part3
+
+Then there is a new script "SBS_HOME/bin/sbs_index.py" which can produce a
+single index linking to all the individual parts: for example,
+
+sbs_index.py build/part1 build/part2 build/part3 build/index.html
+
+the first parameters are the directories to search for summaries and the
+last parameter is the name of the overall index file. Directories are
+searched recursively, so the above example is the same as,
+
+sbs_index.py build build/index.html
+
+
+Text in the Raptor logs is classified as Error, Warning or Remark using the
+list of regular expressions in the file SBS_HOME/lib/config/logfile_regex.csv
+but this can be overriden by placing a file of the same name in the kit in
+its EPOCROOT/epoc32/sbs_config folder.
+
+
+The filter also checks that all the files which were listed in "what" output
+actually exist at the end of the build. Any files which don't exist are
+recorded as "Missing files".

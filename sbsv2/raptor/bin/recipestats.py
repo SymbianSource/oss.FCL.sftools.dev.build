@@ -31,6 +31,7 @@ class RecipeStats(object):
 
 	def add(self, duration):
 		self.time += duration
+		self.count += 1
 
 class BuildStats(object):
 	STAT_OK = 0
