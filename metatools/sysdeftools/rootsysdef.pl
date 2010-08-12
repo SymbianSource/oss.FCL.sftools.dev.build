@@ -55,7 +55,7 @@ sub help
 		"  -w [Note|Warning|Error]\tspecifies prefix text for any notifications. Defautls to Error\n\n",
 		"  -root [dir]\tspecifies the root directory of the filesystem. All globbing will be done relative to this path\n\n",
 
-		"  -glob [wildcard path]\tThe wildcard search to look for pkgdef files. eg  \"\\*\\*\package_definition.xml\". Can specify any number of these.\n",
+		"  -glob [wildcard path]\tThe wildcard search to look for pkgdef files. eg  \"\\*\\*\\package_definition.xml\". Can specify any number of these.\n",
 		"  -placeholders [bool]\tif set, all packages not found in the template will be left in as empty placeholders\n";
 		"  -name [text]\tthe name in <systemModel> to use for the generated root sysdef. If not present, this will use the name from the templat\n";
 	exit(1);
@@ -164,7 +164,13 @@ my %foundDescendants;
 
 foreach(keys %add)
 	{
-	my   $fragment = $parser->parsefile ($_);
+
+	my   $fragment;
+	
+	eval {
+		$fragment  = $parser->parsefile ($_);
+	};
+	$fragment || die "could not parse $_";
 	my $fdoc = $fragment->getDocumentElement();
 	my $topmost =&firstElement($fdoc);
 	if(!$topmost) {

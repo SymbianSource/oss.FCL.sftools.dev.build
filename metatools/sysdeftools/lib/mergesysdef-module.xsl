@@ -11,7 +11,7 @@
 	Contributors:
 	Description:
 	XSLT module for merging only two sysdef files according to the 3.0.1 rules. 
-		2.x and older syntax not supported and must be converetd before calling.
+		2.x and older syntax not supported and must be converted before calling.
 
 		Requires the including XSLT to also include path-module.xsl
 -->
@@ -212,6 +212,15 @@
 			<xsl:with-param name="down" select="$down"/>
 			<xsl:with-param name="replaces" select="$replaces"/>
 		</xsl:apply-templates>
+
+
+		<!-- tack on any remaining layers -->
+		<xsl:apply-templates mode="merge-copy-of" select="$other/systemModel/layer[not(@before) and not(following-sibling::*[@id=current()/layer/@id]) and not(@id=current()/layer/@id)]">
+			<xsl:with-param name="origin" select="$down"/>
+			<xsl:with-param name="root" select="current()/.."/>
+			<xsl:with-param name="replaces" select="$replaces"/>
+		</xsl:apply-templates>		
+
 	</xsl:copy>
 </xsl:template>
 
@@ -490,15 +499,6 @@
 
 		</xsl:otherwise>
 	</xsl:choose>
-	
-	<xsl:if test="self::layer and not(following-sibling::layer)">	
-		<!-- for the last layer, tack on any remaining layers -->
-		<xsl:apply-templates mode="merge-copy-of" select="$other/layer[not(@before) and not(following-sibling::*[@id=$this/../layer/@id]) and not(@id=$this/../layer/@id)]">
-			<xsl:with-param name="origin" select="$down"/>
-			<xsl:with-param name="root" select="$this/ancestor::SystemDefinition"/>			
-			<xsl:with-param name="replaces" select="$replaces"/>
-		</xsl:apply-templates>		
-	</xsl:if>
 </xsl:template>
 
 

@@ -38,6 +38,7 @@ my $defaultns = 'http://www.symbian.org/system-definition';	# needed if no DTD
 my @excludeMetaList;
 my @cannotExclude= ('link-mapping', 'config');
 my %ID;	# list of all IDs
+my $errCount=0;
 
 my @newarg;
 foreach my $a (@ARGV)
@@ -86,7 +87,11 @@ my %excludeMeta;
 foreach (@excludeMetaList) {$excludeMeta{$_}=1}	# make list a hash table
 foreach (@cannotExclude)
 	{
-	$excludeMeta{$_} && print STDERR "Error: Cannot exclude meta rel=\"$_\"\n";
+	if($excludeMeta{$_})
+		{
+		print STDERR "Error: Cannot exclude meta rel=\"$_\"\n";
+		$errCount++;
+		}
 	$excludeMeta{$_}=0
 	}	# cannot exclude any of these rel types
 
@@ -167,6 +172,7 @@ else
 	$sysdefdoc->printToFile($output);
 	}
 
+$errCount && die "Fatal syntax errors";
  
 sub abspath
 	{ 	# normalize the path into an absolute one
@@ -256,6 +262,7 @@ sub walk
 			if(defined $ID{$id})
 				{
 				print STDERR "Error: duplicate ID: $tag \"$id\" in $ptext matches $ID{$id}\n";
+				$errCount++;
 				}
 			else 
 				{
@@ -320,6 +327,7 @@ sub walk
 			if(!$item)
 				{
 				print STDERR "Error: Could not process metadata file: $link\n";
+				$errCount++;
 				next; # do not alter children
 				}
 			$node->removeAttribute('href');
@@ -582,6 +590,7 @@ sub localfile
 	if($file=~m,^([a-z0-9][a-z0-9]+):,i)
 		{
 		print STDERR "ERROR: $1 scheme not supported\n";
+		$errCount++;
 		return;  # return empty string if not supported.
 		} 
 	return $file
@@ -661,7 +670,7 @@ sub doCmpConfig
 	{ # configure in or out the units in a component
 	my $cmp = shift;	# the component node
 	my @unversioned;	# list of all units with no version attribute (if more than one, they should all have filters defined)
-	my %versioned;		# hash table of all units with a specified version, it's a fatal error to hav the same verison twice in one component
+	my %versioned;		# hash table of all units with a specified version, it's a fatal error to have the same verison twice in one component
 	foreach my $item (@{$cmp->getChildNodes})
 		{ # populate %versioned and @unversioned to save processsing later
 		if($item->getNodeType==1 && $item->getTagName eq 'unit')
@@ -793,7 +802,7 @@ sub getDefines
 		else {die "cannot process $_";}
 		}
 	close CPP;
-	$? && die "Call to cpp produced an error";
+	$? && die "Error: Call to cpp produced an error";
 	}
 
 sub  checkSyntaxVersion
