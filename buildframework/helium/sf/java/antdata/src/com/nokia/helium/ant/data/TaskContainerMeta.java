@@ -16,7 +16,6 @@
  */
 package com.nokia.helium.ant.data;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,7 +34,7 @@ public class TaskContainerMeta extends AntObjectMeta {
     private ArrayList<String> signals;
     private ArrayList<String> executables;
 
-    public TaskContainerMeta(AntObjectMeta parent, Node node) throws IOException {
+    public TaskContainerMeta(AntObjectMeta parent, Node node) {
         super(parent, node);
         callAntTargetVisitor();
     }
@@ -56,7 +55,7 @@ public class TaskContainerMeta extends AntObjectMeta {
         return executables;
     }
 
-    private void callAntTargetVisitor() throws IOException {
+    private void callAntTargetVisitor() {
         // Add antcall/runtarget dependencies
         antcallTargets = new ArrayList<String>();
         logs = new ArrayList<String>();
@@ -84,7 +83,6 @@ public class TaskContainerMeta extends AntObjectMeta {
         @Override
         public void visit(Element node) {
             String name = node.getName();
-            // System.out.println(name);
             if (name.equals("antcall") || name.equals("runtarget")) {
                 String text = node.attributeValue("target");
                 targetList.add(text);
@@ -106,17 +104,10 @@ public class TaskContainerMeta extends AntObjectMeta {
             }
 
             if (name.endsWith("signal") || name.endsWith("execSignal")) {
-                // System.out.println(name);
-                String signalid = node.attributeValue("name"); // getProject().replaceProperties(node.attributeValue("name"));
-                // String failbuild = signalType(signalid, node.getDocument());
+                String signalid = node.attributeValue("name");
 
                 if (signalList != null) {
-                    // if (failbuild != null) {
-                    // signalList.add(signalid + "," + failbuild);
-                    // }
-                    // else {
                     signalList.add(signalid);
-                    // }
                 }
             }
 
@@ -130,8 +121,7 @@ public class TaskContainerMeta extends AntObjectMeta {
         private void addLog(String text) {
             if (text != null && logList != null) {
                 for (String log : text.split(" ")) {
-                    // TODO
-                    String fulllogname = log; // getProject().replaceProperties(log);
+                    String fulllogname = log;
                     if (!logList.contains(log) && (fulllogname.endsWith(".log") || fulllogname.endsWith(".html"))) {
                         log = log.replace("--log=", "");
                         logList.add(log);

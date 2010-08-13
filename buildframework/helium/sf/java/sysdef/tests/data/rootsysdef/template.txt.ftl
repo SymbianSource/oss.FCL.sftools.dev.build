@@ -23,7 +23,7 @@ List of packages:
 <#list roots?keys as root>
     <#list roots[root]?keys as layer>
         <#list roots[root][layer] as pkg>
-${root}/${layer}/${pkg}
+${root}/${layer}/${pkg['path']}
         </#list>
     </#list>
 </#list>

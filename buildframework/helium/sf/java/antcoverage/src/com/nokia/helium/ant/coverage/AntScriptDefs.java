@@ -31,8 +31,9 @@ public class AntScriptDefs {
      */
     public void add(String scriptDef) {
         for (ScriptDefHolder sh : antScriptdefs) {
-            if (sh.equals(scriptDef))
+            if (sh.equals(scriptDef)) {
                 return;
+            }
         }
         this.antScriptdefs.add(new ScriptDefHolder(scriptDef));
     }

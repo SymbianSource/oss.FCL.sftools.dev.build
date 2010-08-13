@@ -35,7 +35,7 @@ class DocumentationTest(unittest.TestCase):
         (fileDes, tempFileName) = tempfile.mkstemp()
         old_db = os.path.join(os.environ['TEST_DATA'], 'data', 'docs', 'sample_old_db.xml') 
         new_db = os.path.join(os.environ['TEST_DATA'], 'data', 'docs', 'sample_new_db.xml') 
-        writer = APIDeltaWriter(old_db, new_db)
+        writer = APIDeltaWriter(open(old_db), open(new_db))
         saveout = sys.stdout
         sys.stdout = sys.stderr
         writer.write(tempFileName)
@@ -45,4 +45,4 @@ class DocumentationTest(unittest.TestCase):
         content = tempFile.readlines()
         tempFile.close()
         os.unlink(tempFileName)
-        assert len(content) == 12
+        assert len(content) == 13

@@ -22,9 +22,14 @@ Description:
 -->
 <project name="test-executor">
     <description>Helium antlib core executor test config.</description>
+    <property name="hlm.target.final" value="final-target" />
 
     <target name="target">
         <echo>Running target.</echo>
+    </target>
+    
+    <target name="final-target">
+        <echo>final-target is executed as postbuild action</echo>
     </target>
 
 </project>

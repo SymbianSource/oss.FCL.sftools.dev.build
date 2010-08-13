@@ -29,7 +29,7 @@ Description:
   </info>
   <dependencies>
     <dependency name="helium-core" rev="latest.integration" conf="default" />
-    <dependency org="org.apache.xml" name="xalan" rev="latest.integration" conf="default" />
-    <dependency org="org.apache.xml" name="serializer" rev="latest.integration" conf="default" />
+    <dependency org="org.apache.xml" name="xalan" rev="2.7.0+" conf="default" />
+    <dependency org="org.apache.xml" name="serializer" rev="2.7.0+" conf="default" />
   </dependencies>
 </ivy-module>

@@ -38,7 +38,7 @@ public class ToolChecker {
      *            is the message to be displayed on failure.
      */
     public void verifyIsExpectedToolVersionConfigured(String expVersion,
-            String errorMsg) {
+            String errorMsg) throws CheckToolException {
         if (expVersion == null
                 || (expVersion != null && expVersion.trim().isEmpty())) {
             raiseError(errorMsg);
@@ -58,16 +58,17 @@ public class ToolChecker {
      *            is the message to be displayed on failure.
      */
     public void verifyToolVersion(String command, String expVersion,
-            String versionString2match, String errorMsg) {
+            String versionString2match, String errorMsg) throws CheckToolException {
         String[] versions = expVersion.split(",");
         String installedVersion = getInstalledToolVersion(command);
         boolean valid = false;
         for (String expver : versions) {
-            if (!valid)
+            if (!valid) {
                 valid = installedVersion.contains(versionString2match + expver);
+            }
         }
         if (!valid) {
-            System.out.println("Installed Version : " + installedVersion);
+            HeliumToolsCheckerMain.println("Installed Version : " + installedVersion);
             raiseError(errorMsg);
         }
     }
@@ -78,7 +79,7 @@ public class ToolChecker {
      * @param message
      *            is the failure message.
      */
-    public void raiseError(String message) {
+    public void raiseError(String message) throws CheckToolException {
         incrementErrorCount();
         throw new CheckToolException(message);
     }
@@ -90,7 +91,7 @@ public class ToolChecker {
      *            is the command string to execute.
      * @return the actual tool version.
      */
-    public String getInstalledToolVersion(String cmd) {
+    public String getInstalledToolVersion(String cmd) throws CheckToolException {
         String input = null;
         String error = null;
         try {
@@ -129,10 +130,12 @@ public class ToolChecker {
             versionString = os.toString();
         } finally {
             try {
-                if (os != null)
+                if (os != null) {
                     os.close();
-                if (is != null)
+                }
+                if (is != null) {
                     is.close();
+                }
             } catch (IOException e) {
                 e = null; // ignore the exception
             }

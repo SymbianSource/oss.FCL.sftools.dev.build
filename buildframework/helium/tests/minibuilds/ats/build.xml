@@ -20,7 +20,7 @@ Description:
 
 ============================================================================
 -->
-<project name="minibuild.ats" default="minibuild-ats" xmlns:au="org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+<project name="minibuild.ats" default="minibuild" xmlns:au="org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
     <property environment="env"/>
     <import file="../site/${env.TEAM}.ant.xml" />
 
@@ -31,14 +31,14 @@ Description:
     <property name="major.version" value="0" />
     <property name="minor.version" value="0" />
     <property name="build.version" value="${major.version}.${minor.version}"/>
-    <property name="build.drive" value="z:" />
+    <!--<property name="build.drive" value="z:" />-->
     <property name="build.id" value="${build.name}_${build.version}"/>
     <property name="diamonds.host" value="diamonds.nmp.nokia.com"/>
     <property name="diamonds.port" value="80"/>
     <property name="diamonds.path" value="/diamonds/builds/"/>
     
-    <property name="enabled.ats" value="true" />
-    <property name="skip.ats.sending" value="true"/>
+    <property name="ats.enabled" value="true" />
+    <property name="ats.upload.enabled" value="false"/>
     <property name="ats.image.type" value="variant" />
     <property name="ats.product.name" value="" />
     
@@ -46,7 +46,7 @@ Description:
     <property name="ats.product.hwid" value="" />
     
     <property name="tsrc.data.dir" value="data_rom" />
-    <property name="ats.ctc.enabled" value="True" />
+    <property name="ats.ctc.enabled" value="true" />
     <property name="ats.ctc.host" value="10.11.3.2" />
     
     <property name="ta.flag.list" value="TA_M, TA_MU, TA_MMAPPFW,TA_MM"/>
@@ -61,30 +61,31 @@ Description:
 
 <!--    
     <property name="build.system" value="ec-helium" />
--->	
+-->    
     <property name="rvct.version" value="22_616"/>
     <!-- Archiving configuration-->
     <property name="zip.config.file" location="archive.cfg.xml"/>
     <property name="zips.ee.spec.name" value="minibuild_archive"/>
-	
+    
     <!-- Synergy is not configured -->
     <property name="skip.password.validation" value="1"/>
     
-<echo>
+    <!--<echo>
 DIAMONDS URL: ${diamonds.build.url}
 DIAMONDS HOST: ${diamonds.host}
 DIAMONDS BID: ${diamonds.build.id}
 
 DIAMONDS ATS TEST PAGE: http://${diamonds.host}${diamonds.build.id}#tab=4
-</echo>
+    </echo>-->
+    
     <import file="${helium.dir}/helium.ant.xml"/>
     
-    <!-- Run the full sequence of target for the minibuild. ,mini-build-prep,compile-main,zip-ee,mini-build-check-->
-    <target name="minibuild-ats" depends="mini-build-cleanup,mini-build-prep,compile-main,ats-test,ats-aste"/>
+    <!-- Run the full sequence of target for the minibuild. ,minibuild-prep,compile-main,zip-ee,minibuild-check-->
+    <target name="minibuild" depends="minibuild-cleanup,minibuild-prep,compile-main,ats-test,ats-aste,final"/>
     
     <!-- Prepare the minibuild. -->
-    <!--target name="mini-build-prep" depends="init-build-area,start-ant-log,diamonds,set-arm-version,prep-copy-symbiantools"/-->
-    <target name="mini-build-prep" depends="prep"/>
+    <!--target name="minibuild-prep" depends="init-build-area,start-ant-log,diamonds,set-arm-version,prep-copy-symbiantools"/-->
+    <target name="minibuild-prep" depends="prep"/>
     
     <!-- Stubbing few targets for easy testing with dragonfly ... -->
     <target name="prep-drive" depends="build-number"/>
@@ -94,13 +95,13 @@ DIAMONDS ATS TEST PAGE: http://${diamonds.host}${diamonds.build.id}#tab=4
     <target name="check-env-prep"/>
     <target name="prep-copy"/>
     
-    <target name="mini-build-cleanup">
+    <target name="minibuild-cleanup">
         <delete verbose="true" includeemptydirs="true">
             <fileset dir="${build.drive}/" casesensitive="false">
                 <include name="makefile"/>
                 <include name="*.mk"/>
-            	<include name="ecloud_tmp_*/**"/>
-            	<include name="emake.*"/>            	
+                <include name="ecloud_tmp_*/**"/>
+                <include name="emake.*"/>                
                 <include name="epoc32/build/**"/>
                 <include name="epoc32/rombuild/*/**"/>
                 <include name="timestart.txt"/>
@@ -109,8 +110,8 @@ DIAMONDS ATS TEST PAGE: http://${diamonds.host}${diamonds.build.id}#tab=4
         </delete>
     </target>
     
-    <target name="mini-build-check">
-    	<!-- Check if prep has set some prop correctly... -->
+    <target name="minibuild-check">
+        <!-- Check if prep has set some prop correctly... -->
         <echo>'${arm.compiler.version}'</echo>
         <au:assertMatches string="${arm.compiler.version}" pattern="RVCT2\.2 \[Build 616\]" casesensitive="false" multiline="true"/>
 
@@ -122,11 +123,11 @@ DIAMONDS ATS TEST PAGE: http://${diamonds.host}${diamonds.build.id}#tab=4
         
         <!-- Checking the zip generation -->
         <au:assertFileExists file="${zips.build.dir}/s60_app_organizer_clock_binary.zip"/>
-        <au:assertFileExists file="${zips.build.dir}/s60_app_organizer_clock.zip"/>    	
+        <au:assertFileExists file="${zips.build.dir}/s60_app_organizer_clock.zip"/>        
     </target>
 
 
-	
+    
 </project>
 
     

@@ -40,12 +40,18 @@ Description:
 
     
     <target name="resolve">
-        <mkdir dir="${lib.dir}"/> <!-- not usually necessary, ivy creates the directory IF there are dependencies -->
+        <mkdir dir="${lib.dir}" />
+        <mkdir dir="${lib.dir}/zipsafe" />
+        <mkdir dir="${lib.dir}/zipnotsafe" />
+        <delete dir="${lib.dir}/zipnotsafe" includes="**/*" />
+        
         <ivy:settings file="${ivy.settings.dir}/ivysettings.xml" />
         
         <!-- the call to resolve is not mandatory, retrieve makes an implicit call if we don't -->
         <ivy:resolve file="${ivy.file}" log="download-only"/>
-        <ivy:retrieve pattern="${lib.dir}/[artifact].[ext]" log="download-only"/>
+        <ivy:retrieve pattern="${lib.dir}/zipsafe/[artifact].[ext]" type="egg" log="download-only"/>
+        <ivy:retrieve pattern="${lib.dir}/zipsafe/[artifact].[ext]" type="py" log="download-only"/>
+        <ivy:retrieve pattern="${lib.dir}/[artifact].[ext]" type="jar" log="download-only"/>
     </target>
 
     
@@ -191,6 +197,7 @@ Description:
                     <jvmarg value="-Demma.coverage.out.file=${module.temp.dir}/coverage_junit.emma" />
                     <jvmarg value="-Demma.coverage.out.merge=true" />
                     <jvmarg value="-Dtestdir=${basedir}" />
+                    <jvmarg value="-Dtest.temp.dir=${test.temp.dir}" />
                     <classpath>
                         <fileset dir="${module.temp.dir}/backup/">
                             <include name="**/*.jar"/>
@@ -273,8 +280,9 @@ Description:
                             </instr>
                         </emma>
                         <pathconvert pathsep="${path.separator}" property="python.path">
-                            <fileset dir="${lib.dir}" includes="**/*.egg"/>
-                            <dirset dir="${lib.dir}"/>
+                            <fileset dir="${lib.dir}" includes="zipsafe/*.egg"/>
+                            <dirset dir="${lib.dir}" includes="zipnotsafe/*.egg"/>
+                            <dirset dir="${lib.dir}" includes="zipsafe" />
                         </pathconvert>
                         <exec osfamily="windows" executable="cmd" dir="${basedir}/tests" failonerror="true">
                             <env key="ANT_ARGS" value="-lib ${lib.dir} -lib ${module.temp.dir}/backup/${ant.project.name}.jar -lib ${builder.dir}/antlibs -Dpython.path=${python.path}" />
@@ -329,7 +337,7 @@ Description:
         </if>
         <if>
             <resourcecount count="0" when="gt">
-                <fileset dir="${build.temp.dir}/" includes="*/*.emma" />
+                <fileset dir="${components.temp.dir}/" includes="*/*.emma" />
             </resourcecount>
             <then>
                 <emma enabled="true" verbosity="quiet">

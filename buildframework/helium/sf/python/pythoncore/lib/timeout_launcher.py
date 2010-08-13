@@ -18,6 +18,7 @@
 #===============================================================================
 
 """ Application launcher supporting timeout. """
+
 import os
 import sys
 import re
@@ -61,12 +62,12 @@ def main():
         sys.exit(-1)
     else:
         _logger.debug("Start command")
+        shell = True
+        if _windows:
+            shell = False
         if timeout != None:
             finish = time.time() + timeout
             timedout = False
-            shell = True
-            if _windows:
-                shell = False
             p_file = subprocess.Popen(' '.join(cmdline), stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=shell)
             while (p_file.poll() == None):
                 if time.time() > finish:
@@ -84,15 +85,14 @@ def main():
                     except Exception, exc:
                         print "ERROR: %s" % exc
                 else:
-                    # pylint: disable-msg=E1101
-                    os.kill(p_file.pid, 9)
+                    os.kill(p_file.pid, 9) # pylint: disable=E1101
                 print "ERROR: exiting..."
                 raise Exception("Timeout exception.")
             else:
                 print p_file.communicate()[0]
                 sys.exit(p_file.returncode)
         else:
-            p_file = subprocess.Popen(' '.join(cmdline), stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
+            p_file = subprocess.Popen(' '.join(cmdline), stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=shell)
             print p_file.communicate()[0]
             sys.exit(p_file.returncode)
 

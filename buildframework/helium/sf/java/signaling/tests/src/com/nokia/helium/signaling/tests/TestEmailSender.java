@@ -17,12 +17,16 @@
 
 package com.nokia.helium.signaling.tests;
 
-import org.junit.*;
-import static org.junit.Assert.*;
-import java.io.*;
-import java.util.*;
-import com.nokia.helium.signal.ant.types.*;
+import java.io.File;
+
 import org.apache.tools.ant.Project;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
+import com.nokia.helium.signal.ant.types.EMAILNotifier;
+import com.nokia.helium.signal.ant.types.NotifierInput;
+import com.nokia.helium.signal.ant.types.NotifyWhenEnum;
 
 public class TestEmailSender {
     
@@ -38,12 +42,12 @@ public class TestEmailSender {
      * @throws Exception
      */
     @Test
-    public void test_simpleMergeNode() throws Exception {
+    public void test_simpleEmailNotification() throws Exception {
         EMAILNotifier en = new EMAILNotifier();
         Project p = new Project();
         p.setNewProperty("user.name", "test");
         en.setProject(p);
-        en.setNotifyWhen("always");
+        en.setNotifyWhen((NotifyWhenEnum)NotifyWhenEnum.getInstance(NotifyWhenEnum.class, "always"));
         en.setTitle("test");
         en.setSmtp("test");
         en.setLdap("test");
@@ -52,6 +56,22 @@ public class TestEmailSender {
         en.sendData("test", true, input, "Test Message");
     }
 
-   
+    /**
+     * This test should not fail the build, when no log are found, or default template 
+     * is missing just skip the notification and log an error.
+     * @throws Exception
+     */
+    public void test_emailNotificationWithoutNotifyFileAndTemplate() throws Exception {
+        EMAILNotifier en = new EMAILNotifier();
+        Project p = new Project();
+        p.setNewProperty("user.name", "test");
+        en.setProject(p);
+        en.setNotifyWhen((NotifyWhenEnum)NotifyWhenEnum.getInstance(NotifyWhenEnum.class, "always"));
+        en.setTitle("test");
+        en.setSmtp("test");
+        en.setLdap("test");
+        NotifierInput input = new NotifierInput();
+        en.sendData("test", true, input, "Test Message");
+    }   
 
 }

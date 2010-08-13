@@ -16,13 +16,13 @@
 # Description: 
 #
 if [ ! $HELIUM_HOME ] ; then
-    export HELIUM_HOME=$(dirname $(readlink /proc/$$/fd/255))
+    export HELIUM_HOME=$(dirname $(readlink -f $0))
 fi
 
 export LANG="en_US.UTF-8"
-export ANT_ARGS="-lib $HELIUM_HOME/extensions/nokia/external/antlibs2 -lib $HELIUM_HOME/external/antlibs2 -logger com.nokia.ant.HeliumLogger -Dant.executor.class=com.nokia.helium.core.ant.HeliumExecutor -listener com.nokia.helium.diamonds.ant.HeliumListener -listener com.nokia.helium.logger.ant.listener.StatusAndLogListener -listener com.nokia.helium.core.ant.listener.TargetTimesLogGeneratorListener"
+export ANT_ARGS="-lib $HELIUM_HOME/external/antlibs2 -logger com.nokia.ant.HeliumLogger -Dant.executor.class=com.nokia.helium.core.ant.HeliumExecutor -listener com.nokia.helium.logger.ant.listener.StatusAndLogListener -listener com.nokia.helium.core.ant.listener.TargetTimesLogGeneratorListener"
 
-TEMP_PYTHONPATH="$HELIUM_HOME/external/python/lib/common:$HELIUM_HOME/external/python/lib/auto:$HELIUM_HOME/tools/common/python/scripts:$HELIUM_HOME/extensions/nokia/external/python/lib/2.5:$HELIUM_HOME/extensions/nokia/tools/common/python/lib"
+TEMP_PYTHONPATH="$HELIUM_HOME/external/python/lib/common:$HELIUM_HOME/external/python/lib/auto:$HELIUM_HOME/extensions/nokia/external/python/lib/2.5:$HELIUM_HOME/extensions/nokia/tools/common/python/lib"
 
 TEMP_PERL5LIB="$HELIUM_HOME/tools/common/packages"
 if [ ! $PERL5LIB ] ; then
@@ -74,14 +74,14 @@ if [ ! $EPOCROOT ]; then
 fi 
 
 if [ ! -f "$HELIUM_HOME/external/antlibs2/helium-checktools-1.0.jar" ] ; then
-    echo A required jar '$HELIUM_HOME/external/antlibs2/helium-checktools-1.0.jar' is missing. Verification of basic tools used by Helium cannot be done. Contact Helium support.
+    echo "Please build helium from nokia_builder or builder dir run 'bld && bld get-deps'"
     exit 1
 else 
     java -cp "$HELIUM_HOME/external/antlibs2/helium-checktools-1.0.jar" com.nokia.helium.checktools.HeliumToolsCheckerMain -config "$HELIUM_HOME/config/helium.basic.tools.config"
 
     if [ $? -eq 0 ] ; then
-      exec ant -Dpython.cachedir=$PYTHON_CACHEDIR -Dhelium.dir=$HELIUM_HOME -Dpython.path=$PYTHONPATH -Dcache.dir=$HELIUM_CACHE_DIR $*
+        exec ant -Dpython.cachedir=$PYTHON_CACHEDIR -Dhelium.dir=$HELIUM_HOME -Dpython.path=$JYTHONPATH -Dcache.dir=$HELIUM_CACHE_DIR $*
     else
-        echo Build aborted with error
+        exit 1
     fi    
 fi   

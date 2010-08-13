@@ -292,7 +292,7 @@ class PolicyMapper(Mapper):
                     value = fileutils.read_policy_content(policyfile)
                     if value not in self._binary.keys():    #check policy file is valid
                         _logger.error("POLICY_ERROR: policy file found %s but policy %s value not exists in csv" % (policyfile, value))
-                except Exception, exc:
+                except IOError, exc:
                     _logger.error("POLICY_ERROR: %s" % exc)         
                     value = self._config.get('policy.default.value', MISSING_POLICY)
             else:       #no policy file present
@@ -408,7 +408,7 @@ class SFPolicyRemoverMapper(PolicyRemoverMapper):
         """ Initialization. """
         PolicyRemoverMapper.__init__(self, config, archiver)
 
-    def load_policy_binary(self, csvfile):
+    def load_policy_binary(self, csvfile, column=1):
         """ Loading the policy using the 3rd column. """
         _logger.info("POLICY_INFO: Loading actions from the 3rd column")
         PolicyRemoverMapper.load_policy_binary(self, csvfile, column=3)
@@ -419,7 +419,7 @@ class EPLPolicyRemoverMapper(PolicyRemoverMapper):
         """ Initialization. """
         PolicyRemoverMapper.__init__(self, config, archiver)
 
-    def load_policy_binary(self, csvfile):
+    def load_policy_binary(self, csvfile, column=1):
         """ Loading the policy using the 4th column. """
         _logger.info("POLICY_INFO: Loading actions from the 4th column")
         PolicyRemoverMapper.load_policy_binary(self, csvfile, column=4)

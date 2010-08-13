@@ -83,7 +83,6 @@ public class AntConfigLintTask extends Task implements DynamicElement {
     public void execute() {
         errorsTotal = 0;
         try {
-            System.out.println(getProject());
             db = new Database(getProject());
             if (checks.size() == 0) {
                 throw new BuildException("No checks defined.");

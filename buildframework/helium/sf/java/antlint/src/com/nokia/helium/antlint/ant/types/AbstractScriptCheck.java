@@ -18,11 +18,11 @@ package com.nokia.helium.antlint.ant.types;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.io.IOException;
 
 import org.apache.tools.ant.BuildException;
 
@@ -75,8 +75,9 @@ public abstract class AbstractScriptCheck extends AbstractCheck {
                 output2.write("try:\n");
                 for (String line : text.split("\n")) {
                     if (line.trim().startsWith("import ")
-                            || line.trim().startsWith("from "))
+                            || line.trim().startsWith("from ")) {
                         output2.write("    " + line + "\n");
+                    }
                 }
 
                 output2.write("except ImportError, e:\n");

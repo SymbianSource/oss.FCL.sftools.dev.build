@@ -19,9 +19,13 @@
 package com.nokia.ant.taskdefs;
 
 import org.apache.tools.ant.Task;
+
 import com.nokia.ant.HeliumLogger;
 
 /**
+ * This task is deprecated, please consider using the 
+ * hlm:taskRecorder task from the logging framework.
+ * 
  * This task will control the outputing of the Helium logger.
  * 
  * Example of usage, to stop logging to console:
@@ -35,7 +39,10 @@ import com.nokia.ant.HeliumLogger;
  * </pre> 
  * 
  * @ant.task name="logtoconsole" category="Logging"
+ * @deprecated This task is deprecated, please consider using the 
+ * hlm:taskRecorder task from the logging framework.
  */ 
+@Deprecated
 public class StopLogToConsoleTask extends Task 
 {   
     private boolean stopLogToConsole;
@@ -62,11 +69,13 @@ public class StopLogToConsoleTask extends Task
         super.execute();
         if (HeliumLogger.getStopLogToConsole() != stopLogToConsole)
         {
-            if (stopLogToConsole)
-                log("Logging to console suspended.");             
+            if (stopLogToConsole) {
+                log("Logging to console suspended.");
+            }
             HeliumLogger.setStopLogToConsole(stopLogToConsole);   
-            if (!stopLogToConsole)
-                log("Logging to console resumed."); 
+            if (!stopLogToConsole) {
+                log("Logging to console resumed.");
+            }
         }       
     }   
 }

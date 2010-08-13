@@ -16,6 +16,22 @@
 
 package com.nokia.helium.ant.data;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.tools.ant.Project;
+import org.apache.tools.ant.Target;
+
+import com.nokia.helium.freemarker.WikiMethod;
+
 import freemarker.cache.ClassTemplateLoader;
 import freemarker.cache.FileTemplateLoader;
 import freemarker.cache.MultiTemplateLoader;
@@ -24,44 +40,26 @@ import freemarker.template.Configuration;
 import freemarker.template.DefaultObjectWrapper;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
-import java.io.File;
-import java.io.IOException;
-import java.io.Writer;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.tools.ant.Project;
-import org.apache.tools.ant.Target;
-import org.dom4j.Document;
-import org.dom4j.DocumentException;
-import org.dom4j.DocumentHelper;
-import org.dom4j.Element;
-import org.dom4j.Node;
-import org.dom4j.XPath;
-import org.dom4j.io.SAXReader;
-
-import com.nokia.helium.freemarker.WikiMethod;
 
 /**
- * Reads the current ant project and a fileset and generates a xml file with a
- * summary of targets, macros and properties.
+ * Reads the current ant project and a fileset and generates a xml file with a summary of targets,
+ * macros and properties.
  */
 public class Database {
     /** The default scope filter if no scope filter is defined. */
     public static final String DEFAULT_SCOPE = "public";
+    public static final Map<String, String> NAMESPACE_MAP;
 
     private Project rootProject;
     private Map<String, AntFile> antfilesMap;
     private Map<String, PackageMeta> packagesMap;
     private String scopeFilter;
 
-    private HashMap<String, String> namespaceMap = new HashMap<String, String>();
-    private HashMap<String, List<String>> globalSignalList = new HashMap<String, List<String>>();
-    private Document signaldoc;
+    static {
+        Map<String, String> tempMap = new HashMap<String, String>();
+        tempMap.put("hlm", "http://www.nokia.com/helium");
+        NAMESPACE_MAP = Collections.unmodifiableMap(tempMap);
+    }
 
     public Database(Project project) throws IOException {
         this(project, DEFAULT_SCOPE);
@@ -73,7 +71,6 @@ public class Database {
         this.scopeFilter = scopeFilter;
         antfilesMap = new HashMap<String, AntFile>();
         packagesMap = new HashMap<String, PackageMeta>();
-        namespaceMap.put("hlm", "http://www.nokia.com/helium");
 
         if (project != null) {
             Map<String, Target> targets = project.getTargets();
@@ -87,13 +84,6 @@ public class Database {
                     addAntFile(antFilePath);
                 }
             }
-        }
-
-        Collection<AntFile> antFiles = getAntFiles();
-        Iterator<AntFile> antFilesIter = antFiles.iterator();
-        while (antFilesIter.hasNext()) {
-            AntFile antFile = (AntFile) antFilesIter.next();
-            readSignals(antFile.getFile().getCanonicalPath());
         }
     }
 
@@ -118,7 +108,6 @@ public class Database {
 
             // See if project is part of a package
             checkPackageMembership(antfile);
-            readSignals(antFilePath);
 
             // See if any antlibs are defined
             List<AntFile> antlibFiles = antfile.getAntlibs();
@@ -139,61 +128,6 @@ public class Database {
         }
         PackageMeta packageMeta = packagesMap.get(packageStr);
         packageMeta.addObject(rootObjectMeta);
-    }
-
-    @SuppressWarnings("unchecked")
-    private void readSignals(String antFile) throws IOException {
-        SAXReader xmlReader = new SAXReader();
-        Document antDoc;
-        try {
-            antDoc = xmlReader.read(new File(antFile));
-        }
-        catch (DocumentException e) {
-            throw new IOException(e.getMessage());
-        }
-
-        XPath xpath = DocumentHelper.createXPath("//hlm:signalListenerConfig");
-        xpath.setNamespaceURIs(namespaceMap);
-        List<Node> signalNodes = xpath.selectNodes(antDoc);
-        for (Iterator<Node> iterator = signalNodes.iterator(); iterator.hasNext();) {
-            signaldoc = antDoc;
-            Element propertyNode = (Element) iterator.next();
-            String signalid = propertyNode.attributeValue("id");
-            String signaltarget = propertyNode.attributeValue("target");
-            List<String> existinglist = globalSignalList.get(signaltarget); 
-            String failbuild = findSignalFailMode(signalid, signaldoc);
-            if (existinglist == null) {
-                existinglist = new ArrayList<String>();
-            }
-            existinglist.add(signalid + "," + failbuild);
-            globalSignalList.put(signaltarget, existinglist);
-        }
-    }
-
-    public List<String> getSignals(String target) {
-        return globalSignalList.get(target);
-    }
-
-    @SuppressWarnings("unchecked")
-    private String findSignalFailMode(String signalid, Document antDoc) {
-        XPath xpath2 = DocumentHelper.createXPath("//hlm:signalListenerConfig[@id='" + signalid
-                + "']/signalNotifierInput/signalInput");
-        xpath2.setNamespaceURIs(namespaceMap);
-        List signalNodes3 = xpath2.selectNodes(antDoc);
-
-        for (Iterator iterator3 = signalNodes3.iterator(); iterator3.hasNext();) {
-            Element propertyNode3 = (Element) iterator3.next();
-            String signalinputid = propertyNode3.attributeValue("refid");
-
-            XPath xpath3 = DocumentHelper.createXPath("//hlm:signalInput[@id='" + signalinputid + "']");
-            xpath3.setNamespaceURIs(namespaceMap);
-            List signalNodes4 = xpath3.selectNodes(antDoc);
-            for (Iterator iterator4 = signalNodes4.iterator(); iterator4.hasNext();) {
-                Element propertyNode4 = (Element) iterator4.next();
-                return propertyNode4.attributeValue("failbuild");
-            }
-        }
-        return null;
     }
 
     public void setScopeFilter(String scopeFilter) {
@@ -233,7 +167,6 @@ public class Database {
                 antlibs.add((AntlibMeta) rootObject);
             }
         }
-        // antfiles.addAll(antfilesMap.values());
         Map<String, Object> root = new HashMap<String, Object>();
         root.put("projects", projects);
         root.put("antlibs", antlibs);
@@ -259,12 +192,23 @@ public class Database {
         return antfilesMap.values();
     }
 
-    public List<PropertyMeta> getProperties() throws IOException {
+    public List<PropertyMeta> getProperties() {
         List<PropertyMeta> propertiesList = new ArrayList<PropertyMeta>();
         for (AntFile antfile : antfilesMap.values()) {
             RootAntObjectMeta rootMeta = antfile.getRootObjectMeta();
             if (rootMeta instanceof ProjectMeta) {
                 propertiesList.addAll(((ProjectMeta) rootMeta).getProperties());
+            }
+        }
+        return propertiesList;
+    }
+    
+    public List<PropertyCommentMeta> getCommentProperties() {
+        List<PropertyCommentMeta> propertiesList = new ArrayList<PropertyCommentMeta>();
+        for (AntFile antfile : antfilesMap.values()) {
+            RootAntObjectMeta rootMeta = antfile.getRootObjectMeta();
+            if (rootMeta instanceof ProjectMeta) {
+                propertiesList.addAll(((ProjectMeta) rootMeta).getPropertyCommentBlocks());
             }
         }
         return propertiesList;

@@ -28,9 +28,9 @@ import org.apache.tools.ant.types.DataType;
  */
 public class LogSource extends DataType {
 
-    public File getFilename() {
+    public File getFilename() throws LogSourceException {
         //will be implemented by subclasses
-        throw new HlmAntLibException("Improper logsource usage"); 
+        throw new LogSourceException("Improper logsource usage"); 
     }
 
 }

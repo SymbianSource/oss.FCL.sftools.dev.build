@@ -8,7 +8,7 @@ Helium is now supporting System Definition v3 to achieve build. This document ex
 How to configure the feature?
 -----------------------------
 
-In order to enable the support you first need to define the **schema.new** property to true. Then define a resource ant element to either 
+In order to enable the support you first need to define the **sysdef3.enabled** property to true. Then define a resource ant element to either 
 point to root definition file or package_definition.xml file.
 
 e.g:
@@ -40,8 +40,8 @@ automatically.
 
 
 The package_map.xml must be placed under the root directory of the package. **package_definition.xml** without package_map.xml are considered
-as invalid by the copying step and the automatic root system definition file generation. Only exception to that rule is for the virtual package
-which must be placed exactly two level under the root of the package.
+as invalid by the copying step and the automatic root system definition file generation. Only exception to that rule is for the vendor 
+package_definition.xml which must be placed exactly two level under the root of the package.
 
 Example of package structure:
 ::

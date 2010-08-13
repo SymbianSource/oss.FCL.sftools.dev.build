@@ -17,148 +17,143 @@
 
 package com.nokia.helium.metadata.ant.types;
 
-import java.io.*;
-import org.apache.tools.ant.BuildException;
-import java.util.*;
-import org.apache.log4j.Logger;
-import java.util.regex.Pattern;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Map;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+
+import com.nokia.helium.metadata.AutoCommitEntityManager;
+import com.nokia.helium.metadata.MetadataException;
+import com.nokia.helium.metadata.model.metadata.LogFile;
+import com.nokia.helium.metadata.model.metadata.MetadataEntry;
+import com.nokia.helium.metadata.model.metadata.Severity;
+import com.nokia.helium.metadata.model.metadata.SeverityDAO;
 
 /**
- * This Type is to specify and use the abld logparser type to parse and store the data.
- *
+ * This Type is to specify and use the abld logparser type to parse and store
+ * the data.
+ * 
  * <pre>
- * &lt;hlm:metadatafilterset id="abld.metadata.filter"&gt;
- *    &lt;metadatafilterset filterfile="common.csv" /&gt;
+ * &lt;hlm:metadatafilterset id=&quot;abld.metadata.filter&quot;&gt;
+ *    &lt;metadatafilterset filterfile=&quot;common.csv&quot; /&gt;
  * &lt;/hlm:metadatafilterset&gt;
  * 
  * &lt;hlm:abldmetadatainput&gt;
- *    &lt;fileset dir="${project.dir}/../data/"&gt;
- *        &lt;include name="*_compile*.log"/&gt;
+ *    &lt;fileset dir=&quot;${project.dir}/../data/&quot;&gt;
+ *        &lt;include name=&quot;*_compile*.log&quot;/&gt;
  *    &lt;/fileset&gt;
- *    &lt;metadatafilterset refid="abld.metadata.filter" /&gt;
+ *    &lt;metadatafilterset refid=&quot;abld.metadata.filter&quot; /&gt;
  * &lt;/hlm:antmetadatainput&gt;
  * </pre>
  * 
  * @ant.task name="abldmetadatainput" category="Metadata"
  */
-public class AbldLogMetaDataInput extends TextLogMetaDataInput {
+public class AbldLogMetaDataInput extends AbstractComponentBaseMetadataInput {
 
-    private Logger log = Logger.getLogger(AbldLogMetaDataInput.class);
-    
-    private Pattern abldFinishedPattern = Pattern.compile("^===\\s+.+\\s+finished.*");
-    private Pattern abldStartedPattern = Pattern.compile("^===\\s+(.+)\\s+started.*");
-    private Pattern abldComponentPattern = Pattern.compile("^===\\s+(.+?)\\s+==\\s+(.+)");
-    
+    public static final String DEFAULT_COMPONENT = "General";
+    private Pattern abldFinishedPattern = Pattern
+            .compile("^===\\s+.+\\s+finished.*");
+    private Pattern abldStartedPattern = Pattern
+            .compile("^===\\s+(.+)\\s+started.*");
+    private Pattern abldComponentPattern = Pattern
+            .compile("^===\\s+(.+?)\\s+==\\s+(.+)");
 
-    private String currentComponent;
+    private String currentComponent = DEFAULT_COMPONENT;
+    private EntityManager entityManager;
     
-    private boolean entryCreated;
-
-    private boolean recordText;
-    
-    public AbldLogMetaDataInput() {
-    }
-
     /**
-     * Function to check from the input stream if is there any entries available.
-     * @return true if there are any entry available otherwise false.
+     * {@inheritDoc}
      */
-    public boolean isEntryCreated(File currentFile) {
-        String exceptions = "";
-        int lineNumber = getLineNumber(); 
-        BufferedReader currentReader = getCurrentReader();
-        log.debug("Getting next set of log entries for Abld Input");
+    @Override
+    public void extract(EntityManagerFactory factory, File file)
+        throws MetadataException {
+        entityManager = factory.createEntityManager();
+        AutoCommitEntityManager autoCommitEM = new AutoCommitEntityManager(factory);
         try {
-            if (currentReader == null) {
-                lineNumber = 0;
-                setLineNumber(lineNumber);
-                log.debug("Current abld log file name:" + currentFile);
-                log.debug("Processing file: " + currentFile);
-                currentReader = new BufferedReader(new FileReader(currentFile));
-                setCurrentReader(currentReader);
-            }
-            String logText = null;
-            while ((logText = currentReader.readLine()) != null) {
-                lineNumber ++;
-                setLineNumber(lineNumber);
-                logText = logText.replaceFirst("'^\\s*\\[.+?\\]\\s*", "");
-                if (logText.startsWith("++ Finished at")) {
-                    if (currentComponent != null && !entryCreated) {
-                        addEntry("DEFAULT", currentComponent, currentFile.toString(), 
-                                0, "" );
-                        entryCreated = true;
-                        recordText = false;
-                        return true;
-                    }
-                    entryCreated = false;
-                } else if (logText.startsWith("=== ")) {
-                    Matcher finishMatch = abldFinishedPattern.matcher(logText);
-                    if (finishMatch.matches()) {
-                        if (currentComponent != null && !entryCreated) {
-                            addEntry("DEFAULT", currentComponent, currentFile.toString(), 
-                                    0, "" );
-                            entryCreated = true;
-                            recordText = false;
-                            return true;
-                        }
-                        entryCreated = false;
-                    } else {
-                        Matcher componentMatch = abldComponentPattern.matcher(logText);
-                        if (componentMatch.matches()) {
-                            currentComponent = componentMatch.group(2);
-                            recordText = true;
-                        }
+            // Creating the filename
+            LogFile logFile = getLogFile(entityManager, file);
 
-                        Matcher startMatch = abldStartedPattern.matcher(logText);
-                        if (startMatch.matches()) {
-                            currentComponent = startMatch.group(1);
-                            recordText = true;
+            // Always defines the default component
+            this.getDefaultComponent(logFile);
+
+            // Loading the available priorities
+            SeverityDAO severityDao = new SeverityDAO();
+            severityDao.setEntityManager(entityManager);
+            Map<String, Severity> priorities = severityDao.getSeverities();
+
+            
+            // Parsing the log file
+            BufferedReader reader = new BufferedReader(new FileReader(file));
+            String logText = null;
+            int lineNumber = 0;
+            while ((logText = reader.readLine()) != null) {
+                lineNumber++;
+                String line = logText.replaceFirst("^[ ]*\\[.+?\\][ ]*", "");
+
+                if (line.startsWith("=== ")) {
+                    Matcher matcher = abldComponentPattern.matcher(line);
+                    if (matcher.matches()) {
+                        currentComponent = matcher.group(2);
+                        getComponent(currentComponent, logFile); // declare the component...
+                    } else {
+                        matcher = abldStartedPattern.matcher(line);
+                        if (matcher.matches()) {
+                            currentComponent = DEFAULT_COMPONENT;
+                        } else {
+                            matcher = abldFinishedPattern.matcher(line);
+                            if (matcher.matches()) {
+                                currentComponent = DEFAULT_COMPONENT;
+                            }
                         }
                     }
                 } else {
-                    if (recordText) {
-                        String severity = getSeverity(logText);
-                        if (severity != null) {
-                            entryCreated = true; 
-                            addEntry(severity, currentComponent, currentFile.toString(), 
-                                    lineNumber, logText );
-                            return true;
-                        }
+                    SeverityEnum.Severity severity = getSeverity(line);
+                    if (severity != SeverityEnum.Severity.NONE) {
+                        MetadataEntry entry = new MetadataEntry();
+                        entry.setLogFile(autoCommitEM.merge(logFile));
+                        entry.setLineNumber(lineNumber);
+                        entry.setSeverity(autoCommitEM.merge(priorities.get(severity.toString())));
+                        entry.setText(line);
+                        entry.setComponent(autoCommitEM.merge(getComponent(currentComponent, logFile)));
+                        autoCommitEM.persist(entry);
                     }
                 }
             }
-            currentReader.close();
-            currentReader = null;
-            setCurrentReader(currentReader);
+            reader.close();
         } catch (FileNotFoundException ex) {
-            log.debug("FileNotFoundException in AbldLogMetadata", ex);
-            try {
-                currentReader.close();
-            } catch ( IOException iex) {
-                // We are Ignoring the errors as no need to fail the build. 
-                log.debug("Exception in closing reader", iex);
-            }
-            currentReader = null;
-            setCurrentReader(null);
-            exceptions = exceptions + ex.getMessage() + "\n";
-            return false;
+            throw new MetadataException(ex.getMessage(), ex);
         } catch (IOException ex) {
-            log.debug("IOException in AbldLogMetadata", ex);
-            try {
-                currentReader.close();
-            } catch ( IOException iex) {
-               // We are Ignoring the errors as no need to fail the build. 
-               log.debug("IOException in closing reader", iex);
+            throw new MetadataException(ex.getMessage(), ex);
+        } finally {
+            if (autoCommitEM != null) {
+                autoCommitEM.close();
             }
-            currentReader = null;
-            setCurrentReader(null);
-            exceptions = exceptions + ex.getMessage() + "\n";
-            return false;
+            if (entityManager != null) {
+                if (entityManager.getTransaction().isActive()) {
+                    entityManager.getTransaction().rollback();
+                }
+                entityManager.close();
+                entityManager = null;
+            }
         }
-        if (!exceptions.equals("")) {
-            throw new BuildException(exceptions);
-        }
-        return false;
+        clear();
     }
+
+    @Override
+    protected EntityManager getEntityManager() {
+        return entityManager;
+    }
+    
+    @Override
+    protected String getDefaultComponentName() {
+        return DEFAULT_COMPONENT;
+    }
+
 }

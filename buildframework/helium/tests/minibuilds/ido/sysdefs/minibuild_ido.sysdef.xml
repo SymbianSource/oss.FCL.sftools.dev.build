@@ -22,11 +22,11 @@ Description:
 -->
 <!DOCTYPE SystemDefinition SYSTEM "sysdef_1_4_0.dtd">
 <SystemDefinition name="helium_minibuild_compile" schema="1.4.0">
-	<systemModel>
-		<layer name="mw_layer"/>
-		<layer name="app_layer"/>
-		<layer name="osext_layer"/>
-	</systemModel>
+    <systemModel>
+        <layer name="mw_layer"/>
+        <layer name="app_layer"/>
+        <layer name="osext_layer"/>
+    </systemModel>
     <build>
         <option name="KEEPGOING" abldOption="-keepgoing" description="Causes make to keepgoing on errors" enable="Y"/>
 <!--    <option name="SAVESPACE" abldOption="-savespace" description="Causes the removal of intermediate files" enable="Y"/> -->
@@ -57,37 +57,37 @@ Description:
     <targetList name="cwtools" description="cwtools Targets" target="CWTOOLS"/>
     <targetList name="cwtools_rel" description="cwtools Release Targets" target="CWTOOLS_REL"/>
   
-	    <configuration name="helium_minibuild_ido" description="" filter="raptor_helium_minibuild_ido">
-	    	<layerRef layerName="mw_layer"/>
-	    	<layerRef layerName="app_layer"/>
-	    	<layerRef layerName="osext_layer"/>
-	    	
-	        <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
-	        <task><buildLayer command="abld export" unitParallel="Y"/></task>
-	        <task><buildLayer command="abld makefile" targetList="tools" unitParallel="Y" targetParallel="Y"/></task>
-	        <task><buildLayer command="abld library" targetList="tools" unitParallel="N" targetParallel="N"/></task>
-	        <task><buildLayer command="abld target" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
-	        <task><buildLayer command="abld final" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
-	        <task><buildLayer command="abld -what build" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
-	        <task><buildLayer command="abld -check build" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
-	        <task><buildLayer command="abld makefile" targetList="default_armv5" unitParallel="Y" targetParallel="Y"/></task>
-	        <task><buildLayer command="abld resource" targetList="default_armv5" unitParallel="N" targetParallel="N"/></task>
-	        <task><buildLayer command="abld library" targetList="default_armv5" unitParallel="N" targetParallel="N"/></task>
-	        <task><buildLayer command="abld target" targetList="default_armv5" unitParallel="Y" targetParallel="Y"/></task>
-	        <task><buildLayer command="abld final" targetList="default_armv5" unitParallel="N" targetParallel="N"/></task>
-	        <task><buildLayer command="abld -what build" targetList="default_armv5" unitParallel="Y" targetParallel="Y"/></task>
-	        <task><buildLayer command="abld -check build" targetList="default_armv5" unitParallel="Y" targetParallel="Y"/></task>
-	    </configuration>
-	    
-	    <configuration name="helium_minibuild_ido_clean" description="" filter="raptor_helium_minibuild_ido_clean">
-	    	<layerRef layerName="mw_layer"/>
-	    	<layerRef layerName="app_layer"/>
-	    	<layerRef layerName="osext_layer"/>
-	        <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
-	        <task><buildLayer command="abld makefile" targetList="default_armv5" unitParallel="Y" targetParallel="Y"/></task>
-	        <task><buildLayer command="abld reallyclean" targetList="default_armv5" unitParallel="Y" targetParallel="Y"/></task>
-	        <task><buildLayer command="bldmake clean" unitParallel="Y"/></task>
-	    </configuration>
+        <configuration name="helium_minibuild_ido" description="" filter="raptor_helium_minibuild_ido">
+            <layerRef layerName="mw_layer"/>
+            <layerRef layerName="app_layer"/>
+            <layerRef layerName="osext_layer"/>
+            
+            <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+            <task><buildLayer command="abld export" unitParallel="Y"/></task>
+            <task><buildLayer command="abld makefile" targetList="tools" unitParallel="Y" targetParallel="Y"/></task>
+            <task><buildLayer command="abld library" targetList="tools" unitParallel="N" targetParallel="N"/></task>
+            <task><buildLayer command="abld target" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+            <task><buildLayer command="abld final" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+            <task><buildLayer command="abld -what build" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+            <task><buildLayer command="abld -check build" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+            <task><buildLayer command="abld makefile" targetList="default_armv5" unitParallel="Y" targetParallel="Y"/></task>
+            <task><buildLayer command="abld resource" targetList="default_armv5" unitParallel="N" targetParallel="N"/></task>
+            <task><buildLayer command="abld library" targetList="default_armv5" unitParallel="N" targetParallel="N"/></task>
+            <task><buildLayer command="abld target" targetList="default_armv5" unitParallel="Y" targetParallel="Y"/></task>
+            <task><buildLayer command="abld final" targetList="default_armv5" unitParallel="N" targetParallel="N"/></task>
+            <task><buildLayer command="abld -what build" targetList="default_armv5" unitParallel="Y" targetParallel="Y"/></task>
+            <task><buildLayer command="abld -check build" targetList="default_armv5" unitParallel="Y" targetParallel="Y"/></task>
+        </configuration>
+        
+        <configuration name="helium_minibuild_ido_clean" description="" filter="raptor_helium_minibuild_ido_clean">
+            <layerRef layerName="mw_layer"/>
+            <layerRef layerName="app_layer"/>
+            <layerRef layerName="osext_layer"/>
+            <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+            <task><buildLayer command="abld makefile" targetList="default_armv5" unitParallel="Y" targetParallel="Y"/></task>
+            <task><buildLayer command="abld reallyclean" targetList="default_armv5" unitParallel="Y" targetParallel="Y"/></task>
+            <task><buildLayer command="bldmake clean" unitParallel="Y"/></task>
+        </configuration>
     </build>
     
 </SystemDefinition>

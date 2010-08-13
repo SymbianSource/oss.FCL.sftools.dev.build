@@ -19,4 +19,10 @@ Description:
 
 ============================================================================
 -->
-set ANT_OPTS=%ANT_OPTS% -Dpython.path=%HELIUM_HOME%\external\python\lib\2.5\jython-2.5-py2.5.egg;<#list project.getReference('egg.hlm.deps.fileset').toString().split(';') as file>%HELIUM_HOME%\${file};</#list>;%PYTHONPATH%
+
+<#list project.getReference('egg.hlm.deps.fileset').toString().split(ant['path.separator']) as file>
+set JYTHONPATH=%JYTHONPATH%;%HELIUM_HOME%\${file?substring(ant['source.root.dir']?length + 1)?replace('/', '\\')};
+</#list>
+set JYTHONPATH=%HELIUM_HOME%\external\python\lib\2.5\jython-2.5-py2.5.egg;%JYTHONPATH%;%PYTHONPATH%
+
+set ANT_OPTS=%ANT_OPTS% -Dpython.path="%JYTHONPATH%"

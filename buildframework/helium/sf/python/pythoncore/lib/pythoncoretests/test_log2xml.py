@@ -18,7 +18,7 @@
 #===============================================================================
 """ test log to XML """
 
-# pylint: disable-msg=R0201
+# pylint: disable=R0201
 
 import unittest
 import logging

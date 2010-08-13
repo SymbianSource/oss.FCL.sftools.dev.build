@@ -1,4 +1,4 @@
-priority,regex,description
+severity,regex,description
 ERROR,.*target pattern contains no.*,
 ERROR,.*mixed implicit and static pattern rules.*,
 ERROR,.*multiple target patterns.*,

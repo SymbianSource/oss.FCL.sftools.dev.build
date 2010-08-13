@@ -17,13 +17,29 @@
 
 package com.nokia.helium.metadata.ant.types;
 
-import java.io.*;
-import org.apache.tools.ant.BuildException;
-import java.util.*;
-
-import org.apache.log4j.Logger;
-import java.util.regex.Pattern;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+
+import org.apache.tools.ant.Project;
+
+import com.nokia.helium.metadata.MetadataException;
+import com.nokia.helium.metadata.model.metadata.Component;
+import com.nokia.helium.metadata.model.metadata.LogFile;
+import com.nokia.helium.metadata.model.metadata.MetadataEntry;
+import com.nokia.helium.metadata.model.metadata.Severity;
+import com.nokia.helium.metadata.model.metadata.SeverityDAO;
+
 
 /**
  * This Type is to specify and use the abld logparser type to parse and store
@@ -44,172 +60,87 @@ import java.util.regex.Matcher;
  * 
  * @ant.task name="imakermetadatainput" category="Metadata"
  */
-public class IMakerLogMetaDataInput extends TextLogMetaDataInput {
-
-    /** Internal data storage. */
-    private class Entry {
-
-        private String fileName;
-        private int lineNumber;
-        private String text;
-        private String severity;
-
-        public Entry(String fileName, int lineNumber, String text, String severity) {
-            super();
-            this.text = text;
-            this.lineNumber = lineNumber;
-            this.fileName = fileName;
-            this.severity = severity;
-        }
-
-        public String getText() {
-            return text;
-        }
-
-        public int getLineNumber() {
-            return lineNumber;
-        }
-
-        public String getFileName() {
-            return fileName;
-        }
-
-        public String getSeverity() {
-            return severity;
-        }
-
-    }
-
-    private Logger log = Logger.getLogger(AbldLogMetaDataInput.class);
-
+public class IMakerLogMetaDataInput extends AbstractComponentBaseMetadataInput {
+    public static final String DEFAULT_COMPONENT_NAME = "General";
     private Pattern iMakerFpsxPattern = Pattern.compile("/([^/]*?\\.fpsx)");
+    private EntityManager entityManager;
 
-    private String currentComponent;
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void extract(EntityManagerFactory factory, File file)
+        throws MetadataException {
+        entityManager = factory.createEntityManager();
+        List<MetadataEntry> entries = new ArrayList<MetadataEntry>();
+        String currentComponent = null;
+        try {
+            // Creating the filename
+            LogFile logFile = getLogFile(entityManager, file);
 
-    private boolean entryCreated;
-
-    private boolean isRecordingIssues;
-
-    public IMakerLogMetaDataInput() {
+            // Loading the available priorities
+            SeverityDAO severityDao = new SeverityDAO();
+            severityDao.setEntityManager(entityManager);
+            Map<String, Severity> priorities = severityDao.getSeverities();
+            
+            // Parsing the log file
+            BufferedReader reader = new BufferedReader(new FileReader(file));
+            String line = null;
+            int lineNumber = 0;
+            while ((line = reader.readLine()) != null) {
+                lineNumber++;
+                Matcher matcher = iMakerFpsxPattern.matcher(line);
+                if (matcher.find()) {
+                    currentComponent = matcher.group(1);
+                    log("Matched component: " + currentComponent, Project.MSG_DEBUG);
+                }
+                if (line.startsWith("++ Started at")) {
+                    currentComponent = null;
+                } else if (line.startsWith("++ Finished at")) {
+                    if (currentComponent == null) {
+                        currentComponent = DEFAULT_COMPONENT_NAME;
+                    }
+                    Component component = getComponent(currentComponent, logFile);
+                    entityManager.getTransaction().begin();
+                    for (MetadataEntry entry : entries) {
+                        entry.setComponent(component);
+                        entityManager.persist(entry);
+                    }
+                    entityManager.getTransaction().commit();
+                    entityManager.clear();
+                    entries.clear();
+                } else {
+                    SeverityEnum.Severity severity = getSeverity(line);
+                    if (severity != SeverityEnum.Severity.NONE) {
+                        MetadataEntry entry = new MetadataEntry();
+                        entry.setLogFile(logFile);
+                        entry.setLineNumber(lineNumber);
+                        entry.setSeverity(priorities.get(severity.toString()));
+                        entry.setText(line);
+                        entries.add(entry);
+                    }
+                }
+            }
+            reader.close();
+        } catch (FileNotFoundException ex) {
+            throw new MetadataException(ex.getMessage(), ex);
+        } catch (IOException ex) {
+            throw new MetadataException(ex.getMessage(), ex);
+        } finally {
+            if (entityManager != null) {
+                entityManager.close();
+            }
+            clear();
+        }
+        
     }
 
     /**
-     * Function to check from the input stream if is there any entries
-     * available.
-     * 
-     * @return true if there are any entry available otherwise false.
+     * {@inheritDoc}
      */
-    public boolean isEntryCreated(File currentFile) {
-        String exceptions = "";
-        entryCreated = false;
-        int lineNumber = getLineNumber();
-        BufferedReader currentReader = getCurrentReader();
-        log.debug("Getting next set of log entries for iMaker input");
-        try {
-            if (currentReader == null) {
-                lineNumber = 0;
-                setLineNumber(lineNumber);
-                log.debug("Processing iMaker log file name: " + currentFile);
-                currentReader = new BufferedReader(new FileReader(currentFile));
-                setCurrentReader(currentReader);
-            }
-
-            List<Entry> entriesCache = new ArrayList<Entry>();
-            String logText = null;
-            while ((logText = currentReader.readLine()) != null) {
-                lineNumber++;
-                setLineNumber(lineNumber);
-
-                // Remove Ant task comment text, e.g. "[imaker]"
-                logText = logText.replaceFirst("'^\\s*\\[.+?\\]\\s*", "");
-                // log.debug("Parsing log line: " + logText);
-
-                // See if the line should be captured
-                if (isRecordingIssues) {
-                    // Check for a line with an issue
-                    String severity = getSeverity(logText);
-                    if (severity != null) {
-                        Entry entry = new Entry(currentFile.toString(), lineNumber, logText, severity);
-                        entriesCache.add(entry);
-                    }
-
-                    // Check if the iMaker FPSX image name is on this line, to
-                    // get the component
-                    if (currentComponent == null) {
-                        Matcher componentMatch = iMakerFpsxPattern.matcher(logText);
-                        if (componentMatch.find()) {
-                            currentComponent = componentMatch.group(1);
-                            log.debug("Matched component: " + currentComponent);
-                        }
-                    }
-
-                    // See if the component log block has ended
-                    if (logText.startsWith("++ Finished at")) {
-                        // Add all cached issues
-                        if (currentComponent != null && entriesCache.size() > 0) {
-                            for (int i = 0; i < entriesCache.size(); i++) {
-                                Entry entry = entriesCache.get(i);
-                                addEntry(entry.getSeverity(), currentComponent, entry.getFileName(), entry.getLineNumber(), entry.getText());
-                            }
-                            entryCreated = true;
-                            currentComponent = null;
-                            return true;
-                        }
-                        // Or add a default entry to record the logfile
-                        else {
-                            addEntry("DEFAULT", currentComponent, currentFile.toString(), lineNumber, "");
-                            entryCreated = true;
-                            currentComponent = null;
-                            return true;
-                        }
-                    }
-                }
-                else {
-                    // Check for the start of a block
-                    if (logText.startsWith("++ Started at")) {
-                        isRecordingIssues = true;
-                    }
-                }
-            }
-            currentReader.close();
-            currentReader = null;
-            setCurrentReader(currentReader);
-        }
-        catch (FileNotFoundException ex) {
-            log.debug("FileNotFoundException in AbldLogMetadata", ex);
-            try {
-                if (currentReader != null) {
-                    currentReader.close();
-                }
-            }
-            catch (IOException iex) {
-                // We are Ignoring the errors as no need to fail the build.
-                log.debug("Exception in closing reader", iex);
-            }
-            currentReader = null;
-            setCurrentReader(null);
-            exceptions = exceptions + ex.getMessage() + "\n";
-            return false;
-        }
-        catch (IOException ex) {
-            log.debug("IOException in AbldLogMetadata", ex);
-            try {
-                if (currentReader != null) {
-                    currentReader.close();
-                }
-            }
-            catch (IOException iex) {
-                // We are Ignoring the errors as no need to fail the build.
-                log.debug("IOException in closing reader", iex);
-            }
-            currentReader = null;
-            setCurrentReader(null);
-            exceptions = exceptions + ex.getMessage() + "\n";
-            return false;
-        }
-        if (!exceptions.equals("")) {
-            throw new BuildException(exceptions);
-        }
-        return entryCreated;
+    @Override
+    protected EntityManager getEntityManager() {
+        return entityManager;
     }
+
 }

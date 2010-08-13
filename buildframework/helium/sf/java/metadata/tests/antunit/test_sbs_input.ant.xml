@@ -1,0 +1,432 @@
+<!-- 
+============================================================================ 
+Name        : test_sbs_input.ant.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test-sbs-input" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>Helium metadata SBS input unittests.</description>
+    
+    <dirname property="project.dir" file="${ant.file.test-metadata-regex}" />
+    <taskdef resource="com/nokia/helium/metadata/ant/antlib.xml" uri="http://www.nokia.com/helium" />
+    <taskdef name="fmpp" classname="fmpp.tools.AntTask" onerror="report"/>
+    
+    <target name="setUp">
+        <echo>---=====================================---</echo>
+        <mkdir dir="${test.temp.dir}" />
+        <delete dir="${test.temp.dir}" />
+        <mkdir dir="${test.temp.dir}" />
+    </target>
+    
+    <target name="tearDown">
+        <delete dir="${test.temp.dir}" />
+        <echo>---=====================================---</echo>
+    </target>
+
+    <hlm:metadatafilterset id="error.filterset">
+        <hlm:metadatafilter severity="error" regex="^ERROR: .*" description="Simple error pattern"/>
+        <hlm:metadatafilter severity="warning" regex="^WARNING: .*" description="Simple warning pattern"/>
+    </hlm:metadatafilterset>
+
+    
+
+    <!-- Test categorization for sbs scanlog
+    -->
+    <target name="test-categorization">
+        <echo message="categorization validation" />
+        <hlm:metadatarecord database="${test.temp.dir}/categorization_db">
+            <hlm:sbsmetadatainput>
+                <fileset dir="${project.dir}/../data/sbs">
+                    <include  name="categorization.log"/>
+                </fileset>
+                <metadatafilterset refid="error.filterset" />
+            </hlm:sbsmetadatainput>
+        </hlm:metadatarecord>
+        <fmpp sourceFile="${project.dir}/../data/sbs/parsing_result.ini.ftl"
+                     outputfile="${test.temp.dir}/categorization_db_result.ini">
+            <data expandProperties="yes">
+                dbPath: ${test.temp.dir}/categorization_db
+                ant: antProperties()
+            </data>
+        </fmpp>
+        <property file="${test.temp.dir}/categorization_db_result.ini" />
+        <echo>number.of.logs: ${number.of.logs}</echo>
+        <echo>number.of.execution.times: ${number.of.execution.times}</echo>
+        <echo>number.of.components: ${number.of.components}</echo>
+        <echo>execution.time.0: ${execution.time.0}</echo>
+        <echo>number.of.component.times: ${number.of.component.times}</echo>
+        <au:assertTrue message="Invalid number of logs">
+            <equals arg1="${number.of.logs}" arg2="1" />
+        </au:assertTrue>
+        <au:assertTrue message="Invalid number of execution time">
+            <equals arg1="${number.of.execution.times}" arg2="1" />
+        </au:assertTrue>
+        <au:assertTrue message="Invalid number of logs">
+            <equals arg1="${execution.time.0}" arg2="226" />
+        </au:assertTrue>
+        <au:assertTrue message="Invalid number of components">
+            <equals arg1="${number.of.components}" arg2="2" />
+        </au:assertTrue>
+        <hlm:metadataCountSeverity severity="error" log="${project.dir}/../data/sbs/categorization.log" database="${test.temp.dir}/categorization_db" property="cleanlog_errors"/>
+        <echo>cleanlog_errors: ${cleanlog_errors}</echo>
+        <au:assertTrue>
+            <equals arg1="${cleanlog_errors}" arg2="2"/>
+        </au:assertTrue>
+        <au:assertTrue message="Invalid number of component times">
+            <equals arg1="${number.of.component.times}" arg2="2" />
+        </au:assertTrue>
+    </target>
+       
+    <target name="test-categorization-component-check">
+        <echo message="component error check for categorization" />
+        <hlm:metadatarecord database="${test.temp.dir}/metadata_db">
+            <hlm:sbsmetadatainput>
+                <fileset dir="${project.dir}/../data/sbs">
+                    <include  name="categorization_compile.log"/>
+                </fileset>
+                <metadatafilterset refid="error.filterset" />
+            </hlm:sbsmetadatainput>
+        </hlm:metadatarecord>
+        <fmpp sourceFile="${project.dir}/../data/templates/component_categorization.txt.ftl"
+                     outputfile="${test.temp.dir}/faults.txt">
+            <data expandProperties="yes">
+                dbPath: ${test.temp.dir}/metadata_db
+                ant: antProperties()
+            </data>
+        </fmpp>
+        <loadfile property="componentlogEntry"
+              srcFile="${test.temp.dir}/faults.txt"/>
+        <au:assertMatches string="${componentlogEntry}" pattern="sf/app/organizer/group:error:2" 
+                     casesensitive="false"/>
+    </target>
+
+    <target name="test-categorization-component-check-after">
+        <echo message="component error check for categorization" />
+        <hlm:metadatarecord database="${test.temp.dir}/metadata_db">
+            <hlm:sbsmetadatainput>
+                <fileset dir="${project.dir}/../data/sbs">
+                    <include  name="categorization_error_after_compile.log"/>
+                </fileset>
+                <metadatafilterset refid="error.filterset" />
+            </hlm:sbsmetadatainput>
+        </hlm:metadatarecord>
+        <fmpp sourceFile="${project.dir}/../data/templates/component_categorization.txt.ftl"
+                     outputfile="${test.temp.dir}/faults.txt">
+            <data expandProperties="yes">
+                dbPath: ${test.temp.dir}/metadata_db
+                ant: antProperties()
+            </data>
+        </fmpp>
+        <loadfile property="componentlogEntry"
+              srcFile="${test.temp.dir}/faults.txt"/>
+        <au:assertMatches string="${componentlogEntry}" pattern="sf/app/organizer/group:error:2" 
+                         casesensitive="false"/>
+    </target>
+    
+    
+    <target name="test-categorization-nocleanlog-failed-empty-recipe">
+        <echo message="test-categorization-nocleanlog-failed-empty-recipe" />
+        <hlm:metadatarecord database="${test.temp.dir}/metadata_db">
+            <hlm:sbsmetadatainput>
+                <fileset dir="${project.dir}/../data/sbs">
+                    <include  name="categorization_failed_empty_recipe.log"/>
+                </fileset>
+                <metadatafilterset refid="error.filterset" />
+            </hlm:sbsmetadatainput>
+        </hlm:metadatarecord>
+        <hlm:metadataCountSeverity severity="error" log="${project.dir}/../data/sbs/categorization_failed_empty_recipe.log" database="${test.temp.dir}/metadata_db" property="empty_nocleanlog_errors"/>
+        <au:assertTrue>
+            <equals arg1="${empty_nocleanlog_errors}" arg2="2"/>
+        </au:assertTrue>
+    </target>
+
+    <target name="test-categorization-nocleanlog-failed-error-in-recipe">
+        <echo message="test-categorization-nocleanlog-failed-error-in-recipe" />
+        <hlm:metadatarecord database="${test.temp.dir}/metadata_db">
+            <hlm:sbsmetadatainput>
+                <fileset dir="${project.dir}/../data/sbs">
+                    <include  name="categorization_failed_error_in_recipe.log"/>
+                </fileset>
+                <metadatafilterset refid="error.filterset" />
+            </hlm:sbsmetadatainput>
+        </hlm:metadatarecord>
+        <hlm:metadataCountSeverity severity="error" log="${project.dir}/../data/sbs/categorization_failed_error_in_recipe.log" 
+            database="${test.temp.dir}/metadata_db" property="empty_nocleanlog_errors"/>
+        <echo>empty_nocleanlog_errors: ${empty_nocleanlog_errors}</echo>
+        <au:assertTrue>
+            <equals arg1="${empty_nocleanlog_errors}" arg2="2"/>
+        </au:assertTrue>
+    </target>
+
+
+    <!-- To verify some lengthy text for recipe tag from 
+    sbs metadata input.
+    -->
+    <target name="test-recipe-lengthy-text">
+        <echo message="test-recipe-lengthy-text" />
+        <hlm:metadatarecord database="${test.temp.dir}/metadata_db">
+            <hlm:sbsmetadatainput>
+                <fileset dir="${project.dir}/../data/sbs">
+                    <include  name="receipe_lengthy_warn.log"/>
+                </fileset>
+                <metadatafilterset refid="error.filterset" />
+            </hlm:sbsmetadatainput>
+        </hlm:metadatarecord>
+        <au:assertTrue>
+            <available type="dir" file="${test.temp.dir}/metadata_db" />
+        </au:assertTrue>
+        <hlm:metadataCountSeverity severity="warning" log="${project.dir}/../data/sbs/receipe_lengthy_warn.log" 
+            database="${test.temp.dir}/metadata_db" property="warnings"/>
+        <echo>warnings: ${warnings}</echo>
+        <au:assertTrue>
+            <equals arg1="${warnings}" arg2="1"/>
+        </au:assertTrue>
+    </target>
+
+    <!-- To verify some lengthy member are not failing the recording
+    -->
+    <target name="test-recipe-lengthy-member">
+        <echo message="test-recipe-lengthy-member" />
+        <hlm:metadatarecord database="${test.temp.dir}/metadata_db">
+            <hlm:sbsmetadatainput>
+                <fileset dir="${project.dir}/../data/sbs">
+                    <include  name="receipe_lengthy_whatlog.log"/>
+                </fileset>
+                <metadatafilterset refid="error.filterset" />
+            </hlm:sbsmetadatainput>
+        </hlm:metadatarecord>
+        <au:assertTrue>
+            <available type="dir" file="${test.temp.dir}/metadata_db" />
+        </au:assertTrue>
+    </target>
+
+    <target name="test-metadatacount-no-error-with-missing-files-path-with-backslashes">
+        <hlm:metadatarecord database="${test.temp.dir}/metadata_db">
+            <hlm:sbsmetadatainput>
+                <fileset dir="${project.dir}/../data/sbs">
+                    <include  name="metadatacount_missing_files.log"/>
+                </fileset>
+                <metadatafilterset>
+                    <metadatafilter severity="INFO" regex="^INFO:" description="info" />
+                    <metadatafilter severity="ERROR" regex="^ERROR:" description="error" />
+                    <metadatafilter severity="WARNING" regex=".*warning C4503:.*" description="warning" />
+                </metadatafilterset>
+            </hlm:sbsmetadatainput>
+        </hlm:metadatarecord>
+        <hlm:metadataCountSeverity severity="error" log="${project.dir}/../data/sbs/metadatacount_missing_files.log" database="${test.temp.dir}/metadata_db" property="errors"/>
+        <echo>errors: ${errors}</echo>
+        <au:assertTrue message="We must have 5 missing files counted as error.">
+            <equals arg1="${errors}" arg2="5"/>
+        </au:assertTrue>
+    </target>
+    
+    <target name="test-metadatacount-no-error-with-missing-files">
+        <hlm:metadatarecord database="${test.temp.dir}/metadata_db">
+            <hlm:sbsmetadatainput >
+                <fileset dir="${project.dir}/../data/sbs">
+                    <include  name="metadatacount_missing_files.log"/>
+                </fileset>
+                <metadatafilterset>
+                    <metadatafilter severity="INFO" regex="^INFO:" description="info" />
+                    <metadatafilter severity="ERROR" regex="^ERROR:" description="error" />
+                    <metadatafilter severity="WARNING" regex=".*warning C4503:.*" description="warning" />
+                </metadatafilterset>
+            </hlm:sbsmetadatainput>
+        </hlm:metadatarecord>
+        <hlm:metadataCountSeverity severity="error" log="${project.dir}/../data/sbs/metadatacount_missing_files.log" database="${test.temp.dir}/metadata_db" property="errors"/>
+        <echo>errors: ${errors}</echo>
+        <au:assertTrue message="We must have 5 missing files counted as error.">
+            <equals arg1="${errors}" arg2="5"/>
+        </au:assertTrue>
+    </target>
+    
+    <target name="test-metadatacount-error-with-missing-files">
+    	<echo>test-metadatacount-error-with-missing-files</echo>
+        <hlm:metadatarecord database="${test.temp.dir}/metadata_db">
+            <hlm:sbsmetadatainput>
+                <fileset dir="${project.dir}/../data/sbs">
+                    <include name="metadatacount_error_and_missing_files.log"/>
+                </fileset>
+                <metadatafilterset>
+                    <metadatafilter severity="INFO" regex="^INFO:" description="info" />
+                    <metadatafilter severity="ERROR" regex="^ERROR:" description="error" />
+                    <metadatafilter severity="WARNING" regex=".*warning C4503:.*" description="warning" />
+                </metadatafilterset>
+            </hlm:sbsmetadatainput>
+        </hlm:metadatarecord>
+        <hlm:metadataCountSeverity severity="error" log="${project.dir}/../data/sbs/metadatacount_error_and_missing_files.log" database="${test.temp.dir}/metadata_db" property="errors"/>
+        <echo>error: ${errors}</echo>
+    	<au:assertTrue message="We must have 6 missing files counted as error.">
+            <equals arg1="${errors}" arg2="6"/>
+        </au:assertTrue>
+    </target>        
+
+    <target name="test-count-error-without-missing-files">
+        <hlm:metadatarecord database="${test.temp.dir}/metadata_db">
+            <hlm:sbsmetadatainput checkMissing="false">
+                <fileset dir="${project.dir}/../data/sbs">
+                    <include  name="metadatacount_error_and_missing_files.log"/>
+                </fileset>
+                <metadatafilterset>
+                    <metadatafilter severity="INFO" regex="^INFO:" description="info" />
+                    <metadatafilter severity="ERROR" regex="^ERROR:" description="error" />
+                    <metadatafilter severity="WARNING" regex=".*warning C4503:.*" description="warning" />
+                </metadatafilterset>
+            </hlm:sbsmetadatainput>
+        </hlm:metadatarecord>
+        <hlm:metadataCountSeverity severity="error" log="${project.dir}/../data/sbs/metadatacount_error_and_missing_files.log"
+            database="${test.temp.dir}/metadata_db" property="errors"
+            />
+        <au:assertTrue message="We must have 1 missing files counted as error.">
+            <equals arg1="${errors}" arg2="1"/>
+        </au:assertTrue>
+    </target>
+
+    <target name="test-whatlog-parsing">
+        <hlm:metadatarecord database="${test.temp.dir}/metadata_db">
+            <hlm:sbsmetadatainput>
+                <fileset dir="${project.dir}/../data/sbs">
+                    <include name="build_whatlog.log"/>
+                </fileset>
+                <metadatafilterset>
+                    <metadatafilter severity="INFO" regex="^INFO:" description="info" />
+                    <metadatafilter severity="ERROR" regex="^ERROR:" description="error" />
+                    <metadatafilter severity="WARNING" regex=".*warning C4503:.*" description="warning" />
+                </metadatafilterset>
+            </hlm:sbsmetadatainput>
+        </hlm:metadatarecord>
+        <fmpp sourceFile="${project.dir}/../data/sbs/whatlog_result.ini.ftl"
+                     outputfile="${test.temp.dir}/whatlog_result.ini">
+            <data expandProperties="yes">
+                dbPath: ${test.temp.dir}/metadata_db
+                ant: antProperties()
+            </data>
+        </fmpp>
+        <property file="${test.temp.dir}/whatlog_result.ini" />
+        <au:assertTrue message="Invalid number of logs">
+            <equals arg1="${number.of.logs}" arg2="1" />
+        </au:assertTrue>
+        <au:assertTrue message="Invalid number of whatlog entries">
+            <equals arg1="${number.of.whatlog.entries}" arg2="5" />
+        </au:assertTrue>
+    </target>
+
+    <target name="test-count-error-with-invalid-xml-fail-on-invalid-xml-false">
+        <hlm:metadatarecord database="${test.temp.dir}/metadata_db">
+            <hlm:sbsmetadatainput checkMissing="false" failOnInvalidXml="false">
+                <fileset dir="${project.dir}/../data/sbs">
+                    <include  name="invalid_xml_log_format.log"/>
+                </fileset>
+                <metadatafilterset>
+                    <metadatafilter severity="INFO" regex="^INFO:" description="info" />
+                    <metadatafilter severity="ERROR" regex="^ERROR:" description="error" />
+                    <metadatafilter severity="WARNING" regex=".*warning C4503:.*" description="warning" />
+                </metadatafilterset>
+            </hlm:sbsmetadatainput>
+        </hlm:metadatarecord>
+        <hlm:metadataCountSeverity severity="error" log="${project.dir}/../data/sbs/invalid_xml_log_format.log"
+            database="${test.temp.dir}/metadata_db" property="errors"
+            />
+        <au:assertTrue message="We must have 1 error in the log because of invalid xml format.">
+            <equals arg1="${errors}" arg2="1"/>
+        </au:assertTrue>
+    </target>
+
+    <target name="test-count-error-with-invalid-xml-fail-on-invalid-xml-true">
+        <au:expectfailure expectedMessage="The element type &quot;error&quot; must be terminated by the matching end-tag &quot;&lt;/error&gt;&quot;">
+            <hlm:metadatarecord database="${test.temp.dir}/metadata_db">
+                <hlm:sbsmetadatainput>
+                    <fileset dir="${project.dir}/../data/sbs">
+                        <include  name="invalid_xml_log_format.log"/>
+                    </fileset>
+                    <metadatafilterset>
+                        <metadatafilter severity="INFO" regex="^INFO:" description="info" />
+                        <metadatafilter severity="ERROR" regex="^ERROR:" description="error" />
+                        <metadatafilter severity="WARNING" regex=".*warning C4503:.*" description="warning" />
+                    </metadatafilterset>
+                </hlm:sbsmetadatainput>
+            </hlm:metadatarecord>
+        </au:expectfailure>
+        <hlm:metadataCountSeverity severity="error" log="${project.dir}/../data/sbs/invalid_xml_log_format.log"
+            database="${test.temp.dir}/metadata_db" property="errors"
+            />
+        <au:assertTrue message="We must have 1 error in the log because of invalid xml format.">
+            <equals arg1="${errors}" arg2="1"/>
+        </au:assertTrue>
+    </target>
+    
+    <target name="test-emake-errors-in-sbs-compile">
+        <hlm:metadatarecord  database="${test.temp.dir}/metadata_db">
+            <hlm:sbsmetadatainput>
+                <fileset dir="${project.dir}/../data/sbs">
+                    <include  name="sbs_compile_emake_errors.log"/>
+                </fileset>
+                <metadatafilterset>
+                    <metadatafilter priority="error" regex="^ERROR\s+EC\d+:.*$" description="To capture emake errors" />
+                </metadatafilterset>
+            </hlm:sbsmetadatainput>
+        </hlm:metadatarecord>
+        <hlm:metadataCountSeverity severity="error" log="${project.dir}/../data/sbs/sbs_compile_emake_errors.log"
+            database="${test.temp.dir}/metadata_db" property="errors"/>
+        <au:assertTrue message="We must have 5 emake errors in the log.">
+            <equals arg1="${errors}" arg2="5"/>
+        </au:assertTrue>
+    </target>
+	
+	
+    <target name="test-unit-linkage">
+    	<property name="epocroot" location="../" />
+    	<copy file="${project.dir}/../data/sbs/unit_categorization_compile.log" tofile="${test.temp.dir}/unit_categorization_compile.log">
+    	    <filterchain>
+    		    <expandproperties/>
+    	    </filterchain>
+    	</copy>
+        <hlm:metadatarecord  database="${test.temp.dir}/metadata_db">
+            <hlm:sysdefmetadatainput file="../data/sbs/sysdef3.xml" epocroot="${epocroot}" />
+            <hlm:sbsmetadatainput epocroot="../">
+                <fileset file="${test.temp.dir}/unit_categorization_compile.log" />
+                <metadatafilterset>
+                    <metadatafilter priority="error" regex="^ERROR:.*" description="To capture emake errors" />
+                </metadatafilterset>
+            </hlm:sbsmetadatainput>
+        </hlm:metadatarecord>
+        <fmpp sourceFile="../data/sbs/sysdef_data.ini.ftl"
+                     outputfile="${test.temp.dir}/sysdef_data.ini">
+            <data expandProperties="yes">
+                dbPath: ${test.temp.dir}/metadata_db
+                ant: antProperties()
+            </data>
+        </fmpp>
+        <property file="${test.temp.dir}/sysdef_data.ini" />
+        <echo>component.count: ${component.count}</echo>
+        <echo>component.0.unit.id: ${component.0.unit.id}</echo>
+        <echo>component.0.unit.location: ${component.0.unit.location}</echo>
+        <echo>component.1.unit.id: ${component.1.unit.id}</echo>
+        <echo>component.1.unit.location: ${component.1.unit.location}</echo>
+        <au:assertTrue message="Check the first component do not links to any unit (uncategorized)">
+            <equals arg1="${component.0.unit.id}" arg2="0" />
+        </au:assertTrue>
+        <au:assertTrue message="Check the first component do not links to any unit (uncategorized)">
+            <equals arg1="${component.0.unit.location}" arg2="" />
+        </au:assertTrue>
+        <au:assertTrue message="Check the second component links to a unit">
+            <equals arg1="${component.1.unit.location}" arg2="sf/mw/helloworldapi/group" />
+        </au:assertTrue>
+    </target>
+    
+</project>

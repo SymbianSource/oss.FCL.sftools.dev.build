@@ -18,11 +18,11 @@
  
 package com.nokia.helium.signal.ant.types;
 
-import org.apache.tools.ant.types.DataType;
-import com.nokia.helium.signal.Notifier;
-
-
 import java.util.Vector;
+
+import org.apache.tools.ant.types.DataType;
+
+import com.nokia.helium.signal.Notifier;
 
     
 /**
@@ -53,7 +53,6 @@ public class SignalNotifierList extends DataType {
     /**
      * Returns the list of variables available in the VariableSet 
      * @return variable list
-     * @throws HlmAntLibException
      */
     public Vector<Notifier> getNotifierList() {
         return notifierlist;

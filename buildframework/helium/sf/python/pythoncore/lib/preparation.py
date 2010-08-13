@@ -364,7 +364,7 @@ class PreparationCheckout(PreparationAction):
             co_role = ccm.get_role_for_purpose(session, self._config['purpose'])
             _logger.info("Switching user to role: %s" % co_role)
             session.role = co_role
-            _logger.info("Switched user to role: %s" % session._get_role())
+            _logger.info("Switched user to role: %s" % session.role)
 
     
     def __restoreRole(self, session):
@@ -374,7 +374,7 @@ class PreparationCheckout(PreparationAction):
 
             session.role = self.__role
             self.__role = None
-            _logger.info("Switched user to role: %s" % session._get_role())
+            _logger.info("Switched user to role: %s" % session.role)
 
             
     def __setup_project(self, project, coproject):

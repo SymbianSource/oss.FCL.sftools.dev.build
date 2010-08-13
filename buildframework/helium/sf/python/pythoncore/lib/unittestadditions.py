@@ -22,7 +22,7 @@
 import logging
 _logger = logging.getLogger('unittestadditions')
 
-# pylint: disable-msg=C0103
+# pylint: disable=C0103
 
 class skip(object):
     """ Skip decorator. The decorated function will only be called

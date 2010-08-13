@@ -18,6 +18,7 @@ package com.nokia.helium.quality.ant.taskdefs;
 
 import java.io.File;
 import java.util.Vector;
+
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.taskdefs.ExecTask;
@@ -48,6 +49,8 @@ public class CoverityTask extends Task {
     private String command;
     private boolean failOnError;
     private boolean execute = true;
+    private boolean append;
+    private File error;
     private String dir;
     private Vector<VariableSet> coverityOptions = new Vector<VariableSet>();
     private Vector<VariableImpl> coverityArgs = new Vector<VariableImpl>();
@@ -77,6 +80,8 @@ public class CoverityTask extends Task {
         task.setProject(getProject());
         task.setTaskName(this.getTaskName());
         task.setFailonerror(failOnError);
+        task.setError(this.error);
+        task.setAppend(isAppend());
         task.setExecutable(command);
         task.setDir(new File(this.dir));
 
@@ -164,6 +169,34 @@ public class CoverityTask extends Task {
     }
 
     /**
+     * @return the errorFile
+     */
+    public File getError() {
+        return error;
+    }
+
+    /**
+     * @param errorFile the errorFile to set
+     */
+    public void setError(File errorFile) {
+        this.error = errorFile;
+    }
+
+    /**
+     * @param append the append to set
+     */
+    public void setAppend(boolean append) {
+        this.append = append;
+    }
+
+    /**
+     * @return the append
+     */
+    public boolean isAppend() {
+        return append;
+    }
+
+    /**
      * To read the coverity arguments for coverity commands.
      * 
      * @param variableArg
@@ -184,5 +217,6 @@ public class CoverityTask extends Task {
             coverityArgs.add(coverityArg);
         }
     }
+    
 
 }

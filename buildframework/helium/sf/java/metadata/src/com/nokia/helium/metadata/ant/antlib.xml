@@ -28,8 +28,9 @@ Description:
     <typedef name="textmetadatainput" classname="com.nokia.helium.metadata.ant.types.TextLogMetaDataInput"/>
     <typedef name="antmetadatainput" classname="com.nokia.helium.metadata.ant.types.AntLogMetaDataInput"/>
     <typedef name="abldmetadatainput" classname="com.nokia.helium.metadata.ant.types.AbldLogMetaDataInput"/>
-    <typedef name="sbsmetadatainput" classname="com.nokia.helium.metadata.ant.types.SBSLogMetaDataInput"/>
+    <typedef name="sbsmetadatainput" classname="com.nokia.helium.metadata.ant.types.sbs.SBSLogMetaDataInput"/>
     <typedef name="imakermetadatainput" classname="com.nokia.helium.metadata.ant.types.IMakerLogMetaDataInput"/>
+    <typedef name="sysdefmetadatainput" classname="com.nokia.helium.metadata.ant.types.SysdefMetaDataInput"/>
     <typedef name="policymetadatainput" classname="com.nokia.helium.metadata.ant.types.PolicyLogMetaDataInput"/>
     <typedef name="metadatafilterset" classname="com.nokia.helium.metadata.ant.types.MetaDataFilterSet"/>
     <typedef name="metadatafilter" classname="com.nokia.helium.metadata.ant.types.MetaDataFilter"/>

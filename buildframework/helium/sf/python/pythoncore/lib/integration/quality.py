@@ -144,7 +144,7 @@ class PolicyValidator(object):
         value = None
         try:
             value = fileutils.read_policy_content(filename)
-        except Exception:
+        except IOError:
             yield ["invalidencoding", filename, None]
         if value is not None:
             if self._ids != None:

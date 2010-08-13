@@ -22,8 +22,15 @@ Description:
 <build>
     <category>${ant["build.family"]}</category>
     <name>${ant["build.id"]}</name>
-    <#if diamonds?keys?seq_contains("build.start.time")><started>${diamonds["build.start.time"]}</started></#if>
-    <#if diamonds?keys?seq_contains("build.end.time")><finished>${diamonds["build.end.time"]}</finished></#if>
+    <#if ant?keys?seq_contains("ecc.project")>
+    <project>${ant["ecc.project"]}</project>
+    <schedule>${ant["ecc.schedule"]}</schedule>
+    <timebox>${ant["ecc.ido.branch"]}</timebox>
+    <procedure>${ant["ecc.procedure"]}</procedure>
+    <includeinstats>${ant["ecc.include.in.stats"]}</includeinstats>
+    </#if>
+    <#if ant?keys?seq_contains("build.start.time")><started>${ant["build.start.time"]}</started></#if>
+    <#if ant?keys?seq_contains("build.end.time")><finished></finished></#if>
         <creator>${ant["env.USERNAME"]}</creator>
         <hostname>${ant["env.COMPUTERNAME"]}</hostname>
         <product>${ant["build.name"]}</product>

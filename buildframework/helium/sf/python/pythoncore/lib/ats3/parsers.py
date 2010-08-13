@@ -22,10 +22,6 @@
 """ The ATS related parsers """
 
 
-# pylint: disable-msg=W0142,W0102
-# pylint: disable-msg=C0302
-# pylint: disable-msg=R0201,R0912,R0915,R0911,R0902
-
 #W0142 => * and ** were used
 #W0102 => Dangerous default value [] as argument
 #C0302 => Too many lines
@@ -70,7 +66,7 @@ class CppParser(object):
     def __init__(self):
         self.path_to_build = ""
 
-    def get_cpp_output(self, bld_path = None, output_parameter = "n", imacros = None):
+    def get_cpp_output(self, bld_path = None, output_parameter = "n", imacros = None, bld_drive=None):
         """
         To clean out conditionals from the compilation it is necessary to 
         use C preprocessing to clean out those.
@@ -90,8 +86,8 @@ class CppParser(object):
         else:
             os.chdir(os.path.normpath(os.path.join(bld_path)))
             
-        if imacros is not None:
-            includedir = os.path.join(os.path.splitdrive(bld_path)[0] + os.sep, 'epoc32', 'include')
+        if imacros and bld_drive:
+            includedir = os.path.join(bld_drive + os.sep, 'epoc32', 'include')
             command = r"cpp -imacros %s -I %s bld.inf" % (str(imacros), includedir)
         else:
             command = u"cpp bld.inf"
@@ -198,6 +194,7 @@ class CppParser(object):
                 test_sets[t_case[1]]['content'][t_case[1]]['harness'] = harness
                 test_sets[t_case[1]]['content'][t_case[1]]['pkg_files'] = pkg_parser.get_pkg_files(t_case[1], False)
                 test_sets[t_case[1]]['content'][t_case[1]]['mmp_files'] = bld_parser.get_test_mmp_files(t_case[1], False)
+                test_sets[t_case[1]]['content'][t_case[1]]['dll_files'] = mmp_parser.get_dll_files(t_case[1])
             else:
                 for key, value in test_sets.items():
                     if t_case[0] in value['content'].keys():
@@ -208,6 +205,7 @@ class CppParser(object):
                             test_sets[key]['content'][t_case[1]]['harness'] = harness
                             test_sets[key]['content'][t_case[1]]['pkg_files'] = pkg_parser.get_pkg_files(t_case[1], False)
                             test_sets[key]['content'][t_case[1]]['mmp_files'] = bld_parser.get_test_mmp_files(t_case[1], False)
+                            test_sets[key]['content'][t_case[1]]['dll_files'] = mmp_parser.get_dll_files(t_case[1])
                         else:
                             test_sets[t_case[1]] = {}
                             test_sets[t_case[1]]['content'] = {}
@@ -216,6 +214,7 @@ class CppParser(object):
                             test_sets[t_case[1]]['content'][t_case[1]]['harness'] = harness
                             test_sets[t_case[1]]['content'][t_case[1]]['pkg_files'] = pkg_parser.get_pkg_files(t_case[1], False)
                             test_sets[t_case[1]]['content'][t_case[1]]['mmp_files'] = bld_parser.get_test_mmp_files(t_case[1], False)
+                            test_sets[t_case[1]]['content'][t_case[1]]['dll_files'] = mmp_parser.get_dll_files(t_case[1])
 
         os.chdir(temp_path)
         if test_sets == {}:
@@ -430,6 +429,59 @@ class MmpFileParser(object):
         if mmp file is not given, the function will try to find the file(s) on the given location with extension ".mmp"
         """
         return self.read_information_from_mmp(path_to_mmp, 7)
+    
+    def get_dll_files(self, path_to_mmp = None):
+        """
+        Returns the dll files and their harness of the test component        
+        """
+        return self.read_information_from_mmp(path_to_mmp, 8)
+
+    def get_mmp_harness(self, libraries=None):
+        """
+        Harness was actually calculated at the test component level, it has to be calculated at the
+        mmp file level and it has to be stored as "dll file":"harness" in a dictionary so that while writing
+        execute step in test.xml; the dlls which doesn't have any harness are skipped from being written. 
+        
+        This method identifies the harness from the given list of list libraries found in mmp file under LIBRARY tag(s)
+        Returns the harness of the libraries in mmp file        
+        """        
+        stif = False
+        eunit = False
+        stifunit = False
+        generic = False
+        if libraries:
+            if "stiftestinterface.lib" in libraries:
+                stif = True
+            if "eunit.lib" in libraries or "qttest.lib" in libraries:
+                eunit = True
+            if "stifunit.lib" in libraries:
+                stifunit = True
+            elif "testexecuteutils.lib" in libraries or 'testframeworkclient.lib' in libraries or 'rtest' in libraries or 'symbianunittestfw.lib' in libraries:
+                generic = True
+        
+        return self.select_harness(generic, stif, eunit, stifunit)           
+
+
+    def select_harness(self, generic, stif, eunit, stifunit):
+        """
+        return the harness based on the Test Framework
+        """
+        harness = ""
+        if generic:
+            harness = "GENERIC"
+        elif stif and eunit:
+            #_logger.warning("both eunit.lib and stiftestinterface.lib listed in mmp file - choosing STIF.")
+            harness = "STIF"
+        elif stif and not eunit:
+            harness = "STIF"
+        elif eunit and not stif:
+            harness = "EUNIT"
+        elif stifunit and not stif and not eunit:
+            harness = "STIFUNIT"
+
+        return harness
+
+
 
     def read_information_from_mmp(self, path_to_mmp, flag = 0):
         """
@@ -444,19 +496,17 @@ class MmpFileParser(object):
         5 - libraries
         6 - harness (in case of test component)
         7 - mmpfilename
+        8 - dictionary of dll files and their harness 
         """
 
 
         filename = ""
         filetype = ""
         dll_type = ""
+        libs = []
+        dll_files = {}
         libraries = []
         lst_mmp_paths = []
-        harness = ""
-        stif = False
-        eunit = False
-        stifunit = False
-        tef = False
         self.path_to_mmp = path_to_mmp
         try:
             if isinstance(path_to_mmp, list):
@@ -472,6 +522,7 @@ class MmpFileParser(object):
                     lst_mmp_paths.append(self.path_to_mmp)
 
             for mmp in lst_mmp_paths:
+                mmp_harness = ""
                 mmp_file = open(mmp, 'r')
                 for line in mmp_file:
                     if re.match(r"\A(target\s).*([.]\w+)", line.lower().strip()):
@@ -481,33 +532,19 @@ class MmpFileParser(object):
                     elif re.match(r"\A(targettype\s).*", line.lower().strip()):
                         found = re.findall(r"\Atargettype[\s]*(\w+)", line.lower())
                         if found:
-                            filetype = found[0]                       
-
-                libraries = libraries + re.findall(r"\b(\w+[.]lib)\b", mmp.text().lower())
+                            filetype = found[0]
+                libs = []                                       
+                libs = re.findall(r"\b(\w+[.]lib)\b", mmp.text().lower())       
+                # get harness for a mmp/dll file         
+                mmp_harness = self.get_mmp_harness(libs)
+                # store the harness of every dll file, later to be used while writing test.xml execute steps
+                dll_files[filename] = mmp_harness
+                libraries = libraries + libs
                 if '//rtest' in mmp.text().lower() or '* rtest' in mmp.text().lower() or '// rtest' in mmp.text().lower():
                     libraries.append('rtest')
-            
-            if libraries:
-                if "stiftestinterface.lib" in libraries:
-                    stif = True
-                if "eunit.lib" in libraries or "qttest.lib" in libraries:
-                    eunit = True
-                if "stifunit.lib" in libraries:
-                    stifunit = True
-                elif "testexecuteutils.lib" in libraries or 'testframeworkclient.lib' in libraries or 'rtest' in libraries:
-                    tef = True
-
-            if tef:
-                harness = "GENERIC"
-            elif stif and eunit:
-                #_logger.warning("both eunit.lib and stiftestinterface.lib listed in mmp file - choosing STIF.")
-                harness = "STIF"
-            elif stif and not eunit:
-                harness = "STIF"
-            elif eunit and not stif:
-                harness = "EUNIT"
-            elif stifunit and not stif and not eunit:
-                harness = "STIFUNIT"
+                    
+            # get harness for one (sub)component file
+            harness = self.get_mmp_harness(libraries)            
 
             if harness is "":
                 dll_type = "dependent"
@@ -518,23 +555,27 @@ class MmpFileParser(object):
 
         except:
             traceback.print_exc()
-        finally:
+        else:
+            returnvals = None
             if flag == 0:
-                return (filename, filetype, libraries, harness)
+                returnvals = (filename, filetype, libraries, harness)
             elif flag == 1:
-                return (filename, filetype, libraries)
+                returnvals = (filename, filetype, libraries)
             elif flag == 2:
-                return (filename, filetype)
+                returnvals = (filename, filetype)
             elif flag == 3:
-                return filename
+                returnvals = filename
             elif flag == 4:
-                return filetype
+                returnvals = filetype
             elif flag == 5:
-                return libraries
+                returnvals = libraries
             elif flag == 6:
-                return harness
+                returnvals = harness
             elif flag == 7:
-                return dll_type
+                returnvals = dll_type
+            elif flag == 8:
+                returnvals = dll_files
+            return returnvals
 
 class PkgFileParser(object):
     """
@@ -545,9 +586,10 @@ class PkgFileParser(object):
     for every file in the pkg file
     """
 
-    def __init__(self, bldpath, platform = None, specific_pkg = None, drive=''):
+    def __init__(self, bldpath = None, platform = None, specific_pkg = None, drive=''):
         self.platform = platform
         self.build_platform = None
+        self.build_target = None
         if self.platform is not None and "_" in self.platform:
             plat_tar = re.search(r"(.*)_(.*).pkg", self.platform)
             self.build_platform, self.build_target = plat_tar.groups() 
@@ -619,7 +661,7 @@ class PkgFileParser(object):
         self.exclude = exclude
         self._files = []
 
-        if type(location) is not list:
+        if type(location).__name__ != 'list':
             locations = [location]
         else:
             locations = location
@@ -628,7 +670,7 @@ class PkgFileParser(object):
             
             #if location is already a file
             if ".pkg" in str(_file_).lower():
-                self._files = _file_
+                self._files.append(_file_)
             else:
                 self.location = path(_file_)
 
@@ -657,11 +699,12 @@ class PkgFileParser(object):
         result = re.search(r'^\s*"(.*?)".*?-.*?"(.*?)"', pkg_line)
 
         if result is None:
+            if pkg_line.startswith('"'):
+                _logger.warning(pkg_line.strip() + ' line not valid pkg format in ' + pkg_file)
             return None
         val1, val2 = result.groups()
 
         if val1 != "":
-            
             #replacing delimiters (${platform} and ${target}) in PKG file templates, 
             #for instance, QT tests PKG files have delimeters 
             if "$(platform)" in val1.lower() and self.build_platform is not None:
@@ -669,13 +712,20 @@ class PkgFileParser(object):
             if "$(target)" in val1.lower() and self.build_target is not None:
                 val1 = val1.lower().replace("$(target)", self.build_target)
 
-            if path.isabs(path(val1).normpath()):
-                map_src = os.path.normpath(os.path.join(self.drive, val1))
-            elif re.search(r"\A\w", val1, 1):
-                map_src = str(path.joinpath(self.pkg_file_path + os.sep, os.path.normpath(val1)).normpath())
+            #For MATTI PKG files in which location of the data files are unknown or can be changed
+            if "[PKG_LOC]" in val1.upper():
+                val1 = val1.replace("[PKG_LOC]", self.pkg_file_path)
+
+            if os.path.exists(val1):
+                map_src = os.path.abspath(val1)
             else:
-                map_src = str(path.joinpath(self.pkg_file_path, path(val1)).normpath())
-            map_dst = str(path(val2).normpath())
+                if os.path.isabs(os.path.normpath(val1)):
+                    map_src = os.path.normpath(os.path.join(self.drive, val1))
+                elif re.search(r"\A\w", val1, 1):
+                    map_src = os.path.normpath(os.path.join(self.pkg_file_path + os.sep, os.path.normpath(val1)))
+                else:
+                    map_src = os.path.normpath(os.path.join(self.pkg_file_path, val1))
+            map_dst = os.path.normpath(val2)
         else:
             map_src, map_dst = val1, val2
         map_src = map_src.strip()
@@ -710,7 +760,10 @@ class PkgFileParser(object):
                 if "qttest.lib" in _libraries_:
                     file_type = "data" + ":qt:dependent" 
                 else:
-                    file_type = "testmodule"
+                    if 'symbianunittestfw.lib' in _libraries_:
+                        file_type = "testmodule:sut"
+                    else:
+                        file_type = "testmodule"
                     
         elif ext == 'exe' and 'rtest' in _libraries_:
             file_type = "testmodule:rtest"
@@ -731,9 +784,22 @@ class PkgFileParser(object):
             file_type = "pmd"
         elif ext == "script":
             if "testframeworkclient.lib" in _libraries_:
-                file_type = "testscript:mtf"
+                file_type = "testscript:mtf:testframework.exe"
             else:
-                file_type = "testscript"
+                file_type = "testscript:testexecute.exe"
+            if ',' in pkg_line:
+                exename = pkg_line.split(',')[1].strip()
+                if exename == 'install_only':
+                    file_type = "data"
+                elif exename == 'testframework.exe':
+                    file_type = "testscript:mtf:" + exename
+                elif exename == 'testexecute.exe':
+                    file_type = "testscript:" + exename
+                else:
+                    if "testframeworkclient.lib" in _libraries_:
+                        file_type = "testscript:mtf:" + exename
+                    else:
+                        file_type = "testscript:" + exename
         else:
             file_type = "data"
 
@@ -747,6 +813,9 @@ class PkgFileParser(object):
     def read_pkg_file(self, pkg_files):
         """Reads contents of PKG file"""
         pkg_paths = []
+        if type(pkg_files).__name__ != "list":
+            pkg_files = [pkg_files]
+            
         for pkg_file in pkg_files:
             if not os.path.exists( pkg_file ):
                 _logger.error("No PKG -file in path specified")
@@ -758,7 +827,8 @@ class PkgFileParser(object):
                 except UnicodeError:
                     file1 = open(pkg_file, 'r')
                     lines = file1.readlines()
-                pkg_file_path = path(os.path.dirname(pkg_file))
+
+                pkg_file_path = path((pkg_file.rsplit(os.sep, 1))[0])
                 for line in lines:
                     pkg_path = self.__map_pkg_path(line, pkg_file_path, os.path.basename(pkg_file))
                     if pkg_path is None:

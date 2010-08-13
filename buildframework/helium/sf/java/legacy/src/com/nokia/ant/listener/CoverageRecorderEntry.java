@@ -20,27 +20,37 @@
 
 package com.nokia.ant.listener;
 
-import java.io.*;
-import org.apache.tools.ant.util.DOMElementWriter;
-import org.apache.tools.ant.util.DateUtils;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintStream;
+import java.io.Writer;
+import java.util.Hashtable;
+import java.util.Stack;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.apache.tools.ant.*;
-import java.util.*;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.tools.ant.BuildEvent;
+import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.BuildLogger;
+import org.apache.tools.ant.Project;
+import org.apache.tools.ant.SubBuildListener;
+import org.apache.tools.ant.Target;
+import org.apache.tools.ant.Task;
+import org.apache.tools.ant.UnknownElement;
+import org.apache.tools.ant.util.DOMElementWriter;
+import org.apache.tools.ant.util.DateUtils;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 /**
- * This is a class that represents a XML recorder. This is the listener to the
- * build process.
- *
+ * This is a class that represents a XML recorder. This is the listener to the build process.
+ * 
  */
 public class CoverageRecorderEntry implements BuildLogger, SubBuildListener {
-
-    //////////////////////////////////////////////////////////////////////
-    // ATTRIBUTES
-    
     /** XML element name for a build. */
     private static final String BUILD_TAG = "build";
     /** XML element name for a target. */
@@ -53,21 +63,21 @@ public class CoverageRecorderEntry implements BuildLogger, SubBuildListener {
     private static final String TIME_ATTR = "time";
     /** XML attribute name for a file location. */
     private static final String LOCATION_ATTR = "location";
-    
+
     /** DocumentBuilder to use when creating the document to start with. */
     private static DocumentBuilder builder = getDocumentBuilder();
-    
+
     private String recordTaskName;
-    
-    /** The name of the file associated with this recorder entry.  */
+
+    /** The name of the file associated with this recorder entry. */
     private String filename;
-    /** The state of the recorder (recorder on or off).  */
+    /** The state of the recorder (recorder on or off). */
     private boolean record = true;
-    /** The current verbosity level to record at.  */
+    /** The current verbosity level to record at. */
     private int loglevel = Project.MSG_INFO;
-    /** The output PrintStream to record to.  */
+    /** The output PrintStream to record to. */
     private PrintStream outStream;
-    /** The start time of the last know target.  */
+    /** The start time of the last know target. */
     private long targetStartTime;
     /** project instance the recorder is associated with */
     private Project project;
@@ -79,17 +89,13 @@ public class CoverageRecorderEntry implements BuildLogger, SubBuildListener {
     /** Mapping for when targets started (Task to TimedElement). */
     private Hashtable<Target, TimedElement> targets = new Hashtable<Target, TimedElement>();
     /**
-     * Mapping of threads to stacks of elements
-     * (Thread to Stack of TimedElement).
+     * Mapping of threads to stacks of elements (Thread to Stack of TimedElement).
      */
     private Hashtable<Thread, Stack<TimedElement>> threadStacks = new Hashtable<Thread, Stack<TimedElement>>();
     /**
      * When the build started.
      */
     private TimedElement buildElement;
-    
-    //////////////////////////////////////////////////////////////////////
-    // CONSTRUCTORS / INITIALIZERS
 
     /**
      * @param name The name of this recorder (used as the filename).
@@ -99,37 +105,39 @@ public class CoverageRecorderEntry implements BuildLogger, SubBuildListener {
         this.recordTaskName = recordTaskName;
         startBuild();
     }
-    
+
     /**
-     * Returns a default DocumentBuilder instance or throws an
-     * ExceptionInInitializerError if it can't be created.
-     *
+     * Returns a default DocumentBuilder instance or throws an ExceptionInInitializerError if it
+     * can't be created.
+     * 
      * @return a default DocumentBuilder instance.
      */
     protected static DocumentBuilder getDocumentBuilder() {
         try {
             return DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        } catch (ParserConfigurationException exc) {
+        }
+        catch (ParserConfigurationException exc) {
             throw new ExceptionInInitializerError(exc.getMessage());
         }
     }
-    
+
     /** Utility class representing the time an element started. */
     protected static class TimedElement {
         /**
-         * Start time in milliseconds
-         * (as returned by <code>System.currentTimeMillis()</code>).
+         * Start time in milliseconds (as returned by <code>System.currentTimeMillis()</code>).
          */
         private long startTime;
         /** Element created at the start time. */
         private Element element;
+
         public String toString() {
             return element.getTagName() + ":" + element.getAttribute("name");
         }
     }
-    
+
     /**
      * Returns the stack of timed elements for the current thread.
+     * 
      * @return the stack of timed elements for the current thread
      */
     protected Stack<TimedElement> getStack() {
@@ -138,15 +146,12 @@ public class CoverageRecorderEntry implements BuildLogger, SubBuildListener {
             threadStack = new Stack<TimedElement>();
             threadStacks.put(Thread.currentThread(), threadStack);
         }
-        /* For debugging purposes uncomment:
-        org.w3c.dom.Comment s = doc.createComment("stack=" + threadStack);
-        buildElement.element.appendChild(s);
+        /*
+         * For debugging purposes uncomment: org.w3c.dom.Comment s = doc.createComment("stack=" +
+         * threadStack); buildElement.element.appendChild(s);
          */
         return threadStack;
     }
-    
-    //////////////////////////////////////////////////////////////////////
-    // ACCESSOR METHODS
 
     /**
      * @return the name of the file the output is sent to.
@@ -157,7 +162,7 @@ public class CoverageRecorderEntry implements BuildLogger, SubBuildListener {
 
     /**
      * Turns off or on this recorder.
-     *
+     * 
      * @param state true for on, false for off, null for no change.
      */
     public void setRecordState(Boolean state) {
@@ -171,7 +176,7 @@ public class CoverageRecorderEntry implements BuildLogger, SubBuildListener {
      */
     /** {@inheritDoc}. */
     public void buildStarted(BuildEvent event) {
-        
+
     }
 
     /**
@@ -183,12 +188,11 @@ public class CoverageRecorderEntry implements BuildLogger, SubBuildListener {
     }
 
     /**
-     * Cleans up any resources held by this recorder entry at the end
-     * of a subbuild if it has been created for the subbuild's project
-     * instance.
-     *
+     * Cleans up any resources held by this recorder entry at the end of a subbuild if it has been
+     * created for the subbuild's project instance.
+     * 
      * @param event the buildFinished event
-     *
+     * 
      * @since Ant 1.6.2
      */
     public void subBuildFinished(BuildEvent event) {
@@ -199,9 +203,9 @@ public class CoverageRecorderEntry implements BuildLogger, SubBuildListener {
 
     /**
      * Empty implementation to satisfy the BuildListener interface.
-     *
+     * 
      * @param event the buildStarted event
-     *
+     * 
      * @since Ant 1.6.2
      */
     public void subBuildStarted(BuildEvent event) {
@@ -229,28 +233,27 @@ public class CoverageRecorderEntry implements BuildLogger, SubBuildListener {
         Target target = event.getTarget();
         TimedElement targetElement = (TimedElement) targets.get(target);
         if (targetElement != null) {
-            long totalTime
-                    = System.currentTimeMillis() - targetElement.startTime;
-            targetElement.element.setAttribute(TIME_ATTR,
-                    DateUtils.formatElapsedTime(totalTime));
+            long totalTime = System.currentTimeMillis() - targetElement.startTime;
+            targetElement.element.setAttribute(TIME_ATTR, DateUtils.formatElapsedTime(totalTime));
 
             TimedElement parentElement = null;
             Stack<TimedElement> threadStack = getStack();
             if (!threadStack.empty()) {
                 threadStack.pop();
-//                if (poppedStack != targetElement) {
-//                    throw new RuntimeException("Mismatch - popped element = "
-//                            + poppedStack
-//                            + " finished target element = "
-//                            + targetElement);
-//                }
+                // if (poppedStack != targetElement) {
+                // throw new RuntimeException("Mismatch - popped element = "
+                // + poppedStack
+                // + " finished target element = "
+                // + targetElement);
+                // }
                 if (!threadStack.empty()) {
                     parentElement = threadStack.peek();
                 }
             }
             if (parentElement == null) {
                 buildElement.element.appendChild(targetElement.element);
-            } else {
+            }
+            else {
                 parentElement.element.appendChild(targetElement.element);
             }
         }
@@ -272,8 +275,7 @@ public class CoverageRecorderEntry implements BuildLogger, SubBuildListener {
             name = "";
         }
         taskElement.element.setAttribute(NAME_ATTR, name);
-        taskElement.element.setAttribute(LOCATION_ATTR,
-                event.getTask().getLocation().toString());
+        taskElement.element.setAttribute(LOCATION_ATTR, event.getTask().getLocation().toString());
         tasks.put(task, taskElement);
         getStack().push(taskElement);
     }
@@ -283,14 +285,13 @@ public class CoverageRecorderEntry implements BuildLogger, SubBuildListener {
      */
     /** {@inheritDoc}. */
     public void taskFinished(BuildEvent event) {
-        
-//        if (event.getTask().getTaskName() != recordTaskName) {
+
+        // if (event.getTask().getTaskName() != recordTaskName) {
         Task task = event.getTask();
         TimedElement taskElement = tasks.get(task);
         if (taskElement != null) {
             long totalTime = System.currentTimeMillis() - taskElement.startTime;
-            taskElement.element.setAttribute(TIME_ATTR,
-                    DateUtils.formatElapsedTime(totalTime));
+            taskElement.element.setAttribute(TIME_ATTR, DateUtils.formatElapsedTime(totalTime));
             Target target = task.getOwningTarget();
             TimedElement targetElement = null;
             if (target != null) {
@@ -298,30 +299,31 @@ public class CoverageRecorderEntry implements BuildLogger, SubBuildListener {
             }
             if (targetElement == null) {
                 buildElement.element.appendChild(taskElement.element);
-            } else {
+            }
+            else {
                 targetElement.element.appendChild(taskElement.element);
             }
             Stack<TimedElement> threadStack = getStack();
             if (!threadStack.empty()) {
                 threadStack.pop();
-//                    if (poppedStack != taskElement) {
-//                        throw new RuntimeException("Mismatch - popped element = "
-//                                + poppedStack + " finished task element = "
-//                                + taskElement);
-//                    }
+                // if (poppedStack != taskElement) {
+                // throw new RuntimeException("Mismatch - popped element = "
+                // + poppedStack + " finished task element = "
+                // + taskElement);
+                // }
             }
             tasks.remove(task);
-//            } else {
-//                throw new RuntimeException("Unknown task " + task + " not in " + tasks);
-//            }
+            // } else {
+            // throw new RuntimeException("Unknown task " + task + " not in " + tasks);
+            // }
         }
     }
-    
+
     /**
      * Get the TimedElement associated with a task.
-     *
-     * Where the task is not found directly, search for unknown elements which
-     * may be hiding the real task
+     * 
+     * Where the task is not found directly, search for unknown elements which may be hiding the
+     * real task
      */
     protected TimedElement getTaskElement(Task task) {
         TimedElement element = (TimedElement) tasks.get(task);
@@ -338,13 +340,13 @@ public class CoverageRecorderEntry implements BuildLogger, SubBuildListener {
         }
         return null;
     }
-    
+
     /**
      * @see org.apache.tools.ant.BuildListener#messageLogged(BuildEvent)
      */
     /** {@inheritDoc}. */
     public void messageLogged(BuildEvent event) {
-        
+
     }
 
     /**
@@ -365,7 +367,6 @@ public class CoverageRecorderEntry implements BuildLogger, SubBuildListener {
         outStream = output;
     }
 
-
     /**
      * @see BuildLogger#setErrorPrintStream(PrintStream)
      */
@@ -376,9 +377,9 @@ public class CoverageRecorderEntry implements BuildLogger, SubBuildListener {
 
     /**
      * Set the project associated with this recorder entry.
-     *
+     * 
      * @param project the project instance
-     *
+     * 
      * @since 1.6.2
      */
     public void setProject(Project project) {
@@ -387,7 +388,7 @@ public class CoverageRecorderEntry implements BuildLogger, SubBuildListener {
             project.addBuildListener(this);
         }
     }
-    
+
     /**
      * @since 1.6.2
      */
@@ -398,10 +399,10 @@ public class CoverageRecorderEntry implements BuildLogger, SubBuildListener {
         }
         project = null;
     }
-    
+
     /**
-     * Closes the file associated with this recorder.
-     * Used by Recorder.
+     * Closes the file associated with this recorder. Used by Recorder.
+     * 
      * @since 1.6.3
      */
     void closeFile() {
@@ -418,30 +419,32 @@ public class CoverageRecorderEntry implements BuildLogger, SubBuildListener {
             out.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
             (new DOMElementWriter()).write(buildElement.element, out, 0, "\t");
             out.flush();
-        } catch (IOException exc) {
+        }
+        catch (IOException exc) {
             throw new BuildException("Unable to write log file " + exc.getMessage(), exc);
-        } finally {
+        }
+        finally {
             if (out != null) {
                 try {
                     out.close();
-                } catch (IOException e) {
+                }
+                catch (IOException e) {
                     e = null; // ignore
                 }
             }
         }
         buildElement = null;
     }
-    
+
     void startBuild() {
         buildElement = new TimedElement();
         buildElement.startTime = System.currentTimeMillis();
         buildElement.element = doc.createElement(BUILD_TAG);
     }
-    
+
     void finishBuild() {
         long totalTime = System.currentTimeMillis() - buildElement.startTime;
-        buildElement.element.setAttribute(TIME_ATTR,
-                DateUtils.formatElapsedTime(totalTime));
+        buildElement.element.setAttribute(TIME_ATTR, DateUtils.formatElapsedTime(totalTime));
     }
 
     @Override

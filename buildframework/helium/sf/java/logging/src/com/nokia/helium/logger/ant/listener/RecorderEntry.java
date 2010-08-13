@@ -1,69 +1,61 @@
 /*
-* Copyright (c) 2007-2008 Nokia Corporation and/or its subsidiary(-ies).
-* All rights reserved.
-* This component and the accompanying materials are made available
-* under the terms of the License "Eclipse Public License v1.0"
-* which accompanies this distribution, and is available
-* at the URL "http://www.eclipse.org/legal/epl-v10.html".
-*
-* Initial Contributors:
-* Nokia Corporation - initial contribution.
-*
-* Contributors:
-*
-* Description:  
-*
-*/
+ * Copyright (c) 2007-2008 Nokia Corporation and/or its subsidiary(-ies).
+ * All rights reserved.
+ * This component and the accompanying materials are made available
+ * under the terms of the License "Eclipse Public License v1.0"
+ * which accompanies this distribution, and is available
+ * at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ *
+ * Initial Contributors:
+ * Nokia Corporation - initial contribution.
+ *
+ * Contributors:
+ *
+ * Description:  
+ *
+ */
 package com.nokia.helium.logger.ant.listener;
-
-import java.io.PrintStream;
-
-import org.apache.log4j.Logger;
-import org.apache.tools.ant.BuildEvent;
-import org.apache.tools.ant.DefaultLogger;
-import org.apache.tools.ant.Project;
-import org.apache.tools.ant.util.StringUtils;
-import org.apache.tools.ant.BuildException;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.log4j.Logger;
+import org.apache.tools.ant.BuildEvent;
+import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.DefaultLogger;
+import org.apache.tools.ant.Project;
+import org.apache.tools.ant.util.StringUtils;
+
 /**
- * This is a class that represents a recorder. This is the listener to the
- * build process.
- *
+ * This is a class that represents a recorder. This is the listener to the build process.
+ * 
  * @since Ant 1.4
  */
-public class RecorderEntry implements BuildEventHandler, TargetEventHandler, TaskEventHandler, MessageEventHandler {
+public class RecorderEntry implements BuildEventHandler, TargetEventHandler, TaskEventHandler,
+    MessageEventHandler {
 
-    //////////////////////////////////////////////////////////////////////
-    // ATTRIBUTES
-
-    /** The name of the file associated with this recorder entry.  */
+    /** The name of the file associated with this recorder entry. */
     private File filename;
-    /** The state of the recorder (recorder on or off).  */
+    /** The state of the recorder (recorder on or off). */
     private boolean record = true;
-    /** The current verbosity level to record at.  */
+    /** The current verbosity level to record at. */
     private int loglevel = Project.MSG_INFO;
-    /** The output PrintStream to record to.  */
+    /** The output PrintStream to record to. */
     private PrintStream out;
-    /** The start time of the last know target.  */
+    /** The start time of the last know target. */
     private long targetStartTime;
-    /** Strip task banners if true.  */
+    /** Strip task banners if true. */
     private boolean emacsMode;
-    
+
     private Pattern pattern;
-    
+
     private Vector<String> logRegExps = new Vector<String>();
     private Logger log = Logger.getLogger(getClass());
-
-    
-    //////////////////////////////////////////////////////////////////////
-    // CONSTRUCTORS / INITIALIZERS
 
     /**
      * @param name The name of this recorder (used as the filename).
@@ -72,9 +64,6 @@ public class RecorderEntry implements BuildEventHandler, TargetEventHandler, Tas
         targetStartTime = System.currentTimeMillis();
         filename = name;
     }
-
-    //////////////////////////////////////////////////////////////////////
-    // ACCESSOR METHODS
 
     /**
      * @return the name of the file the output is sent to.
@@ -85,34 +74,36 @@ public class RecorderEntry implements BuildEventHandler, TargetEventHandler, Tas
 
     /**
      * Turns off or on this recorder.
-     *
+     * 
      * @param state true for on, false for off, null for no change.
      */
     public void setRecordState(boolean state) {
-         flush();
-         record = state;
+        flush();
+        record = state;
     }
 
     /**
      * Get the current state of the recorder
+     * 
      * @param state
      */
     public boolean getRecordState() {
         return record;
     }
-    
+
     /**
      * To set the regexp to filter the logging.
+     * 
      * @param regexp
      */
     public void addRegexp(String regexp) {
         logRegExps.add(regexp);
     }
-    
+
     /**
      * To clear all regexp set.
      */
-    public void resetRegExp() { 
+    public void resetRegExp() {
         logRegExps.clear();
     }
 
@@ -136,9 +127,9 @@ public class RecorderEntry implements BuildEventHandler, TargetEventHandler, Tas
 
             if (error == null) {
                 out.println(StringUtils.LINE_SEP + "BUILD SUCCESSFUL");
-            } else {
-                out.println(StringUtils.LINE_SEP + "BUILD FAILED"
-                            + StringUtils.LINE_SEP);
+            }
+            else {
+                out.println(StringUtils.LINE_SEP + "BUILD FAILED" + StringUtils.LINE_SEP);
                 error.printStackTrace(out);
             }
         }
@@ -146,12 +137,11 @@ public class RecorderEntry implements BuildEventHandler, TargetEventHandler, Tas
     }
 
     /**
-     * Cleans up any resources held by this recorder entry at the end
-     * of a subbuild if it has been created for the subbuild's project
-     * instance.
-     *
+     * Cleans up any resources held by this recorder entry at the end of a subbuild if it has been
+     * created for the subbuild's project instance.
+     * 
      * @param event the buildFinished event
-     *
+     * 
      * @since Ant 1.6.2
      */
     public void handleSubBuildFinished(BuildEvent event) {
@@ -161,9 +151,9 @@ public class RecorderEntry implements BuildEventHandler, TargetEventHandler, Tas
 
     /**
      * Empty implementation to satisfy the BuildListener interface.
-     *
+     * 
      * @param event the buildStarted event
-     *
+     * 
      * @since Ant 1.6.2
      */
     public void handleSubBuildStarted(BuildEvent event) {
@@ -175,8 +165,7 @@ public class RecorderEntry implements BuildEventHandler, TargetEventHandler, Tas
      */
     public void handleTargetStarted(BuildEvent event) {
         log(">> TARGET STARTED -- " + event.getTarget(), Project.MSG_DEBUG);
-        log(StringUtils.LINE_SEP + event.getTarget().getName() + ":",
-            Project.MSG_INFO);
+        log(StringUtils.LINE_SEP + event.getTarget().getName() + ":", Project.MSG_INFO);
         targetStartTime = System.currentTimeMillis();
     }
 
@@ -235,10 +224,10 @@ public class RecorderEntry implements BuildEventHandler, TargetEventHandler, Tas
         buf.append(messgeToUpdate);
         log(buf.toString(), event.getPriority());
     }
-    
-    
+
     /**
      * To replace regExp matching with ****.
+     * 
      * @param message
      * @return
      */
@@ -253,10 +242,9 @@ public class RecorderEntry implements BuildEventHandler, TargetEventHandler, Tas
         return message;
     }
 
-
     /**
      * The thing that actually sends the information to the output.
-     *
+     * 
      * @param mesg The message to log.
      * @param level The verbosity level of the message.
      */
@@ -291,7 +279,6 @@ public class RecorderEntry implements BuildEventHandler, TargetEventHandler, Tas
         out = output;
     }
 
-
     /**
      * @see BuildLogger#setEmacsMode(boolean)
      */
@@ -299,7 +286,6 @@ public class RecorderEntry implements BuildEventHandler, TargetEventHandler, Tas
     public void setEmacsMode(boolean emacsMode) {
         this.emacsMode = emacsMode;
     }
-
 
     /**
      * @see BuildLogger#setErrorPrintStream(PrintStream)
@@ -309,26 +295,21 @@ public class RecorderEntry implements BuildEventHandler, TargetEventHandler, Tas
         setOutputPrintStream(err);
     }
 
-
     private static String formatTime(long millis) {
         // CheckStyle:MagicNumber OFF
         long seconds = millis / 1000;
         long minutes = seconds / 60;
 
-
         if (minutes > 0) {
-            return Long.toString(minutes) + " minute"
-                 + (minutes == 1 ? " " : "s ")
-                 + Long.toString(seconds % 60) + " second"
-                 + (seconds % 60 == 1 ? "" : "s");
-        } else {
-            return Long.toString(seconds) + " second"
-                 + (seconds % 60 == 1 ? "" : "s");
+            return Long.toString(minutes) + " minute" + (minutes == 1 ? " " : "s ")
+                + Long.toString(seconds % 60) + " second" + (seconds % 60 == 1 ? "" : "s");
+        }
+        else {
+            return Long.toString(seconds) + " second" + (seconds % 60 == 1 ? "" : "s");
         }
         // CheckStyle:MagicNumber ON
     }
-    
-    
+
     /**
      * Registering ourselves to the StatusAndLogListener.
      */
@@ -337,10 +318,10 @@ public class RecorderEntry implements BuildEventHandler, TargetEventHandler, Tas
         if (listener != null) {
             this.log.debug("register");
             synchronized (listener) {
-                listener.register((BuildEventHandler)this);
-                listener.register((TargetEventHandler)this);
-                listener.register((TaskEventHandler)this);
-                listener.register((MessageEventHandler)this);
+                listener.register((BuildEventHandler) this);
+                listener.register((TargetEventHandler) this);
+                listener.register((TaskEventHandler) this);
+                listener.register((MessageEventHandler) this);
             }
         }
     }
@@ -353,14 +334,13 @@ public class RecorderEntry implements BuildEventHandler, TargetEventHandler, Tas
         if (listener != null) {
             this.log.debug("unregister");
             synchronized (listener) {
-                listener.remove((MessageEventHandler)this);
-                listener.remove((TaskEventHandler)this);
-                listener.remove((TargetEventHandler)this);
-                listener.remove((BuildEventHandler)this);
+                listener.remove((MessageEventHandler) this);
+                listener.remove((TaskEventHandler) this);
+                listener.remove((TargetEventHandler) this);
+                listener.remove((BuildEventHandler) this);
             }
         }
     }
-    
 
     /**
      * @since 1.6.2
@@ -370,63 +350,63 @@ public class RecorderEntry implements BuildEventHandler, TargetEventHandler, Tas
     }
 
     /**
-     * Closes the file associated with this recorder.
-     * Used by Recorder.
+     * Closes the file associated with this recorder. Used by Recorder.
+     * 
      * @since 1.6.3
      */
     public void closeFile() {
-        this.log.debug("closeFile.");                
+        this.log.debug("closeFile.");
         if (out != null) {
             out.close();
             out = null;
             unregister();
         }
     }
-    
+
     /**
-     * Initially opens the file associated with this recorder.
-     * Used by Recorder.
-     * @param append Indicates if output must be appended to the logfile or that
-     * the logfile should be overwritten.
+     * Initially opens the file associated with this recorder. Used by Recorder.
+     * 
+     * @param append Indicates if output must be appended to the logfile or that the logfile should
+     *        be overwritten.
      * @throws BuildException
      * @since 1.6.3
      */
     public void openFile(boolean append) {
         openFileImpl(append);
     }
-    
+
     /**
-     * Re-opens the file associated with this recorder.
-     * Used by Recorder.
+     * Re-opens the file associated with this recorder. Used by Recorder.
+     * 
      * @throws BuildException
      * @since 1.6.3
      */
     public void reopenFile() {
         openFileImpl(true);
     }
-    
+
     private void openFileImpl(boolean append) {
         if (out == null) {
             this.log.debug("openFileImpl: " + filename);
             try {
                 out = new PrintStream(new FileOutputStream(filename, append));
                 register();
-            } catch (IOException ioe) {
-                throw new BuildException("Problems opening file using a "
-                                         + "recorder entry: " + ioe.getMessage(), ioe);
+            }
+            catch (IOException ioe) {
+                throw new BuildException("Problems opening file using a " + "recorder entry: "
+                    + ioe.getMessage(), ioe);
             }
         }
     }
-    
+
     /**
      * To add user message into log file.
+     * 
      * @param message
      */
     public void addLogMessage(String message) {
         out.println(StringUtils.LINE_SEP + message);
-        
+
     }
-    
-    
-    
+
 }

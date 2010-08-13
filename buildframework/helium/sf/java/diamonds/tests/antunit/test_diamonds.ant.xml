@@ -28,25 +28,19 @@ Description:
 
     <target name="test-build">
         <runScenario scenario="build" target="unittest-diamonds" />
-        <au:assertFileExists file="${temp.dir}/output/diamonds-start.log.xml" />
-        <au:assertFileExists file="${temp.dir}/output/diamonds-finish.xml" />
     </target>
 
     <target name="test-build-with-invalid-address">
         <runScenario scenario="invalid-address" target="unittest-diamonds" />
-        <au:assertFileExists file="${temp.dir}/output/diamonds-start.log.xml" />
-        <au:assertFileExists file="${temp.dir}/output/diamonds-finish.xml" />
+        <au:assertLogContains text="Error occured while sending mail" />
     </target>
     
     <target name="test-build-with-invalid-templates">
         <runScenario scenario="invalid-templates" target="unittest-diamonds" />
-        <au:assertFileExists file="${temp.dir}/output/diamonds-start.log.xml" />
-        <au:assertFileExists file="${temp.dir}/output/diamonds-finish.xml" />
     </target>
 
     <target name="test-build-with-invalid-templates-1">
         <runScenario scenario="invalid-templates-1" failonerror="false" target="unittest-diamonds" />
-        <au:assertLogContains text="Not supported: two stages withsame ending target"/>
     </target>
     
 </project>

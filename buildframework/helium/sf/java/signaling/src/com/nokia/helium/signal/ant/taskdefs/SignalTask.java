@@ -17,10 +17,12 @@
 
 package com.nokia.helium.signal.ant.taskdefs;
 
-import org.apache.tools.ant.BuildException;
-import org.apache.tools.ant.Task;
-import org.apache.tools.ant.Target;
 import java.util.Vector;
+
+import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.Target;
+import org.apache.tools.ant.Task;
+
 import com.nokia.helium.signal.ant.SignalList;
 import com.nokia.helium.signal.ant.types.SignalNotifierInput;
 
@@ -115,8 +117,9 @@ public class SignalTask extends Task {
 
     @Override
     public void execute() {
-        if (name == null)
+        if (name == null) {
             throw new BuildException("'name' attribute is not defined.");
+        }
         if (result == null) {
             result = new Integer(0);
         }
@@ -148,7 +151,9 @@ public class SignalTask extends Task {
             if (config == null) {
                 throw new BuildException("Could not find signal config for signal name: " + name);
             }
-            signalList.sendSignal(getName(), result.intValue() != 0);
+            signalList.processForSignal(getProject(), this.getSignalNotifierInput(), this.name, 
+                    this.getOwningTarget().getName(), message, result.intValue() != 0);
+
             if (result.intValue() != 0) {
                 // keep same message as earlier.
                 log(name

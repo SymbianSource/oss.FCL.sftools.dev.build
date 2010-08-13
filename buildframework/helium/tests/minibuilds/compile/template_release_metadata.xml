@@ -31,16 +31,16 @@ Description:
     <releaseFiles/>
     <externalFiles/>
 
-	<filters>
-		<!-- Filter definitions -->
-		<!-- 	code = code used in package attribute "filters" 
-					text = Filter name
-					description = filter description
-		-->
+    <filters>
+        <!-- Filter definitions -->
+        <!--     code = code used in package attribute "filters" 
+                    text = Filter name
+                    description = filter description
+        -->
     <filter code="foo" text="Emulator binaries" description="Files needed for emulator." /> 
     <filter code="bar" text="complementary binaries and sources" description="complementary components binaries and sources"/>
     <filter code="test" text="source files" description="symbian and S60 source files"/>
-	</filters>
+    </filters>
     
 </releaseInformation>
 

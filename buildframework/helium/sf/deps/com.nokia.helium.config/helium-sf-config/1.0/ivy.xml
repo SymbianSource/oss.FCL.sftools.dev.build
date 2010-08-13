@@ -41,6 +41,7 @@ Description:
         <dependency org="com.nokia.helium" name="helium-antdata" rev="latest.integration" conf="default"/>
         <dependency org="com.nokia.helium" name="helium-antunit" rev="latest.integration" conf="default"/>
         <dependency org="com.nokia.helium" name="helium-antcoverage" rev="latest.integration" conf="default"/>
+        <dependency org="com.nokia.helium" name="helium-environment" rev="latest.integration" conf="default"/>
         <dependency org="com.nokia.helium" name="helium-imaker" rev="latest.integration" conf="default"/>
         <dependency org="com.nokia.helium" name="helium-internaldata" rev="latest.integration" conf="default"/>
         <dependency org="com.nokia.helium" name="helium-metadata" rev="latest.integration" conf="default"/>

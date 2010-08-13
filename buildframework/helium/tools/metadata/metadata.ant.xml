@@ -33,8 +33,10 @@ Description:
         <sequential>
             <mkdir dir="@{output-dir}" />
             <var name="email.status.template" value="${build.status.email.template}" />
+            <var name="generate.build.status.file.basename" unset="true" />
+            <basename property="generate.build.status.file.basename" file="@{file}" />
             <fmpp sourceFile="${helium.dir}/tools/common/templates/log/build_status_orm.xml.ftl"
-                         outputfile="@{output-dir}/@{file}.status.xml">
+                         outputfile="@{output-dir}/${generate.build.status.file.basename}.status.xml">
                 <freemarkerLinks expandProperties="yes">
                     macro: ${helium.dir}/tools/common/templates/macro
                 </freemarkerLinks>
@@ -45,7 +47,7 @@ Description:
                 </data>
             </fmpp>
             <fmpp sourceFile="${build.status.email.template}"
-                         outputfile="@{output-dir}/@{file}.status.html">
+                         outputfile="@{output-dir}/${generate.build.status.file.basename}.status.html">
                 <freemarkerLinks expandProperties="yes">
                     macro: ${helium.dir}/tools/common/templates/macro
                 </freemarkerLinks>
@@ -55,8 +57,8 @@ Description:
                     ant: antProperties()
                 </data>
             </fmpp>
-            <hlm:assertFileExists file="@{output-dir}/@{file}.status.xml" />
-            <hlm:assertFileExists file="@{output-dir}/@{file}.status.html" />
+            <hlm:assertFileExists file="@{output-dir}/${generate.build.status.file.basename}.status.xml" />
+            <hlm:assertFileExists file="@{output-dir}/${generate.build.status.file.basename}.status.html" />
         </sequential>
     </macrodef>
 </project>

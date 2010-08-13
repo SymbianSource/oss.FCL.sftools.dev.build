@@ -16,9 +16,9 @@
 */
 
 package com.nokia.helium.internaldata.ant.listener;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.Vector;
-import java.util.Date;
 
 /**
  * Data node object to iterate, keep timing, name, maintain parallel tasks for the node. 
@@ -108,10 +108,11 @@ public abstract class DataNode {
      * Make is reliable: if end time doesn't exists let's use the start time.
      */
     public Date getEndTime() {
-        if (endTime != null)
+        if (endTime != null) { 
             return endTime;
-        else
+        } else {
             return this.getStartTime();
+        }
     }
 
     public void setEndTime(Date endTime) {
@@ -144,13 +145,15 @@ public abstract class DataNode {
      * @return
      */
     public DataNode find(Object reference) {
-        if (this.reference == reference)
-            return this;        
+        if (this.reference == reference) {
+            return this;
+        }
         for (Iterator<DataNode> i = children.iterator() ; i.hasNext() ; ) {
             DataNode node = i.next();
             DataNode result = node.find(reference);
-            if (result != null)
+            if (result != null) {
                 return result;
+            }
         }
         return null;
     }

@@ -98,25 +98,12 @@ This will check for a number of things:
 
 
 .. index::
-  single: Tools version checking
-
-Tools version checking
-======================
-
-Tool version checking can be performed to ensure that all tools have correct versions present. At the same time, a path setting file will be created. Calling this file will add tools into path, so hard coding paths is no longer needed.
-
-To perform checking run the command::
-
-  hlm check-tool-versions
-
-
-.. index::
   single: Build output
 
 Build output
 ================
 
-When a build is running the targets being executed are listed on the screen there is no need to pipe this to a file as the ant targets are logged in the   ``\*_main.ant.log`` for product and IDO builds. Once the build is complete it will say on the screen whether the build was successful or failed. If it has failed it should give an indication of where and why it failed on the screen but for more information you must examine the output logs. If the build says it was successfult this does not necessarily mean that the build compiled all components successfully, you must examine the logs to check that all is compiled and linked correctly. See :ref:`Troubleshooting-label` for information on logs and where they kept.
+When a build is running the targets being executed are listed on the screen there is no need to pipe this to a file as the ant targets are logged in the   ``\*_main.ant.log`` for product and IDO builds. Once the build is complete it will say on the screen whether the build was successful or failed. If it has failed it should give an indication of where and why it failed on the screen but for more information you must examine the output logs. If the build says it was successfult this does not necessarily mean that the build compiled all components successfully, you must examine the logs to check that all is compiled and linked correctly.
 
 The result of the build (compiled files, linked (flash) files etc.) are  stored in the usual folders and directories under the ``\epoc32`` directory.
 
@@ -156,9 +143,9 @@ Logging
 
 Diamonds
 --------
-Logging to the Diamonds metrics database can be disabled by setting the property:: 
+Logging to the Diamonds metrics database could be disabled by setting the property:: 
 
-    skip.diamonds=true
+    diamonds.enabled=false
 
 Internal data
 -------------
@@ -166,9 +153,33 @@ Internal data
 Helium can collect internal data about builds for the purpose of improving support. This can be disabled by setting an environment variable::
 
     set HLM_DISABLE_INTERNAL_DATA=1
+    
+Output logs
+-----------
+
+There are a large number of output logs created to assist with understanding the build and determining what has been performed and what has not. All of the log files are generated in the build area, usually under the ``output/logs`` folder. Many of the logs are created in different formats, e.g. the Bill Of Materials log file exists as HTML, XML and text (all the same information). Some of the logs exist as different file formats giving different information at various stages of the activity, e.g. the cenrep logs in which case generally the HTML files are a summary of the whole activity.
+
+.. image:: dependencies_log.grph.png
 
  
 Troubleshooting
 ================
 
-See :ref:`Troubleshooting-label` for information on how to find faults with Helium.
+This section contains details on how to find errors and problems within Helium itself (for helium contributors) and within the configuration files
+and Ant tasks etc. for build managers and subcons.
+
+Diagnostics
+------------
+
+Use the :hlm-t:`diagnostics` command provide debugging information when reporting problems. It lists all the environment variables and all the Ant 
+properties and all the Ant targets within Helium::
+
+    hlm diagnostics > diag.log
+
+Failing early in the build
+---------------------------
+
+The :hlm-p:`failonerror` property is defined in ``helium.ant.xml`` and has the default value ``false``. It is used to control whether the ``<exec>`` 
+tasks fail when errors occur or the build execution just continues. The build can be configured to "fail fast" if this is set to ``true``, 
+either on the command line or in a build configuration before importing ``helium.ant.xml``. Given that many ``exec`` tasks will return an 
+error code due to build errors, it is not recommended to set this to true for regular builds.

@@ -24,7 +24,7 @@ Description:
     <description>Helium Antlib Signal unittests.</description>
     <import file="run-scenario.ant.xml" />
     <property environment="env"/>
- 
+     
     <target name="test-scenario-valid-build">
         <runScenario scenario="valid_build" target="build" />
     </target>
@@ -164,4 +164,35 @@ Description:
         </au:assertTrue>
     </target>
 
+    <target name="test-missing-default-config">
+        <au:expectfailure>
+            <runScenario scenario="missing_default_config" target="build" />
+        </au:expectfailure>
+        <au:assertLogContains text="BUILD FAILED" />
+        <au:assertLogContains text="There must be one default stagerecord datatype." />
+    </target>
+    
+    <target name="test-missing-stage-refid">
+        <au:expectfailure>
+            <runScenario scenario="missing_stage_refid" target="build" />
+        </au:expectfailure>
+        <au:assertLogContains text="BUILD FAILED" />
+        <au:assertLogContains text="Invalid stagerecord configuration, the stageRefId attribute is not defined at" />
+    </target>
+
+    <target name="test-invalid-stagerefid-reference">
+        <au:expectfailure>
+            <runScenario scenario="invalid_stage_refid" target="build" />
+        </au:expectfailure>
+        <au:assertLogContains text="BUILD FAILED" />
+        <au:assertLogContains text="Invalid stagerecord stageRefId attribute value, the 'stage1-invalid' id doesn't exist at" />
+    </target>
+
+    <target name="test-invalid-stagerefid-object">
+        <au:expectfailure>
+            <runScenario scenario="inavlid_stage_refid_object" target="build" />
+        </au:expectfailure>
+        <au:assertLogContains text="BUILD FAILED" />
+        <au:assertLogContains text="Invalid stagerecord stageRefId attribute value, the 'stage1-invalid-object' id doesn't refer to a stage type at" />
+    </target>
 </project>

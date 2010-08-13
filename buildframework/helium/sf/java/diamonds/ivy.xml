@@ -36,5 +36,7 @@ Description:
     <dependency org="jaxen" name="jaxen" rev="latest.integration" conf="default"/>
     <dependency org="org.apache.commons" name="commons-logging" rev="latest.integration" conf="default"/>
     <dependency org="org.apache.commons" name="commons-codec" rev="latest.integration" conf="default"/>
+    <dependency org="org.apache.commons" name="commons-codec" rev="latest.integration" conf="default"/>
+    <dependency org="xpath-task" name="xpath-task" rev="latest.integration" conf="default"/>
   </dependencies>
 </ivy-module>

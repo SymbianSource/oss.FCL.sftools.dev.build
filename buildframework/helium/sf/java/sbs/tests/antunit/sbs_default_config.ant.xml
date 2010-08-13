@@ -37,8 +37,11 @@ Description:
     </hlm:sbsbuild>
     
     <hlm:sbsbuild id="sf_build">
-        <sbsInput refid="tools-sbs" />
         <sbsInput refid="mainbuild-sbs" />
+    </hlm:sbsbuild>
+    
+    <hlm:sbsbuild id="sf_build2">
+        <sbsInput refid="tools-sbs" />
     </hlm:sbsbuild>
     
     <!-- In future migrationg to 3.0 schema <sbsbuild> would also to handle layers and filters 

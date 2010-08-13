@@ -23,9 +23,9 @@ Description:
 <project name="ido-zip" default="all">
     <target name="all">
         <delete file="${ant['build.output.dir']}/s60Sources.7z" failonerror="false"/>
-        <#if ((data?keys?size > 0) && (ant['do.robot.release']?split(';')?size > 0))>
+        <#if ((data?keys?size > 0) && (ant['robot.release.project']?split(';')?size > 0))>
             <#list data?keys as name>
-                <#list ant['do.robot.release']?split(',') as project>
+                <#list ant['robot.release.project']?split(',') as project>
                     <#if name?replace('\\', '/')?lower_case?contains("/${project}/${project}"?lower_case)>
                     <#-- 7za u test.7z  output/analysisdata/ -->
                     <exec executable="7za" dir="${name}/../">

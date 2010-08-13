@@ -42,68 +42,7 @@ Description:
             </data>
         </fmpp>
     </target>
-
-    
-    <!-- Macro to generate the tools dependency xml output. -->
-    <macrodef name="createToolsTableMacro" uri="http://www.nokia.com/helium">
-        <attribute name="dir"/>
-        <attribute name="failonerror"/>
-        <attribute name="configs"/>
-        <sequential>
-            <ivy:configure file="${tools.ivy.config.file}" override="true"/>
-            <ivy:resolve file="${helium.dir}/config/ivy/ivy.xml" conf="@{configs}" haltonfailure="@{failonerror}"/>
-            <ivy:report todir="@{dir}" outputpattern="tool-dependencies-[conf].xml"
-                        conf="@{configs}" xml="true" graph="false" xsl="false"/>
-        </sequential>
-    </macrodef>
-
-    
-    <!-- Generates the tools dependency xml output. used in the retrieving Helium section to
-    list the tools used within Helium. -->
-    <target name="tools-rst-table">
-        <hlm:createToolsTableMacro dir="${doc.build.dir}/ivy" failonerror="false" 
-            configs="core,ido"/>
-        <fmpp sourceFile="${helium.doc.src.dir}/helium_custom/manual/tool-dependencies.rst.ftl" includes="*.dot.ftl"
-              outputFile="${doc.temp.dir}/manual/tool-dependencies.rst_include"
-              replaceExtension="dot.ftl, dot">
-            <data expandProperties="yes">
-                doc: xml(${doc.build.dir}/ivy/tool-dependencies-ido.xml)
-            </data>
-        </fmpp>
-    </target>
-    
-    
-    <!-- Create a complete dependency graph of Helium libraries. 
         
-    Currently this does not work correctly but it is useful for future testing of repreport. -->
-    <target name="libraries-dependencies">
-        <ivy:settings file="${tools.ivy.config.file}"/>
-        <!--<ivy:resolve file="${helium.dir}/config/ivy/ivy.xml" conf="" haltonfailure="false"/>-->
-        <delete file="@{dir}/ivy-repository-report.xml"/>
-        <ivy:repreport todir="${doc.build.dir}/ivy" organisation="S60_SAM"
-                    xml="true" graph="false" xsl="false"/>
-    </target>
-    
-    <!-- Generate Python API documentation using epydoc. -->
-    <target name="python-apidocs">
-        <fileset id="python.library.files" dir="${helium.dir}">
-            <include name="extensions/nokia/tools/common/python/lib/**/*.py"/>
-            <include name="sf/python/**/*.py"/>
-            <include name="nokia/python/**/*.py"/>
-        </fileset>
-        <mkdir dir="${doc.build.dir}/api/python"/>
-        <pathconvert pathsep=" " property="epydoc.python.modules.path">
-            <fileset refid="python.library.files"/>
-        </pathconvert>
-        <echo>Python modules path: ${epydoc.python.modules.path}</echo>
-        <exec executable="python" dir="${doc.build.dir}" failonerror="true">        
-            <arg line="${python.tools}/epydoc"/>
-            <arg value="-v"/>
-            <arg value="--config=${helium.dir}/config/epydoc.conf"/>
-            <arg value="--exclude=sgmllib"/>
-            <arg line="${epydoc.python.modules.path}"/>
-        </exec>
-    </target>
         
     <!-- Builds the Helium API documentation. -->
     <target name="helium-apidocs" depends="clean-helium-apidocs,database,
@@ -138,10 +77,11 @@ Description:
                 <include name="*/python/*" />
             </dirset>
             <sequential>
-                <copy todir="${doc.temp.dir}/helium-antlib">
+                <copy todir="${doc.temp.dir}/helium-antlib" flatten="true">
                     <fileset dir="@{dir}/">
                         <include name="*.rst"/>
                     </fileset>
+                    <fileset dir="@{dir}/" includes="doc/*" excludes="**/distribution.policy.S60" />
                 </copy>
             </sequential>
         </for>
@@ -170,7 +110,7 @@ import urllib
 import helium.documentation
 
 old_db_file = urllib.urlopen(r'${last.major.release.database.url}')
-writer = helium.documentation.APIDeltaWriter(old_db_file, r'${database.file}')
+writer = helium.documentation.APIDeltaWriter(old_db_file.read(), open(r'${database.file}').read())
 writer.write(r'${doc.build.dir}/api_changes.xml')
         </hlm:python>
         <if>
@@ -386,7 +326,7 @@ file_object.close()
         <script language="jython" setbeans="false">
 import java.io
 import java.util.jar
-antlibsDir = java.io.File('external/antlibs')
+antlibsDir = java.io.File('external/antlibs2')
 print antlibsDir
 jarFiles = antlibsDir.listFiles()
 for jar in jarFiles:
@@ -415,8 +355,7 @@ for jar in jarFiles:
     
     
     <fileset id="jar.files" dir="${helium.dir}">
-        <include name="external/antlibs2/**/*.jar"/>
-        <include name="extensions/nokia/external/antlibs/**/*.jar"/>
+        <include name="external/antlibs2/*.jar"/>
     </fileset>
     
     

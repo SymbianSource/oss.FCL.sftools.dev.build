@@ -18,14 +18,19 @@
  
 package com.nokia.helium.metadata.ant.types;
 
-import java.io.*;
-import java.util.*;
-import org.apache.tools.ant.types.Reference;
-import org.apache.tools.ant.types.DataType;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.util.Collection;
+import java.util.Vector;
+
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
-import org.apache.log4j.Logger;
+import org.apache.tools.ant.types.DataType;
+
 import fmpp.models.CsvSequence;
+import fmpp.util.StringUtil.ParseException;
+import freemarker.template.TemplateModelException;
 import freemarker.template.TemplateSequenceModel;
 
 
@@ -37,8 +42,8 @@ import freemarker.template.TemplateSequenceModel;
  * 
  * Example 2:
  * &lt;metadatafilterset id=&quot;common&quot;/&gt;
- *   &lt;metadatafilter priority=&quot;error&quot; regex=&quot;^make(?:\[\d+\])?:\s+.*\s+not\s+remade&quot; description=&quot;make error&quot; />
- *   &lt;metadatafilter priority=&quot;error&quot;regex=&quot;&quot; description=&quot;&quot; /&gt; 
+ *   &lt;metadatafilter severity=&quot;error&quot; regex=&quot;^make(?:\[\d+\])?:\s+.*\s+not\s+remade&quot; description=&quot;make error&quot; />
+ *   &lt;metadatafilter severity=&quot;error&quot;regex=&quot;&quot; description=&quot;&quot; /&gt; 
  * &lt;metadatafilterset/&gt;
  *
  * Example 3:
@@ -46,30 +51,24 @@ import freemarker.template.TemplateSequenceModel;
  * </pre>
  * @ant.task name="metadatafilterset" category="Metadata"
  */
-public class MetaDataFilterSet extends DataType
-{
-    private Vector<MetaDataFilter> filters = new Vector<MetaDataFilter>();
+public class MetaDataFilterSet extends DataType implements MetaDataFilterCollection {
+    private Vector<MetaDataFilterCollection> filterCollections = new Vector<MetaDataFilterCollection>();
+    private File filterFile;
+    private boolean initialized;
     
-    private Vector<MetaDataFilterSet> filterSets = new Vector<MetaDataFilterSet>();
-    
-    private String filterFile;
-    
-    private Logger log = Logger.getLogger(MetaDataFilterSet.class);
-
     /**
      * Helper function called by ant to set the FilterFile
      * @param FilterFile the csv file used by the filterset
      */
-    public void setFilterFile(String file) throws Exception {
+    public void setFilterFile(File file) throws Exception {
         filterFile = file;
-        addCSVFromFile(file);
     }
 
     /**
      * Helper function called to get FilterFile.
      * @return filterfile used by this filterset
      */
-    public String getFilterFile() {
+    public File getFilterFile() {
         return filterFile;
     }
 
@@ -80,50 +79,57 @@ public class MetaDataFilterSet extends DataType
      * the precedence is maintained.
      * @return All filters
      */
-    public Vector<MetaDataFilter> getAllFilters() {
-        Vector<MetaDataFilter> allFilters = new Vector<MetaDataFilter>();
-        //First look for filters associated with this set.
-        if (filters.size() > 0) {
-            allFilters.addAll(filters);
+    public Collection<MetaDataFilter> getAllFilters() {
+        // Shall we treat current object as a reference?
+        if (this.isReference()) {
+            if (filterFile != null) {
+                throw new BuildException("You cannot use the 'filterFile' in reference object.");
+            }
+            if (!filterCollections.isEmpty()) {
+                throw new BuildException("You cannot have nested filters when using a reference object.");
+            }
+            Object filterSetObject = this.getRefid().getReferencedObject();
+            if (filterSetObject != null && filterSetObject instanceof MetaDataFilterCollection) {
+                Collection<MetaDataFilter> allFilters = ((MetaDataFilterCollection)filterSetObject).getAllFilters();
+                checkInvalidFilters(allFilters);
+                return allFilters;                
+            } else {
+                throw new BuildException("Filterset object is not instance of MetaDataFilterCollection");
+            }
+        } else {
+            if (!initialized) {
+                if (filterFile != null) {
+                    addDataFromCSVFile();
+                }
+                initialized = true;
+            }
+            Collection<MetaDataFilter> allFilters = new Vector<MetaDataFilter>();
+            // Add any nested filterCollection
+            for (MetaDataFilterCollection filterCollection : filterCollections) {
+                allFilters.addAll(filterCollection.getAllFilters());
+            }
+            checkInvalidFilters(allFilters);
             return allFilters;
         }
-        // Then filters as reference in filterset
-        Reference refId = getRefid();
-        Object filterSetObject = null;
-        if (refId != null) {
-            filterSetObject = refId.getReferencedObject();
-           if (filterSetObject != null && filterSetObject instanceof MetaDataFilterSet) {
-                allFilters.addAll(((MetaDataFilterSet)filterSetObject).getAllFilters());
-                return allFilters;
-            }
-            log.debug("Filterset object is not instance of MetaDataFilterSet");
-            throw new BuildException("Filterset object is not instance of MetaDataFilterSet");
-        }
-        // Add any nested filtersets
-        for (MetaDataFilterSet filterSet : filterSets) {
-            allFilters.addAll(filterSet.getAllFilters());
-        }
-        
-        return removeInvalidFilters(allFilters);
     }
 
     /**
      * Helper function called to remove any invalid filters
      * @return only the valid filters
      */
-    private Vector<MetaDataFilter> removeInvalidFilters(Vector<MetaDataFilter> filterList) {
-        ListIterator<MetaDataFilter> iter = filterList.listIterator();
-        while (iter.hasNext()) {
-            MetaDataFilter filter = iter.next();
-            String priority = filter.getPriority();
+    private void checkInvalidFilters(Collection<MetaDataFilter> filterList) {
+        int count = 0;
+        for (MetaDataFilter filter : filterList) {
+            SeverityEnum.Severity severity = filter.getSeverity();
             String regEx = filter.getRegex();
-            if (priority == null || regEx == null) {
-                log("Warning: some filter is invalid removing it", Project.MSG_WARN);
-                iter.remove();
+            if (severity == null || regEx == null) {                
+                log("Invalid filter found at " + filter.getLocation().toString(), Project.MSG_ERR);
+                count++;
             }
         }
-        return filterList;
-        
+        if (count > 0) {
+            throw new BuildException("Invalid filter have been found. Please check your configuration.");
+        }
     }
     
     /**
@@ -134,19 +140,6 @@ public class MetaDataFilterSet extends DataType
         add(filter);
         return filter;
     }
-
-    /**
-     * Helper function to add the created filter
-     * @param filter to be added to the filterset
-     */
-    public void add(MetaDataFilter filter) {
-        MetaDataFilterSet filterSet = createMetaDataFilterSet();
-        filterSet.getFilterList().add(filter);
-    }
-
-     Vector<MetaDataFilter> getFilterList() {
-         return filters;
-     }
 
      /**
      * Helper function called by ant to create the new filter
@@ -161,9 +154,9 @@ public class MetaDataFilterSet extends DataType
      * Helper function to add the created filter
      * @param filter to be added to the filterset
      */
-    public void add(MetaDataFilterSet filterSet) {
-        if (filterSet != null) {
-            filterSets.add(filterSet);
+    public void add(MetaDataFilterCollection filterCollection) {
+        if (filterCollection != null) {
+            filterCollections.add(filterCollection);
         }
     }
 
@@ -171,38 +164,35 @@ public class MetaDataFilterSet extends DataType
      * Helper function to add the filters from the csv files
      * @param csv file path from which the filters needs to be added.
      */
-    private void addCSVFromFile(String csvPath) throws Exception {
+    private void addDataFromCSVFile() {
         CsvSequence csvs = new CsvSequence();
         csvs.setSeparator(',');
-        log.debug("filter file: " + filterFile);
         try {
-            csvs.load(new FileReader(new File(filterFile)));
-        } catch (java.io.FileNotFoundException fex) {
-            log.debug("Metadata CSV file not found:", fex);
-            throw fex;
-        } catch (fmpp.util.StringUtil.ParseException pex) {
-            log.debug("FMPP not able parse the Metadata CSV file. ", pex);
-            throw pex;
-        } catch (java.io.IOException iex) {
-            log.debug("Metadata I/O Exception. " + iex.getMessage(), iex);
-            throw iex;
-        }
-        int size = 0;
-        log.debug("filter CSV record size: " + csvs.size());
-        size = csvs.size();
-        for (int i = 0; i < size; i++) {
-            TemplateSequenceModel model = (TemplateSequenceModel) csvs
-            .get(i);
-            int modelSize = model.size();
-            if (modelSize != 3 ) {
-                log.debug("Metadata CSV file filter file format is invalid. It has row size " + size);
-                throw new Exception("Metadata CSV file filter file format is invalid. It has row size " + size);
+            csvs.load(new FileReader(filterFile));
+            int size = 0;
+            size = csvs.size();
+            for (int i = 0; i < size; i++) {
+                TemplateSequenceModel model = (TemplateSequenceModel)csvs.get(i);
+                int modelSize = model.size();
+                if (modelSize != 3 ) {
+                    throw new BuildException("Metadata CSV file filter file format is invalid. It model must have 3 column, it currently has " + size);
+                }
+                MetaDataFilter filter = new MetaDataFilter();
+                SeverityEnum severity = new SeverityEnum();
+                severity.setValue(model.get(0).toString());
+                filter.setSeverity(severity);
+                filter.setRegex(model.get(1).toString());
+                filter.setDescription(model.get(2).toString());
+                filterCollections.add(filter);
             }
-            MetaDataFilter filter = new MetaDataFilter();
-            filter.setPriority(model.get(0).toString());
-            filter.setRegex(model.get(1).toString());
-            filter.setDescription(model.get(2).toString());
-            filters.add(filter);
+        } catch (FileNotFoundException fex) {
+            throw new BuildException(fex.getMessage(), fex);
+        } catch (ParseException pex) {
+            throw new BuildException(pex.getMessage(), pex);
+        } catch (java.io.IOException iex) {
+            throw new BuildException(iex.getMessage(), iex);
+        } catch (TemplateModelException e) {
+            throw new BuildException(e.getMessage(), e);
         }
     }
 }

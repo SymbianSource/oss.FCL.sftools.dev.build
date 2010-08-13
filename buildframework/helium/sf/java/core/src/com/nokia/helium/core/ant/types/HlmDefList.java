@@ -1,108 +1,85 @@
 /*
-* Copyright (c) 2007-2008 Nokia Corporation and/or its subsidiary(-ies).
-* All rights reserved.
-* This component and the accompanying materials are made available
-* under the terms of the License "Eclipse Public License v1.0"
-* which accompanies this distribution, and is available
-* at the URL "http://www.eclipse.org/legal/epl-v10.html".
-*
-* Initial Contributors:
-* Nokia Corporation - initial contribution.
-*
-* Contributors:
-*
-* Description:  
-*
-*/
-
+ * Copyright (c) 2007-2008 Nokia Corporation and/or its subsidiary(-ies).
+ * All rights reserved.
+ * This component and the accompanying materials are made available
+ * under the terms of the License "Eclipse Public License v1.0"
+ * which accompanies this distribution, and is available
+ * at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ *
+ * Initial Contributors:
+ * Nokia Corporation - initial contribution.
+ *
+ * Contributors:
+ *
+ * Description:  
+ *
+ */
 
 package com.nokia.helium.core.ant.types;
 
 import java.util.Vector;
+
 import org.apache.tools.ant.types.DataType;
+
 import com.nokia.helium.core.ant.HlmExceptionHandler;
+import com.nokia.helium.core.ant.PostBuildAction;
+import com.nokia.helium.core.ant.PreBuildAction;
 
 /**
+ * HlmDefList is a class used to store the pre/post build events and the
+ * exception handlers.
  * 
+ * @ant.type name="deflist" category="Core"
  */
 public class HlmDefList extends DataType {
 
-    private Vector<HlmPreDefImpl> preDefList = new Vector<HlmPreDefImpl>();
-    private Vector<HlmPostDefImpl> postDefList = new Vector<HlmPostDefImpl>();
-    private Vector<HlmExceptionHandler> exceptionHandlerList = new Vector<HlmExceptionHandler>();
+    private Vector<PreBuildAction> preBuildActions = new Vector<PreBuildAction>();
+    private Vector<PostBuildAction> postBuildActions = new Vector<PostBuildAction>();
+    private Vector<HlmExceptionHandler> exceptionHandlers = new Vector<HlmExceptionHandler>();
 
     /**
-     * Creates an empty hlm post-action definition and adds it to the list.
-     */
-    public HlmPreDefImpl createHlmPreDefImpl() {
-        HlmPreDefImpl def = new HlmPreDefImpl();
-        add(def);
-        return (HlmPreDefImpl) def;
-    }
-
-    /**
-     * Creates an empty hlm post-action definition and adds it to the list.
-     */
-    public HlmPostDefImpl createHlmPostDefImpl() {
-        HlmPostDefImpl def = new HlmPostDefImpl();
-        add(def);
-        return (HlmPostDefImpl) def;
-    }
-
-    /**
-     * Add a given variable to the list
+     * Method to add a pre/post build action or an exception handler.
      * 
-     * @param var
-     *            variable to add
+     * @param type
+     *            is the datatype representing a pre/post build action or an
+     *            exception handler.
      */
-    public void add(HlmPreDefImpl definition) {
-        if (definition != null) {
-            preDefList.add(definition);
+    public void add(DataType type) {
+        if (type instanceof PreBuildAction) {
+            preBuildActions.add((PreBuildAction) type);
+        }
+        if (type instanceof PostBuildAction) {
+            postBuildActions.add((PostBuildAction) type);
+        }
+        if (type instanceof HlmExceptionHandler) {
+            exceptionHandlers.add((HlmExceptionHandler) type);
         }
     }
 
     /**
-     * Add a post-action to the list.
+     * Get the list of pre build actions.
+     * 
+     * @return the list of pre build actions.
      */
-    public void add(HlmPostDefImpl definition) {
-        if (definition != null) {
-            postDefList.add(definition);
-        }
-    }
-    
-    /**
-     * Add a exception handler to the list.
-     */
-    public void add(HlmExceptionHandler exceptionHandler) {
-        if (exceptionHandler != null) {
-            exceptionHandlerList.add(exceptionHandler);
-        }
+    public Vector<PreBuildAction> getPreBuildActions() {
+        return preBuildActions;
     }
 
     /**
-     * Get the pre-action list.
+     * Get the list of post build actions.
      * 
-     * @return a vector containing all the pre-actions
+     * @return the list of post build actions.
      */
-    public Vector<HlmPreDefImpl> getPreDefList() {
-        return preDefList;
+    public Vector<PostBuildAction> getPostBuildActions() {
+        return postBuildActions;
     }
 
     /**
-     * Get the post-action list.
+     * Get the list of exception handlers.
      * 
-     * @return a vector containing all the post-actions
+     * @return the list of exception handlers
      */
-    public Vector<HlmPostDefImpl> getPostDefList() {
-        return postDefList;
-    }
-    
-    /**
-     * Get the exception handler list.
-     * 
-     * @return a vector containing all the exception handlers
-     */
-    public Vector<HlmExceptionHandler> getExceptionHandlerList() {
-        return exceptionHandlerList;
+    public Vector<HlmExceptionHandler> getExceptionHandlers() {
+        return exceptionHandlers;
     }
 }

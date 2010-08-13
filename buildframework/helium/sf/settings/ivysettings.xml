@@ -42,5 +42,10 @@ Description:
         </chain>
     </resolvers>
 
+    <triggers>
+        <ant-build antfile="${source.root.dir}/sf/settings/triggers/egg-extract.ant.xml" target="egg-extract" prefix="dep"
+            event="post-retrieve-artifact"  onlyonce="false" filter="type=egg"/>
+    </triggers>
+
 </ivysettings>
 

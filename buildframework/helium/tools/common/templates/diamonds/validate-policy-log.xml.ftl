@@ -20,11 +20,11 @@ Description:
 ============================================================================
 -->
 <#include "diamonds_header.ftl"> 
-<policyvalidation>
+<quality aspect="policy">
 <#if (doc)??!""?keys?seq_contains('policyvalidation')>
 <#list doc['policyvalidation'].error as error>
-      <error type="${error.@type}" message="${error.@message}" value="${error.@value}"/>
+    <message severity="error" type="${error.@type}" message="${error.@message}" value="${error.@value}"/>
 </#list>
 </#if>
-</policyvalidation>
+</quality>
 <#include "diamonds_footer.ftl"> 

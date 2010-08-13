@@ -35,15 +35,14 @@ class MonSymFTPUploader:
         self.ftp = None
     
     def upload(self):
-        """upload"""
-        self._open()
         """ Proceed to the upload. """
+        self._open()
         monsyms = []
         i = 1
         for p_path in self.paths:
             if os.path.exists(p_path) and os.path.isfile(p_path):
                 # ftp://1.2.3.4/ctc_helium/[diamonds_id]/mon_syms/2/mon.sym
-                outputdir = "ctc_helium/%s/mon_syms/%d" % (self.diamondsid , i)
+                outputdir = "%s/mon_syms/%d" % (self.diamondsid , i)
                 output = outputdir + "/MON.SYM"
                 self._ftpmkdirs(outputdir)
                 print "Copying %s under %s" % (p_path, output)
@@ -61,22 +60,24 @@ class MonSymFTPUploader:
         """close"""
         self.ftp.quit()
 
-    def _ftpmkdirs(self, dir):
+    def _ftpmkdirs(self, dir_):
         """ftp make directory"""
         pwd = self.ftp.pwd()
-        for d_dir in dir.split('/'):
-            if len(d_dir)!=0:
-# pylint: disable-msg=W0704
-                #disable except not doing anything
+        for d_dir in dir_.split('/'):
+            if len(d_dir) != 0:
                 try:
                     print "Creating %s under %s" % (d_dir, self.ftp.pwd())
                     self.ftp.mkd(d_dir)
                 except ftplib.error_perm:      #capture the exception but not display it.
                     pass
-# pylint: enable-msg=W0704
                 self.ftp.cwd(d_dir)
         self.ftp.cwd(pwd)
     
     def _send(self, src, dst):
         """send """
-        self.ftp.storbinary("STOR " + dst, open(src, "rb"), 1024)
+        try:
+            self.ftp.storbinary("STOR " + dst, open(src, "rb"), 1024)
+        except ftplib.error_perm, e:
+            print 'File already uploaded. ' + str(e)
+            
+            

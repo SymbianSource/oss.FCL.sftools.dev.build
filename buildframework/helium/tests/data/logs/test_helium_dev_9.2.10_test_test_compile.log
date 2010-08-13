@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<buildlog sbs_version="2.12.1 [2010-01-29 symbian build system 4e477ddf2eed]" xmlns="http://symbian.com/xml/build/log" xmlns:progress="http://symbian.com/xml/build/log/progress" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symbian.com/xml/build/log http://symbian.com/xml/build/log/1_0.xsd">
+<info>sbs: version 2.12.1 [2010-01-29 symbian build system 4e477ddf2eed]
+</info>
+<info>SBS_HOME C:/APPS/sbs</info>
+<info>Set-up C:/APPS/sbs/sbs_init.xml</info>
+<info>Current working directory Y:\</info>
+<info>Environment /S=BHTEST001</info>
+<info>Environment ALLUSERSPROFILE=C:\Documents and Settings\All Users</info>
+<info>Environment ANT_ARGS=-lib "E:\RaghuAE\Helium_WorkArea\Helium_Mercurial\helium-working\helium\external\antlibs2" -lib "E:\RaghuAE\Helium_WorkArea\Helium_Mercurial\helium-working\helium\extensions\nokia\external\antlibs" -logger com.nokia.ant.HeliumLogger   -listener com.nokia.helium.internaldata.ant.listener.Listener  -Dant.executor.class=com.nokia.helium.core.ant.HeliumExecutor  -listener com.nokia.helium.logger.ant.listener.StatusAndLogListener  -listener com.nokia.helium.core.ant.listener.TargetTimesLogGeneratorListener -listener com.nokia.helium.environment.ant.listener.ExecListener</info>
+<info>Environment ANT_CMD_LINE_ARGS=-Dhelium.dir "E:\RaghuAE\Helium_WorkArea\Helium_Mercurial\helium-working\helium" -Dcache.dir "e:\ec_temp\helium\username" -Dbuild.drive Y: -Dbuild.system sbs -Denabled.ats true compile-test</info>
+<info>Environment ANT_HOME=C:\APPS\ant_1.7</info>
+<info>Environment ANT_OPTS=-Xmx896M -Dlog4j.configuration=com/nokia/log4j.xml -Dlog4j.cache.dir="e:\ec_temp\helium\username"  -Dpython.path=E:\RaghuAE\Helium_WorkArea\Helium_Mercurial\helium-working\helium\external\python\lib\2.5\jython-2.5-py2.5.egg;E:\RaghuAE\Helium_WorkArea\Helium_Mercurial\helium-working\helium\external\python\lib\2.6\4Suite_XML-1.0.2-py2.6-win32.egg;E:\RaghuAE\Helium_WorkArea\Helium_Mercurial\helium-working\helium\external\python\lib\2.6\PyXML-0.8.4-py2.6-win32.egg;E:\RaghuAE\Helium_WorkArea\Helium_Mercurial\helium-working\helium\external\python\lib\2.6\lxml-2.2.1-py2.6-win32.egg;E:\RaghuAE\Helium_WorkArea\Helium_Mercurial\helium-working\helium\external\python\lib\auto\4Suite_XML-1.0.2.py2.6-win32.egg;E:\RaghuAE\Helium_WorkArea\Helium_Mercurial\helium-working\helium\external\python\lib\auto\Jinja2-2.2.1.egg;E:\RaghuAE\Helium_WorkArea\Helium_Mercurial\helium-working\helium\external\python\lib\auto\PyRTF-0.45.egg;E:\RaghuAE\Helium_WorkArea\Helium_Mercurial\helium-working\helium\external\python\lib\auto\amara-1.2.0.1.egg;E:\RaghuAE\Helium_WorkArea\Helium_Mercurial\helium-working\helium\external\python\lib\auto\blockspackager-1.0.egg;E:\RaghuAE\Helium_WorkArea\Helium_Mercurial\helium-working\helium\external\python\lib\auto\dp-1.0.egg;E:\RaghuAE\Helium_WorkArea\Helium_Mercurial\helium-working\helium\external\python\lib\auto\iadnokia-1.0.egg;E:\RaghuAE\Helium_WorkArea\Helium_Mercurial\helium-working\helium\external\python\lib\auto\jython-2.5.egg;E:\RaghuAE\Helium_WorkArea\Helium_Mercurial\helium-working\helium\external\python\lib\auto\lxml-2.2.1.py2.6-win32.egg;E:\RaghuAE\Helium_WorkArea\Helium_Mercurial\helium-working\helium\external\python\lib\auto\mocker-0.10.1.egg;E:\RaghuAE\Helium_WorkArea\Helium_Mercurial\helium-working\helium\external\python\lib\auto\path-2.2.egg;E:\RaghuAE\Helium_WorkArea\Helium_Mercurial\helium-working\helium\external\python\lib\auto\pythoncore-1.0.egg;E:\RaghuAE\Helium_WorkArea\Helium_Mercurial\helium-working\helium\external\python\lib\auto\pythonnokia-1.0.egg;E:\RaghuAE\Helium_WorkArea\Helium_Mercurial\helium-working\helium\external\python\lib\auto\setuptools-0.6c5.py2.5.egg;E:\RaghuAE\Helium_WorkArea\Helium_Mercurial\helium-working\helium\external\python\lib\common\Amara-1.2.0.1-py2.5.egg;E:\RaghuAE\Helium_WorkArea\Helium_Mercurial\helium-working\helium\external\python\lib\common\Jinja-1.2-py2.5-win32.egg;E:\RaghuAE\Helium_WorkArea\Helium_Mercurial\helium-working\helium\external\python\lib\common\Jinja2-2.2.1-py2.5.egg;E:\RaghuAE\Helium_WorkArea\Helium_Mercurial\helium-working\helium\external\python\lib\common\Pygments-0.10-py2.5.egg;E:\RaghuAE\Helium_WorkArea\Helium_Mercurial\helium-working\helium\external\python\lib\common\coverage-2.85-py2.5.egg;E:\RaghuAE\Helium_WorkArea\Helium_Mercurial\helium-working\helium\external\python\lib\common\epydoc-3.0beta1-py2.5.egg;E:\RaghuAE\Helium_WorkArea\Helium_Mercurial\helium-working\helium\external\python\lib\common\mocker-0.10.1-py2.5.egg;E:\RaghuAE\Helium_WorkArea\Helium_Mercurial\helium-working\helium\external\python\lib\common\nose-0.11.1-py2.6.egg;E:\RaghuAE\Helium_WorkArea\Helium_Mercurial\helium-working\helium\external\python\lib\common\path-2.2-py2.5.egg;E:\RaghuAE\Helium_WorkArea\Helium_Mercurial\helium-working\helium\external\python\lib\common\setuptools-0.6c5-py2.5.egg;E:\RaghuAE\Helium_WorkArea\Helium_Mercurial\helium-working\helium\external\python\lib\common\simplejson-1.9.1-py2.5-win32.egg;;E:\RaghuAE\Helium_WorkArea\Helium_Mercurial\helium-working\helium\external\python\lib\auto;E:\RaghuAE\Helium_WorkArea\Helium_Mercurial\helium-working\helium\external\python\lib\2.6;E:\RaghuAE\Helium_WorkArea\Helium_Mercurial\helium-working\helium\external\python\lib\common;E:\RaghuAE\Helium_WorkArea\Helium_Mercurial\helium-working\helium\tools\common\python\scripts;E:\RaghuAE\Helium_WorkArea\Helium_Mercurial\helium-working\helium\extensions\nokia\external\python\lib\2.6;E:\RaghuAE\Helium_WorkArea\Helium_Mercurial\helium-working\helium\extensions\nokia\tools\common\python\lib;C:\APPS\sbs\python</info>
+<info>Environment APPDATA=C:\Documents and Settings\username\Application Data</info>
+<info>Environment APR_ICONV_PATH=C:\apps\Subversion\iconv</info>
+<info>Environment APTLMHOST=@oupelic4.emea.nsn-net.net</info>
+<info>Environment ARMROOT=\</info>
+<info>Environment ARMV5VER=:ARM/Thumb C/C++ Compiler, RVCT2.2 [Build 686]</info>
+<info>Environment CLIENTNAME=2INL05520</info>
+<info>Environment CLUSTERLOG=C:\ETPWIN\Cluster\cluster.log</info>
+<info>Environment CMTHOME=C:\APPS\cmt</info>
+<info>Environment COMMONPROGRAMFILES=C:\Program Files\Common Files</info>
+<info>Environment COMPUTERNAME=BHWEC019</info>
+<info>Environment COMSPEC=C:\ETPWIN\system32\cmd.exe</info>
+<info>Environment COPYCMD=/y</info>
+<info>Environment CTCHOME=C:\APPS\ctc</info>
+<info>Environment CTC_AGENT_DEBUG=*</info>
+<info>Environment CYGWIN=nontsec nosmbntsec</info>
+<info>Environment DERBY_HOME=C:\APPS\jdk_1.6.0_11\JavaDB</info>
+<info>Environment EMAKEFLAGS=--emake-reg-roots=-\HKEY_CLASSES_ROOT</info>
+<info>Environment EMAKE_CM=bhwec001</info>
+<info>Environment EMAKE_EMULATION=symbian</info>
+<info>Environment EMAKE_ROOT=\;C:\apps</info>
+<info>Environment EPOCROOT=\</info>
+<info>Environment FLEXLM_BATCH=1</info>
+<info>Environment FLEXLM_TIMEOUT=900000</info>
+<info>Environment FP_NO_HOST_CHECK=NO</info>
+<info>Environment HELIUM_CACHE_DIR="e:\ec_temp\helium\username"</info>
+<info>Environment HELIUM_HOME=E:\RaghuAE\Helium_WorkArea\Helium_Mercurial\helium-working\helium</info>
+<info>Environment HOME=h:\</info>
+<info>Environment HOMEDRIVE=C:</info>
+<info>Environment HOMEPATH=\Documents and Settings\username</info>
+<info>Environment HOSTPLATFORM=win 32</info>
+<info>Environment HOSTPLATFORM_DIR=win32</info>
+<info>Environment INCLUDE=C:\APPS\MSVC6\VC98\ATL\Include\;C:\APPS\MSVC6\VC98\MFC\Include\;C:\APPS\MSVC6\VC98\Include\</info>
+<info>Environment INTERNAL_DATA_ANT_ARGS= -listener com.nokia.helium.internaldata.ant.listener.Listener</info>
+<info>Environment JAVA_1_3_1_HOME=C:\apps\j2sdk_1.3.1_06</info>
+<info>Environment JAVA_5_HOME=C:\APPS\jdk_1.5.0_17</info>
+<info>Environment JAVA_6_HOME=C:\APPS\jdk_1.6.0_11</info>
+<info>Environment JAVA_HOME=C:\APPS\jdk_1.6.0_11</info>
+<info>Environment LIB=C:\APPS\MSVC6\VC98\MFC\Lib\;C:\APPS\MSVC6\VC98\Lib\</info>
+<info>Environment LM_LICENSE_FILE=1727@bhlic01.apac.nokia.com;C:\APPS\licenses\apac.dat;1726@tolic01.apac.nokia.com;C:\APPS\licenses\PCLint.dat;C:\APPS\licenses\apac.dat;1726@tolic01.apac.nokia.com;C:\APPS\licenses\PCLint.dat;1707@bhlic01.apac.nokia.com;</info>
+<info>Environment LOGGING_ANT_ARGS= -listener com.nokia.helium.logger.ant.listener.StatusAndLogListener</info>
+<info>Environment LOGONSERVER=\\BHWDC101</info>
+<info>Environment MSDEVDIR=C:\APPS\MSVC6\Common\MSDev98</info>
+<info>Environment MWCSYM2INCLUDES=C:\APPS\carbide\x86Build\Symbian_Support\MSL\MSL_C\MSL_Common\Include;C:\APPS\carbide\x86Build\Symbian_Support\MSL\MSL_C\MSL_Win32\Include;C:\APPS\carbide\x86Build\Symbian_Support\MSL\MSL_C\MSL_X86;C:\APPS\carbide\x86Build\Symbian_Support\MSL\MSL_C++\MSL_Common\Include;C:\APPS\carbide\x86Build\Symbian_Support\MSL\MSL_Extras\MSL_Common\Include;C:\APPS\carbide\x86Build\Symbian_Support\MSL\MSL_Extras\MSL_Win32\Include;C:\APPS\carbide\x86Build\Symbian_Support\Win32-x86 Support\Headers\Win32 SDK</info>
+<info>Environment MWSYM2LIBRARIES=C:\APPS\carbide\x86Build\Symbian_Support\Win32-x86 Support\Libraries\Win32 SDK;C:\APPS\carbide\x86Build\Symbian_Support\Runtime\Runtime_x86\Runtime_Win32\Libs</info>
+<info>Environment MWSYM2LIBRARYFILES=MSL_All_MSE_Symbian_D.lib;gdi32.lib;user32.lib;kernel32.lib;</info>
+<info>Environment NOKIA_LICENSE_FILE=C:\APPS\licenses\apac.dat;</info>
+<info>Environment NUMBER_OF_PROCESSORS=4</info>
+<info>Environment OS=Windows_NT</info>
+<info>Environment PATH=C:\APPS\sbs\win32\mingw\bin;C:\APPS\sbs\win32\cygwin\bin;C:\APPS\sbs\win32\bin;C:\APPS\jdk_1.6.0_11\bin;C:\APPS\actpython\.;c:\apps\actperl\bin\;c:\apps\rvct22_686\bin;c:\apps\atool;\epoc32\tools;\epoc32\gcc\bin;c:\apps\ue;c:\apps\ccm65\bin;c:\apps\carbide\x86Build\Symbian_Tools\Command_Line_Tools;c:\ECloud\i686_win32\bin;C:\Program Files\HP\NCU;c:\program files\windows resource kits\tools\;C:\ETPWIN\system32;C:\ETPWIN\system32\wbem;c:\progra~1\putty;c:\apps\cmt\;c:\apps\cltools;c:\apps\symrec;c:\apps\ant_1.7.0\bin;c:\apps\understand\bin\pc-win95;c:\apps\unzip;c:\apps\msvc6\common\tools\winnt;c:\apps\msvc6\common\msdev98\bin;c:\apps\msvc6\vc98\bin;c:\eesp\system32;c:\program files\subversion\bin;C:\ETPWIN\system32\WindowsPowerShell\v1.0;C:\APPS\pclint;C:\APPS\ctc;C:\APPS\prevent\bin;C:\APPS\sbs\bin;C:\APPS\blocks\bin;C:\APPS\codescanner;C:\APPS\jdk_1.6.0_11\bin;C:\APPS\7zip;C:\APPS\romtools;C:\APPS\imaker;C:\APPS\bc;\epoc32\gcc_mingw\bin;C:\ETPWIN\system32\WindowsPowerShell\v1.0;C:\APPS\symdec;C:\APPS\ant_1.7\bin;C:\APPS\MSVC6\VC98\Bin\;C:\APPS\MSVC6\Common\Tools\;C:\APPS\MSVC6\Common\MSDev98\Bin\;C:\APPS\ant_1.7\bin;C:\apps\Subversion\bin;E:\RaghuAE\Mercurial;E:\RaghuAE\coverity\bin;C:\apps\OpenSSH\bin;;\epoc32\tools;\epoc32\gcc\bin;\epoc32\tools\build;\epoc32\rombuild;E:\RaghuAE\Helium_WorkArea\Helium_Mercurial\helium-working\helium\extensions\nokia\external\unxutils;E:\RaghuAE\Helium_WorkArea\Helium_Mercurial\helium-working\helium\extensions\nokia\external\Subversion\bin;E:\RaghuAE\Helium_WorkArea\Helium_Mercurial\helium-working\helium\extensions\nokia\external\graphviz\bin;C:\APPS\ctc</info>
+<info>Environment PATHEXT=.COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.py;.pyw;.PSC1</info>
+<info>Environment PERL=C:\APPS\actperl\bin\perl.exe</info>
+<info>Environment PERL5LIB=E:\RaghuAE\Helium_WorkArea\Helium_Mercurial\helium-working\helium\tools\common\packages</info>
+<info>Environment PID=4696</info>
+<info>Environment PROCESSOR_ARCHITECTURE=x86</info>
+<info>Environment PROCESSOR_IDENTIFIER=x86 Family 15 Model 65 Stepping 2, AuthenticAMD</info>
+<info>Environment PROCESSOR_LEVEL=15</info>
+<info>Environment PROCESSOR_REVISION=4102</info>
+<info>Environment PROGRAMFILES=C:\Program Files</info>
+<info>Environment PROMPT=$P$G</info>
+<info>Environment PSMODULEPATH=C:\ETPWIN\system32\WindowsPowerShell\v1.0\Modules\</info>
+<info>Environment PYTHONPATH=C:\APPS\sbs\win32\python264</info>
+<info>Environment PYTHONVERSION=2.6</info>
+<info>Environment RVCT22BIN=C:\APPS\rvct22_686\bin</info>
+<info>Environment RVCT22INC=C:\APPS\rvct22_686\include</info>
+<info>Environment RVCT22LIB=C:\APPS\rvct22_686\lib</info>
+<info>Environment RVCT22_ASMOPT=--licretry --fastlicense --sitelicense</info>
+<info>Environment RVCT22_CCOPT=--licretry --fastlicense --sitelicense</info>
+<info>Environment RVCT22_LINKOPT=--licretry --fastlicense --sitelicense</info>
+<info>Environment SBS_HOME=C:\APPS\sbs</info>
+<info>Environment SESSIONNAME=RDP-Tcp#47</info>
+<info>Environment SIGNALING_ANT_ARGS= -Dant.executor.class=com.nokia.helium.core.ant.HeliumExecutor</info>
+<info>Environment SYMSEE_VERSION=11.1.1</info>
+<info>Environment SYSTEMDRIVE=C:</info>
+<info>Environment SYSTEMROOT=C:\ETPWIN</info>
+<info>Environment TARGET_TIMES_GENERATOR= -listener com.nokia.helium.core.ant.listener.TargetTimesLogGeneratorListener</info>
+<info>Environment TEMP=e:\ec_temp</info>
+<info>Environment TESTED_ANT=C:\APPS\ant_1.7</info>
+<info>Environment TESTED_JAVA=C:\APPS\jdk_1.6.0_11</info>
+<info>Environment TMP=e:\ec_temp</info>
+<info>Environment TMPDIR=e:\ec_tmpdir</info>
+<info>Environment USERNAME=username</info>
+<info>Environment USERPROFILE=C:\Documents and Settings\username</info>
+<info>Environment WINDIR=C:\ETPWIN</info>
+<info>Environment _JAVACMD=C:\APPS\jdk_1.6.0_11\bin\java.exe</info>
+<info>Environment _USE_CLASSPATH=no</info>
+<info>Environment __CYGWIN__=C:\APPS\sbs\win32\cygwin</info>
+<info>Environment __MINGW__=C:\APPS\sbs\win32\mingw</info>
+<info>Environment __PYTHON__=C:\APPS\sbs\win32\python264\python.exe</info>
+<info>Duplicate alias 'make' (the one from 'Y:/epoc32/sbs_config\s60_sbs_config.xml' will override the one in 'C:/APPS/sbs/lib/config\make.xml')</info>
+<info>Duplicate alias 'emake' (the one from 'Y:/epoc32/sbs_config\s60_sbs_config.xml' will override the one in 'C:/APPS/sbs/lib/config\make.xml')</info>
+<info>Buildable configuration 'armv5_urel.test'</info>
+<info>Buildable configuration 'armv5_udeb.test'</info>
+<info>System Definition file Y:/output/build/canonical_system_definition_test.xml</info>
+<info>Found 38 bld.inf references in Y:/output/build/canonical_system_definition_test.xml within 22 layers:</info>
+<info>	stubs_layer, complementary_layer, os_layer, tools_layer, bldmefirst_layer, bldmelast_layer, addon_layer, clean_only_layer, bldfirst_mw_layer, api_test_layer, unit_test_layer, perf_test_layer, module_test_layer, qt_unit_test_layer, s60_stubs_layer, s60_complementary_layer, s60_app_layer, s60_mw_layer, s60_osext_layer, s60_bldmefirst_layer, s60_bldmelast_layer, mecevo_layer</info>
+<info>Found 0 bld.inf references in layer "stubs_layer"</info>
+<info>Found 0 bld.inf references in layer "complementary_layer"</info>
+<info>Found 0 bld.inf references in layer "os_layer"</info>
+<info>Found 0 bld.inf references in layer "tools_layer"</info>
+<info>Found 0 bld.inf references in layer "bldmefirst_layer"</info>
+<info>Found 0 bld.inf references in layer "bldmelast_layer"</info>
+<info>Found 0 bld.inf references in layer "addon_layer"</info>
+<info>Found 0 bld.inf references in layer "clean_only_layer"</info>
+<info>Found 0 bld.inf references in layer "bldfirst_mw_layer"</info>
+<info>Found 15 bld.inf references in layer "api_test_layer"</info>
+<info>Found 23 bld.inf references in layer "unit_test_layer"</info>
+<info>Found 0 bld.inf references in layer "perf_test_layer"</info>
+<info>Found 0 bld.inf references in layer "module_test_layer"</info>
+<info>Found 0 bld.inf references in layer "qt_unit_test_layer"</info>
+<info>Found 0 bld.inf references in layer "s60_stubs_layer"</info>
+<info>Found 0 bld.inf references in layer "s60_complementary_layer"</info>
+<info>Found 0 bld.inf references in layer "s60_app_layer"</info>
+<info>Found 0 bld.inf references in layer "s60_mw_layer"</info>
+<info>Found 0 bld.inf references in layer "s60_osext_layer"</info>
+<info>Found 0 bld.inf references in layer "s60_bldmefirst_layer"</info>
+<info>Found 0 bld.inf references in layer "s60_bldmelast_layer"</info>
+<info>Found 0 bld.inf references in layer "mecevo_layer"</info>
+<info>Toolcheck cache Y:/epoc32/build/toolcheck_cache_.tmp ignored - environment changed
+</info>
+<info>no OS variant for the configuration "armv5_urel.test".</info>
+<info>'armv5_urel.test' uses variant hrh file 'Y:/epoc32/include/feature_settings.hrh'</info>
+<info>no OS variant for the configuration "armv5_udeb.test".</info>

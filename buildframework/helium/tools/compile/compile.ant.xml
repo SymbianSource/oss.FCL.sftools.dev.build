@@ -34,7 +34,48 @@ Description:
     @editable required
     @scope public
     -->
-
+    
+    <!--* @property compile.cmd.clean.enabled
+    Set to true if it clean compilation.  
+    @type boolean
+    @scope public
+    @since 11.0
+    -->
+    
+    <!--* @property internal.compile.cmd.clean.enabled
+    Set to true if compile.cmd.clean.enabled is set to true.  
+    @type boolean
+    @scope private
+    -->
+    
+    <!--* @property compile.cmd.clean
+    Set to true if it clean compilation. - deprecated: Start using compile.cmd.clean.enabled property.  
+    @type boolean
+    @scope public
+    @deprecated since 11.0
+    -->
+    
+    <!--* @property compile.discard.result.enabled
+    Set to true to discard the previous compilation results.  
+    @type boolean
+    @scope public
+    @since 11.0
+    -->
+    
+    <!--* @property internal.compile.discard.result.enabled
+    Set to true if compile.discard.result.enabled set to true.  
+    @type boolean
+    @scope private
+    @since 11.0
+    -->
+    
+    <!--* @property compile.discard.result
+    Set to true to discard the previous compilation results. - deprecated: Start using compile.discard.result.enabled property.  
+    @type boolean
+    @scope public
+    @deprecated since 11.0
+    -->
+    
     <!-- Property declaration -->
     <!-- Suffix used in genxml related output files. This value is added into file names to show that they are genxml related. Used in log files, genxml output files and component list for EE images. Normally does not need to be set.
     @type string
@@ -55,6 +96,41 @@ Description:
     @scope private
     -->
     <property name="diamonds.compile.summary" location="${compile.log.dir}/${build.id}_compile_diamonds.xml" />
+    
+    <!--* @property sysdef3.enabled
+     This property enables sbs compilation based on system definition schema 3.0.0. 
+     @type boolean
+     @scope public
+     @editable required
+     @since 11.0
+     -->
+    
+    <!--* @property internal.sysdef3.enabled
+     To run the sysdef3 dependent tasks if sysdef3.enabled set to true. 
+     @type boolean
+     @scope private
+     -->
+     
+    <!-- Check is sysdef3 enabled. -->
+    <condition property="internal.sysdef3.enabled">
+        <istrue value="${sysdef3.enabled}" />
+    </condition>
+    
+    <!-- To check is it clean compilation -->
+    <condition property="internal.compile.cmd.clean.enabled" value="true" else="false">
+        <or>
+            <istrue value="${compile.cmd.clean.enabled}" />
+            <istrue value="${compile.cmd.clean}" />
+        </or>
+    </condition>
+    
+    <!-- To check is it required to discard old compilation results -->
+    <condition property="internal.compile.discard.result.enabled" value="true" else="false">
+        <or>
+            <istrue value="${compile.discard.result.enabled}" />
+            <istrue value="${compile.discard.result}" />
+        </or>
+    </condition> 
     
     <!-- including common compilation macros -->
     <hlm:typedef file="${helium.dir}/tools/compile/compile.antlib.xml" uri="http://www.nokia.com/helium"/>
@@ -81,7 +157,7 @@ Description:
     <target name="precompile" depends="create-canonical-sysdef-file,precompile-ec,run-coverity-configure"/>
 
     <!-- post operation for EC builds, submits the compile time and lists all the built components-->
-    <target name="postcompile" depends="postcompile-ec,render-build-duplicates,post-coverity" unless="env.HLM_SUBCON" />
+    <target name="postcompile" depends="postcompile-ec,render-build-duplicates,post-coverity,sbs-checksource" unless="env.HLM_SUBCON" />
     
     
     <!-- Pre-processes all System Definition input files.
@@ -141,22 +217,79 @@ self.addMappedName(path)
     <target name="create-canonical-sysdef-file" depends="preprocess-sysdef-files">
         <mkdir dir="${compile.log.dir}" />
         <if>
-            <istrue value="${schema.new}" />
+            <istrue value="${sysdef3.enabled}" />
             <then>
+                <for param="file" keepgoing="true">
+                    <resources refid="system.definition.files" />
+                    <sequential>
+                        <trycatch reference="internal.sysdef3.validation.error">
+                            <try>
+                                <xmlvalidate file="@{file}" lenient="true" />
+                            </try>
+                            <catch>
+                                <echo>ERROR: ${toString:internal.sysdef3.validation.error}</echo>
+                                <throw refid="internal.sysdef3.validation.error" />
+                            </catch>
+                        </trycatch>                        
+                    </sequential>
+                </for>
                 <mkdir dir="${temp.build.dir}/root" />
                 <mkdir dir="${temp.build.dir}/join" />
                 <delete>
                     <fileset dir="${temp.build.dir}/root" />
                     <fileset dir="${temp.build.dir}/join" />
                 </delete>
-                <!-- creating the root sysdef file for packages referenced directly -->
-                <hlm:createRootSysdef destFile="${temp.build.dir}/root/generated.root.xml" epocroot="${build.drive}/"
-                    checkPackageExists="${compile.cmd.clean}">
-                    <restrict>
-                        <resources refid="system.definition.files" />
-                        <rsel:name name="**${file.separator}package_definition.xml" />
-                    </restrict>
-                </hlm:createRootSysdef>
+                <if>
+                    <resourcecount when="ne" count="0">
+                        <restrict>
+                            <resources refid="system.definition.files" />
+                            <rsel:and>
+                                <rsel:name name="**${file.separator}package_definition.xml" />
+                                <rsel:not>
+                                    <hlm:isVendorPackage />
+                                </rsel:not>
+                            </rsel:and>
+                        </restrict>
+                    </resourcecount>
+                    <then>
+                        <!-- creating the root sysdef file for packages referenced directly -->
+                        <hlm:createRootSysdef destFile="${temp.build.dir}/root/generated.root.xml" epocroot="${build.drive}/"
+                            checkPackageExists="${internal.compile.cmd.clean.enabled}">
+                            <restrict>
+                                <resources refid="system.definition.files" />
+                                <rsel:and>
+                                    <rsel:name name="**${file.separator}package_definition.xml" />
+                                    <rsel:not>
+                                        <hlm:isVendorPackage />
+                                    </rsel:not>
+                                </rsel:and>
+                            </restrict>
+                        </hlm:createRootSysdef>
+                    </then>
+                </if>
+                <if>
+                    <resourcecount when="ne" count="0">
+                        <restrict>
+                            <resources refid="system.definition.files" />
+                            <rsel:and>
+                                <rsel:name name="**${file.separator}package_definition.xml" />
+                                <hlm:isVendorPackage />
+                            </rsel:and>
+                        </restrict>
+                    </resourcecount>
+                    <then>
+                        <hlm:createRootSysdef destFile="${temp.build.dir}/root/generated_vendor.root.xml" epocroot="${build.drive}/"
+                            checkPackageExists="${internal.compile.cmd.clean.enabled}">
+                            <restrict>
+                                <resources refid="system.definition.files" />
+                                <rsel:and>
+                                    <rsel:name name="**${file.separator}package_definition.xml" />
+                                    <hlm:isVendorPackage />
+                                </rsel:and>
+                            </restrict>
+                        </hlm:createRootSysdef>
+                    </then>
+                </if>
                 <!-- Joining all the Root sysdef files -->
                 <for param="file">
                     <path>
@@ -167,6 +300,7 @@ self.addMappedName(path)
                             </rsel:not>
                         </restrict>
                         <fileset dir="${temp.build.dir}/root" includes="generated.root.xml" />
+                        <fileset dir="${temp.build.dir}/root" includes="generated_vendor.root.xml" />
                     </path>
                     <sequential>
                         <hlm:joinSysdef epocroot="${build.drive}/" srcfile="@{file}" 
@@ -198,6 +332,9 @@ self.addMappedName(path)
                     <fileset dir="${temp.build.dir}/join" includes="**/*.xml" />
                 </hlm:mergeSysdef>
                 <hlm:assertFileExists file="${canonical.sysdef.file}" />
+                <hlm:metadatarecord database="${metadata.dbfile}">
+                    <hlm:sysdefmetadatainput file="${canonical.sysdef.file}" />
+                </hlm:metadatarecord>
             </then>
             <else>
                 <pathconvert pathsep=" " property="system.definition.files.list">
@@ -220,7 +357,7 @@ self.addMappedName(path)
         <antcall target="compile-configuration" inheritRefs="true">
             <param name="sysdef.configuration" value="${sysdef.clean.configuration}"/>
             <param name="compile.signal.input" value="compileCleanSignalInput"/>
-            <param name="compile.discard.result" value="true"/>
+            <param name="internal.compile.discard.result.enabled" value="true"/>
         </antcall>
     </target>
 
@@ -302,7 +439,7 @@ for line in fileinput.input(["${genxml.output.file}"], inplace=True):
             <then>
                 <if>
                     <not>
-                        <isfalse value="${compile.discard.result}"/>
+                        <isfalse value="${internal.compile.discard.result.enabled}"/>
                     </not>
                     <then>
                         <delete file="${compile.log.dir}/${build.id}.${sysdef.configuration}_compile.log.xml" failonerror="false"/>
@@ -329,7 +466,7 @@ for line in fileinput.input(["${genxml.output.file}"], inplace=True):
                       Only generate the log.xml if we want the results to be included in the final results
                       or get them used by the signaling mechanism.
                     -->
-                    <isfalse value="${compile.discard.result}"/>
+                    <isfalse value="${internal.compile.discard.result.enabled}"/>
                     <then>
                         <hlm:metadatarecord database="${metadata.dbfile}">
                             <hlm:abldmetadatainput>
@@ -337,7 +474,7 @@ for line in fileinput.input(["${genxml.output.file}"], inplace=True):
                                 <metadatafilterset refid="filterset.compile" />
                             </hlm:abldmetadatainput>
                         </hlm:metadatarecord>
-                        <hlm:compileLogSignalMacro compile.summary.file="${build.id}.${sysdef.configuration}_compile.log" 
+                        <hlm:compileLogSignalMacro compile.summary.file="${compile.log.dir}/${build.id}.${sysdef.configuration}_compile.log" 
                             error.limit="${build.errors.limit}" phase="compile"/>
                         <!-- Todo: metadata: insert assertions for metadata parsing here -->
                     </then>
@@ -373,70 +510,6 @@ for line in fileinput.input(["${genxml.output.file}"], inplace=True):
 
     <!-- Starts the actual compilation  phase of a build -->
     <target name="compile-main" depends="precompile,do-compile-main,postcompile"/>
-
-    <!-- Macro to preprocess build information -->
-    <scriptdef name="diamondsSummaryMacro" language="jython" uri="http://www.nokia.com/helium">
-        <attribute name="output"/>
-    <![CDATA[
-from xml.sax.handler import ContentHandler
-from xml.sax import make_parser
-from xml.sax.saxutils import quoteattr
-
-class DiamondsSummary(ContentHandler):
-    def __init__(self):
-        ContentHandler.__init__(self)
-        self.scanLog = False
-        self.components = {}
-        self.component = None
-        self.level = 0
-        self.total = {'error':0, 'critical':0, 'warning':0}
-
-    def startElement(self, name, attrs):
-        if name == 'log' and attrs.get('filename', None) != None and attrs.get('filename', '').endswith('_compile.log'):
-            self.scanLog = True
-        elif self.scanLog and name == "task":
-            self.level += 1
-
-        if self.scanLog and name == "task" and self.level == 2 and attrs.get('name', None) != None:
-            self.component = attrs.get('name', None)
-            if self.component not in self.components:
-                self.components[self.component] = {'error':0, 'critical':0, 'warning':0}
-
-        if self.scanLog and name == "message" and attrs.get('priority', None) != None:
-            if attrs.get('priority') in self.total:
-                self.total[attrs.get('priority')] += 1
-
-        if self.scanLog and name == "message" and self.level > 1 and self.component != None and attrs.get('priority', None) != None:
-            if attrs.get('priority') in self.components[self.component]:
-                self.components[self.component][attrs.get('priority')] += 1
-
-    def endElement(self, name):
-        if name == 'log':
-            self.scanLog = False
-            self.level = 0
-            self.component = None
-        elif name == 'task':
-            self.level = self.level - 1
-
-
-parser = make_parser()
-diamondsSummary = DiamondsSummary()
-parser.setContentHandler(diamondsSummary)
-parser.parse(open(str(project.getProperty('build.summary.file'))))
-
-output = '<?xml version="1.0"?>\n<compile>\n'
-output += '<components>\n'
-for name in diamondsSummary.components:
-    xname = quoteattr(name)
-    output += '<component name=%s error="%d" critical="%d" warning="%d" />\n' % (xname, diamondsSummary.components[name]['error'], diamondsSummary.components[name]['critical'], diamondsSummary.components[name]['warning'])
-    #print name + " ==> %d" % diamondsSummary.components[name]['error']
-output += '</components>\n'
-output += '<total error="%d" critical="%d" warning="%d" />\n' % (diamondsSummary.total['error'], diamondsSummary.total['critical'], diamondsSummary.total['warning'])
-output += '</compile>\n'
-self.log(str("Writing %s" % str(attributes.get('output'))))
-f = open(str(attributes.get('output')), 'w+')
-f.write(output)
-    ]]></scriptdef>
 
     <!-- Creates a .csv log of the sizes of all the binaries created in the build. -->
     <target name="binary-sizes-log" if="binary.sizes.output">
@@ -511,4 +584,6 @@ bnsizelogger.write2csvfile(r'${binary.sizes.output.file}', r'${sysdef.configurat
         <antcall target="dump-swicertstore"/>
         <antcall target="check-stub-sis"/>
     </target>
+
 </project>
+

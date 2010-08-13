@@ -23,13 +23,11 @@ import logging
 import unittest
 import tempfile
 import os
-from lxml import etree
-
+import amara
 import configuration
 import sis
 
 _logger = logging.getLogger('test.sis')
-
 
 class ArchivePreBuilderTest(unittest.TestCase):
     """ Tests for sis module. """
@@ -39,20 +37,20 @@ class ArchivePreBuilderTest(unittest.TestCase):
         data = {'name': 'foo',
                 'path': 'bar'}
         tree = self._setup_test_case(data)
-        assert tree.xpath("/project/target[@name='stage1']/parallel/*/arg/@line")[0] == '-v foo.pkg foo.sis'
+        assert tree.xml_xpath("/project/target[@name='stage1']/parallel/*/arg/@line")[0] == '-v foo.pkg foo.sis'
         
     def test_sis_v2(self):
         """ V2 config format. """
         data = {'input': 'foo.pkg'}
         tree = self._setup_test_case(data)
-        assert tree.xpath("/project/target[@name='stage1']/parallel/*/arg/@line")[0] == '-v foo.pkg foo.sis'
+        assert tree.xml_xpath("/project/target[@name='stage1']/parallel/*/arg/@line")[0] == '-v foo.pkg foo.sis'
 
     def test_sis_v2_1(self):
         """ V2 config format for sisx. """
         data = {'input': 'foo.pkg', 'output': 'foo.sisx'}
         tree = self._setup_test_case(data)
-        assert tree.xpath("/project/target[@name='stage1']/parallel/*/arg/@line")[0] == '-v foo.pkg foo.sis'
-        assert tree.xpath("/project/target[@name='stage2']/parallel/*/arg/@line")[0] == '-v foo.sis foo.sisx cert1 key1'
+        assert tree.xml_xpath("/project/target[@name='stage1']/parallel/*/arg/@line")[0] == '-v foo.pkg foo.sis'
+        assert tree.xml_xpath("/project/target[@name='stage2']/parallel/*/arg/@line")[0] == '-v foo.sis foo.sisx cert1 key1'
         
     def _setup_test_case(self, additional_data):
         """ Setup test case based on varying inputs. """
@@ -66,7 +64,7 @@ class ArchivePreBuilderTest(unittest.TestCase):
         sis_prebuilder = sis.SisPreBuilder(config)
         tmpfile = os.path.join(tempfile.mkdtemp(), 'test.xml')
         sis_prebuilder.write(tmpfile)
-        tree = etree.parse(tmpfile)
+        tree = amara.parse(open(tmpfile))
         return tree
     
 

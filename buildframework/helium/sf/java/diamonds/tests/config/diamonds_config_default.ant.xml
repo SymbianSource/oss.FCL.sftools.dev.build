@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : diamonds_config.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="diamonds-default-config" xmlns:hlm="http://www.nokia.com/helium">
+
+    <property name="diamonds.template-dir" value="${diamonds.unitest.dir}${file.separator}data${file.separator}templates" />
+    <property name="diamonds.smtp.server" value="${email.smtp.server}" />
+    <property name="diamonds.ldap.server" value="${email.ldap.server}" />
+    <property name="diamonds.initializer.targetname" value="diamonds" />
+    <property name="diamonds.tstamp.format" value="yyyy-MM-dd'T'HH:mm:ss" />
+    <property name="diamonds.category" value="${build.family}" />
+
+    <hlm:stage id="test-echo-operation" 
+        startTarget="test-echo-operation" endTarget="test-echo-operation" />
+    <hlm:stage id="test-echo-operation1" 
+        startTarget="test-echo-operation1" endTarget="test-echo-operation1" />
+    <hlm:stage id="test-echo-operation2" 
+        startTarget="test-echo-operation2" endTarget="test-echo-operation2" />
+    <hlm:stage id="test-echo-operation3" 
+        startTarget="test-echo-operation3" endTarget="test-echo-operation3" />
+    <hlm:stage id="test-echo-operation4" 
+        startTarget="test-echo-operation4" endTarget="test-echo-operation4" />
+    <hlm:stage id="test-echo-operation5" 
+        startTarget="test-echo-operation5" endTarget="test-echo-operation5" />
+
+<!--
+    <stage name="build" start="compile-target" end="compile-target"
+        logfile="${ant['compile.log.input']}"/>
+        -->
+    <hlm:stage id="stage-sequence-1" startTarget="test-buildid-set" endTarget="test-version"
+        />
+    <hlm:stage id="stage-sequence-2" startTarget="test-buildid-set" endTarget="test-defer-type"
+        />
+
+    <hlm:stage id="invalid-template-sequence" startTarget="test-buildid-set" endTarget="test-invalid-template-file"/>
+
+    <hlm:fmppMessage id="initial.message" sourceFile="${diamonds.template-dir}/diamonds_start.xml.ftl">
+        <data expandProperties="yes">
+            ant: antProperties()
+        </data>
+    </hlm:fmppMessage>
+
+    <hlm:fmppMessage id="final.message" sourceFile="${diamonds.template-dir}/diamonds_finish.xml.ftl">
+        <data expandProperties="yes">
+            ant: antProperties()
+        </data>
+    </hlm:fmppMessage>
+
+    <hlm:fmppMessage id="diamonds.signal.message" sourceFile="${diamonds.template-dir}/diamonds_signal.xml.ftl">
+        <data expandProperties="yes">
+            ant: antProperties()
+        </data>
+    </hlm:fmppMessage>
+
+    <hlm:fmppMessage id="diamonds.status.message" sourceFile="${diamonds.template-dir}/diamonds_status.xml.ftl">
+        <data expandProperties="yes">
+            ant: antProperties()
+        </data>
+    </hlm:fmppMessage>
+
+    <hlm:fmppMessage id="stage.time.message" sourceFile="${diamonds.template-dir}/diamonds_stage.xml.ftl">
+        <data expandProperties="yes">
+            ant: antProperties()
+        </data>
+    </hlm:fmppMessage>
+
+
+    <hlm:targetMessageTrigger id="codescanner.id" target="codescanner">
+        <hlm:fmppMessage sourceFile="${diamonds.template-dir}/codescanner.xml.ftl">
+            <data expandProperties="yes">
+                ant: antProperties()
+            </data>
+        </hlm:fmppMessage>
+    </hlm:targetMessageTrigger>
+
+    <hlm:targetMessageTrigger id="test-buildid-set.id" target="test-buildid-set">
+        <hlm:fmppMessage sourceFile="${diamonds.template-dir}/tool.xml.ftl">
+            <data expandProperties="yes">
+                ant: antProperties()
+            </data>
+        </hlm:fmppMessage>
+    </hlm:targetMessageTrigger>
+    
+    <hlm:targetMessageTrigger id="invalid-ant-properties-input.id" target="invalid-ant-properties-input">
+        <hlm:fmppMessage sourceFile="${diamonds.template-dir}${file.separator}invalid-ant-properties-input-file.ftl">
+            <data expandProperties="yes">
+                ant: antProperties()
+            </data>
+        </hlm:fmppMessage>
+    </hlm:targetMessageTrigger>
+
+    <hlm:targetMessageTrigger id="invalid-diamonds-server-properties.id" target="invalid-diamonds-server-properties">
+        <hlm:fmppMessage sourceFile="${diamonds.template-dir}/tool.xml.ftl">
+            <data expandProperties="yes">
+                ant: antProperties()
+            </data>
+        </hlm:fmppMessage>
+    </hlm:targetMessageTrigger>
+    
+</project>

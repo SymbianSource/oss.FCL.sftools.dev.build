@@ -31,8 +31,7 @@ Description:
       <artifact type="egg"/>
   </publications>
   <dependencies>
-      <dependency org="amara" name="amara" rev="latest.integration" conf="default" />
-      <dependency org="lxml" name="lxml" rev="latest.integration" conf="default" />
+      <dependency org="py_dom_xpath" name="py_dom_xpath" rev="latest.integration" conf="default" />
       <dependency org="org.apache.commons" name="commons-io" rev="latest.integration" conf="default" />
       <dependency org="mocker" name="mocker" rev="latest.integration" conf="default" />
       <dependency org="path" name="path" rev="latest.integration" conf="default" />

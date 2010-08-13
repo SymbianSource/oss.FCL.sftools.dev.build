@@ -17,15 +17,15 @@
  
 package com.nokia.helium.imaker.ant.types;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Vector;
+
 import org.apache.tools.ant.types.DataType;
 
 import com.nokia.helium.imaker.IMaker;
 import com.nokia.helium.imaker.ant.Command;
 import com.nokia.helium.imaker.ant.IMakerCommandSet;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Vector;
 
 /**
  * Set of iMaker configuration.

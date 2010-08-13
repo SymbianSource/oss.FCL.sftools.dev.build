@@ -1,4 +1,4 @@
-priority,regex,description
+severity,regex,description
 CRITICAL,.*Error:.*mingw_make\.exe.*,
 ERROR,.*\): Missing file:.*, 
 ERROR,(?:(?:\s*\d+\)\s*)|(?:\s*\*\*\*\s*))ERROR:.*,

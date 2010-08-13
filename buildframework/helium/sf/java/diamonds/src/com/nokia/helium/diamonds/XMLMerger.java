@@ -19,12 +19,13 @@
 package com.nokia.helium.diamonds;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.util.Iterator;
-import java.util.List;
+import java.io.InputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.Iterator;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.dom4j.Attribute;
@@ -41,9 +42,10 @@ import org.dom4j.io.XMLWriter;
  */
 public class XMLMerger {
     private Logger log = Logger.getLogger(getClass());
-    private File merge;
+    private InputStream mergeStream;
     private Document doc;
     private Element root;
+    private File outputFile;
 
     /**
      * Create an XMLMerger, the merge file will be used as input and output.
@@ -51,18 +53,40 @@ public class XMLMerger {
      * @param merge
      * @throws XMLMergerException
      */
-    public XMLMerger(File merge) throws XMLMergerException {
-        log.debug("Merging into: " + merge.getAbsolutePath());
+    public XMLMerger(InputStream stream, File file) throws XMLMergerException {
         try {
-            this.merge = merge;
+            outputFile = file;
+            mergeStream = stream;
             SAXReader reader = new SAXReader();
-            doc = reader.read(merge);
+            doc = reader.read(mergeStream);
             root = doc.getRootElement();
         } catch (DocumentException e) {
             throw new XMLMergerException(e.getMessage());
         }        
     }
+
+    public void merge(InputStream stream) throws XMLMergerException {
+        try {
+            SAXReader reader = new SAXReader();
+            Document dataDoc = reader.read(stream);
+            merge(dataDoc);
+        } catch (DocumentException e) {
+            throw new XMLMergerException(e.getMessage());
+        }
+    }
     
+    private void merge(Document dataDoc) throws XMLMergerException {
+        Element dataRoot = dataDoc.getRootElement();
+        if (!root.getName().equals(dataRoot.getName())) {
+            throw new XMLMergerException(
+                    "Trying to merge incompatible xml format ('"
+                            + root.getName() + "'!='" + dataRoot.getName()
+                            + "')");
+        }
+        mergeNode(root, dataRoot);
+        write();
+        
+    }
     /**
      * Add all sub element of data file into the merged file. If the root
      * element name is different for the merged file an XMLMergerException is
@@ -78,14 +102,7 @@ public class XMLMerger {
             SAXReader reader = new SAXReader();
             Document dataDoc = reader.read(data);
             Element dataRoot = dataDoc.getRootElement();
-            if (!root.getName().equals(dataRoot.getName())) {
-                throw new XMLMergerException(
-                        "Trying to merge incompatible xml format ('"
-                                + root.getName() + "'!='" + dataRoot.getName()
-                                + "')");
-            }
-            mergeNode(root, dataRoot);
-            write();
+            merge(dataDoc);
         } catch (DocumentException e) {
             throw new XMLMergerException(e.getMessage());
         }
@@ -131,20 +148,24 @@ public class XMLMerger {
     @SuppressWarnings("unchecked")
     protected boolean areSame(Element a, Element b) {
         log.debug("areSame:" + a + " <=> " + b);
-        if (!a.getName().equals(b.getName()))
+        if (!a.getName().equals(b.getName())) {
             return false;
+        }
         log.debug("same attribute list size?");
-        if (a.attributes().size() != b.attributes().size())
+        if (a.attributes().size() != b.attributes().size()) {
             return false;
+        }
         log.debug("same attribute list?");
         for (Iterator<Attribute> at = a.attributes().iterator(); at.hasNext();) {
             Attribute attra = at.next();
             Attribute attrb = b.attribute(attra.getName());
-            if (attrb == null || !attra.getValue().equals(attrb.getValue()))
+            if (attrb == null || !attra.getValue().equals(attrb.getValue())) {
                 return false;
+            }
         }
-        if (!a.getTextTrim().equals(b.getTextTrim()))
+        if (!a.getTextTrim().equals(b.getTextTrim())) {
             return false;
+        }
         return true;
     }
 
@@ -153,9 +174,8 @@ public class XMLMerger {
      * @throws XMLMergerException
      */
     protected void write() throws XMLMergerException {
-        log.debug("Writing " + merge.getAbsolutePath());
         try {
-            FileOutputStream fos = new FileOutputStream(merge);
+            FileOutputStream fos = new FileOutputStream(outputFile);
             OutputFormat format = OutputFormat.createPrettyPrint();
             XMLWriter writer = new XMLWriter(fos, format);
             writer.write(doc);

@@ -17,6 +17,8 @@
 
 package com.nokia.helium.ant.data.tests;
 
+import static org.junit.Assert.assertTrue;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -28,7 +30,6 @@ import org.dom4j.DocumentException;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Node;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 import com.nokia.helium.ant.data.Database;
 
@@ -81,5 +82,33 @@ public class TestMeta {
         assertTrue(macro.valueOf("name").equals("test_macro"));
         assertTrue(macro.valueOf("scope").equals("public"));
         assertTrue(macro.valueOf("deprecated").equals(""));
+    }
+    
+    @Test
+    public void testProjectMetaScope() throws IOException, DocumentException {
+        readPropertyTotal("public", 3);
+        readPropertyTotal("private", 7);
+    }
+
+    private void readPropertyTotal(String scope, int total) throws IOException, DocumentException {
+        Database db = new Database(null, scope);
+        List<String> paths = new ArrayList<String>();
+        File testAntFile = new File(System.getProperty("testdir"), "tests/data/test_project_scopes.ant.xml");
+        paths.add(testAntFile.getCanonicalPath());
+        db.setScopeFilter(scope);
+        db.addAntFilePaths(paths);
+        StringWriter out = new StringWriter();
+        db.toXML(out);
+
+        Document doc = DocumentHelper.parseText(out.toString());
+        System.out.println(doc.asXML());
+
+        Node database = doc.selectSingleNode("//antDatabase");
+        
+        Node project = database.selectSingleNode("project");
+
+        List properties = project.selectNodes("property");
+        System.out.println(properties.size());
+        assertTrue(properties.size() == total);
     }
 }

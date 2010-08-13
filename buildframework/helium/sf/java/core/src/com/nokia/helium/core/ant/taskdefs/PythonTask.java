@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 
 import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.taskdefs.ExecTask;
 import org.apache.tools.ant.types.Commandline;
@@ -153,11 +154,12 @@ public class PythonTask extends Task {
             execTask.setOutput(output);
             try {
                 execTask.execute();
-            } catch (BuildException t) {
-                if (iFailonerror)
-                    throw new BuildException(t.getMessage());
-                else
-                    log(t.getMessage(), 0); // MSG_ERR=0
+            } catch (BuildException ex) {
+                if (iFailonerror) {
+                    throw new BuildException(ex.getMessage(), ex);
+                } else {
+                    log(ex.getMessage(), Project.MSG_ERR);
+                }
             }
         } else if (iText != null) {
             // Write the content of the script using Echo task
@@ -188,15 +190,16 @@ public class PythonTask extends Task {
                 if (!fileDeleted && iFailonerror) {
                     throw new BuildException("Could not delete script file!");
                 }
-            } catch (IOException e) {
+            } catch (IOException ex) {
                 if (iFailonerror) {
-                    throw new BuildException(e.getMessage());
+                    throw new BuildException(ex.getMessage(), ex);
                 }
-                log("Error while running python task " + e.getMessage());
+                log("Error while running python task: " + ex.getMessage(), Project.MSG_ERR);
             } finally {
                 // make sure we delete the file anyway
-                if (tempfile != null)
+                if (tempfile != null) {
                     tempfile.delete();
+                }
             }
         }
     }

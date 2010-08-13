@@ -16,12 +16,13 @@
 */
 package com.nokia.helium.core.plexus.tests;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import hidden.org.codehaus.plexus.interpolation.os.Os;
 
 import java.util.Hashtable;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 import com.nokia.helium.core.plexus.CommandBase;
 import com.nokia.helium.core.plexus.StreamRecorder;

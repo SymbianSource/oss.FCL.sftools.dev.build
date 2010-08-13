@@ -19,20 +19,27 @@ package com.nokia.helium.core;
 
 import java.util.Arrays;
 import java.util.Properties;
-import java.util.Hashtable;
 import java.util.zip.GZIPOutputStream;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import javax.mail.*;
-import javax.mail.internet.*;
-import javax.naming.*;
-import javax.naming.directory.*;
+
+import javax.mail.BodyPart;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 
 import javax.activation.DataHandler;
 import javax.mail.util.ByteArrayDataSource;
+import javax.mail.internet.AddressException;
+
 import org.apache.log4j.Logger;
 import org.apache.commons.io.FileUtils;
 
@@ -46,7 +53,7 @@ public class EmailDataSender {
 
     // Address email is sent from
     private String from;
-    
+
     // The target address
     private String[] toAddressList;
 
@@ -57,18 +64,15 @@ public class EmailDataSender {
 
     // Configured smtp server address
     private String smtpServerAddress;
+
     /**
-    * Constructor
-    * 
-    * @param String
-    *            comma separeted email recepients list
-    * @param String
-    *            smtp server 
-    * @param String
-    *            ldap server
-    */
-    public EmailDataSender(String toStrings, String smtpServer,
-            String ldapAddress) {
+     * Constructor
+     * 
+     * @param String comma separeted email recepients list
+     * @param String smtp server
+     * @param String ldap server
+     */
+    public EmailDataSender(String toStrings, String smtpServer, String ldapAddress) {
         if (toStrings != null) {
             String[] splitList = toStrings.split(",");
             toAddressList = splitList;
@@ -76,152 +80,128 @@ public class EmailDataSender {
         smtpServerAddress = smtpServer;
         ldapURL = ldapAddress;
     }
+
     /**
-    * Constructor
-    * 
-    * @param String
-    *            email recepient list in array
-    * @param String
-    *            smtp server 
-    * @param String
-    *            ldap server
-    */
-    public EmailDataSender(String[] toList, String smtpServer,
-            String ldapAddress) {
+     * Constructor
+     * 
+     * @param String email recepient list in array
+     * @param String smtp server
+     * @param String ldap server
+     */
+    public EmailDataSender(String[] toList, String smtpServer, String ldapAddress) {
         toAddressList = toList;
         smtpServerAddress = smtpServer;
         ldapURL = ldapAddress;
     }
+
     /**
-    * Constructor
-    * 
-    * @param String
-    *            email recepients list in array
-    * @param String
-    *            smtp server 
-    * @param String
-    *            ldap server
-    * @param String
-    *            root domain in ldap server
-    */
-    public EmailDataSender(String[] toList, String smtpServer,
-            String ldapAddress, String rootdn) {
+     * Constructor
+     * 
+     * @param String email recepients list in array
+     * @param String smtp server
+     * @param String ldap server
+     * @param String root domain in ldap server
+     */
+    public EmailDataSender(String[] toList, String smtpServer, String ldapAddress, String rootdn) {
         toAddressList = toList;
         smtpServerAddress = smtpServer;
         ldapURL = ldapAddress;
         this.rootdn = rootdn;
     }
+
     /**
-    * Set sender address.
-    *
-    * @param String
-    *            mail sender address
-    */
+     * Set sender address.
+     * 
+     * @param String mail sender address
+     */
     public void setFrom(String from) {
         this.from = from;
     }
+
     /**
-    * Add current user to recipient list.
-    *    
-    */
-    public void addCurrentUserToAddressList() {
+     * Add current user to recipient list.
+     * 
+     */
+    public void addCurrentUserToAddressList() throws EmailSendException {
         // Create an empty array if needed
-        if (toAddressList == null)
+        if (toAddressList == null) {
             toAddressList = new String[0];
+        }
         try {
-            String userEmail;
-            userEmail = getUserEmail();
-            toAddressList = Arrays.copyOf(toAddressList,
-                    toAddressList.length + 1);
-            toAddressList[toAddressList.length - 1] = userEmail;
-        } catch (javax.mail.internet.AddressException e) {
-            return;    //does this so that it passes checkstyle and builds
-        } catch (javax.naming.NamingException e) {
-            return;    //without it build complains that errors are thrown and not caught
-                       //methods are used else where and are caught and exercised.
+            String[] tmpToAddressList = Arrays.copyOf(toAddressList, toAddressList.length + 1);
+            tmpToAddressList[tmpToAddressList.length - 1] = getUserEmail();
+            toAddressList = tmpToAddressList;
+        } catch (LDAPException ex) {
+            throw new EmailSendException(ex.getMessage(), ex);
         }
     }
+
     /**
-    * Get recipient address list.
-    * 
-    * @return
-    *       Recipient address list.
-    */
+     * Get recipient address list.
+     * 
+     * @return Recipient address list.
+     */
     private InternetAddress[] getToAddressList() {
         int toListLength = 0;
-        if (toAddressList != null)
+        if (toAddressList != null) {
             toListLength = toAddressList.length;
+        }
         InternetAddress[] addressList = new InternetAddress[toListLength];
         try {
-            log.debug("getToAddressList:length: "
-                    + toListLength);
+            log.debug("getToAddressList:length: " + toListLength);
             for (int i = 0; i < toListLength; i++) {
-                log.debug("getToAddressList:address:"
-                        + toAddressList[i]);
+                log.debug("getToAddressList:address:" + toAddressList[i]);
                 addressList[i] = new InternetAddress(toAddressList[i]);
             }
-        } catch (javax.mail.internet.AddressException aex) {
+        }
+        catch (AddressException aex) {
             log.error("AddressException: " + aex);
         }
         return addressList;
     }
+
     /**
-    * Send xml data without compression
-    * 
-    * @param String
-    *            purpose of this email
-    * @param String
-    *            file to send 
-    * @param String
-    *            mime type
-    * @param String
-    *            subject of email
-    * @param String
-    *            header of email
-    */
-    public void sendData(String purpose, String fileToSend, String mimeType,
-            String subject, String header) {
+     * Send xml data without compression
+     * 
+     * @param String purpose of this email
+     * @param String file to send
+     * @param String mime type
+     * @param String subject of email
+     * @param String header of email
+     */
+    public void sendData(String purpose, File fileToSend, String mimeType,
+            String subject, String header) throws EmailSendException {
         sendData(purpose, fileToSend, mimeType, subject, header, false);
     }
 
-   
     /**
-    * Sending the XML data(compressed) through email.
-    * 
-    * @param String
-    *            purpose of this email
-    * @param String
-    *            file to send     
-    * @param String
-    *            subject of email
-    * @param String
-    *            header of email
-    */
-    public void compresseAndSendData(String purpose, String fileToSend,
-            String subject, String header) {
+     * Sending the XML data(compressed) through email.
+     * 
+     * @param String purpose of this email
+     * @param String file to send
+     * @param String subject of email
+     * @param String header of email
+     */
+    public void compresseAndSendData(String purpose, File fileToSend,
+            String subject, String header) throws EmailSendException {
         sendData(purpose, fileToSend, null, subject, header, true);
     }
+
     /**
-    * Send xml data 
-    * 
-    * @param String
-    *            purpose of this email
-    * @param String
-    *            file to send 
-    * @param String
-    *            mime type
-    * @param String
-    *            subject of email
-    * @param String
-    *            header of mail
-    * @param boolean
-    *            compress data if true
-    */
-    public void sendData(String purpose, String fileToSend, String mimeType,
-            String subject, String header, boolean compressData) {
+     * Send xml data
+     * 
+     * @param String purpose of this email
+     * @param String file to send
+     * @param String mime type
+     * @param String subject of email
+     * @param String header of mail
+     * @param boolean compress data if true
+     */
+    public void sendData(String purpose, File fileToSend, String mimeType,
+            String subject, String header, boolean compressData) throws EmailSendException {
         try {
             log.debug("sendData:Send file: " + fileToSend + " and mimetype: " + mimeType);
-            if (fileToSend != null) {
+            if (fileToSend != null && fileToSend.exists()) {
                 InternetAddress[] toAddresses = getToAddressList();
                 Properties props = new Properties();
                 if (smtpServerAddress != null) {
@@ -230,27 +210,22 @@ public class EmailDataSender {
                 }
                 Session mailSession = Session.getDefaultInstance(props, null);
                 MimeMessage message = new MimeMessage(mailSession);
-                String subjectToSend = subject;
-                if (subject == null) {
-                    subjectToSend = "";
-                }
-                message.setSubject(subjectToSend);
+                message.setSubject(subject == null ? "" : subject);
                 MimeMultipart multipart = new MimeMultipart("related");
                 BodyPart messageBodyPart = new MimeBodyPart();
                 ByteArrayDataSource dataSrc = null;
-                String fileName = new File(fileToSend).getName();
+                String fileName = fileToSend.getName();
                 if (compressData) {
                     log.debug("Sending compressed data");
                     dataSrc = compressFile(fileToSend);
                     dataSrc.setName(fileName + ".gz");
                     messageBodyPart.setFileName(fileName + ".gz");
-                } else {
+                }
+                else {
                     log.debug("Sending uncompressed data:");
-                    dataSrc = new ByteArrayDataSource(new FileInputStream(
-                            new File(fileToSend)), mimeType);
+                    dataSrc = new ByteArrayDataSource(new FileInputStream(fileToSend), mimeType);
 
-                    message.setContent(FileUtils.readFileToString(new File(
-                            fileToSend)), "text/html");
+                    message.setContent(FileUtils.readFileToString(fileToSend), "text/html");
                     multipart = null;
                 }
                 String headerToSend = null;
@@ -266,113 +241,82 @@ public class EmailDataSender {
                     message.setContent(multipart);
                 }
                 try {
-                    InternetAddress fromAddress = getFromAddress(); 
-                    message.setFrom(fromAddress);
-                } catch (HlmAntLibException e) {
-                    // We are Ignoring the errors as no need to fail the build.
-                    log.debug("Error retrieving current user email address: " + e.getMessage(), e);                    
-                } catch (javax.mail.internet.AddressException e) {
-                    // We are Ignoring the errors as no need to fail the build.
-                    log.debug("Error retrieving current user email address: " + e.getMessage(), e);
-                } catch (javax.naming.NamingException e) {
-                    // We are Ignoring the errors as no need to fail the build.
-                    log.debug("Error retrieving current user email address: " + e.getMessage(), e);
+                    message.setFrom(getFromAddress());
+                }
+                catch (AddressException e) {
+                    throw new EmailSendException("Error retrieving the from address: " + e.getMessage(), e);
+                } catch (LDAPException e) {
+                    throw new EmailSendException("Error retrieving the from address: " + e.getMessage(), e);
                 }
                 message.addRecipients(Message.RecipientType.TO, toAddresses);
                 log.info("Sending email alert: " + subject);
                 Transport.send(message);
             }
-        } catch (javax.mail.MessagingException e) {
-            String errorMessage = e.getMessage();
+        } catch (MessagingException e) {
             String fullErrorMessage = "Failed sending e-mail: " + purpose;
-            if (errorMessage != null) {
-                fullErrorMessage += " " + errorMessage;
+            if (e.getMessage() != null) {
+                fullErrorMessage += ": " + e.getMessage();
             }
-        } catch (java.io.IOException e) {
-            String errorMessage = e.getMessage();
+            throw new EmailSendException(fullErrorMessage, e);
+        } catch (IOException e) {
             String fullErrorMessage = "Failed sending e-mail: " + purpose;
-            if (errorMessage != null) {
-                fullErrorMessage += " " + errorMessage;
+            if (e.getMessage() != null) {
+                fullErrorMessage += ": " + e.getMessage();
             }
             // We are Ignoring the errors as no need to fail the build.
-            log.info(fullErrorMessage);
+            throw new EmailSendException(fullErrorMessage, e);
         }
     }
 
     /**
      * GZipping a string.
      * 
-     * @param data
-     *            the content to be gzipped.
-     * @param filename
-     *            the name for the file.
+     * @param data the content to be gzipped.
+     * @param filename the name for the file.
      * @return a ByteArrayDataSource.
      */
-    protected ByteArrayDataSource compressFile(String fileName)
-            throws IOException {
+    protected ByteArrayDataSource compressFile(File fileName) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         GZIPOutputStream gz = new GZIPOutputStream(out);
-        BufferedInputStream bufferedInputStream = new BufferedInputStream(
-                new FileInputStream(new File(fileName)));
+        BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(fileName));
         byte[] dataBuffer = new byte[512];
         while ((bufferedInputStream.read(dataBuffer)) != -1) {
             gz.write(dataBuffer);
         }
         gz.close();
         bufferedInputStream.close();
-        ByteArrayDataSource dataSrc = new ByteArrayDataSource(
-                out.toByteArray(), "application/x-gzip");
+        ByteArrayDataSource dataSrc = new ByteArrayDataSource(out.toByteArray(), "application/x-gzip");
         return dataSrc;
     }
+
     /**
-    * Get sender address.
-    * 
-    * @return
-    *       sender address.
-    */
-    private InternetAddress getFromAddress() throws javax.mail.internet.AddressException, javax.naming.NamingException {
+     * Get sender address.
+     * 
+     * @return sender address.
+     * @throws AddressException 
+     * @throws LDAPException 
+     */
+    private InternetAddress getFromAddress() throws AddressException, LDAPException {
         if (from != null) {
             return new InternetAddress(from);
         }
         return new InternetAddress(getUserEmail());
     }
-    
+
     /**
      * Getting user email.
      * 
-     * @return
-     *    the user email address.
+     * @return the user email address.
      */
-    protected String getUserEmail() throws javax.mail.internet.AddressException, javax.naming.NamingException {
-        String username = System.getProperty("user.name");
-        log.debug("EmailDataSender:getUserEmail:username: " + username);
-
-        // Set up environment for creating initial context
-        Hashtable<String, String> env = new Hashtable<String, String>(11);
-        env.put(Context.INITIAL_CONTEXT_FACTORY,
-                "com.sun.jndi.ldap.LdapCtxFactory");
-        env.put(Context.PROVIDER_URL, ldapURL + "/" + rootdn);
-
-        // Create initial context
-        DirContext ctx = new InitialDirContext(env);
-        SearchControls controls = new SearchControls();
-        controls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-        try {
-            NamingEnumeration<SearchResult> en = ctx.search("", "uid=" + username, controls);
-            if (en.hasMore()) {
-                SearchResult sr = en.next();
-                if (sr.getAttributes().get("mail") != null) {
-                    String email = (String) sr.getAttributes().get("mail").get();
-                    log.debug("getUserEmail:" + email);
-                    return email;
-                }
+    protected String getUserEmail() throws LDAPException {
+        if (ldapURL != null) {
+            LDAPHelper helper = new LDAPHelper(this.ldapURL, this.rootdn);
+            String email = helper.getUserAttributeAsString(LDAPHelper.EMAIL_ATTRIBUTE_NAME);
+            if (email == null) {
+                throw new LDAPException("Could not find email for current user. (" + System.getProperty("user.name") + ")");
             }
-        } catch (javax.naming.NameNotFoundException ex) {
-            throw new HlmAntLibException("Error finding user email for " + username );
+            return email;
         }
-        throw new HlmAntLibException("Could not find user email in LDAP.");
+        throw new LDAPException("LDAP url is not defined.");
     }
 }
-
-
-

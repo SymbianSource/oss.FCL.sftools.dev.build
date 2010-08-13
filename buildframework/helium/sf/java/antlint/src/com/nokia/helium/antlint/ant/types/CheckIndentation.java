@@ -17,12 +17,13 @@
 package com.nokia.helium.antlint.ant.types;
 
 import java.io.File;
+import java.io.IOException;
 
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-import javax.xml.parsers.ParserConfigurationException;
+
 import org.xml.sax.SAXException;
-import java.io.IOException;
 
 import com.nokia.helium.antlint.AntLintHandler;
 import com.nokia.helium.antlint.ant.AntlintException;

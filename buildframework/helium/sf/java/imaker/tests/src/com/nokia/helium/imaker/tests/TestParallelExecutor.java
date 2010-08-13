@@ -17,7 +17,9 @@
 package com.nokia.helium.imaker.tests;
 
 import java.io.File;
+
 import org.junit.Test;
+
 import com.nokia.helium.imaker.utils.ParallelExecutor;
 
 /**

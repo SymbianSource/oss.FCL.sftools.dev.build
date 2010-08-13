@@ -80,7 +80,7 @@ Description:
     </target>
 
     <target name="test-nested-filterset-missing-filter-attribute">
-        <au:expectfailure expectedMessage="'filter' attribute is not defined.">
+        <au:expectfailure expectedMessage="'filter' or/and 'idlist' attribute is not defined.">
         <hlm:filterSysdef epocroot="${epocroot}" srcfile="../data/filter/canonical_system_definition.xml" 
             destfile="${epocroot.temp}/filtered.xml">
             <filterSet>
@@ -102,6 +102,102 @@ Description:
             destfile="${epocroot.temp}/filtered.xml">
             <filterSet refid="filters.id" />
             <hlm:sysdefFilterSet refid="filters2.id"/>
+        </hlm:filterSysdef>
+        <au:assertFileExists file="${epocroot.temp}/filtered.xml" />
+    </target>
+
+    <target name="test-nested-filterset-verbatim">
+        <hlm:filterSysdef epocroot="${epocroot}" srcfile="../data/filter/canonical_system_definition.xml" 
+            destfile="${epocroot.temp}/filtered.xml">
+            <filterSet>
+                <filter filter="test" type="has" verbatim="component"/>
+            </filterSet>
+        </hlm:filterSysdef>
+        <au:assertFileExists file="${epocroot.temp}/filtered.xml" />
+    </target>
+    
+    <target name="test-nested-filterset-verbatim-nofilter">
+        <hlm:filterSysdef epocroot="${epocroot}" srcfile="../data/filter/canonical_system_definition.xml" 
+            destfile="${epocroot.temp}/filtered.xml">
+            <filterSet>
+                <filter verbatim="component"/>
+            </filterSet>
+        </hlm:filterSysdef>
+        <au:assertFileExists file="${epocroot.temp}/filtered.xml" />
+    </target>
+    
+    <target name="test-nested-filterset-with-config-missing-file-attribute">
+        <au:expectfailure expectedMessage="'file' attribute is not defined.">
+            <hlm:filterSysdef epocroot="${epocroot}" srcfile="../data/filter/canonical_system_definition.xml" 
+                    destfile="${epocroot.temp}/filtered.xml">
+                <filterSet>
+                    <config />
+                </filterSet>
+            </hlm:filterSysdef>
+        </au:expectfailure>
+    </target>
+
+    <target name="test-nested-filterset-with-config-missing-invalid-file">
+        <au:expectfailure expectedMessage="Could not find file:">
+            <hlm:filterSysdef epocroot="${epocroot}" srcfile="../data/filter/canonical_system_definition.xml" 
+                    destfile="${epocroot.temp}/filtered.xml">
+                <filterSet>
+                    <config file="invalid_config.hrh"/>
+                </filterSet>
+            </hlm:filterSysdef>
+        </au:expectfailure>
+    </target>
+	
+    <target name="test-nested-filterset-with-config-missing-valid-file">
+        <hlm:filterSysdef epocroot="${epocroot}" srcfile="../data/filter/canonical_system_definition.xml" 
+                destfile="${epocroot.temp}/filtered.xml">
+            <filterSet>
+                <config file="../data/filter/config/config.hrh"/>
+            </filterSet>
+        </hlm:filterSysdef>
+        <au:assertFileExists file="${epocroot.temp}/filtered.xml" />
+        <au:assertLogContains text="-config" />
+        <au:assertLogContains text="-output" />
+        <au:assertLogDoesntContain text="-I" />
+    </target>
+
+
+	
+    <target name="test-nested-filterset-with-config-missing-valid-file-and-includes">
+        <hlm:filterSysdef epocroot="${epocroot}" srcfile="../data/filter/canonical_system_definition.xml" 
+                destfile="${epocroot.temp}/filtered.xml">
+            <filterSet>
+                <config file="../data/filter/config/config.hrh"
+                	includes="${epocroot.temp}/epoc32/include${path.separator}${epocroot.temp}/epoc32/config"/>
+            </filterSet>
+        </hlm:filterSysdef>
+        <au:assertFileExists file="${epocroot.temp}/filtered.xml" />
+        <au:assertLogContains text="-config" />
+        <au:assertLogContains text="-output" />
+        <au:assertLogContains text="-I${epocroot.temp}${file.separator}epoc32${file.separator}include" />
+        <au:assertLogContains text="-I${epocroot.temp}${file.separator}epoc32${file.separator}config" />
+    </target>
+
+    <target name="test-nested-filterset-with-config-check-property-for-home-invalid">
+    	<property name="sysdef.tools.home" location="../../demo/data/invalid_dir" />
+        <au:expectfailure expectedMessage="The sysdef.tools.home property refers to an invalid directory:">
+            <hlm:filterSysdef epocroot="${epocroot}" srcfile="../data/filter/canonical_system_definition.xml" 
+                destfile="${epocroot.temp}/filtered.xml">
+                <filterSet>
+                    <config file="../data/filter/config/config.hrh"/>
+                </filterSet>
+            </hlm:filterSysdef>
+        </au:expectfailure>
+        <au:assertFileDoesntExist file="${epocroot.temp}/filtered.xml" />
+    </target>
+
+    <target name="test-nested-filterset-with-config-check-property-for-home">
+        <property name="sysdef.tools.home" location="../../demo/data/sf/os/buildtools/bldsystemtools/sysdeftools" />
+        <hlm:filterSysdef epocroot="${epocroot}" srcfile="../data/filter/canonical_system_definition.xml" 
+            destfile="${epocroot.temp}/filtered.xml">
+            <filterSet>
+                <config file="../data/filter/config/config.hrh"/>
+            </filterSet>
         </hlm:filterSysdef>
         <au:assertFileExists file="${epocroot.temp}/filtered.xml" />
     </target>

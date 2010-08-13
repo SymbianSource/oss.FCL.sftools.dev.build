@@ -25,7 +25,6 @@ Description:
     <description>
         Ant task definition declarations.
     </description>
-
     
     <path id="lib.path">
         <fileset dir="${helium.dir}/external/antlibs2" includes="**/*.jar"/>
@@ -48,7 +47,20 @@ Description:
     <!-- Nokia internal tasks. -->
     <taskdef resource="com/nokia/ant/antlib.xml" classpathref="lib.path" uri="http://www.nokia.com/helium"/>
     <taskdef resource="com/nokia/helium/ant/data/antlib.xml" classpathref="lib.path" uri="http://www.nokia.com/helium"/>
-    
+    <taskdef resource="com/nokia/helium/core/ant/antlib.xml" uri="http://www.nokia.com/helium"/>
+    <taskdef resource="com/nokia/helium/environment/ant/antlib.xml" classpathref="lib.path" uri="http://www.nokia.com/helium"/>
+    <taskdef resource="com/nokia/helium/signal/ant/antlib.xml" uri="http://www.nokia.com/helium"/>
+    <taskdef resource="com/nokia/helium/scm/ant/antlib.xml" uri="http://www.nokia.com/helium"/>
+    <taskdef resource="com/nokia/helium/metadata/ant/antlib.xml" uri="http://www.nokia.com/helium"/>
+    <taskdef resource="com/nokia/helium/quality/ant/antlib.xml" uri="http://www.nokia.com/helium"/>
+    <taskdef resource="com/nokia/helium/imaker/ant/antlib.xml" uri="http://www.nokia.com/helium" />
+    <taskdef resource="com/nokia/helium/sbs/ant/antlib.xml" uri="http://www.nokia.com/helium" />
+    <taskdef resource="com/nokia/helium/logger/ant/antlib.xml" uri="http://www.nokia.com/helium" />
+    <taskdef resource="com/nokia/helium/synergy/ant/antlib.xml" uri="http://www.nokia.com/helium" />
+    <taskdef resource="com/nokia/helium/ccmtask/ant/antlib.xml" uri="http://www.nokia.com/helium" />
+    <taskdef resource="com/nokia/helium/sysdef/ant/antlib.xml" uri="http://www.nokia.com/helium" />
+    <taskdef resource="com/nokia/helium/internaldata/ant/antlib.xml" uri="http://www.nokia.com/helium"/>
+
     <!-- Nokia internal types. -->
     <typedef resource="com/nokia/helium/ant/coverage/antlib.xml" uri="http://www.nokia.com/helium"/>
         

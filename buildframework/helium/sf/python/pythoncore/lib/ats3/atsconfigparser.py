@@ -103,7 +103,7 @@ class ATSConfigParser:
                     settings[subconfig] = config[subconfig]
         return settings
 
-def converttestxml(specfilename, testxmldata): # pylint: disable-msg=R0912
+def converttestxml(specfilename, testxmldata): # pylint: disable=R0912
     """ convert the specfilename to xml"""
     specfile = open(specfilename)
 

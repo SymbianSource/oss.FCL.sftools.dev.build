@@ -17,8 +17,9 @@
 
 package com.nokia.helium.ant.data;
 
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
@@ -38,9 +39,8 @@ import org.dom4j.VisitorSupport;
  */
 public class TargetMeta extends TaskContainerMeta {
 
-    public TargetMeta(AntObjectMeta parent, Node node) throws IOException {
+    public TargetMeta(AntObjectMeta parent, Node node) {
         super(parent, node);
-        // callAntTargetVisitor();
     }
 
     public String getIf() {
@@ -79,9 +79,14 @@ public class TargetMeta extends TaskContainerMeta {
 
     public List<String> getSignals() {
         List<String> signals = super.getSignals();
-        List<String> additionalSignals = getDatabase().getSignals(getName());
-        if (additionalSignals != null) {
-            signals.addAll(additionalSignals);
+        Collection<AntFile> antFiles = getDatabase().getAntFiles();
+        for (Iterator<AntFile> iterator = antFiles.iterator(); iterator.hasNext();) {
+            AntFile antFile = (AntFile) iterator.next();
+            RootAntObjectMeta rootObjectMeta = antFile.getRootObjectMeta();
+            if (rootObjectMeta instanceof ProjectMeta) {
+                ProjectMeta projectMeta = (ProjectMeta)rootObjectMeta;
+                projectMeta.getConfigSignals(getName(), signals);
+            }
         }
         return signals;
     }
@@ -120,7 +125,6 @@ public class TargetMeta extends TaskContainerMeta {
                 String propertyName = node.attributeValue("name");
                 if (propertyName != null && !propertyList.contains(propertyName)) {
                     propertyList.add(propertyName);
-                    // System.out.println("prop "+propertyName);
                     log("property matches :" + propertyName, Project.MSG_DEBUG);
                 }
             }
@@ -129,24 +133,20 @@ public class TargetMeta extends TaskContainerMeta {
         private void extractUsedProperties(String text) {
             Pattern p1 = Pattern.compile("\\$\\{([^@$}]*)\\}");
             Matcher m1 = p1.matcher(text);
-            log(text, Project.MSG_DEBUG);
             while (m1.find()) {
                 String group = m1.group(1);
                 if (!propertyList.contains(group)) {
                     propertyList.add(group);
-                    // System.out.println("m1 "+group + " "+ text);
                 }
                 log("property matches: " + group, Project.MSG_DEBUG);
             }
 
             Pattern p2 = Pattern.compile("\\$\\{([^\n]*\\})\\}");
             Matcher m2 = p2.matcher(text);
-            log(text, Project.MSG_DEBUG);
             while (m2.find()) {
                 String group = m2.group(1);
                 if (!propertyList.contains(group)) {
                     propertyList.add(group);
-                    // System.out.println("m2 "+group + " "+ text);
                 }
                 log("property matches: " + group, Project.MSG_DEBUG);
             }
@@ -158,7 +158,6 @@ public class TargetMeta extends TaskContainerMeta {
                 String group = m3.group(1);
                 if (!propertyList.contains(group)) {
                     propertyList.add(group);
-                    // System.out.println("m3 "+group + " "+ text);
                 }
                 log("property matches: " + group, Project.MSG_DEBUG);
             }

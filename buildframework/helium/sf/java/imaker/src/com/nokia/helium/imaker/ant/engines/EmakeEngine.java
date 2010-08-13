@@ -1,25 +1,25 @@
 /*
-* Copyright (c) 2007-2008 Nokia Corporation and/or its subsidiary(-ies).
-* All rights reserved.
-* This component and the accompanying materials are made available
-* under the terms of the License "Eclipse Public License v1.0"
-* which accompanies this distribution, and is available
-* at the URL "http://www.eclipse.org/legal/epl-v10.html".
-*
-* Initial Contributors:
-* Nokia Corporation - initial contribution.
-*
-* Contributors:
-*
-* Description:  
-*
-*/
+ * Copyright (c) 2007-2008 Nokia Corporation and/or its subsidiary(-ies).
+ * All rights reserved.
+ * This component and the accompanying materials are made available
+ * under the terms of the License "Eclipse Public License v1.0"
+ * which accompanies this distribution, and is available
+ * at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ *
+ * Initial Contributors:
+ * Nokia Corporation - initial contribution.
+ *
+ * Contributors:
+ *
+ * Description:  
+ *
+ */
 package com.nokia.helium.imaker.ant.engines;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.FileNotFoundException;
 import java.io.OutputStreamWriter;
 import java.io.StringWriter;
 import java.net.MalformedURLException;
@@ -47,14 +47,16 @@ import freemarker.template.Template;
 import freemarker.template.TemplateException;
 
 /**
- *
+ * 
  * Simplest possible definition of the type, e.g:
+ * 
  * <pre>
  * &lt;emakeEngine id="imaker.ec" /&gt;
  * </pre>
  * 
  * Emake engine with some custom configuration.
- * <pre> 
+ * 
+ * <pre>
  * &lt;emakeEngine id="imaker.ec" &gt;
  *     &lt;arg value="--emake-annofile=imaker.anno.xml" /&gt;
  * &lt;/emakeEngine&gt;
@@ -65,17 +67,18 @@ import freemarker.template.TemplateException;
 public class EmakeEngine extends DataType implements Engine {
     private Logger log = Logger.getLogger(getClass());
     private IMakerTask task;
-    private List<Arg> customArgs = new ArrayList<Arg>(); 
+    private List<Arg> customArgs = new ArrayList<Arg>();
     private File template;
-    
+
     /**
-     * Holder for emake custom args. 
+     * Holder for emake custom args.
      */
     public class Arg {
         private String value;
 
         /**
          * Get the value of the argument.
+         * 
          * @return the argument
          */
         public String getValue() {
@@ -83,8 +86,8 @@ public class EmakeEngine extends DataType implements Engine {
         }
 
         /**
-         * Define the additional command line parameter you want to add to emake
-         * invocation.
+         * Define the additional command line parameter you want to add to emake invocation.
+         * 
          * @param value the additional command line parameter
          * @ant.required
          */
@@ -101,10 +104,11 @@ public class EmakeEngine extends DataType implements Engine {
         try {
             // Writing the makefile.
             makefile = writeMakefile(cmdSet);
-            
+
             // Running Emake
             runEmake(makefile);
-        } finally {
+        }
+        finally {
             if (makefile != null) {
                 makefile.delete();
             }
@@ -113,24 +117,29 @@ public class EmakeEngine extends DataType implements Engine {
 
     /**
      * Returns the jar file name containing this class
+     * 
      * @return a File object or null if not found.
      * @throws IMakerException
      */
     protected File getJarFile() throws IMakerException {
-        URL url = this.getClass().getClassLoader().getResource(this.getClass().getName().replace('.', '/') + ".class");
+        URL url = this.getClass().getClassLoader().getResource(this.getClass().getName().replace('.', '/')
+            + ".class");
         if (url.getProtocol().equals("jar") && url.getPath().contains("!/")) {
             String fileUrl = url.getPath().split("!/")[0];
             try {
                 return new File(new URL(fileUrl).getPath());
-            } catch (MalformedURLException e) {
+            }
+            catch (MalformedURLException e) {
                 throw new IMakerException("Error determining the jar file where "
-                        + this.getClass().getName() + " is located.", e);
+                    + this.getClass().getName() + " is located.", e);
             }
         }
         return null;
     }
+
     /**
      * Run emake using defined makefile.
+     * 
      * @param makefile the makefile to build
      * @throws IMakerException
      */
@@ -139,7 +148,8 @@ public class EmakeEngine extends DataType implements Engine {
         if (task.getOutput() != null) {
             try {
                 output = new FileStreamConsumer(task.getOutput());
-            } catch (FileNotFoundException e) {
+            }
+            catch (FileNotFoundException e) {
                 throw new IMakerException("Error creating the stream recorder: " + e.getMessage(), e);
             }
         }
@@ -164,20 +174,23 @@ public class EmakeEngine extends DataType implements Engine {
                 emake.addErrorLineHandler(output);
             }
             emake.execute(args.toArray(new String[args.size()]));
-        } catch (IMakerException e) {
+        }
+        catch (IMakerException e) {
             throw new IMakerException("Error executing emake: " + e.getMessage(), e);
-        } finally {
+        }
+        finally {
             if (output != null) {
                 output.close();
             }
         }
     }
-    
+
     /**
-     * Create the Makefile based on the cmdSet build sequence. 
+     * Create the Makefile based on the cmdSet build sequence.
+     * 
      * @param cmdSet
      * @return
-     * @throws IMakerException 
+     * @throws IMakerException
      * @throws IOException
      */
     private File writeMakefile(List<List<Command>> cmdSet) throws IMakerException {
@@ -186,12 +199,14 @@ public class EmakeEngine extends DataType implements Engine {
             Template template = null;
             if (this.template != null) {
                 if (!this.template.exists()) {
-                    throw new IMakerException("Could not find template file: " + this.template.getAbsolutePath());
+                    throw new IMakerException("Could not find template file: "
+                        + this.template.getAbsolutePath());
                 }
                 task.log("Loading template: " + this.template.getAbsolutePath());
                 cfg.setTemplateLoader(new FileTemplateLoader(this.template.getParentFile()));
                 template = cfg.getTemplate(this.template.getName());
-            } else {
+            }
+            else {
                 cfg.setTemplateLoader(new ClassTemplateLoader(this.getClass(), ""));
                 template = cfg.getTemplate("build_imaker_roms_signing.mk.ftl");
             }
@@ -204,25 +219,31 @@ public class EmakeEngine extends DataType implements Engine {
             data.put("java_home", System.getProperty("java.home"));
             File jar = getJarFile();
             if (jar != null) {
-                task.log("Using " + jar + " as the utility container, make sure the file is available under an emake root.");
+                task.log("Using "
+                    + jar
+                    + " as the utility container, make sure the file is available under an emake root.");
                 data.put("java_utils_classpath", jar.getAbsolutePath());
             }
             template.process(data, out);
             log.debug(out.getBuffer().toString());
-        
+
             OutputStreamWriter output = new OutputStreamWriter(new FileOutputStream(makefile));
             output.append(out.getBuffer().toString());
             output.close();
             return makefile;
-        } catch (IOException e) {
-           throw new IMakerException("Error generating the makefile: " + e.getMessage(), e);
-        } catch (TemplateException e) {
-            throw new IMakerException("Error while rendering the makefile template: " + e.getMessage(), e);
+        }
+        catch (IOException e) {
+            throw new IMakerException("Error generating the makefile: " + e.getMessage(), e);
+        }
+        catch (TemplateException e) {
+            throw new IMakerException("Error while rendering the makefile template: "
+                + e.getMessage(), e);
         }
     }
-    
+
     /**
      * Add custom parameters for the emake invocation.
+     * 
      * @return a new Arg object.
      */
     public Arg createArg() {
@@ -230,8 +251,7 @@ public class EmakeEngine extends DataType implements Engine {
         customArgs.add(arg);
         return arg;
     }
-    
-    
+
     /**
      * {@inheritDoc}
      */
@@ -239,9 +259,10 @@ public class EmakeEngine extends DataType implements Engine {
     public void setTask(IMakerTask task) {
         this.task = task;
     }
-    
+
     /**
      * Defines an alternate template to use to generate the build sequence for emake.
+     * 
      * @ant.not-required
      */
     public void setTemplate(File template) {

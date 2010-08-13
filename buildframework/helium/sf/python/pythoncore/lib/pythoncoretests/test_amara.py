@@ -22,6 +22,10 @@
 
 import amara
 from xmlhelper import recursive_node_scan
+import urllib
+import tempfile
+import os
+import sys
 
 def test_amara():
     """test amara"""
@@ -80,3 +84,68 @@ def test_amara():
     
     #xcf5 = amara.parse(open(r'C:\USERS\helium\helium-dev-forbuilds\helium\tests\data\bom\build_model_bom.xml'))
     #u'%s' % xcf5.bom.content.project.folder.task.synopsis
+    
+    doc = amara.create_document(u"commentLog")
+    if not doc:
+        pass
+
+    xml1 = """<commentLog><branchInfo category="" error="kkk" file="comments_test.txt" originator="sanummel" since="07-03-22">Add rofsfiles for usage in paged images</branchInfo></commentLog>"""
+    doc2 = amara.parse(xml1)
+    assert doc2.commentLog.branchInfo.category == ""
+
+    doc2.commentLog.xml_remove_child(doc2.commentLog.branchInfo)
+    
+    myxml3 = """<a><b value="1"/></a>"""
+    xml3 = amara.parse(myxml3)
+    for p_temp in xml3.xml_xpath("//b"):
+        p_temp.value = u'2'
+    assert '2' in xml3.xml()
+    
+    xml4 = """<a>\n\t<b name="b">a</b>\n</a>"""
+
+    print amara.parse(xml4).xml(indent="yes").replace('\n', 'n').replace('\t', 't')
+    assert xml4 in amara.parse(xml4).xml(indent="yes")
+    
+    ppxml = """<SettingsData>
+  <ProductProfile Version="1.1">
+     <Feature>
+        <Index>35</Index> 
+        <Value>1</Value> 
+     </Feature>
+  </ProductProfile>
+</SettingsData>"""
+
+    newppxml = amara.parse(ppxml)
+    oldppxml = amara.parse(ppxml)
+    
+    oldppdata = {}
+    for oldfeature in oldppxml.SettingsData.ProductProfile.Feature:
+        oldppdata[str(oldfeature.Index)] = oldfeature.Value
+    for newfeature in newppxml.SettingsData.ProductProfile.Feature:
+        if not oldppdata.has_key(str(newfeature.Index)):
+            raise Exception(newfeature.Value)
+        elif oldppdata[str(newfeature.Index)] != str(newfeature.Value):
+            raise Exception(str(oldppdata[str(newfeature.Index)]) + ' ' + str(newfeature.Value))
+
+def test_amara_xinclude():
+    (f_desc1, filename1) = tempfile.mkstemp()
+    f_file1 = os.fdopen(f_desc1, 'w')
+    f_file1.write(r'<b>qwerty</b>')
+    f_file1.close()
+    (f_desc, filename) = tempfile.mkstemp()
+    f_file = os.fdopen(f_desc, 'w')
+    
+    #try:
+    #    from Ft.Lib import Uri
+    #    fileurl = Uri.OsPathToUri(filename1)
+    #except ImportError:
+    fileurl = filename1
+    
+    f_file.write(r'<a xmlns:xi="http://www.w3.org/2001/XInclude"><xi:include href="' + os.path.basename(fileurl) + r'"/></a>')
+    f_file.close()
+    
+    #if 'java' in sys.platform:
+    doc3 = amara.parse(urllib.pathname2url(filename))
+    #else:
+    #    doc3 = amara.parse(Uri.OsPathToUri(filename))
+    assert 'qwerty' in doc3.xml()

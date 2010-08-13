@@ -20,7 +20,7 @@
 import ats3
 import ats3.dropgenerator as adg
 from optparse import OptionParser
-from path import path # pylint: disable-msg=F0401
+from path import path # pylint: disable=F0401
 import logging
 _logger = logging.getLogger('ats')
 

@@ -18,16 +18,19 @@
 package com.nokia.helium.ant.data;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.tools.ant.Project;
 import org.dom4j.Document;
-import org.dom4j.DocumentException;
 import org.dom4j.Element;
 import org.dom4j.Node;
-import org.dom4j.io.SAXReader;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
+import org.xml.sax.helpers.XMLReaderFactory;
 
 /**
  * An Ant build file. It could be a project file or an antlib file.
@@ -46,22 +49,33 @@ public class AntFile {
     public AntFile(Database database, String path, String scope) throws IOException {
         this.database = database;
         this.path = new File(path);
-        SAXReader xmlReader = new SAXReader();
-        try {
-            doc = xmlReader.read(path);
 
-            Element node = doc.getRootElement();
-            if (node.getName().equals("project")) {
-                fileObjectMeta = new ProjectMeta(this, node);
-            }
-            else {
-                fileObjectMeta = new AntlibMeta(this, node);
-            }
-
-            fileObjectMeta.setScopeFilter(scope);
-            fileObjectMeta.setRuntimeProject(rootProject);
+        readDoc();
+        Element node = doc.getRootElement();
+        if (node.getName().equals("project")) {
+            fileObjectMeta = new ProjectMeta(this, node);
         }
-        catch (DocumentException e) {
+        else {
+            fileObjectMeta = new AntlibMeta(this, node);
+        }
+
+        fileObjectMeta.setScopeFilter(scope);
+        fileObjectMeta.setRuntimeProject(rootProject);
+
+    }
+
+    private void readDoc() throws IOException {
+        try {
+            DocumentFactoryWithLocator documentFactory = new DocumentFactoryWithLocator();
+            SAXContentHandlerExt contentHandler = new SAXContentHandlerExt(documentFactory);
+            documentFactory.setContentHandler(contentHandler);
+            XMLReader xmlReader = XMLReaderFactory.createXMLReader();
+            xmlReader.setContentHandler(contentHandler);
+            xmlReader.setProperty("http://xml.org/sax/properties/lexical-handler", contentHandler);
+            xmlReader.parse(new InputSource(new FileReader(path)));
+            doc = contentHandler.getDocument();
+        }
+        catch (SAXException e) {
             throw new IOException(e.getMessage());
         }
     }
@@ -83,9 +97,8 @@ public class AntFile {
      * Get the meta object for the Ant project in this build file.
      * 
      * @return The project meta object.
-     * @throws DocumentException
      */
-    public RootAntObjectMeta getRootObjectMeta() throws IOException {
+    public RootAntObjectMeta getRootObjectMeta() {
         return fileObjectMeta;
     }
 
@@ -107,8 +120,7 @@ public class AntFile {
         Element node = doc.getRootElement();
         List<AntFile> antlibFiles = new ArrayList<AntFile>();
         if (node.getName().equals("project")) {
-            List<Node> typedefs = node
-                    .selectNodes("//*[namespace-uri()='http://www.nokia.com/helium' and local-name()='typedef']");
+            List<Node> typedefs = node.selectNodes("//*[namespace-uri()='http://www.nokia.com/helium' and local-name()='typedef']");
             for (Node typedefNode : typedefs) {
                 String filePath = ((Element) typedefNode).attributeValue("file");
                 filePath = getProject().replaceProperties(filePath);

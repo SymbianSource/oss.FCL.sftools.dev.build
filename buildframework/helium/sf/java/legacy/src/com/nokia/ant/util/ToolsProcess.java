@@ -17,18 +17,15 @@
 
 package com.nokia.ant.util;
 
-import java.util.Hashtable;
+import org.apache.log4j.Logger;
 
 import com.nokia.tools.Tool;
 import com.nokia.tools.ToolsProcessException;
-import org.apache.log4j.Logger;
 /**
  * Utility class to read property value, if property is not defined it will raise an exception.
  *
  */
 public final class ToolsProcess {
-    private static Hashtable tools = new Hashtable();
-
     private static Logger log;
     
     private ToolsProcess() { }

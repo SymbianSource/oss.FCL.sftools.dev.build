@@ -21,10 +21,11 @@
 
 import os
 import fileutils
-import selectors
 import logging
 import codecs
 import pathaddition
+
+import archive.selectors
 
 _logger = logging.getLogger('archive.scanners')
 _logger_abld = logging.getLogger('archive.scanners.abld')
@@ -46,11 +47,11 @@ class Scanner(fileutils.AbstractScanner):
         [self.add_exclude_file(ex) for ex in self._config.get_list('exclude_file', [])]
         [self.add_exclude_lst(filename) for filename in self._config.get_list('exclude.lst', [])]
         [self.add_filetype(filetype) for filetype in self._config.get_list('filetype', [])]
-        [self.add_selector(selectors.get_selector(selector, self._config)) for selector in self._config.get_list('selector', [])]
+        [self.add_selector(archive.selectors.get_selector(selector, self._config)) for selector in self._config.get_list('selector', [])]
         # To support old features.
         # TODO: inform customers and remove.
         if 'distribution.policy.s60' in self._config:
-            self.add_selector(selectors.get_selector('distribution.policy.s60', self._config))
+            self.add_selector(archive.selectors.get_selector('distribution.policy.s60', self._config))
 
     def add_exclude_lst(self, filename):
         """ Adding excludes from exclude list. """

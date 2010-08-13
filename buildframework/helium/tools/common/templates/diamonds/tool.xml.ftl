@@ -21,24 +21,26 @@ Description:
 -->
 <#include "diamonds_header.ftl"> 
 <#include "diamonds_macro.ftl">
-       <tools>        
+    <tools>
 <#if ant?keys?seq_contains("env.SYMSEE_VERSION")>         
         <tool>
-           <name>SymSEE</name>
-           <version>${ant["env.SYMSEE_VERSION"]}</version>
-         </tool>
+            <name>SymSEE</name>
+            <version>${ant["env.SYMSEE_VERSION"]}</version>
+        </tool>
 </#if>
 <#if (doc)??>
-<#list doc["ivy-report/dependencies/module"] as module>
-         <tool>
-           <name>${module.@name}</name>
-           <version>${module.revision.@name}</version>
-         </tool>
+<#list doc["environment/tool"] as tool>
+        <#if tool.path?length &gt; 0>
+        <tool>
+            <name>${tool.name}</name>
+            <version>${tool.version}</version>
+        </tool>
+        </#if>
 </#list>
 </#if>
-         <tool>
-           <name>Helium</name>
-           <version>${ant["helium.version"]}</version>
-         </tool>
-       </tools>
-<#include "diamonds_footer.ftl">        
+        <tool>
+            <name>Helium</name>
+            <version>${ant["helium.version"]}</version>
+        </tool>
+    </tools>
+<#include "diamonds_footer.ftl">

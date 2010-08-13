@@ -19,14 +19,16 @@ package com.nokia.helium.scm.ant.taskdefs;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.maven.scm.ScmException;
 import org.apache.maven.scm.manager.NoSuchScmProviderException;
 import org.apache.maven.scm.manager.ScmManager;
 import org.apache.maven.scm.repository.ScmRepository;
 import org.apache.maven.scm.repository.ScmRepositoryException;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
-import org.apache.maven.scm.ScmException;
 
+import com.nokia.helium.scm.ant.AntScmLogger;
 import com.nokia.helium.scm.ant.actions.AddAction;
 import com.nokia.helium.scm.ant.actions.BranchAction;
 import com.nokia.helium.scm.ant.actions.ChangelogAction;
@@ -76,8 +78,6 @@ public class ScmTask extends Task {
 
     private String scmUrl;
 
-    private String basedir;
-
     private List<ScmAction> actions = new ArrayList<ScmAction>();
 
     private boolean verbose;
@@ -88,10 +88,13 @@ public class ScmTask extends Task {
     public ScmTask() {
         setTaskName("scm");
 
-        scmManager = new BasicExtendedScmManager();
-
+        BasicExtendedScmManager scmManager = new BasicExtendedScmManager();
+        scmManager.addListener(new AntScmLogger(this));
+        this.scmManager = scmManager;
+        HgScmProviderExt provider = new HgScmProviderExt();
+        
         // Add all SCM providers we want to use
-        scmManager.setScmProvider("hg", new HgScmProviderExt());
+        scmManager.setScmProvider("hg", provider);
     }
 
     public ScmManager getScmManager() {

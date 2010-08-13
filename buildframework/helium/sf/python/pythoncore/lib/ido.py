@@ -29,13 +29,13 @@ MATCH_ENTITY = re.compile(r".*ENTITY\s+layer_real_source_path\s+\"(.+)\"\s*>?.*"
 
 def get_sysdef_location(sysdef):
     """ Search for layer_real_source_path entity inside the sysdef file. """
-    input = open(sysdef, 'r')
-    for line in input.readlines():
+    input_ = open(sysdef, 'r')
+    for line in input_.readlines():
         result = MATCH_ENTITY.match(line)
         if result != None:
-            input.close()
+            input_.close()
             return result.groups()[0]
-    input.close()
+    input_.close()
     print 'layer_real_source_path entity not found in ' + sysdef
     return None
 

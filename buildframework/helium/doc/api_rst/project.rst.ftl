@@ -71,12 +71,16 @@ ${target.name}
 </#if>
 :Location: <@helium_api_location_path location="${target.location}"/>
 :Scope: ${target.scope}
+<#if target.since?length &gt; 0>
+:Since: ${target.since}
+</#if>
 <#if target.ifDependency?length &gt; 0>
 :Condition: Target **is** run if property defined: :hlm-p:`${target.ifDependency}`
 </#if>
 <#if target.unlessDependency?length &gt; 0>
 :Condition: Target **is not** run if property defined: ``${target.unlessDependency}``
 </#if>
+
 
 <#recurse target.documentation>
 
@@ -86,6 +90,16 @@ ${target.name}
 
 <#list propertyList as property>
 - :hlm-p:`${property}`
+</#list>
+</#if>
+
+
+<#assign signalsList=target.signal?sort>   
+<#if signalsList?size &gt; 0>
+**Signals**
+
+<#list signalsList as signal>
+- ``${signal}``
 </#list>
 </#if>
 
@@ -139,6 +153,9 @@ ${property.name}
 :Location: <@helium_api_location_path location="${property.location}"/>
 :Type: ${property.type}
 :Scope: ${property.scope}
+<#if property.scope?length &gt; 0>
+:Since: ${property.since}
+</#if>
 :Editable: ${property.editable}
 <#if property.defaultValue?size &gt; 1>
 :Default value: ``${property.defaultValue}``
@@ -180,6 +197,9 @@ ${macro.name}
 
 :Location: <@helium_api_location_path location="${macro.location}"/>
 :Scope: ${macro.scope}
+<#if macro.scope?length &gt; 0>
+:Since: ${macro.since}
+</#if>
 
 <#recurse macro.documentation>
 

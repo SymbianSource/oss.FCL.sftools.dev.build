@@ -43,7 +43,7 @@ public final class SignalStatusList {
      * Get the list of stored SignalStatus object.
      * @return a Vector of SignalStatus instances.
      */
-    public Vector<SignalStatus>getSignalStatusList() {
+    public Vector<SignalStatus> getSignalStatusList() {
         return new Vector<SignalStatus>(signals);
     }
     

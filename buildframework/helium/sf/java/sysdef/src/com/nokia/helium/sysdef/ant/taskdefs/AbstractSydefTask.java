@@ -17,18 +17,18 @@
 package com.nokia.helium.sysdef.ant.taskdefs;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.FileNotFoundException;
 import java.util.Map;
 
 import javax.xml.transform.ErrorListener;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
-import javax.xml.transform.TransformerConfigurationException;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
@@ -45,7 +45,8 @@ public abstract class AbstractSydefTask extends Task implements ErrorListener {
     private File srcFile;
     private File destFile;
     private File epocroot;
-    private boolean failOnError = true;
+    private boolean failOnError = true;  // Error should not fail by default.
+    private boolean failOnWarning; // Warning should not fail by default.
     
     /**
      * Get the source file.
@@ -117,7 +118,15 @@ public abstract class AbstractSydefTask extends Task implements ErrorListener {
     }
 
     /**
-     * Defines if the file should fail on error.
+     * Shall we fail the build on warning.
+     * @return is the task should fail on warning.
+     */
+    public boolean isFailOnWarning() {
+        return failOnWarning;
+    }
+
+    /**
+     * Defines if the task should fail on error.
      * @param failonerror
      * @ant.not-required Default is true.
      */
@@ -126,11 +135,20 @@ public abstract class AbstractSydefTask extends Task implements ErrorListener {
     }
 
     /**
+     * Defines if the task should fail on warning.
+     * @param failonerror
+     * @ant.not-required Default is true.
+     */
+    public void setFailOnWarning(boolean failOnWarning) {
+        this.failOnWarning = failOnWarning;
+    }
+
+    /**
      * This method should be defined by the implementing class
      * to define the location of the XSLT file.
      * @return the XSLT file location.
      */
-    abstract File getXsl();
+    protected abstract File getXsl();
     
     /**
      * Check if required attribute have been configured correctly.
@@ -267,7 +285,7 @@ public abstract class AbstractSydefTask extends Task implements ErrorListener {
      */
     @Override
     public void warning(TransformerException message) throws TransformerException {
-        if (this.isFailOnError()) {
+        if (this.isFailOnWarning()) {
             throw message;
         } else {
             log("WARNING: " + message.getMessageAndLocation(), Project.MSG_WARN);

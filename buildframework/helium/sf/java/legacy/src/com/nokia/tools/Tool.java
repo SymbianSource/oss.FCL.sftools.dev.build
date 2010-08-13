@@ -17,8 +17,9 @@
  
 package com.nokia.tools;
 
-import com.nokia.helium.core.ant.types.VariableSet;
 import org.apache.tools.ant.Project;
+
+import com.nokia.helium.core.ant.types.VariableSet;
 /**
  * Common interface for the command line tool wrapper
  */

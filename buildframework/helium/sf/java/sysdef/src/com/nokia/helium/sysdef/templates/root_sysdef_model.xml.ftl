@@ -140,16 +140,30 @@ Description:
 <!-- filter and priority are deprecated 
     "root" attribute will usually be inserted by tools when merging models, although it can be set manually-->
 ]>
-<SystemDefinition schema="3.0.0">
-<#assign name="">
-<#list roots?keys as root><#assign name=name + root + "_"></#list>
-<systemModel name="${name}">
+<SystemDefinition schema="3.0.0" <#if (idnamespace?? && idnamespace!="http://www.symbian.org/system-definition")>xmlns:vendor="${idnamespace}"</#if>>
+<systemModel name="<#list roots?keys as root>${root}<#if root_has_next>_</#if></#list>">
 <#list layers?keys as layer>
     <layer id="${layer}" name="${layer}">
     <#list roots?keys as root>
         <#if roots[root]?keys?seq_contains(layer)>
             <#list roots[root][layer] as pkg>
-        <package id="${pkg}" href="${dest_dir_to_epocroot?replace('\\', '/')}${root}/${layer}/${pkg}/package_definition.xml"/>
+                    <#assign namespaces="" />
+                    <#if (idnamespace?? && idnamespace!="http://www.symbian.org/system-definition")>
+                        <#assign pkgid="vendor:${pkg['id']}" />
+                    <#else>
+                        <#assign pkgid="${pkg['id']}" />
+                    </#if>
+                    <#list pkg['namespaces']?keys as ns>
+                        <#if pkg['namespaces'][ns] != "http://www.symbian.org/system-definition">                        
+                            <#assign namespaces="${namespaces} ${ns}=\"${pkg['namespaces'][ns]}\"" />
+                        <#else>
+                            <#assign nsname=ns?replace("xmlns:", '')>
+                            <#if pkg['id']?starts_with("${nsname}:")>
+                                <#assign pkgid=pkg['id']?replace("${nsname}:", '') />
+                            </#if>
+                        </#if>
+                    </#list> 
+         <package id="${pkgid}" href="${dest_dir_to_epocroot?replace('\\', '/')}${root}/${layer}/${pkg['path']}/package_definition.xml" ${namespaces}/>
             </#list>
         </#if>
     </#list>

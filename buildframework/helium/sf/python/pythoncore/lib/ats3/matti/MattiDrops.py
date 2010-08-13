@@ -21,7 +21,7 @@
 #===============================================================================
 
 """ create the MATTI test drop file for use on the test server """
-# pylint: disable-msg=R0902, R0903, R0912
+# pylint: disable=R0902, R0903, R0912
 
 import os
 import re
@@ -31,7 +31,7 @@ import zipfile
 import logging 
 from optparse import OptionParser
 from xml.etree import ElementTree as et
-from jinja2 import Environment, PackageLoader # pylint: disable-msg=F0401
+from jinja2 import Environment, PackageLoader # pylint: disable=F0401
 
 # Shortcuts
 E = et.Element

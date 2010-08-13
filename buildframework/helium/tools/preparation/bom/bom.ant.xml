@@ -31,11 +31,26 @@ Description:
     -->
     <property name="create.bom.workarea.root" value="."/> 
     
+    <!--* @property bom.release.regex
+    This property (if set) defines the regular expression BOM will use to extract data from 
+    a basline release. The regular expression must define 4 fields: TYPE, YEAR, WEEK, REVISION
+    Example:
+        (?<TYPE>.*)_(?P<YEAR>\d{4})(?P<WEEK>\d{2})_(?<REVISION>.*)
+    
+    @type string
+    @editable allowed
+    @scope public
+    -->
+    
     <!-- The target create-bom creates a Bill-Of-Material based on the SCM project 
     The target can be run in the project's root directory or the directory can be given by
     setting the property create.bom.workarea.root. The IDO builds are expected to set it to their 
     projects work area directory. -->
-    <target name="create-bom" depends="get-ccm-password,old-bom-log,ccm-prepare-input,prep-prepare-input">
+    <target name="create-bom">
+        <runtarget target="get-ccm-password"/>
+        <runtarget target="old-bom-log"/>
+        <runtarget target="prep-prepare-input" />
+        <runtarget target="ccm-prepare-input"/>
         <hlm:startSpecificLogMacro name="${prep.log.dir}/${build.id}_bom.log" regexp="${ccm.user.password}" phase="prep"/>
         <hlm:python>
 import os
@@ -49,7 +64,7 @@ import traceback
 
 session = None
 try:
-    runccm = ant.get_property(r'${run.ccm}')
+    runccm = ant.get_property(r'${ccm.enabled}')
     database = ant.get_property(r'${ccm.database}')
     username = ant.get_property(r'${ccm.user.login}')
     password = ant.get_property(r'${ccm.user.password}')
@@ -81,7 +96,7 @@ try:
             
         ccmproject =  ccm.extra.get_toplevel_project(session, waroot)
         
-        config_data = {'delivery': deliveryfile, 'prep.xml': ant.get_property(r'${prep.config.file.parsed}'), 'build.id': buildid, 'ccm.database': database, 'symbian_rel_week': ant.get_property(r'${symbian.version.week}'), 'symbian_rel_ver': ant.get_property(r'${symbian.version}'), 'symbian_rel_year': ant.get_property(r'${symbian.version.year}'), 's60_version': ant.get_property(r'${s60.version}'), 's60_release': ant.get_property(r'${s60.release}'), 'currentRelease.xml': ant.get_property(r'${build.drive}') + "/currentRelease.xml"}
+        config_data = {'delivery': deliveryfile, 'prep.xml': ant.get_property(r'${prep.config.file.parsed}'), 'build.id': buildid, 'ccm.database': database, 'symbian_rel_week': ant.get_property(r'${symbian.version.week}'), 'symbian_rel_ver': ant.get_property(r'${symbian.version}'), 'symbian_rel_year': ant.get_property(r'${symbian.version.year}'), 's60_version': ant.get_property(r'${s60.version}'), 's60_release': ant.get_property(r'${s60.release}'), 'currentRelease.xml': ant.get_property(r'${build.drive}') + "/currentRelease.xml", 'release_regexp': ant.get_property(r'${bom.release.regex}') }
         config = configuration.Configuration(config_data)
         
         # let's only support the new spec model!

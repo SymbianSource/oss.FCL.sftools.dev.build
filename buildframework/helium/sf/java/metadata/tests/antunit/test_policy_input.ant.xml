@@ -1,0 +1,64 @@
+<!-- 
+============================================================================ 
+Name        : test_policy_input.ant.xml 
+Part of     : Helium
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test-ant-input" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>Helium metadata Ant input unittests.</description>
+    
+    <dirname property="project.dir" file="${ant.file.test-metadata-regex}" />
+    <taskdef resource="com/nokia/helium/metadata/ant/antlib.xml" uri="http://www.nokia.com/helium" />
+    <taskdef name="fmpp" classname="fmpp.tools.AntTask" onerror="report"/>
+    
+    <target name="setUp">
+        <echo>---=====================================---</echo>
+        <mkdir dir="${test.temp.dir}" />
+        <delete dir="${test.temp.dir}" />
+        <mkdir dir="${test.temp.dir}" />
+    </target>
+    
+    <target name="tearDown">
+        <delete dir="${test.temp.dir}" />
+        <echo>---=====================================---</echo>
+    </target>
+
+    <hlm:metadatafilterset id="error.filterset">
+        <hlm:metadatafilter severity="error" regex="^ERROR: .*" description="Simple error pattern"/>
+        <hlm:metadatafilter severity="warning" regex="^WARNING: .*" description="Simple warning pattern"/>
+    </hlm:metadatafilterset>
+
+    <target name="test-policy-metadata-input">
+        <echo message="test-policy-metadata-input" />
+
+        <hlm:metadatarecord database="${test.temp.dir}/metadata_db">
+            <hlm:policymetadatainput>
+                <fileset file="${project.dir}/../data/policy/validate_policy.log" />
+            </hlm:policymetadatainput>
+        </hlm:metadatarecord>
+            
+        <hlm:metadataCountSeverity severity="error" database="${test.temp.dir}/metadata_db"
+            log="${project.dir}/../data/policy/validate_policy.log" property="errors" />
+        <echo>${errors}</echo>
+        <au:assertTrue>
+            <equals arg1="${errors}" arg2="78" />
+        </au:assertTrue>
+    </target>
+
+        
+</project>

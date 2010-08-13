@@ -72,12 +72,6 @@ Description:
             <arg line="-lib ../../../../antlibs"/>
             <arg line="target"/>
         </exec>
-        <exec osfamily="unix" executable="ant">
-            <arg value="-Dant.executor.class=com.nokia.helium.core.ant.HeliumExecutor"/>
-            <arg line="-lib ../../../../bin"/>
-            <arg line="-lib ../../../../lib"/>
-            <arg line="-lib ../../../../antlibs"/>
-            <arg line="target"/>
-        </exec>
+        <au:assertLogContains text="final-target is executed as postbuild action" />
     </target>
 </project>

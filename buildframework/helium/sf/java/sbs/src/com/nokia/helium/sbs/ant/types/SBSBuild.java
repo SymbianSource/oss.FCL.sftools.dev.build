@@ -17,13 +17,13 @@
  
 package com.nokia.helium.sbs.ant.types;
 
-import org.apache.tools.ant.types.DataType;
-import org.apache.tools.ant.BuildException;
-import java.util.Vector;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Vector;
+
+import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.types.DataType;
 import org.apache.tools.ant.types.Reference;
-import org.apache.log4j.Logger;
 
 
 /**
@@ -49,15 +49,9 @@ import org.apache.log4j.Logger;
  */
 public class SBSBuild extends DataType
 {
-    private static Logger log = Logger.getLogger(SBSBuild.class);
-
     private String name;
 
     private Vector<SBSInput> sbsInputList = new Vector<SBSInput>();
-
-
-    public SBSBuild() {
-    }
     
     /**
      * Set the name of the variable.
@@ -99,7 +93,6 @@ public class SBSBuild extends DataType
             try {
                 sbsInputObject = refId.getReferencedObject();
             } catch ( BuildException ex) {
-                //log.info("Reference id of sbsinput list is not valid");
                 throw new BuildException("Reference id (" + refId.getRefId() + ") of sbsinput list is not valid");
             }
             if (sbsInputObject != null && sbsInputObject instanceof SBSInput) {

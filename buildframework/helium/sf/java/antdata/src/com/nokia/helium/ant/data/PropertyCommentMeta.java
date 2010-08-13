@@ -17,8 +17,6 @@
 
 package com.nokia.helium.ant.data;
 
-import java.io.IOException;
-
 import org.dom4j.Comment;
 
 /**
@@ -31,9 +29,8 @@ public class PropertyCommentMeta extends CommentMeta {
      * 
      * @param parent The parent meta object.
      * @param propertyNode XML node representing the comment.
-     * @throws IOException
      */
-    public PropertyCommentMeta(AntObjectMeta parent, Comment comment) throws IOException {
+    public PropertyCommentMeta(AntObjectMeta parent, Comment comment) {
         super(parent, comment);
     }
 

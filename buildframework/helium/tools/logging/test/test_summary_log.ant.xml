@@ -45,7 +45,7 @@ Description:
             <os family="unix" />
         </condition>
         <hlm:metadatarecord database="${metadata.dbfile}">
-            <hlm:sbsmetadatainput>
+            <hlm:sbsmetadatainput checkMissing="true">
                 <fileset casesensitive="false" file="${sbs.log}"/>
                 <metadatafilterset refid="filterset.sbs" />
             </hlm:sbsmetadatainput>

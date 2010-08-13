@@ -20,16 +20,14 @@ package com.nokia.helium.signal.ant.types;
 
 
 import org.apache.tools.ant.types.DataType;
+
 import com.nokia.helium.signal.Notifier;
-import java.util.List;
 
 /**
  * Defines a signal notification via SMS.
  */
 public class SMSNotifier extends DataType implements Notifier {
 
-    public SMSNotifier() {
-    }
     /**
      * Sends the data to the requested sender list with specified notifier
      * 
@@ -42,13 +40,4 @@ public class SMSNotifier extends DataType implements Notifier {
             NotifierInput notifierInput, String message ) {
     }
 
-    /**
-     * Sends the data to the requested sender list with specified notifier
-     * 
-     * @deprecated
-     *    sends the data to the list of requested user.
-     */
-    public void sendData(String signalName, boolean failStatus,
-            List<String> fileList) {
-    }
 }

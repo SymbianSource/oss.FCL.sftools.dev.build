@@ -17,22 +17,22 @@
 
 package com.nokia.maven.scm.provider.hg.command.log;
 
-import com.nokia.maven.scm.provider.hg.VersionChangeSet;
-
-import org.apache.maven.scm.ScmException;
-import org.apache.maven.scm.ScmTag;
-import org.apache.maven.scm.ScmBranch;
-import org.apache.maven.scm.ScmRevision;
-import org.apache.maven.scm.ChangeFile;
-import org.apache.maven.scm.ScmFileStatus;
-import org.apache.maven.scm.log.ScmLogger;
-import org.apache.maven.scm.provider.hg.command.HgConsumer;
-
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.text.SimpleDateFormat;
+
+import org.apache.maven.scm.ChangeFile;
+import org.apache.maven.scm.ScmBranch;
+import org.apache.maven.scm.ScmException;
+import org.apache.maven.scm.ScmFileStatus;
+import org.apache.maven.scm.ScmRevision;
+import org.apache.maven.scm.ScmTag;
+import org.apache.maven.scm.log.ScmLogger;
+import org.apache.maven.scm.provider.hg.command.HgConsumer;
+
+import com.nokia.maven.scm.provider.hg.VersionChangeSet;
 
 /**
  * Consumer of 'hg changelog' command output.

@@ -154,7 +154,7 @@ session = ccm.open_session(database="fa1f5132")
 
     <!-- Change synergy release tag  -->
     <target name="-test-ccm-release-tag-change">
-        <property name="teamlevel.ci.system" value="true" />
+        <property name="team.level.ci.enabled" value="true" />
         <property name="teamlevel.folder.number" value="to1tobet#90" />
         <property name="ccm.database" value="to1tobet" />
 

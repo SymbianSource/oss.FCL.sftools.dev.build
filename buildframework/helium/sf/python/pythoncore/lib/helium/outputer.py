@@ -38,25 +38,25 @@ class Configuration:
         url_file.close()
         self.__xml = amara.parse(data)
         
-    def getClass(self, type, default = None):
+    def getClass(self, type_, default = None):
         """get Class"""
-        return self._getValue(type, "class", default)
+        return self._getValue(type_, "class", default)
 
-    def getImg(self, type, default = None):
+    def getImg(self, type_, default = None):
         """ get Image"""
-        return self._getValue(type, "img", default)
+        return self._getValue(type_, "img", default)
     
-    def getWidth(self, type, default = None):
+    def getWidth(self, type_, default = None):
         """get Width"""
-        return self._getValue(type, "width", default)
+        return self._getValue(type_, "width", default)
     
-    def getHeight(self, type, default = None):
+    def getHeight(self, type_, default = None):
         """get height"""
-        return self._getValue(type, "height", default)
+        return self._getValue(type_, "height", default)
     
-    def _getValue(self, type, attr, default = None):
+    def _getValue(self, type_, attr, default = None):
         """get value"""
-        r_attr = self.__xml.xml_xpath("/htmloutput/icons/icon[@type='%s']" % type)
+        r_attr = self.__xml.xml_xpath("/htmloutput/icons/icon[@type='%s']" % type_)
         if len(r_attr) == 0:
             if default == None:
                 raise Exception("Not found")
@@ -67,6 +67,7 @@ class Configuration:
 class XML2XHTML:
     """ This class is used to generate an html file from the given xml """
     def __init__(self, filename, url="http://fawww.europe.nokia.com/isis/isis_interface/configuration.xml", usedataurl=False):
+        self.__title = None
         self.__config = Configuration(url)
         self.__filename = filename
         self.__srcdoc = xml.dom.minidom.parse(filename)
@@ -165,15 +166,13 @@ class XML2XHTML:
             elif child.nodeType == xml.dom.Node.ELEMENT_NODE and child.tagName == "task" and child.attributes.has_key('type') and child.attributes['type'] == "maincontent":
                 self._handleMainContent(child, body)
 
-        try:
-            footer = root.getElementsByTagName("__footer")[0]
-            f_foot = self.__factory["__footer"](self.__doc, body)
-            if footer.attributes.has_key("title"):
-                f_foot.setTitle(footer.attributes['title'].value)
-            if footer.attributes.has_key("subtitle"):
-                f_foot.setSubTitle(footer.attributes['subtitle'].value)
-        except Exception:
-            pass
+        footer = root.getElementsByTagName("__footer")[0]
+        f_foot = self.__factory["__footer"](self.__doc, body)
+        if footer.attributes.has_key("title"):
+            f_foot.setTitle(footer.attributes['title'].value)
+        if footer.attributes.has_key("subtitle"):
+            f_foot.setSubTitle(footer.attributes['subtitle'].value)
+
         # Generate summary
         self._createSummary()
 
@@ -285,7 +284,7 @@ class XML2XHTML:
 
     def _createSummary(self):
         """create Summary"""
-        # pylint: disable-msg=E1101
+        # pylint: disable=E1101
         if self.__xhtml_summary == None:
             self.__xhtml_summary = Summary(self.__doc, self.__body)
             self.__xhtml_summary.setTitle("Global Statistics")

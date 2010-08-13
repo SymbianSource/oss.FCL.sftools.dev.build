@@ -18,12 +18,25 @@
 package com.nokia.helium.metadata.ant.conditions;
 
 import java.io.File;
-import com.nokia.helium.jpa.ORMReader;
-import com.nokia.helium.jpa.entity.metadata.Metadata;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Query;
+
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.condition.Condition;
 import org.apache.tools.ant.types.DataType;
+import org.apache.tools.ant.types.Resource;
+import org.apache.tools.ant.types.ResourceCollection;
+
+import com.nokia.helium.metadata.FactoryManager;
+import com.nokia.helium.metadata.MetadataException;
+import com.nokia.helium.metadata.ant.types.SeverityEnum;
 
 /**
  * This class implements a Ant Condition which report true if it finds any
@@ -33,7 +46,7 @@ import org.apache.tools.ant.types.DataType;
  * <pre>
  * &lt;target name=&quot;fail-on-build-error&quot;&gt;
  *   &lt;fail message=&quot;The build contains errors&quot;&gt;
- *     &lt;hlm:metadataHasSeverity log=&quot;my.log&quot; db=&quot;my.db&quot; severity=&quot;error&quot;/&gt;
+ *     &lt;hlm:metadataHasSeverity log=&quot;my.log&quot; database=&quot;my.db&quot; severity=&quot;error&quot;/&gt;
  *   &lt;/fail&gt;
  * &lt;/target&gt;
  * </pre>
@@ -45,31 +58,82 @@ import org.apache.tools.ant.types.DataType;
 public class MetaDataLogCondition extends DataType implements Condition {
 
     // The severity to count
-    private String severity;
-    private String logFile;
-    private File fileName;
-    private boolean countMissing = true;
+    private SeverityEnum severity;
+    private File log;
+    private File database;
+    private List<ResourceCollection> resourceCollections = new ArrayList<ResourceCollection>();
     
     /**
-     * Sets which severity will be counted.
+     * Defines which severity will be counted.
      * 
      * @param severity
      * @ant.required
      */
-    public void setSeverity(String severity) {
+    public void setSeverity(SeverityEnum severity) {
         this.severity = severity;
     }
 
-    public void setDb(File file) {
-        fileName = file;
-    }
-    
-    public void setLog(String log) {
-        logFile = log;
+    /**
+     * Defines the database to use.
+     * @param database
+     */
+    @Deprecated
+    public void setDb(File database) {
+        log("The usage of the 'db' attribute is deprecated, please use the database attribute instead.", Project.MSG_WARN);
+        setDatabase(database);
     }
 
+    /**
+     * Defines the database to use.
+     * @param database
+     */
+    public void setDatabase(File database) {
+        this.database = database;
+    }
+    
+    /**
+     * The log file to look severity for in the metadata. 
+     * @param log the actual real log file.
+     */
+    public void setLog(File log) {
+        this.log = log;
+    }
+
+    /**
+     * Defines if missing file shall be counted (Deprecated attribute is ignored).
+     * @param countMissing
+     */
+    @Deprecated
     public void setCountMissing(boolean countMissing) {
-        this.countMissing = countMissing;
+        log("The usage of the 'countMissing' attribute is deprecated.", Project.MSG_WARN);
+        //this.countMissing = countMissing;
+    }
+    
+    /**
+     * 
+     * @param resourceCollection
+     */
+    public void add(ResourceCollection resourceCollection) {
+        resourceCollections.add(resourceCollection);
+    }
+    
+    /**
+     * Get the severity for a specific log file.
+     * @param file
+     * @return
+     * @throws MetadataException
+     */
+    public int getSeverity(EntityManager em, File file) throws MetadataException {
+        // log file under the DB is always represented with / and not \.
+        String queryString = "select Count(m.id) from MetadataEntry m JOIN  m.logFile as l " +
+                        "JOIN m.severity as p where l.path='" +
+                        file.getAbsolutePath().replace('\\', '/') +
+                        "' and p.severity='" + severity.getSeverity() + "'";
+        log("Query: " + queryString, Project.MSG_DEBUG);
+        Query query = em.createQuery(queryString);
+        Number number = (Number)query.getSingleResult();
+        log("Result: " + number, Project.MSG_DEBUG);
+        return number.intValue();        
     }
     
     /**
@@ -77,45 +141,52 @@ public class MetaDataLogCondition extends DataType implements Condition {
      * 
      * @return the number of a particular severity.
      */
-    public int getSeverity() {
-        if (fileName == null || !fileName.exists() || logFile == null) {
-            //this.log("Error: Log file does not exist " + fileName);
-            return -1;
+    @SuppressWarnings("unchecked")
+    public int getSeverity() throws MetadataException {
+        if (log == null && resourceCollections.isEmpty()) {
+            throw new BuildException("'log' attribute not defined.");
         }
-        if (severity == null)
-            throw new BuildException("'severity' attribute is not defined");
+        if (database == null) {
+            throw new BuildException("'database' attribute not defined.");
+        }
+        if (log != null && !log.exists()) {
+            log("Could not find " + log + ".", Project.MSG_WARN);
+        }
+        if (severity == null) {
+            throw new BuildException("'severity' attribute is not defined.");
+        }
 
-        log("Looking for severity '" + severity + "' under '" + fileName.getAbsolutePath() + "'", Project.MSG_DEBUG);
-        
-        Metadata.PriorityEnum prty = null;
-        if (severity.equalsIgnoreCase("ERROR")) {
-            prty = Metadata.PriorityEnum.ERROR;
-        } else if (severity.equalsIgnoreCase("WARNING")) {
-            prty = Metadata.PriorityEnum.WARNING;
-        } else if (severity.equalsIgnoreCase("FATAL")) {
-            prty = Metadata.PriorityEnum.FATAL;
-        } else if (severity.equalsIgnoreCase("INFO")) {
-            prty = Metadata.PriorityEnum.INFO;
-        } else if (severity.equalsIgnoreCase("REMARK")) {
-            prty = Metadata.PriorityEnum.REMARK;
+        EntityManagerFactory factory = null;
+        EntityManager em = null;
+        int result = 0;
+        try {
+            factory = FactoryManager.getFactoryManager().getEntityManagerFactory(database);
+            em = factory.createEntityManager();
+            Date before = new Date();
+            if (!resourceCollections.isEmpty()) {
+                for (ResourceCollection rc : resourceCollections) {
+                    Iterator<Resource> ri = rc.iterator();
+                    while (ri.hasNext()) {
+                        Resource resource = ri.next();
+                        log("Looking for severity '" + severity.getValue() + "' under '" + resource + "'");
+                        result += getSeverity(em, new File(resource.toString()));
+                    }
+                }
+            } else {
+                log("Looking for severity '" + severity.getValue() + "' under '" + log.getAbsolutePath() + "'");
+                result = getSeverity(em, log);
+            }
+            Date after = new Date();
+            log("Elapsed time: " + (after.getTime() - before.getTime()) + " ms");
+        } finally {
+            if (em != null) {
+                em.close();
+            }
+            if (factory != null) {
+                factory.close();
+            }
         }
-        else
-            throw new BuildException("'severity' attribute is not valid");
-        
-        // log file under the DB is always represented with / and not \.
-        String logname = logFile.replace('\\', '/'); 
-        String query = "select Count(m.id) from MetadataEntry m JOIN  m.logFile as l JOIN m.priority as p where l.path like '%" + logname + "' and UPPER(p.priority)='" + severity.toUpperCase() + "'";
-        ORMReader reader = new ORMReader(fileName.getAbsolutePath());
-        Number number = (Number)reader.executeSingleResult(query, null);
-        int retValue = number.intValue();
-        // Looking for missing file as error
-        if (countMissing && prty == Metadata.PriorityEnum.ERROR) {
-            String queryMissing = "select Count(m.id) from WhatLogEntry m JOIN m.component as c JOIN c.logFile as l where l.path like '%" + logname + "' and m.missing=1";
-            Number numberMissing = (Number) reader.executeSingleResult(queryMissing, null);
-            retValue = number.intValue() + numberMissing.intValue();
-        }
-        reader.close();
-        return retValue;
+        return result;
     }
 
     /**
@@ -125,10 +196,14 @@ public class MetaDataLogCondition extends DataType implements Condition {
      * @return if true if message with the defined severity have been found.
      */
     public boolean eval() {
-        int severity = getSeverity();
-        if (severity < 0) {
-            return false;
+        try {
+            int severity = getSeverity();
+            if (severity < 0) {
+                return false;
+            }
+            return severity > 0;
+        } catch (MetadataException ex) {
+            throw new BuildException(ex.getMessage(), ex);
         }
-        return severity > 0;
     }
 }

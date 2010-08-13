@@ -90,7 +90,8 @@ f = urllib2.urlopen(req)
               - nwiki.domain is typically nwiki.nokia.com
               - location could be, MBPVancouver for example
     -->
-    <target name="create-wiki-bom" depends="remove-build-version-dots,get-nwiki-username,get-nwiki-password" if="publish">
+    <target name="create-wiki-bom" depends="remove-build-version-dots,get-nwiki-username,get-nwiki-password" if="internal.publish.enabled">
+        
         <loadfile property="temp-bom-data" srcfile="${prep.log.dir}/${build.name}_${build.version}_BOM.txt" failonerror="false">
         </loadfile>
         <if>
@@ -109,7 +110,8 @@ f = urllib2.urlopen(req)
               - nwiki.domain is typically nwiki.nokia.com
               - location could be, MBPVancouver for example
     -->
-    <target name="create-wiki-bom-delta" depends="remove-build-version-dots,get-nwiki-username,get-nwiki-password" if="publish">
+    <target name="create-wiki-bom-delta" depends="remove-build-version-dots,get-nwiki-username,get-nwiki-password" if="internal.publish.enabled">
+        
         <loadfile property="temp-bom-delta-data" srcfile="${prep.log.dir}/${build.name}_${build.version}_BOM_delta.txt" failonerror="false">
         </loadfile>
 

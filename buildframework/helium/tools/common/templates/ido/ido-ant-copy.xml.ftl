@@ -25,7 +25,7 @@ Description:
         <parallel threadCount="${r'$'}{number.of.threads}">
         <#list data?keys as component>
             <sequential>
-                <#if ant?keys?seq_contains('ido.keep.old')>
+                <#if ((ant['keep.old.source.enabled']=="true") || ant?keys?seq_contains('ido.keep.old'))>
                 <delete dir="${data[component]}_old" failonerror="false"/>
                 <move file="${data[component]}" todir="${data[component]}_old" failonerror="false"/>
                 <#else>
@@ -46,7 +46,8 @@ Description:
                 <copy todir="${data[component]}" verbose="false" failonerror="false" overwrite="true">
                     <fileset dir="${component}" casesensitive="false" >
                         <exclude name="**/_ccmwaid.inf"/>
-                        <#if (!ant?keys?seq_contains('keep.internals'))>
+                        <exclude name="**/.ccmwaid.inf"/>
+                        <#if ((ant['keep.internal.folders.enabled'] == "false")&& (!ant?keys?seq_contains('keep.internals')))>
                         <exclude name="**/internal/**"/>
                         </#if>
                         <exclude name="**/.hg/**"/>

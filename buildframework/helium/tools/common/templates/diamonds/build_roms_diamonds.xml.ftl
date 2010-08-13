@@ -24,37 +24,40 @@ Description:
 
 <#assign db = pp.loadData('com.nokia.helium.metadata.ORMFMPPLoader', "${dbPath}") >
 
-<images>
-    <status></status>
-    <#list db['native:java.lang.String']['select DISTINCT component.component from component where component.component like \'%.fpsx\''] as component>
-    <image>
-    
-        <#assign status = "ok">
-        <#list db['jpa']['select m from MetadataEntry m JOIN m.logFile as l JOIN m.priority as p JOIN m.component as c where UPPER(p.priority)=\'ERROR\' and c.component=\'${component}\''] as m>
-        <#assign match = m.text?matches(".*?fpsx' - DOESN'T EXIST")>
-        <#if match>
-        <#assign status = "failed">
-        </#if>
-        </#list>
-        <status>${status}</status>
+    <images>
+        <#assign overallStatus = "ok">
         
-        <name>${component}</name>
-        <hardware>N/A</hardware>
-        <#assign type = component?matches("([^.]+)\\.fpsx")[0]>
-        <type>${type?groups[1]}</type>
-        <errors count="${db['jpasingle']['select Count(m.id) from MetadataEntry m JOIN m.logFile as l JOIN m.priority as p JOIN m.component as c where UPPER(p.priority)=\'ERROR\' and c.component=\'${component}\''][0]}">
-            <#list db['jpa']['select m from MetadataEntry m JOIN m.logFile as l JOIN m.priority as p JOIN m.component as c where UPPER(p.priority)=\'ERROR\' and c.component=\'${component}\''] as m>
-            <error>${m.text}</error>
+        <#list db['native:java.lang.String']['select DISTINCT component.component from component where component.component like \'%.fpsx\''] as component>
+        <image>
+            <#assign status = "ok">
+            <#list db['jpa']['select m from MetadataEntry m JOIN m.logFile as l JOIN m.severity as p JOIN m.component as c where p.severity=\'ERROR\' and c.component=\'${component}\''] as m>
+            <#assign match = m.text?matches(".*?fpsx' - DOESN'T EXIST")>
+            <#if match>
+            <#assign status = "failed">
+            <#assign overallStatus = "failed">
+            </#if>
             </#list>
-        </errors>
-        <warnings count="${db['jpasingle']['select Count(m.id) from MetadataEntry m JOIN m.logFile as l JOIN m.priority as p JOIN m.component as c where UPPER(p.priority)=\'WARNING\' and c.component=\'${component}\''][0]}">
-            <#list db['jpa']['select m from MetadataEntry m JOIN m.logFile as l JOIN m.priority as p JOIN m.component as c where UPPER(p.priority)=\'WARNING\' and c.component=\'${component}\''] as m>
-            <warning>${m.text}</warning>
-            </#list>
-        </warnings>
-    </image>
-    </#list>
-</images>
+            <status>${status}</status>
+            
+            <name>${component}</name>
+            <hardware>N/A</hardware>
+            <#assign type = component?matches("([^.]+)\\.fpsx")[0]>
+            <type>${type?groups[1]}</type>
+            <errors count="${db['jpasingle']['select Count(m.id) from MetadataEntry m JOIN m.logFile as l JOIN m.severity as p JOIN m.component as c where p.severity=\'ERROR\' and c.component=\'${component}\''][0]}">
+                <#list db['jpa']['select m from MetadataEntry m JOIN m.logFile as l JOIN m.severity as p JOIN m.component as c where p.severity=\'ERROR\' and c.component=\'${component}\''] as m>
+                <error>${m.text}</error>
+                </#list>
+            </errors>
+            <warnings count="${db['jpasingle']['select Count(m.id) from MetadataEntry m JOIN m.logFile as l JOIN m.severity as p JOIN m.component as c where p.severity=\'WARNING\' and c.component=\'${component}\''][0]}">
+                <#list db['jpa']['select m from MetadataEntry m JOIN m.logFile as l JOIN m.severity as p JOIN m.component as c where p.severity=\'WARNING\' and c.component=\'${component}\''] as m>
+                <warning>${m.text}</warning>
+                </#list>
+            </warnings>
+        </image>
+        </#list>
+        
+        <status>${overallStatus}</status>
+    </images>
 
 <#include "diamonds_footer.ftl">
 

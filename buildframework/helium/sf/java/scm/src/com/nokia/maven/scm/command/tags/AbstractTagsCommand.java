@@ -24,6 +24,7 @@ import org.apache.maven.scm.ScmFileSet;
 import org.apache.maven.scm.command.AbstractCommand;
 import org.apache.maven.scm.provider.ScmProviderRepository;
 
+
 /**
  * Abstract class representing a tags command. 
  * Tags consist in retrieving existing tags for a particular repository.

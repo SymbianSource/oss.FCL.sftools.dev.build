@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="ASCII" standalone="no" ?>
+<?xml-stylesheet type="text/xsl" href="BBCResults.xsl"?>
+<!-- 
+============================================================================ 
+Name        : headers_report_notypeids.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<bbcresults>
+
+  <issuelist>
+    <headerfile>
+      <filename>C:\Symbian\9.2\_sdpdefs.h</filename>
+      <api category="Unknown" name="Unknown"/>
+    </headerfile>
+    <headerfile>
+      <filename>C:\Symbian\9.2\_sipcodecdefs.h</filename>
+      <api category="Unknown" name="Unknown"/>
+    </headerfile>
+    <headerfile>
+      <filename>C:\Symbian\9.2\animationcmd.h</filename>
+      <api category="Unknown" name="Unknown"/>
+      <issue>
+        <issueid>5</issueid>
+        <severity>
+          <typeid>1</typeid>
+          <typestring>BBC Break</typestring>
+        </severity>
+        <scseverity>
+          <typeid>1</typeid>
+          <typestring>SC Break</typestring>
+        </scseverity>
+      </issue>
+    </headerfile>
+  </issuelist>
+</bbcresults>

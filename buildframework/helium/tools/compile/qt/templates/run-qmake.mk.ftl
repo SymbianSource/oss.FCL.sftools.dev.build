@@ -31,12 +31,14 @@ Description:
     <#if unit.@proFile[0]??>
         <#assign prefix="" />
     </#if>
-##########################################################################
-/${unit.@bldFile}/bld.inf: /${unit.@bldFile}/${unit['@${prefix}proFile'][0]}
-	@echo cd /${unit.@bldFile} ^&^& qmake -listgen <#if unit['@${prefix}qmakeArgs'][0]??>${unit['@${prefix}qmakeArgs'][0]}<#else>${ant['qt.qmake.default.args']}</#if><#if "${ant['build.system']?lower_case}" = 'sbs-ec'> -spec symbian-sbsv2</#if> ${unit['@${prefix}proFile'][0]}
-	-@cd /${unit.@bldFile} && qmake -listgen <#if unit['@${prefix}qmakeArgs'][0]??>${unit['@${prefix}qmakeArgs'][0]}<#else>${ant['qt.qmake.default.args']}</#if> ${unit['@${prefix}proFile'][0]}
+    <#assign bldinf="${ant['build.drive']}/${unit.@bldFile}"?replace('\\', '/')?replace('//', '/')>
 
-all:: /${unit.@bldFile}/bld.inf
+##########################################################################
+${bldinf}/bld.inf: ${bldinf}/${unit['@${prefix}proFile'][0]}
+	@echo cd ${bldinf} ^&^& qmake -listgen <#if unit['@${prefix}qmakeArgs'][0]??>${unit['@${prefix}qmakeArgs'][0]}<#else>${ant['qt.qmake.default.args']}</#if><#if "${ant['build.system']?lower_case}" = 'sbs-ec'> -spec symbian-sbsv2</#if> ${unit['@${prefix}proFile'][0]}
+	-@cd ${bldinf} && qmake -listgen <#if unit['@${prefix}qmakeArgs'][0]??>${unit['@${prefix}qmakeArgs'][0]}<#else>${ant['qt.qmake.default.args']}</#if> ${unit['@${prefix}proFile'][0]}
+
+all:: ${bldinf}/bld.inf
 
 
 </#list>

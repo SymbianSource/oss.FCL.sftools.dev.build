@@ -19,8 +19,7 @@
 """build of Materials to file writer"""
 
 class BOMWriter(object):
-    """
-    Read BOM and output in text
+    """ Read BOM and output in text.
     """
     def __init__(self, session, project_name, project, output_dir):
         self.project_name = project_name
@@ -48,16 +47,14 @@ class BOMWriter(object):
             fileout.write(str(i) + ") " + str(project) + "\n")
             
             cmproject = self.session.create(str(project))
+
+            baseline = str(cmproject.baseline).strip()
+            if baseline == "None":
+                fileout.write(str(i) + ") " + str(project) + "\n")
+            else:
+                fileout.write(str(i) + ") " + baseline + "\n")
+            i += 1
             
-            try:
-                baseline = str(cmproject.baseline).strip()
-                if baseline == "None":
-                    fileout.write(str(i) + ") " + str(project) + "\n")
-                else:
-                    fileout.write(str(i) + ") " + baseline + "\n")
-                i += 1
-            except Exception, ex:
-                print ex
         fileout.close()
             
     def writetasks(self):

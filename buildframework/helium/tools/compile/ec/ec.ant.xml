@@ -79,7 +79,7 @@ Description:
                 <metadatafilterset refid="filterset.genxml.ec" />
             </hlm:textmetadatainput>
         </hlm:metadatarecord>
-        <hlm:generateBuildStatus file="${build.id}.${sysdef.configuration}.sysdef2make.log" />
+        <hlm:generateBuildStatus file="${compile.log.dir}/${build.id}.${sysdef.configuration}.sysdef2make.log" />
     </target>
 
     <!-- Locate the dependancy files from a previous build so that only those files that have been changed need to be compiled -->

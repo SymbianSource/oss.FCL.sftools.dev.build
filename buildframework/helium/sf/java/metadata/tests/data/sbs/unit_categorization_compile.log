@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<buildlog sbs_version="2.9.2 [2009-09-21 sf release]" xmlns="http://symbian.com/xml/build/log" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symbian.com/xml/build/log http://symbian.com/xml/build/log/1_0.xsd">
+<recipe name='compile' target='X:/epoc32/build/organizer/c_aff6bae36b1df6c4/srchuiresviewplugin_dll/armv5/urel/srchuiresultview.o' host='' layer='app_layer' component='' bldinf='${epocroot}/sf/mw/helloworldapi/group/bld.inf' mmp='X:/sf/app/organizer/searchui/searchapp/plugins/resultviewerplugin/group/srchuiresviewplugin.mmp' config='armv5_urel.product' platform='armv5' phase='ALL' source='X:/sf/app/organizer/searchui/searchapp/plugins/resultviewerplugin/src/srchuiresultview.cpp'>
+<![CDATA[
+ERROR: some fake error
+]]><time start='1253718692.38008' elapsed='1.094' />
+<status exit='failed' code='1' attempt='3' />
+</recipe>
+<recipe name='compile' target='X:/epoc32/build/organizer/c_aff6bae36b1df6c4/srchuiresviewplugin_dll/armv5/urel/srchuiresultview.o' host='' layer='app_layer' component='' bldinf='${epocroot}/sf/mw/helloworldapi/group/bld.inf' mmp='X:/sf/app/organizer/searchui/searchapp/plugins/resultviewerplugin/group/srchuiresviewplugin.mmp' config='armv5_urel.product' platform='armv5' phase='ALL' source='X:/sf/app/organizer/searchui/searchapp/plugins/resultviewerplugin/src/srchuiresultview.cpp'>
+<![CDATA[
+ERROR: second fake error
+]]><time start='1253718692.38008' elapsed='1.094' />
+<status exit='failed' code='1' attempt='3' />
+</recipe>
+<info>Run time 226 seconds</info>
+</buildlog>

@@ -29,7 +29,7 @@ Description:
             <runScenario scenario="failing-build" target="build" />
         </au:expectfailure>
         <au:assertLogContains text="Signal: buildFailedSignal" />
-        <au:assertLogContains text="Message: Failing the build." />
+        <au:assertLogContains text="Failing the build." />
     </target>
    
     <target name="test-failing-build-with-failure-in-notifier">
@@ -37,7 +37,7 @@ Description:
             <runScenario scenario="failing-build-failing-notifier" target="build" />
         </au:expectfailure>
         <au:assertLogContains text="Signal: buildFailedSignal" />
-        <au:assertLogContains text="Message: Failing the build." />
+        <au:assertLogContains text="Failing the build." />
     </target>
    
 </project>

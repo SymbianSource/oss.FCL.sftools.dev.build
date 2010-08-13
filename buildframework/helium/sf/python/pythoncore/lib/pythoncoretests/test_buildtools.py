@@ -30,7 +30,8 @@ class AntWriterTest(unittest.TestCase):
     def setUp(self):
         """called before all tests run to setup variables etc."""
         self.temp = "temp"
-        os.makedirs(self.temp)
+        if not os.path.exists(self.temp):
+            os.makedirs(self.temp)
     
     def tearDown(self):
         """ called after tests have run to clear anything left hanging around"""

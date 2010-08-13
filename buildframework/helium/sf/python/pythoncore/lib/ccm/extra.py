@@ -43,21 +43,21 @@ class CCMExtraException(ccm.CCMException):
     
     
 
-def Snapshot(project, targetdir, dir=None):
+def Snapshot(project, targetdir, dir_=None):
     """ This function can snapshot anything from Synergy, even prep/working projects """
     assert project != None, "a project object must be supplied"
     assert project.type == "project", "project must be of project type"
-    if not dir:
-        dir = project.root_dir()
-    targetdir = os.path.join(targetdir, dir.name)
+    if not dir_:
+        dir_ = project.root_dir()
+    targetdir = os.path.join(targetdir, dir_.name)
     os.makedirs(targetdir)
-    for object in dir.children(project):
-        if object.type == 'dir':
-            Snapshot(project, targetdir, object)
-        elif object.type == 'project':
-            Snapshot(object, targetdir)
+    for object_ in dir_.children(project):
+        if object_.type == 'dir':
+            Snapshot(project, targetdir, object_)
+        elif object_.type == 'project':
+            Snapshot(object_, targetdir)
         else:
-            object.to_file(os.path.join(targetdir, object.name))
+            object_.to_file(os.path.join(targetdir, object_.name))
 
 
 class _FastSnapshot:
@@ -74,14 +74,14 @@ class _FastSnapshot:
         """ Do the checkout, and then walkthrough the project hierarchy to find subproject to snapshot. """
         _logger.info("Snapshotting %s under %s" % (self.project, self.targetdir))
         self.project.snapshot(self.targetdir, False)
-        def walk(dir, targetdir):
+        def walk(dir_, targetdir):
             """walkthrough the project hierarchy to find subproject to snapshot"""
-            for object in dir.children(self.project):
-                if isinstance(object, ccm.Dir):
-                    walk(object, os.path.join(targetdir, object.name))
-                elif isinstance(object, ccm.Project):
-                    _logger.info("Adding project %s" % object.objectname)
-                    self.pool.addWork(_FastSnapshot(self.pool, object, targetdir, self.callback, self.exc_hld))
+            for object_ in dir_.children(self.project):
+                if isinstance(object_, ccm.Dir):
+                    walk(object_, os.path.join(targetdir, object_.name))
+                elif isinstance(object_, ccm.Project):
+                    _logger.info("Adding project %s" % object_.objectname)
+                    self.pool.addWork(_FastSnapshot(self.pool, object_, targetdir, self.callback, self.exc_hld))
                     
         if len(self.project.subprojects) > 0:
             rootdir = self.project.root_dir()
@@ -147,9 +147,9 @@ def FastMaintainWorkArea(project, path, pst=None, threads=4, wat=False):
         def __call__(self):
             output = ""
             _logger.info("Maintaining project %s" % self.subproject)
-            for tuple in self.subproject.finduse():
-                if tuple['project'] == self.toplevel:
-                    self.subproject['wa_path'] = os.path.join(self.toplevel['wa_path'], tuple['path'])
+            for tuple_ in self.subproject.finduse():
+                if tuple_['project'] == self.toplevel:
+                    self.subproject['wa_path'] = os.path.join(self.toplevel['wa_path'], tuple_['path'])
                     self.subproject["project_subdir_template"] = ""
                     _logger.info("Maintaining project %s under %s" % (self.subproject, self.subproject['wa_path']))
                     output = self.subproject.work_area(True, True, True, wat=self.wat)
@@ -274,7 +274,9 @@ class CachedSessionProvider(SessionProvider):
         """load the command"""
         if self.cacheXml is not None and os.path.exists(self.cacheXml):
             _logger.info("Loading %s" % self.cacheXml)
-            doc = parse(open(self.cacheXml, 'r')) 
+            stream = open(self.cacheXml, 'r')
+            doc = parse(stream)
+            stream.close() 
             sessions = doc.documentElement
             self._lock.acquire()
             try:

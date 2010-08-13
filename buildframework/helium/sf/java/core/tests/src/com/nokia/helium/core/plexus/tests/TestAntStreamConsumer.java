@@ -16,12 +16,14 @@
 */
 package com.nokia.helium.core.plexus.tests;
 
+import static org.junit.Assert.assertTrue;
+
 import org.apache.tools.ant.BuildEvent;
 import org.apache.tools.ant.BuildListener;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Echo;
 import org.junit.Test;
-import static org.junit.Assert.*;
+
 import com.nokia.helium.core.plexus.AntStreamConsumer;
 
 public class TestAntStreamConsumer {

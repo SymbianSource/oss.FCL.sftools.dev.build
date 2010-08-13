@@ -21,6 +21,7 @@
 package com.nokia.ant.taskdefs;
 
 import java.util.Hashtable;
+
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.taskdefs.Recorder;

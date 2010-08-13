@@ -16,14 +16,15 @@
 */
 package com.nokia.helium.sbs.plexus;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.BufferedWriter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
+
 import com.nokia.helium.core.plexus.FileStreamConsumer;
 
 /**

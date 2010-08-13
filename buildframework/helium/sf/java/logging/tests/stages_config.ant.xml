@@ -26,6 +26,7 @@ Description:
     </description>
     
     <taskdef resource="com/nokia/helium/logger/ant/antlib.xml" uri="http://www.nokia.com/helium" />
+    <taskdef resource="com/nokia/helium/core/ant/antlib.xml" uri="http://www.nokia.com/helium"/>
     
     <dirname property="logging.test.project.dir" file="${ant.file.stages-config}" />
     

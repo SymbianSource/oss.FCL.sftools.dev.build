@@ -397,12 +397,12 @@ def read_policy_content(filename):
             value = match.group(1)
         else:
             error = "Content of '%s' doesn't match r'^\d+|0842[0-9a-zA-Z]{3}\s*$'." % filename
-    except Exception, exc:
+    except IOError, exc:
         error = str(exc)
     if value is not None:
         return value
     # worse case....
-    raise Exception(error)
+    raise IOError(error)
 
 def load_policy_content(filename):
     """ Testing policy content loading. """
@@ -410,8 +410,8 @@ def load_policy_content(filename):
     try:
         fileh = codecs.open(filename, 'r', 'ascii')
         data = fileh.read()
-    except:
-        raise Exception("Error loading '%s' as an ASCII file." % filename)
+    except ValueError:
+        raise IOError("Error loading '%s' as an ASCII file." % filename)
     finally:
         fileh.close()
     return data
@@ -485,7 +485,7 @@ def getmd5(fullpath, chunk_size=2**16):
                     break
                 md5.update(chunk)
             file_handle.close()
-        except Exception, exc:
+        except IOError, exc:
             LOGGER.warning("Error happened on %d trial: %s" % (trial, str(exc)))
     return md5.hexdigest()
 
@@ -497,8 +497,8 @@ def read_symbian_policy_content(filename):
         LOGGER.debug('Opening symbian policy file: ' + filename)
         try:
             fileh = codecs.open(filename, 'r', 'ascii')
-        except:
-            raise Exception("Error loading '%s' as an ASCII file." % filename)        
+        except ValueError:
+            raise IOError("Error loading '%s' as an ASCII file." % filename)        
         for line in fileh:
             match = re.match(r'^Category\s+([A-Z])\s*$', line, re.M|re.DOTALL)
             if match != None:
@@ -508,12 +508,12 @@ def read_symbian_policy_content(filename):
         fileh.close()
         if match == None:
             error = "Content of '%s' doesn't match r'^Category\s+([A-Z])\s*$'." % filename
-    except Exception, exc:
+    except IOError, exc:
         error = str(exc)
     if value is not None:
         return value
     # worse case....
-    raise Exception(error)
+    raise IOError(error)
 
 
 class LockFailedException(Exception):
@@ -542,6 +542,7 @@ if os.name == 'nt':
             # Open the file
             if self.f_desc == None:
                 self.f_desc = open(self._filename, "w+")
+            # pylint: disable=W0212
             wfd = win32file._get_osfhandle(self.f_desc.fileno())
             if not wait:
                 try:
@@ -565,9 +566,10 @@ if os.name == 'nt':
             if self.f_desc == None:
                 LOGGER_LOCK.debug("already unlocked")
                 return
+            # pylint: disable=W0212
             wfd = win32file._get_osfhandle(self.f_desc.fileno())
             try:
-                # pylint: disable-msg=E1101
+                # pylint: disable=E1101
                 win32file.UnlockFile(wfd, 0 , 0, 0xffff, 0)
                 self.f_desc.close()
                 self.f_desc = None

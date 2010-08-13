@@ -20,7 +20,7 @@
 #===============================================================================
 
 """ Testing ats4 framework. """
-# pylint: disable-msg=E1101, C0302, W0142, W0603, R0902,R0903,R0912,R0915
+# pylint: disable=E1101, C0302, W0142, W0603, R0902,R0903,R0912,R0915
 #E1101 => Mocker shows mockery
 #C0302 => too many lines
 #W0142 => used * or ** magic 
@@ -40,9 +40,9 @@ import re
 import subprocess
 import fileutils
 
-from path import path # pylint: disable-msg=F0401
+from path import path # pylint: disable=F0401
 import amara
-import mocker # pylint: disable-msg=F0401
+import mocker # pylint: disable=F0401
 
 import ntpath
 
@@ -302,17 +302,6 @@ def check_ctc_log(steps, testtype=""):
     params = step.findall("./parameters/parameter")
     #assert params[0].get("value") == "false"
     assert params[0].get("value") == path(r"c:\data\ctc\ctcdata.txt")
-    if testtype == "withpkgfiles":
-        assert params[1].get("value") == r"\\10.0.0.1\ctc_helium\builds\drop0\set1\ctcdata"
-    else:
-        assert params[1].get("value") == r"\\10.0.0.1\ctc_helium\builds\drop0\set0\ctcdata"
-    
-    #For the ctcdata.txt to be published on the build network drive
-    step = steps.next()
-    assert step.findtext("./type") == "FileDownloadTask"
-    params = step.findall("./parameters/parameter")
-    #assert params[0].get("value") == "true"
-    assert params[0].get("value") == path(r"c:\data\ctc\ctcdata.txt")
 
 def check_ctc_start(steps):
     """Checks if CTC starts in ATS"""
@@ -338,7 +327,6 @@ def check_fetch_logs(steps, harness="STIF"):
 def check_diamonds_action(action):
     """ Testing Diamonds action. """
     assert action.findtext("./type") == "DiamondsAction"
-    assert not action.findall("./parameters/parameter") 
 
 def check_send_email_action(action, reportemail):
     """verifies if sening email option works"""
@@ -534,6 +522,7 @@ class TestTestPlan(mocker.MockerTestCase):
                                        trace_activation_files=self.trace_activation_files,
                                        ctc_enabled=self.atp["ctc_enabled"],
                                        custom_dir=None,
+                                       dll_files={},
                                        component_path=self.component_path)
         assert self.atp.sets[1] == dict(name="set1",
                                        image_files=self.image_files,
@@ -547,6 +536,7 @@ class TestTestPlan(mocker.MockerTestCase):
                                        trace_activation_files=self.trace_activation_files,
                                        ctc_enabled=self.atp["ctc_enabled"],
                                        custom_dir=None,
+                                       dll_files={},
                                        component_path=self.component_path)
 
         assert self.atp.sets[2] == dict(name="set2",
@@ -564,6 +554,7 @@ class TestTestPlan(mocker.MockerTestCase):
                                        trace_activation_files=self.trace_activation_files,
                                        ctc_enabled=self.atp["ctc_enabled"],
                                        custom_dir=None,
+                                       dll_files={},
                                        component_path=self.component_path)
         assert self.atp.sets[3] == dict(name="set3",
                                        data_files=[],
@@ -580,6 +571,7 @@ class TestTestPlan(mocker.MockerTestCase):
                                        trace_activation_files=self.trace_activation_files,
                                        ctc_enabled=self.atp["ctc_enabled"],
                                        custom_dir=None,
+                                       dll_files={},
                                        component_path=self.component_path)
 
         assert self.atp.sets[4] == dict(name="set4",
@@ -597,6 +589,7 @@ class TestTestPlan(mocker.MockerTestCase):
                                        trace_activation_files=self.trace_activation_files,
                                        ctc_enabled=self.atp["ctc_enabled"],
                                        custom_dir=None,
+                                       dll_files={},
                                        component_path=self.component_path)
         
     def test_post_actions_email(self):
@@ -778,6 +771,7 @@ class TestXMLGeneration(mocker.MockerTestCase):
         mocker.expect(test_plan.custom_dir).result(path(r"self.custom_dir"))
         mocker.expect(test_plan["report_email"]).result(self.report_email)
         mocker.expect(test_plan["ctc_run_process_params"]).result(self.ctc_run_process_params)
+        mocker.expect(test_plan["report_type"]).result("")
                 
         if self.trace_enabled.lower() == "true":
             mocker.expect(test_plan["trace_enabled"]).result("True")
@@ -834,6 +828,7 @@ class TestXMLGeneration(mocker.MockerTestCase):
         self.mocker.replay()
         self.test_plan = test_plan
         self.gen = adg.Ats3TemplateTestDropGenerator()
+        self.gen.output_file = 'ats4drop0.zip'
         return self.gen.generate_xml(test_plan)
 
     def test_basic_structure(self):
@@ -1193,6 +1188,7 @@ class TestXMLGenerationWithPKG(mocker.MockerTestCase):
         mocker.expect(test_plan.custom_dir).result(path(r"self.custom_dir"))
         mocker.expect(test_plan["ctc_run_process_params"]).result(self.ctc_run_process_params)
         mocker.expect(test_plan["report_email"]).result(self.report_email)
+        mocker.expect(test_plan["report_type"]).result("")
         if self.trace_enabled == "False":
             mocker.expect(test_plan.sets).result([
                 dict(name="set0", image_files=self.image_files, data_files=self.data_files,
@@ -1240,6 +1236,7 @@ class TestXMLGenerationWithPKG(mocker.MockerTestCase):
         self.test_plan = test_plan
         
         self.gen = adg.Ats3TemplateTestDropGenerator()
+        self.gen.output_file = 'ats4drop0.zip'
         return self.gen.generate_xml(test_plan)
 #        for thar in test_harness:
 #            xml = self.generate_xml(thar)
@@ -1571,6 +1568,7 @@ class TestDropGenerationWithSis(mocker.MockerTestCase):
         mocker.expect(test_plan.custom_dir).result(path(r"self.custom_dir"))
         mocker.expect(test_plan["ctc_run_process_params"]).result(self.ctc_run_process_params)
         mocker.expect(test_plan["report_email"]).result(self.report_email)
+        mocker.expect(test_plan["report_type"]).result("")
         mocker.expect(test_plan.sets).result([
             dict(name="set0", image_files=self.image_files, sis_files=self.sis_files,
                  engine_ini_file=self.engine_ini_file, test_harness=self.harness, ctc_enabled="False", component_path=self.component_path, custom_dir=None),
@@ -1580,6 +1578,7 @@ class TestDropGenerationWithSis(mocker.MockerTestCase):
         self.test_plan = test_plan
         
         self.gen = adg.Ats3TemplateTestDropGenerator()
+        self.gen.output_file = 'ats4drop0.zip'
         return self.gen.generate_xml(test_plan)
 
     def test_case_steps(self):
@@ -1612,3 +1611,24 @@ class TestDropGenerationWithSis(mocker.MockerTestCase):
             assert step.findtext("./type") == "InstallSisTask"
             params = step.findall("./parameters/parameter")
             assert params[-1].get("value") == "c:\\testframework\\" + ntpath.basename(filename)
+
+def test_ats_sut():
+    opts = Bunch(file_store='', flash_images='', diamonds_build_url='', testrun_name='', device_type='', report_email='', test_timeout='', drop_file='', config_file='', target_platform='', data_dir='', build_drive='', sis_files='', harness='', trace_enabled='', specific_pkg='', ats4_enabled='true', device_hwid='')
+
+    test_plan = ats3.Ats3TestPlan(opts)
+    component_parser = ats3.testconfigurator.Ats3ComponentParser(opts)
+    
+    test_plan.sets = [dict(name="set0", image_files='', test_harness='GENERIC', custom_dir=None, src_dst=[("file1.dll", r"c:\sys\bin\file1.dll", "testmodule:sut")])]
+    
+    generator = ats3.dropgenerator.Ats3TemplateTestDropGenerator()
+    generator.output_file = 'ats4drop0.zip'
+    xml = generator.generate_xml(test_plan)
+    #print et.tostring(xml.getroot())
+    
+    steps = iter(xml.findall(".//task"))
+    steps.next()
+    steps.next()
+    step = steps.next()
+    assert step.findtext("./type") == "SymbianUnitTestTask"
+    params = step.findall("./parameters/parameter")
+    assert params[1].get("value") == r"-tests=c:\sys\bin\file1.dll -noprompt"

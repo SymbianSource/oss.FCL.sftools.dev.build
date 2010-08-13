@@ -17,12 +17,11 @@
 
 package com.nokia.helium.ant.data;
 
-import java.io.IOException;
 import java.text.BreakIterator;
 import java.util.HashMap;
 import java.util.StringTokenizer;
 
-import org.apache.tools.ant.Project;
+import org.apache.log4j.Logger;
 import org.dom4j.Comment;
 import org.dom4j.Node;
 
@@ -31,17 +30,19 @@ import org.dom4j.Node;
  * fileset, etc. It should preceed the object.
  */
 public class AntComment {
+    private static Logger log = Logger.getLogger(AntComment.class);
+
     private String summary = "";
     private String parsedDocText = "";
     private HashMap<String, String> tags;
     private String objectName = "";
     private boolean isMarkedComment;
 
-    public AntComment() throws IOException {
+    public AntComment() {
         this(null);
     }
 
-    public AntComment(Comment comment) throws IOException {
+    public AntComment(Comment comment) {
         tags = new HashMap<String, String>();
         if (comment != null) {
             
@@ -60,7 +61,7 @@ public class AntComment {
                 String[] splitStrings = text.split("\\s", 3);
                 objectName = splitStrings[1];
                 if (objectName == null) {
-                    log("Comment block: object name is not defined.", Project.MSG_WARN);
+                    log.warn("Comment block: object name is not defined.");
                     objectName = "";
                 }
                 if (splitStrings.length > 2) {
@@ -74,7 +75,7 @@ public class AntComment {
         }
     }
 
-    private void parseCommentText(String text) throws IOException {
+    private void parseCommentText(String text) {
         if (text.length() > 0) {
             StringTokenizer tokenizer = new StringTokenizer(text, "@");
 
@@ -96,8 +97,9 @@ public class AntComment {
                 while (tokenizer.hasMoreElements()) {
                     String tagText = (String) tokenizer.nextElement();
                     String[] tagParts = tagText.split("\\s", 2);
-                    if (tagParts.length > 1)
+                    if (tagParts.length > 1) {
                         tags.put(tagParts[0], tagParts[1].trim());
+                    }
                 }
             }
         }
@@ -161,10 +163,6 @@ public class AntComment {
     public boolean isMarkedComment() {
         return isMarkedComment;
     }
-
-    private void log(String string, int msgWarn) {
-        System.out.println(string);
-    }
     
     /**
      * Clean the whitespace of the doc text.
@@ -173,7 +171,6 @@ public class AntComment {
      */
     static String getCleanedDocNodeText(Node docNode) {
         Node preceedingWhitespaceNode = docNode.selectSingleNode("preceding-sibling::text()");
-        // System.out.println(whitespace);
         int indent = 0;
         if (preceedingWhitespaceNode != null) {
             String text = preceedingWhitespaceNode.getText();
@@ -181,8 +178,6 @@ public class AntComment {
             if (lines.length > 0) {
                 indent = lines[lines.length - 1].length();
             }
-            // System.out.println("indent: " + lines[lines.length -
-            // 1].length());
         }
         
         String text = docNode.getText();

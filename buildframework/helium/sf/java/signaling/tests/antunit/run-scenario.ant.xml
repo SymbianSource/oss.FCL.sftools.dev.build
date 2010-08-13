@@ -37,14 +37,14 @@ Description:
         <attribute name="scenario" />
         <attribute name="target" />
         <sequential>
-            <exec osfamily="windows" executable="cmd" dir="${file.run-scenario}/../../scenarii/@{scenario}" failonerror="true">
+            <exec osfamily="windows" executable="cmd" dir="${ant.file.run-scenario}/../../scenarii/@{scenario}" failonerror="true">
                 <env key="ANT_ARGS" value="${env.ANT_ARGS}" />
                 <arg line="/c ..\build.bat" />
                 <arg value="@{target}" />
                 <arg value="-Dant.executor.class=com.nokia.helium.core.ant.HeliumExecutor" />
                 <arg value="-Dtemp.dir=${temp.dir}" />
             </exec>
-            <exec osfamily="unix" executable="../bld.sh" dir="${file.run-scenario}/../../scenarii/@{scenario}" failonerror="true">
+            <exec osfamily="unix" executable="../bld.sh" dir="${ant.file.run-scenario}/../../scenarii/@{scenario}" failonerror="true">
                 <env key="ANT_ARGS" value="${env.ANT_ARGS}" />
                 <arg line="@{target}" />
                 <arg value="-Dant.executor.class=com.nokia.helium.core.ant.HeliumExecutor" />

@@ -51,8 +51,9 @@ public class EndLessStack<E> extends Stack<E> {
      */
     public E pop() {
         E element = super.pop();
-        if (element != null)
+        if (element != null) {
             return element;
+        }
         return defaultElement;
     }
     

@@ -41,8 +41,16 @@ _logger = logging.getLogger("ccm")
 VALID_OBJECT_STATES = ('working', 'checkpoint', 'public', 'prep', 'integrate', 'sqa', 'test','released')
 STATIC_OBJECT_STATES = ('integrate', 'sqa', 'test','released')
 CCM_SESSION_LOCK = os.path.join(tempfile.gettempdir(), "ccm_session.lock")
+if os.path == '\\':
+    # on windows platform we need insulation of session opening
+    # so the _router.adr doesn't get modified while
+    # opening a session. This must be in a common location.
+    TEMPDIR = os.path.join(os.environ['SYSTEMROOT'], 'temp')
+    if not os.path.exists(TEMPDIR):
+        TEMPDIR = os.environ['TEMP']
+    CCM_SESSION_LOCK = os.path.join(TEMPDIR, "ccm_session.lock")
 
-def _execute(command, timeout=None):
+def execute(command, timeout=None):
     """ Runs a command and returns the result data. """
     targ = ""
     if timeout is not None:
@@ -72,6 +80,7 @@ class Result(object):
         self.status = None
         self._output = None
         self._output_str = None
+        self.error = None
     
     def _setoutput(self, output):
         """set output"""
@@ -116,15 +125,16 @@ class ResultWithError(Result):
         """ Internal function to allow overloading, you must override _seterror.
         """
         # the error output is automatically converted to ascii before any treatment 
-        if isinstance(error, unicode):
-            self._error_str = error.encode('ascii', 'replace')
-        else:
-            self._error_str = error.decode('ascii', 'ignore')
-        _logger.debug("error ---->")
-        for line in self._error_str.splitlines():
-            _logger.debug(line)
-        _logger.debug("<----")
-        self._seterror(self._error_str)
+        if error is not None:
+            if isinstance(error, unicode):
+                self._error_str = error.encode('ascii', 'replace')
+            else:
+                self._error_str = error.decode('ascii', 'ignore')
+            _logger.debug("error ---->")
+            for line in self._error_str.splitlines():
+                _logger.debug(line)
+            _logger.debug("<----")
+            self._seterror(self._error_str)
                 
     def _geterror(self):
         """ Returns the content of _output. """
@@ -606,12 +616,18 @@ class AbstractSession(object):
         if (self.dbpath != None):            
             return
         result = self.execute("status")
-        for match in re.finditer(r'(?:(?:Graphical)|(?:Command)) Interface\s+@\s+(?P<ccmaddr>\w+:\d+(?:\:\d+\.\d+\.\d+\.\d+)+)(?P<current_session>\s+\(current\s+session\))?\s*\nDatabase:\s*(?P<dbpath>\S+)', result.output, re.M | re.I):
-            dictionary = match.groupdict()
-            if (dictionary['current_session'] != None):
-                _logger.debug("AbstractSession: __find_dbpath: Found dbpath: %s" % dictionary['dbpath'])
-                self.dbpath = dictionary['dbpath']
-        assert self.dbpath != None
+        
+        gotsession = False
+        for line in result.output.splitlines():
+            if gotsession:
+                gotsession = False
+                if 'Database:' in line:
+                    self.dbpath = line.replace('Database:', '').strip()
+                    _logger.debug("AbstractSession: __find_dbpath: Found dbpath: %s" % self.dbpath)
+            if '(current session)' in line:
+                gotsession = True
+        if not self.dbpath:
+            raise Exception('self.dbpath is None ' + result.output)
     
     def execute(self, _, result=None):
         """ Abstract function that should implement the execution of ccm command
@@ -739,13 +755,13 @@ class Session(AbstractSession):
         command = "%s start -m -q -nogui -n %s -pw %s -h %s -d %s" % \
                     (CCM_BIN, username, password, engine, dbpath)
         _logger.debug('Starting new session:' + command.replace(password, "***"))
-        (result, status) = _execute(command, timeout=timeout)
+        (result, status) = execute(command, timeout=timeout)
         if status != 0:
-            raise Exception("Error creating a session: result:\n%s\nCommand: %s" % (result, command.replace(password, "***")))
+            raise CCMException("Error creating a session: result:\n%s\nCommand: %s" % (result, command.replace(password, "***")))
         session_addr = result.strip()
         _logger.debug(session_addr)
         if not re.match(r'[a-zA-Z0-9_\-.]+:\d+:\d+\.\d+\.\d+\.\d+(:\d+\.\d+\.\d+\.\d+)?', session_addr):
-            raise Exception("Error creating a session: result:\n%s" % result)
+            raise CCMException("Error creating a session: result:\n%s" % result)
         return Session(username, engine, dbpath, session_addr)        
             
     def execute(self, cmdline, result=None):
@@ -761,7 +777,7 @@ class Session(AbstractSession):
             if result == None:
                 result = Result(self)
             if os.sep == '\\':
-                command = "set CCM_ADDR=" + self._session_addr + " && " + CCM_BIN + " %s" % cmdline
+                command = "set CCM_ADDR=" + self._session_addr + " && \"" + CCM_BIN + "\" %s" % cmdline
             else:
                 command = "export CCM_ADDR=" + self._session_addr + " && " + CCM_BIN + " %s" % cmdline
             _logger.debug('Execute > ' + command)
@@ -1911,9 +1927,10 @@ def open_session(username=None, password=None, engine=None, dbpath=None, databas
         router_address = None
         if database == None and dbpath != None:
             database = os.path.basename(dbpath)
-        
+                
         lock = fileutils.Lock(CCM_SESSION_LOCK)
         try:
+            _logger.info("Locking " + CCM_SESSION_LOCK)
             lock.lock(wait=True)
             # if we have the database name we can switch to the correct Synergy router
             if database != None:
@@ -1932,9 +1949,11 @@ def open_session(username=None, password=None, engine=None, dbpath=None, databas
             # If no existing sessions were available, start a new one
             _logger.info('Opening session.')
             new_session = Session.start(username, password, engine, dbpath)
+            _logger.info("Unlocking " + CCM_SESSION_LOCK)
             lock.unlock()
             return new_session
         finally:
+            _logger.info("Unlocking " + CCM_SESSION_LOCK)
             lock.unlock()
     raise CCMException("Cannot open session for user '%s'" % username)
 
@@ -1969,6 +1988,7 @@ def running_sessions(database=None):
         raise CCMException("Could not find CM/Synergy executable in the path.")
     command = "%s status" % (CCM_BIN)
 
+    _logger.info("Locking " + CCM_SESSION_LOCK)
     lock = fileutils.Lock(CCM_SESSION_LOCK)
     result = ""
     output = []
@@ -1989,11 +2009,11 @@ def running_sessions(database=None):
                     routerfile.close()
 
         _logger.debug('Command: ' + command)
-        (result, status) = _execute(command)
+        (result, status) = execute(command)
         if database != None:
             lock.unlock()
         if (status != 0):
-            raise CCMException("Ccm status execution returned an error.")
+            raise CCMException("Ccm status execution returned an error. " + command + " " + result)
         _logger.debug('ccm status result: ' + result)
         for match in re.finditer(r'Command Interface\s+@\s+(?P<ccmaddr>\w+:\d+:\d+.\d+.\d+.\d+(:\d+.\d+.\d+.\d+)*)(?P<current_session>\s+\(current\s+session\))?\s+Database:\s*(?P<dbpath>\S+)', result, re.M):
             data = match.groupdict()
@@ -2008,6 +2028,7 @@ def running_sessions(database=None):
                 output.append(existing_session)
     finally:
         if database != None:
+            _logger.info("Unlocking " + CCM_SESSION_LOCK)
             lock.unlock()
     return  output
 

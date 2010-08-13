@@ -39,9 +39,13 @@ Description:
     <typedef name="resourceSet" classname="com.nokia.helium.core.ant.types.ResourceSet"/>
 
     <!-- Type definition -->
+   <typedef name="stage" classname="com.nokia.helium.core.ant.types.Stage"/> 
+    <typedef name="targetMessageTrigger" classname="com.nokia.helium.core.ant.types.TargetMessageTrigger"/> 
     <typedef name="deflist" classname="com.nokia.helium.core.ant.types.HlmDefList"/>
     <typedef name="importdef" classname="com.nokia.helium.core.ant.types.HlmImportDef"/>
     <typedef name="listenerdef" classname="com.nokia.helium.core.ant.types.HlmListenerDef"/>
-    
+    <typedef name="textMessage" classname="com.nokia.helium.core.ant.types.TextMessage"/>
+    <typedef name="fileMessage" classname="com.nokia.helium.core.ant.types.FileMessage"/>
+    <typedef name="fmppMessage" classname="com.nokia.helium.core.ant.types.FMPPMessage"/>
     <typedef name="prettyprintxml" classname="com.nokia.helium.core.ant.filters.PrettyPrintXmlFilter"/> 
 </antlib>

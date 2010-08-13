@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : test_taskrecorder.ant.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test-recorder" xmlns:ac="antlib:net.sf.antcontrib" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>Helium Antlib logger unittests.</description>
+    <property environment="env" />
+
+	<taskdef resource="com/nokia/helium/logger/ant/antlib.xml" uri="http://www.nokia.com/helium" />
+
+    <target name="setUp">    
+        <delete dir="${test.temp.dir}" failonerror="false"/>
+        <mkdir dir="${test.temp.dir}" />
+    </target>
+    
+    <target name="tearDown">
+        <delete dir="${test.temp.dir}" />
+    </target>
+	
+    <target name="test-missing-output-message">
+        <au:expectfailure expectedMessage="The output attribute has not been defined.">
+            <hlm:taskRecorder logLevel="info">
+                <echo>This message should not be logged on the screen.</echo>
+            </hlm:taskRecorder>
+        </au:expectfailure> 
+    </target>
+
+	<target name="test-failing-log-creation">
+        <au:expectfailure expectedMessage="Can't set output to">
+            <hlm:taskRecorder output="${test.temp.dir}/inexisting/output.log" logLevel="info">
+                <echo>This message should not be logged on the screen.</echo>
+            </hlm:taskRecorder>
+        </au:expectfailure> 
+        <au:assertFileDoesntExist file="${test.temp.dir}/inexisting/output.log" />
+    </target>
+    	
+    <target name="test-simple-task-recording">
+        <hlm:taskRecorder output="${test.temp.dir}/output.log" logLevel="info">
+        	<echo>This message should not be logged on the screen.</echo>
+        </hlm:taskRecorder>
+    	<au:assertLogDoesntContain text="This message should not be logged on the screen." />
+    	<au:assertFileExists file="${test.temp.dir}/output.log" />
+        <loadfile property="output.log" srcfile="${test.temp.dir}/output.log" />
+        <echo>${output.log}</echo>
+    	<au:assertTrue>
+    	    <contains string="${output.log}" substring="This message should not be logged on the screen." />
+    	</au:assertTrue>
+    </target>
+    
+    <target name="test-task-recording-under-sequential">
+    	<hlm:taskRecorder output="${test.temp.dir}/output.log" logLevel="info">
+    	    <sequential>
+    	        <echo>This message should not be logged on the screen.</echo>
+    	    </sequential>
+    	</hlm:taskRecorder>
+        <au:assertLogDoesntContain text="This message should not be logged on the screen." />
+        <au:assertFileExists file="${test.temp.dir}/output.log" />
+        <loadfile property="output.log" srcfile="${test.temp.dir}/output.log" />
+        <echo>${output.log}</echo>
+        <au:assertTrue>
+            <contains string="${output.log}" substring="This message should not be logged on the screen." />
+        </au:assertTrue>
+    </target>
+	
+	<target name="called-by-runtarget">
+        <echo>This message should not be logged on the screen.</echo>
+	</target>
+	
+    <target name="test-simple-task-runtarget">
+        <hlm:taskRecorder output="${test.temp.dir}/output.log" logLevel="info">
+        	<ac:runtarget target="called-by-runtarget" />
+        </hlm:taskRecorder>
+        <au:assertLogDoesntContain text="This message should not be logged on the screen." />
+        <au:assertFileExists file="${test.temp.dir}/output.log" />
+        <loadfile property="output.log" srcfile="${test.temp.dir}/output.log" />
+        <echo>${output.log}</echo>
+        <au:assertTrue>
+            <contains string="${output.log}" substring="This message should not be logged on the screen." />
+        </au:assertTrue>
+    </target>
+	
+    <target name="test-recorder-propagate-properties">
+        <hlm:taskRecorder output="${test.temp.dir}/output.log" logLevel="info">
+            <echo>Setting task.recorder.is.wicked property.</echo>
+            <property name="task.recorder.is.wicked" value="that's true!!!" />
+        </hlm:taskRecorder>
+        <au:assertFileExists file="${test.temp.dir}/output.log" />
+        <loadfile property="output.log" srcfile="${test.temp.dir}/output.log" />
+        <echo>${output.log}</echo>
+        <au:assertTrue message="property is not propagated">
+            <isset property="task.recorder.is.wicked" />
+        </au:assertTrue>
+        <au:assertTrue message="property value is incorrect">
+            <equals arg1="${task.recorder.is.wicked}" arg2="that's true!!!"/>
+        </au:assertTrue>
+    </target>
+	
+	<macrodef name="echoMacro">
+		<sequential>
+            <echo>This message should not be logged on the screen.</echo>
+		</sequential>
+	</macrodef>
+
+    <target name="test-simple-task-macro">
+        <hlm:taskRecorder output="${test.temp.dir}/output.log" logLevel="info">
+            <echoMacro />
+        </hlm:taskRecorder>
+        <au:assertLogDoesntContain text="This message should not be logged on the screen." />
+        <au:assertFileExists file="${test.temp.dir}/output.log" />
+        <loadfile property="output.log" srcfile="${test.temp.dir}/output.log" />
+        <echo>${output.log}</echo>
+        <au:assertTrue>
+            <contains string="${output.log}" substring="This message should not be logged on the screen." />
+        </au:assertTrue>
+    </target>
+
+    <macrodef name="recordMacro">
+        <sequential>
+            <hlm:taskRecorder output="${test.temp.dir}/output.log" logLevel="info">
+                <echo>This message should not be logged on the screen.</echo>
+            </hlm:taskRecorder>
+        </sequential>
+    </macrodef>
+
+    <target name="test-record-from-a-macro">
+    	<recordMacro />
+        <au:assertLogDoesntContain text="This message should not be logged on the screen." />
+        <au:assertFileExists file="${test.temp.dir}/output.log" />
+        <loadfile property="output.log" srcfile="${test.temp.dir}/output.log" />
+        <echo>${output.log}</echo>
+        <au:assertTrue>
+            <contains string="${output.log}" substring="This message should not be logged on the screen." />
+        </au:assertTrue>
+    </target>
+
+    <target name="test-simple-task-failure">
+        <au:expectfailure expectedMessage="failing inside taskRecorder" >
+            <hlm:taskRecorder output="${test.temp.dir}/output.log" logLevel="info">
+                <echo>This message should not be logged on the screen.</echo>
+                <fail message="failing inside taskRecorder" />
+            </hlm:taskRecorder>
+        </au:expectfailure>
+        <au:assertLogDoesntContain text="This message should not be logged on the screen." />
+        <au:assertFileExists file="${test.temp.dir}/output.log" />
+        <loadfile property="output.log" srcfile="${test.temp.dir}/output.log" />
+        <echo>${output.log}</echo>
+        <au:assertTrue>
+            <contains string="${output.log}" substring="This message should not be logged on the screen." />
+        </au:assertTrue>
+    </target>
+    
+</project>

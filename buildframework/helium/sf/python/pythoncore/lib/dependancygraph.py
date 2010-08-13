@@ -25,9 +25,9 @@ import zipfile
 
 class Library:
     """ Class Library holds information of the required modules or components such as license and the version """
-    def __init__(self, name, license, version=''):
+    def __init__(self, name, license_, version=''):
         self.name = name
-        self.license = license
+        self.license_ = license_
         self.version = version
         self.requires = []
 
@@ -42,7 +42,7 @@ class ModuleGroup:
         """add library"""
         for lib in self.getLibraries(conf):
             if lib.name.lower() == library.name.lower():
-                lib.license = library.license
+                lib.license_ = library.license_
                 return
         self.getLibraries(conf).append(library)
     def getLibraries(self, conf):
@@ -75,17 +75,17 @@ class ReadIvyConfig:
 
     def readModules(self):
         """read modules"""
-        license = ''
+        license_ = ''
         for module in self.ivyxml['ivy-module'].dependencies.xml_children:
             if hasattr(module, 'data'):
                 if 'License:' in module.data:
-                    license = module.data.strip()
+                    license_ = module.data.strip()
             elif hasattr(module, 'name'):
                 modulename = module.name.replace('-', '_')
             
                 if module.org != 'SWEPT':
-                    self.group.addLibrary(module.conf, Library(modulename, license))
-                    license = ''
+                    self.group.addLibrary(module.conf, Library(modulename, license_))
+                    license_ = ''
 
     def readSubModules(self):
         """read Sub Modules"""
@@ -96,19 +96,19 @@ class ReadIvyConfig:
                     ivydir = os.path.join(ivydir, 'modules')
                     ivyjarfile = os.path.join(ivydir, module.name + '-1.0.ivy.xml')
                     ivymodulexml = amara.parse(open(ivyjarfile))
-                    license = ''
+                    license_ = ''
                     for artifact in ivymodulexml['ivy-module'].publications.xml_children:
                         if hasattr(artifact, 'data'):
                             if 'License:' in artifact.data:
-                                license = artifact.data.strip()
+                                license_ = artifact.data.strip()
                         elif hasattr(artifact, 'name'):
                             bits = artifact.name.split('-')
                             name = bits[0]
                             version = ''
                             if len(bits) > 1:
                                 version = bits[1]
-                            self.group.addLibrary(module.conf, Library(name, license, version))
-                            license = ''
+                            self.group.addLibrary(module.conf, Library(name, license_, version))
+                            license_ = ''
 
 PYTHON_GROUP = True
 SUBCON_PYTHON_GROUP = False
@@ -163,7 +163,7 @@ def readPkgInfo(data):
     """read Pkg info"""
     name = ''
     version = ''
-    license = ''
+    license_ = ''
     license2 = ''
   
     for line in data:
@@ -172,14 +172,14 @@ def readPkgInfo(data):
         if 'Version:' in line:
             version = line.strip().replace('Version: ', '')
         if 'License:' in line:
-            license = line.strip().replace('License: ', '')
+            license_ = line.strip().replace('License: ', '')
         if 'Classifier: License :: ' in line:
             license2 = license2 + ' ' + line.strip().replace('Classifier: License :: ', '').replace('OSI Approved :: ', '')
     
-    if license.lower() == 'unknown' or license == '' or license2 != '':
-        license = license2
+    if license_.lower() == 'unknown' or license_ == '' or license2 != '':
+        license_ = license2
     
-    return Library(name, license, version)
+    return Library(name, license_, version)
 
 def addLicensesColors(graphdata, group):
     """add license colours"""
@@ -190,8 +190,8 @@ def addLicensesColors(graphdata, group):
             for module in group.getLibraries(conf):
                 if module.name.lower() in line.lower() and 'label=' in line:
                     newline = line.replace('label=', 'color=%s,label=' % group.getColor(conf))
-                    if module.license != '':
-                        newline = newline.replace("\"];", "|%s\"];" % module.license)
+                    if module.license_ != '':
+                        newline = newline.replace("\"];", "|%s\"];" % module.license_)
                     break
         newgraphdata.append(newline)
     return newgraphdata
@@ -270,14 +270,14 @@ def linkPythonLibs(libraries, destgraphfilename, subcon):
     output = "helium_ant -> helium_python;\n"
     
     if subcon:
-        list = [SUBCON_PYTHON_GROUP]
+        libs_list = [SUBCON_PYTHON_GROUP]
     else:
-        list = [SUBCON_PYTHON_GROUP, PYTHON_GROUP]
+        libs_list = [SUBCON_PYTHON_GROUP, PYTHON_GROUP]
     
-    for group in list:
+    for group in libs_list:
         for lib in libraries.getLibraries(group):
             output = output + ("helium_python -> \"%s\";\n" % lib.name)
-            output = output + ("\"%s\" [style=filled,shape=record,color=%s,label=\"%s %s|%s\"];\n" % (lib.name, libraries.getColor(group), lib.name, lib.version, lib.license))
+            output = output + ("\"%s\" [style=filled,shape=record,color=%s,label=\"%s %s|%s\"];\n" % (lib.name, libraries.getColor(group), lib.name, lib.version, lib.license_))
             
             for require in lib.requires:
                 output = output + ("\"%s\" -> \"%s\";\n" % (lib.name, require))

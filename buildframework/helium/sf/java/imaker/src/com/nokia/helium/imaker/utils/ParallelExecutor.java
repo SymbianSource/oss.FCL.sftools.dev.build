@@ -20,14 +20,14 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-import java.util.Date;
-import java.text.SimpleDateFormat;
 
 /**
  * Simple application which will execute each line from a text file
@@ -37,6 +37,7 @@ import java.text.SimpleDateFormat;
  * The implementation must not rely on any external dependencies except JVM and owning jar.
  *
  */
+@SuppressWarnings("PMD.SystemPrintln")
 public final class ParallelExecutor {
     
     /**

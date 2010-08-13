@@ -80,7 +80,7 @@ class MockUploader(ctc.MonSymFTPUploader):
         """close"""
         pass
 
-    def _ftpmkdirs(self, dir):
+    def _ftpmkdirs(self, dir_):
         """ftp make dirs"""
         pass    
     
@@ -100,5 +100,5 @@ class NestedConfigurationBuilderTest(unittest.TestCase):
         result = uploader.upload()
         print result
         assert len(result) == 2
-        assert result[0] == "ctc_helium/1234/mon_syms/1/MON.SYM"
-        assert result[1] == "ctc_helium/1234/mon_syms/2/MON.SYM"
+        assert result[0] == "1234/mon_syms/1/MON.SYM"
+        assert result[1] == "1234/mon_syms/2/MON.SYM"

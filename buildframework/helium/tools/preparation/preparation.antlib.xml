@@ -28,7 +28,7 @@ Description:
        the output directory. 'threads' defines how many copy you would like in parallel, and verbose
        defines if you want the copying to be logged.
      -->
-    <scriptdef language="beanshell" name="parallelCopy" uri="http://www.nokia.com/helium">
+    <scriptdef name="parallelCopy" language="beanshell" uri="http://www.nokia.com/helium">
         <attribute name="todir" />
         <attribute name="threads" />
         <attribute name="verbose" />
@@ -56,11 +56,12 @@ if (attributes.get("threads") != null) {
     }
 }
 if (attributes.get("verbose") != null) {
-        verbose = attributes.get("verbose");
+    verbose = attributes.get("verbose");
 }
 if (attributes.get("overwrite") != null) {
-        overwrite = attributes.get("overwrite");
+    overwrite = attributes.get("overwrite");
 }
+
 // Creating the output dir
 Mkdir mkdir = new Mkdir();
 mkdir.setProject(project);
@@ -86,13 +87,13 @@ if (elements.get("resourceset") != null) {
             copy.setVerbose(new Boolean(verbose).booleanValue());
             copy.setOverwrite(new Boolean(overwrite).booleanValue());
             pt.addTask(copy);
-    }
+        }
     }
 }
 self.log("Starting parallel copying...");
 pt.execute();
 self.log("Copying completed.");
-]]>
+    ]]>
     </scriptdef>
 
     <!--
@@ -185,7 +186,8 @@ if (elements.get("resourceset") != null) {
 self.log("Starting parallel unzipping...");
 pt.execute();
 self.log("Unzipping completed.");
-]]>
+    ]]>
     </scriptdef>
 
 </antlib>
+

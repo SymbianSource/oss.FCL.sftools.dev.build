@@ -20,13 +20,16 @@ package com.nokia.ant.taskdefs;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
+
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.configuration.XMLConfiguration;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.types.FileSet;
 import org.apache.tools.ant.types.ResourceCollection;
 import org.apache.tools.ant.types.resources.FileResource;
-
-import org.apache.commons.configuration.*;
 
 /**
  * Can load ant configuration file both in .xml and .txt format.

@@ -21,7 +21,7 @@
 
 """ASTE test drop generation."""
 
-# pylint: disable-msg=R0201,R0903,R0902,W0142
+
 #W0142 => * and ** were used
 #R* removed during refactoring
 
@@ -33,10 +33,10 @@ import re
 import tempfile
 import zipfile
 import pkg_resources
-from path import path # pylint: disable-msg=F0401
+from path import path # pylint: disable=F0401
 import amara
 import ntpath as atspath
-import jinja2 # pylint: disable-msg=F0401
+import jinja2 # pylint: disable=F0401
 
 _logger = logging.getLogger('ats3')
 
@@ -375,7 +375,7 @@ class AsteTemplateTestDropGenerator(AsteTestDropGenerator):
         """ generate an XML file"""
         loader = jinja2.ChoiceLoader([jinja2.PackageLoader(__name__, 'templates')])
         env = jinja2.Environment(loader=loader)
-        template = env.from_string(pkg_resources.resource_string(__name__, 'aste_template.xml'))# pylint: disable-msg=E1101
+        template = env.from_string(pkg_resources.resource_string(__name__, 'aste_template.xml'))# pylint: disable=E1101
         
         xmltext = template.render(test_plan=test_plan, os=os, atspath=atspath, atsself=self).encode('ISO-8859-1')
         return et.ElementTree(et.XML(xmltext))

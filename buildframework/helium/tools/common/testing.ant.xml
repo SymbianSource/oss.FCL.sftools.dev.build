@@ -27,97 +27,8 @@ Description:
     </description>
     
     <!-- Runs all the unit testing targets. -->
-    <target name="unittest" depends="ant-unittest,py-unittest"/>
-    
-    <!-- Unit testing -->
-
-    <!-- Setup environment for Python unit tests. -->
-    <target name="setup-py-unittest">
-        <!-- Autogenerate test data for ArchivePreBuilderTest based on ANT properties -->
-        <if>
-            <available file="${helium.dir}/tests/data/archive_test.cfg.xml"/>
-            <then>
-                <delete file="${helium.dir}/tests/data/archive_test.cfg.xml"/>
-            </then>
-        </if>
-        <copy file="${helium.dir}/tests/data/archive_test_input.cfg.xml" tofile="${helium.dir}/tests/data/archive_test.cfg.xml" overwrite="true">
-            <filterchain>
-                <expandproperties/>
-            </filterchain>
-        </copy>
-    </target>
-
-    <!-- Do Python tests. -->
-    <target name="do-py-unittest" depends="setup-py-unittest">
-        <property name="nose.args" value="nokiacpythontest scripttests"/>
-        <exec executable="python" failonerror="true">
-            <env key="TEST_DATA" value="${helium.dir}/tests"/>
-            <arg line="${python.tools}/coverage.py -x ${python.tools}/nosetests-script.py -v ${nose.args}"/>
-        </exec>
-        <script language="jython" setbeans="false">
-import sys
-import os
-os.putenv('TEST_DATA', os.path.join(os.environ['HELIUM_HOME'], 'tests'))
-sys.path.append(os.path.join(os.environ['HELIUM_HOME'], 'external/python/lib/common/nose-0.11.1-py2.6.egg'))
-sys.path.append(os.path.join(os.environ['HELIUM_HOME'], 'external/python/lib/common/mocker-0.10.1-py2.5.egg'))
-import nose
-args = project.getProperty('nose.args')
-if ' ' in args:
-    nose.run(argv=['-v', 'scripttests'])
-elif 'cpython' not in args:
-    nose.run(argv=['-v', args])
-print >> sys.stderr
-        </script>
-    </target>
-    
-    <!-- Shortcut for Python unit tests. -->
-    <target name="pt" depends="do-py-unittest"/>
-    
+    <target name="unittest" depends="ant-unittest"/>
         
-    <!-- Create Python code coverage statistics. -->
-    <target name="py-unittest-coverage">
-        <mkdir dir="${helium.build.dir}/coverage"/>
-        <pathconvert pathsep=" " property="python.modules.coverage">
-            <fileset dir="${helium.dir}">
-                <include name="tools/**/*.py"/>
-                <include name="extensions/nokia/tools/**/*.py"/>
-                <exclude name="tools/startup/bootstrap/site.py"/>
-            </fileset>
-        </pathconvert>
-        <exec executable="python" failonerror="true">
-            <arg line="${python.tools}/coverage.py -a -d ${helium.build.dir}/coverage ${python.modules.coverage}"/>
-        </exec>
-                        
-        <!-- backup the old line coverage report and create the new one -->
-        <mkdir dir="${helium.build.dir}/coverage/report"/>        
-        <if>
-            <available file="${helium.build.dir}/coverage/report/line_coverage.txt"/>
-            <then>
-                <copy file="${helium.build.dir}/coverage/report/line_coverage.txt" tofile="${helium.build.dir}/coverage/report/line_coverage_old.txt" overwrite="true"/>
-            </then>    
-        </if>        
-        <hlm:record name="${helium.build.dir}/coverage/report/line_coverage.txt" action="start"/>        
-        <exec executable="python" failonerror="true">
-            <arg line="${python.tools}/coverage.py -r ${python.modules.coverage}"/>
-        </exec>
-        <hlm:record name="${helium.build.dir}/coverage/report/line_coverage.txt" action="stop"/>
-        <replace file="${helium.build.dir}/coverage/report/line_coverage.txt">
-            <replacetoken><![CDATA[[exec]]]></replacetoken>
-            <replacevalue><![CDATA[]]></replacevalue>
-        </replace>
-        <hlm:python>
-for line in open(r'${helium.build.dir}/coverage/report/line_coverage.txt'):
-    if 'TOTAL' in line and ' 0%' in line:
-        raise Exception('Coverage at 0%')
-        </hlm:python>
-        <delete file="${helium.dir}/.coverage"/>
-    </target>
-    
-    
-    <!-- Run Python unit test cases. -->
-    <target name="py-unittest" depends="do-py-unittest,py-unittest-coverage"/>
-        
-    
     <!-- Run Ant unit tests. -->
     <target name="ant-unittest">
         <mkdir dir="${helium.build.dir}/temp"/>
@@ -128,7 +39,7 @@ for line in open(r'${helium.build.dir}/coverage/report/line_coverage.txt'):
                 <propertyref name="synergy71.enabled"/>
             </propertyset>
             <fileset dir="${helium.dir}" includes="tools/**/test_*.ant.xml"/> 
-            <fileset dir="${helium.dir}" includes="extensions/nokia/tools/**/test_*.ant.xml"/> 
+            <fileset dir="${helium.dir}" includes="extensions/*/tools/**/test_*.ant.xml"/>  
             <au:plainlistener/>
             <hlm:antcoveragelistener outputfile="${helium.build.dir}/report/antunit/ant_coverage.txt"/>
             <au:xmllistener toDir="${helium.build.dir}/report/antunit" logLevel="info" />

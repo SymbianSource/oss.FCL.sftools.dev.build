@@ -30,9 +30,6 @@ import com.nokia.helium.ant.data.PropertyMeta;
 public class WrongTypePropertyCheck extends AntLintCheck {
     public static final String DESCRIPTION = "Property value does not match type";
 
-    public WrongTypePropertyCheck() {
-    }
-
     @Override
     public void run() throws IOException {
         List<PropertyMeta> properties = getDb().getProperties();

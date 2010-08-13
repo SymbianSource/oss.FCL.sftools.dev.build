@@ -24,9 +24,9 @@ import org.apache.maven.scm.ScmException;
 import org.apache.maven.scm.manager.ScmManager;
 import org.apache.maven.scm.repository.ScmRepository;
 
+import com.nokia.maven.scm.command.info.InfoScmResult;
 import com.nokia.maven.scm.command.pull.PullScmResult;
 import com.nokia.maven.scm.command.tags.TagsScmResult;
-import com.nokia.maven.scm.command.info.InfoScmResult;
 
 /**
  * Extended verison of the Maven ScmManager

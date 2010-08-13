@@ -56,7 +56,7 @@ Description:
         
     <!-- This target uses an XML input file to retrieve content from Synergy.
       -->
-    <target name="prep-work-area" depends="log-build-start" if="run.ccm">
+    <target name="prep-work-area" depends="log-build-start" if="internal.ccm.enabled">
         <hlm:tempRecordStartMacro name="${build.id}_ccm_get_input.log" />
         <runtarget target="get-ccm-password"/>
         <runtarget target="ccm-prepare-input"/>
@@ -110,7 +110,7 @@ sys.exit(0)
      This target will cleanup all snapshoted/checkout project from the disk. Checked out project will
      also be deleted from the synergy database. 
      -->
-    <target name="cleanup-work-area" if="run.ccm">
+    <target name="cleanup-work-area" if="internal.ccm.enabled">
         <hlm:tempRecordStartMacro name="${build.id}_cleanup_work_area.log" />
         <runtarget target="get-ccm-password"/>
         <runtarget target="ccm-prepare-input"/>

@@ -25,28 +25,90 @@ Description:
     <description>
     Synergy publishing related targets
     </description>
-
+    
+    <!--* @property publish.task.to.folder.enabled
+    Must be set to true if the completed tasks needs to be published into folder set using publish.ccm.folder.
+    @type boolean
+    @editable required
+    @scope public
+    @since 11.0
+    -->
+    
+    <!--* @property internal.publish.task.to.folder.enabled
+    Will publish the tasks into synergy folder set using publish.ccm.folder
+    @type boolean
+    @scope private
+    -->
+    
+    <!--* @property publish.ccm.folder
+    Must be set to publish the completed tasks into synergy folder.
+    @type string
+    @editable required
+    @scope public
+    -->
+    
+    <!--* @property team.level.ci.enabled
+    Must be set to true if need to change the synergy release tag in team level CI system.
+    @type boolean
+    @editable required
+    @scope public
+    @since 11.0
+    -->
+    
+    <!--* @property internal.team.level.ci.enabled
+    Set to run the target which will change ther synergy release tag in team CI system if teamlevel.ci.enabled set to true.
+    @type boolean
+    @scope private
+    -->
+    
+    <!--* @property teamlevel.ci.system
+    Must be set to true if need to change the synergy release tag in team level CI system. - deprecated: Start using teamlevel.ci.enabled property.
+    @type boolean
+    @editable required
+    @scope public
+    @deprecated since 11.0
+    -->
+    
     <!-- Validate all the inputs for the publish-tasks-to-folder target. -->
-    <target name="publish-tasks-to-folder-check" if="publish.ccm.folder">
-        <condition property="do.publish-tasks-to-folder" value="true">
-            <available file="${build.log.dir}/${build.id}_bom.xml" />
-        </condition>
-    </target>
+    <condition property="internal.publish.task.to.folder.enabled">
+        <or>
+            <istrue value="${publish.task.to.folder.enabled}"/>
+            <isset property="publish.ccm.folder"/>
+        </or>
+    </condition>
+    
+    <!-- Check is it a team level CI system. -->
+    <condition property="internal.team.level.ci.enabled">
+        <or>
+            <istrue value="${team.level.ci.enabled}"/>
+            <isset property="teamlevel.ci.system"/>
+        </or>
+    </condition>
+    
+    
 
     <!-- Copies all the task found in the BOM into defined folder. -->
-    <target name="publish-tasks-to-folder" depends="publish-tasks-to-folder-check" if="do.publish-tasks-to-folder">
-        <mkdir dir="${temp.build.dir}" />
-        <fmpp sourceFile="${helium.dir}/tools/common/templates/ido/task-publish.ant.xml.ftl" outputFile="${temp.build.dir}/task-publish.ant.xml">
-            <freemarkerLinks expandProperties="yes">
-                macro: ${helium.dir}/tools/common/templates/macro
-            </freemarkerLinks>
-            <data expandProperties="yes">
-                bom: xml(${build.log.dir}/${build.id}_bom.xml)
-                ant: antProperties()
-            </data>
-        </fmpp>
-        <hlm:assertFileExists file="${temp.build.dir}/task-publish.ant.xml" />
-        <ant antfile="${temp.build.dir}/task-publish.ant.xml" dir="${build.drive}/" />
+    <target name="publish-tasks-to-folder" if="internal.publish.task.to.folder.enabled">
+        <if>
+            <available file="${build.log.dir}/${build.id}_bom.xml" />
+            <then>
+                <mkdir dir="${temp.build.dir}" />
+                <fmpp sourceFile="${helium.dir}/tools/common/templates/ido/task-publish.ant.xml.ftl" outputFile="${temp.build.dir}/task-publish.ant.xml">
+                    <freemarkerLinks expandProperties="yes">
+                        macro: ${helium.dir}/tools/common/templates/macro
+                    </freemarkerLinks>
+                    <data expandProperties="yes">
+                        bom: xml(${build.log.dir}/${build.id}_bom.xml)
+                        ant: antProperties()
+                    </data>
+                </fmpp>
+                <hlm:assertFileExists file="${temp.build.dir}/task-publish.ant.xml" />
+                <ant antfile="${temp.build.dir}/task-publish.ant.xml" dir="${build.drive}/" />
+            </then>
+            <else>
+                <echo>Skipped because file ${build.log.dir}/${build.id}_bom.xml not available.</echo>
+            </else>
+        </if>
     </target>
 
     <!--* @property ccm.cache.xml
@@ -56,8 +118,16 @@ Description:
     @scope public
     -->
 
+    <!--
+    Synergy role to use while doing the update of release tag.
+    @type string
+    @editable required
+    @scope public
+    -->
+    <property name="change.release.tag.role" value="build_mgr" />
+    
     <!-- Change team level release tag to program level release tag -->
-    <target name="change-release-tag" if="teamlevel.ci.system">
+    <target name="change-release-tag" if="internal.team.level.ci.enabled">
         <if>
             <isset property="ccm.cache.xml" />
             <then>
@@ -69,6 +139,7 @@ Description:
         </if>
         <hlm:ccm verbose="false">
             <hlm:sessionset refid="releasetag.session" />
+            <hlm:role role="${change.release.tag.role}" />
             <hlm:changereleasetag folder="${teamlevel.folder.number}" releasetag="${programlevel.release.tag}" />
         </hlm:ccm>
         <if>

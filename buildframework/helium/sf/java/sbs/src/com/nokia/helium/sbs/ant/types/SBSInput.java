@@ -1,87 +1,87 @@
 /*
-* Copyright (c) 2007-2008 Nokia Corporation and/or its subsidiary(-ies).
-* All rights reserved.
-* This component and the accompanying materials are made available
-* under the terms of the License "Eclipse Public License v1.0"
-* which accompanies this distribution, and is available
-* at the URL "http://www.eclipse.org/legal/epl-v10.html".
-*
-* Initial Contributors:
-* Nokia Corporation - initial contribution.
-*
-* Contributors:
-*
-* Description: 
-*
-*/
- 
+ * Copyright (c) 2007-2008 Nokia Corporation and/or its subsidiary(-ies).
+ * All rights reserved.
+ * This component and the accompanying materials are made available
+ * under the terms of the License "Eclipse Public License v1.0"
+ * which accompanies this distribution, and is available
+ * at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ *
+ * Initial Contributors:
+ * Nokia Corporation - initial contribution.
+ *
+ * Contributors:
+ *
+ * Description: 
+ *
+ */
+
 package com.nokia.helium.sbs.ant.types;
 
-import com.nokia.helium.core.ant.types.VariableSet;
-import com.nokia.helium.core.ant.MappedVariable;
-import com.nokia.helium.core.ant.VariableMap;
 import java.util.Collection;
-import org.apache.tools.ant.BuildException;
 import java.util.Vector;
 
+import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.types.DataType;
 import org.apache.tools.ant.types.Reference;
 
+import com.nokia.helium.core.ant.MappedVariable;
+import com.nokia.helium.core.ant.VariableMap;
+import com.nokia.helium.core.ant.types.VariableSet;
+
 /**
- * Helper class to store the variable set (list of variables
- * with name / value pair)
- *
- *   &lt;hlm:sbsinput id=&quot;export-sbs-ec&quot;&gt;
- *       &lt;sbsoptions refid=&quot;exportSBS&quot; /&gt;
- *       &lt;sbsmakeoptions refid=&quot;exportSBSEC&quot; /&gt;
- *   &lt;/hlm:sbsinput&gt;
+ * Helper class to store the variable set (list of variables with name / value pair)
+ * 
+ * &lt;hlm:sbsinput id=&quot;export-sbs-ec&quot;&gt; &lt;sbsoptions refid=&quot;exportSBS&quot;
+ * /&gt; &lt;sbsmakeoptions refid=&quot;exportSBSEC&quot; /&gt; &lt;/hlm:sbsinput&gt;
  * 
  * @ant.type name="sbsinput" category="SBS"
  */
 public class SBSInput extends DataType implements VariableMap {
-    
+
     private Vector<VariableSet> sbsOptions = new Vector<VariableSet>();
     private Vector<SBSMakeOptions> sbsMakeOptions = new Vector<SBSMakeOptions>();
     private Vector<SBSInput> sbsInputList = new Vector<SBSInput>();
 
     /**
-     * Creates an empty variable element and adds 
-     * it to the variables list
+     * Creates an empty variable element and adds it to the variables list
+     * 
      * @return empty Variable pair
      */
     public VariableSet createSBSOptions() {
         SBSInput sbsInput = new SBSInput();
-        VariableSet varSet =  new VariableSet();
+        VariableSet varSet = new VariableSet();
         sbsInput.addSBSOptions(varSet);
         sbsInputList.add(sbsInput);
         return varSet;
     }
 
     /**
-     * Adds sbs options to variableset. Called by ant
-     * whenever the varSet is added to current sbs options. 
+     * Adds sbs options to variableset. Called by ant whenever the varSet is added to current sbs
+     * options.
+     * 
      * @param varSet, variable set to be added to current sbs options.
      */
     public void addSBSOptions(VariableSet varSet) {
         sbsOptions.add(varSet);
     }
-    
+
     /**
-     * Creates an empty sbs make options and add it
-     * sbs make options list
+     * Creates an empty sbs make options and add it sbs make options list
+     * 
      * @return empty Variable pair
      */
     public VariableSet createSBSMakeOptions() {
         SBSInput sbsInput = new SBSInput();
-        SBSMakeOptions varSet =  new SBSMakeOptions();
+        SBSMakeOptions varSet = new SBSMakeOptions();
         sbsInput.addSBSMakeOptions(varSet);
         sbsInputList.add(sbsInput);
         return varSet;
     }
 
     /**
-     * Adds sbs make options to variableset. Called by ant
-     * whenever the make option is added to current sbs options. 
+     * Adds sbs make options to variableset. Called by ant whenever the make option is added to
+     * current sbs options.
+     * 
      * @param varSet, variable set to be added to current sbs options.
      */
     public void addSBSMakeOptions(SBSMakeOptions varSet) {
@@ -89,8 +89,9 @@ public class SBSInput extends DataType implements VariableMap {
     }
 
     /**
-     * Creates a new sbsinput type for the current, and the created
-     * sbs input is only containing refid of sbs options / sbs makeoptions.
+     * Creates a new sbsinput type for the current, and the created sbs input is only containing
+     * refid of sbs options / sbs makeoptions.
+     * 
      * @return empty sbsinput type.
      */
     public SBSInput createSBSInput() {
@@ -100,8 +101,8 @@ public class SBSInput extends DataType implements VariableMap {
     }
 
     /**
-     * Helper function to provide the sbs options associated with this
-     * sbsinput.
+     * Helper function to provide the sbs options associated with this sbsinput.
+     * 
      * @return sbs options associated with this sbs input.
      */
     public Vector<VariableSet> getSBSOptions() {
@@ -109,8 +110,8 @@ public class SBSInput extends DataType implements VariableMap {
     }
 
     /**
-     * Helper function to provide the sbs make options associated with this
-     * sbsinput.
+     * Helper function to provide the sbs make options associated with this sbsinput.
+     * 
      * @return sbs make options associated with this sbs input.
      */
     public Vector<SBSMakeOptions> getSBSMakeOptions() {
@@ -118,8 +119,7 @@ public class SBSInput extends DataType implements VariableMap {
     }
 
     /**
-     * Internal function to validate the sbsinput and throw exception
-     * if the input is not valid.
+     * Internal function to validate the sbsinput and throw exception if the input is not valid.
      */
     private void validateInput() {
         if (getRefid() != null && (!sbsMakeOptions.isEmpty() || !sbsOptions.isEmpty())) {
@@ -128,9 +128,9 @@ public class SBSInput extends DataType implements VariableMap {
     }
 
     /**
-     * Internal function to recursively gothrough the sbs options refered by
-     * this sbsinput and provides the complete list of variables associated with
-     * this input.
+     * Internal function to recursively gothrough the sbs options refered by this sbsinput and
+     * provides the complete list of variables associated with this input.
+     * 
      * @return collection of variableset associatied with this sbsinput.
      */
     private Vector<VariableSet> getSBSOptions(SBSInput sbsInput) {
@@ -141,13 +141,15 @@ public class SBSInput extends DataType implements VariableMap {
         if (refId != null) {
             try {
                 sbsInputObject = refId.getReferencedObject();
-            } catch ( BuildException ex) {
-                //log.info("Reference id of sbsinput list is not valid");
-                throw new BuildException("Reference id (" + refId.getRefId() + ") of sbsinput list is not valid");
+            }
+            catch (BuildException ex) {
+                // log.info("Reference id of sbsinput list is not valid");
+                throw new BuildException("Reference id (" + refId.getRefId()
+                    + ") of sbsinput list is not valid");
             }
             if (sbsInputObject != null && sbsInputObject instanceof SBSInput) {
-                VariableSet options = ((SBSInput)sbsInputObject).getFullSBSOptions();
-                if (options != null ) {
+                VariableSet options = ((SBSInput) sbsInputObject).getFullSBSOptions();
+                if (options != null) {
                     if (fullList == null) {
                         fullList = new Vector<VariableSet>();
                     }
@@ -156,7 +158,7 @@ public class SBSInput extends DataType implements VariableMap {
             }
         }
         Vector<VariableSet> optionsList = sbsInput.getSBSOptions();
-        if (optionsList != null ) {
+        if (optionsList != null) {
             if (fullList == null) {
                 fullList = new Vector<VariableSet>();
             }
@@ -166,9 +168,9 @@ public class SBSInput extends DataType implements VariableMap {
     }
 
     /**
-     * Internal function to recursively gothrough the sbs make options refered by
-     * this sbsinput and provides the complete list of sbs make options associated 
-     * with this input.
+     * Internal function to recursively gothrough the sbs make options refered by this sbsinput and
+     * provides the complete list of sbs make options associated with this input.
+     * 
      * @return collection of sbs make options associatied with this sbsinput.
      */
     private Vector<SBSMakeOptions> getSBSMakeOptions(SBSInput sbsInput) {
@@ -178,12 +180,14 @@ public class SBSInput extends DataType implements VariableMap {
         if (refId != null) {
             try {
                 sbsInputObject = refId.getReferencedObject();
-            } catch ( BuildException ex) {
-               throw new BuildException("Reference id (" + refId.getRefId() + ") of sbsinput list is not valid");
+            }
+            catch (BuildException ex) {
+                throw new BuildException("Reference id (" + refId.getRefId()
+                    + ") of sbsinput list is not valid");
             }
             if (sbsInputObject != null && sbsInputObject instanceof SBSInput) {
-                SBSMakeOptions options = ((SBSInput)sbsInputObject).getFullSBSMakeOptions(); 
-                if (options != null ) {
+                SBSMakeOptions options = ((SBSInput) sbsInputObject).getFullSBSMakeOptions();
+                if (options != null) {
                     if (sbsMakeOptionsList == null) {
                         sbsMakeOptionsList = new Vector<SBSMakeOptions>();
                     }
@@ -202,9 +206,9 @@ public class SBSInput extends DataType implements VariableMap {
     }
 
     /**
-     * Internal function to recursively gothrough the sbs make options refered by
-     * this sbsinput and provides the complete list of sbs make options associated 
-     * with this input.
+     * Internal function to recursively gothrough the sbs make options refered by this sbsinput and
+     * provides the complete list of sbs make options associated with this input.
+     * 
      * @return collection of sbs make options associatied with this sbsinput.
      */
     public VariableSet getFullSBSOptions() {
@@ -212,7 +216,7 @@ public class SBSInput extends DataType implements VariableMap {
         VariableSet resultSet = null;
         Vector<VariableSet> currentOptions = getSBSOptions(this);
         if (currentOptions != null && !currentOptions.isEmpty()) {
-            if (fullList == null ) {
+            if (fullList == null) {
                 fullList = new Vector<VariableSet>();
             }
             fullList.addAll(currentOptions);
@@ -220,7 +224,7 @@ public class SBSInput extends DataType implements VariableMap {
         for (SBSInput sbsInput : sbsInputList) {
             Vector<VariableSet> options = getSBSOptions(sbsInput);
             if (options != null && !options.isEmpty()) {
-                if (fullList == null ) {
+                if (fullList == null) {
                     fullList = new Vector<VariableSet>();
                 }
                 fullList.addAll(options);
@@ -240,9 +244,9 @@ public class SBSInput extends DataType implements VariableMap {
     }
 
     /**
-     * Internal function to recursively gothrough the sbs make options refered by
-     * this sbsinput and provides the complete list of sbs make options associated 
-     * with this input.
+     * Internal function to recursively gothrough the sbs make options refered by this sbsinput and
+     * provides the complete list of sbs make options associated with this input.
+     * 
      * @return collection of sbs make options associatied with this sbsinput.
      */
     public SBSMakeOptions getFullSBSMakeOptions() {
@@ -250,7 +254,7 @@ public class SBSInput extends DataType implements VariableMap {
         SBSMakeOptions resultSet = null;
         Vector<SBSMakeOptions> currentOptions = getSBSMakeOptions(this);
         if (currentOptions != null && !currentOptions.isEmpty()) {
-            if (sbsMakeOptionsList == null ) {
+            if (sbsMakeOptionsList == null) {
                 sbsMakeOptionsList = new Vector<SBSMakeOptions>();
             }
             sbsMakeOptionsList.addAll(currentOptions);
@@ -258,13 +262,13 @@ public class SBSInput extends DataType implements VariableMap {
         for (SBSInput sbsInput : sbsInputList) {
             Vector<SBSMakeOptions> options = getSBSMakeOptions(sbsInput);
             if (options != null && !options.isEmpty()) {
-                if (sbsMakeOptionsList == null ) {
+                if (sbsMakeOptionsList == null) {
                     sbsMakeOptionsList = new Vector<SBSMakeOptions>();
                 }
                 sbsMakeOptionsList.addAll(options);
             }
         }
-        if (sbsMakeOptionsList != null ) {
+        if (sbsMakeOptionsList != null) {
             String engine = null;
             String ppThreads = null;
             for (SBSMakeOptions varSet : sbsMakeOptionsList) {
@@ -273,17 +277,19 @@ public class SBSInput extends DataType implements VariableMap {
                 if (currentEngine != null) {
                     if (engine == null) {
                         engine = currentEngine;
-                        if (resultSet == null ) {
+                        if (resultSet == null) {
                             resultSet = new SBSMakeOptions();
                         }
                         resultSet.setEngine(currentEngine);
-                    } else {
-                        if (!engine.equals(currentEngine) ) {
-                            throw new BuildException("inheriting engine types mismatch: " + engine + " != " + currentEngine);
+                    }
+                    else {
+                        if (!engine.equals(currentEngine)) {
+                            throw new BuildException("inheriting engine types mismatch: " + engine
+                                + " != " + currentEngine);
                         }
                     }
                 }
-                if (resultSet == null ) {
+                if (resultSet == null) {
                     resultSet = new SBSMakeOptions();
                 }
                 if (ppThreads == null && currentThread != null) {
@@ -297,14 +303,15 @@ public class SBSInput extends DataType implements VariableMap {
         }
         return resultSet;
     }
-    
+
     /**
      * Helper function to return the collection of variabes associated with this
+     * 
      * @return collection of sbs options associatied with this sbsinput.
      */
     public Collection<MappedVariable> getVariables() {
         Collection<MappedVariable> varList = null;
-        VariableSet  options = getFullSBSOptions();
+        VariableSet options = getFullSBSOptions();
         if (options != null) {
             varList = options.getVariables();
         }

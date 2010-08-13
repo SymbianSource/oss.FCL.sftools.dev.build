@@ -21,21 +21,29 @@ package com.nokia.helium.signal.ant.types;
 
 import java.util.Vector;
 
-import org.apache.tools.ant.types.DataType;
-import com.nokia.helium.core.ant.types.ReferenceType;
 import org.apache.log4j.Logger;
-
-import com.nokia.helium.signal.Notifier;
-
 import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.types.DataType;
+
+import com.nokia.helium.core.ant.types.ReferenceType;
+import com.nokia.helium.signal.Notifier;
 
 /**
  * SignalInput class which is a type to store input for signals
  * Signals..
- * &lt;targetCondition&gt;
- *    &lt;hasSeverity severity="error" file="${build.cache.log.dir}/signals/prep_work_status.xml" /&gt;
- * &lt;/targetCondition&gt;
+ *   
+ * <pre>
+ *   &lt;hlm:signalInput id=&quot;testDeferredSignalInput&quot;&gt;
+ *      &lt;/hlm:notifierList refid=&quot;defaultNotiferList&quot; &gt;
+ *   &lt;/hlm:signalInput&gt;
+ *   
+ *   &lt;hlm:signal name=&quot;compileSignal&quot; result=&quot;${result}&quot;&gt;
+ *       &lt;-- Let's refer to some existing signal input configuration --&gt;
+ *       &lt;hlm:signalInput refid=&quot;testDeferredSignalInput&quot; /&gt;
+ *   &lt;/hlm:signal&gt;
+ * </pre>
  * 
+ * @ant.type name="signalInput" category="Signaling"
  */
 public class SignalInput extends DataType
 {
@@ -50,8 +58,11 @@ public class SignalInput extends DataType
 
     
     /**
-     * Helper function called by ant to set the failbuild type
+     * Defines how the signal framework should handle the error, either
+     * fail "now", at the end of the build "defer", or ignore the failure
+     * with "never".
      * @param failBuild type of failure for this input.
+     * @ant.not-required Default is now.
      */
     public void setFailBuild(FailBuildEnum failInput) {
         failBuild = failInput.getValue();
@@ -115,7 +126,6 @@ public class SignalInput extends DataType
      * Gets the NotifierList associated with this input. If the
      * notifier list reference is empty then it throws exception. 
      * @return List of notifier associated with this input.
-     * @throws HlmAntLibException
      */    
     public Vector<Notifier> getSignalNotifierList() {
         Vector<Notifier> notifierList = null;

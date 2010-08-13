@@ -134,12 +134,12 @@ class ArchivePreBuilder(buildtools.PreBuilder):
                 commonRoots[common_path] = 1
         return commonRoots.keys()
 
-    def getPrefix(self, dir, commonUncRoots):
+    def getPrefix(self, dir_, commonUncRoots):
         """get prefix"""
         for root in commonUncRoots:
-            if dir.startswith(root):
+            if dir_.startswith(root):
                 return root
-        raise Exception("Could not find root for %s." % dir)
+        raise Exception("Could not find root for %s." % dir_)
     
     def checkRootDirValue(self, builder, parse_xml_file, build_drive, config_type):
         """Checks UNC path in root.dir and adds the substituted drive into EMAKEROOT."""

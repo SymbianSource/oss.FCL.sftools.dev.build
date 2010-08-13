@@ -123,11 +123,11 @@ def to_cdata(text):
         v_char = ord(char)
         if v_char == 0x9 or v_char == 0xa or v_char == 0xd:
             result += char
-        elif v_char>=0x20 and v_char <= 0xd7ff:
+        elif v_char >= 0x20 and v_char <= 0xd7ff:
             result += char
-        elif v_char>=0xe000 and v_char <= 0xfffd:
+        elif v_char >= 0xe000 and v_char <= 0xfffd:
             result += char
-        elif v_char>=0x10000 and v_char <= 0x10ffff:
+        elif v_char >= 0x10000 and v_char <= 0x10ffff:
             result += char
         else:
             result += " " 
@@ -330,6 +330,7 @@ def convert_old(inputfile, outputfile, fulllogging=True, configuration=DEFAULT_C
 class ContentWriter(ContentHandler):
     """ SAX Content writer. Parse and write an XML file. """
     def __init__(self, op_sys, indent=""):
+        ContentHandler.__init__(self)
         self.os = op_sys
         self.indent = indent
         self.__content = u""
@@ -339,7 +340,7 @@ class ContentWriter(ContentHandler):
         self.os.write(self.indent + "<" + name)
         if attrs.getLength() > 0:
             self.os.write(" ")
-        self.os.write(" ".join(map(lambda x: "%s=\"%s\"" % (x, attrs.getValue(x)), attrs.getNames())))
+        self.os.write(" ".join(["%s=\"%s\"" % (x, attrs.getValue(x)) for x in attrs.getNames()]))
         self.os.write(">\n")
         self.indent += "\t"
         self.__content = ""
@@ -385,26 +386,26 @@ def append_summary(summary, xmllog, maxmb=80):
     parser = make_parser()
     parser.setContentHandler(AppendSummary(outfile, xmllog))
     
-    input = open(summary, 'r')
-    parser.parse(input)
-    input.close()
+    input_ = open(summary, 'r')
+    parser.parse(input_)
+    input_.close()
     outfile.close()
     # Updating the summary file.
     os.unlink(summary)
     os.rename(summary + ".tmp", summary)
     
 
-def symbian_log_header(output, config, command, dir):
+def symbian_log_header(output, config, command, dir_):
     """symbian log header"""
     output.log("===-------------------------------------------------")
     output.log("=== %s" % config)
     output.log("===-------------------------------------------------")
     output.log("=== %s started %s" % (config, datetime.datetime.now().ctime()))
-    output.log("=== %s == %s" % (config, dir))
+    output.log("=== %s == %s" % (config, dir_))
     output.log("-- %s" % command)
     output.log("++ Started at %s" % datetime.datetime.now().ctime())
     output.log("+++ HiRes Start %f" % time.time())
-    output.log("Chdir %s" % dir)
+    output.log("Chdir %s" % dir_)
 
 
 def symbian_log_footer(output):

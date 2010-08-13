@@ -20,7 +20,7 @@
 #===============================================================================
 
 """ Testing ATS3 framework. """
-# pylint: disable-msg=E1101,C0302,w0142,w0603,R0912,R0902,R0903,R0201,W0404, R0915
+# pylint: disable=E1101,C0302,w0142,w0603,R0912,R0902,R0903,R0201,W0404, R0915
 #w0142 => * and ** were used
 #w0603 => global variables used TSRC_PATH etc
 #R*    => will be fixed while refactoring
@@ -40,9 +40,9 @@ import re
 import subprocess
 import fileutils
 
-from path import path # pylint: disable-msg=F0401
+from path import path # pylint: disable=F0401
 import amara
-import mocker # pylint: disable-msg=F0401
+import mocker # pylint: disable=F0401
 
 import ats3
 import ats3.testconfigurator as atc
@@ -560,7 +560,8 @@ class TestTestPlan(mocker.MockerTestCase):
                                        trace_path=self.atp.file_store.joinpath(u"§RUN_NAME§" + os.sep + u"§RUN_START_DATE§_§RUN_START_TIME§", "traces", "set0", "tracelog.blx"),
                                        trace_activation_files=self.trace_activation_files,
                                        ctc_enabled=self.atp["ctc_enabled"],
-                                       custom_dir=None,
+                                       custom_dir=None, 
+                                       dll_files={},
                                        component_path=self.component_path)
         assert self.atp.sets[1] == dict(name="set1",
                                        image_files=self.image_files,
@@ -574,6 +575,7 @@ class TestTestPlan(mocker.MockerTestCase):
                                        trace_activation_files=self.trace_activation_files,
                                        ctc_enabled=self.atp["ctc_enabled"],
                                        custom_dir=None,
+                                       dll_files={},                                        
                                        component_path=self.component_path)
 
         assert self.atp.sets[2] == dict(name="set2",
@@ -591,6 +593,7 @@ class TestTestPlan(mocker.MockerTestCase):
                                        trace_activation_files=self.trace_activation_files,
                                        ctc_enabled=self.atp["ctc_enabled"],
                                        custom_dir=None,
+                                       dll_files={}, 
                                        component_path=self.component_path)
         assert self.atp.sets[3] == dict(name="set3",
                                        data_files=[],
@@ -607,6 +610,7 @@ class TestTestPlan(mocker.MockerTestCase):
                                        trace_activation_files=self.trace_activation_files,
                                        ctc_enabled=self.atp["ctc_enabled"],
                                        custom_dir=None,
+                                       dll_files={},                                        
                                        component_path=self.component_path)
 
         assert self.atp.sets[4] == dict(name="set4",
@@ -624,6 +628,7 @@ class TestTestPlan(mocker.MockerTestCase):
                                        trace_activation_files=self.trace_activation_files,
                                        ctc_enabled=self.atp["ctc_enabled"],
                                        custom_dir=None,
+                                       dll_files={},                                        
                                        component_path=self.component_path)
         
     def test_post_actions_email(self):
@@ -1155,6 +1160,7 @@ class TestXMLGenerationWithPKG(mocker.MockerTestCase):
         self.component_path = None
         self.custom_files = None
         self.ctc_run_process_params = None
+        self.dll_files = {}
         
     def generate_xml(self, harness, trace_enabled="False"):
         """Generates XML"""
@@ -1165,6 +1171,8 @@ class TestXMLGenerationWithPKG(mocker.MockerTestCase):
         self.data_files = files("data/file1", "data/file2", "data/file3")
         self.config_files = files("conf/file1.cfg", "conf/file2.cfg")
         self.testmodule_files = files("testmodules/file1.dll", "testmodules/file2.dll")
+        self.dll_files["file1.dll"] = "EUNIT"
+        self.dll_files["file2.dll"] = ""
         self.image_files = files("output/images/file1.fpsx", "output/images/file2.fpsx")
         self.engine_ini_file = files("init/TestFramework.ini")[0]
         self.report_email = "test.receiver@company.com"
@@ -1238,12 +1246,12 @@ class TestXMLGenerationWithPKG(mocker.MockerTestCase):
                      config_files=self.config_files, testmodule_files=self.testmodule_files,
                      engine_ini_file=self.engine_ini_file, test_harness=harness0,src_dst=self.src_dst0,
                      ctc_enabled=self.ctc_enabled, eunitexerunner_flags=self.eunitexerunner_flags,
-                     custom_dir = self.custom_dir, component_path=self.component_path),
+                     custom_dir = self.custom_dir, dll_files = self.dll_files, component_path=self.component_path),
                 dict(name="set1", image_files=self.image_files, data_files=self.data_files,
                      config_files=self.config_files, testmodule_files=self.testmodule_files,
                      engine_ini_file=self.engine_ini_file, test_harness=harness1, src_dst=self.src_dst1,
                      ctc_enabled=self.ctc_enabled, eunitexerunner_flags=self.eunitexerunner_flags,
-                     custom_dir = self.custom_dir, component_path=self.component_path),
+                     custom_dir = self.custom_dir, dll_files = self.dll_files, component_path=self.component_path),
             ])
         else:
             mocker.expect(test_plan.sets).result([
@@ -1253,14 +1261,14 @@ class TestXMLGenerationWithPKG(mocker.MockerTestCase):
                      pmd_files=self.pmd_files, trace_activation_files=self.trace_activation_files,
                      trace_path=self.file_store.joinpath("traces", "set0", "tracelog.blx"),
                      ctc_enabled=self.ctc_enabled, eunitexerunner_flags=self.eunitexerunner_flags,
-                     custom_dir = self.custom_dir, component_path=self.component_path),
+                     custom_dir = self.custom_dir, dll_files = self.dll_files, component_path=self.component_path),
                 dict(name="set1", image_files=self.image_files, data_files=self.data_files,
                      config_files=self.config_files, testmodule_files=self.testmodule_files,
                      engine_ini_file=self.engine_ini_file, test_harness=harness1, src_dst=self.src_dst1,
                      pmd_files=self.pmd_files, trace_activation_files=self.trace_activation_files,
                      trace_path=self.file_store.joinpath("traces", "set1", "tracelog.blx"),
                      ctc_enabled=self.ctc_enabled, eunitexerunner_flags=self.eunitexerunner_flags,
-                     custom_dir = self.custom_dir, component_path=self.component_path),
+                     custom_dir = self.custom_dir, dll_files = self.dll_files, component_path=self.component_path),
             ])
         mocker.expect(test_plan.post_actions).result([
             ("SendEmailAction", (("subject", "email subject"),
@@ -1417,16 +1425,7 @@ class TestXMLGenerationWithPKG(mocker.MockerTestCase):
                 assert params[0].get("file") == path(r"z:" + os.sep + "sys" + os.sep + "bin" + os.sep + "EUNITEXERUNNER.EXE")
                 assert params[1].get("result-file") == path(r"c:" + os.sep + "Shared" + os.sep + "EUnit" + os.sep + "logs" + os.sep + "file1_log.xml")
                 assert params[2].get("parameters") == "/E S60AppEnv /R Off /F file1 /l xml file1.dll"
-                assert params[3].get("timeout") == "60"
-                step = steps.next()
-                file_ = self.testmodule_files[1]
-                assert step.get("name") == "Execute test: %s" % file_.name
-                assert step.findtext("./command") == "execute"
-                params = step.findall("./params/param")
-                assert params[0].get("file") == path(r"z:" + os.sep + "sys" + os.sep + "bin" + os.sep + "EUNITEXERUNNER.EXE")
-                assert params[1].get("result-file") == path(r"c:" + os.sep + "Shared" + os.sep + "EUnit" + os.sep + "logs" + os.sep + "file2_log.xml")
-                assert params[2].get("parameters") == "/E S60AppEnv /R Off /F file2 /l xml file2.dll"
-                assert params[3].get("timeout") == "60"
+                assert params[3].get("timeout") == "60"              
 
     def test_steps_trace_enabled(self):
         """checks if traing is enabled"""

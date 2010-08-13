@@ -148,6 +148,14 @@ TARGET          dependent_1.dll
 TARGETTYPE      PLUGIN
             """)
     tc1_dep1_mmp.close()
+    
+    tc1_dep2_mmp = open(path.joinpath(TSRC_DIR, "tsrc", "tc1", "dependent_1", "group", "onemore.mmp"), 'w')
+    tc1_dep2_mmp.write(
+            r"""
+TARGET          onemore.dll
+TARGETTYPE      PLUGIN
+            """)
+    tc1_dep2_mmp.close()
         
     tc1_dep2 = open(path.joinpath(TSRC_DIR, "tsrc", "tc1", "dependent_2", "group", "bld.inf"), "w")
     tc1_dep2.write(
@@ -407,13 +415,13 @@ class TestCppParser(mocker.MockerTestCase):
         self.tcp = ats3.parsers.CppParser()
         upper_bld_path = os.path.dirname(self.bld_path)
         
-        self.dependent_paths_dictionary = {(os.path.normpath(os.path.join(upper_bld_path, "../tsrc/tc1/subtest/if_test/group"))): {'content': {(os.path.normpath(os.path.join(upper_bld_path, "../tsrc/tc1/subtest/if_test/group"))): {'pkg_files': [], 'mmp_files': ['if_test.mmp'], 'harness': 'STIFUNIT', 'type': ''}}},
-                                            (os.path.normpath(os.path.join(upper_bld_path, "../tsrc/tc2//group"))): {'content': {(os.path.normpath(os.path.join(upper_bld_path, "../tsrc/tc2/group"))): {'pkg_files': ['tc2.pkg'], 'mmp_files': ['tc2.mmp'], 'harness': 'EUNIT', 'type': 'executable'}}}, 
-                                            (os.path.normpath(os.path.join(upper_bld_path, "../tsrc/tc3/group"))): {'content': {(os.path.normpath(os.path.join(upper_bld_path, "../tsrc/tc3/group"))): {'pkg_files':[], 'mmp_files': ['tc3.mmp'], 'harness': 'EUNIT', 'type': 'executable'}}},
-                                            (os.path.normpath(os.path.join(upper_bld_path, "../tsrc/tc1/group"))): {'content': {(os.path.normpath(os.path.join(upper_bld_path, "../tsrc/tc1/subtest/group"))): {'pkg_files': [], 'mmp_files': ['sub_test.mmp'], 'harness': 'STIF', 'type': 'executable'}, 
-                                                                                                                                (os.path.normpath(os.path.join(upper_bld_path, "../tsrc/tc1/dependent_1/group"))): {'pkg_files': [], 'mmp_files': ['dependent_1.mmp', 'onemore.mmp'], 'harness': "", 'type':''}, 
-                                                                                                                                (os.path.normpath(os.path.join(upper_bld_path, "../tsrc/tc1/dependent_2/group"))): {'pkg_files': [], 'mmp_files': ['dependent_2.mmp'], 'harness': "", 'type': 'dependent'}, 
-                                                                                                                                (os.path.normpath(os.path.join(upper_bld_path, "../tsrc/tc1/group"))): {'pkg_files': ['tc1.pkg'], 'mmp_files': ['tc1.mmp'],'harness': 'STIF', 'type': 'executable'}}}} 
+        self.dependent_paths_dictionary = {(os.path.normpath(os.path.join(upper_bld_path, "../tsrc/tc1/subtest/if_test/group"))): {'content': {(os.path.normpath(os.path.join(upper_bld_path, "../tsrc/tc1/subtest/if_test/group"))): {'pkg_files': [], 'mmp_files': ['if_test.mmp'], 'dll_files': {'tc1_if.dll': 'STIFUNIT'}, 'harness': 'STIFUNIT', 'type': ''}}},
+                                            (os.path.normpath(os.path.join(upper_bld_path, "../tsrc/tc2//group"))): {'content': {(os.path.normpath(os.path.join(upper_bld_path, "../tsrc/tc2/group"))): {'pkg_files': ['tc2.pkg'], 'mmp_files': ['tc2.mmp'], 'dll_files': {'tc2.dll': 'EUNIT'}, 'harness': 'EUNIT', 'type': 'executable'}}}, 
+                                            (os.path.normpath(os.path.join(upper_bld_path, "../tsrc/tc3/group"))): {'content': {(os.path.normpath(os.path.join(upper_bld_path, "../tsrc/tc3/group"))): {'pkg_files':[], 'mmp_files': ['tc3.mmp'], 'dll_files': {'tc3.dll': 'EUNIT'},  'harness': 'EUNIT', 'type': 'executable'}}},
+                                            (os.path.normpath(os.path.join(upper_bld_path, "../tsrc/tc1/group"))): {'content': {(os.path.normpath(os.path.join(upper_bld_path, "../tsrc/tc1/subtest/group"))): {'pkg_files': [], 'mmp_files': ['sub_test.mmp'], 'dll_files': {'sub_test.dll': 'STIF'}, 'harness': 'STIF', 'type': 'executable'}, 
+                                                                                                                                (os.path.normpath(os.path.join(upper_bld_path, "../tsrc/tc1/dependent_1/group"))): {'pkg_files': [], 'mmp_files': ['dependent_1.mmp', 'onemore.mmp'],'dll_files': {'dependent_1.dll': '', 'onemore.dll': ''}, 'harness': "", 'type':'dependent'}, 
+                                                                                                                                (os.path.normpath(os.path.join(upper_bld_path, "../tsrc/tc1/dependent_2/group"))): {'pkg_files': [], 'mmp_files': ['dependent_2.mmp'], 'dll_files': {'dependent_2.dll': ''}, 'harness': "", 'type': 'dependent'}, 
+                                                                                                                                (os.path.normpath(os.path.join(upper_bld_path, "../tsrc/tc1/group"))): {'pkg_files': ['tc1.pkg'], 'mmp_files': ['tc1.mmp'], 'dll_files': {'tc1.dll': 'STIF'}, 'harness': 'STIF', 'type': 'executable'}}}} 
         
         self.extended_path_list = [(os.path.normpath(upper_bld_path), upper_bld_path),
                            (os.path.normpath(os.path.join(upper_bld_path, "../tsrc/tc1/group")), upper_bld_path),
@@ -549,6 +557,8 @@ class TestBldFileParser(mocker.MockerTestCase):
     
     def __init__(self, methodName="runTest"):
         mocker.MockerTestCase.__init__(self, methodName)
+        self.mmp_file_path = None
+        self.lst_test_mmp = []
     
     def setUp(self):
         """Setup for BldFile parser"""
@@ -667,6 +677,83 @@ class TestMmpFileParser(mocker.MockerTestCase):
         """Test if get_harness returns right harness for given mmp"""
         assert self.tc1_harness == self.tcp.get_harness(os.path.normpath(os.path.join(self.path_list[0], 'tc1.mmp')))
     
+    def test_get_mmp_harness(self):
+        """ 
+        Testing required combinations of libraries with get_mmp_harness method and asserting the harness.
+        """
+        assert self.tcp.get_mmp_harness(None) == ""
+        assert self.tcp.get_mmp_harness(["foo"]) == ""  # value, but unexpected
+        #single values
+        assert self.tcp.get_mmp_harness(["stiftestinterface.lib"]) == "STIF"
+        assert self.tcp.get_mmp_harness(["eunit.lib"]) == "EUNIT"
+        assert self.tcp.get_mmp_harness(["qttest.lib"]) == "EUNIT"        
+        assert self.tcp.get_mmp_harness(["testexecuteutils.lib"]) == "GENERIC"
+        assert self.tcp.get_mmp_harness(["testframeworkclient.lib"]) == "GENERIC"
+        assert self.tcp.get_mmp_harness(["rtest"]) == "GENERIC"        
+        #tef gets priority even if other libraries exist 
+        #takeout only STIFUNIT.lib then TEF
+        assert self.tcp.get_mmp_harness(["stiftestinterface.lib", "eunit.lib", "qttest.lib", "testexecuteutils.lib" , "testframeworkclient.lib", "rtest"]) == "GENERIC"
+        #condition stif and eunit, then harness STIF
+        assert self.tcp.get_mmp_harness(["stiftestinterface.lib", "eunit.lib"]) == "STIF"
+        #condition stif and not eunit, then harness STIF
+        assert self.tcp.get_mmp_harness(["stiftestinterface.lib", "stifunit.lib"]) == "STIF"
+        #condition eunit and not stif , then harness EUNIT
+        assert self.tcp.get_mmp_harness(["eunit.lib", "qttest.lib", "stifunit.lib"]) == "EUNIT"
+        #condition stifunit and not eunit and not stif
+        assert self.tcp.get_mmp_harness(["stifunit.lib"]) == "STIFUNIT"
+        
+                               
+    def test_select_harness(self):
+        """Test if select_harness returns right harness for given set of Test Framework 
+        tef,stif,eunit and stifunit
+        tef   stif  eunit stifunit = result
+        ===================================
+        False,False,False,False    == ""
+
+        True, False,False,False    == "GENERIC"
+        True, True, False,False    == "GENERIC"
+        True, False,True, False    == "GENERIC"
+        True, False,False,True     == "GENERIC"
+        True, False,True, True     == "GENERIC"
+        True, True, True, False    == "GENERIC"
+        True, True, False,True     == "GENERIC"
+        True, True, True, True     == "GENERIC"
+
+        False,True, False,False    == "STIF"
+        False,True, True, False    == "STIF"
+        False,True, False,True     == "STIF"
+        False,True, True, True     == "STIF"
+
+        False,False, True, False    == "EUNIT"
+        False,False, True, True     == "EUNIT"
+
+        False,false, False, True     == "STIFUNIT"
+
+        """
+
+        assert self.tcp.select_harness(False, False, False, False )   == ""
+
+        assert self.tcp.select_harness(True, False, False, False )   == "GENERIC"
+        assert self.tcp.select_harness(True, True, False, False )   == "GENERIC"
+        assert self.tcp.select_harness(True, False, True, False )   == "GENERIC"
+        assert self.tcp.select_harness(True, False, False, True  )   == "GENERIC"
+        assert self.tcp.select_harness(True, False, True, True  )   == "GENERIC"
+        assert self.tcp.select_harness(True, True, True, False )   == "GENERIC"
+        assert self.tcp.select_harness(True, True, False, True  )   == "GENERIC"
+        assert self.tcp.select_harness(True, True, True, True  )   == "GENERIC"
+ 
+        assert self.tcp.select_harness(False, True, False, False )   == "STIF"
+        assert self.tcp.select_harness(False, True, True, False )   == "STIF"
+        assert self.tcp.select_harness(False, True, False, True  )   == "STIF"
+        assert self.tcp.select_harness(False, True, True, True  )   == "STIF"
+
+        assert self.tcp.select_harness(False, False, True, False)    == "EUNIT"
+        assert self.tcp.select_harness(False, False, True, True )    == "EUNIT"
+
+        assert self.tcp.select_harness(False, False, False, True)     == "STIFUNIT"
+        
+                                    
+                                    
     def test_read_information_method(self):
         """Test if read_information_from_mmp returns wanted output for given parameter and mmp-file"""
         assert self.tc1_all == self.tcp.read_information_from_mmp(os.path.normpath(os.path.join(self.path_list[0], 'tc1.mmp')), 0)

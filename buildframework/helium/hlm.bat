@@ -48,8 +48,8 @@ set PATH=%JAVA_HOME%\bin;%PATH%
 
 REM Needed by python logging
 set PID=1
-perl "%HELIUM_HOME%\tools\common\bin\getppid.pl" > %TEMP%\%USERNAME%pid.txt
-set /p PID=< %TEMP%\%USERNAME%pid.txt
+perl "%HELIUM_HOME%\tools\common\bin\getppid.pl" > "%TEMP%\%USERNAME%pid.txt"
+set /p PID=< "%TEMP%\%USERNAME%pid.txt"
 
 REM Configure Apache Ant
 if not defined TESTED_ANT (
@@ -57,18 +57,12 @@ if not defined TESTED_ANT (
 )
 if exist "%TESTED_ANT%" (set ANT_HOME=%TESTED_ANT%)
 if not exist "%ANT_HOME%" ( echo *** Ant cannot be found & goto :errorstop )
-if not defined ANT_OPTS (
-	set ANT_OPTS=-Xmx896M -Dlog4j.configuration=com/nokia/log4j.xml
-)
 
 set SIGNALING_ANT_ARGS= -Dant.executor.class=com.nokia.helium.core.ant.HeliumExecutor
 set LOGGING_ANT_ARGS= -listener com.nokia.helium.logger.ant.listener.StatusAndLogListener
-REM -listener com.nokia.helium.logger.ant.listener.StatusAndLogListener
-set DIAMONDS_ANT_ARGS= -listener com.nokia.helium.diamonds.ant.HeliumListener
 
 if not defined HLM_DISABLE_INTERNAL_DATA (
 set INTERNAL_DATA_ANT_ARGS= -listener com.nokia.helium.internaldata.ant.listener.Listener
-echo Internal data listening enabled.
 )
 
 
@@ -78,7 +72,7 @@ set TARGET_TIMES_GENERATOR= -listener com.nokia.helium.core.ant.listener.TargetT
 
 
 if not defined ANT_ARGS (
-set ANT_ARGS=-lib "%HELIUM_HOME%\external\antlibs2" -lib "%HELIUM_HOME%\extensions\nokia\external\antlibs" -logger com.nokia.ant.HeliumLogger  %DIAMONDS_ANT_ARGS% %INTERNAL_DATA_ANT_ARGS% %SIGNALING_ANT_ARGS% %LOGGING_ANT_ARGS% %TARGET_TIMES_GENERATOR%
+set ANT_ARGS=-lib "%HELIUM_HOME%\external\antlibs2" -logger com.nokia.ant.HeliumLogger  %INTERNAL_DATA_ANT_ARGS% %SIGNALING_ANT_ARGS% %LOGGING_ANT_ARGS% %TARGET_TIMES_GENERATOR% -listener com.nokia.helium.environment.ant.listener.ExecListener
 )
 
 REM Shall we impose the EPOCROOT?
@@ -97,9 +91,9 @@ for /f "tokens=2" %%a in ('"python -V 2>&1"') do (set pythonversion=%%a)
 for /f "tokens=1-2 delims=." %%a in ("%pythonversion%") do (set pythonversion=%%a.%%b)
 
 set PYTHONPATH=%HELIUM_HOME%\external\python\lib\auto;%HELIUM_HOME%\external\python\lib\%pythonversion%
-set PYTHONPATH=%PYTHONPATH%;%HELIUM_HOME%\external\python\lib\common;%HELIUM_HOME%\tools\common\python\scripts
+set PYTHONPATH=%PYTHONPATH%;%HELIUM_HOME%\external\python\lib\common
 set PYTHONPATH=%PYTHONPATH%;%HELIUM_HOME%\extensions\nokia\external\python\lib\%pythonversion%
-set PYTHONPATH=%PYTHONPATH%;%HELIUM_HOME%\extensions\nokia\tools\common\python\lib;%SBS_HOME%\python
+set PYTHONPATH=%PYTHONPATH%;%SBS_HOME%\python
 set PERL5LIB=%HELIUM_HOME%\tools\common\packages
 set COPYCMD=/y
 
@@ -129,22 +123,21 @@ if "%ERRORLEVEL%" neq "0" (goto errorstop)
 )
 
 REM Call the Helium generated batch file if it exists
-REM This must match with the cache.dir property in helium.ant.xml
 if defined JOB_ID  (
-	set HELIUM_CACHE_DIR=%TEMP%\helium\%USERNAME%\%JOB_ID%
-)ELSE set HELIUM_CACHE_DIR=%TEMP%\helium\%USERNAME%
+	set HELIUM_CACHE_DIR="%TEMP%\helium\%USERNAME%\%JOB_ID%"
+)ELSE set HELIUM_CACHE_DIR="%TEMP%\helium\%USERNAME%"
 
 if not exist %HELIUM_CACHE_DIR% (
 md %HELIUM_CACHE_DIR%
 )
 
 REM pass cache dir to a property for log4j log file
-if defined ANT_OPTS (
-	set ANT_OPTS=%ANT_OPTS% -Dlog4j.cache.dir=%HELIUM_CACHE_DIR% 
-    call %HELIUM_HOME%\external\python\configure_jython.bat
+if not defined ANT_OPTS (
+    set ANT_OPTS=-Xmx896M -Dlog4j.configuration=com/nokia/log4j.xml -Dlog4j.cache.dir=%HELIUM_CACHE_DIR% -Dpython.verbose=warning
+    call "%HELIUM_HOME%\external\python\configure_jython.bat"
 )
 
-call ant -Dhelium.dir="%HELIUM_HOME%" -Dcache.dir="%HELIUM_CACHE_DIR%" %*
+call ant -Dhelium.dir="%HELIUM_HOME%" -Dcache.dir=%HELIUM_CACHE_DIR% %*
 
 endlocal
 goto :eof

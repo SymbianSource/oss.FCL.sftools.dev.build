@@ -17,30 +17,30 @@
 
 package com.nokia.helium.quality.ant.taskdefs;
 
-import java.io.*;
+import java.io.File;
 import java.util.Vector;
 
-import org.apache.tools.ant.Task;
 import org.apache.tools.ant.BuildException;
-import org.apache.tools.ant.types.Path;
+import org.apache.tools.ant.Task;
 import org.apache.tools.ant.taskdefs.ExecTask;
+import org.apache.tools.ant.types.Path;
 
 /**
- * This task executes codescanner - and writes the results to the output directory.
- * Codescanner parses C++ code and flags any inconsistencies or errors in output files. 
- * Configuration files are used to determine what passes and fails the checking e.g. maximum length of lines,
- * whether 'C' type comments are allowed as well as C++ comments, does it adhere to the company coding 
- * guidelines and much more. Every person writing any C++ code 
- * should run codescanner on their code to ensure it follows the coding guidelines. The output logs 
- * should have no errors and preferably no warnings before the code should be checked into SCM, e.g. synergy or SVN.
- *
+ * This task executes codescanner - and writes the results to the output directory. Codescanner
+ * parses C++ code and flags any inconsistencies or errors in output files. Configuration files are
+ * used to determine what passes and fails the checking e.g. maximum length of lines, whether 'C'
+ * type comments are allowed as well as C++ comments, does it adhere to the company coding
+ * guidelines and much more. Every person writing any C++ code should run codescanner on their code
+ * to ensure it follows the coding guidelines. The output logs should have no errors and preferably
+ * no warnings before the code should be checked into SCM, e.g. synergy or SVN.
+ * 
  * Below is an example of how to use the target to run codescanner.
- *
+ * 
  * <pre>
  * &lt;property name="codescanner.output.dir" location="./cs" /&gt;
  * &lt;property name="codescanner.output.type" value="html" /&gt;
  * &lt;property name="codescanner.config" location="./codescanner_config.xml" /&gt;
- *
+ * 
  * &lt;hlm:codescanner dest="${codescanner.output.dir}"
  *      format="${codescanner.output.type}"
  *      failonerror="true"
@@ -64,8 +64,7 @@ public class CodeScannerTask extends Task {
     private boolean failonerror;
 
     /**
-     * This defines if the task should fails in case of error while 
-     * executing codescanner.
+     * This defines if the task should fails in case of error while executing codescanner.
      * 
      * @param failonerror
      * @ant.not-required Default is false for backward compatibility.
@@ -163,11 +162,6 @@ public class CodeScannerTask extends Task {
     @Override
     public void execute() {
         // creating the exec subtask
-        String osType = System.getProperty("os.name");
-        if (!osType.toLowerCase().startsWith("win")) {
-            this.log("CODESCANNER: run in windows only");
-            return;
-        }
         ExecTask task = new ExecTask();
         task.setProject(getProject());
         task.setTaskName(this.getTaskName());
@@ -179,18 +173,18 @@ public class CodeScannerTask extends Task {
         }
         if (configuration != null) {
             if (!configuration.exists()) {
-                throw new BuildException("Could not find the file "
-                        + configuration);
-            } else {
+                throw new BuildException("Could not find the file " + configuration);
+            }
+            else {
                 task.createArg().setValue("-c");
                 task.createArg().setValue(configuration.getAbsolutePath());
             }
-        } else {
-            throw new BuildException(
-                    "'configuration' attribute must be defined");
+        }
+        else {
+            throw new BuildException("'configuration' attribute must be defined");
         }
         if (!format.contains("xml")) {
-           setFormat("xml," + format);
+            setFormat("xml," + format);
         }
         this.log("Output format: " + format);
         // -t off
@@ -224,7 +218,8 @@ public class CodeScannerTask extends Task {
             if (i != srcs.size() - 1) {
                 task.createArg().setValue("-i");
                 task.createArg().setValue(srcs.elementAt(i));
-            } else {
+            }
+            else {
                 task.createArg().setValue(srcs.elementAt(i));
                 task.createArg().setValue(dest.toString());
             }

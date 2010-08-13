@@ -93,7 +93,7 @@ Description:
                 <metadatafilterset refid="filterset.test.ccm" />
             </hlm:textmetadatainput>
         </hlm:metadatarecord>
-        <hlm:generateBuildStatus dbfile="${helium.dir}/tests/data/output/temp_db" output-dir="${helium.dir}/tests/data/output/signals" file="temp.log" />
+        <hlm:generateBuildStatus dbfile="${helium.dir}/tests/data/output/temp_db" output-dir="${helium.dir}/tests/data/output/signals" file="${helium.dir}/tests/data/output/temp.log" />
         <au:assertTrue>
             <and>
                 <not>

@@ -16,11 +16,11 @@
 */
 package com.nokia.helium.imaker.tests;
 
-import org.junit.*;
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
 
 import com.nokia.helium.imaker.PrintVarSteamConsumer;
-
-import static org.junit.Assert.*;
 
 public class TestPrintVarStreamConsumer {
 

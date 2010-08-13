@@ -17,19 +17,26 @@
 
 package com.nokia.helium.diamonds.tests;
 
-import java.io.File;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.FileReader;
-import java.io.Reader;
+import static org.junit.Assert.assertTrue;
+
+
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Reader;
+import java.io.FileInputStream;
+import org.custommonkey.xmlunit.Diff;
+import org.custommonkey.xmlunit.DifferenceListener;
+import org.custommonkey.xmlunit.IgnoreTextAndAttributeValuesDifferenceListener;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
 import com.nokia.helium.diamonds.XMLMerger;
 import com.nokia.helium.diamonds.XMLMerger.XMLMergerException;
-
-import org.junit.*;
-import static org.junit.Assert.*;
-import org.custommonkey.xmlunit.*;
 
 public class TestXMLMerger {
     
@@ -58,18 +65,20 @@ public class TestXMLMerger {
      */
     @Test
     public void test_simpleMergeNode() throws Exception {
+        File tempFile = File.createTempFile("merge-out", ".xml");
         File merge = createTextFile("<?xml version=\"1.0\"?>\n<root/>");
         File toBeMerged = createTextFile("<?xml version=\"1.0\"?>\n<root>\n" +                 
                 "<section1/>\n" + 
                 "<section2/>\n"+ 
                 "<section3><subnode>text</subnode></section3>\n"+ 
                 "</root>");
-        XMLMerger merger = new XMLMerger(merge);
+        XMLMerger merger = new XMLMerger(new FileInputStream(merge), tempFile);
         merger.merge(toBeMerged);
         DifferenceListener differenceListener = new IgnoreTextAndAttributeValuesDifferenceListener();
-        Diff diff = new Diff(new ReaderNoSpaces(new FileReader(merge)), new ReaderNoSpaces(new FileReader(toBeMerged)));
+        Diff diff = new Diff(new ReaderNoSpaces(new FileReader(tempFile)), new ReaderNoSpaces(new FileReader(toBeMerged)));
         diff.overrideDifferenceListener(differenceListener);
         assertTrue("Test that 2 simple XML merge correctly  " + diff, diff.similar());
+        tempFile.delete();
     }
 
     /**
@@ -79,7 +88,8 @@ public class TestXMLMerger {
      */
     @Test
     public void test_mergeSameNode() throws Exception {
-        File merge = createTextFile("<?xml version=\"1.0\"?>\n<root>\n" +                 
+        File tempFile = File.createTempFile("merge-out", ".xml");
+        File merge = createTextFile("<?xml version=\"1.0\"?>\n<root>\n" +
                 "<section>\n" + 
                 "<subnode attr=\"1\">1</subnode>\n" + 
                 "</section>\n" + 
@@ -89,12 +99,13 @@ public class TestXMLMerger {
                 "<subnode attr=\"1\">1</subnode>\n" + 
                 "</section>\n" + 
                 "</root>");
-        XMLMerger merger = new XMLMerger(merge);
+        XMLMerger merger = new XMLMerger(new FileInputStream(merge), tempFile);
         merger.merge(toBeMerged);
         DifferenceListener differenceListener = new IgnoreTextAndAttributeValuesDifferenceListener();
-        Diff diff = new Diff(new ReaderNoSpaces(new FileReader(merge)), new ReaderNoSpaces(new FileReader(toBeMerged)));
+        Diff diff = new Diff(new ReaderNoSpaces(new FileReader(tempFile)), new ReaderNoSpaces(new FileReader(toBeMerged)));
         diff.overrideDifferenceListener(differenceListener);
         assertTrue("Test that identity  " + diff, diff.similar());
+        tempFile.delete();
     }
 
     /**
@@ -103,6 +114,7 @@ public class TestXMLMerger {
      */
     @Test
     public void test_mergeWithSubNodeAndAttribute() throws Exception {
+        File tempFile = File.createTempFile("merge-out", ".xml");
         File merge = createTextFile("<?xml version=\"1.0\"?>\n<root/>");
         File toBeMerged1 = createTextFile("<?xml version=\"1.0\"?>\n<root>\n" +                 
                 "<section>\n" + 
@@ -132,14 +144,15 @@ public class TestXMLMerger {
                 "<subnode attr=\"4\">1</subnode>\n" + 
                 "</section>\n" + 
                 "</root>");
-        XMLMerger merger = new XMLMerger(merge);
+        XMLMerger merger = new XMLMerger(new FileInputStream(merge), tempFile);
         merger.merge(toBeMerged1);
         merger.merge(toBeMerged2);
         merger.merge(toBeMerged3);
         merger.merge(toBeMerged4);
-        Diff diff = new Diff(new ReaderNoSpaces(new FileReader(merge)), new ReaderNoSpaces(new FileReader(expected)));
+        Diff diff = new Diff(new ReaderNoSpaces(new FileReader(tempFile)), new ReaderNoSpaces(new FileReader(expected)));
         //System.out.println(readTextFile(merge.getAbsolutePath()));
         assertTrue("test XML matches control skeleton XML " + diff, diff.similar());
+        tempFile.delete();
     }
 
     /**
@@ -147,29 +160,35 @@ public class TestXMLMerger {
      */
     @Test(expected=XMLMergerException.class)
     public void test_mergeWithNoRootNode() throws Exception{
-		File merge = createTextFile("<?xml version=\"1.0\"?>\n");
-		XMLMerger merger = new XMLMerger(merge);
-	}
+        File tempFile = File.createTempFile("merge-out", ".xml");
+        File merge = createTextFile("<?xml version=\"1.0\"?>\n");
+        XMLMerger merger = new XMLMerger(new FileInputStream(merge), tempFile);
+        tempFile.delete();
+}
     /**
      * Test the XMLMerger with xml files with different root nodes to merge.
      */
     @Test(expected=XMLMergerException.class)
     public void test_mergeWithDifferentRootNodes() throws Exception{
-		File merge = createTextFile("<?xml version=\"1.0\"?>\n<root/>");
-		File toBeMerged = createTextFile("<?xml version=\"1.0\"?>\n<root1/>\n");
-		XMLMerger merger = new XMLMerger(merge);
-		merger.merge(toBeMerged);
-	}
+        File tempFile = File.createTempFile("merge-out", ".xml");
+        File merge = createTextFile("<?xml version=\"1.0\"?>\n<root/>");
+        File toBeMerged = createTextFile("<?xml version=\"1.0\"?>\n<root1/>\n");
+        XMLMerger merger = new XMLMerger(new FileInputStream(merge), tempFile);
+        merger.merge(toBeMerged);
+        tempFile.delete();
+    }
     /**
      * Test the XMLMerger with xml files with Wrong xml format
      */
     @Test(expected=XMLMergerException.class)
     public void test_mergeWithWrongXML() throws Exception{
-        	File merge = createTextFile("<?xml version=\"1.0\"?>\n<root/>");
-        	File toBeMerged = createTextFile("<?xml version=\"1.0\"?>\n<root/><test/>\n");
-        	XMLMerger merger = new XMLMerger(merge);
-        	merger.merge(toBeMerged);
-	}
+        File tempFile = File.createTempFile("merge-out", ".xml");
+        File merge = createTextFile("<?xml version=\"1.0\"?>\n<root/>");
+        File toBeMerged = createTextFile("<?xml version=\"1.0\"?>\n<root/><test/>\n");
+        XMLMerger merger = new XMLMerger(new FileInputStream(merge), tempFile);
+        merger.merge(toBeMerged);
+        tempFile.delete();
+    }
 
     /**
      * Load file content into a string. 
@@ -188,9 +207,8 @@ public class TestXMLMerger {
         }
 
         reader.close();
-
         return sb.toString();
-    }    
+    }
     
     public class ReaderNoSpaces extends BufferedReader {
 

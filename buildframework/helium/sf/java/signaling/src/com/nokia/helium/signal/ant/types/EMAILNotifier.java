@@ -18,21 +18,20 @@
 package com.nokia.helium.signal.ant.types;
 
 import com.nokia.helium.core.EmailDataSender;
-import java.util.Iterator;
+
+import com.nokia.helium.core.EmailSendException;
 import com.nokia.helium.core.PropertiesSource;
 import com.nokia.helium.core.TemplateInputSource;
-import com.nokia.helium.core.XMLTemplateSource;
 import com.nokia.helium.signal.Notifier;
-import com.nokia.helium.signal.ant.SignalListener;
 import com.nokia.helium.core.TemplateProcessor;
-import com.nokia.helium.core.HlmAntLibException;
 import java.util.List;
 import java.util.Hashtable;
 import java.util.ArrayList;
 import java.io.IOException;
+
+import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.types.DataType;
-import org.apache.log4j.Logger;
 import java.io.File;
 
 /**
@@ -43,10 +42,8 @@ import java.io.File;
  */
 public class EMAILNotifier extends DataType implements Notifier {
 
-    private Logger log = Logger.getLogger(EmailDataSender.class);
     private TemplateProcessor templateProcessor = new TemplateProcessor();
     private File defaultTemplate;
-    private File templateSrc; // Deprecated    
     private String title;
     private String smtp;
     private String ldap;
@@ -57,208 +54,156 @@ public class EMAILNotifier extends DataType implements Notifier {
 
     /**
      * Rendering the template, and sending the result through email.
-     * @deprecated
-     * @param signalName
-     *            - Name of the signal that has been raised.
-     */
-    @SuppressWarnings("unchecked")
-    public void sendData(String signalName, boolean failStatus,
-            List<String> fileList) {
-        if (notifyWhen != null
-                && (notifyWhen.equals("always") || (notifyWhen.equals("fail") && failStatus)
-                        || (notifyWhen.equals("pass") && !failStatus))) {
-            if (templateSrc == null) {
-                throw new HlmAntLibException(SignalListener.MODULE_NAME,
-                        "templateSrc attribute has not been defined.");
-            }
-
-            if (title == null) {
-                throw new HlmAntLibException(SignalListener.MODULE_NAME,
-                        "title attribute has not been defined.");
-            }
-
-            if (smtp == null) {
-                throw new HlmAntLibException(SignalListener.MODULE_NAME,
-                        "smtp attribute has not been defined.");
-            }
-
-            if (ldap == null) {
-                throw new HlmAntLibException(SignalListener.MODULE_NAME,
-                        "ldap attribute has not been defined.");
-            }
-
-            log.debug("Sending data by e-mail.");
-            File emailOutputFile;
-            try {
-                emailOutputFile = File.createTempFile("helium_", "email.html");
-                emailOutputFile.deleteOnExit();
-                log.debug("sending data by e-mail:outputDir: "
-                        + emailOutputFile.getAbsolutePath());
-
-                List<TemplateInputSource> sourceList = new ArrayList<TemplateInputSource>();
-                sourceList.add(new PropertiesSource("ant", getProject()
-                        .getProperties()));
-                Iterator iter = fileList.iterator();
-                String sourceBaseName = "doc";
-                int count = 0;
-                while (iter.hasNext()) {
-                    String srcFile = (String) iter.next();
-                    sourceList.add(new XMLTemplateSource(sourceBaseName + count, 
-                            new File(srcFile)));
-                    count++;
-                }
-                Hashtable<String, String> signalProperties = new Hashtable<String, String>();
-                signalProperties.put("signal.name", signalName);
-                signalProperties.put("signal.status", "" + failStatus);
-                sourceList.add(new PropertiesSource("signaling",
-                        signalProperties));
-
-                templateProcessor.convertTemplate(templateSrc, emailOutputFile,
-                        sourceList);
-                EmailDataSender emailSender;
-                if (rootdn != null)
-                {
-                    String[] to = null;
-                    if (additionalRecipients != null)
-                    {
-                        to = additionalRecipients.split(",");
-                    }
-                    emailSender = new EmailDataSender(to, smtp, ldap, rootdn);
-                }
-                else
-                {
-                    emailSender = new EmailDataSender(
-                        additionalRecipients, smtp, ldap);
-                }
-                if (from != null)
-                {
-                    emailSender.setFrom(from);
-                }
-                log.debug("EmailNotifier:arlist: " + additionalRecipients);
-                Project subProject = getProject().createSubProject();
-                subProject.setProperty("signal.name", signalName);
-                subProject.setProperty("signal.status", "" + failStatus);
-                emailSender.addCurrentUserToAddressList();
-                emailSender.sendData("signaling", emailOutputFile
-                        .getAbsolutePath(), "application/html", subProject
-                        .replaceProperties(title), null);
-            } catch (IOException e) {
-                log.debug("EmailNotifier:IOexception: ", e);
-            }
-        }
-    }
-            
-    
-    /**
-     * Rendering the template, and sending the result through email.
      * 
-     * @param signalName - is the name of the signal that has been raised.
-     * @param failStatus - indicates whether to fail the build or not
-     * @param notifierInput - contains signal notifier info
-     * @param message - is the message from the signal that has been raised. 
+     * @param signalName
+     *            - is the name of the signal that has been raised.
+     * @param failStatus
+     *            - indicates whether to fail the build or not
+     * @param notifierInput
+     *            - contains signal notifier info
+     * @param message
+     *            - is the message from the signal that has been raised.
      */
 
     @SuppressWarnings("unchecked")
     public void sendData(String signalName, boolean failStatus,
-            NotifierInput notifierInput, String message ) {
+            NotifierInput notifierInput, String message) {
         if (notifyWhen != null
-                && (notifyWhen.equals("always") || (notifyWhen.equals("fail") && failStatus)
-                        || (notifyWhen.equals("pass") && !failStatus))) {
+                && (notifyWhen.equals("always")
+                        || (notifyWhen.equals("fail") && failStatus) || (notifyWhen
+                        .equals("pass") && !failStatus))) {
             if (title == null) {
-                throw new HlmAntLibException(SignalListener.MODULE_NAME,
-                        "title attribute has not been defined.");
+                throw new BuildException(
+                        "The 'title' attribute has not been defined.");
             }
 
             if (smtp == null) {
-                throw new HlmAntLibException(SignalListener.MODULE_NAME,
-                        "smtp attribute has not been defined.");
+                throw new BuildException(
+                        "The 'smtp' attribute has not been defined.");
             }
 
-            if (ldap == null) {
-                throw new HlmAntLibException(SignalListener.MODULE_NAME,
-                        "ldap attribute has not been defined.");
+            if (ldap == null && from == null) {
+                throw new BuildException(
+                        "The 'ldap' attribute has not been defined.");
             }
-            
-            String smtpUpdated = getProject().replaceProperties(smtp);
-            String ldapUpdated = getProject().replaceProperties(ldap);
-            String rootdnUpdated = getProject().replaceProperties(rootdn);
-            String additionalRecipientsUpdated = getProject().replaceProperties(additionalRecipients);
+            EmailDataSender emailSender = createEmailDataSender();
 
-            log.debug("Sending data by e-mail.");
-            EmailDataSender emailSender;
-            if (rootdnUpdated != null)
-            {
-                String[] to = null;
-                if (additionalRecipientsUpdated != null)
-                {
-                    to = additionalRecipientsUpdated.split(",");
-                }
-                emailSender = new EmailDataSender(to, smtpUpdated, ldapUpdated, rootdnUpdated);
-            }
-            else
-            {
-                emailSender = new EmailDataSender(
-                    additionalRecipientsUpdated, smtpUpdated, ldapUpdated);
-            }
-            if (from != null)
-            {
-                emailSender.setFrom(from);
-            }
-            log.debug("EmailNotifier:arlist: " + additionalRecipientsUpdated);
             Project subProject = getProject().createSubProject();
             subProject.setProperty("signal.name", signalName);
             subProject.setProperty("signal.status", "" + failStatus);
             subProject.setProperty("signal.message", "" + message);
-            
-            emailSender.addCurrentUserToAddressList();
-            String filePath = "";
-            File fileToSend = null;
-            if (notifierInput != null) {
-                fileToSend = notifierInput.getFile(".*.html");
-                if (fileToSend != null) {
-                    filePath = fileToSend.toString();
-                }
+            try {
                 
-            } 
-            if (fileToSend == null) {
-                File emailOutputFile;
-                try {
-                    emailOutputFile = File.createTempFile("helium_", "email.html");
-                    emailOutputFile.deleteOnExit();
-                    log.debug("sending data by e-mail:outputDir: "
-                            + emailOutputFile.getAbsolutePath());
-
-                    List<TemplateInputSource> sourceList = new ArrayList<TemplateInputSource>();
-                    sourceList.add(new PropertiesSource("ant", getProject()
-                            .getProperties()));
-                    Hashtable<String, String> signalProperties = new Hashtable<String, String>();
-                    signalProperties.put("signal.name", signalName);
-                    signalProperties.put("signal.status", "" + failStatus);
-                    signalProperties.put("signal.message", "" + message);
-                    sourceList.add(new PropertiesSource("signaling",
-                            signalProperties));
-
-                    templateProcessor.convertTemplate(defaultTemplate, emailOutputFile,
-                            sourceList);
-                    filePath = emailOutputFile.toString();
-                } catch (IOException e) {
-                    log.debug("EmailNotifier: IOexception: ", e);
+                File fileToSend = null;
+                if (notifierInput != null) {
+                    fileToSend = notifierInput.getFile(".*.html");
                 }
+                if (fileToSend == null) {
+                    if (defaultTemplate != null && defaultTemplate.exists()) {
+                        File emailOutputFile;
+                        try {
+                            emailOutputFile = File.createTempFile("helium_",
+                                    "email.html");
+                            emailOutputFile.deleteOnExit();
+                            log("sending data by e-mail:outputDir: "
+                                    + emailOutputFile.getAbsolutePath(), Project.MSG_DEBUG);
+
+                            List<TemplateInputSource> sourceList = new ArrayList<TemplateInputSource>();
+                            sourceList.add(new PropertiesSource("ant",
+                                    getProject().getProperties()));
+                            Hashtable<String, String> signalProperties = new Hashtable<String, String>();
+                            signalProperties.put("signal.name", signalName);
+                            signalProperties.put("signal.status", ""
+                                    + failStatus);
+                            signalProperties
+                                    .put("signal.message", "" + message);
+                            sourceList.add(new PropertiesSource("signaling",
+                                    signalProperties));
+
+                            templateProcessor.convertTemplate(defaultTemplate,
+                                    emailOutputFile, sourceList);
+                            fileToSend = emailOutputFile;
+                        } catch (IOException e) {
+                            log("EmailNotifier: IOexception: " + e.getMessage(), Project.MSG_DEBUG);
+                        }
+                    } else {
+                        if (defaultTemplate == null) {
+                            log("The 'defaultTemplate' has not been defined.",
+                                    Project.MSG_WARN);
+                        } else if (!defaultTemplate.exists()) {
+                            log("Could not find default template: "
+                                    + defaultTemplate.getAbsolutePath(),
+                                    Project.MSG_WARN);
+                        }
+                    }
+                }
+                emailSender.sendData("signaling", fileToSend, "application/html",
+                        subProject.replaceProperties(title), null);
+            } catch (EmailSendException ese) {
+                log(this.getDataTypeName() + " Warning: " + ese.getMessage(), Project.MSG_WARN);
             }
-            emailSender.sendData("signaling", filePath, 
-                    "application/html", subProject
-                    .replaceProperties(title), null);
         }
     }
 
     /**
-     * Set when the notifier should emit the massage. Possible values are: never, always, fail, pass.
+     * Create an EmailDataSender base on this type settings.
+     * @return
+     */
+    private EmailDataSender createEmailDataSender() {
+        String smtpUpdated = getProject().replaceProperties(smtp);
+        String ldapUpdated = getProject().replaceProperties(ldap);
+        String additionalRecipientsUpdated = getProject()
+                .replaceProperties(additionalRecipients);
+
+        log("Sending data by e-mail.", Project.MSG_DEBUG);
+        EmailDataSender emailSender;
+        if (additionalRecipientsUpdated == null) { 
+            additionalRecipientsUpdated = from;
+        } else {
+            additionalRecipientsUpdated += (from != null) ? (additionalRecipientsUpdated.length() > 0 ? "," : "") + from : "";
+        }
+        if (rootdn != null) {
+            String[] to = null;
+            if (additionalRecipientsUpdated != null) {
+                to = additionalRecipientsUpdated.split(",");
+            }
+            emailSender = new EmailDataSender(to, smtpUpdated, ldapUpdated,
+                    getProject().replaceProperties(rootdn));
+        } else {
+            emailSender = new EmailDataSender(additionalRecipientsUpdated,
+                    smtpUpdated, ldapUpdated);
+        }
+        if (from == null) {
+            try {
+                emailSender.addCurrentUserToAddressList();
+            } catch (EmailSendException ex) {
+                // Consider the error as a warning, let's try to send the email anyway
+                log(this.getDataTypeName() + " Warning: " + ex.getMessage(), Project.MSG_WARN);
+            }
+        }
+        if (from != null) {
+            log("Setting from: " + from);
+            emailSender.setFrom(from);
+        }
+        log("EmailNotifier:arlist: " + additionalRecipientsUpdated, Project.MSG_DEBUG);
+        return emailSender;
+    }
+    
+    /**
+     * Set when the notifier should emit the massage. Possible values are:
+     * never, always, fail, pass.
+     * 
      * @ant.not-required Default is never.
      */
-    public void setNotifyWhen(String ntfyWhen) {
-        notifyWhen = ntfyWhen;
+    public void setNotifyWhen(NotifyWhenEnum notifyWhen) {
+        this.notifyWhen = notifyWhen.getValue();
     }
 
+    /**
+     * When do we need to notify the user?
+     * 
+     * @return
+     */
     public String getNotifyWhen() {
         return notifyWhen;
     }
@@ -274,13 +219,19 @@ public class EMAILNotifier extends DataType implements Notifier {
 
     /**
      * Define the template source file to use while rendering the message.
+     * 
      * @deprecated
      * @ant.required
      */
+    @Deprecated
     public void setTemplateSrc(File template) {
-        this.templateSrc = template;
+        log(
+                "The usage of the templateSrc attribute is deprecated,"
+                        + " please consider using the defaultTemplate attribute instead.",
+                Project.MSG_ERR);
+        this.defaultTemplate = template;
     }
-    
+
     /**
      * The title of the email.
      * 
@@ -298,7 +249,7 @@ public class EMAILNotifier extends DataType implements Notifier {
     public void setSmtp(String smtp) {
         this.smtp = smtp;
     }
-    
+
     /**
      * Who the email is sent from.
      * 
@@ -320,12 +271,17 @@ public class EMAILNotifier extends DataType implements Notifier {
     /**
      * The LDAP server URL.
      * 
-     * @ant.required
+     * @ant.required (or from attribute can be used)
      */
     public void setLdap(String ldap) {
         this.ldap = ldap;
     }
-    
+
+    /**
+     * The LDAP rootdn.
+     * @param rootdn
+     * @ant.required
+     */
     public void setRootdn(String rootdn) {
         this.rootdn = rootdn;
     }

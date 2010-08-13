@@ -247,5 +247,52 @@ if int(r'@{error.limit}') > -1:
         <echo>checking indentation</echo>
      </target>
      
+    <target name="check-empty-catch-finally-block-in-trycatch">
+        <echo>checking for empty catch block in try-catch</echo>
+        <trycatch property="test.try">
+            <try>
+                <condition/>
+            </try>
+        </trycatch>
+    </target> 
+
+    <target name="check-empty-catch-block-in-trycatch">
+        <echo>checking for empty catch block in try-catch</echo>
+        <trycatch property="test.try">
+            <try>
+                <condition/>
+            </try>
+            <finally>
+                <echo> inside finally </echo>
+            </finally>
+        </trycatch>
+    </target> 
+
+    <target name="check-empty-finally-block-in-trycatch">
+        <echo>checking for empty catch block in try-catch</echo>
+        <trycatch property="test.try">
+            <try>
+                <condition/>
+            </try>
+            <catch>
+                <echo> inside catch </echo>
+            </catch>
+        </trycatch>
+    </target> 
+    
+    <target name="check-multiple-catch-blocks-in-trycatch">
+        <echo>checking for empty catch block in try-catch</echo>
+        <trycatch property="test.try">
+            <try>
+                <condition/>
+            </try>
+            <catch>
+                <echo> inside catch1 </echo>
+            </catch>
+            <catch>
+                <echo> inside catch2 </echo>
+            </catch>
+        </trycatch>
+    </target> 
      
 </project>

@@ -73,7 +73,7 @@ class DistributionPolicySelector:
         else:
             try:
                 policy_value = fileutils.read_policy_content(policy_file)
-            except Exception:
+            except IOError:
                 _logger.warning('POLICY_ERROR: Exception thrown parsing policy file: ' + policy_file)
                 policy_value = archive.mappers.MISSING_POLICY
         # loop through the possible values
@@ -130,7 +130,7 @@ class SymbianPolicySelector:
         else:
             try:
                 policy_value = fileutils.read_symbian_policy_content(policy_file)
-            except Exception:
+            except IOError:
                 _logger.warning('POLICY_ERROR: Exception thrown parsing policy file: ' + policy_file)
                 policy_value = archive.mappers.MISSING_POLICY
         # loop through the possible values

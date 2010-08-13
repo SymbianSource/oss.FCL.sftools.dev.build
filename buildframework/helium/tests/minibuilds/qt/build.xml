@@ -20,7 +20,7 @@ Description:
 
 ============================================================================
 -->
-<project name="minibuild.qt" default="mini-build" xmlns:au="org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium" basedir=".">
+<project name="minibuild.qt" default="minibuild" xmlns:au="org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium" basedir=".">
     <property environment="env" />
     <import file="../site/${env.TEAM}.ant.xml" optional="true"/>
     <dirname property="config.dir" file="${ant.file.minibuild.qt}" />
@@ -60,20 +60,20 @@ Description:
 
     <import file="${helium.dir}/helium.ant.xml" />
 
-    <!-- Run the full sequence of target for the minibuild. ,mini-build-prep,compile-main,zip-ee,mini-build-check-->
-    <target name="do-mini-build" depends="mini-build-cleanup,mini-build-prep,export-tools,
-      compile-main,zip-ee, mini-build-check" />
+    <!-- Run the full sequence of target for the minibuild. ,minibuild-prep,compile-main,zip-ee,minibuild-check-->
+    <target name="do-minibuild" depends="minibuild-cleanup,minibuild-prep,export-tools,
+      compile-main,zip-ee, minibuild-check,final" />
 
 
 
-    <!--ant code coverage for mini-builds-->
-    <target name="mini-build">
+    <!--ant code coverage for minibuilds-->
+    <target name="minibuild">
         <antcall target="database">
             <param name="home.files.only" value="false"/>
         </antcall>
         <mkdir dir="${helium.build.dir}/temp" />
         <hlm:coveragerecord name="${helium.build.dir}/temp/test_minibuild.xml" action="start" />
-        <runtarget target="do-mini-build" />
+        <runtarget target="do-minibuild" />
         <hlm:coveragerecord name="${helium.build.dir}/temp/test_minibuild.xml" action="stop" />
         <fmpp sourcefile="${helium.dir}/tools/common/templates/coveragerecord.txt.ftl" outputfile="${helium.build.dir}/temp/test_minibuild.txt">
             <data expandProperties="yes">
@@ -95,7 +95,7 @@ ${ant.coverage.summary}</echo>
     </target>
         
     <!-- Prepare the minibuild. -->
-    <target name="mini-build-prep" depends="prep" />
+    <target name="minibuild-prep" depends="prep" />
 
     <!-- Stubbing few targets for easy testing with dragonfly ... -->
     <target name="prep-drive" depends="build-number" />
@@ -159,7 +159,7 @@ ${diamonds.log.start.edited}</echo>-->
         </antcall>
     </target>
 
-    <target name="mini-build-cleanup">
+    <target name="minibuild-cleanup">
         <delete verbose="true" includeemptydirs="true" failonerror="false">         
             <fileset dir="${build.drive}/" casesensitive="false">
                 <include name="makefile" />
@@ -185,7 +185,7 @@ ${diamonds.log.start.edited}</echo>-->
         </delete>
     </target>
 
-    <target name="mini-build-check">
+    <target name="minibuild-check">
         <!-- Checking that the qmake command line have been generated correctly -->
         <if>
             <equals arg1="${build.system}" arg2="ec-helium" />

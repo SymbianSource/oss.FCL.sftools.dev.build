@@ -39,24 +39,23 @@ HELP_STRING = """
 
 
 def print_space_report(drive, space_required):
-    """
-    compares the required space with current free space on the provided drive
+    """ Compares the required space with current free space on the provided drive.
     """
     try:
         if sys.platform == "win32":
-            import win32file # pylint: disable-msg=F0401
+            import win32file # pylint: disable=F0401
             free_bytes = win32file.GetDiskFreeSpaceEx(drive)[0]
         elif 'java' in sys.platform:
-            import java.io # pylint: disable-msg=F0401
+            import java.io # pylint: disable=F0401
             free_bytes = java.io.File(drive).getFreeSpace()
         else:
             import os
             import statvfs
-            # pylint: disable-msg=E1101
+            # pylint: disable=E1101
             stats = os.statvfs(drive)
             free_bytes = stats[statvfs.F_BSIZE] * stats[statvfs.F_BAVAIL]
             
-    except Exception, err_type:
+    except (IOError, win32file.error), err_type:
         print "ERROR: Either specified drive doesn't exist or an unknown error"
         print str(err_type)
         print HELP_STRING
@@ -76,8 +75,7 @@ def print_space_report(drive, space_required):
 
     
 def main():
-    """
-    Gets and parse options and verifies the option values
+    """ Gets and parse options and verifies the option values.
     """
     try:
         opts = getopt.getopt(sys.argv[1:], "hs:d:", \

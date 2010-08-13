@@ -23,10 +23,11 @@ Description:
 <build-status>
     <#assign table_info = pp.loadData('com.nokia.helium.metadata.ORMFMPPLoader',
         "${dbPath}") >
-    <#list table_info['jpa']['select p from Priority p'] as priority>
-        <#assign priority_count = table_info['jpasingle']['select Count(m.id) from MetadataEntry m JOIN  m.logFile  as l JOIN m.priority as p where LOWER(l.path) like \'%${logpath?lower_case}%\' and UPPER(p.priority) like \'%${priority.priority}%\''][0]>
-        <#if (priority_count >= 0)>
-            <${priority.priority?lower_case} count= "${priority_count}" />
+    <#assign convertedLogFile = "${logpath}"?replace("\\","/")>
+    <#list table_info['jpa']['select p from Severity p'] as severity>
+        <#assign severity_count = table_info['jpasingle']['select Count(m.id) from MetadataEntry m JOIN  m.logFile l where LOWER(l.path)=\'${convertedLogFile?lower_case}\' and m.severityId=${severity.id}'][0]>
+        <#if (severity_count >= 0)>
+            <${severity.severity?lower_case} count="${severity_count}" />
         </#if>
     </#list>
 </build-status>

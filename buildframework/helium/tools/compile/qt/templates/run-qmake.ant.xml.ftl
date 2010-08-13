@@ -30,12 +30,13 @@ Description:
         <#if unit.@proFile[0]??>
             <#assign prefix="" />
         </#if>
+        <#assign bldinf="${r'$'}{build.drive}/${unit.@bldFile}"?replace('\\', '/')?replace('//', '/')>
             <sequential>
-                <echo>Running qmake for ${unit.@bldFile}/${unit['@${prefix}proFile'][0]?xml}</echo>
+                <echo>Running qmake for ${bldinf}/${unit['@${prefix}proFile'][0]?xml}</echo>
                 <if>
-                    <available file="${r'$'}{build.drive}/${unit.@bldFile}" type="dir"/>
+                    <available file="${bldinf}" type="dir"/>
                     <then>
-                        <exec executable="cmd" osfamily="windows" dir="${r'$'}{build.drive}/${unit.@bldFile}" failonerror="false">
+                        <exec executable="cmd" osfamily="windows" dir="${bldinf}" failonerror="false">
                             <arg value="/C"/>
                             <arg value="qmake"/>
                             <arg value="-listgen"/>
@@ -46,8 +47,8 @@ Description:
                             </#if>
                             <arg value="${unit['@${prefix}proFile'][0]?xml}"/>
                         </exec>
-                        <exec osfamily="unix" executable="sh" dir="${r'$'}{build.drive}/${unit.@bldFile}" failonerror="false">
-                            <arg value="${ant['epocroot']}/epoc32/tools/qmake"/>
+                        <exec osfamily="unix" executable="sh" dir="${bldinf}" failonerror="false">
+                            <arg value="${(ant['epocroot'] + "/")?replace('//', '/')}epoc32/tools/qmake"/>
                             <arg value="-listgen"/>
                             <#if unit['@${prefix}qmakeArgs'][0]??>
                             <arg line="${unit['@${prefix}qmakeArgs'][0]?xml}"/>
@@ -58,7 +59,7 @@ Description:
                         </exec>
                     </then>
                     <else>
-                       <echo message="ERROR: Directory ${r'$'}{build.drive}/${unit.@bldFile} doesn't exist."/>
+                       <echo message="ERROR: Directory ${bldinf} doesn't exist."/>
                     </else>
                 </if>
             </sequential>

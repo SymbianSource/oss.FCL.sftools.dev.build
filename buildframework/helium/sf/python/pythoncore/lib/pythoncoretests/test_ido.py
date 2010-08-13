@@ -47,7 +47,7 @@ class IDOTest(unittest.TestCase):
     def test_ido_sysdef_valid(self):
         """ Verifying get_sysdef_location method with valid sysdef"""
         test_sysdef_file = os.path.join(os.environ['TEST_DATA'], 'data', 'packageiad', 'layers.sysdef.xml')
-        location = ido.get_sysdef_location(test_sysdef_file); 
+        location = ido.get_sysdef_location(test_sysdef_file) 
         assert location != None
 
     def test_ido_sysdef_invalid(self):
@@ -55,6 +55,6 @@ class IDOTest(unittest.TestCase):
         (f_d, filename) = mkstemp()
         os.write(f_d,'Test sysdef file')
         os.close(f_d)
-        location = ido.get_sysdef_location(filename); 
+        location = ido.get_sysdef_location(filename) 
         os.unlink(filename)
         assert location == None

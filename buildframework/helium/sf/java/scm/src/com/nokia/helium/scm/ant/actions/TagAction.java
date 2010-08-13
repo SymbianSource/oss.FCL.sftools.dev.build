@@ -68,11 +68,13 @@ public class TagAction extends BaseDirectoryScmAction {
     public void execute(ScmRepository repository) throws ScmException {
         TagScmResult result;
 
-        if (name == null)
+        if (name == null) {
             throw new BuildException("'name' attribute is not defined.");
+        }
 
-        if (getBasedir() == null)
+        if (getBasedir() == null) {
             throw new BuildException("'basedir' attribute is not defined.");
+        }
 
         try {
             ExtendedScmManager scmManager = (ExtendedScmManager) getTask()

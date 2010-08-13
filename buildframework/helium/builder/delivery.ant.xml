@@ -32,14 +32,32 @@ Description:
   
     <target name="cleanup-publish-dir" if="publish.ci.dir">
         <tstamp>
-            <format property="before.date" pattern="MM/dd/yyyy hh:mm aa" offset="-1" unit="day"/>
+            <format property="before.date" pattern="MM/dd/yyyy hh:mm aa" offset="-5" unit="day"/>
         </tstamp>
         <echo>Deleting files before: ${before.date}</echo>
-        <delete>
-            <fileset dir="${publish.ci.dir}">
+        <ac:for param="file">
+            <fileset dir="${publish.ci.dir}" includes="**/*.zip">
                 <date datetime="${before.date}" when="before" />
             </fileset>
-        </delete>
+            <sequential>
+                <delete dir="@{file}/../" />
+            </sequential>
+        </ac:for>              
+        <ac:for param="dir">
+            <dirset dir="${publish.ci.dir}" includes="*/*">
+                <date datetime="${before.date}" when="before" />
+            </dirset>
+            <sequential>
+                <ac:if>
+                    <resourcecount when="equal" count="0">
+                        <fileset dir="@{dir}" includes="*" />
+                    </resourcecount>
+                    <then>
+                        <delete dir="@{dir}" />
+                    </then>
+                </ac:if>
+            </sequential>
+        </ac:for>              
     </target>
     
     <target name="create-sf-source-delivery" description="Create the SF source delivery">
@@ -55,6 +73,8 @@ Description:
                 <exclude name="external/antlibs2/**" />
                 <exclude name="external/python/configure_jython.*" />
                 <exclude name="external/python/lib/auto/**" />
+                <exclude name="external/cc-customizations/**" />
+                <exclude name="external/CruiseControl/**" />
                 <scriptselector language="jython">
 try:
     if file.isDirectory():

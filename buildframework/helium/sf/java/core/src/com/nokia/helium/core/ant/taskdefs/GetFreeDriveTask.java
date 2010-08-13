@@ -17,13 +17,14 @@
 
 package com.nokia.helium.core.ant.taskdefs;
 
-import org.apache.tools.ant.BuildException;
-import org.apache.tools.ant.Task;
 import java.io.File;
-import org.apache.tools.ant.taskdefs.condition.Os;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.Task;
+import org.apache.tools.ant.taskdefs.condition.Os;
 
 /**
  * Returns Next Free Drive available to use

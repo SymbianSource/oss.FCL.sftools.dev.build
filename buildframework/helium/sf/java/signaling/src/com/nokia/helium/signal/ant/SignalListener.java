@@ -18,11 +18,10 @@
 
 package com.nokia.helium.signal.ant;
 
-import org.apache.tools.ant.BuildListener;
-
-import org.apache.tools.ant.BuildEvent;
-import org.apache.tools.ant.Project;
 import org.apache.log4j.Logger;
+import org.apache.tools.ant.BuildEvent;
+import org.apache.tools.ant.BuildListener;
+import org.apache.tools.ant.Project;
 
 /**
  * Listener class that can connect to Ant and log information regarding to build
@@ -39,8 +38,6 @@ import org.apache.log4j.Logger;
  * 
  */
 public class SignalListener implements BuildListener {
-
-    public static final String MODULE_NAME = "signaling";
     
     private boolean initialized;
 
@@ -81,10 +78,7 @@ public class SignalListener implements BuildListener {
             initialized = true;
         }
         log.debug("Signaling:targetFinished:sendsignal: " + event.getTarget());
-        //boolean status = signalList1.checkAndNotifyFailure(event.getTarget(),event.getProject());
-        //if (!status) {
-        signalList.checkAndNotifyFailure(event.getTarget(),event.getProject());
-        //}
+        signalList.checkAndNotifyFailure(event.getTarget(), event.getProject());
     }
 
     /**

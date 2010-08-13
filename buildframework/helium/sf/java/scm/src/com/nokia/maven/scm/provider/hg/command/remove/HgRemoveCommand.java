@@ -21,6 +21,8 @@
 
 package com.nokia.maven.scm.provider.hg.command.remove;
 
+import java.io.File;
+
 import org.apache.maven.scm.ScmException;
 import org.apache.maven.scm.ScmFileSet;
 import org.apache.maven.scm.ScmResult;
@@ -31,8 +33,6 @@ import org.apache.maven.scm.provider.ScmProviderRepository;
 import org.apache.maven.scm.provider.hg.HgUtils;
 import org.apache.maven.scm.provider.hg.command.HgCommandConstants;
 import org.apache.maven.scm.provider.hg.command.remove.HgRemoveConsumer;
-
-import java.io.File;
 
 /**
  * Branch version of the remove command, to fix the command line generation.

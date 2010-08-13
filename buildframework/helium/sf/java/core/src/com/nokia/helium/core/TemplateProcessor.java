@@ -17,15 +17,16 @@
 
 package com.nokia.helium.core;
 
-import freemarker.template.Template;
-import freemarker.template.Configuration;
-
-import java.io.FileWriter;
 import java.io.File;
-import java.util.List;
+import java.io.FileWriter;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
 import org.apache.log4j.Logger;
+
+import freemarker.template.Configuration;
+import freemarker.template.Template;
 
 /**
  * Template processor.
@@ -61,10 +62,6 @@ public class TemplateProcessor {
                     PropertiesSource propSource = (PropertiesSource) source;
                     templateMap.put(propSource.getSourceName(), propSource
                             .getProperties());
-                } else if (source instanceof PPInputSource) {
-                    PPInputSource ppSource = (PPInputSource) source;
-                    templateMap.put(ppSource.getSourceName(), ppSource
-                            .getPPHash());
                 }
             }
         } catch (java.io.IOException e) {

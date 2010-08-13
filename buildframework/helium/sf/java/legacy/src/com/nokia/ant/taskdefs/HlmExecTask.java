@@ -17,10 +17,12 @@
 
 package com.nokia.ant.taskdefs;
 
-import org.apache.tools.ant.taskdefs.ExecTask;
-import org.apache.tools.ant.BuildException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 
-import java.util.concurrent.*;
+import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.taskdefs.ExecTask;
 
 /**
  * Exec task using shared thread pool
@@ -39,8 +41,7 @@ public class HlmExecTask extends ExecTask
     public void execute()
     {
         String property = getProject().getProperty("number.of.threads");
-        if (property != null)
-        {
+        if (property != null) {
             ((ThreadPoolExecutor)threadPool).setCorePoolSize(Integer.parseInt(property));
             ((ThreadPoolExecutor)threadPool).setMaximumPoolSize(Integer.parseInt(property));
         }
@@ -48,18 +49,20 @@ public class HlmExecTask extends ExecTask
         threadPool.submit(taskRunnable);
         try {
             synchronized (semaphore) {
-                while (!taskRunnable.isFinished())
+                while (!taskRunnable.isFinished()) {
                     semaphore.wait();
+                }
             }
         } catch (InterruptedException e) { e.printStackTrace(); }
           
         Throwable exception = taskRunnable.getException();
         if (exception != null)
         {
-            if (exception instanceof BuildException)
+            if (exception instanceof BuildException) {
                 throw (BuildException)exception;
-            else
+            } else {
                 exception.printStackTrace();
+            }
         }
     }
     

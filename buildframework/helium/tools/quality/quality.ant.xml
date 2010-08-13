@@ -25,9 +25,12 @@ Description:
     <description>
         Quality
     </description>
+    <import file="lint.ant.xml"/>
     <import file="conflict-checker.ant.xml"/>
     <import file="internal-exports.ant.xml"/>
     <import file="mmp-to-target.ant.xml"/>
     <import file="validate-policy.ant.xml"/>
+    <import file="cone-validate.ant.xml"/>
     <import file="file-comparison/file-comparison.ant.xml"/>
+    <import file="compatibility_analyser/compatibility.ant.xml"/>
 </project>

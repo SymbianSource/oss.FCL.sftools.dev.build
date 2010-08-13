@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : test_imaker_input.ant.xml 
+Part of     : Helium
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test-metadata" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>Helium antlib metadata tests.</description>
+
+    <taskdef resource="com/nokia/helium/metadata/ant/antlib.xml" uri="http://www.nokia.com/helium" />
+    <taskdef name="fmpp" classname="fmpp.tools.AntTask" onerror="report"/>
+
+    <target name="setUp">
+        <echo>---=====================================---</echo>
+        <mkdir dir="${test.temp.dir}" />
+        <delete dir="${test.temp.dir}" />
+        <mkdir dir="${test.temp.dir}" />
+    </target>
+    
+    <target name="tearDown">
+        <delete dir="${test.temp.dir}" />
+        <echo>---=====================================---</echo>
+    </target>
+
+    <hlm:metadatafilterset id="filterset.imaker">
+        <metadatafilter severity="error" regex="^\s*Total duration:\s+\d+:\d+\s+Status:\s+FAILED" description="" />
+        <metadatafilter severity="error" regex="^.+- DOESN'T EXIST" description="" />
+    </hlm:metadatafilterset>
+    
+    <!-- Check the parsing of a default iMaker output log -->
+    <target name="test-imaker-metadata">
+        <hlm:metadatarecord database="${test.temp.dir}/metadata_db">
+            <hlm:imakermetadatainput>
+                <fileset file="../data/imaker/build_roms_sample.log" />
+                <metadatafilterset refid="filterset.imaker" />
+            </hlm:imakermetadatainput>
+        </hlm:metadatarecord>
+
+        <fmpp sourceFile="../data/imaker/rombuild_result.ini.ftl"
+                     outputfile="${test.temp.dir}/result.ini">
+            <data expandProperties="yes">
+                dbPath: ${test.temp.dir}/metadata_db
+                ant: antProperties()
+            </data>
+        </fmpp>
+
+        <property file="${test.temp.dir}/result.ini" />
+        <echo>number.of.logs: ${number.of.logs}</echo>
+        <echo>number.of.components: ${number.of.components}</echo>
+        <echo>number.of.errors: ${number.of.errors}</echo>
+        <au:assertTrue message="Invalid number of logs">
+            <equals arg1="${number.of.logs}" arg2="1" />
+        </au:assertTrue>
+        <au:assertTrue message="Invalid number of components">
+            <equals arg1="${number.of.components}" arg2="5" />
+        </au:assertTrue>
+        <au:assertTrue message="Invalid number of errors">
+            <equals arg1="${number.of.errors}" arg2="9" />
+        </au:assertTrue>
+    </target>
+    
+</project>
+
+
+

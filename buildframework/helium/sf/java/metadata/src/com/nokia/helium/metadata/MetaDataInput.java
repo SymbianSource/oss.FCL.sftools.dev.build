@@ -11,29 +11,29 @@
  *
  * Contributors:
  *
- * Description:
+ * Description:  
  *
  */
-
 package com.nokia.helium.metadata;
 
-import java.util.Iterator;
-import com.nokia.helium.jpa.entity.metadata.Metadata;
+import javax.persistence.EntityManagerFactory;
 
-
+import org.apache.tools.ant.Task;
 
 /**
- * Interface to add any plugins to write the database. Two ways to get
- * the data, either the entire data could written by calling getEntries() method
- * or using Iterator for large amount of entries to be written to the database. 
+ * Interface used by the MetadataRecordTask to extract information and
+ * get them injected into the databased. 
+ *
  */
 public interface MetaDataInput {
-    
+
     /**
-     * 
-     *  @param fileSet fileset to be added
-     * 
+     * This methods is run for each MetadataInput nested into the MetadataRecordTask
+     * to extract data from log file for example. The factory is the entry point to
+     * the database.
+     * @param task an ant task running the plugging, mainly used to implement logging.
+     * @param factory the factory representing the access to the database.
+     * @throws MetadataException
      */
-    Iterator<Metadata.LogEntry> iterator();
-    
+    void extract(Task task, EntityManagerFactory factory) throws MetadataException;
 }

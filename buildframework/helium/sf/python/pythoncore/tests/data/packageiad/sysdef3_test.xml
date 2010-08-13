@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SystemDefinition schema="3.0.0" id-namespace="http://www.symbian.org/system-definition">
+	<systemModel name="sf">
+		
+		<layer id="app" name="app">
+			<package id="helloworldcons" name="helloworldcons" levels="demo">
+				<collection id="helloworldcons_apps" name="helloworldcons_apps" level="demo">
+				
+				</collection>
+			</package>
+		</layer>
+		
+		<layer id="mw" name="mw">
+			<package id="dummytest" name="dummytest" levels="demo">
+				<collection id="test_nested" name="test_nested" level="demo">
+					<component id="tc1" name="tc1" purpose="development" filter="test, unit_test" origin-model="sf">
+						<unit bldFile="/sf/mw/dummytest/test_nested/tc1/group" mrp="/sf/mw/dummytest/"/>
+					</component>
+				
+					<component id="tc2" name="tc2" purpose="development" filter="test" origin-model="sf">
+						<meta rel="testbuild">
+							<group name="drop_tc2_and_tc3"/>
+						</meta>
+						<unit bldFile="/sf/mw/dummytest/test_nested/tc2/group" mrp="/sf/mw/dummytest/"/>
+					</component>
+					
+					<component id="tc3" name="tc3" purpose="development" filter="test" origin-model="sf">
+						<meta rel="testbuild">
+							<group name="drop_tc2_and_tc3"/>
+						</meta>
+						<unit bldFile="/sf/mw/dummytest/test_nested/tc3/group" mrp="/sf/mw/dummytest/"/>
+					</component>
+					
+				</collection>
+			</package>
+			
+			<package id="helloworldapi" name="helloworldapi" levels="demo">
+				<collection id="helloworld_apis" name="helloworlds APIs" level="demo">
+				
+				</collection>
+			</package>
+		</layer>
+		
+		
+	</systemModel>
+</SystemDefinition>

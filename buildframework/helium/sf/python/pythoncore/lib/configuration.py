@@ -83,13 +83,13 @@ class Configuration(object, UserDict.DictMixin):
         """ See if the given name matches the name of this configuration. """
         return self.name == name
 
-    def get(self, key, default_value):
+    def get(self, key, failobj=None):
         """ Get an item from the configuration. """
         try:
             return self.__getitem__(key)
         except KeyError:
-            return default_value
-
+            return failobj
+        
     def get_list(self, key, default_value):
         """ Get a value as a list. """
         try:
@@ -402,7 +402,7 @@ class NestedConfiguration(Configuration):
         """ Is this a buildable configuration? """
         return self.abstract == None
 
-    def _addPropertyValue(self, key, value, parseList=True):
+    def add_property_value(self, key, value, parseList=True):
         """Adds a property value to the configuration.
 
         If the property does not exist, it is added without modification.
@@ -519,14 +519,14 @@ class ConfigurationSet(Configuration):
         Configuration.__init__(self)
         self._configs = configs
 
-    def getConfigurations(self, name=None, type=None):
+    def getConfigurations(self, name=None, type_=None):
         """ Return a list of configs that matches the name and type specified. 
         
         This can be queried multiple times to retrieve different named configurations.
         """
         result = []
         for conf in self._configs:
-            if ((name != None and conf.match_name(name)) or name == None) and ((type != None and conf.type == type) or type == None):
+            if ((name != None and conf.match_name(name)) or name == None) and ((type_ != None and conf.type == type_) or type_ == None):
                 result.append(conf)
         return result
 
@@ -546,9 +546,11 @@ class NestedConfigurationBuilder(ConfigurationBuilder):
 
     def __init__(self, inputfile, configname=''):
         """ Initialization. """
+        ConfigurationBuilder.__init__(self)
         self.inputfile = inputfile
         self.configname = configname
         self._warn_on_deprecated_spec = False
+        self.rootNode = None
 
     def getConfiguration(self):
         """ Returns a ConfigurationSet object.
@@ -624,14 +626,13 @@ class NestedConfigurationBuilder(ConfigurationBuilder):
         out.write(doc.toprettyxml())
         out.close()
 
-
-    def getConfigurations(self, name=None, type=None):
+    def getConfigurations(self, name=None, type_=None):
         """ Get a list of the individual configurations. 
         
         Once read a new builder must be opened to retrieve a differently filtered set of configurations.
         """
         config_set = self.getConfiguration()
-        return config_set.getConfigurations(name, type)
+        return config_set.getConfigurations(name, type_)
 
     def getReferences(self):
         """get references"""
@@ -682,18 +683,18 @@ class NestedConfigurationBuilder(ConfigurationBuilder):
                         if not isinstance(parent_value, types.ListType):
                             parent_value = [parent_value]
                         for value in parent_value:
-                            config._addPropertyValue(name, value)
+                            config.add_property_value(name, value)
 
                 if child.nodeName == 'set' or child.nodeName == 'append':
                     name = child.getAttribute('name')
                     if child.hasAttribute('value'):
                         value = child.getAttribute('value')
-                        config._addPropertyValue(name, value)
+                        config.add_property_value(name, value)
                     elif child.hasChildNodes():
                         value = ""
                         for textchild in child.childNodes:
                             value += textchild.data
-                        config._addPropertyValue(name, value, False)
+                        config.add_property_value(name, value, False)
                 elif child.nodeName == 'specRef':
                     for ref in child.getAttribute('ref').split(','):
                         node = self.getNodeByReference(ref)
@@ -758,13 +759,3 @@ class _Key(object):
         """ Convert the key to XPath syntax. """
         return self.string.replace('.', '/')
         
-        
-class XMLConfiguration(HierarchicalConfiguration):
-    """ A XML-based hierarchical configuration. """
-    
-    def __init__(self, file_):
-        """ Initialization. """
-        from lxml import etree
-        HierarchicalConfiguration.__init__(self)
-        
-        self._root = etree.parse(file_)

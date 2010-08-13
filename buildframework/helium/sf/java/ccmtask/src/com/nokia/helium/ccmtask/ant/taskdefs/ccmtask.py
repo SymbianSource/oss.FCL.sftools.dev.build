@@ -36,18 +36,18 @@ logging.getLogger("ccm").setLevel(logging.INFO)
 logger = logging.getLogger("ccm.ant")
 session = None
 
-def execute_update(command):
+def execute_update(session, command):
     java_ccmtask.log(str('Updating project: ' + command.getProject()))
     project = session.create(command.getProject())
     project.update()
 
-def execute_role(command):
+def execute_role(session, command):
     if not command.getRole():
         raise Exception("The 'role' attribute has not been defined.")
     java_ccmtask.log(str('Updating role: ' + command.getRole()))
     session.role = command.getRole()
     
-def execute_synchronize(command):
+def execute_synchronize(session, command):
     if not command.getProject():
         raise Exception("The 'project' attribute has not been defined.")
     java_ccmtask.log(str('Synchronizing project: ' + command.getProject()))
@@ -55,14 +55,14 @@ def execute_synchronize(command):
     project = session.create(command.getProject())
     project.sync(command.getRecursive())    
         
-def execute_reconcile(command):
+def execute_reconcile(session, command):
     if not command.getProject():
         raise Exception("The 'project' attribute has not been defined.")
     java_ccmtask.log(str('Reconciling project: ' + command.getProject()))
     project = session.create(command.getProject())
     project.reconcile()
 
-def execute_snapshot(command):
+def execute_snapshot(session, command):
     if not command.getProject():
         raise Exception("The 'project' attribute has not been defined.")
     if not command.getDir():
@@ -74,7 +74,7 @@ def execute_snapshot(command):
     else:
         project.snapshot(command.getDir(), command.getRecursive())
 
-def execute_changereleasetag(command):
+def execute_changereleasetag(session, command):
     if not command.getFolder():
         raise Exception("The 'folder' attribute has not been defined.")
     if not command.getReleaseTag():
@@ -86,7 +86,7 @@ def execute_changereleasetag(command):
         if task.release != str(command.getReleaseTag()):
             task.release = str(command.getReleaseTag())
             
-def execute_checkout(command):
+def execute_checkout(session, command):
     if not command.getProject():
         raise Exception("The 'project' attribute has not been defined.")
     java_ccmtask.log(str('Checking out project: ' + command.getProject() + ' with release tag ' + command.getRelease()))
@@ -114,7 +114,7 @@ def execute_checkout(command):
             purpose = None
         project.checkout(session.create(command.getRelease()), version, purpose, recursive)
 
-def execute_createreleasetag(command):
+def execute_createreleasetag(session, command):
     java_ccmtask.log(str('creating a release tag'))
     if not command.getProject():
         raise Exception("The 'project' attribute has not been defined.")
@@ -123,7 +123,7 @@ def execute_createreleasetag(command):
         new_release_tag = command.getNewTag();
         project.create_release_tag(command.getRelease(), new_release_tag)
 
-def execute_deletereleasetag(command):
+def execute_deletereleasetag(session, command):
     java_ccmtask.log(str('deleting a release tag'))
     if not command.getProject():
         raise Exception("The 'project' attribute has not been defined.")
@@ -132,7 +132,7 @@ def execute_deletereleasetag(command):
         new_release_tag = command.getNewTag();
         project.delete_release_tag(command.getRelease(), new_release_tag)
 
-def execute_workarea(command):
+def execute_workarea(session, command):
     if not command.getProject():
         raise Exception("The 'project' attribute has not been defined.")
     java_ccmtask.log(str('Modifying work area for the project : ' + command.getProject()))
@@ -163,11 +163,11 @@ def execute_workarea(command):
         wat = None
     project.work_area(maintain, recursive, relative, path, pst, wat)
 
-def execute_addtask(command):
+def execute_addtask(session, command):
     if command.getFolder() != None:
         tasks = []        
         ccmfolder = session.create("Folder " + command.getFolder())
-        role = find_folder_information(command)
+        role = find_folder_information(session, command)
         if role == "build_mgr":
             java_ccmtask.log("Changing role to %s" % role)
             session.role = "build_mgr"
@@ -181,7 +181,7 @@ def execute_addtask(command):
         for task in tasks:
             ccmfolder.append(task)
     
-def find_folder_information(command):
+def find_folder_information(session, command):
     cmdline = "folder -sh i " + command.getFolder()    
     result = session.execute(cmdline)
     result_array = str(result).split('\r')
@@ -193,7 +193,7 @@ def find_folder_information(command):
             else:
                 return "developer"
 
-def execute_exists(command):
+def execute_exists(session, command):
     fpn = None
     if command.getObject() != None:
         fpn = command.getObject()
@@ -210,12 +210,11 @@ def execute_exists(command):
     else:
         raise Exception("Could not find '%s'." % ccmo)
 
-def execute_close(command):
-    global session
-    java_ccmtask.log(str("Closing session %s." % session))
-    session.close_on_exit = True
+def execute_close(session, command):
+    java_ccmtask.log(str("Closing session %s." % str(session)))
+    if hasattr(session, 'close_on_exit'):
+        session.close_on_exit = True    
     session.close()
-    session = None
     
 def referenceToObject(obj):
     if obj.isReference() == 1:
@@ -235,9 +234,9 @@ if len(sessionIds) > 0:
     sessionid = sessionIds.pop()
     session = ccm.Session(username=None, engine=None, dbpath=None, ccm_addr=sessionid, close_on_exit=False)
 else:
-   username = java_ccmtask.getUsername()
-   password = java_ccmtask.getPassword()
-   session = ccm.open_session(username=username, password=password)
+    username = java_ccmtask.getUsername()
+    password = java_ccmtask.getPassword()
+    session = ccm.open_session(username=username, password=password)
 
 if java_ccmtask.getVerbose() == 1:
     logging.getLogger("ccm").setLevel(logging.DEBUG)
@@ -249,7 +248,7 @@ for command in ccm_commands:
     method_name = 'execute_' + command.getName()
     method = sys.modules['__main__'].__dict__[method_name]
     try:
-        method(command)
+        method(session, command)
     except Exception, e:
         if java_ccmtask.getVerbose() == 1:
             import traceback

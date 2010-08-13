@@ -47,7 +47,7 @@ def test_optparse_help():
     
     import optparse
     
-# pylint: disable-msg=W0613
+# pylint: disable=W0613
 
     def testCallback(option, opt, value, parser):
         """test Call back"""

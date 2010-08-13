@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : test_executetasknotifier.ant.xml
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test_executetasknotifier" xmlns:au="antlib:org.apache.ant.antunit" xmlns:ac="antlib:net.sf.antcontrib" xmlns:hlm="http://www.nokia.com/helium">
+    <description>Helium Antlib Signal unittests.</description>
+    <taskdef resource="com/nokia/helium/core/ant/antlib.xml" uri="http://www.nokia.com/helium" />
+    <taskdef resource="com/nokia/helium/signal/ant/antlib.xml" uri="http://www.nokia.com/helium" />
+    <property environment="env" />
+    <property name="build.summary.file" location="../data/ido_tedo_mcl_devlon52_ec_MCL.52.105_summary.log.xml" />
+
+    <!-- Deferred signal -->
+    <hlm:notifierList id="testSignalNotifiers">
+        <hlm:executeTaskNotifier>
+            <echo>Signal: ${signal.name}</echo>
+        </hlm:executeTaskNotifier>
+    </hlm:notifierList>
+
+    <hlm:notifierList id="testSignalNotifiersRuntarget">
+        <hlm:executeTaskNotifier>
+            <ac:runtarget target="some-custom-target" />    
+        </hlm:executeTaskNotifier>
+    </hlm:notifierList>
+
+    <hlm:signalInput id="testNeverSignalInput" failBuild="never">
+        <hlm:notifierListRef refid="testSignalNotifiers" />
+    </hlm:signalInput>
+    
+    <hlm:signalInput id="testNeverSignalInputRuntarget" failBuild="never">
+        <hlm:notifierListRef refid="testSignalNotifiersRuntarget" />
+    </hlm:signalInput>
+
+    <!-- is called prior to the test -->
+    <target name="setUp">
+        <!-- cleaning deferred pending failures. -->
+        <hlm:clearDeferredFailures />
+    </target>
+
+    <!-- is called after the test, even if that caused an error -->
+    <target name="tearDown">
+        <!-- cleaning deferred pending failures. -->
+        <hlm:clearDeferredFailures />
+    </target>
+
+    <target name="some-custom-target">
+        <echo>Signal: ${signal.name}</echo>
+    </target>
+
+    <target name="test-notifier-is-called">
+        <hlm:signal name="testSignal" result="0" message="message">
+            <signalNotifierInput>
+                <hlm:signalInput refid="testNeverSignalInput" />
+            </signalNotifierInput>
+        </hlm:signal>
+        <au:assertLogContains text="Signal: testSignal" />
+    </target>
+
+    <target name="test-notifier-with-runtarget-works">
+        <hlm:signal name="testSignal" result="0" message="message">
+            <signalNotifierInput>
+                <hlm:signalInput refid="testNeverSignalInputRuntarget" />
+            </signalNotifierInput>
+        </hlm:signal>
+        <au:assertLogContains text="Signal: testSignal" />
+    </target>
+</project>

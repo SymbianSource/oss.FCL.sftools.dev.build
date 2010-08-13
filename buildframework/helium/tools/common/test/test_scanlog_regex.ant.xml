@@ -801,5 +801,21 @@ Description:
             </hlm:metadataRegexTest>
         </au:assertTrue>
     </target>
+
+    <target name="test-scanlog-metadata-regex-emake-config-error">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="ERROR" string="ERROR EC1007: Unknown annotation detail token:">
+                <hlm:metadatafilterset refid="filterset.emake"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
+
+    <target name="test-scanlog-metadata-regex-emake-config-warning">
+        <au:assertTrue>
+            <hlm:metadataRegexTest severity="WARNING" string="WARNING EC1003: Ignoring redundant EMAKE_ROOT value - C:/apps/sbs (It is already included by EMAKE_ROOT value - C:/apps)">
+                <hlm:metadatafilterset refid="filterset.emake"/>
+            </hlm:metadataRegexTest>
+        </au:assertTrue>
+    </target>
     
 </project>

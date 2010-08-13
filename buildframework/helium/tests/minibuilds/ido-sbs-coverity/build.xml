@@ -20,31 +20,39 @@ Description:
 
 ============================================================================
 -->
-<project name="minibuild.ido-sbs" default="help" xmlns:au="org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium" basedir="..\ido">
+<project name="minibuild.ido-sbs-coverity" default="help" xmlns:au="org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium" basedir="..\ido">
     <property environment="env"/>
-	<!--property name="config.temp.build.dir" location="${ant.file.minibuild.ido-sbs}/../build"/ -->
-	
-	<!-- Configuring raptor build system -->
-	<property name="build.system" value="sbs"/>
-	
-	<!-- Configuring get latest env. -->
+    <!--property name="config.temp.build.dir" location="${ant.file.minibuild.ido-sbs}/../build"/ -->
+    
+    <!-- Configuring raptor build system -->
+    <property name="build.system" value="sbs"/>
+    
+    <!-- Configuring get latest env. -->
     <property name="s60.grace.service" value="s60_devices_sw" />
     <property name="s60.grace.product" value="DFS7x.92" />
     <property name="s60.grace.release" value="92_\d{6}_hw79" />
     
     <!-- enable coverity -->
-    <property name="enabled.coverity" value="true"/>
+    <property name="coverity.enabled" value="true"/>
+    <property name="coverity.commit.defects.enabled" value="true"/>
+    <property name="coverity.defect.manager.server" value="ousrv057.europe.nokia.com"/>
+    <property name="coverity.defect.manager.port" value="5467"/>
+    <property name="coverity.defect.manager.product" value="S60-92-Vasko"/>
+    
     <property name="publish.ccm.folder" value="bh1test#310" />
     
-    <!-- Run the full sequence of target for the minibuild. ,mini-build-prep,compile-main,zip-ee,mini-build-check-->
-    <!--<target name="do-mini-build" depends="mini-build-cleanup,
-    										compile-main"/>-->
+    <dirname property="ido.sbs.coverity.dir" file="${ant.file.minibuild.ido-sbs-coverity}"/>
+    <property name="prep.delivery.file" location="${ido.sbs.coverity.dir}/delivery.xml" />
+    
+    <!-- Run the full sequence of target for the minibuild. ,minibuild-prep,compile-main,zip-ee,minibuild-check-->
+    <!--<target name="do-minibuild" depends="minibuild-cleanup,
+                                            compile-main"/>-->
 
-	<property name="build.name" value="minibuild_ido_sbs_coverity" />
+    <property name="build.name" value="minibuild_ido_sbs_coverity" />
     <property name="build.family" value="test_minibuild_ido_sbs_coverity" />
-		
-    <target name="mini-build-check">
-    	<!-- Check if prep has set some prop correctly... -->
+        
+    <target name="minibuild-check">
+        <!-- Check if prep has set some prop correctly... -->
         <echo>'${arm.compiler.version}'</echo>
         <au:assertMatches string="${arm.compiler.version}" pattern="RVCT2\.2 \[Build 686\]" casesensitive="false" multiline="true"/>
 
@@ -58,9 +66,9 @@ Description:
             </then>
         </if>
     </target>
-	
+    
 
-	<import file="../ido/build.xml"/>
+    <import file="../ido/build.xml"/>
     <import file="build.sbsinput.ant.xml" />
 </project>
 

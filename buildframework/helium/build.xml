@@ -37,22 +37,34 @@ Description:
 
     <property name="doc.src.dir" location="${basedir}/doc/src" />
     <!-- Override docs targets to do more for Helium. -->
-    <target name="apidocs" depends="python-apidocs,internal.docs.apidocs"/>
+    <target name="apidocs" depends="internal.docs.apidocs"/>
     <!-- Generate rst files for docs -->
-    <target name="prep-textdocs" depends="overview-to-html,tools-rst-table,dependency-diagram,
+    <target name="prep-textdocs" depends="overview-to-html,dependency-diagram,
         dependency-logs,release-diff,helium-user-graph,internal.docs.prep-textdocs,helium-prep-textdocs"/>
     <!-- generate all the user documentation for helium -->
-    <target name="docs" depends="clean-docs,database,apidocs,textdocs"/>
+    <target name="docs" depends="clean-docs,docs-database,apidocs,textdocs"/>
+    
+    <!-- Generates an Ant XML database file showing only public content.
+    @scope private    
+    -->
+    <target name="docs-database">
+        <hlm:databaseMacro file="${public.database.file}" scope="public"/>
+    </target>
     
     <import file="helium.ant.xml"/>
     <import file="tools/startup/antserver/antserver.ant.xml"/>
     
-    <resources id="textdoc.paths">
-        <path>
-            <pathelement path="${doc.src.dir}"/>
-            <pathelement path="${basedir}/extensions/nokia/doc/src"/>
-        </path>
-    </resources>
+    <if>
+        <isset property="nokia.dir"/>
+        <then>
+            <resources id="textdoc.paths">
+                <path>
+                    <pathelement path="${doc.src.dir}"/>
+                    <pathelement path="${basedir}/extensions/nokia/doc/src"/>
+                </path>
+            </resources>
+        </then>
+    </if>
 
 </project>
 

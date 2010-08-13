@@ -18,12 +18,12 @@ Contributors:
 Description:
 
 ============================================================================
---> 
-    <build>
-        <category>${ant["build.family"]}</category>
-        <name>${ant["id"]}</name>
-        <#if ant?keys?seq_contains("diamonds.start.time")><started>${ant["diamonds.start.time"]}</started></#if>
-        <#if ant?keys?seq_contains("diamonds.end.time")><finished>${ant["diamonds.end.time"]}</finished></#if>
+-->
+<build>
+    <category>${ant["build.family"]}</category>
+    <name>${ant["id"]}</name>
+    <#if ant?keys?seq_contains("build.start.time")><started>${ant["build.start.time"]}</started></#if>
+    <#if ant?keys?seq_contains("build.end.time")><finished></finished></#if>
         <creator>${ant["env.USERNAME"]}</creator>
         <hostname>${ant["env.COMPUTERNAME"]}</hostname>
         <product>${ant["name"]}</product>

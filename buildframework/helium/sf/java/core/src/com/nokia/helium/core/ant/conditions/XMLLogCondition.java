@@ -18,12 +18,16 @@
 package com.nokia.helium.core.ant.conditions;
 
 import java.io.File;
-import org.apache.tools.ant.BuildException;
+
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-import org.xml.sax.*;
-import org.xml.sax.helpers.*;
-import com.nokia.helium.core.ant.types.ConditionType;
+
+import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.taskdefs.condition.Condition;
+import org.apache.tools.ant.types.DataType;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
 
 /**
  * This class implements a Ant Condition which report true if it finds any
@@ -42,7 +46,7 @@ import com.nokia.helium.core.ant.types.ConditionType;
  * 
  * @ant.type name="hasSeverity" category="Core"
  */
-public class XMLLogCondition extends ConditionType {
+public class XMLLogCondition extends DataType implements Condition {
 
     // The severity to count
     private String severity;
@@ -84,8 +88,9 @@ public class XMLLogCondition extends ConditionType {
             //this.log("Error: Log file does not exist " + fileName);
             return -1;
         }
-        if (severity == null)
+        if (severity == null) {
             throw new BuildException("'severity' attribute is not defined");
+        }
 
         //this.log("Looking for severity '" + severity + "' under '" + fileName.getAbsolutePath() + "'");
         SAXParserFactory factory = SAXParserFactory.newInstance();

@@ -57,8 +57,9 @@ public class RemoveAction extends BaseDirectoryScmAction {
 
     @Override
     public void execute(ScmRepository repository) throws ScmException {
-        if (message == null)
+        if (message == null) {
             throw new BuildException("message attribute has not been defined.");
+        }
         // if (getBasedir() == null)
         // throw new BuildException("basedir attribute has not been defined.");
 

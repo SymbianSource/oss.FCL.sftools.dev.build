@@ -56,7 +56,7 @@ Helium can be retrieved from the Hydra_ service:
 
 <#if ant?keys?seq_contains("sf")>
 
-.. include:: sf.html
+.. include:: sf.rst
 
 </#if>
 

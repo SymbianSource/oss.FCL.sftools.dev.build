@@ -36,16 +36,25 @@ import java.util.Hashtable;
  * For more information about system definition file v3.0 please check 
  * <a href="http://developer.symbian.org/wiki/index.php/System_Definition">http://developer.symbian.org/wiki/index.php/System_Definition</a>.
  *
+ * <br>
+ * This task relies on externals tools. Their location can be configured the following ways:
+ *  <li>by configuring the sysdef.tools.home property, fails if the location is incorrect.
+ *  <li>The parent folder of the joinsysdef tool from the PATH, fallback on SDK location.
+ *  <li>Default SDK location.
+ *
  * @ant.task name="joinSysdef" category="Sysdef"
  */
 
 public class JoinTask extends AbstractSydefTask {
-    private static final String XSLT = "sf/os/buildtools/bldsystemtools/sysdeftools/joinsysdef.xsl"; 
+    private static final String XSLT = "joinsysdef.xsl"; 
 
     /**
      * {@inheritDoc}
      */
     public void execute() {
+        // This task is configure to always fail on warnings,
+        // because it doesn't fails in case of missing link. 
+        this.setFailOnWarning(true);
         check();
         log("Joining " + this.getSrcFile()); 
         log("Creating " + this.getDestFile());
@@ -57,6 +66,6 @@ public class JoinTask extends AbstractSydefTask {
      */
     @Override
     protected File getXsl() {
-        return new File(this.getEpocroot(), XSLT);
+        return new File(SysdefUtils.getSysdefHome(getProject(), this.getEpocroot()), XSLT);
     }
 }

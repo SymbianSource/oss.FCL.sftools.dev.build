@@ -55,19 +55,6 @@ Description:
         </hlm:exec>
         <au:assertPropertyEquals name="testexec" value="hi"/>
     </target>
-    
-    <target name="test-ivy-tools">
-        <property name="data.dir" location="../data" />
-        <ivy:configure file="../data/ivy/tools_ivy_settings.xml" override="true" />
-        <ivy:resolve file="../data/ivy/ivy.xml" conf="core" haltonfailure="true" />
-    </target>
 
-    <target name="test-ivy-tools-invalid">
-        <property name="data.dir" location="../data" />
-        <ivy:configure file="../data/ivy/tools_ivy_settings.xml" override="true" />
-        <au:expectfailure message="impossible to resolve dependencies:">
-            <ivy:resolve file="../data/ivy/ivy.xml" conf="core-invalid" haltonfailure="true" />
-        </au:expectfailure>
-    </target>
 </project>
 

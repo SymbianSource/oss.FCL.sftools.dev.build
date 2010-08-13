@@ -18,58 +18,71 @@
  
 package com.nokia.helium.metadata.ant.types;
 
-import org.apache.tools.ant.types.DataType;
-import org.apache.log4j.Logger;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+
+import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.types.DataType;
 
 
 /**
  * This class provides filter input to the metadata task.
  * <pre>
- * &lt;metadatafilter priority=&quot;error&quot; regex=&quot;&quot; description=&quot;&quot; /&gt;
+ * &lt;metadatafilter severity=&quot;error&quot; regex=&quot;&quot; description=&quot;&quot; /&gt;
  * </pre>
  * @ant.task name="metadatafilter" category="Metadata"
  */
-public class MetaDataFilter extends DataType
-{
+public class MetaDataFilter extends DataType implements MetaDataFilterCollection {
 
-    private Logger log = Logger.getLogger(MetaDataFilter.class);
-
-    private String priority;
+    private SeverityEnum.Severity severity;
     private String regex;
     private String description;
     private Pattern pattern;
     
 
     /**
-     * Helper function called by ant to set the priority type
-     * @param priority type of priority for this input.
+     * Defines what is the severity level for this pattern
+     * @param severity type of severity for this input.
      */
-    public void setPriority(String prty) throws Exception {
-        if (prty == null || prty.trim().length() == 0) {
-            throw new Exception(" Invalid Priority");
-        }
-        priority = prty;
+    @Deprecated
+    public void setPriority(SeverityEnum severity) {
+        setSeverity(severity);
     }
 
     /**
-     * Helper function to return the priority type
-     * @return priority type
+     * Defines what is the severity level for this pattern
+     * @param severity type of severity for this input.
      */
-    public String getPriority() {
-        return priority;
+    public void setSeverity(SeverityEnum severity) {
+        this.severity = severity.getSeverity();
+    }
+
+    /**
+     * Helper function to return the severity type
+     * @return severity type
+     * @ant.required
+     */
+    public SeverityEnum.Severity getSeverity() {
+        return severity;
     }
 
     /**
      * Helper function called by ant to set the regex
      * @param regx regular expression of the filter
+     * @ant.required
      */
-    public void setRegex(String regx) throws Exception {
-        if (regx == null || regx.trim().length() == 0) {
-            throw new Exception(" Invalid Regular expression");
+    public void setRegex(String regex) {
+        if (regex == null || regex.trim().length() == 0) {
+            throw new BuildException("Invalid Regular expression: the regex attribute cannot be an empty string.");
         }
-        regex = regx;
-        createPattern(regx);
+        this.regex = regex;
+        try {
+            pattern = Pattern.compile(this.regex);
+        } catch (PatternSyntaxException ex) {
+            throw new BuildException("Invalid regular expression: " + ex.getMessage(), ex);
+        }
     }
 
     /**
@@ -83,6 +96,7 @@ public class MetaDataFilter extends DataType
     /**
      * Helper function called by ant to set the description type
      * @param desc description associated with filter.
+     * @ant.required
      */
     public void setDescription(String desc) {
         description = desc;
@@ -97,19 +111,24 @@ public class MetaDataFilter extends DataType
     }
     
     /**
-     * Internal function to create the pattern
-     * @regex for which the pattern is created.
-     */
-    private void createPattern(String regex) {
-        pattern = Pattern.compile(regex);
-    }
-    
-    /**
      * Helper function to return the pattern
      * @return the pattern of this filter.
      */
     public Pattern getPattern() {
         return pattern;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public Collection<MetaDataFilter> getAllFilters() {
+        Collection<MetaDataFilter> result = new ArrayList<MetaDataFilter>();
+        if (this.isReference()) {
+            result.add((MetaDataFilter)this.getRefid().getReferencedObject());  
+        } else {
+            result.add(this);
+        }
+        return result;
     }
 }
 

@@ -17,21 +17,20 @@
 
 package com.nokia.helium.internaldata.ant.listener;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.Enumeration;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Vector;
-import java.util.Hashtable;
-import java.util.Enumeration;
-import java.io.ByteArrayOutputStream;
-import java.io.UnsupportedEncodingException;
-import java.io.IOException;
 
+import org.apache.tools.ant.BuildEvent;
 import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
-import org.dom4j.io.XMLWriter;
 import org.dom4j.io.OutputFormat;
-
-import org.apache.tools.ant.BuildEvent;
+import org.dom4j.io.XMLWriter;
 /**
  * This xml render object does the following - 
  * Generates target only for TargetNode type of node

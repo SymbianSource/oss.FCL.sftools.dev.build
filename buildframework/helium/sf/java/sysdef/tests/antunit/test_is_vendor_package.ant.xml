@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : test_is_vendor_package.ant.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test-is-vendor-package" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>Helium antlib merge sysdef tests.</description>
+
+    <taskdef resource="com/nokia/helium/sysdef/ant/antlib.xml" uri="http://www.nokia.com/helium" />
+    <property name="epocroot" location="../data/rootsysdef" />
+    <property name="epocroot.temp" location="${epocroot}/temp" />
+
+    <!-- is called prior to the test -->
+    <target name="setUp">
+        <delete dir="${epocroot.temp}/" failonerror="false" />
+        <mkdir dir="${epocroot.temp}" />
+    </target>
+
+    <!-- is called after the test, even if that caused an error -->
+    <target name="tearDown">
+        <delete dir="${epocroot.temp}" failonerror="false" />
+    </target>
+
+    <target name="test-missing-file">
+        <au:expectfailure expectedMessage="'file' attribute is not defined.">
+            <condition property="is.vendor" value="true">
+                <hlm:isVendorPackage />
+            </condition>
+        </au:expectfailure>
+    </target>
+    
+    <target name="test-regular-package">
+        <condition property="is.vendor" value="true" else="false">
+            <hlm:isVendorPackage file="../data/isvendor/package/package_definition.xml" />
+        </condition>
+        <au:assertTrue message="Must not be a vendor package">
+            <isfalse value="${is.vendor}" />
+        </au:assertTrue>
+    </target>
+
+    <target name="test-vendor-package">
+        <condition property="is.vendor" value="true" else="false">
+            <hlm:isVendorPackage file="../data/isvendor/package/vendor_package_info/vendor_package_metadata/package_definition.xml" />
+        </condition>
+        <au:assertTrue message="Must be a vendor package">
+            <istrue value="${is.vendor}" />
+        </au:assertTrue>
+    </target>
+
+    <target name="test-regular-package-selector">
+        <au:assertTrue message="Must not count a package">
+            <resourcecount when="eq" count="0">
+                <restrict>
+                    <fileset dir="../data/isvendor" includes="*/package_definition.xml">
+                        <custom classname="com.nokia.helium.sysdef.ant.conditions.IsVendorPackage" />
+                    </fileset>
+                </restrict>
+            </resourcecount>
+        </au:assertTrue>
+    </target>
+    
+    <target name="test-vendor-package-selector">
+        <au:assertTrue message="Must not be a vendor package">
+            <resourcecount when="eq" count="1">
+                <fileset dir="../data/isvendor" includes="*/*/*/package_definition.xml">
+                    <custom classname="com.nokia.helium.sysdef.ant.conditions.IsVendorPackage" />
+                </fileset>
+            </resourcecount>
+        </au:assertTrue>
+    </target>
+
+    <target name="test-vendor-package-selector-resource">
+        <au:assertTrue message="Must count a vendor package">
+            <resourcecount when="eq" count="1">
+                <restrict>
+                    <fileset dir="../data/isvendor" includes="*/*/*/package_definition.xml" />
+                    <hlm:isVendorPackage />
+                </restrict>
+            </resourcecount>
+        </au:assertTrue>
+    </target>
+
+    <target name="test-regular-package-selector-resource">
+        <au:assertTrue message="Must not count any package package">
+            <resourcecount when="eq" count="0">
+                <restrict>
+                    <fileset dir="../data/isvendor" includes="*/package_definition.xml" />
+                    <hlm:isVendorPackage />
+                </restrict>
+            </resourcecount>
+        </au:assertTrue>
+    </target>
+
+</project>

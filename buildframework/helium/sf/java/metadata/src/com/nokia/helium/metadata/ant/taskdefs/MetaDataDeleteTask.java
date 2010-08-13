@@ -17,15 +17,25 @@
 
 package com.nokia.helium.metadata.ant.taskdefs;
 
-import org.apache.tools.ant.types.FileSet;
-
-import org.apache.tools.ant.DirectoryScanner;
-import org.apache.tools.ant.Task;
-import java.util.Vector;
-import java.util.ArrayList;
+import java.io.File;
+import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
-import org.apache.log4j.Logger;
-import com.nokia.helium.metadata.db.*;
+import java.util.Vector;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+
+import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.Project;
+import org.apache.tools.ant.Task;
+import org.apache.tools.ant.types.Resource;
+import org.apache.tools.ant.types.ResourceCollection;
+
+import com.nokia.helium.metadata.FactoryManager;
+import com.nokia.helium.metadata.MetadataException;
+import com.nokia.helium.metadata.model.metadata.LogFile;
+import com.nokia.helium.metadata.model.metadata.LogFileDAO;
 
 /**
  * This task provide a way to delete the data from db for a log file set.
@@ -41,90 +51,95 @@ import com.nokia.helium.metadata.db.*;
  */
 public class MetaDataDeleteTask extends Task {
 
-    private static Logger log = Logger.getLogger(MetaDataDeleteTask.class);
-
-    private String database;
+    private File database;
     
     private boolean failOnError = true;
 
-    private Vector<FileSet> fileSetList = new Vector<FileSet>();
+    private List<ResourceCollection> resourceCollections = new Vector<ResourceCollection>();
 
     /**
      * Helper function to set the database parameter
      * 
      * @ant.required
      */
-    public void setDatabase(String dbFile) {
-        database = dbFile;
-    }
-
-    public void setFailOnError(String failNotify) {
-        if (failNotify.equals("false")) {
-            failOnError = false;
-        }
+    public void setDatabase(File database) {
+        this.database = database;
     }
 
     /**
-     * Updates the list of filelist from the input fileset.
-     *  @param fileSetList input fileset list
-     *  @return the matched files including the base dir. 
+     * Defines if the task should fail on error.
+     * @param failNotify
+     * @ant.not-required Default is true.
      */
-    private List<String> getFileListFromFileSet() {
-        List<String> fileList = new ArrayList<String>();
-        for (FileSet fs : fileSetList) {
-            DirectoryScanner ds = fs.getDirectoryScanner(getProject());
-            String[] includedFiles = ds.getIncludedFiles();
-            for ( String file : includedFiles ) {
-                fileList.add(file);
-                log.debug("includedfiles: " + file);
-            }
-        }
-        log.debug("fileList.size" + fileList.size());
-        return fileList;
+    public void setFailOnError(boolean failOnError) {
+        this.failOnError = failOnError;
     }
 
     /**
-     * Adds the fileset (list of input log files to be processed).
-     *  @param fileSet fileset to be added
+     * Adds any ResourceCollection types from Ant (list of input log files to be processed).
+     *  @param resourceCollection the ResourceCollection to be added
      * 
      */
-    public void add(FileSet fileSet) {
-        fileSetList.add(fileSet);
+    public void add(ResourceCollection resourceCollection) {
+        resourceCollections.add(resourceCollection);
     }   
 
     /**
      * Helper function to get the database
      * 
      */
-    public String getDatabase() {
+    protected File getDatabase() {
         return database;
     }
 
-    
+    /**
+     * {@inheritDoc}
+     */
+    @SuppressWarnings("unchecked")
     @Override
     public void execute() {
-        /*
-        MetaDataDb metadataDb = null;
+        if (database == null) {
+            throw new BuildException("'database' attribute is not defined.");
+        }
+        EntityManagerFactory factory = null;
+        EntityManager entityManager = null;
         try {
-            log.debug("Initializing DB: " + database + "to delete");
-            log("time before removing entries from db" + new Date());
-            metadataDb = new MetaDataDb(database);
-            metadataDb.removeEntries(getFileListFromFileSet());
-            log("time after removing entries from db" + new Date());
-        } catch (BuildException ex1) {
-            if (failOnError) {
-                throw ex1;
+            factory = FactoryManager.getFactoryManager().getEntityManagerFactory(database);
+            entityManager = factory.createEntityManager();
+            Date before = new Date();
+            log("Time before recording to db: " + before);
+            for (ResourceCollection resourceCollection : resourceCollections) {
+                Iterator<Resource> ri = (Iterator<Resource>)resourceCollection.iterator();
+                while (ri.hasNext()) {
+                    File file = new File(ri.next().toString());
+                    LogFileDAO logFileDAO = new LogFileDAO();
+                    logFileDAO.setEntityManager(entityManager);
+                    LogFile logFile = logFileDAO.findByLogName(file);
+                    if (logFile != null) {
+                        log("Removing log from database: " + file.getAbsolutePath());
+                        entityManager.getTransaction().begin();
+                        logFileDAO.remove(logFile);
+                        entityManager.getTransaction().commit();
+                    }
+                }
             }
-        } catch (Exception ex) {
+            Date after = new Date();
+            log("Time after recording to db: " + after);
+            log("Elapsed time: " + (after.getTime() - before.getTime()) + " ms");
+        } catch (MetadataException ex) {
+            log(ex.getMessage(), Project.MSG_ERR);
             if (failOnError) {
-                throw new BuildException("Failed during writing data to db");
+                throw new BuildException(ex.getMessage(), ex);
             }
         } finally {
-            log.debug("finalizing DB: " + database);
-            if (metadataDb != null) {
-                metadataDb.finalizeDB();
+            if (entityManager != null) {
+                entityManager.close();                
+                entityManager = null;
+            }
+            if (factory != null) {
+                factory.close();
+                factory = null;
             }
         }
-        */
     }
 }

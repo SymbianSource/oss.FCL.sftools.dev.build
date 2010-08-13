@@ -18,8 +18,9 @@
  
 package com.nokia.helium.signal.ant.types;
 
-import org.apache.tools.ant.types.DataType;
 import java.util.Vector;
+
+import org.apache.tools.ant.types.DataType;
 
 /**
  * This Ant type defines a signal input for listener based signals.
@@ -154,29 +155,4 @@ public class SignalListenerConfig extends DataType
         }
         return signalNotifierInputs.get(0);
     }
-
-    /**
-     * Helper function to return the complete target name set of the config.
-     * @return Set, full set of target names referred by this config.
-     * @throws HlmAntLibException
-     */    
-    //public Set<String> getTargetNameSet() {
-    //    if (targetConditionsMap.isEmpty()) {
-    //        initializeTargetConditionsMap();
-    //    }
-    //    return targetConditionsMap.keySet();
-    //}
-
-    /**
-     * Initializes the TargetConditionsMap, mapping target name with corresponding targetcondition
-     * for fast lookup. 
-     */    
-    //private void initializeTargetConditionsMap() {
-    //    for (TargetCondition condition : targetConditions) {
-    //        String name = condition.getName();
-    //        if (name != null) {
-    //            targetConditionsMap.put(name, condition);
-    //        }
-    //    }
-    //}
 }

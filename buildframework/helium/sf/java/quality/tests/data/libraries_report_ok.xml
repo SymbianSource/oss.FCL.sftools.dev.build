@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="ASCII" standalone="no" ?>
+<?xml-stylesheet type="text/xsl" href="BBCResults.xsl"?>
+<!-- 
+============================================================================ 
+Name        : libraries_report_ok.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<bbcresults>
+    <issuelist>
+        <library>
+            <name>C:\Symbian\9.2\S60_3rd_FP1_2\aknicon.dso</name>
+            <currentplatform>armv5</currentplatform>
+            <issue>
+                <typeid>7</typeid>
+                <bc_severity>Informative</bc_severity>
+                <sc_severity>None</sc_severity>
+            </issue>
+            <issue>
+                <typeid>7</typeid>
+                <bc_severity>Informative</bc_severity>
+                <sc_severity>None</sc_severity>
+            </issue>
+        </library>
+        <library>
+            <name>C:\Symbian\9.2\S60_3rd_FP1_2\aknnotify.dso</name>
+            <issue>
+                <typeid>6</typeid>
+                <bc_severity>Possible BBC Break</bc_severity>
+                <sc_severity>SC Break</sc_severity>
+            </issue>
+            <issue>
+                <typeid>7</typeid>
+                <bc_severity>Informative</bc_severity>
+                <sc_severity>None</sc_severity>
+            </issue>
+        </library>
+        <library>
+            <name>C:\Symbian\9.2\S60_3rd_FP1_2\animation.dso</name>
+            <issue>
+                <typeid>7</typeid>
+                <bc_severity>Informative</bc_severity>
+                <sc_severity>None</sc_severity>
+            </issue>
+            <issue>
+                <typeid>14</typeid>
+                 <bc_severity>Informative</bc_severity>
+                <sc_severity>None</sc_severity>
+            </issue>
+        </library>
+        <library>
+            <name>C:\Symbian\9.2\S60_3rd_FP1_2\animationshared.dso</name>
+            <issue>
+                <typeid>14</typeid>
+                <bc_severity>Informative</bc_severity>
+                <sc_severity>None</sc_severity>
+            </issue>
+        </library>
+        <library>
+            <name>C:\Symbian\9.2\S60_3rd_FP1_2\apfile.dso</name>
+          <issue>
+              <typeid>4</typeid>
+              <bc_severity>BBC Break</bc_severity>
+              <sc_severity>SC Break</sc_severity>
+          </issue>
+      </library>
+    </issuelist>
+
+</bbcresults>

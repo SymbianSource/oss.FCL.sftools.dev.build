@@ -19,7 +19,7 @@
 
 """ Test cases for ccm python toolkit."""
 
-# pylint: disable-msg=R0201
+# pylint: disable=R0201
 
 import unittest
 import ccm
@@ -31,10 +31,13 @@ import tempfile
 _logger = logging.getLogger('test.test_session_provider')
 logging.basicConfig(level=logging.INFO)
 
+
 class MockResultSession(ccm.AbstractSession):
     """ Fake session used to test Result"""
-    def __init__(self, behave = {}, database="fakedb"):
+    def __init__(self, behave=None, database="fakedb"):
         ccm.AbstractSession.__init__(self, None, None, None, None)
+        if behave == None:
+            behave = {}
         self._behave = behave
         self._database = database
         self.dbpath = "/path/to/" + database
@@ -56,12 +59,13 @@ class MockResultSession(ccm.AbstractSession):
             result.status = -1  
         return result
 
+
 class MockOpener(object):
     """ An Opener which provides a mock session """
     def __init__(self):
         self.failOnNewOpen = False
     
-# pylint: disable-msg=W0613
+# pylint: disable=W0613
 #need disable msg to prevent pylint warning as this is emulating the real method.
     def __call__(self, username=None, password=None, engine=None, dbpath=None, database=None, reuse=True):
         assert self.failOnNewOpen == False, "This method should not be called again."
@@ -69,6 +73,7 @@ class MockOpener(object):
             raise ccm.CCMException("Invalid database")
         return MockResultSession()
 # pylint: enable-msg=W0613
+
 
 class SessionProviderTest(unittest.TestCase):
     """ Testing Results parsers. """
@@ -84,9 +89,8 @@ class SessionProviderTest(unittest.TestCase):
         try:
             _ = prov.get(database="invaliddb")
             assert False, "Should raise Exception when giving unexisting dbase.'"
-        except Exception, exc:
+        except ccm.CCMException, exc:
             _logger.info(exc)
-
 
 
 class CachedSessionProviderTest(unittest.TestCase):
@@ -117,7 +121,7 @@ class CachedSessionProviderTest(unittest.TestCase):
         try:
             _ = prov.get(database="invaliddb")
             assert False, "Should raise Exception when giving unexisting dbase.'"
-        except Exception, exc:
+        except ccm.CCMException, exc:
             _logger.info(exc)
         
     def test_open_session_twice(self):

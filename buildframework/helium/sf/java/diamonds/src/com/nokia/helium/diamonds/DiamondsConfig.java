@@ -1,32 +1,28 @@
 /*
-* Copyright (c) 2007-2008 Nokia Corporation and/or its subsidiary(-ies).
-* All rights reserved.
-* This component and the accompanying materials are made available
-* under the terms of the License "Eclipse Public License v1.0"
-* which accompanies this distribution, and is available
-* at the URL "http://www.eclipse.org/legal/epl-v10.html".
-*
-* Initial Contributors:
-* Nokia Corporation - initial contribution.
-*
-* Contributors:
-*
-* Description:  
-*
-*/
-
-
+ * Copyright (c) 2007-2008 Nokia Corporation and/or its subsidiary(-ies).
+ * All rights reserved.
+ * This component and the accompanying materials are made available
+ * under the terms of the License "Eclipse Public License v1.0"
+ * which accompanies this distribution, and is available
+ * at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ *
+ * Initial Contributors:
+ * Nokia Corporation - initial contribution.
+ *
+ * Contributors:
+ *
+ * Description:  
+ *
+ */
 
 package com.nokia.helium.diamonds;
 
-import org.apache.tools.ant.BuildException;
-
-import java.util.*;
-import org.dom4j.io.SAXReader;
-import org.dom4j.Document;
-import org.dom4j.Element;
-import org.dom4j.Node;
-import org.dom4j.DocumentException;
+import java.util.HashMap;
+import java.util.Map;
+import com.nokia.helium.core.ant.types.Stage;
+import com.nokia.helium.core.ant.types.TargetMessageTrigger;
+import org.apache.tools.ant.Project;
+import java.util.Hashtable;
 import org.apache.log4j.Logger;
 
 /**
@@ -34,133 +30,77 @@ import org.apache.log4j.Logger;
  * 
  */
 public final class DiamondsConfig {
-    private static DiamondsProperties diamondsProperties;
 
-    private static List<Stage> stages;
+    private static HashMap<String, Stage> stages = new HashMap<String, Stage>();
 
-    private static Logger log;
+    private static Logger log = Logger.getLogger(DiamondsConfig.class);
 
-    private static Map<String, Target> targets;
-
-    private static String outputDir;
-
-    private static String templateDir;
-    
     private static String initialiserTargetName;
+    
+    private static Project project;
+    
+    private static final String DIAMONDS_HOST_PROPERTY = "diamonds.host";
+    private static final String DIAMONDS_PORT_PROPERTY = "diamonds.port";
+    private static final String DIAMONDS_PATH_PROPERTY = "diamonds.path";
+    private static final String DIAMONDS_TSTAMP_PROPERTY = "diamonds.tstamp.format";
+    private static final String DIAMONDS_MAIL_PROPERTY = "diamonds.mail";
+    private static final String DIAMONDS_LDAP_PROPERTY = "diamonds.ldap.server";
+    private static final String DIAMONDS_SMTP_PROPERTY = "diamonds.smtp.server";
+    private static final String DIAMONDS_INITIALIZER_TARGET_PROPERTY = "diamonds.initializer.targetname";
+    private static final String DIAMONDS_CATEGORY_PROPERTY = "diamonds.category";
+    
+    
+    private static final String[] PROPERTY_NAMES = {DIAMONDS_HOST_PROPERTY, DIAMONDS_PORT_PROPERTY, DIAMONDS_PATH_PROPERTY,
+        DIAMONDS_TSTAMP_PROPERTY, DIAMONDS_MAIL_PROPERTY,
+        DIAMONDS_LDAP_PROPERTY, DIAMONDS_SMTP_PROPERTY,
+        DIAMONDS_INITIALIZER_TARGET_PROPERTY, DIAMONDS_CATEGORY_PROPERTY};
+
+    private static HashMap<String, TargetMessageTrigger> targetMessageList = new HashMap<String, TargetMessageTrigger>();
 
     private DiamondsConfig() {
     }
+
+
+    @SuppressWarnings("unchecked")
+    private static void initializeMessage(Project prj) {
+        Hashtable<String, Object> references = prj.getReferences();
+        for (String key : references.keySet()) {
+            Object object = references.get(key);
+            log.debug("key: " + key);
+            if (object instanceof TargetMessageTrigger) {
+                log.debug("found message map:" + object);
+                log.debug("found key: " + key);
+                TargetMessageTrigger message = (TargetMessageTrigger)object;
+                targetMessageList.put(message.getTargetName(), (TargetMessageTrigger)object);
+            }
+        }
+    }
     
-    /**
-     * Method accessed by loggers to load the diamonds specific configuration.
-     * 
-     * @param configFile
-     *            - configuration to load
-     * 
-     */
-    public static void parseConfiguration(String configFile)
-            throws DiamondsException {
-        if (log == null) {
-            log = Logger.getLogger(DiamondsConfig.class);
-        }
-        SAXReader saxReader = new SAXReader();
-        Document document = null;
-        try {
-            log.debug("Reading diamonds configuration.");
-            document = saxReader.read(configFile);
-        } catch (DocumentException e) {
-            // No need to fail the build due to internal Helium configuration errors.
-            log.debug("Diamonds configuration parsing error: "
-                    + e.getMessage());
-        }
-        parseConfig(document);
-        diamondsProperties = parseDiamondsProperties(document);
-        stages = parseStages(document);
-        targets = parseTargets(document);
-    }
-
-    /**
-     * Parses the general configuration info.
-     * 
-     * @param document
-     *            - XML config in DOM4J document
-     */
-    private static void parseConfig(Document document) {
-        log.debug("diamonds:DiamondsConfig:parsing general configuration.");
-        Node node = document.selectSingleNode("//output-dir");
-        outputDir = node.valueOf("@path");
-        node = document.selectSingleNode("//template-dir");
-        templateDir = node.valueOf("@path");
-    }
-
-    /**
-     * Parses the server info.
-     * 
-     * @param document
-     *            - XML config in DOM4J document
-     */
-    private static DiamondsProperties parseDiamondsProperties(Document document) {
-        log.debug("diamonds:DiamondsConfig:parsing diamonds properties.");
-        
-        Map<String, String> propertiesMap = new HashMap<String, String>();
-        
-        loadProperty(document, propertiesMap, "host");
-        loadProperty(document, propertiesMap, "port");
-        loadProperty(document, propertiesMap, "path");
-        loadProperty(document, propertiesMap, "tstampformat");
-        loadProperty(document, propertiesMap, "mail");
-        loadProperty(document, propertiesMap, "ldapserver");
-        loadProperty(document, propertiesMap, "smtpserver");
-        loadProperty(document, propertiesMap, "initialiser-target-name");
-        loadProperty(document, propertiesMap, "category-property");
-        loadProperty(document, propertiesMap, "buildid-property");
-        return new DiamondsProperties(propertiesMap);
-    }
-
-    /**
-     * Parses the Targets data from config.
-     * 
-     * @param document
-     *            - XML config in DOM4J document
-     * @return list of targets available in the config
-     */
     @SuppressWarnings("unchecked")
-    private static Map<String, Target> parseTargets(Document document) {
-        log.debug("diamonds:DiamondsConfig:parsing for targets");
-        Map<String, Target> targets = new HashMap<String, Target>();
-        List<Element> stageNodes = document.selectNodes("//target");
-       
-        // Set initialiserTargetName according to target name defined Diamonds config file
-        initialiserTargetName = diamondsProperties.getProperty("initialiser-target-name");
-        targets.put(initialiserTargetName, new Target(initialiserTargetName,"","","",""));
-        for (Element stageNode : stageNodes) {
-            targets.put(stageNode.valueOf("@name"), new Target(stageNode
-                    .valueOf("@name"), stageNode.valueOf("@template-file"),
-                    stageNode.valueOf("@logfile"), stageNode
-                            .valueOf("@ant-properties"), stageNode
-                            .valueOf("@defer")));
+    public static void initialize(Project prj) throws DiamondsException {
+        project = prj;
+        log.debug("Diamonds config initialization: project: " + project);
+        initializeMessage(prj);
+        for (String property : PROPERTY_NAMES ) {
+            validateProperty(property);
         }
-        return targets;
+        Hashtable<String, Object> references = prj.getReferences();
+        for (String key : references.keySet()) {
+            Object object = references.get(key); 
+            if (object instanceof Stage) {
+                log.debug("stage found: " + key);
+                Stage stageMap = (Stage)object;
+                stageMap.setStageName(key);
+                stages.put(key, (Stage)object);
+            }
+        }
     }
 
-    /**
-     * Parses the stages info.
-     * 
-     * @param document
-     *            - XML config in DOM4J document
-     * @return list of stages in config
-     */
-    @SuppressWarnings("unchecked")
-    private static List<Stage> parseStages(Document document) {
-        List<Stage> stages = new ArrayList<Stage>();
-        List<Element> stageNodes = document.selectNodes("//stage");
-        log.debug("diamonds:DiamondsConfig:parsing for stages");
-        for (Element stage : stageNodes) {
-            stages.add(new Stage(stage.valueOf("@name"), stage
-                    .valueOf("@start"), stage.valueOf("@end"), stage
-                    .valueOf("@logfile")));
+    private static void validateProperty(String propertyName) throws DiamondsException {
+        String propertyValue = project.getProperty(propertyName);
+        if (propertyValue == null) {
+            throw new DiamondsException("required property: " + propertyName + " not defined");
         }
-        return stages;
     }
 
     /**
@@ -168,7 +108,7 @@ public final class DiamondsConfig {
      * 
      * @return the stages from config in memory
      */
-    static List<Stage> getStages() {
+    static Map<String, Stage> getStages() {
         return stages;
     }
 
@@ -177,8 +117,8 @@ public final class DiamondsConfig {
      * 
      * @return the targets from config in memory
      */
-    static Map<String, Target> getTargets() {
-        return targets;
+    static HashMap<String, TargetMessageTrigger> getTargetsMap() {
+        return targetMessageList;
     }
 
     /**
@@ -187,7 +127,7 @@ public final class DiamondsConfig {
      * @return the existance of stages in config
      */
     public static boolean isStagesInConfig() {
-        return stages != null;
+        return !stages.isEmpty();
     }
 
     /**
@@ -196,58 +136,56 @@ public final class DiamondsConfig {
      * @return the targets from config in memory
      */
     public static boolean isTargetsInConfig() {
-        return targets != null;
+        return !targetMessageList.isEmpty();
     }
 
-    /**
-     * Gets the diamonds properties loaded from config
-     * 
-     * @return the targets from config in memory
-     */
-    public static DiamondsProperties getDiamondsProperties() {
-        return diamondsProperties;
+    public static String getHost() {
+        return project.getProperty(DIAMONDS_HOST_PROPERTY);
     }
 
-    /**
-     * Gets the output directory
-     * 
-     * @return the output directory, loaded from config
-     */
-    static String getOutputDir() {
-        return outputDir;
+    public static String getPort() {
+        return project.getProperty(DIAMONDS_PORT_PROPERTY);
     }
 
-    /**
-     * Gets the output directory
-     * 
-     * @return the output directory, loaded from config
-     */
-    static String getTemplateDir() {
-        return templateDir;
+    public static String getPath() {
+        return project.getProperty(DIAMONDS_PATH_PROPERTY);
     }
-    
+
+    public static String getTimeFormat() {
+        return project.getProperty(DIAMONDS_TSTAMP_PROPERTY);
+    }
+
+    public static String getMailInfo() {
+        return project.getProperty(DIAMONDS_MAIL_PROPERTY);
+    }
+
+    public static String getLDAPServer() {
+        return project.getProperty(DIAMONDS_LDAP_PROPERTY);
+    }
+
+    public static String getSMTPServer() {
+        return project.getProperty(DIAMONDS_SMTP_PROPERTY);
+    }
+
+    public static String getBuildIdProperty() {
+        return "diamonds.build.id";
+    }
+
+    public static String getBuildId() {
+        return project.getProperty(getBuildIdProperty());
+    }
+
     /**
      * Gets the initialiserTargetName
      * 
-     * @return the initialiserTargetName, loaded from config
+     * @return the initialiserTargetName
      */
-    public static String getInitialiserTargetName() {
-        return initialiserTargetName;
+    public static String getInitializerTargetProperty() {
+        return DIAMONDS_INITIALIZER_TARGET_PROPERTY;
     }
-    
-    /**
-     * Load diamonds property into hashmap.
-     * @param doc
-     * @param hash
-     * @param name
-     * @return
-     */
-    public static void loadProperty(Document document, Map<String, String> hash, String name) {
-        Node node = document.selectSingleNode("//property[@name='" + name + "']");
-        if (node == null) {
-            throw new BuildException("diamonds: DiamondsConfig:'" + name + "' property definition is missing.");
-        }
-        hash.put(name, node.valueOf("@value"));
+
+    public static String getCategory() {
+        return project.getProperty(DIAMONDS_CATEGORY_PROPERTY);
     }
 
 }

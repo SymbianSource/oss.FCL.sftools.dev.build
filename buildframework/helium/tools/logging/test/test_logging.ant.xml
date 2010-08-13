@@ -97,13 +97,17 @@ Description:
     
      <!-- Check the build-property-cache-file exists or not -->
     <target name="test-build-property-cache-file-exists">
-        <antcall target="diamonds"/>
+        <antcall target="diamonds">
+            <param name="diamonds.enabled" value="false"/>
+        </antcall>
         <au:assertFileExists file="${build.property.cache.file}" />
     </target>
     
     <!-- Check the build-property-cache-file contents-->
     <target name="test-build-property-cache-file-content">
-        <antcall target="diamonds"/>
+        <antcall target="diamonds">
+            <param name="diamonds.enabled" value="false"/>
+        </antcall>
         <loadfile property="test.data" srcFile="${build.property.cache.file}"/>
         <au:assertMatches string="${test.data}" pattern="diamonds.build.url" />
     </target>

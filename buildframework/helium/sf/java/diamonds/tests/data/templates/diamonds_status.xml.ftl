@@ -21,6 +21,6 @@ Description:
 -->
 <#include "header.ftl"> 
   <build>
-    <#if diamonds?keys?seq_contains("build.status")><status>${diamonds["build.status"]}</status></#if>
+    <#if ant?keys?seq_contains("build.status")><status>${ant["build.status"]}</status></#if>
   </build>
 <#include "footer.ftl"> 

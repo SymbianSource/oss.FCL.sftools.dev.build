@@ -17,28 +17,29 @@
 
 package com.nokia.helium.signal.ant;
 
-import org.apache.tools.ant.BuildException;
-import org.apache.tools.ant.taskdefs.condition.Condition;
-import org.apache.tools.ant.Project;
-import org.apache.tools.ant.Target;
-import com.nokia.helium.signal.Notifier;
-import com.nokia.helium.signal.SignalStatus;
-import com.nokia.helium.signal.SignalStatusList;
-import com.nokia.helium.signal.ant.types.SignalListenerConfig;
-import com.nokia.helium.signal.ant.types.SignalInput;
-import com.nokia.helium.signal.ant.types.SignalNotifierInput;
-import com.nokia.helium.signal.ant.types.NotifierInput;
-import com.nokia.helium.signal.ant.types.SignalNotifierList;
-import com.nokia.helium.signal.ant.types.TargetCondition;
-
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
-import java.util.HashMap;
-import java.util.Date;
-import java.util.Enumeration;
+
 import org.apache.log4j.Logger;
+import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.Project;
+import org.apache.tools.ant.Target;
+import org.apache.tools.ant.taskdefs.condition.Condition;
+
+import com.nokia.helium.signal.Notifier;
+import com.nokia.helium.signal.SignalStatus;
+import com.nokia.helium.signal.SignalStatusList;
+import com.nokia.helium.signal.ant.types.NotifierInput;
+import com.nokia.helium.signal.ant.types.SignalInput;
+import com.nokia.helium.signal.ant.types.SignalListenerConfig;
+import com.nokia.helium.signal.ant.types.SignalNotifierInput;
+import com.nokia.helium.signal.ant.types.SignalNotifierList;
+import com.nokia.helium.signal.ant.types.TargetCondition;
 
 /**
  * Helper class to store the list of notifiers.
@@ -229,43 +230,6 @@ public class SignalList {
         return retCondition;
     }
 
-    /**
-     * Send signal notification by running configured notifiers.
-     * 
-     * @param targetName
-     */
-    public void sendSignal(String signalName, boolean failStatus)
-    {
-        log.debug("Sending signal for:" + signalName);
-        if (project.getReference(DEFAULT_NOTIFIER_LIST_REFID) != null) {
-            // sending using default settings
-            sendNotify(((SignalInput) project
-                    .getReference(DEFAULT_NOTIFIER_LIST_REFID))
-                    .getSignalNotifierList(), signalName, failStatus,null);
-        }
-    }
-
-    protected void sendNotify(Vector<Notifier> notifierList, String signalName) {
-        sendNotify(notifierList, signalName, false, null);
-    }
-
-    /**
-     * Send notification using the notification list.
-     * 
-     * @param notifierList
-     */
-    @SuppressWarnings("deprecation")
-    protected void sendNotify(Vector<Notifier> notifierList, String signalName,
-            boolean failStatus, List<String> fileList) {
-        if (notifierList == null) {
-            return;
-        }
-        for (Notifier notifier : notifierList) {
-            if (notifier != null) {
-                notifier.sendData(signalName, failStatus, fileList);
-            }
-        }
-    }
 
     /**
      * Handle the signal, either fail now, or defer the failure.

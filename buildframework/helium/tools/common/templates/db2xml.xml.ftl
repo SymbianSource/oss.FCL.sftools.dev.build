@@ -24,8 +24,8 @@ Description:
 <log filename="${log}">
 <build>
 
-<#list table_info['select * from metadata INNER JOIN logfiles ON logfiles.id=metadata.logpath_id INNER JOIN priority ON priority.id=metadata.priority_id where priority=\'ERROR\' and path like \'${r\'%\'}${log}\''] as recordentry >
-<message priority="error"><![CDATA[${recordentry['data']}]]></message>
+<#list table_info['select * from metadata INNER JOIN logfiles ON logfiles.id=metadata.logfile_id INNER JOIN severity ON severity.id=metadata.severity_id where severity=\'ERROR\' and path like \'${r\'%\'}${log}\''] as recordentry >
+<message severity="error"><![CDATA[${recordentry['data']}]]></message>
 </#list>
 
 </build>

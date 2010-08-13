@@ -1,6 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!-- 
 ============================================================================ 
-Name        : antlib.xml 
+Name        : test_project.ant.xml 
 Part of     : Helium AntLib
 
 Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
@@ -79,7 +80,7 @@ This project is part of the tests package...
         </sequential>
     </macrodef>
     
-    <!-- @property user.defined.property
+    <!--* @property user.defined.property
         
     This property must be defined by the user.
     

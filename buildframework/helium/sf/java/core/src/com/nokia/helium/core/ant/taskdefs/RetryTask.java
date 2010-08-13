@@ -24,7 +24,7 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.TaskContainer;
-import org.apache.tools.ant.taskdefs.*;
+import org.apache.tools.ant.taskdefs.Sleep;
 
 /**
  * Retries the nested task a set number of times

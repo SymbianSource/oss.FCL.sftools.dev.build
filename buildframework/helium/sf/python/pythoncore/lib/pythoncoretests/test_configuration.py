@@ -18,7 +18,7 @@
 #===============================================================================
 """ test configuration """
 
-# pylint: disable-msg=R0201
+# pylint: disable=R0201
 
 import logging
 import StringIO
@@ -63,11 +63,11 @@ class NestedConfigurationBuilderTest(unittest.TestCase):
         assert len(configs) == 1
         assert configs[0].type == 'test.type', "config.type must match 'test.type'."
         
-        configs = config_set.getConfigurations(type='test.type')
+        configs = config_set.getConfigurations(type_='test.type')
         assert len(configs) == 2
         assert configs[0].type == 'test.type', "config.type must match 'test.type'."
 
-        configs = config_set.getConfigurations(name='test_spec', type='test.type')
+        configs = config_set.getConfigurations(name='test_spec', type_='test.type')
         assert len(configs) == 2
         assert configs[0].type == 'test.type', "config.type must match 'test.type'."
         
@@ -261,27 +261,4 @@ class PropertiesConfigurationTest(unittest.TestCase):
         assert config['text.b'] == 'text.value.B'
         assert config['foo'] == 'bar'
         
-        
-if 'java' not in sys.platform:
-    class XMLConfigurationTest(unittest.TestCase):
-        """ Test XML format configuration files. """
-        
-        def test_single_node_xml(self):
-            """ Properties can be read from 1 level of XML sub-elements. """
-            config = configuration.XMLConfiguration(open(os.path.join(os.environ['TEST_DATA'], 'data/ant_config_test.xml'), 'r'))
-            
-            assert config['foo'] == 'bar'
-            assert config['interpolated'] == 'foo value = bar'
-            
-        def test_nested_node_xml(self):
-            """ Properties can be read from multiple levels of XML sub-elements. """
-            config = configuration.XMLConfiguration(open(os.path.join(os.environ['TEST_DATA'], 'data/ant_config_test.xml'), 'r'))
-            
-            assert config['xml.c'] == 'C'
-            
-        def test_xml_list(self):
-            """ Multiple XML elements can be read as a list. """
-            config = configuration.XMLConfiguration(open(os.path.join(os.environ['TEST_DATA'], 'data/ant_config_test.xml'), 'r'))
-            
-            assert config['array.value'] == 'one,two,three'
         

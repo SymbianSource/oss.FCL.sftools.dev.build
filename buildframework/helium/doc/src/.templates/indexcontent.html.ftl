@@ -24,14 +24,12 @@ Description:
   <p><strong>Parts of the documentation:</strong></p>
   <table class="contentstable" align="center"><tr>
     <td width="50%">
+<#if !ant?keys?seq_contains("sf")>
       <p class="biglink"><a class="biglink" href="{{ pathto("releasenotes/index") }}">Release notes</a><br/>
          <span class="linkdescr">what's new</span></p>
+</#if>
       <p class="biglink"><a class="biglink" href="{{ pathto("quick_start_guide") }}">Quick Start Guide</a><br/>
          <span class="linkdescr">start here</span></p>
-<#if !(ant?keys?seq_contains("sf"))>
-      <p class="biglink"><a class="biglink" href="http://lmp.nokia.com/lms/lang-en/taxonomy/TAX_Search.asp?UserMode=0&SearchStr=helium">E-learning</a><br/>
-         <span class="linkdescr">multimedia introduction</span></p>
-</#if>
       <p class="biglink"><a class="biglink" href="{{ pathto("feature_list") }}">Feature list</a><br/>
          <span class="linkdescr">what is supported</span></p>
       <p class="biglink"><a class="biglink" href="{{ pathto("manual/index") }}">Manual</a><br/>
@@ -50,6 +48,7 @@ Description:
     </td></tr>
   </table>
 
+<#if !ant?keys?seq_contains("sf")>
   <p><strong>Customer documentation:</strong></p>
   <table class="contentstable" align="center"><tr>
     <td width="50%">
@@ -60,5 +59,5 @@ Description:
          <span class="linkdescr">development teams</span></p>
     </td></tr>
   </table>
-
+</#if>
 {% endblock %}

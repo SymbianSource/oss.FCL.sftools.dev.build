@@ -103,6 +103,15 @@ Description:
     -->
     <property name="releasenotes.scan2log" value="${build.log.dir}/${build.id}.${product.family}_scan2.html"/>
     
+    
+    <!-- Is it required to check ccm leaks -->
+    <condition property="check.ccm.leaks">
+        <and>
+            <isset property="hlm.enable.asserts"/>
+            <istrue value="${ccm.enabled}"/>
+        </and>
+    </condition>
+    
     <import file="${relnotes.config.dir}/relnotes_properties.ant.xml" optional="true"/>
     
     <!-- @scope private -->
@@ -173,11 +182,8 @@ rn.rtfimage(ant.get_property(r'${releasenotes.logo}'), ant.get_property(r'${rele
     <!-- Find project and baseline of what is running helium
     @scope private    
     -->
-    <target name="release-notes-getcmprojectname">
-        <if>
-            <istrue value="${ccm.enabled}" />
-            <then>
-                <script language="jython" setbeans="false">
+    <target name="release-notes-getcmprojectname" if="internal.ccm.enabled">
+        <script language="jython" setbeans="false">
 import ccm.extra
 import traceback
 import os
@@ -207,8 +213,8 @@ except Exception, ex:
     traceback.print_exc()
     if session:
         session.close()
-                </script>
-                <hlm:python outputproperty="ccm.toplevel.baseline">
+        </script>
+        <hlm:python outputproperty="ccm.toplevel.baseline">
 import traceback
 import ant
 import logging
@@ -230,9 +236,7 @@ except Exception, ex:
     traceback.print_exc()
     if session:
         session.close()
-                </hlm:python>
-            </then>
-        </if>
+        </hlm:python>
     </target>
     
     <!--
@@ -267,12 +271,9 @@ bomfile.close()
     <!-- Write projects, baselines and task list for MC and IBUSAL
     @scope private    
     -->
-    <target name="release-notes-ccm" depends="get-ccm-password,release-notes-getcmprojectname,create-bom">
+    <target name="release-notes-ccm" depends="get-ccm-password,release-notes-getcmprojectname,create-bom" if="internal.ccm.enabled">
         <if>
-            <and>
-                <istrue value="${ccm.enabled}" />
-                <available file="${build.log.dir}/${build.id}_bom.xml" />
-            </and>
+            <available file="${build.log.dir}/${build.id}_bom.xml" />
             <then>
                 <hlm:python>
 import amara
@@ -314,17 +315,12 @@ bomfile.close()
     </target>
     
     <!-- @scope private -->
-    <target name="release-notes-test" if="hlm.enable.asserts">
-        <if>
-            <istrue value="${ccm.enabled}" />
-            <then>
-                <hlm:python>
+    <target name="release-notes-test" if="check.ccm.leaks">
+        <hlm:python>
 import ccm
 #check for ccm session leaks
 assert (len(ccm.running_sessions()) == 0)
-                </hlm:python>
-            </then>
-        </if>
+        </hlm:python>
     </target>
         
     <!-- 

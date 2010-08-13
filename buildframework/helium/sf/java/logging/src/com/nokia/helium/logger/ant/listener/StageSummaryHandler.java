@@ -36,7 +36,7 @@ import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Target;
 import org.apache.tools.ant.util.DateUtils;
 
-import com.nokia.helium.logger.ant.types.Stage;
+import com.nokia.helium.core.ant.types.Stage;
 import com.nokia.helium.logger.ant.types.StageSummary;
 
 import freemarker.cache.FileTemplateLoader;
@@ -83,8 +83,9 @@ public class StageSummaryHandler implements Handler {
      * {@inheritDoc}
      */
     public void handleBuildFinished(BuildEvent event) {
-        if (summarize && currentStage != null)
+        if (summarize && currentStage != null) {
             endCurrentStage();
+        }
         if (summarize && !completedStages.isEmpty()) {
             generateSummary(event.getProject());
             log.debug("Stage Summary generation completed");
@@ -116,8 +117,9 @@ public class StageSummaryHandler implements Handler {
         log.debug("Handling target - " + event.getTarget().getName());
         if (summarize && doRunTarget(event)) {
             StageWrapper stage = searchNewStage(event);
-            if (stage != null)
+            if (stage != null) {
                 startNewStage(stage);
+            }
         }
     }
 
@@ -125,8 +127,9 @@ public class StageSummaryHandler implements Handler {
      * {@inheritDoc}
      */
     public void handleTargetFinished(BuildEvent event) {
-        if (summarize && isCurrentStageToEnd(event))
+        if (summarize && isCurrentStageToEnd(event)) {
             endCurrentStage();
+        }
     }
 
     /**
@@ -143,9 +146,10 @@ public class StageSummaryHandler implements Handler {
             if (event.getException() != null) {
                 currentStage.setError(getReason(event.getException()));
                 end = true;
-            } else
+            } else {
                 end = currentStage.stage.isEndTarget(event.getTarget()
                         .getName());
+            }
         }
         return end;
     }
@@ -167,23 +171,13 @@ public class StageSummaryHandler implements Handler {
             if (object instanceof StageSummary) {
                 count++;
                 if (count > 1) {
-                    raiseException("Multiple entries of 'hlm:stagesummary' found in "
+                    throw new BuildException("Multiple entries of 'hlm:stagesummary' found in "
                             + "stages_config.ant.xml.");
                 }
                 stageSummary = (StageSummary) object;
             }
         }
         return stageSummary;
-    }
-
-    /**
-     * Raise a {@link BuildException} with the specified error message.
-     * 
-     * @param message
-     *            is the error message to display.
-     */
-    private void raiseException(String message) {
-        throw new BuildException(message);
     }
 
     /**
@@ -195,8 +189,9 @@ public class StageSummaryHandler implements Handler {
     private void startNewStage(StageWrapper newStage) {
         endCurrentStage();
         Long currTime = getCurrentTime();
-        if (!completedStages.containsKey(newStage.stageName))
+        if (!completedStages.containsKey(newStage.stageName)) {
             newStage.setStageStartTime(getTimestamp(currTime));
+        }
         newStage.setStartTime(currTime);
         this.currentStage = newStage;
         log.debug("New stage [" + newStage.stageName + "] started at "

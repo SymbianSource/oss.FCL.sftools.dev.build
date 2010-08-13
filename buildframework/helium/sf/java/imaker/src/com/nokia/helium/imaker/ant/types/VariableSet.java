@@ -16,11 +16,11 @@
 */
  
 package com.nokia.helium.imaker.ant.types;
-import org.apache.tools.ant.types.DataType;
-
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Vector;
+
+import org.apache.tools.ant.types.DataType;
 
 /**
  * This type is a container for variable configuration.

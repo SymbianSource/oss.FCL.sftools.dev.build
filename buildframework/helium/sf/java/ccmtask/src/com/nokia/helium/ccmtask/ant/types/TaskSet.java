@@ -17,8 +17,9 @@
  
 package com.nokia.helium.ccmtask.ant.types;
 
-import org.apache.tools.ant.types.DataType;
 import java.util.Vector;
+
+import org.apache.tools.ant.types.DataType;
 
 /**
  * This class abstract a synergy session.

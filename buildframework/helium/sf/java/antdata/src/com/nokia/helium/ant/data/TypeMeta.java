@@ -17,8 +17,6 @@
 
 package com.nokia.helium.ant.data;
 
-import java.io.IOException;
-
 import org.dom4j.Element;
 
 /**
@@ -26,7 +24,7 @@ import org.dom4j.Element;
  */
 public class TypeMeta extends AntObjectMeta {
 
-    public TypeMeta(AntObjectMeta parent, Element node) throws IOException {
+    public TypeMeta(AntObjectMeta parent, Element node) {
         super(parent, node);
     }
 

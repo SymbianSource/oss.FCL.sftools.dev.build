@@ -18,6 +18,7 @@ package com.nokia.helium.imaker;
 
 import org.codehaus.plexus.util.cli.StreamConsumer;
 
+
 /**
  * Parsing iMaker printvar calls.
  * Output from iMaker should match:
