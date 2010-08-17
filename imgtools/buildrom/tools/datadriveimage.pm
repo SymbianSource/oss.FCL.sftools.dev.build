@@ -363,7 +363,7 @@ sub copyNonSisFiles
 # invoke the INTERPRETSIS tool with appropriate parameters.
 sub invokeInterpretsis
 {
-	my($sisFileArray,$dataDrivePath,$verboseOpt,$zDrivePath,$parafile,$keepgoingOpt,$interpretsisOptList) = @_;
+	my($sisFileArray,$dataDrivePath,$verboseOpt,$zDrivePath,$parafile,$keepgoingOpt,$interpretsisOptList,$outputdir) = @_;
 	my $sisfile = ""; 
 	# default system drive letter is specified since interpretsis doesnt allow overloading of options unless default 
 	# options are specified.
@@ -379,17 +379,33 @@ sub invokeInterpretsis
 		$dataDrivePath = '"'.$dataDrivePath.'"';
 	}
 
+	my $currentdir=cwd;
+	$currentdir=~s-\\-\/-go;
+	$currentdir.= "\/" unless $currentdir =~ /\/$/;
+	$currentdir =~ s-\/-\\-g if (&is_windows);
+	my $drive = "";
+	$drive = $1 if ($currentdir =~ /^(.:)/);
+
 	# find out size of the array
 	my $sisarraysize = scalar(@$sisFileArray);
 	for( my $i=0; $i<$sisarraysize; $i++ )
 	{
+		my $tempsisfile = pop(@$sisFileArray);
+		if ($tempsisfile =~ /^[\\\/]/)
+		{
+			$tempsisfile = $drive.$tempsisfile;
+		}elsif ($tempsisfile !~ /^.:/)
+		{
+			$tempsisfile = $currentdir.$tempsisfile;
+		}
+		
 		if($sisfile ne "")
 		{
-			$sisfile = pop(@$sisFileArray).",".$sisfile;
+			$sisfile = $tempsisfile.",".$sisfile;
 		}
 		else
 		{
-			$sisfile = pop(@$sisFileArray);
+			$sisfile = $tempsisfile;
 		}
 	}
 
@@ -421,10 +437,11 @@ sub invokeInterpretsis
 	else
 	{
 		# Truncate and open the parameter file for writing..
-		open( OPTDATA, "> parameterfile.txt" )  or die "can't open parameterfile.txt";
+		$parafile = $outputdir."parameterfile.txt";
+		open( OPTDATA, "> $parafile" )  or die "can't open $parafile";
 		print OPTDATA $basicOption."\n";
 		close( OPTDATA );
-		$command .= "-p parameterfile.txt ";
+		$command .= "-p $parafile ";
 	}
 
 	if( $interpretsisOptList )
@@ -437,6 +454,9 @@ sub invokeInterpretsis
 		}
 	}
 	
+	print "* Changing to $outputdir\n" if ( $verboseOpt );
+	chdir "$outputdir";
+	
 	print "* Executing $command\n" if ( $verboseOpt );
 	system ( $command );
 
@@ -444,6 +464,9 @@ sub invokeInterpretsis
 	{
 		&datadriveimage::reportError("* ERROR: INTERPRETSIS failed",$keepgoingOpt);
 	}
+	
+	print "* Changing back to $currentdir\n" if ( $verboseOpt );
+	chdir "$currentdir";
 }
 
 # invoke the READIMAGE tool with appropriate parameters.

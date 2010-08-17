@@ -576,9 +576,10 @@ int main(int argc, char * argv[])
 			MOFF; cout << uidcrcTool << " " << uidcrcUIDs[0] << " " << uidcrcUIDs[1] << " " << uidcrcUIDs[2] << " " << DataOutputFileName.GetAssertedNonEmptyBuffer(); cout << endl; MON;
 			}
 
-		char uidcrc_params[512];
+		int namelen = strlen(uidcrcTool) + strlen(uidcrcUIDs[0]) * 3 + DataOutputFileName.Length() + 10; 
+		char *uidcrc_params = new char[namelen];
 		const int ret = snprintf(uidcrc_params,
-					 sizeof(uidcrc_params),
+					 namelen,
 					 "%s %s %s %s %s",
 					 uidcrcTool,
 					 uidcrcUIDs[0],
@@ -596,6 +597,8 @@ int main(int argc, char * argv[])
 			cerr << "Failed to write UIDs to " << DataOutputFileName << endl;
 			exit(error);
 			}
+		delete[] uidcrc_params;
+
 		RCBinaryStream RSCStream;
 		RSCStream.OpenForAppend(DataOutputFileName);
 		if(! RSCStream.IsOpen())

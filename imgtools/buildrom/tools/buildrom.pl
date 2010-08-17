@@ -88,7 +88,7 @@ sub processobyfiles {
 
 	# Run single Invocation external tool at InvocationPoint1
 
-	&externaltools::runExternalTool("InvocationPoint1", &getOBYDataRef);
+	&externaltools::runExternalTool("InvocationPoint1", &getOBYDataRef, &getWorkdir);
 	
 	# Creates intermediate tmp4.oby file. Avoids processing of REM ECOM_PLUGIN(xxx,yyy)
 	&plugin_phase;
@@ -100,7 +100,7 @@ sub processobyfiles {
 	&spi_creation_phase;
 
 	# Run single Invocation external tool at InvocationPoint2
-	&externaltools::runExternalTool("InvocationPoint2",&getOBYDataRef);
+	&externaltools::runExternalTool("InvocationPoint2",&getOBYDataRef, &getWorkdir);
 	
 	# Creates intermediate tmp7.oby file. Problem Suppression phase
 	&suppress_phase;
@@ -115,13 +115,13 @@ sub processobyfiles {
 	&cleaning_phase;
 	
 	# Run single Invocation external tool at InvocationPoint2.5
-	&externaltools::runExternalTool("InvocationPoint2.5",&getOBYDataRef);
+	&externaltools::runExternalTool("InvocationPoint2.5",&getOBYDataRef, &getWorkdir);
 
 	#Creates dump OBY file for final oby file
 	&create_dumpfile;
 
 	# Run single Invocation external tool at InvocationPoint3
-	&externaltools::runExternalTool("InvocationPoint3",&getOBYDataRef);
+	&externaltools::runExternalTool("InvocationPoint3",&getOBYDataRef, &getWorkdir);
 
 	#ROM directory listing
 	&create_dirlisting;

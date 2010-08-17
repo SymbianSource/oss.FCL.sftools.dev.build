@@ -40,11 +40,13 @@
 #include "fatimagegenerator.h" 
 #include "r_driveimage.h"
 
+#include "uniconv.hpp"
 extern TInt gCodePagingOverride;
 extern TInt gDataPagingOverride;
 extern ECompression gCompress;
 extern TBool gEnableStdPathWarning; // Default to not warn if destination path provided for a file is not in standard path.
 extern TBool gKeepGoing;
+extern TBool gIsOBYUTF8;
 
 
 #define _P(word)	word, sizeof(word)-1	// match prefix, optionally followed by [HWVD]
@@ -80,6 +82,7 @@ const ObeyFileKeyword ObeyFileReader::iKeywords[] =
 	{_K("dataimagesize"),1, 1,EKeywordDataImageSize, "Maximum size of Data Drive image"},
 	{_K("volume"),1, -1,EKeywordDataImageVolume, "Volume Label of Data Drive image"},
 	{_K("sectorsize"),1, 1,EKeywordDataImageSectorSize, "Sector size(in bytes) of Data Drive image"},
+	{_K("clustersize"),1, 1,EKeywordDataImageClusterSize, "Cluster size(in bytes) of Data Drive image"},
 	{_K("fattable"),1, 1,EKeywordDataImageNoOfFats, "Number of FATs in the Data Drive image"},
 	// things we don't normally report in the help information
 	{_K("trace"),		1, 1, EKeywordTrace, "(ROMBUILD activity trace flags)"},
@@ -782,13 +785,15 @@ TBool CObeyFile::ProcessDriveKeyword(enum EKeyword aKeyword) {
 	case EKeywordDataImageSize:
 		{
 			const char* bigString = iReader.Word(1);
-			if(*bigString == '\0')
+			TInt64 imagesize = 0;
+			Val(imagesize,bigString); 
+			if(imagesize <= 0)
 			{
 				Print(EWarning,"Not a valid Image Size. Default size is considered\n");		
-				break;
-			}
- 
-			Val(iConfigurableFatAttributes.iImageSize,bigString); 
+			}else
+			{
+				iConfigurableFatAttributes.iImageSize = imagesize;
+			} 
 		}
 		break;
 	case EKeywordDataImageVolume:
@@ -829,23 +834,38 @@ TBool CObeyFile::ProcessDriveKeyword(enum EKeyword aKeyword) {
 	case EKeywordDataImageSectorSize:
 		{
 			const char* bigString = iReader.Word(1);
-			TInt sectorSize = atoi(bigString);
+			TInt sectorSize = 0;
+			Val(sectorSize,bigString); 
 			if(sectorSize <= 0)	{
 				Print(EWarning,"Invalid Sector Size value. Default value is considered.\n");
 			}
 			else {
-				iConfigurableFatAttributes.iDriveSectorSize = atoi(bigString);
+				iConfigurableFatAttributes.iDriveSectorSize = sectorSize;
+			}
+		}			
+		break;
+	case EKeywordDataImageClusterSize:
+		{
+			const char* bigString = iReader.Word(1);
+			TInt clusterSize = 0;
+			Val(clusterSize,bigString); 
+			if(clusterSize <= 0)	{
+				Print(EWarning,"Invalid Cluster Size value. Default value is considered.\n");
+			}
+			else {
+				iConfigurableFatAttributes.iDriveClusterSize = clusterSize;
 			}
 		}			
 		break;
 	case EKeywordDataImageNoOfFats:
 		{
 			const char* bigString = iReader.Word(1);
-			TInt noOfFats = atoi(bigString);
+			TInt noOfFats = 0;
+			Val(noOfFats,bigString); 
 			if (noOfFats <=0)
 				Print(EWarning,"Invalid No of FATs specified. Default value is considered.\n");
 			else
-				iConfigurableFatAttributes.iDriveNoOfFATs = atoi(bigString);			
+				iConfigurableFatAttributes.iDriveNoOfFATs = noOfFats;			
 		}			
 		break;			
 	default:
@@ -947,6 +967,20 @@ TBool CObeyFile::ProcessDriveFile(enum EKeyword aKeyword) {
 	if (aKeyword!=EKeywordHide && aKeyword!=EKeywordDir) {
 		// check the PC file exists
 		char* nname = NormaliseFileName(iReader.Word(1));		  
+		if(gIsOBYUTF8 && !UniConv::IsPureASCIITextStream(nname))
+		{
+			char* tempnname = strdup(nname);
+			unsigned int namelen = 0;
+			if(UniConv::UTF82DefaultCodePage(tempnname, strlen(tempnname), &nname, &namelen) < 0)
+			{
+				Print(EError, "Invalid filename encoding: %s\n", tempnname);
+				free(tempnname);
+				delete[] nname;
+				iMissingFiles++;
+				return EFalse;
+			}
+			free(tempnname);
+		}
 		ifstream test(nname);
 		if(!test.is_open()){
 			Print(EError,"Cannot open file %s for input.\n",iReader.Word(1));
@@ -1301,6 +1335,19 @@ TBool CObeyFile::ProcessFile(TInt /*aAlign*/, enum EKeyword aKeyword){
 
 		// check the PC file exists
 		char* nname = NormaliseFileName(iReader.Word(1)); 
+		if(gIsOBYUTF8 && !UniConv::IsPureASCIITextStream(nname))
+		{
+			char* tempnname = strdup(nname);
+			unsigned int namelen = 0;
+			if(UniConv::UTF82DefaultCodePage(tempnname, strlen(tempnname), &nname, &namelen) < 0)
+			{
+				Print(EError, "Invalid filename encoding: %s\n", tempnname);
+				free(tempnname);
+				delete[] nname;
+				return EFalse;
+			}
+			free(tempnname);
+		}
 		ifstream test(nname);
 		if (!test) {
 			Print(EError,"Cannot open file %s for input.\n",iReader.Word(1));
@@ -1638,6 +1685,7 @@ TBool CObeyFile::ProcessKeyword(enum EKeyword aKeyword) {
 		break;
 	default:
 		// unexpected keyword iReader.Word(0)
+		Print(EWarning, "Unexpected keyword '%s' on line %d.\n",iReader.Word(0),iReader.CurrentLine());
 		break;
 	}
 

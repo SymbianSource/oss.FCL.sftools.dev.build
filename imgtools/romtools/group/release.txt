@@ -1,3 +1,24 @@
+Version 2.18.1 (ROMBUILD)
+Version 2.13.1 (ROFSBUILD)
+===============
+Released by Lorence Wang, 10/08/2010
+	1) Add -logfile=<file> option to specify log file
+
+Version 2.18.0 (ROMBUILD)
+===============
+Released by Jason Cui, 28/07/2010
+	1) UTF-8 OBY Support
+
+Version 2.13.0 (ROFSBUILD)
+===============
+Released by Jason Cui, 28/07/2010
+	1) UTF-8 OBY Support
+
+Version 2.12.4 (ROFSBUILD)
+===============
+Released by Lorence Wang, 23/07/2010
+	1) Cluster size support 
+
 Version 2.12.3 (ROFSBUILD)
 ===============
 Released by Marvin Shi, 09/07/2010

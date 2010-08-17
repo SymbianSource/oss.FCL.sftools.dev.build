@@ -1,3 +1,8 @@
+version 8.4.002
+===============
+Released by Marvin Shi, 10/08/2010
+	1) BUG2173 [RCOMP] - Linux : rcomp -o fails due to too long path 
+	
 version 8.4.001
 ===============
 Released by Lorence Wang, 26/04/2010

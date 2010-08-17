@@ -456,7 +456,7 @@ if ($FeatureVariantArg)
 					@reusedHash = featurevariantmap->CheckOldVmapFile($vmap, \%FeatureVariantInfo);
 				}
 			}
-			if(defined(@reusedHash))
+			if(@reusedHash)
 			{
 				$FeatureVariantInfo{$bld."_LABEL"} = $reusedHash[0];
 				$FeatureVariantInfo{$bld."_FEATURES"} = $reusedHash[1];
@@ -557,7 +557,7 @@ if ($TrgType{Basic} =~ /^(EXEDLL|EXE|DLL|LIB)$/ && %FeatureVariantInfo && $Featu
 	$variant_info = &Path_Chop($E32env::Data{BldPath}).$Path{BldInfPath}."\\FeatureVariantInfo\\".$Plat{Real}."\\".$Plat{Real}.".".$FeatureVariantInfo{NAME}.".info" if ! -e $MMPFILE;
 # modified by SV end: makefile improvement 
 	my $variant_key = "VARIANT_PLAT_NAME_".&Path_Split('Base', $MMPFILE);
-	$variant_info_new = $variant_info.".tmp";
+	my $variant_info_new = $variant_info.".tmp";
 	open VARIANTINFOR_NEW, ">$variant_info_new" or die "ERROR: Can't open or create file \"$variant_info_new\"\n";
 
 	# Open the variant infor file

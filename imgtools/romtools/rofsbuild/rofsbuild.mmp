@@ -46,12 +46,13 @@ OS_LAYER_SYSTEMINCLUDE_SYMBIAN
 USERINCLUDE   ../../imglib/inc ../../imglib/compress
 USERINCLUDE   ../../imglib/patchdataprocessor/include ../../imglib/parameterfileprocessor/include
 USERINCLUDE	  ../../imglib/memmap/include
+USERINCLUDE   ../../imglib/uniconv/include
 USERINCLUDE   ../rofsbuild/inc
 USERINCLUDE   ../../imglib/boostlibrary/
 USERINCLUDE   ../../imglib/boostlibrary/boost
 
 STATICLIBRARY 	patchdataprocessor parameterfileprocessor memmap
-STATICLIBRARY   boost_thread-1.39 boost_filesystem-1.39 boost_regex-1.39 boost_system-1.39
+STATICLIBRARY   boost_thread-1.39 boost_filesystem-1.39 boost_regex-1.39 boost_system-1.39 uniconv
 #ifdef TOOLS2_LINUX
 OPTION    GCC -pthread -O2 -Wno-uninitialized
 #else

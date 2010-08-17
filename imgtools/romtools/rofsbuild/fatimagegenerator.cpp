@@ -35,12 +35,35 @@ iType(aType),
 iFatTable(0),
 iFatTableBytes(0), 
 iTotalClusters(0),	
-iBytsPerClus(0)
+iBytsPerClus(aAttr.iDriveClusterSize)
 {
 	memset(&iBootSector,0,sizeof(iBootSector));
 	memset(&iFat32Ext,0,sizeof(iFat32Ext));
 	memset(&iFatHeader,0,sizeof(iFatHeader));
+	
+	if(iBytsPerClus != 0){
+		if(iBytsPerClus > KMaxClusterBytes){
+			Print(EError,"Cluster size is too large!\n");
+			iType = EFatUnknown;
+			return ;
+		}else if(iBytsPerClus < aAttr.iDriveSectorSize){
+			Print(EError,"Cluster size cannot be smaller than sector size (%d)!\n", aAttr.iDriveSectorSize);
+			iType = EFatUnknown;
+			return ;
+		}else{
+			TUint32 tempSectorSize = aAttr.iDriveSectorSize;
+			while (tempSectorSize < iBytsPerClus){
+				tempSectorSize <<=1;
+			}
+			if (tempSectorSize > iBytsPerClus){
+				Print(EError,"Cluster size should be (power of 2)*(sector size) i.e. 512, 1024, 2048, 4096, etc!\n");
+				iType = EFatUnknown;
+				return;
+			}
+		}
+	}
 	if(aAttr.iDriveSectorSize != 512 && aAttr.iDriveSectorSize != 1024 && aAttr.iDriveSectorSize != 2048 && aAttr.iDriveSectorSize != 4096) {
+		Print(EError,"Sector size must be one of (512, 1024, 2048, 4096)!\n");
 		iType = EFatUnknown ;
 		return ;
 	}
@@ -66,19 +89,13 @@ iBytsPerClus(0)
 
 	TUint32 totalSectors = (TUint32)((aAttr.iImageSize + aAttr.iDriveSectorSize - 1) / aAttr.iDriveSectorSize);
 	if(aType == EFat32) {
-		InitAsFat32(totalSectors,aAttr.iSectorPerCluster ,aAttr.iDriveSectorSize);
+		InitAsFat32(totalSectors,aAttr.iDriveSectorSize);
 	}
 	else if(aType == EFat16) {
-		InitAsFat16(totalSectors,aAttr.iSectorPerCluster,aAttr.iDriveSectorSize); 
+		InitAsFat16(totalSectors,aAttr.iDriveSectorSize); 
 	}
 	if(iType == EFatUnknown) return ;
 	iBytsPerClus = iBootSector.BPB_SecPerClus * aAttr.iDriveSectorSize;
-//	if(iBytsPerClus > KMaxClusterBytes){
-//		Print(EError,"Cluster too large!\n");
-//		iType = EFatUnknown;
-//		return ;
-//	}
-	
 
 }
 TFatImgGenerator::~TFatImgGenerator() {
@@ -92,9 +109,10 @@ TFatImgGenerator::~TFatImgGenerator() {
 	}
 }
 
-void TFatImgGenerator::InitAsFat16(TUint32 aTotalSectors,TUint8 aSecPerClus,TUint16 aBytsPerSec){
+void TFatImgGenerator::InitAsFat16(TUint32 aTotalSectors,TUint16 aBytsPerSec){
 	
 	TUint32 numOfClusters ;
+	TUint8 aSecPerClus = iBytsPerClus / aBytsPerSec;
 	if(aSecPerClus == 0) {
 		//Auto-calc the SecPerClus
 		// FAT32 ,Count of clusters must >= 4085 and < 65525 , however , to avoid the "off by xx" warning, 
@@ -122,19 +140,14 @@ void TFatImgGenerator::InitAsFat16(TUint32 aTotalSectors,TUint8 aSecPerClus,TUin
 		}	
 	}
 	else {
-		if( (aSecPerClus * aBytsPerSec) > KMaxClusterBytes){
-			Print(EError,"Cluster too large!\n");
-			iType = EFatUnknown;
-			return ;
-		}
 		numOfClusters = (aTotalSectors + aSecPerClus - 1) / aSecPerClus;
 		if(numOfClusters >= (65525 - 16)){
-      Print(EError,"Cluster count is too big for FAT16, please use the FAT32 format or set a new bigger sector count of cluster!\n");
+      Print(EError,"Cluster count is too big for FAT16, please use the FAT32 format or set a new bigger cluster size!\n");
 			iType = EFatUnknown ;
 			return ;
 		}
 		else if(numOfClusters < (4085 + 16)){
-      Print(EError,"Cluster count is too small for FAT16, please set a new small sector count of cluster or set the size bigger!\n");
+      Print(EError,"Cluster count is too small for FAT16, please set a new smaller cluster size or set the image size bigger!\n");
 			iType = EFatUnknown ;
 			return ;
 		}
@@ -161,9 +174,10 @@ void TFatImgGenerator::InitAsFat16(TUint32 aTotalSectors,TUint8 aSecPerClus,TUin
 	*((TUint16*)iBootSector.BPB_FATSz16) =  sectorsForFAT ; 
 	memcpy(iFatHeader.BS_FilSysType,"FAT16   ",sizeof(iFatHeader.BS_FilSysType));
 }
-void TFatImgGenerator::InitAsFat32(TUint32 aTotalSectors,TUint8 aSecPerClus,TUint16 aBytsPerSec) { 
+void TFatImgGenerator::InitAsFat32(TUint32 aTotalSectors,TUint16 aBytsPerSec) { 
 	
 	TUint32 numOfClusters;
+	TUint8 aSecPerClus = iBytsPerClus / aBytsPerSec;
 	if(aSecPerClus == 0) {
 		//Auto-calc the SecPerClus
 		// FAT32 ,Count of clusters must >= 65525, however , to avoid the "off by xx" warning, 
@@ -185,14 +199,9 @@ void TFatImgGenerator::InitAsFat32(TUint32 aTotalSectors,TUint8 aSecPerClus,TUin
 		}	
 	}
 	else {
-		if( (aSecPerClus * aBytsPerSec) > KMaxClusterBytes){
-			Print(EError,"Cluster too large!\n");
-			iType = EFatUnknown;
-			return ;
-		}
 		numOfClusters = (aTotalSectors + aSecPerClus - 1) / aSecPerClus;
 		if(numOfClusters < (65525 + 16)) {
-            Print(EError,"Cluster count is too small for FAT32, please set a new small sector count of cluster or set the size bigger or use the FAT16 format!\n");
+            Print(EError,"Cluster count is too small for FAT32, please set a new smaller cluster size or set the image size bigger or use the FAT16 format!\n");
 			iType = EFatUnknown ;
 			return ;
 		}

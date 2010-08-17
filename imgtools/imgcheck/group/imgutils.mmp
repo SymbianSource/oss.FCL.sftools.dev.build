@@ -51,6 +51,7 @@ SOURCE		rofsimage.cpp utils.cpp dirreader.cpp
 USERINCLUDE	..\libimgutils\inc
 USERINCLUDE   ..\..\imglib\boostlibrary
 USERINCLUDE   ..\..\imglib\boostlibrary\boost
+USERINCLUDE   ..\..\imglib\uniconv\include
 
 OS_LAYER_SYSTEMINCLUDE_SYMBIAN
 

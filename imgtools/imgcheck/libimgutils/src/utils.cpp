@@ -36,6 +36,7 @@ TInt gCodePagingOverride = -1;
 TInt gDataPagingOverride = -1;
 TInt gLogLevel = 0;
 bool gCache = false;
+TBool gIsOBYUTF8 = EFalse;
 
 /** 
 Function receives an UID type of an executable and identifies whether it is a

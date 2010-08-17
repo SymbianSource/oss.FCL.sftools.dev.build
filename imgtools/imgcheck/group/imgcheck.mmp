@@ -26,6 +26,7 @@ SOURCE 		cmdlinewriter.cpp xmlwriter.cpp dbgflagchecker.cpp
 USERINCLUDE ../libimgutils/inc ../inc ../../imglib/compress
 USERINCLUDE   ../../imglib/boostlibrary
 USERINCLUDE   ../../imglib/boostlibrary/boost
+USERINCLUDE   ../../imglib/uniconv/include
 
 OS_LAYER_SYSTEMINCLUDE_SYMBIAN
 #ifdef TOOL2_LINUX
@@ -35,7 +36,7 @@ SYSTEMINCLUDE ../libxml ../
 #endif
 SYSTEMINCLUDE ../../imglib/inc ../../romtools/rofsbuild
 
-STATICLIBRARY imgutils patchdataprocessor boost_thread-1.39 boost_filesystem-1.39  boost_system-1.39 stlport.5.1
+STATICLIBRARY imgutils patchdataprocessor boost_thread-1.39 boost_filesystem-1.39  boost_system-1.39 stlport.5.1 uniconv
 
 #ifdef TOOLS2_LINUX
 OPTION    GCC -pthread -O2 -Wno-uninitialized -lxml2 -lz -lm 
