@@ -2,9 +2,9 @@
 # Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
-# under the terms of the License "Symbian Foundation License v1.0"
+# under the terms of the License "Eclipse Public License v1.0"
 # which accompanies this distribution, and is available
-# at the URL "http://www.symbianfoundation.org/legal/sfl-v10.html".
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
 #
 # Initial Contributors:
 # Nokia Corporation - initial contribution.
@@ -13,7 +13,7 @@
 #
 # Description:
 # Adds a LOCALISE macro that enables configuration of localised files.
-# The localised language selection is done with a ADD_LANGUAGE macro.
+# The localised language selection is done with a LANGUAGE_CODE macro.
 #
 
 
@@ -26,14 +26,14 @@
 #   target => the target file. The section that needs to be localised should be marked with ??.
 #   languages => a space delimited list of language codes
 #
-# Syntax: ADD_LANGUAGE
-#   ADD_LANGUAGE lang
+# Syntax: LANGUAGE_CODE
+#   LANGUAGE_CODE lang
 #
 # Example:
 # Add languages
-# ADD_LANGUAGE 01
-# ADD_LANGUAGE 02
-# ADD_LANGUAGE 03
+# LANGUAGE_CODE 01
+# LANGUAGE_CODE 02
+# LANGUAGE_CODE 03
 #
 # Use Case 1:
 # Localises a App resoure file.
@@ -45,9 +45,9 @@
 #
 # Use Case 2:
 # Localise all resource files under a section
-# ADD_LANGUAGE 01
-# ADD_LANGUAGE 02
-# ADD_LANGUAGE 03
+# LANGUAGE_CODE 01
+# LANGUAGE_CODE 02
+# LANGUAGE_CODE 03
 #
 # LOCALISE_ALL_RESOURCES_BEGIN
 # // All resource files will be localised
@@ -107,6 +107,7 @@ my %languages;
 my $verbose=0;
 my $errors=0;
 my $localise_all_resource=0;
+my %qt_langs = ();
 
 sub localise_info
   {
@@ -120,17 +121,10 @@ sub do_localise_extension
   my $obydata = shift;
   do_localise_all_resources_extension(\@{$obydata});
 
-
   undef @newobydata;
   foreach $line (@{$obydata})
   {
-    # Ignore REM statements, to avoid processing "REM __SCALABLE_IMAGE( ... )"
-    if ($line =~ /^\s*REM/i)
-    {
-      push @newobydata, $line;
-      next;
-    }
-    # ADD_LANGUAGE xx
+    # LANGUAGE_CODE xx
     if (is_addlanguage_entry($line))
     {
       my $code = get_lang_from_addlanguage_entry($line);
@@ -144,9 +138,27 @@ sub do_localise_extension
       {
         print "adding language $code\n" if $verbose;
         $languages{$code} = 1;
-        push @newobydata, "REM handled $line";
+        push @newobydata, $line;
         next;
       }
+    }
+    # Ignore REM statements, to avoid processing "REM __SCALABLE_IMAGE( ... )"
+    if ($line =~ /^\s*REM/i)
+    {
+      push @newobydata, $line;
+      next;
+    }
+    # Read QT to Symbian language id mappings
+    if ($line =~ /^\s*QT_TO_SYMBIAN_LANGID\s+(.+?)\s*$/i)
+    {
+      push(@newobydata, "REM handled $line");
+      open(FILE, $1) or
+          die("ERROR: localise.pm can't open QT to Symbian language id mapping file `$1'\n");
+      map {
+          $qt_langs{$2} = $1 if (!/^\s*#/ && /^\s*(\S+?)\s*=\s*(\d+)\s*$/);
+      } <FILE>;
+      close(FILE);
+      next;
     }
     # LOCALISE macro
     if (is_localise_entry($line))
@@ -245,14 +257,23 @@ sub convert_lang($$)
   for (my $i=0; $i<$count; $i++) {
     push(@data, $lang);
   }
-  my $output = sprintf($res,@data);
+
+  my $output;
+  if (($res =~ m/\.qm["']?$/i) && %qt_langs)
+        {
+                $output = sprintf($res, $qt_langs{sprintf("%s", @data)});
+        }
+  else
+  {
+        $output = sprintf($res,@data);
+        }
   return $output;
 }
-# match ADD_LANGUAGE 01
+# match LANGUAGE_CODE 01
 sub is_addlanguage_entry($)
 {
   my $entry = shift;
-  if ( $entry =~ m/^\s*ADD_LANGUAGE\s+(\S+)\s*/i )
+  if ( $entry =~ m/^\s*REM\s+handled\s+LANGUAGE_CODE\s+(\S+)\s*$/i )
   {
     return 1;
   }
@@ -262,7 +283,7 @@ sub is_addlanguage_entry($)
 sub get_lang_from_addlanguage_entry($)
 {
   my $entry = shift;
-  if ( $entry =~ m/^\s*ADD_LANGUAGE\s+(\S+)/i )
+  if ( $entry =~ m/^\s*REM\s+handled\s+LANGUAGE_CODE\s+(\S+)\s*$/i )
   {
     return $1;
   }

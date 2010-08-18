@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -60,7 +60,7 @@ SOURCEARGS:=$(subst //,/,$(subst DEPTH=,-,$(subst $(CHAR_SPACE)FILE=,,$(SOURCE))
 
 BMCONVCMDFILE:=$(OUTPUTPATH)/$(BMTARGET)_bmconvcommands
 RELEASEABLES:=$(BITMAPHEADER) $(BITMAPFILE)
-CLEANTARGETS:=$(BITMAPHEADER) $(BITMAPFILE) $(BMCONVCMDFILE)
+CLEANTARGETS:=$(BMCONVCMDFILE)
 
 # The groupbmpin10 macro allows us to construct a command file, 10 
 # bitmap objects at a time to avoid limits on argument lengths and 
@@ -107,7 +107,6 @@ $(MBMCOPYFILES): $(BITMAPFILE)
 	$(GNUCP) $$< $$@ \
 	$(call endrule,bitmapcopy)
 
-CLEANTARGETS:=$(CLEANTARGETS) $(MBMCOPYFILES)
 endef
 
 
@@ -119,64 +118,13 @@ ifneq ($(MBMCOPYFILES),)
 $(eval $(call copybitmap))
 endif
 
-################################### localisation #########################################
-## copy .bmp files to localisation
-
-# $(BMPFILES) is a list of bmp files in src
-BMPFILES:=$(subst FILE=,,$(filter FILE=%,$(SOURCE)))
-BMBASENAME:=$(call lowercase,$(basename $(BMTARGET)))
-BMPCOPYFILES:=
-BMPCOPYDIR:=$(EPOCROOT)/epoc32/localisation/$(BMBASENAME)/mbm
-$(call makepath,$(BMPCOPYDIR))
-
-define copyBMP
-# $(1) is the source .bmp file
-# $(2) is the (lower cased) copy in localisation 
-
-ifneq ($(BINCOPYDIRS),)
-BITMAP:: $(2)
-
-$(2): $(1)
-	$(call startrule,bmpfilecopy,FORCESUCCESS) \
-	$(GNUCP) $(1) $(2) && $(GNUCHMOD) +rw $(2) \
-	$(call endrule,bmpfilecopy)
-
-CLEANTARGETS:=$$(CLEANTARGETS) $(2)
-endif
-
-BMPCOPYFILES:=$$(BMPCOPYFILES) $(2)
-endef
-
-$(foreach BMP,$(BMPFILES),$(eval $(call copyBMP,$(BMP),$(BMPCOPYDIR)/$(call lowercase,$(notdir $(BMP))))))
-
-## create and edit info files for bitmap files in localisation/group
-INFOFILE:=$(EPOCROOT)/epoc32/localisation/group/$(BMBASENAME).info
-DEPTH:=$(subst DEPTH=,,$(filter DEPTH=%,$(SOURCE)))
-BMP:=$(notdir $(BMPFILES))
-DEPTHBMP:=$(subst _,\,$(join $(patsubst %,/%,$(DEPTH)),$(patsubst %,_%,$(BMP))))
-
-define bmpInfo
-
-BITMAP::$(INFOFILE)
-
-$(INFOFILE)::
-	@if [ ! -d $(EPOCROOT)/epoc32/localisation/group ]; then $(GNUMKDIR) -p $(EPOCROOT)/epoc32/localisation/group; fi
-	@if [ ! -f $$@ ]; then echo "DATADIR: /$(BMBASENAME)" > $$@ ; fi
-	@echo -e "\n/z$(TARGETPATH)/$(BMTARGET) : $(DEPTHBMP)" >> $$@
-
-CLEANTARGETS:=$$(CLEANTARGETS) $(INFOFILE)
-endef
-
-$(eval $(call bmpInfo))
-
-# end of localisation #########################################################
 
 ## Clean up
-$(eval $(call GenerateStandardCleanTarget,$(CLEANTARGETS) ,$(CREATABLEPATHS)))
+$(call raptor_clean,$(CLEANTARGETS))
 $(call makepath,$(CREATABLEPATHS))
 $(call makepathfor,$(BITMAPHEADER))
 
 # for the abld -what target
-BMPRELEASEABLES:=$(RELEASEABLES) $(MBMCOPYFILES) $(BMPCOPYFILES) $(INFOFILE)
-$(eval $(call whatmacro,$(BMPRELEASEABLES),WHATBITMAP))
+BMPRELEASEABLES:=$(RELEASEABLES) $(MBMCOPYFILES)
+$(call raptor_release,$(BMPRELEASEABLES),BITMAP)
 

@@ -21,9 +21,9 @@
 #define __ELFTRAN_H__
 
 #include <e32std.h>
-#include <e32image.h>
+#include "e32image.h"
 #include "e32ldfmt.h"
-#include <elfdefs.h>
+#include "elfdefs.h"
 
 class ELFFile;
 

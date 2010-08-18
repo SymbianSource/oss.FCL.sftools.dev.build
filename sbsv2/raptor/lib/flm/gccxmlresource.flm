@@ -22,12 +22,11 @@ RFIFILE:=$(MAIN_OUTPUTPATH)/$(OUTPUTPATHOFFSET)/$(MAIN_TARGET_lower)_$(MAIN_REQU
 
 define generaterfifile
 # $(1) is the .rfi filename
-# $(2) is the list of .rpp files
-# $(3) is the list of dependency files
+# $(2) is the list of dependency files
 
    $(1): $(2)
 	$(call startrule,generaterfifile,FORCESUCCESS) \
-	$(CREATERFIFILE) -o $(1) -x "$(EPOCROOT)/epoc32" $(3) \
+	$(CREATERFIFILE) -o $(1) -x "$(EPOCROOT)/epoc32" $(2) \
 	$(call endrule,generaterfifile)
 endef
 

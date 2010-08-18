@@ -1,0 +1,33 @@
+body
+{
+	font-family: monospace;
+}
+
+pre { background: #cccccc; }
+
+table
+{
+	width: 100%;
+	border: 1px solid black;
+}
+
+th.numbers
+{
+	width: 10%;
+}
+
+td
+{
+	text-align: center;
+}
+
+td.name
+{
+	text-align: left;
+}
+td.ok { background: #80ff80; }
+td.error { background: #ff8080; }
+td.warning { background: #ffff80; }
+td.remark { background: #8080ff; }
+td.missing { background: #c0c0c0; }
+

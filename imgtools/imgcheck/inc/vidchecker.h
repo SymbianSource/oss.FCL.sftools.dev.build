@@ -47,7 +47,7 @@ public:
 	VidChecker(CmdLineHandler* aCmdPtr, ImageReaderPtrList& aImageReaderList);
 	~VidChecker(void);
 	void Check(ImgVsExeStatus& aImgVsExeStatus);
-	void PrepareAndWriteData(ExeContainer* aExeContainer);
+	void PrepareAndWriteData(ExeContainer& aExeContainer);
 
 private:
 	void FillExeVidStatus(IdData* aIdData);

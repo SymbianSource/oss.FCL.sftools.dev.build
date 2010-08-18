@@ -1,0 +1,51 @@
+# Copyright (c) 2005-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+#
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+# 
+# Contributors:
+#
+# Description:
+# epocrc.config
+# Configuration data which is read by epocrc.pl, the data in this file allows 
+# the method of localisation to be specified.
+# check_rls_items can take the values 0 or 1, setting this variable to 1
+# will check for the presence of localisation comment tags before rls items
+# and the use of correct syntax within these comments. If there are no
+# localisation tags within the file then it is assumed that localisation is 
+# not required for this file. To emit a remark about files of this type adjust
+# the value of strict_checking below.
+#
+
+check_rls_items = 0;
+
+
+# strict_checking can take the values 0 or 1, setting this variable to 1
+# will cause rcomp to emit a warning if the rpp file contains rls items but
+# no localisation comments. check_rls_items must also be set to 1 to enable
+# this functionality.
+
+strict_checking = 0;
+
+# Any files and directories which need to be passed to cpp (the c pre-processor) 
+# should be specified here. File names and directory names should be relative to 
+# EPOCROOT and should be proceeded by 'include: ' (without the quotes). 
+#
+# The data added to the cpp command in each case will be:
+# -I "<path-relative to EPOCROOT>" -include "<path-and-filename-relative to EPOCROOT>"
+# if a file name is specified and 
+# -I "<path-relative to EPOCROOT>"
+# if a directory is specified.
+#
+# If a file included here #include-s another file do not specify the 
+# #include-d file here as cpp will then include the file twice.
+# It is however, necessary to specify the directory that any #include-d 
+# files are in if this directory will not be searched by cpp through the
+# files/directories which are included here. 
+
+include: epoc32\include\SymbianTags.rh

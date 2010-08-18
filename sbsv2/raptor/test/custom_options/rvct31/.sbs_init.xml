@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<build xmlns="http://symbian.com/xml/build"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://symbian.com/xml/build build/2_0.xsd">
+
+	<!-- make RVCT3.1 the default compiler for ARMV5 -->
+
+	<alias name="armv5_urel" meaning="arm.v5.urel.rvct3_1"/>
+	<alias name="armv5_udeb" meaning="arm.v5.udeb.rvct3_1"/>
+	
+</build>

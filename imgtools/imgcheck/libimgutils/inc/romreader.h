@@ -31,8 +31,8 @@ class TRomEntry;
 class RomImageFSEntry;
 class RomImageHeader;
 
-const String KEpocIdentifier("EPOC");
-const String KRomImageIdentifier("ROM");
+const string KEpocIdentifier("EPOC");
+const string KRomImageIdentifier("ROM");
 
 const unsigned int KLdrOpcode = 0xe51ff004;
 const unsigned int KRomBase = 0x80000000;
@@ -45,25 +45,22 @@ Class for ROM reader
 @released
 */
 class RomReader : public ImageReader
-{
-private:
-	RomAddrVsExeName iAddVsExeMap;
-	VectorList	iImageAddress;
+{ 
+	
 
 public:
 	RomReader(const char* aFile, EImageType aImgType );
 	~RomReader(void);
 
-	static bool IsRomImage(const String& aWord);
-	static bool IsRomExtImage(const String& aWord);
+	static bool IsRomImage(const string& aWord);
+	static bool IsRomExtImage(const string& aWord);
 	void ReadImage(void);
 	void ProcessImage(void);
 	void BuildDir(TRomDir *aDir, RomImageFSEntry* aPaFSEntry);
 	void BuildDir(short int *aOffsetTbl, short int aOffsetTblCount, 
 					TRomDir *aDir, RomImageFSEntry* aPaFSEntry);
 	void GetRomDirTbl(short int** aBase, short int& aCount, TRomDir *aRomDir);
-	void AddChild(RomImageFSEntry *aPa, RomImageFSEntry *aChild, TRomEntry* aRomEntry);
-	void Name(String& aName, const char * aUnicodeName, const int aLen);
+	void AddChild(RomImageFSEntry *aPa, RomImageFSEntry *aChild, TRomEntry* aRomEntry); 
        
 	const unsigned long int ImageCompressionType(void) const;
 	const char* RomHdrPtr(void) const;
@@ -75,7 +72,7 @@ public:
 	void PrepareExecutableList(void);
 	ExeNamesVsDepListMap& GatherDependencies(void);
 	void PrepareAddVsExeMap(void);
-	void CollectImportExecutableNames(const RomImageFSEntry* aEntry, StringList& aImportExecutableNameList);
+	void CollectImportExecutableNames(const RomImageFSEntry* aEntry, StringList&  aImportExecutables);
 	unsigned int CodeSectionAddress(unsigned int& aImageAddress);
     void PrepareExeVsIdMap(void);
     const ExeVsIdDataMap& GetExeVsIdMap(void) const;
@@ -86,8 +83,9 @@ public:
 	RomImageFSEntry	*iRomImageRootDirEntry;
 	unsigned char *iData;
     ExeVsRomFsEntryMap iExeVsRomFsEntryMap;
-
 	EImageType iImgType;
+	RomAddrVsExeName iAddVsExeMap;
+	VectorList	iImageAddress;
 	static bool iNoRomLoaderHeader;
 };
  

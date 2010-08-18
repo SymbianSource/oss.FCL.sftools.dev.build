@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2003-2009 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of the License "Eclipse Public License v1.0"
@@ -15,9 +15,8 @@
 *
 */
 
-
 macro		__SUPPORT_ELF_FILES__
-
+macro		_STLP_USE_STATIC_LIB
 target			readimage.exe
 targettype		exe
 sourcepath	..\readimage\src
@@ -29,6 +28,8 @@ source			h_file.cpp h_mem.cpp h_utl.cpp
 userinclude	..\readimage\inc ..\rofsbuild ..\rombuild
 sourcepath	..\rofsbuild
 source			r_build.cpp r_coreimage.cpp 
+SOURCEPATH ../rofsbuild/src/cache
+SOURCE cachemanager.cpp cacheexception.cpp cache.cpp cacheablelist.cpp cachevalidator.cpp cachegenerator.cpp cacheentry.cpp
 sourcepath	..\rombuild
 source			r_global.cpp
 sourcepath	..\..\imglib\e32image
@@ -45,17 +46,20 @@ source			patchdataprocessor.cpp
 userinclude     ..\..\imglib\compress 
 userinclude		..\..\imglib\patchdataprocessor\include
 userinclude		..\..\sisutils\inc
+userinclude     ../../imglib/uniconv/include
+USERINCLUDE   ../rofsbuild/inc
 userinclude   ..\..\imglib\boostlibrary
+USERINCLUDE   ../../imglib/boostlibrary/boost
 
 USERINCLUDE ..\..\imglib\inc
 OS_LAYER_SYSTEMINCLUDE_SYMBIAN
+STATICLIBRARY   boost_thread-1.39 boost_filesystem-1.39 sisutils uniconv
 
-staticlibrary 	sisutils
 #ifdef TOOLS2_LINUX
-STATICLIBRARY   boost_thread-mgw34-mt-1_39_linux
-OPTION    GCC -pthread -O2 -Wno-uninitialized
+STATICLIBRARY	boost_system-1.39
+OPTION    GCC -pthread -O2 -Wno-uninitialized -fno-strict-aliasing
 #else
-STATICLIBRARY   boost_thread-mgw34-mt-1_39_win32
 OPTION    GCC -mthreads -O2 -Wno-uninitialized
 #endif
+
 VENDORID 0x70000001

@@ -31,7 +31,7 @@ class Memmap
 {
 private:
 	// Output image file name
-	String iOutFileName;
+	string iOutFileName;
 	// Map pointer
 	char *iData;
 	// Maximum size of the memory map
@@ -49,7 +49,7 @@ private:
 	int FillMemMap( unsigned char fillVal = 0 );
 public:
 
-	Memmap( int aFillFlg, String aOutputFile );
+	Memmap( int aFillFlg, const string& aOutputFile );
 	Memmap( int aFillFlg = 1);
 	~Memmap( );
 
@@ -61,7 +61,7 @@ public:
 	void WriteToOutputFile( );
 
 	// Set the output image file name
-	void SetOutputFile( String aOutputFile );
+	void SetOutputFile(const string& aOutputFile );
 	// Set the maximum memory map size
 	void SetMaxMapSize( unsigned long aMaxSize );
 	// Get the memory map pointer

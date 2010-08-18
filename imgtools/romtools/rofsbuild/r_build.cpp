@@ -26,16 +26,17 @@
 #include <u32std.h>
 #include <e32uid.h>
 #include <f32file.h>
-
-#if defined(__MSVCDOTNET__) || defined(__TOOLS2__)
-	#include <iomanip>
-	#include <strstream>
-#else //!__MSVCDOTNET__
-	#include <iomanip.h>
-#endif //__MSVCDOTNET__
-
+#include <malloc.h>
+#include <map>
+#include <queue> 
+#include <iomanip>
+#include <strstream>
+#include "utf16string.h"
 #ifdef _L
 #undef _L
+#endif
+#ifdef __LINUX__
+#define _alloca alloca
 #endif
 
 #include "h_utl.h"
@@ -44,6 +45,20 @@
 #include "e32image.h"
 #include "patchdataprocessor.h"
 
+#include <filesystem.hpp>
+#include <thread/thread.hpp>
+#include <thread/mutex.hpp>
+#include <thread/condition_variable.hpp>
+
+#include "cache/cacheexception.hpp"
+#include "cache/cacheentry.hpp"
+#include "cache/cache.hpp"
+#include "cache/cachegenerator.hpp"
+#include "cache/cachevalidator.hpp"
+#include "cache/cacheablelist.hpp"
+#include "cache/cachemanager.hpp"
+
+#include "uniconv.hpp"
 extern TUint checkSum(const void* aPtr);
 
 extern ECompression gCompress;
@@ -51,6 +66,8 @@ extern TUint gCompressionMethod;
 extern TInt  gCodePagingOverride;
 extern TInt  gDataPagingOverride;
 extern TInt  gLogLevel;
+extern bool gCache;
+extern TBool gIsOBYUTF8;
 TBool gDriveImage=EFalse;	// for drive image support.
 
 
@@ -106,13 +123,13 @@ TInt i=0;
 	return stricmp((const char*)&temp1[0], (const char*)&temp2[0]);
 	}
 
-TRomNode::TRomNode(TText* aName, TRomBuilderEntry* aEntry)
+TRomNode::TRomNode(const char* aName, TRomBuilderEntry* aEntry)
 //
 // Constructor
 //
 	:
 	iNextNode(NULL),
-	iParent(NULL), iSibling(0), iChild(0), iNextNodeForSameFile(0), 
+	iParent(NULL), iSibling(0), iChild(0), iNextNodeForSameFile(0),
 	iTotalDirectoryBlockSize(0),
 	iTotalFileBlockSize(0),
 	iImagePosition(0),
@@ -121,13 +138,13 @@ TRomNode::TRomNode(TText* aName, TRomBuilderEntry* aEntry)
 	iAttExtra(0xFF),
 	iHidden(EFalse),
 	iEntry(aEntry),
-	iFileStartOffset(0), 
-	iSize(0), 
+	iFileStartOffset(0),
+	iSize(0),
 	iOverride(0),
 	iFileUpdate(EFalse),
     iAlias(false)
 	{
-	iName = (TText*)NormaliseFileName((const char*)aName);
+	iName = NormaliseFileName(aName);
 	iIdentifier=TRomNode::Count++;
 
 	// Add this node to the flat linked list
@@ -151,34 +168,25 @@ TRomNode::TRomNode(TText* aName, TRomBuilderEntry* aEntry)
 		}
 	}
 
-TRomNode::~TRomNode()
-	{
+TRomNode::~TRomNode() {
 	if (iEntry && !iAlias)
-        {
-		delete iEntry;
-        }
-    iEntry = 0;
+		delete iEntry; 
 	if(iName)
-		free(iName);
-    iName = 0;
-	}
-
-TRomNode *TRomNode::FindInDirectory(TText *aName)
+		delete []iName ;
+}
 //
 // Check if the TRomNode for aName exists in aDir, and if so, return it.
 //
-	{
-
+TRomNode *TRomNode::FindInDirectory(const char *aName) const{
 	TRomNode *entry=iChild; // first subdirectory or file
-	while (entry)
-		{
-		if ((stricmp((const char *)aName, (const char *)entry->iName))==0) 
+	while (entry) {
+		if ((stricmp(aName, entry->iName)) == 0)
 			return entry;
 		else
 			entry=entry->iSibling;
-		}
-	return 0;
 	}
+	return 0;
+}
 
 
 
@@ -191,7 +199,7 @@ void indendStructure(TInt i)
 	     cout << "    ";
 	     i--;
 	   }
-       };  
+       };
 
 // displays the directory structure
 void TRomNode::DisplayStructure(ostream* aOut)
@@ -200,7 +208,7 @@ void TRomNode::DisplayStructure(ostream* aOut)
       *aOut  << iName << "\n";
 	  if (iChild)
 	    {
-	      indend++; 
+	      indend++;
 	      iChild->DisplayStructure(aOut);
 	      indend--;
 	    }
@@ -245,50 +253,44 @@ void TRomNode::AddFile(TRomNode* aChild)
 	Add(aChild);
 	}
 
-TRomNode* TRomNode::NewSubDir(TText *aName)
-	{
-	if (iEntry)
-		{
+TRomNode* TRomNode::NewSubDir(const char *aName) {
+	if (iEntry) {
 		Print(EError, "Adding subdirectory to a file!!!\n");
 		return 0;
-		}
+	}
 
-	TRomNode* node = new TRomNode(aName );
-	if (node==0)
-		{
+	TRomNode* node = new TRomNode(aName);
+	if (node==0){
 		Print(EError, "TRomNode::NewNode: Out of memory\n");
 		return 0;
-		}
+	}
 	node->iParent = this;
 	Add(node);
 	return node;
 	}
 
-void TRomNode::Add(TRomNode* aChild)
-	{
-	if (iChild) // this node is a non-empty directory
-		{
+void TRomNode::Add(TRomNode* aChild) {
+	if (iChild){ // this node is a non-empty directory
+		
 		TRomNode* dir = iChild; // find where to link in the new node
 		while (dir->iSibling)
 			dir = dir->iSibling;
 		dir->iSibling = aChild;
-		}
+	}
 	else
 		iChild = aChild; // else just set it up as the child of the dir
 	aChild->iSibling = 0;
 	aChild->iParent = this;
 	}
-
-TInt TRomNode::SetAttExtra(TText *anAttWord, TRomBuilderEntry* aFile, enum EKeyword aKeyword)
 //
 // Set the file extra attribute byte from the letters passed
 // Note: The iAttExtra bits are inverted. '0' represent enabled
 //
-	{
+TInt TRomNode::SetAttExtra(char *anAttWord, TRomBuilderEntry* aFile, enum EKeyword aKeyword){
 	iAttExtra=0xFF;
 	if (anAttWord==0 || anAttWord[0]=='\0')
 		return Print(EError, "Missing argument for keyword 'exattrib'.\n");
-	for (TText *letter=anAttWord;*letter!=0;letter++)
+	for (char *letter=anAttWord;*letter!=0;letter++)
 		{
 		switch (*letter)
 			{
@@ -318,7 +320,7 @@ TInt TRomNode::SetAttExtra(TText *anAttWord, TRomBuilderEntry* aFile, enum EKeyw
 	}
 
 
-TInt TRomNode::SetAtt(TText *anAttWord)
+TInt TRomNode::SetAtt(char *anAttWord)
 //
 // Set the file attribute byte from the letters passed
 //
@@ -326,7 +328,7 @@ TInt TRomNode::SetAtt(TText *anAttWord)
 	iAtt=0;
 	if (anAttWord==0 || anAttWord[0]=='\0')
 		return Print(EError, "Missing argument for keyword 'attrib'.\n");
-	for (TText *letter=anAttWord;*letter!=0;letter++)
+	for (char *letter=anAttWord;*letter!=0;letter++)
 		{
 		switch (*letter)
 			{
@@ -359,13 +361,12 @@ TInt TRomNode::SetAtt(TText *anAttWord)
 	}
 
 
-
-TInt TRomNode::CalculateEntrySize() const
-	// Calculates the amount of ROM space required to hold
-	// this entry. The return is the actual size of the TRofsEntry
-	// structure, not rounded up
-	{
-	TInt requiredSizeBytes = KRofsEntryHeaderSize +	NameLengthUnicode();
+// Calculates the amount of ROM space required to hold
+// this entry. The return is the actual size of the TRofsEntry
+// structure, not rounded up
+TInt TRomNode::CalculateEntrySize() const {
+	UTF16String unistr(iName);
+	TInt requiredSizeBytes = KRofsEntryHeaderSize +	unistr.bytes();
 	return requiredSizeBytes;
 	}
 
@@ -386,7 +387,7 @@ TInt TRomNode::CalculateDirectoryEntrySize( TInt& aDirectoryBlockSize,
 	TInt padBytes=0;
 	if( 0 == iTotalDirectoryBlockSize )
 		{
-		// need to calculate by walking children	
+		// need to calculate by walking children
 		if( !iChild )
 			{
 			return Print(EError, "TRomNode structure corrupt\n");
@@ -415,7 +416,7 @@ TInt TRomNode::CalculateDirectoryEntrySize( TInt& aDirectoryBlockSize,
 				}
 			node = node->iSibling;
 			}
-		
+
 		offsetBytes = ((fileCount + dirCount) * 2) + 4; //the +4 are the two offset counts,
 		padBytes = offsetBytes % 4;
 
@@ -431,24 +432,24 @@ TInt TRomNode::CalculateDirectoryEntrySize( TInt& aDirectoryBlockSize,
 /**
 Place the files and it's attributes (incase of executables)
 Called for both rofs and datadrive creation.
- 
+
 @param aDest   - Destination buffer.
 @param aOffset - offset value, used for rofs only.
 @param aMaxSize- Maximum size required for rofs.
-  
+
 @return - Returns the number of bytes placed or a -ve error code.
-*/ 
-TInt TRomNode::PlaceFile( TUint8* &aDest, TUint aOffset, TUint aMaxSize, CBytePair *aBPE )
+*/
+TInt TRomNode::PlaceFile( TUint8* &aDest, TUint aOffset, TUint aMaxSize, CBytePair *aBPE ){
 	//
 	// Place the file into the ROM image, making any necessary conversions
 	// along the way.
 	//
 	// Returns the number of bytes placed or a -ve error code.
-	{
+	
 
 	TInt size=0;
-	
-	// file hasn't been placed for drive image. 
+
+	// file hasn't been placed for drive image.
 	if(gDriveImage)
 	{
 		size = iEntry->PlaceFile(aDest,aMaxSize,aBPE);
@@ -486,7 +487,7 @@ TInt TRomNode::PlaceFile( TUint8* &aDest, TUint aOffset, TUint aMaxSize, CBytePa
 			Print(EError,"%s: Can't load old format binary\n", iEntry->iFileName);
 			return KErrNotSupported;
 			}
-		
+
 		// First need to check that it's a real image header
 		if( (TUint)size > sizeof(E32ImageHeader) )
 			{
@@ -632,17 +633,20 @@ TInt TRomNode::Place( TUint8* aDestBase )
 			array[index].iIsDir = ETrue;
 			}
 		array[index].iEntry = entry;
-		index++;
-
-		entry->iNameOffset = KRofsEntryNameOffset;
+		index++;	 
+		entry->iNameOffset = KRofsEntryNameOffset; 
 		entry->iAtt = node->iAtt;
 		entry->iAttExtra = node->iAttExtra;
 
 		TInt entryLen = KRofsEntryHeaderSize;
-		entryLen += node->NameCpy( (char*)&entry->iName, entry->iNameLength );
+		UTF16String unistr(node->iName);
+		if(!unistr.IsEmpty()){
+			entry->iNameLength = unistr.length();
+			memcpy(entry->iName,unistr.c_str(),unistr.bytes());
+			entryLen += unistr.bytes() ; 
+		}
 		entryLen += (4 - entryLen) & 3;	// round up to nearest word
 		entry->iStructSize = (TUint16)entryLen;
-
 
 		if( node->IsFile() )
 			{
@@ -659,7 +663,7 @@ TInt TRomNode::Place( TUint8* aDestBase )
 			// node is a subdirectory, entry points to directory
 			pDirEntry->iFileAddress = node->iImagePosition;
 			node->iAtt |= KEntryAttDir;
-			
+
 			// the size is just the size of the directory block
 			pDirEntry->iFileSize = node->iTotalDirectoryBlockSize;
 			pDirEntry = (TRofsEntry*)( (TUint8*)pDirEntry + entryLen );
@@ -740,12 +744,10 @@ void TRomNode::CountDirectory(TInt& aFileCount, TInt& aDirCount)
 		}
 	}
 
- void TRomNode::Destroy()
 //
 // Follow the TRomNode tree, destroying it
 //
-	{
-
+void TRomNode::Destroy() {
  	TRomNode *current = this; // root has no siblings
 	while (current)
 		{
@@ -756,156 +758,11 @@ void TRomNode::CountDirectory(TInt& aFileCount, TInt& aDirCount)
 		delete prev;
         prev = 0;
 		}
- 	}
+ }
 
+ 
 
-
-
-TInt TRomNode::NameCpy(char* aDest, TUint8& aUnicodeLength )
-//
-// Safely copy a file name in the rom entry
-// Returns the number of bytes used. Write the length in unicode characters
-// into aUnicodeLength.
-//
-	{
-
-	if ((aDest==NULL) || (iName==NULL))
-		return 0;
-	const unsigned char* pSourceByte = (const unsigned char*)iName;
-	unsigned char* pTargetByte=(unsigned char*)aDest;
-	for (;;)
-		{
-		const TUint sourceByte=*pSourceByte;
-		if (sourceByte==0)
-			{
-			break;
-			}
-		if ((sourceByte&0x80)==0)
-			{
-			*pTargetByte=(unsigned char)sourceByte;
-			++pTargetByte;
-			*pTargetByte=0;
-			++pTargetByte;
-			++pSourceByte;
-			}
-		else if ((sourceByte&0xe0)==0xc0)
-			{
-			++pSourceByte;
-			const TUint secondSourceByte=*pSourceByte;
-			if ((secondSourceByte&0xc0)!=0x80)
-				{
-				Print(EError, "Bad UTF-8 '%s'", iName);
-				exit(671);
-				}
-			*pTargetByte=(unsigned char)((secondSourceByte&0x3f)|((sourceByte&0x03)<<6));
-			++pTargetByte;
-			*pTargetByte=(unsigned char)((sourceByte>>2)&0x07);
-			++pTargetByte;
-			++pSourceByte;
-			}
-		else if ((sourceByte&0xf0)==0xe0)
-			{
-			++pSourceByte;
-			const TUint secondSourceByte=*pSourceByte;
-			if ((secondSourceByte&0xc0)!=0x80)
-				{
-				Print(EError, "Bad UTF-8 '%s'", iName);
-				exit(672);
-				}
-			++pSourceByte;
-			const TUint thirdSourceByte=*pSourceByte;
-			if ((thirdSourceByte&0xc0)!=0x80)
-				{
-				Print(EError, "Bad UTF-8 '%s'", iName);
-				exit(673);
-				}
-			*pTargetByte=(unsigned char)((thirdSourceByte&0x3f)|((secondSourceByte&0x03)<<6));
-			++pTargetByte;
-			*pTargetByte=(unsigned char)(((secondSourceByte>>2)&0x0f)|((sourceByte&0x0f)<<4));
-			++pTargetByte;
-			++pSourceByte;
-			}
-		else
-			{
-			Print(EError, "Bad UTF-8 '%s'", iName);
-			exit(674);
-			}
-		}
-	const TInt numberOfBytesInTarget=(pTargetByte-(unsigned char*)aDest); // this number excludes the trailing null-terminator
-	if (numberOfBytesInTarget%2!=0)
-		{
-		Print(EError, "Internal error");
-		exit(675);
-		}
-	aUnicodeLength = (TUint8)(numberOfBytesInTarget/2); // returns the length of aDest (in UTF-16 characters for Unicode, not bytes)
-	return numberOfBytesInTarget;
-	}
-
-
-TInt TRomNode::NameLengthUnicode() const
-//
-// Find the unicode lenght of the name
-//
-	{
-
-	if (iName==NULL)
-		return 0;
-
-	const unsigned char* pSourceByte = (const unsigned char*)iName;
-	TInt len = 0;
-	for (;;)
-		{
-		const TUint sourceByte=*pSourceByte;
-		if (sourceByte==0)
-			{
-			break;
-			}
-		if ((sourceByte&0x80)==0)
-			{
-			len += 2;
-			++pSourceByte;
-			}
-		else if ((sourceByte&0xe0)==0xc0)
-			{
-			++pSourceByte;
-			const TUint secondSourceByte=*pSourceByte;
-			if ((secondSourceByte&0xc0)!=0x80)
-				{
-				Print(EError, "Bad UTF-8 '%s'", iName);
-				exit(671);
-				}
-			len += 2;
-			++pSourceByte;
-			}
-		else if ((sourceByte&0xf0)==0xe0)
-			{
-			++pSourceByte;
-			const TUint secondSourceByte=*pSourceByte;
-			if ((secondSourceByte&0xc0)!=0x80)
-				{
-				Print(EError, "Bad UTF-8 '%s'", iName);
-				exit(672);
-				}
-			++pSourceByte;
-			const TUint thirdSourceByte=*pSourceByte;
-			if ((thirdSourceByte&0xc0)!=0x80)
-				{
-				Print(EError, "Bad UTF-8 '%s'", iName);
-				exit(673);
-				}
-			len += 2;
-			++pSourceByte;
-			}
-		else
-			{
-			Print(EError, "Bad UTF-8 '%s'", iName);
-			exit(674);
-			}
-		}
-	return len;
-	}
-
-
+ 
 void TRomNode::AddNodeForSameFile(TRomNode* aPreviousNode, TRomBuilderEntry* aFile)
 	{
 	// sanity checking
@@ -926,37 +783,54 @@ void TRomNode::AddNodeForSameFile(TRomNode* aPreviousNode, TRomBuilderEntry* aFi
 //**************************************
 
 
-
-TRomBuilderEntry::TRomBuilderEntry(const char *aFileName,TText *aName)
 //
 // Constructor
 //
-:iFirstDllDataEntry(0),	iName(0),iFileName(0),iNext(0), iNextInArea(0),
+TRomBuilderEntry::TRomBuilderEntry(const char *aFileName,const char *aName):
+iFirstDllDataEntry(0),	iName(0),iFileName(0),iNext(0), iNextInArea(0),
 iExecutable(EFalse), iFileOffset(EFalse), iCompressEnabled(0),
-iHidden(0), iRomNode(0), iRealFileSize(0)		 
+iHidden(0), iRomNode(0), iRealFileSize(0)
 {
 	if (aFileName)
+	{
    		iFileName = NormaliseFileName(aFileName);
+   		if(gIsOBYUTF8 && !UniConv::IsPureASCIITextStream(iFileName))
+   		{
+			char* tempnname = strdup(iFileName);
+			unsigned int namelen = 0;
+			if(UniConv::UTF82DefaultCodePage(tempnname, strlen(tempnname), &iFileName, &namelen) < 0)
+				Print(EError, "Invalid filename encoding: %s\n", tempnname);
+			free(tempnname);
+   		}
+	}
 	if (aName)
-		iName = (TText*)NormaliseFileName((const char*)aName);
+	{
+		iName = NormaliseFileName(aName);
+		if(!gIsOBYUTF8 && !UniConv::IsPureASCIITextStream(iName))
+		{
+			char* tempnname = strdup(iName);
+			unsigned int namelen = 0;
+			if(UniConv::DefaultCodePage2UTF8(tempnname, strlen(tempnname), &iName, &namelen) < 0)
+				Print(EError, "Invalid filename encoding: %s\n", tempnname);
+			free(tempnname);
+		}
+	}
 	memset(iUids,0 ,sizeof(TCheckedUid));
 }
-	
-TRomBuilderEntry::~TRomBuilderEntry()
 //
 // Destructor
 //
-	{
-	if(iFileName)
-	{
-	free(iFileName);
+TRomBuilderEntry::~TRomBuilderEntry() {
+	if(iFileName) {
+		delete []iFileName;
+		iFileName = 0;
 	}
-	iFileName = 0;
-	if(iName)
-	{
-	free(iName);
+	
+	if(iName) {
+		delete []iName;
+		iName = 0 ;
 	}
-	}
+}
 
 void TRomBuilderEntry::SetRomNode(TRomNode* aNode)
 	{
@@ -964,59 +838,32 @@ void TRomBuilderEntry::SetRomNode(TRomNode* aNode)
 	iRomNode = aNode;
 	}
 
-
-TInt isNumber(TText *aString)
-	{
-	if (aString==NULL)
-		return 0;
-	if (strlen((char *)aString)==0)
-		return 0;
-	return isdigit(aString[0]);
-	}
-
-TInt getNumber(TText *aStr)
-	{
-	TUint a;
-	#ifdef __TOOLS2__
-	istringstream val((char *)aStr);
-	#else
-	istrstream val((char *)aStr,strlen((char *)aStr));
-	#endif
-
-#if defined(__MSVCDOTNET__) || defined(__TOOLS2__)
-	val >> setbase(0);
-#endif //__MSVCDOTNET__
-
-	val >> a;
-	return a;
-	}
+//
+// Place the file in ROFS. Since we don't support compression yet all
+// we have to do is read the file into memory
+// compress it, if it isn't already compressed.
+//
+// Returns the number of bytes used, or -ve error code
+TInt TRomBuilderEntry::PlaceFile( TUint8* &aDest,TUint aMaxSize, CBytePair *aBPE ){
 
 
-TInt TRomBuilderEntry::PlaceFile( TUint8* &aDest,TUint aMaxSize, CBytePair *aBPE )
-	//
-	// Place the file in ROM. Since we don't support compression yet all
-	// we have to do is read the file into memory
-	// compress it, if it isn't already compressed.
-	//
-	// Returns the number of bytes used, or -ve error code
-	{
 	TUint compression = 0;
 	TBool executable = iExecutable;
 	Print(ELog,"Reading file %s to image\n", iFileName );
-	TUint32 size=HFile::GetLength((TText*)iFileName);
+	TUint32 size = HFile::GetLength(iFileName);
 	if (size==0)
 		Print(EWarning, "File %s does not exist or is 0 bytes in length.\n",iFileName);
-        if (aDest == NULL) {
-            aMaxSize = size*2;
-            aMaxSize = (aMaxSize>0) ? aMaxSize : 2;
-            aDest = new TUint8[aMaxSize];
-        }
+	if (aDest == NULL) {
+		aMaxSize = size << 1;
+		aMaxSize = (aMaxSize>0) ? aMaxSize : 2;
+		aDest = new TUint8[aMaxSize];
+   }
 
 	if (executable)
-		{
+	{
 		// indicate if the image will overflow without compression
-	TBool overflow;
-			if(size>aMaxSize)
+		TBool overflow;
+		if(size>aMaxSize)
 			overflow = ETrue;
 		else
 			overflow = EFalse;
@@ -1026,12 +873,12 @@ TInt TRomBuilderEntry::PlaceFile( TUint8* &aDest,TUint aMaxSize, CBytePair *aBPE
 		TInt r = f.Open(iFileName);
 		// is it really a valid E32ImageFile?
 		if (r != KErrNone)
-			{
+		{
 			Print(EWarning, "File '%s' is not a valid executable.  Placing file as data.\n", iFileName);
 			executable = EFalse;
-			}
+		}
 		else
-			{
+		{
 
 			if(iRomNode->iOverride & KOverrideDllData)
 			{
@@ -1043,7 +890,7 @@ TInt TRomBuilderEntry::PlaceFile( TUint8* &aDest,TUint aMaxSize, CBytePair *aBPE
 
 				aExportTbl = (TLinAddr*)((char*)f.iData + f.iOrigHdr->iExportDirOffset);
 
-				// const data symbol may belong in the Code section. If the address lies within the Code or data section limits, 
+				// const data symbol may belong in the Code section. If the address lies within the Code or data section limits,
 				// get the corresponding location and update it.While considering the Data section limits
 				// don't include the Bss section, as it doesn't exist as yet in the image.
 				while( aDllEntry ){
@@ -1053,43 +900,43 @@ TInt TRomBuilderEntry::PlaceFile( TUint8* &aDest,TUint aMaxSize, CBytePair *aBPE
 							aDllEntry = aDllEntry->NextDllDataEntry();
 							continue;
 						}
-					
-				//	Get the address of the data field via the export table.
-					aDataAddr = (TInt32)(aExportTbl[aDllEntry->iOrdinal - 1] + aDllEntry->iOffset);
-					if( aDataAddr >= f.iOrigHdr->iCodeBase && aDataAddr <= (f.iOrigHdr->iCodeBase + f.iOrigHdr->iCodeSize)){
-						aCodeSeg = (char*)(f.iData + f.iOrigHdr->iCodeOffset);
-						aLocation = (void*)(aCodeSeg + aDataAddr - f.iOrigHdr->iCodeBase );
-						memcpy(aLocation, &aDllEntry->iNewValue, aDllEntry->iSize);
-					}
-					else if(aDataAddr >= f.iOrigHdr->iDataBase && aDataAddr <= (f.iOrigHdr->iDataBase + f.iOrigHdr->iDataSize)){
-						aDataSeg = (char*)(f.iData + f.iOrigHdr->iDataOffset);
-						aLocation = (void*)(aDataSeg + aDataAddr - f.iOrigHdr->iDataBase );
-						memcpy(aLocation, &aDllEntry->iNewValue, aDllEntry->iSize);
-					}
-					else
-					{
-						Print(EWarning, "Patchdata failed as address pointed by ordinal %d of DLL %s doesn't lie within Code or Data section limits\n", aDllEntry->iOrdinal, iRomNode->iName);
-					}
+
+						//	Get the address of the data field via the export table.
+						aDataAddr = (TInt32)(aExportTbl[aDllEntry->iOrdinal - 1] + aDllEntry->iOffset);
+						if( aDataAddr >= f.iOrigHdr->iCodeBase && aDataAddr <= (f.iOrigHdr->iCodeBase + f.iOrigHdr->iCodeSize)){
+							aCodeSeg = (char*)(f.iData + f.iOrigHdr->iCodeOffset);
+							aLocation = (void*)(aCodeSeg + aDataAddr - f.iOrigHdr->iCodeBase );
+							memcpy(aLocation, &aDllEntry->iNewValue, aDllEntry->iSize);
+						}
+						else if(aDataAddr >= f.iOrigHdr->iDataBase && aDataAddr <= (f.iOrigHdr->iDataBase + f.iOrigHdr->iDataSize)){
+							aDataSeg = (char*)(f.iData + f.iOrigHdr->iDataOffset);
+							aLocation = (void*)(aDataSeg + aDataAddr - f.iOrigHdr->iDataBase );
+							memcpy(aLocation, &aDllEntry->iNewValue, aDllEntry->iSize);
+						}
+						else
+						{
+							Print(EWarning, "Patchdata failed as address pointed by ordinal %d of DLL %s doesn't lie within Code or Data section limits\n", aDllEntry->iOrdinal, iRomNode->iName);
+						}
 					}
 					else if(aDllEntry->iDataAddress != (TLinAddr)-1){
 						aDataAddr = aDllEntry->iDataAddress + aDllEntry->iOffset;
-					if( aDataAddr >= f.iOrigHdr->iCodeBase && aDataAddr <= (f.iOrigHdr->iCodeBase + f.iOrigHdr->iCodeSize)){
-						aCodeSeg = (char*)(f.iData + f.iOrigHdr->iCodeOffset);
-						aLocation = (void*)(aCodeSeg + aDataAddr - f.iOrigHdr->iCodeBase );
-						memcpy(aLocation, &aDllEntry->iNewValue, aDllEntry->iSize);
-					}
-					else if(aDataAddr >= f.iOrigHdr->iDataBase && aDataAddr <= (f.iOrigHdr->iDataBase + f.iOrigHdr->iDataSize)){
-						aDataSeg = (char*)(f.iData + f.iOrigHdr->iDataOffset);
-						aLocation = (void*)(aDataSeg + aDataAddr - f.iOrigHdr->iDataBase );
-						memcpy(aLocation, &aDllEntry->iNewValue, aDllEntry->iSize);
-					}
-					else
-					{
-						Print(EWarning, "Patchdata failed as address 0x%x of DLL %s doesn't lie within Code or Data section limits\n", aDllEntry->iOrdinal, iRomNode->iName);
-					}
+						if( aDataAddr >= f.iOrigHdr->iCodeBase && aDataAddr <= (f.iOrigHdr->iCodeBase + f.iOrigHdr->iCodeSize)){
+							aCodeSeg = (char*)(f.iData + f.iOrigHdr->iCodeOffset);
+							aLocation = (void*)(aCodeSeg + aDataAddr - f.iOrigHdr->iCodeBase );
+							memcpy(aLocation, &aDllEntry->iNewValue, aDllEntry->iSize);
+						}
+						else if(aDataAddr >= f.iOrigHdr->iDataBase && aDataAddr <= (f.iOrigHdr->iDataBase + f.iOrigHdr->iDataSize)){
+							aDataSeg = (char*)(f.iData + f.iOrigHdr->iDataOffset);
+							aLocation = (void*)(aDataSeg + aDataAddr - f.iOrigHdr->iDataBase );
+							memcpy(aLocation, &aDllEntry->iNewValue, aDllEntry->iSize);
+						}
+						else
+						{
+							Print(EWarning, "Patchdata failed as address 0x%x of DLL %s doesn't lie within Code or Data section limits\n", aDllEntry->iOrdinal, iRomNode->iName);
+						}
 					}
 					aDllEntry = aDllEntry->NextDllDataEntry();
-					}
+				}
 			}
 
 			compression = f.iHdr->CompressionType();
@@ -1112,7 +959,7 @@ TInt TRomBuilderEntry::PlaceFile( TUint8* &aDest,TUint aMaxSize, CBytePair *aBPE
 
 			if( iCompressEnabled != ECompressionUnknown)
 			{
-				// The new state would be as stated in obey file, i.e. 
+				// The new state would be as stated in obey file, i.e.
 				// filecompress or fileuncompress
 				newFileComp = gCompressionMethod;
 			}
@@ -1133,29 +980,29 @@ TInt TRomBuilderEntry::PlaceFile( TUint8* &aDest,TUint aMaxSize, CBytePair *aBPE
 				// overide paging flags...
 				E32ImageHeaderV* h=f.iHdr;
 				if (iRomNode->iOverride & KOverrideCodePaged)
-					{
+				{
 					h->iFlags &= ~KImageCodeUnpaged;
 					h->iFlags |= KImageCodePaged;
-					}
+				}
 				if (iRomNode->iOverride & KOverrideCodeUnpaged)
-					{
+				{
 					h->iFlags |= KImageCodeUnpaged;
 					h->iFlags &= ~KImageCodePaged;
-					}
+				}
 				if (iRomNode->iOverride & KOverrideDataPaged)
-					{
+				{
 					h->iFlags &= ~KImageDataUnpaged;
 					h->iFlags |= KImageDataPaged;
-					}
+				}
 				if (iRomNode->iOverride & KOverrideDataUnpaged)
-					{
+				{
 					h->iFlags |= KImageDataUnpaged;
 					h->iFlags &= ~KImageDataPaged;
-					}
+				}
 
 				// apply global paging override...
 				switch(gCodePagingOverride)
-					{
+				{
 				case EKernelConfigPagingPolicyNoPaging:
 					h->iFlags |= KImageCodeUnpaged;
 					h->iFlags &= ~KImageCodePaged;
@@ -1172,9 +1019,9 @@ TInt TRomBuilderEntry::PlaceFile( TUint8* &aDest,TUint aMaxSize, CBytePair *aBPE
 					if(!(h->iFlags&(KImageCodeUnpaged|KImageCodePaged)))
 						h->iFlags |= KImageCodePaged;
 					break;
-					}
+				}
 				switch(gDataPagingOverride)
-					{
+				{
 				case EKernelConfigPagingPolicyNoPaging:
 					h->iFlags |= KImageDataUnpaged;
 					h->iFlags &= ~KImageDataPaged;
@@ -1191,82 +1038,154 @@ TInt TRomBuilderEntry::PlaceFile( TUint8* &aDest,TUint aMaxSize, CBytePair *aBPE
 					if(!(h->iFlags&(KImageDataUnpaged|KImageDataPaged)))
 						h->iFlags |= KImageDataPaged;
 					break;
-					}
+				}
 				f.UpdateHeaderCrc();
 
 				// make sure paged code has correct compression type...
 				if(h->iFlags&KImageCodePaged)
-					{
+				{
 					if(newFileComp!=0)
 						newFileComp = KUidCompressionBytePair;
-					}
+				}
 			}
 
 			if ( oldFileComp != newFileComp )
-				{
-				
+			{
+
 				if( newFileComp == 0)
-					{
+				{
 					Print(ELog,"Decompressing executable '%s'\n", iFileName);
 					f.iHdr->iCompressionType = 0;
-					}
+				}
 				else
-					{
+				{
 					Print(ELog,"Compressing executable '%s' with method:%08x\n", iFileName, newFileComp);
 					f.iHdr->iCompressionType = newFileComp;
-					}
+				}
 				f.UpdateHeaderCrc();
 				if (overflow)
-					{
-					char * buffer = new char [size];
-					// need to check if the compressed file will fit in the image
-   					#if defined(__LINUX__)
- 					ostrstream os((char*)aDest, aMaxSize, (ios::openmode)(ios::out+ios::binary));
-					#elif defined(__TOOLS2__) && defined (_STLP_THREADS)
-  					ostrstream os((char*)buffer, size,(ios::out+ios::binary));
-  					#elif defined( __TOOLS2__)
-   					ostrstream os((char*)buffer, size,(ios::out+ios::binary));
-					#else
-					ostrstream os( (char*)buffer, size, (ios::out+ios::binary));
-					#endif
-					os << f;
-					TUint compressedSize = os.pcount();
-					if (compressedSize <= aMaxSize)
-						overflow = EFalse;	
-					delete[] buffer;
-					}
-				}
-			if (overflow)
 				{
+					// need to check if the compressed file will fit in the image
+					//TODO the checking will slow down the build process, should do it later along with the writing on aDest.
+					TUint32 compressedSize;
+					char * buffer = new char [size];
+#if defined(__LINUX__)
+					ostrstream os((char*)aDest, aMaxSize, (ios_base::openmode)(ios_base::out+ios_base::binary));
+#elif defined(__TOOLS2__) && defined (_STLP_THREADS)
+					ostrstream os((char*)buffer, size,(ios_base::out+ios_base::binary));
+#elif defined( __TOOLS2__)
+					ostrstream os((char*)buffer, size,(ios_base::out+ios_base::binary));
+#else
+					ostrstream os( (char*)buffer, size, (ios_base::out+ios_base::binary));
+#endif
+					os << f;
+					compressedSize = os.pcount();
+					delete[] buffer;
+					if (compressedSize <= aMaxSize)
+						overflow = EFalse;
+				}
+			}
+			if (overflow)
+			{
 				Print(EError, "Can't fit '%s' in image\n", iFileName);
 				Print(EError, "Overflowed by approximately 0x%x bytes.\n", size - aMaxSize);
 				exit(667);
+			}
+
+			//try to use cached version where possible.
+			if(gCache && !gDriveImage && !(iRomNode->iAlias) && (iRomNode->iEntry->iExecutable) && !(iRomNode->iOverride & KOverrideDllData))
+			{
+				//retrive cached version.
+				size_t len = strlen(iFileName) + 1;
+				char* temp = (char*)_alloca(len);
+				memcpy(temp,iFileName,len);
+				CacheEntry* entryref = CacheManager::GetInstance()->GetE32ImageFileRepresentation(temp , compression); 
+				if(entryref)
+				{
+					size = entryref->GetCachedFileBufferLen();
+					memcpy(aDest, entryref->GetCachedFileBuffer(), size);
+					memcpy(aDest,f.iHdr,sizeof(E32ImageHeaderV));
+					compression = atoi(entryref->GetCachedFileCompressionID());
+					memcpy(&iUids[0], aDest, sizeof(iUids));
+					if (compression)
+						Print(ELog,"Compressed executable File '%s' size: %08x, mode:%08x\n", iFileName, size, compression);
+					else if (iExecutable)
+						Print(ELog,"Executable File '%s' size: %08x\n", iFileName, size);
+					else
+						Print(ELog,"File '%s' size: %08x\n", iFileName, size);
+					iRealFileSize = size;	// required later when directory is written
+
+					return size;
 				}
-  			#if defined(__TOOLS2__) && defined (_STLP_THREADS)
-  			ostrstream os((char*)aDest, aMaxSize,(ios::out+ios::binary));
-  			#elif __TOOLS2__
-			ostrstream os((char*)aDest, aMaxSize, (std::_Ios_Openmode)(ios::out+ios::binary));
-			#else
-			ostrstream os((char*)aDest, aMaxSize, (ios::out+ios::binary));
-			#endif
+			}
+
+#if defined(__TOOLS2__) && defined (_STLP_THREADS)
+			ostrstream os((char*)aDest, aMaxSize,(ios_base::out+ios_base::binary));
+#elif __TOOLS2__
+			ostrstream os((char*)aDest, aMaxSize, (_Ios_Openmode)(ios_base::out+ios_base::binary));
+#else
+			ostrstream os((char*)aDest, aMaxSize, (ios_base::out+ios_base::binary));
+#endif
 			os << f;
 			size = os.pcount();
+
+			//save the decompressed/recompressed executable into the cache if it's enabled.
+			if(gCache && !gDriveImage && !(iRomNode->iAlias) && (iRomNode->iEntry->iExecutable) && !(iRomNode->iOverride & KOverrideDllData))
+			{
+				CacheEntry* newentryref = new (nothrow) CacheEntry();
+				if(newentryref)
+				{
+					boost::filesystem::path originalfilepath(iFileName);
+					time_t originalcreationtime = last_write_time(originalfilepath);
+					newentryref->SetOriginalFileCreateTime(&originalcreationtime);
+					newentryref->SetOriginalFileCompression(f.iHdr->CompressionType());
+					size_t len = strlen(iFileName) + 1;					
+					char* originalfilename = (char*)_alloca(len);
+					memcpy(originalfilename,iFileName,len);
+					CacheManager::GetInstance()->NormalizeFilename(originalfilename);
+					newentryref->SetOriginalFilename(originalfilename); 
+					newentryref->SetCachedFileCompression(compression);
+					string cachedfilename(".rofs.");
+					cachedfilename += newentryref->GetCachedFileCompressionID();
+					cachedfilename += ".";
+					cachedfilename += iFileName;
+					size_t slashpos;
+					while(((slashpos=cachedfilename.find("/"))!=string::npos) || ((slashpos=cachedfilename.find("\\"))!=string::npos))
+						cachedfilename.replace(slashpos, 1, 1, '.');
+					cachedfilename.insert(0, "/");
+					cachedfilename.insert(0, CacheManager::GetInstance()->GetCacheRoot());
+					newentryref->SetCachedFilename(cachedfilename.c_str());
+					newentryref->SetCachedFileBuffer((char*)aDest, size);
+					try
+					{
+						size_t len = strlen(iFileName) + 1;
+						char* temp = (char*)_alloca(len);
+						memcpy(temp,iFileName,len);
+						CacheManager::GetInstance()->Invalidate(temp, newentryref); 
+					}
+					catch (CacheException ce)
+					{
+						Print(EWarning, "Cache brings up an exception (%s) when processes %s\r\n", ce.GetErrorMessage(), iFileName);
+					}
+				}
+			}
+
 			compression = f.iHdr->CompressionType();
 			memcpy(&iUids[0], aDest, sizeof(iUids));
-			}
 		}
+	}
 	if (!executable)
-		{
+	{
 		if ( size > aMaxSize )
-			{
+		{
 			Print(EError, "Can't fit '%s' in image\n", iFileName);
 			Print(EError, "Overflowed by approximately 0x%x bytes.\n", size - aMaxSize);
 			exit(667);
-			}
-		size = HFile::Read((TText*)iFileName, (TAny *)aDest);
-                TUint32 Uidslen = (size > sizeof(iUids)) ? sizeof(iUids) : size;
-                memcpy(&iUids[0], aDest, Uidslen);
 		}
+		size = HFile::Read(iFileName, (TAny *)aDest);
+		TUint32 Uidslen = (size > sizeof(iUids)) ? sizeof(iUids) : size;
+		memcpy(&iUids[0], aDest, Uidslen);
+	}
 
 	if (compression)
 		Print(ELog,"Compressed executable File '%s' size: %08x, mode:%08x\n", iFileName, size, compression);
@@ -1274,10 +1193,11 @@ TInt TRomBuilderEntry::PlaceFile( TUint8* &aDest,TUint aMaxSize, CBytePair *aBPE
 		Print(ELog,"Executable File '%s' size: %08x\n", iFileName, size);
 	else
 		Print(ELog,"File '%s' size: %08x\n", iFileName, size);
+	iCompressEnabled = compression;
 	iRealFileSize = size;	// required later when directory is written
-	
+
 	return size;
-	}
+}
 
 
 TRomNode* TRomNode::CopyDirectory(TRomNode*& aLastExecutable)
@@ -1323,7 +1243,7 @@ void TRomNode::Clone(TRomNode* aOriginal)
 void TRomNode::Alias(TRomNode* aNode)
 	{
 	  // sanity checking
-	if (aNode->iEntry == 0) 
+	if (aNode->iEntry == 0)
 	{
 		Print(EError, "Aliasing: TRomNode structure corrupted\n");
 		exit(666);
@@ -1338,19 +1258,19 @@ void TRomNode::Alias(TRomNode* aNode)
 	}
 
 
-void TRomNode::Rename(TRomNode *aOldParent, TRomNode* aNewParent, TText* aNewName)
-	{
+void TRomNode::Rename(TRomNode *aOldParent, TRomNode* aNewParent, const char* aNewName) {
 	aOldParent->Remove(this);
 	aNewParent->Add(this);
 	delete [] iName;
-	iName = new TText[strlen((const char *)aNewName)+1];
-	strcpy ((char *)iName, (const char *)aNewName);
-	}
+	size_t len = strlen(aNewName)+1;
+	iName = new char[len];
+	memcpy (iName, aNewName,len);
+}
 
 TInt TRomNode::FullNameLength(TBool aIgnoreHiddenAttrib) const
 	{
 	TInt l = 0;
-	// aIgnoreHiddenAttrib is used to find the complete file name length as 
+	// aIgnoreHiddenAttrib is used to find the complete file name length as
 	// in ROM of a hidden file.
 	if (iParent && ( !iHidden || aIgnoreHiddenAttrib))
 		l = iParent->FullNameLength() + 1;
@@ -1391,7 +1311,7 @@ DllDataEntry *TRomBuilderEntry::GetFirstDllDataEntry() const
 // Fuction to set first node in the patchdata linked list
 void TRomBuilderEntry::SetFirstDllDataEntry(DllDataEntry *aDllDataEntry)
 {
-	iFirstDllDataEntry = aDllDataEntry;	
+	iFirstDllDataEntry = aDllDataEntry;
 }
 void TRomBuilderEntry::DisplaySize(TPrintType aWhere)
 {

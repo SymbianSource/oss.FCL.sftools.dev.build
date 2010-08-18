@@ -1,0 +1,167 @@
+#!perl
+# Copyright (c) 2001-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+# 
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+# 
+# Contributors:
+# 
+# Description:
+# 
+#
+
+use strict;
+use FindBin;
+use lib "$FindBin::Bin";
+use Getopt::Long;
+use IniData;
+use RelData;
+use EnvDb;
+use Utils;
+use CommandController;
+
+
+#
+# Globals.
+#
+
+my $verbose = 0;
+my $iniData = IniData->New();
+my $commandController = CommandController->New($iniData, 'EnvSize');
+my $comp;
+my $ver;
+my $quick;
+my $force;
+my $deltasize = 0;
+
+#
+# Main.
+#
+
+ProcessCommandLine();
+
+my $envdb = EnvDb->Open($iniData, $verbose);
+$ver = $envdb->Version($comp) if (!$ver);
+
+EnvSize();
+
+
+#
+# Subs.
+#
+
+sub ProcessCommandLine {
+  Getopt::Long::Configure ("bundling");
+  my $help;
+  GetOptions("h" => \$help, "v+" => \$verbose, "q" => \$quick, 'f' => \$force, "d" => \$deltasize);
+
+  if ($help) {
+    Usage(0);
+  }
+
+  if ($quick && $deltasize) {
+    die "Error: It is not possible to use the -d and -q flags together\n";
+  }
+
+  $comp = shift @ARGV;
+  unless ($comp) {
+    die "Error: No component name specified\n";
+  }
+  if (scalar @ARGV == 1) {
+    $ver = shift @ARGV;
+  }
+  elsif (!scalar @ARGV == 0) {
+    print "Error: Invalid number of arguments\n";
+    Usage(1);
+  }
+}
+
+sub Usage {
+  my $exitCode = shift;
+
+  Utils::PrintDeathMessage($exitCode, "\nUsage: envsize [options] <component> <version>
+
+options:
+
+-h  help
+-v  verbose output (-vv very verbose)
+-f  (deprecated)
+-q  quick (don't print size of environment)
+-d  delta size (only matching versions)
+  
+Note: It is not possible to use the -q and -d flags together.\n");
+}
+
+sub EnvSize {
+  print "Size of component zips in local archive: ".$envdb->GetReleaseSize($comp, $ver)." bytes\n";
+  print "Size of whole environment zips in local archive: ".$envdb->GetEnvironmentSize($comp, $ver, 0)." bytes\n" if (!$quick && !$deltasize);
+  print "Size of environment zips in local archive that match the requested version: ".$envdb->GetEnvironmentSize($comp, $ver, $deltasize)." bytes\n" if (!$quick && $deltasize);
+}
+
+__END__
+
+=head1 NAME
+
+EnvSize - Prints the size of the zip files of the component and its environment.
+
+=head1 SYNOPSIS
+
+  envsize [options] component [version]
+
+options:
+
+  -h  help
+  -v  verbose output (-vv very verbose)
+  -q  quick; only print the size of the component, not its environment
+  -d  delta size; only includes components that match the requested version
+
+Note: It is not possible to use the C<-q> and C<-d> flags together.
+
+=head1 DESCRIPTION
+
+Adds up the size of the zip files of the component. The result is printed,
+in bytes.
+
+Unless you specify the C<-q> flag, it also adds up the sizes of all the
+components that make up its environment, and prints that. (This, of course,
+includes the component you specify).
+
+If you specify the C<-d> flag it will add up the sizes of all the components in
+the archive that match the version number specified.  This is useful if when you
+create an environment you use the same version number for all new components,
+you can see the size taken up by the components released in the new
+environment, and not components which have been re-used.
+
+The first item of information is also shown in the output of C<viewnotes>.
+
+=head1 STATUS
+
+Supported. If you find a problem, please report it to us.
+
+=head1 KNOWN BUGS
+
+None.
+
+=head1 COPYRIGHT
+
+ Copyright (c) 2001-2009 Nokia Corporation and/or its subsidiary(-ies).
+ All rights reserved.
+ This component and the accompanying materials are made available
+ under the terms of the License "Eclipse Public License v1.0"
+ which accompanies this distribution, and is available
+ at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ 
+ Initial Contributors:
+ Nokia Corporation - initial contribution.
+ 
+ Contributors:
+ 
+ Description:
+ 
+
+=cut

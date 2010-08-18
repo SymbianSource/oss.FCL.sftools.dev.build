@@ -9,6 +9,7 @@
 		<param name='CONFIGS' default=''/>
 		<param name='CLI_OPTIONS' default=''/>
 		<param name='NO_BUILD' default='' />
+		<param name='DOEXPORT' default='1' />
 	</interface>
 
 </build>

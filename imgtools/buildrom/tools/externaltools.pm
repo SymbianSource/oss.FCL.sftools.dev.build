@@ -25,14 +25,9 @@ require Exporter;
 		
 );
 
-use Modload; # Dynamically loads the module
+use flexmodload; # Dynamically loads the module
+use IPC::Open3;
 my %invocations; # Indexed by invocation name;
-
-#Set the Module path to load perl modules
-{
-	my $epocToolsPath = $ENV{EPOCROOT}."epoc32\\tools\\";
-	Load_SetModulePath($epocToolsPath);
-}
 
 # Get all the external tool perl module files to load them
 sub loadTools{
@@ -46,9 +41,15 @@ sub loadTools{
 		}
 		my $toolName = $1;
 		my $toolCmdLine = $3;
-		&Load_ModuleL($toolName);
-		my $toolDetailsMap = $toolName.'::' . $toolName.'_info';
-		update(&$toolDetailsMap, $toolCmdLine);
+		if($toolName =~ /configpaging/i){			 
+			my %info = (name=>"configpaging", args=>$toolCmdLine ); 
+			push @{$invocations{"invocationpoint2"}}, \%info;
+		}else{
+			&FlexLoad_ModuleL($toolName);
+			my $toolDetailsMap = $toolName.'::' . $toolName.'_info';
+			update(&$toolDetailsMap, $toolCmdLine);
+		}
+		
 	}
 }
 
@@ -84,12 +85,35 @@ sub update
 # Called between the buildrom stage to invoke single or multiple invocation
 sub runExternalTool {
 	
-	my ($stageName,$OBYData) = @_;
+	my ($stageName,$OBYData,$workdir) = @_;
 	$stageName = lc $stageName;
 	my @toolInfoList =  @{$invocations{$stageName}}; # Collect Tools with respect to its stagename.
 	
 	foreach my $tool (@toolInfoList) { # Traverse for the tools
+		if($tool->{name} eq "configpaging"){
+			my $pid ; 
+			my $args = $tool->{args};
+			my $outputoby = $workdir."cfgp_out.oby";
+			open CONFIG, "| configpaging $args >$outputoby" or die "* Can't execute configpaging";
+	
+			foreach (@$OBYData){
+				chomp ;
+				print CONFIG $_."\n";				 		
+			} 
+			print CONFIG ":q\n";  #terminate the program
 
+			close CONFIG;
+	
+			my $config_status = $?;
+			die "* configpaging failed\n" if ($config_status != 0 || !-f "$outputoby");
+
+			if(open(INTF,"$outputoby")){
+				@$OBYData = <INTF>;
+				close INTF;
+			}			
+			unlink("$outputoby") or die "cannot delete $outputoby";	
+			next ;
+		}
 		if (exists($tool->{single})) {#Check if single invocation exists
 			if (defined ($OBYData)) {
 				invoke_single($OBYData, $tool);

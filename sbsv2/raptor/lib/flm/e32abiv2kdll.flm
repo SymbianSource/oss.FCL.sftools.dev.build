@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -27,11 +27,7 @@ DOPOSTLINK:=1
 
 # Determine what kind of entrypoint option to set
 LINKER_ENTRYPOINT_LIBDEP:=$(STATIC_RUNTIME_DIR)/ekll.lib
-LINKER_ENTRYPOINT_SETTING:=$(LINKER_ENTRY_OPTION) _E32Dll $(LINKER_ENTRYPOINT_DECORATION) $(call dblquote,$(STATIC_RUNTIME_DIR)/ekll.lib$(LINKER_ENTRYPOINT_ADORNMENT))
-
-ifeq ("$(NEED_ENTRYPOINT_LIBRARY)","True")
-LINKER_ENTRYPOINT_SETTING:=$(LINKER_ENTRYPOINT_SETTING) $(LINKER_ENTRYPOINT_LIBDEP)
-endif
+LINKER_ENTRYPOINT_SETTING:=$(LINKER_ENTRYPOINT_PREFIX)$(ENTRYPOINT) $(LINKER_ENTRYPOINT_DECORATION)$(LINKER_SEPARATOR)$(call dblquote,$(STATIC_RUNTIME_DIR)/ekll.lib$(LINKER_ENTRYPOINT_ADORNMENT))
 
 LINKER_STUB_LIBRARY:=$(STATIC_RUNTIME_DIR)/edllstub.lib
 STATIC_RUNTIME_LIB:=$(KERNEL_STATIC_RUNTIME_LIB)
@@ -48,6 +44,7 @@ ifeq ($(NOEXPORTLIBRARY),)
 IMPORTLIBRARYREQUIRED:=1
 endif
 POSTLINKDEFFILE:=$(DEFFILE)
+SUPPORT_FREEZE:=1
 
 # No exception support for kernel code?
 EXCEPTIONS:=$(NO_EXCEPTIONS)

@@ -1,0 +1,5 @@
+component	fixer
+source	fixer.mrp
+source	/prefix/soUrce/DIStribuTION.poliCY
+source	\prefix\soUrce\missing\unowned
+notes_source	dummy

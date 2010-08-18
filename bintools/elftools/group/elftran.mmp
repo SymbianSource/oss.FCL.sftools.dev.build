@@ -31,19 +31,19 @@ sourcepath      ../../../imgtools/imglib/host
 source          h_file.cpp h_mem.cpp h_utl.cpp
 
 userinclude     ../inc
-userinclude     ../../../e32tools/e32lib/e32image/inc
+userinclude     ../../../imgtools/imglib/e32image
+userinclude     ../../../imgtools/imglib/compress
+userinclude     ../../../imgtools/imglib/inc
 
-systeminclude   ../../../e32tools/e32lib/e32image/inc
-
-sourcepath      ../../../e32tools/e32lib/e32image
+sourcepath      ../../../imgtools/imglib/e32image
 source          e32image.cpp tr_main.cpp imgdump.cpp
 
-sourcepath      ../../../e32tools/e32lib/e32image/deflate
+sourcepath      ../../../imgtools/imglib/e32image/deflate
 source          decode.cpp encode.cpp deflate.cpp inflate.cpp panic.cpp compress.cpp
 
 sourcepath      ../../../imgtools/imglib/compress
 source          byte_pair.cpp pagedCompress.cpp
 
-systeminclude   ../inc /epoc32/include ../../../imgtools/imglib/compress /epoc32/include/tools/
+OS_LAYER_SYSTEMINCLUDE_SYMBIAN
 
 VENDORID        0x70000001

@@ -20,19 +20,10 @@ no strict 'vars';
 use English;
 use FindBin;		# for FindBin::Bin
 
-my $PerlLibPath;    # fully qualified pathname of the directory containing our Perl modules
-
-BEGIN {
-    # check user has a version of perl that will cope require 5.005_03;
-    # establish the path to the Perl libraries: currently the same directory as this script
-    $PerlLibPath = $FindBin::Bin; # X:/epoc32/tools
-    $PerlLibPath =~ s/\//\\/g;	# X:\epoc32\tools
-    $PerlLibPath .= "\\";
-}
-
-use lib $PerlLibPath;
-use Modload;
-Load_SetModulePath($PerlLibPath);
+# Version
+my $MajorVersion = 1;
+my $MinorVersion = 1;
+my $PatchVersion = 0;
 
 # Globals
 my $maksym = "";
@@ -351,7 +342,7 @@ sub args
     while (@ARGV) {
 	$arg = shift @ARGV;
 
-	if ($arg=~/^[\-\/](\S*)$/) {
+	if ($arg=~/^[\-](\S*)$/) {
 	    $flag=$1;
 
 	    if ($flag=~/^[\?h]$/i) {
@@ -385,9 +376,7 @@ sub help ()
 {
     my $build;
 
-    &Load_ModuleL('E32TPVER');
-    print "\nmaksym - Produce symbolic information given a ROM image (Build ",
-	&E32tpver, ")\n";
+    print "\nmaksym - Produce symbolic information given a ROM image V${MajorVersion}.${MinorVersion}.${PatchVersion}\n";
     &usage;
     exit 0;
 }

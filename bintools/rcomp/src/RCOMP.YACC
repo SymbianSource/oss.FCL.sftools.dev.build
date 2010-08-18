@@ -35,7 +35,9 @@ using std::endl;
 #pragma warning( disable : 4244 ) // C4244: '=' : conversion from 'int' to 'short', possible loss of data
 #endif //__VC32__
 
-#include "resource.h"
+//#include "resource.h"
+//#include "parser.h"
+#include "RESOURCE.H"
 #include "parser.h"
 
 int yylex();
@@ -677,7 +679,7 @@ string_expression_item:
 
 	    if (pG->EnumValues.IsStored($1))
 			{
-			sprintf($$, "%d", pG->EnumValues.FindId($1));
+			sprintf($$, "%d", (int)(pG->EnumValues.FindId($1)));
 			}
 		else if (pG->RlsNameIndex.count($1)) // if rls item has already been defined
 			{

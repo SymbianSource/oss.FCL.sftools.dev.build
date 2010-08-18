@@ -19,10 +19,6 @@
 #ifndef __R_COREIMAGE_H__
 #define __R_COREIMAGE_H__
 
-#include <string>
-
-typedef std::string String;
-typedef std::ifstream Ifstream;
 
 #include "r_mromimage.h"
 #include "r_coreimagereader.h"
@@ -40,7 +36,7 @@ class CoreRomImage : public MRomImage
 {
 private:
 	CoreRomImageReader* iReader;
-	String iFileName;
+	string iFileName;
 
 	TRomHeader *iRomHdr;
 	// Directory Structure
@@ -53,24 +49,24 @@ private:
 	TUint32 iDataRunAddress;
 
 public:
-	CoreRomImage(char* aFileName);
-	~CoreRomImage();
+	CoreRomImage(const char* aFileName);
+	virtual ~CoreRomImage();
 
 	TBool ProcessImage(TBool aUseMemMap = EFalse);
 	TRomNode* CopyDirectory(TRomNode*& aSourceDirectory);
 
-	TRomNode* RootDirectory();
-	TText* RomFileName();
-	TUint32 RomBase();
-	TUint32 RomSize();
-	TVersion Version();
-	TInt64 Time();
-	TUint32 CheckSum();
-	TUint32 RomAlign();
-	TUint32 DataRunAddress();
-	TUint32 CompressionType();
-	TInt32 VariantCount();
-	THardwareVariant* VariantList();
+	TRomNode* RootDirectory() const ;
+	const char* RomFileName() const ;
+	TUint32 RomBase() const ;
+	TUint32 RomSize() const ;
+	TVersion Version() const ;
+	TInt64 Time() const ;
+	TUint32 CheckSum() const ;
+	TUint32 RomAlign() const ;
+	TUint32 DataRunAddress() const ;
+	TUint32 CompressionType() const ;
+	TInt32 VariantCount() const ;
+	THardwareVariant* VariantList() const ;
 	void SetRomAlign(const TUint32 aAlign);
 	void SetDataRunAddress(const TUint32 aRunAddress);
 

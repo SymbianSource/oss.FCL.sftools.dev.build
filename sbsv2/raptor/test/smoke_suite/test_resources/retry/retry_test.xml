@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<build xmlns="http://symbian.com/xml/build" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symbian.com/xml/build ../../../schema/build/2_0.xsd">
+	<!-- utility interfaces : handy FLMs for simple things -->
+
+	<interface name="retry.test" extends="base.flm" flm="retry_test.flm">
+		<param name='EPOCROOT'/>
+		<param name='FAILURES'/>
+		<param name='COUNTER'/>
+	</interface>
+
+</build>

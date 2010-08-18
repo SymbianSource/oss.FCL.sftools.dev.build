@@ -1,0 +1,5 @@
+# Kicks off the Terminal Filter refiltering for use with terminal_filter_tests.py 
+
+export PYTHONPATH=$SBS_HOME/python:$SBS_HOME/python/plugins
+
+python $SBS_HOME/test/smoke_suite/test_resources/refilter/testfilterterminal.py

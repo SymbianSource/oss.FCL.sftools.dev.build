@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+* Copyright (c) 2010 Nokia Corporation and/or its subsidiary(-ies).
 * All rights reserved.
 * This component and the accompanying materials are made available
 * under the terms of the License "Eclipse Public License v1.0"
@@ -15,6 +15,8 @@
 *
 */
 
+PRJ_PLATFORMS
+TOOLS2
 
 /**
 @file
@@ -26,7 +28,6 @@ PRJ_EXPORTS
 
 ../tools/buildrom.pl		/epoc32/tools/buildrom.pl
 ../tools/buildrom.pm		/epoc32/tools/buildrom.pm
-../tools/buildrom.cmd		/epoc32/tools/buildrom.cmd
 ../tools/cdfparser.pm		/epoc32/tools/cdfparser.pm
 ../tools/datadriveimage.pm	/epoc32/tools/datadriveimage.pm
 ../tools/Dep_Lister.pm		/epoc32/tools/dep_lister.pm
@@ -38,8 +39,14 @@ PRJ_EXPORTS
 ../tools/spitool.pl		/epoc32/tools/spitool.pl
 ../tools/CONVERT.PL		/epoc32/rom/tools/
 ../tools/CODESIZE.PL		/epoc32/rom/tools/
-../tools/configpaging.pm	/epoc32/tools/configpaging.pm
 ../tools/efficient_rom_paging.pm /epoc32/tools/efficient_rom_paging.pm
+../tools/flexmodload.pm  /epoc32/tools/flexmodload.pm
+../tools/romutl.pm  /epoc32/tools/romutl.pm
+../tools/romosvariant.pm  /epoc32/tools/romosvariant.pm
+../tools/checkincludeslash.pl  /epoc32/tools/checkincludeslash.pl
+../tools/checkepocroot.pl  /epoc32/tools/checkepocroot.pl
+../tools/directory.bat  /epoc32/tools/directory.bat
+
 
 //
 // Files for Enhanced Feature Manager Support
@@ -50,11 +57,24 @@ PRJ_EXPORTS
 ../tools/featurefile.pm		/epoc32/tools/featurefile.pm
 ../tools/featurecfg.pm		/epoc32/tools/featurecfg.pm
 ../tools/featuresdat.pm		/epoc32/tools/featuresdat.pm
-../tools/features.cmd		/epoc32/tools/features.cmd
 ../tools/features.pl		/epoc32/tools/features.pl
 ../tools/features.pm		/epoc32/tools/features.pm
 
+#ifndef TOOLS2_LINUX 
+../tools/features.cmd		/epoc32/tools/features.cmd
+../tools/buildrom.cmd		/epoc32/tools/buildrom.cmd
 // backwards compatibility for buildrom commandlines...
+../tools/buildrom.cmd		/epoc32/rom/tools/buildrom.cmd
+#else
+../tools/features		/epoc32/tools/features
+../tools/buildrom		/epoc32/tools/buildrom
+// backwards compatibility for buildrom commandlines...
+../tools/buildrom		/epoc32/rom/tools/buildrom
+#endif
 
-../tools/buildrom.cmd		/epoc32/rom/tools/
+PRJ_MMPFILES
+configpaging
+charsettran
 
+
+ 

@@ -20,7 +20,7 @@ package featurefile;
 
 # Include Module package
 use FileHandle;
-use WRITER;
+use romutl;
 
 use strict;
 
@@ -181,7 +181,7 @@ sub write2File
 	my $object = shift;
 	my $bytes = shift;
 
-	&WRITER::write32($object->{_FILEHANDLE}, $bytes);
+	write_32bit($object->{_FILEHANDLE}, $bytes);
 }
 
 1;

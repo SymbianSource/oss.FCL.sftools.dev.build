@@ -1,0 +1,32 @@
+GT 0063 Emulation Enhancements
+
+1. EPOCROOT check in E32env.PM
+
+Changed from static data to an active BEGIN{} section which tests the EPOCROOT
+environment variable and constructs the rest of the E32env::Data hash accordingly.
+
+EPOCROOT checking is:
+
+ - environment variable must exist
+ - EPOCROOT must begin with \
+ - EPOCROOT must specify an existing directory
+
+Most clients are expected to use $E32Env::Data{EPOCPath} as the raw "epoc32" directory.
+
+
+2. Path_MakeEAbs in PATHUTL.PM
+
+Variant of Path_MakeAbs.
+Path_MakeEAbs takes (EPOCPath, BasePath, ...) and makes the list of directories into 
+absolute paths relative to BasePath. The extra functionality is that paths beginning
+
+	+\...
+
+are treated as paths relative to EPOCPath rather than BasePath. 
+
+As a regression change, this change also extends to paths which begin \epoc32\, which 
+copes with the large number of existing absolute \epoc32 paths (e.g. SYSTEMINCLUDE 
+statements in MMP files). 
+
+Path_MakeEAbs is used in MMP.PM to handle SYSTEMINCLUDE, DEFFILE and USERINCLUDE
+statements, and in BLDMAKE.PL to handle PRJ_EXPORTS and PRJ_TESTEXPORTS.

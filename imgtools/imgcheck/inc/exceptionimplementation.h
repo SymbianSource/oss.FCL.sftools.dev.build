@@ -23,7 +23,7 @@
 
 #include "common.h"
 
-typedef std::map<int,String> IndexVsMessageMap;
+typedef map<int,string> IndexVsMessageMap;
 const unsigned int KMAXWARNINGSORERROR = 100;
 
 /**
@@ -105,9 +105,9 @@ class ExceptionImplementation
 public:
 	static ExceptionImplementation* Instance(unsigned int aCmdFlag);
 	static void DeleteInstance(void);
-	String& Message(int aMsgIndex);
-	void Log(const String aMsg);
-	void Report(const String aMsg);
+	string& Message(int aMsgIndex);
+	void Log(const string aMsg);
+	void Report(const string aMsg);
 	
 private:
 	ofstream iLogStream;

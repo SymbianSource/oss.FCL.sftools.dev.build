@@ -39,14 +39,12 @@ class PEFile
 public:
 	PEFile();
 	~PEFile();
-	TBool Init(const TText * const aFileName);
+	TBool Init(const char* aFileName);
 	void Close();
 	//
-	TImportStat GetNextImport(TText * &aDllName, TUint16 &aOrdinal, TUint32 * &aThunkPtr);
+	TImportStat GetNextImport(char * &aDllName, TUint16 &aOrdinal, TUint32 * &aThunkPtr);
 	TUint32 GetFixUp(const TUint16 aOrdinal);
-// 	TText *GetImageName();
-//	TUint8 *GetExportName(const TUint16 aOrdinal);
-//	TUint32 WriteDllRefTable(PEFile aPeArray[], TUint aMaxFiles);
+
 	void RelocateExportTable();
 	TUint GetNumberOfExportedFunctions();
 	TUint GetOrdinalBase();
@@ -71,11 +69,7 @@ public:
 	TUint DistanceFromSection(TUint aVA, PIMAGE_SECTION_HEADER aHeader);
 	TInt FindSectionByVa(TUint aVa, TUint aTryToBeClever=0);
 	static TInt HasInitialisedData(PIMAGE_SECTION_HEADER aHeader);
-	
-//	static TBool DoFixUps(PEFile aPeArray[], TUint aMaxFiles);
-//	static TBool FindByName(PEFile aPeArray[], TUint aMaxFiles,const TText * const aDllName, PEFile * &aExportPEFile);
-//	static void WriteDllRefTables(PEFile aPeArray[], TUint aMaxFiles);
-//	static void RelocateExportTables(PEFile aPeArray[], TUint aMaxFiles);
+ 
 private:
 	TBool IsInCode(TUint32 anAddr);
 	TBool IsInData(TUint32 anAddr);
@@ -112,7 +106,7 @@ private:
 	IMAGE_NT_HEADERS *iHeader;
  	PIMAGE_EXPORT_DIRECTORY	iExpDirectory;
 	PIMAGE_IMPORT_DESCRIPTOR iImpDescriptor; 
-	TText *iFileName;
+	char *iFileName;
 	TInt32 iFileHandle;
 	TUint32 iLinkedBase;
 	TUint32 iStartOfHeaders; // whether DOS header or not

@@ -1,0 +1,5 @@
+PRJ_PLATFORMS
+ARMV5 WINSCW 
+
+PRJ_MMPFILES
+tc_variants.mmp

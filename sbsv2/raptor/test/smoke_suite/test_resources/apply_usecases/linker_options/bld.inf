@@ -1,0 +1,10 @@
+
+PRJ_EXPORTS
+../apply_test_usecases_variants.xml /epoc32/tools/makefile_templates/
+
+PRJ_PLATFORMS
+TOOLS2
+
+PRJ_MMPFILES
+test_apply_linkeroptions.mmp
+

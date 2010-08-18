@@ -1,3 +1,4 @@
+#!/usr/bin/perl
 #
 # Copyright (c) 2004-2009 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
@@ -18,8 +19,12 @@
 # example:
 # perl -w CONVERT.PL # echo the language code for french is #french#
 
+use romutl;
+
+my $include_path=&get_epocroot."epoc32\/include\/";
 $conversionDelimiter=shift;
-open(E32STD_H, "< \\epoc32\\include\\E32STD.H") or die "\\epoc32\\include\\E32STD.H could not be opened";
+
+open(E32STD_H, "< ${include_path}E32STD.H") or die "${include_path}E32STD.H could not be opened";
 while ($line=<E32STD_H>)
 	{
 	if ($line=~/\benum\s+TLanguage\b(.*)$/)
@@ -72,7 +77,7 @@ for ($i=$#ARGV; $i>=0; --$i)
 		$bitBefore=$1;
 		$languageNameInLowerCase=lc $2;
 		$bitAfter=$3;
-		defined $languageData{$languageNameInLowerCase} or die "The language \"$languageNameInLowerCase\" is not defined in \\epoc32\\include\\E32STD.H";
+		defined $languageData{$languageNameInLowerCase} or die "The language \"$languageNameInLowerCase\" is not defined in \/epoc32\/include\/E32STD.H";
 		$ARGV[$i]=sprintf("$bitBefore%02d$bitAfter", $languageData{$languageNameInLowerCase});
 		}
 	}

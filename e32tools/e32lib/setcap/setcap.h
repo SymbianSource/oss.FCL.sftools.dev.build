@@ -17,8 +17,11 @@
 
 #ifndef __SETCAP_H__
 // We need to build for both TOOLS2 and TOOLS for the moment
-#if !defined(__TOOLS2_LINUX__)
+#ifdef WIN32
 #include <e32wins.h>
+#ifdef _STLP_INTERNAL_WINDOWS_H
+#define __INTERLOCKED_DECLARED
+#endif
 #include <emulator.h>
 #endif
 #include <stdlib.h>

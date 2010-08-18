@@ -34,8 +34,8 @@ Base class to read and process the image(ROFS/ROM/E32)
 class ImageReader
 {
 protected:
-	String	iImgFileName;
-	Ifstream iInputStream;
+	string	iImgFileName;
+	ifstream iInputStream;
 	StringList iExecutableList;
 	StringList iHiddenExeList;
 	unsigned int iImageSize;
@@ -55,8 +55,8 @@ public:
     
 	const StringList& GetExecutableList(void) const;
 	const StringList& GetHiddenExeList(void) const;
-	String& ImageName(void);
-	static EImageType ReadImageType(const String aImageName);
+	const char* ImageName(void) const ;
+	static EImageType ReadImageType(const string aImageName);
 	bool ExecutableAvailable(void);
 };
 

@@ -5,12 +5,14 @@
 		<param name='ALWAYS_BUILD_AS_ARM' default=''/>
 		<param name='SET_ARMINC' default=''/>
 		<param name='ARMLIBS' default=''/>
-		<param name='ARMFPU' default='softvfp'/>
-		<param name='POSTLINKFPU' default='softvfp'/>
+		<param name='ARMFPU' default=''/>
 		<param name='ARMRT' default=''/>
+		<param name='BYTEPAIRCOMPRESSTARGET' default=''/>
 		<param name='TESTPATH' default=''/>
 		<param name='CAPABILITY'/>
+		<param name='COMPRESSTARGET' default=''/>
 		<param name='CPPONLYOPTION' default='-E'/>
+		<param name='DOCUMENT' default=''/>
 		<param name='LIBRARY'/>
 		<param name='LIBRARY_DEBUG'/>
 		<param name='LINKAS' default=''/>
@@ -20,10 +22,12 @@
 		<param name='EXPORTUNFROZEN' default=''/>
 		<param name='FEEDBACK_OPTION' default='--feedback=' />
 		<param name='FIRSTLIB' default=''/>
+		<param name='INFLATECOMPRESSTARGET' default=''/>
 		<param name='LINKEROPTION_ARMCC' default=''/>
 		<param name='LISTING_OPTION' default='-S'/>
 		<param name='MMPDEFS' default=''/>
 		<param name='NOCOMPRESSTARGET' default=''/>
+		<param name='POSTLINKER_SUPPORTS_ASMTYPE' default=''/>
 		<param name='POSTLINKER_SUPPORTS_WDP' default=''/>
 		<param name='PAGED' default=''/>
 		<param name='PAGEDCODE_OPTION' default='default'/>
@@ -38,6 +42,7 @@
 		<param name='SOURCE' default=''/>
 		<param name='TARGET'/>
 		<param name='TARGET_lower'/>
+		<param name='TARGETPATH' default=''/>
 		<param name='LTCG' default=''/>
 		<param name='LTCG_OPTION' default='--ltcg'/>
 		<param name='TARGETTYPE'/>
@@ -58,9 +63,9 @@
 		<param name='EPOCSTACKSIZE' default=''/>
 		<param name='EPOCFIXEDPROCESS' default=''/>
 		<param name='EPOCALLOWDLLDATA' default=''/>
+		<param name='EPOCNESTEDEXCEPTIONS' default=''/>
 		<param name='PLATMACROS.WINDOWS' default=''/>
 		<param name='PLATMACROS.LINUX' default=''/>
-		<param name='MAKEDEFFILE' default='1'/>
 		<param name='STDCPP' default=''/>
 		<param name='NOSTDCPP' default=''/>
 		<param name='NEWLIB' default=''/>
@@ -72,9 +77,11 @@
 		<param name='CC.VAL.SOFTVFP_MAYBE_VFPV2' default=''/>
 		<param name='CODE_SEGMENT_START' default=''/>
 		<param name='TOOLCHAIN' default=''/>
-		<param name='TOOLCHAINVERSION' default=''/>
+		<param name='TRACES' default=''/>
+		<param name='USE_RVCT22_DELETE_WORKAROUND' default=''/>
 	</interface>
 	<interface name="Symbian.e32abiv2" extends="Symbian.mmp" flm="e32abiv2.flm">
+		<param name='BASE_ARCH' default=''/>
 		<param name='SUPPORTS_STDCPP_NEWLIB' default='1'/>
 		<param name='HAS_DEDICATED_OP_NEWDEL_LIB' default='1'/>
 		<param name='DEFAULT_STDCPP_NEWLIB'/>
@@ -89,11 +96,12 @@
 		<param name='CC_WARNINGS_CONTROL_OPTION'/>
 		<param name='CDEFS'/>
 		<param name='CIADEFS'/>
-		<param name='CFLAGS'/>
 		<param name='COMMANDFILE_OPTION'/>
 		<param name='COMPILE_ONLY_OPTION'/>
+		<param name='COMPILER_FPU_DEFAULT'/>
+		<param name='COMPILER_FPU_OPTION'/>
+		<param name='COMPILER_NO_HIDE_ALL_OPTION'/>
 		<param name='COMPILER_CIA_FLAGS'/>
-		<param name='COMPILER_FPU_FLAGS'/>
 		<param name='COMPILER_INTERWORK_DEFINES'/>
 		<param name='COMPILER_SYSTEM_INCLUDE_OPTION'/>
 		<param name='COMPILER_THUMB_DEFINES'/>
@@ -104,26 +112,30 @@
 		<param name='CREATEVMAPCPP'/>
 		<param name='DEBUG_FORMAT'/>
 		<param name='DEBUG_INFO'/>
+		<param name='DEFGENTOOL'/>
 		<param name='DEPEND_OPTION'/>
-		<param name='DEPEND_SKIP' default=''/>
-		<param name='ELF2E32'/>
 		<param name='EFREEZE'/>
 		<param name='EFREEZE_REMOVE_OPTION' default=''/>
 		<param name='ENUM_OPTION'/>
+		<param name='ENTRYPOINT' default=''/>
 		<param name='EXCEPTIONS'/>
 		<param name='NO_EXCEPTIONS'/>
 		<param name='EXPORT_VTBL_OPTION'/>
 		<param name='FEATURELISTFILES' default=''/>
 		<param name='FEATUREVARIANT' default=''/>
 		<param name='FEATUREVARIANTNAME' default=''/>
+		<param name='FEATUREVARIANTSAFE' default=''/>
+		<param name='FIX_EXPORTS_USING_EXP_FILE'/>
 		<param name='FPMODE_OPTION'/>
 		<param name='FROMELF'/>
 		<param name='FULLVARIANTPATH'/>
-		<param name='GENERATE_ABIV1_IMPLIBS' default=''/>		
+		<param name='IMPLIBTOOL'/>
+		<param name='IMPLIB_EXTENSION'/>
 		<param name='RVCT3_1' default=''/>
 		<param name='LD'/>
 		<param name='LD_ERRORS_CONTROL_OPTION'/>
 		<param name='LD_WARNINGS_CONTROL_OPTION'/>
+		<param name='LD_WARNINGS_SUPPRESSION_ARMLIBS' default=''/>
 		<param name='LIBPATH'/>
 		<param name='LICENSERETRY_OPTION' default=''/>
 		<param name='LINKER_ADD_STATIC_RUNTIME'/>
@@ -131,6 +143,7 @@
 		<param name='LINKER_DEFAULT_LIBS'/>
 		<param name='LINKER_DEFAULT_LIB_PATHS'/>
 		<param name='LINKER_ENTRY_OPTION'/>
+		<param name='LINKER_ENTRYPOINT_PREFIX'/>
 		<param name='LINKER_GROUP_START_OPTION'/>
 		<param name='LINKER_GROUP_END_OPTION'/>
 		<param name='LINKER_MISC_FLAGS'/>		
@@ -144,13 +157,20 @@
 		<param name='PERL'/>
 		<param name='PERTURBSTARTTIME'/>
 		<param name='PERTURBMSECS' default='500'/>
+		<param name='POSTLINKER'/>
+		<param name='POSTLINKER_ASM_OPTION' default='' />
+		<param name='POSTLINKER_COMPRESSION_DEFAULT'/>
+		<param name='POSTLINKER_FPU_DEFAULT'/>
+		<param name='POSTLINKER_FPU_MAPPING'/>
 		<param name='PREPDEF'/>
+		<param name='PREPDEF_ENTRYPOINT_PREFIX' default='_'/>
 		<param name='PREINCLUDE'/>
 		<param name='PREINCLUDE_OPTION'/>
 		<param name='PREPROCESSOR_OPTION'/>
 		<param name='RANSLEEP'/>
 		<param name='RELEASEPATH'/>
 		<param name='RESOLVED_DEFFILE'/>
+		<param name='RESOLVED_DEFFILE_SECONDARY'/>
 		<param name='RUNTIME_LIBS_LIST'/>
 		<param name='RUNTIME_LIBS_PATH'/>
 		<param name='RUNTIME_SYMBOL_VISIBILITY_OPTION'/>
@@ -158,6 +178,7 @@
 		<param name='RVCTBIN'/>
 		<param name='RVCTINC'/>
 		<param name='RVCTLIB'/>
+		<param name='RW_BASE'/>
 		<param name='RW_BASE_OPTION'/>
 		<param name='SBSV1MAKE'/>
 		<param name='NMAKE'/>
@@ -165,12 +186,15 @@
 		<param name='SHARED_OBJECT_OPTION'/>
 		<param name='SO_NAME_OPTION'/>
 		<param name='SPLIT_OPTION'/>
+		<param name='TREAT_EXES_AS_SHARED'/>		
 		<param name='KERNEL_STATIC_RUNTIME_LIB'/>
 		<param name='USER_STATIC_RUNTIME_LIB'/>
+		<param name='USER_STATIC_RUNTIME_LIB_NESTED_EXCEPTIONS'/>
 		<param name='STATIC_LIBS_LIST'/>
 		<param name='STATIC_LIBS_PATH'/>
 		<param name='STATIC_LIBRARY_DIR'/>
 		<param name='STATIC_RUNTIME_DIR'/>
+		<param name='SUPPORTS_ABIV1_IMPLIBS'/>		
 		<param name='SYMBIAN_CCFLAGS'/>
 		<param name='SYMBIAN_LD_MESSAGE_OPTION'/>
 		<param name='SYMBIAN_LINK_FLAGS'/>
@@ -194,20 +218,29 @@
 		<param name='EXPLICITVERSION' default=''/>
 	</interface>
 	<interface name="Symbian.exe" extends="Symbian.e32abiv2" flm="e32abiv2exe.flm">
+		<param name='ENTRYPOINT' default="E32Startup"/>
 		<param name='TARGETTYPE' default="exe"/>
 		<param name='UID1' default="1000007a"/>
 	</interface>
 	<interface name="Symbian.stdexe" extends="Symbian.e32abiv2" flm="e32abiv2stdexe.flm">
+		<param name='ENTRYPOINT' default="E32Startup"/>
 		<param name='TARGETTYPE' default="stdexe"/>
 		<param name='UID1' default="1000007a"/>
 		<param name='UID2' default="20004c45"/>
 		<param name='WCHARENTRYPOINT' default=""/>
 	</interface>
 	<interface name="Symbian.dll" extends="Symbian.e32abiv2" flm="e32abiv2dll.flm">
+		<param name='ENTRYPOINT' default="E32Dll"/>
 		<param name='TARGETTYPE' default="dll"/>
 		<param name='UID1' default="10000079"/>
 	</interface>
+	<interface name="Symbian.pdll" extends="Symbian.e32abiv2" flm="e32abiv2pdll.flm">
+		<param name='ENTRYPOINT' default="E32Dll"/>
+		<param name='TARGETTYPE' default="pdll"/>
+		<param name='UID1' default="10000079"/>
+	</interface>
 	<interface name="Symbian.stddll" extends="Symbian.e32abiv2" flm="e32abiv2stddll.flm">
+		<param name='ENTRYPOINT' default="E32Dll"/>
 		<param name='TARGETTYPE' default="stddll"/>
 		<param name='UID1' default="10000079"/>
 		<param name='UID2' default="20004c45"/>
@@ -228,6 +261,8 @@
 	<interface name="Symbian.ani" extends="Symbian.dll" flm="e32abiv2ani.flm">
 	</interface>
 	<interface name="Symbian.plugin" extends="Symbian.dll" flm="e32abiv2plugin.flm">
+	</interface>
+	<interface name="Symbian.plugin3" extends="Symbian.dll" flm="e32abiv2plugin.flm">
 	</interface>
 	<interface name="Symbian.textnotifier2" extends="Symbian.dll" flm="e32abiv2textnotifier2.flm">
 	</interface>

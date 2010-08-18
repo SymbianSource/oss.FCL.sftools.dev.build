@@ -12,7 +12,7 @@
 * Contributors:
 *
 * Description: 
-*
+* Test program for grabbing and releasing the talon output semaphore.
 */
 
 

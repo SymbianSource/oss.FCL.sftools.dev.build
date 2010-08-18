@@ -1,3 +1,43 @@
+version 8.4.002
+===============
+Released by Marvin Shi, 10/08/2010
+	1) BUG2173 [RCOMP] - Linux : rcomp -o fails due to too long path 
+	
+version 8.4.001
+===============
+Released by Lorence Wang, 26/04/2010
+	1) DPDEF145375 RCOMP can not parse data passed to its STDIN correctly 
+
+version 8.3.001
+===============
+Released by Zheng Shen, 16/03/2010
+	1) DPDEF145001  RCOMP failed if uidcrc is not located in the same directory as it is
+
+version 8.3.000
+===============
+Released by Zheng Shen, 22/02/2010
+	1) DPDEF144562	Build Tools cannot be built in Linux
+
+version 8.2.008
+===============
+Released by Marvin Shi, 25/01/2010
+	1) DPDEF143586 Add -o2 optimization to rcomp 
+
+version 8.2.007
+===============
+Released by Marvin Shi, 15/01/2010
+	1) DPDEF143836 rcomp produces error messages which should be warning messages 
+
+Version 8.2.006
+===============
+Released by Zheng Shen, 10/12/2009
+	1) DPDEF143045 rcomp produces a warning 'Cannot convert "1.0" 
+
+Version 8.2.005
+===============
+Released by Jason Cui, 31/7/2009 (did not clear build number, should be done by next feature deliery)
+  1) SITK v1.4, GT0499, MS3.5.3, DS.1772 PREQ2471: RIT: Resource compiler (RComp) must support characters outside of the BMP 
+
 Version 8.1.005
 ===============
 Released by KunalM, 06/03/2007

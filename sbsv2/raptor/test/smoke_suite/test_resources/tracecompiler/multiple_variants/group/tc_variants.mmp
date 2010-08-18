@@ -1,0 +1,24 @@
+
+TARGET			tc_variants
+TARGETTYPE		EXE
+
+UID			0x100039ce 0x10000004
+LIBRARY			euser.lib
+SYSTEMINCLUDE		/epoc32/include
+SYSTEMINCLUDE		/epoc32/include/platform
+
+SOURCEPATH		../src
+SOURCE			tc_main.cpp
+#if defined(MACRO_TC_A)
+SOURCE			tc_a.cpp
+#endif
+#if defined(MACRO_TC_B)
+SOURCE			tc_b.cpp
+#endif
+#if defined(MACRO_TC_C)
+SOURCE			tc_c.cpp
+#endif
+
+USERINCLUDE		../traces
+
+featurevariant

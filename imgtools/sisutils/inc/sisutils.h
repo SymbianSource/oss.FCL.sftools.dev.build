@@ -31,6 +31,7 @@
 #include <iomanip>
 #undef _L
 
+
 #include <e32def.h>
 #include <e32cmn.h>
 
@@ -39,10 +40,17 @@
 
 #ifdef WIN32
 #define PATHSEPARATOR  "\\"
+#else // linux
+#define PATHSEPARATOR  "/"
+ 
+//int wcsnicmp(const wchar_t* str1,const wchar_t* str2,size_t n);
+//int wcsicmp(const wchar_t* str1,const wchar_t* str2);
+//int iswdigit(wchar_t ch);
+char *_fullpath( char *absPath, const char *relPath, size_t maxLength );
 #endif
 
-//typedefs
-typedef std::string String;
+ 
+using namespace std ;
 
 /** 
 class SisUtils
@@ -53,7 +61,7 @@ class SisUtils
 class SisUtils
 {
 public:
-	SisUtils(char* aFile);
+	SisUtils(const char* aFile);
 	virtual ~SisUtils();
 
 	void SetVerboseMode();
@@ -61,33 +69,33 @@ public:
 	virtual void ProcessSisFile() = 0;
 	virtual void GenerateOutput() = 0;
 
-	static String iExtractPath;
-	static String iOutputPath;
+	static string iExtractPath;
+	static string iOutputPath;
 
 protected:
 	TBool IsVerboseMode();
-	TBool IsFileExist(String aFile);
-	TBool MakeDirectory(String aPath);
-	String SisFileName();
-	TUint32 RunCommand(String cmd);
-	void TrimQuotes(String& aStr);
+	TBool IsFileExist(string aFile);
+	TBool MakeDirectory(const string& aPath);
+	const char* SisFileName();
+	TUint32 RunCommand(const char* aCmd);
+	void TrimQuotes(string& aStr);
 
 private:
 	TBool iVerboseMode;
-	String iSisFile;
+	string iSisFile;
 };
 
 // SisUtils Exception handler
 class SisUtilsException
 {
 public:
-	SisUtilsException(char* aFile, char* aErrMessage);
+	SisUtilsException(const char* aFile, const char* aErrMessage);
 	virtual ~SisUtilsException();
 	virtual void Report();
 
 private:
-	String iSisFileName;
-	String iErrMessage;
+	string iSisFileName;
+	string iErrMessage;
 };
 
 

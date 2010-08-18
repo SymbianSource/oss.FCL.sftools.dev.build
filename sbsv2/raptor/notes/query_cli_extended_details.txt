@@ -1,0 +1,19 @@
+
+The --query command-line option has been extended to print more detailed
+information about a given configuration.
+
+Querying aliases now prints the list in sorted order, by name attribute.
+Ditto for products.
+
+Querying a configuration now prints the following additional information:
+
+1. include paths used for preprocessing bld.infs and MMPs
+2. pre-include header file for preprocessing bld.infs and MMPs
+3. pre-include header file passed to the compiler in a build (if used)
+4. macros used to preprocess bld.infs and MMPs (with values, if explicitly set)
+5. core macros used in compilation preprocessing (with values, if explicitly set)
+6. available values to use as the targettype in MMPs
+
+Further documentation can be found here:
+
+http://developer.symbian.org/wiki/index.php/Raptor_Query_Reference

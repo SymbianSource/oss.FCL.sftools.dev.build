@@ -33,18 +33,20 @@ extensions and kernel commands in the obey file
 class MRomImage
 {
 public:
-	virtual TRomNode* RootDirectory() = 0;
+	virtual TRomNode* RootDirectory() const = 0 ;
 	virtual TRomNode* CopyDirectory(TRomNode*& aSourceDirectory)=0;
-	virtual TText* RomFileName() = 0;
-	virtual TUint32 RomBase() = 0;
-	virtual TUint32 RomSize() = 0;
-	virtual TVersion Version() = 0;
-	virtual TInt64 Time() = 0;
-	virtual TUint32 CheckSum() = 0;
-	virtual TUint32 DataRunAddress() = 0;
-	virtual TUint32 RomAlign() = 0;
-
+	virtual const char* RomFileName() const = 0 ;
+	virtual TUint32 RomBase() const = 0 ;
+	virtual TUint32 RomSize() const = 0 ;
+	virtual TVersion Version() const = 0 ;
+	virtual TInt64 Time() const = 0 ;
+	virtual TUint32 CheckSum() const  = 0 ;
+	virtual TUint32 DataRunAddress() const = 0 ;
+	virtual TUint32 RomAlign() const = 0 ;
+ 
+#ifdef __LINUX__
 	virtual ~MRomImage() { };
+#endif
 };
 
 #endif //__R_MROMIMAGE_H__

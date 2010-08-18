@@ -1,0 +1,59 @@
+#!/bin/bash
+# Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+#
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+#
+# Contributors:
+#
+# Description:
+# Test Suite execution file for linux
+#
+
+# Ensure that the host type is set for Raptor:
+eval $($SBS_HOME/bin/gethost.sh -e)
+
+if [ -z "$HOSTPLATFORM" ]; then
+	echo "Error: HOSTPLATFORM could not be determined."
+	exit 1
+fi
+
+if [ "$OSTYPE" == "cygwin" ]; then
+
+	SBS_HOME=${SBS_HOME//\\//}
+
+	__CYGWIN__=${SBS_CYGWIN:-$SBS_HOME/$HOSTPLATFORM_DIR/cygwin}
+	__PYTHON__=${SBS_PYTHON:-$SBS_HOME/$HOSTPLATFORM_DIR/python264/python.exe}
+
+	# Unify paths.
+
+	u="$__CYGWIN__/bin/cygpath.exe -m"
+
+	SBS_HOME=$($u "$SBS_HOME")
+	EPOCROOT=$($u "$EPOCROOT")
+
+	__PYTHON__=$($u "$__PYTHON__")
+else
+	LD_LIBRARY_PATH=$SBS_HOME/$HOSTPLATFORM_DIR/bv/lib:$LD_LIBRARY_PATH
+
+	export PATH LD_LIBRARY_PATH
+	__PYTHON__=python
+fi
+
+# Call run_tests.py with the arguments
+TEST_SUITE_PY="$SBS_HOME/test/common/run_tests.py"
+
+if [ -e "$TEST_SUITE_PY" ]; then
+	# run the source version
+	$__PYTHON__ -tt "$TEST_SUITE_PY" "$@"
+elif [ -e "$TEST_SUITE_PY"c ]; then
+	# run the compiled version
+	$__PYTHON__ -tt "$TEST_SUITE_PY"c "$@"
+else
+	echo "Cannot run Test Suite - $TEST_SUITE_PY not found" 1>&2
+fi

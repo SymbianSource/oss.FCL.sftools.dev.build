@@ -4,7 +4,7 @@
 * This component and the accompanying materials are made available
 * under the terms of the License "Eclipse Public License v1.0"
 * which accompanies this distribution, and is available
-* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+* at the URL "http://www.eclipse.org/legal/epl-v10.htm ".
 *
 * Initial Contributors:
 * Nokia Corporation - initial contribution.
@@ -18,32 +18,39 @@
 
 #include "sisutils.h"
 #include "pkgfileparser.h"
+#ifdef __LINUX__ 
+#include <strings.h>
+#define stricmp strcasecmp
+#define strnicmp strncasecmp
+#endif
+#include "utf16string.h"
 
 // Parse options lookups
 #define MAXTOKENLEN	30
 struct SParseToken
 {
-	WCHAR pszOpt[MAXTOKENLEN];
-	DWORD dwOpt;
+	char pszOpt[MAXTOKENLEN];
+	TUint32 dwOpt;
 };
 
 const SParseToken KTokens[] =
 {
-	{L"if",		IF_TOKEN},
-	{L"elseif",	ELSEIF_TOKEN},
-	{L"else",	ELSE_TOKEN},
-	{L"endif",	ENDIF_TOKEN},
-	{L"exists",	EXISTS_TOKEN},
-	{L"devprop",DEVCAP_TOKEN},
-	{L"appcap",	APPCAP_TOKEN},
-	{L"package",DEVCAP_TOKEN},
-	{L"appprop",APPCAP_TOKEN},
-	{L"not",	NOT_TOKEN},
-	{L"and",	AND_TOKEN},
-	{L"or",		OR_TOKEN},
-	{L"type",	TYPE_TOKEN},
-	{L"key",	KEY_TOKEN},
+	{ "if",		IF_TOKEN},
+	{ "elseif",	ELSEIF_TOKEN},
+	{ "else",	ELSE_TOKEN},
+	{ "endif",	ENDIF_TOKEN},
+	{ "exists",	EXISTS_TOKEN},
+	{ "devprop",DEVCAP_TOKEN},
+	{ "appcap",	APPCAP_TOKEN},
+	{ "package",DEVCAP_TOKEN},
+	{ "appprop",APPCAP_TOKEN},
+	{ "not",	NOT_TOKEN},
+	{ "and",	AND_TOKEN},
+	{ "or",		OR_TOKEN},
+	{ "type",	TYPE_TOKEN},
+	{ "key",	KEY_TOKEN},
 };
+
 #define NUMPARSETOKENS (sizeof(KTokens)/sizeof(SParseToken))
 
 /**
@@ -55,8 +62,7 @@ Initilize the parameters to data members.
 
 @param aFile	- Name of the package script file
 */
-PkgParser::PkgParser(String aFile) : iPkgFile(aFile), m_nLineNo(0)
-{
+PkgParser::PkgParser(const string& aFile) : iPkgFileContent(""),iContentPos(0),iContentStr("") ,iPkgFileName(aFile),iToken(EOF_TOKEN) , iLineNumber(0){
 }
 
 /**
@@ -66,14 +72,10 @@ Deallocates the memory for data members
 @internalComponent
 @released
 */
-PkgParser::~PkgParser()
-{
-	if(iPkgHandle != INVALID_HANDLE_VALUE)
-	{
-		::CloseHandle(iPkgHandle);
-	}
-
+PkgParser::~PkgParser() {
+	 
 	DeleteAll();
+	
 }
 
 /**
@@ -82,13 +84,41 @@ OpenFile: Opens the package script file
 @internalComponent
 @released
 */
-int PkgParser::OpenFile()
-{
-	iPkgHandle = ::CreateFileW(string2wstring(iPkgFile).data(),GENERIC_READ,0,NULL,OPEN_EXISTING,FILE_ATTRIBUTE_NORMAL,NULL);
+bool PkgParser::OpenFile() {
 	
-	return (iPkgHandle != INVALID_HANDLE_VALUE) ? 1 : 0;
+	UTF16String str ;
+	if(!str.FromFile(iPkgFileName.c_str()))
+		return false ;
+	
+	if(!str.ToUTF8(iContentStr)) 		 
+		return false ; 
+	 
+	iPkgFileContent = iContentStr.c_str();
+	iContentPos = 0 ;	
+	return true ;
 }
-
+/** 
+ * GetNextChar : iContentStr is a UTF-8 String, of which char is as follows:
+ * 
+ *0000-007F | 0xxxxxxx
+ *0080-07FF | 110xxxxx 10xxxxxx
+ *0800-FFFF | 1110xxxx 10xxxxxx 10xxxxxx
+ * 10000-10FFFF | 11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+ */
+void PkgParser::GetNextChar() {		
+	if(iContentPos < iContentStr.length()){
+		if(0 == (iPkgFileContent[iContentPos] & 0x80))
+			iContentPos++;
+		else if(0xC0 == (iPkgFileContent[iContentPos]  & 0xE0))
+			iContentPos += 2 ;
+		else if(0xE0 == (iPkgFileContent[iContentPos]  & 0xF0))
+			iContentPos += 3 ;
+		else
+			iContentPos += 4 ;
+		if(iContentPos >= iContentStr.length())
+			iContentPos = iContentStr.length() ;
+	} 
+}
 /**
 GetEmbeddedSisList: Returns the embedded sis file list
 
@@ -97,8 +127,7 @@ GetEmbeddedSisList: Returns the embedded sis file list
 
 @param embedSisList	- reference to sis file list structure
 */
-void PkgParser::GetEmbeddedSisList(SISFILE_LIST& embedSisList)
-{
+void PkgParser::GetEmbeddedSisList(SISFILE_LIST& embedSisList) {
 	embedSisList = iEmbedSisFiles;
 }
 
@@ -110,8 +139,7 @@ GetInstallOptions: Returns the install options read from the package file
 
 @param aOptions	- reference to the string list structure
 */
-void PkgParser::GetInstallOptions(FILE_LIST& aOptions)
-{
+void PkgParser::GetInstallOptions(FILE_LIST& aOptions) {
 	aOptions = iInstallOptions;
 }
 
@@ -123,8 +151,7 @@ GetLanguageList: Returns the language list read from the package file
 
 @param langList	- reference to the language list structure
 */
-void PkgParser::GetLanguageList(LANGUAGE_LIST& langList)
-{
+void PkgParser::GetLanguageList(LANGUAGE_LIST& langList){
 	langList = iLangList;
 }
 
@@ -136,8 +163,7 @@ GetHeader: Returns the header details read from the package file
 
 @param pkgHeader	- reference to the package header structure
 */
-void PkgParser::GetHeader(PKG_HEADER& pkgHeader)
-{
+void PkgParser::GetHeader(PKG_HEADER& pkgHeader) {
 	pkgHeader = iPkgHeader;
 }
 
@@ -149,8 +175,7 @@ GetCommandList: Returns the package body details read from the package file
 
 @param cmdList	- reference to the command list structure
 */
-void PkgParser::GetCommandList(CMDBLOCK_LIST& cmdList)
-{
+void PkgParser::GetCommandList(CMDBLOCK_LIST& cmdList) {
 	cmdList = iPkgBlock;
 }
 
@@ -160,23 +185,13 @@ ParsePkgFile: Parses the package file
 @internalComponent
 @released
 */
-void PkgParser::ParsePkgFile()
-{
+void PkgParser::ParsePkgFile() {
 	if(!OpenFile())
-	{
-		throw SisUtilsException((char*)iPkgFile.data(), "Could not open file");
-	}
-
-	GetNextChar();
-
-	// skip unicode marker if present
-	if(m_pkgChar==0xFEFF) GetNextChar();
-
+		throw SisUtilsException(iPkgFileName.c_str(), "Could not open file"); 
 	GetNextToken ();
-	while(m_token!=EOF_TOKEN)
-	{
+	while(iToken!=EOF_TOKEN) {
 		ParseEmbeddedBlockL();
-		switch (m_token)
+		switch (iToken)
 		{
 		case '&':
 			GetNextToken ();
@@ -221,36 +236,35 @@ ParseLanguagesL: Parses the language section
 @internalComponent
 @released
 */
-void PkgParser::ParseLanguagesL()
-{
-	unsigned long langCode = 0;
-	unsigned long dialect = 0;
+void PkgParser::ParseLanguagesL(){
+	TUint32 iLangCode = 0;
+	TUint32 dialect = 0;
 	
-	while (true)
-	{
-		if (m_token==ALPHA_TOKEN)
-		{
-			langCode = PkgLanguage::GetLanguageCode(m_tokenValue.pszString);
+	while (true){
+		if (iToken==ALPHA_TOKEN){
+			iLangCode = GetLanguageCode(iTokenVal.iString);
 		}
-		else if (m_token==NUMERIC_TOKEN && m_tokenValue.dwNumber>=0 && m_tokenValue.dwNumber<=1000)
-		{
-			langCode = (m_tokenValue.dwNumber);
+		else if (iToken==NUMERIC_TOKEN && iTokenVal.iNumber>=0 && iTokenVal.iNumber<=1000)	{
+			iLangCode = (iTokenVal.iNumber);
 		}
 
 		GetNextToken ();
 
 		// Check if a dialect is defined
-		if (m_token == '(')
+		if (iToken == '(')
 		{
 			GetNumericToken();
 			// Modify the last added language code, combining it with dialect code
-			dialect = (m_tokenValue.dwNumber);
+			dialect = (iTokenVal.iNumber);
 			GetNextToken ();
 			GetNextToken ();
 		}
-		AddLanguage(wstring2string(PkgLanguage::GetLanguageName(langCode)), langCode, dialect);
+		const char* temp = GetLanguageName(iLangCode);
+		if(NULL != temp){		 
+			AddLanguage(string(temp), iLangCode, dialect);
+		}
 
-		if (m_token!=',')
+		if (iToken!=',')
 			return;
 		GetNextToken ();
 	}
@@ -263,24 +277,20 @@ ParseHeaderL: Parses the package header section
 @internalComponent
 @released
 */
-void PkgParser::ParseHeaderL()
-{
-	if (!iLangList.size())
-	{
+void PkgParser::ParseHeaderL() {
+	if (!iLangList.size()) {
 		//No languages defined, assuming English."
 		AddLanguage("EN", PkgLanguage::ELangEnglish, 0);
 	}
 	
 	// process application names
 	ExpectToken('{');
-	for (WORD wNumLangs = 0; wNumLangs < iLangList.size(); wNumLangs++)
-	{
+	for (TUint16 wNumLangs = 0; wNumLangs < iLangList.size(); wNumLangs++) 	{
 		GetNextToken ();
 		ExpectToken(QUOTED_STRING_TOKEN);
-		iPkgHeader.pkgNameList.push_back(wstring2string(m_tokenValue.pszString));
+		iPkgHeader.iPkgNames.push_back(string(iTokenVal.iString));
 		GetNextToken ();
-		if (wNumLangs < (iLangList.size()-1) )
-		{
+		if (wNumLangs < (iLangList.size()-1) ) {
 			ExpectToken(',');
 		}
 	}
@@ -293,40 +303,38 @@ void PkgParser::ParseHeaderL()
 	GetNextToken ();
 	
 	ExpectToken(NUMERIC_TOKEN);
-	iPkgHeader.pkgUid = m_tokenValue.dwNumber;
-	GetNextToken ();
-	
-	ExpectToken(')');
-	GetNextToken ();
-	ExpectToken(',');
-	GetNextToken ();
-	
-	ExpectToken(NUMERIC_TOKEN);
-	iPkgHeader.vMajor = m_tokenValue.dwNumber;
+	iPkgHeader.iPkgUID = iTokenVal.iNumber;
+	GetNextToken (); 
+	ExpectToken(')'); 
+
 	GetNextToken ();
 	ExpectToken(',');
 	GetNextToken ();
 	
 	ExpectToken(NUMERIC_TOKEN);
-	iPkgHeader.vMinor = m_tokenValue.dwNumber;
+	iPkgHeader.iMajorVersion = iTokenVal.iNumber;
 	GetNextToken ();
 	ExpectToken(',');
 	GetNextToken ();
 	
 	ExpectToken(NUMERIC_TOKEN);
-	iPkgHeader.vBuild = m_tokenValue.dwNumber;
+	iPkgHeader.iMinorVersion = iTokenVal.iNumber;
+	GetNextToken ();
+	ExpectToken(',');
+	GetNextToken ();
+	
+	ExpectToken(NUMERIC_TOKEN);
+	iPkgHeader.iBuildVersion = iTokenVal.iNumber;
 	GetNextToken ();
 	
 	// Parse any options
-	while (m_token==',')
-	{
+	while (iToken==',') {
 		GetNextToken ();
-		if (m_token==TYPE_TOKEN)
-		{
+		if (iToken==TYPE_TOKEN) {
 			GetNextToken ();
 			ExpectToken('=');
 			GetNextToken ();
-			iPkgHeader.pkgType = wstring2string(m_tokenValue.pszString);
+			iPkgHeader.iPkgType = iTokenVal.iString;
 			GetNextToken ();
 		}
 		else
@@ -340,12 +348,9 @@ ParseEmbeddedBlockL: Parses the package body block
 @internalComponent
 @released
 */
-void PkgParser::ParseEmbeddedBlockL ()
-{
-	while(m_token!=EOF_TOKEN)
-	{
-		switch (m_token)
-		{
+void PkgParser::ParseEmbeddedBlockL () {
+	while(iToken!=EOF_TOKEN) {
+		switch (iToken) {
 		case QUOTED_STRING_TOKEN:
 			ParseFileL ();
 			break;
@@ -380,20 +385,18 @@ ParseFileL: Parses the file list section
 @internalComponent
 @released
 */
-void PkgParser::ParseFileL()
-{
+void PkgParser::ParseFileL() {
 	PCMD_BLOCK pCmdBlock = 0;
 	PINSTALLFILE_LIST pFileList = 0;
 	
-	std::wstring sourceFile (m_tokenValue.pszString);
+	string sourceFile (iTokenVal.iString);
 	
 	// Linux and windows both support forward slashes so if source path is given '\' need to convert
 	// in forward slash for compatibility.
-	wchar_t *pBuffer = (wchar_t*)sourceFile.c_str();
-	wchar_t *pCurrent = pBuffer;
-	while (pBuffer && *pBuffer && (pCurrent = wcschr(pBuffer,L'\\')) != NULL)
-	{
-		*pCurrent = L'/';
+	char* pBuffer = const_cast<char*>(sourceFile.data());
+	char* pCurrent = pBuffer;
+	while (pBuffer && *pBuffer && (pCurrent = strchr(pBuffer,'\\')) != NULL) {
+		*pCurrent = '/';
 		pBuffer = pCurrent + 1;
 	}
 	
@@ -404,59 +407,53 @@ void PkgParser::ParseFileL()
 	
 	ExpectToken(QUOTED_STRING_TOKEN);
 	
-	std::wstring destinationFile (m_tokenValue.pszString);
+	string destinationFile (iTokenVal.iString);
 	
 	// SWI only supports backward slashesh so need to convert destination path in backward slash if
 	// user gives '/' in Linux.
-	pBuffer = (wchar_t*)destinationFile.c_str();
+	pBuffer = const_cast<char*>(destinationFile.data());
 	pCurrent = pBuffer;
-	while (pBuffer && *pBuffer && (pCurrent = wcschr(pBuffer,L'/')) != NULL)
-	{
-		*pCurrent = L'\\';
+	while (pBuffer && *pBuffer && (pCurrent = strchr(pBuffer,'/')) != NULL) {
+		*pCurrent = '\\';
 		pBuffer = pCurrent + 1;
 	}
 	
 	GetNextToken ();
 	
 	// Test for options
-	if (m_token!=',')
-	{
+	if (iToken!=',') {
 		pCmdBlock = new CMD_BLOCK;
 		pFileList = new INSTALLFILE_LIST;
 
-		pCmdBlock->cmdType = INSTALLFILE;
+		pCmdBlock->iCmdType = INSTALLFILE;
 		pCmdBlock->iInstallFileList = pFileList;
 
-		pFileList->langDepFlg = 0;
-		pFileList->srcFiles.push_back(wstring2string(sourceFile));
-		pFileList->destFile = wstring2string(destinationFile);
+		pFileList->iLangDepFlag = 0;
+		pFileList->iSourceFiles.push_back(sourceFile);
+		pFileList->iDestFile = destinationFile;
 
 		iPkgBlock.push_back(pCmdBlock);
 	}
-	else
-	{	
+	else {	
 		bool needAdd = false;
-		while(m_token==',')
-		{
+		while(iToken==',') {
 			GetNextToken ();
-			std::wstring installOption = m_tokenValue.pszString;
-			if((installOption == L"FF") || (installOption == L"FILE"))
-			{
+			string installOption = iTokenVal.iString;
+			if((installOption == "FF") || (installOption == "FILE")) {
 				needAdd = true;
 			}
 			GetNextToken ();
 		}
-		if (needAdd)
-		{
+		if (needAdd) {
 			pCmdBlock = new CMD_BLOCK;
 			pFileList = new INSTALLFILE_LIST;
 
-			pCmdBlock->cmdType = INSTALLFILE;
+			pCmdBlock->iCmdType = INSTALLFILE;
 			pCmdBlock->iInstallFileList = pFileList;
 
-			pFileList->langDepFlg = 0;
-			pFileList->srcFiles.push_back(wstring2string(sourceFile));
-			pFileList->destFile = wstring2string(destinationFile);
+			pFileList->iLangDepFlag = 0;
+			pFileList->iSourceFiles.push_back(sourceFile);
+			pFileList->iDestFile = destinationFile;
 		
 			iPkgBlock.push_back(pCmdBlock);
 		}
@@ -469,36 +466,33 @@ ParseIfBlockL: Parses the conditional installation body
 @internalComponent
 @released
 */
-void PkgParser::ParseIfBlockL()
-{
+void PkgParser::ParseIfBlockL() {
 	PCMD_BLOCK pCmdBlock = 0; 
 
 	//IF
 	pCmdBlock = new CMD_BLOCK;
-	pCmdBlock->cmdType = IF;
-	ParseLogicalOp(pCmdBlock->cmdExpression);
+	pCmdBlock->iCmdType = IF;
+	ParseLogicalOp(pCmdBlock->iCmdExpr);
 	iPkgBlock.push_back(pCmdBlock);
 
 	ParseEmbeddedBlockL ();
 	
-	while (m_token==ELSEIF_TOKEN)
-	{
+	while (iToken==ELSEIF_TOKEN){
 		GetNextToken ();
 		//ELSEIF
 		pCmdBlock = new CMD_BLOCK;
-		pCmdBlock->cmdType = ELSEIF;
-		ParseLogicalOp(pCmdBlock->cmdExpression);
+		pCmdBlock->iCmdType = ELSEIF;
+		ParseLogicalOp(pCmdBlock->iCmdExpr);
 		iPkgBlock.push_back(pCmdBlock);
 
 		ParseEmbeddedBlockL ();
 	}
 	
-	if (m_token==ELSE_TOKEN)
-	{
+	if (iToken==ELSE_TOKEN) {
 		GetNextToken ();
 		//ELSEIF
 		pCmdBlock = new CMD_BLOCK;
-		pCmdBlock->cmdType = ELSE;
+		pCmdBlock->iCmdType = ELSE;
 		iPkgBlock.push_back(pCmdBlock);
 
 		ParseEmbeddedBlockL ();
@@ -507,7 +501,7 @@ void PkgParser::ParseIfBlockL()
 	ExpectToken(ENDIF_TOKEN);
 	//ENDIF
 	pCmdBlock = new CMD_BLOCK;
-	pCmdBlock->cmdType = ENDIF;
+	pCmdBlock->iCmdType = ENDIF;
 	iPkgBlock.push_back(pCmdBlock);
 
 	GetNextToken ();
@@ -519,15 +513,13 @@ ParseLogicalOp: Parses the logical expression
 @internalComponent
 @released
 */
-void PkgParser::ParseLogicalOp (String& aExpression)
-{
+void PkgParser::ParseLogicalOp (string& aExpression) {
     ParseRelation (aExpression);
-	switch (m_token)
-	{
+	switch (iToken) {
 	case AND_TOKEN:
 	case OR_TOKEN:
 		{
-			if (m_token==AND_TOKEN)
+			if (iToken==AND_TOKEN)
 				aExpression.append(" && ");
 			else
 				aExpression.append(" || ");
@@ -544,10 +536,9 @@ ParseRelation: Parses the relational expression
 @internalComponent
 @released
 */
-void PkgParser::ParseRelation(String& aExpression)
-{
+void PkgParser::ParseRelation(string& aExpression) {
     ParseUnary (aExpression);
-	switch (m_token)
+	switch (iToken)
 	{
 	case '=':
 	case '>':
@@ -557,7 +548,7 @@ void PkgParser::ParseRelation(String& aExpression)
 	case NE_TOKEN:
 	case APPCAP_TOKEN:
 		{
-			switch (m_token)
+			switch (iToken)
 			{
 			case '=':
 				aExpression.append(" == ");
@@ -594,10 +585,8 @@ ParseUnary: Parses the unary expression
 @internalComponent
 @released
 */
-void PkgParser::ParseUnary(String& aExpression)
-{
-    switch (m_token)
-	{
+void PkgParser::ParseUnary(string& aExpression) {
+    switch (iToken) 	{
 	case NOT_TOKEN:
 		aExpression.append(" !");
 		GetNextToken ();
@@ -606,7 +595,7 @@ void PkgParser::ParseUnary(String& aExpression)
 	case EXISTS_TOKEN:
 	case DEVCAP_TOKEN:
 		{	// 1 arg function
-			int token=m_token;
+			TInt token=iToken;
 			GetNextToken ();
 			ExpectToken('(');
 			GetNextToken ();
@@ -615,7 +604,7 @@ void PkgParser::ParseUnary(String& aExpression)
 				aExpression.append("EXISTS(\"");
 				ExpectToken(QUOTED_STRING_TOKEN);
 				GetNextToken ();
-				aExpression.append(wstring2string(m_tokenValue.pszString));
+				aExpression.append(string(iTokenVal.iString));
 				aExpression.append("\")");
 			}
 			else
@@ -640,15 +629,14 @@ ParseFactor: Parses the expression factor
 @internalComponent
 @released
 */
-void PkgParser::ParseFactor(String& aExpression)
-{
-    switch (m_token) {
+void PkgParser::ParseFactor(string& aExpression) {
+    switch (iToken) {
 	case '(':
 		{
 			aExpression.append("(");
 			GetNextToken ();
-			ParseLogicalOp (aExpression);
-			ExpectToken(')');
+			ParseLogicalOp (aExpression); 
+			ExpectToken(')'); 
 			aExpression.append(")");
 		}
 		break;
@@ -656,30 +644,28 @@ void PkgParser::ParseFactor(String& aExpression)
 	case ALPHA_TOKEN:
 	case NUMERIC_TOKEN:
 		{
-			switch (m_token)
+			switch (iToken)
 			{
 			case QUOTED_STRING_TOKEN:
 				aExpression.append("\"");
-				aExpression.append(wstring2string(m_tokenValue.pszString));
+				aExpression.append(iTokenVal.iString);
 				aExpression.append("\"");
 				break;
 			case ALPHA_TOKEN:
-				if(!CompareNString(m_tokenValue.pszString,L"option",6))
-				{
+				if(!strnicmp(iTokenVal.iString,"option",6)) {
 					aExpression.append(" defined(");
-					aExpression.append(wstring2string(m_tokenValue.pszString));
-					aExpression.append(") ");
+					aExpression.append(iTokenVal.iString); 
+					ExpectToken(')'); 
 				}
-				else
-				{
-					aExpression.append(wstring2string(m_tokenValue.pszString));
+				else {
+					aExpression.append(iTokenVal.iString);
 				}
 				break;
 			case NUMERIC_TOKEN:
 				{
-					std::ostringstream str;
+					ostringstream str;
 
-					str << "(0x" << std::setbase(16) << m_tokenValue.dwNumber << ")";
+					str << "(0x" << setbase(16) << iTokenVal.iNumber << ")";
 					aExpression.append(str.str());
 				}
 				break;
@@ -699,10 +685,9 @@ ParsePackageL: Parses the embedded package section
 @internalComponent
 @released
 */
-void PkgParser::ParsePackageL()
-{
+void PkgParser::ParsePackageL() {
 	PCMD_BLOCK pCmdBlock = 0;
-	int found = 0;
+	TInt found = 0;
 
 	ExpectToken(QUOTED_STRING_TOKEN);
 
@@ -710,10 +695,8 @@ void PkgParser::ParsePackageL()
 	SISFILE_LIST::iterator begin = iEmbedSisFiles.begin();
 	SISFILE_LIST::iterator end = iEmbedSisFiles.end();
 
-	while(begin != end)
-	{
-		if((*begin).compare(wstring2string(m_tokenValue.pszString)) == 0)
-		{
+	while(begin != end) {
+		if((*begin) == iTokenVal.iString) {
 			found = 1;
 			break;
 		}
@@ -721,20 +704,18 @@ void PkgParser::ParsePackageL()
 	}
 
 	if(!found)
-	{
-		iEmbedSisFiles.push_back(wstring2string(m_tokenValue.pszString));
-	}
-	
+		iEmbedSisFiles.push_back(string(iTokenVal.iString));
+		
 	//add as a command block as well
-	{
-		pCmdBlock = new CMD_BLOCK;
+	 
+	pCmdBlock = new CMD_BLOCK;
 
-		pCmdBlock->cmdType = PACKAGE;
-		pCmdBlock->iInstallFileList = 0;
-		pCmdBlock->cmdExpression = wstring2string(m_tokenValue.pszString);
+	pCmdBlock->iCmdType = PACKAGE;
+	pCmdBlock->iInstallFileList = 0;
+	pCmdBlock->iCmdExpr = iTokenVal.iString;
 
-		iPkgBlock.push_back(pCmdBlock);
-	}
+	iPkgBlock.push_back(pCmdBlock);
+	 
 
 
 	GetNextToken ();
@@ -756,10 +737,9 @@ ParseCommentL: Parses the comment section
 @internalComponent
 @released
 */
-void PkgParser::ParseCommentL()
-{
+void PkgParser::ParseCommentL() {
 	// parse to end of line
-	while (m_pkgChar && (m_pkgChar!='\n')) GetNextChar();
+	while (GetCurChar() && (GetCurChar()!='\n')) GetNextChar();
 	GetNextToken ();
 }
 
@@ -769,26 +749,22 @@ ParseOptionsBlockL: Parses the install options section
 @internalComponent
 @released
 */
-void PkgParser::ParseOptionsBlockL()
-{
-	WORD wNumLangs;
+void PkgParser::ParseOptionsBlockL() {
+	TUint16 wNumLangs;
 	
 	ExpectToken('(');
 	GetNextToken ();
 	
-	for (;;)
-	{
+	for (;;){
 		ExpectToken('{');
 		GetNextToken ();
 		
 		wNumLangs = 0;
-		while (wNumLangs < iLangList.size())
-		{
+		while (wNumLangs < iLangList.size()){
 			ExpectToken(QUOTED_STRING_TOKEN);
-			iInstallOptions.push_back(wstring2string(m_tokenValue.pszString));
+			iInstallOptions.push_back(string(iTokenVal.iString));
 			GetNextToken ();
-			if (wNumLangs < iLangList.size() - 1)
-			{
+			if (wNumLangs < iLangList.size() - 1){
 				ExpectToken(',');
 				GetNextToken ();
 			}
@@ -797,11 +773,10 @@ void PkgParser::ParseOptionsBlockL()
 		
 		ExpectToken('}');
 		GetNextToken ();
-		if (m_token!=',') break;
+		if (iToken!=',') break;
 		GetNextToken ();
 	}
-	
-	ExpectToken(')');
+	ExpectToken(')'); 
 	GetNextToken ();	
 }
 
@@ -811,21 +786,18 @@ ParsePropertyL: Parses the capability options section
 @internalComponent
 @released
 */
-void PkgParser::ParsePropertyL()
-{
+void PkgParser::ParsePropertyL() {
 	ExpectToken('(');
-	do
-	{
-		GetNextToken ();
-		
+	do {
+		GetNextToken ();		
 		ExpectToken(NUMERIC_TOKEN);
 		GetNextToken ();
 		ExpectToken('=');
 		GetNextToken ();
 		ExpectToken(NUMERIC_TOKEN);
 		GetNextToken ();
-	} while (m_token==',');
-	ExpectToken(')');
+	} while (iToken==','); 
+	ExpectToken(')'); 
 	GetNextToken ();
 }
 
@@ -835,11 +807,9 @@ ParseVendorNameL: Parses the vendor options section
 @internalComponent
 @released
 */
-void PkgParser::ParseVendorNameL()
-{
+void PkgParser::ParseVendorNameL() {
 	ExpectToken('{');
-	for (WORD wNumLangs = 0; wNumLangs < iLangList.size(); wNumLangs++)
-	{
+	for (TUint16 wNumLangs = 0; wNumLangs < iLangList.size(); wNumLangs++) {
 		GetNextToken ();
 		ExpectToken(QUOTED_STRING_TOKEN);
 		GetNextToken ();
@@ -858,15 +828,14 @@ ParseLogoL: Parses the logo options section
 @internalComponent
 @released
 */
-void PkgParser::ParseLogoL()
-{
+void PkgParser::ParseLogoL() {
 	ExpectToken (QUOTED_STRING_TOKEN);
 	GetNextToken ();
 	ExpectToken(',');
 	GetNextToken ();
 	ExpectToken (QUOTED_STRING_TOKEN);
 	GetNextToken ();
-	if (m_token==',')
+	if (iToken==',')
 	{
 		GetNextToken ();
 		ExpectToken (QUOTED_STRING_TOKEN);
@@ -880,8 +849,7 @@ ParseVersion: Parses the version details
 @internalComponent
 @released
 */
-void PkgParser::ParseVersion()
-{
+void PkgParser::ParseVersion() {
 	GetNextToken();
 	ExpectToken(NUMERIC_TOKEN);
 
@@ -904,25 +872,22 @@ ParseDependencyL: Parses the dependency package section
 @internalComponent
 @released
 */
-void PkgParser::ParseDependencyL()
-{
+void PkgParser::ParseDependencyL() {
 	ExpectToken(NUMERIC_TOKEN);
-	GetNextToken ();
-	ExpectToken(')');
+	GetNextToken (); 
+	ExpectToken(')'); 
 	GetNextToken ();
 	ExpectToken(',');
 
 	ParseVersion();
-	if (m_token == '~')
-	{
+	if (iToken == '~') {
 		ParseVersion();
 		ExpectToken(',');
 	}
 	
 	GetNextToken ();
 	ExpectToken('{');
-	for (TUint numLangs = 0; numLangs < iLangList.size(); ++numLangs)
-	{
+	for (TUint numLangs = 0; numLangs < iLangList.size(); ++numLangs) {
 		GetNextToken ();
 		ExpectToken(QUOTED_STRING_TOKEN);
 		GetNextToken ();
@@ -939,8 +904,7 @@ ParseVendorUniqueNameL: Parses the vendor unique name section
 @internalComponent
 @released
 */
-void PkgParser::ParseVendorUniqueNameL()
-{
+void PkgParser::ParseVendorUniqueNameL() {
 	ExpectToken(QUOTED_STRING_TOKEN);
 	GetNextToken ();
 }
@@ -951,8 +915,7 @@ ParseTargetDeviceL: Parses the target device name section
 @internalComponent
 @released
 */
-void PkgParser::ParseTargetDeviceL()
-{
+void PkgParser::ParseTargetDeviceL() {
 	ExpectToken(NUMERIC_TOKEN);
 	GetNextToken ();
 	ExpectToken(']');
@@ -960,8 +923,7 @@ void PkgParser::ParseTargetDeviceL()
 	ExpectToken(',');
 	
 	ParseVersion();
-	if (m_token == '~')
-	{
+	if (iToken == '~') {
 		ParseVersion();
 		ExpectToken(',');
 	}
@@ -969,8 +931,7 @@ void PkgParser::ParseTargetDeviceL()
 	ExpectToken('{');
 	
 	// must do this before adding language strings	
-	for (TUint numLangs = 0; numLangs < iLangList.size(); ++numLangs)
-	{
+	for (TUint numLangs = 0; numLangs < iLangList.size(); ++numLangs) {
 		GetNextToken ();
 		ExpectToken(QUOTED_STRING_TOKEN);
 		GetNextToken ();
@@ -980,41 +941,9 @@ void PkgParser::ParseTargetDeviceL()
 	ExpectToken('}');
 	GetNextToken ();
 }
+ 
 
-
-/**
-GetNextChar: Reads the next character from the package file
-
-@internalComponent
-@released
-*/
-void PkgParser::GetNextChar()
-{
-#ifdef WIN32
-	DWORD dwBytesRead;
-	if (!::ReadFile(iPkgHandle, (LPVOID)&m_pkgChar, sizeof(WCHAR), &dwBytesRead, NULL) ||
-		dwBytesRead!=sizeof(wchar_t))
-		m_pkgChar='\0';
-#else
-#error "TODO: Implement this function under other OS than Windows"
-#endif
-}
-
-/**
-ExpectToken: Tests the current token value
-
-@internalComponent
-@released
-
-@param aToken - expected token value
-*/
-void PkgParser::ExpectToken(int aToken)
-{
-	if (m_token!=aToken)
-	{
-		ParserError("Unexpected Token");
-	}
-}
+ 
 
 /**
 GetNextToken: Reads the next valid token from the package file
@@ -1022,77 +951,63 @@ GetNextToken: Reads the next valid token from the package file
 @internalComponent
 @released
 */
-void PkgParser::GetNextToken ()
-{
+void PkgParser::GetNextToken () {
 	// skip any white space & newLine's
-	while (m_pkgChar == '\n' || isspace(m_pkgChar) || m_pkgChar == 0xA0)
-	{
-		if (m_pkgChar == '\n') ++m_nLineNo;
+	while (GetCurChar() == '\n' || isspace(GetCurChar()) || GetCurChar() == (char)0xA0) {
+		if (GetCurChar() == '\n') ++iLineNumber;
 		GetNextChar();
 	}
 	
-	if (m_pkgChar == '\0')
-		m_token=EOF_TOKEN;
-	else if (IsNumericToken())
-	{
+	if (GetCurChar() == '\0')
+		iToken=EOF_TOKEN;
+	else if (IsNumericToken()){
 		GetNumericToken();
-		m_token=NUMERIC_TOKEN;
+		iToken=NUMERIC_TOKEN;
 	}
-	else if (isalpha(m_pkgChar))
-	{ // have some alphanumeric text
+	else if (isalpha(GetCurChar())){ // have some alphanumeric text
 		GetAlphaNumericToken();
-		m_token=ALPHA_TOKEN;
+		iToken=ALPHA_TOKEN;
 		// check if it is a keyword
-		for(unsigned short wLoop = 0; wLoop < NUMPARSETOKENS; wLoop++)
-		{
-			if(CompareTwoString(m_tokenValue.pszString,(wchar_t*)KTokens[wLoop].pszOpt) == 0)
-			{
-				m_token=KTokens[wLoop].dwOpt;
+		for(unsigned short wLoop = 0; wLoop < NUMPARSETOKENS; wLoop++){
+			if(stricmp(iTokenVal.iString,KTokens[wLoop].pszOpt) == 0){
+				iToken=KTokens[wLoop].dwOpt;
 				break;
 			}
 		}
 	}
-	else if (m_pkgChar == '\"')
-	{ // have a quoted string
+	else if (GetCurChar() == '\"')	{ // have a quoted string
 		GetStringToken();
-		m_token=QUOTED_STRING_TOKEN;
+		iToken=QUOTED_STRING_TOKEN;
 	}
-	else if (m_pkgChar == '>')
-	{
+	else if (GetCurChar() == '>')	{
 		GetNextChar();
-		if (m_pkgChar == '=')
-		{
-			m_token=GE_TOKEN;
+		if (GetCurChar() == '='){
+			iToken=GE_TOKEN;
 			GetNextChar();
 		}
 		else
-			m_token='>';
+			iToken='>';
 	}
-	else if (m_pkgChar == '<')
-	{
+	else if (GetCurChar() == '<'){
 		// check if start of an escaped string, e.g. <123>"abc"
 		if (GetStringToken())
-			m_token=QUOTED_STRING_TOKEN;
-		else
-		{
+			iToken=QUOTED_STRING_TOKEN;
+		else{
 			GetNextChar();
-			if (m_pkgChar == '=')
-			{
-				m_token=LE_TOKEN;
+			if (GetCurChar() == '='){
+				iToken=LE_TOKEN;
 				GetNextChar();
 			}
-			else if (m_pkgChar == '>')
-			{
-				m_token=NE_TOKEN;
+			else if (GetCurChar() == '>'){
+				iToken=NE_TOKEN;
 				GetNextChar();
 			}
 			else
-				m_token='<';
+				iToken='<';
 		}
 	}
-	else
-	{
-		m_token=m_pkgChar;
+	else{
+		iToken=GetCurChar();
 		GetNextChar();
 	}
 }
@@ -1103,34 +1018,29 @@ GetStringToken: Reads the string token from the package file
 @internalComponent
 @released
 */
-bool PkgParser::GetStringToken()
-{
-	DWORD wCount = 0;
+bool PkgParser::GetStringToken() {
+	TUint32 wCount = 0;
 	bool done=false;
 	bool finished=false;
-	DWORD escapeChars = 0;
+	TUint32 escapeChars = 0;
 	
-	while (!finished)
-	{
-		if (m_pkgChar == '\"')
-		{
+	while (!finished){
+		if (GetCurChar() == '\"'){
 			GetNextChar();
-			while(m_pkgChar && m_pkgChar != '\"')
-			{
+			while(GetCurChar() && GetCurChar() != '\"'){
 				if(wCount < (MAX_STRING - 1))
-					m_tokenValue.pszString[wCount++] = m_pkgChar;
+					iTokenVal.iString[wCount++] = GetCurChar();
 				else //We dont want the string with length greater than MAX_STRING to be cut off silently
-					ParserError("Bad String");
+					ParserError("Bad string");
 				GetNextChar();
 			}
-			if(m_pkgChar == '\0')
-				ParserError("Bad String");
+			if(GetCurChar() == '\0')
+				ParserError("Bad string");
 			GetNextChar();
 			done=true;
 		}
-		if (m_pkgChar == '<')
-		{
-			m_tokenValue.pszString[wCount] = L'\0';
+		if (GetCurChar() == '<'){
+			iTokenVal.iString[wCount] = L'\0';
 			escapeChars=ParseEscapeChars();
 			if (escapeChars>0)
 			{
@@ -1139,11 +1049,11 @@ bool PkgParser::GetStringToken()
 				if (wCount>=MAX_STRING) wCount=MAX_STRING-1;
 			}
 		}
-		if (escapeChars==0 || m_pkgChar != '\"')
+		if (escapeChars==0 || GetCurChar() != '\"')
 			finished=true;
 	}
 	
-	m_tokenValue.pszString[wCount] = L'\0';
+	iTokenVal.iString[wCount] = L'\0';
 	return done;
 }
 
@@ -1153,49 +1063,41 @@ ParseEscapeChars: Parses the escape sequence characters
 @internalComponent
 @released
 */
-WORD PkgParser::ParseEscapeChars()
-{
-	WORD found=0;
-	WCHAR temp[MAX_STRING];
-#ifdef WIN32
-	while (m_pkgChar == '<')
-	{
-		wcscpy(temp,m_tokenValue.pszString);
-		DWORD fileOffset=::SetFilePointer(iPkgHandle, 0L, NULL, FILE_CURRENT);
-		try
-		{
+TUint16 PkgParser::ParseEscapeChars() {
+	TUint16 found=0;
+	char temp[MAX_STRING];
+ 
+	while (GetCurChar() == '<'){
+		strcpy(temp,iTokenVal.iString);
+		TUint savedPos = iContentPos ;	
+		try	{
 			GetNextChar();
 			GetNumericToken();
-			if (m_pkgChar=='>')
+			if (GetCurChar()=='>')
 				found++;
-			else
-			{
-				::SetFilePointer(iPkgHandle, fileOffset, NULL, FILE_BEGIN);
+			else {
+				iContentPos = savedPos ;
 				break;
 			}
 		}
-		catch (...)
-		{
-			wcscpy(m_tokenValue.pszString,temp);
-			::SetFilePointer(iPkgHandle, fileOffset, NULL, FILE_BEGIN);
+		catch (...)	{
+			strcpy(iTokenVal.iString,temp);
+			iContentPos = savedPos ;
 			break;
 		}
-		DWORD num=m_tokenValue.dwNumber;
+		TUint32 num=iTokenVal.iNumber;
 		// watch for CP1252 escapes which aren't appropriate for UNICODE
 		if (num>=0x80 && num<=0x9F) ParserError("Invalid Escape");
-		DWORD len=wcslen(temp);
-		wcscpy(m_tokenValue.pszString,temp);
-		if (len+2<=MAX_STRING)
-		{
-			m_tokenValue.pszString[len]=(WCHAR)num;
+		TUint32 len=strlen(temp);
+		memcpy(iTokenVal.iString,temp, len + 1);
+		if ((len + 2) <= MAX_STRING){
+			iTokenVal.iString[len]= static_cast<char>(num);
 			len++;
-			m_tokenValue.pszString[len]='\0';
+			iTokenVal.iString[len]='\0';
 		}
 		GetNextChar();
 	}
-#else
-#error "TODO: Implement this function under other OS than Windows"
-#endif 
+ 
 	return found;
 }
 
@@ -1207,14 +1109,16 @@ GetAlphaNumericToken: Parse an alphanumeric string from the input line
 */
 void PkgParser::GetAlphaNumericToken()
 {
-	WORD wCount = 0;
-	while(m_pkgChar && (isalnum(m_pkgChar) || ((m_pkgChar) == '_')))
-	{
-		if(wCount < (MAX_STRING - 1))
-			m_tokenValue.pszString[wCount++] = m_pkgChar;
-		GetNextChar();
+	size_t length = 0;
+	TUint savedPos = iContentPos ;	
+	TUint bound = iContentStr.length();
+	while((iContentPos < bound) && 
+		(isalnum(iPkgFileContent[iContentPos]) || (iPkgFileContent[iContentPos] == '_'))) {
+		iContentPos ++ ;
+		if(length < (MAX_STRING - 1)) length ++ ; 
 	}
-	m_tokenValue.pszString[wCount] = L'\0';
+	memcpy(iTokenVal.iString,&iPkgFileContent[savedPos],length);	
+	iTokenVal.iString[length] = 0;
 }
 
 /**
@@ -1223,24 +1127,15 @@ IsNumericToken: Determines if the next lexeme is a numeric token
 @internalComponent
 @released
 */
-bool PkgParser::IsNumericToken()
-{
-	bool lexemeIsNumber = false;
-	if (iswdigit(m_pkgChar))
-		lexemeIsNumber = true;
-	else if (m_pkgChar == '+' || m_pkgChar == '-')
-	{
-		// we may have a number but we must look ahead one char to be certain
-		
-		WCHAR oldChar = m_pkgChar;
-		DWORD fileOffset=::SetFilePointer(iPkgHandle, 0L, NULL, FILE_CURRENT);
-		GetNextChar();
-		lexemeIsNumber = iswdigit(m_pkgChar) != FALSE;
-		m_pkgChar = oldChar;
-		::SetFilePointer(iPkgHandle,fileOffset,NULL,FILE_BEGIN);
-	}
-	
-	return lexemeIsNumber;
+bool PkgParser::IsNumericToken() { 
+	char ch = iPkgFileContent[iContentPos];
+	if (isdigit(ch))
+		return true ;
+	else if (ch == '+' || ch == '-'){
+		// we may have a number but we must look ahead one char to be certain	
+		return isdigit(iPkgFileContent[iContentPos + 1]) != 0; 
+	}	
+	return false ;
 }
 
 /**
@@ -1249,26 +1144,17 @@ GetNumericToken: Parse a number from the input line
 @internalComponent
 @released
 */
-void PkgParser::GetNumericToken()
-{
-	WCHAR temp[MAX_STRING];
-	LPWSTR end;
-	bool hexString = false;
-	DWORD dwBytesRead;
-	DWORD fileOffset=::SetFilePointer(iPkgHandle, 0L, NULL, FILE_CURRENT);
-	
-	temp[0]=m_pkgChar;
-	if (!::ReadFile(iPkgHandle, &temp[1], (MAX_STRING-2)*sizeof(WCHAR), &dwBytesRead, NULL) ||
-		dwBytesRead==0)
-		ParserError("Read failed");
-	temp[1+dwBytesRead/sizeof(WCHAR)]='\0';
-	hexString = (!CompareNString(temp, L"0x", 2) || !CompareNString(&temp[1], L"0x", 2));
-	
-	m_tokenValue.dwNumber = wcstoul(temp, &end, (hexString) ? 16 : 10);
-	
-	if (end==temp) ParserError("Read failed"); 
-	::SetFilePointer(iPkgHandle, fileOffset+(end-temp-1)*sizeof(WCHAR), NULL, FILE_BEGIN);
-	GetNextChar();
+void PkgParser::GetNumericToken() {
+	 
+	int base = 10; 
+	const char* temp = &iPkgFileContent[iContentPos] ;
+	if(*temp == '0' &&( temp[1] == 'x' || temp[1] == 'X')){
+		base = 16 ;
+		temp += 2;
+	}
+	char *end = const_cast<char*>(temp) ;
+	iTokenVal.iNumber = strtoul(temp, &end, base);
+	iContentPos = end - iPkgFileContent ;
 }
 
 /**
@@ -1281,13 +1167,12 @@ AddLanguage: Updates the language list structure
 @param aCode - Language code
 @param aDialect - Language dialect code
 */
-void PkgParser::AddLanguage(String aLang, unsigned long aCode, unsigned long aDialect)
-{
+void PkgParser::AddLanguage(const string& aLang, TUint32 aCode, TUint32 aDialect) {
 	PLANG_LIST lc = new LANG_LIST;
 	
-	lc->langName = aLang;
-	lc->langCode = aCode;
-	lc->dialectCode = aDialect;
+	lc->iLangName = aLang;
+	lc->iLangCode = aCode;
+	lc->iDialectCode = aDialect;
 
 	iLangList.push_back(lc);
 }
@@ -1298,36 +1183,36 @@ DeleteAll: Deallocates memory for the data members
 @internalComponent
 @released
 */
-void PkgParser::DeleteAll()
-{
-	while(iPkgBlock.size() > 0)
-	{
+void PkgParser::DeleteAll() {
+	while(iPkgBlock.size() > 0){
 		PCMD_BLOCK ptemp = 0;
 
 		ptemp = iPkgBlock.front();
 		iPkgBlock.pop_front();
 
-		if(ptemp->cmdType == INSTALLFILE)
+		if(ptemp->iCmdType == INSTALLFILE)
 		{
 			delete ptemp->iInstallFileList;
 		}
 		delete ptemp;
 	}
 
-	{
-		LANGUAGE_LIST::iterator begin = iLangList.begin();
-		LANGUAGE_LIST::iterator end = iLangList.end();
-		while(begin != end)
-		{
-			PLANG_LIST ptemp = 0;
-			ptemp = (*begin);
 
-			if(ptemp)
-				delete ptemp;
-			++begin;
-		}
-		iLangList.clear();
+	LANGUAGE_LIST::iterator begin = iLangList.begin();
+	LANGUAGE_LIST::iterator end = iLangList.end();
+	while(begin != end)	{
+		PLANG_LIST ptemp = 0;
+		ptemp = (*begin);
+
+		if(ptemp)
+			delete ptemp;
+		++begin;
 	}
+	iLangList.clear(); 
+	iPkgFileContent = "" ;
+	iContentPos = 0 ;
+	iContentStr.clear(); 
+	
 }
 
 /**
@@ -1338,98 +1223,8 @@ ParserError: Throws exception with the given error message
 
 @param msg - error message to be thrown
 */
-void PkgParser::ParserError(char* msg)
-{
-	std::ostringstream str;
-
-	str << (char*)iPkgFile.data() << "(" << m_nLineNo << "): " << msg;
-
-	throw SisUtilsException("PakageFile-Parser Error", (char*)(str.str()).data());
-}
-
-/**
-wstring2string: Converts wide string to string
-
-@internalComponent
-@released
-
-@param aWide - input wide string
-*/
-String wstring2string (const std::wstring& aWide)
-{
-	int max = ::WideCharToMultiByte(CP_OEMCP,0,aWide.c_str(),aWide.length(),0,0,0,0);
-	String reply;
-	if (max > 0 )
-	{
-		char* buffer = new char [max];
-		try
-		{
-			::WideCharToMultiByte(CP_OEMCP,0,aWide.c_str(),aWide.length(),buffer,max,0,0);
-			reply = String (buffer, max);
-		}
-		catch (...)
-		{
-			throw SisUtilsException("ParserError", "wstring to string conversion failed");
-		}
-		delete [] buffer;
-	}
-	return reply;
-}
-
-/**
-string2wstring: Converts string to wide string
-
-@internalComponent
-@released
-
-@param aNarrow - input string
-*/
-std::wstring string2wstring (const String& aNarrow)
-{
-	int max = ::MultiByteToWideChar(CP_OEMCP,0,aNarrow.c_str(),aNarrow.length(),0,0);
-	std::wstring reply;
-	if (max > 0 )
-	{
-		wchar_t* buffer = new wchar_t [max];
-		try
-		{
-			::MultiByteToWideChar(CP_OEMCP,0,aNarrow.c_str(),aNarrow.length(),buffer,max);
-			reply = std::wstring (buffer, max);
-		}
-		catch (...)
-		{
-			throw SisUtilsException("ParserError", "string to wstring conversion failed");
-		}
-		delete [] buffer;
-	}
-	return reply;
-}
-
-/**
-CompareTwoString: Compares two wide string
-
-@internalComponent
-@released
-
-@param string - first string
-@param option - second string
-*/
-int CompareTwoString(wchar_t* string ,wchar_t* option)
-{
-	return wcsicmp(string,option);
-}
-
-/**
-CompareNString: Compares two wide string for n characters
-
-@internalComponent
-@released
-
-@param string - first string
-@param option - second string
-@param len - no of wide characters to be compared
-*/
-int CompareNString(wchar_t* string ,wchar_t* option, int len)
-{
-	return wcsnicmp(string,option,len);
+void PkgParser::ParserError(const char* aMsg) {
+	ostringstream str;
+	str << iPkgFileName.c_str() << "(" << iLineNumber << "): " << aMsg;
+	throw SisUtilsException("PakageFile-Parser Error", str.str().c_str());
 }

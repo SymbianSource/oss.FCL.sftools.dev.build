@@ -1,0 +1,326 @@
+#!perl
+# Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+# 
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+# 
+# Contributors:
+# 
+# Description:
+# 
+#
+
+use strict;
+use FindBin;
+use lib "$FindBin::Bin";
+use Tk; 
+use Tk::Table; 
+use Getopt::Long;
+use IniData;
+use EnvDb;
+
+
+#
+# Constants.
+#
+
+my $margin = 2;
+
+
+#
+# Globals.
+#
+
+my $verbose = 0;
+my $full = 0;
+my $component;
+my $iniData = IniData->New();
+my $envDb;
+my $overallStatus;
+my $displayClean = 0;
+my $displayDirty = 0;
+my $displayPendingRelease = 0;
+my $noScan = 0;
+
+
+#
+# Main.
+#
+
+ProcessCommandLine();
+CheckEnv();
+DisplayInfo();
+
+
+#
+# Subs.
+#
+
+sub ProcessCommandLine {
+  Getopt::Long::Configure ("bundling");
+  my $help;
+  GetOptions("h" => \$help, "f" => \$full, "c" => \$displayClean, "d" => \$displayDirty, "p" => \$displayPendingRelease, "n" => \$noScan, "v+" => \$verbose);
+  if ($help) {
+    Usage(0);
+  }
+
+  if (not $full and ($displayClean or $displayDirty or $displayPendingRelease)) {
+    print "Warning: Inappropriate option(s)\n";
+  }
+
+  if (not $displayClean and not $displayDirty and not $displayPendingRelease) {
+    $displayClean = 1;
+    $displayDirty = 1;
+    $displayPendingRelease = 1;
+  }
+
+  $component = $ARGV[0];
+  $envDb = EnvDb->Open($iniData, $verbose);
+}
+
+sub Usage {
+  my $exitCode = shift;
+
+  Utils::PrintDeathMessage($exitCode, "\nUsage: envinfo [options] [<component>]
+
+options:
+
+-h  help
+-v  verbose output (-vv very verbose)
+-f  display full information (the remaining switches only apply when this is used)
+-c  display the components with status \"clean\"
+-d  display the components with status \"dirty\"
+-p  display the components with status \"pending release\"
+-n  no scan");
+}
+
+sub CheckEnv {
+  unless ($noScan or not $full) {
+    if (defined $component) {
+      $envDb->CheckComp($component);
+    }
+    else {
+      ($overallStatus) = $envDb->CheckEnv();
+    }
+  }
+}
+
+sub DisplayInfo {
+  # Create a list of the components to be displayed.
+  my @comps;
+  if (defined $component) {
+    my $ver = $envDb->Version($component);
+    unless (defined $ver) {
+      die "Error: $component not found\n";
+    }
+    push @comps, $component;
+  }
+  else {
+    my $versionInfo = $envDb->VersionInfo();
+    foreach my $comp (sort keys %{$versionInfo}) {
+      push @comps, $comp;
+    }
+  }
+
+  my $tableData;
+  if ($full) {
+    $tableData = GenFullInfoTable(\@comps);
+  }
+  else {
+    $tableData = GenMinimalInfoTable(\@comps);
+  }
+
+  # Only print the table if there's something in it.
+  if (scalar(@$tableData) > 1) {
+    print "\n";
+    DisplayTable($tableData, 1);
+  }
+
+  # Only display the overall status if a full check was done.
+  if (defined $overallStatus) {
+    print "\nOverall status: ", EnvDb::StatusString($overallStatus), "\n";
+  }
+}
+
+sub GenMinimalInfoTable {
+  my $comps = shift;
+
+  # Create a two dimentional array of the data to be printed.
+  my $tableData = [["Component", "Version"]];
+  my $row = 1;
+  foreach my $comp (@$comps) {
+    my $ver = $envDb->Version($comp);
+    $tableData->[$row++] = [$comp, $ver];
+  }
+  return $tableData;
+}
+
+sub GenFullInfoTable {
+  my $comps = shift;
+
+  # Create a two dimentional array of the data to be printed.
+  my $tableData = [["Component", "Version", "Internal version", "Status", "Mrp"]];
+  my $row = 1;
+  foreach my $comp (@$comps) {
+    my $ver = $envDb->Version($comp);
+    my $status = $envDb->Status($comp);
+    if (not $displayClean and $status == EnvDb::STATUS_CLEAN) {
+      next;
+    }
+    elsif (not $displayDirty and ($status == EnvDb::STATUS_DIRTY or $status == EnvDb::STATUS_DIRTY_SOURCE)) {
+      next;
+    }
+    elsif (not $displayPendingRelease and $status == EnvDb::STATUS_PENDING_RELEASE) {
+      next;
+    }
+
+    my $mrpName = $envDb->MrpName($comp);
+    unless (defined $mrpName) {
+      $mrpName = "-";
+    }
+    my $intVer = $envDb->InternalVersion($comp);
+    unless (defined $intVer) {
+      $intVer = "-";
+    }
+    $tableData->[$row++] = [$comp, $ver, $intVer, EnvDb::StatusString($status), $mrpName];
+  }
+  return $tableData;
+}
+
+sub DisplayTable {
+  my $tableData = shift;
+  my $numRows = scalar(@{$tableData});
+  die unless $numRows and defined $tableData->[0]; # There must be at least one column and row.
+  my $numCols = scalar(@{$tableData->[0]});
+
+  my $mw = MainWindow->new();
+  CreateGrid($mw, $tableData);
+  MainLoop();
+}
+
+sub CreateGrid() {
+  my $mw = shift;
+  my $data = shift;
+  my $numRows = scalar(@{$data});
+  die unless $numRows and defined $data->[0]; # There must be at least one column and row.
+  my $numCols = scalar(@{$data->[0]});
+
+  foreach my $row (0 ... $numRows - 1) {
+    my @row;
+    foreach my $col (1 ... $numCols - 1) {
+      $row[$col - 1] = $mw->Label(-text => $data->[$row][$col],
+				  -justify => 'left',
+				  -background => 'blue');
+    }
+    $mw->Label(-text => $data->[$row][0],
+	       -justify => 'left')->grid(@row,
+					 -sticky => 'nsew');
+  }
+}
+
+=head1 NAME
+
+EnvInfoTk - Displays information about the installed components in the current environment.
+
+=head1 SYNOPSIS
+
+  envinfo [options] [<component>]
+
+options:
+
+  -h  help
+  -v  verbose output (-vv very verbose)
+  -f  display full information (the remaining switches only apply when this is used)
+  -c  display the components with status "clean"
+  -d  display the components with status "dirty"
+  -p  display the components with status "pending release"
+  -n  no scan
+
+=head1 DESCRIPTION
+
+By default displays a brief summary table of the information contained in the current drive's environment database. For example:
+
+ Component   Version
+
+ mycomp1     026
+ mycomp2     057
+
+If envoked with the C<-f> switch a full table is displayed:
+
+ Component   Version   Internal version                       Status   Mrp
+
+ mycomp1     026       //myproject/latest/mycomp1/...@10106   clean    \mycomp1\mycomp1.mrp
+ mycomp2     057       //myproject/latest/mycomp1/...@10157   clean    \mycomp2\mycomp2.mrp
+
+ Overall status: clean
+
+The C<Component> and C<Version> fields are self explanatory. The C<Internal version> field is a label used by the site that owns the component, to store an internal reference (normally generated by their source control system). This is likely to be of use only to the owning site. The C<Status> field may have the following values:
+
+=over 4
+
+=item *
+
+B<clean> - The component's binaries all match the time stamp information that was stored when they were installed.
+
+=item *
+
+B<dirty> - One or more of the component's binaries doesn't match the time stamp information that was stored when they were installed. This may be because the source has been re-built but not changed (see the commands C<ValidateRel> and C<ValidateEnv> for details of how to check if a re-built set of binaries are identical to an already released set), or because changes have been made.
+
+=item *
+
+B<pending release> - The component is waiting to be released (see the commands C<PrepEnv> and C<MakeEnv> for details of how to make releases).
+
+=back
+
+The C<Mrp> field contains the name of the F<mrp> file that was used when the release was made. The overall status of the environment is displayed last. This may have the following values:
+
+=over 4
+
+=item *
+
+B<clean> - All the installed components have a status of C<clean> and there are no files in the F<\epoc32> tree that have unkown origins (i.e. they are all known to belong to a component).
+
+=item *
+
+B<dirty> - One or more of the installed components has a status of C<dirty>, or there is one or more files in the F<\epoc32> tree that has unknown origins.
+
+=item *
+
+B<pending release> - All components have a status of either C<clean> or C<pending release> and there are no files in the F<\epoc32> with unknown origins.
+
+=back
+
+
+By default C<EnvInfoTk> will perform a scan of the F<\epoc32> tree checking all the time stamps. To avoid this processing, use the C<-n> switch. This will cause the status of each component when the last scan was performed to be displayed (which may now be out of date). The output of C<EnvInfoTk> can be filtered according to status using the switches C<-c>, C<-d> and C<-p>. For example, if you wanted to view all the components that are either C<dirty> or C<pending release>, type:
+
+  envinfo -dp
+
+If envoked with a C<component> argument, then only the details of the specified component will be displayed and a scan of the F<\epoc32> tree will not be performed.
+
+=head1 KNOWN BUGS
+
+None.
+
+=head1 COPYRIGHT
+
+ Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+ All rights reserved.
+ This component and the accompanying materials are made available
+ under the terms of the License "Eclipse Public License v1.0"
+ which accompanies this distribution, and is available
+ at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ 
+ Initial Contributors:
+ Nokia Corporation - initial contribution.
+ 
+ Contributors:
+ 
+ Description:
+ 
+
+=cut

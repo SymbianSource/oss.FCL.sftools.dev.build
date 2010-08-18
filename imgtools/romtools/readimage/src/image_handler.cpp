@@ -40,12 +40,11 @@ string ImageReader::iPattern = "";
 string SisUtils::iOutputPath = ".";
 string SisUtils::iExtractPath = ".";
 
-ImageHandler::ImageHandler() : iReader(NULL) ,iOptions(0), iSisUtils(NULL)
-{
+TBool gIsOBYUTF8 = EFalse;
+ImageHandler::ImageHandler() : iReader(NULL) ,iOptions(0), iSisUtils(NULL) {
 }
 
-ImageHandler::~ImageHandler()
-{
+ImageHandler::~ImageHandler() {
 	if(iReader)
 		delete iReader;
 
@@ -54,220 +53,179 @@ ImageHandler::~ImageHandler()
 }
 
 
-void ImageHandler::ProcessArgs(int argc, char**argv)
-{
-	if( argc < 2)
-	{
+void ImageHandler::ProcessArgs(int argc, char*argv[]) {
+	if( argc < 2) {
 		throw ImageReaderUsageException("", "");
 	}
 
 	bool aOutFileGiven = false;
-	int aPos = 1;
-
-	while( argc > aPos )
-	{
-		if(argv[aPos][0] == '-')
-		{
-			switch(argv[aPos][1])
-			{
-			case 'd':
-			case 'D':
+	int index = 1; 
+	
+	while( argc > index ) {
+		char* arg = argv[index]; 
+		if(arg[0] == '-') {
+			switch(0x20 | arg[1]) {
+			case 'd': 
 				//dump header info
 				iOptions |= DUMP_HDR_FLAG;
 				break;
-			case 'e':
-			case 'E':
-				iOptions |= DUMP_E32_IMG_FLAG;
-				if(argv[aPos+1])
-					ImageReader::iE32ImgFileName = string(argv[aPos+1]);
+			case 'e': 
+				iOptions |= DUMP_E32_IMG_FLAG; 
+				++index ;
+				if(index < argc) {
+					arg = argv[index];
+					ImageReader::iE32ImgFileName = string(arg);
+				}
 				else 
-					throw ImageReaderUsageException("Usage error", argv[aPos]);
-				aPos++;
+					throw ImageReaderUsageException("Usage error", arg);
+				
 				break;
-			case 'h':
-			case 'H':
+			case 'h': 
 				PrintUsage();
 				exit(EXIT_SUCCESS);
-			case 'o':
-			case 'O':
-				{
-					if(argv[aPos][2])
-					{
-						if((stricmp(argv[aPos],"-OUTDIR")==0))
-						{
-							if(argv[aPos+1])
-							{
-								SisUtils::iOutputPath = string(argv[aPos+1]);
-							}
-							else
-								throw ImageReaderUsageException("Usage Error", argv[aPos]);
-
-							aPos++;
+			case 'o':  
+				if(arg[2]) {
+					if((stricmp(arg,"-OUTDIR")==0)) {
+						++index;
+						if(index < argc) {
+							arg = argv[index];
+							SisUtils::iOutputPath = string(arg);
 						}
 						else
-							throw ImageReaderUsageException("Usage Error", argv[aPos]);
+							throw ImageReaderUsageException("Usage Error", arg); 
 					}
 					else
-					{
-						aOutFileGiven = true;
-						if( argv[aPos+1] )
-						{
-							// unless using iOutFile.c_str() immediately after 
-							// iOutFile = argv[aPos+1];
-							// iOutFile will not be assign correctly,
-							// is it a defect of gcc 3.4.5 ?
-							iOutFile = string(argv[aPos+1]);						
-							aPos++;
-						}
-					}
+						throw ImageReaderUsageException("Usage Error", arg);
 				}
+				else {
+					aOutFileGiven = true;
+					++index;				
+					if( index < argc ) {
+						// unless using iOutFile.c_str() immediately after 
+						// iOutFile = argv[index+1];
+						// iOutFile will not be assign correctly,
+						// is it a defect of gcc 3.4.5 ? 
+						arg = argv[index];
+						iOutFile = string(arg); 
+					}
+					else
+						throw ImageReaderUsageException("Usage Error", arg); 
+				}
+				 
 				break;
-			case 'r':
-			case 'R':
-				{
-					if(argv[aPos][2])
-						throw ImageReaderUsageException("Usage Error", argv[aPos]);
+			case 'r': 				 
+				if(arg[2])
+					throw ImageReaderUsageException("Usage Error", arg);
+				iOptions |= RECURSIVE_FLAG;				 
+				break;
+			case 's': 				
+				if(arg[2]) {
+					if(stricmp(arg,"-SIS2IBY")==0) {
+						iOptions |= MODE_SIS2IBY;
+					}
+					else
+						throw ImageReaderUsageException("Usage Error", arg);
+				}
+				else
+					iOptions |= DUMP_DIR_ENTRIES_FLAG;
+				
+				break;
+			case 't': 				 
+				if((stricmp(argv[index],"-TMPDIR")==0)) {
+					++index;
+					if( index < argc ) {  
+						arg = argv[index];
+						SisUtils::iExtractPath = string(arg);
+					}
+					else
+						throw ImageReaderUsageException("Usage Error", arg); 
+				}
+				else
+					throw ImageReaderUsageException("Usage Error", arg);
+				 
+				break;
+			case 'v':  
+				if(arg[2])
+					throw ImageReaderUsageException("Usage Error", arg);
+				iOptions |= DUMP_VERBOSE_FLAG; 
+				break;
+			case 'l': 
+				++index;
+				if(index < argc) {
+					arg = argv[index];
+					ImageReader::iLogFileName = string(arg);
+				}
+				else
+					throw ImageReaderUsageException("Usage error", arg);
+				iOptions |= LOG_IMAGE_CONTENTS_FLAG;
+				 
+				break;
+			case 'x': 
+				++index;
+				if(index < argc && 0 == arg[2]) {
+					arg = argv[index];
+					ImageReader::iPattern = string(arg);
+				}
+				else
+					throw ImageReaderUsageException("Usage error", arg);
 
-					iOptions |= RECURSIVE_FLAG;
-				}
+				iOptions |= EXTRACT_FILE_SET_FLAG; 
+				 
 				break;
-			case 's':
-			case 'S':
-				{
-					if(argv[aPos][2])
-					{
-						if(stricmp(argv[aPos],"-SIS2IBY")==0)
-						{
-							iOptions |= MODE_SIS2IBY;
-						}
-						else
-							throw ImageReaderUsageException("Usage Error", argv[aPos]);
-					}
-					else
-						iOptions |= DUMP_DIR_ENTRIES_FLAG;
+			case 'z': 
+				++index;
+				if(index < argc ){
+					arg = argv[index];
+					ImageReader::iZdrivePath = string(arg);
 				}
-				break;
-			case 't':
-			case 'T':
-				{
-					if((stricmp(argv[aPos],"-TMPDIR")==0))
-					{
-						if(argv[aPos+1])
-						{
-							SisUtils::iExtractPath = string(argv[aPos+1]);
-						}
-						else
-							throw ImageReaderUsageException("Usage Error", argv[aPos]);
-
-						aPos++;
-					}
-					else
-						throw ImageReaderUsageException("Usage Error", argv[aPos]);
-				}
-				break;
-			case 'v':
-			case 'V':
-				{
-					if(argv[aPos][2])
-						throw ImageReaderUsageException("Usage Error", argv[aPos]);
-
-					iOptions |= DUMP_VERBOSE_FLAG;
-				}
-				break;
-			case 'l':
-			case 'L':
-				{
-					if(argv[aPos+1])
-					{
-						ImageReader::iLogFileName = string(argv[aPos+1]);
-					}
-					else
-						throw ImageReaderUsageException("Usage error", argv[aPos]);
-					iOptions |= LOG_IMAGE_CONTENTS_FLAG;
-					aPos++;
-				}
-				break;
-			case 'x':
-			case 'X':
-				{
-					if(argv[aPos+1] && (!argv[aPos][2]))
-					{
-						ImageReader::iPattern = string(argv[aPos+1]);
-					}
-					else
-						throw ImageReaderUsageException("Usage error", argv[aPos]);
-
-					iOptions |= EXTRACT_FILE_SET_FLAG;
-					aPos++;
-				}
-				break;
-			case 'z':
-			case 'Z':
-				{
-					if(argv[aPos+1])
-						ImageReader::iZdrivePath = string(argv[aPos+1]);
-					else
-						throw ImageReaderUsageException("Usage error", argv[aPos]);
-					
-					iOptions |= EXTRACT_FILES_FLAG;
-					aPos++;
-				}
+				else
+					throw ImageReaderUsageException("Usage error", arg);					
+				iOptions |= EXTRACT_FILES_FLAG; 
+				
 				break;
 			default:
-				throw ImageReaderUsageException("Invalid command", argv[aPos]);
+				throw ImageReaderUsageException("Invalid command", arg);
 				break;
 			}
 		}
-		else
-		{
-			if(!iInputFileName.empty())
-			{
+		else {
+			if(!iInputFileName.empty()) {
 				throw ImageReaderUsageException("Invalid command", "Multiple input file not supported");
 			}
 
-			SetInputFile(argv[aPos]);
+			SetInputFile(string(arg));
 		}
-		aPos++;
+		index++;
 	}
 
-	if( aOutFileGiven && !(iOptions & MODE_SIS2IBY) )
-	{
-		ofstream* rdout = new ofstream(iOutFile.c_str(), ios::out | ios::trunc);
+	if( aOutFileGiven && !(iOptions & MODE_SIS2IBY) ) {
+		ofstream* rdout = new ofstream(iOutFile.c_str(), ios_base::out | ios_base::trunc);
 		if( !rdout->is_open()){
 			delete rdout ;
 			rdout = NULL ;
-			throw ImageReaderException((char*)iOutFile.c_str(), "Unable to open File");
+			throw ImageReaderException(iOutFile.c_str(), "Unable to open File");
 		}
 		out = rdout ;
 	}
 
 	// Disable -z option if -x option is passed
-	if( (iOptions & EXTRACT_FILE_SET_FLAG) && (iOptions & EXTRACT_FILES_FLAG) )
-	{
+	if( (iOptions & EXTRACT_FILE_SET_FLAG) && (iOptions & EXTRACT_FILES_FLAG) ) {
 		iOptions &= ~(EXTRACT_FILES_FLAG);
 	}
 
 	// -r option should be used along with -x option
-	if( (iOptions & RECURSIVE_FLAG) && !(iOptions & EXTRACT_FILE_SET_FLAG) )
-	{
+	if( (iOptions & RECURSIVE_FLAG) && !(iOptions & EXTRACT_FILE_SET_FLAG) ) {
 		throw ImageReaderUsageException("Usage error", "-r should be used with -x");
 	}
 }
 
-EImageType ImageHandler::ReadMagicWord()
-{
- 
-#if defined(__TOOLS2__) || defined(__MSVCDOTNET__)
+EImageType ImageHandler::ReadMagicWord() {
 	ifstream file(iInputFileName.c_str(), ios_base::in | ios_base::binary );
-#else
-	ifstream file(iInputFileName.c_str(), ios::in | ios::binary | ios::nocreate);
-#endif
 	
 	EImageType retVal = EUNKNOWN_IMAGE;
 
-	if( !file.is_open() )
-	{
-		throw ImageReaderException((char*)iInputFileName.c_str(), "Cannot open file ");
+	if( !file.is_open() ) {
+		throw ImageReaderException(iInputFileName.c_str(), "Cannot open file ");
 	}
 
 	TUint8 magicWords[16];
@@ -284,9 +242,9 @@ EImageType ImageHandler::ReadMagicWord()
 	else {
 		E32ImageFile	aE32;
 		TUint32			aSz;
-		file.seekg(0,ios::end);
+		file.seekg(0,ios_base::end);
 		aSz = file.tellg();
-		file.seekg(0,ios::beg);			 
+		file.seekg(0,ios_base::beg);			 
 		aE32.Adjust(aSz);
 		aE32.iFileSize = aSz;
 		file  >> aE32;
@@ -296,7 +254,7 @@ EImageType ImageHandler::ReadMagicWord()
 		}
 		else {
 			TExtensionRomHeader exRomHeader;
-			file.seekg(0, ios::beg);
+			file.seekg(0, ios_base::beg);
 			file.read(reinterpret_cast<char*>(&exRomHeader), sizeof(TExtensionRomHeader));
 			TUint zeroTime = time(0);
 			// aExtensionRomHeader.iTime and aExtensionRomHeader.iKernelTime are 
@@ -318,7 +276,7 @@ EImageType ImageHandler::ReadMagicWord()
 	}   
 	
 	if(retVal == EUNKNOWN_IMAGE){
-		file.seekg(0,ios::beg);
+		file.seekg(0,ios_base::beg);
         retVal = ReadBareImage(file);
 	}
 
@@ -334,8 +292,7 @@ EImageType ImageHandler::ReadMagicWord()
  * @return type of the image.
  * @note this function is introduced for handling issues raised by DEF129908
  */
-EImageType ImageHandler::ReadBareImage(ifstream& aIfs)
-{
+EImageType ImageHandler::ReadBareImage(ifstream& aIfs) {
     TRomHeader romHdr ; 
     aIfs.read(reinterpret_cast<char*>(&romHdr),sizeof(TRomHeader)); 
 
@@ -347,39 +304,36 @@ EImageType ImageHandler::ReadBareImage(ifstream& aIfs)
 }
 
 
-void ImageHandler::HandleInputFiles()
-{
-	if(!(iOptions & MODE_SIS2IBY))
-	{
+void ImageHandler::HandleInputFiles() {
+	if(!(iOptions & MODE_SIS2IBY)) {
 		EImageType imgType = ReadMagicWord();
 		
 		switch(imgType)
 		{
 		case EROFS_IMAGE:
 		case EROFX_IMAGE:
-			iReader = new RofsImageReader((char*)iInputFileName.c_str());
+			iReader = new RofsImageReader(iInputFileName.c_str());
 			break;
 		case EROM_IMAGE:
-			iReader = new RomImageReader((char*)iInputFileName.c_str());
+			iReader = new RomImageReader(iInputFileName.c_str());
 			break;
         case EBAREROM_IMAGE:
-            iReader = new RomImageReader((char*)iInputFileName.c_str(), EBAREROM_IMAGE);
+            iReader = new RomImageReader(iInputFileName.c_str(), EBAREROM_IMAGE);
             break;
 		case EROMX_IMAGE:
-			iReader = new RomImageReader((char*)iInputFileName.c_str(), EROMX_IMAGE);
+			iReader = new RomImageReader(iInputFileName.c_str(), EROMX_IMAGE);
 			break;
 		case EE32_IMAGE:
-			iReader = new E32ImageReader((char*)iInputFileName.c_str());
+			iReader = new E32ImageReader(iInputFileName.c_str());
 			break;
 		default:
 			{
-            throw ImageReaderException((char*)iInputFileName.c_str(), "Unknown Type of Image file");
+            throw ImageReaderException(iInputFileName.c_str(), "Unknown Type of Image file");
 			}
 			break;
 		}
 
-		if(iReader)
-		{
+		if(iReader) {
 			iReader->ReadImage();
 			iReader->ProcessImage();
 			iReader->Validate();
@@ -388,34 +342,28 @@ void ImageHandler::HandleInputFiles()
 			iReader->Dump();
 		}
 	}
-	else
-	{
-		if(iInputFileName.empty())
-		{
+	else {
+		if(iInputFileName.empty()) {
 			throw SisUtilsException("Usage Error", "No SIS file passed");
 		}
 
-		iSisUtils = new Sis2Iby((char*)iInputFileName.c_str());
+		iSisUtils = new Sis2Iby(iInputFileName.c_str());
 
-		if(iSisUtils)
-		{
-			if(iOptions & DUMP_VERBOSE_FLAG)
-			{
+		if(iSisUtils) {
+			if(iOptions & DUMP_VERBOSE_FLAG) {
 				iSisUtils->SetVerboseMode();
 			}
 
 			iSisUtils->ProcessSisFile();
 			iSisUtils->GenerateOutput();
 		}
-		else
-		{
+		else {
 			throw SisUtilsException("Error:", "Cannot create Sis2Iby object");
 		}
 	}
 }
 
-void ImageHandler::PrintVersion()
-{
+void ImageHandler::PrintVersion() {
 	*out << "\nReadimage - reader for Rom, Rofs and E32 images V";
 	out->width(1);
 	*out << MajorVersion << ".";
@@ -427,8 +375,7 @@ void ImageHandler::PrintVersion()
 	*out << Copyright;
 }
 
-void ImageHandler::PrintUsage()
-{
+void ImageHandler::PrintUsage() {
 	PrintVersion();
 	const char aUsage[] = 
 		"Usage: readImage [options] [<-sis2iby> [sis-options]] <filename>\n\n"
@@ -451,19 +398,15 @@ void ImageHandler::PrintUsage()
 	*out << aUsage << endl;
 }
 
-int main(int argc, char** argv)
-{
+int main(int argc, char* argv[]) {
 	ImageHandler aIh;
 	int retVal = EXIT_SUCCESS;
-	try
-	{
+	try {
 		aIh.ProcessArgs(argc, argv);
 		aIh.HandleInputFiles();
 	}
-	catch(ImageReaderUsageException& aIre)
-	{
-		if(argc >= 2)
-		{
+	catch(ImageReaderUsageException& aIre) {
+		if(argc >= 2) {
 			//This is a usage error and has to be reported
 			//Otherwise, it is called just to display the usage
 			aIre.Report();
@@ -471,13 +414,11 @@ int main(int argc, char** argv)
 		aIh.PrintUsage();
 		retVal = EXIT_FAILURE;
 	}
-	catch(ImageReaderException& aIre)
-	{
+	catch(ImageReaderException& aIre) {
 		aIre.Report();
 		retVal = EXIT_FAILURE;
 	}
-	catch(SisUtilsException& aSUe)
-	{
+	catch(SisUtilsException& aSUe) {
 		aSUe.Report();
 		retVal = EXIT_FAILURE;
 	}

@@ -135,7 +135,7 @@ public:
 	TVariantList Variants() const {return iVariants;}
 	TRomEntry* CreateRomEntry(char*& anAddr) const;
 	void Restrict(TVariantList aList) {iVariants.Intersection(aList);}
-	const TText* Name() const;
+	const char* Name() const;
 protected:
 	enum {EFile=0, EDir=1};
 	TVariantList iVariants;

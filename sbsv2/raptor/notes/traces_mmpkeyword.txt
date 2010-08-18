@@ -1,0 +1,15 @@
+The traces mmp keyword is used to explicitly indicate Raptor to run trace compiler. It is designed to replace the implicit way, which is specifying trace folder in userinclude.  However, the old way is still supported for compatibility reason. 
+
+The keyword could be used as a swtich with no parameter, which automatically set trace folder to be:
+
+../traces/<target>_<targetext>
+
+When the keyword is used with a parameter, it set trace folder to be:
+
+<parameter>traces/<target>_<targetext>
+
+So e.g. if the mmp file is at the same level with trace folder and you want the trace folder directory to be: "./traces/<target>_<targetext>", in your mmp it should say:
+
+traces ./
+
+N.B. The trace folder directory is relative to the directory of the mmp file where traces keyword is used.

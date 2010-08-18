@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -14,9 +14,7 @@
 # Description: 
 #
 
-SHELL:=$(SBS_HOME)/win32/bin/talon.exe
-TALON_SHELL:=$(SBS_HOME)/win32/cygwin/bin/bash.exe
-TALON_BUILDID:=1
+include settings.mk
 TALON_RECIPEATTRIBUTES:=123
 
 export

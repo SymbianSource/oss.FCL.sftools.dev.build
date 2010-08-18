@@ -1,0 +1,20 @@
+This change causes trace compilation to be performed for all source files in a 
+component before any of those files is compiled.
+
+This should reduce the impact of clashes where the tracecompiler ends up writing the same
+trace headers twice if two mmps in a component share source code.  The reduced impact is 
+that the clash can be detected before any dependent object files are built thus the
+rebuilding that normally happens after a clash detection is not necessary.
+
+There is another problem where some components have static libraries and dlls 
+that share common source files.  If tracing is enabled for the DLL these common 
+files try to include their trace headers.  When the source files are being built
+into the static library they also try to include trace headers which may not have 
+been generated yet because tracing is not enabled for static libraries at this time
+since they don't have UIDs or any unique id to associate any trace points with.
+
+This change cannot fix this problem just as it doesn't prevent clashes but it at
+least makes sure that all trace headers exist before anything could possibly try 
+to use them. This helps the build succeed while work is done to remove clashes and the static
+library tracing problem and it is no more incorrect than the current situation.
+

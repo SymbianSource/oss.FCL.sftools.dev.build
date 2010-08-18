@@ -1,0 +1,73 @@
+# Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+# 
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+# 
+# Contributors:
+# 
+# Description:
+# 
+
+
+=head1 NAME
+
+CleanEnv - Restores an environment to a clean state.
+
+=head1 SYNOPSIS
+
+  cleanenv [options]
+
+options:
+
+  -h  help
+  -r  really clean
+  -f  force (don't prompt)
+  -v  verbose output (-vv very verbose)
+
+=head1 DESCRIPTION
+
+Provides the user with the option of:
+
+=over 4
+
+=item *
+
+Re-installing dirty components.
+
+=item *
+
+Removing files of unknown origin.
+
+=back
+
+Normally when scanning an environment certain directories and files are ignored from the point of view of C<unknown origin> status (see the document I<Installation Guide> for more details), for example intermediate build files. The C<-r> switch causes C<CleanEnv> to not ignore any files when performing it's scan, and hence do a more comprehensive clean.
+
+Normally it will ask you if you want to delete files, and/or reinstall components. The -f flag supresses these questions, and should be used with care.
+
+=head1 KNOWN BUGS
+
+None.
+
+=head1 COPYRIGHT
+
+ Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+ All rights reserved.
+ This component and the accompanying materials are made available
+ under the terms of the License "Eclipse Public License v1.0"
+ which accompanies this distribution, and is available
+ at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ 
+ Initial Contributors:
+ Nokia Corporation - initial contribution.
+ 
+ Contributors:
+ 
+ Description:
+ 
+
+=cut

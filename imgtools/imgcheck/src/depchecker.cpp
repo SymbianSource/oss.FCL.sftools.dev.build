@@ -19,9 +19,9 @@
 
 
 /**
- @file
- @internalComponent
- @released
+@file
+@internalComponent
+@released
 */
 
 #include "depchecker.h"
@@ -36,8 +36,7 @@ Constructor intializes the iHashPtr and iHiddenExeHashPtr members.
 @param aImageReaderList - List of ImageReader insatance pointers
 */
 DepChecker::DepChecker(CmdLineHandler* aCmdPtr, ImageReaderPtrList& aImageReaderList, bool aNoRomImage) 
-:Checker(aCmdPtr, aImageReaderList), iNoRomImage(aNoRomImage)
-{
+:Checker(aCmdPtr, aImageReaderList), iNoRomImage(aNoRomImage) {
 	iHashPtr = new HashTable(KHashTableSize); 
 	iHiddenExeHashPtr = new HashTable(KHiddenExeHashSize);
 }
@@ -48,10 +47,15 @@ Destructor deletes the imagereader objects and hash tables.
 @internalComponent
 @released
 */
-DepChecker::~DepChecker()
-{
-	DELETE(iHiddenExeHashPtr);
-	DELETE(iHashPtr);
+DepChecker::~DepChecker() {
+	if(iHiddenExeHashPtr){
+		delete iHiddenExeHashPtr;
+		iHiddenExeHashPtr = 0 ;
+	}
+	if(iHashPtr){
+		delete iHashPtr ;
+		iHashPtr = 0 ;
+	}
 	iAddressVsExeName.clear();
 }
 
@@ -66,62 +70,66 @@ Fucntion responsible to
 
 @param ImgVsExeStatus - Global integrated container which contains image, exes and attribute value status.
 */
-void DepChecker::Check(ImgVsExeStatus& aImgVsExeStatus)
-{
-	unsigned int imgCnt = 0;
-	RomImagePassed();
-	String imageName;
-	ExeNamesVsDepListMap::iterator exeBegin;
-	ExeNamesVsDepListMap::iterator exeEnd;
-	while(imgCnt < iImageReaderList.size())
-	{
-		imageName = iImageReaderList[imgCnt]->ImageName();
-		PrepareImageExeList(iImageReaderList[imgCnt]);
+void DepChecker::Check(ImgVsExeStatus& aImgVsExeStatus) { 
+	RomImagePassed();  
+	int readerCount = iImageReaderList.size();  
+	
+	for(int i = 0 ; i < readerCount ; i++){ 
+		ImageReader* reader = iImageReaderList.at(i);
+		const char* name = reader->ImageName();
+		PrepareImageExeList(reader); 
 		//Gather dependencies of all the images.
-		ExceptionReporter(GATHERINGDEPENDENCIES, (char*)imageName.c_str()).Log();
-		ExeNamesVsDepListMap& depMap = iImageReaderList[imgCnt]->GatherDependencies();
-		exeBegin = depMap.begin();
-		exeEnd = depMap.end();
-		while(exeBegin != exeEnd)
-		{
-			StringList& list = exeBegin->second;
-			aImgVsExeStatus[imageName][exeBegin->first].iIdData = KNull;
-			aImgVsExeStatus[imageName][exeBegin->first].iDepList = list;
-			++exeBegin;
-		}
-		++imgCnt;
-	}
+		ExceptionReporter(GATHERINGDEPENDENCIES, name).Log();
+		ExeNamesVsDepListMap& depMap = iImageReaderList[i]->GatherDependencies();  
+		for(ExeNamesVsDepListMap::iterator it = depMap.begin() ; 
+				it != depMap.end() ; it++) { 
+			StringList& list = it->second;
+			ImgVsExeStatus::iterator pos = aImgVsExeStatus.find(name);
+			ExeVsMetaData* p = 0;
+			if(pos == aImgVsExeStatus.end()){
+				p = new ExeVsMetaData();
+				put_item_to_map(aImgVsExeStatus,name,p);
+			}
+			else
+				p = pos->second ;
+			ExeContainer container ;
+			container.iExeName = it->first ;
+			container.iIdData = KNull;
+			container.iDepList = list ;
+			put_item_to_map(*p,it->first,container);  
+		} 
+	} 
 }
 
 /**
 Function responsible to
 1. Prepare the ExecutableList
 2. Put the received Excutable list into HASH table, this data will be used later 
-   to identify the dependencies existense.
+to identify the dependencies existense.
 
 @internalComponent
 @released
 
 @param aImageReader - ImageReader instance pointer.
 */
-void DepChecker::PrepareImageExeList(ImageReader* aImageReader)
-{
-	aImageReader->PrepareExecutableList();
-	StringList aExeList = aImageReader->GetExecutableList();
-	iHashPtr->InsertStringList(aExeList); //Put executable names into Hash
+void DepChecker::PrepareImageExeList(ImageReader* aImageReader) {
+	 
+	aImageReader->PrepareExecutableList(); 
+	const StringList& aExeList = aImageReader->GetExecutableList(); 
+	iHashPtr->InsertStringList(aExeList); //Put executable names into Hash 
 	/**
 	In ROM if any file is hidden then its entry is not placed in the directory 
 	section of the image during image building time. But still the entry data is 
 	already resolved and ready for xip. So this entry is marked here as Unknown
 	Dependency and its status is Hidden.
 	*/
-	StringList hiddenExeList = aImageReader->GetHiddenExeList();
-	iHiddenExeHashPtr->Insert(KUnknownDependency); //ROm Specific and only once
-	iHiddenExeHashPtr->InsertStringList(hiddenExeList);
-	DeleteHiddenExeFromExecutableList(aImageReader, hiddenExeList);
-	String imgName = aImageReader->ImageName();
-	ExceptionReporter(NOOFEXECUTABLES, (char*)imgName.c_str(), aExeList.size()).Log();
-	ExceptionReporter(NOOFHEXECUTABLES, (char*)imgName.c_str(), hiddenExeList.size()).Log();
+	const StringList& hiddenExeList = aImageReader->GetHiddenExeList(); 	 
+	iHiddenExeHashPtr->Insert(KUnknownDependency); //ROm Specific and only once 
+	iHiddenExeHashPtr->InsertStringList(hiddenExeList); 
+	DeleteHiddenExeFromExecutableList(aImageReader, hiddenExeList); 
+	const char* imgName = aImageReader->ImageName();
+	ExceptionReporter(NOOFEXECUTABLES, imgName, aExeList.size()).Log();
+	ExceptionReporter(NOOFHEXECUTABLES, imgName, hiddenExeList.size()).Log();
 }
 
 /**
@@ -137,14 +145,9 @@ it is possible to get the status "Hidden" for such executables.
 @param aImageReader - ImageReader instance pointer.
 @param aHiddenExeList - List containing the hidden exe's.
 */
-void DepChecker::DeleteHiddenExeFromExecutableList(ImageReader* /*aImageReader*/, StringList& aHiddenExeList)
-{
-	StringList::iterator begin = aHiddenExeList.begin();
-	StringList::iterator end = aHiddenExeList.end();
-	while(begin != end)
-	{
-		iHashPtr->Delete(*begin);
-		++begin;
+void DepChecker::DeleteHiddenExeFromExecutableList(ImageReader* /*aImageReader*/, const StringList& aHiddenExeList) {
+	for(StringList::const_iterator it = aHiddenExeList.begin(); it != aHiddenExeList.end(); it++){
+		iHashPtr->Delete(*it);  
 	}
 }
 
@@ -157,50 +160,36 @@ Traverses through all the images to identify the executables dependency status.
 
 @param aExeContainer - Global integrated container which contains all the attribute, values and the status.
 */
-void DepChecker::PrepareAndWriteData(ExeContainer* aExeContainer)
-{
-	ExeAttribute* exeAtt;
-	StringList& depList = aExeContainer->iDepList;
-	StringList::iterator depBegin = depList.begin();
-	StringList::iterator depEnd = depList.end();
-	while(depBegin != depEnd)
-	{
-		String status;
-		if(!iNoCheck)
-		{
-			CollectDependencyStatus((*depBegin), status);
-		
-			if(status == String(KStatusNo))
-			{
-				if(iHiddenExeHashPtr->IsAvailable(*depBegin))
-				{
+void DepChecker::PrepareAndWriteData(ExeContainer& aExeContainer) { 
+	StringList& depList = aExeContainer.iDepList;  
+	for(StringList::iterator it = depList.begin(); it != depList.end(); it++) {
+		string status;
+		const char* str = it->c_str() ;
+		if(!iNoCheck) {			
+			CollectDependencyStatus(str, status);
+			if(status == KStatusNo) { 
+				if(iHiddenExeHashPtr->IsAvailable(str)) { 
 					status.assign(KStatusHidden);
 				}
-			}
+			}			 
 			//Include only missing dependencies by default
-			if(!iAllExecutables && (status != String(KStatusNo)))
-			{
-				++depBegin;
+			if(!iAllExecutables && (status != KStatusNo)) {
 				continue;
 			}
 		}
-		exeAtt = new ExeAttribute;
-		if(exeAtt == KNull)
-		{
+		ExeAttribute* exeAtt = new ExeAttribute();
+		if(exeAtt == KNull) {
 			throw ExceptionReporter(NOMEMORY, __FILE__, __LINE__);
 		}
-		exeAtt->iAttName = KDependency;
-		exeAtt->iAttValue = *depBegin;
-		if(!iNoCheck)
-		{
+		exeAtt->iAttName.assign(KDependency);
+		exeAtt->iAttValue.assign(str);
+		if(!iNoCheck) {
 			exeAtt->iAttStatus = status;
 		}
-		else
-		{
+		else {
 			exeAtt->iAttStatus = KNull;
 		}
-		aExeContainer->iExeAttList.push_back(exeAtt);
-		++depBegin;
+		aExeContainer.iExeAttList.push_back(exeAtt); 
 	}
 }
 
@@ -215,14 +204,11 @@ preparing executable list.
 @param aString - Individual dependency name. (input)
 @param aStatus - Dependency status.(for output)
 */
-void DepChecker::CollectDependencyStatus(String& aString, String& aStatus) const
-{
-	if(iHashPtr->IsAvailable(aString))
-	{
+void DepChecker::CollectDependencyStatus(const char* aString, string& aStatus) const {
+	if(iHashPtr->IsAvailable(aString)) 
 		aStatus.assign(KStatusYes);
-		return;
-	}
-	aStatus.assign(KStatusNo);
+	else
+		aStatus.assign(KStatusNo);
 }
 
 /**
@@ -234,10 +220,8 @@ Hence this warning is raised.
 @internalComponent
 @released
 */
-void DepChecker::RomImagePassed(void) const
-{
-	if(iNoRomImage)
-	{
+void DepChecker::RomImagePassed(void) const {
+	if(iNoRomImage) {
 		ExceptionReporter(NOROMIMAGE).Report();
 	}
 }

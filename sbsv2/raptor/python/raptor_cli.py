@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2006-2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2006-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -18,13 +18,8 @@
 # by a raptor.Raptor object.
 #
 
-import re
 import types
 import raptor
-import os
-import sys
-import tempfile
-from raptor_utilities import getOSPlatform
 
 from optparse import OptionParser # for parsing command line parameters
 
@@ -34,7 +29,7 @@ miniCommandOption = "--co"  # update this if another "co" option is added
 # raptor_cli module attributes
 
 parser = OptionParser(prog = raptor.name,
-					  usage = """%prog [--help] [options] [variable=value] [target] ...
+					  usage = """%prog [--help] [options] [target] ...
 
 Targets:
 
@@ -47,7 +42,7 @@ FREEZE         Freeze exported functions in a .DEF file
 LIBRARY        Create import libraries from frozen .DEF files
 LISTING        Create assembler listing files for source files
 REALLYCLEAN    Same as CLEAN but also remove exported files
-RESOURCE       Create resource files and AIFs
+RESOURCE       Create resource files
 ROMFILE        Create an IBY file to be included in a ROM
 TARGET         Create main executables
 WHAT           List all releaseable targets
@@ -87,6 +82,9 @@ parser.add_option("-e","--engine",action="store",dest="make_engine",
 parser.add_option("--export-only",action="store_true",dest="doExportOnly",
 				help="Generate exports only and do not create any make files.")
 
+parser.add_option("--noexport",action="store_true",dest="doExport",
+				help="Don't export any files - useful in some builds when you know exports have already been done.")
+
 parser.add_option("-f","--logfile",action="store",dest="logfile",
 				help="Name of the log file, or '-' for stdout.")
 
@@ -116,6 +114,9 @@ parser.add_option("-n","--nobuild",action="store_true",dest="nobuild",
 
 parser.add_option("--no-depend-include",action="store_true",dest="noDependInclude",
 				help="Do not include generated dependency files. This is only useful for extremely large non-incremental builds.")
+
+parser.add_option("--no-depend-generate",action="store_true",dest="noDependGenerate",
+				help="Do not generate dependency files. This is only useful for extremely large non-incremental builds.  Implies --no-depend-include.")
 				
 parser.add_option("-o","--orderlayers",action="store_true",dest="sys_def_order_layers",
 				help="Build layers in the System Definition XML file in the order listed or, if given, in the order of -l options.")
@@ -125,6 +126,18 @@ parser.add_option("-p","--project",action="append",dest="project_name",
 
 parser.add_option("-q","--quiet",action="store_true",dest="quiet",
 				help="Run quietly, not generating output messages.")
+
+parser.add_option("--query",action="append",dest="query",
+				help="""Access various build settings and options using a basic API. The current options are:
+				
+				* aliases - return all the values that can be sensibly used with the sbs -c option.
+				
+				* products - return all the values that can be "." appended to an alias to specialise it for a product build.
+				
+				* config[x] - return a set of values that represent the build configuration "x". Typically "x" will be an alias name or an alias followed by "." followed by a product.
+				
+				Multiple --query options can be given.
+				""")
 
 parser.add_option("-s","--sysdef",action="store",dest="sys_def_file",
 				help="System Definition XML filename.")
@@ -144,10 +157,15 @@ parser.add_option("--toolcheck",action="store",dest="toolcheck",
 
 				  "forced" -  Check all tool versions. Don't use cached results.
 			""")
+
+parser.add_option("--timing",action="store_true",dest="timing",
+			help="Show extra timing information for various processes in the build.")
+
 parser.add_option("--pp",action="store",dest="parallel_parsing",
 				help="""Controls how metadata (e.g. bld.infs) are parsed in Parallel.
 					Possible values are:
 					"on"  - Parse bld.infs in parallel (should be faster on clusters/multicore machines)
+					"slave" - used internally by Raptor 
 					"off" - Parse bld.infs serially 
 				     """)
 
@@ -234,15 +252,9 @@ def DoRaptor(Raptor, args):
 	# parse the full set of arguments
 	(options, leftover_args) = parser.parse_args(expanded_args)
 
-	# the leftover_args are either variable assignments of the form a=b
-	# or target names.
-	regex = re.compile("^(.+)=(.*)$")
+	# the leftover_args are target names.
 	for leftover in leftover_args:
-		assignment = regex.findall(leftover)
-		if len(assignment) > 0:
-			Raptor.SetEnv(assignment[0][0],assignment[0][1])
-		else:
-			Raptor.AddTarget(leftover)
+		Raptor.AddTarget(leftover)
 
 	# Define the dictionary of functions to be used.
 	# Attributes and function names can be added easily.
@@ -260,23 +272,27 @@ def DoRaptor(Raptor, args):
 				 'quiet' : Raptor.RunQuietly,
 				 'debugoutput' : Raptor.SetDebugOutput,
 				 'doExportOnly' : Raptor.SetExportOnly,
+				 'doExport' : Raptor.SetNoExport,
 				 'keepgoing': Raptor.SetKeepGoing,
 				 'nobuild' : Raptor.SetNoBuild,
 				 'make_engine': Raptor.SetMakeEngine,
 				 'make_option': Raptor.AddMakeOption,
 				 'noDependInclude': Raptor.SetNoDependInclude,
+				 'noDependGenerate': Raptor.SetNoDependGenerate,
 				 'number_of_jobs': Raptor.SetJobs,
 				 'project_name' :  Raptor.AddProject,
+				 'query' : Raptor.AddQuery,
 				 'filter_list' : Raptor.FilterList,
 				 'ignore_os_detection': Raptor.IgnoreOsDetection,
 				 'check' :  Raptor.SetCheck,
 				 'what' :  Raptor.SetWhat,
 				 'tries' : Raptor.SetTries,
 				 'toolcheck' : Raptor.SetToolCheck,
+				 'timing' : Raptor.SetTiming,
 				 'source_target' : Raptor.AddSourceTarget,
 				 'command_file' : CommandFile,
-				'parallel_parsing' : Raptor.SetParallelParsing,
-			 	'version' : Raptor.PrintVersion
+				 'parallel_parsing' : Raptor.SetParallelParsing,
+			 	 'version' : Raptor.PrintVersion
 				}
 
 	# Check if Quiet mode has been specified (otherwise we will make noise)

@@ -329,7 +329,7 @@ sub getFeatures($$)
 
 		$featRef = $FeatureMap{$uid};
 
-		if( $featRef->{include} == 1 )
+		if( defined ($featRef) && defined ($featRef->{include}) && $featRef->{include} == 1 )
 		{
 			&ERROR("The feature $feat->{name} was added into the exclude as well as include list");
 			return 0;
@@ -352,7 +352,7 @@ sub getFeatures($$)
 
 		$featRef = $FeatureMap{$uid};
 
-		if( $featRef->{exclude} == 1 )
+		if( defined ($featRef) && defined ($featRef->{exclude}) && $featRef->{exclude} == 1 )
 		{
 			&ERROR("The feature $feat->{name} was added into the exclude as well as include list");
 			return 0;
@@ -424,7 +424,7 @@ sub ERROR
 sub ConvertHexToDecimal 
 {
 	my $val = shift;
-	if(grep /^0x/i, $val) 
+	if(defined ($val) && grep /^0x/i, $val) 
 	{
 		# Input is Hexadecimal value, convert to Decimal
 		return hex($val);	 

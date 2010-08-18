@@ -1,0 +1,10 @@
+component       dev_build_srctools_readtype
+
+source          /src/tools/build/srctools/readtype
+exports         /src/tools/build/srctools/readtype/group
+binary          /src/tools/build/srctools/readtype/group all
+
+notes_source \component_defs\release.src
+
+ipr T
+

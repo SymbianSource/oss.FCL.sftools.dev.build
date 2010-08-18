@@ -1,0 +1,79 @@
+/*
+* Copyright (c) 2010 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description: 
+*
+*/
+
+PRJ_PLATFORMS
+TOOLS2
+
+/**
+@file
+
+@SYMPurpose Tool for manipulating and verifying system definition files
+*/
+
+PRJ_EXPORTS
+
+//  raw scripts 
+
+../checklinks.pl		/epoc32/tools/build/checklinks.pl
+../filtering.xsl		/epoc32/tools/build/filtering.xsl
+../joinandparesysdef.xsl		/epoc32/tools/build/joinandparesysdef.xsl
+../joinsysdef.pl		/epoc32/tools/build/joinsysdef.pl
+../joinsysdef.xsl		/epoc32/tools/build/joinsysdef.xsl
+../mergesysdef.xsl		/epoc32/tools/build/mergesysdef.xsl
+../rootsysdef.pl		/epoc32/tools/build/rootsysdef.pl
+../sysdefdowngrade.xsl		/epoc32/tools/build/sysdefdowngrade.xsl
+../validate-sysdef.xsl		/epoc32/tools/build/validate-sysdef.xsl
+
+
+//  reusable modules and internal utilities 
+
+../lib/filter-module.xsl		/epoc32/tools/build/lib/filter-module.xsl
+../lib/joinsysdef-module.xsl		/epoc32/tools/build/lib/joinsysdef-module.xsl
+../lib/mergesysdef-module.xsl		/epoc32/tools/build/lib/mergesysdef-module.xsl
+../lib/modelcheck.xsl		/epoc32/tools/build/lib/modelcheck.xsl
+../lib/path-module.xsl		/epoc32/tools/build/lib/path-module.xsl
+../lib/test-model.xsl		/epoc32/tools/build/lib/test-model.xsl
+../lib/usage.xsl		/epoc32/tools/build/lib/usage.xsl
+
+//  Xalan jar files 
+../xalanj/serializer.jar		/epoc32/tools/build/xalanj/serializer.jar
+../xalanj/xalan.jar		/epoc32/tools/build/xalanj/xalan.jar
+../xalanj/xercesImpl.jar		/epoc32/tools/build/xalanj/xercesImpl.jar
+../xalanj/xml-apis.jar		/epoc32/tools/build/xalanj/xml-apis.jar
+
+
+
+
+// Perl-calling .bat files (identical, can export from any single one of these).
+../checklinks.bat		/epoc32/tools/build/checklinks.bat
+../joinsysdef.bat		/epoc32/tools/build/joinsysdef.bat
+../rootsysdef.bat		/epoc32/tools/build/rootsysdef.bat
+
+// Xalan-calling .bat/unix files (identical, can export from single file)
+../joinandparesysdef.bat		/epoc32/tools/build/joinandparesysdef.bat
+../filtering.bat		/epoc32/tools/build/filtering.bat
+../validate-sysdef.bat		/epoc32/tools/build/validate-sysdef.bat
+unixxslcmd 		/epoc32/tools/build/joinandparesysdef
+unixxslcmd 		/epoc32/tools/build/filtering
+unixxslcmd 		/epoc32/tools/build/validate-sysdef
+
+// Xalan-calling .bat/unix files that use XSLTC (identical, can export from single file)
+../mergesysdef.bat		/epoc32/tools/build/mergesysdef.bat
+../sysdefdowngrade.bat		/epoc32/tools/build/sysdefdowngrade.bat
+unixxsltccmd		/epoc32/tools/build/mergesysdef
+unixxsltccmd		/epoc32/tools/build/sysdefdowngrade
+ 

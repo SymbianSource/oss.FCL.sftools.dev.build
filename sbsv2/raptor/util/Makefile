@@ -17,8 +17,14 @@
 
 SHELL:=bash
 
+ifeq ($(CLEANMODE),)
 .PHONY:: all
 all::
+else
+.PHONY:: clean
+clean::
+
+endif
 
 include utilbuild.mk # need general settings e.g. INSTALLROOT
 
@@ -26,42 +32,23 @@ ifeq ($(filter CLEAN,$(MAKECMDGOALS))$(filter clean,$(MAKECMDGOALS)),)
 
 include gccprogram.mk
 
-# Actual programs
-include descramble/Makefile
-
-include talon/Makefile
-
-include ransleep/Makefile
-
-# Some tools not built for windows
-ifneq ($(filter $(HOSTPLATFORM),win),win)
-ifeq ($(CLEANMODE),)
-include bash.mk
-
-include make.mk
-
-#  Build pvm and pvmgmake later when they have been corrected
-#include pvmgmake.mk
-
-#include pvm.mk
-
-include python.mk
-
-include codewarrior.mk
-
-include bvcpp.mk
-
-include gccxml.mk
-
-include dialog.mk
+#################################################
+ifeq ($(TARGETS),)
+  TARGETS:=descramble talon ransleep tmkdir
+  ifneq ($(filter $(HOSTPLATFORM),win),win)
+    # Some tools not built for windows
+    # Some of these don't support our special clean mode
+    TARGETS:=$(TARGETS) bash make python codewarrior bvcpp gccxml dialog
+    #  Build pvm and pvmgmake later when they have been corrected
+    # pvmgmake  pvm
+  endif
 endif
 
-endif
+$(foreach T,$(TARGETS),$(eval include $(T).mk))
 
 else
 
-
 clean:
 	@echo "Cleaning"
-	make $(MAKEFILE) CLEANMODE:=1 | grep '<file>' |sed -r 's#.*<file>(.*)</file>.*#\1#' | (read F; while [ $$? -eq 0 ]; do rm -f "$$F"; read F; done; true )
+	make $(MAKEFILE) CLEANMODE:=1 | grep '<file>' |sed -r 's#.*<file>(.*)</file>.*#\1#' | (read F; while [ $$? -eq 0 ]; do rm -f "$$F"; echo " [rm] $$F"; read F; done; true )
 endif

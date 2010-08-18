@@ -30,12 +30,12 @@
 
 #include "h_utl.h"
 
-TInt HFile::Open(const TText * const aFileName, TInt32 * const aFileHandle)
+TInt HFile::Open(const char* aFileName, TInt32 * const aFileHandle)
 	{
 #ifdef __LINUX__
-	TInt32 hFile = open((const char *)aFileName, O_RDONLY );
+	TInt32 hFile = open(aFileName, O_RDONLY );
 #else
-	TInt32 hFile = _open((const char *)aFileName, _O_RDONLY | _O_BINARY);
+	TInt32 hFile = _open(aFileName, _O_RDONLY | _O_BINARY);
 #endif
 
 	if (hFile == -1)
@@ -95,7 +95,7 @@ TUint32 HFile::GetPos(const TInt32 aFileHandle)
 	}
 
 /******************************************************************************/
-TUint32 HFile::GetLength(TText *aName)
+TUint32 HFile::GetLength(const char* aName)
 	{
 	TInt32 handle;
 	if (HFile::Open(aName, &handle)==0)
@@ -125,7 +125,7 @@ void HFile::Close(const TInt32 aFileHandle)
 
 
 /******************************************************************************/
-TUint32 HFile::Read(TText *aName, TAny *someMem)
+TUint32 HFile::Read(const char* aName, TAny *someMem)
  	{
 	TInt32 handle;
 	if (HFile::Open(aName, &handle)==0)

@@ -15,9 +15,11 @@
 #
 
 # This package contains routines to find the static and dynamic dependencies of a binary.
-package Dep_Lister;
+package dep_lister;
 
 use cdfparser;
+use romutl;
+
 require Exporter;
 @ISA=qw(Exporter);
 @EXPORT=qw(
@@ -34,6 +36,7 @@ sub StaticDeps()
 	my ($file) = @_;
 	my @statdeps;
 
+    is_existinpath("elf2e32", Romutl::DIE_NOT_FOUND);
 	open PIPE, "elf2e32 --dump i --e32input=$file 2>&1 | ";
 	my $executable;
 	my $ver;
@@ -42,7 +45,7 @@ sub StaticDeps()
 	my $binaryInfoRef;
 	my $fileName;
 
-	if($file =~ /.*\\(\S+)/)
+	if($file =~ /.*[\/\\](\S+)/)
 	{
 		$fileName = $1;
 	}

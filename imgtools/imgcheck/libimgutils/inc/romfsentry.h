@@ -32,34 +32,30 @@ Class RomImageFSEntry, Base class ROM image file and directory entry structure
 class RomImageFSEntry 
 {
 public:
-	RomImageFSEntry (char* aName) 
-	: iName(aName), iSibling(0), iChildren(0)
-	{
+	RomImageFSEntry (const char* aName) 
+	: iName(aName), iSibling(0), iChildren(0){
 	}
 
-	virtual ~RomImageFSEntry(void)
-	{
+	virtual ~RomImageFSEntry() {
 	}
 
-	virtual bool IsDirectory(void) = 0;
-	virtual bool IsExecutable(void) = 0;
-	const char *Name(void) { return iName.data();}
+	virtual bool IsDirectory() const = 0;
+	virtual bool IsExecutable() const = 0;
+	const char *Name() const { return iName.c_str();}
 
-	void Destroy(void)
-	{
+	void Destroy() {
 		RomImageFSEntry *current = this; // root has no siblings
-		while (current)
-		{
+		while (current) {
 			if (current->iChildren)
 				current->iChildren->Destroy();
 			RomImageFSEntry* prev=current;
 			current=current->iSibling;
-			DELETE(prev);
+			delete prev;
 		}
 	}
 
-	String iName;
-	String iPath;
+	string iName;
+	string iPath;
 	RomImageFSEntry *iSibling;
 	RomImageFSEntry *iChildren;
 };
@@ -73,19 +69,15 @@ Class RomImageFileEntry, ROM image file entry structure
 class RomImageFileEntry : public RomImageFSEntry 
 {
 public:
-	RomImageFileEntry(char* aName) 
-	: RomImageFSEntry(aName),iExecutable(true)
-	{
+	RomImageFileEntry(const char* aName) 
+	: RomImageFSEntry(aName),iExecutable(true){
 	}
-	~RomImageFileEntry(void)
-	{
+	~RomImageFileEntry() {
 	}
-	bool IsDirectory(void)
-	{
+	bool IsDirectory() const {
 		return false;
 	}
-	union ImagePtr
-	{
+	union ImagePtr {
 		TRomImageHeader *iRomFileEntry;
 		TLinAddr iDataFileAddr;
 	}ImagePtr;
@@ -99,8 +91,7 @@ public:
 
 	@return - returns 'true' if executable or 'false'
 	*/
-	bool IsExecutable(void)
-	{
+	bool IsExecutable() const {
 		if (iExecutable)
 			return true;
 		else
@@ -117,18 +108,14 @@ Class RomImageDirEntry, ROM image Directory entry structure
 class RomImageDirEntry : public RomImageFSEntry
 {
 public:
-	RomImageDirEntry(char* aName) : RomImageFSEntry(aName)
-	{
+	RomImageDirEntry(const char* aName) : RomImageFSEntry(aName){
 	}
-	~RomImageDirEntry(void)
-	{
+	~RomImageDirEntry() {
 	}
-	bool IsDirectory(void)
-	{
+	bool IsDirectory() const {
 		return true;
 	}
-	bool IsExecutable(void)
-	{
+	bool IsExecutable() const {
 		return false;
 	}
 };

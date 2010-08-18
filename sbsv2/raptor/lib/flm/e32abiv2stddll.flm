@@ -1,4 +1,4 @@
-# Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -29,16 +29,13 @@ SUPPORT_FREEZE:=1
 
 # Default Linker settings for this target type
 LINKER_ENTRYPOINT_LIBDEP:=$(STATIC_RUNTIME_DIR)/edll.lib
-LINKER_ENTRYPOINT_SETTING:=$(LINKER_ENTRY_OPTION) _E32Dll $(LINKER_ENTRYPOINT_DECORATION) $(call dblquote,$(STATIC_RUNTIME_DIR)/edll.lib$(LINKER_ENTRYPOINT_ADORNMENT))
+LINKER_ENTRYPOINT_SETTING:=$(LINKER_ENTRYPOINT_PREFIX)$(ENTRYPOINT) $(LINKER_ENTRYPOINT_DECORATION)$(LINKER_SEPARATOR)$(call dblquote,$(STATIC_RUNTIME_DIR)/edll.lib$(LINKER_ENTRYPOINT_ADORNMENT))
 DEFAULT_NEWLIB:=$(DEFAULT_STDCPP_NEWLIB)
-
-ifeq ("$(NEED_ENTRYPOINT_LIBRARY)","True")
-LINKER_ENTRYPOINT_SETTING:=$(LINKER_ENTRYPOINT_SETTING) $(LINKER_ENTRYPOINT_LIBDEP)
-endif
 
 LINKER_STUB_LIBRARY:=$(STATIC_RUNTIME_DIR)/edllstub.lib
 STATIC_RUNTIME_LIB:=$(USER_STATIC_RUNTIME_LIB)
 LIBRARY:=$(LIBRARY) euser.dso
+LIBRARY_DEBUG:=$(LIBRARY_DEBUG) euser.dso
 
 
 # Default Postlinker settings
@@ -58,7 +55,7 @@ $(call vsave,CDEFS SYSTEMINCLUDE)
 #compile options
 SYSTEMINCLUDE:=$(SYSTEMINCLUDE) $(EPOCROOT)/epoc32/include/stdapis
 NOHIDEALL:=1
-CDEFS:=$(CDEFS) __DLL__
+CDEFS:=$(CDEFS) __DLL__ __SYMBIAN_STDCPP_SUPPORT__
 
 include $(FLMHOME)/e32abiv2.flm
 $(call vrestore)

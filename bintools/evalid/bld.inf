@@ -22,6 +22,5 @@ evalid.bat          /epoc32/tools/evalid.bat
 evalid.pl           /epoc32/tools/evalid.pl
 EvalidCompare.pm    /epoc32/tools/evalidcompare.pm
 EvalidMD5.pm        /epoc32/tools/evalidmd5.pm
-pe_dump.exe         /epoc32/tools/pe_dump.exe
 
 evalid.txt          /epoc32/engdoc/tools/host_utilities/evalid.txt

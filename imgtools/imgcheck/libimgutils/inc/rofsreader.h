@@ -26,8 +26,8 @@
 #include "typedefs.h"
 #include "rofsimage.h"
 
-const String KRofsImageIdentifier = "ROFS";
-const String KRofsExtImageIdentifier = "ROFx";
+const string KRofsImageIdentifier = "ROFS";
+const string KRofsExtImageIdentifier = "ROFx";
 
 /**
 class to read rofs image
@@ -38,17 +38,17 @@ class to read rofs image
 class RofsReader : public ImageReader
 {
 public:
-	RofsReader(char *aFile, EImageType aImgType);
+	RofsReader(const char *aFile, EImageType aImgType);
 	~RofsReader(void);
-	static bool IsRofsImage(String& aWord);
-	static bool IsRofsExtImage(String& aWord);
-    bool IsExecutable(String aName);
+	static bool IsRofsImage(const string& aWord);
+	static bool IsRofsExtImage(const string& aWord);
+    bool IsExecutable(const string& aName);
 	void ReadImage(void);
 	void ProcessImage(void);
 	ExeNamesVsDepListMap& GatherDependencies(void);
-	void PrepareExeDependencyList(E32Image* aE32Image, StringList& aExecutableList);
+	void PrepareExeDependencyList(E32Image* aE32Image, StringList& aExecutables);
 	void PrepareExecutableList(void);
-    void PrepareExeVsE32ImageMap(TRomNode* aEntry, CCoreImage *aImage, EImageType aImageType, Ifstream& aInputStream, ExeVsE32ImageMap& aExeVsE32ImageMap, ExeVsOffsetMap& aExeVsOffsetMap, StringList& aHiddenExeList);
+    void PrepareExeVsE32ImageMap(TRomNode* aEntry, CCoreImage *aImage, EImageType aImageType, ifstream& aInputStream, ExeVsE32ImageMap& aExeVsE32ImageMap, ExeVsOffsetMap& aExeVsOffsetMap, StringList& aHiddenExes);
 	void DeleteHiddenExecutableVsE32ImageEntry(void);
     void PrepareExeVsIdMap(void);
     const ExeVsIdDataMap& GetExeVsIdMap(void) const;

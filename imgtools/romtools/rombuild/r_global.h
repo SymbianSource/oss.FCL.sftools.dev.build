@@ -57,7 +57,6 @@ extern TUint32 TheRomRootDir;
 extern TBool Unicode;
 extern TBool gSortedRomFs;
 extern TBool gEnableCompress;
-extern TBool gFastCompress;
 
 extern TUint gCompressionMethod;
 
@@ -86,7 +85,9 @@ extern TBool gEnableStdPathWarning;
 extern TInt gLogLevel;
 extern TBool gLowMem;
 extern TBool gUseCoreImage;
-extern TText *gImageFilename;
+extern string gImageFilename;
+extern TBool gGenSymbols; 
 extern TInt gBootstrapSize;			// To calculate uncompressed un-paged size CR1258
 extern TInt gPageIndexTableSize;	// To calculate uncompressed un-paged size CR1258
+extern TBool gKeepGoing;					// To enable keepgoing
 #endif

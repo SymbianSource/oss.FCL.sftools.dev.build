@@ -116,7 +116,7 @@ void NumericValue::AllocateSpace()
 
 	if ( iNumericValueType != L_DOUBLE && iData == NULL)
 		{
-		ErrorHandler::OutputErrorLine( "Failed to allocate space for number.");
+		ErrorHandler::OutputErrorLine( "Error: Failed to allocate space for number.");
 		exit(1);
 		}
 	}
@@ -207,7 +207,7 @@ void NumericValue::ConvertToNatural( const String & Source)
 			{
 			if ( ! isdigit( * pSourceChar) )
 				{
-				String s( "Cannot convert \"");
+				String s( "Error: Cannot convert \"");
 				s += Source;
 				s += "\" to a number.";
 				ErrorHandler::OutputErrorLine( s);
@@ -238,31 +238,31 @@ void NumericValue::ConvertToNatural( const String & Source)
 			if ( bLeadingHyphen)
 				{
 				if ( ! ( inrange = (LongValue <= 128) ) )			// 2 ^ 7
-					ErrorHandler::OutputErrorLine( "Number too low for BYTE");
+					ErrorHandler::OutputErrorLine( "Error: Number too low for BYTE");
 				}
 			else
 				if ( ! ( inrange = (LongValue <= 0xFF) ) )
-					ErrorHandler::OutputErrorLine( "Number too big for BYTE");
+					ErrorHandler::OutputErrorLine( "Error: Number too big for BYTE");
 			break;
 		case L_WORD:							// L_WORD is 16-bits long.
 			if ( bLeadingHyphen)
 				{
 				if ( ! ( inrange = (LongValue <= 32768) ) )		// 2^15
-					ErrorHandler::OutputErrorLine( "Number too low for WORD");
+					ErrorHandler::OutputErrorLine( "Error: Number too low for WORD");
 				}
 			else
 				if ( ! ( inrange = (LongValue <= 0xFFFF) ) )
-					ErrorHandler::OutputErrorLine( "Number too big for WORD");
+					ErrorHandler::OutputErrorLine( "Error: Number too big for WORD");
 			break;
 		case L_LONG:							// L_LONG is 32-bits long
 			if ( bLeadingHyphen)
 				{
 				if ( ! ( inrange = (LongValue <= 0x80000000) ) )	// 2^31
-					ErrorHandler::OutputErrorLine( "Number too low for LONG");
+					ErrorHandler::OutputErrorLine( "Error: Number too low for LONG");
 				}
 			else
 				if ( ! ( inrange = (LongValue <= 0xFFFFFFFF ) ) ) // This test is a bit pointless as long cannot be greater than 0xffffffff
-					ErrorHandler::OutputErrorLine( "Number too big for LONG");
+					ErrorHandler::OutputErrorLine( "Error: Number too big for LONG");
 			break;
 		default:
 			assert(0);	// Other data types cannot be converted to natural numbers.
@@ -319,7 +319,7 @@ void NumericValue::StoreValue( unsigned long LongValue)
 
 	if ( ! inrange)	
 		{
-		ErrorHandler::OutputErrorLine( "Numeric value out of range for specified type");
+		ErrorHandler::OutputErrorLine( "Error: Numeric value out of range for specified type");
 		exit(1);
 		}
 

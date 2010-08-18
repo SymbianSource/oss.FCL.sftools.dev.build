@@ -20,7 +20,12 @@ PRJ_PLATFORMS
 TOOLS2
 
 PRJ_EXPORTS
+
+#ifdef TOOLS2_LINUX
+../tranasm		/epoc32/tools/tranasm
+#else
 ../tranasm.bat		/epoc32/tools/tranasm.bat
+#endif
 ../tranasm.pl		/epoc32/tools/tranasm.pl
 ../tranasm_x86.pl	/epoc32/tools/tranasm_x86.pl
 

@@ -1,0 +1,9 @@
+component       dev_build_deprecated_etouch
+
+source          /src/tools/build/deprecated/etouch
+exports         /src/tools/build/deprecated/etouch/group
+binary          /src/tools/build/deprecated/etouch/group all
+
+notes_source	\component_defs\release.src
+
+ipr T

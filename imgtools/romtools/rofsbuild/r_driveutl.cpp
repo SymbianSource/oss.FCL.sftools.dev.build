@@ -36,7 +36,7 @@ Checks the validity of driveobey file name before creating the log file name.
   
 @return - returns 'ErrorNone' if log file created, otherwise returns Error.
 */ 
-TInt Getlogfile(TText *aDriveObeyFileName,TText* &aPadLogFile)
+TInt Getlogfile(char *aDriveObeyFileName,char* &aPadLogFile)
 	{
 
 	if(!(*aDriveObeyFileName))
@@ -45,30 +45,12 @@ TInt Getlogfile(TText *aDriveObeyFileName,TText* &aPadLogFile)
 	// Validate the user entered driveoby file name.
 	char* logFile = (char*)aDriveObeyFileName;
 
-#ifdef __LINUX__
-	logFile = strrchr(logFile,'/');
-#else
-	while(*logFile)
-		{
-		if(*logFile == '/')
-			*logFile = '\\';
-		logFile++;
-		}
-	logFile = (char*)aDriveObeyFileName;
-	logFile = strrchr(logFile,'\\');
-#endif
-	
-	if(logFile)
-		++logFile;
-	else
-		logFile = (char*)aDriveObeyFileName;
-
 	TInt len = strlen(logFile);
 	if(!len)
 		return KErrGeneral;
 
 	// Allocates the memory for log file name.
-	aPadLogFile = new TText[(len)+5]; 
+	aPadLogFile = new char[(len)+5]; 
 	if(!aPadLogFile)
 		return KErrNoMemory;
 

@@ -53,12 +53,15 @@ public:
 
 	    @returns The filename of the core image file 
 	 */
-	virtual TText* RomFileName() = 0;
+	virtual const char* RomFileName() const = 0;
 	/** Gets the size of the image file
 
 	   @returns size of file
 	 */
-	virtual TInt Size() = 0;
+	virtual TInt Size() const = 0;
+#ifdef __LINUX__
+	virtual ~MRofsImage(){}
+#endif
 	};
 
 const int K_ID_SIZE=4; /** Size of the image header identifier */
@@ -83,7 +86,7 @@ public:
 		E_ROFX
 		};
 
-	RCoreImageReader(char *aFilename);
+	RCoreImageReader(const char *aFilename);
 	~RCoreImageReader();
 	TBool Open();
 	TImageType ReadImageType();
@@ -91,26 +94,26 @@ public:
 	TInt ReadExtensionHeader(TExtensionRofsHeader& aHeader);
 
 	TInt ReadDirEntry(TRofsDir& aDir);
-	TInt ReadDirEntry(TRofsDir& aDir, long aFilePos);
+	TInt ReadDirEntry(TRofsDir& aDir, size_t aFilePos);
 
-	long FilePosition();
-	void SetFilePosition(long aFilePos);
+	size_t FilePosition();
+	void SetFilePosition(size_t aFilePos);
 
 	TInt ReadRofEntry(TRofsEntry& aEntry);
-	TInt ReadRofEntry(TRofsEntry& aEntry, long aFilePos);
+	TInt ReadRofEntry(TRofsEntry& aEntry, size_t aFilePos);
 	TInt ReadRofEntryName(TUint16* aName, int aLength);
-	TBool IsValidPosition(long filePos);
-	TText* Filename();
+	TBool IsValidPosition(size_t aFilePos);
+	const char* Filename() const ;
 private:
 	TInt ReadIdentifier();
 	TInt ImageError(int aBytesRead, int aExpected, char* aInfo);
 
 	/** Image type of the file being read */
 	TImageType iImageType;
-	/** File handle of core image being read */
-	FILE* iCoreImage;
+	/** File object of core image being read */
+	ifstream iCoreImage;
 	/** Filename of core image file */
-	char* iFilename;
+	string iFilename;
 	/** Image type identifier read from image header */
 	TUint8 iIdentifier[K_ID_SIZE];
 	};
@@ -136,8 +139,8 @@ public:
 	TRomNode* RootDirectory();
 	TRomNode* CopyDirectory(TRomNode*& aSourceDirectory);
 	void SetRootDirectory(TRomNode* aDir);
-	TText* RomFileName();
-	TInt Size();
+	const char* RomFileName() const;
+	TInt Size() const;
 
 protected:
 	void SaveDirInfo(TRofsHeader& header);
@@ -162,7 +165,7 @@ private:
 	/** Size of the file entries block of the directory */
 	long iDirFileEntriesSize;
 	/** Filename of the rom image file */
-	TText* iRomFileName;
+	string iRomFileName;
 	/** Size of image */
 	TInt iImageSize;
 	};
@@ -180,10 +183,9 @@ public:
 	~TDirectoryEntry();
 	TInt Process(long adjustment);
 private:
-	TInt CreateFileEntry(TText* aName, TRofsEntry& aRofsEntry);
+	TInt CreateFileEntry(const char* aName, TRofsEntry& aRofsEntry);
 	TInt AddSubDirs(long endDirPos);
 	TInt AddFiles(long startPos, int size);
-	TText* GetName(TUint16 aFirstChar, TInt aLength);
 
 	/** Handle to core image file */
 	RCoreImageReader* iReader;

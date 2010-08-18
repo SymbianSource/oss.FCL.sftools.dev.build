@@ -1,0 +1,195 @@
+#!perl
+# Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+# 
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+# 
+# Contributors:
+# 
+# Description:
+# 
+#
+
+use strict;
+use FindBin;
+use lib "$FindBin::Bin";
+use Getopt::Long;
+use IniData;
+use EnvDb;
+use CommandController;
+use EnvDifferencer;
+
+
+#
+# Constants.
+#
+
+my $margin = 2;
+
+
+#
+# Globals.
+#
+
+my $verbose = 0;
+my $iniData = IniData->New();
+my $commandController = CommandController->New($iniData, 'DiffEnv');
+my $comp1;
+my $ver1;
+my $comp2;
+my $ver2;
+my $doDateComparison = 0;
+
+
+#
+# Main.
+#
+
+ProcessCommandLine();
+DiffEnv();
+
+
+#
+# Subs.
+#
+
+sub ProcessCommandLine {
+  Getopt::Long::Configure ("bundling");
+  my $help;
+  GetOptions('h' => \$help, 'd' => \$doDateComparison, 'v+' => \$verbose);
+
+  if ($help) {
+    Usage(0);
+  }
+
+  $comp1 = shift @ARGV;
+  $ver1 = shift @ARGV;
+  $comp2 = shift @ARGV;
+  $ver2 = shift @ARGV;
+
+  unless (defined $comp1 and defined $ver1 and $#ARGV == -1) {
+    print "Error: Invalid number of arguments\n";
+    Usage(1);
+  }
+  if (defined $comp2) {
+    unless (defined $ver2) {
+      print "Error: Invalid number of arguments\n";
+      Usage(1);
+    }
+  }
+  if ($verbose && $doDateComparison) {
+    print "Warning: -v disables -d\n";
+    $doDateComparison = 0;
+  }
+}
+
+sub Usage {
+  my $exitCode = shift;
+
+  Utils::PrintDeathMessage($exitCode, "\nUsage: diffenv [options] <component_1> <version_1> [<component_2> <version_2>]
+
+options:
+
+-h  help
+-d  ignore differences when components in the first environment are younger than the second
+-v  verbose output\n");
+}
+
+sub DiffEnv {
+  my $env1Name;
+  my $env2Name;
+  my $envDifferencer = EnvDifferencer->New($iniData, $verbose);
+  if (defined $comp2 and $ver2) {
+    $envDifferencer->SetStartCompVer($comp1, $ver1);
+    $envDifferencer->SetEndCompVer($comp2, $ver2);
+    $env1Name = "$comp1 $ver1";
+    $env2Name = "$comp2 $ver2";
+  }
+  else {
+    $env1Name = "current";
+    $env2Name = "$comp1 $ver1";
+    $envDifferencer->SetEndCompVer($comp1, $ver1);
+    # no need to specify the other environment since the default
+    # is to use the current environment
+  }
+
+  my @tableData;
+  foreach my $comp (@{$envDifferencer->OnlyEnd()}) {
+    push @tableData, [ $comp, '-', $envDifferencer->EndVersion($comp) ];
+  }
+  foreach my $comp (@{$envDifferencer->OnlyStart()}) {
+    push @tableData, [ $comp, $envDifferencer->StartVersion($comp), '-'  ];
+  }
+  if ($verbose) {
+    foreach my $comp (@{$envDifferencer->UnchangedComps()}) {
+      my $ver = $envDifferencer->StartVersion($comp);
+      push @tableData, [ $comp, $ver, $ver  ];
+    }
+  }
+  if ($doDateComparison) {
+    foreach my $comp (@{$envDifferencer->NewerComps()}) {
+      push @tableData, [ $comp, $envDifferencer->StartVersion($comp), $envDifferencer->EndVersion($comp)  ];
+    }
+  } else {
+    foreach my $comp (@{$envDifferencer->ChangedComps()}) {
+      push @tableData, [ $comp, $envDifferencer->StartVersion($comp), $envDifferencer->EndVersion($comp)  ];
+    }
+  }
+
+  if (@tableData) {
+    my @sortedTableData = sort { $a->[0] cmp $b->[0] } @tableData;
+    unshift @sortedTableData, ['', $env1Name, $env2Name]; # Heading.
+    $iniData->TableFormatter->PrintTable(\@sortedTableData, 1);
+  }
+  else {
+    print "Environments identical\n";
+  }
+}
+
+__END__
+
+=head1 NAME
+
+DiffEnv - Compare the component versions of a pair of environments.
+
+=head1 SYNOPSIS
+
+  diffenv [options] <component_1> <version_1> [<component_2> <version_2>]
+
+options:
+
+  -h  help
+  -d  ignore differences when components in the first environment are younger than the second
+  -v  verbose output
+
+=head1 DESCRIPTION
+
+Displays a table of component version differences. If the second component / version pair is ommitted, the comparison is made against the current environment. If the C<-v> switch is specified, all versions will be displayed, even those that are identical. The results will be displayed in a table. The C<-d> option may be useful when newer version of a component are known to be backwards compatible with older versions.
+
+=head1 KNOWN BUGS
+
+None.
+
+=head1 COPYRIGHT
+
+ Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+ All rights reserved.
+ This component and the accompanying materials are made available
+ under the terms of the License "Eclipse Public License v1.0"
+ which accompanies this distribution, and is available
+ at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ 
+ Initial Contributors:
+ Nokia Corporation - initial contribution.
+ 
+ Contributors:
+ 
+ Description:
+ 
+
+=cut

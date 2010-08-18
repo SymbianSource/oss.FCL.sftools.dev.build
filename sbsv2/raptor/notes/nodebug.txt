@@ -1,0 +1,21 @@
+The "nodebug" variant causes executables to be built without debug
+information.  It does not affect the macros that are passed to debug
+executables or the optimisation flags.
+
+The use case for nodebug is for a situation where some executables are
+so large that they trigger a problem in RVCT2.2's linker for the "udeb"
+version of the executable but not for the "urel" version.  There is no
+known solution for this problem without using a new compiler and since
+it isn't currently possible to use different compilers in the same build
+this is not an option.
+
+This variant makes the udeb build of the executable much less useful for
+debugging purposes so it is an undesirable workaround for a build problem but
+there is no alternative.   Newer versions of Symbian support newer compilers
+and will not need this feature.  It is also not needed when building with GCCE.
+We strongly recommend against using this feature.
+
+For exectuables with this problem one must use the APPLY keyword in the mmp
+like so:
+
+apply nodebug

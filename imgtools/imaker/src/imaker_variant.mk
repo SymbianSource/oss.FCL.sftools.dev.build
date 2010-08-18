@@ -2,16 +2,16 @@
 # Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
-# under the terms of the License "Symbian Foundation License v1.0"
+# under the terms of the License "Eclipse Public License v1.0"
 # which accompanies this distribution, and is available
-# at the URL "http://www.symbianfoundation.org/legal/sfl-v10.html".
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
 #
 # Initial Contributors:
 # Nokia Corporation - initial contribution.
 #
 # Contributors:
 #
-# Description: iMaker Variant image configuration
+# Description: iMaker Variant Build image configuration
 #
 
 
@@ -25,107 +25,82 @@
 
 USE_VARIANTBLD = 0
 
+PRODUCT_VARDIR   = $(if $(and $(call true,$(USE_CONE)),$(call true,$(IMAKER_MKRESTARTS))),$(CONE_OUTDIR),$(PRODUCT_DIR))
+
 VARIANT_NAME     = $(TARGETNAME)
 VARIANT_ID       = $(TARGETID)
-VARIANT_DIR      = $(call iif,$(USE_CUSTVARIANTBLD),,$(PRODVARIANT_DIR))
-VARIANT_OUTDIR   = $(if $(filter u U,$(USE_VARIANTBLD)),$(UDA_DATADIR),$($(IMAGE_TYPE)_DIR)/variant)
+VARIANT_DIR      = $(if $(filter $(LANGPACK_PREFIX)%,$(TARGETNAME)),$(LANGPACK_DIR),$(if\
+  $(filter $(CUSTVARIANT_PREFIX)%,$(TARGETNAME)),$(CUSTVARIANT_DIR),$(if\
+    $(filter emmc_% mcard_% uda_%,$(TARGETNAME)),$($(IMAGE_TYPE)_VARDIR),$(if\
+      $(filter variant%,$(TARGETNAME)),,$(PRODUCT_VARDIR)))))
+VARIANT_OUTDIR   = $(if $(filter CORE ROFS%,$(IMAGE_TYPE)),$($(IMAGE_TYPE)_DIR)/variant,$($(IMAGE_TYPE)_DATADIR))
 VARIANT_MKNAME   = variant.mk
 VARIANT_MK       = $(if $(VARIANT_DIR),$(wildcard $(VARIANT_DIR)/$(VARIANT_MKNAME)))
 
-VARIANT_PREFIX   = $($(IMAGE_TYPE)_PREFIX)_$(call lcase,$(IMAGE_TYPE))
-VARIANT_HBY      = $(VARIANT_PREFIX)_customervariant.hby
+VARIANT_HBY      = $(IMAGE_PREFIX)_$(if $(filter CORE ROFS%,$(IMAGE_TYPE)),variant,datadrive).hby
 VARIANT_HEADER   = $(if $(VARIANT_INCDIR),$(call includeiby,$(VARIANT_HBY)))
-VARIANT_OBY      = $(VARIANT_PREFIX)_customervariant.oby
-VARIANT_OVERRIDE = $(if $(filter 1 2,$(USE_VARIANTBLD)),1,0)
-VARIANT_OBYDATA  = data$(call iif,$(VARIANT_OVERRIDE),-override)="%1"  "%2"
+VARIANT_OBY      = $(basename $(VARIANT_HBY)).oby
+VARIANT_OVERRIDE = $(if $(filter CORE ROFS%,$(IMAGE_TYPE)),OVERRIDE_REPLACE/ADD)
+VARIANT_OBYDATA  = data$(call iif,$(VARIANT_OVERRIDE),-override)="%1"  "%2"$(if $(filter CORE ROFS%,$(IMAGE_TYPE)),,  %4)
 
-VARIANT_CONFML   = $(call iif,$(USE_CUSTVARIANTBLD),$(wildcard $(VARIANT_DIR)/$(CONFT_CFGNAME).confml),$(PRODVARIANT_CONFML))
-VARIANT_CONFCP   = $(call iif,$(USE_CUSTVARIANTBLD),$(if $(VARIANT_CONFML),$(CONFT_CFGNAME)),$(PRODVARIANT_CONFCP))
-VARIANT_CPDIR    = $(wildcard $(VARIANT_DIR)/content)
-VARIANT_INCDIR   = $(wildcard $(VARIANT_DIR)/include)
-VARIANT_SISDIR   = $(wildcard $(VARIANT_DIR)/sis)
-VARIANT_OPCDIR   = $(wildcard $(VARIANT_DIR)/opcache)
-VARIANT_ZIPDIR   = $(wildcard $(VARIANT_DIR)/zip)
+VARIANT_CPDIR    = $(if $(wildcard $(VARIANT_DIR)/content/*),$(VARIANT_DIR)/content)
+VARIANT_INCDIR   = $(if $(wildcard $(VARIANT_DIR)/include/*),$(VARIANT_DIR)/include)
+VARIANT_SISDIR   = $(if $(wildcard $(VARIANT_DIR)/sis/*),$(VARIANT_DIR)/sis)
+VARIANT_OPCDIR   = $(if $(wildcard $(VARIANT_DIR)/opcache/*),$(VARIANT_DIR)/opcache)
+VARIANT_WGZDIR   = $(if $(wildcard $(VARIANT_DIR)/widget/*),$(VARIANT_DIR)/widget)
+VARIANT_ZIPDIR   = $(if $(wildcard $(VARIANT_DIR)/zip/*),$(VARIANT_DIR)/zip)
 
 #==============================================================================
 
-CLEAN_CUSTVARIANT =\
-  del | "$(VARIANT_HBY)" "$(VARIANT_OBY)" | deldir | $(VARIANT_OUTDIR) |\
-  $(if $(VARIANT_CONFML),$(CLEAN_CENREP)  |)\
-  $(if $(VARIANT_SISDIR),$(CLEAN_SISINST) |)\
-  $(if $(VARIANT_OPCDIR),$(CLEAN_OPCACHE) |)
+CLEAN_VARIANT =\
+  del | "$(VARIANT_HBY)" "$(VARIANT_OBY)" | deldir | "$(VARIANT_OUTDIR)" |\
+  $(CLEAN_SISINST) | $(CLEAN_OPCACHE) | $(CLEAN_WIDGET)
 
-BUILD_CUSTVARIANT =\
-  echo-q | Variant target             USE_VARIANTBLD = $(call iif,$(USE_VARIANTBLD),`$(USE_VARIANTBLD)$',-) |\
-  echo-q | Variant directory          VARIANT_DIR    = $(or $(filter -,$(VARIANT_DIR)),$(if $(VARIANT_DIR),`$(VARIANT_DIR)$',-)) |\
-  echo-q | Variant config makefile    VARIANT_MK     = $(if $(VARIANT_MK),`$(VARIANT_MK)$',-) |\
-  echo-q | Variant include directory  VARIANT_INCDIR = $(if $(VARIANT_INCDIR),`$(VARIANT_INCDIR)$',-) |\
-  echo-q | Variant confml file        VARIANT_CONFML = $(if $(VARIANT_CONFML),`$(VARIANT_CONFML)$',-) |\
-  echo-q | Variant CenRep configs     VARIANT_CONFCP = $(if $(VARIANT_CONFCP),`$(VARIANT_CONFCP)$',-) |\
-  echo-q | Variant SIS directory      VARIANT_SISDIR = $(if $(VARIANT_SISDIR),`$(VARIANT_SISDIR)$',-) |\
-  echo-q | Variant operator cache dir VARIANT_OPCDIR = $(if $(VARIANT_OPCDIR),`$(VARIANT_OPCDIR)$',-) |\
-  echo-q | Variant zip content dir    VARIANT_ZIPDIR = $(if $(VARIANT_ZIPDIR),`$(VARIANT_ZIPDIR)$',-) |\
-  echo-q | Variant copy content dir   VARIANT_CPDIR  = $(if $(VARIANT_CPDIR),`$(VARIANT_CPDIR)$',-)   |\
-  echo-q | Variant output directory   VARIANT_OUTDIR = $(if $(VARIANT_OUTDIR),`$(VARIANT_OUTDIR)$',-) |\
+BUILD_VARIANT =\
+  echo-q | Variant target              USE_VARIANTBLD = $(call iif,$(USE_VARIANTBLD),`$(USE_VARIANTBLD)',-) |\
+  echo-q | Variant directory           VARIANT_DIR    = $(or $(filter -,$(VARIANT_DIR)),$(if $(VARIANT_DIR),`$(VARIANT_DIR)',-)) |\
+  echo-q | Variant config makefile     VARIANT_MK     = $(if $(VARIANT_MK),`$(VARIANT_MK)',-) |\
+  echo-q | Variant include directory   VARIANT_INCDIR = $(if $(VARIANT_INCDIR),`$(VARIANT_INCDIR)',-) |\
+  echo-q | Variant SIS conf            SISINST_INI    = $(if $(SISINST_INI),`$(SISINST_INI)',-)       |\
+  echo-q | Variant SIS directory       VARIANT_SISDIR = $(if $(VARIANT_SISDIR),`$(VARIANT_SISDIR)',-) |\
+  echo-q | Variant operator cache conf OPC_INI        = $(if $(OPC_INI),`$(OPC_INI)',-)               |\
+  echo-q | Variant operator cache dir  VARIANT_OPCDIR = $(if $(VARIANT_OPCDIR),`$(VARIANT_OPCDIR)',-) |\
+  echo-q | Variant widget preinst conf WIDGET_INI     = $(if $(WIDGET_INI),`$(WIDGET_INI)',-)         |\
+  echo-q | Variant widget preinst dir  VARIANT_WGZDIR = $(if $(VARIANT_WGZDIR),`$(VARIANT_WGZDIR)',-) |\
+  echo-q | Variant zip content dir     VARIANT_ZIPDIR = $(if $(VARIANT_ZIPDIR),`$(VARIANT_ZIPDIR)',-) |\
+  echo-q | Variant copy content dir    VARIANT_CPDIR  = $(if $(VARIANT_CPDIR),`$(VARIANT_CPDIR)',-)   |\
+  echo-q | Variant output directory    VARIANT_OUTDIR = $(if $(VARIANT_OUTDIR),`$(VARIANT_OUTDIR)',-) |\
   $(if $(VARIANT_DIR),,\
-    error | 1 | Variable VARIANT_DIR is not set while making target $@!\n |)\
-  $(if $(word 2,$(USE_VARIANTBLD))$(filter-out 0 1 2 3 4 5 6 u U,$(USE_VARIANTBLD)),\
-    error | 1 | Variable USE_VARIANTBLD is incorrectly defined. Possible values are 1 - 3 (6) and u.\n |)\
-  mkdir  | $(VARIANT_OUTDIR) |\
+    error | 1 | Variable VARIANT_DIR is not set while making target $(TARGETNAME). |)\
+  $(if $(wildcard $(subst \,/,$(VARIANT_DIR))),,\
+    error | 1 | Variable VARIANT_DIR does not point to an existing directory ($(VARIANT_DIR)). |)\
+  $(if $(word 2,$(USE_VARIANTBLD))$(filter-out 0 1 2 3 4 5 6 e E m M u U,$(USE_VARIANTBLD)),\
+    error | 1 | Variable USE_VARIANTBLD is incorrectly defined. Possible values are 1 - 6$(,) e$(,) m and u. |)\
+  mkdir | "$(VARIANT_OUTDIR)" |\
   $(if $(VARIANT_INCDIR),\
     echo-q | Generating oby(s) for Variant image creation |\
-    geniby | $(VARIANT_HBY) | $(VARIANT_INCDIR) | *.hrh | \#include "%3" | end |\
+    geniby | $(VARIANT_HBY) | $(VARIANT_INCDIR) |\
+      __header__ | define _IMAGE_VARINCDIR $(call quote,$(VARIANT_INCDIR)) | *.hrh | \#include "%3" | end |\
     geniby | $(VARIANT_OBY) | $(VARIANT_INCDIR) | *.iby | \#include "%3" | end |)\
-  $(if $(wildcard $(VARIANT_CONFML)),\
-    $(BUILD_CENREP) |)\
-  $(if $(VARIANT_SISDIR),\
-    $(call iif,$(USE_SOSUDA),\
-      geniby-r | >>$(VARIANT_OBY) | $(VARIANT_SISDIR) | *.sis* | sisfile="%1" | end,\
-      $(BUILD_SISINST)) |)\
-  $(if $(VARIANT_OPCDIR),\
+  $(if $(or $(SISINST_INI),$(VARIANT_SISDIR)),\
+    $(BUILD_SISINST) |)\
+  $(if $(or $(OPC_INI),$(VARIANT_OPCDIR)),\
     $(BUILD_OPCACHE) |)\
-  $(if $(VARIANT_ZIPDIR),$(if $(wildcard $(VARIANT_ZIPDIR)/*),\
+  $(if $(or $(WIDGET_INI),$(VARIANT_WGZDIR)),\
+    $(BUILD_WIDGET) |)\
+  $(if $(VARIANT_ZIPDIR),\
     echo-q | Extracting zip content directory |\
-    cmd    | $(7ZIP_TOOL) x -y $(VARIANT_ZIPDIR)/* -o$(VARIANT_OUTDIR) |))\
+    cmd    | $(7ZIP_TOOL) x -y $(VARIANT_ZIPDIR)/* -o$(VARIANT_OUTDIR) |)\
   $(if $(VARIANT_CPDIR),\
-    echo-q | Copying copy content directory |\
-    copy   | $(VARIANT_CPDIR)/* | $(VARIANT_OUTDIR) |)\
-  $(if $(filter u U,$(USE_VARIANTBLD)),,\
-    geniby-r | >>$(VARIANT_OBY) | $(VARIANT_OUTDIR) | * | $(VARIANT_OBYDATA) | end |)\
-  write | >>$(VARIANT_OBY) | |
+    echo-q  | Copying copy content directory |\
+    copydir | "$(VARIANT_CPDIR)" | $(VARIANT_OUTDIR) |)\
+  $(call iif,$(filter CORE ROFS%,$(IMAGE_TYPE))$(USE_SOSUDA),\
+    geniby-r | >>$(VARIANT_OBY) | $(VARIANT_OUTDIR) |\
+      $(call iif,$(VARIANT_OVERRIDE),__header__ | $(VARIANT_OVERRIDE) |)\
+      * | $(VARIANT_OBYDATA) |\
+      $(call iif,$(VARIANT_OVERRIDE),__footer__ | OVERRIDE_END |) end)
 
-#==============================================================================
-
-variantrofs%: USE_CUSTVARIANTBLD = 1
-
-$(foreach rofs,2 3 4 5 6,\
-  $(eval .PHONY: variantrofs$(rofs))\
-  $(eval variantrofs$(rofs) variantrofs$(rofs)%: USE_VARIANTBLD = $(rofs))\
-  $(eval variantrofs$(rofs) variantrofs$(rofs)%: rofs$(rofs)$(TARGETEXT) ;)\
-)
-
-$(call add_help,variantrofs2,t,Create an image from a variant with rofs2. Be sure to define the VARIANT_DIR.)
-$(call add_help,variantrofs3,t,Create an image from a customer variant folder. Be sure to define the VARIANT_DIR.)
-$(call add_help,variantuda,t,Create an image from a variant userdata folder. Be sure to define the VARIANT_DIR.)
-
-#==============================================================================
-
-SOS.VARIANT.STEPS = $(foreach rofs,2 3 4 5 6,$(SOS.ROFS$(rofs).STEPS))
-ALL.VARIANT.STEPS = $(SOS.VARIANT.STEPS)
-
-#==============================================================================
-# Targets
-
-.PHONY: variant variant-image variant-symbol variant-i2file
-
-variant: ;@$(call IMAKER,$$(ALL.VARIANT.STEPS))
-
-variant-image: ;@$(call IMAKER,$$(SOS.VARIANT.STEPS))
-
-variant-symbol:\
-  ;@$(call IMAKER,$(foreach rofs,2 3 4 5 6,$(call iif,$(USE_ROFS$(rofs)),ROFS$(rofs)SYM)))
-
-variant-i2file: ;@$(call IMAKER,VARIANTI2F)
+#  geniby-dr | >>$(VARIANT_OBY) | $(VARIANT_OUTDIR) | * | dir="%2" | end
 
 
 # END OF IMAKER_VARIANT.MK

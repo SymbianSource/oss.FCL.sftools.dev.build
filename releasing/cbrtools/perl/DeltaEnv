@@ -1,0 +1,375 @@
+#!perl
+# Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+# 
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+# 
+# Contributors:
+# 
+# Description:
+# 
+#
+
+use strict;
+use FindBin;
+use lib "$FindBin::Bin";
+use Getopt::Long;
+use IniData;
+use CommandController;
+use Cwd 'abs_path';
+use Symbian::CBR::CreateDelta;
+use Symbian::CBR::ApplyDelta;
+use Symbian::CBR::Release::Manifest;
+use Carp;
+use File::Spec;
+
+#
+# Globals.
+#
+
+my $verbose = 0;
+my $overwrite = 0;
+my $noevalid = 0;
+my $nodelta = 0;
+my $iniData = IniData->New();
+my $commandController = CommandController->New( $iniData, 'DeltaEnv' );
+my $referenceComp;
+my $referenceVer;
+my $nominatedComp;
+my $nominatedVer;
+my $report;
+my $createDelta;
+my $applyDelta;
+my $releaseManifestFile;
+my $receivingArchive;
+my $pgpKey;
+my $deltaPackagePath;
+
+
+#
+# Main.
+#
+
+ProcessCommandLine();
+
+#
+# Subs.
+#
+
+sub ProcessCommandLine {
+  Getopt::Long::Configure ( "bundling" );
+  my $help;
+  my $maxdeltasize;
+
+  GetOptions( 'h' => \$help, 'o' => \$overwrite, 'v+' => \$verbose, 'noevalid+' => \$noevalid, 'nodelta+' => \$nodelta, 'c+' => \$createDelta, 'a+' => \$applyDelta, 'r+' => \$report, 'rb=s' => \$referenceComp, 'rv=s' => \$referenceVer, 'nb=s' => \$nominatedComp, 'nv=s' => \$nominatedVer, 'rm=s' => \$releaseManifestFile, 'ra=s' => \$receivingArchive, 'p=s' => \$pgpKey, 'dp=s' => \$deltaPackagePath, 'maxdelta=s' => \$maxdeltasize );
+
+  if ( $help ) {
+    Usage(0);
+  }
+  elsif ( $report ) {
+    generateReleaseManifest();
+  }
+  elsif ($createDelta) {
+    createDeltaEnv($maxdeltasize);
+  }
+  elsif ($applyDelta) {
+    ReconstructEnv();
+  }
+  else {
+    print "Error: Invalid option.\n";
+    Usage(1);
+  }
+}
+
+sub Usage {
+  my $exitCode = shift;
+
+  if ($report) {
+    GenerateReleaseManifestUsage($exitCode);
+  }
+  if ($createDelta) {
+    CreateDeltaUsage($exitCode);
+  }
+  if ($applyDelta) {
+    ApplyDeltaUsage($exitCode);
+  }
+
+  Utils::PrintDeathMessage($exitCode, "\n
+
+options:
+
+-h    help
+-r    generate release manifest mode
+-c    create delta mode
+-a    apply delta mode
+-v    verbose output
+-r -h generate release manifest mode help
+-c -h create delta mode help
+-a -h apply delta mode help \n" );
+}
+
+sub GenerateReleaseManifestUsage {
+  my $exitCode = shift;
+  
+  Utils::PrintDeathMessage($exitCode, "\nUsage: deltaenv -r [options] <component> <version> [report path]
+
+options:
+
+-h help
+-o overwrite existing release manifest file
+-v verbose output \n" );
+}
+
+sub CreateDeltaUsage {
+  my $exitCode = shift;
+    
+  Utils::PrintDeathMessage($exitCode, "\nUsage: deltaenv -c [options] --nb <nominated baseline> --nv <nominated version> [--rm <release manifest>|--rb <reference baseline> --rv <reference version> --ra <receiving archive>] -p <PGP key> [--dp <delta release package>]
+
+options:
+
+-h         help
+-v         verbose output
+-o         overwrite existing delta release package
+--nodelta  include whole files where modified (don't create deltas)
+--noevalid use raw binary comparison (don't use evalid)
+--nb       <nominated baseline> nominated baseline component name
+--nv       <nominated version> nominated baseline component version
+--rm       <release manifest> release manifest file
+--rb       <reference baseline> reference baseline component name
+--rv       <reference version> reference baseline component version
+--ra       <receiving archive> receiving archive path
+-p         <PGP key> PGP key of recipient
+--maxdelta <max size> max size to delta (larger files treated as --nodelta)
+--dp       <delta release package> delta release package path \n" );
+}
+
+sub ApplyDeltaUsage {
+  my $exitCode = shift;
+
+  Utils::PrintDeathMessage($exitCode, "\nUsage: deltaenv -a [options] <delta release package>
+
+options:
+
+-h help
+-o overwrite existing components
+-v verbose output \n" );
+}
+
+sub generateReleaseManifest {
+  my $comp = shift @ARGV;
+  my $ver = shift @ARGV;
+  my $destinationManifestPath  = shift @ARGV;
+  unless ( defined $comp and defined $ver and $#ARGV == -1 ) {
+    print "Error: Reference component and version must be specified.\n";
+    GenerateReleaseManifestUsage(1);
+  }
+  my $localArchive = $iniData->PathData->LocalArchivePathForExistingComponent($comp, $ver);
+  die "Error: $comp $ver does not exist.\n" unless (defined $localArchive);
+  
+  if ($localArchive !~ s/\Q$comp\E[\\\/]\Q$ver\E([\\\/])?$//) { # Remove the component name
+    die "Error: (INTERNAL) Unable to remove component information $comp $ver from the archive path $localArchive\n";
+  } 
+  
+  my $archiveReleaseManifestDir = File::Spec->catdir($localArchive, ".cbr");
+  my $archiveFile = $comp."_".$ver."_manifest.xml";
+  $archiveFile = File::Spec->catfile($archiveReleaseManifestDir, $archiveFile);
+
+  my $releaseManifest = Symbian::CBR::Release::Manifest->new( $iniData, $verbose );
+  unless ( defined $destinationManifestPath ) {
+    $destinationManifestPath = Cwd::cwd();
+  }
+
+  if (-e $archiveFile and !$overwrite) {
+    $releaseManifest->Load($archiveFile);
+  }
+  else {
+    $releaseManifest->GenerateManifest($comp, $ver);
+  }
+  
+  if ($overwrite or !-e $archiveFile) {
+    eval{ $releaseManifest->Save($archiveReleaseManifestDir);};
+    print "Warning: Not backing up manifest file in $archiveReleaseManifestDir path because $@" if($@);
+  }
+  
+  $releaseManifest->Save( $destinationManifestPath );
+}
+
+sub createDeltaEnv {
+  my $maxdeltasize = shift;
+  unless ( defined $nominatedComp and defined $nominatedVer and $#ARGV == -1 ) {
+    print "Error: Invalid arguments\n";
+    CreateDeltaUsage(1);
+  }
+  unless (defined $releaseManifestFile or (defined $referenceComp and defined $referenceVer)) {
+    print "Error: Invalid arguments\n";
+    CreateDeltaUsage(1);
+  }
+
+  # Parse max delta file size
+  my $maxdeltabytes;
+  if (defined $maxdeltasize) {
+    if ($maxdeltasize =~ /^\d+$/) {
+      $maxdeltabytes = $maxdeltasize;
+    } elsif ($maxdeltasize =~ /^(\d+)k$/i) {
+      $maxdeltabytes = $1*1024;
+    } elsif ($maxdeltasize =~ /^(\d+)m$/i) {
+      $maxdeltabytes = $1*1024*1024;
+    } elsif ($maxdeltasize =~ /^(\d+)g$/i) {
+      $maxdeltabytes = $1*1024*1024*1024;
+    } else {
+      die "Error: Option '--maxdelta ".$maxdeltasize."' is not a valid size (sizes must be in bytes, or have a K, M or G postfix)\n";
+    }
+  }
+
+  # Get a release manifest to represent the nominated baseline in the receiving archive
+  my $deltaAllFiles;
+  my $releaseManifest = Symbian::CBR::Release::Manifest->new( $iniData, $verbose );
+  if ( defined  $releaseManifestFile) {
+    $releaseManifestFile = File::Spec->rel2abs($releaseManifestFile);
+    print "Reading $releaseManifestFile file.\n";
+    $releaseManifest->Load( $releaseManifestFile );
+  }
+  elsif (defined $receivingArchive) {
+    $releaseManifest->GenerateManifest($referenceComp, $referenceVer, $receivingArchive);
+  }
+  else {
+    $deltaAllFiles = 1;
+  }
+
+  # Create the delta
+  $referenceComp = $releaseManifest->{'baselineName'} unless (defined $referenceComp);
+  $referenceVer = $releaseManifest->{'baselineVersion'} unless (defined $referenceVer);
+  unless ( defined $deltaPackagePath ) {
+    $deltaPackagePath = Cwd::cwd();
+  }
+  my $packageZipFile = $referenceVer."_".$nominatedVer.".zip";
+  $packageZipFile = File::Spec->catfile($deltaPackagePath, $packageZipFile);
+  die "Error: Delta release for $referenceVer and $nominatedVer is already present in $deltaPackagePath. Please use -o option to overwrite.\n" if (-e $packageZipFile and !$overwrite);
+  my $createDelta = Symbian::CBR::CreateDelta->new( $iniData, $pgpKey, $releaseManifest, $verbose, $noevalid, $nodelta, $maxdeltabytes );
+  $createDelta->{deltaAllFiles} = 1 if ($deltaAllFiles);
+  $createDelta->{exportAll} = 1 unless (defined $pgpKey);
+  $createDelta->createDeltaEnv( $referenceComp, $referenceVer, $nominatedComp, $nominatedVer, $deltaPackagePath );
+  print "Successfully created deltas for baseline.\n";
+}
+
+sub ReconstructEnv {
+  my $zipFile = shift @ARGV;
+  unless (defined $zipFile and $#ARGV == -1 ) {
+    print "Error: Invalid arguments\n";
+    ApplyDeltaUsage(1);
+  }
+  print "Reconstructing Environment\n";
+  my $reconstructEnv = Symbian::CBR::ApplyDelta->new($iniData,$verbose);
+  $reconstructEnv->ReconstructEnv($zipFile, $overwrite);
+  print "Reconstructed baseline successfully.\n";
+}
+
+
+__END__
+
+=head1 NAME
+
+DeltaEnv - Creates and applies deltas for modified components between pair of baselines.
+
+=head1 SYNOPSIS
+
+options:
+
+  -h    help
+  -r    generate release manifest mode
+  -c    create delta mode
+  -a    apply delta mode
+  -v    verbose output
+  -r -h generate release manifest mode help
+  -c -h create delta mode help
+  -a -h apply delta mode help
+
+
+Generate release manifest mode
+
+  deltaenv -r [options] <component> <version> [report path]
+
+options:
+
+  -h help
+  -o overwrite existing release manifest file
+  -v verbose output
+
+
+Create delta mode
+
+  deltaenv -c [options] --nb <nominated baseline> --nv <nominated version> [--rm <release manifest>|--rb <reference baseline> --rv <reference version> --ra <receiving archive>] -p <PGP key> [--dp <delta release package>]
+
+options:
+
+  -h         help
+  -v         verbose output
+  -o         overwrite existing delta release package
+  --nodelta  include whole files where modified (don't create deltas)
+  --noevalid use raw binary comparison (don't use evalid)
+  --nb       <nominated baseline> nominated baseline component name
+  --nv       <nominated version> nominated baseline component version
+  --rm       <release manifest> release manifest file
+  --rb       <reference baseline> reference baseline component name
+  --rv       <reference version> reference baseline component version
+  --ra       <receiving archive> receiving archive path
+   -p        <PGP key> PGP key of recipient
+  --maxdelta <max size> max size to delta (larger files treated as --nodelta)
+  --dp       <delta release package> delta release package path
+
+
+Apply delta mode
+
+  deltaenv -a [options] <delta release package>
+
+options:
+
+  -h help
+  -o overwrite existing components
+  -v verbose output
+
+=head1 DESCRIPTION
+
+This command can be used in 3 modes: generate release manifest, create delta, and apply delta.
+
+Generate Release Manifest :
+Generates a release manifest file, which lists all files available in the reference baseline at the receiving archive. It is used in create delta mode, in order that it has an accurate representation of the reference baseline to make the delta against.
+
+The release manifest contains the list of components and their versions in the reference baseline environment. It also lists all the files in each component, and all the metadata files, and each file's size, timestamp and MD5 checksum.
+
+
+Create delta mode :
+Creates a smallest possible delta package, using which whole baseline can be reconstructed at the receiving site. this delta package contains deltas for modified files from reference version to the nominated version of a component, newly added files for the existing components, newly added components for the baseline and delta release manifest file. This delta package can be transferred by the user to receiving site instead of whole baseline.
+
+
+Apply delta mode : 
+Reconstructs a nominated baseline using reference version and delta release package which is created in create delta mode. Using create delta and apply delta mode, amount of data to be transferred from sending site to receiving site can be reduced.
+
+
+=head1 KNOWN BUGS
+
+None.
+
+=head1 COPYRIGHT
+
+ Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+ All rights reserved.
+ This component and the accompanying materials are made available
+ under the terms of the License "Eclipse Public License v1.0"
+ which accompanies this distribution, and is available
+ at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ 
+ Initial Contributors:
+ Nokia Corporation - initial contribution.
+ 
+ Contributors:
+ 
+ Description:
+ 
+
+=cut

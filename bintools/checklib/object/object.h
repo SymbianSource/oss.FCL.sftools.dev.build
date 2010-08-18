@@ -12,15 +12,10 @@
 //
 // Description:
 // Classes for interpreting a memory area as an ELF or COFF object.
-//
-//                    <creates>
+// <creates>
 // Object_factory -----------------> Object
-//                                     ^
-//                                     |
-//                              +------+------+
-//                              |             |
-//
-//                         Elf_object      Coff_object
+// Elf_object      Coff_object
+// 
 //
 
 #ifndef OBJECT_H

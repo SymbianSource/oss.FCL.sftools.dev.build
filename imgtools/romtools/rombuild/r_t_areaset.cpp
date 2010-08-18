@@ -16,13 +16,8 @@
 *
 */
 
-
-#if defined(__MSVCDOTNET__) || defined(__TOOLS2__)
-#include <iostream>
-#else //!__MSVCDOTNET__
-#include <iostream.h>
-#endif //__MSVCDOTNET__
-
+ 
+#include <iostream> 
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
@@ -312,7 +307,7 @@ LOCAL_C void TestFileIterator()
 	// Adding one file to that area
 	//
 	
-	TRomBuilderEntry* pfile1 = new TRomBuilderEntry("file1", (TText*) "file1");
+	TRomBuilderEntry* pfile1 = new TRomBuilderEntry("file1", "file1");
 	area->AddFile(pfile1);
 
 	FilesInAreaIterator it2(*area);
@@ -326,7 +321,7 @@ LOCAL_C void TestFileIterator()
 	// Adding a second file to that area
 	//
 
-	TRomBuilderEntry* pFile2 = new TRomBuilderEntry("file2", (TText*) "file2");
+	TRomBuilderEntry* pFile2 = new TRomBuilderEntry("file2", "file2");
 	area->AddFile(pFile2);
 
 	FilesInAreaIterator it3(*area);

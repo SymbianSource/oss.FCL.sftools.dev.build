@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2007-2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2007-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -71,9 +71,9 @@ class MMPParser(object):
 		self.assignment = \
 			( \
 			Line(CaselessKeyword('ARMFPU') + String()) ^ \
+			Line(CaselessKeyword('APPLY') + String()) ^ \
 			Line(CaselessKeyword('ASSPLIBRARY') + StringList()) ^ \
 			Line(CaselessKeyword('CAPABILITY') + StringList()) ^ \
-			Line(CaselessKeyword('DOCUMENT') + StringList()) ^ \
 			Line(CaselessKeyword('EPOCHEAPSIZE') + HexOrDecNumber() + HexOrDecNumber()) ^ \
 			Line(CaselessKeyword('EPOCPROCESSPRIORITY') + String()) ^ \
 			Line(CaselessKeyword('FIRSTLIB') + String()) ^ \
@@ -82,6 +82,7 @@ class MMPParser(object):
 			Line(CaselessKeyword('RAMTARGET') + String()) ^ \
 			Line(CaselessKeyword('TARGETTYPE') + String()) ^ \
 			Line(CaselessKeyword('TARGETPATH') + String()) ^ \
+			Line(CaselessKeyword('TRACES') + Optional(String())) ^ \
 			Line(CaselessKeyword('SYSTEMINCLUDE') + StringList()) ^ \
 			Line(CaselessKeyword('USERINCLUDE') + StringList()) ^ \
 			Line(CaselessKeyword('DEFFILE') + String()) ^ \
@@ -97,39 +98,22 @@ class MMPParser(object):
 			Line(CaselessKeyword('EPOCPROCESSPRIORITY') + String()) ^ \
 			Line(CaselessKeyword('NEWLIB') + String()) \
 			).setParseAction(self.backend.doAssignment) ^ \
-			( \
-			Line(CaselessKeyword('SOURCE') + StringList()).setParseAction(self.backend.doSourceAssignment) \
-			).setParseAction(self.backend.doSourceAssignment) ^ \
-			( \
-			Line(CaselessKeyword('RESOURCE') + StringList()).setParseAction(self.backend.doOldResourceAssignment) \
-			).setParseAction(self.backend.doOldResourceAssignment) ^ \
+			Line(CaselessKeyword('DOCUMENT') + StringList()).setParseAction(self.backend.doDocumentAssignment) ^ \
+			Line(CaselessKeyword('SOURCE') + StringList()).setParseAction(self.backend.doSourceAssignment) ^ \
+			Line(CaselessKeyword('RESOURCE') + StringList()).setParseAction(self.backend.doOldResourceAssignment) ^ \
 			( \
 			Line(CaselessKeyword('SYSTEMRESOURCE') + StringList()).setParseAction(self.backend.doResourceAssignment) \
 			).setParseAction(self.backend.doOldResourceAssignment) ^ \
 			( \
 			Line(CaselessKeyword('SOURCEPATH') + String()).setParseAction(self.backend.doSourceAssignment) \
 			).setParseAction(self.backend.doSourcePathAssignment) ^ \
-			( \
-			Line((CaselessKeyword('UID') + Group(HexOrDecNumber() + Optional(HexOrDecNumber())))).setParseAction(self.backend.doUIDAssignment) \
-			).setParseAction(self.backend.doUIDAssignment)  ^ \
-			( \
-			Line(CaselessKeyword('LANG') + StringList()) \
-			).setParseAction(self.backend.doAppend) ^ \
-			( \
-			Line(CaselessKeyword('LIBRARY') + StringList()) \
-			).setParseAction(self.backend.doAppend) ^ \
-			( \
-			Line(CaselessKeyword('DEBUGLIBRARY') + StringList()) \
-			).setParseAction(self.backend.doAppend) ^ \
-			( \
-			Line(CaselessKeyword('MACRO') + Optional(StringList())) \
-			).setParseAction(self.backend.doAppend) ^ \
-			( \
-			Line(CaselessKeyword('AIF') + StringList()) \
-			).setParseAction(self.backend.doDeprecated) ^ \
-			( \
-			Line(CaselessKeyword('STATICLIBRARY') + StringList()) \
-			).setParseAction(self.backend.doAppend)
+			Line((CaselessKeyword('UID') + Group(HexOrDecNumber() + Optional(HexOrDecNumber())))).setParseAction(self.backend.doUIDAssignment) ^ \
+			Line(CaselessKeyword('LANG') + StringList()).setParseAction(self.backend.doAppend) ^ \
+			Line(CaselessKeyword('LIBRARY') + StringList()).setParseAction(self.backend.doAppend) ^ \
+			Line(CaselessKeyword('DEBUGLIBRARY') + StringList()).setParseAction(self.backend.doAppend) ^ \
+			Line(CaselessKeyword('MACRO') + Optional(StringList())).setParseAction(self.backend.doAppend) ^ \
+			Line(CaselessKeyword('AIF') + StringList()).setParseAction(self.backend.doDeprecated) ^ \
+			Line(CaselessKeyword('STATICLIBRARY') + StringList()).setParseAction(self.backend.doAppend)
 
 		self.switch = \
 			(Line( \
@@ -142,6 +126,7 @@ class MMPParser(object):
 			CaselessKeyword('EPOCALLOWDLLDATA') ^ \
 			CaselessKeyword('EPOCCALLDLLENTRYPOINTS') ^ \
 			CaselessKeyword('EPOCFIXEDPROCESS') ^ \
+			CaselessKeyword('EPOCNESTEDEXCEPTIONS') ^ \
 			CaselessKeyword('EXPORTUNFROZEN') ^ \
 			CaselessKeyword('FEATUREVARIANT') ^ \
 			CaselessKeyword('BYTEPAIRCOMPRESSTARGET') ^ \

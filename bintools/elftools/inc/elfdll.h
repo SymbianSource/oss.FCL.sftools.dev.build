@@ -20,7 +20,7 @@
 #define __ELFDLL_H__
 //#include <e32rom.h>
 #include "e32ldfmt.h"
-#include <elfdefs.h>
+#include "elfdefs.h"
 #include "elffile.h"
 
 #define DLLSYMPREFIX "#<DLL>"
@@ -146,7 +146,7 @@ public:
 	TBool iImageIsDll;
 	TBool ImageIsDll() { return iImageIsDll; }
 
-	Elf32_Word FindSymbolIndex(TText * s);
+	Elf32_Word FindSymbolIndex(const char* s);
 
 	TInt iNumberOfImports;
 	TInt iNumberOfExports;

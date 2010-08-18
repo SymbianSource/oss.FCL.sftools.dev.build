@@ -37,6 +37,8 @@ use strict;
 use XML::DOM;
 use XML::DOM::ValParser;#XML Validator
 
+use romutl;
+
 my $validxml; # XML validation status
 $XML::Checker::FAIL = \&failhandler; # User defined fail handler
 
@@ -54,7 +56,7 @@ sub getRootElement() {
 	die "ERROR: XML File does not exists in the specified path $xmlfile\n" if (!-f $xmlfile);
 	my $DOMParser = new XML::DOM::Parser(); #DOM Parser
 	#Set the SGML_SEARCH_PATH to the path where the DTD files are found ($ENV{EPOCROOT}epoc32\\tools).
-	XML::Checker::Parser::set_sgml_search_path ("$ENV{EPOCROOT}epoc32/tools");
+	XML::Checker::Parser::set_sgml_search_path (&get_epocroot."epoc32/tools");
 	my $xmlValidator = new XML::Checker::Parser();#Validates XML against Schema
 	$validxml = 1;
 	$xmlValidator->parsefile($xmlfile);

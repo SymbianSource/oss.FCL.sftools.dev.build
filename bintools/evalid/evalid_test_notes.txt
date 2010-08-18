@@ -1,0 +1,63 @@
+evalid_test_notes.txt
+
+testfiles.zip contains two matching trees, each divided into 
+three sub-trees:
+
+left\ok\...
+left\missing\...
+left\fail\...
+
+right\ok\...
+right\missing\...
+right\fail\...
+
+Running "evalid left\ok right\ok" should produce 100% OK.
+The "ok" trees contain at least one example of each type of file,
+and should grow to illustrate any new form of non-significant
+difference. 
+
+Running "evalid left\missing right\missing" should report
+only failures in the shape of the tree.
+
+Running "evalid left\fail right\fail" should report differences
+in all pairs of files.
+The "fail" trees should grow whenever a new form of significant
+difference is found, so that we can avoid making EVALID too
+tolerant.
+
+
+-------------
+Significant Difference test cases
+
+Most examples are synthetic test cases obtained by copying one or more pairs from
+the ok tree into the fail tree, then modifying the right\fail file to introduce
+a specific type of difference. The files are usually renamed to indicate the
+nature of the difference. Using the pair of files from the ok tree means that the
+files have a collection of non-significant differences in addition to the extra
+difference introduced.
+
+Other cases are copies of real examples which showed a signficant difference.
+
+unknown_format\data\BuildInfo.txt
+
+- simple example of a text file with different contents
+
+unknown_format\ksa\layout.bin
+
+- simple example of a binary file with different contents
+
+SIS_file\release\armi\urel\gdbstub.sis
+
+- stub SIS file, currently not correctly recognised?
+
+Intel_DLL\wins\udeb\C32.dll
+
+- ??? not recorded why this is different yet
+
+Intel_DLL\wins\urel\BAFL.dll
+
+- Compiler generated thunks are laid out in a different order.
+  This is a known problem with Developer Studio which is triggered
+  by building the source from a different location.
+
+

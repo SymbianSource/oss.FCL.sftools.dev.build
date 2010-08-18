@@ -1,0 +1,5 @@
+component       dev_build_e32tools_uidcrc
+
+source          /src/tools/build/e32tools/uidcrc
+binary          /src/tools/build/e32tools/uidcrc/group all
+

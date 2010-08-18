@@ -20,8 +20,8 @@
 #include <limits.h>
 #include <string.h>
 #include "main.h"
-#include "structst.h"
-#include "parser.h"
+#include "STRUCTST.H"
+#include "Parser.h"
 #include "localise.h"
 
 #define YY_SKIP_YYWRAP 1
@@ -35,26 +35,34 @@ void yyerror(const char* string, ...);
 
 int new_yy_input(char *buf, int max_size)
 {
-   int result;
-   result = fread(buf, 1, max_size, yyin);
+  int result;
+   if(yyin != NULL) {
+		result = fread(buf, 1, max_size, yyin);
+	}
+   else if((pG->StdInBuffer != NULL) && (pG->StdInBufLength > 0)) {
+		int left = pG->StdInBufLength - pG->StdInfBufPos ;
+		if(left == 0)
+			return YY_NULL ;
+		result = (max_size < left) ? max_size : left ; 
+		memcpy(buf,&(pG->StdInBuffer[pG->StdInfBufPos]),result); 
+		pG->StdInfBufPos += result ;
+   }
+
    if (result == 0)
       return YY_NULL;
    
+   const unsigned char BOM[] = {0xef , 0xbb, 0xbf, 0x0 };
    // check for utf8 (BOM) header in buf
-   for (int i = 0; i < result-3; i++)
-   {
-      if (buf[i] == 0xffffffef && buf[i+1] == 0xffffffbb && buf[i+2] == 0xffffffbf)
-      {
-		buf[i] = ' ';
-		buf[i+1] = ' ';
-		buf[i+2] = ' ';
+   for (int i = 0; i < result-3; i++) {
+      if (0 == memcmp(&buf[i],BOM,3)) {
+		memset(&buf[i],0x20,3);
       }
    }
    return result;
 }
 
 #include "rcomp.hpp"
-#include "fileline.h"
+#include "FILELINE.H"
 
 #define VALUE_LEN   (1024*8)	// must match sizeof(YYSTYPE.Value)
 char buf[VALUE_LEN];
@@ -68,31 +76,8 @@ extern String		InputBaseName;
 extern FileLineManager* pFileLineHandler;
 extern int*		pCurrentLineNumber;
 char RealLineNumber[200];
-//
-// Disable MSVC warnings
-//
-#ifdef __VC32__
-#if 0
-..\src\RCOMP.L(95) : warning C4127: conditional expression is constant
-..\src\RCOMP.L(114) : warning C4244: 'initializing' : conversion from 'const int' to 'YY_CHAR', possible loss of data
-..\src\RCOMP.L(119) : warning C4244: '=' : conversion from 'const int' to 'YY_CHAR', possible loss of data
-..\src\RCOMP.L(130) : warning C4102: 'find_rule' : unreferenced label
-..\src\RCOMP.L(513) : warning C4244: 'initializing' : conversion from 'int' to 'YY_CHAR', possible loss of data
-..\src\RCOMP.L(518) : warning C4244: '=' : conversion from 'const int' to 'YY_CHAR', possible loss of data
-..\src\RCOMP.L(548) : warning C4244: '=' : conversion from 'const int' to 'YY_CHAR', possible loss of data
-..\src\RCOMP.L(63) : warning C4505: 'yyunput' : unreferenced local function has been removed
-\epoc32\BUILD\generatedcpp\rcomp\rcompl.cpp(243) : warning C4505: 'yy_flex_realloc' : unreferenced local function has been removed
-#endif
 
-#pragma warning( disable : 4100 )
-#pragma warning( disable : 4102 )
-#pragma warning( disable : 4127 )
-#pragma warning( disable : 4244 )
-#pragma warning( disable : 4245 )
-#pragma warning( disable : 4505 )
-#endif //__VC32__
-
-#include "errorhan.h"
+#include "ERRORHAN.H"
 
 #define REGISTER_LINE	ErrorHandler::Register(pFileLineHandler->GetCurrentFile(), pFileLineHandler->GetErrorLine(* pCurrentLineNumber))
 

@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -88,7 +88,7 @@ endef
 # A macro for removing duplicate tokens from a list 
 # whilst retaining the list's order
 define uniq
-$(if $(1),$(info $(words $(1)) $(1))\
+$(if $(1),\
 $(firstword $(1))$(call uniq,$(filter-out $(firstword $(1)),$(wordlist 2,$(words $(1)),$(1))))\
 ,)
 endef

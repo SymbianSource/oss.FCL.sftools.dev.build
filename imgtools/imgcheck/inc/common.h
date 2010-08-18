@@ -22,7 +22,13 @@
 
 #ifndef COMMON_H
 #define COMMON_H
-
+#ifdef WIN32
+#ifdef _STLP_INTERNAL_WINDOWS_H
+#define __INTERLOCKED_DECLARED
+#endif
+#include <windows.h>
+#undef DELETE
+#endif
 #include "typedefs.h"
 
 /**
@@ -40,12 +46,11 @@ Typedefs used all over the tool.
 
 @internalComponent
 @released
-*/
-typedef std::multimap<String, ExeNamesVsDepListMap> ImageVsDependencyMap;
-typedef std::list<unsigned int> UnIntList;
-typedef std::vector<ReportWriter*> WriterPtrList;
-typedef std::vector<Checker*> CheckerPtrList;
-typedef std::vector<ImageReader*> ImageReaderPtrList;
+*/ 
+typedef list<unsigned int> UnIntList;
+typedef vector<ReportWriter*> WriterPtrList;
+typedef vector<Checker*> CheckerPtrList;
+typedef vector<ImageReader*> ImageReaderPtrList;
 
 /**
 Constants used to mark whether the option received or not.
@@ -75,9 +80,9 @@ public:
 	ExeAttribute(){};
 	~ExeAttribute(){};
 
-	String iAttName;
-	String iAttValue;
-	String iAttStatus;
+	string iAttName;
+	string iAttValue;
+	string iAttStatus;
 };
 
 /**
@@ -111,8 +116,8 @@ Class Common, all general purpose funtions can be included here.
 class Common
 {
 public:
-	static String IntToString(unsigned int aValue);
-	static unsigned int StringToInt(String& aStringVal);
+	static string IntToString(unsigned int aValue);
+	static unsigned int StringToInt(string& aStringVal);
 };
 
 /** 
@@ -121,6 +126,6 @@ Default Log file name, used for logging the progress of application.
 @internalComponent
 @released
 */
-const String gLogFileName ("imgcheck.log");
+const string gLogFileName ("imgcheck.log");
 
 #endif //COMMON_H

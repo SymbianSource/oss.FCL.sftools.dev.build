@@ -29,8 +29,7 @@ Macro to check and delete the pointer.
 */
 #define DELETE(aPtr) if(aPtr != NULL) delete aPtr; aPtr = 0;
 
-typedef std::string String;
-
+ using namespace std;
 /**
 To support large integer values, 64 bit integers are used.
 "__int64" is for MSVC compiler and "long long int" is for GCC compilers
@@ -94,9 +93,9 @@ public:
 	static bool IsExecutable(unsigned char* aUids1, int aType = EAll);
 	static bool IsExe(unsigned long* Uids1);
 	static bool IsDll(unsigned long* Uids1);
-	static const String& ToLower(String& aString);
-	static const String IntToAscii(const int aValue, const int aBase);
-	static Long64 DecStrToInt(String& aString);
-	static unsigned int HexStrToInt(String& aStringVal);
+	static const string& ToLower(string& aString);
+	static const string IntToAscii(const int aValue, const int aBase);
+	static Long64 DecStrToInt(string& aString);
+	static unsigned int HexStrToInt(string& aStringVal);
 };
 #endif //UTILS_H

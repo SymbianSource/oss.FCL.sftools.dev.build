@@ -3,3 +3,8 @@ Nokia Corporation
 
 NOTESRC_RELEASE_REASON
 Seclib Release
+
+version ??
+===============
+Released by Zheng Shen, 22/02/2010
+	1) DPDEF144562	Build Tools cannot be built in Linux

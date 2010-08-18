@@ -1,0 +1,9 @@
+component	dev_build_cpptoolsplat_mingw-gcc-3.4.5
+
+source		\src\tools\build\cpptoolsplat\mingw-gcc-3.4.5
+exports		\src\tools\build\cpptoolsplat\mingw-gcc-3.4.5\group
+notes_source	\component_defs\release.src
+
+ipr T
+ipr O  \src\tools\build\cpptoolsplat\mingw-gcc-3.4.5
+

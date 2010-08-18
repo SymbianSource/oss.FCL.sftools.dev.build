@@ -1,0 +1,215 @@
+#!perl
+# Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+# 
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+# 
+# Contributors:
+# 
+# Description:
+# 
+#
+
+=head1 Introduction
+
+When a release is created with C<makerel> and C<makeenv> it is stored in the releasers local archive. To share this release with other development teams involved in the project it must be exported to a remote release archive (typically hosted on an FTP server) which all teams have access to. 
+
+This document describes how to configure and use the tools to export a teams releases to the remote archive and import other teams releases from it.
+
+=head1 Configuration
+
+The F<reltools.ini> and export data files must be set up as described in the F<Installation> document. Typically these files will have already been created for the user so no further editing of them is required. (An archive path file may also be needed, depending on your archive arrangement).
+
+Releases exported to the remote site are PGP encrypted for security. To encrypt and decrypt releases a command line PGP tool is used by the tools (defined by the C<pgp_tool> keyword in the F<reltools.ini> file). Both supported PGP clients (GnuPG and NAI PGP) require some configuration before they will work with the tools. 
+
+=head2 Configuring Network Associates PGP
+
+NAI command line PGP (version 6 or 7) must be installed on the users machine. The executable is assumed to have the name C<pgp.exe> and exist somewhere in the users path.
+
+PGP encrypts and decrypts files using keys stored on a public and secret key ring. Before using the export and import tools the user must set up their key rings for the project they are working on. If pre-configured keyrings have not been supplied the steps below should be followed:
+
+=over 4
+
+=item * 
+
+To use keys from another keyring first extract the keys with the command
+
+ pgp -kx <keyid> keyfile
+
+If the keyrings are not stored in the default directory then the options C<+PUBRING> or C<+SECRING> are required. For example
+
+ pgp +PUBRING=keyringPath/pubring.pkr -kx 0x12345678 foo.asc
+ pgp +SECRING=keyringPath/secring.skr -kx 0x87654321 bar.asc
+
+Remember to extract both public and private keys.
+
+To extract keys using the GUI version of PGP use the export key menu option. If the key is private make sure the "include private keys" check box is selected.
+
+=item *
+
+Create empty key ring files F<pubring.pkr> and F<secring.skr>. Add key files to these key rings using the command
+
+ pgp -ka keyfile  
+
+For example
+
+ pgp +PUBRING=keyringPath/pubring.pkr -ka somePublicKeyfile.asc
+ pgp +SECRING=keyringPath/secring.skr -ka someSecretKeyfile.asc
+
+The project key rings must have the names F<pubring.pkr> and F<secring.skr> but can be stored in any directory. If this is not the default directory used by PGP then the user must set the C<pgp_config_path> keyword in the F<reltools.ini> file to the directory where they are stored.
+
+=item *
+
+Check that the keys exist on the key ring using the command
+
+ pgp -kv
+
+For example
+
+ pgp +PUBRING=keyringPath/pubring.pkr -kv
+ pgp +SECRING=keyringPath/secring.skr -kv
+
+=back
+
+Once the keyrings have been created and populated, the keys must be signed with the users private key so that PGP can encrypt non-interactively (a requirement for the export tools to work). To sign all the keys on the project keyring follow the steps below:
+
+=over 4
+
+=item *
+
+First set the users private key to be the most trusted introducer and the default signing key. To do this run the command
+
+ pgp -ke your_private_keyid
+
+For example
+
+ pgp +SECRING=keyringPath/secring.skr -kv
+
+Input the passphrase, then answer 'y' to make the key the ultimately trusted introducer and the default signing key. Answer 'n' to the other questions.
+
+=item *
+
+Sign all the keys on the public key ring with the default signing key by calling the command
+
+ pgp -ks public_keyid 
+
+for each public key. For example
+
+ pgp +PUBRING=keyringPath/pubring.pkr -ks 0x12345678 
+
+=back
+
+Finally, once the key rings have been created and all the keys on them signed they maybe moved to a directory of the users choice (although the file names must be F<pubring.pkr> and F<secring.skr>) The C<pgp_config_path> keyword value in F<reltools.ini> should then be modified to this path. 
+
+=head2 Configuring GnuPG
+
+The tools have been tested with versions 1.06 and 1.4.7 of GnuPG and assume that the C<gpg.exe> executable exists somewhere in the users path.  You can either generate a new key pair or you can import PGP keys.
+
+=head3 Generating a New Key Pair
+
+To generate a new GPG key pair use the command
+
+ gpg --gen-key
+
+and follow the on screen instructions.
+
+=head3 Using existing PGP Keys
+
+GnuPG can use key rings created by Network Associates PGP (see above) just rename the files to F<pubring.gpg> and F<secring.gpg>. If the user wishes to create GnuPG key rings then follow the steps below
+
+=over 4
+
+=item *
+
+Export the keys from a PGP keyring using the method described in the section above
+
+=item *
+
+Import the keys onto the public and private key rings using the command:
+
+ gpg --import keyfile
+
+For GnuPG 1.06 (but not for GnuPG 1.4.7) an additional flag needs to be set to import private keys.  Use the command:
+
+ gpg --allow-secret-keys --import keyfile
+
+If the user wishes to use key rings which are not stored in the default location the '--homedir' option must be used. For example
+
+ gpg --homedir keyringPath --import somePublicKeyFile.asc
+
+As before, if importing private keys using GnuPG 1.06, the '--allow-secret-keys' flag is also needed (this flag is not necessary if using GnuPG 1.4.7).  Use the command:
+
+ gpg --homedir keyringPath --allow-secret-keys --import someSecretKeyFile.asc
+
+=item *
+
+Check that the keys exist on the key rings using
+
+ gpg --homedir keyringPath --list-keys
+ gpg --homedir keyringPath --list-secret-keys
+
+=back
+
+Once the key rings have been created they maybe moved to any directory (keeping the file names as F<pubring.gpg> and F<secring.gpg>). The C<pgp_config_path> keyword value in F<reltools.ini> should then be modified to this path.
+
+=head2 PGP vs GPG compatibility
+
+When exporting or importing with GPG defined as your 'pgp_tool' , and when using keys provided by PGP which employ a patented algorithm such as IDEA, an appropriate plugin will have to be installed for use by GPG.
+
+=head1 Exporting releases
+
+To export a single release to the remote site use the C<exportrel> command. For example 
+
+ exportrel mycomp myver -v
+
+to export a complete environment use the C<exportenv> command. For example
+
+ exportenv mycomp myver -v
+
+C<exportenv> will attempt to export every release in the environment of mycomp myver.
+
+Both commands will only attempt to export a release if it is listed in the export table and does not already exist in the remote archive.
+Using the C<-f> option will force releases to be exported even if they already exist on the remote site (again this only applies to components existing in the users export table)
+
+If the C<-r> option is used and the FTP connection is dropped during the upload of a release, the tools will automatically reconnect to the FTP site and resume the upload. This feature may not be supported by some FTP servers.  
+
+=head1 Importing releases
+
+To import a single release to the remote site use the C<importrel> command. For example 
+
+ importrel mycomp myver -v
+
+to import a complete environment use the C<importenv> command. For example
+
+ importenv mycomp myver -v
+
+C<importenv> will attempt to import every release in the environment of mycomp myver. If mycomp myver does not exist in the local archive it will import it, read its environment information and then import the rest of the environment.
+
+C<importrel> has a C<-f> option which will force the import of a release even if it already 
+exists in the local archive
+
+If the C<-r> option is used and the FTP connection is dropped during the download of a release, the tools will automatically reconnect to the FTP site and resume the download. This feature may not be supported by some FTP servers.  
+
+=head1 COPYRIGHT
+
+ Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+ All rights reserved.
+ This component and the accompanying materials are made available
+ under the terms of the License "Eclipse Public License v1.0"
+ which accompanies this distribution, and is available
+ at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ 
+ Initial Contributors:
+ Nokia Corporation - initial contribution.
+ 
+ Contributors:
+ 
+ Description:
+ 
+
+=cut

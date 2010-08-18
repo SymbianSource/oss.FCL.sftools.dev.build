@@ -1,0 +1,148 @@
+#!perl
+# Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+# 
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+# 
+# Contributors:
+# 
+# Description:
+# 
+#
+
+use strict;
+use FindBin;
+use lib "$FindBin::Bin";
+use Getopt::Long;
+use IniData;
+use EnvDb;
+use Utils;
+use PrepRel;
+use CommandController;
+
+
+#
+# Globals.
+#
+
+my $verbose = 0;
+my $mrpName;
+my $comp;
+my $ver;
+my $intVer;
+my $iniData = IniData->New();
+my $commandController = CommandController->New($iniData, 'PrepRel');
+my $envDb;
+
+
+#
+# Main.
+#
+
+ProcessCommandLine();
+PrepRel();
+
+
+#
+# Subs.
+#
+
+sub ProcessCommandLine {
+  Getopt::Long::Configure ("bundling");
+  my $help;
+  GetOptions("h" => \$help, "m=s" => \$mrpName, "v+" => \$verbose);
+
+  if ($help) {
+    Usage(0);
+  }
+
+  $comp = shift @ARGV;
+  $ver = shift @ARGV;
+  $intVer = shift @ARGV;
+
+  unless (defined $comp and $#ARGV == -1) {
+    print "Error: Invalid number of arguments\n";
+    Usage(1);
+  }
+
+  $envDb = EnvDb->Open($iniData, $verbose);
+}
+
+sub Usage {
+  my $exitCode = shift;
+
+  Utils::PrintDeathMessage($exitCode, "\nUsage: preprel [options] <component> [<version>] [<internal_version>]
+
+options:
+
+-h             help
+-m <mrp_name>  specify a new mrp file name
+-v             verbose output (-vv very verbose)\n");
+}
+
+sub PrepRel {
+  my $updating = $envDb->Version($comp);
+  PrepRel::PrepRel($iniData, $envDb, $comp, $ver, $intVer, $mrpName);
+  if (not $ver and not $mrpName) {
+    print "$comp removed\n";
+  }
+  elsif (not $ver and $mrpName) {
+    print "$comp mrp updated\n";
+  }
+  elsif ($updating) {
+    print "$comp updated\n";
+  }
+  else {
+    print "$comp added\n";
+  }
+}
+
+__END__
+
+=head1 NAME
+
+PrepRel - Prepares a component for release.
+
+=head1 SYNOPSIS
+
+  preprel [options] <component> [<version>] [<internal_version>]
+
+options:
+
+  -h             help
+  -m <mrp_name>  specify a new mrp file name
+  -v             verbose output (-vv very verbose)
+
+=head1 DESCRIPTION
+
+Before a component can be released, it's environment database status must be set to I<pending release>. Also, a new version (and optionally internal version - note, if the C<reltools.ini> keyword C<require_internal_versions> has be set, an internal version is manatory) must be specifed. C<PrepRel> provides a means of editing this information in the environment database. To check that the values have been correctly updated, use C<EnvInfo>. Note, this will now take longer to run because the information in the F<mrp> files of the components pending release will need to be gathered. To remove the environment database entry for a component altogether, execute C<PrepRel> with no version.
+
+Note, C<PrepRel> (and its counterpart C<PrepEnv>) do nothing more than update your the environment database. You can execute these commands as many times as you like before running C<MakeEnv> to actually release the environment.
+
+=head1 KNOWN BUGS
+
+None.
+
+=head1 COPYRIGHT
+
+ Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+ All rights reserved.
+ This component and the accompanying materials are made available
+ under the terms of the License "Eclipse Public License v1.0"
+ which accompanies this distribution, and is available
+ at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ 
+ Initial Contributors:
+ Nokia Corporation - initial contribution.
+ 
+ Contributors:
+ 
+ Description:
+ 
+
+=cut

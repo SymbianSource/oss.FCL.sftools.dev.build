@@ -2,9 +2,9 @@
 # Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
-# under the terms of the License "Symbian Foundation License v1.0"
+# under the terms of the License "Eclipse Public License v1.0"
 # which accompanies this distribution, and is available
-# at the URL "http://www.symbianfoundation.org/legal/sfl-v10.html".
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
 #
 # Initial Contributors:
 # Nokia Corporation - initial contribution.
@@ -32,8 +32,6 @@ comma    := ,
 empty    :=
 space    := $(empty) #
 $(space) := $(space)
-squot    := '\''
-'        := '\''
 \t       := $(empty)	# Tabulator!
 
 # Newline
@@ -71,10 +69,11 @@ reverse     = $(if $1,$(call reverse,$(call restwords,$1)) $(word 1,$1))
 firstwords  = $(if $2,$(wordlist 1,$(words $(wordlist $1,$(words $2),$2)),$2),$(wordlist 1,$(words $(wordlist 2,$(words $1),$1)),$1))
 restwords   = $(if $2,$(wordlist $1,$(words $2),$2),$(wordlist 2,$(words $1),$1))
 restelems   = $(call restoreelem,$(subst $( ),|,$(call restwords,$1,$(call getwords,$2))))
+findword    = $(and $1,$2,$(if $(filter $1,$(word 1,$2)),$(words $3 +),$(call findword,$1,$(call restwords,$2),$3 +)))
 substm      = $(eval __i_str := $3)$(strip $(foreach w,$1,$(eval __i_str := $(subst $w,$2,$(__i_str)))))$(__i_str)
 substs      = $(subst $(ichar)\,$2,$(subst $1,$2,$(subst $2,$(ichar)\,$3)))
-quote       = $(call substs,\t,\\\t,$(call substs,\n,\\\n,$1))
-quoteval    = $(subst \#,\\\#,$(subst $$,$$$$,$1))
+quote       = $(call substs,\t,\\t,$(call substs,\n,\\n,$1))
+quoteval    = $(subst \#,\\#,$(subst $$,$$$$,$1))
 sstrip      = $(subst $( ),,$(strip $1))
 
 strlen = $(call _str2chars,$1)$(words $(__i_str))
@@ -84,43 +83,44 @@ _str2chars = $(strip\
   $(foreach c,$(charset)$(ichar),$(eval __i_str := $(subst $c,$c ,$(__i_str)))))
 
 tr =\
-  $(strip $(eval __i_tr := $3)\
-  $(foreach c,\
-    $(join $(addsuffix :,$1),$2),\
-    $(eval __i_tr := $(subst $(word 1,$(subst :, ,$c)),$(word 2,$(subst :, ,$c)),$(__i_tr))))$(__i_tr))
+  $(strip $(eval __i_tr := $(subst $( ),$(ichar),$3))\
+  $(foreach c,$(join $(addsuffix :,$1),$2),\
+    $(eval __i_tr := $(subst $(word 1,$(subst :, ,$c)),$(word 2,$(subst :, ,$c)),$(__i_tr)))))$(subst $(ichar),$( ),$(__i_tr))
 
-pquote      = q$(pchar)$1$(pchar)
-peval       = @PEVAL{$(call substs,|,\|,$1)}LAVEP@
-phex        = $(call peval,sprintf(q(%0$(if $2,$2,8)X),$(subst 0x0x,0x,$1)))
-pabs2rel    = $(call peval,GetRelFname($(call pquote,$1$), $(call pquote,$2)))
-pfilesize   = $(call peval,-s $(call pquote,$1) || 0)
-prepeat     = $(call peval,$(call pquote,$2) x ($1))
-pstr2xml    = $(call peval,Str2Xml($(call pquote,$1)))
-pmatch      = $(call peval,$(call pquote,$1) =~ m$(pchar)$2$(pchar)m $(if $3,$3,&& $$1 || q(???)))
-pgrep       = $(call peval,\
+pquote    = q$(pchar)$1$(pchar)
+peval     = @PEVAL{$(call substs,|,\|,$1)}LAVEP@
+phex      = $(call peval,Int2Hex($(subst 0x0x,0x,$1),$2))
+pfilesize = $(call peval,-s $(call pquote,$1) || 0)
+prepeat   = $(call peval,$(call pquote,$2) x ($1))
+pstr2xml  = $(call peval,Str2Xml(Quote($(call pquote,$1))))
+pmatch    = $(call peval,$(call pquote,$1) =~ m$(pchar)$(subst \\,\,$2)$(pchar)m $(if $3,$3,&& $$1 || q(???)))
+pgrep     = $(call peval,\
   $(eval __i_notfound := $(call pquote,$(if $4,$4,???)))\
   open(F, $(call pquote,$1)) or return($(__i_notfound));\
   $$_ = $(if $2,Uni2Ascii)(join(q(), <F>));\
   $$_ = Quote($(if $3,m$(pchar)$3$(pchar)m ? $$1 : $(__i_notfound),$$_));\
-  s/\n/\\\n/g; s/\t/\\\t/g;\
   close(F); return($$_))
 
-getlastdir = $(foreach file,$1,$(notdir $(patsubst %/,%,$(file))))
-upddrive   = $(if $2,$2,$(EPOCDRIVE))$(if $(filter %:,$(call substr,1,2,$1)),$(call substr,3,,$1),$1)
-dir2inc    = $(foreach dir,$1,-I$(call upddrive,$(dir)))
-findfile   = $(foreach file,$1,$(eval __i_ffile := $(call _findfile,$(addsuffix /$(file),$2)))$(if $(__i_ffile),$(__i_ffile),$(file)))
-_findfile  = $(if $1,$(eval __i_ffile := $(wildcard $(word 1,$1)))$(if $(__i_ffile),$(__i_ffile),$(call _findfile,$(call restwords,$1))))
+getlastdir  = $(foreach file,$1,$(notdir $(patsubst %/,%,$(file))))
+upddrive    = $(if $2,$2,$(EPOCDRIVE))$(if $(filter %:,$(call substr,1,2,$1)),$(call substr,3,,$1),$1)
+updoutdrive = $(call upddrive,$1,$(OUTDRIVE))
+dir2inc     = $(foreach dir,$1,-I$(call upddrive,$(dir)))
+findfile    = $(foreach file,$1,$(eval __i_ffile := $(call _findfile,$(addsuffix /$(file),$(if $2,$2,$(FEATVAR_IDIR)))))$(if $(__i_ffile),$(__i_ffile),$(if $3,,$(file))))
+_findfile   = $(if $1,$(eval __i_ffile := $(wildcard $(word 1,$1)))$(if $(__i_ffile),$(__i_ffile),$(call _findfile,$(call restwords,$1))))
+isabspath   = $(if $(filter / \,$(if $(filter %:,$(call substr,1,2,$1)),$(call substr,3,3,$1),$(call substr,1,1,$1))),$1)
+includechk  = $(foreach file,$(subst \ ,$(ichar),$1),\
+  $(if $(wildcard $(subst $(ichar),\ ,$(file))),$(eval include $(subst $(ichar),\ ,$(file))),\
+    $(error File `$(subst $(ichar), ,$(file))' not found.$(\n)MAKEFILE_LIST =$(MAKEFILE_LIST))))
 
 filterwcard = $(shell $(PERL) -Xe '\
   (my $$re = q$(ichar)$1$(ichar)) =~ s/(.)/{q(*)=>q(.*),q(?)=>q(.),q([)=>q([),q(])=>q(])}->{$$1} || qq(\Q$$1\E)/ge;\
     print(map(qq( $$_), sort({lc($$a) cmp lc($$b)} grep(/^$$re$$/, split(/\s+/, q$(ichar)$2$(ichar))))))')
 
-cppdef2var =\
-  $(if $(wildcard $1),\
-    $(eval __i_def2var := $(shell $(PERL) -Xe '\
-      print(join(q(|), map(/^\s*\#define\s+(\S+)\s*(.*?)\s*$$/ ? qq($$1?=) . ($$2 eq q() ? 1 : $$2) : (),\
-        sort({lc($$a) cmp lc($$b)} qx$(pchar)$(CPP) -nostdinc -undef -dM $(call dir2inc,$2) $(call upddrive,$1)$(pchar)))))'))\
-    $(foreach assign,$(call getwords,$(__i_def2var)),$(eval $(call restoreelem,$(assign)))),\
+cppdef2var = $(if $(wildcard $1),\
+  $(foreach assign,$(call getwords,$(shell $(CPP) -nostdinc -undef -dM $(call dir2inc,$2) $(call upddrive,$1) |\
+    $(PERL) -Xne $(call iif,$(USE_UNIX),',")print(qq($$1?=) . ($$2 eq q() ? 1 : $$2) . q(|))\
+      if /^\s*\#define\s+($(or $(call sstrip,$3),\S+))\s*(.*?)\s*$$/$(call iif,$(USE_UNIX),',"))),\
+        $(eval $(call restoreelem,$(assign)))),\
   $(eval include $1))
 
 mac2cppdef = $(foreach def,$1,$(if\
@@ -128,8 +128,14 @@ mac2cppdef = $(foreach def,$1,$(if\
     $(\n)$(if $(filter -D%,$(def)),\#undef  $(word 1,$(__i_def))$(\n)\#define,define ) $(word 1,$(__i_def)) $(word 2,$(__i_def)),\
   $(if $(filter -U%,$(def)),$(\n)\#undef $(patsubst -U%,%,$(def)))))
 
-EPOCDRIVE   := $(eval EPOCDRIVE := $(call substr,1,2,$(CURDIR)))$(if $(filter %:,$(EPOCDRIVE)),$(EPOCDRIVE))
-EPOC32      := $(patsubst %/,%,$(subst \,/,$(EPOCROOT)))/epoc32
+USE_UNIX    := $(if $(findstring cmd.exe,$(call lcase,$(SHELL)))$(findstring mingw,$(call lcase,$(MAKE))),0,1)
+DONOTHING   := $(call iif,$(USE_UNIX),\#,rem)
+NULL        := $(call iif,$(USE_UNIX),/dev/null,nul)
+PATHSEPCHAR := $(call iif,$(USE_UNIX),:,;)
+CURDIR      := $(CURDIR:/=/.)
+EPOCDRIVE   := $(or $(filter %:,$(call substr,1,2,$(EPOCROOT))),$(filter %:,$(call substr,1,2,$(CURDIR))))
+EPOC_ROOT   := $(patsubst %/,%,$(subst \,/,$(if $(filter %:,$(call substr,1,2,$(EPOCROOT))),,$(EPOCDRIVE))$(EPOCROOT)))
+EPOC32      := $(EPOC_ROOT)/epoc32
 E32ROM      := $(EPOC32)/rom
 E32ROMCFG   := $(E32ROM)/config
 E32ROMINC   := $(E32ROM)/include
@@ -138,18 +144,15 @@ E32INC      := $(EPOC32)/include
 E32INCCFG   := $(E32INC)/config
 E32TOOLS    := $(EPOC32)/tools
 E32GCCBIN   := $(EPOC32)/gcc/bin
+E32DATA     := $(EPOC32)/data
+E32DATAZ    := $(E32DATA)/z
 
-ITOOL_DIR   ?= $(E32TOOLS)/rom
-ITOOL_PATH  :=
-IMAKER_DIR  ?= $(ITOOL_DIR)/imaker
-IMAKER_TOOL := $(IMAKER_DIR)/imaker.pl
+IMAKER_TOOL     := $(IMAKER_DIR)/imaker.pl
+IMAKER_CONFMK    =
+IMAKER_DEFAULTMK = $(call findfile,image_conf_default.mk,,1)
 
-CPP       ?= $(if $(wildcard $(E32TOOLS)/scpp.exe),$(E32TOOLS)/scpp.exe,cpp)
-PERL      ?= perl
-PYTHON    ?= python
-USE_UNIX  := $(if $(findstring cmd.exe,$(call lcase,$(SHELL)))$(findstring mingw,$(call lcase,$(MAKE))),0,1)
-NULL      := $(call iif,$(USE_UNIX),/dev/null,nul)
-DONOTHING := $(call iif,$(USE_UNIX),\#,rem)
+CPP    ?= cpp
+PYTHON ?= python
 
 YEAR  := $(call substr,1,4,$(TIMESTAMP))
 YEAR2 := $(call substr,3,4,$(TIMESTAMP))
@@ -157,18 +160,33 @@ MONTH := $(call substr,5,6,$(TIMESTAMP))
 DAY   := $(call substr,7,8,$(TIMESTAMP))
 WEEK  := $(call substr,15,,$(TIMESTAMP))
 
-CURDIR := $(call substr,$(call select,$(call substr,1,2,$(CURDIR)),$(EPOCDRIVE),3,1),,$(CURDIR))
-CURDIR := $(CURDIR:/=/.)
-USER   := $(or $(USERNAME),$(shell $(PERL) -Xe 'print(getlogin())'))
+.DEFAULT_GOAL = help
+DEFAULT_GOALS =
 
-MAKECMDGOALS ?= $(.DEFAULT_GOAL)
-TARGET        = $(word 1,$(MAKECMDGOALS))
-TARGETNAME    = $(word 1,$(subst -, ,$(TARGET)))
-TARGETID      = $(subst $( ),_,$(call restwords,$(subst _, ,$(TARGETNAME))))
-TARGETEXT     = $(findstring -,$(TARGET))$(subst $( ),-,$(call restwords,$(subst -, ,$(TARGET))))
+TARGET      = $(word 1,$(subst [, [,$(MAKECMDGOALS)))
+TARGETNAME  = $(word 1,$(subst -, ,$(TARGET)))
+TARGETID    = $(subst $( ),_,$(call restwords,$(subst _, ,$(TARGETNAME))))
+TARGETID1   = $(word 2,$(subst _, ,$(TARGETNAME)))
+TARGETID2   = $(word 3,$(subst _, ,$(TARGETNAME)))
+TARGETID2-  = $(subst $( ),_,$(call restwords,3,$(subst _, ,$(TARGETNAME))))
+TARGETID3   = $(word 4,$(subst _, ,$(TARGETNAME)))
+TARGETID3-  = $(subst $( ),_,$(call restwords,4,$(subst _, ,$(TARGETNAME))))
+TARGETEXT   = $(addprefix -,$(subst $( ),-,$(call restwords,$(subst -, ,$(TARGET)))))
+TARGETEXT2  = $(word 3,$(subst -, ,$(TARGET)))
+TARGETEXT2- = $(addprefix -,$(subst $( ),-,$(call restwords,3,$(subst -, ,$(TARGET)))))
+TARGETEXT3  = $(word 4,$(subst -, ,$(TARGET)))
+TARGETEXT3- = $(addprefix -,$(subst $( ),-,$(call restwords,4,$(subst -, ,$(TARGET)))))
+
+TOPTARGET     = $(TARGET)
+TOPTARGETNAME = $(word 1,$(subst -, ,$(TOPTARGET)))
+TOPTARGETID   = $(subst $( ),_,$(call restwords,$(subst _, ,$(TOPTARGETNAME))))
+TOPTARGETEXT  = $(addprefix -,$(subst $( ),-,$(call restwords,$(subst -, ,$(TOPTARGET)))))
+
+TARGET_EXPORT = TOPTARGET? IMAGE_TYPE
 
 CLEAN     = 1
 BUILD     = 1
+FILTERCMD =
 KEEPGOING = 0
 KEEPTEMP  = 0
 PRINTCMD  = 0
@@ -177,35 +195,38 @@ SKIPBLD   = 0
 SKIPPOST  = 0
 VERBOSE   = 1
 
-CONFIGROOT ?= $(E32ROMCFG)
+NAME       = imaker
+WORKDIR    = $(CURDIR)
+WORKTMPDIR = $($(or $(addsuffix _,$(IMAGE_TYPE)),WORK)DIR)/temp# To be removed!
 
-LABEL      =
-NAME       = $(PRODUCT_NAME)$(LABEL)
-WORKDIR    = $(if $(PRODUCT_NAME),$(E32ROMBLD)/$(PRODUCT_NAME),$(CURDIR))
-WORKPREFIX = $(WORKDIR)/$(NAME)
-WORKNAME   = $(WORKPREFIX)
+OUTDIR     = $(WORKDIR)
+OUTPREFIX  = $(OUTDIR)/$(NAME)# Temporary?
+OUTDRIVE   = $(or $(filter %:,$(call substr,1,2,$(OUTDIR))),$(filter %:,$(call substr,1,2,$(CURDIR))))
+OUTTMPDIR  = $($(or $(addsuffix _,$(IMAGE_TYPE)),OUT)DIR)/temp
 
-CLEAN_WORKAREA  = del | $(WORKDIR)/* | deldir | $(WORKDIR)/*
-ALL.CLEAN.STEPS = $(ALL.IMAGE.STEPS) WORKAREA
+ALL.CLEAN.STEPS = $(ALL.IMAGE.STEPS)
 
 
 ###############################################################################
 #
 
-CMDFILE = $(WORKPREFIX)$(if $(notdir $(WORKPREFIX)),_)$(call substm,* : ?,@,$(TARGET)).icmd
-#LOGFILE = $(if $(IMAGE_TYPE),$($(IMAGE_TYPE)_PREFIX)_$(call lcase,$(IMAGE_TYPE))_imaker,$(WORKDIR)/log/$(basename $(notdir $(CMDFILE)))).log
-export LOGFILE ?= $(WORKDIR)/log/$(basename $(notdir $(CMDFILE))).log
+LOGFILE = $($(or $(addsuffix _,$(IMAGE_TYPE)),WORK)PREFIX)_imaker_$(call substm,* / : ? \,@,$(TARGET)).log
 
 BUILD_EMPTY = echo-q | Empty target, nothing to build.
 
-CLEAN_IMAKERPRE = $(CLEAN_IMAKEREVAL) | del | "$(CMDFILE)" "$(IMAKER_VARXML)"
 BUILD_IMAKERPRE =\
-  $(call testnewapi,$(strip $(API_TEST))) |\
-  $(if $(filter help% print-%,$(MAKECMDGOALS)),,$(if $(and $(IMAKER_VARXML),$(IMAKER_VARLIST)),\
-    write | $(IMAKER_VARXML) | $(call def2str,$(IMAKER_XMLINFO))))
+  $(BUILD_TOOLSET) |\
+  logfile   | "$(LOGFILE)" |\
+  filtercmd | $(FILTERCMD)
 
-IMAKER_VARXML  = $(if $(IMAGE_TYPE),$($(IMAGE_TYPE)_PREFIX)_$(TARGET)_config.xml)
-IMAKER_VARLIST = NAME WORKDIR
+CLEAN_IMAKERPOST = $(call iif,$(KEEPTEMP),,deldir | "$(OUTTMPDIR)" |) del | "$(IMAKER_VARXML)"
+BUILD_IMAKERPOST = $(and $(subst IMAKERPRE EMPTY IMAKERPOST,,$(IMAKER_STEPS)),$(IMAKER_VARXML),$(IMAKER_VARLIST),\
+  write | "$(IMAKER_VARXML)" | $(call def2str,$(IMAKER_XMLINFO))\n)
+
+IMAKER_VARXML  = $(if $(IMAGE_TYPE),$($(IMAGE_TYPE)_PREFIX)_$(TARGET).iconfig.xml)
+IMAKER_VARLIST = PRODUCT_NAME TYPE\
+  $(and $(IMAGE_TYPE),$(filter $(call lcase,$(IMAGE_TYPE) $(IMAGE_TYPE))-%,$@),\
+    $(addprefix $(IMAGE_TYPE)_,NAME ID VERSION DIR IMG))
 
 define IMAKER_XMLINFO
   <?xml version="1.0" encoding="utf-8"?>
@@ -217,98 +238,61 @@ define IMAKER_XMLINFO
   </build>
 endef
 
-BUILD_PRINTVAR = $(call peval,DPrint(1,\
-  $(foreach var1,$(subst $(,), ,$(subst print-,,$(filter print-%,$(MAKECMDGOALS)))),\
-    $(foreach var2,$(call filterwcard,$(var1),$(filter-out BUILD_PRINTVAR,$(filter $(word 1,$(call substm,* ? [, ,$(var1)))%,$(.VARIABLES)))),\
-      $(call pquote,$(var2) = `$(call def2str,$($(var2)))$').qq(\n),))); return(q()))
-
 IMAKER_EVAL = $(strip\
-  $(foreach file,$(call getwords,$(value MKFILE_LIST)),$(eval __i_file := $(call restoreelem,$(file)))$(eval -include $(__i_file)))\
-  $(foreach file,$(call getwords,$(value CPPFILE_LIST)),$(eval __i_file := $(call restoreelem,$(file)))$(call cppdef2var,$(__i_file),$(FEATVAR_IDIR)))\
   $(LANGUAGE_EVAL)\
-  $(eval ITOOL_PATH := $(if $(ITOOL_PATH),$(ITOOL_PATH)$(,))$(ITOOL_DIR)$(,))\
-  $(eval ITOOL_PATH := $(ITOOL_PATH)$(call iif,$(USE_IINTPRSIS),$(USE_IINTPRSIS)$(,))$(call iif,$(USE_IREADIMG),$(USE_IREADIMG)$(,))$(call iif,$(USE_IROMBLD),$(USE_IROMBLD)$(,)))\
-  $(eval ITOOL_PATH := $(call pathconv,$(subst $(,),$(call iif,$(USE_UNIX),:,;),$(ITOOL_PATH)$(call upddrive,$(E32TOOLS))$(,)$(call upddrive,$(E32GCCBIN)))))\
-  $(eval PATH := $(ITOOL_PATH)$(call iif,$(USE_UNIX),:,;)$(PATH)))
+  $(foreach file,$(call getwords,$(value CPPFILE_LIST)),$(eval __i_file := $(call restoreelem,$(file)))$(call cppdef2var,$(__i_file),$(FEATVAR_IDIR),$(CPPFILE_FILTER))))
 
-IMAKER_CMDARG  := $(value IMAKER_CMDARG)
-IMAKER_MAKECMD := $(value IMAKER_MAKECMD)
-IMAKER_PERLCMD :=
-IMAKER_SUBMAKE :=
+IMAKER_EXPORT   = PATH
+IMAKER_PRINTVAR = 17 $$@|@ IMAKER_STEPS IMAKER_MKLEVEL IMAKER_MKRESTARTS MAKELEVEL MAKE_RESTARTS MAKEFILE_LIST CPPFILE_LIST FEATVAR_IDIR
+
+__i_evaled :=
+__i_tgtind :=
 
 define IMAKER
-  $(if $(and $(filter-out help-config,$(filter help-% print-%,$(MAKECMDGOALS))),$(IMAKER_PERLCMD)),-$(DONOTHING),
-    $(if $(IMAKER_PERLCMD),,$(IMAKER_EVAL))
-    $(eval __i_steps := $1)
-    $(if $(findstring |,$(__i_steps)),
-      $(eval IMAKER_PERLCMD := -)
-      $(foreach target,$(call getwords,$(__i_steps)),$(if $(call restoreelem,$(target)),
-        $(eval IMAKER_SUBMAKE += $(words $(IMAKER_SUBMAKE) x))
-        $(subst $(MAKECMDGOALS) |,,$(IMAKER_MAKECMD) |)IMAKER_SUBMAKE="$(IMAKER_SUBMAKE)" $(call restoreelem,$(target)) $(call restwords,$(MAKECMDGOALS))$(\n))),
-      $(eval __i_steps := $(if $(strip $(__i_steps)),$(foreach step,$(__i_steps),\
-        $(eval __i_step := $(word 1,$(subst :, ,$(step))))$(eval __i_attrib := $(word 2,$(subst :, ,$(step))))\
-        $(if $(call defined,STEPS_$(__i_step)),\
-          $(foreach step2,$(STEPS_$(__i_step)),$(if $(__i_attrib),$(word 1,$(subst :, ,$(step2))):$(__i_attrib),$(step2))),\
-          $(step))),EMPTY:b))
-      $(eval __i_steps := IMAKERPRE:cbk$(call sstrip,$(foreach step,$(__i_steps),\
-        $(eval __i_step := $(word 1,$(subst :, ,$(step))))$(eval __i_attrib := $(word 2,$(subst :, ,$(step))))\
-        -$(__i_step):$(or $(findstring c,$(__i_attrib)),$(call iif,$(CLEAN),c))$(or $(findstring b,$(__i_attrib)),$(call iif,$(BUILD),b))\
-        $(or $(findstring k,$(__i_attrib)),$(call iif,$(KEEPGOING),k)))))
-      $(eval IMAKER_STEPS := $(__i_steps))
-      $(eval __i_steps :=\
-        $(if $(filter print-%,$(MAKECMDGOALS)),IMAKERPRE:cbk-PRINTVAR:b,\
-          $(if $(filter-out help-config,$(filter help-%,$(MAKECMDGOALS))),IMAKERPRE:cbk-HELPDYNAMIC:b-HELP:b,$(__i_steps))))
-      $(eval IMAKER_PERLCMD := $(PERL) -x $(IMAKER_TOOL)\
-        --cmdfile "$(CMDFILE)"\
-        $(if $(LOGFILE),--logfile "$(if $(word 2,$(IMAKER_SUBMAKE))$(IMAKER_PERLCMD)$(MAKE_RESTARTS),>>$(LOGFILE:>>%=%),$(LOGFILE))")\
-        $(call iif,$(PRINTCMD),--printcmd)\
-        --step "$(__i_steps)"\
-        $(if $(VERBOSE),--verbose "$(call select,$(VERBOSE),debug,127,$(VERBOSE))")\
-        $(if $(WORKDIR),--workdir "$(WORKDIR)"))
-      -$(PERL) -Xe '$(if $(wildcard $(WORKDIR)),,use File::Path; eval { mkpath(q$(ichar)$(WORKDIR)$(ichar)) };)\
-        open(ICMD, q$(ichar)>$(CMDFILE)$(ichar));\
-        $(eval __i_submake := $(words $(IMAKER_SUBMAKE)))\
-        print(ICMD $(foreach var,IMAKER_VERSION IMAKER_CMDARG IMAKER_MAKECMD IMAKER_PERLCMD $(if $(IMAKER_SUBMAKE),IMAKER_SUBMAKE|__i_submake)\
-          IMAKER_EXITSHELL SHELL MAKE MAKEFLAGS MAKECMDGOALS $$@|@ MAKELEVEL MAKE_RESTARTS MAKEFILE_LIST .INCLUDE_DIRS FEATVAR_IDIR CPPFILE_LIST\
-          EPOCROOT ITOOL_DIR IMAKER_DIR ITOOL_PATH PATH,\
-          sprintf(qq(\# %-17s),q($(word 1,$(subst |, ,$(var))))).q$(ichar)= `$($(or $(word 2,$(subst |, ,$(var))),$(var)))$'$(ichar).qq(\n),));\
-        close(ICMD)'
-      $(foreach step,$(subst -, ,$(__i_steps)),\
-        $(eval __i_step := $(word 1,$(subst :, ,$(step))))$(eval __i_attrib := $(subst $(__i_step),,$(step)))\
-        $(eval __i_clean := $(findstring c,$(__i_attrib)))$(eval __i_build := $(findstring b,$(__i_attrib)))\
-        -$(PERL) -Xe 'open(ICMD, q$(ichar)>>$(CMDFILE)$(ichar));\
-          print(ICMD qq(\n)\
-            $(if $(eval __i_imgtype := $(IMAGE_TYPE))$(__i_imgtype),,\
-              $(eval IMAGE_TYPE += $(foreach type,CORE ROFS2 ROFS3 ROFS4 ROFS5 ROFS6 UDA,$(findstring $(type),$(step))))\
-              $(eval IMAGE_TYPE := $(word 1,$(IMAGE_TYPE))))\
-            $(if $(__i_clean),.q$(ichar)CLEAN_$(__i_step)=$(CLEAN_$(__i_step))$(ichar).qq(\n))\
-            $(if $(__i_build),.q$(ichar)BUILD_$(__i_step)=$(BUILD_$(__i_step))$(ichar).qq(\n)));\
-            $(eval IMAGE_TYPE := $(__i_imgtype))\
-          close(ICMD)'$(\n))
-      $(IMAKER_PERLCMD)
-      $(eval IMAKER_CMDARG :=))
-  )
+  $(if $(and $(filter-out help-config,$(filter help-% print-%,$(MAKECMDGOALS))),$(__i_evaled)),,
+    $(info #iMaker$(ichar)BEGIN)
+    $(if $(__i_evaled),,$(IMAKER_EVAL))
+    $(eval __i_evaled := 1)
+    $(eval __i_steps := $(if $(MAKECMDGOALS),$1,$(or\
+      $(if $(DEFAULT_GOALS),$(if $(PRODUCT_NAME),,$(TARGET_PRODUCT)) $(DEFAULT_GOALS)),$(filter help,$(.DEFAULT_GOAL)))))
+    $(if $(call restoreelem,$(call getwords,$(__i_steps))),,$(eval __i_steps :=))
+    $(if $(__i_tgtind),$(eval __i_steps := $(call getelem,$(__i_tgtind),$(__i_steps))))
+    $(eval __i_tgts := $(subst $(__i_steps),,$(call ucase,$(__i_steps))))
+    $(if $(or $(filter-out help-config,$(filter help-% print-%,$(MAKECMDGOALS))),$(call not,$(__i_tgts))),
+      $(eval IMAKER_STEPS := $(if $(filter help% print-%,$(TARGET))$(__i_tgts),,IMAKERPRE )$(or $(strip\
+        $(eval __i_ind := $(call findword,RESTART,$(__i_steps)))$(if $(__i_ind),$(call iif,$(IMAKER_MKRESTARTS),\
+          $(call restwords,$(call restwords,$(__i_ind),$(__i_steps))),$(wordlist 1,$(__i_ind),$(__i_steps))),$(__i_steps))),EMPTY))
+      $(if $(filter-out IMAKERPRE,$(word 1,$(IMAKER_STEPS)))$(filter RESTART,$(lastword $(IMAKER_STEPS))),,
+        $(eval IMAKER_STEPS += IMAKERPOST))
+      $(eval __i_steps := $(if $(filter print-%,$(MAKECMDGOALS)),PRINTVAR,\
+        $(if $(filter-out help-config,$(filter help-%,$(MAKECMDGOALS))),HELP,$(IMAKER_STEPS))))
+      ,
+      $(if $(and $(__i_tgts),$(__i_tgtind)),$(eval IMAKER_STEPS := $(__i_steps)),
+        $(eval __i_ind :=)
+        $(eval IMAKER_STEPS :=)
+        $(foreach step,$(call getwords,$(__i_steps)),
+          $(eval __i_ind += +)
+          $(eval __i_steps := $(call restoreelem,$(step)))
+          $(if $(__i_steps),$(eval IMAKER_STEPS += $(if $(IMAKER_STEPS),|)\
+            $(if $(subst $(__i_steps),,$(call ucase,$(__i_steps))),$(__i_steps),$(TARGETNAME)[$(words $(__i_ind))])))))
+      $(eval __i_steps :=)
+    )
+    $(foreach var,VERBOSE IMAGE_TYPE KEEPGOING PRINTCMD,$(info #iMaker$(ichar)$(var)=$($(var))))
+    $(foreach var,$(sort $(IMAKER_EXPORT)),$(info #iMaker$(ichar)env $(var)=$($(var))))
+    $(foreach var,$(TARGET_EXPORT),$(info #iMaker$(ichar)var $(var)=$($(patsubst %?,%,$(or $(word 2,$(subst :, ,$(var))),$(var))))))
+    $(foreach var,$(call restwords,$(IMAKER_PRINTVAR)),$(info #iMaker$(ichar)print $(word 1,$(IMAKER_PRINTVAR))\
+      $(word 1,$(subst |, ,$(var)))=$($(or $(word 2,$(subst |, ,$(var))),$(var)))))
+    $(info #iMaker$(ichar)STEPS=$(or $(__i_steps),target:$(IMAKER_STEPS)))
+    $(foreach step,$(__i_steps),
+      $(if $(call defined,INIT_$(step)),$(info #iMaker$(ichar)INIT_$(step)=$(INIT_$(step))))
+      $(if $(call true,$(CLEAN)),$(info #iMaker$(ichar)CLEAN_$(step)=$(CLEAN_$(step))))
+      $(if $(call true,$(BUILD)),
+        $(info #iMaker$(ichar)BUILD_$(step)=$(BUILD_$(step)))
+        $(if $(REPORT_$(step)),$(info #iMaker$(ichar)REPORT_$(step)=$(REPORT_$(step)))))
+    )
+    $(info #iMaker$(ichar)END)
+  )-@$(DONOTHING)
 endef
-
-
-###############################################################################
-# Test if old variables are in use
-
-define API_TEST
-#  OLD_VARIABLE1     NEW_VARIABLE1
-#  OLD_VARIABLEn     NEW_VARIABLEn
-
-  CUSTVARIANT_MKNAME  VARIANT_MKNAME
-  CUSTVARIANT_CONFML  VARIANT_CONFML
-  CUSTVARIANT_CONFCP  VARIANT_CONFCP
-endef
-
-testnewapi = $(if $1,\
-  $(if $(call defined,$(word 1,$1)),\
-    warning | 1 | ***************************************\n |\
-    warning | 1 | Old-style variable found: $(word 1,$1) ($(origin $(word 1,$1)))\n |\
-    warning | 1 | Instead$(,) start using $(word 2,$1)\n |)\
-  $(call testnewapi,$(call restwords,3,$1)))
 
 
 ###############################################################################
@@ -326,25 +310,36 @@ clean: LOGFILE   =
 clean:\
   ;@$(call IMAKER,$$(ALL.CLEAN.STEPS))
 
-print-%: ;@$(call IMAKER)
-
-step-% : ;@$(call IMAKER,$(subst -, ,$*))
+step-%: ;@$(call IMAKER,$(subst -, ,$*))
 
 #==============================================================================
 
-include $(addprefix $(IMAKER_DIR)/imaker_,$(addsuffix .mk,help image minienv public tools version))
+$(call includechk,$(addprefix $(IMAKER_DIR)/imaker_,$(addsuffix .mk,help image minienv tools version)))
+include $(wildcard $(IMAKER_DIR)/imaker_extension.mk)
+include $(wildcard $(IMAKER_EXPORTMK))
 
--include $(IMAKER_DIR)/imaker_extension.mk
+$(call includechk,$(LANGPACK_SYSLANGMK))
+$(call includechk,$(IMAKER_DEFAULTMK))
+$(call includechk,$(IMAKER_CONFMK))
+$(call includechk,$(BUILD_INFOMK))
+$(call includechk,$(BUILD_NAMEMK))
+$(call includechk,$(LANGPACK_MK))
+$(call includechk,$(VARIANT_MK))
+$(call includechk,$(call select,$(USE_CONE),mk,$(if $(filter cone-pre,$(TARGET)),,$(subst $( ),\ ,$(CONE_MK)))))
 
+.DEFAULT_GOAL := $(if $(DEFAULT_GOALS),help,$(.DEFAULT_GOAL))
 
-###############################################################################
-#
+%-dir: FILTERCMD = ^cd\|mkcd\|mkdir$$
+%-dir: $$* ;
 
-else
-ifeq ($(__IMAKER_MK__),1)
-__IMAKER_MK__ := 2
+$(foreach ind,1 2 3 4 5 6 7 8 9,\
+  $(eval %[$(ind)]: __i_tgtind = $(ind))\
+  $(eval %[$(ind)]: $$$$* ;))
 
--include $(IMAKER_DIR)/imaker_extension.mk
+include $(wildcard $(IMAKER_DIR)/imaker_extension.mk)
+include $(wildcard $(IMAKER_EXPORTMK))
+
+$(sort $(MAKEFILE_LIST)): ;
 
 
 ###############################################################################
@@ -352,8 +347,8 @@ __IMAKER_MK__ := 2
 
 else
 $(error Do not include imaker.mk, it is handled by iMaker!)
-endif
 
 endif # __IMAKER_MK__
+
 
 # END OF IMAKER.MK

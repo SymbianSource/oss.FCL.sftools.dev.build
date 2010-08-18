@@ -1,0 +1,862 @@
+#!perl
+# Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+# 
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+# 
+# Contributors:
+# 
+# Description:
+# 
+#
+
+use strict;
+use FindBin;
+use lib "$FindBin::Bin";
+use Getopt::Long;
+use IniData;
+use EnvDb;
+use CommandController;
+use DirHandle;
+use Utils;
+
+
+# Globals.
+#
+
+my $verbose = 0;
+my $iniData = IniData->New();
+my $commandController = CommandController->New($iniData, 'SourceInfo');
+my $envDb;
+my $file;
+my $comp;
+my $listindividualfiles;
+my $includeignores;
+my $includebinaries;
+my $summary;
+my $expandepoc32;
+my $countfiles;
+my $skipWarnings;
+
+$envDb = EnvDb->Open($iniData, $verbose);
+
+#
+# Main.
+#
+
+ProcessCommandLine();
+SourceInfo();
+
+#
+# Subs.
+#
+
+sub ProcessCommandLine {
+  Getopt::Long::Configure ("bundling");
+  my $help;
+  GetOptions('h' => \$help, 'v+' => \$verbose, 'f' => \$listindividualfiles, 'i' => \$includeignores, 'b' => \$includebinaries, 's' => \$summary, 'c' => \$countfiles, 'force' => \$skipWarnings);
+
+  if ($help) {
+    Usage(0);
+  }
+
+  if (!$ARGV[0]) {
+    $comp = undef; # it already is, but let's be explicit...
+  } else {
+    if ($envDb->Version($ARGV[0])) {
+      $comp = shift @ARGV;
+    } else {
+      $file = shift @ARGV;
+      Utils::AbsoluteFileName(\$file);
+    }
+  }
+
+  unless ($#ARGV == -1) {
+    print "Error: Invalid arguments\n";
+    Usage(1);
+  }
+}
+
+sub Usage {
+  my $exitCode = shift;
+
+  Utils::PrintDeathMessage($exitCode, "\nUsage: sourceinfo [options] [ component | file ]
+
+options:
+
+-h  help
+-v  verbose output (-vv very verbose)
+-f  list individual files, not just directories
+-c  count the files in each directory (can be slow)
+-b  include binary files in report
+-i  include 'ignored' files in report
+--force (deprecated)
+-s  print summary report (don't specify a component or a file)\n");
+}
+
+sub SourceInfo {
+  $expandepoc32 = WorkOutWhetherExpandEpoc32();
+  if ($file) {
+    die "Error: can't do summary report about a particular file.\n" if ($summary);
+    DoFileReport($file);
+  } elsif ($comp) {
+    die "Error: can't do summary report about a particular component.\n" if ($summary);
+    DoComponentReport($comp);
+  } elsif ($summary) {
+    DoSummaryReport();
+  } else {
+    DoFullReport();
+  }
+}
+
+##############################################################################################
+# Implementation notes
+#
+# This script is very complex. Here is a guide to what's going on.
+# First look at the main SourceInfo function, above. You'll see there's four different
+# types of report, corresponding to the four ways the command line can be used. (-s is
+# treated as its own type of report).
+# Each one of these creates and uses a similar set of objects in different ways.
+#
+# The objects used are:
+#   SourceInfo::OwnerFinder::xxxx - these classes are factories for SourceInfo::Owners.
+#   SourceInfo::Owner - these objects represent each way a directory or file can be owned.
+#                       A single component may produce many 'owners' - for example,
+#                       one for each of its binary files and one for each of the 'source'
+#                       items in its MRP.
+#   SourceInfo::Item - this class is the heart of this script. It represents each item
+#                      on disk (whether a directory or file). It may contain a link
+#                      to one or more owners, if that directory or file is owned.
+#
+# Each of the reports work like this:
+#  1- build up (partial) tree of all the files/directories on disk made of SourceInfo::Items.
+#  2- create a load of SourceInfo::Owners.
+#  3- tell the owners to attach themselves to the relevant items in the tree of Items.
+#  4- tell the items to make themselves shown/hidden depending on various settings.
+#  5- gather the shown items into a list which can be made into a table.
+# 
+# The only exception is the -s option, which doesn't really stick to this pattern for
+# stage 5. But it does for the rest.
+#
+# The different reports work on this in different ways. For example, if a component is 
+# specified on the command line, OwnerFinders (and therefore owners) are only created for 
+# that component.
+#
+# The tree created in Stage 1 starts out small. (In fact, it's just the root). It grows
+# items under many circumstances:
+#  -- an owner item requests an item deep in the tree which hasn't been expanded that
+#     far yet.
+#  -- ExpandAll is called, corresponding to the -f option.
+#  -- ExpandUnownedDirs is called, which will list all the items inside each directory
+#     that isn't owned. This ensures that all unowned files and directories are listed
+#     in the tree.
+#  -- we're a sourceinfo <file> and we have to expand the tree to include the file.
+#  
+#  It's worth noting that the -b flag has two effects. Firstly, binary OwnerFinders
+#  and Owners are not created. Secondly, (more importantly?) neither ExpandAll
+#  nor ExpandUnownedDirs will do any expansion inside \epoc32. So you'll never
+#  see items inside that tree, and 'binary' items outside that tree won't appear
+#  either. (In fact, they'll be reported as having no owner).
+#  \epoc32 is not included if -i is specified, either.
+#
+############################################################################
+
+sub WorkOutWhetherExpandEpoc32 {
+  return 1 if $includebinaries && $includeignores;
+  return 0;
+}
+  
+# The four following methods are the different types of report that can
+# be done.
+
+sub DoFileReport {
+  my $file = shift;
+
+  print "Warning: \"$file\" is not a file and is not a component that is currently installed. The following report assumes it is a file which you could install with \"getsource\"\n" unless -e $file;
+
+  my $owners = FindOwners(); # we have to create all possible owners
+  my $root = new SourceInfo::Item("", undef);
+  $root->FindItem($file, 1); # expand the tree to include our file
+
+  print "Finding owned items\n" if $verbose;
+  FindOwnedItems($owners, $root, 0); # mark the Items as having Owners
+
+  my $items = $root->GetAll;
+  $root->DecideVisibility;
+
+  $iniData->TableFormatter->PrintTable(MakeTable($items), 1); 
+}
+
+sub DoSummaryReport {
+  my $root = CreateRoot();
+  $root->ExpandAll() if ($listindividualfiles);
+  my $owners = FindOwners();
+  FindOwnedItems($owners, $root, 1);
+  $root->ExpandUnownedDirs();
+
+  $root->DecideVisibility;
+
+  my @noowners;
+  my @multiowners;
+  foreach my $item (@{$root->GetAllVisible}) {
+    my $count = $item->NumOwners;
+    if ($count == 0) {
+      push @noowners, $item;
+    } elsif ($count > 1) {
+      push @multiowners, $item;
+    } else {
+      # This has exactly one ownership. Joy!
+    }
+  }
+
+  print "Files/areas without ownership:\n";
+  foreach (@noowners) {
+    print "  ".$_->Path . "\n";
+  }
+ 
+  print "Files/areas with multiple ownership:\n";
+  foreach (@multiowners) {
+    print "  ".$_->Path . "\n";
+  }
+}
+
+sub DoFullReport {
+  print "Doing full report\n" if $verbose;
+  my $root = CreateRoot();
+  $root->ExpandAll() if ($listindividualfiles);
+  my $owners = FindOwners();
+  FindOwnedItems($owners, $root, 1);
+  $root->ExpandUnownedDirs() unless $listindividualfiles; # might have already done it
+
+  my $items = $root->GetAll;
+  if ($listindividualfiles) {
+    $root->ShowAll();
+  } else {
+    $root->DecideVisibility();
+  }
+
+  $iniData->TableFormatter->PrintTable(MakeTable($items), 1); 
+}
+
+sub DoComponentReport {
+  my $component = shift;
+
+  my $root = CreateRoot();
+  my $owners = FindOwners($component);
+  FindOwnedItems($owners, $root, 1);
+  $root->ExpandOwnedDirs() if ($listindividualfiles);
+
+  my $items = $root->GetAll;
+  if ($listindividualfiles) {
+    $root->ShowAll();
+  } else {
+    $root->DecideVisibility();
+  }
+
+  $iniData->TableFormatter->PrintTable(MakeTable($items), 1); 
+}
+
+# The following global functions are used by all the above types of report.
+
+sub CreateRoot {
+  return new SourceInfo::Item("",undef);
+}
+
+sub LimitRelevantOwners {
+  my $ownername = shift;
+  my $owners = shift;
+
+  my @owners = grep { $_->Component =~ m/^\Q$ownername\E$/i } @$owners;
+  return \@owners;
+}
+
+# This takes a load of Items and makes a nice table. Mostly, it
+# just tells each item to produce some relevant rows.
+
+sub MakeTable {
+  my $items = shift;
+
+  my @header = ( "Area" );
+  push @header, "Files" if $countfiles;
+  push @header, ( "Component", "Element", "Status", "Notes" );
+  my @rows = (\@header);
+  foreach my $item (sort { $a->Path cmp $b->Path } @$items) {
+    next unless $item->{show};
+    push @rows, @{$item->MakeRows()};
+  }
+  return \@rows;
+}
+
+# This tells each owner to attach itself to the right place
+# in the tree of Items.
+
+sub FindOwnedItems {
+  my $owners = shift;
+  my $root = shift;
+  my $createnew = shift;
+
+  foreach my $owner (@$owners) {
+    $owner->FindOwnedItem($root, $createnew);
+  }
+}
+
+# This produces all the Owner objects, by way of creating some
+# ephemeral OwnerFinder objects. This is the only place
+# OwnerFinders are used.
+
+sub FindOwners {
+  my $component = shift; # may be undefined
+  my @owners;
+
+  my @ownerfinders = (new SourceInfo::OwnerFinder::Source);
+  push @ownerfinders, new SourceInfo::OwnerFinder::Ignores if $includeignores;
+  push @ownerfinders, new SourceInfo::OwnerFinder::Binaries if $includebinaries;
+
+  @owners = map { @{ $_->FindOwners($component) } } @ownerfinders;
+
+  return \@owners;
+}
+
+##########################################################################################
+##########################################################################################
+package SourceInfo::Item;
+
+sub new {
+  my $class = shift;
+  my $name = shift;
+  my $parent = shift;
+  my $status = shift;
+  die "No name provided" unless (defined $name);
+  return bless {
+    name => $name, # '' if root. NOT '\'
+    children => undef,
+    parent => $parent, # undef if root
+    category => undef,
+    owners => [], # links to any Owner objects.
+    fullpath => undef,
+    status => $status,
+    children => {}, # yes, there are circular references and the whole tree won't die until global cleanup
+    show => 0 # whether to show in the results
+  }, (ref $class || $class);
+}
+
+# Produce rows relevant to put into the results tables
+
+sub MakeRows {
+  my $self = shift;
+
+  my $owners = $self->Owners();
+
+  my @rows;
+  foreach my $owner (@$owners) { # for each owner...
+    push @rows, $self->MakeARow($owner);
+  }
+  if ($self->NumOwners == 0) { # or, if we don't have an owner :-(
+    push @rows, $self->MakeARow();
+  }
+  return \@rows;
+}
+
+sub MakeARow {
+  my $self = shift;
+  my $owner = shift;
+
+  my @row = ($self->Path());
+  push @row, $self->NumFiles() if ($countfiles);
+  if ($owner) {
+    push @row, $owner->Component();
+    push @row, $owner->Element();
+    push @row, $self->Category() || $owner->Status() || "-";
+  } else {
+    push @row, ("-", "-");
+    push @row, $self->Category() || "-";
+  }
+  push @row, $self->Notes();
+  return \@row;
+}
+
+sub NumOwners {
+  my $self = shift;
+  return scalar @{$self->Owners()};
+}
+
+# Will later be used for IPR category.
+# This currently isn't used.
+
+sub Category {
+  my $self = shift;
+  return undef;
+}
+
+# These two methods are alternatives for making some or all of the
+# items visible, depending on their ownership.
+
+sub ShowAll {
+  my $self = shift;
+  $self->{show} = 1;
+  $self->ExecuteChildren(sub {$_->ShowAll});
+}
+
+sub DecideVisibility {
+  my $self = shift;
+  print "Deciding visibility for ".$self->Path.". Is directory: ".$self->IsDirectory.", owners: ".@{$self->{owners}}.", children: ".%{$self->{children}}."\n" if $verbose > 3;
+  if ( $self->IsFile() || @{$self->{owners}} || !%{$self->{children}} ) {
+    $self->{show} = 1;
+  }
+  $self->ExecuteChildren(sub { $_->DecideVisibility } );
+}
+
+sub NumFiles {
+  my $self = shift;
+
+  $self->ExpandAll;
+  my $files = ($self->IsDirectory)?0:1;
+  foreach (values %{$self->{children}}) {
+    $files += $_->NumFiles;
+  }
+  
+  return $files;
+}
+
+sub Notes {
+  my $self = shift;
+  my $numowners = $self->NumOwners;
+  if ($numowners == 0) {
+    return "NONE";
+  } elsif ($numowners > 1) {
+    return "MULTIPLE";
+  } elsif ($self->Owners()->[0]->Type() eq "ignore") {
+    return "IGNORED";
+  }
+}
+ 
+sub IsDirectory {
+  my $self = shift;
+  return -d ($self->Path || "\\");
+}
+
+sub IsFile {
+  my $self = shift;
+  return -f ($self->Path || "\\");
+}
+
+# Destructor. Not currently used - just in case we want to delete
+# a tree full of circular references.
+
+sub DeleteAll {
+  my $self = shift;
+  $self->{parent} = undef;
+  $self->ExecuteChildren( sub { $_->DeleteAll } );
+}
+
+# Returns a list of each item
+
+sub GetAll {
+  my $self = shift;
+  my @items = ($self);
+  $self->ExecuteChildren(sub { push @items, @{$_->GetAll} } );
+  return \@items;
+}
+
+# Returns a list of each item that's visible
+
+sub GetAllVisible {
+  my $self = shift;
+  my @items = grep { $_->{show} } @{$self->GetAll};
+  return \@items;
+}
+
+sub ExpandAll {
+  my $self = shift;
+  print "." if $verbose;
+  $self->FindChildren;
+  $self->ExecuteChildren( sub { $_->ExpandAll } );
+}
+
+# This expands any directories which don't have owners, but some
+# of the subdirectories are owned.
+
+sub ExpandUnownedDirs {
+  my $self = shift;
+  print "Expanding unowned for ".$self->Path."\n" if $verbose>1;
+  return unless $self->IsDirectory;
+  return if $self->NumOwners;
+  # We also return if NONE of the children are owned, 
+  # i.e. we're a totally unowned directory.
+  return unless $self->{childownersfound};
+  $self->FindChildren;
+  $self->ExecuteChildren (sub { $_->ExpandUnownedDirs } );
+}
+
+sub ExpandOwnedDirs {
+  my $self = shift;
+
+  $self->ExpandAll() if (@{$self->{owners}});
+  $self->ExecuteChildren (sub { $_->ExpandOwnedDirs } );
+}
+
+# Recursively applies a function to each item
+
+sub ExecuteChildren {
+  my $self = shift;
+  my $sub = shift;
+  &$sub($_) foreach (values %{$self->{children}});
+}
+
+sub FindChildren {
+  my $self = shift;
+  print "Finding children for ".$self->Path."\n" if $verbose>1;
+  return if defined $self->{foundchildren};
+  return if ($self->Path eq "\\epoc32" && !$expandepoc32);
+  $self->{foundchildren} = 1;
+  $self->ReadDir();
+  my %kids = map { (lc $_, new SourceInfo::Item($_, $self)) } @{$self->{dirlisting}};
+  print "Currently has these children: ".(join (', ', map { "$_->{name} ".$_->NumOwners } values %{$self->{children}}))."\n" if $verbose>2;
+  $self->{children} ||= {};
+  $self->{children} = { %kids, %{$self->{children}} };
+}
+
+sub NumChildren {
+  my $self = shift;
+  $self->ReadDir;
+  return @{$self->{dirlisting}};
+}
+
+sub ReadDir {
+  my $self = shift;
+  return if $self->{dirlisting};
+  $self->{dirlisting} = [] and return unless $self->IsDirectory();
+  print "Reading directory for ".$self->Path."\n" if $verbose > 1;
+  my $dh = new DirHandle($self->Path() || "\\") or die "Couldn't open directory handle for \"".$self->Path()||"\\"."\" because $!";
+  $self->{dirlisting} = [ grep { ! m/^\./ } $dh->read ];
+  $dh = undef; # I know this is OBVIOUSLY going to happen at the end of this function but
+               # I am getting strange out-of-file-descriptor errors.
+}
+
+sub Path {
+  my $self = shift;
+  unless (defined $self->{fullpath}) {
+    if (defined $self->{parent}) {
+      $self->{fullpath} = $self->{parent}->Path() . "\\" . $self->{name};
+    } else {
+      $self->{fullpath} = $self->{name};
+    }
+  }
+  return $self->{fullpath};
+}
+
+# This is used to find a particular item in the tree,
+# given a path. (It's used when searching for something
+# that is owned, for example). The 'createnew' flag
+# specifies whether it should create new files and directories
+# if necessary.
+
+sub FindItem {
+  my $self = shift;
+  my $path = shift;
+  my $createnew = shift;
+
+  print "Asked to find \"$path\"...\n" if ($verbose > 3);
+  
+  my @segments = split (/\\/, $path);
+  unshift @segments, "" unless $segments[0] eq ""; # root segment has no name
+  $self->FindItemBySegments($createnew, @segments);
+}
+
+sub FindItemBySegments {
+  my ($self, $createnew, $firstseg, @othersegs) = @_;
+
+  print "\n$self->{name} (path ".$self->Path().") (createnew $createnew):--\n" if ($verbose > 3);
+  print "First segment $firstseg, others @othersegs\n" if ($verbose > 3);
+
+  die "No path provided" unless defined $firstseg;
+
+  if (lc $firstseg eq lc $self->{name}) {
+    if (@othersegs) {
+      foreach (values %{$self->{children}}) {
+        my $found = $_->FindItemBySegments($createnew, @othersegs);
+        return $found if $found;
+      }
+      return undef unless $createnew;
+      return $self->CreateNewSegment(@othersegs);
+    } else {
+      return $self;
+    }
+  } else {
+    return undef;
+  }
+}
+
+sub CreateNewSegment {
+  my ($self, $firstseg, @othersegs) = @_;
+  print "Creating new segment for $firstseg (others @othersegs) within ".$self->Path."\n" if $verbose>1;
+
+  my $kid = new SourceInfo::Item($firstseg, $self);
+  $self->{children}->{lc $firstseg} = $kid;
+  $self->{childownersfound} = 1;
+  return $kid->FindItemBySegments(1, $firstseg, @othersegs);
+}
+
+sub Owners {
+  my $self = shift;
+  my @allowners = @{$self->{owners}};
+  return \@allowners unless ($self->{parent});
+  push @allowners, @{$self->{parent}->Owners};
+  return \@allowners;
+}
+
+sub AddOwner {
+  my $self = shift;
+  my $owner = shift;
+  push @{$self->{owners}}, $owner;
+}
+
+##########################################################################################
+##########################################################################################
+package SourceInfo::Owner;
+
+sub new {
+  my $class = shift;
+  my $type = shift;
+  my $component = shift;
+  my $element = shift;
+  my $status = shift;
+
+  return bless {
+    type => $type, # ignore, binary or source
+    component => $component,
+    element => $element,
+    status => $status
+  }, (ref $class || $class);
+}
+
+sub FindOwnedItem {
+  my $self = shift;
+  my $root = shift;
+  my $createnew = shift;
+  
+  print "About to find the owned item for \"$self->{element}\" ($createnew)\n" if ($verbose > 3);
+  my $item = $root->FindItem($self->{element}, $createnew);
+  die "Failed to create new item" if (!$item && $createnew);
+  $item->AddOwner($self) if $item;
+}
+
+sub Component {
+  my $self = shift;
+  return "-" if ($self->Type() eq "ignore");
+  return $self->{component};
+}
+
+sub Element {
+  my $self = shift;
+  return "<binary>" if ($self->{type} eq "binary");
+  return "<ignore>" if ($self->Type() eq "ignore");
+  return $self->{element} || "-";
+}
+
+sub Type {
+  my $self = shift;
+  return $self->{type};
+}
+
+sub Status {
+  my $self = shift;
+  return $self->{status};
+}
+
+##########################################################################################
+##########################################################################################
+package SourceInfo::OwnerFinder;
+
+sub new {
+  my $class = shift;
+  return bless {}, (ref $class || $class);
+}
+
+sub Components {
+  my $self = shift;
+  my $versionInfo = $envDb->VersionInfo();
+  return sort keys %$versionInfo;
+}
+
+package SourceInfo::OwnerFinder::Ignores;
+BEGIN { @SourceInfo::OwnerFinder::Ignores::ISA = qw(SourceInfo::OwnerFinder); };
+
+sub FindOwners {
+  my $self = shift;
+  my @owners;
+  # First, the ignored items
+  print "Finding ignored binaries.\n" if $verbose;
+  my $ignoreList = $iniData->BinariesToIgnore();
+  push (@$ignoreList, '\\epoc32\\relinfo\\*');
+  foreach my $ignore (@$ignoreList) {
+    my @found = glob $ignore;
+    if (@found) {
+      push @owners, new SourceInfo::Owner("ignore", undef, $_, undef) foreach (@found);
+    } elsif ($ignore =~ s/\\\*$//) {
+      push @owners, new SourceInfo::Owner("ignore", undef, $ignore, undef);
+    }
+  }
+  return \@owners;
+}
+
+package SourceInfo::OwnerFinder::Source;
+BEGIN { @SourceInfo::OwnerFinder::Source::ISA = qw(SourceInfo::OwnerFinder); };
+
+sub FindOwners {
+  my $self = shift;
+  my $component = shift;
+  print "Finding source directories owned.\n" if $verbose;
+  my @owners;
+  my @comps_to_examine;
+  if ($component) {
+    @comps_to_examine = ($component);
+  } else {
+    @comps_to_examine = $self->Components();
+  }
+
+  foreach my $comp (@comps_to_examine) {
+    eval {
+      foreach my $element (keys %{$self->GetSourceInfo($comp)}) {
+        
+        if($iniData->HasMappings()){
+          $element = $iniData->PerformMapOnFileName($element);
+          $element = Utils::RemoveSourceRoot($element);
+        }
+	      
+        push @owners, new SourceInfo::Owner("source", $comp, $element, undef);
+      }
+    };
+    if ($@) {
+      print "Warning: could not find owner information for \"$comp\" because $@";
+    }
+  }
+  return \@owners;
+}
+
+sub GetSourceInfo {
+  my $self = shift;
+  my $comp = shift;
+  my $ver = $envDb->Version($comp);
+  my $relData = RelData->Open($iniData, $comp, $ver, $verbose);
+  return $relData->SourceItems();
+}
+
+package SourceInfo::OwnerFinder::Binaries;
+BEGIN { @SourceInfo::OwnerFinder::Binaries::ISA = qw(SourceInfo::OwnerFinder); };
+
+sub FindOwners {
+  my $self = shift;
+  my $component = shift;
+  my @owners;
+  print "Finding binaries owned.\n" if $verbose;
+  my @comps_to_examine;
+  if ($component) {
+    @comps_to_examine = ($component);
+  } else {
+    @comps_to_examine = $self->Components();
+  }
+  foreach my $comp (@comps_to_examine) {
+    my $bfowned = $envDb->ListBins($comp);
+    shift @$bfowned; # get rid of the header row
+    foreach my $binfile (@$bfowned) {
+      my $file = $binfile->[0];
+      my $status = $binfile->[1];
+      push @owners, new SourceInfo::Owner("binary", $comp, $file, $status);
+    }
+  }
+  return \@owners;
+}
+
+
+__END__
+
+=head1 NAME
+
+SourceInfo - Displays information about the source code associated with components.
+
+=head1 SYNOPSIS
+
+  sourceinfo [options] [any file | component]
+
+options:
+
+  -h  help
+  -v  verbose output (-vv very verbose)
+  -f  list individual files, not just directories
+  -b  include binary files
+  -i  include 'ignored' files
+  -s  print summary report (don't specify a component or a file)
+  --force (deprecated)
+  -c  show a count of the files in each directory (and its subdirectories) -- can be slow
+
+=head1 DESCRIPTION
+
+If given a filename, prints information about what component(s) release the source directory(ies) containing that file.
+
+  Area                     Files   Component   Element     Status   Notes
+  \aardvark                6       aardvark    \aardvark   -
+  \aardvark\aardvark.mrp   1       aardvark    \aardvark   -
+
+The confusing 'element' column lists what MRP 'source' statement owns that item of source code. 
+
+If given a component name, prints information about what directories that component releases.
+
+  Area        Files   Component   Element     Status   Notes
+  \aardvark   6       aardvark    \aardvark   -
+
+If no component name is specified, then a full report will be provided for each component.  This will also report any files or directories that are not owned by any component, as well as any file or directories which are owned by more than one component.
+
+  Area             Files   Component   Element       Status Notes
+  \aardvark        6       aardvark    \aardvark     -
+  \albatross       6       albatross   \albatross    -
+  \anteater        6       anteater    \anteater     -
+  \buffalo         6       buffalo     \buffalo      -
+
+If the -s flag is provided, then only the information about files/directories with zero or multiple ownership is shown.
+
+  Files/areas without ownership:
+    \prepenv-input.txt
+    \reltools-tmp-cleanremote-conf.txt
+  Files/areas with multiple ownership:
+
+The F<\epoc32> tree is not normally included in reports. Similarly, files owned as "binary" files by components aren't included in reports - so, if a component releases binary files outside of F<\epoc32> then they will be shown as having no ownership.
+
+For completeness, you can include binary ownership in the report using C<-b>. A similar option is C<-i>. This turns on the scanning of 'ignored' areas, such as F<\epoc32\wins\c>. 
+
+The final option is C<-f>. If a directory is uniformly owned, then normally the files inside that directory will not be listed. Adding C<-f> prompts the tool to list every file.
+
+Note that the output of this may NOT be suitable for distributing to licensees, because it may include directory structures of bits of IPR they are not licensed to see.
+
+=head1 STATUS
+
+Supported. If you find a problem, please report it to us.
+
+=head1 KNOWN BUGS
+
+None, but this tool is still rather experimental so please treat the output with caution.
+
+=head1 COPYRIGHT
+
+ Copyright (c) 2000-2009 Nokia Corporation and/or its subsidiary(-ies).
+ All rights reserved.
+ This component and the accompanying materials are made available
+ under the terms of the License "Eclipse Public License v1.0"
+ which accompanies this distribution, and is available
+ at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ 
+ Initial Contributors:
+ Nokia Corporation - initial contribution.
+ 
+ Contributors:
+ 
+ Description:
+ 
+
+=cut
+

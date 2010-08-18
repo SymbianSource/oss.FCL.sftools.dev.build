@@ -23,7 +23,7 @@
 
 #include <e32def.h>
 
-TInt Getlogfile(TText *aDriveObeyFileName,TText* &aPadLogFile);
+TInt Getlogfile(char *aDriveObeyFileName,char* &aPadLogFile);
 TAny GetLocalTime(TAny);
 
 #endif

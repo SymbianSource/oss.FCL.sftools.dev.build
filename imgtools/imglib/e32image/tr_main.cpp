@@ -51,8 +51,8 @@
 #include "elftran.h"
 #endif
 
-#include <h_utl.h>
-#include <h_ver.h>
+#include "h_utl.h"
+#include "h_ver.h"
 #include <stdio.h>
 
 extern int gAlignConstSection;
@@ -73,7 +73,7 @@ unsigned int gVersionWord=0x00010000u;
 int gCallEntryPoints=TRUE;
 int gFixedAddress=FALSE;
 int gPriority=EPriorityForeground;
-SCapabilitySet gCapability={0};
+SCapabilitySet gCapability={{0}};
 int gAllowDllData=FALSE;
 // fix warning for Linux warning: 0 instead of NULL
 TUint gDataBase=0;
@@ -323,7 +323,7 @@ int dotran(const char* ifilename, const char* ofilename)
 	ofile << f;
 	ofile.close();
 	if (gVerbose)
-		f.Dump((TText*)ofilename,gVerbose);
+		f.Dump(ofilename,gVerbose);
 	return KErrNone;
 	}
 
@@ -344,7 +344,7 @@ int dodump(const char* ifilename)
 		Print(EError,"Error %d reading %s.\n",r,ifilename);
 		return 1;
 		}
-	f.Dump((TText*)ifilename, gVerbose ? gVerbose : E32ImageFile::EDumpDefaults);
+	f.Dump(ifilename, gVerbose ? gVerbose : E32ImageFile::EDumpDefaults);
 	return KErrNone;
 	}
 
@@ -469,7 +469,7 @@ int doalter(const char* ifilename)
 	ofile << f;
 	ofile.close();
 	if (gVerbose)
-		f.Dump((TText *)ifilename,gVerbose);
+		f.Dump(ifilename,gVerbose);
 	return KErrNone;
 	}
 
@@ -510,24 +510,8 @@ int getUIntArg(unsigned int &aVal, int argc, char *argv[], int i)
 		return KErrArgument;
 	if (!isNumber(argv[i]))
 		return KErrArgument;
-#ifdef __LINUX__
-	int n;
-	sscanf(argv[i], "%i", &n);
-	aVal = n;
-#else
-#ifdef __TOOLS2__
-istringstream s(argv[i]/*, strlen(argv[i])*/);
-#else
-istrstream s(argv[i], strlen(argv[i]));
-#endif
-
-#if defined(__MSVCDOTNET__) || defined(__TOOLS2__)
-	s >> setbase(0);
-#endif //__MSVCDOTNET__
-
-	s >> aVal;
-#endif // __LINUX__
-	return KErrNone;
+ 
+	return Val(aVal,argv[i]); 
 	}
 
 int getCapabilitiesArg(SCapabilitySet& aVal, int argc, char *argv[], int i)

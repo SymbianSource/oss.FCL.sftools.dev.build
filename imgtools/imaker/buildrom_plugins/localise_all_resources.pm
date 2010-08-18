@@ -2,9 +2,9 @@
 # Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
-# under the terms of the License "Symbian Foundation License v1.0"
+# under the terms of the License "Eclipse Public License v1.0"
 # which accompanies this distribution, and is available
-# at the URL "http://www.symbianfoundation.org/legal/sfl-v10.html".
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
 #
 # Initial Contributors:
 # Nokia Corporation - initial contribution.
@@ -13,7 +13,7 @@
 #
 # Description:
 # Adds a LOCALISE macro that enables configuration of localised files.
-# The localised language selection is done with a ADD_LANGUAGE macro.
+# The localised language selection is done with a LANGUAGE_CODE macro.
 #
 
 
@@ -26,14 +26,14 @@
 #   target => the target file. The section that needs to be localised should be marked with ??.
 #   languages => a space delimited list of language codes
 #
-# Syntax: ADD_LANGUAGE
-#   ADD_LANGUAGE lang
+# Syntax: LANGUAGE_CODE
+#   LANGUAGE_CODE lang
 #
 # Example:
 # Add languages
-# ADD_LANGUAGE 01
-# ADD_LANGUAGE 02
-# ADD_LANGUAGE 03
+# LANGUAGE_CODE 01
+# LANGUAGE_CODE 02
+# LANGUAGE_CODE 03
 #
 # Use Case 1:
 # Localises a App resoure file.
@@ -45,9 +45,9 @@
 #
 # Use Case 2:
 # Localise all resource files under a section
-# ADD_LANGUAGE 01
-# ADD_LANGUAGE 02
-# ADD_LANGUAGE 03
+# LANGUAGE_CODE 01
+# LANGUAGE_CODE 02
+# LANGUAGE_CODE 03
 #
 # LOCALISE_ALL_RESOURCES_BEGIN
 # // All resource files will be localised
@@ -63,19 +63,6 @@
 #   data=APP_RESOURCE_DIR\App.r03 RESOURCE_DIR\app.r03
 #
 ###############################################################################
-
-#
-# Version 4
-# Path corrections to widget support.
-#
-# Version 3
-# Support for Idle widgets.
-#
-# Version 2
-# Localises also *.hlp to *.h%s.
-#
-# Version 1
-# Initial version.
 
 
 package localise_all_resources;
@@ -166,6 +153,15 @@ sub do_localise_all_resources_extension
       {
         # match data/file=foobar.rsc resource/foobar.rsc
         $line = create_localise_entry_from_resource($line);
+        push @newobydata, "$line\n";
+        next;
+      }
+      # localise all qm files inside the localise_all_resources section
+      # qt resource files .ts
+      if ( is_qt_resource_entry($line) )
+      {
+        # match data/file=foobar.qm resource/foobar.qm
+        $line = create_localise_entry_from_qt_resource($line);
         push @newobydata, "$line\n";
         next;
       }
@@ -262,6 +258,19 @@ sub is_resource_entry($)
   return 0;
 }
 
+sub is_qt_resource_entry($)
+{
+  my $entry = shift;
+  my $type = get_type_from_entry($entry);
+  my $source = get_source_from_entry($entry);
+  my $target = get_target_from_entry($entry);
+  if ($source =~ m/\.qm[\"|\']?$/i &&
+      $target =~ m/\.qm[\"|\']?$/i )
+  {
+    return 1;
+  }
+  return 0;
+}
 #
 # match
 sub is_help_entry_xhtml($)
@@ -270,8 +279,8 @@ sub is_help_entry_xhtml($)
   my $type = get_type_from_entry($entry);
   my $source = get_source_from_entry($entry);
   my $target = get_target_from_entry($entry);
-  if ($source =~ m/\\01\\/i &&
-      $target =~ m/\\01\\/i )
+  if ($source =~ m/[\/\\]01[\/\\]/i &&
+      $target =~ m/[\/\\]01[\/\\]/i )
   {
     return 1;
   }
@@ -301,10 +310,10 @@ sub is_dtd_entry($)
   my $type = get_type_from_entry($entry);
   my $source = get_source_from_entry($entry);
   my $target = get_target_from_entry($entry);
-  if (($source =~ m/\\01\\.*\.dtd/i &&
-      $target =~ m/\\01\\.*\.dtd/i ) ||
-    ($source =~ m/\\00\\.*\.dtd/i &&
-      $target =~ m/\\00\\.*\.dtd/i ))
+  if (($source =~ m/[\/\\]01[\/\\].*\.dtd/i &&
+      $target =~ m/[\/\\]01[\/\\].*\.dtd/i ) ||
+    ($source =~ m/[\/\\]00[\/\\].*\.dtd/i &&
+      $target =~ m/[\/\\]00[\/\\].*\.dtd/i ))
   {
     return 1;
   }
@@ -390,6 +399,20 @@ sub create_localise_entry_from_resource($)
   return "$type=LOCALISE($source, $target)";
 }
 
+# create localise entry from qt resource entry
+sub create_localise_entry_from_qt_resource($)
+{
+  my $entry = shift;
+  my $type = get_type_from_entry($entry);
+  my $source = get_source_from_entry($entry);
+  my $target = get_target_from_entry($entry);
+  #convert the .qm to _xx.qm
+  $source =~ s/\.qm/\_%s.qm/i;
+  $target =~ s/\.qm/\_%s.qm/i;
+  #print "create_localise_entry_from_resource: $source\n";
+  return "$type=LOCALISE($source, $target)";
+}
+
 # create localise entry from resource entry
 sub create_localise_entry_from_help($)
 {
@@ -398,8 +421,8 @@ sub create_localise_entry_from_help($)
   my $source = get_source_from_entry($entry);
   my $target = get_target_from_entry($entry);
   #convert the \\01\\ to \\%02d\\
-  $source =~ s/\\01\\/\\%02d\\/i;
-  $target =~ s/\\01\\/\\%02d\\/i;
+  $source =~ s/([\/\\])01([\/\\])/$1%02d$2/i;
+  $target =~ s/([\/\\])01([\/\\])/$1%02d$2/i;
   #print "create_localise_entry_from_resource: $source\n";
   return "$type=LOCALISE($source, $target)";
 }
@@ -468,8 +491,8 @@ sub create_localisable_path($)
 {
   my $entry = shift;
 
-  $entry =~ s/\\01\\/\\%02d\\/ig;
-  $entry =~ s/\\00\\/\\%02d\\/ig;
+  $entry =~ s/([\/\\])01([\/\\])/$1%02d$2/ig;
+  $entry =~ s/([\/\\])00([\/\\])/$1%02d$2/ig;
 
   #print "create_localise_entry_from_resource: $source\n";
   return $entry;

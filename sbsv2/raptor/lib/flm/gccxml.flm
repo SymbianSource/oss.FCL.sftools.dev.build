@@ -1,4 +1,4 @@
-# Copyright (c) 2008-2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2008-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -71,7 +71,7 @@ endef
 # $(2) list of further variable arguments to group in 150 element calls
 define groupcallin50
 	$(if $2,$1 $(foreach L,$(wordlist 1,50,$2),$(L)),)
-	$(if $2,$(call groupcallin50,$1,$(wordlist 51,$(words $2),$2)),true)
+	$(if $2,$(call groupcallin50,$1,$(wordlist 51,$(words $2),$2)),@true)
 endef
 
 # echos content to a file in groups performing optional search/replace based on passed args
@@ -92,7 +92,7 @@ DEPFILES:=$(call mapsource2output,$(SOURCE),.xml.d)
 TEMPGXPARCHIVE:=$(VARIANTBLDPATH)/$(TARGET)$(BASE_TYPE).gxp
 GXPARCHIVE:=$(VARIANTRELEASEPATH)/$(TARGET)$(BASE_TYPE).gxp
 
-CLEANTARGETS:=$(CLEANTARGETS) $(MMPXMLFILE) $(SRCXMLFILES) $(DEPFILES) $(TEMPGXPARCHIVE) $(GXPARCHIVE)
+CLEANTARGETS:=$(CLEANTARGETS) $(MMPXMLFILE) $(SRCXMLFILES) $(DEPFILES) $(TEMPGXPARCHIVE)
 RELEASABLES:=$(RELEASABLES) $(GXPARCHIVE)
 
 # Deduce whether we should be performing a build with standard CPP characteristics
@@ -200,7 +200,7 @@ endif
 define gccxmlprocesssource
 
   $(eval DEPENDFILENAME:=$(call mapsource2output,$(1),.xml.d))
-  $(eval DEPENDFILE:=$(DEPENDFILENAME))
+  $(eval DEPENDFILE:=$(wildcard $(DEPENDFILENAME)))
 
   $(call mapsource2output,$(1),.xml): $(1) $(if $(DEPENDFILE),,RESOURCE BITMAP EXPORT)
 	$(call startrule,gccxmlprocesssource) \
@@ -214,12 +214,12 @@ define gccxmlprocesssource
 	$(call endrule,gccxmlprocesssource)
 
     CLEANTARGETS:=$$(CLEANTARGETS) $(DEPENDFILENAME)
-    ifneq "$(DEPENDFILE)" ""
-    ifeq ($(NO_DEPEND_INCLUDE),)
-      ifeq "$(filter %CLEAN,$(call uppercase,$(MAKECMDGOALS)))" ""
-        -include $(DEPENDFILE)
+    ifneq ($(DEPENDFILE),)
+      ifeq ($(NO_DEPEND_INCLUDE),)
+        ifeq ($(filter %CLEAN,$(call uppercase,$(MAKECMDGOALS))),)
+          -include $(DEPENDFILE)
+        endif
       endif
-    endif
     endif
 
 endef
@@ -235,7 +235,7 @@ $(foreach SRCFILE,$(SOURCE),$(eval $(call gccxmlprocesssource,$(SRCFILE))))
 # note: the main call here needs to reside outside of start/endrule in order to avoid command line length issues.
 define gccxmlpackage
   $(TEMPGXPARCHIVE): $(MMPXMLFILE) $(SRCXMLFILES) $(DEFFILE)
-	  $$(call groupcallin50,$(ZIP) -j $$@,$$^ $(RFIFILES)) ;
+	  $$(call groupcallin50,@$(ZIP) -j $$@ > /dev/null 2>&1,$$^ $(RFIFILES)) ;
 	  $(call startrule,gccxmlpackage) \
 	  $(GNURM) -f $(GXPARCHIVE) && \
 	  $(GNUCP) $$@ $(GXPARCHIVE) \
@@ -252,6 +252,6 @@ $(ALLTARGET):: $(RELEASABLES)
 TARGET:: $(RELEASABLES)
 
 # clean up
-$(eval $(call GenerateStandardCleanTarget,$(CLEANTARGETS),$(CREATABLEPATHS),))
+$(call raptor_clean,$(CLEANTARGETS))
 $(call makepath, $(CREATABLEPATHS))
 

@@ -16,8 +16,8 @@
 */
 
 
-const char version[]="8.2";
+const char version[]="8.4";
 
-const char build[]="005";
+const char build[]="002";
 
 // end of version.h

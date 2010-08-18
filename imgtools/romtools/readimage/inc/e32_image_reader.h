@@ -27,7 +27,7 @@ class E32ImageReader : public ImageReader
 {
 public:
 	E32ImageReader();
-	E32ImageReader(char* aFile);
+	E32ImageReader(const char* aFile);
 	~E32ImageReader();
 
 	void ReadImage();

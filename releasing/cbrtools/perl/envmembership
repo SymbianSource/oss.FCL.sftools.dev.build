@@ -1,0 +1,163 @@
+#!perl
+# Copyright (c) 2001-2009 Nokia Corporation and/or its subsidiary(-ies).
+# All rights reserved.
+# This component and the accompanying materials are made available
+# under the terms of the License "Eclipse Public License v1.0"
+# which accompanies this distribution, and is available
+# at the URL "http://www.eclipse.org/legal/epl-v10.html".
+# 
+# Initial Contributors:
+# Nokia Corporation - initial contribution.
+# 
+# Contributors:
+# 
+# Description:
+# 
+#
+
+use strict;
+use FindBin;
+use lib "$FindBin::Bin";
+use Getopt::Long;
+use IniData;
+use RelData;
+use Utils;
+use CommandController;
+
+
+#
+# Globals.
+#
+
+my $verbose = 0;
+my $iniData = IniData->New();
+my $force;
+my $commandController = CommandController->New($iniData, 'EnvMembership');
+
+#
+# Main.
+#
+
+ProcessCommandLine();
+
+
+#
+# Subs.
+#
+
+sub ProcessCommandLine {
+  Getopt::Long::Configure ("bundling");
+  my $help;
+  GetOptions("h" => \$help, "v+" => \$verbose, "f" => \$force);
+
+  if ($help) {
+    Usage(0);
+  }
+
+  # Functional description:
+  # create reldata objects for each release of <environment>
+  # for each release find if <component> is present in the environment
+  # and if so if <version> matches the version in the environment.
+  # if these conditions are met, place the current <environment> release id in 
+  # an array and print the contents of the array at the end of the script
+  #
+  #
+  if ($#ARGV == 2) {
+    # Extract the command line arguments (Note: GetOptions() will have already
+    # stripped out the options part of the command line
+    my $component_name = shift @ARGV;
+    my $component_version= shift @ARGV;
+    my $env_name= shift @ARGV;
+		
+    # Scalar variable $envRelDatas will contain a reference to an array of reldata
+    # objects following this call.
+    my $envRelDatas = RelData->OpenSet($iniData, $env_name, $verbose);
+    my @outputTable;
+    my @tableHeader = ("Component", "Version");
+    push (@outputTable, \@tableHeader);
+    foreach my $currentEnvRelData (@$envRelDatas) {
+      my $currentEnv = $currentEnvRelData->Environment();
+      # $currentEnv now contains a reference to a hash containing 
+      # component name / version pairs for all the components that were
+      # present in the current release of the environment component
+      if ($currentEnv->{$component_name}) {
+	# component is present in the current environment
+	if ($currentEnv->{$component_name} eq $component_version) {
+	  # component version of interest is present in the current environment
+	  my @tableRow = ($currentEnvRelData->Component(),$currentEnvRelData->Version());
+	  push (@outputTable, \@tableRow);
+	}
+      }
+    }
+    # print the environment versions in which componet version is present
+    my $tableLength = @outputTable;
+    if ($tableLength > 0) {
+      $iniData->TableFormatter->PrintTable(\@outputTable);
+    }
+  } else {
+    print "Error: Invalid number of arguments\n";
+    Usage(1);
+  }
+}
+
+sub Usage {
+  my $exitCode = shift;
+
+  Utils::PrintDeathMessage($exitCode, "\nUsage: envmembership [options] <component> <version> <environment>
+
+options:
+
+-h  help
+-f  (deprecated)
+-v  verbose output (-vv very verbose)\n");
+
+}
+
+__END__
+
+=head1 NAME
+
+EnvMembership - Returns the environments to which a particular component belongs
+
+=head1 SYNOPSIS
+
+  envmembership [options] <component> <version> <environment>
+
+options:
+
+  -h  help
+  -f  (deprecated)
+  -v  verbose output (-vv very verbose)
+
+=head1 DESCRIPTION
+
+Returns all the versions of a specified component for which a particular version of another specified component is present in its release environment. For example, to discover which release of a component called C<my_product> contains the component C<my_comp> at version C<my_ver>, type:
+
+  envmembership my_comp my_ver my_product 
+
+=head1 STATUS
+
+Supported. If you find a problem, please report it to us.
+
+=head1 KNOWN BUGS
+
+None.
+
+=head1 COPYRIGHT
+
+ Copyright (c) 2001-2009 Nokia Corporation and/or its subsidiary(-ies).
+ All rights reserved.
+ This component and the accompanying materials are made available
+ under the terms of the License "Eclipse Public License v1.0"
+ which accompanies this distribution, and is available
+ at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ 
+ Initial Contributors:
+ Nokia Corporation - initial contribution.
+ 
+ Contributors:
+ 
+ Description:
+ 
+
+=cut

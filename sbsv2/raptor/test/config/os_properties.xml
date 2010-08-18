@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<build xmlns="http://symbian.com/xml/build"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://symbian.com/xml/build build/2_0.xsd">
+
+  <!-- This variant modifies the root variant for this particular kit. -->
+  <var name="root.changes">
+
+    <!-- pretend we don't have the new paging options (codepaging, datapaging)
+         so that we can test the old options (paged, unpaged)
+    --> 
+    <set name='POSTLINKER_SUPPORTS_WDP' value=''/>
+  </var>
+  
+</build>

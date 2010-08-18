@@ -28,10 +28,8 @@
 #include "NUMVAL.H"  
 #include "DATATYPE.H"
 
-#if defined(__MSVCDOTNET__) || defined(__TOOLS2__)
-using std::ofstream;
-using std::ios;
-#endif //__MSVCDOTNET__
+ 
+using namespace std ;
 
 extern long CurrentId;
 extern RCTypeArray gTypes;
@@ -520,7 +518,9 @@ void ResourceDataStream::ConvertCompressedRunToUncompressed(int aMarkIndexOfStar
 
 ResourceDataStream::BinaryBuffer* ResourceDataStream::BinaryBuffer::New(int aNumberOfBytes, const unsigned char* aBuffer)
 	{ // static
-	BinaryBuffer* const binaryBuffer=(BinaryBuffer*)malloc((size_t)&((BinaryBuffer*)0)->iBuffer[aNumberOfBytes]);
+		BinaryBuffer *dummy = reinterpret_cast<BinaryBuffer *>(0) ;
+		size_t offset = reinterpret_cast<size_t>(&(dummy->iBuffer[aNumberOfBytes])) ;
+	BinaryBuffer* const binaryBuffer=(BinaryBuffer*)malloc(offset);
 	assert(binaryBuffer!=NULL);
 	binaryBuffer->iNumberOfBytes=aNumberOfBytes;
 	assert(aNumberOfBytes>=0);
