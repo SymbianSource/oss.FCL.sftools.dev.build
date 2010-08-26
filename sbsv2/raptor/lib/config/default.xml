@@ -27,6 +27,7 @@
 		<groupRef ref="tools"/>
 		<groupRef ref="tools2"/>
 		<groupRef ref="winscw"/>
+		<groupRef ref="x86"/>
 	</group>
 
 </build>

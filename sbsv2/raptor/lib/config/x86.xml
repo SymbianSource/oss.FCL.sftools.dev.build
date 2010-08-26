@@ -37,13 +37,13 @@
 		<!-- macros -->
 		<set name="PLATMACROS.WINDOWS" value="$(PLATMACROS.TOOLCHAIN) EPOC32 $(PLATMACROS.CONFIG) $(PLATMACROS.VAR)"/>
 		<set name="PLATMACROS.LINUX" value="$(PLATMACROS.WINDOWS)"/>
-		<set name="PLATMACROS.CONFIG" value=""/>
+		<set name="PLATMACROS.CONFIG" value="X86 GENERIC_X86"/>
 		<set name="PLATMACROS.VAR" value=""/>
 		<set name="PLATMACROS.TOOLCHAIN" value=""/>
 		
 		<set name="BLDINF_OUTPUTPATH" value="$(SBS_BUILD_DIR)"/>
 		<set name="CAPABILITY" value=""/>
-		<set name="CDEFS" value="__X86__ _UNICODE __SYMBIAN32__ __EPOC32__ __PRODUCT_INCLUDE__=&quot;$(PRODUCT_INCLUDE)&quot; $(MMPDEFS)"/>
+		<set name="CDEFS" value="__X86__ _UNICODE __SYMBIAN32__ __EPOC32__ PRODUCT_INCLUDE=&quot;$(PRODUCT_INCLUDE)&quot; $(MMPDEFS)"/>
 		<set name="CODE_SEGMENT_START" value=""/>
 		<set name="COMPILER_FPU_DEFAULT" value=""/>
 		<set name="COMPILER_NO_HIDE_ALL_OPTION" value=""/>

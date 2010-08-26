@@ -22,11 +22,9 @@ sbs -c x86
 sbs -c x86_urel
 sbs -c x86_udeb
 
-If a component supports a build for X86GCC or ARMV5 then it will support a
-build using Raptor's x86 support if requested i.e. if one of the above build
-configurations is used and, for example, the component's bld.inf file has an
-empty PRJ_PLATFORMS section or PRJ_PLATFORMS is populated with X86GCC, ARMV5,
-DEFAULT, BASEDEFAULT etc.
+A component supports a build using the above x86 configurations if its
+bld.inf file has an empty or missing PRJ_PLATFORMS section or PRJ_PLATFORMS is
+populated specifically with X86, DEFAULT, BASEDEFAULT or BASEUSERDEFAULT.
 
 The above x86 group and aliases check that the GCC installation is version 3.4.5
 but, other than that, it is the end user's responsibility to provide a toolchain

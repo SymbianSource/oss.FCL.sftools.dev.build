@@ -262,19 +262,25 @@ ifeq ($(e32importlib_mk),)
   include $(FLMHOME)/e32importlib.mk
 endif
 
-ifneq ($(IMPORTLIBRARYREQUIRED),)
-ifneq ($(or $(DEFFILE),$(EXPORTUNFROZEN)),)
-# Both ABIv2 .dso and ABIv1 .lib import library generation require a processed .def file,
-# unless EXPORTUNFROZEN is being used
-PREPPEDDEFFILE:=
-ifneq ($(DEFFILE),)
-  ifeq ($(EXPORTUNFROZEN),)
-    PREPPEDDEFFILE:=$(INTERMEDIATEPATH)/$(TARGET).prep
-    CLEANTARGETS:=$(CLEANTARGETS) $(PREPPEDDEFFILE)
-    $(eval $(importlibtarget_prepfile_$(BASE_ARCH)))
+# A processed .def file is required for:
+# 1: ABIv2 .dso and ABIv1 .lib import library generation
+# 2: linking where the build fixes exports using a .exp file
+# That is, in both cases, unless EXPORTUNFROZEN is being used
+ifneq ($(or $(IMPORTLIBRARYREQUIRED),$(FIX_EXPORTS_USING_EXP_FILE)),)
+  ifneq ($(or $(DEFFILE),$(EXPORTUNFROZEN)),)
+    PREPPEDDEFFILE:=
+    ifneq ($(DEFFILE),)
+      ifeq ($(EXPORTUNFROZEN),)
+        PREPPEDDEFFILE:=$(INTERMEDIATEPATH)/$(TARGET).prep
+        CLEANTARGETS:=$(CLEANTARGETS) $(PREPPEDDEFFILE)
+        $(eval $(importlibtarget_prepfile_$(BASE_ARCH)))
+      endif
+    endif
   endif
 endif
 
+ifneq ($(IMPORTLIBRARYREQUIRED),)
+ifneq ($(or $(DEFFILE),$(EXPORTUNFROZEN)),)
 # ABIv2 .dso
 ifneq ($(IMPORTLIBTARGET_DSO),) # check that we haven't tried to specify this target already
 
@@ -478,8 +484,6 @@ CIAFILES:=$(call extractfilesoftype,$(CIAFILEEXTENSIONS),$(SOURCE))
 CIA_CPPFILES:=
 ifeq ($(TRANSFORM_CIA),1)
   CIA_CPPFILES:=$(call relocatefiles,$(INTERMEDIATEPATH),$(call extractandmap,$(CIAFILEEXTENSIONS),_.cpp,$(CIAFILES)))
-else
-
 endif
 
 ## LINK ######################################################################
@@ -559,8 +563,12 @@ ifneq ($(ARTARGET),)
 # Runtime libraries which has no deps.
 
 define artarget_func
+
+# Ensure that, when generating .via files, that they do not start with a blank line - some versions of GCC's AR reject
+# any further content in the file if the first line is empty
+
 $(ARTARGET): $(if $(MULTIFILE_ENABLED),$(MULTIFILEOBJECT),$(LINKOBJECTS)) $(STDCPPTAGFILE)
-	$(if $(MULTIFILE_ENABLED),,@echo "$(STDCPPTAGFILE)" > $(VIAFILE);
+	$(if $(MULTIFILE_ENABLED),,@echo $(if $(STDCPPTAGFILE),"$(STDCPPTAGFILE)",-n "") > $(VIAFILE);
 	$(call groupin10,$(LINKOBJECTS)) ;)
 	$(call startrule,ar,FORCESUCCESS) \
 	$$(call dblquote,$(AR)) $(ARCHIVER_CREATE_OPTION) $$@ $(if $(MULTIFILE_ENABLED),$(MULTIFILEOBJECT),$(COMMANDFILE_OPTION)$(VIAFILE)) \
@@ -829,7 +837,7 @@ endef
 $(if $(MULTIFILE_ENABLED),$(eval $(call e32abiv2_compile,$(MULTIFILEOBJECT),$(CPPFILES),$(CFILES),$(CPP_LANG_OPTION))),$(foreach F,$(CPPFILES),$(eval $(call e32abiv2_compile,$(call mapcpp2object,$(F)),$(F),$(CPP_LANG_OPTION)))))
 $(if $(MULTIFILE_ENABLED),,$(foreach F,$(CFILES),$(eval $(call e32abiv2_compile,$(call mapc2object,$(F)),$(F),$(C_LANG_OPTION)))))
 ifneq ($(TRANSFORM_CIA),1)
-  $(if $(MULTIFILE_ENABLED),,$(foreach F,$(CIAFILES),$(eval $(call e32abiv2_compile,$(call mapcia2object,$(F)),$(F),$(CPP_LANG_OPTION) $(COMPILER_CIA_FLAGS)))))
+  $(if $(MULTIFILE_ENABLED),,$(foreach F,$(CIAFILES),$(eval $(call e32abiv2_compile,$(call mapcia2object,$(F)),$(F),$(CPP_LANG_OPTION) $(COMPILER_CIA_FLAGS) $(call makemacrodef,-D,$(CIADEFS))))))
 endif
 
 CLEANTARGETS:=$(CLEANTARGETS) $(if $(MULTIFILE_ENABLED),$(MULTIFILE_VIAFILE) $(MULTIFILEOBJECT),$(CPPFILES_LINKOBJECTS) $(CFILES_LINKOBJECTS) $(CIAFILES_LINKOBJECTS)) $(if $(GENERATELINKERFEEDBACK),$(FEEDBACKFILE))

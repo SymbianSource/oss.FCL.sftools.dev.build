@@ -3,9 +3,9 @@
 	<!-- build variant for GCC x86 toolchains -->
 	<var name="gccx86_base">
 		<set name="TOOLCHAIN" value="GCC"/>
-		<set name="PLATMACROS.TOOLCHAIN" value="X86GCC"/>
+		<set name="PLATMACROS.TOOLCHAIN" value="X86GCC GCC32"/>
 		
-		<set name="TRADITIONAL_PLATFORM" value="X86GCC"/>
+		<set name="TRADITIONAL_PLATFORM" value="X86"/>
 		<set name="VARIANTPLATFORM" value="x86"/>
 
 		<!-- toolchain tools -->
@@ -39,7 +39,7 @@
 		<set name="CODE_SEGMENT_START" value="-Ttext"/>
 		<set name="COMMANDFILE_OPTION" value="@"/>
 		<set name="COMPILE_ONLY_OPTION" value="-c"/>
-		<set name="COMPILER_CIA_FLAGS" value="-fomit-frame-pointer"/>
+		<set name="COMPILER_CIA_FLAGS" value="-O1 -fomit-frame-pointer"/>
 		<set name="COMPILER_FPU_OPTION" value=""/>		
 		<set name="COMPILER_INTERWORK_DEFINES" value=""/>
 		<set name="COMPILER_SYSTEM_INCLUDE_OPTION" value="-I"/>
@@ -57,7 +57,7 @@
 		<set name="FPMODE_OPTION" value=""/>
 		<set name="HEADER_FILES_CONTROL_OPTION" value=""/>
 		<set name="INSTRUCTION_SET" value=""/>
-		<set name="KERNEL_STATIC_RUNTIME_LIB" value="ksrt3_1.lib"/>
+		<set name="KERNEL_STATIC_RUNTIME_LIB" value=""/>
 		<set name="LD_ERRORS_CONTROL_OPTION" value=""/>
 		<set name="LD_WARNINGS_CONTROL_OPTION" value=""/>
 		<set name="LIBPATH" value=""/>

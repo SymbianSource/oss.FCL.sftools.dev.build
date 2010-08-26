@@ -22,12 +22,12 @@ define e32link_genlibexpfile
   # 'exports' generation involves taking a list of the known exports, passing them to
   # gendef.pl to create a temporary .def file, prepdef-ing this .def file and then
   # passing this along to the import library generation tool to create the .lib.exp.
-  # This is invoked for components with knowN interfaces that aren't making use of a .mmp
+  # This is invoked for components with known interfaces that aren't making use of a .mmp
   # listed .def file
   #
   # 'deffile' generation takes the .def file used in the component build, for components
   # that either require a .def file or where a .def file is used to override default behaviour.
-  # The .def file will already have been predef-ed during import library processing, so it's
+  # The .def file will already have been prepdef-ed during initial .def file processing, so it's
   # just a matter of running the import library generation tool on the temporary .def file to
   # create the .lib.exp
   #

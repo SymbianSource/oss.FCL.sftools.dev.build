@@ -38,7 +38,7 @@ import time
 import generic_path
 
 
-PiggyBackedBuildPlatforms = {'ARMV5':['GCCXML', 'X86GCC']}
+PiggyBackedBuildPlatforms = {'ARMV5':['GCCXML']}
 
 PlatformDefaultDefFileDir = {'WINSCW':'bwins',
 				  'ARMV5' :'eabi',
@@ -47,7 +47,7 @@ PlatformDefaultDefFileDir = {'WINSCW':'bwins',
 				  'ARMV6':'eabi',
 				  'ARMV7' : 'eabi',
 				  'ARMV7SMP' : 'eabi',
-				  'X86GCC' : ['bx86gcc', 'eabi']}
+				  'X86' : ['bx86gcc', 'eabi']}
 
 def getVariantCfgDetail(aEPOCROOT, aVariantCfgFile):
 	"""Obtain pertinent build related detail from the Symbian variant.cfg file.
@@ -2484,12 +2484,13 @@ class MMPRaptorBackend(MMPBackend):
 			# We therefore check exisitance of the primary located file if a secondary location is available, and use the
 			# secondary location if required (recording the fact that the secondary file has been used, as this can influence
 			# downstream processing).
+			# Secondary locations are found as follows : resolvedPrimaryLocation/../secondaryLocation/resolvedDefFileName
 			if secondaryDefaultDefFileDir:
 				primaryFileCheck = raptor_utilities.resolveSymbianPath(self.__defFileRoot, resolvedDefFile, 'DEFFILE', "", str(aBuildPlatform['EPOCROOT']))
 			
 				if not os.path.exists(primaryFileCheck):
 					isSecondaryDefaultDefFile = True
-					resolvedDefFile = '../'+secondaryDefaultDefFileDir+'/'+os.path.basename(resolvedDefFile)
+					resolvedDefFile = "{0}/../{1}/{2}".format(os.path.dirname(resolvedDefFile), secondaryDefaultDefFileDir, os.path.basename(resolvedDefFile))
 
 			resolvedDefFile = raptor_utilities.resolveSymbianPath(self.__defFileRoot, resolvedDefFile, 'DEFFILE', "", str(aBuildPlatform['EPOCROOT']))
 
