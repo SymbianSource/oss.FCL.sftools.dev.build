@@ -47,7 +47,7 @@
 
 static const TInt RofsbuildMajorVersion=2;
 static const TInt RofsbuildMinorVersion=13;
-static const TInt RofsbuildPatchVersion=1;
+static const TInt RofsbuildPatchVersion=2;
 static TBool SizeSummary=EFalse;
 static TPrintType SizeWhere=EAlways;
 
@@ -86,9 +86,9 @@ bool gNoCache = false;
 TBool gIsOBYUTF8 = EFalse;
 TBool gKeepGoing = EFalse;
 void PrintVersion() {
-	Print(EAlways,"\nROFSBUILD - Rofs/Datadrive image builder");
-	Print(EAlways, " V%d.%d.%d\n", RofsbuildMajorVersion, RofsbuildMinorVersion, RofsbuildPatchVersion);
-	Print(EAlways,Copyright);
+	printf("\nROFSBUILD - Rofs/Datadrive image builder");
+	printf(" V%d.%d.%d\n", RofsbuildMajorVersion, RofsbuildMinorVersion, RofsbuildPatchVersion);
+	printf("%s\n\n", "Copyright (c) 1996-2010 Nokia Corporation.");
 }
 
 char HelpText[] = 
@@ -517,11 +517,11 @@ TInt main(int argc, char *argv[]){
 	}
 	if(gThreadNum == 0) {
 		if(gCPUNum > 0) {
-			Print (EWarning, "The number of processors (%d) is used as the number of concurrent jobs.\n", gCPUNum);
+			printf("WARNING: The number of processors (%d) is used as the number of concurrent jobs.\n", gCPUNum);
 			gThreadNum = gCPUNum;
 		}
 		else {
-			Print (EWarning, "Can't automatically get the valid number of concurrent jobs and %d is used.\n", DEFAULT_THREADS);
+			printf("WARNING: Can't automatically get the valid number of concurrent jobs and %d is used.\n", DEFAULT_THREADS);
 			gThreadNum = DEFAULT_THREADS;
 		}
 	}

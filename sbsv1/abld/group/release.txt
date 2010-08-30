@@ -1,3 +1,7 @@
+Version 0.01.680
+=========================
+(Made by Marvin Shi 19/08/2010)
+1) bug468 initialized static data built into a static library does not get initialized correctly
 
 <unchange>
 ================

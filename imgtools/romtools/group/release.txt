@@ -1,3 +1,13 @@
+Version 2.13.0 (ROFSBUILD)
+===============
+Released by Jason Cui, 25/08/2010
+	1) ROFSBUILD generates 0-length log file.
+
+Version 2.18.2 (ROMBUILD)
+===============
+Released by Lorence Wang, 20/08/2010
+	1) ou1cimx1#537227 Rombuild crashed when "compress" and "unpageddata" coexist
+
 Version 2.18.1 (ROMBUILD)
 Version 2.13.1 (ROFSBUILD)
 ===============
