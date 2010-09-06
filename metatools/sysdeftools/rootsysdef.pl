@@ -414,7 +414,7 @@ sub walk
 				}
 			}
 		}
-	elsif($tag eq 'meta')
+	elsif($tag eq 'meta' && $node->getAttribute('href'))
 		{
 		&fixHref($node,$file);
 		foreach my $child (@{$node->getChildNodes}) {$node->removeChild($child)} # can't have children

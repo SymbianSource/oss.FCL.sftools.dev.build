@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ProductsDefinition schema="3.0.0">
 	<product name="BuildEnvironment" long-name="Build Environment">
-		<tool name="sysdeftools" long-name="System Definition Tools" default-src="metatools/sysdeftools" default-dst="/" version="1.0.1">
+		<tool name="sysdeftools" long-name="System Definition Tools" default-src="metatools/sysdeftools" default-dst="/" version="1.0.2">
 
 			<!-- core functionality -->
 			<file filename="*.pl"/> 

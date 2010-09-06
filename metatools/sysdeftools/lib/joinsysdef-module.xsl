@@ -215,7 +215,8 @@
 
 <xsl:template name="compare-versions"><xsl:param name="v1"/><xsl:param name="v2"/>
 			<xsl:choose>
-				<xsl:when test="$v1=$v2"><xsl:value-of select="$v1"/></xsl:when>
+				<xsl:when test="$v1=''"><xsl:value-of select="$v2"/></xsl:when>
+				<xsl:when test="$v1=$v2 or $v2=''"><xsl:value-of select="$v1"/></xsl:when>
 				<xsl:when test="substring-before($v1,'.') &gt; substring-before($v2,'.')"><xsl:value-of select="$v1"/></xsl:when>
 				<xsl:when test="substring-before($v1,'.') &lt; substring-before($v2,'.')"><xsl:value-of select="$v2"/></xsl:when>
 				<xsl:when test="substring-before(substring-after($v1,'.'),'.') &gt; substring-before(substring-after($v2,'.'),'.')"><xsl:value-of select="$v1"/></xsl:when>
