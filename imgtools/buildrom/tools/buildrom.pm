@@ -66,8 +66,8 @@ if ($^O !~ /^MSWin32$/i){
 my $enforceFeatureManager = 0; # Flag to make Feature Manager mandatory if SYMBIAN_FEATURE_MANAGER macro is defined. 
 
 my $BuildromMajorVersion = 3 ;
-my $BuildromMinorVersion = 27;
-my $BuildromPatchVersion = 2;
+my $BuildromMinorVersion = 28;
+my $BuildromPatchVersion = 0;
 
 
 sub print_usage
@@ -158,6 +158,7 @@ The available options are
    -prependepocroot                 -- if there is no EPOCROOT## before /epoc32/, prepend EPOCROOT## to epoc32.
    -stdcpp                          -- ignore symbian customized cpp and try to find another cpp in the PATH.(for Windows only)
    -cpp=xxx                         -- specify a CPP preprocessor used by Buildrom.
+   -xiponly                      -- just create the XIP ROM image without creating the ROFS image.
    
 Popular -D defines to use include
 
@@ -352,6 +353,7 @@ my $stdcpp = 0;
 my $obycharset;
 my $cppoption = 0;
 my $preprocessor = "cpp";
+my $opt_xiponly = 0;
 
 sub match_obyfile
 {
@@ -1230,6 +1232,11 @@ sub process_cmdline_arguments
 		if ( $arg =~ /^-lowmem/i )
 		{
 			$lowMem = $arg;
+			next;
+		}
+		if( $arg =~ /^-xiponly$/i)
+		{
+			$opt_xiponly = 1;
 			next;
 		}
 	    if ($arg =~ /^-/)
@@ -3184,7 +3191,12 @@ sub suppress_phase
 	foreach $line (@obydata)
 	{
 		track_source($line);
-		if ($line =~ /^\s*REM/i || $line =~ /^\s*TIME\s*=\s*/i)
+		if (($opt_xiponly == 1) && ($line =~ /^\s*REM\s*ROM_IMAGE\[\s*[^0]\s*\]/i))
+		{
+			print "Skip all the content for ROFS image\n" if($opt_v);
+			last;
+		}
+		elsif ($line =~ /^\s*REM/i || $line =~ /^\s*TIME\s*=\s*/i)
 		{
 			# ignore REM statements, to avoid processing "REM data=xxx yyy"
 		}
@@ -4402,7 +4414,7 @@ sub invoke_rombuild
 				$rombuild .= " -symbols" unless($nosymbols) ;
 				run_rombuilder($rombuild.$compress, $obeyfile, $thisdir."ROMBUILD.LOG");
 			}
-			else
+			elsif($opt_xiponly == 0)
 			{
 				# efficient_rom_paging.pm can move everything to core rom.
 				# If that is the case, don't run rofsbuild at all to avoid errors.

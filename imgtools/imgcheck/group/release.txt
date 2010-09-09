@@ -1,3 +1,8 @@
+version v1.4.1
+===============
+Released by Lorence Wang, 30/08/2010
+	1) ou1cimx1#546004 imgcheck crash when check s60 rofs1 image
+
 version v1.4.0
 ===============
 Released by Zheng Shen, 22/02/2010

@@ -33,7 +33,7 @@ The maintenance version should be reset to 0 if the minor version is incremented
 */
 const string gMajorVersion("V1");
 const string gMinorVersion(".4");
-const string gMaintenanceVersion(".0 \n");
+const string gMaintenanceVersion(".1 \n");
 
 /** 
 Copyright to be displayed

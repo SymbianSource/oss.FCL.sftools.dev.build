@@ -1,3 +1,8 @@
+Version 3.28.0 (BUILDROM)
+===============
+Released by Marvin Shi, 7/09/2010
+	1) feature for XIP image only
+
 Version 3.27.1 (BUILDROM)
 ===============
 Released by Lorence Wang, 10/08/2010

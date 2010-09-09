@@ -1,3 +1,8 @@
+===============
+(Made by Ross Qin 06/09/2010)
+Change for Symbian Foundation bug 3415
+sym_lkup_util 	version 1.1.1
+
 Version 0.01.680
 =========================
 (Made by Marvin Shi 19/08/2010)
