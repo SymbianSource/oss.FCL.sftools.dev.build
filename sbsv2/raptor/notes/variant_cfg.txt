@@ -1,0 +1,25 @@
+The pre-included header file used in builds (.hrh) is normally defined
+inside a text file located at $(EPOCROOT)/epoc32/tools/variant/variant.cfg
+in each kit.
+
+This is an unnecessary extra file to maintain if you already define all the
+other kit properties in an XML file in the $(EPOCROOT)/epoc32/sbs_config
+folder.
+
+This change allows kit owners to define the .hrh file name in the XML instead
+of using an additional variant.cfg file.
+
+An example of this is shown in $(SBS_HOME)/examples/os_properties.xml
+where the VARIANT_HRH parameter is set as follows,
+
+<set name='VARIANT_HRH' value='$(EPOCINCLUDE)/feature_settings.hrh'/>
+
+
+In the unusual case where you want to build without a .hrh file at all (maybe
+to create an epoc32 tree from scratch) there is a variant "nohrh" which
+simply sets VARIANT_HRH as above to an empty file. Example usage would be,
+
+sbs -b bootstrap/bld.inf -c tools2.nohrh
+
+Note that, in general, actual code will not build properly without a .hrh
+file to configure it.

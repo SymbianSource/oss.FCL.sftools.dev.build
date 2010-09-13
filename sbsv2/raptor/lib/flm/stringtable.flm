@@ -66,7 +66,7 @@ $(STRINGTABLECPP) : $(STRINGTABLEHEADER)
 
 $(STRINGTABLEHEADER): $(SOURCE) 
 	$(call startrule,stringtable,FORCESUCCESS) \
-	$(GNUCP) --no-preserve=mode $(SOURCE) $(TEMPSOURCE)  && $(GNUCHMOD) a+w $(TEMPSOURCE) &&  \
+	$(GNUCP) --remove-destination --no-preserve=mode $(SOURCE) $(TEMPSOURCE)  && $(GNUCHMOD) a+w $(TEMPSOURCE) &&  \
 	$(STRINGTABLE) $(TEMPSOURCE)  \
 	$(call endrule,stringtable)
 

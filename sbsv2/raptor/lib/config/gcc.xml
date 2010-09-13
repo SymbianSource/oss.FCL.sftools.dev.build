@@ -94,7 +94,7 @@
 	<alias name="tools2_deb" meaning="tools2_base.t_deb"/>
 	
 	<var name="t_rel">
-		<set name='TOOLSPATH' value='$(EPOCTOOLS)'/> <!-- install -->
+		<set name='TOOLSPATH' value='$(EPOCROOT)/epoc32/tools'/> <!-- install -->
 		<set name='VARIANTTYPE' value='rel'/>
 
 		<append name='CFLAGS' value='-s'/>

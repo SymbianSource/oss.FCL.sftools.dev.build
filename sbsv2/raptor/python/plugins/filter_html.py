@@ -1,19 +1,14 @@
-#
+
 # Copyright (c) 2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
 # which accompanies this distribution, and is available
 # at the URL "http://www.eclipse.org/legal/epl-v10.html".
-#
-# Initial Contributors:
-# Nokia Corporation - initial contribution.
-#
-# Contributors:
-#
-# Description: 
-# Filter class for generating HTML summary pages
-#
+
+'''
+Filter class for generating HTML summary pages
+'''
 
 import os
 import re
@@ -21,6 +16,7 @@ import csv
 import sys
 import shutil
 import tempfile
+import time
 import filter_interface
 
 class HTML(filter_interface.FilterSAX):
@@ -49,6 +45,10 @@ class HTML(filter_interface.FilterSAX):
 				self.regex = self.readregex(str(csv))
 				break
 		
+		# regexes for important "make" errors
+		self.noruletomake = re.compile("No rule to make target `(.+)', needed by `(.+)'")
+		
+		# all our lists are empty
 		self.elements = []
 		self.recipe_tag = None
 		self.error_tag = None
@@ -56,10 +56,15 @@ class HTML(filter_interface.FilterSAX):
 		
 		self.components = {}
 		self.configurations = {}
+		self.missed_depends = {}
+		self.parse_start = {}
 		self.totals = Records()
+
+		self.progress_started = 0
+		self.progress_stopped = 0
 		
 		# create all the directories
-		for s in Records.SUBDIRS:
+		for s in Records.CLASSES:
 			dir = os.path.join(self.dirname, s)
 			if not os.path.isdir(dir):
 				try:
@@ -104,9 +109,10 @@ class HTML(filter_interface.FilterSAX):
 	def startElement(self, name, attributes):
 		"call the start handler for this element if we defined one."
 		
-		self.generic_start(name)    # tracks element nesting
+		ns_name = name.replace(":", "_")
+		self.generic_start(ns_name)    # tracks element nesting
 		
-		function_name = "start_" + name
+		function_name = "start_" + ns_name
 		try:
 			HTML.__dict__[function_name](self, attributes)
 		except KeyError:
@@ -124,7 +130,7 @@ class HTML(filter_interface.FilterSAX):
 	def endElement(self, name):
 		"call the end handler for this element if we defined one."
 		
-		function_name = "end_" + name
+		function_name = "end_" + name.replace(":", "_")
 		try:
 			HTML.__dict__[function_name](self)
 		except KeyError:
@@ -137,6 +143,12 @@ class HTML(filter_interface.FilterSAX):
 		self.existencechecks()
 		self.dumptotals()
 		try:
+			if self.progress_started > 0:
+				t_from = time.asctime(time.localtime(self.progress_started))
+				t_to = time.asctime(time.localtime(self.progress_stopped))
+				self.index.write("<p>start: " + t_from + "\n")
+				self.index.write("<br>end&nbsp;&nbsp;: " + t_to + "\n")
+				
 			self.index.write("<p><table><tr><th></th>")
 			
 			for title in Records.TITLES:
@@ -239,6 +251,23 @@ class HTML(filter_interface.FilterSAX):
 		except KeyError:
 			pass
 	
+	def char_buildlog(self, char):
+		'''process text in the top-level element.
+		
+		ideally all text will be inside <recipe> tags, but some will not.
+		"make" errors in particular appear inside the buildlog tag itself.'''
+		
+		text = char.strip()
+		if text:
+			match = self.noruletomake.search(text)
+			if match:
+				target = match.group(2)
+				depend = match.group(1)
+				if target in self.missed_depends:
+					self.missed_depends[target].append(depend)
+				else:
+					self.missed_depends[target] = [depend]
+		
 	def end_buildlog(self):
 		pass
 		
@@ -269,6 +298,46 @@ class HTML(filter_interface.FilterSAX):
 				self.recipe_tag.code = attributes['code']
 			else:
 				self.err("status element not inside a recipe element")
+		except KeyError:
+			pass
+	
+	def start_time(self, attributes):
+		try:
+			if self.recipe_tag:
+				self.recipe_tag.time = float(attributes['elapsed'])
+			else:
+				self.err("status element not inside a recipe element")
+		except KeyError:
+			pass
+	
+	def start_progress_start(self, attributes):
+		'''on progress:start note the parse starting timestamp.
+		
+		and keep track of the earliest timestamp of all as that shows
+		us when the sbs command was run.'''
+		try:
+			t = float(attributes['time'])
+			if self.progress_started == 0 or t < self.progress_started:
+				self.progress_started = t
+				
+			if attributes['task'] == 'parse':
+				self.parse_start[attributes['key']] = t
+		except KeyError:
+			pass
+		
+	def start_progress_end(self, attributes):
+		'''on progress:end add the elapsed parse time to the total time.
+		
+		also keep track of the latest timestamp of all as that shows
+		us when the sbs command finished.'''
+		try:
+			t = float(attributes['time'])
+			if t > self.progress_stopped:
+				self.progress_stopped = t
+				
+			if attributes['task'] == 'parse':
+				elapsed = t - self.parse_start[attributes['key']]
+				self.totals.inc(Records.TIME, elapsed)
 		except KeyError:
 			pass
 		
@@ -367,7 +436,34 @@ class HTML(filter_interface.FilterSAX):
 			self.tmp.write(self.build_tag.strip() + "\n")
 		except:
 			return self.err("could not write to temporary file")
-				
+	
+	def start_clean(self, attributes):
+		try:
+			for attrib in ['bldinf', 'config']:
+				self.tmp.write("|")
+				if attrib in attributes:
+					self.tmp.write(attributes[attrib])
+			self.tmp.write("\n")
+		except:
+			return self.err("could not write to temporary file")
+	
+	def start_file(self, attributes):
+		'''opening file tag.
+		
+		in the temporary file we need to mark the "clean" targets with a
+		leading ">" character so they can be treated differently from 
+		the "releasable" targets'''
+		self.file_tag = ">"
+		
+	def char_file(self, char):
+		self.file_tag += char
+		
+	def end_file(self):
+		try:
+			self.tmp.write(self.file_tag.strip() + "\n")
+		except:
+			return self.err("could not write to temporary file")
+						
 	# even if we ignore an element we need to mark its coming and going
 	# so that we know which element any character data belongs to.
 	
@@ -436,7 +532,7 @@ class HTML(filter_interface.FilterSAX):
 			# we don't want to show successes, just count them
 			return
 		
-		linkname = os.path.join(Records.SUBDIRS[type], "overall.html")
+		linkname = os.path.join(Records.CLASSES[type], "overall.html")
 		filename = os.path.join(self.dirname, linkname)
 		title = Records.TITLES[type] + " for all configurations"
 		try:
@@ -448,17 +544,18 @@ class HTML(filter_interface.FilterSAX):
 		except:
 			return self.err("cannot create file '%s'" % filename)
 		
-		self.totals.set(type, 'filename', filename)
-		self.totals.set(type, 'linkname', linkname)
+		self.totals.set_filename(type, filename)
+		self.totals.set_linkname(type, linkname)
 	
 	def appendoverallfile(self, type, taggedtext):
-		self.totals.inc(type, 'N')   # one more and counting
+		self.totals.inc(type)   # one more and counting
+		self.totals.inc(Records.TIME, taggedtext.time)
 		
 		if type == Records.OK:
 			# we don't want to show successes, just count them
 			return
 		
-		filename = self.totals.get(type, 'filename')
+		filename = self.totals.get_filename(type)
 		try:
 			file = open(filename, "a")
 			file.write("<p>component: %s " % taggedtext.bldinf)
@@ -473,7 +570,7 @@ class HTML(filter_interface.FilterSAX):
 			# we don't want to show successes, just count them
 			return
 		
-		linkname = os.path.join(Records.SUBDIRS[type], "cfg_" + configuration + ".html")
+		linkname = os.path.join(Records.CLASSES[type], "cfg_" + configuration + ".html")
 		filename = os.path.join(self.dirname, linkname)
 		title = Records.TITLES[type] + " for configuration " + configuration
 		try:
@@ -485,17 +582,18 @@ class HTML(filter_interface.FilterSAX):
 		except:
 			return self.err("cannot create file '%s'" % filename)
 		
-		self.configurations[configuration].set(type, 'filename', filename)
-		self.configurations[configuration].set(type, 'linkname', linkname)
+		self.configurations[configuration].set_filename(type, filename)
+		self.configurations[configuration].set_linkname(type, linkname)
 	
 	def appendconfigurationfile(self, configuration, type, taggedtext):
-		self.configurations[configuration].inc(type, 'N')   # one more and counting
+		self.configurations[configuration].inc(type)   # one more and counting
+		self.configurations[configuration].inc(Records.TIME, taggedtext.time)
 		
 		if type == Records.OK:
 			# we don't want to show successes, just count them
 			return
 		
-		filename = self.configurations[configuration].get(type, 'filename')
+		filename = self.configurations[configuration].get_filename(type)
 		try:
 			file = open(filename, "a")
 			file.write("<p>component: %s\n" % taggedtext.bldinf)
@@ -509,7 +607,7 @@ class HTML(filter_interface.FilterSAX):
 			# we don't want to show successes, just count them
 			return
 		
-		linkname = os.path.join(Records.SUBDIRS[type], "bld_" + re.sub("[/:]","_",component) + ".html")
+		linkname = os.path.join(Records.CLASSES[type], "bld_" + re.sub("[/:]","_",component) + ".html")
 		filename = os.path.join(self.dirname, linkname)
 		title = Records.TITLES[type] + " for component " + component
 		try:
@@ -521,17 +619,18 @@ class HTML(filter_interface.FilterSAX):
 		except:
 			return self.err("cannot create file '%s'" % filename)
 		
-		self.components[component].set(type, 'filename', filename)
-		self.components[component].set(type, 'linkname', linkname)
+		self.components[component].set_filename(type, filename)
+		self.components[component].set_linkname(type, linkname)
 	
 	def appendcomponentfile(self, component, type, taggedtext):
-		self.components[component].inc(type, 'N')   # one more and counting
+		self.components[component].inc(type)   # one more and counting
+		self.components[component].inc(Records.TIME, taggedtext.time)
 		
 		if type == Records.OK:
 			# we don't want to show successes, just count them
 			return
 		
-		filename = self.components[component].get(type, 'filename')
+		filename = self.components[component].get_filename(type)
 		try:
 			file = open(filename, "a")
 			file.write("<p>config: %s\n" % taggedtext.config)
@@ -556,12 +655,37 @@ class HTML(filter_interface.FilterSAX):
 					missing_tag = TaggedText(attribs)
 				else:
 					filename = line.strip()
-					if not filename in missed and not os.path.isfile(filename):
-						missing_tag.text = filename
-						self.record(missing_tag, Records.MISSING)
-						missed.add(filename)
+					if filename.startswith(">"):
+						# a clean target, so we don't care if it exists
+						# but we care if it has a missing dependency
+						filename = filename[1:]
+					else:
+						# a releasable target so it must exist
+						if not filename in missed and not os.path.isfile(filename):
+							missing_tag.text = filename
+							self.record(missing_tag, Records.MISSING)
+							missed.add(filename)
+						
+					if filename in self.missed_depends:
+						missing_tag.text = filename + \
+						"\n\nrequired the following files which could not be found,\n\n"
+						for dep in self.missed_depends[filename]:
+							missing_tag.text += dep + "\n"
+						self.record(missing_tag, Records.ERROR)
+						del self.missed_depends[filename]
 					
 			self.tmp.close()	# this also deletes the temporary file
+			
+			# any missed dependencies left over are not attributable to any
+			# specific component but should still be reported
+			missing_tag = TaggedText({})
+			for filename in self.missed_depends:
+				missing_tag.text = filename + \
+				"\n\nrequired the following files which could not be found,\n\n"
+				for dep in self.missed_depends[filename]:
+					missing_tag.text += dep + "\n"
+				self.record(missing_tag, Records.ERROR)
+						
 		except Exception,e:
 			return self.err("could not close temporary file " + str(e))
 	
@@ -593,8 +717,10 @@ class HTML(filter_interface.FilterSAX):
 				try:
 					type = None
 					
-					if row[0] == "CRITICAL" or row[0] == "ERROR":
+					if row[0] == "ERROR":
 						type = Records.ERROR
+					elif row[0] == "CRITICAL":
+						type = Records.CRITICAL
 					elif row[0] == "WARNING":
 						type = Records.WARNING
 					elif row[0] == "REMARK":
@@ -615,52 +741,65 @@ class HTML(filter_interface.FilterSAX):
 			return []
 		
 		return regexlist
+
+class CountItem(object):
+	def __init__(self):
+		self.N = 0
+		self.filename = None
+		self.linkname = None
+
+	def num_str(self):
+		return str(self.N)
 	
+class TimeItem(CountItem):
+	def num_str(self):
+		return time.strftime("%H:%M:%S", time.gmtime(self.N + 0.5))
+		
 class Records(object):
 	"a group of related records e.g. errors, warnings and remarks."
 	
 	# the different types of record we want to group together
-	OK      = 0
-	ERROR   = 1
-	WARNING = 2
-	REMARK  = 3
-	MISSING = 4
+	TIME     = 0
+	OK       = 1
+	ERROR    = 2
+	CRITICAL = 3
+	WARNING  = 4
+	REMARK   = 5
+	MISSING  = 6
 	
-	SUBDIRS = [ "ok", "error", "warning", "remark", "missing" ]
-	TITLES = [ "OK", "Errors", "Warnings", "Remarks", "Missing files" ]
+	CLASSES = [ "time", "ok", "error", "critical", "warning", "remark", "missing" ]
+	TITLES = [ "CPU Time", "OK", "Errors", "Criticals", "Warnings", "Remarks", "Missing files" ]
 	
 	def __init__(self):
-		self.data = [ {'N':0}, {'N':0}, {'N':0}, {'N':0}, {'N':0} ]
-	
-	def get(self, index, item):
-		try:
-			return self.data[index][item]
-		except KeyError:
-			return None
+		self.data = [ TimeItem(), CountItem(), CountItem(), CountItem(), CountItem(), CountItem(), CountItem() ]
 		
-	def inc(self, index, item):
-		self.data[index][item] += 1
-	
+	def get_filename(self, index):
+		return self.data[index].filename
+		
+	def inc(self, index, increment=1):
+		self.data[index].N += increment
+
 	def isempty(self, index):
-		return (self.data[index]['N'] == 0)
+		return (self.data[index].N == 0)
 		
-	def set(self, index, item, value):
-		self.data[index][item] = value
+	def set_filename(self, index, value):
+		self.data[index].filename = value
 	
+	def set_linkname(self, index, value):
+		self.data[index].linkname = value
+		
 	def tablerow(self, name):
 		row = '<tr><td class="name">%s</td>' % name
-
+		
 		for i,datum in enumerate(self.data):
-			number = datum['N']
-			if number == 0:
+			if datum.N == 0:
 				row += '<td class="zero">0</td>'
 			else:
-				row += '<td class="' + Records.SUBDIRS[i] + '">'
-				try:
-					link = datum['linkname']
-					row += '<a href="%s">%d</a></td>' % (link,number)
-				except KeyError:
-					row += '%d</td>' % number
+				row += '<td class="' + Records.CLASSES[i] + '">'
+				if datum.linkname:
+					row += '<a href="%s">%s</a></td>' % (datum.linkname,datum.num_str())
+				else:
+					row += '%s</td>' % datum.num_str()
 							
 		row += "</tr>"
 		return row
@@ -668,12 +807,11 @@ class Records(object):
 	def textdump(self):
 		text = ""
 		for i,datum in enumerate(self.data):
-			number = datum['N']
-			if number == 0:
+			if datum.N == 0:
 				style = "zero"
 			else:
-				style = Records.SUBDIRS[i]
-			text += str(i) + ',' + style + "," + str(number) + "\n"
+				style = Records.CLASSES[i]
+			text += str(i) + ',' + style + "," + str(datum.N) + "\n"
 		return text
 				
 class TaggedText(object):
@@ -687,5 +825,6 @@ class TaggedText(object):
 					self.__dict__[attrib] = value
 
 		self.text = ""
+		self.time = 0.0
 		
 # the end

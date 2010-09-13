@@ -1133,7 +1133,6 @@ WHATRELEASE:=$(WHATRELEASE) $(OUPUTVMAP)
 TARGET:: $(OUTPUTVMAP)
 VMAPNEEDS:=$(E32TARGET) $(SOURCE) $(PROJECT_META)
 
-BV_SOURCELIST:=$(addprefix -s ,$(SOURCE) $(PROJECT_META))
 BV_FEATURELIST:=$(addprefix -f ,$(FEATURELISTFILES))
 BV_USER_INCLUDES:=$(addprefix -u ,$(USERINCLUDE))
 BV_SYSTEM_INCLUDES:=$(addprefix -x ,$(SYSTEMINCLUDE))
@@ -1141,12 +1140,24 @@ BV_SYSTEM_INCLUDES:=$(addprefix -x ,$(SYSTEMINCLUDE))
 # translate double quoted macros because $(shell) messes them up in some make engines
 BV_MACROLIST:=$(COMPILER_INTERWORK_DEFINES) $(CDEFS) $(if $(ALWAYS_BUILD_AS_ARM),,$(COMPILER_THUMB_DEFINES))
 BV_DEFINES:=$(call makemacrodef,-D,$(subst ",__SBS__QUOTE__,$(BV_MACROLIST)))
+VMAPCOMMANDFILE:=$(INTERMEDIATEPATH)/$(TARGET).vmap.cmdfile
+
+CLEANTARGETS:=$(CLEANTARGETS) $(VMAPCOMMANDFILE)
 
 # the script to generate our .vmap file and hash value
-VMAPCOMMAND:=$(CREATEVMAP) -o $(OUTPUTVMAP) $(BV_FEATURELIST) $(BV_DEFINES) -p $(PREINCLUDE) $(BV_SOURCELIST) $(BV_USER_INCLUDES) $(BV_SYSTEM_INCLUDES) -c $(CREATEVMAPCPP)
+define createvmap
+
+$(OUTPUTVMAP): $(VMAPNEEDS)
+	@echo -n "" > $(VMAPCOMMANDFILE);
+	$(call groupin10infile,$(VMAPCOMMANDFILE),$(addprefix -s,$(SOURCE) $(PROJECT_META))) ;
+	$(call startrule,createvmap) \
+	$(CREATEVMAP) -o $(OUTPUTVMAP) $(BV_FEATURELIST) $(BV_DEFINES) -p $(PREINCLUDE) --command=$(VMAPCOMMANDFILE) $(BV_USER_INCLUDES) $(BV_SYSTEM_INCLUDES) -c $(CREATEVMAPCPP) \
+	$(call endrule,createvmap)
+
+endef
 
 # a recipe to create the .vmap from the "sources" with the createvmap script
-$(call raptor_recipe,createvmap,$(OUTPUTVMAP),$(VMAPNEEDS),$(VMAPCOMMAND))
+$(eval $(createvmap))
 
 endif # E32TARGET != ""
 endif # FEATUREVARIANTNAME != ""

@@ -7,21 +7,28 @@
 		
 		<!-- tools and scripts -->
 		<env name="BMCONV" default="$(EPOCROOT)/epoc32/tools/bmconv$(DOTEXE)" type="tool"/>
-		<env name="CHECKLIB" default="$(EPOCROOT)/epoc32/tools/checklib$(DOTEXE)" type="tool"/>
+		<env name="SBS_CHECKLIB" default="$(EPOCTOOLS)/checklib$(DOTEXE)" type="tool"/>
+		<set name="CHECKLIB" value="$(SBS_CHECKLIB)"/>
 		<env name="CPPFILT" default="$(GCCPREFIX)c++filt$(DOTEXE)" type="tool"/>
-		<env name="EFREEZE" default="$(PERL) $(EPOCROOT)/epoc32/tools/efreeze.pl" type="script"/>
+		<env name="SBS_EFREEZE" default="$(PERL) $(EPOCTOOLS)/efreeze.pl" type="script"/>
+		<set name="EFREEZE" value="$(SBS_EFREEZE)"/>
 		<env name="GENDEF" default="$(PERL) $(EPOCROOT)/epoc32/tools/gendef.pl" type="script"/>
-		<env name="PETRAN" default="$(EPOCROOT)/epoc32/tools/petran$(DOTEXE)" type="tool"/>
-		<env name="PREPDEF" default="$(PERL) $(EPOCROOT)/epoc32/tools/prepdef.pl" type="script"/>
-		<env name="RCOMP" default="$(EPOCROOT)/epoc32/tools/rcomp$(DOTEXE)" type="tool"/>
+		<env name="SBS_PETRAN" default="$(EPOCTOOLS)/petran$(DOTEXE)" type="tool"/>
+		<set name="PETRAN" value="$(SBS_PETRAN)"/>
+		<env name="SBS_PREPDEF" default="$(PERL) $(EPOCTOOLS)/prepdef.pl" type="script"/>
+		<set name="PREPDEF" value="$(SBS_PREPDEF)"/>
+
+		<env name="SBS_RCOMP" default="$(EPOCTOOLS)/rcomp$(DOTEXE)" type="tool"/>
+		<set name="RCOMP" value="$(SBS_RCOMP)"/>
 		<!-- RANSLEEP is a program that can be used to cause a random delay in milliseconds. This is only useful in parallel builds. See the PERTURBSTARTTIME switch for more details.  -->
 		<env name="RANSLEEP" default="$(SBS_HOME)/bin/$(HOSTPLATFORM_DIR)/ransleep$(DOTEXE)" type="tool"/>
 		<env name="SBSV1MAKE" default="$(EPOCROOT)/epoc32/tools/make$(DOTEXE)" type="tool"/>
 		<env name="STRINGTABLE" default="$(PERL) $(EPOCROOT)/epoc32/tools/stringtable.pl" type="script"/>
-		<env name="TRANASM" default="$(PERL) $(EPOCROOT)/epoc32/tools/tranasm.pl" type="script"/>
+		<env name="SBS_TRANASM" default="$(PERL) $(EPOCTOOLS)/tranasm.pl" type="script"/>
+		<set name="TRANASM" value="$(SBS_TRANASM)"/>
 		
 		<set name="BASE_ARCH" value="x86"/>
-		<set name="POSTLINKER" value="$(PETRAN)"/>
+		<set name="POSTLINKER" value="$(SBS_PETRAN)"/>
 		<set name="IMPLIBTOOL" value="$(DLLTOOL)"/>
 		<set name="DEFGENTOOL" value="$(GENDEF)"/>
 		

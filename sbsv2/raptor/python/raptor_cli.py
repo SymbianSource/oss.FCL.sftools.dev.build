@@ -22,9 +22,7 @@ import types
 import raptor
 
 from optparse import OptionParser # for parsing command line parameters
-
-fullCommandOption = "--command"
-miniCommandOption = "--co"  # update this if another "co" option is added
+from raptor_utilities import expand_command_options
 
 # raptor_cli module attributes
 
@@ -179,51 +177,6 @@ def GetArgs(Raptor, args):
 	"Process command line arguments for a Raptor object"
 	return DoRaptor(Raptor,args)
 
-def ReadCommandFile(filename, used):
-	if filename in used:
-		raise IOError("command file '%s' refers to itself" % filename)
-
-	args = []
-	try:
-		file = open(filename, "r")
-		for line in file.readlines():
-			args.extend(line.split())
-		file.close()
-	except:
-		raise IOError("couldn't read command file '%s'" % filename)
-
-	# expand any command files in the options we just read.
-	# making sure we don't get stuck in a loop.
-	usedPlusThis = used[:]
-	usedPlusThis.append(filename)
-	return ExpandCommandOptions(args, usedPlusThis)
-
-def ExpandCommandOptions(args, files = []):
-	"""recursively expand --command options."""
-	expanded = []
-	previousWasOpt = False
-
-	for a in args:
-		if previousWasOpt: # then this one is the filename
-			expanded.extend(ReadCommandFile(a, files))
-			previousWasOpt = False
-			continue
-
-		if a.startswith(miniCommandOption):
-			if "=" in a: # then this is opt=filename
-				opt = a.split("=")
-				if fullCommandOption.startswith(opt[0]):
-					expanded.extend(ReadCommandFile(opt[1], files))
-					continue
-			else: # the next one is the filename
-				if fullCommandOption.startswith(a):
-					previousWasOpt = True
-					continue
-
-		expanded.append(a) # an ordinary arg, nothing to do with command files
-
-	return expanded
-
 def DoRaptor(Raptor, args):
 	"Process raptor arguments"
 	#
@@ -236,7 +189,7 @@ def DoRaptor(Raptor, args):
 	non_ascii_error = "Non-ASCII character in argument or command file"
 
 	try:
-		expanded_args = ExpandCommandOptions(args)
+		expanded_args = expand_command_options(args)
 		for arg in expanded_args:
 			for c in arg:
 				if ord(c) > 127:

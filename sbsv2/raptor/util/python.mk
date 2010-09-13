@@ -36,7 +36,7 @@ $(PYINSTALLROOT)/bin/python: $(PYTHON_TAR)
 	tar -xjf $(PYTHON_TAR) && \
 	(  \
 	cd $(PYTHON_SOURCEDIR) && \
-	CFLAGS="-O3 $(GCCTUNE) -s" ./configure --prefix=$(PYINSTALLROOT) --enable-shared --with-threads && \
+	CFLAGS="-O3 $(GCCTUNE) -s" ./configure --prefix=$(PYINSTALLROOT) --enable-shared --with-threads --enable-bzip2 && \
 	$(MAKE) -j8 && $(MAKE) install \
 	)
 

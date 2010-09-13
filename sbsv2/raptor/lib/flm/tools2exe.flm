@@ -73,7 +73,7 @@ ifneq ($(TOOLSPATH),)
 define tools2install
 $(INSTALLED): $(EXETARGET)
 	$(call startrule,tools2install) \
-	$(GNUCP) "$(EXETARGET)" "$(INSTALLED)" && \
+	$(GNUCP) --remove-destination "$(EXETARGET)" "$(INSTALLED)" && \
 	$(GNUCHMOD) a+rwx "$(INSTALLED)" \
 	$(call endrule,tools2install)
 endef

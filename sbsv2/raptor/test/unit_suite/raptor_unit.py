@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -108,7 +108,8 @@ class TestRaptor(unittest.TestCase):
 			if len(c.specs) > 0: 
 				# something will be built from this component because
 				# it has at least one spec
-				shortname = str(c.bldinf_filename)[len(os.environ['SBS_HOME'])+1:]
+				sbsHome = os.environ['SBS_HOME'].rstrip('\\/')
+				shortname = str(c.bldinf_filename)[len(sbsHome)+1:]
 				self.assertTrue(shortname in expected_spec_output)
 				hits += 1
 

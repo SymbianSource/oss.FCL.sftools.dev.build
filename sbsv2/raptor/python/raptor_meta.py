@@ -2599,11 +2599,14 @@ class MetaReader(object):
 				self.__Raptor.Debug("Automatic OS detection disabled.")
 
 			# is this a feature variant config or an ordinary variant
-			fv = evaluator.Get("FEATUREVARIANTNAME")
-			if fv:
-				variantHdr = evaluator.CheckedGet("VARIANT_HRH")
+			fvn = evaluator.Get("FEATUREVARIANTNAME")
+			detail['ISFEATUREVARIANT'] = (fvn != None and fvn != '')
+
+			# get the .hrh name from VARIANT_HRH if it is set, otherwise read
+			# the name from the contents of the file named in VARIANT_CFG
+			variantHdr = evaluator.Get("VARIANT_HRH")
+			if variantHdr:
 				variantHRH = generic_path.Path(variantHdr)
-				detail['ISFEATUREVARIANT'] = True
 			else:
 				variantCfg = evaluator.CheckedGet("VARIANT_CFG")
 				variantCfg = generic_path.Path(variantCfg)
@@ -2616,12 +2619,11 @@ class MetaReader(object):
 						self.__Raptor.Warn("missing flag ENABLE_ABIV2_MODE in %s file. ABIV1 builds are not supported.",
 										   str(variantCfg))
 				variantHRH = variantCfgs[variantCfg]
-				detail['ISFEATUREVARIANT'] = False
 
 			detail['VARIANT_HRH'] = variantHRH
 			self.__Raptor.Info("'%s' uses variant hrh file '%s'", buildConfig.name, variantHRH)
 			detail['SYSTEMINCLUDE'] = evaluator.CheckedGet("SYSTEMINCLUDE")
-            
+
 			detail['TARGET_TYPES'] = evaluator.CheckedGet("TARGET_TYPES")
 
 			# find all the interface names we need
@@ -2996,8 +2998,7 @@ class MetaReader(object):
 			destDir = destination.Dir()
 			if not destDir.isDir():
 				os.makedirs(str(destDir))
-				# preserve permissions
-				shutil.copy(source_str, dest_str)
+				shutil.copyfile(source_str, dest_str)
 				return exportwhatlog
 
 			sourceMTime = 0
@@ -3016,14 +3017,12 @@ class MetaReader(object):
 						self.__Raptor.Error(message, bldinf=bldInfFile)
 
 			if destMTime == 0 or destMTime < sourceMTime:
-				# remove old version
-				#	- not having ownership prevents chmod
-				#	- avoid clobbering the original if it is a hard link
 				if os.path.exists(dest_str):
-					os.unlink(dest_str)
-				# preserve permissions
-				shutil.copy(source_str, dest_str)
+					os.chmod(dest_str,stat.S_IREAD | stat.S_IWRITE)
+				shutil.copyfile(source_str, dest_str)
 
+				# Ensure that the destination file remains executable if the source was also:
+				os.chmod(dest_str,sourceStat[stat.ST_MODE] | stat.S_IREAD | stat.S_IWRITE | stat.S_IWGRP ) 
 				self.__Raptor.Info("Copied %s to %s", source_str, dest_str)
 			else:
 				self.__Raptor.Info("Up-to-date: %s", dest_str)

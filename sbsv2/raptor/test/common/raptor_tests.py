@@ -323,7 +323,7 @@ class SmokeTest(object):
 		return "-f " + self.logfile();
 	
 	def logfile(self):
-		return logDir + "/" + self.name + ".log"
+		return logDir + "/" + self.name.replace(" ","_") + ".log"
 	
 	def makefileOption(self):
 		return "-m " + self.makefile();
@@ -367,6 +367,7 @@ class SmokeTest(object):
 		
 		print "\nID:", self.id
 		print "TEST:", self.name
+		print "LOGFILE:", self.logfile()
 
 		return self.clean()
 			

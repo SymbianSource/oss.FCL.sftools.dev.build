@@ -23,17 +23,18 @@
 	<!-- Common folders and files -->
 	<var name="root.places">
 		<env name='EPOCROOT' default='/' type='path'/>
+		<env name='SBS_EPOCTOOLS' default='$(EPOCROOT)/epoc32/tools' type='path'/>
 		
 		<set name='EPOCINCLUDE' value='$(EPOCROOT)/epoc32/include'/>
-		<set name='EPOCTOOLS' value='$(EPOCROOT)/epoc32/tools'/>
+		<set name='EPOCTOOLS' value='$(SBS_EPOCTOOLS)'/>
 
 		<!-- Place where intermediate files are built -->
 		<env name='SBS_BUILD_DIR' default='$(EPOCROOT)/epoc32/build' type='path'/> 
 
 		<!-- Configuration files and directories -->
 		<set name='PRODUCT_INCLUDE' value='$(EPOCINCLUDE)/variant/symbian_os.hrh'/>
-		<set name='VARIANT_CFG' value='$(EPOCTOOLS)/variant/variant.cfg'/>
-		<set name='MAKEFILE_TEMPLATES' value='$(EPOCTOOLS)/makefile_templates'/>
+		<set name='VARIANT_CFG' value='$(EPOCROOT)/epoc32/tools/variant/variant.cfg'/>
+		<set name='MAKEFILE_TEMPLATES' value='$(EPOCROOT)/epoc32/tools/makefile_templates'/>
 		<set name='FLM_EXPORT_DIR' value='$(MAKEFILE_TEMPLATES)'/>
 	</var>
 	

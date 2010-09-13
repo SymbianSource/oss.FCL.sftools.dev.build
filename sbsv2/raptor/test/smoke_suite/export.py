@@ -14,7 +14,7 @@
 # Description: 
 #
 
-from raptor_tests import SmokeTest, AntiTargetSmokeTest
+from raptor_tests import AntiTargetSmokeTest
 import os
 
 def run():
@@ -23,9 +23,9 @@ def run():
 	# reallyclean_simple_export tests to use so that we can put the
 	# username into the output filenames - which helps a lot when
 	# several people run tests on the same computer (e.g. linux machines)
-	bld = open('smoke_suite/test_resources/simple_export/expbld.inf', 'w')
+	bld_inf = open('smoke_suite/test_resources/simple_export/expbld.inf', 'w')
 	user = os.environ['USER']
-	bld.write("""
+	bld_inf.write("""
 	
 PRJ_PLATFORMS
 ARMV5 WINSCW
@@ -48,20 +48,16 @@ executable_file executable_file
 "file with a space.doc" "exportedfilewithspacesremoved.doc"
 "file with a space.doc" "exported file with a space.doc"
 
-simple_exp1.h /tmp/%s/  //
-simple_exp2.h \\tmp\\%s/  //
-simple_exp3.h /tmp/%s/simple_exp3.h 
+simple_exp1.h /tmp/{0}/  //
+simple_exp2.h \\tmp\\{0}/  //
+simple_exp3.h /tmp/{0}/simple_exp3.h 
 simple_exp4.h //
+read_only.h was_read_only.h //
 
-""" % (user, user, user))
-	bld.close()
-
-
-	t = SmokeTest()
-	t.id = "0023a"
-	t.name = "export"
-	t.command = "sbs -b smoke_suite/test_resources/simple_export/expbld.inf export"
-	t.targets = [
+""".format(user))
+	bld_inf.close()
+	
+	exported_files = [
 		"$(EPOCROOT)/epoc32/include/exported_1.h",
 		"$(EPOCROOT)/epoc32/include/exported_2.h",
 		"$(EPOCROOT)/epoc32/include/exported_3.h",
@@ -71,79 +67,51 @@ simple_exp4.h //
 		"/tmp/$(USER)/simple_exp2.h",
 		"/tmp/$(USER)/simple_exp3.h",
 		"$(EPOCROOT)/epoc32/include/executable_file",
-		"$(EPOCROOT)/epoc32/include/simple_exp4.h"
+		"$(EPOCROOT)/epoc32/include/simple_exp4.h",
+		"$(EPOCROOT)/epoc32/include/was_read_only.h",
 		]
+
+	t = AntiTargetSmokeTest()
+	
+	# Check basic export success
+	t.name = "export_basic"
+	t.command = "sbs -b smoke_suite/test_resources/simple_export/expbld.inf export"
+	t.targets = exported_files
+	t.antitargets = []
 	t.run()
 	
-
-	t = SmokeTest()
-	t.id = "0023a1"
-	t.name = "export"
+	# Confirm executable permissions are retained on Linux
+	t.name = "export_executable_permissions"
 	t.usebash = True
 	t.command = "ls -l ${EPOCROOT}/epoc32/include/executable_file"
 	t.mustmatch = [ "^.rwxrwxr.x[\.\+]? .*executable_file.*$" ]
-	t.targets = []
+	t.targets = [] # prevent auto clean-up up of target files from previous test
+	t.antitargets = []
 	t.run("linux")
-	t.usebash = False
 
-
-	# Testing if clean deletes any exports which it is not supposed to
-	t.id = "0023b"
-	t.name = "export_clean" 
+	# Check clean does not delete exports
+	t.name = "export_clean"
 	t.command = "sbs -b smoke_suite/test_resources/simple_export/expbld.inf clean"
 	t.mustmatch = []
-	t.targets = [
-		"$(EPOCROOT)/epoc32/include/exported_1.h",
-		"$(EPOCROOT)/epoc32/include/exported_2.h",
-		"$(EPOCROOT)/epoc32/include/exported_3.h",
-		"$(EPOCROOT)/epoc32/include/executable_file",
-		"$(EPOCROOT)/epoc32/include/exportedfilewithspacesremoved.doc",
-		"$(EPOCROOT)/epoc32/include/exported file with a space.doc",
-		"/tmp/$(USER)/simple_exp1.h",
-		"/tmp/$(USER)/simple_exp2.h",
-		"/tmp/$(USER)/simple_exp3.h"
-		]
+	t.targets = exported_files
+	t.antitargets = []
 	t.run()
 
-
-	t = AntiTargetSmokeTest()
-	t.id = "0023c"
+	# Confirm reallyclean deletes all exports, including those that were read-only
+	# as source (and so should now be removable at their destination)
 	t.name = "export_reallyclean" 
 	t.command = "sbs -b smoke_suite/test_resources/simple_export/expbld.inf reallyclean"
-	t.antitargets = [
-		'$(EPOCROOT)/epoc32/include/exported_1.h',
-		'$(EPOCROOT)/epoc32/include/exported_2.h',
-		'$(EPOCROOT)/epoc32/include/exported_3.h',
-		"$(EPOCROOT)/epoc32/include/executable_file",
-		'$(EPOCROOT)/epoc32/include/exportedfilewithspacesremoved.doc',
-		'$(EPOCROOT)/epoc32/include/exported file with a space.doc',
-		'/tmp/$(USER)/simple_exp1.h',
-		'/tmp/$(USER)/simple_exp2.h',
-		'/tmp/$(USER)/simple_exp3.h',
-		'$(EPOCROOT)/epoc32/include/simple_exp4.h'
-	]
+	t.targets = []
+	t.antitargets = exported_files
 	t.run()
 
-	# Check that the --noexport feature really does prevent exports from happening
-	t = AntiTargetSmokeTest()
-	t.id = "0023d"
+	# Check --noexport suppresses exports
 	t.name = "export_noexport" 
 	t.command = "sbs -b smoke_suite/test_resources/simple_export/expbld.inf --noexport -n"
-	t.antitargets = [
-		'$(EPOCROOT)/epoc32/include/exported_1.h',
-		'$(EPOCROOT)/epoc32/include/exported_2.h',
-		'$(EPOCROOT)/epoc32/include/exported_3.h',
-		"$(EPOCROOT)/epoc32/include/executable_file",
-		'$(EPOCROOT)/epoc32/include/exportedfilewithspacesremoved.doc',
-		'$(EPOCROOT)/epoc32/include/exported file with a space.doc',
-		'/tmp/$(USER)/simple_exp1.h',
-		'/tmp/$(USER)/simple_exp2.h',
-		'/tmp/$(USER)/simple_exp3.h',
-		'$(EPOCROOT)/epoc32/include/simple_exp4.h'
-	]
+	t.targets = []
+	t.antitargets = exported_files
 	t.run()
-		
-	t.id = "23"
+	
 	t.name = "export"
 	t.print_result()
 	return t

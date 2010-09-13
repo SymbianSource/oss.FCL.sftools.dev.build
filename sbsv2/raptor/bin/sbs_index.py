@@ -6,20 +6,16 @@
 # under the terms of the License "Symbian Foundation License v1.0"
 # which accompanies this distribution, and is available
 # at the URL "http://www.symbianfoundation.org/legal/sfl-v10.html".
-#
-# Initial Contributors:
-# Nokia Corporation - initial contribution.
-#
-# Contributors:
-#
-# Description:
-#
-# Tie together a set of HTML build summaries by creating a single index page
-# which shows the total number of Errors, Warnings etc. across all the parts
-# of the build and links to the individual summaries.
+
+'''
+Tie together a set of HTML build summaries by creating a single index page
+which shows the total number of Errors, Warnings etc. across all the parts
+of the build and links to the individual summaries.
+'''
 
 import os
 import sys
+import time
 
 # get the absolute path to this script
 script = os.path.abspath(sys.argv[0])
@@ -104,8 +100,13 @@ for t in totals:
 		for row in reader:
 			type = int(row[0])
 			style = row[1]
-			count = int(row[2])
-			if count == 0 or filter_html.Records.SUBDIRS[type] == style:
+			
+			if style == 'time':
+				count = float(row[2])
+			else:
+				count = int(row[2])
+				
+			if count == 0 or filter_html.Records.CLASSES[type] == style:
 				grandtotal[type] += count
 				columns.append((style,count))
 			else:
@@ -119,7 +120,11 @@ for t in totals:
 			linkname = os.path.relpath(os.path.join(linktext, "index.html"), indexdir)
 			index.write('<tr><td class="name"><a href="%s">%s</a></td>' % (linkname, linktext))
 			for (style, count) in columns:
-				index.write('<td class="%s">%d</td>' % (style, count))
+				if style == 'time':
+					n = time.strftime("%H:%M:%S", time.gmtime(count + 0.5))
+				else:
+					n = str(count)
+				index.write('<td class="%s">%s</td>' % (style, n))
 			index.write("</tr>")
 		except:
 			sys.stderr.write("error: cannot write index file %s\n" % indexfile)
@@ -129,10 +134,16 @@ for t in totals:
 try:
 	index.write('<tr><td>&nbsp;</td></tr><tr><td class="name">total</td>')
 	for i, count in enumerate(grandtotal):
+		style = filter_html.Records.CLASSES[i]
+		if style == 'time':
+			n = time.strftime("%H:%M:%S", time.gmtime(count + 0.5))
+		else:
+			n = str(count)
+					
 		if count == 0:
 			index.write('<td class="zero">0</td>')
 		else:
-			index.write('<td class="%s">%d</td>' % (filter_html.Records.SUBDIRS[i], count))
+			index.write('<td class="%s">%s</td>' % (style, n))
 	index.write("</tr></table>")
 	index.write("</body></html>\n")
 	index.close()

@@ -11,9 +11,12 @@
 		<env name='CPP' default='$(GNUCPP)' type='tool'/>
 		<env name='CREATERFIFILE' default='$(PERL) $(SBS_HOME)/bin/createrfifile.pl ' type='script'/>
 		<env name='GNUAWK' default='$(GNUPREFIX)gawk$(DOTEXE)' type='tool' versionCommand='$(GNUAWK) --version' versionResult='GNU Awk [3-9].*'/>
-		<env name='MAKEDEF' default='$(PERL) $(EPOCROOT)/epoc32/tools/makedef.pl' type='script'/>
-		<env name='PREPDEF' default='$(PERL) $(EPOCROOT)/epoc32/tools/prepdef.pl' type='script'/>
-		<env name='RCOMP' default='$(EPOCROOT)/epoc32/tools/rcomp$(DOTEXE)' type='tool'/>
+		<env name='SBS_MAKEDEF' default='$(PERL) $(EPOCTOOLS)/makedef.pl' type='script'/>
+		<set name='MAKEDEF' value='$(SBS_MAKEDEF)'/>
+		<env name='SBS_PREPDEF' default='$(PERL) $(EPOCTOOLS)/prepdef.pl' type='script'/>
+		<set name='PREPDEF' value='$(SBS_PREPDEF)'/>
+		<env name='SBS_RCOMP' default='$(EPOCTOOLS)/rcomp$(DOTEXE)' type='tool'/>
+		<set name='RCOMP' value='$(SBS_RCOMP)'/>
 		<env name='STRINGTABLE' default='$(PERL) $(EPOCROOT)/epoc32/tools/stringtable.pl' type='script'/>
 
 		<!-- link to bld.inf and mmp platform names -->

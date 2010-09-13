@@ -29,6 +29,23 @@ VENDORID 0x70000001
 SOURCEPATH    .
 SOURCE        CreateStaticDLL_variant1.cpp
 
+// > 10 files to test the createvmap handling of command files
+SOURCE        test_createvmap01.cpp
+SOURCE        test_createvmap02.cpp
+SOURCE        test_createvmap03.cpp
+SOURCE        test_createvmap04.cpp
+SOURCE        test_createvmap05.cpp
+SOURCE        test_createvmap06.cpp
+SOURCE        test_createvmap07.cpp
+SOURCE        test_createvmap08.cpp
+SOURCE        test_createvmap09.cpp
+SOURCE        test_createvmap10.cpp
+SOURCE        test_createvmap11.cpp
+SOURCE        test_createvmap12.cpp
+SOURCE        test_createvmap13.cpp
+SOURCE        test_createvmap14.cpp
+SOURCE        test_createvmap15.cpp
+
 USERINCLUDE   .
 APP_LAYER_SYSTEMINCLUDE_SYMBIAN
 

@@ -287,4 +287,8 @@
 		<set name="DEBUG_INFO" value=""/>
 	</var>
 
+	<!-- for builds which don't need a populated .hrh file -->
+	<var name="nohrh">
+		<set name="VARIANT_HRH" value="$(SBS_HOME)/lib/config/empty.hrh"/>
+	</var>
 </build>

@@ -1,0 +1,37 @@
+A requirement on Raptor is to allow all the tools to be configurable via 
+environment variables. To this end, updates have been made to extend the list 
+of tools that can be configured using environment variables.
+
+The list of new SBS_*** environment variables and their purpose is given below:
+
+SBS_EPOCTOOLS       Directory for epoc32 tools; defaults to $EPOCROOT/epoc32/tools
+                    Changes the default locations for all of the following tools.
+SBS_CHECKLIB        Full path to checklib program
+SBS_EFREEZE         perl, followed by full path to efreeze.pl
+SBS_ELF2E32         Full path to elf2e32 program
+SBS_PREPDEF         perl, followed by full path to prepdef.pl
+SBS_RCOMP           Full path to rcomp program
+SBS_TRANASM         perl, followed by full path to tranasm.pl
+SBS_MAKEDEF         perl, followed by full path to makedef.pl
+SBS_PETRAN          perl, followed by full path to petran.pl
+SBS_SYMLOOKUPUTIL   perl, followed by full path to sym_lkup_util.pl
+SBS_SLASHBIN        Linux only: location of /bin, i.e. an alternative location for
+                    GCC and associated tools
+SBS_USRBIN          Linux only: location of /usr/bin, i.e. an alternative location 
+                    for Gnu tools such as the Core Utils
+
+In the case Perl scripts (.pl files), "perl" can be replaced with the full path to 
+the perl program.
+
+The above variables supercede the following environment variables:
+
+CHECKLIB
+EFREEZE
+ELF2E32
+MAKEDEF
+PETRAN
+PREPDEF
+RCOMP
+TRANASM
+
+which are no longer in use.

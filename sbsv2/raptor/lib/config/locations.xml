@@ -7,29 +7,32 @@
 	-->
 
 	<var name="hostplatform.locations" host='linux.*'>	
+		<env name='SBS_SLASHBIN' default='/bin'/>
+		<env name='SBS_USRBIN' default='/usr/bin'/>
+				
 		<set name='DOTEXE' value=''/>
-		<set name='GCCPREFIX' value='/usr/bin/'/>
-		<set name='GNUPREFIX' value='/bin/'/>
+		<set name='GCCPREFIX' value='$(SBS_USRBIN)/'/>
+		<set name='GNUPREFIX' value='$(SBS_SLASHBIN)/'/>
 		
 		<env name='HOSTPLATFORM_DIR' default='linux-i386' />
 		<env name='HOSTPLATFORM' default='linux i386'/>
 		
-		<env name='SBS_GNUCPP' default='/usr/bin/cpp' type='tool'/>
-		<env name='SBS_GNUDATE' default='/bin/date' type='tool'/>
+		<env name='SBS_GNUCPP' default='$(SBS_USRBIN)/cpp' type='tool'/>
+		<env name='SBS_GNUDATE' default='$(SBS_SLASHBIN)/date' type='tool'/>
 		<env name='SBS_GNUMAKE38' default='$(SBS_HOME)/$(HOSTPLATFORM_DIR)/bin/make' type='tool'/>
-		<env name='SBS_GNUSED' default='/bin/sed' type='tool'/>
-		<env name='SBS_GNUMKDIR' default='/bin/mkdir' type='tool'/>
-		<env name='SBS_GNUMV' default='/bin/mv' type='tool'/>
-		<env name='SBS_GNUCP' default='/bin/cp' type='tool'/>
-		<env name='SBS_GNUCAT' default='/bin/cat' type='tool'/>
-		<env name='SBS_GNURM' default='/bin/rm' type='tool'/>
-		<env name='SBS_GNULN' default='/bin/ln' type='tool'/>
-		<env name='SBS_GNURMDIR' default='/bin/rmdir' type='tool'/>
-		<env name='SBS_GNUCHMOD' default='/bin/chmod' type='tool'/>
-		<env name='SBS_GNUMD5SUM' default='/usr/bin/md5sum' type='tool'/>
-		<env name='SBS_GNUTOUCH' default='/bin/touch' type='tool'/>
-		<env name='SBS_GNUFIND' default='/usr/bin/find' type='tool'/>
-		<env name='SBS_GNUGREP' default='/bin/grep' type='tool'/>
+		<env name='SBS_GNUSED' default='$(SBS_SLASHBIN)/sed' type='tool'/>
+		<env name='SBS_GNUMKDIR' default='$(SBS_SLASHBIN)/mkdir' type='tool'/>
+		<env name='SBS_GNUMV' default='$(SBS_SLASHBIN)/mv' type='tool'/>
+		<env name='SBS_GNUCP' default='$(SBS_SLASHBIN)/cp' type='tool'/>
+		<env name='SBS_GNUCAT' default='$(SBS_SLASHBIN)/cat' type='tool'/>
+		<env name='SBS_GNURM' default='$(SBS_SLASHBIN)/rm' type='tool'/>
+		<env name='SBS_GNULN' default='$(SBS_SLASHBIN)/ln' type='tool'/>
+		<env name='SBS_GNURMDIR' default='$(SBS_SLASHBIN)/rmdir' type='tool'/>
+		<env name='SBS_GNUCHMOD' default='$(SBS_SLASHBIN)/chmod' type='tool'/>
+		<env name='SBS_GNUMD5SUM' default='$(SBS_USRBIN)/md5sum' type='tool'/>
+		<env name='SBS_GNUTOUCH' default='$(SBS_SLASHBIN)/touch' type='tool'/>
+		<env name='SBS_GNUFIND' default='$(SBS_USRBIN)/find' type='tool'/>
+		<env name='SBS_GNUGREP' default='$(SBS_SLASHBIN)/grep' type='tool'/>
 		<env name='SBS_GNUSORT' default='sort' type='tool'/>
 		<env name='SBS_SHELL' default="$(SBS_HOME)/$(HOSTPLATFORM_DIR)/bin/sh" type='tool'/>
 		<env name='SBS_ZIP' default="$(SBS_HOME)/$(HOSTPLATFORM_DIR)/bin/zip" type='tool'/>

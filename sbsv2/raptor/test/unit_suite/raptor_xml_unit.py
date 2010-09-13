@@ -122,9 +122,9 @@ class TestRaptorXML(unittest.TestCase):
 		self.assertTrue(systemModel.IsLayerBuildable("Seventh Layer"))
 		self.assertTrue(len(self.__logger.errors) == 1)
 		sbsHome = os.environ["SBS_HOME"]
-		sysDefPath = sbsHome + "/test/metadata/system/system_definition_multi_layers.xml"
+		sysDefPath = os.path.join(sbsHome, "test/metadata/system/system_definition_multi_layers.xml")
 		sysDefPath = sysDefPath.replace("\\","/")
-		bldInfPath = sbsHome + "/test/smoke_suite/test_resources/does_not_exist/bld.inf"
+		bldInfPath = os.path.join(sbsHome, "test/smoke_suite/test_resources/does_not_exist/bld.inf")
 		bldInfPath = bldInfPath.replace("\\","/")
 		self.assertEquals(self.__logger.errors[0],
 		  ("System Definition layer \"Seventh Layer\" from system definition file \"%s\" refers to non existent bld.inf file %s" % (sysDefPath, bldInfPath)))

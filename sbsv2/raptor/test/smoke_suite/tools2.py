@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -18,10 +18,10 @@ from raptor_tests import SmokeTest
 
 def run():
 	t = SmokeTest()
-	t.id = "51"
-	t.name = "tools2"
+	
+	t.id = "51a"
+	t.name = "tools2_exe_lib"
 	t.command = "sbs -b smoke_suite/test_resources/tools2/bld.inf -c tools2"
-
 
 	t.targets = [
 		"$(EPOCROOT)/epoc32/release/tools2/deb/libtool_lib1.a",
@@ -74,5 +74,19 @@ def run():
 			"tool_exe_exe/tool_exe_exe/tools2/deb/$(HOSTPLATFORM_DIR)/tool_exe_a.o"
 			])
 		t.run("linux") # tools2 output is platform dependent
-		
+	
+	t.id = "51b"
+	t.name = "tools2_nohrh"
+	t.usebash = True
+	t.command = "sbs -b smoke_suite/test_resources/tools2/bootstrap.inf -c tools2.nohrh -f -"
+	t.targets = ["$(EPOCROOT)/epoc32/include/bootstrap_header_abc.h"]
+	t.mustmatch_singleline = ["empty\.hrh"]
+	t.mustnotmatch_singleline = ["Symbian_OS.hrh",
+								 "symbian_os.hrh",
+								 "feature_settings.hrh"]
+	t.run()
+	
+	t.id = "51"
+	t.name = "tools2"
+	t.print_result()
 	return t

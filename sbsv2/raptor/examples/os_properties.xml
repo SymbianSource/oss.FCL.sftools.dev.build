@@ -11,14 +11,13 @@
 	The file can have any name as long as it ends with ".xml"
 	
 	-->
-	
-	<!-- changes required for v9.4, TB91, and TB91sf -->
 		 
 	<var name="root.changes">
 		<set name='POSTLINKER_SUPPORTS_WDP' value=''/>
 		<set name='SUPPORTS_STDCPP_NEWLIB' value=''/>
 		<set name='RVCT_PRE_INCLUDE' value='$(EPOCINCLUDE)/rvct2_2/rvct2_2.h'/>
 		<set name="SUPPORTS_ABIV1_IMPLIBS" value='1'/>
+		<set name='VARIANT_HRH' value='$(EPOCINCLUDE)/feature_settings.hrh'/>
 	</var>
 	
 </build>

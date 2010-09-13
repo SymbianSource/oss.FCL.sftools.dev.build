@@ -24,6 +24,7 @@ class Annofile(xml.sax.handler.ContentHandler):
 	def __init__(self, name, maxagents=30):
 		self.name = name
 		self.overallAggregateTime = 0
+		self.duration = 0
 		self.inJob = False
 		self.inMetricDuration = False
 		self.jobType = ''

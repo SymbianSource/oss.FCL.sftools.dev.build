@@ -50,6 +50,12 @@ else
    echo "You DON'T appear to have the ncurses dev libraries - please install them (ncurses-dev or ncurses-devel)"
 fi
 
+if [ -f "/usr/include/bzlib.h" ]; then
+   echo "You appear to have the bzip2 dev libraries"
+else
+   echo "You DON'T appear to have the bzip2 dev libraries - please install them (bzip2-dev or bzip2-devel)"
+fi
+
 echo "Do you wish to continue (Y or y for 'yes' anything else for no)?"
 
 read X

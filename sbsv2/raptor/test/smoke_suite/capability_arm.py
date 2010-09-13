@@ -16,13 +16,15 @@
 
 from raptor_tests import SmokeTest
 import sys
+import os
 
 def run():
 	t = SmokeTest()
 	t.usebash = True
 
-
-	if sys.platform.startswith("win"):
+	if "SBS_ELF2E32" in os.environ:
+		elf2e32 = os.environ["SBS_ELF2E32"]
+	elif sys.platform.startswith("win"):
 		elf2e32 = "$(EPOCROOT)/epoc32/tools/elf2e32.exe"
 	else:
 		elf2e32 = "$(EPOCROOT)/epoc32/tools/elf2e32"

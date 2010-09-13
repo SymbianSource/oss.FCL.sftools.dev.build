@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -43,6 +43,7 @@ def run():
 		"$(EPOCROOT)/epoc32/testunzip/archive/archivefile3.txt",
 		"$(EPOCROOT)/epoc32/testunzip/archive/archivefile4.txt",
 		"$(EPOCROOT)/epoc32/testunzip/archive/archivefilelinuxbin",
+		"$(EPOCROOT)/epoc32/testunzip/archive/archivefilereadonly.txt",
 		"$(EPOCROOT)/epoc32/build/" + markerfile
 		]
 	t.addbuildtargets('smoke_suite/test_resources/simple_stringtable/bld.inf', [
@@ -60,6 +61,7 @@ def run():
 		"<member>$(EPOCROOT)/epoc32/testunzip/archive/archivefile3.txt</member>",
 		"<member>$(EPOCROOT)/epoc32/testunzip/archive/archivefile4.txt</member>",
 		"<member>$(EPOCROOT)/epoc32/testunzip/archive/archivefilelinuxbin</member>",
+		"<member>$(EPOCROOT)/epoc32/testunzip/archive/archivefilereadonly.txt</member>",
 		"<zipmarker>$(EPOCROOT)/epoc32/build/" + markerfile + "</zipmarker>"
 	]
 	t.run()
