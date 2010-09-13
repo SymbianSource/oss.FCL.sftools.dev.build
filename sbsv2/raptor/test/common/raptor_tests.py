@@ -449,23 +449,32 @@ class SmokeTest(object):
 	def posttest(self):
 		# what to do after the test has run
 	
-		# count the targets that got built
+		# count the targets that got built, recording those that are found
+		# to be missing
 		found = 0
 		missing = []
 		for t in self.targets:
+			# Either we're looking at a single target file here, or a list of related target files where
+			# at least one needs to match.  We therefore use a list for the check that includes one or
+			# more items
 			if type(t) is not list:
-				target_alternatives=[t]
+				unresolved_targets=[t]
+			else:
+				unresolved_targets=t
+			
+			resolved_targets = []	
+			for target in unresolved_targets:
+				resolved_targets.append(os.path.normpath(ReplaceEnvs(target)))			
 
 			found_flag = False	
-			for alt in target_alternatives:
-				tgt = os.path.normpath(ReplaceEnvs(alt))
-				if os.path.exists(tgt):
+			for target in resolved_targets:
+				if os.path.exists(target):
 					found_flag = True
 					break
 			if found_flag:
 				found += 1
 			else:
-				missing.append(tgt)
+				missing.append(resolved_targets)
 	
 		# count the errors and warnings
 		warn = 0
@@ -529,8 +538,16 @@ class SmokeTest(object):
 	
 		if len(missing) != self.missing:
 			print "MISSING: %d, expected %s" % (len(missing), self.missing)
-			for file in missing:
-				print "\t%s" % (file)
+			
+			# Missing entries are lists containing either a single missing file, or multiple alternative
+			# files that were all found to be missing when checked
+			for entry in missing:
+				for index,file in enumerate(entry):
+					if index != len(entry)-1:
+						suffix = " or"
+					else:
+						suffix = "" 
+					print "\t%s" % (file) + suffix
 			
 		if warn != self.warnings:
 			print "WARNINGS: %d, expected %d" % (warn, self.warnings)

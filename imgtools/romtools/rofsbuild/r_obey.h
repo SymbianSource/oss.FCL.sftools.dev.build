@@ -76,6 +76,7 @@ enum EKeyword
 	EKeywordDataImageSize,
 	EKeywordDataImageVolume,
 	EKeywordDataImageSectorSize,
+	EKeywordDataImageClusterSize,
 	EKeywordDataImageNoOfFats,
 	EKeywordSmrImageName,
 	EKeywordSmrFileData,

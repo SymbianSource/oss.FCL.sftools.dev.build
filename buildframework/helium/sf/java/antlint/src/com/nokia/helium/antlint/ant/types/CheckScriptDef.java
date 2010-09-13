@@ -18,12 +18,12 @@ package com.nokia.helium.antlint.ant.types;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.io.IOException;
 
 import org.apache.tools.ant.BuildException;
 import org.dom4j.Document;
@@ -127,19 +127,22 @@ public class CheckScriptDef extends AbstractScriptCheck {
             PrintWriter output = new PrintWriter(new FileOutputStream(file));
 
             for (String line : text.split("\n")) {
-                if (line.trim().startsWith("import"))
+                if (line.trim().startsWith("import")) {
                     output.write(line + "\n");
+                }
             }
 
             output.write("/**\n * x\n */\npublic final class " + scriptdefname
                     + " {\n");
-            output.write("private " + scriptdefname + "() { }\n");
-            output.write("public static void main(String[] args) {\n");
+            output.write("    private " + scriptdefname + "() { }\n");
+            output.write("    public static void main(String[] args) {\n");
             for (String line : text.split("\n")) {
-                if (!line.trim().startsWith("import"))
-                    output.write(line + "\n");
+                if (!line.trim().startsWith("import")) {
+                    output.write("        " + line + "\n");
+                }
             }
-            output.write("} }");
+            output.write("    }\n");
+            output.write("}\n");
             output.close();
         } catch (IOException e) {
             throw new BuildException("Not able to write Beanshell File "

@@ -21,12 +21,15 @@ import java.io.File;
 import java.io.IOException;
 import java.text.BreakIterator;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.dom4j.Comment;
-import org.dom4j.DocumentException;
+import org.dom4j.Document;
+import org.dom4j.DocumentHelper;
 import org.dom4j.Element;
 import org.dom4j.Node;
+import org.dom4j.XPath;
 
 /**
  * Meta object for an Ant project.
@@ -36,7 +39,7 @@ public class ProjectMeta extends RootAntObjectMeta {
 
     private String description = "";
 
-    public ProjectMeta(AntFile antFile, Element node) throws DocumentException, IOException {
+    public ProjectMeta(AntFile antFile, Element node) throws IOException {
         super(antFile, node);
 
         // Only parse a project comment if it is marked
@@ -45,7 +48,6 @@ public class ProjectMeta extends RootAntObjectMeta {
         }
 
         Element descriptionNode = ((Element) getNode()).element("description");
-        // System.out.println(descriptionNode);
         if (descriptionNode != null) {
             description = AntComment.getCleanedDocNodeText(descriptionNode);
         }
@@ -73,7 +75,6 @@ public class ProjectMeta extends RootAntObjectMeta {
             text = getDocumentation();
         }
         BreakIterator iterator = BreakIterator.getSentenceInstance();
-        // BreakIterator iterator = BreakIterator.getLineInstance();
         iterator.setText(text);
         String summary = "";
         if (iterator.next() > 0) {
@@ -83,7 +84,7 @@ public class ProjectMeta extends RootAntObjectMeta {
     }
 
     @SuppressWarnings("unchecked")
-    public List<TargetMeta> getTargets() throws IOException {
+    public List<TargetMeta> getTargets() {
         ArrayList<TargetMeta> objects = new ArrayList<TargetMeta>();
         List<Node> nodes = getNode().selectNodes("target");
         for (Node targetNode : nodes) {
@@ -97,7 +98,7 @@ public class ProjectMeta extends RootAntObjectMeta {
     }
 
     @SuppressWarnings("unchecked")
-    public List<PropertyMeta> getProperties() throws IOException {
+    public List<PropertyMeta> getProperties() {
         List<PropertyMeta> properties = new ArrayList<PropertyMeta>();
         List<Node> propertyNodes = getNode().selectNodes("//property[string-length(@name)>0]");
         for (Node propNode : propertyNodes) {
@@ -111,7 +112,7 @@ public class ProjectMeta extends RootAntObjectMeta {
     }
 
     @SuppressWarnings("unchecked")
-    public List<MacroMeta> getMacros() throws IOException {
+    public List<MacroMeta> getMacros() {
         ArrayList<MacroMeta> objects = new ArrayList<MacroMeta>();
         List<Element> nodes = getNode().selectNodes("//macrodef | //scriptdef");
         for (Element node : nodes) {
@@ -150,7 +151,7 @@ public class ProjectMeta extends RootAntObjectMeta {
     }
 
     @SuppressWarnings("unchecked")
-    public List<PropertyCommentMeta> getPropertyCommentBlocks() throws IOException {
+    public List<PropertyCommentMeta> getPropertyCommentBlocks() {
         ArrayList<PropertyCommentMeta> objects = new ArrayList<PropertyCommentMeta>();
         List<Node> nodes = getNode().selectNodes("//comment()");
         for (Node node : nodes) {
@@ -158,9 +159,48 @@ public class ProjectMeta extends RootAntObjectMeta {
             if (text.startsWith(DOC_COMMENT_MARKER + " @property")) {
                 PropertyCommentMeta propertyCommentMeta = new PropertyCommentMeta(this, (Comment) node);
                 propertyCommentMeta.setRuntimeProject(getRuntimeProject());
-                objects.add(propertyCommentMeta);
+                if (propertyCommentMeta.matchesScope(getScopeFilter())) {
+                    objects.add(propertyCommentMeta);
+                }
             }
         }
         return objects;
+    }
+
+    @SuppressWarnings("unchecked")
+    public void getConfigSignals(String targetName, List<String> signals) {
+        XPath xpath = DocumentHelper.createXPath("//hlm:signalListenerConfig[@target='"
+            + targetName + "']");
+        xpath.setNamespaceURIs(Database.NAMESPACE_MAP);
+        List<Node> signalNodes = xpath.selectNodes(getNode());
+        for (Iterator<Node> iterator = signalNodes.iterator(); iterator.hasNext();) {
+            Element propertyNode = (Element) iterator.next();
+            String signalid = propertyNode.attributeValue("id");
+            String failbuild = findSignalFailMode(signalid, getNode().getDocument());
+            signals.add(signalid + "(" + failbuild + ")");
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private String findSignalFailMode(String signalid, Document antDoc) {
+        XPath xpath2 = DocumentHelper.createXPath("//hlm:signalListenerConfig[@id='" + signalid
+            + "']/signalNotifierInput/signalInput");
+        xpath2.setNamespaceURIs(Database.NAMESPACE_MAP);
+        List signalNodes3 = xpath2.selectNodes(antDoc);
+
+        for (Iterator iterator3 = signalNodes3.iterator(); iterator3.hasNext();) {
+            Element propertyNode3 = (Element) iterator3.next();
+            String signalinputid = propertyNode3.attributeValue("refid");
+
+            XPath xpath3 = DocumentHelper.createXPath("//hlm:signalInput[@id='" + signalinputid
+                + "']");
+            xpath3.setNamespaceURIs(Database.NAMESPACE_MAP);
+            List signalNodes4 = xpath3.selectNodes(antDoc);
+            for (Iterator iterator4 = signalNodes4.iterator(); iterator4.hasNext();) {
+                Element propertyNode4 = (Element) iterator4.next();
+                return propertyNode4.attributeValue("failbuild");
+            }
+        }
+        return null;
     }
 }

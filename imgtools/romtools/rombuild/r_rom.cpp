@@ -563,7 +563,7 @@ void E32Rom::CreatePageIndex(char*& aAddr)
 
 TInt E32Rom::SetupPages()
 	{
-	iHeader->iPageableRomStart = 0;
+	iHeader->iPageableRomStart = iSizeUsed;
 	iHeader->iPageableRomSize = 0;
 	iHeader->iDemandPagingConfig = gDemandPagingConfig;
 
@@ -637,6 +637,8 @@ TInt E32Rom::CompressPages()
 		pi->iDataStart = prev->iDataStart + prev->iDataSize;
 		}
 	TInt relSize = pi->iDataStart + pi->iDataSize;
+	if (relSize == 0)//no page is compressed
+		relSize = iSizeUsed;
 
 	memset((TUint8*)iHeader + relSize, 0xff, iSizeUsed - relSize);
 	TInt compression = (iSizeUsed >= 1000) ? (relSize*10)/(iSizeUsed/1000) : (relSize*10000)/iSizeUsed;

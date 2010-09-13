@@ -21,7 +21,7 @@
 
 """ Testing ATS4 ASTE framework. """
 
-# pylint: disable-msg=E1101, R0903, R0911, R0912, W0603, W0142, R0902, R0201
+# pylint: disable=E1101, R0903, R0911, R0912, W0603, W0142, R0902, R0201
 #E1101 => Mocker shows mockery
 #C0302 => too many lines
 #W0142 => used * or ** magic 
@@ -39,8 +39,8 @@ import tempfile
 import zipfile
 import os
 
-from path import path # pylint: disable-msg=F0401
-import mocker # pylint: disable-msg=F0401
+from path import path # pylint: disable=F0401
+import mocker # pylint: disable=F0401
 
 import ats3.aste
 

@@ -30,11 +30,17 @@ Description:
 
     <target name="resolve">
         <mkdir dir="${lib.dir}" />
+        <mkdir dir="${lib.dir}/zipsafe" />
+        <mkdir dir="${lib.dir}/zipnotsafe" />
+        <delete dir="${lib.dir}/zipnotsafe" includes="**/*" />
+        
         <ivy:settings file="${ivy.settings.dir}/ivysettings.xml" />
         
         <!-- the call to resolve is not mandatory, retrieve makes an implicit call if we don't -->
         <ivy:resolve file="${ivy.file}" log="download-only"/>
-        <ivy:retrieve pattern="${lib.dir}/[artifact].[ext]" log="download-only"/>
+        <ivy:retrieve pattern="${lib.dir}/zipsafe/[artifact].[ext]" type="egg" log="download-only"/>
+        <ivy:retrieve pattern="${lib.dir}/zipsafe/[artifact].[ext]" type="py" log="download-only"/>
+        <ivy:retrieve pattern="${lib.dir}/[artifact].[ext]" type="jar" log="download-only"/>
     </target>
 
     <target name="checkstyle"/>

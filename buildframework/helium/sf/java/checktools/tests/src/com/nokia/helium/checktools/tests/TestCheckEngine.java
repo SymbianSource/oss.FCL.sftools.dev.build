@@ -53,7 +53,7 @@ public class TestCheckEngine extends TestCase {
     /**
      * Method tests the ant version with valid version set.
      */
-    public void testVerifyAntVersionValid() {
+    public void testVerifyAntVersionValid() throws CheckToolException {
         CheckToolException cte = null;
         Properties props = new Properties();
         String str = new ToolChecker().getInstalledToolVersion(OSResolver
@@ -73,7 +73,7 @@ public class TestCheckEngine extends TestCase {
     /**
      * Method tests the python version with invalid version set.
      */
-    public void testVerifyPythonVersionInValid() {
+    public void testVerifyPythonVersionInValid() throws CheckToolException {
         CheckToolException cte = null;
         Properties props = new Properties();
         props.setProperty("python.version", "0.0.0.0");
@@ -91,7 +91,7 @@ public class TestCheckEngine extends TestCase {
     /**
      * Method tests the python version with valid version set.
      */
-    public void testVerifyPythonVersionValid() {
+    public void testVerifyPythonVersionValid() throws CheckToolException {
         CheckToolException cte = null;
         Properties props = new Properties();
         String str = new ToolChecker().getInstalledToolVersion(OSResolver

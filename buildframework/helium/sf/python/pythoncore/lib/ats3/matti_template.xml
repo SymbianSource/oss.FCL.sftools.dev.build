@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<!-- 
+============================================================================ 
+Name        : matti_template.xml
+Part of     : Helium 
+
+Copyright (c) 2010 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+Contains the template for the test.xml file output. The test.xml file contains
+information on the files used to create the drop file.
+============================================================================
+-->
+
+<testrun>
+    <metadata>
+        {% if xml_dict['diamonds_build_url'] -%}
+        <meta name="diamonds-buildid">{{ xml_dict['diamonds_build_url'] }}</meta> 
+        <meta name="diamonds-testtype">Smoke</meta>
+        {% endif %}
+        <meta name="name">{{ xml_dict['testrun_name'] }}</meta> 
+    </metadata>
+    
+    <agents>
+        <agent alias="{{ xml_dict['alias_name'] }}">
+            <property name="hardware" value="{{ xml_dict["device_type"] }}"/>
+        </agent>
+    </agents>
+    
+    
+    {% for exe_block in xml_dict['execution_blocks'] -%}
+    <execution defaultAgent="{{ xml_dict['alias_name'] }}">        
+        <initialization>
+        
+            {% if exe_block['image_files'] -%}
+            <task agents="{{ xml_dict['alias_name'] }}">
+                <type>FlashTask</type>
+                <parameters>
+                {% set i = 1 %}
+                {% for img in exe_block['image_files'] -%}
+                    <parameter name="image-{{ i }}" value="images\{{ os.path.basename(img) }}" />
+                    {% set i = i + 1 %}
+                {% endfor -%}
+                </parameters>
+            </task>
+            {% endif %}
+                     
+
+            {% if exe_block['install_files'] != [] -%}
+              {% for file in exe_block['install_files'] -%}            
+            <task agents="{{ xml_dict['alias_name'] }}">
+                <type>FileUploadTask</type>
+                <parameters>
+                    <parameter name="src" value="{{exe_block['name']}}{{ atspath.normpath(atspath.normpath(file[0]).replace(atspath.normpath(exe_block['asset_path']).rsplit("\\", 1)[0], "")) }}"/>
+                    <parameter name="dst" value="{{ atspath.normpath(file[1]) }}"/>
+                </parameters>
+            </task>
+              {% endfor -%}
+            {% endif %}
+            
+            {% if exe_block['matti_sis_files'] != [] -%}
+              {% for sisfile in exe_block['matti_sis_files'] -%}            
+            <task agents="{{ xml_dict['alias_name'] }}">
+                <type>FileUploadTask</type>
+                <parameters>
+                    <parameter name="src" value="sisfiles\{{ os.path.basename(sisfile[0]) }}"/>
+                    <parameter name="dst" value="{{ sisfile[2] }}"/>
+                </parameters>
+            </task>
+              {% endfor -%}
+            {% endif %}
+
+          {% for sis_file in exe_block["matti_sis_files"] -%}
+            <task agents="{{ xml_dict['alias_name'] }}">
+               <type>InstallSisTask</type>
+               <parameters>
+                    <parameter name="software-package" value="{{ sis_file[2] }}"/>
+                    <parameter name="timeout" value="{{ exe_block["test_timeout"] }}"/>
+                    <parameter name="upgrade-data " value="true"/>
+                    <parameter name="ignore-ocsp-warnings" value="true"/>
+                    <parameter name="ocsp-done" value="true"/>
+                    <parameter name="install-drive" value="{{ sis_file[2].split(":")[0] }}"/>
+                    <parameter name="overwrite-allowed" value="true"/>
+                    <parameter name="download-allowed" value="false"/>
+                    <parameter name="download-username" value="user"/>
+                    <parameter name="download-password" value="passwd"/>
+                    <parameter name="upgrade-allowed" value="true"/>
+                    <parameter name="optional-items-allowed" value="true"/>
+                    <parameter name="untrusted-allowed" value="true"/>
+                    <parameter name="package-info-allowed" value="true"/>
+                    <parameter name="user-capabilities-granted" value="true"/>
+                    <parameter name="kill-app" value="true"/>
+               </parameters>
+            </task>
+          {%- endfor -%}
+
+            <task agents="{{ xml_dict['alias_name'] }}">
+                <type>RebootTask</type>
+                <parameters/>                
+            </task>
+            <task agents="{{ xml_dict['alias_name'] }}">
+                <type>CreateDirTask</type>
+                <parameters>                
+                    <parameter value="c:\logs\testability" name="dir"/>
+                </parameters>
+            </task>
+        </initialization>
+
+        {% for task_file in exe_block["matti_task_files"] -%}
+        <task agents="{{ xml_dict['alias_name'] }}">
+           <type>MATTITask</type>
+           <parameters>
+              <parameter value="{{ exe_block["name"] }}\matti_testcases\" name="script"/>
+              <parameter value="{{ exe_block["name"] }}\matti_testcases\mattiparameters\{{ os.path.basename(exe_block["matti_parameters"][0]) }}" name="xml"/>
+              <parameter value="{{ exe_block['test_timeout'] }}" name="timeout"/>
+              <parameter value="{{ exe_block["sierra_enabled"] }}" name="sierra"/>
+              <parameter value="{{ exe_block["sierra_parameters"] }} -e %TEST_RUN_SANDBOX%/{{ exe_block["name"] }}/{{ task_file }} test_unit" name="executable-parameters"/>
+           </parameters>
+        </task>
+        {% endfor -%}
+        
+        <finalization>
+	      <task agents="{{ xml_dict['alias_name'] }}">
+	        <type>CleanupTask</type>
+	        <parameters>
+	          <parameter value="true" name="upload-files"/>
+	        </parameters>
+	      </task>
+        </finalization>
+    </execution>    
+    {% endfor -%}
+    
+    <postActions>
+    <action>
+      <type>EmailAction</type>
+      <parameters>
+        <parameter value="{{ xml_dict['email_subject'] }}" name="subject"/>
+        <parameter value="{{ xml_dict['report_email'] }}" name="to"/>
+        <parameter value="{{ xml_dict['email_format'] }}" name="format"/>
+      </parameters>
+    </action>
+    </postActions>
+    
+</testrun>

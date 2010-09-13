@@ -34,6 +34,8 @@ import org.apache.tools.ant.Task;
 import org.apache.tools.ant.types.Resource;
 import org.apache.tools.ant.types.ResourceCollection;
 
+import com.nokia.helium.sysdef.PackageDefinition;
+import com.nokia.helium.sysdef.PackageDefinitionParsingException;
 import com.nokia.helium.sysdef.PackageMap;
 import com.nokia.helium.sysdef.PackageMapParsingException;
 
@@ -50,9 +52,9 @@ import freemarker.template.TemplateException;
  *
  * Example:
  * <pre>
- * &lt;hlm:createPackageMapping epocroot="E:\sdk" destFile="E:\sdk\sysdef_root.xml" &gt;
+ * &lt;hlm:createRootSysdef epocroot="E:\sdk" destFile="E:\sdk\sysdef_root.xml" &gt;
  *     &lt;fileset dir="E:\sdk" includes="root/&#42;&#42;/package_definition.xml"&gt;
- * &lt;/hlm:createPackageMapping&gt;
+ * &lt;/hlm:createRootSysdef&gt;
  * </pre>
  *
  * @ant.task name="createRootSysdef" category="Sysdef"
@@ -61,12 +63,13 @@ public class CreateRootSysdefTask extends Task {
 
     private File destFile;
     private List<ResourceCollection> resourceCollections = new ArrayList<ResourceCollection>(); 
-    private Map<String, Map<String, List<String>>> roots = new HashMap<String, Map<String, List<String>>>();
+    private Map<String, Map<String, List<Map<String, Object>>>> roots = new HashMap<String, Map<String, List<Map<String, Object>>>>();
     private Map<String, List<String>> layers = new HashMap<String, List<String>>();
     private File epocroot;
     private boolean failOnError = true;
     private boolean checkPackageExists;
     private File template;
+    private String idNamespace;
 
     /**
      * {@inheritDoc}
@@ -101,14 +104,14 @@ public class CreateRootSysdefTask extends Task {
                     if (pkgMapFile.exists()) {
                         log("Package map file: " + pkgMapFile);
                         if (!checkPackageExists) {
-                            addPackage(pkgMapFile, pkgDir.getName());
+                            addPackage(pkgDefFile, pkgMapFile, pkgDir.getName());
                         } else {
                             PackageMap pkgMap = new PackageMap(pkgMapFile);
                             File destPkg = new File(epocroot, pkgMap.getRoot() + File.separator +
                                     pkgMap.getLayer() + File.separator + pkgDir.getName() + File.separator +
                                     CreatePackageMappingTask.PACKAGE_DEFINITION_FILENAME);
                             if (destPkg.exists()) {
-                                addPackage(pkgMapFile, pkgDir.getName());
+                                addPackage(pkgDefFile, pkgMapFile, pkgDir.getName());
                             } else {
                                 log("Could not find " + destPkg.getAbsolutePath() +
                                         " so entry is not added to the root system definition.", Project.MSG_ERR);
@@ -119,7 +122,9 @@ public class CreateRootSysdefTask extends Task {
                         log("Package map file: " + pkgMapFile);
                         if (pkgMapFile.exists()) {
                             if (!checkPackageExists) {
-                                addPackage(pkgMapFile, pkgDir.getName());
+                                // slash must be use to generate correct path.
+                                addPackage(pkgDefFile, pkgMapFile, pkgMapFile.getParentFile().getName() + "/" +
+                                        pkgDir.getParentFile().getName() + "/" + pkgDir.getName());
                             } else {
                                 PackageMap pkgMap = new PackageMap(pkgMapFile);
                                 File destPkg = new File(epocroot, pkgMap.getRoot() + File.separator +
@@ -129,23 +134,29 @@ public class CreateRootSysdefTask extends Task {
                                         File.separator +
                                         CreatePackageMappingTask.PACKAGE_DEFINITION_FILENAME);
                                 if (destPkg.exists()) {
-                                    addPackage(pkgMapFile, pkgDir.getParentFile().getName() +
-                                            File.separator + pkgDir.getName());
+                                    addPackage(destPkg, pkgMapFile, pkgMapFile.getParentFile().getName() + "/" +
+                                            pkgDir.getParentFile().getName() + "/" + pkgDir.getName());
                                 } else {
                                     log("Could not find " + destPkg.getAbsolutePath() +
                                             " so entry is not added to the root system definition.", Project.MSG_ERR);
                                 }
                             }
                         } else {
-                            log("Could not find: " + pkgMapFile.toString(), Project.MSG_ERR);
+                            log("Could not find package_map.xml file for " + pkgDefFile.toString(), Project.MSG_ERR);
                             if (shouldFailOnError()) {
-                                throw new BuildException("Could not find:" + pkgMapFile.toString());
+                                throw new BuildException("Could not find package_map.xml file for " + pkgDefFile.toString());
                             }
                         }
                     }
                 } catch (PackageMapParsingException e) {
                     log("Invalid " + CreatePackageMappingTask.PACKAGE_MAP_FILENAME 
                             + " file: " + pkgMapFile.toString() 
+                            + "(" + e.getMessage() + ")", Project.MSG_ERR);
+                    if (shouldFailOnError()) {
+                        throw new BuildException(e.getMessage(), e);
+                    }
+                } catch (PackageDefinitionParsingException e) {
+                    log("Invalid " + CreatePackageMappingTask.PACKAGE_DEFINITION_FILENAME 
                             + "(" + e.getMessage() + ")", Project.MSG_ERR);
                     if (shouldFailOnError()) {
                         throw new BuildException(e.getMessage(), e);
@@ -157,19 +168,33 @@ public class CreateRootSysdefTask extends Task {
         generateRootSysdef();
     }
 
-    private void addPackage(File pkgMapFile, String pkgPath) throws 
-        PackageMapParsingException {
-        log("Adding: " + pkgMapFile, Project.MSG_DEBUG);
+    private void addPackage(File pkgDefinition, File pkgMapFile, String pkgPath) throws
+        PackageMapParsingException, PackageDefinitionParsingException {
+        // Some quick validity checking. 
+        PackageDefinition pkg = new PackageDefinition(pkgDefinition);
+        if (idNamespace == null && (pkg.getIdNamespace() != null && pkg.getIdNamespace().length() > 0)) {
+            idNamespace = pkg.getIdNamespace();
+        } else if (idNamespace != null && !idNamespace.equals(pkg.getIdNamespace())) {
+            log("Warning: " + pkgDefinition.toString() +
+                    " namespace doesn't match the default one. (" 
+                    + idNamespace + " != " + pkg.getIdNamespace(), Project.MSG_WARN);
+        }
+            
         // Adding the package in the structure.
+        log("Adding: " + pkgMapFile, Project.MSG_DEBUG);
         PackageMap pkgMap = new PackageMap(pkgMapFile);
         if (!roots.containsKey(pkgMap.getRoot())) {
-            roots.put(pkgMap.getRoot(), new HashMap<String, List<String>>());
+            roots.put(pkgMap.getRoot(), new HashMap<String, List<Map<String, Object>>>());
         }
         if (!roots.get(pkgMap.getRoot()).containsKey(pkgMap.getLayer())) {
-            roots.get(pkgMap.getRoot()).put(pkgMap.getLayer(), new ArrayList<String>());
+            roots.get(pkgMap.getRoot()).put(pkgMap.getLayer(), new ArrayList<Map<String, Object>>());
             layers.put(pkgMap.getLayer(), new ArrayList<String>());
         }
-        roots.get(pkgMap.getRoot()).get(pkgMap.getLayer()).add(pkgPath);
+        Map<String, Object> data = new HashMap<String, Object>();
+        data.put("path", pkgPath);
+        data.put("id", pkg.getId());
+        data.put("namespaces", pkg.getNamespaces());
+        roots.get(pkgMap.getRoot()).get(pkgMap.getLayer()).add(data);
         layers.get(pkgMap.getLayer()).add(pkgPath);
     }
     
@@ -282,6 +307,10 @@ public class CreateRootSysdefTask extends Task {
             data.put("roots", roots);
             // Content by layer
             data.put("layers", layers);
+            // id-namespace
+            if (idNamespace != null) {
+                data.put("idnamespace", idNamespace);
+            }
             // Environment location
             data.put("epocroot", getEpocroot().getAbsolutePath());
             // Relative path from destFile to epocroot.
@@ -313,10 +342,14 @@ public class CreateRootSysdefTask extends Task {
      */
     protected String getRelativeDiff() {
         String rel = getEpocroot().toURI().relativize(getDestFile().getParentFile().toURI()).getPath();
-        String[] relArray = rel.split("/"); // This is an URI not a File.
-        rel = "";
-        for (String string : relArray) {
-            rel += ".." + File.separatorChar; 
+        if (rel.length() > 0) {
+            String[] relArray = rel.split("/"); // This is an URI not a File.
+            rel = ""; //"." + File.separatorChar;
+            for (@SuppressWarnings("unused") String string : relArray) {
+                rel += ".." + File.separatorChar; 
+            }
+        } else {
+            rel = "." + File.separatorChar;
         }
         return rel;
     }

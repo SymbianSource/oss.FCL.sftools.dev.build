@@ -35,7 +35,9 @@
 #include "r_global.h"
 #include "r_dir.h"
 
+#include "uniconv.hpp"
 TInt NumRootDirs;
+extern TBool gIsOBYUTF8;
 
 inline TLinAddr ActualToRomAddress(TAny* anAddr) { 
 	return TLinAddr(anAddr)-TheRomMem+TheRomLinearAddress; 
@@ -723,13 +725,32 @@ iOverrideFlags(0),iCodeAlignment(0),iDataAlignment(0),iUid1(0), iUid2(0), iUid3(
 iHardwareVariant(KVariantIndependent),iDataBssOffset(0xffffffff), 
 iStackReserve(0),iIATRefs(0), iNext(0), iNextInArea(0), 
 iRomImageFlags(0),iProcessName(0), iRomNode(NULL) {
-	if (aFileName){
+	if (aFileName)
+	{
 		if(iFileName)
 			delete []iFileName;
 		iFileName = NormaliseFileName(aFileName);	 
+   		if(gIsOBYUTF8 && !UniConv::IsPureASCIITextStream(iFileName))
+   		{
+			char* tempnname = strdup(iFileName);
+			unsigned int namelen = 0;
+			if(UniConv::UTF82DefaultCodePage(tempnname, strlen(tempnname), &iFileName, &namelen) < 0)
+				Print(EError, "Invalid filename encoding: %s\n", tempnname);
+			free(tempnname);
+   		}
 	}
 	if (aName)
+	{
 		iName = NormaliseFileName(aName);
+		if(!gIsOBYUTF8 && !UniConv::IsPureASCIITextStream(iName))
+		{
+			char* tempnname = strdup(iName);
+			unsigned int namelen = 0;
+			if(UniConv::DefaultCodePage2UTF8(tempnname, strlen(tempnname), &iName, &namelen) < 0)
+				Print(EError, "Invalid filename encoding: %s\n", tempnname);
+			free(tempnname);
+		}
+	}
 }
 //
 // Destructor

@@ -1,0 +1,52 @@
+
+Raptor now supports a basic x86 OS build on Windows given the installation
+of an appropriate MinGW GCC toolchain (available separately).
+
+This is very much a first cut of the core x86 support, and should be considered
+alpha quality, but the fundamentals are now present to build EXE, DLL, IMPLIB
+and LIB TARGETTYPEs, as well as most fixed export TARGETTYPEs.  Support for
+functionality not directly related to a release build e.g. freezing, assembler
+listing, single file compilation etc. is either not yet implemented or
+untested, so should not be expected to work correctly.
+
+In order to build components for an x86 configuration, an SBS_GCCX86BIN
+environment variable must first be set, with a path as its value, pointing to
+the "bin" directory of the MinGW installation intended for use in the build
+e.g.:
+
+SBS_GCCX86BIN=C:\apps\MinGW\bin
+
+x86 build configurations should then be available for use as follows:
+
+sbs -c x86
+sbs -c x86_urel
+sbs -c x86_udeb
+
+A component supports a build using the above x86 configurations if its
+bld.inf file has an empty or missing PRJ_PLATFORMS section or PRJ_PLATFORMS is
+populated specifically with X86, DEFAULT, BASEDEFAULT or BASEUSERDEFAULT.
+
+The above x86 group and aliases check that the GCC installation is version 3.4.5
+but, other than that, it is the end user's responsibility to provide a toolchain
+that is suitable for an x86 build; currently the x86 build requires a custom
+GCC toolchain that differs from vanilla MinGW releases.
+
+By default, and in common with other Raptor build configurations, x86 build
+output locations are architecture rather than toolchain based, therefore the
+following output folders are used:
+
+%EPOCROOT%\epoc32\release\x86\lib
+%EPOCROOT%\epoc32\release\x86\urel
+%EPOCROOT%\epoc32\release\x86\udeb
+
+An optional release_x86gcc variant is available if the output directories need
+to differentiate based on the toolchain used.  This variant can be used as
+follows:
+
+sbs -c x86.release_x86gcc
+
+...and will lead to the use of these output directories:
+
+%EPOCROOT%\epoc32\release\x86gcc\lib
+%EPOCROOT%\epoc32\release\x86gcc\urel
+%EPOCROOT%\epoc32\release\x86gcc\udeb

@@ -1,0 +1,16 @@
+
+TARGET			traces_keyword.exe
+TARGETTYPE		EXE
+
+UID			0x10003902 0x11100011
+LIBRARY			euser.lib
+SYSTEMINCLUDE		/epoc32/include
+SYSTEMINCLUDE		/epoc32/include/platform
+
+SOURCEPATH		./src
+SOURCE			traces_keyword.cpp
+
+TRACES			./
+// the above equals below:
+// USERINCLUDE		./traces/traces_keyword_exe
+//

@@ -29,7 +29,6 @@ Description:
     <hlm:stage id="preparation" starttarget="ido-build-prep" endtarget="ido-build-prep"/>
     <hlm:stage id="compilation" starttarget="compile-main" endtarget="compile-main"/>
     <hlm:stage id="test" starttarget="ats-test" endtarget="ats-test"/>
-    <hlm:stage id="localisation" starttarget="localisation-50-build" endtarget="localisation-50-build"/>
     
     
     <!-- Stage record configuration -->
@@ -38,7 +37,5 @@ Description:
     <hlm:stagerecord id="stage.compilation" stagerefid="compilation" output="${build.log.dir}/${build.id}_compile.ant.log" loglevel="info" append="true"/>
     
     <hlm:stagerecord id="stage.test" stagerefid="test" output="${build.log.dir}/${build.id}_test.ant.log" loglevel="info" append="true"/>
-    
-    <hlm:stagerecord id="stage.localisation" stagerefid="localisation" output="${build.log.dir}/${build.id}_localisation.ant.log" loglevel="info" append="true"/>
     
 </project>

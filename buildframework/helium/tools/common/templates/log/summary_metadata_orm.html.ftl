@@ -55,13 +55,13 @@ build summary</title>
     </#if>
 </#macro>
 
-<#macro logfile_severity logname, priority, count, helium_node_id>
-    <@helium_message_box nodeid="${helium_node_id}" type="${priority}"  count="${count}"?number />
+<#macro logfile_severity logname, severity, count, helium_node_id>
+    <@helium_message_box nodeid="${helium_node_id}" type="${severity}" count="${count}"?number />
 </#macro>
 
 
-<#macro logfile_entry_detail text, priority, helium_node_id>
-    <@logentry "${text}", "${priority?lower_case}" />
+<#macro logfile_entry_detail text, severity, helium_node_id>
+    <@logentry "${text}", "${severity?lower_case}" />
 </#macro>
 
 <!-- Call the macros to render the log contents. -->
@@ -84,45 +84,30 @@ build summary</title>
     <#assign helium_node_id = helium_node_id + 1>
     <#-- -->
     <@helium_logger_node_head nodeid="${helium_node_id}" title="${logentry.path}">
-        <#list table_info['jpa']['select p from Priority p where p.priority not like \'%DEFAULT%\''] as priority>
-        <#assign missing_count=0/>
-        <#if priority.priority == "ERROR">
-            <#assign missing_count=table_info['jpasingle']['select Count(w.id) from WhatLogEntry w JOIN w.component as c JOIN c.logFile as l where l.id=${logentry.id} and l.path not like \'%_clean_%compile.log\' and w.missing=1'][0]/>
-        </#if>        
-        <#assign count = missing_count + table_info['jpasingle']['select Count(m.id) from MetadataEntry m where m.priorityId = ${priority.id} and m.logPathId=${logentry.id}'][0]>
-            <@logfile_severity "${logentry.path}", "${priority.priority?lower_case}", 
+        <#list table_info['jpa']['select p from Severity p where p.severity not like \'INFO\''] as severity>
+        <#assign count=table_info['jpasingle']['select Count(m.id) from MetadataEntry m where m.severityId=${severity.id} and m.logFileId=${logentry.id}'][0]>
+            <@logfile_severity "${logentry.path}", "${severity.severity?lower_case}", 
                 "${count}", 
                 "${helium_node_id}" />
         </#list>
     </@helium_logger_node_head>
     <@helium_logger_node_content nodeid="${helium_node_id}">
-        <#list table_info['jpa']['select c from Component c where c.logPathID=${logentry.id}'] as component>
+        <#list table_info['jpa']['select c from Component c where c.logFileId=${logentry.id}'] as component>
             <#assign helium_node_id = helium_node_id + 1>
             <@helium_logger_node_head nodeid="${helium_node_id}" title="${component.component}">
-                <#list table_info['jpa']['select p from Priority p where p.priority not like \'%DEFAULT%\''] as priority>
-                    <#assign missing_count=0/>
-                    <#if priority.priority == "ERROR">
-                        <#assign missing_count=table_info['jpasingle']['select Count(w.id) from WhatLogEntry w JOIN w.component as c JOIN c.logFile as l where c.id=${component.id} and l.path not like \'%_clean_%compile.log\' and w.missing=1'][0]/>
-                    </#if>
-                    <@logfile_severity "${component.id}", "${priority.priority?lower_case}", 
-                            table_info['jpasingle']['select Count(m.id) from MetadataEntry m where m.priorityId=${priority.id} and m.componentId = ${component.id}'][0] + missing_count, 
+                <#list table_info['jpa']['select p from Severity p where p.severity not like \'INFO\''] as severity>
+                    <@logfile_severity "${component.id}", "${severity.severity?lower_case}", 
+                            table_info['jpasingle']['select Count(m.id) from MetadataEntry m where m.severityId=${severity.id} and m.componentId=${component.id}'][0], 
                             "${helium_node_id}" />
                 </#list>
             </@helium_logger_node_head>
             <@helium_logger_node_content nodeid="${helium_node_id}">
-                <#list table_info['jpa']['select p from Priority p'] as priority>
-                <#list table_info['native:com.nokia.helium.jpa.entity.metadata.MetadataEntry']['select * from metadataentry where metadataentry.component_id=${component.id} and metadataentry.priority_id = ${priority.id}'] as entry >
+                <#list table_info['jpa']['select p from Severity p'] as severity>
+                <#list table_info['jpa']['select m from MetadataEntry m where m.componentId=${component.id} and m.severityId=${severity.id}'] as entry>
                     <#if entry.text??>
-                    <#-- <#if sublog?node_name == "logfile"> --> 
-                        <@logfile_entry_detail "${entry.text}", "${priority.priority}", "${helium_node_id}" />
+                        <@logfile_entry_detail "${entry.text}", "${severity.severity?lower_case}", "${helium_node_id}" />
                     </#if>
-                    <#-- <#elseif sublog?node_name == "log">
-                        <@antlognode sublog/>
-                    </#if> -->
                 </#list>
-            </#list>
-            <#list table_info['jpa']['select distinct w FROM WhatLogEntry w join  w.component as c JOIN c.logFile as l where c.id=${component.id} and l.path not like \'%_clean_%compile.log\' AND w.missing=1'] as entry>
-                <@logfile_entry_detail "MISSING: ${entry.member}", "ERROR", "${helium_node_id}" />
             </#list>
             </@helium_logger_node_content>
         </#list>

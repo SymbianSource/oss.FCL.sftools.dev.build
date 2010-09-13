@@ -20,7 +20,7 @@ Description:
 
 ============================================================================
 -->
-<project name="minibuild.ido" default="help" xmlns:au="org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+<project name="minibuild.ido" default="minibuild" xmlns:au="org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
     <property environment="env" />
     <import file="../site/${env.TEAM}.ant.xml" />
     <dirname property="config.dir" file="${ant.file.minibuild.ido}" />
@@ -28,21 +28,20 @@ Description:
     <property name="data.drive.letter" value="E" />
     <!-- Enable Helium internal assertion checking. -->
     <property name="hlm.enable.asserts" value="1" />
-
+    <property name="cmt.enabled" value="true" />
     <property name="build.name" value="minibuild_ido" />
     <property name="build.family" value="test_minibuild_ido" />
     <property name="major.version" value="0" />
     <property name="minor.version" value="0" />
+    <!-- Compatibility analyser enabling flag, causes binary check to be run -->
+    <property name="ca.enabled" value="true" />
     
     <condition property="ccm.project.wa_path" value="${data.drive.letter}:\Build_${data.drive.letter}\${env.USERNAME}\ido_wa\${build.name}"  else="${build.name}\wa" > 
           <os family="windows"/>
     </condition> 
     <property name="ccm.enabled" value="true" />
+    <property name="iad.pkg.validation.enabled" value="true" />
     
-    <!-- CMT++ only runs on windows not linux machines -->
-    <condition property="enable.cmt" >
-        <os family="windows" />
-    </condition>
     <!--property name="ido.name" value="test_cmt" /-->
 
 
@@ -60,8 +59,8 @@ Description:
 
     <!-- Configuring get latest env. -->
     <property name="s60.grace.service" value="S60RnD" />
-    <property name="s60.grace.product" value="pf_5250" />
-    <property name="s60.grace.release" value="pf_5250_\d{6}" />
+    <property name="s60.grace.product" value="pf_5250_prd" />
+    <property name="s60.grace.release" value="pf_5250_prd_\d{2}\.\d{1}\.\d{3}" />
     
     <!-- matching mcl_200948_hw79 -->
     <condition property="prep.root.dir" value="${data.drive.letter}:\Build_${data.drive.letter}\${env.USERNAME}\ido_ba\${build.name}" else="${build.name}\ido_ba" >
@@ -78,7 +77,7 @@ Description:
     <property name="skip.password.validation" value="1" />
 
     <!-- IDO robot configuration -->
-    <property name="do.robot.release" value="MinibuildDomain" />
+    <property name="robot.release.enabled" value="true" />
     <tstamp>
         <format property="ido.robot.tstamp" pattern="yyyyMMddhhmmss" />
     </tstamp>
@@ -88,25 +87,27 @@ Description:
     <import file="${helium.dir}/helium.ant.xml" />
     <import file="config/stages_config.ant.xml" />
 
-    <!-- Run the full sequence of target for the minibuild. ,mini-build-prep,compile-main,zip-ee,mini-build-check-->
-    <target name="do-mini-build" depends="ido-update-build-area,
+    <!-- Run the full sequence of target for the minibuild. ,minibuild-prep,compile-main,zip-ee,minibuild-check-->
+    <target name="do-minibuild" depends="ido-update-build-area,
                                             flag-ba-for-deletion,
-                                            mini-build-cleanup,
+                                            minibuild-cleanup,
                                             ido-build,
                                             check-diamonds,
-                                            mini-build-check,
-                                            run-hack" />
+                                            minibuild-check,
+                                            run-hack,
+                                            blocks-create-bundles,
+                                            final" />
 
 
-    <!--ant code coverage for mini-builds-->
-    <target name="mini-build">
-    <antcall target="database">
-        <param name="home.files.only" value="false"/>
-    </antcall>
+    <!--ant code coverage for minibuilds-->
+    <target name="minibuild">
+        <antcall target="database">
+            <param name="home.files.only" value="false"/>
+        </antcall>
         <mkdir dir="${helium.build.dir}/temp" />
         <property name="config.temp.build.dir" location="${config.dir}/build" />
         <hlm:coveragerecord name="${helium.build.dir}/temp/test.minibuild-ido.xml" action="start" />
-        <runtarget target="do-mini-build" />
+        <runtarget target="do-minibuild" />
         <hlm:coveragerecord name="${helium.build.dir}/temp/test.minibuild-ido.xml" action="stop" />
         <fmpp sourcefile="${helium.dir}/tools/common/templates/coveragerecord.txt.ftl" outputfile="${helium.build.dir}/temp/test_minibuild.txt">
             <data expandProperties="yes">
@@ -129,8 +130,12 @@ ${ant.coverage.summary}</echo>
 
 
     <!-- Preparing the content on top of the env -->
-    <target name="ido-50-build" depends="ido-build-prep,compile-main,build-log-summary,render-internal-exports,update-policy-src-reference,render-validate-policy,check-sf-source-header,localisation-50-build,ido-codescanner,ats-test,publish-tasks-to-folder,ido-sources-to-s60-build-robot" />
-    <target name="ido-build-prep" depends="ido-configure-prep,init,check-tool-dependencies,log-build-env,set-arm-version,check-free-space,diamonds,do-prep-work-area,ido-prep-clean,ido-prep-copy,create-bom" />
+    <target name="ido-50-build" depends="ido-build-prep,compile-main,build-log-summary,render-internal-exports,
+                                         update-policy-src-reference,render-validate-policy,check-sf-source-header,
+                                         ido-codescanner,iad-check-pkg-version,ats-test,publish-tasks-to-folder,
+                                         ido-sources-to-s60-build-robot" />
+    <target name="ido-build-prep" depends="ido-configure-prep,init,log-build-env,set-arm-version,check-free-space,
+                                           diamonds,do-prep-work-area,ido-prep-clean,ido-prep-copy,create-bom" />
 
     <!-- needed to defined skip.prep-drive -->
     <target name="ido-configure-prep">
@@ -163,7 +168,7 @@ ${ant.coverage.summary}</echo>
         </xmlvalidate>
     </target>
 
-    <target name="mini-build-cleanup">
+    <target name="minibuild-cleanup">
         <delete verbose="true" includeemptydirs="true" failonerror="false">
             <fileset dir="${build.drive}/" casesensitive="false">
                 <include name="makefile" />
@@ -180,7 +185,7 @@ ${ant.coverage.summary}</echo>
     </target>
 
 
-    <target name="mini-build-check">
+    <target name="minibuild-check">
         <!-- Check if prep has set some prop correctly... -->
         <!-- remember to update the selection by the environment variable in hlm.bat when switching to other compiler version -->
         <echo>'${arm.compiler.version}'</echo>
@@ -207,8 +212,6 @@ ${ant.coverage.summary}</echo>
         <au:assertFileExists file="${build.log.dir}/${build.id}_ido_prep.ant.log" />
         <au:assertFileExists file="${build.log.dir}/${build.id}_compile.ant.log" />
         <au:assertFileExists file="${build.log.dir}/${build.id}_test.ant.log" />
-        <au:assertFileExists file="${build.log.dir}/${build.id}_localisation.ant.log" />
-        
     </target>
 
 

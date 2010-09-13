@@ -20,7 +20,7 @@
 """ Test cases for ccm python toolkit.
 
 """
-# pylint: disable-msg=R0201
+# pylint: disable=R0201
 
 import unittest
 import ccm

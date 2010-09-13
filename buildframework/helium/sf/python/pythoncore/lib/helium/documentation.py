@@ -19,8 +19,7 @@
 
 """ Helium API documentation processing. """
 
-from lxml import etree
-
+import amara
 
 class APIDeltaWriter(object):
     """ Creates an XML delta of the Helium API between releases. """
@@ -31,81 +30,76 @@ class APIDeltaWriter(object):
         
     def write(self, path):
         """ Write the API delta information to an XML file. """
-        root = etree.Element('apiChanges')
+        root = amara.create_document('apiChanges')
         
-        old_db = etree.parse(self.old_database)
-        new_db = etree.parse(self.new_database)
+        old_db = amara.parse(self.old_database)
+        new_db = amara.parse(self.new_database)        
         
+        old_macro_names = set([str(macro.name) for macro in old_db.xml_xpath('/antDatabase/project/macro')])
+        new_macro_names = set([str(macro.name) for macro in new_db.xml_xpath('/antDatabase/project/macro')])
         
-        old_macro_names = set([macro[0].text for macro in old_db.findall('/project/macro')])
-        new_macro_names = set([macro[0].text for macro in new_db.findall('/project/macro')])
+        old_target_names = set([str(target.name) for target in old_db.xml_xpath('/antDatabase/project/target')])
+        new_target_names = set([str(target.name) for target in new_db.xml_xpath('/antDatabase/project/target')])
+        new_target_names_public = set([str(target.name) for target in new_db.xml_xpath("/antDatabase/project/target[scope='public']")])
         
-        old_target_names = set([target[0].text for target in old_db.findall('/project/target')])
-        new_target_names = set([target[0].text for target in new_db.findall('/project/target')])
+        old_property_names = set([str(property_.name) for property_ in old_db.xml_xpath('/antDatabase/project/property')])
+        new_property_names = set([str(property_.name) for property_ in new_db.xml_xpath('/antDatabase/project/property')])
+        new_property_names_public = set([str(property_.name) for property_ in new_db.xml_xpath("/antDatabase/project/property[scope='public']")])
         
-        old_property_names = set([property[0].text for property in old_db.findall('/project/property')])
-        new_property_names = set([property[0].text for property in new_db.findall('/project/property')])
-        
-        old_project_names = set([project[0].text for project in old_db.findall('/project')])
-        new_project_names = set([project[0].text for project in new_db.findall('/project')])
+        old_project_names = set([str(project.name) for project in old_db.xml_xpath('/antDatabase/project')])
+        new_project_names = set([str(project.name) for project in new_db.xml_xpath('/antDatabase/project')])
         
         dict_old_taskdef_names  = {}
         dict_new_taskdef_names  = {}
-        for taskdef in old_db.findall('/project/taskdef'):
-            dict_old_taskdef_names[taskdef[0].text] = taskdef[1].text
-        for taskdef in new_db.findall('/project/taskdef'):
-            dict_new_taskdef_names[taskdef[0].text] = taskdef[1].text
+        for taskdef in old_db.xml_xpath('/antDatabase/project/taskdef'):
+            dict_old_taskdef_names[taskdef.name] = taskdef.name
+        for taskdef in new_db.xml_xpath('/antDatabase/project/taskdef'):
+            dict_new_taskdef_names[taskdef.name] = taskdef.name
 
         projects_removed = old_project_names.difference(new_project_names)
         for project in projects_removed:
-            project_element = etree.SubElement(root, 'project', attrib={'state': 'removed'})
-            project_element.text = project
+            root.xml_append(root.xml_create_element('project', attributes={'state': 'removed'}, content=project))
         projects_added = new_project_names.difference(old_project_names)
         for project in projects_added:
-            project_element = etree.SubElement(root, 'project', attrib={'state': 'added'})
-            project_element.text = project
+            root.xml_append(root.xml_create_element('project', attributes={'state': 'added'}, content=project))
         
         propertys_removed = old_property_names.difference(new_property_names)
-        for property in propertys_removed:
-            property_element = etree.SubElement(root, 'property', attrib={'state': 'removed'})
-            property_element.text = property
+        for property_ in propertys_removed:
+            root.xml_append(root.xml_create_element('property', attributes={'state': 'removed'}, content=property_))
         propertys_added = new_property_names.difference(old_property_names)
-        for property in propertys_added:
-            property_element = etree.SubElement(root, 'property', attrib={'state': 'added'})
-            property_element.text = property
+        for property_ in propertys_added:
+            if property_ in new_property_names_public or new_property_names_public == set([]):
+                root.xml_append(root.xml_create_element('property', attributes={'state': 'added'}, content=property_))
                     
         macros_removed = old_macro_names.difference(new_macro_names)
         for macro in macros_removed:
-            macro_element = etree.SubElement(root, 'macro', attrib={'state': 'removed'})
-            macro_element.text = macro
+            root.xml_append(root.xml_create_element('macro', attributes={'state': 'removed'}, content=macro))
         macros_added = new_macro_names.difference(old_macro_names)
         for macro in macros_added:
-            macro_element = etree.SubElement(root, 'macro', attrib={'state': 'added'})
-            macro_element.text = macro
+            root.xml_append(root.xml_create_element('macro', attributes={'state': 'added'}, content=macro))
         targets_removed = old_target_names.difference(new_target_names)
         
         for target in targets_removed:
-            target_element = etree.SubElement(root, 'target', attrib={'state': 'removed'})
-            target_element.text = target
+            root.xml_append(root.xml_create_element('target', attributes={'state': 'removed'}, content=target))
         targets_added = new_target_names.difference(old_target_names)
         for target in targets_added:
-            target_element = etree.SubElement(root, 'target', attrib={'state': 'added'})
-            target_element.text = target
+            if target in new_target_names_public or new_target_names_public == set([]):
+                root.xml_append(root.xml_create_element('target', attributes={'state': 'added'}, content=target))
 
         taskdefs_removed = set(dict_old_taskdef_names.keys()) - set(dict_new_taskdef_names.keys()) 
         for taskdefKey in taskdefs_removed:
-            taskdef_element = etree.SubElement(root, 'taskdef', attrib={'state': 'removed'})
-            taskdef_element.text = taskdefKey
-            taskdef_element.attrib['classname'] =  dict_old_taskdef_names[taskdefKey]
+            taskdef_element = root.xml_create_element('taskdef', attributes={'state': 'removed'}, content=str(taskdefKey))
+            root.xml_append(taskdef_element)
+            taskdef_element.classname = dict_old_taskdef_names[taskdefKey]
         taskdefs_added = set(dict_new_taskdef_names.keys()) - set(dict_old_taskdef_names.keys())
         for taskdefKey in taskdefs_added:
-            taskdef_element = etree.SubElement(root, 'taskdef', attrib={'state': 'added'})
-            taskdef_element.text = taskdefKey
-            taskdef_element.attrib['classname'] =  dict_new_taskdef_names[taskdefKey]
+            taskdef_element = root.xml_create_element('taskdef', attributes={'state': 'added'}, content=str(taskdefKey))
+            root.xml_append(taskdef_element)
+            taskdef_element.classname = dict_new_taskdef_names[taskdefKey]
             
-        etree.dump(root)
-        tree = etree.ElementTree(root)
-        tree.write(path, pretty_print=True)
+        f = open(path, 'w')
+        root.xml(indent=True, out=f)
+        f.close()
         
         
         

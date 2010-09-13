@@ -27,6 +27,8 @@ import java.util.Vector;
 import java.util.jar.JarFile;
 import java.util.zip.ZipEntry;
 
+import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.Task;
 import org.python.util.PythonInterpreter;
 
 import com.nokia.helium.ccmtask.ant.commands.AddTask;
@@ -34,6 +36,8 @@ import com.nokia.helium.ccmtask.ant.commands.CcmCommand;
 import com.nokia.helium.ccmtask.ant.commands.ChangeReleaseTag;
 import com.nokia.helium.ccmtask.ant.commands.Checkout;
 import com.nokia.helium.ccmtask.ant.commands.Close;
+import com.nokia.helium.ccmtask.ant.commands.CreateReleaseTag;
+import com.nokia.helium.ccmtask.ant.commands.DeleteReleaseTag;
 import com.nokia.helium.ccmtask.ant.commands.Reconcile;
 import com.nokia.helium.ccmtask.ant.commands.Role;
 import com.nokia.helium.ccmtask.ant.commands.Snapshot;
@@ -41,10 +45,6 @@ import com.nokia.helium.ccmtask.ant.commands.Synchronize;
 import com.nokia.helium.ccmtask.ant.commands.Update;
 import com.nokia.helium.ccmtask.ant.commands.Workarea;
 import com.nokia.helium.ccmtask.ant.types.SessionSet;
-import com.nokia.helium.ccmtask.ant.commands.CreateReleaseTag;
-import com.nokia.helium.ccmtask.ant.commands.DeleteReleaseTag;
-import org.apache.tools.ant.BuildException;
-import org.apache.tools.ant.Task;
 
 /**
  * Synergy task.
@@ -220,7 +220,6 @@ public class CcmTask extends Task
     /**
      * Returns the jar file name containing this class
      * @return a File object or null if not found.
-     * @throws IMakerException
      */
     protected File getJarFile() {
         URL url = this.getClass().getClassLoader().getResource(this.getClass().getName().replace('.', '/') + ".class");

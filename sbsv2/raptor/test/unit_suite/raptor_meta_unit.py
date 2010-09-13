@@ -40,6 +40,7 @@ class TestRaptorMeta(unittest.TestCase):
 		self.__platmacros_armv6 = "ARMCC EPOC32 MARM EABI ARMCC_2 ARMCC_2_2 GENERIC_MARM MARM_ARMV5 ARMV6"
 		self.__platmacros_armv7 = "ARMCC EPOC32 MARM EABI ARMCC_2 ARMCC_2_2 GENERIC_MARM MARM_ARMV5 ARMV7"
 		self.__platmacros_winscw = "CW32 WINS WINSCW"
+		self.__platmacros_x86gcc = "X86GCC EPOC32"
 
 		self.variant_hrh = self.__testRoot.Append('metadata/include/test_hrh.hrh')
 		
@@ -136,8 +137,21 @@ class TestRaptorMeta(unittest.TestCase):
 								 'SBS_BUILD_DIR' : str(self.__epocroot) + "/epoc32/build",
 								 'METADEPS' : [] 
 							   }
+
+		self.X86GCC          = { 'PLATFORM': 'X86',
+							     'EPOCROOT': self.__epocroot,
+							     'VARIANT_HRH': self.variant_hrh,
+							     'SYSTEMINCLUDE' : '',
+							     'id': 2,
+							     'key': '2222222222222222',
+							     'key_md5': '2222222222222222',
+							     'ISFEATUREVARIANT' : False,
+							     'PLATMACROS' : self.__platmacros_x86gcc,
+								 'SBS_BUILD_DIR' : str(self.__epocroot) + "/epoc32/build",
+								 'METADEPS' : [] 
+							   }
 				
-		self.testPlats = [self.ARMV5, self.ARMV5SMP, self.ARMV6, self.ARMV7, self.ARMV7SMP, self.WINSCW]
+		self.testPlats = [self.ARMV5, self.ARMV5SMP, self.ARMV6, self.ARMV7, self.ARMV7SMP, self.WINSCW, self.X86GCC]
 		
 		# Get the version of CPP that we are using and hope it's correct
 		# since there is no tool check.
@@ -207,9 +221,9 @@ class TestRaptorMeta(unittest.TestCase):
 		self.assertEquals(bp, aExpectedBldInfPlatforms)
 
 		buildableBldInfBuildPlatforms = raptor_meta.getBuildableBldInfBuildPlatforms(bp,
-				'ARMV5 ARMV7 WINSCW',
-				'ARMV5 ARMV5SMP ARMV7 WINSCW',
-				'ARMV5 ARMV7 WINSCW')
+				'ARMV5 ARMV7 WINSCW X86',
+				'ARMV5 ARMV5SMP ARMV7 WINSCW X86',
+				'ARMV5 ARMV7 WINSCW X86')
 		
 		for expectedBuildablePlatform in aExpectedBuildablePlatforms:
 			self.assertTrue(expectedBuildablePlatform in buildableBldInfBuildPlatforms)
@@ -222,17 +236,17 @@ class TestRaptorMeta(unittest.TestCase):
 		bldInfTestRoot = self.__testRoot.Append('metadata/project/bld.infs')
 				
 		self.__testBuildPlatforms(bldInfTestRoot, 'no_prj_platforms.inf', 
-								  [], ['ARMV7', 'ARMV5', 'WINSCW', 'GCCXML'])
+								  [], ['ARMV7', 'ARMV5', 'WINSCW', 'GCCXML', 'X86'])
 		self.__testBuildPlatforms(bldInfTestRoot, 'no_plats.inf', 
-								  [], ['ARMV7', 'ARMV5', 'WINSCW', 'GCCXML'])
+								  [], ['ARMV7', 'ARMV5', 'WINSCW', 'GCCXML', 'X86'])
 		self.__testBuildPlatforms(bldInfTestRoot, 'default_plats.inf', 
-								  ['DEFAULT'], ['ARMV7', 'ARMV5', 'WINSCW', 'GCCXML'])
+								  ['DEFAULT'], ['ARMV7', 'ARMV5', 'WINSCW', 'GCCXML', 'X86'])
 		self.__testBuildPlatforms(bldInfTestRoot, 'default_plats_minus_plat.inf', 
-								  ['DEFAULT', '-WINSCW'], ['ARMV7', 'ARMV5', 'GCCXML'])
+								  ['DEFAULT', '-WINSCW'], ['ARMV7', 'ARMV5', 'GCCXML', 'X86'])
 		self.__testBuildPlatforms(bldInfTestRoot, 'single_plat.inf', 
 								  ['ARMV5'], ['ARMV5', 'GCCXML'])
 		self.__testBuildPlatforms(bldInfTestRoot, 'multiple_plats.inf', 
-								  ['ARMV5', 'WINSCW', 'TOOLS'], ['ARMV5', 'WINSCW', 'TOOLS', 'GCCXML'])
+								  ['ARMV5', 'WINSCW', 'TOOLS', 'X86'], ['ARMV5', 'WINSCW', 'TOOLS', 'GCCXML', 'X86'])
 		return
 	
 	def __testBldInfTestCode(self, aTestRoot, aBldInf, aActual, aExpected):
@@ -686,8 +700,9 @@ class TestRaptorMeta(unittest.TestCase):
 		
 		class DefFileTest(object):
 			""" Test resolveDefFile for a particular set of mmp options """
-			def __init__(self, resolveddeffile, mmpfilename, deffilekeyword, target, nostrictdef, platform):
-				self.resolveddeffile = resolveddeffile
+			def __init__(self, primarydeffile, secondarydeffile, mmpfilename, deffilekeyword, target, nostrictdef, platform):
+				self.primarydeffile = primarydeffile
+				self.secondarydeffile = secondarydeffile
 				self.mmpfilename=mmpfilename
 				self.deffilekeyword=deffilekeyword
 				self.target=target
@@ -698,43 +713,58 @@ class TestRaptorMeta(unittest.TestCase):
 				m = raptor_meta.MMPRaptorBackend(raptor, self.mmpfilename, "")
 				m.deffile = self.deffilekeyword
 				m.nostrictdef = self.nostrictdef
-				f = m.resolveDefFile(self.target, self.platform)
+				(resolvedDefFile, isSecondaryDefFile) = m.resolveDefFile(self.target, self.platform)
 				
-				return path_compare_notdrivelettercase(self.resolveddeffile,f)
+				expectedDefFile = self.primarydeffile
+				if isSecondaryDefFile:
+					expectedDefFile = self.secondarydeffile
+				
+				return path_compare_notdrivelettercase(expectedDefFile, resolvedDefFile)
 		
 		defFileTests = []
 		
 		for testPlat in self.testPlats:			
 			epocroot = str(testPlat['EPOCROOT'])
 			releaseDir = testPlat['PLATFORM'].lower()
-			defFileDir = "eabi"
+			
+			# Some configurations support both a primary location and a secondary location for .def files
+			# In these cases, if the primary location .def file doesn't exist the secondary is used.
+			primaryDefFileDir = "eabi"
+			secondaryDefFileDir = ""
 			if testPlat['PLATFORM'] == "WINSCW":
-				defFileDir = "bwins"
-							
+				primaryDefFileDir = "bwins"
+			elif testPlat['PLATFORM'] == "X86":
+				primaryDefFileDir = "bx86gcc"
+				secondaryDefFileDir = "eabi"
+											
 			defFileTests.extend([
 				DefFileTest(
-					self.__OSRoot+'/test/'+defFileDir+'/targetu.def',
+					self.__OSRoot+'/test/'+primaryDefFileDir+'/targetu.def',
+					self.__OSRoot+'/test/'+secondaryDefFileDir+'/targetu.def',
 					'/test/component/mmpfile.mmp',
 					'',
 					'target.exe',
 					False,
 					testPlat),
 				DefFileTest(
-					self.__OSRoot+'/test/'+defFileDir+'/target.def',
+					self.__OSRoot+'/test/'+primaryDefFileDir+'/target.def',
+					self.__OSRoot+'/test/'+secondaryDefFileDir+'/target.def',
 					'/test/component/mmpfile.mmp',
 					'',
 					'target.exe',
 					True,
 					testPlat),
 				DefFileTest(
-					self.__OSRoot+'/test/'+defFileDir+'/targetu.DEF',
+					self.__OSRoot+'/test/'+primaryDefFileDir+'/targetu.DEF',
+					self.__OSRoot+'/test/'+secondaryDefFileDir+'/targetu.DEF',
 					'/test/component/mmpfile.mmp',
 					'target.DEF',
 					'target.exe',
 					False,
 					testPlat),
 				DefFileTest(
-					self.__OSRoot+'/test/'+defFileDir+'/target2.DEF',
+					self.__OSRoot+'/test/'+primaryDefFileDir+'/target2.DEF',
+					self.__OSRoot+'/test/'+secondaryDefFileDir+'/target2.DEF',
 					'/test/component/mmpfile.mmp',
 					'target2.DEF',
 					'target.exe',
@@ -742,6 +772,7 @@ class TestRaptorMeta(unittest.TestCase):
 					testPlat),
 				DefFileTest(
 					self.__OSRoot+'/test/component/target2u.DEF',
+					self.__OSRoot+'/test/'+secondaryDefFileDir+'/target2u.DEF',
 					'/test/component/mmpfile.mmp',
 					'./target2.DEF',
 					'target.exe',
@@ -749,20 +780,23 @@ class TestRaptorMeta(unittest.TestCase):
 					testPlat),
 				DefFileTest(
 					self.__OSRoot+'/test/component/target2.DEF',
+					self.__OSRoot+'/test/'+secondaryDefFileDir+'/target2.DEF',
 					'/test/component/mmpfile.mmp',
 					'./target2.DEF',
 					'target.exe',
 					True,
 					testPlat),
 				DefFileTest(
-					self.__OSRoot+'/test/component/'+defFileDir+'/target3u.DEF',
+					self.__OSRoot+'/test/component/'+primaryDefFileDir+'/target3u.DEF',
+					self.__OSRoot+'/test/component/'+secondaryDefFileDir+'/target3u.DEF',
 					'/test/component/mmpfile.mmp',
 					'./~/target3.DEF',
 					'target.exe',
 					False,
 					testPlat),
 				DefFileTest(
-					epocroot+'/epoc32/include/def/'+defFileDir+'/targetu.def',
+					epocroot+'/epoc32/include/def/'+primaryDefFileDir+'/targetu.def',
+					epocroot+'/epoc32/include/def/'+secondaryDefFileDir+'/targetu.def',
 					'/test/component/mmpfile.mmp',
 					'/epoc32/include/def/~/target.def',
 					'target.exe',
@@ -770,6 +804,7 @@ class TestRaptorMeta(unittest.TestCase):
 					testPlat),
 				DefFileTest(
 					epocroot+'/epoc32/release/'+releaseDir+'/target.def',
+					epocroot+'/epoc32/release/'+secondaryDefFileDir+'/target.def',
 					'/test/component/mmpfile.mmp',
 					'/epoc32/release/'+releaseDir+'/target.def',
 					'target.exe',
@@ -777,6 +812,7 @@ class TestRaptorMeta(unittest.TestCase):
 					testPlat),
 				DefFileTest(
 					self.__OSRoot+'/deffiles/targetu.def',
+					self.__OSRoot+'/'+secondaryDefFileDir+'/targetu.def',
 					'/test/component/mmpfile.mmp',
 					'/deffiles/target.def',
 					'target.exe',
@@ -785,7 +821,7 @@ class TestRaptorMeta(unittest.TestCase):
 				])
 		
 		for t in defFileTests:
-			result = t.test(self.raptor)
+			result = t.test(self.raptor)			
 			self.assertEquals(result, True)
 	
 	def dummyMetaReader(self):

@@ -18,10 +18,12 @@
 package com.nokia.helium.sbs.ant.taskdefs;
 
 import java.util.List;
+
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
-import com.nokia.helium.sbs.ant.types.*;
-import com.nokia.helium.sbs.ant.*;
+
+import com.nokia.helium.sbs.ant.SBSBuildList;
+import com.nokia.helium.sbs.ant.types.SBSInput;
 
 /**
  * This task provide a way to get the list of sbs command input for a particular

@@ -14,7 +14,7 @@
 
 		<set name="CC" value="$(GCCECC)"/>
 		<set name="LD" value="$(GCCELD)"/>
-		<set name="ASM" value="$(GCCEASM)"/>
+		<set name="ASM" value="$(GCCECC)"/>
 		<set name="AR" value="$(GCCEAR)"/>
 
 		<set name="AAPCS_OPTION" value="-mapcs -mthumb-interwork"/>
@@ -37,21 +37,20 @@
 		<set name="CC.SOFTVFP_MAYBE_VFPV3" value="soft"/>
 		<set name="CC_ERRORS_CONTROL_OPTION" value=""/>
 		<set name="CC_WARNINGS_CONTROL_OPTION" value="-Wall -Wno-unknown-pragmas"/>
-		<set name="CFLAGS" value=""/>
 		<set name="CIADEFS" value="__CIA__"/>
 		<set name="CODE_SEGMENT_START" value="-Ttext"/>
 		<set name="COMMANDFILE_OPTION" value="@"/>
 		<set name="COMPILE_ONLY_OPTION" value="-c"/>
-		<set name="COMPILER_CIA_FLAGS" value="-marm"/>
-		<set name="COMPILER_DEFINES" value="-D__GCCE__"/>
+		<set name="COMPILER_CIA_FLAGS" value="-marm"/>		
 		<set name="COMPILER_FPU_OPTION" value="-mfloat-abi="/>
 		<set name="COMPILER_INTERWORK_DEFINES" value="__MARM_INTERWORK__"/>
-        <set name="COMPILER_NO_HIDE_ALL_OPTION" value="-fvisibility=default"/>
+        	<set name="COMPILER_NO_HIDE_ALL_OPTION" value="-fvisibility=default"/>
 		<set name="COMPILER_SYSTEM_INCLUDE_OPTION" value="-I"/>
 		<set name="COMPILER_THUMB_DEFINES" value="__MARM_THUMB__"/>
 		<set name="CPP_LANG_OPTION" value="-x c++ -Wno-ctor-dtor-privacy"/>
 		<set name="DATA_SEGMENT_START" value="$(SPLIT_OPTION) $(RW_BASE_OPTION)"/>
 		<set name="DEBUG_OPTIMISATION" value="-O0"/>
+		<set name="DEBUGINFO_OPTIMISATION" value=""/>
 		<set name="DEPEND_OPTION" value="-MD -MF"/>
 		<set name="ENUM_OPTION" value=""/>
 		<set name="EXCEPTIONS" value="-fexceptions"/>
@@ -90,6 +89,7 @@
 		<set name="OWN_LIBRARY_OPTION" value=""/>
 		<set name="PL.SOFTVFP_MAYBE_VFPV2" value="softvfp"/>
 		<set name="PL.SOFTVFP_MAYBE_VFPV3" value="softvfp"/>
+		<set name='POSTLINKER_ASM_OPTION' value="--asm=gas"/>
 		<set name="PREINCLUDE" value="$(EPOCINCLUDE)/gcce/gcce.h"/>
 		<set name="PREINCLUDE_OPTION" value="-include"/>
 		<set name="PREPROCESSOR_OPTION" value="-E"/>

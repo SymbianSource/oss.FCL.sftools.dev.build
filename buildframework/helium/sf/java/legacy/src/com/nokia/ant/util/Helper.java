@@ -29,8 +29,9 @@ public final class Helper
     public static String getProperty(Project project, String val) throws Exception
     {
         String prop = project.getProperty(val);
-        if (prop == null)
+        if (prop == null) {
             throw new Exception(val + " not defined");
+        }
         return prop;
     }
 }

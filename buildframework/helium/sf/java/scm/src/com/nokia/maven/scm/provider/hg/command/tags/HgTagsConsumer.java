@@ -17,14 +17,14 @@
 
 package com.nokia.maven.scm.provider.hg.command.tags;
 
-import org.apache.maven.scm.provider.hg.command.HgConsumer;
-import org.apache.maven.scm.log.ScmLogger;
+import java.util.Enumeration;
+import java.util.Hashtable;
+
 import org.apache.maven.scm.ScmFileStatus;
 import org.apache.maven.scm.ScmRevision;
 import org.apache.maven.scm.ScmTag;
-
-import java.util.Enumeration;
-import java.util.Hashtable;
+import org.apache.maven.scm.log.ScmLogger;
+import org.apache.maven.scm.provider.hg.command.HgConsumer;
 
 /**
  */

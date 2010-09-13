@@ -16,8 +16,6 @@
 
 package com.nokia.helium.ant.data;
 
-import java.io.IOException;
-
 import org.dom4j.Comment;
 
 /**
@@ -25,7 +23,7 @@ import org.dom4j.Comment;
  */
 public class CommentMeta extends AntObjectMeta {
 
-    public CommentMeta(AntObjectMeta parent, Comment comment) throws IOException {
+    public CommentMeta(AntObjectMeta parent, Comment comment) {
         super(parent, comment);
     }
 

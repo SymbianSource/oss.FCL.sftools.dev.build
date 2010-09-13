@@ -67,7 +67,15 @@ Helium version ${helium.version}
         </echo>
         <runtarget target="config"/>
         <diagnostics/>
-        <hlm:database/>
+        <echo>
+            
+Java properties
+---------------
+        </echo>
+        <script language="beanshell">
+            properties = System.getProperties();
+            properties.list(System.out);
+        </script>
     </target>
     
     <!-- Sets the properties that are dependent on build.number -property. 
@@ -252,12 +260,12 @@ Helium version ${helium.version}
             </then>
         </if>
         <if>
-            <isset property="help.target"/>
+            <isset property="help.item"/>
             <then>
                 <fmpp sourcefile="${helium.dir}/tools/common/templates/help_text.txt.ftl" outputfile="build/help_text.txt" quiet="true">
                     <data expandProperties="yes">
                         xml: xml(${database.file})
-                        helpTarget: ${help.target}
+                        helpItem: ${help.item}
                     </data>
                 </fmpp>
                 <loadfile srcfile="build/help_text.txt" property="help.text"/>
@@ -333,14 +341,7 @@ hlm -Dbuild.system=ec-helium   use electric cloud build system
         
     This lists all the targets and information about them. -->
     <target name="database">
-        <mkdir dir="${basedir}/build"/>
-        <hlm:database output="${database.file}">
-            <fileset dir="${helium.dir}">
-                <include name="config/signaling_config_default.ant.xml"/>
-                <include name="config/stages_config_default.ant.xml"/>
-                <include name="config/metadata_filter_config_default.ant.xml"/>
-            </fileset>
-        </hlm:database>
+        <hlm:databaseMacro file="${database.file}" scope="private"/>
     </target>
     
     
@@ -362,26 +363,27 @@ hlm -Dbuild.system=ec-helium   use electric cloud build system
                 <exclude name="**/tests/data/**"/>
                 <exclude name="build/**"/>
             </fileset>
-            <hlm:checkTabCharacter severity="error" enabled="true"/>
-            <hlm:checkPropertyName severity="warning" enabled="true" regexp="([a-z0-9[\\d\\_\\.\\@\\{\\}\\$]]*)" />
-            <hlm:checkTargetName severity="warning" enabled="true" regexp="([a-z0-9[\\d\\-]]*)" />
-            <hlm:checkIndentation severity="error" enabled="true"/>
-            <hlm:checkPresetDefMacroDefName severity="warning" enabled="true" regexp="([a-z0-9][a-zA-Z0-9]*)" />       
-            <hlm:checkProjectName severity="warning" enabled="true" regexp="([a-z0-9[\\d\\.\\_\\-]]*)" />
-            <hlm:checkDescription severity="warning" enabled="true"/>
-            <hlm:checkFileName severity="warning" enabled="true" regexp="^build.xml$|ant.xml$|antlib.xml$" />
-            <hlm:checkRunTarget severity="warning" enabled="true"/>
-            <hlm:checkAntCall severity="warning" enabled="true"/>
-            <hlm:checkScriptSize severity="warning" enabled="true"/>
-            <hlm:checkUseOfIfInTargets severity="warning" enabled="true"/>
-            <hlm:checkJythonScript severity="error" enabled="true" outputDir="${helium.build.dir}/jep"/>
-            <hlm:checkScriptCondition severity="warning" enabled="true" outputDir="${helium.build.dir}/scriptcondition"/>
-            <hlm:checkPythonTasks severity="warning" enabled="true" outputDir="${helium.build.dir}/python"/>
-            <hlm:checkUseOfEqualsTask severity="warning" enabled="true"/>
-            <hlm:checkScriptDefNameAttributes severity="error" enabled="true"/>
-            <hlm:checkScriptDefStyle severity="warning" enabled="true"/>
-            <hlm:checkScriptDef severity="error" enabled="true" outputDir="${helium.build.dir}/beanshell"/>
-            <hlm:checkDuplicateNames severity="warning" enabled="true"/>
+            <hlm:checkTabCharacter severity="error" />
+            <hlm:checkPropertyName severity="warning" regexp="([a-z0-9[\\d\\_\\.\\@\\{\\}\\$]]*)" />
+            <hlm:checkTargetName severity="warning" regexp="([a-z0-9[\\d\\-]]*)" />
+            <hlm:checkIndentation severity="error" />
+            <hlm:checkPresetDefMacroDefName severity="warning" regexp="([a-z0-9][a-zA-Z0-9]*)" />       
+            <hlm:checkProjectName severity="warning" regexp="([a-z0-9[\\d\\.\\_\\-]]*)" />
+            <hlm:checkDescription severity="warning" />
+            <hlm:checkFileName severity="warning" regexp="^build.xml$|ant.xml$|antlib.xml$" />
+            <hlm:checkRunTarget severity="warning" />
+            <hlm:checkAntCall severity="warning" />
+            <hlm:checkScriptSize severity="warning" />
+            <hlm:checkUseOfIfInTargets severity="warning" />
+            <hlm:checkJythonScript severity="error" outputDir="${helium.build.dir}/jep"/>
+            <hlm:checkScriptCondition severity="warning" outputDir="${helium.build.dir}/scriptcondition"/>
+            <hlm:checkPythonTasks severity="warning" outputDir="${helium.build.dir}/python"/>
+            <hlm:checkUseOfEqualsTask severity="warning" />
+            <hlm:checkScriptDefNameAttributes severity="error" />
+            <hlm:checkScriptDefStyle severity="warning" />
+            <hlm:checkScriptDef severity="error" outputDir="${helium.build.dir}/beanshell"/>
+            <hlm:checkDuplicateNames severity="warning" />
+            <hlm:checkTryCatchBlock severity="warning" />
             
             <!-- Reporters -->
             <hlm:antlintCheckstyleReporter file="${helium.build.dir}/report/antlint/antlint_report.xml" />
@@ -391,9 +393,9 @@ hlm -Dbuild.system=ec-helium   use electric cloud build system
             <include name="jep/**/*.py"/>
             <include name="python/**/*.py"/>
         </fileset>
-        <antcall target="pylint" inheritRefs="true">
+        <!--<antcall target="pylint" inheritRefs="true">
             <reference refid="jep.files" torefid="python.files" />
-        </antcall>
+        </antcall>-->
         <cs:checkstyle config="builder/java/config/java_checkstyle_config.xml">
             <fileset dir="${helium.build.dir}/beanshell" includes="**/*.java"/>
             <formatter type="plain"/>
@@ -447,6 +449,14 @@ hlm -Dbuild.system=ec-helium   use electric cloud build system
     <target name="macro-test">
         <hlm:fooMacro/>
     </target>
+
+   <!--* @property hlm.final.target
+   This property defines a target that will be run after build completion, whatever the 
+   status of the build is.   
+   @type string
+   @scope public
+   @since 10.0
+   -->
 
 </project>
     

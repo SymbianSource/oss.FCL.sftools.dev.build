@@ -31,8 +31,9 @@ public class TestOSResolver extends TestCase {
 
     /**
      * Method to test getCommand.
+     * @throws CheckToolException 
      */
-    public void testGetCommand() {
+    public void testGetCommand() throws CheckToolException {
         String result = OSResolver.getCommand("test");
         String osName = System.getProperty("os.name").toLowerCase(Locale.US);
         boolean isWindows = osName.indexOf("windows") > -1;
@@ -50,7 +51,7 @@ public class TestOSResolver extends TestCase {
     /**
      * Method to test whether the given os is of Windows family or not.
      */
-    public void testIsOSWindowsFamily() {
+    public void testIsOSWindowsFamily() throws CheckToolException  {
         String osName = System.getProperty("os.name").toLowerCase(Locale.US);
         boolean isWindows = osName.indexOf("windows") > -1;
         boolean result = OSResolver.isOs("windows");
@@ -64,7 +65,7 @@ public class TestOSResolver extends TestCase {
     /**
      * Method to test whether the given os is of unix family or not.
      */
-    public void testIsOSUnixFamily() {
+    public void testIsOSUnixFamily() throws CheckToolException  {
         String osName = System.getProperty("os.name").toLowerCase(Locale.US);
         String pathSeparator = System.getProperty("path.separator");
         boolean isUnix = pathSeparator.equals(":")

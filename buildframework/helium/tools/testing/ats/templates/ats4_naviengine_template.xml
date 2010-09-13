@@ -44,7 +44,7 @@ information on the files used to create the drop file.
                 <parameter value="{{ test_plan["test_timeout"] }}" name="timeout"/>
                 <parameter value="cmd.exe" name="file"/>
                 {% for setd in test_plan.sets -%}                
-                <parameter value="/C NaviTest.bat %DEFAULT_GENERIC->NaviPowerIP% %DEFAULT_GENERIC->NaviPowerPort% %DEFAULT_GENERIC->NaviSerialPort% %TEST_RUN_SANDBOX% ATS3Drop\images\{{ os.path.basename(atsself.get_sorted_images(setd)[0]) }} c:\temp\%DEFAULT_GENERIC->name%-console.log" name="parameters"/>
+                <parameter value="/C NaviTest.bat %DEFAULT_GENERIC->NaviPowerIP% %DEFAULT_GENERIC->NaviPowerPort% %DEFAULT_GENERIC->NaviSerialPort% %TEST_RUN_SANDBOX% ATS3Drop\images\{{ os.path.basename(atsself.get_sorted_images(setd)[0]) }} c:\temp\%DEFAULT_GENERIC->name%-console.log %DEFAULT_GENERIC->NaviPowerType%" name="parameters"/>
                 {% endfor -%}
                 <parameter value="c:\temp\%DEFAULT_GENERIC->name%-console.log" name="result-file"/>
                 <parameter value="true" name="local-execute"/>

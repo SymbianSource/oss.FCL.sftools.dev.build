@@ -32,21 +32,21 @@ Description:
         <config name="minibuild_archive" abstract="true">
             <set name="archives.dir" value="${zips.build.dir}"/>
             <config>
-	            <set name="root.dir" value="${build.drive}\s60\app\organizer\clock"/>
+                <set name="root.dir" value="${build.drive}\s60\app\organizer\clock"/>
                 <set name="name" value="s60_app_organizer_clock"/>
                 <set name="include" value="**"/>
                 <set name="exclude" value="**/_ccmwaid.inf"/>
             </config>
             <!--<config>
-	            <set name="root.dir" value="${build.drive}\"/>
+                <set name="root.dir" value="${build.drive}\"/>
                 <set name="name" value="s60_app_organizer_clock_binary"/>
                 <set name="scanners" value="abld.what"/>
                 <set name="abld.buildpath" value="${build.drive}\s60\app\organizer\clock\group"/>
                 <set name="include" value="**"/>
                 <set name="exclude" value="**/_ccmwaid.inf"/>
             </config>-->
-    	</config>
+        </config>
 
-	</config>
+    </config>
 </build>
   

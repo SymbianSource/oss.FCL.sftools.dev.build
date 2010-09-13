@@ -21,9 +21,6 @@
 
 """ Generate test drop zip file for ATS3"""
 
-# pylint: disable-msg=W0142,R0912,R0201,R0915,R0913,R0904
-# pylint: disable-msg=C0302
-# pylint: disable-msg=W0404,W0603
 
 #W0142 => * and ** were used
 #C0302 => Too many lines
@@ -31,23 +28,22 @@
 #W => use of global statement
 
 import codecs
-from  xml.parsers.expat import ExpatError
+from xml.parsers.expat import ExpatError
 
 from xml.etree import ElementTree as et
 import pkg_resources
-from path import path # pylint: disable-msg=F0401
+from path import path # pylint: disable=F0401
 import logging
 import os
 import re
 import zipfile
 import amara
-import atsconfigparser
+import ats3.atsconfigparser
 
-# pylint: disable-msg=W0404
 from ntpath import sep as atssep
 import ntpath as atspath
 
-import jinja2 # pylint: disable-msg=F0401
+import jinja2 # pylint: disable=F0401
 
 _logger = logging.getLogger('ats')
 
@@ -106,7 +102,7 @@ class Ats3TestDropGenerator(object):
         
         if config_file:
             xmltext = et.tostring(xml.getroot(), "ISO-8859-1")
-            xmltext = atsconfigparser.converttestxml(config_file, xmltext)
+            xmltext = ats3.atsconfigparser.converttestxml(config_file, xmltext)
             xml = et.ElementTree(et.XML(xmltext))
             
         return self.generate_drop(test_plan, xml, output_file)
@@ -304,7 +300,7 @@ class Ats3TestDropGenerator(object):
                     SE(params, "param", engineini=path(r"c:" + os.sep + "testframework") / ini_name)            
                     
                 # if no inifile, but cfg files defined, use those
-                elif setd["config_files"]!=[]:
+                elif setd["config_files"] != []:
                     for config_file in setd["config_files"]:
                         step = SE(case, "step", 
                                   name="Execute test: %s" % config_file.name, 
@@ -444,11 +440,17 @@ class Ats3TestDropGenerator(object):
             if 'rofs3' in image_file.name:
                 sorted_images.append(image_file)
         for image_file in setd["image_files"]:
-            if 'core' not in image_file.name and 'rofs2' not in image_file.name and 'rofs3' not in image_file.name:
+            if 'core' not in image_file.name and 'rofs2' not in image_file.name and 'rofs3' not in image_file.name and 'udaerase' not in image_file.name.lower():
                 sorted_images.append(image_file)
         if len(sorted_images) > 0 and "rofs" in sorted_images[0]:
             return setd["image_files"]
         return sorted_images
+        
+    def get_udaerase_image(self, setd):
+        for image_file in setd["image_files"]:
+            if 'udaerase' in image_file.name.lower():
+                return image_file
+        return None
     
     def generate_steps(self, setd, case, test_plan):
         """Generate the test plan <step>s."""
@@ -520,7 +522,7 @@ class Ats3TestDropGenerator(object):
                 filename = file1[1]
                 filename = filename[file1[1].rfind(os.sep)+1:]
                 harness = "testexecute.exe"
-                if file1[2] == "testscript:mtf":
+                if "testscript:mtf" in file1[2]:
                     harness = "testframework.exe"
                 step = SE(case, "step", 
                               name="Execute test: %s" %  filename, harness=setd["test_harness"], 
@@ -530,12 +532,12 @@ class Ats3TestDropGenerator(object):
                 SE(params, "param", file=harness)
                 SE(params, "param", parameters=file1[1])
                 
-                if file1[2] == "testscript:mtf":
+                if "testscript:mtf" in file1[2]:
                     SE(params, "param", {'result-file': self.MTF_LOG_DIR + os.sep + filename.replace('.script', '.htm')})
                 else:
                     SE(params, "param", {'result-file': self.TEF_LOG_DIR + os.sep + filename.replace('.script', '.htm')})
                 SE(params, "param", timeout=time_out)
-                if file1[2] == "testscript:mtf":
+                if "testscript:mtf" in file1[2]:
                     SE(params, "param", parser="MTFResultParser")
                 else:
                     SE(params, "param", parser="TEFTestResultParser")
@@ -640,32 +642,42 @@ class Ats3TestDropGenerator(object):
             #for EUnit or other executables
             if sdst[2] == "testmodule":
                 eunit_exe = "EUNITEXERUNNER.EXE"
-                if re_dll.search(filename):                    
-                    step = SE(case, "step", name = "Execute test: %s" % filename, harness=setd["test_harness"],
-                              **self.defaults)
-                    SE(step, "command").text = "execute"
-                    params = SE(step, "params")
-                    SE(params, "param", file=path(r"z:" + os.sep + "sys" + os.sep + "bin") / eunit_exe)
-                    elem = SE(params, "param")
-                    elem.set('result-file', path(self.EUNIT_LOG_DIR) / no_dll_xml)
-                    SE(params, "param", parameters="%s /F %s /l xml %s" % (eunit_flags, no_dll, filename))
-                    SE(params, "param", timeout=time_out)
-            
+                # include dll file only if it has some harness defined, else skip execute step, only install                
+                if filename.lower() in setd['dll_files']:
+                    if setd['dll_files'][filename.lower()] == "":
+                        pass 
+                    else:
+                        if re_dll.search(filename):                    
+                            step = SE(case, "step", name = "Execute test: %s" % filename, harness=setd["test_harness"],
+                                      **self.defaults)
+                            SE(step, "command").text = "execute"
+                            params = SE(step, "params")
+                            SE(params, "param", file=path(r"z:" + os.sep + "sys" + os.sep + "bin") / eunit_exe)
+                            elem = SE(params, "param")
+                            elem.set('result-file', path(self.EUNIT_LOG_DIR) / no_dll_xml)
+                            SE(params, "param", parameters="%s /F %s /l xml %s" % (eunit_flags, no_dll, filename))
+                            SE(params, "param", timeout=time_out)
+                    
             #for QtTest.lib executables
             elif sdst[2] == "testmodule:qt":
-                step = SE(case, "step", name = "Execute Qt-test: %s" % filename, harness=setd["test_harness"],
-                          **self.defaults)
-                SE(step, "command").text = "execute"
-                params = SE(step, "params")
-                SE(params, "param", file=path(sdst[1]))
-                SE(params, "param", parameters=r"-lightxml -o %s\%s" % (path(self.QT_LOG_DIR),  no_dll_xml))
-                elem = SE(params, "param")
-                elem.set('result-file', path(self.QT_LOG_DIR) / no_dll_xml)
-                SE(params, "param", parser="QTestResultParser")
-                elem = SE(params, "param")
-                elem.set('delete-result',"true")
-                SE(params, "param", async="false")
-                SE(params, "param", timeout=time_out)
+                # include dll file only if it has some harness defined, else skip execute step, only install
+                if filename.lower() in setd['dll_files']:
+                    if setd['dll_files'][filename.lower()] == "":
+                        pass 
+                    else:
+                        step = SE(case, "step", name = "Execute Qt-test: %s" % filename, harness=setd["test_harness"],
+                                  **self.defaults)
+                        SE(step, "command").text = "execute"
+                        params = SE(step, "params")
+                        SE(params, "param", file=path(sdst[1]))
+                        SE(params, "param", parameters=r"-lightxml -o %s\%s" % (path(self.QT_LOG_DIR),  no_dll_xml))
+                        elem = SE(params, "param")
+                        elem.set('result-file', path(self.QT_LOG_DIR) / no_dll_xml)
+                        SE(params, "param", parser="QTestResultParser")
+                        elem = SE(params, "param")
+                        elem.set('delete-result',"true")
+                        SE(params, "param", async="false")
+                        SE(params, "param", timeout=time_out)
 
                 
 
@@ -795,7 +807,14 @@ class Ats3TestDropGenerator(object):
     def check_mtf_harness(self, _setd_):
         """check the testscript.mtf file is present"""
         for _srcdst_ in _setd_['src_dst']:
-            if _srcdst_[2] == "testscript:mtf":
+            if "testscript:mtf" in _srcdst_[2]:
+                return True
+        return False
+        
+    def check_sut_harness(self, _setd_):
+        """check the testscript.sut file is present"""
+        for _srcdst_ in _setd_['src_dst']:
+            if "testmodule:sut" in _srcdst_[2]:
                 return True
         return False
 
@@ -871,11 +890,11 @@ def insert_custom_file(xmltree, filename):
                 # clear the loop variable 
                     loop = ''
                 cust = unicode(custom_action_file.read(1))
-        except Exception, err:
+        except UnicodeError, err:
             _logger.error("Error %s in XML when prosessing %s\n" % ( err, filename))
             xmltree.append(et.Comment("Error in XML file when prosessing %s\n" % ( filename)))
 
-        if loop != '' :
+        if loop != '':
             # we should have used all the input and cleared loop variable
             _logger.warning("Issues in customization file %s in XML when prosessing issue %s \n Line and column refer to section:\n%s\n" % ( filename, err,  loop))
 
@@ -912,11 +931,13 @@ class Ats3TemplateTestDropGenerator(Ats3TestDropGenerator):
     STIF_LOG_DIR = r"c:\logs\testframework"
     TEF_LOG_DIR = r"c:\logs\testexecute"
     MTF_LOG_DIR = r"c:\logs\testresults"
+    SUT_LOG_DIR = r"c:\sut"
     STIFUNIT_LOG_DIR = r"c:\logs\testframework"
     EUNIT_LOG_DIR = r"c:\Shared\EUnit\logs"
     #QT_LOG_DIR = r"c:\private\Qt\logs"
     QT_LOG_DIR = r"c:\shared\EUnit\logs"
     CTC_LOG_DIR = r"c:\data\ctc"
+    AtsInterface_LOG_DIR = r"c:\spd_logs\xml"
 
     def stif_init_file(self, src_dst):
         """init the STIF format file"""
@@ -955,23 +976,39 @@ class Ats3TemplateTestDropGenerator(Ats3TestDropGenerator):
             drop_id = temp_drop_id
 
         return atspath.join(ats_network, "ctc_helium" , diamonds_id, drop_id, setd["name"], "ctcdata")
+    
+    def stifmodulename(self, ini_file):
+        modname = None
+        ini = open(ini_file)
+        for line in ini:
+            if line.startswith('ModuleName'):
+                modname = line.split('=')[1].strip()
+        ini.close()
+        return modname
 
-    def getlogdir(self, setd):
+    def getlogdir(self, test_plan, setd):
         """ find the logger directory"""
+        returnval = None
         if setd["test_harness"] == "STIF":
-            return self.STIF_LOG_DIR
+            if test_plan['hti'] == 'True':
+                returnval = self.STIF_LOG_DIR
+            else:
+                returnval = self.AtsInterface_LOG_DIR
         elif setd["test_harness"] == "STIFUNIT":
-            return self.STIFUNIT_LOG_DIR
+            returnval = self.STIFUNIT_LOG_DIR
         elif setd["test_harness"] == "GENERIC":
             if self.check_mtf_harness(setd):
-                return self.MTF_LOG_DIR
+                returnval = self.MTF_LOG_DIR
+            elif self.check_sut_harness(setd):
+                returnval = self.SUT_LOG_DIR
             else:
-                return self.TEF_LOG_DIR
+                returnval = self.TEF_LOG_DIR
         elif setd["test_harness"] == "EUNIT":
             if self.check_qt_harness(setd):
-                return self.QT_LOG_DIR
+                returnval = self.QT_LOG_DIR
             else:
-                return self.EUNIT_LOG_DIR
+                returnval = self.EUNIT_LOG_DIR
+        return returnval
 
     def generate_xml(self, test_plan):
         """generate the XML"""
@@ -989,7 +1026,19 @@ class Ats3TemplateTestDropGenerator(Ats3TestDropGenerator):
         if hasattr(test_plan, 'custom_template'):
             template = env.from_string(open(test_plan.custom_template).read())
         else:
-            template = env.from_string(pkg_resources.resource_string(__name__, 'ats4_template.xml'))# pylint: disable-msg=E1101
+            template = env.from_string(pkg_resources.resource_string(__name__, 'ats4_template.xml'))# pylint: disable=E1101
 
         xmltext = template.render(test_plan=test_plan, os=os, atspath=atspath, atsself=self).encode('ISO-8859-1')
         return et.ElementTree(et.XML(xmltext))
+        
+    def get_template(self, directory, template_name):
+        if directory:
+            name = os.path.join(directory, template_name)
+            if os.path.exists(name):
+                template_file = open(name)
+                contents = template_file.read()
+                template_file.close()
+                return contents
+        return ''
+    
+    

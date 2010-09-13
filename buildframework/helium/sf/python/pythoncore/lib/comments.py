@@ -87,12 +87,10 @@ class CommentParser(object):
             if COMMENT_SYMBOLS.has_key(file_type):
                 for i in range(len(COMMENT_SYMBOLS[file_type])): 
                     comment = comment.replace(COMMENT_SYMBOLS[file_type][i], "")
-            try:
-                doc.commentLog.xml_append_fragment(comment)
-                # Add a generic file attribute to the comment to label which file it comes from
-                doc.commentLog.xml_children[-1].xml_set_attribute(u'file', unicode(filename))
-            except Exception:
-                _logger.warning("A comment in '%s' is not valid XML." % filename)
+                    
+            doc.commentLog.xml_append_fragment(comment)
+            # Add a generic file attribute to the comment to label which file it comes from
+            doc.commentLog.xml_children[-1].xml_set_attribute(u'file', unicode(filename))
 
         #print doc.xml()
         return doc

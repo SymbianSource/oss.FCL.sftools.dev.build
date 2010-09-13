@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<!-- 
+============================================================================ 
+Name        : test_diamonds.ant.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test-environment" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>Helium Antlib environment unittests.</description>
+
+    <typedef resource="com/nokia/helium/environment/ant/antlib.xml" uri="http://www.nokia.com/helium" />
+    
+
+    <target name="test-environment">
+        <hlm:environment output="tools.xml">
+            <hlm:envdata>
+                <hlm:executable name="java" versionArgs="-version" versionRegex="java version &quot;(\S+)\&quot;"/>
+                <hlm:executable name="ant" versionArgs="-badarg" versionRegex="Apache Ant version (\S+)"/>
+            </hlm:envdata>
+        </hlm:environment>
+        <au:assertFileExists file="tools.xml"/>
+        <loadfile srcfile="tools.xml" property="tools.xml.text"/>
+        <au:assertMatches string="${tools.xml.text}" pattern="1\.6" multiline="true" casesensitive="false"/>
+        <au:assertMatches string="${tools.xml.text}" pattern="bin[\\/]java" multiline="true" casesensitive="false"/>
+        <au:assertMatches string="${tools.xml.text}" pattern="length&gt;\d+&lt;/length" multiline="true" casesensitive="false"/>
+        <au:assertMatches string="${tools.xml.text}" pattern="bin[\\/]ant" multiline="true" casesensitive="false"/>
+        <delete file="tools.xml"/>
+    </target>
+
+    
+</project>
+
+
+
+
+

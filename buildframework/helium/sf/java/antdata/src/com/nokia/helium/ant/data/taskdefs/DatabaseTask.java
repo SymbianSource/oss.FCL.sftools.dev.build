@@ -29,18 +29,20 @@ import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.types.FileSet;
 import org.apache.tools.ant.types.ResourceCollection;
+
 import com.nokia.helium.ant.data.Database;
 
 /**
- * Reads the current Ant project and any additional filesets and generates a xml
- * file with a summary of targets, macros and properties.
+ * Reads the current Ant project and/or Ant files and generates a XML file with a summary
+ * of targets, macros and properties.
  * 
- * @ant.task name="database"
+ * @ant.task name="database" category="Database"
  */
 public class DatabaseTask extends Task {
+    private static final String DEFAULT_SCOPE = "public";
+
     private File outputFile;
-    // private boolean excludeParsedFiles
-    private String scope = "public";
+    private String scope = DEFAULT_SCOPE;
     private boolean filesetonly;
     private List<ResourceCollection> rcs = new ArrayList<ResourceCollection>();
 
@@ -70,14 +72,13 @@ public class DatabaseTask extends Task {
     public void setOutput(File outputFile) {
         this.outputFile = outputFile;
     }
-    
-    public void setFilesetOnly(boolean f)
-    {
-        filesetonly = f; 
+
+    public void setFilesetOnly(boolean filesetonly) {
+        this.filesetonly = filesetonly;
     }
 
     /**
-     * Defines what level of visibility to display Ant objects at.
+     * Defines what level of visibility to display Ant objects at. Default value is "public".
      * 
      * @param scope The visibility level, either public, protected or private.
      */
@@ -110,10 +111,12 @@ public class DatabaseTask extends Task {
 
             // Output the database file
             Database db;
-            if (filesetonly)
+            if (filesetonly) {
                 db = new Database(null);
-            else
+            }
+            else {
                 db = new Database(getProject());
+            }
             db.setScopeFilter(scope);
             db.addAntFilePaths(antFilePaths);
             FileWriter out = new FileWriter(outputFile);

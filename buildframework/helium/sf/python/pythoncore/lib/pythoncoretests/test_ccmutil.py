@@ -46,7 +46,7 @@ class CcmUtilTest(unittest.TestCase):
         dbpath = "ccm.database.path"
         try:
             session = ccmutil.get_session(database, username, password, engine, dbpath)
-        except Exception:
+        except ccm.CCMException:
             print "Error creating session"
         assert session is None
             
@@ -60,7 +60,7 @@ class CcmUtilTest(unittest.TestCase):
         dbpath = "ccm.database.path"
         try:
             session = ccmutil.get_session(database, username, password, engine, dbpath)
-        except Exception:
+        except ccm.CCMException:
             print "Error creating session"
         assert session is None
 
@@ -72,7 +72,10 @@ class CcmUtilTest(unittest.TestCase):
         
 class MockSession(ccm.AbstractSession):
     """ Fake session used to test """
-    def __init__(self, behave = {}, username=None, password=None, engine=None, dbpath=None, database=None):
+    def __init__(self, behave=None, username=None, password=None, engine=None, dbpath=None, database=None):
+        ccm.AbstractSession.__init__(self, username, engine, dbpath, None)
+        if behave == None:
+            behave = {}
         if database == "fakedb":
             self._behave = behave
             self._database = database

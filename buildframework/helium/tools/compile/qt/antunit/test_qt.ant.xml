@@ -89,15 +89,17 @@ Description:
         <au:assertTrue message="The output file must contain helloworldapi.pro">
             <contains string="${run.qmake.out}" substring="helloworldapi.pro" />
         </au:assertTrue>
-        <au:assertTrue message="The output file must contain $${build.drive}/\sf\app\HelloWorldCons\group">
-            <contains string="${run.qmake.out}" substring="$${build.drive}/\sf\app\HelloWorldCons\group" />
+        <au:assertTrue message="The output file must contain $${build.drive}/sf/app/HelloWorldCons/group">
+            <contains string="${run.qmake.out}" substring="$${build.drive}/sf/app/HelloWorldCons/group" />
         </au:assertTrue>
-        <au:assertTrue message="The output file must contain $${build.drive}/\sf\mw\HelloWorldAPI\group">
-            <contains string="${run.qmake.out}" substring="$${build.drive}/\sf\mw\HelloWorldAPI\group" />
+        <au:assertTrue message="The output file must contain $${build.drive}/sf/mw/HelloWorldAPI/group">
+            <contains string="${run.qmake.out}" substring="$${build.drive}/sf/mw/HelloWorldAPI/group" />
         </au:assertTrue>
     </target>
     
     <target name="test-sysdef151-namespaced-qt-mk">
+        <propertyregex property="build.drive.slash" input="${build.drive}" regexp="\\" replace="/" />
+        <property name="build.drive.slash" value="${build.drive}" />
         <property name="sysdef.configuration" value="demo" />
         <fmpp sourceFile="${helium.dir}/tools/compile/qt/templates/run-qmake.mk.ftl"
            outputFile="${qt.temp.dir}/run-qmake151.mk">
@@ -117,15 +119,17 @@ Description:
         <au:assertTrue message="The output file must contain helloworldapi.pro">
             <contains string="${run.qmake.out}" substring="helloworldapi.pro" />
         </au:assertTrue>
-        <au:assertTrue message="The output file must contain -@cd /\sf\mw\HelloWorldAPI\group &amp;&amp; qmake -listgen -nomoc helloworldapi.pro">
-            <contains string="${run.qmake.out}" substring="-@cd /\sf\mw\HelloWorldAPI\group &amp;&amp; qmake -listgen -nomoc helloworldapi.pro" />
+        <au:assertTrue message="The output file must contain -@cd ${build.drive.slash}/sf/mw/HelloWorldAPI/group &amp;&amp; qmake -listgen -nomoc helloworldapi.pro">
+            <contains string="${run.qmake.out}" substring="-@cd ${build.drive.slash}/sf/mw/HelloWorldAPI/group &amp;&amp; qmake -listgen -nomoc helloworldapi.pro" />
         </au:assertTrue>
-        <au:assertTrue message="The output file must contain -@cd /\sf\app\HelloWorldCons\group &amp;&amp; qmake -listgen -r helloworld.pro">
-            <contains string="${run.qmake.out}" substring="-@cd /\sf\app\HelloWorldCons\group &amp;&amp; qmake -listgen -r helloworld.pro" />
+        <au:assertTrue message="The output file must contain -@cd ${build.drive.slash}/sf/app/HelloWorldCons/group &amp;&amp; qmake -listgen -r helloworld.pro">
+            <contains string="${run.qmake.out}" substring="-@cd ${build.drive.slash}/sf/app/HelloWorldCons/group &amp;&amp; qmake -listgen -r helloworld.pro" />
         </au:assertTrue>
     </target>
 
     <target name="test-sysdef3-namespaced-qt-mk">
+        <propertyregex property="build.drive.slash" input="${build.drive}" regexp="\\" replace="/" global="true" />
+        <property name="build.drive.slash" value="${build.drive}" />
         <property name="sysdef.configuration" value="demo" />
         <fmpp sourceFile="${helium.dir}/tools/compile/qt/templates/run-qmake.mk.ftl"
            outputFile="${qt.temp.dir}/run-qmake3.mk">
@@ -135,7 +139,7 @@ Description:
             </data>
         </fmpp>
         <au:assertFileExists file="${qt.temp.dir}/run-qmake3.mk" />
-        <loadfile property="run.qmake.out" srcfile="${qt.temp.dir}/run-qmake151.mk" />
+        <loadfile property="run.qmake.out" srcfile="${qt.temp.dir}/run-qmake3.mk" />
         <au:assertTrue message="The output file must contain the -nomoc argument.">
             <contains string="${run.qmake.out}" substring="-nomoc" />
         </au:assertTrue>
@@ -145,11 +149,11 @@ Description:
         <au:assertTrue message="The output file must contain helloworldapi.pro">
             <contains string="${run.qmake.out}" substring="helloworldapi.pro" />
         </au:assertTrue>
-        <au:assertTrue message="The output file must contain -@cd /\sf\mw\HelloWorldAPI\group &amp;&amp; qmake -listgen -nomoc helloworldapi.pro">
-            <contains string="${run.qmake.out}" substring="-@cd /\sf\mw\HelloWorldAPI\group &amp;&amp; qmake -listgen -nomoc helloworldapi.pro" />
+        <au:assertTrue message="The output file must contain -@cd ${build.drive.slash}/sf/mw/helloworldapi/group &amp;&amp; qmake -listgen -nomoc helloworldapi.pro">
+            <contains string="${run.qmake.out}" substring="-@cd ${build.drive.slash}/sf/mw/helloworldapi/group &amp;&amp; qmake -listgen -nomoc helloworldapi.pro" />
         </au:assertTrue>
-        <au:assertTrue message="The output file must contain -@cd /\sf\app\HelloWorldCons\group &amp;&amp; qmake -listgen -r helloworld.pro">
-            <contains string="${run.qmake.out}" substring="-@cd /\sf\app\HelloWorldCons\group &amp;&amp; qmake -listgen -r helloworld.pro" />
+        <au:assertTrue message="The output file must contain -@cd ${build.drive.slash}/sf/app/helloworldcons/group &amp;&amp; qmake -listgen -r helloworld.pro">
+            <contains string="${run.qmake.out}" substring="-@cd ${build.drive.slash}/sf/app/helloworldcons/group &amp;&amp; qmake -listgen -r helloworld.pro" />
         </au:assertTrue>
     </target>
 </project>

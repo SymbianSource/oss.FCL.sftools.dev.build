@@ -18,24 +18,29 @@ Contributors:
 Description:
 
 ============================================================================
---> 
-<#list xml["//target[name='${helpTarget}']"] as target>
+-->
+<#assign itemList = xml["//*[name='${helpItem}']"]/>
+<#if itemList?size &gt; 0>
+<#list itemList as item>
 
-Target ${target.name}:
+${item.name}
 -----------------------------
-Location: ${target.location}
+Location: ${item.location}
 
-<#if target.description?length &gt; 0>
+<#if (item.description)?has_content>
 Description:
-${target.description}
+${item.description}
 </#if>
-Documentation:<#recurse target.documentation>
+Documentation:<#recurse item.documentation>
 
-Property dependencies:
-<#list target.propertyDependency as property>
-* ${property}
 </#list>
-</#list>
+
+<#else>
+
+${helpItem}
+Documentation not found.
+</#if>
+
 
 <#macro tt> "<#recurse>" </#macro>
 
@@ -50,7 +55,12 @@ Property dependencies:
 <#macro li> * <#recurse>
 </#macro>
 
-<#macro b><#recurse>*</#macro>
+<#macro b><#recurse></#macro>
 
 <#macro @text>${.node?trim}</#macro>
+
+<#macro pre>
+
+
+    <#recurse></#macro>
 

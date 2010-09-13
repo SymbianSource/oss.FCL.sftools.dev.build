@@ -30,8 +30,8 @@ import symrec
 
 # Uncomment this line to enable logging in this module, or configure logging elsewhere
 _logger = logging.getLogger("bom")
-#_logger.setLevel(logging.DEBUG)
-logging.basicConfig(level=logging.DEBUG)
+_logger.setLevel(logging.INFO)
+#logging.basicConfig(level=logging.DEBUG)
 
 
 class SessionCreator(object):
@@ -63,7 +63,7 @@ class BOM(object):
         self.config = config
         self.build = ""
         self._projects = []
-        self._icd_icfs = []
+        self.icd_icfs = []
         self._flags = []
         
         self._capture_icd_icfs()
@@ -95,8 +95,8 @@ class BOM(object):
                                                 if file_.endswith(exclude):
                                                     excluded = True
                                             if file_.endswith('.zip') and not excluded:
-                                                self._icd_icfs.append(file_)
-                                                self._icd_icfs.sort(key=str)
+                                                self.icd_icfs.append(file_)
+                                                self.icd_icfs.sort(key=str)
         
     def _capture_flags(self):
         """capture flags"""
@@ -414,16 +414,6 @@ class Task(object):
     def __str__(self):
         """ String representation. """
         return str(self.ccm_task)
-        
-        
-class ICD_ICF(object):
-    """ A ICD or ICF patch zip file provided by Symbian. """
-    pass
-
-
-class Flag(object):
-    """ A compilation flag. """
-    pass
     
 
 class BOMDeltaXMLWriter(object):
@@ -439,7 +429,7 @@ class BOMDeltaXMLWriter(object):
         """ Write the BOM delta information to an XML file. """
         bom_log = amara.parse(open(self._bom_log, 'r'))
         doc = amara.create_document(u'bomDelta')
-        # pylint: disable-msg=E1101
+        # pylint: disable=E1101
         doc.bomDelta.xml_append(doc.xml_create_element(u'buildFrom', content=unicode(bom_log.bom.build)))
         doc.bomDelta.xml_append(doc.xml_create_element(u'buildTo', content=unicode(self._bom.config['build.id'])))
         content_node = doc.xml_create_element(u'content')
@@ -601,7 +591,7 @@ class BOMXMLWriter(object):
     def write(self, path):
         """ Write the BOM information to an XML file. """
         doc = amara.create_document(u'bom')
-        # pylint: disable-msg=E1101
+        # pylint: disable=E1101
         doc.bom.xml_append(doc.xml_create_element(u'build', content=unicode(self._bom.config['build.id'])))
         doc.bom.xml_append(doc.xml_create_element(u'content'))
         for project in self._bom.projects:
@@ -639,7 +629,7 @@ class BOMXMLWriter(object):
                     fix_node = doc.xml_create_element(u'fix', content=(unicode(task)), attributes = {u'type': unicode(fix.__class__.__name__)})
                     project_node.xml_append(fix_node)
 
-        if self._bom._icd_icfs != []:
+        if self._bom.icd_icfs != []:
             # Add ICD info to BOM
             doc.bom.content.xml_append(doc.xml_create_element(u'input'))
     
@@ -653,12 +643,14 @@ class BOMXMLWriter(object):
     
             doc.bom.content.input.xml_append(doc.xml_create_element(u'icds'))
 
-        # pylint: disable-msg=R0914
-        for i, icd in enumerate(self._bom._icd_icfs):
+        # pylint: disable=R0914
+        for i, icd in enumerate(self._bom.icd_icfs):
             doc.bom.content.input.icds.xml_append(doc.xml_create_element(u'icd'))
             doc.bom.content.input.icds.icd[i].xml_append(doc.xml_create_element(u'name', content=(unicode(icd))))
         #If currentRelease.xml exists then send s60 <input> tag to diamonds
         current_release_xml_path = self._bom.config['currentRelease.xml']
+        # data from the metadata will go first as they must be safer than the one
+        # given by the user 
         if current_release_xml_path is not None and os.path.exists(current_release_xml_path):
             metadata = symrec.ReleaseMetadata(current_release_xml_path)
             service = metadata.service
@@ -666,32 +658,80 @@ class BOMXMLWriter(object):
             release = metadata.release
             # Get name, year, week and version from baseline configuration
             s60_input_node = doc.xml_create_element(u'input')
-            s60_version = self._bom.config['s60_version']
-            s60_release = self._bom.config['s60_release']
-            if s60_version != None:
-                s60_year = s60_version[0:4]
-                s60_week = s60_version[4:]
+            s60_type = u's60'
+            s60_year = u'0'
+            s60_week = u'0'
+            s60_release = u''
+            # Using regular expression in first place
+            regexp = r'(?P<TYPE>.*)_(?P<YEAR>\d{4})(?P<WEEK>\d{2})_(?P<REVISION>.*)'            
+            if self._bom.config['release_regexp']:
+                if '?P<TYPE>' not in self._bom.config['release_regexp']:
+                    _logger.error('Missing TYPE in: %s' % str(self._bom.config['release_regexp']))
+                    _logger.info('Using default regular expression: %s' % regexp)
+                elif '?P<YEAR>' not in self._bom.config['release_regexp']:
+                    _logger.error('Missing YEAR in: %s' % str(self._bom.config['release_regexp']))
+                    _logger.info('Using default regular expression: %s' % regexp)
+                elif '?P<WEEK>' not in self._bom.config['release_regexp']:
+                    _logger.error('Missing WEEK in: %s' % str(self._bom.config['release_regexp']))
+                    _logger.info('Using default regular expression: %s' % regexp)
+                elif '?P<REVISION>' not in self._bom.config['release_regexp']:
+                    _logger.error('Missing REVISION in: %s' % str(self._bom.config['release_regexp']))
+                    _logger.info('Using default regular expression: %s' % regexp)
+                else:
+                    _logger.info('Using custom regular expression to capture the baseline release information: %s'
+                                  % str(self._bom.config['release_regexp']))
+                    regexp = self._bom.config['release_regexp']                
+            res = re.match(regexp, release)            
+            if res != None:
+                s60_type = res.group('TYPE')
+                s60_release = res.group('TYPE') + '_' + res.group('REVISION')
+                s60_year = res.group('YEAR')
+                s60_week = res.group('WEEK')
             else:
-                s60_year = u'0'
-                s60_week = u'0'
-                if s60_version == None:
-                    res = re.match(r'(.*)_(\d{4})(\d{2})_(.*)', release)
-                    if res != None:
-                        s60_release = res.group(1) + '_' + res.group(4)
-                        s60_year = res.group(2)
-                        s60_week = res.group(3)
-            s60_input_node.xml_append(doc.xml_create_element(u'name', content=(unicode("s60"))))
+                _logger.warning("Regular expression '%s' is not matching '%s'." % (regexp, release))
+                if self._bom.config['s60_version'] != None:
+                    # last resorts if it doesn't matches
+                    _logger.warning("Falling back on s60.version and s60.release to determine input.")
+                    s60_version = self._bom.config['s60_version']
+                    s60_year = s60_version[0:4]
+                    s60_week = s60_version[4:]
+                    if self._bom.config['s60_release']:
+                        s60_release = self._bom.config['s60_release']
+
+            s60_input_node.xml_append(doc.xml_create_element(u'name', content=(unicode(s60_type))))
             s60_input_node.xml_append(doc.xml_create_element(u'year', content=(unicode(s60_year))))
             s60_input_node.xml_append(doc.xml_create_element(u'week', content=(unicode(s60_week))))
             s60_input_node.xml_append(doc.xml_create_element(u'version', content=(unicode(s60_release))))
 
             s60_input_source = s60_input_node.xml_create_element(u'source')
-            s60_input_source.xml_append(doc.xml_create_element(u'type', content=(unicode("grace"))))
+            s60_input_source.xml_append(doc.xml_create_element(u'type', content=(unicode("hydra"))))
             s60_input_source.xml_append(doc.xml_create_element(u'service', content=(unicode(service))))
             s60_input_source.xml_append(doc.xml_create_element(u'product', content=(unicode(product))))
             s60_input_source.xml_append(doc.xml_create_element(u'release', content=(unicode(release))))
             s60_input_node.xml_append(s60_input_source)
             doc.bom.content.xml_append(s60_input_node)
+        elif self._bom.config['s60_version'] and self._bom.config['s60_release']:
+            _logger.info("currentRelease.xml not defined, falling back on s60.version and s60.release to determine input.")
+            s60_type = u's60'
+            s60_version = self._bom.config['s60_version']
+            s60_year = u'0'
+            s60_week = u'0'
+            if len(s60_version) > 6:
+                s60_year = s60_version[0:4]
+                s60_week = s60_version[4:]
+            s60_release = self._bom.config['s60_release']
+            s60_input_node = doc.xml_create_element(u'input')
+            s60_input_node.xml_append(doc.xml_create_element(u'name', content=(unicode(s60_type))))
+            s60_input_node.xml_append(doc.xml_create_element(u'year', content=(unicode(s60_year))))
+            s60_input_node.xml_append(doc.xml_create_element(u'week', content=(unicode(s60_week))))
+            s60_input_node.xml_append(doc.xml_create_element(u'version', content=(unicode(s60_release))))
+
+            s60_input_source = s60_input_node.xml_create_element(u'source')
+            s60_input_source.xml_append(doc.xml_create_element(u'type', content=(unicode("unknown"))))
+            s60_input_node.xml_append(s60_input_source)
+            doc.bom.content.xml_append(s60_input_node)
+            
+            
         out = open(path, 'w')
         doc.xml(out, indent='yes')
         out.close()

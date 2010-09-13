@@ -87,6 +87,7 @@ Diamonds logging
 * Can upload distribution policy file related errors like missing, invalid encoding and error type A, B, C.
 * Can upload List of Illegal APIs names if disable.analysis.tool is not set.
 * Can upload custom build tags.
+* Can upload confml problems.
 * Logging can be skipped if desired.
 
 
@@ -206,6 +207,7 @@ Quality assurance
 * Build duplicates detection.
 * Internal exports detection.
 * Codescanner task.
+* Validate the confml files using ConE tool.
 
 .. index::
   single: feature - Publishing

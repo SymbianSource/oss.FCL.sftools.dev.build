@@ -16,13 +16,13 @@
 */
 package com.nokia.helium.imaker.tests;
 
+import static org.junit.Assert.assertArrayEquals;
+
 import java.io.File;
 
-import org.junit.*;
+import org.junit.Test;
 
 import com.nokia.helium.imaker.HelpConfigStreamConsumer;
-
-import static org.junit.Assert.*;
 
 /**
  * Test the HelpTargetStreamConsumer.

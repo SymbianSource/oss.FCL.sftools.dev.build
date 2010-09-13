@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2009-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -26,8 +26,8 @@ def run():
 		"$(EPOCROOT)/epoc32/release/winscw/udeb/simple_implib.lib"
 		]
 	t.addbuildtargets('smoke_suite/test_resources/simple_implib/bld.inf', [
-		["simple_implib/simple_implib_lib/winscw/udeb/simple_implib.prep.def",
-		"simple_implib/simple_implib_lib/winscw/urel/simple_implib.prep.def"]
+		["simple_implib_lib/winscw/udeb/simple_implib.prep.def",
+		"simple_implib_lib/winscw/urel/simple_implib.prep.def"]
 	])
 	t.run()
 	return t

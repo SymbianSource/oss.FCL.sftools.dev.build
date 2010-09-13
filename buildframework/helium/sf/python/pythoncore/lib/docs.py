@@ -35,7 +35,7 @@ def find_python_dependencies(setpath, _, dbPrj):
                 filePath = os.path.abspath(os.path.join(root, fname))
                 with open(filePath) as f_file:
                     filePathAmara = 'file:///'+ filePath.replace('\\','/')
-                    curPrj=amara.parse(filePathAmara)
+                    curPrj = amara.parse(filePathAmara)
                     for line in f_file:
                         linePattern = re.compile('^import')
                         lineMatch = linePattern.search(line)
@@ -47,7 +47,7 @@ def find_python_dependencies(setpath, _, dbPrj):
                                 try:
                                     importModule = __import__(curModule)
                                     if hasattr(importModule, '__file__'):
-                                        modulePath=importModule.__file__
+                                        modulePath = importModule.__file__
                                         if 'helium' in modulePath:
                                             for projectList in dbPrj.antDatabase.project:
                                                 if (projectList.name == curPrj.project.name):

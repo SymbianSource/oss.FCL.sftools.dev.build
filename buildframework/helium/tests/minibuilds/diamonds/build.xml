@@ -20,10 +20,10 @@ Description:
 
 ============================================================================
 -->
-<project name="minibuild.diamonds" default="mini-build" xmlns:au="org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium" basedir=".">
+<project name="minibuild.diamonds" default="minibuild" xmlns:au="org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium" basedir=".">
     <property environment="env"/>
     
-	<dirname property="config.dir" file="${ant.file.minibuild.diamonds}"/>
+    <dirname property="config.dir" file="${ant.file.minibuild.diamonds}"/>
 
     <!-- Enable Helium internal assertion checking. -->
     <property name="hlm.enable.asserts" value="1" />
@@ -36,8 +36,8 @@ Description:
     
     <import file="${helium.dir}/helium.ant.xml"/>
         
-    <!--ant code coverage for mini-builds-->
-    <target name="mini-build" depends="prep-drive,init-build-area,diamonds,prebuild,compile-main"/>
+    <!--ant code coverage for minibuilds-->
+    <target name="minibuild" depends="prep-drive,init-build-area,diamonds,prebuild,compile-main,final"/>
 
     
     <!-- Stubbing few targets for easy testing with dragonfly ... -->
@@ -51,6 +51,6 @@ Description:
     </target>
     <target name="check-env-prep"/>
     <target name="prep-copy"/>
-	
+    
 </project>
 

@@ -60,9 +60,10 @@ public class CheckinAction extends BaseDirectoryScmAction {
     public void execute(ScmRepository repository) throws ScmException {
         ScmManager scmManager = getTask().getScmManager();
 
-        if (message == null)
+        if (message == null) {
             throw new BuildException(
                     "'message attribute has not been defined.'");
+        }
 
         CheckInScmResult result;
         try {

@@ -76,32 +76,45 @@ Description:
     <import file="${project.dir}/sbs_default_config.ant.xml" />
 
     <target name="test-7952">
+        <echo message="-----------test-7952-----------" />
         <hlm:getsbsinputs config="pf_7952" outputProperty="sbs-inputs"/>
         <hlm:sbstask outputLog="tmp" sbsinput="${sbs-inputs}" sysdefFile="../data/test.sysdef.xml" 
             workingDir="${working.dir}" execute="false"/>
+        <au:assertLogContains text="-e emake" />
     </target>
 
     <target name="test-without-sysdef">
         <property name="build.system" value="sbs" />
-        <au:expectfailure>
-            <hlm:getsbsinputs config="pf_7952" outputProperty="sbs-inputs"/>
+        <hlm:getsbsinputs config="pf_7952" outputProperty="sbs-inputs"/>
+       <au:expectfailure expectedMessage="'System Definition' file is missing" >
             <hlm:sbstask outputLog="tmp" sbsinput="pf_7952" workingDir="${working.dir}" execute="false"/>
         </au:expectfailure>
     </target>
 
     <target name="test-without-working-dir">
         <property name="build.system" value="sbs" />
-        <au:expectfailure>
-            <hlm:getsbsinputs config="pf_7952" outputProperty="sbs-inputs"/>
+        <hlm:getsbsinputs config="pf_7952" outputProperty="sbs-inputs"/>
+        <au:expectfailure expectedMessage="'workingDir' must be set" >
             <hlm:sbstask outputLog="tmp" sbsinput="${sbs-inputs}" sysdefFile="../data/test.sysdef.xml" execute="false" />
         </au:expectfailure>
     </target>
 
     <target name="test-sbs">
         <property name="build.system" value="sbs" />
-        <hlm:getsbsinputs config="pf_7952" outputProperty="sbs-inputs"/>
+        <hlm:getsbsinputs config="sf_build" outputProperty="sbs-inputs"/>
         <hlm:sbstask outputLog="tmp" sbsinput="${sbs-inputs}" sysdefFile="../data/test.sysdef.xml" 
             workingDir="${working.dir}" execute="false"/>
+        <au:expectfailure>
+            <au:assertLogContains text="-e emake" />
+        </au:expectfailure>    
+    </target>
+    
+    <target name="test-tools-sbs">
+        <property name="build.system" value="sbs" />
+        <hlm:getsbsinputs config="sf_build2" outputProperty="sbs-inputs"/>
+        <hlm:sbstask outputLog="tmp" sbsinput="${sbs-inputs}" sysdefFile="../data/test.sysdef.xml" 
+            workingDir="${working.dir}" execute="false"/>
+        <au:assertLogContains text="-c tools" />
     </target>
 
     <target name="test-sbs-ec">
@@ -109,6 +122,7 @@ Description:
         <hlm:getsbsinputs config="pf_7952" outputProperty="sbs-inputs"/>
         <hlm:sbstask outputLog="tmp" sbsinput="${sbs-inputs}" sysdefFile="../data/test.sysdef.xml" 
             workingDir="${working.dir}" execute="false"/>
+        <au:assertLogContains text="-e emake" />
     </target>
 
     <target name="test-all-layers">
@@ -116,15 +130,17 @@ Description:
         <hlm:getsbsinputs config="pf_7952" outputProperty="sbs-inputs"/>
         <hlm:sbstask outputLog="tmp" sbsinput="${sbs-inputs}" sysdefFile="../data/test.sysdef.xml" 
             workingDir="${working.dir}" execute="false"/>
+        <au:assertLogContains text="test.sysdef.xml" />
     </target>
 
     <target name="test-include-layers">
         <property name="build.system" value="sbs" />
         <hlm:getsbsinputs config="pf_7952" outputProperty="sbs-inputs"/>
         <hlm:sbstask outputLog="tmp" sbsinput="${sbs-inputs}" sysdefFile="../data/test.sysdef.xml" 
-            layerPatternSetRef="includeLayerPatternSet" workingDir="${working.dir}"
+            layerPatternSetRef="includeLayerPatternSet" workingDir="${working.dir}" 
             execute="false"/>
         <au:assertLogContains text="sbs" />
+        <au:assertLogContains text="-l include_layer_set" />
         <au:expectfailure>
             <au:assertLogContains text="-l exclude_layer_set" />
         </au:expectfailure>
@@ -142,6 +158,9 @@ Description:
         <hlm:sbstask outputLog="tmp" sbsinput="${sbs-inputs}" sysdefFile="../data/test.sysdef.xml" 
             layerPatternSetRef="excludeLayerPatternSet" 
             workingDir="${working.dir}" execute="false"/>
+        <au:expectfailure>
+            <au:assertLogContains text="-l exclude_layer_set" />
+        </au:expectfailure>
         <au:assertLogContains text="-l include_layer_set" />
         <au:assertLogContains text="-l include_exclude_matcher" />
         <au:assertLogContains text="-l include_exclude_non-matcher" />
@@ -185,15 +204,15 @@ Description:
         <property name="build.system" value="sbs" />
         <hlm:getsbsinputs config="pf_7952" outputProperty="sbs-inputs"/>
         <hlm:sbstask outputLog="tmp" sbsinput="${sbs-inputs}" sysdefFile="../data/test.sysdef.xml" 
-            layerPatternSetRef="incExcludeLayerPatternSet" 
+            layerPatternSetRef="incExcludeLayerPatternSet"
             workingDir="${working.dir}" execute="false"/>
         <au:assertLogContains text="-l include_exclude_matcher" />
     </target>
 
     <target name="test-empty-pattern-set">
         <property name="build.system" value="sbs-ec" />
-        <au:expectfailure>
-            <hlm:getsbsinputs config="pf_7952" outputProperty="sbs-inputs"/>
+        <hlm:getsbsinputs config="pf_7952" outputProperty="sbs-inputs"/>
+	    <au:expectfailure expectedMessage="sbstask doesn't support" > 
             <hlm:sbstask outputLog="tmp" config="${sbs-inputs}" sysdefFile="../data/test.sysdef.xml" 
                 layerPatternSetRef="emptySet" 
                 workingDir="${working.dir}" execute="false"/>
@@ -202,8 +221,8 @@ Description:
 
     <target name="test-engine-inheritence1">
         <property name="build.system" value="sbs-ec" />
-        <au:expectfailure>
-            <hlm:getsbsinputs config="inherit1" outputProperty="sbs-inputs"/>
+        <hlm:getsbsinputs config="inherit1" outputProperty="sbs-inputs"/>
+	    <au:expectfailure expectedMessage="engine should not be null" > 
             <hlm:sbstask outputLog="tmp" sbsinput="${sbs-inputs}" sysdefFile="../data/test.sysdef.xml" 
                 workingDir="${working.dir}" execute="false"/>
         </au:expectfailure>
@@ -218,8 +237,8 @@ Description:
 
     <target name="test-engine-inheritence3">
         <property name="build.system" value="sbs-ec" />
-        <au:expectfailure>
-            <hlm:getsbsinputs config="inherit3" outputProperty="sbs-inputs"/>
+        <hlm:getsbsinputs config="inherit3" outputProperty="sbs-inputs"/>
+        <au:expectfailure expectedMessage="Config's engine type ec-helium not matching" >
             <hlm:sbstask outputLog="tmp" sbsinput="${sbs-inputs}" sysdefFile="../data/test.sysdef.xml" 
                 workingDir="${working.dir}" execute="false"/>
         </au:expectfailure>
@@ -241,6 +260,7 @@ Description:
             <hlm:sbsinput refid="${sbs-inputs}" />
         </hlm:getVariableValue>
         <echo message="${sbs-inputs}" />
+        <au:assertLogContains text="inherit3_sbs_input" />
     </target>
 
     <target name="test-include-def-layer">
@@ -250,6 +270,7 @@ Description:
             layerPatternSetRef="includeDefLayerPatternSet" workingDir="${working.dir}"
             execute="false"/>
         <au:assertLogContains text="sbs" />
+        <au:assertLogContains text="-l use_layer_real_Def_layer" />
     </target>
 
     <target name="test-include-error-layer">
@@ -261,7 +282,6 @@ Description:
         <au:assertLogContains text="-l use_no_name_layer" />
     </target>
 
-    
     <target name="test-include-no-layer">
         <property name="build.system" value="sbs" />
         <hlm:getsbsinputs config="pf_7952" outputProperty="sbs-inputs"/>

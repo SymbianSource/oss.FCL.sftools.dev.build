@@ -38,18 +38,18 @@ DEFAULT_NEWLIB:=$(DEFAULT_SYMBIAN_NEWLIB)
 
 
 # Reset these variables as they change for every single target type
-# LINKER_ENTRYPOINT_ADORNMENT will be blank for GCCE; for RVCT it will look like "(uc_exe_.o)"
-# LINKER_ENTRYPOINT_DECORATION will be blank for RVCT; for GCCE it will look like "-u _E32Startup"
-# LINKER_SEPARATOR is a comma for GCCE as g++ is used for linking; for RVCT is should be a space, but
+# LINKER_ENTRYPOINT_ADORNMENT will be blank for GCC; for RVCT it will look like "(uc_exe_.o)"
+# LINKER_ENTRYPOINT_DECORATION will be blank for RVCT; for GCC it will look like "-u _E32Startup"
+# LINKER_SEPARATOR is a comma for GCC as g++ is used for linking; for RVCT is should be a space, but
 # as make strips trailing spaces, we use the CHAR_SPACE variable.
 
 LINKER_ENTRYPOINT_ADORNMENT:=
 LINKER_ENTRYPOINT_DECORATION:=
 LINKER_SEPARATOR:=
 
-# For GCCE
-ifeq ($(TOOLCHAIN),GCCE)
-LINKER_ENTRYPOINT_DECORATION:=$(if $(call isoneof,$(TARGETTYPE),exexp exe),-Wl$(CHAR_COMMA)-u$(CHAR_COMMA)_E32Startup,-Wl$(CHAR_COMMA)-u$(CHAR_COMMA)_E32Dll)
+# For GCC
+ifneq ($(findstring GCC,$(TOOLCHAIN)),)
+LINKER_ENTRYPOINT_DECORATION:=$(if $(call isoneof,$(TARGETTYPE),exexp exe),-Wl$(CHAR_COMMA)-u$(CHAR_COMMA)$(LINKER_ENTRYPOINT_PREFIX)$(ENTRYPOINT),-Wl$(CHAR_COMMA)-u$(CHAR_COMMA)$(LINKER_ENTRYPOINT_PREFIX)$(ENTRYPOINT))
 LINKER_SEPARATOR:=$(CHAR_COMMA)
 endif
 
@@ -96,7 +96,7 @@ ifeq ($(TOOLCHAIN),RVCT)
 endif
 
 # "ARMFPU" overrides for 'fpu-ness' in compiler and postlinker calls in .mmp files are currently only
-# supported for RVCT-based builds, GCCE builds always make use of the interface defined defaults.
-ifeq ($(TOOLCHAIN),GCCE)
+# supported for RVCT-based builds, other builds always make use of the interface defined defaults.
+ifneq ($(TOOLCHAIN),RVCT)
   ARMFPU:=
 endif

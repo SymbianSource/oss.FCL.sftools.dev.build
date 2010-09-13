@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : egg-extract.ant.xml
+Part of     : Helium
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="egg-extract" xmlns:ac="antlib:net.sf.antcontrib">
+
+    <target name="egg-extract">
+        <ac:if>
+            <matches string="${dep.to}" pattern="^.*\.egg$" casesensitive="false" singleline="true"/>
+            <then>  
+                <ac:if>
+                    <resourcecount when="eq" count="1">
+                        <zipfileset src="${dep.to}" includes="EGG-INFO/not-zip-safe" />
+                    </resourcecount>
+                    <then>
+                        <basename property="filename" file="${dep.to}" />
+                        <dirname property="dir" file="${dep.to}" />
+                        <mkdir dir="${dir}/../zipnotsafe/${filename}" />
+                        <unzip src="${dep.to}" dest="${dir}/../zipnotsafe/${filename}" />
+                        <delete file="${dep.to}" /> 
+                    </then>
+                </ac:if>
+            </then>
+        </ac:if>
+    </target>
+
+</project>

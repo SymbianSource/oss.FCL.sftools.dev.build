@@ -21,7 +21,7 @@ package com.nokia.helium.checktools;
  * failure occurred during checking of tools required by the Helium.
  * 
  */
-public class CheckToolException extends RuntimeException {
+public class CheckToolException extends Exception {
 
     private static final long serialVersionUID = 1L;
 

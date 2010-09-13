@@ -31,11 +31,13 @@ public class RootAntObjectMeta extends AntObjectMeta {
     static final String DEFAULT_PACKAGE = "(default)";
 
     private AntFile antFile;
+    private String filepath;
     private String scopeFilter;
 
     public RootAntObjectMeta(AntFile antFile, Element node) throws IOException {
         super(null, node);
         this.antFile = antFile;
+        this.filepath = antFile.getFile().getCanonicalPath();
     }
 
     public String getPackage() {
@@ -48,6 +50,15 @@ public class RootAntObjectMeta extends AntObjectMeta {
 
     public AntFile getAntFile() {
         return antFile;
+    }
+    
+    /**
+     * Returns the location path of the object.
+     * 
+     * @return Location path string.
+     */
+    public String getFilePath() {
+        return filepath;
     }
 
     public void setScopeFilter(String scopeFilter) {
@@ -76,3 +87,5 @@ public class RootAntObjectMeta extends AntObjectMeta {
         return objects;
     }
 }
+
+

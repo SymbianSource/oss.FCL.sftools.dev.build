@@ -21,7 +21,7 @@ Description:
 ============================================================================
 -->
 <!--* @package testing -->
-<project name="_testing.eunit">
+<project name="_testing.eunit" xmlns:hlm="http://www.nokia.com/helium">
     <description>
         Testing using EUnit. (For WINSCW)
     </description>
@@ -48,7 +48,7 @@ Description:
     -->
 
     <!-- Unzip test package to build drive. -->
-    <target name="prepare-eunit" if="enabled.ats">
+    <target name="prepare-eunit" if="internal.ats.enabled">
         <unzip src="${eunit.prepare.zip}" dest="${build.drive}/" />
     </target>
 

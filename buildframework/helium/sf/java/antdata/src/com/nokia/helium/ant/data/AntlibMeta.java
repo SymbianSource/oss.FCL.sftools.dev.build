@@ -18,7 +18,7 @@
 package com.nokia.helium.ant.data;
 
 import java.io.IOException;
-import org.dom4j.DocumentException;
+
 import org.dom4j.Element;
 
 /**
@@ -26,7 +26,7 @@ import org.dom4j.Element;
  */
 public class AntlibMeta extends RootAntObjectMeta {
 
-    public AntlibMeta(AntFile antFile, Element node) throws DocumentException, IOException {
+    public AntlibMeta(AntFile antFile, Element node) throws IOException {
         super(antFile, node);
 
         // Only parse a project comment if it is marked

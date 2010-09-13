@@ -17,18 +17,17 @@
  
 package com.nokia.helium.core.ant.types;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
+import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.types.DataType;
+
 import com.nokia.helium.core.ant.MappedVariable;
 import com.nokia.helium.core.ant.Variable;
 import com.nokia.helium.core.ant.VariableMap;
-
-
-import org.apache.tools.ant.BuildException;
-import org.apache.tools.ant.types.DataType;
-import java.util.ArrayList;
 
 /**
  * Helper class to store the variable set (list of variables
@@ -108,8 +107,9 @@ public class VariableSet extends DataType implements Variable, VariableMap {
             for (Variable variable : variables) {
                 if (variable instanceof MappedVariable) {
                     allVariables.put(((MappedVariable)variable).getName(), (MappedVariable)variable);
-                } else if (variable instanceof VariableSet)
+                } else if (variable instanceof VariableSet) {
                     allVariables.putAll(((VariableSet)variable).getVariablesMap());
+                }
             }
             return allVariables;
         }

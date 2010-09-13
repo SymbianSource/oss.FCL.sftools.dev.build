@@ -17,8 +17,8 @@
  
 package com.nokia.helium.imaker.ant.types;
 
-import org.apache.tools.ant.types.DataType;
 import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.types.DataType;
 
 /**
  * Configure a variable for iMaker.

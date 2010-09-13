@@ -25,15 +25,14 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.tools.ant.TaskContainer;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.ComponentHelper;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
-import org.apache.tools.ant.helper.ProjectHelper2;
+import org.apache.tools.ant.TaskContainer;
 import org.apache.tools.ant.UnknownElement;
-
-import org.apache.tools.ant.taskdefs.*;
+import org.apache.tools.ant.helper.ProjectHelper2;
+import org.apache.tools.ant.taskdefs.AntlibDefinition;
 
 /**
  * Antlib task. It does not

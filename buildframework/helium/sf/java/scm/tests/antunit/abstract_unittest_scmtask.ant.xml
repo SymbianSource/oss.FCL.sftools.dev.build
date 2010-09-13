@@ -289,6 +289,22 @@ Description:
     </target>
         
     <target name="test-update-basedir-tag" depends="test-checkin">
+        <echo file="${repo.dir}/test1/not_in_repo.txt">Not in repo</echo>
+        <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/test1">
+            <hlm:add>
+                <fileset dir="${repo.dir}/test1">
+                    <include name="**" />
+                    <exclude name="**/.${repo.type}/**" />
+                </fileset>
+            </hlm:add>
+            <hlm:checkin message="Adding not_in_repo.txt...">
+                <fileset dir="${repo.dir}/test1">
+                    <include name="not_in_repo.txt" />
+                </fileset>
+            </hlm:checkin>
+            <hlm:tag baseDir="${repo.dir}/test1" name="tag_0.1" />
+            <hlm:tags baseDir="${repo.dir}/test1" />
+        </hlm:scm>
         <echo file="${repo.dir}/test1/not_in_repo2.txt">Not in repo2</echo>
         <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/test1">
             <hlm:add>
@@ -297,20 +313,35 @@ Description:
                     <exclude name="**/.${repo.type}/**" />
                 </fileset>
             </hlm:add>
-        </hlm:scm>
-        <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/test1">
             <hlm:checkin message="Adding not_in_repo2.txt...">
                 <fileset dir="${repo.dir}/test1">
                     <include name="not_in_repo2.txt" />
                 </fileset>
             </hlm:checkin>
+            <hlm:tag baseDir="${repo.dir}/test1" name="tag_0.2" />
+            <hlm:tags baseDir="${repo.dir}/test1" />
         </hlm:scm>
+        <au:assertLogContains text=" * tag_0.1" />
+        <au:assertLogContains text=" * tag_0.2" />
+        <!-- Updating to first tag, only not_in_repo.txt file should be present -->
         <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/test1">
             <hlm:update basedir="${repo.dir}/test1">
-                <hlm:tag name="0" />
+                <hlm:tag name="tag_0.1" />
             </hlm:update>
         </hlm:scm>
+        <au:assertLogContains text="not_in_repo2.txt:patched" /> <!-- The file is removed so patched -->
+        <au:assertFileExists file="${repo.dir}/test1/not_in_repo.txt" />
         <au:assertFileDoesntExist file="${repo.dir}/test1/not_in_repo2.txt" />
+
+    	<!-- Updating to first tag, only not_in_repo.txt file should be present -->
+        <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/test1">
+            <hlm:update basedir="${repo.dir}/test1">
+                <hlm:tag name="tag_0.2" />
+            </hlm:update>
+        </hlm:scm>
+        <au:assertLogContains text="not_in_repo2.txt:patched" /> <!-- The file is added so patched -->
+        <au:assertFileExists file="${repo.dir}/test1/not_in_repo.txt" />
+        <au:assertFileExists file="${repo.dir}/test1/not_in_repo2.txt" />
     </target>
 
     <target name="test-update-basedir-revision" depends="test-checkin">
@@ -354,6 +385,8 @@ Description:
         <au:assertFileDoesntExist file="${repo.dir}/test1/not_in_repo3.txt" />
     </target>
 
+	
+	
     <!--
      **************************************************************
      ** EXPORT

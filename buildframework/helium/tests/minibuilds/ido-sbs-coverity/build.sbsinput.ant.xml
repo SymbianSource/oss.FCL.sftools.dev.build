@@ -60,15 +60,13 @@ Description:
 
     <hlm:sbsinput id="build_input_tools">
         <sbsInput refid="tools-${build.system}" />
-        <sbsOptions>
-            <arg name="--logfile" value="${compile.log.dir}/${build.id}_tools_rel_build.log" />
-        </sbsOptions>
+        <sbsOptions/>
     </hlm:sbsinput>
 
     <hlm:sbsinput id="build_input_armv5">
         <sbsInput refid="armv5-${build.system}" />
         <sbsOptions>
-            <arg name="--logfile" value="${compile.log.dir}/${build.id}_armv5_build.log" />
+            <arg name="--logfile" value="${compile.log.dir}/${build.id}_armv5_build.compile.log" />
         </sbsOptions>
     </hlm:sbsinput>
 
@@ -80,7 +78,7 @@ Description:
     <hlm:sbsinput id="build_input_clean_tools">
         <sbsInput refid="tools-${build.system}-clean" />
         <sbsOptions>
-            <arg name="--logfile" value="${compile.log.dir}/${build.id}_tools_rel_build_clean.log" />
+            <arg name="--logfile" value="${compile.log.dir}/${build.id}_tools_rel_build_clean.compile.log" />
             <arg name="--makefile" value="${compile.log.dir}/${build.id}_tools_rel_build_clean" />
         </sbsOptions>
     </hlm:sbsinput>
@@ -88,7 +86,7 @@ Description:
     <hlm:sbsinput id="build_input_clean_armv5">
         <sbsInput refid="armv5-${build.system}-clean" />
         <sbsOptions>
-            <arg name="--logfile" value="${compile.log.dir}/${build.id}_armv5_build_clean.log" />
+            <arg name="--logfile" value="${compile.log.dir}/${build.id}_armv5_build_clean.compile.log" />
             <arg name="--makefile" value="${compile.log.dir}/${build.id}_armv5_build_clean" />
         </sbsOptions>
     </hlm:sbsinput>
@@ -101,7 +99,7 @@ Description:
     <hlm:sbsinput id="helium_minibuild_ido_input_tools">
         <sbsInput refid="tools-${build.system}" />
         <sbsOptions>
-            <arg name="--logfile" value="${compile.log.dir}/${build.id}_tools_helium_minibuild_ido.log" />
+            <arg name="--logfile" value="${compile.log.dir}/${build.id}_tools_helium_minibuild_ido.compile.log" />
             <arg name="--makefile" value="${compile.log.dir}/${build.id}_tools_helium_minibuild_ido" />
         </sbsOptions>
     </hlm:sbsinput>
@@ -109,7 +107,7 @@ Description:
     <hlm:sbsinput id="helium_minibuild_ido_input_armv5">
         <sbsInput refid="armv5-${build.system}" />
         <sbsOptions>
-            <arg name="--logfile" value="${compile.log.dir}/${build.id}_armv5_helium_minibuild_ido.log" />
+            <arg name="--logfile" value="${compile.log.dir}/${build.id}_armv5_helium_minibuild_ido.compile.log" />
             <arg name="--makefile" value="${compile.log.dir}/${build.id}_armv5_helium_minibuild_ido" />
         </sbsOptions>
     </hlm:sbsinput>
@@ -131,7 +129,7 @@ Description:
     <hlm:sbsinput id="helium_minibuild_ido_input_clean_tools">
         <sbsInput refid="tools-${build.system}-clean"/>
         <sbsOptions>
-            <arg name="--logfile" value="${compile.log.dir}/${build.id}_tools_helium_minibuild_ido_clean.log" />
+            <arg name="--logfile" value="${compile.log.dir}/${build.id}_tools_helium_minibuild_ido_clean.compile.log" />
             <arg name="--makefile" value="${compile.log.dir}/${build.id}_tools_helium_minibuild_ido_clean" />
         </sbsOptions>
     </hlm:sbsinput>
@@ -139,8 +137,8 @@ Description:
     <hlm:sbsinput id="helium_minibuild_ido_input_clean_armv5">
         <sbsInput refid="armv5-${build.system}-clean" />
         <sbsOptions>
-            <arg name="--logfile" value="${compile.log.dir}/${build.id}_armv5_helium_minibuild_ido_clean.log" />
-            <arg name="--makefile" value="${compile.log.dir}/${build.id}_armv5_helium_minibuild_ido_clean.log" />
+            <arg name="--logfile" value="${compile.log.dir}/${build.id}_armv5_helium_minibuild_ido_clean.compile.log" />
+            <arg name="--makefile" value="${compile.log.dir}/${build.id}_armv5_helium_minibuild_ido_clean" />
         </sbsOptions>
     </hlm:sbsinput>
 
@@ -152,7 +150,6 @@ Description:
     <hlm:sbsinput id="sf_build_input_tools">
         <sbsInput refid="tools-${build.system}" />
         <sbsOptions>
-            <arg name="--logfile" value="${compile.log.dir}/${build.id}_tools_sf_build.log" />
             <arg name="--makefile" value="${compile.log.dir}/${build.id}_tools_sf_build" />
         </sbsOptions>
     </hlm:sbsinput> 
@@ -160,7 +157,6 @@ Description:
     <hlm:sbsinput id="sf_build_input_armv5">
         <sbsInput refid="armv5-${build.system}" />
         <sbsOptions>
-            <arg name="--logfile" value="${compile.log.dir}/${build.id}_armv5_sf_build.log" />
             <arg name="--makefile" value="${compile.log.dir}/${build.id}_armv5_sf_build" />
         </sbsOptions>
     </hlm:sbsinput> 
@@ -177,7 +173,6 @@ Description:
     <hlm:sbsinput id="sf_build_input_clean_tools">
         <sbsInput refid="tools-${build.system}-clean" />
         <sbsOptions>
-            <arg name="--logfile" value="${compile.log.dir}/${build.id}_tools_sf_build_clean.log" />
             <arg name="--makefile" value="${compile.log.dir}/${build.id}_tools_sf_build_clean" />
         </sbsOptions>
     </hlm:sbsinput>
@@ -185,7 +180,6 @@ Description:
     <hlm:sbsinput id="sf_build_input_armv5">
         <sbsInput refid="armv5-${build.system}-clean" />
         <sbsOptions>
-            <arg name="--logfile" value="${compile.log.dir}/${build.id}_armv5_sf_build_clean.log" />
             <arg name="--makefile" value="${compile.log.dir}/${build.id}_armv5_sf_build_clean" />
         </sbsOptions>
     </hlm:sbsinput>
@@ -202,7 +196,6 @@ Description:
     <hlm:sbsinput id="nonhw_input_clean_tools">
         <sbsInput refid="tools-${build.system}-clean" />
         <sbsOptions>
-            <arg name="--logfile" value="${compile.log.dir}/${build.id}_tools_winscw_build_clean.log" />
             <arg name="--makefile" value="${compile.log.dir}/${build.id}_tools_winscw_build_clean" />
         </sbsOptions>
     </hlm:sbsinput>
@@ -210,7 +203,6 @@ Description:
     <hlm:sbsinput id="nonhw_input_clean_winscw">
         <sbsInput refid="winscw-${build.system}-clean" />
         <sbsOptions>
-            <arg name="--logfile" value="${compile.log.dir}/${build.id}_winscw_winscw_build_clean.log" />
             <arg name="--makefile" value="${compile.log.dir}/${build.id}_winscw_winscw_build_clean" />
         </sbsOptions>
     </hlm:sbsinput>
@@ -227,7 +219,6 @@ Description:
     <hlm:sbsinput id="nonhw_input_tools">
         <sbsInput refid="tools-${build.system}" />
         <sbsOptions>
-            <arg name="--logfile" value="${compile.log.dir}/${build.id}_tools_build.log" />
             <arg name="--makefile" value="${compile.log.dir}/${build.id}_tools_build" />
         </sbsOptions>
     </hlm:sbsinput>
@@ -235,7 +226,6 @@ Description:
     <hlm:sbsinput id="nonhw_input_winscw">
         <sbsInput refid="winscw-${build.system}" />
         <sbsOptions>
-            <arg name="--logfile" value="${compile.log.dir}/${build.id}_winscw_build.log" />
             <arg name="--makefile" value="${compile.log.dir}/${build.id}_winscw_build" />
         </sbsOptions>
     </hlm:sbsinput>
@@ -243,7 +233,6 @@ Description:
     <hlm:sbsinput id="test_input_tools">
         <sbsInput refid="test-${build.system}" />
         <sbsOptions>
-            <arg name="--logfile" value="${compile.log.dir}/${build.id}_tools_test.log" />
             <arg name="--makefile" value="${compile.log.dir}/${build.id}_tools_test" />
         </sbsOptions>
     </hlm:sbsinput>
@@ -251,7 +240,6 @@ Description:
     <hlm:sbsinput id="test_input_armv5">
         <sbsInput refid="test-${build.system}" />
         <sbsOptions>
-            <arg name="--logfile" value="${compile.log.dir}/${build.id}_armv5_test.log" />
             <arg name="--makefile" value="${compile.log.dir}/${build.id}_armv5_test" />
         </sbsOptions>
     </hlm:sbsinput>
@@ -268,7 +256,6 @@ Description:
     <hlm:sbsinput id="test_input_clean_tools">
         <sbsInput refid="test-${build.system}" />
         <sbsOptions>
-            <arg name="--logfile" value="${compile.log.dir}/${build.id}_tools_test_clean.log" />
             <arg name="--makefile" value="${compile.log.dir}/${build.id}_tools_test_clean" />
         </sbsOptions>
     </hlm:sbsinput>
@@ -276,7 +263,6 @@ Description:
     <hlm:sbsinput id="test_input_clean_armv5">
         <sbsInput refid="test-${build.system}" />
         <sbsOptions>
-            <arg name="--logfile" value="${compile.log.dir}/${build.id}_armv5_test_clean.log" />
             <arg name="--makefile" value="${compile.log.dir}/${build.id}_armv5_test_clean" />
         </sbsOptions>
     </hlm:sbsinput>

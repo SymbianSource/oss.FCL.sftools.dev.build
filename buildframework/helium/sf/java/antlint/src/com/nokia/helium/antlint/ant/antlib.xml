@@ -45,7 +45,8 @@ Description:
     <typedef name="checkDuplicateNames" classname="com.nokia.helium.antlint.ant.types.CheckDuplicateNames"/>
     <typedef name="checkFileName" classname="com.nokia.helium.antlint.ant.types.CheckFileName"/>
     <typedef name="checkAntCall" classname="com.nokia.helium.antlint.ant.types.CheckAntCall"/>
-
+    <typedef name="checkTryCatchBlock" classname="com.nokia.helium.antlint.ant.types.CheckTryCatchBlock"/>
+    
     <!-- Reporters -->
     <typedef name="antlintConsoleReporter" classname="com.nokia.helium.antlint.ant.types.ConsoleReporter"/>
     <typedef name="antlintCheckstyleReporter" classname="com.nokia.helium.antlint.ant.types.CheckstyleXmlReporter"/>

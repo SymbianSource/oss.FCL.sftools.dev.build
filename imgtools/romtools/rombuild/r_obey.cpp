@@ -41,6 +41,8 @@
 #include "patchdataprocessor.h"
 #include "r_coreimage.h" 
 
+#include "uniconv.hpp"
+extern TBool gIsOBYUTF8;
 #define _P(word)	word, sizeof(word)-1	// match prefix, optionally followed by [HWVD]
 #define _K(word)	word, 0					// match whole word
 static char* const NullString = "" ;
@@ -1070,6 +1072,20 @@ TBool CObeyFile::ProcessFile(TInt aAlign, enum EKeyword aKeyword){
 
 	// check the PC file exists
 	char* nname = NormaliseFileName(iReader.Word(1)); 
+	if(gIsOBYUTF8 && !UniConv::IsPureASCIITextStream(nname))
+	{
+		char* tempnname = strdup(nname);
+		unsigned int namelen = 0;
+		if(UniConv::UTF82DefaultCodePage(tempnname, strlen(tempnname), &nname, &namelen) < 0)
+		{
+			Print(EError, "Invalid filename encoding: %s\n", tempnname);
+			free(tempnname);
+			iMissingFiles++;
+			delete[] nname;
+			return EFalse;
+		}
+		free(tempnname);
+	}
 	ifstream test(nname,ios_base::binary | ios_base::in); 
 
 	if (!test.is_open()) {

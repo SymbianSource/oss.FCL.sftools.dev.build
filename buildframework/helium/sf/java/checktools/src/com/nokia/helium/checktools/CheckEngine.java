@@ -46,7 +46,7 @@ public class CheckEngine extends ToolChecker {
     /**
      * Method verifies Ant version.
      */
-    public void verifyAntVersion() {
+    public void verifyAntVersion() throws CheckToolException {
         String expVersion = configuration.getProperty("ant.version");
         String errorMsg = "Supported Ant version is not defined in 'helium.basic.tools.config' file under helium config folder.";
         verifyIsExpectedToolVersionConfigured(expVersion, errorMsg);
@@ -59,7 +59,7 @@ public class CheckEngine extends ToolChecker {
     /**
      * Method verifies Python version.
      */
-    public void verifyPythonVersion() {
+    public void verifyPythonVersion() throws CheckToolException {
         String expVersion = configuration.getProperty("python.version");
         String errorMsg = "Supported Python version is not defined in 'helium.basic.tools.config' file under helium config folder.";
         verifyIsExpectedToolVersionConfigured(expVersion, errorMsg);

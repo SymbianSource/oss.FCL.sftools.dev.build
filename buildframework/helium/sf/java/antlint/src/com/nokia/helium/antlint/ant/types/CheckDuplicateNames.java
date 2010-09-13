@@ -56,13 +56,14 @@ public class CheckDuplicateNames extends AbstractCheck {
 
         for (String macroName : macros) {
             if (macros.contains(macroName + "Macro")
-                    || macros.contains(macroName + "macro"))
+                    || macros.contains(macroName + "macro")) {
                 this.getReporter()
                         .report(
                                 this.getSeverity(),
                                 macroName + " and " + macroName + "Macro"
                                         + " found duplicate name",
                                 this.getAntFile(), 0);
+            }
         }
     }
 

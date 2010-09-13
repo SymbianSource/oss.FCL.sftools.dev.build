@@ -18,6 +18,6 @@
 #===============================================================================
 
 """ iMaker framework. """
-from api import *       #this needs to remain here even though pylint throws it as 
-                        #a warning 'unused' due to being needed by what imports this AGH!!! 
-                        #can't the thing that imports this import the api file?
+from imaker.api import * #this needs to remain here even though pylint throws it as 
+                         #a warning 'unused' due to being needed by what imports this AGH!!! 
+                         #can't the thing that imports this import the api file?

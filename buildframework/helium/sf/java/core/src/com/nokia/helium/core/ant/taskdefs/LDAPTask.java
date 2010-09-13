@@ -17,11 +17,12 @@
 
 package com.nokia.helium.core.ant.taskdefs;
 
-import org.apache.tools.ant.Task;
 import org.apache.tools.ant.BuildException;
-import javax.naming.*;
-import javax.naming.directory.*;
-import java.util.Hashtable;
+import org.apache.tools.ant.Project;
+import org.apache.tools.ant.Task;
+
+import com.nokia.helium.core.LDAPException;
+import com.nokia.helium.core.LDAPHelper;
 
 /**
  * Task is to search data from LDAP server.
@@ -41,43 +42,41 @@ public class LDAPTask extends Task {
     private String filter;
     private String key;
     private String property;
+    private boolean failOnError = true;
 
     /**
      * Method executes current task.
      */
     public void execute() {
-        if (url == null)
+        if (url == null) {
             throw new BuildException("'url' attribute is not defined");
-        if (rootdn == null)
+        }
+        if (rootdn == null) {
             throw new BuildException("'rootdn' attribute is not defined");
-        if (filter == null)
+        }
+        if (filter == null) {
             throw new BuildException("'filter' attribute is not defined");
-        if (property == null)
+        }
+        if (property == null) {
             throw new BuildException("'property' attribute is not defined");
-        if (key == null)
+        }
+        if (key == null) {
             throw new BuildException("'key' attribute is not defined");
+        }
 
-        // Set up environment for creating initial context
-        Hashtable<String, String> env = new Hashtable<String, String>();
-        env.put(Context.INITIAL_CONTEXT_FACTORY,
-                "com.sun.jndi.ldap.LdapCtxFactory");
-        env.put(Context.PROVIDER_URL, url + "/" + rootdn);
-
-        // Create initial context
         try {
-            DirContext ctx = new InitialDirContext(env);
-            SearchControls controls = new SearchControls();
-            controls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-            NamingEnumeration<SearchResult> en = ctx.search("", filter,
-                    controls);
-            if (en.hasMore()) {
-                SearchResult sr = en.next();
-                getProject().setProperty(property,
-                        (String) sr.getAttributes().get(key).get());
-                return;
+            LDAPHelper helper = new LDAPHelper(url, rootdn);
+            String value = helper.getAttributeAsString(filter, key);
+            if (value != null) {
+                getProject().setNewProperty(property, value);
+            } else {
+                log("Could not find value for key: " + key, Project.MSG_WARN);
             }
-        } catch (NamingException exc) {
-            throw new BuildException(exc.getMessage());
+        } catch (LDAPException exc) {
+            log(exc.getMessage(), Project.MSG_ERR);
+            if (failOnError) {
+                throw new BuildException(exc.getMessage(), exc);
+            }
         } 
     }
 
@@ -175,4 +174,14 @@ public class LDAPTask extends Task {
     public void setKey(String key) {
         this.key = key;
     }
+
+    /**
+     * Defines if the task should fail on error or not found.
+     * @param failOnError
+     * @ant.not-required Default is true
+     */
+    public void setFailOnError(boolean failOnError) {
+        this.failOnError = failOnError;
+    }
+
 }

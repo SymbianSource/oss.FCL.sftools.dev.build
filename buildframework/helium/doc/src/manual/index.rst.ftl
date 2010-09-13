@@ -33,8 +33,8 @@ Description:
    retrieving
 </#if>
    configuring
+   configuring_features
    running
-   debugging
    stages
    stage_matti
 <#if !ant?keys?seq_contains("sf")>
@@ -43,10 +43,11 @@ Description:
    iad
 </#if>
    documentation
-   quality
    cruisecontrol
    sysdef3
+   messaging
    metrics
+   coverity
 
    
    

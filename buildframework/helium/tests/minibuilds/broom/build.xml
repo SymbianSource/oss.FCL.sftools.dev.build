@@ -22,7 +22,7 @@ Description:
 -->
 <project name="minibuild.compile" default="minibuild" xmlns:au="org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium" basedir=".">
     <property environment="env"/>
-	<dirname property="config.dir" file="${ant.file.minibuild.compile}"/>
+    <dirname property="config.dir" file="${ant.file.minibuild.compile}"/>
 
     <!-- Enable Helium internal assertion checking. -->
     <property name="hlm.enable.asserts" value="1" />
@@ -32,16 +32,16 @@ Description:
     <property name="major.version" value="0" />
     <property name="minor.version" value="0" />
     <property name="publish.root.dir" location="${build.drive}/release"/>
-	<property name="ci.cleanup.env.dir" location="E:/bb/minibuild-broom/trigger"/>
+    <property name="ci.cleanup.env.dir" location="E:/bb/minibuild-broom/trigger"/>
 
-	<target name="create-ci-dir">
-		<mkdir dir="${ci.cleanup.env.dir}"/>
-	</target>
-	
-	<target name="mini-build" depends="create-ci-dir,delete-folders-from-list"/>
-	
-	<import file="${helium.dir}/helium.ant.xml"/>
-	
+    <target name="create-ci-dir">
+        <mkdir dir="${ci.cleanup.env.dir}"/>
+    </target>
+    
+    <target name="minibuild" depends="create-ci-dir,delete-folders-from-list"/>
+    
+    <import file="${helium.dir}/helium.ant.xml"/>
+    
 </project>
 
     

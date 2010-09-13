@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : compatibility.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="compatibility.analyser" xmlns:hlm="http://www.nokia.com/helium">
+    <description>
+        Compatibility Analyser - BC (Binary Comparison) needs the property ca.enabled to
+        be set to true in order to run the targets bc-check and ca-generate-diamond-summary
+    </description>
+
+    <!-- The following parameters need to be set up by the IDO before CheckBC.py will run -->
+    <!-- place where the CheckBC and FilterBC tools are - required
+    @type string
+    @editable required
+    @scope public
+    -->
+    <property name="bctools.root" location="E:\brtaylor\Apps\carbide\plugins\com.nokia.s60tools.compatibilityanalyser.corecomponents_2.0.0\BCTools" />
+
+    <!-- Place where the CheckBC default configuration file is - required (see compatibility analyser user guide for details)
+    it is copied from this location to the output folder  for use by checkBC.py
+    @type string
+    @editable required
+    @scope public
+    -->
+    <property name="default.bc.config"  location="${helium.dir}/tools/quality/compatibility_analyser/ca_config_template.txt" />
+
+    <!-- The bc_config_template.txt file (default configuration file) will be copied from the folder
+    it is saved in within helium to the location named in this property where it will be used.
+    @type string
+    @editable required
+    @scope public
+    -->
+    <property name="bc.config.dir" location="${build.log.dir}/bc" />
+
+    <!-- The bc_config_template.txt file (default configuration file) will be copied from the
+    folder it is saved in within helium to the location and file name named in this property 
+    where it will be used. You need to make sure this is 
+    not the same name as any other IDO or person using the build area
+    @type string
+    @editable required
+    @scope public
+    -->
+    <property name="bc.config.file" location="${bc.config.dir}/bc.config" />
+
+    <!-- Enables the Binary Comparison for libraries when set to true
+    @type boolean
+    @editable required
+    @scope public
+    -->
+    <property name="bc.check.libraries.enabled" value="true" />
+    
+    <!-- Defines the parameter that checkBC.py is called with 
+       -la (all libraries checked) 
+    or -ls lib (single library checked) (lib = the name of library to check)
+    or -lm file.name (multiple libraries checked) 
+    the file.name is a file that contains the names of the library(ies) to check 
+    @type string
+    @editable required
+    @scope public
+    -->
+    <property name="lib.param.val" value="-la" />
+
+    <!-- Enables the Binary Comparison for headers when set to true
+    @type boolean
+    @editable required
+    @scope public
+    -->
+    <property name="bc.check.headers.enabled" value="true" />
+    
+    <!-- Defines the parameter that checkBC.py is called with 
+       -ha (all headers checked) 
+    or -hs file (single header checked) (file= name of header file to check) 
+    or -hm file.name (multiple headers checked) 
+    the file.name is a file that contains the names of the header(s) to check 
+    @type string
+    @editable required
+    @scope public
+    -->
+    <property name="head.param.val" value="-ha" />
+
+    <!-- Adds this to the CA output file name to give it a unique name
+    @type string
+    @editable required
+    @scope public
+    -->
+    <property name="bc.check.report.id" value="${build.name}_${build.number}" />
+
+    <!-- Defines the location of CA output and the input for the diamonds creation target.
+    @type string
+    -->
+    <property name="ido.ca.html.output.dir" location="${build.log.dir}/${build.id}_ca"/>
+
+    <condition property="internal.run.ca">
+        <istrue value="${ca.enabled}" />
+    </condition>
+
+
+<!-- static and dynamic BC Test target -->
+    <target name="bc-check" if="internal.run.ca" >
+        <!-- create BC dir -->
+        <mkdir dir="${build.log.dir}/BC"/>
+        <delete file="${bc.config.file}" quiet="true"/>
+        <delete file="${build.log.dir}/BC/BBCResults.xsl" quiet="true"/>
+
+        <copy file="${default.bc.config}" tofile="${bc.config.file}" failonerror="false" verbose="true"/>
+
+        <!--copy the CSS file to the output folder-->
+        <copy file="${bctools.root}/reports/BBCResults.xsl" tofile="${build.log.dir}/BC/BBCResults.xsl" failonerror="false" verbose="true"/>
+
+        <if>    <!--the library check enaled flag is set then run the check on the lirary files-->
+            <istrue value="${bc.check.libraries.enabled}"/>
+            <then>
+                <exec executable="python" dir="${build.log.dir}/BC" failonerror="true">
+                    <arg value="${bctools.root}/CheckBC.py"/>
+                    <arg value="${bc.config.file}"/>
+                    <arg line="${lib.param.val}"/>
+                    <arg value="-f"/>
+                    <arg value="${bc.check.report.id}"/>
+                </exec>
+            </then>
+        </if>
+
+        <if>    <!-- if the header check flag is set then run the checks on the headers-->
+            <istrue value="${bc.check.headers.enabled}"/>
+            <then>
+                <exec executable="python" dir="${build.log.dir}/BC" failonerror="true">
+                    <arg value="${bctools.root}/CheckBC.py"/>
+                    <arg value="${bc.config.file}"/>
+                    <arg line="${head.param.val}"/>
+                    <arg value="-f"/>
+                    <arg value="${bc.check.report.id}"/>
+                </exec>
+            </then>
+        </if>
+    </target>
+
+
+    <target name="ca-generate-diamond-summary" if="internal.run.ca">
+        <!--use the header.ftl template file to create the init part of the output file
+        that can be copied to the final output file by the java class-->
+        <property name="temp.diamonds.header.xml" location="${env.TEMP}/diamonds_header.xml" />
+        <fmpp sourcefile="${helium.dir}/tools/common/templates/diamonds/diamonds_header.ftl" 
+              outputfile="${temp.diamonds.header.xml}" quiet="true"/>
+        <property name="temp.diamonds.footer.xml" location="${env.TEMP}/diamonds_footer.xml" />
+        <fmpp sourcefile="${helium.dir}/tools/common/templates/diamonds/diamonds_footer.ftl" 
+              outputfile="${temp.diamonds.footer.xml}" quiet="true"/>
+
+        <mkdir dir="${diamonds.build.output.dir}" />
+
+        <if>    <!-- if the header check flag is set then run the checks on the headers-->
+            <istrue value="${bc.check.headers.enabled}"/>
+            <then>
+                <hlm:casummary diamondsHeaderFileName="${temp.diamonds.header.xml}" diamondsFooterFileName="${temp.diamonds.footer.xml}"
+                    header="true"
+                    outputFile="${diamonds.build.output.dir}/ca_summary_header.xml"
+                    inputFile="${bc.config.dir}/headers_report_${bc.check.report.id}.xml" 
+                     />
+            </then>
+        </if>
+
+        <if>    <!--the library check enaled flag is set then run the check on the lirary files-->
+            <istrue value="${bc.check.libraries.enabled}"/>
+            <then>
+                <hlm:casummary diamondsHeaderFileName="${temp.diamonds.header.xml}" diamondsFooterFileName="${temp.diamonds.footer.xml}"
+                    header="false" 
+                    outputFile="${diamonds.build.output.dir}/ca_summary_library.xml"
+                    inputFile="${bc.config.dir}/libraries_report_${bc.check.report.id}.xml"
+                    />
+            </then>
+        </if>
+
+        <delete file="${temp.diamonds.header.xml}" failonerror="false" />
+        <delete file="${temp.diamonds.footer.xml}" failonerror="false" />
+    </target>
+
+</project>

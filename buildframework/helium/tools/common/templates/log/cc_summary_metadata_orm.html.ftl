@@ -25,7 +25,7 @@ Description:
  
 <h1>${ant['build.id']}</h1>
 
-<#if ant?keys?seq_contains('publish')>
+<#if ant?keys?seq_contains('publish.enabled') || ant?keys?seq_contains('publish')>
     <#if ant?keys?seq_contains('publish.dir.list')>
         <h2>Publish locations</h2>
         <p>
@@ -41,10 +41,10 @@ Description:
     </#if>
 </#if>
 
-<#list table_info['jpa']['select l from LogFile l where LOWER(l.path) like \'%_ccm_get_input.log%\''] as logfile>
+<#list table_info['jpa']['select l from LogFile l where LOWER(l.path) like \'%_ccm_get_input.log\''] as logfile>
 <h2>Synergy errors</h2>
     <p>
-    <#list table_info['native:com.nokia.helium.jpa.entity.metadata.MetadataEntry']['select * from metadataentry m INNER JOIN priority p ON p.priority_id=m.priority_id where m.logpath_id=${logfile.id} and ( UPPER(p.priority) like \'ERROR\' or UPPER(p.priority) like \'WARNING\' )'] as entry >
+    <#list table_info['jpa']['select m from MetadataEntry m JOIN m.severity p where m.logFileId=${logfile.id} and (p.severity=\'ERROR\' or p.severity=\'WARNING\' )'] as entry>
         ${entry.text}<br/>
     </#list>
     </p>
@@ -63,15 +63,11 @@ Description:
     <th width="15%">Notes</th>
 </tr>
 
-<#list table_info['jpa']['select c from Component c where c.logPathID=${logfile.id} ORDER BY c.component'] as component>
+<#list table_info['jpa']['select c from Component c where c.logFileId=${logfile.id} ORDER BY c.component'] as component>
 <tr>
 <td>${component.component}</td>
     <#list colors?keys as type>
-        <#assign count =  table_info['jpasingle']['select count(m.id) from MetadataEntry m JOIN  m.priority as p JOIN m.component as c where (UPPER(p.priority)=\'${type?upper_case}\' and c.id=${component.id})'][0] >    
-        <#if type=='error'>
-            <#assign count_missing = table_info['jpasingle']['select count(w.id) from WhatLogEntry w JOIN w.component c where c.logPathID=${logfile.id} and c.id=${component.id} and w.missing=\'true\''][0]> 
-            <#assign count = count?number + count_missing?number>
-        </#if>
+        <#assign count =  table_info['jpasingle']['select count(m.id) from MetadataEntry m JOIN  m.severity as p JOIN m.component as c where (p.severity=\'${type?upper_case}\' and c.id=${component.id})'][0] >    
         <#if (count?number > 0)>
 <td align="center" bgcolor="#${colors[type]}">${count}</td>
         <#else>
@@ -86,7 +82,7 @@ Description:
 <#list table_info['jpa']['select l from LogFile l where LOWER(l.path) like \'%roms.log\''] as logfile>
     <h2>ROMs ${logfile.path}</h2>
         <p>
-    <#list table_info['native:com.nokia.helium.jpa.entity.metadata.MetadataEntry']['select * from metadataentry m where m.logpath_id=${logfile.id}'] as entry >
+    <#list table_info['jpa']['select m from MetadataEntry m where m.logFileId=${logfile.id}'] as entry>
         ${entry.text}<br/>
     </#list>
         </p>
@@ -95,7 +91,7 @@ Description:
 <#list table_info['jpa']['select l from LogFile l where LOWER(l.path) like \'%validate-policy.summary.xml\''] as logfile>
 <h2>Distribution Policy validation</h2>
         <p>
-        <#list table_info['native:com.nokia.helium.jpa.entity.metadata.MetadataEntry']['select * from metadataentry m where m.logpath_id=${logfile.id}'] as entry >
+        <#list table_info['jpa']['select m from MetadataEntry m where m.logFileId=${logfile.id}'] as entry>
             ${entry.text}<br/>
         </#list>
         </p>

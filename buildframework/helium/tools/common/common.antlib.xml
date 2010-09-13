@@ -62,17 +62,18 @@ Description:
         <attribute name="file"/>
         <element name="path" type="path"/>
         <![CDATA[
-    import java.io.FileWriter;
-    FileWriter out = new FileWriter(attributes.get("file"));
-    paths = elements.get("path");
-    for (int i = 0 ; i < paths.size() ; i++) {
-        String[] files = paths.get(i).list();
-        for (int l = 0; l < files.length ; l++) {
-            out.write(files[l] + "\n");
-        }
+import java.io.FileWriter;
+FileWriter out = new FileWriter(attributes.get("file"));
+
+paths = elements.get("path");
+for (int i = 0 ; i < paths.size() ; i++) {
+    String[] files = paths.get(i).list();
+    for (int j = 0; j < files.length ; j++) {
+        out.write(files[j] + "\n");
     }
+}
 out.close();
-]]>   
+    ]]>   
     </scriptdef>
 
     
@@ -91,47 +92,50 @@ out.close();
     <scriptdef name="toolMacro" language="beanshell" uri="http://www.nokia.com/helium">
         <element name="toolvarset" classname="com.nokia.helium.core.ant.types.VariableSet"/>
         <attribute name="name"/>
-<![CDATA[
+        <![CDATA[
 import com.nokia.ant.util.ToolsProcess;
 import com.nokia.tools.*;
 import com.nokia.helium.core.ant.types.VariableSet;
 import org.apache.tools.ant.types.Reference;
-    Reference ref;
-    java.lang.String toolName = attributes.get("name");
-    confTool =  ToolsProcess.getTool(toolName);
-    varSets = elements.get("toolvarset");
-    for (i = 0; i < varSets.size(); ++i) {
-        try {
-            varSet = (VariableSet)varSets.get(i);
-            if (varSet.isReference()) {
-                varSet = varSet.getRefid().getReferencedObject(project);
-            }
-            confTool.execute(varSet,project);
-        } catch (BuildException e) {
-            self.log("Error: " + e);
-            //self.log("Tool Argument Validation failure");
-            throw e;
+
+Reference ref;
+java.lang.String toolName = attributes.get("name");
+confTool =  ToolsProcess.getTool(toolName);
+varSets = elements.get("toolvarset");
+for (i = 0; i < varSets.size(); ++i) {
+    try {
+        varSet = (VariableSet)varSets.get(i);
+        if (varSet.isReference()) {
+            varSet = varSet.getRefid().getReferencedObject(project);
         }
-  }
-]]>
+        confTool.execute(varSet,project);
+    }
+    catch (BuildException e) {
+        self.log("Error: " + e);
+        //self.log("Tool Argument Validation failure");
+        throw e;
+    }
+}
+    ]]>
     </scriptdef>
     
     <!-- ConE tool macro to run the command for each argument -->
     <scriptdef name="conEToolMacro" language="beanshell" uri="http://www.nokia.com/helium">
-        <element name="arg" classname="com.nokia.ant.types.Variable"/>
+        <element name="arg" classname="com.nokia.helium.core.ant.types.VariableImpl"/>
         <attribute name="name"/>
-<![CDATA[
+        <![CDATA[
 import com.nokia.ant.util.ToolsProcess;
 import com.nokia.tools.*;
-import com.nokia.ant.types.Variable;
-    conETool =  ToolsProcess.getTool("ConE");
-    vars = elements.get("arg");
-    for (i = 0; i < vars.size(); ++i) {
-        var = (Variable)vars.get(i);
-        conETool.storeVariables(var.getName(), var.getValue());
-  }
-  conETool.execute(project);
-]]>
+import com.nokia.helium.core.ant.types.VariableImpl;
+
+conETool =  ToolsProcess.getTool("ConE");
+vars = elements.get("arg");
+for (i = 0; i < vars.size(); ++i) {
+    var = (VariableImpl)vars.get(i);
+    conETool.storeVariables(var.getName(), var.getValue());
+}
+conETool.execute(project);
+    ]]>
     </scriptdef>
     
     
@@ -140,14 +144,15 @@ import com.nokia.ant.types.Variable;
         <attribute name="filename"/>
         <attribute name="output"/>
         <attribute name="regexp"/>
-<![CDATA[
+        <![CDATA[
 import java.util.*;
 import java.io.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-if (attributes.get("filename") == null ||  attributes.get("output") == null || attributes.get("regexp") == null)
+if (attributes.get("filename") == null ||  attributes.get("output") == null || attributes.get("regexp") == null) {
     throw new BuildException("Filename/output/regexp attribute is not set for readLineMacro");
+}
     
 String search = attributes.get("regexp");
 String output = "";
@@ -155,24 +160,25 @@ pattern = Pattern.compile(search);
 
 BufferedReader input =  new BufferedReader(new FileReader(attributes.get("filename")));
 try {
-        String line = null;
-        Matcher match = null;
-        while (( line = input.readLine()) != null) {
-             match = pattern.matcher(line);
-            if (match.find()) {
-                //self.log("Line containg " + search + " is = " + line + " returned vaue = " + match.group(1));
-                int checkIndex = output.indexOf(match.group(1), 0);
-                if (checkIndex == -1 ) {
-                   output = output + match.group(1) + ",";
-                }
+    String line = null;
+    Matcher match = null;
+    while (( line = input.readLine()) != null) {
+        match = pattern.matcher(line);
+        if (match.find()) {
+            //self.log("Line containg " + search + " is = " + line + " returned vaue = " + match.group(1));
+            int checkIndex = output.indexOf(match.group(1), 0);
+            if (checkIndex == -1 ) {
+                output = output + match.group(1) + ",";
             }
         }
-    } catch (IOException ex) {
-      ex.printStackTrace();
     }
-    project.setNewProperty(attributes.get("output") , output);
+}
+catch (IOException ex) {
+    ex.printStackTrace();
+}
+project.setNewProperty(attributes.get("output") , output);
 
-]]>
+        ]]>
     </scriptdef>
 
     
@@ -180,16 +186,17 @@ try {
     <scriptdef name="echoFileMacro" language="beanshell" uri="http://www.nokia.com/helium">
         <attribute name="file"/>
         <![CDATA[        
-        //Open the file for reading
-         try {
-            java.io.BufferedReader in = new java.io.BufferedReader(new java.io.FileReader(attributes.get("file")));
-            while ((thisLine = in.readLine()) != null) { // while loop begins here
-                 self.log(thisLine);
-            } // end while 
-        } catch (java.io.IOException e) {
-            self.log("Error: " + e);
-            throw e;
-        }        
+//Open the file for reading
+try {
+    java.io.BufferedReader in = new java.io.BufferedReader(new java.io.FileReader(attributes.get("file")));
+    while ((thisLine = in.readLine()) != null) {
+        self.log(thisLine);
+    }
+}
+catch (java.io.IOException e) {
+    self.log("Error: " + e);
+    throw e;
+}        
         ]]>
     </scriptdef>
     
@@ -474,47 +481,36 @@ project.setProperty(str(attributes.get('resultproperty')), str(result))
         <attribute name="result" default="not-set"/>
         <sequential>
             <var name="signal.errors.total" value="" unset="true"/>
-            <var name="base.signal.log.file" value="" unset="true"/>
-            <basename property="base.signal.log.file" file="@{logfile}"/>
             <if>
                 <isfalse value="@{skip.count}" />
                 <then>
                     <hlm:metadataCountSeverity severity="error" 
                         log="@{logfile}"
-                        db="${metadata.dbfile}" property="signal.errors.total"/>
+                        database="${metadata.dbfile}" property="signal.errors.total"/>
                 </then>
                 <else>
                     <if>
                         <equals arg1="@{result}" arg2="not-set"/>
                         <then>
-                            <fail message="result parameter is missing for signa macro" />
+                            <fail message="The result attribute is missing for signalMacro." />
                         </then>
                     </if>
                     <var name="signal.errors.total" value="@{result}" />
                 </else>
             </if>
-            <if>
-                <isset property="@{phase}.log.dir" />
-                <then>
-                    <var name="signal.log.dir" value="" unset="true"/>
-                    <property name="signal.log.dir" value="${@{phase}.log.dir}"/>
-                    <echo>signal.log.dir = ${signal.log.dir}</echo>
-                </then>
-                <else>
-                    <var name="signal.log.dir" value="" unset="true"/>
-                    <property name="signal.log.dir" value="${build.log.dir}"/>
-                </else>
-            </if>
             <hlm:generateBuildStatus output-dir="${build.signal.status.dir}/" 
-                file="${base.signal.log.file}" />
+                file="@{logfile}" />
+
             <!-- signal for errors -->
-            <hlm:signal name="@{signal.input}" result="${signal.errors.total}" >
+            <var name="internal.signal.macro.log.basename" value="" unset="true"/> 
+            <basename property="internal.signal.macro.log.basename" file="@{logfile}" />
+            <hlm:signal name="@{signal.input}" result="${signal.errors.total}"
+                message="Found ${signal.errors.total} errors under @{logfile}.">
                 <signalNotifierInput>
                     <signalInput refid="@{signal.input}" />
                     <notifierInput>
-                        <fileset casesensitive="false" dir="${build.log.dir}" >
-                            <include name="**/${base.signal.log.file}*" />
-                        </fileset>
+                        <fileset casesensitive="false" dir="${build.signal.status.dir}"
+                            includes="${internal.signal.macro.log.basename}.status.html" />
                     </notifierInput>
                 </signalNotifierInput>
             </hlm:signal>
@@ -620,5 +616,123 @@ for id in range(elements.get("path").size()):
         fileutils.touch(path)
         ]]>
     </scriptdef>
+    
+    <!--
+        The fileBackupMacro enables the user to take the backup of any file(s).
+        By default it will back up log files from srcdir to destdir.
+        e.g
+        <pre>
+            <hlm:fileBackupMacro srcDir="${compile.log.dir}" destDir="${compile.log.dir}/backuplogs" regExp="(.*?_compile.log)$"/>
+            <hlm:fileBackupMacro file="${compile.log.dir}/${build.id}.clean.cmaker.log"/>
+        </pre>
+    -->
+    <macrodef name="fileBackupMacro" uri="http://www.nokia.com/helium">
+        <attribute name="regExp" default=""/>
+        <attribute name="file" default=""/>
+        <attribute name="srcDir" default=""/>
+        <attribute name="destDir" default=""/>
+        <sequential>
+            <!--Check is it required to do failback up or need to take backup log files
+                from specified source dir to destination dir -->
+            <if>
+                <and>
+                    <not>
+                        <length string="@{file}" trim="true" length="0" when="greater"/>
+                    </not>
+                    <not>
+                        <length string="@{srcDir}" trim="true" length="0" when="greater"/>
+                    </not>
+                </and>
+                <then>
+                    <fail message="'fileBackupMacro' requires 'file' or 'srcdir' attributes set"/>
+                </then>
+            </if>
+            
+            <!-- Set the backup format for taking back up -->
+            <var name="files.backup.format" unset="true"/>
+            <tstamp>
+                <format property="files.backup.format" pattern="ddMMyyyyHHmmssSS" unit="millisecond"/>
+            </tstamp>
+            
+            <!-- Set dest dir if not set -->
+            <var name="files.dest.dir" unset="true"/>
+            <if>
+                <length string="@{destDir}" trim="true" length="0" when="greater"/>
+                <then>
+                    <property name="files.dest.dir" value="@{destDir}"/>
+                </then>
+                <else>
+                    <property name="files.dest.dir" value="@{srcDir}"/>
+                </else>
+            </if>
+            
+            <!-- Set dest dir if not set -->
+            <var name="files.regular.exp" unset="true"/>
+            <if>
+                <length string="@{regExp}" trim="true" length="0" when="greater"/>
+                <then>
+                    <property name="files.regular.exp" value="@{regExp}"/>
+                </then>
+                <else>
+                    <property name="files.regular.exp" value="^(.*?\.log)$"/>
+                </else>
+            </if>
+            
+            <!-- To validate the unittest cases.-->
+            <script language="beanshell"> <![CDATA[
+                backupFormat = project.getProperty("files.backup.format"); 
+                project.setProperty("file.backup.format",backupFormat);
+                ]]>
+            </script>
+                 
+            <!-- Check need to do file back up -->
+            <if>
+                <and>
+                    <length string="@{file}" trim="true" length="0" when="greater"/>
+                    <available file="@{file}"/>
+                </and>
+                <then>
+                    <basename property="file.name" file="@{file}"/>
+                    <dirname property="file.dir.path" file="@{file}"/>
+                    <copy file="@{file}" tofile="${file.dir.path}/${file.name}.${files.backup.format}.bak" overwrite="true" failonerror="${failonerror}"/>
+                </then>
+            </if>
+            
+            <!-- Check need to do mutliple files back up -->
+            <if>
+                <and>
+                    <length string="@{srcDir}" trim="true" length="0" when="greater"/>
+                    <available file="@{srcDir}" type="dir"/>
+                </and>
+                <then>
+                    <mkdir dir="${files.dest.dir}"/>
+                    <copy todir="${files.dest.dir}" overwrite="true" failonerror="${failonerror}">
+                        <regexpmapper from="${files.regular.exp}" to="\1.${files.backup.format}.bak" casesensitive="false"/>
+                        <fileset dir="@{srcDir}"/>
+                    </copy>
+                </then>
+            </if>
+        </sequential>
+    </macrodef>
+    
+    <!-- Macro to generate an Ant database file for Helium. 
+        
+    @scope private
+    -->
+    <macrodef name="databaseMacro" uri="http://www.nokia.com/helium">
+        <attribute name="file"/>
+        <attribute name="scope"/>
+        <sequential>
+            <mkdir dir="${basedir}/build"/>
+            <hlm:database output="@{file}" scope="@{scope}">
+                <fileset dir="${helium.dir}">
+                    <include name="config/signaling_config_default.ant.xml"/>
+                    <include name="config/stages_config_default.ant.xml"/>
+                    <include name="config/metadata_filter_config_default.ant.xml"/>
+                    <include name="tools/**/*.antlib.xml"/>
+                </fileset>
+            </hlm:database>
+        </sequential>
+    </macrodef>
     
 </antlib>

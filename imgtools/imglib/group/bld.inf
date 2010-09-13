@@ -65,3 +65,4 @@ patchdataprocessor
 parameterfileprocessor
 memmap
 uidcrc
+uniconv

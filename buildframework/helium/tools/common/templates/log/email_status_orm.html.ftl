@@ -88,10 +88,10 @@ Description:
         "${dbPath}") >
 
     <#assign convertedLogFile = "${logpath}"?replace("\\","/")>
-    <#assign logfile =  table_info['jpasingle']['select l from LogFile l where LOWER(l.path) like \'%${convertedLogFile?lower_case}\''][0]>
+    <#list table_info['jpa']['select l from LogFile l where LOWER(l.path)=\'${convertedLogFile?lower_case}\''] as logfile>
 
 
-<#assign error_count = table_info['jpasingle']['select Count(m.id) from MetadataEntry m JOIN m.priority as p where m.logPathId=${logfile.id} and p.priority like \'%ERROR%\''][0]> 
+<#assign error_count = table_info['jpasingle']['select Count(m.id) from MetadataEntry m JOIN m.severity as p where m.logFileId=${logfile.id} and p.severity=\'ERROR\''][0]> 
     <!-- section -->
     <#macro create_section title type>
            <div id="foldername">
@@ -105,19 +105,15 @@ Description:
 <#if (error_count > 0)>
         <span class="errormessage">
             ${logfile.path}...FAIL<br/>
-            <#list table_info['native:com.nokia.helium.jpa.entity.metadata.MetadataEntry']['select * from metadataentry INNER JOIN priority ON priority.priority_id=metadataentry.priority_id where UPPER(priority.priority) like \'%ERROR%\' and logpath_id=${logfile.id}'] as entry >
+            <#list table_info['jpa']['select e from MetadataEntry e JOIN e.severity s where s.severity=\'ERROR\' and e.logFileId=${logfile.id}'] as entry >
             <ul>
             ${entry.text}<br/>
             </ul>
             </#list>
-<#list table_info['jpa']['select distinct w FROM Component c, WhatLogEntry w WHERE c.logPathID=${logfile.id} AND c.id=w.componentID AND w.missing=1'] as entry>
-            <ul>
-MISSING: ${entry.member}<br/>
-            </ul>
-</#list>
         </span>
 <#else>
     <span class="okmessage">${logfile.path}...OK<br/></span>
 </#if>
+</#list>
 </body>
 </html>

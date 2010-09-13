@@ -16,44 +16,29 @@
 */
 package com.nokia.helium.sysdef.ant.types;
 
+import java.io.File;
+
+import com.nokia.helium.sysdef.ant.taskdefs.FilterTask;
+
 /**
- * This type defines a system definition filter.
+ * This interface defines filter applied by the sysdefFilter task.
  *
  */
-public class Filter {
-    private String filter;
-    private String type = "has";
+public interface Filter {
 
     /**
-     * Define the filter
-     * @param filter the filter string.
+     * Validate the object parameters.
+     * This method will be called before the filter method.
      */
-    public void setFilter(String filter) {
-        this.filter = filter;
-    }
+    void validate();
     
     /**
-     * Get the filter.
+     * Apply filtering on the src file and save the outcome into
+     * the dest file.
+     * @param task the calling task.
+     * @param src the source file
+     * @param dest the dest file.
      */
-    public String getFilter() {
-        return filter;
-    }
-
-    /**
-     * Define the filter type
-     * @param type
-     * @ant.not-required Default has.
-     */
-    public void setType(SydefFilterTypeEnum type) {
-        this.type = type.getValue();
-    }
-
-    /**
-     * Get the filter type.
-     * @return
-     */
-    public String getType() {
-        return type;
-    }
-
+    void filter(FilterTask task, File src, File dest);
+    
 }

@@ -118,7 +118,7 @@ bool RofsReader::IsExecutable(const string& aName) {
 				ext.find(".prt") != string::npos || ext.find(".nif") != string::npos || 
 				ext.find(".tsy") != string::npos || ext.find(".pdl") != string::npos || 
 				ext.find(".csy") != string::npos || ext.find(".agt") != string::npos || 
-				ext.find(".ani") != string::npos || ext.find(".loc") != string::npos || 
+				ext.find(".ani") != string::npos || //ext.find(".loc") != string::npos || 
 				ext.find(".pdd") != string::npos || ext.find(".ldd") != string::npos ||
 				ext.find(".drv") != string::npos)  {
 				return true;

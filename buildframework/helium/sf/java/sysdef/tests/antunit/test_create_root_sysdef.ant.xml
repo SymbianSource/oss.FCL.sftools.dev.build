@@ -92,6 +92,15 @@ Description:
         <au:assertTrue>
             <contains string="${pkg.root}" substring="valid_package" />
         </au:assertTrue>
+        <au:assertFalse>
+            <contains string="${pkg.root}" substring="id-namespace=&quot;&quot;" />
+        </au:assertFalse>
+        <au:assertTrue message="Check if xmlns:qt=&quot;http://qt.nokia.com&quot; is defined.">
+            <contains string="${pkg.root}" substring="xmlns:qt=&quot;http://qt.nokia.com&quot;" />
+        </au:assertTrue>
+        <au:assertTrue message="Check if id=&quot;valid_package&quot; is defined.">
+            <contains string="${pkg.root}" substring="id=&quot;valid_package&quot;" />
+        </au:assertTrue>
     </target>
 
     <!--
@@ -219,9 +228,9 @@ Description:
         <au:assertTrue>
             <not>
                 <and>
-                    <contains string="${pkg.root}" substring="valid_package" />
-                    <contains string="${pkg.root}" substring="vendor_package" />
-                    <contains string="${pkg.root}" substring="nokia_vendor_package" />
+                    <contains string="${pkg.root}" substring="valid_package/package_definition.xml" />
+                    <contains string="${pkg.root}" substring="vendor_package/package_definition.xml" />
+                    <contains string="${pkg.root}" substring="vendor_package/vendor_package_info/nokia_vendor_package_metadata/package_definition.xml" />
                 </and>
             </not>
         </au:assertTrue>
@@ -230,17 +239,35 @@ Description:
     <target name="test-create-root-sysdef-single-root-test-vendor-package">
         <hlm:createRootSysdef destFile="${epocroot.temp}/sysdef_model.xml" epocroot="${epocroot.temp}">
             <fileset dir="${epocroot}">
-                <include name="vendor_package/**/package_definition.xml" />
+                <include name="vendor_package/*/*/package_definition.xml" />
+                <include name="vendor_package2/**/package_definition.xml" />
             </fileset>
         </hlm:createRootSysdef>
         <au:assertFileExists file="${epocroot.temp}/sysdef_model.xml" />
         <loadfile property="pkg.root" srcfile="${epocroot.temp}/sysdef_model.xml" />
+        <echo>${pkg.root}</echo>
         <au:assertTrue>
-            <and>
-                <contains string="${pkg.root}" substring="vendor_package" />
-                <contains string="${pkg.root}" substring="nokia_vendor_package" />
-            </and>
+            <contains string="${pkg.root}" substring="vendor_package/vendor_package_info/nokia_vendor_package_metadata/package_definition.xml" />
         </au:assertTrue>
+        <au:assertTrue message="Vendor package overriding SF should not be prefixed by sf because it is the default namespace.">
+            <contains string="${pkg.root}" substring="id=&quot;vendor_package&quot;" />
+        </au:assertTrue>
+        <au:assertTrue message="Check that xmlns:qt=&quot;http://www.nokia.com/qt&quot; is added.">
+            <contains string="${pkg.root}" substring="xmlns:qt=&quot;http://www.nokia.com/qt&quot;" />
+        </au:assertTrue>
+        <au:assertTrue message="Check that xmlns:vendor=&quot;http://www.vendor.com/schema/drd/system-definition&quot; is added.">
+            <contains string="${pkg.root}" substring="xmlns:vendor=&quot;http://www.vendor.com/schema/drd/system-definition&quot;" />
+        </au:assertTrue>
+        <au:assertTrue message="Verify that a space is added between namespaces">
+            <not>
+                <contains string="${pkg.root}" substring="&quot;xmlns" />
+            </not>
+        </au:assertTrue>        
+        <au:assertTrue message="Vendor package 2 is pure vendor, so it must be prefixed with vendor.">
+            <contains string="${pkg.root}" substring="id=&quot;vendor:vendor_package2&quot;" />
+        </au:assertTrue>
+    	<!-- Let's check if the file is syntaxically correct. -->
+    	<xmlvalidate file="${epocroot.temp}/sysdef_model.xml" lenient="yes"/>
     </target>
       
 </project>

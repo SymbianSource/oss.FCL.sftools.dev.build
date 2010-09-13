@@ -71,13 +71,15 @@ public class ExportAction extends BaseDirectoryScmAction {
     public void execute(ScmRepository repository) throws ScmException {
         ScmManager scmManager = getTask().getScmManager();
 
-        if (getDestPath() == null)
+        if (getDestPath() == null) {
             throw new ScmException("destPath attribute has not been provided.");
-
-        if (tags.size() > 1)
+        }
+        
+        if (tags.size() > 1) {
             throw new ScmException(
                     "You can only specify one tag nested element.");
-
+        }
+        
         ExportScmResult result;
         try {
             if (tags.size() == 0) {

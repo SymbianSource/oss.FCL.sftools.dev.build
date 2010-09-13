@@ -16,6 +16,14 @@
 */
  
 package com.nokia.helium.imaker.ant.types;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.Vector;
+import java.util.regex.Pattern;
+
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.ant.Project;
@@ -26,14 +34,6 @@ import com.nokia.helium.imaker.IMaker;
 import com.nokia.helium.imaker.IMakerException;
 import com.nokia.helium.imaker.ant.Command;
 import com.nokia.helium.imaker.ant.IMakerCommandSet;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.Vector;
-import java.util.regex.Pattern;
 
 /**
  * The imakerconfiguration enables the build manager to configure his iMaker
@@ -84,6 +84,8 @@ import java.util.regex.Pattern;
  * imaker -f /epoc32/rom/config/platform/product/image_conf_product_ui.mk TYPE=subcon USE_FOTI=0 USE_FOTA=1 langpack_01
  * </pre>
  * 
+ * Remember to update helium/sf/java/imaker/imaker.rst if you change this
+ *
  * @ant.type name="imakerconfiguration" category="imaker"
  */
 public class Configuration extends DataType implements IMakerCommandSet {
@@ -324,7 +326,6 @@ public class Configuration extends DataType implements IMakerCommandSet {
         if (makefiles.size() > 0) {
             Matcher matcher = getMakefileMatcher(imaker);
             for (String configuration : configurations) {
-                System.out.println("configuration: " + configuration);
                 if (matcher.match(configuration)) {
                     result.add(configuration);
                 }

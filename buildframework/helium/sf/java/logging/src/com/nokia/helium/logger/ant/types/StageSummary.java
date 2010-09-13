@@ -17,8 +17,9 @@
 package com.nokia.helium.logger.ant.types;
 
 import java.io.File;
-import org.apache.tools.ant.Project;
+
 import org.apache.log4j.Logger;
+import org.apache.tools.ant.Project;
 import org.apache.tools.ant.types.DataType;
 
 import com.nokia.helium.logger.ant.listener.StageSummaryHandler;

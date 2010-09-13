@@ -35,7 +35,7 @@ import re
 
 import ats3.parsers as parser
 
-from path import path # pylint: disable-msg=F0401
+from path import path # pylint: disable=F0401
 
 _logger = logging.getLogger('ats')
 
@@ -85,7 +85,7 @@ class Configuration(object):
             hrh = os.path.join(self.build_drive + os.sep, 'epoc32', 'include', 'feature_settings.hrh')
             if os.path.exists(tsrc):
                 if os.path.exists(hrh):
-                    temp_dict = c_parser.get_cpp_output(path(tsrc), "d", hrh)
+                    temp_dict = c_parser.get_cpp_output(path(tsrc), "d", hrh, self.build_drive)
                 else:
                     temp_dict = c_parser.get_cpp_output(path(tsrc), "d")
                 for t_key, t_value in temp_dict.items():
@@ -157,6 +157,7 @@ class Ats3TestPlan(object):
             self.eunitexerunner_flags = config.eunitexerunner_flags
         self.sets = []
         self.src_dst = []
+        self.dll_files = {}
         self.pmd_files = []
         self.trace_activation_files = []
         self.trace_enabled = 'False'
@@ -183,7 +184,8 @@ class Ats3TestPlan(object):
     def insert_set(self, data_files=None, config_files=None, 
                    engine_ini_file=None,  image_files=None, sis_files=None,
                    testmodule_files=None, test_timeout=None,eunitexerunner_flags=None , test_harness=None,
-                   src_dst=None, pmd_files=None, trace_activation_files=None, custom_dir=None, component_path=None):
+                   src_dst=None, pmd_files=None, trace_activation_files=None, custom_dir=None, 
+                   dll_files=None, component_path=None):
         """
         Insert a test set into the test plan.
         """
@@ -212,9 +214,11 @@ class Ats3TestPlan(object):
             trace_activation_files = []
         if component_path is None:
             component_path = self.component_path
+        if dll_files is None:
+            dll_files = self.dll_files
             
         setd = dict(name="set%d" % len(self.sets),
-                    image_files=image_files, engine_ini_file=engine_ini_file, ctc_enabled=self.ctc_enabled, component_path=component_path)
+                    image_files=image_files, engine_ini_file=engine_ini_file, ctc_enabled=self.ctc_enabled, dll_files=dll_files, component_path=component_path)
         
         setd = dict(setd, custom_dir=custom_dir)
         if sis_files:
@@ -420,7 +424,7 @@ def create_drop(config):
     else:
         generator = adg.Ats3TestDropGenerator()
     _logger.info("generating drop file: %s" % config.drop_file)
-    generator.generate(test_plan, output_file=config.drop_file, config_file=config.config_file)
+    generator.generate(test_plan, output_file=config.drop_file, config_file=config.config_file )
 
 def split_paths(arg, delim=","):
     """

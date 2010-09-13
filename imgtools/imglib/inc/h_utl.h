@@ -93,7 +93,7 @@ void HeapCheck();
 #endif
 #define Print H.PrintString
 //
-const TInt KMaxStringLength=0x400;
+const TInt KMaxStringLength=0x800;
 //
 class HFile
 	{

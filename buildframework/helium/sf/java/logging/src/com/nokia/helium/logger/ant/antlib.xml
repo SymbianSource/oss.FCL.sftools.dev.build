@@ -25,10 +25,10 @@ Description:
     <taskdef name="record" classname="com.nokia.helium.logger.ant.taskdefs.LogRecorderTask"/>
     <taskdef name="logreplace" classname="com.nokia.helium.logger.ant.taskdefs.LogReplaceTask"/>
     <taskdef name="triggerlogger" classname="com.nokia.helium.logger.ant.taskdefs.TriggerLoggerTask"/>
+    <taskdef name="taskRecorder" classname="com.nokia.helium.logger.ant.taskdefs.TaskRecorder"/>
     
     <!-- Type definition -->
     <typedef name="stagerecord" classname="com.nokia.helium.logger.ant.types.StageLogging"/>
-    <typedef name="stage" classname="com.nokia.helium.logger.ant.types.Stage"/>
     <typedef name="stagesummary" classname="com.nokia.helium.logger.ant.types.StageSummary"/>
     <typedef name="recordfilterset" classname="com.nokia.helium.logger.ant.types.RecordFilterSet"/>
     

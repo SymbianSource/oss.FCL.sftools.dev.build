@@ -19,9 +19,7 @@ package com.nokia.helium.sysdef.ant.taskdefs;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.util.FileUtils;
@@ -48,26 +46,18 @@ import com.nokia.helium.sysdef.ant.types.FilterSet;
  * For more information about system definition file v3.0 please check 
  * <a href="http://developer.symbian.org/wiki/index.php/System_Definition">http://developer.symbian.org/wiki/index.php/System_Definition</a>.
  *
+ * <br>
+ * This task relies on externals tools. Their location can be configured the following ways:
+ *  <li>by configuring the sysdef.tools.home property, fails if the location is incorrect.
+ *  <li>The parent folder of the joinsysdef tool from the PATH, fallback on SDK location.
+ *  <li>Default SDK location.
+ *
  * @ant.task name="filterSysdef" category="Sysdef"
  */
 public class FilterTask extends AbstractSydefTask {
-    private static final String XSLT = "sf/os/buildtools/bldsystemtools/sysdeftools/filtering.xsl";
+    private static final String XSLT = "filtering.xsl";
     private List<FilterSet> filterSets = new ArrayList<FilterSet>();
     
-    /**
-     * Running the filtering operation on src file and put the result in dest file.
-     * @param src the source file
-     * @param dest the destination file
-     * @param filter the filter to use
-     * @param filterType the filter type to use (e.g has, only, with)
-     */
-    protected void filter(File src, File dest, String filter, String filterType) {
-        Map<String, String> params = new Hashtable<String, String>();
-        params.put("filter-type", filterType);
-        params.put("filter", filter);
-        transform(params);
-    }
-
     /**
      * Create a FilterSet object to store filters.
      * @return a new FilterSet object
@@ -96,19 +86,26 @@ public class FilterTask extends AbstractSydefTask {
         log("Filtering " + this.getSrcFile());
         for (FilterSet filterSet : filterSets) {
             if (filterSet.isReference()) {
-                filterSet = (FilterSet)filterSet.getRefid().getReferencedObject();
+                try {
+                    filterSet = (FilterSet)filterSet.getRefid().getReferencedObject();
+                } catch (ClassCastException ex) {
+                    throw new BuildException("Object referenced by '" + filterSet.getRefid().getRefId() + "' is not a sysdefFilterSet.", ex);
+                }
             }
             List<File> toDelete = new ArrayList<File>();
             try {
                 File src = this.getSrcFile();
                 File dst = null;
                 for (Filter filter : filterSet.getFilters()) {
-                    if (filter.getFilter() == null) {
-                        throw new BuildException("'filter' attribute is not defined.");
-                    }
+                    
+                    // validating parameter first.
+                    filter.validate();
+                    
+                    // Then filter the file
                     dst = File.createTempFile("sysdef", ".xml", this.getEpocroot());
                     toDelete.add(dst);
-                    filter(src, dst, filter.getFilter(), filter.getType());
+                    filter.filter(this, src, dst);
+                    
                     // Dest is the input for next loop.
                     src = dst;
                 }
@@ -135,7 +132,7 @@ public class FilterTask extends AbstractSydefTask {
      * {@inheritDoc}
      */
     @Override
-    File getXsl() {
-        return new File(this.getEpocroot(), XSLT);
+    protected File getXsl() {
+        return new File(SysdefUtils.getSysdefHome(getProject(), this.getEpocroot()), XSLT);
     }
 }

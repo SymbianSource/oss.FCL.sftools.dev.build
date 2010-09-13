@@ -17,10 +17,22 @@
 
 package com.nokia.helium.metadata.ant.types;
 
-import java.io.*;
-import java.util.*;
-import org.apache.log4j.Logger;
-import org.apache.tools.ant.BuildException;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Map;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+
+import com.nokia.helium.metadata.AutoCommitEntityManager;
+import com.nokia.helium.metadata.MetadataException;
+import com.nokia.helium.metadata.model.metadata.LogFile;
+import com.nokia.helium.metadata.model.metadata.MetadataEntry;
+import com.nokia.helium.metadata.model.metadata.Severity;
+import com.nokia.helium.metadata.model.metadata.SeverityDAO;
 
 /**
  * This Type is to specify and use the text logparser type to parse and store the data.
@@ -42,119 +54,52 @@ import org.apache.tools.ant.BuildException;
  */
 public class TextLogMetaDataInput extends LogMetaDataInput {
 
-    private Logger log = Logger.getLogger(TextLogMetaDataInput.class);
-    
-    private int lineNumber;
-    
-    private BufferedReader currentReader;
-
     /**
-     * Constructor
+     * {@inheritDoc}
      */
-    public TextLogMetaDataInput() {
-        
-    }
-
-    /**
-     * Helper function to set the line number
-     * @param lineNo to be set for the entry
-     */
-    protected void setLineNumber(int lineNo) {
-        lineNumber = lineNo;
-    }
-
-    /**
-     * Helper function to return the line number of this entry.
-     * @return line number of the entry.
-     */
-    protected int getLineNumber() {
-        return lineNumber;
-    }
-
-    /**
-     * Helper function to set the reader of this stream
-     * @param reader to process the stream.
-     */
-    protected void setCurrentReader(BufferedReader reader) {
-        currentReader = reader;
-    }
-
-    /**
-     * Function to check if is there any additionaly entry. This is being used for example during streaming
-     * recorded and at the end of streaming use the recorded data to add any additional entry. Used by
-     * @return true if there are any additional entries which are to be recorded in the database.
-     */
-    public boolean isAdditionalEntry() {
-        return false;
-    }
-
-    /**
-     * Helper function to return the lbuffer reader for the current meta data input
-     * @return buffer reader object for the current metadata input.
-     */
-    protected BufferedReader getCurrentReader() {
-        return currentReader;
-    }
-
-    public boolean isEntryCreated(File currentFile) {
-        String exceptions = "";
+    @Override
+    public void extract(EntityManagerFactory factory, File file) throws MetadataException {
+        EntityManager em = factory.createEntityManager();
+        AutoCommitEntityManager autoCommitEM = new AutoCommitEntityManager(factory);
         try {
-            if (currentReader == null) {
-                lineNumber = 0;
-                log.debug("Current Text log file name:" + currentFile);
-                log.debug("Processing file: " + currentFile);
-                currentReader = new BufferedReader(new FileReader(currentFile));
-            }
+            // Get the severities
+            SeverityDAO severityDao = new SeverityDAO();
+            severityDao.setEntityManager(em);
+            Map<String, Severity> priorities = severityDao.getSeverities();
+            
+            // Add a logfile entry into the database.
+            LogFile logFile = getLogFile(em, file);
+
+            // Start parsing
+            BufferedReader reader = new BufferedReader(new FileReader(file));
             String logText = null;
-            while ((logText = currentReader.readLine()) != null) {
-                logText = logText.replaceFirst("^[ ]*\\[.+?\\][ ]*", "");
-                String severity = getSeverity(logText);
-                if (severity != null) {
-                    addEntry(severity, currentFile.getName(), currentFile.toString(), 
-                            lineNumber, logText );
-                    lineNumber ++;
-                    return true;
+            int lineNumber = 0;
+            while ((logText = reader.readLine()) != null) {
+                lineNumber++;                    
+                String line = logText.replaceFirst("^\\s*\\[.+?\\]\\s*", "");
+                SeverityEnum.Severity severity = getSeverity(line);
+                if (severity != SeverityEnum.Severity.NONE) {
+                    MetadataEntry entry = new MetadataEntry();
+                    entry.setLogFile(autoCommitEM.merge(logFile));
+                    entry.setLineNumber(lineNumber);
+                    entry.setSeverity(autoCommitEM.merge(priorities.get(severity.toString())));
+                    entry.setText(line);
+                    autoCommitEM.persist(entry);
                 }
             }
-            currentReader.close();
-            currentReader = null;
-            if (isAdditionalEntry()) {
-                return true;
-            }
+            reader.close();
         } catch (FileNotFoundException ex) {
-            log.debug("FileNotFoundException in TextLogMetadata", ex);
-            try {
-                currentReader.close();
-                currentReader = null;
-            } catch (IOException ex1) {
-                // We are Ignoring the errors as no need to fail the build.
-                log.debug("Exception in TextLogMetadata", ex1);
-                try {
-                    currentReader.close();
-                } catch ( IOException iex) {
-                 // We are Ignoring the errors as no need to fail the build.
-                    log.debug("Exception in closing reader", iex);
-                }
-                currentReader = null;
-                exceptions = exceptions + ex.getMessage() + "\n";
-                return false;
-            }
+            throw new MetadataException(ex.getMessage(), ex);
         } catch (IOException ex) {
-            log.debug("Exception in TextLogMetadata", ex);
-            try {
-                currentReader.close();
-                currentReader = null;
-            } catch (IOException ex1) {
-                // We are Ignoring the errors as no need to fail the build.
-                log.debug("Exception in TextLogMetadata", ex1);
-                exceptions = exceptions + ex.getMessage() + "\n";
-                return false;
+            throw new MetadataException(ex.getMessage(), ex);
+        } finally {
+            if (autoCommitEM != null) {
+                autoCommitEM.close();
+            }
+            if (em != null) {
+                em.close();
             }
         }
-        if (!exceptions.equals("")) {
-            throw new BuildException(exceptions);
-        }
-        
-        return false;
     }
+
 }

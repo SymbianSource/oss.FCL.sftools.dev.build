@@ -44,9 +44,11 @@ import org.apache.tools.ant.Project;
 public class HeliumLogger extends DefaultLogger {
 
     private static boolean stopLogToConsole;
+    private static final String INTERNALPROPERTY = "internal.";
 
     private Project project;
     private Logger log = Logger.getLogger(this.getClass());
+    
 
 
     /**
@@ -78,13 +80,28 @@ public class HeliumLogger extends DefaultLogger {
         /**if the target is not going to execute (due to 'if' or 'unless' conditions) 
         print a message telling the user why it is not going to execute**/
         if (!testIfCondition(ifCondition) && ifCondition != null) {
-            project.log("Skipped because property '"
-                + project.replaceProperties(ifCondition)
-                + "' not set.", Project.MSG_INFO);
+            if (ifCondition.startsWith(INTERNALPROPERTY)) {
+                String enableProperty = ifCondition.substring(INTERNALPROPERTY.length());
+                project.log("Skipped because property '"
+                        + enableProperty
+                        + "' not set to 'true'.", Project.MSG_INFO);
+            } else {
+                project.log("Skipped because property '"
+                        + project.replaceProperties(ifCondition)
+                        + "' is not set.", Project.MSG_INFO);
+            }
+            
         } else if (!testUnlessCondition(unlessCondition) && unlessCondition != null) {
-            project.log("Skipped because property '"
-                + project.replaceProperties(unlessCondition)
-                + "' set.", Project.MSG_INFO);
+            if (unlessCondition.startsWith(INTERNALPROPERTY)) {
+                String enableProperty = unlessCondition.substring(INTERNALPROPERTY.length());
+                project.log("Skipped because property '"
+                        + enableProperty
+                        + "' is set.", Project.MSG_INFO);
+            } else {
+                project.log("Skipped because property '"
+                        + project.replaceProperties(unlessCondition)
+                        + "' set.", Project.MSG_INFO);
+            }
         }
     }
 
@@ -129,17 +146,18 @@ public class HeliumLogger extends DefaultLogger {
      * See if build needs a final cleanup target to be called.
      */
     private void cleanup() {
-        String loggingoutputfile = project.getProperty("logging.output.file");
-        if (loggingoutputfile != null) {
-            File file = new File(loggingoutputfile);
-            if (file.exists()) {
-                file.delete();
+        if (project != null) {
+            String loggingoutputfile = project.getProperty("logging.output.file");
+            if (loggingoutputfile != null) {
+                File file = new File(loggingoutputfile);
+                if (file.exists()) {
+                    file.delete();
+                }
             }
-        }
-
-        if ((project.getProperty("call.cleanup") != null)
-                && (project.getProperty("call.cleanup").equals("yes"))) {
-            project.executeTarget("cleanup-all");
+            if ((project.getProperty("call.cleanup") != null)
+                    && (project.getProperty("call.cleanup").equals("yes"))) {
+                project.executeTarget("cleanup-all");
+            }
         }
     }
 

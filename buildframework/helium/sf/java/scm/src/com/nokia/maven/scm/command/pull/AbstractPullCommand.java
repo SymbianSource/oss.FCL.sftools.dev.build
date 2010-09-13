@@ -28,6 +28,7 @@ import org.apache.maven.scm.ScmVersion;
 import org.apache.maven.scm.command.AbstractCommand;
 import org.apache.maven.scm.provider.ScmProviderRepository;
 
+
 /**
  * Abstract class to representing a pull command.
  * This functionality is mainly targeted for distributed 

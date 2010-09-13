@@ -33,8 +33,8 @@ class DeltaZipTest( unittest.TestCase ):
         self.cwd_backup = os.getcwd()
         self.logger = logging.getLogger('test.deltazip')
         self.root = os.environ['TEST_DATA']
-        self.output = os.path.join(tempfile.gettempdir(), 'deltazip')
-        self.output2 = os.path.join(tempfile.gettempdir(), 'deltazip2')
+        self.output = tempfile.mkdtemp()
+        self.output2 = tempfile.mkdtemp()
         
         logging.basicConfig(level=logging.INFO)
 

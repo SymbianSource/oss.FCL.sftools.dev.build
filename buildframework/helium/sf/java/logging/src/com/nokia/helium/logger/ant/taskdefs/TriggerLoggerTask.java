@@ -16,12 +16,12 @@
 */
 package com.nokia.helium.logger.ant.taskdefs;
 
+import org.apache.log4j.Logger;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
 
 import com.nokia.helium.logger.ant.listener.AntLoggingHandler;
 import com.nokia.helium.logger.ant.listener.StatusAndLogListener;
-import org.apache.log4j.Logger;
 
 /**
  * This task is used to start the helium logging listener.

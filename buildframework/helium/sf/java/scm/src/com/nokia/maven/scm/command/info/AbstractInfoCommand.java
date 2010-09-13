@@ -24,6 +24,7 @@ import org.apache.maven.scm.ScmFileSet;
 import org.apache.maven.scm.command.AbstractCommand;
 import org.apache.maven.scm.provider.ScmProviderRepository;
 
+
 /**
  * The 'hg info' command.
  */

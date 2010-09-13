@@ -1,48 +1,46 @@
 /*
-* Copyright (c) 2007-2008 Nokia Corporation and/or its subsidiary(-ies).
-* All rights reserved.
-* This component and the accompanying materials are made available
-* under the terms of the License "Eclipse Public License v1.0"
-* which accompanies this distribution, and is available
-* at the URL "http://www.eclipse.org/legal/epl-v10.html".
-*
-* Initial Contributors:
-* Nokia Corporation - initial contribution.
-*
-* Contributors:
-*
-* Description:  
-*
-*/
-
+ * Copyright (c) 2007-2008 Nokia Corporation and/or its subsidiary(-ies).
+ * All rights reserved.
+ * This component and the accompanying materials are made available
+ * under the terms of the License "Eclipse Public License v1.0"
+ * which accompanies this distribution, and is available
+ * at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ *
+ * Initial Contributors:
+ * Nokia Corporation - initial contribution.
+ *
+ * Contributors:
+ *
+ * Description:  
+ *
+ */
 
 package com.nokia.helium.diamonds;
 
 import org.apache.tools.ant.BuildEvent;
+
 import org.apache.tools.ant.Project;
-import org.apache.tools.ant.util.FileUtils;
 import java.util.Date;
-import java.util.List;
-import java.util.HashSet;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.ListIterator;
 import org.apache.log4j.Logger;
-import java.util.Properties;
-import com.nokia.helium.core.PropertiesSource;
-import com.nokia.helium.core.TemplateInputSource;
-import com.nokia.helium.core.TemplateProcessor;
+import com.nokia.helium.core.EmailSendException;
+import com.nokia.helium.core.ant.Message;
+import com.nokia.helium.core.MessageCreationException;
 import com.nokia.helium.diamonds.XMLMerger.XMLMergerException;
+import java.io.InputStream;
 
 /**
- * Base diamonds logger implementation. The common implementation like
- * initialization done here and used by sub classes.
+ * Base diamonds logger implementation. The common implementation like initialization done here and
+ * used by sub classes.
  */
 public class DiamondsListenerImpl implements DiamondsListener {
 
-    private static ArrayList<File> finalLogList = new ArrayList<File>();
+    private static ArrayList<InputStream> finalStreamList = new ArrayList<InputStream>();
 
     private static DiamondsClient diamondsClient;
 
@@ -50,97 +48,72 @@ public class DiamondsListenerImpl implements DiamondsListener {
 
     private static ArrayList<String> deferLogList = new ArrayList<String>();
 
-    private TemplateProcessor templateProcessor;
+    private static Logger log = Logger.getLogger(DiamondsListenerImpl.class);
 
-    private Project project;
-    
-    private SimpleDateFormat timeFormat;
+    private static Project project;
 
-    private Date buildStartTime;
+    private static Object mutexObject = new Object();;
     
-    private Logger log = Logger.getLogger(DiamondsListenerImpl.class);
+    private static SimpleDateFormat timeFormat;
 
     /**
      * Default constructor
      */
     public DiamondsListenerImpl() {
-        templateProcessor = new TemplateProcessor();
-        timeFormat = new SimpleDateFormat(DiamondsConfig
-                .getDiamondsProperties().getProperty("tstampformat"));
+    }
+    
+    public static void initialize(Project prj) {
+        project = prj;
+        log.debug("buildbegin:" + project);
+        Date date = new Date();
+        timeFormat = new SimpleDateFormat(DiamondsConfig.getTimeFormat());
+        log.debug("build.start.time:" + date);
+        project.setProperty("build.start.time", timeFormat.format(date));
     }
 
     /**
      * Function to process logging info during end of build
      * 
-     * @param event
-     *            of target execution.
+     * @param event of target execution.
      */
-    public final void buildBegin(BuildEvent buildEvent)
-            throws DiamondsException {
-        project = buildEvent.getProject();
-        buildStartTime = new Date();
+    public final void buildBegin(BuildEvent buildEvent) throws DiamondsException {
     }
     
     /**
      * Function to process logging info during end of build
      * 
-     * @param event
-     *            of target execution.
+     * @param event of target execution.
      */
     @SuppressWarnings("unchecked")
-    public final void buildEnd(BuildEvent buildEvent) throws DiamondsException {
+    public void buildEnd(BuildEvent buildEvent) throws DiamondsException {
+        log.debug("build end: " + isInitialized());
         if (isInitialized()) {
-            log.debug("diamonds:DiamondsListenerImpl:sending final data to diamonds.");
-            String output = DiamondsConfig.getOutputDir() + File.separator
-                    + "diamonds-finish.xml";
-            File outputFile = new File(output);
-            String finishTemplateFile = "diamonds_finish.xml.ftl";
-            Properties tempProperties = new Properties();
-            tempProperties.put("build.end.time", timeFormat
-                    .format(new Date()));
-            List<TemplateInputSource> sourceList = new ArrayList<TemplateInputSource>();
-            sourceList.add(new PropertiesSource("ant", project
-                    .getProperties()));
-            sourceList
-                    .add(new PropertiesSource("diamonds", tempProperties));
-            templateProcessor.convertTemplate(DiamondsConfig
-                    .getTemplateDir(), finishTemplateFile, output,
-                    sourceList);
-
-            log.info("Sending final data to diamonds.");
-            // String mergedFile = mergeFiles(output);
-            diamondsClient.sendData(output, DiamondsConfig
-                    .getDiamondsProperties().getDiamondsBuildID());
-            mergeToFullResults(outputFile);
+            project.setProperty("build.end.time", timeFormat.format(new Date()));
+            sendMessage("final.message");
             isInitialized = false;
-            DiamondsProperties props = DiamondsConfig.getDiamondsProperties();
-            String smtpServer = project.getProperty(props
-                    .getProperty("smtpserver"));
-            String ldapServer = project.getProperty(props
-                    .getProperty("ldapserver"));
-
+            InputStream first = finalStreamList.remove(0);
             try {
-                File first = finalLogList.remove(0);
-                String outputDir = DiamondsConfig.getOutputDir();
-                File fullResultsFile = new File(outputDir + File.separator
-                        + "diamonds-full-results.xml");
-                FileUtils.getFileUtils().copyFile(first, fullResultsFile);
-                XMLMerger merger = new XMLMerger(fullResultsFile);
-                HashSet<File> fileHash = new HashSet<File>(finalLogList);
-                for (File file : fileHash) {
+                //printStreamContent(first);
+                File fullResultsFile = File.createTempFile("diamonds-full-results", ".xml");
+                XMLMerger merger = new XMLMerger(first, fullResultsFile);
+                String smtpServer = DiamondsConfig.getSMTPServer();
+                String ldapServer = DiamondsConfig.getLDAPServer();
+                for (InputStream stream : finalStreamList) {
                     try {
-                        merger.merge(file);
-                    } catch (XMLMerger.XMLMergerException xe) {
+                        merger.merge(stream);
+                    }
+                    catch (XMLMerger.XMLMergerException xe) {
                         log.debug("Error during the merge: ", xe);
                     }
                 }
-//                diamondsClient.sendData(fullResultsFile.getAbsolutePath(), DiamondsConfig.getDiamondsProperties().getDiamondsBuildID());
-                diamondsClient.sendDataByMail(
-                        fullResultsFile.getAbsolutePath(), smtpServer,
-                        ldapServer);
+                diamondsClient.sendDataByMail(fullResultsFile.getAbsolutePath(), smtpServer, ldapServer);
+            } catch (EmailSendException ese) {
+                log.warn("Error occured while sending mail: " + ese.getMessage());
+                
             } catch (IOException e) {
                 log.error("Error sending diamonds final log: IOException", e);
-            } catch (XMLMergerException e) {
+            }
+            catch (XMLMergerException e) {
                 log.error("Error sending diamonds final log: XMLMergerException ", e);
             }
         }
@@ -149,8 +122,7 @@ public class DiamondsListenerImpl implements DiamondsListener {
     /**
      * Function to process logging info during begining of target execution
      * 
-     * @param event
-     *            of target execution.
+     * @param event of target execution.
      */
     public void targetBegin(BuildEvent buildEvent) throws DiamondsException {
         initDiamondsClient();
@@ -159,8 +131,7 @@ public class DiamondsListenerImpl implements DiamondsListener {
     /**
      * Function to process logging info during end of target execution
      * 
-     * @param event
-     *            of target execution.
+     * @param event of target execution.
      */
     public void targetEnd(BuildEvent buildEvent) throws DiamondsException {
     }
@@ -174,97 +145,109 @@ public class DiamondsListenerImpl implements DiamondsListener {
         return isInitialized;
     }
 
-    public static void mergeToFullResults(File xmlFile) throws DiamondsException {
-        finalLogList.add(xmlFile);
+    public static void mergeToFullResults(InputStream stream) throws DiamondsException {
+        finalStreamList.add(stream);
     }
 
-    protected String getSourceFile(String inputName) {
-        return DiamondsConfig.getOutputDir() + File.separator + inputName
-                + ".xml";
+
+    /**
+     * Helper function to return the default project passed to messages.
+     */
+    static Project getProject() {
+        return project;
     }
-    
+
+
+
     protected DiamondsClient getDiamondsClient() {
         return diamondsClient;
     }
-    
-    protected TemplateProcessor getTemplateProcessor() {
-        return templateProcessor;
-    }
-    
+
+
     protected boolean getIsInitialized() {
         return isInitialized;
     }
-    
-    protected SimpleDateFormat getTimeFormat() {
+
+    protected static SimpleDateFormat getTimeFormat() {
         return timeFormat;
     }
-    
+
     protected ArrayList<String> getDeferLogList() {
         return deferLogList;
     }
+    
+    protected static File streamToTempFile(InputStream stream) throws IOException {
+        File temp = File.createTempFile("diamonds", "xml");
+        FileOutputStream out = new FileOutputStream(temp);
+        int read = 0;
+        byte[] bytes = new byte[1024];
+ 
+        while ((read = stream.read(bytes)) != -1) {
+            out.write(bytes, 0, read);
+        }
+        out.flush();
+        out.close();
+        stream.close();
+        return temp;
+    }
 
+    private static void sendMessage(Message message, String buildID) throws DiamondsException {
+        try {
+            File tempFile = streamToTempFile(message.getInputStream());
+            tempFile.deleteOnExit();
+            if (buildID == null) {
+                buildID = diamondsClient.getBuildId(new FileInputStream(tempFile));
+                if (buildID != null) {
+                    project.setProperty(DiamondsConfig.getBuildIdProperty(), buildID);
+                    log.info("got Build ID from diamonds:" + buildID);
+                }
+            } else {
+                diamondsClient.sendData(new FileInputStream(tempFile), buildID);
+            }
+            mergeToFullResults(new FileInputStream(tempFile));
+        } catch (IOException iex) {
+            log.debug("IOException while retriving message:", iex);
+            throw new DiamondsException("IOException while retriving message");
+        } 
+        catch (MessageCreationException mex) {
+            log.debug("IOException while retriving message:", mex);
+            throw new DiamondsException("error during message retrival");
+        }
+    }
+
+    /**
+     * Send message to diamonds.
+     * @param messageId - id to look from in the ant config and to send it to diamonds.
+     *                    id is pointing to an fmpp message.
+     */
+    public static void sendMessage(String messageId) throws DiamondsException {
+        log.debug("send-message:" + messageId);
+        synchronized (mutexObject) {
+            String buildID = project.getProperty(DiamondsConfig.getBuildIdProperty());
+            Object obj = project.getReference(messageId);
+            if (obj != null) {
+                if (obj instanceof Message) {
+                    sendMessage((Message)obj, buildID);
+                }
+            } else {
+                log.debug("Message not sent for message id: " + messageId);
+            }
+        }
+    }
+    
     /**
      * Initializes the diamonds client and sends the initial data
      */
     @SuppressWarnings("unchecked")
     protected void initDiamondsClient() throws DiamondsException {
-        String outputDir = DiamondsConfig.getOutputDir();
         if (!isInitialized) {
-            String startTemplateFile = "diamonds_start.xml.ftl";
-            String output = outputDir + File.separator
-                    + "diamonds-start.log.xml";
-            new File(outputDir).mkdirs();
-            File outputFile = new File(output);
-            Properties tempProperties = new Properties();
-            tempProperties.put("build.start.time", timeFormat
-                    .format(buildStartTime));
-            List<TemplateInputSource> sourceList = new ArrayList<TemplateInputSource>();
-            sourceList.add(new PropertiesSource("ant", project
-                    .getProperties()));
-            sourceList
-                    .add(new PropertiesSource("diamonds", tempProperties));
-            DiamondsProperties diamondsProperties = DiamondsConfig
-                    .getDiamondsProperties();
-            templateProcessor.convertTemplate(DiamondsConfig
-                    .getTemplateDir(), startTemplateFile, output,
-                    sourceList);
-            mergeToFullResults(outputFile);
-
-            // String mergedFile = mergeFiles(output);
-            log.info("Initializing diamonds client");
-            diamondsClient = new DiamondsClient(project
-                    .getProperty(diamondsProperties.getProperty("host")),
-                    project.getProperty(diamondsProperties
-                            .getProperty("port")), project
-                            .getProperty(diamondsProperties
-                                    .getProperty("path")), project
-                            .getProperty(diamondsProperties
-                                    .getProperty("mail")));
-            String buildID = diamondsClient
-                    .getBuildId(outputFile.getAbsolutePath());
-            if (buildID != null) {
-                diamondsProperties.setDiamondsBuildID(buildID);
-                project.setProperty(diamondsProperties.getProperty("buildid-property"),
-                        diamondsProperties.getDiamondsBuildID());
-                log.info("Got build id from diamonds: " + buildID);
-            } else {
-                diamondsProperties.setDiamondsBuildID(buildID);
-                project.setProperty(diamondsProperties.getProperty("buildid-property"),
-                        "default");
-                log.info("diamonds build id set to default and in record only mode");
-            }
-            if (deferLogList.size() > 0) {
-                log
-                        .debug("diamonds:DiamondsListenerImpl: sending DefferList");
-                ListIterator<String> defferList = deferLogList
-                        .listIterator();
-                while (defferList.hasNext()) {
-                    String mergedDeferFile = defferList.next();
-                    mergeToFullResults(new File(mergedDeferFile));
-                    diamondsClient.sendData(mergedDeferFile, DiamondsConfig
-                            .getDiamondsProperties().getDiamondsBuildID());
-                }
-                deferLogList.clear();
+            diamondsClient = new DiamondsClient(DiamondsConfig.getHost(), 
+                    DiamondsConfig.getPort(), 
+                    DiamondsConfig.getPath(), 
+                    DiamondsConfig.getMailInfo());
+            String buildID = project.getProperty(DiamondsConfig.getBuildIdProperty());
+            if (buildID == null ) {
+                sendMessage("initial.message");
             }
             isInitialized = true;
         }

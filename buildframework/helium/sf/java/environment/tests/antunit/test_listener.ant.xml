@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : test_signaltask.ant.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test-exec-listener" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>Helium Antlib logger unittests.</description>
+    
+    <property environment="env" />
+
+    <dirname file="${ant.file.test-exec-listener}" property="test-exec-listener.dir"/>
+      
+    <taskdef resource="net/sf/antcontrib/antlib.xml"/>
+    
+    <target name="setUp">    
+        <tempfile property="temp.dir" suffix=".dir" />
+        <mkdir dir="${temp.dir}" />
+    </target>
+    
+    
+    <target name="tearDown">
+        <delete dir="${temp.dir}" />
+    </target>
+    
+    
+    <macrodef name="runScenario">
+        <attribute name="scenario" />
+        <attribute name="target" />
+        <sequential>
+            <trycatch property="scenario.unittest.error">
+                <try>
+                    <exec osfamily="windows" executable="cmd" dir="${test-exec-listener.dir}/listener" failonerror="true" errorproperty="scenario.unittest.error.log">
+                        <env key="ANT_ARGS" value="${env.ANT_ARGS} -listener com.nokia.helium.environment.ant.listener.ExecListener" />
+                        <arg line="/c ..\..\build.bat @{target}" />
+                        <arg value="-Dant.executor.class=com.nokia.helium.core.ant.HeliumExecutor" />
+                        <arg value="-Dtemp.dir=${temp.dir}" />
+                    </exec>
+                    <exec osfamily="unix" executable="../../bld.sh" dir="${test-exec-listener.dir}/listener" failonerror="true" errorproperty="scenario.unittest.error.log">
+                        <env key="ANT_ARGS" value="${env.ANT_ARGS} -listener com.nokia.helium.environment.ant.listener.ExecListener" />
+                        <arg line="@{target}" />
+                        <arg value="-Dant.executor.class=com.nokia.helium.core.ant.HeliumExecutor" />
+                        <arg value="-Dtemp.dir=${temp.dir}" />
+                    </exec>
+                </try>
+            </trycatch>
+            <au:assertTrue message="${scenario.unittest.error.log}">
+                <not>
+                    <isset property="scenario.unittest.error" />
+                </not>
+            </au:assertTrue>
+        </sequential>
+    </macrodef>
+    
+    
+    <target name="test-exec-listener">
+        <runScenario scenario="logger" target="test-exec-calls" />
+        <au:assertFileExists file="listener/executables.csv"/>
+        <loadfile srcfile="listener/executables.csv" property="executables.csv.text"/>
+        <au:assertMatches string="${executables.csv.text}" pattern="perl" multiline="true"/>
+        <au:assertMatches string="${executables.csv.text}" pattern="python" multiline="true"/>
+        
+        <delete file="listener/executables.csv"/>
+        <delete file="listener/tools_listener.xml"/>
+    </target>
+
+</project>
+
+
+

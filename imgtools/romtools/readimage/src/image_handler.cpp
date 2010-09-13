@@ -40,6 +40,7 @@ string ImageReader::iPattern = "";
 string SisUtils::iOutputPath = ".";
 string SisUtils::iExtractPath = ".";
 
+TBool gIsOBYUTF8 = EFalse;
 ImageHandler::ImageHandler() : iReader(NULL) ,iOptions(0), iSisUtils(NULL) {
 }
 

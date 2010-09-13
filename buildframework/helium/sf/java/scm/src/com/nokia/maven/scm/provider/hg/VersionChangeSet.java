@@ -18,13 +18,13 @@
 package com.nokia.maven.scm.provider.hg;
 
 
-import org.apache.maven.scm.ChangeSet;
-import org.apache.maven.scm.ScmVersion;
-import org.apache.maven.scm.ScmException;
-import org.apache.maven.scm.ChangeFile;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.maven.scm.ChangeFile;
+import org.apache.maven.scm.ChangeSet;
+import org.apache.maven.scm.ScmException;
+import org.apache.maven.scm.ScmVersion;
 
 /**
  * A version changeset.
@@ -74,26 +74,26 @@ public class VersionChangeSet extends ChangeSet
     {
         String result = "";
         for (ScmVersion versions : getScmVersion()) {
-            if (!versions.getName().equals("")) 
-            {
+            if (!versions.getName().equals("")) {
                 result += versions.getType().toLowerCase() + ":" + versions.getName() + "\n";
             }
         }
-        if (getAuthor() != null)
+        if (getAuthor() != null) {
             result += "user:" + getAuthor() + "\n";
-        if (getDate() != null)
+        }
+        if (getDate() != null) {
             result += "date:" + getDate() + "\n";
+        }
         List<ChangeFile> files = getFiles();
-        if ( files.size() != 0 )
-        {
+        if ( files.size() != 0 ) {
             result += "files:";
-            for ( ChangeFile changeFile : files )
-            {
+            for ( ChangeFile changeFile : files ) {
                 result += changeFile.getName() + " ";
             }
         }
-        if (!getComment().equals(""))
+        if (!getComment().equals("")) {
             result += "\ndescription:" + getComment() + "\n";
+        }
         return result;
     }
     

@@ -46,13 +46,14 @@ source			patchdataprocessor.cpp
 userinclude     ..\..\imglib\compress 
 userinclude		..\..\imglib\patchdataprocessor\include
 userinclude		..\..\sisutils\inc
+userinclude     ../../imglib/uniconv/include
 USERINCLUDE   ../rofsbuild/inc
 userinclude   ..\..\imglib\boostlibrary
 USERINCLUDE   ../../imglib/boostlibrary/boost
 
 USERINCLUDE ..\..\imglib\inc
 OS_LAYER_SYSTEMINCLUDE_SYMBIAN
-STATICLIBRARY   boost_thread-1.39 boost_filesystem-1.39 sisutils
+STATICLIBRARY   boost_thread-1.39 boost_filesystem-1.39 sisutils uniconv
 
 #ifdef TOOLS2_LINUX
 STATICLIBRARY	boost_system-1.39

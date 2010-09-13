@@ -67,8 +67,8 @@ Description:
         </au:assertTrue>
         <au:assertTrue message="Check for components">
             <and>
-                <contains string="${scanlog}" substring="sf/mw/HelloWorldAPI/group" />
-                <contains string="${scanlog}" substring="sf/app/HelloWorldCons/group" />
+                <contains string="${scanlog}" substring="sf/mw/helloworldapi/group" />
+                <contains string="${scanlog}" substring="sf/app/helloworldcons/group" />
             </and>
         </au:assertTrue>
     </target>
@@ -79,7 +79,7 @@ Description:
         </condition>
         <property name="sbs.log.file" location="${helium.dir}/tests/data/test-scanlog_helium_minibuild_ido_input_compile.log" />
         <hlm:metadatarecord  database="${scanlog.temp.dir}/test-cc-summary-generation_db">
-            <hlm:sbsmetadatainput>
+            <hlm:sbsmetadatainput checkMissing="true">
                 <fileset casesensitive="false" file="${sbs.log.file}"/>
                 <metadatafilterset refid="filterset.sbs" />
             </hlm:sbsmetadatainput>
@@ -100,8 +100,8 @@ Description:
         <loadfile property="scanlog" srcFile="${scanlog.temp.dir}/cc_summary.html" />
         <au:assertTrue message="Check for components">
             <and>
-                <contains string="${scanlog}" substring="sf/mw/HelloWorldAPI/group" />
-                <contains string="${scanlog}" substring="sf/app/HelloWorldCons/group" />
+                <contains string="${scanlog}" substring="sf/mw/helloworldapi/group" />
+                <contains string="${scanlog}" substring="sf/app/helloworldcons/group" />
             </and>
         </au:assertTrue>
         <au:assertTrue message="Check for 7 errors">
@@ -135,7 +135,7 @@ Description:
                 ant: antProperties()
             </data>
         </fmpp>
-        <hlm:generateBuildStatus dbfile="${scanlog.temp.dir}/test-metadata-1_db" output-dir="${helium.dir}/tests/data/" file="test-scanlog-metadata-1.log"/>
+        <hlm:generateBuildStatus dbfile="${scanlog.temp.dir}/test-metadata-1_db" output-dir="${helium.dir}/tests/data/" file="${helium.dir}/tests/data/test-scanlog-metadata-1.log"/>
         <hlm:assertFileExists file="${scanlog.temp.dir}/test-scanlog-metadata-1.log.scan2.html"/>
     </target>
 
@@ -176,9 +176,8 @@ Description:
                 ant: antProperties()
             </data>
         </fmpp>
-        <basename property="sbslog.basename" file="${sbslog}" />
         <hlm:generateBuildStatus dbfile="${scanlog.temp.dir}/test-metadata-1_db" 
-            output-dir="${scanlog.temp.dir}" file="${sbslog.basename}"/>
+            output-dir="${scanlog.temp.dir}" file="${sbslog}"/>
         <au:assertFileExists file="${scanlog.temp.dir}/test-scanlog-metadata-1.log.scan2.html"/>
     </target>
 
@@ -195,18 +194,13 @@ Description:
         <copy file="${sbs.log.file}" tofile="${scanlog.temp.dir}/test-scanlog_helium_minibuild_ido_input_clean_compile.log" />
         <copy file="${sbs.log.file}" tofile="${scanlog.temp.dir}/test-scanlog_helium_minibuild_ido_input2_compile.log" />
         <hlm:metadatarecord  database="${scanlog.temp.dir}/test-diamonds-faults_db">
-            <hlm:sbsmetadatainput>
+            <hlm:sbsmetadatainput checkMissing="true">            
                 <fileset casesensitive="false" file="${sbs.log.file}"/>
-                <fileset casesensitive="false" file="${scanlog.temp.dir}/test-scanlog_helium_minibuild_ido_input_clean_compile.log" />
                 <fileset casesensitive="false" file="${scanlog.temp.dir}/test-scanlog_helium_minibuild_ido_input2_compile.log" />
                 <metadatafilterset refid="filterset.sbs" />
             </hlm:sbsmetadatainput>
-            <hlm:sbsmetadatainput>
+            <hlm:sbsmetadatainput checkMissing="false">
                 <fileset casesensitive="false" file="${scanlog.temp.dir}/test-scanlog_helium_minibuild_ido_input_clean_compile.log" />
-                <metadatafilterset refid="filterset.sbs" />
-            </hlm:sbsmetadatainput>
-            <hlm:sbsmetadatainput>
-                <fileset casesensitive="false" file="${scanlog.temp.dir}/test-scanlog_helium_minibuild_ido_input2_compile.log" />
                 <metadatafilterset refid="filterset.sbs" />
             </hlm:sbsmetadatainput>
             <hlm:textmetadatainput>
@@ -226,8 +220,8 @@ Description:
         <echo>${scanlog}</echo>
         <au:assertTrue message="Check for components">
             <and>
-                <contains string="${scanlog}" substring="&lt;name&gt;sf/mw/HelloWorldAPI/group&lt;/name&gt;" />
-                <contains string="${scanlog}" substring="&lt;name&gt;sf/app/HelloWorldCons/group&lt;/name&gt;" />
+                <contains string="${scanlog}" substring="&lt;name&gt;sf/mw/helloworldapi/group&lt;/name&gt;" />
+                <contains string="${scanlog}" substring="&lt;name&gt;sf/app/helloworldcons/group&lt;/name&gt;" />
                 <contains string="${scanlog}" substring="&lt;generated_files&gt;46&lt;/generated_files&gt;" />
             </and>
         </au:assertTrue>
@@ -247,6 +241,75 @@ Description:
             <contains string="${scanlog}" substring="&gt;14&lt;/total&gt;" />
         </au:assertTrue>
     </target>
+
+    <target name="test-diamonds-faults-package">
+        <condition property="sbs.log.file" value="${helium.dir}/tests/data/test-scanlog_linux_helium_minibuild_ido_input_compile.log">
+            <os family="unix" />
+        </condition>
+        <condition property="epocroot.test" value="/" else="m:\">
+            <os family="unix" />
+        </condition>
+        <property name="sbs.log.file" location="${helium.dir}/tests/data/test-scanlog_helium_minibuild_ido_input_compile.log" />
+        <copy file="${sbs.log.file}" tofile="${scanlog.temp.dir}/test-scanlog_helium_minibuild_ido_input_clean_compile.log" />
+        <copy file="${sbs.log.file}" tofile="${scanlog.temp.dir}/test-scanlog_helium_minibuild_ido_input2_compile.log" />
+        <hlm:metadatarecord  database="${scanlog.temp.dir}/test-diamonds-faults_db">
+            <hlm:sysdefmetadatainput file="${helium.dir}/tests/data/test-minibuild-sysdef3.xml" />
+            <hlm:sbsmetadatainput checkMissing="true" epocroot="${epocroot.test}">
+                <fileset casesensitive="false" file="${sbs.log.file}"/>
+                <fileset casesensitive="false" file="${scanlog.temp.dir}/test-scanlog_helium_minibuild_ido_input2_compile.log" />
+                <metadatafilterset refid="filterset.sbs" />
+            </hlm:sbsmetadatainput>
+            <hlm:sbsmetadatainput checkMissing="false" epocroot="${epocroot.test}">
+                <fileset casesensitive="false" file="${scanlog.temp.dir}/test-scanlog_helium_minibuild_ido_input_clean_compile.log" />
+                <metadatafilterset refid="filterset.sbs" />
+            </hlm:sbsmetadatainput>
+            <hlm:textmetadatainput>
+                <fileset casesensitive="false" file="${helium.dir}/tests/data/diamonds-faults_compile.text.log"/>
+                <metadatafilterset refid="filterset.sbs" />
+            </hlm:textmetadatainput>
+        </hlm:metadatarecord>
+
+        <fmpp sourceFile="${helium.dir}/tools/common/templates/diamonds/faults_metadata_orm.ftl"
+                outputfile="${scanlog.temp.dir}/compile-main.xml">
+            <data expandProperties="yes">
+                  dbPath: ${scanlog.temp.dir}/test-diamonds-faults_db
+                  ant: antProperties()
+            </data>
+        </fmpp>
+        <loadfile property="scanlog" srcFile="${scanlog.temp.dir}/compile-main.xml" />
+        <echo>${scanlog}</echo>
+        <au:assertTrue message="Check for components">
+            <and>
+                <contains string="${scanlog}" substring="&lt;name&gt;sf/mw/helloworldapi/group&lt;/name&gt;" />
+                <contains string="${scanlog}" substring="&lt;name&gt;sf/app/helloworldcons/group&lt;/name&gt;" />
+            </and>
+        </au:assertTrue>
+        <au:assertTrue message="Check for generated files.">
+            <contains string="${scanlog}" substring="&lt;generated_files&gt;46&lt;/generated_files&gt;" />
+        </au:assertTrue>
+        
+        <au:assertTrue message="Check that diamonds-faults_compile.text.log is not pushed to diamonds">
+            <not>
+                <contains string="${scanlog}" substring="&lt;name&gt;diamonds-faults_compile.text.log&lt;/name&gt;" />
+            </not>
+        </au:assertTrue>
+        <au:assertTrue message="Check for 46 errors">
+            <contains string="${scanlog}" substring="&gt;46&lt;/total&gt;" />
+        </au:assertTrue>
+        <au:assertTrue message="Check for 32 errors">
+            <contains string="${scanlog}" substring="&gt;32&lt;/total&gt;" />
+        </au:assertTrue>
+        <au:assertTrue message="Check for 14 errors">
+            <contains string="${scanlog}" substring="&gt;14&lt;/total&gt;" />
+        </au:assertTrue>
+        <au:assertTrue message="Check for helloworldapi">
+            <contains string="${scanlog}" substring="&lt;package&gt;helloworldapi&lt;/package&gt;" />
+        </au:assertTrue>
+        <au:assertTrue message="Check for helloworldcons">
+            <contains string="${scanlog}" substring="&lt;package&gt;helloworldcons&lt;/package&gt;" />
+        </au:assertTrue>
+    </target>
+
 
     <target name="test-cc-summary-metadata-generation"> 
         <hlm:metadatarecord  database="${scanlog.temp.dir}/test_metadata_db">

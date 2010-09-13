@@ -17,10 +17,12 @@
  
 package com.nokia.helium.sbs.ant.types;
 
-import com.nokia.helium.core.ant.types.VariableSet;
-import org.apache.tools.ant.types.Reference;
-import org.apache.tools.ant.BuildException;
 import java.util.List;
+
+import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.types.Reference;
+
+import com.nokia.helium.core.ant.types.VariableSet;
 
 /**
  * Helper class to store the variable set (list of variables

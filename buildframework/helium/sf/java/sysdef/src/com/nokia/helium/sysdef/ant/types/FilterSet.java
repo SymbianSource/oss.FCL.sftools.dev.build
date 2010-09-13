@@ -24,7 +24,7 @@ import org.apache.tools.ant.types.DataType;
 /**
  * This Ant type defines a set of system definition
  * filters.
- *
+ * @ant.type name="sysdefFilterSet" category="Sysdef"
  */
 public class FilterSet extends DataType {
     private List<Filter> filters = new ArrayList<Filter>();
@@ -32,8 +32,8 @@ public class FilterSet extends DataType {
     /**
      * Create a new nested filter.
      */
-    public Filter createFilter() {
-        Filter filter = new Filter();
+    public SysdefFilter createFilter() {
+        SysdefFilter filter = new SysdefFilter();
         filters.add(filter);
         return filter;
     }
@@ -45,6 +45,15 @@ public class FilterSet extends DataType {
     public List<Filter> getFilters() {
         return filters;
     }
-    
 
+    /**
+     * Create a config filter.
+     * @return a config filter.
+     */
+    public SysdefConfig createConfig() {
+        SysdefConfig filter = new SysdefConfig();
+        filters.add(filter);
+        return filter;
+    }
+    
 }

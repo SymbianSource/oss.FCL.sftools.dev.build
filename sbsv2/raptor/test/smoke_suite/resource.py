@@ -39,10 +39,10 @@ def run():
 
 	t.addbuildtargets('smoke_suite/test_resources/simple_gui/Bld.inf', [
 		"helloworld_exe/helloworld.mbm_bmconvcommands",
-		"helloworld_exe/helloworld_HelloWorld_sc.rpp",
-		"helloworld_exe/helloworld_HelloWorld_sc.rpp.d",
-		"helloworld_reg_exe/helloworld_reg_HelloWorld_reg_sc.rpp",
-		"helloworld_reg_exe/helloworld_reg_HelloWorld_reg_sc.rpp.d"])
+		"helloworld_exe/helloworld_HelloWorld.rsc.rpp",
+		"helloworld_exe/helloworld_HelloWorld.rsc.d",
+		"helloworld_reg_exe/helloworld_reg_HelloWorld_reg.rsc.rpp",
+		"helloworld_reg_exe/helloworld_reg_HelloWorld_reg.rsc.d"])
 
 	t.mustnotmatch = ["HelloWorld.rss.* warning: trigraph"]
 	
@@ -60,7 +60,7 @@ def run():
 			    is used because the weight of 'complete' dependency information would overwhelm make.
 			 """
 	buildLocation = ReplaceEnvs("$(EPOCROOT)/epoc32/build/") + BldInfFile.outputPathFragment('smoke_suite/test_resources/resource/group/bld.inf')
-	res_depfile= buildLocation+"/dependentresource_/dependentresource_dependentresource_sc.rpp.d"
+	res_depfile= buildLocation+"/dependentresource_/dependentresource_dependentresource.rsc.d"
 
 
 	t.targets = [
@@ -68,7 +68,6 @@ def run():
 		"$(EPOCROOT)/epoc32/data/z/resource/anotherresource/testresource.rsc",
 		"$(EPOCROOT)/epoc32/data/z/resource/dependentresource/dependentresource.rsc",
 		"$(EPOCROOT)/epoc32/data/z/resource/testresource/testresource.r01",
-		"$(EPOCROOT)/epoc32/data/z/resource/testresource/testresource.rsc",
 		"$(EPOCROOT)/epoc32/include/testresource.hrh",
 		"$(EPOCROOT)/epoc32/include/testresource.rsg",
 		"$(EPOCROOT)/epoc32/include/onelang.rsg",
@@ -86,18 +85,19 @@ def run():
 		"dependentresource_/dependentresource_dependentresource.rsc",
 		"testresource_/testresource_dependentresource.r01",
 		"testresource_/testresource_dependentresource.rsc",
-		"testresource_/testresource_testresource_01.rpp",
-		"testresource_/testresource_testresource_01.rpp.d",
-		"testresource_/testresource_testresource_02.rpp",
-                "onelang_/onelang_onelang_sc.rpp",
-		"testresource_/testresource_testresource_sc.rpp"])
+		"testheader_/testheader_testresource_sc.rsg.d",
+		"testheader_/testheader_testresource_sc.rsg.rpp",
+		"testresource_/testresource_testresource.r02.rpp",
+		"onelang_/onelang_onelang_sc.rsg.rpp",
+		"testresource_/testresource_testresource.rsc.rpp"])
 
-	t.command = "sbs -b smoke_suite/test_resources/resource/group/bld.inf  -c armv5_urel -c winscw_urel reallyclean ; sbs --no-depend-generate -j 16 -b smoke_suite/test_resources/resource/group/bld.inf -c armv5_urel -c  winscw_urel -f ${SBSLOGFILE} -m ${SBSMAKEFILE} && grep 'epoc32.include.testresource.rsg' %s && { X=`md5sum $(EPOCROOT)/epoc32/release/winscw/urel/z/resource/anotherresource/testresource.rsc` && Y=`md5sum $(EPOCROOT)/epoc32/data/z/resource/testresource/testresource.rsc` && [ \"${X%% *}\" != \"${Y%% *}\" ] ; }  && wc -l %s " % (res_depfile, res_depfile)
+	t.command = "sbs -b smoke_suite/test_resources/resource/group/bld.inf  -c armv5_urel -c winscw_urel reallyclean ; sbs --no-depend-generate -j 16 -b smoke_suite/test_resources/resource/group/bld.inf -c armv5_urel -c  winscw_urel -f ${SBSLOGFILE} -m ${SBSMAKEFILE} && grep 'epoc32.include.test[^ ]*.rsg' %s && { X=`md5sum $(EPOCROOT)/epoc32/release/winscw/urel/z/resource/anotherresource/testresource.rsc` && Y=`md5sum $(EPOCROOT)/epoc32/data/z/resource/testresource/testresource.rsc` && [ \"${X%% *}\" != \"${Y%% *}\" ] ; }  && wc -l %s " % (res_depfile, res_depfile)
+
 
 	t.mustnotmatch = []
 
 	t.mustmatch = [
-			"[23] .*.dependentresource_.dependentresource_dependentresource_sc.rpp.d"
+			"[23] .*.dependentresource_.dependentresource_dependentresource.rsc.d"
 		      ]
 
 	t.run()

@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : diamonds_config_default.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="diamonds-default-config" xmlns:hlm="http://www.nokia.com/helium">
+
+    <property name="diamonds.output.dir" value="${diamonds.build.output.dir}" />
+    <property name="diamonds.smtp.server" value="${email.smtp.server}" />
+    <property name="diamonds.ldap.server" value="${email.ldap.server}" />
+    <property name="diamonds.initializer.targetname" value="diamonds" />
+    <property name="diamonds.tstamp.format" value="yyyy-MM-dd'T'HH:mm:ss" />
+    <property name="diamonds.category" value="${build.family}" />
+
+    <hlm:fmppMessage id="initial.message" sourceFile="${helium.dir}/tools/common/templates/diamonds/diamonds_start.xml.ftl">
+        <data expandProperties="yes">
+            ant: antProperties()
+        </data>
+    </hlm:fmppMessage>
+
+    <hlm:fmppMessage id="final.message" sourceFile="${helium.dir}/tools/common/templates/diamonds/diamonds_finish.xml.ftl">
+        <data expandProperties="yes">
+            ant: antProperties()
+        </data>
+    </hlm:fmppMessage>
+
+    <hlm:fmppMessage id="diamonds.signal.message" sourceFile="${helium.dir}/tools/common/templates/diamonds/diamonds_signal.xml.ftl">
+        <data expandProperties="yes">
+            ant: antProperties()
+        </data>
+    </hlm:fmppMessage>
+
+    <hlm:fmppMessage id="diamonds.status.message" sourceFile="${helium.dir}/tools/common/templates/diamonds/diamonds_status.xml.ftl">
+        <data expandProperties="yes">
+            ant: antProperties()
+        </data>
+    </hlm:fmppMessage>
+
+    <hlm:fmppMessage id="stage.time.message" sourceFile="${helium.dir}/tools/common/templates/diamonds/diamonds_stage.xml.ftl">
+        <data expandProperties="yes">
+            ant: antProperties()
+        </data>
+    </hlm:fmppMessage>
+
+    <hlm:targetMessageTrigger id="log-environment.id" target="log-environment">
+        <hlm:fmppMessage sourceFile="${helium.dir}/tools/common/templates/diamonds/tool.xml.ftl">
+            <data expandProperties="yes">
+                ant: antProperties()
+                doc: xml(${build.log.dir}/${build.id}_environment.xml)
+            </data>
+        </hlm:fmppMessage>
+    </hlm:targetMessageTrigger>
+
+    <hlm:targetMessageTrigger id="compile-main.id" target="compile-main">
+        <hlm:fmppMessage sourceFile="${helium.dir}/tools/common/templates/diamonds/faults_metadata_orm.ftl">
+            <data expandProperties="yes">
+                dbPath: ${metadata.dbfile}
+                ant: antProperties()
+            </data>
+        </hlm:fmppMessage>
+    </hlm:targetMessageTrigger>
+
+    <hlm:targetMessageTrigger id="sbs-checksource.id" target="sbs-checksource">
+        <hlm:fmppMessage sourceFile="${helium.dir}/tools/common/templates/diamonds/sbs-checksource_fmpp.xml.ftl">
+            <data expandProperties="yes">
+                dbPath: ${metadata.dbfile}
+                ant: antProperties()
+            </data>
+        </hlm:fmppMessage>
+    </hlm:targetMessageTrigger>
+
+    <hlm:targetMessageTrigger id="build-roms.id" target="build-roms">
+        <hlm:fmppMessage sourceFile="${helium.dir}/tools/common/templates/diamonds/build_roms_diamonds.xml.ftl">
+            <data expandProperties="yes">
+                dbPath: ${metadata.dbfile}
+                ant: antProperties()
+            </data>
+        </hlm:fmppMessage>
+    </hlm:targetMessageTrigger>
+
+    <hlm:targetMessageTrigger id="codescanner.id" target="ido-codescanner">
+        <hlm:fmppMessage sourceFile="${helium.dir}/tools/common/templates/diamonds/codescanner.xml.ftl">
+            <data expandProperties="yes">
+                ant: antProperties()
+                doc: xml(${ido.codescanner.output.dir}/problemIndex.xml)
+            </data>
+        </hlm:fmppMessage>
+    </hlm:targetMessageTrigger>
+
+    <hlm:targetMessageTrigger id="create-bom.id" target="create-bom">
+        <hlm:fileMessage file="${diamonds.build.output.dir}/create-bom.xml" />
+    </hlm:targetMessageTrigger>
+
+    <hlm:targetMessageTrigger id="post-coverity.id" target="post-coverity" >
+        <hlm:fmppMessage sourceFile="${helium.dir}/tools/common/templates/diamonds/coverity.xml.ftl">
+            <data expandProperties="yes">
+                ant: antProperties()
+                doc: xml(${diamonds.coverity.report.file})
+            </data>
+        </hlm:fmppMessage>
+    </hlm:targetMessageTrigger>
+
+    <hlm:targetMessageTrigger id="ido-validate-confml.id" target="ido-validate-confml">
+        <hlm:fmppMessage sourceFile="${helium.dir}/tools/common/templates/diamonds/confml-validate.xml.ftl">
+            <data expandProperties="yes">
+                ant: antProperties()
+                doc: xml(${build.drive}/output/logs/post/${build.id}_validate_confml.xml)
+            </data>
+        </hlm:fmppMessage>
+    </hlm:targetMessageTrigger>
+
+    <hlm:targetMessageTrigger id="rndsdk-create-api-descr-xml.id" target="rndsdk-create-api-descr-xml">
+        <hlm:fmppMessage sourceFile="${helium.dir}/tools/common/templates/diamonds/apimetrics.xml.ftl">
+            <data expandProperties="yes">
+                ant: antProperties()
+                doc: xml(${build.drive}/output/apidescr/apidescr.xml)
+            </data>
+        </hlm:fmppMessage>
+    </hlm:targetMessageTrigger>
+
+    <hlm:targetMessageTrigger id="render-validate-policy.id" target="render-validate-policy" >
+        <hlm:fmppMessage sourceFile="${helium.dir}/tools/common/templates/diamonds/validate-policy-log.xml.ftl">
+            <data expandProperties="yes">
+                ant: antProperties()
+                doc: xml(${validate.policy.log})
+            </data>
+        </hlm:fmppMessage>
+    </hlm:targetMessageTrigger>
+
+
+    <hlm:targetMessageTrigger id="cmt-generate-diamond-summary.id" target="cmt-generate-diamond-summary">
+        <hlm:fileMessage file="${diamonds.build.output.dir}/cmt_summary.xml" />
+    </hlm:targetMessageTrigger>
+
+    <hlm:targetMessageTrigger id="iad-check-pkg-version.id" target="iad-check-pkg-version" >
+        <hlm:fmppMessage sourceFile="${helium.dir}/tools/common/templates/diamonds/iad-check-pkg-version_fmpp.xml.ftl">
+            <data expandProperties="yes">
+                dbPath: ${metadata.dbfile}
+                ant: antProperties()
+            </data>
+        </hlm:fmppMessage>
+    </hlm:targetMessageTrigger>
+
+    <hlm:targetMessageTrigger id="check-tool-dependencies.id" target="check-tool-dependencies">
+        <hlm:fmppMessage sourceFile="${helium.dir}/tools/common/templates/diamonds/tool.xml.ftl">
+            <data expandProperties="yes">
+                ant: antProperties()
+                doc: xml(${build.drive}/build/doc/ivy/tool-dependencies-${build.type}.xml)
+            </data>
+        </hlm:fmppMessage>
+    </hlm:targetMessageTrigger>
+
+    <!-- the rendering target should import the templates manually and use single fmpp call,
+        but currently it is not doing it. So using a file message to send data to diamonds.-->
+    <hlm:targetMessageTrigger id="ca-generate-diamond-summary.id" target="ca-generate-diamond-summary">
+        <hlm:fileMessage file="${diamonds.build.output.dir}/ca_summary_library.xml" />
+        <hlm:fileMessage file="${diamonds.build.output.dir}/ca_summary_header.xml" />
+    </hlm:targetMessageTrigger>
+
+    <hlm:targetMessageTrigger id="publish.id" target="publish">
+        <hlm:fmppMessage sourceFile="${helium.dir}/tools/common/templates/diamonds/publish.xml.ftl">
+            <data expandProperties="yes">
+                ant: antProperties()
+            </data>
+        </hlm:fmppMessage>
+    </hlm:targetMessageTrigger>
+
+</project>

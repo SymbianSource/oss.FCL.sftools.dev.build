@@ -343,7 +343,7 @@ DATA_SEGMENT_START=$(SPLIT_OPTION) $(RW_BASE_OPTION)
 #---------------------------------------------------------
 
 # Option to control the Linker warnings
-LD_WARNINGS_CONTROL_OPTION=--diag_suppress 6331,6780
+LD_WARNINGS_CONTROL_OPTION=--diag_suppress 6331,6780,6319 --keep *(.init) --keep *(.fini) --keep *(.init_array) --keep *(.fini_array) 
 
 # Option to suppress the Linker errors
 LD_ERRORS_CONTROL_OPTION=

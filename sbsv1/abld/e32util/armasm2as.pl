@@ -288,12 +288,14 @@ sub process_logical_expr($$) {
 	$val =~ s/\{TRUE\}/(1)/g;
 	$val =~ s/\{FALSE\}/(0)/g;
 
-	my @lops = split( /(\s*\:LAND\:\s*|\s*\:LOR\:\s*|\s*\:LNOT\:\s*|\s*\:DEF\:\s*)/, $val );
+	my @lops = split( /(\s*\:LAND\:\s*|\s*\:LOR\:\s*|\s*\:LNOT\:\s*|\s*\:DEF\:\s*|\s*\(\s*|\s*\)\s*)/, $val );
 	foreach (@lops) {
 		s/\s*\:LAND\:\s*/\:LAND\:/go;
 		s/\s*\:LOR\:\s*/\:LOR\:/go;
 		s/\s*\:LNOT\:\s*/\:LNOT\:/go;
 		s/\s*\:DEF\:\s*/\:DEF\:/go;
+		s/\s*\(\s*/\(/go;
+		s/\s*\)\s*/\)/go;
 	}
 	my @lops2;
 	while (scalar (@lops)) {
@@ -320,12 +322,28 @@ sub process_logical_expr($$) {
 	while (scalar (@lops2)) {
 		my $x = shift @lops2;
 		if ($x eq ':LNOT:') {
-			my $operand;
-			while (1) {
+			my $operand= shift @lops2;
+			while( @lops2 && $operand =~ /^\s*$/) {
 				$operand = shift @lops2;
-				last if ($operand !~ /^\s*$/);
 			}
-			push @lops3, "(0==($operand))";
+			if($operand eq '(') {
+				my $balance = 1;
+				my $compound = $operand;
+				while($balance > 0 && @lops2) {
+					$operand = shift @lops2;
+					if($operand eq '(') {
+						++$balance;
+					}
+					elsif ($operand eq ')') {
+						--$balance;
+					}
+					$compound .= $operand;
+				}
+				push @lops3, "(0==$compound)";
+			}
+			else {
+				push @lops3, "(0==($operand))";
+			}
 		} else {
 			push @lops3, $x;
 		}

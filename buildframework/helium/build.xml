@@ -1,329 +1,70 @@
-<?xml version="1.0"?>
-<project name="helium-root" default="all">
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : build.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="helium-build" default="help" xmlns:au="org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium"> 
+    <description>
+        Helium targets to build helium itself.
+    </description>
+    <property environment="env" />
     
-    <property environment="env"/>
-    <import file="helium/build.xml"/>
+    <property name="build.drive" location="${env.TEMP}/helium/temp_drive"/>
+    <mkdir dir="${build.drive}/"/> 
     
+    <!--* @property helium.version
+    @type string
+    @scope private -->
+    <property file="${helium.dir}/config/version.txt"/>
+    <property name="release.label" value="${helium.version}"/>
 
-    <property name="helium.svn.workarea.dir" value="\\vcfiler02\proj2\Juno\juno_build_release\helium\svn"/>
-    <property name="helium.ccm.workarea.dir" value="\\vcfiler02\proj2\Juno\juno_build_release\internal\workarea\helium\next"/>
-    <property name="helium.svn.url" value="http://helium.nmp.nokia.com/svn" />
-
-    <target name="unittest">
-        <ant dir="helium" target="unittest" inheritAll="false"/>
-    </target>
-
-    <target name="ant-unittest" depends="xtest-diamonds">
-        <ant dir="helium" target="ant-unittest" inheritAll="false"/>
-    </target>
-
-    <target name="ju-unittest">
-        <ant dir="helium" target="ju-unittest" inheritAll="false"/>
-    </target>
-
-    <target name="py-unittest">
-        <ant dir="helium" target="py-unittest" inheritAll="false"/>
-    </target>
-
-    <target name="check">
-        <ant dir="helium" target="check" inheritAll="false"/>
-    </target>
-
-    <target name="check-distribution-policies">
-        <ant dir="helium" target="delete-svn-unversioned" inheritAll="false"/>
-        <ant dir="helium" target="check-distribution-policies" inheritAll="false"/>
-    </target>
-
-    <target name="pylint">
-        <ant dir="helium" target="pylint" inheritAll="false"/>
-    </target>
-
-    <target name="antlint">
-        <ant dir="helium" target="antlint" inheritAll="false"/>
-    </target>
-
-    <target name="java-checkstyle">
-        <ant dir="helium" target="java-checkstyle" inheritAll="false"/>
-    </target>
-
-    <target name="apidocs">
-        <ant dir="helium" target="apidocs" inheritAll="false"/>
-    </target>
-
-    <target name="textdocs">
-        <ant dir="helium" target="textdocs" inheritAll="false"/>
-    </target>
-
-    <target name="docs">
-        <ant dir="helium" target="docs" inheritAll="false"/>
-    </target>
-
-    <target name="upload-docs">
-        <ant dir="helium" target="upload-docs" inheritAll="false"/>
-    </target>
-
-    <target name="build-zip">
-        <ant dir="helium" target="build-zip" inheritAll="false"/>
-    </target>
-
-    <target name="all" depends="unittest,apidocs,docs,pylint,java-checkstyle"/>
-
-    <!-- Create a new branch from the current working copy.
+    <property name="doc.src.dir" location="${basedir}/doc/src" />
+    <!-- Override docs targets to do more for Helium. -->
+    <target name="apidocs" depends="internal.docs.apidocs"/>
+    <!-- Generate rst files for docs -->
+    <target name="prep-textdocs" depends="overview-to-html,dependency-diagram,
+        dependency-logs,release-diff,helium-user-graph,internal.docs.prep-textdocs,helium-prep-textdocs"/>
+    <!-- generate all the user documentation for helium -->
+    <target name="docs" depends="clean-docs,docs-database,apidocs,textdocs"/>
     
-    A ${branch} property must be defined for the branch version, e.g. 0.9.x.    
-    --> 
-    <target name="branch" description="Create a new branch from the current working copy">
-        <fail unless="branch">"branch" property not defined, e.g. 0.21.x</fail>
-        <fail unless="version">"version" property not defined, e.g. 0.21</fail>
-        <!-- Major Branches need a reference_branch set -->
-        <if>
-            <contains string="${branch}" substring=".0" />
-            <then>
-                <fail unless="reference_branch">"reference_branch" property not defined, e.g. 0.21</fail>   
-            </then>
-        </if>
-        <if>
-            <not>
-                <isset property="create.branch"/>
-            </not>
-            <then>
-                <input validargs="y,n" addproperty="create.branch">
-A svn branch will be made:
-To: ${helium.svn.url}/helium/branches/helium-${branch}
-Do you want to continue?
-                </input>
-            </then>
-        </if>
-        <if>
-            <equals arg1="${create.branch}" arg2="y"/>
-            <then>
-            	<propertyfile file="helium\config\version.txt" comment="Helium version - DO NOT EDIT">
-                    <entry key="helium.version" value="${version}"/>
-                </propertyfile>
-                <svn username="${env.USERNAME}" password="${env.USERNAME}">
-                	<commit file="helium\config\version.txt"
-                		    message="Updating version to ${version}"/>
-                </svn>
-                <if>
-                    <or>
-                        <not>
-                            <isset property="reference_branch" />                            
-                        </not>
-                        <equals arg1="${reference_branch}" arg2="trunk" />                            
-                    </or>
-                    <then>
-                        <echo message="Create a trunk based branch" />
-                        <!-- Create a Sprint branch -->
-                        <svn username="${env.USERNAME}" password="${env.USERNAME}">
-                            <copy srcurl="${helium.svn.url}/helium/trunk"
-                                  desturl="${helium.svn.url}/helium/branches/helium-${branch}"
-                                  message="Created release branch for helium-${branch} branch based on helium trunk."/>
-                        </svn>
-                    </then>
-                    <else>
-                        <echo message="Create a Sprint based branch" />
-                        <!-- Create a Major branch -->
-                        <svn username="${env.USERNAME}" password="${env.USERNAME}">
-                            <copy srcurl="${helium.svn.url}/helium/branches/helium-${reference_branch}"
-                                  desturl="${helium.svn.url}/helium/branches/helium-${branch}"
-                                  message="Created release branch for helium-${branch} branch based on helium-${reference_branch}."/>
-                            <copy srcurl="${helium.svn.url}/helium/trunk/helium/config/version.txt"
-                                  desturl="${helium.svn.url}/helium/branches/helium-${branch}/helium/config/version.txt"
-                                  message="Updating version to ${version}."/>
-                        </svn>
-                    </else>
-                </if>
-                <svn username="${env.USERNAME}" password="${env.USERNAME}">
-                    <switch path="${helium.svn.workarea.dir}\helium-next"
-                            url="${helium.svn.url}/helium/branches/helium-${branch}"/>
-                </svn>
-            </then>
-        </if>
+    <!-- Generates an Ant XML database file showing only public content.
+    @scope private    
+    -->
+    <target name="docs-database">
+        <hlm:databaseMacro file="${public.database.file}" scope="public"/>
     </target>
-
-    <!-- Create a new release tag from the given branch.
     
-        
-    --> 
-    <target name="release" description="Create a new release tag from the current working copy">
-        <fail unless="branch">"branch" property not defined</fail>
-        <fail unless="version">"version" property not defined</fail>
-        <property name="url" value=""/>
-        <if>
-            <not>
-                <isset property="create.release"/>
-            </not>
-            <then>
-                <input validargs="y,n" addproperty="create.release">
-A svn tag will be made:
-From: ${helium.svn.url}/helium/branches/helium-${branch}
-To  : ${helium.svn.url}/helium/tags/helium-${version}
-Do you want to continue?
-                </input>
-            </then>
-        </if>
-        <if>
-            <equals arg1="${create.release}" arg2="y"/>
-            <then>
-                <echo>Creating release tag from ${helium.svn.url}/helium/branches/helium-${branch}</echo>                
-                <propertyfile file="${helium.svn.workarea.dir}\helium-next\helium\config\version.txt" comment="Helium version - DO NOT EDIT">
-                    <entry key="helium.version" value="${version}"/>
-                </propertyfile>
-                <svn username="${env.USERNAME}" password="${env.USERNAME}">
-                    <commit file="${helium.svn.workarea.dir}\helium-next\helium\config\version.txt" message="Updating version to ${version}"/>
-                </svn>
-                <svn username="${env.USERNAME}" password="${env.USERNAME}" failonerror="false">
-                    <copy srcurl="${helium.svn.url}/helium/branches/helium-${branch}"
-                          desturl="${helium.svn.url}/helium/tags/helium-${version}"
-                          message="Created release tag for helium-${version} release."/>
-                    <switch path="${helium.svn.workarea.dir}\helium-next"
-                            url="${helium.svn.url}/helium/tags/helium-${version}"/>
-                </svn>
-                <exec executable="python" failonerror="true">        
-                    <arg line="bin\trac-add-version.py"/>
-                    <arg value="helium-${version}"/>
-                </exec>
-            </then>
-        </if>
-    </target>
-
-    <target name="merge-svn-to-ccm">
-        <exec executable="c:\apps\bc\bc2.exe">
-            <arg value="@${helium.dir}/tools/common/svn-ccm-sync.bc.txt"/>
-            <arg value="${helium.svn.workarea.dir}\helium-next\helium"/>
-            <arg value="${helium.ccm.workarea.dir}\helium"/>
-            <arg value="c:\svn_ccm_diff.txt"/>
-        </exec>
-    </target>
-
-    <target name="release-email" description="Create a release email HTML content">
-        <fail unless="milestone">"milestone" property not defined (typically sprint name)</fail>
-        <fail unless="release">"release" property not defined</fail>
-        <exec executable="python" failonerror="true">        
-            <arg line="bin\trac-collect-release-email-changes.py"/>
-            <arg value="${milestone}"/>
-        </exec>
-        <fmpp sourceFile="${helium.dir}/extensions/nokia/doc/src/release_notes.html.ftl"
-        	  outputFile="${helium.dir}/build/doc/release_notes_${release}.html">
-            <data expandProperties="yes">
-                doc: xml(${helium.dir}/../release_notes_tickets_${milestone}.xml)
-                cfg: tdd(${helium.dir}/../release_notes_config.txt)
-                ant: antProperties(milestone, release)
-            </data>
-        </fmpp>
-        <fmpp sourceFile="${helium.dir}/extensions/nokia/doc/src/release_notes.rst.ftl"
-        	  outputFile="${helium.dir}/extensions/nokia/doc/src/releasenotes/release_notes_${release}.rst">
-            <data expandProperties="yes">
-                doc: xml(${helium.dir}/../release_notes_tickets_${milestone}.xml)
-                cfg: tdd(${helium.dir}/../release_notes_config.txt)
-                ant: antProperties(milestone, release)
-            </data>
-        </fmpp>
-    </target>
- 
-    <!-- Get a listing of the number of story points completed in a sprint per user. -->
-    <target name="story-points">
-        <fail unless="milestone">"milestone" property not defined (typically sprint name)</fail>
-        <echo>Story points per developer for ${milestone}:
-        </echo>
-        <exec executable="python" failonerror="true">        
-            <arg line="bin\trac-user-story-points.py"/>
-            <arg value="${milestone}"/>
-        </exec>
-    </target>
-
-    <!-- Shows a dialog allowing the daily SCRUM information to be posted to the Trac wiki. -->
-    <target name="scrum">
-        <antform title="Submit SCRUM notes">
-            <dateProperty label="Date" property="date" dateFormat="yyyy-MM-dd" focus="true"/>
-            <multiLineTextProperty label="Done" property="done"/>
-            <multiLineTextProperty label="Todo" property="todo"/>
-            <multiLineTextProperty label="Blocking" property="blocking"/>
-        </antform>
-        <echo file="scrum_notes.txt">
-== ${env.USERNAME} ==
-   '''Done:''' ${done}
-
-   '''Todo:''' ${todo}
-
-   '''Blocking:''' ${blocking}
-        </echo>
-        <if>
-            <isset property="date"/>
-            <then>
-                <echo>${done}</echo>
-                <property name="page" value="Scrum/Log/${date}"/>
-                <property name="done" value="None"/>
-                <property name="todo" value="None"/>
-                <property name="blocking" value="None"/>
-                <exec executable="python" failonerror="true">        
-                    <arg line="bin\trac-update-scrum-notes.py"/>
-                    <arg line="--file scrum_notes.txt ${page}"/>
-                </exec>   
-            </then>
-        </if>
-    </target>
-
-    <!-- Install BBControllerService.py and start the service to control Buildbot service -->
-    <target name="install-bb-controller-service">
-        <copy file="bin\BBControllerService.py" tofile="c:\apps\actpython\Lib\site-packages\BBControllerService.py"/>
-        <exec osfamily="windows" executable="python" failonerror="true">            
-            <env key="PYTHONPATH" value="${env.PYTHONPATH};${python.modules.path}"/>
-            <arg line="c:\apps\actpython\Lib\site-packages\BBControllerService.py"/>
-            <arg line="--startup auto"/> 
-            <arg line="install"/>
-        </exec>
-        <exec osfamily="windows" executable="python" failonerror="true">            
-            <env key="PYTHONPATH" value="${env.PYTHONPATH};${python.modules.path}"/>
-            <arg line="c:\apps\actpython\Lib\site-packages\BBControllerService.py"/>
-            <arg line="start"/>
-        </exec>
-    </target>
-
-    <!-- Use this target to restart a Helium buildbot service. BBControllerService.py service
-    must be installed in buildbot machine.
-    Usage:
-    <pre>
-        Usage: hlm restart-buildbot -Dbb.machine=[Buildbot machine name] -Dbb.command=[BB_RESTART]
-    </pre>  -->
-    <target name="restart-buildbot">
-        <script language="jython" setbeans="false">
-import os
-import socket
-import time
-import sys
-import traceback
-
-bbmachie = project.getProperty("bb.machine")
-cmd = project.getProperty("bb.cmd")
-
-if bbmachie == None or cmd == None :
-    print "Buildbot machine name and/or Command not found."
-    print "Usage: hlm restart-buildbot -Dbb.machine=[Buildbot machine name] -Dbb.cmd=[BB_RESTART]"
-else :    
-    sockt = socket.socket(socket.AF_INET, socket.SOCK_STREAM)        
-    try:
-        sockt.connect((bbmachie, int(50008)))
-        sockt.send(cmd)    
-        data = sockt.recv(1024)
-        print "Response: ", data
-    except:
-        print "Buildbot machine is busy or not found."
-        traceback.print_exc()
-    sockt.close()       
-        </script>
-    </target>
-
-    <target name="coffee">
-        <splash imageurl="file:////${helium.dir}/../coffee.png" showduration="5000"/>
-    </target>
-
-    <!-- Create a zip file of Helium for release via Hydra -->    
-    <target name="helium-hydra-zip">
-        <delete file="${env.TEMP}/helium-${helium.version}.zip" failonerror="false"/>  
-        <zip destfile="${env.TEMP}/helium-${helium.version}.zip">
-            <zipfileset dir="./helium" prefix="helium"/>
-        </zip>
-    </target>
+    <import file="helium.ant.xml"/>
+    <import file="tools/startup/antserver/antserver.ant.xml"/>
+    
+    <if>
+        <isset property="nokia.dir"/>
+        <then>
+            <resources id="textdoc.paths">
+                <path>
+                    <pathelement path="${doc.src.dir}"/>
+                    <pathelement path="${basedir}/extensions/nokia/doc/src"/>
+                </path>
+            </resources>
+        </then>
+    </if>
 
 </project>
+

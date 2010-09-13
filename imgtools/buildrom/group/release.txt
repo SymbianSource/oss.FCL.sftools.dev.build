@@ -1,3 +1,26 @@
+Version 3.28.0 (BUILDROM)
+===============
+Released by Marvin Shi, 7/09/2010
+	1) feature for XIP image only
+
+Version 3.27.1 (BUILDROM)
+===============
+Released by Lorence Wang, 10/08/2010
+	1) -cpp=xxx option support
+
+Version 3.27.0 (BUILDROM)
+Version 0.1    (charsettran)
+===============
+Released by Marvin Shi, 02/08/2010
+	1) UTF-8 OBY Support
+	
+Version 3.26.1 (BUILDROM)
+Version 0.2 (checkepocroot.pl)
+===============
+Released by Lorence Wang 28/07/2010
+	1) Standard cpp selection -stdcpp option
+	2) Case insensitive in checkepocroot.pl
+
 Version 3.26.0 (BUILDROM)
 ===============
 Released by Lorence Wang 28/06/2010

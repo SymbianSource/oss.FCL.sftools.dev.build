@@ -71,7 +71,7 @@ def main():
                     if len(str(v_info)) > 0:
                         outfile.write(str(v_info)+"\n")
         outfile.close()
-    except Exception, exc:
+    except IOError, exc:
         print "ERROR: %s" % exc
         sys.exit(-1)
     

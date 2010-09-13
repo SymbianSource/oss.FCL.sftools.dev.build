@@ -18,7 +18,7 @@
 #===============================================================================
 """ test BOM to file"""
 
-# pylint: disable-msg=R0201
+# pylint: disable=R0201
 
 import tempfile
 from shutil import rmtree

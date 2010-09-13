@@ -189,7 +189,7 @@ class FilterList(filter_interface.Filter):
 		
 		for filter in self.out:
 			if (filter != sys.stdout) and (filter != sys.stderr):
-				returnVal = returnVal and filter.close()
+				returnVal = filter.close() and returnVal
 		
 		return returnVal
 

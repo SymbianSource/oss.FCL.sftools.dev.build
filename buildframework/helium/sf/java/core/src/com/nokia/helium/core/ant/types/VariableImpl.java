@@ -18,14 +18,14 @@
 package com.nokia.helium.core.ant.types;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-import org.apache.tools.ant.types.DataType;
 import org.apache.tools.ant.BuildException;
-import org.apache.commons.lang.StringUtils;
+import org.apache.tools.ant.types.DataType;
+import org.codehaus.plexus.util.StringUtils;
 
 import com.nokia.helium.core.ant.MappedVariable;
-import java.util.Arrays;
 
 /**
  * Helper class to store the command line variables

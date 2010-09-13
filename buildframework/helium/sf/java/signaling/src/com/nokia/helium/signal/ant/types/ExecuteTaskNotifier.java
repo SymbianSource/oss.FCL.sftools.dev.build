@@ -18,6 +18,7 @@
 
 package com.nokia.helium.signal.ant.types;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
@@ -25,7 +26,9 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.BuildListener;
+import org.apache.tools.ant.MagicNames;
 import org.apache.tools.ant.Project;
+import org.apache.tools.ant.ProjectHelper;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.TaskContainer;
 import org.apache.tools.ant.types.DataType;
@@ -75,12 +78,17 @@ public class ExecuteTaskNotifier extends DataType implements Notifier,
         try {
             // Configure the project
             Project prj = getProject().createSubProject();
+            getProject().initSubProject(prj);
             prj.initProperties();
             prj.setInputHandler(getProject().getInputHandler());
             for (BuildListener bl : (Vector<BuildListener>)getProject().getBuildListeners()) {
                 prj.addBuildListener(bl);
             }
             getProject().copyUserProperties(prj);
+            getProject().copyInheritedProperties(prj);
+            // We need to autoconfigure the project - target and tasks-...
+            ProjectHelper.configureProject(prj, new File(getProject().getProperty(MagicNames.ANT_FILE)));
+            prj.inheritIDReferences(getProject());
             
             
             prj.setProperty("signal.name", signalName);
@@ -111,10 +119,6 @@ public class ExecuteTaskNotifier extends DataType implements Notifier,
     public void addTask(Task task) {
         log.debug("Adding task: " + task.getTaskName());
         tasks.add(task);
-    }
-
-    @Override
-    public void sendData(String signalName, boolean failStatus, List fileList) {        
     }
 
     /**

@@ -61,7 +61,7 @@ To enable logging to diamonds from Helium one needs to ensure that:
     <property name="diamonds.host" value="new.diamonds.server"/>*  
     <property name="diamonds.port" value="newport"/>*
 
-* If you define the property :hlm-p:`skip.diamonds` to ``true`` Diamonds is disabled.
+* If you define the property :hlm-p:`diamonds.enabled` to ``false`` Diamonds is disabled.
 
 
 .. index::

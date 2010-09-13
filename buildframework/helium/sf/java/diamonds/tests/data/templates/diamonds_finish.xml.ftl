@@ -21,6 +21,6 @@ Description:
 -->
 <#include "header.ftl">
   <build>
-    <#if ant?keys?seq_contains("diamonds.end.time")><finished>${ant["diamonds.end.time"]}</finished></#if>
+    <#if ant?keys?seq_contains("build.end.time")><finished>${ant["build.end.time"]}</finished></#if>
   </build>
 <#include "footer.ftl">

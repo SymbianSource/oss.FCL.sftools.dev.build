@@ -17,19 +17,19 @@
 
 package com.nokia.helium.scm.ant.actions;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.maven.scm.ScmException;
+import org.apache.maven.scm.ScmRevision;
+import org.apache.maven.scm.ScmTag;
 import org.apache.maven.scm.command.checkout.CheckOutScmResult;
 import org.apache.maven.scm.manager.ScmManager;
 import org.apache.maven.scm.repository.ScmRepository;
 import org.apache.tools.ant.BuildException;
-import org.apache.maven.scm.ScmRevision;
-import org.apache.maven.scm.ScmTag;
 
-import com.nokia.helium.scm.ant.types.Tag;
 import com.nokia.helium.scm.ant.types.Revision;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.nokia.helium.scm.ant.types.Tag;
 
 /**
  * Checkout the defined project. Depending on the kind of repository used this
@@ -72,13 +72,15 @@ public class CheckoutAction extends BaseDirectoryScmAction {
     public void execute(ScmRepository repository) throws ScmException {
         ScmManager scmManager = getTask().getScmManager();
 
-        if (tags.size() > 1)
+        if (tags.size() > 1) {
             throw new ScmException(
                     "You can only specify one tag nested element.");
+        }
 
-        if (revisions.size() > 1)
+        if (revisions.size() > 1) {
             throw new ScmException(
                     "You can only specify one revision nested element.");
+        }
 
         if ((tags.size() == 1) && (revisions.size() == 1)) {
             throw new ScmException(

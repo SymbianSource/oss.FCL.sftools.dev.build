@@ -20,15 +20,15 @@ Description:
 
 ============================================================================
 -->
-<!DOCTYPE SystemDefinition SYSTEM "http://delivery.nmp.nokia.com/trac/helium/browser/trunk/helium/tools/common/dtd/sysdef_1_4_0.dtd?format=raw">
+<!DOCTYPE SystemDefinition SYSTEM "sysdef_1_4_0.dtd">
 <SystemDefinition name="helium_minibuild_compile" schema="1.4.0">
-	<systemModel>
-	 	<layer name="matti_test_layer">
-			<module name="mod_tsrc_test">
-				<unit unitID="sortutil_api" name="sortutilapi" bldFile="\sf\os\devicesrv\sysstatemgmt\tsrc\public\basic\group" mrp="" />
-			</module>
-	 	</layer>
-	</systemModel>
+    <systemModel>
+         <layer name="matti_test_layer">
+            <module name="mod_tsrc_test">
+                <unit unitID="sortutil_api" name="sortutilapi" bldFile="\sf\os\devicesrv\sysstatemgmt\tsrc\public\basic\group" mrp="" />
+            </module>
+         </layer>
+    </systemModel>
     <build>
         <option name="KEEPGOING" abldOption="-keepgoing" description="Causes make to keepgoing on errors" enable="Y"/>
 <!--    <option name="SAVESPACE" abldOption="-savespace" description="Causes the removal of intermediate files" enable="Y"/> -->
@@ -59,26 +59,26 @@ Description:
     <targetList name="cwtools" description="cwtools Targets" target="CWTOOLS"/>
     <targetList name="cwtools_rel" description="cwtools Release Targets" target="CWTOOLS_REL"/>
   
-	    <configuration name="helium_minibuild_matti_compile" description="" filter="">
-	    	<layerRef layerName="matti_test_layer"/>
-	    	
-	        <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
-	        <task><buildLayer command="abld export" unitParallel="Y"/></task>
-	        <task><buildLayer command="abld makefile" targetList="tools" unitParallel="Y" targetParallel="Y"/></task>
-	        <task><buildLayer command="abld library" targetList="tools" unitParallel="N" targetParallel="N"/></task>
-	        <task><buildLayer command="abld target" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
-	        <task><buildLayer command="abld final" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
-	        <task><buildLayer command="abld -what build" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
-	        <task><buildLayer command="abld -check build" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
-	        <task><buildLayer command="abld test build" targetList="default" unitParallel="Y"/></task>
-	        <task><buildLayer command="abld makefile" targetList="default_armv5" unitParallel="Y" targetParallel="Y"/></task>
-	        <task><buildLayer command="abld resource" targetList="default_armv5" unitParallel="N" targetParallel="N"/></task>
-	        <task><buildLayer command="abld library" targetList="default_armv5" unitParallel="N" targetParallel="N"/></task>
-	        <task><buildLayer command="abld target" targetList="default_armv5" unitParallel="Y" targetParallel="Y"/></task>
-	        <task><buildLayer command="abld final" targetList="default_armv5" unitParallel="N" targetParallel="N"/></task>
-	        <task><buildLayer command="abld -what build" targetList="default_armv5" unitParallel="Y" targetParallel="Y"/></task>
-	        <task><buildLayer command="abld -check build" targetList="default_armv5" unitParallel="Y" targetParallel="Y"/></task>
-	    </configuration>
+        <configuration name="helium_minibuild_matti_compile" description="" filter="">
+            <layerRef layerName="matti_test_layer"/>
+            
+            <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+            <task><buildLayer command="abld export" unitParallel="Y"/></task>
+            <task><buildLayer command="abld makefile" targetList="tools" unitParallel="Y" targetParallel="Y"/></task>
+            <task><buildLayer command="abld library" targetList="tools" unitParallel="N" targetParallel="N"/></task>
+            <task><buildLayer command="abld target" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+            <task><buildLayer command="abld final" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+            <task><buildLayer command="abld -what build" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+            <task><buildLayer command="abld -check build" targetList="tools_rel" unitParallel="N" targetParallel="Y"/></task>
+            <task><buildLayer command="abld test build" targetList="default" unitParallel="Y"/></task>
+            <task><buildLayer command="abld makefile" targetList="default_armv5" unitParallel="Y" targetParallel="Y"/></task>
+            <task><buildLayer command="abld resource" targetList="default_armv5" unitParallel="N" targetParallel="N"/></task>
+            <task><buildLayer command="abld library" targetList="default_armv5" unitParallel="N" targetParallel="N"/></task>
+            <task><buildLayer command="abld target" targetList="default_armv5" unitParallel="Y" targetParallel="Y"/></task>
+            <task><buildLayer command="abld final" targetList="default_armv5" unitParallel="N" targetParallel="N"/></task>
+            <task><buildLayer command="abld -what build" targetList="default_armv5" unitParallel="Y" targetParallel="Y"/></task>
+            <task><buildLayer command="abld -check build" targetList="default_armv5" unitParallel="Y" targetParallel="Y"/></task>
+        </configuration>
     </build>
     
 </SystemDefinition>

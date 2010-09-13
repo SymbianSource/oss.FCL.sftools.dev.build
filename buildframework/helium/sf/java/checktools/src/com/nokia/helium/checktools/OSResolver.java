@@ -48,7 +48,7 @@ public final class OSResolver {
      *            is the command to be formatted.
      * @return the formatted OS specific command string.
      */
-    public static String getCommand(String cmd) {
+    public static String getCommand(String cmd) throws CheckToolException {
         StringBuffer buffer = new StringBuffer();
         if (isOs("windows")) {
             if (!isOs("win9x")) {
@@ -71,7 +71,7 @@ public final class OSResolver {
      *            The OS family
      * @return true if the OS matches; otherwise false.
      */
-    public static boolean isOs(String family) {
+    public static boolean isOs(String family) throws CheckToolException {
         boolean retValue = false;
         if (family != null) {
             // windows probing logic relies on the word 'windows' in

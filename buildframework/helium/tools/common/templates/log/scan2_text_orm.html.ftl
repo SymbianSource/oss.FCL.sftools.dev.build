@@ -37,11 +37,11 @@ Description:
     <td>${component.component}</td>
 <#--write each of the component tables information -->
 <td align="center">${hours?string("00")}:${minutes?string("00")}:${seconds?string("00")}</td>
-<#list color_list?keys as priority>
-    <#assign count =  table_info['jpasingle']['select count(m.id) from MetadataEntry as m JOIN  m.priority as p JOIN m.component as c where UPPER(p.priority) like \'%${priority?upper_case}%\' and c.id=${component.id}'][0] >
+<#list color_list?keys as severity>
+    <#assign count =  table_info['jpasingle']['select count(m.id) from MetadataEntry as m JOIN  m.severity as p JOIN m.component as c where p.severity=\'${severity?upper_case}\' and c.id=${component.id}'][0] >
     <#if count &gt; 0>
-        <#assign color = color_list['${priority}']>
-        <td align="center" bgcolor="${color}"><a href="#section${priority}${href_c_id}">${count}</a></td>
+        <#assign color = color_list['${severity}']>
+        <td align="center" bgcolor="${color}"><a href="#section${severity}${href_c_id}">${count}</a></td>
     <#else>
         <td align="center">${count}</td>
     </#if>
@@ -50,8 +50,8 @@ Description:
 </tr>
 </#macro>
 
-<#macro print_list_text priority component href_id>
-<#assign count =  table_info['jpasingle']['select count(m.id) from MetadataEntry as m JOIN m.priority as p JOIN m.component as c where  UPPER(p.priority) like \'%${priority?upper_case}%\' and c.id=${component.id}'][0] >
+<#macro print_list_text severity component href_id>
+<#assign count =  table_info['jpasingle']['select count(m.id) from MetadataEntry as m JOIN m.severity as p JOIN m.component as c where p.severity=\'${severity?upper_case}\' and c.id=${component.id}'][0] >
 <#if count?? && count?number &gt; 0>
 <#if "${component.component}" != "general">
         <h3><a name="section${href_id}">${component.component}(${count})</a></h3>
@@ -59,7 +59,7 @@ Description:
         <h3><a name="section${href_id}">Uncategorized(${count})</a></h3>
     </#if>
 </#if>
-<#list table_info['native:com.nokia.helium.jpa.entity.metadata.MetadataEntry']['select * from metadataentry INNER JOIN component ON component.component_id=metadataentry.component_id INNER JOIN priority ON priority.priority_id=metadataentry.priority_id where component.component_id=${component.id} and UPPER(priority.priority) like \'%${priority?upper_case}%\''] as entry >
+<#list table_info['native:com.nokia.helium.jpa.entity.metadata.MetadataEntry']['select * from metadataentry INNER JOIN component ON component.component_id=metadataentry.component_id INNER JOIN severity ON severity.severity_id=metadataentry.severity_id where component.component_id=${component.id} and severity.severity=\'${severity?upper_case}\''] as entry >
 ${logfile}:${entry.lineNumber}>${entry.text}<br />
 </#list>
 </#macro>
@@ -90,7 +90,7 @@ ${logfile}:${entry.lineNumber}>${entry.text}<br />
     <#assign table_info = pp.loadData('com.nokia.helium.metadata.ORMFMPPLoader',
         "${dbPath}") >
 <#-- overall summary -->
-<#assign logpath = table_info['jpasingle']['select l from LogFile l where LOWER(l.path) like \'%${logfile?lower_case}\''][0] >
+<#assign logfile = table_info['jpasingle']['select l from LogFile l where LOWER(l.path) like \'${logfile?lower_case}\''][0] >
 <html>
 <head><title>${logfile}</title></head>
 <body>
@@ -110,12 +110,12 @@ ${logfile}:${entry.lineNumber}>${entry.text}<br />
 <#-- need to create variables for the items tobe displayed in the comment title Overall_Total
 doing this the long winded way because I could not find a way to add items to a hash in a loop -->
 <#assign color_list={'error': 'FF0000', 'warning': 'FFF000', 'critical': 'FF7000', 'remark': 'FFCCFF', 'info': 'FFFFFF'}>
-<#assign priority_ids = color_list?keys>
+<#assign severity_ids = color_list?keys>
 <td width="22%%">Total</td>
 <td width="12%%" align="center">${time}</td>
-<#list priority_ids as priority>
-    <@add_severity_count severity='${priority}' color=color_list['${priority}'] 
-        count = table_info['jpasingle']['select Count(m.id) from MetadataEntry m JOIN m.priority p where m.logPathId=${logpath.id} and UPPER(p.priority) like \'%${priority?upper_case}%\''][0] />
+<#list severity_ids as severity>
+    <@add_severity_count severity='${severity}' color=color_list['${severity}'] 
+        count = table_info['jpasingle']['select Count(m.id) from MetadataEntry m JOIN m.severity p where m.logFileId=${logfile.id} and p.severity=\'${severity?upper_case}\''][0] />
 </#list>
 </tr>
 </table>
@@ -137,31 +137,31 @@ doing this the long winded way because I could not find a way to add items to a 
         </tr>
 
 <#assign c_id = 0>
-<#assign general_component_list = table_info['jpasingle']['select c from Component c where LOWER(c.component) like \'%general%\' and c.logPathID=${logpath.id}']>
+<#assign general_component_list = table_info['jpasingle']['select c from Component c where LOWER(c.component) like \'%general%\' and c.logFileId=${logfile.id}']>
 <#if general_component_list[0]?? >
 <#assign general_component = general_component_list[0] >
 <@print_component_summary component=general_component  href_c_id="${c_id}"/>
 <#assign c_id = c_id + 1>
 </#if>
-<#list table_info['jpa']['select c from Component c where c.logPathID=${logpath.id} and LOWER(c.component) not like \'%general%\' ORDER BY c.component'] as componentEntry>
+<#list table_info['jpa']['select c from Component c where c.logFileId=${logfile.id} and LOWER(c.component) not like \'%general%\' ORDER BY c.component'] as componentEntry>
 <@print_component_summary component=componentEntry href_c_id="${c_id}"/>
 <#assign c_id = c_id + 1>
 </#list>
 </table>
 
 <#-- Individual components status -->
-<#list priority_ids as p_id>
-<#assign p_count = table_info['jpasingle']['select Count(m.id) from MetadataEntry m JOIN m.priority as p where m.logPathId=${logpath.id} and UPPER(p.priority) like \'%${p_id?upper_case}%\''][0]>
+<#list severity_ids as p_id>
+<#assign p_count = table_info['jpasingle']['select Count(m.id) from MetadataEntry m JOIN m.severity as p where m.logFileId=${logfile.id} and p.severity=\'${p_id?upper_case}\''][0]>
 <#if p_count &gt; 0>
     <h3><a>${p_id} Details By Component</a></h3>
 </#if>
 <#assign href_cid = 0>
 <#if general_component??>
-    <@print_list_text priority="${p_id}" component=general_component href_id="${p_id}${href_cid}" /> 
+    <@print_list_text severity="${p_id}" component=general_component href_id="${p_id}${href_cid}" /> 
     <#assign href_cid = href_cid + 1>
 </#if>
-<#list table_info['jpa']['select c from Component c where c.logPathID=${logpath.id} and LOWER(c.component) not like \'%general%\' ORDER BY c.component'] as componentEntry>
-    <@print_list_text priority="${p_id}" component=componentEntry href_id="${p_id}${href_cid}" />
+<#list table_info['jpa']['select c from Component c where c.logFileId=${logfile.id} and LOWER(c.component) not like \'%general%\' ORDER BY c.component'] as componentEntry>
+    <@print_list_text severity="${p_id}" component=componentEntry href_id="${p_id}${href_cid}" />
     <#assign href_cid = href_cid + 1>
 </#list>
 </#list>

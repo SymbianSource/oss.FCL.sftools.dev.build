@@ -67,14 +67,16 @@ public class LatestTag extends Tag {
      */
     @Override
     public String getName() {
-        if (pattern == null)
+        if (pattern == null) {
             throw new BuildException("'pattern' attribute has not been defined.");
+        }
 
         List<Tag> tags = getCleanedList();
         Collections.sort(tags, new TagComparator<Tag>(getPattern()));
         
-        if (tags.isEmpty())
+        if (tags.isEmpty()) {
             throw new BuildException("No tag found.");
+        }
 
         getProject().log("Latest tag: " + tags.get(0).getName());
         return tags.get(0).getName();
@@ -162,8 +164,9 @@ public class LatestTag extends Tag {
         public int compare(T o1, T o2) {
             getProject().log("Comparing: " + o1.getName() + ">" + o2.getName(), Project.MSG_DEBUG);
             
-            if (o1.getName().equals(o2.getName()))
+            if (o1.getName().equals(o2.getName())) {
                 return 0;
+            }
             Matcher m1 = pVer.matcher(o1.getName());
             Matcher m2 = pVer.matcher(o2.getName());
             m1.matches();

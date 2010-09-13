@@ -32,4 +32,5 @@ setup(
     packages = find_packages('lib', exclude=["*tests"]),
     test_suite = 'nose.collector',
     package_data = {'': ['*.xml', '**/*.xml', '*.pl']},
+    zip_safe = True,
     )

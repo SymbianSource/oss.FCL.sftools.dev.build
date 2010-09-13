@@ -44,6 +44,13 @@ Description:
     -->
     <property name="api.rst.doc.src.dir" location="${helium.dir}/doc/api_rst" />
     
+    <!-- Location of helium database
+    @type string
+    @scope private
+    -->
+    <property name="public.database.file" location="${basedir}/build/public_database.xml"/>
+    
+    
     <!-- A list of source paths for RST documentation to be built. -->
     <resources id="textdoc.paths">
         <path>
@@ -80,6 +87,19 @@ Description:
     </target>
     
     
+    <!-- Generates an Ant XML database file showing only public content.
+    @scope private    
+    -->    
+    <target name="docs-database">
+        <hlm:database output="${public.database.file}" scope="public" filesetonly="true">
+            <fileset dir=".">
+                <include name="**/*.ant.xml"/>
+                <include name="**/build.xml"/>
+            </fileset>
+        </hlm:database>
+    </target>
+    
+    
     <!-- Creates images of the dependencies for all Ant targets.
         
     This includes creating a cmap file that is included in the HTML document,
@@ -90,7 +110,7 @@ Description:
         <fmpp sourceRoot="${api.rst.doc.src.dir}" includes="*.dot.ftl" outputRoot="${doc.temp.dir}/api/helium"
               replaceExtension="dot.ftl, dot">
             <data expandProperties="yes">
-                doc: xml(${database.file})
+                doc: xml(${public.database.file})
             </data>
         </fmpp>
         <for param="dot.file" parallel="true" threadCount="${number.of.threads}">
@@ -122,7 +142,7 @@ Description:
               replaceExtension="html.ftl, html">
             <data expandProperties="yes">
                 ant: antProperties()
-                doc: xml(${database.file})
+                doc: xml(${public.database.file})
             </data>
         </fmpp>
     </target>
@@ -136,14 +156,14 @@ Description:
               replaceExtension="rst.ftl, rst">
             <data expandProperties="yes">
                 ant: antProperties()
-                doc: xml(${database.file})
+                doc: xml(${public.database.file})
             </data>
         </fmpp>
     </target>
     
     
     <!-- Builds the Helium API documentation. -->
-    <target name="helium-apidocs" depends="clean-helium-apidocs,database,
+    <target name="helium-apidocs" depends="clean-helium-apidocs,docs-database,
                     helium-api-dependency-images,helium-api-rst-docs"/>
 
     
@@ -166,6 +186,7 @@ Description:
                         <data expandProperties="yes">
                             ant: antProperties()
                             project: antProject()
+                            doc: xml(${public.database.file})
                         </data>
                     </fmpp>
                 </sequential>
@@ -282,7 +303,7 @@ for root, dirs, files in os.walk(r'${doc.build.dir}/api', topdown=False):
     
     
     <!-- Generate rst files for docs -->
-    <target name="prep-textdocs">
+    <target name="prep-textdocs" depends="docs-database">
         <echo>Building docs into ${doc.build.dir}.</echo>
         
         <delete dir="${doc.build.dir}/.doctrees"/>
@@ -292,6 +313,7 @@ for root, dirs, files in os.walk(r'${doc.build.dir}/api', topdown=False):
             <!-- default doc content is always processed first -->
             <path>
                 <pathelement path="${helium.dir}/doc/default"/>
+                <pathelement path="${helium.dir}/doc/src/manual"/>
             </path>
             <resources refid="textdoc.paths"/>
         </resources>
@@ -323,8 +345,6 @@ for root, dirs, files in os.walk(r'${doc.build.dir}/api', topdown=False):
     -->
     <target name="build-textdocs">
         <hlm:rstMacro />
-        
-        <copy file="${database.file}" todir="${doc.build.dir}"/>
     </target>
     
     

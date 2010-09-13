@@ -19,19 +19,21 @@
 package com.nokia.helium.diamonds.ant;
 
 import java.io.File;
-import java.util.Hashtable;
-import java.util.List;
 import java.util.ArrayList;
-import java.io.IOException;
-import org.apache.tools.ant.BuildListener;
-import org.apache.tools.ant.BuildException;
-import com.nokia.helium.diamonds.*;
-import com.nokia.helium.core.PropertiesSource;
-import com.nokia.helium.core.TemplateProcessor;
+import java.util.List;
 
-import org.apache.tools.ant.BuildEvent;
-import org.apache.tools.ant.Project;
 import org.apache.log4j.Logger;
+import org.apache.tools.ant.BuildEvent;
+import org.apache.tools.ant.BuildListener;
+import org.apache.tools.ant.Project;
+
+import com.nokia.helium.diamonds.AllTargetDiamondsListener;
+import com.nokia.helium.diamonds.DiamondsConfig;
+import com.nokia.helium.diamonds.DiamondsException;
+import com.nokia.helium.diamonds.DiamondsListener;
+import com.nokia.helium.diamonds.DiamondsListenerImpl;
+import com.nokia.helium.diamonds.StageDiamondsListener;
+import com.nokia.helium.diamonds.TargetDiamondsListener;
 
 /**
  * Listener class that can connect to Ant and log information regarding to build
@@ -57,7 +59,7 @@ public class HeliumListener implements BuildListener {
 
     private boolean isInitialized;
 
-    private boolean skipDiamonds;
+    private boolean skipDiamonds ;
     private boolean skipDiamondsSet;
 
     /**
@@ -79,40 +81,53 @@ public class HeliumListener implements BuildListener {
      */
     @SuppressWarnings("unchecked") 
     public void targetStarted(BuildEvent event) {
+        Project prj = event.getProject();
         String targetName = event.getTarget().getName();
-        project = event.getProject();
 
-        String skip = project.getProperty("skip.diamonds");
-        if (skip != null && skip.equals("true")) {
-            skipDiamonds = true;
+        String diamondsEnabled = prj.getProperty("diamonds.enabled");
+        String skip = prj.getProperty("skip.diamonds");
+        log.debug("diamondsenabled: " + diamondsEnabled);
+        log.debug("skip: " + skip);
+        if (!isInitialized) {
+            if (diamondsEnabled != null && !Project.toBoolean(diamondsEnabled)) {
+                log.info("'diamonds.enabled' is not true, to use diamonds set 'diamonds.enabled' to 'true'.");
+                skipDiamonds = true;
+                isInitialized = true;
+            } else if (skip != null && Project.toBoolean(skip)) {
+                log.info("'skip.diamonds' is deprecated. Please consider using 'diamonds.enabled'.");
+                skipDiamonds = true;
+                isInitialized = true;
+            }
         }
+        
         try {
             if (!skipDiamonds) {
                 if (!isInitialized) {
-                    String configFile = project
-                            .getProperty("diamonds.listener.configuration.file");
-                    parseConfig(configFile, project.getProperties());
-                    isInitialized = true;
-                }
-                DiamondsProperties diamondProperties = DiamondsConfig
-                        .getDiamondsProperties();
-
-                /**
-                 * Initialize Diamonds if and only if initializer-target-name has been called
-                 */
-                if (targetName.equals(DiamondsConfig.getInitialiserTargetName())) {                                        
-                    String categoryName = diamondProperties.getProperty("category-property");
-                    String category = project.getProperty(categoryName);
-                    log.debug("category:" + category);
-                    if (category != null && diamondsListeners.isEmpty()) {
-                        addListeners(event);
-                        log.info("Diamonds enabled");
+                    /**
+                     * Initialize Diamonds if and only if initializer-target-name has been called
+                     */
+                    String buildID = prj.getProperty(DiamondsConfig.getBuildIdProperty());
+                    log.debug("targetStarted:buildid:" + buildID);
+                    String initializerTargetName = prj.getProperty(DiamondsConfig.getInitializerTargetProperty());
+                    log.debug("initializerTargetName:" + initializerTargetName);
+                    log.debug("targetName:" + targetName);
+                    if ( buildID != null || (initializerTargetName != null && targetName.equals(initializerTargetName))) {
+                        isInitialized = true;
+                        project = prj;
+                        log.debug("trying to initialize diamonds config");
+                        DiamondsConfig.initialize(project);
+                        DiamondsListenerImpl.initialize(project);
+                        String category = DiamondsConfig.getCategory();
+                        log.debug("category:" + category);
+                        if (category != null && diamondsListeners.isEmpty()) {
+                            addListeners(event);
+                            log.info("Diamonds enabled");
+                        }
                     }
                 }
             } else {
                 if (!skipDiamondsSet && skipDiamonds)
                 {
-                    log.info("skip.diamonds set, to use diamonds don't set skip.diamonds.");
                     skipDiamondsSet = true;
                 }
             }
@@ -143,33 +158,6 @@ public class HeliumListener implements BuildListener {
         }
     }
 
-    @SuppressWarnings("unchecked") 
-    private void parseConfig(String configFile, Hashtable<String, String> antProperties) {
-        TemplateProcessor templateProcessor = new TemplateProcessor();
-        File outputFile = null;
-        try {
-            outputFile = File.createTempFile("diamonds", "-config.xml");
-            outputFile.deleteOnExit();
-            log
-                    .debug("Preprocessing the diamonds configuration: "
-                            + configFile);
-            List sourceList = new ArrayList();
-            sourceList.add(new PropertiesSource("ant", antProperties));
-            templateProcessor.convertTemplate(configFile,
-                    outputFile.toString(), sourceList);
-        } catch (IOException e) {
-            throw new BuildException(
-                    "Diamonds configuration pre-parsing error: "
-                            + e.getMessage());
-        }
-        try {
-            DiamondsConfig.parseConfiguration(outputFile.toString());
-        } catch (DiamondsException e) {
-            throw new BuildException("Diamonds configuration parsing error: "
-                    + e.getMessage());
-        }
-    }
-
     private void addListeners(BuildEvent event) throws DiamondsException {
         if (DiamondsConfig.isStagesInConfig()) {
             StageDiamondsListener stageListener = new StageDiamondsListener();
@@ -181,6 +169,10 @@ public class HeliumListener implements BuildListener {
             diamondsListeners.add(targetListener);
             targetListener.buildBegin(event);
         }
+        
+        AllTargetDiamondsListener allTargetListener = new AllTargetDiamondsListener();
+        diamondsListeners.add(allTargetListener);
+        allTargetListener.buildBegin(event);
     }
 
     /**
@@ -230,8 +222,9 @@ public class HeliumListener implements BuildListener {
         String loggingoutputfile = project.getProperty("logging.output.file");
         if (loggingoutputfile != null) {
             File file = new File(loggingoutputfile);
-            if (file.exists())
+            if (file.exists()) {
                 file.delete();
+            }
         }
     }
 

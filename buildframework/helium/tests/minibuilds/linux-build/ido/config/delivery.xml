@@ -26,17 +26,15 @@ Description:
         <set name="dir" value="${ccm.project.wa_path}" />
         <set name="threads" value="1" />
         <set name="sync" value="true" />
-		<set name="show.conflicts" value="true" />
-		<set name="fix.missing.baselines" value="true" />
-		<set name="replace.subprojects" value="true" />
-		
-
-
+        <set name="show.conflicts" value="true" />
+        <set name="fix.missing.baselines" value="true" />
+        <set name="replace.subprojects" value="true" />
         <set name="use.reconfigure.template" value="true" />
         <set name="purpose" value="Insulated Development" />
         <set name="release" value="MinibuildDomain/next" />
 
-        <config name="${ccm.project}" type="checkout"/>
+        <set name="version" value="bh1test#eswaraia"/>
+        <config name="MinibuildDomain-bh1test#eswaraia:project:tr1test1#1" type="update"/>
         
     </config>
 </build>

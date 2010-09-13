@@ -17,10 +17,8 @@ rem Description:
 rem
 
 setlocal
-if exist "E:\APPS\sbs" (
-set SBS_HOME=E:\APPS\sbs
-set PATH=%SBS_HOME%\bin;%PATH%
-)
+
 echo Using Raptor from: %SBS_HOME%
 ..\..\..\hlm.bat %*
+
 endlocal

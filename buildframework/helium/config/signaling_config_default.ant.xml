@@ -27,7 +27,7 @@ Description:
     
     <!-- Only for backward compatibility -->
     <hlm:notifierList id="defaultSignalFailNotifier">
-        <hlm:emailNotifier templateSrc="${helium.dir}/tools/common/templates/log/email_new.html.ftl" title="[signal] ${signal.name} - [message] ${signal.message}"
+        <hlm:emailNotifier defaultTemplate="${helium.dir}/tools/common/templates/log/email_new.html.ftl" title="[signal] ${signal.name} - [message] ${signal.message}"
             smtp="${email.smtp.server}" ldap="${email.ldap.server}" notifyWhen="fail">
         </hlm:emailNotifier>
     </hlm:notifierList>
@@ -57,7 +57,7 @@ Description:
 
     <!-- Only for backward compatibility -->
     <hlm:notifierList id="defaultSignalAlwaysNotifier">
-        <hlm:emailNotifier templateSrc="${helium.dir}/tools/common/templates/log/email_new.html.ftl" title="[signal] ${signal.name}"
+        <hlm:emailNotifier defaultTemplate="${helium.dir}/tools/common/templates/log/email_new.html.ftl" title="[signal] ${signal.name}"
             smtp="${email.smtp.server}" ldap="${email.ldap.server}" notifyWhen="always">
         </hlm:emailNotifier>
     </hlm:notifierList>
@@ -144,6 +144,10 @@ Description:
     <hlm:signalInput id="publishSignalInput" failbuild="defer">
         <hlm:notifierListRef refid="defaultFailNotifier" />
     </hlm:signalInput>
+    
+    <hlm:signalInput id="ConEValidateSignalInput" failbuild="defer">
+        <hlm:notifierListRef refid="defaultFailNotifier" />
+    </hlm:signalInput>
 
     <hlm:signalInput id="testOneSignalInput" failbuild="now" />
 
@@ -167,7 +171,7 @@ Description:
         <hlm:notifierListRef refid="defaultFailNotifier" />
     </hlm:signalInput>
 
-    <hlm:signalListenerConfig id="prepWorkAreaSignal" target="prep-work-area" message="Errors happened during Preparing Work Area">
+    <hlm:signalListenerConfig id="prepWorkAreaSignal" target="prep-work-area" message="Errors during Preparing Work Area">
         <hlm:targetCondition>
             <hlm:hasSeverity severity="error" file="${build.cache.log.dir}/signals/${build.id}_ccm_get_input.log.status.xml" />
         </hlm:targetCondition>
@@ -197,7 +201,7 @@ Description:
     </hlm:signalListenerConfig>
 
 
-    <hlm:signalListenerConfig id="subconRomsSignal" target="subcon-roms" message="Errors happened during subcon rom image">
+    <hlm:signalListenerConfig id="subconRomsSignal" target="subcon-roms" message="Errors during subcon rom image">
         <hlm:targetCondition>
             <hlm:hasSeverity severity="error" file="${build.signal.status.dir}/${build.id}_subcon_roms.log.status.xml" />
         </hlm:targetCondition>
@@ -226,7 +230,7 @@ Description:
         </signalNotifierInput>
     </hlm:signalListenerConfig>
 
-    <hlm:signalListenerConfig id="fotaSignal" target="fota-a-build" message="Fota execution finished">
+    <hlm:signalListenerConfig id="fotaSignal" target="fota-a-build" message="FOTA execution had errors">
         <hlm:targetCondition>
             <hlm:hasSeverity severity="error" file="${build.signal.status.dir}/${build.id}_fota.log.xml" />
         </hlm:targetCondition>
@@ -240,7 +244,7 @@ Description:
         </signalNotifierInput>
     </hlm:signalListenerConfig>
 
-    <hlm:signalListenerConfig id="dataPackagingSignal" target="build-icreatordp" message="DP creation finished">
+    <hlm:signalListenerConfig id="dataPackagingSignal" target="build-icreatordp" message="DP creation had errors">
         <hlm:targetCondition>
             <hlm:hasSeverity severity="error" file="${build.signal.status.dir}/${build.id}_dp.log.status.xml" />
         </hlm:targetCondition>
@@ -258,7 +262,7 @@ Description:
         <hlm:notifierListRef refid="defaultFailNotifier" />
     </hlm:signalInput>
 
-    <hlm:signalListenerConfig id="atsSignal" target="ats-test" message="ATS creation finished">
+    <hlm:signalListenerConfig id="atsSignal" target="ats-test" message="ATS had errors">
         <targetCondition>
             <hlm:hasSeverity severity="error" file="${build.signal.status.dir}/${build.id}_ats.log.status.xml" />
         </targetCondition>
@@ -272,7 +276,7 @@ Description:
         </signalNotifierInput>
     </hlm:signalListenerConfig>
 
-    <hlm:signalListenerConfig id="asteSignal" target="ats-aste" message="ASTE finished">
+    <hlm:signalListenerConfig id="asteSignal" target="ats-aste" message="ASTE had errors">
         <hlm:targetCondition>
             <hlm:hasSeverity severity="error" file="${build.signal.status.dir}/${build.id}_aste.log.status.xml" />
         </hlm:targetCondition>
@@ -286,7 +290,7 @@ Description:
         </signalNotifierInput>
     </hlm:signalListenerConfig>
 
-    <hlm:signalListenerConfig id="mattiSignal" target="matti-test" message="ATS MATTI creation finished">
+    <hlm:signalListenerConfig id="mattiSignal" target="matti-test" message="ATS MATTI creation had errors">
         <targetCondition>
             <hlm:hasSeverity severity="error" file="${build.signal.status.dir}/${build.id}_matti.log.status.xml" />
         </targetCondition>
@@ -316,7 +320,7 @@ Description:
         <hlm:notifierListRef refid="defaultFailNotifier" />
     </hlm:signalInput>
 
-    <hlm:signalListenerConfig id="signalValidatePolicyInvalidOrMissing" target="render-validate-policy" message="Policy file validation">
+    <hlm:signalListenerConfig id="signalValidatePolicyInvalidOrMissing" target="render-validate-policy" message="Policy file validation had errors">
         <targetCondition>
             <hlm:hasSeverity severity="error" file="${build.signal.status.dir}/${build.id}_validate-policy.summary.status.xml" />
         </targetCondition>
@@ -342,7 +346,7 @@ Description:
         <hlm:notifierListRef refid="defaultFailNotifier" />
     </hlm:signalInput>
 
-    <hlm:signalListenerConfig id="getEnvSignal" target="preparation-getenv" message="Getenv finished">
+    <hlm:signalListenerConfig id="getEnvSignal" target="preparation-getenv" message="Getenv had errors">
         <targetCondition>
             <hlm:hasSeverity severity="error" file="${build.signal.status.dir}/${build.id}_getenv.log.status.xml" />
         </targetCondition>
@@ -364,7 +368,7 @@ Description:
         <hlm:notifierListRef refid="defaultFailNotifier" />
     </hlm:signalInput>
 
-    <hlm:signalListenerConfig id="signalConfigureQt" target="configure-qt" message="Configuring Qt framework">
+    <hlm:signalListenerConfig id="signalConfigureQt" target="configure-qt" message="Configuring Qt framework had errors">
         <targetCondition>
             <hlm:hasSeverity severity="error" file="${build.signal.status.dir}/${qt.configure.log.name}.status.xml" />
         </targetCondition>
@@ -386,7 +390,7 @@ Description:
         <hlm:notifierListRef refid="defaultSignalFailNotifier" />
     </hlm:signalInput>
 
-    <hlm:signalListenerConfig id="sisFilesSignal" target="sisfiles" message="sisfiles finished">
+    <hlm:signalListenerConfig id="sisFilesSignal" target="sisfiles" message="sisfiles had errors">
         <hlm:targetCondition>
             <hlm:hasSeverity severity="error" file="${build.signal.status.dir}/${build.id}_sisfiles.log.status.xml" 
  />

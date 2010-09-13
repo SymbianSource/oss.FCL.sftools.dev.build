@@ -6,6 +6,38 @@
 
 <h1>Release Notes for Symbian Build System v2</h1>
 
+<h2>version 2.15.1</h2>
+
+<h3>Defect Fixes</h3>
+<ul>
+<li><a href="http://developer.symbian.org/bugs/show_bug.cgi?id=3523">SF Bug 3523</a> - gnumakefile.flm workaround for romstuff.mke changes uses wrong output file</li>
+<li><a href="http://developer.symbian.org/bugs/show_bug.cgi?id=3374">SF Bug 3374</a> -  Issues with Raptor support for X86 prototype (2.15)</li>
+<li>Fix resource header generation - was being done for every language thus causing clashes in parallel builds</li>
+</ul>
+
+<h2>version 2.15.0</h2>
+
+<h3>New Features</h3>
+<ul>
+<li><a href="notes/slimdebug.txt">.slimdebug variant to optionally reduce debug binary sizes in RVCT builds</a></li>
+<li><a href="notes/x86_initial.txt">Initial support for a MinGW GCC-based x86 build</a></li>
+<li><a href="notes/filter_html.txt">Log summary in HTML format</a></li>
+<li><a href="notes/query_cli_extended_details.txt">Extended details for --query option</a></li>
+<li><a href="notes/traces_mmpkeyword.txt">New mmp keyword: traces</a></li>
+<li>Uprated internally-supplied Python to version 2.7 on linux</li>
+<li>Add <a href="notes/nodebug.txt">nodebug variant</a> to permit workaround for rvct 2.2 linker crashes on very large udeb targets</li>
+</ul>
+
+<h3>Defect Fixes</h3>
+<ul>
+<li><a href="http://developer.symbian.org/bugs/show_bug.cgi?id=2617">SF Bug 2617</a> - SBS2 [Raptor] does not support the DOCUMENT keyword in mmp files</li>
+<li><a href="http://developer.symbian.org/bugs/show_bug.cgi?id=1405">SF Bug 1405</a> - GCCE: Raptor passing unknown option -mapcs to the assembler</li>
+<li><a href="http://developer.symbian.org/bugs/show_bug.cgi?id=2979">SF Bug 2979</a> - [GCCE] elf2e32 --dump generates RVCT assembly.</li>
+<li><a href="http://developer.symbian.org/bugs/show_bug.cgi?id=3221">SF Bug 3221</a> - [Raptor] ROMFILE creation results in incorrect entries in iby file</li>
+<li><a href="http://developer.symbian.org/bugs/show_bug.cgi?id=2735">SF Bug 2735</a> - [Raptor] Relative unit paths in pkgdefs are not handled correctly - ammendment to fix in 2.14.2</li>
+<li><a href="http://developer.symbian.org/bugs/show_bug.cgi?id=3360">SF Bug 3360</a> - HTML filter breaks if FilterTerminal specified first</li>
+</ul>
+
 <h2>version 2.14.2</h2>
 
 <h3>Defect Fixes</h3>

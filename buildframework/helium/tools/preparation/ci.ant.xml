@@ -97,10 +97,13 @@ import time
 ctime_dict = {}
 root_dir = str(attributes.get('rootdir'))
 output_dir = str(attributes.get('outputdir'))
-for dir_ in os.listdir(root_dir):
-    if (os.path.isdir(os.path.join(root_dir, dir_))):
-        dir_ctime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(os.path.getctime(os.path.join(root_dir, dir_))))
-        ctime_dict[dir_ctime] = dir_
+if os.path.exists(root_dir):
+    for dir_ in os.listdir(root_dir):
+        if (os.path.isdir(os.path.join(root_dir, dir_))):
+            dir_ctime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(os.path.getctime(os.path.join(root_dir, dir_))))
+            ctime_dict[dir_ctime] = dir_
+else:
+    self.log("Skipping " + root_dir + " dir because it doesn't exist.")
 ctime_list = ctime_dict.keys()
 ctime_list.sort()
 self.log(str("ctime_list: %s" % ctime_list))
@@ -148,11 +151,18 @@ logging.basicConfig(level=logging.INFO)
 databases = []
 delivery = str(attributes.get('delivery'))
 sessionFile = str(attributes.get('sessionfile'))
+engine = project.getProperty('ccm.engine.host')
+dbpath = project.getProperty('ccm.database.path')
+            
 configBuilder = configuration.NestedConfigurationBuilder(open(delivery, 'r'))
 configSet = configBuilder.getConfiguration()
-for config in configSet.getConfigurations():
-    if config['database'] not in databases:
-        databases.append(config['database'])
+
+if dbpath:
+    databases.append(dbpath)
+else:
+    for config in configSet.getConfigurations():
+        if config['database'] not in databases:
+            databases.append(config['database'])
 
 config = configuration.PropertiesConfiguration()
 if os.path.exists(sessionFile):
@@ -175,7 +185,7 @@ for database in databases:
     if update_session:
         try:
             self.log(str("Opening a new session for %s..." % database))
-            session = nokia.nokiaccm.open_session(database=database)
+            session = nokia.nokiaccm.open_session(database=database, engine=engine, dbpath=dbpath)
             session.close_on_exit = False        
             config[database] = session.addr()
         except Exception, exc:
@@ -290,7 +300,7 @@ output.close()
             <and>
                 <available file="${prep.delivery.conf.parsed}"/>
                 <isset property="ci.session.file"/>                
-                <isset property="run.ccm"/>
+                <istrue value="${ccm.enabled}"/>
             </and>
             <then>
                 <property name="do.ci-monitor-ccm-session" value="true"/>

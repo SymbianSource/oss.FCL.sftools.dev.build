@@ -22,8 +22,7 @@ Description:
 -->
 <SystemDefinition schema="3.0.0" xmlns:qt="http://qt.nokia.com">
   <package id="valid_package_root2" name="valid_package_root2" levels="demo">
-    <!-- the xml syntax of this file is voluntarly wrong. -->
-    <collection id="collection2" name="Collection 2" level="demo" />
+    <collection id="collection2" name="Collection 2" level="demo">
       <component id="component2" name="Component 2" purpose="development">
         <unit bldFile="collection2/component2/group" mrp="" />
       </component>

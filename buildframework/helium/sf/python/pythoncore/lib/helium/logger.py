@@ -23,7 +23,7 @@
   - First version of the module.
 """
 
-# pylint: disable-msg=E1101,E1103
+# pylint: disable=E1101,E1103
 
 import codecs
 import xml.dom.minidom
@@ -43,6 +43,7 @@ class _CustomizePrint(object):
     def __call__(self, *args):
         """Make this object callable. Call _print from the logger instance.
         @params *args a list of arguments"""
+        # pylint: disable=W0212
         self.__logger._print(self.__name, args)
 
 
@@ -142,10 +143,10 @@ class Logger(object):
             print ("---------------------------------------------------------------------")
             print (" + %s" % title)
 
-    def SetCustomOutputer(self, type, classname, config = None):
+    def SetCustomOutputer(self, type_, classname, config = None):
         """set custom out puter"""
         node = self.__doc.createElementNS("", "__customoutputer")
-        node.setAttributeNS("", "type", type)
+        node.setAttributeNS("", "type", type_)
         node.setAttributeNS("", "module", classname)
         if config != None:
             node.appendChild(config)
@@ -170,7 +171,7 @@ class Logger(object):
         """Generic method that handle the print in the XML document
             @param kind type of output
             @param *args a list of arguments (must be strings)"""
-        output = u"".join(map(lambda x: u"%s" % x, list(*args)))
+        output = u"".join([u"%s" % x for x in list(*args)])
         nodetype = kind.lower()
         msgtype = ""
         if nodetype != "print" and nodetype != "info" and nodetype != "debug":

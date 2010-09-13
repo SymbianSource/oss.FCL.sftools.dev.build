@@ -17,6 +17,7 @@
 package com.nokia.helium.core.plexus;
 
 import java.util.Vector;
+
 import org.codehaus.plexus.util.cli.StreamConsumer;
 
 /**

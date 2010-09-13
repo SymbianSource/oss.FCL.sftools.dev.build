@@ -1,6 +1,6 @@
 <#--
 ============================================================================ 
-Name        : finish.xml.ftl 
+Name        : diamonds_signal.xml.ftl 
 Part of     : Helium 
 
 Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
@@ -21,21 +21,13 @@ Description:
 -->
 <#include "diamonds_header.ftl"> 
   <signals>
-      <#assign diamondsignalname = ""/>
-      <#assign diamondkeys = diamondSignal?keys>
-      <#list diamondkeys as diamondkey>
-      <#if diamondkey?contains("diamond.signal.name")>
-      <#list diamondkey?split(".") as index>
-      <#assign signalIndex = index/>
-      </#list>
+      <#list ant?keys as diamondskey>
+      <#if diamondskey?starts_with("diamond.signal.name.")>
+      <#assign signalIndex = diamondskey?split(".")?last />
       <signal>
-      <#list diamondkeys as diamondkey>
-      <#if diamondkey?contains("${signalIndex}")>
-          <#if diamondkey?contains("diamond.signal.name.${signalIndex}")><name>${diamondSignal[diamondkey]}</name></#if>
-          <#if diamondkey?contains("diamond.error.message.${signalIndex}")><message>${diamondSignal[diamondkey]}</message></#if>
-          <#if diamondkey?contains("diamond.time.stamp.${signalIndex}")><timestamp>${diamondSignal[diamondkey]}</timestamp></#if>
-      </#if>
-      </#list>
+          <#if ant?keys?seq_contains("diamond.signal.name.${signalIndex}")><name>${ant["diamond.signal.name.${signalIndex}"]?xml}</name></#if>
+          <#if ant?keys?seq_contains("diamond.error.message.${signalIndex}")><message>${ant["diamond.error.message.${signalIndex}"]?xml}</message></#if>
+          <#if ant?keys?seq_contains("diamond.time.stamp.${signalIndex}")><timestamp>${ant["diamond.time.stamp.${signalIndex}"]?xml}</timestamp></#if>
       </signal>
       </#if>
       </#list>

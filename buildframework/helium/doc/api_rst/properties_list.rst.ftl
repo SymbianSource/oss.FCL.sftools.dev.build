@@ -30,11 +30,11 @@ Properties list
 </#list>
 
 .. csv-table:: Helium properties
-   :header: "Property", "Project", "Summary"
+   :header: "Property", "Project", "Summary", "Default Value"
    
 <#list propertyCache?keys?sort as name>
 <#assign property=propertyCache[name]>
-    ":hlm-t:`${name}`", "${property?parent.name}", "${property.summary?replace("^", "    ", "rm")?replace("\"", "\"\"", "rm")?trim}"
+    ":hlm-t:`${name}`", "${property?parent.name}", "${property.summary?replace("^", "    ", "rm")?replace("\"", "\"\"", "rm")?trim}", "<#if property.defaultValue?length &lt; 25>${property.defaultValue}</#if>"
 </#list>
 
 

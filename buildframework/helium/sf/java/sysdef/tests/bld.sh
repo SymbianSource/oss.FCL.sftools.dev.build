@@ -16,9 +16,4 @@
 # Description: 
 #
 
-
-
-module load java/1.6.0
-module load mercurial
-export OLDANT_ARGS="-lib ../lib -lib ../../lib -lib ../../bin/helium-core.jar -lib ../../bin/helium-sysdef.jar -lib ../../antlibs"
-ant -Dant.executor.class="com.nokia.helium.core.ant.HeliumExecutor" $*
+ant  $*

@@ -31,6 +31,16 @@ Description:
     @scope private
     -->
     <property name="build.duplicates.log" location="${temp.build.dir}/${build.id}_build_duplicates.xml" />
+    
+    <!-- Check, is it required to run build duplicates -->
+    <condition property="run.build.duplicates">
+        <not>
+            <or>
+                <equals arg1="${build.system}" arg2="sbs" />
+                <equals arg1="${build.system}" arg2="sbs-ec" />
+            </or>
+        </not>
+    </condition>
 
     <!--
         This macro extract the list of files generated/exported several time from different component 
@@ -55,23 +65,11 @@ import integration.ant
 integration.ant.check_build_duplicates_task(project, self, attributes, elements)
         ]]>
     </scriptdef>
-
-    <!-- 
-       Check if the build duplicated needs to be run.
-    -->
-    <target name="check-build-duplicates">
-        <condition property="skip.build.duplicates" value="">
-            <or>
-                <equals arg1="${build.system}" arg2="sbs" />
-                <equals arg1="${build.system}" arg2="sbs-ec" />
-            </or>
-        </condition>
-    </target>
-
+   
     <!-- Parse all the build log and extract files that are generated/exported
         several times.
     -->
-    <target name="integration-build-duplicates" depends="check-build-duplicates" unless="skip.build.duplicates">
+    <target name="integration-build-duplicates" if="run.build.duplicates">
         <hlm:checkBuildDuplicatesMacro output="${build.duplicates.log}">
             <fileset dir="${compile.log.dir}">
                 <include name="${build.id}.*_compile.log" />
@@ -82,7 +80,7 @@ integration.ant.check_build_duplicates_task(project, self, attributes, elements)
     </target>
 
     <!-- Render the build duplicates xml file into an HTML output. -->
-    <target name="render-build-duplicates" depends="integration-build-duplicates" unless="skip.build.duplicates">
+    <target name="render-build-duplicates" depends="integration-build-duplicates" if="run.build.duplicates">
         <fmpp sourceFile="${helium.dir}/tools/common/templates/integration/build-duplicates.html.ftl" outputFile="${build.log.dir}/${build.id}_build-duplicates.html">
             <freemarkerLinks expandProperties="yes">
                             macro: ${helium.dir}/tools/common/templates/macro

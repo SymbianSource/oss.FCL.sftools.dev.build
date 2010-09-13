@@ -96,7 +96,7 @@ void ImageReader::ExtractFile(TUint aOffset,TInt aSize,const char* aFileName,con
 			fullPath += SLASH_CHAR1 ;		
 	}
 	int startImagePath = (int)fullPath.length();
-	fullPath += aPath ;	 
+	fullPath += aPath ;	
 	
 	// create specified directory where file needs to be extracted. 
 	// to lower
@@ -107,7 +107,6 @@ void ImageReader::ExtractFile(TUint aOffset,TInt aSize,const char* aFileName,con
 		}
 	}
 	CreateSpecifiedDir(fullPath);
-
 	data -- ;
 	if(*data != SLASH_CHAR1)
 		fullPath += SLASH_CHAR1 ; 
@@ -131,7 +130,8 @@ void ImageReader::ExtractFile(TUint aOffset,TInt aSize,const char* aFileName,con
 		infile.seekg(aOffset,ios_base::beg);
 		//read number of bytes specified by the variable size 
 		//from the stream and place it on to buffer.
-		infile.read(buffer,aSize);
+		if (aSize)
+			infile.read(buffer,aSize);
 		//close the input stream after reading.
 		infile.close();
 	}
@@ -142,7 +142,8 @@ void ImageReader::ExtractFile(TUint aOffset,TInt aSize,const char* aFileName,con
 	if(outfile.is_open()) {
 		//writes number of bytes specified by the variable size 
 		//from buffer to the current output stream.
-		outfile.write(buffer,aSize);
+		if (aSize)
+			outfile.write(buffer,aSize);
 		//close the output stream after writing.
 		outfile.close();
 	}

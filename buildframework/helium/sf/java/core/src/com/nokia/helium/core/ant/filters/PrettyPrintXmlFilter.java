@@ -17,6 +17,7 @@
 
 package com.nokia.helium.core.ant.filters;
 
+import java.io.IOException;
 import java.io.StringWriter;
 
 import org.apache.tools.ant.BuildException;
@@ -25,7 +26,6 @@ import org.dom4j.Document;
 import org.dom4j.DocumentHelper;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
-import java.io.IOException;
 
 /**
  * Prints xml file in pretty format.
@@ -59,8 +59,9 @@ public class PrettyPrintXmlFilter implements Filter {
                 throw new BuildException(exc.getMessage(), exc);
             } finally {
                 try {
-                    if (writer != null)
+                    if (writer != null) {
                         writer.close();
+                    }
                 } catch (IOException exc) {
                     throw new BuildException(exc.getMessage(), exc);
                 }

@@ -17,11 +17,12 @@
 
 package com.nokia.helium.signal.ant.types;
 
-import com.nokia.helium.signal.Notifier;
-import org.apache.tools.ant.types.DataType;
-import org.apache.log4j.Logger;
-import java.util.List;
 import java.io.File;
+
+import org.apache.log4j.Logger;
+import org.apache.tools.ant.types.DataType;
+
+import com.nokia.helium.signal.Notifier;
 
 /**
  * The InfoNotifier provides you an easy way to inform the
@@ -31,16 +32,6 @@ import java.io.File;
 public class InfoNotifier extends DataType implements Notifier {
 
     private Logger log = Logger.getLogger(InfoNotifier.class);
-    /**
-     * Rendering the template, and sending the result through email.
-     * @deprecated
-     * @param signalName
-     *            - Name of the signal that has been raised.
-     */
-    @SuppressWarnings("unchecked")
-    public void sendData(String signalName, boolean failStatus,
-            List<String> fileList) {
-    }
     
     /**
      * Rendering the template, and sending the result through email.

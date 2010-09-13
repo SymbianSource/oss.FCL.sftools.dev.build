@@ -25,6 +25,25 @@ Description:
     <description>
         ROM image creation using iMaker (future implementation).
     </description>
+    
+    <!--* @property imaker.engine
+    Defines which accelerator to use for running iMaker. (default value from build.system property)
+    @type string
+    @scope private
+    -->
+    
+    <condition property="imaker.engine" value="imaker.engine.ec" else="imaker.engine.default">
+        <and>
+            <not>
+                <isset property="imaker.engine" />
+            </not>
+            <or>
+                <equals arg1="${build.system}" arg2="ec-helium" />
+                <equals arg1="${build.system}" arg2="sbs-ec" />
+            </or>
+        </and>
+    </condition>      
+        
 
     <!--
        This task merges all files mentioned in the fileset and output them in filename output file. 
@@ -32,7 +51,7 @@ Description:
     <scriptdef name="mergeConfigXML" language="beanshell"  uri="http://www.nokia.com/helium">
         <element name="fileset" type="fileset"/>
         <attribute name="filename"/>
-<![CDATA[
+        <![CDATA[
 import java.io.File;
 import org.dom4j.Node;
 import org.dom4j.io.SAXReader;
@@ -50,24 +69,24 @@ rootConfig.addAttribute("name", "ee-roms");
 
 filesets = elements.get("fileset");
 for (i = 0; i < filesets.size(); ++i) {
-        ds = filesets.get(i).getDirectoryScanner(project);
-        ds.scan();
-        String[] files = ds.getIncludedFiles();
-        for (j = 0; j < files.length ; ++j) {
-           romconf = new File(ds.getBasedir(), files[j]);
-           self.log("Adding " + romconf + ".");
-           SAXReader reader = new SAXReader();
-           Document document = reader.read(romconf);
-           Node node = document.selectSingleNode("//build/config");
-           rootConfig.add(node.detach());
-        }
+    ds = filesets.get(i).getDirectoryScanner(project);
+    ds.scan();
+    String[] files = ds.getIncludedFiles();
+    for (j = 0; j < files.length ; ++j) {
+        romconf = new File(ds.getBasedir(), files[j]);
+        self.log("Adding " + romconf + ".");
+        SAXReader reader = new SAXReader();
+        Document document = reader.read(romconf);
+        Node node = document.selectSingleNode("//build/config");
+        rootConfig.add(node.detach());
+    }
 }
 // lets write to a file
 OutputFormat format = OutputFormat.createPrettyPrint();
 XMLWriter writer = new XMLWriter(new FileWriter(attributes.get("filename")), format);
 writer.write( document );
 writer.close();
-]]>
+        ]]>
     </scriptdef>
     
     <!--
@@ -115,31 +134,7 @@ writer.close();
     -->
     <target name="build-roms" depends="rombuild-imaker-create-buildinfo">
         <mkdir dir="${roms.log.dir}"/>
-        <if>
-            <not>
-                <isset property="imaker.engine" />
-            </not>
-            <then>
-                <if>
-                    <or>
-                        <equals arg1="${build.system}" arg2="ec-helium" />
-                        <equals arg1="${build.system}" arg2="sbs-ec" />
-                    </or>
-                    <then>
-                        <!-- Defines which accelerator to use for running iMaker. (default value from build.system property)
-                        @type string
-                        @scope private
-                        -->
-                        <property name="imaker.engine" value="imaker.engine.ec" />
-                    </then>
-                </if>
-            </then>
-        </if>
-        <!-- Defines which accelerator to use for running iMaker. (default value from build.system property)
-        @type string
-        @scope private
-        -->
-        <property name="imaker.engine" value="imaker.engine.default" />        
+        
         <property name="imaker.rom.name" value=""/>
         <hlm:imaker epocroot="${build.drive}/" engineRefid="${imaker.engine}"
                         output="${roms.log.dir}/${build.id}${imaker.rom.name}.roms.log" verbose="true">
@@ -154,10 +149,10 @@ writer.close();
             </then>
         </if>
         <hlm:metadatarecord database="${metadata.dbfile}">
-            <hlm:textmetadatainput>
+            <hlm:imakermetadatainput>
                 <fileset casesensitive="false" file="${roms.log.dir}/${build.id}${imaker.rom.name}.roms.log" />
                 <metadatafilterset refid="filterset.imaker" />
-            </hlm:textmetadatainput>
+            </hlm:imakermetadatainput>
         </hlm:metadatarecord>
         <hlm:signalMacro logfile="${roms.log.dir}/${build.id}${imaker.rom.name}.roms.log" 
                          signal.input="rombuildSignalInput" />
@@ -178,13 +173,6 @@ writer.close();
                 </exec>
             </then>
         </if>
-        <fmpp sourceFile="${helium.dir}/tools/common/templates/diamonds/build_roms_diamonds.xml.ftl"
-                     outputfile="${diamonds.build.output.dir}/build-roms.xml">
-            <data expandProperties="yes">
-                dbPath: ${metadata.dbfile}
-                ant: antProperties()
-            </data>
-        </fmpp>
     </target>
     
     

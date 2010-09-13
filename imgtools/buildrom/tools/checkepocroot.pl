@@ -2,7 +2,7 @@
 
 use Getopt::Long;
 
-use constant TOOL_VERSION=>"0.1";
+use constant TOOL_VERSION=>"0.2";
 
 my $help;
 my $dir;
@@ -65,20 +65,20 @@ sub convobyfile
 	my $line;
 	while($line = <SRC>)
 	{
-		if ($line =~ /[\\\/]epoc32/)
+		if ($line =~ /[\\\/]epoc32[\\\/]/i)
 		{
 	  	print "Found content in file $src\n";
 	  	print LOG "Found content in file $src\n";
 	  	print "current line is $line";
 	  	print LOG "current line is $line";
-			if ($line =~ /EPOCROOT##[\\\/]?epoc32/)
+			if ($line =~ /EPOCROOT##[\\\/]?epoc32[\\\/]/i)
 			{
 				print "Error: this line already contain EPOCROOT\n";
 				next;
 			}
 	  	if($convert)
 	  	{
-		  	$line =~ s-[\\\/]epoc32-EPOCROOT##epoc32-g;
+		  	$line =~ s-[\\\/]epoc32(?=[\\\/])-EPOCROOT##epoc32-ig;
 		  	print "converted line is $line";
 		  	print LOG "converted line is  $line";
 		  }

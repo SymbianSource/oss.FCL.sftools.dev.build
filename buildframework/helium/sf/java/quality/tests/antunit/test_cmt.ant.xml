@@ -38,13 +38,12 @@ Description:
     <target name="setUp">
         <delete dir="${cmt.output.dir}/cmt" failonerror="false" />
         <mkdir dir="${cmt.output.dir}/cmt" />
-        
-        <!--take the diamonds header and footer .ftl files and turn them into .xml files
-        for copying as the headera nd footer parts of the output files-->
-        <fmpp sourcefile="./../../../../../tools/common/templates/diamonds/diamonds_header.ftl" 
-              outputfile="${temp.diamonds.header.xml}" quiet="true"/>
-        <fmpp sourcefile="./../../../../../tools/common/templates/diamonds/diamonds_footer.ftl" 
-              outputfile="${temp.diamonds.footer.xml}" quiet="true"/>
+        <echo file="${temp.diamonds.header.xml}"><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<diamonds-build>
+    <schema>23</schema>
+]]></echo>
+        <echo file="${temp.diamonds.footer.xml}"><![CDATA[</diamonds-build>
+]]></echo>
     </target>
 
     <!-- is called after the test, even if that caused an error -->

@@ -38,6 +38,8 @@ class MD5SignatureBuilder(object):
         self.temp_dir = temp_dir
         self.exclude_dirs = exclude_dirs
         self.list_of_files = list_of_files
+        self.dest_dir = None
+        self.list_of_lists = None
         
     def create_file_list(self):
         """Create list of files (was list_files.pl)"""
@@ -171,6 +173,10 @@ class MD5SignatureBuilder(object):
     
 class MD5SignatureBuilderEBS(MD5SignatureBuilder):
     """ build the MD5 CRCs for all the files in the list of files"""
+    def __init__(self, build_area_root, nb_split, temp_dir, exclude_dirs, list_of_files):
+        MD5SignatureBuilder.__init__(self, build_area_root, nb_split, temp_dir, exclude_dirs, list_of_files)
+        self.makefile = None
+        
     def create_build_file(self):
         """Create EBS XML"""
         liste = self.create_command_list()
@@ -189,6 +195,7 @@ class MD5SignatureBuilderEC(MD5SignatureBuilder):
     """ The MD5 CRC creation for delta zippinf for use on EC machines"""
     def __init__(self, build_area_root, nb_split, temp_dir, exclude_dirs, ec_cluster_manager, ec_build_class, list_of_files):
         MD5SignatureBuilder.__init__(self, build_area_root, nb_split, temp_dir, exclude_dirs, list_of_files)
+        self.makefile = None
         self.ec_cluster_manager = ec_cluster_manager
         self.ec_build_class = ec_build_class
     
@@ -332,10 +339,10 @@ class SignaturesDict(dict):
         
         return string
 
-def readEvalid(dir):
+def readEvalid(dir_):
     """read E valid"""
     filesdict = {}
-    for root, _, files in os.walk(dir):
+    for root, _, files in os.walk(dir_):
         for name in files:
             f_file = os.path.join(root, name)
             directory = None
@@ -373,7 +380,7 @@ def evalidAdomapping(builddrive, dest, adomappingfile):
         shutil.rmtree(dest)
     os.mkdir(dest)
     for line in open(adomappingfile):
-        dir = line.split('=')[0].replace(r'\:', ':')
+        dir_ = line.split('=')[0].replace(r'\:', ':')
         tmpfile = os.path.join(dest, str(i))
-        os.system('evalid -g ' + dir + ' ' + tmpfile)
+        os.system('evalid -g ' + dir_ + ' ' + tmpfile)
         i = i + 1

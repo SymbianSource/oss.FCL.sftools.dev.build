@@ -16,7 +16,7 @@
 #
 #Description:
 #===============================================================================
-# pylint: disable-msg=W0212,W0141
+# pylint: disable=W0212,W0141
 """ IO module for SystemDefinitionFile.
     - Allow convertion to m,a 
 """

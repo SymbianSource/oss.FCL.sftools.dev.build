@@ -26,6 +26,7 @@ Description:
     <taskdef name="coverity" classname="com.nokia.helium.quality.ant.taskdefs.CoverityTask" onerror="ignore"/>
     <taskdef name="cmt" classname="com.nokia.helium.quality.ant.taskdefs.CMTToolTask" onerror="ignore"/>
     <taskdef name="cmtsummarytask" classname="com.nokia.helium.quality.ant.taskdefs.CMTSummaryTask" onerror="ignore"/>
+    <taskdef name="casummary" classname="com.nokia.helium.quality.ant.taskdefs.CASummaryTask" onerror="ignore"/>
 
     <!-- Type definition -->
     <typedef name="coverityoptions" classname="com.nokia.helium.core.ant.types.VariableSet"/>

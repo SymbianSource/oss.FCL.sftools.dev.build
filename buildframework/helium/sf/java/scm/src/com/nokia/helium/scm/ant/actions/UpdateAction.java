@@ -21,15 +21,15 @@ import java.util.List;
 
 import org.apache.maven.scm.ScmException;
 import org.apache.maven.scm.ScmFile;
+import org.apache.maven.scm.ScmRevision;
 import org.apache.maven.scm.ScmTag;
 import org.apache.maven.scm.command.update.UpdateScmResult;
 import org.apache.maven.scm.manager.ScmManager;
 import org.apache.maven.scm.repository.ScmRepository;
 import org.apache.tools.ant.BuildException;
-import org.apache.maven.scm.ScmRevision;
 
-import com.nokia.helium.scm.ant.types.Tag;
 import com.nokia.helium.scm.ant.types.Revision;
+import com.nokia.helium.scm.ant.types.Tag;
 
 /**
  * Update the defined project for a specific revision or tag.

@@ -37,6 +37,17 @@ def test_atsant_singledrop():
     files = atsant.files_to_test(os.path.join(os.environ['TEST_DATA'], 'data/packageiad/layers.sysdef.xml'), None, None, 'z:', 'true')
     assert len(files) == 1
 
+def test_atsant_multipledrop_with_sysdef3():
+    """test atsant and check MULTIPLE drop files are created when sysdef3 files are in use"""
+    files = atsant.files_to_test(os.path.join(os.environ['TEST_DATA'], 'data/packageiad/sysdef3_test.xml'), None, None, 'z:', 'false', True)
+    assert len(files) == 2
+    
+def test_atsant_singledrop_with_sysdef3():
+    """test atsant and check SINGLE drop file is created when sysdef3 files are in use"""
+    files = atsant.files_to_test(os.path.join(os.environ['TEST_DATA'], 'data/packageiad/sysdef3_test.xml'), None, None, 'z:', 'true', True)
+
+    assert len(files) == 1
+
 def test_IConfigATS():
     """test I config ATS"""
     tmpdir = tempfile.mkdtemp()

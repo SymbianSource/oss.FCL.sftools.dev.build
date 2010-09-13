@@ -45,24 +45,6 @@ TInt Getlogfile(char *aDriveObeyFileName,char* &aPadLogFile)
 	// Validate the user entered driveoby file name.
 	char* logFile = (char*)aDriveObeyFileName;
 
-#ifdef __LINUX__
-	logFile = strrchr(logFile,'/');
-#else
-	while(*logFile)
-		{
-		if(*logFile == '/')
-			*logFile = '\\';
-		logFile++;
-		}
-	logFile = (char*)aDriveObeyFileName;
-	logFile = strrchr(logFile,'\\');
-#endif
-	
-	if(logFile)
-		++logFile;
-	else
-		logFile = (char*)aDriveObeyFileName;
-
 	TInt len = strlen(logFile);
 	if(!len)
 		return KErrGeneral;

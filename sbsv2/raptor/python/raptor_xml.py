@@ -336,10 +336,10 @@ class SystemModel(object):
 				aContainers[parent.tagName] = name
 
 			self.__GetElementContainers(parent, aContainers)
-	
+
 	def __ProcessSystemModelMetaElement(self, aElement):
 		# stub method - may deal with metadata elements at some point in the future
-		return	
+		return
 
 	def __ProcessSystemModelElement(self, aElement):
 		"""Search for XML <unit/> elements with 'bldFile' attributes and resolve concrete bld.inf locations
@@ -353,7 +353,7 @@ class SystemModel(object):
 		# The effective "layer" is the item whose parent does not have an id (or name in 2.x and earlier)
 		if not aElement.parentNode.hasAttribute(self.__IdAttribute) :
 			currentLayer = aElement.getAttribute(self.__IdAttribute)
-			
+
 			if not self.__LayerDetails.has_key(currentLayer):
 				self.__LayerDetails[currentLayer] = []
 
@@ -389,8 +389,12 @@ class SystemModel(object):
 					if not group.isAbsolute() and bldInfRoot:
 						group = generic_path.Join(bldInfRoot, group)
 				else:
-					# all paths are changed by root var in 3.x
-					if bldInfRoot:
+					# relative paths for v3
+					if not group.isAbsolute():
+						group = generic_path.Join(generic_path.Join(self.__SystemDefinitionFile).Dir(),group)
+					# absolute paths for v3
+					# are relative to bldInfRoot if set, or relative to the drive root otherwise
+					elif bldInfRoot:
 						group = generic_path.Join(bldInfRoot, group)
 
 				bldinf = generic_path.Join(group, "bld.inf").FindCaseless()

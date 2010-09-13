@@ -23,22 +23,23 @@ Description:
 <project name="test-diamonds-invalid-template" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
     <description>Helium Antlib diamonds unittests.</description>
     <property environment="env" />
-    
+    <taskdef resource="com/nokia/helium/core/ant/antlib.xml" uri="http://www.nokia.com/helium"/>
+    <taskdef name="xpathtest" classname="se.jtech.ant.xpath.XPathEvaluatorTask" onerror="ignore"/>    
+    <property name="diamonds.enabled" value="true" />
     <property name="diamonds.unitest.dir" location="${ant.file.test-diamonds-invalid-template}/../../../" />
     <import file="../../../../../../nokia/companyproperties.ant.xml" optional="true"/>
-    <import file="../../../../../../../extensions/nokia/external/helium-nokia-antlib/companyproperties.ant.xml" optional="true"/>
     <property name="diamonds.output.dir" location="${temp.dir}/output" />
     <property name="diamonds.template.dir" location="${diamonds.unitest.dir}/data/invalid_templates" />
     <property name="build.family" value="test_new_hlm"/>
     <property name="id" value="123"/>
     <property name="name" value="${build.family}_${id}"/>
     <property name="build.system" value="ec-helium"/>
-    <property name="diamonds.listener.configuration.file" location="${diamonds.unitest.dir}/config/diamonds_config.xml.ftl" />
     <property name="compile.log.input" location="${diamonds.unitest.dir}/data/compile.log.xml" />
     <property name="codescanner.log.input" location="${diamonds.unitest.dir}/data/problemIndex.xml" />
     <property name="policy.log.input" location="${diamonds.unitest.dir}/data/policy.log.xml" />
     <property name="invalid.target.input.file" location="${diamonds.unitest.dir}/data/invalid.target.input.log.xml" />
     <property name="symsee.version" value="9.1.0" />
+    <import file="../../config/diamonds_config_default.ant.xml" />
 
     <target name="unittest" depends="unittest-diamonds" />
     
@@ -67,74 +68,26 @@ Description:
         <echo message="target without input file and just to send the data" />
     </target>
 
-    <target name="invalid-target-input-file">
-        <echo message="target with invalid input source xml file" />
-    </target>
-
-    <target name="invalid-stage-input-file">
-        <echo message="stage with invalid input source xml file" />
-    </target>
 
     <target name="invalid-template-file">
-        <echo message="target with invalid template-file" />
+        <echo message="expected message: ${diamonds.template-dir}${file.separator}invalid-target-input-file.ftl doesn't exists" />
+        <au:expectfailure expectedMessage="input file : ${diamonds.template-dir}${file.separator}invalid-target-input-file.ftl doesn't exists" >
+            <hlm:targetMessageTrigger id="invalid-target-input-file.id" target="invalid-target-input-file">
+                <hlm:fmppMessage sourceFile="${diamonds.template-dir}${file.separator}invalid-target-input-file.ftl">
+                    <data expandProperties="yes">
+                        ant: antProperties()
+                    </data>
+                </hlm:fmppMessage>
+            </hlm:targetMessageTrigger>
+        </au:expectfailure>
     </target>
 
     <target name="invalid-ant-properties-input">
         <echo message="target with invalid ant properties input" />
     </target>
 
-    <target name="non-existing-ant-properties">
-        <echo message="target with non-existing-ant-properties" />
-    </target>
-
-    <target name="invalid-diamonds-server-properties">
-        <echo message="target with invalid-diamonds-server-properties" />
-    </target>
-
-    <target name="defer-type">
-        <echo message="version target for diamonds to verify sending data to diamonds" />
-    </target>
-
-    <target name="test-defer-type">
-        <antcall target="defer-type" />
-    </target>
-
-    <target name="test-create-bom-log">
-        <antcall target="create-bom-log" />
-    </target>
-
-    <target name="test-codescanner">
-        <antcall target="codescanner" />
-    </target>
-
-    <target name="test-invalid-target-input-file">
-        <antcall target="invalid-target-input-file" />
-    </target>
-
-    <target name="test-invalid-stage-input-file">
-        <antcall target="invalid-target-input-file" />
-        <echo message="stage with invalid input source xml file" />
-    </target>
-
-    <target name="test-invalid-template-file">
-        <antcall target="invalid-template-file" />
-    </target>
-
     <target name="test-invalid-ant-properties-input">
         <antcall target="invalid-ant-properties-input" />
-    </target>
-
-    <target name="test-non-existing-ant-properties">
-        <antcall target="non-existing-ant-properties" />
-    </target>
-
-    <target name="test-invalid-diamonds-server-properties">
-        <antcall target="invalid-diamonds-server-properties" />
-        <echo message="target with invalid-diamonds-server-properties" />
-    </target>
-
-    <target name="test-compile-target">
-        <antcall target="compile-target" />
     </target>
 
     <target name="test-version">
@@ -154,8 +107,27 @@ Description:
         </au:assertFalse>
     </target>
 
-    <target name="test-all" depends="test-buildid-notset, diamonds, test-buildid-set, test-defer-type, test-version,
-        test-create-bom-log,test-codescanner,test-compile-target,test-invalid-diamonds-server-properties,
-        test-non-existing-ant-properties,test-invalid-ant-properties-input,test-invalid-template-file,
-        test-invalid-target-input-file,test-invalid-stage-input-file " />
+    <target name="test-invalid-template-file">
+            <antcall target="invalid-template-file" />
+    </target>
+
+    <target name="test-verify-targets">
+        <au:assertTrue>
+            <isset property="diamonds.build.id"/>
+        </au:assertTrue>
+     </target>
+
+    <target name="test-verify-stages">
+        <get src="http://${diamonds.host}:${diamonds.port}${diamonds.build.id}?fmt=xml"
+             dest="${temp.dir}/test-verify-stages.xml" 
+             usetimestamp="true" />
+        <xpathtest xmlfile="${temp.dir}/test-verify-stages.xml">
+            <namespace uri="" prefix=""/>
+            <xpath expression="/diamonds-build/stages/stage[name='invalid-template-sequence']"/>
+        </xpathtest>
+    </target>        
+
+
+    <target name="test-all" depends="test-buildid-notset, diamonds, test-buildid-set, test-invalid-ant-properties-input,
+        test-invalid-template-file, test-verify-targets, test-verify-stages" />
 </project>

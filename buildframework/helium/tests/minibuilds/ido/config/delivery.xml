@@ -26,9 +26,9 @@ Description:
         <set name="dir" value="${ccm.project.wa_path}" />
         <set name="threads" value="1" />
         <set name="sync" value="true" />
-		<set name="show.conflicts" value="true" />
-		<set name="fix.missing.baselines" value="true" />
-		<set name="replace.subprojects" value="true" />
+        <set name="show.conflicts" value="true" />
+        <set name="fix.missing.baselines" value="true" />
+        <set name="replace.subprojects" value="true" />
 
 
 

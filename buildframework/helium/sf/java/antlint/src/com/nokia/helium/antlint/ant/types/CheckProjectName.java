@@ -53,9 +53,6 @@ public class CheckProjectName extends AbstractCheck {
 
     /**
      * {@inheritDoc}
-     * 
-     * @throws SAXException
-     * @throws ParserConfigurationException
      */
     public void run(Element node) {
         if (node.getName().equals("project")) {

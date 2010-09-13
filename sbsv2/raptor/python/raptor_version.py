@@ -14,9 +14,12 @@
 # Description: 
 # raptor version information module
 
-# replace CHANGESET with the Hg changeset for ANY release
+# replace ISODATE with the creation date of the release
+# replace CHANGESET with the Hg changeset of the release
+#
+# both of these are done automatically by the installer builder.
 
-version=(2,14,2,"2010-07-13","symbian build system","CHANGESET")
+version=(2,15,1,"ISODATE","symbian build system","CHANGESET")
 
 def numericversion():
 	"""Raptor version string"""

@@ -18,10 +18,10 @@ package com.nokia.helium.antlint.ant.types;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
-import java.io.IOException;
 
 import org.apache.tools.ant.BuildException;
 import org.dom4j.Document;
@@ -93,8 +93,9 @@ public class CheckPythonTasks extends AbstractCheck {
             PrintWriter output = new PrintWriter(new FileOutputStream(file));
             if (!text.equals("")) {
                 output.write("def abc():");
-                for (String line : text.split("\n"))
+                for (String line : text.split("\n")) {
                     output.write("    " + line + "\n");
+                }
             }
             output.close();
         } catch (IOException e) {

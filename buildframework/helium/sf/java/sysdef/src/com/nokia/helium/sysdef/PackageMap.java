@@ -51,13 +51,13 @@ public class PackageMap {
             DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             Document doc = builder.parse(file);
             if (!doc.getDocumentElement().getNodeName().equals("PackageMap")) {
-               throw new PackageMapParsingException("Invalid XML format for " + file.getAbsolutePath() + " root element must be PackageMap");
+                throw new PackageMapParsingException("Invalid XML format for " + file.getAbsolutePath() + " root element must be PackageMap");
             }
             if (!doc.getDocumentElement().hasAttribute("root")) {
-               throw new PackageMapParsingException("root attribute under element " + doc.getDocumentElement().getTagName() + " is missing in file: " + file);
+                throw new PackageMapParsingException("root attribute under element " + doc.getDocumentElement().getTagName() + " is missing in file: " + file);
             }
             if (!doc.getDocumentElement().hasAttribute("layer")) {
-               throw new PackageMapParsingException("layer attribute under element " + doc.getDocumentElement().getTagName() + " is missing in file: " + file);
+                throw new PackageMapParsingException("layer attribute under element " + doc.getDocumentElement().getTagName() + " is missing in file: " + file);
             }
             setRoot(doc.getDocumentElement().getAttribute("root"));
             setLayer(doc.getDocumentElement().getAttribute("layer"));

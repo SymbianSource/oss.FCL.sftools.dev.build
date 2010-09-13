@@ -18,7 +18,7 @@
 #===============================================================================
 """ rtf utilis"""
 
-# pylint: disable-msg=R0201
+# pylint: disable=R0201
 
 import csv
 import os
@@ -43,13 +43,13 @@ class RTFUtils(object):
         template = file(self.template, 'rb' )
         output = file(outputfilename, 'w' )
         
-        self._rtftable(errors, output, tagtoreplace, template)
+        self.rtftable_file(errors, output, tagtoreplace, template)
         
         errors.close()
         output.close()
         template.close()
         
-    def _rtftable(self, errors, output, tagtoreplace, template):
+    def rtftable_file(self, errors, output, tagtoreplace, template):
         """rtf table"""
         PyRTF.Elements.StandardColours.append(PyRTF.PropertySets.Colour('NokiaBlue', 153, 204, 255))
        
@@ -104,12 +104,12 @@ class RTFUtils(object):
         template = file(self.template, 'rb' )
         output = file(outputfilename, 'w' )
         
-        self._rtfimage(image, output, tagtoreplace, template)
+        self.rtfimage_file(image, output, tagtoreplace, template)
         
         output.close()
         template.close()
     
-    def _rtfimage(self, image, output, tagtoreplace, template):
+    def rtfimage_file(self, image, output, tagtoreplace, template):
         """rtf image"""
         temp_file = 'image_temp.rtf'
         
@@ -149,12 +149,12 @@ class RTFUtils(object):
         inputfile = file( inputfilename, 'r' )
         outputfile = file( outputfilename, 'w' )
         
-        self._rtfconvert(inputfile, outputfile)
+        self.rtfconvert_file(inputfile, outputfile)
         
         inputfile.close()
         outputfile.close()
         
-    def _rtfconvert(self, inputfile, outputfile):
+    def rtfconvert_file(self, inputfile, outputfile):
         """rtf convert"""
         ppp = re.compile(r'(.+=)((\\\\|http|\.\\|ftp)(.+))')
         for line in inputfile:

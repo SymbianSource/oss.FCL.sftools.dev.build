@@ -17,7 +17,7 @@
 
 package com.nokia.helium.ant.data;
 
-import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,19 +33,22 @@ import org.dom4j.Node;
  */
 public class AntObjectMeta {
 
-    public static final Map<String, Integer> SCOPES = new HashMap<String, Integer>() {
-        {
-            put("public", new Integer(1));
-            put("protected", new Integer(2));
-            put("private", new Integer(3));
-        }
-    };
+    public static final Map<String, Integer> SCOPES;
+    
+    static {
+        Map<String, Integer> tempMap = new HashMap<String, Integer>();
+        tempMap.put("public", new Integer(1));
+        tempMap.put("protected", new Integer(2));
+        tempMap.put("private", new Integer(3));
+        SCOPES = Collections.unmodifiableMap(tempMap);
+    }
+    
     /** The default scope if an element does not have a defined scope. */
     public static final String DEFAULT_SCOPE = "public";
 
     private static AntComment emptyComment;
 
-    private Project rootProject;
+    private Project runtimeProject;
 
     /** The parent meta object. */
     private AntObjectMeta parent;
@@ -55,12 +58,7 @@ public class AntObjectMeta {
     private AntComment comment = emptyComment;
 
     static {
-        try {
-            emptyComment = new AntComment();
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
+        emptyComment = new AntComment();
     }
 
     /**
@@ -68,20 +66,19 @@ public class AntObjectMeta {
      * 
      * @param parent The parent meta object.
      * @param node The XML node of the Ant object.
-     * @throws IOException
      */
-    public AntObjectMeta(AntObjectMeta parent, Node node) throws IOException {
+    public AntObjectMeta(AntObjectMeta parent, Node node) {
         this.parent = parent;
         this.node = node;
         processComment();
     }
 
     public Project getRuntimeProject() {
-        return rootProject;
+        return runtimeProject;
     }
 
     public void setRuntimeProject(Project project) {
-        this.rootProject = project;
+        this.runtimeProject = project;
     }
 
     /**
@@ -142,15 +139,6 @@ public class AntObjectMeta {
         String name = getAttr("name");
         if (name.length() == 0) {
             name = getComment().getObjectName();
-//            if (name.length() == 0) {
-//                try {
-//                    System.out.println("name is 0 length: " + getLocation());
-//                    // System.out.println(node.toString());
-//                }
-//                catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//            }
         }
         return name;
     }
@@ -159,11 +147,14 @@ public class AntObjectMeta {
      * Returns the location path of the object.
      * 
      * @return Location path string.
-     * @throws IOException
      */
-    public String getLocation() throws IOException {
+    public String getLocation() {
         RootAntObjectMeta rootMeta = getRootMeta();
-        return rootMeta.getFile().getCanonicalPath();
+        String location = rootMeta.getFilePath();
+        if (node instanceof ElementWithLocation) {
+            location += ":" + ((ElementWithLocation)node).getLineNumber();
+        }
+        return location;
     }
 
     /**
@@ -203,7 +194,7 @@ public class AntObjectMeta {
             throw new IllegalArgumentException("Invalid scope filter: " + scopeFilter);
         }
         String scope = getScope();
-        if (!SCOPES.containsKey(scope)) {
+        if (scope.length() > 0 && !SCOPES.containsKey(scope)) {
             log("Invalid scope: " + scope + ", " + toString(), Project.MSG_WARN);
             return false;
         }
@@ -218,6 +209,16 @@ public class AntObjectMeta {
      */
     public String getDeprecated() {
         return comment.getTagValue("deprecated");
+    }
+    
+    /**
+     * Returns the content of the "since" tag that should indicate which release this feature
+     * was first added.
+     * 
+     * @return Since release number.
+     */
+    public String getSince() {
+        return comment.getTagValue("since");
     }
 
     /**
@@ -246,7 +247,7 @@ public class AntObjectMeta {
         this.comment = comment;
     }
 
-    private void processComment() throws IOException {
+    private void processComment()  {
         Comment commentNode = getCommentNode();
         if (commentNode != null) {
             comment = new AntComment(commentNode);
@@ -288,5 +289,9 @@ public class AntObjectMeta {
         if (project != null) {
             project.log(text, level);
         }
+    }
+    
+    public String toString() {
+        return getName();
     }
 }

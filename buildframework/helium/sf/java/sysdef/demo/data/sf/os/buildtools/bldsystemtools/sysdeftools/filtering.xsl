@@ -3,7 +3,7 @@
 <!--Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
 	All rights reserved.
 	This component and the accompanying materials are made available
-	under the terms of "Eclipse Public License v1.0"
+	under the terms of the License "Eclipse Public License v1.0"
 	which accompanies this distribution, and is available
 	at the URL "http://www.eclipse.org/legal/epl-v10.html".
 
@@ -12,15 +12,69 @@
 	Contributors:
 	Description:
 	Filter a sysdef in the 2.0 or 3.0 syntax
+	The functionality of these filters is not supported outside of this tool. 
+	The filtering concepts here may not be carried forward in future system definition processing tools
 -->
+<!--Description:This filters a sysdef in either the 2.0 or 3.0 syntax
+If using the 3.0 syntax, specific IDs optionally be included verbatim
+-->
+
+<!--Input:<sysdef> - (required) The system definition XML file to process.
+		Can be in the 2.0 or 3.0 format, and can be a fragment or
+		stand-alone.-->
+<!--Output:<sysdef> - (optional) The system definition XML file to save the
+		output as. If not present it will write to stdout.-->
+
 <xsl:output method="xml" indent="yes"/>
 
-<xsl:param name="filter-type">only</xsl:param> <!-- only, has or with -->
+<xsl:param name="filter-type">only</xsl:param>
+<!-- <type> - The method of filtering. Legal values are:
+		"only" = every component/unit can only have zero or more of
+			these specified filters. ie, it can only have filters
+			from this list, no other filters are allowed. This
+			covers the common use case of "I want anything with gt
+			and or techview, but no other filters" that was the
+			first step in all old symbian.com builds. 
 
-<xsl:param name="filter"/> <!-- comma-separated list -->
+		"has" =  every component/unit must have all of these filters.
+			ie it can have any other filters, but all specified
+			filters must all be present. This covers the case where
+			filter="test" identifies tests and there is no special
+			filter to identify things that are not tests. So a
+			filter for "!test" will strip out anything with
+			filter="test" (plus any other filters) for a production
+			build, and a filter of "test" will strip out everything
+			that does not have filter="test" (plus any other
+			filters) for a test build. Opposite filters will
+			generate sets that are exactly opposite to each other.
 
-<xsl:param name="addbuild" select="0"/> <!-- add a system build section that accepts everything -->
+		"with" =  components/units that have the opposite filter are
+			removed. This covers the old symbian.com case of
+			java, !java and "don't care" components. In other words
+			we have a global feature that every item can be built
+			only when the feature is set, only when the feature is
+			not set, or it does not care and will always be built.
+			So for a !java build only items containing filter="java"
+			are stripped out. For a java build, only items with
+			filter="!java" are stripped out. Anything which does not
+			explicitly mention java are always unaffected. Opposite
+			filters will generate sets which overlap.
+-->
 
+
+<xsl:param name="filter"/> <!-- <list> - (required) A comma-separated list of filters
+		used to process the sysdef.-->
+
+<xsl:param name="addbuild" select="0"/> <!--1 - (optional) If present, it will add a system build
+		section that accepts everything. This is needed for genxml
+		processing -->
+
+<xsl:param name="verbatim"/> <!-- <list> - (optional) A comma-separated list of system
+		model IDs to include unfiltered. IDs must take the form as in
+		the document they appear (ie using the same namespace prefix).
+		This does not work on 2.0 syntax sysdefs. -->
+
+<xsl:variable name="ID-list" select="concat(',',translate(normalize-space($verbatim),' ',''),',')"/> <!-- remove all spaces from $idlist and add surrounding commas for easier processing-->
 
 <xsl:template match="node()|@*"><xsl:copy-of select="."/></xsl:template>
 <xsl:template match="*"><xsl:param name="data"/>
@@ -38,8 +92,8 @@
 			<xsl:with-param name="item" select="current()"/>
 		</xsl:apply-templates>
 	 </xsl:variable>
-	 
-	 <xsl:if test="$display != 'hide' "> <!-- if hide, remove completely from the output-->
+	 <xsl:if test="$display != 'hide' or ($verbatim != '' and ancestor-or-self::*[contains($ID-list,concat(',',@id,','))])"> 
+		<!-- if 'hide', remove completely from the output, but always include any ID listed as a $ID-list item-->
 		<xsl:copy>
 			<xsl:copy-of select="@*"/>
 			<xsl:apply-templates select="node()">
@@ -95,7 +149,7 @@
 </xsl:template>
 
 
-<xsl:include href="filter-module.xsl"/>
+<xsl:include href="lib/filter-module.xsl"/>
 
 <xsl:template name="DTD-bld">
 <xsl:text disable-output-escaping="yes"><![CDATA[<!DOCTYPE SystemDefinition [

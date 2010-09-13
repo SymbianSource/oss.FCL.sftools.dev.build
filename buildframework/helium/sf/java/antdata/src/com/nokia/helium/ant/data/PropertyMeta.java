@@ -17,8 +17,6 @@
 
 package com.nokia.helium.ant.data;
 
-import java.io.IOException;
-
 import org.apache.tools.ant.Project;
 import org.dom4j.Element;
 import org.dom4j.Node;
@@ -33,7 +31,7 @@ public class PropertyMeta extends AntObjectMeta {
     public static final String BOOLEAN_TYPE = "boolean";
     public static final String DEFAULT_TYPE = STRING_TYPE;
 
-    public PropertyMeta(AntObjectMeta parent, Node propNode) throws IOException {
+    public PropertyMeta(AntObjectMeta parent, Node propNode) {
         super(parent, propNode);
     }
 
@@ -80,21 +78,10 @@ public class PropertyMeta extends AntObjectMeta {
      */
     @Override
     public String getScope() {
-        String scope = getComment().getTagValue("scope");
-        if (scope.equals("")) {
-            Element parent = getNode().getParent();
-            if (parent.getName().equals("project")) {
-                scope = "public";
-                //if (getComment().getDocumentation().equals("")) {
-                //    System.out.println(getName() + " no comment");
-                //}
-            }
-            else {
-                scope = "private";
-                //if (!getComment().getDocumentation().equals("")) {
-                //    System.out.println(getName() + " no scope");
-                //}
-            }
+        String scope = super.getScope();
+        Element parent = getNode().getParent();
+        if (getComment().getTagValue("scope").length() == 0 && !parent.getName().equals("project")) {
+            scope = "private";
         }
         return scope;
     }

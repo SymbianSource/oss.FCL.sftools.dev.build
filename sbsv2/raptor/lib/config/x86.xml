@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<build xmlns="http://symbian.com/xml/build" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symbian.com/xml/build ../../schema/build/2_0.xsd">
+	<!-- build variants for x86 toolchain builds -->
+	<var name="x86" extends="root">
+		<varRef ref="default.interfaces"/>
+		<varRef ref="default.locations"/>
+		
+		<!-- tools and scripts -->
+		<env name="BMCONV" default="$(EPOCROOT)/epoc32/tools/bmconv$(DOTEXE)" type="tool"/>
+		<env name="CHECKLIB" default="$(EPOCROOT)/epoc32/tools/checklib$(DOTEXE)" type="tool"/>
+		<env name="CPPFILT" default="$(GCCPREFIX)c++filt$(DOTEXE)" type="tool"/>
+		<env name="EFREEZE" default="$(PERL) $(EPOCROOT)/epoc32/tools/efreeze.pl" type="script"/>
+		<env name="GENDEF" default="$(PERL) $(EPOCROOT)/epoc32/tools/gendef.pl" type="script"/>
+		<env name="PETRAN" default="$(EPOCROOT)/epoc32/tools/petran$(DOTEXE)" type="tool"/>
+		<env name="PREPDEF" default="$(PERL) $(EPOCROOT)/epoc32/tools/prepdef.pl" type="script"/>
+		<env name="RCOMP" default="$(EPOCROOT)/epoc32/tools/rcomp$(DOTEXE)" type="tool"/>
+		<!-- RANSLEEP is a program that can be used to cause a random delay in milliseconds. This is only useful in parallel builds. See the PERTURBSTARTTIME switch for more details.  -->
+		<env name="RANSLEEP" default="$(SBS_HOME)/bin/$(HOSTPLATFORM_DIR)/ransleep$(DOTEXE)" type="tool"/>
+		<env name="SBSV1MAKE" default="$(EPOCROOT)/epoc32/tools/make$(DOTEXE)" type="tool"/>
+		<env name="STRINGTABLE" default="$(PERL) $(EPOCROOT)/epoc32/tools/stringtable.pl" type="script"/>
+		<env name="TRANASM" default="$(PERL) $(EPOCROOT)/epoc32/tools/tranasm.pl" type="script"/>
+		
+		<set name="BASE_ARCH" value="x86"/>
+		<set name="POSTLINKER" value="$(PETRAN)"/>
+		<set name="IMPLIBTOOL" value="$(DLLTOOL)"/>
+		<set name="DEFGENTOOL" value="$(GENDEF)"/>
+		
+		<!-- targettypes -->
+		<set name="TARGET_TYPES" value="ani dll exe exexp implib fsy kdll kext klib ldd lib pdd pdl pdll plugin plugin3 stdexe stddll stdlib textnotifier2 var var2 none"/>
+		
+		<!-- interfaces -->
+		<append name="INTERFACE_TYPES" value="$(TARGET_TYPES)"/>
+
+		<!-- START block interfaces -->
+		<set name="INTERFACE.extension" value="Symbian.extension"/>
+		
+		<!-- macros -->
+		<set name="PLATMACROS.WINDOWS" value="$(PLATMACROS.TOOLCHAIN) EPOC32 $(PLATMACROS.CONFIG) $(PLATMACROS.VAR)"/>
+		<set name="PLATMACROS.LINUX" value="$(PLATMACROS.WINDOWS)"/>
+		<set name="PLATMACROS.CONFIG" value="X86 GENERIC_X86"/>
+		<set name="PLATMACROS.VAR" value=""/>
+		<set name="PLATMACROS.TOOLCHAIN" value=""/>
+		
+		<set name="BLDINF_OUTPUTPATH" value="$(SBS_BUILD_DIR)"/>
+		<set name="CAPABILITY" value=""/>
+		<set name="CDEFS" value="__X86__ _UNICODE __SYMBIAN32__ __EPOC32__ PRODUCT_INCLUDE=&quot;$(PRODUCT_INCLUDE)&quot; $(MMPDEFS)"/>
+		<set name="CODE_SEGMENT_START" value=""/>
+		<set name="COMPILER_FPU_DEFAULT" value=""/>
+		<set name="COMPILER_NO_HIDE_ALL_OPTION" value=""/>
+		<set name="DEBUG_FORMAT" value=""/>
+		<set name="DEFAULT_STDCPP_NEWLIB" value="stdnew.dso"/>
+		<set name="DEFAULT_SYMBIAN_NEWLIB" value=""/>
+		<set name="EPOCSTACKSIZE" value=""/>
+		<set name="FIX_EXPORTS_USING_EXP_FILE" value="1"/>
+		<set name="FULLVARIANTPATH" value="$(VARIANTPLATFORM)/$(VARIANTTYPE)"/>
+		<set name="HEADER_FILES_CONTROL_OPTION" value=""/>
+		<set name="IMPLIB_EXTENSION" value="lib"/>
+		<set name="LIBRARY_DEBUG" value=""/>
+		<set name="LINKER_ARCH_OPTION" value=""/>
+		<set name="LINKER_ENTRYPOINT_PREFIX" value="__"/>
+		<set name="MMPDEFS" value=""/>
+		<set name="NMAKE" value="nmake"/>
+		<set name="NMAKEFLAGS" value="-nologo -x - "/>
+		<set name="NO_UNALIGNED_ACCESS" value="$(CC.NO_UNALIGNED_ACCESS)"/>
+		<set name="OUTPUTPATH" value="$(SBS_BUILD_DIR)"/>
+		<set name="PERTURBSTARTTIME" value=""/>
+		<!-- add a random delay before starting tools to ease contention for licenses the maximum time to delay in milliseconds. RANSLEEP program must be available.   -->
+		<set name="PERTURBMSECS" value="500"/>
+		<!-- the maximum time to delay in milliseconds -->
+		<set name="POSTLINKER_COMPRESSION_DEFAULT" value="none"/>
+		<set name="POSTLINKER_FPU_DEFAULT" value="$(PL.SOFTVFP_MAYBE_VFPV2)"/>
+		<set name="POSTLINKER_FPU_MAPPING" value=""/>
+		<set name="RELEASEPATH" value="$(EPOCROOT)/epoc32/release"/>
+		<set name="RESOLVED_DEFFILE" value=""/>
+		<set name="RESOLVED_DEFFILE_SECONDARY" value=""/>
+		<set name="RUNTIME_LIBS_PATH" value="$(EPOCROOT)/epoc32/release/$(VARIANTPLATFORM)/lib"/>
+		<set name="SID" value=""/>
+		<set name="STATIC_LIBRARY_DIR" value="$(EPOCROOT)/epoc32/release/$(VARIANTPLATFORM)/$(VARIANTTYPE)"/>
+		<set name="STATIC_RUNTIME_DIR" value="$(EPOCROOT)/epoc32/release/$(VARIANTPLATFORM)/$(VARIANTTYPE)"/>
+		<set name="SYMBIAN_CC_MESSAGE_OPTION" value="$(CC_WARNINGS_CONTROL_OPTION) $(CC_ERRORS_CONTROL_OPTION)"/>
+		<set name="SYMBIAN_LINK_FLAGS" value="$(SYMBIAN_LD_MESSAGE_OPTION) $(BPABI_OPTION) $(RELOCATABLE_IMAGE_OPTION) $(UNRESOLVED_SYMBOL_REF_OPTION) $(STDLIB_OPTION) $(EXTRA_LD_OPTION) $(SYMBIAN_LINK_FLAGS.CONFIG) $(SYMBIAN_LINK_FLAGS.VAR)"/>
+		<set name="SYMBIAN_LINK_FLAGS.CONFIG" value=""/>
+		<set name="SYMBIAN_LINK_FLAGS.VAR" value=""/>
+		<set name="SYSTEMINCLUDE" value=""/>
+		<set name="TARGET" value=""/>
+		<set name="TARGET_ARCH_OPTION" value=""/>
+		<set name="TREAT_EXES_AS_SHARED" value=""/>
+		<set name="UNRESOLVED_SYMBOL_REF_OPTION" value=""/>	
+	</var>
+
+	<alias name="x86_urel" meaning="x86.urel.gccx86"/>
+	<alias name="x86_udeb" meaning="x86.udeb.gccx86"/>
+
+	<group name="x86">
+		<aliasRef ref="x86_urel"/>
+		<aliasRef ref="x86_udeb"/>
+	</group>
+	
+</build>

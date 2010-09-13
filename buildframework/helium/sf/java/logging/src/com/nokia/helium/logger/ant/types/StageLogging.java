@@ -18,8 +18,8 @@ package com.nokia.helium.logger.ant.types;
 
 import java.io.File;
 
-import org.apache.tools.ant.types.DataType;
 import org.apache.log4j.Logger;
+import org.apache.tools.ant.types.DataType;
 
 /**
  * A 'StageRecord' is a Data type which stores attributes for stage recording/logging.

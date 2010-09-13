@@ -14,262 +14,283 @@
  * Description:  
  *
  */
-
 package com.nokia.helium.core.ant;
 
-import java.util.StringTokenizer;
-import java.util.Vector;
-import java.util.Enumeration;
-import java.util.List;
-import java.io.BufferedReader;
-import java.io.FileWriter;
-import java.io.InputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.JarURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-
-import org.apache.tools.ant.taskdefs.ImportTask;
-import org.apache.tools.ant.helper.DefaultExecutor;
-import org.apache.tools.ant.Project;
-import org.apache.tools.ant.BuildException;
-import org.apache.tools.ant.Target;
-import org.apache.tools.ant.Location;
-import com.nokia.helium.core.ant.types.*;
-
-import java.util.HashMap;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
-import org.apache.log4j.Logger;
+
+import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.BuildListener;
+import org.apache.tools.ant.BuildLogger;
+import org.apache.tools.ant.Project;
+import org.apache.tools.ant.ProjectHelper;
+import org.apache.tools.ant.helper.DefaultExecutor;
+
+import com.nokia.helium.core.MultiCauseBuildException;
+import com.nokia.helium.core.ant.types.HlmDefList;
 
 /**
  * This class implements a flexible Ant Executor which allows dynamic discovery
  * and automatic loading of new features. It also supports pre/post actions to
  * be executed.
+ * 
  */
 public class HeliumExecutor extends DefaultExecutor {
-    private HashMap<String, Vector<HlmDefinition>> preOperations = new HashMap<String, Vector<HlmDefinition>>();
-    private HashMap<String, Vector<HlmDefinition>> postOperations = new HashMap<String, Vector<HlmDefinition>>();
-    private HashMap<String, Vector<HlmExceptionHandler>> exceptionHandlers = new HashMap<String, Vector<HlmExceptionHandler>>();
-    private Project project;
-    private Logger log = Logger.getLogger(HeliumExecutor.class);
+
+    private static final String HELP_TARGET = "help";
+
+    private List<HlmDefList> hlmDefCache = new ArrayList<HlmDefList>();
+    private MultiCauseBuildException failure;
 
     /**
-     * Override the default Ant executor.
+     * Execute the specified Targets for the specified Project.
      * 
      * @param project
-     *            Object of the project
+     *            the Ant Project.
      * @param targetNames
-     *            Array of target names to execute
-     * 
+     *            String[] of Target names.
+     * @throws BuildException
+     *             on error
      */
     public void executeTargets(Project project, String[] targetNames) {
-        this.project = project;
-        log.debug("Running executeTargets");
-        BuildException failure = null;
+        if (targetNames.length > 1 && targetNames[0].equals(HELP_TARGET)) {
+            displayHelp(project, targetNames);
+        } else {
+            executeRegularTargets(project, targetNames);
+        }
+    }
+
+    /**
+     * Execute the given targets.
+     * 
+     * @param project
+     *            is the ant project
+     * @param targetNames
+     *            array of target names to be executed.
+     */
+    public void executeRegularTargets(Project project, String[] targetNames) {
+        project.log("Running executeTargets", Project.MSG_DEBUG);
+        loadModules(project);
+        handlePreBuildActions(project, targetNames);
         try {
-            loadModules(project);
-            doOperations(preOperations, project, targetNames);
             super.executeTargets(project, targetNames);
-        } catch (BuildException e) {
-            // Saving current issue
-            // We are Ignoring the errors as no need to fail the build.
-            failure = e;
+        } catch (BuildException be) {
+            recordFailure(be);
+        } finally {
+            handlePostBuildActions(project, targetNames);
+            // Propagating any raised issues.
+            handleException(project);
         }
+    }
 
+    /**
+     * Method loads all the available helium modules from the system classpath.
+     * 
+     * @param project
+     *            is the ant project.
+     */
+    @SuppressWarnings("unchecked")
+    private void loadModules(Project project) {
         try {
-            doOperations(postOperations, project, targetNames);
-        } catch (BuildException e) {
-            // Treating possible new issues...
-            if (failure != null) {
-                failure = new BuildException(e.toString() + failure.toString());
-            } else {
-                failure = e;
+            List<URL> modules = getAvailableModules();
+            project.log("Total no of modules available : " + modules.size(), Project.MSG_DEBUG);
+            for (URL module : modules) {
+                loadModule(project, module);
             }
-        }
-        // Propagating any raised issues.
-        if (failure != null) {
-            handleExceptions(project, failure);
-            throw failure;
+            Map<String, Object> references = (Hashtable<String, Object>)project.getReferences();
+            for (String key : references.keySet()) {
+                Object refObj = references.get(key);
+                if (refObj instanceof HlmDefList) {
+                    hlmDefCache.add((HlmDefList)refObj);
+                    project.log("Total pre build actions : "
+                            + ((HlmDefList)refObj).getPreBuildActions().size(), Project.MSG_DEBUG);
+                    project.log("Total post build actions : "
+                            + ((HlmDefList)refObj).getPostBuildActions().size(), Project.MSG_DEBUG);
+                    project.log("Total exception handlers : "
+                            + ((HlmDefList)refObj).getExceptionHandlers().size(), Project.MSG_DEBUG);
+                }
+            }            
+        } catch (BuildException be) {
+            recordFailure(be);
         }
     }
 
     /**
-     * Loading all the discovered modules.
+     * Returns a list of available helium modules from the system classpath.
      * 
-     * @param module
-     * @param prj
+     * @return a list of helium module files.
      */
-    private void loadModules(Project prj) {
-        List<File> moduleList = loadAvailableModules();
-        for (File moduleName : moduleList) {
-            loadModule(moduleName, prj);
-        }
-    }
-
-    /**
-     * Load a specific module.
-     * 
-     * @param moduleLib
-     * @param prj
-     */
-    private void loadModule(File moduleLib, Project prj) {
-        String file = getHlmAntLibFile(moduleLib);
-        if (file == null) {
-            return;
-        }
-        log.debug("Loading " + moduleLib.getName());
-        ImportTask task = new ImportTask();
-        Target target = new Target();
-        target.setName("");
-        target.setProject(prj);
-        task.setOwningTarget(target);
-        task.setLocation(new Location(file));
-        task.setFile(file);
-        task.setProject(prj);
-        task.execute();
-        String moduleName = getModuleName(moduleLib);
-        Object refObject = prj.getReference(moduleName + ".list");
-
-        if (refObject == null) {
-            log.debug(moduleName + ".list not found");
-        }
-        if (refObject != null && refObject instanceof HlmDefList) {
-            HlmDefList defList = (HlmDefList) refObject;
-            Vector<HlmDefinition> tempDefList = new Vector<HlmDefinition>(
-                    defList.getPreDefList());
-            if (tempDefList != null) {
-                preOperations.put(moduleName, tempDefList);
-            }
-            Vector<HlmDefinition> tempPostDefList = new Vector<HlmDefinition>(
-                    defList.getPostDefList());
-            if (tempPostDefList != null) {
-                postOperations.put(moduleName, tempPostDefList);
-            }
-            Vector<HlmExceptionHandler> tempExceptionDefList = defList
-                    .getExceptionHandlerList();
-            if (tempExceptionDefList != null) {
-                exceptionHandlers.put(moduleName, tempExceptionDefList);
-            }
-            log.debug("loadModule:pre-opsize: "
-                    + preOperations.size());
-            log.debug("loadModule:post-opsize: "
-                    + postOperations.size());
-            log.debug("loadModule:exception-opsize: "
-                    + exceptionHandlers.size());
-            log.debug("Checking " + moduleLib);
-        }
-    }
-
-    /**
-     * Search for helium.antlib.xml under the module Jar.
-     * 
-     * @param moduleLib
-     * @return
-     * @throws IOException
-     */
-    protected URL findHeliumAntlibXml(File moduleLib) throws IOException {
-        JarFile jarFile = new JarFile(moduleLib);
-        Enumeration<JarEntry> jee = jarFile.entries();
-        while (jee.hasMoreElements()) {
-            JarEntry je = jee.nextElement();
-            if (je.getName().endsWith("/helium.antlib.xml")) {
-                return new URL("jar:" + moduleLib.toURI().toString() + "!/"
-                        + je.getName());
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Retrieve the found helium.antlib.xml. TODO improve if possible without
-     * extracting the file.
-     * 
-     * @param moduleLib
-     * @return
-     */
-    private String getHlmAntLibFile(File moduleLib) {
-        log.debug("[HeliumExecutor] Checking " + moduleLib);
-        try {
-            URL url = findHeliumAntlibXml(moduleLib);
-            if (url == null)
-                return null;
-            log.debug("Getting " + url);
-
-            JarURLConnection jarConnection = (JarURLConnection) url
-                    .openConnection();
-            JarEntry jarEntry = jarConnection.getJarEntry();
-            JarFile jarFile = new JarFile(moduleLib);
-            InputStream is = jarFile.getInputStream(jarEntry);
-            InputStreamReader isr = new InputStreamReader(is);
-            BufferedReader reader = new BufferedReader(isr);
-            File file = File.createTempFile("helium", "antlib.xml");
-            file.deleteOnExit();
-            FileWriter writer = new FileWriter(file);
-            String line;
-            while ((line = reader.readLine()) != null) {
-                writer.write(line + "\n");
-            }
-            writer.close();
-            reader.close();
-            log.debug("Temp file " + file.getAbsolutePath());
-            return file.getAbsolutePath();
-        } catch (IOException ex) {
-            log.error("Error: " + ex.getMessage(), ex);
-            return null;
-        }
-    }
-
-    private void doOperations(
-            HashMap<String, Vector<HlmDefinition>> operations, Project prj,
-            String[] targetNames) {
-        log.debug("doOperations: start");
-        for (String moduleName : operations.keySet()) {
-            log.debug("doOperations: module: " + moduleName);
-            for (HlmDefinition definition : operations.get(moduleName)) {
-                definition.execute(prj, moduleName, targetNames);
-            }
-        }
-    }
-
-    private void handleExceptions(Project prj, Exception e) {
-        for (String moduleName : this.exceptionHandlers.keySet()) {
-            log.debug("handleExceptions: module: " + moduleName);
-            for (HlmExceptionHandler exceptionHandler : this.exceptionHandlers
-                    .get(moduleName)) {
-                exceptionHandler.handleException(prj, moduleName, e);
-            }
-        }
-    }
-
-    private String getModuleName(File moduleLib) {
-        String name = moduleLib.getName();
-        name = name.substring(0, name.lastIndexOf('.'));
-        // The module name can ends with a version
-        if (name.matches("(\\w|-)+-\\d+(\\.\\d+)+")) {
-            name = name.substring(0, name.lastIndexOf('-'));
-        }
-        return name;
-    }
-
-    private List<File> loadAvailableModules() {
-        List<File> moduleList = new ArrayList<File>();
+    private List<URL> getAvailableModules() {
+        List<URL> moduleList = new ArrayList<URL>();
         String classpathString = System.getProperty("java.class.path");
-        StringTokenizer tokenizier = new StringTokenizer(classpathString,
-                File.pathSeparator);
-        String token;
-        while (tokenizier.hasMoreTokens()) {
-            token = (String) tokenizier.nextToken();
-            if (new File(token).isFile() && token.endsWith(".jar")) {
-                moduleList.add(new File(token));
+        String[] modules = classpathString.split(File.pathSeparator);
+        File module = null;
+        URL url = null;
+        for (String moduleName : modules) {
+            module = new File(moduleName);
+            if (module != null && module.isFile()
+                    && module.getName().endsWith(".jar")) {
+                try {
+                    String hlmAntlibXmlFile = findHeliumAntlibXml(new JarFile(
+                            module));
+                    if (hlmAntlibXmlFile != null) {
+                        url = new URL("jar:" + module.toURI().toString() + "!/"
+                                + hlmAntlibXmlFile);
+                        moduleList.add(url);
+                    }
+                } catch (MalformedURLException me) {
+                    throw new BuildException(
+                            "Error occured while getting helium module "
+                                    + module + " : ", me);
+                } catch (IOException ioe) {
+                    throw new BuildException("Error reading file " + module
+                            + ": " + ioe.getMessage(), ioe);
+                }
             }
         }
         return moduleList;
     }
 
-    protected Project getProject() {
-        return project;
+    /**
+     * Search for helium.antlib.xml under the module Jar.
+     * 
+     * @param jarFile
+     *            is the jar to be searched in.
+     * @return the helium.antlib.xml
+     */
+    private String findHeliumAntlibXml(JarFile jarFile) {
+        String hlmAntlibXmlFile = null;
+        for (Enumeration<JarEntry> jarEntries = jarFile.entries(); jarEntries
+                .hasMoreElements();) {
+            JarEntry je = jarEntries.nextElement();
+            if (je.getName().endsWith("/helium.antlib.xml")) {
+                hlmAntlibXmlFile = je.getName();
+                break;
+            }
+        }
+        return hlmAntlibXmlFile;
+    }
+
+    /**
+     * Method loads the specified module .
+     * 
+     * @param project
+     *            is the ant project.
+     * @param module
+     *            the helium module to be loaded.
+     */
+    private void loadModule(Project project, URL module) {
+        project.log("Loading module : " + module.toString(), Project.MSG_DEBUG);
+        ProjectHelper helper = (ProjectHelper) project
+                .getReference(ProjectHelper.PROJECTHELPER_REFERENCE);
+        helper.parse(project, module);
+    }
+
+    /**
+     * Method handles all the pre build events.
+     * 
+     * @param project
+     *            is the ant project.
+     * @param targets
+     *            an array of target names.
+     */
+    private void handlePreBuildActions(Project project, String[] targets) {
+        for (HlmDefList hlmDefList : hlmDefCache) {
+            for (PreBuildAction event : hlmDefList.getPreBuildActions()) {
+                try {
+                    event.executeOnPreBuild(project, targets);
+                } catch (BuildException be) {
+                    // Saving current issue
+                    // We are Ignoring the errors as no need to fail the build.
+                    recordFailure(be);
+                }
+            }
+        }
+    }
+
+    /**
+     * Method handles all the post build events.
+     * 
+     * @param project
+     *            is the ant project.
+     * @param targets
+     *            an array of target names.
+     */
+    private void handlePostBuildActions(Project project, String[] targets) {
+        for (HlmDefList hlmDefList : hlmDefCache) {
+            for (PostBuildAction event : hlmDefList.getPostBuildActions()) {
+                try {
+                    event.executeOnPostBuild(project, targets);
+                } catch (BuildException be) {
+                    // Treating possible new issues...
+                    recordFailure(be);
+                }
+            }
+        }
+    }
+
+    /**
+     * Records a build failure.
+     * 
+     * @param be
+     *            a build failure.
+     */
+    private void recordFailure(BuildException be) {
+        if (failure == null) {
+            failure = new MultiCauseBuildException();
+        }
+        failure.add(be);
+    }
+
+    /**
+     * Method handles the recored build failures if any.
+     * 
+     * @param project
+     *            is the ant project.
+     */
+    private void handleException(Project project) {
+        if (failure != null) {
+            for (HlmDefList hlmDefList : hlmDefCache) {
+                for (HlmExceptionHandler handler : hlmDefList
+                        .getExceptionHandlers()) {
+                    try {
+                        handler.handleException(project, failure);
+                    } catch (BuildException be) {
+                        // Treating possible new issues...
+                        recordFailure(be);
+                    }
+                }
+            }
+            throw failure;
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private void displayHelp(Project project, String[] targetNames) {
+        if (targetNames.length > 1) {
+            project.setProperty("help.item", targetNames[1]);
+        }
+        // Set Emacs mode to true for all listeners, so that help text does
+        // not have [echo] at the start of each line
+        Iterator<BuildListener> iter = project.getBuildListeners().iterator();
+        while (iter.hasNext()) {
+            BuildListener listener = iter.next();
+            if (listener instanceof BuildLogger) {
+                BuildLogger logger = (BuildLogger) listener;
+                logger.setEmacsMode(true);
+            }
+        }
+        // Run the 'help' target
+        project.executeTarget(HELP_TARGET);
     }
 }

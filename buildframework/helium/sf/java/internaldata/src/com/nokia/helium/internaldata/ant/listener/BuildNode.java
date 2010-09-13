@@ -33,8 +33,9 @@ public class BuildNode extends DataNode {
     }
 
     public String getName() {
-        if (name != null)
+        if (name != null) {
             return name;
+        }
         return "build";
     } 
 

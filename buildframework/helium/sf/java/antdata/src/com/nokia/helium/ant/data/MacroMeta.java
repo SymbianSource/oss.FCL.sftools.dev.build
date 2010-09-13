@@ -17,7 +17,6 @@
 
 package com.nokia.helium.ant.data;
 
-import java.io.IOException;
 import java.util.List;
 
 import org.dom4j.Element;
@@ -28,7 +27,7 @@ import org.dom4j.Node;
  */
 public class MacroMeta extends TaskContainerMeta {
 
-    public MacroMeta(AntObjectMeta parent, Element objNode) throws IOException {
+    public MacroMeta(AntObjectMeta parent, Element objNode) {
         super(parent, objNode);
     }
 

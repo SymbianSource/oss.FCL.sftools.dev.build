@@ -18,7 +18,12 @@
 		<!-- link to bld.inf and mmp platform names -->
 		<set name='TRADITIONAL_PLATFORM' value='TOOLS'/>
 
+		<!-- targettypes -->
+		<set name="TARGET_TYPES" value="exe lib"/>
+
 		<!-- interfaces -->
+		<append name="INTERFACE_TYPES" value="$(TARGET_TYPES)"/>
+
 		<set name="INTERFACE.exe" value="msvctools.exe"/>
 		<set name="INTERFACE.lib" value="msvctools.lib"/>		
 		

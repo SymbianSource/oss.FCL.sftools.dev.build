@@ -104,10 +104,10 @@ class Parser(symbian.log.Parser):
         _logger.debug(name) 
         self.stages.append(name)
 
-    def task(self, name, cmdline, dir, output):
+    def task(self, name, cmdline, dir_, output):
         """task"""
-        _logger.debug("%s, %s, %s, %s" % (name, cmdline, dir, output)) 
-        self.tasks.append({'name': name, 'cmdline': cmdline, 'dir': dir, 'output': output})
+        _logger.debug("%s, %s, %s, %s" % (name, cmdline, dir_, output)) 
+        self.tasks.append({'name': name, 'cmdline': cmdline, 'dir': dir_, 'output': output})
 
 
 class TestSymbianLog(unittest.TestCase):

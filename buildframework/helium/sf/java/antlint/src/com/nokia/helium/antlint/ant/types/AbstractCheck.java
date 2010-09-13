@@ -22,6 +22,7 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.types.DataType;
 import org.dom4j.Element;
 import org.dom4j.Node;
+
 import com.nokia.helium.antlint.ant.Reporter;
 import com.nokia.helium.antlint.ant.Severity;
 
@@ -31,7 +32,7 @@ import com.nokia.helium.antlint.ant.Severity;
  */
 public abstract class AbstractCheck extends DataType implements Check {
 
-    private boolean enabled;
+    private boolean enabled = true;
     private Severity severity;
     private Reporter reporter;
 

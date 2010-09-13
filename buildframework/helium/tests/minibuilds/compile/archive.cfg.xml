@@ -32,22 +32,22 @@ Description:
         <config name="empty_minibuild_archive" abstract="true" />
         
         <config name="minibuild_archive" abstract="true">
-        	<set name="grace.service" value="minibuild"/>
-        	<set name="grace.product" value="SF"/>
-        	<set name="grace.release" value="SF_minibuild_${build.number}"/>
-        	<set name="grace.metadata" value="true"/>
-        	<set name="grace.template" value="${config.dir}/template_release_metadata.xml"/>
-        	
+            <set name="grace.service" value="minibuild"/>
+            <set name="grace.product" value="SF"/>
+            <set name="grace.release" value="SF_minibuild_${build.number}"/>
+            <set name="grace.metadata" value="true"/>
+            <set name="grace.template" value="${config.dir}/template_release_metadata.xml"/>
+            
             <set name="archives.dir" value="${zips.build.dir}/${zipping.type}"/>
             <set name="clock.dir" value="${build.drive}\sf\app\organizer\clock2"/>
             <config>
-	            <set name="root.dir" value="${clock.dir}"/>
+                <set name="root.dir" value="${clock.dir}"/>
                 <set name="name" value="sf_app_organizer_clock"/>
                 <set name="include" value="**"/>
                 <set name="exclude" value="**/_ccmwaid.inf"/>
             </config>
             <!--config>
-	            <set name="root.dir" value="${build.drive}\"/>
+                <set name="root.dir" value="${build.drive}\"/>
                 <set name="name" value="sf_app_organizer_clock_binary"/>
                 <set name="scanners" value="abld.what"/>
                 <set name="abld.buildpath" value="${clock.dir}\group"/>
@@ -55,7 +55,7 @@ Description:
                 <set name="exclude" value="**/_ccmwaid.inf"/>
             </config-->
             <config>
-	            <set name="root.dir" value="${build.drive}/"/>
+                <set name="root.dir" value="${build.drive}/"/>
                 <set name="name" value="sf_mw_classicui_and_app_radio"/>
                 <set name="mapper" value="policy"/>
                 <set name="include" value="sf/mw/classicui/**"/>
@@ -64,7 +64,7 @@ Description:
                 <set name="policy.csv" value="${config.dir}/distribution.policy.extended_for_sf.id_status.csv"/>
             </config>
             <config>
-	            <set name="root.dir" value="${build.drive}/"/>
+                <set name="root.dir" value="${build.drive}/"/>
                 <set name="name" value="sf_os"/>
                 <set name="mapper" value="policy.remover"/>
                 <set name="include" value="test_policy/os/**"/>
@@ -72,7 +72,7 @@ Description:
                 <set name="policy.root.dir" value="${build.drive}/test_policy"/>
                 <set name="policy.csv" value="${config.dir}/distribution.policy.extended_for_sf.id_status.csv"/>
             </config>
-    	</config>
-	</config>
+        </config>
+    </config>
 </build>
   

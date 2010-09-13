@@ -34,13 +34,13 @@ def validate(grace, service, product, release):
         s60 grace release are set.
     """    
     if not grace:
-        raise Exception("Property 's60.grace.server' is not defined.")
+        raise EnvironmentError("Property 's60.grace.server' is not defined.")
     if not service:
-        raise Exception("Property 's60.grace.service' is not defined.")
+        raise EnvironmentError("Property 's60.grace.service' is not defined.")
     if not product:
-        raise Exception("Property 's60.grace.product' is not defined.")
+        raise EnvironmentError("Property 's60.grace.product' is not defined.")
     if not release:
-        raise Exception("Property 's60.grace.release' is not defined.")
+        raise EnvironmentError("Property 's60.grace.release' is not defined.")
             
 def get_s60_env_details(grace, service, product, release, rev, cachefilename, s60gracecheckmd5, s60graceusetickler):
     """ Return s60 environ details """
@@ -59,7 +59,7 @@ def get_s60_env_details(grace, service, product, release, rev, cachefilename, s6
                 
     branch = os.path.join(grace, service, product)
     if not os.path.exists(branch):
-        raise Exception("Error occurred: Could not find directory %s" % branch)
+        raise IOError("Error occurred: Could not find directory %s" % branch)
         
     result = []
     for rel in os.listdir(branch):
@@ -92,14 +92,14 @@ def get_s60_env_details(grace, service, product, release, rev, cachefilename, s6
                     _logger.info(str("%s is not a valid release." % rel))
             elif metadata_filename is None:
                 _logger.info(str("Could not find the release metadata file under %s" % rel))
-        except Exception, exc:
+        except IOError, exc:
             _logger.warning(str("WARNING: %s: %s" % (rel , exc)))
             _logger.warning(("%s is not a valid release." % rel))
             traceback.print_exc()
     
     result = validresults
     if len(result) == 0:
-        raise Exception("Error finding GRACE release.")
+        raise EnvironmentError("Error finding GRACE release.")
     print result[0]
     return result
     
@@ -119,10 +119,10 @@ def get_version(buiddrive, resultname):
         
 def create_ado_mapping(sysdefconfig, adomappingfile, adoqualitymappingfile, builddrive, adoqualitydirs):
     """ Creates ado mapping and ado quality mapping files """
-    input = open(sysdefconfig, 'r')
+    input_ = open(sysdefconfig, 'r')
     output = open(adomappingfile, 'w')
     outputquality = open(adoqualitymappingfile, 'w')
-    for sysdef in input.readlines():
+    for sysdef in input_.readlines():
         sysdef = sysdef.strip()
         if len(sysdef) > 0:
             print "Checking %s" % sysdef
@@ -143,14 +143,14 @@ def create_ado_mapping(sysdefconfig, adomappingfile, adoqualitymappingfile, buil
                 if adoqualitydirs == None:
                     outputquality.write("%s=%s\n" % (sysdef, component))
                 else:
-                    for dir in adoqualitydirs.split(','):
-                        if os.path.normpath(dir) == os.path.normpath(os.path.join(builddrive, os.environ['EPOCROOT'], location)):
+                    for dir_ in adoqualitydirs.split(','):
+                        if os.path.normpath(dir_) == os.path.normpath(os.path.join(builddrive, os.environ['EPOCROOT'], location)):
                             outputquality.write("%s=%s\n" % (sysdef, component))
 
 
     outputquality.close()
     output.close()
-    input.close()
+    input_.close()
 
 
     

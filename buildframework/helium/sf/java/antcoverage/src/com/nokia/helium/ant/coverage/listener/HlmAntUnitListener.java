@@ -206,8 +206,7 @@ public class HlmAntUnitListener extends BaseAntUnitListener {
         Hashtable<String, Target> projectTargets = project.getTargets();
         Enumeration<String> targetEnum = projectTargets.keys();
         while (targetEnum.hasMoreElements()) {
-            String key = targetEnum.nextElement();
-            System.out.println(key + ": " + projectTargets.get(key));
+            String key = targetEnum.nextElement();            
             if (!isAntUnitTestTarget(key) && key.length() > 0) {
                 antTargets.add((Target) projectTargets.get(key));
             }

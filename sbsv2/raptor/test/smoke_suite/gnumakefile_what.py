@@ -23,6 +23,11 @@ def run():
 	t.name = "gnumakefile_what"
 	t.command = "sbs -b smoke_suite/test_resources/gnumakefile/bld.inf --what"
 	componentpath = re.sub(r'\\','/',os.path.abspath("smoke_suite/test_resources/gnumakefile"))
+	# The raptor tests standardise on uppercase drive letters
+	# so make this the same thus it will match strings created 
+	# inside make/raptor from an EPOCROOT with an uppercase 
+	# drive letter.
+	componentpath = componentpath[0].upper() + componentpath[1:]
 	
 	t.output_expected_only_once = True
 	t.stdout = [

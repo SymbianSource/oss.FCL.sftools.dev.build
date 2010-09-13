@@ -1,0 +1,17 @@
+The optional "slimdebug" variant is now available for use in e32 builds.
+
+This currently has an impact on RVCT-based e32 builds and, when applied,
+calls to armcc in udeb compilation have the "--no_debug_macros" and
+"--remove_unneeded_entities" options added; there is no change to the vanilla
+urel compilation call in RVCT-based builds, nor to the compiler calls in
+other e32 builds using other toolchains.
+
+The net result of applying "slimdebug" is a general decrease in udeb object
+and image sizes due to the removal of debug table entries and unused debug
+information.
+
+Examples of the variant's application are as follows:
+
+sbs -c armv5.slimdebug
+sbs -c armv6_udeb.slimdebug
+

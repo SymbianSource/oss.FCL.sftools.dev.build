@@ -17,19 +17,30 @@
 
 package com.nokia.helium.internaldata.ant.listener;
 
-import java.util.Properties;
-import java.util.Hashtable;
-import java.util.zip.GZIPOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import javax.mail.*;
-import javax.mail.internet.*;
-import javax.naming.*;
-import javax.naming.directory.*;
+import java.util.Hashtable;
+import java.util.Properties;
+import java.util.zip.GZIPOutputStream;
 
 import javax.activation.DataHandler;
+import javax.mail.BodyPart;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 import javax.mail.util.ByteArrayDataSource;
+import javax.naming.Context;
+import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
+import javax.naming.directory.DirContext;
+import javax.naming.directory.InitialDirContext;
+import javax.naming.directory.SearchControls;
+import javax.naming.directory.SearchResult;
 
 import org.apache.log4j.Logger;
 
@@ -68,8 +79,9 @@ public class EmailDataSender {
      * Get the smtp server address.
      */
     public String getSMTPServer() {
-        if (smtpServer != null)
+        if (smtpServer != null) {
             return smtpServer;
+        }
         return SMTP_SERVER;
     }
     

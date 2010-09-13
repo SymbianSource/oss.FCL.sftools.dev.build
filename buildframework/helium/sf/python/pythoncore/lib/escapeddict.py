@@ -38,7 +38,10 @@ class _CustomArray(list):
 class EscapedDict(UserDict.UserDict):
     """ Implements a dictionary that escapes the key values recursively. """        
     
-    def __init__(self, dict={}, failonerror=False):
+    # pylint: disable=W0622
+    def __init__(self, dict=None, failonerror=False):
+        if dict == None:
+            dict = {}
         UserDict.UserDict.__init__(self, dict)
         self.__failonerror = failonerror
         

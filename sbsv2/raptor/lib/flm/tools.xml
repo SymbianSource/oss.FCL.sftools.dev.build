@@ -11,7 +11,7 @@
 		<param name='COMPILER'/>
 		<param name='COMPILER_PATH.WIN32'/>
 		<param name='COMPILER_PATH.LINUX'/>
-		<param name='INC.COMPILER' default=''/>
+		<param name='PREINCLUDE' default=''/>
 		<param name='MMPDEFS' default=''/>
 		<param name='OPT.D'/>
 		<param name='OPT.O'/>

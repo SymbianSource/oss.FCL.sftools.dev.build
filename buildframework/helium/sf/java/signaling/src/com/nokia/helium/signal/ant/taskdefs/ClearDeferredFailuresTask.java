@@ -19,6 +19,7 @@
 package com.nokia.helium.signal.ant.taskdefs;
 
 import org.apache.tools.ant.Task;
+
 import com.nokia.helium.signal.SignalStatusList;
 
 /**

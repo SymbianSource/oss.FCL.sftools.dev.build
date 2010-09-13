@@ -28,6 +28,7 @@ Description:
     <property environment="env"/>
     
     <property name="helium.dir" location="../../.." />
+    <property name="temp.dir" location="${helium.dir}/build/temp" />
     <import file="../../../build.xml"/>
         
     <target name="test-text-config">
@@ -269,6 +270,29 @@ project.setProperty("xml.test.list", str(result))
     <target name="test-grep-macro">
         <hlm:grepMacro filename="${helium.dir}/tests/data/logs/test_log.log" regexp="([^\\]*.confml)$" output="confml.file.list"/>
         <au:assertPropertySet name="confml.file.list"/>
+    </target>
+    
+    <target name="test-filebackup-attributes">
+        <au:expectfailure>
+            <hlm:fileBackupMacro/>
+        </au:expectfailure>
+    </target>
+    
+    <target name="test-single-file-backup">
+        <copy file="${helium.dir}/tests/data/logs/test_helium_dev_9.1.50_targetTimesLog.csv" tofile="${temp.dir}/test_helium_dev_9.1.50_targetTimesLog.csv"/>
+        <hlm:fileBackupMacro file="${temp.dir}/test_helium_dev_9.1.50_targetTimesLog.csv"/>
+        <au:assertFileExists file="${temp.dir}/test_helium_dev_9.1.50_targetTimesLog.csv.${file.backup.format}.bak"/>
+    </target>
+    
+    <target name="test-folder-file-backup">
+        <hlm:fileBackupMacro srcdir="${helium.dir}/tests/data/logs" destdir="${temp.dir}/backuptest"/>
+        <au:assertFileExists file="${temp.dir}/backuptest/test_log.log.${file.backup.format}.bak"/>
+        <au:assertFileExists file="${temp.dir}/backuptest/test_helium_dev_9.2.10_test_test_compile.log.${file.backup.format}.bak"/>
+    </target>
+    
+    <target name="test-folder-file-backup-regexp">
+        <hlm:fileBackupMacro srcdir="${helium.dir}/tests/data/logs" destdir="${temp.dir}/backuptest" regexp="(.*?targetTimes.*?)$"/>
+        <au:assertFileExists file="${temp.dir}/backuptest/test_helium_dev_9.1.50_targetTimesLog.csv.${file.backup.format}.bak"/>
     </target>
 
 </project>

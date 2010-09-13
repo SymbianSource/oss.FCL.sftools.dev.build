@@ -31,14 +31,14 @@ information on the files used to create the drop file.
   </target>
   <plan passrate="100" enabled="true" name="MATTI test " significant="false" harness="STIF">
     <session name="session" harness="STIF" enabled="true" passrate="100"><set name="MATTI test set0" harness="STIF" enabled="true" passrate="100">
-    			<target>
-          	<device alias="STIF" rank="master"/>
-        	</target>
-    			<case name="MATTI test case" passrate="100" harness="STIF" enabled="true" significant="false"> 
+                <target>
+              <device alias="STIF" rank="master"/>
+            </target>
+                <case name="MATTI test case" passrate="100" harness="STIF" enabled="true" significant="false"> 
           <flash target-alias="STIF" images="ATS3Drop\images\test_file.fpsx" />
-          	<flash target-alias="STIF" images="ATS3Drop\images\test_file_3rd.fpsx" />
-          	<flash target-alias="STIF" images="ATS3Drop\images\test_file_another.fpsx" />
-          	
+              <flash target-alias="STIF" images="ATS3Drop\images\test_file_3rd.fpsx" />
+              <flash target-alias="STIF" images="ATS3Drop\images\test_file_another.fpsx" />
+              
           <step name="Create logs folder" harness="STIF" enabled="true" passrate="100" significant="false">
           <command>makedir</command>
                         <params>
@@ -55,8 +55,8 @@ information on the files used to create the drop file.
                     </step>
 
                     <step name="Install SIS" harness="STIF" enabled="true" passrate="100" significant="false">
-	                    <command>install-software</command>
-		    								<params>
+                        <command>install-software</command>
+                                            <params>
                             <param sisPackageName="E:\another_test_file_matti_install.sis"/>
                             <param upgradeAllowed="true"/>
                             <param optionalItemsAllowed="true"/>
@@ -72,10 +72,10 @@ information on the files used to create the drop file.
                             <param downloadPassword="passwd"/>
                             <param installDrive="C"/>
                             <param upgradeData="true"/>
-                            <param timeout="40"/>                       	
-										    </params>
-										</step>
-          	<step name="Copy sis" harness="STIF" enabled="true" passrate="100" significant="false">
+                            <param timeout="40"/>                           
+                                            </params>
+                                        </step>
+              <step name="Copy sis" harness="STIF" enabled="true" passrate="100" significant="false">
                         <command>install</command>
                         <params>
                             <param src="ATS3Drop\sis\test_file_matti_install.sis"/>
@@ -85,8 +85,8 @@ information on the files used to create the drop file.
                     </step>
 
                     <step name="Install SIS" harness="STIF" enabled="true" passrate="100" significant="false">
-	                    <command>install-software</command>
-		    								<params>
+                        <command>install-software</command>
+                                            <params>
                             <param sisPackageName="E:\test_file_matti_install.sis"/>
                             <param upgradeAllowed="true"/>
                             <param optionalItemsAllowed="true"/>
@@ -102,20 +102,20 @@ information on the files used to create the drop file.
                             <param downloadPassword="passwd"/>
                             <param installDrive="C"/>
                             <param upgradeData="true"/>
-                            <param timeout="40"/>                       	
-										    </params>
-										</step>
-          	          
+                            <param timeout="40"/>                           
+                                            </params>
+                                        </step>
+                        
           <step name="Test case" harness="STIF" enabled="true" passrate="100" significant="false">
                         <command>execute</command>
                         <params>
-    			    							<param dir="C:\ruby\bin\"/>
-    			    							<param file="C:\ruby\bin\ruby.exe"/>
+                                                <param dir="C:\ruby\bin\"/>
+                                                <param file="C:\ruby\bin\ruby.exe"/>
                             <param parameters="&#x00A7;TEST_RUN_ROOT&#x00A7;\ATS3Drop\MATTISCRIPTS\test.rb"/>
                             <param timeout="60"/>
                             <param local="true"/>
                             <param async="false"/>
-			    									<param needs-connection="true"/>
+                                                    <param needs-connection="true"/>
                         </params>
                     </step>
           </case>
@@ -124,7 +124,7 @@ information on the files used to create the drop file.
   
   
   <files>
-  	<file>ATS3Drop\images\test_file.fpsx</file>
+      <file>ATS3Drop\images\test_file.fpsx</file>
     <file>ATS3Drop\images\test_file_3rd.fpsx</file>
     <file>ATS3Drop\images\test_file_another.fpsx</file>
     <file>ATS3Drop\sis\another_test_file_matti_install.sis</file>

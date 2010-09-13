@@ -183,8 +183,8 @@ public class CMTToolTask extends Task {
      */
     private ExecTask getExecTask(String taskName, String cmd, File outDir) {
         ExecTask task = new ExecTask();
+        task.bindToOwner(this);
         task.setDir(outDir);
-        task.setTaskName(this.getTaskName());
         task.setExecutable(cmd);
         return task;
     }
@@ -211,19 +211,22 @@ public class CMTToolTask extends Task {
             dirScanner.scan();
             String[] filelist = dirScanner.getIncludedFiles();
             String lineSeparator = System.getProperty("line.separator");
+            String fileSeparator = System.getProperty("file.separator");
+            
             BufferedWriter outputFile = null;
             try {
                 outputFile = new BufferedWriter(new FileWriter(input));
                 for (String file : filelist) {
-                    outputFile.write(dirScanner.getBasedir().toString() + file
+                    outputFile.write(dirScanner.getBasedir().toString() + fileSeparator + file
                             + lineSeparator);
                 }
             } catch (IOException e) {
                 throw new BuildException("Not able to generate file list for 'cmt'. ", e);
             } finally {
                 try {
-                    if (outputFile != null)
+                    if (outputFile != null) {
                         outputFile.close();
+                    }
                 } catch (IOException ex) {
                     // ignore exception
                     ex = null;

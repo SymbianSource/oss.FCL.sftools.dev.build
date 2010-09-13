@@ -47,7 +47,6 @@ Description:
     
     <target name="test-synergyjavataks" if="run.ccm.71">
         <hlm:createSessionMacro database="sa1bm1" reference="test.session" />
-        <au:assertLogContains text="Database engine set using the GSCM database"/>
         <!-- To synchronize the project -->
         <hlm:ccm >
             <hlm:sessionset refid="test.session" />

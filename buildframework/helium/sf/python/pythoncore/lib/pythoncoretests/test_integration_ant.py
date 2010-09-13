@@ -18,7 +18,7 @@
 #===============================================================================
 """ Testing integration.ant module """  
 
-# pylint: disable-msg=R0201
+# pylint: disable=R0201
 
 import tempfile
 import os
@@ -31,6 +31,7 @@ logging.basicConfig(level=logging.INFO)
 
 class IntegrationAntTest(unittest.TestCase):
     """Verifying integration ant module"""
+    
     def test_check_build_duplicates_task(self):
         """Verifying check_build_duplicates_task method """
         (fileDes, outputFilename) = tempfile.mkstemp()
@@ -41,12 +42,14 @@ class IntegrationAntTest(unittest.TestCase):
         outputFile.close()
         os.unlink(outputFilename)
         assert len(contents) == 15
+        
     def test_check_build_duplicates_task_invalid(self):
         """Verifying check_build_duplicates_task (invalid args) method"""
         self.assertRaises(Exception, integration.ant.check_build_duplicates_task, None, None, None, None)
 
 class _emulateTask():
     """Emulate task"""
+
     def log(self, message):
         """Emulate log method"""
         pass
@@ -55,39 +58,47 @@ class _emulateAttributes():
     """Emulate attributes"""
     def __init__(self, outputFilename):
         self.outputFilename = outputFilename
+        
     def get(self, _):
         """Emulate get method"""
         return self.outputFilename
 
 class _emulateElements():
     """Emulate elements"""
+    
     def get(self, _):
         """Emulate get method"""
         return _emulateFileset()
 
 class _emulateFileset():
     """Emulate fileset"""
+    
     def get(self, _):
         """Emulate get method"""
         return _emulateDirScanner()
+    
     def size(self):
         """Emulate size method"""
         return 1
 
 class _emulateDirScanner():
     """Emulate dirscanner"""
+    
     def scan(self):
         """Emulate scan method"""
         pass
+    
     def getIncludedFiles(self):
         """Emulate getIncludedFiles method """
         if os.sep == '\\':
             return ['test_build_compile.log']
         elif os.sep == '/':
             return ['test_build_compile_linux.log']
+        
     def getDirectoryScanner(self, _):
         """Emulate getDirectoryScanner method """
         return self
+    
     def getBasedir(self):
         """Emulate getBasedir method """
         return os.path.join(os.environ['TEST_DATA'], 'data', 'compile', 'logs')

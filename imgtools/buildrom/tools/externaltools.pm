@@ -85,7 +85,7 @@ sub update
 # Called between the buildrom stage to invoke single or multiple invocation
 sub runExternalTool {
 	
-	my ($stageName,$OBYData) = @_;
+	my ($stageName,$OBYData,$workdir) = @_;
 	$stageName = lc $stageName;
 	my @toolInfoList =  @{$invocations{$stageName}}; # Collect Tools with respect to its stagename.
 	
@@ -93,8 +93,8 @@ sub runExternalTool {
 		if($tool->{name} eq "configpaging"){
 			my $pid ; 
 			my $args = $tool->{args};
-		
-			open CONFIG, "| configpaging $args >cfgp_out.oby" or die "* Can't execute cpp";
+			my $outputoby = $workdir."cfgp_out.oby";
+			open CONFIG, "| configpaging $args >$outputoby" or die "* Can't execute configpaging";
 	
 			foreach (@$OBYData){
 				chomp ;
@@ -105,13 +105,13 @@ sub runExternalTool {
 			close CONFIG;
 	
 			my $config_status = $?;
-			die "* configpaging failed\n" if ($config_status != 0 || !-f "cfgp_out.oby");
+			die "* configpaging failed\n" if ($config_status != 0 || !-f "$outputoby");
 
-			if(open(INTF,"cfgp_out.oby")){
+			if(open(INTF,"$outputoby")){
 				@$OBYData = <INTF>;
 				close INTF;
 			}			
-			unlink("cfgp_out.oby") or die "cannot delete cfgp_out.oby";	
+			unlink("$outputoby") or die "cannot delete $outputoby";	
 			next ;
 		}
 		if (exists($tool->{single})) {#Check if single invocation exists

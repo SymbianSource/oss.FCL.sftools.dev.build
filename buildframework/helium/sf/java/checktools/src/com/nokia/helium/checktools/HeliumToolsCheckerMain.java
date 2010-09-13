@@ -14,6 +14,7 @@
  * Description: 
  *
  */
+
 package com.nokia.helium.checktools;
 
 import java.io.FileInputStream;
@@ -21,12 +22,11 @@ import java.io.IOException;
 import java.util.Properties;
 
 /**
- * HeliumToolsCheckerMain is the main class which is used to trigger the
- * checking of basic tools required by the Helium.
+ * HeliumToolsCheckerMain is the main class which is used to trigger the checking of basic tools
+ * required by the Helium.
  * 
- * Note: HeliumToolsCheckerMain requires a '-config' parameter to be passed as
- * the argument. The config parameter should be followed by a valid location of
- * the configuration file.
+ * Note: HeliumToolsCheckerMain requires a '-config' parameter to be passed as the argument. The
+ * config parameter should be followed by a valid location of the configuration file.
  * 
  */
 public final class HeliumToolsCheckerMain {
@@ -34,12 +34,10 @@ public final class HeliumToolsCheckerMain {
     private Properties configuration;
     private CheckEngine checkEngine;
 
-    
     /**
      * Create an instance of HeliumToolsCheckerMain.
      * 
-     * @param configFile
-     *            is the config file to read.
+     * @param configFile is the config file to read.
      */
     private HeliumToolsCheckerMain(String configFile) {
         loadConfiguration(configFile);
@@ -54,7 +52,7 @@ public final class HeliumToolsCheckerMain {
         try {
             checkEngine.verifyAntVersion();
         } catch (CheckToolException e) {
-            System.out.println("*** Error: " + e.getMessage());
+            println("*** Error: " + e.getMessage());
         }
     }
 
@@ -65,7 +63,7 @@ public final class HeliumToolsCheckerMain {
         try {
             checkEngine.verifyPythonVersion();
         } catch (CheckToolException e) {
-            System.out.println("*** Error: " + e.getMessage());
+            println("*** Error: " + e.getMessage());
         }
     }
 
@@ -81,16 +79,14 @@ public final class HeliumToolsCheckerMain {
     /**
      * Method loads the configuration details from the given file.
      * 
-     * @param configFile
-     *            is the configuration file to be loaded.
+     * @param configFile is the configuration file to be loaded.
      */
     private void loadConfiguration(String configFile) {
         try {
             configuration = new Properties();
             configuration.load(new FileInputStream(configFile));
         } catch (IOException th) {
-            System.out.println("Error occured while loading config file: "
-                    + configFile);
+            println("Error occured while loading config file: " + configFile);
             System.exit(-1);
         }
     }
@@ -98,8 +94,7 @@ public final class HeliumToolsCheckerMain {
     /**
      * Main method to trigger tool check.
      * 
-     * @param args
-     *            contains command line arguments passed.
+     * @param args contains command line arguments passed.
      * @throws Exception
      */
     public static void main(String[] args) throws Exception {
@@ -108,29 +103,31 @@ public final class HeliumToolsCheckerMain {
 
         // check for configuration file
         if (args.length == 2 && args[0].equalsIgnoreCase("-config")) {
-            if (args[1] == null
-                    || (args[1] != null && args[1].trim().isEmpty())) {
-                System.out.println("*** Error: Parameter '-config' not set for HeliumToolsCheckerMain");
+            if (args[1] == null || (args[1] != null && args[1].trim().isEmpty())) {
+                println("*** Error: Parameter '-config' not set for HeliumToolsCheckerMain");
                 System.exit(-1);
             }
             configFile = args[1];
         }
 
         if (configFile != null) {
-            HeliumToolsCheckerMain checkerMain = new HeliumToolsCheckerMain(
-                    configFile);
+            HeliumToolsCheckerMain checkerMain = new HeliumToolsCheckerMain(configFile);
             checkerMain.checkAnt();
             checkerMain.checkPython();
             if (checkerMain.checkFailed()) {
                 System.exit(-1);
             }
-        } else {
-            System.out.println("*** Error: Missing '-config' argument for HeliumToolsCheckerMain");
-            System.out
-                    .println("Usage: java [main-class-name] -config [location of configuration file]");
-            System.out
-                    .println("Example: java com.nokia.helium.checktools.HeliumToolsCheckerMain -config \"config/helium.basic.tools.config\"");
+        }
+        else {
+            println("*** Error: Missing '-config' argument for HeliumToolsCheckerMain");
+            println("Usage: java [main-class-name] -config [location of configuration file]");
+            println("Example: java com.nokia.helium.checktools.HeliumToolsCheckerMain -config \"config/helium.basic.tools.config\"");
             System.exit(-1);
         }
+    }
+
+    @SuppressWarnings("PMD.SystemPrintln")
+    public static void println(String text) {
+        System.out.println(text);
     }
 }

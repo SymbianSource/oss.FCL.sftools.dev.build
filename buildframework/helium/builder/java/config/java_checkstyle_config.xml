@@ -75,7 +75,6 @@ Description:
         <module name="LocalVariableName">
             <property name="format" value="^[ij]$|^[a-z][a-zA-Z0-9]+$"/>
             <property name="tokens" value="VARIABLE_DEF"/>
-            <property name="severity" value="warning"/>
         </module>
         <module name="MemberName"/>
         <module name="MethodName"/>
@@ -105,7 +104,9 @@ Description:
 
         <!-- Checks for imports                              -->
         <!-- See http://checkstyle.sf.net/config_import.html -->
-        <!--<module name="AvoidStarImport"/>-->
+        <module name="AvoidStarImport">
+            <property name="severity" value="warning"/>
+        </module>
         <module name="IllegalImport"/> <!-- defaults to sun.* packages -->
         <module name="RedundantImport"/>
         <module name="UnusedImports"/>
@@ -113,7 +114,11 @@ Description:
 
         <!-- Checks for Size Violations.                    -->
         <!-- See http://checkstyle.sf.net/config_sizes.html -->
-        <!--<module name="LineLength"/>-->
+        <module name="LineLength">
+            <property name="max" value="180"/>
+            <property name="ignorePattern" value="^ *\* *[^ ]+$"/>
+            <property name="severity" value="warning"/>
+        </module>
         <module name="MethodLength"/>
         <module name="ParameterNumber"/>
 
@@ -125,11 +130,14 @@ Description:
         <module name="NoWhitespaceAfter"/>
         <module name="NoWhitespaceBefore"/>
         <module name="OperatorWrap"/>
-        <module name="ParenPad"/>
         <module name="TypecastParenPad"/>
-        <module name="WhitespaceAfter"/>-->
+        <module name="WhitespaceAfter"/>
+        <module name="ParenPad">
+            <property name="severity" value="warning"/>
+        </module>
+        -->
         <module name="WhitespaceAround"/>
-
+        <module name="GenericWhitespace"/>
 
         <!-- Modifier Checks                                    -->
         <!-- See http://checkstyle.sf.net/config_modifiers.html -->
@@ -142,7 +150,7 @@ Description:
         <module name="AvoidNestedBlocks"/>
         <module name="EmptyBlock"/>
         <!--<module name="LeftCurly">--> 
-        <!--<module name="NeedBraces"/>-->
+        <module name="NeedBraces" />
         <!--<module name="RightCurly">-->
 
 
@@ -194,12 +202,8 @@ Description:
         
         <module name="IllegalCatch"/>
         
-        <module name="MethodParamPad">
-            <property name="severity" value="warning"/>
-        </module>
-        <module name="Indentation">
-            <property name="severity" value="warning"/>
-        </module>
+        <module name="MethodParamPad"/>
+        <module name="Indentation"/>
     </module>
 
 </module>

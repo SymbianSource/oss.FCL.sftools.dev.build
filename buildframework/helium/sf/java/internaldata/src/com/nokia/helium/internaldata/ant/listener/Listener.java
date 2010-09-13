@@ -17,18 +17,20 @@
  
 package com.nokia.helium.internaldata.ant.listener;
 
-import java.util.Hashtable;
+import java.lang.management.ManagementFactory;
+import java.lang.management.MemoryMXBean;
+import java.lang.management.MemoryUsage;
 import java.util.Date;
-import com.nokia.helium.internaldata.ant.taskdefs.HlmAssertMessageTask;
+import java.util.Hashtable;
+
+import org.apache.log4j.Logger;
 import org.apache.tools.ant.BuildEvent;
 import org.apache.tools.ant.BuildListener;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.SubBuildListener;
 import org.dom4j.Document;
-import org.apache.log4j.Logger;
-import java.lang.management.ManagementFactory;
-import java.lang.management.MemoryMXBean;
-import java.lang.management.MemoryUsage;
+
+import com.nokia.helium.internaldata.ant.taskdefs.HlmAssertMessageTask;
 
 /**
  * Listener class for the Logger.
@@ -46,7 +48,10 @@ public class Listener implements BuildListener, SubBuildListener {
     private EndLessStack<DataNode> buildEventStack = new EndLessStack<DataNode>();
     
     // default list of properties to extract.
-    private String[] propList = {"os.name", "user.name", "build.name", "build.number", "build.id", "build.family", "build.system", "env.NUMBER_OF_PROCESSORS", "helium.version", "env.SYMSEE_VERSION", "diamonds.build.id"};
+    private String[] propList = {"os.name", "user.name", "build.name",
+                                 "build.number", "build.id", "build.family", "build.system",
+                                 "env.NUMBER_OF_PROCESSORS", "helium.version",
+                                 "env.SYMSEE_VERSION", "diamonds.build.id"};
 
     // Memory bean 
     private MemoryMXBean mbean;
@@ -62,8 +67,6 @@ public class Listener implements BuildListener, SubBuildListener {
     public void sendData(String smtpServer, BuildEvent event) {
         if (buildNode != null) {
             Document database = null;
-            //TreeDumper dumper = new TreeDumper(buildNode);
-            //dumper.dump();
             log.debug("Creating the XML log.");
             XMLRenderer writer = new XMLRenderer(buildNode, database, this.extractProperties(), event);
             EmailDataSender sender = new EmailDataSender();

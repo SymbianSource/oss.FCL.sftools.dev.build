@@ -56,6 +56,7 @@ require Exporter;
 	featurefile_creation_phase
 	processData
 	create_smrimage
+	getWorkdir
 );
 
 my $useinterpretsis = 1;
@@ -65,7 +66,7 @@ if ($^O !~ /^MSWin32$/i){
 my $enforceFeatureManager = 0; # Flag to make Feature Manager mandatory if SYMBIAN_FEATURE_MANAGER macro is defined. 
 
 my $BuildromMajorVersion = 3 ;
-my $BuildromMinorVersion = 26;
+my $BuildromMinorVersion = 28;
 my $BuildromPatchVersion = 0;
 
 
@@ -131,6 +132,7 @@ The available options are
    -cache                           -- allow the ROFSBUILD to reuse/generate cached executable files
    -nocache                         -- force the ROFSBUILD not to reuse/generate cached executable files
    -cleancache                      -- permanently remove all cached executable files
+   -oby-charset=<charset>	        -- used character set in which OBY was written
    -loglevel<level>                 -- Level of information logging where loglevel is 0,1,2
                                        0 default level of information
                                        1 host/ROM filenames, file size and the hidden attribute along with level0 log
@@ -154,7 +156,10 @@ The available options are
                                     the result will be checkcase.log, this option is only valid on windows.
    -workdir=xxx                     -- specify a directory to contain generated files. 
    -prependepocroot                 -- if there is no EPOCROOT## before /epoc32/, prepend EPOCROOT## to epoc32.
-
+   -stdcpp                          -- ignore symbian customized cpp and try to find another cpp in the PATH.(for Windows only)
+   -cpp=xxx                         -- specify a CPP preprocessor used by Buildrom.
+   -xiponly                      -- just create the XIP ROM image without creating the ROFS image.
+   
 Popular -D defines to use include
 
    -D_DEBUG         -- select debug versions of some files
@@ -344,6 +349,11 @@ my $checkcase_platform = "";
 my $checkcase_test = 0;
 my $opt_workdir = 0;
 my $prependepocroot = 0;
+my $stdcpp = 0;
+my $obycharset;
+my $cppoption = 0;
+my $preprocessor = "cpp";
+my $opt_xiponly = 0;
 
 sub match_obyfile
 {
@@ -497,8 +507,8 @@ sub processData
 	{
 		# set the default path for Z drive and Data drive directory,
 		# if and only if, path is not specified by the user. 
-		$ZDirloc = &datadriveimage::setPath("zdrive") unless ($ZDirloc);
-		$DataDriveDirloc = &datadriveimage::setPath("datadrive") unless ($DataDriveDirloc);
+		$ZDirloc = $thisdir."zdrive" unless ($ZDirloc);
+		$DataDriveDirloc = $thisdir."datadrive" unless ($DataDriveDirloc);
 		#delete any existing Z drive directory.
 		my $retVal = &datadriveimage::deleteDirectory($ZDirloc,$opt_v)if(!$opt_r);
 		if($retVal)
@@ -535,6 +545,10 @@ sub processData
 					# Location of stub-sis file(s) inside Z Drive folder.
 					my $zDriveSisFileLoc;
 					# check if more than one data drive image needs to be generated. 
+					if ($datadrivename =~ /.*[\\\/]([^\\\/]+)$/)
+					{
+						$datadrivename = $1;
+					}
 					if( $dataImageCount > 1 )
 					{
 						# if yes, then set the location of prototype data drive folder as 
@@ -602,7 +616,7 @@ sub processData
 						# invoke INTERPRETSIS tool with z drive folder location.
 						if ($useinterpretsis)
 						{
-							&datadriveimage::invokeInterpretsis( \@sisfilelist,$proDataDriveDirloc,$opt_v,$zDriveSisFileLoc,$paraFile,$opt_k,\@interpretsisOptList)if($sisfilepresent);
+							&datadriveimage::invokeInterpretsis( \@sisfilelist,$proDataDriveDirloc,$opt_v,$zDriveSisFileLoc,$paraFile,$opt_k,\@interpretsisOptList,$thisdir)if($sisfilepresent);
 						}else
 						{
 							print "Warning: interpretsis is not ready on linux.\n";
@@ -763,7 +777,27 @@ sub process_cmdline_arguments
 		if ( $arg =~ /^-k$/i || $arg =~ /^-keepgoing$/i )
 	  {
 			$opt_k = 1;		
-  		last;	
+  		next;	
+		}
+		if ($arg =~ /^-workdir=(.*)/)
+		{
+			my $workdir = $1;
+			if (!-d $workdir)
+			{
+				die "directory $workdir does not exist\n";
+			}
+			my $currentdir = cwd;
+			chdir "$workdir" or die "cannot change to directory $workdir\n";
+			$thisdir=cwd;
+			$thisdir=~s-\\-\/-go;		    # separator from Perl 5.005_02+ is forward slash
+			$thisdir.= "\/" unless $thisdir =~ /\/$/;
+			if(&is_windows)
+			{
+				$thisdir =~ s-\/-\\-g;
+			}
+			$opt_workdir = 1;
+			chdir "$currentdir";
+			next;	
 		}
 	}
 	foreach my $arg (@argList)
@@ -814,7 +848,12 @@ sub process_cmdline_arguments
 		}
 		next;
 	    }
-	    if ($arg =~ /^-o(.*)/i)
+	    if ($arg =~/^-oby-charset=(.*)$/i)
+	    {
+		$obycharset = $1;
+		next;
+	    }
+	    if (($arg =~ /^-o(.*)/i) && ($arg !~ /^-oby-charset/i))
 	    {
 		$opt_o = $1;
 		next;
@@ -1003,24 +1042,44 @@ sub process_cmdline_arguments
 		}
 		if ($arg =~ /^-workdir=(.*)/)
 		{
-			my $workdir = $1;
-			if (!-d $workdir)
-			{
-				die "directory $workdir does not exist\n";
-			}
-			my $currentdir = cwd;
-			chdir "$workdir" or die "cannot change to directory $workdir\n";
-			$thisdir=cwd;
-			$thisdir=~s-\\-\/-go;		    # separator from Perl 5.005_02+ is forward slash
-			$thisdir.= "\/" unless $thisdir =~ /\/$/;
-			if(&is_windows)
-			{
-				$thisdir =~ s-\/-\\-g;
-			}
-			$opt_workdir = 1;
-			chdir "$currentdir";
-			next;	
+			next;
 		}
+		if ($arg =~ /^-stdcpp$/)
+		{
+			if (&is_linux)
+			{
+				print "Warning: option -stdcpp only apply for Windows\n";
+				next;
+			}
+			if ($cppoption)
+			{
+				die "Error: -stdcpp option and -cpp=xxx option cannot be used at the same time.\n";
+			}
+			$stdcpp = 1;
+			next;
+		}
+		if ($arg =~ /^-cpp=(.*)/)
+		{
+			if ($stdcpp)
+			{
+				die "Error: -stdcpp option and -cpp=xxx option cannot be used at the same time.\n";
+			}
+			if ($cppoption)
+			{
+				print "Warning: -cpp option has been set before. The previous configuration will be overwritten!\n";
+			}
+			$cppoption = 1;
+			$preprocessor = $1;
+			$preprocessor =~ s-\\-\/-g;
+			$preprocessor =~ s-EPOCROOT##\/?-$epocroot-g;
+			if (-d $preprocessor)
+			{
+				$preprocessor .= "\/" unless $preprocessor =~ /\/$/;
+				$preprocessor .= "cpp";
+			}
+			next;
+		}
+
 		if ($arg =~ /^-prependepocroot$/)
 		{
 			$prependepocroot = 1;
@@ -1074,7 +1133,7 @@ sub process_cmdline_arguments
 				if( $ZDirloc !~ m/:/)
 				{
 					print "drive letter not specified\n";
-					$ZDirloc = &datadriveimage::setPath($ZDirloc);
+					$ZDirloc = $thisdir.$ZDirloc;
 				}
 				print "Z Drive directory location = $ZDirloc\n";
 				#set the location of Z Drive directory.
@@ -1104,7 +1163,7 @@ sub process_cmdline_arguments
 				if( $DataDriveDirloc !~ m/:/)
 				{
 					print "drive not specified\n";
-					$DataDriveDirloc = &datadriveimage::setPath($DataDriveDirloc);
+					$DataDriveDirloc = $thisdir.$DataDriveDirloc;
 				}
 				print "Data Drive directory location = $DataDriveDirloc\n";
 				#set the location of Data Drive directory.
@@ -1175,6 +1234,11 @@ sub process_cmdline_arguments
 			$lowMem = $arg;
 			next;
 		}
+		if( $arg =~ /^-xiponly$/i)
+		{
+			$opt_xiponly = 1;
+			next;
+		}
 	    if ($arg =~ /^-/)
 	    {
 		print "Unknown arg: $arg\n";
@@ -1198,6 +1262,13 @@ sub process_cmdline_arguments
 	{
 	    print "Missing obyfile argument\n";
 	    $errors++ if(!$opt_k);
+	}
+	if(defined($obycharset))
+	{
+		unless($obycharset =~ /utf-?8/i)
+		{
+			print "Warning: Ignoring not supportted charset $obycharset, local charset will be used as default!\n";
+		}
 	}
 
 	if ($errors)
@@ -1287,11 +1358,15 @@ sub preprocessing_phase
 		$cppargs .= " -I. -I \"$rominclude\"";
 	}
 
-	print "* cpp -Wno-endif-labels -o $temp1OBYFile $cppargs\n" if ($opt_v);
+	if ($stdcpp)
+	{
+		$preprocessor = find_stdcpp();
+	}
+	print "* $preprocessor -Wno-endif-labels -o $temp1OBYFile $cppargs\n" if ($opt_v);
 	
-	is_existinpath("cpp", romutl::DIE_NOT_FOUND);
+	is_existinpath("$preprocessor", romutl::DIE_NOT_FOUND);
 	$errors = 0;
-	open CPP, "| cpp -Wno-endif-labels -o $temp1OBYFile $cppargs" or die "* Can't execute cpp";
+	open CPP, "| $preprocessor -Wno-endif-labels -o $temp1OBYFile $cppargs" or die "* Can't execute cpp";
 	foreach my $arg (@obyfiles)
 	{
 		print CPP "\n#line 1 \"$arg\"\n";
@@ -1329,6 +1404,20 @@ sub preprocessing_phase
 
 	# Setup default rom configuration
 	$romimage[0] = {xip=>1, compress=>0, extension=>0, composite=>"none",uncompress=>0 };
+	if($obycharset =~ /utf-?8/i)
+	{
+		my $utf8file = $thisdir."tmp1utf8.oby";
+		open INFILE, "<$temp1OBYFile" or die "* Can't open file $temp1OBYFile";
+		open CHARSETTRAN, "| charsettran -to=hostcharset > $utf8file" or die "* Can't execute charsetran";
+		while(<INFILE>)
+		{
+			print CHARSETTRAN $_;
+		}
+		close CHARSETTRAN;
+		close INFILE;	
+		unlink $temp1OBYFile  or die "* Can't remove file $temp1OBYFile";
+		rename 	$utf8file, $temp1OBYFile or die "* Can't rename file $utf8file to file $temp1OBYFile";
+	}
 }
 
 sub ReadPreprocessedFile
@@ -2124,9 +2213,14 @@ sub reorganize_phase
 			}
 			elsif($smrImageStartRegion && !$smrImageEndRegion)
 			{
-				if($line =~ /^\s*IMAGENAME\s*=\s*(\S+)/i)
+				if($line =~ /^(\s*IMAGENAME\s*=\s*)(\S+)/i)
 				{
-					my $smrimagename = $1;
+					my $front = $1;
+					my $smrimagename = $2;
+					if ($smrimagename !~ /^.:/ && $smrimagename !~ /^[\\\/]/)
+					{
+						$smrimagename = $thisdir.$smrimagename;
+					}
 					$smrimagename =~s/(\.img)//i;
 					if(exists($smrNameInfo{$smrimagename}))
 					{
@@ -2136,9 +2230,11 @@ sub reorganize_phase
 					{
 						$smrNameInfo{$smrimagename} = 1;
 					}
-					$line =~s/(\.img)//i;
+					push @linesArray, "$front$smrimagename\n";
+				}else
+				{
+					push @linesArray, $line;
 				}
-				push @linesArray, $line;
 				$line = "REM handled $line";
 			}
 		}
@@ -3095,7 +3191,12 @@ sub suppress_phase
 	foreach $line (@obydata)
 	{
 		track_source($line);
-		if ($line =~ /^\s*REM/i || $line =~ /^\s*TIME\s*=\s*/i)
+		if (($opt_xiponly == 1) && ($line =~ /^\s*REM\s*ROM_IMAGE\[\s*[^0]\s*\]/i))
+		{
+			print "Skip all the content for ROFS image\n" if($opt_v);
+			last;
+		}
+		elsif ($line =~ /^\s*REM/i || $line =~ /^\s*TIME\s*=\s*/i)
 		{
 			# ignore REM statements, to avoid processing "REM data=xxx yyy"
 		}
@@ -3164,7 +3265,7 @@ sub suppress_phase
 				# it is a manatory ROMBUILD keyword, in which case it is better
 				# to let ROMBUILD report the missing file rather than report the
 				# missing keyword.
-   				if ($what !~ /^bootbinary|variant|primary|secondary|hide|dir/i)
+   				if ($what !~ /^bootbinary|variant|primary|secondary|hide|dir|imagename/i)
 				{
    					$line = "REM MISSING " . $line;
    					print_source_error("Missing file: '$filename' in statement '$what='");
@@ -4103,6 +4204,11 @@ sub create_dumpfile
 		{
 				my $dataimageidx=$1;
 				close DUMPFILE;
+				my $name = $datadriveimage[$dataimageidx]{name};
+				if ($name !~ /^.:/ && $name !~ /^[\\\/]/)
+				{
+					$datadriveimage[$dataimageidx]{name} = $thisdir.$name;
+				}
 				$dumpfile="$datadriveimage[$dataimageidx]{name}";
 				$datadriveimage[$dataimageidx]{obeyfile}=$dumpfile;
 				$dumpfile .= ".oby";
@@ -4185,7 +4291,7 @@ sub suppress_image_generation
 sub run_rombuilder
 {
 	my ($command, $obeyfile, $logfile) = @_;
-	$command .= " $obeyfile.oby";
+	$command .= " -logfile=$logfile $obeyfile.oby";
 	#CR1258 test cases are depending on the following output.
 	print "* Executing $command\n" if ($opt_v);
 
@@ -4306,9 +4412,9 @@ sub invoke_rombuild
 			{
 				is_existinpath("rombuild", romutl::DIE_NOT_FOUND);
 				$rombuild .= " -symbols" unless($nosymbols) ;
-				run_rombuilder($rombuild.$compress, $obeyfile, "ROMBUILD.LOG");
+				run_rombuilder($rombuild.$compress, $obeyfile, $thisdir."ROMBUILD.LOG");
 			}
-			else
+			elsif($opt_xiponly == 0)
 			{
 				# efficient_rom_paging.pm can move everything to core rom.
 				# If that is the case, don't run rofsbuild at all to avoid errors.
@@ -4333,7 +4439,7 @@ sub invoke_rombuild
 					{
 						$rofsbuild .= " -symbols";
 					}			
-					run_rombuilder($rofsbuild.$compress, $obeyfile, "ROFSBUILD.LOG");
+					run_rombuilder($rofsbuild.$compress, $obeyfile, $thisdir."ROFSBUILD.LOG");
 				}
 			}
 			unlink "rombuild.log";
@@ -4801,6 +4907,49 @@ sub create_smrimage
 		print "\n SMR image creating error for empty image name!\n";
 	}
 }
+
+sub getWorkdir
+{
+	return $thisdir;
+}
+
+sub find_stdcpp
+{
+    return "cpp" if (!$stdcpp);
+    return "cpp" if (&is_linux);
+    
+    my $delimiter = &env_delimiter;
+		$ENV{PATH}="${epocroot}epoc32\/gcc_mingw\/bin$delimiter".$ENV{PATH};
+    my @paths;
+ 		@paths = split(/$delimiter/, $ENV{PATH});
+    unshift @paths, "\.";
+    
+    foreach my $path (@paths)
+    {
+        next if ($path =~ /^\s*$/);
+        chomp $path;
+        $path =~ s/\\/\//g;
+        $path .= "\/" unless ($path =~ /\/$/);
+        $path = $path."cpp.exe";
+        if (-e $path)
+        {
+		        $path = "\"$path\"";
+        		my $command = "$path --version 2>&1";
+						open DATA, "$command |"   or die "Couldn't execute command: $command\n";
+						my $line = <DATA>;
+						chomp($line);
+						print "$line\n" if($opt_v);
+						if ($line =~ /cpp\.exe \(GCC\) .* \(mingw special\)/)
+						{
+							print "found stdcpp in $path\n" if($opt_v);
+							close DATA;
+							return $path;
+						}
+						close DATA;
+        }
+    }
+    die "Error: Cannot found standard cpp.exe in the PATH.\n";
+} 
 
 sub checkcase()
 {

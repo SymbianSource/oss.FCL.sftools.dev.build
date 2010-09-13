@@ -20,7 +20,8 @@ Description:
 ============================================================================
 -->
 import sys; sys.__plen = len(sys.path)
-<#list project.getReference('egg.deps.fileset').toString().split(';') as file>
-./${file}
+<#list project.getReference('egg.deps.fileset').toString()?split(ant['path.separator']) as file>
+<#assign path = file?split("[\\\\/]", 'r')>
+./${path[path?size-2]}/${path?last}
 </#list>
 import sys; new=sys.path[sys.__plen:]; del sys.path[sys.__plen:]; p=getattr(sys,'__egginsert',0); sys.path[p:p]=new; sys.__egginsert = p+len(new)

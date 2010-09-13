@@ -24,19 +24,25 @@ package com.nokia.ant;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.net.MalformedURLException;
-import java.util.Map;
-import java.util.HashMap;
+import java.net.URL;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Properties;
 
-import org.apache.tools.ant.*;
-import org.apache.tools.ant.taskdefs.*;
-import org.apache.tools.ant.util.FileUtils;
+import org.apache.tools.ant.AntTypeDefinition;
+import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.ComponentHelper;
+import org.apache.tools.ant.Location;
+import org.apache.tools.ant.MagicNames;
+import org.apache.tools.ant.Project;
+import org.apache.tools.ant.ProjectHelper;
+import org.apache.tools.ant.taskdefs.Definer;
 import org.apache.tools.ant.types.EnumeratedAttribute;
+import org.apache.tools.ant.util.FileUtils;
 
 /**
  * Base class for Taskdef and Typedef - handles all

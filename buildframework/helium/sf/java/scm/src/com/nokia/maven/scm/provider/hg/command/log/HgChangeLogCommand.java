@@ -18,13 +18,15 @@
 package com.nokia.maven.scm.provider.hg.command.log;
 
 
-import com.nokia.maven.scm.provider.hg.VersionChangeSet;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 import org.apache.maven.scm.ScmBranch;
-import org.apache.maven.scm.ScmVersion;
 import org.apache.maven.scm.ScmException;
 import org.apache.maven.scm.ScmFileSet;
 import org.apache.maven.scm.ScmResult;
+import org.apache.maven.scm.ScmVersion;
 import org.apache.maven.scm.command.Command;
 import org.apache.maven.scm.command.changelog.AbstractChangeLogCommand;
 import org.apache.maven.scm.command.changelog.ChangeLogScmResult;
@@ -33,9 +35,7 @@ import org.apache.maven.scm.provider.ScmProviderRepository;
 import org.apache.maven.scm.provider.hg.HgUtils;
 import org.apache.maven.scm.provider.hg.command.HgCommandConstants;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import com.nokia.maven.scm.provider.hg.VersionChangeSet;
 
 /**
  * 'hg changelog' command.

@@ -42,7 +42,7 @@ Description:
      -->
     <target name="release-work-area">
         <mkdir dir="${release.log.dir}" />
-        <record name="${release.log.dir}/${build.id}_release_work_area.log" action="start"/>
+        <hlm:record name="${release.log.dir}/${build.id}_release_work_area.log" action="start"/>
         <runtarget target="get-ccm-password"/>
         <runtarget target="ccm-prepare-input"/>
         
@@ -83,7 +83,7 @@ sys.exit(0)
                 </hlm:python>
             </try>
             <finally>
-                <record name="${release.log.dir}/${build.id}_release_work_area.log" action="stop"/>
+                <hlm:record name="${release.log.dir}/${build.id}_release_work_area.log" action="stop"/>
                 <hlm:assertFileExists file="${release.log.dir}/${build.id}_release_work_area.log" />
             </finally>
         </trycatch>

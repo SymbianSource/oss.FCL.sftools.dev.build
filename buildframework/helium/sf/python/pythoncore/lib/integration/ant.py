@@ -46,7 +46,7 @@ def check_build_duplicates_task(project, task, attributes, elements):
         for filename in components_per_file.keys():
             if len(components_per_file[filename]) > 1:
                 output.write("    <file name=\"%s\">\n" % filename)
-                output.write("".join(map(lambda x: "        <component name=\"%s\"/>\n" % x, components_per_file[filename])))
+                output.write("".join(["        <component name=\"%s\"/>\n" % x for x in components_per_file[filename]]))
                 output.write("    </file>\n")
         output.write("</buildconflicts>\n")
         output.close()

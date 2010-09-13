@@ -25,6 +25,7 @@ Description:
             <description>${macro.description}</description>
             <scope>${macro.scope}</scope>
             <deprecated>${macro.deprecated}</deprecated>
+            <since>${macro.since}</since>
             <location>${macro.location}</location>
             <summary>${macro.summary}</summary>
             <documentation>${wiki(macro.documentation)}</documentation>
@@ -46,6 +47,7 @@ Description:
         <description>${wiki(project.description)}</description>
         <scope>${project.scope}</scope>
         <deprecated>${project.deprecated}</deprecated>
+        <since>${project.since}</since>
         <location>${project.location}</location>
         <summary>${project.summary}</summary>
         <documentation>${wiki(project.documentation)}</documentation>
@@ -68,6 +70,7 @@ Description:
             <description>${target.description}</description>
             <scope>${target.scope}</scope>
             <deprecated>${target.deprecated}</deprecated>
+            <since>${target.since}</since>
             <location>${target.location}</location>
             <summary>${target.summary}</summary>
             <documentation>${wiki(target.documentation)}</documentation>
@@ -109,6 +112,7 @@ Description:
             <editable>${property.editable}</editable>
             <scope>${property.scope}</scope>
             <deprecated>${property.deprecated}</deprecated>
+            <since>${property.since}</since>
             <location>${property.location}</location>
             <summary>${property.summary}</summary>
             <documentation>${wiki(property.documentation)}</documentation>
@@ -118,13 +122,14 @@ Description:
         </#list>
         
         <#list project.propertyCommentBlocks as property>
-        <property>
+        <property definedInComment="true">
             <name>${property.name}</name>
             <defaultValue>No default value.</defaultValue>
             <type>${property.type}</type>
             <editable>${property.editable}</editable>
             <scope>${property.scope}</scope>
             <deprecated>${property.deprecated}</deprecated>
+            <since>${property.since}</since>
             <location>${property.location}</location>
             <summary>${property.summary}</summary>
             <documentation>${wiki(property.documentation)}</documentation>

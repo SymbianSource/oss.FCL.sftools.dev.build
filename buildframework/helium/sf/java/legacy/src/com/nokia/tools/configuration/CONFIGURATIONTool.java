@@ -1,26 +1,28 @@
 /*
-* Copyright (c) 2007-2008 Nokia Corporation and/or its subsidiary(-ies).
-* All rights reserved.
-* This component and the accompanying materials are made available
-* under the terms of the License "Eclipse Public License v1.0"
-* which accompanies this distribution, and is available
-* at the URL "http://www.eclipse.org/legal/epl-v10.html".
-*
-* Initial Contributors:
-* Nokia Corporation - initial contribution.
-*
-* Contributors:
-*
-* Description: 
-*
-*/
+ * Copyright (c) 2007-2008 Nokia Corporation and/or its subsidiary(-ies).
+ * All rights reserved.
+ * This component and the accompanying materials are made available
+ * under the terms of the License "Eclipse Public License v1.0"
+ * which accompanies this distribution, and is available
+ * at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ *
+ * Initial Contributors:
+ * Nokia Corporation - initial contribution.
+ *
+ * Contributors:
+ *
+ * Description: 
+ *
+ */
 
 package com.nokia.tools.configuration;
 
+import org.apache.tools.ant.Project;
+
 import com.nokia.helium.core.ant.MappedVariable;
 import com.nokia.helium.core.ant.types.VariableSet;
-import com.nokia.tools.*;
-import org.apache.tools.ant.Project;
+import com.nokia.tools.Tool;
+import com.nokia.tools.ToolsProcessException;
 
 /**
  * Command Line wrapper for configuration tools
@@ -28,14 +30,12 @@ import org.apache.tools.ant.Project;
 public class CONFIGURATIONTool implements Tool {
 
     /**
-     * Sets the command line variables to be used to execute and validates for
-     * the required parameters
+     * Sets the command line variables to be used to execute and validates for the required
+     * parameters
      * 
-     * @param varSet
-     *            variable(name / value list)
+     * @param varSet variable(name / value list)
      */
-    public void execute(VariableSet varSet, Project prj)
-            throws ToolsProcessException {
+    public void execute(VariableSet varSet, Project prj) throws ToolsProcessException {
         String path = null;
         String masterConf = null;
         String confml = null;
@@ -50,17 +50,23 @@ public class CONFIGURATIONTool implements Tool {
             value = variable.getValue();
             if (varName.equals("path")) {
                 path = value;
-            } else if (varName.equals("master_conf")) {
+            }
+            else if (varName.equals("master_conf")) {
                 masterConf = value;
-            } else if (varName.equals("confml")) {
+            }
+            else if (varName.equals("confml")) {
                 confml = value;
-            } else if (varName.equals("impl")) {
+            }
+            else if (varName.equals("impl")) {
                 impl = value;
-            } else if (varName.equals("iby")) {
+            }
+            else if (varName.equals("iby")) {
                 iby = value;
-            } else if (varName.equals("keepgoing")) {
+            }
+            else if (varName.equals("keepgoing")) {
                 keepGoing = value;
-            } else if (varName.equals("report")) {
+            }
+            else if (varName.equals("report")) {
                 report = value;
             }
         }
@@ -73,7 +79,8 @@ public class CONFIGURATIONTool implements Tool {
         task.setExecutable(path + java.io.File.separator + "cli_build.cmd");
         if (keepGoing.equals("false")) {
             task.setFailonerror(true);
-        } else {
+        }
+        else {
             task.createArg().setValue("-ignore_errors");
         }
         task.createArg().setValue("-master_conf");

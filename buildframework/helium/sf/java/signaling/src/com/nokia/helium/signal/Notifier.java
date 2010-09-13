@@ -18,8 +18,8 @@
 
 package com.nokia.helium.signal;
 
-import java.util.List;
 import org.apache.tools.ant.Project;
+
 import com.nokia.helium.signal.ant.types.NotifierInput;
 
 /**
@@ -46,11 +46,4 @@ public interface Notifier {
     void sendData(String signalName, boolean failStatus,
             NotifierInput notifierInput, String message );
 
-    /**
-     * Sends the data to the requested sender list with specified notifier
-     * 
-     * @deprecated
-     */    
-    void sendData(String signalName, boolean failStatus,
-            List<String> fileList);
 }

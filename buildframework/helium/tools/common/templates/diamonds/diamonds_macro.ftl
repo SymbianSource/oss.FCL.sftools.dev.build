@@ -102,4 +102,4 @@ ${count}</#macro>
         </components>
     </#if>
 </#macro>
-<#assign schema_version=21/>
+<#assign schema_version = 24/>

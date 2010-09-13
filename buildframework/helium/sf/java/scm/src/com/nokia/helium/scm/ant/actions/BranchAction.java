@@ -55,9 +55,10 @@ public class BranchAction extends BaseDirectoryScmAction {
     @Override
     public void execute(ScmRepository repository) {
 
-        if (name == null)
+        if (name == null) {
             throw new BuildException("'name' attribute is not defined.");
-
+        }
+        
         ScmManager scmManager = getTask().getScmManager();
         BranchScmResult result;
 

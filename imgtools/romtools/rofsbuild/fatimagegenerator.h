@@ -52,8 +52,8 @@ public :
 	//If FAT image is not valid, or error accurs, return false
 	bool Execute(TFSNode* aRootDir , const char* aOutputFile);
 protected :
-	void InitAsFat16(TUint32 aTotalSectors,TUint8 aSecPerClus,TUint16 aBytsPerSec);
-	void InitAsFat32(TUint32 aTotalSectors,TUint8 aSecPerClus,TUint16 aBytsPerSec);
+	void InitAsFat16(TUint32 aTotalSectors, TUint16 aBytsPerSec);
+	void InitAsFat32(TUint32 aTotalSectors, TUint16 aBytsPerSec);
 	bool PrepareClusters(TUint& aNextClusIndex,TFSNode* aNode);
 	TSupportedFatType iType ;
 	char* iFatTable ; 

@@ -29,8 +29,10 @@ Description:
   </info>
   <dependencies>
     <dependency name="helium-core" rev="latest.integration" conf="default" />
-    <dependency name="helium-jpa" rev="latest.integration" conf="default" />
-    <dependency org="org.sqlite" name="sqlitejdbc" rev="latest.integration" conf="default" />
+    <dependency org="log4j" name="log4j" rev="1.2.9" conf="default" />
+    <dependency org="eclipselink" name="eclipselink" rev="2.0.0" conf="default" />
+    <dependency org="javax.persistence" name="persistence" rev="2.0.0" conf="default" />
+    <dependency org="org.apache.derby" name="derby" rev="10.5" conf="default" />
     <dependency org="bsh" name="bsh" rev="latest.integration" conf="default" />
   </dependencies>
 </ivy-module>

@@ -18,7 +18,7 @@
 #===============================================================================
 """ unit tests the timeout launcher """
 
-# pylint: disable-msg=E1101
+# pylint: disable=E1101
 
 import logging
 import sys
@@ -38,7 +38,7 @@ if sys.platform == "win32":
     WINDOWS = True
 
 
-# pylint: disable-msg=C0103
+# pylint: disable=C0103
 
 class os(object):   #has to be named this as it is mocking os method.
     """ dummy the os function call"""
@@ -64,7 +64,7 @@ class TimeoutLauncherTest(mocker.MockerTestCase):
         sys.argv = ['timeout_launcher.py', '--timeout=1', 'version']
         timeout_launcher.main()
 
-# pylint: disable-msg=W0104
+# pylint: disable=W0104
 
     def test_valid_with_timeout(self):
         """test_valid_with_timeout: initial test with valid values and timeout."""
@@ -104,7 +104,10 @@ class TimeoutLauncherTest(mocker.MockerTestCase):
         process = self.mocker.mock()
 
         obj = self.mocker.replace("subprocess.Popen")
-        obj(' '.join(cmdline), stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=True)
+        shell = True
+        if WINDOWS:
+            shell = False
+        obj(' '.join(cmdline), stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=shell)
         self.mocker.result(process)
 
         process.communicate()[0]
@@ -172,6 +175,6 @@ class TimeoutLauncherTest(mocker.MockerTestCase):
         failed = False
         try:
             timeout_launcher.main()
-        except:
+        except Exception:
             failed = True
         assert failed

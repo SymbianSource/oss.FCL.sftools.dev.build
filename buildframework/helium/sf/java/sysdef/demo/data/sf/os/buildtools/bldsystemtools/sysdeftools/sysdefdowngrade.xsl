@@ -3,7 +3,7 @@
 <!--Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
 	All rights reserved.
 	This component and the accompanying materials are made available
-	under the terms of "Eclipse Public License v1.0"
+	under the terms of the License "Eclipse Public License v1.0"
 	which accompanies this distribution, and is available
 	at the URL "http://www.eclipse.org/legal/epl-v10.html".
 
@@ -14,11 +14,19 @@
 	Downgrade a 3.x system definition into the 2.0.1 syntax
 -->
 	<xsl:output method="xml" indent="yes"/>
-	
+
+
+<!--Description:Downgrades a 3.x system definition into the 2.0.1 syntax
+ -->
+
+<!--Input:<sysdef> - (required) The system definition XML file to process, in the 3.0 format, and can be a pkgdef or stand-alone sysdef.-->
+<!--Output:<sysdef> - (optional) The system definition XML file to save the output as. If not present it will write to stdout.-->
+
 	<xsl:param name="Path">os/deviceplatformrelease/foundation_system/system_model</xsl:param>
-	<!-- $Path is the location of the root system definition XML file. Must not end in /
-		This is used to compute the absolute paths the 2.0 syntax needs-->
-	<xsl:param name="Root"/> <!-- space separated list of root variables in the form "VAR1=value1 VAR=value2" --> 
+	<!-- <oldpath> - The directory containing the root system definition XML file in the 2.0 sysdef style. This must not end in /
+		This is used to compute the absolute paths the 2.0 syntax needs. -->
+	<xsl:param name="Root"/> <!--<list> - (optional) A space separated list of root variables in the form "VAR1=value1 VAR=value2" --> 
+	<xsl:param name="Strict" select="0"/> <!--1 - (optional) If present, namespaced extensions are stripped out --> 
 	<xsl:variable name="root" select="concat(' ',$Root,' ')"/> <!-- sort of hack to allow absolute paths in downgraded output -->
 	<xsl:variable name="srcroot" select="substring-before(substring-after($root,' SRCROOT='),' ')"/> <!-- the default path prefix -->
 
@@ -26,10 +34,10 @@
 	<xsl:message terminate="yes">ERROR: Cannot process this document</xsl:message>
 </xsl:template>
 
-<!-- can only handle 3.0.0 to 2.0.1 transforms
+<!-- can only handle 3.0.x to 2.0.1 transforms
 	Assumes only packages are using href
  -->
-<xsl:template match="/SystemDefinition[@schema='3.0.0']"> 
+<xsl:template match="/SystemDefinition[starts-with(@schema,'3.0.')]"> 
 	<!-- process root system definition or package definition-->
 	<xsl:call-template name="DTD"/> <!-- insert 2.0.01 DTD -->
   <SystemDefinition name="{*/@name}" schema="2.0.1">
@@ -37,7 +45,7 @@
   </SystemDefinition>
 </xsl:template>
 
-<xsl:template match="/SystemDefinition[@schema='3.0.0' and systemModel]"> 
+<xsl:template match="/SystemDefinition[starts-with(@schema,'3.0.') and systemModel]"> 
 	<xsl:call-template name="DTD"/> <!-- insert 2.0.01 DTD -->
   <SystemDefinition name="{systemModel/@name}" schema="2.0.1">
   	<xsl:apply-templates select="*|comment()"/>
@@ -106,6 +114,7 @@
 		<xsl:choose>
 			<xsl:when test="@href">
 				<xsl:variable name="this" select="."/>
+				<xsl:variable name="prefixmap" select="ancestor::SystemDefinition/*/meta[@rel='link-mapping']/map-prefix[starts-with(current()/@href,@link)]"/>
 				<xsl:for-each select="document(@href,.)/SystemDefinition/*">
 					<xsl:variable name="my-id"><xsl:apply-templates mode="normalize-id" select="@id"/></xsl:variable>
 					<xsl:variable name="other-id"><xsl:apply-templates mode="normalize-id" select="$this/@id"/></xsl:variable>
@@ -124,9 +133,31 @@
 					</xsl:for-each>
 					<xsl:apply-templates select="*|comment()">
 	  					<xsl:with-param name="path">
-	  						<xsl:call-template name="normpath">
-	  							<xsl:with-param name="path" select="concat($path,'/',$this/@href)"/>
-	  						</xsl:call-template>
+							<xsl:choose>
+								<xsl:when test="$prefixmap">
+	  								<xsl:call-template name="normpath">
+	  									<xsl:with-param name="path">
+										<xsl:apply-templates select="$prefixmap/@to"/>
+										<xsl:value-of select="substring-after($this/@href,$prefixmap/@link)"/>
+									 </xsl:with-param>
+	  								</xsl:call-template>
+								</xsl:when>
+								<xsl:when test="starts-with($this/@href,'/')">  <!-- absolute path -->
+	  								<xsl:call-template name="normpath">
+	  									<xsl:with-param name="path" select="$this/@href"/>
+	  								</xsl:call-template>
+								</xsl:when>
+								<xsl:when test="contains($this/@href,'://')">  <!-- generic URI -->
+	  								<xsl:call-template name="normpath">
+	  									<xsl:with-param name="path" select="substring-after($this/@href,'://')"/>
+	  								</xsl:call-template>
+								</xsl:when>
+								<xsl:otherwise>
+	  								<xsl:call-template name="normpath">
+	  									<xsl:with-param name="path" select="concat($path,'/',$this/@href)"/>
+	  								</xsl:call-template>
+								</xsl:otherwise>
+							</xsl:choose>
 	  					</xsl:with-param> 
 	  				</xsl:apply-templates>
 				</xsl:for-each>
@@ -194,6 +225,11 @@
 			<xsl:with-param name="path" select="$path"/> 
 		</xsl:apply-templates>
 		<xsl:copy-of select="@filter|@root[not(contains($root,concat(' ',.,'=')))]|@version|@prebuilt|@priority"/>
+		<xsl:for-each select="@*[contains(name(),':') and not($Strict)]">
+			<xsl:attribute name="{local-name()}">
+				<xsl:value-of select="."/>
+			</xsl:attribute>
+		</xsl:for-each>
 	</unit>
 </xsl:template>
 
@@ -211,7 +247,11 @@
 		<xsl:choose>
 			<xsl:when test="../@root">
 				<xsl:variable name="pre" select="substring-before(substring-after($root,concat(' ',../@root,'=')),' ')"/>
-				<xsl:if test="$pre!=''"><xsl:value-of select="concat($pre,'/')"/></xsl:if>
+				<xsl:value-of select="$pre"/>
+				<xsl:if test="$pre!='' and $pre!='/'">/</xsl:if>
+			</xsl:when>
+			<xsl:when test="$srcroot='/'"> <!-- treat all paths as absolute -->
+				<xsl:value-of select="$srcroot"/>
 			</xsl:when>
 			<xsl:when test="$srcroot!=''">
 				<xsl:value-of select="concat($srcroot,'/')"/>
@@ -240,6 +280,15 @@
 <xsl:template match="meta[info/@contract]"> <!-- except contract -->
 	<xsl:copy-of select="info/@contract"/>
 </xsl:template>
+
+
+<xsl:template match="meta[@rel='link-mapping']/map-prefix/@to">
+	<xsl:choose>
+		<xsl:when test="starts-with(.,'/')"><xsl:value-of select="substring(.,2)"/></xsl:when> <!-- absolute paths in 3.0 are relative in 2.0 -->
+		<xsl:otherwise><xsl:value-of select="."/></xsl:otherwise>
+	</xsl:choose>
+</xsl:template>
+
 
 <xsl:template match="@id" mode="normalize-id">
 	<xsl:choose>

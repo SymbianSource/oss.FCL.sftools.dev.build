@@ -22,10 +22,10 @@ Description:
 -->
 <project name="minibuild.ido-sbs" default="help" xmlns:au="org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium" basedir="..\ido">
     <property environment="env"/>
-	<!--property name="config.temp.build.dir" location="${ant.file.minibuild.ido-sbs}/../build"/ -->
-	
-	<!-- Configuring raptor build system -->
-	<property name="build.system" value="sbs"/>
+    <!--property name="config.temp.build.dir" location="${ant.file.minibuild.ido-sbs}/../build"/ -->
+    
+    <!-- Configuring raptor build system -->
+    <property name="build.system" value="sbs"/>
 
     <!-- Configuring get latest env. -->
     <property name="s60.grace.service" value="s60_devices_sw" />
@@ -36,14 +36,14 @@ Description:
     <property name="ccm.project" value="MinibuildDomain-tr1ido#50_201012:project:tr1test1#1" />
 
 
-    <!-- Run the full sequence of target for the minibuild. ,mini-build-prep,compile-main,zip-ee,mini-build-check-->
-    <!--<target name="do-mini-build" depends="mini-build-cleanup,
-    										compile-main"/>-->
+    <!-- Run the full sequence of target for the minibuild. ,minibuild-prep,compile-main,zip-ee,minibuild-check-->
+    <!--<target name="do-minibuild" depends="minibuild-cleanup,
+                                            compile-main"/>-->
 
-	<property name="build.name" value="minibuild_ido_sbs" />
+    <property name="build.name" value="minibuild_ido_sbs" />
     <property name="build.family" value="test_minibuild_ido_sbs" />
 
-    <target name="mini-build-check-blocks">
+    <target name="minibuild-check-blocks">
         <if>
             <istrue value="${blocks.enabled}" />
             <then>
@@ -53,17 +53,17 @@ Description:
         </if>
     </target>
 
-    <target name="mini-build-check" depends="mini-build-check-blocks">
-    	<!-- Check if prep has set some prop correctly... -->
+    <target name="minibuild-check" depends="minibuild-check-blocks">
+        <!-- Check if prep has set some prop correctly... -->
         <echo>'${arm.compiler.version}'</echo>
         <au:assertMatches string="${arm.compiler.version}" pattern="RVCT2\.2 \[Build 686\]" casesensitive="false" multiline="true"/>
 
         <!-- Check if compile-main step did what expected... -->
         <au:assertFileExists file="${canonical.sysdef.file}"/>
     </target>
-	
+    
 
-	<import file="../ido/build.xml"/>
+    <import file="../ido/build.xml"/>
     <import file="build.sbsinput.ant.xml" />
 
     <!-- We should defer the failure for raptor. -->

@@ -139,7 +139,7 @@ class Parser(object):
         """ Method to override to catch the end stage event. """
         pass
     
-    def task(self, name, cmdline, dir, output):
+    def task(self, name, cmdline, dir_, output):
         """ Method to override to catch the task event. """
         pass
     

@@ -17,8 +17,9 @@
  
 package com.nokia.helium.internaldata.ant.taskdefs;
 
-import org.apache.tools.ant.Task;
 import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.Task;
+
 import com.nokia.helium.internaldata.ant.listener.Listener;
 
 
@@ -42,10 +43,12 @@ public class HlmAssertMessageTask extends Task {
      */
     public void execute() {
         
-        if (assertName == null)
+        if (assertName == null) {
             throw new BuildException("'assertName' attribute is not defined");
-        if (message == null)
+        }
+        if (message == null) {
             throw new BuildException("'message' attribute is not defined");
+        }
         
         for (int i = 0 ; i < getProject().getBuildListeners().size() ; i++) {
             if (getProject().getBuildListeners().get(i) instanceof Listener) {

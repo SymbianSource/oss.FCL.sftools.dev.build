@@ -24,7 +24,7 @@ require Exporter;
 
 
 sub E32tpver () {
-	my $Version=679; 
+	my $Version=680; 
 }
 
 1;

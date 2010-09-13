@@ -29,8 +29,8 @@ import org.dom4j.io.SAXReader;
 import com.nokia.helium.antlint.ant.AntlintException;
 
 /**
- * <code>CheckAntCall</code> is used to check whether antcall is used with no
- * param elements and calls the target with no dependencies
+ * <code>CheckAntCall</code> is used to check whether antcall is used with no param elements and
+ * calls the target with no dependencies
  * 
  * <pre>
  * Usage:
@@ -63,8 +63,7 @@ public class CheckAntCall extends AbstractCheck {
     /**
      * Check against the given node.
      * 
-     * @param node
-     *            is the node to check.
+     * @param node is the node to check.
      */
     @SuppressWarnings("unchecked")
     private void checkAntCalls(Element node) {
@@ -72,18 +71,11 @@ public class CheckAntCall extends AbstractCheck {
             List<Element> antcallList = node.elements("antcall");
             for (Element antcallElement : antcallList) {
                 String antcallName = antcallElement.attributeValue("target");
-                if (((node.elements("param") == null) || (node
-                        .elements("param") != null && node.elements("param")
-                        .isEmpty()))
-                        && !checkTargetDependency(antcallName)) {
-                    this
-                            .getReporter()
-                            .report(
-                                    this.getSeverity(),
-                                    "<antcall> is used with no param elements and calls the target "
-                                            + antcallName
-                                            + " that has no dependencies! (<runtarget> could be used instead.)",
-                                    this.getAntFile(), 0);
+                if (((node.elements("param") == null) || (node.elements("param") != null && node.elements("param").isEmpty()))
+                    && !checkTargetDependency(antcallName)) {
+                    this.getReporter().report(this.getSeverity(), "<antcall> is used with no param elements and calls the target "
+                        + antcallName
+                        + " that has no dependencies! (<runtarget> could be used instead.)", this.getAntFile(), 0);
                 }
             }
         }
@@ -104,7 +96,8 @@ public class CheckAntCall extends AbstractCheck {
         try {
             doc = saxReader.read(antFilename);
             elementTreeWalk(doc.getRootElement(), "target", targetNodes);
-        } catch (DocumentException e) {
+        }
+        catch (DocumentException e) {
             throw new AntlintException("Invalid XML file " + e.getMessage());
         }
 
@@ -125,16 +118,14 @@ public class CheckAntCall extends AbstractCheck {
     /**
      * Check the availability dependent targets of the given target.
      * 
-     * @param targetName
-     *            is the target for which dependent targets to be loked up.
+     * @param targetName is the target for which dependent targets to be loked up.
      * @return true, if the dependant targets are available; otherwise false
      */
     private boolean checkTargetDependency(String targetName) {
         boolean dependencyCheck = false;
-        Target targetDependency = (Target) getProject().getTargets().get(
-                targetName);
+        Target targetDependency = (Target) getProject().getTargets().get(targetName);
         dependencyCheck = targetDependency != null
-                && targetDependency.getDependencies().hasMoreElements();
+            && targetDependency.getDependencies().hasMoreElements();
         return dependencyCheck;
     }
 

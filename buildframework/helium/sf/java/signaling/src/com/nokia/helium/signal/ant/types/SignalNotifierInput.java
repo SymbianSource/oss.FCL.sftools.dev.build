@@ -21,9 +21,8 @@ package com.nokia.helium.signal.ant.types;
 
 import java.util.Vector;
 
-import org.apache.tools.ant.types.DataType;
-
 import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.types.DataType;
 
 
 /**

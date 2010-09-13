@@ -28,11 +28,12 @@ Description:
     
     <target name="pt">
         <pathconvert pathsep=":" property="python.path">
-            <fileset dir="${python.builder.dir}/lib" includes="**/*.egg" excludes="jython*"/>
-            <fileset dir="${lib.dir}" includes="**/*.egg"/>
-            <dirset dir="${lib.dir}"/>
-            <fileset dir="${module.bin.dir}" includes="**/${ant.project.name}*.egg"/>
-            <dirset dir="${basedir}/lib"/>
+            <fileset dir="${python.builder.dir}/lib" includes="*.egg" excludes="jython*"/>
+            <fileset dir="${lib.dir}" includes="zipsafe/*.egg" />
+            <dirset dir="${lib.dir}" includes="zipnotsafe/*.egg" />
+            <dirset dir="${lib.dir}/zipsafe" />
+            <!--<fileset dir="${module.bin.dir}" includes="${ant.project.name}*.egg"/>-->
+            <dirset dir="${basedir}" includes="lib"/>
         </pathconvert>
         <pathconvert pathsep=" " property="python.modules.coverage">
             <fileset dir="${basedir}" includes="**/*.py"/>
@@ -55,9 +56,10 @@ Description:
 import sys
 import os
 import shutil
+
 for p in project.getProperty('python.path').split(':'):
-    if 'amara' not in p:
-        sys.path.append(p)
+    sys.path.append(p)
+    
 os.chdir(project.getProperty('lib.dir'))
 if os.path.exists('build'):
     shutil.rmtree('build')
@@ -68,9 +70,11 @@ testdir = os.path.join(project.getProperty('basedir'), 'lib', project.getPropert
 
 result = True
 if ' ' in args:
-    result = nose.run(argv=['-v', testdir + 'tests'])
+    argv = ['-v', testdir + 'tests']
+    result = nose.run(argv=argv)
 elif 'cpython' not in args:
-    result = nose.run(argv=['-v', args2])
+    argv = ['-v', args2]
+    result = nose.run(argv=argv)
 print >> sys.stderr
 if not result:
     raise Exception('Jython unittest failure.')

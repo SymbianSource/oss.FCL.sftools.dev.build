@@ -17,8 +17,8 @@
 package com.nokia.helium.core.ant.listener;
 
 import java.io.DataOutputStream;
-import java.io.FileOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -92,8 +92,9 @@ public class TargetTimesLogGeneratorListener implements BuildListener {
                             targetTimesLogCsv, true);
                     timesLogOut = new DataOutputStream(timesLogFileStream);
                     // Display (sorted) hashtable.
-                    for (String targetTime : targetTimesTable)
+                    for (String targetTime : targetTimesTable) {
                         timesLogOut.writeBytes(targetTime + "\n");
+                    }
                     timesLogOut.close();
                 }
             } catch (java.io.FileNotFoundException ex) {

@@ -25,7 +25,7 @@ import ccm
 import os
 import logging
 
-# pylint: disable-msg=R0201
+# pylint: disable=R0201
 
 _logger = logging.getLogger('test.ccm_results')
 logging.basicConfig(level=logging.INFO)
@@ -49,8 +49,10 @@ class CounterHandler(logging.Handler):
 
 class MockResultSession(ccm.AbstractSession):
     """ Fake session used to test Result"""
-    def __init__(self, behave = {}, database="fakedb"):
+    def __init__(self, behave=None, database="fakedb"):
         ccm.AbstractSession.__init__(self, None, None, None, None)
+        if behave == None:
+            behave = {}
         self._behave = behave
         self._database = database
     
@@ -324,7 +326,7 @@ tr1test1#5226   Explicitly specified but not included
         session = MockResultSession(behave)
         result = session.execute('test_update', ccm.ConflictsResult(session))
         #_logger.debug(result.output)
-        # pylint: disable-msg=E1103
+        # pylint: disable=E1103
         assert len(result.output.keys()) == 7, "Should detect 7 projects."
         subproj = session.create("Cartman_sub_sub_sub02-Release_v4:project:%s#1" % session.database())
         assert len(result.output[subproj]) == 2, "%s should contain 2 conflicts" % subproj.objectname
@@ -393,11 +395,11 @@ Update Summary
 Serious: 
 Update failed.
 """
-        _logger = logging.getLogger('count.logger')
-        _logger.setLevel(logging.WARNING)
+        count_logger = logging.getLogger('count.logger')
+        count_logger.setLevel(logging.WARNING)
         handler = CounterHandler()
-        _logger.addHandler(handler)
-        ccm.log_result(log, ccm.UPDATE_LOG_RULES, _logger)
+        count_logger.addHandler(handler)
+        ccm.log_result(log, ccm.UPDATE_LOG_RULES, count_logger)
         print handler.warnings
         print handler.errors
         assert handler.warnings == 5
@@ -415,11 +417,11 @@ Warning: Object version 'fa1ssdo#MobileSearch_4_10_09w09_S60_3_3' too long, use 
 Copy Project complete with 1 errors.
 WARNING: There is no matching baseline project for 'ci-hitchcock_nga' in baseline 'tr1s60#ABS_domain_mcl92-abs.mcl.92_200907'.  This baseline might not be complete
 """
-        _logger = logging.getLogger('count.logger')
-        _logger.setLevel(logging.WARNING)
+        count_logger = logging.getLogger('count.logger')
+        count_logger.setLevel(logging.WARNING)
         handler = CounterHandler()
-        _logger.addHandler(handler)
-        ccm.log_result(log, ccm.CHECKOUT_LOG_RULES, _logger)
+        count_logger.addHandler(handler)
+        ccm.log_result(log, ccm.CHECKOUT_LOG_RULES, count_logger)
         print handler.warnings
         print handler.errors
         assert handler.warnings == 4
@@ -438,11 +440,11 @@ WARNING: There is no matching baseline project for 'ci-hitchcock_nga' in baselin
 You can use Reconcile to resolve work area conflicts
 Warning: Conflicts detected during synchronization. Check your logs.
 """
-        _logger = logging.getLogger('count.logger')
-        _logger.setLevel(logging.WARNING)
+        count_logger = logging.getLogger('count.logger')
+        count_logger.setLevel(logging.WARNING)
         handler = CounterHandler()
-        _logger.addHandler(handler)
-        ccm.log_result(log, ccm.SYNC_LOG_RULES, _logger)
+        count_logger.addHandler(handler)
+        ccm.log_result(log, ccm.SYNC_LOG_RULES, count_logger)
         print handler.warnings
         print handler.errors
         assert handler.warnings == 0

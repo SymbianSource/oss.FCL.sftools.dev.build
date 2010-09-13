@@ -1,0 +1,85 @@
+<!-- 
+============================================================================ 
+Name        : test_abld_input.ant.xml 
+Part of     : Helium
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test-abld-input" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>Helium metadata Abld input unittests.</description>
+
+    <dirname property="project.dir" file="${ant.file.test-abld-input}" />
+    <taskdef resource="com/nokia/helium/metadata/ant/antlib.xml" uri="http://www.nokia.com/helium" />
+    <taskdef name="fmpp" classname="fmpp.tools.AntTask" onerror="report"/>
+    
+    <target name="setUp">
+        <echo>---=====================================---</echo>
+        <mkdir dir="${test.temp.dir}" />
+        <delete dir="${test.temp.dir}" />
+        <mkdir dir="${test.temp.dir}" />
+    </target>
+    
+    <target name="tearDown">
+        <delete dir="${test.temp.dir}" />
+        <echo>---=====================================---</echo>
+    </target>
+
+    <hlm:metadatafilterset id="abld.regex">
+        <metadatafilter severity="WARNING" regex=".*warning U4010" description="mingw error" />
+        <metadatafilterset filterfile="${project.dir}/../data/common.csv" />
+    </hlm:metadatafilterset>
+
+
+    <target name="test-abld-log-parsing">
+        <echo message="test-abld-log-parsing" />
+
+        <hlm:metadatarecord database="${test.temp.dir}/metadata_db">
+            <hlm:abldmetadatainput>
+                <fileset dir="${project.dir}/../data/abld">
+                    <include  name="sample_abld.log"/>
+                </fileset>
+                <metadatafilterset refid="abld.regex" />
+            </hlm:abldmetadatainput>
+        </hlm:metadatarecord>
+        <au:assertTrue>
+            <available type="dir" file="${test.temp.dir}/metadata_db" />
+        </au:assertTrue>
+        
+        <fmpp sourceFile="${project.dir}/../data/abld/parsing_result.ini.ftl"
+                     outputfile="${test.temp.dir}/result.ini">
+            <data expandProperties="yes">
+                dbPath: ${test.temp.dir}/metadata_db
+                ant: antProperties()
+            </data>
+        </fmpp>
+        <property file="${test.temp.dir}/result.ini" />
+        <echo>number.of.logs: ${number.of.logs}</echo>
+        <echo>number.of.execution.times: ${number.of.execution.times}</echo>
+        <echo>number.of.components: ${number.of.components}</echo>
+        <au:assertTrue message="Invalid number of logs">
+            <equals arg1="${number.of.logs}" arg2="1" />
+        </au:assertTrue>
+        <au:assertTrue message="Invalid number of execution time">
+            <equals arg1="${number.of.execution.times}" arg2="0" />
+        </au:assertTrue>
+        <au:assertTrue message="Invalid number of components">
+            <equals arg1="${number.of.components}" arg2="3" />
+        </au:assertTrue>
+    </target>
+
+
+</project>

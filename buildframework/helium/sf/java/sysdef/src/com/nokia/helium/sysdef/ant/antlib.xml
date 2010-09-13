@@ -22,13 +22,14 @@ Description:
 -->
 <antlib>
     <!-- Task definition -->
-    <taskdef name="joinSysdef" classname="com.nokia.helium.sysdef.ant.taskdefs.JoinTask"/>
-    <taskdef name="mergeSysdef" classname="com.nokia.helium.sysdef.ant.taskdefs.MergeTask"/>
-    <taskdef name="downgradeSysdef" classname="com.nokia.helium.sysdef.ant.taskdefs.DowngradeTask"/>
-    <taskdef name="createPackageMapping" classname="com.nokia.helium.sysdef.ant.taskdefs.CreatePackageMappingTask"/>
-    <taskdef name="createRootSysdef" classname="com.nokia.helium.sysdef.ant.taskdefs.CreateRootSysdefTask"/>
-    <taskdef name="filterSysdef" classname="com.nokia.helium.sysdef.ant.taskdefs.FilterTask"/>
+    <taskdef name="joinSysdef" classname="com.nokia.helium.sysdef.ant.taskdefs.JoinTask" />
+    <taskdef name="mergeSysdef" classname="com.nokia.helium.sysdef.ant.taskdefs.MergeTask" />
+    <taskdef name="downgradeSysdef" classname="com.nokia.helium.sysdef.ant.taskdefs.DowngradeTask" />
+    <taskdef name="createPackageMapping" classname="com.nokia.helium.sysdef.ant.taskdefs.CreatePackageMappingTask" />
+    <taskdef name="createRootSysdef" classname="com.nokia.helium.sysdef.ant.taskdefs.CreateRootSysdefTask" />
+    <taskdef name="filterSysdef" classname="com.nokia.helium.sysdef.ant.taskdefs.FilterTask" />
     
     <!-- Type definition -->
-    <typedef name="sysdefFilterSet" classname="com.nokia.helium.sysdef.ant.types.FilterSet"/>
+    <typedef name="sysdefFilterSet" classname="com.nokia.helium.sysdef.ant.types.FilterSet" />
+    <typedef name="isVendorPackage" classname="com.nokia.helium.sysdef.ant.conditions.IsVendorPackage" />
 </antlib>

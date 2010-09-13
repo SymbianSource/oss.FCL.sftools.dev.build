@@ -46,8 +46,8 @@ def run():
 		]
 	t.addbuildtargets('smoke_suite/test_resources/simple_gui/Bld.inf', [
 		"helloworld_exe/helloworld.mbm_bmconvcommands",
-		"helloworld_exe/helloworld_HelloWorld_sc.rpp",
-		"helloworld_exe/helloworld_HelloWorld_sc.rpp.d",
+		"helloworld_exe/helloworld_HelloWorld.rsc.rpp",
+		"helloworld_exe/helloworld_HelloWorld.rsc.d",
 		"helloworld_exe/armv5/udeb/HelloWorld_Application.o",
 		"helloworld_exe/armv5/udeb/HelloWorld_Application.o.d",
 		"helloworld_exe/armv5/udeb/HelloWorld_AppUi.o",
@@ -108,7 +108,7 @@ def run():
 		"helloworld_exe/winscw/urel/helloworld_UID_.dep",
 		"helloworld_exe/winscw/urel/helloworld_UID_.o",
 		"helloworld_exe/winscw/urel/helloworld_UID_.o.d",
-		"helloworld_reg_exe/helloworld_reg_HelloWorld_reg_sc.rpp.d"
+		"helloworld_reg_exe/helloworld_reg_HelloWorld_reg.rsc.d"
 	])
 	t.stdout = [
 		"<whatlog bldinf='"+componentpath+"/Bld.inf' mmp='"+componentpath+"/HelloWorld.mmp' config='armv5_udeb.whatlog'>",

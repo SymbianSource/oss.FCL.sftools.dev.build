@@ -29,8 +29,8 @@ information on the files used to create the drop file.
         {% if test_plan['diamonds_build_url'] -%}
         <meta name="diamonds-buildid">{{ test_plan['diamonds_build_url'] }}</meta> 
         <meta name="diamonds-testtype">Smoke</meta>
-        {% endif %}
-        <meta name="name">{{ test_plan['testrun_name'] }}</meta> 
+        {%- endif %}
+        <meta name="name">{{ test_plan['testrun_name'] }}</meta>
     </metadata>
     
     <agents>
@@ -47,7 +47,7 @@ information on the files used to create the drop file.
             <meta name="component_path">{{ setd['component_path'] }}</meta>
         </metadata>
         <initialization>
-            {% include 'prestep_custom.xml' ignore missing %}
+            {{ atsself.get_template(setd['custom_dir'], 'prestep_custom.xml') }}
         
             {% if setd.image_files -%}
             <task>
@@ -57,23 +57,33 @@ information on the files used to create the drop file.
                 {% for img in atsself.get_sorted_images(setd) -%}
                     {% if img.startswith('\\\\') -%}
                     <parameter name="image-{{ i }}" value="{{ img }}" />
-                    {% else %}
+                    {% else -%}
                     <parameter name="image-{{ i }}" value="ATS3Drop\images\{{ os.path.basename(img) }}" />
-                    {% endif %}
+                    {%- endif %}
                     {% set i = i + 1 %}
-                {% endfor -%}
+                {%- endfor %}
                 </parameters>
             </task>
-            {% endif %}
+            {%- endif %}
+            {% set udaerase = atsself.get_udaerase_image(setd) %}
+            {% if udaerase -%}
+            <task>
+                <type>FlashTask</type>
+                <parameters>
+                    <parameter name="image-{{ i }}" value="ATS3Drop\images\{{ os.path.basename(udaerase) }}" />
+                    <parameter name="force" value="true"/>
+                </parameters>
+            </task>
+            {%- endif %}
             
             {% if setd["ctc_enabled"] == "True" -%}
             {{ macros.ctc_initialization() }}
-            {% endif %}
+            {%- endif %}
             
             <task>
                 <type>CreateDirTask</type>
-                <parameters>                
-                    <parameter value="{{ atsself.getlogdir(setd) }}" name="dir"/>
+                <parameters>
+                    <parameter value="{{ atsself.getlogdir(test_plan, setd) }}" name="dir"/>
                 </parameters>
             </task>
                       
@@ -84,50 +94,60 @@ information on the files used to create the drop file.
                 <parameters>
                     <parameter name="src" value="ATS3Drop\{{ setd.name }}\sis\{{ os.path.basename(sis_file) }}"/>
                     <parameter name="dst" value="c:\testframework\{{ os.path.basename(sis_file) }}"/>
+                    <parameter name="reboot-retry-count" value="1"/>
+                    <parameter name="retry-count" value="1"/>
                 </parameters>
             </task>
-              {% endfor -%}
-          {% else %}
+              {%- endfor %}
+          {% else -%}
               {% if setd['src_dst'] != [] -%}
-                {% for file in setd['src_dst'] -%}            
+                {% for file in setd['src_dst'] -%}
             <task>
                 <type>FileUploadTask</type>
                 <parameters>
                     <parameter value="ATS3Drop\{{ setd.name }}\{{ file[1].replace(":", "") }}" name="src"/>
                     <parameter value="{{ file[1] }}" name="dst"/>
+                    <parameter name="reboot-retry-count" value="1"/>
+                    <parameter name="retry-count" value="1"/>
                 </parameters>
             </task>
-                {% endfor -%}
-              {% else %}
+                {%- endfor %}
+              {% else -%}
                   {% for data_file in setd["data_files"] -%}
             <task>
                 <type>FileUploadTask</type>
                 <parameters>
                     <parameter name="src" value="ATS3Drop\{{ setd.name }}\data\{{ os.path.basename(data_file) }}"/>
                     <parameter name="dst" value="e:\testing\data\{{ os.path.basename(data_file) }}"/>
+                    <parameter name="reboot-retry-count" value="1"/>
+                    <parameter name="retry-count" value="1"/>
                 </parameters>
             </task>
-                  {% endfor -%}
+                  {%- endfor %}
                   {% for data_file in setd["config_files"] -%}
             <task>
                 <type>FileUploadTask</type>
                 <parameters>
                     <parameter name="src" value="ATS3Drop\{{ setd.name }}\conf\{{ os.path.basename(data_file) }}"/>
                     <parameter name="dst" value="e:\testing\conf\{{ os.path.basename(data_file) }}"/>
+                    <parameter name="reboot-retry-count" value="1"/>
+                    <parameter name="retry-count" value="1"/>
                 </parameters>
             </task>
-                  {% endfor -%}
+                  {%- endfor %}
                   {% for data_file in setd["testmodule_files"] -%}
             <task>
                 <type>FileUploadTask</type>
                 <parameters>
                     <parameter name="src" value="ATS3Drop\{{ setd.name }}\testmodules\{{ os.path.basename(data_file) }}"/>
                     <parameter name="dst" value="c:\sys\bin\{{ os.path.basename(data_file) }}"/>
+                    <parameter name="reboot-retry-count" value="1"/>
+                    <parameter name="retry-count" value="1"/>
                 </parameters>
             </task>
-                  {% endfor -%}
-              {% endif %}
-          {% endif %}
+                  {%- endfor %}
+              {%- endif %}
+          {%- endif %}
           
           {% if setd.engine_ini_file -%}
               {% if (setd.has_key("sis_files") and setd["sis_files"]) or setd["src_dst"] == [] -%}
@@ -136,10 +156,12 @@ information on the files used to create the drop file.
                 <parameters>
                     <parameter name="src" value="ATS3Drop\{{ setd.name }}\init\{{ os.path.basename(setd["engine_ini_file"]) }}"/>
                     <parameter name="dst" value="c:\testframework\{{ os.path.basename(setd["engine_ini_file"]) }}"/>
+                    <parameter name="reboot-retry-count" value="1"/>
+                    <parameter name="retry-count" value="1"/>
                 </parameters>
             </task>
-              {% endif %}
-          {% endif %}
+              {%- endif %}
+          {%- endif %}
           
           {% for sis_file in setd["sis_files"] -%}
             <task>
@@ -152,14 +174,11 @@ information on the files used to create the drop file.
                     <parameter name="software-package" value="c:\testframework\{{ os.path.basename(sis_file) }}"/>
                </parameters>
             </task>
-          {% endfor -%}
+          {%- endfor %}
         </initialization>    
-        
-        {% include 'prerun_custom.xml' ignore missing %}
-
+        {{ atsself.get_template(setd['custom_dir'], 'prerun_custom.xml') }}
         {% if setd['src_dst'] -%}
             {{ macros.generate_runsteps_stif(setd) }}
-            
             {% for file in setd['src_dst'] -%}
                 {% if setd["test_harness"] == "GENERIC" -%}
                     {% if 'testscript' in file[2] -%}
@@ -167,25 +186,28 @@ information on the files used to create the drop file.
         <task>
             <type>MTFTask</type>
             <parameters>
-                <parameter name="file" value="testframework.exe"/>
+                <parameter name="file" value="{{ file[2].split(':')[2] }}"/>
                 <parameter name="parameters" value="{{ file[1] }}"/>
                 <parameter name="timeout" value="{{ test_plan["test_timeout"] }}"/>
-                <parameter name="result-file" value="{{ atsself.MTF_LOG_DIR }}\{{ os.path.basename(file[1]).replace('.script', '.htm') }}"/>
+                <parameter name="result-file" value="{{ atsself.MTF_LOG_DIR }}\{{ atspath.basename(file[1]).replace('.script', '.htm') }}"/>
+                <parameter name="result-download-retry-count" value="1" />
+                <parameter name="result-download-reboot-retry-count" value="1" />
             </parameters>
         </task>
-                        {% else %}
+                        {% else -%}
         <task>
             <type>TEFTask</type>
             <parameters>
-                <parameter name="file" value="testexecute.exe"/>
+                <parameter name="file" value="{{ file[2].split(':')[1] }}"/>
                 <parameter name="parameters" value="{{ file[1] }}"/>
                 <parameter name="timeout" value="{{ test_plan["test_timeout"] }}"/>
-                <parameter name="result-file" value="{{ atsself.TEF_LOG_DIR }}\{{ os.path.basename(file[1]).replace('.script', '.htm') }}"/>
+                <parameter name="result-file" value="{{ atsself.TEF_LOG_DIR }}\{{ atspath.basename(file[1]).replace('.script', '.htm') }}"/>
+                <parameter name="result-download-retry-count" value="1" />
+                <parameter name="result-download-reboot-retry-count" value="1" />
             </parameters>
         </task>
-                        {% endif %}
-                    {% endif %}
-                    
+                        {%- endif %}
+                    {%- endif %}
                     {% if file[2] == 'testmodule:rtest' -%}
         <task>
             <type>ExecutableTestCaseTask</type>
@@ -194,11 +216,26 @@ information on the files used to create the drop file.
                 <parameter name="parser" value="RTestResultParser" />
                 <parameter name="timeout" value="{{ test_plan["test_timeout"] }}"/>
                 <parameter name="parameters" value="" />
-                <parameter name="result-file" value="{{ atsself.TEF_LOG_DIR }}\{{ os.path.basename(file[1]).replace('.exe', '.htm') }}"/>
+                <parameter name="result-file" value="{{ atsself.TEF_LOG_DIR }}\{{ atspath.basename(file[1]).replace('.exe', '.htm') }}"/>
+                <parameter name="result-download-retry-count" value="1" />
+                <parameter name="result-download-reboot-retry-count" value="1" />
             </parameters>
         </task>
-                    {% endif %}
-                {% endif %}
+                    {%- endif %}
+                    {% if file[2] == "testmodule:sut" -%}
+        <task>
+            <type>SymbianUnitTestTask</type>
+            <parameters>
+                <parameter value="z:\sys\bin\symbianunittest.exe" name="file"/>
+                <parameter value="-tests={{ file[1] }} -noprompt" name="parameters"/>
+                <parameter value="{{ atsself.SUT_LOG_DIR }}\SymbianUnitTestResults.html" name="result-file"/>
+                <parameter name="timeout" value="{{ test_plan["test_timeout"] }}"/>
+                <parameter name="result-download-retry-count" value="1" />
+                <parameter name="result-download-reboot-retry-count" value="1" />
+            </parameters>
+        </task>
+                    {%- endif %}
+                {%- endif %}
                 {% if setd["test_harness"] == "EUNIT" -%}
                     {% if file[2] == "testmodule" -%}
         <task>
@@ -208,77 +245,91 @@ information on the files used to create the drop file.
                 <parameter name="result-file" value="{{ atsself.EUNIT_LOG_DIR }}\{{ atspath.basename(file[1]).replace('.' + file[1].rsplit(".")[1], '_log.xml') }}"/>
                 <parameter name="parameters" value="{{ test_plan["eunitexerunner_flags"] }} /F {{ atspath.basename(file[1]).replace('.dll', '').replace('.exe', '') }} /l xml {{ atspath.basename(file[1]) }}"/>
                 <parameter name="timeout" value="{{ test_plan["test_timeout"] }}"/>
+                <parameter name="result-download-retry-count" value="1" />
+                <parameter name="result-download-reboot-retry-count" value="1" />
             </parameters>
         </task>
-                    {% endif %}
+                    {%- endif %}
                     {% if file[2] == "testmodule:qt" -%}
         <task>
             <type>QTestTask</type>
             <parameters>
-                <parameter name="file" value="{{ file[1] }}"/>                      
-                <parameter name="parameters" value="-lightxml -o {{ atsself.QT_LOG_DIR }}\{{ os.path.basename(file[1]).replace('.' + file[1].rsplit(".")[1], '_log.xml') }}"/>
-                <parameter name="result-file" value="{{ atsself.QT_LOG_DIR }}\{{ os.path.basename(file[1]).replace('.' + file[1].rsplit(".")[1], '_log.xml') }}"/>
+                <parameter name="file" value="{{ file[1] }}"/>
+                <parameter name="parameters" value="-lightxml -o {{ atsself.QT_LOG_DIR }}\{{ atspath.basename(file[1]).replace('.' + file[1].rsplit(".")[1], '_log.xml') }}"/>
+                <parameter name="result-file" value="{{ atsself.QT_LOG_DIR }}\{{ atspath.basename(file[1]).replace('.' + file[1].rsplit(".")[1], '_log.xml') }}"/>
                 <parameter name="timeout" value="{{ test_plan["test_timeout"] }}"/>
+                <parameter name="result-download-retry-count" value="1" />
+                <parameter name="result-download-reboot-retry-count" value="1" />
             </parameters>
         </task>
-                    {% endif %}
-                {% endif %}
-            {% endfor -%}
-        {% else %}
+                    {%- endif %}
+                {%- endif %}
+            {%- endfor %}
+        {% else -%}
             {{ macros.generate_runsteps_stif_single_set(setd) }}
-        {% endif %}
-        
-        {% include 'postrun_custom.xml' ignore missing %}
+        {%- endif %}
+        {{ atsself.get_template(setd['custom_dir'], 'postrun_custom.xml') }}
         
         <finalization>
         {% if setd["ctc_enabled"] == "True" -%}
         {{ macros.ctc_finalization(setd) }}
-        {% endif %}
+        {%- endif %}
 
             <task>
                 <type>FileDownloadTask</type>
                 <parameters>
-                    <parameter value="{{ atsself.getlogdir(setd) }}\*" name="src"/>
+                    <parameter value="{{ atsself.getlogdir(test_plan, setd) }}\*" name="src"/>
                     <parameter name="recursive" value="true"/>
+                    <parameter name="reboot-retry-count" value="1"/>
+                    <parameter name="retry-count" value="1"/>
                 </parameters>
             </task>
-        {% include 'poststep_custom.xml' ignore missing %}
+        {{ atsself.get_template(setd['custom_dir'], 'poststep_custom.xml') }}
         </finalization>
         
     </execution>    
-    {% endfor -%}
+    {%- endfor %}
     
     {% include 'postset_custom.xml' ignore missing %}
     
     <postActions>
         {% include 'prepostaction.xml' ignore missing %}
         {% for action_type, parameters in test_plan.post_actions -%}
-            {% if action_type == 'RunProcessAction' %}
+            {% if action_type == 'RunProcessAction' -%}
         <action>
             <type>{{ action_type }}</type>
             <parameters>
                 {% for name, value in parameters -%}
                 <parameter name="{{ name }}" value="{{ value }}"/>
-                {% endfor -%}
+                {%- endfor %}
             </parameters>
         </action>
-            {% endif %}
-        {% endfor -%}
+            {%- endif %}
+        {%- endfor %}
         {% if test_plan['report_email'] -%}
         <action>
             <type>EmailAction</type>
             <parameters>
-                <parameter value="Release testing" name="subject"/>
+                <parameter value="ATS test results {{ test_plan['testrun_name'] }}" name="subject"/>
                 <parameter value="{{ test_plan['report_email'] }}" name="to"/>
                 <parameter value="simplelogger" name="format"/>
+                {% if test_plan['report_type'].lower() == 'no_attachment' -%}
+                <parameter value="false" name="attach-report"/>
+                {%- endif %}
             </parameters>
         </action>
-        {% endif %}
+        {%- endif %}
         {% if test_plan['diamonds_build_url'] -%}
         <action>
             <type>DiamondsAction</type>
+            {% if test_plan.sets != [] and test_plan.sets[0]["ctc_enabled"] == "True" -%}
+            <parameters>
+                <parameter value="true" name="send-ctc-data" /> 
+            </parameters>
+            {%- endif %}
         </action>
-        {% endif %}
+        {%- endif %}
+        
         {% include 'postpostaction.xml' ignore missing %}
     </postActions>
     

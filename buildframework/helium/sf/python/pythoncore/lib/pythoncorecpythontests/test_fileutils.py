@@ -152,11 +152,11 @@ _test_file_content = {
     }
     
 # Used by test_archive.
-_root_test_dir = "build/_test_" + str(time.strftime("%H.%M.%S"))
+root_test_dir = "build/_test_" + str(time.strftime("%H.%M.%S"))
 
 def _testpath(subpath):
     """ Normalised path for test paths. """
-    return os.path.normpath(os.path.join(_root_test_dir, subpath))
+    return os.path.normpath(os.path.join(root_test_dir, subpath))
     
 def setup_module():
     """ Setup files test config. 
@@ -167,7 +167,7 @@ def setup_module():
     #print 'setup_module()'
     #print _test_file_content.keys()
     for child_path in _test_file_paths:
-        path = os.path.join(_root_test_dir, child_path)
+        path = os.path.join(root_test_dir, child_path)
         path_dir = path
         path_dir = os.path.dirname(path)
         
@@ -185,8 +185,8 @@ def setup_module():
 
 def teardown_module():
     """ Teardown test config. """
-    if os.path.exists(_root_test_dir):
-        fileutils.rmtree(_root_test_dir)
+    if os.path.exists(root_test_dir):
+        fileutils.rmtree(root_test_dir)
     
 
 class FileScannerTest(unittest.TestCase):
@@ -386,7 +386,6 @@ class FileScannerTest(unittest.TestCase):
         print testpaths
         assert result == testpaths
 
-
     def test_emptydir(self):
         """Empty dir."""
         scanner = fileutils.FileScanner(_testpath(''))
@@ -452,7 +451,6 @@ class FileScannerTest(unittest.TestCase):
         print testpaths
         assert result == testpaths
         
-        
     def test_distribution_policy_exclude(self):
         """ Distribution policy files can determine file selection - exclude. """
         scanner = fileutils.FileScanner(_testpath(''))
@@ -465,7 +463,6 @@ class FileScannerTest(unittest.TestCase):
         testpaths = []
         
         assert result == testpaths
-        
         
     def test_symbian_distribution_policy_cat_a(self):
         """test symbian distribution policy category A"""
@@ -507,7 +504,6 @@ class FileScannerTest(unittest.TestCase):
         
         assert result == testpaths
     
-        
     def test_find_subroots(self):
         """ Testing the find_subroots method. """
         scanner = fileutils.FileScanner(_testpath(''))
@@ -534,18 +530,17 @@ class FileScannerTest(unittest.TestCase):
         _logger.debug(result)
         assert result == [_testpath('')]
 
-
     def test_load_policy_content(self):
         """test load policy content"""
         try:
             fileutils.load_policy_content(_testpath('test_policies/1/Distribution.Policy.S60'))
             assert "Should fail while loading 'test_policies/1/Distribution.Policy.S60'."
-        except:
+        except IOError:
             pass
         
         try:
             fileutils.load_policy_content(_testpath('s60/Distribution.Policy.S60'))
-        except:
+        except IOError:
             assert "Should not fail while loading 's60/Distribution.Policy.S60'."
 
 
@@ -555,7 +550,7 @@ class FileScannerTest(unittest.TestCase):
             try:
                 fileutils.read_policy_content(filename)
                 assert "Should fail while loading '%s'." % filename
-            except:
+            except IOError:
                 pass
         else:
             assert fileutils.read_policy_content(filename) == value
@@ -566,7 +561,7 @@ class FileScannerTest(unittest.TestCase):
             try:
                 fileutils.read_symbian_policy_content(filename)
                 assert "Should fail while loading '%s'." % filename
-            except:
+            except IOError:
                 pass
         else:
             assert fileutils.read_symbian_policy_content(filename) == value
@@ -601,7 +596,7 @@ class FileScannerTest(unittest.TestCase):
 
 class TestLongPath(unittest.TestCase):
     """ Unit test case for testing long path strings """
-    long_path = os.path.join(_root_test_dir, '01234567890123456789012345678901234567890123456789', 
+    long_path = os.path.join(root_test_dir, '01234567890123456789012345678901234567890123456789', 
                      '01234567890123456789012345678901234567890123456789', '01234567890123456789012345678901234567890123456789',
                      '01234567890123456789012345678901234567890123456789', '01234567890123456789012345678901234567890123456789')
     def setUp(self):
@@ -623,7 +618,7 @@ class TestLongPath(unittest.TestCase):
     def mkdir(self, path):
         """create a folder"""
         if 'java' in sys.platform:
-            import java.io
+            import java.io # pylint: disable=F0401
             f_file = java.io.File(path)
             if not f_file.exists():
                 os.mkdir(path)
@@ -632,23 +627,23 @@ class TestLongPath(unittest.TestCase):
                 try:
                     import win32file
                     win32file.CreateDirectoryW('\\\\?\\' + path, None)
-                except:
+                except (ImportError, IOError, win32file.error):
                     pass
             else:
                 os.mkdir(path)
 
     def test_rmtree_long_path(self):
         """test remove tree with a long path name"""
-        fileutils.rmtree(_root_test_dir)
+        fileutils.rmtree(root_test_dir)
         assert not os.path.exists(self.long_path)
-        assert not os.path.exists(_root_test_dir)
+        assert not os.path.exists(root_test_dir)
 
     def test_rmtree_long_path_unc_format(self):
         """test remove tree with long path name and UNC format"""
         if sys.platform == "win32":
-            fileutils.rmtree(u"\\\\?\\" + os.path.join(os.path.abspath('.'), _root_test_dir))
+            fileutils.rmtree(u"\\\\?\\" + os.path.join(os.path.abspath('.'), root_test_dir))
             assert not os.path.exists(self.long_path)
-            assert not os.path.exists(_root_test_dir)
+            assert not os.path.exists(root_test_dir)
         
 class DestInSrcTest(unittest.TestCase):
     """ Unit test case to test fileutils.destinsrc """

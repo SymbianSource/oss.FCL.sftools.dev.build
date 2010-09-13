@@ -32,6 +32,8 @@ SOURCEPATH		../src
 userinclude		.
 userinclude		../inc
 
+DOCUMENT file01.txt file02.txt
+
 OS_LAYER_SYSTEMINCLUDE_SYMBIAN
 
 #if defined (SYMBIAN_SSM_GRACEFUL_SHUTDOWN)

@@ -136,7 +136,7 @@
 		<set name="USER_STATIC_RUNTIME_LIB" value="usrt2_2.lib"/>
 		<set name="USER_STATIC_RUNTIME_LIB_NESTED_EXCEPTIONS" value="usrt_nx_2_2.lib"/>
 		<set name="KERNEL_STATIC_RUNTIME_LIB" value="ksrt2_2.lib"/>
-		<set name="NEED_ENTRYPOINT_LIBRARY" value="False"/>
+		<set name="NEED_ENTRYPOINT_LIBRARY" value=""/>
 		<set name="CC.NO_UNALIGNED_ACCESS" value="--memaccess -UL41"/>
 		<set name="CC.SOFTVFP_MAYBE_VFPV2" value="softvfp"/>
 		<set name="PL.SOFTVFP_MAYBE_VFPV2" value="softvfp"/>
@@ -164,7 +164,7 @@
 		<set name="USER_STATIC_RUNTIME_LIB" value="usrt3_1.lib"/>
 		<set name="USER_STATIC_RUNTIME_LIB_NESTED_EXCEPTIONS" value="usrt_nx_3_1.lib"/>
 		<set name="KERNEL_STATIC_RUNTIME_LIB" value="ksrt3_1.lib"/>
-		<set name="NEED_ENTRYPOINT_LIBRARY" value="True"/>
+		<set name="NEED_ENTRYPOINT_LIBRARY" value="1"/>
 		<set name="CC.NO_UNALIGNED_ACCESS" value="--no_unaligned_access"/>
 		<set name="CC.SOFTVFP_MAYBE_VFPV2" value="softvfp"/>
 		<set name="PL.SOFTVFP_MAYBE_VFPV2" value="softvfp"/>
@@ -194,7 +194,7 @@
 		<set name="USER_STATIC_RUNTIME_LIB" value="usrt4_0.lib"/>
 		<set name="USER_STATIC_RUNTIME_LIB_NESTED_EXCEPTIONS" value="usrt_nx_4_0.lib"/>
 		<set name="KERNEL_STATIC_RUNTIME_LIB" value="ksrt4_0.lib"/>
-		<set name="NEED_ENTRYPOINT_LIBRARY" value="True"/>
+		<set name="NEED_ENTRYPOINT_LIBRARY" value="1"/>
 		<set name="CC.NO_UNALIGNED_ACCESS" value="--no_unaligned_access"/>
 		<set name="CC.SOFTVFP_MAYBE_VFPV2" value="softvfp+vfpv2"/>
 		<set name="PL.SOFTVFP_MAYBE_VFPV2" value="vfpv2"/>
@@ -204,6 +204,18 @@
 		<set name="CC.ARMV5" value="--cpu 5TE"/>
 		<set name="CC.ARMV6" value="--cpu 6"/>
 		<set name="CC.ARMV7" value="--cpu 7-A"/>
+	</var>
+	
+	<var name="gccx86" extends="gccx86_base">
+		<env name="SBS_GCCX86BIN" type="toolchainpath" />
+		<set name="GCCX86BIN" value="$(SBS_GCCX86BIN)" />
+		<set name="GCCX86CC" value="$(GCCX86BIN)/g++$(DOTEXE)" type="tool" versionCommand="$(GCCX86CC) -dumpversion" versionResult="3\.4\.5"/>
+		<set name="RUNTIME_LIBS_LIST" value=""/>
+	</var>
+	
+	<!-- Support x86 gcc build into a toolchain-specific tree -->
+	<var name="release_x86gcc">
+		<set name="VARIANTPLATFORM" value="x86gcc" />
 	</var>
 
 	<var name="urel">
@@ -222,6 +234,10 @@
 
 	<var name="remove_freeze">
 		<set name='EFREEZE_REMOVE_OPTION' value='-Remove'/>
+	</var>
+	
+	<var name="slimdebug">
+		<append name='DEBUG_OPTIMISATION' value="$(DEBUGINFO_OPTIMISATION)"/>
 	</var>
 
 	<!-- OS variant mechanism is now deprecated. We retain the values for
@@ -265,4 +281,10 @@
 	<var name="release_gccev7" extends="release_gcce" >
 		<set name="VARIANTPLATFORM" value="gccev7" />
 	</var>
+
+	<!-- Variant to permit a workaround for an armlink 2.2 crash with very large targets -->
+	<var name="nodebug">
+		<set name="DEBUG_INFO" value=""/>
+	</var>
+
 </build>

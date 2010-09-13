@@ -17,16 +17,19 @@
 
 package com.nokia.helium.metadata.ant.taskdefs;
 
-import com.nokia.helium.metadata.CustomMetaDataProvider;
-import com.nokia.helium.metadata.MetaDataInput;
-import com.nokia.helium.jpa.entity.metadata.Metadata;
-import org.apache.tools.ant.BuildException;
-import org.apache.tools.ant.Task;
-import java.util.Vector;
-import java.util.Iterator;
-import org.apache.log4j.Logger;
-import com.nokia.helium.metadata.db.*;
+import java.io.File;
 import java.util.Date;
+import java.util.Vector;
+
+import javax.persistence.EntityManagerFactory;
+
+import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.Project;
+import org.apache.tools.ant.Task;
+
+import com.nokia.helium.metadata.FactoryManager;
+import com.nokia.helium.metadata.MetaDataInput;
+import com.nokia.helium.metadata.MetadataException;
 
 /**
  * This task provide a way to record the data in the Database.
@@ -55,33 +58,35 @@ import java.util.Date;
  */
 public class MetaDataRecordTask extends Task {
 
-    private static Logger log = Logger.getLogger(MetaDataRecordTask.class);
-
-    private String database;
+    private File database;
     
     private boolean failOnError = true;
     
-    private Vector<MetaDataInput> metadataList = new Vector<MetaDataInput>();
+    private Vector<MetaDataInput> metaDataInputs = new Vector<MetaDataInput>();
 
     /**
      * Helper function to set the database parameter
      * 
      * @ant.required
      */
-    public void setDatabase(String dbFile) {
-        database = dbFile;
+    public void setDatabase(File database) {
+        this.database = database;
     }
 
-    public void setFailOnError(String failNotify) {
-        if (failNotify.equals("false")) {
-            failOnError = false;
-        }
+    /**
+     * Defines if the task should fail on error.
+     * @param failOnError
+     * @ant.not-required Default is true.
+     */
+    public void setFailOnError(boolean failOnError) {
+        this.failOnError = failOnError;
     }
+    
     /**
      * Helper function to get the database
      * 
      */
-    public String getDatabase() {
+    public File getDatabase() {
         return database;
     }
 
@@ -90,11 +95,11 @@ public class MetaDataRecordTask extends Task {
      *  @return build metadata object
      * 
      */
-    public Vector<MetaDataInput> getMetaDataList() throws Exception {
-        if (metadataList.isEmpty()) {
-            throw new Exception("metadata list is empty");
+    public Vector<MetaDataInput> getMetaDataList() throws MetadataException {
+        if (metaDataInputs.isEmpty()) {
+            throw new MetadataException("metadata list is empty");
         }
-        return metadataList;
+        return metaDataInputs;
     }
 
     /**
@@ -102,76 +107,39 @@ public class MetaDataRecordTask extends Task {
      *  @param build metadata list to add
      * 
      */
-    public void add(MetaDataInput interf) {
-        metadataList.add(interf);
+    public void add(MetaDataInput metaDataInput) {
+        metaDataInputs.add(metaDataInput);
     }
 
-    
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void execute() {
-        ORMMetadataDB ormDB = null;
+        if (database == null) {
+            throw new BuildException("'database' attribute is not defined.");
+        }
+        EntityManagerFactory factory = null;
         try {
-            log.debug("Getting Contents to write to db: " + database);
-            log.debug("Initializing DB: " + database);
-            log.debug("initializing ORM db");
-            ormDB = new ORMMetadataDB(database);
-            log.debug("Parsing the input and writing to DB");
+            factory = FactoryManager.getFactoryManager().getEntityManagerFactory(database);
             Date before = new Date();
             log("Time before recording to db: " + before);
-            for (MetaDataInput metadataInput : metadataList) {
-                boolean removed = false;
-                String logPath = null;
-                String currentLogPath = null;
-                Iterator<Metadata.LogEntry> inputIterator = metadataInput.iterator();
-                while (inputIterator.hasNext()) {
-                    //Todo: better way of log handling, with metadatainput
-                    // metadata initialization for each logfile within 
-                    //metadatainput itself would be better. this is temporary.
-                    Metadata.LogEntry logEntry = inputIterator.next();
-                    logPath = logEntry.getLogPath();
-                    if (currentLogPath == null) {
-                        currentLogPath = logPath;
-                        removed = false;
-                    } else if (!currentLogPath.equals(logPath)) {
-                        finalizeForLogPath(currentLogPath, metadataInput, ormDB);
-                        currentLogPath = logPath;
-                        removed = false;
-                    }
-                    if (!removed ) {
-                        log.debug("processing for log: " + logPath);
-                        ormDB.removeEntries(logPath);
-                        removed = true;
-                    }
-                    //initializes the metadata if none exists
-                    ormDB.addLogEntry(logEntry);
-                }
-                finalizeForLogPath(currentLogPath, metadataInput, ormDB);
+            for (MetaDataInput metadataInput : metaDataInputs) {
+                metadataInput.extract(this, factory);
             }
             Date after = new Date();
             log("Time after recording to db: " + after);
             log("Elapsed time: " + (after.getTime() - before.getTime()) + " ms");
-            log.debug("Successfully writen to DB");
-        } catch (BuildException ex1) {
-            log.debug("BuildException during writing to db: ", ex1);
+        } catch (MetadataException ex) {
+            log(ex.getMessage(), Project.MSG_ERR);
             if (failOnError) {
-                throw ex1;
+                throw new BuildException(ex.getMessage(), ex);
             }
         } finally {
-            if (ormDB != null) {
-                ormDB.finalizeDB();
+            if (factory != null) {
+                factory.close();
             }
-        }
-    }
-    
-    private void finalizeForLogPath(String currentLogPath, 
-            MetaDataInput metadataInput, ORMMetadataDB ormDB) {
-        if (currentLogPath != null) {
-            if (metadataInput instanceof CustomMetaDataProvider) {
-                CustomMetaDataProvider provider = 
-                    (CustomMetaDataProvider)metadataInput;
-                provider.provide(ormDB, currentLogPath);
-            }
-            ormDB.finalizeMetadata(currentLogPath);
+            factory = null;
         }
     }
 }

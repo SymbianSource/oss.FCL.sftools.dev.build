@@ -567,11 +567,11 @@ class SystemDefinition(object):
         for (unit_name, binaries) in binaries_reader:
             unit_name = unit_name.lower()
             if self.units.has_key(unit_name):
-                for bin in binaries:
-                    #if bin.find('_stolon_ekern') != -1:
-                    _logger.debug("Merging: %s" % bin)
+                for bin_ in binaries:
+                    #if bin_.find('_stolon_ekern') != -1:
+                    _logger.debug("Merging: %s" % bin_)
                 unit = self.units[unit_name]
-                unit.binaries = [Binary(bin.lower(), self) for bin in binaries]
+                unit.binaries = [Binary(bin_.lower(), self) for bin_ in binaries]
                 for binary in unit.binaries:
                     self.addElement(binary)
                     _logger.info('Merging binary: %s' % str(binary))

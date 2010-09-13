@@ -50,8 +50,8 @@ $(ALLTARGET):: $(TARGETS)
 TARGET:: $(TARGETS)
 
 ## Pre-Include directories
-ifneq ($(INC.COMPILER),)
-PINCLUDE:=$(patsubst %,$(OPT.PREINCLUDE)%,$(INC.COMPILER))
+ifneq ($(PREINCLUDE),)
+PINCLUDE:=$(patsubst %,$(OPT.PREINCLUDE)%,$(PREINCLUDE))
 endif
 
 ## User and System Include directories

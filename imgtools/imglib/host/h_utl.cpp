@@ -177,7 +177,7 @@ const char *str=tmp.c_str();
 
 
 	TInt build=0;
-	memset(&aVersion, sizeof(TVersion), 0);	
+	memset(&aVersion, 0, sizeof(TVersion));	
 	TInt i;
 	TInt len=strlen(str);
 	for (i=0; i<len; i++)

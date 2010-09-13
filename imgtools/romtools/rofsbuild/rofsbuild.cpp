@@ -46,8 +46,8 @@
 #endif
 
 static const TInt RofsbuildMajorVersion=2;
-static const TInt RofsbuildMinorVersion=12;
-static const TInt RofsbuildPatchVersion=4;
+static const TInt RofsbuildMinorVersion=13;
+static const TInt RofsbuildPatchVersion=2;
 static TBool SizeSummary=EFalse;
 static TPrintType SizeWhere=EAlways;
 
@@ -77,16 +77,18 @@ string filename;				// to store oby filename passed to Rofsbuild.
 TBool reallyHelp = EFalse;	
 TBool gSmrImage = EFalse;
 string gSmrFileName = "";
+static string rofslogfile = "ROFSBUILD.LOG";
 
 //Cache global variables
 bool gCache = false;
 bool gCleanCache = false;
 bool gNoCache = false;
+TBool gIsOBYUTF8 = EFalse;
 TBool gKeepGoing = EFalse;
 void PrintVersion() {
-	Print(EAlways,"\nROFSBUILD - Rofs/Datadrive image builder");
-	Print(EAlways, " V%d.%d.%d\n", RofsbuildMajorVersion, RofsbuildMinorVersion, RofsbuildPatchVersion);
-	Print(EAlways,Copyright);
+	printf("\nROFSBUILD - Rofs/Datadrive image builder");
+	printf(" V%d.%d.%d\n", RofsbuildMajorVersion, RofsbuildMinorVersion, RofsbuildPatchVersion);
+	printf("%s\n\n", "Copyright (c) 1996-2010 Nokia Corporation.");
 }
 
 char HelpText[] = 
@@ -107,11 +109,13 @@ char HelpText[] =
 	"        -datadrive=<drive obyfile1>,<drive obyfile2>,... for driveimage creation\n"
 	"              user can also input rofs oby file if required to generate both.\n"
 	"        -smr=<SMR obyfile1>,<SMR obyfile2>,... for SMR partition creation\n"
+	"        -oby-charset=<charset> used character set in which OBY was written\n"
 	"        -loglevel<level>  level of information to log (valid levels are 0,1,2).\n"//Tools like Visual ROM builder need the host/ROM filenames, size & if the file is hidden.
 	"        -wstdpath   warn if destination path provided for a file is not the standard path\n"
 	"        -argfile=<FileName>   specify argument-file name containing list of command-line arguments\n"
 "        -lowmem     use memory-mapped file for image build to reduce physical memory consumption\n"
-"        -k     to enable keepgoing when duplicate files exist in oby\n";
+"        -k     to enable keepgoing when duplicate files exist in oby\n"
+"        -logfile=<fileName>           specify log file\n";
 
 char ReallyHelpText[] =
 "Log Level:\n"
@@ -228,6 +232,13 @@ void processCommandLine(int argc, char *argv[], TBool paramFileFlag = EFalse) {
 					}
 				}
 			}
+			else if(strnicmp(argv[i], "-OBY-CHARSET=", 13) == 0)
+			{
+				if((stricmp(&argv[i][13], "UTF8")==0) || (stricmp(&argv[i][13], "UTF-8")==0))
+					gIsOBYUTF8 = ETrue;
+				else
+					Print(EError, "Invalid encoding %s, default system internal encoding will be used.\n", &argv[i][13]);
+			}
 			else if (stricmp(argv[i], "-UNCOMPRESS") == 0) {
 				gCompress = ECompressionUncompress;
 			}
@@ -311,6 +322,9 @@ void processCommandLine(int argc, char *argv[], TBool paramFileFlag = EFalse) {
 				gLogLevel = DEFAULT_LOG_LEVEL;
 			else if (stricmp(argv[i], "-LOWMEM") == 0)
 				gLowMem = ETrue;
+			else if (strnicmp(argv[i], "-logfile=",9) ==0) {
+				rofslogfile = argv[i] + 9;
+			}
 			else {
 #ifdef WIN32
 				Print (EWarning, "Unrecognised option %s\n",argv[i]);
@@ -503,11 +517,11 @@ TInt main(int argc, char *argv[]){
 	}
 	if(gThreadNum == 0) {
 		if(gCPUNum > 0) {
-			Print (EWarning, "The number of processors (%d) is used as the number of concurrent jobs.\n", gCPUNum);
+			printf("WARNING: The number of processors (%d) is used as the number of concurrent jobs.\n", gCPUNum);
 			gThreadNum = gCPUNum;
 		}
 		else {
-			Print (EWarning, "Can't automatically get the valid number of concurrent jobs and %d is used.\n", DEFAULT_THREADS);
+			printf("WARNING: Can't automatically get the valid number of concurrent jobs and %d is used.\n", DEFAULT_THREADS);
 			gThreadNum = DEFAULT_THREADS;
 		}
 	}
@@ -570,7 +584,9 @@ TInt main(int argc, char *argv[]){
 	}
 	// Process Rofs Obey files.
 	if(obeyFileName) {
-		H.SetLogFile("ROFSBUILD.LOG");		
+		if (rofslogfile[rofslogfile.size()-1] == '\\' || rofslogfile[rofslogfile.size()-1] == '/')
+			rofslogfile += "ROFSBUILD.LOG";
+	 	H.SetLogFile(rofslogfile.c_str());
 		ObeyFileReader *reader = new ObeyFileReader(obeyFileName); 
 		if (!reader->Open())
 			return KErrGeneral;

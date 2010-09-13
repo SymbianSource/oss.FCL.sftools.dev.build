@@ -23,62 +23,35 @@ Description:
 <project name="test-metadata" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
     <description>Helium antlib metadata tests.</description>
 
+    <dirname property="project.dir" file="${ant.file.test-metadata}" />
     <taskdef resource="com/nokia/helium/metadata/ant/antlib.xml" uri="http://www.nokia.com/helium" />
     <taskdef name="fmpp" classname="fmpp.tools.AntTask" onerror="report"/>
-
-    <target name="check-metadata">
-        <hlm:metadatarecord srcfile="${basedir}\data\gensis.txt" database="${basedir}\metadata_db">
-            <fileset dir="data" includes="gensis.txt"/>
-            <hlm:textlogparser>
-                <!-- Single set defined by csv file 
-                <hlm:metadatafilterset filterFile="${basedir}\data\common.csv"/>-->
-                <!-- Set defined by nested single filter and another nested set -->
-                <hlm:metadatafilterset>
-                    <hlm:metadatafilter priority="error" regex=".*Warning: Could not find file.*" description="Test pattern for missing file."/>
-                    <!--<hlm:metadatafilterset>
-                        <hlm:metadatafilter priority="warning" regex="File not found" description="Test pattern for missing file."/>
-                    </hlm:metadatafilterset>-->
-                </hlm:metadatafilterset>
-            </hlm:textlogparser>
-        </hlm:metadatarecord>
-        <!--<au:assertLogContains text="Successfully executed codescanner"/>
-        <au:assertLogContains text="Output format: xml,html"/>
-        <au:assertFileExists file="${codescanner.output.dir}/problemIndex.xml"/>-->
+    
+    <target name="setUp">
+        <echo>---=====================================---</echo>
+        <mkdir dir="${test.temp.dir}" />
+        <delete dir="${test.temp.dir}" />
+        <mkdir dir="${test.temp.dir}" />
     </target>
     
-    
-    <target name="render-scanlog">
-        <property name="build.logs.dir" value="${bmd.test.project.dir}/test_bmd" />
-        <fmpp sourceFile="${basedir}/../src/templates/readdata.xml.ftl"
-                      outputFile="${basedir}/readdata.xml">
-            <freemarkerLinks expandProperties="yes">
-                macro: ${basedir}/../src/templates
-            </freemarkerLinks>
-            <data>
-                templatedir: "${basedir}/src/templates"
-                template: "components_status.xml.ftl"
-                dbPath: "tests/metadata_db"
-                countOnly: "true"
-                tableName: "out"
-                queryString: "where priority='WARNING' or priority='error'"
-                limit: "500"
-                ant: antProperties()
-            </data>
-        </fmpp>
+    <target name="tearDown">
+        <delete dir="${test.temp.dir}" />
+        <echo>---=====================================---</echo>
     </target>
 
     <hlm:metadatafilterset id="metadata.regex.test">
-        <hlm:metadatafilter priority="ERROR" regex="^Error \d+: this is some serious error.*" description="Test pattern for testing metadataRegexTest condition."/>
+        <hlm:metadatafilter severity="ERROR" regex="^Error \d+: this is some serious error.*" description="Test pattern for testing metadataRegexTest condition."/>
     </hlm:metadatafilterset>
 
-    <target name="test-scanlog-metadata-regex-pass">
+    <target name="test-metadata-regex-pass">
         <au:assertTrue>
             <hlm:metadataRegexTest severity="ERROR" string="Error 193: this is some serious error">
                 <hlm:metadatafilterset refid="metadata.regex.test"/>
             </hlm:metadataRegexTest>
         </au:assertTrue>
     </target>
-    <target name="test-scanlog-metadata-regex-fail-1">
+
+    <target name="test-metadata-regex-fail-string-missing">
         <au:expectfailure>
             <fail>
                 <condition>
@@ -89,7 +62,8 @@ Description:
             </fail>
         </au:expectfailure>
     </target>
-    <target name="test-scanlog-metadata-regex-fail-2">
+    
+    <target name="test-metadata-regex-fail-severity-missing">
         <au:expectfailure>
             <fail>
                 <condition>
@@ -101,45 +75,211 @@ Description:
         </au:expectfailure>
     </target>
     
-    
-    <hlm:metadatafilterset id="filterset.imaker">
-        <metadatafilter priority="error" regex="^\s*Total duration:\s+\d+:\d+\s+Status:\s+FAILED" description="" />
-        <metadatafilter priority="error" regex="^.+- DOESN'T EXIST" description="" />
-    </hlm:metadatafilterset>
-    <hlm:metadatafilterset id="filterset.abld">
-        <metadatafilter priority="error" regex="^ERROR:" description="" />
-        <metadatafilter priority="warning" regex="^WARNING:.*" description="" />
-    </hlm:metadatafilterset>
-    
-    <target name="test-rombuild-metadata">
-        <hlm:metadatarecord database="${basedir}\metadata_db">
+    <target name="test-same-log-several-times">
+        <hlm:metadatarecord database="${test.temp.dir}/metadata_db">
             <hlm:imakermetadatainput>
-                <fileset casesensitive="false" file="${basedir}/../data/build_roms_sample.log" />
-                <fileset casesensitive="false" file="${basedir}/../data/sample_abld.log" />
-                <metadatafilterset refid="filterset.imaker" />
+                <fileset casesensitive="false" file="../data/sample_abld.log" />
+                <hlm:metadatafilterset>
+                    <metadatafilter severity="error" regex="^ERROR:" description="" />
+                    <metadatafilter severity="warning" regex="^WARNING:.*" description="" />
+                </hlm:metadatafilterset>
             </hlm:imakermetadatainput>
         </hlm:metadatarecord>
-        <hlm:metadatarecord database="${basedir}\metadata_db">
+        <hlm:metadatarecord database="${test.temp.dir}/metadata_db">
             <hlm:imakermetadatainput>
-                <fileset casesensitive="false" file="${basedir}/../data/sample_abld.log" />
-                <metadatafilterset refid="filterset.abld" />
+                <fileset casesensitive="false" file="../data/sample_abld.log" />
+                <hlm:metadatafilterset>
+                    <metadatafilter severity="error" regex="^ERROR:" description="" />
+                    <metadatafilter severity="warning" regex="^WARNING:.*" description="" />
+                </hlm:metadatafilterset>
             </hlm:imakermetadatainput>
         </hlm:metadatarecord>
-        
-        <fmpp sourceFile="${basedir}/../../../../../tools/common/templates/diamonds/build_roms_diamonds.xml.ftl"
-                     outputfile="build_roms_diamonds.xml">
-            <data expandProperties="yes">
-                dbPath: ${basedir}\metadata_db
-                ant: antProperties()
-            </data>
-        </fmpp>
-        
-        <loadfile srcfile="build_roms_diamonds.xml" property="diamonds.output"/>
-        <au:assertMatches string="${diamonds.output}" pattern=".*?RM-XXX_010\.014_00\.01_79\.92_prd\.rofs3\.fpsx.*" singleline="true"/>
-        <delete file="build_roms_diamonds.xml"/>
-        <delete dir="${basedir}\metadata_db"/>
     </target>
     
+    <scriptdef language="jython" name="createLog">
+        <attribute name="file" />
+        <attribute name="length" />
+        <![CDATA[
+f = open(attributes.get('file'), 'w+')
+length = attributes.get('length')
+if length:
+    length = int(length)
+else:
+    length = 10000
+try:
+    while length > 0:
+        f.write("ERROR: error %d\n" % length)
+        length = length - 1
+finally:
+    f.close()
+        ]]>
+    </scriptdef>
+    
+    <!-- Let's try to get 4 logs pushed in parallel into the database. -->
+    <target name="test-parallel-database-creation">
+        <createLog file="${test.temp.dir}/log1.log" length="10000"/>
+        <copy file="${test.temp.dir}/log1.log" tofile="${test.temp.dir}/log2.log" />
+        <copy file="${test.temp.dir}/log1.log" tofile="${test.temp.dir}/log3.log" />
+        <copy file="${test.temp.dir}/log1.log" tofile="${test.temp.dir}/log4.log" />
+        
+        <parallel>
+            <hlm:metadatarecord database="${test.temp.dir}/metadata_db">
+                <hlm:textmetadatainput>
+                    <fileset casesensitive="false" file="${test.temp.dir}/log1.log" />
+                    <hlm:metadatafilterset>
+                        <metadatafilter severity="error" regex="^ERROR:.*" description="" />
+                    </hlm:metadatafilterset>
+                </hlm:textmetadatainput>
+            </hlm:metadatarecord>
+            <hlm:metadatarecord database="${test.temp.dir}/metadata_db">
+                <hlm:textmetadatainput>
+                    <fileset casesensitive="false" file="${test.temp.dir}/log2.log" />
+                    <hlm:metadatafilterset>
+                        <metadatafilter severity="error" regex="^ERROR:.*" description="" />
+                    </hlm:metadatafilterset>
+                </hlm:textmetadatainput>
+            </hlm:metadatarecord>
+            <hlm:metadatarecord database="${test.temp.dir}/metadata_db">
+                <hlm:textmetadatainput>
+                    <fileset casesensitive="false" file="${test.temp.dir}/log3.log" />
+                    <hlm:metadatafilterset>
+                        <metadatafilter severity="error" regex="^ERROR:.*" description="" />
+                    </hlm:metadatafilterset>
+                </hlm:textmetadatainput>
+            </hlm:metadatarecord>
+            <hlm:metadatarecord database="${test.temp.dir}/metadata_db">
+                <hlm:textmetadatainput>
+                    <fileset casesensitive="false" file="${test.temp.dir}/log4.log" />
+                    <hlm:metadatafilterset>
+                        <metadatafilter severity="error" regex="^ERROR:.*" description="" />
+                    </hlm:metadatafilterset>
+                </hlm:textmetadatainput>
+            </hlm:metadatarecord>
+        </parallel>
+        <hlm:metadataCountSeverity severity="error" database="${test.temp.dir}/metadata_db" property="errors">
+            <fileset dir="${test.temp.dir}" includes="log*.log" />
+        </hlm:metadataCountSeverity>
+        <echo>errors: ${errors}</echo>
+        <au:assertTrue>
+            <equals arg1="${errors}" arg2="40000" />
+        </au:assertTrue>
+    </target>
+    
+    <!-- Let's metadata delete. -->
+    <target name="test-metadatadelete">
+        <createLog file="${test.temp.dir}/log1.log" length="10"/>
+        <copy file="${test.temp.dir}/log1.log" tofile="${test.temp.dir}/log2.log" />
+        
+        <hlm:metadatarecord database="${test.temp.dir}/metadata_db">
+            <hlm:textmetadatainput>
+                <fileset dir="${test.temp.dir}" includes="log*.log" />
+                <hlm:metadatafilterset>
+                    <metadatafilter severity="error" regex="^ERROR:.*" description="" />
+                </hlm:metadatafilterset>
+            </hlm:textmetadatainput>
+        </hlm:metadatarecord>
+        
+        <hlm:metadataCountSeverity severity="error" log="${test.temp.dir}/log1.log" 
+            database="${test.temp.dir}/metadata_db" property="errors.before" />        
+        <echo>errors.before: ${errors.before}</echo>
+        <hlm:metadatadelete database="${test.temp.dir}/metadata_db">
+            <fileset dir="${test.temp.dir}" includes="log1.log" />
+        </hlm:metadatadelete>
+        <hlm:metadataCountSeverity severity="error" log="${test.temp.dir}/log1.log" 
+            database="${test.temp.dir}/metadata_db" property="errors.after" />        
+        <echo>errors.after: ${errors.after}</echo>
+
+        <au:assertTrue>
+            <equals arg1="${errors.before}" arg2="10" />
+        </au:assertTrue>
+        <au:assertTrue>
+            <equals arg1="${errors.after}" arg2="0" />
+        </au:assertTrue>
+    </target>
+
+    
+    <!-- Test that error and warnings are counted properly by the hlm:metadataHasSeverity task -->
+    <target name="test-has-severity">
+        <hlm:metadatarecord database="${test.temp.dir}/metadata_db">
+            <hlm:textmetadatainput>
+                <fileset file="${project.dir}/../data/countseverity/text_has_severity.log" />
+                <hlm:metadatafilterset>
+                    <metadatafilter severity="error" regex="^ERROR:.*" description="" />
+                    <metadatafilter severity="warning" regex="^WARNING:.*" description="" />
+                </hlm:metadatafilterset>
+            </hlm:textmetadatainput>
+        </hlm:metadatarecord>
+        
+        <au:assertTrue message="Must found an error">
+            <hlm:metadataHasSeverity severity="error" log="${project.dir}/../data/countseverity/text_has_severity.log" database="${test.temp.dir}/metadata_db" />
+        </au:assertTrue>
+        <au:assertTrue message="Must found a warning">
+            <hlm:metadataHasSeverity severity="warning" log="${project.dir}/../data/countseverity/text_has_severity.log" database="${test.temp.dir}/metadata_db" />
+        </au:assertTrue>
+        
+        <au:assertTrue message="Must found an error">
+            <hlm:metadataHasSeverity severity="error" database="${test.temp.dir}/metadata_db">
+                <fileset file="${project.dir}/../data/countseverity/text_has_severity.log" />
+            </hlm:metadataHasSeverity>
+        </au:assertTrue>
+        <au:assertTrue message="Must found a warning">
+            <hlm:metadataHasSeverity severity="warning" database="${test.temp.dir}/metadata_db">
+                <fileset file="${project.dir}/../data/countseverity/text_has_severity.log" />
+            </hlm:metadataHasSeverity>
+        </au:assertTrue>
+    </target>
+        
+    <!-- Test that error and warnings are counted properly by the hlm:metadataHasSeverity task -->
+    <target name="test-has-severity-testing-parameters">
+        <hlm:metadatarecord database="${test.temp.dir}/metadata_db">
+            <hlm:textmetadatainput>
+                <fileset file="${project.dir}/../data/countseverity/text_has_severity.log" />
+                <hlm:metadatafilterset>
+                    <metadatafilter severity="error" regex="^ERROR:.*" description="" />
+                    <metadatafilter severity="error" regex="^WARNING:*" description="" />
+                </hlm:metadatafilterset>
+            </hlm:textmetadatainput>
+        </hlm:metadatarecord>
+        
+        <au:expectfailure expectedMessage="'log' attribute not defined.">
+            <condition property="test" value="whatever">
+                <hlm:metadataHasSeverity severity="error" database="${test.temp.dir}/metadata_db" />
+            </condition>
+        </au:expectfailure>
+        <au:expectfailure expectedMessage="'database' attribute not defined.">
+            <condition property="test" value="whatever">
+                <hlm:metadataHasSeverity severity="error" log="${project.dir}/../data/countseverity/text_has_severity.log" />
+            </condition>
+        </au:expectfailure>
+        <au:expectfailure expectedMessage="'severity' attribute is not defined.">
+            <condition property="test" value="whatever">
+                <hlm:metadataHasSeverity log="${project.dir}/../data/countseverity/text_has_severity.log" database="${test.temp.dir}/metadata_db" />
+            </condition>
+        </au:expectfailure>
+    </target>
+    
+	<!-- If the database is invalid, for example in the case of
+	     Derby only the directory exists, then implementation
+	     should remove it and create a valid database.
+	 -->
+    <target name="test-invalid-database">
+        <mkdir dir="${test.temp.dir}/metadata_db" />
+        <createLog file="${test.temp.dir}/log1.log" length="10"/>
+        <hlm:metadatarecord database="${test.temp.dir}/metadata_db">
+            <hlm:textmetadatainput>
+                <fileset casesensitive="false" file="${test.temp.dir}/log1.log" />
+                <hlm:metadatafilterset>
+                    <metadatafilter severity="error" regex="^ERROR:.*" description="" />
+                </hlm:metadatafilterset>
+            </hlm:textmetadatainput>
+        </hlm:metadatarecord>    	
+        <hlm:metadataCountSeverity severity="error" log="${test.temp.dir}/log1.log" 
+            database="${test.temp.dir}/metadata_db" property="errors" />        
+        <echo>errors: ${errors}</echo>
+        <au:assertTrue>
+            <equals arg1="${errors}" arg2="10" />
+        </au:assertTrue>
+    </target>
 </project>
 
 

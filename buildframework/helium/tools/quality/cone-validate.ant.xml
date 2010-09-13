@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : cone-validate.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<!--* @package quality -->
+<project name="cone-validate" xmlns:hlm="http://www.nokia.com/helium">
+    <description>
+        To validate confml configuration files.
+    </description>
+    
+    <!--* @property cone.validation.enabled
+    Set to true to run ConE tool to validate conml and impl files.
+    @type boolean
+    @editable required
+    @scope public
+    @since 11.0
+    -->
+    
+    <!--* @property internal.cone.validation.enabled
+    Set to run cone validation targets if  cone.validation.enabled set to true.
+    @type boolean
+    @scope private
+    -->
+    
+    <!-- To enable to confml file validation -->
+    <condition property="internal.cone.validation.enabled">
+        <and>
+            <istrue value="${cone.validation.enabled}" />
+            <isset property="product.list"/>
+        </and>
+    </condition>
+    
+    <!-- Target to validate confml configuration files of product -->
+    <target name="cone-validate" if="internal.cone.validation.enabled">
+        <mkdir dir="${post.log.dir}" />
+        <mkdir dir="${temp.build.dir}" />
+        <tempfile property="cone.dynamic.config" suffix=".xml" deleteonexit="false" destdir="${temp.build.dir}"/>
+        
+        <fmpp sourceFile="${helium.dir}/tools/common/templates/quality/cone-validate.xml.ftl"
+              outputfile="${cone.dynamic.config}">
+            <data expandProperties="yes">
+                ant: antProperties()
+                os: eval('System.getProperty("os.name")')
+            </data>
+        </fmpp>
+        
+        <trycatch property="cone.validate.thrown">
+            <try>
+                <ant antfile="${cone.dynamic.config}" output="${post.log.dir}/${build.id}_validate_cone.log"/>
+            </try>
+            <catch>
+                <fail message="${cone.validate.thrown}"/>
+            </catch>
+            <finally>
+                <hlm:metadatarecord database="${metadata.dbfile}">
+                    <hlm:textmetadatainput>
+                        <fileset casesensitive="false" file="${post.log.dir}/${build.id}_validate_cone.log" />
+                        <metadatafilterset>
+                            <metadatafilter priority="error" regex="^ERROR\s+:.*" description="cone error" />
+                            <metadatafilter priority="error" regex="\s*[1-9]\d*\s*problem\(s\).*?" description="cone validation error" />
+                            <metadatafilter priority="warning" regex="^WARNING\s+:.*" description="cone warnings" />
+                            <metadatafilter priority="info" regex="^INFO\s+:.*" description="cone info" />
+                        </metadatafilterset>
+                    </hlm:textmetadatainput>
+                </hlm:metadatarecord>
+                <hlm:metadataCountSeverity severity="ERROR" log="${build.id}_validate_cone.log" database="${metadata.dbfile}"
+                                           property="cone.validate.error.total"/>
+                <echo>ConE error: ${cone.validate.error.total}</echo>
+                <hlm:generateBuildStatus file="${build.id}_validate_cone.log" />
+                <hlm:signalMacro logfile="${build.id}_validate_cone.log" phase="post" signal.input="ConEValidateSignalInput" />
+            </finally>
+        </trycatch>
+        
+    </target>
+    
+    
+</project>

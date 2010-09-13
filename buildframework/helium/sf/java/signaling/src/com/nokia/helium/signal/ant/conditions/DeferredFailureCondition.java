@@ -18,11 +18,11 @@
 
 package com.nokia.helium.signal.ant.conditions;
 
+import org.apache.tools.ant.ProjectComponent;
 import org.apache.tools.ant.taskdefs.condition.Condition;
+
 import com.nokia.helium.signal.SignalStatus;
 import com.nokia.helium.signal.SignalStatusList;
-
-import org.apache.tools.ant.ProjectComponent;
 
 /**
  * The hasDeferredFailure condition allows you to know if any diferred failure are pending,

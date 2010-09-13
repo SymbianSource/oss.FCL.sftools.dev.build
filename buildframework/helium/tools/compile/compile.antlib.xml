@@ -46,9 +46,13 @@ Description:
     <macrodef name="calculateErrorsFromLog" uri="http://www.nokia.com/helium">
         <sequential>
             <if>
-                <not>
-                    <isset property="skip.diamonds"/>
-                </not>
+                <or>
+                    <istrue value="${diamonds.enabled}"/>
+                    <isfalse value="${skip.diamonds}"/>
+                    <not>
+                        <isset property="skip.diamonds"/>
+                    </not>
+                </or>
                 <then>
                     <fmpp sourceFile="${helium.dir}/tools/common/templates/diamonds/faults_metadata_orm.ftl"
                                  outputfile="${diamonds.build.output.dir}/compile-main.xml">
@@ -71,20 +75,9 @@ Description:
             <hlm:calculateErrorsFromLog />
             <var name="build.errors.total" unset="true" />
             <var name="compile.result" unset="true" />
-            <if>
-                <equals arg1="${compile.signal.input}" arg2="compileCleanSignalInput" />
-                <then>
-                    <hlm:metadataCountSeverity severity="ERROR" log="@{compile.summary.file}"
-                        db="${metadata.dbfile}"
-                        countMissing="false"
-                        property="build.errors.total"/>
-                </then>
-                <else>
-                    <hlm:metadataCountSeverity severity="ERROR" log="@{compile.summary.file}"
-                        db="${metadata.dbfile}"
-                        property="build.errors.total"/>
-                </else>
-            </if>
+            <hlm:metadataCountSeverity severity="ERROR" log="@{compile.summary.file}"
+                database="${metadata.dbfile}"
+                property="build.errors.total"/>
                 
             <echo>Errors after compile-main: ${build.errors.total}</echo>
             <echo message="${build.errors.limit}" />
@@ -243,75 +236,82 @@ if int(r'@{error.limit}') > -1:
         <attribute name="root"/> 
         <attribute name="failonerror"/>
         <attribute name="phase"/>
-          self.setTaskName("emake");
-          // check attributes
-          if (attributes.get("name") == null)
-            throw new org.apache.tools.ant.BuildException("name attribute is not defined");
-          self.log("Name: " + attributes.get("name"));
-          if (attributes.get("makefile") == null)
-            throw new org.apache.tools.ant.BuildException("makefile attribute is not defined");
-          self.log("Makefile: " + attributes.get("makefile"));
-          String target = "all";
-          String custom = "";
-          String annofileDir = "";
-          if (attributes.get("target") != null)
-            target = attributes.get("target");
-          self.log("Target: " + target);
-          if (attributes.get("custom") != null)
-            custom = attributes.get("custom");
-          if (attributes.get("root") != null)
-            root = attributes.get("root");
-          else
-            root = "";
-          
-          self.log("Custom: " + custom);
+self.setTaskName("emake");
+// check attributes
+if (attributes.get("name") == null) {
+    throw new org.apache.tools.ant.BuildException("name attribute is not defined");
+}
+self.log("Name: " + attributes.get("name"));
+if (attributes.get("makefile") == null) {
+    throw new org.apache.tools.ant.BuildException("makefile attribute is not defined");
+}
+self.log("Makefile: " + attributes.get("makefile"));
+String target = "all";
+String custom = "";
+String annofileDir = "";
+if (attributes.get("target") != null) {
+    target = attributes.get("target");
+}
+self.log("Target: " + target);
+if (attributes.get("custom") != null) {
+    custom = attributes.get("custom");
+}
+if (attributes.get("root") != null) {
+    root = attributes.get("root");
+}
+else {
+    root = "";
+}
 
-      // Create and configure exec target
-          org.apache.tools.ant.taskdefs.ExecTask task = new org.apache.tools.ant.taskdefs.ExecTask();
-          task.setProject(self.getProject());
-          task.setTaskName(self.getTaskName());
-          String emake = com.nokia.ant.util.Helper.getProperty(project, "ec.emake");          
-          task.setExecutable(emake);
-          if (attributes.get("failonerror") != null) {
-            task.setFailonerror(Boolean.parseBoolean(attributes.get("failonerror")));
-          } else {
-            task.setFailonerror(true);
-          }
-          String buildDrive = com.nokia.ant.util.Helper.getProperty(project, "build.drive");              
-          task.setDir(new java.io.File(buildDrive + "/"));
-          if (attributes.get("log") != null) {
-            self.log("Log: " + attributes.get("log"));
-            task.setOutput(new java.io.File(attributes.get("log")));
-          }
-          if (attributes.get("dir") != null) {
-            self.log("dir: " + attributes.get("dir"));
-            task.setDir(new java.io.File(attributes.get("dir")));
-          }
-          String buildId = com.nokia.ant.util.Helper.getProperty(project, "build.id");
-          task.createArg().setValue("--emake-build-label=" + buildId + "-" + attributes.get("name"));
-          String eclass = com.nokia.ant.util.Helper.getProperty(project, "ec.build.class");
-          task.createArg().setValue("--emake-class=" + eclass);
-          String eroot = com.nokia.ant.util.Helper.getProperty(project, "env.EMAKE_ROOT");          
-          String heliumDir = com.nokia.ant.util.Helper.getProperty(project, "helium.dir"); 
-          if (attributes.get("root") != null) {
-            self.log("--emake-root=" + eroot + ";" + heliumDir + ";" + root);
-          }         
-          task.createArg().setValue("--emake-root=" + eroot + ";" + heliumDir + ";" + root);
-          if (attributes.get("phase") != null) {
-            annofileDir = com.nokia.ant.util.Helper.getProperty(project, "build.log.dir") + "/" + attributes.get("phase");
-          }
-          else {
-            annofileDir = com.nokia.ant.util.Helper.getProperty(project, "build.log.dir");  
-          }
-          if (attributes.get("annodetail") != null) {
-            task.createArg().setValue("--emake-annodetail=" + attributes.get("annodetail"));            
-            task.createArg().setValue("--emake-annofile=" + annofileDir + "/" + buildId + "-" + attributes.get("name") + ".emake.anno.xml");
-          }
-          task.createArg().setLine(custom);
-          task.createArg().setLine("-f " + attributes.get("makefile"));
-          task.createArg().setLine(target);
-          // Execute.
-          task.execute();
+self.log("Custom: " + custom);
+
+// Create and configure exec target
+org.apache.tools.ant.taskdefs.ExecTask task = new org.apache.tools.ant.taskdefs.ExecTask();
+task.setProject(self.getProject());
+task.setTaskName(self.getTaskName());
+String emake = com.nokia.ant.util.Helper.getProperty(project, "ec.emake");          
+task.setExecutable(emake);
+if (attributes.get("failonerror") != null) {
+    task.setFailonerror(Boolean.parseBoolean(attributes.get("failonerror")));
+}
+else {
+    task.setFailonerror(true);
+}
+String buildDrive = com.nokia.ant.util.Helper.getProperty(project, "build.drive");              
+task.setDir(new java.io.File(buildDrive + "/"));
+if (attributes.get("log") != null) {
+    self.log("Log: " + attributes.get("log"));
+    task.setOutput(new java.io.File(attributes.get("log")));
+}
+if (attributes.get("dir") != null) {
+    self.log("dir: " + attributes.get("dir"));
+    task.setDir(new java.io.File(attributes.get("dir")));
+}
+String buildId = com.nokia.ant.util.Helper.getProperty(project, "build.id");
+task.createArg().setValue("--emake-build-label=" + buildId + "-" + attributes.get("name"));
+String eclass = com.nokia.ant.util.Helper.getProperty(project, "ec.build.class");
+task.createArg().setValue("--emake-class=" + eclass);
+String eroot = com.nokia.ant.util.Helper.getProperty(project, "env.EMAKE_ROOT");          
+String heliumDir = com.nokia.ant.util.Helper.getProperty(project, "helium.dir"); 
+if (attributes.get("root") != null) {
+    self.log("--emake-root=" + eroot + ";" + heliumDir + ";" + root);
+}         
+task.createArg().setValue("--emake-root=" + eroot + ";" + heliumDir + ";" + root);
+if (attributes.get("phase") != null) {
+    annofileDir = com.nokia.ant.util.Helper.getProperty(project, "build.log.dir") + "/" + attributes.get("phase");
+}
+else {
+    annofileDir = com.nokia.ant.util.Helper.getProperty(project, "build.log.dir");  
+}
+if (attributes.get("annodetail") != null) {
+    task.createArg().setValue("--emake-annodetail=" + attributes.get("annodetail"));            
+    task.createArg().setValue("--emake-annofile=" + annofileDir + "/" + buildId + "-" + attributes.get("name") + ".emake.anno.xml");
+}
+task.createArg().setLine(custom);
+task.createArg().setLine("-f " + attributes.get("makefile"));
+task.createArg().setLine(target);
+
+task.execute();
     </scriptdef>
 
     
@@ -325,21 +325,21 @@ if int(r'@{error.limit}') > -1:
         <attribute name="layer-order"/>
         <attribute name="command"/>
         <attribute name="components"/>
-<![CDATA[
+        <![CDATA[
 import com.nokia.tools.sbs.SBSTool;
 SBSTool sbsTool = new SBSTool();
 sbsTool.execute(attributes,project);
-]]>
+        ]]>
     </scriptdef>
 
     
     <scriptdef name="getSBSConfigMacro" language="beanshell" uri="http://www.nokia.com/helium">
         <attribute name="sbs.sysdef.file"/>
-<![CDATA[
+        <![CDATA[
 import com.nokia.config.SAXConfigParser;
 SAXConfigParser configParser = new SAXConfigParser(attributes.get("sbs.sysdef.file"));
 project.setProperty("sbs.configs",configParser.getConfigs());
-]]>
+        ]]>
     </scriptdef>
     
 </antlib>

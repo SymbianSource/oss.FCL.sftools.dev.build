@@ -31,8 +31,9 @@ public class AntMacros {
      */
     public void add(String macro) {
         for (MacroHolder mh : antMacros) {
-            if (mh.equals(macro))
+            if (mh.equals(macro)) {
                 return;
+            }
         }
         this.antMacros.add(new MacroHolder(macro));
     }

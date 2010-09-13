@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<build xmlns="http://symbian.com/xml/build" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symbian.com/xml/build ../../schema/build/2_0.xsd">
+	<!-- build variant for GCC x86 toolchains -->
+	<var name="gccx86_base">
+		<set name="TOOLCHAIN" value="GCC"/>
+		<set name="PLATMACROS.TOOLCHAIN" value="X86GCC GCC32"/>
+		
+		<set name="TRADITIONAL_PLATFORM" value="X86"/>
+		<set name="VARIANTPLATFORM" value="x86"/>
+
+		<!-- toolchain tools -->
+		<set name="GCCX86AR" value="$(GCCX86BIN)/ar$(DOTEXE)"/>
+		<set name="GCCX86ASM" value="$(GCCX86BIN)/as$(DOTEXE)"/>
+		<set name="GCCX86CC" value="$(GCCX86BIN)/g++$(DOTEXE)"/>
+		<set name="GCCX86LD" value="$(GCCX86BIN)/g++$(DOTEXE)"/>
+		<set name="GCCX86DLLTOOL" value="$(GCCX86BIN)/dlltool$(DOTEXE)"/>
+		<set name="FROMELF" value="$(GCCX86BIN)/readelf$(DOTEXE)"/>
+
+		<set name="CC" value="$(GCCX86CC)"/>
+		<set name="LD" value="$(GCCX86LD)"/>
+		<set name="ASM" value="$(GCCX86ASM)"/>
+		<set name="AR" value="$(GCCX86AR)"/>
+		<set name="DLLTOOL" value="$(GCCX86DLLTOOL)"/>
+		
+		<set name="AAPCS_OPTION" value=""/>
+		<set name="ARCHIVER_CREATE_OPTION" value="cr"/>
+		<set name="ARM_INSTRUCTION_SET" value=""/>
+		<set name="ARMLIBS" value=""/>
+		<set name="ASM_OUTPUT_OPTION" value="-o"/>
+		<set name="ASSEMBLER_LISTING_OPTION" value="-S"/>
+		<set name="BPABI_OPTION" value=""/>
+		<set name="C_LANG_OPTION" value="-x c -masm=intel"/>
+		<set name="CC.NO_UNALIGNED_ACCESS" value=""/>
+		<set name="CC.SOFTVFP_MAYBE_VFPV2" value="soft"/>
+		<set name="CC.SOFTVFP_MAYBE_VFPV3" value="soft"/>
+		<set name="CC_ERRORS_CONTROL_OPTION" value=""/>
+		<set name="CC_WARNINGS_CONTROL_OPTION" value="-Wall -Wno-unknown-pragmas"/>
+		<set name="CIADEFS" value="__CIA__"/>
+		<set name="CODE_SEGMENT_START" value="-Ttext"/>
+		<set name="COMMANDFILE_OPTION" value="@"/>
+		<set name="COMPILE_ONLY_OPTION" value="-c"/>
+		<set name="COMPILER_CIA_FLAGS" value="-O1 -fomit-frame-pointer"/>
+		<set name="COMPILER_FPU_OPTION" value=""/>		
+		<set name="COMPILER_INTERWORK_DEFINES" value=""/>
+		<set name="COMPILER_SYSTEM_INCLUDE_OPTION" value="-I"/>
+		<set name="COMPILER_THUMB_DEFINES" value=""/>
+		<set name="CPP_LANG_OPTION" value="-x c++ -masm=intel -fno-rtti -fno-exceptions -fcheck-new"/>
+		<set name="DATA_SEGMENT_START" value="$(SPLIT_OPTION) $(RW_BASE_OPTION)"/>
+		<set name="DEBUG_OPTIMISATION" value="-O0"/>
+		<set name="DEBUGINFO_OPTIMISATION" value=""/>
+		<set name="DEPEND_OPTION" value="-MD -MF"/>
+		<set name="ENUM_OPTION" value=""/>
+		<set name="EXCEPTIONS" value=""/>
+		<set name="EXPORT_VTBL_OPTION" value=""/>
+		<set name="EXTRA_CC_OPTION" value=""/>
+		<set name="EXTRA_LD_OPTION" value=""/>
+		<set name="FPMODE_OPTION" value=""/>
+		<set name="HEADER_FILES_CONTROL_OPTION" value=""/>
+		<set name="INSTRUCTION_SET" value=""/>
+		<set name="KERNEL_STATIC_RUNTIME_LIB" value=""/>
+		<set name="LD_ERRORS_CONTROL_OPTION" value=""/>
+		<set name="LD_WARNINGS_CONTROL_OPTION" value=""/>
+		<set name="LIBPATH" value=""/>
+		<set name="LIBRARY" value=""/>
+		<set name="LICENSERETRY_OPTION" value=""/>
+		<set name="LINKER_ADD_STATIC_RUNTIME" value="1"/>
+		<set name="LINKER_DEBUG_OPTION" value=""/>
+		<set name="LINKER_DEFAULT_LIB_PATHS" value=""/>
+		<set name="LINKER_DEFAULT_LIBS" value=""/>
+		<set name="LINKER_ENTRY_OPTION" value="-Wl,--entry"/>
+		<set name="LINKER_GROUP_END_OPTION" value="--end-group"/>
+		<set name="LINKER_GROUP_START_OPTION" value="--start-group"/>
+		<set name="LINKER_MISC_FLAGS" value="-nostdlib"/>
+		<set name="LINKER_NODEBUG_OPTION" value = ""/>
+		<set name="LINKER_SCRIPT_FILE_OPTION" value="-T"/>
+		<set name="LINKER_SYMBOLS_FILE_OPTION" value="-Wl,-Map"/>
+		<set name="LINKER_SYMBOLS_OPTION" value=""/>
+		<set name="LISTING_OPTION" value="-S"/>
+		<set name="NEED_ENTRYPOINT_LIBRARY" value="" />
+		<set name="NEED_ENTRYPOINT_LIBRARY" value=""/>
+		<set name="NO_EXCEPTIONS" value="-fno-exceptions"/>
+		<set name="NO_UNALIGNED_ACCESS" value="$(CC.NO_UNALIGNED_ACCESS)"/>
+		<set name="OWN_LIBRARY_OPTION" value=""/>
+		<set name="PL.SOFTVFP_MAYBE_VFPV2" value="softvfp"/>
+		<set name="PL.SOFTVFP_MAYBE_VFPV3" value="softvfp"/>
+		<set name="PREINCLUDE" value="$(EPOCINCLUDE)/gcc.h"/>
+		<set name="PREINCLUDE_OPTION" value="-include"/>
+		<set name="PREPROCESSOR_OPTION" value="-E"/>
+		<set name="REL_OPTIMISATION" value="-O2"/>
+		<set name="RELOCATABLE_IMAGE_OPTION" value=""/>
+		<set name="RUNTIME_SYMBOL_VISIBILITY_OPTION" value=""/>
+		<set name="RVCTBIN" value="" />
+		<set name="RVCTINC" value="" />
+		<set name="RVCTLIB" value=""/>
+		<set name="RW_BASE" value=""/>
+		<set name="RW_BASE_OPTION" value=""/>
+		<set name="SHARED_OBJECT_OPTION" value="-Wl,--dll"/>
+		<set name="SID" value=""/>
+		<set name="SO_NAME_OPTION" value=""/>
+		<set name="SPLIT_OPTION" value=""/>
+		<set name="STATIC_LIBS_LIST" value=""/>
+		<set name="STATIC_LIBS_PATH" value="" />
+		<set name="STDCPP_INCLUDE" value="$(EPOCINCLUDE)/stdapis"/>
+		<set name="STDLIB_OPTION" value=""/>
+		<set name="SUPPORTS_ABIV1_IMPLIBS" value=""/>	
+		<set name="SYMBIAN_LD_MESSAGE_OPTION" value="$(LD_WARNINGS_CONTROL_OPTION) $(LD_ERRORS_CONTROL_OPTION)"/>
+		<set name="SYMVER_OPTION" value=""/>
+		<set name="TARGET_RELOCATION_OPTION" value="--target1-rel" />
+		<set name="TEMP_FILES_OPTION" value="-pipe"/>
+		<set name="THUMB_INSTRUCTION_SET" value=""/>
+		<set name="TRANSFORM_CIA" value=""/>		
+		<set name="UNDEFINED_SYMBOL_REF_OPTION" value="-u"/>
+		<set name="UNRESOLVED_SYMBOL_REF_OPTION" value=""/>
+		<set name="USER_LIBS_PATH_OPTION" value="--userlibpath"/>
+		<set name="USER_STATIC_RUNTIME_LIB" value=""/>
+		<set name="USER_STATIC_RUNTIME_LIB_NESTED_EXCEPTIONS" value=""/>
+		<set name="USERINCLUDE" value=""/>
+		<set name="VFE_OPTION" value=""/>
+
+		<append name="CDEFS" value="__X86GCC__ __GCC32__"/>
+	</var>
+</build>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<buildlog sbs_version="2.12.1 [2010-01-29 symbian build system 4e477ddf2eed]" xmlns="http://symbian.com/xml/build/log" xmlns:progress="http://symbian.com/xml/build/log/progress" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://symbian.com/xml/build/log http://symbian.com/xml/build/log/1_0.xsd">
+<info>sbs: version 2.12.1 [2010-01-29 symbian build system 4e477ddf2eed]
+</info>
+<info>SBS_HOME C:/APPS/sbs</info>
+<info>Set-up C:/APPS/sbs/sbs_init.xml</info>
+<info>Processing V:/sf/app/HelloWorldCons/group/HelloWorldCons.mmp for platform armv5_urel + armv5_udeb</info>
+<info>Processing V:/sf/mw/HelloWorldAPI/group/HelloWorldAPI.mmp for platform armv5_urel + armv5_udeb</info>
+<info>Running C:/APPS/sbs/win32/bin/talonctl.exe start</info>
+<info>Making V:/output/logs/compile/minibuild_ido_sbs_0.0.1_armv5_helium_minibuild_ido_all.export</info>
+<info>Executing 'emake HAVE_ORDERONLY= -r -f  "V:/output/logs/compile/minibuild_ido_sbs_0.0.1_armv5_helium_minibuild_ido_all.export"  -k -j 20   --emake-emulation=gmake  --emake-class=s60  --emake-annodetail=basic,history,waiting  --case-sensitive=0  '--emake-root=\;C:\apps;E:\hacs\helium_3\helium;C:\APPS\sbs'  --emake-maxagents=1  '--emake-historyfile=V:\output\logs/ec_history/raptor_clean.emake.data' TALON_DESCRAMBLE=0  2&gt;'V:/output/logs/compile/minibuild_ido_sbs_0.0.1_armv5_helium_minibuild_ido_all.export.stderr' '</info>
+WARNING EC1003: Ignoring redundant EMAKE_ROOT value - C:/apps/sbs (It is already included by EMAKE_ROOT value - C:/apps)
+ERROR EC1128: History file path references non-existent or read-only directory: V:\output\logs/ec_history
+<info>Making V:/output/logs/compile/minibuild_ido_sbs_0.0.1_armv5_helium_minibuild_ido_all.bitmap</info>
+<info>Executing 'emake HAVE_ORDERONLY= -r -f  "V:/output/logs/compile/minibuild_ido_sbs_0.0.1_armv5_helium_minibuild_ido_all.bitmap"  -k -j 20   --emake-emulation=gmake  --emake-class=s60  --emake-annodetail=basic,history,waiting  --case-sensitive=0  '--emake-root=\;C:\apps;E:\hacs\helium_3\helium;C:\APPS\sbs'  --emake-maxagents=1  '--emake-historyfile=V:\output\logs/ec_history/raptor_clean.emake.data' TALON_DESCRAMBLE=0  2&gt;'V:/output/logs/compile/minibuild_ido_sbs_0.0.1_armv5_helium_minibuild_ido_all.bitmap.stderr' '</info>
+WARNING EC1003: Ignoring redundant EMAKE_ROOT value - C:/apps/sbs (It is already included by EMAKE_ROOT value - C:/apps)
+ERROR EC1128: History file path references non-existent or read-only directory: V:\output\logs/ec_history
+<info>Making V:/output/logs/compile/minibuild_ido_sbs_0.0.1_armv5_helium_minibuild_ido_all.resource_deps</info>
+<info>Executing 'emake HAVE_ORDERONLY= -r -f  "V:/output/logs/compile/minibuild_ido_sbs_0.0.1_armv5_helium_minibuild_ido_all.resource_deps"  -k -j 20   --emake-emulation=gmake  --emake-class=s60  --emake-annodetail=basic,history,waiting  --case-sensitive=0  '--emake-root=\;C:\apps;E:\hacs\helium_3\helium;C:\APPS\sbs'  --emake-maxagents=1  '--emake-historyfile=V:\output\logs/ec_history/raptor_clean.emake.data' TALON_DESCRAMBLE=0  2&gt;'V:/output/logs/compile/minibuild_ido_sbs_0.0.1_armv5_helium_minibuild_ido_all.resource_deps.stderr' '</info>
+WARNING EC1003: Ignoring redundant EMAKE_ROOT value - C:/apps/sbs (It is already included by EMAKE_ROOT value - C:/apps)
+ERROR EC1128: History file path references non-existent or read-only directory: V:\output\logs/ec_history
+<info>Making V:/output/logs/compile/minibuild_ido_sbs_0.0.1_armv5_helium_minibuild_ido_all.resource</info>
+<info>Executing 'emake HAVE_ORDERONLY= -r -f  "V:/output/logs/compile/minibuild_ido_sbs_0.0.1_armv5_helium_minibuild_ido_all.resource"  -k -j 20   --emake-emulation=gmake  --emake-class=s60  --emake-annodetail=basic,history,waiting  --case-sensitive=0  '--emake-root=\;C:\apps;E:\hacs\helium_3\helium;C:\APPS\sbs'  --emake-maxagents=1  '--emake-historyfile=V:\output\logs/ec_history/raptor_clean.emake.data' TALON_DESCRAMBLE=0  2&gt;'V:/output/logs/compile/minibuild_ido_sbs_0.0.1_armv5_helium_minibuild_ido_all.resource.stderr' '</info>
+WARNING EC1003: Ignoring redundant EMAKE_ROOT value - C:/apps/sbs (It is already included by EMAKE_ROOT value - C:/apps)
+ERROR EC1128: History file path references non-existent or read-only directory: V:\output\logs/ec_history
+<info>Making V:/output/logs/compile/minibuild_ido_sbs_0.0.1_armv5_helium_minibuild_ido_all.default</info>
+<info>Executing 'emake HAVE_ORDERONLY= -r -f  "V:/output/logs/compile/minibuild_ido_sbs_0.0.1_armv5_helium_minibuild_ido_all.default"  -k -j 20   --emake-emulation=gmake  --emake-class=s60  --emake-annodetail=basic,history,waiting  --case-sensitive=0  '--emake-root=\;C:\apps;E:\hacs\helium_3\helium;C:\APPS\sbs'  --emake-maxagents=1  '--emake-historyfile=V:\output\logs/ec_history/raptor_clean.emake.data' TALON_DESCRAMBLE=0  2&gt;'V:/output/logs/compile/minibuild_ido_sbs_0.0.1_armv5_helium_minibuild_ido_all.default.stderr' '</info>
+WARNING EC1003: Ignoring redundant EMAKE_ROOT value - C:/apps/sbs (It is already included by EMAKE_ROOT value - C:/apps)
+ERROR EC1128: History file path references non-existent or read-only directory: V:\output\logs/ec_history
+<info>Running C:/APPS/sbs/win32/bin/talonctl.exe stop</info>
+<info>The make-engine exited successfully.</info>
+<info>Run time 3 seconds</info>
+<info>Created/Updated toolcheck cache: V:/epoc32/build/toolcheck_cache_.tmp
+</info>
+</buildlog>

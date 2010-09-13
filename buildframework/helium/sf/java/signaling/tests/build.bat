@@ -21,7 +21,7 @@ if not defined JAVA_6_HOME (
 set TESTED_JAVA=C:\Apps\j2sdk_1.6.0_02
 ) ELSE  set TESTED_JAVA=%JAVA_6_HOME%
 if exist %TESTED_JAVA% (set JAVA_HOME=%TESTED_JAVA%)
-call ant -Dant.executor.class=com.nokia.helium.core.ant.HeliumExecutor -Dskip.diamonds=true %*
+call ant -Dant.executor.class=com.nokia.helium.core.ant.HeliumExecutor -Ddiamonds.enabled=false %*
 if "%ERRORLEVEL%" neq "0" (goto error)
 endlocal
 goto :eof

@@ -18,7 +18,7 @@
 #===============================================================================
 
 """ Test the build.io module. """
-# pylint: disable-msg=R0201
+# pylint: disable=R0201
 #method could be a function warning removed
 
 import logging

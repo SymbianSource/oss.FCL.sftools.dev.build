@@ -1,0 +1,5 @@
+EXPORTS
+	_ZN10CMessenger11ShowMessageEv @ 1 NONAME
+	_ZN10CMessenger5NewLCER12CConsoleBaseRK7TDesC16 @ 2 NONAME
+	_ZTI10CMessenger @ 3 NONAME ABSENT ; #<TI>#
+	_ZTV10CMessenger @ 4 NONAME ABSENT ; #<VT>#

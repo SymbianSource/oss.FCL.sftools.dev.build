@@ -22,6 +22,7 @@ Description:
 -->
 <project name="test-recorder" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
     <description>Helium Antlib logger unittests.</description>
+    <taskdef resource="com/nokia/helium/core/ant/antlib.xml" uri="http://www.nokia.com/helium"/>
     <import file="../../stages_config.ant.xml" />
 
     <target name="test-recorder">

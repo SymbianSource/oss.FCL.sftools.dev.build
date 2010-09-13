@@ -18,11 +18,50 @@
 #===============================================================================
 """amara"""
 
-# pylint: disable-msg=E1103
-import sys
-if 'java' in sys.platform:
+# pylint: disable=E1103
+#import sys
+#if 'java' in sys.platform:
+#    pass
+if True:
+    import os
     import xml.dom.minidom
     import urllib
+    import xpath
+    import xml.etree.ElementTree
+    import xml.etree.ElementInclude
+    
+    # pylint: disable=W0212
+    def fixed_writexml(self, writer, indent="", addindent="", newl=""):
+        # indent = current indentation
+        # addindent = indentation to add to higher levels
+        # newl = newline string
+        writer.write(indent + "<" + self.tagName)
+    
+        attrs = self._get_attributes()
+        a_names = attrs.keys()
+        a_names.sort()
+    
+        for a_name in a_names:
+            writer.write(" %s=\"" % a_name)
+            xml.dom.minidom._write_data(writer, attrs[a_name].value)
+            writer.write("\"")
+        if self.childNodes:
+            if len(self.childNodes) == 1 \
+              and self.childNodes[0].nodeType == xml.dom.minidom.Node.TEXT_NODE:
+                writer.write(">")
+                self.childNodes[0].writexml(writer, "", "", "")
+                writer.write("</%s>%s" % (self.tagName, newl))
+                return
+            writer.write(">%s" % (newl))
+            for node in self.childNodes:
+                if node.__class__ == xml.dom.minidom.Text and node.data.strip() == '':
+                    continue
+                node.writexml(writer, indent + addindent, addindent, newl)
+            writer.write("%s</%s>%s" % (indent, self.tagName, newl))
+        else:
+            writer.write("/>%s" % (newl))
+    # replace minidom's function with ours
+    xml.dom.minidom.Element.writexml = fixed_writexml
     
     def parse(param):
         """parse"""
@@ -42,29 +81,55 @@ if 'java' in sys.platform:
             if isinstance(dom, file):
                 self.dom = xml.dom.minidom.parse(dom)
             elif isinstance(dom, basestring):
-                if dom.startswith('file:///'):
+                cwd_backup = os.getcwd()
+                if dom.startswith('file:///') or dom.startswith('///') or os.path.exists(dom):
+                    try:
+                        path = urllib.url2pathname(dom)
+                        path = path.replace('file:///', '')
+                        os.chdir(os.path.dirname(path))
+                    except IOError:
+                        pass
                     dom = urllib.urlopen(dom).read()
+                
+                ettree = xml.etree.ElementTree.fromstring(dom)
+                xml.etree.ElementInclude.include(ettree)
+                dom = xml.etree.ElementTree.tostring(ettree)
+                os.chdir(cwd_backup)
                 self.dom = xml.dom.minidom.parseString(dom)
             else:
                 self.dom = dom
         
         def __getitem__(self, name):
             return self.__getattr__(name)
-        
+            
+        def __setitem__(self, key, value):
+            self.xml_set_attribute(key, value)
+            
         def __getattr__(self, attr):
             if isinstance(attr, basestring):
                 res = self.dom.getElementsByTagName(attr)
                 if len(res) == 0:
                     if hasattr(self.dom, 'documentElement'):
                         val = self.dom.documentElement.getAttribute(attr)
+                        if not self.dom.documentElement.hasAttribute(attr):
+                            raise Exception(attr + ' not found')
                     else:
                         val = self.dom.getAttribute(attr)
-                    if val == '':
-                        raise Exception(attr + ' not found')
+                        if not self.dom.hasAttribute(attr):
+                            raise Exception(attr + ' not found')
                     return val
                 return MinidomAmara(res[0], self.dom)
-            return MinidomAmara(self.parent.getElementsByTagName(self.dom.tagName)[attr])
+            if self.parent:
+                return MinidomAmara(self.parent.getElementsByTagName(self.dom.tagName)[attr])
+            else:
+                raise Exception(str(attr) + ' not found')
     
+        def __setattr__(self, name, value):
+            if isinstance(value, basestring):
+                self.xml_set_attribute(name, value)
+            else:
+                object.__setattr__(self, name, value)
+        
         def __iter__(self):
             for entry in self.parent.getElementsByTagName(self.dom.tagName):
                 yield MinidomAmara(entry)
@@ -76,13 +141,15 @@ if 'java' in sys.platform:
                     text = text + t_text.data
             return text
         
-        def xml(self, out=None, indent=True, omitXmlDeclaration=False, encoding=''):
+        def xml(self, out=None, indent=False, omitXmlDeclaration=False, encoding='utf-8'):
             """xml"""
+            if omitXmlDeclaration:
+                pass
             if out:
-                out.write(self.dom.toprettyxml())
+                out.write(self.dom.toprettyxml(encoding=encoding))
             if indent:
-                return self.dom.toprettyxml()
-            return self.dom.toxml()
+                return self.dom.toprettyxml(encoding=encoding)
+            return self.dom.toxml(encoding=encoding)
         
         def xml_append_fragment(self, text):
             """xml append fragment"""
@@ -91,6 +158,9 @@ if 'java' in sys.platform:
         def xml_set_attribute(self, name, value):
             """set XML attribute"""
             self.dom.setAttribute(name, value)
+        
+        def xml_remove_child(self, value):
+            self.dom.removeChild(value.dom)
         
         def _getxml_children(self):
             """get xml children"""
@@ -142,24 +212,32 @@ if 'java' in sys.platform:
         
         def __eq__(self, obj):
             return str(self) == obj
+        def __ne__(self, obj):
+            return str(self) != obj
         
         def __len__(self):
-            return len(self.parent.getElementsByTagName(self.dom.tagName))
+            if self.parent:
+                return len(self.parent.getElementsByTagName(self.dom.tagName))
+            return 1
         
-        def xml_xpath(self, xpath):
+        def xml_xpath(self, axpath):
             """append to the XML path"""
-            import java.io.ByteArrayInputStream
-            import org.dom4j.io.SAXReader
-            import org.dom4j.DocumentHelper
-
-            stream = java.io.ByteArrayInputStream(java.lang.String(self.dom.toxml()).getBytes("UTF-8"))
-            xmlReader = org.dom4j.io.SAXReader()
-            doc = xmlReader.read(stream)
-            xpath = org.dom4j.DocumentHelper.createXPath(xpath)
-            signalNodes = xpath.selectNodes(doc)
-            iterator = signalNodes.iterator()
-            out = []
-            while iterator.hasNext():
-                p_iterator = iterator.next()
-                out.append(MinidomAmara(p_iterator.asXML()))
-            return out
+            results  = [] 
+            for result in xpath.find(axpath, self.dom): 
+                results.append(MinidomAmara(result)) 
+            return results 
+#            import java.io.ByteArrayInputStream
+#            import org.dom4j.io.SAXReader
+#            import org.dom4j.DocumentHelper
+#
+#            stream = java.io.ByteArrayInputStream(java.lang.String(self.dom.toxml()).getBytes("UTF-8"))
+#            xmlReader = org.dom4j.io.SAXReader()
+#            doc = xmlReader.read(stream)
+#            xpath = org.dom4j.DocumentHelper.createXPath(xpath)
+#            signalNodes = xpath.selectNodes(doc)
+#            iterator = signalNodes.iterator()
+#            out = []
+#            while iterator.hasNext():
+#                p_iterator = iterator.next()
+#                out.append(MinidomAmara(p_iterator.asXML()))
+#            return out

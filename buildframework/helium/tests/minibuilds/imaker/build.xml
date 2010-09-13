@@ -24,7 +24,7 @@ Description:
     <property environment="env"/>
     <import file="../site/${env.TEAM}.ant.xml" />
     <dirname property="config.dir" file="${ant.file.minibuild.ido}"/>
-	
+    
     <!-- Enable Helium internal assertion checking. -->
     <property name="hlm.enable.asserts" value="1" />
 
@@ -57,28 +57,29 @@ Description:
     <import file="${helium.dir}/helium.ant.xml"/>
 
     <!-- Need to define custom preparation steps. -->
-	  <target name="ido-prep" depends="prep-drive,preparation-getenv"/>
+      <target name="ido-prep" depends="prep-drive,preparation-getenv"/>
 
-    <!-- Run the full sequence of target for the minibuild. ,mini-build-prep,compile-main,zip-ee,mini-build-check-->
-    <target name="do-mini-build" depends="ido-update-build-area,
-    										mini-build-cleanup,
-                                            mini-build-install-new-imaker,
-                                            mini-build-prepare,
+    <!-- Run the full sequence of target for the minibuild. ,minibuild-prep,compile-main,zip-ee,minibuild-check-->
+    <target name="do-minibuild" depends="ido-update-build-area,
+                                            minibuild-cleanup,
+                                            minibuild-install-new-imaker,
+                                            minibuild-prepare,
                                             build-roms,
                                             fota-a-build,
                                             build-icreatordp,
-    	                                    mini-build-check"/>
+                                            minibuild-check,
+                                            final"/>
     
     
-    <!--ant code coverage for mini-builds-->
-    <target name="mini-build">
+    <!--ant code coverage for minibuilds-->
+    <target name="minibuild">
         <antcall target="database">
             <param name="home.files.only" value="false"/>
         </antcall>
         <mkdir dir="${helium.build.dir}/temp"/>
         <property name="config.temp.build.dir" location="${config.dir}/build"/>
         <hlm:coveragerecord name="${helium.build.dir}/temp/test.minibuild-ido.xml" action="start"/>
-        <runtarget target="do-mini-build"/>
+        <runtarget target="do-minibuild"/>
         <hlm:coveragerecord name="${helium.build.dir}/temp/test.minibuild-ido.xml" action="stop"/>
         <fmpp sourcefile="${helium.dir}/tools/common/templates/coveragerecord.txt.ftl"
             outputfile="${helium.build.dir}/temp/test_minibuild.txt">
@@ -92,33 +93,33 @@ Description:
 The summary of Ant code coverage:
 
 ${ant.coverage.summary}</echo>
-		<fmpp sourcefile="${helium.dir}/tools/common/templates/coveragerecord.html.ftl"
-			  outputfile="${helium.build.dir}/temp/test_minibuild.html">
-			<data expandProperties="yes">
-            	doc: xml(${helium.build.dir}/temp/test.minibuild-ido.xml)
+        <fmpp sourcefile="${helium.dir}/tools/common/templates/coveragerecord.html.ftl"
+              outputfile="${helium.build.dir}/temp/test_minibuild.html">
+            <data expandProperties="yes">
+                doc: xml(${helium.build.dir}/temp/test.minibuild-ido.xml)
                 database: xml(${database.file})
-			</data>
-		</fmpp>
+            </data>
+        </fmpp>
     </target>
 
-    <target name="mini-build-install-new-imaker">
+    <target name="minibuild-install-new-imaker">
         <!-- Export custom image configuration file. -->
         <copy file="config/image_conf_naming.mk" tofile="${build.drive}/epoc32/rom/config/image_conf_naming.mk"/>
         <!--hlm:bldmakeBldfilesMacro dir="${build.drive}/imaker_rnd/group"/>
         <hlm:abldMacro dir="${build.drive}/imaker_rnd/group" command="cleanexport" platform=""/>
         <hlm:abldMacro dir="${build.drive}/imaker_rnd/group" command="export" platform=""/-->
     </target>
-	
-	<target name="minibuild-build-roms" depends="build-roms,imaker-merge-rom-xml"/>
-	
+    
+    <target name="minibuild-build-roms" depends="build-roms,imaker-merge-rom-xml"/>
+    
     <target name="build-roms-ec">
         <antcall target="minibuild-build-roms">
             <reference refid="imaker.rom.config" torefid="imaker.rom.config"/>
             <param name="build.system" value="ec-helium"/>
-        	<param name="release.images.dir" value="${build.output.dir}/imaker_ec"/>        	
+            <param name="release.images.dir" value="${build.output.dir}/imaker_ec"/>            
        </antcall>
     </target>
-	
+    
     <target name="build-roms-ebs">
         <antcall target="minibuild-build-roms">
             <reference refid="imaker.rom.config" torefid="imaker.rom.config"/>
@@ -126,22 +127,22 @@ ${ant.coverage.summary}</echo>
             <param name="release.images.dir" value="${build.output.dir}/imaker_ebs"/>         
        </antcall>
     </target>
-	
-	<!-- test target. -->
-	<target name="imaker-build" depends="build-roms-ec,build-roms-ebs">
-	</target>
+    
+    <!-- test target. -->
+    <target name="imaker-build" depends="build-roms-ec,build-roms-ebs">
+    </target>
 
     
     <target name="check-diamonds">
-		<loadfile srcfile="${build.log.dir}/${build.id}_diamonds-log-start.xml" property="diamonds.log.start"/>
+        <loadfile srcfile="${build.log.dir}/${build.id}_diamonds-log-start.xml" property="diamonds.log.start"/>
         <echo>${diamonds.log.start}</echo>
         <loadresource property="diamonds.log.start.output">
             <url url="${diamonds.build.url}?fmt=xml"/>
         </loadresource>
         <echo>${diamonds.log.start.output}</echo>
-	</target>
+    </target>
     
-    <target name="mini-build-cleanup">
+    <target name="minibuild-cleanup">
         <delete verbose="true" includeemptydirs="true" failonerror="false">
             <fileset dir="${build.drive}/" casesensitive="false">
                 <include name="makefile"/>
@@ -155,18 +156,18 @@ ${ant.coverage.summary}</echo>
                 <include name="timestop.txt"/>
             </fileset>
         </delete>
-    	<mkdir dir="${build.drive}/output/logs"/>
+        <mkdir dir="${build.drive}/output/logs"/>
     </target>
     
     
-    <target name="mini-build-prepare">
-    	<hlm:hackMacro file="${build.drive}/epoc32/rom/config/${product.platform}/${product.name}/customer/custvariant_01_test/content/variant.mk" keyword="CUSTVARIANT_COMPLP" regex="(custvariant\s*$)" replace="\1\nCUSTVARIANT_COMPLP=01 02"/>
+    <target name="minibuild-prepare">
+        <hlm:hackMacro file="${build.drive}/epoc32/rom/config/${product.platform}/${product.name}/customer/custvariant_01_test/content/variant.mk" keyword="CUSTVARIANT_COMPLP" regex="(custvariant\s*$)" replace="\1\nCUSTVARIANT_COMPLP=01 02"/>
     </target>
 
-    <target name="mini-build-check">
+    <target name="minibuild-check">
     </target>
-	
-	<!-- Rom configuration -->
+    
+    <!-- Rom configuration -->
     <hlm:imakerconfigurationset id="imaker.rom.config">
         <imakerconfiguration>
             <makefileset>
@@ -201,7 +202,7 @@ ${ant.coverage.summary}</echo>
                 <variable name="TYPE" value="prd"/>
             </variableset>
         </imakerconfiguration-->
-    </hlm:imakerconfigurationset>	
+    </hlm:imakerconfigurationset>    
 </project>
 
     

@@ -38,11 +38,11 @@ class IADPackager :
         """ get the list of build directories """
         units = layer.getElementsByTagName ("unit")
         for unit in units :
-            dir = unit.getAttribute ("bldFile").rstrip ('\\/')
-            i = dir.rfind ("\\")
+            dir_ = unit.getAttribute ("bldFile").rstrip ('\\/')
+            i = dir_.rfind ("\\")
             if i == - 1 :
-                i = dir.rfind ("/")
-            bldDirs.append (dir[:i + 1])
+                i = dir_.rfind ("/")
+            bldDirs.append (dir_[:i + 1])
     
     def getLayer(self, configuration, layers, bldDirs) :
         """ get each layer info """
@@ -93,14 +93,14 @@ class IADPackager :
         sisFile = packageName + '/' + packageName + ".sis"
         infoFile = packageName + "/sisinfo.xml"
         depFile = packageName + "/depends.xml"
-        zip = zipfile.ZipFile (zipFile, "w")
-        zip.write (sisFile, sisFile.encode ("utf-8"))
-        zip.write (infoFile, infoFile.encode ("utf-8"))
-        zip.write (depFile, depFile.encode ("utf-8"))
+        zip_ = zipfile.ZipFile (zipFile, "w")
+        zip_.write (sisFile, sisFile.encode ("utf-8"))
+        zip_.write (infoFile, infoFile.encode ("utf-8"))
+        zip_.write (depFile, depFile.encode ("utf-8"))
         if self.hasStub :
             stubFile = packageName + '/' + packageName + "_stub.sis"
-            zip.write (stubFile, stubFile.encode ("utf-8"))
-        zip.close()
+            zip_.write (stubFile, stubFile.encode ("utf-8"))
+        zip_.close()
         
     
     def processSisDir(self, sisDir, makesis) :

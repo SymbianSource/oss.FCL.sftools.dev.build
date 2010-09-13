@@ -34,10 +34,16 @@ import java.util.Hashtable;
  *   For more information about system definition file v3.0 please check 
  *   <a href="http://developer.symbian.org/wiki/index.php/System_Definition">http://developer.symbian.org/wiki/index.php/System_Definition</a>.
  *
+ * <br>
+ * This task relies on externals tools. Their location can be configured the following ways:
+ *  <li>by configuring the sysdef.tools.home property, fails if the location is incorrect.
+ *  <li>The parent folder of the joinsysdef tool from the PATH, fallback on SDK location.
+ *  <li>Default SDK location.
+ *
  *   @ant.task name="downgradeSysdef" category="Sysdef"
  */
 public class DowngradeTask extends AbstractSydefTask {
-    private static final String XSLT = "sf/os/buildtools/bldsystemtools/sysdeftools/sysdefdowngrade.xsl"; 
+    private static final String XSLT = "sysdefdowngrade.xsl"; 
 
     /**
      * {@inheritDoc}
@@ -54,6 +60,6 @@ public class DowngradeTask extends AbstractSydefTask {
      */
     @Override
     protected File getXsl() {
-        return new File(this.getEpocroot(), XSLT);
+        return new File(SysdefUtils.getSysdefHome(getProject(), this.getEpocroot()), XSLT);
     }
 }

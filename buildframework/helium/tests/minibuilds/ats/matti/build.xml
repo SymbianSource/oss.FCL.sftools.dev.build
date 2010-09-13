@@ -33,23 +33,23 @@ Contains the configuration variables for the minibuild testing of MATTI.
     <property name="build.drive" value="z:" />
     
     <!-- MATTI testing parameters-->
-    <property name="enabled.matti" value="true" />
-    <property name="enabled.ats" value="true" />
-	<property name="matti.scripts" value="${helium.dir}\testconfig\ats3\matti\script" />
-	<property name="template.file" value="${helium.dir}\tools\common\python\lib\ats3\matti\template\matti_demo.xml" />
-	<property name="ats.sis.images.dir" location="${helium.dir}\testconfig\ats3\matti\sis" />
+    <property name="matti.enabled" value="true" />
+    <property name="ats.enabled" value="true" />
+    <property name="matti.scripts" value="${helium.dir}\testconfig\ats3\matti\script" />
+    <property name="template.file" value="${helium.dir}\tools\common\python\lib\ats3\matti\template\matti_demo.xml" />
+    <property name="ats.sis.images.dir" location="${helium.dir}\testconfig\ats3\matti\sis" />
     <property name="ats.image.type" value="variant" />
-	<property name="ats.product.name" value="" />
-	<property name="ats.email.list" value="" />
-	<property name="ats.plan.name" value="" />
-	<property name="ats.flashfiles.minlimit" value="2" />
-	<property name="ats.target.platform" value="armv5 urel" />
-	<property name="ats.script.type" value="import" />
-	<property name="ats.product.hwid" value="" />
+    <property name="ats.product.name" value="" />
+    <property name="ats.email.list" value="" />
+    <property name="ats.plan.name" value="" />
+    <property name="ats.flashfiles.minlimit" value="2" />
+    <property name="ats.target.platform" value="armv5 urel" />
+    <property name="ats.script.type" value="import" />
+    <property name="ats.product.hwid" value="" />
     <property name="core.build.version" value="1" />
     <property name="build.id" value="001" />
-	<property name="ats.testrun.name" value="${build.id}_${ats.product.name}_${core.build.version}" />
-	<property name="ats.test.timeout" value="60" />
+    <property name="ats.testrun.name" value="${build.id}_${ats.product.name}_${core.build.version}" />
+    <property name="ats.test.timeout" value="60" />
     <property name="ats.output.dir" location="${build.drive}\output\ats" />
     <property name="ats.sisfiles.minlimit" value="1" />
 
@@ -62,7 +62,7 @@ Contains the configuration variables for the minibuild testing of MATTI.
     <property name="ido.build.filter" value="${ta.flag.list},dfs_build"/>
    <property name="ats.server" value="4fio00105:8080"/>
     <property name="release.images.dir" value="${helium.dir}\testconfig\ats3\matti\variant_images" />
-		
+        
     <!-- build configuration -->
     <property name="sysdef.configurations.list" value="helium_minibuild_matti_compile" />
     <path id="system.definition.files">
@@ -70,24 +70,24 @@ Contains the configuration variables for the minibuild testing of MATTI.
     </path>
 <!--    
     <property name="build.system" value="ec-helium" />
--->	
-	<property name="rvct.version" value="22_616"/>
-	<!-- Archiving configuration-->
-	<property name="zip.config.file" location="archive.cfg.xml"/>
-	<property name="zips.ee.spec.name" value="minibuild_archive"/>
-	
+-->    
+    <property name="rvct.version" value="22_616"/>
+    <!-- Archiving configuration-->
+    <property name="zip.config.file" location="archive.cfg.xml"/>
+    <property name="zips.ee.spec.name" value="minibuild_archive"/>
+    
     <!-- Synergy is not configured -->
     <property name="skip.password.validation" value="1"/>
     
     <import file="${helium.dir}/helium.ant.xml"/>
     
-   <!-- Run the full sequence of target for the minibuild. ,mini-build-prep,compile-main,zip-ee,mini-build-check-->
-    <!--target name="minibuild-matti" depends="mini-build-cleanup,mini-build-prep,compile-main,matti-test"/-->
-    <target name="minibuild-matti" depends="mini-build-prep,build-roms,matti-test"/>
+   <!-- Run the full sequence of target for the minibuild. ,minibuild-prep,compile-main,zip-ee,minibuild-check-->
+    <!--target name="minibuild-matti" depends="minibuild-cleanup,minibuild-prep,compile-main,matti-test"/-->
+    <target name="minibuild-matti" depends="minibuild-prep,build-roms,matti-test"/>
     
     <!-- Prepare the minibuild. -->
-    <!--target name="mini-build-prep" depends="init-build-area,start-ant-log,diamonds,set-arm-version,prep-copy-symbiantools"/-->
-    <target name="mini-build-prep" depends="prep"/>
+    <!--target name="minibuild-prep" depends="init-build-area,start-ant-log,diamonds,set-arm-version,prep-copy-symbiantools"/-->
+    <target name="minibuild-prep" depends="prep"/>
     
     <!-- Stubbing few targets for easy testing with dragonfly ... -->
     <target name="prep-drive" depends="build-number"/>
@@ -97,13 +97,13 @@ Contains the configuration variables for the minibuild testing of MATTI.
     <target name="check-env-prep"/>
     <target name="prep-copy"/>
     
-    <target name="mini-build-cleanup">
+    <target name="minibuild-cleanup">
         <delete verbose="true" includeemptydirs="true">
             <fileset dir="${build.drive}/" casesensitive="false">
                 <include name="makefile"/>
                 <include name="*.mk"/>
-            	<include name="ecloud_tmp_*/**"/>
-            	<include name="emake.*"/>            	
+                <include name="ecloud_tmp_*/**"/>
+                <include name="emake.*"/>                
                 <include name="epoc32/build/**"/>
                 <include name="epoc32/rombuild/*/**"/>
                 <include name="timestart.txt"/>
@@ -112,24 +112,24 @@ Contains the configuration variables for the minibuild testing of MATTI.
         </delete>
     </target>
     
-    <target name="mini-build-check">
-    	<!-- Check if prep has set some prop correctly... -->
+    <target name="minibuild-check">
+        <!-- Check if prep has set some prop correctly... -->
         <echo>'${arm.compiler.version}'</echo>
         <au:assertMatches string="${arm.compiler.version}" pattern="RVCT2\.2 \[Build 616\]" casesensitive="false" multiline="true"/>
 
         <!-- Check if compile-main step did what expected... -->
-    	<au:assertFileExists file="${canonical.sysdef.file}"/>
+        <au:assertFileExists file="${canonical.sysdef.file}"/>
         <au:assertFileExists file="${build.drive}/Makefile"/>
         <au:assertFileExists file="${build.drive}/emake.data"/>
         <au:assertFileExists file="${build.log.dir}/${build.id}.helium_minibuild_compile_run_emake.bat"/>
-    	
-    	
-    	<!-- Checking the zip generation -->
-    	<au:assertFileExists file="${zips.build.dir}/s60_app_organizer_clock_binary.zip"/>
-    	<au:assertFileExists file="${zips.build.dir}/s60_app_organizer_clock.zip"/>    	
+        
+        
+        <!-- Checking the zip generation -->
+        <au:assertFileExists file="${zips.build.dir}/s60_app_organizer_clock_binary.zip"/>
+        <au:assertFileExists file="${zips.build.dir}/s60_app_organizer_clock.zip"/>        
     </target>
     
-	
+    
 </project>
 
     

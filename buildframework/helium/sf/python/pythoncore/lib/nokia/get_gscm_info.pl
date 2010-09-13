@@ -42,7 +42,10 @@ BEGIN {
     }
     else
     {
-      $gscm_lib = $ENV{'CCM_HOME'} . "/../gscm-apps/lib"; # TODO: remove hardcoded path!
+      use File::Basename;
+
+      # Do not use .. because evaluation get wrong under  64-bit Linux
+      $gscm_lib = dirname($ENV{'CCM_HOME'}) . "/gscm-apps/lib"; # TODO: remove hardcoded path!
     }
     my ($perl_version) = $Config{version} =~ /^(\d+\.\d+)/;    
     unshift @INC, "$gscm_lib/$perl_version/$archname", "$gscm_lib/$perl_version", $gscm_lib;

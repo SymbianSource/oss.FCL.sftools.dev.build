@@ -29,10 +29,10 @@ import csv
 LOGGER = logging.getLogger("symrec")
 logging.basicConfig(level=logging.INFO)
 
-def _cleanup_list(input):
+def _cleanup_list(input_):
     """cleanup  list"""
     result = []
-    for chars in input:
+    for chars in input_:
         if chars is not None and chars.strip() != "":
             result.append(chars)
     return result
@@ -56,6 +56,7 @@ def ignore_whitespace_writexml(self, writer, indent="", addindent="", newl=""):
     addindent = indentation to add to higher levels
     newl = newline string
     """
+    # pylint: disable=W0212
     writer.write(indent + "<" + self.tagName)
 
     attrs = self._get_attributes()
@@ -112,6 +113,7 @@ class ServicePack(object):
             result.append(instr.getAttribute('name'))
         return result
 
+
 class ReleaseMetadata(object):
     """ Create or read Metadata XML from SYMREC/SYMDEC. """
     
@@ -141,7 +143,7 @@ class ReleaseMetadata(object):
                 self.product = product
             if release != None:
                 self.release = release
-        elif service!=None and product!=None and release!=None:
+        elif service != None and product != None and release != None:
             self._xml = xml.dom.minidom.Document()
             self._releaseInformation = self._xml.createElement(u"releaseInformation")
             self._xml.appendChild(self._releaseInformation)
@@ -170,8 +172,7 @@ class ReleaseMetadata(object):
             #    releaseFiles
             self._releaseInformation.appendChild(self._xml.createElement(u'externalFiles'))
         else:
-            raise Exception("Error metadata file doesn't exists.")
-
+            raise IOError("Error metadata file doesn't exists.")
 
     def get_dependsof(self):
         """ Return a ReleaseMetada object pointing to the dependency release. """
@@ -184,7 +185,6 @@ class ReleaseMetadata(object):
         else:
             return None
 
-
     def set_dependsof(self, filename):
         """ Setting the dependency release. """
         metadata  = ReleaseMetadata(filename)
@@ -192,7 +192,7 @@ class ReleaseMetadata(object):
         self.dependsof_product  = metadata.product
         self.dependsof_release  = metadata.release
 
-    def add_package(self, name, type=None, default=True, filters=None, extract="single", md5checksum=None, size=None):
+    def add_package(self, name, type_=None, default=True, filters=None, extract="single", md5checksum=None, size=None):
         """ Adding a package to the metadata file. """
         # check if update mode
         package = None
@@ -208,8 +208,8 @@ class ReleaseMetadata(object):
             self._releaseFiles.appendChild(package)
             
         xml_setattr(package, 'name', os.path.basename(name))
-        if type != None:
-            xml_setattr(package, 'type', type)
+        if type_ != None:
+            xml_setattr(package, 'type', type_)
         else:
             xml_setattr(package, 'type', os.path.splitext(name)[1].lstrip('.'))
         xml_setattr(package, 'default', str(default).lower())
@@ -224,7 +224,6 @@ class ReleaseMetadata(object):
             xml_setattr(package, unicode("md5checksum"), unicode(md5checksum))
         if size != None:
             xml_setattr(package, unicode("size"), unicode(size))
-        
 
     def keys(self):
         """keys"""
@@ -250,7 +249,7 @@ class ReleaseMetadata(object):
                     size = pkg.getAttribute('size')
                 return {'type': pkg.getAttribute('type'), 'extract': pkg.getAttribute('extract'), 'default': (pkg.getAttribute('default')=="true"), \
                          'filters': filters, 's60filter': s60filters, 'md5checksum': md5checksum, 'size': size}
-        raise Exception("Key '%s' not found." % key)
+        raise KeyError("Key '%s' not found." % key)
 
     def __setitem__(self, key, value):
         self.add_package(key, value['type'], value['default'], value['filters'], value['extract'], value['md5checksum'], value['size'])
@@ -402,6 +401,7 @@ class ValidateReleaseMetadata(ReleaseMetadata):
             return ValidateReleaseMetadata(dependency.filename).is_valid(checkmd5)
         return True
 
+
 class MetadataMerger(object):
     """ Merge packages definition to the root metadata. """
     
@@ -424,6 +424,7 @@ class MetadataMerger(object):
     def save(self, filename = None):
         """ Saving the XML into the provided filename. """
         return self._metadata.save(filename)
+ 
  
 class Metadata2TDD(ReleaseMetadata):
     """ Convert Metadata to a TDD file """
@@ -476,10 +477,11 @@ def find_latest_metadata(releasedir):
         metadatas.sort(reverse=True)
         if len(metadatas) > 0:
             return os.path.normpath(os.path.join(releasedir, metadatas[0]))
-    except Exception, exc:
+    except (IOError, OSError), exc:
         LOGGER.error(exc)
         return None
     return None
+
 
 class ValidateReleaseMetadataCached(ValidateReleaseMetadata):
     """ Cached version of the metadata validation. """
@@ -538,12 +540,13 @@ class ValidateReleaseMetadataCached(ValidateReleaseMetadata):
             writer.writerows(metadatas)
             f_file.close()
 
+
 class ValidateTicklerReleaseMetadata(ValidateReleaseMetadataCached):
     """ This class validate if a metadata file is stored in the correct location and
         if all deps exists.
     """
     def __init__(self, filename):
-        ReleaseMetadata.__init__(self, filename)
+        ValidateReleaseMetadataCached.__init__(self, filename)
         self.location = os.path.dirname(filename)
     
     def is_valid(self, checkmd5=True):

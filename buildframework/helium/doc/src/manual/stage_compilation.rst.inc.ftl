@@ -105,9 +105,7 @@ Raptor compilation
 ------------------
 
 Enabling CTC integration
-   It is possible to enable CTC instrumenting while building with SBSv2. To proceed you need to define the **sbs.build.ctc** to true.
-   If default options are not satisfying (default command line arguments: "-i m"), you can override the **ctc.instrument.type** property to
-   define an another instrumentation type. Or if you need to define additional arguments you can then override 
-   the argSet referenced by **ctc.build.options**. 
+
+   It is possible to enable CTC instrumenting while building with SBSv2. To proceed you need to define the ``ctc.enabled`` to true. If default options are not satisfying (default command line arguments: "-i m"), you can override the ``ctc.instrument.type`` property to define an another instrumentation type. Or if you need to define additional arguments you can then override the argSet referenced by ``ctc.build.options``. 
    
    

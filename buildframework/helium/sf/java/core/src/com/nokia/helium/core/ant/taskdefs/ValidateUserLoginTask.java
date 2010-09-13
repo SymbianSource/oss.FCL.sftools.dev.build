@@ -17,12 +17,21 @@
  
 package com.nokia.helium.core.ant.taskdefs;
 
-import org.apache.tools.ant.Task;
-import org.apache.tools.ant.Project;
-import org.apache.tools.ant.BuildException;
-import javax.naming.*;
-import javax.naming.directory.*;
 import java.util.Hashtable;
+
+import javax.naming.Context;
+import javax.naming.NamingEnumeration;
+import javax.naming.NamingException;
+import javax.naming.directory.Attribute;
+import javax.naming.directory.Attributes;
+import javax.naming.directory.DirContext;
+import javax.naming.directory.InitialDirContext;
+import javax.naming.directory.SearchControls;
+import javax.naming.directory.SearchResult;
+
+import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.Project;
+import org.apache.tools.ant.Task;
 import org.apache.tools.ant.taskdefs.condition.Condition;
 
 /**
@@ -61,8 +70,9 @@ public class ValidateUserLoginTask extends Task implements Condition
     public void execute()
     {
         
-        if (property == null)
+        if (property == null) {
             throw new BuildException("'property' attribute is not defined");
+        }
         validateParameters(url, rootdn, filter, key, searchdn, password);
         log("Authenticating the user...");
         if (authenticateUser(url, searchUser(url, rootdn, filter, key, searchdn))) {
@@ -113,18 +123,24 @@ public class ValidateUserLoginTask extends Task implements Condition
     
     public void validateParameters(String url, String rootdn, String filter, String key, String searchdn, String password) {
         
-        if (url == null)
+        if (url == null) {
             throw new BuildException("'url' attribute is not defined");
-        if (rootdn == null)
+        }
+        if (rootdn == null) {
             throw new BuildException("'rootdn' attribute is not defined");
-        if (filter == null)
+        }
+        if (filter == null) {
             throw new BuildException("'filter' attribute is not defined");
-        if (key == null)
+        }
+        if (key == null) {
             throw new BuildException("'key' attribute is not defined");
-        if (searchdn == null)
+        }
+        if (searchdn == null) {
             throw new BuildException("'searchdn' attribute is not defined");
-        if (password == null)
+        }
+        if (password == null) {
             throw new BuildException("'password' attribute is not defined");
+        }
     }
     
     public boolean authenticateUser(String ldapurl, String rooTdn) {
@@ -136,7 +152,7 @@ public class ValidateUserLoginTask extends Task implements Condition
         env.put(Context.SECURITY_PRINCIPAL, rooTdn);
         env.put(Context.SECURITY_CREDENTIALS, password);
         try {
-            DirContext authContext = new InitialDirContext(env);
+            DirContext authContext = new InitialDirContext(env); //NOPMD
             return true;
         } catch (NamingException e) {
             // We are Ignoring the errors as no need to fail the build.

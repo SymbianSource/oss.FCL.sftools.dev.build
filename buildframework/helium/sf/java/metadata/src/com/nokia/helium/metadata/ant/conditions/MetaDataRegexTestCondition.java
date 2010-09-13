@@ -24,16 +24,16 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.tools.ant.BuildException;
-import org.apache.tools.ant.ProjectComponent;
 import org.apache.tools.ant.taskdefs.condition.Condition;
-
+import org.apache.tools.ant.types.DataType;
 
 import com.nokia.helium.metadata.ant.types.MetaDataFilter;
 import com.nokia.helium.metadata.ant.types.MetaDataFilterSet;
+import com.nokia.helium.metadata.ant.types.SeverityEnum;
 
 /**
  * This class implements a Ant Condition which report true if it finds the given 
- * input string is matched against the given filter of given priority
+ * input string is matched against the given filter of given severity
  * 
  * Example:
  * <pre> 
@@ -46,13 +46,13 @@ import com.nokia.helium.metadata.ant.types.MetaDataFilterSet;
  *   &lt;/target&gt;
  * </pre>
  * 
- * The condition will eval as true if the string is matched with any of the pattern in the given priority
+ * The condition will eval as true if the string is matched with any of the pattern in the given severity
  * 
  * @ant.type name="metadataRegexTest" category="Metadata"
  */
-public class MetaDataRegexTestCondition extends ProjectComponent implements Condition {
+public class MetaDataRegexTestCondition extends DataType implements Condition {
 
-    private String severity;
+    private SeverityEnum severity;
     private String string;  
     
     private List<MetaDataFilterSet> filterSets = new ArrayList<MetaDataFilterSet>();
@@ -63,7 +63,7 @@ public class MetaDataRegexTestCondition extends ProjectComponent implements Cond
      * @param severity
      * @ant.required
      */
-    public void setSeverity(String severity) {
+    public void setSeverity(SeverityEnum severity) {
         this.severity = severity;
     }
     /**
@@ -90,19 +90,21 @@ public class MetaDataRegexTestCondition extends ProjectComponent implements Cond
     
     /**
      * This method iterates through the regular expression patterns and match the input string against them.
-     * @return true if the string is matched with any of the pattern in the given priority, false otherwise.
+     * @return true if the string is matched with any of the pattern in the given severity, false otherwise.
      */
     public boolean eval() {
-        if (this.severity == null || (this.severity != null && this.severity.trim().isEmpty()))
+        if (this.severity == null) {
             throw new BuildException("'severity' attribute is not defined");
-        if (this.string == null || (this.string != null && this.string.isEmpty()))
+        }
+        if (this.string == null || (this.string != null && this.string.isEmpty())) {
             throw new BuildException("'string' attribute is not defined");
+        }
         for (MetaDataFilterSet set : filterSets) {
             for (MetaDataFilter filter : set.getAllFilters()) {
                 Pattern pattern = filter.getPattern();
                 Matcher matcher = pattern.matcher(this.string);
                 if (matcher.matches()) {
-                    return this.severity.equalsIgnoreCase(filter.getPriority());
+                    return severity.getSeverity().equals(filter.getSeverity());
                 }
             }
         }

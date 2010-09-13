@@ -18,7 +18,7 @@
 #===============================================================================
 """ handles components in XML documents"""
 
-# pylint: disable-msg=E1101
+# pylint: disable=E1101
 
 import xml.dom.minidom
 class Widget:
@@ -100,7 +100,7 @@ class Summary(Box):
 
         self.__table.appendChild(row)
 
-    def addStatistics(self, type, value):
+    def addStatistics(self, type_, value):
         """add Statistics"""
         if self.__table_stat == None:
             head1 = self._Box__doc.createElementNS("", "h1")
@@ -123,8 +123,8 @@ class Summary(Box):
 
         t_d = self._Box__doc.createElementNS("", "td")
         div = self._Box__doc.createElementNS("", "div")
-        div.setAttributeNS("", "class", "gbl_cnt_" + type)
-        div.appendChild(self._Box__doc.createTextNode("%d %ss" % (value, type)))
+        div.setAttributeNS("", "class", "gbl_cnt_" + type_)
+        div.appendChild(self._Box__doc.createTextNode("%d %ss" % (value, type_)))
         t_d.appendChild(div)
         self.__table_stat.appendChild(t_d)
           
@@ -132,7 +132,7 @@ class Summary(Box):
     
 class Event(Widget):
     """ A widget representing an event component """
-    def __init__(self, doc, container, id):
+    def __init__(self, doc, container, id_):
         Widget.__init__(self)
         self.__doc = doc
         node_head = doc.createElementNS("", "div")
@@ -140,11 +140,11 @@ class Event(Widget):
         container.appendChild(node_head)
 
         link = doc.createElementNS("", "a")
-        link.setAttributeNS("", "href", "javascript:ToggleNode('Img%d')" % id)
+        link.setAttributeNS("", "href", "javascript:ToggleNode('Img%d')" % id_)
         node_head.appendChild(link)
         
         span = doc.createElementNS("", "span")
-        span.setAttributeNS("", "id", "Img%d" % id)
+        span.setAttributeNS("", "id", "Img%d" % id_)
         span.setAttributeNS("", "style", "background:url(http://fawww.europe.nokia.com/isis/isis_interface/img/icons/button_open.gif) no-repeat")
         link.appendChild(span)
 
@@ -156,7 +156,7 @@ class Event(Widget):
         
         # shaow all
         showall = doc.createElementNS("", "a")
-        showall.setAttributeNS("", "href", "javascript:ShowChilds('Img%d')"  % id)
+        showall.setAttributeNS("", "href", "javascript:ShowChilds('Img%d')"  % id_)
         span = doc.createElementNS("", "span")
         span.setAttributeNS("", "class", "node_action")
         span.appendChild(doc.createTextNode("[Show All]"))
@@ -164,7 +164,7 @@ class Event(Widget):
         
         #hide all
         hideall = doc.createElementNS("", "a")
-        hideall.setAttributeNS("", "href", "javascript:HideChilds('Img%d')" % id)
+        hideall.setAttributeNS("", "href", "javascript:HideChilds('Img%d')" % id_)
         span = doc.createElementNS("", "span")
         span.setAttributeNS("", "class", "node_action")
         span.appendChild(doc.createTextNode("[Hide All]"))
@@ -172,7 +172,7 @@ class Event(Widget):
         
         #toggle node
         self.__togglenode = doc.createElementNS("", "a")
-        self.__togglenode.setAttributeNS("", "href", "javascript:ToggleNode('Img%d')" % id)
+        self.__togglenode.setAttributeNS("", "href", "javascript:ToggleNode('Img%d')" % id_)
         self.__togglenode.appendChild(doc.createTextNode(""))
         # append container
         node_head.appendChild(showall)
@@ -180,7 +180,7 @@ class Event(Widget):
         node_head.appendChild(self.__togglenode)
 
         contentx = doc.createElementNS("", "div")
-        contentx.setAttributeNS("", "id", "Content%d" % id)
+        contentx.setAttributeNS("", "id", "Content%d" % id_)
         contentx.setAttributeNS("", "style", "display:none")
         container.appendChild(contentx)
         content = doc.createElementNS("", "div")
@@ -194,15 +194,15 @@ class Event(Widget):
         """set Title"""
         self.__title.data = title
 
-    def addStatistics(self, type, value):
+    def addStatistics(self, type_, value):
         """add Statistics"""
         if self.__node_info == None:
             self.__node_info = self.__doc.createElementNS("", "span")
             self.__node_info.setAttributeNS("", "class", "node_info")
             self.__togglenode.appendChild(self.__node_info)
         span = self.__doc.createElementNS("", "span")
-        span.setAttributeNS("", "class","cnt_%s" % type)
-        span.appendChild(self.__doc.createTextNode("%d %ss" % (value, type)))
+        span.setAttributeNS("", "class","cnt_%s" % type_)
+        span.appendChild(self.__doc.createTextNode("%d %ss" % (value, type_)))
         self.__node_info.appendChild(span)
           #<span class="node_info">
           #  <span class="cnt_warning">2 warnings</span>
@@ -302,7 +302,7 @@ class Text(Widget):
             """push Content"""
             self.getDOMContainer().appendChild(self.__doc.createTextNode(arg))
             self.getDOMContainer().appendChild(self.__doc.createElementNS("","br"))
-        map(pushContent, text.strip().split("\n"))
+        [pushContent(line) for line in text.strip().split("\n")]
 
     def getDOMContainer(self):
         """get DOM Container"""

@@ -24,19 +24,9 @@ Description:
 <project name="helium_preinclude" basedir="." xmlns:hlm="http://www.nokia.com/helium">
     
     <description>
-    Helium task definations. User can import this file and use helium and helium-antlib tasks.
+    Users can import this file and use Helium and external tasks.
     </description>
     
     <import file="tools/common/libs.ant.xml"/>
-    <taskdef resource="com/nokia/ant/antlib.xml" uri="http://www.nokia.com/helium"/>
-    <taskdef resource="com/nokia/helium/core/ant/antlib.xml" uri="http://www.nokia.com/helium"/>
-    <taskdef resource="com/nokia/helium/signal/ant/antlib.xml" uri="http://www.nokia.com/helium"/>
-    <taskdef resource="com/nokia/helium/scm/ant/antlib.xml" uri="http://www.nokia.com/helium"/>
-    <taskdef resource="com/nokia/helium/metadata/ant/antlib.xml" uri="http://www.nokia.com/helium"/>
-    <taskdef resource="com/nokia/helium/quality/ant/antlib.xml" uri="http://www.nokia.com/helium"/>
-    <taskdef resource="com/nokia/helium/imaker/ant/antlib.xml" uri="http://www.nokia.com/helium" />
-    <taskdef resource="com/nokia/helium/sbs/ant/antlib.xml" uri="http://www.nokia.com/helium" />
-    <taskdef resource="com/nokia/helium/logger/ant/antlib.xml" uri="http://www.nokia.com/helium" />
-    <taskdef resource="com/nokia/helium/synergy/ant/antlib.xml" uri="http://www.nokia.com/helium" />
-    <taskdef resource="com/nokia/helium/ccmtask/ant/antlib.xml" uri="http://www.nokia.com/helium" />
+    
 </project>

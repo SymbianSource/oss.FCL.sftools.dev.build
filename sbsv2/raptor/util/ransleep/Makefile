@@ -15,15 +15,6 @@
 #
 #
 
-TARGET:=ransleep
-SOURCES:=$(SBS_HOME:\=/)/util/ransleep/ransleep.c
+all:
+	cd .. && make ransleep
 
-ifeq ($(filter win,$(HOSTPLATFORM)),win)
-CFLAGS:=-DWIN32
-LDFLAGS:=
-else
-CFLAGS:=
-LDFLAGS:=-lpthread
-endif
-
-$(eval $(cprogram))

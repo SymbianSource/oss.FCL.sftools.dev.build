@@ -32,13 +32,14 @@ const TInt KRomLoaderHeaderEPOC=1;
 const TInt KRomLoaderHeaderCOFF=2;
 
 static const TInt RombuildMajorVersion=2;
-static const TInt RombuildMinorVersion=17;
-static const TInt RombuildPatchVersion=4;
+static const TInt RombuildMinorVersion=18;
+static const TInt RombuildPatchVersion=2;
 static TBool SizeSummary=EFalse;
 static TPrintType SizeWhere=EAlways;
 static string compareROMName = "";
 static TInt MAXIMUM_THREADS = 128;
 static TInt DEFAULT_THREADS = 8;
+static string romlogfile = "ROMBUILD.LOG";
 
 string filename;			// to store oby filename passed to Rombuild.
 TBool reallyHelp=EFalse;
@@ -48,6 +49,7 @@ char* g_pCharCPUNum = NULL;
 TBool gGenDepGraph = EFalse;
 string gDepInfoFile = "";
 TBool gGenSymbols = EFalse ;
+TBool gIsOBYUTF8 = EFalse;
 void PrintVersion() {
  	Print(EAlways,"\nROMBUILD - Rom builder");
   	Print(EAlways, " V%d.%d.%d\n", RombuildMajorVersion, RombuildMinorVersion, RombuildPatchVersion);
@@ -72,13 +74,15 @@ char HelpText[] =
 	"        -symbols                      generate symbol file\n"
 	"        -compressionmethod <method>   method one of none|inflate|bytepair to set the compression\n"
 	"        -no-sorted-romfs              do not add sorted entries arrays (6.1 compatible)\n"
+	"        -oby-charset=<charset> used character set in which OBY was written\n"
 	"        -geninc                       to generate include file for licensee tools to use\n"			// DEF095619
 	"        -loglevel<level>              level of information to log (valid levels are 0,1,2,3,4).\n" //Tools like Visual ROM builder need the host/ROM filenames, size & if the file is hidden.
 	"        -wstdpath                     warn if destination path provided for a file is not a standard path\n"
 	"        -argfile=<fileName>           specify argument-file name containing list of command-line arguments to rombuild\n"
 	"        -lowmem                       use memory-mapped file for image build to reduce physical memory consumption\n"
 	"        -coreimage=<core image file>  to pass the core image as input for extension ROM image generation\n"
-	"        -k                            to enable keepgoing when duplicate files exist in oby\n";
+	"        -k                            to enable keepgoing when duplicate files exist in oby\n"
+	"        -logfile=<fileName>           specify log file\n";
 
 
 char ReallyHelpText[] =
@@ -256,6 +260,13 @@ void processCommandLine(int argc, char *argv[], TBool paramFileFlag=EFalse) {
 					delete[] parameter;
 					}
 				}	
+			else if(strnicmp(argv[i], "-OBY-CHARSET=", 13) == 0)
+			{
+				if((stricmp(&argv[i][13], "UTF8")==0) || (stricmp(&argv[i][13], "UTF-8")==0))
+					gIsOBYUTF8 = ETrue;
+				else
+					Print(EError, "Invalid encoding %s, default system internal encoding will be used.\n", &argv[i][13]);
+			}
 			else if( stricmp(arg, "compressionmethod") == 0 ) {
  				// next argument should be a method
 				if( (i+1) >= argc || argv[i+1][0] == '-') {
@@ -334,6 +345,9 @@ void processCommandLine(int argc, char *argv[], TBool paramFileFlag=EFalse) {
 				else {
  					Print (EError, "Core ROM image file is missing\n"); 
 				}
+			}
+			else if (strnicmp(arg, "logfile=",8) ==0) {
+				romlogfile = arg + 8;
 			}
 			else 
 #ifdef WIN32
@@ -424,7 +438,6 @@ void GenerateIncludeFile(const char* aRomName, TInt aUnpagedSize, TInt aPagedSiz
 }
 
 int main(int argc, char *argv[])  {
- 	H.SetLogFile("ROMBUILD.LOG");
 	TInt r = 0;
 #ifdef __LINUX__
 	gCPUNum = sysconf(_SC_NPROCESSORS_CONF);
@@ -440,6 +453,10 @@ int main(int argc, char *argv[])  {
  	if(filename.empty())
    		return KErrGeneral;
 		
+	if (romlogfile[romlogfile.size()-1] == '\\' || romlogfile[romlogfile.size()-1] == '/')
+		romlogfile += "ROMBUILD.LOG";
+ 	H.SetLogFile(romlogfile.c_str());
+
     if(gThreadNum == 0) {
  		if(gCPUNum > 0 && gCPUNum <= MAXIMUM_THREADS) {
  			Print(EAlways, "The number of processors (%d) is used as the number of concurrent jobs.\n", gCPUNum);

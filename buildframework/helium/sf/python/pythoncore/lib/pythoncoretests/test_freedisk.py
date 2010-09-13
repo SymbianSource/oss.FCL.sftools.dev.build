@@ -18,7 +18,7 @@
 #===============================================================================
 """ test free disk """
 
-# pylint: disable-msg=R0201
+# pylint: disable=R0201
 
 import unittest
 import logging
@@ -67,7 +67,9 @@ if sys.platform == "win32":
             """
             Tests with drive which does not exist
             """
+            print 'Running: ' + 'python -m freedisk -d %s: -s 10 ' % self.drive_letter
             output = os.system('python -m freedisk -d %s: -s 10 ' % self.drive_letter)
+            print 'output: ' + str(output)
             assert(output==-2)
             
         def test_missing_parameters(self):

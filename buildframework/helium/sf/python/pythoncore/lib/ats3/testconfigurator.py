@@ -21,7 +21,7 @@
 
 """Parse Symbian SW component for ATS3 testing related information"""
 
-# pylint: disable-msg=R0902,R0912,R0901,R0915,R0201
+
 #R* remove during refactoring
 
 from path import path # pylint: disable-msg=F0401
@@ -100,6 +100,7 @@ class Ats3ComponentParser(object):
         src_dst = []
         pmd_files = []
         trace_activation_files = []
+        dll_files = {}
         
         if not os.path.exists( self.tsrc_dir ):
             _logger.error("Missing test source directory: %s", self.tsrc_dir)
@@ -135,6 +136,10 @@ class Ats3ComponentParser(object):
             elif test_harness == "EUNIT":
                 try:
                     src_dst  = pkg_parser.get_data_files(self.tsrc_pkg_files(_paths_dict_), self.build_drive)
+                    #collecting dll files and their harness for the test component, it will be
+                    # compared while writing 'execute' step in the test.xml generation                    
+                    for sub_component in _paths_dict_[tsrc_dir]['content'].keys():                        
+                        dll_files.update(_paths_dict_[tsrc_dir]['content'][sub_component]['dll_files'])  
 
                 except OSError:
                     _logger.warning("No pkg file found in the directory ( %s )" % self.tsrc_pkg_dir)
@@ -187,6 +192,7 @@ class Ats3ComponentParser(object):
                                              pmd_files=pmd_files,
                                              trace_activation_files=trace_activation_files,
                                              custom_dir=self.custom_dir,
+                                             dll_files=dll_files,
                                              component_path=tsrc_dir)
                     else:
                         test_plan.insert_set(image_files=self.flash_images,
@@ -195,6 +201,7 @@ class Ats3ComponentParser(object):
                                              test_harness=test_harness,
                                              src_dst=src_dst,
                                              custom_dir=self.custom_dir,
+                                             dll_files = dll_files,
                                              component_path=tsrc_dir)
             else:
                 if self.trace_enabled == "True":
@@ -210,6 +217,7 @@ class Ats3ComponentParser(object):
                                          pmd_files=pmd_files,
                                          trace_activation_files=trace_activation_files,
                                          custom_dir=self.custom_dir,
+                                         dll_files = dll_files,
                                          component_path=tsrc_dir)
                 else:
                     test_plan.insert_set(image_files=self.flash_images,
@@ -218,13 +226,16 @@ class Ats3ComponentParser(object):
                                          test_harness=test_harness,
                                          src_dst=src_dst,
                                          custom_dir=self.custom_dir,
+                                         dll_files = dll_files,
                                          component_path=tsrc_dir)
 
     def check_dll_duplication(self, _dll_file_, _src_dst_ ):
         """Checks if the dll is already in the dictionary, created by pkg file"""
         for item in _src_dst_:
             first = item[0]
-            return _dll_file_.lower() in first.lower()
+            if _dll_file_.lower() in first.lower():
+                return True
+        return False
             
     @property
     def tsrc_bld_dir(self):

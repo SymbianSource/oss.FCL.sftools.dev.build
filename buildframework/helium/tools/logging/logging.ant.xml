@@ -23,9 +23,8 @@ Description:
 <!--* @package framework -->
 <project name="logging" xmlns:hlm="http://www.nokia.com/helium">
     <description>
-        Targets related to log parsing, rendaring, upload to diamonds etc.
+        Targets related to log parsing, rendering, upload to diamonds etc.
     </description>
-    
     
     <!-- This is where the preparation build logs are stored.
     @type string
@@ -62,7 +61,6 @@ Description:
     @scope private
     -->
     <property name="localisation.log.dir" location="${build.log.dir}/localisation"/>    
-    
     
     <!-- Macro to record content to a separate log file without recording in the main log. -->
     <macrodef name="recordStartMacro" uri="http://www.nokia.com/helium">
@@ -117,7 +115,6 @@ Description:
                 <filelist dir="${build.cache.log.dir}" files="temp_ant_build.log"/>                        
             </concat>
             <delete file="${build.cache.log.dir}/temp_ant_build.log" failonerror="false"/>
-            <echo>End of filtering @{log} for passwords</echo>
         </sequential>
     </macrodef>
     
@@ -221,7 +218,7 @@ else:
                     <metadatafilterset refid="@{filterref}" />
                 </hlm:antmetadatainput>
             </hlm:metadatarecord>
-            <hlm:generateBuildStatus dbfile="@{database}" output-dir="${build.cache.log.dir}/signals" file="@{name}" />
+            <hlm:generateBuildStatus dbfile="@{database}" output-dir="${build.cache.log.dir}/signals" file="${build.cache.log.dir}/@{name}" />
             <if>
                 <isset property="@{phase}.log.dir" />
                 <then>
@@ -305,7 +302,7 @@ else:
     
     <!-- Merges all XML log files ending in ".log2.xml" in the build log directory
     into a single summary log file. -->
-    <target name="log-merge"  unless="metadata.enable">
+    <target name="log-merge">
         <mkdir dir="${build.log.dir}"/>
         <dependset>
             <srcfileset dir="${build.log.dir}" includes="**/${build.id}*.log.xml"/>

@@ -23,7 +23,6 @@ Description:
 <!-- Ivy settings file for environment tools and dependency libraries. -->
 <ivysettings>
     
-    <typedef name="tool" classname="com.nokia.ivy.ToolResolver"/>
     <typedef name="version-range" classname="org.apache.ivy.plugins.version.VersionRangeMatcher"/>
     
     <caches useOrigin="true"/>
@@ -43,16 +42,6 @@ Description:
         <url name="helium-svn">
             <ivy pattern="http://helium.nmp.nokia.com/svn/[module]/branches/[revision]/bin/ivy.xml" />
         </url>
-        
-        <dual name="tool-resolver">
-            <filesystem name="ivy-tool-resolver">
-                <ivy pattern="${helium.dir}/config/ivy/modules/[module]-[revision].ivy.xml" />
-            </filesystem>
-            
-            <tool name="artifact-tool-resolver" validate="false">
-                <artifact pattern="[name]"/>
-            </tool>
-        </dual>
     </resolvers>
 
     <triggers>
@@ -73,7 +62,6 @@ Description:
 
     
     <modules>
-        <module organisation="SWEPT" name=".*" resolver="tool-resolver" />
         <module organisation="python" name=".*" resolver="download" />
         <module organisation="java" name=".*" resolver="download" />
         <module organisation="helium-external" name=".*" resolver="helium-svn" />

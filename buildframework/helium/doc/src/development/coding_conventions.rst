@@ -73,6 +73,7 @@ It is possible to link to targets, properties and macros in the API documentatio
    "``hlm-p``", "Properties"
    "``hlm-m``", "Macros"
    
+   It is **not** possible to link to the task or anything in the Java documentation. 
    
 Creating Index References
 `````````````````````````

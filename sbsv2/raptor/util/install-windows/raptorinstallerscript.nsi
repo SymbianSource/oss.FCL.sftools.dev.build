@@ -13,6 +13,10 @@
 # Description: 
 # Raptor installer/uninstaller script
 
+# Set compression type - the advice in the NSIS user manual 
+# is to have this at the top of the main .nsi file.
+SetCompressor /SOLID lzma
+
 # Standard NSIS Library includes 
 !include "MUI2.nsh"
 !include "LogicLib.nsh"
@@ -77,6 +81,7 @@ XPStyle on
 ShowInstDetails show
 
 ##################### Pages in the installer #####################
+!define MUI_WELCOMEPAGE_TITLE_3LINES
 !insertmacro MUI_PAGE_WELCOME
 !insertmacro MUI_PAGE_LICENSE ${RAPTOR_LOCATION}\license.txt
 !define MUI_PAGE_HEADER_TEXT "Installation type"
@@ -84,6 +89,7 @@ Page custom UserOrSysInstall UserOrSysInstallLeave
 !define MUI_PAGE_CUSTOMFUNCTION_LEAVE DirLeave # Directory page exit function - disallow spaces in $INSTDIR
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_INSTFILES
+!define MUI_FINISHPAGE_TITLE_3LINES
 !insertmacro MUI_PAGE_FINISH
 
 ######################## .onInit function ########################
@@ -107,9 +113,11 @@ Section "Install Raptor" INSTALLRAPTOR
     SetOutPath "$INSTDIR\lib"
     File /r /x distribution.policy.s60 ${RAPTOR_LOCATION}\lib\*.*
     SetOutPath "$INSTDIR\python"
-    File /r /x distribution.policy.s60 ${RAPTOR_LOCATION}\python\*.*
+    File /r /x distribution.policy.s60 /x *.pyc /x *.pydevproject /x *.project ${RAPTOR_LOCATION}\python\*.*
     SetOutPath "$INSTDIR\schema"
     File /r /x distribution.policy.s60 ${RAPTOR_LOCATION}\schema\*.*
+    SetOutPath "$INSTDIR\style"
+    File /r /x distribution.policy.s60 ${RAPTOR_LOCATION}\style\*.*
     SetOutPath "$INSTDIR\win32\bin"
     File /r /x distribution.policy.s60 ${RAPTOR_LOCATION}\win32\bin\*.*
     SetOutPath "$INSTDIR\win32\bv"
@@ -200,7 +208,6 @@ Section
     ${EndUnless}
 	
 	# Write the uninstaller
-	# WriteUninstaller "$INSTDIR\${UNINSTALLER_FILENAME}"
 	WriteUninstaller "$INSTDIR\${UNINSTALLER_FILENAME}"
 	# Unload registry plug in
 	${registry::Unload}
@@ -320,9 +327,11 @@ FunctionEnd
 ShowUninstDetails show
 
 #################### Pages in the uninstaller ####################
+!define MUI_WELCOMEPAGE_TITLE_3LINES
 !insertmacro MUI_UNPAGE_WELCOME
 !insertmacro MUI_UNPAGE_CONFIRM
 !insertmacro MUI_UNPAGE_INSTFILES
+!define MUI_FINISHPAGE_TITLE_3LINES
 !insertmacro MUI_UNPAGE_FINISH
 
 ################## Sections in the uninstaller ##################
@@ -334,6 +343,7 @@ Section "Uninstall"
     RmDir /r $INSTDIR\lib
     RmDir /r $INSTDIR\python
     RmDir /r $INSTDIR\schema
+    RmDir /r $INSTDIR\style
     RmDir /r $INSTDIR\win32
     Delete $INSTDIR\RELEASE-NOTES.html
     RmDir /r $INSTDIR\notes

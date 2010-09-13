@@ -40,10 +40,35 @@ Description:
     @type string
     -->
     <property name="validate.policy.csv" location="${helium.dir}/tests/minibuilds/compile/distribution.policy.extended_for_sf.id_status.csv" />
-    <!-- Skip the validation of the given root folders.
+    
+    <!--* @property validate.policy.ignoreroot.enabled
+    Skip the validation of the given root folders if set to true.
     @type boolean
+    @scope public
+    @since 11.0
     -->
-    <property name="validate.policy.ignoreroot" value="false" />
+    
+    <!--* @property validate.policy.ignoreroot
+    Skip the validation of the given root folders if set to true. - deprecated: Start using validate.policy.ignoreroot.enabled.
+    @type boolean
+    @scope public
+    @deprecated since 11.0
+    -->
+    
+    <!-- * @property internal.validate.policy.ignoreroot.enabled
+    If the property is set to "true", if validate.policy.ignoreroot.enabled set to true.
+    @type boolean
+    @scope private
+    -->
+    <condition property="internal.validate.policy.ignoreroot.enabled" value="true" else="false">
+        <or>
+            <istrue value="${validate.policy.ignoreroot.enabled}"/>
+            <istrue value="${validate.policy.ignoreroot}"/>
+        </or>
+    </condition>
+    
+    
+    
     <!-- Comma separated list of pattern for policy validation.
     Default value is, distribution.policy.s60,distribution.policy,distribution.policy.pp
     @type string
@@ -54,7 +79,43 @@ Description:
     @type string
     -->
     <property name="validate.policy.exclude.pattern" value=".static_wa,_ccmwaid.inf" />
+    
+    <!--* Set to true to validate distribution.policy.S60 files values.
+    @type boolean
+    @editable required
+    @scope public
+    @since 11.0
+    -->
+    <property name="policy.file.validation.enabled" value="true"/>
 
+    
+    <!--* @property internal.policy.file.validation.enabled
+    Set to run targets to validate distribution.policy.S60 files values if policy.file.validation.enabled set to true.
+    @type boolean
+    @scope private
+    -->
+    
+    <!--* @property skip.policy-validation
+    Set to false to disbale validate distribution.policy.S60 files values. - deprecated: Start using policy.file.validation.enabled property.
+    @type boolean
+    @editable required
+    @scope public
+    @deprecated since 11.0
+    -->
+    
+    <!-- Check, is distribution.policy.S60 files validation is enabled.-->
+    <condition property="internal.policy.file.validation.enabled">
+        <and>
+            <not>
+                <isfalse value="${policy.file.validation.enabled}" />
+            </not>
+            <not>
+                <isset property="skip.policy-validation"/>
+            </not>
+        </and>
+    </condition>
+    
+    
     <!-- Default path settings for policy validation. -->
     <path id="reference.policy.path.list">
         <pathelement path="${build.drive}/s60" />
@@ -69,7 +130,7 @@ Description:
     <pre>
       <hlm:validatePolicyMacro output="${validate.policy.log}"
           ids="${validate.policy.csv}"
-          ignoreroot="${validate.policy.ignoreroot}">
+          ignoreroot="${internal.validate.policy.ignoreroot.enabled}">
           <path refid="reference.policy.path.list"/>
       </hlm:validatePolicyMacro>
     </pre>
@@ -142,7 +203,7 @@ if output is not None:
         <mkdir dir="${post.log.dir}"/>
         <mkdir dir="${temp.build.dir}"/>
         <hlm:validatePolicyMacro output="${validate.policy.log}" ids="${validate.policy.csv}" 
-            ignoreroot="${validate.policy.ignoreroot}" pattern="${validate.policy.pattern}"
+            ignoreroot="${internal.validate.policy.ignoreroot.enabled}" pattern="${validate.policy.pattern}"
             excludes="${validate.policy.exclude.pattern}">
             <path refid="reference.policy.path.list" />
         </hlm:validatePolicyMacro>
@@ -151,41 +212,31 @@ if output is not None:
                 <fileset casesensitive="false" file="${validate.policy.log}/" />
             </hlm:policymetadatainput>
         </hlm:metadatarecord>
-        <hlm:generateBuildStatus file="${build.id}_validate-policy.summary.xml" />
+        <hlm:generateBuildStatus file="${validate.policy.log}" />
     </target>
 
     <!--
     Render the policy validation xml file ('validate.policy.log') into an text output.
   -->
     <target name="render-validate-policy" depends="integration-validate-policy">
-        <if>
-            <not>
-                <istrue value="${metadata.enable}" />
-            </not>
-            <then>
-                <fmpp sourceFile="${helium.dir}/tools/common/templates/integration/validate-policy.log.ftl" outputFile="${post.log.dir}/${build.id}_validate-policy.log">
-                    <freemarkerLinks expandProperties="yes">
-                      macro: ${helium.dir}/tools/common/templates/macro
-                  </freemarkerLinks>
-                    <data expandProperties="yes">
-                      doc: xml(${validate.policy.log})
-                      ant: antProperties()
-                    </data>
-                </fmpp>
-                <fmpp sourceFile="${helium.dir}/tools/common/templates/integration/validate-policy.log.xml.ftl" outputFile="${validate.policy.log.xml}">
-                    <freemarkerLinks expandProperties="yes">
-                      macro: ${helium.dir}/tools/common/templates/macro
-                  </freemarkerLinks>
-                    <data expandProperties="yes">
-                      doc: xml(${validate.policy.log})
-                      ant: antProperties()
-                    </data>
-                </fmpp>
-            </then>
-            <else>
-                <!-- Todo: check and if required convert as metadata template -->
-            </else>
-        </if>
+        <fmpp sourceFile="${helium.dir}/tools/common/templates/integration/validate-policy.log.ftl" outputFile="${post.log.dir}/${build.id}_validate-policy.log">
+            <freemarkerLinks expandProperties="yes">
+                macro: ${helium.dir}/tools/common/templates/macro
+            </freemarkerLinks>
+            <data expandProperties="yes">
+                doc: xml(${validate.policy.log})
+                ant: antProperties()
+            </data>
+        </fmpp>
+        <fmpp sourceFile="${helium.dir}/tools/common/templates/integration/validate-policy.log.xml.ftl" outputFile="${validate.policy.log.xml}">
+            <freemarkerLinks expandProperties="yes">
+                macro: ${helium.dir}/tools/common/templates/macro
+            </freemarkerLinks>
+            <data expandProperties="yes">
+                doc: xml(${validate.policy.log})
+                ant: antProperties()
+            </data>
+        </fmpp>
     </target>
 
     <!-- Target that will apply regular IDO validation rules on Helium. -->
@@ -197,21 +248,12 @@ if output is not None:
         </hlm:validatePolicyMacro>
     </target>
 
-    <!--
-      Internal target that set an intermediate property to disable policy validation execution.
-    -->
-    <target name="ido-validate-policy-skip">
-        <condition property="do.skip.policy-validation" value="1">
-            <istrue value="${skip.policy-validation}"/>
-        </condition>
-    </target>
-    
     <!-- Policy validation target for IDO. Only detected ADO will get scanned. -->    
-    <target name="ido-validate-policy" depends="ido-create-ado-mapping,ido-validate-policy-skip" unless="do.skip.policy-validation">
-        <record name="${temp.build.dir}/${build.id}_validate-policy.ant.log" action="start" />
+    <target name="ido-validate-policy" depends="ido-create-ado-mapping" if="internal.policy.file.validation.enabled">
+        <hlm:record name="${temp.build.dir}/${build.id}_validate-policy.ant.log" action="start" />
         <hlm:iniKeys2Path ini="${ado.quality.mapping.file}" pathid="reference.policy.path.list"/>
         <runtarget target="render-validate-policy" />
-        <record name="${temp.build.dir}/${build.id}_validate-policy.ant.log" action="stop" />
+        <hlm:record name="${temp.build.dir}/${build.id}_validate-policy.ant.log" action="stop" />
     </target>
 
 </project>

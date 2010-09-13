@@ -329,5 +329,23 @@ Description:
         </au:assertTrue>
     </target>
     
-    
+    <target name="test-check-try-catch-block-with-empty-catch-block">
+        <au:expectfailure>
+            <hlm:antlint>
+                <fileset file="${antlint.test.dir}/data/sample.ant.xml"/>
+                <hlm:checkTryCatchBlock severity="error" />
+            </hlm:antlint>
+        </au:expectfailure>
+        <au:assertLogContains text="trycatch> block found without " level="info"/>
+    </target>
+
+    <target name="test-check-try-catch-block-with-multiple-catch-block">
+        <au:expectfailure>
+            <hlm:antlint>
+                <fileset file="${antlint.test.dir}/data/sample.ant.xml"/>
+                <hlm:checkTryCatchBlock severity="error" />
+            </hlm:antlint>
+        </au:expectfailure>
+        <au:assertLogContains text="trycatch> block found with 2 " level="info"/>
+    </target>
 </project>

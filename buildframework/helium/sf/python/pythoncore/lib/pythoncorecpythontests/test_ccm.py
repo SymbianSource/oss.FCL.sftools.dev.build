@@ -21,7 +21,7 @@
 
 """
 
-# pylint: disable-msg=E1101
+# pylint: disable=E1101
 
 import logging
 import os
@@ -38,7 +38,7 @@ class CcmTest(mocker.MockerTestCase):
 
     def test_running_sessions(self):
         """ Running sessions can be checked. """
-        obj = self.mocker.replace(ccm._execute)
+        obj = self.mocker.replace(ccm.execute)
         if sys.platform == "win32":
             obj('c:\\apps\\ccm65\\bin\\ccm.exe status')
         else:

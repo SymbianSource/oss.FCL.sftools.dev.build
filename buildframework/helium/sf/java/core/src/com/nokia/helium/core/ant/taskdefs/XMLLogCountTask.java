@@ -21,6 +21,7 @@ import java.io.File;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
+
 import com.nokia.helium.core.ant.conditions.XMLLogCondition;
 
 /**
@@ -78,8 +79,9 @@ public class XMLLogCountTask extends Task {
      * @throws BuildException
      */
     public void execute() {
-        if (property == null)
+        if (property == null) {
             throw new BuildException("'property' attribute is not defined");
+        }
         
         XMLLogCondition cond = new XMLLogCondition();
         cond.setFile(fileName);

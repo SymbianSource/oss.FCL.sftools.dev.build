@@ -20,13 +20,14 @@ package com.nokia.helium.signal.ant.types;
 
 
 import java.io.File;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
+
+import org.apache.log4j.Logger;
+import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.ant.types.DataType;
 import org.apache.tools.ant.types.FileSet;
-import org.apache.tools.ant.DirectoryScanner;
-import org.apache.log4j.Logger;
 
 /**
  * Helper class to store the signal notifier info.

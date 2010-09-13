@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : test_diamonds_templates.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test_common" xmlns:au="org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>
+    Testing targets.
+    </description>
+    
+    <property environment="env"/>
+    
+    <property name="helium.dir" location="../../.." />
+    <property name="temp.dir" location="${helium.dir}/build/temp" />
+    <import file="${helium.dir}/helium.ant.xml" />
+    <property name="test.temp.dir" location="${helium.build.dir}/antunit/diamonds-templates" />
+    
+    <target name="setUp">
+        <mkdir dir="${test.temp.dir}" />
+        <delete dir="${test.temp.dir}" />
+        <mkdir dir="${test.temp.dir}" />
+    </target>
+    
+    <target name="tearDown">
+        <delete dir="${test.temp.dir}" />        
+    </target>
+    
+    <target name="test-diamonds-signal-template-without-signal-data">
+        <fmpp sourceFile="${helium.dir}/tools/common/templates/diamonds/diamonds_signal.xml.ftl"
+                     outputfile="${test.temp.dir}/diamonds_signal.xml">
+            <data expandProperties="yes">
+                ant: antProperties()
+            </data>
+        </fmpp>
+        <loadfile property="diamonds.xml" srcFile="${test.temp.dir}/diamonds_signal.xml" />
+        <echo>${diamonds.xml}</echo>
+        <au:assertTrue message="No signals are pushed to diamonds">
+            <not>
+                <contains string="${diamonds.xml}" substring="&lt;signal&gt;" />
+            </not>
+        </au:assertTrue>
+    </target>
+    
+    <target name="test-diamonds-signal-template">
+        <property name="diamond.signal.name.0" value="fakeSignal" />
+        <fmpp sourceFile="${helium.dir}/tools/common/templates/diamonds/diamonds_signal.xml.ftl"
+                     outputfile="${test.temp.dir}/diamonds_signal.xml">
+            <data expandProperties="yes">
+                ant: antProperties()
+            </data>
+        </fmpp>
+        <loadfile property="diamonds.xml" srcFile="${test.temp.dir}/diamonds_signal.xml" />
+        <echo>${diamonds.xml}</echo>
+        <au:assertTrue message="One signal is defined.">
+            <contains string="${diamonds.xml}" substring="&lt;signal&gt;" />
+        </au:assertTrue>
+        <au:assertTrue message="One name is defined.">
+            <contains string="${diamonds.xml}" substring="&lt;name&gt;fakeSignal&lt;/name&gt;" />
+        </au:assertTrue>
+    </target>
+</project>

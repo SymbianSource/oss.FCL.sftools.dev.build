@@ -20,4 +20,4 @@ Description:
 ============================================================================
 -->
 #!/bin/sh
-export HLM_EGG_JYTHONPATH=<#list project.getReference('egg.hlm.deps.fileset').toString().split(';') as file>${r'$'}HELIUM_HOME/${file}:</#list>
+export HLM_EGG_JYTHONPATH=<#list project.getReference('egg.hlm.deps.fileset').toString().split(ant['path.separator']) as file>${r'$'}HELIUM_HOME/${file?substring(ant['source.root.dir']?length + 1)?replace('\\', '/')}:</#list>

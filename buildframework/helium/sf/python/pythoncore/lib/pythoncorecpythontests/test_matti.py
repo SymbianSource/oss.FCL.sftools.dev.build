@@ -21,7 +21,7 @@
 
 """ Testing MATTI framework. """
 
-# pylint: disable-msg=E1101
+# pylint: disable=E1101
 
 import logging
 logging.getLogger().setLevel(logging.ERROR)
@@ -30,8 +30,6 @@ import os
 from path import path
 import ats3.aste
 import ats3.matti.MattiDrops
-#from lxml import objectify
-#from lxml import etree
 import tempfile
 
 TEST_FILE_NAME = 'test.xml'

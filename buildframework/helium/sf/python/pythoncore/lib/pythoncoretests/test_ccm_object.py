@@ -21,7 +21,7 @@
     unitesting CCMObject functionality
 """
 
-# pylint: disable-msg=R0201
+# pylint: disable=R0201
 
 import unittest
 import ccm
@@ -80,7 +80,9 @@ _logger = logging.getLogger('test.ccm_objects')
 
 class MockResultSession(ccm.AbstractSession):
     """ Fake session used to test Result"""
-    def __init__(self, behave = {}, database="fakedb"):
+    def __init__(self, behave=None, database="fakedb"):
+        if behave == None:
+            behave = {}
         ccm.AbstractSession.__init__(self, None, None, None, None)
         self._behave = behave
         self._database = database
@@ -101,6 +103,7 @@ class MockResultSession(ccm.AbstractSession):
             result.status = -1  
         return result
 
+
 class CCMObjectTest(unittest.TestCase):
     """ Unit test case for CCMObject functionality """
     def test_get_baseline(self):
@@ -114,7 +117,6 @@ class CCMObjectTest(unittest.TestCase):
         assert objv1.baseline == None
         objv2 = session.create('foo-2.0:project:db#1')
         assert objv2.baseline == objv1
-
 
     def test_delete_project(self):
         """ Check project deletion """
@@ -140,7 +142,7 @@ class CCMObjectTest(unittest.TestCase):
         try:
             result = project.delete(recurse=True, scope='project_and_subproject_hierarchy')        
             assert False, "The delete method must fail in case of synergy failure"
-        except:
+        except ccm.CCMException:
             pass
 
     def test_delete_object(self):
@@ -150,6 +152,8 @@ class CCMObjectTest(unittest.TestCase):
         obj = session.create('object-1:object:db#1')
         result = obj.delete()
         assert "Deleting object 'object-1:object:db#1'" in result.output
+
+
 
 if __name__ == "__main__":
     unittest.main()

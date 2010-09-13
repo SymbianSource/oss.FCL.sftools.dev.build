@@ -40,12 +40,13 @@ source			pagedcompress.cpp
 
 userinclude	../../imglib/compress 	../../imglib/inc 
 userinclude	../../imglib/patchdataprocessor/include ../../imglib/parameterfileprocessor/include
+userinclude     ../../imglib/uniconv/include
 userinclude ../../imglib/memmap/include
 userinclude	../../imglib/boostlibrary/
 
 OS_LAYER_SYSTEMINCLUDE_SYMBIAN
 
-staticlibrary	patchdataprocessor parameterfileprocessor memmap boost_thread-1.39
+staticlibrary	patchdataprocessor parameterfileprocessor memmap boost_thread-1.39 uniconv
 
 #ifdef TOOLS2_LINUX
 OPTION    GCC -O2 -Wno-uninitialized -pthread

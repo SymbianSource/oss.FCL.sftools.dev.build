@@ -17,12 +17,12 @@
 package com.nokia.helium.internaldata.tests;
 
 import static org.junit.Assert.assertFalse;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.IOException;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
@@ -31,6 +31,7 @@ import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Target;
 import org.apache.tools.ant.taskdefs.Ant;
 import org.junit.Test;
+
 import com.nokia.helium.internaldata.ant.listener.Listener;
 
 public class TestListener {

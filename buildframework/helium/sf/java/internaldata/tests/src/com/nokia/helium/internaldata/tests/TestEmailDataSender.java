@@ -22,14 +22,10 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 
-
 import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.junit.Test;
-
-
-
 
 import com.nokia.helium.internaldata.ant.listener.EmailDataSender;
 

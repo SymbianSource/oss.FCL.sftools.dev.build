@@ -18,7 +18,7 @@
 #===============================================================================
 """ Testing preparation module """  
 
-# pylint: disable-msg=R0201
+# pylint: disable=R0201
 
 import tempfile
 from shutil import rmtree
@@ -34,7 +34,7 @@ logging.basicConfig(level=logging.INFO)
 _disable_is_relative = False
 _disable_sub_projects = False
 
-# pylint: disable-msg=W0613
+# pylint: disable=W0613
 #these methods are all mocking/emulating the real methods in other files so need the interface to be
 #the same and no code present hence pylint throws up warnings saying unused variables.
 def _get_role_for_status(status): 
@@ -57,7 +57,7 @@ def _updateResultSimple(session):
     """ Emulate ccm.UpdateResultSimple method for unit testing """
     pass
 
-def _fastMaintainWorkArea(project, dir, projectname, threads): 
+def _fastMaintainWorkArea(project, dir_, projectname, threads): 
     """ Emulate ccm.extra.FastMaintainWorkArea method for unit testing """
     pass
 
@@ -366,9 +366,9 @@ def dummyFunction(item):
 
 class _config():
     """Emulating configuration class"""
-    def __init__(self, type):
+    def __init__(self, type_):
         self.database = 'test'
-        self.type = type
+        self.type = type_
         self.name = 'test'
         self.data = {'database': 'test'}
         self.data['dir'] = tempfile.gettempdir()
@@ -435,7 +435,7 @@ class _emulateSession():
         """ Check if key exists. """
         return self.data.has_key(key)
 
-# pylint: disable-msg=W0613
+# pylint: disable=W0613
 #need disable msg to prevent pylint warning as this is emulating the real method.
     def create(self, fpn):
         """Emulating session.create method"""
@@ -446,7 +446,7 @@ class _emulateSession():
         """Emulating session.purposes method"""
         return self
 
-# pylint: disable-msg=W0613
+# pylint: disable=W0613
 #need disable msg to prevent pylint warning as this is emulating the real method.
     def get_workarea_info(self, path):
         """Emulating session.get_workarea_info method"""
@@ -465,8 +465,6 @@ class _getWorkAreaInfo():
 class _project():
     """Emulating project class"""
     def __init__(self):
-        global _disable_sub_projects
-        global _disable_is_relative
         self.name = 'pyUnitTestHeliumProject'
         self.objectname = '1'
         self.data = {'status':None} 
@@ -506,7 +504,7 @@ class _project():
         """Emulating project.update method"""
         pass
 
-    def work_area(self, boolean1, boolean2, boolean3 = None, dir=None, projectname=None ):
+    def work_area(self, boolean1, boolean2, boolean3 = None, dir_=None, projectname=None ):
         """Emulating project.work_area method"""
         pass
 
@@ -514,7 +512,7 @@ class _project():
         """Emulating project.conflict method"""
         pass
 
-# pylint: disable-msg=W0613
+# pylint: disable=W0613
 #need disable msg to prevent pylint warning as this is emulating the real method.
     def checkout(self, session, version, purpose):
         """Emulating project.checkout method"""
@@ -589,7 +587,7 @@ class _subProject():
         """Emulating sub project.exists """
         return True                
 
-# pylint: disable-msg=W0613
+# pylint: disable=W0613
 #need disable msg to prevent pylint warning as this is emulating the real method.
     def checkout(self, session, version, purpose, subprojects=None):
         """Emulating sub project.checkout """

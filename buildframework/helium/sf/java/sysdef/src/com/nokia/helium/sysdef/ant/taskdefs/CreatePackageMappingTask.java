@@ -22,18 +22,20 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import org.apache.tools.ant.types.DirSet;
+
 import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.DirectoryScanner;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
+import org.apache.tools.ant.types.DirSet;
 import org.apache.tools.ant.types.Resource;
 import org.apache.tools.ant.types.ResourceCollection;
-import java.util.Hashtable;
-import org.apache.tools.ant.DirectoryScanner;
+
 import com.nokia.helium.sysdef.PackageMap;
 import com.nokia.helium.sysdef.PackageMapParsingException;
 

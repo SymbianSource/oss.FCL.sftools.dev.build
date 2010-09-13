@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : lint.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="lint" xmlns:hlm="http://www.nokia.com/helium"
+                     xmlns:cs="antlib:com.puppycrawl.tools.checkstyle">
+
+    <!-- Run AntLint on project Ant XML files. -->
+    <target name="antlint">
+        <delete dir="${helium.build.dir}/jep"/>
+        <delete dir="${helium.build.dir}/python"/>
+        <delete dir="${helium.build.dir}/beanshell"/>
+        <delete file="${helium.build.dir}/test_jython.xml"/>
+        <mkdir dir="${helium.build.dir}/report/antlint" />
+        <hlm:antlint>
+            <fileset dir="${helium.dir}/tools">
+                <include name="**/*.ant.xml"/>
+                <include name="**/build.xml"/>
+                <include name="**/*.antlib.xml"/>
+                <exclude name="tests/**"/>
+                <exclude name="**/test/test_*.xml"/>
+                <exclude name="external/**"/>
+                <exclude name="**/tests/data/**"/>
+                <exclude name="build/**"/>
+            </fileset>
+            <hlm:checkTabCharacter severity="error" enabled="true"/>
+            <hlm:checkPropertyName severity="warning" enabled="true" regexp="([a-z0-9[\\d\\_\\.\\@\\{\\}\\$]]*)" />
+            <hlm:checkTargetName severity="warning" enabled="true" regexp="([a-z0-9[\\d\\-]]*)" />
+            <hlm:checkIndentation severity="error" enabled="true"/>
+            <hlm:checkPresetDefMacroDefName severity="warning" enabled="true" regexp="([a-z0-9][a-zA-Z0-9]*)" />       
+            <hlm:checkProjectName severity="warning" enabled="true" regexp="([a-z0-9[\\d\\.\\_\\-]]*)" />
+            <hlm:checkDescription severity="warning" enabled="true"/>
+            <hlm:checkFileName severity="warning" enabled="true" regexp="^build.xml$|ant.xml$|antlib.xml$" />
+            <hlm:checkRunTarget severity="warning" enabled="true"/>
+            <hlm:checkAntCall severity="warning" enabled="true"/>
+            <hlm:checkScriptSize severity="warning" enabled="true"/>
+            <hlm:checkUseOfIfInTargets severity="warning" enabled="true"/>
+            <hlm:checkJythonScript severity="error" enabled="true" outputDir="${helium.build.dir}/jep"/>
+            <hlm:checkScriptCondition severity="warning" enabled="true" outputDir="${helium.build.dir}/scriptcondition"/>
+            <hlm:checkPythonTasks severity="warning" enabled="true" outputDir="${helium.build.dir}/python"/>
+            <hlm:checkUseOfEqualsTask severity="warning" enabled="true"/>
+            <hlm:checkScriptDefNameAttributes severity="error" enabled="true"/>
+            <hlm:checkScriptDefStyle severity="warning" enabled="true"/>
+            <hlm:checkScriptDef severity="error" enabled="true" outputDir="${helium.build.dir}/beanshell"/>
+            <hlm:checkDuplicateNames severity="warning" enabled="true"/>
+            
+            <!-- Reporters -->
+            <hlm:antlintCheckstyleReporter file="${helium.build.dir}/report/antlint/antlint_report.xml" />
+            <hlm:antlintConsoleReporter />            
+        </hlm:antlint>
+        <fileset id="jep.files" dir="${helium.build.dir}">
+            <include name="jep/**/*.py"/>
+            <include name="python/**/*.py"/>
+        </fileset>
+        <antcall target="pylint" inheritRefs="true">
+            <reference refid="jep.files" torefid="python.files" />
+        </antcall>
+        <cs:checkstyle config="${helium.dir}/builder/java/config/java_checkstyle_config.xml">
+            <fileset dir="${helium.build.dir}/beanshell" includes="**/*.java"/>
+            <formatter type="plain"/>
+        </cs:checkstyle>
+    </target>    
+        
+    
+    <!-- Checks FTL files for lint issues. -->
+    <target name="ftllint">
+        <for param="file">
+            <path>
+                <fileset dir="${helium.dir}">
+                    <include name="**/*.ftl"/>
+                    <include name="**/*.rst"/>
+                    <exclude name="**/*.mk.ftl"/>
+                    <exclude name="build/**/*"/>
+                </fileset>
+            </path>
+            <sequential>
+                <loadfile srcfile="@{file}" property="tabs.in.ftl">
+                    <filterchain>
+                        <linecontainsregexp>
+                            <regexp pattern="\t"/>
+                        </linecontainsregexp>
+                    </filterchain>
+                </loadfile>
+                <fail if="tabs.in.ftl" message="@{file} has tabs" />
+            </sequential>
+        </for>
+    </target>
+    
+    
+    <target name="hlmlint" depends="antlint,ftllint"/>
+    
+</project>
+
+
+
+

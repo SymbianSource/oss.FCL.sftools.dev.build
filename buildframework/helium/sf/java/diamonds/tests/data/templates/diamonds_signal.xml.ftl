@@ -22,18 +22,18 @@ Description:
 <#include "header.ftl"> 
   <signals>
       <#assign diamondsignalname = ""/>
-      <#assign diamondkeys = diamondSignal?keys>
+      <#assign diamondkeys = ant?keys>
       <#list diamondkeys as diamondkey>
       <#if diamondkey?contains("diamond.signal.name")>
-      <#list diamondSignal[diamondkey]?split(".") as signalname>
-      <#assign diamondsignalname = signalname/>
+      <#list diamondkey?split(".") as index>
+      <#assign signalIndex = index/>
       </#list>
       <signal>
       <#list diamondkeys as diamondkey>
-      <#if diamondkey?contains("${diamondsignalname}")>
-          <#if diamondkey?contains("diamond.signal.name.${diamondsignalname}")><name>${diamondSignal[diamondkey]}</name></#if>
-          <#if diamondkey?contains("diamond.error.message.${diamondsignalname}")><message>${diamondSignal[diamondkey]}</message></#if>
-          <#if diamondkey?contains("diamond.time.stamp.${diamondsignalname}")><timestamp>${diamondSignal[diamondkey]}</timestamp></#if>
+      <#if diamondkey?contains("${signalIndex}")>
+          <#if ant?contains("diamond.signal.name.${signalIndex}")><name>${ant["diamond.signal.name.${signalIndex}"]}</name></#if>
+          <#if ant?contains("diamond.error.message.${signalIndex}")><message>${ant["diamond.error.message.${signalIndex}"]}</message></#if>
+          <#if ant?contains("diamond.time.stamp.${signalIndex}")><timestamp>${ant["diamond.time.stamp.${signalIndex}"]}</timestamp></#if>
       </#if>
       </#list>
       </signal>

@@ -17,7 +17,7 @@
 
 package com.nokia.ant;
 
-import junit.framework.*;
+import junit.framework.TestCase;
 
 /**
  * Test class for Helium Logger.

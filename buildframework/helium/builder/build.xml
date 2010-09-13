@@ -67,6 +67,8 @@ Description:
     
     <target name="cleanup" description="Cleanup (delete the temp build directory)">
         <delete dir="${build.temp.dir}" failonerror="false"/>
+        <delete dir="${source.root.dir}/external/antlibs2" failonerror="false" />
+        <delete dir="${source.root.dir}/external/python/lib/auto" failonerror="false" />
     </target>
     
     
@@ -113,13 +115,27 @@ Description:
         <ac:for param="file" keepgoing="true">
             <path refid="ivy.buildlist.path" />
             <sequential>
-                <echo>Testing: @{file}</echo>
-                <ant antfile="@{file}" dir="@{file}/.." target="test" inheritAll="false">
-                    <property name="builder.dir" location="${builder.dir}" />
-                    <property name="source.root.dir" location="${source.root.dir}" />
-                </ant>
+                <ac:trycatch>
+                    <try>
+                        <echo>Start component test set: @{file}</echo>
+                        <ant antfile="@{file}" dir="@{file}/.." target="test" inheritAll="false">
+                            <property name="builder.dir" location="${builder.dir}" />
+                            <property name="source.root.dir" location="${source.root.dir}" />
+                        </ant>
+                        <echo>End component test set: @{file}</echo>
+                    </try>
+                    <catch>
+                        <property name="quality.thrown" value="@{file}"/>
+                    </catch>
+                </ac:trycatch>
             </sequential>
         </ac:for>
+        <ac:if>
+            <isset property="quality.thrown"/>
+            <then>
+                <fail message="${quality.thrown} failed"/>
+            </then>
+        </ac:if> 
     </target>
     <!-- TODO: remove after CI tools are cleaned up -->
     <target name="unittest" depends="test"/>
@@ -146,27 +162,55 @@ Description:
             <path refid="ivy.buildlist.path" />
             <sequential>
                 <echo>Checking @{file}</echo>
-                <ant antfile="@{file}" dir="@{file}/.." target="quality" inheritAll="false">
-                    <property name="builder.dir" location="${builder.dir}" />
-                    <property name="source.root.dir" value="${source.root.dir}"/>
-                    <property name="platform" value="${platform}"/>
-                </ant>
+                <ac:trycatch>
+                    <try>
+                        <ant antfile="@{file}" dir="@{file}/.." target="quality" inheritAll="false">
+                            <property name="builder.dir" location="${builder.dir}" />
+                            <property name="source.root.dir" value="${source.root.dir}"/>
+                            <property name="platform" value="${platform}"/>
+                        </ant>
+                    </try>
+                    <catch>
+                        <property name="quality.thrown" value="@{file}"/>
+                    </catch>
+                </ac:trycatch>
             </sequential>
         </ac:for>
+        <ac:if>
+            <isset property="quality.thrown"/>
+            <then>
+                <fail message="${quality.thrown} failed"/>
+            </then>
+        </ac:if>  
     </target>
 
+    
+    <target name="ci" depends="quality"/>
     
     <target name="checkstyle" depends="get-build-list" description="Run checkstyle on each component">
         <ac:for param="file" keepgoing="true">
             <path refid="ivy.buildlist.path" />
             <sequential>
-                <ant antfile="@{file}" dir="@{file}/.." target="checkstyle" inheritAll="false">
-                    <property name="builder.dir" location="${builder.dir}" />
-                    <property name="source.root.dir" value="${source.root.dir}"/>
-                    <property name="platform" value="${platform}"/>
-                </ant>
+                <ac:trycatch>
+                    <try>
+                        <ant antfile="@{file}" dir="@{file}/.." target="checkstyle" inheritAll="false">
+                            <property name="builder.dir" location="${builder.dir}" />
+                            <property name="source.root.dir" value="${source.root.dir}"/>
+                            <property name="platform" value="${platform}"/>
+                        </ant>
+                    </try>
+                    <catch>
+                        <property name="quality.thrown" value="@{file}"/>
+                    </catch>
+                </ac:trycatch>
             </sequential>
         </ac:for>
+        <ac:if>
+            <isset property="quality.thrown"/>
+            <then>
+                <fail message="${quality.thrown} failed"/>
+            </then>
+        </ac:if> 
     </target>
 
     
@@ -190,31 +234,54 @@ Description:
         <ivy:retrieve sync="true" conf="default" organisation="com.nokia.helium.config"
             module="helium-${config}-config" revision="1.0"
             inline="true" type="jar"
-            pattern="${source.root.dir}/external/antlibs2/[artifact]-[revision].[ext]" />        
+            pattern="${source.root.dir}/external/antlibs2/[artifact]-[revision].[ext]" />
+        <delete>
+           <fileset dir="${source.root.dir}" includes="external/python/lib/auto/zipnotsafe/**" />
+        </delete>
         <ivy:retrieve sync="true" conf="default" organisation="com.nokia.helium.config"
             module="helium-${config}-config" revision="1.0"
             inline="true" type="egg"
-            pattern="${source.root.dir}/external/python/lib/auto/[artifact]-[revision].[ext]" />
-        <fileset id="egg.deps.fileset" dir="${source.root.dir}/external/python/lib/auto" includes="*.egg" excludes="jython*.egg" />
+            pattern="${source.root.dir}/external/python/lib/auto/zipsafe/[artifact]-[revision].[ext]" />
+        <ivy:retrieve sync="false" conf="default" organisation="com.nokia.helium.config"
+            module="helium-${config}-config" revision="1.0"
+            inline="true" type="py"
+            pattern="${source.root.dir}/external/python/lib/auto/[artifact].[ext]" />
+        
+        
+        <path id="egg.deps.fileset" >
+            <dirset dir="${source.root.dir}/external/python/lib/auto" includes="*/*.egg" excludes="*/jython*.egg" />
+            <fileset dir="${source.root.dir}/external/python/lib/auto" includes="*/*.egg" excludes="*/jython*.egg" />
+        </path>
         <fmpp sourceFile="template/easy-install.pth.ftl" outputFile="${source.root.dir}/external/python/lib/auto/easy-install.pth">
             <data>
                 project: antProject()
+                ant: antProperties()
             </data>
         </fmpp>
         
-        <fileset id="egg.hlm.deps.fileset" dir="${source.root.dir}">
-            <include name="external/python/**/*.egg" />
-            <exclude name="**/2.5/**" />
-        </fileset>
+        <path id="egg.hlm.deps.fileset">
+            <dirset dir="${source.root.dir}">
+                <include name="external/python/lib/**/*.egg" />
+                <exclude name="**/*amara*" />
+                <exclude name="**/2.5/**" />
+            </dirset>
+            <fileset dir="${source.root.dir}">
+                <include name="external/python/**/*.egg" />
+                <exclude name="**/*amara*" />
+                <exclude name="**/2.5/**" />
+            </fileset>
+        </path>
         <fmpp sourceFile="template/configure_jython.bat.ftl" outputFile="${source.root.dir}/external/python/configure_jython.bat">
             <data>
                 project: antProject()
+                ant: antProperties()
             </data>
         </fmpp>
 
         <fmpp sourceFile="template/configure_jython.sh.ftl" outputFile="${source.root.dir}/external/python/configure_jython.sh">
             <data>
                 project: antProject()
+                ant: antProperties()
             </data>
         </fmpp>
     </target>
@@ -300,8 +367,10 @@ Description:
             <fileset dir="${source.root.dir}/sf/doc/src"/>
         </copy>
         <copy todir="${build.temp.dir}/doc/doctmp" overwrite="true" flatten="true">
-            <fileset dir="${source.root.dir}" includes="*/java/*/**/*.rst"/>
-            <fileset dir="${source.root.dir}" includes="*/python/*/**/*.rst"/>
+            <fileset dir="${source.root.dir}" includes="*/java/*/**/*.rst" excludes="*/java/*/doc/**/*.rst" />
+            <fileset dir="${source.root.dir}" includes="*/python/*/**/*.rst" excludes="*/python/*/doc/**/*.rst" />
+            <fileset dir="${source.root.dir}" includes="*/java/*/doc/" />
+            <fileset dir="${source.root.dir}" includes="*/python/*/doc/" />
         </copy>
         <rstMacro version="1.0" src="${build.temp.dir}/doc/doctmp"/>
     </target>

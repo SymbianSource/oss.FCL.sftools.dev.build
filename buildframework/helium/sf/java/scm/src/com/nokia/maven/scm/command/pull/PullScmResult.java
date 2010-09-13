@@ -20,6 +20,7 @@ package com.nokia.maven.scm.command.pull;
 
 import org.apache.maven.scm.ScmResult;
 
+
 /**
  * 
  *

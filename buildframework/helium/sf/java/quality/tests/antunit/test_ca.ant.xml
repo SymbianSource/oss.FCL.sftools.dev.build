@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : test_ca.ant.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test-ca" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>Helium antlib Quality Compatibility Analyser related tests.</description>
+
+    <taskdef name="fmpp" classname="fmpp.tools.AntTask" onerror="report"/>
+
+    <taskdef resource="com/nokia/helium/quality/ant/antlib.xml" uri="http://www.nokia.com/helium" />
+    <property name="ca.output.dir" location="${test.temp.dir}/output"/>
+    <property name="test.data.src" location="./../data"/>
+    <property name="temp.diamonds.header.xml" location="${ca.output.dir}/ca/diamonds_header.xml" />
+    <property name="temp.diamonds.footer.xml" location="${ca.output.dir}/ca/diamonds_footer.xml" />
+    
+    <property name="diamonds.build.output.dir" location="${ca.output.dir}/ca" />
+    <property name="bc.config.dir.name" location="" />
+
+    <!-- is called prior to the test -->
+    <target name="setUp">
+        <delete dir="${ca.output.dir}/ca" failonerror="false" />
+        <mkdir dir="${ca.output.dir}/ca" />
+        
+        <!--take the diamonds header and footer .ftl files and turn them into .xml files
+        for copying as the headera nd footer parts of the output files-->
+        <fmpp sourcefile="./../../../../../tools/common/templates/diamonds/diamonds_header.ftl" 
+              outputfile="${temp.diamonds.header.xml}" quiet="true"/>
+        <fmpp sourcefile="./../../../../../tools/common/templates/diamonds/diamonds_footer.ftl" 
+              outputfile="${temp.diamonds.footer.xml}" quiet="true"/>
+    </target>
+
+    <!-- is called after the test, even if that caused an error -->
+    <target name="tearDown">
+        <delete dir="${ca.output.dir}/ca" failonerror="false" />
+        <delete file="${temp.diamonds.header.xml}" failonerror="false" />
+        <delete file="${temp.diamonds.footer.xml}" failonerror="false" />
+    </target>
+
+
+    <!--
+     **************************************************************
+     ** test CMT for windows
+     **************************************************************
+    -->
+
+    <target name="test-ca-header-with-all-reqd-params-set" >
+        <echo> output file is ${diamonds.build.output.dir} </echo>
+        <hlm:casummary diamondsHeaderFileName="${temp.diamonds.header.xml}" diamondsFooterFileName="${temp.diamonds.footer.xml}"
+                    header="true"
+                    outputFile="${ca.output.dir}/ca/ca_summary_header_ok.xml"
+                    inputFile="${test.data.src}/headers_report_ok.xml" />
+        <au:assertLogContains text="CASummaryTask execute"/>
+        <au:assertFileExists file="${ca.output.dir}\ca\ca_summary_header_ok.xml"/>
+        <loadfile property="header.ok" srcfile="${ca.output.dir}/ca/ca_summary_header_ok.xml">
+            <filterchain>
+                <replaceregex pattern="\\(:|\\)" replace="\1" flags="g" />
+            </filterchain>
+        </loadfile>
+        <echo>${header.ok}</echo>
+        <au:assertTrue message="type ID 13 occurs ">
+            <contains string="${header.ok}" 
+                substring="value=" />
+        </au:assertTrue>
+    </target>
+
+    <target name="test-ca-header-no-typeids" >
+        <hlm:casummary diamondsHeaderFileName="${temp.diamonds.header.xml}" diamondsFooterFileName="${temp.diamonds.footer.xml}"
+                    header="true"
+                    outputFile="${ca.output.dir}/ca/ca_summary_header_notypeids.xml"
+                    inputFile="${test.data.src}/headers_report_notypeids.xml" />
+        <au:assertLogContains text="CASummaryTask execute"/>
+        <au:assertFileExists file="${ca.output.dir}\ca\ca_summary_header_notypeids.xml"/>
+        <loadfile property="header.notypeids" srcfile="${ca.output.dir}/ca/ca_summary_header_notypeids.xml">
+            <filterchain>
+                <replaceregex pattern="\\(:|\\)" replace="\1" flags="g" />
+            </filterchain>
+        </loadfile>
+        <echo>${header.notypeids}</echo>
+        <au:assertTrue message="compatibility-headers">
+            <not>
+                <contains string="${header.notypeids}" 
+                    substring="summary message" />
+            </not>
+        </au:assertTrue>
+    </target>
+
+    <target name="test-ca-library-ok" >
+        <hlm:casummary diamondsHeaderFileName="${temp.diamonds.header.xml}" diamondsFooterFileName="${temp.diamonds.footer.xml}"
+                    header="false"
+                    outputFile="${ca.output.dir}/ca/ca_summary_library_ok.xml"
+                    inputFile="${test.data.src}/libraries_report_ok.xml" />
+        <au:assertLogContains text="CASummaryTask execute"/>
+        <au:assertFileExists file="${ca.output.dir}\ca\ca_summary_library_ok.xml"/>
+        <loadfile property="libraries.ok" srcfile="${ca.output.dir}/ca/ca_summary_library_ok.xml">
+            <filterchain>
+                <replaceregex pattern="\\(:|\\)" replace="\1" flags="g" />
+            </filterchain>
+        </loadfile>
+        <echo>${libraries.ok}</echo>
+        <au:assertTrue message="compatibility-libs">
+            <contains string="${libraries.ok}" 
+                substring="type ID 14 occurs" />
+        </au:assertTrue>
+    </target>
+    
+    <target name="test-ca-library-fail" >
+            <hlm:casummary diamondsHeaderFileName="${temp.diamonds.header.xml}" diamondsFooterFileName="${temp.diamonds.footer.xml}"
+                    header="false"
+                    outputFile="${ca.output.dir}/ca/ca_summary_library_fail.xml"
+                    inputFile="${test.data.src}/libraries_report_fail.xml" />
+        <au:assertFileDoesntExist file="${ca.output.dir}\ca\ca_summary_library_fail.xml" />
+        <au:assertLogContains text="FileNotFoundException while getting the input file" />
+    </target>
+
+    <target name="test-ca-library-one_id" >
+        <hlm:casummary diamondsHeaderFileName="${temp.diamonds.header.xml}" diamondsFooterFileName="${temp.diamonds.footer.xml}"
+                    header="false"
+                    outputFile="${ca.output.dir}/ca/ca_summary_library_one_id.xml"
+                    inputFile="${test.data.src}/libraries_report_one_id.xml" />
+        <au:assertFileExists file="${ca.output.dir}\ca\ca_summary_library_one_id.xml" />
+        <loadfile property="libraries.one.id" srcfile="${ca.output.dir}/ca/ca_summary_library_one_id.xml">
+            <filterchain>
+                <replaceregex pattern="\\(:|\\)" replace="\1" flags="g" />
+            </filterchain>
+        </loadfile>
+        <echo>${libraries.one.id}</echo>
+        <au:assertTrue message="compatibility-libs">
+            <contains string="${libraries.one.id}" 
+                substring="type ID 7 occurs" />
+        </au:assertTrue>
+    </target>
+
+</project>

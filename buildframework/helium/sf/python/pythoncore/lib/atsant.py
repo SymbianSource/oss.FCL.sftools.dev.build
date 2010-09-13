@@ -26,6 +26,7 @@ import sysdef.api
 import os
 import logging
 import configuration
+import amara
 
 _logger = logging.getLogger('atsant')
 
@@ -36,7 +37,7 @@ class IConfigATS(object):
         self.productname = productname
         self.config = self.getconfig()
         
-    def getconfig(self, type=None, productname=None):
+    def getconfig(self, type_=None, productname=None):
         """get configuration"""
         noncust = None
         for root, _, files in os.walk(self.imagesdir, topdown=False):
@@ -46,12 +47,12 @@ class IConfigATS(object):
                     configBuilder = configuration.NestedConfigurationBuilder(open(filePath, 'r'))
                     configSet = configBuilder.getConfiguration()
                     for config in configSet.getConfigurations():
-                        if type and productname:
-                            if type in config.type and config['PRODUCT_NAME'] in productname:
+                        if type_ and productname:
+                            if type_ in config.type and config['PRODUCT_NAME'].lower() in productname.lower():
                                 return config
                         else:
                             noncust = config
-        if type:
+        if type_:
             return None
         if noncust:
             return noncust
@@ -68,7 +69,7 @@ class IConfigATS(object):
     def findimages(self): 
         """find images"""
         output = ''
-        for imagetype, imagetypename in [('core', 'CORE'), ('langpack', 'ROFS2'), ('cust', 'ROFS3'), ('udaerase', 'UDAERASE')]:
+        for imagetype, imagetypename in [('core', 'CORE'), ('langpack', 'ROFS2'), ('cust', 'ROFS3'), ('udaerase', 'UDAERASE'), ('emmc', 'EMMC')]:
             iconfigxml = self.getconfig(imagetype, self.productname)
             if iconfigxml == None:
                 iconfigxml = self.config
@@ -98,52 +99,64 @@ def get_boolean(string_val):
     return retVal
 
 
-def files_to_test(canonicalsysdeffile, excludetestlayers, idobuildfilter, builddrive, createmultipledropfiles):
+def files_to_test(canonicalsysdeffile, excludetestlayers, idobuildfilter, builddrive, createmultipledropfiles, sysdef3=False):
     """list the files to test"""
-    sdf = sysdef.api.SystemDefinition(canonicalsysdeffile)
-    
-    single_key = 'singledropfile'       #default single drop file name
     modules = {}
-    for layr in sdf.layers:
-        if re.match(r".*_test_layer$", layr):
-# pylint: disable-msg=W0704
-            try:
-                if re.search(r"\b%s\b" % layr, excludetestlayers):
+    if sysdef3 == True:
+        sdf = amara.parse(open(canonicalsysdeffile))
+        for package in sdf.SystemDefinition.systemModel.package:
+            for collection in package.collection:
+                if hasattr(collection, 'component'): 
+                    for component in collection.component:
+                        print component.id
+                        if get_boolean(createmultipledropfiles):
+                            group = 'singledropfile'
+                        else:
+                            group = 'default'
+                        if hasattr(component, 'meta') and hasattr(component.meta, 'group'):
+                            if not group.lower() == 'singledropfile':
+                                group = component.meta.group[0].name                            
+                        if hasattr(component, 'unit'):
+                            for unit in component.unit:
+                                if group not in modules:
+                                    modules[group] = []
+                                modules[group].append(builddrive + os.sep + unit.bldFile)
+    else:
+        sdf = sysdef.api.SystemDefinition(canonicalsysdeffile)
+        
+        single_key = 'singledropfile'       #default single drop file name
+       
+        for layr in sdf.layers:
+            if re.match(r".*_test_layer$", layr):
+                if excludetestlayers and re.search(r"\b%s\b" % layr, excludetestlayers):
                     continue
-            except TypeError:       #needed to catch exceptions and not have them printed
-                pass
-# pylint: enable-msg=W0704
-
-            layer = sdf.layers[layr]
-            for mod in layer.modules:
-                if get_boolean(createmultipledropfiles):  #creating single drop file?
-                    if single_key not in modules:       #have we already added the key to the dictionary?
-                        modules[single_key] = []        #no so add it
-                elif mod.name not in modules:
-                    modules[mod.name] = []
-                    single_key = mod.name               #change the key name to write to modules
-                for unit in mod.units:
-                    include_unit = True
-                    if idobuildfilter != None:
-                        if idobuildfilter != "":
-                            include_unit = False
-                            if hasattr(unit, 'filters'):
-                                if len(unit.filters) > 0:
-                                    for afilter in unit.filters:
-                                        if re.search(r"\b%s\b" % afilter, idobuildfilter):
-                                            include_unit = True
-                                        else:
-                                            include_unit = False
-                                elif len(unit.filters) == 0:
-                                    include_unit = True
+                layer = sdf.layers[layr]
+                for mod in layer.modules:
+                    if get_boolean(createmultipledropfiles):  #creating single drop file?
+                        if single_key not in modules:       #have we already added the key to the dictionary?
+                            modules[single_key] = []        #no so add it
+                    elif mod.name not in modules:
+                        modules[mod.name] = []
+                        single_key = mod.name               #change the key name to write to modules
+                    for unit in mod.units:
+                        include_unit = True
+                        if idobuildfilter != None:
+                            if idobuildfilter != "":
+                                include_unit = False
+                                if hasattr(unit, 'filters'):
+                                    if len(unit.filters) > 0:
+                                        for afilter in unit.filters:
+                                            include_unit = re.search(r"\b%s\b" % afilter, idobuildfilter)
+                                    elif len(unit.filters) == 0:
+                                        include_unit = True
+                                else:
+                                    include_unit = False
                             else:
                                 include_unit = False
-                        else:
-                            include_unit = False
-                            if hasattr(unit, 'filters'):
-                                if len(unit.filters) == 0:
-                                    include_unit = True
-                    if include_unit:
-                        modules[single_key].append(os.path.join(builddrive + os.sep, unit.path))
+                                if hasattr(unit, 'filters'):
+                                    if len(unit.filters) == 0:
+                                        include_unit = True
+                        if include_unit:
+                            modules[single_key].append(builddrive + os.sep + unit.path)
     return modules
 

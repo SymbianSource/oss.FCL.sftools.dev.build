@@ -58,6 +58,7 @@
 #include "cache/cacheablelist.hpp"
 #include "cache/cachemanager.hpp"
 
+#include "uniconv.hpp"
 extern TUint checkSum(const void* aPtr);
 
 extern ECompression gCompress;
@@ -66,6 +67,7 @@ extern TInt  gCodePagingOverride;
 extern TInt  gDataPagingOverride;
 extern TInt  gLogLevel;
 extern bool gCache;
+extern TBool gIsOBYUTF8;
 TBool gDriveImage=EFalse;	// for drive image support.
 
 
@@ -790,9 +792,29 @@ iExecutable(EFalse), iFileOffset(EFalse), iCompressEnabled(0),
 iHidden(0), iRomNode(0), iRealFileSize(0)
 {
 	if (aFileName)
+	{
    		iFileName = NormaliseFileName(aFileName);
+   		if(gIsOBYUTF8 && !UniConv::IsPureASCIITextStream(iFileName))
+   		{
+			char* tempnname = strdup(iFileName);
+			unsigned int namelen = 0;
+			if(UniConv::UTF82DefaultCodePage(tempnname, strlen(tempnname), &iFileName, &namelen) < 0)
+				Print(EError, "Invalid filename encoding: %s\n", tempnname);
+			free(tempnname);
+   		}
+	}
 	if (aName)
+	{
 		iName = NormaliseFileName(aName);
+		if(!gIsOBYUTF8 && !UniConv::IsPureASCIITextStream(iName))
+		{
+			char* tempnname = strdup(iName);
+			unsigned int namelen = 0;
+			if(UniConv::DefaultCodePage2UTF8(tempnname, strlen(tempnname), &iName, &namelen) < 0)
+				Print(EError, "Invalid filename encoding: %s\n", tempnname);
+			free(tempnname);
+		}
+	}
 	memset(iUids,0 ,sizeof(TCheckedUid));
 }
 //
