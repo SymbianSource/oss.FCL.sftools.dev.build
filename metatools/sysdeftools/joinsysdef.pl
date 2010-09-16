@@ -488,7 +488,7 @@ sub fixIDs
 	{
 	# translate the ID to use the root doc's namespaces 
 	my $node = shift;
-	foreach my $id ('id','before')
+	foreach my $id ('id','before','replace')
 		{
 		&fixID($node,$id);
 		}
