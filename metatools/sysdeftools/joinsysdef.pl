@@ -290,6 +290,10 @@ sub walk
 				$node->setAttribute($atr,$link);
 				}
 			}
+		if(scalar @{$node->getChildNodes()} && $maxschema=~/^3\.0/)
+			{
+			die "Error: Fatal syntax error in $file. Unit elements must be empty in schema $maxschema.\n";
+			}
 		}
 	elsif($tag eq 'meta')
 		{
