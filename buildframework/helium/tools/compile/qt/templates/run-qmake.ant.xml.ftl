@@ -30,36 +30,54 @@ Description:
         <#if unit.@proFile[0]??>
             <#assign prefix="" />
         </#if>
-        <#assign bldinf="${r'$'}{build.drive}/${unit.@bldFile}"?replace('\\', '/')?replace('//', '/')>
+        <#if ant['iswindows'] == "false" && ant['sysdef3.enabled'] == "true">
+            <#assign bldinf="${unit.@bldFile}"?replace('\\', '/')?replace('//', '/')>
+        <#else>
+            <#assign bldinf="${r'$'}{build.drive}/${unit.@bldFile}"?replace('\\', '/')?replace('//', '/')>
+        </#if>
             <sequential>
                 <echo>Running qmake for ${bldinf}/${unit['@${prefix}proFile'][0]?xml}</echo>
                 <if>
-                    <available file="${bldinf}" type="dir"/>
+                    <os family='windows'/>
                     <then>
-                        <exec executable="cmd" osfamily="windows" dir="${bldinf}" failonerror="false">
-                            <arg value="/C"/>
-                            <arg value="qmake"/>
-                            <arg value="-listgen"/>
-                            <#if unit['@${prefix}qmakeArgs'][0]??>
-                            <arg line="${unit['@${prefix}qmakeArgs'][0]?xml}"/>
-                            <#else>
-                            <arg line="${ant['qt.qmake.default.args']?xml}"/>
-                            </#if>
-                            <arg value="${unit['@${prefix}proFile'][0]?xml}"/>
-                        </exec>
-                        <exec osfamily="unix" executable="sh" dir="${bldinf}" failonerror="false">
-                            <arg value="${(ant['epocroot'] + "/")?replace('//', '/')}epoc32/tools/qmake"/>
-                            <arg value="-listgen"/>
-                            <#if unit['@${prefix}qmakeArgs'][0]??>
-                            <arg line="${unit['@${prefix}qmakeArgs'][0]?xml}"/>
-                            <#else>
-                            <arg line="${ant['qt.qmake.default.args']?xml}"/>
-                            </#if>
-                            <arg value="${unit['@${prefix}proFile'][0]?xml}"/>
-                        </exec>
+                        <if>
+                            <available file="${bldinf}" type="dir"/>
+                            <then>
+                                <exec executable="cmd" dir="${bldinf}" failonerror="false">
+                                    <arg value="/C"/>
+                                    <arg value="qmake"/>
+                                    <arg value="-listgen"/>
+                                    <#if unit['@${prefix}qmakeArgs'][0]??>
+                                    <arg line="${unit['@${prefix}qmakeArgs'][0]?xml}"/>
+                                    <#else>
+                                    <arg line="${ant['qt.qmake.default.args']?xml}"/>
+                                    </#if>
+                                    <arg value="${unit['@${prefix}proFile'][0]?xml}"/>
+                                </exec>
+                            </then>
+                            <else>
+                               <echo message="ERROR: Directory ${bldinf} doesn't exist."/>
+                            </else>
+                        </if>
                     </then>
                     <else>
-                       <echo message="ERROR: Directory ${bldinf} doesn't exist."/>
+                        <if>
+                            <available file="${bldinf}" type="dir"/>
+                            <then>
+                                <exec executable="${ant['build.drive']}/epoc32/tools/qmake" dir="${bldinf}" failonerror="false">
+                                    <arg value="-listgen"/>
+                                    <#if unit['@${prefix}qmakeArgs'][0]??>
+                                    <arg line="${unit['@${prefix}qmakeArgs'][0]?xml}"/>
+                                    <#else>
+                                    <arg line="${ant['qt.qmake.default.args']?xml}"/>
+                                    </#if>
+                                    <arg value="${unit['@${prefix}proFile'][0]?xml}"/>
+                                </exec>
+                            </then>
+                            <else>
+                               <echo message="ERROR: Directory ${bldinf} doesn't exist."/>
+                            </else>
+                        </if>
                     </else>
                 </if>
             </sequential>

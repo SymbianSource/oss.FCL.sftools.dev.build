@@ -40,7 +40,7 @@ Description:
         * update
         * maintain the work area
      -->
-    <target name="release-work-area">
+    <target name="release-work-area" if="internal.ccm.enabled">
         <mkdir dir="${release.log.dir}" />
         <hlm:record name="${release.log.dir}/${build.id}_release_work_area.log" action="start"/>
         <runtarget target="get-ccm-password"/>
@@ -61,25 +61,14 @@ import os.path
 # enabling logging
 logging.basicConfig(level=logging.INFO)
 
-builder = None           
+configBuilder = configuration.NestedConfigurationBuilder(open(ant.get_property(r'${prep.delivery.conf.parsed}'), 'r'))
+configSet = configBuilder.getConfiguration()
+password = ant.get_property(r'${ccm.user.password}')
+builder = preparation.PreparationBuilder(configSet.getConfigurations(), ant.get_property(r'${ccm.user.login}'), password, cache=ant.get_property(r'${ccm.cache.xml}'))
 try:
-    configBuilder = configuration.NestedConfigurationBuilder(open(ant.get_property(r'${prep.delivery.conf.parsed}'), 'r'))
-    configSet = configBuilder.getConfiguration()
-    password = ant.get_property(r'${ccm.user.password}')
-    builder = preparation.PreparationBuilder(configSet.getConfigurations(), ant.get_property(r'${ccm.user.login}'), password, cache=ant.get_property(r'${ccm.cache.xml}'))
     builder.extract_release_data(r'${release.log.dir}/${build.id}_releasable.xml')
+finally:
     builder.close()
-except Exception, e:
-    print "ERROR: error found during preparation phase:" 
-    for l in traceback.format_exc().splitlines(False):
-        print "ERROR: %s" % l
-    print "ERROR: this is a critical error, build will fail now:"
-    for l in str(e).splitlines(False):
-        print "ERROR: %s" % l
-    if builder != None:
-        builder.close()
-    sys.exit(-1)
-sys.exit(0)
                 </hlm:python>
             </try>
             <finally>

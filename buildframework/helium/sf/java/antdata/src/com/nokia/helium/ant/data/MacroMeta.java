@@ -17,6 +17,7 @@
 
 package com.nokia.helium.ant.data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.dom4j.Element;
@@ -33,6 +34,10 @@ public class MacroMeta extends TaskContainerMeta {
 
     public String getDescription() {
         return getAttr("description");
+    }
+    
+    public String getText() {
+        return getNode().getText();
     }
 
     @SuppressWarnings("unchecked")
@@ -65,5 +70,18 @@ public class MacroMeta extends TaskContainerMeta {
         else {
             return "<hlm:" + macroName + " " + usage + ">\n" + macroElements + "    </hlm:" + macroName + ">";
         }
+    }
+    
+    @SuppressWarnings("unchecked")
+    public List<String> getAttributes() {
+        List<String> attributes = new ArrayList<String>();
+        if (getNode().getNodeType() == Node.ELEMENT_NODE) {
+            Element element = (Element)getNode();
+            List<Element> attributeNodes = element.elements("attribute");
+            for (Element attributeNode : attributeNodes) {
+                attributes.add(attributeNode.attributeValue("name"));
+            }
+        }
+        return attributes; 
     }
 }

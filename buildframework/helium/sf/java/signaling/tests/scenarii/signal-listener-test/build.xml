@@ -1,0 +1,94 @@
+<?xml version="1.0"?>
+<!-- 
+============================================================================ 
+Name        : build.xml 
+Part of     : Helium
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="signal-listener-test" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium" xmlns:cond="antlib:org.apache.tools.ant.types.conditions">
+    
+    <taskdef resource="com/nokia/helium/signal/ant/antlib.xml" uri="http://www.nokia.com/helium" />
+    
+    <!-- Deferred signal -->
+    <hlm:notifierList id="testSignalNotifiers">
+        <hlm:executeTaskNotifier>
+            <echo>Signal: ${signal.name}</echo>
+        </hlm:executeTaskNotifier>
+    </hlm:notifierList>
+
+    <hlm:signalInput id="testDeferredSignalInput" failBuild="defer">
+        <hlm:notifierListRef refid="testSignalNotifiers" />
+    </hlm:signalInput>
+
+    <hlm:signalListenerConfig id="testDeferredSignal" target="failing-target" message="Errors happened during failing-target">
+        <signalNotifierInput>
+            <signalInput refid="testDeferredSignalInput" />
+        </signalNotifierInput>
+        <targetCondition >
+            <cond:not>
+                <equals arg1="0" arg2="${number.of.errors}" />
+            </cond:not>
+        </targetCondition>
+    </hlm:signalListenerConfig>
+
+    <hlm:signalInput id="testNeverSignalInput" failBuild="never">
+        <hlm:notifierListRef refid="testSignalNotifiers" />
+    </hlm:signalInput>
+
+    <hlm:signalListenerConfig id="testNeverSignal" target="never-failing-target" message="Errors happened during never-failing-target">
+        <signalNotifierInput>
+            <signalInput refid="testNeverSignalInput" />
+        </signalNotifierInput>
+        <targetCondition >
+            <cond:not>
+                <equals arg1="0" arg2="${number.of.errors}" />
+            </cond:not>
+        </targetCondition>
+    </hlm:signalListenerConfig>
+
+    <target name="failing-target">
+        <echo message="Executing failing-target." />
+        <property name="number.of.errors" value="1" />
+    </target>
+
+    <target name="build-with-deferred-failure" depends="failing-target">
+        <echo message="Executing build." />
+    </target>
+
+    <target name="never-failing-target">
+        <echo message="Executing never-failing-target." />
+        <property name="number.of.errors" value="1" />
+    </target>
+
+    <target name="build-with-never-failure" depends="never-failing-target">
+        <echo message="Executing build." />
+    </target>
+
+    
+    <!-- -->
+    <hlm:signalInput id="testNoCondSignalInput" failBuild="defer" />
+
+    <hlm:signalListenerConfig id="testNoCondSignal" target="no-cond-signal" message="This signal is emitted without specific condition, except the target being called.">
+        <signalNotifierInput>
+            <signalInput refid="testNoCondSignalInput" />
+        </signalNotifierInput>
+    </hlm:signalListenerConfig>
+
+    <target name="no-cond-signal" />
+
+</project>

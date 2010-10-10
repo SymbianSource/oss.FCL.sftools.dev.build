@@ -136,6 +136,10 @@ Update: define type of the spec as update and name as the project to update.
     The following properties are required:
         - database: the name of the synergy database you want to use.
 
+<#if !ant?keys?seq_contains("sf")>
+.. include:: stage_nokia_ccm.rst.inc
+</#if>
+
 Mercurial
 ---------
 
@@ -150,6 +154,8 @@ Add to ant configuration:
         </hlm:scm>
     </target>
 
+<#if !ant?keys?seq_contains("sf")>
 For more information see API_
 
-.. _API: ../helium-antlib/api/doclet/index.SCM.html
+.. _API: ../api/doclet/index.SCM.html
+</#if>

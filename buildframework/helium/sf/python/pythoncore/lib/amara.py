@@ -105,24 +105,26 @@ if True:
         def __setitem__(self, key, value):
             self.xml_set_attribute(key, value)
             
-        def __getattr__(self, attr):
+        def __getattr__(self, attr):        
+            if attr == 'xml_child_elements':
+                return self._getxml_child_elements()
             if isinstance(attr, basestring):
                 res = self.dom.getElementsByTagName(attr)
                 if len(res) == 0:
                     if hasattr(self.dom, 'documentElement'):
                         val = self.dom.documentElement.getAttribute(attr)
                         if not self.dom.documentElement.hasAttribute(attr):
-                            raise Exception(attr + ' not found')
+                            raise AttributeError(attr + ' not found')
                     else:
                         val = self.dom.getAttribute(attr)
                         if not self.dom.hasAttribute(attr):
-                            raise Exception(attr + ' not found')
+                            raise AttributeError(attr + ' not found')
                     return val
                 return MinidomAmara(res[0], self.dom)
             if self.parent:
                 return MinidomAmara(self.parent.getElementsByTagName(self.dom.tagName)[attr])
             else:
-                raise Exception(str(attr) + ' not found')
+                raise AttributeError(str(attr) + ' not found')
     
         def __setattr__(self, name, value):
             if isinstance(value, basestring):
@@ -134,13 +136,20 @@ if True:
             for entry in self.parent.getElementsByTagName(self.dom.tagName):
                 yield MinidomAmara(entry)
     
-        def __str__(self):
+        def _get_text(self, node):
+            """ Recursive method to collate sub-node strings. """
             text = ''
-            for t_text in self.dom.childNodes:
-                if t_text.nodeType == t_text.TEXT_NODE and t_text.data != None:
-                    text = text + t_text.data
-            return text
+            for child in node.childNodes:
+                if child.nodeType == child.TEXT_NODE and child.data != None:
+                    text = text + ' ' + child.data
+                else:
+                    text += self._get_text(child)
+            return text.strip()
         
+        def __str__(self):
+            """ Output a string representing the XML node. """
+            return self._get_text(self.dom)
+
         def xml(self, out=None, indent=False, omitXmlDeclaration=False, encoding='utf-8'):
             """xml"""
             if omitXmlDeclaration:
@@ -168,6 +177,14 @@ if True:
             for elem in self.dom.childNodes:
                 if elem.nodeType == elem.ELEMENT_NODE:
                     l_attrib.append(MinidomAmara(elem))
+            return l_attrib
+
+        def _getxml_child_elements(self):
+            """get xml children"""
+            l_attrib = {}
+            for elem in self.dom.childNodes:
+                if elem.nodeType == elem.ELEMENT_NODE:
+                    l_attrib[elem.tagName] = MinidomAmara(elem)
             return l_attrib
         
         def _getxml_attributes(self):
@@ -209,6 +226,7 @@ if True:
         childNodes = property(_getxml_children)
         xml_children = property(_getxml_children)
         xml_attributes = property(_getxml_attributes)
+        xml_child_elements = property(_getxml_child_elements)
         
         def __eq__(self, obj):
             return str(self) == obj

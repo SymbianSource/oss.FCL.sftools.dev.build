@@ -21,6 +21,7 @@ import java.io.File;
 import java.util.Vector;
 
 import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.taskdefs.ExecTask;
 import org.apache.tools.ant.types.Path;
@@ -57,11 +58,13 @@ import org.apache.tools.ant.types.Path;
 public class CodeScannerTask extends Task {
     private Vector<Path> paths = new Vector<Path>();
     private File configuration;
-    private String dest;
+    private File dest;
     private String format = "xml,html";
     private boolean auto;
     private File log;
-    private boolean failonerror;
+    private boolean failonerror = true;
+    private String lxrURL;
+    private File sourceDir;
 
     /**
      * This defines if the task should fails in case of error while executing codescanner.
@@ -86,7 +89,7 @@ public class CodeScannerTask extends Task {
      * Get dest attribute.
      * 
      */
-    public String getDest() {
+    public File getDest() {
         return this.dest;
     }
 
@@ -96,7 +99,7 @@ public class CodeScannerTask extends Task {
      * @param dest
      * @ant.required
      */
-    public void setDest(String dest) {
+    public void setDest(File dest) {
         this.dest = dest;
     }
 
@@ -157,17 +160,33 @@ public class CodeScannerTask extends Task {
     }
 
     /**
+     * Set lxr URL to update the codescanner html output files.
+     * @param lxrURL the lxrURL to set
+     */
+    public void setLxrURL(String lxrURL) {
+        this.lxrURL = lxrURL;
+    }
+
+    /**
+     * Set the source folder path in case lxr URL property is set. 
+     * @param sourceDir the sourceDir to set
+     */
+    public void setSourceDir(File sourceDir) {
+        this.sourceDir = sourceDir;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
     public void execute() {
         // creating the exec subtask
         ExecTask task = new ExecTask();
-        task.setProject(getProject());
-        task.setTaskName(this.getTaskName());
+        task.bindToOwner(this);
         task.setFailonerror(failonerror);
         task.setExecutable("codescanner");
         task.setDir(new File("."));
+        String commandString = "codescanner";
         if (dest == null) {
             throw new BuildException("'dest' attribute must be defined");
         }
@@ -178,6 +197,7 @@ public class CodeScannerTask extends Task {
             else {
                 task.createArg().setValue("-c");
                 task.createArg().setValue(configuration.getAbsolutePath());
+                commandString += " -c " + configuration.getAbsolutePath();
             }
         }
         else {
@@ -190,7 +210,7 @@ public class CodeScannerTask extends Task {
         // -t off
         task.createArg().setValue("-t");
         task.createArg().setValue(auto ? "on" : "off");
-
+        commandString += " -t " + (auto ? "on" : "off");
         // -l log
         if (log != null) {
             this.log("Output log: " + log.getAbsolutePath());
@@ -201,34 +221,66 @@ public class CodeScannerTask extends Task {
         // -o type
         task.createArg().setValue("-o");
         task.createArg().setValue(format);
-        if (paths.isEmpty()) {
-            throw new BuildException("No input directory defined");
+        commandString += " -o " + format;
+            
+        if (this.lxrURL != null ) {
+            if (this.sourceDir == null) {
+                throw new BuildException("'sourceDir' attribute must be defined");
+            }
+            if (!paths.isEmpty() ) {
+                throw new BuildException("Nested path element are not allowed when lxrURL attribute is in use.");
+            }
+            task.createArg().setValue("-x");
+            task.createArg().setValue(this.lxrURL);
+            commandString += " -x " + this.lxrURL;
+            task.createArg().setValue(sourceDir.getAbsolutePath());
+            commandString += " " + sourceDir.getAbsolutePath();
+        } else {
+            if (paths.isEmpty()) {
+                throw new BuildException("No input directory defined");
+            }
+            
+            // Getting the list of source dir to scan
+            Vector<String> srcs = new Vector<String>();
+            for (Path path : paths) {
+                if (path.isReference()) {
+                    path = (Path) path.getRefid().getReferencedObject();
+                }
+                for (String apath : path.list()) {
+                    srcs.add(apath);
+                }
+            }
+            for (int i = 0; i < srcs.size(); i++) {
+                if (i != srcs.size() - 1) {
+                    task.createArg().setValue("-i");
+                    task.createArg().setValue(srcs.elementAt(i));
+                    commandString += " -i " + srcs.elementAt(i);
+                }
+                else {
+                    task.createArg().setValue(srcs.elementAt(i));
+                    commandString += " " + srcs.elementAt(i);
+                }
+            }
         }
-        // Getting the list of source dir to scan
-        Vector<String> srcs = new Vector<String>();
-        for (Path path : paths) {
-            if (path.isReference()) {
-                path = (Path) path.getRefid().getReferencedObject();
-            }
-            for (String apath : path.list()) {
-                srcs.add(apath);
-            }
-        }
-        for (int i = 0; i < srcs.size(); i++) {
-            if (i != srcs.size() - 1) {
-                task.createArg().setValue("-i");
-                task.createArg().setValue(srcs.elementAt(i));
-            }
-            else {
-                task.createArg().setValue(srcs.elementAt(i));
-                task.createArg().setValue(dest.toString());
-            }
-        }
+        
         // output path
-        this.log("Output dir " + dest);
+        task.createArg().setValue(dest.getAbsolutePath());
+        commandString += " " + dest.getAbsolutePath();
+        this.log("Output dir " + dest.getAbsolutePath());
 
         // Run codescanner
-        task.execute();
+        try {
+            log("Running codescanner with arguments '" + commandString + "'");
+            task.execute();
+        } catch (BuildException be) {
+            if (this.failonerror) {
+                throw new BuildException("Errors occured while running 'codescanner'", be);
+            } else {
+                log("Errors occured while running 'codescanner' " + be.getMessage(), Project.MSG_ERR);
+            }
+        }
+        
+        
         this.log("Successfully executed codescanner");
     }
 }

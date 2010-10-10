@@ -75,6 +75,7 @@ public class EnvironmentTask extends Task {
         try {
             if (outputFile != null) {
                 out = new FileOutputStream(outputFile);
+                project.log("Writing output to " + outputFile.toString(), Project.MSG_INFO);
             }
             List<ExecutableInfo> executableDefs = new ArrayList<ExecutableInfo>();
             for (Iterator<EnvData> iterator = envDataList.iterator(); iterator.hasNext();) {
@@ -85,6 +86,7 @@ public class EnvironmentTask extends Task {
             Environment environment = new Environment(project);
             environment.setExecutableDefs(executableDefs);
             environment.scan(ExecListener.getExecCalls());
+            
             EnvironmentXMLWriter writer = new EnvironmentXMLWriter(out);
             writer.write(environment);
         }

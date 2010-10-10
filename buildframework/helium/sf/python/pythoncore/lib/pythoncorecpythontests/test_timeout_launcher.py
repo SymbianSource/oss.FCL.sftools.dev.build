@@ -32,9 +32,9 @@ logging.basicConfig(level=logging.INFO)
 # Platform
 WINDOWS = False
 if sys.platform == "win32":
-    import win32process
+#    import win32process
     import win32con
-    import win32api
+#    import win32api
     WINDOWS = True
 
 
@@ -175,6 +175,6 @@ class TimeoutLauncherTest(mocker.MockerTestCase):
         failed = False
         try:
             timeout_launcher.main()
-        except Exception:
+        except (OSError, IOError):
             failed = True
         assert failed

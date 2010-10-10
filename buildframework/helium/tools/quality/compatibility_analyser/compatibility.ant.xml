@@ -20,7 +20,7 @@ Description:
 
 ============================================================================
 -->
-<project name="compatibility.analyser" xmlns:hlm="http://www.nokia.com/helium">
+<project name="compatibility.analyser" xmlns:hlm="http://www.nokia.com/helium" xmlns:au="org.apache.ant.antunit">
     <description>
         Compatibility Analyser - BC (Binary Comparison) needs the property ca.enabled to
         be set to true in order to run the targets bc-check and ca-generate-diamond-summary
@@ -32,25 +32,17 @@ Description:
     @editable required
     @scope public
     -->
-    <property name="bctools.root" location="E:\brtaylor\Apps\carbide\plugins\com.nokia.s60tools.compatibilityanalyser.corecomponents_2.0.0\BCTools" />
+    <property name="bc.tools.root" location="${build.drive}/epoc32/tools/s60rndtools/bctools/compatibilityanalyser" />
 
-    <!-- Place where the CheckBC default configuration file is - required (see compatibility analyser user guide for details)
-    it is copied from this location to the output folder  for use by checkBC.py
-    @type string
-    @editable required
-    @scope public
-    -->
-    <property name="default.bc.config"  location="${helium.dir}/tools/quality/compatibility_analyser/ca_config_template.txt" />
-
-    <!-- The bc_config_template.txt file (default configuration file) will be copied from the folder
+    <!-- The ca.cfg.xml file (default configuration file) will be copied from the folder
     it is saved in within helium to the location named in this property where it will be used.
     @type string
     @editable required
     @scope public
     -->
-    <property name="bc.config.dir" location="${build.log.dir}/bc" />
+    <property name="bc.build.dir" location="${build.log.dir}/bc" />
 
-    <!-- The bc_config_template.txt file (default configuration file) will be copied from the
+    <!-- The ca.cfg.xml file (default configuration file) will be copied from the
     folder it is saved in within helium to the location and file name named in this property 
     where it will be used. You need to make sure this is 
     not the same name as any other IDO or person using the build area
@@ -58,101 +50,239 @@ Description:
     @editable required
     @scope public
     -->
-    <property name="bc.config.file" location="${bc.config.dir}/bc.config" />
+    <property name="bc.config.file" location="${bc.build.dir}/bc_config.txt" />
 
     <!-- Enables the Binary Comparison for libraries when set to true
     @type boolean
     @editable required
     @scope public
     -->
-    <property name="bc.check.libraries.enabled" value="true" />
+    <property name="bc.check.libraries.enabled" value="false" />
     
-    <!-- Defines the parameter that checkBC.py is called with 
+    <!--* @property bc.lib.param.val
+        Defines which library files will be compared, user can define or leave as default value '-la'.
+        If the property 'bc.what.log.entry.enabled' is set to true 'bc.head.param.val' needs to be left unset. 
        -la (all libraries checked) 
     or -ls lib (single library checked) (lib = the name of library to check)
     or -lm file.name (multiple libraries checked) 
-    the file.name is a file that contains the names of the library(ies) to check 
+    the file.name is a file that contains the names of the library(ies) to check e.g.
+    property name="bc.lib.param.val" value="-ls J:\epoc32\release\armv5\lib\platsimopengles11.dso"
     @type string
     @editable required
     @scope public
     -->
-    <property name="lib.param.val" value="-la" />
 
+    <!--* @property ca.enabled
+        when set to true enables the Compatibility Analyser code to function, when to to flase or not present CA is disabled
+    @type string
+    @editable required
+    @scope public
+    -->
+
+    
     <!-- Enables the Binary Comparison for headers when set to true
     @type boolean
     @editable required
     @scope public
     -->
-    <property name="bc.check.headers.enabled" value="true" />
+    <property name="bc.check.headers.enabled" value="false" />
     
-    <!-- Defines the parameter that checkBC.py is called with 
+    <!--* @property bc.head.param.val
+        Defines which header files will be compared, user can define or leave as default value '-ha'.
+        If the property 'bc.what.log.entry.enabled' is set to true 'bc.head.param.val' needs to be left unset. 
        -ha (all headers checked) 
     or -hs file (single header checked) (file= name of header file to check) 
     or -hm file.name (multiple headers checked) 
-    the file.name is a file that contains the names of the header(s) to check 
+    the file.name is a file that contains the names of the header(s) to check used when 'bc.what.log.entry.enabled' is set to 'true'.
+    e.g. property name="bc.head.param.val" value="-hs j:\epoc32\include\csy.rh
     @type string
     @editable required
     @scope public
     -->
-    <property name="head.param.val" value="-ha" />
 
     <!-- Adds this to the CA output file name to give it a unique name
     @type string
     @editable required
     @scope public
     -->
-    <property name="bc.check.report.id" value="${build.name}_${build.number}" />
+    <property name="bc.check.report.id" value="${build.name}_${build.number}.xml" />
 
-    <!-- Defines the location of CA output and the input for the diamonds creation target.
+    <!-- location of the config file that contains the values for checkbc.py config file (template.txt)
     @type string
+    @editable required
+    @scope public
     -->
-    <property name="ido.ca.html.output.dir" location="${build.log.dir}/${build.id}_ca"/>
+    <property name="bc.prep.ca.file" location="./../ca.cfg.xml" />
+    
+    <!-- Enables the use of whatlogentry (from the metadata DB) to generate the list of files
+     to be compared against the compiled code when set to true.
+    @type boolean
+    @editable required
+    @scope public
+    -->
+    <property name="bc.what.log.entry.enabled" value="false" />
 
+    <!--* @property bc.log.file.to.scan
+        the name of the log file that contains all the 'what' information. e.g. ${build.log.dir}/compile/${build.id}_dfs_build_armv5_compile.log
+    @type string
+    @editable required
+    @scope public
+    -->
+
+    <!-- If set to true fails the build if there is an error. If set to false does not fail the build if there is an error. Default value is false.
+    @type boolean
+    @editable required
+    @scope public
+    -->
+    <property name="bc.fail.on.error" value="false" />
+    
+    <!-- check if it is enabled and set the flag to make the target run -->
     <condition property="internal.run.ca">
         <istrue value="${ca.enabled}" />
     </condition>
+    
+    <!-- create the parsed file name-->
+    <property name="prep.ca.conf.parsed" location="${bc.build.dir}\ca.cfg.xml.parsed" />
 
 
-<!-- static and dynamic BC Test target -->
-    <target name="bc-check" if="internal.run.ca" >
+    <!-- the whatlogentry DB is scanned and the files written to the file named here -->
+    <var name="bc.db.output.file" value="" />
+
+    <!--location and name of the file that the checkbc.py script writes the output for the headers to 
+    then used as the input to the target that summarises the output to go to diamonds -->
+    <property name="bc.header.output.file" location="${bc.build.dir}/ca_header_${bc.check.report.id}" />
+     <!--location and name of the file that the checkbc.py script writes the output for the libraries to 
+    then used as the input to the target that summarises the output to go to diamonds -->
+    <property name="bc.library.output.file" location="${bc.build.dir}/ca_library_${bc.check.report.id}" />
+
+    <!--setup property so can be tested - location of the FMPP template file-->
+    <property name="ca.template.file" location="${helium.dir}/tools/common/templates/log/ca_content.txt.ftl" />
+    
+    <property name="bc.template.macro" location="${helium.dir}/tools/common/templates/macro" />
+    
+    <!-- scan the whatlogentry contents and retrieve the files to compare within the headers and libraries-->
+    <target name="get-whatlogentry-contents-for-ca" >
+        <fmpp sourceFile="${ca.template.file}"
+                     outputfile="${bc.db.output.file}">
+            <freemarkerLinks expandProperties="yes">
+                macro: ${bc.template.macro}
+            </freemarkerLinks>
+            <data expandProperties="yes">
+                dbPath: ${build.log.dir}/${build.id}_metadata_db
+                logfilename: ${bc.log.file.to.scan}
+                checktype: ${bc.check.type}
+                ant: antProperties()
+            </data>
+        </fmpp>
+    </target>
+    
+    <!--takes the ca BC config file and runs it through the parser to replace ant properties with
+    real values, taken out here so that some testing of the CA code can be done-->
+    <target name="parse-ca-config" >
+        <!-- run through the bc.prep.ca.file and replace all the ant properties with real values-->
+        <copy file="${bc.prep.ca.file}" tofile="${prep.ca.conf.parsed}" overwrite="true">
+            <filterchain>
+                <expandproperties />
+            </filterchain>
+        </copy>
+
+        <!-- run through the parsed bc.prep.ca.file and take the 'set' name and write this to a text file
+        with the '=' sign after it and write the 'set' value after the '=' sign. This is to create the
+        checkbc.py configuration file which contains all its configration values -->
+        <hlm:python>
+import configuration
+
+configBuilder = configuration.NestedConfigurationBuilder(open(r'${prep.ca.conf.parsed}', 'r'))
+configSet = configBuilder.getConfiguration()
+outputFile = open(r'${bc.config.file}', 'w')
+for config in configSet.getConfigurations('compatibility.analyser.cfg'):
+    for x in config.keys():
+        outputFile.write(x)
+        outputFile.write('=')
+        outputFile.write(config[x])
+        outputFile.write('\n')
+        
+outputFile.close()
+        </hlm:python>
+    </target>
+    
+    <!-- static and dynamic BC Test target -->
+    <target name="bc-check"  if="internal.run.ca" >
         <!-- create BC dir -->
-        <mkdir dir="${build.log.dir}/BC"/>
+        <mkdir dir="${bc.build.dir}"/>
         <delete file="${bc.config.file}" quiet="true"/>
-        <delete file="${build.log.dir}/BC/BBCResults.xsl" quiet="true"/>
-
-        <copy file="${default.bc.config}" tofile="${bc.config.file}" failonerror="false" verbose="true"/>
-
+        <delete file="${bc.build.dir}/BBCResults.xsl" quiet="true"/>
         <!--copy the CSS file to the output folder-->
-        <copy file="${bctools.root}/reports/BBCResults.xsl" tofile="${build.log.dir}/BC/BBCResults.xsl" failonerror="false" verbose="true"/>
+        <copy file="${bc.tools.root}/reports/BBCResults.xsl" tofile="${bc.build.dir}/BBCResults.xsl" 
+                                                                failonerror="false" verbose="true"/>
 
-        <if>    <!--the library check enaled flag is set then run the check on the lirary files-->
+        <runtarget target="parse-ca-config" />
+        
+        <if>    <!--the library check enabled flag is set then run the check on the library files-->
             <istrue value="${bc.check.libraries.enabled}"/>
             <then>
-                <exec executable="python" dir="${build.log.dir}/BC" failonerror="true">
-                    <arg value="${bctools.root}/CheckBC.py"/>
+                <if>
+                    <!-- check to see if the whatlogentry needs to be scanned for list of files to compare
+                    if it is not set then the bc.lib.param.val as defined by the user will be used-->
+                    <istrue value="${bc.what.log.entry.enabled}"/>
+                    <then>
+                        <var name="bc.check.type" value="lib" />
+                        <var name="bc.db.output.file" value="${bc.build.dir}/ca_libraries.txt" />
+                        <runtarget target="get-whatlogentry-contents-for-ca" failonerror="${bc.fail.on.error}"/>
+                        <property name="bc.lib.param.val" value="-lm ${bc.db.output.file}"/>
+                    </then>
+                </if>
+                <condition property="bc.lib.param.val" value="-la">
+                    <not>
+                        <isset property="bc.lib.param.val" />
+                    </not>
+                </condition>
+                <exec executable="python" dir="${build.log.dir}/bc" failonerror="${bc.fail.on.error}">
+                    <arg value="${bc.tools.root}/CheckBC.py"/>
                     <arg value="${bc.config.file}"/>
-                    <arg line="${lib.param.val}"/>
+                    <arg line="${bc.lib.param.val}"/>
                     <arg value="-f"/>
                     <arg value="${bc.check.report.id}"/>
                 </exec>
+                <copy file="${bc.tools.root}/reports/Libraries_CompatibilityReport_${bc.check.report.id}" 
+                      tofile="${bc.library.output.file}" />
             </then>
         </if>
 
         <if>    <!-- if the header check flag is set then run the checks on the headers-->
             <istrue value="${bc.check.headers.enabled}"/>
             <then>
-                <exec executable="python" dir="${build.log.dir}/BC" failonerror="true">
-                    <arg value="${bctools.root}/CheckBC.py"/>
+                <if>
+                    <!-- check to see if the whatlogentry needs to be scanned for list of files to compare
+                    if it is not set then the bc.lib.param.val as defined by the user will be used-->
+                    <istrue value="${bc.what.log.entry.enabled}"/>
+                    <then>
+                        <var name="bc.check.type" value="header" />
+                        <var name="bc.db.output.file" value="${bc.build.dir}/ca_headers.txt" />
+                        <runtarget target="get-whatlogentry-contents-for-ca" failonerror="${bc.fail.on.error}"/>
+                        <property name="bc.head.param.val" value="-hm ${bc.db.output.file}"/>
+                    </then>
+                </if>
+                <condition property="bc.head.param.val" value="-ha">
+                    <not>
+                        <isset property="bc.head.param.val" />
+                    </not>
+                </condition>
+                <exec executable="python" dir="${build.log.dir}/bc" failonerror="${bc.fail.on.error}">
+                    <arg value="${bc.tools.root}/CheckBC.py"/>
                     <arg value="${bc.config.file}"/>
-                    <arg line="${head.param.val}"/>
+                    <arg line="${bc.head.param.val}"/>
                     <arg value="-f"/>
                     <arg value="${bc.check.report.id}"/>
                 </exec>
+                <copy file="${bc.tools.root}/reports/Headers_CompatibilityReport_${bc.check.report.id}" 
+                      tofile="${bc.header.output.file}" />
             </then>
         </if>
+        <runtarget target="ca-generate-diamond-summary" />
     </target>
 
-
+    <!-- used to summarise the output of the CA and pass the summary on to Diamonds for display -->
     <target name="ca-generate-diamond-summary" if="internal.run.ca">
         <!--use the header.ftl template file to create the init part of the output file
         that can be copied to the final output file by the java class-->
@@ -163,6 +293,7 @@ Description:
         <fmpp sourcefile="${helium.dir}/tools/common/templates/diamonds/diamonds_footer.ftl" 
               outputfile="${temp.diamonds.footer.xml}" quiet="true"/>
 
+        <!-- just in case it does not exist-->
         <mkdir dir="${diamonds.build.output.dir}" />
 
         <if>    <!-- if the header check flag is set then run the checks on the headers-->
@@ -171,8 +302,8 @@ Description:
                 <hlm:casummary diamondsHeaderFileName="${temp.diamonds.header.xml}" diamondsFooterFileName="${temp.diamonds.footer.xml}"
                     header="true"
                     outputFile="${diamonds.build.output.dir}/ca_summary_header.xml"
-                    inputFile="${bc.config.dir}/headers_report_${bc.check.report.id}.xml" 
-                     />
+                    inputFile="${bc.header.output.file}" 
+                    failOnError="${bc.fail.on.error}"/>
             </then>
         </if>
 
@@ -182,8 +313,8 @@ Description:
                 <hlm:casummary diamondsHeaderFileName="${temp.diamonds.header.xml}" diamondsFooterFileName="${temp.diamonds.footer.xml}"
                     header="false" 
                     outputFile="${diamonds.build.output.dir}/ca_summary_library.xml"
-                    inputFile="${bc.config.dir}/libraries_report_${bc.check.report.id}.xml"
-                    />
+                    inputFile="${bc.library.output.file}"
+                    failOnError="${bc.fail.on.error}"/>
             </then>
         </if>
 
@@ -191,4 +322,5 @@ Description:
         <delete file="${temp.diamonds.footer.xml}" failonerror="false" />
     </target>
 
+    
 </project>

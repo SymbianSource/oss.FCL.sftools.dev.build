@@ -60,6 +60,7 @@ Description:
     <taskdef resource="com/nokia/helium/ccmtask/ant/antlib.xml" uri="http://www.nokia.com/helium" />
     <taskdef resource="com/nokia/helium/sysdef/ant/antlib.xml" uri="http://www.nokia.com/helium" />
     <taskdef resource="com/nokia/helium/internaldata/ant/antlib.xml" uri="http://www.nokia.com/helium"/>
+    <taskdef resource="com/nokia/helium/diamonds/ant/antlib.xml" uri="http://www.nokia.com/helium"/>
 
     <!-- Nokia internal types. -->
     <typedef resource="com/nokia/helium/ant/coverage/antlib.xml" uri="http://www.nokia.com/helium"/>

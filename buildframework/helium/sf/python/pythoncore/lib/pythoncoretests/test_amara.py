@@ -31,12 +31,16 @@ def test_amara():
     """test amara"""
     xxx = amara.parse(r'<commentLog><branchInfo category="" error="kkk" file="tests/data/comments_test.txt" originator="sanummel" since="07-03-22">Add rofsfiles for usage in paged images</branchInfo></commentLog>')
     assert str(xxx.commentLog.branchInfo) == 'Add rofsfiles for usage in paged images'
+    print "xxx: '" + str(xxx) + "'"
+    print xxx.xml()
     
     xxx = amara.parse(r'<commentLog><branchInfo>1</branchInfo><branchInfo>2</branchInfo></commentLog>')
     for yyy in xxx.commentLog.branchInfo:
         assert str(yyy) == '1'
         break
-          
+    print "xxx: '" + str(xxx) + "'"
+    print xxx.xml()
+    
     myxml = """<DpComponent DpType="File" name="dp.cfg.xml" fileType="Binary" fileSubType="1" fileIndex="1" owner="SwUpdate" extract="true" signed="true" optional="true" crc="true" useCases="Refurbish,BackupRestore" variantPackage="true" include="true" EnableCRCVerification="true" parameters="test"/>"""
     xcf = amara.parse(myxml)
     assert xcf.DpComponent['name'] == 'dp.cfg.xml'
@@ -117,6 +121,8 @@ def test_amara():
 
     newppxml = amara.parse(ppxml)
     oldppxml = amara.parse(ppxml)
+    
+    assert 'SettingsData' in newppxml.xml_child_elements
     
     oldppdata = {}
     for oldfeature in oldppxml.SettingsData.ProductProfile.Feature:

@@ -20,10 +20,12 @@ package com.nokia.helium.signal.ant.taskdefs;
 import java.util.Vector;
 
 import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Target;
 import org.apache.tools.ant.Task;
 
-import com.nokia.helium.signal.ant.SignalList;
+import com.nokia.helium.signal.ant.Signals;
+import com.nokia.helium.signal.ant.types.SignalInput;
 import com.nokia.helium.signal.ant.types.SignalNotifierInput;
 
 /**
@@ -58,24 +60,29 @@ public class SignalTask extends Task {
 
     private Vector<SignalNotifierInput> signalNotifierInputs = new Vector<SignalNotifierInput>();
     
-    public String getMessage() {
-        return message;
-    }
-
     /**
-     * Helper function called by ant to create the new signalinput
-     */
+     * Create a nested signalNotifierInput element.
+     * @return a SignalNotifierInput instance
+     */   
     public SignalNotifierInput createSignalNotifierInput() {
         SignalNotifierInput input =  new SignalNotifierInput();
         add(input);
         return input;
     }
 
+    /**
+     * Get the nested SignalNotifierInput. Only the first element will be returned.
+     * @return null if the list is empty of the first element.
+     */
     public SignalNotifierInput getSignalNotifierInput() {
+        if (signalNotifierInputs.isEmpty()) {
+            return null;
+        }
         return (SignalNotifierInput)signalNotifierInputs.elementAt(0);
     }
+    
     /**
-     * Helper function to add the created signalinput
+     * Add a SignalNotifierInput kind of element.
      * @param filter to be added to the filterset
      */
     public void add(SignalNotifierInput input) {
@@ -84,21 +91,16 @@ public class SignalTask extends Task {
     
     
     /**
-     * Error message.
-     * 
-     * @ant.not-required
+     * Error message sent to the user.
+     * @ant.not-required Default message will be sent.
      */
     public void setMessage(String message) {
         this.message = message;
     }
 
-
-    public String getName() {
-        return name;
-    }
-
     /**
-     * Signal name to emit.
+     * Reference of the signal to emit. The referenced object
+     * must be a signalInput.
      * 
      * @ant.required
      */
@@ -109,69 +111,59 @@ public class SignalTask extends Task {
     /**
      * integer value representing the number of errors.
      * 
-     * @ant.required
+     * @ant.no-required Default is 0.
      */
     public void setResult(int result) {
         this.result = new Integer(result);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void execute() {
-        if (name == null) {
+        if (name == null && getSignalNotifierInput() == null) {
             throw new BuildException("'name' attribute is not defined.");
+        }
+        if (name != null && getSignalNotifierInput() != null) {
+            log("The usage of name and nested signalInputNotifier at the same time is deprecated.", Project.MSG_WARN);
+            log("'name' attribute will be ignored.", Project.MSG_WARN);
+            name = null;
         }
         if (result == null) {
             result = new Integer(0);
         }
-
-        SignalList signalList = new SignalList(getProject());
-        boolean failStatus = result.intValue() != 0; 
-        if (failStatus) {
-            // keep same message as earlier.
-            log(name
-                    + ": "
-                    + name
-                    + " signal failed. Expected result was 0, actual result was "
-                    + result);
-
-            if (message == null) {
-                message = "Expected result was 0, actual result was " + result;
+        SignalNotifierInput config = null;
+        String signalName = null;
+        if (name != null) {
+            signalName = name;
+            Object configObject = getProject().getReference(name);
+            if (configObject != null && configObject instanceof SignalInput) {
+                config = new SignalNotifierInput();
+                config.setProject(getProject());
+                config.add((SignalInput)configObject);
+            } else {
+                throw new BuildException("name attribute (" + name + ") is not refering to a signalInput");
             }
+        } else {
+            config = getSignalNotifierInput();
+            signalName = config.getSignalInput().getName();
         }
-        
+
         // notify the user
-        String targetName = "signalExceptionTarget";  
+        String targetName = "unknown";  
         Target target = this.getOwningTarget();
         if (target != null) {
             targetName = target.getName();
         }
 
-        if (signalNotifierInputs.isEmpty()) {          
-            Object config = getProject().getReference(name);
-            if (config == null) {
-                throw new BuildException("Could not find signal config for signal name: " + name);
-            }
-            signalList.processForSignal(getProject(), this.getSignalNotifierInput(), this.name, 
-                    this.getOwningTarget().getName(), message, result.intValue() != 0);
-
-            if (result.intValue() != 0) {
-                // keep same message as earlier.
-                log(name
-                        + ": "
-                        + name
-                        + " signal failed. Expected result was 0, actual result was "
-                        + result);
-
-                if (message == null) {
-                    message = "Expected result was 0, actual result was " + result;
-                }
-                signalList.fail(getName(), this.getOwningTarget().getName(), message);
-            }
-            
-        } else {
-            signalList.processForSignal(getProject(), getSignalNotifierInput(), getName(),
-                targetName, message, failStatus);
+        if (message == null) {
+            message = "Expected result was 0, actual result was " + result;
         }
+        log(signalName + ": " + targetName + ": " + message);
+
+        Signals.getSignals().processSignal(getProject(), config, signalName, 
+                targetName, message, result.intValue() != 0);            
     }
 
 }

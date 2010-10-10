@@ -31,8 +31,6 @@ Description:
         </sequential>
     </macrodef>
     
-    
-    
     <scriptdef  name="check-prop-in-scriptdef" language="jython">
 result = None
 if project.getProperty("test.scriptdef.property")is not None:
@@ -45,10 +43,23 @@ if project.getProperty("test.scriptdef.property")is not None:
 target = str(attributes.get('attr0'))    
     </scriptdef>
     
-    <scriptdef name="check-scriptdef-beanshell" language="beanshell">
+    <scriptdef name="checkScriptdefBeanshell" language="beanshell">
         <attribute name="attr0"/>
         <attribute name="attr2"/>
-target = str(attributes.get('attr0'))    
+        <element name="path" type="path"/>
+        <![CDATA[
+import java.io.*;
+FileWriter out = new FileWriter(attributes.get("attr0"));
+
+paths = elements.get("path");
+for (int i = 0 ; i < paths.size() ; i++) {
+    String[] files = paths.get(i).list();
+    for (int j = 0; j < files.length ; j++) {
+        out.write(files[j] + "\n");
+    }
+}
+out.close();
+    ]]>   
     </scriptdef>    
     
     <scriptdef name="check-scriptdef-style" language="jython" uri="http://www.nokia.com/helium">
@@ -70,7 +81,28 @@ if ${build.drive} is None:
 target = str(attributes.get('target'))    
     </scriptdef>
     
-    <scriptdef name="check-scriptdef-attributes" language="beanshell">
-target = str(attributes.get('target'))    
+    <scriptdef name="checkScriptdefAttributes" language="beanshell">
+        <element name="path" type="path"/>
+        <![CDATA[
+import java.io.*;
+FileWriter out = new FileWriter(attributes.get("attr0"));
+
+paths = elements.get("path");
+for (int i = 0 ; i < paths.size() ; i++) {
+    String[] files = paths.get(i).list();
+    for (int j = 0; j < files.length ; j++) {
+        out.write(files[j] + "\n");
+    }
+}
+out.close();
+    ]]>   
     </scriptdef>
+    
+    <macrodef name="antlint" uri="http://www.nokia.com/helium">
+        <sequential>
+            <echo>antlintMacro</echo>
+            <runtarget target="hello"/>
+        </sequential>
+    </macrodef>
+
 </antlib>

@@ -18,12 +18,12 @@
     
     ============================================================================
 
-####################
+###########################
 Configuring Helium Features
-####################
+###########################
 
 Introduction
--------------------------------
+------------
 
 This describes how to configure the Helium features.
 
@@ -36,15 +36,15 @@ We could configure features by enabing/disabling repective properties::
     Enabling blocks features.
     Enabling to use dragonfly and many more.
 
-Properties need to be defined for enabling/disabling the features.
--------------------------------------------------------------
+Properties need to be defined for enabling/disabling the features
+-----------------------------------------------------------------
 <#assign propertyCache = {}>
 <#list doc.antDatabase.project.property as property>
     <#assign propertyCache = propertyCache + {property.name: property}>
 </#list>
  
 .. csv-table:: Feature properties
-   :header: "Property name", "Description", "Allowed value", "Deprecated property"
+   :header: "Property name", "Description", "Default value", "Deprecated property"
    
 <#list propertyCache?keys?sort as name>
 <#assign property=propertyCache[name]>
@@ -58,7 +58,7 @@ Properties need to be defined for enabling/disabling the features.
             <#assign deprecatedMessage="${deprecatedName.deprecated}">
         </#if>
     </#list>
-    ":hlm-p:`${name}`", "${property.summary?replace("^", "    ", "rm")?replace("\"", "\"\"", "rm")?trim}", "true/false", "${deprecatedProperty}${deprecatedMessage}"
+    ":hlm-p:`${name}`", "${property.summary?replace("^", "    ", "rm")?replace("\"", "\"\"", "rm")?trim}", "${property.defaultValue}", "${deprecatedProperty}${deprecatedMessage}"
 </#if>
 </#list>
    

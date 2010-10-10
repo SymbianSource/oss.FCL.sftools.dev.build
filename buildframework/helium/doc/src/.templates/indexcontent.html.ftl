@@ -28,10 +28,12 @@ Description:
       <p class="biglink"><a class="biglink" href="{{ pathto("releasenotes/index") }}">Release notes</a><br/>
          <span class="linkdescr">what's new</span></p>
 </#if>
-      <p class="biglink"><a class="biglink" href="{{ pathto("quick_start_guide") }}">Quick Start Guide</a><br/>
+      <p class="biglink"><a class="biglink" href="{{ pathto("quick_start_guide") }}">Quick start guide</a><br/>
          <span class="linkdescr">start here</span></p>
       <p class="biglink"><a class="biglink" href="{{ pathto("feature_list") }}">Feature list</a><br/>
          <span class="linkdescr">what is supported</span></p>
+      <p class="biglink"><a class="biglink" href="{{ pathto("new_user_tutorial") }}">New user tutorial</a><br/>
+         <span class="linkdescr">covers the basics</span></p>
       <p class="biglink"><a class="biglink" href="{{ pathto("manual/index") }}">Manual</a><br/>
          <span class="linkdescr">reference docs</span></p>
     </td><td width="50%">

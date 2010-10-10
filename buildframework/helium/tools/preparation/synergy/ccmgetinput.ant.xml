@@ -76,26 +76,15 @@ import os.path
 # enabling logging
 logging.basicConfig(level=logging.INFO)
 
-builder = None           
+configBuilder = configuration.NestedConfigurationBuilder(open(ant.get_property(r'${prep.delivery.conf.parsed}'), 'r'))
+configSet = configBuilder.getConfiguration()
+password = ant.get_property(r'${ccm.user.password}')
+builder = preparation.PreparationBuilder(configSet.getConfigurations(), ant.get_property(r'${ccm.user.login}'), password, cache=ant.get_property(r'${ccm.cache.xml}'))
 try:
-    configBuilder = configuration.NestedConfigurationBuilder(open(ant.get_property(r'${prep.delivery.conf.parsed}'), 'r'))
-    configSet = configBuilder.getConfiguration()
-    password = ant.get_property(r'${ccm.user.password}')
-    builder = preparation.PreparationBuilder(configSet.getConfigurations(), ant.get_property(r'${ccm.user.login}'), password, cache=ant.get_property(r'${ccm.cache.xml}'))
     builder.check()
     builder.get_content()
+finally:
     builder.close()
-except Exception, e:
-    print "ERROR: error found during preparation phase:" 
-    for l in traceback.format_exc().splitlines(False):
-        print "ERROR: %s" % l         
-    print "ERROR: this is a critical error, build will fail now:"
-    for l in str(e).splitlines(False):
-        print "ERROR: %s" % l         
-    if builder != None:
-        builder.close()
-    sys.exit(-1)
-sys.exit(0)
                 </hlm:python>
             </try>
             <finally>
@@ -130,25 +119,14 @@ import os.path
 # enabling logging
 logging.basicConfig(level=logging.INFO)
 
-builder = None           
+configBuilder = configuration.NestedConfigurationBuilder(open(ant.get_property(r'${prep.delivery.conf.parsed}'), 'r'))
+configSet = configBuilder.getConfiguration()
+password = ant.get_property(r'${ccm.user.password}')
+builder = preparation.PreparationBuilder(configSet.getConfigurations(), ant.get_property(r'${ccm.user.login}'), password, cache=ant.get_property(r'${ccm.cache.xml}'))
 try:
-    configBuilder = configuration.NestedConfigurationBuilder(open(ant.get_property(r'${prep.delivery.conf.parsed}'), 'r'))
-    configSet = configBuilder.getConfiguration()
-    password = ant.get_property(r'${ccm.user.password}')
-    builder = preparation.PreparationBuilder(configSet.getConfigurations(), ant.get_property(r'${ccm.user.login}'), password, cache=ant.get_property(r'${ccm.cache.xml}'))
     builder.cleanup()
+finally:
     builder.close()
-except Exception, e:
-    print "ERROR: error found during preparation phase:" 
-    for l in traceback.format_exc().splitlines(False):
-        print "ERROR: %s" % l         
-    print "ERROR: this is a critical error, build will fail now:"
-    for l in str(e).splitlines(False):
-        print "ERROR: %s" % l         
-    if builder != None:
-        builder.close()
-    sys.exit(-1)
-sys.exit(0)
                 </hlm:python>
             </try>
             <finally>

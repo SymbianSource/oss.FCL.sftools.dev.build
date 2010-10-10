@@ -19,14 +19,14 @@
 package com.nokia.helium.signal.ant.types;
 
 
+import java.util.List;
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.types.DataType;
 
 import com.nokia.helium.core.ant.types.ReferenceType;
-import com.nokia.helium.signal.Notifier;
+import com.nokia.helium.signal.ant.Notifier;
 
 /**
  * SignalInput class which is a type to store input for signals
@@ -47,14 +47,10 @@ import com.nokia.helium.signal.Notifier;
  */
 public class SignalInput extends DataType
 {
-    private Vector<ReferenceType> notifierListRef = new Vector<ReferenceType>();
-
-    private Vector<NotifierInput> notifierInputList = new Vector<NotifierInput>();
+    private List<ReferenceType<SignalNotifierList>> notifierListRef = new Vector<ReferenceType<SignalNotifierList>>();
 
     // By default it is configured to fail the build.
     private String failBuild = "now";
-
-    private Logger log = Logger.getLogger(SignalInput.class);
 
     
     /**
@@ -73,27 +69,10 @@ public class SignalInput extends DataType
      * @param failBuild type of failure for this input.
      */
     public String getFailBuild() {
-        return failBuild;
-    }
-
-    /**
-     * Helper function called by ant to create a new notifier for
-     * this input.
-     * @return ReferenceType created ReferenceType.
-     */    
-    public NotifierInput createNotifierInput() {
-        NotifierInput notifierInput =  new NotifierInput();
-        add(notifierInput);
-        return notifierInput;
-    }
-
-    /**
-     * Adds the created notifier to the list
-     * @param ReferenceType notifier to be added to the list.
-     */    
-    public void add(NotifierInput notifierInput) {
-        if (notifierInput != null) {
-            notifierInputList.add(notifierInput);
+        if (this.isReference()) {
+            return getReferencedObject().getFailBuild();
+        } else {
+            return failBuild;
         }
     }
     
@@ -102,8 +81,8 @@ public class SignalInput extends DataType
      * this input.
      * @return ReferenceType created ReferenceType.
      */    
-    public ReferenceType createNotifierListRef() {
-        ReferenceType notifierRef =  new ReferenceType();
+    public ReferenceType<SignalNotifierList> createNotifierListRef() {
+        ReferenceType<SignalNotifierList> notifierRef =  new ReferenceType<SignalNotifierList>();
         add(notifierRef);
         return notifierRef;
     }
@@ -112,34 +91,49 @@ public class SignalInput extends DataType
      * Adds the created notifier to the list
      * @param ReferenceType notifier to be added to the list.
      */    
-    public void add(ReferenceType notifier) {
+    public void add(ReferenceType<SignalNotifierList> notifier) {
         if (notifier != null) {
             notifierListRef.add(notifier);
         }
     }
-    
-    public Vector<NotifierInput> getNotifierInput() {
-        return notifierInputList;
-    }
-    
+        
     /**
      * Gets the NotifierList associated with this input. If the
      * notifier list reference is empty then it throws exception. 
      * @return List of notifier associated with this input.
      */    
     public Vector<Notifier> getSignalNotifierList() {
-        Vector<Notifier> notifierList = null;
-        if (notifierListRef != null) {
-            log.debug("getSignalNotifierList:list.size:" + notifierListRef.size());
-            for (ReferenceType notifierRef : notifierListRef) {
-                Object obj = notifierRef.getReferencedObject();
-                if (obj instanceof SignalNotifierList) {
-                    notifierList = ((SignalNotifierList)obj).getNotifierList();
-                    break;
+        if (this.isReference()) {
+            return getReferencedObject().getSignalNotifierList();
+        } else {
+            Vector<Notifier> notifierList = null;
+            if (notifierListRef != null) {
+                for (ReferenceType<SignalNotifierList> notifierRef : notifierListRef) {
+                    notifierList = notifierRef.getReferencedObject().getNotifierList();
                 }
+                return notifierList;
             }
-            return notifierList;
+            throw new BuildException("No signal notifierlist reference defined.");
         }
-        throw new BuildException("No signal notifierlist reference defined.");
-    }    
+    }
+    
+    /**
+     * Get the signal name. If the object is a reference then its id is used.
+     * 'unknownSignalName' is returned otherwise. 
+     * @return the signal name.
+     */
+    public String getName() {
+        if (this.isReference()) {
+            return this.getRefid().getRefId();
+        }
+        return "unknownSignalName";
+    }
+    
+    protected SignalInput getReferencedObject() {
+        Object obj = this.getRefid().getReferencedObject();
+        if (obj instanceof SignalInput) {
+            return (SignalInput)obj; 
+        }
+        throw new BuildException("SignalInput reference " + this.getRefid().getRefId() + " does not exist.");
+    }
 }

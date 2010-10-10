@@ -27,12 +27,19 @@ public class DiamondsException extends Exception {
     private static final long serialVersionUID = 8743300713686555395L;
 
     /**
-     * Constructor
-     * 
-     * @exception - exception to be processed.
+     * Diamonds exception with error message.
+     * @param message the error message.
      */
+    public DiamondsException(String message) {
+        super(message);
+    }
 
-    public DiamondsException(String exception) {
-        super(exception);
+    /**
+     * Diamonds exception with error message and a root cause
+     * @param message the error message
+     * @param cause the root cause
+     */
+    public DiamondsException(String message, Throwable cause) {
+        super(message, cause);
     }
 }

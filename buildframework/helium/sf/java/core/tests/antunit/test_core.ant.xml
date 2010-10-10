@@ -25,6 +25,8 @@ Description:
         Testing core targets
     </description>
     
+    <taskdef resource="com/nokia/helium/core/ant/antlib.xml" uri="http://www.nokia.com/helium" />
+
     <target name="test-prettyprintxml-filter">
         <loadfile srcfile="./../data/config_test.cfg.xml" property="xml.test.content">
             <filterchain>

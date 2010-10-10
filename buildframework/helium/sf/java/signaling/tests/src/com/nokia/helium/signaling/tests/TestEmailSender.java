@@ -51,7 +51,7 @@ public class TestEmailSender {
         en.setTitle("test");
         en.setSmtp("test");
         en.setLdap("test");
-        NotifierInput input = new NotifierInput();
+        NotifierInput input = new NotifierInput(p);
         input.setFile(new File(System.getProperty("testdir") + "/tests/data/test.log_status.html"));
         en.sendData("test", true, input, "Test Message");
     }
@@ -70,7 +70,7 @@ public class TestEmailSender {
         en.setTitle("test");
         en.setSmtp("test");
         en.setLdap("test");
-        NotifierInput input = new NotifierInput();
+        NotifierInput input = new NotifierInput(p);
         en.sendData("test", true, input, "Test Message");
     }   
 

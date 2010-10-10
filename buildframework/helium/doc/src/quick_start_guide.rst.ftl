@@ -70,8 +70,7 @@ Configuration
 
   - `Using Ant <http://ant.apache.org/manual/using.html>`_: specifically the Projects and Properties sections.
   - `Configure Helium  <manual/configuring.html>`_: `common configuration format <manual/configuring.html#common-configuration-format>`_ and `Helium stages <manual/stages.html>`_.
-  - `Helium glossary <api/helium/properties-table.html>`_: lists the specific properties used in Helium.
-  
+  - `Helium glossary <api/helium/properties_list.html>`_: lists the specific properties used in Helium.
   
 .. index::
   single: Running builds with Helium

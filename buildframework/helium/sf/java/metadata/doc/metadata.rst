@@ -49,8 +49,8 @@ This document describes the usage of metadata filter to change the severity leve
 Overview
 --------
 
-Metadata filters are set of regular expressions used to match the text of the build output and process the errors, categorize it,
-and used to generate the output for diamonds, summary file, email output. Predefined set of ids are defined for each stage of the
+Metadata filters are a set of regular expressions used to match the text of the build output and process the errors, categorize it,
+and used to generate the output for diamonds, summary file, email output. A predefined set of ids are defined for each stage of the
 build. For example for raptor compilation filter is defined as below,
 
 The default definition of filterset.sbs is
@@ -71,11 +71,11 @@ which is using the common definition which is,
     </hlm:metadatafilterset>
 
 
-The complete list of predefined ids for various stages of the build are defined in this file,
+The complete list of predefined ids for various stages of the build are defined in the file,
 
 helium/config/metadata_filter_config_default.xml
 
-Each ID can be overridden to provide additional regular expression to control the results of the build for different stages.
+Each ID can be overridden to provide additional regular expressions to control the results of the build for different stages.
 
 Two ways to add the regular expressions
 ---------------------------------------
@@ -104,9 +104,9 @@ This can be done as below,
 Note
 ----
 
-1. The order of metadatafilter / metadatafilterset is important, so the first one takes precedence than the second one.
+1. The order of metadatafilter / metadatafilterset is important, so the first one takes precedence over the second one.
 
-2. Order is also preserved in the csv file, the expressions which are defined first get precedence than the later one.
+2. Order is also preserved in the csv file, the expressions which are defined first has precedence over the later one.
 
 3. All the regular expressions are JAVA patterns.
          
@@ -181,14 +181,14 @@ JPQL::
 Using the Metadata framework with FMPP
 ======================================
 
-The Metadata framework gives an efficient opportunity to record huge amount or data in a fast and reliable way (timewise and memory consumption-wise).
-Thanks to the ORMFMPPLoader database loader it is really simple to access those data and render then in any other format: HTML for easy to read build summary,
-XML to communicated with other tools, text file...
+The Metadata framework gives an efficient opportunity to record huge amounts of data in a fast and reliable way (timewise and memory consumption-wise).
+Thanks to the ORMFMPPLoader database loader it is really simple to access those data and render them in  another format: HTML for easy to read build summary,
+XML to communicate with other tools, text file...
 
 Loading a database
 ------------------
 
-A database can be load and assigned to a template variable using the pp.loadData functionnality from the FMPP task. The 'com.nokia.helium.metadata.ORMFMPPLoader'
+A database can be loaded and assigned to a template variable using the pp.loadData functionnality from the FMPP task. The 'com.nokia.helium.metadata.ORMFMPPLoader'
 accept one argument which is the path to the database.
 
 Example::
@@ -206,7 +206,7 @@ Accessing data using a JPA single query
 ---------------------------------------
 
 The 'jpasingle' is the best way to access results from single values like count of entities. The jpasingle queries must be written in JPQL, 
-please check the valid database schema in the previous section (case matter!).
+please check the valid database schema in the previous section (case matters!).
 
 Example of a template that will return the number of log files recorded in the database::
    
@@ -217,7 +217,7 @@ Accessing data using a JPA query
 --------------------------------
  
 The JPA query allows you to perform query and directly use JPA entity object directly inside the template. The jpa queries must be written in JPQL, 
-please check the valid database schema in the previous section (case matter!).
+please check the valid database schema in the previous section (case matters!).
 
 In the following example the query loop through the available log files::
     

@@ -62,6 +62,7 @@ Description:
             configuration="${codescanner.config}">
             <path refid="src.path"/>
         </hlm:codescanner>
+        <au:assertLogContains text="Running codescanner with arguments 'codescanner -c"/>
         <au:assertLogContains text="Successfully executed codescanner"/>
         <au:assertLogContains text="Output format: xml,html"/>
         <au:assertLogContains text="data\src\exclude.txt"/>
@@ -113,4 +114,41 @@ Description:
         <au:assertLogContains text="data\src2\exclude.txt"/>
         <au:assertFileExists file="${codescanner.output.dir}/problemIndex.xml"/>
     </target>
+    
+    <target name="test-codescanner-with-lxr-without-source-dir">
+        <au:expectfailure expectedMessage="'sourceDir' attribute must be defined">
+            <hlm:codescanner dest="${codescanner.output.dir}"
+                format="${codescanner.output.type}"
+                configuration="${codescanner.config}"
+                lxrurl="http://codescanner.lxr.server.com/source">
+                <path refid="src.path.two.path"/>
+            </hlm:codescanner>
+        </au:expectfailure>
+        <au:assertFileExists file="${codescanner.output.dir}" message="codescanner task is not able to create dest folder."/>
+    </target>
+    
+    <target name="test-codescanner-with-lxr-with-source-dir-and-path">
+        <au:expectfailure expectedMessage="Nested path element are not allowed when lxrURL attribute is in use">
+            <hlm:codescanner dest="${codescanner.output.dir}"
+                format="${codescanner.output.type}"
+                configuration="${codescanner.config}"
+                lxrurl="http://codescanner.lxr.server.com/source"
+                sourcedir="../data">
+                <path refid="src.path.two.path"/>
+            </hlm:codescanner>
+        </au:expectfailure>
+        <au:assertFileExists file="${codescanner.output.dir}" message="codescanner task is not able to create dest folder."/>
+    </target>
+    
+    <target name="test-codescanner-with-lxr-without-input-dir" if="do.codescanner.test">
+        <hlm:codescanner dest="${codescanner.output.dir}"
+            format="${codescanner.output.type}"
+            configuration="${codescanner.config}"
+            lxrurl="http://codescanner.lxr.server.com/source"
+            sourcedir="../data/src"/>
+        <au:assertLogContains text="-x http://codescanner.lxr.server.com/source"/>
+        <au:assertFileExists file="${codescanner.output.dir}" message="codescanner task is not able to create dest folder."/>
+    </target>
+    
+    
 </project>

@@ -63,71 +63,68 @@ import sys
 import traceback
 
 session = None
-try:
-    runccm = ant.get_property(r'${ccm.enabled}')
-    database = ant.get_property(r'${ccm.database}')
-    username = ant.get_property(r'${ccm.user.login}')
-    password = ant.get_property(r'${ccm.user.password}')
-    engine = ant.get_property(r'${ccm.engine.host}')
-    dbpath = ant.get_property(r'${ccm.database.path}')
-    waroot = ant.get_property(r'${create.bom.workarea.root}')
-    buildid = ant.get_property(r'${build.id}')
-    buildlogdir = ant.get_property(r'${build.log.dir}')
-    deliveryfile = ant.get_property(r'${prep.delivery.conf.parsed}')
-    oldbom = ant.get_property(r'${old.bom.log}')
-    bom = None
-    bomfilename = r"%s/%s_bom.xml" % (buildlogdir, buildid)
-    if runccm and deliveryfile:
-        cache = None
-        if ant.get_property(r'${ccm.cache.xml}') is not None:
-            cache = str(ant.get_property(r'${ccm.cache.xml}'))
-        provider = ccm.extra.CachedSessionProvider(opener=nokia.nokiaccm.open_session, cache=cache)
-            
-        configBuilder = configuration.NestedConfigurationBuilder(open(deliveryfile, 'r'))
-        configSet = configBuilder.getConfiguration()
-        for config in configSet.getConfigurations():
-            waroot = config['dir']
-            print "Found wa for project %s" % waroot
-                        
-        if database != None:
-            session = provider.get(username, password, database=database)
-        else:
-            session = provider.get(username, password, engine, dbpath)
-            
-        ccmproject =  ccm.extra.get_toplevel_project(session, waroot)
+
+runccm = ant.get_property(r'${ccm.enabled}')
+database = ant.get_property(r'${ccm.database}')
+username = ant.get_property(r'${ccm.user.login}')
+password = ant.get_property(r'${ccm.user.password}')
+engine = ant.get_property(r'${ccm.engine.host}')
+dbpath = ant.get_property(r'${ccm.database.path}')
+waroot = ant.get_property(r'${create.bom.workarea.root}')
+buildid = ant.get_property(r'${build.id}')
+buildlogdir = ant.get_property(r'${build.log.dir}')
+deliveryfile = ant.get_property(r'${prep.delivery.conf.parsed}')
+oldbom = ant.get_property(r'${old.bom.log}')
+bom = None
+bomfilename = r"%s/%s_bom.xml" % (buildlogdir, buildid)
+if deliveryfile and runccm == 'true':
+    cache = None
+    if ant.get_property(r'${ccm.cache.xml}') is not None:
+        cache = str(ant.get_property(r'${ccm.cache.xml}'))
+    provider = ccm.extra.CachedSessionProvider(opener=nokia.nokiaccm.open_session, cache=cache)
         
-        config_data = {'delivery': deliveryfile, 'prep.xml': ant.get_property(r'${prep.config.file.parsed}'), 'build.id': buildid, 'ccm.database': database, 'symbian_rel_week': ant.get_property(r'${symbian.version.week}'), 'symbian_rel_ver': ant.get_property(r'${symbian.version}'), 'symbian_rel_year': ant.get_property(r'${symbian.version.year}'), 's60_version': ant.get_property(r'${s60.version}'), 's60_release': ant.get_property(r'${s60.release}'), 'currentRelease.xml': ant.get_property(r'${build.drive}') + "/currentRelease.xml", 'release_regexp': ant.get_property(r'${bom.release.regex}') }
-        config = configuration.Configuration(config_data)
-        
-        # let's only support the new spec model!
-        bom = build.model.SynergyBOM(config, ccmproject, username=username, password=password, provider=provider)
-        
-        xml_writer = build.model.BOMXMLWriter(bom)
-        xml_writer.write(bomfilename)
-    if not bom and os.path.exists(bomfilename):
-        config_data = {'prep.xml': ant.get_property(r'${prep.config.file.parsed}'), 'build.id': buildid, 'symbian_rel_week': ant.get_property(r'${symbian.version.week}'), 'symbian_rel_ver': ant.get_property(r'${symbian.version}'), 'symbian_rel_year': ant.get_property(r'${symbian.version.year}'), 's60_version': ant.get_property(r'${s60.version}'), 's60_release': ant.get_property(r'${s60.release}'), 'currentRelease.xml': ant.get_property(r'${build.drive}') + "/currentRelease.xml"}
-        config = configuration.Configuration(config_data)
-        bom = build.model.SimpleBOM(config, bomfilename)
-    if os.path.exists(oldbom):
-        xml_delta_writer = build.model.BOMDeltaXMLWriter(bom, oldbom)
-        xml_delta_writer.write(buildlogdir + "/" + buildid + "_bom_delta.xml")
-        delta_bom_content_validity = xml_delta_writer.validate_delta_bom_contents(buildlogdir + "/" + buildid + "_bom_delta.xml", bomfilename, oldbom)
-        if((delta_bom_content_validity == False) and (ant.get_property(r'${hlm.enable.asserts}') is not None)):
-            print 'Bom delta contents are not matching'
-            raise Exception
-        elif((delta_bom_content_validity == True) or (delta_bom_content_validity == None)):
-            print 'Bom delta contents are matching.'
-        elif(delta_bom_content_validity == False):
-            print 'Bom delta contents are not matching.'
+    configBuilder = configuration.NestedConfigurationBuilder(open(deliveryfile, 'r'))
+    configSet = configBuilder.getConfiguration()
+    for config in configSet.getConfigurations():
+        waroot = config['dir']
+        print "Found wa for project %s" % waroot
+                    
+    if database != None:
+        session = provider.get(username, password, database=database)
     else:
-        print 'Old BOM log cannot be found ' + oldbom + ', skipping BOM delta creation.'
-    if runccm:
-        bom.close()
-    if session:
-        session.close()
-except Exception, ex:
-    print 'Caught exception in BOM: ' + str(ex)
-    traceback.print_exc()
+        session = provider.get(username, password, engine, dbpath)
+        
+    ccmproject =  ccm.extra.get_toplevel_project(session, waroot)
+    
+    config_data = {'delivery': deliveryfile, 'prep.xml': ant.get_property(r'${prep.config.file.parsed}'), 'build.id': buildid, 'ccm.database': database, 'symbian_rel_week': ant.get_property(r'${symbian.version.week}'), 'symbian_rel_ver': ant.get_property(r'${symbian.version}'), 'symbian_rel_year': ant.get_property(r'${symbian.version.year}'), 's60_version': ant.get_property(r'${s60.version}'), 's60_release': ant.get_property(r'${s60.release}'), 'currentRelease.xml': ant.get_property(r'${build.drive}') + "/currentRelease.xml", 'release_regexp': ant.get_property(r'${bom.release.regex}') }
+    config = configuration.Configuration(config_data)
+    
+    # let's only support the new spec model!
+    bom = build.model.SynergyBOM(config, ccmproject, username=username, password=password, provider=provider)
+    
+    xml_writer = build.model.BOMXMLWriter(bom)
+    xml_writer.write(bomfilename)
+if not bom and os.path.exists(bomfilename):
+    config_data = {'prep.xml': ant.get_property(r'${prep.config.file.parsed}'), 'build.id': buildid, 'symbian_rel_week': ant.get_property(r'${symbian.version.week}'), 'symbian_rel_ver': ant.get_property(r'${symbian.version}'), 'symbian_rel_year': ant.get_property(r'${symbian.version.year}'), 's60_version': ant.get_property(r'${s60.version}'), 's60_release': ant.get_property(r'${s60.release}'), 'currentRelease.xml': ant.get_property(r'${build.drive}') + "/currentRelease.xml"}
+    config = configuration.Configuration(config_data)
+    bom = build.model.SimpleBOM(config, bomfilename)
+if bom and os.path.exists(oldbom):
+    xml_delta_writer = build.model.BOMDeltaXMLWriter(bom, oldbom)
+    xml_delta_writer.write(buildlogdir + "/" + buildid + "_bom_delta.xml")
+    delta_bom_content_validity = xml_delta_writer.validate_delta_bom_contents(buildlogdir + "/" + buildid + "_bom_delta.xml", bomfilename, oldbom)
+    if((delta_bom_content_validity == False) and (ant.get_property(r'${hlm.enable.asserts}') is not None)):
+        print 'Bom delta contents are not matching'
+        raise Exception
+    elif((delta_bom_content_validity == True) or (delta_bom_content_validity == None)):
+        print 'Bom delta contents are matching.'
+    elif(delta_bom_content_validity == False):
+        print 'Bom delta contents are not matching.'
+else:
+    print 'Old BOM log cannot be found ' + oldbom + ', skipping BOM delta creation.'
+if runccm == 'true':
+    bom.close()
+if session:
+    session.close()
         </hlm:python>
         <if>
             <available file="${build.log.dir}/${build.id}_bom.xml"/>
@@ -136,7 +133,7 @@ except Exception, ex:
                 <xmltask source="${build.log.dir}/${build.id}_bom.xml" dest="${build.log.dir}/${build.id}_bom.xml" outputter="simple">
                     <replace path="//bom/build/text()" withText="${build.id}"/>
                 </xmltask>
-                <fmpp sourceRoot="${helium.dir}/tools/preparation/bom"
+                <fmpp sourceRoot="${helium.dir}/tools/preparation/bom/templates"
                       outputRoot="${prep.log.dir}" includes="bom.html.*,bom.txt.*" removeExtensions="ftl">
                     <freemarkerLinks expandProperties="yes">
                         macro: ${helium.dir}/tools/common/templates/macro
@@ -189,10 +186,13 @@ except Exception, ex:
         </if>
         
         <if>
-            <available file="${old.bom.log}"/>
+            <and>
+                <available file="${old.bom.log}"/>
+                <available file="${build.log.dir}/${build.id}_bom_delta.xml"/>
+            </and>
             <then>
                 <hlm:assertFileExists file="${build.log.dir}/${build.id}_bom_delta.xml"/>
-                <fmpp sourceRoot="${helium.dir}/tools/preparation/bom"
+                <fmpp sourceRoot="${helium.dir}/tools/preparation/bom/templates"
                       outputRoot="${prep.log.dir}" includes="bom_delta.*" removeExtensions="ftl">
                     <freemarkerLinks expandProperties="yes">
                         macro: ${helium.dir}/tools/common/templates/macro
@@ -287,7 +287,7 @@ if taskOwnersDup:
                 <if>
                     <isset property="email.ldap.server"/>
                     <then>
-                        <hlm:ldap url="${email.ldap.server}" rootdn="${email.ldap.rootdn}" filter="uid=${task.owner}" outputproperty="task.owner.email" key="mail"/>
+                        <hlm:ldap url="${email.ldap.server}" rootdn="${email.ldap.rootdn}" filter="uid=${task.owner}" outputproperty="task.owner.email" key="mail" failonerror="false"/>
                         <if>
                             <isset property="task.owners.email"/>
                             <then>

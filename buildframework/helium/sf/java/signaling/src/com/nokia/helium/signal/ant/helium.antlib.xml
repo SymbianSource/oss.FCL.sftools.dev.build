@@ -29,8 +29,8 @@ Description:
 
     <typedef name="signalstatusdef" classname="com.nokia.helium.signal.ant.types.SignalStatusDef" uri="http://www.nokia.com/helium"/>
     <typedef name="exceptionsignal" classname="com.nokia.helium.signal.ant.types.SignalExceptionConfigHandler" uri="http://www.nokia.com/helium"/>
-    <typedef name="buildfailmessage" classname="com.nokia.helium.signal.SignalExceptionMessage" uri="http://www.nokia.com/helium"/>
-    <typedef name="buildneverfailmessage" classname="com.nokia.helium.signal.SignalNeverFailMessage" uri="http://www.nokia.com/helium"/>
+    <typedef name="buildfailmessage" classname="com.nokia.helium.signal.ant.SignalExceptionMessage" uri="http://www.nokia.com/helium"/>
+    <typedef name="buildneverfailmessage" classname="com.nokia.helium.signal.ant.SignalNeverFailMessage" uri="http://www.nokia.com/helium"/>
 
     <hlm:deflist id="helium-signaling.list">
         <hlm:listenerdef classname="com.nokia.helium.signal.ant.SignalListener" />

@@ -27,7 +27,8 @@ Description:
     
     <taskdef resource="com/nokia/helium/logger/ant/antlib.xml" uri="http://www.nokia.com/helium" />
     <taskdef resource="com/nokia/helium/core/ant/antlib.xml" uri="http://www.nokia.com/helium"/>
-    
+    <hlm:stagerecorderlistener id="stage.recorder.listener.id" />
+
     <dirname property="logging.test.project.dir" file="${ant.file.stages-config}" />
     
     <hlm:stagesummary id="stage.summary" template="${logging.test.project.dir}\build_stages_summary.txt.ftl" />
@@ -37,6 +38,9 @@ Description:
     <hlm:stage id="post" starttarget="prep-ccm-get-input" endtarget="prep-ccm-get-input"/>
     <hlm:stage id="startend" starttarget="start" endtarget="end"/>
     <hlm:stage id="paralleltest" starttarget="paratest" endtarget="paratest"/>
+    
+    <property name="build.log.dir" location="${temp.dir}/logs"/>
+    <property name="build.id" value="1"/>
     
     <hlm:stagerecord id="record.default" defaultoutput="${build.log.dir}/${build.id}_main.ant.log" loglevel="info" append="false"/>
     

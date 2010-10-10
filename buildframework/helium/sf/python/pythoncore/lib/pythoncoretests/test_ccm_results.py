@@ -332,6 +332,30 @@ tr1test1#5226   Explicitly specified but not included
         assert len(result.output[subproj]) == 2, "%s should contain 2 conflicts" % subproj.objectname
 
 
+
+    def test_ConflictsResult_object_result(self):
+        """ Validating ConflictsResult with object checking output."""
+        behave = {'test_update' : """
+Project: Cartman-Release_v4
+
+header.h-8.1.1:incl:tr1test1#1   tr1test1#30010, tr1test1#42792    Implicitly required by multiple tasks - parallel
+header2.h-5.2.1:prj_spec:tr1test1#2    tr1test1#28554  Implicitly required but not included - parallel
+
+Project: Cartman_sub03-next
+
+         No conflicts detected.
+
+        """}
+        session = MockResultSession(behave)
+        result = session.execute('test_update', ccm.ConflictsResult(session))
+        #_logger.debug(result.output)
+        # pylint: disable=E1103
+        assert len(result.output.keys()) == 2, "Should detect 2 projects."
+        subproj = session.create("Cartman-Release_v4:project:%s#1" % session.database())
+        # 3 conflicts will be detected one per tasks.
+        assert len(result.output[subproj]) == 3, "%s should contain 3 conflicts" % subproj.objectname
+
+
     def test_DataMapperListResult_result(self):
         """ Validating DataMapperListResult."""
         behave = {'test_query' : """>>>objectname>>>task5204-1:task:tr1test1>>>task_synopsis>>>Create Cartman_sub03>>>

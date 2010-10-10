@@ -30,12 +30,12 @@ public interface SubBuildEventHandler {
      * Method to handle SubBuild Started  events.
      * @param event
      */
-    void handleSubBuildStarted( BuildEvent event );
+    void subBuildStarted( BuildEvent event );
     
     /**
      * Method to handle SubBuild Finished  events.
      * @param event
      */
-    void handleSubBuildFinished( BuildEvent event );
+    void subBuildFinished( BuildEvent event );
     
 }

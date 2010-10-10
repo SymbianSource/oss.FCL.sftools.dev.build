@@ -28,7 +28,7 @@ if not defined BUILDER_HOME (
 
 set JYTHONPATH=%BUILDER_HOME%\antlibs\jython-2.5-py2.5.egg
 set PATH=%JAVA_HOME%\bin;%PATH%
-ant -lib %BUILDER_HOME%\antlibs %*
+call ant -lib %BUILDER_HOME%\antlibs %*
 if "%ERRORLEVEL%" neq "0" (goto error)
 endlocal
 goto :eof

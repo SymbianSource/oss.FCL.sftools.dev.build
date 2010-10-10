@@ -20,8 +20,6 @@
 #===============================================================================
 
 """ Testing ATS3 ASTE framework. """
-
-# pylint: disable=W0603,W0142,R0903,R0911,R0912,R0902,R0901,R0201
 # pylint: disable=E1101
 #E1101 => Mocker shows mockery
 #R* remove during refactoring
@@ -61,6 +59,7 @@ class Bunch(object):
         self.__dict__.update(kwargs)
     
 
+# pylint: disable=R0911
 def equal_xml(xml1, xml2):
     """Check the equality of the given XML snippets.
     

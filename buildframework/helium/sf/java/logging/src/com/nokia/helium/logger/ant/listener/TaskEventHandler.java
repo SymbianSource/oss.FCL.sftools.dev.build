@@ -31,13 +31,13 @@ public interface TaskEventHandler {
     * 
     * @param event is the build event to be handled. 
     */
-    void handleTaskFinished( BuildEvent event );
+    void taskFinished( BuildEvent event );
 
    /**
     * Method to handle Task Started( events.
     * 
     * @param event is the build event to be handled. 
     */
-    void handleTaskStarted( BuildEvent event );
+    void taskStarted( BuildEvent event );
     
 }

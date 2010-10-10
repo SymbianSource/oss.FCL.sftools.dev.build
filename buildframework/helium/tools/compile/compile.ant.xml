@@ -104,6 +104,7 @@ Description:
      @editable required
      @since 11.0
      -->
+    <property name="sysdef3.enabled" value="true" />
     
     <!--* @property internal.sysdef3.enabled
      To run the sysdef3 dependent tasks if sysdef3.enabled set to true. 

@@ -51,7 +51,7 @@ Description:
     
     <target name="helium-prep-textdocs">
         <mkdir dir="${doc.temp.dir}/minibuilds"/>
-        <copy todir="${doc.temp.dir}/development/minibuilds" failonerror="false">
+        <copy todir="${doc.temp.dir}/development/minibuilds">
             <fileset dir="${helium.dir}/tests/minibuilds/">
                 <include name="*/doc/**/*"/>
             </fileset>
@@ -69,6 +69,13 @@ Description:
                         <include name="**/*.png"/>
                     </fileset>
                 </copy>
+                <hlm:rstPrepMacro destdir="${doc.temp.dir}/helium-antlib">
+                    <resources>
+                        <path>
+                            <pathelement path="@{dir}"/>
+                        </path>
+                    </resources>
+                </hlm:rstPrepMacro>
             </sequential>
         </for>
         <for param="dir">
@@ -105,7 +112,7 @@ Description:
         @scope private
         -->
         <property name="last.major.release.database.url" value="${documentation.url.root}/${last.major.helium.version}/database.xml"/>
-        <hlm:python>
+        <hlm:python failonerror="true">
 import urllib
 import helium.documentation
 
@@ -385,7 +392,7 @@ for jar in jarFiles:
         
         <antcall target="dependency-grouping"/>
         
-        <exec executable="dot">
+        <exec executable="dot" failonerror="true">
             <arg line="-Tpng -Grankdir=LR -Nshape=box -Nfontsize=9 -Nwidth=0.3 -Nheight=0.2 ${dependency.grph} -O"/>
         </exec>
         
@@ -413,7 +420,7 @@ for jar in jarFiles:
         @scope private
         -->
         <property name="ivy.xml.file" value="${helium.dir}/config/ivy/ivy.xml"/>
-        <hlm:python>
+        <hlm:python failonerror="true">
 import os
 import dependancygraph
 
@@ -485,7 +492,7 @@ import dependancygraph
 dependancygraph.findLogFiles(r'${database.file}.parsed', r'${dependency.external.grph}')
         </hlm:python>
         <!---->
-        <exec executable="dot">
+        <exec executable="dot" failonerror="true">
             <arg line="-Tpng -Grankdir=LR -Nshape=box -Nfontsize=9 -Nwidth=0.3 -Nheight=0.2 ${dependency.external.grph} -O"/>
         </exec>
     </target>
@@ -503,10 +510,10 @@ dependancygraph.findLogFiles(r'${database.file}.parsed', r'${dependency.external
             <fileset dir="${doc.temp.dir}" includes="user_graph.dot"/>
             <sequential>
                 <echo>Processing dot file: @{dot.file}</echo>
-                <exec executable="dot" dir="${doc.temp.dir}/">
+                <exec executable="dot" dir="${doc.temp.dir}/" failonerror="true">
                     <arg line="-Tcmap @{dot.file} -O"/>
                 </exec>
-                <exec executable="dot" dir="${doc.build.dir}/api">
+                <exec executable="dot" dir="${doc.build.dir}/api" failonerror="true">
                     <arg line="-Tpng @{dot.file} -O"/>
                 </exec>
             </sequential>

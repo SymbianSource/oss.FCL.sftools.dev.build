@@ -31,12 +31,16 @@ Description:
     <#if unit.@proFile[0]??>
         <#assign prefix="" />
     </#if>
-    <#assign bldinf="${ant['build.drive']}/${unit.@bldFile}"?replace('\\', '/')?replace('//', '/')>
+    <#if ant['iswindows'] == "false" && ant['sysdef3.enabled'] == "true">
+        <#assign bldinf="${unit.@bldFile}"?replace('\\', '/')?replace('//', '/')>
+    <#else>
+        <#assign bldinf="${ant['build.drive']}/${unit.@bldFile}"?replace('\\', '/')?replace('//', '/')>
+    </#if>
 
 ##########################################################################
 ${bldinf}/bld.inf: ${bldinf}/${unit['@${prefix}proFile'][0]}
-	@echo cd ${bldinf} ^&^& qmake -listgen <#if unit['@${prefix}qmakeArgs'][0]??>${unit['@${prefix}qmakeArgs'][0]}<#else>${ant['qt.qmake.default.args']}</#if><#if "${ant['build.system']?lower_case}" = 'sbs-ec'> -spec symbian-sbsv2</#if> ${unit['@${prefix}proFile'][0]}
-	-@cd ${bldinf} && qmake -listgen <#if unit['@${prefix}qmakeArgs'][0]??>${unit['@${prefix}qmakeArgs'][0]}<#else>${ant['qt.qmake.default.args']}</#if> ${unit['@${prefix}proFile'][0]}
+	@echo "cd ${bldinf} && ${ant['build.drive']}/epoc32/tools/qmake -listgen <#if unit['@${prefix}qmakeArgs'][0]??>${unit['@${prefix}qmakeArgs'][0]}<#else>${ant['qt.qmake.default.args']}</#if><#if "${ant['build.system']?lower_case}" = 'sbs-ec'> -spec symbian-sbsv2</#if> ${unit['@${prefix}proFile'][0]}"
+	-@cd ${bldinf} && ${ant['build.drive']}/epoc32/tools/qmake -listgen <#if unit['@${prefix}qmakeArgs'][0]??>${unit['@${prefix}qmakeArgs'][0]}<#else>${ant['qt.qmake.default.args']}</#if> ${unit['@${prefix}proFile'][0]}
 
 all:: ${bldinf}/bld.inf
 

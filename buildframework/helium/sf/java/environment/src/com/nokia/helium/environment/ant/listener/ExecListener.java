@@ -31,6 +31,7 @@ import org.apache.tools.ant.Project;
 import org.apache.tools.ant.RuntimeConfigurable;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.UnknownElement;
+import org.apache.tools.ant.taskdefs.condition.Os;
 
 /**
  * Checks for uses of the <exec> task and logs them to a CSV file.
@@ -102,6 +103,10 @@ public class ExecListener implements BuildListener {
                 Project project = event.getProject();
                 executable = project.replaceProperties(executable);
                 logger.debug("ExecListener: executable is run: " + executable);
+                String osFamily = (String) map.get("osfamily");
+                if (osFamily != null && !Os.isOs(osFamily, null, null, null)) {
+                    return;
+                }    
                 execCalls.add(executable);
             }
         }

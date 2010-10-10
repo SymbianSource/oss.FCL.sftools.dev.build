@@ -35,6 +35,7 @@ Description:
     <property name="minor.version" value="0" />
     <!-- Compatibility analyser enabling flag, causes binary check to be run -->
     <property name="ca.enabled" value="true" />
+    <property name="bc.prep.ca.file" location="${helium.dir}/tools/quality/compatibility_analyser/ca.cfg.xml" />
     
     <condition property="ccm.project.wa_path" value="${data.drive.letter}:\Build_${data.drive.letter}\${env.USERNAME}\ido_wa\${build.name}"  else="${build.name}\wa" > 
           <os family="windows"/>
@@ -47,20 +48,35 @@ Description:
 
     <!-- build configuration -->
     <property name="sysdef.configurations.list" value="helium_minibuild_ido" />
-    <path id="system.definition.files">
+    <property name="sysdef3.enabled" value="true" />
+    <property name="qmake.enabled" value="true" />    
+    <condition property="sysdef3.system.definition.files.id" value="system.definition.files.new" else="system.definition.files.old">
+        <istrue value="${sysdef3.enabled}" />
+    </condition>
+    <!--property name="ido.name" value="test_cmt" /-->
+    <path id="system.definition.files.old"> 
         <fileset dir="${config.dir}" includes="sysdefs/*.sysdef.xml" />
         <fileset dir="${ccm.project.wa_path}" includes="*/*/*/layers.sysdef.xml" />
+    </path>
+    
+    <path id="system.definition.files.new"> 
+        <fileset dir="${ccm.project.wa_path}" includes="*/*/*/package_definition.xml"/>  
+    </path>
+
+      
+    <path id="system.definition.files">
+        <path refid="${sysdef3.system.definition.files.id}" />
     </path>
 
 
     <!-- Configuring the build system -->
-    <property name="build.system" value="ec-helium" />
+    <property name="build.system" value="sbs" />
     <property name="rvct.version" value="22_686" />
 
     <!-- Configuring get latest env. -->
-    <property name="s60.grace.service" value="S60RnD" />
-    <property name="s60.grace.product" value="pf_5250_prd" />
-    <property name="s60.grace.release" value="pf_5250_prd_\d{2}\.\d{1}\.\d{3}" />
+    <property name="s60.grace.service" value="s60_devices_sw" />
+    <property name="s60.grace.product" value="DFS7x.92" />
+    <property name="s60.grace.release" value="92_\d{6}_hw79" />
     
     <!-- matching mcl_200948_hw79 -->
     <condition property="prep.root.dir" value="${data.drive.letter}:\Build_${data.drive.letter}\${env.USERNAME}\ido_ba\${build.name}" else="${build.name}\ido_ba" >
@@ -86,7 +102,8 @@ Description:
     <import file="hack-test.ant.xml" />
     <import file="${helium.dir}/helium.ant.xml" />
     <import file="config/stages_config.ant.xml" />
-
+    <import file="config/build.sbsinput.ant.xml" />
+    
     <!-- Run the full sequence of target for the minibuild. ,minibuild-prep,compile-main,zip-ee,minibuild-check-->
     <target name="do-minibuild" depends="ido-update-build-area,
                                             flag-ba-for-deletion,
@@ -215,8 +232,10 @@ ${ant.coverage.summary}</echo>
     </target>
 
 
-    <target name="update-policy-src-reference" depends="ido-create-ado-mapping">
-        <hlm:iniKeys2Path ini="${ado.mapping.file}" pathid="reference.policy.path.list"/>
+    <target name="update-policy-src-reference">
+        <property name="policy.src.mapping.file" location="${build.output.dir}/build/ado_mapping_policy_src.ini" />
+        <hlm:createAdoMappingMacro adoMapFile="${policy.src.mapping.file}" />
+        <hlm:iniKeys2Path ini="${policy.src.mapping.file}" pathid="reference.policy.path.list"/>
     </target>
 
 </project>

@@ -28,23 +28,9 @@ import ido
 
 logging.basicConfig(level=logging.INFO)
 _logger = logging.getLogger("check_latest_release")
-
-def validate(grace, service, product, release):
-    """ Validate s60 grace server, s60 grace service, s60 grace product and 
-        s60 grace release are set.
-    """    
-    if not grace:
-        raise EnvironmentError("Property 's60.grace.server' is not defined.")
-    if not service:
-        raise EnvironmentError("Property 's60.grace.service' is not defined.")
-    if not product:
-        raise EnvironmentError("Property 's60.grace.product' is not defined.")
-    if not release:
-        raise EnvironmentError("Property 's60.grace.release' is not defined.")
             
-def get_s60_env_details(grace, service, product, release, rev, cachefilename, s60gracecheckmd5, s60graceusetickler):
+def get_s60_env_details(server, service, product, release, rev, cachefilename, checkmd5, usetickler):
     """ Return s60 environ details """
-    validate(grace, service, product, release)
     revision = r'(_\d{3})?'
     if rev != None:
         revision = rev
@@ -53,11 +39,11 @@ def get_s60_env_details(grace, service, product, release, rev, cachefilename, s6
         _logger.info(str("Using cache file: %s" % cachefilename))
     
     checkmd5 = False
-    if s60gracecheckmd5 != None:
-        checkmd5 = str(s60gracecheckmd5).lower()
+    if checkmd5 != None:
+        checkmd5 = str(checkmd5).lower()
         checkmd5 = ((checkmd5 == "true") or (checkmd5 == "1") or (checkmd5 == "on"))
                 
-    branch = os.path.join(grace, service, product)
+    branch = os.path.join(server, service, product)
     if not os.path.exists(branch):
         raise IOError("Error occurred: Could not find directory %s" % branch)
         
@@ -71,7 +57,7 @@ def get_s60_env_details(grace, service, product, release, rev, cachefilename, s6
             result.append(relpath)
     result.sort(reverse=True)
     use_tickler = False
-    tickler_validation = str(s60graceusetickler).lower()
+    tickler_validation = str(usetickler).lower()
     if tickler_validation != None:
         use_tickler = ((tickler_validation == "true") or (tickler_validation == "1"))
     validresults = []
@@ -99,7 +85,7 @@ def get_s60_env_details(grace, service, product, release, rev, cachefilename, s6
     
     result = validresults
     if len(result) == 0:
-        raise EnvironmentError("Error finding GRACE release.")
+        raise EnvironmentError("Error finding release.")
     print result[0]
     return result
     
@@ -117,11 +103,11 @@ def get_version(buiddrive, resultname):
         _logger.info("Version file not found getting new environment...")
     return version
         
-def create_ado_mapping(sysdefconfig, adomappingfile, adoqualitymappingfile, builddrive, adoqualitydirs):
+def create_ado_mapping(sysdefconfig, adomappingfile, qualityMapping, builddrive, adoqualitydirs):
     """ Creates ado mapping and ado quality mapping files """
     input_ = open(sysdefconfig, 'r')
     output = open(adomappingfile, 'w')
-    outputquality = open(adoqualitymappingfile, 'w')
+    print "ado mapping file: %s" % adomappingfile
     for sysdef in input_.readlines():
         sysdef = sysdef.strip()
         if len(sysdef) > 0:
@@ -139,18 +125,11 @@ def create_ado_mapping(sysdefconfig, adomappingfile, adoqualitymappingfile, buil
                     else:
                         component = os.path.normpath(os.path.join(builddrive, location)).replace('\\','/')
                 print "%s=%s\n" % (sysdef, component)
-                output.write("%s=%s\n" % (sysdef, component))
-                if adoqualitydirs == None:
-                    outputquality.write("%s=%s\n" % (sysdef, component))
+                if adoqualitydirs == None or qualityMapping == 'false':
+                    output.write("%s=%s\n" % (sysdef, component))
                 else:
                     for dir_ in adoqualitydirs.split(','):
                         if os.path.normpath(dir_) == os.path.normpath(os.path.join(builddrive, os.environ['EPOCROOT'], location)):
-                            outputquality.write("%s=%s\n" % (sysdef, component))
-
-
-    outputquality.close()
+                            output.write("%s=%s\n" % (sysdef, component))
     output.close()
     input_.close()
-
-
-    

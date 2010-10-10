@@ -1,6 +1,6 @@
 <#--
 ============================================================================ 
-Name        : macro.ftl 
+Name        : diamonds_macro.ftl 
 Part of     : Helium 
 
 Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
@@ -58,9 +58,9 @@ ${count}</#macro>
             </#if>
             <#if componentname != currentcomponentname>
             <component>
-                <name>${componentname}</name>
-                <total severity="error">${componenterrors}</total>
-                <total severity="warning">${componentwarnings}</total>
+                <name>${componentname?xml}</name>
+                <total severity="error">${componenterrors?xml}</total>
+                <total severity="warning">${componentwarnings?xml}</total>
             </component>
                 <#assign componentname=currentcomponentname>
                 <#assign components= components + ",${componentname}">
@@ -77,20 +77,20 @@ ${count}</#macro>
         </#list>
         <#if componentname!= "">
             <component>
-                <name>${componentname}</name>
-                <total severity="error">${componenterrors}</total>
-                <total severity="warning">${componentwarnings}</total>
-                <total severity="critical">${componentcriticals}</total>
+                <name>${componentname?xml}</name>
+                <total severity="error">${componenterrors?xml}</total>
+                <total severity="warning">${componentwarnings?xml}</total>
+                <total severity="critical">${componentcriticals?xml}</total>
             </component>
         </#if>
             <!-- print summary of the errors -->
             <#assign totalerrors = totalerrors + componenterrors>
             <#assign totalwarnings = totalwarnings + componentwarnings>
-            <total severity="error">${totalerrors}</total>      
-            <total severity="warning">${totalwarnings}</total>
-            <total severity="warning_rvct_other">${totalwarnings}</total>
+            <total severity="error">${totalerrors?xml}</total>      
+            <total severity="warning">${totalwarnings?xml}</total>
+            <total severity="warning_rvct_other">${totalwarnings?xml}</total>
             <!-- todo update to calculate the correct value -->
-            <total severity="warning_rvct_bad">${totalcriticals}</total>
+            <total severity="warning_rvct_bad">${totalcriticals?xml}</total>
         </faults>
         <components>
         <!-- all components -->

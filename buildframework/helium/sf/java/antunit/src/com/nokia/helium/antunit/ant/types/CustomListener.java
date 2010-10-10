@@ -32,14 +32,14 @@ import org.apache.tools.ant.types.DataType;
  * The customListener type allows you to defines additional custom
  * listener to be run while running test. Each test are considered
  * as single build.
- * 
+ * <pre>
  * &lt;au:antunit&lt;
  *     .......
  *     &lt;hlm:customListener&lt;
  *         &lt;hlm:listener classname="org.apache.tools.ant.listener.XmlLogger" /&lt;
  *     &lt;/hlm:customListener&lt;
  * &lt;/au:antunit&lt;
- * 
+ * </pre>
  * @ant.type name="customListener" category="antunit"
  */
 public class CustomListener extends DataType implements AntUnitListener {

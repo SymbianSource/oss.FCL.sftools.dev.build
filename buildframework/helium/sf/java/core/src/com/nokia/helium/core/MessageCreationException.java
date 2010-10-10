@@ -19,18 +19,26 @@
 package com.nokia.helium.core;
 
 /**
- * Exception class for Messagecreation implementation
+ * Exception class for Message creation implementation
  * 
  */
 public class MessageCreationException extends Exception {
+    private static final long serialVersionUID = 330899302955104898L;
 
     /**
-     * Constructor
-     * 
-     * @exception - exception to be processed.
+     * Create a MessageCreationException with an error message
+     * @param message the error message.
      */
+    public MessageCreationException(String message) {
+        super("Message Creation Error: " + message);
+    }
 
-    public MessageCreationException(String exception) {
-        super("Message Creation Error: " + exception);
+    /**
+     * Creating a MessageCreationException with a message and a cause.
+     * @param message the message
+     * @param cause the root cause
+     */
+    public MessageCreationException(String message, Throwable cause) {
+        super("Message Creation Error: " + message, cause);
     }
 }

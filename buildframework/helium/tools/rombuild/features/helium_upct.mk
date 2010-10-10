@@ -127,7 +127,7 @@ ALL_UPCT_CONFS=$(wildcard $(UPCT_CONF_DIR)/*.mk)
 
 %-create-upct-config:
 	@echo Building $*
-	-@imaker -p$(PRODUCT_NAME) -c$(COREPLAT_NAME) -f /epoc32/rom/config/helium_upct.mk -f $* step-CREATE_UPCT_CONF
+	-@imaker -p$(PRODUCT_NAME) -f /epoc32/rom/config/helium_upct.mk -f $* step-CREATE_UPCT_CONF
 
 create-upct-configs: $(foreach config,$(ALL_UPCT_CONFS),$(config)-create-upct-config)
 
@@ -140,7 +140,7 @@ ALL_MAKEUPCT_CONFS=$(wildcard $(MAKEUPCT_CONF_DIR)/*.mk)
 
 %-create-makeupct-config:
 	@echo Building $*
-	-@imaker -p$(PRODUCT_NAME) -c$(COREPLAT_NAME) -f /epoc32/rom/config/helium_upct.mk -f $* step-MAKEUPCT_FOTA_CNF
+	-@imaker -p$(PRODUCT_NAME) -f /epoc32/rom/config/helium_upct.mk -f $* step-MAKEUPCT_FOTA_CNF
 
 create-makeupct-configs: $(foreach config,$(ALL_MAKEUPCT_CONFS),$(config)-create-makeupct-config)
 

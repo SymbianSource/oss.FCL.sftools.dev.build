@@ -44,6 +44,7 @@ import com.nokia.helium.core.ant.types.VariableSet;
  * &lt;/hlm:getVariableValue&gt;
  * </pre>
  * 
+ * @ant.task category="Core"
  * @ant.task name="getVariableValue"
  */
 public class GetValueFromVariableSetTask extends Task {

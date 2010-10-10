@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="yes"?>
+<!-- 
+============================================================================ 
+Name        : bootup_testing_template.xml
+Part of     : Helium 
+
+Copyright (c) 2010 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+Contains the template for the test.xml file output. The test.xml file contains
+information on the files used to create the drop file.
+============================================================================
+-->
+
+<testrun>
+    <metadata>
+        {% if xml_dict['diamonds_build_url'] -%}
+        <meta name="diamonds-buildid">{{ xml_dict['diamonds_build_url'] }}</meta> 
+        <meta name="diamonds-testtype">Smoke</meta>
+        {% endif %}
+        <meta name="name">{{ xml_dict['testrun_name'] }}</meta> 
+    </metadata>
+    
+    <agents>
+        <agent alias="{{ xml_dict['alias_name'] }}">
+            <property name="hardware" value="{{ xml_dict["device_type"] }}"/>
+        </agent>
+    </agents>
+    
+    
+    {% for exe_block in xml_dict['execution_blocks'] -%}
+    <execution defaultAgent="{{ xml_dict['alias_name'] }}">        
+        <initialization>
+        
+            {% if exe_block['image_files'] -%}
+            <task agents="{{ xml_dict['alias_name'] }}">
+                <type>FlashTask</type>
+                <parameters>
+                {% set i = 1 %}
+                {% for img in exe_block['image_files'] -%}
+                    <parameter name="image-{{ i }}" value="{{ exe_block['name'] }}\images\{{ os.path.basename(img) }}" />
+                    {% set i = i + 1 %}
+                {% endfor -%}
+                </parameters>
+            </task>
+            {% endif %}           
+
+            <task agents="{{ xml_dict['alias_name'] }}">
+                <type>RebootTask</type>
+                <parameters/>                
+            </task>
+            <task agents="{{ xml_dict['alias_name'] }}">
+                <type>CreateDirTask</type>
+                <parameters>                
+                    <parameter value="c:\logs\testability" name="dir"/>
+                </parameters>
+            </task>
+        </initialization>
+        
+        <finalization>
+	      <task agents="{{ xml_dict['alias_name'] }}">
+	        <type>CleanupTask</type>
+	        <parameters>
+	          <parameter value="true" name="upload-files"/>
+	        </parameters>
+	      </task>
+        </finalization>
+    </execution>    
+    {% endfor -%}
+    
+    <postActions>
+    <action>
+      <type>EmailAction</type>
+      <parameters>
+        <parameter value="{{ xml_dict['email_subject'] }}" name="subject"/>
+        <parameter value="{{ xml_dict['report_email'] }}" name="to"/>
+        <parameter value="{{ xml_dict['email_format'] }}" name="format"/>
+      </parameters>
+    </action>
+    </postActions>
+    
+</testrun>

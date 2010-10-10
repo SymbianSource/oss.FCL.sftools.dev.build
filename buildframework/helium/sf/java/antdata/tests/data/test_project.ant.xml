@@ -50,8 +50,18 @@ This project is part of the tests package...
     <path id="helium.antdata.classpath">
         <fileset dir="${helium.antlib.root.dir}/bin" includes="*.jar"/>
         <fileset dir="${helium.antlib.root.dir}/antdata/lib" includes="*.jar"/>
-    </path>
+    </path> 
     
+    <!--* @property foo
+    test 
+    @type string
+    @scope public
+    -->
+    <!--* @property bar
+    test 
+    @type string
+    @scope public
+    -->
     <!-- This target is for testing the generation of documentation.
         
     So this comment is also for testing if the comments can be extracted.
@@ -62,6 +72,8 @@ This project is part of the tests package...
     
     @deprecated Lets pretend this target is deprecated.
     -->
+    
+
     <target name="check-target" if="foo" unless="bar" depends="dep1, dep2" description="A test target">
         <antcall target="sub_test_target"/>
         <echo>${property1}</echo>

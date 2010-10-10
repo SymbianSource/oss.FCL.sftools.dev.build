@@ -1,6 +1,6 @@
 <#--
 ============================================================================ 
-Name        : start.xml.ftl 
+Name        : diamonds_start.xml.ftl 
 Part of     : Helium 
 
 Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).

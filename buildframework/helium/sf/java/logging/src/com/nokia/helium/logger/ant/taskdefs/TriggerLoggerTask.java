@@ -16,12 +16,11 @@
 */
 package com.nokia.helium.logger.ant.taskdefs;
 
-import org.apache.log4j.Logger;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
 
 import com.nokia.helium.logger.ant.listener.AntLoggingHandler;
-import com.nokia.helium.logger.ant.listener.StatusAndLogListener;
+import com.nokia.helium.logger.ant.listener.CommonListener;
 
 /**
  * This task is used to start the helium logging listener.
@@ -29,25 +28,19 @@ import com.nokia.helium.logger.ant.listener.StatusAndLogListener;
  */
 public class TriggerLoggerTask extends Task {
     
-    private Logger log = Logger.getLogger(TriggerLoggerTask.class);
     
     public void execute() {
-        log.debug("Registering Ant logging to StatusAndLogListener listener");
-        if (StatusAndLogListener.getStatusAndLogListener() == null) {
-            this.log("The StatusAndLogListener is not available.", Project.MSG_WARN);
+        log("Registering Ant logging to StatusAndLogListener listener", Project.MSG_DEBUG);
+        if (CommonListener.getCommonListener() == null) {
+            this.log("The CommonListener is not available.", Project.MSG_WARN);
             return;
         }
-        AntLoggingHandler antLoggingHandler = new AntLoggingHandler(getProject());
-        StatusAndLogListener.getStatusAndLogListener().register(antLoggingHandler);
-        if (antLoggingHandler != null ) {
-            if (!antLoggingHandler.getLoggingStarted()) {
-                log.debug("Starting Logging using 'AntLoggingHandler' first time.");
-                antLoggingHandler.setLoggingStarted(true);
-            } else {
-                log.debug("'AntLoggingHandler' is already started logging.");
-            }
+        AntLoggingHandler handler = CommonListener.getCommonListener().getHandler(AntLoggingHandler.class);
+        if (handler != null) {
+            log("Starting logging framework.", Project.MSG_DEBUG);
+            handler.setRecordState(true);
         } else {
-            log.debug("Could not find the AntLoggingHandler instance.");
+            log("Could not find the logging listener.", Project.MSG_WARN);
         }
     }
 

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : test_buildstatusdef.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test_buildstatusdef" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+	
+	<import file="run-scenario.ant.xml" />
+	
+	
+	<target name="test-properties">
+        <runScenario scenario="config_report" target="run-target-disabled" />
+        <au:assertLogContains text="Warning: enable.feature property has been deprecated since 11.0. Start using feature.enabled property"/>
+        <au:assertLogContains text="Warning: internal.abc.enabled property has been overridden"/>
+        <au:assertLogContains text="Warning: internal.bla.enabled property has been deprecated since 6.0. Start using internal.abc.enabled property"/>
+        <au:assertLogContains text="Warning: feature.enabled property has been overridden"/>
+        <au:assertLogContains text="Warning: Property 'test.prop.bool.val' has invalid boolean value set as 't'. (Valid values: true|false)"/>
+        <au:assertLogContains text="Warning: Property 'test.comment.prop.bool.val' has invalid boolean value set as 'yes'. (Valid values: true|false)"/>
+        <au:assertLogContains text="Warning: Property 'test.build.number' has invalid integer value set as '123aa'."/>
+        <au:assertLogContains text="Warning: Property 'test.prop.int.3' has invalid integer value set as '1.8'."/>
+        <au:assertLogContains text="Warning: Property 'test.prop.float.2' has invalid float value set as '1.5a'."/>
+    </target>
+    
+    <target name="test-deprecated-target-with-antcall">
+        <runScenario scenario="config_report" target="antcall-deprecated-target" />
+        <au:assertLogContains text="Warning: a-deprecated-target target has been deprecated. Implementation of the feature has changed, and the target is not needed anymore."/>
+    </target>
+
+    <target name="test-deprecated-target-with-runtarget">
+        <runScenario scenario="config_report" target="runtarget-deprecated-target" />
+        <au:assertLogContains text="Warning: b-deprecated-target target has been deprecated. Implementation of the feature has changed, and the target is not needed anymore."/>
+    </target>
+
+    <target name="test-deprecated-target-with-depends">
+        <runScenario scenario="config_report" target="depends-deprecated-target" />
+        <au:assertLogContains text="Warning: c-deprecated-target target has been deprecated. Implementation of the feature has changed, and the target is not needed anymore."/>
+    </target>
+
+    <target name="test-private-target-with-antcall">
+        <runScenario scenario="config_report" target="run-private-target-as-antcall" />
+        <au:assertLogContains text="Warning: a-private-target is private and should only be called by helium"/>
+    </target>
+
+    <target name="test-private-target-with-runtarget">
+        <runScenario scenario="config_report" target="run-private-target-as-runtarget" />
+        <au:assertLogContains text="Warning: b-private-target is private and should only be called by helium"/>
+    </target>
+
+    <target name="test-private-target-with-depends">
+        <runScenario scenario="config_report" target="run-private-target-as-depends" />
+        <au:assertLogContains text="Warning: c-private-target is private and should only be called by helium"/>
+    </target>
+
+</project>

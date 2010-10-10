@@ -33,10 +33,6 @@ Documentation
 APIs
 ====
 
-* `Search API`_
-
-.. _`Search API`: ../api/index.html
-
 * `Helium API`_
 
     The `Helium API`_ specifies all the available Ant_ targets and their 
@@ -50,19 +46,20 @@ APIs
 
 .. _`Helium Antlib`: ../helium-antlib/index.html
 
+<#if !(ant?keys?seq_contains("sf"))>
+
 * `Ant Tasks`_
 
-.. _`Ant Tasks`: ../api/ant/index.html
+.. _`Ant Tasks`: ../api/doclet/index.html
 
-<#if !(ant?keys?seq_contains("sf"))>
 Customer APIs
 -------------
 
 * `IDO API`_
 * `DFS70501 API`_
 
-.. _`IDO API`: ../ido/api/helium/index.html
-.. _`DFS70501 API`: ../dfs70501/api/helium/index.html
+.. _`IDO API`: http://helium.nmp.nokia.com/doc/ido/api/helium/index.html
+.. _`DFS70501 API`: http://helium.nmp.nokia.com/doc/dfs70501/api/helium/index.html
 </#if>
 
 Building custom documentation

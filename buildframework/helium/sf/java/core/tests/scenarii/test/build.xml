@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : build.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test-enable-flags" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>Helium Antlib logger unittests.</description>
+    
+    <import file="../property/feature.ant.xml"/>
+    <property name="feature.enabled" value="true"/>
+    <property name="enable.feature" value="true"/>
+    <property name="internal.abc.enabled" value="true"/>
+    <property name="internal.bla.enabled" value="false"/>
+    <property name="skip.ats.sending" value="t"/>
+    
+    
+    <condition property="internal.old.enabled">
+        <or>
+            <istrue value="${xyz.enabled}"/>
+            <isset property="enable.feature"/>
+        </or>
+    </condition>
+    
+    <condition property="internal.new.enabled">
+        <or>
+            <istrue value="${feature.enabled}"/>
+            <isset property="abc.feature"/>
+        </or>
+    </condition>
+    
+    <condition property="internal.both.enabled">
+        <or>
+            <istrue value="${feature.enabled}"/>
+            <isset property="enable.feature"/>
+        </or>
+    </condition>
+    
+    <!-- Disabled testing target -->
+    <target name="run-target-disabled" if="internal.feature.enabled">
+        <echo>Running run-target-disabled</echo>
+    </target>
+    
+    <!-- Enabled testing target -->
+    <target name="run-target-enabled" if="feature.enabled">
+        <echo>Running run-target-enabled</echo>
+    </target>
+    
+    <!-- Testing target with old property set -->
+    <target name="run-with-old-flag-enabled" if="internal.old.enabled">
+        <echo>Running run-with-old-flag-enabled</echo>
+    </target>
+    
+    <!-- Testing target with new property set -->
+    <target name="run-with-new-flag-enabled" if="internal.new.enabled">
+        <echo>Running run-with-new-flag-enabled</echo>
+    </target>
+    
+    <!-- Testing target with old and new properties set -->
+    <target name="run-with-both-enabled" if="internal.both.enabled">
+        <echo>Running run-with-both-enabled</echo>
+    </target>
+    
+    <!-- Target with unless property set -->
+    <target name="run-with-unless-enabled" unless="skip.ats.sending">
+        <echo>Running run-with-unless-enabled</echo>
+    </target>
+    
+    <!-- Target with unless propety set -->
+    <target name="run-with-unless-internal-enabled" unless="internal.old.enabled">
+        <echo>Running run-with-unless-internal-enabled</echo>
+    </target>
+
+</project>

@@ -217,6 +217,8 @@ Coverity defect manager
 
     machine coverity login <user name> password <password>
 
+.. _`.netrc file`: configuring.html?highlight=netrc#passwords
+
 .. csv-table:: Coverity feature flags
    :header: "Flags to set", "Action performed", "Allowed value"
    

@@ -87,7 +87,7 @@ information on the files used to create the drop file.
         <action>
             <type>EmailAction</type>
             <parameters>
-                <parameter value="Release testing" name="subject"/>
+                <parameter value="ATS test results {{ test_plan['testrun_name'] }}" name="subject"/>
                 <parameter value="{{ test_plan['report_email'] }}" name="to"/>
                 <parameter value="simplelogger" name="format"/>
             </parameters>

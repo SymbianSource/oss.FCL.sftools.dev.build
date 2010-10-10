@@ -16,19 +16,12 @@
  */
 package com.nokia.helium.antlint.ant.types;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-
-import org.dom4j.Element;
-import org.dom4j.Node;
-import org.xml.sax.SAXException;
-
-import com.nokia.helium.antlint.AntLintHandler;
+import com.nokia.helium.ant.data.MacroMeta;
+import com.nokia.helium.ant.data.ProjectMeta;
+import com.nokia.helium.ant.data.RootAntObjectMeta;
+import com.nokia.helium.ant.data.TargetMeta;
 import com.nokia.helium.antlint.ant.AntlintException;
 
 /**
@@ -44,92 +37,94 @@ import com.nokia.helium.antlint.ant.AntlintException;
  *               &lt;include name=&quot;*build.xml&quot;/&gt;
  *               &lt;include name=&quot;*.antlib.xml&quot;/&gt;
  *       &lt;/fileset&gt;
- *       &lt;CheckTabCharacter&quot; severity=&quot;error&quot; enabled=&quot;true&quot; /&gt;
+ *       &lt;checkTabCharacter&quot; severity=&quot;error&quot; enabled=&quot;true&quot; /&gt;
  *  &lt;/antlint&gt;
  * </pre>
  * 
- * @ant.task name="CheckTabCharacter" category="AntLint"
+ * @ant.task name="checkTabCharacter" category="AntLint"
  * 
  */
-public class CheckTabCharacter extends AbstractCheck {
+public class CheckTabCharacter extends AbstractAntFileStyleCheck {
 
-    private File antFile;
+    private static final String TAB_CHAR = "\t";
 
     /**
      * {@inheritDoc}
      */
-    public void run(Element node) {
-        checkTabsInScript(node);
+    public void run() throws AntlintException {
+        super.run();
+        RootAntObjectMeta rootObjectMeta = getAntFile().getRootObjectMeta();
+        run(rootObjectMeta);
     }
 
     /**
-     * Check against the given node.
+     * Method runs the check against the given {@link RootAntObjectMeta}.
      * 
-     * @param node
-     *            is the node to check.
+     * @param root is the {@link RootAntObjectMeta} against which the check is
+     *            run.
      */
-    @SuppressWarnings("unchecked")
-    private void checkTabsInScript(Element node) {
-        if (node.getName().equals("target")) {
-            String target = node.attributeValue("name");
-
-            List<Node> statements = node.selectNodes("//target[@name='"
-                    + target + "']/script | //target[@name='" + target
-                    + "']/*[name()=\"hlm:python\"]");
-
-            for (Node statement : statements) {
-                if (statement.getText().contains("\t")) {
-                    this.getReporter().report(getSeverity(),
-                            "Target " + target + " has a script with tabs",
-                            getAntFile(), 0);
-                }
+    private void run(RootAntObjectMeta root) {
+        if (root instanceof ProjectMeta) {
+            ProjectMeta projectMeta = (ProjectMeta) root;
+            List<TargetMeta> targets = projectMeta.getTargets();
+            for (TargetMeta targetMeta : targets) {
+                run(targetMeta);
             }
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.nokia.helium.antlint.ant.types.Check#run(java.io.File)
+    /**
+     * {@inheritDoc}
      */
-    public void run(File antFilename) throws AntlintException {
-        try {
-            this.antFile = antFilename;
-            SAXParserFactory saxFactory = SAXParserFactory.newInstance();
-            saxFactory.setNamespaceAware(true);
-            saxFactory.setValidating(true);
-            SAXParser parser = saxFactory.newSAXParser();
-            AntLintHandler handler = new AntLintHandler(this);
-            handler.setTabCharacterCheck(true);
-            parser.parse(antFilename, handler);
-        } catch (ParserConfigurationException e) {
-            throw new AntlintException("Not able to parse XML file "
-                    + e.getMessage());
-        } catch (SAXException e) {
-            throw new AntlintException("Not able to parse XML file "
-                    + e.getMessage());
-        } catch (IOException e) {
-            throw new AntlintException("Not able to find XML file "
-                    + e.getMessage());
+    protected void handleStartDocument() {
+        // Do nothing
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected void handleEndDocument() {
+        // Do nothing
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected void handleEndElement(String text) {
+        checkTabChars(text, getLocator().getLineNumber());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected void handleStartElement(String text) {
+        checkTabChars(text, getLocator().getLineNumber());
+    }
+
+    private void checkTabChars(String text, int lineNum) {
+        if (text.contains(TAB_CHAR)) {
+            report("Tabs should not be used!", lineNum);
+        }
+        clearBuffer();
+    }
+
+    /**
+     * Method to run the check against the input {@link TargetMeta}.
+     * 
+     * @param targetMeta is the {@link TargetMeta} against whom the check is
+     *            run.
+     */
+    private void run(TargetMeta targetMeta) {
+        List<MacroMeta> macros = targetMeta.getScriptDefinitions("//target[@name='"
+                + targetMeta.getName() + "']/descendant::script | //target[@name='"
+                + targetMeta.getName() + "']/descendant::*[name()=\"hlm:python\"]");
+        if (macros != null) {
+            for (MacroMeta macroMeta : macros) {
+                if (macroMeta.getText().contains(TAB_CHAR)) {
+                    report("Target " + targetMeta.getName() + " has a script with tabs",
+                            macroMeta.getLineNumber());
+                }
+            }
         }
     }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.apache.tools.ant.types.DataType#toString()
-     */
-    public String toString() {
-        return "CheckTabCharacter";
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.nokia.helium.antlint.ant.types.Check#getAntFile()
-     */
-    public File getAntFile() {
-        return this.antFile;
-    }
-
 }

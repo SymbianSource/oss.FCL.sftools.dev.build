@@ -64,6 +64,35 @@ build summary</title>
     <@logentry "${text}", "${severity?lower_case}" />
 </#macro>
 
+<#macro metadata_entry_detail logentry, helium_node_id, component_name, component_id>
+    <#assign title_text="general">
+    <#assign component_query=" is NULL">
+    <#assign c_id="${logentry.path}">
+    
+    <#if !(component_name == "")>
+        <#assign title_text="${component_name}">
+        <#assign component_query="=${component_id}">
+        <#assign c_id="${component_id}">
+    </#if>
+    <@helium_logger_node_head nodeid="${helium_node_id}" title="${title_text}">
+        <#list table_info['jpa']['select p from Severity p where p.severity not like \'INFO\''] as severity>
+            <@logfile_severity "${c_id}", "${severity.severity?lower_case}", 
+                    table_info['jpasingle']['select Count(m.id) from MetadataEntry m where m.severityId=${severity.id} and m.componentId ${component_query} and m.logFileId = ${logentry.id}'][0], 
+                    "${helium_node_id}" />
+        </#list>
+    </@helium_logger_node_head>
+
+    <@helium_logger_node_content nodeid="${helium_node_id}">
+        <#list table_info['jpa']['select p from Severity p'] as severity>
+        <#list table_info['jpa']['select m from MetadataEntry m where m.componentId ${component_query} and m.severityId=${severity.id} and m.logFileId = ${logentry.id}'] as entry>
+            <#if entry.text??>
+                <@logfile_entry_detail "${entry.text}", "${severity.severity?lower_case}", "${helium_node_id}" />
+            </#if>
+        </#list>
+    </#list>
+    </@helium_logger_node_content>
+</#macro>
+
 <!-- Call the macros to render the log contents. -->
 <#assign mykey=loginfo>
 <#if (conv[mykey])?exists>
@@ -92,24 +121,14 @@ build summary</title>
         </#list>
     </@helium_logger_node_head>
     <@helium_logger_node_content nodeid="${helium_node_id}">
+        <#assign count_default_component = table_info['jpasingle']['select Count(m.id) from MetadataEntry m where m.logFileId=${logentry.id} and m.componentId is NULL'][0]>
+        <#if count_default_component &gt; 0>
+            <#assign helium_node_id = helium_node_id + 1>
+            <@metadata_entry_detail logentry, "${helium_node_id}", "", ""/>
+        </#if>
         <#list table_info['jpa']['select c from Component c where c.logFileId=${logentry.id}'] as component>
             <#assign helium_node_id = helium_node_id + 1>
-            <@helium_logger_node_head nodeid="${helium_node_id}" title="${component.component}">
-                <#list table_info['jpa']['select p from Severity p where p.severity not like \'INFO\''] as severity>
-                    <@logfile_severity "${component.id}", "${severity.severity?lower_case}", 
-                            table_info['jpasingle']['select Count(m.id) from MetadataEntry m where m.severityId=${severity.id} and m.componentId=${component.id}'][0], 
-                            "${helium_node_id}" />
-                </#list>
-            </@helium_logger_node_head>
-            <@helium_logger_node_content nodeid="${helium_node_id}">
-                <#list table_info['jpa']['select p from Severity p'] as severity>
-                <#list table_info['jpa']['select m from MetadataEntry m where m.componentId=${component.id} and m.severityId=${severity.id}'] as entry>
-                    <#if entry.text??>
-                        <@logfile_entry_detail "${entry.text}", "${severity.severity?lower_case}", "${helium_node_id}" />
-                    </#if>
-                </#list>
-            </#list>
-            </@helium_logger_node_content>
+            <@metadata_entry_detail logentry, "${helium_node_id}", "${component.component}", "${component.id}" />
         </#list>
     </@helium_logger_node_content>
 </#list>

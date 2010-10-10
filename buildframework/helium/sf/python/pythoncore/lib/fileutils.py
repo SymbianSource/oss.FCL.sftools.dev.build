@@ -310,7 +310,7 @@ def move(src, dst):
     except OSError:
         if os.path.isdir(src):
             if destinsrc(src, dst):
-                raise Exception, "Cannot move a directory '%s' into itself '%s'." % (src, dst)
+                raise OSError, "Cannot move a directory '%s' into itself '%s'." % (src, dst)
             shutil.copytree(src, dst, symlinks=True)
             rmtree(src)
         else:
@@ -376,10 +376,15 @@ def which(executable):
             except os.error:
                 continue
             # Check if the path is a regular file
-            if stat.S_ISREG(status[stat.ST_MODE]):
-                mode = stat.S_IMODE(status[stat.ST_MODE])
-                if mode & 0111:
+            if os.sep == '\\':
+                if os.path.isfile(filename):
                     return os.path.normpath(filename)
+            else:
+                # On Unix also check the executable rigths
+                if stat.S_ISREG(status[stat.ST_MODE]):
+                    mode = stat.S_IMODE(status[stat.ST_MODE])
+                    if mode & 0111:
+                        return os.path.normpath(filename)
     return None
 
 
@@ -407,8 +412,8 @@ def read_policy_content(filename):
 def load_policy_content(filename):
     """ Testing policy content loading. """
     data = ''
+    fileh = codecs.open(filename, 'r', 'ascii')
     try:
-        fileh = codecs.open(filename, 'r', 'ascii')
         data = fileh.read()
     except ValueError:
         raise IOError("Error loading '%s' as an ASCII file." % filename)
@@ -607,7 +612,7 @@ if os.name == 'nt':
         if drive_type == win32con.DRIVE_REMOTE:
             win32wnet.WNetCancelConnection2(drive, win32netcon.CONNECT_UPDATE_PROFILE, 1)
         else:
-            raise Exception("%s couldn't be umount." % drive)
+            raise OSError("%s couldn't be umount." % drive)
 
 else:
     def rmdir(path):
@@ -653,14 +658,14 @@ if os.sep == '\\':
         p_subst = subprocess.Popen("subst %s %s" % (drive, path),  shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         errmsg = p_subst.communicate()[0]
         if p_subst.returncode != 0:
-            raise Exception("Error substing '%s' under '%s': %s" % (path, drive, errmsg))
+            raise OSError("Error substing '%s' under '%s': %s" % (path, drive, errmsg))
     
     def unsubst(drive):
         """ Unsubsting the drive. """
         p_subst = subprocess.Popen("subst /D %s" % (drive), shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         errmsg = p_subst.communicate()[0]
         if p_subst.returncode != 0:
-            raise Exception("Error unsubsting '%s': %s" % (drive, errmsg))
+            raise OSError("Error unsubsting '%s': %s" % (drive, errmsg))
     
     def getSubstedDrives():
         """get substituted drive"""

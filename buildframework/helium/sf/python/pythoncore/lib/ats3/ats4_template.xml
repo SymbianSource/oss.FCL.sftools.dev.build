@@ -77,7 +77,7 @@ information on the files used to create the drop file.
             {%- endif %}
             
             {% if setd["ctc_enabled"] == "True" -%}
-            {{ macros.ctc_initialization() }}
+            {{ macros.ctc_initialization(test_plan) }}
             {%- endif %}
             
             <task>
@@ -168,7 +168,7 @@ information on the files used to create the drop file.
                <type>InstallSisTask</type>
                <parameters>
                     <parameter name="timeout" value="{{ test_plan["test_timeout"] }}"/>
-                    <parameter name="upgrade-data " value="true"/>
+                    <parameter name="upgrade-data" value="true"/>
                     <parameter name="ignore-ocsp-warnings" value="true"/>
                     <parameter name="ocsp-done" value="true"/>
                     <parameter name="software-package" value="c:\testframework\{{ os.path.basename(sis_file) }}"/>
@@ -272,7 +272,7 @@ information on the files used to create the drop file.
         
         <finalization>
         {% if setd["ctc_enabled"] == "True" -%}
-        {{ macros.ctc_finalization(setd) }}
+        {{ macros.ctc_finalization(test_plan) }}
         {%- endif %}
 
             <task>
@@ -311,7 +311,7 @@ information on the files used to create the drop file.
             <type>EmailAction</type>
             <parameters>
                 <parameter value="ATS test results {{ test_plan['testrun_name'] }}" name="subject"/>
-                <parameter value="{{ test_plan['report_email'] }}" name="to"/>
+                <parameter value="{{ test_plan['report_email']|e }}" name="to"/>
                 <parameter value="simplelogger" name="format"/>
                 {% if test_plan['report_type'].lower() == 'no_attachment' -%}
                 <parameter value="false" name="attach-report"/>
@@ -319,6 +319,15 @@ information on the files used to create the drop file.
             </parameters>
         </action>
         {%- endif %}
+        {% if test_plan['file_store'] -%}
+        <action>
+            <type>FileStoreAction</type>
+            <parameters>
+                <parameter value="{{ test_plan['file_store'] }}\%START_DATE%_%START_TIME%_%SERVER_TOKEN%" name="dst"/>
+                <parameter value="true" name="overwrite"/>
+            </parameters>
+        </action>
+        {% endif %}
         {% if test_plan['diamonds_build_url'] -%}
         <action>
             <type>DiamondsAction</type>

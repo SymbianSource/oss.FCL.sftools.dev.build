@@ -74,3 +74,9 @@ Optional extra arguments:
     <hlm:argSet id="ctc.build.options">
         <arg line="-C OPT_ADD_COMPILE+-DCTC_NO_START_CTCMAN" />
     </hlm:argSet>
+    
+    or
+    
+    <hlm:argSet id="ctc.build.options">
+        <arg line='-C "EXCLUDE+*\sf\os\xyz\*,*\tools\xyz\*"'/>
+    </hlm:argSet>

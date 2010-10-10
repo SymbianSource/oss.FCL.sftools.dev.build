@@ -43,12 +43,36 @@ public class TargetMeta extends TaskContainerMeta {
         super(parent, node);
     }
 
+    private String getPropertyFromDb(String prop) {
+        for (PropertyMeta property : getDatabase().getProperties()) {
+            if (property.getName().equals(prop)
+                    && property.matchesScope(getRootMeta().getScopeFilter())) {
+                return prop;
+            }
+        }
+        for (PropertyCommentMeta property : getDatabase().getCommentProperties()) {
+            if (property.getName().equals(prop)
+                    && property.matchesScope(getRootMeta().getScopeFilter())) {
+                return prop;
+            }
+        }
+        return null;
+    }
+
     public String getIf() {
-        return getAttr("if");
+        String propertyIf = getAttr("if");
+        if (!propertyIf.isEmpty() && getPropertyFromDb(propertyIf) != null) {
+            return propertyIf;
+        }
+        return "";
     }
 
     public String getUnless() {
-        return getAttr("unless");
+        String propertyUnless = getAttr("unless");
+        if (!propertyUnless.isEmpty() && getPropertyFromDb(propertyUnless) != null) {
+            return propertyUnless;
+        }
+        return "";
     }
 
     public String getDescription() {
@@ -84,7 +108,7 @@ public class TargetMeta extends TaskContainerMeta {
             AntFile antFile = (AntFile) iterator.next();
             RootAntObjectMeta rootObjectMeta = antFile.getRootObjectMeta();
             if (rootObjectMeta instanceof ProjectMeta) {
-                ProjectMeta projectMeta = (ProjectMeta)rootObjectMeta;
+                ProjectMeta projectMeta = (ProjectMeta) rootObjectMeta;
                 projectMeta.getConfigSignals(getName(), signals);
             }
         }
@@ -95,7 +119,17 @@ public class TargetMeta extends TaskContainerMeta {
         ArrayList<String> properties = new ArrayList<String>();
         Visitor visitor = new AntPropertyVisitor(properties);
         getNode().accept(visitor);
-        return properties;
+        return filterPropertyDependencies(properties);
+    }
+
+    private List<String> filterPropertyDependencies(ArrayList<String> properties) {
+        List<String> propertiesFiltered = new ArrayList<String>();
+        for (String string : properties) {
+            if (getPropertyFromDb(string) != null) {
+                propertiesFiltered.add(string);
+            }
+        }
+        return propertiesFiltered;
     }
 
     private class AntPropertyVisitor extends VisitorSupport {

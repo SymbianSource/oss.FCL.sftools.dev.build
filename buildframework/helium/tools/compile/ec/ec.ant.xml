@@ -345,6 +345,7 @@ project.setProperty(str(attributes.get('property')), str(file_path))
 
         <echo>Building ${sysdef.configuration}....</echo>
         <echo file="${temp.build.dir}/${build.id}.${sysdef.configuration}_run_emake.bat" level="info">
+set JYTHONPATH=
 set
 ${ec.emake} --emake-build-label=${build.id}.${sysdef.configuration} --emake-class=${ec.build.class} --emake-priority=normal --emake-maxagents=${ec.maxagents} --emake-job-limit=0 --emake-mem-limit=${ec.mem.limit} --emake-history=${ec.history.option} --emake-annodetail=basic,history,file,waiting --emake-annofile=${compile.log.dir}\${build.id}.${sysdef.configuration}.emake.anno.xml --emake-historyfile=${ec.historyfile} --emake-debug=${emake_debug_flag} --emake-logfile=${compile.log.dir}\${build.id}.${sysdef.configuration}.emake.g.dlog --emake-root=%EMAKE_ROOT%;${helium.dir} --emake-autodepend=1 -k -i -f ${build.drive}/${sysdef.configuration}.make LOGBUILDTIME=&quot;&quot; VERBOSE=&quot;&quot; SAVESPACE=&quot;&quot; ${sysdef.configuration}
         </echo>

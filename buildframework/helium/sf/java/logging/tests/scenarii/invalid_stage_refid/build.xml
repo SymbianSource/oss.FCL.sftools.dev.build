@@ -28,6 +28,7 @@ Description:
         
     <taskdef resource="com/nokia/helium/logger/ant/antlib.xml" uri="http://www.nokia.com/helium" />
     <taskdef resource="com/nokia/helium/core/ant/antlib.xml" uri="http://www.nokia.com/helium"/>
+    <hlm:stagerecorderlistener id="stage.recorder.listener.id" />
     
     <hlm:stage id="stage1" starttarget="stage1" endtarget="stage1" />
     <hlm:stage id="stage2" starttarget="stage2" endtarget="stage2" />

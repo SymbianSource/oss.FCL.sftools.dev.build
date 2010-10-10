@@ -1,6 +1,6 @@
 <#--
 ============================================================================ 
-Name        : .xml.ftl 
+Name        : publish.xml.ftl 
 Part of     : Helium 
 
 Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
@@ -25,15 +25,15 @@ Description:
     <#list ant['diamonds.files']?split(" ") as line>
         <#if line?split(".")?last == "fpsx">
     <file>
-        <name>${line?split("\\")?last}</name>
-        <url>${line}</url>
+        <name>${line?split("\\")?last?xml}</name>
+        <url>${line?xml}</url>
         <type>flash_image</type>
     </file>
         </#if>
         <#if line?split(".")?last == "html" || line?split(".")?last == "log">
     <file>
-        <name>${line?split("\\")?last}</name>
-        <url>${line}</url>
+        <name>${line?split("\\")?last?xml}</name>
+        <url>${line?xml}</url>
         <type>log</type>
     </file>
         </#if>

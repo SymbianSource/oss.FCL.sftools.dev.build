@@ -93,7 +93,7 @@ Description:
             <available file="${build.log.dir}/${build.id}_bom.xml" />
             <then>
                 <mkdir dir="${temp.build.dir}" />
-                <fmpp sourceFile="${helium.dir}/tools/common/templates/ido/task-publish.ant.xml.ftl" outputFile="${temp.build.dir}/task-publish.ant.xml">
+                <fmpp sourceFile="${helium.dir}/tools/publish/templates/task-publish.ant.xml.ftl" outputFile="${temp.build.dir}/task-publish.ant.xml">
                     <freemarkerLinks expandProperties="yes">
                         macro: ${helium.dir}/tools/common/templates/macro
                     </freemarkerLinks>

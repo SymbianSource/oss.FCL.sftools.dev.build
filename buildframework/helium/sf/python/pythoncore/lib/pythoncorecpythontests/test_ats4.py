@@ -20,7 +20,6 @@
 #===============================================================================
 
 """ Testing ats4 framework. """
-# pylint: disable=E1101, C0302, W0142, W0603, R0902,R0903,R0912,R0915
 #E1101 => Mocker shows mockery
 #C0302 => too many lines
 #W0142 => used * or ** magic 
@@ -271,6 +270,11 @@ TestReportFilePath= C:\LOGS\TestFramework\
 TestReportFileName= TestReport
 
 TestReportFormat= TXT            # Possible values: TXT or HTML
+[End_Defaults]
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
+[New_Module]
+ModuleName= testscripter 
         
         """)
 
@@ -294,7 +298,7 @@ def check_ctc_write(steps):
     assert params[0].get("value") == "writefile"
     assert params[1].get("value") == path(r"z:\sys\bin\ctcman.exe")
 
-def check_ctc_log(steps, testtype=""):
+def check_ctc_log(steps):
     """Fetches CTC Log"""
     #For the ctcdata.txt to be published on the ATS network drive
     step = steps.next()
@@ -772,6 +776,7 @@ class TestXMLGeneration(mocker.MockerTestCase):
         mocker.expect(test_plan["report_email"]).result(self.report_email)
         mocker.expect(test_plan["ctc_run_process_params"]).result(self.ctc_run_process_params)
         mocker.expect(test_plan["report_type"]).result("")
+        mocker.expect(test_plan["file_store"]).result("")
                 
         if self.trace_enabled.lower() == "true":
             mocker.expect(test_plan["trace_enabled"]).result("True")
@@ -937,6 +942,20 @@ class TestXMLGeneration(mocker.MockerTestCase):
         assert params[0].get("value") == "*"
         assert params[1].get("value") == "60"
         assert params[2].get("value") == "c:\\testframework\\" + ntpath.basename(self.engine_ini_file)
+        step = steps.next()
+        assert step.findtext("./type") == "StifRunCasesTask"
+        params = step.findall("./parameters/parameter")
+        assert params[0].get("value") == "TESTSCRIPTER"
+        assert params[1].get("value") == "*"
+        assert params[2].get("value") == "60"
+        assert params[3].get("value") == r"e:\testing\conf\file1.cfg"
+        step = steps.next()
+        assert step.findtext("./type") == "StifRunCasesTask"
+        params = step.findall("./parameters/parameter")
+        assert params[0].get("value") == "TESTSCRIPTER"
+        assert params[1].get("value") == "*"
+        assert params[2].get("value") == "60"
+        assert params[3].get("value") == r"e:\testing\conf\file2.cfg"
 
     def test_steps_trace_enabled(self):
         """ Test steps trace enabled. """
@@ -1113,8 +1132,9 @@ class TestXMLGenerationWithPKG(mocker.MockerTestCase):
         self.custom_files = None
         self.component_path = None
         self.ctc_run_process_params = None
+        self.ats_stf_enabled = None
         
-    def generate_xml(self, harness, trace_enabled="False"):
+    def generate_xml(self, harness, trace_enabled="False", tef_test_module=None, ats_stf_enabled="False"):
         """Generates XML"""
         def files(*paths):
             """generates paths for the files"""
@@ -1125,6 +1145,59 @@ class TestXMLGenerationWithPKG(mocker.MockerTestCase):
         self.config_files = files("conf/file1.cfg", "conf/file2.cfg")
         self.testmodule_files = files("testmodules/file1.dll", "testmodules/file2.dll")
         self.image_files = files("output/images/file1.fpsx", "output/images/file2.fpsx")
+        if tef_test_module:
+            TEST_PATH.joinpath(r"tsrc" + os.sep + "init" + os.sep + "TestFramework.ini").write_text(
+                r"""
+#     - Sets a device reset module's dll name(Reboot).
+#        + If Nokia specific reset module is not available or it is not correct one
+#          StifHWResetStub module may use as a template for user specific reset
+#          module. 
+
+[Engine_Defaults]
+
+TestReportMode= FullReport        # Possible values are: 'Empty', 'Summary', 'Environment',
+                                                               'TestCases' or 'FullReport'
+
+CreateTestReport= YES            # Possible values: YES or NO
+
+TestReportFilePath= C:\LOGS\TestFramework\
+TestReportFileName= TestReport
+
+TestReportFormat= TXT            # Possible values: TXT or HTML
+[End_Defaults]
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
+[New_Module]
+ModuleName= teftestmodule 
+        
+        """)
+        else:
+            TEST_PATH.joinpath(r"tsrc" + os.sep + "init" + os.sep + "TestFramework.ini").write_text(        
+                r"""
+#     - Sets a device reset module's dll name(Reboot).
+#        + If Nokia specific reset module is not available or it is not correct one
+#          StifHWResetStub module may use as a template for user specific reset
+#          module. 
+
+[Engine_Defaults]
+
+TestReportMode= FullReport        # Possible values are: 'Empty', 'Summary', 'Environment',
+                                                               'TestCases' or 'FullReport'
+
+CreateTestReport= YES            # Possible values: YES or NO
+
+TestReportFilePath= C:\LOGS\TestFramework\
+TestReportFileName= TestReport
+
+TestReportFormat= TXT            # Possible values: TXT or HTML
+[End_Defaults]
+# -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
+[New_Module]
+ModuleName= testscripter
+        
+        """)
+
         self.engine_ini_file = files("init/TestFramework.ini")[0]
         self.report_email = "test.receiver@company.com"
         self.file_store = path("path/to/reports")
@@ -1133,6 +1206,7 @@ class TestXMLGenerationWithPKG(mocker.MockerTestCase):
         self.pmd_files = TEST_FILES["pmd_file"]
         self.trace_activation_files = files("trace_init/trace_activation_1.xml")
         self.ctc_enabled = "True"
+        self.ats_stf_enabled = ats_stf_enabled
         self.eunitexerunner_flags = "/E S60AppEnv /R Off"
         self.custom_dir = "custom"
         self.custom_files = files("custom/postpostaction.xml", "custom/prepostaction.xml")
@@ -1184,11 +1258,13 @@ class TestXMLGenerationWithPKG(mocker.MockerTestCase):
         mocker.expect(test_plan["device_hwid"]).result("5425")
         mocker.expect(test_plan["trace_enabled"]).result(self.trace_enabled)
         mocker.expect(test_plan["ctc_enabled"]).result(self.ctc_enabled)
+        mocker.expect(test_plan["ats_stf_enabled"]).result(self.ats_stf_enabled)
         mocker.expect(test_plan["custom_dir"]).result("custom1A")
         mocker.expect(test_plan.custom_dir).result(path(r"self.custom_dir"))
         mocker.expect(test_plan["ctc_run_process_params"]).result(self.ctc_run_process_params)
         mocker.expect(test_plan["report_email"]).result(self.report_email)
         mocker.expect(test_plan["report_type"]).result("")
+        mocker.expect(test_plan["file_store"]).result("")
         if self.trace_enabled == "False":
             mocker.expect(test_plan.sets).result([
                 dict(name="set0", image_files=self.image_files, data_files=self.data_files,
@@ -1314,11 +1390,71 @@ class TestXMLGenerationWithPKG(mocker.MockerTestCase):
                 self.check_install_step(steps, "EUNIT", set_count="1")
                 self.check_run_cases(steps, "EUNIT")
                 check_ctc_write(steps)
-                check_ctc_log(steps, "withpkgfiles")
+                check_ctc_log(steps)
                 check_fetch_logs(steps, "EUNIT")
             else:
                 self.check_install_step(steps, thar)
                 self.check_run_cases(steps, thar)
+                check_ctc_write(steps)
+                check_ctc_log(steps)
+                check_fetch_logs(steps, thar)
+                
+    def test_case_steps_teftestmodule(self):
+        """Checks cases in steps in the test.xml file for TEFTESTMODULE"""
+        test_harness = ["STIF", "EUNIT", "MULTI_HARNESS"]
+        for thar in test_harness:
+            xml = self.generate_xml(thar, tef_test_module=True, ats_stf_enabled="True")
+            #print et.tostring(xml.getroot())
+            steps = iter(xml.findall(".//task"))
+            steps.next() # Flash images
+            check_ctc_start(steps)
+            check_log_dir(steps)
+            if "MULTI_HARNESS" in thar:
+                self.check_install_step(steps, "STIF")
+                self.check_run_cases(steps, "STIF", tef_test_module=True, ats_stf_enabled="True")
+                check_ctc_write(steps)
+                check_ctc_log(steps)
+                check_fetch_logs(steps, "STIF")
+                
+                steps.next() # Flash images
+                check_ctc_start(steps)
+                check_log_dir(steps)
+                self.check_install_step(steps, "EUNIT", set_count="1")
+                self.check_run_cases(steps, "EUNIT")
+                check_ctc_write(steps)
+                check_ctc_log(steps)
+                check_fetch_logs(steps, "EUNIT")
+            else:
+                self.check_install_step(steps, thar)
+                self.check_run_cases(steps, thar, tef_test_module=True)
+                check_ctc_write(steps)
+                check_ctc_log(steps)
+                check_fetch_logs(steps, thar)
+        for thar in test_harness:
+            xml = self.generate_xml(thar, tef_test_module=True)
+            #print et.tostring(xml.getroot())
+            steps = iter(xml.findall(".//task"))
+            steps.next() # Flash images
+            check_ctc_start(steps)
+            check_log_dir(steps)
+            if "MULTI_HARNESS" in thar:
+                self.check_install_step(steps, "STIF")
+                self.check_run_cases(steps, "STIF", tef_test_module=True)
+                check_ctc_write(steps)
+                check_ctc_log(steps)
+                check_fetch_logs(steps, "STIF")
+                
+                steps.next() # Flash images
+                check_ctc_start(steps)
+                check_log_dir(steps)
+                self.check_install_step(steps, "EUNIT", set_count="1")
+                self.check_run_cases(steps, "EUNIT")
+                check_ctc_write(steps)
+                check_ctc_log(steps)
+                check_fetch_logs(steps, "EUNIT")
+            else:
+                self.check_install_step(steps, thar)
+                self.check_run_cases(steps, thar, tef_test_module=True)
                 check_ctc_write(steps)
                 check_ctc_log(steps)
                 check_fetch_logs(steps, thar)
@@ -1348,7 +1484,7 @@ class TestXMLGenerationWithPKG(mocker.MockerTestCase):
                 assert ntpath.basename(dst) == filename
                 assert ntpath.dirname(dst) == drive + "\\sys\\bin"
 
-    def check_run_cases(self, steps, harness="STIF"):
+    def check_run_cases(self, steps, harness="STIF", tef_test_module=None, ats_stf_enabled="False"):
         """Checks run cases in the test.xml file"""
         step = steps.next()
         if harness == "STIF":
@@ -1358,6 +1494,45 @@ class TestXMLGenerationWithPKG(mocker.MockerTestCase):
             assert params[0].get("value") == "*"
             assert params[1].get("value") == "60"
             assert params[2].get("value") == "c:\\sys\\bin\\" + ntpath.basename(self.engine_ini_file)
+            step = steps.next()
+            assert step.findtext("./type") == "StifRunCasesTask"
+            params = step.findall("./parameters/parameter")
+            assert params[0].get("value") == "file1.dll"
+            assert params[1].get("value") == "*"
+            assert params[2].get("value") == "60"
+            step = steps.next()
+            assert step.findtext("./type") == "StifRunCasesTask"
+            params = step.findall("./parameters/parameter")
+            assert params[0].get("value") == "file2.dll"
+            assert params[1].get("value") == "*"
+            assert params[2].get("value") == "60"
+            step = steps.next()
+            assert step.findtext("./type") == "StifRunCasesTask"
+            params = step.findall("./parameters/parameter")
+            if tef_test_module:
+                assert params[0].get("value") == "teftestmodule"
+            else:
+                assert params[0].get("value") == "TESTSCRIPTER"
+            assert params[1].get("value") == "*"
+            assert params[2].get("value") == "60"
+            assert params[3].get("value") == r"c:\sys\bin\file1.cfg"
+            if tef_test_module  and ats_stf_enabled.lower() == "true":
+                assert params[4].get("value") == r"c:\spd_logs\xml\teftestmodule.xml"
+            
+            step = steps.next()
+            assert step.findtext("./type") == "StifRunCasesTask"
+            params = step.findall("./parameters/parameter")
+            if tef_test_module:
+                assert params[0].get("value") == "teftestmodule"
+            else:                
+                assert params[0].get("value") == "TESTSCRIPTER"
+            assert params[1].get("value") == "*"
+            assert params[2].get("value") == "60"
+            assert params[3].get("value") == r"c:\sys\bin\file2.cfg"
+            if tef_test_module  and ats_stf_enabled.lower() == "true":
+                assert params[4].get("value") == r"c:\spd_logs\xml\teftestmodule.xml"
+            
+            
         elif harness == "EUNIT":
             _ = self.testmodule_files[0]
             assert step.findtext("./type") == "EUnitTask"
@@ -1569,6 +1744,7 @@ class TestDropGenerationWithSis(mocker.MockerTestCase):
         mocker.expect(test_plan["ctc_run_process_params"]).result(self.ctc_run_process_params)
         mocker.expect(test_plan["report_email"]).result(self.report_email)
         mocker.expect(test_plan["report_type"]).result("")
+        mocker.expect(test_plan["file_store"]).result("")
         mocker.expect(test_plan.sets).result([
             dict(name="set0", image_files=self.image_files, sis_files=self.sis_files,
                  engine_ini_file=self.engine_ini_file, test_harness=self.harness, ctc_enabled="False", component_path=self.component_path, custom_dir=None),
@@ -1613,6 +1789,7 @@ class TestDropGenerationWithSis(mocker.MockerTestCase):
             assert params[-1].get("value") == "c:\\testframework\\" + ntpath.basename(filename)
 
 def test_ats_sut():
+    """Test SymbianUnitTest"""
     opts = Bunch(file_store='', flash_images='', diamonds_build_url='', testrun_name='', device_type='', report_email='', test_timeout='', drop_file='', config_file='', target_platform='', data_dir='', build_drive='', sis_files='', harness='', trace_enabled='', specific_pkg='', ats4_enabled='true', device_hwid='')
 
     test_plan = ats3.Ats3TestPlan(opts)

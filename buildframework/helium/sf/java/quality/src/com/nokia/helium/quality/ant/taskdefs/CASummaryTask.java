@@ -24,10 +24,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
@@ -43,6 +39,7 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import org.xml.sax.SAXException;
+import org.apache.tools.ant.BuildException;
 
 
 /**
@@ -65,10 +62,53 @@ import org.xml.sax.SAXException;
 public class CASummaryTask extends Task {
 
     /** String used to look for the tag values in the header xml file **/
-    private static String headerExpression = "//issuelist/headerfile/issue/typeid/text()";
+    private static final String HEADER_EXPRESSION = "//issuelist/headerfile/issue/typeid/text()";
 
     /** String used to look for the tag values in the library xml file **/
-    private static String libraryExpression = "//issuelist/library/issue/typeid/text()";
+    private static final String LIBRARY_EXPRESSION = "//issuelist/library/issue/typeid/text()";
+
+    /**maximum number of typeIDs available for the library compare file*/
+    private static final int MAX_NUM_TYPE_IDS = 15;
+    
+    /** 0 to 14 typeID modes, supplied by Satarupa Pal. Add this i=to the output information to diamonds*/
+    private static final String[] TYPE_MODE = {
+        "unknown",
+        "removed",
+        "added",
+        "moved",
+        "deleted",
+        "inserted",
+        "modified",
+        "added",
+        "modified",
+        "modified",
+        "modified",
+        "modified",
+        "modified",
+        "removed",
+        "not available"};
+
+    /** 
+    the BC library output file: xml paths required to retrieve the additional textual information.
+    */
+    private static final String[] SEARCH_PATHS = {
+        "//issuelist/library/issue[typeid = \"0\"]/bc_severity/text()",
+        "//issuelist/library/issue[typeid = \"1\"]/bc_severity/text()",
+        "//issuelist/library/issue[typeid = \"2\"]/bc_severity/text()",
+        "//issuelist/library/issue[typeid = \"3\"]/bc_severity/text()",
+        "//issuelist/library/issue[typeid = \"4\"]/bc_severity/text()",
+        "//issuelist/library/issue[typeid = \"5\"]/bc_severity/text()",
+        "//issuelist/library/issue[typeid = \"6\"]/bc_severity/text()",
+        "//issuelist/library/issue[typeid = \"7\"]/bc_severity/text()",
+        "//issuelist/library/issue[typeid = \"8\"]/typeinfo/text()",
+        "//issuelist/library/issue[typeid = \"9\"]/typeinfo/text()",
+        "//issuelist/library/issue[typeid = \"10\"]/typeinfo/text()",
+        "//issuelist/library/issue[typeid = \"11\"]/typeinfo/text()",
+        "//issuelist/library/issue[typeid = \"12\"]/typeinfo/text()",
+        "//issuelist/library/issue[typeid = \"13\"]/typeinfo/text()",
+        "//issuelist/library/issue[typeid = \"14\"]/typeinfo/text()"};
+
+    private boolean failOnError;            //init to default value false
 
     /** The file containing the CA summary data */
     private String inputFile;
@@ -172,6 +212,24 @@ public class CASummaryTask extends Task {
         return header;
     }
 
+    /**
+     * Defines if the task should fail in case of error. 
+     * @param failOnError
+     * @ant.not-required Default true
+     */
+    public void setFailOnError(boolean failOnError) {
+        this.failOnError = failOnError;
+    }
+    
+    /**
+     * Shall we fail in case of issue.
+     * @return
+     */
+    public boolean shouldFailOnError() {
+        System.out.println(" failOnError = " + failOnError);
+        return failOnError;
+    }
+
     /** the main part of the code - the method that is called */
     public void execute() {
         log("CASummaryTask execute method with input file : " + inputFile, Project.MSG_ERR);
@@ -189,25 +247,35 @@ public class CASummaryTask extends Task {
             log("FileNotFoundException while getting the input file.  : " + inputFile + "  "
                 + exc.getMessage(), Project.MSG_ERR);
             inputFileFound = false; // stops an empty output file being created.
+            if (shouldFailOnError()) {
+                throw new BuildException(exc.getMessage(), exc);
+            }
         }
+        
         if (inputFileFound) {
             try {
                 // write the title stuff for the XML diamonds schema
                 output = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(getoutputFile()), "UTF8"));
-            }
-            catch (FileNotFoundException exc) {
+            } catch (FileNotFoundException exc) {
                 log("FileNotFoundException while getting the output file.  : " + getoutputFile()
                     + "   " + exc.getMessage(), Project.MSG_ERR);
-            }
-            catch (UnsupportedEncodingException exc) {
+                if (shouldFailOnError()) {
+                    throw new BuildException(exc.getMessage(), exc);
+                }
+            } catch (UnsupportedEncodingException exc) {
                 // We are Ignoring the errors as no need to fail the build.
                 log("UnsupportedEncodingException while creating the output file : "
                     + getoutputFile() + "   " + exc.getMessage(), Project.MSG_ERR);
-            }
-            catch (SecurityException exc) {
+                if (shouldFailOnError()) {
+                    throw new BuildException(exc.getMessage(), exc);
+                }
+            } catch (SecurityException exc) {
                 // We are Ignoring the errors as no need to fail the build.
                 log("SecurityException while creating the output file : " + getoutputFile() + "   "
                     + exc.getMessage(), Project.MSG_ERR);
+                if (shouldFailOnError()) {
+                    throw new BuildException(exc.getMessage(), exc);
+                }
             }
 
             if (output != null) {
@@ -226,11 +294,11 @@ public class CASummaryTask extends Task {
                     if (tempheader) {
                         output.write("    <quality aspect=\"compatibility-headers\"> \r\n");
                         // process each line
-                        findTextAndOutput(headerExpression); // read input file and write the output
+                        findHeaderTextAndOutput(HEADER_EXPRESSION); // read input file and write the output
                     } else {
                         output.write("    <quality aspect=\"compatibility-libs\"> \r\n");
                         // process each line
-                        findTextAndOutput(libraryExpression); // read input file and write the output
+                        findLibTextAndOutput(LIBRARY_EXPRESSION); // read input file and write the output
                     }
 
                     // write the end of file text
@@ -249,17 +317,26 @@ public class CASummaryTask extends Task {
                 catch (FileNotFoundException exc) {
                     log("FileNotFoundException while getting the diamonds header file : "
                         + getdiamondsHeaderFileName() + "   " + exc.getMessage(), Project.MSG_ERR);
+                    if (shouldFailOnError()) {
+                        throw new BuildException(exc.getMessage(), exc);
+                    }
                 }
                 catch (IOException exc) {
                     // We are Ignoring the errors as no need to fail the build.
                     log("IOException : " + getdiamondsHeaderFileName() + " output file =  "
                         + getoutputFile() + "  " + exc.getMessage(), Project.MSG_ERR);
+                    if (shouldFailOnError()) {
+                        throw new BuildException(exc.getMessage(), exc);
+                    }
                 }
                 catch (IllegalArgumentException exc) {
                     // We are Ignoring the errors as no need to fail the build.
                     log("IllegalArgumentException : " + getdiamondsHeaderFileName()
                         + " output file =  " + getoutputFile() + "  " + exc.getMessage(), Project.MSG_ERR);
-                }
+                    if (shouldFailOnError()) {
+                        throw new BuildException(exc.getMessage(), exc);
+                    }
+                } 
             }
             else {
                 log("Error: no output File available ", Project.MSG_ERR);
@@ -270,18 +347,63 @@ public class CASummaryTask extends Task {
         }
     }
 
+    /** 
+    class for recording the number of occurances of a typeID for the library comparison output.
+    */
+    private class HeaderInfo {
+        private int typeId;
+        private long numOccurances;
+
+        /**
+         * @param typeId the type ID of the issue
+         * @ant.required
+         */
+        private void settypeId(int typeId) {
+            this.typeId = typeId;
+        }
+    
+        /**
+         * @return the typeID
+         */
+        private int gettypeId() {
+            return typeId;
+        }
+
+        /**
+         * @param numOccurances the number of times the type ID appears in the output file
+         * @ant.required
+         */
+        public void setnumOccurances(long numOccurances) {
+            this.numOccurances = numOccurances;
+        }
+    
+        /**
+         * @return the number of occurrance of the typeID
+         */
+        public long getnumOccurances() {
+            return numOccurances;
+        }
+    }
+
+
     /**
      * This is the function that performs the actual file searches and writes the number of occurances
      * of each typeID to the output xml file
      */
-    private void findTextAndOutput(String expression) {
+    private void findHeaderTextAndOutput(String expression) {
         String value;
-        Integer count;
+         
         /** place to store the number of typeids found */
-        Hashtable<Integer, Integer> typeIds = new Hashtable<Integer, Integer>();
+        HeaderInfo[] headerinf = new HeaderInfo[MAX_NUM_TYPE_IDS];
         int tempKey;
-        int tempVal;
-        
+
+        //initialise the array of typeIDs
+        int sizevar = headerinf.length;
+        for (int i = 0; i < MAX_NUM_TYPE_IDS; i++) {
+            headerinf[i] = new HeaderInfo();
+            headerinf[i].typeId = i;
+            headerinf[i].numOccurances = 0;
+        }
         try {
             DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = docFactory.newDocumentBuilder();
@@ -297,32 +419,179 @@ public class CASummaryTask extends Task {
             //expression is evaluated with respect to a certain context node which is doc.
             Object result = expr.evaluate(doc, XPathConstants.NODESET);
             NodeList nodeList = (NodeList) result;
+            //and scan through the list
             for (int i = 0; i < nodeList.getLength(); i++) {
-                value = nodeList.item(i).getNodeValue();    //get the value as a string from the xml file
-                tempKey = Integer.parseInt(value);          //convert it to an integer so they can be sorted
-                if (!typeIds.containsKey(tempKey)) {        //see if the typeID is already present in the hashtable
-                    typeIds.put(tempKey, 0);                //it's not so create it (stops null pointer exceptions)
+                value = nodeList.item(i).getNodeValue();      //get the value as a string from the xml file
+                tempKey = Integer.parseInt(value);            //convert it to an integer
+                if (tempKey < MAX_NUM_TYPE_IDS) {
+                    headerinf[tempKey].numOccurances++;       //increase the number of occurances
+                } else {
+                    log("tempKey out of range");
                 }
-                count = typeIds.get(tempKey);               //get the current count of this typeID
-                count++;                                    //inc the count
-                typeIds.put(tempKey, count);                //write it back to the hashtable
             }
-            
-            //now sort and write to xml file
-            SortedSet<Integer> sortedset = new TreeSet<Integer>(typeIds.keySet());
-            Iterator<Integer> sorted = sortedset.iterator();
-            while (sorted.hasNext()) {      //go through each one on the file and write to xml output file
-                tempVal = sorted.next();
-                output.write("        <summary message=\"type ID " + tempVal + " occurs \" value=\"" + typeIds.get(tempVal) + "\"/> \r\n");
+    
+            boolean noErrors = true;                        //so we print something when no data present
+            for (int i = 0; i < MAX_NUM_TYPE_IDS; i++)         //typeIDS 1 to 14
+            {
+                if (headerinf[i].numOccurances != 0) {
+                    noErrors = false;
+                    String headSearchPath = "//issuelist/headerfile/issue[typeid = \"" + i + "\"]/typestring/text()";
+                    //XPath object created compiles the XPath expression: 
+                    XPathExpression typeInfoExpr = xpath.compile(headSearchPath);
+                    //expression is evaluated with respect to a certain context node which is doc.
+                    Object typeInfoResult = typeInfoExpr.evaluate(doc, XPathConstants.NODESET);
+                    NodeList typeInfoNodeList = (NodeList) typeInfoResult;
+                    output.write("        <summary message=\"typeID:" + headerinf[i].typeId + 
+                        ":" + typeInfoNodeList.item(0).getNodeValue() + ":occurs \" value=\"" + headerinf[i].numOccurances + "\"/> \r\n");
+                }
+            }
+            if (noErrors) {
+                output.write("        <summary message=\"number of errors present \" value=\"0\"/> \r\n");
             }
         } catch (ParserConfigurationException err) {
             log("Error: ParserConfigurationException: trying to parse xml file ", Project.MSG_ERR);
+            if (shouldFailOnError()) {
+                throw new BuildException(err.getMessage(), err);
+            }
         } catch (SAXException err) {
             log("Error: SAXException: trying to parse xml file ", Project.MSG_ERR);
+            if (shouldFailOnError()) {
+                throw new BuildException(err.getMessage(), err);
+            }
         } catch (XPathExpressionException err) {
             log("Error: XPathExpressionException: trying to parse xml file ", Project.MSG_ERR);
+            if (shouldFailOnError()) {
+                throw new BuildException(err.getMessage(), err);
+            }
         } catch (IOException err) {
             log("Error: IOException: trying to parse xml file ", Project.MSG_ERR);
+            if (shouldFailOnError()) {
+                throw new BuildException(err.getMessage(), err);
+            }
+        }
+    }
+    
+    /** 
+    class for recording the number of occurances of a typeID for the library comparison output.
+    */
+    private class LibraryInfo {
+        private int typeId;
+        private long numOccurances;
+
+        /**
+         * @param typeId the type ID of the issue
+         * @ant.required
+         */
+        private void settypeId(int typeId) {
+            this.typeId = typeId;
+        }
+    
+        /**
+         * @return the typeID
+         */
+        private int gettypeId() {
+            return typeId;
+        }
+
+        /**
+         * @param numOccurances the number of times the type ID appears in the output file
+         * @ant.required
+         */
+        public void setnumOccurances(long numOccurances) {
+            this.numOccurances = numOccurances;
+        }
+    
+        /**
+         * @return the number of occurrance of the typeID
+         */
+        public long getnumOccurances() {
+            return numOccurances;
+        }
+    }
+
+    /**
+     * This is the function that performs the actual file searches and writes the number of occurances
+     * of each typeID to the output xml file
+     */
+    private void findLibTextAndOutput(String expression) {
+
+        String value;
+         
+        /** place to store the number of typeids found */
+        LibraryInfo[] libraryinf = new LibraryInfo[MAX_NUM_TYPE_IDS];
+        int tempKey;
+
+        //initialise the array of typeIDs
+        int sizevar = libraryinf.length;
+        for (int i = 0; i < MAX_NUM_TYPE_IDS; i++) {
+            libraryinf[i] = new LibraryInfo();
+            libraryinf[i].typeId = i;
+            libraryinf[i].numOccurances = 0;
+        }
+        
+        try {
+            DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = docFactory.newDocumentBuilder();
+            Document doc = builder.parse(getinputFile());
+    
+            //creating an XPathFactory:
+            XPathFactory factory = XPathFactory.newInstance();
+            //using this factory to create an XPath object: 
+            XPath xpath = factory.newXPath();
+            //XPath object created compiles the XPath expression: 
+            XPathExpression expr = xpath.compile(expression);
+    
+            //expression is evaluated with respect to a certain context node which is doc.
+            Object result = expr.evaluate(doc, XPathConstants.NODESET);
+            //create a node list
+            NodeList nodeList = (NodeList) result;
+            //and scan through the list
+            for (int i = 0; i < nodeList.getLength(); i++) {
+                value = nodeList.item(i).getNodeValue();      //get the value as a string from the xml file
+                tempKey = Integer.parseInt(value);            //convert it to an integer
+                if (tempKey < MAX_NUM_TYPE_IDS) {
+                    libraryinf[tempKey].numOccurances++;         //increase the number of occurances
+                } else {
+                    log("tempKey out of range");
+                }
+            }
+    
+            boolean noErrors = true;                      //so we print something when no data present
+            for (int i = 1; i < MAX_NUM_TYPE_IDS; i++) {        //typeIDS 1 to 14
+                if (libraryinf[i].numOccurances != 0) {
+                    noErrors = false;
+                    //XPath object created compiles the XPath expression: 
+                    XPathExpression typeInfoExpr = xpath.compile(SEARCH_PATHS[i]);
+                    //expression is evaluated with respect to a certain context node which is doc.
+                    Object typeInfoResult = typeInfoExpr.evaluate(doc, XPathConstants.NODESET);
+                    NodeList typeInfoNodeList = (NodeList) typeInfoResult;
+                    output.write("        <summary message=\"typeID:" + libraryinf[i].typeId + ":mode:" + TYPE_MODE[i] + 
+                        ":" + typeInfoNodeList.item(0).getNodeValue() + ":occurs \" value=\"" + libraryinf[i].numOccurances + "\"/> \r\n");
+                }
+            }
+            if (noErrors) {
+                output.write("        <summary message=\"number of errors present \" value=\"0\"/> \r\n");
+            }
+        } catch (XPathExpressionException err) {
+            log("Error: XPathExpressionException: trying to parse xml file ", Project.MSG_ERR);
+            if (shouldFailOnError()) {
+                throw new BuildException(err.getMessage(), err);
+            }
+        } catch (ParserConfigurationException err) {
+            log("Error: ParserConfigurationException: trying to parse xml file ", Project.MSG_ERR);
+            if (shouldFailOnError()) {
+                throw new BuildException(err.getMessage(), err);
+            }
+        } catch (SAXException err) {
+            log("Error: SAXException: trying to parse xml file ", Project.MSG_ERR);
+            if (shouldFailOnError()) {
+                throw new BuildException(err.getMessage(), err);
+            }
+        } catch (IOException err) {
+            log("Error: IOException: trying to parse xml file ", Project.MSG_ERR);
+            if (shouldFailOnError()) {
+                throw new BuildException(err.getMessage(), err);
+            }
         }
     }
 

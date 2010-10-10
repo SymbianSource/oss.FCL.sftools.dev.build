@@ -39,7 +39,7 @@ Description:
                 <propertyref name="synergy71.enabled"/>
             </propertyset>
             <fileset dir="${helium.dir}" includes="tools/**/test_*.ant.xml"/> 
-            <fileset dir="${helium.dir}" includes="extensions/*/tools/**/test_*.ant.xml"/>  
+            <fileset dir="${helium.dir}" includes="extensions/*/tools/**/test_*.ant.xml"/>
             <au:plainlistener/>
             <hlm:antcoveragelistener outputfile="${helium.build.dir}/report/antunit/ant_coverage.txt"/>
             <au:xmllistener toDir="${helium.build.dir}/report/antunit" logLevel="info" />

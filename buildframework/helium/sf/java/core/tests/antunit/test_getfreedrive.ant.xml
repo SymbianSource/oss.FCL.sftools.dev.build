@@ -25,8 +25,8 @@ Description:
     <description>
         Testing getFreeDrive targets
     </description>
-
-    <property name="current.dir" value="."/>
+    
+    <taskdef resource="com/nokia/helium/core/ant/antlib.xml" uri="http://www.nokia.com/helium" />
     
     <condition property="is.windows">
         <os family="windows"/>
@@ -49,10 +49,10 @@ Description:
         <hlm:getfreedrive property="build.drive"/>
         <exec osfamily="windows" executable="subst.exe" failonerror="false">
             <arg value="${build.drive}"/>
-            <arg value="${current.dir}"/>
+            <arg value="."/>
         </exec>
         <au:assertTrue>
-           <hasfreespace partition="${build.drive}" needed="1M"/>
+           <available file="${build.drive}" type="dir" />
         </au:assertTrue>
         <exec osfamily="windows" executable="subst.exe" failonerror="false">
             <arg value="${build.drive}"/>

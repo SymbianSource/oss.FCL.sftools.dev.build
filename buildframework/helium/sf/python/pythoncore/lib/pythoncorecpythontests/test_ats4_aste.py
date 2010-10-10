@@ -21,7 +21,6 @@
 
 """ Testing ATS4 ASTE framework. """
 
-# pylint: disable=E1101, R0903, R0911, R0912, W0603, W0142, R0902, R0201
 #E1101 => Mocker shows mockery
 #C0302 => too many lines
 #W0142 => used * or ** magic 
@@ -44,6 +43,8 @@ import mocker # pylint: disable=F0401
 
 import ats3.aste
 
+import pythoncorecpythontests.test_ats3_aste
+
 TEST_PATH = None
 TEST_FILES = {}
 TEST_ASSET_FILES = {}
@@ -63,75 +64,7 @@ class Bunch(object):
         self.__dict__.update(kwargs)
 
 def equal_xml(xml1, xml2):
-    """Check the equality of the given XML snippets.
-    
-    Tag name equality:
-    
-    >>> equal_xml('<a/>', '<a/>')
-    True
-    >>> equal_xml('<a/>', '<b/>')
-    False
-    
-    Attribute equality:
-    
-    >>> equal_xml('<a k="v"/>', '<a k="v"/>')
-    True
-    >>> equal_xml('<a k="v"/>', '<a k="w"/>')
-    False
-    
-    Text content equality:
-    
-    >>> equal_xml('<a>v</a>', '<a>v</a>')
-    True
-    >>> equal_xml('<a>v</a>', '<a>w</a>')
-    False
-    >>> equal_xml('<a>v</a>', '<a></a>')
-    False
-    
-    Text content equality when whitespace differs:
-    >>> equal_xml('<a>v</a>', '<a>v </a>')
-    True
-
-    Equality of child elements:
-    
-    >>> equal_xml('<a><b><c k="v"/></b></a>', '<a><b><c k="v"/></b></a>')
-    True
-    >>> equal_xml('<a><b><c k="v"/></b></a>', '<a><b><c k="w"/></b></a>')
-    False
-    >>> equal_xml('<a><b><c k="v"/>v</b></a>', '<a><b><c k="v"/>w</b></a>')
-    False
-    >>> equal_xml('<a><b><c k="v"/>v</b></a>', '<a><b><c k="v"/>v </b></a>')
-    True
-    
-    """
-    if isinstance(xml1, basestring):
-        xml1 = fromstring(xml1)
-    if isinstance(xml2, basestring):
-        xml2 = fromstring(xml2)
-    if xml1.tag != xml2.tag:
-        return False
-    if xml1.attrib != xml2.attrib:
-        return False
-    if xml1.text:
-        if not xml2.text:
-            return False
-    if xml2.text:
-        if not xml1.text:
-            return False
-    if xml1.text and xml2.text and xml1.text.strip() != xml2.text.strip():
-        return False
-    if xml1.tail is not None and xml2.tail is not None:
-        if xml1.tail.strip() != xml2.tail.strip():
-            return False
-    elif xml1.tail != xml2.tail:
-        return False
-    children1 = list(xml1.getchildren())
-    children2 = list(xml2.getchildren())
-    if len(children1) != len(children2):
-        return False
-    for child1, child2 in zip(children1, children2):
-        return equal_xml(child1, child2)
-    return True        
+    return pythoncorecpythontests.test_ats3_aste.equal_xml(xml1, xml2)    
 
 
 def setup_module():

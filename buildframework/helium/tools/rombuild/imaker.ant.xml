@@ -29,7 +29,7 @@ Description:
     <!--* @property imaker.engine
     Defines which accelerator to use for running iMaker. (default value from build.system property)
     @type string
-    @scope private
+    @scope public
     -->
     
     <condition property="imaker.engine" value="imaker.engine.ec" else="imaker.engine.default">
@@ -116,7 +116,7 @@ writer.close();
         @type string
         @scope private
         -->
-        <property name="rombuild.buildinfo.output" location="${build.drive}${env.EPOCROOT}epoc32/rom/config/image_conf_buildinfo.mk" />
+        <property name="rombuild.buildinfo.output" location="${build.drive}/epoc32/rom/config/image_conf_buildinfo.mk" />
         <fmpp sourceFile="${rombuild.buildinfo.template}" outputFile="${rombuild.buildinfo.output}">
             <data expandProperties="yes">
                 ant: antProperties()

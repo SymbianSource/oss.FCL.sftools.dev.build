@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : test_blocks.ant.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="helium-antlib-blocks-unittest" xmlns:hlm="http://www.nokia.com/helium" xmlns:au="antlib:org.apache.ant.antunit">
+    <description>Helium Antlib blocks unittests.</description>
+    
+    <target name="setUp">
+        <tstamp>
+            <format property="tstamp" pattern="yyyyMMddHHmmssSSS" locale="en,UK" />
+        </tstamp>
+        <mkdir dir="${test.temp.dir}" />
+        <delete file="${test.temp.dir}" />
+        <mkdir dir="${test.temp.dir}" />
+    </target>
+
+    <target name="tearDown">
+        <delete dir="${test.temp.dir}" />
+    </target>
+    
+    <target name="is-blocks-available">
+        <exec executable="blocks.bat"  resultproperty="blocks.result" failifexecutionfails="false" osfamily="windows" />
+        <exec executable="blocks"  resultproperty="blocks.result" failifexecutionfails="false" osfamily="unix" />
+        <condition property="execute.test" value="true">
+            <equals arg1="${blocks.result}" arg2="0" />
+        </condition>
+        <echo>execute.test: ${execute.test}</echo>    
+    </target>
+    
+    <target name="test-addworkspace" depends="is-blocks-available" if="execute.test">
+        <mkdir dir="${test.temp.dir}/workspace-addworkspace" />
+        <hlm:blocksAddWorkspace name="unittest-addworkspace-${tstamp}" dir="${test.temp.dir}/workspace-addworkspace" wsidproperty="wsid" />
+        <hlm:blocksRemoveWorkspace wsid="${wsid}" />
+    </target>
+
+    <target name="test-workspace-cond-dir" depends="is-blocks-available" if="execute.test">
+        <mkdir dir="${test.temp.dir}/workspace-workspacecond" />
+        <hlm:blocksAddWorkspace name="workspace-workspacecond-${tstamp}" dir="${test.temp.dir}/workspace-workspacecond" wsidproperty="wsid" />
+        <au:assertTrue>
+            <hlm:blocksWorkspaceExists dir="${test.temp.dir}/workspace-workspacecond" />
+        </au:assertTrue>
+        <hlm:blocksRemoveWorkspace wsid="${wsid}" />
+    </target>
+
+    <target name="test-workspace-cond-name" depends="is-blocks-available" if="execute.test">
+        <mkdir dir="${test.temp.dir}/workspace-workspacecond" />
+        <hlm:blocksAddWorkspace name="workspace-workspacecond-${tstamp}" dir="${test.temp.dir}/workspace-workspacecond" wsidproperty="wsid" />
+        <au:assertTrue>
+            <hlm:blocksWorkspaceExists name="workspace-workspacecond-${tstamp}" />
+        </au:assertTrue>
+        <hlm:blocksRemoveWorkspace wsid="${wsid}" />
+    </target>
+
+    <target name="test-workspace-cond-not-workspace-dir" depends="is-blocks-available" if="execute.test">
+        <mkdir dir="${test.temp.dir}/workspace-workspacecond" />
+        <au:assertTrue>
+            <not>
+                <hlm:blocksWorkspaceExists dir="${test.temp.dir}/workspace-workspacecond" />
+            </not>
+        </au:assertTrue>
+    </target>
+
+    <target name="test-workspace-cond-not-workspace-name" depends="is-blocks-available" if="execute.test">
+        <mkdir dir="${test.temp.dir}/workspace-workspacecond" />
+        <au:assertTrue>
+            <not>
+                <hlm:blocksWorkspaceExists name="workspacecond" />
+            </not>
+        </au:assertTrue>
+    </target>
+
+    <target name="test-workspace-get-workspace-id-no-args" depends="is-blocks-available" if="execute.test">
+        <au:expectfailure message="You must define either name or dir attribute">
+        	<hlm:blocksGetWorkspaceId />
+        </au:expectfailure>
+    </target>
+
+    <target name="test-workspace-get-workspace-id-both-args" depends="is-blocks-available" if="execute.test">
+        <mkdir dir="${test.temp.dir}/workspace-addworkspace" />
+        <au:expectfailure message="You must define either name or dir attribute">
+        	<hlm:blocksGetWorkspaceId name="some-invalid-name" dir="${test.temp.dir}/workspace-addworkspace"/>
+        </au:expectfailure>
+    </target>
+
+    <target name="test-workspace-get-workspace-name" depends="is-blocks-available" if="execute.test">
+        <mkdir dir="${test.temp.dir}/workspace-workspacecond" />
+        <hlm:blocksAddWorkspace name="workspace-workspacecond-${tstamp}" dir="${test.temp.dir}/workspace-workspacecond" wsidproperty="wsid" />
+        <hlm:blocksGetWorkspaceId name="workspace-workspacecond-${tstamp}" wsidoutput="get.wsid"/>
+        <hlm:blocksRemoveWorkspace wsid="${wsid}" />
+        <au:assertTrue>
+            <equals arg1="${get.wsid}" arg2="${wsid}" />
+        </au:assertTrue>
+    </target>
+
+    <target name="test-workspace-get-workspace-dir" depends="is-blocks-available" if="execute.test">
+        <mkdir dir="${test.temp.dir}/workspace-workspacecond" />
+        <hlm:blocksAddWorkspace name="workspace-workspacecond-${tstamp}" dir="${test.temp.dir}/workspace-workspacecond" wsidproperty="wsid" />
+        <hlm:blocksGetWorkspaceId dir="${test.temp.dir}/workspace-workspacecond" wsidoutput="get.wsid"/>
+        <hlm:blocksRemoveWorkspace wsid="${wsid}" />
+        <au:assertTrue>
+            <equals arg1="${get.wsid}" arg2="${wsid}" />
+        </au:assertTrue>
+    </target>
+</project>

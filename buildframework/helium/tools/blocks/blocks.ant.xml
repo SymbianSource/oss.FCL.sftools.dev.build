@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : blocks.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<!--* @package preparation -->
+<project name="blocks" xmlns:hlm="http://www.nokia.com/helium">
+    <description>
+        Blocks integration.
+    </description>
+        
+    <!-- The directory where the blocks configuration will be generated.
+    @type string
+    -->
+    <property name="blocks.config.dir" location="${build.output.dir}/blocks/config" />
+    <!-- The directory where the bundles will be generated.
+    @type string
+    -->
+    <property name="blocks.bundle.dir" location="${build.output.dir}/blocks/bundles" />
+    <!-- The directory where the blocks metadata will be generated.
+    @type string
+    -->
+    <property name="blocks.metadata.dir" location="${build.output.dir}/blocks/metadata" />
+    <!-- Name of the writer to use while creating bundles.
+    @type string
+    -->
+    <property name="blocks.writer" value="deb" />
+    <!-- Number of workers to use while creating the bundles.
+    @type string
+    -->
+    <property name="blocks.workers" value="4" />
+    <!-- Location of the blocks log.
+    @type string
+    -->
+    <property name="blocks.log.dir" location="${build.output.dir}/blocks/logs" />
+    <!-- File extension of the blocks log.
+    @type string
+    -->
+    <property name="blocks.log.extension" value="blocks.log" />
+    <!-- Boolean attribute for the packager application to support generation of packages with inter-dependency. 
+    @type boolean
+    @scope public
+    @deprecated Since 11.0
+    -->
+    <property name="blocks.interdeps.generation" value="false" />
+    
+    <!-- Boolean attribute for the packager application to support generation of packages with inter-dependency. 
+    @type boolean
+    @scope public
+    -->
+    <property name="blocks.interdeps.generation.enabled" value="false" />
+    
+    <!--* @property internal.blocks.interdeps.generation.enabled
+    Internal property set if blocks.interdeps.generation.enabled set to true. 
+    @type boolean
+    @scope private
+    @since 11.0
+    -->
+    
+    <!--* @property blocks.enabled
+    Set to true to enable blocks.
+    @type boolean
+    @editable required
+    @scope public
+    @since 11.0
+    -->
+    
+    <!--* @property internal.blocks.enabled
+    Internal property to run the targets if blocks.enabled property is set to true.
+    @type boolean
+    @scope private
+    -->
+    
+    <!-- Check, is blocks enabled -->
+    <condition property="internal.blocks.enabled">
+        <istrue value="${blocks.enabled}"/>
+    </condition>
+    
+    <hlm:metadatafilterset id="filterset.blocks.archiving">
+        <metadatafilter priority="error" regex="^ERROR:.*" description="" />
+        <metadatafilter priority="warning" regex="^WARNING:.*" description="" />
+    </hlm:metadatafilterset>
+        
+    <!--
+        This target will run the packager application using all configurations
+        generated during the build under blocks.config.dir.
+     -->
+    <target name="blocks-create-bundles" if="internal.blocks.enabled">
+        <mkdir dir="${blocks.config.dir}" />
+        <mkdir dir="${blocks.bundle.dir}" />
+        <mkdir dir="${blocks.metadata.dir}" />
+        <mkdir dir="${blocks.log.dir}" />
+        
+        <condition property="arg.blocks.target.rules" value="--targetRules=${blocks.target.rules}" else="">
+            <isset property="blocks.target.rules" />
+        </condition>
+        
+        <condition property="arg.blocks.source.rules" value="--sourceRules=${blocks.source.rules}" else="">
+            <isset property="blocks.source.rules" />
+        </condition>
+        
+        <condition property="arg.blocks.package.directives" value="--pkgDirectives=${blocks.package.directives}" else="">
+            <isset property="blocks.package.directives" />
+        </condition>
+        
+        <condition property="internal.blocks.interdeps.generation.enabled" value="true" else="false">
+            <or>
+                <istrue value="${blocks.interdeps.generation.enabled}"/>
+                <istrue value="${blocks.interdeps.generation}"/>
+            </or>
+        </condition>
+        
+        <exec executable="python" failonerror="false" output="${blocks.log.dir}/${build.id}_blocks_archiving.${blocks.log.extension}">
+            <arg value="-m"/>
+            <arg value="packager.cli"/>
+            <arg value="--epocroot=${build.drive}/" />
+            <arg value="--config=${blocks.config.dir}" />
+            <arg value="--outputdir=${blocks.bundle.dir}" />
+            <arg value="--metadatadir=${blocks.metadata.dir}" />
+            <arg value="--workers=${blocks.workers}" />
+            <arg value="--writer=${blocks.writer}" />
+            <arg line="${arg.blocks.target.rules}" />
+            <arg line="${arg.blocks.source.rules}" />
+            <arg line="${arg.blocks.package.directives}" />
+            <arg value="--createBundle" />
+            <arg value="--debug" />
+            <arg value="--interdeps=${internal.blocks.interdeps.generation.enabled}" />
+        </exec>
+        <hlm:metadatarecord database="${metadata.dbfile}">
+            <hlm:textmetadatainput>
+                <fileset casesensitive="false" file= "${blocks.log.dir}/${build.id}_blocks_archiving.${blocks.log.extension}"/>
+                <metadatafilterset refid="filterset.blocks.archiving" />
+            </hlm:textmetadatainput>
+        </hlm:metadatarecord>
+        <hlm:blocksCreateRepositoryIndex dest="${blocks.bundle.dir}" verbose="true" failonerror="false" />
+    </target>
+    
+    <!--* @property blocks.workspace.id
+     The blocks.workspace.id gets defined by the blocks-create-workspace target while reusing or
+      creating a new workspace.     
+     @scope public
+     @since 12.0.0
+     -->
+    
+    <!--
+     The blocks-create-workspace will try to reuse existing workspace mapped on "${build.drive}/", or
+     create a new one if none exists.
+     
+     If a new workspace is created then repositories from blocks.repositories.id blocksRespositorySet
+     will be added to the newly created workspace.
+     
+     @scope public
+     @since 12.0.0
+     -->
+    <target name="blocks-create-workspace" if="internal.blocks.enabled">
+        <if>
+            <hlm:blocksWorkspaceExists dir="${build.drive}/" verbose="true" />
+            <then>
+                <echo>Reusing current workspace.</echo>
+                <hlm:blocksGetWorkspaceId wsidoutput="blocks.workspace.id" dir="${build.drive}/" verbose="true" /> 
+            </then>
+            <else>
+                <echo>Creating new workspace under ${build.drive}${file.separator}.</echo>
+                <hlm:blocksAddWorkspace name="${build.family}" dir="${build.drive}/" wsidproperty="blocks.workspace.id"  verbose="true" />
+                <if>
+                    <and>
+                        <not>
+                            <hlm:blocksRepositoryExists wsid="${blocks.workspace.id}" verbose="true"/>
+                        </not>
+                        <isreference refid="blocks.repositories.id" />
+                    </and>
+                    <then>
+                        <echo>Creating new repsoitory for workspace ID ${blocks.workspace.id}.</echo>
+                        <hlm:blocksAddRepository wsid="${blocks.workspace.id}">
+                            <repositorySet refid="blocks.repositories.id" />
+                        </hlm:blocksAddRepository>
+                    </then>
+                    <else>
+                        <echo level="warning">'blocks.repositories.id' reference doesn't exist/repository already exists.</echo>
+                    </else>
+                </if>
+            </else>
+        </if>
+    </target>
+
+    <!--
+     The blocks-install-bundles will install bundles on the workspace under build.drive.
+     @scope public
+     @since 12.0.0
+     -->
+    <target name="blocks-install-bundles" if="internal.blocks.enabled" depends="blocks-create-workspace">
+        <if>
+            <isreference refid="blocks.bundle.filters.id" />
+            <then>
+                <hlm:blocksInstallBundle wsid="${blocks.workspace.id}" verbose="true">
+                    <hlm:bundleFilterSet refid="blocks.bundle.filters.id" />
+                </hlm:blocksInstallBundle>
+            </then>
+            <else>
+                <echo level="warning">Nothing to do, blocks.bundle.filters.id reference doesn't exist.</echo>
+            </else>
+        </if>
+        <if>
+            <isreference refid="blocks.group.filters.id" />
+            <then>
+                <hlm:blocksInstallBundle wsid="${blocks.workspace.id}" verbose="true">
+                    <hlm:groupFilterSet refid="blocks.group.filters.id" />
+                </hlm:blocksInstallBundle>
+            </then>
+            <else>
+                <echo level="warning">Nothing to do, blocks.group.filters.id reference doesn't exist.</echo>
+            </else>
+        </if>
+    </target>
+
+    <!--
+     The blocks-update-bundles will update the workspace under build.drive.
+     @scope public
+     @since 12.0.0
+     -->
+    <target name="blocks-update-bundles" if="internal.blocks.enabled" depends="blocks-create-workspace">
+        <hlm:blocksUpdate wsid="${blocks.workspace.id}" />
+    </target>
+
+    <!--
+     The blocks-add-repo will update the current workspace using repositories defined by the
+     blocks.repositories.id reference.
+     
+     @scope public
+     @since 12.0.0
+     -->
+    <target name="blocks-add-repo" if="internal.blocks.enabled" depends="blocks-create-workspace">
+        <if>
+            <and>
+                <not>
+                    <hlm:blocksRepositoryExists wsid="${blocks.workspace.id}" verbose="true"/>
+                </not>
+                <isreference refid="blocks.repositories.id" />
+            </and>
+            <then>
+                <hlm:blocksAddRepository wsid="${blocks.workspace.id}">
+                    <repositorySet refid="blocks.repositories.id" />
+                </hlm:blocksAddRepository>
+            </then>
+            <else>
+                <echo level="warning">'blocks.repositories.id' reference doesn't exist/repository already exists.</echo>
+            </else>
+        </if>
+    </target>
+</project>

@@ -27,6 +27,10 @@ Description:
      
     <target name="test-scenario-valid-build">
         <runScenario scenario="valid_build" target="build" />
+        <loadfile property="main.log" srcFile="${temp.dir}/logs/ant-logging-test_main.ant.log" />
+        <au:assertTrue message="Target name are not recorded properly.">
+            <contains string="${main.log}" substring="test-stages:" />
+        </au:assertTrue>
     </target>
 
     <target name="test-override-scenario">

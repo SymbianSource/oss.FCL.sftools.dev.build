@@ -159,8 +159,8 @@ Description:
 
     <hlm:signalInput id="testAlertsSignalInput" failbuild="now" />
 
-    <hlm:signalInput id="fotaSignalInput" failbuild="never">
-        <hlm:notifierListRef refid="fotaSignalInput" />
+    <hlm:signalInput id="fotaSignalInput" failbuild="defer">
+        <hlm:notifierListRef refid="defaultFailNotifier" />
     </hlm:signalInput>
 
     <hlm:signalInput id="archivePolicyErrorSignalInput" failbuild="never">
@@ -181,6 +181,21 @@ Description:
                 <fileset dir="${build.cache.log.dir}" >
                     <include name="signals/${build.id}_ccm_get_input*" />
                     <include name="${build.id}_ccm_get_input*" />
+                </fileset>
+            </notifierInput>
+        </signalNotifierInput>
+    </hlm:signalListenerConfig>
+    
+    <hlm:signalListenerConfig id="prepWorkAreaSignal2" target="cleanup-work-area" message="Errors during Preparing Work Area">
+        <hlm:targetCondition>
+            <hlm:hasSeverity severity="error" file="${build.cache.log.dir}/signals/${build.id}_cleanup_work_area.log.status.xml" />
+        </hlm:targetCondition>
+        <signalNotifierInput>
+            <signalInput refid="prepWorkAreaSignalInput" />
+            <notifierInput>
+                <fileset dir="${build.cache.log.dir}" >
+                    <include name="signals/${build.id}_cleanup_work_area*" />
+                    <include name="${build.id}_cleanup_work_area*" />
                 </fileset>
             </notifierInput>
         </signalNotifierInput>
@@ -290,15 +305,15 @@ Description:
         </signalNotifierInput>
     </hlm:signalListenerConfig>
 
-    <hlm:signalListenerConfig id="mattiSignal" target="matti-test" message="ATS MATTI creation had errors">
+    <hlm:signalListenerConfig id="tDriverSignal" target="tdriver-test" message="ATS TDRIVER creation had errors">
         <targetCondition>
-            <hlm:hasSeverity severity="error" file="${build.signal.status.dir}/${build.id}_matti.log.status.xml" />
+            <hlm:hasSeverity severity="error" file="${build.signal.status.dir}/${build.id}_tdriver.log.status.xml" />
         </targetCondition>
         <signalNotifierInput>
             <signalInput refid="atsSignalInput" />
             <notifierInput>
                 <fileset dir="${build.log.dir}" >
-                    <include name="**/${build.id}_matti*" />
+                    <include name="**/${build.id}_tdriver*" />
                 </fileset>
             </notifierInput>
         </signalNotifierInput>
@@ -322,7 +337,7 @@ Description:
 
     <hlm:signalListenerConfig id="signalValidatePolicyInvalidOrMissing" target="render-validate-policy" message="Policy file validation had errors">
         <targetCondition>
-            <hlm:hasSeverity severity="error" file="${build.signal.status.dir}/${build.id}_validate-policy.summary.status.xml" />
+            <hlm:hasSeverity severity="error" file="${build.signal.status.dir}/${build.id}_validate-policy.summary.xml.status.xml" />
         </targetCondition>
         <signalNotifierInput>
             <signalInput refid="signalValidatePolicyInvalidOrMissingInput" />

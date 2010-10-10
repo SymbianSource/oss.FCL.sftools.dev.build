@@ -24,6 +24,7 @@ Description:
     <description>Helium Antlib diamonds unittests.</description>
     <property environment="env" />
     <taskdef resource="com/nokia/helium/core/ant/antlib.xml" uri="http://www.nokia.com/helium"/>
+    <taskdef resource="com/nokia/helium/diamonds/ant/antlib.xml" uri="http://www.nokia.com/helium"/>
     <property name="diamonds.enabled" value="true" />
     <property name="diamonds.unitest.dir" location="${ant.file.test-diamonds-invalid-template}/../../../" />
     <import file="../../../../../../nokia/companyproperties.ant.xml" optional="true"/>

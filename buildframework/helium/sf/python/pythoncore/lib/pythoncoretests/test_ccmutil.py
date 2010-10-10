@@ -27,9 +27,8 @@ import ccm
 _logger = logging.getLogger('test.ccmutil')
 logging.basicConfig(level=logging.INFO)
 
-def open_session(username=None, password=None, engine=None, dbpath=None, database=None, reuse=True):
+def open_session(username=None, password=None, engine=None, dbpath=None, database=None):
     """open session"""
-    reuse = True        #just for pylint
     return MockSession(None, username, password, engine, dbpath, database)
 
 nokia.nokiaccm.open_session = open_session

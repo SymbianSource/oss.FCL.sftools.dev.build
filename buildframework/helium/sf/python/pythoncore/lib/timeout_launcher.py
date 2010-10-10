@@ -61,14 +61,15 @@ def main():
         print "e.g: timeout_launcher.py --timeout=1 -- cmd /c sleep 10"
         sys.exit(-1)
     else:
-        _logger.debug("Start command")
+        command = ' '.join(cmdline)
+        _logger.debug("Start command: " + command)
         shell = True
         if _windows:
             shell = False
         if timeout != None:
             finish = time.time() + timeout
             timedout = False
-            p_file = subprocess.Popen(' '.join(cmdline), stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=shell)
+            p_file = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, shell=shell)
             while (p_file.poll() == None):
                 if time.time() > finish:
                     timedout = True
@@ -82,12 +83,12 @@ def main():
                         handle = win32api.OpenProcess(True, win32con.PROCESS_TERMINATE, p_file.pid)
                         win32process.TerminateProcess(handle, -1)
                         print "ERROR: Process killed..."
-                    except Exception, exc:
+                    except Exception, exc: # pylint: disable=W0703
                         print "ERROR: %s" % exc
                 else:
                     os.kill(p_file.pid, 9) # pylint: disable=E1101
                 print "ERROR: exiting..."
-                raise Exception("Timeout exception.")
+                raise IOError("Timeout exception.")
             else:
                 print p_file.communicate()[0]
                 sys.exit(p_file.returncode)

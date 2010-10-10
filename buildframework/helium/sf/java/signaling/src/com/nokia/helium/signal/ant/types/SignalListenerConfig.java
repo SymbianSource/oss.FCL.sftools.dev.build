@@ -20,6 +20,7 @@ package com.nokia.helium.signal.ant.types;
 
 import java.util.Vector;
 
+import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.types.DataType;
 
 /**
@@ -50,7 +51,7 @@ public class SignalListenerConfig extends DataType
     
     private String errMsg;
 
-    private Vector<TargetCondition> targetConditions = new Vector<TargetCondition>();
+    private TargetCondition targetCondition;
         
     private String configID;
 
@@ -85,27 +86,24 @@ public class SignalListenerConfig extends DataType
      */
     public SignalNotifierInput createSignalNotifierInput() {
         SignalNotifierInput input =  new SignalNotifierInput();
-        add(input);
+        signalNotifierInputs.add(input);
+        if (this.signalNotifierInputs.size() > 1) {
+            throw new BuildException(this.getDataTypeName() + " only accept one nested signalNotifierInput at " + this.getLocation());
+        }
         return input;
     }
-
-    /**
-     * Helper function to add the created signalinput
-     * @param filter to be added to the filterset
-     */
-    public void add(SignalNotifierInput input) {
-        signalNotifierInputs.add(input);
-    }
-
 
     /**
      * Creates type target condition of type TargetCondition.
      * @return ReferenceType which is created and stored by the config.
      */
     public TargetCondition createTargetCondition() {
+        if (this.targetCondition != null) {
+            throw new BuildException(this.getDataTypeName() + " only accept one nested targetCondition at " + this.getLocation());
+        }
         TargetCondition condition =  new TargetCondition();
-        add(condition);
-        return condition;
+        this.targetCondition = condition;
+        return this.targetCondition;
     }
 
     /**
@@ -125,24 +123,12 @@ public class SignalListenerConfig extends DataType
     }
 
     /**
-     * Adds the TargetCondition reference to the container.
-     * @param TargetCondition to be added to the container, to be processed during signaling.
-     */    
-    public void add(TargetCondition condition) {
-        if (condition != null) {
-            targetConditions.add(condition);
-        }
-    }    
-
-    /**
      * Helper function to return the Targetcondition matching the target name.
-     * @param String name of the target for which the targetcondition is returned,
+     * @param String name of the target for which the targetcondition is returned, can be null in case of
+     * informative signal, in that case build should not be failing. 
      */    
     public TargetCondition getTargetCondition() {
-        if (targetConditions.isEmpty()) {
-            return null;
-        }
-        return targetConditions.get(0);
+        return this.targetCondition;
     }
 
     /**

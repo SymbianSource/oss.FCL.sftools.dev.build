@@ -21,8 +21,8 @@ package com.nokia.helium.signal.ant.conditions;
 import org.apache.tools.ant.ProjectComponent;
 import org.apache.tools.ant.taskdefs.condition.Condition;
 
-import com.nokia.helium.signal.SignalStatus;
-import com.nokia.helium.signal.SignalStatusList;
+import com.nokia.helium.signal.ant.SignalStatus;
+import com.nokia.helium.signal.ant.Signals;
 
 /**
  * The hasDeferredFailure condition allows you to know if any diferred failure are pending,
@@ -65,7 +65,7 @@ public class DeferredFailureCondition extends ProjectComponent implements
     public boolean eval() {
         if (name != null) {
             getProject().log("Has deferred " + name + " failure?");
-            for (SignalStatus signal : SignalStatusList.getDeferredSignalList().getSignalStatusList()) {
+            for (SignalStatus signal : Signals.getSignals().getDeferredSignalList()) {
                 if (signal.getName().equals(name)) {
                     getProject().log("Failure " + name + " found.");
                     return true;
@@ -74,9 +74,9 @@ public class DeferredFailureCondition extends ProjectComponent implements
         } else {
             getProject().log(
                     "Deferred failure: "
-                            + ((SignalStatusList.getDeferredSignalList().hasSignalInList()) ? "Yes"
+                            + ((!Signals.getSignals().getDeferredSignalList().isEmpty()) ? "Yes"
                                     : "No"));
-            return SignalStatusList.getDeferredSignalList().hasSignalInList();
+            return !Signals.getSignals().getDeferredSignalList().isEmpty();
         }
         return false;
     }

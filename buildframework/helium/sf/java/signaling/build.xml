@@ -22,10 +22,6 @@ Description:
 -->
 <project name="helium-signaling">
     <description>Helium Antlib signaling.</description>
-    
-    
-    <property name="name" value="signaling"/>
-    
     <import file="${builder.dir}/java/macros.ant.xml"/>
     
 </project>

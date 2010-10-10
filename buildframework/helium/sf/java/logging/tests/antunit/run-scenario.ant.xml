@@ -21,36 +21,36 @@ Description:
 ============================================================================
 -->
 <project name="run-scenario" xmlns:ac="antlib:net.sf.antcontrib" xmlns:au="antlib:org.apache.ant.antunit">
-    <description>Helium Antlib logger macro.</description>
+   <description>Helium Antlib logger macro.</description>
 
-    <target name="setUp">
-        <tempfile property="temp.dir" suffix=".dir" />
-        <mkdir dir="${temp.dir}" />
-        <echo>--------------------------------------------</echo>
-    </target>
+   <target name="setUp">
+       <tempfile property="temp.dir" suffix=".dir" />
+       <mkdir dir="${temp.dir}" />
+       <echo>--------------------------------------------</echo>
+   </target>
     
-    <target name="tearDown">
-        <echo>--------------------------------------------</echo>
-        <delete dir="${temp.dir}" />
-    </target>
+   <target name="tearDown">
+       <echo>--------------------------------------------</echo>
+       <delete dir="${temp.dir}" />
+   </target>
     
-    <macrodef name="runScenario">
-        <attribute name="scenario" />
-        <attribute name="target" />
-        <sequential>
-            <exec osfamily="windows" executable="cmd" dir="${ant.file.run-scenario}/../../scenarii/@{scenario}" failonerror="true">
-                 <env key="ANT_ARGS" value="${env.ANT_ARGS} -listener com.nokia.helium.logger.ant.listener.StatusAndLogListener" />
-                 <arg line="/c ..\build.bat @{target}" />
-                 <arg value="-Dant.executor.class=com.nokia.helium.core.ant.HeliumExecutor" />
-                 <arg value="-Dtemp.dir=${temp.dir}" />
-            </exec>
-            <exec osfamily="unix" executable="../bld.sh" dir="${ant.file.run-scenario}/../../scenarii/@{scenario}" failonerror="true">
-                 <env key="ANT_ARGS" value="${env.ANT_ARGS} -listener com.nokia.helium.logger.ant.listener.StatusAndLogListener" />
-                 <arg line="@{target}" />
-                 <arg value="-Dant.executor.class=com.nokia.helium.core.ant.HeliumExecutor" />
-                 <arg value="-Dtemp.dir=${temp.dir}" />
-            </exec>
-        </sequential>
-    </macrodef>
+   <macrodef name="runScenario">
+       <attribute name="scenario" />
+       <attribute name="target" />
+       <sequential>
+           <exec osfamily="windows" executable="cmd" dir="${ant.file.run-scenario}/../../scenarii/@{scenario}" failonerror="true">
+               <env key="ANT_ARGS" value="${env.ANT_ARGS} -listener com.nokia.helium.logger.ant.listener.CommonListener" />
+               <arg line="/c ..\build.bat @{target}" />
+               <arg value="-Dant.executor.class=com.nokia.helium.core.ant.HeliumExecutor" />
+               <arg value="-Dtemp.dir=${temp.dir}" />
+           </exec>
+           <exec osfamily="unix" executable="../bld.sh" dir="${ant.file.run-scenario}/../../scenarii/@{scenario}" failonerror="true">
+               <env key="ANT_ARGS" value="${env.ANT_ARGS} -listener com.nokia.helium.logger.ant.listener.CommonListener" />
+               <arg line="@{target}" />
+               <arg value="-Dant.executor.class=com.nokia.helium.core.ant.HeliumExecutor" />
+               <arg value="-Dtemp.dir=${temp.dir}" />
+           </exec>
+       </sequential>
+   </macrodef>
 
 </project>

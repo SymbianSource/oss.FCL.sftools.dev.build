@@ -18,12 +18,11 @@ package com.nokia.helium.logger.ant.types;
 
 import java.io.File;
 
-import org.apache.log4j.Logger;
-import org.apache.tools.ant.Project;
 import org.apache.tools.ant.types.DataType;
 
+import com.nokia.helium.logger.ant.listener.CommonListenerRegister;
 import com.nokia.helium.logger.ant.listener.StageSummaryHandler;
-import com.nokia.helium.logger.ant.listener.StatusAndLogListener;
+import com.nokia.helium.logger.ant.listener.CommonListener;
 
 /**
  * <code>StageSummary</code> is a Data type when set a build summary is 
@@ -38,21 +37,9 @@ import com.nokia.helium.logger.ant.listener.StatusAndLogListener;
  * @ant.task name="stagesummary" category="Logging"
  * 
  */
-public class StageSummary extends DataType {
+public class StageSummary extends DataType implements CommonListenerRegister {
 
-    private static boolean isStageSummaryHandlerRegistered;
     private File template;
-    private Logger log = Logger.getLogger(getClass());
-
-    public void setProject(Project project)
-    {
-        super.setProject(project);
-        if ( !isStageSummaryHandlerRegistered && StatusAndLogListener.getStatusAndLogListener() != null) {
-            log.debug("Registering stage summary to the StatusAndLogListener listener");
-            StatusAndLogListener.getStatusAndLogListener().register( new StageSummaryHandler() );
-            isStageSummaryHandlerRegistered = true;
-        }
-    }
     
     /**
      * Get the template used for displaying build stage summary.
@@ -72,5 +59,14 @@ public class StageSummary extends DataType {
      */
     public void setTemplate( File template ) {
         this.template = template;
+    }
+
+    @Override
+    public void register(CommonListener commonListener) {
+        if (commonListener.getHandler(StageSummaryHandler.class) != null) {
+            log("Only one stageSummary configuration element should be used. Ignoring type at " + this.getLocation());
+        } else {
+            commonListener.register(new StageSummaryHandler(getTemplate()));
+        }
     }
 }

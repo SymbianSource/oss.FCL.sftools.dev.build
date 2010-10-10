@@ -52,10 +52,16 @@ def generateromcontent(drive, testtype, pkgs):
     atsautoexec.write(r'md c:\logs\testresults' + '\n')
     atsautoexec.write(r'md c:\logs\testexecute' + '\n')
     
+    for _, dst, _, _ in pkgfiles:
+        (_, dstsplit) = os.path.splitdrive(dst)
+        dst_nodrive = 'atsdata' + dstsplit
+        zdst = 'z:\\' + dst_nodrive
+        atsautoexec.write(r'md ' + os.path.dirname(dst) + '\n')
+        atsautoexec.write(r'copy ' + zdst + ' ' + dst + '\n')
+    
     for src, dst, filetype, _ in pkgfiles:
-        (_, dst) = os.path.splitdrive(dst)
-        dst_nodrive = 'atsdata' + dst
-        dst = r'z:\atsdata' + dst
+        (_, dstsplit) = os.path.splitdrive(dst)
+        dst_nodrive = 'atsdata' + dstsplit
         myiby.write('data=' + src + ' ' + dst_nodrive + '\n')
         if 'testscript' in filetype and testtype == 'tef':
             atsautoexec.write('testexecute.exe ' + dst + '\n')
@@ -75,7 +81,6 @@ def generateromcontent(drive, testtype, pkgs):
             atsautoexec.write(r'runtests \sys\bin\atsrtestexec.bat' + '\n')
             myiby.write(r'data=' + rtestexecfilename + r' \sys\bin\atsrtestexec.bat' + '\n')
             
-        
         myiby.write(r'data=' + dummyexecfilename + r' z:\dummytest.txt' + '\n')
         atsautoexec.write(r'RUNTESTS z:\dummytest.txt -p')
     myiby.write("#endif\n")

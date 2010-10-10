@@ -30,6 +30,6 @@ Description:
     <dependencies>
         <dependency org="dom4j" name="dom4j" rev="latest.integration" conf="default" />
         <dependency org="log4j" name="log4j" rev="1.2.9" conf="default" />
-        <dependency name="helium-core" rev="latest.integration" conf="default" />
+        <dependency name="helium-antdata" rev="latest.integration" conf="default" />
     </dependencies>
 </ivy-module>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : build.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="helium-antlib-blocks-demo" xmlns:hlm="http://www.nokia.com/helium">
+    <description>Helium Antlib blocks demo.</description>
+    
+    <taskdef resource="com/nokia/helium/blocks/ant/antlib.xml" uri="http://www.nokia.com/helium" />
+    <import file="../../../companyproperties.ant.xml" />
+    
+    <target name="demo">
+        <mkdir dir="./workspace-demo" />
+        <hlm:blocksAddWorkspace name="unittest-addworkspace" dir="./workspace-demo" wsidproperty="wsid" verbose="true" />
+        <echo>wsid: ${wsid}</echo>
+        <condition property="name.exists" else="false">
+            <hlm:blocksWorkspaceExists name="unittest-addworkspace" />
+        </condition>
+        <echo>unittest-addworkspace exists: ${name.exists}</echo>
+        <condition property="dir.exists" else="false">
+            <hlm:blocksWorkspaceExists dir="workspace-demo" />
+        </condition>
+        <echo>workspace-demo dir exists: ${dir.exists}</echo>
+        <hlm:blocksRemoveWorkspace wsid="${wsid}" verbose="true" />
+    </target>
+
+</project>

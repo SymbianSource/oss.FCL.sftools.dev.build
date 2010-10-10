@@ -1,6 +1,6 @@
 <#--
 ============================================================================ 
-Name        : locations.ftl 
+Name        : diamonds_locations.ftl 
 Part of     : Helium 
 
 Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
@@ -22,7 +22,7 @@ Description:
 <locations>
     <#if ant?keys?seq_contains("release.hydra.dir")>
         <location>
-               <link>${ant["release.hydra.dir"]}</link>
+               <link>${ant["release.hydra.dir"]?xml}</link>
                <description>Hydra server</description>
         </location>
     </#if>
@@ -30,7 +30,7 @@ Description:
         <#list ant["publish.dir.list"]?split(",") as path>
             <#if !path?contains("${")>
                 <location>
-                       <link>${path}</link>
+                       <link>${path?xml}</link>
                        <description>Shared drive</description>
                 </location>
             </#if>
@@ -38,7 +38,7 @@ Description:
     </#if>
     <#if (ant?keys?seq_contains("publish.dir") && !ant["publish.dir"]?contains("${"))>
         <location>
-            <link>${ant["publish.dir"]}</link>
+            <link>${ant["publish.dir"]?xml}</link>
             <description>Shared drive</description>
         </location>
     </#if>

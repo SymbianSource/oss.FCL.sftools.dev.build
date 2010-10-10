@@ -17,6 +17,7 @@
 
 package com.nokia.helium.ant.data;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -34,7 +35,7 @@ import org.dom4j.Node;
 public class AntObjectMeta {
 
     public static final Map<String, Integer> SCOPES;
-    
+
     static {
         Map<String, Integer> tempMap = new HashMap<String, Integer>();
         tempMap.put("public", new Integer(1));
@@ -42,7 +43,7 @@ public class AntObjectMeta {
         tempMap.put("private", new Integer(3));
         SCOPES = Collections.unmodifiableMap(tempMap);
     }
-    
+
     /** The default scope if an element does not have a defined scope. */
     public static final String DEFAULT_SCOPE = "public";
 
@@ -88,7 +89,7 @@ public class AntObjectMeta {
      * @param name Attribute name.
      * @return Attribute value.
      */
-    protected String getAttr(String name) {
+    public String getAttr(String name) {
         if (node.getNodeType() == Node.ELEMENT_NODE) {
             String value = ((Element) node).attributeValue(name);
             if (value != null) {
@@ -114,6 +115,10 @@ public class AntObjectMeta {
             return (RootAntObjectMeta) parent;
         }
         return parent.getRootMeta();
+    }
+
+    public AntObjectMeta getParent() {
+        return parent;
     }
 
     /**
@@ -150,11 +155,15 @@ public class AntObjectMeta {
      */
     public String getLocation() {
         RootAntObjectMeta rootMeta = getRootMeta();
-        String location = rootMeta.getFilePath();
-        if (node instanceof ElementWithLocation) {
-            location += ":" + ((ElementWithLocation)node).getLineNumber();
+        return rootMeta.getFilePath() + ":" + getLineNumber();
+    }
+
+    public Integer getLineNumber() {
+        int lineNum = 0;
+        if (node != null && node instanceof ElementWithLocation) {
+            lineNum = ((ElementWithLocation) node).getLineNumber();
         }
-        return location;
+        return lineNum;
     }
 
     /**
@@ -210,10 +219,10 @@ public class AntObjectMeta {
     public String getDeprecated() {
         return comment.getTagValue("deprecated");
     }
-    
+
     /**
-     * Returns the content of the "since" tag that should indicate which release this feature
-     * was first added.
+     * Returns the content of the "since" tag that should indicate which release
+     * this feature was first added.
      * 
      * @return Since release number.
      */
@@ -247,7 +256,7 @@ public class AntObjectMeta {
         this.comment = comment;
     }
 
-    private void processComment()  {
+    private void processComment() {
         Comment commentNode = getCommentNode();
         if (commentNode != null) {
             comment = new AntComment(commentNode);
@@ -259,8 +268,7 @@ public class AntObjectMeta {
         Node commentNode = null;
         if (node.getNodeType() == Node.COMMENT_NODE) {
             commentNode = node;
-        }
-        else {
+        } else {
             List<Node> children = node.selectNodes("preceding-sibling::node()");
             if (children.size() > 0) {
                 // Scan past the text nodess, which are most likely whitespace
@@ -275,13 +283,12 @@ public class AntObjectMeta {
                 if (child.getNodeType() == Node.COMMENT_NODE) {
                     commentNode = child;
                     log("Node has comment: " + node.getStringValue(), Project.MSG_DEBUG);
-                }
-                else {
+                } else {
                     log("Node has no comment: " + node.toString(), Project.MSG_WARN);
                 }
             }
         }
-        return (Comment)commentNode;
+        return (Comment) commentNode;
     }
 
     public void log(String text, int level) {
@@ -290,8 +297,36 @@ public class AntObjectMeta {
             project.log(text, level);
         }
     }
-    
+
     public String toString() {
         return getName();
+    }
+
+    public List<TaskMeta> getTasks(String taskType) {
+        return getTaskDefinitions(".//" + taskType);
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<MacroMeta> getScriptDefinitions(String xpathExpression) {
+        List<Element> nodes = getNode().selectNodes(xpathExpression);
+        List<MacroMeta> scripts = new ArrayList<MacroMeta>();
+        for (Element node : nodes) {
+            MacroMeta macroMeta = new MacroMeta(this, node);
+            macroMeta.setRuntimeProject(getRuntimeProject());
+            scripts.add(macroMeta);
+        }
+        return scripts;
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<TaskMeta> getTaskDefinitions(String xpathExpression) {
+        List<Element> nodes = getNode().selectNodes(xpathExpression);
+        List<TaskMeta> tasks = new ArrayList<TaskMeta>();
+        for (Element node : nodes) {
+            TaskMeta taskMeta = new TaskMeta(this, node);
+            taskMeta.setRuntimeProject(getRuntimeProject());
+            tasks.add(taskMeta);
+        }
+        return tasks;
     }
 }

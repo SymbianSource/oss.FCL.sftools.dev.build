@@ -56,7 +56,8 @@ Description:
     <!-- build configuration -->
     <property name="sysdef.configurations.list" value="helium_minibuild_ats_compile" />
     <path id="system.definition.files">
-        <fileset dir="." includes="*.sysdef.xml"/>
+        <fileset dir="${build.drive}/sf/app/contacts" includes="package_definition.xml"/>
+        <fileset dir="${build.drive}/sf/os/graphics" includes="package_definition.xml"/>
     </path>
 
 <!--    

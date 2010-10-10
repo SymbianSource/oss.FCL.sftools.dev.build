@@ -100,3 +100,64 @@ class AtsConfigParserTest(unittest.TestCase):
         self.assert_( '<property name="HARNESS2" value="STIF2"/>' in output)
         self.assert_( '<property name="HARNESS2" value="STIF3"/>' not in output)
         self.assert_( '<property name="HARNESS3" value="STIF2"/>' in output)
+
+
+    def test_converttestxml_ats4(self):
+        spectext = """<ATSConfigData>
+    <config name="common" abstract="true">
+
+        <!-- Properties to add/modify -->
+        <config type="properties">
+           <set name="HARNESS" value="STIFx" />
+           <set name="HARNESS2" value="STIF2"/>
+           <set name="HARNESS3" value="STIF2"/>
+           <set name="2" value="3" />
+        </config>
+
+        <!-- Attributes to modify -->
+        <config type="attributes">
+           <set name="xyz" value="2" />
+           <set name="significant" value="true" />
+        </config>
+
+    </config>
+</ATSConfigData>
+        """
+        testxmldataats4 = """<testrun>
+    <metadata>
+        <meta name="name">mybuild</meta> 
+    </metadata>
+    
+    <agents>
+        <agent alias="DEFAULT_GENERIC">
+            <property name="hardware" value="product"/>
+        </agent>
+    </agents>
+
+    <execution defaultAgent="DEFAULT_GENERIC">
+        <initialization>
+        </initialization>    
+
+        <finalization>
+        </finalization>    
+    </execution>    
+    
+    <postActions>        
+    </postActions>
+</testrun>
+        """
+        
+        (file_descriptor, filename) = tempfile.mkstemp()
+        file_handle = os.fdopen(file_descriptor, 'w')
+        file_handle.write(spectext)
+        file_handle.close()
+
+        output = ats3.atsconfigparser.converttestxml(filename, testxmldataats4)
+        os.remove(filename)
+        
+        self.assert_( '<property name="2" value="3"/>' in output)
+        self.assert_( '<property name="HARNESS" value="STIFx"/>' in output)
+        self.assert_( '<property name="HARNESS" value="STIF"/>' not in output)
+        self.assert_( '<property name="HARNESS2" value="STIF2"/>' in output)
+        self.assert_( '<property name="HARNESS2" value="STIF3"/>' not in output)
+        self.assert_( '<property name="HARNESS3" value="STIF2"/>' in output)

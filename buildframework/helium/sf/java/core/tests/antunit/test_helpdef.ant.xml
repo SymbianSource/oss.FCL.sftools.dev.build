@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : test_helpdef.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test_helpdef" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+	
+	<import file="run-scenario.ant.xml" />
+	
+	
+	<target name="test-help">
+        <runScenario scenario="help" target="help" />
+        <au:assertLogContains text="Help:"/>
+        <au:assertLogContains text="This is the documentation."/>
+        <au:assertLogContains text="help.item: ${help.item}"/>
+    </target>
+
+    
+    <target name="test-target-help">
+        <runScenario scenario="help" target="help" cmdline="custom-target"/>
+        <au:assertLogContains text="Help:"/>
+        <au:assertLogContains text="This is the documentation."/>
+        <au:assertLogContains text="help.item: custom-target"/>
+    </target>
+    
+</project>

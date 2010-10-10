@@ -64,7 +64,12 @@ Description:
 
     <target name="raise-deferred-failure">
         <!-- This raise a  testSignal. -->
-        <hlm:signal name="testDeferredSignal" result="1" message="message">
+        <hlm:signal name="testDeferredSignalInput" result="1" message="message" />
+    </target>
+
+    <target name="raise-deferred-failure-nested-signal">
+        <!-- This raise a  testSignal. -->
+        <hlm:signal result="1" message="message">
             <signalNotifierInput>
                 <hlm:signalInput refid="testDeferredSignalInput" />
             </signalNotifierInput>
@@ -101,13 +106,25 @@ Description:
     <target name="test-raise-deferred-failure">
         <!-- This will not fail the build -->
         <antcall target="raise-deferred-failure" />
+        <au:assertTrue>
+            <hlm:hasDeferredFailure name="testDeferredSignalInput"/>
+        </au:assertTrue>
+    </target>
+
+    
+    <target name="test-raise-deferred-failure-nested-signal">
+        <!-- This will not fail the build -->
+        <antcall target="raise-deferred-failure-nested-signal" />
+        <au:assertTrue>
+            <hlm:hasDeferredFailure name="testDeferredSignalInput"/>
+        </au:assertTrue>
     </target>
 
     <target name="test-raise-deferred-now-failure">
         <!-- This will not fail the build -->
         <antcall target="raise-deferred-failure" />
         <!-- But next one should. -->
-        <au:expectfailure expectedMessage="testSignal: message : raise-failure-now">
+        <au:expectfailure expectedMessage="testSignalInput: message : raise-failure-now">
             <antcall target="raise-failure-now" />
         </au:expectfailure>
     </target>
@@ -120,13 +137,14 @@ Description:
     </target>
 
     <target name="test-name-args-not-existing">
-        <au:expectfailure expectedMessage="Could not find signal config for signal name: testNonExistingSignal">
+        <au:expectfailure expectedMessage="name attribute (testNonExistingSignal) is not refering to a signalInput">
             <hlm:signal name="testNonExistingSignal" />
         </au:expectfailure>
     </target>
 
+    <!-- You can use-->
     <target name="test-too-many-nested-element">
-        <au:expectfailure expectedMessage="One and only signal input can be defined">
+        <au:expectfailure expectedMessage="One and only signalInput can be defined at">
             <hlm:signal name="testNonExistingSignal">
                 <signalNotifierInput>
                     <hlm:signalInput refid="testSignalInput" />
@@ -135,5 +153,25 @@ Description:
             </hlm:signal>
         </au:expectfailure>
     </target>
+
+    <!-- Should fail if the signal name is not refering to a signalInput instance -->
+    <fileset id="fileset.id" dir="." />
+    <target name="test-invalid-reference">
+        <au:expectfailure expectedMessage="name attribute (fileset.id) is not refering to a signalInput">
+            <hlm:signal name="fileset.id" />
+        </au:expectfailure>
+    </target>
+
+    
+    <target name="test-deprecation-message">
+        <!-- This raise a  testSignal. -->
+        <hlm:signal name="testDeferredSignal" result="1" message="message">
+            <signalNotifierInput>
+                <hlm:signalInput refid="testDeferredSignalInput" />
+            </signalNotifierInput>
+        </hlm:signal>
+        <au:assertLogContains text="The usage of name and nested signalInputNotifier at the same time is deprecated." />
+    </target>
+
 
 </project>

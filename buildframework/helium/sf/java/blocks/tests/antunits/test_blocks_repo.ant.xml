@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : test_blocks_repo.ant.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="helium-blocks-repo-unittest" xmlns:hlm="http://www.nokia.com/helium" xmlns:au="antlib:org.apache.ant.antunit" 
+    xmlns:ac="antlib:net.sf.antcontrib">
+    <description>Helium blocks repository unittests.</description>
+    
+    <property name="workspace" location="${test.temp.dir}/workspace" />
+    <property name="repo" location="${test.temp.dir}/repo" />
+    
+    <target name="setUp">
+        <tstamp>
+            <format property="tstamp" pattern="yyyyMMddHHmmssSSS" locale="en,UK" />
+        </tstamp>
+        <mkdir dir="${test.temp.dir}" />
+        <delete file="${test.temp.dir}" />
+        <mkdir dir="${test.temp.dir}" />
+        <mkdir dir="${workspace}" />
+        <mkdir dir="${repo}" />
+        
+        <exec executable="blocks.bat"  resultproperty="blocks.result" failifexecutionfails="false" osfamily="windows" />
+        <exec executable="blocks"  resultproperty="blocks.result" failifexecutionfails="false" osfamily="unix" />
+        <condition property="execute.test" value="true">
+            <equals arg1="${blocks.result}" arg2="0" />
+        </condition>
+        <echo>execute.test: ${execute.test}</echo>    
+        <ac:if>
+        	<istrue value="${execute.test}" />
+        	<then>
+                <hlm:blocksAddWorkspace name="unittest-addworkspace-${tstamp}" dir="${workspace}"
+                    wsidproperty="wsid" />
+        	    <copy todir="${workspace}">
+        	        <fileset dir="../" includes="src/**" />
+        	    </copy>
+        	    <mkdir dir="${workspace}/epoc32" />
+        	    <copy todir="${workspace}/epoc32">
+        	        <fileset dir="../" includes="src/**" />
+        	    </copy>
+        	    <exec executable="bundle.bat" dir="${workspace}" osfamily="windows">
+        	        <arg line="create-xml -n blocks -v 1.0" />
+        	        <arg value="--source=${workspace}/src" />
+        	        <arg value="--target=${workspace}/epoc32" />
+        	        <arg value="${test.temp.dir}/blocks.xml" />
+        	    </exec>
+        	    <exec executable="bundle.bat" dir="${workspace}" osfamily="windows">
+        	        <arg line="create" />
+        	        <arg line="-o ${repo}" />
+        	        <arg value="${test.temp.dir}/blocks.xml" />
+        	    </exec>
+                <hlm:blocksCreateRepositoryIndex dest="${repo}" verbose="true" />
+        	</then>
+        </ac:if>
+    </target>
+
+    <target name="tearDown">
+        <ac:if>
+        	<isset property="execute.test" />
+        	<then>
+	        	<hlm:blocksRemoveWorkspace wsid="${wsid}" />
+        	</then>
+        </ac:if>
+        <delete dir="${workspace}" />
+    </target>
+        
+    <target name="test-add-repo-fail-if-url-is-not-defined" if="execute.test">
+        <au:expectfailure expectedMessage="'url' attribute has not been defined.">
+    	    <hlm:blocksAddRepository wsid="${wsid}" />
+        </au:expectfailure>
+    </target>
+
+    <target name="test-add-repo-fail-if-url-is-not-defined-with-name" if="execute.test">
+        <au:expectfailure expectedMessage="'url' attribute has not been defined.">
+    	    <hlm:blocksAddRepository wsid="${wsid}" name="demo"/>
+        </au:expectfailure>
+    </target>
+    
+    <target name="test-add-repo-fail-if-url-defined-with-nested-reposet" if="execute.test">
+        <au:expectfailure expectedMessage="'url' attribute and nested repositorySet element cannot be used at the same time.">
+    	    <hlm:blocksAddRepository wsid="${wsid}" url="${repo}">
+    	        <repositorySet />
+    	    </hlm:blocksAddRepository>
+        </au:expectfailure>
+    </target>
+
+    <target name="test-add-repo-fail-if-nested-reposet-has-invalid-reference-type" if="execute.test">
+        <patternset id="patternset.id" />
+        <au:expectfailure expectedMessage="The type referenced by patternset.id is not of RepositorySet type.">
+    	    <hlm:blocksAddRepository wsid="${wsid}">
+    	        <repositorySet refid="patternset.id" />
+    	    </hlm:blocksAddRepository>
+        </au:expectfailure>
+    </target>
+
+    <target name="test-add-repo-is-working-using-url" if="execute.test">
+        <au:assertFalse message="The workspace should not have any repo allocted yet.">
+            <hlm:blocksRepositoryExists wsid="${wsid}" />
+        </au:assertFalse>
+  	    <hlm:blocksAddRepository wsid="${wsid}" url="file:${repo}" />
+        <au:assertTrue message="The workspace should have a declared repo.">
+            <hlm:blocksRepositoryExists wsid="${wsid}" />
+        </au:assertTrue>
+    </target>
+
+    <target name="test-add-repo-is-working-using-url-and-name" if="execute.test">
+        <au:assertFalse message="The workspace should not have any repo allocted yet.">
+            <hlm:blocksRepositoryExists wsid="${wsid}" />
+        </au:assertFalse>
+  	    <hlm:blocksAddRepository wsid="${wsid}" name="demo" url="file:${repo}" />
+        <au:assertTrue message="The workspace should have a declared repo.">
+            <hlm:blocksRepositoryExists wsid="${wsid}" name="demo" />
+        </au:assertTrue>
+    </target>
+
+    <target name="test-add-repo-is-working-using-nested-reposet" if="execute.test">
+        <au:assertFalse message="The workspace should not have any repo allocted yet.">
+            <hlm:blocksRepositoryExists wsid="${wsid}" />
+        </au:assertFalse>
+  	    <hlm:blocksAddRepository wsid="${wsid}">
+  	        <repositorySet>
+  	            <repository  name="demo" url="file:${repo}" />
+  	        </repositorySet>
+  	    </hlm:blocksAddRepository>
+        <au:assertTrue message="The workspace should have a declared repo.">
+            <hlm:blocksRepositoryExists wsid="${wsid}" name="demo" />
+        </au:assertTrue>
+    </target>
+
+    <hlm:blocksRepositorySet id="reposet.id">
+        <repository  name="demo" url="file:${repo}" />
+    </hlm:blocksRepositorySet>
+
+    <target name="test-add-repo-is-working-using-nested-reposet-ref" if="execute.test">
+        <au:assertFalse message="The workspace should not have any repo allocted yet.">
+            <hlm:blocksRepositoryExists wsid="${wsid}" />
+        </au:assertFalse>
+  	    <hlm:blocksAddRepository wsid="${wsid}">
+  	        <repositorySet refid="reposet.id" />
+  	    </hlm:blocksAddRepository>
+        <au:assertTrue message="The workspace should have a declared repo.">
+            <hlm:blocksRepositoryExists wsid="${wsid}" name="demo" />
+        </au:assertTrue>
+    </target>
+
+    <target name="test-remove-repo-fail-if-repositoryId-is-not-defined" if="execute.test">
+        <au:expectfailure message="'repositoryId' attribute has not been defined.">
+    	    <hlm:blocksRemoveRepository wsid="${wsid}" />
+        </au:expectfailure>
+    </target>
+
+    <target name="test-remove-repo-fail-if-repositoryId-and-name-are-defined" if="execute.test">
+        <au:expectfailure message="'repositoryId' attribute has not been defined.">
+    	    <hlm:blocksRemoveRepository wsid="${wsid}" />
+        </au:expectfailure>
+    </target>
+
+    <target name="test-remove-repo-with-repositoryid" if="execute.test">
+        <au:assertFalse message="The workspace should not have any repo allocted yet.">
+            <hlm:blocksRepositoryExists wsid="${wsid}" />
+        </au:assertFalse>
+  	    <hlm:blocksAddRepository wsid="${wsid}">
+  	        <repositorySet>
+  	            <repository  name="demo" url="file:${repo}" />
+  	        </repositorySet>
+  	    </hlm:blocksAddRepository>
+        <au:assertTrue message="The workspace should have a declared repo.">
+            <hlm:blocksRepositoryExists wsid="${wsid}" name="demo" />
+        </au:assertTrue>
+	    <hlm:blocksRemoveRepository wsid="${wsid}" repositoryId="1" />
+        <au:assertFalse message="The workspace should not have any declared repo.">
+            <hlm:blocksRepositoryExists wsid="${wsid}" />
+        </au:assertFalse>
+    </target>
+
+    <target name="test-remove-repo-with-name" if="execute.test">
+        <au:assertFalse message="The workspace should not have any repo allocted yet.">
+            <hlm:blocksRepositoryExists wsid="${wsid}" />
+        </au:assertFalse>
+  	    <hlm:blocksAddRepository wsid="${wsid}">
+  	        <repositorySet>
+  	            <repository  name="demo" url="file:${repo}" />
+  	        </repositorySet>
+  	    </hlm:blocksAddRepository>
+        <au:assertTrue message="The workspace should have a declared repo.">
+            <hlm:blocksRepositoryExists wsid="${wsid}" name="demo" />
+        </au:assertTrue>
+	    <hlm:blocksRemoveRepository wsid="${wsid}" name="demo" />
+        <au:assertFalse message="The workspace should not have a declared repo.">
+            <hlm:blocksRepositoryExists wsid="${wsid}" name="demo" />
+        </au:assertFalse>
+    </target>
+
+    
+</project>

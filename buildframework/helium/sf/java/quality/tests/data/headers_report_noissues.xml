@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="ASCII" standalone="no" ?>
+<?xml-stylesheet type="text/xsl" href="BBCResults.xsl"?>
+<!-- 
+============================================================================ 
+Name        : headers_report_noissues.xml 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<bbcresults>
+
+  <issuelist>
+    <headerfile>
+      <filename>C:\Symbian\9.2\S60_3rd_FP1_2\epoc32\include\_sdpdefs.h</filename>
+      <api category="Unknown" name="Unknown"/>
+    </headerfile>
+    <headerfile>
+      <filename>C:\Symbian\9.2\S60_3rd_FP1_2\epoc32\include\_sipcodecdefs.h</filename>
+      <api category="Unknown" name="Unknown"/>
+    </headerfile>
+    <headerfile>
+      <filename>C:\Symbian\9.2\S60_3rd_FP1_2\epoc32\include\animationcmd.h</filename>
+      <api category="Unknown" name="Unknown"/>
+    </headerfile>
+  </issuelist>
+</bbcresults>

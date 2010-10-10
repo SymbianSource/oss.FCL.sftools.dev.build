@@ -266,13 +266,14 @@ class LogicalArchiveTest(unittest.TestCase):
             content = [s.strip() for s in content]
         content.sort()
 
-        print content
         if os.sep == '\\':
             expected_paths = [s.strip().lower() for s in expected_paths]
         else:
             expected_paths = [s.strip() for s in expected_paths]
         expected_paths.sort()
-        print expected_paths
+        
+        _logger.info("expected_paths:\n" + str("\n".join(expected_paths)))
+        _logger.info("content:\n" + str("\n".join(content)))
         assert content == expected_paths
         
     def test_split_manifest_file_unicode(self):
@@ -890,6 +891,66 @@ class LogicalArchiveTest(unittest.TestCase):
         self.assert_(content == expectedPaths)
         self.assert_(content1 == expectedPaths1)
         self.assert_(content2 == expectedPaths2)
+        
+    def test_split_on_uncompressed_size_enabled(self):
+        """ Testing the policy mapper with split on uncompressed size enabled. """
+        configDict = {'root.dir': root_test_dir,
+                  'temp.build.dir': os.path.abspath(os.path.join(root_test_dir, 'temp_build_files')),
+                  'archives.dir': root_test_dir,
+                  'name': 's60_policy_mapper_test',
+                  'include': 's60/',
+                  'archive.tool': '7za',
+                  'mapper': 'policy',
+                  'max.files.per.archive': '1',
+                  'split.on.uncompressed.size.enabled': 'true',
+                  'policy.csv': os.path.join(os.environ['TEST_DATA'], 'data/distribution.policy.id_status.csv'),
+                 }
+        config = configuration.Configuration(configDict)
+
+        builder = archive.ArchivePreBuilder(configuration.ConfigurationSet([config]), "config", index=0)
+        manifest_file_path = builder.build_manifest(config)
+        cmds = builder.manifest_to_commands(config, manifest_file_path)
+        
+        expectedPaths0 = ['s60' + os.sep + 'component_private' + os.sep + 'Distribution.Policy.S60\n']
+        expectedPaths1 = ['s60' + os.sep + 'component_private' + os.sep + 'component_private_file.txt\n']
+        expectedPaths2 = ['s60' + os.sep + 'Distribution.Policy.S60\n']
+        expectedPaths3 = ['s60' + os.sep + 'component_public' + os.sep + 'Distribution.Policy.S60\n']
+        expectedPaths4 = ['s60' + os.sep + 'component_public' + os.sep + 'component_public_file.txt\n']
+        expectedPaths5 = ['s60' + os.sep + 'missing' + os.sep + 'subdir' + os.sep + 'Distribution.Policy.S60\n']
+                
+        includeFilePath0 = os.path.join(root_test_dir, 'temp_build_files/s60_policy_mapper_test_part01_1.txt')
+        includeFilePath1 = os.path.join(root_test_dir, 'temp_build_files/s60_policy_mapper_test_part02_1.txt')
+        includeFilePath2 = os.path.join(root_test_dir, 'temp_build_files/s60_policy_mapper_test_part01_0.txt')
+        includeFilePath3 = os.path.join(root_test_dir, 'temp_build_files/s60_policy_mapper_test_part02_0.txt')
+        includeFilePath4 = os.path.join(root_test_dir, 'temp_build_files/s60_policy_mapper_test_part03_0.txt')
+        includeFilePath5 = os.path.join(root_test_dir, 'temp_build_files/s60_policy_mapper_test_part04_0.txt')
+        
+        with open(includeFilePath0) as f_file:
+            content0 = f_file.readlines()
+        with open(includeFilePath1) as f_file:
+            content1 = f_file.readlines()
+        with open(includeFilePath2) as f_file:
+            content2 = f_file.readlines()
+        with open(includeFilePath3) as f_file:
+            content3 = f_file.readlines()
+        with open(includeFilePath4) as f_file:
+            content4 = f_file.readlines()
+        with open(includeFilePath5) as f_file:
+            content5 = f_file.readlines()
+            
+        print "content0: ", content0
+        print "content1: ", content1
+        print "content2: ", content2
+        print "content3: ", content3
+        print "content4: ", content4
+        print "content5: ", content5
+        
+        self.assert_(content0 == expectedPaths0 or content0 == expectedPaths1)
+        self.assert_(content1 == expectedPaths1 or content1 == expectedPaths0)
+        self.assert_(content2 == expectedPaths2)
+        self.assert_(content3 == expectedPaths3 or content3 == expectedPaths4)
+        self.assert_(content4 == expectedPaths4 or content4 == expectedPaths3)
+        self.assert_(content5 == expectedPaths5)
 
 class CheckRootDirValueTest(unittest.TestCase):
     """test root drive value"""

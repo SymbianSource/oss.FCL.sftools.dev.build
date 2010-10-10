@@ -44,7 +44,7 @@ public class SysdefCollection {
     @Column(name = "ID", nullable = false, unique = true, length = 255)
     private String collectionId;
 
-    @Column(name = "NAME", nullable = false, length = 255)
+    @Column(name = "NAME", length = 255)
     private String name;
 
     @Column(name = "PACKAGE_ID", insertable = false, updatable = false, nullable = false)

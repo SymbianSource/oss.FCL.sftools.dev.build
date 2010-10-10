@@ -81,7 +81,7 @@ integration.ant.check_build_duplicates_task(project, self, attributes, elements)
 
     <!-- Render the build duplicates xml file into an HTML output. -->
     <target name="render-build-duplicates" depends="integration-build-duplicates" if="run.build.duplicates">
-        <fmpp sourceFile="${helium.dir}/tools/common/templates/integration/build-duplicates.html.ftl" outputFile="${build.log.dir}/${build.id}_build-duplicates.html">
+        <fmpp sourceFile="${helium.dir}/tools/quality/templates/build-duplicates.html.ftl" outputFile="${build.log.dir}/${build.id}_build-duplicates.html">
             <freemarkerLinks expandProperties="yes">
                             macro: ${helium.dir}/tools/common/templates/macro
                         </freemarkerLinks>

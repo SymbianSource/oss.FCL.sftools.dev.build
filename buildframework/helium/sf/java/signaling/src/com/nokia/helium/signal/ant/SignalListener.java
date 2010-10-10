@@ -18,10 +18,18 @@
 
 package com.nokia.helium.signal.ant;
 
-import org.apache.log4j.Logger;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.List;
+
 import org.apache.tools.ant.BuildEvent;
 import org.apache.tools.ant.BuildListener;
 import org.apache.tools.ant.Project;
+import org.apache.tools.ant.Target;
+
+import com.nokia.helium.signal.ant.types.SignalListenerConfig;
 
 /**
  * Listener class that can connect to Ant and log information regarding to build
@@ -38,14 +46,13 @@ import org.apache.tools.ant.Project;
  * 
  */
 public class SignalListener implements BuildListener {
-    
     private boolean initialized;
-
-    private SignalList signalList;
 
     private Project project;
 
-    private Logger log = Logger.getLogger(this.getClass());
+    private Hashtable<String, SignalListenerConfig> signalListenerConfigs = new Hashtable<String, SignalListenerConfig>();
+
+    private HashMap<String, List<SignalListenerConfig>> targetsMap = new HashMap<String, List<SignalListenerConfig>>();
 
     /**
      * Ant call this function when build start.
@@ -57,28 +64,41 @@ public class SignalListener implements BuildListener {
     /**
      * Triggered when a target starts.
      */
+    @SuppressWarnings("unchecked")
     public void targetStarted(BuildEvent event) {
         if (project == null) {
             project = event.getProject();
         }
-    }
-
-    private void initialize() {
-        signalList = new SignalList(project);
-        //signalList1 = new SignalList(project);
+        if (!initialized) {
+            Hashtable<String, Object> references = (Hashtable<String, Object>)project.getReferences();
+            Enumeration<String> keyEnum = references.keys();
+            while (keyEnum.hasMoreElements()) {
+                String key = keyEnum.nextElement();
+                if (references.get(key) instanceof SignalListenerConfig) {
+                    SignalListenerConfig config = (SignalListenerConfig) references
+                        .get(key);
+                    config.setConfigId(key);
+                    signalListenerConfigs.put(key, config);
+                    String targetName = config.getTargetName();
+                    List<SignalListenerConfig> list;
+                    if (targetsMap.get(targetName) == null) {
+                        list = new ArrayList<SignalListenerConfig>();
+                    } else {
+                        list = targetsMap.get(targetName);
+                    }
+                    list.add(config);
+                    targetsMap.put(targetName, list);
+                }
+            }
+            initialized = true;
+        }
     }
 
     /**
      * Triggered when a target finishes.
      */
     public void targetFinished(BuildEvent event) {
-        if (!initialized) {
-            log.debug("Signaling: Initializing Signaling");
-            initialize();
-            initialized = true;
-        }
-        log.debug("Signaling:targetFinished:sendsignal: " + event.getTarget());
-        signalList.checkAndNotifyFailure(event.getTarget(), event.getProject());
+        checkAndNotifyFailure(event.getTarget(), event.getProject());
     }
 
     /**
@@ -104,4 +124,30 @@ public class SignalListener implements BuildListener {
      */
     public void messageLogged(BuildEvent event) {
     }
+
+    protected boolean checkAndNotifyFailure(Target target, Project prj) {
+        String targetName = target.getName();
+        String signalName = "unknown";
+        boolean retValue = false;
+        
+        if (targetsMap.containsKey(targetName)) {
+            retValue = true;
+            for (SignalListenerConfig config : targetsMap.get(targetName))
+            {
+                String refid = config.getConfigId();
+                Object  configCurrent = prj.getReference(refid);
+                if (configCurrent != null && configCurrent instanceof SignalListenerConfig) {
+                    signalName = refid;
+                }
+                boolean failBuild = false;
+                if (config.getTargetCondition() != null) {
+                    failBuild = config.getTargetCondition().getCondition().eval();
+                }
+                Signals.getSignals().processSignal(prj, config.getSignalNotifierInput(), signalName, 
+                        targetName, config.getErrorMessage(), failBuild);
+            }
+        }
+        return retValue;
+    }
+
 }

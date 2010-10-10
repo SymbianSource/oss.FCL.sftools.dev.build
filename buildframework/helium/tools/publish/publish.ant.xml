@@ -30,7 +30,7 @@ Description:
     <hlm:envdata id="helium.tools.envdata">
         <hlm:executable name="7za" versionArgs="" versionRegex="7-Zip (\S+)"/>
         <hlm:executable name="ant" versionArgs="-version" versionRegex="Apache Ant version (\S+)"/>
-        <hlm:executable name="armcc" versionArgs="" versionRegex="RVCT(.+)" output="stderr"/>
+        <hlm:executable name="armcc" versionArgs="" versionRegex="RVCT(.+)"/>
         <hlm:executable name="ccm" versionArgs="version -c" versionRegex="(\S+)"/>
         <hlm:executable name="codescanner" versionArgs="" versionRegex="version (\S+)"/>
         <hlm:executable name="ctc" versionArgs="" versionRegex="This is CTC\+\+ \(v(\S+)\)"/>
@@ -327,44 +327,40 @@ logging.basicConfig(level=logging.INFO)
 
 def merge_filelist(merger, filelist):
     for filename in filelist:
-        try:
-            LOGGER.info("Merging %s" % filename)
-            merger.merge(filename)
-            os.unlink(filename)
-        except Exception, exc:
-            LOGGER.warning("Warning: %s" % exc)
+        LOGGER.info("Merging %s" % filename)
+        merger.merge(filename)
+        os.unlink(filename)
 
-try:
-    builder = configuration.NestedConfigurationBuilder(open(ant.get_property(r'@{file}')), 'r')
-    configSet = builder.getConfiguration()
-    configs = configSet.getConfigurations(ant.get_property(r'@{config}'))
+filename = ant.get_property(r'@{file}')
+if filename == None:
+    raise IOError(r'@{file} not found')
+builder = configuration.NestedConfigurationBuilder(open(filename), 'r')
+configSet = builder.getConfiguration()
+configs = configSet.getConfigurations(ant.get_property(r'@{config}'))
+
+if len(configs) > 0:
+    filelist = []
+    for config in configs:
+        if config.get_boolean("release.metadata", False):
+            metadata = os.path.join(config['archives.dir'], config['name']+ ".metadata.xml")
+            if os.path.exists(metadata):
+                LOGGER.info("Found %s" % metadata)
+                filelist.append(metadata)
     
-    if len(configs) > 0:
-        filelist = []
-        for config in configs:
-            if config.get_boolean("grace.metadata", False):
-                metadata = os.path.join(config['archives.dir'], config['name']+ ".metadata.xml")
-                if os.path.exists(metadata):
-                    LOGGER.info("Found %s" % metadata)
-                    filelist.append(metadata)
-        
-        merger = None
-        metadata_main = os.path.join(configs[0]['archives.dir'], "release_metadata.xml")
-        if os.path.exists(metadata_main):
-            merger = symrec.MetadataMerger(metadata_main)
-            merge_filelist(merger, filelist)
-            LOGGER.info(str("Writing %s" % metadata_main))
-            merger.save()
-        elif len(filelist) > 0:
-            input = filelist.pop(0)
-            merger = symrec.MetadataMerger(input)
-            merge_filelist(merger, filelist)
-            LOGGER.info(str("Writing %s" % metadata_main))
-            merger.save(metadata_main)
-            os.unlink(input)
-except Exception, e:
-    LOGGER.error('ERROR: %s' % e)
-    sys.exit(-1)
+    merger = None
+    metadata_main = os.path.join(configs[0]['archives.dir'], "release_metadata.xml")
+    if os.path.exists(metadata_main):
+        merger = symrec.MetadataMerger(metadata_main)
+        merge_filelist(merger, filelist)
+        LOGGER.info(str("Writing %s" % metadata_main))
+        merger.save()
+    elif len(filelist) > 0:
+        input = filelist.pop(0)
+        merger = symrec.MetadataMerger(input)
+        merge_filelist(merger, filelist)
+        LOGGER.info(str("Writing %s" % metadata_main))
+        merger.save(metadata_main)
+        os.unlink(input)
 ]]> 
             </hlm:python>
         </sequential>
@@ -405,31 +401,27 @@ filters = None
 if ant.get_property(r'@{filters}') is not None:
     filters = ant.get_property(r'@{filters}').split(r',')
 
-try:
-    filename = ant.get_property(r'@{file}')
-    archive = ant.get_property(r'@{archive}')
-    if not os.path.exists(filename):
-        raise Exception("Could not find file: %s" % filename)
-    if not os.path.exists(archive):
-        raise Exception("Could not find file: %s" % archive)
+filename = ant.get_property(r'@{file}')
+archive = ant.get_property(r'@{archive}')
+if not os.path.exists(filename):
+    raise Exception("Could not find file: %s" % filename)
+if not os.path.exists(archive):
+    raise Exception("Could not find file: %s" % archive)
 
-    LOGGER.info(str("Opening %s" % filename))
-    md = symrec.ReleaseMetadata(filename)
-    if os.path.basename(archive) not in md.keys():
-        LOGGER.info(str("Adding %s to metadata" % os.path.basename(archive)))
-        md.add_package(os.path.basename(archive), md5checksum=fileutils.getmd5(archive), size=os.path.getsize(archive), filters=filters)
-    else:
-        LOGGER.info(str("Updating %s to metadata" % os.path.basename(archive)))
-        result = md[os.path.basename(archive)]
-        result['md5checksum'] = unicode(fileutils.getmd5(archive))
-        result['size'] = unicode(os.path.getsize(archive))
-        if filters is not None:
-            result['filters'] = filters
-        md[os.path.basename(archive)] = result
-    md.save()
-except Exception, e:
-    LOGGER.error('ERROR: %s' % e)
-    sys.exit(-1)
+LOGGER.info(str("Opening %s" % filename))
+md = symrec.ReleaseMetadata(filename)
+if os.path.basename(archive) not in md.keys():
+    LOGGER.info(str("Adding %s to metadata" % os.path.basename(archive)))
+    md.add_package(os.path.basename(archive), md5checksum=fileutils.getmd5(archive), size=os.path.getsize(archive), filters=filters)
+else:
+    LOGGER.info(str("Updating %s to metadata" % os.path.basename(archive)))
+    result = md[os.path.basename(archive)]
+    result['md5checksum'] = unicode(fileutils.getmd5(archive))
+    result['size'] = unicode(os.path.getsize(archive))
+    if filters is not None:
+        result['filters'] = filters
+    md[os.path.basename(archive)] = result
+md.save()
 ]]> 
             </hlm:python>
         </sequential>
@@ -462,26 +454,24 @@ LOGGER.setLevel(level=logging.INFO)
 logging.basicConfig(level=logging.INFO)
           
 # Reading the config from Ant
-try:
-    config_filename = ant.get_property(r'@{file}')
-    spec_name = ant.get_property(r'@{config}')
-    # Loading the config file.                        
-    builder = configuration.NestedConfigurationBuilder(open(config_filename, 'r'))
-    configSet = builder.getConfiguration()
-    configs = configSet.getConfigurations(spec_name)
+config_filename = ant.get_property(r'@{file}')
+spec_name = ant.get_property(r'@{config}')
+# Loading the config file.
+if config_filename == None:
+    raise IOError(r'@{file} not found')
+builder = configuration.NestedConfigurationBuilder(open(config_filename, 'r'))
+configSet = builder.getConfiguration()
+configs = configSet.getConfigurations(spec_name)
 
-    if len(configs) > 0:
-        if os.path.exists(os.path.join(configs[0]['archives.dir'], "release_metadata.xml")):
-            md5update = symrec.MD5Updater(os.path.join(configs[0]['archives.dir'], "release_metadata.xml"))
-            md5update.update()
-            md5update.save()
-        else:
-            LOGGER.warning(str('WARNING: Could not find %s.' % os.path.join(configs[0]['archives.dir'], "release_metadata.xml")))
+if len(configs) > 0:
+    if os.path.exists(os.path.join(configs[0]['archives.dir'], "release_metadata.xml")):
+        md5update = symrec.MD5Updater(os.path.join(configs[0]['archives.dir'], "release_metadata.xml"))
+        md5update.update()
+        md5update.save()
     else:
-        LOGGER.warning('WARNING: No config.')
-except Exception, e:
-    LOGGER.error('ERROR: %s' % e)
-    sys.exit(-1)
+        LOGGER.warning(str('WARNING: Could not find %s.' % os.path.join(configs[0]['archives.dir'], "release_metadata.xml")))
+else:
+    LOGGER.warning('WARNING: No config.')
 ]]> 
         </hlm:python>
         </sequential>
@@ -643,6 +633,8 @@ if len(configs) > 0 or not failonemptyconfig:
         toAppendEmakeRoot = prebuilder.checkRootDirValue(builder, config_parsed_filename, project.getProperty('build.drive'), config_type)
         if toAppendEmakeRoot is not None:
             project.setProperty("emake.root.to.append", str(toAppendEmakeRoot))
+    else:
+        project.setProperty("emake.root.to.append", "")
     prebuilder.writeTopLevel(os.path.join(project.getProperty('build.drive') + os.sep, 'ZIP_' + config_type + outputext), project.getProperty('temp.build.dir'), config_parsed_filename)       
 else:
     raise Exception('There are no archive configs to build. Looked for %s' % config_type)
@@ -894,19 +886,19 @@ print md5file.replace('.md5', '')
 
         <move file="${delta.zip.delete.file}" todir="${delta.zip.temp.location}" />
         <move file="${md5.signature.file}" todir="${delta.zip.temp.location}" />
-
-        <exec executable="C:\APPS\symrec\symrec" failonerror="${failonerror}">
+        
+        <exec osfamily="windows" executable="C:\APPS\symrec\symrec" failonerror="${failonerror}">
             <arg value="create" />
             <arg value="-ser" />
-            <arg value="${release.grace.service}" />
+            <arg value="${hydra.service}" />
             <arg value="-pro" />
-            <arg value="${release.grace.product}" />
+            <arg value="${hydra.product}" />
             <arg value="-rel" />
             <arg value="${release.label}" />
             <arg value="-relroot" />
             <arg value="${delta.zip.location}" />
             <arg value="-dep" />
-            <arg value="${release.grace.service}/${release.grace.product}/${old.release.label}" />
+            <arg value="${hydra.service}/${hydra.product}/${old.release.label}" />
         </exec>
 
         <move file="${delta.zip.temp.location}/specialInstructions.xml" tofile="${delta.zip.delete.file}" />
@@ -952,20 +944,6 @@ if not os.path.exists(md5lastbuild):
 
     <!-- Creates a delta from the prevous build to the current one -->
     <target name="delta-zip" depends="delta-use-last-build,build-md5,generate-delta" description="Generate a delta between two build areas" />
-
-
-    <!-- Upload the delta and config into Grace -->
-    <target name="delta-zip-grace-upload">
-        <fileset id="grace.delta.zips.id" dir="${delta.zip.location}">
-            <include name="**/*.zip" />
-            <include name="**/*.xml" />
-        </fileset>
-
-        <antcall target="grace-upload">
-            <reference refid="grace.delta.zips.id" torefid="release.zips" />
-        </antcall>
-    </target>
-
     
     <!-- Publishes the Ant build log.
         
@@ -1046,11 +1024,13 @@ if not os.path.exists(md5lastbuild):
     
     
     <!-- This target will zip the WA depending on the ado mapping file -->
-    <target name="zip-wa" depends="ido-create-ado-mapping" if="internal.archive.wa.enabled">
+    <target name="zip-wa" if="internal.archive.wa.enabled">
+        <property name="zip.mapping.file" location="${build.output.dir}/build/ado_mapping_zip.ini" />
+        <hlm:createAdoMappingMacro adoMapFile="${zip.mapping.file}" />
         <tempfile property="zipwa.dynamic.config" suffix=".xml" deleteonexit="false" destdir="${temp.build.dir}"/>
-        <fmpp sourceFile="${helium.dir}/tools/common/templates/ido/zip-ant-wa-copy.xml.ftl" outputFile="${zipwa.dynamic.config}">
+        <fmpp sourceFile="${helium.dir}/tools/publish/templates/zip-ant-wa-copy.xml.ftl" outputFile="${zipwa.dynamic.config}">
             <data expandProperties="yes">
-                inputfile: antProperty(ado.mapping.file)
+                inputfile: antProperty(zip.mapping.file)
                 ant: antProperties()
                 data: eval('
                     java.io.FileInputStream pin = new java.io.FileInputStream(filename);

@@ -61,12 +61,13 @@ for eid in range(elements.get("fileset").size()):
     for filename in ds.getIncludedFiles():
         filename = os.path.join(str(ds.getBasedir()), str(filename))
         project.log("Analysing %s" % filename, 4)
-        input = open(filename, 'r')
-        for line in input.readlines():
+        inputfile = open(filename, 'r')
+        for line in inputfile.readlines():
             m = match_target.match(line)
             # do not match resource files.
             if m != None and os.path.splitext(m.group(1))[1].lower() != ".rsc":            
                 output.write("%s : %s\n" % (os.path.splitdrive(filename)[1], m.group(1)))
+        inputfile.close()
 output.close()
         ]]>
     </scriptdef>

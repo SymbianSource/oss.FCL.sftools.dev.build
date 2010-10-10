@@ -229,8 +229,8 @@ Description:
             <signalInput refid="validSignalInput" />
         </signalNotifierInput>
 
-        <targetCondition >
-            <!-- <xml severity="error" file="./data/helium_minibuild_ido_compile.log.xml" /> -->
+        <targetCondition>
+            <cond:not><equals arg1="0" arg2="0"/></cond:not>
         </targetCondition>
     </hlm:signalListenerConfig>
 
@@ -239,7 +239,7 @@ Description:
             <signalInput refid="validSignalInput" />
         </signalNotifierInput>
         <targetCondition >
-            <!-- <cond:not><equals arg1="0" arg2="${number.of.error}"/></cond:not> -->
+            <cond:not><equals arg1="0" arg2="0"/></cond:not>
         </targetCondition>
     </hlm:signalListenerConfig>
 
@@ -248,7 +248,7 @@ Description:
             <signalInput refid="validSignalInput" />
         </signalNotifierInput>
         <targetCondition >
-            <!--<cond:not><equals arg1="0" arg2="0"/></cond:not> -->
+            <cond:not><equals arg1="0" arg2="0"/></cond:not>
         </targetCondition>
     </hlm:signalListenerConfig>
 
@@ -274,12 +274,12 @@ Description:
         </targetCondition>
     </hlm:signalListenerConfig>
 
-    <hlm:signalListenerConfig id="failNow" target="fail-no-condition" message="Errors during testing" >
+    <!-- Not allowed hlm:signalListenerConfig id="failNow" target="fail-no-condition" message="Errors during testing" >
         <signalNotifierInput>
             <signalInput refid="input-fail-build-never" />
         </signalNotifierInput>
         <targetCondition />
-    </hlm:signalListenerConfig>
+    </hlm:signalListenerConfig-->
 
     <hlm:signalListenerConfig id="failbuildDefer" target="fail-defer-false-condition" message="Errors during testing">
         <signalNotifierInput>
@@ -320,7 +320,7 @@ Description:
             <signalInput refid="input-fail-build-never" />
         </signalNotifierInput>
 
-        <targetCondition  >
+        <targetCondition>
             <cond:not>
                 <equals arg1="0" arg2="${number.of.errors}" />
             </cond:not>
@@ -330,6 +330,41 @@ Description:
     <target name="test-wrong-type">
         <au:expectfailure>
             <hlm:signalInput id="invalid-input1" failbuild="wrong-type" />
+        </au:expectfailure>
+    </target>
+    
+    
+    <target name="test-dual-cond-failure">
+        <au:expectfailure expectedMessage="TargetCondition type can only accept one condition at">
+            <hlm:signalListenerConfig id="dualCondSignal" target="compile-signal-test" message="Errors happened during compilation">
+                <signalNotifierInput>
+                    <signalInput refid="compilesignalinput" />
+                </signalNotifierInput>
+                <targetCondition >
+                    <cond:not>
+                        <equals arg1="0" arg2="${number.of.errors}" />
+                    </cond:not>
+                    <cond:equals arg1="0" arg2="${number.of.errors}" />
+                </targetCondition>
+            </hlm:signalListenerConfig>
+        </au:expectfailure>
+    </target>
+
+    <target name="test-dual-signal-input-failure">
+        <au:expectfailure expectedMessage="signalListenerConfig only accept one nested signalNotifierInput at">
+            <hlm:signalListenerConfig id="dualSignalNotifierInputSignal" target="compile-signal-test" message="Errors happened during compilation">
+                <signalNotifierInput>
+                    <signalInput refid="compilesignalinput" />
+                </signalNotifierInput>
+                <signalNotifierInput>
+                    <signalInput refid="compilesignalinput" />
+                </signalNotifierInput>
+                <targetCondition>
+                    <cond:not>
+                        <equals arg1="0" arg2="${number.of.errors}" />
+                    </cond:not>
+                </targetCondition>
+            </hlm:signalListenerConfig>
         </au:expectfailure>
     </target>
 </project>

@@ -18,8 +18,6 @@
 #===============================================================================
 """ Testing preparation module """  
 
-# pylint: disable=R0201
-
 import tempfile
 from shutil import rmtree
 import os
@@ -496,9 +494,9 @@ class _project():
         """Emulating project.exists method"""
         return True                
 
-    def snapshot(self, target_dir, status):
+    def snapshot(self, target_dir, _):
         """Emulating project.snapshot method"""
-        print "Snapshot created"
+        print "Snapshot created: target_dir = " + str(target_dir)
 
     def update(self, status, replace_subprojects, update_keepgoing, result): 
         """Emulating project.update method"""

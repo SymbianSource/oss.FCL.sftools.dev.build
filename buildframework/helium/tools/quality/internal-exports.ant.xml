@@ -60,7 +60,7 @@ for eid in range(elements.get("fileset").size()):
         parser.parse()
         for component in parser.internalexports.keys():
             output.write("    <component name=\"%s\">\n" % component)
-            output.write("".join(map(lambda x: "        <file name=\"%s\"/>\n" % x, parser.internalexports[component])))
+            output.write("".join(["        <file name=\"%s\"/>\n" % x for x in parser.internalexports[component]]))
             output.write("    </component>\n")
 output.write("</internalexports>\n")
 output.close()
@@ -83,7 +83,7 @@ output.close()
     
     <!-- Render the build duplicates xml file into an HTML output. -->
     <target name="render-internal-exports" depends="integration-internal-exports">
-        <fmpp sourceFile="${helium.dir}/tools/common/templates/integration/internal-exports.html.ftl"
+        <fmpp sourceFile="${helium.dir}/tools/quality/templates/internal-exports.html.ftl"
               outputFile="${build.log.dir}/${build.id}_internal-exports.html">
             <freemarkerLinks expandProperties="yes">
                 macro: ${helium.dir}/tools/common/templates/macro

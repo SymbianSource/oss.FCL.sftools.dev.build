@@ -16,17 +16,7 @@
  */
 package com.nokia.helium.antlint.ant.types;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.dom4j.Document;
-import org.dom4j.DocumentException;
-import org.dom4j.Element;
-import org.dom4j.Node;
-import org.dom4j.io.SAXReader;
-
-import com.nokia.helium.antlint.ant.AntlintException;
+import com.nokia.helium.ant.data.MacroMeta;
 
 /**
  * <code>CheckScriptSize</code> is used to check the size of script. By default,
@@ -41,91 +31,37 @@ import com.nokia.helium.antlint.ant.AntlintException;
  *               &lt;include name=&quot;*build.xml&quot;/&gt;
  *               &lt;include name=&quot;*.antlib.xml&quot;/&gt;
  *       &lt;/fileset&gt;
- *       &lt;CheckScriptSize&quot; severity=&quot;error&quot; enabled=&quot;true&quot; /&gt;
+ *       &lt;checkScriptSize severity=&quot;error&quot; /&gt;
  *  &lt;/antlint&gt;
  * </pre>
  * 
- * @ant.task name="CheckScriptSize" category="AntLint"
+ * @ant.task name="checkScriptSize" category="AntLint"
  * 
  */
-public class CheckScriptSize extends AbstractCheck {
-
-    private File antFile;
+public class CheckScriptSize extends AbstractScriptCheck {
 
     /**
      * {@inheritDoc}
      */
-    public void run(Element node) {
-        if (node.getName().equals("target")) {
-            checkSizeOfScript(node);
-        }
+    protected String getMacroXPathExpression() {
+        return null;
     }
 
     /**
-     * Check against the given node.
-     * 
-     * @param node
-     *            is the node to check.
+     * {@inheritDoc}
      */
-    @SuppressWarnings("unchecked")
-    private void checkSizeOfScript(Element node) {
-        String target = node.attributeValue("name");
-
-        List<Node> statements = node.selectNodes("//target[@name='" + target
-                + "']/script | //target[@name='" + target
-                + "']/*[name()=\"hlm:python\"]");
-
-        for (Node statement : statements) {
-            int size = statement.getText().length();
-            if (size > 1000) {
-                this
-                        .getReporter()
-                        .report(
-                                this.getSeverity(),
-                                "Target "
-                                        + target
-                                        + " has a script with "
-                                        + size
-                                        + " characters, code should be inside a python file",
-                                this.getAntFile(), 0);
-            }
-        }
+    protected String getScriptXPathExpression(String targetName) {
+        return ".//script | " + "//target[@name='" + targetName + "']/*[name()=\"hlm:python\"]";
     }
 
-    public void run(File antFilename) throws AntlintException {
-
-        List<Element> targetNodes = new ArrayList<Element>();
-
-        this.antFile = antFilename;
-        SAXReader saxReader = new SAXReader();
-        Document doc;
-        try {
-            doc = saxReader.read(antFilename);
-            elementTreeWalk(doc.getRootElement(), "target", targetNodes);
-        } catch (DocumentException e) {
-            throw new AntlintException("Invalid XML file " + e.getMessage());
-        }
-        for (Element targetNode : targetNodes) {
-            run(targetNode);
-        }
-
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.apache.tools.ant.types.DataType#toString()
+    /**
+     * {@inheritDoc}
      */
-    public String toString() {
-        return "CheckScriptSize";
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.nokia.helium.antlint.ant.types.Check#getAntFile()
-     */
-    public File getAntFile() {
-        return this.antFile;
+    protected void run(MacroMeta macroMeta) {
+        int size = macroMeta.getText().length();
+        if (size > 1000) {
+            report("Target " + macroMeta.getParent().getName() + " has a script with " + size
+                    + " characters, code should be inside a python file", macroMeta.getLineNumber());
+        }
     }
 }

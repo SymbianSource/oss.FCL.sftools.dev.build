@@ -51,21 +51,25 @@ class Mapper(object):
         self._metadata = None
         if not os.path.exists(self._config['archives.dir']):
             os.makedirs(self._config['archives.dir'])
-        if self._config.has_key("grace.metadata") and self._config.get_boolean("grace.metadata", False):
-            if self._config.has_key("grace.template") and os.path.exists(self._config["grace.template"]) and \
+        
+        if self._config.has_key("grace.metadata"):
+            raise Exception('grace.metadata not supported, see documentation for correct configuration')
+        
+        if self._config.has_key("release.metadata") and self._config.get_boolean("release.metadata", False):
+            if self._config.has_key("release.template") and os.path.exists(self._config["release.template"]) and \
              not os.path.exists(os.path.join(self._config['archives.dir'], self._config['name'] + ".metadata.xml")):
-                shutil.copy(config["grace.template"], os.path.join(self._config['archives.dir'], self._config['name'] + ".metadata.xml"))
+                shutil.copy(config["release.template"], os.path.join(self._config['archives.dir'], self._config['name'] + ".metadata.xml"))
             self._metadata = symrec.ReleaseMetadata(os.path.join(self._config['archives.dir'], self._config['name']+ ".metadata.xml"),
-                                       service=self._config['grace.service'],
-                                       product=self._config['grace.product'],
-                                       release=self._config['grace.release'])
+                                       service=self._config['release.service'],
+                                       product=self._config['release.product'],
+                                       release=self._config['release.name'])
             self._metadata.save()            
         
     def declare_package(self, filename, extract="single"):
         """ Add a package to the metadata file. """
         if self._metadata is None:
             return
-        self._metadata.add_package(os.path.basename(filename), extract=extract, filters=self._config.get_list('grace.filters', None), default=self._config.get_boolean('grace.default', True))
+        self._metadata.add_package(os.path.basename(filename), extract=extract, filters=self._config.get_list('release.filters', None), default=self._config.get_boolean('release.default', True))
         self._metadata.save()
     
     def create_commands(self, manifest):
@@ -99,12 +103,12 @@ class DefaultMapper(Mapper):
             if len(manifests) == 1:
                 filename = os.path.join(self._config['archives.dir'], self._config['name'])
             _logger.info("  * " + filename + self._tool.extension())
-            self.declare_package(filename + self._tool.extension(), self._config.get('grace.extract', 'single'))
+            self.declare_package(filename + self._tool.extension(), self._config.get('release.extract', 'single'))
             result.extend(self._tool.create_command(self._config.get('zip.root.dir', self._config['root.dir']), filename, manifests=[manifest]))
         
         return [result]
 
-    def _split_manifest_file(self, name, manifest_file_path):
+    def _split_manifest_file(self, name, manifest_file_path, key=None):
         """ This method return a list of files that contain the content of the zip parts to create. """
         filenames = []
         
@@ -137,7 +141,10 @@ class DefaultMapper(Mapper):
                             files = 0
                             part += 1
         
-                            filename = "%s_part%02d" % (name, part)
+                            if key is not None:
+                                filename = "%s_part%02d_%s" % (name, part, key)
+                            else:
+                                filename = "%s_part%02d" % (name, part)
                             filenames.append(os.path.join(self._config['temp.build.dir'], filename + ".txt"))
         
                             output = codecs.open(os.path.join(self._config['temp.build.dir'], filename + ".txt"), 'w', "utf-8" )
@@ -156,7 +163,10 @@ class DefaultMapper(Mapper):
                                 files = 0
                                 part += 1
         
-                                filename = "%s_part%02d" % (name, part)
+                                if key is not None:
+                                    filename = "%s_part%02d_%s" % (name, part, key)
+                                else:
+                                    filename = "%s_part%02d" % (name, part)
                                 filenames.append(os.path.join(self._config['temp.build.dir'], filename + ".txt"))
                                 
                                 output = open(os.path.abspath(os.path.join(self._config['temp.build.dir'], filename + ".txt")), 'w')
@@ -178,7 +188,7 @@ class DefaultMapper(Mapper):
         return filenames
 
 
-class PolicyMapper(Mapper):
+class PolicyMapper(DefaultMapper):
     """ Implements a policy content mapper.
     
     It transforms a list of files into a list of commands with their inputs.
@@ -188,7 +198,7 @@ class PolicyMapper(Mapper):
     
     def __init__(self, config, archiver):
         """ Initialization. """
-        Mapper.__init__(self, config, archiver)
+        DefaultMapper.__init__(self, config, archiver)
         self._policies = {}
         self._policy_cache = {}
         self._binary = {}
@@ -233,11 +243,22 @@ class PolicyMapper(Mapper):
         
         # Generating sublists.
         for key in self._policies.keys():
+            manifests = []
             self._policies[key].close()
             manifest = os.path.join(self._config['temp.build.dir'], self._config['name'] + "_%s" % key + ".txt")
-            filename = os.path.join(self._config['archives.dir'], self._config['name'] + "_%s" % key)
-            _logger.info("  * " + filename + self._tool.extension())
-            result.extend(self._tool.create_command(self._config.get('zip.root.dir', self._config['root.dir']), filename, manifests=[manifest]))
+            _logger.info("  * Input manifest: " + manifest)
+            if self._config.has_key("split.on.uncompressed.size.enabled") and self._config.get_boolean("split.on.uncompressed.size.enabled", "false"):
+                manifests = self._split_manifest_file(self._config['name'], manifest, key)
+            else:
+                manifests.append(manifest)
+            for manifest in manifests:
+                _logger.info("  * Creating command for manifest: " + manifest)
+                filename = os.path.join(self._config['archives.dir'], os.path.splitext(os.path.basename(manifest))[0])
+                if len(manifests) == 1:
+                    filename = os.path.join(self._config['archives.dir'], self._config['name'] + "_%s" % key)
+                _logger.info("  * " + filename + self._tool.extension())
+                self.declare_package(filename + self._tool.extension(), self._config.get('release.extract', 'single'))
+                result.extend(self._tool.create_command(self._config.get('zip.root.dir', self._config['root.dir']), filename, manifests=[manifest]))
         stages.append(result)
         
         # See if any internal archives need to be created

@@ -39,10 +39,20 @@ Description:
     <!-- Override docs targets to do more for Helium. -->
     <target name="apidocs" depends="internal.docs.apidocs"/>
     <!-- Generate rst files for docs -->
-    <target name="prep-textdocs" depends="overview-to-html,dependency-diagram,
-        dependency-logs,release-diff,helium-user-graph,internal.docs.prep-textdocs,helium-prep-textdocs"/>
+    <target name="prep-textdocs">
+        <parallel>
+            <antcall target="overview-to-html"/>
+            <antcall target="dependency-diagram"/>
+            <antcall target="dependency-logs"/>
+            <antcall target="release-diff"/>
+            <antcall target="helium-user-graph"/>
+        </parallel>
+        <antcall target="internal.docs.prep-textdocs"/>
+        <antcall target="helium-prep-textdocs"/>
+    </target>
+    
     <!-- generate all the user documentation for helium -->
-    <target name="docs" depends="clean-docs,docs-database,apidocs,textdocs"/>
+    <target name="docs" depends="clean-docs,docs-database,apidocs,textdocs,docs-check-links"/>
     
     <!-- Generates an Ant XML database file showing only public content.
     @scope private    

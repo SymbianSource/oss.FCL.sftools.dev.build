@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- 
 ============================================================================ 
-Name        : libs.ant.xml 
+Name        : log4j.xml 
 Part of     : Helium 
 
 Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
@@ -42,7 +42,7 @@ Description:
 
     <appender name="FILE" class="org.apache.log4j.RollingFileAppender">
         <param name="File" value="${log4j.cache.dir}/hlm_debug.log"/>
-        <param name="append" value="false"/>
+        <param name="append" value="true"/>
         <layout class="org.apache.log4j.PatternLayout">
                <param name="ConversionPattern" 
                             value="%d{HH:mm:ss,SSS}  %-2p - %-20c{1} - %m  %n "/>

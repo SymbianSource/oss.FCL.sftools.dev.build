@@ -25,9 +25,13 @@ Description:
         Ant task definition declarations.
     </description>
     <taskdef resource="com/nokia/helium/core/ant/antlib.xml" uri="http://www.nokia.com/helium"/>
-    <typedef name="finaltargetdef" classname="com.nokia.helium.core.ant.types.HlmFinalTargetDef"/> 
-
+    <typedef name="finaltargetdef" classname="com.nokia.helium.core.ant.types.HlmFinalTargetDef" uri="http://www.nokia.com/helium"/> 
+    <typedef name="postbuildqualitycheck" classname="com.nokia.helium.core.ant.types.PostBuildQualityCheckAction" uri="http://www.nokia.com/helium"/>
+    <typedef name="helpdef" classname="com.nokia.helium.core.ant.types.HelpDef" uri="http://www.nokia.com/helium"/>
+    
     <hlm:deflist id="helium-core.list">
-        <finaltargetdef/>
+        <hlm:postbuildqualitycheck/>
+        <hlm:helpdef/>
+        <hlm:finaltargetdef/>
     </hlm:deflist>
 </project>

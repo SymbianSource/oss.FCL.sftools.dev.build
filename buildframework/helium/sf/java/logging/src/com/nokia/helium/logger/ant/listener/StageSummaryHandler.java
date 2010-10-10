@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
 import org.apache.tools.ant.BuildEvent;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
@@ -37,7 +36,6 @@ import org.apache.tools.ant.Target;
 import org.apache.tools.ant.util.DateUtils;
 
 import com.nokia.helium.core.ant.types.Stage;
-import com.nokia.helium.logger.ant.types.StageSummary;
 
 import freemarker.cache.FileTemplateLoader;
 import freemarker.template.Configuration;
@@ -49,72 +47,60 @@ import freemarker.template.Template;
  * build process.
  * 
  */
-public class StageSummaryHandler implements Handler {
+public class StageSummaryHandler implements BuildEventHandler, TargetEventHandler {
 
     public static final String PASSED = "PASSED";
     public static final String FAILED = "FAILED";
 
-    private Logger log = Logger.getLogger(getClass());
-    private boolean lookup4Stages;
     private boolean summarize;
+    private boolean initialized;
+    
 
-    private Map<String, StageWrapper> completedStages;
+    private Map<String, StageWrapper> completedStages = new LinkedHashMap<String, StageWrapper>();;
     private StageWrapper currentStage;
     private Hashtable<String, Stage> stages;
     private File template;
 
-    /**
-     * Create an instance of {@link StageSummaryHandler}
-     * 
-     */
-    public StageSummaryHandler() {
-        completedStages = new LinkedHashMap<String, StageWrapper>();
-        log.debug("StageStatusHandler instantiated");
+    public StageSummaryHandler(File template) {
+        this.template = template;
     }
 
     /**
      * {@inheritDoc}
      */
-    public void handleBuildStarted(BuildEvent event) {
+    public void buildStarted(BuildEvent event) {
 
     }
 
     /**
      * {@inheritDoc}
      */
-    public void handleBuildFinished(BuildEvent event) {
+    public void buildFinished(BuildEvent event) {
         if (summarize && currentStage != null) {
             endCurrentStage();
         }
         if (summarize && !completedStages.isEmpty()) {
             generateSummary(event.getProject());
-            log.debug("Stage Summary generation completed");
+            CommonListener.getCommonListener().getProject().log("Stage Summary generation completed", Project.MSG_DEBUG);
         }
     }
 
     /**
      * {@inheritDoc}
      */
-    public void handleTargetStarted(BuildEvent event) {
-        Project project = event.getProject();
-        if (!summarize) {
-            StageSummary stageSummary = getStageSummary(project);
-            summarize = stageSummary != null
-                    && stageSummary.getTemplate() != null;
-            lookup4Stages = summarize;
-            template = stageSummary.getTemplate();
-            log.debug("Is Project configured to display Stage Summary ? "
-                    + summarize);
+    public void targetStarted(BuildEvent event) {
+        if (!initialized) {
+            if (template != null) {
+                parseStages(event.getProject());
+                CommonListener.getCommonListener().getProject().log("Stage summary enabled...", Project.MSG_DEBUG);
+                summarize = true;
+            } else {
+                
+                CommonListener.getCommonListener().getProject().log("Stage summary disabled because template is missing.", Project.MSG_DEBUG);
+            }
+            initialized = true;
         }
 
-        if (lookup4Stages) {
-            log.debug("Loading stages....");
-            parseStages(event.getProject());
-            log.debug("Total no of stages loaded = " + stages.size());
-            lookup4Stages = false;
-        }
-
-        log.debug("Handling target - " + event.getTarget().getName());
         if (summarize && doRunTarget(event)) {
             StageWrapper stage = searchNewStage(event);
             if (stage != null) {
@@ -126,7 +112,7 @@ public class StageSummaryHandler implements Handler {
     /**
      * {@inheritDoc}
      */
-    public void handleTargetFinished(BuildEvent event) {
+    public void targetFinished(BuildEvent event) {
         if (summarize && isCurrentStageToEnd(event)) {
             endCurrentStage();
         }
@@ -155,32 +141,6 @@ public class StageSummaryHandler implements Handler {
     }
 
     /**
-     * Method returns the configured {@link StageSummary}.
-     * 
-     * @param project
-     *            is the project to lookup for stageSummary.
-     * @return the {@link StageSummary}.
-     */
-    @SuppressWarnings("unchecked")
-    private StageSummary getStageSummary(Project project) {
-        StageSummary stageSummary = null;
-        int count = 0;
-        Hashtable<String, Object> references = project.getReferences();
-        for (Enumeration<String> en = references.keys(); en.hasMoreElements();) {
-            Object object = references.get(en.nextElement());
-            if (object instanceof StageSummary) {
-                count++;
-                if (count > 1) {
-                    throw new BuildException("Multiple entries of 'hlm:stagesummary' found in "
-                            + "stages_config.ant.xml.");
-                }
-                stageSummary = (StageSummary) object;
-            }
-        }
-        return stageSummary;
-    }
-
-    /**
      * Start the given stage as a new build stage.
      * 
      * @param newStage
@@ -194,8 +154,8 @@ public class StageSummaryHandler implements Handler {
         }
         newStage.setStartTime(currTime);
         this.currentStage = newStage;
-        log.debug("New stage [" + newStage.stageName + "] started at "
-                + getTimestamp(currTime));
+        CommonListener.getCommonListener().getProject().log("New stage [" + newStage.stageName + "] started at "
+                + getTimestamp(currTime), Project.MSG_DEBUG);
     }
 
     /**
@@ -214,8 +174,8 @@ public class StageSummaryHandler implements Handler {
                         currTime));
                 completedStages.put(currentStage.stageName, currentStage);
             }
-            log.debug("Stage [" + currentStage.stageName + "] finished at "
-                    + getTimestamp(currTime));
+            CommonListener.getCommonListener().getProject().log("Stage [" + currentStage.stageName + "] finished at "
+                    + getTimestamp(currTime), Project.MSG_DEBUG);
             currentStage = null;
         }
     }
@@ -333,7 +293,7 @@ public class StageSummaryHandler implements Handler {
         if (template != null) {
             try {
                 Configuration cfg = new Configuration();
-                log.debug("Basedir: " + template.getParentFile());
+                CommonListener.getCommonListener().getProject().log("Basedir: " + template.getParentFile(), Project.MSG_DEBUG);
                 cfg.setTemplateLoader(new FileTemplateLoader(template
                         .getParentFile()));
                 Template templ = cfg.getTemplate(template.getName());
@@ -412,13 +372,13 @@ public class StageSummaryHandler implements Handler {
     private void validateStageInformation(String stageKey, Stage stage) {
 
         if (stage.getStartTarget() == null) {
-            throw new BuildException("'starttarget' for stage '" + stageKey
-                    + "' should not be null.");
+            throw new BuildException("'starttarget' attribute for stage '" + stageKey
+                    + "' is not defined.");
         }
 
         if (stage.getEndTarget() == null) {
-            throw new BuildException("'endtarget' for stage '" + stageKey
-                    + "' should not be null.");
+            throw new BuildException("'endtarget' attribute for stage '" + stageKey
+                    + "' is not defined.");
         }
     }
 

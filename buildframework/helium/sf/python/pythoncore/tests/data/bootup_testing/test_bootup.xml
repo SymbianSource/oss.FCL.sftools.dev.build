@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<testrun>
+	<metadata>
+		<meta name="diamonds-buildid">http://diamonds.com/1234</meta>
+		<meta name="diamonds-testtype">Smoke</meta>
+		<meta name="name">Bootup test run</meta>
+	</metadata>
+	<agents>
+		<agent alias="alias">
+			<property name="hardware" value="new_device"/>
+		</agent>
+	</agents>
+	<execution defaultAgent="alias">
+		<initialization>
+			<task agents="alias">
+				<type>FlashTask</type>
+				<parameters>
+					<parameter name="image-1" value="exe1\images\image1.fpsx"/>
+					<parameter name="image-2" value="exe1\images\image2.fpsx"/>
+				</parameters>
+			</task>
+			<task agents="alias">
+				<type>RebootTask</type>
+				<parameters/>
+			</task>
+			<task agents="alias">
+				<type>CreateDirTask</type>
+				<parameters>
+					<parameter name="dir" value="c:\logs\testability"/>
+				</parameters>
+			</task>
+		</initialization>
+		<finalization>
+			<task agents="alias">
+				<type>CleanupTask</type>
+				<parameters>
+					<parameter name="upload-files" value="true"/>
+				</parameters>
+			</task>
+		</finalization>
+	</execution>
+	<postActions>
+		<action>
+			<type>EmailAction</type>
+			<parameters>
+				<parameter name="subject" value="Bootup test report"/>
+				<parameter name="to" value="firstname.lastname@domain.com"/>
+				<parameter name="format" value="simplelogger"/>
+			</parameters>
+		</action>
+	</postActions>
+</testrun>

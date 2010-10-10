@@ -60,7 +60,18 @@ Description:
 
     <hlm:metadatafilterset id="filterset.sbs.cli">
         <metadatafilter priority="error" regex="^sbs:\s+error:.*" description="sbs cli error" />
+        <metadatafilter priority="error" regex="^Error:\[ERROR\].*" description="coverity cli error" />
         <metadatafilter priority="warning" regex="^sbs:\s+warning:.*" description="sbs cli warning" />
+    </hlm:metadatafilterset>
+    
+    <hlm:metadatafilterset id="filterset.coverity.output.cli">
+        <metadatafilter priority="error" regex="\[ERROR\].*" description="coverity cli error" />
+        <metadatafilter priority="error" regex="\[FATAL\].*" description="coverity fatal cli error" />
+        <metadatafilter priority="error" regex="^Error:.*" description="coverity cli error" />
+    </hlm:metadatafilterset>
+    
+    <hlm:metadatafilterset id="filterset.coverity.error.cli">
+        <metadatafilter priority="error" regex=".*" description="coverity cli error" />
     </hlm:metadatafilterset>
     
     <hlm:metadatafilterset id="filterset.sbs.checksource">
@@ -138,7 +149,7 @@ Description:
         <metadatafilterset refid="filterset.common" />
     </hlm:metadatafilterset>
     
-    <hlm:metadatafilterset id="filterset.matti">
+    <hlm:metadatafilterset id="filterset.tdriver">
         <metadatafilterset refid="filterset.common" />
     </hlm:metadatafilterset>
     

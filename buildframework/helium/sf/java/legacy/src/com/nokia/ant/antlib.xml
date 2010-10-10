@@ -26,7 +26,6 @@ Description:
     <taskdef name="configuration" classname="com.nokia.ant.taskdefs.AntConfigurationTask"/>
     <taskdef name="coveragerecord" classname="com.nokia.ant.taskdefs.CoverageRecorderTask"/>
     <taskdef name="fastcopy" classname="com.nokia.ant.taskdefs.CopyParallelTask"/>
-    <taskdef name="logtoconsole" classname="com.nokia.ant.taskdefs.StopLogToConsoleTask"/>
     <taskdef name="parsemodel" classname="com.nokia.ant.taskdefs.ModelPropertiesTask"/>
     
     <typedef name="typedef" classname="com.nokia.ant.TypedefURIFix"/>

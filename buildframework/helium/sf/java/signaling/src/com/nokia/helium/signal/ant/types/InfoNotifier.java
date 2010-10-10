@@ -19,10 +19,12 @@ package com.nokia.helium.signal.ant.types;
 
 import java.io.File;
 
-import org.apache.log4j.Logger;
+import org.apache.tools.ant.Project;
 import org.apache.tools.ant.types.DataType;
+import org.apache.tools.ant.types.ResourceCollection;
 
-import com.nokia.helium.signal.Notifier;
+import com.nokia.helium.core.ant.ResourceCollectionUtils;
+import com.nokia.helium.signal.ant.Notifier;
 
 /**
  * The InfoNotifier provides you an easy way to inform the
@@ -30,24 +32,15 @@ import com.nokia.helium.signal.Notifier;
  * @ant.type name="infoNotifier" category="Signaling"
  */
 public class InfoNotifier extends DataType implements Notifier {
-
-    private Logger log = Logger.getLogger(InfoNotifier.class);
     
     /**
-     * Rendering the template, and sending the result through email.
-     * 
-     * @param signalName - is the name of the signal that has been raised.
-     * @param failStatus - indicates whether to fail the build or not
-     * @param notifierInput - contains signal notifier info
-     * @param message - is the message from the signal that has been raised. 
+     * {@inheritDoc}
      */
-
-    @SuppressWarnings("unchecked")
     public void sendData(String signalName, boolean failStatus,
-            NotifierInput notifierInput, String message ) {
-        if (notifierInput != null) { 
-            File logFile = notifierInput.getFile(".*.log");
-            log.error("Error in log file: " + logFile);
+            ResourceCollection notifierInput, String message ) {
+        if (notifierInput != null) {
+            File logFile = ResourceCollectionUtils.getFile(notifierInput, ".*.log");
+            log("Error in log file: " + logFile, Project.MSG_ERR);
         }
     }
 }

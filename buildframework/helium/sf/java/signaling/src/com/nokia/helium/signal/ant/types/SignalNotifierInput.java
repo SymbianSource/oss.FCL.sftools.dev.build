@@ -23,6 +23,7 @@ import java.util.Vector;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.types.DataType;
+import org.apache.tools.ant.types.ResourceCollection;
 
 
 /**
@@ -33,43 +34,41 @@ import org.apache.tools.ant.types.DataType;
  * &lt;/targetCondition&gt;
  * 
  */
-public class SignalNotifierInput extends DataType
-{
+public class SignalNotifierInput extends DataType {
+    
     private Vector<SignalInput> signalInputs = new Vector<SignalInput>();
 
-    private Vector<NotifierInput> notifierInputList = new Vector<NotifierInput>();
+    private Vector<ResourceCollection> notifierInputList = new Vector<ResourceCollection>();
 
     /**
-     * Helper function called by ant to create a new notifier for
-     * this input.
-     * @return ReferenceType created ReferenceType.
+     * Create a nested notifierInput element.
+     * @return a new NotifierInput instance.
      */    
     public NotifierInput createNotifierInput() {
-        NotifierInput notifierInput =  new NotifierInput();
+        NotifierInput notifierInput =  new NotifierInput(getProject());
         add(notifierInput);
         return notifierInput;
     }
 
     /**
-     * Adds the created notifier to the list
-     * @param ReferenceType notifier to be added to the list.
+     * Adds any kind of ResourceCollection Ant type like 
+     * paths or filesets.
+     * @param notifierInput notifier to be added to the list.
      */    
-    public void add(NotifierInput notifierInput) {
-        if (notifierInput != null) {
-            notifierInputList.add(notifierInput);
-        }
+    public void add(ResourceCollection notifierInput) {
+        notifierInputList.add(notifierInput);
     }
 
     /**
-     * Helper function to add the created signalinput
-     * @param filter to be added to the filterset
+     * Add a nested signalInput.
+     * @param signalInput the signalInput to be added
      */
-    public void add(SignalInput input) {
-        signalInputs.add(input);
+    public void add(SignalInput signalInput) {
+        signalInputs.add(signalInput);
     }
 
     /**
-     * Helper function called by ant to create the new signalinput
+     * Create a nested signalInput.
      */
     public SignalInput createSignalInput() {
         SignalInput input =  new SignalInput();
@@ -77,8 +76,12 @@ public class SignalNotifierInput extends DataType
         return input;
     }
 
-    public NotifierInput getNotifierInput() {
-        NotifierInput input = null;
+    /**
+     * Returns the notifierInput associated to the current object.
+     * @return a ResourceCollection representing the notifier inputs.
+     */
+    public ResourceCollection getNotifierInput() {
+        ResourceCollection input = null;
         if (notifierInputList.size() > 1) {
             throw new BuildException("One and only signal input can be defined");
         }
@@ -94,18 +97,11 @@ public class SignalNotifierInput extends DataType
      */    
     public SignalInput getSignalInput() {
         if (signalInputs.isEmpty()) {
-            throw new BuildException("No signal input in signal config, failed: ");
+            throw new BuildException("One nested signalInput is required at " + this.getLocation());
         }
         if (signalInputs.size() > 1) {
-            throw new BuildException("One and only signal input can be defined");
+            throw new BuildException("One and only signalInput can be defined at " + this.getLocation());
         }
-
-        Object refObject =  signalInputs.elementAt(0).getRefid().getReferencedObject();
-        if (refObject == null) {
-            throw new BuildException("Signal Input Reference not exists");
-        }
-        
-        SignalInput signalInput = (SignalInput)refObject;
-        return signalInput;
+        return signalInputs.elementAt(0);
     }
 }

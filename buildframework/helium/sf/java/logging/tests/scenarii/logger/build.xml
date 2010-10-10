@@ -127,5 +127,17 @@ Description:
             <contains string="${message}" substring="Some sensitive test output ********"/>
         </au:assertTrue>
     </target>
+    
+    <target name="test-mainlog">
+        <hlm:triggerlogger/>
+        <antcall target="print-target"/>
+    </target>
+    
+    <target name="print-target">
+        <echo>test1</echo>
+        <hlm:record name="${temp.dir}/record1.log" action="start"/>
+        <echo>Not in mainlog</echo>
+        <hlm:record name="${temp.dir}/record1.log" action="stop"/>
+    </target>
 
 </project>

@@ -111,19 +111,6 @@ public class ProjectMeta extends RootAntObjectMeta {
         return properties;
     }
 
-    @SuppressWarnings("unchecked")
-    public List<MacroMeta> getMacros() {
-        ArrayList<MacroMeta> objects = new ArrayList<MacroMeta>();
-        List<Element> nodes = getNode().selectNodes("//macrodef | //scriptdef");
-        for (Element node : nodes) {
-            MacroMeta macroMeta = new MacroMeta(this, node);
-            macroMeta.setRuntimeProject(getRuntimeProject());
-            if (macroMeta.matchesScope(getScopeFilter())) {
-                objects.add(macroMeta);
-            }
-        }
-        return objects;
-    }
 
     @SuppressWarnings("unchecked")
     public List<String> getProjectDependencies() {
@@ -181,13 +168,12 @@ public class ProjectMeta extends RootAntObjectMeta {
         }
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("rawtypes")
     private String findSignalFailMode(String signalid, Document antDoc) {
         XPath xpath2 = DocumentHelper.createXPath("//hlm:signalListenerConfig[@id='" + signalid
             + "']/signalNotifierInput/signalInput");
         xpath2.setNamespaceURIs(Database.NAMESPACE_MAP);
         List signalNodes3 = xpath2.selectNodes(antDoc);
-
         for (Iterator iterator3 = signalNodes3.iterator(); iterator3.hasNext();) {
             Element propertyNode3 = (Element) iterator3.next();
             String signalinputid = propertyNode3.attributeValue("refid");

@@ -440,7 +440,7 @@ class Ats3TestDropGenerator(object):
             if 'rofs3' in image_file.name:
                 sorted_images.append(image_file)
         for image_file in setd["image_files"]:
-            if 'core' not in image_file.name and 'rofs2' not in image_file.name and 'rofs3' not in image_file.name and 'udaerase' not in image_file.name.lower():
+            if 'core' not in image_file.name and 'rofs2' not in image_file.name and 'rofs3' not in image_file.name:
                 sorted_images.append(image_file)
         if len(sorted_images) > 0 and "rofs" in sorted_images[0]:
             return setd["image_files"]
@@ -1029,7 +1029,11 @@ class Ats3TemplateTestDropGenerator(Ats3TestDropGenerator):
             template = env.from_string(pkg_resources.resource_string(__name__, 'ats4_template.xml'))# pylint: disable=E1101
 
         xmltext = template.render(test_plan=test_plan, os=os, atspath=atspath, atsself=self).encode('ISO-8859-1')
-        return et.ElementTree(et.XML(xmltext))
+        try:
+            xml = et.ElementTree(et.XML(xmltext))
+        except ExpatError, err:
+            raise ExpatError(str(err) + xmltext)
+        return xml
         
     def get_template(self, directory, template_name):
         if directory:

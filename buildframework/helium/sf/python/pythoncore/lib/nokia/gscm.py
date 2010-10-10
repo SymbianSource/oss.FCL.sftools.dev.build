@@ -35,7 +35,7 @@ def _execute(command):
     """ Runs a command and returns the result data. """
     process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     output = process.stdout.read()
-    process.poll()
+    process.wait()
     status = process.returncode
     return (output, status)
 
@@ -53,9 +53,11 @@ def __get_gscm_info(method, dbname):
     _logger.debug("Status: %s" % status)
     _logger.debug("Output: %s" % output)
     if status == 0 or status == None and not ("Can't locate" in output):
+        _logger.debug("Returning output")
         return output.strip()
     if not 'HLM_SUBCON' in os.environ:
-        raise Exception("Error retrieving get_db_path info for '%s' database.\nOUTPUT:%s" % (dbname, output.strip()))
+        _logger.debug("Raising exception")
+        raise IOError("Error retrieving get_db_path info for '%s' database.\nOUTPUT:%s" % (dbname, output.strip()))
     return None
 
 def get_db_path(dbname):

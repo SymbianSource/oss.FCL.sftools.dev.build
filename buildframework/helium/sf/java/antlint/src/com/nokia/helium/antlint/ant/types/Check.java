@@ -16,38 +16,24 @@
  */
 package com.nokia.helium.antlint.ant.types;
 
-import java.io.File;
-
-import org.dom4j.Element;
-
+import com.nokia.helium.ant.data.AntFile;
 import com.nokia.helium.antlint.ant.AntlintException;
 import com.nokia.helium.antlint.ant.Reporter;
 import com.nokia.helium.antlint.ant.Severity;
 
 /**
- * <code>Check</code> represents a basic antlint component responsible for
- * running the user configured checks.
+ * <code>Check</code> represents a basic antlint validation component
+ * responsible for running the user configured checks.
  * 
  */
 public interface Check {
 
     /**
-     * Method runs the configured checks against the given node.
+     * Method runs the configured check against a ant file.
      * 
-     * @param node
-     *            is the node of the xml to be checked.
+     * @throws AntlintException if check fails
      */
-    void run(Element node);
-
-    /**
-     * Method runs the configured checks against the given ant file.
-     * 
-     * @param fileName
-     *            is the name of the ant file.
-     * @param reporter
-     * @throws AntlintException
-     */
-    void run(File fileName) throws AntlintException;
+    void run() throws AntlintException;
 
     /**
      * Return whether this is check is enabled or not.
@@ -97,17 +83,16 @@ public interface Check {
     Reporter getReporter();
 
     /**
-     * Return ant file.
-     * 
-     * @return
-     */
-    File getAntFile();
-
-    /**
      * To return current checker name.
      * 
      * @return
      */
     String toString();
 
+    /**
+     * Set the ant file.
+     * 
+     * @param antFile the ant file to set.
+     */
+    void setAntFile(AntFile antFile);
 }

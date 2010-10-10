@@ -51,7 +51,7 @@ public class RootAntObjectMeta extends AntObjectMeta {
     public AntFile getAntFile() {
         return antFile;
     }
-    
+
     /**
      * Returns the location path of the object.
      * 
@@ -73,19 +73,15 @@ public class RootAntObjectMeta extends AntObjectMeta {
         return this;
     }
 
-    @SuppressWarnings("unchecked")
-    public List<MacroMeta> getMacros() throws IOException {
-        ArrayList<MacroMeta> objects = new ArrayList<MacroMeta>();
-        List<Element> nodes = getNode().selectNodes("//macrodef | //scriptdef");
-        for (Element node : nodes) {
-            MacroMeta macroMeta = new MacroMeta(this, node);
-            macroMeta.setRuntimeProject(getRuntimeProject());
-            if (macroMeta.matchesScope(scopeFilter)) {
-                objects.add(macroMeta);
+    public List<MacroMeta> getMacros() {
+        List<MacroMeta> objects = getScriptDefinitions("//macrodef | //scriptdef");
+        List<MacroMeta> filteredList = new ArrayList<MacroMeta>();
+        for (MacroMeta macroMeta : objects) {
+            if (macroMeta.matchesScope(getScopeFilter())) {
+                filteredList.add(macroMeta);
             }
         }
-        return objects;
+        return filteredList;
     }
+
 }
-
-

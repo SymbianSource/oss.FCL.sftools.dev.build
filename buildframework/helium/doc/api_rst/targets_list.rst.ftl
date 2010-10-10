@@ -34,7 +34,7 @@ Targets list
    
 <#list targetCache?keys?sort as name>
 <#assign target=targetCache[name]>
-    ":hlm-t:`${name}`", "${target?parent.name}", "${target.summary?replace("^", "    ", "rm")?replace("\"", "\"\"", "rm")?trim}"
+    ":hlm-t:`${name}`", "`${target?parent.name} <project-${target?parent.name}.html>`_", "${target.summary?replace("^", "    ", "rm")?replace("\"", "\"\"", "rm")?trim}"
 </#list>
 
 

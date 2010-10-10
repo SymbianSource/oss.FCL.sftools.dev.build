@@ -27,8 +27,8 @@ Description:
     <!-- TypeDef definition -->
     <typedef name="checkTabCharacter" classname="com.nokia.helium.antlint.ant.types.CheckTabCharacter"/>
     <typedef name="checkProjectName" classname="com.nokia.helium.antlint.ant.types.CheckProjectName"/>
-    <typedef name="checkScriptDefNameAttributes" classname="com.nokia.helium.antlint.ant.types.CheckScriptDefNameAttributes"/>
     <typedef name="checkPropertyName" classname="com.nokia.helium.antlint.ant.types.CheckPropertyName"/>
+    <typedef name="checkScriptDefAttributes" classname="com.nokia.helium.antlint.ant.types.CheckScriptDefAttributes"/>
     <typedef name="checkTargetName" classname="com.nokia.helium.antlint.ant.types.CheckTargetName"/>
     <typedef name="checkIndentation" classname="com.nokia.helium.antlint.ant.types.CheckIndentation"/>
     <typedef name="checkPresetDefMacroDefName" classname="com.nokia.helium.antlint.ant.types.CheckPresetDefMacroDefName"/>
@@ -39,16 +39,19 @@ Description:
     <typedef name="checkJythonScript" classname="com.nokia.helium.antlint.ant.types.CheckJythonScript"/>
     <typedef name="checkUseOfEqualsTask" classname="com.nokia.helium.antlint.ant.types.CheckUseOfEqualsTask"/>
     <typedef name="checkScriptCondition" classname="com.nokia.helium.antlint.ant.types.CheckScriptCondition"/>
-    <typedef name="checkPythonTasks" classname="com.nokia.helium.antlint.ant.types.CheckPythonTasks"/>
     <typedef name="checkScriptDefStyle" classname="com.nokia.helium.antlint.ant.types.CheckScriptDefStyle"/>
-    <typedef name="checkScriptDef" classname="com.nokia.helium.antlint.ant.types.CheckScriptDef"/>
     <typedef name="checkDuplicateNames" classname="com.nokia.helium.antlint.ant.types.CheckDuplicateNames"/>
     <typedef name="checkFileName" classname="com.nokia.helium.antlint.ant.types.CheckFileName"/>
     <typedef name="checkAntCall" classname="com.nokia.helium.antlint.ant.types.CheckAntCall"/>
     <typedef name="checkTryCatchBlock" classname="com.nokia.helium.antlint.ant.types.CheckTryCatchBlock"/>
+    <typedef name="checkVariableTask" classname="com.nokia.helium.antlint.ant.types.CheckVariableTask"/>
+    <typedef name="checkPropertyTypeAndValueMismatch" classname="com.nokia.helium.antlint.ant.types.CheckPropertyTypeAndValueMismatch"/>
+    <typedef name="checkScriptDefName" classname="com.nokia.helium.antlint.ant.types.CheckScriptDefName"/>
     
     <!-- Reporters -->
     <typedef name="antlintConsoleReporter" classname="com.nokia.helium.antlint.ant.types.ConsoleReporter"/>
     <typedef name="antlintCheckstyleReporter" classname="com.nokia.helium.antlint.ant.types.CheckstyleXmlReporter"/>
 
+    <typedef name="pylintExecutor" classname="com.nokia.helium.antlint.ant.types.PylintExecutor"/>
+    <typedef name="checkstyleExecutor" classname="com.nokia.helium.antlint.ant.types.CheckstyleExecutor"/>
 </antlib>

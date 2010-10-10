@@ -23,16 +23,16 @@ The imakerconfigurationset supports imakerconfiguration nested elements.
 .. csv-table:: Attributes to modify
    :header: "Attribute", "Description", "Values"
 
-   ":hlm-p:`regionalVariation`", "Enable regional variation switching. - Deprecated (always false)", "false"
+   "``regionalVariation``", "Enable regional variation switching. - Deprecated (always false)", "false"
 
 The imakerconfiguration supports three sub-types:
 
 .. csv-table:: Attributes to modify
    :header: "Sub-type", "Description"
 
-   ":hlm-p:`makefileset`", "Defines the list of iMaker configuration to run image creation on."
-   ":hlm-p:`targetset`", "List of regular expression used to match which target need to be executed."
-   ":hlm-p:`variableset`", "List of variable to set when executing iMaker."
+   "``makefileset``", "Defines the list of iMaker configuration to run image creation on."
+   "``targetset``", "List of regular expression used to match which target need to be executed."
+   "``variableset``", "List of variable to set when executing iMaker."
 
 
 Example of configuration:

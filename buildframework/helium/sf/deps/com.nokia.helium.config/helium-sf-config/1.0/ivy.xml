@@ -54,9 +54,11 @@ Description:
         <dependency org="com.nokia.helium" name="helium-synergy" rev="latest.integration" conf="default"/>
         <dependency org="com.nokia.helium" name="helium-ccmtask" rev="latest.integration" conf="default"/>
         <dependency org="com.nokia.helium" name="java-analyser-config" rev="latest.integration" conf="default"/>
+        <dependency org="com.nokia.helium" name="helium-blocks" rev="latest.integration" conf="default"/>
         
         <!-- Helium Python deps -->
         <dependency org="com.nokia.helium" name="pythoncore" rev="latest.integration" conf="default"/>
+        <dependency org="com.nokia.helium" name="blockspackager" rev="latest.integration" conf="default"/>
 
         <!-- Ant specific dependencies -->
         <dependency org="de.jeckle" name="xia" rev="1.0" conf="default"/>

@@ -33,6 +33,7 @@ import csv
 import fileutils
 import pathaddition.match
 import logging
+import traceback
 
 #logging.basicConfig(level=logging.DEBUG)
 _logger = logging.getLogger("integration.quality")
@@ -111,7 +112,7 @@ class AbldWhatParser(symbian.log.Parser):
 
 class PolicyValidator(object):
     """ Validate policy files on a hierarchy. """
-    def __init__(self, policyfiles=None, csvfile=None, ignoreroot=False, excludes=None):
+    def __init__(self, policyfiles=None, ignoreroot=False, excludes=None):
         """The constructor """
         if policyfiles is None:
             policyfiles = ['distribution.policy.s60']
@@ -135,7 +136,16 @@ class PolicyValidator(object):
                 self._ids[row[0]] = row
                 if row[1].lower() != "yes" and row[1].lower() != "no" and row[1].lower() != "bin":
                     yield ["unknownstatus", row[0], row[2]]
-
+    
+    def epl_load_policy_ids(self, csvfile):
+        """ Load the icds from the CSV file for epl check."""
+        self._ids = {}
+        reader = csv.reader(open(csvfile, "rU"))
+        for row in reader:
+            if len(row)>=3 and re.match(r"^\s*\d+\s*$", row[0]):
+                if row[1].lower() == "yes" or row[1].lower() == "bin":
+                    self._ids[row[0]] = row
+    
     def validate_content(self, filename):
         """  Validating the policy file content. If it cannot be decoded, 
             it reports an 'invalidencoding'.
@@ -150,6 +160,20 @@ class PolicyValidator(object):
             if self._ids != None:
                 if value not in self._ids:
                     yield ["notinidlist", filename, value]
+    
+    def epl_validate_content(self, filename):
+        """  Validating the policy file content for epl"""
+        value = None
+        try:
+            value = fileutils.read_policy_content(filename)
+        except IOError, exc:
+            traceback.print_exc()
+            raise exc
+        if value is not None:
+            if self._ids != None:
+                if value not in self._ids:
+                    return False
+        return True
     
     def find_policy(self, path):
         """ find the policy file under path using filenames under the list. """

@@ -26,6 +26,7 @@ Description:
     <taskdef name="metadatadelete" classname="com.nokia.helium.metadata.ant.taskdefs.MetaDataDeleteTask"/>
     <!-- Type definition -->
     <typedef name="textmetadatainput" classname="com.nokia.helium.metadata.ant.types.TextLogMetaDataInput"/>
+    <typedef name="coveritymetadatainput" classname="com.nokia.helium.metadata.ant.types.CoverityLogMetaDataInput"/>
     <typedef name="antmetadatainput" classname="com.nokia.helium.metadata.ant.types.AntLogMetaDataInput"/>
     <typedef name="abldmetadatainput" classname="com.nokia.helium.metadata.ant.types.AbldLogMetaDataInput"/>
     <typedef name="sbsmetadatainput" classname="com.nokia.helium.metadata.ant.types.sbs.SBSLogMetaDataInput"/>

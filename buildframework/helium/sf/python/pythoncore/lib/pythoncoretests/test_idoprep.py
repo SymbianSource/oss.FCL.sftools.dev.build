@@ -34,22 +34,6 @@ class IDOPrepTest(unittest.TestCase):
         """called before any of the tests are run"""
         self.server = os.path.join(os.environ['TEST_DATA'], "data/symrec/GRACE/")
 
-    def test_validate_grace(self):
-        """Verifiying validate(grace) method"""
-        self.assertRaises(Exception, idoprep.validate, None, 'test', 'test', 'test')
-
-    def test_validate_service(self):
-        """Verifiying validate(service) method"""
-        self.assertRaises(Exception, idoprep.validate, 'test', None, 'test', 'test')
-
-    def test_validate_product(self):
-        """Verifiying validate(product) method"""
-        self.assertRaises(Exception, idoprep.validate, 'test', 'test', None, 'test')
-
-    def test_validate_release(self):
-        """Verifiying validate(release) method"""
-        self.assertRaises(Exception, idoprep.validate, 'test', 'test', 'test', None) 
-
     def test_get_s60_env_details_valid(self):
         """Verifiying get_s60_env_details(valid args) method"""
         (fileDes, cacheFilename) = tempfile.mkstemp()
@@ -91,47 +75,16 @@ class IDOPrepTest(unittest.TestCase):
         """Verifiying create_ado_mapping method"""
         (sysdefFileDes, sysdefConfig) = tempfile.mkstemp()
         (adoFileDes, adoMappingFile) = tempfile.mkstemp()
-        (adoqtyFileDes, adoQualityMappingFile) = tempfile.mkstemp()
         buildDrive = tempfile.gettempdir() 
         adoQualityDirs = None
         testSysdefFile = os.path.join(os.environ['TEST_DATA'], 'data', 'packageiad', 'layers.sysdef.xml')
         os.write(sysdefFileDes, testSysdefFile)
         os.close(sysdefFileDes)
-        idoprep.create_ado_mapping(sysdefConfig, adoMappingFile, adoQualityMappingFile, buildDrive, adoQualityDirs)
+        idoprep.create_ado_mapping(sysdefConfig, adoMappingFile, 'false', buildDrive, adoQualityDirs)
         os.unlink(sysdefConfig)
         os.close(adoFileDes)
-        os.close(adoqtyFileDes)
         adoFile = open(adoMappingFile, 'r')
         adoMappingFileContents = adoFile.readlines()
         adoFile.close()
-        adoQtyFile = open(adoQualityMappingFile, 'r')
-        adoQualityMappingFileContents = adoQtyFile.readlines()
-        adoQtyFile.close()
         os.unlink(adoMappingFile)
-        os.unlink(adoQualityMappingFile)
-        assert len(adoMappingFileContents) >= 1 and  len(adoQualityMappingFileContents) >= 1 
-
-    def test_create_ado_mapping_adoqualitydirs(self):
-        """Verifiying create_ado_mapping (with valid adoqualitydirs) method"""
-        (sysdefFileDes, sysdefConfig) = tempfile.mkstemp()
-        (adoFileDes, adoMappingFile) = tempfile.mkstemp()
-        (adoqtyFileDes, adoQualityMappingFile) = tempfile.mkstemp()
-        buildDrive = tempfile.gettempdir() 
-        testSysdefFile = os.path.join(os.environ['TEST_DATA'], 'data', 'packageiad', 'layers.sysdef.xml')
-        location = ido.get_sysdef_location(testSysdefFile)
-        adoQualityDirs = (os.path.normpath(os.path.join(buildDrive, os.environ['EPOCROOT'], location))) 
-        os.write(sysdefFileDes, testSysdefFile)
-        os.close(sysdefFileDes)
-        idoprep.create_ado_mapping(sysdefConfig, adoMappingFile, adoQualityMappingFile, buildDrive, adoQualityDirs)
-        os.unlink(sysdefConfig)
-        os.close(adoFileDes)
-        os.close(adoqtyFileDes)
-        adoFile = open(adoMappingFile, 'r')
-        adoMappingFileContents = adoFile.readlines()
-        adoFile.close()
-        adoQtyFile = open(adoQualityMappingFile, 'r')
-        adoQualityMappingFileContents = adoQtyFile.readlines()
-        adoQtyFile.close()
-        os.unlink(adoMappingFile)
-        os.unlink(adoQualityMappingFile)
-        assert len(adoMappingFileContents) >= 1 and  len(adoQualityMappingFileContents) >= 1 
+        assert len(adoMappingFileContents) >= 1

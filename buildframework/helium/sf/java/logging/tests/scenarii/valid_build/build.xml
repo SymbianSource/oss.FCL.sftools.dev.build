@@ -39,8 +39,7 @@ Description:
     </target>
     
     
-    <target name="run-stages">
-        <antcall target="start-ant-log"/>
+    <target name="run-stages" depends="start-ant-log">
         <antcall target="para-test7"/>
         <hlm:record name="${build.log.dir}/${build.id}_recorder.log" action="start" loglevel="info" backup="false">
             <hlm:recordfilterset refid="recordfilter.config"/>

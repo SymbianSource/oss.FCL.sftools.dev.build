@@ -25,6 +25,10 @@ Description:
         Common sbs input config.
     </description>
     <!-- Common make options for particular engine values of it could be overridden by referencing it-->
+    <condition property="sbs.no.thread.jobs" value="20" else="${number.of.threads}">
+        <equals arg1="${build.system}" arg2="sbs-ec" />
+    </condition>
+
     <hlm:sbsmakeoptions id="commonEMakeOptions" engine="emake">
         <arg name="--emake-emulation" value="gmake" />
         <arg name="--emake-annodetail" value="basic,history,waiting" />
@@ -51,6 +55,7 @@ Description:
     <!-- tools common sbs options -->
     <hlm:sbsoptions id="commonSBS">
         <arg line="-k" />
+        <arg line="-j ${sbs.no.thread.jobs}" />
     </hlm:sbsoptions>
 
     <!-- tools common sbs options -->

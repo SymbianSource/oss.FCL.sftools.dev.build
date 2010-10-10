@@ -45,4 +45,19 @@ Description:
         <runScenario scenario="logger" target="test-recorder-filtering" />
     </target>
     
+    <target name="test-mainlog">
+        <runScenario scenario="logger" target="test-mainlog" />
+        
+        <loadfile srcfile="${temp.dir}/logs/1_main.ant.log" property="message"/>
+        <au:assertTrue message="test1 missing">
+            <contains string="${message}" substring="test1"/>
+        </au:assertTrue>
+        <au:assertTrue message="BUILD SUCCESSFUL missing">
+            <contains string="${message}" substring="BUILD SUCCESSFUL"/>
+        </au:assertTrue>
+        <au:assertFalse message="Not in mainlog found">
+            <contains string="${message}" substring="Not in mainlog"/>
+        </au:assertFalse>
+    </target>
+    
 </project>

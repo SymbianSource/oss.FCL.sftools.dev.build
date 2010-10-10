@@ -32,7 +32,6 @@ Description:
     <property name="temp.diamonds.footer.xml" location="${ca.output.dir}/ca/diamonds_footer.xml" />
     
     <property name="diamonds.build.output.dir" location="${ca.output.dir}/ca" />
-    <property name="bc.config.dir.name" location="" />
 
     <!-- is called prior to the test -->
     <target name="setUp">
@@ -57,12 +56,11 @@ Description:
 
     <!--
      **************************************************************
-     ** test CMT for windows
+     ** test CA for windows
      **************************************************************
     -->
 
     <target name="test-ca-header-with-all-reqd-params-set" >
-        <echo> output file is ${diamonds.build.output.dir} </echo>
         <hlm:casummary diamondsHeaderFileName="${temp.diamonds.header.xml}" diamondsFooterFileName="${temp.diamonds.footer.xml}"
                     header="true"
                     outputFile="${ca.output.dir}/ca/ca_summary_header_ok.xml"
@@ -75,7 +73,7 @@ Description:
             </filterchain>
         </loadfile>
         <echo>${header.ok}</echo>
-        <au:assertTrue message="type ID 13 occurs ">
+        <au:assertTrue message="typeID:13:has compilation errors:occurs ">
             <contains string="${header.ok}" 
                 substring="value=" />
         </au:assertTrue>
@@ -95,10 +93,27 @@ Description:
         </loadfile>
         <echo>${header.notypeids}</echo>
         <au:assertTrue message="compatibility-headers">
-            <not>
-                <contains string="${header.notypeids}" 
-                    substring="summary message" />
-            </not>
+            <contains string="${header.notypeids}" 
+                substring="number of errors present" />
+        </au:assertTrue>
+    </target>
+
+    <target name="test-ca-header-no-issues" >
+        <hlm:casummary diamondsHeaderFileName="${temp.diamonds.header.xml}" diamondsFooterFileName="${temp.diamonds.footer.xml}"
+                    header="true"
+                    outputFile="${ca.output.dir}/ca/ca_summary_header_noissues.xml"
+                    inputFile="${test.data.src}/headers_report_noissues.xml" />
+        <au:assertLogContains text="CASummaryTask execute"/>
+        <au:assertFileExists file="${ca.output.dir}\ca\ca_summary_header_noissues.xml"/>
+        <loadfile property="header.no.issues" srcfile="${ca.output.dir}/ca/ca_summary_header_noissues.xml">
+            <filterchain>
+                <replaceregex pattern="\\(:|\\)" replace="\1" flags="g" />
+            </filterchain>
+        </loadfile>
+        <echo>${header.no.issues}</echo>
+        <au:assertTrue message="compatibility-headers">
+            <contains string="${header.no.issues}" 
+                substring="number of errors present" />
         </au:assertTrue>
     </target>
 
@@ -117,15 +132,37 @@ Description:
         <echo>${libraries.ok}</echo>
         <au:assertTrue message="compatibility-libs">
             <contains string="${libraries.ok}" 
-                substring="type ID 14 occurs" />
+                substring="typeID:6:mode:modified:None:occurs" />
+        </au:assertTrue>
+        <au:assertTrue message="compatibility-libs">
+            <contains string="${libraries.ok}" 
+                substring="typeID:2:mode:added:Informative:occurs" />
+        </au:assertTrue>
+        <au:assertTrue message="compatibility-libs">
+            <contains string="${libraries.ok}" 
+                substring="typeID:14:mode:not available:Baseline DLL is not available for analysis:occurs" />
         </au:assertTrue>
     </target>
     
-    <target name="test-ca-library-fail" >
+    <target name="test-ca-library-fail-failOnError-true" >
+        <property name="bc.fail.on.error" value="true" />
+        <au:expectfailure message="not stop the build if failOnError is set to false">
             <hlm:casummary diamondsHeaderFileName="${temp.diamonds.header.xml}" diamondsFooterFileName="${temp.diamonds.footer.xml}"
                     header="false"
                     outputFile="${ca.output.dir}/ca/ca_summary_library_fail.xml"
-                    inputFile="${test.data.src}/libraries_report_fail.xml" />
+                    inputFile="${test.data.src}/libraries_report_fail.xml" 
+                    failOnError="${bc.fail.on.error}" />
+            <au:assertFileDoesntExist file="${ca.output.dir}\ca\ca_summary_library_fail.xml" />
+            <au:assertLogContains text="FileNotFoundException while getting the input file" />
+        </au:expectfailure>
+    </target>
+
+    <target name="test-ca-library-fail-failOnError-false" >
+        <hlm:casummary diamondsHeaderFileName="${temp.diamonds.header.xml}" diamondsFooterFileName="${temp.diamonds.footer.xml}"
+                header="false"
+                outputFile="${ca.output.dir}/ca/ca_summary_library_fail.xml"
+                inputFile="${test.data.src}/libraries_report_fail.xml" 
+                failOnError="false"/>
         <au:assertFileDoesntExist file="${ca.output.dir}\ca\ca_summary_library_fail.xml" />
         <au:assertLogContains text="FileNotFoundException while getting the input file" />
     </target>
@@ -144,8 +181,53 @@ Description:
         <echo>${libraries.one.id}</echo>
         <au:assertTrue message="compatibility-libs">
             <contains string="${libraries.one.id}" 
-                substring="type ID 7 occurs" />
+                substring="typeID:7:mode:added:Informative:occurs" />
         </au:assertTrue>
     </target>
 
+    <target name="test-ca-library-no-ids" >
+        <hlm:casummary diamondsHeaderFileName="${temp.diamonds.header.xml}" diamondsFooterFileName="${temp.diamonds.footer.xml}"
+                    header="false"
+                    outputFile="${ca.output.dir}/ca/ca_summary_library_no_ids.xml"
+                    inputFile="${test.data.src}/libraries_report_no_ids.xml" />
+        <au:assertFileExists file="${ca.output.dir}\ca\ca_summary_library_no_ids.xml" />
+        <loadfile property="libraries.no.id" srcfile="${ca.output.dir}/ca/ca_summary_library_no_ids.xml">
+            <filterchain>
+                <replaceregex pattern="\\(:|\\)" replace="\1" flags="g" />
+            </filterchain>
+        </loadfile>
+        <echo>${libraries.no.id}</echo>
+        <au:assertTrue message="compatibility-libs">
+            <contains string="${libraries.no.id}" 
+                substring="number of errors present" />
+        </au:assertTrue>
+    </target>
+
+
+    <target name="test-ca-library-no-issues" >
+        <hlm:casummary diamondsHeaderFileName="${temp.diamonds.header.xml}" diamondsFooterFileName="${temp.diamonds.footer.xml}"
+                    header="false"
+                    outputFile="${ca.output.dir}/ca/ca_summary_library_noissues.xml"
+                    inputFile="${test.data.src}/libraries_report_noissues.xml" />
+        <au:assertFileExists file="${ca.output.dir}\ca\ca_summary_library_noissues.xml" />
+        <loadfile property="libraries.no.issues" srcfile="${ca.output.dir}/ca/ca_summary_library_noissues.xml">
+            <filterchain>
+                <replaceregex pattern="\\(:|\\)" replace="\1" flags="g" />
+            </filterchain>
+        </loadfile>
+        <echo>${libraries.no.issues}</echo>
+        <au:assertTrue message="compatibility-libs">
+            <contains string="${libraries.no.issues}" 
+                substring="number of errors present" />
+        </au:assertTrue>
+    </target>
+
+    <target name="test-ca-library-no-input-file-no-fail" >
+            <hlm:casummary diamondsHeaderFileName="${temp.diamonds.header.xml}" diamondsFooterFileName="${temp.diamonds.footer.xml}"
+                        header="false"
+                        outputFile="${ca.output.dir}/ca/ca_summary_library_nofile.xml"
+                        inputFile="${test.data.src}/libraries_report_nofile.xml"
+                        failOnError = "false" />
+            <au:assertFileDoesntExist file="${ca.output.dir}\ca\ca_summary_library_nofile.xml" />
+    </target>
 </project>

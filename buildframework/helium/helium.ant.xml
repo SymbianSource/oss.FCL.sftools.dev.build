@@ -22,11 +22,11 @@ Description:
 -->
 <project name="helium" xmlns:hlm="http://www.nokia.com/helium">
     <description>
-    Main full build targets and properties
+    Main starting point to import Helium. Imports the other main Ant files.
     </description>
     
     <property environment="env" />
-	
+    
     <!-- Load the current Helium version. -->
     <!--* @property helium.version
     @type string
@@ -68,6 +68,7 @@ Description:
     <import file="tools/testing/testing.ant.xml" />
     <import file="tools/startup/bootstrap/bootstrap.ant.xml"/>
     <import file="tools/iad/iad.ant.xml"/>
+    <import file="tools/blocks/blocks.ant.xml"/>
     <import file="config/signaling_config_default.ant.xml"/>
     <import file="config/stages_config_default.ant.xml"/>
     <import file="config/metadata_filter_config_default.ant.xml"/>

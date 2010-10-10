@@ -86,7 +86,11 @@ ${logfile.path}:${entry.lineNumber}>${entry.text}<br />
         "${dbPath}") >
 <#-- overall summary -->
 <#assign logfile = table_info['jpasingle']['select l from LogFile l where LOWER(l.path)=\'${logfilename_cleaned?lower_case}\''][0] >
-<#assign time = table_info['jpasingle']['select et from ExecutionTime et where et.logFileId=${logfile.id}'][0] >
+<#assign time = 0 >
+<#if (table_info['jpasingle']['select count(et) from ExecutionTime et where et.logFileId=${logfile.id}'][0] != 0)>
+<#assign time = table_info['jpasingle']['select et from ExecutionTime et where et.logFileId=${logfile.id}'][0]>
+<#assign time = time.time >
+</#if>
 <html>
 <head><title>${logfile.path}</title></head>
 <body>
@@ -107,7 +111,7 @@ doing this the long winded way because I could not find a way to add items to a 
 <#assign color_list={'error': 'FF0000', 'warning': 'FFF000', 'critical': 'FF7000', 'remark': 'FFCCFF', 'info': 'FFFFFF'}>
 <#assign severity_ids = color_list?keys>
 <td width="22%%">Total</td>
-<td width="12%%" align="center"><@converttime time=time.time /></td>
+<td width="12%%" align="center"><@converttime time=time /></td>
 <#assign count_check_errors = table_info['jpasingle']['select Count(w.id) from WhatLogEntry w JOIN w.component c where c.logFileId=${logfile.id} and w.missing=\'true\''][0]> 
 <#list severity_ids as severity>
     <#assign count = table_info['jpasingle']['select Count(m.id) from MetadataEntry m JOIN m.severity p where m.logFileId=${logfile.id} and p.severity=\'${severity?upper_case}\''][0]>

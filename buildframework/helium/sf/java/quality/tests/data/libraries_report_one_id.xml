@@ -31,11 +31,6 @@ Description:
                 <bc_severity>Informative</bc_severity>
                 <sc_severity>None</sc_severity>
             </issue>
-            <issue>
-                <typeid>7</typeid>
-                <bc_severity>Informative</bc_severity>
-                <sc_severity>None</sc_severity>
-            </issue>
         </library>
     </issuelist>
 

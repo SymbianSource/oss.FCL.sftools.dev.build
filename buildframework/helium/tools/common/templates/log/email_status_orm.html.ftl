@@ -107,7 +107,7 @@ Description:
             ${logfile.path}...FAIL<br/>
             <#list table_info['jpa']['select e from MetadataEntry e JOIN e.severity s where s.severity=\'ERROR\' and e.logFileId=${logfile.id}'] as entry >
             <ul>
-            ${entry.text}<br/>
+            <#if entry.text??>${entry.text?html}</#if><br/>
             </ul>
             </#list>
         </span>

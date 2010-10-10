@@ -54,7 +54,7 @@ Description:
         <mkdir dir="${temp.build.dir}" />
         <tempfile property="cone.dynamic.config" suffix=".xml" deleteonexit="false" destdir="${temp.build.dir}"/>
         
-        <fmpp sourceFile="${helium.dir}/tools/common/templates/quality/cone-validate.xml.ftl"
+        <fmpp sourceFile="${helium.dir}/tools/quality/templates/cone-validate.xml.ftl"
               outputfile="${cone.dynamic.config}">
             <data expandProperties="yes">
                 ant: antProperties()

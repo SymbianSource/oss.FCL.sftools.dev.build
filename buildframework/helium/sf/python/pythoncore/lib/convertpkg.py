@@ -64,6 +64,8 @@ def convertpkg(srcs, dst, testtype):
             submmpfile.write('//rtest\n')
         elif testtype == 'stif':
             submmpfile.write('LIBRARY stiftestinterface.lib\n')
+        elif testtype == 'sut':
+            submmpfile.write('LIBRARY symbianunittestfw.lib\n')
         else:
             raise Exception('Test type unknown: ' + testtype)
         submmpfile.close()

@@ -36,6 +36,7 @@ Description:
     <property name="prep.root.dir" value="../../../build/test/preproot" />
 
     <property name="helium.dir" location="../../.." />
+    <property name="sysdef3.enabled" value="true"/>
     <!--<import file="../../../build.xml"/>-->
 
     <!-- in the normal run we should not have the same build.drive content in the second run 
@@ -224,7 +225,7 @@ project.setProperty("r.tag", str(strExists))
         <antcall target="create-directory-structure" />
         <au:assertLogContains text="'directory.structure.config' reference not found, so not any directory structure will be created." />
     </target>
-    
+
     <target name="test-create-directory-structure">
         <antcall target="create-directory-structure">
             <reference refid="test.directory.structure.config" torefid="directory.structure.config" />
@@ -238,4 +239,5 @@ project.setProperty("r.tag", str(strExists))
             <available file="${preparation.temp.dir}/dir2" type="dir" />
         </au:assertTrue>
     </target>
+
 </project>

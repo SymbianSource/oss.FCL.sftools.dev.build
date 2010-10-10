@@ -157,8 +157,8 @@ class NestedConfigurationBuilderTest(unittest.TestCase):
     <set name="root.dir" value="X:/rootdir" />
     <set name="name" value="PF5250_200832_internal_code" />
     <set name="include" value="**/internal/**" />
-    <set name="grace.filters" value="tsrc" />
-    <set name="grace.default" value="false" />
+    <set name="release.filters" value="tsrc" />
+    <set name="release.default" value="false" />
    </config>
    <config>
     <set name="root.dir" value="X:/rootdir" />
@@ -166,8 +166,8 @@ class NestedConfigurationBuilderTest(unittest.TestCase):
     <append name="include" value="**/doc/**" />
     <set name="include" value="**/docs/**" />
     <append name="exclude" value="**/internal/**" />                            <!-- set changed to append -->
-    <set name="grace.filters" value="tsrc" />
-    <set name="grace.default" value="false" />
+    <set name="release.filters" value="tsrc" />
+    <set name="release.default" value="false" />
    </config>
   </config>
 </build>

@@ -44,7 +44,6 @@ import com.nokia.helium.environment.ant.types.ExecutableInfo;
  */
 public class Environment {
     private static final String[] WINDOWS_EXE_EXTENSIONS = { ".exe", ".bat", ".cmd" };
-    private static final String STDERR_OUTPUT = "stderr";
     private static final String[] DEFAULT_EXECUTABLES = { "java", "ant" };
 
     private Project project;
@@ -79,7 +78,6 @@ public class Environment {
      * Adds default executables to the list that must have been run because Ant is running.
      */
     private void addDefaultExecutables() {
-
         for (int i = 0; i < DEFAULT_EXECUTABLES.length; i++) {
             Executable exe = new Executable(DEFAULT_EXECUTABLES[i]);
             exe.setExecuted(true);
@@ -188,6 +186,7 @@ public class Environment {
                 if (executableFiles != null && executableFiles.length > 0) {
                     executableFile = executableFiles[0];
                     exec.setPath(executableFile.getCanonicalPath());
+                    break;
                 }
             }
         }
@@ -226,46 +225,94 @@ public class Environment {
         return pathDirs;
     }
 
-    private boolean findVersion(Executable exec) throws IOException {
-        // Get the executable additional data for this execution
-        ExecutableInfo def = defs.get(exec.getNameNoExt());
-        if (def != null && def.getVersionArgs() != null) {
-            String path = exec.getPath();
-            if (path == null) {
-                path = "";
-            }
-            String[] versionArgs = def.getVersionArgs().split(" ");
-            String[] commands = new String[versionArgs.length + 1];
-            commands[0] = path;
-            for (int i = 0; i < versionArgs.length; i++) {
-                commands[i + 1] = versionArgs[i].trim();
-            }
-            Process commandProcess = Runtime.getRuntime().exec(commands);
+    private class ExecutableVersionReader implements Runnable {
+        private static final int VERSION_TEXT_READ_TIMEOUT = 5000;
+        private static final int CHAR_ARRAY_SIZE = 1000;
+        
+        private String[] commands;
+        private InputStream in;
+        private StringBuilder text = new StringBuilder();
+        private char[] chars = new char[CHAR_ARRAY_SIZE];
+        private IOException exception;
 
-            String output = def.getOutput();
-            StringBuilder text = new StringBuilder();
-            int dataRead = 0;
-            char[] chars = new char[1000];
-            if (output == null || !output.equals(STDERR_OUTPUT)) {
-                InputStream in = commandProcess.getInputStream();
+        ExecutableVersionReader(String[] commands) {
+            this.commands = commands;
+        }
+
+        public void run() {
+            try {
+                int dataRead = 0;
                 InputStreamReader textIn = new InputStreamReader(in);
                 while (dataRead != -1) {
+
                     dataRead = textIn.read(chars, 0, chars.length);
+
                     if (dataRead != -1) {
                         text.append(chars, 0, dataRead);
                     }
                 }
             }
-            InputStream err = commandProcess.getErrorStream();
-            InputStreamReader textErr = new InputStreamReader(err);
-            dataRead = 0;
-            while (dataRead != -1) {
-                dataRead = textErr.read(chars, 0, chars.length);
-                if (dataRead != -1) {
-                    text.append(chars, 0, dataRead);
+            catch (IOException e) {
+                exception = e;
+            }
+            synchronized (this) {
+                notify();
+            }
+        }
+
+        /**
+         * Read output data from both stdout and stderr streams.
+         * 
+         * @return Text data.
+         * @throws IOException
+         * @throws InterruptedException
+         */
+        public String readData() throws IOException {
+            try {
+                Process commandProcess = Runtime.getRuntime().exec(commands);
+                // Try to read from stdout
+                in = commandProcess.getInputStream();
+                new Thread(this).start();
+                synchronized (this) {
+                    wait(VERSION_TEXT_READ_TIMEOUT);
+                }
+
+                // If no data available after timeout, try reading from stderr
+                if (text.length() == 0) {
+                    in = commandProcess.getErrorStream();
+                    new Thread(this).start();
+                    synchronized (this) {
+                        wait(VERSION_TEXT_READ_TIMEOUT);
+                    }
                 }
             }
-            String versionText = text.toString();
+            catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            if (exception != null) {
+                throw exception;
+            }
+            return text.toString();
+        }
+    }
+
+    private boolean findVersion(Executable exec) throws IOException {
+        // Get the executable additional data for this execution
+        ExecutableInfo def = defs.get(exec.getNameNoExt());
+        if (def != null && def.getVersionArgs() != null) {
+            String exePath = exec.getPath();
+            if (exePath == null) {
+                exePath = "";
+            }
+            String[] versionArgs = def.getVersionArgs().split(" ");
+            String[] commands = new String[versionArgs.length + 1];
+            commands[0] = exePath;
+            for (int i = 0; i < versionArgs.length; i++) {
+                commands[i + 1] = versionArgs[i].trim();
+            }
+
+            ExecutableVersionReader reader = new ExecutableVersionReader(commands);
+            String versionText = reader.readData();
             if (def.getVersionRegex() != null) {
                 Pattern versionPattern = Pattern.compile(def.getVersionRegex());
                 Matcher versionMatch = versionPattern.matcher(versionText);
@@ -291,7 +338,7 @@ public class Environment {
         exec.setLastModified(file.lastModified());
         exec.setLength(file.length());
     }
-    
+
     /**
      * Calculate a hash value for the executable file.
      * 

@@ -22,7 +22,7 @@ import java.util.Vector;
 
 import org.apache.tools.ant.types.DataType;
 
-import com.nokia.helium.signal.Notifier;
+import com.nokia.helium.signal.ant.Notifier;
 
     
 /**

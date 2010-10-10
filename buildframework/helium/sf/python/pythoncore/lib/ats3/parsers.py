@@ -222,7 +222,7 @@ class CppParser(object):
                 _logger.debug(itm)
             for itm in test_cases:
                 _logger.debug(itm)
-            _logger.error(path_to_bld + ' test_sets are empty')
+            _logger.error(path_to_bld + ' - test sets are empty')
         return test_sets
 
     
@@ -553,7 +553,7 @@ class MmpFileParser(object):
             elif harness is "STIF":
                 dll_type = "executable"
 
-        except:
+        except IOError:
             traceback.print_exc()
         else:
             returnvals = None
@@ -596,7 +596,6 @@ class PkgFileParser(object):
         self.drive = drive
         self._files = []
         self.pkg_files = []
-        self.pkg_file_path = None
         self.exclude = ""
         self.location = None
         self.bldpath = bldpath
@@ -638,7 +637,7 @@ class PkgFileParser(object):
 
         return self.pkg_files
 
-    def get_data_files(self, location = [], drive = "", exclude = ""):
+    def get_data_files(self, location=None, drive="", exclude=""):
         """
         Returns data files, source and destination of the files to be installed 
         on the phone 
@@ -656,7 +655,9 @@ class PkgFileParser(object):
         
         if pkg file is not given, the function will try to find the file(s) on the given location with extension ".pkg"
         """
-
+        if location == None:
+            location = []
+            
         self.drive = drive
         self.exclude = exclude
         self._files = []
@@ -681,15 +682,13 @@ class PkgFileParser(object):
 
         return self.read_pkg_file(self._files)
 
-    def __map_pkg_path(self, pkg_line, pkg_file_path, pkg_file):
+    def __map_pkg_path(self, pkg_line, pkg_file_path, pkg_file, test_type, libraries):
         """Parse package file to get the src and dst paths" for installing files"""
-        mmp_parser = MmpFileParser(self.bldpath)
         ext = ""
         val1 = ""
         val2 = ""
         map_src = ""
         map_dst = ""
-        self.pkg_file_path = pkg_file_path
         
         if not self.exclude == "":
             if re.search(r'%s' % self.exclude, pkg_line) is not None:
@@ -712,19 +711,20 @@ class PkgFileParser(object):
             if "$(target)" in val1.lower() and self.build_target is not None:
                 val1 = val1.lower().replace("$(target)", self.build_target)
 
-            #For MATTI PKG files in which location of the data files are unknown or can be changed
+            #For TDriver PKG files in which location of the data files are unknown or can be changed
             if "[PKG_LOC]" in val1.upper():
-                val1 = val1.replace("[PKG_LOC]", self.pkg_file_path)
+                val1 = val1.replace("[PKG_LOC]", pkg_file_path)
 
-            if os.path.exists(val1):
-                map_src = os.path.abspath(val1)
+            if os.path.isabs(os.path.normpath(val1)):
+                map_src = os.path.normpath(os.path.join(self.drive, val1))
+            elif re.search(r"\A\w", val1, 1):
+                map_src = os.path.normpath(os.path.join(pkg_file_path + os.sep, os.path.normpath(val1)))
             else:
-                if os.path.isabs(os.path.normpath(val1)):
-                    map_src = os.path.normpath(os.path.join(self.drive, val1))
-                elif re.search(r"\A\w", val1, 1):
-                    map_src = os.path.normpath(os.path.join(self.pkg_file_path + os.sep, os.path.normpath(val1)))
-                else:
-                    map_src = os.path.normpath(os.path.join(self.pkg_file_path, val1))
+                map_src = os.path.normpath(os.path.join(pkg_file_path, val1))
+
+            if os.sep == '\\': 
+                if os.path.splitunc(val1)[0].strip() != "":
+                    map_src = os.path.normpath(val1)
             map_dst = os.path.normpath(val2)
         else:
             map_src, map_dst = val1, val2
@@ -739,14 +739,6 @@ class PkgFileParser(object):
             ext = indx[1]
         else:
             _logger.warning("File extension not found for " + map_dst)
-
-        _test_type_ = ""
-        _target_filename_ = ""
-        
-        _target_filename_ = mmp_parser.get_target_filename(self.pkg_file_path)
-        _test_type_ = mmp_parser.get_dll_type(self.pkg_file_path)
-        _harness_ = mmp_parser.get_harness(self.pkg_file_path)
-        _libraries_ = mmp_parser.get_libraries(self.pkg_file_path)
         
         if ext == "ini":
             file_type = "engine_ini"
@@ -754,24 +746,24 @@ class PkgFileParser(object):
             file_type = "conf"
         elif ext == "dll":
             #adding type of dll (executable or dependent), if file type is dll
-            if _test_type_ == "dependent":
-                file_type = "data" + ":%s" % _test_type_
+            if test_type == "dependent":
+                file_type = "data" + ":%s" % test_type
             else:
-                if "qttest.lib" in _libraries_:
+                if "qttest.lib" in libraries:
                     file_type = "data" + ":qt:dependent" 
                 else:
-                    if 'symbianunittestfw.lib' in _libraries_:
+                    if 'symbianunittestfw.lib' in libraries:
                         file_type = "testmodule:sut"
                     else:
                         file_type = "testmodule"
                     
-        elif ext == 'exe' and 'rtest' in _libraries_:
+        elif ext == 'exe' and 'rtest' in libraries:
             file_type = "testmodule:rtest"
         elif ext == "exe":
-            if _test_type_ == "dependent":
-                file_type = "data" + ":%s" % _test_type_
+            if test_type == "dependent":
+                file_type = "data" + ":%s" % test_type
             else:
-                if "qttest.lib" in _libraries_:
+                if "qttest.lib" in libraries:
                     file_type = "testmodule:qt"
                 else:
                     file_type = "testmodule"
@@ -783,7 +775,7 @@ class PkgFileParser(object):
         elif ext == "pmd":
             file_type = "pmd"
         elif ext == "script":
-            if "testframeworkclient.lib" in _libraries_:
+            if "testframeworkclient.lib" in libraries:
                 file_type = "testscript:mtf:testframework.exe"
             else:
                 file_type = "testscript:testexecute.exe"
@@ -796,7 +788,7 @@ class PkgFileParser(object):
                 elif exename == 'testexecute.exe':
                     file_type = "testscript:" + exename
                 else:
-                    if "testframeworkclient.lib" in _libraries_:
+                    if "testframeworkclient.lib" in libraries:
                         file_type = "testscript:mtf:" + exename
                     else:
                         file_type = "testscript:" + exename
@@ -817,8 +809,8 @@ class PkgFileParser(object):
             pkg_files = [pkg_files]
             
         for pkg_file in pkg_files:
-            if not os.path.exists( pkg_file ):
-                _logger.error("No PKG -file in path specified")
+            if not os.path.exists(pkg_file):
+                _logger.error(pkg_file + ' not found')
                 continue
             else:
                 file1 = codecs.open(pkg_file, 'r', 'utf16')
@@ -829,11 +821,13 @@ class PkgFileParser(object):
                     lines = file1.readlines()
 
                 pkg_file_path = path((pkg_file.rsplit(os.sep, 1))[0])
+                
+                mmp_parser = MmpFileParser(self.bldpath)
+                test_type = mmp_parser.get_dll_type(pkg_file_path)
+                libraries = mmp_parser.get_libraries(pkg_file_path)
                 for line in lines:
-                    pkg_path = self.__map_pkg_path(line, pkg_file_path, os.path.basename(pkg_file))
-                    if pkg_path is None:
-                        continue
-                    else:
+                    pkg_path = self.__map_pkg_path(line, pkg_file_path, os.path.basename(pkg_file), test_type, libraries)
+                    if pkg_path:
                         pkg_paths.append(pkg_path)
 
         return pkg_paths

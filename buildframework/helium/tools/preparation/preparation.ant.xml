@@ -120,7 +120,7 @@ Description:
 
 
     <!-- Gets a release from network drive. -->
-    <target name="preparation-getenv" if="base_release.path" depends="init-build-area">
+    <target name="preparation-getenv" if="base_release.path" depends="init-build-area,start-ant-log">
         <!-- Making sure we have nothing to pass -->
         <property name="base_release.path" value=""/>
         <property name="base_release.getenv_options" value=""/>
@@ -373,7 +373,6 @@ if project.getProperty("build.area.count") > project.getProperty("build.area.lim
     <propertyset id="password.list.ref">
         <propertyref name="ccm.password.rc" />
         <propertyref name="ccm.user.password" />
-        <propertyref name="release.grace.password" />
         <propertyref name="unix.password" />
         <propertyref name="release.notes.password" />
         <propertyref name="nwiki.password" />
@@ -443,7 +442,10 @@ if project.getProperty("build.area.count") > project.getProperty("build.area.lim
                         <script language="jython" setbeans="false">
 from java.io import *
 import time
+import os
 prep_build_dir_str = project.getProperty('prep.build.dir')
+if prep_build_dir_str.endswith(os.sep):
+    prep_build_dir_str = prep_build_dir_str[:-1]
 prep_build_dir = File(prep_build_dir_str)
 print prep_build_dir
 if prep_build_dir.exists(): 

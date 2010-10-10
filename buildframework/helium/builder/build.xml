@@ -20,7 +20,7 @@ Description:
 
 ============================================================================
 -->
-<project name="helium-builder" default="build" xmlns:au="antlib:org.apache.ant.antunit" xmlns:ivy="antlib:org.apache.ivy.ant" xmlns:ac="antlib:net.sf.antcontrib">
+<project name="helium-builder" default="build" xmlns:au="antlib:org.apache.ant.antunit" xmlns:ivy="antlib:org.apache.ivy.ant" xmlns:ac="antlib:net.sf.antcontrib" xmlns:hlm="http://www.nokia.com/helium">
     <property environment="env" />
     <taskdef name="fmpp" classname="fmpp.tools.AntTask" />
     <import file="delivery.ant.xml" />
@@ -49,6 +49,7 @@ Description:
     <property name="config" value="sf" />
     <property name="sf.delivery.zip" location="${build.temp.dir}/helium-sf-src.zip" />
     <property name="binary.delivery.zip" location="${build.temp.dir}/helium-bin.zip" />
+    <property name="doc.build.dir" location="${build.temp.dir}/doc/api" />
     
     <fileset id="ant.build.files" dir="${source.root.dir}">
         <include name="${component.root}/${component.type}/${component}/build.xml" />
@@ -64,11 +65,24 @@ Description:
         <exclude name="build/**" />
     </fileset>
   
-    
+    <!-- Add macro in order to avoid the use of failonerror="false" in the delete task -->
+    <macrodef name="deleteIfDirExists">
+        <attribute name="dir"/>
+        <sequential>
+            <ac:if>
+                <available file="@{dir}" type="dir" />
+                <then>
+                    <delete dir="@{dir}" />
+                </then> 
+            </ac:if>        
+        </sequential>
+    </macrodef>
+
+   
     <target name="cleanup" description="Cleanup (delete the temp build directory)">
-        <delete dir="${build.temp.dir}" failonerror="false"/>
-        <delete dir="${source.root.dir}/external/antlibs2" failonerror="false" />
-        <delete dir="${source.root.dir}/external/python/lib/auto" failonerror="false" />
+        <deleteIfDirExists dir="${build.temp.dir}" />
+        <deleteIfDirExists dir="${source.root.dir}/external/antlibs2" />
+        <deleteIfDirExists dir="${source.root.dir}/external/python/lib/auto" />
     </target>
     
     
@@ -236,7 +250,7 @@ Description:
             inline="true" type="jar"
             pattern="${source.root.dir}/external/antlibs2/[artifact]-[revision].[ext]" />
         <delete>
-           <fileset dir="${source.root.dir}" includes="external/python/lib/auto/zipnotsafe/**" />
+            <fileset dir="${source.root.dir}" includes="external/python/lib/auto/zipnotsafe/**" />
         </delete>
         <ivy:retrieve sync="true" conf="default" organisation="com.nokia.helium.config"
             module="helium-${config}-config" revision="1.0"
@@ -362,7 +376,7 @@ Description:
     
     
     <target name="textdoc">
-        <delete dir="${build.temp.dir}/doc/doctmp" failonerror="false"/>
+        <deleteIfDirExists dir="${build.temp.dir}/doc/doctmp" />
         <copy todir="${build.temp.dir}/doc/doctmp" overwrite="true">
             <fileset dir="${source.root.dir}/sf/doc/src"/>
         </copy>
@@ -383,7 +397,7 @@ Description:
         <attribute name="output" default="${build.temp.dir}/doc/text"/>
         <sequential>
             <property name="sphinx.lib.dir" location="${builder.dir}/tools/sphinx/Sphinx-0.5.1-py2.5.egg/sphinx" />
-            <exec executable="python" failonerror="${failonerror}">
+            <exec executable="python" failonerror="true">
                 <env key="PYTHONPATH" path="${builder.dir}/tools/sphinx" />
                 <arg file="${builder.dir}/tools/sphinx/sphinx-build.py"/>
                 <arg value="-b" />
@@ -397,6 +411,32 @@ Description:
             </exec>
         </sequential>
     </macrodef>
+
+    <!-- Generate Ant API documentation using jeldoclet. -->
+    <target name="jeldoclet">
+        <path id="doclet-classpath">
+            <fileset dir="${build.temp.dir}" includes="**/*.jar"/>
+            <pathelement path="${java.class.path}/"/>
+        </path>
+        <javadoc destdir="${build.temp.dir}"
+           docletpathref="doclet-classpath"
+           useexternalfile="true"
+           failonerror="true">
+            <sourcepath>
+                <dirset dir="${source.root.dir}">
+                    <include name="*/java/*/src"/>
+                </dirset>
+            </sourcepath>
+            <doclet name="com.jeldoclet.JELDoclet"/>
+        </javadoc>
+        <fmpp sourceFile="${builder.dir}/tools/antdoclet/doclet_list.rst.ftl"
+            outputFile="${build.temp.dir}/temp/doc/helium-antlib/tasks.rst">
+            <data expandProperties="yes">
+                doc: xml(${build.temp.dir}/jel.xml)
+                ant: antProperties()
+            </data>
+        </fmpp>
+    </target>
     
 </project>
 

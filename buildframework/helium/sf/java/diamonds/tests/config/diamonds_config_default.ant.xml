@@ -29,29 +29,17 @@ Description:
     <property name="diamonds.tstamp.format" value="yyyy-MM-dd'T'HH:mm:ss" />
     <property name="diamonds.category" value="${build.family}" />
 
-    <hlm:stage id="test-echo-operation" 
-        startTarget="test-echo-operation" endTarget="test-echo-operation" />
-    <hlm:stage id="test-echo-operation1" 
-        startTarget="test-echo-operation1" endTarget="test-echo-operation1" />
-    <hlm:stage id="test-echo-operation2" 
-        startTarget="test-echo-operation2" endTarget="test-echo-operation2" />
-    <hlm:stage id="test-echo-operation3" 
-        startTarget="test-echo-operation3" endTarget="test-echo-operation3" />
-    <hlm:stage id="test-echo-operation4" 
-        startTarget="test-echo-operation4" endTarget="test-echo-operation4" />
-    <hlm:stage id="test-echo-operation5" 
-        startTarget="test-echo-operation5" endTarget="test-echo-operation5" />
+    <!-- those stages should be ignored -->
+    <hlm:stage id="inexistant-start-target" 
+        startTarget="inexistant-start-target" endTarget="diamonds" />
+    <hlm:stage id="inexistant-end-target" 
+        startTarget="diamonds" endTarget="inexistant-end-target" />
 
-<!--
-    <stage name="build" start="compile-target" end="compile-target"
-        logfile="${ant['compile.log.input']}"/>
-        -->
-    <hlm:stage id="stage-sequence-1" startTarget="test-buildid-set" endTarget="test-version"
-        />
-    <hlm:stage id="stage-sequence-2" startTarget="test-buildid-set" endTarget="test-defer-type"
-        />
-
-    <hlm:stage id="invalid-template-sequence" startTarget="test-buildid-set" endTarget="test-invalid-template-file"/>
+    <!-- stage 2 should be ignored. -->
+    <hlm:stage id="stage-sequence-1" startTarget="test-buildid-set" endTarget="test-version" />
+    <hlm:stage id="stage-sequence-2" startTarget="test-buildid-set" endTarget="test-defer-type" />
+    <hlm:stage id="stage-sequence-3" startTarget="test-defer-type" endTarget="test-version" />
+    
 
     <hlm:fmppMessage id="initial.message" sourceFile="${diamonds.template-dir}/diamonds_start.xml.ftl">
         <data expandProperties="yes">
@@ -77,11 +65,6 @@ Description:
         </data>
     </hlm:fmppMessage>
 
-    <hlm:fmppMessage id="stage.time.message" sourceFile="${diamonds.template-dir}/diamonds_stage.xml.ftl">
-        <data expandProperties="yes">
-            ant: antProperties()
-        </data>
-    </hlm:fmppMessage>
 
 
     <hlm:targetMessageTrigger id="codescanner.id" target="codescanner">
@@ -115,5 +98,23 @@ Description:
             </data>
         </hlm:fmppMessage>
     </hlm:targetMessageTrigger>
+
+    <hlm:targetMessageTrigger id="skipped-target.id" target="skipped-target">
+        <hlm:fmppMessage sourceFile="${diamonds.template-dir}${file.separator}skipped-target.xml.ftl">
+            <data expandProperties="yes">
+                ant: antProperties()
+            </data>
+        </hlm:fmppMessage>
+    </hlm:targetMessageTrigger>
+    
+    <hlm:targetTimingMessageListener id="target.timing.message.listener" minTime="1500" />
+    <hlm:targetMessageListener id="target.message.listener" />
+    <hlm:stageMessageListener id="stage.message.listener">
+        <hlm:fmppMessage sourceFile="${diamonds.template-dir}/diamonds_stage.xml.ftl">
+            <data expandProperties="yes">
+                ant: antProperties()
+            </data>
+        </hlm:fmppMessage>
+    </hlm:stageMessageListener>
     
 </project>
