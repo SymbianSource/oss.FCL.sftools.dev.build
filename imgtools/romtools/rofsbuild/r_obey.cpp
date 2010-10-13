@@ -40,6 +40,16 @@
 #include "fatimagegenerator.h" 
 #include "r_driveimage.h"
 
+#ifdef __LINUX__
+#include <dirent.h> 
+#include <sys/stat.h>
+#include <unistd.h>
+#else
+#include <io.h> 
+#include <direct.h> //TODO: check under MinGW4 + stlport 5.2
+#include <conio.h> 
+#endif
+
 #include "uniconv.hpp"
 extern TInt gCodePagingOverride;
 extern TInt gDataPagingOverride;
@@ -57,6 +67,7 @@ const ObeyFileKeyword ObeyFileReader::iKeywords[] =
 	{_K("file"),		2,-2, EKeywordFile, "File to be copied into ROFS"},
 	{_K("data"),		2,-2, EKeywordData, "same as file"},
 	{_K("dir"),         2,1, EKeywordDir, "Directory to be created into FAT image"},
+	{_K("dircopy"),      2,-2, EKeywordDirCpy, "Directory to be copied into FAT image"},
 
 	{_K("rofsname"),	1, 1, EKeywordRofsName, "output file for ROFS image"},
 	{_K("romsize"),		1, 1, EKeywordRomSize, "size of ROM image"}, 
@@ -268,7 +279,7 @@ TInt ObeyFileReader::ReadAndParseLine() {
 }
 
 TInt ObeyFileReader::NextLine(TInt aPass, enum EKeyword& aKeyword) {
-
+	static int warnline = -1;
 NextLine:
 	TInt err = ReadAndParseLine();
 	if (err == KErrEof)
@@ -312,8 +323,10 @@ NextLine:
 		aKeyword = k->iKeywordEnum;
 		return KErrNone;
 	}
-	if (aPass == 1)
+	if (aPass == 1 && iCurrentLine > warnline){
+		warnline = iCurrentLine;
 		Print(EWarning, "Unknown keyword '%s'.  Line %d ignored\n", iWord[0], iCurrentLine);
+	}
 	goto NextLine;
 }
 
@@ -740,6 +753,7 @@ TInt CObeyFile::ProcessDataDrive() {
 		case EKeywordHide:						
 		case EKeywordFile:
 		case EKeywordDir:
+		case EKeywordDirCpy:
 		case EKeywordData:
 		case EKeywordFileCompress:
 		case EKeywordFileUncompress:
@@ -933,7 +947,6 @@ EFalse- Fail to generate the tree.
 */
 TBool CObeyFile::ProcessDriveFile(enum EKeyword aKeyword) {
 
-	TBool isPeFile = ETrue;
 	TBool aFileCompressOption, aFileUncompressOption;
 
 	TInt epocPathStart=2;
@@ -945,8 +958,8 @@ TBool CObeyFile::ProcessDriveFile(enum EKeyword aKeyword) {
 	{
 	case EKeywordData:
 	case EKeywordDir:
+	case EKeywordDirCpy:
 	case EKeywordHide:
-		isPeFile = EFalse;
 		break;
 
 	case EKeywordFile:
@@ -964,7 +977,7 @@ TBool CObeyFile::ProcessDriveFile(enum EKeyword aKeyword) {
 		return EFalse;
 	}
 
-	if (aKeyword!=EKeywordHide && aKeyword!=EKeywordDir) {
+	if (aKeyword!=EKeywordHide && aKeyword!=EKeywordDir && aKeyword!=EKeywordDirCpy) {
 		// check the PC file exists
 		char* nname = NormaliseFileName(iReader.Word(1));		  
 		if(gIsOBYUTF8 && !UniConv::IsPureASCIITextStream(nname))
@@ -990,15 +1003,12 @@ TBool CObeyFile::ProcessDriveFile(enum EKeyword aKeyword) {
 		delete []nname ;												
 		 
 	}
-	else
+	else if (aKeyword != EKeywordDirCpy)
 		epocPathStart=1;   
-
-	if(aKeyword != EKeywordDir)
-		iNumberOfFiles++;
 
 	TBool endOfName=EFalse;
 	const char *epocStartPtr;
-	if(aKeyword != EKeywordDir)
+	if(aKeyword != EKeywordDir && aKeyword != EKeywordDirCpy)
 		epocStartPtr = IsValidFilePath(iReader.Word(epocPathStart));
 	else
 		epocStartPtr = IsValidDirPath(iReader.Word(epocPathStart));
@@ -1011,59 +1021,12 @@ TBool CObeyFile::ProcessDriveFile(enum EKeyword aKeyword) {
 
 	TRomNode* dir=iRootDirectory;
 	TRomNode* subDir=0;
-	TRomBuilderEntry *file=0;      
 
 	while (!endOfName) {
 		endOfName = GetNextBitOfFileName(epocEndPtr);      
-		if (endOfName && (aKeyword!=EKeywordDir)) { // file
-			TRomNode* alreadyExists=dir->FindInDirectory(epocStartPtr);
-			if ((aKeyword != EKeywordHide) && alreadyExists) { // duplicate file		
-				if (gKeepGoing) {
-					Print(EWarning, "Duplicate file for %s on line %d, will be ignored\n",iReader.Word(1),iReader.CurrentLine());
-					iNumberOfFiles--;
-					return ETrue;
-				}
-				else {	
-					Print(EError, "Duplicate file for %s on line %d\n",iReader.Word(1),iReader.CurrentLine());
-					return EFalse;
-				}
-			}
-			else if((aKeyword == EKeywordHide) && (alreadyExists)) { 
-				alreadyExists->iEntry->iHidden = ETrue;
-				alreadyExists->iHidden = ETrue;
-				return ETrue;
-			}
-			else if((aKeyword == EKeywordHide) && (!alreadyExists)) {
-				Print(EWarning, "Hiding non-existent file %s on line %d\n",iReader.Word(1),iReader.CurrentLine());
-				return ETrue;
-			}
-
-			file = new TRomBuilderEntry(iReader.Word(1), epocStartPtr);                   
-			file->iExecutable=isPeFile;
-			if( aFileCompressOption ) {
-				file->iCompressEnabled = ECompressionCompress;
-			}
-			else if(aFileUncompressOption )	{
-				file->iCompressEnabled = ECompressionUncompress;
-			}
-
-			TRomNode* node=new TRomNode(epocStartPtr, file);
-			if (node==0)
+		if (endOfName && (aKeyword!=EKeywordDir) && (aKeyword!=EKeywordDirCpy)) { // file
+			if (!AddFileToNodeTree(aKeyword, dir, epocStartPtr, iReader.Word(1), ETrue, aFileCompressOption, aFileUncompressOption))
 				return EFalse;
-
-			TInt r=ParseFileAttributes(node, file, aKeyword);         
-			if (r!=KErrNone)
-				return EFalse;
-
-			if(gCompress != ECompressionUnknown) {
-				node->iFileUpdate = ETrue;
-			}
-
-			if((node->iOverride) || (aFileCompressOption) || (aFileUncompressOption)) {
-				node->iFileUpdate = ETrue;
-			}
-
-			dir->AddFile(node);	// to drive directory structure.
 		}		 
 		else {
 			// directory
@@ -1071,24 +1034,195 @@ TBool CObeyFile::ProcessDriveFile(enum EKeyword aKeyword) {
 			if(!*epocStartPtr)
 				break;
 
-			subDir = dir->FindInDirectory(epocStartPtr);      
-			if (!subDir){ // sub directory does not exist			
-				if(aKeyword==EKeywordHide) {
-					Print(EWarning, "Hiding non-existent file %s on line %d\n",
-						iReader.Word(1),iReader.CurrentLine());
-					return ETrue;
-				}
-				subDir = dir->NewSubDir(epocStartPtr);
-				if (!subDir)
-					return EFalse;
+			subDir = AddDirToNodeTree(aKeyword, dir, epocStartPtr);				
+			if (!subDir) {
+				if (aKeyword != EKeywordHide)
+					return EFalse;//this is for memory alloc failed
+				else
+					return ETrue;//this is for hide a non-exist dir
 			}
 			dir=subDir;
 			epocStartPtr = epocEndPtr;
 		}  // end of else.
 	}
+
+	if (aKeyword == EKeywordDirCpy)	{
+		if(!CreateFromFolder(iReader.Word(1), dir))
+			return EFalse;
+	}
+		
 	return ETrue;
 }
 
+TRomNode* CObeyFile::AddFileToNodeTree(enum EKeyword aKeyword, TRomNode* dir, const char* filename, const char* aPCSidename, const TBool aParseAttr, TBool aFileCompressOption, TBool aFileUncompressOption)	{
+	TRomNode* alreadyExists=dir->FindInDirectory(filename);
+	if ((aKeyword != EKeywordHide) && alreadyExists) { // duplicate file		
+		if (gKeepGoing) {
+			Print(EWarning, "Duplicate file for %s on line %d, will be ignored\n",aPCSidename,iReader.CurrentLine());
+			return alreadyExists;
+		}
+		else {	
+			Print(EError, "Duplicate file for %s on line %d\n",aPCSidename,iReader.CurrentLine());
+			return 0;
+		}
+	}
+	else if((aKeyword == EKeywordHide) && (alreadyExists)) { 
+		alreadyExists->iEntry->iHidden = ETrue;
+		alreadyExists->iHidden = ETrue;
+		return alreadyExists;
+	}
+	else if((aKeyword == EKeywordHide) && (!alreadyExists)) {
+		Print(EWarning, "Hiding non-existent file %s on line %d\n",aPCSidename,iReader.CurrentLine());
+		return (TRomNode*)1;
+	}
+
+	iNumberOfFiles++;
+	TRomBuilderEntry* file = new TRomBuilderEntry(aPCSidename, filename);                   
+	if( aFileCompressOption ) {
+		file->iCompressEnabled = ECompressionCompress;
+	}
+	else if(aFileUncompressOption )	{
+		file->iCompressEnabled = ECompressionUncompress;
+	}
+
+	TRomNode* node=new TRomNode(filename, file);
+	if (node==0)
+		return 0;
+
+	if (aParseAttr){
+		TInt r=ParseFileAttributes(node, file, aKeyword);         
+		if (r!=KErrNone)
+			return 0;
+	}
+	if(gCompress != ECompressionUnknown) {
+		node->iFileUpdate = ETrue;
+	}
+
+	if((node->iOverride) || (aFileCompressOption) || (aFileUncompressOption)) {
+		node->iFileUpdate = ETrue;
+	}
+
+	dir->AddFile(node);	// to drive directory structure.
+	return node;
+}
+
+TRomNode* CObeyFile::AddDirToNodeTree(enum EKeyword aKeyword, TRomNode* dir, const char* dirname) {
+	TRomNode* subDir = dir->FindInDirectory(dirname);      
+	if (!subDir){ // sub directory does not exist			
+		if(aKeyword==EKeywordHide) {
+			Print(EWarning, "Hiding non-existent file %s on line %d\n",
+				iReader.Word(1),iReader.CurrentLine());
+			return 0;
+		}
+		subDir = dir->NewSubDir(dirname);
+		if (!subDir)
+			return 0;
+	}
+	return subDir;
+}
+
+TBool CObeyFile::CreateFromFolder(const char* aPath,TRomNode* aParent) { 
+	int len = strlen(aPath);  
+	if(!aParent)
+		aParent = new TRomNode("//");
+#ifdef __LINUX__
+	DIR* dir = opendir(aPath);
+	if(dir == NULL) {
+		Print(EError, "The directory %s does not exist.\n",aPath);
+		return EFalse;
+	}
+	dirent*  entry; 
+	struct stat statbuf ;
+	char* fileName = new(nothrow) char[len + 200];
+	if(!fileName) return EFalse ;
+	memcpy(fileName,aPath,len); 
+	fileName[len] = '/';
+	while ((entry = readdir(dir)) != NULL)  {
+		if(strcmp(entry->d_name,".") == 0 || strcmp(entry->d_name,"..") == 0)
+			continue ; 
+		strcpy(&fileName[len+1],entry->d_name);             
+		stat(fileName , &statbuf);   
+		if (S_ISDIR(statbuf.st_mode)){
+			TRomNode* subdir = AddDirToNodeTree(EKeywordDirCpy, aParent, entry->d_name);
+			if (!subdir){
+				delete []fileName;
+				return EFalse;
+			}
+			if (!CreateFromFolder(fileName, subdir)){
+				delete []fileName;
+				return EFalse;
+			}
+		}else{
+			if (!AddFileToNodeTree(EKeywordDirCpy, aParent, entry->d_name, fileName, EFalse)){
+				delete []fileName;
+				return EFalse;
+			}
+		}
+	}	
+	delete []fileName ;
+	closedir(dir);
+#else
+	struct _finddata_t data ;
+	memset(&data, 0, sizeof(data)); 	
+	char* fileName = new(nothrow) char[len + 200];
+	if(!fileName) return EFalse ;
+	memcpy(fileName,aPath,len); 
+  fileName[len] = '\\';
+	fileName[len+1] = '*';
+	fileName[len+2] = 0;
+	intptr_t hFind =  _findfirst(fileName,&data); 
+ 
+	if(hFind == (intptr_t)-1 ) {
+		Print(EError, "The directory %s does not exist.\n",aPath);
+		delete []fileName;
+		return EFalse;
+	}	
+	
+	do {        
+    if(strcmp(data.name,".") == 0 || strcmp(data.name,"..") == 0)
+        continue ; 
+        
+    strcpy(&fileName[len+1],data.name); 
+    if(data.attrib & _A_SUBDIR){ 
+			TRomNode* subDir = AddDirToNodeTree(EKeywordDirCpy, aParent, data.name);
+			if (!subDir){
+				delete []fileName;
+				return EFalse;
+			}
+      if(data.attrib & _A_RDONLY)
+				subDir->iAtt |= KEntryAttReadOnly;
+      if(data.attrib &  _A_HIDDEN){
+				subDir->iAtt |= KEntryAttHidden;
+			}
+      if(data.attrib & _A_SYSTEM)
+				subDir->iAtt |= KEntryAttSystem;
+			if (!CreateFromFolder(fileName, subDir)){
+				delete []fileName;
+				return EFalse;
+			}
+		}else{
+			TRomNode* node = AddFileToNodeTree(EKeywordDirCpy, aParent, data.name, fileName, EFalse);
+			if (!node){
+				delete []fileName;
+				return EFalse;
+			}
+      if(data.attrib & _A_RDONLY)
+				node->iAtt |= KEntryAttReadOnly;
+      if(data.attrib &  _A_HIDDEN){
+				node->iAtt |= KEntryAttHidden;
+     		node->iEntry->iHidden = ETrue;
+				node->iHidden = ETrue;
+			}
+      if(data.attrib & _A_SYSTEM)
+				node->iAtt |= KEntryAttSystem;
+		}
+  } while(-1 != _findnext(hFind, &data));
+	delete []fileName ;
+  _findclose(hFind);
+#endif
+ 
+	return ETrue;
+}
 
 TInt CObeyFile::SetStackSize(TRomNode *aNode, const char* aStr) {
 	if (EFalse == IsValidNumber(aStr))

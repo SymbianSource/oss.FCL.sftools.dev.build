@@ -296,7 +296,7 @@ TInt ObeyFileReader::ReadAndParseLine() {
 }
 TInt ObeyFileReader::NextLine(TInt aPass, enum EKeyword& aKeyword)
 	{
-
+	static int warnline = -1;
 NextLine:
 	TInt err = ReadAndParseLine();
 	if (err == KErrEof)
@@ -346,8 +346,10 @@ NextLine:
 		aKeyword = k->iKeywordEnum;
 		return KErrNone;
 	}
-	if (aPass == 1)
+	if (aPass == 1 && iCurrentLine > warnline){
+		warnline = iCurrentLine;
 		Print(EWarning, "Unknown keyword '%s'.  Line %d ignored\n", iWord[0], iCurrentLine);
+	}
 	goto NextLine;
 }
 

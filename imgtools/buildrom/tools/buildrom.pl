@@ -53,13 +53,15 @@ $ENV{PATH}="${PerlLibPath}$delimiter${epocroot}epoc32\/tools$delimiter${epocroot
 	# Processes the buildrom command line parameters.
 	&process_cmdline_arguments;
 	
-	&image_content_processing_phase;
+	my $ignoreconfig = &isIgnoreConfig;
+	
+	&image_content_processing_phase if(!$ignoreconfig);
 
 	#Processes intermediate oby files.  Also processes any new option added to the buildrom in future.
-	&processobyfiles;
+	&processobyfiles if(!$ignoreconfig);
 
 	# Suppress ROM/ROFS/DataDrive Image creation if "-noimage" option is provided.
-	&suppress_image_generation;
+	&suppress_image_generation if(!$ignoreconfig);
 	
 	#Invokes ROMBUILD and ROFSBUILD
 	&invoke_rombuild;

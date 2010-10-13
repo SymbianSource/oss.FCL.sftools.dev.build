@@ -57,6 +57,7 @@ require Exporter;
 	processData
 	create_smrimage
 	getWorkdir
+	isIgnoreConfig
 );
 
 my $useinterpretsis = 1;
@@ -66,7 +67,7 @@ if ($^O !~ /^MSWin32$/i){
 my $enforceFeatureManager = 0; # Flag to make Feature Manager mandatory if SYMBIAN_FEATURE_MANAGER macro is defined. 
 
 my $BuildromMajorVersion = 3 ;
-my $BuildromMinorVersion = 28;
+my $BuildromMinorVersion = 30;
 my $BuildromPatchVersion = 0;
 
 
@@ -159,6 +160,9 @@ The available options are
    -stdcpp                          -- ignore symbian customized cpp and try to find another cpp in the PATH.(for Windows only)
    -cpp=xxx                         -- specify a CPP preprocessor used by Buildrom.
    -xiponly                      -- just create the XIP ROM image without creating the ROFS image.
+   -inputoby=<finalOBYfile>         -- Ignore BUILDROM config phase, invoke Rombuild/Rofsbuild using <finalOBYfile>.
+                                    <finalOBYfile> must contain one and ONLY one of romsize/rofssize/dataimagename/imagename keywords,
+                                    The keywords will be used to identify the OBY type.
    
 Popular -D defines to use include
 
@@ -354,6 +358,8 @@ my $obycharset;
 my $cppoption = 0;
 my $preprocessor = "cpp";
 my $opt_xiponly = 0;
+my $ignoreconfig = 0;
+my $romcount = 0;
 
 sub match_obyfile
 {
@@ -424,7 +430,8 @@ sub create_datadriveImage
 					$compress =~m/\s-(compression)(method)\s(none|inflate|bytepair)/;
 					print "* ".$1." ".$2.": ".$3;
 				}
-				my $command = "rofsbuild -slog".$compress." -datadrive=$obeyfile.oby";
+				my $command = "rofsbuild -slog".$compress." -datadrive=$obeyfile.oby -logfile=$thisdir";
+				$command .= " -k" if($opt_k);      
 				print "* Executing $command\n" if ($opt_v);
 				system($command);
 				if ($? != 0)
@@ -505,129 +512,132 @@ sub processData
 {
 	if($dataImageCount)
 	{
-		# set the default path for Z drive and Data drive directory,
-		# if and only if, path is not specified by the user. 
-		$ZDirloc = $thisdir."zdrive" unless ($ZDirloc);
-		$DataDriveDirloc = $thisdir."datadrive" unless ($DataDriveDirloc);
-		#delete any existing Z drive directory.
-		my $retVal = &datadriveimage::deleteDirectory($ZDirloc,$opt_v)if(!$opt_r);
-		if($retVal)
+		if(!$ignoreconfig)
 		{
-			exit(1) if(!$opt_k);
-		}
-		# delete pre-existence of data drive folder, if and only if -r option is not enabled.
-		$retVal = &datadriveimage::deleteDirectory($DataDriveDirloc,$opt_v) if(!$opt_r);
-		if($retVal)
-		{
-			exit(1) if(!$opt_k);
-		}
-		if($opt_logFile)
-		{
-			# clean any pre-existance of log file.
-			unlink($ZDirloc."\/".$imageEntryLogFile);
-		}
-		
-		for (my $datadriveidx=0; $datadriveidx < $dataImageCount; $datadriveidx++)
-		{
-			my $driveIndex = $dataIndexHash{$datadriveidx};
-			# get the data drive name.
-			if( defined( $driveIndex ) )
+			# set the default path for Z drive and Data drive directory,
+			# if and only if, path is not specified by the user. 
+			$ZDirloc = $thisdir."zdrive" unless ($ZDirloc);
+			$DataDriveDirloc = $thisdir."datadrive" unless ($DataDriveDirloc);
+			#delete any existing Z drive directory.
+			my $retVal = &datadriveimage::deleteDirectory($ZDirloc,$opt_v)if(!$opt_r);
+			if($retVal)
 			{
-				my $datadrivename=$datadriveimage[$driveIndex]{obeyfile};
-				# get the size of the data drive.
-				my $size = $datadriveimage[$driveIndex]{size};
-				if( $datadrivename )
+				exit(1) if(!$opt_k);
+			}
+			# delete pre-existence of data drive folder, if and only if -r option is not enabled.
+			$retVal = &datadriveimage::deleteDirectory($DataDriveDirloc,$opt_v) if(!$opt_r);
+			if($retVal)
+			{
+				exit(1) if(!$opt_k);
+			}
+			if($opt_logFile)
+			{
+				# clean any pre-existance of log file.
+				unlink($ZDirloc."\/".$imageEntryLogFile);
+			}
+			
+			for (my $datadriveidx=0; $datadriveidx < $dataImageCount; $datadriveidx++)
+			{
+				my $driveIndex = $dataIndexHash{$datadriveidx};
+				# get the data drive name.
+				if( defined( $driveIndex ) )
 				{
-					# set data drive oby file.
-					my $datadriveobyfile = $datadrivename.".oby";
-					# final location of prototype data drive.
-					my $proDataDriveDirloc;
-					# Location of stub-sis file(s) inside Z Drive folder.
-					my $zDriveSisFileLoc;
-					# check if more than one data drive image needs to be generated. 
-					if ($datadrivename =~ /.*[\\\/]([^\\\/]+)$/)
+					my $datadrivename=$datadriveimage[$driveIndex]{obeyfile};
+					# get the size of the data drive.
+					my $size = $datadriveimage[$driveIndex]{size};
+					if( $datadrivename )
 					{
-						$datadrivename = $1;
-					}
-					if( $dataImageCount > 1 )
-					{
-						# if yes, then set the location of prototype data drive folder as 
-						# DataDriveDirloc + datadrivename
-						$proDataDriveDirloc = $DataDriveDirloc."\/".$datadrivename;
-					}
-					else
-					{
-						# else, then set the location of prototype data drive folder as DataDriveDirloc 
-						$proDataDriveDirloc = $DataDriveDirloc;
-					}
-
-					# create prototype data drive folder.
-					print "creating data drive folder\n" if ($opt_v);
-					&datadriveimage::createDirectory($proDataDriveDirloc);
-
-					# check for sis file keyword in ROM description file.
-					# if found,then locate for stub-sisfile.
-					# create Z drive( if and only if stub-sis files are present in ROM description file )
-					# and dump all the non-sis files on to the Z drive folder. 
-					if(&datadriveimage::checkForSisFile($datadriveobyfile,\@sisfilelist,\$sisfilepresent))
-					{
-						my $zDriveImagePresent = 0; # flag to check whether z drive image is Present;
-						if(&datadriveimage::checkForZDriveImageKeyword($datadriveobyfile,\@zDriveImageList,\$zDriveImagePresent) )
+						# set data drive oby file.
+						my $datadriveobyfile = $datadrivename.".oby";
+						# final location of prototype data drive.
+						my $proDataDriveDirloc;
+						# Location of stub-sis file(s) inside Z Drive folder.
+						my $zDriveSisFileLoc;
+						# check if more than one data drive image needs to be generated. 
+						if ($datadrivename =~ /.*[\\\/]([^\\\/]+)$/)
 						{
-							# find out size of the array
-							my $arraysize = scalar(@zDriveImageList);
-							for( my $i=0; $i < $arraysize; $i++ )
-							{
-								$zDriveSisFileLoc =  $ZDirloc."\/".$datadrivename;
-								&datadriveimage::invokeReadImage(pop(@zDriveImageList),$zDriveSisFileLoc,$opt_v,$imageEntryLogFile,$opt_k);
-							}
+							$datadrivename = $1;
+						}
+						if( $dataImageCount > 1 )
+						{
+							# if yes, then set the location of prototype data drive folder as 
+							# DataDriveDirloc + datadrivename
+							$proDataDriveDirloc = $DataDriveDirloc."\/".$datadrivename;
 						}
 						else
 						{
-							$zDriveSisFileLoc = $ZDirloc;
-							# locate and copy stub-sis file(s),for the first time.
-							if( !$zDrivePresent )
+							# else, then set the location of prototype data drive folder as DataDriveDirloc 
+							$proDataDriveDirloc = $DataDriveDirloc;
+						}
+	
+						# create prototype data drive folder.
+						print "creating data drive folder\n" if ($opt_v);
+						&datadriveimage::createDirectory($proDataDriveDirloc);
+	
+						# check for sis file keyword in ROM description file.
+						# if found,then locate for stub-sisfile.
+						# create Z drive( if and only if stub-sis files are present in ROM description file )
+						# and dump all the non-sis files on to the Z drive folder. 
+						if(&datadriveimage::checkForSisFile($datadriveobyfile,\@sisfilelist,\$sisfilepresent))
+						{
+							my $zDriveImagePresent = 0; # flag to check whether z drive image is Present;
+							if(&datadriveimage::checkForZDriveImageKeyword($datadriveobyfile,\@zDriveImageList,\$zDriveImagePresent) )
 							{
-								# check for image file.
-								if( $opt_zimage )
+								# find out size of the array
+								my $arraysize = scalar(@zDriveImageList);
+								for( my $i=0; $i < $arraysize; $i++ )
 								{
-									# image(s)supplied to BUILDROM(like rom,rofs,extrofs or core) using "-zdriveimage" option, 
-									# are maintained in a seperate array and the element from the array is fetched one by one and is 
-									# fed to READIMAGE as an input.
-									foreach my $element (@zdriveImageName)
-									{
-										# invoke READIMAGE to extract all /swi stub sis file(s) from the given image.
-										$zDrivePresent = &datadriveimage::invokeReadImage($element,$zDriveSisFileLoc,$opt_v,$imageEntryLogFile,$opt_k);
-									}
+									$zDriveSisFileLoc =  $ZDirloc."\/".$datadrivename;
+									&datadriveimage::invokeReadImage(pop(@zDriveImageList),$zDriveSisFileLoc,$opt_v,$imageEntryLogFile,$opt_k);
 								}
-								else
+							}
+							else
+							{
+								$zDriveSisFileLoc = $ZDirloc;
+								# locate and copy stub-sis file(s),for the first time.
+								if( !$zDrivePresent )
 								{
-									# if zdrive image(s) such as (rom,core,rofs or extrofs) are generated ealier to the data drive image processing
-									# then these images are maintained in an array and the element from the array is fetched one by one and is 
-									# fed to READIMAGE as an input.
-									foreach my $element (@romImages)
+									# check for image file.
+									if( $opt_zimage )
 									{
-										# invoke READIMAGE to extract all /swi stub sis file(s) from the given image.
-										$zDrivePresent = &datadriveimage::invokeReadImage($element,$zDriveSisFileLoc,$opt_v,$imageEntryLogFile,$opt_k);
+										# image(s)supplied to BUILDROM(like rom,rofs,extrofs or core) using "-zdriveimage" option, 
+										# are maintained in a seperate array and the element from the array is fetched one by one and is 
+										# fed to READIMAGE as an input.
+										foreach my $element (@zdriveImageName)
+										{
+											# invoke READIMAGE to extract all /swi stub sis file(s) from the given image.
+											$zDrivePresent = &datadriveimage::invokeReadImage($element,$zDriveSisFileLoc,$opt_v,$imageEntryLogFile,$opt_k);
+										}
+									}
+									else
+									{
+										# if zdrive image(s) such as (rom,core,rofs or extrofs) are generated ealier to the data drive image processing
+										# then these images are maintained in an array and the element from the array is fetched one by one and is 
+										# fed to READIMAGE as an input.
+										foreach my $element (@romImages)
+										{
+											# invoke READIMAGE to extract all /swi stub sis file(s) from the given image.
+											$zDrivePresent = &datadriveimage::invokeReadImage($element,$zDriveSisFileLoc,$opt_v,$imageEntryLogFile,$opt_k);
+										}
 									}
 								}
 							}
+							# invoke INTERPRETSIS tool with z drive folder location.
+							if ($useinterpretsis)
+							{
+								&datadriveimage::invokeInterpretsis( \@sisfilelist,$proDataDriveDirloc,$opt_v,$zDriveSisFileLoc,$paraFile,$opt_k,\@interpretsisOptList,$thisdir)if($sisfilepresent);
+							}else
+							{
+								print "Warning: interpretsis is not ready on linux.\n";
+							}	
 						}
-						# invoke INTERPRETSIS tool with z drive folder location.
-						if ($useinterpretsis)
-						{
-							&datadriveimage::invokeInterpretsis( \@sisfilelist,$proDataDriveDirloc,$opt_v,$zDriveSisFileLoc,$paraFile,$opt_k,\@interpretsisOptList,$thisdir)if($sisfilepresent);
-						}else
-						{
-							print "Warning: interpretsis is not ready on linux.\n";
-						}	
+	
+						# create an oby file by traversing through upated prototype data drive directory.
+						&datadriveimage::dumpDatadriveObydata( $proDataDriveDirloc,$datadriveobyfile,$size,\@nonsisFilelist,
+											\@renameList,\@aliaslist,\@hideList,\@sisobydata,\@datadrivedata,$opt_k,$opt_v );
+						#reset sisfilepresent flag to zero;
+						$sisfilepresent =0;
 					}
-
-					# create an oby file by traversing through upated prototype data drive directory.
-					&datadriveimage::dumpDatadriveObydata( $proDataDriveDirloc,$datadriveobyfile,$size,\@nonsisFilelist,
-										\@renameList,\@aliaslist,\@hideList,\@sisobydata,\@datadrivedata,$opt_k,$opt_v );
-					#reset sisfilepresent flag to zero;
-					$sisfilepresent =0;
 				}
 			}
 		}
@@ -902,7 +912,7 @@ sub process_cmdline_arguments
 		next;
 	    }
    		#Process imagecontent file 
-	    if( $arg =~ /^-i(.*)/)
+	    if( $arg =~ /^-i(.*)/ && $arg !~ /^-input(.*)/)
 	    {
 # Disabling -i option
 		print "Warning: Ignoring invalid Option $arg \n";
@@ -1106,6 +1116,61 @@ sub process_cmdline_arguments
           }
           next;
         }
+		if ($arg =~ /^-inputoby=(.*)/)
+		{
+			$ignoreconfig =1;
+			my $ignoreoby = $1;
+			$ignoreoby .= ".oby" unless $ignoreoby =~ /\.oby$/i;
+			die "$ignoreoby file does not exist!!\n" if (!-e $ignoreoby);
+			open IGNORE, "$ignoreoby" or die("* Can't open $ignoreoby\n");
+			my @lines = <IGNORE>;
+			close IGNORE;
+			my $keywordcount = 0;
+			my $romimgcount = 0;
+			my $rofsimgcount = 0;
+			my $fatcount = 0;
+			my $smrcount = 0;
+			foreach my $line (@lines)
+			{
+				if ($line =~ /^\s*romsize\s*=/)
+				{
+					next if ($romimgcount);
+					$romimgcount = 1;
+					$keywordcount ++;
+					$ignoreoby =~ s/\.oby$//i;
+					$romimage[$romcount] = {xip=>1, obeyfile=>$ignoreoby, compress=>0, extension=>0, composite=>"none",uncompress=>0 };
+					$romcount ++;
+				}elsif ($line =~ /^\s*rofssize\s*=/)
+				{
+					next if ($rofsimgcount);
+					$rofsimgcount = 1;
+					$keywordcount ++;
+					$ignoreoby =~ s/\.oby$//i;
+					$romimage[$romcount] = {xip=>0, obeyfile=>$ignoreoby, compress=>0, extension=>0, composite=>"none",uncompress=>0 };
+					$romcount ++;
+				}elsif ($line =~ /^\s*dataimagename\s*=/)
+				{
+					next if ($fatcount);
+					$fatcount = 1;
+					$keywordcount ++;
+					$ignoreoby =~ s/\.oby$//i;
+					$datadriveimage[$dataImageCount] = {obeyfile=>$ignoreoby, compress=>0, uncompress=>0};
+					$dataImageCount ++;
+					$dataIndexHash{0} = 0;
+				}elsif ($line =~ /^\s*imagename\s*=/)
+				{
+					next if ($smrcount);
+					$smrcount = 1;
+					$keywordcount ++;
+					$ignoreoby =~ s/\.oby$//i;
+					$needSmrImage = 1;
+					push @obeyFileList, $ignoreoby;
+				}
+			}
+			die "$ignoreoby file does not contain keywords romsize/rofssize/dataimagename/imagename, cannot identify the oby type!\n" if ($keywordcount == 0);
+			die "$ignoreoby file contains $keywordcount keywords of romsize/rofssize/dataimagename/imagename, cannot identify the oby type! Maybe $ignoreoby is not a final oby file.\n" if ($keywordcount > 1);
+			next;
+		}
 		if( $arg =~ /^-loglevel\d+$/)
 		{
 			$logLevel= $arg;
@@ -1258,7 +1323,8 @@ sub process_cmdline_arguments
 		return;
 	}
 	
-	if (@obyfiles<1)
+	$preserve = 1 if ($ignoreconfig);
+	if (@obyfiles<1 && !$ignoreconfig)
 	{
 	    print "Missing obyfile argument\n";
 	    $errors++ if(!$opt_k);
@@ -3250,6 +3316,7 @@ sub suppress_phase
 				$from =~ s/\\/\\\\/g;	
 				$from =~ s/\//\\\//g;		# need to escape backslashes
 				$from =~ s/(\[|\])/\\$1/g;	# need to escape square brackets for file names like "featreg.cfg[x-y]",etc.
+				$from =~ s/(\{|\})/\\$1/g;	# need to escape brace for file names like "mydll{00010001}.dll",etc.
 				my $into = $fileExists;
 
  				$line =~ s/$from/$into/i;
@@ -3607,7 +3674,7 @@ sub reformat_line($)
 	{
 		return $line;
 	}
-	elsif($line =~ /^\s*dir\s*=.*/i)
+	elsif($line =~ /^\s*(dir|dircopy)\s*=.*/i)
 	{
 		return $line;
 	}
@@ -4868,7 +4935,8 @@ sub create_smrimage
 		foreach my $oby (@obeyFileList)
 		{
 			is_existinpath("rofsbuild", romutl::ERROR_NOT_FOUND);
-			my $command = "rofsbuild -slog -smr=$oby.oby";
+			my $command = "rofsbuild -slog -smr=$oby.oby -logfile=$thisdir";
+			$command .= " -k" if($opt_k);      
 			print "* Executing $command\n" if($opt_v);
 			system($command);
 			if($? != 0)
@@ -4911,6 +4979,11 @@ sub create_smrimage
 sub getWorkdir
 {
 	return $thisdir;
+}
+
+sub isIgnoreConfig
+{
+	return $ignoreconfig;
 }
 
 sub find_stdcpp

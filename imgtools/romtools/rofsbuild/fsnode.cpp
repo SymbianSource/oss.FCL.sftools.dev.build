@@ -25,19 +25,6 @@
  
 #include <ctype.h> 
  
-
-#ifdef __LINUX__
-#include <dirent.h> 
-#include <sys/stat.h>
-#include <unistd.h>
-#define SPLIT_CHAR '/'
-#else
-#include <io.h> 
-#include <direct.h> //TODO: check under MinGW4 + stlport 5.2
-#include <conio.h> 
-#define SPLIT_CHAR '\\'
-#endif
- 
 using namespace std;
 
 const TUint KBytesPerEntry = 13 ;
@@ -103,85 +90,6 @@ TFSNode::~TFSNode(){
 		delete iWideName;
 	if(iPCSideName)
 		free(iPCSideName);
-}
- 
-TFSNode* TFSNode::CreateFromFolder(const char* aPath,TFSNode* aParent) { 
-	 
-	int len = strlen(aPath);  
-#ifdef __LINUX__
-	DIR* dir = opendir(aPath);
-	if(dir == NULL) {
-		cout << aPath << " does not contain any subfolder/file.\n";     
-			return aParent;
-	}
-	if(!aParent)
-		aParent = new TFSNode(NULL,"/",ATTR_DIRECTORY);
-	dirent*  entry; 
-	struct stat statbuf ;
-	char* fileName = new(nothrow) char[len + 200];
-	if(!fileName) return NULL ;
-	memcpy(fileName,aPath,len); 
-	fileName[len] = SPLIT_CHAR;
-	while ((entry = readdir(dir)) != NULL)  {
-		if(strcmp(entry->d_name,".") == 0 || strcmp(entry->d_name,"..") == 0)
-			continue ; 
-		strcpy(&fileName[len+1],entry->d_name);             
-		stat(fileName , &statbuf);         
-		TFSNode* pNewItem = new TFSNode(aParent,fileName,S_ISDIR(statbuf.st_mode) ? ATTR_DIRECTORY : 0);
-		pNewItem->Init(statbuf.st_ctime,statbuf.st_atime,statbuf.st_mtime,statbuf.st_size);         
-		if(S_ISDIR(statbuf.st_mode)){ 
-			CreateFromFolder(fileName,pNewItem);
-		} 
-	}	
-	delete []fileName ;
-	closedir(dir);
-#else
-	struct _finddata_t data ;
-	memset(&data, 0, sizeof(data)); 	
-	char* fileName = new(nothrow) char[len + 200];
-	if(!fileName) return NULL ;
-	memcpy(fileName,aPath,len); 
-    fileName[len] = SPLIT_CHAR;
-	fileName[len+1] = '*';
-	fileName[len+2] = 0;
-	intptr_t hFind =  _findfirst(fileName,&data); 
- 
-	if(hFind == (intptr_t)-1 ) {
-		cout << aPath << " does not contain any subfolder/file.\n";		
-		delete []fileName;
-		return aParent;
-	}	
-	if(!aParent)
-	    aParent = new TFSNode(NULL,"/",ATTR_DIRECTORY);	
-	
-	do {        
-        if(strcmp(data.name,".") == 0 || strcmp(data.name,"..") == 0)
-            continue ; 
-        
-        strcpy(&fileName[len+1],data.name); 
-        TUint8 attr = 0;
-        if(data.attrib & _A_SUBDIR)  
-            attr |= ATTR_DIRECTORY;
-        if(data.attrib & _A_RDONLY)
-            attr |= ATTR_READ_ONLY ;
-        if(data.attrib &  _A_HIDDEN)
-            attr |= ATTR_HIDDEN ;
-        if(data.attrib & _A_SYSTEM)
-            attr |= ATTR_SYSTEM ;
-        if(data.attrib & _A_ARCH)
-            attr |= ATTR_ARCHIVE;      
-        TFSNode* pNewItem = new TFSNode(aParent,data.name,attr,fileName);        
-        pNewItem->Init(data.time_create,data.time_access,data.time_write,data.size);            
-        if(data.attrib & _A_SUBDIR){ 
-            CreateFromFolder(fileName,pNewItem);
-        }  
- 
-    } while(-1 != _findnext(hFind, &data));
-	delete []fileName ;
-    _findclose(hFind);
-#endif
- 
-	return aParent;
 }
  
 /** GenerateBasicName : Generate the short name according to long name 

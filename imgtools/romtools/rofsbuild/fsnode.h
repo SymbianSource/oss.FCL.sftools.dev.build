@@ -55,9 +55,7 @@ public :
 	// GetSize() 
 	void WriteDirEntries(TUint aStartIndex, TUint8* aClusterData ); 
 	
-	static TFSNode* CreateFromFolder(const char* aPath,TFSNode* aParent = NULL);
-	
-	
+
 	
 protected:
 	void GenerateBasicName();

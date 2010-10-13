@@ -288,20 +288,35 @@ sub copyNonSisFiles
 	open (OBEY ,$obyfile) or die($obyfile."\n");
 	while(my $line =<OBEY>) 
 	{
-		if( $line =~ /^(file|data)\s*=\s*(\"[^"]+\")\s+(\"[^"]+\")/i || 
-				$line =~ /^(file|data)\s*=\s*(\"[^"]+\")\s+(\S+)/i || 
-				$line =~ /^(file|data)\s*=\s*(\S+)\s+(\"[^"]+\")/i || 
-				$line =~ /^(file|data)\s*=\s*(\S+)\s+(\S+)/i )
+		if( $line =~ /^(file|data|dircopy)\s*=\s*(\"[^"]+\")\s+(\"[^"]+\")/i || 
+				$line =~ /^(file|data|dircopy)\s*=\s*(\"[^"]+\")\s+(\S+)/i || 
+				$line =~ /^(file|data|dircopy)\s*=\s*(\S+)\s+(\"[^"]+\")/i || 
+				$line =~ /^(file|data|dircopy)\s*=\s*(\S+)\s+(\S+)/i )
 		{
 			my $keyWord=$1;
 			my $source=$2;
 			my $dest=$3;
 
-			if( $source !~ /(\S+):([^"]+)/ )
-			{ 
-				$source = get_drive().$2;
+			my $currentdir=cwd;
+			$currentdir=~s-\\-\/-go;
+			$currentdir.= "\/" unless $currentdir =~ /\/$/;
+			$currentdir =~ s-\/-\\-g if (&is_windows);
+			my $drive = "";
+			$drive = $1 if ($currentdir =~ /^(.:)/);
+			$source =~ s/\"//g;
+			if ($source =~ /^[\\\/]/)
+			{
+				$source = $drive.$source;
+			}elsif ($source !~ /^.:/)
+			{
+				$source = $currentdir.$source;
 			}
-			my $var = &copyFilesToFolders( $source,$dest,$dir,$verboseOpt);
+			$source = "\"".$source."\"";
+
+			my $var = $source;
+			if ($keyWord ne "dircopy"){
+				$var = &copyFilesToFolders( $source,$dest,$dir,$verboseOpt);
+			}
 			if($var)
 			{
 				$line = $keyWord."=".$var."\t".$dest."\n";
@@ -371,8 +386,6 @@ sub invokeInterpretsis
 	my $command = "interpretsis ";
 	my $vOption = "-w info" if ($verboseOpt);
 	
-	is_existinpath("interpretsis", romutl::DIE_NOT_FOUND);
-
 	# do a check if the path has a white space.
 	if( $dataDrivePath =~ m/ /)
 	{
@@ -457,6 +470,11 @@ sub invokeInterpretsis
 	print "* Changing to $outputdir\n" if ( $verboseOpt );
 	chdir "$outputdir";
 	
+	my $epocroot = &get_epocroot;
+	if ($epocroot !~ /^(.:)/)
+	{
+	  $ENV{EPOCROOT} = $drive.$epocroot;
+	}
 	print "* Executing $command\n" if ( $verboseOpt );
 	system ( $command );
 
@@ -467,6 +485,7 @@ sub invokeInterpretsis
 	
 	print "* Changing back to $currentdir\n" if ( $verboseOpt );
 	chdir "$currentdir";
+	$ENV{EPOCROOT} = $epocroot;
 }
 
 # invoke the READIMAGE tool with appropriate parameters.
@@ -654,7 +673,7 @@ sub dumpDatadriveObydata
 			my $linekeyword = "alias";
 			&compareArrays($aliasArray,$nonsisFileArray,$linesource,$linedest,$linekeyword);
 		}
-		elsif(	$line =~ /^(file|data)\s*=\s*/i || $line =~ /^\s*(zdriveimagename|sisfile)\s*=\s*/i )
+		elsif(	$line =~ /^(file|data|dircopy)\s*=\s*/i || $line =~ /^\s*(zdriveimagename|sisfile)\s*=\s*/i )
 		{
 			# skip to next line. 
 			next;

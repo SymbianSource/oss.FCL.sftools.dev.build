@@ -32,33 +32,49 @@ Derive log file name from the given driveobey file name(it could be absolute pat
 Checks the validity of driveobey file name before creating the log file name.
 
 @param adriveobeyFileName - Drive obey file.
-@param &apadlogfile       - Reference to log file name.
+@param &apadlogfile       - Log file name from command line. 
   
 @return - returns 'ErrorNone' if log file created, otherwise returns Error.
 */ 
-TInt Getlogfile(char *aDriveObeyFileName,char* &aPadLogFile)
+string Getlogfile(char *aDriveObeyFileName,const string &CmdLogFile)
 	{
-
+	string strLogfile(CmdLogFile);
+	if(strLogfile.size() > 0 && strLogfile[strLogfile.size()-1] != '\\' && strLogfile[strLogfile.size()-1] != '/')
+		return strLogfile;
+		
 	if(!(*aDriveObeyFileName))
-		return KErrGeneral;
+		return string("");
 
 	// Validate the user entered driveoby file name.
 	char* logFile = (char*)aDriveObeyFileName;
 
+#ifdef __LINUX__
+	logFile = strrchr(logFile,'/');
+#else
+	while(*logFile)
+		{
+		if(*logFile == '/')
+			*logFile = '\\';
+		logFile++;
+		}
+	logFile = (char*)aDriveObeyFileName;
+	logFile = strrchr(logFile,'\\');
+#endif
+	
+	if(logFile)
+		++logFile;
+	else
+		logFile = (char*)aDriveObeyFileName;
+
 	TInt len = strlen(logFile);
 	if(!len)
-		return KErrGeneral;
-
-	// Allocates the memory for log file name.
-	aPadLogFile = new char[(len)+5]; 
-	if(!aPadLogFile)
-		return KErrNoMemory;
+		return string("");
 
 	// Create the log file name.
-	strcpy((char*)aPadLogFile,logFile);
-	strcat((char*)aPadLogFile,".LOG");
+	strLogfile += logFile;
+	strLogfile += ".LOG";
 				
-	return  KErrNone;
+	return  strLogfile;
 	}
 
 /**

@@ -48,6 +48,7 @@ enum EKeyword
 	EKeywordFile,
 	EKeywordData,
 	EKeywordDir,
+	EKeywordDirCpy,
 	EKeywordRofsName,
 	EKeywordExtensionRofs, 
 	EKeywordCoreRofsName,
@@ -252,6 +253,10 @@ private:
 	TInt SetUid2(TRomNode* aNode, const char *aStr);
 	TInt SetUid3(TRomNode* aNode, const char *aStr);
 	TInt SetPriority(TRomNode* aNode, const char *aStr);
+
+	TRomNode* AddFileToNodeTree(enum EKeyword aKeyword, TRomNode* dir, const char* filename, const char* aPCSidename, const TBool aParseAttr, TBool aFileCompressOption = EFalse, TBool aFileUncompressOption = EFalse);
+	TRomNode* AddDirToNodeTree(enum EKeyword aKeyword, TRomNode* dir, const char* dirname);
+	TBool CreateFromFolder(const char* aPath,TRomNode* aParent);
 	
 	static TBool GetNextBitOfFileName(char*& epocEndPtr);
 	static const char *IsValidFilePath(const char *aPath);

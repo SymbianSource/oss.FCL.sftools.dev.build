@@ -1,3 +1,24 @@
+Version 3.30.0 (BUILDROM)
+===============
+Released by Lorence Wang, 12/10/2010
+	1) ROM tools performance improvement: ignore configuration check.
+
+Version 3.29.1 (BUILDROM)
+===============
+Released by Zheng Shen, 30/09/2010
+	1) ou1cimx1#577011 [MCL]Fallback failed in case of {} exists in filename, and file doesn't exists in default ABI folder
+
+Version 3.29.0 (BUILDROM)
+===============
+Released by Lorence Wang, 17/09/2010
+	1) Whole directory support in FAT.
+
+Version 3.28.1 (BUILDROM)
+===============
+Released by Lorence Wang, 13/09/2010
+	1) ou1cimx1#560005 Buildrom failed with -workdir="folder of different drive"
+	2) ou1cimx1#563537 Rofsbuild generates the log file for smr image and datadrive image in wrong location
+
 Version 3.28.0 (BUILDROM)
 ===============
 Released by Marvin Shi, 7/09/2010

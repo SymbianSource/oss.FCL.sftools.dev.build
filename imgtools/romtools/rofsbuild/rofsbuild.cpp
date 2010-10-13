@@ -46,8 +46,8 @@
 #endif
 
 static const TInt RofsbuildMajorVersion=2;
-static const TInt RofsbuildMinorVersion=13;
-static const TInt RofsbuildPatchVersion=2;
+static const TInt RofsbuildMinorVersion=14;
+static const TInt RofsbuildPatchVersion=1;
 static TBool SizeSummary=EFalse;
 static TPrintType SizeWhere=EAlways;
 
@@ -77,7 +77,7 @@ string filename;				// to store oby filename passed to Rofsbuild.
 TBool reallyHelp = EFalse;	
 TBool gSmrImage = EFalse;
 string gSmrFileName = "";
-static string rofslogfile = "ROFSBUILD.LOG";
+static string cmdlogfile = "";
 
 //Cache global variables
 bool gCache = false;
@@ -323,7 +323,7 @@ void processCommandLine(int argc, char *argv[], TBool paramFileFlag = EFalse) {
 			else if (stricmp(argv[i], "-LOWMEM") == 0)
 				gLowMem = ETrue;
 			else if (strnicmp(argv[i], "-logfile=",9) ==0) {
-				rofslogfile = argv[i] + 9;
+				cmdlogfile = argv[i] + 9;
 			}
 			else {
 #ifdef WIN32
@@ -386,7 +386,7 @@ Main logic for data drive image creation. Called many types depending on no. of 
 
 @return - returns the status, after processing the drive obey file.
 */ 
-TInt ProcessDataDriveMain(char* aobeyFileName,char* alogfile) {
+TInt ProcessDataDriveMain(char* aobeyFileName, const char* alogfile) {
 
 	ObeyFileReader *reader = new ObeyFileReader(aobeyFileName);
 
@@ -432,7 +432,7 @@ TInt ProcessDataDriveMain(char* aobeyFileName,char* alogfile) {
 	return retstatus;
 }
 
-TInt ProcessSmrImageMain(char* aObeyFileName, char* /* alogfile */) {
+TInt ProcessSmrImageMain(char* aObeyFileName, const char* /* alogfile */) {
 	ObeyFileReader *reader = new ObeyFileReader(aObeyFileName);
 	if(!reader)
 		return KErrNoMemory;
@@ -536,13 +536,12 @@ TInt main(int argc, char *argv[]){
 			*(--ptr)++ = 0; 
 
 			if(*driveobeyFileName) {
-				char* logfile = 0;
-				if(Getlogfile(driveobeyFileName,logfile) == KErrNone) {
-					H.SetLogFile(logfile);
+				string logfile = Getlogfile(driveobeyFileName, cmdlogfile);
+				if(logfile.size() > 0) {
+					H.SetLogFile(logfile.c_str());
 					GetLocalTime();
-					r = ProcessDataDriveMain(driveobeyFileName,logfile);   
+					r = ProcessDataDriveMain(driveobeyFileName,logfile.c_str());   
 					H.CloseLogFile();
-					delete[] logfile;
 					if(r == KErrNoMemory)
 						return KErrNoMemory;
 				}
@@ -564,13 +563,12 @@ TInt main(int argc, char *argv[]){
 			*(--ptr)++ = 0;
 
 			if(*smrImageObeyFileName){	
-				char * logfile = 0;
-				if(Getlogfile(smrImageObeyFileName,logfile) == KErrNone){
-					H.SetLogFile(logfile);
+				string logfile = Getlogfile(smrImageObeyFileName, cmdlogfile);
+				if(logfile.size() > 0) {
+					H.SetLogFile(logfile.c_str());
 					GetLocalTime();
-					r = ProcessSmrImageMain(smrImageObeyFileName, logfile);
+					r = ProcessSmrImageMain(smrImageObeyFileName, logfile.c_str());
 					H.CloseLogFile();
-					delete[] logfile;
 					if(r == KErrNoMemory)
 						return KErrNoMemory;
 				}
@@ -584,9 +582,9 @@ TInt main(int argc, char *argv[]){
 	}
 	// Process Rofs Obey files.
 	if(obeyFileName) {
-		if (rofslogfile[rofslogfile.size()-1] == '\\' || rofslogfile[rofslogfile.size()-1] == '/')
-			rofslogfile += "ROFSBUILD.LOG";
-	 	H.SetLogFile(rofslogfile.c_str());
+		if (cmdlogfile[cmdlogfile.size()-1] == '\\' || cmdlogfile[cmdlogfile.size()-1] == '/')
+			cmdlogfile += "ROFSBUILD.LOG";
+	 	H.SetLogFile(cmdlogfile.c_str());
 		ObeyFileReader *reader = new ObeyFileReader(obeyFileName); 
 		if (!reader->Open())
 			return KErrGeneral;
