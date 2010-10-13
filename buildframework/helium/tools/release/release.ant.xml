@@ -32,43 +32,7 @@ Description:
     @type string
     @scope private
     -->
-    <property name="release.log.dir" location="${build.log.dir}/release"/>       
-    
-    
-    <!--* @property release.grace.service
-    The Grace service used
-    @type string
-    @editable required
-    @scope public
-    -->
-
-    <!--* @property release.grace.product
-    The Grace product used
-    @type string
-    @editable required
-    @scope public
-    -->
-
-    <!--* @property release.grace.mail.to
-    To whom the completion mail is sent to
-    @type string
-    @editable required
-    @scope public
-    -->
-
-    <!--* @property release.grace.mail.subject
-    The subject of the Grace upload completion mail
-    @type string
-    @editable required
-    @scope public
-    -->
-
-    <!--* @property release.grace.mail.message
-    The message contents of the Grace upload completion mail
-    @type string
-    @editable required
-    @scope public
-    -->
+    <property name="release.log.dir" location="${build.log.dir}/release"/>
     
     <!--* @property robot.release.enabled
     Set to true to do build robot release after completing the build and if it successful.
@@ -94,13 +58,10 @@ Description:
     
     <!-- Check, is robot release is enabled -->
     <condition property="internal.robot.release.enabled">
-        <and>
-            <or>
-                <istrue value="${robot.release.enabled}"/>
-                <isset property="do.robot.release"/>
-            </or>
-            <isset property="s60.build.robot.path"/>
-        </and>    
+        <or>
+            <istrue value="${robot.release.enabled}"/>
+            <isset property="do.robot.release"/>
+        </or> 
     </condition>
 
     <fileset id="release.files" dir="${publish.dir}">
@@ -152,16 +113,15 @@ projects = []
 mconfigstr = project.getProperty('s60.build.robot.date')
 if mconfigstr != None:
     for configstr in mconfigstr.split(';'):
-        config = map(lambda x: x.strip(), configstr.split(','))
-        try:
-            if ido.is_in_interval(int(config[0]), config[1], int(config[2]), config[3]):
-                self.log("It is release time!")
-                projects.append(config[4])
-                project.setProperty('robot.release.project', ",".join(projects))
-            else:
-                self.log("It is not release time!")
-        except Exception, e:
-            self.log("'%s' invalid configuration." % configstr)
+        config = [x.strip() for x in configstr.split(',')]
+        if len(config) < 4:
+            raise Exception(configstr + ' is invalid config')
+        if ido.is_in_interval(int(config[0]), config[1], int(config[2]), config[3]):
+            self.log("It is release time!")
+            projects.append(config[4])
+            project.setProperty('robot.release.project', ",".join(projects))
+        else:
+            self.log("It is not release time!")
 else:
     self.log("'s60.build.robot.date' is not defined.")
 ]]>
@@ -173,19 +133,21 @@ else:
     zip them all and send to the specified location. There is only one but mandatory 
     property to tell the location of the build server which is "s60.build.robot.path".
     -->
-    <target name="ido-sources-to-s60-build-robot" if="internal.robot.release.enabled" depends="ido-create-ado-mapping,check-robot-release,lookup-email">
+    <target name="ido-sources-to-s60-build-robot" if="internal.robot.release.enabled" depends="check-robot-release,lookup-email">
         <if>
             <isset property="robot.release.project"/>
             <then>
+                <property name="robot.mapping.file" location="${build.output.dir}/build/ado_mapping_robot.ini" />
+                <hlm:createAdoMappingMacro adoMapFile="${robot.mapping.file}" />
                 <!-- Location of the ready.txt FMPP template (override that property if you want to customize the content).
                 @type string
                 @scope private
                 -->
-                <property name="ido.template.robot.ready" location="${helium.dir}/tools/common/templates/ido/ready.txt.ftl" />
+                <property name="ido.template.robot.ready" location="${helium.dir}/tools/release/templates/ready.txt.ftl" />
                 <tempfile property="s60robot.dynamic.config" suffix=".xml" deleteonexit="false" destdir="${temp.build.dir}" />
-                <fmpp sourceFile="${helium.dir}/tools/common/templates/ido/ido-robot-zip.ant.xml.ftl" outputFile="${s60robot.dynamic.config}">
+                <fmpp sourceFile="${helium.dir}/tools/release/templates/ido-robot-zip.ant.xml.ftl" outputFile="${s60robot.dynamic.config}">
                     <data expandProperties="yes">
-                            inputfile: antProperty(ado.mapping.file)
+                            inputfile: antProperty(robot.mapping.file)
                             ant: antProperties()
                             data: eval('
                                 java.io.FileInputStream pin = new java.io.FileInputStream(filename);

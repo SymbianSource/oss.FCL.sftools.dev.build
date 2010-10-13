@@ -306,7 +306,10 @@ class ReleaseMetadata(object):
             result.append(ServicePack(spack))
         return result
 
-    filename = property(lambda self:self._filename)
+    @property
+    def filename(self):
+        return self._filename
+    
     service = property(lambda self:self.get_releasedetails_info('service'), lambda self, value:self.set_releasedetails_info('service', value))
     product = property(lambda self:self.get_releasedetails_info('product'), lambda self, value:self.set_releasedetails_info('product', value))
     release = property(lambda self:self.get_releasedetails_info('release'), lambda self, value:self.set_releasedetails_info('release', value))
@@ -346,6 +349,8 @@ class ValidateReleaseMetadata(ReleaseMetadata):
     
     def is_valid(self, checkmd5=True, checkPath=True):
         """ Run the validation mechanism. """
+        valid = True
+        
         status = os.path.join(os.path.dirname(self._filename), 'HYDRASTATUS.xml')
         if os.path.exists(status):
             hydraxml = xml.dom.minidom.parse(open(status, "r"))
@@ -353,53 +358,63 @@ class ValidateReleaseMetadata(ReleaseMetadata):
                 if t_name.nodeType == t_name.TEXT_NODE:
                     if t_name.nodeValue != 'Ready':
                         LOGGER.error("HYDRASTATUS.xml is not ready")
-                        return False
-        if checkPath:
+                        valid = False
+                        
+        if valid and checkPath:
             if os.path.basename(self.location) != self.release:
                 LOGGER.error("Release doesn't match.")
-                return False
+                valid = False
             if os.path.basename(os.path.dirname(self.location)) != self.product:
                 LOGGER.error("Product doesn't match.")
-                return False
+                valid = False
             if os.path.basename(os.path.dirname(os.path.dirname(self.location))) != self.service:
                 LOGGER.error("Service doesn't match.")
-                return False
+                valid = False
         
-        for name in self.keys():
-            path = os.path.join(self.location, name)
-            if not os.path.exists(path):
-                LOGGER.error("%s doesn't exist." % path)
-                return False
-            try:
-                LOGGER.debug("Trying to open %s" % path)
-                content_file = open(path)
-                content_file.read(1)
-            except IOError:
-                LOGGER.error("%s is not available yet" % path)
-                return False
-                
-            if checkmd5 and self[name].has_key('md5checksum'):
-                if self[name]['md5checksum'] != None:
-                    if fileutils.getmd5(path).lower() != self[name]['md5checksum']:
-                        LOGGER.error("%s md5checksum missmatch." % path)
-                        return False
+        if valid:
+            for name in self.keys():
+                path = os.path.join(self.location, name)
+                if not os.path.exists(path):
+                    LOGGER.error("%s doesn't exist." % path)
+                    valid = False
+                    break
+                try:
+                    LOGGER.debug("Trying to open %s" % path)
+                    content_file = open(path)
+                    content_file.read(1)
+                except IOError:
+                    LOGGER.error("%s is not available yet" % path)
+                    valid = False
+                    break
+                    
+                if checkmd5 and self[name].has_key('md5checksum'):
+                    if self[name]['md5checksum'] != None:
+                        if fileutils.getmd5(path).lower() != self[name]['md5checksum']:
+                            LOGGER.error("%s md5checksum missmatch." % path)
+                            valid = False
 
-        for spack in self.servicepacks:
-            for name in spack.files:
-                path = os.path.join(self.location, name)
-                if not os.path.exists(path):
-                    LOGGER.error("%s doesn't exist." % path)
-                    return False
-            for name in spack.instructions:
-                path = os.path.join(self.location, name)
-                if not os.path.exists(path):
-                    LOGGER.error("%s doesn't exist." % path)
-                    return False
+        if valid:
+            for spack in self.servicepacks:
+                if valid:
+                    for name in spack.files:
+                        path = os.path.join(self.location, name)
+                        if not os.path.exists(path):
+                            LOGGER.error("%s doesn't exist." % path)
+                            valid = False
+                            break
+                    for name in spack.instructions:
+                        path = os.path.join(self.location, name)
+                        if not os.path.exists(path):
+                            LOGGER.error("%s doesn't exist." % path)
+                            valid = False
+                            break
         
-        dependency = self.get_dependsof()
-        if dependency != None:
-            return ValidateReleaseMetadata(dependency.filename).is_valid(checkmd5)
-        return True
+        if valid:
+            dependency = self.get_dependsof()
+            if dependency != None:
+                return ValidateReleaseMetadata(dependency.filename).is_valid(checkmd5)
+            
+        return valid
 
 
 class MetadataMerger(object):
@@ -549,11 +564,11 @@ class ValidateTicklerReleaseMetadata(ValidateReleaseMetadataCached):
         ValidateReleaseMetadataCached.__init__(self, filename)
         self.location = os.path.dirname(filename)
     
-    def is_valid(self, checkmd5=True):
+    def is_valid(self, checkmd5=True, checkPath=True):
         """ Run the validation mechanism. """
         tickler_path = os.path.join(self.location,"TICKLER")
         if not os.path.exists(tickler_path):
             LOGGER.error("Release not available yet")
             return False
         else:
-            return ValidateReleaseMetadataCached.is_valid(self, checkmd5)
+            return ValidateReleaseMetadataCached.is_valid(self, checkmd5, checkPath)

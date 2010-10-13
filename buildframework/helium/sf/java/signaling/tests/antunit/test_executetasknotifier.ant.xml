@@ -65,20 +65,20 @@ Description:
     </target>
 
     <target name="test-notifier-is-called">
-        <hlm:signal name="testSignal" result="0" message="message">
+        <hlm:signal result="0" message="message">
             <signalNotifierInput>
                 <hlm:signalInput refid="testNeverSignalInput" />
             </signalNotifierInput>
         </hlm:signal>
-        <au:assertLogContains text="Signal: testSignal" />
+        <au:assertLogContains text="Signal: testNeverSignalInput" />
     </target>
 
     <target name="test-notifier-with-runtarget-works">
-        <hlm:signal name="testSignal" result="0" message="message">
+        <hlm:signal result="0" message="message">
             <signalNotifierInput>
                 <hlm:signalInput refid="testNeverSignalInputRuntarget" />
             </signalNotifierInput>
         </hlm:signal>
-        <au:assertLogContains text="Signal: testSignal" />
+        <au:assertLogContains text="Signal: testNeverSignalInputRuntarget" />
     </target>
 </project>

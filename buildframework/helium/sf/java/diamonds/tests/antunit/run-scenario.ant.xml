@@ -25,12 +25,11 @@ Description:
     <property environment="env" />
     
     <target name="setUp">
-        <tempfile property="temp.dir" suffix=".dir" />
-        <mkdir dir="${temp.dir}" />
+        <mkdir dir="${test.temp.dir}" />
     </target>
     
     <target name="tearDown">
-        <delete dir="${temp.dir}" />
+        <delete dir="${test.temp.dir}" />
     </target>
     
     <macrodef name="runScenario">
@@ -43,13 +42,13 @@ Description:
                 <arg line="/c ..\build.bat" />
                 <arg line="@{target}" />
                 <arg value="-Dant.executor.class=com.nokia.helium.core.ant.HeliumExecutor" />
-                <arg value="-Dtemp.dir=${temp.dir}" />
+                <arg value="-Dtemp.dir=${test.temp.dir}" />
             </exec>
             <exec osfamily="unix" executable="../bld.sh" dir="${ant.file.run-scenario}/../../scenarii/@{scenario}" failonerror="@{failonerror}">
                 <env key="ANT_ARGS" value="${env.ANT_ARGS}" />
                 <arg line="@{target}" />
                 <arg value="-Dant.executor.class=com.nokia.helium.core.ant.HeliumExecutor" />
-                <arg value="-Dtemp.dir=${temp.dir}" />
+                <arg value="-Dtemp.dir=${test.temp.dir}" />
             </exec>
         </sequential>
     </macrodef>

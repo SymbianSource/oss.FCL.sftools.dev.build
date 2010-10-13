@@ -44,7 +44,7 @@ public class SysdefPackage {
     @Column(name = "ID", nullable = false, unique = true, length = 255)
     private String packageId;
 
-    @Column(name = "NAME", nullable = false, length = 255)
+    @Column(name = "NAME", length = 255)
     private String name;
     
     @OneToMany

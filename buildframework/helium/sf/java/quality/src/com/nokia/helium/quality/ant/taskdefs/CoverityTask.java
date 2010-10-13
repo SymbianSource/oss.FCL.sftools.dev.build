@@ -23,6 +23,7 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.taskdefs.ExecTask;
 
+import com.nokia.helium.core.ant.MappedVariable;
 import com.nokia.helium.core.ant.types.VariableImpl;
 import com.nokia.helium.core.ant.types.VariableSet;
 
@@ -40,7 +41,7 @@ import com.nokia.helium.core.ant.types.VariableSet;
  * 
  * </pre>
  * 
- * @ant.task name="coverity" category="Quality".
+ * @ant.task name="coverity" category="Quality"
  * 
  */
 
@@ -51,6 +52,7 @@ public class CoverityTask extends Task {
     private boolean execute = true;
     private boolean append;
     private File error;
+    private File output;
     private String dir;
     private Vector<VariableSet> coverityOptions = new Vector<VariableSet>();
     private Vector<VariableImpl> coverityArgs = new Vector<VariableImpl>();
@@ -81,17 +83,32 @@ public class CoverityTask extends Task {
         task.setTaskName(this.getTaskName());
         task.setFailonerror(failOnError);
         task.setError(this.error);
+        if (this.output != null) {
+            task.setOutput(this.output);
+        }
         task.setAppend(isAppend());
         task.setExecutable(command);
         task.setDir(new File(this.dir));
 
         for (VariableSet coverityArg : coverityOptions) {
+            
+            for (MappedVariable variable : coverityArg.getVariables()) {
+                if (variable.getName().equals("--password") || variable.getName().equals("-pa")) {
+                    commandString += " " + variable.getName() + " ********";
+                } else {
+                    commandString += " " + variable.getName() + " " + variable.getValue();
+                }
+            }
             task.createArg().setLine(coverityArg.getParameter(" "));
-            commandString += " " + coverityArg.getParameter(" ");
+            
         }
         for (VariableImpl coverityArg : coverityArgs) {
+            if (coverityArg.getName().equals("--password") || coverityArg.getName().equals("-pa")) {
+                commandString += " " + coverityArg.getName() + " ********";
+            } else {
+                commandString += " " + coverityArg.getName() + " " + coverityArg.getValue();
+            }
             task.createArg().setLine(coverityArg.getParameter(" "));
-            commandString += " " + coverityArg.getParameter(" ");
         }
 
         try {
@@ -180,6 +197,20 @@ public class CoverityTask extends Task {
      */
     public void setError(File errorFile) {
         this.error = errorFile;
+    }
+
+    /**
+     * @param output the output to set
+     */
+    public void setOutput(File output) {
+        this.output = output;
+    }
+
+    /**
+     * @return the output
+     */
+    public File getOutput() {
+        return output;
     }
 
     /**

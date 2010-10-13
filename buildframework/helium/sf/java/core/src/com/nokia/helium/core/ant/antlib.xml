@@ -28,6 +28,7 @@ Description:
     <taskdef name="python" classname="com.nokia.helium.core.ant.taskdefs.PythonTask"/>
     <taskdef name="retry" classname="com.nokia.helium.core.ant.taskdefs.RetryTask"/>
     <taskdef name="getfreedrive" classname="com.nokia.helium.core.ant.taskdefs.GetFreeDriveTask"/>
+    <taskdef name="resourceaccess" classname="com.nokia.helium.core.ant.taskdefs.ResourceAccessTask"/> 
     
     <!-- Type definition -->
     <typedef name="hasSeverity" classname="com.nokia.helium.core.ant.conditions.XMLLogCondition"/>

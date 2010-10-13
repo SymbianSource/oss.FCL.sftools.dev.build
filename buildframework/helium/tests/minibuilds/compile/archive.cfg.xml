@@ -32,11 +32,11 @@ Description:
         <config name="empty_minibuild_archive" abstract="true" />
         
         <config name="minibuild_archive" abstract="true">
-            <set name="grace.service" value="minibuild"/>
-            <set name="grace.product" value="SF"/>
-            <set name="grace.release" value="SF_minibuild_${build.number}"/>
-            <set name="grace.metadata" value="true"/>
-            <set name="grace.template" value="${config.dir}/template_release_metadata.xml"/>
+            <set name="release.service" value="minibuild"/>
+            <set name="release.product" value="SF"/>
+            <set name="release.name" value="SF_minibuild_${build.number}"/>
+            <set name="release.metadata" value="true"/>
+            <set name="release.template" value="${config.dir}/template_release_metadata.xml"/>
             
             <set name="archives.dir" value="${zips.build.dir}/${zipping.type}"/>
             <set name="clock.dir" value="${build.drive}\sf\app\organizer\clock2"/>

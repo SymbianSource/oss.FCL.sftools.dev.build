@@ -288,7 +288,7 @@ Description:
         </hlm:scm>
     </target>
         
-    <target name="test-update-basedir-tag" depends="test-checkin">
+    <target name="test-update-basedir-tag">
         <echo file="${repo.dir}/test1/not_in_repo.txt">Not in repo</echo>
         <hlm:scm verbose="true" scmUrl="scm:${repo.type}:${repo.dir}/test1">
             <hlm:add>

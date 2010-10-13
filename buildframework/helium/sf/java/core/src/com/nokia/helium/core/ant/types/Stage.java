@@ -18,9 +18,11 @@
  
 package com.nokia.helium.core.ant.types;
 
+import java.util.Hashtable;
+import java.util.Map;
+
 import org.apache.tools.ant.types.DataType;
 import org.apache.tools.ant.BuildException;
-import org.apache.log4j.Logger;
     
 /**
  * A <code>Stage</code> is a Data type which stores Stage information.
@@ -41,24 +43,25 @@ import org.apache.log4j.Logger;
  */
 public class Stage extends DataType {
 
-    //Default id is used as the stage name so overriding is possible.
-    private Logger log = Logger.getLogger(Stage.class);
-    private String stageName;
-    
     private String startTarget;
     
     private String endTarget;
-
-    public void setStageName(String name) {
-        log.debug("stage-name:" + name);
-        if (stageName != null) {
-            throw new BuildException("no supported attribute stageName externally");
-        }
-        stageName = name;
-    }
     
     public String getStageName() {
-        return stageName;
+        if (!this.isReference()) {
+            if (getProject() != null && getProject().getReferences() != null &&
+                    getProject().getReferences().containsValue(this)) {
+                @SuppressWarnings("unchecked")
+                Hashtable<String, Object> references = (Hashtable<String, Object>)getProject().getReferences();
+                for (Map.Entry<String, Object> entry : references.entrySet()) {
+                    if (entry.getValue() == this) {
+                        return entry.getKey();
+                    }
+                }
+            }
+            throw new BuildException("stage type can only be used as a reference at " + this.getLocation());
+        }
+        return this.getRefid().getRefId();
     }
     /**
      * Returns the stage start target. 

@@ -20,7 +20,7 @@ package com.nokia.helium.signal.ant.taskdefs;
 
 import org.apache.tools.ant.Task;
 
-import com.nokia.helium.signal.SignalStatusList;
+import com.nokia.helium.signal.ant.Signals;
 
 /**
  * This class implements a task that clear all pending failure. It is quite
@@ -35,7 +35,7 @@ public class ClearDeferredFailuresTask extends Task {
     @Override
     public void execute() {
         log("Clearing all pending failures.");
-        SignalStatusList.getDeferredSignalList().clearStatusList();
+        Signals.getSignals().getDeferredSignalList().clear();
     }
 
 }

@@ -56,7 +56,7 @@ class IConfigATS(object):
             return None
         if noncust:
             return noncust
-        raise Exception('iconfig not found in ' + self.imagesdir)
+        raise IOError('iconfig not found in ' + self.imagesdir)
     
     def getimage(self, name):
         """get image"""
@@ -64,7 +64,7 @@ class IConfigATS(object):
             for fname in files:
                 if fname.lower() == name.lower():
                     return os.path.join(root, fname)
-        raise Exception(name + ' not found in ' + self.imagesdir)
+        raise IOError(name + ' not found in ' + self.imagesdir)
     
     def findimages(self): 
         """find images"""
@@ -82,10 +82,10 @@ class IConfigATS(object):
                 if os.path.exists(image):
                     output = output + image + ','
                 else:
-                    raise Exception(image + ' not found')
+                    raise IOError(image + ' not found')
             else:
                 if imagetype == 'core':
-                    raise Exception(imagetypename + '_FLASH not found in iconfig.xml in ' + self.imagesdir)
+                    raise IOError(imagetypename + '_FLASH not found in iconfig.xml in ' + self.imagesdir)
                 print imagetypename + '_FLASH not found in iconfig.xml'
         return output
 
@@ -120,7 +120,10 @@ def files_to_test(canonicalsysdeffile, excludetestlayers, idobuildfilter, buildd
                             for unit in component.unit:
                                 if group not in modules:
                                     modules[group] = []
-                                modules[group].append(builddrive + os.sep + unit.bldFile)
+                                if os.sep == '\\':
+                                    modules[group].append(builddrive + os.sep + unit.bldFile)
+                                else:
+                                    modules[group].append(unit.bldFile)
     else:
         sdf = sysdef.api.SystemDefinition(canonicalsysdeffile)
         

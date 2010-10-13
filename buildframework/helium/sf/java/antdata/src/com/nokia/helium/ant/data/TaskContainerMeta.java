@@ -106,7 +106,7 @@ public class TaskContainerMeta extends AntObjectMeta {
             if (name.endsWith("signal") || name.endsWith("execSignal")) {
                 String signalid = node.attributeValue("name");
 
-                if (signalList != null) {
+                if (signalid != null && signalid.length() > 0) {
                     signalList.add(signalid);
                 }
             }

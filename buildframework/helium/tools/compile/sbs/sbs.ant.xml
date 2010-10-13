@@ -212,7 +212,7 @@ Description:
                 <if>
                     <or>
                         <istrue value="${coverity.enabled}" />
-                        <isset property="enabled.coverity"/>
+                        <istrue value="${enabled.coverity}"/>
                     </or>
                     <then>
                         <hlm:coveritybuild  sbsinput="@{sbs.input}" 

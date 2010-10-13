@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : build.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test-enable-flags" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium" xmlns:ac="antlib:net.sf.antcontrib">
+    <description>Helium Antlib logger unittests.</description>
+    
+    <property name="feature.enabled" value="true"/>
+    <property name="enable.feature" value="true"/>
+    <property name="internal.abc.enabled" value="true"/>
+    <property name="internal.bla.enabled" value="false"/>
+    <property name="skip.ats.sending" value="t"/>
+    <property name="test.prop.bool.val" value="t"/>
+    <property name="test.comment.prop.bool.val" value="yes"/>
+    <property name="test.build.number" value="123aa"/>
+    <property name="test.build.id" value="test-build-id-1"/>
+    <property name="test.bn" value="123"/>
+    <property name="test.prop.float.1" value="6.5"/>
+    <property name="test.prop.float.2" value="1.5a"/>
+    <property name="test.prop.int.3" value="1.8"/>
+    
+    <import file="feature/feature.ant.xml"/>
+    
+    <condition property="internal.old.enabled">
+        <or>
+            <istrue value="${xyz.enabled}"/>
+            <isset property="enable.feature"/>
+        </or>
+    </condition>
+    
+    <condition property="internal.new.enabled">
+        <or>
+            <istrue value="${feature.enabled}"/>
+            <isset property="abc.feature"/>
+        </or>
+    </condition>
+    
+    <condition property="internal.both.enabled">
+        <or>
+            <istrue value="${feature.enabled}"/>
+            <isset property="enable.feature"/>
+        </or>
+    </condition>
+    
+    <target name="run-target-disabled" if="internal.feature.enabled">
+        <echo>Running run-target-disabled</echo>
+    </target>
+    
+    <target name="run-target-enabled" if="feature.enabled">
+        <echo>Running run-target-enabled</echo>
+    </target>
+    
+    <target name="run-with-old-flag-enabled" if="internal.old.enabled">
+        <echo>Running run-with-old-flag-enabled</echo>
+    </target>
+    
+    <target name="run-with-new-flag-enabled" if="internal.new.enabled">
+        <echo>Running run-with-new-flag-enabled</echo>
+    </target>
+    
+    <target name="run-with-both-enabled" if="internal.both.enabled">
+        <echo>Running run-with-both-enabled</echo>
+    </target>
+    
+    <target name="run-with-unless-enabled" unless="skip.ats.sending">
+        <echo>Running run-with-unless-enabled</echo>
+    </target>
+    
+    <target name="run-with-unless-internal-enabled" unless="internal.old.enabled">
+        <echo>Running run-with-unless-internal-enabled</echo>
+    </target>
+    
+    <target name="antcall-deprecated-target" if="test.bool.val">
+        <echo>Running antcall-deprecated-target</echo>
+        <antcall target="a-deprecated-target"/>
+    </target> 
+
+    <target name="runtarget-deprecated-target">
+        <echo>Running runtarget-deprecated-target</echo>
+        <ac:runtarget target="b-deprecated-target"/>
+    </target> 
+
+    <target name="depends-deprecated-target" depends="c-deprecated-target">
+        <echo>Running depends-deprecated-target</echo>
+    </target> 
+
+    <target name="run-private-target-as-antcall">
+        <echo>Running run-private-target-as-antcall</echo>
+        <antcall target="a-private-target"/>
+    </target>
+
+    <target name="run-private-target-as-runtarget">
+        <echo>Running run-private-target-as-runtarget</echo>
+        <ac:runtarget target="b-private-target"/>
+    </target>
+    
+    <target name="run-private-target-as-depends" depends="c-private-target">
+        <echo>Running run-private-target-as-depends</echo>
+    </target>
+
+</project>

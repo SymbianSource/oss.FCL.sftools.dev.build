@@ -249,7 +249,7 @@ to be user and not developer oriented, for instance examples of the task/type us
 Also all setter methods visible through Ant must be documented properly using *@ant.required* 
 or *@ant.not-required* javadoc style attributes.
 
-You can find more information on how to document Ant tasks using the doclet plugin on http://doclet.neuroning.com/. 
+You can find more information on how to document Ant tasks using the doclet plugin on http://antdoclet.neuroning.com/.
 
 General coding guidelines
 -------------------------
@@ -264,7 +264,7 @@ Ant type and task guidelines
 ----------------------------
 
 In order to match as must as  configurability concepts, Helium custom types and tasks must follow  development guidelines as 
-much as possible. You can find then on http://.apache.org/_task_guidelines.html.
+much as possible. You can find then on http://ant.apache.org/ant_task_guidelines.html.
 
 Logging
 -------
@@ -413,6 +413,15 @@ A specific component can be selected using::
     > bld -Dcomponent=sbs unittest
 
 Debug logs for component tests can be found at ``/build/components/<component>/xunit``.
+
+Filtering Python tests using nose
+---------------------------------
+
+Python unit tests are run through the nose testing framework. To run just a single Python test module, use::
+
+    bld test -Dcomponent=pythoncore -Dnose.args=amara
+    
+The value of ``nose.args`` is passed through to nose.
 
 
 .. index::

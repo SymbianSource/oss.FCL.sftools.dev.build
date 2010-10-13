@@ -34,7 +34,7 @@ Description:
     <condition property="run.ccm.71">
         <istrue value="${synergy71.enabled}" />
     </condition>
-    
+
     <target name="suiteSetUp" if="run.ccm.71">
         <mkdir dir="${synergy71.project.wa}"/>
         <mkdir dir="${synergy71.snapshot.wa}"/>
@@ -88,6 +88,24 @@ Description:
             <hlm:workarea project="MinibuildDomain-hlm_71_test" maintain="true" recursive="true" path="${synergy71.project.wa}"/>
         </hlm:ccm>
         <au:assertLogContains text="Modifying work area for the project : MinibuildDomain-hlm_71_test"/>
+        
+        <!-- To unmaintain the project workarea -->
+        <delete dir="${synergy71.project.wa}"/>
+        <hlm:ccm >
+            <hlm:sessionset refid="test.session" />
+            <hlm:workarea project="MinibuildDomain-hlm_71_test" maintain="false" recursive="true" path="${synergy71.project.wa}"/>
+        </hlm:ccm>
+        <au:assertLogContains text="Modifying work area for the project : MinibuildDomain-hlm_71_test"/>
+        <au:assertFileDoesntExist file="${synergy71.project.wa}/MinibuildDomain/MinibuildDomain/_ccmwaid.inf" />
+        
+        <!-- To unmaintain the project workarea for snapshot-->
+        <delete dir="${synergy71.snapshot.wa}"/>
+        <hlm:ccm >
+            <hlm:sessionset refid="test.session" />
+            <hlm:workarea project="MinibuildDomain-hlm_71_test" maintain="false" recursive="true" path="${synergy71.snapshot.wa}"/>
+        </hlm:ccm>
+        <au:assertLogContains text="Modifying work area for the project : MinibuildDomain-hlm_71_test"/>
+        <au:assertFileDoesntExist file="${synergy71.snapshot.wa}/MinibuildDomain/MinibuildDomain/_ccmwaid.inf" />
         
         <!-- To add the tasks into folders -->
         <hlm:ccm >

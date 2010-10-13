@@ -20,8 +20,8 @@ package com.nokia.helium.core.ant.types;
 
 import java.io.File;
 import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.Project;
 import org.apache.tools.ant.types.DataType;
-import org.apache.log4j.Logger;
 import fmpp.tools.AntTask;
 import fmpp.tools.AntTask.AntAttributeSubstitution;
 
@@ -37,22 +37,19 @@ import com.nokia.helium.core.ant.Message;
  *
  * Example 1:
  * <pre>
- *   &lt;hlm:fmppMessage target="diamonds" sourceFile="tool.xml.ftl"&gt;
+ *   &lt;hlm:fmppMessage sourceFile="tool.xml.ftl"&gt;
  *        &lt;data expandProperties="yes"&gt;
  *           ant: antProperties()
  *       &lt;/data&gt;
  *   &lt;/hlm:fmppMessage&gt;
  * </pre>
+ * 
  * @ant.type name="fmppMessage" category="Core" 
  */
 public class FMPPMessage extends DataType implements Message {
 
-    private File outputFile;
-
     private AntTask task = new AntTask();
     
-    private Logger log = Logger.getLogger(FMPPMessage.class);
-
     public void setSourceFile(File sourceFile) {
         if (!sourceFile.exists()) {
             throw new BuildException("input file : " + sourceFile + " doesn't exists");
@@ -79,18 +76,18 @@ public class FMPPMessage extends DataType implements Message {
         InputStream stream = null;
         try {
             task.setProject(getProject());
-            outputFile = File.createTempFile("fmppmessage", ".xml");
+            File outputFile = File.createTempFile("fmppmessage", ".xml");
             outputFile.deleteOnExit();
             task.setTaskName("fmpp");
             task.setOutputFile(outputFile);
             task.execute();
-            log.debug("outputfile in getinputstream: " + outputFile);
+            log("Temp output file for template rendering: " + outputFile, Project.MSG_DEBUG);
             stream = new FileInputStream(outputFile);
         } catch (BuildException bex) {
-            throw new MessageCreationException(bex.getMessage());
+            throw new MessageCreationException(bex.getMessage(), bex);
         }
         catch (IOException iex) {
-            throw new MessageCreationException(iex.getMessage());
+            throw new MessageCreationException(iex.getMessage(), iex);
         }
         return stream;
     }

@@ -62,7 +62,7 @@ import com.nokia.helium.metadata.model.metadata.SeverityDAO;
  */
 public class IMakerLogMetaDataInput extends AbstractComponentBaseMetadataInput {
     public static final String DEFAULT_COMPONENT_NAME = "General";
-    private Pattern iMakerFpsxPattern = Pattern.compile("/([^/]*?\\.fpsx)");
+    private Pattern iMakerFpsxPattern = Pattern.compile("/([^/]*?\\.(?:fpsx|bin))");
     private EntityManager entityManager;
 
     /**

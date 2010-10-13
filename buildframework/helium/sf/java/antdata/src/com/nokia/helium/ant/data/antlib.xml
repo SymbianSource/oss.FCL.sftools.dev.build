@@ -23,6 +23,5 @@ Description:
 <antlib>
     <!-- Task definition -->
     <taskdef name="database" classname="com.nokia.helium.ant.data.taskdefs.DatabaseTask" />
-    <taskdef name="antconfiglint" classname="com.nokia.helium.ant.data.taskdefs.AntConfigLintTask" />
 
 </antlib>

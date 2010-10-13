@@ -108,7 +108,7 @@ Description:
         <hlm:fileMessage file="${diamonds.build.output.dir}/create-bom.xml" />
     </hlm:targetMessageTrigger>
 
-    <hlm:targetMessageTrigger id="post-coverity.id" target="post-coverity" >
+    <hlm:targetMessageTrigger id="post-coverity.id" target="gen-coverity-report" >
         <hlm:fmppMessage sourceFile="${helium.dir}/tools/common/templates/diamonds/coverity.xml.ftl">
             <data expandProperties="yes">
                 ant: antProperties()
@@ -181,5 +181,16 @@ Description:
             </data>
         </hlm:fmppMessage>
     </hlm:targetMessageTrigger>
+
+    <!-- Declaring Diamonds sublisteners -->
+    <hlm:targetTimingMessageListener id="target.timing.message.listener" />
+    <hlm:targetMessageListener id="target.message.listener" />
+    <hlm:stageMessageListener id="stage.message.listener">
+        <hlm:fmppMessage sourceFile="${helium.dir}/tools/common/templates/diamonds/diamonds_stage.xml.ftl">
+            <data expandProperties="yes">
+                ant: antProperties()
+            </data>
+        </hlm:fmppMessage>
+    </hlm:stageMessageListener>
 
 </project>

@@ -28,8 +28,9 @@ Description:
     <taskdef name="taskRecorder" classname="com.nokia.helium.logger.ant.taskdefs.TaskRecorder"/>
     
     <!-- Type definition -->
-    <typedef name="stagerecord" classname="com.nokia.helium.logger.ant.types.StageLogging"/>
+    <typedef name="stagerecord" classname="com.nokia.helium.logger.ant.types.StageRecord"/>
     <typedef name="stagesummary" classname="com.nokia.helium.logger.ant.types.StageSummary"/>
     <typedef name="recordfilterset" classname="com.nokia.helium.logger.ant.types.RecordFilterSet"/>
+    <typedef name="stagerecorderlistener" classname="com.nokia.helium.logger.ant.listener.AntLoggingHandler"/>
     
 </antlib>

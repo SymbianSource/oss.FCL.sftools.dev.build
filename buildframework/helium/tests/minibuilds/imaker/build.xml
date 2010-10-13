@@ -166,18 +166,16 @@ ${ant.coverage.summary}</echo>
 
     <target name="minibuild-check">
     </target>
-    
+        
     <!-- Rom configuration -->
     <hlm:imakerconfigurationset id="imaker.rom.config">
         <imakerconfiguration>
-            <makefileset>
-                <include name="**/${product.name}/*ui.mk"/>
-            </makefileset>
+            <hlm:product list="${product.list}" ui="true"/>
             <targetset>
                 <include name="^core$"/>
                 <include name="^langpack_01.*$"/>
-                <include name="^langpack_02.*$"/><!---->
-                <include name="^custvariant_.*$"/>
+                <include name="^langpack_02.*$"/>
+                <include name="^custvariant_01_test$"/>
             </targetset>
             <variableset>
                 <variable name="USE_FOTI" value="0"/>

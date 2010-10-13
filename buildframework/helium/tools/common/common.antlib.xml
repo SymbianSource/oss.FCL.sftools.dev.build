@@ -325,13 +325,13 @@ target = str(attributes.get('target'))
 collectTargetDependencies(target, 1)
 targetList.append((target, 0))
     
-format = str(attributes.get('format'))
+formatstr = str(attributes.get('format'))
 
-if format == 'nested':    
+if formatstr == 'nested':    
     for target, indent in targetList:        
         indentString = ''.join(['   ' for x in range(indent)])
         print indentString + str(target)
-elif format == 'executable':
+elif formatstr == 'executable':
     print "Top level targets:\n"
     print ''.join([str(target) + ' ' for target, indent in targetList[:-1] if indent == 1])
     print "\n\nAll targets in sequence:\n"
@@ -378,18 +378,17 @@ output.close()
 import netrc
 import os
 result = "0"
-try:
-    netrc_file = netrc.netrc()
-    self.log("Type: %s" % str(attributes.get("type")))
-    netrc_info = netrc_file.authenticators(str(attributes.get("type")))
-    if netrc_info == None:
-        raise Exception("No entry found for Type: %s" % str(attributes.get("type")))
+
+netrc_file = netrc.netrc()
+self.log("Type: %s" % str(attributes.get("type")))
+netrc_info = netrc_file.authenticators(str(attributes.get("type")))
+if netrc_info == None:
+    print "No entry found for Type: %s" % str(attributes.get("type"))
+    result = '-1'
+else:
     (n_username, n_account, n_password) = netrc_info
     if attributes.get('output-prop') != None:
         project.setProperty(str(attributes.get('output-prop')), str(n_password))
-except Exception, e:
-    result = "-1"
-    print "Warning: %s" % e
 if attributes.get('result-prop') != None:
     project.setProperty(str(attributes.get('result-prop')), str(result))
         ]]>
@@ -405,18 +404,17 @@ if attributes.get('result-prop') != None:
 import netrc
 import os
 result = "0"
-try:
-    netrc_file = netrc.netrc()
-    self.log("Type: %s" % str(attributes.get("type")))
-    netrc_info = netrc_file.authenticators(str(attributes.get("type")))
-    if netrc_info == None:
-        raise Exception("No entry found for Type: %s" % str(attributes.get("type")))
+
+netrc_file = netrc.netrc()
+self.log("Type: %s" % str(attributes.get("type")))
+netrc_info = netrc_file.authenticators(str(attributes.get("type")))
+if netrc_info == None:
+    print "No entry found for Type: %s" % str(attributes.get("type"))
+    result = '-1'
+else:
     (n_username, n_account, n_password) = netrc_info
     if attributes.get('output-prop') != None:
         project.setProperty(str(attributes.get('output-prop')), str(n_username))
-except Exception, e:
-    result = "-1"
-    print "Warning: %s" % e
 if attributes.get('result-prop') != None:
     project.setProperty(str(attributes.get('result-prop')), str(result))
         ]]>
@@ -438,37 +436,22 @@ result = "0"
 cache = None
 if project.getProperty("ccm.cache.xml")is not None:
     cache = str(project.getProperty("ccm.cache.xml"))
-try:
-    database = project.getProperty('ccm.database')
-    
-    if project.getProperty('ccm.user.login') == None :
-        raise Exception("'ccm.user.login' property is not defined")
-        
-    username = project.getProperty('ccm.user.login')
-    
-    if project.getProperty('ccm.user.password') == None :
-        raise Exception("'ccm.user.password' property is not defined")
-        
-    password = project.getProperty('ccm.user.password')
-    
-    
-    engine = project.getProperty('ccm.engine.host')
-    dbpath = project.getProperty('ccm.database.path')
-    provider = ccm.extra.CachedSessionProvider(opener=nokia.nokiaccm.open_session, cache=cache)
-    if database != None:
-        session = provider.get(username, password, database=database, reuse=False)
-    else:
-        session = provider.get(username, password, engine, dbpath, reuse=False)
-    session.close()
-    provider.close()
-except Exception, e:
-    print "ERROR: %s" % e
-    if str(e).find("access denied") != -1:
-        result = "-2"
-    else:
-        result = "-1"
-self.log("Result: %s" % attributes.get('resultproperty'))
-project.setProperty(str(attributes.get('resultproperty')), str(result))
+database = project.getProperty('ccm.database')
+if project.getProperty('ccm.user.login') == None :
+    raise Exception("'ccm.user.login' property is not defined")
+username = project.getProperty('ccm.user.login')
+if project.getProperty('ccm.user.password') == None :
+    raise Exception("'ccm.user.password' property is not defined")
+password = project.getProperty('ccm.user.password')
+engine = project.getProperty('ccm.engine.host')
+dbpath = project.getProperty('ccm.database.path')
+provider = ccm.extra.CachedSessionProvider(opener=nokia.nokiaccm.open_session, cache=cache)
+if database != None:
+    session = provider.get(username, password, database=database, reuse=False)
+else:
+    session = provider.get(username, password, engine, dbpath, reuse=False)
+session.close()
+provider.close()
         ]]>
     </scriptdef>
 
@@ -504,13 +487,13 @@ project.setProperty(str(attributes.get('resultproperty')), str(result))
             <!-- signal for errors -->
             <var name="internal.signal.macro.log.basename" value="" unset="true"/> 
             <basename property="internal.signal.macro.log.basename" file="@{logfile}" />
-            <hlm:signal name="@{signal.input}" result="${signal.errors.total}"
-                message="Found ${signal.errors.total} errors under @{logfile}.">
+            <hlm:signal result="${signal.errors.total}" message="Found ${signal.errors.total} errors under @{logfile}."> 
                 <signalNotifierInput>
                     <signalInput refid="@{signal.input}" />
                     <notifierInput>
-                        <fileset casesensitive="false" dir="${build.signal.status.dir}"
-                            includes="${internal.signal.macro.log.basename}.status.html" />
+                        <fileset casesensitive="false" dir="${build.log.dir}">
+                            <include name="**/${internal.signal.macro.log.basename}*" />
+                        </fileset>
                     </notifierInput>
                 </signalNotifierInput>
             </hlm:signal>
@@ -536,7 +519,7 @@ project.setProperty(str(attributes.get('resultproperty')), str(result))
         <attribute name="failonerror"/>
         <![CDATA[
 import logging
-
+import junit.framework
 import java.io
 import org.custommonkey.xmlunit
 
@@ -562,7 +545,7 @@ try:
     test_reader = java.io.InputStreamReader(test_resource.getInputStream())
     org.custommonkey.xmlunit.XMLAssert.assertXMLEqual(control_reader, test_reader)
     print 'XML is similar'
-except Exception, e:
+except junit.framework.AssertionFailedError, e:
     print 'XML is NOT similar!'
     failonerror = str(attributes.get('failonerror'))
     if failonerror == 'true' or failonerror == 'None':
@@ -575,7 +558,7 @@ except Exception, e:
     <scriptdef name="unsubst" language="jython" uri="http://www.nokia.com/helium">
         <attribute name="drive"/>
         <attribute name="failonerror"/>
-""" internal.codescanner.drive """
+#internal.codescanner.drive
 import os
 if os.sep == '\\':
     import fileutils
@@ -596,7 +579,7 @@ if os.sep == '\\':
         try:
             self.log(str("Unsubsting %s..." % drive))
             fileutils.unsubst(drive)
-        except Exception, e:
+        except OSError, e:
             if failonerror:
                 raise e
             else:
@@ -609,8 +592,8 @@ if os.sep == '\\':
         <element name="path" type="path"/>
         <![CDATA[
 import fileutils
-for id in range(elements.get("path").size()):
-    iterator = elements.get("path").get(int(id)).iterator()
+for aid in range(elements.get("path").size()):
+    iterator = elements.get("path").get(int(aid)).iterator()
     while iterator.hasNext():
         path = str(iterator.next())
         fileutils.touch(path)
@@ -729,6 +712,7 @@ for id in range(elements.get("path").size()):
                     <include name="config/signaling_config_default.ant.xml"/>
                     <include name="config/stages_config_default.ant.xml"/>
                     <include name="config/metadata_filter_config_default.ant.xml"/>
+                    <include name="tools/common/default_config.ant.xml"/>
                     <include name="tools/**/*.antlib.xml"/>
                 </fileset>
             </hlm:database>

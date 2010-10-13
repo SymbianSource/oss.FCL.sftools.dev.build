@@ -216,7 +216,6 @@ if int(r'@{error.limit}') > -1:
         </sequential>
     </macrodef>
 
-
     <!-- Electric Cloud emake support.
 
     e.g:
@@ -256,13 +255,6 @@ self.log("Target: " + target);
 if (attributes.get("custom") != null) {
     custom = attributes.get("custom");
 }
-if (attributes.get("root") != null) {
-    root = attributes.get("root");
-}
-else {
-    root = "";
-}
-
 self.log("Custom: " + custom);
 
 // Create and configure exec target
@@ -291,12 +283,18 @@ String buildId = com.nokia.ant.util.Helper.getProperty(project, "build.id");
 task.createArg().setValue("--emake-build-label=" + buildId + "-" + attributes.get("name"));
 String eclass = com.nokia.ant.util.Helper.getProperty(project, "ec.build.class");
 task.createArg().setValue("--emake-class=" + eclass);
+
+// Defining the emake-root argument for the command line.
 String eroot = com.nokia.ant.util.Helper.getProperty(project, "env.EMAKE_ROOT");          
 String heliumDir = com.nokia.ant.util.Helper.getProperty(project, "helium.dir"); 
-if (attributes.get("root") != null) {
-    self.log("--emake-root=" + eroot + ";" + heliumDir + ";" + root);
-}         
-task.createArg().setValue("--emake-root=" + eroot + ";" + heliumDir + ";" + root);
+String pathSeparator = com.nokia.ant.util.Helper.getProperty(project, "path.separator");
+String emakeRoot = eroot + pathSeparator + heliumDir;
+if (attributes.get("root") != null &amp;&amp; attributes.get("root").length() > 0) {
+    emakeRoot = emakeRoot + pathSeparator + attributes.get("root");
+}   
+self.log("Roots: " + emakeRoot);
+task.createArg().setValue("--emake-root=" + emakeRoot);
+
 if (attributes.get("phase") != null) {
     annofileDir = com.nokia.ant.util.Helper.getProperty(project, "build.log.dir") + "/" + attributes.get("phase");
 }

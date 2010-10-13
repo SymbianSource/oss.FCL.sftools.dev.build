@@ -26,6 +26,7 @@ Description:
     
     <!-- Configuring raptor build system -->
     <property name="build.system" value="sbs"/>
+    <property name="qmake.enabled" value="true" />
 
     <!-- Configuring get latest env. -->
     <property name="s60.grace.service" value="s60_devices_sw" />
@@ -33,8 +34,14 @@ Description:
     <property name="s60.grace.release" value="92_\d{6}_hw79" />
     
     <!-- Synergy project for TB92 -->
-    <property name="ccm.project" value="MinibuildDomain-tr1ido#50_201012:project:tr1test1#1" />
+	<property name="ccm.project" value="MinibuildDomain-tr1ido#20100928_3:project:tr1test1#1" />
+    
+    <!-- Compatibility analyser enabling flag, causes binary check to be run -->
+    <property name="ca.enabled" value="true" />
+    <property name="bc.prep.ca.file" location="${helium.dir}/tools/quality/compatibility_analyser/ca.cfg.xml" />
 
+    <property name="codescanner.enabled" value="false" />
+    
 
     <!-- Run the full sequence of target for the minibuild. ,minibuild-prep,compile-main,zip-ee,minibuild-check-->
     <!--<target name="do-minibuild" depends="minibuild-cleanup,
@@ -47,8 +54,18 @@ Description:
         <if>
             <istrue value="${blocks.enabled}" />
             <then>
-                <au:assertFileExists file="${blocks.config.dir}/minibuild_helloworldapi.blocks_component.xml" />
-                <au:assertFileExists file="${blocks.config.dir}/minibuild_helloworldcons.blocks_component.xml" />
+                <if>
+                    <istrue value="${sysdef3.enabled}" />
+                    <then>
+                        <au:assertFileExists file="${blocks.config.dir}/helloworld_api.blocks_component.xml" />
+                        <au:assertFileExists file="${blocks.config.dir}/helloworldcons_app.blocks_component.xml" />
+                        <au:assertFileExists file="${blocks.config.dir}/qt_helloworld_app.blocks_component.xml" />
+                    </then>
+                    <else>
+                        <au:assertFileExists file="${blocks.config.dir}/minibuild_helloworldapi.blocks_component.xml" />
+                        <au:assertFileExists file="${blocks.config.dir}/minibuild_helloworldcons.blocks_component.xml" />
+                    </else>
+                </if>
             </then>
         </if>
     </target>
@@ -70,6 +87,10 @@ Description:
     <hlm:signalInput id="raptorErrorSignalInput" failbuild="defer">
         <hlm:notifierListRef refid="defaultFailNotifier" />
     </hlm:signalInput>
+
+    <!-- used by the compatibility analyser to define the build log that is to be
+     scanned and the output used for the comparison-->
+    <property name="bc.log.file.to.scan" location="${build.log.dir}/compile/${build.id}_dfs_build_armv5_compile.log" />
 
 </project>
 

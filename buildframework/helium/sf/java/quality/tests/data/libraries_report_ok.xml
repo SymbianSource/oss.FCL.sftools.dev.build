@@ -23,7 +23,7 @@ Description:
 -->
 <bbcresults>
     <issuelist>
-        <library>
+          <library>
             <name>C:\Symbian\9.2\S60_3rd_FP1_2\aknicon.dso</name>
             <currentplatform>armv5</currentplatform>
             <issue>
@@ -36,49 +36,191 @@ Description:
                 <bc_severity>Informative</bc_severity>
                 <sc_severity>None</sc_severity>
             </issue>
-        </library>
-        <library>
-            <name>C:\Symbian\9.2\S60_3rd_FP1_2\aknnotify.dso</name>
+              <name>C:\Symbian\9.2\S60_3rd_FP1_2\epoc32\release\armv5\lib\hal.dso</name>
+              <comparefilename>J:\epoc32\release\armv5\lib\hal.dso</comparefilename>
+              <shortname>hal</shortname>
+              <baseplatform>armv5</baseplatform>
+              <currentplatform>armv5</currentplatform>
+              <issue>
+                    <typeid>13</typeid>
+                    <typeinfo>DLL is missing in current SDK</typeinfo>
+                    <bc_severity>BBC Break</bc_severity>
+                    <sc_severity>None</sc_severity>
+                    <status>OK</status>
+              </issue>
+              <issue>
+                    <typeid>14</typeid>
+                    <typeinfo>Baseline DLL is not available for analysis</typeinfo>
+                    <bc_severity>Informative</bc_severity>
+                    <sc_severity>None</sc_severity>
+              </issue>
+          </library>
+          <library>
+              <name>C:\Symbian\9.2\S60_3rd_FP1_2\epoc32\release\armv5\lib\irs.dso</name>
+              <comparefilename>J:\epoc32\release\armv5\lib\irs.dso</comparefilename>
+              <shortname>irs</shortname>
+              <baseplatform>armv5</baseplatform>
+              <currentplatform>armv5</currentplatform>
+              <issue>
+                    <typeid>14</typeid>
+                    <typeinfo>Baseline DLL is not available for analysis</typeinfo>
+                    <bc_severity>Informative</bc_severity>
+                    <sc_severity>None</sc_severity>
+              </issue>
             <issue>
-                <typeid>6</typeid>
-                <bc_severity>Possible BBC Break</bc_severity>
-                <sc_severity>SC Break</sc_severity>
-            </issue>
-            <issue>
-                <typeid>7</typeid>
-                <bc_severity>Informative</bc_severity>
+                <typeid>8</typeid>
+                <typeinfo>Target type/UID1 has been changed</typeinfo>
+                <bc_severity>BBC Break</bc_severity>
                 <sc_severity>None</sc_severity>
             </issue>
-        </library>
-        <library>
-            <name>C:\Symbian\9.2\S60_3rd_FP1_2\animation.dso</name>
             <issue>
-                <typeid>7</typeid>
-                <bc_severity>Informative</bc_severity>
+                <typeid>9</typeid>
+                <typeinfo>UID2 has been changed</typeinfo>
+                <bc_severity>BBC Break</bc_severity>
                 <sc_severity>None</sc_severity>
             </issue>
             <issue>
-                <typeid>14</typeid>
-                 <bc_severity>Informative</bc_severity>
+                <typeid>10</typeid>
+                <typeinfo>UID3 has been changed</typeinfo>
+                <bc_severity>BBC Break</bc_severity>
                 <sc_severity>None</sc_severity>
             </issue>
+          </library>
+          <library>
+              <name>C:\Symbian\9.2\S60_3rd_FP1_2\epoc32\release\armv5\lib\lmkcommonui.dso</name>
+              <comparefilename/>
+              <shortname>lmkcommonui</shortname>
+              <baseplatform>armv5</baseplatform>
+              <currentplatform/>
+              <issue>
+                    <typeid>1</typeid>
+                    <bc_severity>BBC Break</bc_severity>
+                    <sc_severity>SC Break</sc_severity>
+              </issue>
+              <issue>
+                    <typeid>13</typeid>
+                    <typeinfo>DLL is missing in current SDK</typeinfo>
+                    <bc_severity>BBC Break</bc_severity>
+                    <sc_severity>None</sc_severity>
+              </issue>
+          </library>
+          <library>
+              <name/>
+              <comparefilename>J:\epoc32\release\armv5\lib\HelloWorldAPI.dso</comparefilename>
+              <shortname>HelloWorldAPI</shortname>
+              <baseplatform/>
+              <currentplatform>armv5</currentplatform>
+              <issue>
+                    <typeid>2</typeid>
+                    <bc_severity>Informative</bc_severity>
+                    <sc_severity>Informative</sc_severity>
+              </issue>
+              <issue>
+                    <typeid>4</typeid>
+                    <funcname>vtable for CommsDat::CCDDefaultCDMA2000SettingsRecord</funcname>
+                    <funcpos>222</funcpos>
+                    <bc_severity>BBC Break</bc_severity>
+                    <sc_severity>SC Break</sc_severity>
+                    <status>OK</status>
+                    <comment>Studied and approved..</comment>
+              </issue>
+              <issue>
+                    <typeid>5</typeid>
+                    <newfuncname>typeinfo for CommsDat::CCDCprRecord</newfuncname>
+                    <newfuncpos>257</newfuncpos>
+                    <bc_severity>BBC Break</bc_severity>
+                    <sc_severity>None</sc_severity>
+                    <status>OK</status>
+                    <comment>CCDCprRecord is part of internal technology..</comment>
+              </issue>
+              <issue>
+                    <typeid>3</typeid>
+                    <funcname>typeinfo for CommsDat::CCDIAPPrioritySelectionPolicyRecord</funcname>
+                    <funcpos>257</funcpos>
+                    <newfuncpos>289</newfuncpos>
+                    <bc_severity>BBC Break</bc_severity>
+                    <sc_severity>None</sc_severity>
+                    <status>OK</status>
+                    <comment>Constructor is part of internal technology..</comment>
+              </issue>
+              <issue>
+                    <typeid>5</typeid>
+                    <newfuncname>typeinfo for CommsDat::CCDLEAPRecord</newfuncname>
+                    <newfuncpos>258</newfuncpos>
+                    <bc_severity>BBC Break</bc_severity>
+                    <sc_severity>None</sc_severity>
+              </issue>
+              <issue>
+                    <typeid>3</typeid>
+                    <funcname>vtable for CommsDat::CCDAccessPointRecord</funcname>
+                    <funcpos>258</funcpos>
+                    <newfuncpos>281</newfuncpos>
+                    <bc_severity>BBC Break</bc_severity>
+                    <sc_severity>None</sc_severity>
+                    <status>OK</status>
+                    <comment>Constructor is part of internal technology..</comment>
+              </issue>
+         </library>
+          <library>
+              <name>C:\Symbian\9.2\S60_3rd_FP1_2\epoc32\release\armv5\lib\cone.dso</name>
+              <comparefilename>J:\epoc32\release\armv5\lib\cone.dso</comparefilename>
+              <shortname>cone</shortname>
+              <baseplatform>armv5</baseplatform>
+              <currentplatform>armv5</currentplatform>
+              <issue>
+                    <typeid>6</typeid>
+                    <funcname>CCoeControl::SetGc(CWindowGc*) const</funcname>
+                    <newfuncname>CCoeControl::SetCustomGc(CWindowGc*)</newfuncname>
+                    <funcpos>470</funcpos>
+                    <bc_severity>None</bc_severity>
+                    <sc_severity>SC Break</sc_severity>
+                    <status>OK</status>
+                    <comment>Function names changed but entry points and arg lists retained.  Old names deprecated. an inline trampoline exists for both removed functions.  This is OK.</comment>
+              </issue>
+              <issue>
+                    <typeid>6</typeid>
+                    <funcname>CCoeTextDrawerBase::CCoeTextDrawerBase_Reserved2()</funcname>
+                    <newfuncname>CCoeTextDrawerBase::DrawTextVertical(CGraphicsContext&amp;, TCoeTextTypeAdaptor const&amp;, CFont const&amp;, TRect const&amp;, TRect const&amp;, int) const</newfuncname>
+                    <funcpos>536</funcpos>
+                    <bc_severity>None</bc_severity>
+                    <sc_severity>SC Break</sc_severity>
+                    <status>OK</status>
+                    <comment>Reserved function has been renamed.</comment>
+              </issue>
+              <issue>
+                    <typeid>4</typeid>
+                    <funcname>CCoePlainTextDrawer::Construct()</funcname>
+                    <funcpos>552</funcpos>
+                    <bc_severity>BBC Break</bc_severity>
+                    <sc_severity>SC Break</sc_severity>
+                    <status>OK</status>
+                    <comment>Private function, which is not called from any inline functions.</comment>
+              </issue>
+              <issue>
+                    <typeid>6</typeid>
+                    <funcname>CCoeControl::GetGc() const</funcname>
+                    <newfuncname>CCoeControl::CustomGc() const</newfuncname>
+                    <funcpos>619</funcpos>
+                    <bc_severity>Possible BBC Break</bc_severity>
+                    <sc_severity>Possible SC Break</sc_severity>
+                    <status>OK</status>
+                    <comment>Function name has changed, which is ok.</comment>
+              </issue>
+              <issue>
+                    <typeid>7</typeid>
+                    <newfuncname>CCoeEnv::ScreenDevice(int) const</newfuncname>
+                    <newfuncpos>716</newfuncpos>
+                    <bc_severity>Informative</bc_severity>
+                    <sc_severity>None</sc_severity>
+              </issue>
+              <issue>
+                    <typeid>7</typeid>
+                    <newfuncname>CCoeEnv::RootWin(int) const</newfuncname>
+                    <newfuncpos>717</newfuncpos>
+                    <bc_severity>Informative</bc_severity>
+                    <sc_severity>None</sc_severity>
+              </issue>
         </library>
-        <library>
-            <name>C:\Symbian\9.2\S60_3rd_FP1_2\animationshared.dso</name>
-            <issue>
-                <typeid>14</typeid>
-                <bc_severity>Informative</bc_severity>
-                <sc_severity>None</sc_severity>
-            </issue>
-        </library>
-        <library>
-            <name>C:\Symbian\9.2\S60_3rd_FP1_2\apfile.dso</name>
-          <issue>
-              <typeid>4</typeid>
-              <bc_severity>BBC Break</bc_severity>
-              <sc_severity>SC Break</sc_severity>
-          </issue>
-      </library>
     </issuelist>
 
 </bbcresults>

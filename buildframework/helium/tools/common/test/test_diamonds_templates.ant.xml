@@ -42,6 +42,7 @@ Description:
         <delete dir="${test.temp.dir}" />        
     </target>
     
+    
     <target name="test-diamonds-signal-template-without-signal-data">
         <fmpp sourceFile="${helium.dir}/tools/common/templates/diamonds/diamonds_signal.xml.ftl"
                      outputfile="${test.temp.dir}/diamonds_signal.xml">
@@ -51,6 +52,7 @@ Description:
         </fmpp>
         <loadfile property="diamonds.xml" srcFile="${test.temp.dir}/diamonds_signal.xml" />
         <echo>${diamonds.xml}</echo>
+        <xmlvalidate file="${test.temp.dir}/diamonds_signal.xml" lenient="true" />
         <au:assertTrue message="No signals are pushed to diamonds">
             <not>
                 <contains string="${diamonds.xml}" substring="&lt;signal&gt;" />
@@ -75,4 +77,106 @@ Description:
             <contains string="${diamonds.xml}" substring="&lt;name&gt;fakeSignal&lt;/name&gt;" />
         </au:assertTrue>
     </target>
+
+    <target name="test-diamonds-build-roms-template">
+        <hlm:metadatarecord  database="${test.temp.dir}/database_db">
+            <hlm:imakermetadatainput>
+                <fileset casesensitive="false" file="${helium.dir}/tests/data/diamonds/build_roms_sample.log"/>
+                <metadatafilterset refid="filterset.imaker" />
+            </hlm:imakermetadatainput>
+        </hlm:metadatarecord>
+        <fmpp sourceFile="${helium.dir}/tools/common/templates/diamonds/build_roms_diamonds.xml.ftl"
+                     outputfile="${test.temp.dir}/build_roms_diamonds.xml">
+            <data expandProperties="yes">
+                dbPath: ${test.temp.dir}/database_db
+                ant: antProperties()
+            </data>
+        </fmpp>
+        <loadfile property="diamonds.xml" srcFile="${test.temp.dir}/build_roms_diamonds.xml" />
+        <echo>${diamonds.xml}</echo>
+        <xmlvalidate file="${test.temp.dir}/build_roms_diamonds.xml" lenient="true" warn="true" />
+        <au:assertTrue message="XML character are escaped.">
+            <contains string="${diamonds.xml}" substring="&amp;apos;" />
+        </au:assertTrue>
+        <au:assertTrue message="known image can be found.">
+            <contains string="${diamonds.xml}" substring="&lt;name&gt;RM-XXX_010.014_79.92_prd.udaerase.fpsx&lt;/name&gt;" />
+        </au:assertTrue>
+    </target>
+    
+    <target name="test-diamonds-build-xml-template">
+        <property name="ecc.project" value="diamonds_ecc_test"/>
+        <property name="ecc.schedule" value="diamonds_ecc_schedule"/>
+        <property name="ecc.ido.branch" value="diamonds_ecc_ido_branch"/>
+        <property name="ecc.procedure" value="diamonds_ecc_procedure"/>
+        <property name="ecc.include.in.stats" value="diamonds_ecc_include_in_stats"/>
+        <property name="build.family" value="diamonds_template_test"/>
+        <property name="ecc.ido.branch" value="diamonds_ecc_ido_branch"/>
+        <property name="ecc.ido.branch" value="diamonds_ecc_ido_branch"/>
+        <tstamp>
+            <format property="build.start.time" pattern="MM/dd/yyyy hh:mm aa" unit="hour"/>
+        </tstamp>
+        <tstamp>
+            <format property="build.end.time" pattern="MM/dd/yyyy hh:mm aa" unit="hour"/>
+        </tstamp>
+        <fmpp sourceFile="${helium.dir}/tools/common/templates/diamonds/diamonds_build.xml.ftl"
+                     outputfile="${test.temp.dir}/diamonds_build.xml">
+            <data expandProperties="yes">
+                dbPath: ${test.temp.dir}/database_db
+                ant: antProperties()
+            </data>
+        </fmpp>
+        <loadfile property="diamonds.xml" srcFile="${test.temp.dir}/diamonds_build.xml" />
+        <echo>${diamonds.xml}</echo>
+        <au:assertTrue message="XML character are escaped.">
+            <contains string="${diamonds.xml}" substring="diamonds_template_test" />
+        </au:assertTrue>
+    </target>
+    
+    <target name="test-diamonds-finish-xml-template">
+        <tstamp>
+            <format property="build.end.time" pattern="MM/dd/yyyy hh:mm aa" unit="hour"/>
+        </tstamp>
+        <echo> test.temp.dir = ${test.temp.dir}</echo>
+        <fmpp sourceFile="${helium.dir}/tools/common/templates/diamonds/diamonds_finish.xml.ftl"
+                     outputfile="${test.temp.dir}/finish.xml">
+            <data expandProperties="yes">
+                dbPath: ${test.temp.dir}/database_db
+                ant: antProperties()
+            </data>
+        </fmpp>
+        <loadfile property="diamonds.xml" srcFile="${test.temp.dir}/finish.xml" />
+        <echo>${diamonds.xml}</echo>
+        <au:assertTrue message="XML character are escaped.">
+            <contains string="${diamonds.xml}" substring="${build.end.time}" />
+        </au:assertTrue>
+    </target>
+    
+    <target name="test-diamonds-stage-xml-template">
+        <property name="logical.stage" value="diamonds-test"/>
+        <tstamp>
+            <format property="stage.start.time" pattern="MM/dd/yyyy hh:mm aa" unit="hour"/>
+        </tstamp>
+        <tstamp>
+            <format property="stage.end.time" pattern="MM/dd/yyyy hh:mm aa" unit="hour"/>
+        </tstamp>
+        <fmpp sourceFile="${helium.dir}/tools/common/templates/diamonds/diamonds_stage.xml.ftl"
+                     outputfile="${test.temp.dir}/stage.xml">
+            <data expandProperties="yes">
+                dbPath: ${test.temp.dir}/database_db
+                ant: antProperties()
+            </data>
+        </fmpp>
+        <loadfile property="diamonds.xml" srcFile="${test.temp.dir}/stage.xml" />
+        <echo>${diamonds.xml}</echo>
+        <au:assertTrue message="XML character are escaped.">
+            <contains string="${diamonds.xml}" substring="${stage.start.time}" />
+        </au:assertTrue>
+        <au:assertTrue message="XML character are escaped.">
+            <contains string="${diamonds.xml}" substring="${stage.end.time}" />
+        </au:assertTrue>
+    </target>
+    
+    
+    
+
 </project>

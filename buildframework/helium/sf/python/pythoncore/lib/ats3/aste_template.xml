@@ -139,7 +139,7 @@ information on the files used to create the drop file.
                <type>InstallSisTask</type>
                <parameters>
                     <parameter name="timeout" value="{{ test_plan["test_timeout"] }}"/>
-                    <parameter name="upgrade-data " value="true"/>
+                    <parameter name="upgrade-data" value="true"/>
                     <parameter name="ignore-ocsp-warnings" value="true"/>
                     <parameter name="ocsp-done" value="true"/>
                     <parameter name="software-package" value="c:\testframework\{{ os.path.basename(sis_file) }}"/>

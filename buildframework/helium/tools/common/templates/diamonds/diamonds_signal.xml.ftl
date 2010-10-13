@@ -25,6 +25,7 @@ Description:
       <#if diamondskey?starts_with("diamond.signal.name.")>
       <#assign signalIndex = diamondskey?split(".")?last />
       <signal>
+          <id>${signalIndex}</id>
           <#if ant?keys?seq_contains("diamond.signal.name.${signalIndex}")><name>${ant["diamond.signal.name.${signalIndex}"]?xml}</name></#if>
           <#if ant?keys?seq_contains("diamond.error.message.${signalIndex}")><message>${ant["diamond.error.message.${signalIndex}"]?xml}</message></#if>
           <#if ant?keys?seq_contains("diamond.time.stamp.${signalIndex}")><timestamp>${ant["diamond.time.stamp.${signalIndex}"]?xml}</timestamp></#if>

@@ -19,10 +19,15 @@ Description:
 
 ============================================================================
 -->
-###################################
-  Helium Manual
-###################################
+#############
+Helium Manual
+#############
 
+.. raw:: html
+
+   <table border="0" cellspacing="0" cellpadding="10">
+   <tr valign="top">
+   <td width="50%" style="border-right: 1px solid black">
 
 .. toctree::
    :maxdepth: 2
@@ -36,7 +41,14 @@ Description:
    configuring_features
    running
    stages
-   stage_matti
+   
+.. raw:: html
+
+   </td><td width="50%">
+
+.. toctree::
+   :maxdepth: 2
+   
 <#if !ant?keys?seq_contains("sf")>
    nokiastages
    datapackage
@@ -48,7 +60,9 @@ Description:
    messaging
    metrics
    coverity
+   final
 
-   
-   
-   
+.. raw:: html
+
+   </td></tr>
+   </table>

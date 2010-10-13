@@ -30,13 +30,12 @@ import org.apache.tools.ant.BuildEvent;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
+import org.apache.tools.ant.taskdefs.Recorder.VerbosityLevelChoices;
 import org.apache.tools.ant.types.EnumeratedAttribute;
-import org.apache.tools.ant.types.LogLevel;
 
 import com.nokia.helium.logger.ant.listener.AntLoggingHandler;
-import com.nokia.helium.logger.ant.listener.Handler;
 import com.nokia.helium.logger.ant.listener.RecorderEntry;
-import com.nokia.helium.logger.ant.listener.StatusAndLogListener;
+import com.nokia.helium.logger.ant.listener.CommonListener;
 import com.nokia.helium.logger.ant.types.RecordFilter;
 import com.nokia.helium.logger.ant.types.RecordFilterSet;
 
@@ -51,11 +50,11 @@ import com.nokia.helium.logger.ant.types.RecordFilterSet;
  *      
  * </pre>
  * 
- * @ant.task name="Record" category="Logging".
+ * @ant.task name="Record" category="Logging"
  *
  */
 
-public class LogRecorderTask extends Task implements Handler {
+public class LogRecorderTask extends Task {
     
     private static Hashtable<File, RecorderEntry> recorderEntries = new Hashtable<File, RecorderEntry>();
     private File fileName;
@@ -74,18 +73,15 @@ public class LogRecorderTask extends Task implements Handler {
      * Run by the task.
      */
     public void execute() {
-        StatusAndLogListener statusAndLogListener = new StatusAndLogListener();
-        AntLoggingHandler antLoggingHandler = new AntLoggingHandler(getProject());
-        antLoggingHandler.setLoggingStarted(true);
-        statusAndLogListener.register(antLoggingHandler);
+        CommonListener commonListener = CommonListener.getCommonListener();
             
-        /* To validate attributes passed. */
+        // To validate attributes passed.
         validateAttributes();
         
-        /* to add regular filters */
+        // to add regular filters
         addAllRecordFilters();
         
-        /* Init password/record filter and replace any unset properties */
+        // Init password/record filter and replace any unset properties
         initAndReplaceProperties();
         
         //Create the root folder path.
@@ -117,30 +113,25 @@ public class LogRecorderTask extends Task implements Handler {
         recorder.setEmacsMode(emacsMode);
         if (start != null) {
             if (start.booleanValue()) {
-                getProject().addBuildListener(statusAndLogListener);
-                if (antLoggingHandler != null) {
-                    if (antLoggingHandler.getCurrentStageName() != null) {
-                        antLoggingHandler.doLoggingAction(antLoggingHandler.getCurrentStageName(), false, "Stopping", this, getOwningTarget());
-                    } else {
-                        antLoggingHandler.doLoggingAction("default", false, "Stopping", this, getOwningTarget());
-                    }
-                }
                 recorder.reopenFile();
+                commonListener.register(recorder);
                 recorder.setRecordState(start.booleanValue());
+                recorder.setRecorderProject(getProject());
+                AntLoggingHandler handler = commonListener.getHandler(AntLoggingHandler.class);
+                if (handler != null) {
+                    handler.addRecordExclusion(getProject());
+                }
             } else {
                 recorder.setRecordState(start.booleanValue());
                 recorder.closeFile();
-                getProject().removeBuildListener(statusAndLogListener);
-                if (antLoggingHandler != null) {
-                    if (antLoggingHandler.getCurrentStageName() != null) {
-                        antLoggingHandler.doLoggingAction(antLoggingHandler.getCurrentStageName(), true, "Starting", this, getOwningTarget());
-                    } else {
-                        antLoggingHandler.doLoggingAction("default", true, "Starting", this, getOwningTarget());
-                    }
+                commonListener.unRegister(recorder);
+                recorder.setRecorderProject(null);
+                AntLoggingHandler handler = commonListener.getHandler(AntLoggingHandler.class);
+                if (handler != null) {
+                    handler.removeRecordExclusion(getProject());
                 }
             }
         }
-        
     }
     /**
      * To Validate is the fileName set for recording.
@@ -281,16 +272,7 @@ public class LogRecorderTask extends Task implements Handler {
             return VALUES;
         }
     }
-    
-    /**
-     * To set the verbosity levels
-     * 
-     *
-     */
-    public static class VerbosityLevelChoices extends LogLevel {
-    }
-    
-    
+        
     /**
      * To register the recorder entry
      */
@@ -298,11 +280,10 @@ public class LogRecorderTask extends Task implements Handler {
         RecorderEntry entry = recorderEntries.get(name);
         if (entry == null) {
             // create a recorder entry
-            entry = new RecorderEntry(name);
+            entry = new RecorderEntry(name, true);
             for (String regExp : regExpList) {
                 if (!regExp.equals("")) {
-                    String pattern = Pattern.quote(regExp);
-                    entry.addRegexp(pattern);
+                    entry.addRegexp(Pattern.compile(Pattern.quote(regExp)));
                 }
             }
             entry.openFile(append);
@@ -320,23 +301,10 @@ public class LogRecorderTask extends Task implements Handler {
         }
     }
     
-    public void handleBuildFinished(BuildEvent event) {
-        // TODO Auto-generated method stub
-
+    public void buildFinished(BuildEvent event) {
     }
 
-    public void handleBuildStarted(BuildEvent event) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void handleTargetFinished(BuildEvent event) {
-        // TODO Auto-generated method stub
-    }
-
-    public void handleTargetStarted(BuildEvent event) {
-        // TODO Auto-generated method stub
-
+    public void buildStarted(BuildEvent event) {
     }
     
     /**

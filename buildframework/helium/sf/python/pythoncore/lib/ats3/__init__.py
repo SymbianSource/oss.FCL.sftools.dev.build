@@ -54,7 +54,11 @@ class Configuration(object):
         # Customize some attributes from how optparse leaves them.
         if hasattr(self._opts, 'build_drive'):
             self.build_drive = path(self._opts.build_drive)
-        self.file_store = path(self._opts.file_store)
+        if os.path.exists(self._opts.file_store):
+            self.file_store = path(self._opts.file_store)
+        else:
+            self.file_store = ''
+            _logger.info(self._opts.file_store + ' not found')
         self.flash_images = split_paths(self._opts.flash_images)
         if hasattr(self._opts, 'sis_files'):
             self.sis_files = split_paths(self._opts.sis_files)
@@ -62,6 +66,8 @@ class Configuration(object):
             self.config_file = self._opts.config
         if hasattr(self._opts, 'obey_pkgfiles'):
             self.obey_pkgfiles = to_bool(self._opts.obey_pkgfiles)
+        if hasattr(self._opts, 'minimum_execution_blocks'):
+            self.minimum_execution_blocks = (self._opts.minimum_execution_blocks == 'true')
         if hasattr(self._opts, 'hti'):
             self.hti = to_bool(self._opts.hti)
         if hasattr(self._opts, 'test_type'):
@@ -91,7 +97,7 @@ class Configuration(object):
                 for t_key, t_value in temp_dict.items():
                     self.tsrc_paths_dict[t_key] = t_value
             else:
-                _logger.error(tsrc + ' not found')
+                _logger.error(tsrc + ' - test source not found')
         
         #preparing a list of main components
         for main_component in self.tsrc_paths_dict.keys():
@@ -166,6 +172,9 @@ class Ats3TestPlan(object):
         self.ctc_enabled = 'False'
         if hasattr(config, 'ctc_enabled'):
             self.ctc_enabled = to_bool(config.ctc_enabled)
+        self.ats_stf_enabled = 'False'
+        if hasattr(config, 'ats_stf_enabled'):
+            self.ats_stf_enabled = to_bool(config.ats_stf_enabled)
         if hasattr(config, 'multiset_enabled'):
             self.multiset_enabled = to_bool(config.multiset_enabled)
         if hasattr(config, 'monsym_files'):
@@ -180,6 +189,9 @@ class Ats3TestPlan(object):
             self.flash_images = config.flash_images
         if hasattr(config, 'test_type'):
             self.test_type = config.test_type
+        self.minimum_execution_blocks = False
+        if hasattr(config, 'minimum_execution_blocks'):
+            self.minimum_execution_blocks = config.minimum_execution_blocks
     
     def insert_set(self, data_files=None, config_files=None, 
                    engine_ini_file=None,  image_files=None, sis_files=None,
@@ -230,12 +242,39 @@ class Ats3TestPlan(object):
         if self.trace_enabled != "":
             if self.trace_enabled.lower() == "true":
                 setd = dict(setd, pmd_files=pmd_files, 
-                            trace_path=self.file_store.joinpath(self.REPORT_PATH, "traces", setd["name"], "tracelog.blx"),
+                            trace_path=os.path.join(self.file_store, self.REPORT_PATH, "traces", setd["name"], "tracelog.blx"),
                             trace_activation_files=trace_activation_files)
             else:
                 setd = dict(setd, pmd_files=[], 
                             trace_path="",trace_activation_files=[])
-        self.sets.append(setd)
+        
+        if self.minimum_execution_blocks:
+            if self.sets == []:
+                self.sets = [setd]
+            else:
+                files = ['component_path',
+                'trace_activation_files',
+                'src_dst',
+                #'trace_path',
+                #'custom_dir',
+                'pmd_files',
+                'dll_files',
+                'config_files',
+                'data_files',
+                'testmodule_files']
+
+                if self.sets[0]['test_harness'] == setd['test_harness'] and setd['engine_ini_file'] == None:
+                    for param in files:
+                        if setd[param]:
+                            if type(setd[param]) == dict:
+                                for key in setd[param].keys():
+                                    self.sets[0][param][key] = setd[param][key]
+                            else:
+                                self.sets[0][param] = self.sets[0][param] + setd[param]
+                else:
+                    self.sets.append(setd)
+        else:
+            self.sets.append(setd)
 
     def set_plan_harness(self):
         """setting up test harness for a plan"""
@@ -272,7 +311,7 @@ class Ats3TestPlan(object):
         actions = []
         temp_var = ""
         include_ctc_runprocess = False
-        report_path = self.file_store.joinpath(self.REPORT_PATH)
+        report_path = os.path.join(self.file_store, self.REPORT_PATH)
         
         if self.ctc_enabled and adg.CTC_PATHS_LIST != [] and self.monsym_files != "" and not "${" in self.monsym_files:
             include_ctc_runprocess = True
@@ -311,18 +350,18 @@ class Ats3TestPlan(object):
                              ("send-files", "true"),
                              ("to", self.report_email)))
         ats3_report = ("FileStoreAction", 
-                       (("to-folder", report_path.joinpath("ATS3_REPORT")),
+                       (("to-folder", os.path.join(report_path, "ATS3_REPORT")),
                         ("report-type", "ATS3_REPORT"),
                         ("date-format", "yyyyMMdd"),
                         ("time-format", "HHmmss")))
         stif_report = ("FileStoreAction", 
-                       (("to-folder", report_path.joinpath("STIF_REPORT")),
+                       (("to-folder", os.path.join(report_path, "STIF_REPORT")),
                         ("report-type", "STIF_COMPONENT_REPORT_ALL_CASES"),
                         ("run-log", "true"),
                         ("date-format", "yyyyMMdd"),
                         ("time-format", "HHmmss")))
         eunit_report = ("FileStoreAction", 
-                       (("to-folder", report_path.joinpath("EUNIT_REPORT")),
+                       (("to-folder", os.path.join(report_path, "EUNIT_REPORT")),
                         ("report-type", "EUNIT_COMPONENT_REPORT_ALL_CASES"),
                         ("run-log", "true"),
                         ("date-format", "yyyyMMdd"),
@@ -405,7 +444,9 @@ def create_drop(config):
         tesplan_counter += 1
         exe_flag = False
         for srcanddst in plan_sets['src_dst']:
-            _ext = srcanddst[0].rsplit(".")[1]
+            _ext = ''
+            if '.' in srcanddst[0]:
+                _ext = srcanddst[0].rsplit(".")[1]
             #the list below are the files which are executable
             #if none exists, set is not executable
             for mat in ["dll", "ini", "cfg", "exe", "script"]:
@@ -488,9 +529,11 @@ def main():
                    default="")
     cli.add_option("--specific-pkg", help="Text in name of pkg files to use", default='')
     cli.add_option("--ats4-enabled", help="ATS4 enabled", default="False")
+    cli.add_option("--ats-stf-enabled", help="ATS STF enabled", default="False")
     cli.add_option("--obey-pkgfiles", help="If this option is True, then only test components having PKG file are executable and if the compnents don't have PKG files they will be ignored.", default="False")
     cli.add_option("--verbose", help="Increase output verbosity", action="store_true", default=False)
     cli.add_option("--hti", help="HTI enabled", default="True")
+    cli.add_option("--minimum-execution-blocks", help="Create as few as possible execution blocks", default="false")
     
     opts, tsrc_paths = cli.parse_args()
 

@@ -16,18 +16,6 @@
  */
 package com.nokia.helium.antlint.ant.types;
 
-import java.io.File;
-import java.io.IOException;
-
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-
-import org.xml.sax.SAXException;
-
-import com.nokia.helium.antlint.AntLintHandler;
-import com.nokia.helium.antlint.ant.AntlintException;
-
 /**
  * <code>CheckIndentation</code> is used to check the indentations in the ant
  * files.
@@ -41,58 +29,96 @@ import com.nokia.helium.antlint.ant.AntlintException;
  *               &lt;include name=&quot;*build.xml&quot;/&gt;
  *               &lt;include name=&quot;*.antlib.xml&quot;/&gt;
  *       &lt;/fileset&gt;
- *       &lt;CheckIndentation&quot; severity=&quot;error&quot; enabled=&quot;true&quot; /&gt;
+ *       &lt;checkIndentation severity=&quot;error&quot; /&gt;
  *  &lt;/antlint&gt;
  * </pre>
  * 
- * @ant.task name="CheckIndentation" category="AntLint"
+ * @ant.task name="checkIndentation" category="AntLint"
  * 
  */
-public class CheckIndentation extends AbstractCheck {
-    private File antFile;
+public class CheckIndentation extends AbstractAntFileStyleCheck {
+    private static final int INDENT_SPACES = 4;
+    private int indentLevel;
+    private int totalNoOfSpaces;
+    private boolean textElement;
+    private int currentLine;
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.nokia.helium.antlint.ant.types.Check#run(java.io.File)
+    /**
+     * {@inheritDoc}
      */
-    public void run(File antFilename) throws AntlintException {
-        try {
-            this.antFile = antFilename;
-            SAXParserFactory saxFactory = SAXParserFactory.newInstance();
-            saxFactory.setNamespaceAware(true);
-            saxFactory.setValidating(true);
-            SAXParser parser = saxFactory.newSAXParser();
-            AntLintHandler handler = new AntLintHandler(this);
-            handler.setIndentationCheck(true);
-            parser.parse(antFilename, handler);
-        } catch (ParserConfigurationException e) {
-            throw new AntlintException("Not able to parse XML file "
-                    + e.getMessage());
-        } catch (SAXException e) {
-            throw new AntlintException("Not able to parse XML file "
-                    + e.getMessage());
-        } catch (IOException e) {
-            throw new AntlintException("Not able to find XML file "
-                    + e.getMessage());
+    public void handleStartDocument() {
+        indentLevel -= INDENT_SPACES;
+    }
+
+    @Override
+    protected void handleEndDocument() {
+        indentLevel = 0;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void handleStartElement(String text) {
+        countSpaces(text);
+
+        // When an element start tag is encountered,
+        // indentLevel is increased 4 spaces.
+        indentLevel += INDENT_SPACES;
+
+        checkIndent(text);
+        currentLine = getLocator().getLineNumber();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public void handleEndElement(String text) {
+        countSpaces(text);
+        // Ignore end tags in the same line
+        if (currentLine != getLocator().getLineNumber()) {
+            checkIndent(text);
+        }
+        // When an element end tag is encountered,
+        // indentLevel is decreased 4 spaces.
+        indentLevel -= INDENT_SPACES;
+        textElement = false;
+    }
+
+    /**
+     * Check for indentation.
+     * 
+     */
+    private void checkIndent(String text) {
+        if ((totalNoOfSpaces != indentLevel) && !textElement) {
+            report("Bad indentation : ", getLocator().getLineNumber());
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.apache.tools.ant.types.DataType#toString()
+    /**
+     * Method counts the number of spaces.
      */
-    public String toString() {
-        return "CheckIndentation";
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.nokia.helium.antlint.ant.types.Check#getAntFile()
-     */
-    public File getAntFile() {
-        return this.antFile;
+    public void countSpaces(String text) {
+        // Counts spaces and tabs in every newline.
+        int numSpaces = 0;
+        for (int i = 0; i < text.length(); i++) {
+            switch (text.charAt(i)) {
+                case '\t':
+                    numSpaces += 4;
+                    break;
+                case '\n':
+                    numSpaces = 0;
+                    break;
+                case ' ':
+                    numSpaces++;
+                    break;
+                default:
+                    // An alphanumeric character encountered
+                    // set the text element flag
+                    textElement = true;
+                    break;
+            }
+        }
+        totalNoOfSpaces = numSpaces;
+        clearBuffer();
     }
 }

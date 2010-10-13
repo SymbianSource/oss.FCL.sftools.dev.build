@@ -51,8 +51,11 @@ class TestXML:
                 p_temp.value = value
                 changed = True
         if not changed:
-            for device in self.doc.test.target.device:
-                device.xml_append(self.doc.xml_create_element(u"setting", attributes = {u'name': unicode(name), u'value': unicode(value)}))
+            if hasattr(self.doc, 'test'):
+                for device in self.doc.test.target.device:
+                    device.xml_append(self.doc.xml_create_element(u"setting", attributes = {u'name': unicode(name), u'value': unicode(value)}))
+            else:
+                raise Exception("You can't add a setting with ats4")
         
     def containsattribute(self, name, value):
         """ returns true or false """
@@ -74,9 +77,12 @@ class TestXML:
                 p_temp.value = value
                 changed = True
         if not changed:
-            for device in self.doc.test.target.device:
-                device.xml_append(self.doc.xml_create_element(u"property", attributes = {u'name': unicode(name), u'value': unicode(value)}))
-
+            if hasattr(self.doc, 'test'):
+                for device in self.doc.test.target.device:
+                    device.xml_append(self.doc.xml_create_element(u"property", attributes = {u'name': unicode(name), u'value': unicode(value)}))
+            else:
+                for device in self.doc.testrun.agents.agent:
+                    device.xml_append(self.doc.xml_create_element(u"property", attributes = {u'name': unicode(name), u'value': unicode(value)}))
 
 class ATSConfigParser:
     """ ATS configuration parser"""

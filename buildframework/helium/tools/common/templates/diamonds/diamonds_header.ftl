@@ -1,6 +1,6 @@
 <#--
 ============================================================================ 
-Name        : header.ftl 
+Name        : diamonds_header.ftl 
 Part of     : Helium 
 
 Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
@@ -22,4 +22,4 @@ Description:
 <#include "diamonds_macro.ftl">
 <?xml version="1.0" encoding="UTF-8"?>
 <diamonds-build>
-    <schema>${schema_version}</schema>
+    <schema>${schema_version?xml}</schema>

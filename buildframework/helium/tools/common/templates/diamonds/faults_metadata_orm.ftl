@@ -38,7 +38,7 @@ Description:
         <total severity="warning_rvct_bad">${table_info['jpasingle']['select Count(m.id) from MetadataEntry m JOIN m.severity as p JOIN m.logFile as l where LOWER(l.path) like \'%\\_compile.log\' ESCAPE \'\\\' and LOWER(l.path) not like \'%\\_clean\\_%compile.log\' ESCAPE \'\\\' and p.severity=\'CRITICAL\''][0]}</total>
     <#list table_info['native:java.lang.String']['select DISTINCT component.component from component INNER JOIN logfile ON logfile.logfile_id=component.logfile_id where logfile.path like \'%_compile.log\' and logfile.path not like \'%\\_clean\\_%compile.log\''] as component>
         <component>
-            <name>${component}</name>
+            <name>${component?xml}</name>
             <total severity="error">${table_info['jpasingle']['select Count(m.id) from MetadataEntry m JOIN m.logFile as l JOIN m.severity as p JOIN m.component as c where UPPER(p.severity)=\'ERROR\' and c.component=\'${component}\' and LOWER(l.path) like \'%\\_compile.log\' ESCAPE \'\\\' and LOWER(l.path) not like \'%\\_clean\\_%compile.log\' ESCAPE \'\\\''][0]}</total>
             <total severity="warning">${table_info['jpasingle']['select Count(m.id) from MetadataEntry m JOIN m.logFile as l JOIN m.severity as p JOIN m.component as c where UPPER(p.severity)=\'WARNING\' and c.component=\'${component}\' and LOWER(l.path) like \'%\\_compile.log\' ESCAPE \'\\\' and LOWER(l.path) not like \'%\\_clean\\_%compile.log\' ESCAPE \'\\\''][0]}</total>
             <total severity="critical">${table_info['jpasingle']['select Count(m.id) from MetadataEntry m JOIN m.logFile as l JOIN m.severity as p JOIN m.component as c where UPPER(p.severity)=\'REMARK\' and c.component=\'${component}\' and LOWER(l.path) like \'%\\_compile.log\' ESCAPE \'\\\' and LOWER(l.path) not like \'%\\_clean\\_%compile.log\' ESCAPE \'\\\''][0]}</total>
@@ -53,9 +53,9 @@ Description:
         <#if (!components?seq_contains(component.component))>
         <@pp.add seq=components value=component.component />
         <component>
-            <name>${component.component}</name>
+            <name>${component.component?xml}</name>
             <#if component.sysdefUnit??>
-            <package>${component.sysdefUnit.sysdefComponent.sysdefCollection.sysdefPackage.packageId}</package>
+            <package>${component.sysdefUnit.sysdefComponent.sysdefCollection.sysdefPackage.packageId?xml}</package>
             </#if>
         </component>
         </#if>

@@ -17,8 +17,7 @@
 
 package com.nokia.helium.signal.ant.types;
 
-import java.util.Vector;
-
+import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.taskdefs.condition.Condition;
 import org.apache.tools.ant.types.DataType;
 
@@ -31,17 +30,17 @@ public class TargetCondition extends DataType {
 
     private String name;
 
-    private String errMsg;
+    private String message;
 
-    private Vector<Condition> conditionList = new Vector<Condition>();
+    private Condition condition;
 
     /**
      * Helper function to store the Name of the target for which the signal to be processed.
      * 
      * @param targetName to be stored.
      */
-    public void setName(String targetName) {
-        name = targetName;
+    public void setName(String name) {
+        this.name = name;
     }
 
     /**
@@ -49,8 +48,8 @@ public class TargetCondition extends DataType {
      * 
      * @param errorMessage to be displayed after failure.
      */
-    public void setMessage(String errorMessage) {
-        errMsg = errorMessage;
+    public void setMessage(String message) {
+        this.message = message;
     }
 
     /**
@@ -59,7 +58,10 @@ public class TargetCondition extends DataType {
      * @param condition variable to add
      */
     public void add(Condition condition) {
-        conditionList.add(condition);
+        if (this.condition != null) {
+            throw new BuildException(this.getDataTypeName() + " type can only accept one condition at " + this.getLocation().toString());
+        }
+        this.condition = condition;
     }
 
     /**
@@ -67,8 +69,11 @@ public class TargetCondition extends DataType {
      * 
      * @return conditions variable for this configuration.
      */
-    public Vector<Condition> getConditions() {
-        return conditionList;
+    public Condition getCondition() {
+        if (this.condition == null) {
+            throw new BuildException(this.getDataTypeName() + " must have one nested condition defined at " + this.getLocation().toString());
+        }
+        return condition;
     }
 
     /**
@@ -88,6 +93,6 @@ public class TargetCondition extends DataType {
      * @deprecated
      */
     public String getMessage() {
-        return errMsg;
+        return message;
     }
 }

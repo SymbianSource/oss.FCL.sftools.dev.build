@@ -29,6 +29,6 @@ public interface MessageEventHandler {
      * Method to handle SubBuild Started  events.
      * @param event
      */
-    void handleMessageLogged( BuildEvent event );
+    void messageLogged(BuildEvent event);
 
 }

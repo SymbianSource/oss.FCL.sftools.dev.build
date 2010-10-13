@@ -73,8 +73,6 @@ for dir_ in delete_dirs:
     try:
         self.log(str("Removing %s" % dir_))
         fileutils.rmtree(dir_)
-    except Exception, exc:
-        self.log(str("ERROR: %s" % exc))
     except IOException, ioExc:
         self.log(str("ERROR: %s" % ioExc))
 
@@ -183,14 +181,10 @@ for database in databases:
             update_session = False
 
     if update_session:
-        try:
-            self.log(str("Opening a new session for %s..." % database))
-            session = nokia.nokiaccm.open_session(database=database, engine=engine, dbpath=dbpath)
-            session.close_on_exit = False        
-            config[database] = session.addr()
-        except Exception, exc:
-            traceback.print_exc()
-            raise exc
+        self.log(str("Opening a new session for %s..." % database))
+        session = nokia.nokiaccm.open_session(database=database, engine=engine, dbpath=dbpath)
+        session.close_on_exit = False        
+        config[database] = session.addr()
     
 self.log(str("Updating the file %s..." % sessionFile))
 config.store(open(sessionFile, 'w+'))    

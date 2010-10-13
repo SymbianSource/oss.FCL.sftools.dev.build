@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : test_blocks.ant.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="helium-antlib-bundle-unittest" xmlns:hlm="http://www.nokia.com/helium" xmlns:au="antlib:org.apache.ant.antunit">
+    <description>Helium Antlib bundle unittests.</description>
+    
+    <target name="setUp">
+        <delete file="${test.temp.dir}" />
+        <mkdir dir="${test.temp.dir}" />
+    </target>
+
+    <target name="tearDown">
+        <delete dir="${test.temp.dir}" />
+    </target>
+    
+    <target name="is-bundle-available">
+        <exec executable="bundle.bat"  resultproperty="bundle.result" failifexecutionfails="false" osfamily="windows" />
+        <exec executable="bundle"  resultproperty="bundle.result" failifexecutionfails="false" osfamily="unix" />
+        <condition property="execute.test" value="true">
+            <equals arg1="${bundle.result}" arg2="0" />
+        </condition>
+        <echo>execute.test: ${execute.test}</echo>    
+    </target>
+    
+    <target name="test-nonsign-invalid-debs" depends="is-bundle-available" if="execute.test">
+        <mkdir dir="${test.temp.dir}/repo" />
+        <copy todir="${test.temp.dir}/repo">
+            <fileset dir="${ant.file.helium-antlib-bundle-unittest}/../../data" includes="invalid*.deb"/>
+        </copy>
+        <au:expectfailure>
+            <hlm:blocksCreateRepositoryIndex dest="${test.temp.dir}/repo" verbose="true" />
+        </au:expectfailure>
+        <au:assertFileExists file="${test.temp.dir}/repo/Packages" />
+    </target>
+
+    <target name="test-nonsign-invalid-debs-failonerror-false" depends="is-bundle-available" if="execute.test">
+        <mkdir dir="${test.temp.dir}/repo" />
+        <copy todir="${test.temp.dir}/repo">
+            <fileset dir="${ant.file.helium-antlib-bundle-unittest}/../../data" includes="invalid*.deb"/>
+        </copy>
+        <hlm:blocksCreateRepositoryIndex dest="${test.temp.dir}/repo" verbose="true" failonerror="false" />
+        <au:assertFileExists file="${test.temp.dir}/repo/Packages" />
+    </target>
+
+    <target name="test-nonsign-empty" depends="is-bundle-available" if="execute.test">
+        <mkdir dir="${test.temp.dir}/repo" />
+        <hlm:blocksCreateRepositoryIndex dest="${test.temp.dir}/repo" verbose="true" />
+        <au:assertFileExists file="${test.temp.dir}/repo/Packages" />
+    </target>
+
+    <target name="test-noargs" depends="is-bundle-available" if="execute.test">
+        <mkdir dir="${test.temp.dir}/repo" />
+        <au:expectfailure message="'dest' attribute must be defined.">
+            <hlm:blocksCreateRepositoryIndex />
+        </au:expectfailure>
+        <au:assertFileDoesntExist file="${test.temp.dir}/repo/Packages" />
+    </target>
+
+    <target name="test-nonsign-valid-debs" depends="is-bundle-available" if="execute.test">
+        <mkdir dir="${test.temp.dir}/repo" />
+        <copy todir="${test.temp.dir}/repo">
+            <fileset dir="${ant.file.helium-antlib-bundle-unittest}/../../data" includes="demo*.deb"/>
+        </copy>
+        <hlm:blocksCreateRepositoryIndex dest="${test.temp.dir}/repo" verbose="true" />
+        <au:assertFileExists file="${test.temp.dir}/repo/Packages" />
+    </target>
+
+
+</project>

@@ -36,7 +36,7 @@ Description:
     @scope private
     -->
     <property name="logging.output.file" location="${cache.dir}/logging.${env.PID}.conf" />
-    <fmpp sourceFile="${helium.dir}/config/logging.conf.ftl" outputFile="${logging.output.file}" quiet="true">
+    <fmpp sourceFile="${helium.dir}/tools/logging/templates/logging.conf.ftl" outputFile="${logging.output.file}" quiet="true">
         <data expandProperties="yes">
             ant: antProperties()
         </data>
@@ -71,24 +71,26 @@ Description:
         </and>
         <then>
             <!-- used to track if build.drive has predefined or not
-            @type flag
+            @type boolean
             @scope private
             -->
-            <property name="build.drive.notdefined" value="true"/> 
-            <exec osfamily="windows" executable="python" failonerror="true" outputproperty="build.drive">
-                <arg line="-m searchnextdrive"/>               
-            </exec>
-            <if>
-                <equals arg1="${build.drive}" arg2="Error: No free drive!"/>
-                <then>            
-                    <fail message="ERROR: Failed to assign build drive, please check you are not running out of drives." />    
-                </then>
-            </if>
-            <mkdir dir="${env.TEMP}/helium/temp_drive"/>
-            <exec osfamily="windows" executable="subst" failonerror="false">
-                <arg value="${build.drive}" />
-                <arg value="${env.TEMP}/helium/temp_drive" />
-            </exec>
+            <property name="build.drive.notdefined" value="true"/>
+            <hlm:resourceaccess lockName="subst-drive">
+                <exec osfamily="windows" executable="python" failonerror="true" outputproperty="build.drive">
+                    <arg line="-m searchnextdrive"/>
+                </exec>
+                <if>
+                    <equals arg1="${build.drive}" arg2="Error: No free drive!"/>
+                    <then>            
+                        <fail message="ERROR: Failed to assign build drive, please check you are not running out of drives." />    
+                    </then>
+                </if>
+                <mkdir dir="${env.TEMP}/helium/temp_drive"/>
+                <exec osfamily="windows" executable="subst" failonerror="false">
+                    <arg value="${build.drive}" />
+                    <arg value="${env.TEMP}/helium/temp_drive" />
+                </exec>
+            </hlm:resourceaccess>
             <script language="jython" setbeans="false">
                 <![CDATA[
 import os
@@ -356,7 +358,7 @@ ${build.int.db.file.comments}
     -->
     <property name="failonerror" value="false"/>
     <!-- Maximum allowable errors in a build.
-    @type number
+    @type integer
     -->
     <property name="build.errors.limit" value="0"/>
     <!-- Unsubsted drive after build finished. If not defined then helium should left the drive as subst. Set the value as "yes" if you want to unsubst after build finished.

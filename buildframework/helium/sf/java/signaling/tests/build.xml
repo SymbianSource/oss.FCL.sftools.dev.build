@@ -24,17 +24,5 @@ Description:
     <description>Helium Antlib signaling tests.</description>
     <import file="${builder.dir}/java/test-macros.ant.xml"/>
 
-    <property environment="env" />
-    <dirname property="signaling.test.project.dir" file="${ant.file.helium-antlib-signaling-unittest}" />
-    <property name="build.summary.file" location="${signaling.test.project.dir}/test_signal/data/ido_tedo_mcl_devlon52_ec_MCL.52.105_summary.log.xml" />
-    <property name="build.id" value="test_new_hlm"/>
-  
-    <import file="${signaling.test.project.dir}/antunit/signaling_test.ant.xml" />
-    
-    <target name="unittest" depends="unittest-signaling,test-macros.unittest" />
-
-    <target name="unittest-signaling">
-        <antcall target="test-all" />
-    </target>
 
 </project>

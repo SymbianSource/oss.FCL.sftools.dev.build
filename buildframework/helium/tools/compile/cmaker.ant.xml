@@ -80,6 +80,24 @@ Description:
     </condition>
 
     <!--
+     This property defines the full path location of cmaker under windows. 
+     @type string
+     @scope public
+     @editable allowed
+     @since 11.0.1
+     -->
+    <property name="cmaker.windows.location" value="${build.drive}/epoc32/tools/cmaker.cmd" />
+
+    <!--
+     This property defines the full path location of cmaker under linux. 
+     @type string
+     @scope public
+     @editable allowed
+     @since 11.0.1
+     -->
+    <property name="cmaker.linux.location" value="${build.drive}/epoc32/tools/cmaker" />
+    
+    <!--
         The cmakerMacro enables the user to run cmaker commands directly from Ant.
         To configure it just provide NCP and S60 version and the action you want to run.
         Default action is WHAT.
@@ -114,12 +132,12 @@ Description:
             </if>
             <hlm:symbianLogHeaderMacro command="cmaker ${temp.cmaker.arg1} ${temp.cmaker.arg2} ACTION=@{action}"
                     config="CMAKER_@{action}" dir="${cmaker.config.dir}"/>
-            <exec executable="${build.drive}/epoc32/tools/cmaker.cmd" osfamily="windows" dir="${cmaker.config.dir}">
+            <exec executable="${cmaker.windows.location}" osfamily="windows" dir="${cmaker.config.dir}">
                 <arg line="${temp.cmaker.arg1}" />
                 <arg line="${temp.cmaker.arg2}" />
                 <arg value="ACTION=@{action}" />
             </exec>
-            <exec executable="${build.drive}/epoc32/tools/cmaker.sh" osfamily="unix" dir="${cmaker.config.dir}">
+            <exec executable="${cmaker.linux.location}" osfamily="unix" dir="${cmaker.config.dir}">
                 <arg line="${temp.cmaker.arg1}" />
                 <arg line="${temp.cmaker.arg2}" />
                 <arg value="ACTION=@{action}" />

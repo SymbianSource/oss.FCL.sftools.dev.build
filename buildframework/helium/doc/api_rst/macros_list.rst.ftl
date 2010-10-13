@@ -33,11 +33,15 @@ Macros list
 </#list>
 
 .. csv-table:: Helium macros
-   :header: "Macro", "Project", "Summary"
+   :header: "Macro", "Project/Antlib", "Summary"
    
 <#list macroCache?keys?sort as name>
 <#assign macro=macroCache[name]>
-    ":hlm-t:`${name}`", "${macro?parent.name}", "${macro.summary?replace("^", "    ", "rm")?replace("\"", "\"\"", "rm")?trim}"
+<#assign prefix = "project">
+<#if macro?parent.name?contains("antlib")>
+    <#assign prefix = "antlib">
+</#if>
+    ":hlm-t:`${name}`", "`${macro?parent.name} <${prefix}-${macro?parent.name}.html>`_", "${macro.summary?replace("^", "    ", "rm")?replace("\"", "\"\"", "rm")?trim}"
 </#list>
 
 

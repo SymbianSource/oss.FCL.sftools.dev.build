@@ -31,13 +31,13 @@ public interface BuildEventHandler {
     * 
     * @param event is the build event to be handled. 
     */
-    void handleBuildStarted( BuildEvent event );
+    void buildStarted( BuildEvent event );
 
    /**
     * Method to handle build finish events.
     * 
     * @param event is the build event to be handled. 
     */
-    void handleBuildFinished( BuildEvent event );
+    void buildFinished( BuildEvent event );
     
 }

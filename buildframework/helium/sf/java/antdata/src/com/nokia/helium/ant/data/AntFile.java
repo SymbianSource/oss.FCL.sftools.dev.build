@@ -76,10 +76,14 @@ public class AntFile {
             doc = contentHandler.getDocument();
         }
         catch (SAXException e) {
-            throw new IOException(e.getMessage());
+            throw new IOException("Error parsing: " + path + " at " + e.getMessage(), e);
         }
     }
 
+    public String getName() {
+        return getFile().getName();
+    }
+    
     public Project getProject() {
         return rootProject;
     }
@@ -129,4 +133,6 @@ public class AntFile {
         }
         return antlibFiles;
     }
+    
+    
 }

@@ -20,7 +20,6 @@
 #===============================================================================
 
 """ Testing ATS3 framework. """
-# pylint: disable=E1101,C0302,w0142,w0603,R0912,R0902,R0903,R0201,W0404, R0915
 #w0142 => * and ** were used
 #w0603 => global variables used TSRC_PATH etc
 #R*    => will be fixed while refactoring

@@ -20,10 +20,10 @@ package com.nokia.helium.signal.ant.types;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.BuildListener;
 import org.apache.tools.ant.MagicNames;
@@ -32,8 +32,10 @@ import org.apache.tools.ant.ProjectHelper;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.TaskContainer;
 import org.apache.tools.ant.types.DataType;
+import org.apache.tools.ant.types.Resource;
+import org.apache.tools.ant.types.ResourceCollection;
 
-import com.nokia.helium.signal.Notifier;
+import com.nokia.helium.signal.ant.Notifier;
 
 /**
  * This notifier allows you to execute a task sequence when a specific signal
@@ -55,11 +57,8 @@ import com.nokia.helium.signal.Notifier;
  * 
  * @ant.type name="executeTaskNotifier" category="Signaling"
  */
-@SuppressWarnings("deprecation")
 public class ExecuteTaskNotifier extends DataType implements Notifier,
         TaskContainer {
-
-    private Logger log = Logger.getLogger(ExecuteTaskNotifier.class);
     private List<Task> tasks = new ArrayList<Task>();
     private boolean failOnError;
 
@@ -74,7 +73,7 @@ public class ExecuteTaskNotifier extends DataType implements Notifier,
      */
     @SuppressWarnings("unchecked")
     public void sendData(String signalName, boolean failStatus,
-            NotifierInput notifierInput, String message ) {
+            ResourceCollection notifierInput, String message ) {
         try {
             // Configure the project
             Project prj = getProject().createSubProject();
@@ -96,12 +95,18 @@ public class ExecuteTaskNotifier extends DataType implements Notifier,
             prj.setProperty("signal.message", message );
             // Converting the list of inputs into a string.
             String inputs = "";
-            if (notifierInput != null && notifierInput.getFile() != null) {
-                inputs += notifierInput.getFile().toString();
+            if (notifierInput != null) {
+                Iterator<Resource> ri = notifierInput.iterator();
+                while (ri.hasNext()) {
+                    inputs += ri.next().toString();
+                    if (ri.hasNext()) {
+                        inputs += File.pathSeparator;
+                    }
+                }
             }
             prj.setProperty("signal.notifier.inputs", inputs);
             for (Task task : tasks) {
-                log.debug("Executing task: " + task.getTaskName());
+                log("Executing task: " + task.getTaskName(), Project.MSG_DEBUG);
                 task.setProject(prj);
                 task.perform();
             }
@@ -115,9 +120,10 @@ public class ExecuteTaskNotifier extends DataType implements Notifier,
         }
     }
 
-    @Override
+    /**
+     * {@inheritDoc}
+     */
     public void addTask(Task task) {
-        log.debug("Adding task: " + task.getTaskName());
         tasks.add(task);
     }
 

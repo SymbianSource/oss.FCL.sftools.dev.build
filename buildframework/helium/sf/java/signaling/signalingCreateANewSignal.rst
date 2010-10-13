@@ -69,7 +69,7 @@ You also need to create a signalInput configuration to define your signal behavi
 
 The signalListenerConfig defines which target to listen and raise signal for. The target name is defined through the **target** attribute.
 Then the nested **targetCondition** element is used to configure how the signal should be triggered.
-This element accepts any nested `Ant conditions <http://ant.apache.org/manual/CoreTasks/conditions.html>`_.
+This element accepts any nested `Ant conditions <http://ant.apache.org/manual/Tasks/condition.html>`_.
 In this case the signal will get raised only if the file is not present after the execution of the **custom-action** target.
 
 The framework then uses the defined signalInput from the signalNotifierInput configuration to know how to behave when the signal is raised. In the previous example it will

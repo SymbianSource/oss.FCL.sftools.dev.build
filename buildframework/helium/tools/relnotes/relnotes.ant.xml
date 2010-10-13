@@ -207,10 +207,7 @@ try:
         print 'Error: ' + waroot + ' must be a synergy project and still be in database'
     else:
         project.setProperty("ccm.toplevel.project", str(cmproject))
-    session.close()
-except Exception, ex:
-    print 'Caught exception: ' + str(ex)
-    traceback.print_exc()
+finally:
     if session:
         session.close()
         </script>
@@ -230,10 +227,7 @@ try:
     session = ccmutil.get_session(database, username, password, engine, dbpath)
     cmproject = session.create(ant.get_property(r'${ccm.toplevel.project}'))
     print cmproject.baseline
-    session.close()
-except Exception, ex:
-    print 'Caught exception: ' + str(ex)
-    traceback.print_exc()
+finally:
     if session:
         session.close()
         </hlm:python>

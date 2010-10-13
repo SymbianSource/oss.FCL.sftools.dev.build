@@ -91,6 +91,7 @@ Description:
     @scope private    
     -->    
     <target name="docs-database">
+        <mkdir dir="${basedir}/build"/>
         <hlm:database output="${public.database.file}" scope="public" filesetonly="true">
             <fileset dir=".">
                 <include name="**/*.ant.xml"/>
@@ -117,10 +118,10 @@ Description:
             <fileset dir="${doc.temp.dir}/api/helium" includes="*.dot"/>
             <sequential>
                 <echo>Processing dot file: @{dot.file}</echo>
-                <exec executable="dot" dir="${doc.temp.dir}/api/helium">
+                <exec executable="dot" dir="${doc.temp.dir}/api/helium" failonerror="true">
                     <arg line="-Tcmap @{dot.file} -O"/>
                 </exec>
-                <exec executable="dot" dir="${doc.build.dir}/api">
+                <exec executable="dot" dir="${doc.build.dir}/api" failonerror="true">
                     <arg line="-Tpng @{dot.file} -O"/>
                 </exec>
             </sequential>
@@ -168,8 +169,11 @@ Description:
 
     
     <!-- Generate API documentation from the source code. -->
-    <target name="apidocs" depends="helium-apidocs"/>
-    
+    <target name="apidocs" depends="helium-apidocs" unless="env.HLM_SUBCON">
+        <exec executable="cmd" osfamily="windows" dir="${helium.dir}/nokia_builder" failonerror="true">
+            <arg line="/C bld doc" />
+        </exec>
+    </target>
     
     <!-- Macro to generate HTML docs from rst. -->
     <macrodef name="rstPrepMacro" uri="http://www.nokia.com/helium">
@@ -232,6 +236,11 @@ Description:
                     <patch reverse="true" patchfile="${nokia.python.tools}/sphinxfixsearch.diff" originalfile="${sphinx.lib.dir}/search.py"/>
                 </then>
             </if>
+            <copy todir="@{output}" overwrite="true">
+                <fileset dir="@{src}">
+                    <include name="**/*.zip"/>
+                </fileset>
+            </copy>
         </sequential>
     </macrodef>
     
@@ -261,7 +270,7 @@ for root, dirs, files in os.walk(r'${doc.build.dir}/api', topdown=False):
             try:
                 rstfile = codecs.open(rstfilename, 'r', 'utf8')
                 rstfile.read()
-            except:
+            except UnicodeError:
                 print rstfilename + ' has invalid unicode'
                 rstfile.close()
                 os.remove(rstfilename)
@@ -313,7 +322,6 @@ for root, dirs, files in os.walk(r'${doc.build.dir}/api', topdown=False):
             <!-- default doc content is always processed first -->
             <path>
                 <pathelement path="${helium.dir}/doc/default"/>
-                <pathelement path="${helium.dir}/doc/src/manual"/>
             </path>
             <resources refid="textdoc.paths"/>
         </resources>
@@ -331,7 +339,7 @@ for root, dirs, files in os.walk(r'${doc.build.dir}/api', topdown=False):
             </fileset>
             <sequential>
                 <echo>Building dot file: @{dot.file}</echo>
-                <exec executable="dot">
+                <exec executable="dot" failonerror="true">
                     <arg line="-Tpng @{dot.file} -O"/>
                 </exec>
             </sequential>
@@ -375,6 +383,40 @@ for root, dirs, files in os.walk(r'${doc.build.dir}/api', topdown=False):
     
     
     <!-- generate all the user documentation for helium -->
-    <target name="docs" depends="clean-docs,apidocs,textdocs"/>
+    <target name="docs" depends="clean-docs,apidocs,textdocs,docs-check-links"/>
 
+    <!-- Check links in docs -->
+    <target name="docs-check-links">
+        <hlm:python failonerror="true">
+<![CDATA[
+import os
+error = ''
+for root, dirs, files in os.walk(r'${doc.build.dir}', topdown=False):
+    for fname in files:
+        if '.htm' in fname:
+            filename = os.path.abspath(os.path.join(root, fname))
+            f = open(filename)
+            for line in f:
+                if ' src="' in line:
+                    line1 = line.split('src="')[1]
+                    line1 = line1.split('"')[0]
+                    os.chdir(root)
+                    if line1 and not os.path.exists(line1) and not ':' in line1 and not '$' in line1:
+                        error = error + filename + ' has a broken link ' + line1 + '\n'
+                if ' href="' in line:
+                    line = line.split('href="')[1]
+                    line = line.split('"')[0]
+                    if '#' in line:
+                        line = line.split('#')[0]
+                    if '?' in line:
+                        line = line.split('?')[0]
+                    os.chdir(root)
+                    if line and not os.path.exists(line) and not ':' in line and not '&' in line:
+                        error = error + filename + ' has a broken link ' + line + '\n'
+            f.close()
+if error != '':
+    raise Exception(error)
+]]>
+        </hlm:python>
+    </target>
 </project>

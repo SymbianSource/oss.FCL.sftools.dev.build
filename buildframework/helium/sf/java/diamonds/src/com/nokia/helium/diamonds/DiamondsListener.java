@@ -19,18 +19,23 @@ package com.nokia.helium.diamonds;
 
 import org.apache.tools.ant.BuildEvent;
 
+import com.nokia.helium.diamonds.ant.Listener;
+
 /**
  * Diamonds specific Listener interface.
  * 
  */
 public interface DiamondsListener {
+    
+    void configure(Listener listener) throws DiamondsException;
+    
     /**
      * Function to process logging info during beginning of target execution
      * 
      * @param event
      *            of target execution.
      */
-    void targetBegin(BuildEvent buildEvent) throws DiamondsException;
+    void targetStarted(BuildEvent buildEvent) throws DiamondsException;
 
     /**
      * Function to process logging info during end of target execution
@@ -38,7 +43,7 @@ public interface DiamondsListener {
      * @param event
      *            of target execution.
      */
-    void targetEnd(BuildEvent buildEvent) throws DiamondsException;
+    void targetFinished(BuildEvent buildEvent) throws DiamondsException;
 
     /**
      * Function to process logging info during beginning of build
@@ -46,7 +51,7 @@ public interface DiamondsListener {
      * @param event
      *            of target execution.
      */
-    void buildBegin(BuildEvent buildEvent) throws DiamondsException;
+    void buildStarted(BuildEvent buildEvent) throws DiamondsException;
 
     /**
      * Function to process logging info during end of build
@@ -54,5 +59,5 @@ public interface DiamondsListener {
      * @param event
      *            of target execution.
      */
-    void buildEnd(BuildEvent buildEvent) throws DiamondsException;
+    void buildFinished(BuildEvent buildEvent) throws DiamondsException;
 }

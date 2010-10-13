@@ -1,5 +1,5 @@
 
-# Copyright (c) 2008-2009 Nokia Corporation and/or its subsidiary(-ies).
+# Copyright (c) 2008-2010 Nokia Corporation and/or its subsidiary(-ies).
 # All rights reserved.
 # This component and the accompanying materials are made available
 # under the terms of the License "Eclipse Public License v1.0"
@@ -38,7 +38,7 @@ ifeq ($(TARGETS),)
   ifneq ($(filter $(HOSTPLATFORM),win),win)
     # Some tools not built for windows
     # Some of these don't support our special clean mode
-    TARGETS:=$(TARGETS) bash make python codewarrior bvcpp gccxml dialog
+    TARGETS:=$(TARGETS) bash make python codewarrior bvcpp dialog
     #  Build pvm and pvmgmake later when they have been corrected
     # pvmgmake  pvm
   endif

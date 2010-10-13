@@ -22,7 +22,7 @@ import org.apache.tools.ant.Project;
 import org.apache.tools.ant.types.DataType;
 
 import com.nokia.helium.core.ant.PostBuildAction;
-import com.nokia.helium.signal.SignalStatusList;
+import com.nokia.helium.signal.ant.Signals;
 
 /**
  * Class to store the status of the signal of a particular target.
@@ -35,8 +35,8 @@ public class SignalStatusDef extends DataType implements PostBuildAction {
      * @throws BuildException
      */
     public void executeOnPostBuild(Project project, String[] targetNames) {
-        if (SignalStatusList.getDeferredSignalList().hasSignalInList()) {
-            throw new BuildException(SignalStatusList.getDeferredSignalList().getErrorMsg());
+        if (!Signals.getSignals().getDeferredSignalList().isEmpty()) {
+            throw new BuildException(Signals.getSignals().getDeferredSignalList().toString());
         }
     }
 }

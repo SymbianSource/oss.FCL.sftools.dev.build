@@ -50,7 +50,7 @@ Targets added
 =============
 <#list doc.apiChanges.target?sort as target>
     <#if target.@state == 'added'>
-* `${target} <api/helium/target-${target}.html>`_
+* :hlm-t:`${target}`
     </#if>
 </#list>
 
@@ -66,7 +66,7 @@ Properties added
 ================
 <#list doc.apiChanges.property?sort as property>
     <#if property.@state == 'added'>
-* `${property} <api/helium/property-${property}.html>`_
+* :hlm-p:`${property}`
     </#if>
 </#list>
 
@@ -82,7 +82,7 @@ Macros added
 ============
 <#list doc.apiChanges.macro?sort as macro>
     <#if macro.@state == 'added'>
-* `${macro} <api/helium/macro-${macro}.html>`_
+* ${macro}
     </#if>
 </#list>
 

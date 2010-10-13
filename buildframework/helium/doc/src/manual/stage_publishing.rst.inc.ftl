@@ -34,7 +34,7 @@ Uploading build information to Diamonds
 
 Diamonds is a utility tool that keeps track of build and release information. See the **Metrics** manual under section `Helium Configuration`_ for more info.
 
-.. _Helium Configuration: ../metrics.html#helium-configuration
+.. _Helium Configuration: metrics.html#helium-configuration
 
 
 .. index::
@@ -103,6 +103,7 @@ The :hlm-p:`zip.config.file` property defines the path to a :ref:`common-configu
                 <set name="mapper" value="policy"/>
                 <set name="policy.internal.name" value="really_confidential_stuff"/>
                 <set name="policy.filenames" value="Distribution.Policy.S60"/>
+                <set name="split.on.uncompressed.size.enabled" value="true"/>
             </config>
         </config>
 
@@ -114,6 +115,7 @@ The :hlm-p:`zip.config.file` property defines the path to a :ref:`common-configu
                 <set name="policy.internal.name" value="really_confidential_stuff"/>
                 <set name="policy.filenames" value="Distribution.Policy.S60"/>
                 <set name="policy.root.dir" value="${r'$'}{root.dir}/s60"/>
+                <set name="split.on.uncompressed.size.enabled" value="true"/>
             </config>
         </config>
       
@@ -179,6 +181,8 @@ The :hlm-p:`zip.config.file` property defines the path to a :ref:`common-configu
    "``archives.dir``", "The directory where the zip files are saved to.", ""
    "``policy.csv``", "This property defines the location of the policy definition file.", ""
    "``policy.default.value``", "This property defines the policy value when policy file is missing or invalid (e.g. wrong format).", "9999"
+   "``split.on.uncompressed.size.enabled``", "To enable/disable splitting the zip files depending on source file size.", "true/false"
+   
 
 The policy mapper enables the sorting of the content compare to its policy value. The mapper is looking for a policy file in the file to archive directory.
 If the distribution policy file is missing then the file will go to the ``policy.default.value`` archive. Else it tries to open the file which
@@ -226,6 +230,9 @@ named mappers to use them:
 
 They support the same set of configuration properties as the default ``policy.remover``.
 
+<#if !ant?keys?seq_contains("sf")>
+.. include:: stage_metadata.rst.inc
+</#if>
  
 .. index::
   single: Zipping SUBCON
@@ -233,5 +240,12 @@ They support the same set of configuration properties as the default ``policy.re
 Subcon zipping
 --------------
 
-Subcon zipping is also configured using the same XML format as :hlm-t:`zip-ee` and implemented in the :hlm-t:`zip-subcon` target. A :hlm-p:`zips.subcon.spec.name` property must be defined but currently it is still a separate configuration file.
+Subcon zipping is also configured using the same XML format as :hlm-t:`zip-ee` and implemented in the :hlm-t:`zip-subcon` target. A ``zips.subcon.spec.name`` property must be defined but currently it is still a separate configuration file.
 
+
+Stage: Blocks packaging
+=======================
+
+Refer to the `Blocks integration manual`_
+
+.. _`Blocks intergration manual`: blocks.html

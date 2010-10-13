@@ -68,7 +68,7 @@ References
 Practices
 =========
 
-Files created in Ant, Perl, Python or XML syntax must follow the `Style guide <coding_conventions.html>`_.
+Files created in Ant, Perl, Python or XML syntax must follow the `Style guide <development/coding_conventions.html>`_.
 
 
 .. index::
@@ -88,15 +88,8 @@ APIs
 See the reference API documentation:
 
 * `Helium API`_
-* `Java APIs`_
-* `Python APIs`_
-* `Custom Ant tasks`_
 
 .. _`Helium API` : api/helium/index.html
-.. _`Java APIs` : api/java/index.html
-.. _`Python APIs` : api/python/index.html
-.. _`Custom Ant tasks` : api/ant/index.html
-
 
 .. index::
   single: Tools and scripts locations

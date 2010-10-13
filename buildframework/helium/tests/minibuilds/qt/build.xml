@@ -39,11 +39,13 @@ Description:
     <property name="minor.version" value="0" />
     <property name="publish.root.dir" location="${build.drive}/release" />
 
-    <!-- For Grace upload-->
+    <!-- For upload-->
     <property name="hydra.service" value="Helium" />
     <property name="hydra.product" value="minibuild_qt" />
     <property name="release.label" value="${major.version}.${minor.version}" />
-
+    
+    <property name="sysdef3.enabled" value="false" />
+    
     <!-- build configuration -->
     <property name="sysdef.configurations.list" value="build_tools,build" />
     <path id="system.definition.files">

@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<!-- 
+============================================================================ 
+Name        : build.xml 
+Part of     : Helium
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test-signal-listener" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    
+    <taskdef resource="com/nokia/helium/signal/ant/antlib.xml" uri="http://www.nokia.com/helium" />
+    <import file="run-scenario.ant.xml" />
+
+    <!-- This scenario is testing the SignalStatusDef is correctly failing the build -->
+    <target name="test-failing-build-with-deferred-failure">
+        <au:expectfailure>
+            <runScenario scenario="signal-listener-test" target="build-with-deferred-failure" />
+        </au:expectfailure>
+        <au:assertLogContains text="BUILD FAILED" />
+        <au:assertLogContains text="Executing failing-target." />
+        <au:assertLogContains text="Executing build." />
+        <au:assertLogContains text="testDeferredSignal: Errors happened during failing-target : failing-target" />
+        <au:assertLogContains text="Build completed with errors and warnings." />
+    </target>
+   
+    <target name="test-failing-build-with-never-failure">
+        <runScenario scenario="signal-listener-test" target="build-with-never-failure" />
+        <au:assertLogContains text="BUILD SUCCESSFUL" />
+        <au:assertLogContains text="Executing never-failing-target." />
+        <au:assertLogContains text="Executing build." />
+        <au:assertLogContains text="Build completed with errors and warnings." />
+    </target>
+
+    <!-- This test check that missing condition on signalListenerConfig only throw non-failing signal -->
+    <target name="test-no-cond-signal">
+        <runScenario scenario="signal-listener-test" target="no-cond-signal" />
+        <au:assertLogContains text="BUILD SUCCESSFUL" />
+        <au:assertLogContains text="Signal: testNoCondSignal" />
+        <au:assertLogContains text="Failure: No" />
+    </target>
+</project>

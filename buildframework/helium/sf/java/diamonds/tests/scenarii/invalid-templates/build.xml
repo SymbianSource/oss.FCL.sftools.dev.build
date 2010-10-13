@@ -24,6 +24,7 @@ Description:
     <description>Helium Antlib diamonds unittests.</description>
     <property environment="env" />
     <taskdef resource="com/nokia/helium/core/ant/antlib.xml" uri="http://www.nokia.com/helium"/>
+    <taskdef resource="com/nokia/helium/diamonds/ant/antlib.xml" uri="http://www.nokia.com/helium"/>
     <taskdef name="xpathtest" classname="se.jtech.ant.xpath.XPathEvaluatorTask" onerror="ignore"/>    
     <property name="diamonds.enabled" value="true" />
     <property name="diamonds.unitest.dir" location="${ant.file.test-diamonds-invalid-template}/../../../" />
@@ -121,10 +122,12 @@ Description:
         <get src="http://${diamonds.host}:${diamonds.port}${diamonds.build.id}?fmt=xml"
              dest="${temp.dir}/test-verify-stages.xml" 
              usetimestamp="true" />
-        <xpathtest xmlfile="${temp.dir}/test-verify-stages.xml">
-            <namespace uri="" prefix=""/>
-            <xpath expression="/diamonds-build/stages/stage[name='invalid-template-sequence']"/>
-        </xpathtest>
+        <au:expectfailure>
+            <xpathtest xmlfile="${temp.dir}/test-verify-stages.xml">
+                <namespace uri="" prefix=""/>
+                <xpath expression="/diamonds-build/stages/stage"/>
+            </xpathtest>
+        </au:expectfailure>
     </target>        
 
 

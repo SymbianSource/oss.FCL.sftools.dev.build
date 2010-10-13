@@ -23,13 +23,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.tools.ant.Project;
-import org.apache.tools.ant.Target;
-
+import org.apache.tools.ant.ProjectHelper;
 import com.nokia.helium.freemarker.WikiMethod;
 
 import freemarker.cache.ClassTemplateLoader;
@@ -50,6 +47,8 @@ public class Database {
     public static final String DEFAULT_SCOPE = "public";
     public static final Map<String, String> NAMESPACE_MAP;
 
+    private List<PropertyMeta> propertiesList;
+    private List<PropertyCommentMeta> commentPropertiesList;
     private Project rootProject;
     private Map<String, AntFile> antfilesMap;
     private Map<String, PackageMeta> packagesMap;
@@ -65,23 +64,17 @@ public class Database {
         this(project, DEFAULT_SCOPE);
     }
 
-    @SuppressWarnings("unchecked")
-    public Database(Project project, String scopeFilter) throws IOException {
-        this.rootProject = project;
+    public Database(Project rootProject, String scopeFilter) throws IOException {
+        this.rootProject = rootProject;
         this.scopeFilter = scopeFilter;
         antfilesMap = new HashMap<String, AntFile>();
         packagesMap = new HashMap<String, PackageMeta>();
 
-        if (project != null) {
-            Map<String, Target> targets = project.getTargets();
-            Iterator<Target> targetsIter = targets.values().iterator();
-
-            while (targetsIter.hasNext()) {
-                Target target = targetsIter.next();
-                String antFilePath = new File(target.getLocation().getFileName()).getCanonicalPath();
-
-                if (!antfilesMap.containsKey(antFilePath)) {
-                    addAntFile(antFilePath);
+        if (rootProject != null) {
+            ProjectHelper helper = (ProjectHelper) rootProject.getReference(ProjectHelper.PROJECTHELPER_REFERENCE);
+            for (Object antFilename : helper.getImportStack()) {
+                if (antFilename instanceof File) {
+                    addAntFile(((File) antFilename).getCanonicalPath());
                 }
             }
         }
@@ -101,7 +94,7 @@ public class Database {
 
     private void addAntFile(String antFilePath) throws IOException {
         if (!antfilesMap.containsKey(antFilePath)) {
-            log("Adding project to database: " + antFilePath, Project.MSG_DEBUG);
+            log("Adding project to database: " + antFilePath, Project.MSG_VERBOSE);
             AntFile antfile = new AntFile(this, antFilePath, scopeFilter);
             antfile.setProject(rootProject);
             antfilesMap.put(antFilePath, antfile);
@@ -193,25 +186,29 @@ public class Database {
     }
 
     public List<PropertyMeta> getProperties() {
-        List<PropertyMeta> propertiesList = new ArrayList<PropertyMeta>();
-        for (AntFile antfile : antfilesMap.values()) {
-            RootAntObjectMeta rootMeta = antfile.getRootObjectMeta();
-            if (rootMeta instanceof ProjectMeta) {
-                propertiesList.addAll(((ProjectMeta) rootMeta).getProperties());
+        if ( propertiesList == null) {
+            propertiesList = new ArrayList<PropertyMeta>();
+            for (AntFile antfile : antfilesMap.values()) {
+                RootAntObjectMeta rootMeta = antfile.getRootObjectMeta();
+                if (rootMeta instanceof ProjectMeta) {
+                    propertiesList.addAll(((ProjectMeta) rootMeta).getProperties());
+                }
             }
         }
         return propertiesList;
     }
-    
+
     public List<PropertyCommentMeta> getCommentProperties() {
-        List<PropertyCommentMeta> propertiesList = new ArrayList<PropertyCommentMeta>();
-        for (AntFile antfile : antfilesMap.values()) {
-            RootAntObjectMeta rootMeta = antfile.getRootObjectMeta();
-            if (rootMeta instanceof ProjectMeta) {
-                propertiesList.addAll(((ProjectMeta) rootMeta).getPropertyCommentBlocks());
+        if (commentPropertiesList == null) {
+            commentPropertiesList = new ArrayList<PropertyCommentMeta>();
+            for (AntFile antfile : antfilesMap.values()) {
+                RootAntObjectMeta rootMeta = antfile.getRootObjectMeta();
+                if (rootMeta instanceof ProjectMeta) {
+                    commentPropertiesList.addAll(((ProjectMeta) rootMeta).getPropertyCommentBlocks());
+                }
             }
         }
-        return propertiesList;
+        return commentPropertiesList;
     }
 
     public List<PackageMeta> getPackages() throws IOException {
@@ -220,5 +217,16 @@ public class Database {
             packages.add(packageMeta);
         }
         return packages;
+    }
+    
+    public List<TargetMeta> getTargets() {
+        List<TargetMeta> targets = new ArrayList<TargetMeta>();
+        for (AntFile antFile : antfilesMap.values()) {
+            RootAntObjectMeta rootMeta = antFile.getRootObjectMeta();
+            if (rootMeta instanceof ProjectMeta) {
+                targets.addAll(((ProjectMeta)rootMeta).getTargets());
+            }
+        }
+        return targets;
     }
 }

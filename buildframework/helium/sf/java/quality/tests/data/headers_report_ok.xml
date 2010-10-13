@@ -31,6 +31,7 @@ Description:
         <issueid>60</issueid>
         <typeid>13</typeid>
         <identityid>13</identityid>
+        <typestring>has compilation errors</typestring>
         <severity>
           <typeid>1</typeid>
           <typestring>BBC Break</typestring>
@@ -48,6 +49,22 @@ Description:
         <issueid>62</issueid>
         <typeid>13</typeid>
         <identityid>13</identityid>
+        <typestring>has compilation errors</typestring>
+        <identitydescription>File</identitydescription>
+        <severity>
+          <typeid>1</typeid>
+          <typestring>BBC Break</typestring>
+        </severity>
+        <scseverity>
+          <typeid>1</typeid>
+          <typestring>SC Break</typestring>
+        </scseverity>
+      </issue>
+      <issue>
+        <issueid>63</issueid>
+        <typeid>6</typeid>
+        <identityid>13</identityid>
+        <typestring>has changed parameters</typestring>
         <identitydescription>File</identitydescription>
         <severity>
           <typeid>1</typeid>
@@ -66,6 +83,7 @@ Description:
         <issueid>5</issueid>
         <typeid>0</typeid>
         <identityid>13</identityid>
+        <typestring>has been removed</typestring>
         <severity>
           <typeid>1</typeid>
           <typestring>BBC Break</typestring>
@@ -75,6 +93,35 @@ Description:
           <typestring>SC Break</typestring>
         </scseverity>
       </issue>
+      <issue>
+        <issueid>519</issueid>
+        <typeid>13</typeid>
+        <typestring>has compilation errors</typestring>
+        <cause/>
+        <documentation>Not specified</documentation>
+        <severity>
+          <typeid>1</typeid>
+          <typestring>BBC Break</typestring>
+        </severity>
+      </issue>
+    </headerfile>
+    <headerfile>
+      <filename>c:\symbian\9.2\s60_3rd_fp1_2\epoc32\include\avkon.rh</filename>
+      <comparefilename>j:\epoc32\include\platform\mw\avkon.rh</comparefilename>
+      <api category="Unknown" name="Unknown"/>
+      <issue>
+        <issueid>0</issueid>
+        <typeid>12</typeid>
+        <typestring>has changed its initialisation value</typestring>
+        <cause>avkon_multiselection_list_query_list::flags</cause>
+        <documentation>Not specifiedavkon_multiselection_list_query_list::flags</documentation>
+        <scseverity>
+          <typeid>1</typeid>
+          <typestring>SC Break</typestring>
+        </scseverity>
+      </issue>
+      <checksum>xZxyUIjD0pqjT</checksum>
+      <shortname>platform\mw\avkon.rh</shortname>
     </headerfile>
   </issuelist>
 </bbcresults>

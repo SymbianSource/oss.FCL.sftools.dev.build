@@ -46,6 +46,7 @@ Description:
                 <hlm:executable name="ant" versionArgs="-version" versionRegex="Apache Ant version (\S+)"/>
                 <hlm:executable name="perl" versionArgs="-v" versionRegex="This is perl, v(\S+)"/>
                 <hlm:executable name="python" versionArgs="--version" versionRegex="Python (\S+)"/>
+                <hlm:executable name="armcc" versionArgs="" versionRegex="RVCT(.+)"/>
             </hlm:envdata>
         </hlm:environment>
     </target>

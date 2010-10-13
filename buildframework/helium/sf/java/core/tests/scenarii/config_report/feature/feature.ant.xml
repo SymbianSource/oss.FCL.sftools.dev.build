@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : feature.ant.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="feature" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>Helium Antlib logger unittests.</description>
+    
+    <property name="helium.dir" location="${ant.file.feature}/.." />
+    
+    <!-- Set to true to enable feature
+    @type boolean
+    @editable required
+    @scope private
+    -->
+    <property name="feature.enabled" value="true"/>
+    
+    <!-- Set to true to enable feature - deprecated: Start using feature.enabled property
+    @type boolean
+    @editable required
+    @scope public
+    @deprecated since 11.0 
+    -->
+    <property name="enable.feature" value="true"/>
+    
+    <!--* @property internal.abc.enabled 
+    Set to true to true to run targets.
+    @type boolean
+    @editable required
+    @scope private
+    -->
+    
+    <!--* @property internal.bla.enabled 
+    Set to true to true to run targets - deprecated: Start using internal.abc.enabled property.
+    @type boolean
+    @editable required
+    @scope public
+    @deprecated since 6.0 
+    -->
+
+    <!-- Test Property to check for boolean type
+    @type boolean
+    @editable required
+    @scope public
+    -->
+    <property name="test.prop.bool.val" value="true"/>
+    
+    <!--* @property test.comment.prop.bool.val 
+    Test Property to check for boolean type of comment properties
+    @type boolean
+    @editable required
+    @scope public
+    -->
+    
+    <!--* @property test.build.number 
+    Test Property to check for integer type of comment properties
+    @type integer
+    @editable required
+    @scope public
+    -->
+
+    <!--* @property test.build.id
+    Test Property to check for string type of comment properties
+    @type string
+    @editable required
+    @scope public
+    -->
+
+    <!--* @property test.bn
+    Test Property to check for integer type of properties
+    @type integer
+    @editable required
+    @scope public
+    -->
+    <property name="test.bn" value="abc"/>
+    
+    <!-- Test property to check for valid float property types.
+    @type float
+    @scope public
+    -->
+    <property name="test.prop.float.1" value="1.5"/>
+
+    <!--* @property test.prop.float.2
+    Test property to check for invalid float property types.
+    @type float
+    @scope public
+    -->
+
+    <!-- Test property to check for invalid integer property types.
+    @type integer
+    @scope public
+    -->
+    <property name="test.prop.int.3" value="1"/>
+   
+    <!-- Test target to check for antcall of deprecated target.
+
+	@deprecated Implementation of the feature has changed, and the target is not needed anymore
+    -->
+    <target name="a-deprecated-target">
+        <echo>Warning: this target is deprecated, please remove it from your configuration</echo>
+    </target>        
+    
+    <!-- Test target to check for runtarget of deprecated target.
+
+	@deprecated Implementation of the feature has changed, and the target is not needed anymore
+    -->
+    <target name="b-deprecated-target">
+        <echo>Warning: this target is deprecated, please remove it from your configuration</echo>
+    </target> 
+
+    <!-- Test target to check for dependencies for deprecated target.
+
+	@deprecated Implementation of the feature has changed, and the target is not needed anymore
+    -->
+    <target name="c-deprecated-target">
+        <echo>Warning: this target is deprecated, please remove it from your configuration</echo>
+    </target> 
+    
+    <!-- Test target to check for private target usage with antcall. @scope private -->
+    <target name="a-private-target">
+        <echo>Inside private target a-private-target </echo>
+    </target>
+
+    <!-- Test target to check for private target usage with runtarget. @scope private -->
+    <target name="b-private-target">
+        <echo>Inside private target b-private-target </echo>
+    </target>
+
+    <!-- Test target to check for private target usage as dependent target. @scope private -->
+    <target name="c-private-target">
+        <echo>Inside private target c-private-target </echo>
+    </target>
+
+</project>

@@ -1,6 +1,6 @@
 <#--
 ============================================================================ 
-Name        : finish.xml.ftl 
+Name        : diamonds_status.xml.ftl 
 Part of     : Helium 
 
 Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
@@ -21,6 +21,6 @@ Description:
 -->
 <#include "diamonds_header.ftl"> 
   <build>
-    <#if ant?keys?seq_contains("build.status")><status>${ant["build.status"]}</status></#if>
+    <#if ant?keys?seq_contains("build.status")><status>${ant["build.status"]?xml}</status></#if>
   </build>
 <#include "diamonds_footer.ftl"> 

@@ -20,7 +20,7 @@ Description:
 
 ============================================================================
 -->
-<project name="test-antlint" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+<project name="test-antlint" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium" xmlns:cs="antlib:com.puppycrawl.tools.checkstyle">
     <description>Helium Antlib AntLint unittests.</description>
 
     <dirname property="antlint.test.dir" file="${ant.file.test-antlint}/.."/>
@@ -42,6 +42,102 @@ Description:
         <delete dir="${antlint.test.dir}/data/output" failonerror="false" />
     </target>
 
+    <target name="test-check-antcall">
+        <hlm:antlint>
+            <fileset id="antlint.files" dir="${antlint.test.dir}/data">
+                <include name="sample.ant.xml"/>
+            </fileset>
+            <hlm:checkAntCall severity="warning"/>
+        </hlm:antlint>
+        <au:assertLogContains text="antcall> is used with no param elements and calls the target 'hello' that has no dependencies!" level="info"/>
+    </target>
+
+    <target name="test-check-description">
+        <hlm:antlint>
+            <fileset id="antlint.files" dir="${antlint.test.dir}/data">
+                <include name="build.xml"/>
+            </fileset>
+            <hlm:checkDescription severity="warning"/>
+        </hlm:antlint>
+        <au:assertLogContains text="WARNING: 23: Description not specified!" level="info"/>
+    </target>
+
+    <target name="test-check-duplicate-names">
+        <hlm:antlint>
+            <fileset id="antlint.files" dir="${antlint.test.dir}/data">
+                <include name="*.xml"/>
+                <include name="*.ant.xml"/>
+                <include name="build.xml"/>
+                <include name="*.antlib.xml"/>
+            </fileset>
+            <hlm:checkDuplicateNames severity="warning"/>
+        </hlm:antlint>
+        <au:assertLogContains text="WARNING: 101: Task 'antlint' and macro 'antlint' has duplicate name." level="info"/>
+    </target>
+
+    <target name="test-check-filename">
+        <hlm:antlint>
+            <fileset id="antlint.files" dir="${antlint.test.dir}/data">
+                <include name="invalid.build.xml"/>
+            </fileset>
+            <hlm:checkFileName severity="warning" regexp="^build.xml$|ant.xml$|antlib.xml$" />
+        </hlm:antlint>
+        <au:assertLogContains text="WARNING: Invalid file Name:" level="info"/>
+    </target>
+
+    <target name="test-check-script-size">
+        <hlm:antlint>
+            <fileset id="antlint.files" dir="${antlint.test.dir}/data">
+                <include name="sample.ant.xml"/>
+            </fileset>
+            <hlm:checkScriptSize enabled="true" severity="warning"/>
+        </hlm:antlint>
+        <au:assertLogContains text="WARNING: 77: Target check-script-size has a script with 1188 characters, code should be inside a python file" level="info"/>
+    </target>
+    
+    <target name="test-check-presetdef-macrodef-name">
+        <hlm:antlint>
+            <fileset id="antlint.files" dir="${antlint.test.dir}/data">
+                <include name="sample.antlib.xml"/>
+                <include name="sample.ant.xml"/>
+            </fileset>
+            <hlm:checkPresetDefMacroDefName severity="warning" regexp="([a-z0-9][a-zA-Z0-9]*)"/>       
+        </hlm:antlint>
+        <au:assertLogContains text="WARNING: 45: Invalid presetdef/macrodef name: check_PresetDef.Name" level="info"/>
+        <au:assertLogContains text="WARNING: 27: Invalid presetdef/macrodef name: foo_Macro" level="info"/>
+    </target>
+
+    <target name="test-check-runtarget">
+        <hlm:antlint>
+            <fileset id="antlint.files" dir="${antlint.test.dir}/data">
+                <include name="sample.ant.xml"/>
+            </fileset>
+            <hlm:checkRunTarget enabled="true" severity="warning"/>
+        </hlm:antlint>
+        <au:assertLogContains text="runtarget> calls the target smile that has dependencies!" level="info"/>
+    </target>
+
+    <target name="test-check-scriptdef-style">
+        <hlm:antlint>
+            <fileset id="antlint.files" dir="${antlint.test.dir}/data">
+                <include name="sample.antlib.xml"/>
+            </fileset>
+            <hlm:checkScriptDefStyle severity="warning" />
+        </hlm:antlint>
+        <au:assertLogContains text="WARNING: 65: Scriptdef check-scriptdef-style doesn't reference attributes directly, poor style" level="info"/>
+    </target>
+
+    <target name="test-check-script-condition">
+        <hlm:antlint>
+            <fileset id="antlint.files" dir="${antlint.test.dir}/data">
+                <include name="sample.ant.xml"/>
+                <include name="sample.antlib.xml"/>
+            </fileset>
+            <hlm:checkScriptCondition severity="warning"/> 
+        </hlm:antlint>
+        <au:assertLogContains text=" found in target_check-scriptcondition" level="info"/>
+    </target>
+    
     <target name="test-check-tab-character">
         <hlm:antlint>
             <fileset id="antlint.files" dir="${antlint.test.dir}/data">
@@ -50,7 +146,7 @@ Description:
             <hlm:checkTabCharacter severity="warning" enabled="true"/>
         </hlm:antlint>
         <au:assertLogContains text="WARNING: 25: Tabs should not be used!" level="info"/>
-        <au:assertLogContains text="WARNING: 29: Tabs should not be used!" level="info"/>
+        <au:assertLogContains text="WARNING: 31: Target test2 has a script with tabs" level="info"/>
     </target>
     
     <target name="test-check-property-name">
@@ -60,7 +156,7 @@ Description:
             </fileset>
             <hlm:checkPropertyName severity="warning" enabled="true" regexp="([a-z0-9[\\d\\_\\.\\@\\{\\}\\$]]*)" />
         </hlm:antlint>
-        <au:assertLogContains text="WARNING: INVALID Property Name: check-property-name" level="info"/>
+        <au:assertLogContains text="WARNING: 42: Invalid property name: check-property-name" level="info"/>
     </target>
     
     <target name="test-check-target-name">
@@ -70,9 +166,50 @@ Description:
             </fileset>
             <hlm:checkTargetName severity="warning" enabled="true" regexp="([a-z0-9[\\d\\-]]*)" />
         </hlm:antlint>
-        <au:assertLogContains text="WARNING: INVALID Target Name: Check_target.Name" level="info"/>
+        <au:assertLogContains text="WARNING: 64: INVALID Target Name: Check_target.Name" level="info"/>
     </target>
     
+    <target name="test-check-use-of-equals-task">
+        <hlm:antlint>
+            <fileset id="antlint.files" dir="${antlint.test.dir}/data">
+                <include name="sample.ant.xml"/>
+            </fileset>
+            <hlm:checkUseOfEqualsTask severity="warning" enabled="true"/>
+        </hlm:antlint>
+        <au:assertLogContains text="WARNING: 209: test.boolean1 uses 'equals', should use 'istrue' task" level="info"/>
+        <au:assertLogContains text="WARNING: 210: test.boolean2 uses 'equals', should use 'istrue' task" level="info"/>
+    </target>
+
+    <target name="test-check-use-of-if-in-targets">
+        <hlm:antlint>
+            <fileset id="antlint.files" dir="${antlint.test.dir}/data">
+                <include name="sample.ant.xml"/>
+            </fileset>
+            <hlm:checkUseOfIfInTargets enabled="true" severity="warning"/>
+        </hlm:antlint>
+        <au:assertLogContains text="WARNING: 126: Target check-use-of-if-in-targets poor use of if statement, use" level="info"/>
+        <au:assertLogContains text="WARNING: 136: Target check-use-of-if-else-in-targets poor use of if-else-property statement, use condition task" level="info"/>
+        <au:assertLogContains text="WARNING: 151: Target check-use-of-if-then-in-targets poor use of if-then-property statement, use condition task" level="info"/>
+        <au:assertLogContains text="WARNING: 173: Target check-prop-in-scriptcondition poor use of if-else-property statement, use condition task" level="info"/>
+        <au:assertLogContains text="WARNING: 229: Target check-scriptcondition poor use of if-else-property statement, use condition task" level="info"/>
+    </target>
+    
+    <target name="test-check-try-catch-block-with-empty-catch-block">
+        <hlm:antlint>
+            <fileset file="${antlint.test.dir}/data/sample.ant.xml"/>
+            <hlm:checkTryCatchBlock severity="warning" />
+        </hlm:antlint>
+        <au:assertLogContains text="trycatch> block found without " level="info"/>
+    </target>
+
+    <target name="test-check-try-catch-block-with-multiple-catch-block">
+        <hlm:antlint>
+            <fileset file="${antlint.test.dir}/data/sample.ant.xml"/>
+            <hlm:checkTryCatchBlock severity="warning" />
+        </hlm:antlint>
+        <au:assertLogContains text="trycatch> block found with 2 " level="info"/>
+    </target>
+
     <target name="test-check-indentation">
         <hlm:antlint>
             <fileset id="antlint.files" dir="${antlint.test.dir}/data">
@@ -80,19 +217,7 @@ Description:
             </fileset>
             <hlm:checkIndentation severity="warning" enabled="true"/>
         </hlm:antlint>
-        <au:assertLogContains text="WARNING: 248: Bad indentation" level="info"/>
-    </target>
-    
-   <target name="test-check-presetdef-macrodef-name">
-        <hlm:antlint>
-            <fileset id="antlint.files" dir="${antlint.test.dir}/data">
-                <include name="sample.antlib.xml"/>
-                <include name="sample.ant.xml"/>
-            </fileset>
-            <hlm:checkPresetDefMacroDefName enabled="true" severity="warning" regexp="([a-z0-9][a-zA-Z0-9]*)"/>       
-        </hlm:antlint>
-        <au:assertLogContains text="WARNING: INVALID PRESETDEF/MACRODEF Name: check_PresetDef.Name" level="info"/>
-        <au:assertLogContains text="WARNING: INVALID PRESETDEF/MACRODEF Name: foo_Macro" level="info"/>
+        <au:assertLogContains text="WARNING: 252: Bad indentation" level="info"/>
     </target>
     
     <target name="test-check-project-name">
@@ -103,164 +228,8 @@ Description:
             </fileset>
             <hlm:checkProjectName enabled="true" severity="warning" regexp="([a-z0-9[\\d\\.\\_\\-]]*)"/>
         </hlm:antlint>
-        <au:assertLogContains text="WARNING: INVALID Project Name: Sample" level="info"/>
-        <au:assertLogContains text="WARNING: Project name not specified!" level="info"/>
-    </target>
-    
-    <target name="test-check-description">
-        <hlm:antlint>
-            <fileset id="antlint.files" dir="${antlint.test.dir}/data">
-                <include name="build.xml"/>
-            </fileset>
-            <hlm:checkDescription enabled="true" severity="warning"/>
-        </hlm:antlint>
-        <au:assertLogContains text="WARNING: Description not specified!" level="info"/>
-    </target>
-    
-    <target name="test-check-runtarget">
-        <hlm:antlint>
-            <fileset id="antlint.files" dir="${antlint.test.dir}/data">
-                <include name="sample.ant.xml"/>
-            </fileset>
-            <hlm:checkRunTarget enabled="true" severity="warning"/>
-        </hlm:antlint>
-        <au:assertLogContains text="runtarget> calls the target smile that has dependencies!" level="info"/>
-    </target>
-    
-    <target name="test-check-antcall">
-        <hlm:antlint>
-            <fileset id="antlint.files" dir="${antlint.test.dir}/data">
-                <include name="sample.ant.xml"/>
-            </fileset>
-            <hlm:checkAntCall enabled="true" severity="warning"/>
-        </hlm:antlint>
-        <au:assertLogContains text="antcall> is used with no param elements and calls the target hello that has no dependencies!" level="info"/>
-    </target>
-    
-    <target name="test-check-script-size">
-        <hlm:antlint>
-            <fileset id="antlint.files" dir="${antlint.test.dir}/data">
-                <include name="sample.ant.xml"/>
-            </fileset>
-            <hlm:checkScriptSize enabled="true" severity="warning"/>
-        </hlm:antlint>
-        <au:assertLogContains text="WARNING: Target check-script-size has a script with 1098 characters, code should be inside a python file" level="info"/>
-    </target>
-    
-    <target name="test-check-use-of-if-in-targets">
-        <hlm:antlint>
-            <fileset id="antlint.files" dir="${antlint.test.dir}/data">
-                <include name="sample.ant.xml"/>
-            </fileset>
-            <hlm:checkUseOfIfInTargets enabled="true" severity="warning"/>
-        </hlm:antlint>
-        <au:assertLogContains text="WARNING: Target check-use-of-if-in-targets poor use of if statement, use " level="info"/>
-        <au:assertLogContains text="WARNING: Target check-use-of-if-else-in-targets poor use of if-else-property statement, use condition task" level="info"/>
-        <au:assertLogContains text="WARNING: Target check-use-of-if-then-in-targets poor use of if-then-property statement, use condition task" level="info"/>
-        <au:assertLogContains text="WARNING: Target check-prop-in-scriptcondition poor use of if-else-property statement, use condition task" level="info"/>
-        <au:assertLogContains text="WARNING: Target check-scriptcondition poor use of if-else-property statement, use condition task" level="info"/>
-    </target>
-    
-    <target name="test-check-jython-script">
-        <hlm:antlint>
-            <fileset id="antlint.files" dir="${antlint.test.dir}/data">
-                <include name="sample.ant.xml"/>
-                <include name="sample.antlib.xml"/>
-            </fileset>
-            <hlm:checkJythonScript enabled="true" severity="warning" outputDir="${antlint.test.dir}/data/output"/>
-        </hlm:antlint>
-        <au:assertLogContains text="found in target_check-jython-script" level="info"/>
-        <au:assertLogContains text="found in check-script" level="info"/>
-    </target>
-    
-    <target name="test-check-use-of-equals-task">
-        <hlm:antlint>
-            <fileset id="antlint.files" dir="${antlint.test.dir}/data">
-                <include name="sample.ant.xml"/>
-            </fileset>
-            <hlm:checkUseOfEqualsTask severity="warning" enabled="true"/>
-        </hlm:antlint>
-        <au:assertLogContains text="WARNING: test.boolean1 uses 'equals' should use 'istrue' task" level="info"/>
-        <au:assertLogContains text="WARNING: test.boolean2 uses 'equals' should use 'istrue' task" level="info"/>
-    </target>
-    
-    <target name="test-check-script-condition">
-        <hlm:antlint>
-            <fileset id="antlint.files" dir="${antlint.test.dir}/data">
-                <include name="sample.ant.xml"/>
-                <include name="sample.antlib.xml"/>
-            </fileset>
-            <hlm:checkScriptCondition enabled="true" severity="warning" outputDir="${antlint.test.dir}/data/output"/> 
-        </hlm:antlint>
-        <au:assertLogContains text="found in scriptcondition_check-scriptcondition" level="info"/>
-    </target>
-    
-    <target name="test-check-python-tasks">
-        <hlm:antlint>
-            <fileset id="antlint.files" dir="${antlint.test.dir}/data">
-                <include name="*.xml"/>
-                <include name="*.ant.xml"/>
-                <include name="build.xml"/>
-                <include name="*.antlib.xml"/>
-            </fileset>
-            <hlm:checkPythonTasks severity="warning" enabled="true" outputDir="${antlint.test.dir}/data/output"/>
-        </hlm:antlint>
-        <au:assertFileExists file="${antlint.test.dir}/data/output/python/target0_check-prop-in-pythontask.py"/>
-        <au:assertFileExists file="${antlint.test.dir}/data/output/python/target0_check-script-size.py"/>
-    </target>
-    
-    <target name="test-check-scriptdef-name-attributes">
-        <hlm:antlint>
-            <fileset id="antlint.files" dir="${antlint.test.dir}/data">
-                <include name="sample.antlib.xml"/>
-            </fileset>
-            <hlm:checkScriptDefNameAttributes severity="warning" enabled="true" />
-        </hlm:antlint>
-        <au:assertLogContains text="WARNING: Scriptdef check-scriptdef-attributes does not have attribute target" level="info"/>
-    </target>
-    
-    
-    <target name="test-check-scriptdef-style">
-        <hlm:antlint>
-            <fileset id="antlint.files" dir="${antlint.test.dir}/data">
-                <include name="sample.antlib.xml"/>
-            </fileset>
-            <hlm:checkScriptDefStyle severity="warning" enabled="true" />
-        </hlm:antlint>
-        <au:assertLogContains text="WARNING: Scriptdef check-scriptdef-style doesn't reference attributes directly, poor style" level="info"/>
-    </target>
-    
-    <target name="test-check-scriptdef">
-        <hlm:antlint>
-            <fileset id="antlint.files" dir="${antlint.test.dir}/data">
-                <include name="sample.antlib.xml"/>
-            </fileset>
-            <hlm:checkScriptDef severity="warning" enabled="true" outputDir="${antlint.test.dir}/data/output"/>
-        </hlm:antlint>
-        <au:assertLogContains text="WARNING: Scriptdef check-scriptdef does not use attr2" level="info"/>
-        <au:assertLogContains text="WARNING: Scriptdef check-scriptdef-beanshell does not use attr2" level="info"/>
-    </target>
-    
-    <target name="test-check-duplicate-names">
-        <hlm:antlint>
-            <fileset id="antlint.files" dir="${antlint.test.dir}/data">
-                <include name="*.xml"/>
-                <include name="*.ant.xml"/>
-                <include name="build.xml"/>
-                <include name="*.antlib.xml"/>
-            </fileset>
-            <hlm:checkDuplicateNames enabled="true" severity="warning"/>
-        </hlm:antlint>
-    </target>
-    
-    <target name="test-check-filename">
-        <hlm:antlint>
-            <fileset id="antlint.files" dir="${antlint.test.dir}/data">
-                <include name="invalid.build.xml"/>
-            </fileset>
-            <hlm:checkFileName severity="warning" enabled="true" regexp="^build.xml$|ant.xml$|antlib.xml$" />
-        </hlm:antlint>
-        <au:assertLogContains text="WARNING: INVALID File Name:" level="info"/>
+        <au:assertLogContains text="WARNING: 23: Invalid project name: Sample" level="info"/>
+        <au:assertLogContains text="WARNING: 23: Project name not specified!" level="info"/>
     </target>
     
     <target name="test-antlint-failonerror-false">
@@ -273,10 +242,10 @@ Description:
             </fileset>
             <hlm:checkTabCharacter severity="error" enabled="true"/>
             <hlm:checkProjectName enabled="true" severity="error" regexp="([a-z0-9[\\d\\.\\_\\-]]*)"/>
-            <hlm:checkScriptDefNameAttributes severity="error" enabled="true" />
+            <hlm:checkScriptDefAttributes severity="error" />
         </hlm:antlint>
-        <au:assertLogContains text="ERROR: Scriptdef check-scriptdef-attributes does not have attribute target" level="info"/>
-        <au:assertLogContains text="ERROR: Project name not specified!" level="info"/>
+        <au:assertLogContains text="ERROR: 80: Scriptdef check-scriptdef-attributes does not have attribute target" level="info"/>
+        <au:assertLogContains text="ERROR: 23: Project name not specified!" level="info"/>
     </target> 
     
     <target name="test-antlint-failonerror-true">
@@ -290,11 +259,11 @@ Description:
                 </fileset>
                 <hlm:checkTabCharacter severity="error" enabled="true"/>
                 <hlm:checkProjectName enabled="true" severity="error" regexp="([a-z0-9[\\d\\.\\_\\-]]*)"/>
-                <hlm:checkScriptDefNameAttributes severity="error" enabled="true" />
+                <hlm:checkScriptDefAttributes severity="error" />
             </hlm:antlint>
         </au:expectfailure>
-        <au:assertLogContains text="ERROR: Scriptdef check-scriptdef-attributes does not have attribute target" level="info"/>
-        <au:assertLogContains text="ERROR: Project name not specified!" level="info"/>
+        <au:assertLogContains text="ERROR: 80: Scriptdef check-scriptdef-attributes does not have attribute target" level="info"/>
+        <au:assertLogContains text="ERROR: 23: Project name not specified!" level="info"/>
     </target>
     
     <target name="test-antlint-console-and-xml-reporting">
@@ -308,15 +277,15 @@ Description:
                 </fileset>
                 <hlm:checkTabCharacter severity="error" enabled="true"/>
                 <hlm:checkProjectName enabled="true" severity="error" regexp="([a-z0-9[\\d\\.\\_\\-]]*)"/>
-                <hlm:checkScriptDefNameAttributes severity="error" enabled="true" />
-                
+                <hlm:checkScriptDefAttributes severity="error" />
+
                 <!-- reporters -->
                 <hlm:antlintCheckstyleReporter file="${antlint.test.dir}/data/output/report.xml" />
                 <hlm:antlintConsoleReporter />
             </hlm:antlint>
         </au:expectfailure>
-        <au:assertLogContains text="ERROR: Scriptdef check-scriptdef-attributes does not have attribute target" level="info"/>
-        <au:assertLogContains text="ERROR: Project name not specified!" level="info"/>
+        <au:assertLogContains text="ERROR: 80: Scriptdef check-scriptdef-attributes does not have attribute target" level="info"/>
+        <au:assertLogContains text="ERROR: 23: Project name not specified!" level="info"/>
         <au:assertFileExists file="${antlint.test.dir}/data/output/report.xml" />
         <loadfile property="report.xml" srcfile="${antlint.test.dir}/data/output/report.xml" />
         <echo>${report.xml}</echo>
@@ -328,24 +297,114 @@ Description:
             </and>
         </au:assertTrue>
     </target>
-    
-    <target name="test-check-try-catch-block-with-empty-catch-block">
+
+    <target name="test-antcontrib-var-type-value-unset-set-case">
         <au:expectfailure>
             <hlm:antlint>
-                <fileset file="${antlint.test.dir}/data/sample.ant.xml"/>
-                <hlm:checkTryCatchBlock severity="error" />
+                <fileset id="antlint.files" dir="${antlint.test.dir}/data">
+                    <include name="sample.ant.xml"/>
+                </fileset>
+                <hlm:checkVariableTask severity="error" />
             </hlm:antlint>
         </au:expectfailure>
-        <au:assertLogContains text="trycatch> block found without " level="info"/>
+        <au:assertLogContains text="ERROR: 30: Variable 'var1' should not have 'value' attribute set when 'unset' is true." level="info"/>
     </target>
 
-    <target name="test-check-try-catch-block-with-multiple-catch-block">
+    <target name="test-invalid-property-type-values">
         <au:expectfailure>
             <hlm:antlint>
-                <fileset file="${antlint.test.dir}/data/sample.ant.xml"/>
-                <hlm:checkTryCatchBlock severity="error" />
+                <fileset id="antlint.files" dir="${antlint.test.dir}/data">
+                    <include name="sample.ant.xml"/>
+                </fileset>
+                <hlm:checkPropertyTypeAndValueMismatch severity="error" />
             </hlm:antlint>
         </au:expectfailure>
-        <au:assertLogContains text="trycatch> block found with 2 " level="info"/>
+        <au:assertLogContains text="ERROR: 324: Property 'test.prop.int.2' has invalid integer value set as '123abc'." level="info"/>
+        <au:assertLogContains text="ERROR: 342: Property 'test.prop.bool.3' has invalid boolean value set as 't'. (Valid values: true|false)" level="info"/>
+        <au:assertLogContains text="ERROR: 348: Property 'test.prop.bool.4' has invalid boolean value set as 'f'. (Valid values: true|false)" level="info"/>
+        <au:assertLogContains text="ERROR: 354: Property 'test.prop.bool.5' has invalid boolean value set as 'yes'. (Valid values: true|false)" level="info"/>
+        <au:assertLogContains text="ERROR: 360: Property 'test.prop.bool.6' has invalid boolean value set as 'no'. (Valid values: true|false)" level="info"/>
+        <au:assertLogContains text="ERROR: 366: Property 'test.prop.bool.7' has invalid boolean value set as 'poo'. (Valid values: true|false)" level="info"/>
+        <au:assertLogContains text="ERROR: 393: Property 'test.prop.number.1' has invalid type as 'number'. (Valid types: boolean|float|integer|string)" level="info"/>
+        <au:assertLogContains text="ERROR: 399: Property 'test.prop.flag' has invalid type as 'flag'. (Valid types: boolean|float|integer|string)" level="info"/>
+        <au:assertLogContains text="ERROR: 411: Property 'test.prop.float.2' has invalid float value set as '1.5a'." level="info"/>
+        <au:assertLogContains text="ERROR: 417: Property 'test.prop.int.3' has invalid integer value set as '1.8'." level="info"/>
     </target>
+        
+
+    <target name="test-check-scriptdef-name">
+        <hlm:antlint>
+            <fileset id="antlint.files" dir="${antlint.test.dir}/data">
+                <include name="sample.antlib.xml"/>
+            </fileset>
+            <hlm:checkScriptDefName severity="warning" regexp="([a-z0-9][a-zA-Z0-9]*)"/>
+        </hlm:antlint>
+        <au:assertLogContains text="WARNING: 34: Invalid scriptdef name: check-prop-in-scriptdef" level="info"/>
+        <au:assertLogContains text="WARNING: 65: Invalid scriptdef name: check-scriptdef-style" level="info"/>
+    </target>
+
+    <target name="test-check-scriptdef-attributes">
+        <hlm:antlint>
+            <fileset id="antlint.files" dir="${antlint.test.dir}/data">
+                <include name="sample.antlib.xml"/>
+            </fileset>
+            <hlm:checkScriptDefAttributes severity="warning"/>
+        </hlm:antlint>
+        <au:assertLogContains text="WARNING: 40: Scriptdef check-scriptdef does not use attr2" level="info"/>
+        <au:assertLogContains text="WARNING: 46: Scriptdef checkScriptdefBeanshell does not use attr2" level="info"/>
+        <au:assertLogContains text="WARNING: 80: Scriptdef check-scriptdef-attributes does not have attribute target" level="info"/>
+        <au:assertLogContains text="WARNING: 84: Scriptdef checkScriptdefAttributes does not have attribute attr0" level="info"/>
+    </target>
+
+    <target name="test-beanshell-script-dump-task">
+        <hlm:antlint>
+            <fileset id="antlint.files" dir="${antlint.test.dir}/data">
+                <include name="sample.antlib.xml"/>
+            </fileset>
+            <hlm:checkstyleExecutor outputDir="${antlint.test.dir}/data/output/beanshell" config="${antlint.test.dir}/data/config/java_checkstyle_config.xml">
+                <formatter type="plain"/>
+            </hlm:checkstyleExecutor>
+        </hlm:antlint>
+        <au:assertLogContains text="BeanshellcheckScriptdefAttributes.java:1: warning: Using the '.*' form of import should be avoided - java.io.*." level="info"/>
+        <au:assertLogContains text="BeanshellcheckScriptdefBeanshell.java:1: warning: Using the '.*' form of import should be avoided - java.io.*." level="info"/>
+    </target>
+
+    <target name="test-check-jython-script">
+        <hlm:antlint>
+            <fileset id="antlint.files" dir="${antlint.test.dir}/data">
+                <include name="sample.ant.xml"/>
+                <include name="sample.antlib.xml"/>
+            </fileset>
+            <hlm:checkJythonScript severity="warning"/>
+        </hlm:antlint>
+        <au:assertLogContains text="found in target_check-jython-script" level="info"/>
+        <au:assertLogContains text="found in check-script" level="info"/>
+    </target>
+    
+    <target name="test-python-script-dump-task">
+        <pathconvert pathsep="${path.separator}" property="python.tools.path">
+            <fileset dir="./../../../../../nokia_builder" includes="tools/pylint/**/*.egg" />
+            <dirset dir="./../../../../../nokia_builder" includes="tools/pylint/**/*.egg" />
+        </pathconvert>
+        <au:expectfailure>
+            <hlm:antlint>
+                <fileset id="antlint.files" dir="${antlint.test.dir}/data">
+                    <include name="*.xml"/>
+                    <include name="*.ant.xml"/>
+                    <include name="build.xml"/>
+                    <include name="*.antlib.xml"/>
+                </fileset>
+                <hlm:pylintExecutor outputDir="${antlint.test.dir}/data/output/python" >
+                    <env key="PYTHONPATH" value="${python.tools.path}"/>
+                    <arg file="${antlint.test.dir}/data/config/pylint-script.py"/>
+                    <arg value="--output-format=parseable"/>
+                    <arg line="--rcfile=${antlint.test.dir}/data/config/pylintrc.txt"/>
+                </hlm:pylintExecutor>
+            </hlm:antlint>
+        </au:expectfailure>
+        <au:assertFileExists file="${antlint.test.dir}/data/output/python/python/target0_check-prop-in-pythontask.py"/>
+        <au:assertFileExists file="${antlint.test.dir}/data/output/python/python/target0_check-script-size.py"/>
+        <au:assertLogContains text="target0_check-prop-in-pythontask.py:3: [E0602, abc] Undefined variable 'abcd'" level="info"/>
+    </target>
+
 </project>

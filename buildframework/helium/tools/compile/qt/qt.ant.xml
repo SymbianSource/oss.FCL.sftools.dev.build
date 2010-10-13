@@ -60,6 +60,9 @@ Description:
     <condition property="internal.qmake.enabled">
         <istrue value="${qmake.enabled}"/>
     </condition>
+    <condition property="iswindows" value="true" else="false">
+        <os family='windows'/>
+    </condition>
     
     <!--
         Executing qmake on all Qt components defined under the system definition file.

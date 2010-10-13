@@ -94,4 +94,36 @@ Description:
             </hlm:metadatarecord>
         </au:expectfailure>
     </target>
+
+    <target name="test-sysdef-metadata-input-without-names">
+        <echo message="test-sysdef-metadata-input-without-names" />
+        <hlm:metadatarecord database="${test.temp.dir}/metadata_1_db">
+            <hlm:sysdefmetadatainput file="../data/sysdef/sysdef3_without_name.xml" epocroot="../" />
+        </hlm:metadatarecord>
+        <fmpp sourceFile="../data/sysdef/sysdef_data.ini.ftl"
+                     outputfile="${test.temp.dir}/sysdef_data.ini">
+            <data expandProperties="yes">
+                dbPath: ${test.temp.dir}/metadata_1_db
+                ant: antProperties()
+            </data>
+        </fmpp>
+        <property file="${test.temp.dir}/sysdef_data.ini" />
+        <echo>package.count: ${package.count}</echo>
+        <echo>collection.count: ${collection.count}</echo>
+        <echo>component.count: ${component.count}</echo>
+        <echo>unit.count: ${unit.count}</echo>
+        <au:assertTrue message="Invalid number of packages">
+            <equals arg1="${package.count}" arg2="2" />
+        </au:assertTrue>
+        <au:assertTrue message="Invalid number of collection">
+            <equals arg1="${collection.count}" arg2="2" />
+        </au:assertTrue>
+        <au:assertTrue message="Invalid number of components">
+            <equals arg1="${component.count}" arg2="2" />
+        </au:assertTrue>
+        <au:assertTrue message="Invalid number of units">
+            <equals arg1="${unit.count}" arg2="2" />
+        </au:assertTrue>
+    </target>
+    
 </project>

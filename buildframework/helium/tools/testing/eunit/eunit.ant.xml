@@ -40,12 +40,6 @@ Description:
     @scope public
     -->
     
-    <!--* @property eunitexerunner.flags
-    Flags for EUnit exerunner can be set by setting the value of this variable. The default flags are set to "/E S60AppEnv /R Off".
-    @type string
-    @editable required
-    @scope public
-    -->
 
     <!-- Unzip test package to build drive. -->
     <target name="prepare-eunit" if="internal.ats.enabled">

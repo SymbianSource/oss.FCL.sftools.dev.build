@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : test_signaltask.ant.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="run-scenario" xmlns:ac="antlib:net.sf.antcontrib" xmlns:au="antlib:org.apache.ant.antunit">
+    <description>Helium Antlib feature enabler macro.</description>
+    <property environment="env" />
+    
+    <target name="setUp">    
+        <tempfile property="temp.dir" suffix=".dir" />
+        <mkdir dir="${temp.dir}" />
+    </target>
+    
+    <target name="tearDown">
+        <delete dir="${temp.dir}" />
+    </target>
+    
+    <macrodef name="runScenario">
+        <attribute name="scenario" />
+        <attribute name="target" />
+        <attribute name="cmdline" default=""/>
+        <sequential>
+            <ac:trycatch property="scenario.unittest.error">
+                <try>
+                    <exec osfamily="windows" executable="cmd" dir="${ant.file.run-scenario}/../../scenarii/@{scenario}" failonerror="true" errorproperty="scenario.unittest.error.log">
+                        <env key="ANT_ARGS" value="${env.ANT_ARGS} -logger com.nokia.helium.core.ant.HeliumLogger" />
+                        <arg line="/c ..\build.bat" />
+                        <arg value="-Dant.executor.class=com.nokia.helium.core.ant.HeliumExecutor" />
+                        <arg value="-Dtemp.dir=${temp.dir}" />
+                        <arg line="@{target}" />
+                        <arg value="@{cmdline}" />
+                    </exec>
+                    <exec osfamily="unix" executable="bash" dir="${ant.file.run-scenario}/../../scenarii/@{scenario}" failonerror="true" errorproperty="scenario.unittest.error.log">
+                        <env key="ANT_ARGS" value="${env.ANT_ARGS} -logger com.nokia.helium.core.ant.HeliumLogger" />
+                        <arg value="../bld.sh" />
+                        <arg value="-Dant.executor.class=com.nokia.helium.core.ant.HeliumExecutor" />
+                        <arg value="-Dtemp.dir=${temp.dir}" />
+                        <arg line="@{target}" />
+                        <arg line="@{cmdline}" />
+                    </exec>
+                </try>
+            </ac:trycatch>
+            <au:assertTrue message="${scenario.unittest.error.log}">
+                <not>
+                    <isset property="scenario.unittest.error" />
+                </not>
+            </au:assertTrue>
+        </sequential>
+    </macrodef>
+
+</project>

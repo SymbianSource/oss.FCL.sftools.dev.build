@@ -23,24 +23,102 @@ Description:
 <project name="test-diamonds" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
     <description>Helium Antlib diamonds unittests.</description>
 
-    
+    <taskdef name="xpathtest" classname="se.jtech.ant.xpath.XPathEvaluatorTask" onerror="ignore"/>    
+
     <import file="run-scenario.ant.xml" />
 
     <target name="test-build">
         <runScenario scenario="build" target="unittest-diamonds" />
+        <au:assertLogContains text="Diamonds build id:" />
     </target>
 
     <target name="test-build-with-invalid-address">
         <runScenario scenario="invalid-address" target="unittest-diamonds" />
-        <au:assertLogContains text="Error occured while sending mail" />
+        <au:assertLogContains text="Error sending the message: invalid.server.local" />
+        <au:assertLogContains text="Diamonds reporting will be disabled." />
     </target>
     
     <target name="test-build-with-invalid-templates">
         <runScenario scenario="invalid-templates" target="unittest-diamonds" />
+        <au:assertLogContains text="Error with invalid-ant-properties-input-file.ftl" />
+        <au:assertLogContains text="Diamonds build id:" />
     </target>
 
     <target name="test-build-with-invalid-templates-1">
-        <runScenario scenario="invalid-templates-1" failonerror="false" target="unittest-diamonds" />
+        <runScenario scenario="invalid-templates-1" target="unittest-diamonds" />
+        <au:assertLogContains text="Diamonds build id:" />
+    </target>
+    
+    <target name="test-build-without-config">
+        <runScenario scenario="build-without-config" target="unittest-diamonds" />
+        <au:assertLogContains text="Diamonds reporting is disabled, because the listener is not configured properly: required property: diamonds.host not defined" />
+    </target>
+
+    <target name="test-failing-build">
+        <au:expectfailure>
+            <runScenario scenario="failing-build" target="build" />
+        </au:expectfailure>
+        <au:assertLogContains text="BUILD FAILED" />
+        <au:assertLogContains text="diamonds:" />
+        <au:assertLogContains text="failing-target:" />
+        <property file="${test.temp.dir}/diamonds.ini" />
+        <get src="http://${diamonds.host}:${diamonds.port}${diamonds.build.id}?fmt=xml"
+             dest="${test.temp.dir}/diamonds_data.xml" 
+             usetimestamp="true" />
+        <xpathtest xmlfile="${test.temp.dir}/diamonds_data.xml">
+            <namespace uri="" prefix=""/>
+            <xpath expression="/diamonds-build/build[status='failed']"/>
+         </xpathtest>        
+        <xpathtest xmlfile="${test.temp.dir}/diamonds_data.xml">
+            <namespace uri="" prefix=""/>
+            <xpath expression="/diamonds-build/build/finished"/>
+         </xpathtest>        
+    </target>
+
+    <target name="test-signal-build">
+        <au:expectfailure>
+            <runScenario scenario="signal-build" target="build" />
+        </au:expectfailure>
+        <au:assertLogContains text="BUILD FAILED" />
+        <au:assertLogContains text="diamonds:" />
+        <au:assertLogContains text="failing-target:" />
+        <property file="${test.temp.dir}/diamonds.ini" />
+        <get src="http://${diamonds.host}:${diamonds.port}${diamonds.build.id}?fmt=xml"
+             dest="${test.temp.dir}/diamonds_data.xml" 
+             usetimestamp="true" />
+        <xpathtest xmlfile="${test.temp.dir}/diamonds_data.xml">
+            <namespace uri="" prefix=""/>
+            <xpath expression="/diamonds-build/build[status='failed']"/>
+         </xpathtest>        
+        <xpathtest xmlfile="${test.temp.dir}/diamonds_data.xml">
+            <namespace uri="" prefix=""/>
+            <xpath expression="/diamonds-build/build/finished"/>
+         </xpathtest>        
+        <xpathtest xmlfile="${test.temp.dir}/diamonds_data.xml">
+            <namespace uri="" prefix=""/>
+            <xpath expression="/diamonds-build/signals/signal[position()=1 and name='testDeferredSignalInput']"/>
+         </xpathtest>        
+        <xpathtest xmlfile="${test.temp.dir}/diamonds_data.xml">
+            <namespace uri="" prefix=""/>
+            <xpath expression="/diamonds-build/signals/signal[position()=2 and name='testNowSignalInput']"/>
+         </xpathtest>        
+    </target>
+    
+    <target name="test-target-recording">
+        <runScenario scenario="target-recording" target="build" />
+        <au:assertLogContains text="BUILD SUCCESSFUL" />
+        <au:assertLogContains text="diamonds:" />
+        <property file="${test.temp.dir}/diamonds.ini" />
+        <get src="http://${diamonds.host}:${diamonds.port}${diamonds.build.id}?fmt=xml"
+             dest="${test.temp.dir}/diamonds_data.xml" 
+             usetimestamp="true" />
+        <xpathtest xmlfile="${test.temp.dir}/diamonds_data.xml">
+            <namespace uri="" prefix=""/>
+            <xpath expression="/diamonds-build/targets/target[name='target-recording']"/>
+            <xpath expression="/diamonds-build/targets/target[name='sub-target2']"/>
+            <xpath expression="/diamonds-build/targets/target[name='sub-target3']"/>
+            <xpath expression="/diamonds-build/targets[count(target)=3]"/>
+         </xpathtest>        
     </target>
     
 </project>

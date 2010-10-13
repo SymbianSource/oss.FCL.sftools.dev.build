@@ -25,7 +25,7 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.types.DataType;
 
-import com.nokia.helium.signal.Notifier;
+import com.nokia.helium.signal.ant.Notifier;
 
 /**
  * The signalExceptionConfig type will allow you to configure post-build

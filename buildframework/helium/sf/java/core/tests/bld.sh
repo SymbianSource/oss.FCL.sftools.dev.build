@@ -21,4 +21,4 @@ if [ -f ~/.bashrc ] ; then
     . ~/.bashrc
 fi
 
-ant -Dant.executor.class="com.nokia.helium.core.ant.HeliumExecutor" $*
+ant $*

@@ -41,7 +41,7 @@ class skip(object):
 
     def __call__(self, f_file):
         """ Returns the function f_file if  shouldSkip is False. Else a stub function is returned. """
-        def __skiptest(*args, **kargs):
+        def __skiptest(*args, **kargs): # pylint: disable=W0613
             """skip test"""
             _logger.warning("Skipping test %s" % f_file.__name__)
             return self.returns

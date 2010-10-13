@@ -1,30 +1,33 @@
 /*
- * Copyright (c) 2007-2008 Nokia Corporation and/or its subsidiary(-ies).
- * All rights reserved.
- * This component and the accompanying materials are made available
- * under the terms of the License "Eclipse Public License v1.0"
- * which accompanies this distribution, and is available
- * at the URL "http://www.eclipse.org/legal/epl-v10.html".
+ *  Licensed to the Apache Software Foundation (ASF) under one or more
+ *  contributor license agreements.  See the NOTICE file distributed with
+ *  this work for additional information regarding copyright ownership.
+ *  The ASF licenses this file to You under the Apache License, Version 2.0
+ *  (the "License"); you may not use this file except in compliance with
+ *  the License.  You may obtain a copy of the License at
  *
- * Initial Contributors:
- * Nokia Corporation - initial contribution.
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
- * Contributors:
- *
- * Description:  
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
  *
  */
+/* * Portion Copyright (c) 2007-2008 Nokia Corporation and/or its subsidiary(-ies). All rights reserved.*/
+
 package com.nokia.helium.logger.ant.listener;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.log4j.Logger;
 import org.apache.tools.ant.BuildEvent;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DefaultLogger;
@@ -37,7 +40,7 @@ import org.apache.tools.ant.util.StringUtils;
  * @since Ant 1.4
  */
 public class RecorderEntry implements BuildEventHandler, TargetEventHandler, TaskEventHandler,
-    MessageEventHandler {
+    MessageEventHandler, SubBuildEventHandler {
 
     /** The name of the file associated with this recorder entry. */
     private File filename;
@@ -52,17 +55,34 @@ public class RecorderEntry implements BuildEventHandler, TargetEventHandler, Tas
     /** Strip task banners if true. */
     private boolean emacsMode;
 
-    private Pattern pattern;
+    // defines if this recorder entry should notify the stage logger about project to exclude from recording.
+    private boolean excludeSubProject;
+    private List<Project> excludedProjects = new ArrayList<Project>();
+    private List<Project> includedProjects = new ArrayList<Project>();
 
-    private Vector<String> logRegExps = new Vector<String>();
-    private Logger log = Logger.getLogger(getClass());
+    private List<Pattern> logRegExps = new ArrayList<Pattern>();
 
     /**
-     * @param name The name of this recorder (used as the filename).
+     * Create a RecorderEntry using a filename. 
+     * @param name the filename of the log file.
      */
     public RecorderEntry(File name) {
         targetStartTime = System.currentTimeMillis();
         filename = name;
+    }
+
+    /**
+     * New RecorderEntry using a filename and allow sub project exclusion.
+     * @param name the log filename
+     * @param excludeSubProject If true this recorder entry will notify 
+     *                          the stage logger about projects to exclude 
+     *                          from recording. If false, then only non-excluded
+     *                          project message will be handled.
+     */
+    public RecorderEntry(File name, boolean excludeSubProject) {
+        targetStartTime = System.currentTimeMillis();
+        filename = name;
+        this.excludeSubProject = true;
     }
 
     /**
@@ -96,8 +116,8 @@ public class RecorderEntry implements BuildEventHandler, TargetEventHandler, Tas
      * 
      * @param regexp
      */
-    public void addRegexp(String regexp) {
-        logRegExps.add(regexp);
+    public void addRegexp(Pattern pattern) {
+        logRegExps.add(pattern);
     }
 
     /**
@@ -111,7 +131,7 @@ public class RecorderEntry implements BuildEventHandler, TargetEventHandler, Tas
      * @see org.apache.tools.ant.BuildListener#buildStarted(BuildEvent)
      */
     /** {@inheritDoc}. */
-    public void handleBuildStarted(BuildEvent event) {
+    public void buildStarted(BuildEvent event) {
         log("> BUILD STARTED", Project.MSG_DEBUG);
     }
 
@@ -119,8 +139,8 @@ public class RecorderEntry implements BuildEventHandler, TargetEventHandler, Tas
      * @see org.apache.tools.ant.BuildListener#buildFinished(BuildEvent)
      */
     /** {@inheritDoc}. */
-    public void handleBuildFinished(BuildEvent event) {
-        log.debug("< BUILD FINISHED");
+    public void buildFinished(BuildEvent event) {        
+        log("< BUILD FINISHED", Project.MSG_DEBUG);
 
         if (record && out != null) {
             Throwable error = event.getException();
@@ -144,9 +164,16 @@ public class RecorderEntry implements BuildEventHandler, TargetEventHandler, Tas
      * 
      * @since Ant 1.6.2
      */
-    public void handleSubBuildFinished(BuildEvent event) {
+    public void subBuildFinished(BuildEvent event) {
         log("< SUBBUILD FINISHED", Project.MSG_DEBUG);
-        // let's keep the logging ongoing, even if sub-build finishes.
+        if (excludeSubProject && CommonListener.getCommonListener() != null) {
+            AntLoggingHandler antLogger = CommonListener.getCommonListener().getHandler(AntLoggingHandler.class);
+            if (antLogger != null) {
+                antLogger.removeRecordExclusion(event.getProject());
+            }
+        }
+        excludedProjects.remove(event.getProject());
+        includedProjects.remove(event.getProject());
     }
 
     /**
@@ -156,73 +183,102 @@ public class RecorderEntry implements BuildEventHandler, TargetEventHandler, Tas
      * 
      * @since Ant 1.6.2
      */
-    public void handleSubBuildStarted(BuildEvent event) {
+    public void subBuildStarted(BuildEvent event) {
         log("< SUBBUILD STARTED", Project.MSG_DEBUG);
+        includedProjects.add(event.getProject());
+        if (excludeSubProject && CommonListener.getCommonListener() != null) {
+            AntLoggingHandler antLogger = CommonListener.getCommonListener().getHandler(AntLoggingHandler.class);
+            if (antLogger != null) {
+                antLogger.addRecordExclusion(event.getProject());
+            }
+        }
     }
 
     /**
      * {@inheritDoc}
      */
-    public void handleTargetStarted(BuildEvent event) {
-        log(">> TARGET STARTED -- " + event.getTarget(), Project.MSG_DEBUG);
-        log(StringUtils.LINE_SEP + event.getTarget().getName() + ":", Project.MSG_INFO);
+    public void targetStarted(BuildEvent event) {
+        if ((!excludeSubProject && !excludedProjects.contains(event.getTarget().getProject())) ||
+                (this.excludeSubProject && this.includedProjects.contains(event.getTarget().getProject()))) {
+            log(">> TARGET STARTED -- " + event.getTarget(), Project.MSG_DEBUG);
+            log(StringUtils.LINE_SEP + event.getTarget().getName() + ":", Project.MSG_INFO);
+        }
         targetStartTime = System.currentTimeMillis();
     }
 
     /**
      * {@inheritDoc}
      */
-    public void handleTargetFinished(BuildEvent event) {
-        log("<< TARGET FINISHED -- " + event.getTarget(), Project.MSG_DEBUG);
+    public void targetFinished(BuildEvent event) {
+        if ((!excludeSubProject && !excludedProjects.contains(event.getTarget().getProject())) || 
+            (this.excludeSubProject && this.includedProjects.contains(event.getTarget().getProject()))) {
+            log("<< TARGET FINISHED -- " + event.getTarget(), Project.MSG_DEBUG);
 
-        String time = formatTime(System.currentTimeMillis() - targetStartTime);
+            String time = formatTime(System.currentTimeMillis() - targetStartTime);
 
-        log(event.getTarget() + ":  duration " + time, Project.MSG_VERBOSE);
-        flush();
+            log(event.getTarget() + ":  duration " + time, Project.MSG_VERBOSE);
+            flush();
+        }
     }
 
     /**
      * @see org.apache.tools.ant.BuildListener#taskStarted(BuildEvent)
      */
     /** {@inheritDoc}. */
-    public void handleTaskStarted(BuildEvent event) {
-        log(">>> TASK STARTED -- " + event.getTask(), Project.MSG_DEBUG);
+    public void taskStarted(BuildEvent event) {
+        if ((!excludeSubProject && !excludedProjects.contains(event.getTask().getProject())) ||
+            (this.excludeSubProject && this.includedProjects.contains(event.getTask().getProject()))) {
+            log(">>> TASK STARTED -- " + event.getTask(), Project.MSG_DEBUG);
+        }
     }
 
     /**
      * @see org.apache.tools.ant.BuildListener#taskFinished(BuildEvent)
      */
     /** {@inheritDoc}. */
-    public void handleTaskFinished(BuildEvent event) {
-        log("<<< TASK FINISHED -- " + event.getTask(), Project.MSG_DEBUG);
-        flush();
+    public void taskFinished(BuildEvent event) {
+        if ((!excludeSubProject && !excludedProjects.contains(event.getTask().getProject())) ||
+            (this.excludeSubProject && this.includedProjects.contains(event.getTask().getProject()))) {
+            log("<<< TASK FINISHED -- " + event.getTask(), Project.MSG_DEBUG);
+            flush();
+        }
     }
 
     /**
      * @see org.apache.tools.ant.BuildListener#messageLogged(BuildEvent)
      */
     /** {@inheritDoc}. */
-    public void handleMessageLogged(BuildEvent event) {
-        log("--- MESSAGE LOGGED", Project.MSG_DEBUG);
-
-        StringBuffer buf = new StringBuffer();
-
-        if (event.getTask() != null) {
-            String name = event.getTask().getTaskName();
-
-            if (!emacsMode) {
-                String label = "[" + name + "] ";
-                int size = DefaultLogger.LEFT_COLUMN_SIZE - label.length();
-
-                for (int i = 0; i < size; i++) {
-                    buf.append(" ");
-                }
-                buf.append(label);
-            }
+    public void messageLogged(BuildEvent event) {
+        Project project = event.getProject();
+        if (project == null && event.getTask() != null) {
+            project = event.getTask().getProject();
         }
-        String messgeToUpdate = filterMessage(event.getMessage());
-        buf.append(messgeToUpdate);
-        log(buf.toString(), event.getPriority());
+        if (project == null && event.getTarget() != null) {
+            project = event.getTarget().getProject();
+        }
+        if ((!excludeSubProject && !excludedProjects.contains(project))
+            || (excludeSubProject && includedProjects.contains(project))) {
+            log("--- MESSAGE LOGGED", Project.MSG_DEBUG);
+
+            StringBuilder buf = new StringBuilder();
+
+            if (event.getTask() != null) {
+                String name = event.getTask().getTaskName();
+
+                if (!emacsMode) {
+                    String label = "[" + name + "] ";
+                    int size = DefaultLogger.LEFT_COLUMN_SIZE - label.length();
+
+                    for (int i = 0; i < size; i++) {
+                        buf.append(" ");
+                    }
+                    buf.append(label);
+                }
+            }
+            String messgeToUpdate = filterMessage(event.getMessage());
+            buf.append(messgeToUpdate);
+            log(buf.toString(), event.getPriority());
+        }
     }
 
     /**
@@ -232,12 +288,9 @@ public class RecorderEntry implements BuildEventHandler, TargetEventHandler, Tas
      * @return
      */
     private String filterMessage(String message) {
-        for (String regExp : logRegExps) {
-            pattern = Pattern.compile(regExp);
-            if (pattern != null) {
-                Matcher match = pattern.matcher(message);
-                message = match.replaceAll("********");
-            }
+        for (Pattern pattern : logRegExps) {
+            Matcher match = pattern.matcher(message);
+            message = match.replaceAll("********");
         }
         return message;
     }
@@ -311,38 +364,6 @@ public class RecorderEntry implements BuildEventHandler, TargetEventHandler, Tas
     }
 
     /**
-     * Registering ourselves to the StatusAndLogListener.
-     */
-    public void register() {
-        StatusAndLogListener listener = StatusAndLogListener.getStatusAndLogListener();
-        if (listener != null) {
-            this.log.debug("register");
-            synchronized (listener) {
-                listener.register((BuildEventHandler) this);
-                listener.register((TargetEventHandler) this);
-                listener.register((TaskEventHandler) this);
-                listener.register((MessageEventHandler) this);
-            }
-        }
-    }
-
-    /**
-     * Unregistering ourselves from the StatusAndLogListener.
-     */
-    public void unregister() {
-        StatusAndLogListener listener = StatusAndLogListener.getStatusAndLogListener();
-        if (listener != null) {
-            this.log.debug("unregister");
-            synchronized (listener) {
-                listener.remove((MessageEventHandler) this);
-                listener.remove((TaskEventHandler) this);
-                listener.remove((TargetEventHandler) this);
-                listener.remove((BuildEventHandler) this);
-            }
-        }
-    }
-
-    /**
      * @since 1.6.2
      */
     public void cleanup() {
@@ -355,11 +376,9 @@ public class RecorderEntry implements BuildEventHandler, TargetEventHandler, Tas
      * @since 1.6.3
      */
     public void closeFile() {
-        this.log.debug("closeFile.");
         if (out != null) {
             out.close();
             out = null;
-            unregister();
         }
     }
 
@@ -387,10 +406,11 @@ public class RecorderEntry implements BuildEventHandler, TargetEventHandler, Tas
 
     private void openFileImpl(boolean append) {
         if (out == null) {
-            this.log.debug("openFileImpl: " + filename);
             try {
+                if (!filename.getParentFile().exists()) {
+                    filename.getParentFile().mkdirs();
+                }
                 out = new PrintStream(new FileOutputStream(filename, append));
-                register();
             }
             catch (IOException ioe) {
                 throw new BuildException("Problems opening file using a " + "recorder entry: "
@@ -405,8 +425,30 @@ public class RecorderEntry implements BuildEventHandler, TargetEventHandler, Tas
      * @param message
      */
     public void addLogMessage(String message) {
-        out.println(StringUtils.LINE_SEP + message);
-
+        if (out != null) {
+            out.println(StringUtils.LINE_SEP + message);
+        }
     }
 
+    /**
+     * 
+     * @param excludedProjects
+     */
+    public void setExcludedProject(List<Project> excludedProjects) {
+        this.excludedProjects = new ArrayList<Project>(excludedProjects);
+    }
+
+    /**
+     * Defines the root project a recorder entry should record 
+     * from. (this one and sub-project). List will be cleared
+     * if the project is null. 
+     * @param project
+     */
+    public void setRecorderProject(Project project) {
+        if (project != null) {
+            this.includedProjects.add(project);
+        } else {
+            this.includedProjects.clear();
+        }
+    }
 }

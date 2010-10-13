@@ -16,12 +16,19 @@
  */
 package com.nokia.helium.antlint.ant.types;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
+
+import org.apache.tools.ant.taskdefs.MacroInstance;
+import org.apache.tools.ant.taskdefs.optional.script.ScriptDefBase;
+
+import com.nokia.helium.ant.data.MacroMeta;
+import com.nokia.helium.ant.data.RootAntObjectMeta;
 
 /**
- * <code>CheckDuplicateNames</code> is used to check for duplicate macro names.
+ * <code>CheckDuplicateNames</code> is used to check for duplicate macro and
+ * task names.
  * 
  * <pre>
  * Usage:
@@ -32,57 +39,53 @@ import java.util.Hashtable;
  *               &lt;include name=&quot;*build.xml&quot;/&gt;
  *               &lt;include name=&quot;*.antlib.xml&quot;/&gt;
  *       &lt;/fileset&gt;
- *       &lt;CheckDuplicateNames&quot; severity=&quot;error&quot; enabled=&quot;true&quot;/&gt;
+ *       &lt;checkDuplicateNames severity=&quot;error&quot; /&gt;
  *  &lt;/antlint&gt;
  * </pre>
  * 
- * @ant.task name="CheckDuplicateNames" category="AntLint"
+ * @ant.task name="checkDuplicateNames" category="AntLint"
  */
-public class CheckDuplicateNames extends AbstractCheck {
+public class CheckDuplicateNames extends AbstractProjectCheck {
 
-    private File antFile;
+    private static final String HELIUM_URI = "http://www.nokia.com/helium";
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.nokia.helium.antlint.ant.types.Check#run(java.io.File)
+    private List<String> heliumTaskList;
+
+    /**
+     * {@inheritDoc}
      */
-    @SuppressWarnings("unchecked")
-    public void run(File antFilename) {
-        this.antFile = antFilename;
-        Hashtable<String, Class<Object>> taskdefs = getProject()
-                .getTaskDefinitions();
-        ArrayList<String> macros = new ArrayList<String>(taskdefs.keySet());
-
-        for (String macroName : macros) {
-            if (macros.contains(macroName + "Macro")
-                    || macros.contains(macroName + "macro")) {
-                this.getReporter()
-                        .report(
-                                this.getSeverity(),
-                                macroName + " and " + macroName + "Macro"
-                                        + " found duplicate name",
-                                this.getAntFile(), 0);
+    protected void run(RootAntObjectMeta root) {
+        if (heliumTaskList == null) {
+            setHeliumTaskList(root);
+        }
+        List<MacroMeta> macros = root.getMacros();
+        if (heliumTaskList != null ) {
+            for (MacroMeta macroMeta : macros) {
+                if (heliumTaskList.contains(macroMeta.getName())) {
+                    report("Task '" + macroMeta.getName() + "' and macro '" + macroMeta.getName()
+                            + "' has duplicate name.", macroMeta.getLineNumber());
+                }
             }
         }
     }
 
-    /*
-     * (non-Javadoc)
+    /**
+     * Method sets a list of helium tasks.
      * 
-     * @see org.apache.tools.ant.types.DataType#toString()
+     * @param root is the {@link RootAntObjectMeta} used to lookup for tasks.
      */
-    public String toString() {
-        return "CheckDuplicateNames";
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    private void setHeliumTaskList(RootAntObjectMeta root) {
+        heliumTaskList = new ArrayList<String>();
+        Hashtable<String, Class<Object>> taskdefs = root.getRuntimeProject().getTaskDefinitions();
+        List<String> list = new ArrayList<String>(taskdefs.keySet());
+        for (String taskName : list) {
+            Class clazz = taskdefs.get(taskName);
+            int index = taskName.lastIndexOf(":");
+            if (taskName.startsWith(HELIUM_URI)
+                    && !(clazz.equals(MacroInstance.class) || clazz.equals(ScriptDefBase.class))) {
+                heliumTaskList.add(taskName.substring(index + 1));
+            }
+        }
     }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.nokia.helium.antlint.ant.types.Check#getAntFile()
-     */
-    public File getAntFile() {
-        return this.antFile;
-    }
-
 }

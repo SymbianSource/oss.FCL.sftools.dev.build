@@ -291,10 +291,11 @@ Description:
                             <arg line="/c build.bat unittest " />
                             <arg value="-Dbuilder.dir=${builder.dir}" />
                         </exec>
-                        <exec osfamily="unix" executable="./bld.sh" dir="${basedir}/tests" failonerror="true">
+                        <exec osfamily="unix" executable="/bin/bash" dir="${basedir}/tests" failonerror="true">
                             <env key="ANT_ARGS" value="-lib ${lib.dir} -lib ${module.temp.dir}/backup/${ant.project.name}.jar -lib ${builder.dir}/antlibs -Dpython.path=${python.path}" />
                             <env key="PYTHONPATH" value="${python.path}" />
                             <env key="JYTHONPATH" value="${python.path}" />
+                            <arg value="./bld.sh" />
                             <arg line="unittest" />
                             <arg value="-Dbuilder.dir=${builder.dir}" />
                         </exec>

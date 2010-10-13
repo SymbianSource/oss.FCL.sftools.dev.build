@@ -17,7 +17,9 @@
 
 package com.nokia.helium.core.ant.types;
 
-import org.apache.log4j.Logger;
+import java.util.Vector;
+
+import org.apache.tools.ant.BuildEvent;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.BuildListener;
 import org.apache.tools.ant.Project;
@@ -33,22 +35,64 @@ import com.nokia.helium.core.ant.PreBuildAction;
 public class HlmListenerDef extends DataType implements PreBuildAction {
 
     private String classname;
-    private Logger log = Logger.getLogger(HlmListenerDef.class);
+    private boolean preappend;
 
+    /**
+     * The classname of the BuildListener to instantiate and register
+     * to the project..
+     * @param preappend
+     */
     public void setClassname(String classname) {
         this.classname = classname;
     }
-
+    
+    /**
+     * Defines if the listener should be added at the end of 
+     * the list or always appended at the beguining of the list
+     * just after the logger.
+     * @param preappend
+     */
+    public void setPreappend(boolean preappend) {
+        this.preappend = preappend;
+    }
+    
     /**
      * Register given listener to the project.
      */
+    @SuppressWarnings("unchecked")
     public void executeOnPreBuild(Project project, String[] targetNames) {
+        if (classname == null) {
+            throw new BuildException("classname attribute has not been defined.");
+        }
         try {
             Class<?> listenerClass = Class.forName(classname);
             BuildListener listener = (BuildListener) listenerClass
                     .newInstance();
-            project.addBuildListener(listener);
-            log.debug(classname + " is registered");
+            
+            if (preappend) {
+                Vector<BuildListener> listeners = (Vector<BuildListener>)project.getBuildListeners();
+                for (BuildListener removeListener : listeners) {
+                    project.removeBuildListener(removeListener);
+                }
+                // Always add the listener as after the first element which should be
+                // the logger.
+                if (listeners.size() > 0) {
+                    listeners.add(1, listener);
+                } else {
+                    // this is really unlikely to happen
+                    listeners.add(listener);
+                }
+                for (BuildListener addListener : listeners) {
+                    project.addBuildListener(addListener);
+                }
+                
+            } else {
+                project.addBuildListener(listener);                
+            }
+            // Trigger that build has started under the listener,
+            // so initialization could happen.
+            listener.buildStarted(new BuildEvent(project));
+            log(classname + " is registered", Project.MSG_DEBUG);
         } catch (ClassNotFoundException ex) {
             throw new BuildException("Class not found exception:"
                     + ex.getMessage(), ex);

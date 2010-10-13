@@ -16,97 +16,113 @@
  */
 package com.nokia.helium.antlint.ant.types;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.tools.ant.BuildException;
+import com.nokia.helium.ant.data.AntlibMeta;
+import com.nokia.helium.ant.data.MacroMeta;
+import com.nokia.helium.ant.data.ProjectMeta;
+import com.nokia.helium.ant.data.RootAntObjectMeta;
+import com.nokia.helium.ant.data.TargetMeta;
 
 /**
  * <code>AbstractScriptCheck</code> is an abstract implementation of
  * {@link Check} and contains some concrete methods related to script.
  * 
  */
-public abstract class AbstractScriptCheck extends AbstractCheck {
+public abstract class AbstractScriptCheck extends AbstractTargetCheck {
 
     /**
-     * Write a script with the given name and the text.
-     * 
-     * @param name
-     *            is the name of the script
-     * @param text
-     *            is the script text.
+     * {@inheritDoc}
      */
-    protected void writeJythonFile(String name, String text, File outputDir) {
-        if (outputDir == null) {
-            throw new BuildException("'output' attribute for the checker '"
-                    + this.toString() + "' should be specified.");
-        }
-        if (text.contains("${")) {
-            this.getReporter().report(this.getSeverity(),
-                    "${ found in " + name, this.getAntFile(), 0);
-        }
-        try {
-            String heliumpath = outputDir.getCanonicalPath();
-            new File(heliumpath + File.separator + "jep").mkdirs();
-            File file = new File(heliumpath + File.separator + "jep"
-                    + File.separator + name + "_jep.py");
-            PrintWriter output = new PrintWriter(new FileOutputStream(file));
-            output.write("def abc():\n");
-            output.write("    attributes = {} # pylint: disable-msg=C0103\n");
-            output.write("    elements = {} # pylint: disable-msg=C0103\n");
-            output.write("    project = None # pylint: disable-msg=C0103\n");
-            output.write("    self = None # pylint: disable-msg=C0103\n");
-            text = text.replace(" File(", " self.File(");
-            for (String line : text.split("\n")) {
-                output.write("    " + line + "\n");
-            }
-            output.close();
-
-            if (text.contains("import ")) {
-                File file2 = new File(heliumpath + File.separator
-                        + "test_jython.xml");
-                PrintWriter output2 = new PrintWriter(new FileOutputStream(
-                        file2, true));
-                output2.write("try:\n");
-                for (String line : text.split("\n")) {
-                    if (line.trim().startsWith("import ")
-                            || line.trim().startsWith("from ")) {
-                        output2.write("    " + line + "\n");
-                    }
+    protected void run(RootAntObjectMeta root) {
+        super.run(root);
+        if (getMacroXPathExpression() != null) {
+            if (root instanceof ProjectMeta) {
+                ProjectMeta projectMeta = (ProjectMeta) root;
+                List<MacroMeta> macros = projectMeta
+                        .getScriptDefinitions(getMacroXPathExpression());
+                for (MacroMeta macroMeta : macros) {
+                    run(macroMeta);
                 }
-
-                output2.write("except ImportError, e:\n");
-                output2.write("    print '" + name + " failed: ' + str(e)\n");
-                output2.close();
             }
-        } catch (IOException e) {
-            throw new BuildException("Not able to write JEP File " + name
-                    + "_jep.py");
+            if (root instanceof AntlibMeta) {
+                AntlibMeta antlibMeta = (AntlibMeta) root;
+                List<MacroMeta> macros = antlibMeta.getScriptDefinitions(getMacroXPathExpression());
+                for (MacroMeta macroMeta : macros) {
+                    run(macroMeta);
+                }
+            }
         }
     }
 
     /**
-     * Check for the properties in the given script text.
-     * 
-     * @param text
-     *            is the script text to lookup.
+     * {@inheritDoc}
      */
-    protected void checkJepPropertiesInText(String text) {
-        Pattern p1 = Pattern
-                .compile("getProperty\\([\"']([a-zA-Z0-9\\.]*)[\"']\\)");
-        Matcher m1 = p1.matcher(text);
-        ArrayList<String> props = new ArrayList<String>();
-        while (m1.find()) {
-            props.add(m1.group(1));
+    protected void run(TargetMeta targetMeta) {
+        String xpath = getScriptXPathExpression(targetMeta.getName());
+        if (xpath != null) {
+            List<MacroMeta> macros = targetMeta.getScriptDefinitions(xpath);
+            for (MacroMeta macroMeta : macros) {
+                run(macroMeta);
+            }
         }
-        /*
-         * for (String group : props) { checkPropertyInModel(group); }
-         */
+    }
+
+    /**
+     * Method returns the name of the macro or a constructed name for the given
+     * script using its parent name.
+     * 
+     * @param macroMeta is an instance of Macrometa.
+     * @return name of the script
+     */
+    protected String getScriptName(MacroMeta macroMeta) {
+        String name = macroMeta.getName();
+        if (name.isEmpty()) {
+            name = "target_" + macroMeta.getParent().getName();
+        }
+        return name;
+    }
+
+    /**
+     * Method runs the check against the input {@link MacroMeta}.
+     * 
+     * @param macroMeta is the {@link MacroMeta} against whom the check is run.
+     */
+    protected abstract void run(MacroMeta macroMeta);
+
+    /**
+     * Get the xpath expression of the macro.
+     * 
+     * @return the xpath expression of the macro.
+     */
+    protected abstract String getMacroXPathExpression();
+
+    /**
+     * Get the xpath expression for the input target.
+     * 
+     * @param targetName is the name of the target.
+     * @return the xpath expression for the input target.
+     */
+    protected abstract String getScriptXPathExpression(String targetName);
+
+    /**
+     * Method returns a list of property names used in the given script
+     * definition.
+     * 
+     * @param macroMeta the macrometa instance to lookup.
+     * @return a list of used property names
+     */
+    protected List<String> getUsedProperties(MacroMeta macroMeta) {
+        Pattern pattern = Pattern.compile("attributes.get\\([\"']([^\"']*)[\"']\\)");
+        Matcher matcher = pattern.matcher(macroMeta.getText());
+        List<String> usedPropertyList = new ArrayList<String>();
+        while (matcher.find()) {
+            usedPropertyList.add(matcher.group(1));
+        }
+        return usedPropertyList;
     }
 
 }

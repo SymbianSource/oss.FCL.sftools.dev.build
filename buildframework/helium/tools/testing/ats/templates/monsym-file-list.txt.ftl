@@ -20,6 +20,6 @@ Description:
 ============================================================================
 -->
 ${ant['build.drive']}/mon.sym
-<#list data["//unit"] as unit>
+<#list data["//unit[@bldFile]"] as unit>
 ${ant['build.drive']}${unit.@bldFile}/mon.sym
 </#list>

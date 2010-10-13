@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : 
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<build>
+    <config abstract="true">
+        <set name="max.uncompressed.size" value="12500000"/>
+        <set name="split.on.uncompressed.size.enabled" value="true"/>
+        <set name="max.files.per.archive" value="65000"/>
+        <set name="archive.tool" value="7za"/>
+        <set name="root.dir" value="${build.drive}\"/>
+        <set name="temp.build.dir" value="${temp.build.dir}"/>
+        <set name="archives.dir" value="${zips.build.dir}/${zipping.type}"/>
+                
+        <config name="minibuild_archive" abstract="true">
+            <config>
+                <set name="name" value="sf_mw_classicui_and_app_radio_01"/>
+                <set name="mapper" value="policy"/>
+                <set name="include" value="sf/mw/classicui/**"/>
+                <set name="include" value="sf/app/radio/**"/>
+                <set name="exclude" value="**/_ccmwaid.inf"/>
+                <set name="policy.csv" value="${config.dir}/distribution.policy.extended_for_sf.id_status.csv"/>
+            </config>
+            <config>
+                <set name="name" value="sf_os_01"/>
+                <set name="mapper" value="policy.remover"/>
+                <set name="include" value="test_policy/os/**"/>
+                <set name="exclude" value="**/_ccmwaid.inf"/>
+                <set name="policy.root.dir" value="${build.drive}/test_policy"/>
+                <set name="policy.csv" value="${config.dir}/distribution.policy.extended_for_sf.id_status.csv"/>
+            </config>
+        </config>
+    </config>
+</build>
+  

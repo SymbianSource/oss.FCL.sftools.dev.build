@@ -27,7 +27,10 @@ Description:
     
     <taskdef resource="net/sf/antcontrib/antlib.xml"/>
     
-        
+    <var name="var1" value="bar" unset="true"/>
+    <var name="var2" value="bar"  />
+    <var name="var3" unset="true" /> 
+    
     <macrodef name="pow" uri="http://www.nokia.com/helium">
         <sequential>
             <echo>pow</echo>
@@ -72,51 +75,51 @@ Description:
     
     <target name="check-script-size">
         <hlm:python>
-print check-script-size
-print check-script-size
-print check-script-size
-print check-script-size
-print check-script-size
-print check-script-size
-print check-script-size
-print check-script-size
-print check-script-size
-print check-script-size
-print check-script-size
-print check-script-size
-print check-script-size
-print check-script-size
-print check-script-size
-print check-script-size
-print check-script-size
-print check-script-size
-print check-script-size
-print check-script-size
-print check-script-size
-print check-script-size
-print check-script-size
-print check-script-size
-print check-script-size
-print check-script-size
-print check-script-size
-print check-script-size
-print check-script-size
-print check-script-size
-print check-script-size
-print check-script-size
-print check-script-size
-print check-script-size
-print check-script-size
-print check-script-size
-print check-script-size
-print check-script-size
-print check-script-size
-print check-script-size
-print check-script-size
-print check-script-size
-print check-script-size         
-print check-script-size
-print check-script-size
+print 'check-script-size'
+print 'check-script-size'
+print 'check-script-size'
+print 'check-script-size'
+print 'check-script-size'
+print 'check-script-size'
+print 'check-script-size'
+print 'check-script-size'
+print 'check-script-size'
+print 'check-script-size'
+print 'check-script-size'
+print 'check-script-size'
+print 'check-script-size'
+print 'check-script-size'
+print 'check-script-size'
+print 'check-script-size'
+print 'check-script-size'
+print 'check-script-size'
+print 'check-script-size'
+print 'check-script-size'
+print 'check-script-size'
+print 'check-script-size'
+print 'check-script-size'
+print 'check-script-size'
+print 'check-script-size'
+print 'check-script-size'
+print 'check-script-size'
+print 'check-script-size'
+print 'check-script-size'
+print 'check-script-size'
+print 'check-script-size'
+print 'check-script-size'
+print 'check-script-size'
+print 'check-script-size'
+print 'check-script-size'
+print 'check-script-size'
+print 'check-script-size'
+print 'check-script-size'
+print 'check-script-size'
+print 'check-script-size'
+print 'check-script-size'
+print 'check-script-size'
+print 'check-script-size'         
+print 'check-script-size'
+print 'check-script-size'
         </hlm:python>
     </target>
     
@@ -187,6 +190,7 @@ if int(r'@{error.limit}') > -1:
     <target name="check-prop-in-pythontask">    
         <hlm:python>
 from path import path
+print abcd
 print "Writing version file...."
 vfile = path(r'${build.drive}'+"/").joinpath('s60_version.txt')
 f = open(str(vfile), 'w')
@@ -294,5 +298,122 @@ if int(r'@{error.limit}') > -1:
             </catch>
         </trycatch>
     </target> 
+
+    <!-- Test property to check for invalid string property types.
+    @type string
+    @scope public
+    -->
+    <property name="test.prop.str.1" value="str.prop"/>
+    
+    <!-- Test property to check for invalid string property types.
+    @type string
+    @scope private
+    -->
+    <property name="test.prop.str.2" value="12345"/>
+
+    <!-- Test property to check for invalid integer property types.
+    @type integer
+    @scope public
+    -->
+    <property name="test.prop.int.1" value="123"/>
+
+    <!-- Test property to check for invalid integer property types.
+    @type integer
+    @scope public
+    -->
+    <property name="test.prop.int.2" value="123abc"/>
      
+    <!-- Test property to check for invalid boolean property types.
+    @type boolean
+    @scope public
+    -->
+    <property name="test.prop.bool.1" value="true"/>
+    
+    <!-- Test property to check for invalid boolean property types.
+    @type boolean
+    @scope public
+    -->
+    <property name="test.prop.bool.2" value="false"/>
+    
+    <!-- Test property to check for invalid boolean property types.
+    @type boolean
+    @scope public
+    -->
+    <property name="test.prop.bool.3" value="t"/>
+    
+    <!-- Test property to check for invalid boolean property types.
+    @type boolean
+    @scope public
+    -->
+    <property name="test.prop.bool.4" value="f"/>
+    
+    <!-- Test property to check for invalid boolean property types.
+    @type boolean
+    @scope public
+    -->
+    <property name="test.prop.bool.5" value="yes"/>
+
+    <!-- Test property to check for invalid boolean property types.
+    @type boolean
+    @scope public
+    -->
+    <property name="test.prop.bool.6" value="no"/>
+
+    <!-- Test property to check for invalid boolean property types.
+    @type boolean
+    @scope public
+    -->
+    <property name="test.prop.bool.7" value="poo"/>
+
+   <!--* @property test.comment.str.prop
+   Test comment property to check for invalid string values.   
+   @type string
+   @scope public
+   @since 10.0
+   -->
+
+   <!--* @property test.comment.int.prop
+   Test comment property to check for invalid integer values.   
+   @type integer
+   @scope public
+   @since 10.0
+   -->
+
+   <!--* @property test.comment.bool.prop
+   Test comment property to check for invalid string values.   
+   @type boolean
+   @scope public
+   @since 10.0
+   -->
+
+   <!-- Test property to check for invalid integer property types.
+   @type number
+   @scope public
+   -->
+   <property name="test.prop.number.1" value="1234"/>
+     
+   <!-- Test property to check for invalid boolean property types.
+   @type flag
+   @scope public
+   -->
+   <property name="test.prop.flag" value="true"/>
+
+   <!-- Test property to check for valid float property types.
+   @type float
+   @scope public
+   -->
+   <property name="test.prop.float.1" value="1.5"/>
+
+   <!-- Test property to check for invalid float property types.
+   @type float
+   @scope public
+   -->
+   <property name="test.prop.float.2" value="1.5a"/>
+
+   <!-- Test property to check for invalid integer property types.
+   @type integer
+   @scope public
+   -->
+   <property name="test.prop.int.3" value="1.8"/>
+
 </project>

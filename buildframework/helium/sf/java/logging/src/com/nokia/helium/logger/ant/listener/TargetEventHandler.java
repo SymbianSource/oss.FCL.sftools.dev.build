@@ -32,13 +32,13 @@ public interface TargetEventHandler {
      * @param event
      */
     
-    void handleTargetStarted( BuildEvent event );
+    void targetStarted( BuildEvent event );
   
    /**
     * Method to handle target finish events.
     * 
     * @param event is the build event to be handled. 
     */
-    void handleTargetFinished( BuildEvent event );
+    void targetFinished( BuildEvent event );
    
 }

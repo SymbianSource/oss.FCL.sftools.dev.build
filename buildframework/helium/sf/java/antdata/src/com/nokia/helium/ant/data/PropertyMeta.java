@@ -29,6 +29,7 @@ public class PropertyMeta extends AntObjectMeta {
     public static final String STRING_TYPE = "string";
     public static final String INTEGER_TYPE = "integer";
     public static final String BOOLEAN_TYPE = "boolean";
+    public static final String FLOAT_TYPE = "float";
     public static final String DEFAULT_TYPE = STRING_TYPE;
 
     public PropertyMeta(AntObjectMeta parent, Node propNode) {

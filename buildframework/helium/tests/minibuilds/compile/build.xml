@@ -34,10 +34,14 @@ Description:
     <property name="minor.version" value="0" />
     <property name="publish.root.dir" location="${build.drive}/release" />
 
-    <!-- For Grace upload-->
+    <!-- For upload-->
     <property name="hydra.service" value="Helium" />
     <property name="hydra.product" value="minibuild_compile" />
     <property name="release.label" value="${major.version}.${minor.version}" />
+    
+    <!-- build -->
+    <property name="qmake.enabled" value="true" />
+    <property name="sysdef3.enabled" value="false" />
 
     <!-- build configuration -->
     <property name="sysdef.configurations.list" value="helium_minibuild_compile" />
@@ -221,7 +225,7 @@ ${diamonds.log.start.edited}</echo>-->
     </target>
 
 
-    <target name="minibuild-archive" depends="minibuild-archive-ant,minibuild-archive-ec-full,minibuild-archive-ant-empty-config" />
+    <target name="minibuild-archive" depends="minibuild-archive-ant,minibuild-archive-ec-full,minibuild-archive-ant-empty-config,minibuild-split-archive-ec-full,minibuild-split-archive-ant" />
 
     <!-- This target will copy a part of the tree structure to test policy.remover mapper. -->
     <target name="prepare-archiving">
@@ -254,7 +258,26 @@ ${diamonds.log.start.edited}</echo>-->
             <param name="zipping.type" value="ant" />
             <!-- Uses to set the target location -->
         </antcall>
-        
+    </target>
+    
+    <target name="minibuild-split-archive-ec-full">
+        <antcall target="do-minibuild-split-archive">
+            <param name="build.system" value="ec-helium" />
+            <param name="zip.config.file" value="archive.split.cfg.xml" />
+            <param name="archive.using.ec" value="true" />
+            <param name="zipping.type" value="ec" />
+            <!-- Uses to set the target location -->
+        </antcall>
+    </target>
+    
+    <target name="minibuild-split-archive-ant">
+        <antcall target="do-minibuild-split-archive">
+            <param name="build.system" value="ebs" />
+            <param name="zip.config.file" value="archive.split.cfg.xml" />
+            <param name="archive.using.ec" value="false" />
+            <param name="zipping.type" value="ant" />
+            <!-- Uses to set the target location -->
+        </antcall>
     </target>
  
     <target name="minibuild-archive-ant-empty-config">
@@ -286,6 +309,33 @@ ${diamonds.log.start.edited}</echo>-->
         <au:assertFileExists file="${zips.build.dir}/${zipping.type}/sf_os_1435.zip" />
         <au:assertFileExists file="${zips.build.dir}/${zipping.type}/sf_os_1436.zip" />
     </target>
+    
+    <target name="do-minibuild-split-archive">
+            <runtarget target="prepare-archiving" />
+            <runtarget target="zip-ee" />
+            <au:assertFileExists file="${zips.build.dir}/${zipping.type}/sf_mw_classicui_and_app_radio_01_part01_0.zip" />
+            <au:assertFileExists file="${zips.build.dir}/${zipping.type}/sf_mw_classicui_and_app_radio_01_part02_0.zip" />
+            <au:assertFileExists file="${zips.build.dir}/${zipping.type}/sf_mw_classicui_and_app_radio_01_part03_0.zip" />
+            <au:assertFileExists file="${zips.build.dir}/${zipping.type}/sf_mw_classicui_and_app_radio_01_part04_0.zip" />
+            <au:assertFileExists file="${zips.build.dir}/${zipping.type}/sf_mw_classicui_and_app_radio_01_part05_0.zip" />
+            <au:assertFileExists file="${zips.build.dir}/${zipping.type}/sf_mw_classicui_and_app_radio_01_part01_3.zip" />
+            <au:assertFileExists file="${zips.build.dir}/${zipping.type}/sf_mw_classicui_and_app_radio_01_part02_3.zip" />
+            <au:assertFileExists file="${zips.build.dir}/${zipping.type}/sf_mw_classicui_and_app_radio_01_part03_3.zip" />
+            <au:assertFileExists file="${zips.build.dir}/${zipping.type}/sf_mw_classicui_and_app_radio_01_part01_7.zip" />
+            <au:assertFileExists file="${zips.build.dir}/${zipping.type}/sf_mw_classicui_and_app_radio_01_part02_7.zip" />
+            <au:assertFileExists file="${zips.build.dir}/${zipping.type}/sf_mw_classicui_and_app_radio_01_part03_7.zip" />
+            <au:assertFileExists file="${zips.build.dir}/${zipping.type}/sf_mw_classicui_and_app_radio_01_part04_7.zip" />
+            <au:assertFileExists file="${zips.build.dir}/${zipping.type}/sf_mw_classicui_and_app_radio_01_part05_7.zip" />
+            <au:assertFileExists file="${zips.build.dir}/${zipping.type}/sf_mw_classicui_and_app_radio_01_part06_7.zip" />
+            <au:assertFileExists file="${zips.build.dir}/${zipping.type}/sf_mw_classicui_and_app_radio_01_1401.zip" />
+            <au:assertFileExists file="${zips.build.dir}/${zipping.type}/sf_os_01_0.zip" />
+            <au:assertFileExists file="${zips.build.dir}/${zipping.type}/sf_os_01_1.zip" />
+            <au:assertFileExists file="${zips.build.dir}/${zipping.type}/sf_os_01_part01_2.zip" />
+            <au:assertFileExists file="${zips.build.dir}/${zipping.type}/sf_os_01_3.zip" />
+            <au:assertFileExists file="${zips.build.dir}/${zipping.type}/sf_os_01_part01_1422.zip" />
+            <au:assertFileExists file="${zips.build.dir}/${zipping.type}/sf_os_01_part02_1422.zip" />
+            <au:assertFileExists file="${zips.build.dir}/${zipping.type}/sf_os_01_part01_1435.zip" />
+        </target>
 
 
     <target name="minibuild-cleanup">

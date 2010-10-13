@@ -21,6 +21,7 @@
 import logging
 import os
 import unittest
+import urllib2
 
 import helium.logger
 import helium.outputer
@@ -88,10 +89,13 @@ class TestHeliumLogger(unittest.TestCase):
         mclogger.WriteToFile('log.xml')
         
         _logger.info(mclogger)
-        
-        out = helium.outputer.XML2XHTML('log.xml')
-        out.generate()
-        out.WriteToFile('log.html')
+
+        try:
+            out = helium.outputer.XML2XHTML('log.xml')
+            out.generate()
+            out.WriteToFile('log.html')
+        except urllib2.URLError, e:
+            _logger.warning('Test cannont run properly as the configuration url cannot be accessed properly.')
         
         os.unlink('log.xml')
         os.unlink('log.html')

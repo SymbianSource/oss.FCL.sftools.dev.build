@@ -32,8 +32,10 @@ Description:
     <property name="s60.grace.product" value="DFS7x.92" />
     <property name="s60.grace.release" value="92_\d{6}_hw79" />
     
+    <property name="sysdef3.enabled" value="true" />
+    <property name="codescanner.enabled" value="false" />
+    
     <!-- enable coverity -->
-    <property name="coverity.enabled" value="true"/>
     <property name="coverity.commit.defects.enabled" value="true"/>
     <property name="coverity.defect.manager.server" value="ousrv057.europe.nokia.com"/>
     <property name="coverity.defect.manager.port" value="5467"/>
@@ -50,7 +52,9 @@ Description:
 
     <property name="build.name" value="minibuild_ido_sbs_coverity" />
     <property name="build.family" value="test_minibuild_ido_sbs_coverity" />
-        
+    
+    <property name="sfvalidate.enabled" value="true" />
+    
     <target name="minibuild-check">
         <!-- Check if prep has set some prop correctly... -->
         <echo>'${arm.compiler.version}'</echo>
@@ -67,9 +71,43 @@ Description:
         </if>
     </target>
     
+    <!-- Preparing the content on top of the env -->
+    <target name="ido-50-build" depends="ido-build-prep,compile-main-source,build-log-summary,render-internal-exports,
+                                         update-policy-src-reference,render-validate-policy,check-sf-source-header,
+                                         ido-codescanner,ido-check-sf-source-header,iad-check-pkg-version,ats-test,publish-tasks-to-folder,
+                                         ido-sources-to-s60-build-robot,check-epl-errors" />
+    
+    <target name="ido-build-prep" depends="ido-configure-prep,init,log-build-env,set-arm-version,check-free-space,
+                                               diamonds,do-prep-work-area,ido-prep-clean-source,ido-prep-copy,create-bom" />
+    
+    <target name="ido-prep-clean-source">
+        <antcall target="ido-prep-clean">
+           <param name="enabled.coverity" value="false"/>
+        </antcall>
+    </target>
+    
+    <target name="compile-main-source">
+        <antcall target="compile-main">
+           <param name="coverity.enabled" value="true"/>
+        </antcall>
+    </target>
+    
 
     <import file="../ido/build.xml"/>
     <import file="build.sbsinput.ant.xml" />
+    
+    <hlm:signalInput id="EPLLicenseSignalInput" failbuild="never">
+        <hlm:notifierListRef refid="defaultFailNotifier" />
+    </hlm:signalInput>
+    
+    <target name="check-epl-errors">
+        <loadfile property="epl.errors" srcFile="${sf.check.source.log}"/>
+        <au:assertMatches string="${epl.errors}"
+            pattern="ERROR: EPL license header not found:"
+            message="EPL validation is not done."
+            multiline="true"
+        />
+    </target>
 </project>
 
     

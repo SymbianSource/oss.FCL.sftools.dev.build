@@ -25,5 +25,12 @@ Description:
 	<target name="test">
 		<echo> Test target </echo>
 	</target>
-		
+
+  <target name="test2">
+    <echo>Test target test2</echo>
+    <script language="jython">
+if ${build.drive} is None:
+	print "Not found"        
+    </script>    
+  </target>		
 </project>

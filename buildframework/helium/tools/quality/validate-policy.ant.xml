@@ -219,7 +219,7 @@ if output is not None:
     Render the policy validation xml file ('validate.policy.log') into an text output.
   -->
     <target name="render-validate-policy" depends="integration-validate-policy">
-        <fmpp sourceFile="${helium.dir}/tools/common/templates/integration/validate-policy.log.ftl" outputFile="${post.log.dir}/${build.id}_validate-policy.log">
+        <fmpp sourceFile="${helium.dir}/tools/quality/templates/validate-policy.log.ftl" outputFile="${post.log.dir}/${build.id}_validate-policy.log">
             <freemarkerLinks expandProperties="yes">
                 macro: ${helium.dir}/tools/common/templates/macro
             </freemarkerLinks>
@@ -228,7 +228,7 @@ if output is not None:
                 ant: antProperties()
             </data>
         </fmpp>
-        <fmpp sourceFile="${helium.dir}/tools/common/templates/integration/validate-policy.log.xml.ftl" outputFile="${validate.policy.log.xml}">
+        <fmpp sourceFile="${helium.dir}/tools/quality/templates/validate-policy.log.xml.ftl" outputFile="${validate.policy.log.xml}">
             <freemarkerLinks expandProperties="yes">
                 macro: ${helium.dir}/tools/common/templates/macro
             </freemarkerLinks>
@@ -249,9 +249,11 @@ if output is not None:
     </target>
 
     <!-- Policy validation target for IDO. Only detected ADO will get scanned. -->    
-    <target name="ido-validate-policy" depends="ido-create-ado-mapping" if="internal.policy.file.validation.enabled">
+    <target name="ido-validate-policy" if="internal.policy.file.validation.enabled">
+        <property name="policy.mapping.file" location="${build.output.dir}/build/ado_mapping_policy.ini" />
+        <hlm:createAdoMappingMacro adoMapFile="${policy.mapping.file}" mapForQuality="true"/>
         <hlm:record name="${temp.build.dir}/${build.id}_validate-policy.ant.log" action="start" />
-        <hlm:iniKeys2Path ini="${ado.quality.mapping.file}" pathid="reference.policy.path.list"/>
+        <hlm:iniKeys2Path ini="${policy.mapping.file}" pathid="reference.policy.path.list"/>
         <runtarget target="render-validate-policy" />
         <hlm:record name="${temp.build.dir}/${build.id}_validate-policy.ant.log" action="stop" />
     </target>

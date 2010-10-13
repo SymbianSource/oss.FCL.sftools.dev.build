@@ -125,6 +125,10 @@ class PreparationSnapshot(PreparationAction):
         session = self.get_session()
         project = session.create(self._config.name)
 
+        session.home = self._config['dir']
+        path = os.path.join(session.home, project.name)
+        project.work_area(False, True, True, path=path)
+
         target_dir = os.path.normpath(os.path.join(self._config['dir'], project.name))
         _logger.info("Deleting snapshot under %s." % target_dir)
         if os.path.exists(target_dir):
@@ -209,13 +213,9 @@ class PreparationCheckout(PreparationAction):
         
         for project in self.__get_subbaselines():
             self._check_object(project)
-        
-        try:
-            if (not os.path.exists(self._config['dir'])):
-                os.makedirs(self._config['dir'])
-        except Exception:
-            _logger.info("ERROR: Not able to create the synergy workarea %s " % (self._config['dir']))
-            raise Exception("ERROR: Not able to create the synergy workarea %s" % self._config.name)
+
+        if (not os.path.exists(self._config['dir'])):
+            os.makedirs(self._config['dir'])
             
         # checking if the purpose exists
         if self._config.has_key('purpose'):
@@ -241,6 +241,10 @@ class PreparationCheckout(PreparationAction):
         session.home = self._config['dir']
         
         result = self.__find_project(project)
+        
+        path = os.path.join(session.home, project.name)
+        project.work_area(False, True, True, path=path)
+        
         if (result != None):
             _logger.info("Project found: '%s'" % result)
             role = session.role
@@ -308,9 +312,14 @@ class PreparationCheckout(PreparationAction):
                 _logger.info("Using version: '%s'" % version)
 
             try:
-                self.__setRole(session)
-                result = project.checkout(session.create(self._config['release']), version=version, purpose=purpose)
+                if (not self._config.get_boolean('use.default_wa_path', True)):
+                    wa_path = self._config['dir']
+                    _logger.info("Using work area path to checkout directly")
+                    result = project.checkout(session.create(self._config['release']), version=version, purpose=purpose, path=wa_path)
+                else:
+                    result = project.checkout(session.create(self._config['release']), version=version, purpose=purpose)
                 ccm.log_result(result, ccm.CHECKOUT_LOG_RULES, _logger)
+                self.__setRole(session)
             except ccm.CCMException, exc:
                 ccm.log_result(exc.result, ccm.CHECKOUT_LOG_RULES, _logger)
                 raise exc

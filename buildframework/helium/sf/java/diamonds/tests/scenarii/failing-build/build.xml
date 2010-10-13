@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<!-- 
+============================================================================ 
+Name        : test_diamonds.ant.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test-diamonds" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>Helium Antlib diamonds unittests.</description>
+    <property environment="env" />
+    <taskdef resource="com/nokia/helium/core/ant/antlib.xml" uri="http://www.nokia.com/helium"/>
+    <taskdef resource="com/nokia/helium/diamonds/ant/antlib.xml" uri="http://www.nokia.com/helium"/>
+    
+    <property name="diamonds.enabled" value="true" />
+    <property name="diamonds.unitest.dir" location="${ant.file.test-diamonds}/../../../" />
+    <import file="../../../../../../nokia/companyproperties.ant.xml" optional="true"/>
+    <import file="../../config/diamonds_config_default.ant.xml" />
+    <property name="diamonds.output.dir" location="${temp.dir}/output" />
+    <property name="diamonds.template.dir" location="${diamonds.unitest.dir}/data/templates" />
+    <property name="build.family" value="test_helium_diamonds_unitest_failing_build"/>
+    <property name="id" value="123"/>
+    <property name="name" value="${build.family}_${id}"/>
+    <property name="build.system" value="ec-helium"/>
+    <import file="${diamonds.unitest.dir}/config/diamonds_config_default.ant.xml" />
+
+
+    <target name="build" depends="diamonds,backup-diamonds-id,failing-target" />
+    
+    <target name="diamonds" />
+    
+    <target name="backup-diamonds-id">
+        <echoproperties destfile="${temp.dir}/diamonds.ini">
+            <propertyset>
+                <propertyref prefix="diamonds.host"/>
+                <propertyref prefix="diamonds.port"/>
+                <propertyref prefix="diamonds.build.id"/>
+            </propertyset>
+        </echoproperties>
+    </target>
+    
+    <target name="failing-target">
+        <fail message="some error in the build." />
+    </target>
+
+</project>

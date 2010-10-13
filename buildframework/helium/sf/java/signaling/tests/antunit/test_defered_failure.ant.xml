@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!-- 
+============================================================================ 
+Name        : build.xml 
+Part of     : Helium
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test-deferred-failure" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    
+    <taskdef resource="com/nokia/helium/signal/ant/antlib.xml" uri="http://www.nokia.com/helium" />
+    <import file="run-scenario.ant.xml" />
+
+    <!-- This scenario is testing the SignalStatusDef is correctly failing the build -->
+    <target name="test-failing-build">
+        <au:expectfailure>
+            <runScenario scenario="test-deferred-failure" target="build" />
+        </au:expectfailure>
+        <au:assertLogContains text="BUILD FAILED" />
+        <au:assertLogContains text="Executing failing-target." />
+        <au:assertLogContains text="Executing build." />
+    </target>
+   
+</project>

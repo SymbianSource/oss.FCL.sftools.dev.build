@@ -29,10 +29,10 @@ Description:
     <illegal-apis>
     <#list doc.api_dataset.api as illegal>
         <#if illegal.release.@category == 'private'>
-            <api>${illegal.buildfiles.file.path}</api>
+            <api>${illegal.buildfiles.file.path?xml}</api>
         </#if>
         <#if illegal.release.@category == 'internal'>
-            <api>${illegal.buildfiles.file.path}</api>
+            <api>${illegal.buildfiles.file.path?xml}</api>
         </#if>
     </#list>
     </illegal-apis>

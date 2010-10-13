@@ -19,7 +19,7 @@ Description:
 
 ============================================================================
 -->
-{% macro ctc_initialization() -%}
+{% macro ctc_initialization(test_plan) -%}
             <task>
                 <type>CreateDirTask</type>
                 <parameters>
@@ -35,7 +35,7 @@ Description:
             </task>
 {%- endmacro %}
 
-{% macro ctc_finalization(setd) -%}
+{% macro ctc_finalization(test_plan) -%}
             <task>
                 <type>NonTestExecuteTask</type>
                 <parameters>
@@ -68,6 +68,7 @@ Description:
 {% macro generate_runsteps_stif(setd) -%}
             {% set ini_file = atsself.stif_init_file(setd['src_dst']) %}
             {% if ini_file -%}
+            {% set ini_file_module_name = atsself.stifmodulename(ini_file[0])  %}
         {% if test_plan['hti'] == 'True' -%}
         <task>
             <type>StifRunCasesTask</type>
@@ -90,7 +91,8 @@ Description:
             </parameters>
         </task>
         {%- endif %}
-            {% else -%}
+        {%- endif %}
+            
                 {% for file in setd['src_dst'] -%}
                     {% if setd["test_harness"] == "STIF" or setd["test_harness"] == "STIFUNIT" -%}
                         {% if file[2] == "conf" and ".dll" not in file[1].lower() -%}
@@ -98,10 +100,17 @@ Description:
         <task>
             <type>StifRunCasesTask</type>
             <parameters>
+                {% if ini_file_module_name.upper() == 'TEFTESTMODULE' -%}
+                <parameter name="module" value="{{ ini_file_module_name }}"/>
+                {% else -%}
                 <parameter name="module" value="TESTSCRIPTER"/>
+                {%- endif %}
                 <parameter name="filter" value="*"/>
                 <parameter name="timeout" value="{{ test_plan["test_timeout"] }}"/>
                 <parameter name="testcase-file" value="{{ file[1] }}"/>
+                {% if ini_file_module_name.upper() == 'TEFTESTMODULE' and test_plan['ats_stf_enabled'].lower() == "true" -%}                
+                <parameter name="result-file" value="{{ atsself.AtsInterface_LOG_DIR }}\{{ ini_file_module_name }}.xml" />
+                {%- endif %}
             </parameters>
         </task>
         {% else -%}
@@ -110,8 +119,13 @@ Description:
             <parameters>
                 <parameter name="timeout" value="{{ test_plan["test_timeout"] }}"/>
                 <parameter name="file" value="atsinterface.exe" />
+                {% if ini_file_module_name.upper() == 'TEFTESTMODULE' -%}
+                <parameter name="parameters" value="-testmodule {{ ini_file_module_name }}" />
+                <parameter name="result-file" value="{{ atsself.AtsInterface_LOG_DIR }}\{{ ini_file_module_name }}.xml" />
+                {% else -%}
                 <parameter name="parameters" value="-testmodule TESTSCRIPTER" />
                 <parameter name="result-file" value="{{ atsself.AtsInterface_LOG_DIR }}\TESTSCRIPTER.xml" />
+                {%- endif %}
                 <parameter name="result-download-retry-count" value="1" />
                 <parameter name="result-download-reboot-retry-count" value="1" />
             </parameters>
@@ -123,7 +137,7 @@ Description:
         <task>
             <type>StifRunCasesTask</type>
             <parameters>
-                <parameter name="module" value="{{ os.path.basename(file[1]) }}"/>
+                <parameter name="module" value="{{ atspath.basename(file[1]) }}"/>
                 <parameter name="filter" value="*"/>
                 <parameter name="timeout" value="{{ test_plan["test_timeout"] }}"/>
             </parameters>
@@ -144,11 +158,13 @@ Description:
                         {%- endif %}
                     {%- endif %}
                 {%- endfor %}
-            {%- endif %}
 {%- endmacro %}
 
 {% macro generate_runsteps_stif_single_set(setd) -%}
             {% if setd["engine_ini_file"] != None -%}
+
+            {% set ini_file_module_name = atsself.stifmodulename(setd["engine_ini_file"])  %}
+            
         {% if test_plan['hti'] == 'True' -%}
         <task>
             <type>StifRunCasesTask</type>
@@ -171,16 +187,24 @@ Description:
             </parameters>
         </task>
         {%- endif %}
-            {% elif setd["config_files"] != [] -%}
+        {%- endif %}
+            {% if setd["config_files"] != [] -%}
                  {% for config_file in setd["config_files"] -%}
         {% if test_plan['hti'] == 'True' -%}
         <task>
             <type>StifRunCasesTask</type>
             <parameters>
+                {% if ini_file_module_name.upper() == 'TEFTESTMODULE' -%}
+                <parameter name="module" value="{{ ini_file_module_name }}"/>
+                {% else -%}
                 <parameter name="module" value="TESTSCRIPTER"/>
+                {%- endif %}
                 <parameter name="filter" value="*"/>
                 <parameter name="timeout" value="{{ test_plan["test_timeout"] }}"/>
                 <parameter name="testcase-file" value="e:\testing\conf\{{ os.path.basename(config_file) }}"/>
+                {% if ini_file_module_name.upper() == 'TEFTESTMODULE' and test_plan['ats_stf_enabled'].lower() == "true" -%}
+                <parameter name="result-file" value="e:\testing\conf\{{ os.path.basename(config_file) }}.xml" />
+                {%- endif %}
             </parameters>
         </task>
         {% else -%}

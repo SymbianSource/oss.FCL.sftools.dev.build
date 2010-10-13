@@ -107,7 +107,7 @@ strict digraph G {
     "DOS Scripting" -> NOSE[dir=none, lhead=cluster_4_1, ltail=cluster_4];
    
     
-    Start [fontcolor=navyblue,fontsize=12,style=filled,href="introduction.html"];
+    Start [fontcolor=navyblue,fontsize=12,style=filled,href="manual/introduction.html"];
     
     Ant [fontcolor=navyblue,fontsize=12,shape=box,href="http://ant.apache.org/manual/"];
     "Running Helium" [fontcolor=navyblue,fontsize=12,shape=box,href="manual/running.html"];
@@ -123,7 +123,7 @@ strict digraph G {
     "ROM Image" [fontcolor=navyblue,fontsize=12,shape=box,href="tutorials/rom_image.html"];
     
     <#if !(ant?keys?seq_contains("sf"))>
-        "Setting up Helium at Nokia" [fontcolor=navyblue,fontsize=12,shape=box,href="nokia/nokia.html"];
+        "Setting up Helium at Nokia" [fontcolor=navyblue,fontsize=12,shape=box,href="manual/retrieving.html"];
         "Helium Nokia Stages" [fontcolor=navyblue,fontsize=12,shape=box,href="manual/nokiastages.html"];
         Diamonds [fontcolor=navyblue,fontsize=12,shape=box,href="http://diamonds.nmp.nokia.com/diamonds/"];
         "Helium Wiki" [fontcolor=navyblue,fontsize=12,shape=box,href="http://delivery.nmp.nokia.com/trac/helium/wiki"];
@@ -131,7 +131,7 @@ strict digraph G {
         MCL [fontcolor=navyblue,fontsize=12,shape=box,href="http://s60wiki.nokia.com/S60Wiki/S60_Software_Asset_Management/Organization/Delivery_Services/Howto_build_DFS70.91.91_/_S60.MCL_with_Helium"];
         IDO [fontcolor=navyblue,fontsize=12,shape=box,href="http://helium.nmp.nokia.com/doc/ido"];
         TeamCI [fontcolor=navyblue,fontsize=12,shape=box,href="http://helium.nmp.nokia.com/doc/teamci"];
-        "Helium Test Plan" [fontcolor=navyblue,fontsize=12,shape=box,href="manual/testing.html"];
+        "Helium Test Plan" [fontcolor=navyblue,fontsize=12,shape=box,href="development/testing.html"];
     </#if>
       
     "Helium Developer Guide" [fontcolor=navyblue,fontsize=12,shape=box,href="development/developer_guide.html"];
@@ -139,7 +139,7 @@ strict digraph G {
     Python [fontcolor=navyblue,fontsize=12,shape=box,href="http://www.python.org/"];
     Java [fontcolor=navyblue,fontsize=12,shape=box,href="http://java.sun.com/j2se/"];
     FMPP [fontcolor=navyblue,fontsize=12,shape=box,href="http://fmpp.sourceforge.net/"];
-    "DOS Scripting" [fontcolor=navyblue,fontsize=12,shape=box,href="http://en.wikipedia.org/wiki/Batch_script"];
+    "DOS Scripting" [fontcolor=navyblue,fontsize=12,shape=box,href="http://en.wikipedia.org/wiki/Batch_file"];
     ANTUnit [fontcolor=navyblue,fontsize=12,shape=box,href="http://ant.apache.org/antlibs/antunit/"];
     NOSE [fontcolor=navyblue,fontsize=12,shape=box,href="http://ivory.idyll.org/articles/nose-intro.html"];
 }

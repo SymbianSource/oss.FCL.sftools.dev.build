@@ -46,7 +46,7 @@ General conventions
 Documentation
 =============
 
-Standalone documents like this design document and the user guide are documented in reStructuredText__ format.
+Standalone documents like this design document and the user guide are documented in reStructuredText_ format.
 
 __ http://docutils.sourceforge.net/rst.html
 
@@ -73,8 +73,31 @@ It is possible to link to targets, properties and macros in the API documentatio
    "``hlm-p``", "Properties"
    "``hlm-m``", "Macros"
    
-   It is **not** possible to link to the task or anything in the Java documentation. 
    
+.. note:: It is **not** possible to link to tasks or anything in the Java documentation. 
+   
+A section of RST documentation might look like this::
+
+    The :hlm-t:`foo` target requires the :hlm-p:`bar` property to be defined. It uses the :hlm-t:`bazMacro` macro.
+
+Fields from the API elements can also be embedded in the RST documentation using an index-like syntax::
+
+    :hlm-p:`bar[summary]`
+    
+This would extract the ``summary`` field of the ``bar`` property and insert it into the document. The available fields are:
+    
+.. csv-table:: API element fields
+   :header: "Field", "Description"
+   
+   "summary", "The first sentence or section of the documentation."
+   "documentation", "The whole documentation text."
+   "scope", "The visibility scope."
+   "defaultValue", "The default value if one is defined. Properties only."
+   "type", "The type of the element. Properties only."
+   "editable", "Whether definition is required or optional. Properties only."
+   "deprecated", "Deprecation message."
+    
+    
 Creating Index References
 `````````````````````````
 
@@ -129,7 +152,7 @@ The Helium API documentation is generated directly from the Ant source files. Ad
    :header: "Tag", "Applies to", "Description"
 
    "scope", "All elements", "The scope or visibility of the element. Valid values are ``public`` (default), ``protected`` and ``private``."
-   "editable", "All types", "Whether this element should be overridden or defined by the user. Valid values are ``required`` and ``optional``"
+   "editable", "All types", "Indicates whether the property must be defined or not. Valid values are ``required`` and ``optional``. ``required`` means it must be defined for the related feature to work. The user must define it if there is no default value, i.e. it is not already defined in Helium."
    "type", "Properties", "The type of the property value. Valid values are ``string`` (default), ``integer``, ``boolean``."
    "deprecated", "All elements", "Documents that the element is deprecated and may be removed in a future release. The text should describe what to use instead."
 
@@ -341,7 +364,7 @@ Unit testing
 
 * Unit tests are written for each Python module.
 * They should follow the Nose_ testing framework conventions.
-* The test suite is run by calling :hlm-t:`py-unittest`.
+* The test suite is run by calling ``bld test``.
 
 .. _Nose : http://somethingaboutorange.com/mrl/projects/nose/
 
@@ -364,7 +387,7 @@ These reference standards are used for all conventions not covered above.
 * `Twisted Coding Standard`_ (but with a grain of salt):
 
 .. _`PEP 8 - Style Guide for Python Code` : http://www.python.org/dev/peps/pep-0008/
-.. _`Twisted Coding Standard` : http://twistedmatrix.com/trac/browser/trunk/doc/development/policy/coding-standard.xhtml?format=raw
+.. _`Twisted Coding Standard` : http://twistedmatrix.com/documents/current/core/development/policy/coding-standard.html
 
 
 .. index::

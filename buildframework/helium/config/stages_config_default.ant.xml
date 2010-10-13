@@ -26,6 +26,10 @@ Description:
     </description>
     
     <taskdef resource="com/nokia/helium/logger/ant/antlib.xml" uri="http://www.nokia.com/helium" />
+
+    <!-- Registering the stage recorder. -->
+    <hlm:stagerecorderlistener id="stage.recorder.listener.id" />
+
     
     <!-- Build Stage Summary configuration -->
     <!-- Comment out below line to skip displaying build stage summary at end of build process -->

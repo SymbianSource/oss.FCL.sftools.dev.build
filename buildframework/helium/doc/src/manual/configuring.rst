@@ -84,7 +84,7 @@ In the context of Helium, some specific elements and properties should be used. 
         <import file="${helium.dir}/helium.ant.xml"/>
     </project>
 
-Note that here the default target is :hlm-t:`product-build` so this would be used for a product build configuration. In reality it would need many more properties to be complete.
+Note that here the default target is ``product-build`` so this would be used for a product build configuration. In reality it would need many more properties to be complete.
 
 Refer to the `configuration reference`_ for a full list of all Helium Ant properties.
 
@@ -188,9 +188,7 @@ A default configuration of the signals is defined in ``config/helium_signals_def
 Viewing target dependencies
 ===========================
 
-The :hlm-t:`deps` target can be used to display a list of the target dependencies for a given target. See the `manual page`_ for more information. Also the :hlm-t:`execlist` command works in a similar way but shows a dialog showing a separated list of all the dependent targets and then just the top-level of dependencies, to help with continuing a build on the command line.
-
-.. _`manual page`: ../api/helium/target-deps.html
+The :hlm-t:`deps` target can be used to display a list of the target dependencies for a given target. Also the :hlm-t:`execlist` command works in a similar way but shows a dialog showing a separated list of all the dependent targets and then just the top-level of dependencies, to help with continuing a build on the command line.
 
 
 .. index::

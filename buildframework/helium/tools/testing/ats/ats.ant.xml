@@ -25,7 +25,7 @@ Description:
     <description>
     ATS testing targets.
     </description>
-    
+          
     <!--* @property ats.enabled
     Value must be set to execute ats-test target.
     @type boolean
@@ -34,12 +34,88 @@ Description:
     @since 11.0
     -->
     
+    <!--* @property ats.bootuptest.enabled
+    Value must be set to execute ats-bootup-test target.
+    @type boolean
+    @scope public
+    @since 12.0
+    -->
+
     <!--* @property internal.ats.enabled
     Set to run ats targests if ats.enabled set to true.
     @type boolean
     @scope private
     -->
+
+    <!--* @property ats.aste.testasset.location
+    Location of SW Test Assets, if the TestAsset is not packaged then it is first compressed to a .zip  file. It should be a UNC path.
+    @type string
+    @editable required
+    @scope public
+    -->
+
+    <!--* @property eunit.test.package
+    The EUnit package name to be unzipped on the environment, for executing EUnit tests.
+    @type string
+    @scope public
+    -->
+
+    <!--* @property ats.script.type
+    There are two types of ats script files to send drop to ATS server, runx and import; only difference is that with import  ATS doesn't have to have access rights to testdrop.zip file, as it is sent to the system over http and import doesn't need network shares. If that is not needed import should not be used. Default value is runx as import involves heavy processing on ATS server.
+    @type string
+    @scope public
+    -->
+
+    <!--* @property tsrc.path.list
+    Contains list of the tsrc directories. Gets the list from system definition layer files. Assuming that the test components are defined already in te layers.sysdef.xml  files to get compiled. Not recommended, but the property value can be set if there are no System Definition file(s), and tsrc directories paths to set manually.
+    @type string
+    @scope public
+    -->
+
+    <!--* @property ats.diamonds.signal
+    Should be true  so at end of the build diamonds is checked for test results and Helium fails if tests failed.
+    @type string
+    @scope public
+    -->
+
+    <!-- Contains a test filterset name. A filterset is used to select/unselect test components. The filter(s) is/are effective when the same filters are defined in the package definition file for component(s).
+    @type string
+    @editable required
+    @scope public
+    @since 10.79
+    -->
+    <property name="ats.test.filterset" value="sysdef.filters.test" />
+    <hlm:sysdefFilterSet id="sysdef.filters.test" >
+        <filter filter="test" />
+    </hlm:sysdefFilterSet>
     
+    <!--* @property tdriver.asset.location
+    The location of the test asset where ruby test files, sip profiles, hardware data etc are located.
+    @type string
+    @editable required
+    @scope public
+    -->
+    
+    <!--* @property tdriver.test.profiles
+    Test profiles to be executed should be mentioned in this comma separated list e.g., 'bat, fute'.
+    @type string
+    @editable required
+    @scope public
+    -->
+    
+    <!--* @property tdriver.tdrunner.enabled
+    Mustbe set to 'true' if TDrunner is engine is to be used. If true .sip files are used otherwise .rb (ruby) files are used to execute tests.
+    @type boolean
+    @editable required
+    @scope public
+    -->
+
+    <!--* @property tdriver.template.file
+    Location of the TDriver template file if user wants to use own template file instead of the default one.
+    @type string
+    @scope public
+    -->
+
     <!--* @property enabled.ats
     Value must be set to execute ats-test target. - deprecated: Start using ats.enabled property.
     @type boolean
@@ -77,12 +153,19 @@ Description:
     @scope public
     @since 11.0
     -->
-    
+
     <!--* @property internal.ats4.enabled
     Set if ats4.enabled is set to true. To run ats4 dependent targets.
     @type boolean
     @scope private
     -->
+
+    <!-- Execute test cases using stf on ats4. Defaults to True, Set it to False if you do not want to enable stf.
+    @type boolean
+    @scope public
+    @since 12.0
+    -->
+    <property name="ats.stf.enabled" value="true"/>
     
     <!--* @property ats.product.name
     Name of the product to be tested. For example: "PRODUCT"
@@ -106,14 +189,14 @@ Description:
     -->
     
     <!--* @property ats.password
-    Password for ATS. This password might be different from NOE or HTTP/UNIX password.
+    Password for ATS3. This password might be different from NOE or HTTP/UNIX password.
     @type string
     @editable required
     @scope public
     -->
     
     <!--* @property ats.username
-    Username for ATS server. This is NOT the NOE or HTTP/UNIX username.
+    Username for ATS3 server. This is NOT the NOE or HTTP/UNIX username.
     @type string
     @editable required
     @scope public
@@ -163,16 +246,16 @@ Description:
     @deprecated since 11.0
     -->
     
-    <!--* @property matti.enabled
-    Value must be set to true to enable testing with matti.
+    <!--* @property ats.tdriver.enabled
+    Value must be set to true to enable testing with TDriver.
     @type boolean
     @editable required
     @scope public
     @since 11.0
     -->
     
-    <!--* @property internal.matti.enabled
-    Set to run matti targets if matti.enabled is set to true.
+    <!--* @property internal.ats.tdriver.enabled
+    Set to run TDriver targets if ats.tdriver.enabled is set to true.
     @type boolean
     @scope private
     -->
@@ -185,12 +268,6 @@ Description:
     @since 11.0
     -->
     
-    <!--* @property ats.delta.enabled
-    Set to run ats delta target if  ats.delta.enabled set to true.
-    @type boolean
-    @scope private
-    -->
-    
     <!--* @property ats.disable.java.importer
     To disable java importer for ats. - deprecated: Start using ats.java.importer.enabled property.
     @type boolean
@@ -199,7 +276,7 @@ Description:
     @deprecated since 11.0
     -->
         
-    <!-- To disable java importer for ats
+    <!-- To disable java importer for ats3
     @type boolean
     @editable required
     @scope public
@@ -277,12 +354,17 @@ Description:
             <isset property="enabled.aste"/>
         </or>
     </condition>
-    
+
+    <!-- Check if bootup testing is enabled -->
+    <condition property="internal.ats.bootuptest.enabled">
+        <istrue value="${ats.bootuptest.enabled}" />
+    </condition>
+
     <!-- Check is the ast4 enabled -->
     <condition property="internal.ats4.enabled" value="true" else="false">
         <istrue value="${ats4.enabled}" />
     </condition>
-    
+
     <!-- Check is the ats emulator enabled -->
     <condition property="internal.ats.emulator.enabled">
         <or>
@@ -291,9 +373,13 @@ Description:
         </or>
     </condition>
     
-    <!-- Check is the ats matti enabled -->
-    <condition property="internal.matti.enabled">
-        <istrue value="${matti.enabled}" />
+    <!-- Check is the ats TDriver enabled -->
+    <condition property="internal.ats.tdriver.enabled">
+        <or>
+            <istrue value="${ats.tdriver.enabled}" />
+            <istrue value="${tdriver.enabled}" />
+            <istrue value="${matti.enabled}" />
+        </or>
     </condition>
     
     <!-- Check is the ats ats delta enabled -->
@@ -321,7 +407,21 @@ Description:
         </or>
     </condition>
     
+    <!-- Should be "true" if coverage measurement and dynamic analysis (CTC) tool support is to be used by ATS. Default value is "false", the values are case-sensitive.
+    @type boolean
+    @editable required
+    @scope public
+    -->
+    <property name="ats.ctc.enabled" value="false"/>
     
+    <!--* @property internal.ats.ctc.enabled
+    Set to run the ats ctc targets.
+    @type boolean
+    @scope private
+    -->
+    <condition property="internal.ats.ctc.enabled">
+        <istrue value="${ats.ctc.enabled}" />
+    </condition>
     
     <!--  -->
     <fileset id="reference.ats.flash.images" dir="${release.images.dir}">
@@ -345,7 +445,7 @@ Description:
     <fileset id="reference.ats.sis.images" dir="${ats.sis.images.dir}">
         <include name="**/*.sis" />
     </fileset>
-    <!-- Limit of minimum number of sis files to execute matti-test target, otherwise MATTI-drop.zip will not be generated. Default value is "1" files.
+    <!-- Limit of minimum number of sis files to execute tdriver-test target, otherwise TDriver-drop.zip will not be generated. Default value is "1" files.
     @type string
     @scope public
     -->
@@ -406,20 +506,26 @@ Description:
         <hlm:generateBuildStatus file="${test.log.dir}/${build.id}_aste.log" />
     </target>
 
-    <!-- The target creates the MATTI_drop.zip file including test.xml for MATTI tests. This target is executable.-->
-    <target name="matti-test" if="internal.matti.enabled">
+    <!-- Old target for tdriver-test. Deprecated in Helium 12 -->
+    <target name="matti-test">
+        <runtarget target="tdriver-test" />
+    </target>
+    
+    <!-- The target creates the TDriver_drop.zip file including test.xml for TDriver tests. This target is executable.-->
+    <target name="tdriver-test" if="internal.ats.tdriver.enabled">
         <mkdir dir="${test.log.dir}"/>
         <runtarget target="load-property-from-cache-file" />
         <hlm:filterRecordStartMacro pattern="${ats.password}" category="ats"/>
-        <runtarget target="do-ats-matti" />
-        <hlm:filterRecordStopMacro log="${test.log.dir}/${build.id}_matti.log" append="false"/>
+        <runtarget target="copy-mon-sym" />
+        <runtarget target="do-ats-tdriver" />
+        <hlm:filterRecordStopMacro log="${test.log.dir}/${build.id}_tdriver.log" append="false"/>
         <hlm:metadatarecord database="${metadata.dbfile}">
             <hlm:textmetadatainput>
-                <fileset casesensitive="false" file="${test.log.dir}/${build.id}_matti.log" />
-                <metadatafilterset refid="filterset.matti" />
+                <fileset casesensitive="false" file="${test.log.dir}/${build.id}_tdriver.log" />
+                <metadatafilterset refid="filterset.tdriver" />
             </hlm:textmetadatainput>
         </hlm:metadatarecord>
-        <hlm:generateBuildStatus file="${test.log.dir}/${build.id}_matti.log" />
+        <hlm:generateBuildStatus file="${test.log.dir}/${build.id}_tdriver.log" />
     </target>
 
     <!-- Sends drop file to ATS/ASTE. Please see `ats-test` for description. -->
@@ -455,6 +561,7 @@ if '1.6.0' in version:
                 <condition property="ats4.libs" value="${helium.dir}/extensions/nokia/external/ats4" else="${helium.dir}/external/antlibs">
                     <available type="dir" file="${helium.dir}/extensions/nokia/external/ats4"/>
                 </condition>
+                <echo message="Uploading using: -url http://${ats.server}/ServerService -path ${ats.drop.location.file} ${ats.import.arg}"/>
                 <java classname="com.nokia.ats.util.server.CommandLineClient" fork="true" maxmemory="1024m" failonerror="true">
                     <classpath>
                         <pathelement path="${java.class.path}"/>
@@ -511,7 +618,7 @@ if project.getProperty('internal.ats.iconfig.enabled') == 'true':
     ic = None
     try:
         ic = atsant.IConfigATS(project.getProperty('release.images.dir'), project.getProperty('ats.product.name'))
-    except Exception, ex:
+    except IOError, ex:
         print ex
     if ic:
         project.setProperty('ats.flash.images', ic.findimages())
@@ -538,6 +645,11 @@ if flashfilescount < mincount:
     <!-- Sets values common for ATS, this is a dependent target and shouldn't be used as an individual target -->
     <target name="ats-common">
         <property name="ats.config.file" value="" />
+
+        <!-- Text in name of PKG files to use eg. 'sanity' would only use xxxsanity.pkg files from components.
+        @type string
+        @scope public
+        -->
         <property name="ats.specific.pkg" value="" />
         
         <!-- Product HardWare ID (HWID) attached to ATS. By default the value of HWID is not set.
@@ -615,30 +727,17 @@ if flashfilescount < mincount:
         @editable required
         -->
         <property name="ats.trace.enabled" value="false"/>
-        
-        <!-- Should be "true" if coverage measurement and dynamic analysis (CTC) tool support is to be used by ATS. Default value is "false", the values are case-sensitive.
+        <!-- Should be ``true`` so a set is used for each pkg file in a component, this allows tests to run in parallel on several devices.
         @type boolean
-        @editable required
-        @scope public
-        -->
-        <property name="ats.ctc.enabled" value="false"/>
-        
-        <!--* @property internal.ats.ctc.enabled
-        Set to run the ats ctc targets.
-        @type boolean
-        @scope private
-        -->
-        <condition property="internal.ats.ctc.enabled">
-            <istrue value="${ats.ctc.enabled}" />
-        </condition>
-        
-        <!-- Flags for EUnit exerunner can be set by setting the value of this variable. The default flags are set to "/E S60AppEnv /R Off".
-        @type boolean
-        @editable required
         @scope public
         -->
         <property name="ats.multiset.enabled" value="false"/>
-                    
+        
+        <!-- Flags for EUnit exerunner can be set by setting the value of this variable. The default flags are set to "/E S60AppEnv /R Off".
+        @type string
+        @editable required
+        @scope public
+        -->         
         <property name="eunitexerunner.flags" value="/E S60AppEnv /R Off" />
             
         <!--* @property ats.obey.pkgfiles.rule.enabled
@@ -685,10 +784,32 @@ if flashfilescount < mincount:
     <!-- Sets default values for the ASTE, this is a dependent target and shouldn't be used as an individual target -->
     <target name="ats-set-defaults-aste" depends="ats-common">
         <var name="ats.drop.file" value="ATSAsteDrop.zip" />
+        <!-- Type of test to run. Default is 'smoke'.
+        @type string
+        @scope public
+        -->
         <property name="ats.aste.test.type" value="smoke" />
+        <!-- These are the cases that which tests should be run from the TestAsset. For example, value can be set as 100,101,102,103,105,106,. A comma is needed to separate case IDs
+        @type string
+        @scope public
+        -->
         <property name="ats.aste.testasset.caseids" value="100,101,102,103,105,106,107,108,109,110,111,112,113,114,115" />
+        <!-- Version of the software to be tested. For example: 'W81'
+        @type string
+        @editable required
+        @scope public
+        -->
         <property name="ats.aste.software.version" value="${build.id}" />
+        <!-- Variant Language to be tested. Default is 'English'
+        @type string
+        @scope public
+        -->
         <property name="ats.aste.language" value="English" />
+        <!-- Flash images releases, for example 'SPP 51.32'.
+        @type string
+        @editable required
+        @scope public
+        -->
         <property name="ats.aste.software.release" value="${build.name}" />
         <!-- Modify the plan name if you have understanding of test.xml file or leave it as it is. Default value is "plan"
         @type string
@@ -802,8 +923,10 @@ project.setProperty('ats.drops.count', str(len(modules)))
                     <arg value="--config=${ats.config.file}" />
                     <arg value="--obey-pkgfiles=${internal.ats.obey.pkgfiles.rule.enabled}" />
                     <arg value="--ats4-enabled=${internal.ats4.enabled}" />
+                    <arg value="--ats-stf-enabled=${ats.stf.enabled}" />
                     <arg value="--specific-pkg=${ats.specific.pkg}" />
                     <arg value="--hti=${ats.hti.enabled}" />
+                    <arg value="--minimum-execution-blocks=${ats.minimum.execution.blocks.enabled}" />
                     <arg value="--verbose" />
                     <arg line="${module.tsrc.@{module}}" />
                 </exec>
@@ -914,10 +1037,11 @@ project.setNewProperty('ats.ctc.monsyms', ';'.join([ "//%s/%s" % (server, x) for
     <macrodef name="evalidMacro" uri="http://www.nokia.com/helium">
         <attribute name="dir"/>
         <sequential>
-            <runtarget target="ido-create-ado-mapping"/>
+            <property name="evalid.mapping.file" location="${build.output.dir}/build/ado_mapping_evalid.ini" />
+            <hlm:createAdoMappingMacro adoMapFile="${evalid.mapping.file}" />
             <hlm:python>
 import delta_zip
-delta_zip.evalidAdomapping(r'${build.drive}', r'@{dir}', r'${ado.mapping.file}')
+delta_zip.evalidAdomapping(r'${build.drive}', r'@{dir}', r'${evalid.mapping.file}')
             </hlm:python>
         </sequential>
     </macrodef>
@@ -945,8 +1069,8 @@ project.addReference('ats.system.definition.files', atspath)
         </script>
     </target>
     
-    <!-- Common target to run ats, aste and matti -->
-    <target name="run-test" depends="ats-test,ats-aste,matti-test"/>
+    <!-- Common target to run ats, aste and TDriver -->
+    <target name="run-test" depends="ats-test,ats-aste,tdriver-test"/>
     
     <!-- Zip build area for emulator -->
     <target name="ats-emulator-zip" if="internal.ats.emulator.enabled">
@@ -986,48 +1110,109 @@ project.addReference('ats.system.definition.files', atspath)
         <runtarget target="do-ats-test" />
     </target>
 
-    <!-- a dependant target please do not call directly use matti-test,
-     target calls the MATTI script that creates the MATTI_drop.zip file and runs the tests
+    <!-- a dependant target please do not call directly use tdriver-test,
+     target calls the TDriver script that creates the TDriver_drop.zip file and runs the tests
      listed in test.rb.  ats-set-flash-image-path and ats-set-sis-flash-image-path look for lists of files-->
-    <target name="do-ats-matti" depends="ats-set-flash-image-path" >
+    <target name="do-ats-tdriver" depends="ats-set-flash-image-path" >
         <runtarget target="ats-set-defaults-stifeunit" />
+
+        <!-- Separate but similar property to ats.test.timeout for TDriver tests.
+        @type string
+        @editable required
+        @scope public
+        -->
+        <property name="tdriver.test.timeout" value="60" />
+        <!-- There are special sis files required to execute with test execution. This is a comma separated list in which several sis files can be deifned in a certain format like '<src file on build area>#<destination to save the file on memory card>#<destination to install the file>' e.g. <x:dir1abc.sis#f:memory1abc.sis#c:phonememoryprivateabc.sis>
+        @type string
+        @editable required
+        @scope public
+        -->
+        <property name="tdriver.sis.files" value=""/>
+        <!-- TDrunner parameters are set using this property. e.g. 'teardown ordered'.
+        @type string
+        @editable required
+        @scope public
+        -->
+        <property name="tdriver.tdrunner.parameters" value=""/>
+        <!-- TDriver test parameters can be given through TDriver parameters xml file.
+        @type string
+        @editable required
+        @scope public
+        -->
+        <property name="tdriver.parameters" value=""/>
+        <!-- Alias name for the test cases to be used in test.xml files for ATS4 drops only. 
+        @type string
+        @scope public
+        @since 11.0
+        -->
+        <property name="ats.alias.name" value="sut_s60"/>
+        <!-- The Subject for the ATS report email. This email is received in the end of the test execution.
+        @type string
+        @scope public
+        -->
+        <property name="ats.email.subject" value="${build.id} TDriver test results"/>
+        <!-- This specifies email format. E.g. to receive email without attachment 'simplelogger'.
+        @type string
+        @scope public
+        -->
+        <property name="ats.email.format" value="simplelogger"/>
+        <fail unless="tdriver.asset.location" message="Error: tdriver.asset.location property not defined" />
+        
         <!--need to set theseup for use by do-ats-test target-->
         <mkdir dir="${build.output.dir}/ats" />
-        <var name="ats.drop.file" value="ATSMattiDrop.zip" />
-        <!-- execute the MattiDrops.py script with parameters-->
+        <var name="ats.drop.file" value="ATSTDriverDrop.zip" />
+        <!-- execute the tdriver.py script with parameters-->
         <exec executable="python" resultproperty="script.response">
-            <arg line="-m ats3.matti2" />
+            <arg line="-m ats3.tdriver" />
             <arg value="--build-drive=${build.drive}" />
-            <arg value="--test-profiles=${matti.test.profiles}" />      <!--"all, !bat1" -->
-            <arg value="--sierra-enabled=${matti.sierra.enabled}" />    <!--"true/false" -->
-            <arg value="--matti-timeout=${matti.test.timeout}" />       <!--"600" -->
+            <arg value="--test-profiles=${tdriver.test.profiles}" />      <!--"all, !bat1" -->
+            <arg value="--tdrunner-enabled=${tdriver.tdrunner.enabled}" />    <!--"true/false" -->
+            <arg value="--tdriver-timeout=${tdriver.test.timeout}" />       <!--"600" -->
             <arg value="${internal.ats.diamonds.arg}" />
-            <arg value="--testasset-location=${matti.asset.location}" />    <!--"local and/or network drive" -->
-            <arg value="--file-store=${ats.output.dir}" />              <!--"network drive" -->
-            <arg value="--testrun-name=${ats.testrun.name}" />          <!--"Matti_Profile_Name" -->
+            <arg value="--testasset-location=${tdriver.asset.location}" />    <!--"local and/or network drive" -->
+            <arg value="--file-store=${ats.report.location}" />                <!--"network drive" -->
+            <arg value="--testrun-name=${ats.testrun.name}" />          <!--"TDriver_Profile_Name" -->
             <arg value="--alias-name=${ats.alias.name}" />                        <!--"agents_alias_Name" -->
             <arg value="--device-type=${ats.product.name}" />
             <arg value="--flash-images=${ats.flash.images}" /> 
             <arg value="--drop-file=${build.output.dir}/ats/${ats.drop.file}" />
             <arg value="--minimum-flash-images=${ats.flashfiles.minlimit}" />
-            <arg value="--template-loc=${matti.template.file}" />             <!--"local and/or network drive. No comma separated list" -->
+            <arg value="--template-loc=${tdriver.template.file}" />             <!--"local and/or network drive. No comma separated list" -->
             <arg value="--email-format=${ats.email.format}" />          <!--"Email Formatting. e.g. simplelogger" -->
-            <arg value="--email-subject=${ats.email.subject}" />        <!--"Email Subject. e.g. Matti testing" -->
+            <arg value="--email-subject=${ats.email.subject}" />        <!--"Email Subject. e.g. TDriver testing" -->
             <arg value="--report-email=${ats.email.list}" /> 
             <arg value="--ats4-enabled=${internal.ats4.enabled}" />
-            <arg value="--matti-sis-files=${matti.sis.files}" />        <!--"src#store#dst, src#store#dst" -->
-            <arg value="--matti-parameters=${matti.parameters}" />
-            <arg value="--sierra-parameters=${matti.sierra.parameters}" />    <!--Additional sierra parameters for matti task e.g. ordered teardown -->
+            <arg value="--tdriver-sis-files=${tdriver.sis.files}" />        <!--"src#store#dst, src#store#dst" -->
+            <arg value="--tdriver-parameters=${tdriver.parameters}" />
+            <arg value="--tdrunner-parameters=${tdriver.tdrunner.parameters}" />    <!--Additional TDrunner parameters for tdriver task e.g. ordered teardown -->
+            <arg value="--ctc-enabled=${ats.ctc.enabled}" />
         </exec>
-        
-        <!-- Unset the internal property to overwrite with new value-->
-        <var name="internal.ats.upload.enabled" unset="true"/>
-        <!-- set internal property if python returns 0 value for matti test drop creation --> 
-        <condition property="internal.ats.upload.enabled">
-            <equals arg1="${script.response}" arg2="0" />
-        </condition>
         <runtarget target="do-ats-test" />
     </target>
 
+    <!-- The target is used to test ROM image files that whether device boots up -->
+    <target name="ats-bootup-test" depends="ats-common,ats-set-flash-image-path" if="internal.ats.bootuptest.enabled">
+        <!--need to set the setup for use by do-ats-test target-->
+        <mkdir dir="${build.output.dir}/ats" />
+        <var name="ats.drop.file" value="ATSBootupDrop.zip" />
+        <!-- execute the bootup_testing.py script with parameters-->
+        <exec executable="python" resultproperty="script.response">
+            <arg line="-m ats3.bootup_testing" />
+            <arg value="--build-drive=${build.drive}" />
+            <arg value="${internal.ats.diamonds.arg}" />
+            <arg value="--file-store=${ats.report.location}" />         <!--"network drive" -->
+            <arg value="--testrun-name=${ats.testrun.name}" />          <!--"bootup_test" -->
+            <arg value="--alias-name=${ats.alias.name}" />              <!--"agents_alias_Name" -->
+            <arg value="--device-type=${ats.product.name}" />
+            <arg value="--flash-images=${ats.flash.images}" /> 
+            <arg value="--drop-file=${build.output.dir}/ats/${ats.drop.file}" />
+            <arg value="--minimum-flash-images=${ats.flashfiles.minlimit}" />
+            <arg value="--email-format=${ats.email.format}" />          <!--"Email Formatting. e.g. simplelogger" -->
+            <arg value="--email-subject=${ats.email.subject}" />        <!--"Email Subject. e.g. TDriver testing" -->
+            <arg value="--report-email=${ats.email.list}" /> 
+            <arg value="--ats4-enabled=${internal.ats4.enabled}" />
+        </exec>
+        <runtarget target="do-ats-test" />
+    </target>
 
 </project>

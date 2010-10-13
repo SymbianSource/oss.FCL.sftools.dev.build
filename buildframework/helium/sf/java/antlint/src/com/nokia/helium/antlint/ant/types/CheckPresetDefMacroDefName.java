@@ -16,18 +16,10 @@
  */
 package com.nokia.helium.antlint.ant.types;
 
-import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import org.dom4j.Document;
-import org.dom4j.DocumentException;
-import org.dom4j.Element;
-import org.dom4j.io.SAXReader;
-
-import com.nokia.helium.antlint.ant.AntlintException;
+import com.nokia.helium.ant.data.AntObjectMeta;
+import com.nokia.helium.ant.data.MacroMeta;
 
 /**
  * <code>CheckPresetDefMacroDefName</code> is used to check the naming
@@ -42,108 +34,63 @@ import com.nokia.helium.antlint.ant.AntlintException;
  *               &lt;include name=&quot;*build.xml&quot;/&gt;
  *               &lt;include name=&quot;*.antlib.xml&quot;/&gt;
  *       &lt;/fileset&gt;
- *       &lt;CheckPresetDefMacroDefName&quot; severity=&quot;error&quot; enabled=&quot;true&quot; /&gt;
+ *       &lt;checkPresetDefMacroDefName severity=&quot;error&quot; /&gt;
  *  &lt;/antlint&gt;
  * </pre>
  * 
- * @ant.task name="CheckPresetDefMacroDefName" category="AntLint"
+ * @ant.task name="checkPresetDefMacroDefName" category="AntLint"
  * 
  */
-public class CheckPresetDefMacroDefName extends AbstractCheck {
+public class CheckPresetDefMacroDefName extends AbstractScriptCheck {
 
     private String regExp;
-    private File antFile;
 
     /**
      * {@inheritDoc}
      */
-    @SuppressWarnings("unchecked")
-    public void run(Element node) {
-        if (node.getName().equals("presetdef")
-                || node.getName().equals("macrodef")) {
-            String text = node.attributeValue("name");
-            if (text != null && !text.isEmpty()) {
-                checkDefName(text);
+    protected String getMacroXPathExpression() {
+        return "//macrodef | //presetdef";
+    }
 
-            }
+    /**
+     * {@inheritDoc}
+     */
+    protected String getScriptXPathExpression(String targetName) {
+        return ".//script";
+    }
 
-            List<Element> attributeList = node.elements("attribute");
-            for (Element attributeElement : attributeList) {
-                String attributeName = attributeElement.attributeValue("name");
-                checkDefName(attributeName);
-            }
+    /**
+     * {@inheritDoc}
+     */
+    protected void run(MacroMeta macroMeta) {
+        validateName(macroMeta.getName(), macroMeta);
+        List<String> attributes = macroMeta.getAttributes();
+        for (String attrName : attributes) {
+            validateName(attrName, macroMeta);
+        }
+    }
+
+    private void validateName(String name, AntObjectMeta object) {
+        if (name != null && !name.isEmpty() && !matches(name, getRegExp())) {
+            report("Invalid presetdef/macrodef name: " + name, object.getLineNumber());
         }
     }
 
     /**
-     * Check the given text.
+     * Set the regular expression.
      * 
-     * @param text
-     *            is the text to check.
-     */
-    private void checkDefName(String text) {
-        Pattern p1 = Pattern.compile(getRegExp());
-        Matcher m1 = p1.matcher(text);
-        if (!m1.matches()) {
-            this.getReporter().report(this.getSeverity(),
-                    "INVALID PRESETDEF/MACRODEF Name: " + text,
-                    this.getAntFile(), 0);
-        }
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.nokia.helium.antlint.ant.types.Check#run(java.io.File)
-     */
-    public void run(File antFilename) throws AntlintException {
-        this.antFile = antFilename;
-        SAXReader saxReader = new SAXReader();
-        Document doc;
-        List<Element> presetDefNodes = new ArrayList<Element>();
-        try {
-            doc = saxReader.read(antFilename);
-            elementTreeWalk(doc.getRootElement(), "presetdef", presetDefNodes);
-            elementTreeWalk(doc.getRootElement(), "macrodef", presetDefNodes);
-        } catch (DocumentException e) {
-            throw new AntlintException("Invalid XML file " + e.getMessage());
-        }
-        for (Element presetDefNode : presetDefNodes) {
-            run(presetDefNode);
-        }
-    }
-
-    /**
-     * @param regExp
-     *            the regExp to set
+     * @param regExp the regExp to set
      */
     public void setRegExp(String regExp) {
         this.regExp = regExp;
     }
 
     /**
+     * Get the regular expression.
+     * 
      * @return the regExp
      */
     public String getRegExp() {
         return regExp;
     }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.apache.tools.ant.types.DataType#toString()
-     */
-    public String toString() {
-        return "CheckPresetDefMacroDefName";
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.nokia.helium.antlint.ant.types.Check#getAntFile()
-     */
-    public File getAntFile() {
-        return this.antFile;
-    }
-
 }

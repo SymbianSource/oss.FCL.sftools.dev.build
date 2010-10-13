@@ -23,7 +23,7 @@ import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
 
 import com.nokia.helium.logger.ant.listener.AntLoggingHandler;
-import com.nokia.helium.logger.ant.listener.StatusAndLogListener;
+import com.nokia.helium.logger.ant.listener.CommonListener;
 
 /**
  * To replace the property values with real values if the properties are not set at the begining of the build.
@@ -32,7 +32,7 @@ import com.nokia.helium.logger.ant.listener.StatusAndLogListener;
  *      &lt;hlm:logreplace regexp="${property.not.set}"/&gt;
  * </pre>
  * 
- * @ant.task name="logreplace" category="Logging".
+ * @ant.task name="logreplace" category="Logging"
  */
 public class LogReplaceTask extends Task {
     
@@ -43,20 +43,20 @@ public class LogReplaceTask extends Task {
      */
     
     public void execute() {
-        if (StatusAndLogListener.getStatusAndLogListener() == null) {
-            this.log("The StatusAndLogListener is not available.", Project.MSG_WARN);
-            return;
-        }
-
-        AntLoggingHandler antLoggingHandler  = (AntLoggingHandler)StatusAndLogListener.getStatusAndLogListener().getHandler(AntLoggingHandler.class);
-        
         if (regExp == null ) {
             throw new BuildException("'regexp' attribute should not be null.");
         }
-        
+
+        if (CommonListener.getCommonListener() == null) {
+            this.log("The common listener is not available.", Project.MSG_WARN);
+            return;
+        }
+
+        AntLoggingHandler antLoggingHandler  = CommonListener.getCommonListener().getHandler(AntLoggingHandler.class);
         if (antLoggingHandler != null) {
-            String pattern = Pattern.quote(regExp);
-            antLoggingHandler.addRegExp(pattern);
+            antLoggingHandler.addRegexp(Pattern.compile(Pattern.quote(regExp)));
+        } else {
+            log("Could not find the logging framework.", Project.MSG_WARN);
         }
     }
 

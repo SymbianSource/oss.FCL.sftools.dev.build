@@ -41,8 +41,8 @@ import com.nokia.helium.antlint.ant.Reporter;
 import com.nokia.helium.antlint.ant.Severity;
 
 /**
- * This reporter will generate a Checkstyle compatible XML to
- * report Antlint issues.
+ * This reporter will generate a Checkstyle compatible XML to report Antlint
+ * issues.
  * 
  * Usage:
  * 
@@ -59,7 +59,7 @@ import com.nokia.helium.antlint.ant.Severity;
  *       &lt;antlintCheckstyleReporter file=&quot;report.xml&quot; /&gt;
  *  &lt;/antlint&gt;
  * </pre>
- *    
+ * 
  * @ant.type name="antlintCheckstyleReporter" category="AntLint"
  */
 public class CheckstyleXmlReporter extends DataType implements Reporter {
@@ -74,8 +74,7 @@ public class CheckstyleXmlReporter extends DataType implements Reporter {
      * {@inheritDoc}
      */
     @Override
-    public void report(Severity severity, String message, File filename,
-            int lineNo) {
+    public void report(Severity severity, String message, File filename, int lineNo) {
         if (doc != null) {
             if (currentFile == null || !currentFile.equals(filename)) {
                 currentFileNode = doc.createElement("file");
@@ -101,8 +100,7 @@ public class CheckstyleXmlReporter extends DataType implements Reporter {
     }
 
     /**
-     * Closing the reporting session. It will generates
-     * the xml file.
+     * Closing the reporting session. It will generates the xml file.
      */
     @Override
     public void close() {
@@ -129,7 +127,7 @@ public class CheckstyleXmlReporter extends DataType implements Reporter {
     }
 
     /**
-     * {@inheritDoc}    
+     * {@inheritDoc}
      */
     @Override
     public void open() {

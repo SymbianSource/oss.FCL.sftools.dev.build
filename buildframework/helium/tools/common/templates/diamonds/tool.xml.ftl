@@ -25,22 +25,22 @@ Description:
 <#if ant?keys?seq_contains("env.SYMSEE_VERSION")>         
         <tool>
             <name>SymSEE</name>
-            <version>${ant["env.SYMSEE_VERSION"]}</version>
+            <version>${ant["env.SYMSEE_VERSION"]?xml}</version>
         </tool>
 </#if>
 <#if (doc)??>
 <#list doc["environment/tool"] as tool>
         <#if tool.path?length &gt; 0>
         <tool>
-            <name>${tool.name}</name>
-            <version>${tool.version}</version>
+            <name>${tool.name?xml}</name>
+            <version>${tool.version?xml}</version>
         </tool>
         </#if>
 </#list>
 </#if>
         <tool>
             <name>Helium</name>
-            <version>${ant["helium.version"]}</version>
+            <version>${ant["helium.version"]?xml}</version>
         </tool>
     </tools>
 <#include "diamonds_footer.ftl">

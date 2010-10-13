@@ -139,17 +139,18 @@ def readEggs(libraries, dirtosearch, internaldir):
                     
                 if os.path.isfile(filename) and fname.endswith('.egg'):
                     eggfile = zipfile.ZipFile(filename, 'r', zipfile.ZIP_DEFLATED)
-                    
-                    data = eggfile.read('EGG-INFO/PKG-INFO')
-                    
-                    library = readPkgInfo(data.split('\n'))
-                    
-                    if 'EGG-INFO/requires.txt' in eggfile.namelist():
-                        requiresdata = eggfile.read('EGG-INFO/requires.txt')
-                        readRequiresFile(requiresdata.split('\n'), library)
+                    if 'EGG-INFO/PKG-INFO' in eggfile.namelist():
+                        data = eggfile.read('EGG-INFO/PKG-INFO')
                         
-                    libraries.addLibrary(notinsubcon, library)
-                    
+                        library = readPkgInfo(data.split('\n'))
+                        
+                        if 'EGG-INFO/requires.txt' in eggfile.namelist():
+                            requiresdata = eggfile.read('EGG-INFO/requires.txt')
+                            readRequiresFile(requiresdata.split('\n'), library)
+                            
+                        libraries.addLibrary(notinsubcon, library)
+                    else:
+                        print 'EGG-INFO/PKG-INFO not in ' + filename
                     eggfile.close()
 
 def readRequiresFile(data, library):
@@ -326,8 +327,9 @@ def appendLogs(targ, proj, output, macro=False):
             if macro:
                 output.append("\"%s\" [fontname=\"Times-Italic\"];" % str(targ.name))
             output.append('subgraph \"cluster%s\" {label = \"%s\"; \"%s\"}\n' % (str(proj.name), str(proj.name), str(targ.name)))
-            splt = str(signal).split(',')
+            splt = str(signal).split('(')
             if len(splt) > 1:
+                splt[1] = splt[1].replace(')', '')
                 if splt[1] == 'now':
                     color = 'red'
                 elif splt[1] == 'defer':

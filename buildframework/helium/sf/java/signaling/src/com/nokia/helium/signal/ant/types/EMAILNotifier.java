@@ -22,8 +22,10 @@ import com.nokia.helium.core.EmailDataSender;
 import com.nokia.helium.core.EmailSendException;
 import com.nokia.helium.core.PropertiesSource;
 import com.nokia.helium.core.TemplateInputSource;
-import com.nokia.helium.signal.Notifier;
+import com.nokia.helium.signal.ant.Notifier;
 import com.nokia.helium.core.TemplateProcessor;
+import com.nokia.helium.core.ant.ResourceCollectionUtils;
+
 import java.util.List;
 import java.util.Hashtable;
 import java.util.ArrayList;
@@ -32,6 +34,8 @@ import java.io.IOException;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.types.DataType;
+import org.apache.tools.ant.types.ResourceCollection;
+
 import java.io.File;
 
 /**
@@ -53,21 +57,11 @@ public class EMAILNotifier extends DataType implements Notifier {
     private String additionalRecipients;
 
     /**
-     * Rendering the template, and sending the result through email.
-     * 
-     * @param signalName
-     *            - is the name of the signal that has been raised.
-     * @param failStatus
-     *            - indicates whether to fail the build or not
-     * @param notifierInput
-     *            - contains signal notifier info
-     * @param message
-     *            - is the message from the signal that has been raised.
+     * {@inheritDoc}
      */
-
     @SuppressWarnings("unchecked")
     public void sendData(String signalName, boolean failStatus,
-            NotifierInput notifierInput, String message) {
+            ResourceCollection notifierInput, String message) {
         if (notifyWhen != null
                 && (notifyWhen.equals("always")
                         || (notifyWhen.equals("fail") && failStatus) || (notifyWhen
@@ -96,7 +90,7 @@ public class EMAILNotifier extends DataType implements Notifier {
                 
                 File fileToSend = null;
                 if (notifierInput != null) {
-                    fileToSend = notifierInput.getFile(".*.html");
+                    fileToSend = ResourceCollectionUtils.getFile(notifierInput, ".*.html");
                 }
                 if (fileToSend == null) {
                     if (defaultTemplate != null && defaultTemplate.exists()) {

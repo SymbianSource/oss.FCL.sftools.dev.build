@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : test_blocks.ant.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="helium-blocks-bundles-unittest" xmlns:hlm="http://www.nokia.com/helium" xmlns:au="antlib:org.apache.ant.antunit" 
+    xmlns:ac="antlib:net.sf.antcontrib">
+    <description>Helium Antlib blocks unittests.</description>
+    
+    <property name="workspace" location="${test.temp.dir}/workspace" />
+    <property name="repo" location="${test.temp.dir}/repo" />
+    
+    <target name="setUp">
+        <tstamp>
+            <format property="tstamp" pattern="yyyyMMddHHmmssSSS" locale="en,UK" />
+        </tstamp>
+        <mkdir dir="${test.temp.dir}" />
+        <delete file="${test.temp.dir}" />
+        <mkdir dir="${test.temp.dir}" />
+        <mkdir dir="${workspace}" />
+        <mkdir dir="${repo}" />
+        
+        <exec executable="blocks.bat"  resultproperty="blocks.result" failifexecutionfails="false" osfamily="windows" />
+        <exec executable="blocks"  resultproperty="blocks.result" failifexecutionfails="false" osfamily="unix" />
+        <condition property="execute.test" value="true">
+            <equals arg1="${blocks.result}" arg2="0" />
+        </condition>
+        <echo>execute.test: ${execute.test}</echo>    
+        <ac:if>
+        	<istrue value="${execute.test}" />
+        	<then>
+                <hlm:blocksAddWorkspace name="unittest-addworkspace-${tstamp}" dir="${workspace}"
+                    wsidproperty="wsid" />
+        	    <copy todir="${workspace}">
+        	        <fileset dir="../" includes="src/**" />
+        	    </copy>
+        	    <mkdir dir="${workspace}/epoc32" />
+        	    <copy todir="${workspace}/epoc32">
+        	        <fileset dir="../" includes="src/**" />
+        	    </copy>
+        	    <exec executable="bundle.bat" dir="${workspace}" osfamily="windows">
+        	        <arg line="create-xml -n blocks -v 1.0" />
+        	        <arg value="--source=${workspace}/src" />
+        	        <arg value="--target=${workspace}/epoc32" />
+        	        <arg value="${test.temp.dir}/blocks.xml" />
+        	    </exec>
+        	    <exec executable="bundle.bat" dir="${workspace}" osfamily="windows">
+        	        <arg line="create" />
+        	        <arg line="-o ${repo}" />
+        	        <arg value="${test.temp.dir}/blocks.xml" />
+        	    </exec>
+                <hlm:blocksCreateRepositoryIndex dest="${repo}" verbose="true" />
+        	    <hlm:blocksAddRepository wsid="${wsid}" name="repo" url="file:${repo}" />
+        	    <delete dir="${workspace}/src" />
+        	    <delete dir="${workspace}/epoc32" />
+        	</then>
+        </ac:if>
+    </target>
+
+    <target name="tearDown">
+        <ac:if>
+        	<isset property="execute.test" />
+        	<then>
+	        	<hlm:blocksRemoveWorkspace wsid="${wsid}" />
+        	</then>
+        </ac:if>
+        <delete dir="${workspace}" />
+    </target>
+        
+    <target name="test-bundle-install-fail-wsid-not-defined" if="execute.test">
+        <au:expectfailure expectedMessage="wsid has not been specified.">
+    		<hlm:blocksInstallBundle bundle="name" />
+        </au:expectfailure>
+    </target>
+
+    <target name="test-bundle-install-fail-bundle-not-defined" if="execute.test">
+        <au:expectfailure expectedMessage="You can either use the bundle attribute or the group attribute or use nested groupfilterset or bundlefilterset.">
+    		<hlm:blocksInstallBundle wsid="${wsid}" />
+        </au:expectfailure>
+    </target>
+
+    <target name="test-bundle-install-fail-bundle-and-patternset-defined" if="execute.test">
+        <au:expectfailure expectedMessage="You can either use the bundle attribute or the group attribute or use nested groupfilterset or bundlefilterset.">
+    		<hlm:blocksInstallBundle wsid="${wsid}" bundle="bundle">
+    		    <bundleFilterSet>
+    		        <include name=".*" />
+    		    </bundleFilterSet>
+    		</hlm:blocksInstallBundle>
+        </au:expectfailure>
+    </target>
+    
+    <target name="test-blocks-single-bundle-install" if="execute.test">
+        <au:assertFileDoesntExist file="${workspace}/epoc32" />
+        <hlm:blocksInstallBundle wsid="${wsid}" bundle="blocks.extras" />
+        <au:assertFileExists file="${workspace}/epoc32" />
+    </target>
+
+    <target name="test-blocks-single-invalid-bundle-install" if="execute.test">
+        <au:expectfailure message="External process error: apt-get failed">
+        	<hlm:blocksInstallBundle wsid="${wsid}" bundle="blocks.invalid.bundle" />
+        </au:expectfailure>
+    </target>
+
+    <target name="test-blocks-single-bundle-install-all" if="execute.test">
+        <au:assertFileDoesntExist file="${workspace}/src" />
+        <au:assertFileDoesntExist file="${workspace}/epoc32" />
+        <hlm:blocksInstallBundle wsid="${wsid}">
+		    <bundleFilterSet>
+		        <include name=".*" />
+		    </bundleFilterSet>
+  		</hlm:blocksInstallBundle>
+        <au:assertFileExists file="${workspace}/src" />
+        <au:assertFileExists file="${workspace}/epoc32" />
+    </target>
+
+    <target name="test-blocks-single-bundle-install-exclude" if="execute.test">
+        <au:assertFileDoesntExist file="${workspace}/src" />
+        <au:assertFileDoesntExist file="${workspace}/epoc32" />
+        <hlm:blocksInstallBundle wsid="${wsid}">
+		    <bundleFilterSet>
+		        <exclude name=".*extra.*" />
+		    </bundleFilterSet>
+  		</hlm:blocksInstallBundle>
+        <au:assertFileExists file="${workspace}/src" />
+        <au:assertFileDoesntExist file="${workspace}/epoc32" />
+    </target>
+
+    <target name="test-blocks-single-group-install" if="execute.test">
+        <au:assertFileDoesntExist file="${workspace}/src" />
+        <au:assertFileDoesntExist file="${workspace}/epoc32" />
+        <hlm:blocksInstallBundle wsid="${wsid}" group="Sources" />
+        <au:assertFileExists file="${workspace}/src" />
+        <au:assertFileDoesntExist file="${workspace}/epoc32" />
+    </target>
+
+    <target name="test-blocks-filter-group-install" if="execute.test">
+        <au:assertFileDoesntExist file="${workspace}/src" />
+        <au:assertFileDoesntExist file="${workspace}/epoc32" />
+        <hlm:blocksInstallBundle wsid="${wsid}">
+		    <groupFilterSet>
+		        <include name="Source.*" />
+		    </groupFilterSet>
+  		</hlm:blocksInstallBundle>
+        <au:assertFileExists file="${workspace}/src" />
+        <au:assertFileDoesntExist file="${workspace}/epoc32" />
+    </target>
+        
+    <target name="test-blocks-update-workspace" if="execute.test">
+        <hlm:blocksInstallBundle wsid="${wsid}" group="Sources" />
+        <hlm:blocksUpdate wsid="${wsid}" verbose="true" />
+        <au:assertLogContains text="Updating workspace " />
+        <au:assertLogContains text="updated successfully." />
+        <au:assertLogContains text="Reading package lists..." />
+    </target>
+</project>

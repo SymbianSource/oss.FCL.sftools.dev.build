@@ -36,5 +36,7 @@ Description:
     <dependency org="org.apache.commons" name="commons-lang" rev="2.4"  />
     <dependency org="net.sourceforge.fmpp" name="fmpp" rev="0.9.13"  />
     <dependency org="dom4j" name="dom4j" rev="latest.integration"  />
+    <dependency org="com.nokia.helium" name="helium-antdata" rev="latest.integration"  />
+    <dependency org="com.nokia.helium" name="helium-antlint" rev="latest.integration"  />
   </dependencies>
 </ivy-module>

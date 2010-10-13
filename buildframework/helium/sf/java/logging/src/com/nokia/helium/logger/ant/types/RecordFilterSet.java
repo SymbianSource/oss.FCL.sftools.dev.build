@@ -35,7 +35,7 @@ import org.apache.tools.ant.types.Reference;
  *      
  * </pre>
  * 
- * @ant.task name="Recordfilterset" category="Logging".
+ * @ant.task name="Recordfilterset" category="Logging"
  *
  */
 

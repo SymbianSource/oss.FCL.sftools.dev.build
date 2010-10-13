@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : test_ido-prep.ant.xml 
+Part of     : Helium 
+
+Copyright (c) 2010 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test_ido-prep" xmlns:au="org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>
+         Preparation Testing targets
+    </description>
+
+    <property name="helium.dir" location="../../.." />
+    <property name="sysdef3.enabled" value="true"/>
+    <import file="../../../build.xml" />
+
+    <path id="system.definition.files">
+        <fileset dir="${helium.dir}/tests/minibuilds" includes="*.sysdef.xml"/>
+    </path>
+    
+    <target name="test-ido-create-ado-mapping">
+        <property name="ado.mapping.file" location="${build.output.dir}/build/ado_mapping.ini" />
+        <hlm:createAdoMappingMacro adoMapFile="${policy.src.mapping.file}" />
+        <au:assertFileExists file="${ado.mapping.file}" />
+    </target>
+
+</project>

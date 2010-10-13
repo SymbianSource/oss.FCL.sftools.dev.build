@@ -48,11 +48,10 @@ class Scanner(fileutils.AbstractScanner):
         [self.add_exclude_lst(filename) for filename in self._config.get_list('exclude.lst', [])]
         [self.add_filetype(filetype) for filetype in self._config.get_list('filetype', [])]
         [self.add_selector(archive.selectors.get_selector(selector, self._config)) for selector in self._config.get_list('selector', [])]
-        # To support old features.
-        # TODO: inform customers and remove.
+        
         if 'distribution.policy.s60' in self._config:
             self.add_selector(archive.selectors.get_selector('distribution.policy.s60', self._config))
-
+ 
     def add_exclude_lst(self, filename):
         """ Adding excludes from exclude list. """
         if not os.path.exists(filename):
@@ -76,7 +75,7 @@ class Scanner(fileutils.AbstractScanner):
             This method need to be overloaded by the specialized class.
             return fullpath name
         """
-        raise  NotImplementedError()
+        raise NotImplementedError()
 
 
 class AbldWhatScanner(Scanner):

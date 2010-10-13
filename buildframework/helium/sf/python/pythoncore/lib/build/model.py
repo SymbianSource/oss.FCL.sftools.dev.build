@@ -199,13 +199,7 @@ class Project(object):
         """ Initialisation. """
         self._ccm_project = ccm_project
         self._baselines = {}
-        #TODO : could querying release attribute return the ccm object? Or add a release attribute to Project
-        # class
-        release = self._ccm_project['release']
-        _logger.debug("Project release: '%s'" % release)
-        self._ccm_release = None
-        if release != '':
-            self._ccm_project.session.create(release)
+        _logger.debug("Project release: '%s'" % self._ccm_project.release)
 
         # capturing the frozen baseline.
         _logger.debug('Capture baselines')
@@ -309,8 +303,8 @@ class Project(object):
         
     def _getsupplier(self):
         """get supplier"""
-        if self._ccm_release != None:
-            component = self._ccm_release.component
+        if self._ccm_project.release != None:
+            component = self._ccm_project.release.component
             comparisons = {'MC': '^mc',
                            'S60': 'S60',
                            'SPP/NCP': '^spp_config|spp_psw|spp_tools|ncp_sw$',
@@ -458,12 +452,12 @@ class BOMDeltaXMLWriter(object):
                             for name in folder.name:
                                 folder_name = unicode(name)
                                 _logger.debug('folder_name: %s' % folder_name)
-                            if not old_folders.has_key(unicode(folder_name)):
-                                old_folders[unicode(folder_name)] = {}
-                            if hasattr(name, 'xml_attributes'):
-                                for attr_name, _ in sorted(name.xml_attributes.iteritems()):
-                                    _logger.debug('attr_name: %s' % attr_name)
-                                    old_folders[unicode(folder_name)][unicode(attr_name)] = unicode(getattr(name, attr_name))
+                                if not old_folders.has_key(unicode(folder_name)):
+                                    old_folders[unicode(folder_name)] = {}
+                                if hasattr(name, 'xml_attributes'):
+                                    for attr_name, _ in sorted(name.xml_attributes.iteritems()):
+                                        _logger.debug('attr_name: %s' % attr_name)
+                                        old_folders[unicode(folder_name)][unicode(attr_name)] = unicode(getattr(name, attr_name))
         for task in recursive_node_scan(bom_log.bom.content, u'task'):
             _logger.debug('task: %s' % task)
             _logger.debug('task: %s' % task.id)
@@ -629,6 +623,14 @@ class BOMXMLWriter(object):
                     fix_node = doc.xml_create_element(u'fix', content=(unicode(task)), attributes = {u'type': unicode(fix.__class__.__name__)})
                     project_node.xml_append(fix_node)
 
+        self.write_icd_icfs(doc)
+        self.write_release_info(doc)
+            
+        out = open(path, 'w')
+        doc.xml(out, indent='yes')
+        out.close()
+        
+    def write_icd_icfs(self, doc):
         if self._bom.icd_icfs != []:
             # Add ICD info to BOM
             doc.bom.content.xml_append(doc.xml_create_element(u'input'))
@@ -642,12 +644,13 @@ class BOMXMLWriter(object):
             doc.bom.content.input.xml_append(doc.xml_create_element(u'version', content=(unicode(empty_bom_str))))
     
             doc.bom.content.input.xml_append(doc.xml_create_element(u'icds'))
-
-        # pylint: disable=R0914
-        for i, icd in enumerate(self._bom.icd_icfs):
-            doc.bom.content.input.icds.xml_append(doc.xml_create_element(u'icd'))
-            doc.bom.content.input.icds.icd[i].xml_append(doc.xml_create_element(u'name', content=(unicode(icd))))
-        #If currentRelease.xml exists then send s60 <input> tag to diamonds
+            
+            for i, icd in enumerate(self._bom.icd_icfs):
+                doc.bom.content.input.icds.xml_append(doc.xml_create_element(u'icd'))
+                doc.bom.content.input.icds.icd[i].xml_append(doc.xml_create_element(u'name', content=(unicode(icd))))
+            
+    def write_release_info(self, doc):
+        # If currentRelease.xml exists then send s60 <input> tag to diamonds
         current_release_xml_path = self._bom.config['currentRelease.xml']
         # data from the metadata will go first as they must be safer than the one
         # given by the user 
@@ -730,12 +733,6 @@ class BOMXMLWriter(object):
             s60_input_source.xml_append(doc.xml_create_element(u'type', content=(unicode("unknown"))))
             s60_input_node.xml_append(s60_input_source)
             doc.bom.content.xml_append(s60_input_node)
-            
-            
-        out = open(path, 'w')
-        doc.xml(out, indent='yes')
-        out.close()
-        
     def parse_status_log(self, log):
         """parse status log"""
         _log_array = log.split('\r')

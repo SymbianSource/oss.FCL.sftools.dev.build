@@ -104,8 +104,6 @@ some information.
         </hlm:executeTaskNotifier>
     </hlm:notifierList>
 
-Detailed documentation of the notifier interface could be found `here <../../helium-antlib/index.html>`_.
-
 
 Example: configuring compileSignal
 ----------------------------------

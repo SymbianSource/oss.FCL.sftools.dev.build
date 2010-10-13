@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : test_serializepath.ant.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test-resource-access" xmlns:au="antlib:org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>Helium antlib core resource access tests.</description>
+
+    <property environment="env"/>
+
+    <dirname property="current.dir" file="${ant.file.test-resource-access}" />
+
+
+    <taskdef resource="com/nokia/helium/core/ant/antlib.xml" uri="http://www.nokia.com/helium" />
+
+    <property name="base.dir" value="${test.temp.dir}/resourceAccess" />
+    
+    <!-- is called prior to the test -->
+    <target name="setUp">
+        <mkdir dir="${base.dir}" />
+        <mkdir dir="${base.dir}/1" />
+        <mkdir dir="${base.dir}/2" />
+        <condition property="isWindows">
+            <os family="windows" />
+        </condition>
+    </target>
+
+    <!-- is called after the test, even if that caused an error -->
+    <target name="tearDown">
+        <delete dir="${base.dir}" failonerror="false" />
+        <delete dir="${base.dir}/1" failonerror="false" />
+        <delete dir="${base.dir}/2" failonerror="false" />
+    </target>
+
+    <target name="test-resourceaccess-invalid-dir">
+        <au:expectfailure expectedMessage="base directory of resource access task not exists">
+            <hlm:resourceaccess baseDirectory="${base.dir}/invalid-dir" lockName="subst-drive" />
+        </au:expectfailure>
+    </target>
+
+    <target name="test-resourceaccess-valid-subst" if="isWindows">
+        <antcall target="subst-drive" />
+        <au:assertFileExists file="${base.dir}/subst-drive" />
+    </target>
+
+    <target name="subst-drive">
+        <hlm:resourceaccess baseDirectory="${base.dir}" lockName="subst-drive">
+            <hlm:getfreedrive property="build.drive"/>
+            <exec osfamily="windows" executable="subst.exe" failonerror="false">
+                <arg value="${build.drive}"/>
+                <arg value="${current.dir}"/>
+            </exec>
+        </hlm:resourceaccess>
+    </target>
+
+    <target name="resource-access-test-infinite">
+        <hlm:resourceaccess baseDirectory="${base.dir}" lockName="${lock.name}">
+            <!-- tried to write as many times so there would be some delay in doing parallel operation -->
+            <echoproperties destfile="${base.dir}/${lock.name}1" />
+            <echoproperties destfile="${base.dir}/${lock.name}2" />
+            <echoproperties destfile="${base.dir}/${lock.name}3" />
+            <echoproperties destfile="${base.dir}/${lock.name}4" />
+            <echoproperties destfile="${base.dir}/${lock.name}5" />
+            <echoproperties destfile="${base.dir}/${lock.name}6" />
+            <echoproperties destfile="${base.dir}/${lock.name}7" />
+            <echoproperties destfile="${base.dir}/${lock.name}8" />
+            <echoproperties destfile="${base.dir}/${lock.name}9" />
+            <echoproperties destfile="${base.dir}/${lock.name}10" />
+        </hlm:resourceaccess>
+    </target>
+
+    <target name="resource-access-test-three-retry">
+        <hlm:resourceaccess baseDirectory="${base.dir}" lockName="${lock.name}" noOfRetry="3" interval="10">
+            <!-- tried to write as many times so there would be some delay in doing parallel operation -->
+            <echoproperties destfile="${base.dir}/${lock.name}1" />
+            <echoproperties destfile="${base.dir}/${lock.name}2" />
+            <echoproperties destfile="${base.dir}/${lock.name}3" />
+            <echoproperties destfile="${base.dir}/${lock.name}4" />
+            <echoproperties destfile="${base.dir}/${lock.name}5" />
+            <echoproperties destfile="${base.dir}/${lock.name}6" />
+            <echoproperties destfile="${base.dir}/${lock.name}7" />
+            <echoproperties destfile="${base.dir}/${lock.name}8" />
+            <echoproperties destfile="${base.dir}/${lock.name}9" />
+            <echoproperties destfile="${base.dir}/${lock.name}10" />
+        </hlm:resourceaccess>
+    </target>        
+    
+    <target name="test-parallel-infinite" if="isWindows">
+        <parallel>
+            <antcall target="resource-access-test-infinite">
+                <param name="lock.name" value="parallel-test"/>
+                <param name="base.dir" value="${base.dir}/1"/>
+            </antcall>
+            <antcall target="resource-access-test-infinite">
+                <param name="lock.name" value="parallel-test"/>
+                <param name="base.dir" value="${base.dir}/2"/>
+            </antcall>
+        </parallel>
+    </target>
+
+    <target name="test-parallel-three-retry" if="isWindows">
+        <au:expectfailure expectedMessage="lock not acquired">
+            <parallel>
+                <antcall target="resource-access-test-three-retry">
+                    <param name="lock.name" value="parallel-test"/>
+                    <param name="base.dir" value="${base.dir}/1"/>
+                </antcall>
+                <antcall target="resource-access-test-three-retry">
+                    <param name="lock.name" value="parallel-test"/>
+                    <param name="base.dir" value="${base.dir}/2"/>
+                </antcall>
+            </parallel>
+        </au:expectfailure>
+    </target>
+
+</project>

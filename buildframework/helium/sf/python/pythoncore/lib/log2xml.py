@@ -174,9 +174,11 @@ class LogWriter(object):
             print exc
 
 
-def convert(inputfile, outputfile, fulllogging=True, configuration=DEFAULT_CONFIGURATION):
+def convert(inputfile, outputfile, fulllogging=True, configuration=None):
     """ Convert an input log into an XML log and write an outputfile. """
-    
+    if configuration == None:
+        configuration = DEFAULT_CONFIGURATION
+        
     # Compiling the regexp  
     built_config = {}
     for category in configuration.keys():
@@ -243,9 +245,11 @@ def convert(inputfile, outputfile, fulllogging=True, configuration=DEFAULT_CONFI
     # end file
     xmllog.close()
     
-def convert_old(inputfile, outputfile, fulllogging=True, configuration=DEFAULT_CONFIGURATION):
+def convert_old(inputfile, outputfile, fulllogging=True, configuration=None):
     """ Convert an input log into an XML log and write an outputfile. """
-    
+    if configuration == None:
+        configuration = DEFAULT_CONFIGURATION
+        
     # Compiling the regexp  
     built_config = {}
     for category in configuration.keys():

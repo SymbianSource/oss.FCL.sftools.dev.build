@@ -53,7 +53,7 @@ class TestGSCM(unittest.TestCase):
         try:        
             _logger.info("get_db_path('not_valid_db'): %s" % nokia.gscm.get_db_path('not_valid_db'))
             assert False, "Should raise Exception when giving unexisting db.'"
-        except Exception, exc:
+        except IOError, exc:
             _logger.info(exc)
 
     def test_get_engine_host(self):
@@ -66,7 +66,7 @@ class TestGSCM(unittest.TestCase):
         try:        
             _logger.info("get_engine_host('not_valid_db'): %s" % nokia.gscm.get_engine_host('not_valid_db'))
             assert False, "Should raise Exception when giving unexisting db.'"
-        except Exception, exc:
+        except IOError, exc:
             _logger.info(exc)
 
     def test_get_router_address(self):
@@ -78,5 +78,5 @@ class TestGSCM(unittest.TestCase):
         try:        
             _logger.info("get_router_address('not_valid_db'): %s" % nokia.gscm.get_router_address('not_valid_db'))
             assert False, "Should raise Exception when giving unexisting db.'"
-        except Exception, exc:
+        except IOError, exc:
             _logger.info(exc)

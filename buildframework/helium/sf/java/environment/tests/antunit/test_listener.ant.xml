@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- 
 ============================================================================ 
-Name        : test_signaltask.ant.xml 
+Name        : test_listener.ant.xml 
 Part of     : Helium AntLib
 
 Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).

@@ -56,6 +56,27 @@ Description:
     @since 11.0
     -->
     
+    <!--* @property post.coverity.steps.enabled
+    Set to true to run post coverity steps.
+    @type boolean
+    @scope private
+    @since 11.0.4
+    -->
+    
+    <!--* @property is.zero.coverity.errors
+    Set to true if coverity error file contains zero errors.
+    @type boolean
+    @scope private
+    @since 11.0.4
+    -->
+    
+    <!--* @property is.zero.coverity.output.errors
+    Set to true if coverity output file contains zero fatal errors.
+    @type boolean
+    @scope private
+    @since 11.0.4
+    -->
+    
     <!--* @property internal.coverity.commit.defects.enabled
     Run the targets to commit the defects into database if coverity.commit.defects.enabled set to true.
     @type boolean
@@ -145,14 +166,14 @@ Description:
     <!-- set property if coverity is enabled -->
     <condition property="internal.coverity.enabled">
         <or>
-            <istrue value="${coverity.enabled}" />
+            <istrue value="${coverity.enabled}"/>
             <istrue value="${enabled.coverity}"/>
         </or>
     </condition>
     
     <!-- set property if coverity.commit.defects.enabled is enabled -->
     <condition property="internal.coverity.commit.defects.enabled">
-        <istrue value="${coverity.commit.defects.enabled}" />
+        <istrue value="${coverity.commit.defects.enabled}"/>
     </condition>
     
     <if>
@@ -178,74 +199,59 @@ Description:
         <arg name="--record-only" value=""/>
     </hlm:coverityoptions>
     
-    <!-- cov-build emit command options -->
-    <hlm:coverityoptions id="coverity.emit.options">
-        <arg name="--config" value="${coverity.config.dir}/coverity_config.xml"/>
-        <arg name="--dir" value="${coverity.inter.dir}"/>
-        <arg name="--replay" value=""/>
-        <arg name="--replay-processes" value="${coverity.no.thread}"/>
-    </hlm:coverityoptions>
-    
-    <!-- cov-config command options -->
-    <hlm:coverityoptions id="coverity.config.options">
-        <hlm:arg name="--config" value="${coverity.config.dir}/coverity_config.xml"/>
-        <hlm:arg name="--template" value=""/>
-        <hlm:arg name="--comptype" value="armcc"/>
-        <hlm:arg name="--compiler" value="armcc.exe"/>
-    </hlm:coverityoptions>
-    
-    <!-- cov-analyze command options -->
-    <hlm:coverityoptions id="coverity.analyze.options">
-        <hlm:arg name="--dir" value="${coverity.analyze.dir}"/>
-        <hlm:arg name="--all" value=""/>
-        <hlm:arg name="--symbian" value=""/>
-        <hlm:arg name="--append" value=""/>
-        <hlm:arg name="--enable-callgraph-metrics" value=""/>
-    </hlm:coverityoptions>
-
     <!-- To run post coverity steps -->
     <target name="post-coverity" if="internal.coverity.enabled">
         <mkdir dir="${post.log.dir}"/>
+        
         <!-- To emit the file into defect database -->
-        <antcall target="run-coverity-emit"/>
+        <runtarget target="run-coverity-emit"/>
+        
+        <!-- To collect linkage information on all files -->
+        <runtarget target="run-coverity-link"/>
         
         <!-- To analyze the sources file -->
-        <antcall target="run-coverity-analyze"/>
+        <runtarget target="run-coverity-analyze"/>
         
         <!-- To generate the HTML error pages -->
-        <antcall target="gen-coverity-report"/>
+        <runtarget target="gen-coverity-report"/>
         
         <!-- To commit the defects into coverity defect manager. -->
-        <antcall target="run-commit-defects"/>
-        
-        <hlm:metadatarecord database="${metadata.dbfile}">
-            <hlm:textmetadatainput>
-                <fileset casesensitive="false" file="${post.log.dir}/${build.id}_coverity_command_errors.log" />
-                <metadatafilterset>
-                    <metadatafilter priority="error" regex=".*" description="coverity error" />
-                </metadatafilterset>
-            </hlm:textmetadatainput>
-        </hlm:metadatarecord>
-        <hlm:metadataCountSeverity severity="ERROR" log="${post.log.dir}/${build.id}_coverity_command_errors.log" database="${metadata.dbfile}" property="coverity.error.total"/>
-        <echo>Coverity command errors: ${coverity.error.total}</echo>
-        <hlm:generateBuildStatus file="${post.log.dir}/${build.id}_coverity_command_errors.log" />
-        <hlm:signalMacro logfile="${post.log.dir}/${build.id}_coverity_command_errors.log" phase="post" signal.input="coveritySignalInput" />
+        <runtarget target="run-commit-defects"/>
     </target>
     
     <!-- Run coverity configure if the coverity.enabled is set to true -->
     <target name="run-coverity-configure" if="internal.coverity.enabled">
-        <hlm:coverity command="cov-configure" dir="${build.drive}/">
-            <hlm:coverityoptions refid="coverity.config.options"/>
-        </hlm:coverity >
+        <mkdir dir="${compile.log.dir}"/>
+        <!-- cov-config command options -->
+        <hlm:coverityoptions id="coverity.config.options">
+            <hlm:arg name="--config" value="${coverity.config.dir}/coverity_config.xml"/>
+            <hlm:arg name="--template" value=""/>
+            <hlm:arg name="--comptype" value="armcc"/>
+            <hlm:arg name="--compiler" value="armcc.exe"/>
+        </hlm:coverityoptions>
+        <hlm:runCoverityCommand errorlog="${compile.log.dir}/${build.id}_coverity_configure_errors.log"
+            command="cov-configure"
+            options="coverity.config.options"
+            outputlog="${compile.log.dir}/${build.id}_coverity_configure_output.log"
+        />
     </target>
     
     <!-- Run coverity build with emit options if the coverity.enabled is set to true 
      re-running the cov-build with replay option will reduce the build time by ~ 20% 
     -->
-    <target name="run-coverity-emit" >
-        <hlm:coverity command="cov-build" dir="${build.drive}/" error="${post.log.dir}/${build.id}_coverity_command_errors.log" >
-            <hlm:coverityoptions refid="coverity.emit.options"/>
-        </hlm:coverity >
+    <target name="run-coverity-emit">
+        <!-- cov-build emit command options -->
+        <hlm:coverityoptions id="coverity.emit.options">
+            <arg name="--config" value="${coverity.config.dir}/coverity_config.xml"/>
+            <arg name="--dir" value="${coverity.inter.dir}"/>
+            <arg name="--replay" value=""/>
+            <arg name="--replay-processes" value="${coverity.no.thread}"/>
+        </hlm:coverityoptions>
+        <hlm:runCoverityCommand errorlog="${post.log.dir}/${build.id}_coverity_emit_errors.log"
+            command="cov-build"
+            options="coverity.emit.options"
+            outputlog="${post.log.dir}/${build.id}_coverity_emit_output.log"
+        />
     </target>
     
     <!-- Run coverity-analyze if the coverity.enabled is set to true 
@@ -260,34 +266,75 @@ Description:
      So run the cov-link commands and analyze the database using cov-analyze command.
     
     -->
-    <target name="run-coverity-analyze" >
+    <target name="run-coverity-link" if="post.coverity.steps.enabled">
         <mkdir dir="${coverity.link.dir}"/>
-        <hlm:coverity command="cov-link" dir="${build.drive}/" error="${post.log.dir}/${build.id}_coverity_command_errors.log" append="true">
+        
+        <!-- Run cov-link with the -co and -of options to collect linkage information on all files compiled in an emit directory.-->        
+        <hlm:coverityoptions id="coverity.link.all.options">
             <hlm:arg name="--dir" value="${coverity.inter.dir}"/>
             <hlm:arg name="--collect" value=""/>
             <hlm:arg name="-of" value="${coverity.link.dir}/all.link"/>
-        </hlm:coverity >
-        <hlm:coverity command="cov-link" dir="${build.drive}/" error="${post.log.dir}/${build.id}_coverity_command_errors.log" append="true">
+        </hlm:coverityoptions>
+        <hlm:runCoverityCommand errorlog="${post.log.dir}/${build.id}_coverity_link_errors.log" 
+            command="cov-link" 
+            options="coverity.link.all.options"
+            outputlog="${post.log.dir}/${build.id}_coverity_link_output.log"
+        />
+        
+        <!--Create one or more additional link files by filtering information using either an argument or a portion 
+        of the pathname that was used during command-line compilation-->
+        <hlm:coverityoptions id="coverity.link.options">
             <hlm:arg name="--dir" value="${coverity.inter.dir}"/>
             <hlm:arg name="--compile-arg" value="armv5"/>
             <hlm:arg name="-of" value="${coverity.link.dir}/armv5.link"/>
             <hlm:arg name="${coverity.link.dir}/all.link" value=""/>
-        </hlm:coverity >
-        <hlm:coverity command="cov-link" dir="${build.drive}/" error="${post.log.dir}/${build.id}_coverity_command_errors.log" append="true">
+        </hlm:coverityoptions>
+        <hlm:runCoverityCommand errorlog="${post.log.dir}/${build.id}_coverity_link_errors.log"
+            append="true"
+            command="cov-link" 
+            options="coverity.link.options"
+            outputlog="${post.log.dir}/${build.id}_coverity_link_output.log"
+        />
+        
+        <!--Use the link files created in the previous steps, and the emit repository in the original intermediate directory, to create a new 
+        intermediate directory with an emit repository with resolved function calls -->
+        <hlm:coverityoptions id="coverity.link.extract.options">
             <hlm:arg name="--dir" value="${coverity.inter.dir}"/>
             <hlm:arg name="--output-dir" value="${coverity.analyze.dir}"/>
             <hlm:arg name="${coverity.link.dir}/armv5.link" value=""/>
-        </hlm:coverity >
-        <hlm:coverity command="cov-analyze" dir="${build.drive}/" error="${post.log.dir}/${build.id}_coverity_command_errors.log" append="true">
-            <hlm:coverityoptions refid="coverity.analyze.options"/>
-        </hlm:coverity >
+        </hlm:coverityoptions>
+        <hlm:runCoverityCommand errorlog="${post.log.dir}/${build.id}_coverity_link_errors.log" 
+            append="true" 
+            command="cov-link" 
+            options="coverity.link.extract.options"
+            outputlog="${post.log.dir}/${build.id}_coverity_link_output.log"
+        />
+    </target>
+    
+    <!-- To analyze the sources file -->
+    <target name="run-coverity-analyze" if="post.coverity.steps.enabled">
+        
+        <!-- cov-analyze command options -->
+        <hlm:coverityoptions id="coverity.analyze.options">
+            <hlm:arg name="--dir" value="${coverity.analyze.dir}"/>
+            <hlm:arg name="--all" value=""/>
+            <hlm:arg name="--symbian" value=""/>
+            <hlm:arg name="--append" value=""/>
+            <hlm:arg name="--enable-callgraph-metrics" value=""/>
+        </hlm:coverityoptions>
+        <hlm:runCoverityCommand errorlog="${post.log.dir}/${build.id}_coverity_analyze_errors.log" 
+            command="cov-analyze" 
+            options="coverity.analyze.options"
+            outputlog="${post.log.dir}/${build.id}_coverity_analyze_output.log"
+        />
+        
     </target>
     
     
     <!-- Generate coverity report -->
-    <target name="gen-coverity-report">
+    <target name="gen-coverity-report" if="post.coverity.steps.enabled">
         <!-- Read the summary file generated by cov-analyze and generate html file -->
-        <fmpp sourceFile="${helium.dir}/tools/common/templates/coverity/coverity.summary.html.ftl"
+        <fmpp sourceFile="${helium.dir}/tools/compile/templates/coverity.summary.html.ftl"
               outputFile="${temp.build.dir}/${build.id}_coverity_build_summary.html">
             <data   expandProperties="yes">
                     ant: antProperties()
@@ -296,7 +343,7 @@ Description:
         </fmpp>
         
         <!-- To generate summary file for diamonds -->
-        <fmpp sourceFile="${helium.dir}/tools/common/templates/coverity/coverity.summary.xml.ftl"
+        <fmpp sourceFile="${helium.dir}/tools/compile/templates/coverity.summary.xml.ftl"
               outputFile="${coverity.summary.xml.file}">
             <data   expandProperties="yes">
                     ant: antProperties()
@@ -305,11 +352,16 @@ Description:
         </fmpp>
         
         <!-- Run this to get the static html pages -->
-        <hlm:coverity command="cov-format-errors" dir="${build.drive}/" error="${post.log.dir}/${build.id}_coverity_command_errors.log" append="true">
+        <hlm:coverityoptions id="coverity.format.errors.options">
             <hlm:arg name="--dir" value="${coverity.analyze.dir}"/>
             <hlm:arg name="--filesort" value=""/>
             <hlm:arg name="--functionsort" value=""/>
-        </hlm:coverity >
+        </hlm:coverityoptions>
+        <hlm:runCoverityCommand errorlog="${post.log.dir}/${build.id}_coverity_format_errors.log" 
+            command="cov-format-errors" 
+            options="coverity.format.errors.options"
+            outputlog="${post.log.dir}/${build.id}_coverity_format_ouput.log"
+        />
         
         <!-- Copy the summary file to resolve the xml load error -->
         <copy file="${coverity.analyze.dir}/c/output/errors/summary.xml" tofile="${coverity.checkers.xml.file}" overwrite="true" failonerror="false">
@@ -341,61 +393,40 @@ Description:
         </concat>
     </target>
     
-    
-    <!-- To get the SBS variable value -->
-    <macrodef name="getSBSVariableValue" uri="http://www.nokia.com/helium">
-        <attribute name="variablename"/>
-        <attribute name="outputvar"/>
-        <attribute name="sbsinput"/>
-        <sequential>
-            <var name="output.var" unset="true"/>
-            <hlm:getVariableValue name="@{variablename}" property="output.var">
-                <hlm:sbsinput refid="@{sbsinput}" />
-            </hlm:getVariableValue>
-            <if>
-                <and>
-                    <isset property="output.var"/>
-                    <matches string="${output.var}" pattern="arm.*"/>
-                </and>
-                <then>
-                    <antcall target="set-arm-version"/>
-                </then>
-            </if>
-            <script language="beanshell"> <![CDATA[
-                curVal=project.getProperty("output.var"); 
-                project.setProperty("@{outputvar}",curVal);
-                ]]>
-            </script> 
-        </sequential>
-    </macrodef>
-    
     <!-- To commit the coverity defects into coverity defect manager --> 
     <target name="run-commit-defects" depends="coverity-username,coverity-password" if="internal.coverity.commit.defects.enabled">
-        
-        <!-- Check is the coverity defect manager server and port numbers are set -->
-        <fail message="FAILED: Coverity defect manager server/IP address is not set. Please set 'coverity.defect.manager.server'. Ex: server.domain.extension or 100.220.530.101" 
-            unless="coverity.defect.manager.server"/>
-        <fail message="FAILED: Coverity defect manager HTTP port number is not set. Please set 'coverity.defect.manager.port'." 
-            unless="coverity.defect.manager.port"/>        
-        <!-- Check is the coverity defect manager server product is set to submit the coverity errors.-->
-        <fail message="FAILED: Coverity defect manager product name is not set. Please set 'coverity.defect.manager.product'." 
-            unless="coverity.defect.manager.product"/>
-        
-        <!-- cov-commit-defects command options -->
-        <hlm:coverityoptions id="coverity.commit.defects.options">
-            <hlm:arg name="--config" value="${coverity.config.dir}/coverity_config.xml"/>
-            <hlm:arg name="--remote" value="${coverity.defect.manager.server}"/>
-            <hlm:arg name="--port" value="${coverity.defect.manager.port}"/>
-            <hlm:arg name="--user" value="${coverity.username}"/>
-            <hlm:arg name="--password" value="${coverity.password}"/>
-            <hlm:arg name="--dir" value="${coverity.analyze.dir}"/>
-            <hlm:arg name="--product" value="${coverity.defect.manager.product}"/>
-        </hlm:coverityoptions>
-        
-        <!-- Run the coverity commit defects command to submit the errors into defect manager -->
-        <hlm:coverity command="cov-commit-defects" dir="${build.drive}/" error="${post.log.dir}/${build.id}_coverity_command_errors.log" append="true">
-            <hlm:coverityoptions refid="coverity.commit.defects.options"/>
-        </hlm:coverity >
+        <if>
+            <istrue value="${post.coverity.steps.enabled}"/>
+            <then>
+                <mkdir dir="${post.log.dir}"/>
+                <!-- Check is the coverity defect manager server and port numbers are set -->
+                <fail message="FAILED: Coverity defect manager server/IP address is not set. Please set 'coverity.defect.manager.server'. Ex: server.domain.extension or 100.220.530.101" 
+                    unless="coverity.defect.manager.server"/>
+                <fail message="FAILED: Coverity defect manager HTTP port number is not set. Please set 'coverity.defect.manager.port'." 
+                    unless="coverity.defect.manager.port"/>        
+                <!-- Check is the coverity defect manager server product is set to submit the coverity errors.-->
+                <fail message="FAILED: Coverity defect manager product name is not set. Please set 'coverity.defect.manager.product'." 
+                    unless="coverity.defect.manager.product"/>
+                
+                <!-- cov-commit-defects command options -->
+                <hlm:coverityoptions id="coverity.commit.defects.options">
+                    <hlm:arg name="--config" value="${coverity.config.dir}/coverity_config.xml"/>
+                    <hlm:arg name="--remote" value="${coverity.defect.manager.server}"/>
+                    <hlm:arg name="--port" value="${coverity.defect.manager.port}"/>
+                    <hlm:arg name="--user" value="${coverity.username}"/>
+                    <hlm:arg name="--password" value="${coverity.password}"/>
+                    <hlm:arg name="--dir" value="${coverity.analyze.dir}"/>
+                    <hlm:arg name="--product" value="${coverity.defect.manager.product}"/>
+                </hlm:coverityoptions>
+                
+                <!-- Run the coverity commit defects command to submit the errors into defect manager -->
+                <hlm:runCoverityCommand errorlog="${post.log.dir}/${build.id}_coverity_commit_defects_errors.log" 
+                    command="cov-commit-defects" 
+                    options="coverity.commit.defects.options"
+                    outputlog="${post.log.dir}/${build.id}_coverity_commit_defects_ouput.log"
+                />
+            </then>
+        </if>
     </target>
     
     <!-- Retrieve the coverity password from the .netrc file and store it into coverity.password property. -->
@@ -409,4 +440,60 @@ Description:
         <hlm:netrcUsernameMacro output-prop="coverity.username" result-prop="coverity.username.available" type="coverity"/>
     </target>
     
+    
+    <!-- To run coverity command and to check errors thrown by coverity commands -->
+    <macrodef name="runCoverityCommand" uri="http://www.nokia.com/helium">
+        <attribute name="errorlog"/>
+        <attribute name="outputlog"/>
+        <attribute name="command"/>
+        <attribute name="append" default="false"/>
+        <attribute name="options"/>
+        <sequential>
+            <var name="is.zero.coverity.errors" unset="true"/>
+            <var name="is.zero.coverity.output.errors" unset="true"/>
+            <var name="post.coverity.steps.enabled" unset="true"/>
+            <var name="total.coverity.errors" unset="true"/>
+            <var name="total.coverity.output.errors" unset="true"/>
+            <hlm:coverity command="@{command}" dir="${build.drive}/" error="@{errorlog}" append="@{append}" output="@{outputlog}">
+                <hlm:coverityoptions refid="@{options}"/>
+            </hlm:coverity>
+            <hlm:metadatarecord database="${metadata.dbfile}">
+                <hlm:coveritymetadatainput>
+                    <fileset casesensitive="false" file="@{errorlog}"/>
+                    <metadatafilterset refid="filterset.coverity.error.cli"/>
+                </hlm:coveritymetadatainput>
+            </hlm:metadatarecord>
+            <hlm:metadataCountSeverity severity="ERROR" log="@{errorlog}" database="${metadata.dbfile}" property="total.coverity.errors"/>
+            <echo>Coverity command '@{command}' errors: ${total.coverity.errors}</echo>
+            <condition property="is.zero.coverity.errors">
+                <equals arg1="${total.coverity.errors}" arg2="0"/>
+            </condition>
+            <hlm:generateBuildStatus file="@{errorlog}"/>
+            <hlm:signalMacro logfile="@{errorlog}" phase="post" signal.input="coveritySignalInput"/>
+            <if>
+                <available file="@{outputlog}" />
+                <then>
+                    <hlm:metadatarecord database="${metadata.dbfile}">
+                        <hlm:coveritymetadatainput>
+                            <fileset casesensitive="false" file="@{outputlog}"/>
+                            <metadatafilterset refid="filterset.coverity.output.cli"/>
+                        </hlm:coveritymetadatainput>
+                    </hlm:metadatarecord>
+                    <hlm:metadataCountSeverity severity="ERROR" log="@{outputlog}" database="${metadata.dbfile}" property="total.coverity.output.errors"/>
+                    <echo>Coverity command '@{command}' errors: ${total.coverity.output.errors}</echo>
+                    <condition property="is.zero.coverity.output.errors">
+                        <equals arg1="${total.coverity.output.errors}" arg2="0"/>
+                    </condition>
+                    <hlm:generateBuildStatus file="@{outputlog}"/>
+                    <hlm:signalMacro logfile="@{outputlog}" phase="post" signal.input="coveritySignalInput"/>
+                </then>
+            </if>
+            <condition property="post.coverity.steps.enabled">
+                <and>
+                    <istrue value="${is.zero.coverity.errors}"/>
+                    <istrue value="${is.zero.coverity.output.errors}"/>
+                </and>
+            </condition>
+        </sequential>
+    </macrodef>
 </project>

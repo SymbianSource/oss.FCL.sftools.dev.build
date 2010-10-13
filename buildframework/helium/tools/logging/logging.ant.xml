@@ -288,7 +288,7 @@ else:
             </hlm:metadatarecord>
             <!-- todo: check to add for usage and add genbuildstatus macro -->
             <basename property="log.name" file="@{log}"/>
-            <fmpp sourceFile="${helium.dir}/tools/common/templates/db2xml.xml.ftl"
+            <fmpp sourceFile="${helium.dir}/tools/logging/templates/db2xml.xml.ftl"
                          outputfile="@{log}.xml">
                 <data expandProperties="yes">
                     dbPath: ${metadata.dbfile}

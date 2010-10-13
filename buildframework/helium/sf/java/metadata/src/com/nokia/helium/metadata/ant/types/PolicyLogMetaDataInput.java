@@ -124,23 +124,32 @@ public class PolicyLogMetaDataInput extends LogMetaDataInput {
         public void startElement(String uri, String localName, String qName,
                 Attributes attributes) throws SAXException {
             if (qName.equalsIgnoreCase("error")) {
-                String errorType = attributes.getValue("", "type");
+                String errorType = attributes.getValue("type");
                 MetadataEntry me = new MetadataEntry();
                 me.setLogFile(autoCommitEM.merge(logFile));
                 me.setLineNumber(locator.getLineNumber());
                 me.setSeverity(severity);
                 if (errorType.equals("unknownstatus")) {
-                    me.setText(attributes.getValue("", "message") + attributes.getValue("", "value"));
+                    me.setText(attributes.getValue("message") + attributes.getValue("value"));
                 } else if (errorType.equals("A") || errorType.equals("B") 
                         || errorType.equals("C") || errorType.equals("D")) {
                     int flags = Pattern.CASE_INSENSITIVE | Pattern.DOTALL ;
                     Pattern pattern = Pattern.compile("([\\\\/][^\\\\/]+?)$", flags);
                     me.setText(pattern.matcher(errorType + "Found incorrect value for " 
-                            + attributes.getValue("", "message")).replaceAll(""));
+                            + attributes.getValue("message")).replaceAll(""));
                 } else if (errorType.equals("missing")) {
-                    me.setText(attributes.getValue("", "message"));
+                    me.setText(attributes.getValue("message"));
                 } else if (errorType.equals("invalidencoding")) {
-                    me.setText(attributes.getValue("", "message"));
+                    me.setText(attributes.getValue("message"));
+                } else {
+                    String message = errorType;
+                    if (attributes.getValue("message") != null) {
+                        message += " : " + attributes.getValue("message"); 
+                    }
+                    if (attributes.getValue("value") != null) {
+                        message += ", " + attributes.getValue("value"); 
+                    }
+                    me.setText(message);                    
                 }
                 autoCommitEM.persist(me);
             }

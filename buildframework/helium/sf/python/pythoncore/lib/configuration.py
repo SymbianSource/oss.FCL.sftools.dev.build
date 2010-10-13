@@ -558,10 +558,7 @@ class NestedConfigurationBuilder(ConfigurationBuilder):
         A ConfigurationSet represents a number of Configuration objects
         that all may need to be processed.
         """
-        try:
-            dom = xml.dom.minidom.parse(self.inputfile)
-        except Exception, exc:
-            raise Exception("XML file '%s' cannot be parsed properly: %s" % (self.inputfile, exc))
+        dom = xml.dom.minidom.parse(self.inputfile)
 
         # The root element is typically <build> but can be anything
         self.rootNode = dom.documentElement

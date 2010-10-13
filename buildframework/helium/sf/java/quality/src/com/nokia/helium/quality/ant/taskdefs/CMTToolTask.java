@@ -49,7 +49,7 @@ import org.apache.tools.ant.types.FileSet;
  * fileset: Location of the source files whose complexity is to be measured.
  * </pre>
  * 
- * @ant.task name="cmt" category="Quality".
+ * @ant.task name="cmt" category="Quality"
  */
 public class CMTToolTask extends Task {
 

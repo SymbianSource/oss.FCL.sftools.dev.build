@@ -202,10 +202,11 @@ class ConflictsResult(Result):
             if mresult != None:
                 project = self._session.create(mresult.group(1))
                 self._output[project] = []
-            mresult = re.match(r"^(.*)\s+(\w+#\d+)\s+(.+)$", line)
+            mresult = re.match(r"^(.*?)\s+(\w+#\d+(?:,\s+\w+#\d+)*)\s+(.+)$", line)
             if mresult != None and project != None:
-                self._output[project].append({'object': self._session.create(mresult.group(1)),
-                                              'task': self._session.create("Task %s" % mresult.group(2)),
+                for task in mresult.group(2).split(','):
+                    self._output[project].append({'object': self._session.create(mresult.group(1)),
+                                              'task': self._session.create("Task %s" % task),
                                               'comment': mresult.group(3)})
             mresult = re.match(r"^(\w+#\d+)\s+(.+)$", line)
             if mresult != None and project != None:
@@ -340,7 +341,6 @@ class UpdateResult(UpdateResultSimple):
         match_warning = re.compile(r"^Warning:(.*)")
         match_failed = re.compile(r"(Update failed)")
         
-        # TODO: cleanup the parsing to do that in a more efficient way.
         for line in output.splitlines():
             _logger.info(line)
             res = match_object_update.match(line)
@@ -723,9 +723,6 @@ class AbstractSession(object):
         
     def __repr__(self):
         return self.__str__()
-    
-    def __del__(self):
-        self.close()
 
     def purposes(self, role=None):
         """ Returns available purposes. """
@@ -922,7 +919,7 @@ class SessionPool(AbstractSession):
             
         try:
             for session in self._free_sessions:
-                session.role = session._set_role(role)
+                session.role = role
         finally:                
             self._lock_pool = False
             self._pool_lock.notifyAll()
@@ -1349,11 +1346,13 @@ class Project(CCMObject):
         
     def _getrelease(self):
         """ Get the release of the current object. Returns a Releasedef object. """
-        self._release = Releasedef(self._session, self['release'])
+        if self._release == None and (self['release'] != None and self['release'] != ''):
+            self._release = Releasedef(self._session, self['release'])
         return self._release
 
     def _setrelease(self, release):
         """ Set the release of the current object. """
+        self._release = release
         self['release'] = release['displayname']
     
     def refresh(self):
@@ -1381,7 +1380,7 @@ class Project(CCMObject):
         if result.status != None and result.status != 0:
             raise CCMException("Error setting basline of project '%s'\n%s" % (self.objectname, result.output))
 
-    def set_update_method(self, name, recurse = False):
+    def set_update_method(self, name, recurse=False):
         """ Set the update method for the project (and subproject if recurse is True). """
         assert name != None, "name must not be None."
         assert len(name) > 0, "name must not be an empty string."
@@ -1392,7 +1391,7 @@ class Project(CCMObject):
         if result.status != None and result.status != 0:
             raise CCMException("Error setting reconfigure properties to %s for project '%s'\nStatus: %s\n%s" % (name, self.objectname, result.status, result.output))
    
-    def apply_update_properties(self, baseline = True, tasks_and_folders = True, recurse=True):
+    def apply_update_properties(self, baseline=True, tasks_and_folders=True, recurse=True):
         """ Apply update properties to subprojects. """
         args = ""
         if not baseline:
@@ -1423,7 +1422,7 @@ class Project(CCMObject):
                 return result.output
         raise CCMException("Error creation snapshot of %s,\n%s" % (self.objectname, result.output), result)
     
-    def checkout(self, release, version=None, purpose=None, subprojects=True):
+    def checkout(self, release, version=None, purpose=None, subprojects=True, path=None):
         """ Create a checkout of this project. 
         
         This will only checkout the project in Synergy. It does not create a work area.
@@ -1448,6 +1447,9 @@ class Project(CCMObject):
             self._session.role = get_role_for_purpose(self._session, purpose)
             
             args += " -purpose \"%s\"" % purpose
+        if path:
+            args += " -path \"%s\"" % path
+            
         if subprojects:
             args += " -subprojects"
         result = self._session.execute("checkout -project \"%s\" -release \"%s\" -no_wa %s" \
@@ -1456,47 +1458,7 @@ class Project(CCMObject):
             self._session.role = role
         if result.project == None:
             raise CCMException("Error checking out project %s,\n%s" % (self.objectname, result.output), result)
-        return result
-    
-    def create_release_tag(self, release, new_tag):
-        """ creates new release tag """
-        role = self._session.role
-        
-        if role is None:
-            self._session.role = "developer"
-            role = self._session.role
-
-        args = "release -create %s -from %s -bl %s -active -allow_parallel_check_out" % (new_tag, release, release)
-        self._session.role = "build_mgr"
-
-        result = self._session.execute(" %s" \
-                                  % (args), Result(self._session))
-        self._session.role = role
-
-        return result.output
-
-    def delete_release_tag(self, release, new_tag):
-        """ deletes new release tag """
-
-        role = self._session.role
-        if role is None:
-            self._session.role = "developer"
-            role = self._session.role
-        
-
-        self._session.role = "build_mgr"
-
-        result = self._session.execute("pg -l -r %s -u" \
-                                  % (new_tag), Result(self._session))
-        result = self._session.execute("pg -d \"%s\" -m" \
-                                  % (result.output), Result(self._session))
-        result = self._session.execute("release -d %s -force" \
-                                  % (new_tag), Result(self._session))
-
-        self._session.role = role
-
-        return result.output
-        
+        return result        
         
     def work_area(self, maintain, recursive=None, relative=None, path=None, pst=None, wat=False):
         """ Configure the work area. This allow to enable it or disable it, set the path, recursion... """
@@ -1629,6 +1591,44 @@ class Releasedef(CCMObject):
         return self.name
             
     component = property(_getcomponent)
+    
+    def create_tag(self, new_tag):
+        """ creates new release tag """
+        role = self._session.role
+        
+        if role is None:
+            self._session.role = "developer"
+            role = self._session.role
+
+        args = "release -create %s -from %s -bl %s -active -allow_parallel_check_out" % (new_tag, self.objectname, self.objectname)
+        self._session.role = "build_mgr"
+
+        result = self._session.execute(" %s" \
+                                  % (args), Result(self._session))
+        self._session.role = role
+
+        return result.output
+
+    def delete_tag(self, new_tag):
+        """ deletes new release tag """
+
+        role = self._session.role
+        if role is None:
+            self._session.role = "developer"
+            role = self._session.role
+        
+        self._session.role = "build_mgr"
+
+        result = self._session.execute("pg -l -r %s -u" \
+                                  % (new_tag), Result(self._session))
+        result = self._session.execute("pg -d \"%s\" -m" \
+                                  % (result.output), Result(self._session))
+        result = self._session.execute("release -d \"%s\" -force" \
+                                  % (new_tag), Result(self._session))
+
+        self._session.role = role
+
+        return result.output
 
 
 class Folder(CCMObject):
@@ -1751,7 +1751,6 @@ class Task(CCMObject):
     objects = property(_getobjects)
     
     def __unicode__(self):
-        # TODO: use optimised query that makes only 1 ccm query with suitable format
         if self.__unicode_str_text == None:
             self.__unicode_str_text = u'%s: %s' % (self['displayname'], self['task_synopsis'])
         return self.__unicode_str_text
@@ -1770,6 +1769,7 @@ class Task(CCMObject):
         return result.output
 
     release = property(get_release_tag, set_release_tag)
+
 
 class UpdateTemplate:
     """ Allow to access Update Template property using Release and Purpose. """

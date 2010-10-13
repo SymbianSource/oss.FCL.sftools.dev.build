@@ -40,7 +40,7 @@ of the S60 code.
 
 It is recommended to read the Ant_ documentation before learning about Helium. An understanding of XML_ is also needed as Ant_ is configured using an XML_ format.
 
-.. _Ant: http://Ant.apache.org/
+.. _Ant: http://ant.apache.org/
 .. _XML: http://www.w3.org/XML/
 
 .. index::

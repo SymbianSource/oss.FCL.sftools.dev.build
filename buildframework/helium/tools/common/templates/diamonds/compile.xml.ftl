@@ -28,21 +28,21 @@ Description:
     <faults>
         <#list doc.compile.components.component as component>
         <component>
-            <name>${component.@name}</name>
-            <total severity="error">${component.@error}</total>
-            <total severity="warning">${component.@warning}</total>
+            <name>${component.@name?xml}</name>
+            <total severity="error">${component.@error?xml}</total>
+            <total severity="warning">${component.@warning?xml}</total>
         </component>
         </#list>
         <!-- print summary of the errors -->
-        <total severity="error">${doc.compile.total.@error}</total>      
-        <total severity="warning">${doc.compile.total.@warning}</total>
+        <total severity="error">${doc.compile.total.@error?xml}</total>      
+        <total severity="warning">${doc.compile.total.@warning?xml}</total>
         <total severity="warning_rvct_other">0</total>
         <!-- todo update to calculate the correct value -->
-        <total severity="warning_rvct_bad">${doc.compile.total.@critical}</total>
+        <total severity="warning_rvct_bad">${doc.compile.total.@critical?xml}</total>
     </faults>
     <components>
         <#list doc.compile.components.component as component>
-        <component>${component.@name}</component>
+        <component>${component.@name?xml}</component>
         </#list>
     </components>
 </#if>

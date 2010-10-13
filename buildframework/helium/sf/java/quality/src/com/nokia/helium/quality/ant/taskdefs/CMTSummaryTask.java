@@ -304,7 +304,6 @@ public class CMTSummaryTask extends Task {
                             lineLen = 0;
                         }
                         else {
-                            log("can't find the '=' at end of line  ", Project.MSG_ERR);
                             lineLen = 0;
                         }
                     }
@@ -322,7 +321,6 @@ public class CMTSummaryTask extends Task {
                     }
                     else {
                         lineLen = 0;
-                        log("can't find the digits at beg of line ", Project.MSG_ERR);
                     }
                 }
                 else {

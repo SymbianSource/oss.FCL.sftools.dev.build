@@ -19,12 +19,13 @@ Description:
 
 ============================================================================
 -->
-<#include "diamonds_header.ftl"> 
+<#include "diamonds_header.ftl">
 <quality aspect="policy">
-<#if (doc)??!""?keys?seq_contains('policyvalidation')>
-<#list doc['policyvalidation'].error as error>
+    <#if (doc)??!""?keys?seq_contains('policyvalidation')>
+    <summary message="Policy validation errors" value="${doc['policyvalidation'].error?size}"/>
+    <#list doc['policyvalidation'].error as error>
     <message severity="error" type="${error.@type}" message="${error.@message}" value="${error.@value}"/>
-</#list>
-</#if>
+    </#list>
+    </#if>
 </quality>
-<#include "diamonds_footer.ftl"> 
+<#include "diamonds_footer.ftl">

@@ -382,7 +382,6 @@ class Configuration(SysDefElement):
                     reason = filter_out(self.filters, unit.filters)
                     if reason == None:
                         # Get the unit object from the cache if this is a string
-                        # TODO - remove once unitlist returns list of Unit objects
                         if isinstance(unit, types.UnicodeType):
                             unit = self._sysDef[unit]
                         result.append(unit)
@@ -458,7 +457,6 @@ class SystemDefinition(object):
         """ Initialisation """
         self.__xml = xml.dom.minidom.parse(open(filename, "r"))
         self._cache = {}
-        #TODO - why store these as hashes?
         self._units = {}
         self._layers = {}
         self._modules = {}
@@ -551,7 +549,6 @@ class SystemDefinition(object):
             
     def addElement(self, element):
         """ Adds SysDef element to cache. """
-        #TODO - handle duplicate names of different types
         if not self._cache.has_key(element.get_id()):
             self._cache[element.get_id()] = element
             #_logger.info('Adding SysDef element to cache: %s' % str(element))

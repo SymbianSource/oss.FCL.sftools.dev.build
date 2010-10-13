@@ -26,8 +26,11 @@ class FlashImageSizeWriter(object):
     def __init__(self, output):
         """ Initialisation. """
         self.output = output
-        self._out = file(output, 'w')
-        
+        if isinstance(output, basestring):
+            self._out = file(output, 'w')
+        else:
+            self._out = output
+            
     def write(self, sys_def, config_list):
         """ Write the .csv data to a file for the given System Definition and configuration name. """
         self._out.write('component,binary,rom,rofs1,rofs2,rofs3\n')

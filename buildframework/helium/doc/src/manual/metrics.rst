@@ -45,7 +45,7 @@ Helium configuration
 ====================
 To enable logging to diamonds from Helium one needs to ensure that:
 
-* The properties :hlm-p:`diamonds.host` and :hlm-p:`diamonds.port` are set correctly.
+* The properties ``diamonds.host`` and ``diamonds.port`` are set correctly.
 * By default they are taken from ``helium/tools/common/companyproperties.ant.xml``, but can be overridden by using:
 
   * **Command line**    
@@ -83,8 +83,8 @@ Properties need to be defined for successful logging:
    "``diamonds.host``", "Diamonds server address"
    "``diamonds.port``", "Server port number"
    "``diamonds.path``", "Builds path in Diamonds server"
-   ":hlm-p:`build.family`", "Category of product"
-   ":hlm-p:`stages`", "Start and end target of a stages with logical stage name"
+   "``build.family``", "Category of product"
+   "``stages``", "Start and end target of a stages with logical stage name"
    ":hlm-p:`sysdef.configurations.list`", "System definition name list to log component faults"
    ":hlm-p:`build.name`", "Name of product"
    ":hlm-p:`release.label`", "Name of release"

@@ -28,7 +28,7 @@ import org.apache.tools.ant.types.DataType;
  *      &lt;hlm:recordfilter category="warn" regexp="^WARN"/&gt;
  * </pre>
  * 
- * @ant.task name="Recordfilter" category="Logging".
+ * @ant.task name="Recordfilter" category="Logging"
  *
  */
 

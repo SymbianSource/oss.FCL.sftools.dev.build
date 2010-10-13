@@ -77,7 +77,7 @@ class BOMMock:
 class BOMTest(unittest.TestCase):
     """ Test BOM and related classes. """
     
-# TODO - removed until non-Synergy dependent tests can be provided.
+# Removed until non-Synergy dependent tests can be provided.
 
 #    def test_bom_output(self):
 #        """ Test basic BOM execution. Only new spec format will be covered!"""

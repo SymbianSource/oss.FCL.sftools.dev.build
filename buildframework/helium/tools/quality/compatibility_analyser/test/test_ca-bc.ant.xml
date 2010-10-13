@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : test_ca-bc.ant.xml 
+Part of     : Helium AntLib
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="test-ca-bc" xmlns:au="org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium">
+    <description>Helium antlib Quality Compatibility Analyser related tests.</description>
+
+
+    <taskdef resource="com/nokia/helium/quality/ant/antlib.xml" uri="http://www.nokia.com/helium" />
+    <!--place the output is written to-->
+    <property name="ca.output.dir" location="./output"/>
+    <!-- add the Ca folder to the output dir-->
+    <property name="build.log.dir" location="${ca.output.dir}/ca"/>
+    <!-- location and name of the bc.config file used by checkbc.py-->
+    <property name="bc.config.file" location="${build.log.dir}/bc.config" />
+    <!-- name of the parsed config file-->
+    <property name="prep.ca.conf.parsed" location="${build.log.dir}/ca.cfg.xml.parsed" />
+    <!--name of the ant CA config file-->
+    <property name="ca.ant.config.file" location="ca-ant-config.xml" />
+    <!-- used by the compatibility analyser to define the build log that is to be
+     scanned and the output used for the comparison-->
+    <property name="log.file.to.scan" location="${build.log.dir}/compile/${build.id}_armv5_compile.log" />
+
+    <!--setup property so can be tested - location of the FMPP template file-->
+    <property name="ca.template.file" location="./../../../common/templates/log/ca_content.txt.ftl" />
+    
+    <property name="template.macro" location="./../../../common/templates/macro" />
+
+    
+    <!--import the file under test-->
+    <import file="./../compatibility.ant.xml" />
+
+    <!-- is called prior to the test -->
+    <target name="setUp">
+        <delete dir="${build.log.dir}" failonerror="false" />
+        <mkdir dir="${build.log.dir}" />
+        
+    </target>
+
+    <!-- is called after the test, even if that caused an error -->
+    <target name="tearDown">
+        <delete dir="${build.log.dir}" failonerror="false" />
+    </target>
+
+    <!-- tests part of the CA code that parses the input file-->
+    <target name="test-ca-parse-config" depends="parse-ca-config">
+        
+        <au:assertFileExists file="${prep.ca.conf.parsed}" />
+        <au:assertFileExists file="${bc.config.file}" />
+        <loadfile property="ca.one.id" srcfile="${bc.config.file}">
+            <filterchain>
+                <replaceregex pattern="\\(:|\\)" replace="\1" flags="g" />
+            </filterchain>
+        </loadfile>
+        <echo>${ca.one.id}</echo>
+        <au:assertTrue message="file not parsed correctly">
+            <contains string="${ca.one.id}" 
+                substring="BASELINE_NAME='SDK 3rd Edition'" />
+        </au:assertTrue>
+        <delete file="${prep.ca.conf.parsed}" quiet="true" />
+        <delete dir="${ca.output.dir}" quiet="true" />
+    </target>
+
+
+    <!--tests the scanning of the whatlog NOT WORKING YET-->
+    <!--target name="test_ftl_file_header">
+        <echo> helium dir = ${helium.dir} </echo>
+        <var name="check.type" value="header" />
+        <var name="bc.db.output.file" value="${build.log.dir}/ca_headers.txt" />
+        <runtarget target="get-whatlogentry-contents-for-ca" />
+        <au:assertFileExists file="${bc.db.output.file}"/>
+    </target>
+
+    <target name="test_ftl_file_lib">
+        <echo> helium dir = ${helium.dir} </echo>
+        <var name="check.type" value="lib" />
+        <var name="bc.db.output.file" value="${build.log.dir}/ca_libraries.txt" />
+        <runtarget target="get-whatlogentry-contents-for-ca" />
+        <au:assertFileExists file="${bc.db.output.file}"/>
+    </target-->
+        
+</project>

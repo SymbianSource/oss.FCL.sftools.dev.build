@@ -16,19 +16,10 @@
  */
 package com.nokia.helium.antlint.ant.types;
 
-import java.io.File;
-import java.io.IOException;
+import java.util.List;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-
-import org.xml.sax.Attributes;
-import org.xml.sax.Locator;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
-
-import com.nokia.helium.antlint.ant.AntlintException;
+import com.nokia.helium.ant.data.TargetMeta;
+import com.nokia.helium.ant.data.TaskMeta;
 
 /**
  * <code>CheckTryCatchBlock</code> is used to check for empty and more than one
@@ -43,92 +34,28 @@ import com.nokia.helium.antlint.ant.AntlintException;
  *               &lt;include name=&quot;*build.xml&quot;/&gt;
  *               &lt;include name=&quot;*.antlib.xml&quot;/&gt;
  *       &lt;/fileset&gt;
- *       &lt;checkTryCatchBlock&quot; severity=&quot;error&quot; enabled=&quot;true&quot; /&gt;
+ *       &lt;checkTryCatchBlock&quot; severity=&quot;error&quot; /&gt;
  *  &lt;/antlint&gt;
  * </pre>
  * 
  * @ant.task name="checkTryCatchBlock" category="AntLint"
  * 
  */
-public class CheckTryCatchBlock extends AbstractCheck {
-
-    private File antFile;
+public class CheckTryCatchBlock extends AbstractTargetCheck {
 
     /**
      * {@inheritDoc}
      */
-    public File getAntFile() {
-        return antFile;
-    }
+    protected void run(TargetMeta targetMeta) {
+        List<TaskMeta> trycatches = targetMeta.getTasks("trycatch");
+        List<TaskMeta> catches = targetMeta.getTasks("trycatch//catch");
 
-    /**
-     * {@inheritDoc}
-     */
-    public void run(File antFilename) throws AntlintException {
-        try {
-            this.antFile = antFilename;
-            SAXParserFactory saxFactory = SAXParserFactory.newInstance();
-            saxFactory.setNamespaceAware(true);
-            saxFactory.setValidating(true);
-            SAXParser parser = saxFactory.newSAXParser();
-            TryCatchBlockHandler handler = new TryCatchBlockHandler();
-            parser.parse(antFilename, handler);
-        } catch (ParserConfigurationException e) {
-            throw new AntlintException("Not able to parse XML file "
-                    + e.getMessage());
-        } catch (SAXException e) {
-            throw new AntlintException("Not able to parse XML file "
-                    + e.getMessage());
-        } catch (IOException e) {
-            throw new AntlintException("Not able to find XML file "
-                    + e.getMessage());
+        if (!trycatches.isEmpty() && catches.isEmpty()) {
+            report("<trycatch> block found without <catch> element", targetMeta.getLineNumber());
         }
-    }
-
-    public String toString() {
-        return "CheckTryCatchBlock";
-    }
-
-    private class TryCatchBlockHandler extends DefaultHandler {
-
-        private Locator locator;
-        private int catchCounter;
-
-        /**
-         * {@inheritDoc}
-         */
-        public void setDocumentLocator(Locator locator) {
-            this.locator = locator;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        public void startElement(String uri, String localName, String qName,
-                Attributes attributes) throws SAXException {
-            if (localName.equals("trycatch")) {
-                catchCounter = 0;
-            } else if (localName.equals("catch")) {
-                catchCounter++;
-            }
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        public void endElement(String uri, String localName, String qName)
-            throws SAXException {
-            if (localName.equals("trycatch") && catchCounter == 0) {
-                getReporter().report(getSeverity(),
-                        "<trycatch> block found without <catch> element",
-                        getAntFile(), locator.getLineNumber());
-            } else if (localName.equals("trycatch") && catchCounter > 1) {
-                getReporter().report(
-                        getSeverity(),
-                        "<trycatch> block found with " + catchCounter
-                                + " <catch> elements.", getAntFile(),
-                        locator.getLineNumber());
-            }
+        if (!trycatches.isEmpty() && catches.size() > 1) {
+            report("<trycatch> block found with " + catches.size() + " <catch> elements.",
+                    targetMeta.getLineNumber());
         }
     }
 }

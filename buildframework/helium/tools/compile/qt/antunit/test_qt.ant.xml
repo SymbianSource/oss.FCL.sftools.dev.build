@@ -61,16 +61,17 @@ Description:
         <au:assertTrue message="The output file must contain helloworldapi.pro">
             <contains string="${run.qmake.out}" substring="helloworldapi.pro" />
         </au:assertTrue>
-        <au:assertTrue message="The output file must contain $${build.drive}/sf/app/helloworldcons/group">
-            <contains string="${run.qmake.out}" substring="$${build.drive}/sf/app/helloworldcons/group" />
+        <au:assertTrue message="The output file must contain sf/app/helloworldcons/group ${run.qmake.out}">
+            <contains string="${run.qmake.out}" substring="sf/app/helloworldcons/group" />
         </au:assertTrue>
-        <au:assertTrue message="The output file must contain $${build.drive}/sf/mw/helloworldapi/group">
-            <contains string="${run.qmake.out}" substring="$${build.drive}/sf/mw/helloworldapi/group" />
+        <au:assertTrue message="The output file must contain sf/mw/helloworldapi/group">
+            <contains string="${run.qmake.out}" substring="sf/mw/helloworldapi/group" />
         </au:assertTrue>
     </target>
     
     <target name="test-sysdef151-namespaced-qt-ant">
         <property name="sysdef.configuration" value="demo" />
+        <var name="sysdef3.enabled" value="false" />
         <fmpp sourceFile="${helium.dir}/tools/compile/qt/templates/run-qmake.ant.xml.ftl"
            outputFile="${qt.temp.dir}/run-qmake151.ant.xml">
             <data expandProperties="yes">
@@ -78,6 +79,7 @@ Description:
                 ant: antProperties()
             </data>
         </fmpp>
+        <var name="sysdef3.enabled" value="true" />
         <au:assertFileExists file="${qt.temp.dir}/run-qmake151.ant.xml" />
         <loadfile property="run.qmake.out" srcfile="${qt.temp.dir}/run-qmake151.ant.xml" />
         <au:assertTrue message="The output file must contain the -nomoc argument.">
@@ -101,6 +103,7 @@ Description:
         <propertyregex property="build.drive.slash" input="${build.drive}" regexp="\\" replace="/" />
         <property name="build.drive.slash" value="${build.drive}" />
         <property name="sysdef.configuration" value="demo" />
+        <var name="sysdef3.enabled" value="false" />
         <fmpp sourceFile="${helium.dir}/tools/compile/qt/templates/run-qmake.mk.ftl"
            outputFile="${qt.temp.dir}/run-qmake151.mk">
             <data expandProperties="yes">
@@ -108,6 +111,7 @@ Description:
                 ant: antProperties()
             </data>
         </fmpp>
+        <var name="sysdef3.enabled" value="true" />
         <au:assertFileExists file="${qt.temp.dir}/run-qmake151.mk" />
         <loadfile property="run.qmake.out" srcfile="${qt.temp.dir}/run-qmake151.mk" />
         <au:assertTrue message="The output file must contain the -nomoc argument.">
@@ -119,11 +123,11 @@ Description:
         <au:assertTrue message="The output file must contain helloworldapi.pro">
             <contains string="${run.qmake.out}" substring="helloworldapi.pro" />
         </au:assertTrue>
-        <au:assertTrue message="The output file must contain -@cd ${build.drive.slash}/sf/mw/HelloWorldAPI/group &amp;&amp; qmake -listgen -nomoc helloworldapi.pro">
-            <contains string="${run.qmake.out}" substring="-@cd ${build.drive.slash}/sf/mw/HelloWorldAPI/group &amp;&amp; qmake -listgen -nomoc helloworldapi.pro" />
+        <au:assertTrue message="The output file must contain -@cd ${build.drive.slash}/sf/mw/HelloWorldAPI/group &amp;&amp; ${build.drive}/epoc32/tools/qmake -listgen -nomoc helloworldapi.pro, ${run.qmake.out}">
+            <contains string="${run.qmake.out}" substring="-@cd ${build.drive.slash}/sf/mw/HelloWorldAPI/group &amp;&amp; ${build.drive}/epoc32/tools/qmake -listgen -nomoc helloworldapi.pro" />
         </au:assertTrue>
-        <au:assertTrue message="The output file must contain -@cd ${build.drive.slash}/sf/app/HelloWorldCons/group &amp;&amp; qmake -listgen -r helloworld.pro">
-            <contains string="${run.qmake.out}" substring="-@cd ${build.drive.slash}/sf/app/HelloWorldCons/group &amp;&amp; qmake -listgen -r helloworld.pro" />
+        <au:assertTrue message="The output file must contain -@cd ${build.drive.slash}/sf/app/HelloWorldCons/group &amp;&amp; ${build.drive}/epoc32/tools/qmake -listgen -r helloworld.pro">
+            <contains string="${run.qmake.out}" substring="-@cd ${build.drive.slash}/sf/app/HelloWorldCons/group &amp;&amp; ${build.drive}/epoc32/tools/qmake -listgen -r helloworld.pro" />
         </au:assertTrue>
     </target>
 
@@ -149,11 +153,11 @@ Description:
         <au:assertTrue message="The output file must contain helloworldapi.pro">
             <contains string="${run.qmake.out}" substring="helloworldapi.pro" />
         </au:assertTrue>
-        <au:assertTrue message="The output file must contain -@cd ${build.drive.slash}/sf/mw/helloworldapi/group &amp;&amp; qmake -listgen -nomoc helloworldapi.pro">
-            <contains string="${run.qmake.out}" substring="-@cd ${build.drive.slash}/sf/mw/helloworldapi/group &amp;&amp; qmake -listgen -nomoc helloworldapi.pro" />
+        <au:assertTrue message="The output file must contain sf/mw/helloworldapi/group &amp;&amp; ${build.drive}/epoc32/tools/qmake -listgen -nomoc helloworldapi.pro, ${run.qmake.out}">
+            <contains string="${run.qmake.out}" substring="sf/mw/helloworldapi/group &amp;&amp; ${build.drive}/epoc32/tools/qmake -listgen -nomoc helloworldapi.pro" />
         </au:assertTrue>
-        <au:assertTrue message="The output file must contain -@cd ${build.drive.slash}/sf/app/helloworldcons/group &amp;&amp; qmake -listgen -r helloworld.pro">
-            <contains string="${run.qmake.out}" substring="-@cd ${build.drive.slash}/sf/app/helloworldcons/group &amp;&amp; qmake -listgen -r helloworld.pro" />
+        <au:assertTrue message="The output file must contain sf/app/helloworldcons/group &amp;&amp; ${build.drive}/epoc32/tools/qmake -listgen -r helloworld.pro">
+            <contains string="${run.qmake.out}" substring="sf/app/helloworldcons/group &amp;&amp; ${build.drive}/epoc32/tools/qmake -listgen -r helloworld.pro" />
         </au:assertTrue>
     </target>
 </project>

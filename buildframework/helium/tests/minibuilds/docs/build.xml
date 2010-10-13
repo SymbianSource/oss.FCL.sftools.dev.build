@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+============================================================================ 
+Name        : build.xml
+Part of     : Helium 
+
+Copyright (c) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+This component and the accompanying materials are made available
+under the terms of the License "Eclipse Public License v1.0"
+which accompanies this distribution, and is available
+at the URL "http://www.eclipse.org/legal/epl-v10.html".
+
+Initial Contributors:
+Nokia Corporation - initial contribution.
+
+Contributors:
+
+Description:
+
+============================================================================
+-->
+<project name="minibuild.docs" default="minibuild.docs-test" xmlns:au="org.apache.ant.antunit" xmlns:hlm="http://www.nokia.com/helium" basedir=".">
+
+    <property name="helium.dir" location="../../.." />
+    <import file="../../../build.xml" />
+    
+    <!-- Run Ant unit tests. -->
+    <target name="minibuild.docs-test">
+        <mkdir dir="${helium.build.dir}/temp/minibuild"/>
+        <mkdir dir="${helium.build.dir}/report/antunit/minibuild"/>
+        <au:antunit>
+            <fileset dir="${helium.dir}" includes="tests/minibuilds/docs/test_docs_minibuild.ant.xml"/> 
+            <au:plainlistener/>
+            <hlm:antcoveragelistener outputfile="${helium.build.dir}/report/antunit/minibuild/ant_coverage.txt"/>
+            <au:xmllistener toDir="${helium.build.dir}/report/antunit/minibuild" logLevel="info" />
+        </au:antunit>
+    </target>
+      
+</project>

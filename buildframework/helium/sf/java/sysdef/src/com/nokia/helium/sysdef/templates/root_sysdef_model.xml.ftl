@@ -142,7 +142,7 @@ Description:
 ]>
 <SystemDefinition schema="3.0.0" <#if (idnamespace?? && idnamespace!="http://www.symbian.org/system-definition")>xmlns:vendor="${idnamespace}"</#if>>
 <systemModel name="<#list roots?keys as root>${root}<#if root_has_next>_</#if></#list>">
-<#list layers?keys as layer>
+<#list layers?keys?sort as layer>
     <layer id="${layer}" name="${layer}">
     <#list roots?keys as root>
         <#if roots[root]?keys?seq_contains(layer)>

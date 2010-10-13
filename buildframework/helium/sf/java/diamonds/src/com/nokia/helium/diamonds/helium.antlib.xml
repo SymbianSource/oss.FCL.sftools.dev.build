@@ -25,11 +25,9 @@ Description:
         Ant task definition declarations.
     </description>
     <taskdef resource="com/nokia/helium/core/ant/antlib.xml" uri="http://www.nokia.com/helium" />
-    <typedef name="diamondsExceptionStatusUpdate" classname="com.nokia.helium.diamonds.DiamondsExceptionStatusUpdate" uri="http://www.nokia.com/helium"/>    
-    <typedef name="diamondsPostBuildStatusUpdate" classname="com.nokia.helium.diamonds.DiamondsPostBuildStatusUpdate" uri="http://www.nokia.com/helium"/>
+    <typedef name="diamondsStatusUpdate" classname="com.nokia.helium.diamonds.DiamondsStatusUpdate" uri="http://www.nokia.com/helium"/>
     <hlm:deflist id="helium-diamonds.list">
-        <hlm:listenerdef classname="com.nokia.helium.diamonds.ant.HeliumListener"/>
-        <hlm:diamondsExceptionStatusUpdate/>
-        <hlm:diamondsPostBuildStatusUpdate/>
+        <hlm:listenerdef classname="com.nokia.helium.diamonds.ant.Listener" preappend="true" />
+        <hlm:diamondsStatusUpdate/>
     </hlm:deflist>    
 </project>
