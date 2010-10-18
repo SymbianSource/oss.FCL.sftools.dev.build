@@ -20,6 +20,7 @@
 		<xsl:apply-templates select="document(/model/sysdef/@href)| SystemDefinition" mode="ids"/>
 	</xsl:variable>
 
+	<xsl:variable name="sf-ns">http://www.symbian.org/system-definition</xsl:variable>
  
 <xsl:template match="/model" priority="-1">
 	<xsl:apply-templates select="." mode="check"/>
@@ -198,9 +199,13 @@
 
 <xsl:template match="package/@tech-domain|component/@purpose|component/@target" mode="valid">
 	<xsl:variable name="v" select="document('')/*/xsl:template[@name=concat('validate-',name(current()))]/*[.=current()]"/>
+	<xsl:variable name="ns"><xsl:apply-templates select="../@id" mode="namespace-for-id"/></xsl:variable>
 	<xsl:choose>
-		<xsl:when test="not($v)">
+		<xsl:when test="not($v) and $ns=$sf-ns">
 			<xsl:call-template name="Error"><xsl:with-param name="text">Illegal <xsl:value-of select="name()"/> value <xsl:value-of select="name()"/>="<xsl:value-of select="."/>"</xsl:with-param></xsl:call-template>
+		</xsl:when> 
+		<xsl:when test="not($v)">
+			<xsl:call-template name="Note"><xsl:with-param name="text">Non-standard <xsl:value-of select="name()"/> value <xsl:value-of select="name()"/>="<xsl:value-of select="."/>"</xsl:with-param></xsl:call-template>
 		</xsl:when> 
 		<xsl:when test="name($v)='ok'"/> 
 		<xsl:when test="name($v)='w'">
@@ -327,6 +332,17 @@
 	<xsl:call-template name="Error"><xsl:with-param name="text">Undefined namespace for ID "<xsl:value-of select="."/>"</xsl:with-param></xsl:call-template>
 </xsl:if>
 
+</xsl:template>
+
+
+<xsl:template match="@*" mode="namespace-for-id">
+<xsl:choose>
+	<xsl:when test="contains(.,':') and ancestor::*/namespace::*[name()=substring-before(current(),':')]">
+		<xsl:value-of select="ancestor::*/namespace::*[name()=substring-before(current(),':')]"/>
+	</xsl:when>
+	<xsl:when test="ancestor::SystemDefinition/@id-namespace"><xsl:value-of select="ancestor::SystemDefinition/@id-namespace"/></xsl:when>
+	<xsl:otherwise><xsl:value-of select="$sf-ns"/></xsl:otherwise>
+</xsl:choose>
 </xsl:template>
 
 

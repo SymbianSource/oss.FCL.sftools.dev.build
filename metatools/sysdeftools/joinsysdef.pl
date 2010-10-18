@@ -290,6 +290,10 @@ sub walk
 				$node->setAttribute($atr,$link);
 				}
 			}
+		if(scalar @{$node->getChildNodes()} && $maxschema=~/^3\.0/)
+			{
+			die "Error: Fatal syntax error in $file. Unit elements must be empty in schema $maxschema.\n";
+			}
 		}
 	elsif($tag eq 'meta')
 		{
@@ -488,7 +492,7 @@ sub fixIDs
 	{
 	# translate the ID to use the root doc's namespaces 
 	my $node = shift;
-	foreach my $id ('id','before')
+	foreach my $id ('id','before','replace')
 		{
 		&fixID($node,$id);
 		}
