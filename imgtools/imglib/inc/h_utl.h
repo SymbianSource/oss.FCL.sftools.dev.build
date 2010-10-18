@@ -21,10 +21,11 @@
 //
 #include <stdio.h>
 
-#ifdef __VC32__
- #ifdef __MSVCDOTNET__
+#ifdef _MSC_VER 
+ #if (_MSC_VER > 1200) //!__MSVCDOTNET__
+  #define __MSVCDOTNET__ 1
   #include <iostream>
-  #include <strstream>
+  #include <sstream>
   #include <fstream>
   using namespace std;
  #else //!__MSVCDOTNET__
@@ -151,7 +152,7 @@ extern TBool PVerbose;
 TAny *operator new(TUint aSize);
 void operator delete(TAny *aPtr);
 //
-#ifdef __TOOLS2__
+#if defined(__TOOLS2__) || defined(__MSVCDOTNET__)
 istringstream &operator>>(istringstream &is, TVersion &aVersion);
 #else
 istrstream &operator>>(istrstream &is, TVersion &aVersion);
@@ -173,12 +174,12 @@ TInt Val(T& aVal, const char* aStr)
 	{
 
 	T x;
-	#ifdef __TOOLS2__
+	#if defined(__TOOLS2__) || defined(__MSVCDOTNET__)
 	istringstream val(aStr);
 	#else
 	istrstream val((char*)aStr,strlen(aStr));
 	#endif
-	#if defined(__MSVCDOTNET__) || defined (__TOOLS2__) 
+	#if  defined (__TOOLS2__) || defined(__MSVCDOTNET__)
 		val >> setbase(0);
 	#endif //__MSVCDOTNET__                             
 	val >> x;

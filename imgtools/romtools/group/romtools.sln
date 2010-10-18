@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual C++ Express 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "rombuild", "rombuild.vcproj", "{77D9E2A3-AD01-4691-9137-8DA53692BE9D}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "rofsbuild", "rofsbuild.vcproj", "{A68ED0C5-60D6-4281-8226-8F9830A424CF}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "readimage", "readimage.vcproj", "{14ADB7DA-3076-4A77-868E-83E04E8D5A13}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{77D9E2A3-AD01-4691-9137-8DA53692BE9D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{77D9E2A3-AD01-4691-9137-8DA53692BE9D}.Debug|Win32.Build.0 = Debug|Win32
+		{77D9E2A3-AD01-4691-9137-8DA53692BE9D}.Release|Win32.ActiveCfg = Release|Win32
+		{77D9E2A3-AD01-4691-9137-8DA53692BE9D}.Release|Win32.Build.0 = Release|Win32
+		{A68ED0C5-60D6-4281-8226-8F9830A424CF}.Debug|Win32.ActiveCfg = Debug|Win32
+		{A68ED0C5-60D6-4281-8226-8F9830A424CF}.Debug|Win32.Build.0 = Debug|Win32
+		{A68ED0C5-60D6-4281-8226-8F9830A424CF}.Release|Win32.ActiveCfg = Release|Win32
+		{A68ED0C5-60D6-4281-8226-8F9830A424CF}.Release|Win32.Build.0 = Release|Win32
+		{14ADB7DA-3076-4A77-868E-83E04E8D5A13}.Debug|Win32.ActiveCfg = Debug|Win32
+		{14ADB7DA-3076-4A77-868E-83E04E8D5A13}.Debug|Win32.Build.0 = Debug|Win32
+		{14ADB7DA-3076-4A77-868E-83E04E8D5A13}.Release|Win32.ActiveCfg = Release|Win32
+		{14ADB7DA-3076-4A77-868E-83E04E8D5A13}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

@@ -19,11 +19,7 @@
 
 #define __INCLUDE_CAPABILITY_NAMES__
 
-#if defined(_MSVCDOTNET__) || defined(__TOOLS2__)
 
-#else //!__MSVCDOTNET__
-#include <string.h>
-#endif //__MSVCDOTNET__
 
 #include <stdarg.h>
 #include <stdlib.h>
@@ -32,6 +28,12 @@
 #include <e32std_private.h>
 
 #include "h_utl.h"
+
+#if defined(__MSVCDOTNET__)|| defined(__TOOLS2__)
+
+#else //!__MSVCDOTNET__
+#include <string.h>
+#endif //__MSVCDOTNET__
 
 #ifdef __LINUX__
  
@@ -155,7 +157,7 @@ TVersion::TVersion()
 TVersion::TVersion(TInt aMajor, TInt aMinor, TInt aBuild)
 	: iMajor((TInt8)aMajor), iMinor((TInt8)aMinor), iBuild((TInt16)aBuild)
 	{}
-#ifdef __TOOLS2__
+#if defined(__TOOLS2__ ) ||  defined(__MSVCDOTNET__ )
 istringstream &operator>>(istringstream &is, TVersion &aVersion)
 #else
 istrstream &operator>>(istrstream &is, TVersion &aVersion)
@@ -164,7 +166,7 @@ istrstream &operator>>(istrstream &is, TVersion &aVersion)
 // Input a TVersion with syntax: major[.minor][(build)]
 //	
 	{
-#ifdef __TOOLS2__
+#if defined(__TOOLS2__ ) ||  defined(__MSVCDOTNET__ )
 string tmp = is.str();
 const char *str=tmp.c_str();
 #else
@@ -192,7 +194,7 @@ const char *str=tmp.c_str();
 		{ 
 		cout << "\n Warning: major version must be in range 0 - 127 \n";
 		}
-	char* pMinor = strchr(str, '.');
+	char* pMinor = (char*)strchr(str, '.');
 	if (pMinor)
 		{
 		pMinor++; 
@@ -300,7 +302,7 @@ TInt StringToTime(Int64 &aTime, char *aString)
 	TInt sec=0;
 	TInt mill=0;
 	char ch;
-	#ifdef __TOOLS2__
+	#if defined(__TOOLS2__) || defined(__MSVCDOTNET__)
 	istringstream val(aString);
 	#else
 	istrstream val(aString,strlen(aString));

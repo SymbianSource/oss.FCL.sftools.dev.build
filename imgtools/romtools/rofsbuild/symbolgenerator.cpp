@@ -1,3 +1,20 @@
+/*
+* Copyright (c) 2010 Nokia Corporation and/or its subsidiary(-ies).
+* All rights reserved.
+* This component and the accompanying materials are made available
+* under the terms of the License "Eclipse Public License v1.0"
+* which accompanies this distribution, and is available
+* at the URL "http://www.eclipse.org/legal/epl-v10.html".
+*
+* Initial Contributors:
+* Nokia Corporation - initial contribution.
+*
+* Contributors:
+*
+* Description: 
+*
+*/
+
 #include <boost/regex.hpp>
 #define MAX_LINE 65535
 #include "symbolgenerator.h"
@@ -71,10 +88,10 @@ void SymbolGenerator::ProcessExecutable( const string& fileName ){
         boost::regex regARMV5("ARMV5", boost::regex::icase);
         boost::regex regGCCEoARMV4("(GCCE|ARMV4)", boost::regex::icase);
         boost::cmatch what;
-        if(regex_search(fileName, what, regARMV5)) {
+        if(regex_search(fileName.c_str(), what, regARMV5)) {
             ProcessArmv5File(fileName, fMap);
         }
-        else if(regex_search(fileName, what, regGCCEoARMV4)) {
+        else if(regex_search(fileName.c_str(), what, regGCCEoARMV4)) {
             ProcessGcceOrArm4File(fileName, fMap);
         }
         else {
@@ -185,13 +202,13 @@ void SymbolGenerator::ProcessGcceOrArm4File( const string& fileName, ifstream& a
                 break;
             else if(regex_search(str, what, reg1)) {
                 sLibFile.assign(what[4].first,what[4].second-what[4].first);
-                if(!regex_search(sLibFile, what1, reg)) {
+                if(!regex_search(sLibFile.c_str(), what1, reg)) {
                     sTmp.assign(what[2].first,what[2].second-what[2].first);
                     addr = strtol(sTmp.c_str(), NULL, 16);
                     sTmp.assign(what[3].first,what[3].second-what[3].first);
                     len = strtol(sTmp.c_str(), NULL, 16);
                     syms[addr+len] = "";
-                    if(regex_search(sLibFile, what, reg3)) {
+                    if(regex_search(sLibFile.c_str(), what, reg3)) {
                         stubhex = addr;
                     }
                 }

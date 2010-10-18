@@ -47,7 +47,7 @@
 
 static const TInt RofsbuildMajorVersion=2;
 static const TInt RofsbuildMinorVersion=14;
-static const TInt RofsbuildPatchVersion=1;
+static const TInt RofsbuildPatchVersion=2;
 static TBool SizeSummary=EFalse;
 static TPrintType SizeWhere=EAlways;
 
@@ -582,8 +582,12 @@ TInt main(int argc, char *argv[]){
 	}
 	// Process Rofs Obey files.
 	if(obeyFileName) {
-		if (cmdlogfile[cmdlogfile.size()-1] == '\\' || cmdlogfile[cmdlogfile.size()-1] == '/')
-			cmdlogfile += "ROFSBUILD.LOG";
+		if(cmdlogfile.empty())
+			cmdlogfile.assign("ROFSBUILD.LOG");
+		else if (cmdlogfile[cmdlogfile.length()-1] == '\\' || cmdlogfile[cmdlogfile.length()-1] == '/') {
+			cmdlogfile += "ROFSBUILD.LOG" ;
+		}
+			
 	 	H.SetLogFile(cmdlogfile.c_str());
 		ObeyFileReader *reader = new ObeyFileReader(obeyFileName); 
 		if (!reader->Open())
