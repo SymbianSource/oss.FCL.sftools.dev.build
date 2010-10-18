@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ProductsDefinition schema="3.0.0">
 	<product name="BuildEnvironment" long-name="Build Environment">
-		<tool name="sysdeftools" long-name="System Definition Tools" default-src="metatools/sysdeftools" default-dst="/" version="1.0.2">
+		<tool name="sysdeftools" long-name="System Definition Tools" default-src="metatools/sysdeftools" default-dst="/" version="1.0.3">
 
 			<!-- core functionality -->
 			<file filename="*.pl"/> 
@@ -29,6 +29,10 @@
 			</windows>
 		
 			<linux>
+			  <file filename="unixperlcmd" src="metatools/sysdeftools/group/" dstFile="/checklinks"/> 
+			  <file filename="unixperlcmd" src="metatools/sysdeftools/group/" dstFile="/joinsysdef"/> 
+			  <file filename="unixperlcmd" src="metatools/sysdeftools/group/" dstFile="/rootsysdef"/> 
+
 				<!-- Xalan-calling unix files -->
 			  <file filename="unixxslcmd" src="metatools/sysdeftools/group/" dstFile="/joinandparesysdef"/> 
 			  <file filename="unixxslcmd" src="metatools/sysdeftools/group/" dstFile="/filtering"/> 

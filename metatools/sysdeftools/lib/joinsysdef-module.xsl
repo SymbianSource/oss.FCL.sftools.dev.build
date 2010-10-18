@@ -136,7 +136,8 @@
 	<xsl:variable name="linked" select="document(@href,.)/*"/>
 	<xsl:for-each select="$linked">
 		<xsl:apply-templates select="//*[(self::component or self::collection or self::package or self::layer) and @href]" mode="scan-for-namespaces"/>
-		<xsl:for-each select="//namespace::* | @id-namespace">
+		<xsl:for-each select="//namespace::*[.!='http://www.w3.org/XML/1998/namespace'] | @id-namespace">
+			<!-- ignore XML namespace -->
 			<xsl:value-of select="concat(name(),' ',.,'&#xa;')"/>
 		</xsl:for-each>
 	</xsl:for-each>

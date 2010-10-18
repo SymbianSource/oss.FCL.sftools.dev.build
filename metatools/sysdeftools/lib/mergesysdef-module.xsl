@@ -136,7 +136,7 @@
 	<xsl:if test="name(*) != name($other/*)">
 		<xsl:message terminate="yes">ERROR: Can only merge system models of the same rank</xsl:message>
 	</xsl:if>
-	 
+
 	<xsl:copy>
 		<xsl:attribute name="schema">
 			<xsl:call-template name="compare-versions">
@@ -220,8 +220,44 @@
 			<xsl:with-param name="replaces" select="$replaces"/>
 		</xsl:apply-templates>		
 
+		<!-- and now check for error cases, and tack those on -->
+		<xsl:call-template name="check-and-add-out-of-order-items">
+			<xsl:with-param name="match" select="$other/systemModel"/>
+			<xsl:with-param name="down" select="$down"/>
+			<xsl:with-param name="replaces" select="$replaces"/>
+		</xsl:call-template> 
 	</xsl:copy>
 </xsl:template>
+
+<xsl:template name="check-and-add-out-of-order-items"><xsl:param name="match"/><xsl:param name="down"/><xsl:param name="replaces"/>
+	<xsl:if test="$match">
+		<!-- determine the order of the children in the upstream and downstream docs --> 
+		<xsl:variable name="up-order">
+			<xsl:for-each select="*[@id=$match/*[not(@before)]/@id]"><xsl:value-of select="@id"/><xsl:text> </xsl:text></xsl:for-each>
+		</xsl:variable>
+		<xsl:variable name="down-order">
+			<xsl:for-each select="$match/*[@id = current()/*[not(@before)]/@id]"><xsl:value-of select="@id"/> <xsl:text> </xsl:text></xsl:for-each>
+		</xsl:variable>
+
+		<!-- check for error cases, and tack those on -->
+		<xsl:if test="$up-order != $down-order">
+			<xsl:variable name="down-final" select="$match/*[@id = current()/*[not(@before)]/@id][last()]/@id"/>
+				<!-- the last item in the downstream model that is also in the upstream one -->
+
+			<xsl:variable name="out-of-order" select="$match/*[@id][not(@before=current()/*/@id) and not(@id=current()/*/@id) and following-sibling::*[@id=$down-final]]"/>
+				<!-- contains all items in the downstream model that can't be put in order-->
+			<xsl:if test="$out-of-order">
+				<xsl:message>Warning: Order of <xsl:value-of select="name(*)"/>s in upstream document does not match order in downstream.  The following <xsl:value-of select="name(*)"/>s will be appended to the end<xsl:if test="@id"> of <xsl:value-of select="@id"/></xsl:if>: <xsl:for-each select="$out-of-order"><xsl:value-of select="concat(@id,' ')"/></xsl:for-each></xsl:message>
+			</xsl:if>
+			<xsl:apply-templates mode="merge-copy-of" select="$out-of-order">
+				<xsl:with-param name="origin" select="$down"/>
+				<xsl:with-param name="root" select="current()/ancestor::SystemDefinition"/>			
+				<xsl:with-param name="replaces" select="$replaces"/>
+			</xsl:apply-templates>			
+		</xsl:if>
+	</xsl:if>
+</xsl:template>
+
 
 <xsl:template match="@*|*|comment()" mode="merge-models"><xsl:copy-of select="."/></xsl:template>
 
@@ -370,17 +406,37 @@
 	</xsl:call-template>
 </xsl:variable>
 
+
+	<!-- check the order of the items in the upstream and downstream doc. If they don't match up, we can't merge them nicely -->
+	<xsl:variable name="up-order">
+		<xsl:for-each select="../*[@id=$match/../*[not(@before)]/@id]"><xsl:value-of select="@id"/><xsl:text> </xsl:text></xsl:for-each>
+	</xsl:variable>
+	<xsl:variable name="down-order">
+		<xsl:for-each select="$match/../*[@id = current()/../*[not(@before)]/@id]"><xsl:value-of select="@id"/> <xsl:text> </xsl:text></xsl:for-each>
+	</xsl:variable>
+
 	<!-- prev = the previous item before the current one (no metas, only named items)-->
 	<xsl:variable name="prev" select="preceding-sibling::*[@id=$prev-id]"/> 
 
 
 	<!-- copy all items between this and prev that are solely in the downstream model -->	 		
 
+	<!-- <xsl:variable name="upstream-ids" select="ancestor::SystemDefinition//@id[parent::component or parent::collection or parent::package or parent::layer]"/> -->
+	<xsl:variable name="upstream-ids" select="../*/@id"/> <!-- this is much faster than using all IDs. before only currently works in the same parent anyway -->
+
+	<!-- $upstream-ids is used to avoid inserting an item that's being moved -->
+
 	<xsl:choose>
+		<xsl:when test="$match and $up-order != $down-order">
+		<!-- if the contents are in a different order, there's no way to merge them together. Don't try. Tack them on to the end later -->
+				<xsl:message>Warning: Order of <xsl:value-of select="name()"/>s in upstream <xsl:value-of select="../@id"/>
+				<xsl:if test="not(../@id)">document</xsl:if> does not match the order of the <xsl:value-of select="name()"/>s in common in the downstream equivalent. Contents will not be properly merged: <xsl:value-of select="$up-order"/>  != 	<xsl:value-of select="$down-order"/></xsl:message>
+		</xsl:when>
+
 		<xsl:when test="$match and $prev">
 			<xsl:call-template name="copy-sorted-content">
 				<xsl:with-param name="base" select="../*[@id]"/>
-				<xsl:with-param name="to-sort" select="$other/*[@id][following-sibling::*[@id=$match/@id]][preceding-sibling::*[@id=$prev/@id]]"/>
+				<xsl:with-param name="to-sort" select="$other/*[@id and not(@before=$upstream-ids)][following-sibling::*[@id=$match/@id]][preceding-sibling::*[@id=$prev/@id]]"/>
 				<xsl:with-param name="start" select="$prev"/>
 				<xsl:with-param name="end" select="."/>
 				<xsl:with-param name="down" select="$down"/>
@@ -389,7 +445,7 @@
 		<xsl:when test="$match and not($prev)">
 			<xsl:call-template name="copy-sorted-content">
 				<xsl:with-param name="base" select="../*[@id]"/>
-				<xsl:with-param name="to-sort" select="$other/*[@id][following-sibling::*[@id=$match/@id]]"/>
+				<xsl:with-param name="to-sort" select="$other/*[@id and not(@before=$upstream-ids)][following-sibling::*[@id=$match/@id]]"/>
 				<xsl:with-param name="start" select="$prev"/>
 				<xsl:with-param name="end" select="."/>
 				<xsl:with-param name="down" select="$down"/>
@@ -398,6 +454,7 @@
 	</xsl:choose>
 
  	<!-- just copy anything identified as being before this, assume they're all ok -->
+
 	<xsl:apply-templates mode="merge-copy-of" select="$other/*[@before=current()/@id]">
 		<xsl:with-param name="remove-before" select="1"/>
 		<xsl:with-param name="origin" select="$down"/>
@@ -409,11 +466,11 @@
 		<xsl:apply-templates select="@*" mode="merge-models"> <!-- copy upstream attributes -->
 			<xsl:with-param name="other" select="$match"/>
 		</xsl:apply-templates>
-		
-		<xsl:if test="self::component and not(@origin-model) and $up/@name">
+		<xsl:if test="self::component and not(@origin-model) and ($up/@name or ancestor::systemModel/@name)">
 			<!-- insert origin-model and optional root for components only -->
 			<xsl:attribute name="origin-model">
 				<xsl:value-of select="$up/@name"/>
+				<xsl:if test="not($up/@name)"><xsl:value-of select="ancestor::systemModel/@name"/></xsl:if>
 			</xsl:attribute>
 			<xsl:if test="not(@root)">
 				<xsl:copy-of select="$up/@root"/>
@@ -466,9 +523,16 @@
 				</xsl:for-each>
 			</xsl:otherwise>
 		</xsl:choose>
-	</xsl:copy>
 
-		</xsl:otherwise>
+		<!-- and now check for error cases, and tack those on -->
+		<xsl:call-template name="check-and-add-out-of-order-items">
+			<xsl:with-param name="match" select="$match"/>
+			<xsl:with-param name="down" select="$down"/>
+			<xsl:with-param name="replaces" select="$replaces"/>
+		</xsl:call-template> 
+
+	</xsl:copy>
+ 	</xsl:otherwise>
 	</xsl:choose>
 </xsl:template>
 
@@ -554,9 +618,10 @@
 					<xsl:with-param name="remove-before" select="$remove-before"/>
 					<xsl:with-param name="root" select="$root"/>
 				</xsl:call-template>
-				<xsl:if test="not(@origin-model) and $origin/@name">
+				<xsl:if test="not(@origin-model) and ($origin/@name or ancestor::systemModel/@name)">
 					<xsl:attribute name="origin-model">
 						<xsl:value-of select="$origin/@name"/>
+						<xsl:if test="not($origin/@name)"><xsl:value-of select="ancestor::systemModel/@name"/></xsl:if>
 					</xsl:attribute>
 					<xsl:if test="not(@root)">
 						<xsl:copy-of select="$origin/@root"/>
