@@ -1071,9 +1071,9 @@ TInt TRomBuilderEntry::PlaceFile( TUint8* &aDest,TUint aMaxSize, CBytePair *aBPE
 					char * buffer = new char [size];
 #if defined(__LINUX__)
 					ostrstream os((char*)aDest, aMaxSize, (ios_base::openmode)(ios_base::out+ios_base::binary));
-#elif defined(__TOOLS2__) && defined (_STLP_THREADS)
+#elif ( defined(__TOOLS2__) || defined(__MSVCDOTNET__)) && defined (_STLP_THREADS)
 					ostrstream os((char*)buffer, size,(ios_base::out+ios_base::binary));
-#elif defined( __TOOLS2__)
+#elif ( defined(__TOOLS2__) || defined(__MSVCDOTNET__))
 					ostrstream os((char*)buffer, size,(ios_base::out+ios_base::binary));
 #else
 					ostrstream os( (char*)buffer, size, (ios_base::out+ios_base::binary));
@@ -1119,10 +1119,12 @@ TInt TRomBuilderEntry::PlaceFile( TUint8* &aDest,TUint aMaxSize, CBytePair *aBPE
 				}
 			}
 
-#if defined(__TOOLS2__) && defined (_STLP_THREADS)
+#if defined(__TOOLS2__) || defined(__MSVCDOTNET__) 
+	#ifdef _STLP_THREADS
 			ostrstream os((char*)aDest, aMaxSize,(ios_base::out+ios_base::binary));
-#elif __TOOLS2__
+	#else 
 			ostrstream os((char*)aDest, aMaxSize, (_Ios_Openmode)(ios_base::out+ios_base::binary));
+	#endif
 #else
 			ostrstream os((char*)aDest, aMaxSize, (ios_base::out+ios_base::binary));
 #endif

@@ -356,7 +356,7 @@ TInt E32Rofs::PlaceFiles( TRomNode* /*aRootDir*/, TUint8* aDestBase, TUint aBase
             thrds.join_all();
             delete [] workers;
             if(iSymGen)
-                iSymGen->AddFile("",false);
+                iSymGen->SetFinished();
 
             TUint offset = aBaseOffset;
             TUint8* dest = aDestBase;

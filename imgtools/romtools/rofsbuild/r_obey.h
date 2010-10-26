@@ -75,6 +75,7 @@ enum EKeyword
 	EKeywordDataImageName,    
 	EKeywordDataImageFileSystem, 
 	EKeywordDataImageSize,
+	EKeywordDataImageVolumeID,
 	EKeywordDataImageVolume,
 	EKeywordDataImageSectorSize,
 	EKeywordDataImageClusterSize,
@@ -158,12 +159,12 @@ public:
 
 	void ProcessTime(TInt64& aTime);
 	static void TimeNow(TInt64& aTime);
-private:
-	TInt ReadAndParseLine(); 
-	TInt Parse();
 	inline static TBool IsGap(char ch) {
 		return (ch==' ' || ch=='=' || ch=='\t');
 	}
+private:
+	TInt ReadAndParseLine(); 
+	TInt Parse();
 
 	static const ObeyFileKeyword iKeywords[];
 	static const FileAttributeKeyword iAttributeKeywords[];

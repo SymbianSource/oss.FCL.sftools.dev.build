@@ -34,6 +34,8 @@
 #include "cache/cachevalidator.hpp"
 #include "cache/cacheablelist.hpp"
 #include "cache/cachemanager.hpp"
+#include "logging/loggingexception.hpp"
+#include "logging/logparser.hpp"
 #include <malloc.h>
  
 #ifndef WIN32
@@ -46,7 +48,7 @@
 #endif
 
 static const TInt RofsbuildMajorVersion=2;
-static const TInt RofsbuildMinorVersion=14;
+static const TInt RofsbuildMinorVersion=16;
 static const TInt RofsbuildPatchVersion=1;
 static TBool SizeSummary=EFalse;
 static TPrintType SizeWhere=EAlways;
@@ -78,6 +80,7 @@ TBool reallyHelp = EFalse;
 TBool gSmrImage = EFalse;
 string gSmrFileName = "";
 static string cmdlogfile = "";
+static string loginput = "";
 
 //Cache global variables
 bool gCache = false;
@@ -115,7 +118,8 @@ char HelpText[] =
 	"        -argfile=<FileName>   specify argument-file name containing list of command-line arguments\n"
 "        -lowmem     use memory-mapped file for image build to reduce physical memory consumption\n"
 "        -k     to enable keepgoing when duplicate files exist in oby\n"
-"        -logfile=<fileName>           specify log file\n";
+"        -logfile=<fileName>           specify log file\n"
+"        -loginput=<log filename>      specify as input a log file and produce as output symbol file.\n";
 
 char ReallyHelpText[] =
 "Log Level:\n"
@@ -325,6 +329,9 @@ void processCommandLine(int argc, char *argv[], TBool paramFileFlag = EFalse) {
 			else if (strnicmp(argv[i], "-logfile=",9) ==0) {
 				cmdlogfile = argv[i] + 9;
 			}
+			else if (strnicmp(argv[i], "-loginput=", 10) == 0) {
+				loginput = argv[i] + 10;
+			}
 			else {
 #ifdef WIN32
 				Print (EWarning, "Unrecognised option %s\n",argv[i]);
@@ -348,7 +355,7 @@ void processCommandLine(int argc, char *argv[], TBool paramFileFlag = EFalse) {
 		return;
 
 	if((gDriveImage == EFalse) && (gSmrImage ==  EFalse) && 
-		(filename.empty() || (gUseCoreImage && gImageFilename.length() == 0))){
+		(filename.empty() || (gUseCoreImage && gImageFilename.length() == 0)) && (loginput.length() == 0)){
 			Print (EAlways, HelpText);
 			if (reallyHelp) {
 				ObeyFileReader::KeywordHelp();
@@ -487,6 +494,29 @@ TInt main(int argc, char *argv[]){
 		gCPUNum = MAXIMUM_THREADS;
 	PrintVersion();
 	processCommandLine(argc, argv);
+	if(gThreadNum == 0) {
+		if(gCPUNum > 0) {
+			printf("WARNING: The number of processors (%d) is used as the number of concurrent jobs.\n", gCPUNum);
+			gThreadNum = gCPUNum;
+		}
+		else {
+			printf("WARNING: Can't automatically get the valid number of concurrent jobs and %d is used.\n", DEFAULT_THREADS);
+			gThreadNum = DEFAULT_THREADS;
+		}
+	}
+	if(loginput.length() >= 1)
+	{
+		try
+		{
+			LogParser::GetInstance()->ParseSymbol(loginput.c_str());
+		}
+		catch(LoggingException le)
+		{
+			printf("ERROR: %s\r\n", le.GetErrorMessage());
+			return 1;
+		}
+		return 0;
+	}
 	//if the user wants to clean up the cache, do it only.
 	if(gCleanCache){
 		try {
@@ -514,16 +544,6 @@ TInt main(int argc, char *argv[]){
 		obeyFileName = filename.c_str(); 
 	if ((!obeyFileName) && (!gDriveFilename.empty()) && (!gSmrFileName.empty())){
 		return KErrGeneral;
-	}
-	if(gThreadNum == 0) {
-		if(gCPUNum > 0) {
-			printf("WARNING: The number of processors (%d) is used as the number of concurrent jobs.\n", gCPUNum);
-			gThreadNum = gCPUNum;
-		}
-		else {
-			printf("WARNING: Can't automatically get the valid number of concurrent jobs and %d is used.\n", DEFAULT_THREADS);
-			gThreadNum = DEFAULT_THREADS;
-		}
 	}
 	// Process drive obey files.
 	if(gDriveImage) {  
@@ -582,8 +602,9 @@ TInt main(int argc, char *argv[]){
 	}
 	// Process Rofs Obey files.
 	if(obeyFileName) {
-		if (cmdlogfile[cmdlogfile.size()-1] == '\\' || cmdlogfile[cmdlogfile.size()-1] == '/')
-			cmdlogfile += "ROFSBUILD.LOG";
+		if (cmdlogfile.empty() || cmdlogfile[cmdlogfile.size()-1] == '\\' || cmdlogfile[cmdlogfile.size()-1] == '/')
+			cmdlogfile += "ROFSBUILD.LOG" ;
+			
 	 	H.SetLogFile(cmdlogfile.c_str());
 		ObeyFileReader *reader = new ObeyFileReader(obeyFileName); 
 		if (!reader->Open())

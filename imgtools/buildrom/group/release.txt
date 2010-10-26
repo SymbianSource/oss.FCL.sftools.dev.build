@@ -1,3 +1,8 @@
+Version 3.31.0 (BUILDROM)
+===============
+Released by Lorence Wang, 20/10/2010
+	1) Volume Serial NO. for FAT image.
+
 Version 3.30.0 (BUILDROM)
 ===============
 Released by Lorence Wang, 12/10/2010

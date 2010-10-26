@@ -67,7 +67,7 @@ if ($^O !~ /^MSWin32$/i){
 my $enforceFeatureManager = 0; # Flag to make Feature Manager mandatory if SYMBIAN_FEATURE_MANAGER macro is defined. 
 
 my $BuildromMajorVersion = 3 ;
-my $BuildromMinorVersion = 30;
+my $BuildromMinorVersion = 31;
 my $BuildromPatchVersion = 0;
 
 
@@ -3666,7 +3666,7 @@ sub reformat_line($)
 	{
 		return $line;
 	}
-  	elsif($line =~ /^\s*volume\s*=.*/i)
+  	elsif($line =~ /^\s*(volume|volumeid)\s*=.*/i)
   	{
   		return $line;		
   	}

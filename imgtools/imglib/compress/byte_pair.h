@@ -19,9 +19,10 @@
 #define BYTE_PAIR_H
 
  
-#ifdef __VC32__
- #ifdef __MSVCDOTNET__
-  #include <strstream>
+#ifdef _MSC_VER 
+ #if (_MSC_VER > 1200)
+  #define __MSVCDOTNET__ 1
+  #include <sstream>
   #include <iomanip>
  #else //!__MSVCDOTNET__
   #include <strstrea.h>

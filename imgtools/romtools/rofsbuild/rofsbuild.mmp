@@ -25,10 +25,13 @@ SOURCEPATH	../rofsbuild
 SOURCE			 r_obey.cpp r_build.cpp r_rofs.cpp r_driveimage.cpp r_driveutl.cpp
 SOURCE			 rofsbuild.cpp r_coreimage.cpp r_smrimage.cpp symbolgenerator.cpp
 SOURCE			 fatcluster.cpp fsnode.cpp fatimagegenerator.cpp
+SOURCE			 symbolprocessunit.cpp
 SOURCEPATH	../../imglib/host
 SOURCE			h_utl.cpp h_file.cpp h_mem.cpp utf16string.cpp
 SOURCEPATH ../rofsbuild/src/cache
 SOURCE cachemanager.cpp cacheexception.cpp cache.cpp cacheablelist.cpp cachevalidator.cpp cachegenerator.cpp cacheentry.cpp
+SOURCEPATH ../rofsbuild/src/logging
+SOURCE loggingexception.cpp logparser.cpp
 
 // executable compression
 SOURCEPATH	../../imglib/e32uid
@@ -50,6 +53,7 @@ USERINCLUDE   ../../imglib/uniconv/include
 USERINCLUDE   ../rofsbuild/inc
 USERINCLUDE   ../../imglib/boostlibrary/
 USERINCLUDE   ../../imglib/boostlibrary/boost
+USERINCLUDE   ../rofsbuild
 
 STATICLIBRARY 	patchdataprocessor parameterfileprocessor memmap
 STATICLIBRARY   boost_thread-1.39 boost_filesystem-1.39 boost_regex-1.39 boost_system-1.39 uniconv

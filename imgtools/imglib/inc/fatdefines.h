@@ -16,6 +16,7 @@
 */
 #ifndef __FAT_DEFINES_HEADER__
 #define __FAT_DEFINES_HEADER__
+#include <time.h>
 #include <e32std.h>
 struct TFATBootSector {
 	TUint8 BS_jmpBoot[3];
@@ -130,8 +131,12 @@ struct ConfigurableFatAttributes
     TUint16 iDriveSectorSize;
     TUint32 iDriveClusterSize;
     TUint8 iDriveNoOfFATs;    
+    TUint32 iVolumeId;
     ConfigurableFatAttributes():iImageSize(0),iDriveSectorSize(512),iDriveClusterSize(0),iDriveNoOfFATs(2){
         memcpy(iDriveVolumeLabel,"NO NAME    \0",12);
+				time_t rawtime;
+				time(&rawtime);
+				iVolumeId = (TUint32)rawtime;
     }
 };
 #endif

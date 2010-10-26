@@ -65,6 +65,7 @@ PRJ_EXPORTS
 ../platform/gccev6.bsf        /epoc32/tools/gccev6.bsf 
 ../platform/armv6_abiv1.bsf        /epoc32/tools/armv6_abiv1.bsf 
 ../platform/armv7.bsf        /epoc32/tools/armv7.bsf  
+../platform/armv7smp.bsf        /epoc32/tools/armv7smp.bsf  
 
 #ifdef SBSV2
 #ifndef TOOLS2_LINUX

@@ -33,7 +33,7 @@ const TInt KRomLoaderHeaderCOFF=2;
 
 static const TInt RombuildMajorVersion=2;
 static const TInt RombuildMinorVersion=18;
-static const TInt RombuildPatchVersion=3;
+static const TInt RombuildPatchVersion=4;
 static TBool SizeSummary=EFalse;
 static TPrintType SizeWhere=EAlways;
 static string compareROMName = "";

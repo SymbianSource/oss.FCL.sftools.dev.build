@@ -76,9 +76,7 @@ iBytsPerClus(aAttr.iDriveClusterSize)
 	iFatHeader.BS_DrvNum = 0x80 ;
 	iFatHeader.BS_BootSig = 0x29 ;
 
-	time_t rawtime;
-	time(&rawtime);
-	*((TUint32*)iFatHeader.BS_VolID) = (TUint32)rawtime;
+	*((TUint32*)iFatHeader.BS_VolID) = aAttr.iVolumeId;
 	memcpy(iFatHeader.BS_VolLab,aAttr.iDriveVolumeLabel,sizeof(iFatHeader.BS_VolLab));
 	if(aAttr.iImageSize == 0){
 		if(aType == EFat32)

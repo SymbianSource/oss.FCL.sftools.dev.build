@@ -91,6 +91,7 @@ const ObeyFileKeyword ObeyFileReader::iKeywords[] =
 	{_K("dataimagename"),1, 1,EKeywordDataImageName, "Data Drive image file name"},
 	{_K("dataimagefilesystem"),1, 1,EKeywordDataImageFileSystem, "Drive image file system format"},
 	{_K("dataimagesize"),1, 1,EKeywordDataImageSize, "Maximum size of Data Drive image"},
+	{_K("volumeid"),1, 1,EKeywordDataImageVolumeID, "Volume ID of Data Drive image"},
 	{_K("volume"),1, -1,EKeywordDataImageVolume, "Volume Label of Data Drive image"},
 	{_K("sectorsize"),1, 1,EKeywordDataImageSectorSize, "Sector size(in bytes) of Data Drive image"},
 	{_K("clustersize"),1, 1,EKeywordDataImageClusterSize, "Cluster size(in bytes) of Data Drive image"},
@@ -819,30 +820,33 @@ TBool CObeyFile::ProcessDriveKeyword(enum EKeyword aKeyword) {
 
 			TUint position = volumeLabel.find(volumeLabelKeyword.c_str(),0,volumeLabelKeyword.size());
 			position += volumeLabelKeyword.size();
-			if (volumeLabel.find('=',position) != string::npos) {
-				position=volumeLabel.find('=',position);
-				++position;
+			while (iReader.IsGap(volumeLabel[position]))
+				position ++;
+			volumeLabel = volumeLabel.substr(position);
+				
+			if (volumeLabel.find('=',0) != string::npos) {
+				Print(EWarning,"Value for Volume Label includes illegel charactor. Default value is considered.\n");
+				break;
 			}								
 
-			position = volumeLabel.find_first_not_of(' ',position);
+			// Remove the new line character from the end
+			position = volumeLabel.find_first_of("\n");
 			if (position != string::npos) {
-				volumeLabel = volumeLabel.substr(position);
-
-				// Remove the new line character from the end
-				position = volumeLabel.find_first_of("\r\n");
-				if (position != string::npos)
-					volumeLabel = volumeLabel.substr(0,position);
-				size_t length = volumeLabel.length() ;
-				if(length > 11) 
-						length = 11 ;
-				memcpy(iConfigurableFatAttributes.iDriveVolumeLabel,volumeLabel.c_str(),length) ;
-				while(length != 11)
-					iConfigurableFatAttributes.iDriveVolumeLabel[length++] = ' ';
-				iConfigurableFatAttributes.iDriveVolumeLabel[length] = 0;
+				if (position != 0 && volumeLabel[position-1] == '\r')
+					position --;
+				volumeLabel = volumeLabel.substr(0,position);
 			}
-			else {
+			size_t length = volumeLabel.length();
+			if (length == 0) {
 				Print(EWarning,"Value for Volume Label is not provided. Default value is considered.\n");
+				break;
 			}
+			if(length > 11) 
+					length = 11 ;
+			memcpy(iConfigurableFatAttributes.iDriveVolumeLabel,volumeLabel.c_str(),length) ;
+			while(length != 11)
+				iConfigurableFatAttributes.iDriveVolumeLabel[length++] = ' ';
+			iConfigurableFatAttributes.iDriveVolumeLabel[length] = 0;
 			break;
 		}
 	case EKeywordDataImageSectorSize:
@@ -880,6 +884,21 @@ TBool CObeyFile::ProcessDriveKeyword(enum EKeyword aKeyword) {
 				Print(EWarning,"Invalid No of FATs specified. Default value is considered.\n");
 			else
 				iConfigurableFatAttributes.iDriveNoOfFATs = noOfFats;			
+		}			
+		break;			
+	case EKeywordDataImageVolumeID:
+		{
+			static bool isSet = false;
+			if (isSet)
+				Print(EWarning,"Duplicate setting for volume ID will be ignored.\n");
+			const char* bigString = iReader.Word(1);
+			TUint32 volumeid = 0;
+			TInt res = Val(volumeid,bigString); 
+			if (res != KErrNone || volumeid == 0xFFFFFFFF)
+				Print(EWarning,"Invalid Volume ID specified. Default value is considered.\n");
+			else
+				iConfigurableFatAttributes.iVolumeId = volumeid;			
+			isSet = true;
 		}			
 		break;			
 	default:

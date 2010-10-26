@@ -1,3 +1,25 @@
+Version 2.16.1 (ROFSBUILD)
+===============
+Released by Marvin Shi, 25/10/2010
+	1) ou1cimx1#627682  Rofsbuild hangs with "-loginput" option on linux
+	
+=======
+Version 2.16.0 (ROFSBUILD)
+===============
+Released by Marvin Shi and Jason Cui, 21/10/2010
+	1) Concurrent symbol generation.
+	
+Version 2.15.0 (ROFSBUILD)
+===============
+Released by Lorence Wang, 20/10/2010
+	1) Volume Serial NO. for FAT image.
+
+Version 2.18.4 (ROMBUILD)
+Version 2.14.2 (ROFSBUILD)
+===============
+Released by Ross Qin, 15/10/2010
+	1) ou1cimx1#616869 Copyright Info missing in symbolgenerator.*/Romtools source codes are not VC friendly
+
 Version 2.18.3 (ROMBUILD)
 Version 2.14.1 (ROFSBUILD)
 ===============
