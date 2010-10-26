@@ -467,7 +467,7 @@
 	<xsl:variable name="prefix" select="name($namespaces[.=$ns])"/>
 	<xsl:attribute name="{name()}">
 	<xsl:choose>
-		<xsl:when test="$prefix = 'id-namespace' or  (not($namespaces[name()='id-namespace']) and $ns=$defaultns)"/> <!-- it's the default namespace, no prefix -->
+		<xsl:when test="$prefix = 'id-namespace' or $namespaces[name()='id-namespace']=$ns or  (not($namespaces[name()='id-namespace']) and $ns=$defaultns)"/> <!-- it's the default namespace, no prefix -->
 		<xsl:when test="$prefix='' and contains(.,':')">
 			<!-- complex: copy id and copy namespace (namespace should be copied already)-->
 			<xsl:value-of select="."/>

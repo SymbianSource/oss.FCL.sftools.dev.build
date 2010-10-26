@@ -75,7 +75,7 @@
 <xsl:template match="/SystemDefinition[starts-with(@schema,'3.0.')] | systemModel">
 	<xsl:param name="filename"  select="$Filename"/>
 		
-<xsl:if test="//unit and not(self::systemModel)">
+<xsl:if test="descendant::unit and not(self::systemModel)">
 <xsl:call-template name="Section">
 	<xsl:with-param name="text"><xsl:value-of select="translate(substring(name(*),1,1),'clp','CLP')"/><xsl:value-of select="substring(name(*),2)"/> Definition: <xsl:value-of select="*/@name"/></xsl:with-param>
 	<xsl:with-param name="id"><xsl:value-of select="*/@id"/></xsl:with-param>
@@ -335,7 +335,7 @@
 <xsl:template match="layer | package | collection | component">
 	<xsl:param name="filename"/>
 
-<xsl:if test="self::package and not(parent::SystemDefinition)">
+<xsl:if test="self::package[not(@href)] and not(parent::SystemDefinition)">
 <xsl:call-template name="Section">
 	<xsl:with-param name="id"><xsl:value-of select="@id"/></xsl:with-param>
 	<xsl:with-param name="text"><xsl:value-of select="translate(substring(name(),1,1),'clp','CLP')"/><xsl:value-of select="substring(name(),2)"/>: <xsl:value-of select="@name"/></xsl:with-param>
@@ -348,7 +348,7 @@
 <xsl:if test="self::component">
 	<xsl:choose>
 		<xsl:when test="count(unit[not(@filter | @version)]) = 0 "/>
-		<xsl:when test="count(unit[not(@version)]) &gt; 1 and @filter='s60'">
+		<xsl:when test="count(unit[not(@version)]) &gt; 1 and descendant-or-self::*[contains(@filter,'s60')]">
 			<xsl:call-template name="Warning"><xsl:with-param name="text">S60 Component <id><xsl:value-of select="@id"/></id> has <xsl:value-of select="count(unit)"/> units.</xsl:with-param></xsl:call-template>
 		</xsl:when>
 		<xsl:when test="count(unit[not(@version)]) &gt; 1">
@@ -505,7 +505,7 @@
 	<xsl:call-template name="Error"><xsl:with-param name="text">ID "<id><xsl:value-of select="."/></id>" contains reserved character "-" </xsl:with-param></xsl:call-template>
 </xsl:if>
 
-<xsl:if test="contains(.,'.') and not(parent::package) and not(contains(ancestor::pacakge/@id,'.'))">
+<xsl:if test="contains(.,'.') and not(parent::package) and not(contains(ancestor::package/@id,'.'))">
 	<xsl:call-template name="Error"><xsl:with-param name="text">ID "<xsl:value-of select="."/>" contains reserved character "<code>.</code>" </xsl:with-param></xsl:call-template>
 </xsl:if>
 
@@ -548,6 +548,19 @@
 </xsl:if>
 <xsl:if test="contains(.,'\')">
 		<xsl:call-template name="Error"><xsl:with-param name="text"><code><xsl:value-of select="name()"/></code> path "<xsl:value-of select="."/>" must use only forward slashes</xsl:with-param></xsl:call-template>
+</xsl:if>
+
+<xsl:if test="count(//unit[@bldFile=current()]/..) &gt; 1">
+		<xsl:call-template name="Error"><xsl:with-param name="text"><code><xsl:value-of select="name()"/></code> path "<xsl:value-of select="."/>" appears in components <xsl:for-each select="//unit[@bldFile=current()]/..">
+			<id><xsl:value-of select="@id"/></id>
+			<xsl:choose>
+			<xsl:when test="position()=last() - 1"> and </xsl:when>
+			<xsl:when test="position()!=last()">, </xsl:when>
+			</xsl:choose>
+			</xsl:for-each>
+		</xsl:with-param>
+		<xsl:with-param name="sub">Use filters or config metadata to control what kind of builds a component can appear in</xsl:with-param>
+		</xsl:call-template>
 </xsl:if>
 
 <!-- this is a realtive path, so just check that it's the expected number of dirs down -->
