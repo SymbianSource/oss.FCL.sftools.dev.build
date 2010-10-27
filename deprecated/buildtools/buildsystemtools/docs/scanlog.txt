@@ -1,0 +1,127 @@
+SCANLOG.PL
+17/02/2003
+
+1. Introduction
+
+scanlog.pl is a utility for summarising a build log. It reports the time 
+taken for each phase of the build, and the numbers of fatal errors and warnings.
+For each component, the numbers of warnings and errors are accumulated across
+all phases and reported by component.
+
+
+2. Log file format
+
+scanlog expects the logfiles to have a particular structure for identifying 
+the phases and components. It will tolerate log files which don't fully conform
+to this structure, but the reporting will have less detail.
+
+The expected structure is:
+
+===-------------------------------------------------
+=== <command for the phase>
+===-------------------------------------------------
+=== <phase> started Fri Feb  7 12:47:28 2003.
+=== <phase> == <component1>
+... build output
+=== <phase> == <component2>
+... build output
+=== <phase> == <componentN>
+... build output
+=== <phase> finished Fri Feb  7 13:13:41 2003.
+
+<phase> should be a single word without spaces, for example "target".
+The timestamps are optional and not processed by the current version of scanlog,
+though they are being processed by other tools.
+
+For this example, scanlog would summarise this part of the log as
+
+<command for the phase>		00:26:13	0	0
+
+assuming that there are no errors or warnings detected.
+
+
+3. Errors and Warnings
+
+Scanlog uses a set of regular expressions to identify lines in the log file
+which are usually associated with errors or warnings, for example:
+
+	/make(\[\d+\])?: \*\*\* /		-- e.g. make[2]: ***
+
+which is the way that GNU make reports a failure. 
+
+This rather simple approach can overstate the number of errors, particularly 
+given the nested makefile approach used by the Symbian build tools. It is
+counting the symptoms of a failure rather than necessarily identifying the
+root cause.
+
+Errors are warnings are summarised according to the build phase (described above)
+and also accumulated across build phases and reported by component. If scanlog
+is invoked with the additional -V argument, the lines counted as warnings and
+errors are reported for each component, to aid problem diagnosis.
+
+
+4. Things not built...
+
+Scanlog also looks for lines which begin with "MISSING: ", which are normally
+produced by the output of "abld -check build". The missing files are listed and
+marked with the component which reported them, serving as an additional view of
+what has actually failed if fatal errors are reported.
+
+
+5. List of patterns 
+
+Scanlog originally just looked for errors and warnings arising from the structure
+of the Symbian build, but has increasingly gained patterns to detect output from
+specific tools such as the ARM RealView compiler. This contributes to the "over
+counting" of errors, but provides more useful "scanlog -V" output.
+
+Scanlog uses these patterns to identify errors:
+
+	/^MISSING COMPONENT (.*):.* find (.*)$/
+	/(ABLD|BLDMAKE) ERROR:/
+	/FATAL ERROR\(S\):/
+	/fatal error U1073: .* make '(.*)'/
+	/fatal error U1077/
+	/warning U4010/
+	/make(\[\d+\])?: \*\*\* /
+	/make(\[\d+\])?: .* not remade /
+ 	/"(.*)", line (\d+): (Error: +(.\d+.*?):.*)$/
+	/error: ((Internal fault):.*)$/
+	/Exception: STATUS_ACCESS_VIOLATION/
+	/target .*? given more than once in the same rule/
+	/^ERROR: /
+ 
+The "warning U4010" pattern catches lines such as
+ 
+  NMAKE : warning U4010: 'FINALCOPYFXCM' : build failed; /K specified, continuing ...
+ 
+which would arise from the use of nmake /k in situations which would otherwise 
+be fatal errors.
+ 
+  
+Scanlog uses these patterns to identify warnings:
+ 
+	/Warning: Unmatched/i
+	/^BLDMAKE WARNING:/
+	/WARNING\(S\)/
+	/^WARNING: /
+	/\(\d+\) : warning C/
+	/LINK : warning/
+	/:\d+: warning:/
+	/"(.*)", line (\d+): (Warning: +(.\d+.*?):.*)$/
+	/^MAKEDEF WARNING:/
+	/ERROR: bad relocation:/
+    	/mwldsym\d+.exe: warning:/
+	/^(\d+) warning/
+	/mwld.exe:/
+	/^Command line warning/
+	/Usage Warning:/
+ 
+The "ERROR: bad relocation" pattern catches messages from petran which are actually
+just warnings, for example:
+ 
+  ERROR: bad relocation:  [00004f60] = 00000f68
+ 
+Petran follows a heuristic in these cases, and to date there has never been a 
+runtime error attributed to this warning.
+ 

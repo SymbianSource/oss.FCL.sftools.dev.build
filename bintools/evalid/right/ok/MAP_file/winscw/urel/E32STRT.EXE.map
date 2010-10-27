@@ -1,0 +1,311 @@
+Address   Size      Name    Subname  Module
+
+00401000 00000179 .text             ESTART.o(?LoadLocale@@YAXAAVRFs@@@Z)
+00401179 0000011b .text             ESTART.o(?InitialiseScreenCalibration@@YAXAAVRFs@@@Z)
+00401294 0000008a .text             ESTART.o(?LocalFSInitialisation@@YAXAAVRFs@@@Z)
+0040131e 000002d7 .text             ESTART.o(?E32Main@@YAHXZ)
+004015f6 00000006 .text             EUSER.dll(??0TLocale@@QAE@XZ)
+004015fc 00000006 .text             EFSRV.dll(??0TFindFile@@QAE@AAVRFs@@@Z)
+00401602 00000006 .text             EUSER.dll(??0TBufBase16@@IAE@ABVTDesC16@@H@Z)
+00401608 00000006 .text             HAL.dll(?Get@HAL@@SAHW4TAttribute@HALData@@AAH@Z)
+0040160e 00000006 .text             EUSER.dll(?AppendNumFixedWidth@TDes16@@QAEXIW4TRadix@@H@Z)
+00401614 00000006 .text             HAL.dll(?Set@HAL@@SAHW4TAttribute@HALData@@H@Z)
+0040161a 00000006 .text             EFSRV.dll(?FindByDir@TFindFile@@QAEHABVTDesC16@@0@Z)
+00401620 00000006 .text             EFSRV.dll(?FullName@TParseBase@@QBEABVTDesC16@@XZ)
+00401626 00000006 .text             EUSER.dll(?Copy@TDes16@@QAEXABVTDesC16@@@Z)
+0040162c 00000006 .text             EFSRV.dll(?Open@RFile@@QAEHAAVRFs@@ABVTDesC16@@I@Z)
+00401632 00000006 .text             EUSER.dll(??0TPtr8@@QAE@PAEH@Z)
+00401638 00000006 .text             EFSRV.dll(?Read@RFile@@QBEHAAVTDes8@@H@Z)
+0040163e 00000006 .text             EUSER.dll(?Set@TLocale@@QBEXXZ)
+00401644 00000006 .text             EUSER.dll(??0TCurrencySymbol@@QAE@XZ)
+0040164a 00000006 .text             EUSER.dll(?SetCurrencySymbol@User@@SAXABVTDesC16@@@Z)
+00401650 00000006 .text             EFSRV.dll(?Close@RFsBase@@QAEXXZ)
+00401656 00000006 .text             EUSER.dll(??0TBufBase16@@IAE@H@Z)
+0040165c 00000006 .text             EUSER.dll(?SetXYInputCalibration@UserHal@@SAHABVTDigitizerCalibration@@@Z)
+00401662 00000006 .text             EUSER.dll(??0TBufBase8@@IAE@H@Z)
+00401668 00000006 .text             EFSRV.dll(?DriveList@RFs@@QBEHAAV?$TBuf8@$0BK@@@@Z)
+0040166e 00000006 .text             EUSER.dll(?Panic@User@@SAXABVTDesC16@@H@Z)
+00401674 00000006 .text             EUSER.dll(?AtC@TDesC8@@IBEABEH@Z)
+0040167a 00000006 .text             EFSRV.dll(?MountFileSystem@RFs@@QBEHABVTDesC16@@H@Z)
+00401680 00000006 .text             EFSRV.dll(?StartupInitComplete@RFs@@QAEXAAVTRequestStatus@@@Z)
+00401686 00000006 .text             EUSER.dll(?WaitForRequest@User@@SAXAAVTRequestStatus@@@Z)
+0040168c 00000006 .text             EFSRV.dll(?Connect@RFs@@QAEHH@Z)
+00401692 00000006 .text             EFSRV.dll(?Size@RFile@@QBEHAAH@Z)
+00401698 00000006 .text             EFSRV.dll(?Read@RFile@@QBEHAAVTDes8@@@Z)
+0040169e 00000006 .text             EUSER.dll(?Alloc@User@@SAPAXH@Z)
+004016a4 00000006 .text             EUSER.dll(??0TPtr8@@QAE@PAEHH@Z)
+004016aa 00000006 .text             EUSER.dll(?Free@User@@SAXPAX@Z)
+004016b0 00000006 .text             EUSER.dll(?AtC@TDesC16@@IBEABGH@Z)
+004016b6 00000006 .text             EUSER.dll(?Create@RProcess@@QAEHABVTDesC16@@0W4TOwnerType@@@Z)
+004016bc 00000006 .text             EUSER.dll(?Resume@RProcess@@QAEXXZ)
+004016c2 00000006 .text             EUSER.dll(?Close@RHandleBase@@QAEXXZ)
+004016c8 00000020 .text             UP_EXE.obj(?initTable@@YAXPAP6AXXZ0@Z)
+004016e8 00000021 .text             UP_EXE.obj(?Panic@@YAXW4TStatPanic@@@Z)
+00401709 00000177 .text             UP_EXE.obj(?startupThread@@YAHXZ)
+00401880 00000011 .text             UP_EXE.obj(?_E32Startup@@YGXXZ)
+00401892 00000006 .text             EUSER.dll(??0TPtrC16@@QAE@PBG@Z)
+00401898 00000006 .text             EUSER.dll(?BlockThreads@UserSvr@@SAXW4TBlockType@@@Z)
+0040189e 00000006 .text             EUSER.dll(?__DllAttachProcess@UpWins@@SAXXZ)
+004018a4 00000006 .text             EUSER.dll(?__FileServer@UpWins@@SAP6AHPAX@ZXZ)
+004018aa 00000006 .text             EUSER.dll(?Create@RThread@@QAEHABVTDesC16@@P6AHPAX@ZHHH1W4TOwnerType@@@Z)
+004018b0 00000006 .text             EUSER.dll(?SetPriority@RThread@@QBEXW4TThreadPriority@@@Z)
+004018b6 00000006 .text             EUSER.dll(?SetSystem@RThread@@QBEXH@Z)
+004018bc 00000006 .text             EUSER.dll(?SetProtected@RThread@@QBEXH@Z)
+004018c2 00000006 .text             EUSER.dll(?Resume@RThread@@QBEXXZ)
+004018c8 00000006 .text             EUSER.dll(?__Synchronize@UpWins@@SAXXZ)
+004018ce 00000006 .text             EUSER.dll(?__ReleaseInitThreads@UpWins@@SAXXZ)
+004018d4 00000006 .text             EUSER.dll(?__WindowServer@UpWins@@SAP6AHPAX@ZXZ)
+004018da 00000006 .text             EUSER.dll(?__WireKernel@UpWins@@SAXXZ)
+004018e0 00000006 .text             EUSER.dll(?KernelStartup@UserSvr@@SAXP6AHPAX@Z@Z)
+00402000 0000019c .data             ESTART.o
+004021a0 00000018 .data             uid.o
+004021b8 00000018 .data             UP_EXE.obj
+004021d0 00000040 .data             UP_EXE.obj
+00403000 0000000c .E32_UID          uid.o
+00404000 00000014 .idata   $2       EFSRV.dll
+00404014 00000014 .idata   $2       EUSER.dll
+00404028 00000014 .idata   $2       HAL.dll
+0040403c 00000014 .idata   $3       EFSRV.dll
+00404050 00000004 .idata   $4       EFSRV.dll
+00404054 00000004 .idata   $4       EFSRV.dll
+00404058 00000004 .idata   $4       EFSRV.dll
+0040405c 00000004 .idata   $4       EFSRV.dll
+00404060 00000004 .idata   $4       EFSRV.dll
+00404064 00000004 .idata   $4       EFSRV.dll
+00404068 00000004 .idata   $4       EFSRV.dll
+0040406c 00000004 .idata   $4       EFSRV.dll
+00404070 00000004 .idata   $4       EFSRV.dll
+00404074 00000004 .idata   $4       EFSRV.dll
+00404078 00000004 .idata   $4       EFSRV.dll
+0040407c 00000004 .idata   $4       EFSRV.dll
+00404080 00000004 .idata   $4       EFSRV.dll
+00404084 00000004 .idata   $4       EUSER.dll
+00404088 00000004 .idata   $4       EUSER.dll
+0040408c 00000004 .idata   $4       EUSER.dll
+00404090 00000004 .idata   $4       EUSER.dll
+00404094 00000004 .idata   $4       EUSER.dll
+00404098 00000004 .idata   $4       EUSER.dll
+0040409c 00000004 .idata   $4       EUSER.dll
+004040a0 00000004 .idata   $4       EUSER.dll
+004040a4 00000004 .idata   $4       EUSER.dll
+004040a8 00000004 .idata   $4       EUSER.dll
+004040ac 00000004 .idata   $4       EUSER.dll
+004040b0 00000004 .idata   $4       EUSER.dll
+004040b4 00000004 .idata   $4       EUSER.dll
+004040b8 00000004 .idata   $4       EUSER.dll
+004040bc 00000004 .idata   $4       EUSER.dll
+004040c0 00000004 .idata   $4       EUSER.dll
+004040c4 00000004 .idata   $4       EUSER.dll
+004040c8 00000004 .idata   $4       EUSER.dll
+004040cc 00000004 .idata   $4       EUSER.dll
+004040d0 00000004 .idata   $4       EUSER.dll
+004040d4 00000004 .idata   $4       EUSER.dll
+004040d8 00000004 .idata   $4       EUSER.dll
+004040dc 00000004 .idata   $4       EUSER.dll
+004040e0 00000004 .idata   $4       EUSER.dll
+004040e4 00000004 .idata   $4       EUSER.dll
+004040e8 00000004 .idata   $4       EUSER.dll
+004040ec 00000004 .idata   $4       EUSER.dll
+004040f0 00000004 .idata   $4       EUSER.dll
+004040f4 00000004 .idata   $4       EUSER.dll
+004040f8 00000004 .idata   $4       EUSER.dll
+004040fc 00000004 .idata   $4       EUSER.dll
+00404100 00000004 .idata   $4       EUSER.dll
+00404104 00000004 .idata   $4       EUSER.dll
+00404108 00000004 .idata   $4       EUSER.dll
+0040410c 00000004 .idata   $4       EUSER.dll
+00404110 00000004 .idata   $4       EUSER.dll
+00404114 00000004 .idata   $4       HAL.dll
+00404118 00000004 .idata   $4       HAL.dll
+0040411c 00000004 .idata   $4       HAL.dll
+00404120 00000004 .idata   $5       EFSRV.dll(__imp_??0TFindFile@@QAE@AAVRFs@@@Z)
+00404124 00000004 .idata   $5       EFSRV.dll(__imp_?FindByDir@TFindFile@@QAEHABVTDesC16@@0@Z)
+00404128 00000004 .idata   $5       EFSRV.dll(__imp_?FullName@TParseBase@@QBEABVTDesC16@@XZ)
+0040412c 00000004 .idata   $5       EFSRV.dll(__imp_?Open@RFile@@QAEHAAVRFs@@ABVTDesC16@@I@Z)
+00404130 00000004 .idata   $5       EFSRV.dll(__imp_?Read@RFile@@QBEHAAVTDes8@@H@Z)
+00404134 00000004 .idata   $5       EFSRV.dll(__imp_?Close@RFsBase@@QAEXXZ)
+00404138 00000004 .idata   $5       EFSRV.dll(__imp_?DriveList@RFs@@QBEHAAV?$TBuf8@$0BK@@@@Z)
+0040413c 00000004 .idata   $5       EFSRV.dll(__imp_?MountFileSystem@RFs@@QBEHABVTDesC16@@H@Z)
+00404140 00000004 .idata   $5       EFSRV.dll(__imp_?StartupInitComplete@RFs@@QAEXAAVTRequestStatus@@@Z)
+00404144 00000004 .idata   $5       EFSRV.dll(__imp_?Connect@RFs@@QAEHH@Z)
+00404148 00000004 .idata   $5       EFSRV.dll(__imp_?Size@RFile@@QBEHAAH@Z)
+0040414c 00000004 .idata   $5       EFSRV.dll(__imp_?Read@RFile@@QBEHAAVTDes8@@@Z)
+00404150 00000004 .idata   $5       EFSRV.dll
+00404154 00000004 .idata   $5       EUSER.dll(__imp_??0TLocale@@QAE@XZ)
+00404158 00000004 .idata   $5       EUSER.dll(__imp_??0TBufBase16@@IAE@ABVTDesC16@@H@Z)
+0040415c 00000004 .idata   $5       EUSER.dll(__imp_?AppendNumFixedWidth@TDes16@@QAEXIW4TRadix@@H@Z)
+00404160 00000004 .idata   $5       EUSER.dll(__imp_?Copy@TDes16@@QAEXABVTDesC16@@@Z)
+00404164 00000004 .idata   $5       EUSER.dll(__imp_??0TPtr8@@QAE@PAEH@Z)
+00404168 00000004 .idata   $5       EUSER.dll(__imp_?Set@TLocale@@QBEXXZ)
+0040416c 00000004 .idata   $5       EUSER.dll(__imp_??0TCurrencySymbol@@QAE@XZ)
+00404170 00000004 .idata   $5       EUSER.dll(__imp_?SetCurrencySymbol@User@@SAXABVTDesC16@@@Z)
+00404174 00000004 .idata   $5       EUSER.dll(__imp_??0TBufBase16@@IAE@H@Z)
+00404178 00000004 .idata   $5       EUSER.dll(__imp_?SetXYInputCalibration@UserHal@@SAHABVTDigitizerCalibration@@@Z)
+0040417c 00000004 .idata   $5       EUSER.dll(__imp_??0TBufBase8@@IAE@H@Z)
+00404180 00000004 .idata   $5       EUSER.dll(__imp_?Panic@User@@SAXABVTDesC16@@H@Z)
+00404184 00000004 .idata   $5       EUSER.dll(__imp_?AtC@TDesC8@@IBEABEH@Z)
+00404188 00000004 .idata   $5       EUSER.dll(__imp_?WaitForRequest@User@@SAXAAVTRequestStatus@@@Z)
+0040418c 00000004 .idata   $5       EUSER.dll(__imp_?Alloc@User@@SAPAXH@Z)
+00404190 00000004 .idata   $5       EUSER.dll(__imp_??0TPtr8@@QAE@PAEHH@Z)
+00404194 00000004 .idata   $5       EUSER.dll(__imp_?Free@User@@SAXPAX@Z)
+00404198 00000004 .idata   $5       EUSER.dll(__imp_?AtC@TDesC16@@IBEABGH@Z)
+0040419c 00000004 .idata   $5       EUSER.dll(__imp_?Create@RProcess@@QAEHABVTDesC16@@0W4TOwnerType@@@Z)
+004041a0 00000004 .idata   $5       EUSER.dll(__imp_?Resume@RProcess@@QAEXXZ)
+004041a4 00000004 .idata   $5       EUSER.dll(__imp_?Close@RHandleBase@@QAEXXZ)
+004041a8 00000004 .idata   $5       EUSER.dll(__imp_??0TPtrC16@@QAE@PBG@Z)
+004041ac 00000004 .idata   $5       EUSER.dll(__imp_?BlockThreads@UserSvr@@SAXW4TBlockType@@@Z)
+004041b0 00000004 .idata   $5       EUSER.dll(__imp_?__DllAttachProcess@UpWins@@SAXXZ)
+004041b4 00000004 .idata   $5       EUSER.dll(__imp_?__FileServer@UpWins@@SAP6AHPAX@ZXZ)
+004041b8 00000004 .idata   $5       EUSER.dll(__imp_?Create@RThread@@QAEHABVTDesC16@@P6AHPAX@ZHHH1W4TOwnerType@@@Z)
+004041bc 00000004 .idata   $5       EUSER.dll(__imp_?SetPriority@RThread@@QBEXW4TThreadPriority@@@Z)
+004041c0 00000004 .idata   $5       EUSER.dll(__imp_?SetSystem@RThread@@QBEXH@Z)
+004041c4 00000004 .idata   $5       EUSER.dll(__imp_?SetProtected@RThread@@QBEXH@Z)
+004041c8 00000004 .idata   $5       EUSER.dll(__imp_?Resume@RThread@@QBEXXZ)
+004041cc 00000004 .idata   $5       EUSER.dll(__imp_?__Synchronize@UpWins@@SAXXZ)
+004041d0 00000004 .idata   $5       EUSER.dll(__imp_?__ReleaseInitThreads@UpWins@@SAXXZ)
+004041d4 00000004 .idata   $5       EUSER.dll(__imp_?__WindowServer@UpWins@@SAP6AHPAX@ZXZ)
+004041d8 00000004 .idata   $5       EUSER.dll(__imp_?__WireKernel@UpWins@@SAXXZ)
+004041dc 00000004 .idata   $5       EUSER.dll(__imp_?KernelStartup@UserSvr@@SAXP6AHPAX@Z@Z)
+004041e0 00000004 .idata   $5       EUSER.dll
+004041e4 00000004 .idata   $5       HAL.dll(__imp_?Get@HAL@@SAHW4TAttribute@HALData@@AAH@Z)
+004041e8 00000004 .idata   $5       HAL.dll(__imp_?Set@HAL@@SAHW4TAttribute@HALData@@H@Z)
+004041ec 00000004 .idata   $5       HAL.dll
+004041f0 0000000a .idata   $6       EFSRV.dll
+004041fa 0000000a .idata   $6       EUSER.dll
+00404204 00000008 .idata   $6       HAL.dll
+00405000 00000004 .CRT     $XCA     UP_EXE.obj
+00405008 00000004 .CRT     $XCZ     UP_EXE.obj
+00405010 00000004 .CRT     $XIA     UP_EXE.obj
+00405018 00000004 .CRT     $XIZ     UP_EXE.obj
+00405020 00000004 .CRT     $XPA     UP_EXE.obj
+00405028 00000004 .CRT     $XPZ     UP_EXE.obj
+00405030 00000004 .CRT     $XTA     UP_EXE.obj
+00405038 00000004 .CRT     $XTZ     UP_EXE.obj
+00406000 00000008 .bss              ESTART.o
+00406008 00000008 .bss              uid.o
+00406010 00000008 .bss              UP_EXE.obj
+00406018 00000000 .bss              
+
+--------------
+Public Symbols
+--------------
+
+Address  Module               Name
+-------- -------------------- ----
+0040131e ESTART.o             ?E32Main@@YAHXZ
+004015f6 EUSER.dll            ??0TLocale@@QAE@XZ
+004015fc EFSRV.dll            ??0TFindFile@@QAE@AAVRFs@@@Z
+00401602 EUSER.dll            ??0TBufBase16@@IAE@ABVTDesC16@@H@Z
+00401608 HAL.dll              ?Get@HAL@@SAHW4TAttribute@HALData@@AAH@Z
+0040160e EUSER.dll            ?AppendNumFixedWidth@TDes16@@QAEXIW4TRadix@@H@Z
+00401614 HAL.dll              ?Set@HAL@@SAHW4TAttribute@HALData@@H@Z
+0040161a EFSRV.dll            ?FindByDir@TFindFile@@QAEHABVTDesC16@@0@Z
+00401620 EFSRV.dll            ?FullName@TParseBase@@QBEABVTDesC16@@XZ
+00401626 EUSER.dll            ?Copy@TDes16@@QAEXABVTDesC16@@@Z
+0040162c EFSRV.dll            ?Open@RFile@@QAEHAAVRFs@@ABVTDesC16@@I@Z
+00401632 EUSER.dll            ??0TPtr8@@QAE@PAEH@Z
+00401638 EFSRV.dll            ?Read@RFile@@QBEHAAVTDes8@@H@Z
+0040163e EUSER.dll            ?Set@TLocale@@QBEXXZ
+00401644 EUSER.dll            ??0TCurrencySymbol@@QAE@XZ
+0040164a EUSER.dll            ?SetCurrencySymbol@User@@SAXABVTDesC16@@@Z
+00401650 EFSRV.dll            ?Close@RFsBase@@QAEXXZ
+00401656 EUSER.dll            ??0TBufBase16@@IAE@H@Z
+0040165c EUSER.dll            ?SetXYInputCalibration@UserHal@@SAHABVTDigitizerCalibration@@@Z
+00401662 EUSER.dll            ??0TBufBase8@@IAE@H@Z
+00401668 EFSRV.dll            ?DriveList@RFs@@QBEHAAV?$TBuf8@$0BK@@@@Z
+0040166e EUSER.dll            ?Panic@User@@SAXABVTDesC16@@H@Z
+00401674 EUSER.dll            ?AtC@TDesC8@@IBEABEH@Z
+0040167a EFSRV.dll            ?MountFileSystem@RFs@@QBEHABVTDesC16@@H@Z
+00401680 EFSRV.dll            ?StartupInitComplete@RFs@@QAEXAAVTRequestStatus@@@Z
+00401686 EUSER.dll            ?WaitForRequest@User@@SAXAAVTRequestStatus@@@Z
+0040168c EFSRV.dll            ?Connect@RFs@@QAEHH@Z
+00401692 EFSRV.dll            ?Size@RFile@@QBEHAAH@Z
+00401698 EFSRV.dll            ?Read@RFile@@QBEHAAVTDes8@@@Z
+0040169e EUSER.dll            ?Alloc@User@@SAPAXH@Z
+004016a4 EUSER.dll            ??0TPtr8@@QAE@PAEHH@Z
+004016aa EUSER.dll            ?Free@User@@SAXPAX@Z
+004016b0 EUSER.dll            ?AtC@TDesC16@@IBEABGH@Z
+004016b6 EUSER.dll            ?Create@RProcess@@QAEHABVTDesC16@@0W4TOwnerType@@@Z
+004016bc EUSER.dll            ?Resume@RProcess@@QAEXXZ
+004016c2 EUSER.dll            ?Close@RHandleBase@@QAEXXZ
+004016e8 UP_EXE.obj           ?Panic@@YAXW4TStatPanic@@@Z
+00401880 UP_EXE.obj           ?_E32Startup@@YGXXZ
+00401892 EUSER.dll            ??0TPtrC16@@QAE@PBG@Z
+00401898 EUSER.dll            ?BlockThreads@UserSvr@@SAXW4TBlockType@@@Z
+0040189e EUSER.dll            ?__DllAttachProcess@UpWins@@SAXXZ
+004018a4 EUSER.dll            ?__FileServer@UpWins@@SAP6AHPAX@ZXZ
+004018aa EUSER.dll            ?Create@RThread@@QAEHABVTDesC16@@P6AHPAX@ZHHH1W4TOwnerType@@@Z
+004018b0 EUSER.dll            ?SetPriority@RThread@@QBEXW4TThreadPriority@@@Z
+004018b6 EUSER.dll            ?SetSystem@RThread@@QBEXH@Z
+004018bc EUSER.dll            ?SetProtected@RThread@@QBEXH@Z
+004018c2 EUSER.dll            ?Resume@RThread@@QBEXXZ
+004018c8 EUSER.dll            ?__Synchronize@UpWins@@SAXXZ
+004018ce EUSER.dll            ?__ReleaseInitThreads@UpWins@@SAXXZ
+004018d4 EUSER.dll            ?__WindowServer@UpWins@@SAP6AHPAX@ZXZ
+004018da EUSER.dll            ?__WireKernel@UpWins@@SAXXZ
+004018e0 EUSER.dll            ?KernelStartup@UserSvr@@SAXP6AHPAX@Z@Z
+00403000 uid.o                ?uid@@3PAVTUid@@A
+00404000 EFSRV.dll            __IMPORT_DESCRIPTOR_EFSRV
+00404014 EUSER.dll            __IMPORT_DESCRIPTOR_EUSER
+00404028 HAL.dll              __IMPORT_DESCRIPTOR_HAL
+0040403c EFSRV.dll            __NULL_IMPORT_DESCRIPTOR
+00404120 EFSRV.dll            __imp_??0TFindFile@@QAE@AAVRFs@@@Z
+00404124 EFSRV.dll            __imp_?FindByDir@TFindFile@@QAEHABVTDesC16@@0@Z
+00404128 EFSRV.dll            __imp_?FullName@TParseBase@@QBEABVTDesC16@@XZ
+0040412c EFSRV.dll            __imp_?Open@RFile@@QAEHAAVRFs@@ABVTDesC16@@I@Z
+00404130 EFSRV.dll            __imp_?Read@RFile@@QBEHAAVTDes8@@H@Z
+00404134 EFSRV.dll            __imp_?Close@RFsBase@@QAEXXZ
+00404138 EFSRV.dll            __imp_?DriveList@RFs@@QBEHAAV?$TBuf8@$0BK@@@@Z
+0040413c EFSRV.dll            __imp_?MountFileSystem@RFs@@QBEHABVTDesC16@@H@Z
+00404140 EFSRV.dll            __imp_?StartupInitComplete@RFs@@QAEXAAVTRequestStatus@@@Z
+00404144 EFSRV.dll            __imp_?Connect@RFs@@QAEHH@Z
+00404148 EFSRV.dll            __imp_?Size@RFile@@QBEHAAH@Z
+0040414c EFSRV.dll            __imp_?Read@RFile@@QBEHAAVTDes8@@@Z
+00404150 EFSRV.dll            EFSRV_NULL_THUNK_DATA
+00404154 EUSER.dll            __imp_??0TLocale@@QAE@XZ
+00404158 EUSER.dll            __imp_??0TBufBase16@@IAE@ABVTDesC16@@H@Z
+0040415c EUSER.dll            __imp_?AppendNumFixedWidth@TDes16@@QAEXIW4TRadix@@H@Z
+00404160 EUSER.dll            __imp_?Copy@TDes16@@QAEXABVTDesC16@@@Z
+00404164 EUSER.dll            __imp_??0TPtr8@@QAE@PAEH@Z
+00404168 EUSER.dll            __imp_?Set@TLocale@@QBEXXZ
+0040416c EUSER.dll            __imp_??0TCurrencySymbol@@QAE@XZ
+00404170 EUSER.dll            __imp_?SetCurrencySymbol@User@@SAXABVTDesC16@@@Z
+00404174 EUSER.dll            __imp_??0TBufBase16@@IAE@H@Z
+00404178 EUSER.dll            __imp_?SetXYInputCalibration@UserHal@@SAHABVTDigitizerCalibration@@@Z
+0040417c EUSER.dll            __imp_??0TBufBase8@@IAE@H@Z
+00404180 EUSER.dll            __imp_?Panic@User@@SAXABVTDesC16@@H@Z
+00404184 EUSER.dll            __imp_?AtC@TDesC8@@IBEABEH@Z
+00404188 EUSER.dll            __imp_?WaitForRequest@User@@SAXAAVTRequestStatus@@@Z
+0040418c EUSER.dll            __imp_?Alloc@User@@SAPAXH@Z
+00404190 EUSER.dll            __imp_??0TPtr8@@QAE@PAEHH@Z
+00404194 EUSER.dll            __imp_?Free@User@@SAXPAX@Z
+00404198 EUSER.dll            __imp_?AtC@TDesC16@@IBEABGH@Z
+0040419c EUSER.dll            __imp_?Create@RProcess@@QAEHABVTDesC16@@0W4TOwnerType@@@Z
+004041a0 EUSER.dll            __imp_?Resume@RProcess@@QAEXXZ
+004041a4 EUSER.dll            __imp_?Close@RHandleBase@@QAEXXZ
+004041a8 EUSER.dll            __imp_??0TPtrC16@@QAE@PBG@Z
+004041ac EUSER.dll            __imp_?BlockThreads@UserSvr@@SAXW4TBlockType@@@Z
+004041b0 EUSER.dll            __imp_?__DllAttachProcess@UpWins@@SAXXZ
+004041b4 EUSER.dll            __imp_?__FileServer@UpWins@@SAP6AHPAX@ZXZ
+004041b8 EUSER.dll            __imp_?Create@RThread@@QAEHABVTDesC16@@P6AHPAX@ZHHH1W4TOwnerType@@@Z
+004041bc EUSER.dll            __imp_?SetPriority@RThread@@QBEXW4TThreadPriority@@@Z
+004041c0 EUSER.dll            __imp_?SetSystem@RThread@@QBEXH@Z
+004041c4 EUSER.dll            __imp_?SetProtected@RThread@@QBEXH@Z
+004041c8 EUSER.dll            __imp_?Resume@RThread@@QBEXXZ
+004041cc EUSER.dll            __imp_?__Synchronize@UpWins@@SAXXZ
+004041d0 EUSER.dll            __imp_?__ReleaseInitThreads@UpWins@@SAXXZ
+004041d4 EUSER.dll            __imp_?__WindowServer@UpWins@@SAP6AHPAX@ZXZ
+004041d8 EUSER.dll            __imp_?__WireKernel@UpWins@@SAXXZ
+004041dc EUSER.dll            __imp_?KernelStartup@UserSvr@@SAXP6AHPAX@Z@Z
+004041e0 EUSER.dll            EUSER_NULL_THUNK_DATA
+004041e4 HAL.dll              __imp_?Get@HAL@@SAHW4TAttribute@HALData@@AAH@Z
+004041e8 HAL.dll              __imp_?Set@HAL@@SAHW4TAttribute@HALData@@H@Z
+004041ec HAL.dll              HAL_NULL_THUNK_DATA
+00405000 UP_EXE.obj           ?__xc_a@@3PAP6AXXZA
+00405008 UP_EXE.obj           ?__xc_z@@3PAP6AXXZA
+00405010 UP_EXE.obj           ?__xi_a@@3PAP6AXXZA
+00405018 UP_EXE.obj           ?__xi_z@@3PAP6AXXZA
+00405020 UP_EXE.obj           ?__xp_a@@3PAP6AXXZA
+00405028 UP_EXE.obj           ?__xp_z@@3PAP6AXXZA
+00405030 UP_EXE.obj           ?__xt_a@@3PAP6AXXZA
+00405038 UP_EXE.obj           ?__xt_z@@3PAP6AXXZA

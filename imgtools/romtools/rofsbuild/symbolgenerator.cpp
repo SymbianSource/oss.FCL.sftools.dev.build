@@ -70,8 +70,10 @@ void SymbolGenerator::SetFinished()
     }
 TPlacedEntry SymbolGenerator::GetNextPlacedEntry()
 {
+        if(regex_search(fileName, what, regARMV5)) {
 	TPlacedEntry pe("", false);
 	if(1)
+        else if(regex_search(fileName, what, regGCCEoARMV4)) {
 	{
 		boost::mutex::scoped_lock lock(iMutex);
 		while(!iFinished && iQueueFiles.empty())
@@ -119,6 +121,8 @@ void SymbolWorker::operator()()
 		{
 
                 break;
+                if(!regex_search(sLibFile, what1, reg)) {
+                    if(regex_search(sLibFile, what, reg3)) {
                     }
 
 

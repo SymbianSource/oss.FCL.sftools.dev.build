@@ -1,0 +1,145 @@
+Address   Size      Name    Subname  Module
+
+40701000 0000003d .text             ASSHDALARM.o(??0TASShdAlarm@@QAE@XZ)
+4070103d 00000107 .text             ASSHDALARM.o(?InternalizeL@TASShdAlarm@@QAEXAAVRReadStream@@@Z)
+40701144 000000dc .text             ASSHDALARM.o(?ExternalizeL@TASShdAlarm@@QBEXAAVRWriteStream@@@Z)
+40701220 000000a2 .text             ASSHDALARM.o(?Reset@TASShdAlarm@@QAEXXZ)
+407012c2 00000003 .text             ASSHDDLL.o(?E32Dll@@YAHW4TDllReason@@@Z)
+407012c6 00000006 .text             EUSER.dll(??0TBufBase16@@IAE@H@Z)
+407012cc 00000006 .text             ESTOR.dll(?ReadUint16L@RReadStream@@QAEGXZ)
+407012d2 00000006 .text             ESTOR.dll(?ReadInt8L@RReadStream@@QAECXZ)
+407012d8 00000006 .text             ESTOR.dll(?ReadInt32L@RReadStream@@QAEJXZ)
+407012de 00000006 .text             ESTOR.dll(?InternalizeL@@YAXAAVTInt64@@AAVRReadStream@@@Z)
+407012e4 00000006 .text             ESTOR.dll(?InternalizeL@@YAXAAVTDes16@@AAVRReadStream@@@Z)
+407012ea 00000006 .text             ESTOR.dll(?ReadInt16L@RReadStream@@QAEFXZ)
+407012f0 00000006 .text             ESTOR.dll(?WriteUint16L@RWriteStream@@QAEXI@Z)
+407012f6 00000006 .text             ESTOR.dll(?WriteInt8L@RWriteStream@@QAEXH@Z)
+407012fc 00000006 .text             ESTOR.dll(?WriteInt32L@RWriteStream@@QAEXJ@Z)
+40701302 00000006 .text             ESTOR.dll(?ExternalizeL@@YAXVTInt64@@AAVRWriteStream@@@Z)
+40701308 00000006 .text             ESTOR.dll(?ExternalizeL@@YAXABVTDesC16@@AAVRWriteStream@@@Z)
+4070130e 00000006 .text             ESTOR.dll(?WriteInt16L@RWriteStream@@QAEXH@Z)
+40701314 00000006 .text             EUSER.dll(?NullTTime@Time@@SA?AVTTime@@XZ)
+4070131a 00000006 .text             EUSER.dll(?Copy@TDes16@@QAEXABVTDesC16@@@Z)
+40701320 00000020 .text             UP_DLL.obj(?initTable@@YAXPAP6AXXZ0@Z)
+40701340 000000a7 .text             UP_DLL.obj(?_E32Dll@@YGHPAXI0@Z)
+407013e8 00000006 .text             EUSER.dll(?__WireKernel@UpWins@@SAXXZ)
+40702000 0000001c .data             ASSHDALARM.o
+40702020 00000018 .data             ASSHDDLL.o
+40702038 00000018 .data             uid.o
+40702050 00000018 .data             UP_DLL.obj
+40702068 00000010 .data             UP_DLL.obj
+40703000 0000000c .E32_UID          uid.o
+40704000 00000014 .idata   $2       ESTOR.dll
+40704014 00000014 .idata   $2       EUSER.dll
+40704028 00000014 .idata   $3       EUSER.dll
+4070403c 00000004 .idata   $4       ESTOR.dll
+40704040 00000004 .idata   $4       ESTOR.dll
+40704044 00000004 .idata   $4       ESTOR.dll
+40704048 00000004 .idata   $4       ESTOR.dll
+4070404c 00000004 .idata   $4       ESTOR.dll
+40704050 00000004 .idata   $4       ESTOR.dll
+40704054 00000004 .idata   $4       ESTOR.dll
+40704058 00000004 .idata   $4       ESTOR.dll
+4070405c 00000004 .idata   $4       ESTOR.dll
+40704060 00000004 .idata   $4       ESTOR.dll
+40704064 00000004 .idata   $4       ESTOR.dll
+40704068 00000004 .idata   $4       ESTOR.dll
+4070406c 00000004 .idata   $4       ESTOR.dll
+40704070 00000004 .idata   $4       EUSER.dll
+40704074 00000004 .idata   $4       EUSER.dll
+40704078 00000004 .idata   $4       EUSER.dll
+4070407c 00000004 .idata   $4       EUSER.dll
+40704080 00000004 .idata   $4       EUSER.dll
+40704084 00000004 .idata   $5       ESTOR.dll(__imp_?ReadUint16L@RReadStream@@QAEGXZ)
+40704088 00000004 .idata   $5       ESTOR.dll(__imp_?ReadInt8L@RReadStream@@QAECXZ)
+4070408c 00000004 .idata   $5       ESTOR.dll(__imp_?ReadInt32L@RReadStream@@QAEJXZ)
+40704090 00000004 .idata   $5       ESTOR.dll(__imp_?InternalizeL@@YAXAAVTInt64@@AAVRReadStream@@@Z)
+40704094 00000004 .idata   $5       ESTOR.dll(__imp_?InternalizeL@@YAXAAVTDes16@@AAVRReadStream@@@Z)
+40704098 00000004 .idata   $5       ESTOR.dll(__imp_?ReadInt16L@RReadStream@@QAEFXZ)
+4070409c 00000004 .idata   $5       ESTOR.dll(__imp_?WriteUint16L@RWriteStream@@QAEXI@Z)
+407040a0 00000004 .idata   $5       ESTOR.dll(__imp_?WriteInt8L@RWriteStream@@QAEXH@Z)
+407040a4 00000004 .idata   $5       ESTOR.dll(__imp_?WriteInt32L@RWriteStream@@QAEXJ@Z)
+407040a8 00000004 .idata   $5       ESTOR.dll(__imp_?ExternalizeL@@YAXVTInt64@@AAVRWriteStream@@@Z)
+407040ac 00000004 .idata   $5       ESTOR.dll(__imp_?ExternalizeL@@YAXABVTDesC16@@AAVRWriteStream@@@Z)
+407040b0 00000004 .idata   $5       ESTOR.dll(__imp_?WriteInt16L@RWriteStream@@QAEXH@Z)
+407040b4 00000004 .idata   $5       ESTOR.dll
+407040b8 00000004 .idata   $5       EUSER.dll(__imp_??0TBufBase16@@IAE@H@Z)
+407040bc 00000004 .idata   $5       EUSER.dll(__imp_?NullTTime@Time@@SA?AVTTime@@XZ)
+407040c0 00000004 .idata   $5       EUSER.dll(__imp_?Copy@TDes16@@QAEXABVTDesC16@@@Z)
+407040c4 00000004 .idata   $5       EUSER.dll(__imp_?__WireKernel@UpWins@@SAXXZ)
+407040c8 00000004 .idata   $5       EUSER.dll
+407040cc 0000000a .idata   $6       ESTOR.dll
+407040d6 0000000a .idata   $6       EUSER.dll
+40705000 00000004 .CRT     $XCA     UP_DLL.obj
+40705008 00000004 .CRT     $XCZ     UP_DLL.obj
+40705010 00000004 .CRT     $XIA     UP_DLL.obj
+40705018 00000004 .CRT     $XIZ     UP_DLL.obj
+40705020 00000004 .CRT     $XPA     UP_DLL.obj
+40705028 00000004 .CRT     $XPZ     UP_DLL.obj
+40705030 00000004 .CRT     $XTA     UP_DLL.obj
+40705038 00000004 .CRT     $XTZ     UP_DLL.obj
+40706000 00000012 .bss              ASSHDALARM.o
+40706018 00000008 .bss              ASSHDDLL.o
+40706020 00000008 .bss              uid.o
+40706028 00000008 .bss              UP_DLL.obj
+40706030 00000004 .bss              
+
+--------------
+Public Symbols
+--------------
+
+Address  Module               Name
+-------- -------------------- ----
+40701000 ASSHDALARM.o         ??0TASShdAlarm@@QAE@XZ
+4070103d ASSHDALARM.o         ?InternalizeL@TASShdAlarm@@QAEXAAVRReadStream@@@Z
+40701144 ASSHDALARM.o         ?ExternalizeL@TASShdAlarm@@QBEXAAVRWriteStream@@@Z
+40701220 ASSHDALARM.o         ?Reset@TASShdAlarm@@QAEXXZ
+407012c2 ASSHDDLL.o           ?E32Dll@@YAHW4TDllReason@@@Z
+407012c6 EUSER.dll            ??0TBufBase16@@IAE@H@Z
+407012cc ESTOR.dll            ?ReadUint16L@RReadStream@@QAEGXZ
+407012d2 ESTOR.dll            ?ReadInt8L@RReadStream@@QAECXZ
+407012d8 ESTOR.dll            ?ReadInt32L@RReadStream@@QAEJXZ
+407012de ESTOR.dll            ?InternalizeL@@YAXAAVTInt64@@AAVRReadStream@@@Z
+407012e4 ESTOR.dll            ?InternalizeL@@YAXAAVTDes16@@AAVRReadStream@@@Z
+407012ea ESTOR.dll            ?ReadInt16L@RReadStream@@QAEFXZ
+407012f0 ESTOR.dll            ?WriteUint16L@RWriteStream@@QAEXI@Z
+407012f6 ESTOR.dll            ?WriteInt8L@RWriteStream@@QAEXH@Z
+407012fc ESTOR.dll            ?WriteInt32L@RWriteStream@@QAEXJ@Z
+40701302 ESTOR.dll            ?ExternalizeL@@YAXVTInt64@@AAVRWriteStream@@@Z
+40701308 ESTOR.dll            ?ExternalizeL@@YAXABVTDesC16@@AAVRWriteStream@@@Z
+4070130e ESTOR.dll            ?WriteInt16L@RWriteStream@@QAEXH@Z
+40701314 EUSER.dll            ?NullTTime@Time@@SA?AVTTime@@XZ
+4070131a EUSER.dll            ?Copy@TDes16@@QAEXABVTDesC16@@@Z
+40701340 UP_DLL.obj           ?_E32Dll@@YGHPAXI0@Z
+407013e8 EUSER.dll            ?__WireKernel@UpWins@@SAXXZ
+40703000 uid.o                ?uid@@3PAVTUid@@A
+40704000 ESTOR.dll            __IMPORT_DESCRIPTOR_ESTOR
+40704014 EUSER.dll            __IMPORT_DESCRIPTOR_EUSER
+40704028 EUSER.dll            __NULL_IMPORT_DESCRIPTOR
+40704084 ESTOR.dll            __imp_?ReadUint16L@RReadStream@@QAEGXZ
+40704088 ESTOR.dll            __imp_?ReadInt8L@RReadStream@@QAECXZ
+4070408c ESTOR.dll            __imp_?ReadInt32L@RReadStream@@QAEJXZ
+40704090 ESTOR.dll            __imp_?InternalizeL@@YAXAAVTInt64@@AAVRReadStream@@@Z
+40704094 ESTOR.dll            __imp_?InternalizeL@@YAXAAVTDes16@@AAVRReadStream@@@Z
+40704098 ESTOR.dll            __imp_?ReadInt16L@RReadStream@@QAEFXZ
+4070409c ESTOR.dll            __imp_?WriteUint16L@RWriteStream@@QAEXI@Z
+407040a0 ESTOR.dll            __imp_?WriteInt8L@RWriteStream@@QAEXH@Z
+407040a4 ESTOR.dll            __imp_?WriteInt32L@RWriteStream@@QAEXJ@Z
+407040a8 ESTOR.dll            __imp_?ExternalizeL@@YAXVTInt64@@AAVRWriteStream@@@Z
+407040ac ESTOR.dll            __imp_?ExternalizeL@@YAXABVTDesC16@@AAVRWriteStream@@@Z
+407040b0 ESTOR.dll            __imp_?WriteInt16L@RWriteStream@@QAEXH@Z
+407040b4 ESTOR.dll            ESTOR_NULL_THUNK_DATA
+407040b8 EUSER.dll            __imp_??0TBufBase16@@IAE@H@Z
+407040bc EUSER.dll            __imp_?NullTTime@Time@@SA?AVTTime@@XZ
+407040c0 EUSER.dll            __imp_?Copy@TDes16@@QAEXABVTDesC16@@@Z
+407040c4 EUSER.dll            __imp_?__WireKernel@UpWins@@SAXXZ
+407040c8 EUSER.dll            EUSER_NULL_THUNK_DATA
+40705000 UP_DLL.obj           ?__xc_a@@3PAP6AXXZA
+40705008 UP_DLL.obj           ?__xc_z@@3PAP6AXXZA
+40705010 UP_DLL.obj           ?__xi_a@@3PAP6AXXZA
+40705018 UP_DLL.obj           ?__xi_z@@3PAP6AXXZA
+40705020 UP_DLL.obj           ?__xp_a@@3PAP6AXXZA
+40705028 UP_DLL.obj           ?__xp_z@@3PAP6AXXZA
+40705030 UP_DLL.obj           ?__xt_a@@3PAP6AXXZA
+40705038 UP_DLL.obj           ?__xt_z@@3PAP6AXXZA
+40706030 common               ?_initialised@@3HA

@@ -1,0 +1,1062 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE SystemBuild [
+ <!ELEMENT SystemBuild (option* | target+ | targetList+ | list+ | configuration+)*>
+<!ATTLIST SystemBuild
+  schema CDATA #REQUIRED
+>
+
+<!ELEMENT list (ref+)>
+<!-- e.g. common, beech, cedar, etc -->
+<!ATTLIST list
+  name ID #REQUIRED
+  description CDATA #REQUIRED
+>
+
+<!ELEMENT ref EMPTY>
+<!-- Reference to a named entity in System Model -->
+<!ATTLIST ref
+  item CDATA #REQUIRED
+>
+
+<!ELEMENT targetList EMPTY>
+<!-- e.g. DEFAULT_7.0S, TOOLS_7.0S, etc -->
+<!ATTLIST targetList
+  name ID #REQUIRED
+  description CDATA #REQUIRED
+  target IDREFS #REQUIRED
+>
+
+<!ELEMENT target EMPTY>
+<!-- e.g. WINS, WINSCW, ARM4, etc -->
+<!ATTLIST target
+  name ID #REQUIRED
+  abldTarget CDATA #REQUIRED
+  description CDATA #REQUIRED
+>
+
+<!ELEMENT option EMPTY>
+<!-- e.g. Keepgoing, SaveSpace, etc -->
+<!ATTLIST option
+  name ID #REQUIRED
+  abldOption CDATA #REQUIRED
+  description CDATA #REQUIRED
+  enable (Y | N ) #REQUIRED
+>
+
+<!ELEMENT configuration (listRef+ | ref+ | task+)*>
+<!-- 7.0s, 8.0a, 8.0b, cuskit, etc -->
+<!ATTLIST configuration
+  name ID #REQUIRED
+  description CDATA #REQUIRED
+  filter CDATA #REQUIRED
+>
+<!ELEMENT task (listRef* , (buildLayer | specialInstructions))>
+
+<!ELEMENT listRef EMPTY>
+<!-- Reference to unitList -->
+<!ATTLIST listRef
+  list CDATA #REQUIRED
+>
+
+<!ELEMENT buildLayer EMPTY>
+<!-- bldmake, abld export, etc -->
+<!ATTLIST buildLayer
+  command CDATA #REQUIRED
+  targetList IDREFS #IMPLIED
+  unitParallel (Y | N ) #REQUIRED
+  targetParallel (Y | N ) "N"
+>
+
+<!ELEMENT specialInstructions EMPTY>
+<!-- BootStrap -->
+<!ATTLIST specialInstructions
+  name CDATA #REQUIRED
+  cwd CDATA #REQUIRED
+  root CDATA #IMPLIED
+  command CDATA #REQUIRED
+>
+]>
+<SystemBuild schema="1.0.0">
+  <option name="KEEPGOING" abldOption="-keepgoing" description="Causes make to keepgoing on errors" enable="Y"/>
+  <option name="SAVESPACE" abldOption="-savespace" description="Causes the removal of intermediate files" enable="Y"/>
+  <option name="NO_DEBUG" abldOption="-no_debug" description="Causes the toolchain not to generate debug tables" enable="N"/>
+  <target name="WINS" abldTarget="wins" description="MSVC Compiler"/>
+  <target name="WINS_REL" abldTarget="wins urel" description="MSVC Compiler"/>
+  <target name="WINS_DEB" abldTarget="wins udeb" description="MSVC Compiler"/>
+  <target name="WINSCW" abldTarget="winscw" description="CodeWarrior Compiler"/>
+  <target name="WINSCW_REL" abldTarget="winscw urel" description="CodeWarrior Compiler"/>
+  <target name="WINSCW_DEB" abldTarget="winscw udeb" description="CodeWarrior Compiler"/>
+  <target name="TOOLS" abldTarget="tools" description="MSVC Compiler for Tools"/>
+  <target name="TOOLS_REL" abldTarget="tools rel" description="MSVC Compiler for Tools Release mode only"/>
+  <target name="TOOLS2" abldTarget="tools2" description="MinGW GCC Compiler for Tools"/>
+  <target name="TOOLS2_REL" abldTarget="tools2 rel" description="MinGW GCC Compiler for Tools Release mode only"/>
+  <target name="ARMV5" abldTarget="armv5" description="RVCT Compiler"/>
+  <target name="ARMV5_REL" abldTarget="armv5 urel" description="RVCT Compiler"/>
+  <target name="ARMV5_DEB" abldTarget="armv5 udeb" description="RVCT Compiler"/>
+  <target name="ARMV7" abldTarget="armv7" description="RVCT Compiler"/>
+  <target name="ARMV7_REL" abldTarget="armv7 urel" description="RVCT Compiler"/>
+  <target name="ARMV7_DEB" abldTarget="armv7 udeb" description="RVCT Compiler"/>
+  <target name="ARMV5SMP" abldTarget="armv5smp" description="RVCT Compiler for SMP"/>
+  <target name="ARMV5SMP_REL" abldTarget="armv5smp urel" description="RVCT Compiler for SMP"/>
+  <target name="ARMV5SMP_DEB" abldTarget="armv5smp udeb" description="RVCT Compiler for SMP"/>
+
+  <!-- Aditional Targets -->
+  <target name="CWTOOLS" abldTarget="cwtools" description="CodeWarrior Compiler for Tools"/> <!-- Not supported -->
+  <target name="CWTOOLS_REL" abldTarget="cwtools rel" description="CodeWarrior Compiler for Tools Release mode only"/> <!-- Not supported -->
+  <target name="GCCXML" abldTarget="gccxml" description="GCCXML for Code comparision tools"/>
+  <target name="GCCXML_REL" abldTarget="gccxml urel" description="GCCXML for Code comparision tools release mode only"/>
+  
+  <targetList name="default_9.0" description="Main Targets for 9.0" target="WINSCW ARMV5"/>
+  <targetList name="default_9.0_rel" description="Main Targets for 9.0_rel" target="WINSCW_REL ARMV5_REL"/>
+  <targetList name="default_9.0_deb" description="Main Targets for 9.0_deb" target="WINSCW_DEB ARMV5_DEB"/>
+  <targetList name="tools" description="tools Targets" target="TOOLS"/>
+  <targetList name="tools_rel" description="tools Release Targets" target="TOOLS_REL"/>
+  <targetList name="tools2" description="tools Targets" target="TOOLS2"/>
+  <targetList name="tools2_rel" description="tools Release Targets" target="TOOLS2_REL"/>
+  <targetList name="gccxml" description="tools Targets" target="GCCXML"/>
+  <targetList name="gccxml_rel" description="tools Release Targets" target="GCCXML_REL"/>
+  <targetList name="armv5smp" description="Separate ARMV5 SMP target" target="ARMV5SMP"/>
+  <targetList name="armv5smp_rel" description="Separate ARMV5 SMP release target" target="ARMV5SMP_REL"/>
+  <targetList name="armv5smp_deb" description="Separate ARMV5 SMP debug target" target="ARMV5SMP_DEB"/>
+  <targetList name="default_9.0_armv7" description="Main targets and ARMV7 target" target="WINSCW ARMV5 ARMV7"/>
+  <targetList name="default_9.0_rel_armv7" description="Main targets and ARMV7 release target" target="WINSCW_REL ARMV5_REL ARMV7_REL"/>
+  <targetList name="default_9.0_deb_armv7" description="Main targets and ARMV7 debug target" target="WINSCW_DEB ARMV5_DEB ARMV7_DEB"/>
+
+  
+  <list name="SYSTEMTEST_LIST" description="System Test Code">
+    <ref item="n:integtestltsy"/>
+    <ref item="n:systemtestos"/>
+  </list>
+  <list name="SYSTEMTEST_LIST_INTEGTESTSMP" description="System Test Code">
+    <ref item="n:integtestsmp"/>
+  </list>
+
+    <!-- 9.5 configuration -->
+
+  <configuration name="Custkit_9.5" description="9.5 Custkit build" filter="9.5,custkit">
+    <ref item="os"/>
+    <ref item="mw"/>
+    <ref item="app"/>
+    <task><specialInstructions name="BootStrap1" cwd="cedar/generic/tools/e32toolp/group" command="setupprj.bat secure"/></task>
+    <task><specialInstructions name="BootStrap2" cwd="cedar/generic/tools/e32toolp/group" command="bld.bat rel"/></task>
+    <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+    <task><buildLayer command="abld export" unitParallel="Y"/></task>
+    <task><buildLayer command="abld makefile" targetList="tools" unitParallel="Y" targetParallel="N"/></task>
+    <task><buildLayer command="abld library" targetList="tools" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld target" targetList="tools_rel" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld final" targetList="tools_rel" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld -what build" targetList="tools_rel" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld -check build" targetList="tools_rel" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld makefile" targetList="tools2" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld library" targetList="tools2" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld target" targetList="tools2_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld final" targetList="tools2_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld -what build" targetList="tools2_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld -check build" targetList="tools2_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld makefile" targetList="default_9.0" unitParallel="Y" targetParallel="N"/></task>
+    <task><buildLayer command="abld resource" targetList="default_9.0" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld library" targetList="default_9.0" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld target" targetList="default_9.0" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld final" targetList="default_9.0" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld -what build" targetList="default_9.0" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld -check build" targetList="default_9.0" unitParallel="Y" targetParallel="Y"/></task>
+  </configuration>
+
+  <configuration name="GT_9.5" description="9.5 GT build" filter="9.5,gt">
+    <ref item="os"/>
+    <ref item="mw"/>
+    <ref item="app"/>
+    <task><specialInstructions name="BootStrap1" cwd="cedar/generic/tools/e32toolp/group" command="setupprj.bat secure"/></task>
+    <task><specialInstructions name="BootStrap2" cwd="cedar/generic/tools/e32toolp/group" command="bld.bat rel"/></task>
+    <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+    <task><buildLayer command="abld export" unitParallel="Y"/></task>
+    <task><buildLayer command="abld makefile" targetList="tools" unitParallel="Y" targetParallel="N"/></task>
+    <task><buildLayer command="abld library" targetList="tools" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld target" targetList="tools_rel" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld final" targetList="tools_rel" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld -what build" targetList="tools_rel" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld -check build" targetList="tools_rel" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld makefile" targetList="tools2" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld library" targetList="tools2" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld target" targetList="tools2_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld final" targetList="tools2_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld -what build" targetList="tools2_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld -check build" targetList="tools2_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld makefile" targetList="default_9.0" unitParallel="Y" targetParallel="N"/></task>
+    <task><buildLayer command="abld resource" targetList="default_9.0" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld library" targetList="default_9.0" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld target" targetList="default_9.0" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld final" targetList="default_9.0" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld -what export" unitParallel="Y"/></task>
+    <task><buildLayer command="abld -what target" targetList="default_9.0_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld -what target" targetList="default_9.0_deb" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld help" unitParallel="Y"/></task>
+    <task><buildLayer command="abld -check build" targetList="default_9.0" unitParallel="Y" targetParallel="Y"/></task>
+  </configuration>
+    
+  <configuration name="GT_9.5_ARMV5SMP" description="9.5 ARMV5SMP build" filter="9.5,gt">
+    <ref item="os"/>
+    <ref item="mw"/>
+    <ref item="app"/>
+    <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+    <task><buildLayer command="abld export" unitParallel="Y"/></task>
+    <task><buildLayer command="abld makefile" targetList="armv5smp" unitParallel="Y" targetParallel="N"/></task>
+    <task><buildLayer command="abld resource" targetList="armv5smp" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld library" targetList="armv5smp" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld target" targetList="armv5smp" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld final" targetList="armv5smp" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld -what export" unitParallel="Y"/></task>
+    <task><buildLayer command="abld -what target" targetList="armv5smp_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld -what target" targetList="armv5smp_deb" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld help" unitParallel="Y"/></task>
+    <task><buildLayer command="abld -check build" targetList="armv5smp" unitParallel="Y" targetParallel="Y"/></task>
+  </configuration>
+  <configuration name="TV_9.5" description="9.5 Techview build" filter="9.5,techview">
+    <ref item="techview"/>
+    <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+    <task><buildLayer command="abld export" unitParallel="Y"/></task>
+    <task><buildLayer command="abld makefile" targetList="default_9.0" unitParallel="Y" targetParallel="N"/></task>
+    <task><buildLayer command="abld resource" targetList="default_9.0" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld library" targetList="default_9.0" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld target" targetList="default_9.0" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld final" targetList="default_9.0" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld -what export" unitParallel="Y"/></task>
+    <task><buildLayer command="abld -what target" targetList="default_9.0_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld -what target" targetList="default_9.0_deb" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld help" unitParallel="Y"/></task>
+    <task><buildLayer command="abld -check build" targetList="default_9.0" unitParallel="Y" targetParallel="Y"/></task>
+  </configuration>
+
+  <configuration name="SystemTest_9.5" description="9.5 System Test build" filter="9.5,systemtest">
+    <ref item="techview"/>
+    <task><specialInstructions name="Copy Systemtest Configuration" cwd="common/generic/SystemTest/Symbian/Group" command="copy 9.5\configuration.cfg %CleanSourceDir%\common\generic\SystemTest\Symbian\Group\"/></task>
+    <task>
+      <listRef list="SYSTEMTEST_LIST"/>
+      <buildLayer command="bldmake bldfiles" unitParallel="Y"/>
+    </task>
+    <task>
+      <listRef list="SYSTEMTEST_LIST"/>
+      <buildLayer command="abld export" unitParallel="Y"/>
+    </task>
+    <task>
+      <listRef list="SYSTEMTEST_LIST"/>
+      <buildLayer command="abld export -what" unitParallel="N"/>
+    </task>
+    <task>
+      <listRef list="SYSTEMTEST_LIST"/>
+      <buildLayer command="abld export -check" unitParallel="N"/>
+    </task>
+    <task>
+      <listRef list="SYSTEMTEST_LIST"/>
+      <buildLayer command="abld test build" targetList="default_9.0" unitParallel="N" targetParallel="N"/>
+    </task>
+    <task>
+      <listRef list="SYSTEMTEST_LIST"/>
+      <buildLayer command="abld test -what build" targetList="default_9.0" unitParallel="N" targetParallel="N"/>
+    </task>
+    <task>
+      <listRef list="SYSTEMTEST_LIST"/>
+      <buildLayer command="abld test -check build" targetList="default_9.0" unitParallel="N" targetParallel="N"/>
+    </task>
+  </configuration>
+
+  <configuration name="GCCXML_9.5" description="9.5 GCCXML build" filter="9.5,gt,techview">
+    <ref item="os"/>
+    <ref item="mw"/>
+    <ref item="app"/>
+    <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+    <task><buildLayer command="abld makefile" targetList="gccxml" unitParallel="Y" targetParallel="N"/></task>
+    <task><buildLayer command="abld resource" targetList="gccxml_rel" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld library" targetList="gccxml" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld target" targetList="gccxml_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld final" targetList="gccxml_rel" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld -what export" unitParallel="Y"/></task>
+    <task><buildLayer command="abld -what target" targetList="gccxml_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld help" unitParallel="Y"/></task>
+    <task><buildLayer command="abld -check build" targetList="gccxml_rel" unitParallel="Y" targetParallel="Y"/></task>
+  </configuration>
+ 
+
+    <!-- 9.6 configuration -->
+
+  <configuration name="Custkit_9.6" description="9.6 Custkit build" filter="9.6,custkit">
+    <ref item="os"/>
+    <ref item="mw"/>
+    <ref item="app"/>
+    <task><specialInstructions name="BootStrap1" cwd="cedar/generic/tools/e32toolp/group" command="setupprj.bat secure"/></task>
+    <task><specialInstructions name="BootStrap2" cwd="cedar/generic/tools/e32toolp/group" command="bld.bat rel"/></task>
+    <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+    <task><buildLayer command="abld export" unitParallel="Y"/></task>
+    <task><buildLayer command="abld makefile" targetList="tools" unitParallel="Y" targetParallel="N"/></task>
+    <task><buildLayer command="abld library" targetList="tools" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld target" targetList="tools_rel" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld final" targetList="tools_rel" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld -what build" targetList="tools_rel" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld -check build" targetList="tools_rel" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld makefile" targetList="tools2" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld library" targetList="tools2" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld target" targetList="tools2_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld final" targetList="tools2_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld -what build" targetList="tools2_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld -check build" targetList="tools2_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld makefile" targetList="default_9.0" unitParallel="Y" targetParallel="N"/></task>
+    <task><buildLayer command="abld resource" targetList="default_9.0" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld library" targetList="default_9.0" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld target" targetList="default_9.0" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld final" targetList="default_9.0" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld -what build" targetList="default_9.0" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld -check build" targetList="default_9.0" unitParallel="Y" targetParallel="Y"/></task>
+  </configuration>
+
+  <configuration name="GT_9.6_ARMV5SMP" description="9.6 ARMV5SMP build" filter="9.6,gt">
+    <ref item="os"/>
+    <ref item="mw"/>
+    <ref item="app"/>
+    <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+    <task><buildLayer command="abld export" unitParallel="Y"/></task>
+    <task><buildLayer command="abld makefile" targetList="armv5smp" unitParallel="Y" targetParallel="N"/></task>
+    <task><buildLayer command="abld resource" targetList="armv5smp" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld library" targetList="armv5smp" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld target" targetList="armv5smp" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld final" targetList="armv5smp" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld -what export" unitParallel="Y"/></task>
+    <task><buildLayer command="abld -what target" targetList="armv5smp_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld -what target" targetList="armv5smp_deb" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld help" unitParallel="Y"/></task>
+    <task><buildLayer command="abld -check build" targetList="armv5smp" unitParallel="Y" targetParallel="Y"/></task>
+  </configuration>
+  
+  <configuration name="GT_9.6" description="9.6 GT build" filter="9.6,gt">
+    <ref item="os"/>
+    <ref item="mw"/>
+    <ref item="app"/>
+    <task><specialInstructions name="BootStrap1" cwd="cedar/generic/tools/e32toolp/group" command="setupprj.bat secure"/></task>
+    <task><specialInstructions name="BootStrap2" cwd="cedar/generic/tools/e32toolp/group" command="bld.bat rel"/></task>
+    <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+    <task><buildLayer command="abld export" unitParallel="Y"/></task>
+    <task><buildLayer command="abld makefile" targetList="tools" unitParallel="Y" targetParallel="N"/></task>
+    <task><buildLayer command="abld library" targetList="tools" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld target" targetList="tools_rel" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld final" targetList="tools_rel" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld -what build" targetList="tools_rel" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld -check build" targetList="tools_rel" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld makefile" targetList="tools2" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld library" targetList="tools2" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld target" targetList="tools2_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld final" targetList="tools2_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld -what build" targetList="tools2_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld -check build" targetList="tools2_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld makefile" targetList="default_9.0" unitParallel="Y" targetParallel="N"/></task>
+    <task><buildLayer command="abld resource" targetList="default_9.0" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld library" targetList="default_9.0" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld target" targetList="default_9.0" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld final" targetList="default_9.0" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld -what export" unitParallel="Y"/></task>
+    <task><buildLayer command="abld -what target" targetList="default_9.0_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld -what target" targetList="default_9.0_deb" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld help" unitParallel="Y"/></task>
+    <task><buildLayer command="abld -check build" targetList="default_9.0" unitParallel="Y" targetParallel="Y"/></task>
+  </configuration>
+    
+  <configuration name="TV_9.6" description="9.6 Techview build" filter="9.6,techview">
+    <ref item="techview"/>
+    <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+    <task><buildLayer command="abld export" unitParallel="Y"/></task>
+    <task><buildLayer command="abld makefile" targetList="default_9.0" unitParallel="Y" targetParallel="N"/></task>
+    <task><buildLayer command="abld resource" targetList="default_9.0" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld library" targetList="default_9.0" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld target" targetList="default_9.0" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld final" targetList="default_9.0" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld -what export" unitParallel="Y"/></task>
+    <task><buildLayer command="abld -what target" targetList="default_9.0_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld -what target" targetList="default_9.0_deb" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld help" unitParallel="Y"/></task>
+    <task><buildLayer command="abld -check build" targetList="default_9.0" unitParallel="Y" targetParallel="Y"/></task>
+  </configuration>
+
+  <configuration name="SystemTest_9.6" description="9.6 System Test build" filter="9.6,systemtest">
+    <task><specialInstructions name="Copy Systemtest Configuration" cwd="common/generic/SystemTest/Symbian/Group" command="copy 9.6\configuration.cfg %CleanSourceDir%\common\generic\SystemTest\Symbian\Group\"/></task>
+    <task>
+      <listRef list="SYSTEMTEST_LIST"/>
+      <buildLayer command="bldmake bldfiles" unitParallel="Y"/>
+    </task>
+    <task>
+      <listRef list="SYSTEMTEST_LIST"/>
+      <buildLayer command="abld export" unitParallel="Y"/>
+    </task>
+    <task>
+      <listRef list="SYSTEMTEST_LIST"/>
+      <buildLayer command="abld export -what" unitParallel="N"/>
+    </task>
+    <task>
+      <listRef list="SYSTEMTEST_LIST"/>
+      <buildLayer command="abld export -check" unitParallel="N"/>
+    </task>
+    <task>
+      <listRef list="SYSTEMTEST_LIST"/>
+      <buildLayer command="abld test build" targetList="default_9.0" unitParallel="N" targetParallel="N"/>
+    </task>
+    <task>
+      <listRef list="SYSTEMTEST_LIST"/>
+      <buildLayer command="abld test -what build" targetList="default_9.0" unitParallel="N" targetParallel="N"/>
+    </task>
+    <task>
+      <listRef list="SYSTEMTEST_LIST"/>
+      <buildLayer command="abld test -check build" targetList="default_9.0" unitParallel="N" targetParallel="N"/>
+    </task>
+  </configuration>
+
+  <configuration name="GCCXML_9.6" description="9.6 GCCXML build" filter="9.6,gt,techview">
+    <ref item="os"/>
+    <ref item="mw"/>
+    <ref item="app"/>
+    <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+    <task><buildLayer command="abld makefile" targetList="gccxml" unitParallel="Y" targetParallel="N"/></task>
+    <task><buildLayer command="abld resource" targetList="gccxml_rel" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld library" targetList="gccxml" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld target" targetList="gccxml_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld final" targetList="gccxml_rel" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld -what export" unitParallel="Y"/></task>
+    <task><buildLayer command="abld -what target" targetList="gccxml_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld help" unitParallel="Y"/></task>
+    <task><buildLayer command="abld -check build" targetList="gccxml_rel" unitParallel="Y" targetParallel="Y"/></task>
+  </configuration>
+
+  
+  <!-- tb92 configuration -->
+
+  <configuration name="Custkit_tb92" description="tb92 Custkit build" filter="tb92,custkit">
+    <ref item="os"/>
+    <ref item="mw"/>
+    <ref item="app"/>
+    <task><specialInstructions name="BootStrap1" cwd="cedar/generic/tools/e32toolp/group" command="setupprj.bat secure"/></task>
+    <task><specialInstructions name="BootStrap2" cwd="cedar/generic/tools/e32toolp/group" command="bld.bat rel"/></task>
+    <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+    <task><buildLayer command="abld export" unitParallel="Y"/></task>
+    <task><buildLayer command="abld makefile" targetList="tools" unitParallel="Y" targetParallel="N"/></task>
+    <task><buildLayer command="abld library" targetList="tools" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld target" targetList="tools_rel" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld final" targetList="tools_rel" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld -what build" targetList="tools_rel" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld -check build" targetList="tools_rel" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld makefile" targetList="tools2" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld library" targetList="tools2" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld target" targetList="tools2_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld final" targetList="tools2_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld -what build" targetList="tools2_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld -check build" targetList="tools2_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld makefile" targetList="default_9.0" unitParallel="Y" targetParallel="N"/></task>
+    <task><buildLayer command="abld resource" targetList="default_9.0" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld library" targetList="default_9.0" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld target" targetList="default_9.0" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld final" targetList="default_9.0" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld -what build" targetList="default_9.0" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld -check build" targetList="default_9.0" unitParallel="Y" targetParallel="Y"/></task>
+  </configuration>
+
+  <configuration name="GT_tb92" description="tb92 GT build" filter="tb92,gt">
+    <ref item="os"/>
+    <ref item="mw"/>
+    <ref item="app"/>
+    <task><specialInstructions name="BootStrap1" cwd="cedar/generic/tools/e32toolp/group" command="setupprj.bat secure"/></task>
+    <task><specialInstructions name="BootStrap2" cwd="cedar/generic/tools/e32toolp/group" command="bld.bat rel"/></task>
+    <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+    <task><buildLayer command="abld export" unitParallel="Y"/></task>
+    <task><buildLayer command="abld makefile" targetList="tools" unitParallel="Y" targetParallel="N"/></task>
+    <task><buildLayer command="abld library" targetList="tools" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld target" targetList="tools_rel" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld final" targetList="tools_rel" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld -what build" targetList="tools_rel" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld -check build" targetList="tools_rel" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld makefile" targetList="tools2" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld library" targetList="tools2" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld target" targetList="tools2_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld final" targetList="tools2_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld -what build" targetList="tools2_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld -check build" targetList="tools2_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld makefile" targetList="default_9.0" unitParallel="Y" targetParallel="N"/></task>
+    <task><buildLayer command="abld resource" targetList="default_9.0" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld library" targetList="default_9.0" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld target" targetList="default_9.0" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld final" targetList="default_9.0" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld -what export" unitParallel="Y"/></task>
+    <task><buildLayer command="abld -what target" targetList="default_9.0_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld -what target" targetList="default_9.0_deb" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld help" unitParallel="Y"/></task>
+    <task><buildLayer command="abld -check build" targetList="default_9.0" unitParallel="Y" targetParallel="Y"/></task>
+  </configuration>
+    
+  <configuration name="GT_tb92_ARMV5SMP" description="tb92 ARMV5SMP build" filter="tb92,gt">
+    <ref item="os"/>
+    <ref item="mw"/>
+    <ref item="app"/>
+    <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+    <task><buildLayer command="abld export" unitParallel="Y"/></task>
+    <task><buildLayer command="abld makefile" targetList="armv5smp" unitParallel="Y" targetParallel="N"/></task>
+    <task><buildLayer command="abld resource" targetList="armv5smp" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld library" targetList="armv5smp" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld target" targetList="armv5smp" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld final" targetList="armv5smp" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld -what export" unitParallel="Y"/></task>
+    <task><buildLayer command="abld -what target" targetList="armv5smp_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld -what target" targetList="armv5smp_deb" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld help" unitParallel="Y"/></task>
+    <task><buildLayer command="abld -check build" targetList="armv5smp" unitParallel="Y" targetParallel="Y"/></task>
+  </configuration>
+  <configuration name="TV_tb92" description="tb92 Techview build" filter="tb92,techview">
+    <ref item="techview"/>
+    <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+    <task><buildLayer command="abld export" unitParallel="Y"/></task>
+    <task><buildLayer command="abld makefile" targetList="default_9.0" unitParallel="Y" targetParallel="N"/></task>
+    <task><buildLayer command="abld resource" targetList="default_9.0" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld library" targetList="default_9.0" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld target" targetList="default_9.0" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld final" targetList="default_9.0" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld -what export" unitParallel="Y"/></task>
+    <task><buildLayer command="abld -what target" targetList="default_9.0_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld -what target" targetList="default_9.0_deb" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld help" unitParallel="Y"/></task>
+    <task><buildLayer command="abld -check build" targetList="default_9.0" unitParallel="Y" targetParallel="Y"/></task>
+  </configuration>
+
+  <configuration name="SystemTest_tb92" description="tb92 System Test build" filter="tb92,systemtest">
+    <ref item="techview"/>
+    <task><specialInstructions name="Copy Systemtest Configuration" cwd="common/generic/SystemTest/Symbian/Group" command="copy tb92\configuration.cfg %CleanSourceDir%\common\generic\SystemTest\Symbian\Group\"/></task>
+    <task>
+      <listRef list="SYSTEMTEST_LIST"/>
+      <buildLayer command="bldmake bldfiles" unitParallel="Y"/>
+    </task>
+    <task>
+      <listRef list="SYSTEMTEST_LIST"/>
+      <buildLayer command="abld export" unitParallel="Y"/>
+    </task>
+    <task>
+      <listRef list="SYSTEMTEST_LIST"/>
+      <buildLayer command="abld export -what" unitParallel="N"/>
+    </task>
+    <task>
+      <listRef list="SYSTEMTEST_LIST"/>
+      <buildLayer command="abld export -check" unitParallel="N"/>
+    </task>
+    <task>
+      <listRef list="SYSTEMTEST_LIST"/>
+      <buildLayer command="abld test build" targetList="default_9.0" unitParallel="N" targetParallel="N"/>
+    </task>
+    <task>
+      <listRef list="SYSTEMTEST_LIST"/>
+      <buildLayer command="abld test -what build" targetList="default_9.0" unitParallel="N" targetParallel="N"/>
+    </task>
+    <task>
+      <listRef list="SYSTEMTEST_LIST"/>
+      <buildLayer command="abld test -check build" targetList="default_9.0" unitParallel="N" targetParallel="N"/>
+    </task>
+  </configuration>
+
+  <configuration name="GCCXML_tb92" description="tb92 GCCXML build" filter="tb92,gt,techview">
+    <ref item="os"/>
+    <ref item="mw"/>
+    <ref item="app"/>
+    <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+    <task><buildLayer command="abld makefile" targetList="gccxml" unitParallel="Y" targetParallel="N"/></task>
+    <task><buildLayer command="abld resource" targetList="gccxml_rel" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld library" targetList="gccxml" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld target" targetList="gccxml_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld final" targetList="gccxml_rel" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld -what export" unitParallel="Y"/></task>
+    <task><buildLayer command="abld -what target" targetList="gccxml_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld help" unitParallel="Y"/></task>
+    <task><buildLayer command="abld -check build" targetList="gccxml_rel" unitParallel="Y" targetParallel="Y"/></task>
+  </configuration>
+
+  <!-- tb92sf configuration -->
+
+  <configuration name="Custkit_tb92sf" description="tb92sf Custkit build" filter="tb92sf,custkit">
+    <ref item="os"/>
+    <ref item="mw"/>
+    <ref item="app"/>
+    <task><specialInstructions name="BootStrap1" cwd="os/buildtools/sbsv1_os/e32toolp/group" command="setupprj.bat secure"/></task>
+    <task><specialInstructions name="BootStrap2" cwd="os/buildtools/sbsv1_os/e32toolp/group" command="bld.bat rel"/></task>
+    <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+    <task><buildLayer command="abld export" unitParallel="Y"/></task>
+    <task><buildLayer command="abld makefile" targetList="tools" unitParallel="Y" targetParallel="N"/></task>
+    <task><buildLayer command="abld library" targetList="tools" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld target" targetList="tools_rel" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld final" targetList="tools_rel" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld -what build" targetList="tools_rel" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld -check build" targetList="tools_rel" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld makefile" targetList="tools2" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld library" targetList="tools2" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld target" targetList="tools2_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld final" targetList="tools2_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld -what build" targetList="tools2_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld -check build" targetList="tools2_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld makefile" targetList="default_9.0" unitParallel="Y" targetParallel="N"/></task>
+    <task><buildLayer command="abld resource" targetList="default_9.0" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld library" targetList="default_9.0" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld target" targetList="default_9.0" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld final" targetList="default_9.0" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld -what build" targetList="default_9.0" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld -check build" targetList="default_9.0" unitParallel="Y" targetParallel="Y"/></task>
+  </configuration>
+
+  <configuration name="GT_tb92sf" description="tb92sf GT build" filter="tb92sf,gt">
+    <ref item="os"/>
+    <ref item="mw"/>
+    <ref item="app"/>
+    <task><specialInstructions name="BootStrap1" cwd="os/buildtools/sbsv1_os/e32toolp/group" command="setupprj.bat secure"/></task>
+    <task><specialInstructions name="BootStrap2" cwd="os/buildtools/sbsv1_os/e32toolp/group" command="bld.bat rel"/></task>
+    <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+    <task><buildLayer command="abld export" unitParallel="Y"/></task>
+    <task><buildLayer command="abld makefile" targetList="tools" unitParallel="Y" targetParallel="N"/></task>
+    <task><buildLayer command="abld library" targetList="tools" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld target" targetList="tools_rel" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld final" targetList="tools_rel" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld -what build" targetList="tools_rel" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld -check build" targetList="tools_rel" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld makefile" targetList="tools2" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld library" targetList="tools2" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld target" targetList="tools2_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld final" targetList="tools2_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld -what build" targetList="tools2_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld -check build" targetList="tools2_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld makefile" targetList="default_9.0" unitParallel="Y" targetParallel="N"/></task>
+    <task><buildLayer command="abld resource" targetList="default_9.0" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld library" targetList="default_9.0" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld target" targetList="default_9.0" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld final" targetList="default_9.0" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld -what export" unitParallel="Y"/></task>
+    <task><buildLayer command="abld -what target" targetList="default_9.0_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld -what target" targetList="default_9.0_deb" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld help" unitParallel="Y"/></task>
+    <task><buildLayer command="abld -check build" targetList="default_9.0" unitParallel="Y" targetParallel="Y"/></task>
+  </configuration>
+    
+  <configuration name="GT_tb92sf_ARMV5SMP" description="tb92sf ARMV5SMP build" filter="tb92sf,gt">
+    <ref item="os"/>
+    <ref item="mw"/>
+    <ref item="app"/>
+    <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+    <task><buildLayer command="abld export" unitParallel="Y"/></task>
+    <task><buildLayer command="abld makefile" targetList="armv5smp" unitParallel="Y" targetParallel="N"/></task>
+    <task><buildLayer command="abld resource" targetList="armv5smp" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld library" targetList="armv5smp" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld target" targetList="armv5smp" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld final" targetList="armv5smp" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld -what export" unitParallel="Y"/></task>
+    <task><buildLayer command="abld -what target" targetList="armv5smp_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld -what target" targetList="armv5smp_deb" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld help" unitParallel="Y"/></task>
+    <task><buildLayer command="abld -check build" targetList="armv5smp" unitParallel="Y" targetParallel="Y"/></task>
+  </configuration>
+  <configuration name="TV_tb92sf" description="tb92sf Techview build" filter="tb92sf,techview">
+    <ref item="techview"/>
+    <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+    <task><buildLayer command="abld export" unitParallel="Y"/></task>
+    <task><buildLayer command="abld makefile" targetList="default_9.0" unitParallel="Y" targetParallel="N"/></task>
+    <task><buildLayer command="abld resource" targetList="default_9.0" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld library" targetList="default_9.0" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld target" targetList="default_9.0" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld final" targetList="default_9.0" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld -what export" unitParallel="Y"/></task>
+    <task><buildLayer command="abld -what target" targetList="default_9.0_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld -what target" targetList="default_9.0_deb" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld help" unitParallel="Y"/></task>
+    <task><buildLayer command="abld -check build" targetList="default_9.0" unitParallel="Y" targetParallel="Y"/></task>
+  </configuration>
+
+  <configuration name="SystemTest_tb92sf" description="tb92sf System Test build" filter="tb92sf,systemtest">
+    <ref item="techview"/>
+    <task><specialInstructions name="Copy Systemtest Configuration" cwd="app/techview/sysvalidation/systemtestos/Group" command="copy tb92sf\configuration.cfg %CleanSourceDir%\app\techview\sysvalidation\systemtestos\Group\"/></task>
+    <task>
+      <listRef list="SYSTEMTEST_LIST"/>
+      <buildLayer command="bldmake bldfiles" unitParallel="Y"/>
+    </task>
+    <task>
+      <listRef list="SYSTEMTEST_LIST"/>
+      <buildLayer command="abld export" unitParallel="Y"/>
+    </task>
+    <task>
+      <listRef list="SYSTEMTEST_LIST"/>
+      <buildLayer command="abld export -what" unitParallel="N"/>
+    </task>
+    <task>
+      <listRef list="SYSTEMTEST_LIST"/>
+      <buildLayer command="abld export -check" unitParallel="N"/>
+    </task>
+    <task>
+      <listRef list="SYSTEMTEST_LIST"/>
+      <buildLayer command="abld test build" targetList="default_9.0" unitParallel="N" targetParallel="N"/>
+    </task>
+    <task>
+      <listRef list="SYSTEMTEST_LIST"/>
+      <buildLayer command="abld test -what build" targetList="default_9.0" unitParallel="N" targetParallel="N"/>
+    </task>
+    <task>
+      <listRef list="SYSTEMTEST_LIST"/>
+      <buildLayer command="abld test -check build" targetList="default_9.0" unitParallel="N" targetParallel="N"/>
+    </task>
+  </configuration>
+
+  <configuration name="GCCXML_tb92sf" description="tb92sf GCCXML build" filter="tb92sf,gt,techview">
+    <ref item="os"/>
+    <ref item="mw"/>
+    <ref item="app"/>
+    <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+    <task><buildLayer command="abld makefile" targetList="gccxml" unitParallel="Y" targetParallel="N"/></task>
+    <task><buildLayer command="abld resource" targetList="gccxml_rel" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld library" targetList="gccxml" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld target" targetList="gccxml_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld final" targetList="gccxml_rel" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld -what export" unitParallel="Y"/></task>
+    <task><buildLayer command="abld -what target" targetList="gccxml_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld help" unitParallel="Y"/></task>
+    <task><buildLayer command="abld -check build" targetList="gccxml_rel" unitParallel="Y" targetParallel="Y"/></task>
+  </configuration>
+
+<!-- tb101sf configuration -->
+
+  <configuration name="Custkit_tb101sf" description="tb101sf Custkit build" filter="tb101sf,custkit">
+    <ref item="os"/>
+    <ref item="mw"/>
+    <ref item="app"/>
+    <task><specialInstructions name="BootStrap1" cwd="os/buildtools/sbsv1_os/e32toolp/group" command="setupprj.bat secure"/></task>
+    <task><specialInstructions name="BootStrap2" cwd="os/buildtools/sbsv1_os/e32toolp/group" command="bld.bat rel"/></task>
+    <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+    <task><buildLayer command="abld export" unitParallel="Y"/></task>
+    <task><buildLayer command="abld makefile" targetList="tools" unitParallel="Y" targetParallel="N"/></task>
+    <task><buildLayer command="abld library" targetList="tools" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld target" targetList="tools_rel" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld final" targetList="tools_rel" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld -what build" targetList="tools_rel" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld -check build" targetList="tools_rel" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld makefile" targetList="tools2" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld library" targetList="tools2" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld target" targetList="tools2_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld final" targetList="tools2_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld -what build" targetList="tools2_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld -check build" targetList="tools2_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld makefile" targetList="default_9.0" unitParallel="Y" targetParallel="N"/></task>
+    <task><buildLayer command="abld resource" targetList="default_9.0" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld library" targetList="default_9.0" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld target" targetList="default_9.0" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld final" targetList="default_9.0" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld -what build" targetList="default_9.0" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld -check build" targetList="default_9.0" unitParallel="Y" targetParallel="Y"/></task>
+  </configuration>
+
+  <configuration name="GT_tb101sf" description="tb101sf GT build" filter="tb101sf,gt">
+    <ref item="os"/>
+    <ref item="mw"/>
+    <ref item="app"/>
+    <task><specialInstructions name="BootStrap1" cwd="os/buildtools/sbsv1_os/e32toolp/group" command="setupprj.bat secure"/></task>
+    <task><specialInstructions name="BootStrap2" cwd="os/buildtools/sbsv1_os/e32toolp/group" command="bld.bat rel"/></task>
+    <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+    <task><buildLayer command="abld export" unitParallel="Y"/></task>
+    <task><buildLayer command="abld makefile" targetList="tools" unitParallel="Y" targetParallel="N"/></task>
+    <task><buildLayer command="abld library" targetList="tools" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld target" targetList="tools_rel" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld final" targetList="tools_rel" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld -what build" targetList="tools_rel" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld -check build" targetList="tools_rel" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld makefile" targetList="tools2" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld library" targetList="tools2" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld target" targetList="tools2_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld final" targetList="tools2_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld -what build" targetList="tools2_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld -check build" targetList="tools2_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld makefile" targetList="default_9.0" unitParallel="Y" targetParallel="N"/></task>
+    <task><buildLayer command="abld resource" targetList="default_9.0" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld library" targetList="default_9.0" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld target" targetList="default_9.0" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld final" targetList="default_9.0" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld -what export" unitParallel="Y"/></task>
+    <task><buildLayer command="abld -what target" targetList="default_9.0_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld -what target" targetList="default_9.0_deb" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld help" unitParallel="Y"/></task>
+    <task><buildLayer command="abld -check build" targetList="default_9.0" unitParallel="Y" targetParallel="Y"/></task>
+  </configuration>
+    
+  <configuration name="GT_tb101sf_ARMV5SMP" description="tb101sf ARMV5SMP build" filter="tb101sf,gt">
+    <ref item="os"/>
+    <ref item="mw"/>
+    <ref item="app"/>
+    <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+    <task><buildLayer command="abld export" unitParallel="Y"/></task>
+    <task><buildLayer command="abld makefile" targetList="armv5smp" unitParallel="Y" targetParallel="N"/></task>
+    <task><buildLayer command="abld resource" targetList="armv5smp" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld library" targetList="armv5smp" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld target" targetList="armv5smp" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld final" targetList="armv5smp" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld -what export" unitParallel="Y"/></task>
+    <task><buildLayer command="abld -what target" targetList="armv5smp_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld -what target" targetList="armv5smp_deb" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld help" unitParallel="Y"/></task>
+    <task><buildLayer command="abld -check build" targetList="armv5smp" unitParallel="Y" targetParallel="Y"/></task>
+  </configuration>
+  <configuration name="TV_tb101sf" description="tb101sf Techview build" filter="tb101sf,techview">
+    <ref item="techview"/>
+    <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+    <task><buildLayer command="abld export" unitParallel="Y"/></task>
+    <task><buildLayer command="abld makefile" targetList="default_9.0" unitParallel="Y" targetParallel="N"/></task>
+    <task><buildLayer command="abld resource" targetList="default_9.0" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld library" targetList="default_9.0" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld target" targetList="default_9.0" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld final" targetList="default_9.0" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld -what export" unitParallel="Y"/></task>
+    <task><buildLayer command="abld -what target" targetList="default_9.0_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld -what target" targetList="default_9.0_deb" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld help" unitParallel="Y"/></task>
+    <task><buildLayer command="abld -check build" targetList="default_9.0" unitParallel="Y" targetParallel="Y"/></task>
+  </configuration>
+
+  <configuration name="SystemTest_tb101sf" description="tb101sf System Test build" filter="tb101sf,systemtest">
+    <ref item="techview"/>
+    <task><specialInstructions name="Copy Systemtest Configuration" cwd="app/techview/sysvalidation/systemtestos/Group" command="copy tb101sf\configuration.cfg %CleanSourceDir%\app\techview\sysvalidation\systemtestos\Group\"/></task>
+    <task>
+      <listRef list="SYSTEMTEST_LIST"/>
+      <buildLayer command="bldmake bldfiles" unitParallel="Y"/>
+    </task>
+    <task>
+      <listRef list="SYSTEMTEST_LIST"/>
+      <buildLayer command="abld export" unitParallel="Y"/>
+    </task>
+    <task>
+      <listRef list="SYSTEMTEST_LIST"/>
+      <buildLayer command="abld export -what" unitParallel="N"/>
+    </task>
+    <task>
+      <listRef list="SYSTEMTEST_LIST"/>
+      <buildLayer command="abld export -check" unitParallel="N"/>
+    </task>
+    <task>
+      <listRef list="SYSTEMTEST_LIST"/>
+      <buildLayer command="abld test build" targetList="default_9.0" unitParallel="N" targetParallel="N"/>
+    </task>
+    <task>
+      <listRef list="SYSTEMTEST_LIST"/>
+      <buildLayer command="abld test -what build" targetList="default_9.0" unitParallel="N" targetParallel="N"/>
+    </task>
+    <task>
+      <listRef list="SYSTEMTEST_LIST"/>
+      <buildLayer command="abld test -check build" targetList="default_9.0" unitParallel="N" targetParallel="N"/>
+    </task>
+	    <task>
+      <listRef list="SYSTEMTEST_LIST_INTEGTESTSMP"/>
+      <buildLayer command="bldmake bldfiles" unitParallel="Y"/>
+    </task>
+    <task>
+      <listRef list="SYSTEMTEST_LIST_INTEGTESTSMP"/>
+      <buildLayer command="abld export" unitParallel="Y"/>
+    </task>
+    <task>
+      <listRef list="SYSTEMTEST_LIST_INTEGTESTSMP"/>
+      <buildLayer command="abld export -what" unitParallel="N"/>
+    </task>
+    <task>
+      <listRef list="SYSTEMTEST_LIST_INTEGTESTSMP"/>
+      <buildLayer command="abld export -check" unitParallel="N"/>
+    </task>
+    <task>
+      <listRef list="SYSTEMTEST_LIST_INTEGTESTSMP"/>
+      <buildLayer command="abld test build" targetList="default_9.0" unitParallel="N" targetParallel="N"/>
+    </task>
+    <task>
+      <listRef list="SYSTEMTEST_LIST_INTEGTESTSMP"/>
+      <buildLayer command="abld test -what build" targetList="default_9.0" unitParallel="N" targetParallel="N"/>
+    </task>
+    <task>
+      <listRef list="SYSTEMTEST_LIST_INTEGTESTSMP"/>
+      <buildLayer command="abld test -check build" targetList="default_9.0" unitParallel="N" targetParallel="N"/>
+    </task>
+  </configuration>
+
+  <configuration name="GCCXML_tb101sf" description="tb101sf GCCXML build" filter="tb101sf,gt,techview">
+    <ref item="os"/>
+    <ref item="mw"/>
+    <ref item="app"/>
+    <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+    <task><buildLayer command="abld makefile" targetList="gccxml" unitParallel="Y" targetParallel="N"/></task>
+    <task><buildLayer command="abld resource" targetList="gccxml_rel" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld library" targetList="gccxml" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld target" targetList="gccxml_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld final" targetList="gccxml_rel" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld -what export" unitParallel="Y"/></task>
+    <task><buildLayer command="abld -what target" targetList="gccxml_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld help" unitParallel="Y"/></task>
+    <task><buildLayer command="abld -check build" targetList="gccxml_rel" unitParallel="Y" targetParallel="Y"/></task>
+  </configuration>
+
+
+<!-- Future configuration -->
+
+  <configuration name="Custkit_Future" description="Future Custkit build" filter="Future,custkit">
+    <ref item="os"/>
+    <ref item="mw"/>
+    <ref item="app"/>
+    <task><specialInstructions name="BootStrap1" cwd="os/buildtools/sbsv1_os/e32toolp/group" command="setupprj.bat secure"/></task>
+    <task><specialInstructions name="BootStrap2" cwd="os/buildtools/sbsv1_os/e32toolp/group" command="bld.bat rel"/></task>
+    <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+    <task><buildLayer command="abld export" unitParallel="Y"/></task>
+    <task><buildLayer command="abld makefile" targetList="tools" unitParallel="Y" targetParallel="N"/></task>
+    <task><buildLayer command="abld library" targetList="tools" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld target" targetList="tools_rel" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld final" targetList="tools_rel" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld -what build" targetList="tools_rel" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld -check build" targetList="tools_rel" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld makefile" targetList="tools2" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld library" targetList="tools2" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld target" targetList="tools2_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld final" targetList="tools2_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld -what build" targetList="tools2_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld -check build" targetList="tools2_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld makefile" targetList="default_9.0" unitParallel="Y" targetParallel="N"/></task>
+    <task><buildLayer command="abld resource" targetList="default_9.0" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld library" targetList="default_9.0" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld target" targetList="default_9.0" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld final" targetList="default_9.0" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld -what build" targetList="default_9.0" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld -check build" targetList="default_9.0" unitParallel="Y" targetParallel="Y"/></task>
+  </configuration>
+
+  <configuration name="GT_Future" description="Future GT build" filter="Future,gt">
+    <ref item="os"/>
+    <ref item="mw"/>
+    <ref item="app"/>
+    <task><specialInstructions name="BootStrap1" cwd="os/buildtools/sbsv1_os/e32toolp/group" command="setupprj.bat secure"/></task>
+    <task><specialInstructions name="BootStrap2" cwd="os/buildtools/sbsv1_os/e32toolp/group" command="bld.bat rel"/></task>
+    <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+    <task><buildLayer command="abld export" unitParallel="Y"/></task>
+    <task><buildLayer command="abld makefile" targetList="tools" unitParallel="Y" targetParallel="N"/></task>
+    <task><buildLayer command="abld library" targetList="tools" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld target" targetList="tools_rel" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld final" targetList="tools_rel" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld -what build" targetList="tools_rel" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld -check build" targetList="tools_rel" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld makefile" targetList="tools2" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld library" targetList="tools2" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld target" targetList="tools2_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld final" targetList="tools2_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld -what build" targetList="tools2_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld -check build" targetList="tools2_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld makefile" targetList="default_9.0" unitParallel="Y" targetParallel="N"/></task>
+    <task><buildLayer command="abld resource" targetList="default_9.0" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld library" targetList="default_9.0" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld target" targetList="default_9.0" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld final" targetList="default_9.0" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld -what export" unitParallel="Y"/></task>
+    <task><buildLayer command="abld -what target" targetList="default_9.0_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld -what target" targetList="default_9.0_deb" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld help" unitParallel="Y"/></task>
+    <task><buildLayer command="abld -check build" targetList="default_9.0" unitParallel="Y" targetParallel="Y"/></task>
+  </configuration>
+    
+  <configuration name="GT_Future_ARMV5SMP" description="Future ARMV5SMP build" filter="Future,gt">
+    <ref item="os"/>
+    <ref item="mw"/>
+    <ref item="app"/>
+    <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+    <task><buildLayer command="abld export" unitParallel="Y"/></task>
+    <task><buildLayer command="abld makefile" targetList="armv5smp" unitParallel="Y" targetParallel="N"/></task>
+    <task><buildLayer command="abld resource" targetList="armv5smp" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld library" targetList="armv5smp" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld target" targetList="armv5smp" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld final" targetList="armv5smp" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld -what export" unitParallel="Y"/></task>
+    <task><buildLayer command="abld -what target" targetList="armv5smp_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld -what target" targetList="armv5smp_deb" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld help" unitParallel="Y"/></task>
+    <task><buildLayer command="abld -check build" targetList="armv5smp" unitParallel="Y" targetParallel="Y"/></task>
+  </configuration>
+  <configuration name="TV_Future" description="Future Techview build" filter="Future,techview">
+    <ref item="techview"/>
+    <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+    <task><buildLayer command="abld export" unitParallel="Y"/></task>
+    <task><buildLayer command="abld makefile" targetList="default_9.0" unitParallel="Y" targetParallel="N"/></task>
+    <task><buildLayer command="abld resource" targetList="default_9.0" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld library" targetList="default_9.0" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld target" targetList="default_9.0" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld final" targetList="default_9.0" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld -what export" unitParallel="Y"/></task>
+    <task><buildLayer command="abld -what target" targetList="default_9.0_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld -what target" targetList="default_9.0_deb" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld help" unitParallel="Y"/></task>
+    <task><buildLayer command="abld -check build" targetList="default_9.0" unitParallel="Y" targetParallel="Y"/></task>
+  </configuration>
+
+  <configuration name="SystemTest_Future" description="Future System Test build" filter="Future,systemtest">
+    <ref item="techview"/>
+    <task><specialInstructions name="Copy Systemtest Configuration" cwd="app/techview/sysvalidation/systemtestos/Group" command="copy future\configuration.cfg %CleanSourceDir%\app\techview\sysvalidation\systemtestos\Group\"/></task>
+    <task>
+      <listRef list="SYSTEMTEST_LIST"/>
+      <buildLayer command="bldmake bldfiles" unitParallel="Y"/>
+    </task>
+    <task>
+      <listRef list="SYSTEMTEST_LIST"/>
+      <buildLayer command="abld export" unitParallel="Y"/>
+    </task>
+    <task>
+      <listRef list="SYSTEMTEST_LIST"/>
+      <buildLayer command="abld export -what" unitParallel="N"/>
+    </task>
+    <task>
+      <listRef list="SYSTEMTEST_LIST"/>
+      <buildLayer command="abld export -check" unitParallel="N"/>
+    </task>
+    <task>
+      <listRef list="SYSTEMTEST_LIST"/>
+      <buildLayer command="abld test build" targetList="default_9.0" unitParallel="N" targetParallel="N"/>
+    </task>
+    <task>
+      <listRef list="SYSTEMTEST_LIST"/>
+      <buildLayer command="abld test -what build" targetList="default_9.0" unitParallel="N" targetParallel="N"/>
+    </task>
+    <task>
+      <listRef list="SYSTEMTEST_LIST"/>
+      <buildLayer command="abld test -check build" targetList="default_9.0" unitParallel="N" targetParallel="N"/>
+    </task>
+	    <task>
+      <listRef list="SYSTEMTEST_LIST_INTEGTESTSMP"/>
+      <buildLayer command="bldmake bldfiles" unitParallel="Y"/>
+    </task>
+    <task>
+      <listRef list="SYSTEMTEST_LIST_INTEGTESTSMP"/>
+      <buildLayer command="abld export" unitParallel="Y"/>
+    </task>
+    <task>
+      <listRef list="SYSTEMTEST_LIST_INTEGTESTSMP"/>
+      <buildLayer command="abld export -what" unitParallel="N"/>
+    </task>
+    <task>
+      <listRef list="SYSTEMTEST_LIST_INTEGTESTSMP"/>
+      <buildLayer command="abld export -check" unitParallel="N"/>
+    </task>
+    <task>
+      <listRef list="SYSTEMTEST_LIST_INTEGTESTSMP"/>
+      <buildLayer command="abld test build" targetList="default_9.0" unitParallel="N" targetParallel="N"/>
+    </task>
+    <task>
+      <listRef list="SYSTEMTEST_LIST_INTEGTESTSMP"/>
+      <buildLayer command="abld test -what build" targetList="default_9.0" unitParallel="N" targetParallel="N"/>
+    </task>
+    <task>
+      <listRef list="SYSTEMTEST_LIST_INTEGTESTSMP"/>
+      <buildLayer command="abld test -check build" targetList="default_9.0" unitParallel="N" targetParallel="N"/>
+    </task>
+  </configuration>
+
+  <configuration name="GCCXML_Future" description="Future GCCXML build" filter="Future,gt,techview">
+    <ref item="os"/>
+    <ref item="mw"/>
+    <ref item="app"/>
+    <task><buildLayer command="bldmake bldfiles" unitParallel="Y"/></task>
+    <task><buildLayer command="abld makefile" targetList="gccxml" unitParallel="Y" targetParallel="N"/></task>
+    <task><buildLayer command="abld resource" targetList="gccxml_rel" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld library" targetList="gccxml" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld target" targetList="gccxml_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld final" targetList="gccxml_rel" unitParallel="N" targetParallel="N"/></task>
+    <task><buildLayer command="abld -what export" unitParallel="Y"/></task>
+    <task><buildLayer command="abld -what target" targetList="gccxml_rel" unitParallel="Y" targetParallel="Y"/></task>
+    <task><buildLayer command="abld help" unitParallel="Y"/></task>
+    <task><buildLayer command="abld -check build" targetList="gccxml_rel" unitParallel="Y" targetParallel="Y"/></task>
+  </configuration>
+</SystemBuild>

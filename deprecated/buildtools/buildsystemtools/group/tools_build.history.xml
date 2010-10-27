@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<relnotes name="BUILDSYSTEMTOOLS">
+  <purpose>
+  </purpose>
+
+  <defect number="PDEF117063" title="scanlog module name is not case consistent" revision="004">
+     Renamed scanlog.pm to Scanlog.pm. Updated PRJ_EXPORTS for Scanlog.pm.
+  </defect>
+
+  <defect number="DEF120924" title="Exports fail on Linux due to wrong filename / directory case" revision="003">
+     Exports fail on Linux due to wrong filename / directory case    
+  </defect>
+
+  <minorchange revision="002">
+    Removed graphics_graphicssurfaces unit, which is an obsolete prototype implementation. The "Graphics Surfaces" component remains in the model, and will eventually contain the production implementation of this feature.
+  </minorchange>
+
+  <minorchange revision="001">
+    Enable additional components in the v9.5 configuration. The extra components are in the graphics subsystem, associated with PREQ1004 (egl, eglheader, openvg, openvgheaders) and PREQ1007 (graphicssurfaces).
+  </minorchange>
+</relnotes>
